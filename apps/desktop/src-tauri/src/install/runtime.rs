@@ -598,6 +598,7 @@ mod tests {
                 file("config/c.toml", false),
             ],
             optional_files: vec![],
+            optional_groups: vec![],
             pinned: false,
             game_type: GameType::Minecraft,
             emulator: None,

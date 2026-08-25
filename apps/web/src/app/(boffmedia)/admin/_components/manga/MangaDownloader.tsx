@@ -69,7 +69,11 @@ function ScraperSourcesPanel() {
               <span className="text-[13px] font-medium text-txt">{t("tunnel")}</span>
               <span className="text-[11px] text-txt-dim">{t("tunnelDesc")}</span>
             </div>
-            <Toggle on={browserConfig.tunnelEnabled} onChange={handleTunnelToggle} />
+            <Toggle
+              on={browserConfig.tunnelEnabled}
+              onChange={handleTunnelToggle}
+              ariaLabel={t("tunnel")}
+            />
           </div>
         )}
       </div>

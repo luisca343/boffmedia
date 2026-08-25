@@ -43,6 +43,7 @@ function toVersion(pack: WirePack): PackVersionSummary | null {
     // left it perpetually null, so an emulator pack could never resolve its kind.
     emulatorKind: v.emulatorKind ?? null,
     fileCount: v.fileCount,
+    optionalFeatureCount: v.optionalFeatureCount ?? 0,
     createdAt: v.createdAt,
   }
 }
@@ -76,6 +77,10 @@ function toLocalEntry(manifest: PackManifest): PackEntry {
       loaderVersion: loaderEntry?.[1] ?? null,
       emulatorKind: null,
       fileCount: manifest.version.files.length,
+      optionalFeatureCount: (
+        (manifest.version as { optionalGroups?: { features?: unknown[] }[] })
+          .optionalGroups ?? []
+      ).reduce((total, group) => total + (group.features?.length ?? 0), 0),
       createdAt: manifest.version.createdAt,
     },
     // A local pack is always "on disk" as a document; install/launch runs the

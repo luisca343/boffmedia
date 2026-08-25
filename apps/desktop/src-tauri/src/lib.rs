@@ -31,6 +31,8 @@ pub mod local_packs;
 pub mod meta;
 pub mod mrpack;
 pub mod pack;
+/// Publishing a local pack to the registry (Phase 6).
+pub mod publish;
 pub mod randomizer;
 pub mod settings;
 pub mod tool_api;
@@ -133,6 +135,8 @@ pub fn run() {
             install::instance_unpin,
             install::instance_optional,
             install::instance_optional_set,
+            install::instance_optional_model,
+            install::instance_feature_set,
             // Per-instance Java runtime + memory.
             install::instance_runtime,
             install::instance_runtime_set,
@@ -165,6 +169,8 @@ pub fn run() {
             updates::updates_install,
             status::server_status,
             local_packs::local_packs_list,
+            publish::pack_publish_plan,
+            publish::pack_publish,
             local_packs::local_pack_get,
             local_packs::local_pack_save,
             local_packs::local_pack_delete,
@@ -200,7 +206,12 @@ pub fn run() {
             catalog::catalog_resolve_url,
             icons::icon_cache,
             catalog::catalog_versions_by_ids,
+            catalog::catalog_versions_by_hashes,
             install::instance_content,
+            install::instance_extra_files,
+            install::instance_extra_set_enabled,
+            install::instance_extra_delete,
+            install::instance_install_files,
             browse::instance_browse,
             browse::instance_delete_path,
             browse::instance_delete,

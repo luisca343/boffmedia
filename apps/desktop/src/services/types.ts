@@ -49,6 +49,9 @@ export type PackVersionSummary = {
   /** For emulator packs: "mgba" | "melonds". For others: null. */
   emulatorKind?: "mgba" | "melonds" | null
   fileCount: number
+  /** How many things the player can switch on or off. Zero for a pack that
+   *  installs everything it has, which is most of them. */
+  optionalFeatureCount?: number
   createdAt: string
 }
 
@@ -311,6 +314,78 @@ export type OptionalFile = {
   name: string
   size: number
   enabled: boolean
+}
+
+// ── Optional content ───────────────────────────────────────────────────────
+//
+// Re-exported rather than redeclared. The same shapes are rendered by the
+// launcher's chooser, the web admin's editor and a pack's public page, so they
+// live in `@boffmedia/ui` where all three can reach them — and a second copy
+// here would be a second thing to keep in step with Rust's
+// `install/optional.rs`, which is what actually serialises them.
+export type {
+  Activation,
+  OptionalFeature,
+  OptionalGroup,
+  OptionalSelect,
+} from "@boffmedia/ui"
+
+import type { OptionalGroup as OptionalGroupShape } from "@boffmedia/ui"
+
+/** What one toggle did. A toggle is rarely one feature: group exclusivity and
+ *  `requires` mean switching Shaders on can move three. Launcher-only — it
+ *  describes a change to an INSTALLED instance, which is the one surface the
+ *  web has no equivalent of. */
+export type FeatureSetResult = {
+  /** The whole model again, so the caller re-renders from one source of truth
+   *  rather than patching the row it guessed at. */
+  groups: OptionalGroupShape[]
+  /** Feature ids whose effective state changed, including the one asked for. */
+  changed: string[]
+  /** Paths now wanted that are not on disk. Feed these to
+   *  `instanceInstallFiles` to fetch them without a full install pass. */
+  missing: string[]
+  /** The choice is saved but its config edit waits for the next launch:
+   *  Minecraft rewrites `options.txt` from memory when it exits, so anything
+   *  written while it is open would vanish silently (D3). */
+  deferred: boolean
+}
+
+// ── Publishing a local pack ────────────────────────────────────────────────
+
+/** The preflight the publish screen renders, before anything leaves the machine.
+ *
+ *  Every field answers a question worth having in advance: is the pack valid at
+ *  all, how many megabytes are ACTUALLY about to move (the server may already
+ *  hold most of the blobs), and does this create a pack or add a version to one
+ *  that already exists. */
+export type PublishPlan = {
+  slug: string
+  packName: string
+  versionName: string
+  /** Empty when the manifest is valid. Each entry is one schema violation, in
+   *  the words the shared schema itself produced — the same schema the API runs,
+   *  so a clean preflight means the upload will not be refused for shape. */
+  errors: string[]
+  /** Non-fatal. A datapack shipped without a global loader is the current one. */
+  warnings: string[]
+  fileCount: number
+  overrideCount: number
+  /** The actual upload list: overrides the server does not have yet. */
+  missingBlobs: string[]
+  uploadBytes: number
+  existingPackId: string | null
+  hasIcon: boolean
+  optionalFeatureCount: number
+}
+
+export type PublishResult = {
+  packId: string
+  versionId: string
+  /** False means it landed as a draft — created, stored, and invisible to every
+   *  launcher until someone publishes it. */
+  published: boolean
+  uploadedBlobs: number
 }
 
 // ── Version metadata (local pack pickers) ──────────────────────────────────

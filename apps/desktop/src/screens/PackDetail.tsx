@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import {
   Badge,
@@ -33,6 +33,8 @@ import { BrowsePage } from "../components/pack/BrowsePage"
 import { getModule } from "../services/gameModules"
 import { BackupsTab } from "../components/pack/BackupsTab"
 import { ContentTab } from "../components/pack/ContentTab"
+import { OptionalPanel } from "../components/pack/OptionalPanel"
+import { PublishDialog } from "../components/pack/PublishDialog"
 import { FilesTab } from "../components/pack/FilesTab"
 import { GalleryTab } from "../components/pack/GalleryTab"
 import { ScreenshotsTab } from "../components/pack/ScreenshotsTab"
@@ -51,7 +53,9 @@ import {
   localPackIconSet,
   localPackSave,
   filePicker,
+  openUrl,
   provideFile,
+  webBaseUrl,
 } from "../runtime"
 import { DeleteLocalPackModal, UninstallPackModal } from "../components/pack/PackDeleteDialogs"
 import { useApp } from "../state/app"
@@ -272,12 +276,16 @@ export function PackDetail() {
   // The delete / uninstall / open-folder actions are library vocabulary shared
   // with the packs screen, so their labels live in the `packs` namespace.
   const tk = useT("packs")
+  // The optional-content strings live in the `content` namespace with the rest
+  // of the chooser's, so this panel and the Content tab cannot drift apart.
+  const tc = useT("content")
   const { selected, install, play, repair, stop, game, go, logs, reloadPacks, offline, editIntent, clearEditIntent } =
     useApp()
   const now = useNow(game.kind === "running")
   const [editing, setEditing] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [exportingServer, setExportingServer] = useState(false)
+  const [publishing, setPublishing] = useState(false)
   const [duplicating, setDuplicating] = useState(false)
   const [showDelete, setShowDelete] = useState(false)
   const [showUninstall, setShowUninstall] = useState(false)
@@ -286,6 +294,27 @@ export function PackDetail() {
   const [contentNonce, setContentNonce] = useState(0)
   const [providingFile, setProvidingFile] = useState<string | null>(null)
   const [fileError, setFileError] = useState<{ path: string; message: string } | null>(null)
+  // The Content tab's rows describe what is ON DISK, and an install or a launch
+  // changes that from outside the tab. Without this the badges an install just
+  // made true stay false until the player navigates away and back — which is
+  // exactly what "instalé el pack y los mods siguen sin instalar" was.
+  //
+  // Keyed on the FALLING edge of `installing` rather than on every state
+  // change, so an unrelated re-scan does not refetch the whole list. A launch
+  // is covered by the same edge: it re-verifies the instance and emits install
+  // progress while it does, so `play` passes through `installing` too.
+  const installPhase = selected?.state.kind
+  const wasInstalling = useRef(false)
+  useEffect(() => {
+    if (installPhase === "installing") {
+      wasInstalling.current = true
+      return
+    }
+    if (!wasInstalling.current) return
+    wasInstalling.current = false
+    setContentNonce((n) => n + 1)
+  }, [installPhase])
+
   // A local pack's icon is a file on disk (a data: URL), not the manifest's
   // iconUrl; resolve it here so the header prefers it. Re-runs when contentNonce
   // bumps after an icon edit.
@@ -436,6 +465,11 @@ export function PackDetail() {
       icon: "upload",
       onSelect: () => void doExport(true),
     },
+    // Offered to everyone; the API is what enforces BOFF_ADMIN. Hiding it based
+    // on a role the renderer would have to guess at is how a button ends up
+    // lying about what it does — a 403 with a real message is more honest than
+    // an entry that silently is not there.
+    { label: t("publishMenu"), icon: "globe", onSelect: () => setPublishing(true) },
     ...(hasFiles ? [openFolder] : []),
     { sep: true },
     {
@@ -447,6 +481,18 @@ export function PackDetail() {
     },
   ]
   const managedMenuItems: MenuItem[] = [
+    // Public packs only, matching the API: password and allowlist packs have no
+    // public page at all, so offering the link would open a 404 and quietly
+    // suggest that a private pack is shareable.
+    ...(pack.accessKind === "public"
+      ? [
+          {
+            label: t("sharePageMenu"),
+            icon: "globe" as const,
+            onSelect: () => void openUrl(`${webBaseUrl()}/app/packs/${pack.slug}`),
+          },
+        ]
+      : []),
     openFolder,
     {
       label: tk("uninstallMenu"),
@@ -773,15 +819,25 @@ export function PackDetail() {
 
       {tab === "content" && (
         <ContentTab
-          key={contentNonce}
           slug={pack.slug}
+          packId={pack.id}
           isLocal={isLocal}
           minecraft={latest?.minecraft ?? ""}
           loader={latest?.loader ?? null}
           onBrowse={() => setBrowsing(true)}
           onChanged={reloadPacks}
+          // A prop, not a `key`: remounting would also throw away the search
+          // box, the category filter and the live per-file download state.
+          refreshKey={contentNonce}
         />
       )}
+
+      <PublishDialog
+        slug={pack.slug}
+        open={publishing}
+        onClose={() => setPublishing(false)}
+        onPublished={reloadPacks}
+      />
 
       {tab === "files" && <FilesTab slug={pack.slug} />}
 
@@ -814,6 +870,23 @@ export function PackDetail() {
               <p className="whitespace-pre-wrap text-sm text-txt-muted">{pack.description}</p>
             </Panel>
           )}
+          {/* The install-time step. Here rather than behind the Install button
+              because a modal in front of a download is a modal people dismiss:
+              this is the screen they are already reading while deciding, and
+              choosing NOW is what keeps a declined 400 MB shaderpack from ever
+              being fetched. The Content tab keeps the same switches afterwards,
+              so nothing is decided permanently. */}
+          {state.kind === "not-installed" && (
+            <Panel title={tc("optionalTitle")}>
+              <OptionalPanel
+                slug={pack.slug}
+                packId={pack.id}
+                isLocal={isLocal}
+                preInstall
+                onChanged={reloadPacks}
+              />
+            </Panel>
+          )}
           <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
             <Panel title={t("info.version")}>
               <DataList
@@ -823,6 +896,13 @@ export function PackDetail() {
                   module.detailTabs?.some((t) => t.value === "content") && { label: t("info.minecraft"), value: latest?.minecraft ?? "—", mono: true },
                   module.detailTabs?.some((t) => t.value === "content") && { label: t("info.loaderLabel"), value: loader, mono: true },
                   { label: t("info.filesLabel"), value: latest?.fileCount ?? 0 },
+                  // Only when the pack offers something, for the same reason
+                  // the library card omits it: a zero here tells nobody
+                  // anything.
+                  !!latest?.optionalFeatureCount && {
+                    label: tc("optionalTitle"),
+                    value: latest.optionalFeatureCount,
+                  },
                   (state.kind === "installed" || state.kind === "outdated") && {
                     label: t("info.diskLabel"),
                     value: formatBytes(state.sizeBytes),

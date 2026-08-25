@@ -110,6 +110,13 @@ export const packVersions = mysqlTable(
     // The PackFile[] of first-install-only files, validated against
     // @boffmedia/pack-schema on write.
     initialFiles: json('initial_files').$type<unknown[]>(),
+    // The OptionalGroup[] a player chooses from: named groups of features, each
+    // owning several files[] paths. Its own column rather than a field inside
+    // `files` because it is a view ACROSS files, not a property of one — the
+    // whole point of the feature unit is that Iris + Sodium + a config + a .zip
+    // are one decision. Validated by the shared zod schema on write, which is
+    // also where the nine cross-field rules live.
+    optionalGroups: json('optional_groups').$type<unknown[]>(),
     /** Draft versions are invisible to launchers — publishing is a deliberate act. */
     published: boolean('published').notNull().default(false),
     notes: text('notes'),

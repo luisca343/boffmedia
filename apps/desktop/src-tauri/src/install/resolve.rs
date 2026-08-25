@@ -130,6 +130,13 @@ pub struct PlannedMinecraft {
     pub minecraft: String,
     pub loader: Option<(LoaderKind, String)>,
     pub files: Vec<PlannedFile>,
+    /// The optional-content model this version declares, with unclaimed optional
+    /// files already folded into the synthesised `otros` group (D4).
+    ///
+    /// Resolved from the MANIFEST rather than read back from the marker,
+    /// because this is what is about to be installed — the marker still
+    /// describes the previous version until the install completes.
+    pub optional_groups: Vec<super::optional::Group>,
     /// Sum of `fileSize` across planned files. The manifest's own numbers, not
     /// Content-Length: a real total is needed before the first byte arrives.
     pub total_bytes: u64,
@@ -281,6 +288,7 @@ fn plan_minecraft(manifest: &PackManifest) -> Result<PlannedMinecraft, InstallFa
         minecraft,
         loader: loader_of(manifest),
         files,
+        optional_groups: super::optional::model_of(manifest),
         total_bytes,
         quick_play,
     })

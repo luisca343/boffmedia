@@ -8,6 +8,8 @@ import {
   Field,
   Icon,
   Input,
+  type OptionalGroup,
+  OptionalGroupsEditor,
   Seg,
   Select,
   Textarea,
@@ -52,7 +54,7 @@ const LOADERS: { value: string; label: string }[] = [
   { value: "quilt-loader", label: "Quilt" },
 ]
 
-const STEPS = ["metadata", "mods", "files", "worlds", "review"] as const
+const STEPS = ["metadata", "mods", "files", "worlds", "optional", "review"] as const
 type Step = (typeof STEPS)[number]
 
 /** Everything the EmulatorEditor produces for a version. An emulator pack has no
@@ -92,6 +94,7 @@ type StoredFile = {
   sha512: string
   fileSize: number
   source: { kind: string; projectId?: unknown; versionId?: unknown; fileId?: unknown }
+  loader?: string
 }
 
 /** Turns a stored version's files back into picker rows so a clone starts from
@@ -117,6 +120,9 @@ function toSelected(files: unknown[]): SelectedMod[] {
         fileName,
         projectId:
           file.source?.projectId !== undefined ? String(file.source.projectId) : undefined,
+        // Round-trips the Connector marker so cloning a version does not quietly
+        // demote its Fabric mods back to "same loader as the pack".
+        loader: file.loader === "fabric" ? "fabric" : undefined,
       }
     })
 }
@@ -204,6 +210,7 @@ export function VersionEditor({
   const [uploads, setUploads] = useState<Upload[]>([])
   const [mods, setMods] = useState<SelectedMod[]>([])
   const [worlds, setWorlds] = useState<BundledWorld[]>([])
+  const [optionalGroups, setOptionalGroups] = useState<OptionalGroup[]>([])
   const [extraJson, setExtraJson] = useState("")
   const [busy, setBusy] = useState(false)
   const [showSnapshots, setShowSnapshots] = useState(false)
@@ -277,6 +284,10 @@ export function VersionEditor({
       lastPair.current = `${version.loader ?? ""}:${version.minecraft ?? ""}`
       setNotes(version.notes ?? "")
       setMods(toSelected(version.files))
+      // Restored for an edit AND a clone: the groups are the most laborious
+      // part of a version to author, and a clone that dropped them would
+      // silently turn every optional file back into a required one.
+      setOptionalGroups((version.optionalGroups ?? []) as OptionalGroup[])
     })
     return () => {
       live = false
@@ -348,6 +359,51 @@ export function VersionEditor({
 
   const patch = (path: string, next: Partial<Upload>) =>
     setUploads((current) => current.map((u) => (u.path === path ? { ...u, ...next } : u)))
+
+  /** Every path this version will contain, from the three places they come
+   *  from. Available before anything is uploaded because a path is decided when
+   *  the file is picked, not when its bytes land — which is what lets the
+   *  optional step work in the same pass as the rest of the form. */
+  const candidatePaths = useMemo(() => {
+    const seen = new Set<string>()
+    const out: { path: string }[] = []
+    const add = (path: unknown) => {
+      if (typeof path !== "string" || !path) return
+      const key = path.toLowerCase().replace(/\\/g, "/")
+      if (seen.has(key)) return
+      seen.add(key)
+      out.push({ path })
+    }
+    for (const mod of mods) add(mod.path)
+    for (const upload of uploads) add(upload.path)
+    try {
+      const extra: unknown = extraJson.trim() ? JSON.parse(extraJson) : []
+      if (Array.isArray(extra)) for (const entry of extra) add((entry as { path?: unknown })?.path)
+    } catch {
+      // A malformed extra block is reported by its own field; here it just
+      // contributes no paths.
+    }
+    return out
+  }, [mods, uploads, extraJson])
+
+  /** The paths any feature claims, normalised. Rule 2 makes these exactly the
+   *  files that must be written as `env.client: "optional"`, which is what
+   *  `submit` does — derived at save rather than tracked alongside, so there is
+   *  one source of truth and it is the groups. */
+  const optionalPaths = useMemo(
+    () =>
+      new Set(
+        optionalGroups
+          .flatMap((g) => g.features.flatMap((f) => f.paths))
+          .map((p) => p.toLowerCase().replace(/\\/g, "/")),
+      ),
+    [optionalGroups],
+  )
+
+  const envFor = (path: string) =>
+    optionalPaths.has(path.toLowerCase().replace(/\\/g, "/"))
+      ? { client: "optional" as const, server: "unsupported" as const }
+      : undefined
 
   /** Parsed only to catch a typo before anything uploads — the authority is the
    *  API's zod pass, so this deliberately does not re-implement the schema. */
@@ -442,7 +498,10 @@ export function VersionEditor({
           toast({ tone: "bad", title: t("blobFailed"), msg: upload.path })
           return
         }
-        overrides.push(overrideFileEntry(upload.path, result.sha512, result.fileSize))
+        overrides.push({
+          ...(overrideFileEntry(upload.path, result.sha512, result.fileSize) as object),
+          ...(envFor(upload.path) ? { env: envFor(upload.path) } : {}),
+        })
         patch(upload.path, { state: result.reused ? "reused" : "done" })
       }
 
@@ -453,6 +512,15 @@ export function VersionEditor({
         sha512: mod.sha512,
         fileSize: mod.fileSize,
         source: mod.source,
+        // Only ever set for a jar whose loader differs from the pack's — a
+        // Fabric mod running on NeoForge through Connector. Omitted otherwise,
+        // which is what the schema treats as "the pack's own loader".
+        ...(mod.loader ? { loader: mod.loader } : {}),
+        // Rule 2: a path a feature owns must be env.client "optional", or the
+        // .mrpack view disagrees with ours and the manifest is refused.
+        // `server: "unsupported"` because a client-optional mod is a client
+        // decision — nothing here is authored for a server install.
+        ...(envFor(mod.path) ? { env: envFor(mod.path) } : {}),
       }))
 
       const payload: {
@@ -465,6 +533,7 @@ export function VersionEditor({
         worlds?: BundledWorld[]
         emulator?: { kind: EmulatorKind; rom: string; args?: string[] }
         initialFiles?: unknown[]
+        optionalGroups?: unknown[]
       } = {
         name: (emu ? emu.name : name).trim(),
         files: [...modFiles, ...overrides, ...extra],
@@ -473,6 +542,9 @@ export function VersionEditor({
 
       // Minecraft-specific fields
       if (!emu) {
+        // Omitted when empty so a pack with no optional content serialises to
+        // exactly the manifest shape every existing launcher installs from.
+        if (optionalGroups.length > 0) payload.optionalGroups = optionalGroups
         payload.minecraft = minecraft.trim()
         payload.loader = (loader || undefined) as PackLoader | undefined
         payload.loaderVersion = loader ? loaderVersion.trim() : undefined
@@ -906,6 +978,36 @@ export function VersionEditor({
           </div>
         )}
 
+        {step === "optional" && (
+          <div className="flex flex-col gap-5">
+            <div className="flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
+              <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
+                <span className="font-mono text-[12px] font-bold">05</span>
+              </span>
+              <div className="min-w-0">
+                <p className="font-display text-[15px] font-bold uppercase tracking-[0.04em] text-txt">
+                  {t("optionalEditor.label")}
+                </p>
+                <p className="mt-1 max-w-[66ch] text-[13px] leading-[1.5] text-txt-dim">
+                  {t("optionalEditor.lead")}
+                </p>
+              </div>
+            </div>
+
+            <section className="border border-solid border-line bg-panel-2 p-4">
+              {/* `onFilesChange` is omitted on purpose: this form assembles its
+                  files[] at submit, so `env` is derived from the groups there
+                  rather than tracked in a second place that could disagree. */}
+              <OptionalGroupsEditor
+                groups={optionalGroups}
+                onChange={setOptionalGroups}
+                files={candidatePaths}
+                t={t}
+              />
+            </section>
+          </div>
+        )}
+
         {step === "review" && (
           <dl className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
             {[
@@ -915,6 +1017,10 @@ export function VersionEditor({
               [t("mods"), String(mods.length)],
               [t("overrides"), String(uploads.length)],
               [t("worlds.label"), String(worlds.length)],
+              [
+                t("optionalEditor.label"),
+                String(optionalGroups.reduce((n, g) => n + g.features.length, 0)),
+              ],
               [t("notes"), notes || "—"],
             ].map(([label, value]) => (
               <div

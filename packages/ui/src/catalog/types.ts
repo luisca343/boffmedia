@@ -125,10 +125,75 @@ export interface ModSearchInput {
   sort?: CatalogSort
   /** CurseForge category id, or Modrinth category name. */
   category?: string
+  /** Widen the loader filter to include Fabric, because this pack runs Sinytra
+   *  Connector and can therefore load Fabric mods on NeoForge (on Forge for
+   *  1.20.1). Modrinth ORs the values inside one facet array, so this is one
+   *  blended, correctly-ranked list rather than two searches stitched together.
+   *
+   *  Modrinth-only: CurseForge's search has no equivalent, and ignores this. */
+  includeFabricViaConnector?: boolean
 }
 
 export interface CatalogFileFilters {
   gameVersion?: string
   loader?: CatalogLoader
   pageSize?: number
+}
+
+// ── Optional content: what a player chooses from ───────────────────────────
+//
+// Shared here rather than in each host because three surfaces render the same
+// model: the launcher's install-time chooser and Content tab, the web admin's
+// authoring editor, and a pack's public page. The launcher's Rust side is the
+// source of these shapes — `install/optional.rs` serialises exactly this.
+
+/** Where a placed file also has to be switched ON.
+ *
+ *  For a mod, dropping the jar in `mods/` is the whole job. For these it is
+ *  half: the file sits on disk and the game ignores it until a config names it.
+ *  `datapack` carries no config edit — under D1 a global loader (OpenLoader /
+ *  Paxi) reads a directory, so the file's own path IS its activation — but it
+ *  is declared so a chooser can say "datapack" rather than "a zip in config/". */
+export type Activation =
+  | { kind: "resourcepack"; file: string; priority: number }
+  | { kind: "shaderpack"; file: string }
+  | { kind: "datapack"; file: string }
+
+/** One thing a player switches on or off.
+ *
+ *  The unit is a FEATURE, never a file: "Shaders" is Iris + Sodium + a config +
+ *  the `.zip`, and offering four switches lets a player build a crash. */
+export interface OptionalFeature {
+  id: string
+  name: string
+  description?: string | null
+  iconUrl?: string | null
+  paths: string[]
+  /** What the pack author declared. Kept alongside `enabled` so a UI can mark
+   *  the author's recommendation and offer to restore it. */
+  default: boolean
+  /** Feature ids that must be on for this one to be on. */
+  requires: string[]
+  activate?: Activation | null
+  enabled: boolean
+  /** True when `enabled` is the player's doing rather than the author's. */
+  explicit: boolean
+  /** Declared bytes across the feature's files, so the cost of a 400 MB
+   *  shaderpack is visible BEFORE it is downloaded. */
+  size: number
+  /** False means turning this on needs a download — the normal state for
+   *  something declined at install time. */
+  installed: boolean
+}
+
+/** `any` — independent switches. `one` — a radio, always exactly one on.
+ *  `atMostOne` — a radio plus "ninguno". */
+export type OptionalSelect = "any" | "one" | "atMostOne"
+
+export interface OptionalGroup {
+  id: string
+  name: string
+  description?: string | null
+  select: OptionalSelect
+  features: OptionalFeature[]
 }

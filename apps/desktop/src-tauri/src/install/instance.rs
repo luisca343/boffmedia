@@ -259,6 +259,17 @@ pub struct Marker {
     /// never be switched back on without a reinstall.
     #[serde(default)]
     pub optional_files: Vec<ManagedFile>,
+    /// The FEATURE catalogue this version declares: groups, their selection
+    /// modes, and which paths each feature owns.
+    ///
+    /// It has to survive on disk for the same reason `optional_files` does, one
+    /// level up. `managed` holds only what is installed, so a feature the player
+    /// switched off owns no files there — without the catalogue the chooser
+    /// could not render the switch that would turn it back on. `default` so a
+    /// marker written by an older build loads as "no groups", which resolves to
+    /// exactly the pre-feature behaviour.
+    #[serde(default)]
+    pub optional_groups: Vec<super::optional::Group>,
     /// Set by a revert. A pinned instance is launched at this version instead
     /// of at whatever the server currently calls latest.
     #[serde(default)]
@@ -321,34 +332,14 @@ impl History {
     }
 }
 
-/// Which optional files the player switched OFF, persisted per instance.
+/// The player's optional-content choices live in `install::optional`, which is
+/// where the FEATURE model they key on lives too. Re-exported here because the
+/// state file sits beside the marker and every caller reaches for both.
 ///
-/// Stored as the disabled set, not the enabled one: a new optional mod added by
-/// a later pack version is then enabled by default, which matches `.mrpack`
-/// semantics ("optional" means opt-out, and the pack author put it there for a
-/// reason). Storing the enabled set would silently drop every newly added
-/// optional mod.
-#[derive(Debug, Clone, Default, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct OptionalState {
-    #[serde(default)]
-    pub disabled: Vec<String>,
-}
-
-impl OptionalState {
-    pub fn is_disabled(&self, path: &str) -> bool {
-        let path = normalise(path);
-        self.disabled.iter().any(|p| normalise(p) == path)
-    }
-
-    pub fn set(&mut self, path: &str, enabled: bool) {
-        let path = normalise(path);
-        self.disabled.retain(|p| normalise(p) != path);
-        if !enabled {
-            self.disabled.push(path);
-        }
-    }
-}
+/// It gained two fields when features arrived (§5.1 of docs/packs-v2-plan.md):
+/// the original `disabled` path set could only express opt-OUT, so "off until
+/// the player asks for it" had no representation at all.
+pub use super::optional::OptionalState;
 
 /// What the renderer sees for one retained version.
 #[derive(Debug, Clone, Serialize)]
@@ -559,7 +550,7 @@ pub fn optional_list(catalogue: &[ManagedFile], state: &OptionalState) -> Vec<Op
             let path = normalise(&f.path);
             OptionalFile {
                 name: path.rsplit('/').next().unwrap_or(&path).to_string(),
-                enabled: !state.is_disabled(&path),
+                enabled: !state.is_path_disabled(&path),
                 size: f.size,
                 path,
             }
@@ -692,6 +683,7 @@ mod tests {
             pack_id: "pk".into(),
             managed: vec![managed("mods/a.jar", "aa")],
             optional_files: vec![],
+            optional_groups: vec![],
             pinned: false,
             game_type: GameType::Minecraft,
             emulator: None,
@@ -796,7 +788,7 @@ mod tests {
         let mut state = OptionalState::default();
         assert!(optional_list(&catalogue, &state).iter().all(|f| f.enabled));
 
-        state.set("mods/minimap.jar", false);
+        state.set_path("mods/minimap.jar", false);
         let list = optional_list(&catalogue, &state);
         assert_eq!(list[0].name, "minimap.jar");
         assert!(!list[0].enabled);
@@ -804,8 +796,8 @@ mod tests {
 
         // Idempotent, and re-enabling clears the entry rather than adding a
         // second one.
-        state.set("mods/minimap.jar", false);
-        state.set("mods/minimap.jar", true);
+        state.set_path("mods/minimap.jar", false);
+        state.set_path("mods/minimap.jar", true);
         assert!(state.disabled.is_empty());
     }
 
@@ -874,6 +866,6 @@ mod tests {
     fn a_disabled_path_matches_whatever_separator_it_was_stored_with() {
         let mut state = OptionalState::default();
         state.disabled.push("mods\\minimap.jar".into());
-        assert!(state.is_disabled("mods/minimap.jar"));
+        assert!(state.is_path_disabled("mods/minimap.jar"));
     }
 }

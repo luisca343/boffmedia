@@ -113,10 +113,10 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
         <Select value={sort} onChange={setSort} ariaLabel={t("app.sort.label")} className="w-auto min-w-[180px]"
           options={["num", "name", "rarity", "hp"].map((s) => ({ value: s, label: `${t("app.sort.label")}: ${t(`app.sort.${s}`)}` }))} />
         <ToolBarSpacer />
-        <label className="inline-flex cursor-pointer items-center gap-2">
-          <Toggle on={ownedOnly} onChange={setOwnedOnly} />
+        <span className="inline-flex items-center gap-2">
+          <Toggle on={ownedOnly} onChange={setOwnedOnly} ariaLabel={t("app.ownedOnly")} />
           <span className="font-mono text-[12px] uppercase tracking-[0.06em] text-txt-muted">{t("app.ownedOnly")}</span>
-        </label>
+        </span>
         <Seg value={density} onChange={(v) => setDensity(v as Density)}
           options={[{ value: "compacta", label: "S" }, { value: "comoda", label: "M" }, { value: "espaciosa", label: "L" }]} />
       </ToolBar>

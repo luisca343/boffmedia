@@ -4,7 +4,7 @@ import {
   ApiPropertyOptional,
   getSchemaPath,
 } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
@@ -278,6 +278,17 @@ export class CreatePackVersionDto {
   @IsOptional()
   @IsArray()
   initialFiles?: unknown[];
+
+  @ApiPropertyOptional({
+    description:
+      'OptionalGroup[] — el contenido opcional que el jugador elige, validado con @boffmedia/pack-schema. ' +
+      'La unidad es una FEATURE (varios archivos, una decisión), no un archivo suelto.',
+    type: 'array',
+    items: { type: 'object' },
+  })
+  @IsOptional()
+  @IsArray()
+  optionalGroups?: unknown[];
 }
 
 /** Grant to an account. The normal path — a pack is a Boffmedia entitlement. */
@@ -357,6 +368,19 @@ export class CatalogSearchQueryDto {
   @IsOptional()
   @IsIn(CATALOG_LOADERS)
   loader?: (typeof CATALOG_LOADERS)[number];
+
+  @ApiPropertyOptional({
+    description:
+      'Amplía el filtro de loader para incluir Fabric, porque el pack lleva ' +
+      'Sinytra Connector. Solo Modrinth; CurseForge lo ignora.',
+  })
+  @IsOptional()
+  // A query string carries "true"/"false" as text, and `Type(() => Boolean)`
+  // would turn BOTH into `true` — the string "false" is truthy. This is the
+  // only conversion that makes `?includeFabricViaConnector=false` mean false.
+  @Transform(({ value }) => value === true || value === 'true')
+  @IsBoolean()
+  includeFabricViaConnector?: boolean;
 
   @ApiPropertyOptional({ default: 0 })
   @IsOptional()

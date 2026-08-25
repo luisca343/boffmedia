@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest"
 import type { z } from "zod"
 
-import { PackManifest, gameTypeOf, loaderOf } from "./index.js"
+import {
+  PackManifest,
+  SYNTHETIC_GROUP_ID,
+  gameTypeOf,
+  loaderOf,
+  optionalModelOf,
+  optionalWarnings,
+  selectOf,
+} from "./index.js"
 
 const sha512 = "a".repeat(128)
 
@@ -357,5 +365,325 @@ describe("loaderOf", () => {
       loader: "neoforge",
       version: "21.4.30",
     })
+  })
+})
+
+// Every case here has a twin in apps/desktop/src-tauri/src/pack.rs's test module.
+// The two rule sets are written twice — JSON Schema drops refinements, so the
+// Rust side re-implements them by hand — and these fixtures are what keeps the
+// pair honest. Adding a rule means adding a test on BOTH sides.
+describe("optional content", () => {
+  const optionalFile = (path: string): z.input<typeof PackManifest>["version"]["files"][number] => ({
+    path,
+    sha512,
+    fileSize: 10,
+    env: { client: "optional", server: "unsupported" },
+    source: { kind: "url" as const, url: "https://example.com/f" },
+  })
+
+  // A pack with three optional files, one authored group holding one feature.
+  const withOptional = (): z.input<typeof PackManifest> => {
+    const m = manifest()
+    m.version.files.push(optionalFile("mods/iris.jar"))
+    m.version.files.push(optionalFile("shaderpacks/bsl.zip"))
+    m.version.files.push(optionalFile("mods/extra.jar"))
+    m.version.optionalGroups = [
+      {
+        id: "rendimiento",
+        name: "Rendimiento",
+        select: "any" as const,
+        features: [{ id: "iris", name: "Iris", paths: ["mods/iris.jar"], default: true }],
+      },
+    ]
+    return m
+  }
+
+  it("accepts a well-formed group and defaults `select` to any through selectOf", () => {
+    const m = withOptional()
+    delete m.version.optionalGroups![0].select
+    const parsed = PackManifest.parse(m)
+    expect(selectOf(parsed.version.optionalGroups![0])).toBe("any")
+  })
+
+  // ---- rule 1 ----
+  it("rejects a feature path that is not a files[] entry", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].features[0].paths = ["mods/ghost.jar"]
+    expect(() => PackManifest.parse(m)).toThrow(/must match a files\[\] entry/)
+  })
+
+  // ---- rule 2 ----
+  // The .mrpack view has to agree with ours: Prism and packwiz read env.client
+  // and nothing else, so a switchable file marked "required" installs
+  // differently depending on which launcher opened the pack.
+  it("rejects a feature path whose file is not env.client optional", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].features[0].paths = ["mods/sodium.jar"]
+    expect(() => PackManifest.parse(m)).toThrow(/must be env\.client "optional"/)
+  })
+
+  // ---- rule 3 ----
+  it("rejects duplicate group ids", () => {
+    const m = withOptional()
+    m.version.optionalGroups!.push({
+      ...m.version.optionalGroups![0],
+      features: [{ id: "otra", name: "Otra", paths: ["mods/extra.jar"], default: false }],
+    })
+    expect(() => PackManifest.parse(m)).toThrow(/duplicate group id/)
+  })
+
+  it("rejects a feature id reused across two groups", () => {
+    const m = withOptional()
+    m.version.optionalGroups!.push({
+      id: "visual",
+      name: "Visual",
+      features: [{ id: "iris", name: "Iris otra vez", paths: ["mods/extra.jar"], default: false }],
+    })
+    expect(() => PackManifest.parse(m)).toThrow(/duplicate feature id/)
+  })
+
+  it("reserves the synthesised group id", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].id = SYNTHETIC_GROUP_ID
+    expect(() => PackManifest.parse(m)).toThrow(/reserved/)
+  })
+
+  // ---- rule 4 ----
+  it("rejects one path owned by two features", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].features.push({
+      id: "iris-bis",
+      name: "Iris bis",
+      paths: ["mods/iris.jar"],
+      default: false,
+    })
+    expect(() => PackManifest.parse(m)).toThrow(/already owned by feature/)
+  })
+
+  // ---- rule 5 ----
+  it("rejects requires pointing at a feature that does not exist", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].features[0].requires = ["nope"]
+    expect(() => PackManifest.parse(m)).toThrow(/must name an existing feature id/)
+  })
+
+  it("accepts requires pointing at a feature declared later in the document", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].features[0].requires = ["extra"]
+    m.version.optionalGroups!.push({
+      id: "extras",
+      name: "Extras",
+      features: [{ id: "extra", name: "Extra", paths: ["mods/extra.jar"], default: false }],
+    })
+    expect(() => PackManifest.parse(m)).not.toThrow()
+  })
+
+  it("rejects requires targeting a member of a radio group", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].features[0].requires = ["bsl"]
+    m.version.optionalGroups!.push({
+      id: "shaders",
+      name: "Shaders",
+      select: "one" as const,
+      features: [{ id: "bsl", name: "BSL", paths: ["shaderpacks/bsl.zip"], default: true }],
+    })
+    expect(() => PackManifest.parse(m)).toThrow(/only target a feature in an "any" group/)
+  })
+
+  it("rejects a self-requirement", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].features[0].requires = ["iris"]
+    expect(() => PackManifest.parse(m)).toThrow(/cannot require itself/)
+  })
+
+  it("rejects a requires cycle", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].features[0].requires = ["extra"]
+    m.version.optionalGroups![0].features.push({
+      id: "extra",
+      name: "Extra",
+      paths: ["mods/extra.jar"],
+      default: false,
+      requires: ["iris"],
+    })
+    expect(() => PackManifest.parse(m)).toThrow(/cycle/)
+  })
+
+  // ---- rule 6 ----
+  it("requires exactly one default in a `one` group", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].select = "one"
+    m.version.optionalGroups![0].features.push({
+      id: "extra",
+      name: "Extra",
+      paths: ["mods/extra.jar"],
+      default: true,
+    })
+    expect(() => PackManifest.parse(m)).toThrow(/exactly one default:true/)
+  })
+
+  it("rejects a `one` group with no default on", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].select = "one"
+    m.version.optionalGroups![0].features[0].default = false
+    expect(() => PackManifest.parse(m)).toThrow(/exactly one default:true/)
+  })
+
+  it("allows an `atMostOne` group with nothing on by default", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].select = "atMostOne"
+    m.version.optionalGroups![0].features[0].default = false
+    expect(() => PackManifest.parse(m)).not.toThrow()
+  })
+
+  // ---- rule 7 ----
+  it("rejects activating a file the feature does not own", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].select = "one"
+    m.version.optionalGroups![0].features[0].activate = {
+      kind: "shaderpack" as const,
+      file: "shaderpacks/bsl.zip",
+    }
+    expect(() => PackManifest.parse(m)).toThrow(/one of the feature's own paths/)
+  })
+
+  // ---- rule 8 ----
+  it("rejects a shaderpack activation in an `any` group", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].features[0].paths = ["shaderpacks/bsl.zip"]
+    m.version.optionalGroups![0].features[0].activate = {
+      kind: "shaderpack" as const,
+      file: "shaderpacks/bsl.zip",
+    }
+    expect(() => PackManifest.parse(m)).toThrow(/"one" or "atMostOne" group/)
+  })
+
+  it("accepts a shaderpack activation in a `one` group", () => {
+    const m = withOptional()
+    m.version.optionalGroups![0].select = "one"
+    m.version.optionalGroups![0].features[0].paths = ["shaderpacks/bsl.zip"]
+    m.version.optionalGroups![0].features[0].activate = {
+      kind: "shaderpack" as const,
+      file: "shaderpacks/bsl.zip",
+    }
+    expect(() => PackManifest.parse(m)).not.toThrow()
+  })
+
+  // ---- rule 9 (D1) ----
+  it("rejects a datapack outside a global loader directory", () => {
+    const m = manifest()
+    m.version.files.push(optionalFile("saves/mundo/datapacks/tweaks.zip"))
+    m.version.optionalGroups = [
+      {
+        id: "extras",
+        name: "Extras",
+        features: [
+          {
+            id: "tweaks",
+            name: "Tweaks",
+            paths: ["saves/mundo/datapacks/tweaks.zip"],
+            default: true,
+            activate: { kind: "datapack" as const, file: "saves/mundo/datapacks/tweaks.zip" },
+          },
+        ],
+      },
+    ]
+    expect(() => PackManifest.parse(m)).toThrow(/global loader reads it/)
+  })
+
+  const withDatapack = (): z.input<typeof PackManifest> => {
+    const m = manifest()
+    m.version.files.push(optionalFile("config/openloader/datapacks/tweaks.zip"))
+    m.version.optionalGroups = [
+      {
+        id: "extras",
+        name: "Extras",
+        features: [
+          {
+            id: "tweaks",
+            name: "Tweaks",
+            paths: ["config/openloader/datapacks/tweaks.zip"],
+            default: true,
+            activate: {
+              kind: "datapack" as const,
+              file: "config/openloader/datapacks/tweaks.zip",
+            },
+          },
+        ],
+      },
+    ]
+    return m
+  }
+
+  it("accepts a datapack under a global loader directory", () => {
+    expect(() => PackManifest.parse(withDatapack())).not.toThrow()
+  })
+
+  // ---- warnings, which must never be errors ----
+  it("warns — and does not fail — when a datapack ships with no global loader", () => {
+    const parsed = PackManifest.parse(withDatapack())
+    const warnings = optionalWarnings(parsed.version)
+    expect(warnings).toHaveLength(1)
+    expect(warnings[0].code).toBe("datapack-loader-missing")
+    expect(warnings[0].featureId).toBe("tweaks")
+  })
+
+  it("stays quiet once a loader jar is in files[]", () => {
+    const m = withDatapack()
+    m.version.files.push({
+      path: "mods/openloader-1.21.jar",
+      sha512,
+      fileSize: 10,
+      source: { kind: "url" as const, url: "https://example.com/ol" },
+    })
+    expect(optionalWarnings(PackManifest.parse(m).version)).toHaveLength(0)
+  })
+})
+
+// D4: an optional file no feature claims is not an error — it is the pre-feature
+// behaviour, folded into a synthesised group so the chooser can still show it.
+describe("optionalModelOf", () => {
+  it("folds unclaimed optional files into `otros`, on by default", () => {
+    const m = manifest()
+    m.version.files.push({
+      path: "mods/journeymap.jar",
+      sha512,
+      fileSize: 10,
+      env: { client: "optional", server: "unsupported" },
+      source: { kind: "url" as const, url: "https://example.com/jm" },
+    })
+    const model = optionalModelOf(PackManifest.parse(m).version)
+    expect(model).toHaveLength(1)
+    expect(model[0].id).toBe(SYNTHETIC_GROUP_ID)
+    expect(model[0].features[0].default).toBe(true)
+    expect(model[0].features[0].name).toBe("journeymap.jar")
+    expect(model[0].features[0].paths).toEqual(["mods/journeymap.jar"])
+  })
+
+  it("leaves a claimed optional file alone and returns no synthetic group", () => {
+    const m = manifest()
+    m.version.files.push({
+      path: "mods/journeymap.jar",
+      sha512,
+      fileSize: 10,
+      env: { client: "optional", server: "unsupported" },
+      source: { kind: "url" as const, url: "https://example.com/jm" },
+    })
+    m.version.optionalGroups = [
+      {
+        id: "mapas",
+        name: "Mapas",
+        features: [
+          { id: "journeymap", name: "JourneyMap", paths: ["mods/journeymap.jar"], default: false },
+        ],
+      },
+    ]
+    const model = optionalModelOf(PackManifest.parse(m).version)
+    expect(model).toHaveLength(1)
+    expect(model[0].id).toBe("mapas")
+  })
+
+  it("returns the authored groups unchanged when nothing is optional", () => {
+    expect(optionalModelOf(PackManifest.parse(manifest()).version)).toEqual([])
   })
 })

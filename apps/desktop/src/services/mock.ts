@@ -1,5 +1,5 @@
 import type { PackManifest } from "@boffmedia/pack-schema"
-import type { ContentFile, DirEntry, World } from "../runtime"
+import type { ContentFile, DirEntry, ExtraFile, World } from "../runtime"
 import type {
   CatalogCategory,
   ModFile,
@@ -500,6 +500,25 @@ export function mockCatalogResolve(source: ResolveSource): ResolvedFile | null {
 // ── Instance content / files / worlds ──────────────────────────────────────
 // Browser mode has no instance on disk, so these stand in for one that is
 // installed, has a disabled mod, and has been played.
+
+/** Hand-dropped jars, for browser mode. One identifiable and one not, because
+ *  the row renders differently for each: a real title and icon when Modrinth
+ *  knows the hash, the bare filename when it does not. */
+export function mockExtraFiles(): ExtraFile[] {
+  return [
+    {
+      path: "mods/journeymap-neoforge-1.21.1-6.0.0.jar",
+      size: 4_800_000,
+      enabled: true,
+      sha512: "c".repeat(128),
+    },
+    {
+      path: "mods/my-private-build.jar",
+      size: 220_000,
+      enabled: false,
+    },
+  ]
+}
 
 export function mockContent(): ContentFile[] {
   return [

@@ -56,6 +56,28 @@
       "linux": "Linux",
       "macIntel": "macOS (Intel)",
       "macApple": "macOS (Apple Silicon)"
+    },
+    "packPage": {
+      "files": "{count} archivos",
+      "installLead": "Este pack se instala desde la Boffmedia App. Descárgala, inicia sesión y aparecerá en tu biblioteca.",
+      "getApp": "Descargar la app",
+      "about": "Sobre el pack",
+      "gallery": "Galería",
+      "optionalTitle": "Contenido opcional",
+      "optionalLead": "Lo que puedes activar o desactivar al instalarlo, y cambiar cuando quieras después.",
+      "optionalRecommended": "Recomendado",
+      "optionalDefaultOn": "Activado por defecto",
+      "optionalDefaultOff": "Desactivado por defecto",
+      "optionalNone": "Ninguno",
+      "optionalNeedsDownload": "Falta descargar",
+      "optionalDeferred": "Se aplica al reiniciar",
+      "optionalRequires": "Necesita: {names}",
+      "optionalPickOne": "Elige uno",
+      "optionalPickAny": "Elige los que quieras",
+      "optionalPickAtMostOne": "Elige uno o ninguno",
+      "kindResourcepack": "Recursos",
+      "kindShaderpack": "Shader",
+      "kindDatapack": "Datapack"
     }
   },
   "appAuth": {

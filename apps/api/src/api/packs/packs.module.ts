@@ -4,6 +4,8 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { AuthModule } from '@api/auth/auth.module';
 import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 import { RandomizerPackLinkModule } from '@api/_repositories/randomizer/pack-link.repository';
+import { UploadModule } from '@api/boffmedia/util/upload/upload.module';
+import { DesktopAdminGuard } from './guards/desktop-admin.guard';
 import { DesktopAuthGuard } from './guards/desktop-auth.guard';
 import { DesktopAuthController } from './desktop-auth.controller';
 import { LauncherController } from './launcher.controller';
@@ -14,6 +16,7 @@ import { PacksCatalogService } from './packs-catalog.service';
 import { PacksDownloadsService } from './packs-downloads.service';
 import { PacksMetaService } from './packs-meta.service';
 import { PacksController } from './packs.controller';
+import { PacksDesktopController } from './packs-desktop.controller';
 import { PacksRepository } from './packs.repository';
 import { PacksService } from './packs.service';
 
@@ -30,8 +33,17 @@ import { PacksService } from './packs.service';
     RandomizerPackLinkModule,
     // The CurseForge API/CDN proxy.
     HttpModule,
+    // D2: publishing from the app uploads the pack icon and gallery through the
+    // SAME image pipeline the web /upload/image route uses, rather than a second
+    // one that would drift from its type allowlist and size ceiling.
+    UploadModule,
   ],
-  controllers: [PacksController, LauncherController, DesktopAuthController],
+  controllers: [
+    PacksController,
+    PacksDesktopController,
+    LauncherController,
+    DesktopAuthController,
+  ],
   providers: [
     PacksRepository,
     PacksService,
@@ -42,6 +54,8 @@ import { PacksService } from './packs.service';
     PacksCatalogService,
     PacksMetaService,
     DesktopAuthGuard,
+    // Composes on DesktopAuthGuard, so both are providers here.
+    DesktopAdminGuard,
   ],
   exports: [
     PacksService,

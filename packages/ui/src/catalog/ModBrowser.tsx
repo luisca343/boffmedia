@@ -8,11 +8,13 @@ import { Badge } from "../primitives/badge"
 import { Button } from "../primitives/button"
 import { Icon } from "../primitives/icon"
 import { Input } from "../primitives/input"
+import { Modal } from "../primitives/modal"
 import { Seg } from "../primitives/seg"
 import { Select } from "../primitives/select"
 import { Spinner } from "../primitives/spinner"
 import { CatalogIcon } from "./CatalogIcon"
 import { getCatalog } from "./client"
+import { effectiveLoader, isViaConnector } from "./connector"
 import type {
   CatalogCategory,
   CatalogLoader,
@@ -50,6 +52,19 @@ export type BrowsePick = {
   hit: ModSearchHit
   file: ModFile
   projectType: CatalogProjectType
+  /** True when this project does not publish the pack's own loader and is only
+   *  installable because Connector is on. The host needs it for two things the
+   *  file alone cannot answer: whether to pull Connector into the pack, and what
+   *  to record on the manifest entry so the pack page can badge it later. */
+  viaConnector: boolean
+}
+
+/** How a host offers Connector mode. Absent means the pack cannot use it — no
+ *  toggle is rendered at all, which is the case for every Fabric or Quilt pack
+ *  and for any Minecraft version Connector has not shipped for. */
+export type ConnectorControl = {
+  enabled: boolean
+  onChange: (enabled: boolean) => void
 }
 
 function formatSize(bytes: number): string {
@@ -83,6 +98,7 @@ export function ModBrowser({
   projectTypes = ALL_TYPES,
   gameVersion,
   loader,
+  connector,
   isAdded,
   onAdd,
   busyKey,
@@ -102,6 +118,9 @@ export function ModBrowser({
    *  `modpack`, which brings its own — see `needsGameVersion`. */
   gameVersion: string
   loader?: CatalogLoader
+  /** Present only when this pack's Minecraft/loader pair can actually run
+   *  Connector — the host resolves that with `connectorSupport()`. */
+  connector?: ConnectorControl
   isAdded: (platform: ModPlatform, projectId: string) => boolean
   onAdd: (pick: BrowsePick) => void | Promise<void>
   busyKey: string | null
@@ -125,12 +144,18 @@ export function ModBrowser({
     return () => clearTimeout(timer)
   }, [query])
 
+  // Connector widens a MOD search and nothing else: it hosts Fabric mods, and a
+  // resource pack or shader has no loader to widen in the first place. Scoped to
+  // Modrinth because that is the only search with an OR-able loader facet.
+  const connectorOn =
+    Boolean(connector?.enabled) && platform === "modrinth" && projectType === "mod"
+
   // Any filter change restarts paging: appending page 2 of the new filters to
   // page 1 of the old ones is how a picker shows mods that do not match.
   useEffect(() => {
     setPage(0)
     setHits([])
-  }, [debounced, platform, projectType, sort, category, gameVersion, loader])
+  }, [debounced, platform, projectType, sort, category, gameVersion, loader, connectorOn])
 
   useEffect(() => {
     setCategory("")
@@ -170,6 +195,7 @@ export function ModBrowser({
         // Resource packs and shaders have no loader, and sending one filters
         // every result away.
         loader: projectType === "mod" ? loader : undefined,
+        includeFabricViaConnector: connectorOn,
         sort,
         category: category || undefined,
         projectType,
@@ -183,13 +209,42 @@ export function ModBrowser({
         setTotal(data.total)
         setLoading(false)
       })
-  }, [platform, debounced, gameVersion, loader, sort, category, projectType, page, needsGameVersion])
+  }, [
+    platform,
+    debounced,
+    gameVersion,
+    loader,
+    sort,
+    category,
+    projectType,
+    page,
+    needsGameVersion,
+    connectorOn,
+  ])
 
   // ProjectDetail knows the hit and the file but not which tab they came from,
   // so the browser stamps the type on the way out. One place, rather than a
   // prop threaded through both ProjectDetail mounts.
+  //
+  // `viaConnector` is stamped here for the same reason: it is a fact about the
+  // project against THIS pack's loader, which the detail pane has no business
+  // recomputing.
   const addPick = (pick: { hit: ModSearchHit; file: ModFile }) =>
-    onAdd({ ...pick, projectType })
+    onAdd({
+      ...pick,
+      projectType,
+      viaConnector: isViaConnector(pick.hit, loader, connectorOn),
+    })
+
+  // A Fabric-only project has no NeoForge files, so asking the detail pane for
+  // them returns an empty list and the player is shown a mod with nothing to
+  // install. The pack's own loader still wins wherever the project publishes it,
+  // which is most of them — sodium, iris and lithium are all dual-loader.
+  const detailLoader = effectiveLoader(
+    selected ?? { categories: [], platform: "modrinth" },
+    projectType === "mod" ? loader : undefined,
+    connectorOn,
+  )
 
   const canLoadMore = hits.length > 0 && hits.length < total && !loading
 
@@ -272,8 +327,37 @@ export function ModBrowser({
             options={sorts.map((s) => ({ value: s, label: t(`sortBy.${s}`) }))}
           />
         </div>
+        {/* Only for a mod browse: on the shader or resource-pack tab the toggle
+            would still render but change nothing, which reads as broken. */}
+        {connector && projectType === "mod" && platform === "modrinth" && (
+          <label
+            className="flex shrink-0 cursor-pointer items-center gap-[6px] font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim"
+            title={t("connectorHint")}
+          >
+            <input
+              type="checkbox"
+              checked={connector.enabled}
+              onChange={(e) => {
+                connector.onChange(e.target.checked)
+                setSelected(null)
+              }}
+              className="size-[13px] accent-[var(--accent)]"
+            />
+            {t("connectorToggle")}
+          </label>
+        )}
         {loading && <Spinner size={16} className="text-txt-muted" />}
       </div>
+
+      {/* Stated once, above the results, rather than repeated on every Fabric
+          card: Connector makes these mods REACHABLE, it does not make them all
+          work. Mods with deep Fabric-internal mixins still fail, and there is no
+          catalog field that would let us filter them out for the player. */}
+      {connectorOn && (
+        <p className="shrink-0 border border-solid border-line bg-panel px-3 py-2 font-body text-[11px] text-txt-dim">
+          {t("connectorNote")}
+        </p>
+      )}
 
       {/* The three panes each own their scroll, so the page itself never grows:
           categories · results · the selected project. */}
@@ -327,6 +411,7 @@ export function ModBrowser({
               >
                 {hits.map((hit) => {
                   const added = isAdded(hit.platform, hit.projectId)
+                  const viaConnector = isViaConnector(hit, loader, connectorOn)
                   return (
                     <li key={`${hit.platform}:${hit.projectId}`} className="h-full">
                       <button
@@ -343,6 +428,15 @@ export function ModBrowser({
                             <span className="min-w-0 flex-1 truncate font-display text-[13px] font-bold uppercase tracking-[0.03em]">
                               {hit.name}
                             </span>
+                            {/* `new`, not `info`: the hosts already spend `info`
+                                on the platform badge in the selected list, and
+                                the Fabric marker has to read the same in both
+                                places to be recognisable. */}
+                            {viaConnector && (
+                              <Badge tone="new" className="shrink-0">
+                                {t("loaderFabric")}
+                              </Badge>
+                            )}
                             {added && (
                               <Badge tone="ok" className="shrink-0">
                                 {t("added")}
@@ -385,36 +479,25 @@ export function ModBrowser({
             </>
           )}
         </div>
-
-        {selected && (
-          <div className="bm-scroll hidden min-h-0 w-[400px] shrink-0 overflow-auto lg:block 2xl:w-[480px]">
-            <ProjectDetail
-              t={t}
-              hit={selected}
-              gameVersion={needsGameVersion ? gameVersion : ""}
-              loader={projectType === "mod" ? loader : undefined}
-              onClose={() => setSelected(null)}
-              onAdd={addPick}
-              busyKey={busyKey}
-            />
-          </div>
-        )}
       </div>
 
-      {/* Below lg there is no room for a third pane, so the detail goes back
-          under the results rather than vanishing. */}
+      {/* A modal rather than a third pane. The pane was 400px holding a version
+          row of seven fields, a capped description and a capped file list, and
+          it had to exist TWICE — one `lg:block` copy and one `lg:hidden` copy
+          below the grid — which is its own bug surface: a fix applied to one
+          mount silently misses the other. One mount, and the grid gets the
+          width the pane was taking. */}
       {selected && (
-        <div className="shrink-0 lg:hidden">
-          <ProjectDetail
-            t={t}
-            hit={selected}
-            gameVersion={needsGameVersion ? gameVersion : ""}
-            loader={projectType === "mod" ? loader : undefined}
-            onClose={() => setSelected(null)}
-            onAdd={addPick}
-            busyKey={busyKey}
-          />
-        </div>
+        <ProjectDetail
+          t={t}
+          hit={selected}
+          gameVersion={needsGameVersion ? gameVersion : ""}
+          loader={detailLoader}
+          viaConnector={isViaConnector(selected, loader, connectorOn)}
+          onClose={() => setSelected(null)}
+          onAdd={addPick}
+          busyKey={busyKey}
+        />
       )}
     </div>
   )
@@ -425,6 +508,7 @@ function ProjectDetail({
   hit,
   gameVersion,
   loader,
+  viaConnector,
   onClose,
   onAdd,
   busyKey,
@@ -433,6 +517,9 @@ function ProjectDetail({
   hit: ModSearchHit
   gameVersion: string
   loader?: CatalogLoader
+  /** Shown as a badge here too: this is the last screen before the mod is
+   *  added, so it is the right place to say it is a Fabric jar. */
+  viaConnector: boolean
   onClose: () => void
   /** Deliberately narrower than `BrowsePick`: the detail pane has no idea which
    *  tab it was opened from, and the browser stamps `projectType` on before
@@ -475,150 +562,194 @@ function ProjectDetail({
   }, [hit.platform, hit.projectId, gameVersion, loader, showAllFiles])
 
   const description = project ? toPlainText(project.description || project.summary) : ""
-
   return (
-    <div className="flex flex-col gap-3 border border-solid border-acc bg-panel px-3 py-3">
-      <div className="flex items-start gap-3">
-        <CatalogIcon src={hit.iconUrl} size={48} />
-        <div className="min-w-0 flex-1">
-          <h3 className="truncate font-display text-[15px] font-bold uppercase tracking-[0.03em]">
-            {hit.name}
-          </h3>
-          <p className="font-body text-[12px] text-txt-dim">{hit.summary}</p>
-          <div className="mt-1 flex flex-wrap items-center gap-2 font-mono text-[10px] text-txt-muted">
-            {project?.clientSide && project.clientSide !== "unknown" && (
-              <Badge tone={project.clientSide === "required" ? "info" : "warn"}>
-                {t(`side.client.${project.clientSide}`)}
-              </Badge>
-            )}
-            {project?.serverSide && project.serverSide !== "unknown" && (
-              <Badge tone={project.serverSide === "required" ? "info" : "warn"}>
-                {t(`side.server.${project.serverSide}`)}
-              </Badge>
-            )}
-            {(project?.categories ?? hit.categories).slice(0, 5).map((c) => (
-              <span key={c} className="capitalize">
-                {c}
+    <Modal
+      open
+      onClose={onClose}
+      title={hit.name}
+      // Wider than the `lg` preset's 760px: a version row carries seven fields,
+      // and the whole point of moving off the 400px pane was that they stop
+      // wrapping. The fixed height on md+ keeps the panel from resizing as the
+      // player clicks from a mod with one version to a mod with forty.
+      className="max-w-[1040px] md:h-[min(720px,calc(100dvh-3rem))]"
+      // On md+ the body must NOT scroll as one — each column owns its own
+      // scroll, so the version list stays put while a long description moves.
+      // Stacked on narrow, one scroll for the whole thing is the right feel.
+      bodyClassName="p-0 overflow-y-auto md:overflow-hidden"
+    >
+      <div className="flex min-h-0 flex-col md:h-full md:flex-row">
+        <aside className="bm-scroll flex shrink-0 flex-col gap-3 border-b border-solid border-line p-4 md:min-h-0 md:w-[320px] md:overflow-y-auto md:border-b-0 md:border-r lg:w-[360px]">
+          <div className="flex items-start gap-3">
+            <CatalogIcon src={hit.iconUrl} size={56} />
+            <div className="min-w-0 flex-1">
+              <p className="font-body text-[12px] text-txt-dim">{hit.summary}</p>
+              <span className="mt-1 flex items-center gap-2 font-mono text-[10px] text-txt-muted">
+                <Icon name="download" size={11} />
+                {compactCount(hit.downloads)}
+                {hit.author ? ` · ${hit.author}` : ""}
               </span>
-            ))}
+            </div>
           </div>
-        </div>
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t("close")}
-          className="shrink-0 font-mono text-[12px] text-txt-dim hover:text-txt"
-        >
-          ×
-        </button>
-      </div>
 
-      {description && (
-        <p className="max-h-[120px] overflow-auto whitespace-pre-line font-body text-[12px] text-txt-dim">
-          {description}
-        </p>
-      )}
-
-      {project && (project.sourceUrl || project.issuesUrl || project.websiteUrl) && (
-        <div className="flex flex-wrap gap-3 font-mono text-[11px]">
-          {project.sourceUrl && (
-            <a href={project.sourceUrl} target="_blank" rel="noreferrer" className="text-acc">
-              {t("linkSource")}
-            </a>
-          )}
-          {project.issuesUrl && (
-            <a href={project.issuesUrl} target="_blank" rel="noreferrer" className="text-acc">
-              {t("linkIssues")}
-            </a>
-          )}
-          {project.websiteUrl && (
-            <a href={project.websiteUrl} target="_blank" rel="noreferrer" className="text-acc">
-              {t("linkWebsite")}
-            </a>
-          )}
-        </div>
-      )}
-
-      <div className="flex items-center justify-between gap-2">
-        <span className="font-display text-[11px] font-bold uppercase tracking-[0.08em] text-txt-dim">
-          {t("files")}
-        </span>
-        <Seg
-          value={showAllFiles ? "all" : "compatible"}
-          onChange={(v) => setShowAllFiles(v === "all")}
-          options={[
-            { value: "compatible", label: t("compatibleOnly") },
-            { value: "all", label: t("allFiles") },
-          ]}
-        />
-      </div>
-
-      {loading ? (
-        <span className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
-          <Spinner size={12} /> {t("loadingFiles")}
-        </span>
-      ) : files.length === 0 ? (
-        <p className="font-body text-[12px] text-txt-dim">{t("noCompatibleFiles")}</p>
-      ) : (
-        <ul className="flex max-h-[220px] flex-col gap-1 overflow-auto">
-          {files.map((file) => {
-            const key = `${hit.platform}:${hit.projectId}:${file.fileId}`
-            const busy = busyKey === key
-            const requiredDeps = file.dependencies.filter((d) => d.relation === "required").length
-            return (
-              <li
-                key={file.fileId}
-                className="flex flex-wrap items-center gap-2 border border-solid border-line bg-panel-2 px-2 py-[6px]"
-              >
-                <Badge tone={file.releaseType === "release" ? "ok" : "warn"} className="shrink-0">
-                  {t(`releaseType.${file.releaseType}`)}
+          {(viaConnector ||
+            (project?.clientSide && project.clientSide !== "unknown") ||
+            (project?.serverSide && project.serverSide !== "unknown")) && (
+            <div className="flex flex-wrap items-center gap-2">
+              {/* First, and in the browser's colour: this is the last screen
+                  before the jar is added, so "this one is Fabric" belongs where
+                  the player is already looking. */}
+              {viaConnector && <Badge tone="new">{t("loaderFabric")}</Badge>}
+              {project?.clientSide && project.clientSide !== "unknown" && (
+                <Badge tone={project.clientSide === "required" ? "info" : "warn"}>
+                  {t(`side.client.${project.clientSide}`)}
                 </Badge>
-                <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-txt-muted">
-                  {file.fileName}
-                </span>
-                {showAllFiles && (
-                  <span className="shrink-0 font-mono text-[10px] text-txt-dim">
-                    {file.gameVersions
-                      .filter((v) => /^\d/.test(v))
-                      .slice(0, 3)
-                      .join(", ")}
-                  </span>
-                )}
-                {requiredDeps > 0 && (
-                  <Badge tone="info" className="shrink-0">
-                    {t("depsCount", { count: requiredDeps })}
-                  </Badge>
-                )}
-                <span className="shrink-0 font-mono text-[11px] text-txt-dim">
-                  {formatSize(file.fileSize)}
-                </span>
-                <span className="shrink-0 font-mono text-[11px] text-txt-dim">
-                  {file.datePublished.slice(0, 10)}
-                </span>
-                {file.downloadable ? (
-                  <Button
-                    size="sm"
-                    icon="plus"
-                    loading={busy}
-                    disabled={busyKey !== null}
-                    onClick={() => void onAdd({ hit, file })}
+              )}
+              {project?.serverSide && project.serverSide !== "unknown" && (
+                <Badge tone={project.serverSide === "required" ? "info" : "warn"}>
+                  {t(`side.server.${project.serverSide}`)}
+                </Badge>
+              )}
+            </div>
+          )}
+
+          {(project?.categories ?? hit.categories).length > 0 && (
+            <div className="flex flex-wrap gap-x-2 gap-y-1 font-mono text-[10px] capitalize text-txt-muted">
+              {(project?.categories ?? hit.categories).slice(0, 8).map((c) => (
+                <span key={c}>{c}</span>
+              ))}
+            </div>
+          )}
+
+          {/* No max-height any more: the column scrolls, so a long description
+              is read by scrolling rather than through a 120px porthole. */}
+          {description && (
+            <p className="whitespace-pre-line font-body text-[12px] leading-relaxed text-txt-dim">
+              {description}
+            </p>
+          )}
+
+          {project && (project.sourceUrl || project.issuesUrl || project.websiteUrl) && (
+            <div className="mt-auto flex flex-wrap gap-3 pt-2 font-mono text-[11px]">
+              {project.sourceUrl && (
+                <a href={project.sourceUrl} target="_blank" rel="noreferrer" className="text-acc">
+                  {t("linkSource")}
+                </a>
+              )}
+              {project.issuesUrl && (
+                <a href={project.issuesUrl} target="_blank" rel="noreferrer" className="text-acc">
+                  {t("linkIssues")}
+                </a>
+              )}
+              {project.websiteUrl && (
+                <a href={project.websiteUrl} target="_blank" rel="noreferrer" className="text-acc">
+                  {t("linkWebsite")}
+                </a>
+              )}
+            </div>
+          )}
+        </aside>
+
+        <section className="flex min-h-0 flex-1 flex-col p-4 md:overflow-hidden">
+          <div className="mb-2 flex shrink-0 flex-wrap items-center justify-between gap-2">
+            <span className="font-display text-[11px] font-bold uppercase tracking-[0.08em] text-txt-dim">
+              {t("files")}
+            </span>
+            <Seg
+              value={showAllFiles ? "all" : "compatible"}
+              onChange={(v) => setShowAllFiles(v === "all")}
+              options={[
+                { value: "compatible", label: t("compatibleOnly") },
+                { value: "all", label: t("allFiles") },
+              ]}
+            />
+          </div>
+
+          {loading ? (
+            <span className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
+              <Spinner size={12} /> {t("loadingFiles")}
+            </span>
+          ) : files.length === 0 ? (
+            <p className="font-body text-[12px] text-txt-dim">{t("noCompatibleFiles")}</p>
+          ) : (
+            <ul className="bm-scroll flex min-h-0 flex-1 flex-col gap-1 md:overflow-y-auto">
+              {files.map((file) => {
+                const key = `${hit.platform}:${hit.projectId}:${file.fileId}`
+                const busy = busyKey === key
+                const requiredDeps = file.dependencies.filter(
+                  (d) => d.relation === "required",
+                ).length
+                return (
+                  <li
+                    key={file.fileId}
+                    className="flex flex-wrap items-center gap-x-2 gap-y-1 border border-solid border-line bg-panel-2 px-2 py-2"
                   >
-                    {busy ? t("resolving") : t("addMod")}
-                  </Button>
-                ) : (
-                  <span className="flex shrink-0 items-center gap-1 font-mono text-[11px] text-bad">
-                    <Icon name="alert" size={12} />
-                    {t("notDistributable")}
-                  </span>
-                )}
-              </li>
-            )
-          })}
-        </ul>
-      )}
-      {files.some((f) => !f.downloadable) && (
-        <p className="font-body text-[12px] text-bad">{t("notDistributableLead")}</p>
-      )}
-    </div>
+                    <Badge
+                      tone={file.releaseType === "release" ? "ok" : "warn"}
+                      className="shrink-0"
+                    >
+                      {t(`releaseType.${file.releaseType}`)}
+                    </Badge>
+                    <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-txt-muted">
+                      {file.fileName}
+                    </span>
+                    {file.downloadable ? (
+                      <Button
+                        size="sm"
+                        icon="plus"
+                        loading={busy}
+                        disabled={busyKey !== null}
+                        // Closes on success so the player lands back on the
+                        // grid with the card now marked "added". A pane could
+                        // stay open because it sat BESIDE the results; a modal
+                        // covers them, and there is never a second version of
+                        // the same mod to pick. A throw leaves it open on
+                        // purpose — the host toasts the reason, and closing
+                        // would hide the row it refers to.
+                        onClick={async () => {
+                          await onAdd({ hit, file })
+                          onClose()
+                        }}
+                        className="shrink-0"
+                      >
+                        {busy ? t("resolving") : t("addMod")}
+                      </Button>
+                    ) : (
+                      <span className="flex shrink-0 items-center gap-1 font-mono text-[11px] text-bad">
+                        <Icon name="alert" size={12} />
+                        {t("notDistributable")}
+                      </span>
+                    )}
+                    {/* `w-full` drops the metadata onto its own line under the
+                        filename. With the Add button sharing the first line, one
+                        row of seven fields would still wrap at any width this
+                        modal can offer. */}
+                    <span className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] text-txt-dim">
+                      {file.versionNumber && <span>{file.versionNumber}</span>}
+                      <span>
+                        {file.gameVersions
+                          .filter((v) => /^\d/.test(v))
+                          .slice(0, 4)
+                          .join(", ")}
+                      </span>
+                      <span>{formatSize(file.fileSize)}</span>
+                      <span>{file.datePublished.slice(0, 10)}</span>
+                      {requiredDeps > 0 && (
+                        <Badge tone="info">{t("depsCount", { count: requiredDeps })}</Badge>
+                      )}
+                    </span>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+
+          {files.some((f) => !f.downloadable) && (
+            <p className="mt-2 shrink-0 font-body text-[12px] text-bad">
+              {t("notDistributableLead")}
+            </p>
+          )}
+        </section>
+      </div>
+    </Modal>
   )
 }

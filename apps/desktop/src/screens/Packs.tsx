@@ -286,6 +286,14 @@ function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "c
                 ? `${latest.minecraft} · ${t("filesCount", { count: latest.fileCount })}`
                 : t("noPublishedVersion")}
             </span>
+            {/* Only when there is something to choose. A "0 opciones" chip on
+                every card of a 40-pack library is noise; this one appears only
+                where it changes what the player would do next. */}
+            {!!latest?.optionalFeatureCount && (
+              <Badge tone="info">
+                {t("optionalCount", { count: latest.optionalFeatureCount })}
+              </Badge>
+            )}
           </>
         }
         footerMeta={

@@ -261,8 +261,11 @@ fn backoff_delay(attempt: u32) -> std::time::Duration {
     std::time::Duration::from_millis(base + jitter)
 }
 
+/// Fetch (or place from cache) exactly one file. `pub(crate)` because the
+/// add-a-mod path in mod.rs downloads a handful of named files without a plan,
+/// a phase or a progress bar — everything `download_all` exists to provide.
 #[allow(clippy::too_many_arguments)]
-async fn fetch_one(
+pub(crate) async fn fetch_one(
     app: &tauri::AppHandle,
     http: &reqwest::Client,
     layout: &Layout,

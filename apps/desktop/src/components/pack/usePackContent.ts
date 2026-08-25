@@ -7,8 +7,10 @@ import {
   type ContentFile,
   catalogProjectSummaries,
   catalogVersions,
+  catalogVersionsByHashes,
   catalogVersionsByIds,
   instanceContent,
+  instanceExtraFiles,
   localPackGet,
 } from "../../runtime"
 
@@ -35,7 +37,13 @@ export type ContentRow = {
   optional: boolean
   enabled: boolean
   installed: boolean
-  kind: "modrinth" | "curseforge" | "url" | "override"
+  /** Where the bytes came from. `manual` is the odd one out: it is not a
+   *  source the pack declares at all, it is a file the player put there. */
+  kind: "modrinth" | "curseforge" | "url" | "override" | "manual"
+  /** True for a file found on disk that the marker does not claim. Rendered
+   *  with its own badge, and deliberately never written back to the marker —
+   *  that is what keeps the stale sweep off it. */
+  manual?: boolean
   projectId?: string
   versionId?: string
   /** Display name: the project's title when we know it, else the filename. */
@@ -43,6 +51,11 @@ export type ContentRow = {
   iconUrl?: string
   author?: string
   versionLabel?: string
+  /** The loader this jar was built for, when it is NOT the pack's own — in
+   *  practice "fabric" on a NeoForge pack running Connector. Read straight off
+   *  the manifest rather than re-derived: the alternative is one Modrinth round
+   *  trip per row every time the tab opens. */
+  loader?: string
   /** Set when a newer version exists for this pack's Minecraft/loader pair.
    *  `fromLabel` is absent when the pinned version is not in the project's
    *  current list for this pair (withdrawn, or built for another loader) —
@@ -83,9 +96,21 @@ type ManifestFile = {
   path: string
   fileSize: number
   source: { kind: string; projectId?: unknown; versionId?: unknown; url?: unknown }
+  /** Present only for a jar built for a different loader than the pack's — a
+   *  Fabric mod running through Sinytra Connector. */
+  loader?: string
 }
 
-export function usePackContent(slug: string, isLocal: boolean, active: boolean) {
+/** `refreshKey` is an outside-in refetch: the rows describe what is ON DISK, so
+ *  an install that finishes elsewhere on the page silently invalidates them.
+ *  A prop rather than a remount, because the tab now also holds live per-file
+ *  download state that a remount would drop mid-download. */
+export function usePackContent(
+  slug: string,
+  isLocal: boolean,
+  active: boolean,
+  refreshKey = 0,
+) {
   const t = useT("content")
   const [rows, setRows] = useState<ContentRow[]>([])
   const [loading, setLoading] = useState(true)
@@ -99,7 +124,12 @@ export function usePackContent(slug: string, isLocal: boolean, active: boolean) 
     setLoading(true)
 
     void (async () => {
-      const installed = await instanceContent(slug)
+      // Both reads hit the same instance directory, so there is nothing to
+      // serialise them for.
+      const [installed, extras] = await Promise.all([
+        instanceContent(slug),
+        instanceExtraFiles(slug),
+      ])
       const byPath = new Map<string, ContentRow>()
 
       const push = (row: ContentRow) => {
@@ -138,6 +168,48 @@ export function usePackContent(slug: string, isLocal: boolean, active: boolean) 
               raw.source?.versionId === undefined
                 ? derived?.versionId
                 : String(raw.source.versionId),
+            name: fileNameOf(path),
+            loader: raw.loader,
+          })
+        }
+      }
+
+      // Hand-dropped files, pushed LAST so anything the pack declares keeps its
+      // own row: `push` is first-wins, and a pack file that happens to sit on
+      // disk is a pack file, not a manual one.
+      //
+      // One batched hash lookup turns filenames into mods. Without it a row
+      // reading "journeymap-neoforge-1.21.1-6.0.0.jar" sits next to managed rows
+      // showing a title, an icon and an author, and looks like a defect rather
+      // than a feature.
+      if (extras.length > 0) {
+        const hashes = extras.map((e) => e.sha512).filter(Boolean) as string[]
+        const byHash = new Map<string, Awaited<ReturnType<typeof catalogVersionsByHashes>>[number]>()
+        for (const version of await catalogVersionsByHashes(hashes)) {
+          if (version.sha512) byHash.set(version.sha512.toLowerCase(), version)
+        }
+
+        for (const extra of extras) {
+          const path = extra.path.replace(/\\/g, "/")
+          const match = extra.sha512 ? byHash.get(extra.sha512.toLowerCase()) : undefined
+          push({
+            path,
+            fileName: fileNameOf(path),
+            size: extra.size,
+            isMod: path.toLowerCase().startsWith("mods/"),
+            optional: false,
+            enabled: extra.enabled,
+            // Found by walking the directory, so it is on disk by definition.
+            installed: true,
+            kind: "manual",
+            manual: true,
+            // Set when Modrinth recognised the hash. `projectId` is what the
+            // batch below turns into a name, an icon and an author; `kind` stays
+            // "manual" so `findUpdates` skips these — applying an update writes
+            // to the manifest, and a manual file is not in it.
+            projectId: match?.projectId,
+            versionId: match?.fileId,
+            versionLabel: match?.versionNumber,
             name: fileNameOf(path),
           })
         }
@@ -184,7 +256,7 @@ export function usePackContent(slug: string, isLocal: boolean, active: boolean) 
     return () => {
       live = false
     }
-  }, [slug, isLocal, active, nonce])
+  }, [slug, isLocal, active, nonce, refreshKey])
 
   return { rows, loading, reload, setRows }
 }

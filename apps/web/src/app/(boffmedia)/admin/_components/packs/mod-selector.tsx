@@ -1,10 +1,12 @@
 "use client"
 
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
 import {
   Badge,
   type BrowsePick,
+  CONNECTOR_PROJECT_ID,
+  type CatalogLoader,
   type CatalogProjectType,
   Button,
   Field,
@@ -17,6 +19,9 @@ import {
   Spinner,
   bestFile,
   catalogLoaderOf,
+  connectorCompanions,
+  connectorSubstitute,
+  connectorSupport,
   defaultFolder,
   getCatalog,
   resolveSourceOf,
@@ -44,6 +49,10 @@ export type SelectedMod = {
    *  admin can tell it apart from a deliberate pick. */
   viaDependency?: boolean
   projectId?: string
+  /** Recorded only when the jar's loader differs from the pack's — a Fabric mod
+   *  running on NeoForge through Connector. Carried straight to the manifest's
+   *  `PackFile.loader`, and what the "Fabric" badge in the list reads. */
+  loader?: CatalogLoader
 }
 
 function formatSize(bytes: number): string {
@@ -79,6 +88,28 @@ export function ModSelector({
   const gameVersion = minecraft.trim()
   const catalogLoader = catalogLoaderOf(loader)
 
+  // Connector mode. `available` is asked of Modrinth (does Connector ship for
+  // this Minecraft/loader pair at all?); `choice` is the admin's explicit
+  // toggle, and null means "not touched", in which case the pack already
+  // containing Connector is taken as the answer. That way the switch turns
+  // itself on the moment Connector lands in the list, without ever overriding
+  // someone who deliberately turned it off.
+  const [connectorAvailable, setConnectorAvailable] = useState(false)
+  const [connectorChoice, setConnectorChoice] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    let live = true
+    void connectorSupport(gameVersion, catalogLoader).then((support) => {
+      if (live) setConnectorAvailable(support.available)
+    })
+    return () => {
+      live = false
+    }
+  }, [gameVersion, catalogLoader])
+
+  const hasConnector = value.some((m) => m.projectId === CONNECTOR_PROJECT_ID)
+  const connectorEnabled = connectorAvailable && (connectorChoice ?? hasConnector)
+
   // `value` is read inside async handlers, never in an effect; a ref keeps the
   // handlers free of a dependency that changes on every pick.
   const valueRef = useRef(value)
@@ -86,8 +117,23 @@ export function ModSelector({
   const appendAll = useCallback(
     (mods: SelectedMod[]) => {
       if (mods.length === 0) return
+      // Both sets grow as the batch is walked, so the incoming mods are deduped
+      // against EACH OTHER as well as against what is already selected. Path is
+      // checked alongside key because path is what the manifest actually
+      // constrains: two dependency edges resolving to the same jar (Fabric API
+      // and Forgified Fabric API both land on the forgified one under Connector)
+      // produce different keys but the SAME path, and the API rejects the whole
+      // version over it.
       const existing = new Set(valueRef.current.map((m) => m.key))
-      const fresh = mods.filter((m) => !existing.has(m.key))
+      const paths = new Set(valueRef.current.map((m) => m.path.toLowerCase()))
+      const fresh: SelectedMod[] = []
+      for (const mod of mods) {
+        const path = mod.path.toLowerCase()
+        if (existing.has(mod.key) || paths.has(path)) continue
+        existing.add(mod.key)
+        paths.add(path)
+        fresh.push(mod)
+      }
       if (fresh.length > 0) onChange([...valueRef.current, ...fresh])
     },
     [onChange],
@@ -109,6 +155,8 @@ export function ModSelector({
       name: string,
       viaDependency: boolean,
       projectType: CatalogProjectType,
+      /** Only when it differs from the pack's own loader — see SelectedMod. */
+      entryLoader?: CatalogLoader,
     ): Promise<SelectedMod | null> => {
       const resolved = await getCatalog().resolve(
         resolveSourceOf(hitPlatform, projectId, file.fileId),
@@ -127,9 +175,71 @@ export function ModSelector({
         versionLabel: file.versionNumber ?? file.displayName,
         viaDependency,
         projectId,
+        loader: entryLoader,
       }
     },
     [],
+  )
+
+  /** Files for a project against this pack, falling back to Fabric when the
+   *  project has nothing for the pack's own loader and Connector is on.
+   *
+   *  Empirical rather than derived from the project's advertised loaders on
+   *  purpose: a search hit folds its loaders into `categories`, but a project
+   *  summary does not reliably, so asking "are there files?" is the only check
+   *  that is correct for both. The second request only happens on the fallback
+   *  path — a dual-loader mod never reaches it. */
+  const filesForLoader = useCallback(
+    async (
+      hitPlatform: ModPlatform,
+      projectId: string,
+    ): Promise<{ files: ModFile[]; entryLoader?: CatalogLoader }> => {
+      const native = await getCatalog().files(hitPlatform, projectId, {
+        gameVersion,
+        loader: catalogLoader,
+        pageSize: 30,
+      })
+      if (native.length > 0 || !connectorEnabled) return { files: native }
+
+      const fabric = await getCatalog().files(hitPlatform, projectId, {
+        gameVersion,
+        loader: "fabric",
+        pageSize: 30,
+      })
+      return fabric.length > 0 ? { files: fabric, entryLoader: "fabric" } : { files: native }
+    },
+    [catalogLoader, connectorEnabled, gameVersion],
+  )
+
+  /** Best installable file for a project id, resolved into a manifest entry.
+   *  Shared by the dependency walk, the Connector substitution and the
+   *  companion add, so all three agree on loader fallback and naming. */
+  const entryForProject = useCallback(
+    async (
+      hitPlatform: ModPlatform,
+      projectId: string,
+      name: string,
+      viaDependency: boolean,
+    ): Promise<{ entry: SelectedMod; file: ModFile } | null> => {
+      const { files, entryLoader } = await filesForLoader(hitPlatform, projectId)
+      const pick = bestFile(files)
+      if (!pick) return null
+      // Always "mod": a required dependency is a loadable jar whatever depends
+      // on it — a shader's dependency is Iris, which is a mod.
+      const entry = await resolveEntry(
+        hitPlatform,
+        projectId,
+        pick,
+        name,
+        viaDependency,
+        "mod",
+        entryLoader,
+      )
+      // The file comes back alongside the entry because the dependency walk
+      // needs ITS dependencies to build the next frontier.
+      return entry ? { entry, file: pick } : null
+    },
+    [filesForLoader, resolveEntry],
   )
 
   /** Walks required dependencies breadth-first. Without this a pack installs
@@ -147,54 +257,99 @@ export function ModSelector({
       // Depth cap: dependency graphs are shallow in practice, and a cycle here
       // would otherwise resolve (and download) forever.
       for (let depth = 0; depth < 4 && frontier.length > 0; depth += 1) {
-        const pending = frontier.filter((d) => !known.has(`${d.platform}:${d.projectId}`))
+        // A Fabric mod's dependency on Fabric API must become Forgified Fabric
+        // API under Connector. Connector refuses to load Fabric API itself, so
+        // following this edge literally is not a degraded pack, it is one that
+        // does not boot.
+        //
+        // The substitution happens BEFORE the `known` check, not after, and that
+        // order is the whole point: the companion pass registers the FORGIFIED
+        // id, while the raw edge carries the FABRIC one. Filtering on the raw id
+        // first let Fabric API through, substituted it to a project already
+        // queued, and produced two entries with the same path — which the
+        // manifest rejects, so the entire add failed.
+        //
+        // Both ids are checked: the raw one so an already-present Fabric API is
+        // still skipped, the substituted one so the companion is not re-added.
+        // `roundSeen` covers the third case the set cannot — two mods in the
+        // SAME batch depending on Fabric API, which would otherwise resolve to
+        // the same jar twice.
+        const roundSeen = new Set<string>()
+        const targets: { dep: (typeof frontier)[number]; projectId: string }[] = []
+        for (const dep of frontier) {
+          const projectId =
+            (connectorEnabled ? connectorSubstitute(dep.projectId) : undefined) ??
+            dep.projectId
+          if (
+            known.has(`${dep.platform}:${dep.projectId}`) ||
+            known.has(`${dep.platform}:${projectId}`) ||
+            roundSeen.has(projectId)
+          ) {
+            continue
+          }
+          roundSeen.add(projectId)
+          targets.push({ dep, projectId })
+        }
         frontier = []
-        if (pending.length === 0) break
+        if (targets.length === 0) break
 
+        // Names come from the batch lookup on the SUBSTITUTED ids, so the list
+        // shows the forgified jar under its own name rather than "Fabric API".
         const summaries = await getCatalog().projectSummaries(
           hitPlatform,
-          pending.map((d) => d.projectId),
+          targets.map((x) => x.projectId),
         )
         const names = new Map<string, ModSearchHit>(summaries.map((s) => [s.projectId, s]))
 
-        for (const dep of pending) {
+        for (const { dep, projectId: depId } of targets) {
           known.add(`${dep.platform}:${dep.projectId}`)
-          const name = names.get(dep.projectId)?.name ?? dep.projectId
+          known.add(`${dep.platform}:${depId}`)
+
+          const name = names.get(depId)?.name ?? depId
           setProgress(t("resolvingDependency", { name }))
 
-          const files = await getCatalog().files(hitPlatform, dep.projectId, {
-            gameVersion,
-            loader: catalogLoader,
-            pageSize: 30,
-          })
-          const pick = bestFile(files)
-          if (!pick) {
+          const resolved = await entryForProject(hitPlatform, depId, name, true)
+          if (!resolved) {
             skipped.push(name)
             continue
           }
-          // Always "mod": a required dependency is a loadable jar whatever
-          // depends on it — a shader's dependency is Iris, which is a mod.
-          const entry = await resolveEntry(hitPlatform, dep.projectId, pick, name, true, "mod")
-          if (!entry) {
-            skipped.push(name)
-            continue
-          }
-          added.push(entry)
-          frontier.push(...pick.dependencies.filter((d) => d.relation === "required"))
+          added.push(resolved.entry)
+          frontier.push(...resolved.file.dependencies.filter((d) => d.relation === "required"))
         }
       }
       return { added, skipped }
     },
-    [catalogLoader, gameVersion, resolveEntry, t],
+    [connectorEnabled, entryForProject, t],
   )
 
   const addPick = useCallback(
-    async ({ hit, file, projectType }: BrowsePick) => {
+    async ({ hit, file, projectType, viaConnector }: BrowsePick) => {
       const key = `${hit.platform}:${hit.projectId}:${file.fileId}`
       if (busyKey) return
       setBusyKey(key)
       setProgress(t("resolving"))
       try {
+        // The substitution has to cover a DIRECT pick, not just a walked
+        // dependency: with Connector on, Fabric API ranks first for almost any
+        // query, so the likeliest way to break a pack is for someone to click it.
+        const substitute = connectorEnabled
+          ? connectorSubstitute(hit.projectId)
+          : undefined
+        if (substitute) {
+          const swapped = await entryForProject(hit.platform, substitute, hit.name, false)
+          if (!swapped) {
+            toast({ tone: "bad", title: t("resolveFailed"), msg: hit.name })
+            return
+          }
+          appendAll([swapped.entry])
+          toast({
+            tone: "warn",
+            title: t("connectorSubstituted"),
+            msg: swapped.entry.name,
+          })
+          return
+        }
+
         const entry = await resolveEntry(
           hit.platform,
           hit.projectId,
@@ -202,6 +357,7 @@ export function ModSelector({
           hit.name,
           false,
           projectType,
+          viaConnector ? "fabric" : undefined,
         )
         if (!entry) {
           toast({ tone: "bad", title: t("resolveFailed"), msg: file.fileName })
@@ -213,9 +369,34 @@ export function ModSelector({
             .map((m) => `${m.platform}:${m.projectId}`),
         )
         known.add(`${hit.platform}:${hit.projectId}`)
-        const { added, skipped } = await collectDependencies(hit.platform, file, known)
-        appendAll([entry, ...added])
 
+        // Connector and Forgified Fabric API, pulled in the first time a Fabric
+        // mod is added. Both, not just Connector: Connector alone boots and then
+        // every Fabric mod touching Fabric API crashes on a missing class.
+        // `known` gets them before the dependency walk so the walk cannot add
+        // them a second time.
+        const companions: SelectedMod[] = []
+        if (viaConnector) {
+          for (const c of await connectorCompanions(gameVersion, catalogLoader)) {
+            if (known.has(`${hit.platform}:${c.projectId}`)) continue
+            known.add(`${hit.platform}:${c.projectId}`)
+            setProgress(t("resolvingDependency", { name: c.file.displayName }))
+            const resolved = await entryForProject(
+              hit.platform,
+              c.projectId,
+              c.file.displayName,
+              true,
+            )
+            if (resolved) companions.push(resolved.entry)
+          }
+        }
+
+        const { added, skipped } = await collectDependencies(hit.platform, file, known)
+        appendAll([entry, ...companions, ...added])
+
+        if (companions.length > 0) {
+          toast({ tone: "ok", title: t("connectorCompanionsAdded") })
+        }
         if (skipped.length > 0) {
           toast({ tone: "warn", title: t("depsSkipped"), msg: skipped.join(", ") })
         } else if (added.length > 0) {
@@ -226,7 +407,17 @@ export function ModSelector({
         setProgress(null)
       }
     },
-    [appendAll, busyKey, collectDependencies, resolveEntry, t],
+    [
+      appendAll,
+      busyKey,
+      catalogLoader,
+      collectDependencies,
+      connectorEnabled,
+      entryForProject,
+      gameVersion,
+      resolveEntry,
+      t,
+    ],
   )
 
   const addByUrl = useCallback(async () => {
@@ -317,6 +508,14 @@ export function ModSelector({
           onPlatformChange={setPlatform}
           gameVersion={gameVersion}
           loader={catalogLoader}
+          // Absent unless Connector actually ships for this Minecraft/loader
+          // pair, so a Fabric pack or an unsupported version never sees a
+          // toggle that could not do anything.
+          connector={
+            connectorAvailable
+              ? { enabled: connectorEnabled, onChange: setConnectorChoice }
+              : undefined
+          }
           isAdded={isAdded}
           onAdd={addPick}
           busyKey={busyKey}
@@ -394,6 +593,11 @@ export function ModSelector({
                   <Badge tone="info" className="shrink-0">
                     {t(`sourceKind.${mod.platform}`)}
                   </Badge>
+                  {mod.loader === "fabric" && (
+                    <Badge tone="new" className="shrink-0">
+                      {t("loaderFabric")}
+                    </Badge>
+                  )}
                   {mod.viaDependency && (
                     <Badge tone="warn" className="shrink-0">
                       {t("viaDependency")}

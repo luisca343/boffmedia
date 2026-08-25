@@ -235,7 +235,11 @@ export function PmdSkyView() {
                   <div className="font-body text-[13px] font-semibold leading-[1.2] text-txt">{tApp("euTitle")}</div>
                   <div className="mt-[3px] font-body text-[12px] leading-[1.45] text-txt-dim">{tApp("euSub")}</div>
                 </div>
-                <Toggle on={form.europeanVersion} onChange={(v) => setEuropean(v)} />
+                <Toggle
+                  on={form.europeanVersion}
+                  onChange={(v) => setEuropean(v)}
+                  ariaLabel={tApp("euTitle")}
+                />
               </div>
             </Disclosure>
           </div>

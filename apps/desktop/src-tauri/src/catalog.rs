@@ -298,6 +298,7 @@ pub async fn catalog_search(
     category: Option<String>,
     page: Option<u32>,
     page_size: Option<u32>,
+    include_fabric_via_connector: Option<bool>,
 ) -> Result<ModSearchPage, CatalogErrorWire> {
     let limit = page_size.unwrap_or(20).clamp(1, 100);
     let offset = page.unwrap_or(0) * limit;
@@ -314,7 +315,24 @@ pub async fn catalog_search(
     // On Modrinth a loader IS a category, which is also why a loader facet on a
     // resource-pack search silently returns nothing.
     if let Some(l) = loader.as_deref().filter(|v| !v.is_empty()) {
-        facets.push(vec![format!("categories:{l}")]);
+        // Sinytra Connector runs Fabric mods on NeoForge (on Forge for 1.20.1),
+        // so a pack that has it can install either. Both loaders go in ONE inner
+        // array to be OR'd: a second array would AND them and match only mods
+        // that publish both, which is the opposite of what this is for.
+        //
+        // Gated on the pack's own loader being one Connector can host — a Fabric
+        // pack asking for Fabric twice is a no-op, and a Quilt pack would be
+        // offered mods it cannot load.
+        let widen = include_fabric_via_connector.unwrap_or(false)
+            && matches!(l, "neoforge" | "forge");
+        if widen {
+            facets.push(vec![
+                format!("categories:{l}"),
+                "categories:fabric".to_string(),
+            ]);
+        } else {
+            facets.push(vec![format!("categories:{l}")]);
+        }
     }
     if let Some(c) = category.as_deref().filter(|v| !v.is_empty()) {
         facets.push(vec![format!("categories:{c}")]);
@@ -626,6 +644,57 @@ pub async fn catalog_versions_by_ids(
             let project_id = v.project_id.clone();
             let mut file = mod_file_of(v)?;
             file.project_id = project_id;
+            Some(file)
+        })
+        .collect())
+}
+
+/// Identify jars by their SHA-512.
+///
+/// This is what makes a hand-dropped mod a first-class row instead of a
+/// filename: Modrinth will name the exact version a hash belongs to, so a jar
+/// the launcher never installed still gets its real title, icon, author and
+/// update check.
+///
+/// A POST, unlike every other call in this file, because the hash list is the
+/// request body — sixty SHA-512s is ~8KB, well past what a query string can
+/// carry. Unknown hashes are simply absent from the response (a private build,
+/// or a jar from anywhere but Modrinth), which is not an error: the caller
+/// falls back to the filename for those.
+#[tauri::command]
+pub async fn catalog_versions_by_hashes(
+    hashes: Vec<String>,
+) -> Result<Vec<ModFile>, CatalogErrorWire> {
+    if hashes.is_empty() {
+        return Ok(Vec::new());
+    }
+    let body = serde_json::json!({ "hashes": hashes, "algorithm": "sha512" });
+    let res = http()
+        .post(format!("{MODRINTH}/version_files"))
+        .header("accept", "application/json")
+        .json(&body)
+        .send()
+        .await
+        .map_err(|_| CatalogError::Unreachable)?;
+    if !res.status().is_success() {
+        return Err(CatalogError::Unreachable.into());
+    }
+    // Keyed BY HASH, not an array: the caller has to know which local file each
+    // answer belongs to, and the version's own file list can hold several.
+    let raw: std::collections::HashMap<String, VersionRaw> =
+        res.json().await.map_err(|_| CatalogError::Unreachable)?;
+
+    Ok(raw
+        .into_iter()
+        .filter_map(|(hash, version)| {
+            let project_id = version.project_id.clone();
+            let mut file = mod_file_of(version)?;
+            file.project_id = project_id;
+            // The response key is the hash that was ASKED about; the version's
+            // primary file may be a different artifact (a sources jar, another
+            // loader's build). Stamping the queried hash back on is what lets
+            // the caller match the row to the file on disk.
+            file.sha512 = Some(hash);
             Some(file)
         })
         .collect())

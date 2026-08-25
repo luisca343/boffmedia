@@ -27,6 +27,7 @@ configureCatalog({
       category: input.category,
       page: input.page,
       pageSize: input.pageSize,
+      includeFabricViaConnector: input.includeFabricViaConnector,
     }),
   categories: (_platform, projectType) => catalogCategories(projectType),
   project: (_platform, projectId) => catalogProject(projectId),

@@ -18,6 +18,7 @@ import {
   DesktopPrincipal,
   LauncherPackView,
   PackVersionView,
+  PublicPackView,
   StoredPackFile,
   StoredPackServer,
 } from './types/packs.types';
@@ -29,6 +30,20 @@ import {
 
 const ID_BYTES = 12;
 const INVITE_BYTES = 8;
+
+/** Features across every group of a stored `optional_groups` column.
+ *
+ *  Defensive at every level because this reads a JSON column: a row written by
+ *  an older build has `null`, and one hand-edited in the database could be
+ *  anything. A malformed value must degrade to "no optional content" rather than
+ *  take down the whole pack listing. */
+function countOptionalFeatures(groups: unknown): number {
+  if (!Array.isArray(groups)) return 0;
+  return groups.reduce<number>((total, group) => {
+    const features = (group as { features?: unknown })?.features;
+    return total + (Array.isArray(features) ? features.length : 0);
+  }, 0);
+}
 
 @Injectable()
 export class PacksService {
@@ -110,6 +125,9 @@ export class PacksService {
                   loaderVersion: version.loaderVersion,
                   fileCount: version.files.length,
                   worldCount: version.worlds?.length ?? 0,
+                  optionalFeatureCount: countOptionalFeatures(
+                    version.optionalGroups,
+                  ),
                   emulatorKind: this.emulatorKind(version.emulator),
                   createdAt: version.createdAt.toISOString(),
                 }
@@ -118,6 +136,72 @@ export class PacksService {
       }),
     );
     return views.filter((v): v is LauncherPackView => v !== null);
+  }
+
+  /**
+   * A pack's shareable public page — the link you hand someone alongside the
+   * `/app` download.
+   *
+   * **Public packs only.** `password` and `allowlist` return null, which the
+   * controller turns into a 404, and that is deliberate: those two access kinds
+   * exist so a pack's composition is not public, and a reduced page would still
+   * disclose that the pack exists and what it is called. One rule, and nothing
+   * about it can be got subtly wrong when someone adds a fourth access kind.
+   *
+   * Also archived-aware and draft-aware: an archived pack is not something to
+   * hand a stranger, and an unpublished latest version is a draft nobody outside
+   * the dashboard is meant to have seen.
+   *
+   * This is a shop window, not an install source. No `files[]`, no blob hashes,
+   * no download URLs — the manifest route is the one that hands those out, and
+   * it checks entitlement.
+   */
+  async publicPage(slug: string): Promise<PublicPackView | null> {
+    const pack = await this.repo.findBySlug(slug);
+    if (!pack || pack.archived) return null;
+    if (pack.accessKind !== 'public') return null;
+
+    const version = pack.latestVersionId
+      ? await this.repo.findVersion(pack.latestVersionId)
+      : null;
+    // A latest version that is somehow still a draft is not shown. The publish
+    // flow moves `latestVersionId` and `published` in one transaction, so this
+    // should be unreachable — which is exactly why it is worth a line rather
+    // than an assumption.
+    const published = version?.published ? version : null;
+
+    return {
+      slug: pack.slug,
+      name: pack.name,
+      summary: pack.summary ?? null,
+      description: pack.description ?? null,
+      iconUrl: pack.iconUrl ?? null,
+      // `packs.gallery` is a JSON column typed `unknown[]`; the shape is
+      // enforced on write by the same zod schema the manifest uses, so the cast
+      // is the boundary between an untyped column and a typed read, not a
+      // guess. The listing above does the same thing one field at a time.
+      gallery: (pack.gallery ?? []) as PublicPackView['gallery'],
+      // The host, never the port: this is a description of the pack, not
+      // something anyone connects from.
+      serverHost: pack.server?.host ?? null,
+      version: published
+        ? {
+            name: published.name,
+            minecraft: published.minecraft,
+            loader: published.loader,
+            loaderVersion: published.loaderVersion,
+            fileCount: published.files.length,
+            createdAt: published.createdAt.toISOString(),
+          }
+        : null,
+      // Straight through as stored. The renderer is `@boffmedia/ui`'s
+      // OptionalChooser in `readOnly` mode — the same component the launcher
+      // uses — so the page and the app describe a pack's choices identically
+      // rather than through two hand-written descriptions that drift.
+      optionalGroups: Array.isArray(published?.optionalGroups)
+        ? published.optionalGroups
+        : [],
+    };
   }
 
   /** The game-type-specific half of a version block, shared by the served
@@ -136,6 +220,7 @@ export class PacksService {
       zomboid?: unknown;
       stardew?: unknown;
       initialFiles?: unknown[] | null;
+      optionalGroups?: unknown[] | null;
     },
   ): Record<string, unknown> {
     const out: Record<string, unknown> = {};
@@ -151,6 +236,11 @@ export class PacksService {
     }
     if (v.initialFiles && v.initialFiles.length > 0)
       out.initialFiles = v.initialFiles;
+    // Game-agnostic like `initialFiles`, and omitted when empty for the same
+    // reason: a manifest without optional content stays byte-identical to the
+    // shape every existing launcher already installs from.
+    if (v.optionalGroups && v.optionalGroups.length > 0)
+      out.optionalGroups = v.optionalGroups;
     return out;
   }
 
@@ -632,6 +722,7 @@ export class PacksService {
       zomboid?: unknown;
       stardew?: unknown;
       initialFiles?: unknown[];
+      optionalGroups?: unknown[];
     }
   > {
     const version = await this.repo.findVersion(versionId);
@@ -657,6 +748,9 @@ export class PacksService {
       ...(version.zomboid ? { zomboid: version.zomboid } : {}),
       ...(version.stardew ? { stardew: version.stardew } : {}),
       ...(version.initialFiles ? { initialFiles: version.initialFiles } : {}),
+      ...(version.optionalGroups
+        ? { optionalGroups: version.optionalGroups }
+        : {}),
     };
   }
 
@@ -695,6 +789,7 @@ export class PacksService {
       zomboid: pv.zomboid ?? null,
       stardew: pv.stardew ?? null,
       initialFiles: pv.initialFiles ?? null,
+      optionalGroups: pv.optionalGroups ?? null,
       notes: dto.notes ?? null,
     });
     await this.repo.audit(AUDIT.VERSION_UPDATED, packId, null, {
@@ -768,6 +863,7 @@ export class PacksService {
           zomboid: dto.zomboid,
           stardew: dto.stardew,
           initialFiles: dto.initialFiles,
+          optionalGroups: dto.optionalGroups,
         }),
       },
     };
@@ -809,6 +905,7 @@ export class PacksService {
       zomboid: pv.zomboid ?? null,
       stardew: pv.stardew ?? null,
       initialFiles: pv.initialFiles ?? null,
+      optionalGroups: pv.optionalGroups ?? null,
       notes: dto.notes ?? null,
       published: false,
       createdBy: actorId,

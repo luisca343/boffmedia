@@ -41,7 +41,7 @@ fn local_packs_dir(app: &tauri::AppHandle) -> Result<PathBuf, InstallFailure> {
 /// own kebab-case pattern, or one crafted with `..`/`/`, is rejected before it
 /// ever reaches the filesystem (RF-10: managed packs, and anything outside
 /// this tree, are structurally unreachable).
-fn safe_local_dir(app: &tauri::AppHandle, slug: &str) -> Result<PathBuf, InstallFailure> {
+pub fn safe_local_dir(app: &tauri::AppHandle, slug: &str) -> Result<PathBuf, InstallFailure> {
     if !slug.starts_with(LOCAL_PREFIX) {
         return Err(InstallFailure::message(
             "Los packs locales deben tener un identificador que empiece por «local-».".to_string(),

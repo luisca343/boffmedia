@@ -5,7 +5,9 @@
 // The RULES below are hand-written on purpose. JSON Schema cannot express zod
 // refinements, so `emit-schema.mjs` silently drops them; anything added to
 // PackManifest as a `.superRefine` is invisible to the generated types and must
-// be mirrored here. Today that is exactly one rule: duplicate target paths.
+// be mirrored here: duplicate target paths, the bundled-world folder rules, the
+// game-type exclusivity engine, `patched`, the emulator arm, `initialFiles`, and
+// the nine optional-content rules in `validate_optional`.
 //
 // If you add a refinement in boffmedia.ts, add it here too — nothing enforces
 // that pairing automatically, which is why both files say so.
@@ -14,7 +16,24 @@
 
 include!(concat!(env!("OUT_DIR"), "/pack_schema.rs"));
 
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
+
+/// The group id `optionalModelOf` uses for the synthesised group of optional
+/// files no feature claims (D4). Reserved: an authored group by that name would
+/// be indistinguishable from a fold-in. Kept in step with `SYNTHETIC_GROUP_ID`
+/// in packages/pack-schema/src/boffmedia.ts.
+const SYNTHETIC_GROUP_ID: &str = "otros";
+
+/// Directory prefixes a global datapack loader reads (D1). `saves/<world>/
+/// datapacks/` does not exist until the world does and a player creates worlds
+/// whenever they like, so a per-world copy could only ever cover the worlds that
+/// existed at install time. Kept in step with `DATAPACK_LOADER_DIRS` in
+/// boffmedia.ts.
+const DATAPACK_LOADER_DIRS: [&str; 2] = ["config/openloader/datapacks/", "config/paxi/datapacks/"];
+
+/// Shorter local name for the generated select enum, which is otherwise 45
+/// characters of path in every match arm.
+type OptionalSelect = PackManifestVersionOptionalGroupsItemSelect;
 
 #[derive(Debug, thiserror::Error)]
 pub enum ManifestError {
@@ -66,6 +85,34 @@ pub enum ManifestError {
     PatchedPatchMissing(String),
     #[error("patched.patch must reference an override or url file: {0}")]
     PatchedPatchNotDistributable(String),
+    #[error("\"otros\" is reserved for unclaimed optional files: {0}")]
+    ReservedGroupId(String),
+    #[error("two optional groups share an id: {0}")]
+    DuplicateGroupId(String),
+    #[error("two optional features share an id: {0}")]
+    DuplicateFeatureId(String),
+    #[error("a feature path does not match any files[] entry: {0}")]
+    FeaturePathNotInFiles(String),
+    #[error("a feature path must be env.client \"optional\": {0}")]
+    FeaturePathNotOptional(String),
+    #[error("two features own the same path: {0}")]
+    FeaturePathOwnedTwice(String),
+    #[error("group \"{0}\" declares the wrong number of default:true features for its select mode")]
+    GroupDefaultCount(String),
+    #[error("activate.file must be one of the feature's own paths: {0}")]
+    ActivateFileNotOwned(String),
+    #[error("a shaderpack activation needs a \"one\" or \"atMostOne\" group: {0}")]
+    ShaderpackInAnyGroup(String),
+    #[error("a datapack must sit under a global loader directory: {0}")]
+    DatapackOutsideLoaderDir(String),
+    #[error("a feature cannot require itself: {0}")]
+    RequiresSelf(String),
+    #[error("requires names a feature that does not exist: {0}")]
+    RequiresUnknownFeature(String),
+    #[error("requires may only target a feature in an \"any\" group: {0}")]
+    RequiresRadioMember(String),
+    #[error("requires forms a cycle through: {0}")]
+    RequiresCycle(String),
 }
 
 /// Parse and fully validate a manifest — schema-level via serde, plus the
@@ -78,6 +125,7 @@ pub fn parse_manifest(raw: &str) -> Result<PackManifest, ManifestError> {
     validate_game_type(&manifest)?;
     validate_patched(&manifest)?;
     validate_emulator(&manifest)?;
+    validate_optional(&manifest)?;
     Ok(manifest)
 }
 
@@ -352,6 +400,221 @@ fn validate_initial_files(
         let key = path.to_lowercase().replace('\\', "/");
         if !seen.insert(key.clone()) {
             return Err(ManifestError::InitialFilesPathCollision(path.to_string()));
+        }
+    }
+
+    Ok(())
+}
+
+/// Mirrors the optional-content refinements in boffmedia.ts — all nine of them.
+///
+/// This is the highest-risk mirror in the file and worth saying why: the OTHER
+/// validators here are defence in depth, re-checking something the JSON Schema
+/// also encodes as a pattern or a required field. These nine are not. JSON
+/// Schema cannot express any of them, so `emit-schema.mjs` drops them and the
+/// generated types below carry no trace. If this function is wrong, the launcher
+/// installs a pack the dashboard would have refused, and nothing anywhere says
+/// so. The vitest suite in packages/pack-schema and the tests at the bottom of
+/// this file are deliberately case-for-case identical for that reason.
+///
+/// The rule numbers match the comments in boffmedia.ts's superRefine.
+fn validate_optional(manifest: &PackManifest) -> Result<(), ManifestError> {
+    let groups = &manifest.version.optional_groups;
+    if groups.is_empty() {
+        return Ok(());
+    }
+
+    let mut group_ids: HashSet<String> = HashSet::new();
+    // path -> "groupId/featureId" of the feature that already claims it.
+    let mut path_owner: HashMap<String, String> = HashMap::new();
+    // featureId -> the select mode of its group; also the existence check for
+    // `requires`.
+    let mut feature_select: HashMap<String, OptionalSelect> = HashMap::new();
+    let mut feature_requires: HashMap<String, Vec<String>> = HashMap::new();
+    // Insertion order, so a cycle is always reported over the same features in
+    // the same order regardless of HashMap iteration order.
+    let mut feature_order: Vec<String> = Vec::new();
+
+    let files: HashMap<String, &PackManifestVersionFilesItem> = manifest
+        .version
+        .files
+        .iter()
+        .map(|f| (norm_path(f.path.as_str()), f))
+        .collect();
+
+    for group in groups {
+        let group_id = group.id.as_str();
+        let select = group.select.clone().unwrap_or(OptionalSelect::Any);
+
+        // Rule 3a: unique group ids, and `otros` reserved for the group
+        // `optionalModelOf` synthesises out of unclaimed optional files.
+        if group_id == SYNTHETIC_GROUP_ID {
+            return Err(ManifestError::ReservedGroupId(group_id.to_string()));
+        }
+        if !group_ids.insert(group_id.to_string()) {
+            return Err(ManifestError::DuplicateGroupId(group_id.to_string()));
+        }
+
+        // Rule 6: a radio group needs exactly one default on; `atMostOne` at
+        // most one. Two defaults in a `one` group have no correct resolution.
+        let defaults_on = group.features.iter().filter(|f| f.default).count();
+        match select {
+            OptionalSelect::One if defaults_on != 1 => {
+                return Err(ManifestError::GroupDefaultCount(group_id.to_string()));
+            }
+            OptionalSelect::AtMostOne if defaults_on > 1 => {
+                return Err(ManifestError::GroupDefaultCount(group_id.to_string()));
+            }
+            _ => {}
+        }
+
+        for feature in &group.features {
+            let feature_id = feature.id.as_str();
+
+            // Rule 3b: feature ids are unique across the WHOLE version, not per
+            // group — the player's stored state is a flat set of feature ids, so
+            // two groups sharing one id would share one switch.
+            if feature_select.contains_key(feature_id) {
+                return Err(ManifestError::DuplicateFeatureId(feature_id.to_string()));
+            }
+            feature_select.insert(feature_id.to_string(), select.clone());
+            feature_requires.insert(
+                feature_id.to_string(),
+                feature.requires.iter().map(|r| r.as_str().to_string()).collect(),
+            );
+            feature_order.push(feature_id.to_string());
+
+            for path in &feature.paths {
+                let key = norm_path(path.as_str());
+
+                // Rule 1: the path is a real files[] entry — a feature owning a
+                // path that does not exist is a switch wired to nothing.
+                let Some(file) = files.get(&key) else {
+                    return Err(ManifestError::FeaturePathNotInFiles(path.as_str().to_string()));
+                };
+                // Rule 2: keeps the .mrpack view honest. Prism and packwiz read
+                // env.client and nothing else, so a file we let the player skip
+                // while calling it "required" installs differently depending on
+                // which launcher opened the pack.
+                if !matches!(file.env.client, PackManifestVersionFilesItemEnvClient::Optional) {
+                    return Err(ManifestError::FeaturePathNotOptional(
+                        path.as_str().to_string(),
+                    ));
+                }
+
+                // Rule 4: one owner per path. Two features owning one jar cannot
+                // both be honoured — switching either off parks the other's file.
+                if let Some(owner) = path_owner.get(&key) {
+                    return Err(ManifestError::FeaturePathOwnedTwice(format!(
+                        "{} (already owned by {owner})",
+                        path.as_str()
+                    )));
+                }
+                path_owner.insert(key, format!("{group_id}/{feature_id}"));
+            }
+
+            if let Some(activate) = &feature.activate {
+                let (kind, file) = match activate {
+                    PackManifestVersionOptionalGroupsItemFeaturesItemActivate::Resourcepack {
+                        file,
+                        ..
+                    } => ("resourcepack", file.as_str()),
+                    PackManifestVersionOptionalGroupsItemFeaturesItemActivate::Shaderpack {
+                        file,
+                    } => ("shaderpack", file.as_str()),
+                    PackManifestVersionOptionalGroupsItemFeaturesItemActivate::Datapack {
+                        file,
+                    } => ("datapack", file.as_str()),
+                };
+                let activate_key = norm_path(file);
+
+                // Rule 7: you may only activate what you own. Naming a file
+                // another feature can switch off means writing a config that
+                // points at a file that is not there.
+                if !feature
+                    .paths
+                    .iter()
+                    .any(|p| norm_path(p.as_str()) == activate_key)
+                {
+                    return Err(ManifestError::ActivateFileNotOwned(file.to_string()));
+                }
+
+                // Rule 8: iris.properties/oculus.properties hold ONE shaderPack
+                // value, so an `any` group would be offering a choice the game
+                // cannot honour and the launcher would have to pick a winner.
+                if kind == "shaderpack" && matches!(select, OptionalSelect::Any) {
+                    return Err(ManifestError::ShaderpackInAnyGroup(group_id.to_string()));
+                }
+
+                // Rule 9 (D1): a datapack reaches the game through a global
+                // loader, so its path has to be where that loader looks.
+                // Anywhere else and the file is downloaded, verified, and never
+                // read by anything.
+                if kind == "datapack"
+                    && !DATAPACK_LOADER_DIRS
+                        .iter()
+                        .any(|dir| activate_key.starts_with(dir))
+                {
+                    return Err(ManifestError::DatapackOutsideLoaderDir(file.to_string()));
+                }
+            }
+        }
+    }
+
+    // Rule 5: `requires` must resolve, must not self-reference, and must target
+    // an `any` group. A second pass so a feature may require one declared later
+    // in the document — position in the file should not be a rule.
+    for feature_id in &feature_order {
+        for req in &feature_requires[feature_id] {
+            if req == feature_id {
+                return Err(ManifestError::RequiresSelf(req.clone()));
+            }
+            let Some(target_select) = feature_select.get(req) else {
+                return Err(ManifestError::RequiresUnknownFeature(req.clone()));
+            };
+            // A dependency is a force-on. Forcing on a member of a radio group
+            // either turns a second member on or silently turns off the player's
+            // choice; an author cannot have meant either.
+            if !matches!(target_select, OptionalSelect::Any) {
+                return Err(ManifestError::RequiresRadioMember(req.clone()));
+            }
+        }
+    }
+
+    // Cycle detection. Iterative DFS with three-colour marking — the graph is
+    // tiny (<= 32 groups x 64 features) but recursion over a hostile manifest is
+    // not an acceptable failure mode on the client.
+    #[derive(Clone, Copy, PartialEq)]
+    enum Mark {
+        White,
+        Grey,
+        Black,
+    }
+    let mut mark: HashMap<&str, Mark> = HashMap::new();
+    for start in &feature_order {
+        if mark.get(start.as_str()).copied().unwrap_or(Mark::White) != Mark::White {
+            continue;
+        }
+        let mut stack: Vec<(&str, usize)> = vec![(start.as_str(), 0)];
+        mark.insert(start.as_str(), Mark::Grey);
+        while let Some(&mut (id, ref mut next)) = stack.last_mut() {
+            let deps = &feature_requires[id];
+            if *next >= deps.len() {
+                mark.insert(id, Mark::Black);
+                stack.pop();
+                continue;
+            }
+            let dep = deps[*next].as_str();
+            *next += 1;
+            // Unknown targets were already rejected by rule 5 above.
+            match mark.get(dep).copied().unwrap_or(Mark::White) {
+                Mark::Grey => return Err(ManifestError::RequiresCycle(dep.to_string())),
+                Mark::White => {
+                    mark.insert(dep, Mark::Grey);
+                    stack.push((dep, 0));
+                }
+                Mark::Black => {}
+            }
         }
     }
 
@@ -753,5 +1016,273 @@ mod tests {
                   "initialFiles":{path_json}}}}}"#
         );
         assert!(parse_manifest(&json).is_ok());
+    }
+
+    // ---- optional content ----
+    //
+    // The twin of the `describe("optional content")` block in
+    // packages/pack-schema/src/pack-schema.test.ts. The nine rules exist in two
+    // hand-written copies because JSON Schema cannot carry refinements; these
+    // fixtures are the only thing that keeps the copies from drifting. A rule
+    // added on one side needs a test added on BOTH.
+
+    /// `mods/sodium.jar` (required) plus the named optional files, then whatever
+    /// `groups` JSON the caller wants under `optionalGroups`.
+    fn optional_manifest(optional_paths: &[&str], groups: &str) -> String {
+        let files: String = optional_paths
+            .iter()
+            .map(|p| {
+                format!(
+                    r#",{{"path":"{p}","sha512":"{s}","fileSize":10,"env":{{"client":"optional","server":"unsupported"}},"source":{{"kind":"url","url":"https://example.com/f"}}}}"#,
+                    s = "b".repeat(128)
+                )
+            })
+            .collect();
+        format!(
+            r#"{{"formatVersion":1,
+                "pack":{{"id":"pk","slug":"boff-smp","name":"Boff SMP","access":{{"kind":"public"}}}},
+                "version":{{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
+                  "dependencies":{{"minecraft":"1.21.4","neoforge":"21.4.30"}},
+                  "optionalGroups":{groups},
+                  "files":[{{"path":"mods/sodium.jar","sha512":"{s}","fileSize":10,
+                    "env":{{"client":"required","server":"required"}},
+                    "source":{{"kind":"modrinth","projectId":"p","versionId":"v"}}}}{files}]}}}}"#,
+            s = "a".repeat(128)
+        )
+    }
+
+    const IRIS_GROUP: &str = r#"[{"id":"rendimiento","name":"Rendimiento","select":"any",
+        "features":[{"id":"iris","name":"Iris","paths":["mods/iris.jar"],"default":true}]}]"#;
+
+    #[test]
+    fn accepts_a_well_formed_optional_group() {
+        assert!(parse_manifest(&optional_manifest(&["mods/iris.jar"], IRIS_GROUP)).is_ok());
+    }
+
+    #[test]
+    fn accepts_a_group_with_select_omitted() {
+        // `select` is optional in the schema and defaults to `any` through
+        // selectOf/unwrap_or — a manifest that leaves it out must still parse.
+        let groups = r#"[{"id":"g","name":"G",
+            "features":[{"id":"iris","name":"Iris","paths":["mods/iris.jar"],"default":true}]}]"#;
+        assert!(parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).is_ok());
+    }
+
+    #[test]
+    fn accepts_a_manifest_with_no_optional_groups_at_all() {
+        // Back-compat: every manifest authored before this feature existed.
+        assert!(parse_manifest(&manifest_json("mods/sodium.jar", None)).is_ok());
+    }
+
+    // ---- rule 1 ----
+    #[test]
+    fn rejects_a_feature_path_that_is_not_a_file() {
+        let groups = r#"[{"id":"g","name":"G",
+            "features":[{"id":"f","name":"F","paths":["mods/ghost.jar"],"default":true}]}]"#;
+        let err = parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).unwrap_err();
+        assert!(matches!(err, ManifestError::FeaturePathNotInFiles(_)));
+    }
+
+    // ---- rule 2 ----
+    #[test]
+    fn rejects_a_feature_path_that_is_not_env_optional() {
+        let groups = r#"[{"id":"g","name":"G",
+            "features":[{"id":"f","name":"F","paths":["mods/sodium.jar"],"default":true}]}]"#;
+        let err = parse_manifest(&optional_manifest(&[], groups)).unwrap_err();
+        assert!(matches!(err, ManifestError::FeaturePathNotOptional(_)));
+    }
+
+    // ---- rule 3 ----
+    #[test]
+    fn rejects_duplicate_group_ids() {
+        let groups = r#"[
+            {"id":"g","name":"G","features":[{"id":"a","name":"A","paths":["mods/iris.jar"],"default":true}]},
+            {"id":"g","name":"G2","features":[{"id":"b","name":"B","paths":["mods/extra.jar"],"default":true}]}]"#;
+        let err =
+            parse_manifest(&optional_manifest(&["mods/iris.jar", "mods/extra.jar"], groups))
+                .unwrap_err();
+        assert!(matches!(err, ManifestError::DuplicateGroupId(_)));
+    }
+
+    #[test]
+    fn rejects_a_feature_id_reused_across_groups() {
+        let groups = r#"[
+            {"id":"g1","name":"G","features":[{"id":"a","name":"A","paths":["mods/iris.jar"],"default":true}]},
+            {"id":"g2","name":"G2","features":[{"id":"a","name":"A2","paths":["mods/extra.jar"],"default":true}]}]"#;
+        let err =
+            parse_manifest(&optional_manifest(&["mods/iris.jar", "mods/extra.jar"], groups))
+                .unwrap_err();
+        assert!(matches!(err, ManifestError::DuplicateFeatureId(_)));
+    }
+
+    #[test]
+    fn rejects_the_reserved_synthetic_group_id() {
+        let groups = r#"[{"id":"otros","name":"Otros",
+            "features":[{"id":"f","name":"F","paths":["mods/iris.jar"],"default":true}]}]"#;
+        let err = parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).unwrap_err();
+        assert!(matches!(err, ManifestError::ReservedGroupId(_)));
+    }
+
+    // ---- rule 4 ----
+    #[test]
+    fn rejects_one_path_owned_by_two_features() {
+        let groups = r#"[{"id":"g","name":"G","features":[
+            {"id":"a","name":"A","paths":["mods/iris.jar"],"default":true},
+            {"id":"b","name":"B","paths":["mods/iris.jar"],"default":false}]}]"#;
+        let err = parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).unwrap_err();
+        assert!(matches!(err, ManifestError::FeaturePathOwnedTwice(_)));
+    }
+
+    // ---- rule 5 ----
+    #[test]
+    fn rejects_requires_naming_an_unknown_feature() {
+        let groups = r#"[{"id":"g","name":"G","features":[
+            {"id":"a","name":"A","paths":["mods/iris.jar"],"default":true,"requires":["nope"]}]}]"#;
+        let err = parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).unwrap_err();
+        assert!(matches!(err, ManifestError::RequiresUnknownFeature(_)));
+    }
+
+    #[test]
+    fn accepts_requires_pointing_forward_in_the_document() {
+        // Position in the file must not be a rule — hence the second pass.
+        let groups = r#"[
+            {"id":"g1","name":"G","features":[{"id":"a","name":"A","paths":["mods/iris.jar"],"default":true,"requires":["b"]}]},
+            {"id":"g2","name":"G2","features":[{"id":"b","name":"B","paths":["mods/extra.jar"],"default":true}]}]"#;
+        assert!(
+            parse_manifest(&optional_manifest(&["mods/iris.jar", "mods/extra.jar"], groups))
+                .is_ok()
+        );
+    }
+
+    #[test]
+    fn rejects_requires_targeting_a_radio_group_member() {
+        let groups = r#"[
+            {"id":"g1","name":"G","features":[{"id":"a","name":"A","paths":["mods/iris.jar"],"default":true,"requires":["b"]}]},
+            {"id":"g2","name":"G2","select":"one","features":[{"id":"b","name":"B","paths":["mods/extra.jar"],"default":true}]}]"#;
+        let err =
+            parse_manifest(&optional_manifest(&["mods/iris.jar", "mods/extra.jar"], groups))
+                .unwrap_err();
+        assert!(matches!(err, ManifestError::RequiresRadioMember(_)));
+    }
+
+    #[test]
+    fn rejects_a_self_requirement() {
+        let groups = r#"[{"id":"g","name":"G","features":[
+            {"id":"a","name":"A","paths":["mods/iris.jar"],"default":true,"requires":["a"]}]}]"#;
+        let err = parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).unwrap_err();
+        assert!(matches!(err, ManifestError::RequiresSelf(_)));
+    }
+
+    #[test]
+    fn rejects_a_requires_cycle() {
+        let groups = r#"[{"id":"g","name":"G","features":[
+            {"id":"a","name":"A","paths":["mods/iris.jar"],"default":true,"requires":["b"]},
+            {"id":"b","name":"B","paths":["mods/extra.jar"],"default":true,"requires":["a"]}]}]"#;
+        let err =
+            parse_manifest(&optional_manifest(&["mods/iris.jar", "mods/extra.jar"], groups))
+                .unwrap_err();
+        assert!(matches!(err, ManifestError::RequiresCycle(_)));
+    }
+
+    // ---- rule 6 ----
+    #[test]
+    fn rejects_two_defaults_in_a_one_group() {
+        let groups = r#"[{"id":"g","name":"G","select":"one","features":[
+            {"id":"a","name":"A","paths":["mods/iris.jar"],"default":true},
+            {"id":"b","name":"B","paths":["mods/extra.jar"],"default":true}]}]"#;
+        let err =
+            parse_manifest(&optional_manifest(&["mods/iris.jar", "mods/extra.jar"], groups))
+                .unwrap_err();
+        assert!(matches!(err, ManifestError::GroupDefaultCount(_)));
+    }
+
+    #[test]
+    fn rejects_a_one_group_with_nothing_on() {
+        let groups = r#"[{"id":"g","name":"G","select":"one","features":[
+            {"id":"a","name":"A","paths":["mods/iris.jar"],"default":false}]}]"#;
+        let err = parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).unwrap_err();
+        assert!(matches!(err, ManifestError::GroupDefaultCount(_)));
+    }
+
+    #[test]
+    fn accepts_an_at_most_one_group_with_nothing_on() {
+        let groups = r#"[{"id":"g","name":"G","select":"atMostOne","features":[
+            {"id":"a","name":"A","paths":["mods/iris.jar"],"default":false}]}]"#;
+        assert!(parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).is_ok());
+    }
+
+    // ---- rule 7 ----
+    #[test]
+    fn rejects_activating_a_file_the_feature_does_not_own() {
+        let groups = r#"[{"id":"g","name":"G","select":"one","features":[
+            {"id":"a","name":"A","paths":["mods/iris.jar"],"default":true,
+             "activate":{"kind":"shaderpack","file":"shaderpacks/bsl.zip"}}]}]"#;
+        let err = parse_manifest(&optional_manifest(
+            &["mods/iris.jar", "shaderpacks/bsl.zip"],
+            groups,
+        ))
+        .unwrap_err();
+        assert!(matches!(err, ManifestError::ActivateFileNotOwned(_)));
+    }
+
+    // ---- rule 8 ----
+    #[test]
+    fn rejects_a_shaderpack_activation_in_an_any_group() {
+        let groups = r#"[{"id":"g","name":"G","select":"any","features":[
+            {"id":"a","name":"A","paths":["shaderpacks/bsl.zip"],"default":true,
+             "activate":{"kind":"shaderpack","file":"shaderpacks/bsl.zip"}}]}]"#;
+        let err = parse_manifest(&optional_manifest(&["shaderpacks/bsl.zip"], groups)).unwrap_err();
+        assert!(matches!(err, ManifestError::ShaderpackInAnyGroup(_)));
+    }
+
+    #[test]
+    fn accepts_a_shaderpack_activation_in_a_one_group() {
+        let groups = r#"[{"id":"g","name":"G","select":"one","features":[
+            {"id":"a","name":"A","paths":["shaderpacks/bsl.zip"],"default":true,
+             "activate":{"kind":"shaderpack","file":"shaderpacks/bsl.zip"}}]}]"#;
+        assert!(parse_manifest(&optional_manifest(&["shaderpacks/bsl.zip"], groups)).is_ok());
+    }
+
+    // ---- rule 9 (D1) ----
+    #[test]
+    fn rejects_a_datapack_outside_a_global_loader_directory() {
+        let groups = r#"[{"id":"g","name":"G","features":[
+            {"id":"a","name":"A","paths":["saves/mundo/datapacks/t.zip"],"default":true,
+             "activate":{"kind":"datapack","file":"saves/mundo/datapacks/t.zip"}}]}]"#;
+        let err =
+            parse_manifest(&optional_manifest(&["saves/mundo/datapacks/t.zip"], groups))
+                .unwrap_err();
+        assert!(matches!(err, ManifestError::DatapackOutsideLoaderDir(_)));
+    }
+
+    #[test]
+    fn accepts_a_datapack_under_a_global_loader_directory() {
+        let groups = r#"[{"id":"g","name":"G","features":[
+            {"id":"a","name":"A","paths":["config/openloader/datapacks/t.zip"],"default":true,
+             "activate":{"kind":"datapack","file":"config/openloader/datapacks/t.zip"}}]}]"#;
+        assert!(
+            parse_manifest(&optional_manifest(&["config/openloader/datapacks/t.zip"], groups))
+                .is_ok()
+        );
+    }
+
+    #[test]
+    fn accepts_a_resourcepack_activation_with_a_priority() {
+        let groups = r#"[{"id":"g","name":"G","features":[
+            {"id":"a","name":"A","paths":["resourcepacks/faithful.zip"],"default":true,
+             "activate":{"kind":"resourcepack","file":"resourcepacks/faithful.zip","priority":10}}]}]"#;
+        assert!(
+            parse_manifest(&optional_manifest(&["resourcepacks/faithful.zip"], groups)).is_ok()
+        );
+    }
+
+    #[test]
+    fn judges_feature_paths_case_insensitively_like_the_rest_of_the_file() {
+        // Rule 1 resolves through norm_path, so a manifest whose feature path
+        // differs only in case from its files[] entry must still resolve — the
+        // alternative is a pack that validates on Linux and not on Windows.
+        let groups = r#"[{"id":"g","name":"G","features":[
+            {"id":"a","name":"A","paths":["Mods/Iris.jar"],"default":true}]}]"#;
+        assert!(parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).is_ok());
     }
 }

@@ -33,10 +33,56 @@ export interface LauncherPackView {
     loaderVersion: string | null;
     fileCount: number;
     worldCount: number;
+    /** How many things the player can switch on or off in this version.
+     *
+     *  A COUNT and not the model: the library card only has to answer "does this
+     *  pack let me choose anything?", and shipping every group's features on
+     *  every card of a 40-pack library is a lot of payload to answer a yes/no.
+     *  The full model arrives with the manifest, at install time, which is when
+     *  the player is actually choosing. */
+    optionalFeatureCount: number;
     /** Present for emulator packs — the library sidebar's system mapping. */
     emulatorKind?: 'mgba' | 'melonds' | null;
     createdAt: string;
   } | null;
+}
+
+/**
+ * What a stranger sees on a pack's shareable page.
+ *
+ * PUBLIC PACKS ONLY, and that is the whole access rule: `password` and
+ * `allowlist` exist precisely so a pack's composition is not public, so those
+ * 404 rather than getting a reduced page. One rule, nothing to get subtly wrong
+ * later, and no disclosure of the existence or the name of a private pack.
+ *
+ * Deliberately NOT the manifest. This is a shop window, not an install source:
+ * no download URLs, no blob hashes, no `files[]`. What it carries is what
+ * someone deciding whether to install would want — what the pack is, what it
+ * runs on, and what it lets them choose.
+ */
+export interface PublicPackView {
+  slug: string;
+  name: string;
+  summary: string | null;
+  description: string | null;
+  iconUrl: string | null;
+  gallery: StoredPackGalleryImage[];
+  /** Present only for server packs — the host, never the port, because the page
+   *  is a description and not something anything connects from. */
+  serverHost: string | null;
+  version: {
+    name: string;
+    minecraft: string | null;
+    loader: PackLoader | null;
+    loaderVersion: string | null;
+    fileCount: number;
+    createdAt: string;
+  } | null;
+  /** The optional-content model, exactly as `@boffmedia/ui`'s OptionalChooser
+   *  renders it in `readOnly` mode — so the page and the launcher show the same
+   *  thing from one component. Effective state is the AUTHOR's default here:
+   *  nobody is installed, so there are no player choices to reflect. */
+  optionalGroups: unknown[];
 }
 
 /** The stored shape of `packs.server`. Mirrors PackServer in

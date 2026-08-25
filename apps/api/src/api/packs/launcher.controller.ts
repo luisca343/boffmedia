@@ -5,6 +5,7 @@ import {
   Headers,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   ParseIntPipe,
   Post,
@@ -119,6 +120,38 @@ export class LauncherController {
       .split(',')
       .map((s) => s.trim().toLowerCase())
       .filter(Boolean);
+  }
+
+  /**
+   * A pack's shareable page — the one genuinely UNAUTHENTICATED read in this
+   * file. Everything else here is `@Public()` only to get past the website's
+   * JwtAuthGuard before `DesktopAuthGuard` does the real check; this one has no
+   * guard at all, on purpose.
+   *
+   * That makes the access rule the whole of its security, so it is stated in one
+   * place and it is absolute: PUBLIC PACKS ONLY. `password` and `allowlist`
+   * exist so a pack's composition is not public, and they 404 rather than
+   * returning a reduced page — a page that said "this pack exists but you cannot
+   * see it" would still disclose the existence and the name of a private pack.
+   *
+   * Throttled by IP like the other unauthenticated routes: this one takes a slug
+   * from the URL and hits the database with it, so an unthrottled version is a
+   * free slug-enumeration oracle.
+   */
+  @Get('public/:slug')
+  @Public()
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 60 } })
+  @ApiOperation({
+    summary: 'La página pública de un pack',
+    description:
+      'Solo packs con acceso `public`. Los de contraseña y lista blanca devuelven 404: existen precisamente para que su composición no sea pública. No incluye `files[]` ni hashes — es un escaparate, no una fuente de instalación.',
+  })
+  @ApiResponse({ status: HttpStatus.OK })
+  async publicPage(@Param('slug') slug: string) {
+    const view = await this.packs.publicPage(slug);
+    if (!view) throw new NotFoundException('Pack no encontrado');
+    return view;
   }
 
   @Get('me')

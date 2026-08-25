@@ -68,7 +68,7 @@ export function WonderMailChapter() {
             <Disclosure title="Ajustes avanzados" icon="settings" sub="Región y codificación">
               <div className="flex items-center justify-between gap-4 py-1">
                 <span className="font-body text-[13px]/[1.4] font-semibold text-txt">Versión europea (EU)</span>
-                <Toggle on={eu} onChange={setEu} />
+                <Toggle on={eu} onChange={setEu} ariaLabel="Versión europea (EU)" />
               </div>
             </Disclosure>
           </div>

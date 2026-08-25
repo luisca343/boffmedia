@@ -1,0 +1,1 @@
+ALTER TABLE `pack_versions` ADD `optional_groups` json;

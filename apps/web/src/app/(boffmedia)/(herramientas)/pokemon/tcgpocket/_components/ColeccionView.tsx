@@ -166,10 +166,10 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
             <Select value={setF} onChange={setSetF} ariaLabel={t("app.filters.expansion")} className="w-auto min-w-[140px]"
               options={[{ value: "", label: t("app.filters.allSets") }].concat(data.sets.map((s) => ({ value: s.id, label: s.id })))} />
             <ToolBarSpacer />
-            <label className="inline-flex cursor-pointer items-center gap-2">
-              <Toggle on={hideMissing} onChange={setHideMissing} />
+            <span className="inline-flex items-center gap-2">
+              <Toggle on={hideMissing} onChange={setHideMissing} ariaLabel={t("app.coleccion.hideMissing")} />
               <span className="font-mono text-[12px] uppercase tracking-[0.06em] text-txt-muted">{t("app.coleccion.hideMissing")}</span>
-            </label>
+            </span>
           </ToolBar>
 
           {groups.length === 0 ? (

@@ -15,12 +15,16 @@
 // stylistic — it is the difference between the installer working and the app
 // aborting.
 
+/// Placement is not activation: options.txt and the Iris/Oculus config.
+pub mod activate;
 pub mod crash;
 pub mod emulator;
 pub mod files;
 pub mod game;
 pub mod initial;
 pub mod instance;
+/// Optional content: the feature model a player chooses from.
+pub mod optional;
 pub mod patch;
 pub mod paths;
 pub mod process;
@@ -285,6 +289,18 @@ impl InstallManager {
             .lock()
             .unwrap_or_else(|poisoned| poisoned.into_inner())
             .is_empty()
+    }
+
+    /// True while THIS pack's game is running. Distinct from `is_busy`, which
+    /// asks about the whole app: activation writes are only unsafe against the
+    /// instance Minecraft currently has open, because it is that process which
+    /// rewrites `options.txt` from memory when it exits (D3).
+    pub async fn is_pack_running(&self, pack_id: &str) -> bool {
+        self.running
+            .lock()
+            .await
+            .get(pack_id)
+            .is_some_and(|game| !game.has_exited())
     }
 
     fn begin_install(&self, pack_id: &str) -> Result<InstallGuard, InstallFailure> {
@@ -656,12 +672,34 @@ async fn install_payload(
     // OFFERS the choice, not whether the launcher honours one already made.
     // Requiring it here brings a disabled non-optional mod back on the next
     // launch: the file is re-fetched into the path the rename just vacated.
-    let disabled = read_optional_state(&prepared.instance);
+    //
+    // FEATURES, not paths, are what the player actually switched. A feature owns
+    // several paths — Iris + Sodium + a config + the `.zip` — and subtracting
+    // them here, before a byte moves, is what makes the install-time chooser
+    // worth having: an unwanted 400 MB shaderpack is never downloaded rather
+    // than downloaded and then parked.
+    let state = read_optional_state(&prepared.instance);
+    let views = optional::resolve(
+        &prepared.plan.optional_groups,
+        &state,
+        &plan_sizes(&prepared.plan.files),
+    );
+    let feature_off = optional::disabled_paths(&views);
+    // A path a feature has switched ON overrides a stale legacy opt-out for the
+    // same file: the feature record is the newer and more specific statement.
+    let feature_on = optional::enabled_paths(&views);
+
     let wanted: Vec<PlannedFile> = prepared
         .plan
         .files
         .iter()
-        .filter(|f| !disabled.is_disabled(&f.path))
+        .filter(|f| {
+            let path = instance::normalise(&f.path);
+            if feature_off.contains(&path) {
+                return false;
+            }
+            feature_on.contains(&path) || !state.is_path_disabled(&path)
+        })
         .cloned()
         .collect();
 
@@ -754,6 +792,13 @@ async fn install_payload(
             marker.optional_files = prev.optional_files.clone();
         }
     }
+    // Same trap, same fix, for the feature catalogue: a pinned relaunch rebuilds
+    // its plan from `managed`, which holds no files for a feature that is off.
+    if marker.optional_groups.is_empty() {
+        if let Some(prev) = previous.as_ref().filter(|p| p.version_id == marker.version_id) {
+            marker.optional_groups = prev.optional_groups.clone();
+        }
+    }
     if let Some(previous) = &previous {
         let stale = instance::stale_files(&previous.managed, &marker.managed_paths());
         for (path, outcome) in
@@ -774,6 +819,34 @@ async fn install_payload(
 
     write_marker(&prepared.instance, &marker)?;
     retain_version(&prepared.instance, &marker, prepared.settings.retain_versions());
+
+    // Placement is not activation: a resourcepack sitting in `resourcepacks/`
+    // and a shaderpack in `shaderpacks/` do nothing until a config names them.
+    //
+    // Here specifically, and not in a launch-only step, because this function IS
+    // the pre-launch verify pass as well as the installer — so one call covers
+    // both, and it always runs before `process::spawn`. That ordering is what
+    // makes D3 work: Minecraft rewrites `options.txt` from memory when it exits,
+    // so the only safe moment to touch it is while the game is not running, and
+    // a toggle made mid-session is applied right here on the next launch.
+    match activate::reconcile(
+        &prepared.instance.minecraft,
+        &views,
+        prepared.plan.loader.as_ref().map(|(kind, _)| kind.key()),
+    ) {
+        Ok(lines) => {
+            for line in lines {
+                reporter.log("info", &line);
+            }
+        }
+        // Never fatal. A pack whose files are all present is playable; a config
+        // we could not rewrite is a wrong-looking resourcepack list, not a
+        // broken install, and failing the launch over it would be the worse bug.
+        Err(e) => reporter.log(
+            "warn",
+            &format!("No se pudo aplicar la configuración de contenido opcional: {e}"),
+        ),
+    }
 
     reporter.emit(Phase::Verifying, 1.0, "", 0, 0);
     Ok(())
@@ -808,6 +881,10 @@ fn build_marker(prepared: &game::Prepared, installed: &[PlannedFile], manifest: 
             .filter(|f| f.optional)
             .map(instance::ManagedFile::from_planned)
             .collect(),
+        // The FEATURE catalogue, for the same reason and one level up: a
+        // switched-off feature owns nothing in `managed`, so without this the
+        // chooser has no switch to render and the choice becomes irreversible.
+        optional_groups: plan.optional_groups.clone(),
         // A forward install always clears the pin: the player asked for this
         // version explicitly.
         pinned: false,
@@ -875,6 +952,29 @@ fn retain_version(instance: &InstancePaths, marker: &Marker, keep: usize) {
     if let Ok(raw) = serde_json::to_string_pretty(&history) {
         let _ = std::fs::write(&instance.history, raw);
     }
+}
+
+/// Declared byte size per instance path, so a feature can show what it costs
+/// before anything is downloaded. Built from the plan (the manifest's own
+/// numbers) rather than from disk, because the whole point is to answer the
+/// question BEFORE the file exists.
+fn plan_sizes(files: &[PlannedFile]) -> HashMap<String, u64> {
+    files
+        .iter()
+        .map(|f| (instance::normalise(&f.path), f.size))
+        .collect()
+}
+
+/// The same index built from a marker, for the surfaces that have no plan in
+/// hand — the Content tab reads what this instance HAS, not what a manifest
+/// declares.
+fn marker_sizes(marker: &Marker) -> HashMap<String, u64> {
+    marker
+        .managed
+        .iter()
+        .chain(marker.optional_files.iter())
+        .map(|f| (instance::normalise(&f.path), f.size))
+        .collect()
 }
 
 fn read_optional_state(instance: &InstancePaths) -> OptionalState {
@@ -1380,8 +1480,11 @@ pub async fn instance_revert(
         .iter()
         .map(instance::ManagedFile::to_planned)
         // Same rule as the install pass: a revert must not silently re-enable
-        // what the player switched off.
-        .filter(|f| !disabled.is_disabled(&f.path))
+        // what the player switched off. Path-level here rather than
+        // feature-level because a revert replays a MARKER, and the marker's
+        // `managed` list already excludes everything a switched-off feature
+        // owns — there is nothing left for the feature filter to subtract.
+        .filter(|f| !disabled.is_path_disabled(&f.path))
         .collect();
     let (mods, overrides): (Vec<_>, Vec<_>) = wanted.iter().cloned().partition(|f| f.is_mod);
 
@@ -1491,6 +1594,234 @@ pub async fn instance_optional(
     Ok(instance::optional_list(&catalogue, &read_optional_state(&instance)))
 }
 
+/// The optional-content model for one instance: groups, features, and the
+/// effective on/off state of each.
+///
+/// Serves BOTH chooser surfaces, which need different sources and is why
+/// `manifest` is optional:
+///
+/// - **Content tab** (installed): read from the MARKER, so it describes what
+///   this instance actually has, the same reason `instance_content` does.
+/// - **Install-time step** (not installed yet): there is no marker, so the model
+///   comes from the manifest about to be installed. The player's state file is
+///   still consulted — it is user state that outlives an uninstall, so someone
+///   who declined shaders, removed the pack and reinstalled it should not have
+///   to decline them again.
+///
+/// A marker always wins when one exists: it records the catalogue of the version
+/// on disk, which is the one the toggles act on.
+#[tauri::command]
+pub async fn instance_optional_model(
+    slug: String,
+    manifest: Option<serde_json::Value>,
+    app: tauri::AppHandle,
+) -> Result<Vec<optional::GroupView>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+    let state = read_optional_state(&instance);
+
+    if let Some(marker) = read_marker(&instance) {
+        let mut views = optional::resolve(&marker.optional_groups, &state, &marker_sizes(&marker));
+        mark_installed(&mut views, &instance);
+        return Ok(views);
+    }
+
+    let Some(manifest) = manifest else {
+        return Ok(Vec::new());
+    };
+    let (groups, sizes) = model_from_manifest(&manifest)?;
+    // No `mark_installed`: nothing is on disk, so every feature correctly
+    // reports `installed: false` — which is what tells the chooser that turning
+    // one on means a download.
+    Ok(optional::resolve(&groups, &state, &sizes))
+}
+
+/// The model a manifest declares, plus the declared size of every path in it.
+///
+/// The sizes come from the manifest's own numbers rather than from disk, because
+/// the whole point of the install-time chooser is answering "how big is this?"
+/// BEFORE the bytes exist.
+fn model_from_manifest(
+    manifest: &serde_json::Value,
+) -> Result<(Vec<optional::Group>, HashMap<String, u64>), InstallFailure> {
+    let parsed = parse_manifest_value(manifest)?;
+    let sizes = parsed
+        .version
+        .files
+        .iter()
+        .map(|f| (instance::normalise(f.path.as_str()), f.file_size.max(0) as u64))
+        .collect();
+    Ok((optional::model_of(&parsed), sizes))
+}
+
+/// Fill in each feature's `installed` flag from what is on disk.
+///
+/// Separate from `optional::resolve` because resolve also runs at install time,
+/// where nothing is on disk yet and the question is meaningless. A feature
+/// counts as installed only when EVERY path it owns is present — three of four
+/// files is what the feature unit exists to prevent, so reporting it as
+/// installed would be the same lie in a different place.
+fn mark_installed(views: &mut [optional::GroupView], instance: &InstancePaths) {
+    for group in views.iter_mut() {
+        for feature in group.features.iter_mut() {
+            feature.installed = !feature.paths.is_empty()
+                && feature.paths.iter().all(|path| {
+                    let active = instance::safe_join(&instance.minecraft, path)
+                        .map(|p| p.is_file())
+                        .unwrap_or(false);
+                    active || instance::is_parked(&instance.minecraft, path)
+                });
+        }
+    }
+}
+
+/// What a toggle did.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct FeatureSetResult {
+    /// The whole model again, so the caller re-renders from one source of truth
+    /// rather than patching a row it guessed at. A toggle is rarely one feature:
+    /// exclusivity and `requires` mean switching Shaders on can move three.
+    pub groups: Vec<optional::GroupView>,
+    /// Feature ids whose effective state changed, including the one asked for.
+    pub changed: Vec<String>,
+    /// Paths now wanted that are not on disk under either name. The renderer
+    /// feeds these to `instance_install_files`, which already carries the
+    /// marker interlock and the per-row progress events.
+    pub missing: Vec<String>,
+    /// D3: the toggle needed a config edit (a resourcepack or a shaderpack) but
+    /// the game is open, and Minecraft rewrites `options.txt` from memory when
+    /// it exits — so anything written now is discarded at that moment, silently.
+    /// The choice IS saved; it takes effect at the next launch, and the chooser
+    /// says so on the affected row. Losing the edit quietly is the one outcome
+    /// worth ruling out.
+    pub deferred: bool,
+}
+
+/// Switch one FEATURE on or off.
+///
+/// The unit is deliberately not a path. Switching "Shaders" off has to park
+/// Iris, its config and the `.zip` together, and switching it on has to bring
+/// Sodium with it — a player who ends up with three of those four files has a
+/// crash, not a choice. `optional::apply_toggle` owns those rules; this command
+/// owns what they mean on disk.
+///
+/// Switching OFF parks every file the feature owns (`<name>.disabled`), which is
+/// instant and needs no network. Switching ON unparks what is already there and
+/// reports what is not, because the first time a player opts into something they
+/// declined at install time, the bytes were never downloaded.
+#[tauri::command]
+pub async fn instance_feature_set(
+    slug: String,
+    feature_id: String,
+    enabled: bool,
+    manifest: Option<serde_json::Value>,
+    app: tauri::AppHandle,
+    manager: tauri::State<'_, InstallManager>,
+) -> Result<FeatureSetResult, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    // Before the first install there is no marker, and the install-time chooser
+    // still has to record choices — that is the whole point of choosing at
+    // install time, since the install pass then never downloads what was
+    // declined. Falling back to the manifest is what makes the same command
+    // serve both surfaces. Everything below is then a no-op on disk, correctly:
+    // there are no files yet to park.
+    let marker = read_marker(&instance);
+    let (groups, sizes) = match &marker {
+        Some(m) => (m.optional_groups.clone(), marker_sizes(m)),
+        None => {
+            let Some(manifest) = &manifest else {
+                return Err(InstallFailure::message(
+                    "Este pack todavía no está instalado.",
+                ));
+            };
+            model_from_manifest(manifest)?
+        }
+    };
+    if optional::find(&groups, &feature_id).is_none() {
+        // The state file feeds the install filter directly, so recording an
+        // unknown id there would be a silent no-op the player reads as a
+        // working switch.
+        return Err(InstallFailure::message(format!(
+            "«{feature_id}» no es una opción de este pack."
+        )));
+    }
+
+    let mut state = read_optional_state(&instance);
+    let changed = optional::apply_toggle(&groups, &mut state, &feature_id, enabled);
+    write_optional_state(&instance, &state)?;
+
+    // Park or unpark every affected file. Done AFTER the state write so an
+    // interrupted toggle leaves the intent recorded — the next install pass
+    // then honours it, where the reverse order would leave files renamed with
+    // nothing on disk saying why.
+    let mut missing: Vec<String> = Vec::new();
+    for id in &changed {
+        let Some((_, feature)) = optional::find(&groups, id) else {
+            continue;
+        };
+        let now_on = state.is_feature_enabled(feature);
+        for path in &feature.paths {
+            // Pre-install this renames nothing, because nothing is there — and
+            // that is right. `missing` stays empty too: the install pass is
+            // about to fetch everything that is on, so reporting files for the
+            // add-a-mod shortcut to grab would race it.
+            instance::set_enabled_on_disk(&instance.minecraft, path, now_on).map_err(|e| {
+                InstallFailure::message(format!(
+                    "No se pudo {} «{path}»: {e}",
+                    if now_on { "activar" } else { "desactivar" }
+                ))
+            })?;
+            if now_on && marker.is_some() {
+                let active = instance::safe_join(&instance.minecraft, path)
+                    .map(|p| p.is_file())
+                    .unwrap_or(false);
+                if !active && !instance::is_parked(&instance.minecraft, path) {
+                    missing.push(path.clone());
+                }
+            }
+        }
+    }
+
+    let mut groups_view = optional::resolve(&groups, &state, &sizes);
+    if marker.is_some() {
+        mark_installed(&mut groups_view, &instance);
+    }
+
+    // Parking a jar is safe at any time — the loader only reads `mods/` at
+    // startup. Editing `options.txt` is not: Minecraft holds the whole file in
+    // memory and writes it back on exit, so an edit made now would vanish
+    // without a trace. Defer to the next launch, where `install_payload`'s
+    // reconcile pass applies it from the state we just wrote (D3).
+    //
+    // Pre-install there is nothing to reconcile against: the install pass runs
+    // it once at the end, from the state this call just wrote.
+    let needs_config = marker.is_some()
+        && groups_view
+            .iter()
+            .flat_map(|g| g.features.iter())
+            .any(|f| changed.contains(&f.id) && f.activate.is_some());
+    let pack_id = marker.as_ref().map(|m| m.pack_id.clone()).unwrap_or_default();
+    let deferred = needs_config && manager.is_pack_running(&pack_id).await;
+    if needs_config && !deferred {
+        let loader = marker.as_ref().and_then(|m| m.loader.as_deref());
+        activate::reconcile(&instance.minecraft, &groups_view, loader).map_err(|e| {
+            InstallFailure::message(format!("No se pudo aplicar la configuración: {e}"))
+        })?;
+    }
+
+    Ok(FeatureSetResult {
+        groups: groups_view,
+        changed,
+        missing,
+        deferred,
+    })
+}
+
 /// One row of the Content tab.
 #[derive(Debug, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -1547,7 +1878,7 @@ pub async fn instance_content(
             size: file.size,
             is_mod: file.is_mod,
             optional: file.optional,
-            enabled: !state.is_disabled(&path),
+            enabled: !state.is_path_disabled(&path),
             installed: active || parked,
             source: file.source.clone(),
             path,
@@ -1555,6 +1886,189 @@ pub async fn instance_content(
     }
     out.sort_by(|a, b| a.path.to_lowercase().cmp(&b.path.to_lowercase()));
     Ok(out)
+}
+
+// ── Add-a-mod: install just the new files ──────────────────────────────────
+
+pub const EVENT_CONTENT_FILE: &str = "content://file";
+
+/// One file's download state while an add is in flight. The Content tab keys
+/// on `path` to swap that row's "sin instalar" badge for a spinner, so `path`
+/// is normalised exactly the way `instance_content` normalises the paths it
+/// hands the same component.
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ContentFileEvent {
+    slug: String,
+    path: String,
+    /// `downloading` | `done` | `error`
+    state: &'static str,
+    error: Option<String>,
+}
+
+fn emit_content_file(
+    app: &tauri::AppHandle,
+    slug: &str,
+    path: &str,
+    state: &'static str,
+    error: Option<String>,
+) {
+    use tauri::Emitter;
+    let _ = app.emit(
+        EVENT_CONTENT_FILE,
+        ContentFileEvent {
+            slug: slug.to_string(),
+            path: instance::normalise(path),
+            state,
+            error,
+        },
+    );
+}
+
+/// Download the files a local pack just gained and place them in its instance,
+/// without a full install pass.
+///
+/// This exists so that adding a mod makes it INSTALLED, not merely declared.
+/// `install_pack` cannot serve that: it goes through `prepare()`, which demands
+/// a live Minecraft (MSA) session — and fetching a jar off Modrinth's CDN needs
+/// no session at all. Asking a player to sign in to Microsoft to add a mod is
+/// the wrong trade, so this path is deliberately session-free and does only the
+/// two things it can do safely: fetch the named files, and record them.
+///
+/// `previous_version_id` is the manifest version this instance was installed
+/// from BEFORE the add. It is the whole safety interlock:
+///
+///   * marker missing, or its version id does not match  ->  do nothing. The
+///     instance is not in sync with the manifest for reasons this command
+///     cannot see (never installed, a pending update, a rollback), and dropping
+///     one jar into it would not change that. Install/Play still does the job.
+///   * it matches  ->  every other file the manifest declares is already on
+///     disk, so once these land the instance IS the new version, and the
+///     marker's version id may move with it.
+///
+/// A partial failure keeps the version id where it was: the files that arrived
+/// are recorded (their rows go green), the pack stays `outdated`, and the next
+/// install finishes what this could not. Reporting "installed" over a jar that
+/// never downloaded is the one outcome worth ruling out.
+///
+/// Returns true when the marker moved onto the new version.
+#[tauri::command]
+pub async fn instance_install_files(
+    slug: String,
+    manifest: serde_json::Value,
+    paths: Vec<String>,
+    previous_version_id: Option<String>,
+    app: tauri::AppHandle,
+) -> Result<bool, InstallFailure> {
+    let parsed = parse_manifest_value(&manifest)?;
+    // Minecraft only. An emulator pack has no mod browser to add from, and its
+    // payload is a ROM the player supplies rather than something to fetch.
+    let resolve::PlannedGame::Minecraft(plan) = resolve::plan(&parsed)? else {
+        return Ok(false);
+    };
+
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    let Some(mut marker) = read_marker(&instance) else {
+        return Ok(false);
+    };
+    if previous_version_id.as_deref() != Some(marker.version_id.as_str()) {
+        return Ok(false);
+    }
+
+    // The requested paths, resolved back to planned files. Anything the player
+    // has switched off is skipped: the optional state is an intent the install
+    // pass honours by never fetching the file, and this path must not disagree.
+    let wanted: HashSet<String> = paths.iter().map(|p| instance::normalise(p)).collect();
+    let state = read_optional_state(&instance);
+    let targets: Vec<PlannedFile> = plan
+        .files
+        .iter()
+        .filter(|f| wanted.contains(&instance::normalise(&f.path)))
+        .filter(|f| !state.is_path_disabled(&instance::normalise(&f.path)))
+        .cloned()
+        .collect();
+    if targets.is_empty() {
+        return Ok(false);
+    }
+
+    layout.prepare(&instance)?;
+    let http = reqwest::Client::builder()
+        .user_agent(concat!("BoffmediaApp/", env!("CARGO_PKG_VERSION")))
+        .build()
+        .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
+
+    // Sequential, unlike `download_all`'s six-wide fan-out. An add is a handful
+    // of files the player is watching one row at a time, and the per-row badges
+    // read as progress only if they light up in order.
+    let mut placed: Vec<&PlannedFile> = Vec::new();
+    let mut failed = false;
+    for file in &targets {
+        emit_content_file(&app, &slug, &file.path, "downloading", None);
+        match files::fetch_one(
+            &app,
+            &http,
+            &layout,
+            &instance.minecraft,
+            &plan.pack_id,
+            None,
+            file,
+        )
+        .await
+        {
+            Ok(()) => {
+                placed.push(file);
+                emit_content_file(&app, &slug, &file.path, "done", None);
+            }
+            Err(err) => {
+                failed = true;
+                emit_content_file(&app, &slug, &file.path, "error", Some(err.message.clone()));
+            }
+        }
+    }
+
+    if placed.is_empty() {
+        return Ok(false);
+    }
+
+    // Recorded in the marker, or `instance_extra_files` would find them on disk
+    // and the Content tab would badge a pack file as hand-dropped.
+    let mut by_path: HashMap<String, instance::ManagedFile> = marker
+        .managed
+        .iter()
+        .map(|f| (instance::normalise(&f.path), f.clone()))
+        .collect();
+    for file in placed {
+        by_path.insert(
+            instance::normalise(&file.path),
+            instance::ManagedFile::from_planned(file),
+        );
+    }
+    marker.managed = by_path.into_values().collect();
+    marker.managed.sort_by(|a, b| a.path.cmp(&b.path));
+    marker.file_count = marker.managed.len();
+    // The full catalogue of switchable files, rebuilt from the new plan so a
+    // freshly added optional mod is toggleable without a reinstall.
+    marker.optional_files = plan
+        .files
+        .iter()
+        .filter(|f| f.optional)
+        .map(instance::ManagedFile::from_planned)
+        .collect();
+
+    let complete = !failed;
+    if complete {
+        marker.version_id = plan.version_id.clone();
+        marker.version_name = plan.version_name.clone();
+        marker.installed_at = chrono::Utc::now().to_rfc3339();
+    }
+    write_marker(&instance, &marker)?;
+    if complete {
+        retain_version(&instance, &marker, settings.retain_versions());
+    }
+    Ok(complete)
 }
 
 /// Switch one file on or off.
@@ -1597,7 +2111,7 @@ pub async fn instance_optional_set(
     }
 
     let mut state = read_optional_state(&instance);
-    state.set(&path, enabled);
+    state.set_path(&path, enabled);
     write_optional_state(&instance, &state)?;
 
     instance::set_enabled_on_disk(&instance.minecraft, &path, enabled).map_err(|e| {
@@ -1892,6 +2406,237 @@ pub async fn instance_user_files_scan(
         satisfied,
         still_missing: remaining.into_iter().map(|(path, _, _)| path).collect(),
     })
+}
+
+/// One file sitting in the instance that the launcher did NOT put there — a jar
+/// the player dropped into `mods/` by hand.
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ExtraFile {
+    /// Instance-relative, WITHOUT the `.disabled` suffix, so it is the same
+    /// path whether the file is currently parked or not.
+    pub path: String,
+    pub size: u64,
+    pub enabled: bool,
+    /// SHA-512, so the renderer can ask Modrinth what this jar actually is.
+    /// `None` when the file could not be read.
+    pub sha512: Option<String>,
+}
+
+/// The folders a player actually drops content into, each paired with the file
+/// extensions that folder can actually LOAD. Depth 1: `mods/` is flat, and
+/// descending further would sweep up the per-mod data directories some mods
+/// create inside `resourcepacks/`.
+///
+/// The extension allowlist is the other half of that depth rule, and it is not
+/// cosmetic. A shaderpack is often shipped UNZIPPED — a real folder full of
+/// licences, READMEs and a `.gitignore` — and depth 1 walks straight into it, so
+/// without the filter every `.txt` and `.md` inside `ComplementaryUnbound.../`
+/// showed up in the Shaders list as if the player had dropped it there.
+const EXTRA_ROOTS: [(&str, &[&str]); 3] = [
+    ("mods", &["jar"]),
+    ("resourcepacks", &["zip"]),
+    ("shaderpacks", &["zip"]),
+];
+
+/// True when an instance-relative path (`.disabled` already stripped) sits in a
+/// content folder AND carries an extension that folder can load.
+///
+/// Used by both the listing and the guard on purpose: a file the Content tab
+/// refuses to show must also be a file `instance_extra_delete` refuses to touch.
+fn is_extra_candidate(path: &str) -> bool {
+    EXTRA_ROOTS.iter().any(|(root, exts)| {
+        path.starts_with(&format!("{root}/"))
+            && path.rsplit_once('.').is_some_and(|(_, ext)| {
+                exts.iter().any(|allowed| ext.eq_ignore_ascii_case(allowed))
+            })
+    })
+}
+
+/// Hashing every jar on every Content-tab open is the one expensive part of the
+/// scan, and the answer almost never changes: a file's identity is fixed by its
+/// (len, mtime) pair. Process-lifetime cache, so the first open pays and the
+/// rest are free; a rebuilt jar changes mtime and is re-hashed.
+static EXTRA_HASH_CACHE: std::sync::Mutex<
+    Option<std::collections::HashMap<(std::path::PathBuf, u64, i64), String>>,
+> = std::sync::Mutex::new(None);
+
+fn cached_sha512(path: &std::path::Path, len: u64, mtime: i64) -> Option<String> {
+    let key = (path.to_path_buf(), len, mtime);
+    if let Ok(guard) = EXTRA_HASH_CACHE.lock() {
+        if let Some(hit) = guard.as_ref().and_then(|m| m.get(&key)) {
+            return Some(hit.clone());
+        }
+    }
+    let hash = files::sha512_of(path)?;
+    if let Ok(mut guard) = EXTRA_HASH_CACHE.lock() {
+        guard
+            .get_or_insert_with(std::collections::HashMap::new)
+            .insert(key, hash.clone());
+    }
+    Some(hash)
+}
+
+fn mtime_of(meta: &std::fs::Metadata) -> i64 {
+    meta.modified()
+        .ok()
+        .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+        .map(|d| d.as_secs() as i64)
+        .unwrap_or(0)
+}
+
+/// Everything in the content folders that the marker does not claim.
+///
+/// This is the OTHER half of "locked vs user space". The marker is the authority
+/// on what the launcher owns and may sweep; anything else in `mods/` belongs to
+/// the player and is deliberately never touched by an update. Until now it was
+/// also never SHOWN, so a hand-dropped jar was invisible in the very list that
+/// claims to be the pack's contents.
+///
+/// Returned separately from `instance_content` rather than merged into it, and
+/// that separation is the point: these files must not end up in the marker. The
+/// moment one did, the stale sweep would consider it a candidate for deletion.
+#[tauri::command]
+pub async fn instance_extra_files(
+    slug: String,
+    app: tauri::AppHandle,
+) -> Result<Vec<ExtraFile>, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+    if !instance.minecraft.is_dir() {
+        return Ok(Vec::new());
+    }
+
+    // Paths the pack owns. A missing marker is not an error: a local pack that
+    // has never been installed owns nothing, so everything on disk is extra.
+    let owned: HashSet<String> = read_marker(&instance)
+        .map(|m| {
+            m.managed
+                .iter()
+                .chain(m.optional_files.iter())
+                .map(|f| instance::normalise(&f.path))
+                .collect()
+        })
+        .unwrap_or_default();
+
+    let mut out = Vec::new();
+    for (root, _) in EXTRA_ROOTS {
+        let dir = instance.minecraft.join(root);
+        if !dir.is_dir() {
+            continue;
+        }
+        for file in walk_files(&dir, 1) {
+            let Ok(relative) = file.strip_prefix(&instance.minecraft) else {
+                continue;
+            };
+            let raw = instance::normalise(&relative.to_string_lossy());
+            // A parked file is reported under its REAL path with enabled:false,
+            // matching how the marker-backed rows report themselves — otherwise
+            // switching a mod off would make it look like a different file.
+            let (path, enabled) = match raw.strip_suffix(instance::DISABLED_SUFFIX) {
+                Some(base) => (base.to_string(), false),
+                None => (raw, true),
+            };
+            if !is_extra_candidate(&path) || owned.contains(&path) {
+                continue;
+            }
+            let Ok(meta) = std::fs::metadata(&file) else {
+                continue;
+            };
+            let len = meta.len();
+            out.push(ExtraFile {
+                sha512: cached_sha512(&file, len, mtime_of(&meta)),
+                path,
+                size: len,
+                enabled,
+            });
+        }
+    }
+    out.sort_by(|a, b| a.path.to_lowercase().cmp(&b.path.to_lowercase()));
+    Ok(out)
+}
+
+/// Park or unpark a file the player added themselves.
+///
+/// Separate from `instance_optional_set` on purpose: that one also records the
+/// choice in the optional-state file, which exists so an INSTALL can honour it.
+/// An extra file is never part of an install plan, so there is no intent to
+/// persist — the rename on disk is the whole truth.
+#[tauri::command]
+pub async fn instance_extra_set_enabled(
+    slug: String,
+    path: String,
+    enabled: bool,
+    app: tauri::AppHandle,
+) -> Result<(), InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+    guard_extra_path(&instance, &path)?;
+    instance::set_enabled_on_disk(&instance.minecraft, &path, enabled)
+        .map_err(|e| InstallFailure::message(format!("No se pudo cambiar «{path}»: {e}")))
+}
+
+/// Delete a file the player added themselves. Both names are removed, because
+/// the file may be parked, and the caller asked for it to be gone either way.
+#[tauri::command]
+pub async fn instance_extra_delete(
+    slug: String,
+    path: String,
+    app: tauri::AppHandle,
+) -> Result<(), InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+    guard_extra_path(&instance, &path)?;
+
+    let Some(active) = instance::safe_join(&instance.minecraft, &path) else {
+        return Ok(());
+    };
+    let parked = std::path::PathBuf::from(format!(
+        "{}{}",
+        active.display(),
+        instance::DISABLED_SUFFIX
+    ));
+    for target in [active, parked] {
+        if target.is_file() {
+            std::fs::remove_file(&target)
+                .map_err(|e| InstallFailure::message(format!("No se pudo borrar «{path}»: {e}")))?;
+        }
+    }
+    Ok(())
+}
+
+/// Refuse to touch anything the launcher owns, or anything outside the content
+/// folders.
+///
+/// `safe_join` already stops traversal out of the instance; this is the second
+/// half of the rule. Without it a caller could hand a managed mod's path to
+/// `instance_extra_delete` and delete a pack file through the one command whose
+/// entire premise is that it only ever touches user space.
+fn guard_extra_path(instance: &InstancePaths, path: &str) -> Result<(), InstallFailure> {
+    let normalised = instance::normalise(path);
+    if !is_extra_candidate(&normalised) {
+        return Err(InstallFailure::message(format!(
+            "«{path}» no está en una carpeta de contenido."
+        )));
+    }
+    if instance::safe_join(&instance.minecraft, &normalised).is_none() {
+        return Err(InstallFailure::message(format!("Ruta no válida: «{path}».")));
+    }
+    let owned = read_marker(instance).is_some_and(|m| {
+        m.managed
+            .iter()
+            .chain(m.optional_files.iter())
+            .any(|f| instance::normalise(&f.path) == normalised)
+    });
+    if owned {
+        return Err(InstallFailure::message(format!(
+            "«{path}» pertenece al pack; gestiónalo desde el pack."
+        )));
+    }
+    Ok(())
 }
 
 /// Return the emulator ROM slot's instance-relative path, if this is an emulator

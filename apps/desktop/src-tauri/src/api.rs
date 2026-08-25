@@ -296,6 +296,16 @@ pub struct LauncherVersion {
     pub loader: Option<String>,
     pub loader_version: Option<String>,
     pub file_count: u32,
+    /// How many things the player can switch on or off in this version. A COUNT
+    /// and not the model: the card only answers "does this pack let me choose
+    /// anything?", and the full model arrives with the manifest at install time,
+    /// which is when the player is actually choosing.
+    ///
+    /// `default` so a listing served by an older API — or a cached one written
+    /// before this field existed — still deserialises, reporting no choices
+    /// rather than failing the whole library load.
+    #[serde(default)]
+    pub optional_feature_count: u32,
     /// Present for emulator packs (`"mgba"`/`"melonds"`) so the library sidebar
     /// can map the pack to its system without a manifest fetch.
     #[serde(default)]
@@ -1021,6 +1031,95 @@ pub async fn authed_get(api: &ApiState, path: &str) -> Result<reqwest::Response,
             .header("X-Boff-Game-Types", game_types_header())
     })
     .await
+}
+
+/// Authenticated POST with a JSON body. Same session handling as every other
+/// authed call — a separate client would share neither the connection pool nor
+/// the 401-forgets-the-session rule.
+pub async fn authed_post_json(
+    api: &ApiState,
+    path: &str,
+    body: &impl Serialize,
+) -> Result<reqwest::Response, ApiError> {
+    authed(api, |http, base| {
+        http.post(format!("{base}{path}"))
+            .timeout(CONTROL_TIMEOUT)
+            .json(body)
+    })
+    .await
+}
+
+/// Authenticated PATCH with a JSON body.
+pub async fn authed_patch_json(
+    api: &ApiState,
+    path: &str,
+    body: &impl Serialize,
+) -> Result<reqwest::Response, ApiError> {
+    authed(api, |http, base| {
+        http.patch(format!("{base}{path}"))
+            .timeout(CONTROL_TIMEOUT)
+            .json(body)
+    })
+    .await
+}
+
+/// Authenticated POST with no body — a pure action, like publishing a version.
+pub async fn authed_post_empty(api: &ApiState, path: &str) -> Result<reqwest::Response, ApiError> {
+    authed(api, |http, base| {
+        http.post(format!("{base}{path}")).timeout(CONTROL_TIMEOUT)
+    })
+    .await
+}
+
+/// Authenticated POST of raw bytes. Deliberately WITHOUT `CONTROL_TIMEOUT`: a
+/// blob upload is not a control-plane call, and a 200 MB override on a slow
+/// connection would trip a 20-second ceiling every time.
+pub async fn authed_post_bytes(
+    api: &ApiState,
+    path: &str,
+    bytes: Vec<u8>,
+) -> Result<reqwest::Response, ApiError> {
+    authed(api, move |http, base| {
+        http.post(format!("{base}{path}"))
+            .header(reqwest::header::CONTENT_TYPE, "application/octet-stream")
+            .body(bytes.clone())
+    })
+    .await
+}
+
+/// Authenticated multipart upload of one image. The server's image pipeline
+/// reads a `file` part, which is what the web /upload/image route sends too.
+pub async fn authed_post_image(
+    api: &ApiState,
+    path: &str,
+    bytes: Vec<u8>,
+    filename: &str,
+) -> Result<reqwest::Response, ApiError> {
+    let filename = filename.to_string();
+    authed(api, move |http, base| {
+        let part = reqwest::multipart::Part::bytes(bytes.clone())
+            .file_name(filename.clone())
+            .mime_str(mime_for(&filename))
+            .unwrap_or_else(|_| reqwest::multipart::Part::bytes(bytes.clone()));
+        http.post(format!("{base}{path}"))
+            .multipart(reqwest::multipart::Form::new().part("file", part))
+    })
+    .await
+}
+
+/// The image types the server accepts, by extension. Guessed from the filename
+/// because that is all a file on disk gives us, and the server re-validates.
+fn mime_for(filename: &str) -> &'static str {
+    let lower = filename.to_lowercase();
+    if lower.ends_with(".png") {
+        "image/png"
+    } else if lower.ends_with(".webp") {
+        "image/webp"
+    } else if lower.ends_with(".gif") {
+        "image/gif"
+    } else {
+        "image/jpeg"
+    }
 }
 
 // ── Commands ───────────────────────────────────────────────────────────────

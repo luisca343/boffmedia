@@ -177,7 +177,12 @@ export function ControlRenderer({ control }: { control: RzControl }) {
               label={label}
               tipKey={control.tipKey}
               control={
-                <Toggle on={Boolean(value)} onChange={(v) => !disabled && onChange(v)} className={disabled ? "pointer-events-none" : ""} />
+                <Toggle
+                  on={Boolean(value)}
+                  onChange={(v) => !disabled && onChange(v)}
+                  ariaLabel={label}
+                  className={disabled ? "pointer-events-none" : ""}
+                />
               }
             />
           )}
@@ -333,6 +338,7 @@ export function ControlRenderer({ control }: { control: RzControl }) {
                     <Toggle
                       on={on}
                       onChange={(v) => !disabled && onChange(v ? (control.onValue ?? control.min ?? 1) : 0)}
+                      ariaLabel={label}
                       className={disabled ? "pointer-events-none" : ""}
                     />
                   </div>
@@ -478,7 +484,7 @@ function MiscBitmask() {
               <span className="font-body text-[14px] font-semibold text-txt">{t(`opt.${key}.label`)}</span>
               <InfoTip tipKey={`opt.${key}.tip`} />
             </div>
-            <Toggle on={on} onChange={(v) => setBit(mask, v)} />
+            <Toggle on={on} onChange={(v) => setBit(mask, v)} ariaLabel={t(`opt.${key}.label`)} />
           </div>
         )
       })}

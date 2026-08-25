@@ -182,6 +182,10 @@ export interface CreateVersionInput {
   // Emulator pack fields — awaiting reconciliation via pnpm generate:shared
   emulator?: { kind: 'mgba' | 'melonds'; rom: string; args?: string[] };
   initialFiles?: unknown[];
+  /** OptionalGroup[] — the content a player chooses from. Typed as unknown[]
+   *  like the rest of the manifest payload: the API's zod pass is the authority,
+   *  and a second shape declared here is a second thing to keep in step. */
+  optionalGroups?: unknown[];
 }
 
 // The catalog vocabulary is shared with apps/desktop, which browses mods too
@@ -283,6 +287,7 @@ export class PacksService {
         files: unknown[];
         emulator?: { kind: 'mgba' | 'melonds'; rom: string; args?: string[] };
         initialFiles?: unknown[];
+        optionalGroups?: unknown[];
       }
     >(`/packs/admin/${packId}/versions/${versionId}`);
   }
@@ -337,6 +342,10 @@ export class PacksService {
         query: input.query,
         gameVersion: input.gameVersion,
         loader: input.loader,
+        // Sent only when on, as the string the DTO's transform expects. Omitted
+        // rather than sent as "false" because `queryString` takes strings and
+        // numbers, and absent already means false on the server.
+        includeFabricViaConnector: input.includeFabricViaConnector ? 'true' : undefined,
         page: input.page,
         pageSize: input.pageSize,
         projectType: input.projectType,

@@ -146,7 +146,11 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                   <p className="truncate font-mono text-xs text-txt">{file.name}</p>
                   <p className="text-[11px] text-txt-dim">{formatBytes(file.size)}</p>
                 </div>
-                <Toggle on={file.enabled} onChange={() => void toggle(file)} />
+                <Toggle
+                  on={file.enabled}
+                  onChange={() => void toggle(file)}
+                  ariaLabel={t("toggleFileLabel", { name: file.name })}
+                />
               </li>
             ))}
           </ul>

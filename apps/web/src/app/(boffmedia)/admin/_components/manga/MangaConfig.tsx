@@ -103,7 +103,11 @@ export default function MangaConfig() {
             {loading ? (
               <Spinner size={16} className="text-accent" />
             ) : (
-              <Toggle on={!!config?.cron.enabled} onChange={handleCronToggle} />
+              <Toggle
+                on={!!config?.cron.enabled}
+                onChange={handleCronToggle}
+                ariaLabel={t("cronTask")}
+              />
             )}
           </div>
 

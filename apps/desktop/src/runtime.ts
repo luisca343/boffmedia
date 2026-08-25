@@ -9,6 +9,7 @@ import {
   MOCK_SETTINGS,
   mockCatalogCategories,
   mockContent,
+  mockExtraFiles,
   mockDirEntries,
   mockWorlds,
   mockCatalogProject,
@@ -43,9 +44,16 @@ import type {
   JavaChoice,
   LoaderVersion,
   LogLine,
+  Activation,
+  FeatureSetResult,
   MemoryChoice,
+  OptionalFeature,
   OptionalFile,
+  OptionalGroup,
+  OptionalSelect,
   ProvideFileError,
+  PublishPlan,
+  PublishResult,
   ProvideFileResult,
   ResolvedRuntime,
   RetainedVersion,
@@ -56,14 +64,21 @@ import type {
 } from "./services/types"
 
 export type {
+  Activation,
   EmulatorStatus,
+  FeatureSetResult,
   GameVersion,
   InstanceRuntime,
   JavaChoice,
   LoaderVersion,
   MemoryChoice,
+  OptionalFeature,
   OptionalFile,
+  OptionalGroup,
+  OptionalSelect,
   PackManifest,
+  PublishPlan,
+  PublishResult,
   ResolvedRuntime,
   RetainedVersion,
   RomScanResult,
@@ -467,6 +482,10 @@ export type WirePackVersion = {
   /** Present for emulator packs — the system the pack targets. */
   emulatorKind?: "mgba" | "melonds" | null
   fileCount: number
+  /** How many things the player can switch on or off. Optional here because a
+   *  cached listing written before this field existed must still parse — the
+   *  Rust side has the matching `#[serde(default)]` for the same reason. */
+  optionalFeatureCount?: number
   createdAt: string
 }
 
@@ -602,6 +621,20 @@ export const EVENT_INSTALL_PROGRESS = "install://progress"
 export const EVENT_INSTALL_DONE = "install://done"
 export const EVENT_GAME_LOG = "game://log"
 export const EVENT_GAME_STATE = "game://state"
+/** Per-file download state while an add-a-mod install is in flight. Separate
+ *  from `install://progress`, which describes the ONE pack-wide bar: these
+ *  events are row-level and must not put the pack card into "instalando". */
+export const EVENT_CONTENT_FILE = "content://file"
+
+/** One file of an add-a-mod install. `path` is instance-relative, normalised
+ *  the same way `instance_content` normalises the paths the Content tab already
+ *  holds, so the two can be matched row for row. */
+export type ContentFileEvent = {
+  slug: string
+  path: string
+  state: "downloading" | "done" | "error"
+  error?: string
+}
 
 export type InstallProgressEvent = {
   packId: string
@@ -670,6 +703,8 @@ export const onGameLog = (fn: (line: LogLine) => void) =>
   subscribe<LogLine>(EVENT_GAME_LOG, fn)
 export const onGameState = (fn: (state: GameState) => void) =>
   subscribe<GameState>(EVENT_GAME_STATE, fn)
+export const onContentFile = (fn: (e: ContentFileEvent) => void) =>
+  subscribe<ContentFileEvent>(EVENT_CONTENT_FILE, fn)
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
@@ -807,6 +842,76 @@ const mockOptional: OptionalFile[] = [
   { path: "mods/shaders.jar", name: "shaders.jar", size: 1_800_000, enabled: false },
 ]
 
+// The FEATURE model, mocked with the three shapes the chooser has to handle: an
+// `any` group of independent switches, a `one` radio, and a dependency chain.
+// Without a mock this screen could only be built by launching the shell.
+const mockGroups: OptionalGroup[] = [
+  {
+    id: "rendimiento",
+    name: "Rendimiento",
+    description: "Mejoras de FPS. Recomendado dejarlas activadas.",
+    select: "any",
+    features: [
+      {
+        id: "sodium",
+        name: "Sodium",
+        description: "Reescribe el renderizador. Duplica los FPS en la mayoría de equipos.",
+        paths: ["mods/sodium.jar"],
+        default: true,
+        requires: [],
+        enabled: true,
+        explicit: false,
+        size: 1_800_000,
+        installed: true,
+      },
+      {
+        id: "iris",
+        name: "Iris",
+        description: "Necesario para los shaders.",
+        paths: ["mods/iris.jar"],
+        default: false,
+        requires: ["sodium"],
+        enabled: false,
+        explicit: false,
+        size: 2_400_000,
+        installed: false,
+      },
+    ],
+  },
+  {
+    id: "shaders",
+    name: "Shaders",
+    description: "Solo uno a la vez.",
+    select: "atMostOne",
+    features: [
+      {
+        id: "bsl",
+        name: "BSL",
+        paths: ["shaderpacks/bsl.zip"],
+        default: false,
+        requires: ["iris"],
+        activate: { kind: "shaderpack", file: "shaderpacks/bsl.zip" },
+        enabled: false,
+        explicit: false,
+        size: 412_000_000,
+        installed: false,
+      },
+      {
+        id: "complementary",
+        name: "Complementary",
+        paths: ["shaderpacks/complementary.zip"],
+        default: false,
+        requires: ["iris"],
+        activate: { kind: "shaderpack", file: "shaderpacks/complementary.zip" },
+        enabled: false,
+        explicit: false,
+        size: 380_000_000,
+        installed: false,
+      },
+    ],
+  },
+]
+
 const mockVersions: RetainedVersion[] = [
   {
     versionId: "mock-3",
@@ -901,6 +1006,142 @@ export async function instanceOptionalSet(
   }
   try {
     return await invoke<OptionalFile[]>("instance_optional_set", { slug, path, enabled })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** The pack's optional CONTENT model: named groups of features, each with its
+ *  effective on/off state.
+ *
+ *  Distinct from `instanceOptional`, which is the older path-level view and
+ *  stays for packs that declare optional files without grouping them.
+ *
+ *  `manifest` is what makes this work BEFORE the first install, where there is
+ *  no marker to read a catalogue from. Pass it on the pre-install screen and
+ *  omit it afterwards: an installed instance's marker always wins, because it
+ *  records the catalogue of the version actually on disk. */
+export async function instanceOptionalModel(
+  slug: string,
+  manifest?: unknown,
+): Promise<OptionalGroup[]> {
+  if (!isDesktop()) return structuredClone(mockGroups)
+  try {
+    return await invoke<OptionalGroup[]>("instance_optional_model", { slug, manifest })
+  } catch {
+    return []
+  }
+}
+
+/** Switch one FEATURE on or off.
+ *
+ *  Returns the whole model rather than one row because a toggle is rarely one
+ *  feature: a radio group turns its siblings off, and `requires` pulls
+ *  dependencies on or takes dependents down. Re-render from what comes back
+ *  rather than patching optimistically, or the UI and the disk disagree.
+ *
+ *  `manifest` serves the pre-install chooser, exactly as in
+ *  {@link instanceOptionalModel}. Choosing there is worth more than choosing
+ *  later: the install pass reads this state and never downloads what was
+ *  declined, so an unwanted 400 MB shaderpack costs nothing at all. */
+export async function instanceFeatureSet(
+  slug: string,
+  featureId: string,
+  enabled: boolean,
+  manifest?: unknown,
+): Promise<FeatureSetResult> {
+  if (!isDesktop()) return mockFeatureSet(featureId, enabled)
+  try {
+    return await invoke<FeatureSetResult>("instance_feature_set", {
+      slug,
+      featureId,
+      enabled,
+      manifest,
+    })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Browser-mode simulation of `instance_feature_set`, mirroring the SAME rules
+ *  the Rust side applies — exclusivity, then the `requires` closure — so the
+ *  chooser's behaviour can be developed and reviewed without the shell. */
+function mockFeatureSet(featureId: string, enabled: boolean): FeatureSetResult {
+  const all = mockGroups.flatMap((g) => g.features)
+  const before = new Map(all.map((f) => [f.id, f.enabled]))
+  const group = mockGroups.find((g) => g.features.some((f) => f.id === featureId))
+  const target = all.find((f) => f.id === featureId)
+  if (!group || !target) {
+    return { groups: structuredClone(mockGroups), changed: [], missing: [], deferred: false }
+  }
+
+  if (enabled) {
+    if (group.select !== "any") {
+      for (const sibling of group.features) if (sibling.id !== target.id) sibling.enabled = false
+    }
+    target.enabled = true
+    // Transitive requirements, pulled on with it.
+    const queue = [...target.requires]
+    while (queue.length > 0) {
+      const dep = all.find((f) => f.id === queue.pop())
+      if (!dep || dep.enabled) continue
+      dep.enabled = true
+      queue.push(...dep.requires)
+    }
+  } else {
+    target.enabled = false
+    // Anything that required it can no longer stand.
+    const queue = [target.id]
+    while (queue.length > 0) {
+      const id = queue.pop()!
+      for (const f of all) {
+        if (f.enabled && f.requires.includes(id)) {
+          f.enabled = false
+          queue.push(f.id)
+        }
+      }
+    }
+    if (group.select === "one" && !group.features.some((f) => f.enabled)) {
+      const fallback = group.features.find((f) => f.default) ?? group.features[0]
+      if (fallback) fallback.enabled = true
+    }
+  }
+
+  for (const f of all) f.explicit = f.enabled !== f.default
+  const changed = all.filter((f) => before.get(f.id) !== f.enabled).map((f) => f.id)
+  const missing = all
+    .filter((f) => f.enabled && !f.installed && changed.includes(f.id))
+    .flatMap((f) => f.paths)
+  return { groups: structuredClone(mockGroups), changed: changed.sort(), missing, deferred: false }
+}
+
+// ── Publishing a local pack ────────────────────────────────────────────────
+// BOFF_ADMIN only, and the API enforces that — these two calls exist on every
+// build, and a non-admin simply gets a 403 from the server rather than a hidden
+// button that lies about what it would do.
+
+/** The preflight. Validates the manifest locally against the same schema the
+ *  server runs, then asks which override blobs are already up there. Uploads
+ *  nothing, so it is safe to call every time the screen opens. */
+export async function packPublishPlan(slug: string): Promise<PublishPlan | null> {
+  if (!isDesktop()) return null
+  try {
+    return await invoke<PublishPlan>("pack_publish_plan", { slug })
+  } catch (err) {
+    throw asFailure(err)
+  }
+}
+
+/** Upload the missing blobs, create (or update) the pack, and add a version.
+ *
+ *  `publish: false` leaves it as a DRAFT, which is the reviewable path: a draft
+ *  is stored and invisible to every launcher until somebody says otherwise. That
+ *  split is why this is not one button — creating a version and making it the
+ *  one every player downloads are different decisions. */
+export async function packPublish(slug: string, publish: boolean): Promise<PublishResult> {
+  if (!isDesktop()) throw new Error("Publicar solo funciona en la app de escritorio.")
+  try {
+    return await invoke<PublishResult>("pack_publish", { slug, publish })
   } catch (err) {
     throw asFailure(err)
   }
@@ -1219,6 +1460,7 @@ export async function catalogSearch(input: {
   category?: string
   page?: number
   pageSize?: number
+  includeFabricViaConnector?: boolean
 }): Promise<ModSearchPage> {
   if (!isDesktop()) return mockCatalogSearch(input.query)
   try {
@@ -1339,6 +1581,66 @@ export async function instanceContent(slug: string): Promise<ContentFile[]> {
   } catch {
     return []
   }
+}
+
+/** A file sitting in the instance that the launcher did not put there. */
+export type ExtraFile = {
+  /** Instance-relative and WITHOUT the `.disabled` suffix, so a parked file
+   *  keeps the same identity it had while enabled. */
+  path: string
+  size: number
+  enabled: boolean
+  /** What the renderer asks Modrinth about, to turn a filename into a mod. */
+  sha512?: string
+}
+
+/** Content-folder files the marker does not claim — jars the player dropped in
+ *  by hand. Kept separate from `instanceContent` because these must never enter
+ *  the marker: the moment one did, the stale sweep could delete it. */
+export async function instanceExtraFiles(slug: string): Promise<ExtraFile[]> {
+  if (!isDesktop()) return mockExtraFiles()
+  try {
+    return await invoke<ExtraFile[]>("instance_extra_files", { slug })
+  } catch {
+    return []
+  }
+}
+
+/** Download files a local pack just gained and place them in its instance,
+ *  without a full install pass — so a mod added from the browser is INSTALLED
+ *  rather than merely declared.
+ *
+ *  `previousVersionId` is the manifest version the instance was installed from
+ *  BEFORE the edit; the Rust side refuses the shortcut unless the marker still
+ *  matches it, because only then is "these files and nothing else are missing"
+ *  actually true. Resolves false when it declined or could not finish, which is
+ *  not an error: Install/Play remains the path that always works.
+ *
+ *  Progress arrives as `content://file` events, not as a return value — the
+ *  caller does not await this. */
+export async function instanceInstallFiles(
+  slug: string,
+  manifest: unknown,
+  paths: string[],
+  previousVersionId: string | null,
+): Promise<boolean> {
+  if (!isDesktop()) return false
+  return await invoke<boolean>("instance_install_files", {
+    slug,
+    manifest,
+    paths,
+    previousVersionId,
+  })
+}
+
+export async function instanceExtraSetEnabled(slug: string, path: string, enabled: boolean) {
+  if (!isDesktop()) return
+  await invoke("instance_extra_set_enabled", { slug, path, enabled })
+}
+
+export async function instanceExtraDelete(slug: string, path: string) {
+  if (!isDesktop()) return
+  await invoke("instance_extra_delete", { slug, path })
 }
 
 export async function instanceBrowse(slug: string, rel: string): Promise<DirEntry[]> {
@@ -1466,6 +1768,18 @@ export async function catalogVersionsByIds(ids: string[]): Promise<ModFile[]> {
   if (!isDesktop() || ids.length === 0) return []
   try {
     return await invoke<ModFile[]>("catalog_versions_by_ids", { ids })
+  } catch {
+    return []
+  }
+}
+
+/** Identify jars by SHA-512. Each returned file carries the hash that was asked
+ *  about, so the caller can match an answer back to the file on disk. Hashes
+ *  Modrinth does not know are simply absent — a private build is not an error. */
+export async function catalogVersionsByHashes(hashes: string[]): Promise<ModFile[]> {
+  if (!isDesktop() || hashes.length === 0) return []
+  try {
+    return await invoke<ModFile[]>("catalog_versions_by_hashes", { hashes })
   } catch {
     return []
   }

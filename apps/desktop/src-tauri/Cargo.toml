@@ -53,7 +53,7 @@ portablemc = "5.0"
 keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
 # §5's auth chain is hand-rolled (portablemc::msa cannot surface the refresh
 # token for the keychain), so the launcher makes these calls itself.
-reqwest = { version = "0.12", features = ["json"] }
+reqwest = { version = "0.12", features = ["json", "multipart"] }
 # "net" + "io-util": the hand-rolled SLP client (status.rs) opens a raw
 # TcpStream and writes/reads varints over it directly, no HTTP involved.
 tokio = { version = "1", features = ["time", "sync", "net", "io-util"] }

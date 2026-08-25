@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 
 import {
   Badge,
@@ -7,6 +7,7 @@ import {
   Empty,
   Icon,
   Input,
+  Modal,
   Seg,
   Spinner,
   Toggle,
@@ -15,9 +16,15 @@ import {
 } from "@boffmedia/ui"
 
 import { useT } from "../../i18n"
-import { instanceOptionalSet } from "../../runtime"
+import {
+  instanceExtraDelete,
+  instanceExtraSetEnabled,
+  instanceOptionalSet,
+  onContentFile,
+} from "../../runtime"
 import { removeFile, replaceFile } from "../../services/localPackEdit"
 import { formatBytes } from "../../utils/format"
+import { OptionalPanel } from "./OptionalPanel"
 import { UpdateReview } from "./UpdateReview"
 import {
   type ContentCategory,
@@ -38,21 +45,29 @@ import {
 
 export function ContentTab({
   slug,
+  packId,
   isLocal,
   minecraft,
   loader,
   onBrowse,
   onChanged,
+  refreshKey = 0,
 }: {
   slug: string
+  /** Only used to resolve the pack's manifest when a newly-enabled optional
+   *  feature needs files fetched. */
+  packId: string
   isLocal: boolean
   minecraft: string
   loader: string | null
   onBrowse: () => void
   onChanged: () => void
+  /** Bumped by the page when an install or a launch finishes. The rows report
+   *  what is on disk, and nothing inside this component knows that changed. */
+  refreshKey?: number
 }) {
   const t = useT("content")
-  const { rows, loading, reload, setRows } = usePackContent(slug, isLocal, true)
+  const { rows, loading, reload, setRows } = usePackContent(slug, isLocal, true, refreshKey)
 
   const CATEGORY_LABEL: Record<Exclude<ContentCategory, "all">, string> = {
     mod: t("categories.mod"),
@@ -66,7 +81,12 @@ export function ContentTab({
     curseforge: t("kinds.curseforge"),
     url: t("kinds.url"),
     override: t("kinds.override"),
+    manual: t("kinds.manual"),
   }
+  // Deleting a manual file is irreversible in a way removing a pack file is
+  // not: the launcher never had a copy and cannot fetch it again. Pack files
+  // keep the existing one-click behaviour.
+  const [confirmDelete, setConfirmDelete] = useState<ContentRow | null>(null)
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState<ContentCategory>("all")
   const [busyPath, setBusyPath] = useState<string | null>(null)
@@ -74,6 +94,56 @@ export function ContentTab({
   const [updatingAll, setUpdatingAll] = useState(false)
   const [reviewing, setReviewing] = useState(false)
   const [updateProgress, setUpdateProgress] = useState<string | null>(null)
+  // Paths currently being fetched by the add-a-mod shortcut. Lowercased,
+  // because the rows carry the manifest's casing and the events carry the
+  // instance's.
+  const [downloading, setDownloading] = useState<Set<string>>(() => new Set())
+
+  // Adding a mod downloads it in the background, so the rows this component
+  // read a moment ago go stale one file at a time. Refetching per file would be
+  // a Modrinth round trip per jar of a dependency closure, so completions are
+  // coalesced into one reload shortly after the last of them.
+  //
+  // A finished file stays in `downloading` until that reload lands, rather than
+  // being dropped the moment its event arrives: the row's `installed` still
+  // reads false until the refetch, so clearing early would flash "sin instalar"
+  // between the spinner and the truth — the exact badge this whole change is
+  // about.
+  const settle = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Read through refs so the subscription survives a re-render. `onChanged` is
+  // `reloadPacks`, rebuilt on every render of the app provider; in the deps it
+  // would tear the listener down and back up in a loop.
+  const latest = useRef({ reload, onChanged, t })
+  latest.current = { reload, onChanged, t }
+  useEffect(() => {
+    const stop = onContentFile((event) => {
+      if (event.slug !== slug) return
+      const key = event.path.toLowerCase()
+      if (event.state === "downloading") {
+        setDownloading((prev) => new Set(prev).add(key))
+        return
+      }
+      if (event.state === "error") {
+        setDownloading((prev) => {
+          const next = new Set(prev)
+          next.delete(key)
+          return next
+        })
+        toast.error(event.error ?? latest.current.t("downloadError", { name: event.path }))
+      }
+      if (settle.current) clearTimeout(settle.current)
+      settle.current = setTimeout(() => {
+        settle.current = null
+        setDownloading(new Set())
+        latest.current.reload()
+        latest.current.onChanged()
+      }, 400)
+    })
+    return () => {
+      stop()
+      if (settle.current) clearTimeout(settle.current)
+    }
+  }, [slug])
 
   const pendingUpdates = useMemo(() => rows.filter((r) => r.update), [rows])
   const updateCount = pendingUpdates.length
@@ -181,7 +251,14 @@ export function ContentTab({
     // feel broken.
     setRows(rows.map((r) => (r.path === row.path ? { ...r, enabled: !r.enabled } : r)))
     try {
-      await instanceOptionalSet(slug, row.path, !row.enabled)
+      // A manual file has no marker entry and no optional-state to record, so
+      // the rename on disk is the whole operation. `instanceOptionalSet` would
+      // write an intent for a file no install plan will ever read.
+      if (row.manual) {
+        await instanceExtraSetEnabled(slug, row.path, !row.enabled)
+      } else {
+        await instanceOptionalSet(slug, row.path, !row.enabled)
+      }
       onChanged()
     } catch (err) {
       setRows(rows.map((r) => (r.path === row.path ? { ...r, enabled: row.enabled } : r)))
@@ -194,7 +271,15 @@ export function ContentTab({
   const remove = async (row: ContentRow) => {
     setBusyPath(row.path)
     try {
-      await removeFile(slug, row.path)
+      // Two different operations behind one button. Removing a PACK file edits
+      // the manifest and leaves the bytes for the next install pass to sweep;
+      // removing a MANUAL file deletes it off disk, because nothing else ever
+      // will — the sweep deliberately ignores files it does not own.
+      if (row.manual) {
+        await instanceExtraDelete(slug, row.path)
+      } else {
+        await removeFile(slug, row.path)
+      }
       toast.success(t("removed", { name: row.name }))
       reload()
       onChanged()
@@ -222,6 +307,54 @@ export function ContentTab({
         progress={updateProgress}
         onCancel={() => setReviewing(false)}
         onConfirm={(chosen) => void applyChosen(chosen)}
+      />
+
+      {/* Only manual files reach this. Removing a pack file is recoverable —
+          the manifest still describes it and a repair fetches it again — so it
+          keeps its one-click behaviour. Deleting a file the player supplied is
+          the one action here the launcher cannot undo. */}
+      <Modal
+        open={confirmDelete !== null}
+        onClose={() => setConfirmDelete(null)}
+        title={t("deleteFileTitle")}
+        size="sm"
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-sm text-txt-muted">
+            {t("deleteFileWarning", { name: confirmDelete?.name ?? "" })}
+          </p>
+          <p className="font-mono text-xs text-txt-dim">{confirmDelete?.path}</p>
+          <div className="flex justify-end gap-2">
+            <Button size="sm" onClick={() => setConfirmDelete(null)}>
+              {t("cancelButton")}
+            </Button>
+            <Button
+              size="sm"
+              variant="danger"
+              icon="trash"
+              loading={busyPath === confirmDelete?.path}
+              onClick={() => {
+                const row = confirmDelete
+                setConfirmDelete(null)
+                if (row) void remove(row)
+              }}
+            >
+              {t("deleteButton")}
+            </Button>
+          </div>
+        </div>
+      </Modal>
+
+      {/* Above the file list, not inside it. The list answers "what is in this
+          pack"; this answers "what do I want from it", and mixing a decision
+          into a 200-row inventory is how the decision goes unnoticed. Renders
+          nothing at all for a pack that offers no choices, which is most. */}
+      <OptionalPanel
+        slug={slug}
+        packId={packId}
+        isLocal={isLocal}
+        refreshKey={refreshKey}
+        onChanged={onChanged}
       />
 
       <div className="flex flex-wrap items-center gap-2">
@@ -325,20 +458,42 @@ export function ContentTab({
                     <span className="min-w-0 truncate font-display text-[13px] font-bold uppercase tracking-[0.03em]">
                       {row.name}
                     </span>
+                    {/* `new`, matching the browser's Fabric marker: a mod the
+                        pack only runs because of Connector should look the same
+                        wherever it is listed. */}
+                    {row.manual && (
+                      <Badge tone="warn" className="shrink-0">
+                        {t("manualBadge")}
+                      </Badge>
+                    )}
+                    {row.loader === "fabric" && (
+                      <Badge tone="new" className="shrink-0">
+                        {t("loaderFabric")}
+                      </Badge>
+                    )}
                     {row.update && (
                       <Badge tone="info" className="shrink-0">
-                        Actualización
+                        {t("updateBadge")}
                       </Badge>
                     )}
                     {!row.enabled && (
                       <Badge tone="warn" className="shrink-0">
-                        Desactivado
+                        {t("disabledBadge")}
                       </Badge>
                     )}
-                    {!row.installed && (
-                      <Badge tone="warn" className="shrink-0">
-                        Sin instalar
+                    {/* Downloading wins over "sin instalar": both are true
+                        while a just-added mod is in flight, and only one of
+                        them tells the player something is happening. */}
+                    {downloading.has(row.path.toLowerCase()) ? (
+                      <Badge tone="info" className="flex shrink-0 items-center gap-1">
+                        <Spinner size={9} /> {t("downloadingBadge")}
                       </Badge>
+                    ) : (
+                      !row.installed && (
+                        <Badge tone="warn" className="shrink-0">
+                          {t("notInstalledBadge")}
+                        </Badge>
+                      )
                     )}
                   </span>
                   <span className="truncate font-mono text-[11px] text-txt-dim">
@@ -377,15 +532,25 @@ export function ContentTab({
                       {/* Managed packs allow the toggle only where the manifest
                           declares the file optional; local packs own every file
                           and may switch any of them off. */}
-                      {(isLocal || row.optional) && (
-                        <Toggle on={row.enabled} onChange={() => void toggle(row)} />
+                      {/* A manual file is the player's own, so it is toggleable
+                          and deletable in a MANAGED pack too — the restriction
+                          exists to protect the pack's files, and these are not
+                          the pack's. */}
+                      {(isLocal || row.optional || row.manual) && (
+                        <Toggle
+                          on={row.enabled}
+                          onChange={() => void toggle(row)}
+                          ariaLabel={t("toggleFileLabel", { name: row.name })}
+                        />
                       )}
-                      {isLocal && (
+                      {(isLocal || row.manual) && (
                         <button
                           type="button"
-                          aria-label={`Eliminar ${row.name}`}
-                          title="Eliminar del pack"
-                          onClick={() => void remove(row)}
+                          aria-label={`${t("deleteAction")} ${row.name}`}
+                          title={row.manual ? t("deleteFileTitle") : t("deletePackFileTitle")}
+                          onClick={() =>
+                            row.manual ? setConfirmDelete(row) : void remove(row)
+                          }
                           className="p-1 text-txt-dim hover:text-bad"
                         >
                           <Icon name="trash" size={15} />

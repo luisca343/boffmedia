@@ -419,6 +419,7 @@ function FeatureToggleSample() {
     <FeatureToggle
       icon={<Icon name="shield" size={20} />}
       title="Whitelist de acceso"
+      ariaLabel="Whitelist de acceso"
       description="Limita quién puede acceder a este paquete"
       on={on}
       onChange={setOn}

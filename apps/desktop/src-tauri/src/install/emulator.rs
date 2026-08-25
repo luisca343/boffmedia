@@ -59,7 +59,7 @@ async fn install_payload(
         .plan
         .files
         .iter()
-        .filter(|f| !disabled.is_disabled(&f.path))
+        .filter(|f| !disabled.is_path_disabled(&f.path))
         .cloned()
         .collect();
 
@@ -282,6 +282,10 @@ fn build_marker(
             .filter(|f| f.optional)
             .map(ManagedFile::from_planned)
             .collect(),
+        // Emulator packs declare no feature groups: there is no mod browser to
+        // author them from and the payload is a ROM the player supplies. The
+        // path-level catalogue above is the whole of their optional story.
+        optional_groups: Vec::new(),
         pinned: false,
         game_type: GameType::Emulator,
         emulator: Some(instance::EmulatorMarker {
@@ -607,6 +611,7 @@ mod tests {
             pack_id: "pk1".into(),
             managed: vec![rom_entry(rom_sha512, 4096)],
             optional_files: vec![],
+            optional_groups: vec![],
             pinned: false,
             game_type: GameType::Emulator,
             emulator: Some(instance::EmulatorMarker {

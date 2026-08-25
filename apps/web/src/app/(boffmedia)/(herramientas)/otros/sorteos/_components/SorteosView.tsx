@@ -139,14 +139,14 @@ export function SorteosView() {
                   <b className="block font-display text-[12px] font-bold uppercase tracking-[0.05em] text-txt">{t("cfgWeighted")}</b>
                   <span className="mt-[4px] block font-mono text-[10px] leading-[1.4] text-txt-dim">{t("cfgWeightedSub")}</span>
                 </span>
-                <Toggle on={weighted} onChange={setWeighted} />
+                <Toggle on={weighted} onChange={setWeighted} ariaLabel={t("cfgWeighted")} />
               </div>
               <div className="flex items-center justify-between gap-[12px]">
                 <span className="min-w-0">
                   <b className="block font-display text-[12px] font-bold uppercase tracking-[0.05em] text-txt">{t("cfgExclude")}</b>
                   <span className="mt-[4px] block font-mono text-[10px] leading-[1.4] text-txt-dim">{t("cfgExcludeSub")}</span>
                 </span>
-                <Toggle on={exclude} onChange={setExclude} />
+                <Toggle on={exclude} onChange={setExclude} ariaLabel={t("cfgExclude")} />
               </div>
             </div>
           </SrtPanel>

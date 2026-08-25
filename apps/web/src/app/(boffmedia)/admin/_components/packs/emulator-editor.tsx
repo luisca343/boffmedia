@@ -624,6 +624,7 @@ export function EmulatorEditor({
       <FeatureToggle
         icon={<Icon name="copy" size={18} />}
         title={t("emulator.romhackToggle")}
+        ariaLabel={t("emulator.romhackToggle")}
         description={t("emulator.romhackToggleLead")}
         on={useRomhack}
         onChange={(on) => setUseRomhack(on)}
@@ -734,6 +735,7 @@ export function EmulatorEditor({
       <FeatureToggle
         icon={<Icon name="download" size={18} />}
         title={t("emulator.saveToggle")}
+        ariaLabel={t("emulator.saveToggle")}
         description={t("emulator.saveToggleLead")}
         on={startingSave !== null}
         onChange={(on) => setStartingSave(on ? { file: new File([], ""), name: "" } : null)}

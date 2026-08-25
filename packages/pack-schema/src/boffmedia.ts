@@ -6,6 +6,14 @@ import { EnvSupport, FileEnv, InstancePath, MrpackDependencies, loaderOf } from 
 // third-party tool (Prism, packwiz) ignores them and the pack still installs.
 // Per file: source, SHA-512, target path, env.
 
+/** A normalized, case-insensitive view of an instance path: lowercased with
+ *  separators unified. Windows and macOS would silently overwrite one file with
+ *  another differing only in case, while Linux installs both — a pack that
+ *  installs differently per platform is a pack that cannot be supported. Every
+ *  path comparison in this file goes through here so the three ends (the
+ *  refinements, the optional model, and `pack.rs::norm_path`) agree. */
+export const normPath = (p: string): string => p.toLowerCase().split("\\").join("/")
+
 /** Which game a pack targets. Absent means `minecraft`, so a pack with no
  *  `gameType` still loads. All four values are declared even though only
  *  `minecraft` is playable: the discriminator, filtering and validation
@@ -77,6 +85,17 @@ export const PackFile = z.object({
   fileSize: z.number().int().nonnegative(),
   env: FileEnv.default({ client: "required", server: "required" }),
   source: FileSource,
+  /** The mod loader this jar was built for, recorded ONLY when it differs from
+   *  the pack's own — that is, a Fabric mod running on NeoForge through Sinytra
+   *  Connector. Absent means "the pack's loader", which is every ordinary file.
+   *
+   *  Stored rather than re-derived because the alternative is one Modrinth
+   *  round trip per entry, every time a pack page wants to show which mods are
+   *  Fabric. Deliberately NOT enforced by a superRefine: a cross-field rule here
+   *  would have to be hand-mirrored in `pack.rs` (JSON Schema drops refinements
+   *  silently), and "Fabric files but no Connector" is better surfaced as a
+   *  warning in the editor than as a manifest that refuses to parse. */
+  loader: z.enum(["fabric", "quilt", "forge", "neoforge"]).optional(),
 })
 export type PackFile = z.infer<typeof PackFile>
 
@@ -134,6 +153,127 @@ export const BundledWorld = z.object({
 })
 export type BundledWorld = z.infer<typeof BundledWorld>
 
+/** Where a resourcepack / shaderpack / datapack has to be *switched on*, not
+ *  merely placed.
+ *
+ *  For a mod, dropping the jar in `mods/` is the entire job. For the three kinds
+ *  below it is half the job: the file sits on disk and the game ignores it until
+ *  a config names it. `activate` is that other half, declared by the author so
+ *  the launcher does not have to guess from a file extension.
+ *
+ *  `datapack` is the odd one out and deliberately so. Under D1 (see
+ *  docs/packs-v2-plan.md §11) datapacks are delivered through a global loader —
+ *  OpenLoader or Paxi — so the file's own `path` already puts it where the loader
+ *  reads it, and there is no config to edit. The variant still exists because it
+ *  declares INTENT: it is what lets validation insist on a loader directory
+ *  (rule 9) and warn when no loader jar ships with the pack, and what lets the
+ *  chooser say "datapack" instead of "a zip inside config/". */
+export const ActivationSpec = z.discriminatedUnion("kind", [
+  /** `options.txt` carries `resourcePacks:["vanilla","file/x.zip"]` — a JSON
+   *  array on ONE line. Later entries win in-game, so `priority` decides where
+   *  in that array the pack is inserted; higher wins. Absent = 0. */
+  z.object({
+    kind: z.literal("resourcepack"),
+    file: InstancePath,
+    priority: z.number().int().min(0).max(100).optional(),
+  }),
+  /** Iris/Oculus read `shaderPack=` out of their own properties file, which
+   *  holds exactly ONE value. Two shaderpacks cannot both be active, so this
+   *  variant is legal only inside a `one`/`atMostOne` group (rule 8) — the
+   *  schema must not let an author imply a choice the game cannot honour. */
+  z.object({
+    kind: z.literal("shaderpack"),
+    file: InstancePath,
+  }),
+  /** Declaration only — see the note above. `file` must live under a global
+   *  loader's datapack directory (rule 9). */
+  z.object({
+    kind: z.literal("datapack"),
+    file: InstancePath,
+  }),
+])
+export type ActivationSpec = z.infer<typeof ActivationSpec>
+
+/** Directory prefixes a global datapack loader reads. D1 picked the loader route
+ *  because `saves/<world>/datapacks/` does not exist until the world does, and a
+ *  player creates worlds whenever they like — a per-world copy can only ever
+ *  cover the worlds that existed at install time. */
+export const DATAPACK_LOADER_DIRS = ["config/openloader/datapacks/", "config/paxi/datapacks/"] as const
+
+/** Substrings that identify a global datapack loader jar. A heuristic on the
+ *  filename, which is why it drives a WARNING and never an error — a heuristic
+ *  must not be able to make a valid pack unpublishable. */
+const DATAPACK_LOADER_HINTS = ["openloader", "paxi"] as const
+
+/** One thing a player switches on or off.
+ *
+ *  The unit is a FEATURE, not a file. "Shaders" is Iris + Sodium + a config +
+ *  the `.zip`, and a player who can switch on three of those four has a crash,
+ *  not a choice. `env.client: "optional"` marks a PATH as skippable, which is
+ *  the right thing to tell Prism or packwiz; a feature is the decision that
+ *  spans those paths, which is the right thing to show a person. */
+export const OptionalFeature = z.object({
+  /** Stable across versions — the player's saved choice keys on this id, so
+   *  renaming it silently resets everyone's selection. */
+  id: z
+    .string()
+    .max(64)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "feature id must be lowercase kebab-case"),
+  name: z.string().min(1).max(64),
+  description: z.string().max(512).optional(),
+  iconUrl: z.url().optional(),
+  /** Instance paths this feature owns. Every one must be a `files[]` entry whose
+   *  `env.client` is `"optional"` (rules 1-2), and no path may be owned by two
+   *  features (rule 4) — two switches fighting over one jar cannot both win. */
+  paths: z.array(InstancePath).min(1).max(64),
+  /** On unless the player says otherwise (opt-out) vs off until they ask for it
+   *  (opt-in). This is precisely what `env.client` alone could never express:
+   *  it has one "optional" and no way to say which way it leans.
+   *
+   *  Required, with no zod default, on purpose — an author must decide. It is
+   *  also the value a player's stored state is a DEVIATION from, so a feature
+   *  added in a later version lands here rather than on a value recorded before
+   *  it existed. See OptionalState in apps/desktop/src-tauri/src/install/. */
+  default: z.boolean(),
+  /** Feature ids that must be ON for this one to be on. Targets must exist, must
+   *  not cycle, and must live in an `any` group (rule 5) — a `requires` pointing
+   *  into a radio group could force two of its members on at once. */
+  requires: z.array(z.string().max(64)).max(8).optional(),
+  /** Placement is not always activation — see ActivationSpec. */
+  activate: ActivationSpec.optional(),
+})
+export type OptionalFeature = z.infer<typeof OptionalFeature>
+
+/** How many features in a group may be on at once. */
+export const OptionalSelect = z.enum(["any", "one", "atMostOne"])
+export type OptionalSelect = z.infer<typeof OptionalSelect>
+
+export const OptionalGroup = z.object({
+  id: z
+    .string()
+    .max(64)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "group id must be lowercase kebab-case"),
+  name: z.string().min(1).max(64),
+  description: z.string().max(512).optional(),
+  /** `any` — independent switches.
+   *  `one` — exactly one on at all times (a radio; the group must declare
+   *          exactly one `default: true`).
+   *  `atMostOne` — a radio plus "ninguno".
+   *
+   *  OPTIONAL rather than `.default("any")`, following `gameType`: a zod default
+   *  survives to the emitted JSON Schema as a `default` keyword on a field the
+   *  schema still lists as required, and whether the Rust codegen honours that
+   *  is the codegen's business, not ours. Read it through `selectOf(group)`, the
+   *  way `gameTypeOf(pack)` is read. */
+  select: OptionalSelect.optional(),
+  features: z.array(OptionalFeature).min(1).max(64),
+})
+export type OptionalGroup = z.infer<typeof OptionalGroup>
+
+/** The resolved selection mode of a group: the stored value, or `any` when
+ *  absent. One place owns the default so no consumer re-implements it. */
+export const selectOf = (group: OptionalGroup): OptionalSelect => group.select ?? "any"
+
 export const PackVersion = z.object({
   /** Opaque, server-assigned. Not semver — packs version on their own clock. */
   id: z.string().min(1),
@@ -154,6 +294,15 @@ export const PackVersion = z.object({
   emulator: EmulatorSpec.optional(),
   zomboid: z.unknown().optional(),
   stardew: z.unknown().optional(),
+  /** Content the player opts into or out of, organised into named groups.
+   *  Minecraft-only in practice today, but not forbidden elsewhere — nothing in
+   *  the model is Minecraft-specific except the `activate` kinds.
+   *
+   *  Optional on the version: a pack that offers no choices carries no groups,
+   *  and a manifest authored before this existed keeps parsing. Read the model
+   *  through `optionalModelOf(version)`, which also folds in optional files no
+   *  group claims (D4). */
+  optionalGroups: z.array(OptionalGroup).max(32).optional(),
   /** First-install-only files (a starting `.sav`, a default options file):
    *  written only if the target path does not already exist, then owned by the
    *  player — never re-verified or overwritten on update/repair. Same shape as
@@ -169,6 +318,112 @@ export type PackVersion = z.infer<typeof PackVersion>
  *  absent (a pack authored before multi-game). One place owns the default so no
  *  consumer re-implements it. */
 export const gameTypeOf = (pack: Pack): GameType => pack.gameType ?? "minecraft"
+
+/** The optional-content model as the launcher and the chooser should see it:
+ *  the authored groups, plus a synthesised `otros` group holding every
+ *  `env.client === "optional"` file no feature claims (D4).
+ *
+ *  Why synthesise rather than reject: `env.client: "optional"` is a `.mrpack`
+ *  field, so a pack imported from Modrinth can arrive carrying optional files
+ *  that were never authored here. Each unclaimed file becomes its own feature
+ *  with `default: true` — which IS today's behaviour, since the pre-feature
+ *  runtime stored only a `disabled` set and therefore treated every optional
+ *  file as on-unless-switched-off. So the fold-in is not a new policy, it is the
+ *  old one written down. One exported helper owns it, the way `gameTypeOf` owns
+ *  the game-type default, so no consumer re-derives it and drifts.
+ *
+ *  `otros` is a reserved group id — rule 3 rejects an author who declares it, so
+ *  a synthesised group can never collide with a real one. */
+export const SYNTHETIC_GROUP_ID = "otros"
+
+export const optionalModelOf = (version: PackVersion): OptionalGroup[] => {
+  const groups = version.optionalGroups ?? []
+  const claimed = new Set<string>()
+  for (const group of groups) {
+    for (const feature of group.features) {
+      for (const path of feature.paths) claimed.add(normPath(path))
+    }
+  }
+
+  const orphans = version.files.filter(
+    (f) => f.env.client === "optional" && !claimed.has(normPath(f.path)),
+  )
+  if (orphans.length === 0) return groups
+
+  return [
+    ...groups,
+    {
+      id: SYNTHETIC_GROUP_ID,
+      name: "Otros",
+      select: "any",
+      features: orphans.map((f) => ({
+        // Derived from the path, so it is stable for as long as the path is —
+        // which is the same guarantee the pre-feature path-keyed state had.
+        id: syntheticFeatureId(f.path),
+        name: basenameOf(f.path),
+        paths: [f.path],
+        default: true,
+      })),
+    },
+  ]
+}
+
+/** The last segment of an instance path, separators unified but case kept —
+ *  this one feeds a label a person reads, not a comparison. */
+const basenameOf = (path: string): string =>
+  path.split("\\").join("/").split("/").pop() || path
+
+/** A kebab-case id derived from a path. Collisions are impossible in practice
+ *  because paths are already unique case-insensitively (the duplicate-path
+ *  refinement), and any two paths that normalised to the same id would have had
+ *  to differ only in characters this strips. */
+const syntheticFeatureId = (path: string): string =>
+  normPath(path)
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 64)
+    .replace(/-+$/, "") || "archivo"
+
+/** Non-fatal findings an authoring surface should show. Separate from the
+ *  `superRefine` because zod issues are errors and these must not be: they rest
+ *  on filename heuristics, and a heuristic that can refuse to publish a valid
+ *  pack is worse than no check at all. */
+export type OptionalWarning = {
+  code: "datapack-loader-missing"
+  groupId: string
+  featureId: string
+  message: string
+}
+
+export const optionalWarnings = (version: PackVersion): OptionalWarning[] => {
+  const warnings: OptionalWarning[] = []
+  const groups = version.optionalGroups ?? []
+  if (groups.length === 0) return warnings
+
+  // A global datapack loader is what makes D1 work: it is read at every world
+  // load, so a world created next month still gets the datapack. Without one,
+  // the zip sits in config/ and nothing ever reads it.
+  const hasLoader = version.files.some((f) => {
+    const name = basenameOf(f.path).toLowerCase()
+    return name.endsWith(".jar") && DATAPACK_LOADER_HINTS.some((hint) => name.includes(hint))
+  })
+  if (hasLoader) return warnings
+
+  for (const group of groups) {
+    for (const feature of group.features) {
+      if (feature.activate?.kind !== "datapack") continue
+      warnings.push({
+        code: "datapack-loader-missing",
+        groupId: group.id,
+        featureId: feature.id,
+        message:
+          `"${feature.name}" ships a datapack, but no global datapack loader ` +
+          `(OpenLoader or Paxi) is in files[]. Without one the game never reads it.`,
+      })
+    }
+  }
+  return warnings
+}
 
 /** Quick Play target for this pack (RF-01/RF-03). `port` is OPTIONAL: a bare
  *  host (e.g. `play.example.com` behind a Minecraft SRV record) declares no
@@ -241,7 +496,7 @@ export const PackManifest = z
     // A normalized, case-insensitive view of a target path: Windows and macOS
     // would silently overwrite one file with the other while Linux installs
     // both, so collisions are judged case-insensitively with separators unified.
-    const norm = (p: string) => p.toLowerCase().replace(/\\/g, "/")
+    const norm = normPath
 
     // ---- duplicate target paths within files[] ----
     const seen = new Set<string>()
@@ -436,6 +691,248 @@ export const PackManifest = z
           path: ["version", "emulator", "rom"],
           message: `a ${v.emulator.kind} ROM must end in ${wantExt}: ${v.emulator.rom}`,
         })
+      }
+    }
+
+    // ---- optional content: groups, features, activation ----
+    // NINE cross-field rules, and every one of them must be mirrored by hand in
+    // apps/desktop/src-tauri/src/pack.rs. emit-schema.mjs drops refinements
+    // silently and build.rs generates the Rust types from that output, so
+    // nothing in the pipeline catches a violation on the Rust side. This block
+    // and `validate_optional` in pack.rs are one rule set written twice.
+    const groups = v.optionalGroups ?? []
+    if (groups.length > 0) {
+      const groupIds = new Set<string>()
+      // path -> "groupId/featureId" of the feature that already claims it.
+      const pathOwner = new Map<string, string>()
+      // featureId -> the select mode of the group it lives in; also the
+      // existence check for `requires`.
+      const featureGroupSelect = new Map<string, OptionalSelect>()
+      const featureRequires = new Map<string, string[]>()
+
+      for (const [gi, group] of groups.entries()) {
+        const select = selectOf(group)
+
+        // Rule 3a: group ids unique, and `otros` reserved for the synthesised
+        // group in optionalModelOf — an authored group by that name would be
+        // indistinguishable from a fold-in of unclaimed files.
+        if (group.id === SYNTHETIC_GROUP_ID) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["version", "optionalGroups", gi, "id"],
+            message: `"${SYNTHETIC_GROUP_ID}" is reserved for unclaimed optional files`,
+          })
+        }
+        if (groupIds.has(group.id)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["version", "optionalGroups", gi, "id"],
+            message: `duplicate group id: ${group.id}`,
+          })
+        }
+        groupIds.add(group.id)
+
+        // Rule 6: a radio group needs exactly one default on; `atMostOne` at
+        // most one. Two defaults in a `one` group has no correct resolution —
+        // whichever the launcher picked would be arbitrary.
+        const defaultsOn = group.features.filter((f) => f.default).length
+        if (select === "one" && defaultsOn !== 1) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["version", "optionalGroups", gi, "features"],
+            message: `a "one" group must declare exactly one default:true feature (found ${defaultsOn})`,
+          })
+        }
+        if (select === "atMostOne" && defaultsOn > 1) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["version", "optionalGroups", gi, "features"],
+            message: `an "atMostOne" group may declare at most one default:true feature (found ${defaultsOn})`,
+          })
+        }
+
+        for (const [fi, feature] of group.features.entries()) {
+          const at = (...rest: (string | number)[]) => [
+            "version",
+            "optionalGroups",
+            gi,
+            "features",
+            fi,
+            ...rest,
+          ]
+
+          // Rule 3b: feature ids unique across the WHOLE version, not per group
+          // — the player's saved state is a flat set of feature ids, so two
+          // groups sharing an id would share a switch.
+          if (featureGroupSelect.has(feature.id)) {
+            ctx.addIssue({
+              code: "custom",
+              path: at("id"),
+              message: `duplicate feature id: ${feature.id}`,
+            })
+          }
+          featureGroupSelect.set(feature.id, select)
+          featureRequires.set(feature.id, feature.requires ?? [])
+
+          for (const [pi, path] of feature.paths.entries()) {
+            const key = norm(path)
+
+            // Rule 1: the path is a real files[] entry. A feature owning a path
+            // that does not exist is a switch wired to nothing.
+            const file = fileByPath.get(key)
+            if (!file) {
+              ctx.addIssue({
+                code: "custom",
+                path: at("paths", pi),
+                message: `feature path must match a files[] entry: ${path}`,
+              })
+            } else if (file.env.client !== "optional") {
+              // Rule 2: keeps the .mrpack view honest. Prism and packwiz read
+              // env.client and nothing else; a file we let a player skip while
+              // telling them it is "required" installs differently depending on
+              // which launcher opened the pack.
+              ctx.addIssue({
+                code: "custom",
+                path: at("paths", pi),
+                message: `a feature path must be env.client "optional" (${path} is "${file.env.client}")`,
+              })
+            }
+
+            // Rule 4: one owner per path. Two features owning one jar cannot
+            // both be honoured — switching either off deletes the other's file.
+            const owner = pathOwner.get(key)
+            if (owner) {
+              ctx.addIssue({
+                code: "custom",
+                path: at("paths", pi),
+                message: `path is already owned by feature "${owner}": ${path}`,
+              })
+            } else {
+              pathOwner.set(key, `${group.id}/${feature.id}`)
+            }
+          }
+
+          if (feature.activate) {
+            const activateKey = norm(feature.activate.file)
+
+            // Rule 7: you may only activate what you own. Activating a file
+            // another feature can switch off means writing a config that names a
+            // file that is not there.
+            if (!feature.paths.some((p) => norm(p) === activateKey)) {
+              ctx.addIssue({
+                code: "custom",
+                path: at("activate", "file"),
+                message: `activate.file must be one of the feature's own paths: ${feature.activate.file}`,
+              })
+            }
+
+            // Rule 8: iris.properties/oculus.properties hold ONE shaderPack
+            // value. In an `any` group the author is offering a choice the game
+            // cannot honour, and the launcher would have to pick a winner.
+            if (feature.activate.kind === "shaderpack" && select === "any") {
+              ctx.addIssue({
+                code: "custom",
+                path: at("activate", "kind"),
+                message: `a shaderpack activation requires a "one" or "atMostOne" group — only one shaderpack can be active`,
+              })
+            }
+
+            // Rule 9: D1. A datapack reaches the game through a global loader,
+            // so its path has to be where that loader looks. Anywhere else and
+            // the file is installed, verified, and never read.
+            if (
+              feature.activate.kind === "datapack" &&
+              !DATAPACK_LOADER_DIRS.some((dir) => activateKey.startsWith(dir))
+            ) {
+              ctx.addIssue({
+                code: "custom",
+                path: at("activate", "file"),
+                message:
+                  `a datapack must be placed under ${DATAPACK_LOADER_DIRS.join(" or ")} ` +
+                  `so a global loader reads it: ${feature.activate.file}`,
+              })
+            }
+          }
+        }
+      }
+
+      // Rule 5: `requires` must resolve, must not cycle, and must point at an
+      // `any` group. Deferred to a second pass so a feature may require one
+      // declared later in the document — order in the file should not be a rule.
+      for (const [gi, group] of groups.entries()) {
+        for (const [fi, feature] of group.features.entries()) {
+          for (const [ri, req] of (feature.requires ?? []).entries()) {
+            const path = ["version", "optionalGroups", gi, "features", fi, "requires", ri]
+            if (req === feature.id) {
+              ctx.addIssue({ code: "custom", path, message: `a feature cannot require itself: ${req}` })
+              continue
+            }
+            const targetSelect = featureGroupSelect.get(req)
+            if (targetSelect === undefined) {
+              ctx.addIssue({
+                code: "custom",
+                path,
+                message: `requires must name an existing feature id: ${req}`,
+              })
+              continue
+            }
+            // A dependency is a force-on. Forcing on a member of a radio group
+            // either turns a second member on or silently turns the player's
+            // choice off; neither is something an author can have meant.
+            if (targetSelect !== "any") {
+              ctx.addIssue({
+                code: "custom",
+                path,
+                message: `requires may only target a feature in an "any" group: ${req}`,
+              })
+            }
+          }
+        }
+      }
+
+      // Cycle detection over the whole graph, reported at every feature that sits
+      // on one. Iterative DFS with three-colour marking — the graph is tiny
+      // (<= 32 groups x 64 features), but recursion on a hostile manifest is not
+      // an acceptable failure mode when this runs inside the API.
+      const state = new Map<string, 0 | 1 | 2>()
+      const cyclic = new Set<string>()
+      for (const start of featureRequires.keys()) {
+        if (state.get(start)) continue
+        const stack: Array<{ id: string; next: number }> = [{ id: start, next: 0 }]
+        state.set(start, 1)
+        while (stack.length > 0) {
+          const frame = stack[stack.length - 1]!
+          const deps = featureRequires.get(frame.id) ?? []
+          if (frame.next >= deps.length) {
+            state.set(frame.id, 2)
+            stack.pop()
+            continue
+          }
+          const dep = deps[frame.next++]!
+          if (!featureRequires.has(dep)) continue // already reported by rule 5
+          const depState = state.get(dep) ?? 0
+          if (depState === 1) {
+            // `dep` is grey: it is on the current stack, so everything from it
+            // up to here closes a cycle.
+            const from = stack.findIndex((f) => f.id === dep)
+            for (const f of stack.slice(from === -1 ? 0 : from)) cyclic.add(f.id)
+          } else if (depState === 0) {
+            state.set(dep, 1)
+            stack.push({ id: dep, next: 0 })
+          }
+        }
+      }
+      if (cyclic.size > 0) {
+        for (const [gi, group] of groups.entries()) {
+          for (const [fi, feature] of group.features.entries()) {
+            if (!cyclic.has(feature.id)) continue
+            ctx.addIssue({
+              code: "custom",
+              path: ["version", "optionalGroups", gi, "features", fi, "requires"],
+              message: `requires forms a cycle through "${feature.id}"`,
+            })
+          }
+        }
       }
     }
   })

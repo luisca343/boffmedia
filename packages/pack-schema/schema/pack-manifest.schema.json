@@ -380,6 +380,15 @@
                     "additionalProperties": false
                   }
                 ]
+              },
+              "loader": {
+                "type": "string",
+                "enum": [
+                  "fabric",
+                  "quilt",
+                  "forge",
+                  "neoforge"
+                ]
               }
             },
             "required": [
@@ -591,6 +600,161 @@
         },
         "zomboid": {},
         "stardew": {},
+        "optionalGroups": {
+          "maxItems": 32,
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "maxLength": 64,
+                "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 64
+              },
+              "description": {
+                "type": "string",
+                "maxLength": 512
+              },
+              "select": {
+                "type": "string",
+                "enum": [
+                  "any",
+                  "one",
+                  "atMostOne"
+                ]
+              },
+              "features": {
+                "minItems": 1,
+                "maxItems": 64,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "maxLength": 64,
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+                    },
+                    "name": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 64
+                    },
+                    "description": {
+                      "type": "string",
+                      "maxLength": 512
+                    },
+                    "iconUrl": {
+                      "type": "string",
+                      "format": "uri"
+                    },
+                    "paths": {
+                      "minItems": 1,
+                      "maxItems": 64,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "default": {
+                      "type": "boolean"
+                    },
+                    "requires": {
+                      "maxItems": 8,
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "maxLength": 64
+                      }
+                    },
+                    "activate": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "resourcepack"
+                            },
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            },
+                            "priority": {
+                              "type": "integer",
+                              "minimum": 0,
+                              "maximum": 100
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "file"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "shaderpack"
+                            },
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "file"
+                          ],
+                          "additionalProperties": false
+                        },
+                        {
+                          "type": "object",
+                          "properties": {
+                            "kind": {
+                              "type": "string",
+                              "const": "datapack"
+                            },
+                            "file": {
+                              "type": "string",
+                              "minLength": 1
+                            }
+                          },
+                          "required": [
+                            "kind",
+                            "file"
+                          ],
+                          "additionalProperties": false
+                        }
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "paths",
+                    "default"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "features"
+            ],
+            "additionalProperties": false
+          }
+        },
         "initialFiles": {
           "type": "array",
           "items": {
@@ -775,6 +939,15 @@
                     ],
                     "additionalProperties": false
                   }
+                ]
+              },
+              "loader": {
+                "type": "string",
+                "enum": [
+                  "fabric",
+                  "quilt",
+                  "forge",
+                  "neoforge"
                 ]
               }
             },

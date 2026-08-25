@@ -73,13 +73,13 @@ export function DataControls() {
         icon="chart"
         title={t("analytics")}
         desc={t("analyticsDesc")}
-        end={<Toggle on={analytics} onChange={setAnalytics} />}
+        end={<Toggle on={analytics} onChange={setAnalytics} ariaLabel={t("analytics")} />}
       />
       <Ctrl
         icon="mail"
         title={t("communications")}
         desc={t("communicationsDesc")}
-        end={<Toggle on={marketing} onChange={setMarketing} />}
+        end={<Toggle on={marketing} onChange={setMarketing} ariaLabel={t("communications")} />}
       />
       <Ctrl
         icon="trash"

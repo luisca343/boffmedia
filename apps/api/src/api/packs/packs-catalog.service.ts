@@ -259,7 +259,22 @@ export class PacksCatalogService {
       [`project_type:${MODRINTH_TYPE[q.projectType ?? 'mod'] ?? 'mod'}`],
     ];
     if (q.gameVersion) facets.push([`versions:${q.gameVersion}`]);
-    if (q.loader) facets.push([`categories:${q.loader}`]);
+    if (q.loader) {
+      // Modrinth ORs the values WITHIN one facet array and ANDs across arrays,
+      // so widening for Connector is one extra entry in the same array — a
+      // single blended list in Modrinth's own ranking, not two searches merged
+      // client-side with a broken relevance order.
+      //
+      // Gated on the pack's loader being one Connector can host: a Fabric pack
+      // asking for Fabric-plus-Fabric is a no-op, and a Quilt pack would get
+      // mods it cannot load.
+      const loaders =
+        q.includeFabricViaConnector &&
+        (q.loader === 'neoforge' || q.loader === 'forge')
+          ? [q.loader, 'fabric']
+          : [q.loader];
+      facets.push(loaders.map((l) => `categories:${l}`));
+    }
     if (q.category) facets.push([`categories:${q.category}`]);
 
     const data = await this.modrinthGet<{

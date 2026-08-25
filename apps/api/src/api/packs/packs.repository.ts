@@ -20,7 +20,11 @@ import {
   boffMediaEvents,
   boffMediaParticipants,
 } from '@/_db/schema/BoffMediaEvents';
-import { boffMediaUsers } from '@/_db/schema/BoffMedia';
+import {
+  boffMediaRoles,
+  boffMediaUserRoles,
+  boffMediaUsers,
+} from '@/_db/schema/BoffMedia';
 import type { AuditAction } from './types/packs.types';
 
 /**
@@ -37,6 +41,21 @@ export interface PackPrincipal {
 @Injectable()
 export class PacksRepository {
   constructor(@Inject(DRIZZLE) private readonly db: MySql2Database) {}
+
+  /** The role names an account holds.
+   *
+   *  Read here rather than trusted from the token: a desktop session is minted
+   *  once and lives for a long time, so a role embedded in it would keep working
+   *  after the role was taken away. Publishing is the one desktop capability
+   *  where that matters, which is why it is the one that pays for a join. */
+  async rolesOf(userId: number): Promise<string[]> {
+    const rows = await this.db
+      .select({ name: boffMediaRoles.name })
+      .from(boffMediaUserRoles)
+      .innerJoin(boffMediaRoles, eq(boffMediaUserRoles.roleId, boffMediaRoles.id))
+      .where(eq(boffMediaUserRoles.userId, userId));
+    return rows.map((r) => r.name);
+  }
 
   /** Current launcher revocation counter, or null if the account is gone. Single
    *  keyed lookup — the guard runs this on every launcher request. */
@@ -296,6 +315,9 @@ export class PacksRepository {
     }
     if (typeof hydrated.initialFiles === 'string') {
       hydrated.initialFiles = JSON.parse(hydrated.initialFiles) as unknown[];
+    }
+    if (typeof hydrated.optionalGroups === 'string') {
+      hydrated.optionalGroups = JSON.parse(hydrated.optionalGroups) as unknown[];
     }
     return hydrated;
   }
