@@ -79,7 +79,7 @@ export function ResetScreen() {
 
   if (!token) {
     return (
-      <AuthShell kicker={t("reset.kicker")} title={t("reset.title")}>
+      <AuthShell title={t("reset.title")}>
         <p className="font-body text-[14px]/[1.55] not-italic normal-case text-danger">
           {t("reset.missingToken")}
         </p>
@@ -88,7 +88,7 @@ export function ResetScreen() {
   }
 
   return (
-    <AuthShell kicker={t("reset.kicker")} title={t("reset.title")} subtitle={t("reset.subtitle")}>
+    <AuthShell title={t("reset.title")} subtitle={t("reset.subtitle")}>
       {done ? (
         <div className="flex flex-col gap-[15px]">
           <p className="font-body text-[14px]/[1.55] not-italic normal-case text-txt-muted">

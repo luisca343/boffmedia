@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Panel, Empty, ToolHeader } from "@boffmedia/ui"
+import { Button, Panel, Empty } from "@boffmedia/ui"
 import type { TcgCard } from "@boffmedia/shared"
 import type { TcgpData, TcgpSet } from "../_lib/useTcgpCards"
 import { typeColor } from "../_lib/tcgp-maps"
@@ -64,7 +64,10 @@ export function SobresView({ data, effective, initialSetId, onOpenCard }: Props)
 
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
-      <ToolHeader eyebrow={t("app.tabs.sobres")} title={t("app.sobres.title")} sub={t("app.sobres.lead")} />
+      {/* No header, by the same rule as CartasView. */}
+      <p className="mb-5 max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">
+        {t("app.sobres.lead")}
+      </p>
 
       {sets.map((s) => (
         <section key={s.id} className="mb-[26px]">

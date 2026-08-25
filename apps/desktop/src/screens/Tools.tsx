@@ -1,5 +1,5 @@
 import { Suspense, useMemo, type CSSProperties } from "react"
-import { Icon, isIconName, Spinner, type IconName } from "@boffmedia/ui"
+import { Icon, isIconName, Spinner, ToolHeader, type IconName } from "@boffmedia/ui"
 import { getTool, listTools, type ToolManifest } from "@boffmedia/tool-kit"
 
 import { useT } from "../i18n"
@@ -58,8 +58,8 @@ export function Tools() {
 
   return (
     <div className="mx-auto w-full max-w-3xl p-6">
-      <h1 className="text-xl font-semibold text-txt">{t("title")}</h1>
-      <p className="mt-1 text-sm text-txt-muted">{t("subtitle")}</p>
+      {/* Was `text-xl font-semibold` — not even the display face. */}
+      <ToolHeader title={t("title")} sub={t("subtitle")} />
 
       {tools.length === 0 ? (
         <p className="mt-6 text-sm text-txt-muted">{t("empty")}</p>

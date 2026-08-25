@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Icon, Panel, type IconName } from "@boffmedia/ui"
+import { Button, Icon, Panel, ToolHeader, type IconName } from "@boffmedia/ui"
 import { EventCard, eventStatus, type EventLike } from "@/components/boffmedia/ui/events"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
@@ -45,11 +45,7 @@ export function CommunityView() {
 
   return (
     <main className="wrap pb-[90px] pt-[34px]">
-      <div className="mb-6">
-        <span className="mono-label">{t("kicker")}</span>
-        <h1 className="mt-2 text-[clamp(46px,6vw,80px)]">{t("title")}</h1>
-        <p className="mt-3 max-w-[64ch] font-body text-[17px]/[1.6] text-txt-muted">{t("lead")}</p>
-      </div>
+      <ToolHeader className="mb-6" title={t("title")} sub={t("lead")} />
 
       {/* Discord CTA */}
       <div className="mb-8 flex flex-wrap items-center gap-5 border border-solid border-accent-line border-l-4 border-l-accent bg-[linear-gradient(120deg,var(--accent-soft),var(--panel)_60%)] px-7 py-6 cut-corner cut-corner-edge [--cut-line:var(--accent-line)]">

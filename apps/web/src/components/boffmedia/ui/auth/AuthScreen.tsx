@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { signIn } from "next-auth/react"
-import { AuthProviderBtn, Divider, Icon, Kicker, toast } from "@boffmedia/ui"
+import { AuthProviderBtn, Divider, Icon, toast } from "@boffmedia/ui"
 import { ASSET, staticAsset } from "@/lib/assets"
 import { CredentialsForm } from "./CredentialsForm"
 
@@ -99,7 +99,6 @@ export function AuthScreen({
         </Link>
 
         <div className="flex flex-col gap-1.5">
-          <Kicker>{isRegister ? t("register.kicker") : t("login.kicker")}</Kicker>
           <h1 className="text-[30px]/[1.02] tracking-[0.01em] max-[480px]:text-[25px]">
             {isRegister ? t("register.title") : t("login.title")}
           </h1>

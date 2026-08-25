@@ -29,6 +29,27 @@ use crate::install::InstallFailure;
 use crate::pack::{parse_manifest, ManifestError, PackManifest};
 
 const LOCAL_PREFIX: &str = "local-";
+/// The prefix `local_pack_save` mints pack IDs with. Deliberately NOT
+/// `LOCAL_PREFIX`: an id is built as `local:{slug}` and a slug already carries
+/// `local-`, so a local pack's id reads `local:local-mi-pack`.
+const LOCAL_ID_PREFIX: &str = "local:";
+
+/// True for a slug naming a pack in `local-packs/` rather than the registry.
+pub fn is_local_slug(slug: &str) -> bool {
+    slug.starts_with(LOCAL_PREFIX)
+}
+
+/// True for a pack ID belonging to a local pack.
+///
+/// Both spellings are accepted and both are load-bearing. The id minted today
+/// is `local:<slug>`, which does NOT start with `local-` — so two call sites
+/// that tested a pack ID against the SLUG prefix silently took the managed
+/// branch for every local pack, and would have fetched a local override or
+/// bundled world through the entitlement-checked API proxy. `local-` stays
+/// accepted because a pack imported with an id of its own may carry it.
+pub fn is_local_pack_id(pack_id: &str) -> bool {
+    pack_id.starts_with(LOCAL_ID_PREFIX) || pack_id.starts_with(LOCAL_PREFIX)
+}
 const MANIFEST_FILE: &str = "manifest.json";
 
 fn local_packs_dir(app: &tauri::AppHandle) -> Result<PathBuf, InstallFailure> {
@@ -1553,6 +1574,27 @@ mod tests {
         assert_eq!(slugify("Boff SMP!"), "boff-smp");
         assert_eq!(slugify("   "), "pack");
         assert!(is_kebab(&format!("{LOCAL_PREFIX}{}", slugify("My Pack"))));
+    }
+
+    #[test]
+    fn a_local_pack_id_is_recognised_despite_the_colon() {
+        // The regression this pins: an id is minted as `local:{slug}` and the
+        // slug already carries `local-`, so the id reads `local:local-mi-pack`
+        // and does NOT start with `local-`. Two call sites tested it against the
+        // slug prefix and took the MANAGED branch for every local pack, which
+        // would have sent a local override or bundled world through the
+        // entitlement-checked API proxy.
+        assert!(is_local_pack_id("local:local-mi-pack"));
+        // Still accepted: a pack imported carrying an id of its own.
+        assert!(is_local_pack_id("local-mi-pack"));
+        assert!(!is_local_pack_id("cobblemon"));
+        assert!(!is_local_pack_id("01HZY-managed-uuid"));
+
+        assert!(is_local_slug("local-mi-pack"));
+        assert!(!is_local_slug("cobblemon"));
+        // A SLUG is never spelled with the colon, so the id form must not pass
+        // for one: `safe_local_dir` joins it straight onto `local-packs/`.
+        assert!(!is_local_slug("local:local-mi-pack"));
     }
 
     #[test]

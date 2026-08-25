@@ -41,7 +41,7 @@ export function RecoverScreen() {
 
   if (sent) {
     return (
-      <AuthShell kicker={t("recover.kicker")} title={t("recover.sentTitle")}>
+      <AuthShell title={t("recover.sentTitle")}>
         <div className="flex flex-col items-center gap-3.5 text-center">
           <span aria-hidden className="grid h-14 w-14 place-items-center rounded-full bg-accent-soft text-accent">
             <Icon name="mail" size={26} />
@@ -55,7 +55,7 @@ export function RecoverScreen() {
   }
 
   return (
-    <AuthShell kicker={t("recover.kicker")} title={t("recover.title")} subtitle={t("recover.subtitle")}>
+    <AuthShell title={t("recover.title")} subtitle={t("recover.subtitle")}>
       <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[15px]" noValidate>
         <Field label={t("fields.email")} error={errors.email?.message}>
           <Input type="email" placeholder={t("fields.emailPh")} autoComplete="email" {...register("email")} />

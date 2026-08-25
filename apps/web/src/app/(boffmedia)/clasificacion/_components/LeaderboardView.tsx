@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Empty, IconButton, Pagination, SearchInput, Seg, Spinner } from "@boffmedia/ui"
+import { Button, Empty, IconButton, Pagination, SearchInput, Seg, Spinner, StatChip, ToolBar, ToolHeader } from "@boffmedia/ui"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { useFormat } from "@boffmedia/ui/useFormat"
 import { LeaderRow, type LeaderRowData, type SortKey } from "./LeaderRow"
@@ -46,13 +46,13 @@ export function LeaderboardView() {
 
   return (
     <main className="wrap pb-[90px] pt-[34px]">
-      <div className="mb-6">
-        <span className="mono-label">{t("kicker")}</span>
-        <h1 className="mt-2 text-[clamp(40px,5vw,60px)]">{t("title")}</h1>
-        <p className="mt-3 max-w-[64ch] font-body text-[15px]/[1.6] text-txt-muted">{t("lead")}</p>
-      </div>
+      <ToolHeader
+        title={t("title")}
+        sub={t("lead")}
+        meta={<StatChip icon="users" value={total} label={t("statPlayers")} />}
+      />
 
-      <div className="mb-4 flex flex-wrap items-center gap-3">
+      <ToolBar note={t("count", { count: total })}>
         <SearchInput value={q} onChange={setQ} placeholder={t("search")} className="max-w-[360px] flex-1 basis-[240px]" />
         <Seg
           options={[
@@ -69,10 +69,7 @@ export function LeaderboardView() {
           onClick={() => setDesc((d) => !d)}
           className={cn("transition-transform duration-[140ms]", !desc && "rotate-180")}
         />
-        <span className="ml-auto font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-txt-muted">
-          {t("count", { count: total })}
-        </span>
-      </div>
+      </ToolBar>
 
       {isLoading ? (
         <div className="grid min-h-[40vh] place-items-center">

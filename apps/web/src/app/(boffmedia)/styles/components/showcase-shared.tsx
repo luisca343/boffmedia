@@ -1,6 +1,5 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Kicker } from "@boffmedia/ui"
 
 // Shared class fragments + specimen wrappers for the Sistema showcase.
 
@@ -58,7 +57,7 @@ export function Sample({
 export function Section({ id, kicker, title, lead, children }: { id: string; kicker: string; title: string; lead?: React.ReactNode; children: React.ReactNode }) {
   return (
     <section id={id} className="mb-[74px] scroll-mt-[120px]">
-      <Kicker>{kicker}</Kicker>
+      <span className={MONO_LABEL}>{kicker}</span>
       <h2 className={cn(DISPLAY, "text-[clamp(30px,8vw,42px)]/[0.92] mt-[10px] mb-2")}>{title}</h2>
       {lead && <p className="text-txt-muted max-w-[66ch] mb-7 text-[15px] [&_code]:font-mono [&_code]:text-[13px] [&_code]:text-accent">{lead}</p>}
       {children}

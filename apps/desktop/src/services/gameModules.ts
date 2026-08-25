@@ -52,6 +52,10 @@ const minecraftModule: GameModule = {
   defaultArtUrl: minecraftDefaultArt,
   detailTabs: [
     { value: "content", label: "tabs.content" },
+    // Shown only when the pack actually offers choices (or is local, where the
+    // author needs the door to define them) — PackDetail filters it. A tab that
+    // is empty on most packs is worse than no tab at all.
+    { value: "optional", label: "tabs.optional" },
     { value: "files", label: "tabs.files" },
     { value: "worlds", label: "tabs.worlds" },
     { value: "screenshots", label: "tabs.screenshots" },

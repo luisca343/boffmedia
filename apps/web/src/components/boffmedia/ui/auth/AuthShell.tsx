@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { Icon, Kicker } from "@boffmedia/ui"
+import { Icon } from "@boffmedia/ui"
 import { ASSET, staticAsset } from "@/lib/assets"
 
 const GRID_BG: React.CSSProperties = {
@@ -23,12 +23,10 @@ const GRID_BG: React.CSSProperties = {
  * flows read as one surface.
  */
 export function AuthShell({
-  kicker,
   title,
   subtitle,
   children,
 }: {
-  kicker: string
   title: string
   subtitle?: string
   children: React.ReactNode
@@ -54,7 +52,6 @@ export function AuthShell({
         </Link>
 
         <div className="flex flex-col gap-1.5">
-          <Kicker>{kicker}</Kicker>
           <h1 className="text-[30px]/[1.02] tracking-[0.01em] max-[480px]:text-[25px]">{title}</h1>
           {subtitle && (
             <p className="font-body text-[14px]/[1.5] not-italic normal-case text-txt-muted">{subtitle}</p>

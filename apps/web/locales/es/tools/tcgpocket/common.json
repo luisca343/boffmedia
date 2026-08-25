@@ -16,7 +16,6 @@
       "palkia": "Palkia - Pugna Espaciotemporal",
       "arceus": "Arceus - Luz Triunfal"
     },
-
     "item": {
       "xp": "XP",
       "packhourglass": "Reloj de Arena de Sobres",
@@ -24,9 +23,7 @@
       "shopticket": "Cupón de Tienda",
       "shinedust": "Polvo Iris"
     },
-
     "mewQuest": "Mew Inmersivo",
-    
     "heroAlt": "Pokémon TCG Pocket",
     "logoAlt": "Logo de TCG Pocket",
     "heading": {
@@ -176,7 +173,6 @@
         "lead": "Base de datos completa · {cards} cartas en {sets} expansiones."
       },
       "panel": {
-        "kicker": "Pokémon · Cartas de bolsillo",
         "collection": "Colección",
         "lead": "Explora cada expansión, sigue tu colección carta a carta, calcula qué sobre te conviene abrir y consulta galerías de otros jugadores. Todo en un solo panel.",
         "exploreCards": "Explorar cartas",

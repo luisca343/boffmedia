@@ -51,6 +51,17 @@ export type OptionalChooserProps = {
   /** No switches, no radios — just what the pack offers. What a public pack
    *  page and the pre-install preview both want. */
   readOnly?: boolean
+  /** How the groups themselves are laid out.
+   *
+   *  `stack` is the default because the chooser's usual home is a column inside
+   *  something else — a pack's public page, the pre-install step in a sidebar —
+   *  where there is no width to spend.
+   *
+   *  `grid` is for a surface that owns the page. Three groups stacked is three
+   *  screens of scrolling for a decision that fits on one, and a group is a
+   *  self-contained block with a heading, so side by side reads as well as it
+   *  reads down. Single column below 720px either way. */
+  layout?: "stack" | "grid"
   t: (key: string, values?: Record<string, string | number | Date>) => string
   formatSize?: (bytes: number) => string
   className?: string
@@ -68,6 +79,7 @@ export function OptionalChooser({
   busy = [],
   deferred = [],
   readOnly = false,
+  layout = "stack",
   t,
   formatSize = defaultFormatSize,
   className,
@@ -75,7 +87,18 @@ export function OptionalChooser({
   if (groups.length === 0) return null
 
   return (
-    <div className={cn("flex flex-col gap-6", className)}>
+    <div
+      className={cn(
+        layout === "grid"
+          ? // `auto-fit` rather than a column count, and `items-start` so a
+            // two-feature group does not stretch to match a ten-feature one
+            // sitting next to it — the border would then enclose empty space
+            // and read as a missing row.
+            "grid items-start gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr))]"
+          : "flex flex-col gap-6",
+        className,
+      )}
+    >
       {groups.map((group) => (
         <GroupBlock
           key={group.id}
@@ -196,7 +219,10 @@ function FeatureRow({
   formatSize: (bytes: number) => string
 }) {
   const size = formatSize(feature.size)
-  const requiredNames = feature.requires
+  // `?? []` for the same reason as in the editor: the manifest omits `requires`
+  // when empty, and a read-only render of an AUTHORED catalogue (a pack's public
+  // page, before any instance has resolved it) hands that document straight in.
+  const requiredNames = (feature.requires ?? [])
     .map((id) => group.features.find((f) => f.id === id)?.name ?? id)
     .join(", ")
 

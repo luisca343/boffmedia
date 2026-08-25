@@ -18,7 +18,10 @@ export function PlannerBar({
         <MhSeal name="sword" />
         <div className="min-w-0 flex flex-col gap-px">
           <input
-            className="font-display text-[17px] leading-none font-bold uppercase tracking-[0.02em] text-txt bg-transparent border-0 border-b-[1.5px] border-dashed border-transparent hover:border-line-2 focus:border-[var(--mh)] outline-none py-[3px] px-0.5 min-w-[60px] max-w-[42vw]"
+            /* Typography matches `ToolTitle` exactly (17px display bold uppercase,
+               tracking .04em). It stays an <input> rather than becoming the
+               primitive because this title is the build's editable name. */
+            className="font-display text-[17px] leading-[1.05] font-bold uppercase tracking-[0.04em] text-txt bg-transparent border-0 border-b-[1.5px] border-dashed border-transparent hover:border-line-2 focus:border-[var(--mh)] outline-none py-[3px] px-0.5 min-w-[60px] max-w-[42vw]"
             value={name}
             onChange={(e) => onName(e.target.value)}
             aria-label={t("build_planner.build_name_placeholder")}

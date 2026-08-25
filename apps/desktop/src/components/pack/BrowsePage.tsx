@@ -386,11 +386,19 @@ export function BrowsePage({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-3">
+      {/* `items-start`, not `items-center`. The link shares this row with the
+          add-by-URL field, which is a label over an input over a hint — three
+          times its own height — so centring pushed the one thing that has to sit
+          at the top of the page a full 27px down it. Every other depth-one view
+          puts its back link right under the page padding (see SectionHeader),
+          and this one visibly did not. */}
+      <div className="flex flex-wrap items-start gap-3">
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1.5 text-xs uppercase tracking-[0.1em] text-txt-muted hover:text-accent-bright"
+          // `py-[3px]` so the text's cap-height lines up with the field label
+          // beside it rather than with the top of its own line box.
+          className="flex items-center gap-1.5 py-[3px] text-xs uppercase tracking-[0.1em] text-txt-muted transition-colors hover:text-accent-bright"
         >
           <Icon name="back" size={13} /> {t("backButton")}
         </button>

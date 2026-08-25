@@ -8,7 +8,7 @@
 import * as React from "react"
 import { MEW, MEW_CATS, mewValidName, type MewCat } from "./mew-util"
 import { setMewArt } from "./mew-art"
-import { BASE, emit, store, subscribe, type CatData } from "./mew-store-state"
+import { emit, mewUrl, store, subscribe, type CatData } from "./mew-store-state"
 import { compactAbility, normCharacters, normClasses, normEvents, normItems, normKeywords, normMaps, normPassives } from "./mew-normalize"
 import { buildIndex, select } from "./mew-resolvers"
 
@@ -16,13 +16,13 @@ export { select } from "./mew-resolvers"
 
 // the fetch boundary handles genuinely untyped JSON; the normalizers re-type it
 async function fetchJson(path: string): Promise<any> {
-  const r = await fetch(BASE + path)
+  const r = await fetch(mewUrl(path))
   if (!r.ok) throw new Error(path + " " + r.status)
   return r.json()
 }
 async function fetchJsonSoft(path: string): Promise<any> {
   try {
-    const r = await fetch(BASE + path)
+    const r = await fetch(mewUrl(path))
     return r.ok ? await r.json() : null
   } catch {
     return null

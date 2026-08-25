@@ -14,7 +14,7 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
   const t = useTranslations("mewgenics")
   const { ready, total, randomPick } = codex
   return (
-    <div className="relative z-[2] flex min-h-[64px] flex-none flex-wrap items-center gap-4 border-b-2 border-solid border-[color:var(--mwp-nline)] px-[clamp(16px,2.4vw,36px)] pb-2.5 pt-3">
+    <>
       <div className="flex min-w-0 items-center gap-[13px]">
         <span className="grid h-[42px] w-[42px] flex-none place-items-center border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [border-radius:55%_45%_50%_50%/50%_55%_45%_50%] [box-shadow:var(--mwp-hard)] [transform:rotate(-5deg)]">
           <Icon name="paw" size={22} />
@@ -40,7 +40,7 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
           <span className="max-[760px]:hidden">{t("chrome.random")}</span>
         </button>
       </div>
-    </div>
+    </>
   )
 }
 
@@ -48,7 +48,7 @@ export function MewCatTabs({ codex }: { codex: MewCodexModel }) {
   const t = useTranslations("mewgenics")
   const { cat, ready, abilitiesLoading, pickCat } = codex
   return (
-    <div className="relative z-[2] flex flex-none items-end gap-2 overflow-x-auto border-b-2 border-solid border-[color:var(--mwp-nline)] px-[clamp(16px,2.4vw,36px)] pb-[11px] pt-3 [scrollbar-width:thin]" role="tablist" aria-label={t("chrome.tabsAriaLabel")}>
+    <div className="-my-2 flex flex-1 items-end gap-2 overflow-x-auto py-2 [scrollbar-width:thin]" role="tablist" aria-label={t("chrome.tabsAriaLabel")}>
       {MEW_CATS.map((c, i) => {
         const on = c.key === cat
         const n = c.remote && abilitiesLoading && !(MewData.data[c.key] || []).length ? "…" : (MewData.data[c.key] || []).length

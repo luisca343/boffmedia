@@ -5,7 +5,10 @@ import { mewHuman, type MewRec } from "./mew-util"
 // separate so the normalizers (which localize) and the resolvers (which index)
 // depend only on this, not on each other or the load orchestration.
 
-export const BASE = staticAsset(ASSET.boffmedia.tools.mewgenics)
+/** Resolve a dataset file under the Mewgenics asset prefix. A joiner, not a
+ *  bare prefix: the prefix carries no trailing slash, so concatenating onto it
+ *  silently produces `/boffmedia/tools/mewgenicsitems.json`. */
+export const mewUrl = (path: string) => staticAsset(ASSET.boffmedia.tools.mewgenics, path)
 
 // raw wiki_data JSON is genuinely untyped external input the normalizers re-type
 export type Raw = Record<string, any>

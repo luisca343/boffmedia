@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useToolT } from "../i18n"
-import { Button, Chip, Empty, Icon, Select, Spinner } from "@boffmedia/ui"
+import { Button, Chip, Empty, Icon, Select, Spinner, ToolTitle } from "@boffmedia/ui"
 import { useWeaponTreeData } from "./useWeaponTreeData"
 import {
   MhApp, MhBar, MhBarSide, MhBody, MhWrap, MhSeal, MhModes, MhSrc, MhSearch,
@@ -220,14 +220,14 @@ export function WeaponTreeView() {
       <MhBar>
         <div className="flex items-center gap-[11px] min-w-0">
           <MhSeal name="tree" />
-          <div className="min-w-0 flex flex-col gap-px">
-            <div className="font-display text-[18px] leading-none font-extrabold uppercase tracking-[0.03em] not-italic">
-              {t("tree.titlePrefix")} <em className="text-[var(--mh-bright)] not-italic">{t("tree.titleAccent")}</em>
-            </div>
-            <div className="font-mono text-[11px] leading-tight text-txt-muted tracking-[0.02em] truncate">
-              {t(`weapons.${type}`)} · {t("tree.weaponsCount", { count: total })} · {t("tree.forgedCount", { count: ownedCount })}
-            </div>
-          </div>
+          <ToolTitle
+            title={
+              <>
+                {t("tree.titlePrefix")} <em className="not-italic text-[var(--mh-bright)]">{t("tree.titleAccent")}</em>
+              </>
+            }
+            sub={`${t(`weapons.${type}`)} · ${t("tree.weaponsCount", { count: total })} · ${t("tree.forgedCount", { count: ownedCount })}`}
+          />
         </div>
         <MhBarSide>
           <MhModes

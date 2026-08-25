@@ -61,7 +61,7 @@ export function MhWrap({ children, className = "" }: { children: React.ReactNode
  */
 export function MhBar({ children }: { children: React.ReactNode }) {
   return (
-    <ToolStrip className="min-h-[58px] gap-4 [--tool-pad:clamp(16px,2.4vw,36px)] py-[11px]">
+    <ToolStrip>
       {children}
     </ToolStrip>
   )

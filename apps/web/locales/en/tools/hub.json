@@ -11,7 +11,6 @@
       "minecraft": "Schematic compatibility and utilities"
     },
     "hub": {
-      "kicker": "Tools · Community",
       "title": "The <em>toolbox</em>",
       "lead": "Competitive calculators, planners and databases — built by and for the community. Pick your game and dive in.",
       "searchPlaceholder": "Search tools, games…",
@@ -30,7 +29,7 @@
     },
     "category": {
       "metaTitle": "{game} tools",
-      "bannerPrefix": "Tools",
+      "bannerPrefix": "Tools for",
       "featured": "Featured",
       "featuredNew": "Featured · New",
       "openTool": "Open tool",
@@ -48,7 +47,8 @@
       "collapse": "Collapse",
       "collapseTitle": "Collapse sidebar",
       "pin": "Pin sidebar",
-      "openToolsMenu": "Open tools menu"
+      "openToolsMenu": "Open tools menu",
+      "breadcrumb": "Breadcrumb"
     },
     "card": {
       "new": "New",

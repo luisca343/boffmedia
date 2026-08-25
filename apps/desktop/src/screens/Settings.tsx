@@ -1,4 +1,4 @@
-import { Badge, Button, DataList, Divider, Field, IconButton, Input, Kicker, Panel, Seg, Slider, Toggle, toast } from "@boffmedia/ui"
+import { Badge, Button, DataList, Divider, Field, IconButton, Input, Panel, Seg, Slider, Toggle, toast, ToolHeader } from "@boffmedia/ui"
 import { useEffect, useState } from "react"
 
 import { useT } from "../i18n"
@@ -152,12 +152,7 @@ export function Settings() {
 
   return (
     <div className="px-8 py-7">
-      <header className="mb-6">
-        <Kicker>{t("kicker")}</Kicker>
-        <h1 className="font-display text-[30px]/none font-bold uppercase tracking-[0.06em] text-txt">
-          {t("title")}
-        </h1>
-      </header>
+      <ToolHeader className="mb-6" title={t("title")} />
 
       <div className="grid max-w-[1600px] gap-4 [grid-template-columns:repeat(auto-fit,minmax(340px,1fr))]">
         <Panel

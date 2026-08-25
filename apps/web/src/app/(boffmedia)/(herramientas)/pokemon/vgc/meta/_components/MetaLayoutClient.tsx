@@ -235,7 +235,7 @@ export function MetaLayoutClient() {
       // rides the page scroll — DkApp does not bound their height.
       <div className="grid min-h-0 flex-1 items-start grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
         <MvList
-          className="sticky top-[calc(var(--nav-h)_+_var(--dk-bar-h,45px))] h-[calc(100dvh_-_var(--nav-h)_-_var(--dk-bar-h,45px))] border-r border-solid border-line"
+          className="sticky top-[calc(var(--tool-sticky-top,0px)_+_var(--tool-bar-h,58px))] h-[calc(100dvh_-_var(--tool-sticky-top,0px)_-_var(--tool-bar-h,58px))] border-r border-solid border-line"
           entries={usageEntries}
           pokeMap={pokeMap}
           selectedId={selectedEntry?.id ?? null}

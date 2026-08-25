@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Spinner } from "@boffmedia/ui"
+import { Spinner, ToolBar, ToolHeader } from "@boffmedia/ui"
 import { DkSeg } from "@/components/boffmedia/ui/tools/datakit"
 import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
 import { useTournaments } from "@/hooks/tournaments/useTournaments"
@@ -41,17 +41,9 @@ export function TorneosView() {
 
   return (
     <main className="wrap py-10">
-      <header className="mb-6 grid gap-3">
-        <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-txt-dim">
-          {t("listing.section")}
-        </span>
-        <h1 className="text-[clamp(34px,5vw,56px)]">{t("listing.title")}</h1>
-        <p className="max-w-xl font-body text-[14px] leading-[1.55] text-txt-muted">
-          {t("listing.subtitle")}
-        </p>
-      </header>
+      <ToolHeader title={t("listing.title")} sub={t("listing.subtitle")} />
 
-      <div className="mb-5 flex flex-wrap items-center gap-3">
+      <ToolBar>
         <DkSeg
           size="sm"
           value={filter}
@@ -71,7 +63,7 @@ export function TorneosView() {
           aria-label={t("listing.searchAriaLabel")}
           className="min-w-[180px] flex-1 border border-solid border-line bg-panel px-3 py-1.5 font-body text-[13px] placeholder:text-txt-dim sm:max-w-xs"
         />
-      </div>
+      </ToolBar>
 
       {isLoading ? (
         <div className="grid place-items-center py-24">

@@ -205,3 +205,176 @@ export async function addFiles(
   fetchInBackground(slug, manifest, added, previousVersionId)
   return manifest
 }
+
+// ── Optional content ───────────────────────────────────────────────────────
+//
+// Authoring the optional-content catalogue, which is a different kind of edit
+// from the ones above: it writes `version.optionalGroups` AND rewrites
+// `files[].env` in the SAME save, because rule 2 of the manifest refinements
+// requires every path a feature claims to be `env.client: "optional"`. Writing
+// one without the other produces a manifest `local_pack_save` refuses, so they
+// cannot be two calls.
+//
+// This is also why `mutate` above could not be reused: it is `files[]`-only by
+// construction, and there is nowhere in it to put the groups.
+
+/** The manifest's group shape — which is NOT the shape the editor hands back.
+ *
+ *  `@boffmedia/ui`'s `OptionalFeature` is the RESOLVED view: it carries
+ *  `enabled`, `explicit`, `size` and `installed`, which describe an instance on
+ *  disk and have no place in a document. The editor fills them with placeholders
+ *  so its own type-checks pass, and they must be stripped here — the manifest is
+ *  validated with `additionalProperties: false`, so `local_pack_save` rejects
+ *  the whole save with `unknown field \`enabled\``, exactly the way it rejects
+ *  BrowsePage's `projectId` in `toManifestFile`. Same trap, same fix. */
+type ManifestFeature = {
+  id: string
+  name: string
+  description?: string
+  iconUrl?: string
+  paths: string[]
+  default: boolean
+  requires?: string[]
+  activate?: unknown
+}
+
+type ManifestGroup = {
+  id: string
+  name: string
+  description?: string
+  select?: string
+  features: ManifestFeature[]
+}
+
+/** The subset of a group the editor is allowed to have an opinion about. */
+type EditedFeature = {
+  id: string
+  name: string
+  description?: string | null
+  iconUrl?: string | null
+  paths: string[]
+  default: boolean
+  requires?: string[]
+  activate?: unknown
+}
+
+type EditedGroup = {
+  id: string
+  name: string
+  description?: string | null
+  select?: string
+  features: EditedFeature[]
+}
+
+/** Omitted, never written as null. `description` and `iconUrl` are `type:
+ *  "string"` in the schema with no null branch, so an explicit null fails
+ *  validation just as loudly as an unknown key would — and the editor's own
+ *  state type allows null for "the author cleared the box". */
+function toManifestGroup(group: EditedGroup): ManifestGroup {
+  const clean: ManifestGroup = {
+    id: group.id,
+    name: group.name.trim(),
+    features: group.features.map(toManifestFeature),
+  }
+  const description = group.description?.trim()
+  if (description) clean.description = description
+  if (group.select) clean.select = group.select
+  return clean
+}
+
+function toManifestFeature(feature: EditedFeature): ManifestFeature {
+  const clean: ManifestFeature = {
+    id: feature.id,
+    name: feature.name.trim(),
+    paths: feature.paths,
+    default: feature.default,
+  }
+  const description = feature.description?.trim()
+  if (description) clean.description = description
+  if (feature.iconUrl) clean.iconUrl = feature.iconUrl
+  if (feature.requires && feature.requires.length > 0) clean.requires = feature.requires
+  if (feature.activate) clean.activate = feature.activate
+  return clean
+}
+
+/** What the schema will refuse, phrased for the author instead of for a parser.
+ *
+ *  Checked HERE rather than left to `local_pack_save` because the Rust side can
+ *  only answer with the validator's own words — `name: minLength 1` on a group
+ *  the author simply has not named yet — and a half-authored group is the normal
+ *  state of the form, not an exceptional one. The nine `validate_optional` rules
+ *  are still the authority and still run on save; these are the three failures
+ *  the editor produces on its way to a valid model. */
+export function optionalGroupProblems(
+  groups: EditedGroup[],
+  t: (key: string, values?: Record<string, string | number>) => string,
+): string[] {
+  const problems: string[] = []
+  for (const group of groups) {
+    const label = group.name.trim() || group.id
+    if (!group.name.trim()) problems.push(t("optionalEditor.errorGroupName", { id: group.id }))
+    if (group.features.length === 0) {
+      problems.push(t("optionalEditor.errorGroupEmpty", { name: label }))
+    }
+    for (const feature of group.features) {
+      if (!feature.name.trim()) {
+        problems.push(t("optionalEditor.errorFeatureName", { group: label }))
+      }
+      if (feature.paths.length === 0) {
+        problems.push(
+          t("optionalEditor.errorFeatureEmpty", { name: feature.name.trim() || feature.id }),
+        )
+      }
+    }
+  }
+  return problems
+}
+
+/** Write the catalogue and the `env` it implies, in one save.
+ *
+ *  `files` is what the editor handed back through `onFilesChange` — the desktop
+ *  form passes that callback where apps/web deliberately does not, and the
+ *  difference is structural rather than stylistic: the admin wizard assembles
+ *  its `files[]` at submit and derives `env` there, and there is no submit here.
+ *  A local pack's manifest IS the live document, so both halves have to be
+ *  carried by the one call that writes it.
+ *
+ *  Only `env` is taken from `files`; every other field comes from the manifest
+ *  on disk. The editor never sees hashes or sources and must not be able to
+ *  clear one by round-tripping a file it only knows the path of. */
+export async function saveOptionalGroups(
+  slug: string,
+  groups: EditedGroup[],
+  files: Array<{ path: string; env?: { client?: string; server?: string } | null }>,
+): Promise<PackManifest> {
+  const current = await localPackGet(slug)
+  if (!current) throw new Error("No se encontró el pack.")
+
+  const edited = new Map(files.map((f) => [normalise(f.path), f.env]))
+  const nextFiles = ((current.version?.files ?? []) as ManifestFile[])
+    .map((file) => {
+      const env = edited.get(normalise(file.path))
+      if (!env?.client) return { ...file, env: file.env ?? DEFAULT_ENV }
+      return {
+        ...file,
+        env: { client: env.client, server: env.server ?? file.env?.server ?? "required" },
+      }
+    })
+    .map(toManifestFile)
+
+  const nextGroups = groups.map(toManifestGroup)
+
+  // Built as a mutable object so the empty case can DELETE the key rather than
+  // write `[]`. The schema has `optionalGroups` optional, and spreading
+  // `...current.version` would otherwise carry the old catalogue straight
+  // through the save that was meant to remove it.
+  const version: Record<string, unknown> = {
+    ...current.version,
+    id: nextVersionId(slug),
+    files: nextFiles,
+  }
+  if (nextGroups.length > 0) version.optionalGroups = nextGroups
+  else delete version.optionalGroups
+
+  return await localPackSave({ ...current, version })
+}

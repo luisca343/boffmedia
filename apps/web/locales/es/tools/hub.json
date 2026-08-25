@@ -11,7 +11,6 @@
       "minecraft": "Compatibilidad de esquemas y utilidades"
     },
     "hub": {
-      "kicker": "Herramientas · Comunidad",
       "title": "Caja de <em>herramientas</em>",
       "lead": "Calculadoras, planificadores y bases de datos competitivas — creadas por y para la comunidad. Elige tu juego y entra.",
       "searchPlaceholder": "Buscar herramienta, juego…",
@@ -30,7 +29,7 @@
     },
     "category": {
       "metaTitle": "Herramientas de {game}",
-      "bannerPrefix": "Herramientas",
+      "bannerPrefix": "Herramientas de",
       "featured": "Destacada",
       "featuredNew": "Destacada · Nueva",
       "openTool": "Abrir herramienta",
@@ -48,7 +47,8 @@
       "collapse": "Contraer",
       "collapseTitle": "Contraer barra",
       "pin": "Fijar barra",
-      "openToolsMenu": "Abrir menú de herramientas"
+      "openToolsMenu": "Abrir menú de herramientas",
+      "breadcrumb": "Ruta de navegación"
     },
     "card": {
       "new": "Nuevo",

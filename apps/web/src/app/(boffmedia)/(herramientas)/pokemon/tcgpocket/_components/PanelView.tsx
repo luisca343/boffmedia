@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { Button, Panel, Kicker, Icon, SearchInput, DISPLAY_VOICE } from "@boffmedia/ui"
+import { Button, Panel, Icon, SearchInput, DISPLAY_VOICE } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import type { TcgpData } from "../_lib/useTcgpCards"
 import type { RecentUpdate } from "../_lib/useCollection"
@@ -50,8 +50,8 @@ export function PanelView({ data, owned, effective, recent, loggedIn, go, onGall
           </TcgRing>
         </div>
         <div className="relative">
-          <Kicker>{t("app.panel.kicker")}</Kicker>
-          <h1 className={cn(DISPLAY_VOICE, "mt-2 text-[clamp(38px,5vw,66px)] text-txt")}>
+          {/* Hero rung — this is the section's Landing, not an Index page. */}
+          <h1 className={cn(DISPLAY_VOICE, "text-[clamp(46px,6.5vw,96px)] text-txt")}>
             TCG <em>Pocket</em>
           </h1>
           <p className="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-txt-muted">{t("app.panel.lead")}</p>

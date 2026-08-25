@@ -40,12 +40,11 @@ export function PatronesChapter() {
             >
               <Sample
                 title="Cabecera de página"
-                code={'<ToolHeader eyebrow title sub meta>'}
+                code={'<ToolHeader title sub meta>'}
                 col
                 note={<>La regla de densidad: <code>bar</code> si la herramienta tiene controles permanentes, ocupa el viewport o alberga rutas hijas; <code>page</code> en cualquier otro caso — y <code>page</code> desempata, porque una cabecera de página puede colgar un <code>ToolBar</code> fijo debajo mientras que una franja nunca puede hacerle sitio a un titular.</>}
               >
                 <ToolHeader
-                  eyebrow="Otros · Biblioteca"
                   title={<>Claves de <em>Steam</em></>}
                   sub="Catálogo de juegos que repartimos en la comunidad."
                   meta={

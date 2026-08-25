@@ -56,6 +56,18 @@ const ACTIVATION_KINDS = ["none", "resourcepack", "shaderpack", "datapack"] as c
  *  cheaper as a hint next to the file. */
 const DATAPACK_DIRS = ["config/openloader/datapacks/", "config/paxi/datapacks/"]
 
+/** Where a file of each activation kind has to live for the game to read it.
+ *
+ *  Used to pick a sensible default file rather than to forbid one: rule 7 only
+ *  requires `activate.file` to be one of the feature's own paths, so a jar
+ *  declared as a resourcepack validates and then silently does nothing — the
+ *  worst kind of wrong, because every check passes. */
+const ACTIVATION_DIRS: Record<Exclude<(typeof ACTIVATION_KINDS)[number], "none">, string[]> = {
+  resourcepack: ["resourcepacks/"],
+  shaderpack: ["shaderpacks/"],
+  datapack: DATAPACK_DIRS,
+}
+
 /** Ids are positional placeholders (`opcion-3`), never derived from the name,
  *  and never rewritten once assigned.
  *
@@ -329,6 +341,38 @@ function FeatureEditor({
 }) {
   const owned = new Set(feature.paths.map(norm))
 
+  // Per FeatureEditor rather than per group: two features are picked from the
+  // same file list but almost never with the same query, and the list is keyed
+  // on `feature.id`, so this state follows the feature it belongs to rather
+  // than the position it happens to sit at.
+  const [filter, setFilter] = React.useState("")
+  const query = norm(filter.trim())
+  const visible = React.useMemo(
+    () => (query ? files.filter((f) => norm(f.path).includes(query)) : files),
+    [files, query],
+  )
+  // Matched against the FULL path, so "shaderpacks/" narrows by folder and
+  // "sodium" by name — one box does both, and a jar is as often found by where
+  // it lives as by what it is called.
+
+  /** Files this feature owns that the filter is hiding.
+   *
+   *  Surfaced rather than left implicit because this list is the ONLY view of
+   *  the selection — nothing else on the form enumerates `feature.paths` — so a
+   *  filter that quietly hides three ticked rows reads as having lost them. */
+  const hiddenSelected = React.useMemo(
+    () =>
+      // Only while filtering. With no query the misses are paths the pack no
+      // longer has — a jar deleted after the feature claimed it — and calling
+      // those "hidden by the filter" would be a wrong answer to a question
+      // nobody asked. They are still visible where they belong: the save
+      // carries them, and rule 1 rejects a path that is not in files[].
+      query
+        ? feature.paths.filter((path) => !visible.some((f) => norm(f.path) === norm(path))).length
+        : 0,
+    [feature.paths, visible, query],
+  )
+
   const togglePath = (path: string, on: boolean) => {
     const next = on
       ? [...feature.paths, path]
@@ -345,7 +389,17 @@ function FeatureEditor({
 
   const setActivation = (kind: (typeof ACTIVATION_KINDS)[number]) => {
     if (kind === "none") return onPatch({ activate: null })
-    const file = feature.activate?.file ?? feature.paths[0]
+    // Prefer a path that belongs where this kind has to live. `paths[0]` is a
+    // coin toss on the feature this is FOR — a resourcepack and the mod that
+    // reads it, where the jar is very often first — and a jar declared as a
+    // resourcepack passes rule 7, writes itself into options.txt and does
+    // nothing. Falls back to the old behaviour when nothing matches, so a pack
+    // laid out unusually is still authorable.
+    const dirs = ACTIVATION_DIRS[kind]
+    const file =
+      feature.activate?.file ??
+      feature.paths.find((p) => dirs.some((dir) => norm(p).startsWith(dir))) ??
+      feature.paths[0]
     if (!file) return
     const next: Activation =
       kind === "resourcepack"
@@ -410,7 +464,18 @@ function FeatureEditor({
         <Field label={t("optionalEditor.activationFile")}>
           <Select
             value={feature.activate.file}
-            options={feature.paths.map((p) => ({ value: p, label: p }))}
+            // Every path stays selectable — rule 7 allows any of them and an
+            // unusual layout is not an error — but one that does not sit where
+            // its kind is read from is marked, so a wrong pick is visible at the
+            // moment it is made rather than as a feature that does nothing.
+            options={feature.paths.map((p) => ({
+              value: p,
+              label: ACTIVATION_DIRS[feature.activate!.kind].some((dir) =>
+                norm(p).startsWith(dir),
+              )
+                ? p
+                : `${p}  ⚠`,
+            }))}
             onChange={(file) =>
               onPatch({ activate: { ...feature.activate!, file } as Activation })
             }
@@ -434,36 +499,65 @@ function FeatureEditor({
         hint={t("optionalEditor.pathsHint")}
         error={feature.paths.length === 0 ? t("optionalEditor.errorNoPaths") : undefined}
       >
-        <ul className="bm-scroll flex max-h-[190px] flex-col overflow-auto border border-solid border-line">
-          {files.map((file) => {
-            const owner = claimedBy.get(norm(file.path))
-            // Rule 4: one owner per path. Shown as a disabled row with the
-            // owner's name rather than hidden, so an author who cannot find a
-            // file learns where it went instead of thinking it vanished.
-            const takenByOther = owner !== undefined && owner !== feature.id
-            return (
-              <li
-                key={file.path}
-                className={cn(
-                  "flex items-center gap-2 px-2 py-1",
-                  takenByOther && "opacity-50",
-                )}
-              >
-                <Checkbox
-                  checked={owned.has(norm(file.path))}
-                  disabled={takenByOther}
-                  onChange={(on) => togglePath(file.path, on)}
-                  label={file.path}
-                />
-                {takenByOther && (
-                  <Badge tone="warn" className="ml-auto shrink-0">
-                    {owner}
-                  </Badge>
-                )}
+        {/* ONE child, or Field clones nothing and its <label> ends up naming
+            nothing at all — the exact defect that component exists to prevent.
+            `role="group"` is what makes the cloned `aria-label` carry: on a bare
+            <div> it is ignored, and the visible label would have been hidden
+            from AT while naming no control. */}
+        <div role="group" className="flex flex-col gap-2">
+          <Input
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            // Explicit, so Field leaves it alone: its label belongs to the
+            // group, and naming the search box "Archivos de esta opción" would
+            // announce the wrong control.
+            aria-label={t("optionalEditor.pathsFilterLabel")}
+            placeholder={t("optionalEditor.pathsFilter", { count: files.length })}
+            className="py-[7px] text-[13px]"
+          />
+
+          {hiddenSelected > 0 && (
+            <p role="status" className="font-body text-[12px] leading-[1.4] text-warn">
+              {t("optionalEditor.pathsHiddenSelected", { count: hiddenSelected })}
+            </p>
+          )}
+
+          <ul className="bm-scroll flex max-h-[190px] flex-col overflow-auto border border-solid border-line">
+            {visible.length === 0 && (
+              <li className="px-2 py-3 text-center font-body text-[12px] text-txt-dim">
+                {t("optionalEditor.pathsNoMatch", { query: filter.trim() })}
               </li>
-            )
-          })}
-        </ul>
+            )}
+            {visible.map((file) => {
+              const owner = claimedBy.get(norm(file.path))
+              // Rule 4: one owner per path. Shown as a disabled row with the
+              // owner's name rather than hidden, so an author who cannot find a
+              // file learns where it went instead of thinking it vanished.
+              const takenByOther = owner !== undefined && owner !== feature.id
+              return (
+                <li
+                  key={file.path}
+                  className={cn(
+                    "flex items-center gap-2 px-2 py-1",
+                    takenByOther && "opacity-50",
+                  )}
+                >
+                  <Checkbox
+                    checked={owned.has(norm(file.path))}
+                    disabled={takenByOther}
+                    onChange={(on) => togglePath(file.path, on)}
+                    label={file.path}
+                  />
+                  {takenByOther && (
+                    <Badge tone="warn" className="ml-auto shrink-0">
+                      {owner}
+                    </Badge>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        </div>
       </Field>
     </li>
   )
@@ -488,9 +582,24 @@ function RequiresPicker({
     group.select === "any" ? group.features.filter((f) => f.id !== feature.id) : []
   if (candidates.length === 0) return null
 
+  /** `requires` arrives UNDEFINED off a saved document, and the type says it
+   *  cannot.
+   *
+   *  The schema has it optional and the sanitisers omit it when empty rather
+   *  than writing `[]`, so a group round-tripped through a manifest comes back
+   *  without the key. Every load site casts the stored document into
+   *  `OptionalFeature` — the RESOLVED view, where the array is always present —
+   *  which is exactly what lets the gap through the type system: desktop's
+   *  `startEditing`, web's version-editor at `setOptionalGroups`. Reading
+   *  `.includes` off it threw, and a throw in render blanks the whole window.
+   *
+   *  Tolerated at the read rather than normalised at each cast, because there is
+   *  no submit between them: this is the only place that has to care. */
+  const requires = feature.requires ?? []
+
   const toggle = (id: string, on: boolean) => {
     onPatch({
-      requires: on ? [...feature.requires, id] : feature.requires.filter((r) => r !== id),
+      requires: on ? [...requires, id] : requires.filter((r) => r !== id),
     })
   }
 
@@ -500,7 +609,7 @@ function RequiresPicker({
         {candidates.map((candidate) => (
           <Checkbox
             key={candidate.id}
-            checked={feature.requires.includes(candidate.id)}
+            checked={requires.includes(candidate.id)}
             onChange={(on) => toggle(candidate.id, on)}
             label={candidate.name || candidate.id}
           />

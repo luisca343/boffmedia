@@ -141,6 +141,11 @@ function SideRail({
                     href={it.href}
                     onClick={onNavigate}
                     title={it.label}
+                    // The rail is the ONLY thing naming an App surface, now that
+                    // those views carry no title of their own. Colour and the 3px
+                    // bar say "you are here" to sighted users; without this the
+                    // rail is N identical links to a screen reader.
+                    aria-current={on ? "page" : undefined}
                     className={cn(
                       "group/link relative flex h-11 w-full items-center gap-3 overflow-hidden whitespace-nowrap pl-6 pr-3 no-underline transition-[color,background] duration-[140ms]",
                       "before:absolute before:left-0 before:top-1/2 before:w-[3px] before:-translate-y-1/2 before:bg-[var(--ghue)] before:transition-[height] before:duration-[260ms] before:content-['']",
@@ -276,6 +281,16 @@ export function ToolShell({ slug, children }: ToolShellProps) {
 
   const bleed = React.useMemo(() => isBleedRoute(game, pathname), [game, pathname])
 
+  /** Group + tool for the current route, for the mobile breadcrumb. Derived from
+   *  the same `groups` the rail renders, so the two can never disagree. */
+  const activeCrumb = React.useMemo(() => {
+    for (const g of groups) {
+      const item = g.items.find((i) => i.href === pathname)
+      if (item) return { group: g.name, label: item.label }
+    }
+    return null
+  }, [groups, pathname])
+
   if (!game || !hub) return <>{children}</>
 
   return (
@@ -312,6 +327,21 @@ export function ToolShell({ slug, children }: ToolShellProps) {
             <span className="font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
             <Icon name="list" size={18} className="text-txt-muted" />
           </button>
+
+          {/* On a phone the rail collapses to the button above, which says only
+              the game. That left nothing naming the tool — fine while every view
+              carried its own title, wrong now that App surfaces do not. */}
+          {activeCrumb && (
+            <nav aria-label={tShell("breadcrumb")} className="flex min-w-0 items-center gap-2">
+              <span className="flex-none font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim">
+                {activeCrumb.group}
+              </span>
+              <span aria-hidden="true" className="flex-none text-[11px] leading-none text-line-2">/</span>
+              <span className="truncate font-display text-[14px] font-bold uppercase leading-none tracking-[0.04em] text-accent">
+                {activeCrumb.label}
+              </span>
+            </nav>
+          )}
         </div>
         <div className={cn("min-w-0", !bleed && "[--pad-x:clamp(22px,3.2vw,60px)] [--pad-y:30px] px-[var(--pad-x)] pb-[90px] pt-[var(--pad-y)]")}>
           {children}

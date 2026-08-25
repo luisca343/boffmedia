@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { DISPLAY, DISPLAY_EM, HEAD4, MONO_LABEL, Sample, Section } from "../showcase-shared"
-import { Chip, Kicker, Panel } from "@boffmedia/ui"
+import { Chip, Panel } from "@boffmedia/ui"
 
 export function BasesChapter() {
 
@@ -59,10 +59,6 @@ export function BasesChapter() {
                     </div>
                   ))}
                 </div>
-              </Sample>
-              <Sample title="Kicker" code="<Kicker>">
-                <Kicker>Comunidad en acción</Kicker>
-                <Kicker>Producto destacado · Próximamente</Kicker>
               </Sample>
             </Section>
 

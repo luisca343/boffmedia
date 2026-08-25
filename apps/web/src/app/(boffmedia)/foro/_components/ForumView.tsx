@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Empty, Spinner } from "@boffmedia/ui"
+import { Empty, Spinner, ToolHeader } from "@boffmedia/ui"
 import { CategoryTile, ForumStats, OnlineList } from "@/components/boffmedia/ui/community"
 import { useForumCategories } from "@/hooks/forum/useForumCategories"
 import { useForumOnline } from "@/hooks/forum/useForumOnline"
@@ -22,13 +22,7 @@ export function ForumView() {
 
   return (
     <main data-ds="boffmedia" className="wrap pb-[90px] pt-[34px]">
-      <div className="mb-6">
-        <span className="mono-label">{t("view.kicker")}</span>
-        <h1 className="mt-2 text-[clamp(46px,6vw,80px)]">{t("view.title")}</h1>
-        <p className="mt-3 max-w-[64ch] font-body text-[17px]/[1.6] text-txt-muted">
-          {t("view.lead")}
-        </p>
-      </div>
+      <ToolHeader className="mb-6" title={t("view.title")} sub={t("view.lead")} />
 
       <div className="grid items-start gap-5 [grid-template-columns:1fr_320px] max-[900px]:grid-cols-1">
         <div className="min-w-0">

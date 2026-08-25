@@ -16,12 +16,15 @@ import { cssVars } from "./utils"
 export function DkApp({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div
-      // `--dk-bar-h` is the nominal DkBar height. Split views inside a DkApp use
-      // it to sticky-offset their own column below the bar; override per tool if
-      // a bar wraps to two rows.
-      // `--tool-pad` is the gutter token the shared `ToolStrip` reads; `--dk-pad`
-      // stays as the name the datakit's own bodies and split views use.
-      style={cssVars({ "--dk-pad": "clamp(14px,2vw,32px)", "--tool-pad": "clamp(14px,2vw,32px)", "--dk-bar-h": "45px" })}
+      // `--dk-bar-h` is GONE: it was a second name for the bar height, pinned at
+      // 45px, and split views offset against it. When the bar became 58 it was
+      // silently wrong — which is the whole reason the height is a token now.
+      // Anything offsetting below a bar reads `--tool-bar-h`, the one definition.
+      //
+      // `--dk-pad` stays as the name the datakit's own bodies and split views use
+      // for the gutter; the bar's gutter (`--tool-pad`) is the host shell's to
+      // set, and a tool must never set it — see `ToolStrip`.
+      style={cssVars({ "--dk-pad": "clamp(14px,2vw,32px)" })}
       className={cn(
         "flex min-w-0 flex-col min-h-[calc(100dvh_-_var(--nav-h))]",
         className,

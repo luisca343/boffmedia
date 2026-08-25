@@ -42,7 +42,6 @@ const es = {
   },
 
   settings: {
-    kicker: "Preferencias",
     title: "Ajustes",
     performance: {
       title: "Rendimiento",
@@ -164,7 +163,6 @@ const es = {
   },
 
   boffSignin: {
-    kicker: "Boffmedia App",
     title: "Autoriza la app",
     subtitle: "Con tu cuenta de Boffmedia. No hace falta Minecraft: solo se te pedirá cuando instales o juegues un pack de Minecraft.",
     failedTitle: "No se pudo autorizar",
@@ -384,7 +382,6 @@ const es = {
   },
 
   packs: {
-    librarySectionTitle: "Tu biblioteca",
     systemFilterLabel: "Filtrar por sistema",
     allSystems: "Todos",
     title: "Packs",
@@ -507,6 +504,7 @@ const es = {
     appClosable: "La app puede cerrarse sin afectar a la partida.",
     tabs: {
       content: "Contenido",
+      optional: "Opciones",
       files: "Archivos",
       worlds: "Mundos",
       screenshots: "Capturas",
@@ -605,7 +603,6 @@ const es = {
   },
 
   logs: {
-    sectionTitle: "Diagnóstico",
     title: "Registro",
     copied: "Copiado",
     copyReportButton: "Copiar informe",
@@ -855,6 +852,85 @@ const es = {
     optionalPickAtMostOne: "Elige uno o ninguno",
     optionalDeferredToast: "Guardado. Se aplicará la próxima vez que inicies el pack.",
     optionalDownloading: "Descargando {count} archivo(s)…",
+    // ── Optional content: authoring (local packs only) ───────────────────
+    //
+    // Lifted from the admin catalogue in apps/web rather than re-translated: the
+    // same OptionalGroupsEditor renders both surfaces, so a second wording would
+    // make the dashboard and the launcher describe one feature two ways.
+    optionalEditor: {
+      lead: "Agrupa lo que el jugador puede activar o desactivar. La unidad es una OPCIÓN, no un archivo: «Shaders» son Iris, Sodium, su config y el .zip, y quien pueda activar tres de esos cuatro tiene un crash, no una elección.",
+      define: "Definir opciones",
+      edit: "Editar opciones",
+      // The authoring form is a page of its own, so it needs its own title and
+      // its own way back — `pack.libraryBack` says "Biblioteca", which is one
+      // level too far up from here.
+      pageTitle: "Contenido opcional",
+      backToPack: "Volver al pack",
+      applyHint:
+        "Los cambios se guardan en el pack al pulsar Guardar, pero no llegan a los archivos instalados hasta que pulses Jugar o Instalar.",
+      save: "Guardar",
+      saving: "Guardando…",
+      cancel: "Cancelar",
+      saved: "Contenido opcional guardado.",
+      saveError: "No se pudo guardar el contenido opcional.",
+      loadError: "No se pudo leer el pack.",
+      pending: "Hay cambios sin instalar. Esta lista es la de los archivos que hay ahora en disco; pulsa Jugar o Instalar para aplicar lo último.",
+      // The local-pack counterpart, and it says the OPPOSITE of `pending`: this
+      // list is the manifest, not the disk. Two messages rather than one vague
+      // both-ways wording, because the author's next question is precisely
+      // "is what I'm looking at what I saved, or what is installed?".
+      pendingAuthored:
+        "Estas son las opciones tal y como las has guardado. Todavía no están en los archivos instalados: pulsa Jugar o Instalar para aplicarlas, y entonces podrás activarlas y desactivarlas.",
+      emptyTitle: "Sin contenido opcional",
+      emptyDesc: "Este pack instala todos sus archivos siempre. Crea un grupo para poder elegir.",
+      addGroup: "Añadir grupo",
+      removeGroup: "Eliminar grupo",
+      addFeature: "Añadir opción",
+      removeFeature: "Eliminar opción",
+      groupName: "Nombre del grupo",
+      groupNamePlaceholder: "Rendimiento, Shaders, Extras…",
+      groupDescription: "Descripción del grupo",
+      selectMode: "Cuántas se pueden activar",
+      mode: {
+        any: "Las que quiera",
+        one: "Exactamente una",
+        atMostOne: "Una o ninguna",
+      },
+      featureName: "Nombre de la opción",
+      featureDescription: "Descripción",
+      defaultState: "Por defecto",
+      defaultOn: "Activada",
+      defaultOff: "Desactivada",
+      activation: "Activación",
+      activationFile: "Archivo que se activa",
+      activationKind: {
+        none: "Ninguna (solo instalar)",
+        resourcepack: "Paquete de recursos",
+        shaderpack: "Shader",
+        datapack: "Datapack",
+      },
+      requires: "Necesita",
+      requiresHint: "Activar esta opción activará también las marcadas aquí, y desactivar una de ellas desactivará esta.",
+      paths: "Archivos de esta opción",
+      pathsHint: "Se marcarán como env.client «optional» al guardar. Un archivo solo puede pertenecer a una opción.",
+      pathsFilter: "Filtrar {count} archivo(s) por nombre…",
+      pathsFilterLabel: "Filtrar archivos por nombre",
+      pathsNoMatch: "Ningún archivo coincide con «{query}».",
+      pathsHiddenSelected: "{count} archivo(s) de esta opción no coinciden con el filtro y no se ven aquí.",
+      errorNoPaths: "Una opción necesita al menos un archivo.",
+      errorOneDefault: "Un grupo «Exactamente una» necesita justo una opción activada por defecto (hay {count}).",
+      errorAtMostOneDefault: "Un grupo «Una o ninguna» admite como mucho una activada por defecto (hay {count}).",
+      errorShaderpackGroup: "Un shader necesita un grupo «Exactamente una» o «Una o ninguna»: solo puede haber un shader activo.",
+      errorDatapackDir: "Un datapack debe estar dentro de {dirs} para que un cargador global lo lea.",
+      // Refused by the schema too (group name minLength 1, features minItems 1,
+      // paths minItems 1), but phrased for the author: a half-authored group is
+      // the normal state of this form rather than an exceptional one, and the
+      // validator can only answer in its own words.
+      errorGroupName: "El grupo «{id}» necesita un nombre.",
+      errorGroupEmpty: "El grupo «{name}» necesita al menos una opción.",
+      errorFeatureName: "Una opción del grupo «{group}» necesita un nombre.",
+      errorFeatureEmpty: "La opción «{name}» necesita al menos un archivo.",
+    },
     kindResourcepack: "Recursos",
     kindShaderpack: "Shader",
     kindDatapack: "Datapack",
@@ -1119,7 +1195,6 @@ const en = {
   },
 
   settings: {
-    kicker: "Preferences",
     title: "Settings",
     performance: {
       title: "Performance",
@@ -1237,7 +1312,6 @@ const en = {
   },
 
   boffSignin: {
-    kicker: "Boffmedia App",
     title: "Authorize the app",
     subtitle: "With your Boffmedia account. Minecraft is not required — you will only be asked for it when you install or play a Minecraft pack.",
     failedTitle: "Could not authorize",
@@ -1457,7 +1531,6 @@ const en = {
   },
 
   packs: {
-    librarySectionTitle: "Your library",
     systemFilterLabel: "Filter by system",
     allSystems: "All",
     title: "Packs",
@@ -1580,6 +1653,7 @@ const en = {
     appClosable: "The app can close without affecting the game.",
     tabs: {
       content: "Content",
+      optional: "Options",
       files: "Files",
       worlds: "Worlds",
       screenshots: "Screenshots",
@@ -1678,7 +1752,6 @@ const en = {
   },
 
   logs: {
-    sectionTitle: "Diagnostics",
     title: "Log",
     copied: "Copied",
     copyReportButton: "Copy report",
@@ -1928,6 +2001,78 @@ const en = {
     optionalPickAtMostOne: "Pick one or none",
     optionalDeferredToast: "Saved. It will apply the next time you start the pack.",
     optionalDownloading: "Downloading {count} file(s)…",
+    // ── Optional content: authoring (local packs only) ───────────────────
+    //
+    // Lifted from the admin catalogue in apps/web rather than re-translated: the
+    // same OptionalGroupsEditor renders both surfaces, so a second wording would
+    // make the dashboard and the launcher describe one feature two ways.
+    optionalEditor: {
+      lead: "Group what the player can switch on or off. The unit is an OPTION, not a file: “Shaders” is Iris, Sodium, its config and the .zip, and someone who can switch on three of those four has a crash, not a choice.",
+      define: "Define options",
+      edit: "Edit options",
+      pageTitle: "Optional content",
+      backToPack: "Back to pack",
+      applyHint:
+        "Save writes the changes to the pack, but they do not reach the installed files until you press Play or Install.",
+      save: "Save",
+      saving: "Saving…",
+      cancel: "Cancel",
+      saved: "Optional content saved.",
+      saveError: "Could not save the optional content.",
+      loadError: "Could not read the pack.",
+      pending: "There are changes that are not installed yet. This list is what is on disk right now; press Play or Install to apply the latest.",
+      pendingAuthored:
+        "These are the options exactly as you saved them. They are not in the installed files yet: press Play or Install to apply them, and you will then be able to switch them on and off.",
+      emptyTitle: "No optional content",
+      emptyDesc: "This pack always installs every file. Create a group to make some of it a choice.",
+      addGroup: "Add group",
+      removeGroup: "Remove group",
+      addFeature: "Add option",
+      removeFeature: "Remove option",
+      groupName: "Group name",
+      groupNamePlaceholder: "Performance, Shaders, Extras…",
+      groupDescription: "Group description",
+      selectMode: "How many can be on",
+      mode: {
+        any: "Any of them",
+        one: "Exactly one",
+        atMostOne: "One or none",
+      },
+      featureName: "Option name",
+      featureDescription: "Description",
+      defaultState: "Default",
+      defaultOn: "On",
+      defaultOff: "Off",
+      activation: "Activation",
+      activationFile: "File to activate",
+      activationKind: {
+        none: "None (install only)",
+        resourcepack: "Resource pack",
+        shaderpack: "Shader",
+        datapack: "Datapack",
+      },
+      requires: "Requires",
+      requiresHint: "Turning this on also turns on whatever is ticked here, and turning one of those off takes this one down with it.",
+      paths: "Files in this option",
+      pathsHint: "These are written as env.client “optional” on save. A file can belong to only one option.",
+      pathsFilter: "Filter {count} file(s) by name…",
+      pathsFilterLabel: "Filter files by name",
+      pathsNoMatch: "No file matches “{query}”.",
+      pathsHiddenSelected: "{count} file(s) in this option do not match the filter and are not shown here.",
+      errorNoPaths: "An option needs at least one file.",
+      errorOneDefault: "An “Exactly one” group needs exactly one option on by default (there are {count}).",
+      errorAtMostOneDefault: "A “One or none” group allows at most one on by default (there are {count}).",
+      errorShaderpackGroup: "A shader needs an “Exactly one” or “One or none” group: only one shader can be active.",
+      errorDatapackDir: "A datapack must sit inside {dirs} so a global loader reads it.",
+      // Refused by the schema too (group name minLength 1, features minItems 1,
+      // paths minItems 1), but phrased for the author: a half-authored group is
+      // the normal state of this form rather than an exceptional one, and the
+      // validator can only answer in its own words.
+      errorGroupName: "Group “{id}” needs a name.",
+      errorGroupEmpty: "Group “{name}” needs at least one option.",
+      errorFeatureName: "An option in group “{group}” needs a name.",
+      errorFeatureEmpty: "Option “{name}” needs at least one file.",
+    },
     kindResourcepack: "Resources",
     kindShaderpack: "Shader",
     kindDatapack: "Datapack",

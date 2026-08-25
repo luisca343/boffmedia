@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, Icon, Button, Empty, SearchInput } from "@boffmedia/ui"
+import { Icon, Button, Empty, SearchInput } from "@boffmedia/ui"
 import { GameLogo, ToolGrid, TxSection, VideoHero, buildHubGames } from "@/components/boffmedia/ui/tools"
 
 const META = "inline-flex items-center gap-[9px] font-mono text-[12px] uppercase leading-none tracking-[0.08em] text-txt-muted [&_b]:font-bold [&_b]:text-txt [&_svg]:text-accent"
@@ -30,8 +30,9 @@ export function ToolsHub() {
   return (
     <main>
       <VideoHero>
-        <Kicker>{tHub("kicker")}</Kicker>
-        <h1 className="mb-[18px] mt-5 text-[clamp(52px,7vw,108px)]">
+        {/* Hero rung — Landing only. The one surface allowed to be loud,
+            because orientation is its whole job. */}
+        <h1 className="mb-[18px] text-[clamp(46px,6.5vw,96px)]">
           {tHub.rich("title", { em: (chunks) => <em>{chunks}</em> })}
         </h1>
         <p className="max-w-[46ch] text-[20px] leading-[1.5] text-txt-muted">{tHub("lead")}</p>

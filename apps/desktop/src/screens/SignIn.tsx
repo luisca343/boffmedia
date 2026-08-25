@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-import { Badge, Banner, Button, Icon, Kicker, Panel, Spinner } from "@boffmedia/ui"
+import { Badge, Banner, Button, Icon, Panel, Spinner, DISPLAY_VOICE } from "@boffmedia/ui"
 
 import { useT } from "../i18n"
 import { authOpenVerification, copyText } from "../runtime"
@@ -46,8 +46,7 @@ export function SignIn() {
     <div className="grid h-full place-items-center px-8 py-10">
       <div className="w-full max-w-[520px]">
         <div className="mb-6 text-center">
-          <Kicker>Boffmedia App</Kicker>
-          <h1 className="font-display text-[34px]/none font-bold uppercase tracking-[0.06em] text-txt">
+          <h1 className={`${DISPLAY_VOICE} text-[34px] text-txt`}>
             {t("title")}
           </h1>
           <p className="mt-3 text-sm text-txt-muted">

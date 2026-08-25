@@ -16,7 +16,6 @@
       "palkia": "Palkia - Space-Time Smackdown",
       "arceus": "Arceus - Triumphant Light"
     },
-
     "item": {
       "xp": "XP",
       "packhourglass": "Pack Hourglass",
@@ -24,9 +23,7 @@
       "shopticket": "Shop Ticket",
       "shinedust": "Shinedust"
     },
-
     "mewQuest": "Immersive Mew",
-    
     "heroAlt": "Pokémon TCG Pocket",
     "logoAlt": "TCG Pocket Logo",
     "heading": {
@@ -176,7 +173,6 @@
         "lead": "Full database · {cards} cards across {sets} expansions."
       },
       "panel": {
-        "kicker": "Pokémon · Pocket cards",
         "collection": "Collection",
         "lead": "Explore every expansion, track your collection card by card, work out which pack is worth opening and browse other players' galleries. All in one panel.",
         "exploreCards": "Explore cards",

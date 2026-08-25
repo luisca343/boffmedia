@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Button, Empty, SearchInput, Seg, Spinner } from "@boffmedia/ui"
+import { Button, Empty, SearchInput, Seg, Spinner, StatChip, ToolBar, ToolHeader } from "@boffmedia/ui"
 import { AchievementItem, type AchievementLike } from "@/components/boffmedia/ui/events"
 import { useGetAchievements } from "@/hooks/events/useGetAchievements"
 import { useFormat } from "@boffmedia/ui/useFormat"
@@ -35,18 +35,17 @@ export function LogrosView() {
 
   return (
     <main className="wrap pb-[90px] pt-[34px]">
-      <div className="mb-6">
-        <span className="mono-label">{t("kicker")}</span>
-        <h1 className="mt-2 text-[clamp(44px,6vw,72px)]">{t("title")}</h1>
-        <p className="mt-3 max-w-[64ch] font-body text-[16px]/[1.55] text-txt-muted">{t("lead")}</p>
-        {totalPoints > 0 && (
-          <p className="mt-3 font-mono text-[12px] font-medium uppercase tracking-[0.1em] text-accent">
-            {t("totalPoints", { points: formatNumber(totalPoints) })}
-          </p>
-        )}
-      </div>
+      <ToolHeader
+        title={t("title")}
+        sub={t("lead")}
+        meta={
+          totalPoints > 0 ? (
+            <StatChip icon="star" value={formatNumber(totalPoints)} label={t("statPoints")} tone="ok" />
+          ) : undefined
+        }
+      />
 
-      <div className="mb-6 flex flex-wrap items-center gap-3">
+      <ToolBar note={t("count", { count: filtered.length })}>
         <SearchInput value={q} onChange={setQ} placeholder={t("search")} className="max-w-[360px] flex-1 basis-[240px]" />
         <div className="max-w-full overflow-x-auto">
           <Seg
@@ -56,10 +55,7 @@ export function LogrosView() {
             className="w-max"
           />
         </div>
-        <span className="ml-auto font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-txt-muted">
-          {t("count", { count: filtered.length })}
-        </span>
-      </div>
+      </ToolBar>
 
       {isLoading ? (
         <div className="grid min-h-[40vh] place-items-center">

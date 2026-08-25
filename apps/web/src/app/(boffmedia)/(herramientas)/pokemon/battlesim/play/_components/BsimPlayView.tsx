@@ -17,7 +17,7 @@ import { BattleLogPanel } from '@/app/battlesim/_components/BattleLogPanel';
 import { useFullscreen } from '@/app/battlesim/_hooks/useFullscreen';
 import { cn } from '@/lib/utils';
 import { DkSelect } from '@/components/boffmedia/ui/tools/datakit';
-import { Icon } from '@boffmedia/ui';
+import { Empty, Icon } from '@boffmedia/ui';
 import { BattleShell } from '../../_components/BattleShell';
 import { BSIM_FORMATS } from '../../_lib/bsim-data';
 
@@ -81,13 +81,12 @@ function PlayInner() {
 
   // Idle state — direct navigation without a format.
   if (!session || !state) {
+    // Not a header — an idle state reached by direct navigation without a
+    // format. It is an `Empty`, which is why it keeps a heading while the
+    // other battlesim views (App surfaces) lost theirs.
     return (
-      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-6 px-4 text-txt">
-        <div className="text-center">
-          <h1 className="text-[clamp(28px,4vw,40px)]">{t('play.title')}</h1>
-          <p className="mt-1 text-txt-muted">{t('play.subtitle')}</p>
-        </div>
-        <div className="flex w-full max-w-[320px] flex-col items-stretch gap-3">
+      <Empty icon="sword" title={t('play.title')} lead={t('play.subtitle')} className="min-h-[60vh]">
+        <div className="mx-auto flex w-full max-w-[320px] flex-col items-stretch gap-3">
           <DkSelect
             value={selectedFormat}
             onChange={setSelectedFormat}
@@ -102,7 +101,7 @@ function PlayInner() {
             <Icon name="sword" size={20} />{t('play.start')}
           </button>
         </div>
-      </div>
+      </Empty>
     );
   }
 

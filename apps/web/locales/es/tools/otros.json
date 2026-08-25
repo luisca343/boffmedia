@@ -55,7 +55,6 @@
     "accessButton": "Acceder a {tool}",
     "explore": "Explorar",
     "keysApp": {
-      "kicker": "Otros · Biblioteca",
       "titlePre": "Claves de",
       "titleEm": "Steam",
       "sub": "Catálogo de juegos que repartimos en la comunidad. Consulta ficha, precio y medios de cada uno — tomados de Steam. La clave se entrega por sorteo o de forma manual, nunca se muestra.",
@@ -97,7 +96,6 @@
       "mediaN": "Media {n}"
     },
     "sorteosApp": {
-      "kicker": "Otros · Comunidad",
       "titlePre": "Sorteo",
       "titleEm": "rápido",
       "sub": "Pega tus participantes, dale a sortear y obtén ganadores al instante — con peso opcional por persona, varios ganadores a la vez y semilla verificable.",
@@ -162,7 +160,6 @@
       "winnerTag": "Ganador"
     },
     "bibliotecaApp": {
-      "kicker": "Otros · Biblioteca",
       "titlePre": "Biblioteca",
       "titleEm": "Local",
       "sub": "Explora los juegos descargados en el servidor y descárgalos a tu dispositivo. Filtra por consola y región.",
@@ -193,7 +190,6 @@
       "searchError": "Error al buscar."
     },
     "myrientApp": {
-      "kicker": "Otros · Catálogo",
       "titlePre": "Descargador",
       "titleEm": "Myrient",
       "sub": "Explora el catálogo, selecciona los juegos que quieras y descárgalos directamente al servidor.",
@@ -255,7 +251,6 @@
       "nextPage": "Página siguiente"
     },
     "steamfreeApp": {
-      "kicker": "Otros · En directo desde Steam",
       "titlePre": "Gratis en",
       "titleEm": "Steam",
       "sub": "Todos los juegos que Steam está regalando ahora mismo al 100 % de descuento, directo de la tienda. Reclámalo antes de que se acabe el tiempo y es tuyo para siempre — sin clave, sin sorteo, solo tu cuenta de Steam.",

@@ -1,7 +1,6 @@
 import * as React from "react"
 import { cn } from "../cn"
 import { Icon, type IconName } from "./icon"
-import { Kicker } from "./kicker"
 
 /**
  * The display voice — heavy italic condensed uppercase, with `<em>` rendered as
@@ -18,18 +17,26 @@ export const DISPLAY_VOICE = cn(
 
 export interface ToolHeaderProps {
   /**
-   * `page` is the editorial header: kicker, big italic title, lead, and a meta
-   * row of StatChips. `bar` is the 45px sticky strip a tool uses when it owns
-   * the viewport or carries persistent controls.
+   * Which one you want follows from the SURFACE, not from the header:
    *
-   * The tie-break is `page`: a page header can grow a sticky ToolBar underneath
-   * it, but a bar can never grow a title — the cheap conversion runs one way.
+   * - A surface that OWNS THE VIEWPORT (panes, internal scroll regions,
+   *   controls that must stay put while the content moves) is an App, and an
+   *   App carries no title at all. Its name lives in the chrome around it —
+   *   ToolShell's rail. Use a bare `ToolStrip` for its controls, and reach for
+   *   `density="bar"` only when the tool is a frame in its own right, with no
+   *   rail to inherit from (the schematic tools, TcgpApp).
+   * - A surface that FLOWS IN THE DOCUMENT — a list you scroll to the end of —
+   *   is an Index, and it names itself: `density="page"`.
+   * - Nothing names itself twice. Inside a surface that already carries a name,
+   *   an inner view never adds a second header; the tab row is the label.
+   *
+   * Carrying persistent controls does NOT on its own make something a bar — an
+   * Index has a `ToolBar` under its title and is still a page. Owning the
+   * viewport is the test.
    */
   density?: "page" | "bar"
-  /** Kicker text (page) — the small accent-ruled label above the title. */
-  eyebrow?: React.ReactNode
-  /** Leading seal glyph. Rendered in `bar`; ignored in `page`, where the kicker
-   *  already does the labelling work an icon would repeat. */
+  /** Leading seal glyph. Rendered in `bar`; ignored in `page`, where the
+   *  title already does the labelling work an icon would repeat. */
   icon?: IconName
   /** The title. Wrap a word in `<em>` to get the accent outline treatment. */
   title: React.ReactNode
@@ -43,36 +50,112 @@ export interface ToolHeaderProps {
 }
 
 /**
- * The sticky strip a `bar`-density header lives in. Exported on its own because
- * a bar is not always a header: datakit's sub-bar and mhwilds' toolbar are the
- * same strip carrying only controls.
+ * ONE bar height for the whole system, published as a token rather than spelled
+ * as a number at each call site.
+ *
+ * It is a token because layouts have to offset against it: mhwilds' roster
+ * column sticks below the bar and subtracts its height, and it used to do that
+ * by repeating `58px` twice. A literal there is a silent breakage waiting for
+ * the next height change — the column drifts and nothing errors. Anything that
+ * needs the bar's height reads `var(--tool-bar-h)`.
+ *
+ * 58px rather than the old nominal 45px because 45 was never real: a bar whose
+ * `ToolTitle` carries a `sub` needs ~52px, so those bars quietly grew and the
+ * system ended up with heights nobody chose. 58 fits seal + title + sub, and a
+ * control-only bar simply has more air.
+ */
+export const TOOL_BAR_H = "58px"
+
+const STRIP_GUTTER = "px-[var(--tool-pad,clamp(14px,2vw,32px))]"
+
+/**
+ * A themed tool (Mewgenics, and anything like it later) needs its bar to be the
+ * SAME OBJECT as every other bar — same height, gutter, sticky offset, row
+ * structure — while looking like itself. So the three surface colours are
+ * tokens with the system palette as the fallback, and a skin sets them on the
+ * `ToolStrip`.
+ *
+ * Colour only, deliberately. A skin cannot reach height, padding or gutter
+ * through these, which is what separates "own skin" from the `className`
+ * free-for-all that produced four heights in the first place.
+ */
+const STRIP_BG = "bg-[var(--tool-bar-bg,var(--bg))]"
+const STRIP_SUB_BG = "bg-[var(--tool-bar-sub-bg,var(--bg-2))]"
+const STRIP_LINE = "border-[var(--tool-bar-line,var(--line))]"
+
+/** One row of a strip. Not exported: a row only ever exists inside a
+ *  `ToolStrip`, which owns the sticky context, the border and the background. */
+function StripRow({ tone = "base", children }: { tone?: "base" | "sub"; children: React.ReactNode }) {
+  return (
+    <div
+      className={cn(
+        "flex flex-wrap items-center gap-3",
+        STRIP_GUTTER,
+        tone === "sub"
+          ? cn("border-t border-solid py-2", STRIP_LINE, STRIP_SUB_BG)
+          : "min-h-[var(--tool-bar-h,58px)] py-[10px]",
+      )}
+    >
+      {children}
+    </div>
+  )
+}
+
+export interface ToolStripProps {
+  /** Second row, under the title row: this tool's tabs, or its filter set.
+   *
+   *  It is a SLOT rather than something a caller assembles because of a trap
+   *  that is invisible until it bites: a sticky child inside a sticky parent
+   *  resolves against the parent, not the viewport, so a hand-built two-row bar
+   *  scrolls its second row out from under its first. This component owns the
+   *  one sticky context and both rows run static inside it. */
+  sub?: React.ReactNode
+  /** Off for a bar that is not the top of a scrolling region — a tool whose own
+   *  body scrolls, or a strip inside an already-sticky shell. */
+  sticky?: boolean
+  /** `base` is the primary bar. `sub` makes the whole strip the recessed row,
+   *  for the case where the two rows are rendered by DIFFERENT components and
+   *  cannot use the `sub` slot (datakit's standalone sub-bar). Prefer `sub`. */
+  tone?: "base" | "sub"
+  /** Skin only — palette, per-tool tint, z-order. NOT geometry: height, padding
+   *  and gutter come from the props and tokens above, and a `check-tool-chassis`
+   *  lint rule fails the build on a geometry class here. That escape hatch is
+   *  how seven call sites ended up with four heights and four gutters. */
+  className?: string
+  /** How a skin sets `--tool-bar-bg` / `--tool-bar-sub-bg` / `--tool-bar-line`.
+   *  Colour tokens only — geometry does not have a token here to set. */
+  style?: React.CSSProperties
+  children: React.ReactNode
+}
+
+/**
+ * The tool's sticky header region: one or two rows, one gutter, one sticky
+ * context, one height.
  *
  * It sticks to `--tool-sticky-top`, never `--nav-h`. `--nav-h` exists in
  * apps/web's globals.css alone, so in apps/desktop the whole declaration would
  * be invalid and silently dropped — and the right offset there is 0, which is
  * this token's fallback. The host maps the two (apps/web: `--tool-sticky-top:
  * var(--nav-h)`).
+ *
+ * `--tool-pad` is owned by the HOST SHELL, not by the tool — the same rule that
+ * keeps viewport math out of `packages/tools/*`. A tool that sets its own
+ * gutter is a tool whose bar no longer lines up with the body beneath it.
  */
-export function ToolStrip({
-  tone = "base",
-  className,
-  children,
-}: {
-  /** `base` is the primary bar; `sub` is the recessed second row beneath it. */
-  tone?: "base" | "sub"
-  className?: string
-  children: React.ReactNode
-}) {
+export function ToolStrip({ sub, sticky = true, tone = "base", className, style, children }: ToolStripProps) {
   return (
     <div
+      style={style}
       className={cn(
-        "sticky top-[var(--tool-sticky-top,0px)] flex flex-none flex-wrap items-center gap-3 border-b border-solid border-line",
-        "px-[var(--tool-pad,clamp(14px,2vw,32px))]",
-        tone === "sub" ? "z-[25] bg-base-2 py-2" : "z-30 min-h-[45px] bg-base py-[10px]",
+        "flex-none border-b border-solid",
+        STRIP_LINE,
+        tone === "sub" ? cn("z-[25]", STRIP_SUB_BG) : cn("z-30", STRIP_BG),
+        sticky && "sticky top-[var(--tool-sticky-top,0px)]",
         className,
       )}
     >
-      {children}
+      <StripRow tone={tone}>{children}</StripRow>
+      {present(sub) && <StripRow tone="sub">{sub}</StripRow>}
     </div>
   )
 }
@@ -145,10 +228,15 @@ export function ToolTitle({ title, sub, className }: { title: React.ReactNode; s
 }
 
 /**
- * One header for every tool. It absorbs the five chassis that grew in parallel
- * under `(herramientas)`: the hand-rolled editorial `<header>` (which had drifted
- * into two different title scales), datakit's `DkBar` + `DkTitle`, TCG Pocket's
- * own non-italic title, and the bare no-header views.
+ * One header for every surface that needs one — and, by the rule on `density`,
+ * none for the ones that do not. It absorbs the chassis that grew in parallel
+ * under `(herramientas)` AND the eight hand-rolled headers on the site's own
+ * index pages, which never heard about the tool canon and drifted the other way
+ * (72px and 80px against the tools' 66px).
+ *
+ * The `page` rung is `clamp(32px,4vw,52px)`, down from 66. The drift is the
+ * evidence: every tool that hand-rolled a title picked something SMALLER, because
+ * 66px of condensed italic over a thirty-row list is a poster, not a header.
  *
  * The `bar` density sticks to `--tool-sticky-top`, never `--nav-h`. `--nav-h` is
  * defined in apps/web's globals.css only; in apps/desktop the whole declaration
@@ -157,7 +245,6 @@ export function ToolTitle({ title, sub, className }: { title: React.ReactNode; s
  */
 export function ToolHeader({
   density = "page",
-  eyebrow,
   icon,
   title,
   sub,
@@ -181,10 +268,14 @@ export function ToolHeader({
   }
 
   return (
-    <header className={cn("flex flex-wrap items-end justify-between gap-6 pb-5 pt-1", className)}>
+    <header
+      className={cn(
+        "flex flex-wrap items-end justify-between gap-6 border-b border-solid border-line pb-5 pt-1",
+        className,
+      )}
+    >
       <div className="min-w-0">
-        {eyebrow && <Kicker>{eyebrow}</Kicker>}
-        <h1 className={cn(DISPLAY_VOICE, "my-3 text-[clamp(38px,5vw,66px)]")}>{title}</h1>
+        <h1 className={cn(DISPLAY_VOICE, "mb-3 text-[clamp(32px,4vw,52px)]")}>{title}</h1>
         {present(sub) && <p className="max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">{sub}</p>}
       </div>
       {(present(meta) || present(actions)) && (
@@ -231,7 +322,7 @@ export function ToolBar({ sticky, filters, note, className, children }: ToolBarP
   return (
     <div
       className={cn(
-        "mb-[18px] mt-1",
+        "mb-5 mt-4",
         sticky && "sticky top-[var(--tool-sticky-top,0px)] z-20 -mx-[var(--tool-pad,0px)] bg-base/90 px-[var(--tool-pad,0px)] py-2 backdrop-blur-[10px]",
         className,
       )}

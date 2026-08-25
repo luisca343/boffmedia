@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Empty, Icon, Spinner } from "@boffmedia/ui"
+import { Button, Empty, Icon, Spinner, ToolHeader } from "@boffmedia/ui"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useFormat } from "@boffmedia/ui/useFormat"
 import { EventStatusChip, dayMonth, eventStatus, type EventLike } from "@/components/boffmedia/ui/events"
@@ -36,11 +36,7 @@ export function CalendarView() {
 
   return (
     <main className="wrap pb-[90px] pt-[34px]">
-      <div className="mb-8">
-        <span className="mono-label">{t("kicker")}</span>
-        <h1 className="mt-2 text-[clamp(44px,6vw,72px)]">{t("title")}</h1>
-        <p className="mt-3 max-w-[64ch] font-body text-[16px]/[1.55] text-txt-muted">{t("lead")}</p>
-      </div>
+      <ToolHeader className="mb-8" title={t("title")} sub={t("lead")} />
 
       {isLoading ? (
         <div className="grid min-h-[40vh] place-items-center">

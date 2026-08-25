@@ -50,11 +50,9 @@ export function BsimPvpView() {
 
   return (
     <div className="mx-auto flex w-full max-w-4xl flex-col gap-4 p-4 text-txt">
+      {/* App surface: the rail names the tool, so this view does not repeat it. */}
       <div className="flex items-center justify-between gap-3">
-        <div>
-          <h1 className="text-[clamp(24px,3.5vw,34px)]">{t('pvp.title')}</h1>
-          <p className="mt-1 text-txt-muted">{t('pvp.subtitle')}</p>
-        </div>
+        <p className="text-txt-muted">{t('pvp.subtitle')}</p>
         <Badge tone={STATUS_TONE[status] ?? 'default'}>{statusLabel}</Badge>
       </div>
 

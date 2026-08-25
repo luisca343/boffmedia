@@ -119,6 +119,7 @@
     "search": "Search achievement…",
     "count": "{count, plural, =0 {No achievements} one {# achievement} other {# achievements}}",
     "totalPoints": "{points} points up for grabs",
+    "statPoints": "Points",
     "filter": {
       "all": "All",
       "achievement": "Achievements",

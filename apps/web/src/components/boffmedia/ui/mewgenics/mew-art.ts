@@ -4,8 +4,6 @@ import { ASSET, staticAsset } from '@/lib/assets';
 // monogram fallback). Kept dependency-free so the showcase — which never loads
 // the store — bundles it without pulling the fetch layer.
 
-export const MEW_ART_BASE = staticAsset(ASSET.boffmedia.tools.mewgenics)
-
 interface MewArtState {
   /** character id → sprite svg path (single representative frame) */
   sprites: Record<string, string>
@@ -37,5 +35,5 @@ export function mewArtSrc(cat: string, rec: ArtRec | null | undefined): string |
   else if (cat === "items" || cat === "passives") path = rec.icon || (id ? state.icons[cat]?.[id] : undefined)
   else if (cat === "abilities") path = rec.icon || (id ? state.icons.abilities?.[id] : undefined)
   if (!path) return null
-  return path.startsWith("http") || path.startsWith("/") ? path : MEW_ART_BASE + path
+  return path.startsWith("http") || path.startsWith("/") ? path : staticAsset(ASSET.boffmedia.tools.mewgenics, path)
 }

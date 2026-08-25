@@ -3,7 +3,7 @@
 import * as React from "react"
 import { lazy, Suspense, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Tabs, Button, Spinner } from "@boffmedia/ui"
+import { Tabs, Button, Select, Spinner, ToolStrip } from "@boffmedia/ui"
 import { useCalculatorStore } from "../_store/calculatorStore"
 import { useChampionsRegulations } from "../../meta/_hooks/useChampionsRegulations"
 import { useCalcUrlSync } from "../_hooks/useCalcUrlSync"
@@ -16,14 +16,6 @@ const TypesView = lazy(() => import("../_components/TypesView").then((m) => ({ d
 const SavedDrawer = lazy(() => import("../_components/SavedDrawer").then((m) => ({ default: m.SavedDrawer })))
 
 type TabId = "combate" | "matriz" | "velocidad" | "tipos"
-
-const REG_CARET: React.CSSProperties = {
-  backgroundImage:
-    "linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%)",
-  backgroundPosition: "calc(100% - 16px) 55%, calc(100% - 11px) 55%",
-  backgroundSize: "5px 5px",
-  backgroundRepeat: "no-repeat",
-}
 
 function TabFallback() {
   return (
@@ -44,8 +36,10 @@ function DamageCalcShell() {
 
   return (
     <div className="flex min-w-0 flex-col" style={{ minHeight: "calc(100dvh - var(--nav-h))" }}>
-      {/* App bar */}
-      <div className="sticky top-[var(--nav-h)] z-20 flex flex-none flex-wrap items-center gap-[18px] border-b border-solid border-line bg-base px-[clamp(18px,2.4vw,40px)] py-3">
+      {/* App bar. An App surface: it deliberately carries NO title — the tool is
+          named by ToolShell's rail, not by its own bar. ToolStrip sticks to
+          `--tool-sticky-top`, so this no longer hardcodes `--nav-h`. */}
+      <ToolStrip>
         <Tabs
           value={tab}
           onChange={(v) => setTab(v as TabId)}
@@ -59,22 +53,18 @@ function DamageCalcShell() {
         />
         <div className="flex flex-wrap items-center gap-2">
           {regs.length > 0 && (
-            <select
+            <Select
               value={regulation}
-              aria-label={t("title")}
-              onChange={(e) => {
-                setRegulation(e.target.value)
+              ariaLabel={t("title")}
+              onChange={(v) => {
+                setRegulation(v)
                 setUseChampions(true)
               }}
-              style={REG_CARET}
-              className="cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:8px] cursor-pointer appearance-none border border-solid border-line-2 bg-panel py-2 pl-3 pr-[30px] font-mono text-[12px]/none font-semibold tracking-[0.06em] text-txt-muted outline-none focus-visible:outline-2 focus-visible:outline-accent-line"
-            >
-              {regs.map((r) => (
-                <option key={r.formatId} value={r.formatId}>
-                  {r.name}
-                </option>
-              ))}
-            </select>
+              options={regs.map((r) => ({ value: r.formatId, label: r.name }))}
+              // `Select` is full-width by default; in a bar that eats the row and
+              // wraps the buttons onto a second line, doubling the bar's height.
+              className="w-auto min-w-[190px]"
+            />
           )}
           <Button size="sm" icon={linkCopied ? "check" : "link"} onClick={copyShareLink}>
             {linkCopied ? t("shareCopied") : t("share")}
@@ -83,7 +73,7 @@ function DamageCalcShell() {
             {t("ui.saved")}
           </Button>
         </div>
-      </div>
+      </ToolStrip>
 
       {/* Body */}
       <div className="flex-1 px-[clamp(18px,2.4vw,40px)] pb-[60px] pt-5">

@@ -10,9 +10,9 @@ import {
   Toggle,
   Disclosure,
   Banner,
-  Kicker,
   OptionGroup,
   Icon,
+  ToolHeader,
 } from "@boffmedia/ui"
 import { getFloors } from "@/tools/pmd-sky/DungeonData"
 import { useWmV3 } from "../_lib/useWmV3"
@@ -71,36 +71,37 @@ export function PmdSkyView() {
 
   return (
     <div className="flex min-w-0 flex-col bg-base min-h-[calc(100dvh_-_var(--nav-h))]">
-      {/* ── top bar: sticks under the site Navbar (was `top-0`, i.e. under it) ── */}
-      <div className="sticky top-[var(--nav-h)] z-20 flex flex-none flex-wrap items-end gap-5 border-b border-solid border-line bg-base px-[clamp(18px,2.4vw,40px)] py-4 max-[960px]:items-start">
-        <div className="min-w-0 flex-1">
-          <Kicker>{tApp("kicker")}</Kicker>
-          <h1 className="mt-1 font-display text-[clamp(1.4rem,2.6vw,2rem)] font-extrabold not-italic uppercase leading-[1.02] tracking-[0.01em] text-txt">
-            {tApp("title")}
-          </h1>
-        </div>
-        <div className="flex flex-wrap items-end gap-[10px] max-[560px]:w-full max-[560px]:justify-between">
-          <div className="grid gap-[6px]">
-            <span className="font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
-              {tApp("region")}
+      {/* ── top bar. An App surface: it owns the viewport and carries a persistent
+           region control, so it is a `bar`, and it sticks to `--tool-sticky-top`
+           (via ToolStrip) rather than hardcoding `--nav-h`. ─────────────────── */}
+      <ToolHeader
+        density="bar"
+        icon="compass"
+        title={tApp("title")}
+        actions={
+          <>
+            <span className="flex items-center gap-2">
+              <span className="font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
+                {tApp("region")}
+              </span>
+              <Seg
+                value={form.europeanVersion ? "eu" : "us"}
+                onChange={(v) => setEuropean(v === "eu")}
+                options={[
+                  { value: "us", label: tApp("regionIntl") },
+                  { value: "eu", label: tApp("regionEU") },
+                ]}
+              />
             </span>
-            <Seg
-              value={form.europeanVersion ? "eu" : "us"}
-              onChange={(v) => setEuropean(v === "eu")}
-              options={[
-                { value: "us", label: tApp("regionIntl") },
-                { value: "eu", label: tApp("regionEU") },
-              ]}
-            />
-          </div>
-          <Button size="sm" icon="refresh" onClick={randomize}>
-            {tApp("randomize")}
-          </Button>
-          <Button size="sm" variant="ghost" icon="trash" onClick={reset}>
-            {tApp("reset")}
-          </Button>
-        </div>
-      </div>
+            <Button size="sm" icon="refresh" onClick={randomize}>
+              {tApp("randomize")}
+            </Button>
+            <Button size="sm" variant="ghost" icon="trash" onClick={reset}>
+              {tApp("reset")}
+            </Button>
+          </>
+        }
+      />
 
       {/* ── body: builder + ticket ──────────────────────────────────────────── */}
       <div className="min-h-0 flex-1 px-[clamp(18px,2.4vw,40px)] pb-[60px] pt-[22px]">

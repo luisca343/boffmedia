@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Kicker, Icon, Button, Chip } from "@boffmedia/ui"
+import { Icon, Button, Chip } from "@boffmedia/ui"
 import { GameLogo } from "./GameLogo"
 import { ToolGrid } from "./ToolGrid"
 import { TxSection } from "./TxSection"
@@ -26,8 +26,13 @@ export function GameBanner({ cat }: { cat: CategoryData }) {
         <div className="relative z-[2] flex flex-1 items-end gap-[26px] px-[var(--pad-x,22px)] pb-[30px] pt-[34px]">
           <GameLogo label={cat.logoLabel} hueColor={cat.hueColor} size="lg" imageSrc={cat.iconImg} bare className="max-sm:hidden" />
           <div className="min-w-0">
-            <Kicker>{cat.banner.prefix}</Kicker>
-            <h1 className="text-[clamp(40px,5.4vw,82px)] leading-[0.9]">{cat.banner.highlight}</h1>
+            {/* `prefix` + `highlight` are one sentence, not a label and a title —
+                "Herramientas de" + "Pokémon". They live in the same h1 so the
+                heading is a whole phrase for search and screen readers; the
+                accent-outline `em` carries the emphasis the kicker used to. */}
+            <h1 className="text-[clamp(40px,5.4vw,82px)] leading-[0.9]">
+              {cat.banner.prefix} <em>{cat.banner.highlight}</em>
+            </h1>
             <p className="mt-[10px] max-w-[66ch] text-[17px] leading-[1.5] text-txt-muted">{cat.banner.subtitle}</p>
           </div>
         </div>

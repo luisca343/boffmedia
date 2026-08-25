@@ -24,7 +24,6 @@ import {
 } from "../../runtime"
 import { removeFile, replaceFile } from "../../services/localPackEdit"
 import { formatBytes } from "../../utils/format"
-import { OptionalPanel } from "./OptionalPanel"
 import { UpdateReview } from "./UpdateReview"
 import {
   type ContentCategory,
@@ -45,7 +44,6 @@ import {
 
 export function ContentTab({
   slug,
-  packId,
   isLocal,
   minecraft,
   loader,
@@ -54,9 +52,6 @@ export function ContentTab({
   refreshKey = 0,
 }: {
   slug: string
-  /** Only used to resolve the pack's manifest when a newly-enabled optional
-   *  feature needs files fetched. */
-  packId: string
   isLocal: boolean
   minecraft: string
   loader: string | null
@@ -344,18 +339,6 @@ export function ContentTab({
           </div>
         </div>
       </Modal>
-
-      {/* Above the file list, not inside it. The list answers "what is in this
-          pack"; this answers "what do I want from it", and mixing a decision
-          into a 200-row inventory is how the decision goes unnoticed. Renders
-          nothing at all for a pack that offers no choices, which is most. */}
-      <OptionalPanel
-        slug={slug}
-        packId={packId}
-        isLocal={isLocal}
-        refreshKey={refreshKey}
-        onChanged={onChanged}
-      />
 
       <div className="flex flex-wrap items-center gap-2">
         <div className="min-w-[220px] flex-1">

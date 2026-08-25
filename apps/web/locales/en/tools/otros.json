@@ -55,7 +55,6 @@
     "accessButton": "Access {tool}",
     "explore": "Explore",
     "keysApp": {
-      "kicker": "Others · Library",
       "titlePre": "Steam",
       "titleEm": "Keys",
       "sub": "Catalogue of games we hand out in the community. Check each one's details, price and media — pulled from Steam. The key is given by raffle or manually, and is never shown.",
@@ -97,7 +96,6 @@
       "mediaN": "Media {n}"
     },
     "sorteosApp": {
-      "kicker": "Others · Community",
       "titlePre": "Quick",
       "titleEm": "raffle",
       "sub": "Paste your entrants, hit draw and get winners instantly — with optional per-person weight, several winners at once and a verifiable seed.",
@@ -162,7 +160,6 @@
       "winnerTag": "Winner"
     },
     "bibliotecaApp": {
-      "kicker": "Others · Library",
       "titlePre": "Local",
       "titleEm": "Library",
       "sub": "Browse the games downloaded on the server and download them to your device. Filter by console and region.",
@@ -193,7 +190,6 @@
       "searchError": "Search failed."
     },
     "myrientApp": {
-      "kicker": "Other · Catalogue",
       "titlePre": "Downloader",
       "titleEm": "Myrient",
       "sub": "Browse the catalogue, pick the games you want and download them straight to the server.",
@@ -255,7 +251,6 @@
       "nextPage": "Next page"
     },
     "steamfreeApp": {
-      "kicker": "Others · Live from Steam",
       "titlePre": "Free on",
       "titleEm": "Steam",
       "sub": "Every game Steam is giving away at 100 % off right now, straight from the store. Claim one before its timer runs out and it is yours forever — no key, no raffle, just your Steam account.",

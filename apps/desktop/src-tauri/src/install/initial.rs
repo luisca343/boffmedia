@@ -87,7 +87,7 @@ async fn fetch_initial_bytes(
             // Local packs keep their override bytes only in the local blob store;
             // managed packs stream them through the entitlement-checked proxy —
             // the same split bundled worlds make.
-            if pack_id.starts_with("local-") {
+            if crate::local_packs::is_local_pack_id(pack_id) {
                 let path = files::local_blob_path(layout, &sha512);
                 std::fs::read(&path).map_err(|e| e.to_string())
             } else {

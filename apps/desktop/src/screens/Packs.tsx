@@ -9,7 +9,6 @@ import {
   Field,
   Icon,
   Input,
-  Kicker,
   Menu,
   Modal,
   PackCard,
@@ -17,6 +16,7 @@ import {
   SearchInput,
   Seg,
   toast,
+  ToolHeader,
 } from "@boffmedia/ui"
 import type { MenuItem } from "@boffmedia/ui"
 
@@ -549,14 +549,11 @@ export function Packs() {
 
   return (
     <div className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-7">
-        <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <Kicker>{t("librarySectionTitle")}</Kicker>
-          <h1 className="font-display text-[30px]/none font-bold uppercase tracking-[0.06em] text-txt">
-            {t("title")}
-          </h1>
-        </div>
-        <div className="flex items-end gap-3">
+        <ToolHeader
+          className="mb-6"
+          title={t("title")}
+          actions={
+        <>
           <div className="w-[280px]">
             <SearchInput value={query} onChange={setQuery} placeholder={t("search")} size="sm" />
           </div>
@@ -592,8 +589,9 @@ export function Packs() {
               </>
             )
           })()}
-        </div>
-      </header>
+        </>
+          }
+        />
 
       <SystemChips />
 

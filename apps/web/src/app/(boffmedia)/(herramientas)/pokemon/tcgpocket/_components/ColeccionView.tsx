@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useLocale, useTranslations } from "next-intl"
-import { Button, Panel, SearchInput, Select, Toggle, Banner, Empty, Icon, ToolBar, ToolBarSpacer, ToolHeader } from "@boffmedia/ui"
+import { Button, Panel, SearchInput, Select, Toggle, Banner, Empty, Icon, ToolBar, ToolBarSpacer } from "@boffmedia/ui"
 import { useBoffSession } from "@/services/useBoffSession"
 import type { TcgCard } from "@boffmedia/shared"
 import type { TcgpData } from "../_lib/useTcgpCards"
@@ -144,11 +144,11 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
 
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
-      <ToolHeader
-        eyebrow={t("app.tabs.coleccion")}
-        title={username ? t("app.coleccion.galleryTitle", { user: username }) : t("app.coleccion.myTitle")}
-        sub={t("app.coleccion.summary", { have: totals.have, total: totals.total, pct: totals.pct, dupes: totals.dupes })}
-      />
+      {/* No header, by the same rule as CartasView. Whose gallery this is — the
+          one thing the tab row cannot say — is carried by the Banner below. */}
+      <p className="mb-5 max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">
+        {t("app.coleccion.summary", { have: totals.have, total: totals.total, pct: totals.pct, dupes: totals.dupes })}
+      </p>
 
       {username && (
         <div className="mb-4">

@@ -18,7 +18,7 @@
     "generate:shared": "pnpm --filter api generate:shared && node scripts/generate-error-codes.mjs",
     "generate:error-codes": "node scripts/generate-error-codes.mjs",
     "check:error-codes": "node scripts/generate-error-codes.mjs --check",
-    "lint": "node scripts/lint-sequential.js && node scripts/check-v3-conventions.mjs && node scripts/check-layering.mjs && node scripts/check-i18n.mjs && node scripts/check-fonts.mjs && pnpm --filter @boffmedia/pack-schema check:schema && node scripts/generate-error-codes.mjs --check",
+    "lint": "node scripts/lint-sequential.js && node scripts/check-v3-conventions.mjs && node scripts/check-layering.mjs && node scripts/check-i18n.mjs && node scripts/check-fonts.mjs && node scripts/check-tool-chassis.mjs && pnpm --filter @boffmedia/pack-schema check:schema && node scripts/generate-error-codes.mjs --check",
     "lint:parallel": "pnpm -r lint",
     "check:v3": "node scripts/check-v3-conventions.mjs",
     "check:layering": "node scripts/check-layering.mjs",
@@ -28,7 +28,8 @@
     "generate:i18n": "node scripts/generate-i18n-manifest.mjs",
     "check:i18n": "node scripts/check-i18n.mjs",
     "check:fonts": "node scripts/check-fonts.mjs",
-    "check:schema": "pnpm --filter @boffmedia/pack-schema check:schema"
+    "check:schema": "pnpm --filter @boffmedia/pack-schema check:schema",
+    "check:chassis": "node scripts/check-tool-chassis.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.0.0",

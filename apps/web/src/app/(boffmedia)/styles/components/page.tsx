@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Icon, Kicker, ToastStack } from "@boffmedia/ui"
+import { Icon, ToastStack } from "@boffmedia/ui"
 import { CHAPTERS, DOMAINS } from "./showcase-data"
 import { DISPLAY, DISPLAY_EM, MONO_LABEL, GRP_KEY, norm, sideLink } from "./showcase-shared"
 import { BasesChapter } from "./_chapters/BasesChapter"
@@ -173,8 +173,7 @@ export default function ComponentsShowcase() {
     <main className="wrap">
       <div className="pt-[34px]">
       <div className="pt-[34px]">
-        <Kicker>Sistema de diseño · v3</Kicker>
-        <h1 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(40px,11vw,72px)]/[0.92] mt-[14px] mb-[10px] break-words")}>
+        <h1 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(40px,11vw,72px)]/[0.92] mb-[10px] break-words")}>
           Componentes de <em>Boffmedia</em>
         </h1>
         <p className="text-txt-muted max-w-[68ch]">

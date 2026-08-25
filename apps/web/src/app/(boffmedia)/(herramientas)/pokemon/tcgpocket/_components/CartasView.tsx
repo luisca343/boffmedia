@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Select, SearchInput, Seg, Toggle, Empty, ToolBar, ToolBarSpacer, ToolHeader } from "@boffmedia/ui"
+import { Button, Select, SearchInput, Seg, Toggle, Empty, ToolBar, ToolBarSpacer } from "@boffmedia/ui"
 import type { TcgCard } from "@boffmedia/shared"
 import type { TcgpData } from "../_lib/useTcgpCards"
 import { normType, rarityMeta, typeColor, cssVars, TYPE_ORDER } from "../_lib/tcgp-maps"
@@ -75,11 +75,11 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
 
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
-      <ToolHeader
-        eyebrow={t("app.tabs.cartas")}
-        title={t("app.cartas.title")}
-        sub={t("app.cartas.lead", { cards: data.cards.length, sets: data.sets.length })}
-      />
+      {/* No header: TcgpApp's strip names the tool and its tab row names this
+          view, so a second title here would name it twice. The lead stays. */}
+      <p className="mb-5 max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">
+        {t("app.cartas.lead", { cards: data.cards.length, sets: data.sets.length })}
+      </p>
 
       <ToolBar
         filters={

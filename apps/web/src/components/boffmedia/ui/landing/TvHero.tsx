@@ -3,9 +3,9 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Kicker, Button, CountUp } from "@boffmedia/ui"
+import { Button, CountUp } from "@boffmedia/ui"
 import { ASSET, staticAsset } from "@/lib/assets"
-import { Decode, FxParticles } from "./travesia-fx"
+import { FxParticles } from "./travesia-fx"
 import { BEAMS, Grain, LINE_INNER, LINE_MASK, PRI_GLOW, tvGoTo } from "./landing-shared"
 import { TV3_HUD } from "./landing-data"
 import { useTvMouseVar } from "./landing-hooks"
@@ -46,13 +46,10 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
       </div>
       <div className="wrap relative z-[2] grid grid-cols-[1.08fr_0.92fr] items-center gap-[50px] px-5 max-[980px]:grid-cols-1 max-[980px]:gap-[30px] min-[640px]:px-10">
         <div>
-          <Kicker>
-            <Decode text={t("kicker")} />
-          </Kicker>
           {/* display treatment comes from the data-ds base styles (root of LandingPage) */}
           <h1
             data-reveal="lines"
-            className="group mb-0 mt-4 leading-[0.95] text-txt !opacity-100 !transform-none [font-size:clamp(52px,6.4vw,104px)]"
+            className="group mb-0 leading-[0.95] text-txt !opacity-100 !transform-none [font-size:clamp(52px,6.4vw,104px)]"
           >
             <span className={LINE_MASK}>
               <span className={LINE_INNER} style={{ ["--l"]: 0 } as React.CSSProperties}>

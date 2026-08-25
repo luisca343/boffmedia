@@ -73,40 +73,41 @@ export function TcgpApp({ view, expansion, cardId }: Props) {
     <div className="flex min-w-0 flex-col">
       {/* section header — the shared ToolStrip, so this tool's bar is the same
           object (height, gutter, sticky offset, z-order) as every other one. */}
-      {/* The whole two-row block sticks, so `ToolStrip` runs `static` here and
-          the sticky offset lives on the wrapper — a sticky child inside a sticky
-          parent resolves against the parent, not the viewport, and the tab row
-          would scroll away from under the title. */}
-      <header className="sticky top-[var(--tool-sticky-top,0px)] z-20 flex-none border-b border-solid border-line bg-base/90 backdrop-blur-[10px]">
-        <ToolStrip className="static z-auto border-b-0 bg-transparent [--tool-pad:clamp(16px,3vw,34px)] gap-4 py-[14px]">
-          <ToolSeal label="TCG" solid />
-          <ToolTitle title="TCG Pocket" sub={<span className="max-[560px]:hidden">{t("app.tagline")}</span>} />
-          <div className="ml-auto w-[min(320px,40vw)] max-[720px]:hidden">
-            <SearchInput
-              value={search}
-              onChange={setSearch}
-              onSubmit={submitSearch}
-              placeholder={t("app.searchCards")}
-              size="sm"
-            />
-          </div>
-        </ToolStrip>
-        <nav role="tablist" aria-label="TCG Pocket" className="flex gap-[2px] overflow-x-auto px-[clamp(16px,3vw,34px)] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-          {TABS.map((tab) => {
-            const on = tab.key === view
-            return (
-              <button key={tab.key} role="tab" aria-selected={on} type="button" onClick={() => nav(tab.key)}
-                className={cn(
-                  "inline-flex flex-none items-center gap-2 border-b-2 border-solid px-[15px] pb-[15px] pt-[13px] font-display text-[14px] font-bold uppercase leading-none tracking-[0.06em] transition-colors",
-                  on ? "border-accent text-txt" : "border-transparent text-txt-muted hover:text-txt",
-                )}>
-                <Icon name={tab.icon} size={16} className={on ? "text-accent" : "text-txt-dim"} />
-                {t(`app.tabs.${tab.key}`)}
-              </button>
-            )
-          })}
-        </nav>
-      </header>
+      {/* Two rows, one sticky context — `ToolStrip` owns both. The wrapper this
+          used to hand-roll (and the `static` override that went with it) is now
+          the primitive's job, so the tab row cannot scroll out from under the
+          title here or anywhere else. */}
+      <ToolStrip
+        sub={
+          <nav role="tablist" aria-label="TCG Pocket" className="-my-2 flex gap-[2px] overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {TABS.map((tab) => {
+              const on = tab.key === view
+              return (
+                <button key={tab.key} role="tab" aria-selected={on} type="button" onClick={() => nav(tab.key)}
+                  className={cn(
+                    "inline-flex flex-none items-center gap-2 border-b-2 border-solid px-[15px] pb-[13px] pt-[11px] font-display text-[14px] font-bold uppercase leading-none tracking-[0.06em] transition-colors",
+                    on ? "border-accent text-txt" : "border-transparent text-txt-muted hover:text-txt",
+                  )}>
+                  <Icon name={tab.icon} size={16} className={on ? "text-accent" : "text-txt-dim"} />
+                  {t(`app.tabs.${tab.key}`)}
+                </button>
+              )
+            })}
+          </nav>
+        }
+      >
+        <ToolSeal label="TCG" solid />
+        <ToolTitle title="TCG Pocket" sub={<span className="max-[560px]:hidden">{t("app.tagline")}</span>} />
+        <div className="ml-auto w-[min(320px,40vw)] max-[720px]:hidden">
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            onSubmit={submitSearch}
+            placeholder={t("app.searchCards")}
+            size="sm"
+          />
+        </div>
+      </ToolStrip>
 
       {/* body */}
       <div>

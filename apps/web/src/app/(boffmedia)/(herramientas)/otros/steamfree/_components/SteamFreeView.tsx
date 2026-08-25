@@ -65,7 +65,6 @@ export function SteamFreeView() {
   return (
     <main className="pb-[10px]">
       <ToolHeader
-        eyebrow={t("kicker")}
         title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
         sub={t("sub")}
         meta={

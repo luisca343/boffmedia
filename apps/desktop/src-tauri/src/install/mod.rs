@@ -476,7 +476,7 @@ async fn extract_bundled_worlds(
 
         // Fetch the world zip bytes
         let zip_bytes = match &prepared.plan.pack_id {
-            pack_id if pack_id.starts_with("local-") => {
+            pack_id if crate::local_packs::is_local_pack_id(pack_id) => {
                 // Local pack: fetch from local blob store
                 let layout = &prepared.layout;
                 let local_blob_path = files::local_blob_path(layout, &world.sha512);
@@ -1610,19 +1610,34 @@ pub async fn instance_optional(
 ///
 /// A marker always wins when one exists: it records the catalogue of the version
 /// on disk, which is the one the toggles act on.
+///
+/// - **Authoring a local pack** (`prefer_manifest`): the exception, and the only
+///   one. On a local pack the manifest IS the document and the marker is a
+///   record of the last install, so an author who has just added a group and not
+///   reinstalled is shown their own edit missing — three groups saved, one
+///   rendered, nothing on screen accounting for the other two. The caller asks
+///   for the manifest's catalogue explicitly and renders it read-only while the
+///   two disagree, because `instance_feature_set` still resolves against the
+///   marker and a feature the marker has never heard of cannot be toggled.
 #[tauri::command]
 pub async fn instance_optional_model(
     slug: String,
     manifest: Option<serde_json::Value>,
+    prefer_manifest: Option<bool>,
     app: tauri::AppHandle,
 ) -> Result<Vec<optional::GroupView>, InstallFailure> {
     let settings = settings::load(&app);
     let layout = Layout::new(&app, settings.game_dir())?;
     let instance = layout.instance(&slug);
     let state = read_optional_state(&instance);
+    let marker = read_marker(&instance);
 
-    if let Some(marker) = read_marker(&instance) {
-        let mut views = optional::resolve(&marker.optional_groups, &state, &marker_sizes(&marker));
+    // Only when a manifest was actually supplied: the flag asks for a better
+    // source, not for an empty answer when there is none.
+    let authored = prefer_manifest.unwrap_or(false) && manifest.is_some();
+
+    if let Some(marker) = marker.as_ref().filter(|_| !authored) {
+        let mut views = optional::resolve(&marker.optional_groups, &state, &marker_sizes(marker));
         mark_installed(&mut views, &instance);
         return Ok(views);
     }
@@ -1631,10 +1646,16 @@ pub async fn instance_optional_model(
         return Ok(Vec::new());
     };
     let (groups, sizes) = model_from_manifest(&manifest)?;
-    // No `mark_installed`: nothing is on disk, so every feature correctly
-    // reports `installed: false` — which is what tells the chooser that turning
-    // one on means a download.
-    Ok(optional::resolve(&groups, &state, &sizes))
+    let mut views = optional::resolve(&groups, &state, &sizes);
+    // Only when something is actually installed. With no marker nothing is on
+    // disk, and every feature correctly reports `installed: false` — which is
+    // what tells the chooser that turning one on means a download. With a marker
+    // the files are real, and a newly authored feature whose jars are already
+    // present should say so rather than claim a download it does not need.
+    if marker.is_some() {
+        mark_installed(&mut views, &instance);
+    }
+    Ok(views)
 }
 
 /// The model a manifest declares, plus the declared size of every path in it.
@@ -2097,7 +2118,24 @@ pub async fn instance_optional_set(
     // would let a caller switch OFF a required file and have the next install
     // honour it. Only validated once a marker exists — before the first install
     // there is no catalogue to check against and toggling intent is still valid.
-    if let Some(marker) = read_marker(&instance) {
+    //
+    // NOT applied to a local pack, and the exemption is the point rather than a
+    // loophole: this guard protects the MANIFEST'S authority over the instance,
+    // which is exactly right while the manifest is the server's and the player
+    // is not its author. On a local pack the two are the same person. The
+    // Content tab has always drawn a switch on every row of a local pack ("local
+    // packs own every file and may switch any of them off") while this refused
+    // every one of them, so the promise and the answer disagreed and the switch
+    // simply did not work — on required files AND, whenever the marker predated
+    // the edit that declared them, on the optional ones too.
+    //
+    // Nothing else has to change for it to hold: the install filter is
+    // `feature_on.contains(path) || !state.is_path_disabled(path)` and never
+    // consults whether a file is optional, so a path-level opt-out already
+    // survives a reinstall for a required file exactly as it does for an
+    // optional one.
+    let guarded = read_marker(&instance).filter(|_| !crate::local_packs::is_local_slug(&slug));
+    if let Some(marker) = guarded {
         let target = instance::normalise(&path);
         let is_optional = marker
             .optional_files

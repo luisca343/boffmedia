@@ -36,7 +36,7 @@ export function VerifyEmailScreen() {
           : { text: t("verify.error"), tone: "text-danger" }
 
   return (
-    <AuthShell kicker={t("verify.kicker")} title={t("verify.title")}>
+    <AuthShell title={t("verify.title")}>
       <div className="flex flex-col gap-[15px]">
         <p className={`font-body text-[14px]/[1.55] not-italic normal-case ${message.tone}`}>
           {message.text}

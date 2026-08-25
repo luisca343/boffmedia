@@ -119,6 +119,7 @@
     "search": "Buscar logro…",
     "count": "{count, plural, =0 {Sin logros} one {# logro} other {# logros}}",
     "totalPoints": "{points} puntos en juego",
+    "statPoints": "Puntos",
     "filter": {
       "all": "Todos",
       "achievement": "Logros",

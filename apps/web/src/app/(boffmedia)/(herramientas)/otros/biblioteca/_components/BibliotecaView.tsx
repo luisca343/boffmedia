@@ -36,7 +36,6 @@ export function BibliotecaView() {
     <main className="pb-[10px]">
       <ToolHeader
         className="mb-5"
-        eyebrow={t("kicker")}
         title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
         sub={t("sub")}
         meta={

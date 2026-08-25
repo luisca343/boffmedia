@@ -70,7 +70,7 @@ export function SchematicCompatTool() {
         {/* app bar — the shared ToolStrip. `static` because this shell is a
             fixed-height flex column that never scrolls, so there is nothing for
             a sticky bar to stick to. */}
-        <ToolStrip className="static z-auto h-[58px] gap-[18px] py-0 [--tool-pad:18px]">
+        <ToolStrip sticky={false}>
           <ToolSeal icon="cube" solid />
           <ToolTitle title={t("appName")} sub={t("appTagline")} />
           <div className="flex-1 min-w-2" />

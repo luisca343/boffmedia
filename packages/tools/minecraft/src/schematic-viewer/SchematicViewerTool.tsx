@@ -65,7 +65,7 @@ export function SchematicViewerTool() {
       >
         {/* app bar — the shared ToolStrip, `static` for the same reason as in
             the compat tool: this shell is a fixed-height column, not a scroller. */}
-        <ToolStrip className="static z-auto h-[58px] gap-[18px] py-0 [--tool-pad:18px]">
+        <ToolStrip sticky={false}>
           <ToolSeal icon="cube" solid />
           <ToolTitle title={t("appName")} sub={t("appTagline")} />
           <div className="min-w-2 flex-1" />

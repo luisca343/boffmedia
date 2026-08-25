@@ -10,7 +10,6 @@ import {
   Field,
   Icon,
   Input,
-  Kicker,
   Menu,
   Modal,
   Panel,
@@ -20,6 +19,7 @@ import {
   Tabs,
   Textarea,
   toast,
+  DISPLAY_VOICE,
 } from "@boffmedia/ui"
 import type { MenuItem } from "@boffmedia/ui"
 
@@ -33,6 +33,7 @@ import { BrowsePage } from "../components/pack/BrowsePage"
 import { getModule } from "../services/gameModules"
 import { BackupsTab } from "../components/pack/BackupsTab"
 import { ContentTab } from "../components/pack/ContentTab"
+import { OptionalEditorPage } from "../components/pack/OptionalEditorPage"
 import { OptionalPanel } from "../components/pack/OptionalPanel"
 import { PublishDialog } from "../components/pack/PublishDialog"
 import { FilesTab } from "../components/pack/FilesTab"
@@ -45,6 +46,7 @@ import { RandomizerPanel } from "../components/pack/RandomizerPanel"
 import {
   exportMrpack,
   exportServerMrpack,
+  instanceOptionalModel,
   instanceReveal,
   localPackDuplicate,
   localPackGet,
@@ -269,7 +271,7 @@ function EditLocalPackModal({
   )
 }
 
-type TabKey = "content" | "files" | "worlds" | "gallery" | "screenshots" | "backups" | "logs" | "info"
+type TabKey = "content" | "optional" | "files" | "worlds" | "gallery" | "screenshots" | "backups" | "logs" | "info"
 
 export function PackDetail() {
   const t = useT("packDetail")
@@ -291,7 +293,17 @@ export function PackDetail() {
   const [showUninstall, setShowUninstall] = useState(false)
   const [tab, setTab] = useState<TabKey>("content")
   const [browsing, setBrowsing] = useState(false)
+  const [editingOptional, setEditingOptional] = useState(false)
   const [contentNonce, setContentNonce] = useState(0)
+  // An authoring save always mints a new version id, so the instance is
+  // outdated the instant it returns. Held locally rather than waiting for
+  // `state.kind` to catch up: the rescan behind `reloadPacks` is a round trip,
+  // and for the length of it the panel would show the marker's catalogue — the
+  // groups from the LAST install — with nothing on screen saying so. That gap
+  // is exactly what "I saved three groups and only the first one shows" looks
+  // like. Cleared on the same falling edge of `installing` that refreshes the
+  // rest of the page, because that is when it stops being true.
+  const [optionalJustSaved, setOptionalJustSaved] = useState(false)
   const [providingFile, setProvidingFile] = useState<string | null>(null)
   const [fileError, setFileError] = useState<{ path: string; message: string } | null>(null)
   // The Content tab's rows describe what is ON DISK, and an install or a launch
@@ -313,7 +325,44 @@ export function PackDetail() {
     if (!wasInstalling.current) return
     wasInstalling.current = false
     setContentNonce((n) => n + 1)
+    setOptionalJustSaved(false)
   }, [installPhase])
+
+  /** How many optional groups this pack actually offers, for the one decision
+   *  that has to be made BEFORE the panel mounts: whether the tab exists at all.
+   *
+   *  Read off the same command the panel uses rather than from
+   *  `latest.optionalFeatureCount`, and the difference is not pedantry: that
+   *  number counts AUTHORED features only, while the model also folds in every
+   *  unclaimed `env.client: "optional"` file as a synthesised `otros` group.
+   *  A pack imported from a .mrpack carries exactly that and nothing else — so
+   *  gating on the count would hide the tab from the packs where optional
+   *  content most often comes from someone else's authoring.
+   *
+   *  A local pack always gets the tab regardless: it is the only door to the
+   *  authoring page, so hiding it on a pack with no groups yet would hide the
+   *  feature from precisely the packs that have not used it.
+   *
+   *  Answers 0 for a managed pack that is not installed yet — no marker to read
+   *  and no manifest fetched here. That case is already served by the
+   *  pre-install chooser on the Info tab, which is where the decision is worth
+   *  more anyway: declining a 400 MB shaderpack there means never fetching it. */
+  const [optionalGroupCount, setOptionalGroupCount] = useState(0)
+  const scanSlug = selected?.pack.slug ?? null
+  useEffect(() => {
+    if (!scanSlug) return
+    let alive = true
+    void instanceOptionalModel(scanSlug)
+      .then((groups) => {
+        if (alive) setOptionalGroupCount(groups.length)
+      })
+      .catch(() => {
+        if (alive) setOptionalGroupCount(0)
+      })
+    return () => {
+      alive = false
+    }
+  }, [scanSlug, contentNonce])
 
   // A local pack's icon is a file on disk (a data: URL), not the manifest's
   // iconUrl; resolve it here so the header prefers it. Re-runs when contentNonce
@@ -526,6 +575,23 @@ export function PackDetail() {
     )
   }
 
+  // Same takeover shape as browsing, and for the same reason: the authoring form
+  // is groups holding options holding a scrolling file picker, and every one of
+  // those levels needs width a column beside the file list cannot give it.
+  if (editingOptional && isLocal) {
+    return (
+      <OptionalEditorPage
+        slug={pack.slug}
+        onBack={() => setEditingOptional(false)}
+        onSaved={() => {
+          setOptionalJustSaved(true)
+          setContentNonce((n) => n + 1)
+          reloadPacks()
+        }}
+      />
+    )
+  }
+
   return (
     <div className="px-8 py-7">
       <SectionHeader label={t("libraryBack")} onBack={() => go("packs")} />
@@ -534,13 +600,18 @@ export function PackDetail() {
         <div className="flex min-w-0 items-start gap-4">
           <CatalogIcon src={localIcon ?? pack.iconUrl ?? undefined} size={64} />
           <div className="min-w-0">
-            <Kicker>{pack.slug}</Kicker>
-            <h1 className="font-display text-[30px]/none font-bold uppercase tracking-[0.06em] text-txt">
+            <h1 className={`${DISPLAY_VOICE} text-[30px] text-txt`}>
               {pack.name}
             </h1>
             {/* The reference's metadata strip: the three facts a player checks
-                before pressing Play, on one line instead of in a panel. Rendered via module. */}
+                before pressing Play, on one line instead of in a panel. Rendered via module.
+                The slug leads it: `name` is a display string that can change between
+                versions, so the slug is the only stable id a player can quote in a
+                report — and it is what the logs, the install dir and the API all use. */}
             <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-txt-muted">
+              <span className="flex items-center gap-1.5">
+                <Icon name="code" size={12} /> {pack.slug}
+              </span>
               {module.detailTabs?.some((t) => t.value === "content") && (
                 <>
                   {latest?.minecraft && (
@@ -792,11 +863,15 @@ export function PackDetail() {
           { value: "info", label: t("tabs.info") },
         ]
         const module = getModule(pack.gameType)
-        const moduleTabs = (module.detailTabs ?? []).map((tab) => ({
-          ...tab,
-          // Resolve tab label keys
-          label: t(tab.label),
-        }))
+        const moduleTabs = (module.detailTabs ?? [])
+          .map((tab) => ({
+            ...tab,
+            // Resolve tab label keys
+            label: t(tab.label),
+          }))
+          // See `optionalGroupCount`: the tab is declared by the module but
+          // only earns its place on a pack that has something to put in it.
+          .filter((tab) => tab.value !== "optional" || isLocal || optionalGroupCount > 0)
         const allTabs = [...moduleTabs, ...baseTabs]
         const moduleTabValues = moduleTabs.map((t) => t.value)
         return (
@@ -820,7 +895,6 @@ export function PackDetail() {
       {tab === "content" && (
         <ContentTab
           slug={pack.slug}
-          packId={pack.id}
           isLocal={isLocal}
           minecraft={latest?.minecraft ?? ""}
           loader={latest?.loader ?? null}
@@ -829,6 +903,31 @@ export function PackDetail() {
           // A prop, not a `key`: remounting would also throw away the search
           // box, the category filter and the live per-file download state.
           refreshKey={contentNonce}
+        />
+      )}
+
+      {/* Its own tab rather than a block above the file list. The list answers
+          "what is in this pack" and runs to a few hundred rows; this answers
+          "what do I want from it", and a decision parked on top of an inventory
+          is a decision that gets scrolled past. Owning the page is also what
+          lets the groups sit side by side instead of stacking. */}
+      {tab === "optional" && (
+        <OptionalPanel
+          slug={pack.slug}
+          packId={pack.id}
+          isLocal={isLocal}
+          layout="grid"
+          // `not-installed` excluded deliberately: with no marker there is
+          // nothing for the document to be ahead OF, the panel is already
+          // reading the manifest, and the pre-install toggles are exactly what
+          // the install pass consumes — so locking them would cost the author
+          // the one choice that is worth making before the download.
+          pendingInstall={
+            state.kind === "outdated" || (optionalJustSaved && state.kind !== "not-installed")
+          }
+          refreshKey={contentNonce}
+          onChanged={reloadPacks}
+          onEdit={isLocal ? () => setEditingOptional(true) : undefined}
         />
       )}
 

@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useToolT } from "../i18n"
 import { cn } from "@boffmedia/ui/cn"
-import { Icon, Empty, Spinner } from "@boffmedia/ui"
+import { Icon, Empty, Spinner, ToolTitle } from "@boffmedia/ui"
 import { MhApp, MhBar, MhBody, MhSeal, MhSearch, MhPanel, MhLabel, MhTypeChip } from "../ui/mh-kit"
 import { elementColor } from "../ui/mh-helpers"
 import type { MhMonster } from "../types"
@@ -90,10 +90,7 @@ export function BestiaryView() {
     <MhApp>
       <MhBar>
         <MhSeal name="paw" />
-        <div className="min-w-0">
-          <div className="font-mono text-[10px] leading-none uppercase tracking-[0.14em] text-[var(--mh-bright)]">{t("kicker")}</div>
-          <h1 className="font-display text-[22px] font-extrabold italic leading-none uppercase mt-1">{t("title")}</h1>
-        </div>
+        <ToolTitle title={t("title")} sub={t("kicker")} />
         {!loading && !error && (
           <span className="ml-auto font-mono text-[11px] leading-none uppercase tracking-[0.1em] text-txt-dim">
             {t("count", { count: monsters.length })}
@@ -116,7 +113,7 @@ export function BestiaryView() {
                 cannot express without it: its height must match the SCROLLPORT,
                 and only the host knows how tall that is. Falls back to the full
                 viewport, which is right for a host that is the whole window. */}
-            <div className="flex flex-col min-h-0 lg:sticky lg:top-[calc(var(--tool-sticky-top,0px)_+_58px)] lg:h-[calc(var(--tool-vh,100dvh)_-_58px)] lg:border-r border-solid border-line bg-base-2">
+            <div className="flex flex-col min-h-0 lg:sticky lg:top-[calc(var(--tool-sticky-top,0px)_+_var(--tool-bar-h,58px))] lg:h-[calc(var(--tool-vh,100dvh)_-_var(--tool-bar-h,58px))] lg:border-r border-solid border-line bg-base-2">
               <div className="flex flex-col gap-2.5 p-[12px_13px] border-b border-solid border-line">
                 <div className="flex gap-2 items-center">
                   <MhSearch value={q} onChange={setQ} placeholder={t("searchPlaceholder")} />

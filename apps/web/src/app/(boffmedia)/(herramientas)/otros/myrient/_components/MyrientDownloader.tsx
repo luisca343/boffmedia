@@ -309,7 +309,6 @@ export default function MyrientDownloader() {
       {/* header */}
       <ToolHeader
         className="mb-5"
-        eyebrow={t("kicker")}
         title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
         sub={t("sub")}
         meta={

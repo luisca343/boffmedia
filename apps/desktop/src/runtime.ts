@@ -1024,10 +1024,20 @@ export async function instanceOptionalSet(
 export async function instanceOptionalModel(
   slug: string,
   manifest?: unknown,
+  /** Read the catalogue from `manifest` even when the instance has an install
+   *  marker. For authoring a LOCAL pack, where the manifest is the document and
+   *  the marker only records the last install — see the command's own note. The
+   *  result must be rendered read-only while the two disagree: toggling still
+   *  resolves against the marker. */
+  preferManifest?: boolean,
 ): Promise<OptionalGroup[]> {
   if (!isDesktop()) return structuredClone(mockGroups)
   try {
-    return await invoke<OptionalGroup[]>("instance_optional_model", { slug, manifest })
+    return await invoke<OptionalGroup[]>("instance_optional_model", {
+      slug,
+      manifest,
+      preferManifest,
+    })
   } catch {
     return []
   }

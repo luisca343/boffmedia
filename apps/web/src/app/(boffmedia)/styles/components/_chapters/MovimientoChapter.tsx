@@ -3,7 +3,7 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { DISPLAY, HEAD4, Sample, Section } from "../showcase-shared"
-import { Button, Chip, CountUp, Kicker, Ticker } from "@boffmedia/ui"
+import { Button, Chip, CountUp, Ticker } from "@boffmedia/ui"
 import { GLARE } from "@/components/boffmedia/ui/landing/landing-shared"
 import { Decode, Kinetic, useSignalFX } from "@/components/boffmedia/ui/landing/travesia-fx"
 import { Marquee } from "@/components/boffmedia/ui/layout/Marquee"
@@ -90,9 +90,9 @@ export function MovimientoChapter() {
                   <span className={cn(DISPLAY, "text-[54px] leading-none text-accent")}>
                     <CountUp value="412+" />
                   </span>
-                  <Kicker>
+                  <span className="font-mono text-[12px]/none font-semibold uppercase tracking-[0.16em] text-accent">
                     <Decode text="Comunidad Pixelmon · En vivo" />
-                  </Kicker>
+                  </span>
                 </div>
                 <div>
                   <Button size="sm" icon="play" onClick={() => setFxKey((k) => k + 1)}>

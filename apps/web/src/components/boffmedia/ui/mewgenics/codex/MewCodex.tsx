@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Banner } from "@boffmedia/ui"
+import { Banner, ToolStrip } from "@boffmedia/ui"
 import { MEW_SENAL_VARS } from "../mew-util"
 import { MewCatTabs, MewTopBar } from "./MewChrome"
 import { MewBrowse } from "./MewBrowse"
@@ -35,12 +35,22 @@ export function MewCodex() {
       className="relative flex min-h-[calc(100dvh_-_var(--nav-h))] min-w-0 flex-col text-[color:var(--mwp-cream)] [font-family:var(--mwf-hand)]"
       style={{ ...MEW_SENAL_VARS, background: "radial-gradient(120% 90% at 50% -10%, #161a22 0%, var(--base-deep,#0b0d11) 55%, #050709 100%)" }}
     >
-      {/* The strips are transparent, so the sticky group carries the backing.
-          Under the site Navbar (z-50), over the page content. */}
-      <div className="sticky top-[var(--nav-h)] z-[40] flex-none bg-[color:var(--mwp-night-2)]">
+      {/* System geometry, own skin. Same object as every other tool bar — one
+          height, one gutter, one sticky context, title row + tab row — with the
+          Mewgenics palette supplied through the strip's three colour tokens.
+          What makes this feel like Mewgenics is the ink and the paper, not a
+          bespoke 64px row. */}
+      <ToolStrip
+        className="z-[40] border-b-2"
+        style={{
+          "--tool-bar-bg": "var(--mwp-night-2)",
+          "--tool-bar-sub-bg": "var(--mwp-night-2)",
+          "--tool-bar-line": "var(--mwp-nline)",
+        } as React.CSSProperties}
+        sub={<MewCatTabs codex={codex} />}
+      >
         <MewTopBar codex={codex} />
-        <MewCatTabs codex={codex} />
-      </div>
+      </ToolStrip>
 
       {!ready ? (
         <div className="flex flex-1 items-center justify-center gap-3 py-24 text-[15px]/none font-semibold text-[color:var(--mwp-cream-dim)]">

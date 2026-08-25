@@ -4,7 +4,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { DEMO_TOOLS } from "../showcase-data"
 import { DISPLAY, DISPLAY_EM, HEAD4, Sample, Section } from "../showcase-shared"
-import { Button, Empty, Icon, Kicker, Panel, Seg } from "@boffmedia/ui"
+import { Button, Empty, Icon, Panel, Seg } from "@boffmedia/ui"
 import { ExtLinks, FeaturedTool, GameBanner, GameCover, GameLogo, ToolCard, ToolGrid, ToolShell, TxSection, VideoHero, buildCategory } from "@/components/boffmedia/ui/tools"
 import { useTranslations } from "next-intl"
 
@@ -85,8 +85,7 @@ export function HubChapter() {
                 <div className="w-full">
                   <VideoHero>
                     <div className="px-8 py-16">
-                      <Kicker>Herramientas</Kicker>
-                      <h3 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(28px,5vw,48px)] mt-2")}>Elige tu <em>señal</em></h3>
+                      <h3 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(28px,5vw,48px)]")}>Elige tu <em>señal</em></h3>
                     </div>
                   </VideoHero>
                 </div>
@@ -98,8 +97,7 @@ export function HubChapter() {
                 <div className="w-full h-[520px] resize-y overflow-auto border border-solid border-line">
                   <ToolShell slug="pokemon">
                     <div className="p-6">
-                      <Kicker>Contenido</Kicker>
-                      <h3 className={cn(HEAD4, "text-[22px] mt-2")}>Página de herramienta</h3>
+                      <h3 className={cn(HEAD4, "text-[22px]")}>Página de herramienta</h3>
                       <p className="text-txt-muted mt-2 text-[14px]">El contenido de cada herramienta va aquí, con el carril a la izquierda.</p>
                     </div>
                   </ToolShell>
