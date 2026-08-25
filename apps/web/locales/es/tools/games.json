@@ -52,6 +52,7 @@
       },
       "tools": {
         "schematicCompat": "Compatibilidad de Schematics",
+        "seedFinder": "Buscador de Semillas",
         "schematicViewer": "Visor de Schematics"
       }
     }

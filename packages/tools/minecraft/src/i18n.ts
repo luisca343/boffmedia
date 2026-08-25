@@ -22,3 +22,4 @@ export function useToolT(namespace: string): Translate {
 /** Message-key namespaces owned by this package. */
 export const SCHEMATIC_COMPAT_NS = "tools.schematicCompat";
 export const SCHEMATIC_VIEWER_NS = "tools.schematicViewer";
+export const SEED_FINDER_NS = "tools.seedFinder";

@@ -145,6 +145,10 @@
         "title": "Schematic viewer",
         "description": "Open and explore Minecraft schematics in 3D."
       },
+      "seedFinder": {
+        "title": "Seed finder",
+        "description": "Evaluate a Minecraft seed's world generation in your browser, with your own datapacks."
+      },
       "schematicCompat": {
         "title": "Schematic compatibility",
         "description": "Check whether a Minecraft schematic works on another version."

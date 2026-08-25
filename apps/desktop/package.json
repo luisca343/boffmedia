@@ -5,16 +5,17 @@
   "scripts": {
     "dev": "node scripts/profile.mjs dev dev",
     "dev:prod": "node scripts/profile.mjs prod dev",
-    "dev:renderer": "vite",
+    "dev:renderer": "node scripts/sync-tool-assets.mjs && vite",
     "build": "node scripts/profile.mjs dev build",
     "build:prod": "node scripts/profile.mjs prod build",
-    "build:renderer": "vite build",
+    "build:renderer": "node scripts/sync-tool-assets.mjs && vite build",
     "build:portable": "node scripts/portable.mjs prod",
     "gen:installer-art": "node scripts/gen-installer-art.mjs",
     "preview": "vite preview",
     "tauri": "tauri",
     "type-check": "tsc --noEmit --skipLibCheck",
-    "lint": "eslint src --ext .ts,.tsx"
+    "lint": "eslint src --ext .ts,.tsx",
+    "sync:tool-assets": "node scripts/sync-tool-assets.mjs"
   },
   "dependencies": {
     "@boffmedia/pack-schema": "workspace:*",

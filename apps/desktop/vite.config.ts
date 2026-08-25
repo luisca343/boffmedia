@@ -35,6 +35,13 @@ export default defineConfig({
       // Tool packages ship TS source too ("Consumed as TS source").
       "@boffmedia/tool-kit": resolve(__dirname, "../../packages/tools/kit/src"),
       "@boffmedia/tools-minecraft": resolve(__dirname, "../../packages/tools/minecraft/src"),
+      // Source, not `dist`, because the published package is CJS-only — its
+      // `exports` map has `require` and `default` and no `import`, so Rollup
+      // reads `dist/cjs/index.js` and fails with `"ASSET" is not exported`.
+      // The package cannot simply gain an ESM build: apps/api consumes it as
+      // compiled CJS, the same constraint that keeps @boffmedia/pack-schema
+      // dual-built. Resolving it per-host here changes nothing for the API.
+      "@boffmedia/asset-paths": resolve(__dirname, "../../packages/asset-paths/src"),
     },
   },
   // The schematic tools spawn `new Worker(new URL(...), { type: "module" })`,

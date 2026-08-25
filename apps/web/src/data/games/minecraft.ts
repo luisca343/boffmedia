@@ -37,6 +37,26 @@ export const minecraft: GameEntry = {
           },
         },
         {
+          key: "seedFinder",
+          nameKey: "games.minecraft.tools.seedFinder",
+          href: "/minecraft/seeds",
+          sidebarIcon: "grid",
+          // `bleed` removes the shell's content padding. This tool declares
+          // `layout: "viewport"` and sizes itself to `100dvh - --nav-h`; with the
+          // shell's 30px top and 90px bottom padding on top of that, the page
+          // scrolled by exactly the padding and the map never fit the screen.
+          bleed: true,
+          landing: {
+            icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/schematic-icon.webp"),
+            fallbackIcon: "grid",
+            fallbackIconColor: "text-sky-400",
+            color: "from-sky-700 to-cyan-500",
+            features: ["biomeMap", "datapacks", "spawn"],
+            isNew: true,
+            popularity: "medium",
+          },
+        },
+        {
           key: "schematicViewer",
           nameKey: "games.minecraft.tools.schematicViewer",
           href: "/minecraft/schematic-viewer",

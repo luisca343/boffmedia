@@ -10,13 +10,14 @@
 // registry-driven hosts (the launcher Tools hub) go through `minecraftTools`.
 export { SchematicCompatTool } from "./schematic-compat/SchematicCompatTool";
 export { SchematicViewerTool } from "./schematic-viewer/SchematicViewerTool";
+export { SeedFinderTool } from "./seeds/SeedFinderTool";
 
 // Registry manifests (D6).
-export { minecraftTools, schematicCompatTool, schematicViewerTool } from "./tools";
+export { minecraftTools, schematicCompatTool, schematicViewerTool, seedFinderTool } from "./tools";
 
 // Message-key namespaces + the bound-translator shim, for hosts that merge the
 // package catalogs or render tool titles themselves.
-export { SCHEMATIC_COMPAT_NS, SCHEMATIC_VIEWER_NS, useToolT } from "./i18n";
+export { SCHEMATIC_COMPAT_NS, SCHEMATIC_VIEWER_NS, SEED_FINDER_NS, useToolT } from "./i18n";
 
 // The shared schematic UI kit. Exported because the web styleguide renders it
 // directly, and because a future minecraft tool will build on it.

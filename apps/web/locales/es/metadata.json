@@ -145,6 +145,10 @@
         "title": "Visor de esquemas",
         "description": "Abre y explora esquemas de Minecraft en 3D."
       },
+      "seedFinder": {
+        "title": "Buscador de semillas",
+        "description": "Evalúa la generación de mundo de una semilla de Minecraft en tu navegador, con tus datapacks."
+      },
       "schematicCompat": {
         "title": "Compatibilidad de esquemas",
         "description": "Comprueba si un esquema de Minecraft es compatible con otra versión."
