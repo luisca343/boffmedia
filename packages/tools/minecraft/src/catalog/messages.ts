@@ -90,6 +90,7 @@ export const messages = {
         "search": {
           "searchingCapped": "{n} buscando, solo {effective} a la vez",
           "workerCount": "Hilos de búsqueda",
+          "attritionReport": "Desgaste por restricción",
           "searchingWith": "{n} buscando",
           "recommended": "recomendado {n}",
           "impactFaster": "{pct}% más rápido que lo recomendado",
@@ -145,7 +146,12 @@ export const messages = {
             "landConnectedTo": "Comprueba si se puede llegar a pie, sin barco.",
             "terrainFlatness": "Mide el desnivel medio, en bloques de subida por cada 16 recorridos.",
             "distanceToOpenOcean": "Mide la distancia hasta el océano más grande del área.",
-            "surfaceHeight": "Mide la altura del terreno justo en el sitio."
+            "surfaceHeight": "Mide la altura del terreno justo en el sitio.",
+            "separation": "Mide la distancia al asentamiento ya colocado más cercano.",
+            "distanceTo": "Mide la distancia hasta otro lugar ya resuelto.",
+            "reachability": "Mide el rodeo del camino a pie hasta otro lugar, respecto a la línea recta.",
+            "waterAccess": "Mide la distancia hasta el agua más cercana: río, lago o costa.",
+            "corridorLateral": "Mide cuánto se aparta el sitio del eje de la ruta."
           },
           "step": {
             "where": "Dónde buscar",
@@ -163,7 +169,11 @@ export const messages = {
           },
           "settings": {
             "title": "Ajustes de la configuración",
-            "open": "Ajustes"
+            "open": "Ajustes",
+            "engineConstants": "Constantes del motor",
+            "xRange": "Banda lateral por defecto",
+            "directionBiasCone": "Cono de sesgo direccional",
+            "radiusDefault": "Radio por defecto"
           },
           "title": "Qué buscas",
           "lead": "Describe el mundo que quieres. Cada condición se comprueba contra la semilla del mapa y te dice el número que la cumple o la incumple.",
@@ -173,7 +183,7 @@ export const messages = {
           "preset": {
             "oceanSpawn": "Spawn junto al océano",
             "islandAndCities": "Isla de spawn + dos ciudades costeras",
-            "teras": "Teras — un pueblo por bioma"
+            "teras": "Teras — un pueblo por tipo"
           },
           "verdict": {
             "pass": "Cumple",
@@ -230,7 +240,13 @@ export const messages = {
             "anyDirection": "Cualquier dirección",
             "location": "Otro lugar",
             "pickLocation": "Elegir lugar…",
-            "fine": "Medición fina"
+            "fine": "Medición fina",
+            "acceptable": "Distancia aceptable",
+            "idealDetour": "Rodeo ideal",
+            "maxDetour": "Rodeo máximo",
+            "axis": "Eje",
+            "innerBand": "Banda interior",
+            "outerBand": "Banda exterior"
           },
           "constraint": {
             "landAt": "Tierra firme cerca",
@@ -244,6 +260,11 @@ export const messages = {
             "terrainFlatness": "Llanura del terreno",
             "distanceToOpenOcean": "Distancia a mar abierto",
             "surfaceHeight": "Altura del terreno",
+            "separation": "Separación entre asentamientos",
+            "distanceTo": "Distancia a otro lugar",
+            "reachability": "Accesible a pie desde",
+            "waterAccess": "Acceso al agua",
+            "corridorLateral": "Cerca del eje de la ruta",
             "unknown": "Esta condición no existe en el editor y se descartará al exportar."
           },
           "direction": {
@@ -708,6 +729,7 @@ export const messages = {
         "search": {
           "searchingCapped": "{n} searching, only {effective} at a time",
           "workerCount": "Search threads",
+          "attritionReport": "Constraint attrition",
           "searchingWith": "{n} searching",
           "recommended": "recommended {n}",
           "impactFaster": "{pct}% faster than recommended",
@@ -763,7 +785,12 @@ export const messages = {
             "landConnectedTo": "Checks whether you can walk there without a boat.",
             "terrainFlatness": "Measures average relief, in blocks of rise per 16 blocks travelled.",
             "distanceToOpenOcean": "Measures the distance to the largest ocean in the area.",
-            "surfaceHeight": "Measures the ground height at the site itself."
+            "surfaceHeight": "Measures the ground height at the site itself.",
+            "separation": "Measures the distance to the nearest settlement already placed.",
+            "distanceTo": "Measures the distance to another resolved location.",
+            "reachability": "Measures how far the walking route to another location detours from the straight line.",
+            "waterAccess": "Measures the distance to the nearest water: river, lake or coast.",
+            "corridorLateral": "Measures how far the site strays from the route's axis."
           },
           "step": {
             "where": "Where to look",
@@ -781,7 +808,11 @@ export const messages = {
           },
           "settings": {
             "title": "Spec settings",
-            "open": "Settings"
+            "open": "Settings",
+            "engineConstants": "Engine constants",
+            "xRange": "Default lateral band",
+            "directionBiasCone": "Direction bias cone",
+            "radiusDefault": "Default radius"
           },
           "title": "What you want",
           "lead": "Describe the world you want. Every condition is checked against the seed on the map, and reports the number behind its verdict.",
@@ -791,7 +822,7 @@ export const messages = {
           "preset": {
             "oceanSpawn": "Ocean spawn",
             "islandAndCities": "Island spawn + two coastal cities",
-            "teras": "Teras — one town per biome"
+            "teras": "Teras — one town per type"
           },
           "verdict": {
             "pass": "Pass",
@@ -848,7 +879,13 @@ export const messages = {
             "anyDirection": "Any direction",
             "location": "Other location",
             "pickLocation": "Pick a location…",
-            "fine": "Fine measurement"
+            "fine": "Fine measurement",
+            "acceptable": "Acceptable distance",
+            "idealDetour": "Ideal detour",
+            "maxDetour": "Maximum detour",
+            "axis": "Axis",
+            "innerBand": "Inner band",
+            "outerBand": "Outer band"
           },
           "constraint": {
             "landAt": "Dry land nearby",
@@ -862,6 +899,11 @@ export const messages = {
             "terrainFlatness": "Terrain flatness",
             "distanceToOpenOcean": "Distance to open ocean",
             "surfaceHeight": "Surface height",
+            "separation": "Settlement separation",
+            "distanceTo": "Distance to another location",
+            "reachability": "Walkable from",
+            "waterAccess": "Water access",
+            "corridorLateral": "Near the route axis",
             "unknown": "This condition does not exist in the editor and will be dropped on export."
           },
           "direction": {

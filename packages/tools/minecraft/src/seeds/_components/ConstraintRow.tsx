@@ -25,7 +25,7 @@
 import { Button, Icon, Input, Select } from "@boffmedia/ui";
 
 import type { Translate } from "@boffmedia/ui/i18n";
-import { CONSTRAINT_BY_TYPE, DIRECTIONS, type FieldSpec } from "../_spec/vocabulary";
+import { CONSTRAINT_BY_TYPE, DIRECTIONS, type FieldSpec, type BandSpec } from "../_spec/vocabulary";
 import type { UiConstraint } from "../_spec/model";
 import type { ConstraintResult } from "../_lib/worker/seeds-api";
 
@@ -85,7 +85,7 @@ export function ConstraintRow({
 }: ConstraintRowProps) {
   const spec = CONSTRAINT_BY_TYPE.get(constraint.type);
 
-  const setValue = (key: string, value: number | string | boolean | string[]) => {
+  const setValue = (key: string, value: number | string | boolean | string[] | BandSpec) => {
     onChange({ ...constraint, values: { ...constraint.values, [key]: value } });
   };
 
@@ -185,6 +185,115 @@ export function ConstraintRow({
     }
 
     const unitKey = unitKeyFor(f.kind);
+
+    // Band field rendering (soft-band support for min/ideal/ideal_max/max)
+    if (f.band) {
+      const bandValue = (typeof raw === "object" && raw !== null ? raw : {}) as Partial<BandSpec>;
+      const maxVal = f.max ?? 20000;
+      const minWidth = Math.max(5, (bandValue.min ?? 0) / maxVal * 100);
+      const idealStart = bandValue.ideal ?? 0;
+      const idealEnd = bandValue.ideal_max ?? idealStart;
+      const idealWidth = Math.max(5, (idealEnd - idealStart) / maxVal * 100);
+      const maxStart = bandValue.max ?? maxVal;
+      const maxWidth = Math.max(5, (maxVal - maxStart) / maxVal * 100);
+
+      return (
+        <div key={f.key} className="col-span-2 grid gap-2">
+          <span className="font-mono text-[10px] uppercase tracking-wide text-txt-dim">{label}</span>
+
+          {/* Band visualization */}
+          <div className="flex h-6 gap-1 rounded border border-line-2 bg-panel p-1">
+            <div className="flex-1 flex gap-0.5">
+              {/* Hard fail zone (below min) */}
+              {bandValue.min !== undefined && (
+                <div className="h-full bg-danger/20 rounded-sm" style={{ flex: `0 0 ${minWidth}%` }} />
+              )}
+              {/* Soft band zone */}
+              {bandValue.ideal !== undefined && (
+                <div className="h-full bg-warning/20 rounded-sm" style={{ flex: `0 0 ${idealWidth}%` }} />
+              )}
+              {/* Hard fail zone (above max) */}
+              {bandValue.max !== undefined && bandValue.ideal_max !== undefined && (
+                <div className="h-full bg-danger/20 rounded-sm" style={{ flex: `0 0 ${maxWidth}%` }} />
+              )}
+              <div className="flex-1" />
+            </div>
+          </div>
+
+          {/* Sliders for band fields - order: min, ideal, ideal_max, max */}
+          <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
+            {/* min slider */}
+            <div className="grid gap-1">
+              <span className="text-[10px] text-txt-dim">min</span>
+              <Input
+                type="number"
+                value={bandValue.min ?? ""}
+                min={f.min}
+                max={f.max}
+                step={f.step}
+                onChange={(e) => {
+                  const n = e.target.value === "" ? undefined : Number(e.target.value);
+                  setValue(f.key, { ...bandValue, min: n });
+                }}
+                className="!py-1 !text-[11px]"
+              />
+            </div>
+
+            {/* ideal slider */}
+            <div className="grid gap-1">
+              <span className="text-[10px] text-txt-dim">ideal</span>
+              <Input
+                type="number"
+                value={bandValue.ideal ?? ""}
+                min={f.min}
+                max={f.max}
+                step={f.step}
+                onChange={(e) => {
+                  const n = e.target.value === "" ? undefined : Number(e.target.value);
+                  setValue(f.key, { ...bandValue, ideal: n });
+                }}
+                className="!py-1 !text-[11px]"
+              />
+            </div>
+
+            {/* ideal_max slider */}
+            <div className="grid gap-1">
+              <span className="text-[10px] text-txt-dim">ideal_max</span>
+              <Input
+                type="number"
+                value={bandValue.ideal_max ?? ""}
+                min={f.min}
+                max={f.max}
+                step={f.step}
+                onChange={(e) => {
+                  const n = e.target.value === "" ? undefined : Number(e.target.value);
+                  setValue(f.key, { ...bandValue, ideal_max: n });
+                }}
+                className="!py-1 !text-[11px]"
+              />
+            </div>
+
+            {/* max slider */}
+            <div className="grid gap-1">
+              <span className="text-[10px] text-txt-dim">max</span>
+              <Input
+                type="number"
+                value={bandValue.max ?? ""}
+                min={f.min}
+                max={f.max}
+                step={f.step}
+                onChange={(e) => {
+                  const n = e.target.value === "" ? undefined : Number(e.target.value);
+                  setValue(f.key, { ...bandValue, max: n });
+                }}
+                className="!py-1 !text-[11px]"
+              />
+            </div>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div key={f.key} className="grid gap-1.5">
         <span className="font-mono text-[10px] uppercase tracking-wide text-txt-dim">{label}</span>

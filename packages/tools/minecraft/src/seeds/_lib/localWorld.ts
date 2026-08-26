@@ -45,6 +45,67 @@ export interface LocalSample {
  */
 const CACHE_LIMIT = 4096;
 
+/* ------------------------------------------------- localStorage spec storage -- */
+
+/**
+ * specStorage — persist UiSpec to localStorage with CRUD operations.
+ *
+ * All operations check typeof window before accessing localStorage, so they
+ * gracefully handle SSR environments. Client-only checks (e.g., in useEffect
+ * or event handlers) prevent reading during render.
+ */
+export namespace specStorage {
+  const PREFIX = "seedFinder:specs:";
+
+  /**
+   * Save a spec to localStorage under a user-chosen name.
+   */
+  export function saveSpec(name: string, spec: unknown): void {
+    if (typeof window === "undefined") return;
+    const key = PREFIX + name;
+    localStorage.setItem(key, JSON.stringify(spec));
+  }
+
+  /**
+   * Load a spec from localStorage, or null if not found.
+   */
+  export function loadSpec(name: string): unknown | null {
+    if (typeof window === "undefined") return null;
+    const key = PREFIX + name;
+    const json = localStorage.getItem(key);
+    if (!json) return null;
+    try {
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * List all saved spec names, in the order localStorage provides them.
+   */
+  export function listSpecs(): string[] {
+    if (typeof window === "undefined") return [];
+    const names: string[] = [];
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(PREFIX)) {
+        names.push(key.slice(PREFIX.length));
+      }
+    }
+    return names;
+  }
+
+  /**
+   * Delete a spec from localStorage.
+   */
+  export function deleteSpec(name: string): void {
+    if (typeof window === "undefined") return;
+    const key = PREFIX + name;
+    localStorage.removeItem(key);
+  }
+}
+
 export class LocalWorld {
   private evaluator: EvaluatorType | null = null;
   private world: SeededWorld | null = null;

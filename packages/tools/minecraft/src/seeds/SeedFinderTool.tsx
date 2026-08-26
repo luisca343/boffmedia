@@ -42,6 +42,7 @@ import { blocksPerPixel, gridSpacingFor, type Quality } from "./_lib/mapMath";
 import { readViewState, teleportCommand, writeViewState, type ViewState } from "./_lib/urlState";
 import type { LoadStackResult, TileMode, WorkerPackRef } from "./_lib/worker/seeds-api";
 import { searchPoolTarget } from "./_lib/pool";
+import { hasPrefilter } from "./_lib/search";
 import { useSeedsEngine } from "./_hooks/useSeedsEngine";
 import { SeedMap, type HoverInfo } from "./_components/SeedMap";
 import { MapHud } from "./_components/MapHud";
@@ -364,6 +365,24 @@ export function SeedFinderTool() {
 
   const search = useSeedSearch(engine?.pool ?? null, coreSpec);
 
+  /**
+   * What one seed costs for the spec on screen, kept from the last COLD
+   * evaluation the editor ran. A warm one re-scores a cached grid and would
+   * flatter the estimate by an order of magnitude, so only cold ones count.
+   *
+   * A ref feeds the state so a warm evaluation leaves the last real figure
+   * standing instead of blanking the estimate every time a threshold is typed.
+   */
+  const [perSeedMs, setPerSeedMs] = useState<number | null>(null);
+  useEffect(() => {
+    const r = evaluation.result;
+    if (r?.cold && typeof r.costMs === "number" && r.costMs > 0) setPerSeedMs(r.costMs);
+  }, [evaluation.result]);
+
+  // A spec with no prefilter evaluates every seed in full, so the survivor rate
+  // the meter measures does not apply to it.
+  const prefiltered = useMemo(() => hasPrefilter(coreSpec), [coreSpec]);
+
   /** Sites for the map: every location that resolved, pass or fail. */
   const sites = useMemo(() => {
     if (!evaluation.result) return undefined;
@@ -433,6 +452,8 @@ export function SeedFinderTool() {
               hits={search.hits}
               dropped={search.dropped}
               survivorRate={survivorRate}
+              prefiltered={prefiltered}
+              perSeedMs={perSeedMs}
               count={searchCount}
               onCountChange={setSearchCount}
               workerTarget={workerTarget}
@@ -443,6 +464,7 @@ export function SeedFinderTool() {
                 search.start(searchCount, {
                   survivorRate: survivorRate ?? undefined,
                   workerTarget,
+                  perSeedMs,
                 })
               }
               onStop={search.stop}

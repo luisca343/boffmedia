@@ -17,12 +17,17 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { SeedsPool } from "../_lib/pool";
 import type { SpecEvalResult } from "../_lib/worker/seeds-api";
 import { IDLE_PROGRESS, SeedSearch, type SearchProgress } from "../_lib/search";
+import { specStorage } from "../_lib/localWorld";
+import type { UiSpec } from "../_spec/model";
 
 export interface SeedSearchState {
   progress: SearchProgress;
   hits: SpecEvalResult[];
   dropped: number;
-  start: (total: number, opts?: { survivorRate?: number; workerTarget?: number }) => void;
+  start: (
+    total: number,
+    opts?: { survivorRate?: number; workerTarget?: number; perSeedMs?: number | null },
+  ) => void;
   stop: () => void;
   clear: () => void;
 }
@@ -48,7 +53,10 @@ export function useSeedSearch(pool: SeedsPool | null, coreSpec: unknown): SeedSe
     [],
   );
 
-  const start = useCallback((total: number, opts?: { survivorRate?: number; workerTarget?: number }) => {
+  const start = useCallback((
+    total: number,
+    opts?: { survivorRate?: number; workerTarget?: number; perSeedMs?: number | null },
+  ) => {
     const p = poolRef.current;
     if (!p) return;
 
@@ -63,6 +71,7 @@ export function useSeedSearch(pool: SeedsPool | null, coreSpec: unknown): SeedSe
       spec: JSON.parse(JSON.stringify(specRef.current)) as unknown,
       total,
       survivorRate: opts?.survivorRate,
+      perSeedMs: opts?.perSeedMs ?? null,
       workerTarget: opts?.workerTarget,
       onProgress: setProgress,
       onHits: setHits,
@@ -83,4 +92,34 @@ export function useSeedSearch(pool: SeedsPool | null, coreSpec: unknown): SeedSe
   }, []);
 
   return { progress, hits, dropped: progress.dropped, start, stop, clear };
+}
+
+/**
+ * useNamedSpecs — manage spec persistence using localStorage.
+ *
+ * Returns CRUD operations for saving/loading/listing specs. All operations are
+ * safe in SSR: they check typeof window and do nothing if localStorage is unavailable.
+ */
+export function useNamedSpecs() {
+  const save = useCallback((name: string, spec: UiSpec) => {
+    specStorage.saveSpec(name, spec);
+  }, []);
+
+  const load = useCallback((name: string): UiSpec | null => {
+    const data = specStorage.loadSpec(name);
+    if (data && typeof data === "object" && "origin" in data && "scan" in data && "locations" in data) {
+      return data as UiSpec;
+    }
+    return null;
+  }, []);
+
+  const list = useCallback(() => {
+    return specStorage.listSpecs();
+  }, []);
+
+  const remove = useCallback((name: string) => {
+    specStorage.deleteSpec(name);
+  }, []);
+
+  return { save, load, list, remove };
 }

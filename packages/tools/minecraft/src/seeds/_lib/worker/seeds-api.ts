@@ -130,6 +130,19 @@ export interface SpecEvalResult {
     largestWaterArea: number;
     largestLandArea: number;
   };
+  /** Per-constraint attrition: count and percentage of failures across evaluated seeds. */
+  readonly attrition?: Readonly<Record<string, { count: number; percentage: number }>>;
+  /**
+   * Wall-clock cost of this evaluation, set by `evaluateSpec` only.
+   *
+   * `cold` says whether the session had to build the world and grid first. A
+   * cold evaluation does exactly what a search worker does for one seed, so its
+   * cost is the only honest per-seed figure for THIS spec on THIS machine — a
+   * warm one re-runs constraints over a cached grid and is an order of
+   * magnitude cheaper, which is why the two are told apart rather than averaged.
+   */
+  readonly costMs?: number;
+  readonly cold?: boolean;
 }
 
 /**

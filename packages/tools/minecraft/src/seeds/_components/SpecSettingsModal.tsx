@@ -34,6 +34,7 @@ import {
   unsupportedFields,
   type UiSpec,
   type WaterModeName,
+  type EngineConstants,
 } from "../_spec/model";
 import type { PrefilterSample } from "../_lib/worker/seeds-api";
 
@@ -66,6 +67,12 @@ export function SpecSettingsModal({
 
   const patchScan = (part: Partial<UiSpec["scan"]>) =>
     onChange({ ...spec, scan: { ...spec.scan, ...part } });
+
+  const patchEngineConstants = (part: Partial<EngineConstants>) =>
+    onChange({
+      ...spec,
+      engineConstants: { ...spec.engineConstants, ...part },
+    });
 
   const runTest = useCallback(async () => {
     setTesting(true);
@@ -207,6 +214,52 @@ export function SpecSettingsModal({
               onChange={(v) => patchScan({ water: v as WaterModeName })}
               options={WATER_MODES.map((m) => ({ value: m, label: t(`spec.water.${m}`) }))}
             />
+          </div>
+        </section>
+
+        {/* ------------------------------------------ engine constants */}
+        <section className="grid gap-3 border-t border-line pt-5">
+          <div>
+            <h4 className="font-display text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-txt">
+              {t("spec.settings.engineConstants")}
+            </h4>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <Field label={t("spec.settings.xRange")} hint="±0 to ±5000">
+              <Input
+                type="number"
+                min={0}
+                max={5000}
+                value={String(spec.engineConstants?.x_range?.[0] ?? 2000)}
+                onChange={(e) => {
+                  const val = Number(e.target.value) || 2000;
+                  patchEngineConstants({ x_range: [val, val] });
+                }}
+              />
+            </Field>
+            <Field label={t("spec.settings.directionBiasCone")} hint="0 to 180°">
+              <Input
+                type="number"
+                min={0}
+                max={180}
+                value={String(spec.engineConstants?.direction_bias_cone ?? 70)}
+                onChange={(e) =>
+                  patchEngineConstants({ direction_bias_cone: Number(e.target.value) || 70 })
+                }
+              />
+            </Field>
+            <Field label={t("spec.settings.radiusDefault")} hint="6000 to 25000">
+              <Input
+                type="number"
+                min={6000}
+                max={25000}
+                value={String(spec.engineConstants?.radius_default ?? 12096)}
+                onChange={(e) =>
+                  patchEngineConstants({ radius_default: Number(e.target.value) || 12096 })
+                }
+              />
+            </Field>
           </div>
         </section>
 

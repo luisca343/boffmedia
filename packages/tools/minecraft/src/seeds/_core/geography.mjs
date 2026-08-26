@@ -140,6 +140,18 @@ export class Geography {
     }
     return out;
   }
+
+  /**
+   * Identify small non-ocean water bodies (lakes). Ocean is the largest water
+   * component; lakes are water components with area <= maxArea (in blocks).
+   * @returns {Array<component>} water components with kind='lake', sorted by size descending
+   */
+  detectLakes(maxArea = 100000) {
+    const allWater = this.waterBodies();
+    if (allWater.length === 0) return [];
+    const ocean = allWater[0];
+    return allWater.slice(1).filter(c => c.areaBlocks <= maxArea).sort((a, b) => b.cells - a.cells);
+  }
 }
 
 /* ------------------------------------------------------------------------ */
@@ -275,4 +287,113 @@ export function nearestBiome(grid, x, z, matchIdx, maxRadius = Infinity) {
     if (best) return best;
   }
   return null;
+}
+
+/**
+ * Octile walking-distance field over land, flooded from one source cell.
+ *
+ * 4-neighbour BFS measured Manhattan paths, which put a direction bias of up
+ * to √2 on the detour factor — a perfectly clean diagonal route read 1.414×
+ * while the same route due north read 1.000×. Octile movement (cardinal cost
+ * 5, diagonal cost 7 ≈ 5·√2) makes the measure direction-neutral to within
+ * ~1%.
+ *
+ * Diagonal steps are allowed only when BOTH orthogonal neighbours are land, so
+ * the metric cannot squeeze through a corner two 4-connected components merely
+ * touch at — reachability stays exactly the component relation Geography uses.
+ *
+ * One flood serves every query against the same target: computing this once
+ * per capital and reading one cell per candidate replaced ~2,400 full BFS runs
+ * per seed.
+ *
+ * @param {LandMask} mask
+ * @param {Geography} geo
+ * @param {number} x @param {number} z source world coordinate (must be land)
+ * @returns {{dist: Int32Array, scale: number}} scaled cell costs, -1 = unreachable
+ */
+export function distanceField(mask, geo, x, z) {
+  const { nx, nz, water } = mask;
+  const n = nx * nz;
+  const dist = new Int32Array(n).fill(-1);
+  const field = { dist, scale: 5 };
+
+  const [sx, sz] = worldToCell(mask, x, z);
+  if (!inBounds(mask, sx, sz)) return field;
+  const start = sz * nx + sx;
+  if (water[start] === 1) return field;
+
+  // Dial's algorithm: edge costs are only 5 or 7, so a ring of 8 buckets
+  // (max edge + 1) holds every frontier cost that can be pending at once.
+  const RING = 8;
+  const buckets = Array.from({ length: RING }, () => []);
+  dist[start] = 0;
+  buckets[0].push(start);
+  let pending = 1;
+
+  for (let cost = 0; pending > 0; cost++) {
+    const bucket = buckets[cost % RING];
+    for (let b = 0; b < bucket.length; b++) {
+      const cur = bucket[b];
+      pending--;
+      if (dist[cur] !== cost) continue; // stale entry, already settled cheaper
+      const jx = cur % nx, jz = (cur - jx) / nx;
+      for (let dz = -1; dz <= 1; dz++) {
+        for (let dx = -1; dx <= 1; dx++) {
+          if (dx === 0 && dz === 0) continue;
+          const ax = jx + dx, az = jz + dz;
+          if (ax < 0 || az < 0 || ax >= nx || az >= nz) continue;
+          const ai = az * nx + ax;
+          if (water[ai] === 1) continue;
+          const diagonal = dx !== 0 && dz !== 0;
+          if (diagonal) {
+            // no corner-cutting: both orthogonal cells must be walkable
+            if (water[jz * nx + ax] === 1 || water[az * nx + jx] === 1) continue;
+          }
+          const next = cost + (diagonal ? 7 : 5);
+          if (dist[ai] !== -1 && dist[ai] <= next) continue;
+          dist[ai] = next;
+          buckets[next % RING].push(ai);
+          pending++;
+        }
+      }
+    }
+    bucket.length = 0;
+  }
+  return field;
+}
+
+/** Blocks of walking from a field's source to (x,z), or Infinity. */
+export function fieldDistanceTo(mask, field, x, z) {
+  const [jx, jz] = worldToCell(mask, x, z);
+  if (!inBounds(mask, jx, jz)) return Infinity;
+  const d = field.dist[jz * mask.nx + jx];
+  return d < 0 ? Infinity : (d / field.scale) * mask.step;
+}
+
+/**
+ * Octile walking distance with detour factor from (x1,z1) to (x2,z2) over
+ * land. Returns {pathLength, detourFactor}; null if unreachable, off-mask, or
+ * either endpoint is not on land. detourFactor = pathLength / straight line.
+ *
+ * Pure measurement only — scoring happens in constraint evaluators. Callers
+ * with many queries against one target should build `distanceField` once and
+ * read `fieldDistanceTo` instead.
+ */
+export function walkingDistance(mask, geo, x1, z1, x2, z2) {
+  const [jx1, jz1] = worldToCell(mask, x1, z1);
+  const [jx2, jz2] = worldToCell(mask, x2, z2);
+  if (!inBounds(mask, jx1, jz1) || !inBounds(mask, jx2, jz2)) return null;
+
+  const id1 = geo.bodyAt(x1, z1);
+  const id2 = geo.bodyAt(x2, z2);
+  if (id1 === null || id2 === null) return null;
+  const comp1 = geo.components[id1];
+  if (!comp1 || comp1.kind !== 'land' || id1 !== id2) return null;
+
+  const field = distanceField(mask, geo, x2, z2);
+  const pathLength = fieldDistanceTo(mask, field, x1, z1);
+  if (!Number.isFinite(pathLength)) return null;
+  const straight = Math.hypot(x2 - x1, z2 - z1);
+  const detourFactor = straight > 0 ? pathLength / straight : 1;
+  return { pathLength, detourFactor };
 }

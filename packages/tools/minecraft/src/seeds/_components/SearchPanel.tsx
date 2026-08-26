@@ -27,6 +27,7 @@ import type { Translate } from "@boffmedia/ui/i18n";
 import { DEFAULT_WORKER_COUNT, searchPoolTarget } from "../_lib/pool";
 import type { SpecEvalResult } from "../_lib/worker/seeds-api";
 import { estimateMs, MAX_HITS, type SearchProgress } from "../_lib/search";
+import { AttritionReport } from "./AttritionReport";
 import { HitRow } from "./HitRow";
 import { WorkerControl } from "./WorkerControl";
 
@@ -39,6 +40,13 @@ export interface SearchPanelProps {
   dropped: number;
   /** Fraction the prefilter lets through, if it has been measured. */
   survivorRate: number | null;
+  /**
+   * Whether the spec declares a prefilter at all. Without one every seed pays
+   * for a full evaluation and `survivorRate` does not apply.
+   */
+  prefiltered: boolean;
+  /** Cost of one cold evaluation of this spec, timed by the editor. */
+  perSeedMs: number | null;
   count: number;
   onCountChange: (n: number) => void;
   /** Pool size to grow to during a search. 0 until read on mount. */
@@ -70,6 +78,8 @@ export function SearchPanel({
   hits,
   dropped,
   survivorRate,
+  prefiltered,
+  perSeedMs,
   count,
   onCountChange,
   workerTarget,
@@ -115,7 +125,9 @@ export function SearchPanel({
 
   // Before a search: the published baseline against the pool the user has
   // chosen. During: whatever the run itself is doing.
-  const estimate = running ? etaMs : estimateMs(count, chosen, survivorRate ?? undefined, cores);
+  const estimate = running
+    ? etaMs
+    : estimateMs(count, chosen, survivorRate ?? undefined, cores, { prefiltered, perSeedMs });
 
   // Both estimates are quoted for a POOL size, worker 0 included: this one for
   // the pool asked for, the running one for `workers + 1`, the pool actually
@@ -127,7 +139,10 @@ export function SearchPanel({
 
   // What the recommended pool would cost, so the slider can say what moving it
   // is worth rather than only what it is set to.
-  const baseline = estimateMs(count, poolTarget, survivorRate ?? undefined, cores);
+  const baseline = estimateMs(count, poolTarget, survivorRate ?? undefined, cores, {
+    prefiltered,
+    perSeedMs,
+  });
 
   return (
     <>
@@ -252,6 +267,12 @@ export function SearchPanel({
             {running ? t("search.searching") : t("search.noResults")}
           </p>
         )}
+
+        {progress.attrition ? (
+          <div className="mt-3">
+            <AttritionReport data={progress.attrition} t={t} />
+          </div>
+        ) : null}
       </Panel>
     </>
   );

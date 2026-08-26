@@ -27,6 +27,14 @@ export declare function evaluateSeed(
   spec: Record<string, unknown>,
   seed: bigint | number | string,
   reuse?: { world?: SeededWorld; grid?: unknown; geo?: unknown; fineGrids?: Map<string, unknown> },
+  opts?: {
+    /**
+     * Skip the remaining locations once a hard one has failed. The search
+     * path's shortcut — a failed seed is never a hit; the editor keeps the
+     * full per-location picture by leaving this off.
+     */
+    stopOnHardFail?: boolean;
+  },
 ): unknown;
 
 /**

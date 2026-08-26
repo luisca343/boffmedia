@@ -67,6 +67,12 @@ export interface SearchProgress {
   readonly etaMs: number | null;
   readonly workers: number;
   readonly error: string | null;
+  /**
+   * Per-constraint failure tallies summed over every evaluated seed, with each
+   * type's share of the total failures. What the attrition report renders:
+   * which constraint is doing the rejecting.
+   */
+  readonly attrition: Readonly<Record<string, { count: number; percentage: number }>> | null;
 }
 
 export const IDLE_PROGRESS: SearchProgress = {
@@ -80,6 +86,7 @@ export const IDLE_PROGRESS: SearchProgress = {
   etaMs: null,
   workers: 0,
   error: null,
+  attrition: null,
 };
 
 /**
@@ -101,9 +108,21 @@ export function effectiveWorkers(pool: number, cores: number): number {
 }
 
 /**
- * Estimate before a search starts, from the baselines and whatever the
- * prefilter meter last measured. `survivorRate` is the fraction the prefilter
- * lets through; 0.32 is the worked example's, used when nothing was measured.
+ * Estimate before a search starts.
+ *
+ * Two things decide whether this is honest, and both were wrong once:
+ *
+ * **Whether the spec HAS a prefilter.** Without one there is no cheap first
+ * pass and every seed pays for a full evaluation, so `survivorRate` is 1 and
+ * the prefilter term is zero. Teras carries no prefilter, and assuming the
+ * worked example's 0.32 there under-counted full evaluations threefold.
+ *
+ * **What one evaluation actually costs for THIS spec.** A single global
+ * constant cannot serve both a one-location spec and a 21-location one with a
+ * walking-distance BFS in it; the two differ by more than an order of
+ * magnitude. `perSeedMs`, when the editor has timed a cold evaluation, is that
+ * spec measured on this machine and beats any constant. `BASELINE` is only the
+ * fallback for before anything has been measured.
  *
  * `cores` matters: without it this divides by the worker count forever and
  * promises a speed-up the machine cannot deliver — the estimate kept falling as
@@ -115,20 +134,48 @@ export function estimateMs(
   workers: number,
   survivorRate = 0.32,
   cores = 0,
+  opts: { prefiltered?: boolean; perSeedMs?: number | null } = {},
 ): number {
   const searching = effectiveWorkers(workers, cores);
-  const prefilter = total / (BASELINE.prefilterPerWorker * searching);
-  const evaluation = (total * survivorRate) / (BASELINE.evalPerWorker * searching);
+  const prefiltered = opts.prefiltered ?? true;
+  const survivors = prefiltered ? survivorRate : 1;
+
+  if (opts.perSeedMs && opts.perSeedMs > 0) {
+    // A measured evaluation replaces the eval baseline; the prefilter pass, if
+    // there is one, is still the cheap constant — it is a different code path
+    // and the meter beside it measures that one directly.
+    const prefilter = prefiltered ? total / (BASELINE.prefilterPerWorker * searching) : 0;
+    return prefilter * 1000 + (total * survivors * opts.perSeedMs) / searching;
+  }
+
+  const prefilter = prefiltered ? total / (BASELINE.prefilterPerWorker * searching) : 0;
+  const evaluation = (total * survivors) / (BASELINE.evalPerWorker * searching);
   return (prefilter + evaluation) * 1000;
 }
+
+/**
+ * `getRandomValues` fills at most 65536 BYTES per call and throws
+ * QuotaExceededError past that, so a Java long being 8 bytes puts the ceiling
+ * at 8192 seeds in one go — every search larger than that must be filled in
+ * chunks.
+ */
+const SEEDS_PER_DRAW = 8192;
 
 /** A crypto-random Java long, as a decimal string. */
 function randomSeeds(n: number): string[] {
   const buf = new BigUint64Array(n);
-  crypto.getRandomValues(buf);
+  for (let i = 0; i < n; i += SEEDS_PER_DRAW) {
+    crypto.getRandomValues(buf.subarray(i, Math.min(i + SEEDS_PER_DRAW, n)));
+  }
   // Reinterpreted as signed: Minecraft seeds are Java longs, and drawing only
   // from the non-negative half would search half the worlds that exist.
   return Array.from(buf, (v) => BigInt.asIntN(64, v).toString());
+}
+
+/** Whether a core spec declares a prefilter — `scan.prefilter` with locations. */
+export function hasPrefilter(spec: unknown): boolean {
+  const scan = (spec as { scan?: { prefilter?: unknown } } | null)?.scan;
+  return Boolean(scan && scan.prefilter);
 }
 
 export interface SeedSearchOptions {
@@ -137,6 +184,8 @@ export interface SeedSearchOptions {
   spec: unknown;
   total: number;
   survivorRate?: number;
+  /** A cold evaluation of this spec, timed by the editor. See `estimateMs`. */
+  perSeedMs?: number | null;
   /** Total pool size to grow to. One of them stays reserved for the map. */
   workerTarget?: number;
   onProgress: (p: SearchProgress) => void;
@@ -159,6 +208,7 @@ export class SeedSearch {
   private seeds: string[] = [];
   private flushTimer: ReturnType<typeof setInterval> | null = null;
   private dirty = false;
+  private attritionCounts: Record<string, number> = {};
 
   constructor(private readonly opts: SeedSearchOptions) {}
 
@@ -170,14 +220,15 @@ export class SeedSearch {
     const { pool, spec, total } = this.opts;
 
     this.started = performance.now();
-    // Drawn up front rather than per worker: a fixed list is what makes
-    // "checked N of M" a promise instead of an estimate, and 50k Java longs is
-    // ~1 MB of strings — cheaper than the first seed's evaluation.
-    this.seeds = randomSeeds(total);
-    this.flushTimer = setInterval(() => this.flush(), FLUSH_MS);
-    this.emit();
 
     try {
+      // Drawn up front rather than per worker: a fixed list is what makes
+      // "checked N of M" a promise instead of an estimate, and 50k Java longs is
+      // ~1 MB of strings — cheaper than the first seed's evaluation.
+      this.seeds = randomSeeds(total);
+      this.flushTimer = setInterval(() => this.flush(), FLUSH_MS);
+      this.emit();
+
       const remotes = await pool.growForSearch(this.opts.workerTarget);
       if (this.stopped) return;
       this.workers = remotes.length;
@@ -197,6 +248,11 @@ export class SeedSearch {
               // Only passing seeds are hits: the spec IS the filter, and a
               // ranked list of seeds that failed it would rank nothing.
               if (check.result?.pass) this.insert(check.result);
+              if (check.result?.attrition) {
+                for (const [type, a] of Object.entries(check.result.attrition)) {
+                  this.attritionCounts[type] = (this.attritionCounts[type] ?? 0) + a.count;
+                }
+              }
               this.dirty = true;
             } catch (e) {
               // One worker dying should not take the search with it — the
@@ -208,6 +264,12 @@ export class SeedSearch {
           }
         }),
       );
+    } catch (e) {
+      // Anything that fails before the worker loops — drawing the seed list,
+      // growing the pool — is still a failed search and has to reach the
+      // panel. `run` is called as a floating promise, so a throw that is not
+      // recorded here is a search that silently never starts.
+      if (!this.stopped) this.error = e instanceof Error ? e.message : String(e);
     } finally {
       this.finish();
     }
@@ -274,7 +336,17 @@ export class SeedSearch {
       etaMs: this.eta(elapsedMs),
       workers: this.workers,
       error: this.error,
+      attrition: this.attritionSnapshot(),
     });
+  }
+
+  private attritionSnapshot(): SearchProgress["attrition"] {
+    const entries = Object.entries(this.attritionCounts);
+    if (!entries.length) return null;
+    const total = entries.reduce((s, [, n]) => s + n, 0) || 1;
+    const out: Record<string, { count: number; percentage: number }> = {};
+    for (const [type, count] of entries) out[type] = { count, percentage: (count / total) * 100 };
+    return out;
   }
 
   private eta(elapsedMs: number): number | null {
@@ -289,10 +361,14 @@ export class SeedSearch {
     if (!this.workers) return null;
     const survivors = this.checked ? this.evaluated / this.checked : (this.opts.survivorRate ?? 0.32);
     const cores = typeof navigator === "undefined" ? 0 : (navigator.hardwareConcurrency ?? 0);
+    const prefiltered = hasPrefilter(this.opts.spec);
     // `+ 1` because `estimateMs` is quoted for a POOL, worker 0 included, which
     // is what the panel passes before a search starts. The two only agree while
     // the pool granted matches the pool asked for; the panel is what says so
     // when they part company.
-    return estimateMs(remaining, this.workers + 1, survivors, cores);
+    return estimateMs(remaining, this.workers + 1, survivors, cores, {
+      prefiltered,
+      perSeedMs: this.opts.perSeedMs ?? null,
+    });
   }
 }

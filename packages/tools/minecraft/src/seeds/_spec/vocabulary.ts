@@ -29,6 +29,17 @@ export type ConstraintGroup = (typeof CONSTRAINT_GROUPS)[number];
 /** A biome selector is a biome id (`minecraft:plains`) or a tag (`#minecraft:is_ocean`). */
 export type FieldKind = "blocks" | "area" | "fraction" | "height" | "biomes" | "direction" | "location" | "flag";
 
+export interface BandSpec {
+  /** Soft-band lower threshold. Hard fail below min; score 1 at/beyond ideal. */
+  min?: number;
+  /** Soft-band lower ideal threshold. Linear interpolation between min and ideal. */
+  ideal?: number;
+  /** Soft-band upper ideal threshold. Linear interpolation between ideal_max and max. */
+  ideal_max?: number;
+  /** Soft-band upper threshold. Hard fail above max; score 1 at/below ideal_max. */
+  max?: number;
+}
+
 export interface FieldSpec {
   /** Key in the emitted constraint JSON. Matches `_core/constraints.mjs`. */
   readonly key: string;
@@ -40,6 +51,8 @@ export interface FieldSpec {
   readonly min?: number;
   readonly max?: number;
   readonly step?: number;
+  /** Optional soft-band configuration for numeric constraints (blocks, area, height, fraction). */
+  readonly band?: BandSpec;
 }
 
 export interface ConstraintSpec {
@@ -66,11 +79,11 @@ export interface ConstraintSpec {
   readonly fineable?: boolean;
 }
 
-const blocks = (key: string, label: string, def: number, max = 20000): FieldSpec =>
-  ({ key, kind: "blocks", label, def, min: 0, max, step: 50 });
+const blocks = (key: string, label: string, def: number, max = 20000, band?: BandSpec): FieldSpec =>
+  ({ key, kind: "blocks", label, def, min: 0, max, step: 50, band });
 
-const area = (key: string, label: string, def: number): FieldSpec =>
-  ({ key, kind: "area", label, def, min: 0, step: 10000 });
+const area = (key: string, label: string, def: number, band?: BandSpec): FieldSpec =>
+  ({ key, kind: "area", label, def, min: 0, step: 10000, band });
 
 export const CONSTRAINT_SPECS: readonly ConstraintSpec[] = [
   {
@@ -189,6 +202,65 @@ export const CONSTRAINT_SPECS: readonly ConstraintSpec[] = [
       { key: "maximum", kind: "height", label: "maximum", def: 200, min: -64, max: 320, step: 1 },
     ],
   },
+  // No `band` metadata on `minimum`: the engine reads these as plain numbers
+  // (the hard floor), and bands live on SCORE terms, which the engine reads
+  // via `c.band`. Band metadata here made the row render a band editor that
+  // hid the real value and stored an object the engine compared as NaN — the
+  // constraint then failed every candidate.
+  {
+    type: "separation",
+    group: "space",
+    valueKind: "blocks",
+    label: "separation",
+    prefilterSafe: false,
+    fields: [blocks("minimum", "minimum", 750, 20000)],
+  },
+  {
+    type: "distance_to",
+    group: "space",
+    valueKind: "blocks",
+    label: "distanceTo",
+    prefilterSafe: false,
+    fields: [
+      { key: "location", kind: "location", label: "location", required: true, def: "" },
+      blocks("minimum", "minimum", 750, 20000),
+    ],
+  },
+  {
+    type: "reachability",
+    group: "space",
+    valueKind: "count",
+    label: "reachability",
+    prefilterSafe: false,
+    fields: [
+      { key: "location", kind: "location", label: "location", required: true, def: "" },
+      { key: "ideal_detour", kind: "fraction", label: "idealDetour", def: 1.4, min: 1, max: 5, step: 0.1 },
+      { key: "max_detour", kind: "fraction", label: "maxDetour", def: 2.5, min: 1, max: 5, step: 0.1 },
+    ],
+  },
+  {
+    type: "water_access",
+    group: "water",
+    valueKind: "blocks",
+    label: "waterAccess",
+    prefilterSafe: false,
+    fineable: true,
+    // `acceptable` is the field the engine actually reads (the previous
+    // `ideal` field edited a key nothing consumed).
+    fields: [blocks("acceptable", "acceptable", 800, 5000)],
+  },
+  {
+    type: "corridor_lateral",
+    group: "space",
+    valueKind: "blocks",
+    label: "corridorLateral",
+    prefilterSafe: false,
+    fields: [
+      { key: "axis", kind: "direction", label: "axis", def: "north" },
+      blocks("inner_band", "innerBand", 1500, 10000),
+      blocks("outer_band", "outerBand", 5000, 20000),
+    ],
+  },
 ];
 
 export const CONSTRAINT_BY_TYPE: ReadonlyMap<string, ConstraintSpec> = new Map(
@@ -211,7 +283,13 @@ export const DIRECTIONS = [
 
 export type Direction = (typeof DIRECTIONS)[number];
 
-/** Scorers the core knows. A score term is only offerable if its constraint is present. */
+/**
+ * Scorers the core knows. A score term is only offerable if its constraint is present.
+ *
+ * These are DEPRECATED in favor of soft-band specifications on individual fields.
+ * Use bandFromReference() to convert a SCORER_REFERENCE value to an equivalent
+ * BandSpec for backward compatibility with existing specs.
+ */
 export const SCORER_REFERENCE: Readonly<Record<string, number>> = {
   terrain_flatness: 4,
   coastline: 4000,
@@ -225,3 +303,14 @@ export const SCORER_REFERENCE: Readonly<Record<string, number>> = {
   surface_height: 1,
   land_connected_to: 1,
 };
+
+/**
+ * Convert a SCORER_REFERENCE value to an equivalent soft-band spec.
+ * For backward compatibility: treats reference as the "ideal" point.
+ *
+ * @param reference The SCORER_REFERENCE value (ideal distance/height/count)
+ * @returns BandSpec with min=0, ideal=reference (achieves 1.0 score)
+ */
+export function bandFromReference(reference: number): BandSpec {
+  return { min: 0, ideal: reference };
+}

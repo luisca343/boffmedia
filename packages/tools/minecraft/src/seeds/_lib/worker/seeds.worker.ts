@@ -164,15 +164,24 @@ const api: SeedsWorkerApi = {
     // replaced rather than reused. Dropping the reference first matters: the old
     // grids are the largest thing in this isolate, and building the replacement
     // before releasing them would briefly hold two.
-    if (session?.key !== key) {
+    let active = session;
+    let cold = false;
+    if (!active || active.key !== key) {
+      cold = true;
       session = null;
-      session = { key, s: new Session(ev, spec as Record<string, unknown>, seed) };
+      active = { key, s: new Session(ev, spec as Record<string, unknown>, seed) };
+      session = active;
     }
 
     // `evaluate(spec)` re-runs the constraint vocabulary over the cached grid.
     // Passing the spec explicitly is what makes threshold edits cheap — the
     // session was constructed with an older copy and must not use it.
-    return session.s.evaluate(spec as Record<string, unknown>) as SpecEvalResult;
+    //
+    // Timed, because a cold pass does exactly what a search worker does for one
+    // seed and is the only per-seed cost this spec can be estimated from.
+    const t0 = performance.now();
+    const result = active.s.evaluate(spec as Record<string, unknown>) as SpecEvalResult;
+    return { ...result, costMs: performance.now() - t0, cold };
   },
 
   async prefilterBatch(spec, seeds) {
@@ -206,7 +215,11 @@ const api: SeedsWorkerApi = {
     // evaluation usually needs the untrimmed one — handing the coarse world
     // over would silently evaluate a different, wrong world. Rebuilding costs
     // ~13 ms against an evaluation of ~1.5 s.
-    const result = evaluateSeed(ev, s, BigInt(seed)) as SpecEvalResult;
+    //
+    // `stopOnHardFail`: a seed whose hard location already failed can never be
+    // a hit, so the remaining locations are skipped. Only here — the editor's
+    // `evaluateSpec` keeps the full per-location picture.
+    const result = evaluateSeed(ev, s, BigInt(seed), {}, { stopOnHardFail: true }) as SpecEvalResult;
     const hit: SeedCheck = { seed, prefiltered: true, result, ms: performance.now() - t0 };
     return hit;
   },

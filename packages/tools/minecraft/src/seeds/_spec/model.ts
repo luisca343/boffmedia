@@ -20,7 +20,7 @@
  * serialisation attaches it even though the browser resolves no paths at all.
  */
 
-import { CONSTRAINT_BY_TYPE, SCORER_REFERENCE } from "./vocabulary";
+import { CONSTRAINT_BY_TYPE, type BandSpec } from "./vocabulary";
 
 export type WaterModeName = "biome" | "preliminary" | "sea_level" | "auto" | "exact";
 
@@ -29,13 +29,20 @@ export interface UiConstraint {
   /** Stable across edits so React keys survive a type change. */
   readonly id: string;
   type: string;
-  values: Record<string, number | string | boolean | string[]>;
+  values: Record<string, number | string | boolean | string[] | BandSpec>;
 }
 
 export interface UiScoreTerm {
   type: string;
   weight: number;
   reference?: number;
+  /**
+   * Every other field the core scorer reads — bands, `acceptable`,
+   * `inner_band`/`outer_band`, `ideal_detour`… The editor offers no widgets
+   * for these yet, so they ride through serialisation untouched. Dropping
+   * them was the bug that silently un-banded the Teras score terms.
+   */
+  extra?: Record<string, unknown>;
 }
 
 export interface UiLocation {
@@ -44,6 +51,8 @@ export interface UiLocation {
   hard: boolean;
   /** Only meaningful when `hard` is false. */
   weight: number;
+  /** Theme influences suitability defaults: "normal" | "mountain" | "mesa" | "harbor". */
+  theme?: string;
   mode: "at" | "discover";
   at: { x: number; z: number; tolerance: number };
   discover: {
@@ -70,12 +79,27 @@ export interface UiScan {
     step: number;
     water: WaterModeName;
   };
+  /**
+   * Placement-engine flags (`resolution_order`, `fine_top_k`, `score_gating`,
+   * `candidate_source`), carried verbatim. The editor has no widgets for
+   * them; a preset that opts into the v2 placement engine must still run the
+   * v2 placement engine after a round-trip through this model — losing these
+   * silently reverted the Teras search to the legacy engine.
+   */
+  engine: Record<string, unknown>;
+}
+
+export interface EngineConstants {
+  x_range?: [number, number];
+  direction_bias_cone?: number;
+  radius_default?: number;
 }
 
 export interface UiSpec {
   origin: { x: number; z: number };
   scan: UiScan;
   locations: UiLocation[];
+  engineConstants?: EngineConstants;
 }
 
 /* ------------------------------------------------------------------ ids -- */
@@ -109,6 +133,7 @@ export function defaultLocation(name: string): UiLocation {
     name,
     hard: true,
     weight: 0.5,
+    theme: "normal",
     mode: "at",
     at: { x: 0, z: 0, tolerance: 800 },
     discover: { direction: "north", min: 2000, max: 5000, step: 500, xRange: null },
@@ -125,7 +150,11 @@ export const DEFAULT_SCAN: UiScan = {
   fineStep: 16,
   water: "auto",
   prefilter: { enabled: true, radius: 1200, step: 64, water: "biome" },
+  engine: {},
 };
+
+/** The scan keys that are placement-engine flags rather than grid geometry. */
+const ENGINE_FLAG_KEYS = ["resolution_order", "fine_top_k", "score_gating", "candidate_source"] as const;
 
 /* ------------------------------------------------------ sampling lattice -- */
 
@@ -210,6 +239,13 @@ function cleanValues(type: string, values: UiConstraint["values"]): Record<strin
     if (Array.isArray(v) && v.length === 0) continue;
     if (v === "") continue;
     if (f.kind === "flag" && v === false) continue;
+    // Band specs: only include if at least one field is set
+    if (typeof v === "object" && "min" in v) {
+      const band = v as BandSpec;
+      if (band.min === undefined && band.ideal === undefined && band.ideal_max === undefined && band.max === undefined) {
+        continue;
+      }
+    }
     out[f.key] = v;
   }
   return out;
@@ -288,6 +324,10 @@ function prefilterable(loc: UiLocation, ui: UiSpec): boolean {
 /**
  * The browser spec the evaluator actually runs. `packIds` must be the enabled
  * stack in load order — vanilla first — exactly as handed to `loadStack`.
+ *
+ * Forward-reference validation: distance_to, reachability, and land_connected_to
+ * can only reference locations that have already been declared (hard locations
+ * first in declaration order).
  */
 export function toCoreSpec(
   ui: UiSpec,
@@ -296,13 +336,19 @@ export function toCoreSpec(
 ): CoreSpec {
   const locations: Record<string, unknown> = {};
   const coarse = coarseStepOf(ui);
+  const declaredLocations = new Set<string>();
 
   for (const loc of ui.locations) {
     const name = loc.name.trim();
     if (!name) continue;
 
     const entry: Record<string, unknown> = { hard: loc.hard };
-    if (!loc.hard) entry.weight = loc.weight;
+    // Hard locations carry weight too (Spawn and the capitals are 3×) —
+    // emitting it only for soft ones silently reset them to 1 and let the
+    // eighteen pueblos outvote the places that matter. Elide only when it
+    // equals the engine default for the hardness.
+    if (loc.weight !== (loc.hard ? 1 : 0.5)) entry.weight = loc.weight;
+    if (loc.theme && loc.theme !== "normal") entry.theme = loc.theme;
 
     if (loc.mode === "at") {
       entry.at = { x: loc.at.x, z: loc.at.z, tolerance: loc.at.tolerance };
@@ -333,17 +379,37 @@ export function toCoreSpec(
       entry.discover = d;
     }
 
-    entry.constraints = loc.constraints.map((c) => ({ type: c.type, ...cleanValues(c.type, c.values) }));
+    entry.constraints = loc.constraints.map((c) => {
+      const clean = cleanValues(c.type, c.values);
+      // Validate forward references: distance_to, reachability, land_connected_to can only reference earlier locations
+      if (c.type === "distance_to" || c.type === "reachability" || c.type === "land_connected_to") {
+        const refLocation = clean.location as string | undefined;
+        if (refLocation && !declaredLocations.has(refLocation)) {
+          throw new Error(
+            `Forward-reference error in "${name}": ${c.type} references "${refLocation}" which has not been declared yet. ` +
+            `Location references must point to locations declared earlier (hard locations first in declaration order).`
+          );
+        }
+      }
+      return { type: c.type, ...clean };
+    });
 
     if (loc.score.length) {
+      // No SCORER_REFERENCE injection: the core scorers already default to
+      // exactly those values, and stamping them in made every export claim an
+      // opinion the author never held. `extra` restores the fields the editor
+      // has no widgets for (bands, thresholds) — dropping them un-banded the
+      // Teras score terms on every round-trip.
       entry.score = loc.score.map((s) => ({
         type: s.type,
         weight: s.weight,
-        reference: s.reference ?? SCORER_REFERENCE[s.type],
+        ...(s.reference !== undefined ? { reference: s.reference } : {}),
+        ...(s.extra ?? {}),
       }));
     }
 
     locations[name] = entry;
+    declaredLocations.add(name);
   }
 
   const scan: Record<string, unknown> = {
@@ -353,6 +419,8 @@ export function toCoreSpec(
     coarse_step: coarse,
     fine_step: ui.scan.fineStep,
     water_mode: ui.scan.water,
+    // The placement-engine flags ride through verbatim (see UiScan.engine).
+    ...ui.scan.engine,
   };
   if (ui.scan.prefilter.enabled) {
     const names = ui.locations.filter((l) => prefilterable(l, ui)).map((l) => l.name.trim());
@@ -450,7 +518,10 @@ export function fromCoreSpec(core: Record<string, unknown>): UiSpec {
     locations.push({
       ...base,
       hard: loc.hard !== false,
-      weight: asNum(loc.weight, 0.5),
+      // The fallback must be the ENGINE's default for the hardness (hard 1,
+      // soft 0.5) — a flat 0.5 read Spawn's implicit weight wrong and then
+      // re-exported the error as fact.
+      weight: asNum(loc.weight, loc.hard !== false ? 1 : 0.5),
       mode: at ? "at" : "discover",
       at: at
         ? { x: asNum(at.x, 0), z: asNum(at.z, 0), tolerance: asNum(at.tolerance, 0) }
@@ -472,21 +543,39 @@ export function fromCoreSpec(core: Record<string, unknown>): UiSpec {
         .filter((c) => typeof c.type === "string" && CONSTRAINT_BY_TYPE.has(c.type as string))
         .map((c) => {
           const { type, ...rest } = c as { type: string } & Record<string, unknown>;
-          const out = defaultConstraint(type);
+          // Only the fields the source spec actually states — NOT
+          // `defaultConstraint(type)`. Pre-filling vocabulary defaults here
+          // invented bounds the author never wrote: it stamped a hard
+          // flatness maximum of 2.5 onto the capitals (re-instating, tighter,
+          // the gate the attrition report had just demoted) and a surface
+          // ceiling of 200 onto Iwa. An absent field means "the engine's own
+          // default", and absent it must stay.
+          const out: UiConstraint = { id: nextId("c"), type, values: {} };
           for (const [k, v] of Object.entries(rest)) {
             if (k === "//") continue;
-            out.values[k] = v as number | string | boolean | string[];
+            out.values[k] = v as number | string | boolean | string[] | BandSpec;
           }
           return out;
         }),
       score: ((loc.score ?? []) as Record<string, unknown>[])
         .filter((s) => typeof s.type === "string")
-        .map((s) => ({
-          type: s.type as string,
-          weight: asNum(s.weight, 0.5),
-          reference: typeof s.reference === "number" ? s.reference : undefined,
-        })),
+        .map((s) => {
+          const { type, weight, reference, ...rest } = s as { type: string } & Record<string, unknown>;
+          const extra: Record<string, unknown> = {};
+          for (const [k, v] of Object.entries(rest)) if (k !== "//") extra[k] = v;
+          return {
+            type,
+            weight: asNum(weight, 0.5),
+            reference: typeof reference === "number" ? reference : undefined,
+            ...(Object.keys(extra).length ? { extra } : {}),
+          };
+        }),
     });
+  }
+
+  const engine: Record<string, unknown> = {};
+  for (const key of ENGINE_FLAG_KEYS) {
+    if (scan[key] !== undefined) engine[key] = scan[key];
   }
 
   return {
@@ -502,6 +591,7 @@ export function fromCoreSpec(core: Record<string, unknown>): UiSpec {
         step: asNum(pf?.step, DEFAULT_SCAN.prefilter.step),
         water: (pf?.water_mode as WaterModeName) ?? DEFAULT_SCAN.prefilter.water,
       },
+      engine,
     },
     locations,
   };
