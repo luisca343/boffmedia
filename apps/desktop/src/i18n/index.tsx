@@ -2,6 +2,8 @@ import * as React from "react"
 
 import { configureUi, DEFAULT_LOCALE, isAppLocale, type AppLocale } from "@boffmedia/ui"
 
+import { openUrl } from "../runtime"
+
 import { messages as toolsMinecraftMessages } from "@boffmedia/tools-minecraft/catalog"
 import { messages as toolsMhwildsMessages } from "@boffmedia/tools-mhwilds/catalog"
 
@@ -220,4 +222,10 @@ configureUi({
   // Unbound — the tool packages' `tools.*` keys live at the root of this store.
   useTranslateRoot: () => useT(),
   useLocale,
+  // Links inside rendered Markdown (a mod description) must reach the SYSTEM
+  // browser. The default opens a tab, which under Tauri means navigating this
+  // webview — the launcher UI would be replaced by a web page with no way back.
+  openUrl: (url: string) => {
+    void openUrl(url).catch(() => undefined)
+  },
 })

@@ -15,6 +15,8 @@ import { Spinner } from "../primitives/spinner";
 import { CatalogIcon } from "./CatalogIcon";
 import { getCatalog } from "./client";
 import { effectiveLoader, isViaConnector } from "./connector";
+import { ProjectDescription } from "./ProjectDescription";
+import { toSummaryText } from "./descriptionText";
 import type {
   CatalogCategory,
   CatalogLoader,
@@ -89,16 +91,10 @@ function compactCount(value: number): string {
   return String(value);
 }
 
-/** Strips the HTML CurseForge returns for its description; Modrinth's markdown
- *  survives this unchanged apart from its (rare) inline tags. */
-function toPlainText(value: string): string {
-  return value
-    .replace(/<br\s*\/?>/gi, "\n")
-    .replace(/<\/(p|div|li|h\d)>/gi, "\n")
-    .replace(/<[^>]+>/g, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
+// Description/summary text is normalised by `descriptionText`, which is shared
+// so every surface that shows catalogue prose strips the same things. The old
+// local version stripped HTML tags only: it left `&amp;`/`&#39;` on screen and
+// rendered Modrinth's Markdown verbatim, headings and all.
 
 export function ModBrowser({
   t,
@@ -497,7 +493,7 @@ export function ModBrowser({
                             )}
                           </span>
                           <span className="line-clamp-1 font-body text-[11px] text-txt-dim">
-                            {hit.summary}
+                            {toSummaryText(hit.summary)}
                           </span>
                           <span className="mt-auto flex items-center gap-2 font-mono text-[10px] text-txt-muted">
                             <Icon name="download" size={11} />
@@ -628,9 +624,10 @@ function ProjectDetail({
     };
   }, [hit.platform, hit.projectId, gameVersion, loader, showAllFiles]);
 
-  const description = project
-    ? toPlainText(project.description || project.summary)
-    : "";
+  // The project body, rendered rather than flattened — this pane is where the
+  // player decides whether to add the mod, and a feature list stripped to one
+  // run-on paragraph is the part that made that hard.
+  const description = project?.description || project?.summary || "";
   return (
     <Modal
       open
@@ -640,19 +637,32 @@ function ProjectDetail({
       // and the whole point of moving off the 400px pane was that they stop
       // wrapping. The fixed height on md+ keeps the panel from resizing as the
       // player clicks from a mod with one version to a mod with forty.
-      className="max-w-[1040px] md:h-[min(720px,calc(100dvh-3rem))]"
+      //
+      // Both caps are ceilings, not sizes — `max-w` and the `min()` mean a
+      // small window still gets a modal that fits it, and only a large one
+      // spends the extra room. The description is the half that benefits:
+      // rendered Markdown has headings, lists and screenshots to lay out.
+      //
+      // The 3rem is NOT a spare-room guess: the overlay is `p-6`, so it is
+      // exactly the padding this modal sits inside. Raising the pixel cap is
+      // free; shrinking that subtraction overflows the viewport.
+      className="max-w-[1320px] md:h-[min(880px,calc(100dvh-3rem))]"
       // On md+ the body must NOT scroll as one — each column owns its own
       // scroll, so the version list stays put while a long description moves.
       // Stacked on narrow, one scroll for the whole thing is the right feel.
       bodyClassName="p-0 overflow-y-auto md:overflow-hidden"
     >
       <div className="flex min-h-0 flex-col md:h-full md:flex-row">
-        <aside className="bm-scroll flex shrink-0 flex-col gap-3 border-b border-solid border-line p-4 md:min-h-0 md:w-[320px] md:overflow-y-auto md:border-b-0 md:border-r lg:w-[360px]">
+        {/* The description column. Widened well past the version list's needs:
+            a version row is a fixed set of short fields and stops improving
+            with more space, whereas prose keeps getting easier to read — so
+            the extra width goes here rather than being split evenly. */}
+        <aside className="bm-scroll flex shrink-0 flex-col gap-3 border-b border-solid border-line p-4 md:min-h-0 md:w-[420px] md:overflow-y-auto md:border-b-0 md:border-r lg:w-[520px] xl:w-[600px]">
           <div className="flex items-start gap-3">
             <CatalogIcon src={hit.iconUrl} size={56} />
             <div className="min-w-0 flex-1">
               <p className="font-body text-[12px] text-txt-dim">
-                {hit.summary}
+                {toSummaryText(hit.summary)}
               </p>
               <span className="mt-1 flex items-center gap-2 font-mono text-[10px] text-txt-muted">
                 <Icon name="download" size={11} />
@@ -697,11 +707,7 @@ function ProjectDetail({
 
           {/* No max-height any more: the column scrolls, so a long description
               is read by scrolling rather than through a 120px porthole. */}
-          {description && (
-            <p className="whitespace-pre-line font-body text-[12px] leading-relaxed text-txt-dim">
-              {description}
-            </p>
-          )}
+          {description && <ProjectDescription markup={description} />}
 
           {project &&
             (project.sourceUrl || project.issuesUrl || project.websiteUrl) && (

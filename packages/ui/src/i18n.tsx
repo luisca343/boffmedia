@@ -29,6 +29,11 @@ export type UiRuntime = {
   useTranslateRoot: () => Translate
   useLocale: () => string
   Link: LinkComponent
+  /** Open an external URL. The default navigates a new tab, which is right in a
+   *  browser and WRONG in a webview host: under Tauri an unhandled link would
+   *  replace the launcher UI with a web page and strand the user with no way
+   *  back. Hosts that are not a plain browser MUST override this. */
+  openUrl: (url: string) => void
 }
 
 const DefaultLink: LinkComponent = ({ href, children, ...rest }) => (
@@ -45,12 +50,21 @@ let runtime: UiRuntime = {
   useTranslateRoot: () => (key: string) => key,
   useLocale: () => DEFAULT_LOCALE,
   Link: DefaultLink,
+  openUrl: (url: string) => {
+    if (typeof window !== "undefined") window.open(url, "_blank", "noopener,noreferrer")
+  },
 }
 
 /** Call once per module graph, at import time. Under Next that means both the
  *  server and the client bundle — see apps/web/src/lib/ui-runtime.ts. */
 export function configureUi(partial: Partial<UiRuntime>) {
   runtime = { ...runtime, ...partial }
+}
+
+/** Hand an external URL to the host. Not a hook: it is called from click
+ *  handlers inside rendered Markdown, where hooks cannot run. */
+export function uiOpenUrl(url: string) {
+  runtime.openUrl(url)
 }
 
 /** The in-package replacement for `useTranslations("common.primitives")`.

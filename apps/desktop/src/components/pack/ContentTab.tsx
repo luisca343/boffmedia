@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import type { KeyboardEvent } from "react";
 
 import {
   Badge,
@@ -12,7 +13,10 @@ import {
   Seg,
   Spinner,
   Toggle,
+  ProjectModal,
+  cn,
   getCatalog,
+  projectUrl,
   toast,
 } from "@boffmedia/ui";
 
@@ -90,6 +94,10 @@ export function ContentTab({
   // not: the launcher never had a copy and cannot fetch it again. Pack files
   // keep the existing one-click behaviour.
   const [confirmDelete, setConfirmDelete] = useState<ContentRow | null>(null);
+  // The row whose project page is open, IN the launcher. Held as the row
+  // rather than the id so the modal can show its name from the first frame
+  // instead of waiting for the fetch to name it.
+  const [viewing, setViewing] = useState<ContentRow | null>(null);
   /** A disable or delete that something else needs, held until the player
    *  confirms. Carries the action so one dialog serves both. */
   const [confirmBreak, setConfirmBreak] = useState<{
@@ -399,6 +407,20 @@ export function ContentTab({
 
   return (
     <div className="flex flex-col gap-4">
+      {/* The project page, in the launcher. Keyed on the path so switching
+          rows remounts rather than showing the previous mod's body while the
+          new fetch lands. */}
+      {viewing?.projectId && (
+        <ProjectModal
+          key={viewing.path}
+          t={t}
+          platform={viewing.kind === "curseforge" ? "curseforge" : "modrinth"}
+          projectId={viewing.projectId}
+          fallbackName={viewing.name}
+          onClose={() => setViewing(null)}
+        />
+      )}
+
       <UpdateReview
         open={reviewing}
         rows={pendingUpdates}
@@ -592,10 +614,37 @@ export function ContentTab({
           </li>
           {visible.map((row) => {
             const busy = busyPath === row.path;
+            // Null for a hand-dropped jar, an `override` blob or a bare URL —
+            // those have no project page, so the row stays inert rather than
+            // offering a link that goes nowhere.
+            const link = projectUrl(row.kind, row.projectId);
+            const open = () => {
+              if (link) setViewing(row);
+            };
             return (
               <li
                 key={row.path}
-                className="flex items-center gap-3 border-b border-solid border-line px-3 py-2 hover:bg-panel-2"
+                className={cn(
+                  "flex items-center gap-3 border-b border-solid border-line px-3 py-2 hover:bg-panel-2",
+                  link && "cursor-pointer",
+                )}
+                // `button`, not `link`: this opens a panel inside the app, it
+                // does not navigate anywhere. Keyboard users need the role and
+                // the keys explicitly — an <li> gives them neither.
+                {...(link
+                  ? {
+                      role: "button",
+                      tabIndex: 0,
+                      title: row.name,
+                      onClick: open,
+                      onKeyDown: (event: KeyboardEvent) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          open();
+                        }
+                      },
+                    }
+                  : {})}
               >
                 <CatalogIcon src={row.iconUrl} size={40} />
 
@@ -701,7 +750,14 @@ export function ContentTab({
                   )}
                 </span>
 
-                <span className="flex w-[140px] shrink-0 items-center justify-end gap-1">
+                {/* Stops the row's link from firing behind every action: the
+                    toggle, update and delete controls all live inside the
+                    clickable row, and a delete that also opens Modrinth is
+                    not what anyone pressed. */}
+                <span
+                  className="flex w-[140px] shrink-0 items-center justify-end gap-1"
+                  onClick={(event) => event.stopPropagation()}
+                >
                   {busy ? (
                     <Spinner size={14} className="text-txt-muted" />
                   ) : (

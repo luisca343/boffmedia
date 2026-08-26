@@ -107,7 +107,7 @@ function reconcileGroups(
     return live.has(normalise(path)) ? path : null;
   };
 
-  return groups
+  const kept = groups
     .map((group) => {
       const g = group as { features?: unknown[] };
       const features = (Array.isArray(g.features) ? g.features : [])
@@ -139,6 +139,39 @@ function reconcileGroups(
       return { ...(group as object), features };
     })
     .filter((g) => (g as { features: unknown[] }).features.length > 0);
+
+  // Rule 5 outlives the feature it points at. Dropping a feature above is not
+  // the end of the edit: every OTHER feature's `requires` may still name it, and
+  // `validate_optional` rejects the whole manifest with
+  // `RequiresUnknownFeature` — so the save fails and the author is told the pack
+  // is invalid over a switch they never touched. Updating Sodium is exactly that
+  // path: the shaderpack feature requires `sodium`, the jar's name carries its
+  // version, and an update routed through remove+add (rather than `replaceFile`,
+  // which passes a rename) takes the `sodium` feature with it.
+  //
+  // Pruned rather than reported: a `requires` whose target no longer exists has
+  // nothing left to constrain, and the alternative — refusing the edit — would
+  // make removing a mod impossible until the author hunted down every feature
+  // that mentioned it.
+  const liveIds = new Set(
+    kept.flatMap((g) =>
+      (g as { features: { id?: string }[] }).features.map((f) => f.id),
+    ),
+  );
+  return kept.map((group) => {
+    const g = group as { features: { requires?: string[] }[] };
+    return {
+      ...(group as object),
+      features: g.features.map((f) => {
+        const requires = (f.requires ?? []).filter((r) => liveIds.has(r));
+        // Deleted, not emptied: `requires` has a min of 1 in the schema, so
+        // writing `[]` swaps one validation failure for another.
+        if (requires.length > 0) return { ...f, requires };
+        const { requires: _dropped, ...rest } = f;
+        return rest;
+      }),
+    };
+  });
 }
 
 async function mutate(
@@ -485,6 +518,13 @@ export function optionalGroupProblems(
   t: (key: string, values?: Record<string, string | number>) => string,
 ): string[] {
   const problems: string[] = [];
+  // Rule 5's targets are feature ids, and the editor is where a stale one is
+  // still fixable: once `local_pack_save` answers, all the author gets is
+  // "requires names a feature that does not exist: sodium" over a dialog with no
+  // field to correct.
+  const liveIds = new Set(
+    groups.flatMap((g) => g.features.map((feature) => feature.id)),
+  );
   for (const group of groups) {
     const label = group.name.trim() || group.id;
     if (!group.name.trim())
@@ -502,6 +542,16 @@ export function optionalGroupProblems(
             name: feature.name.trim() || feature.id,
           }),
         );
+      }
+      for (const req of feature.requires ?? []) {
+        if (!liveIds.has(req)) {
+          problems.push(
+            t("optionalEditor.errorRequiresUnknown", {
+              name: feature.name.trim() || feature.id,
+              id: req,
+            }),
+          );
+        }
       }
     }
   }
