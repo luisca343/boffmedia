@@ -42,10 +42,7 @@ describe('WingullFacadeService', () => {
     Pick<WingullTransportService, 'getTaxiStops' | 'teleportPlayer'>
   >;
   let wingullRepository: jest.Mocked<
-    Pick<
-      WingullRepository,
-      'getPlayersOwnedRegions' | 'getAllPlots'
-    >
+    Pick<WingullRepository, 'getPlayersOwnedRegions' | 'getAllPlots'>
   >;
   let _logger: jest.Mocked<Pick<Logger, 'log' | 'warn' | 'error'>>;
 

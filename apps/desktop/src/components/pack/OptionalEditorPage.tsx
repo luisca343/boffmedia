@@ -11,9 +11,9 @@ import {
 
 import { SectionHeader } from "../SectionHeader"
 import { useT } from "../../i18n"
-import { localPackGet } from "../../runtime"
+import { instanceModGraph, localPackGet } from "../../runtime"
 import { optionalGroupProblems, saveOptionalGroups } from "../../services/localPackEdit"
-import type { OptionalGroup } from "../../services/types"
+import type { ModGraph, OptionalGroup } from "../../services/types"
 
 // Authoring the optional catalogue, as a page of its own rather than a block
 // inside the Content tab.
@@ -52,6 +52,7 @@ export function OptionalEditorPage({
   const [draft, setDraft] = useState<Draft | null>(null)
   const [failed, setFailed] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [graph, setGraph] = useState<ModGraph | null>(null)
 
   /** Opens on the manifest, NOT on the resolved model.
    *
@@ -64,6 +65,12 @@ export function OptionalEditorPage({
     void (async () => {
       const manifest = await localPackGet(slug).catch(() => null)
       if (!live) return
+      // `preferManifest`, matching the rest of this page: the author is editing
+      // the manifest, so the features the graph resolves paths against must come
+      // from that document and not from the last install's marker.
+      void instanceModGraph(slug, manifest ?? undefined, true).then((g) => {
+        if (live) setGraph(g)
+      })
       if (!manifest) {
         setFailed(true)
         return
@@ -154,6 +161,11 @@ export function OptionalEditorPage({
         ) : (
           <OptionalGroupsEditor
             groups={draft.groups}
+            // The one check the editor cannot derive from the document it edits:
+            // a hard dependency lives INSIDE a jar. Iris requires Sodium, and if
+            // the author has made Sodium its own switch with no `requires`, the
+            // only place that fact exists is the jar's own metadata.
+            missingRequires={graph?.missingRequires ?? []}
             onChange={(next) => setDraft((d) => (d ? { ...d, groups: next } : d))}
             files={draft.files}
             // Passed where apps/web deliberately omits it. That form assembles

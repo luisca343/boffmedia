@@ -219,7 +219,9 @@ export class UrbanismoService {
     const plots = await this.getPlots();
     const plot = plots.find((p) => p.regionId === regionId);
     if (!plot)
-      throw new NotFoundException(`Plot ${regionId} not found in the region catalog`);
+      throw new NotFoundException(
+        `Plot ${regionId} not found in the region catalog`,
+      );
 
     const meta = await this.urbanismoRepository.findParcelaByRegion(regionId);
     const names = await this.peopleRepository.findUsernames([plot.ownerUuid]);

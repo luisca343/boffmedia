@@ -1,6 +1,11 @@
-import type { PackManifest } from "@boffmedia/pack-schema"
+import type { PackManifest } from "@boffmedia/pack-schema";
 
-import { instanceInstallFiles, localPackGet, localPackSave } from "../runtime"
+import {
+  instanceDeletePath,
+  instanceInstallFiles,
+  localPackGet,
+  localPackSave,
+} from "../runtime";
 
 // Every edit a local pack's detail page can make, funnelled through one
 // read-modify-write. Doing it here rather than in each component keeps two
@@ -10,17 +15,17 @@ import { instanceInstallFiles, localPackGet, localPackSave } from "../runtime"
 // what it is actually given).
 
 type ManifestFile = {
-  path: string
-  sha512: string
-  fileSize: number
-  env: { client: string; server: string }
-  source: unknown
+  path: string;
+  sha512: string;
+  fileSize: number;
+  env: { client: string; server: string };
+  source: unknown;
   /** Set only for a jar whose loader differs from the pack's — a Fabric mod
    *  running on NeoForge through Sinytra Connector. */
-  loader?: string
-}
+  loader?: string;
+};
 
-const DEFAULT_ENV = { client: "required", server: "required" } as const
+const DEFAULT_ENV = { client: "required", server: "required" } as const;
 
 /** Reduce an entry to the manifest's PackFile shape and nothing else.
  *
@@ -40,15 +45,15 @@ function toManifestFile(file: ManifestFile): ManifestFile {
     fileSize: file.fileSize,
     env: file.env ?? DEFAULT_ENV,
     source: file.source,
-  }
+  };
   // Omitted rather than written as undefined: absent is what the schema reads
   // as "the pack's own loader".
-  if (file.loader) clean.loader = file.loader
-  return clean
+  if (file.loader) clean.loader = file.loader;
+  return clean;
 }
 
 function normalise(path: string): string {
-  return path.toLowerCase().replace(/\\/g, "/")
+  return path.toLowerCase().replace(/\\/g, "/");
 }
 
 /** A new opaque version id, minted on every edit.
@@ -63,45 +68,166 @@ function normalise(path: string): string {
  *  this pack has ever had (the install history is keyed on it), and there is no
  *  monotonic source here that survives a reinstall. */
 function nextVersionId(slug: string): string {
-  return `local-${Date.now()}-${slug}`
+  return `local-${Date.now()}-${slug}`;
 }
 
 /** The version id the pack carried BEFORE this edit. Handed to
  *  `instanceInstallFiles`, which uses it to prove the instance on disk was in
  *  sync with the manifest a moment ago — the only condition under which
  *  dropping in a jar or two leaves it in sync again. */
-type Mutation = { manifest: PackManifest; previousVersionId: string | null }
+type Mutation = { manifest: PackManifest; previousVersionId: string | null };
+
+/** Carry the optional catalogue across a change to `files[]`.
+ *
+ *  Rule 3 requires every feature path to name a real `files[]` entry, so any
+ *  edit that renames or removes a file invalidates the whole manifest unless the
+ *  groups move with it. Updating a mod is exactly that: the jar's filename
+ *  carries its version, so `moreculling-1.0.6.jar` becomes `moreculling-1.0.7.jar`
+ *  and every feature still pointing at the old name makes the pack unsaveable —
+ *  with an error naming a path the author never typed.
+ *
+ *  Done here rather than in `replaceFile` because `removeFile` breaks the same
+ *  invariant in the other direction, and two callers maintaining one rule is how
+ *  one of them ends up wrong.
+ *
+ *  Empty features and groups are dropped rather than left behind: `paths` has a
+ *  min of 1 and `features` likewise, so a feature whose only jar was deleted is
+ *  not a valid document either. */
+function reconcileGroups(
+  groups: unknown,
+  files: ManifestFile[],
+  renames: Map<string, string>,
+): unknown {
+  if (!Array.isArray(groups)) return groups;
+  const live = new Set(files.map((f) => normalise(f.path)));
+
+  const mapPath = (path: string): string | null => {
+    const renamed = renames.get(normalise(path));
+    if (renamed) return renamed;
+    return live.has(normalise(path)) ? path : null;
+  };
+
+  return groups
+    .map((group) => {
+      const g = group as { features?: unknown[] };
+      const features = (Array.isArray(g.features) ? g.features : [])
+        .map((feature) => {
+          const f = feature as {
+            paths?: string[];
+            activate?: { file?: string } | null;
+          };
+          const paths = (f.paths ?? [])
+            .map(mapPath)
+            .filter((p): p is string => p !== null);
+          // An activation whose file is gone must go with it: rule 7 requires
+          // `activate.file` to be one of the feature's own paths, and a stale
+          // one fails validation just as loudly as a stale path.
+          const activateFile = f.activate?.file
+            ? mapPath(f.activate.file)
+            : null;
+          const activate =
+            f.activate && activateFile
+              ? { ...f.activate, file: activateFile }
+              : undefined;
+          return {
+            ...f,
+            paths,
+            ...(activate ? { activate } : { activate: undefined }),
+          };
+        })
+        .filter((f) => f.paths.length > 0);
+      return { ...(group as object), features };
+    })
+    .filter((g) => (g as { features: unknown[] }).features.length > 0);
+}
 
 async function mutate(
   slug: string,
   change: (files: ManifestFile[]) => ManifestFile[],
+  /** Old path -> new path, for an edit that MOVES a file rather than adding or
+   *  removing one. Without it a rename looks like a delete plus an unrelated
+   *  add, and the feature that owned the file silently loses it. */
+  renames: Map<string, string> = new Map(),
 ): Promise<Mutation> {
-  const current = await localPackGet(slug)
-  if (!current) throw new Error("No se encontró el pack.")
-  const files = ((current.version?.files ?? []) as ManifestFile[]).map((file) => ({
-    ...file,
-    env: file.env ?? DEFAULT_ENV,
-  }))
+  const current = await localPackGet(slug);
+  if (!current) throw new Error("No se encontró el pack.");
+  const files = ((current.version?.files ?? []) as ManifestFile[]).map(
+    (file) => ({
+      ...file,
+      env: file.env ?? DEFAULT_ENV,
+    }),
+  );
   // Sanitised HERE rather than in each caller: this is the one funnel every
   // edit passes through, and it already owns the other invariant of the same
   // kind (every entry has `env`).
-  const next = change(files).map(toManifestFile)
+  const next = change(files).map(toManifestFile);
   const manifest = await localPackSave({
     ...current,
     version: {
       ...current.version,
       id: nextVersionId(slug),
       files: next,
+      optionalGroups: reconcileGroups(
+        current.version?.optionalGroups,
+        next,
+        renames,
+      ),
     },
-  })
-  return { manifest, previousVersionId: current.version?.id ?? null }
+  });
+  return { manifest, previousVersionId: current.version?.id ?? null };
+}
+
+/** The Modrinth/CurseForge project a file came from, when it has one.
+ *
+ *  This is the identity that decides whether two files are "the same mod". The
+ *  PATH cannot: CreativeCore ships as `CreativeCore_NEOFORGE_v2.12.x.jar` and
+ *  `..._v2.13.x.jar`, so a path-keyed check happily puts both in `mods/` and the
+ *  loader then refuses to start with a duplicate mod id. An `override` blob or a
+ *  hand-dropped jar has no project and is never matched by identity. */
+function projectKeyOf(source: unknown): string | null {
+  const src = source as { kind?: string; projectId?: string | number } | null;
+  if (!src || typeof src.kind !== "string") return null;
+  if (src.kind !== "modrinth" && src.kind !== "curseforge") return null;
+  return src.projectId === undefined || src.projectId === null
+    ? null
+    : `${src.kind}:${src.projectId}`;
+}
+
+/** Remove a pack file's BYTES from the instance.
+ *
+ *  The manifest edit alone is not an uninstall. The install pass sweeps files the
+ *  previous marker claimed and the new one does not — but that pass only runs on
+ *  Install/Play, so between the edit and the next launch the jar is still in
+ *  `mods/` and still loads. For a delete that reads as "uninstall this", and for
+ *  a version swap that must not leave two copies of one mod, the bytes have to go
+ *  now.
+ *
+ *  Both spellings are attempted because a switched-off mod lives at
+ *  `<name>.jar.disabled`; deleting only the plain path would silently no-op on
+ *  exactly the files a player is most likely to be tidying up. A missing path is
+ *  not an error on the Rust side, so the extra call is free.
+ *
+ *  Never throws: the manifest is already written by the time this runs, and
+ *  failing here would report a successful edit as a failure. */
+async function deleteBytes(slug: string, path: string): Promise<void> {
+  for (const candidate of [path, `${path}.disabled`]) {
+    try {
+      await instanceDeletePath(slug, candidate);
+    } catch {
+      /* the sweep on the next install is the backstop */
+    }
+  }
 }
 
 export async function removeFile(slug: string, path: string) {
   const { manifest } = await mutate(slug, (files) =>
     files.filter((f) => normalise(f.path) !== normalise(path)),
-  )
-  return manifest
+  );
+  // After the manifest, not before: if the save is rejected the file is still
+  // described by the pack, and deleting first would leave the instance missing a
+  // jar the manifest still requires.
+  await deleteBytes(slug, path);
+  return manifest;
 }
 
 /** Point an existing entry at a different file — a version swap, or an update.
@@ -112,18 +238,33 @@ export async function replaceFile(
   oldPath: string,
   next: { path: string; sha512: string; fileSize: number; source: unknown },
 ) {
-  const { manifest } = await mutate(slug, (files) =>
-    files.map((f) =>
-      normalise(f.path) === normalise(oldPath) ? { ...f, ...next, env: f.env ?? DEFAULT_ENV } : f,
-    ),
-  )
+  const { manifest } = await mutate(
+    slug,
+    (files) =>
+      files.map((f) =>
+        normalise(f.path) === normalise(oldPath)
+          ? { ...f, ...next, env: f.env ?? DEFAULT_ENV }
+          : f,
+      ),
+    // An update renames the jar — the version is in the filename — so every
+    // feature that owned the old name has to follow it to the new one.
+    new Map([[normalise(oldPath), next.path]]),
+  );
   // Deliberately NOT fetched in the background the way an add is. A replace
   // also RETIRES a file, and `instance_install_files` only ever adds: it would
   // download the new jar, mark the instance complete, and thereby guarantee the
   // install pass — the only thing that runs the stale sweep — never runs again.
   // The old jar would sit in mods/ beside the new one, which is a crash, not a
   // cosmetic leftover. Updates stay on the Install/Play path.
-  return manifest
+  //
+  // The retired jar's bytes go NOW rather than waiting for that sweep. Leaving
+  // them is what puts two versions of one mod in `mods/` in the window between
+  // the update and the next launch — and the loader refuses to start on a
+  // duplicate mod id, so "I updated a mod and now it will not boot" is the
+  // symptom. The sweep still runs and is still the backstop for everything else.
+  if (normalise(oldPath) !== normalise(next.path))
+    await deleteBytes(slug, oldPath);
+  return manifest;
 }
 
 /** One in-flight background fetch per pack, so a second add cannot start before
@@ -134,7 +275,7 @@ export async function replaceFile(
  *  that, and correctly declines — leaving a mod the player just added sitting
  *  at "sin instalar" for no reason they can see. Adding three mods in a row is
  *  the normal way to use the browser, so this is the common case, not the edge. */
-const queues = new Map<string, Promise<unknown>>()
+const queues = new Map<string, Promise<unknown>>();
 
 /** Kick the download off and return immediately.
  *
@@ -148,18 +289,18 @@ function fetchInBackground(
   paths: string[],
   previousVersionId: string | null,
 ) {
-  if (paths.length === 0) return
+  if (paths.length === 0) return;
   const next = (queues.get(slug) ?? Promise.resolve()).then(() =>
     instanceInstallFiles(slug, manifest, paths, previousVersionId).catch(() => {
       /* per-file errors already arrived as `content://file` events */
     }),
-  )
-  queues.set(slug, next)
+  );
+  queues.set(slug, next);
   // Drop the entry once it is the tail, so the map does not grow one dead
   // promise per add for the life of the session.
   void next.then(() => {
-    if (queues.get(slug) === next) queues.delete(slug)
-  })
+    if (queues.get(slug) === next) queues.delete(slug);
+  });
 }
 
 /** Append entries, skipping any whose path is already taken. The manifest
@@ -172,17 +313,19 @@ function fetchInBackground(
 export async function addFiles(
   slug: string,
   entries: Array<{
-    path: string
-    sha512: string
-    fileSize: number
-    source: unknown
+    path: string;
+    sha512: string;
+    fileSize: number;
+    source: unknown;
     /** Set only for a jar whose loader differs from the pack's — a Fabric mod
      *  running on NeoForge through Connector. Named in the signature rather than
      *  left to the spread so it is visibly part of what an entry may carry. */
-    loader?: string
+    loader?: string;
   }>,
 ) {
-  const added: string[] = []
+  const added: string[] = [];
+  /** Files an incoming entry replaces: same project, different jar. */
+  const superseded: string[] = [];
   const { manifest, previousVersionId } = await mutate(slug, (files) => {
     // `taken` grows as the batch is walked, so it dedupes the incoming entries
     // against EACH OTHER as well as against what the pack already holds. The
@@ -191,19 +334,50 @@ export async function addFiles(
     // one under Connector) would otherwise put two identical paths in the same
     // save, and the manifest's duplicate-path rule rejects the whole thing —
     // the player loses the add entirely over a duplicate we could have dropped.
-    const taken = new Set(files.map((f) => normalise(f.path)))
-    const fresh: ManifestFile[] = []
-    for (const entry of entries) {
-      const key = normalise(entry.path)
-      if (taken.has(key)) continue
-      taken.add(key)
-      fresh.push({ ...entry, env: DEFAULT_ENV })
+    const taken = new Set(files.map((f) => normalise(f.path)));
+
+    // Identity, not path. A pack must never hold two versions of one mod: the
+    // loader sees two jars declaring the same mod id and refuses to start. Path
+    // dedupe cannot catch it, because the version is IN the filename — which is
+    // exactly how a pack ends up with two CreativeCores.
+    const byProject = new Map<string, string>();
+    for (const file of files) {
+      const key = projectKeyOf(file.source);
+      if (key) byProject.set(key, normalise(file.path));
     }
-    added.push(...fresh.map((f) => f.path))
-    return [...files, ...fresh]
-  })
-  fetchInBackground(slug, manifest, added, previousVersionId)
-  return manifest
+
+    const drop = new Set<string>();
+    const fresh: ManifestFile[] = [];
+    for (const entry of entries) {
+      const key = normalise(entry.path);
+      if (taken.has(key)) continue;
+
+      const project = projectKeyOf(entry.source);
+      const existing = project ? byProject.get(project) : undefined;
+      // Already at this exact jar under a different name is impossible (the path
+      // check above caught it), so a hit here is always a different version.
+      if (existing && existing !== key) {
+        drop.add(existing);
+        superseded.push(existing);
+      }
+      if (project) byProject.set(project, key);
+
+      taken.add(key);
+      fresh.push({ ...entry, env: DEFAULT_ENV });
+    }
+    added.push(...fresh.map((f) => f.path));
+    return [...files.filter((f) => !drop.has(normalise(f.path))), ...fresh];
+  });
+
+  // The superseded jar's bytes, explicitly. `fetchInBackground` runs
+  // `instance_install_files`, which only ever ADDS — it would fetch the new jar,
+  // mark the instance complete, and so guarantee the stale sweep never runs. The
+  // old jar would then sit in `mods/` beside the new one, which is a crash and
+  // not a cosmetic leftover. Same reasoning as `replaceFile`'s note above.
+  for (const path of superseded) await deleteBytes(slug, path);
+
+  fetchInBackground(slug, manifest, added, previousVersionId);
+  return manifest;
 }
 
 // ── Optional content ───────────────────────────────────────────────────────
@@ -228,43 +402,43 @@ export async function addFiles(
  *  the whole save with `unknown field \`enabled\``, exactly the way it rejects
  *  BrowsePage's `projectId` in `toManifestFile`. Same trap, same fix. */
 type ManifestFeature = {
-  id: string
-  name: string
-  description?: string
-  iconUrl?: string
-  paths: string[]
-  default: boolean
-  requires?: string[]
-  activate?: unknown
-}
+  id: string;
+  name: string;
+  description?: string;
+  iconUrl?: string;
+  paths: string[];
+  default: boolean;
+  requires?: string[];
+  activate?: unknown;
+};
 
 type ManifestGroup = {
-  id: string
-  name: string
-  description?: string
-  select?: string
-  features: ManifestFeature[]
-}
+  id: string;
+  name: string;
+  description?: string;
+  select?: string;
+  features: ManifestFeature[];
+};
 
 /** The subset of a group the editor is allowed to have an opinion about. */
 type EditedFeature = {
-  id: string
-  name: string
-  description?: string | null
-  iconUrl?: string | null
-  paths: string[]
-  default: boolean
-  requires?: string[]
-  activate?: unknown
-}
+  id: string;
+  name: string;
+  description?: string | null;
+  iconUrl?: string | null;
+  paths: string[];
+  default: boolean;
+  requires?: string[];
+  activate?: unknown;
+};
 
 type EditedGroup = {
-  id: string
-  name: string
-  description?: string | null
-  select?: string
-  features: EditedFeature[]
-}
+  id: string;
+  name: string;
+  description?: string | null;
+  select?: string;
+  features: EditedFeature[];
+};
 
 /** Omitted, never written as null. `description` and `iconUrl` are `type:
  *  "string"` in the schema with no null branch, so an explicit null fails
@@ -275,11 +449,11 @@ function toManifestGroup(group: EditedGroup): ManifestGroup {
     id: group.id,
     name: group.name.trim(),
     features: group.features.map(toManifestFeature),
-  }
-  const description = group.description?.trim()
-  if (description) clean.description = description
-  if (group.select) clean.select = group.select
-  return clean
+  };
+  const description = group.description?.trim();
+  if (description) clean.description = description;
+  if (group.select) clean.select = group.select;
+  return clean;
 }
 
 function toManifestFeature(feature: EditedFeature): ManifestFeature {
@@ -288,13 +462,14 @@ function toManifestFeature(feature: EditedFeature): ManifestFeature {
     name: feature.name.trim(),
     paths: feature.paths,
     default: feature.default,
-  }
-  const description = feature.description?.trim()
-  if (description) clean.description = description
-  if (feature.iconUrl) clean.iconUrl = feature.iconUrl
-  if (feature.requires && feature.requires.length > 0) clean.requires = feature.requires
-  if (feature.activate) clean.activate = feature.activate
-  return clean
+  };
+  const description = feature.description?.trim();
+  if (description) clean.description = description;
+  if (feature.iconUrl) clean.iconUrl = feature.iconUrl;
+  if (feature.requires && feature.requires.length > 0)
+    clean.requires = feature.requires;
+  if (feature.activate) clean.activate = feature.activate;
+  return clean;
 }
 
 /** What the schema will refuse, phrased for the author instead of for a parser.
@@ -309,25 +484,28 @@ export function optionalGroupProblems(
   groups: EditedGroup[],
   t: (key: string, values?: Record<string, string | number>) => string,
 ): string[] {
-  const problems: string[] = []
+  const problems: string[] = [];
   for (const group of groups) {
-    const label = group.name.trim() || group.id
-    if (!group.name.trim()) problems.push(t("optionalEditor.errorGroupName", { id: group.id }))
+    const label = group.name.trim() || group.id;
+    if (!group.name.trim())
+      problems.push(t("optionalEditor.errorGroupName", { id: group.id }));
     if (group.features.length === 0) {
-      problems.push(t("optionalEditor.errorGroupEmpty", { name: label }))
+      problems.push(t("optionalEditor.errorGroupEmpty", { name: label }));
     }
     for (const feature of group.features) {
       if (!feature.name.trim()) {
-        problems.push(t("optionalEditor.errorFeatureName", { group: label }))
+        problems.push(t("optionalEditor.errorFeatureName", { group: label }));
       }
       if (feature.paths.length === 0) {
         problems.push(
-          t("optionalEditor.errorFeatureEmpty", { name: feature.name.trim() || feature.id }),
-        )
+          t("optionalEditor.errorFeatureEmpty", {
+            name: feature.name.trim() || feature.id,
+          }),
+        );
       }
     }
   }
-  return problems
+  return problems;
 }
 
 /** Write the catalogue and the `env` it implies, in one save.
@@ -345,24 +523,30 @@ export function optionalGroupProblems(
 export async function saveOptionalGroups(
   slug: string,
   groups: EditedGroup[],
-  files: Array<{ path: string; env?: { client?: string; server?: string } | null }>,
+  files: Array<{
+    path: string;
+    env?: { client?: string; server?: string } | null;
+  }>,
 ): Promise<PackManifest> {
-  const current = await localPackGet(slug)
-  if (!current) throw new Error("No se encontró el pack.")
+  const current = await localPackGet(slug);
+  if (!current) throw new Error("No se encontró el pack.");
 
-  const edited = new Map(files.map((f) => [normalise(f.path), f.env]))
+  const edited = new Map(files.map((f) => [normalise(f.path), f.env]));
   const nextFiles = ((current.version?.files ?? []) as ManifestFile[])
     .map((file) => {
-      const env = edited.get(normalise(file.path))
-      if (!env?.client) return { ...file, env: file.env ?? DEFAULT_ENV }
+      const env = edited.get(normalise(file.path));
+      if (!env?.client) return { ...file, env: file.env ?? DEFAULT_ENV };
       return {
         ...file,
-        env: { client: env.client, server: env.server ?? file.env?.server ?? "required" },
-      }
+        env: {
+          client: env.client,
+          server: env.server ?? file.env?.server ?? "required",
+        },
+      };
     })
-    .map(toManifestFile)
+    .map(toManifestFile);
 
-  const nextGroups = groups.map(toManifestGroup)
+  const nextGroups = groups.map(toManifestGroup);
 
   // Built as a mutable object so the empty case can DELETE the key rather than
   // write `[]`. The schema has `optionalGroups` optional, and spreading
@@ -372,9 +556,9 @@ export async function saveOptionalGroups(
     ...current.version,
     id: nextVersionId(slug),
     files: nextFiles,
-  }
-  if (nextGroups.length > 0) version.optionalGroups = nextGroups
-  else delete version.optionalGroups
+  };
+  if (nextGroups.length > 0) version.optionalGroups = nextGroups;
+  else delete version.optionalGroups;
 
-  return await localPackSave({ ...current, version })
+  return await localPackSave({ ...current, version });
 }

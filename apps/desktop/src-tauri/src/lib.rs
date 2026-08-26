@@ -137,6 +137,7 @@ pub fn run() {
             install::instance_optional_set,
             install::instance_optional_model,
             install::instance_feature_set,
+            install::instance_mod_graph,
             // Per-instance Java runtime + memory.
             install::instance_runtime,
             install::instance_runtime_set,

@@ -240,7 +240,17 @@ export type Settings = {
   packLayout: "card" | "compact" | "row"
   /** Whether to automatically backup saves/config before updating a pack. */
   backupBeforeUpdate: boolean
+  /** Webview zoom factor. Applied through the webview's own `setZoom`, not
+   *  through CSS: every size in the UI is a hardcoded px value in a Tailwind
+   *  arbitrary class, which no root font-size can move. */
+  uiScale: UiScale
 }
+
+/** The offered zoom steps. A closed set rather than a free number so every value
+ *  is one a layout was actually looked at, and so the control can be a segmented
+ *  picker instead of a slider landing text on half-pixels. */
+export const UI_SCALES = [0.9, 1, 1.1, 1.25] as const
+export type UiScale = (typeof UI_SCALES)[number]
 
 /** Total playtime in milliseconds per pack, keyed by pack id. */
 export type Playtime = Record<string, number>
@@ -325,6 +335,12 @@ export type OptionalFile = {
 // `install/optional.rs`, which is what actually serialises them.
 export type {
   Activation,
+  BreakReason,
+  BrokenDep,
+  DepEdge,
+  ModGraph,
+  ModJar,
+  MissingRequires,
   OptionalFeature,
   OptionalGroup,
   OptionalSelect,

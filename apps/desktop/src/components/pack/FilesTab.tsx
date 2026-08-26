@@ -3,7 +3,14 @@ import { useEffect, useState } from "react"
 import { Button, Empty, Icon, Spinner, toast } from "@boffmedia/ui"
 
 import { useT } from "../../i18n"
-import { type DirEntry, instanceBrowse, instanceDeletePath, instanceReveal } from "../../runtime"
+import {
+  type DirEntry,
+  instanceBrowse,
+  instanceDeletePath,
+  instanceModGraph,
+  instanceReveal,
+} from "../../runtime"
+import type { ModGraph } from "../../services/types"
 import { formatBytes, formatWhen } from "../../utils/format"
 
 // A plain browser over the instance's game directory.
@@ -19,6 +26,23 @@ export function FilesTab({ slug }: { slug: string }) {
   const [entries, setEntries] = useState<DirEntry[]>([])
   const [loading, setLoading] = useState(true)
   const [nonce, setNonce] = useState(0)
+  // Only in `mods/`: the graph is about jars, and asking for it while the player
+  // browses `saves/` would be a scan of fifty archives to annotate nothing.
+  const [graph, setGraph] = useState<ModGraph | null>(null)
+
+  useEffect(() => {
+    if (rel !== "mods") {
+      setGraph(null)
+      return
+    }
+    let live = true
+    void instanceModGraph(slug).then((g) => {
+      if (live) setGraph(g)
+    })
+    return () => {
+      live = false
+    }
+  }, [slug, rel, nonce])
 
   useEffect(() => {
     let live = true
@@ -36,6 +60,12 @@ export function FilesTab({ slug }: { slug: string }) {
   }, [slug, rel, nonce])
 
   const segments = rel ? rel.split("/").filter(Boolean) : []
+
+  /** Files that would break without `path`, as bare filenames. Reads the
+   *  precomputed reverse map rather than walking edges — every question on this
+   *  screen runs in that direction. */
+  const dependentsOf = (path: string): string[] =>
+    (graph?.dependents[path] ?? []).map((p) => p.split("/").pop() ?? p)
 
   const remove = async (entry: DirEntry) => {
     try {
@@ -121,8 +151,18 @@ export function FilesTab({ slug }: { slug: string }) {
                   {entry.name}
                 </button>
               ) : (
-                <span className="min-w-0 flex-1 truncate font-mono text-[12px] text-txt-muted">
-                  {entry.name}
+                <span className="flex min-w-0 flex-1 flex-col gap-[2px]">
+                  <span className="truncate font-mono text-[12px] text-txt-muted">
+                    {entry.name}
+                  </span>
+                  {/* The answer to "why is this 7 MB Kotlin jar here, and can I
+                      delete it?" — the question the delete button next to it
+                      invites and nothing else on this screen answers. */}
+                  {dependentsOf(entry.path).length > 0 && (
+                    <span className="truncate font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">
+                      {t("neededBy", { names: dependentsOf(entry.path).join(", ") })}
+                    </span>
+                  )}
                 </span>
               )}
               <span className="hidden w-[110px] shrink-0 text-right font-mono text-[11px] text-txt-dim sm:block">

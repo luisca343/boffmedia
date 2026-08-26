@@ -195,6 +195,7 @@ export const MOCK_SETTINGS: Settings = {
   locale: "es",
   packLayout: "card",
   backupBeforeUpdate: true,
+  uiScale: 1,
 }
 
 /** Browser-mode library. The desktop equivalent is `loadPackEntries`, which

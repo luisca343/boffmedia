@@ -337,6 +337,7 @@ dependencies = [
  "tauri-plugin-updater",
  "thiserror 2.0.19",
  "tokio",
+ "toml 0.8.2",
  "typify",
  "uuid",
  "windows-sys 0.59.0",

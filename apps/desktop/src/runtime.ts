@@ -1,6 +1,7 @@
-import { invoke } from "@tauri-apps/api/core"
-import { listen } from "@tauri-apps/api/event"
-import { getCurrentWindow } from "@tauri-apps/api/window"
+import { invoke } from "@tauri-apps/api/core";
+import { listen } from "@tauri-apps/api/event";
+import { getCurrentWebview } from "@tauri-apps/api/webview";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import {
   MOCK_ACCOUNT,
@@ -21,8 +22,8 @@ import {
   mockLocalPacks,
   mockLogs,
   mockServerStatus,
-} from "./services/mock"
-import type { PackManifest } from "@boffmedia/pack-schema"
+} from "./services/mock";
+import type { PackManifest } from "@boffmedia/pack-schema";
 import type {
   CatalogCategory,
   ModFile,
@@ -31,7 +32,7 @@ import type {
   ModSearchPage,
   ResolveSource,
   ResolvedFile,
-} from "@boffmedia/ui"
+} from "@boffmedia/ui";
 
 import type {
   Account,
@@ -47,6 +48,7 @@ import type {
   Activation,
   FeatureSetResult,
   MemoryChoice,
+  ModGraph,
   OptionalFeature,
   OptionalFile,
   OptionalGroup,
@@ -61,7 +63,7 @@ import type {
   RuntimeSource,
   ServerStatus,
   Settings,
-} from "./services/types"
+} from "./services/types";
 
 export type {
   Activation,
@@ -84,7 +86,7 @@ export type {
   RomScanResult,
   RuntimeSource,
   ServerStatus,
-}
+};
 
 // The single boundary between the renderer and the Rust shell. Keeping it in
 // one module means the six screens never import @tauri-apps directly, so they
@@ -92,35 +94,35 @@ export type {
 // the desktop build needs a Windows machine or WSLg.
 
 export type RuntimeInfo = {
-  platform: string
-  arch: string
-  tauri: string
-  appVersion: string
-}
+  platform: string;
+  arch: string;
+  tauri: string;
+  appVersion: string;
+};
 
 /** True when running inside the Tauri shell rather than a browser tab. */
 export function isDesktop(): boolean {
-  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window
+  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 }
 
 export async function getRuntimeInfo(): Promise<RuntimeInfo | null> {
-  if (!isDesktop()) return null
+  if (!isDesktop()) return null;
   try {
     const info = await invoke<{
-      platform: string
-      arch: string
-      tauri: string
-      app_version: string
-    }>("runtime_info")
+      platform: string;
+      arch: string;
+      tauri: string;
+      app_version: string;
+    }>("runtime_info");
     return {
       platform: info.platform,
       arch: info.arch,
       tauri: info.tauri,
       appVersion: info.app_version,
-    }
+    };
   } catch {
     // Never let a shell failure blank the UI — browser mode is a valid state.
-    return null
+    return null;
   }
 }
 
@@ -130,30 +132,34 @@ export async function getRuntimeInfo(): Promise<RuntimeInfo | null> {
 // token.
 
 export type DeviceCode = {
-  userCode: string
-  verificationUri: string
-  expiresIn: number
-}
+  userCode: string;
+  verificationUri: string;
+  expiresIn: number;
+};
 
 // Re-exported rather than redeclared. Two separate definitions of "an account"
 // had already drifted apart — this one lacked the skin the other required — and
 // the only reason it type-checked was that every call site rebuilt the object
 // by hand. There is one wire shape; this is it.
-export type { Account }
+export type { Account };
 
 /** Rust serialises with serde's snake_case field names. */
 type RawDeviceCode = {
-  user_code: string
-  verification_uri: string
-  expires_in: number
-}
+  user_code: string;
+  verification_uri: string;
+  expires_in: number;
+};
 
-export type AuthFailure = { message: string; needsSignin: boolean; code?: string }
+export type AuthFailure = {
+  message: string;
+  needsSignin: boolean;
+  code?: string;
+};
 
 function asFailure(err: unknown): AuthFailure {
   // Tauri rejects with the serialised AuthFailure; anything else is a bug in
   // the bridge rather than something the player can act on.
-  const e = err as { message?: string; needs_signin?: boolean; code?: string }
+  const e = err as { message?: string; needs_signin?: boolean; code?: string };
   return {
     message: e?.message ?? "Error inesperado al iniciar sesión.",
     // Only a real Rust NeedsSignin flips this. Defaulting it true made every
@@ -163,26 +169,26 @@ function asFailure(err: unknown): AuthFailure {
     // Carried through so the caller can map a machine code (randomizer_*,
     // store_error) to its own message. asFailure must not drop it.
     code: e?.code,
-  }
+  };
 }
 
 /** Step 1 — the code the user types at microsoft.com/link. */
 export async function authBegin(): Promise<DeviceCode> {
-  const raw = await invoke<RawDeviceCode>("auth_begin")
+  const raw = await invoke<RawDeviceCode>("auth_begin");
   return {
     userCode: raw.user_code,
     verificationUri: raw.verification_uri,
     expiresIn: raw.expires_in,
-  }
+  };
 }
 
 /** Step 2 — resolves only once the user finishes in the browser. Long-running:
  *  the device code stays valid for about fifteen minutes. */
 export async function authAwait(): Promise<Account> {
   try {
-    return await invoke<Account>("auth_await")
+    return await invoke<Account>("auth_await");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -190,11 +196,11 @@ export async function authAwait(): Promise<Account> {
  *  A THROW means the credential store itself failed, which must not be
  *  mistaken for a first run. */
 export async function authRestore(): Promise<Account | null> {
-  if (!isDesktop()) return null
+  if (!isDesktop()) return null;
   try {
-    return await invoke<Account | null>("auth_restore")
+    return await invoke<Account | null>("auth_restore");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -203,11 +209,11 @@ export async function authRestore(): Promise<Account | null> {
  *  credential store, see `auth_offline`. The session it returns can launch
  *  installed packs into singleplayer and nothing else. */
 export async function authOffline(): Promise<Account> {
-  if (!isDesktop()) return MOCK_ACCOUNT
+  if (!isDesktop()) return MOCK_ACCOUNT;
   try {
-    return await invoke<Account>("auth_offline")
+    return await invoke<Account>("auth_offline");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -218,39 +224,39 @@ export async function authOffline(): Promise<Account> {
 // asked for only when a Minecraft pack is actually installed or launched.
 
 export interface BoffDeviceCode {
-  userCode: string
-  verificationUri: string
-  expiresIn: number
-  intervalSeconds: number
+  userCode: string;
+  verificationUri: string;
+  expiresIn: number;
+  intervalSeconds: number;
 }
 
 export interface BoffAccount {
-  id: number
-  username: string
-  mcUuid: string | null
+  id: number;
+  username: string;
+  mcUuid: string | null;
 }
 
 /** A row in the Boffmedia account switcher: only `active` has the live session
  *  `authed()` is sending; the rest can be switched to without a browser trip. */
-export type BoffAccountEntry = BoffAccount & { active: boolean }
+export type BoffAccountEntry = BoffAccount & { active: boolean };
 
 export interface BoffDevicePoll {
-  status: "pending" | "approved" | "denied" | "expired"
-  user: BoffAccount | null
+  status: "pending" | "approved" | "denied" | "expired";
+  user: BoffAccount | null;
 }
 
 const MOCK_BOFF_ACCOUNT: BoffAccount = {
   id: 1,
   username: "Trainer",
   mcUuid: MOCK_ACCOUNT.uuid,
-}
+};
 
 /** The website this launcher belongs to. Used for the links the launcher hands
  *  to the system browser — a relative URL from a Tauri custom protocol resolves
  *  against `tauri://localhost` and goes nowhere. */
 export function webBaseUrl(): string {
-  const fromEnv = import.meta.env?.VITE_BOFF_WEB_URL as string | undefined
-  return (fromEnv && fromEnv.trim()) || "https://boffmedia.es"
+  const fromEnv = import.meta.env?.VITE_BOFF_WEB_URL as string | undefined;
+  return (fromEnv && fromEnv.trim()) || "https://boffmedia.es";
 }
 
 export async function boffDeviceStart(): Promise<BoffDeviceCode> {
@@ -260,33 +266,33 @@ export async function boffDeviceStart(): Promise<BoffDeviceCode> {
       verificationUri: "https://boffmedia.es/app/autorizar",
       expiresIn: 600,
       intervalSeconds: 2,
-    }
+    };
   }
   try {
-    return await invoke<BoffDeviceCode>("boff_device_start")
+    return await invoke<BoffDeviceCode>("boff_device_start");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** One poll. The caller sets the cadence — see the interval the start call
  *  returned — so a ten-minute wait never parks a request anywhere. */
 export async function boffDevicePoll(): Promise<BoffDevicePoll> {
-  if (!isDesktop()) return { status: "approved", user: MOCK_BOFF_ACCOUNT }
+  if (!isDesktop()) return { status: "approved", user: MOCK_BOFF_ACCOUNT };
   try {
-    return await invoke<BoffDevicePoll>("boff_device_poll")
+    return await invoke<BoffDevicePoll>("boff_device_poll");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** The stored 30-day session, if it is still live. `null` = sign in again. */
 export async function boffSessionRestore(): Promise<BoffAccount | null> {
-  if (!isDesktop()) return MOCK_BOFF_ACCOUNT
+  if (!isDesktop()) return MOCK_BOFF_ACCOUNT;
   try {
-    return await invoke<BoffAccount | null>("boff_session_restore")
+    return await invoke<BoffAccount | null>("boff_session_restore");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -294,35 +300,35 @@ export async function boffSessionRestore(): Promise<BoffAccount | null> {
  *  afterwards — another signed-in account is promoted — or null when that was
  *  the last one and BoffSignIn is due. */
 export async function boffSignOut(): Promise<BoffAccount | null> {
-  if (!isDesktop()) return null
+  if (!isDesktop()) return null;
   try {
-    return await invoke<BoffAccount | null>("boff_sign_out")
+    return await invoke<BoffAccount | null>("boff_sign_out");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Every signed-in Boffmedia account, active one flagged. Offline and cheap —
  *  reads the roster, never the network. */
 export async function boffAccounts(): Promise<BoffAccountEntry[]> {
-  if (!isDesktop()) return [{ ...MOCK_BOFF_ACCOUNT, active: true }]
+  if (!isDesktop()) return [{ ...MOCK_BOFF_ACCOUNT, active: true }];
   try {
-    return await invoke<BoffAccountEntry[]>("boff_accounts")
+    return await invoke<BoffAccountEntry[]>("boff_accounts");
   } catch {
     // Degrade to "just the account you are signed in as" rather than blocking
     // the shell on a roster it could not read.
-    return []
+    return [];
   }
 }
 
 /** Make a known Boffmedia account active. Swaps the token every API call and the
  *  randomizer send use, so the pack library reloads for the new account. */
 export async function boffSwitch(id: number): Promise<BoffAccount> {
-  if (!isDesktop()) return MOCK_BOFF_ACCOUNT
+  if (!isDesktop()) return MOCK_BOFF_ACCOUNT;
   try {
-    return await invoke<BoffAccount>("boff_switch", { id })
+    return await invoke<BoffAccount>("boff_switch", { id });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -330,9 +336,9 @@ export async function boffSwitch(id: number): Promise<BoffAccount> {
  *  code expires on its own, and clearing `pending` is what stops a late
  *  approval from being committed by a stray poll. */
 export async function boffDeviceCancel(): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    await invoke("boff_device_cancel")
+    await invoke("boff_device_cancel");
   } catch {
     /* nothing to abandon is not an error the player can act on */
   }
@@ -343,11 +349,11 @@ export async function boffDeviceCancel(): Promise<void> {
  *  play from the on-disk manifest cache; every API call still fails until the
  *  connection returns. */
 export async function boffOffline(): Promise<BoffAccount> {
-  if (!isDesktop()) return MOCK_BOFF_ACCOUNT
+  if (!isDesktop()) return MOCK_BOFF_ACCOUNT;
   try {
-    return await invoke<BoffAccount>("boff_offline")
+    return await invoke<BoffAccount>("boff_offline");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -356,56 +362,63 @@ export async function boffOffline(): Promise<BoffAccount> {
  *  Resolves to the live account, or null when the session is gone and
  *  BoffSignIn is due. */
 export async function boffRevalidate(): Promise<BoffAccount | null> {
-  if (!isDesktop()) return MOCK_BOFF_ACCOUNT
+  if (!isDesktop()) return MOCK_BOFF_ACCOUNT;
   try {
-    return await invoke<BoffAccount | null>("boff_revalidate")
+    return await invoke<BoffAccount | null>("boff_revalidate");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Signs out of EVERY account and forgets them. Per-account sign-out is
  *  `authRemove`. */
 export async function authLogout(): Promise<void> {
-  if (!isDesktop()) return
-  await invoke("auth_logout")
+  if (!isDesktop()) return;
+  await invoke("auth_logout");
 }
 
 /** A row in the account switcher. Only the `active` one has a live session
  *  behind it; the rest are names the launcher can resolve on demand. */
-export type AccountEntry = Account & { active: boolean }
+export type AccountEntry = Account & { active: boolean };
 
 /** Offline and cheap — reads the roster, never the network. */
 export async function authAccounts(): Promise<AccountEntry[]> {
-  if (!isDesktop()) return []
+  if (!isDesktop()) return [];
   try {
-    return await invoke<AccountEntry[]>("auth_accounts")
+    return await invoke<AccountEntry[]>("auth_accounts");
   } catch {
     // The switcher degrades to "just the account you are signed in as" rather
     // than blocking the whole shell on a roster it could not read.
-    return []
+    return [];
   }
 }
 
 /** Make a known account active. Runs the full refresh chain, so it is as slow
  *  as a silent sign-in — the caller should show progress. */
 export async function authSwitch(uuid: string): Promise<Account> {
-  if (!isDesktop()) throw asFailure({ message: "Cambiar de cuenta solo funciona en la aplicación de escritorio." })
+  if (!isDesktop())
+    throw asFailure({
+      message:
+        "Cambiar de cuenta solo funciona en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<Account>("auth_switch", { uuid })
+    return await invoke<Account>("auth_switch", { uuid });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Forget one account. Resolves to whoever is active afterwards, or null when
  *  that was the last one and the sign-in screen is due. */
 export async function authRemove(uuid: string): Promise<Account | null> {
-  if (!isDesktop()) throw asFailure({ message: "Quitar cuentas solo funciona en la aplicación de escritorio." })
+  if (!isDesktop())
+    throw asFailure({
+      message: "Quitar cuentas solo funciona en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<Account | null>("auth_remove", { uuid })
+    return await invoke<Account | null>("auth_remove", { uuid });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -414,13 +427,13 @@ export async function authRemove(uuid: string): Promise<Account | null> {
  *  precisely what the device-code flow exists to avoid. */
 export async function authOpenVerification(fallbackUrl: string): Promise<void> {
   if (!isDesktop()) {
-    window.open(fallbackUrl, "_blank", "noopener,noreferrer")
-    return
+    window.open(fallbackUrl, "_blank", "noopener,noreferrer");
+    return;
   }
   try {
-    await invoke("auth_open_verification")
+    await invoke("auth_open_verification");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -430,13 +443,13 @@ export async function authOpenVerification(fallbackUrl: string): Promise<void> {
  *  randomizer event link both live in the API/website, not in `AuthState`. */
 export async function openUrl(url: string): Promise<void> {
   if (!isDesktop()) {
-    window.open(url, "_blank", "noopener,noreferrer")
-    return
+    window.open(url, "_blank", "noopener,noreferrer");
+    return;
   }
   try {
-    await invoke("open_url", { url })
+    await invoke("open_url", { url });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -447,22 +460,22 @@ export async function copyText(text: string): Promise<boolean> {
   try {
     // Requires a secure context; tauri://localhost qualifies, but a plain
     // http:// dev server on a LAN address does not — hence the fallback.
-    await navigator.clipboard.writeText(text)
-    return true
+    await navigator.clipboard.writeText(text);
+    return true;
   } catch {
     try {
-      const el = document.createElement("textarea")
-      el.value = text
-      el.setAttribute("readonly", "")
-      el.style.position = "fixed"
-      el.style.opacity = "0"
-      document.body.appendChild(el)
-      el.select()
-      const ok = document.execCommand("copy")
-      document.body.removeChild(el)
-      return ok
+      const el = document.createElement("textarea");
+      el.value = text;
+      el.setAttribute("readonly", "");
+      el.style.position = "fixed";
+      el.style.opacity = "0";
+      document.body.appendChild(el);
+      el.select();
+      const ok = document.execCommand("copy");
+      document.body.removeChild(el);
+      return ok;
     } catch {
-      return false
+      return false;
     }
   }
 }
@@ -473,52 +486,52 @@ export async function copyText(text: string): Promise<boolean> {
 // boundary. What comes back is already access-filtered by the server.
 
 export type WirePackVersion = {
-  id: string
-  name: string
+  id: string;
+  name: string;
   /** Null for non-minecraft packs (the API sends null). */
-  minecraft: string | null
-  loader: string | null
-  loaderVersion: string | null
+  minecraft: string | null;
+  loader: string | null;
+  loaderVersion: string | null;
   /** Present for emulator packs — the system the pack targets. */
-  emulatorKind?: "mgba" | "melonds" | null
-  fileCount: number
+  emulatorKind?: "mgba" | "melonds" | null;
+  fileCount: number;
   /** How many things the player can switch on or off. Optional here because a
    *  cached listing written before this field existed must still parse — the
    *  Rust side has the matching `#[serde(default)]` for the same reason. */
-  optionalFeatureCount?: number
-  createdAt: string
-}
+  optionalFeatureCount?: number;
+  createdAt: string;
+};
 
 export type WireGalleryImage = {
-  url: string
-  alt?: string | null
-}
+  url: string;
+  alt?: string | null;
+};
 
 export type WirePack = {
-  id: string
-  slug: string
-  name: string
-  summary: string | null
-  description?: string | null
-  iconUrl: string | null
-  gallery?: WireGalleryImage[]
-  accessKind: "public" | "password" | "allowlist"
+  id: string;
+  slug: string;
+  name: string;
+  summary: string | null;
+  description?: string | null;
+  iconUrl: string | null;
+  gallery?: WireGalleryImage[];
+  accessKind: "public" | "password" | "allowlist";
   /** The game type this pack targets. Always present — the API resolves it. */
-  gameType?: "minecraft" | "emulator" | "zomboid" | "stardew"
+  gameType?: "minecraft" | "emulator" | "zomboid" | "stardew";
   /** The Quick Play target — set only for server packs (from the registry).
    *  `port` is absent for a bare SRV host; `host` can be absent on a legacy
    *  `{}` row, which still counts as a server pack (shown "unavailable"). */
-  server?: { host?: string | null; port?: number | null } | null
-  latestVersion: WirePackVersion | null
-}
+  server?: { host?: string | null; port?: number | null } | null;
+  latestVersion: WirePackVersion | null;
+};
 
 /** Whether the backend is answering, as three states the UI phrases
  *  differently — see the Rust `ServerHealth`. */
 export type ServerHealth = {
-  status: "ok" | "unreachable" | "down"
-  httpStatus: number | null
-  detail: string | null
-}
+  status: "ok" | "unreachable" | "down";
+  httpStatus: number | null;
+  detail: string | null;
+};
 
 /** Probe the API. NEVER throws and never needs a session: it is the thing that
  *  has to still work when everything else is failing, including for a player
@@ -526,14 +539,14 @@ export type ServerHealth = {
  *  so `dev:renderer` reports healthy rather than painting a false alarm over
  *  every screen. */
 export async function serverHealth(): Promise<ServerHealth> {
-  if (!isDesktop()) return { status: "ok", httpStatus: 200, detail: null }
+  if (!isDesktop()) return { status: "ok", httpStatus: 200, detail: null };
   try {
-    return await invoke<ServerHealth>("server_health")
+    return await invoke<ServerHealth>("server_health");
   } catch (err) {
     // The command itself is infallible on the Rust side, so reaching here means
     // the IPC bridge failed. Reporting "unreachable" is still the honest
     // answer: nothing can be fetched either way.
-    return { status: "unreachable", httpStatus: null, detail: String(err) }
+    return { status: "unreachable", httpStatus: null, detail: String(err) };
   }
 }
 
@@ -543,9 +556,9 @@ export async function serverHealth(): Promise<ServerHealth> {
  *  snake_case silently produced a library of packs with no version. */
 export async function packsList(): Promise<WirePack[]> {
   try {
-    return await invoke<WirePack[]>("packs_list")
+    return await invoke<WirePack[]>("packs_list");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -553,9 +566,9 @@ export async function packsList(): Promise<WirePack[]> {
  *  missing play history is cosmetic. */
 export async function playsGet(): Promise<Record<string, string>> {
   try {
-    return await invoke<Record<string, string>>("plays_get")
+    return await invoke<Record<string, string>>("plays_get");
   } catch {
-    return {}
+    return {};
   }
 }
 
@@ -563,9 +576,9 @@ export async function playsGet(): Promise<Record<string, string>> {
  *  cosmetic. */
 export async function playtimeGet(): Promise<Record<string, number>> {
   try {
-    return await invoke<Record<string, number>>("playtime_get")
+    return await invoke<Record<string, number>>("playtime_get");
   } catch {
-    return {}
+    return {};
   }
 }
 
@@ -580,9 +593,9 @@ export async function packManifest(
     return await invoke<unknown>("pack_manifest", {
       packId,
       password: password ?? null,
-    })
+    });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -590,21 +603,25 @@ export async function packManifest(
  *  none was ever stored. Never throws and never hits the network: it is the
  *  offline fallback for {@link packManifest}, letting an installed emulator
  *  pack relaunch with no connection. Browser mode has no cache, so null. */
-export async function packManifestCached(slug: string): Promise<unknown | null> {
-  if (!isDesktop()) return null
+export async function packManifestCached(
+  slug: string,
+): Promise<unknown | null> {
+  if (!isDesktop()) return null;
   try {
-    return (await invoke<unknown | null>("pack_manifest_cache", { slug })) ?? null
+    return (
+      (await invoke<unknown | null>("pack_manifest_cache", { slug })) ?? null
+    );
   } catch {
-    return null
+    return null;
   }
 }
 
 /** Redeem an invite code; resolves to the pack id it unlocked. */
 export async function inviteRedeem(code: string): Promise<string> {
   try {
-    return await invoke<string>("invite_redeem", { code })
+    return await invoke<string>("invite_redeem", { code });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -617,96 +634,99 @@ export async function inviteRedeem(code: string): Promise<string> {
 // reducer therefore has ONE code path, and `dev:renderer` keeps a moving
 // progress bar and a live log.
 
-export const EVENT_INSTALL_PROGRESS = "install://progress"
-export const EVENT_INSTALL_DONE = "install://done"
-export const EVENT_GAME_LOG = "game://log"
-export const EVENT_GAME_STATE = "game://state"
+export const EVENT_INSTALL_PROGRESS = "install://progress";
+export const EVENT_INSTALL_DONE = "install://done";
+export const EVENT_GAME_LOG = "game://log";
+export const EVENT_GAME_STATE = "game://state";
 /** Per-file download state while an add-a-mod install is in flight. Separate
  *  from `install://progress`, which describes the ONE pack-wide bar: these
  *  events are row-level and must not put the pack card into "instalando". */
-export const EVENT_CONTENT_FILE = "content://file"
+export const EVENT_CONTENT_FILE = "content://file";
 
 /** One file of an add-a-mod install. `path` is instance-relative, normalised
  *  the same way `instance_content` normalises the paths the Content tab already
  *  holds, so the two can be matched row for row. */
 export type ContentFileEvent = {
-  slug: string
-  path: string
-  state: "downloading" | "done" | "error"
-  error?: string
-}
+  slug: string;
+  path: string;
+  state: "downloading" | "done" | "error";
+  error?: string;
+};
 
 export type InstallProgressEvent = {
-  packId: string
-  phase: InstallPhase
-  fraction: number
-  file: string
-  downloadedBytes: number
-  totalBytes: number
-}
+  packId: string;
+  phase: InstallPhase;
+  fraction: number;
+  file: string;
+  downloadedBytes: number;
+  totalBytes: number;
+};
 
-export type InstallDoneEvent = { packId: string }
+export type InstallDoneEvent = { packId: string };
 
 /** Everything `instance_scan` and `install_pack` can report. `installing` is
  *  absent by design: only the renderer, which holds the progress events, can
  *  know a pack is mid-install. */
-export type ScannedInstallState = Exclude<InstallState, { kind: "installing" }>
+export type ScannedInstallState = Exclude<InstallState, { kind: "installing" }>;
 
-export type Unsubscribe = () => void
+export type Unsubscribe = () => void;
 
-type Handler = (payload: never) => void
+type Handler = (payload: never) => void;
 
-const bus = new Map<string, Set<Handler>>()
+const bus = new Map<string, Set<Handler>>();
 
 function busEmit<T>(event: string, payload: T): void {
-  for (const fn of bus.get(event) ?? []) (fn as (p: T) => void)(payload)
+  for (const fn of bus.get(event) ?? []) (fn as (p: T) => void)(payload);
 }
 
 /** Subscribe to a shell event. The returned function is safe to call twice and
  *  safe to call before the underlying `listen` has resolved — which is exactly
  *  what React StrictMode does on every mount in dev. */
-function subscribe<T>(event: string, handler: (payload: T) => void): Unsubscribe {
+function subscribe<T>(
+  event: string,
+  handler: (payload: T) => void,
+): Unsubscribe {
   if (!isDesktop()) {
-    const set = bus.get(event) ?? new Set<Handler>()
-    bus.set(event, set)
-    set.add(handler as Handler)
+    const set = bus.get(event) ?? new Set<Handler>();
+    bus.set(event, set);
+    set.add(handler as Handler);
     return () => {
-      set.delete(handler as Handler)
-    }
+      set.delete(handler as Handler);
+    };
   }
 
-  let stop: Unsubscribe | null = null
-  let cancelled = false
+  let stop: Unsubscribe | null = null;
+  let cancelled = false;
   void listen<T>(event, (e) => {
-    if (!cancelled) handler(e.payload)
+    if (!cancelled) handler(e.payload);
   })
     .then((unlisten) => {
-      if (cancelled) unlisten()
-      else stop = unlisten
+      if (cancelled) unlisten();
+      else stop = unlisten;
     })
     .catch(() => {
       /* no shell, no events — browser mode is a valid state */
-    })
+    });
 
   return () => {
-    cancelled = true
-    stop?.()
-    stop = null
-  }
+    cancelled = true;
+    stop?.();
+    stop = null;
+  };
 }
 
 export const onInstallProgress = (fn: (e: InstallProgressEvent) => void) =>
-  subscribe<InstallProgressEvent>(EVENT_INSTALL_PROGRESS, fn)
+  subscribe<InstallProgressEvent>(EVENT_INSTALL_PROGRESS, fn);
 export const onInstallDone = (fn: (e: InstallDoneEvent) => void) =>
-  subscribe<InstallDoneEvent>(EVENT_INSTALL_DONE, fn)
+  subscribe<InstallDoneEvent>(EVENT_INSTALL_DONE, fn);
 export const onGameLog = (fn: (line: LogLine) => void) =>
-  subscribe<LogLine>(EVENT_GAME_LOG, fn)
+  subscribe<LogLine>(EVENT_GAME_LOG, fn);
 export const onGameState = (fn: (state: GameState) => void) =>
-  subscribe<GameState>(EVENT_GAME_STATE, fn)
+  subscribe<GameState>(EVENT_GAME_STATE, fn);
 export const onContentFile = (fn: (e: ContentFileEvent) => void) =>
-  subscribe<ContentFileEvent>(EVENT_CONTENT_FILE, fn)
+  subscribe<ContentFileEvent>(EVENT_CONTENT_FILE, fn);
 
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const MOCK_PHASES: InstallPhase[] = [
   "resolving",
@@ -717,13 +737,13 @@ const MOCK_PHASES: InstallPhase[] = [
   "mods",
   "overrides",
   "verifying",
-]
+];
 
 async function mockInstall(packId: string): Promise<ScannedInstallState> {
-  const total = 1_284_000_000
+  const total = 1_284_000_000;
   for (const [i, phase] of MOCK_PHASES.entries()) {
     for (let step = 0; step < 4; step++) {
-      const fraction = (i * 4 + step + 1) / (MOCK_PHASES.length * 4)
+      const fraction = (i * 4 + step + 1) / (MOCK_PHASES.length * 4);
       busEmit<InstallProgressEvent>(EVENT_INSTALL_PROGRESS, {
         packId,
         phase,
@@ -731,12 +751,12 @@ async function mockInstall(packId: string): Promise<ScannedInstallState> {
         file: `${phase}/archivo-${step + 1}`,
         downloadedBytes: Math.round(fraction * total),
         totalBytes: total,
-      })
-      await sleep(110)
+      });
+      await sleep(110);
     }
   }
-  busEmit<InstallDoneEvent>(EVENT_INSTALL_DONE, { packId })
-  return { kind: "installed", versionId: "mock", sizeBytes: total }
+  busEmit<InstallDoneEvent>(EVENT_INSTALL_DONE, { packId });
+  return { kind: "installed", versionId: "mock", sizeBytes: total };
 }
 
 /** Install or update a pack. `manifest` is what {@link packManifest} returned;
@@ -745,58 +765,70 @@ export async function installPack(
   packId: string,
   manifest: unknown,
 ): Promise<ScannedInstallState> {
-  if (!isDesktop()) return mockInstall(packId)
+  if (!isDesktop()) return mockInstall(packId);
   try {
-    return await invoke<ScannedInstallState>("install_pack", { manifest })
+    return await invoke<ScannedInstallState>("install_pack", { manifest });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Verify, then spawn. Resolves to the OS pid; `game://state` carries the rest,
  *  including the crash exit code the pid alone cannot tell you about. */
-export async function launchPack(packId: string, manifest: unknown): Promise<number> {
+export async function launchPack(
+  packId: string,
+  manifest: unknown,
+): Promise<number> {
   if (!isDesktop()) {
-    busEmit<GameState>(EVENT_GAME_STATE, { kind: "preparing" })
-    await sleep(600)
-    await mockInstall(packId)
-    busEmit<GameState>(EVENT_GAME_STATE, { kind: "running", pid: 4821, since: Date.now() })
-    for (const line of mockLogs()) busEmit<LogLine>(EVENT_GAME_LOG, line)
+    busEmit<GameState>(EVENT_GAME_STATE, { kind: "preparing" });
+    await sleep(600);
+    await mockInstall(packId);
+    busEmit<GameState>(EVENT_GAME_STATE, {
+      kind: "running",
+      pid: 4821,
+      since: Date.now(),
+    });
+    for (const line of mockLogs()) busEmit<LogLine>(EVENT_GAME_LOG, line);
     // `?crash=1` replays a crashed session so the diagnosis UI is
     // developable in a browser. Opt-in, because the default mock must still
     // exercise the running state.
     if (new URLSearchParams(location.search).get("crash") === "1") {
       void (async () => {
-        await sleep(1200)
+        await sleep(1200);
         for (const [level, source, text] of MOCK_CRASH_LOG) {
-          busEmit<LogLine>(EVENT_GAME_LOG, { ts: Date.now(), level, source, text })
+          busEmit<LogLine>(EVENT_GAME_LOG, {
+            ts: Date.now(),
+            level,
+            source,
+            text,
+          });
         }
         busEmit<GameState>(EVENT_GAME_STATE, {
           kind: "crashed",
           exitCode: 1,
           diagnosis: MOCK_DIAGNOSIS,
-        })
-      })()
+        });
+      })();
     }
-    return 4821
+    return 4821;
   }
   try {
-    return await invoke<number>("launch_pack", { manifest })
+    return await invoke<number>("launch_pack", { manifest });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Idempotent: stopping a pack that already exited is the normal race. */
 export async function stopGame(packId: string): Promise<void> {
   if (!isDesktop()) {
-    busEmit<GameState>(EVENT_GAME_STATE, { kind: "idle" })
-    return
+    busEmit<GameState>(EVENT_GAME_STATE, { kind: "idle" });
+    return;
   }
   try {
-    await invoke("stop_game", { packId })
+    await invoke("stop_game", { packId });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -806,25 +838,27 @@ export async function instanceScan(
   slug: string,
   latestVersionId: string | null,
 ): Promise<ScannedInstallState> {
-  if (!isDesktop()) return { kind: "not-installed" }
+  if (!isDesktop()) return { kind: "not-installed" };
   try {
     return await invoke<ScannedInstallState>("instance_scan", {
       slug,
       latestVersionId,
-    })
+    });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Drop the managed files (mods, config, bin, marker) so the next install
  *  rebuilds them. Saves and options are left alone by the Rust side. */
-export async function repairInstance(slug: string): Promise<ScannedInstallState> {
-  if (!isDesktop()) return { kind: "not-installed" }
+export async function repairInstance(
+  slug: string,
+): Promise<ScannedInstallState> {
+  if (!isDesktop()) return { kind: "not-installed" };
   try {
-    return await invoke<ScannedInstallState>("repair_instance", { slug })
+    return await invoke<ScannedInstallState>("repair_instance", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -838,9 +872,19 @@ export async function repairInstance(slug: string): Promise<ScannedInstallState>
 // toggle and revert screens are actually developable in `dev:renderer`.
 
 const mockOptional: OptionalFile[] = [
-  { path: "mods/journeymap.jar", name: "journeymap.jar", size: 4_200_000, enabled: true },
-  { path: "mods/shaders.jar", name: "shaders.jar", size: 1_800_000, enabled: false },
-]
+  {
+    path: "mods/journeymap.jar",
+    name: "journeymap.jar",
+    size: 4_200_000,
+    enabled: true,
+  },
+  {
+    path: "mods/shaders.jar",
+    name: "shaders.jar",
+    size: 1_800_000,
+    enabled: false,
+  },
+];
 
 // The FEATURE model, mocked with the three shapes the chooser has to handle: an
 // `any` group of independent switches, a `one` radio, and a dependency chain.
@@ -855,7 +899,8 @@ const mockGroups: OptionalGroup[] = [
       {
         id: "sodium",
         name: "Sodium",
-        description: "Reescribe el renderizador. Duplica los FPS en la mayoría de equipos.",
+        description:
+          "Reescribe el renderizador. Duplica los FPS en la mayoría de equipos.",
         paths: ["mods/sodium.jar"],
         default: true,
         requires: [],
@@ -910,7 +955,7 @@ const mockGroups: OptionalGroup[] = [
       },
     ],
   },
-]
+];
 
 const mockVersions: RetainedVersion[] = [
   {
@@ -935,16 +980,18 @@ const mockVersions: RetainedVersion[] = [
     current: false,
     revertible: true,
   },
-]
+];
 
 /** Versions still on this machine, newest first. Never throws: an empty
  *  rollback list is a normal state, not an error worth a red banner. */
-export async function instanceVersions(slug: string): Promise<RetainedVersion[]> {
-  if (!isDesktop()) return mockVersions
+export async function instanceVersions(
+  slug: string,
+): Promise<RetainedVersion[]> {
+  if (!isDesktop()) return mockVersions;
   try {
-    return await invoke<RetainedVersion[]>("instance_versions", { slug })
+    return await invoke<RetainedVersion[]>("instance_versions", { slug });
   } catch {
-    return []
+    return [];
   }
 }
 
@@ -957,38 +1004,40 @@ export async function instanceRevert(
   password?: string,
 ): Promise<ScannedInstallState> {
   if (!isDesktop()) {
-    for (const v of mockVersions) v.current = v.versionId === versionId
-    return { kind: "installed", versionId, sizeBytes: 1_284_000_000 }
+    for (const v of mockVersions) v.current = v.versionId === versionId;
+    return { kind: "installed", versionId, sizeBytes: 1_284_000_000 };
   }
   try {
     return await invoke<ScannedInstallState>("instance_revert", {
       slug,
       versionId,
       password: password ?? null,
-    })
+    });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Follow the server's latest version again. */
-export async function instanceUnpin(slug: string): Promise<ScannedInstallState> {
-  if (!isDesktop()) return { kind: "not-installed" }
+export async function instanceUnpin(
+  slug: string,
+): Promise<ScannedInstallState> {
+  if (!isDesktop()) return { kind: "not-installed" };
   try {
-    return await invoke<ScannedInstallState>("instance_unpin", { slug })
+    return await invoke<ScannedInstallState>("instance_unpin", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** The pack's optional files. Empty before the first install — optional-ness
  *  is a manifest fact the marker remembers, not something the disk can show. */
 export async function instanceOptional(slug: string): Promise<OptionalFile[]> {
-  if (!isDesktop()) return mockOptional.map((f) => ({ ...f }))
+  if (!isDesktop()) return mockOptional.map((f) => ({ ...f }));
   try {
-    return await invoke<OptionalFile[]>("instance_optional", { slug })
+    return await invoke<OptionalFile[]>("instance_optional", { slug });
   } catch {
-    return []
+    return [];
   }
 }
 
@@ -1000,14 +1049,18 @@ export async function instanceOptionalSet(
   enabled: boolean,
 ): Promise<OptionalFile[]> {
   if (!isDesktop()) {
-    const hit = mockOptional.find((f) => f.path === path)
-    if (hit) hit.enabled = enabled
-    return mockOptional.map((f) => ({ ...f }))
+    const hit = mockOptional.find((f) => f.path === path);
+    if (hit) hit.enabled = enabled;
+    return mockOptional.map((f) => ({ ...f }));
   }
   try {
-    return await invoke<OptionalFile[]>("instance_optional_set", { slug, path, enabled })
+    return await invoke<OptionalFile[]>("instance_optional_set", {
+      slug,
+      path,
+      enabled,
+    });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1031,15 +1084,103 @@ export async function instanceOptionalModel(
    *  resolves against the marker. */
   preferManifest?: boolean,
 ): Promise<OptionalGroup[]> {
-  if (!isDesktop()) return structuredClone(mockGroups)
+  if (!isDesktop()) return structuredClone(mockGroups);
   try {
     return await invoke<OptionalGroup[]>("instance_optional_model", {
       slug,
       manifest,
       preferManifest,
-    })
+    });
   } catch {
-    return []
+    return [];
+  }
+}
+
+/** Browser-mode graph, shaped like the real one so the three surfaces that
+ *  render it can be developed without the shell. Mirrors the two relationships
+ *  that made this feature worth building: a shared library with several
+ *  dependents, and a cross-feature hard dependency with no `requires` to match. */
+function mockModGraph(): ModGraph {
+  const yacl = "mods/yet_another_config_lib_v3.jar";
+  return {
+    jars: [],
+    edges: [
+      {
+        from: "mods/better-clouds.jar",
+        to: yacl,
+        modId: "yet_another_config_lib_v3",
+      },
+      {
+        from: "mods/controlify.jar",
+        to: yacl,
+        modId: "yet_another_config_lib_v3",
+      },
+      { from: "mods/iris.jar", to: "mods/sodium.jar", modId: "sodium" },
+    ],
+    unresolved: [],
+    broken: [
+      {
+        from: "mods/moreculling.jar",
+        to: "mods/cloth-config.jar",
+        modId: "cloth_config",
+        reason: "disabled",
+      },
+    ],
+    missingRequires: [
+      {
+        feature: "shaders",
+        needs: "sodium",
+        fromPath: "mods/iris.jar",
+        toPath: "mods/sodium.jar",
+        modId: "sodium",
+        toIsLibrary: false,
+      },
+    ],
+    dependents: {
+      [yacl]: ["mods/better-clouds.jar", "mods/controlify.jar"],
+      "mods/sodium.jar": ["mods/iris.jar"],
+    },
+    ownerOf: {
+      "mods/better-clouds.jar": "nubes",
+      "mods/iris.jar": "shaders",
+      "mods/sodium.jar": "sodium",
+    },
+  };
+}
+
+/** What every jar in the instance declares it provides and requires, read from
+ *  the jars themselves.
+ *
+ *  Not derived from the manifest on purpose — the whole value is catching what
+ *  the author did NOT record. `manifest`/`preferManifest` only choose which
+ *  catalogue the features are read from, with the same precedence
+ *  {@link instanceOptionalModel} uses.
+ *
+ *  Returns an EMPTY graph rather than throwing when the scan fails: every
+ *  surface that renders this is decoration on a screen that must still work.
+ *  A pack whose jars cannot be read is a pack you can still play. */
+export async function instanceModGraph(
+  slug: string,
+  manifest?: unknown,
+  preferManifest?: boolean,
+): Promise<ModGraph> {
+  if (!isDesktop()) return mockModGraph();
+  try {
+    return await invoke<ModGraph>("instance_mod_graph", {
+      slug,
+      manifest,
+      preferManifest,
+    });
+  } catch {
+    return {
+      jars: [],
+      edges: [],
+      unresolved: [],
+      broken: [],
+      missingRequires: [],
+      dependents: {},
+      ownerOf: {},
+    };
   }
 }
 
@@ -1060,16 +1201,16 @@ export async function instanceFeatureSet(
   enabled: boolean,
   manifest?: unknown,
 ): Promise<FeatureSetResult> {
-  if (!isDesktop()) return mockFeatureSet(featureId, enabled)
+  if (!isDesktop()) return mockFeatureSet(featureId, enabled);
   try {
     return await invoke<FeatureSetResult>("instance_feature_set", {
       slug,
       featureId,
       enabled,
       manifest,
-    })
+    });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1077,52 +1218,68 @@ export async function instanceFeatureSet(
  *  the Rust side applies — exclusivity, then the `requires` closure — so the
  *  chooser's behaviour can be developed and reviewed without the shell. */
 function mockFeatureSet(featureId: string, enabled: boolean): FeatureSetResult {
-  const all = mockGroups.flatMap((g) => g.features)
-  const before = new Map(all.map((f) => [f.id, f.enabled]))
-  const group = mockGroups.find((g) => g.features.some((f) => f.id === featureId))
-  const target = all.find((f) => f.id === featureId)
+  const all = mockGroups.flatMap((g) => g.features);
+  const before = new Map(all.map((f) => [f.id, f.enabled]));
+  const group = mockGroups.find((g) =>
+    g.features.some((f) => f.id === featureId),
+  );
+  const target = all.find((f) => f.id === featureId);
   if (!group || !target) {
-    return { groups: structuredClone(mockGroups), changed: [], missing: [], deferred: false }
+    return {
+      groups: structuredClone(mockGroups),
+      changed: [],
+      missing: [],
+      deferred: false,
+    };
   }
 
   if (enabled) {
     if (group.select !== "any") {
-      for (const sibling of group.features) if (sibling.id !== target.id) sibling.enabled = false
+      for (const sibling of group.features)
+        if (sibling.id !== target.id) sibling.enabled = false;
     }
-    target.enabled = true
+    target.enabled = true;
     // Transitive requirements, pulled on with it.
-    const queue = [...target.requires]
+    const queue = [...target.requires];
     while (queue.length > 0) {
-      const dep = all.find((f) => f.id === queue.pop())
-      if (!dep || dep.enabled) continue
-      dep.enabled = true
-      queue.push(...dep.requires)
+      const dep = all.find((f) => f.id === queue.pop());
+      if (!dep || dep.enabled) continue;
+      dep.enabled = true;
+      queue.push(...dep.requires);
     }
   } else {
-    target.enabled = false
+    target.enabled = false;
     // Anything that required it can no longer stand.
-    const queue = [target.id]
+    const queue = [target.id];
     while (queue.length > 0) {
-      const id = queue.pop()!
+      const id = queue.pop()!;
       for (const f of all) {
         if (f.enabled && f.requires.includes(id)) {
-          f.enabled = false
-          queue.push(f.id)
+          f.enabled = false;
+          queue.push(f.id);
         }
       }
     }
     if (group.select === "one" && !group.features.some((f) => f.enabled)) {
-      const fallback = group.features.find((f) => f.default) ?? group.features[0]
-      if (fallback) fallback.enabled = true
+      const fallback =
+        group.features.find((f) => f.default) ?? group.features[0];
+      if (fallback) fallback.enabled = true;
     }
   }
 
-  for (const f of all) f.explicit = f.enabled !== f.default
-  const changed = all.filter((f) => before.get(f.id) !== f.enabled).map((f) => f.id)
+  for (const f of all) f.explicit = f.enabled !== f.default;
+  const changed = all
+    .filter((f) => before.get(f.id) !== f.enabled)
+    .map((f) => f.id);
   const missing = all
     .filter((f) => f.enabled && !f.installed && changed.includes(f.id))
-    .flatMap((f) => f.paths)
-  return { groups: structuredClone(mockGroups), changed: changed.sort(), missing, deferred: false }
+    .flatMap((f) => f.paths);
+  return {
+    groups: structuredClone(mockGroups),
+    changed: changed.sort(),
+    missing,
+    deferred: false,
+  };
 }
 
 // ── Publishing a local pack ────────────────────────────────────────────────
@@ -1133,12 +1290,14 @@ function mockFeatureSet(featureId: string, enabled: boolean): FeatureSetResult {
 /** The preflight. Validates the manifest locally against the same schema the
  *  server runs, then asks which override blobs are already up there. Uploads
  *  nothing, so it is safe to call every time the screen opens. */
-export async function packPublishPlan(slug: string): Promise<PublishPlan | null> {
-  if (!isDesktop()) return null
+export async function packPublishPlan(
+  slug: string,
+): Promise<PublishPlan | null> {
+  if (!isDesktop()) return null;
   try {
-    return await invoke<PublishPlan>("pack_publish_plan", { slug })
+    return await invoke<PublishPlan>("pack_publish_plan", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1148,12 +1307,16 @@ export async function packPublishPlan(slug: string): Promise<PublishPlan | null>
  *  is stored and invisible to every launcher until somebody says otherwise. That
  *  split is why this is not one button — creating a version and making it the
  *  one every player downloads are different decisions. */
-export async function packPublish(slug: string, publish: boolean): Promise<PublishResult> {
-  if (!isDesktop()) throw new Error("Publicar solo funciona en la app de escritorio.")
+export async function packPublish(
+  slug: string,
+  publish: boolean,
+): Promise<PublishResult> {
+  if (!isDesktop())
+    throw new Error("Publicar solo funciona en la app de escritorio.");
   try {
-    return await invoke<PublishResult>("pack_publish", { slug, publish })
+    return await invoke<PublishResult>("pack_publish", { slug, publish });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1164,27 +1327,30 @@ export async function packPublish(slug: string, publish: boolean): Promise<Publi
 // panel is developable in `dev:renderer` — the mock mirrors the SAME formula so
 // the UI never learns to expect numbers the shell would not produce.
 
-const MOCK_TOTAL_RAM_MIB = 16384
+const MOCK_TOTAL_RAM_MIB = 16384;
 
 /** Mirrors `recommended_heap_mib` in src-tauri/src/install/runtime.rs. Browser
  *  mode only — the desktop build never runs this, and the Rust unit tests are
  *  the authority on the formula. */
 function mockRecommend(modCount: number, totalRamMib: number): number {
-  const want = 2560 + 12 * Math.min(modCount, 4096)
-  const ceiling = Math.min(Math.floor((totalRamMib * 3) / 5), totalRamMib - 2048)
-  const chosen = Math.min(want, ceiling, 16384)
-  return Math.max(Math.floor(chosen / 512) * 512, 1024)
+  const want = 2560 + 12 * Math.min(modCount, 4096);
+  const ceiling = Math.min(
+    Math.floor((totalRamMib * 3) / 5),
+    totalRamMib - 2048,
+  );
+  const chosen = Math.min(want, ceiling, 16384);
+  return Math.max(Math.floor(chosen / 512) * 512, 1024);
 }
 
 const mockRuntime: { memory: MemoryChoice; java: JavaChoice } = {
   memory: { mode: "inherit" },
   java: { mode: "inherit" },
-}
+};
 
 function mockResolve(): InstanceRuntime {
-  const modCount = 214
-  const recommendedMib = mockRecommend(modCount, MOCK_TOTAL_RAM_MIB)
-  const globalMemoryMib = MOCK_SETTINGS.memoryMib
+  const modCount = 214;
+  const recommendedMib = mockRecommend(modCount, MOCK_TOTAL_RAM_MIB);
+  const globalMemoryMib = MOCK_SETTINGS.memoryMib;
 
   const [heapMib, memorySource]: [number, RuntimeSource] =
     mockRuntime.memory.mode === "fixed"
@@ -1193,14 +1359,14 @@ function mockResolve(): InstanceRuntime {
         ? [recommendedMib, "auto"]
         : MOCK_SETTINGS.memoryAuto
           ? [recommendedMib, "auto"]
-          : [globalMemoryMib, "global"]
+          : [globalMemoryMib, "global"];
 
   const [javaPath, javaSource]: [string | null, RuntimeSource] =
     mockRuntime.java.mode === "custom"
       ? [mockRuntime.java.path.trim() || null, "override"]
       : mockRuntime.java.mode === "auto"
         ? [null, "override"]
-        : [MOCK_SETTINGS.javaPath, "global"]
+        : [MOCK_SETTINGS.javaPath, "global"];
 
   return {
     over: { ...mockRuntime },
@@ -1216,18 +1382,18 @@ function mockResolve(): InstanceRuntime {
     globalMemoryMib,
     globalMemoryAuto: MOCK_SETTINGS.memoryAuto,
     globalJavaPath: MOCK_SETTINGS.javaPath,
-  }
+  };
 }
 
 /** This pack's Java/memory choice and what it currently resolves to. Never
  *  throws: a runtime panel that cannot render is worse than one showing the
  *  inherited defaults. */
 export async function instanceRuntime(slug: string): Promise<InstanceRuntime> {
-  if (!isDesktop()) return mockResolve()
+  if (!isDesktop()) return mockResolve();
   try {
-    return await invoke<InstanceRuntime>("instance_runtime", { slug })
+    return await invoke<InstanceRuntime>("instance_runtime", { slug });
   } catch {
-    return mockResolve()
+    return mockResolve();
   }
 }
 
@@ -1239,14 +1405,18 @@ export async function instanceRuntimeSet(
   java: JavaChoice,
 ): Promise<InstanceRuntime> {
   if (!isDesktop()) {
-    mockRuntime.memory = memory
-    mockRuntime.java = java
-    return mockResolve()
+    mockRuntime.memory = memory;
+    mockRuntime.java = java;
+    return mockResolve();
   }
   try {
-    return await invoke<InstanceRuntime>("instance_runtime_set", { slug, memory, java })
+    return await invoke<InstanceRuntime>("instance_runtime_set", {
+      slug,
+      memory,
+      java,
+    });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1255,65 +1425,93 @@ export async function instanceRuntimeSet(
 // can follow BOFF_API_URL like every other API call does. Here there is only
 // the bridge.
 
-export const EVENT_UPDATE_PROGRESS = "update://progress"
+export const EVENT_UPDATE_PROGRESS = "update://progress";
 
 export type UpdateInfo = {
-  version: string
-  currentVersion: string
-  notes: string | null
-  date: string | null
-}
+  version: string;
+  currentVersion: string;
+  notes: string | null;
+  date: string | null;
+};
 
 export type UpdateProgressEvent = {
-  downloadedBytes: number
+  downloadedBytes: number;
   /** null until the server's Content-Length is known. */
-  totalBytes: number | null
-}
+  totalBytes: number | null;
+};
 
 /** `null` = up to date (the feed answers 204) or no shell. THROWS a string when
  *  the check itself failed — the startup path swallows that so an offline
  *  player sees nothing, while a manual check can say so. */
 export async function updatesCheck(): Promise<UpdateInfo | null> {
-  if (!isDesktop()) return null
-  return await invoke<UpdateInfo | null>("updates_check")
+  if (!isDesktop()) return null;
+  return await invoke<UpdateInfo | null>("updates_check");
 }
 
 /** Download + verify + install + relaunch. Never resolves on success — the
  *  process is replaced. Throws a plain string message on failure. */
 export async function updatesInstall(): Promise<void> {
-  if (!isDesktop()) throw "Las actualizaciones solo funcionan en la aplicación de escritorio."
-  await invoke("updates_install")
+  if (!isDesktop())
+    throw "Las actualizaciones solo funcionan en la aplicación de escritorio.";
+  await invoke("updates_install");
 }
 
 export const onUpdateProgress = (fn: (e: UpdateProgressEvent) => void) =>
-  subscribe<UpdateProgressEvent>(EVENT_UPDATE_PROGRESS, fn)
+  subscribe<UpdateProgressEvent>(EVENT_UPDATE_PROGRESS, fn);
 
 // ── Settings ───────────────────────────────────────────────────────────────
 
 export async function settingsGet(): Promise<Settings> {
-  if (!isDesktop()) return MOCK_SETTINGS
+  if (!isDesktop()) return MOCK_SETTINGS;
   try {
-    return await invoke<Settings>("settings_get")
+    return await invoke<Settings>("settings_get");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 export async function settingsSet(settings: Settings): Promise<Settings> {
-  if (!isDesktop()) return settings
+  if (!isDesktop()) return settings;
   try {
-    return await invoke<Settings>("settings_set", { settings })
+    return await invoke<Settings>("settings_set", { settings });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
+  }
+}
+
+/** Apply the UI scale to the webview.
+ *
+ *  Chromium's own zoom, not a CSS transform: it scales text, spacing and icons
+ *  together and reflows honestly, where a transform would blur and leave hit
+ *  targets where they were. A CSS/rem approach cannot work at all here — every
+ *  size in the UI is a hardcoded px value in a Tailwind arbitrary class.
+ *
+ *  Requires `core:webview:allow-set-webview-zoom` in the capability file. It is
+ *  NOT part of Tauri's default webview permission set — which grants only
+ *  get-all-webviews, position, size and toggle-devtools — so without it every
+ *  call is rejected by the ACL.
+ *
+ *  Returns false rather than throwing, and NEVER swallows the reason: a
+ *  swallowed rejection here is indistinguishable from a working setting, which
+ *  is exactly how the missing permission went unnoticed. Boot still proceeds —
+ *  a preference is not worth failing on — but the failure is on the record. */
+export async function applyUiScale(scale: number): Promise<boolean> {
+  if (!isDesktop()) return false;
+  try {
+    await getCurrentWebview().setZoom(scale);
+    return true;
+  } catch (err) {
+    console.error("No se pudo aplicar la escala de la interfaz", err);
+    return false;
   }
 }
 
 /** The window is created hidden so the user never sees an unstyled white
  *  flash; this reveals it once React has painted. No-op in a browser. */
 export async function revealWindow(): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    await getCurrentWindow().show()
+    await getCurrentWindow().show();
   } catch {
     /* a visible window is not worth crashing over */
   }
@@ -1321,9 +1519,9 @@ export async function revealWindow(): Promise<void> {
 
 /** Minimize the window. No-op in a browser. */
 export async function minimizeWindow(): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    await getCurrentWindow().minimize()
+    await getCurrentWindow().minimize();
   } catch {
     /* window control failures are non-fatal */
   }
@@ -1331,9 +1529,9 @@ export async function minimizeWindow(): Promise<void> {
 
 /** Maximize the window. No-op in a browser. */
 export async function maximizeWindow(): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    await getCurrentWindow().maximize()
+    await getCurrentWindow().maximize();
   } catch {
     /* window control failures are non-fatal */
   }
@@ -1341,14 +1539,14 @@ export async function maximizeWindow(): Promise<void> {
 
 /** Toggle between maximized and restored state. No-op in a browser. */
 export async function toggleMaximize(): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    const win = getCurrentWindow()
-    const isMaximized = await win.isMaximized()
+    const win = getCurrentWindow();
+    const isMaximized = await win.isMaximized();
     if (isMaximized) {
-      await win.unmaximize()
+      await win.unmaximize();
     } else {
-      await win.maximize()
+      await win.maximize();
     }
   } catch {
     /* window control failures are non-fatal */
@@ -1357,9 +1555,9 @@ export async function toggleMaximize(): Promise<void> {
 
 /** Close the window. No-op in a browser. */
 export async function closeWindow(): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    await getCurrentWindow().close()
+    await getCurrentWindow().close();
   } catch {
     /* window control failures are non-fatal */
   }
@@ -1367,11 +1565,11 @@ export async function closeWindow(): Promise<void> {
 
 /** Check if the window is maximized. Returns false in a browser. */
 export async function isMaximized(): Promise<boolean> {
-  if (!isDesktop()) return false
+  if (!isDesktop()) return false;
   try {
-    return await getCurrentWindow().isMaximized()
+    return await getCurrentWindow().isMaximized();
   } catch {
-    return false
+    return false;
   }
 }
 
@@ -1380,12 +1578,18 @@ export async function isMaximized(): Promise<boolean> {
 // so the bridge does not either — a card that cannot ping shows offline, not
 // an error state.
 
-export async function serverStatus(host: string, port?: number): Promise<ServerStatus> {
-  if (!isDesktop()) return mockServerStatus(host)
+export async function serverStatus(
+  host: string,
+  port?: number,
+): Promise<ServerStatus> {
+  if (!isDesktop()) return mockServerStatus(host);
   try {
-    return await invoke<ServerStatus>("server_status", { host, port: port ?? null })
+    return await invoke<ServerStatus>("server_status", {
+      host,
+      port: port ?? null,
+    });
   } catch {
-    return { online: false, players: null, motd: null, latencyMs: null }
+    return { online: false, players: null, motd: null, latencyMs: null };
   }
 }
 
@@ -1396,40 +1600,41 @@ export async function serverStatus(host: string, port?: number): Promise<ServerS
 // a local pack from ever addressing a managed one.
 
 export async function localPacksList(): Promise<PackManifest[]> {
-  if (!isDesktop()) return mockLocalPacks()
+  if (!isDesktop()) return mockLocalPacks();
   try {
-    return await invoke<PackManifest[]>("local_packs_list")
+    return await invoke<PackManifest[]>("local_packs_list");
   } catch {
-    return []
+    return [];
   }
 }
 
 export async function localPackGet(slug: string): Promise<PackManifest | null> {
-  if (!isDesktop()) return mockLocalPacks().find((m) => m.pack.slug === slug) ?? null
+  if (!isDesktop())
+    return mockLocalPacks().find((m) => m.pack.slug === slug) ?? null;
   try {
-    return await invoke<PackManifest>("local_pack_get", { slug })
+    return await invoke<PackManifest>("local_pack_get", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Create (no existing local slug) or save-in-place (an existing one). The
  *  Rust side assigns a fresh, collision-free `local-` slug for a new pack. */
 export async function localPackSave(manifest: unknown): Promise<PackManifest> {
-  if (!isDesktop()) return manifest as PackManifest
+  if (!isDesktop()) return manifest as PackManifest;
   try {
-    return await invoke<PackManifest>("local_pack_save", { manifest })
+    return await invoke<PackManifest>("local_pack_save", { manifest });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 export async function localPackDelete(slug: string): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    await invoke("local_pack_delete", { slug })
+    await invoke("local_pack_delete", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1438,21 +1643,27 @@ export async function localPackDelete(slug: string): Promise<void> {
 // why this does not go through the API like the dashboard's picker does.
 
 export async function minecraftVersions(): Promise<GameVersion[]> {
-  if (!isDesktop()) return mockGameVersions()
+  if (!isDesktop()) return mockGameVersions();
   try {
-    return await invoke<GameVersion[]>("meta_minecraft_versions")
+    return await invoke<GameVersion[]>("meta_minecraft_versions");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
-export async function loaderVersions(loader: string, minecraft: string): Promise<LoaderVersion[]> {
-  if (!loader) return []
-  if (!isDesktop()) return mockLoaderVersions()
+export async function loaderVersions(
+  loader: string,
+  minecraft: string,
+): Promise<LoaderVersion[]> {
+  if (!loader) return [];
+  if (!isDesktop()) return mockLoaderVersions();
   try {
-    return await invoke<LoaderVersion[]>("meta_loader_versions", { loader, minecraft })
+    return await invoke<LoaderVersion[]>("meta_loader_versions", {
+      loader,
+      minecraft,
+    });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1462,48 +1673,57 @@ export async function loaderVersions(loader: string, minecraft: string): Promise
 // User-Agent Modrinth asks for is impossible to set from a webview.
 
 export async function catalogSearch(input: {
-  query?: string
-  gameVersion?: string
-  loader?: string
-  projectType?: string
-  sort?: string
-  category?: string
-  page?: number
-  pageSize?: number
-  includeFabricViaConnector?: boolean
+  query?: string;
+  gameVersion?: string;
+  loader?: string;
+  projectType?: string;
+  sort?: string;
+  category?: string;
+  page?: number;
+  pageSize?: number;
+  includeFabricViaConnector?: boolean;
 }): Promise<ModSearchPage> {
-  if (!isDesktop()) return mockCatalogSearch(input.query)
+  if (!isDesktop()) return mockCatalogSearch(input.query);
   try {
-    return await invoke<ModSearchPage>("catalog_search", input)
+    return await invoke<ModSearchPage>("catalog_search", input);
   } catch {
-    return { hits: [], total: 0 }
+    return { hits: [], total: 0 };
   }
 }
 
-export async function catalogCategories(projectType: string): Promise<CatalogCategory[]> {
-  if (!isDesktop()) return mockCatalogCategories()
+export async function catalogCategories(
+  projectType: string,
+): Promise<CatalogCategory[]> {
+  if (!isDesktop()) return mockCatalogCategories();
   try {
-    return await invoke<CatalogCategory[]>("catalog_categories", { projectType })
+    return await invoke<CatalogCategory[]>("catalog_categories", {
+      projectType,
+    });
   } catch {
-    return []
+    return [];
   }
 }
 
-export async function catalogProject(projectId: string): Promise<ModProject | null> {
-  if (!isDesktop()) return mockCatalogProject(projectId)
+export async function catalogProject(
+  projectId: string,
+): Promise<ModProject | null> {
+  if (!isDesktop()) return mockCatalogProject(projectId);
   try {
-    return await invoke<ModProject>("catalog_project", { projectId })
+    return await invoke<ModProject>("catalog_project", { projectId });
   } catch {
-    return null
+    return null;
   }
 }
 
-export async function catalogProjectSummaries(ids: string[]): Promise<ModSearchHit[]> {
-  if (!isDesktop()) return mockCatalogSearch().hits.filter((h) => ids.includes(h.projectId))
+export async function catalogProjectSummaries(
+  ids: string[],
+): Promise<ModSearchHit[]> {
+  if (!isDesktop())
+    return mockCatalogSearch().hits.filter((h) => ids.includes(h.projectId));
   try {
-    return await invoke<ModSearchHit[]>("catalog_project_summaries", { ids })
+    return await invoke<ModSearchHit[]>("catalog_project_summaries", { ids });
   } catch {
-    return []
+    return [];
   }
 }
 
@@ -1511,34 +1731,41 @@ export async function catalogVersions(
   projectId: string,
   filters: { gameVersion?: string; loader?: string },
 ): Promise<ModFile[]> {
-  if (!isDesktop()) return mockCatalogVersions(projectId)
+  if (!isDesktop()) return mockCatalogVersions(projectId);
   try {
-    return await invoke<ModFile[]>("catalog_versions", { projectId, ...filters })
+    return await invoke<ModFile[]>("catalog_versions", {
+      projectId,
+      ...filters,
+    });
   } catch {
-    return []
+    return [];
   }
 }
 
 /** Modrinth publishes sha512 and size with the version, so this costs one
  *  metadata request. A raw URL has no hash to borrow and must be downloaded to
  *  be hashed, which is why it is a separate, slower command. */
-export async function catalogResolve(source: ResolveSource): Promise<ResolvedFile | null> {
-  if (!isDesktop()) return mockCatalogResolve(source)
+export async function catalogResolve(
+  source: ResolveSource,
+): Promise<ResolvedFile | null> {
+  if (!isDesktop()) return mockCatalogResolve(source);
   try {
     if (source.kind === "modrinth") {
       return await invoke<ResolvedFile>("catalog_resolve_modrinth", {
         projectId: source.projectId,
         versionId: source.versionId,
-      })
+      });
     }
     if (source.kind === "url") {
-      return await invoke<ResolvedFile>("catalog_resolve_url", { url: source.url })
+      return await invoke<ResolvedFile>("catalog_resolve_url", {
+        url: source.url,
+      });
     }
     // CurseForge never reaches this launcher: it has no key and must not have
     // one. The dashboard authors those entries.
-    return null
+    return null;
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1548,48 +1775,48 @@ export async function catalogResolve(source: ResolveSource): Promise<ResolvedFil
  *  `enabled` are independent: a file can be declared but not yet downloaded,
  *  or downloaded and switched off. */
 export type ContentFile = {
-  path: string
-  size: number
-  isMod: boolean
+  path: string;
+  size: number;
+  isMod: boolean;
   /** Whether the pack OFFERS the choice — not whether it is currently on. */
-  optional: boolean
-  enabled: boolean
-  installed: boolean
+  optional: boolean;
+  enabled: boolean;
+  installed: boolean;
   source:
     | { kind: "url"; url: string }
     | { kind: "modrinth"; versionId: string }
     | { kind: "curseforge"; projectId: number; fileId: number }
-    | { kind: "override"; sha512: string }
-}
+    | { kind: "override"; sha512: string };
+};
 
 export type DirEntry = {
-  path: string
-  name: string
-  isDir: boolean
-  size: number
-  modified: number
-}
+  path: string;
+  name: string;
+  isDir: boolean;
+  size: number;
+  modified: number;
+};
 
 export type World = {
-  folder: string
-  name: string
-  lastPlayed: number
-  sizeBytes: number
-  gameMode: "survival" | "creative" | "adventure" | "spectator" | "unknown"
-  hardcore: boolean
-  version: string | null
-  hasIcon: boolean
-}
+  folder: string;
+  name: string;
+  lastPlayed: number;
+  sizeBytes: number;
+  gameMode: "survival" | "creative" | "adventure" | "spectator" | "unknown";
+  hardcore: boolean;
+  version: string | null;
+  hasIcon: boolean;
+};
 
 /** What the Content tab renders. Empty before the first install — there is no
  *  marker to read, and a LOCAL pack's own manifest is the fallback the caller
  *  layers on top. */
 export async function instanceContent(slug: string): Promise<ContentFile[]> {
-  if (!isDesktop()) return mockContent()
+  if (!isDesktop()) return mockContent();
   try {
-    return await invoke<ContentFile[]>("instance_content", { slug })
+    return await invoke<ContentFile[]>("instance_content", { slug });
   } catch {
-    return []
+    return [];
   }
 }
 
@@ -1597,22 +1824,22 @@ export async function instanceContent(slug: string): Promise<ContentFile[]> {
 export type ExtraFile = {
   /** Instance-relative and WITHOUT the `.disabled` suffix, so a parked file
    *  keeps the same identity it had while enabled. */
-  path: string
-  size: number
-  enabled: boolean
+  path: string;
+  size: number;
+  enabled: boolean;
   /** What the renderer asks Modrinth about, to turn a filename into a mod. */
-  sha512?: string
-}
+  sha512?: string;
+};
 
 /** Content-folder files the marker does not claim — jars the player dropped in
  *  by hand. Kept separate from `instanceContent` because these must never enter
  *  the marker: the moment one did, the stale sweep could delete it. */
 export async function instanceExtraFiles(slug: string): Promise<ExtraFile[]> {
-  if (!isDesktop()) return mockExtraFiles()
+  if (!isDesktop()) return mockExtraFiles();
   try {
-    return await invoke<ExtraFile[]>("instance_extra_files", { slug })
+    return await invoke<ExtraFile[]>("instance_extra_files", { slug });
   } catch {
-    return []
+    return [];
   }
 }
 
@@ -1634,50 +1861,60 @@ export async function instanceInstallFiles(
   paths: string[],
   previousVersionId: string | null,
 ): Promise<boolean> {
-  if (!isDesktop()) return false
+  if (!isDesktop()) return false;
   return await invoke<boolean>("instance_install_files", {
     slug,
     manifest,
     paths,
     previousVersionId,
-  })
+  });
 }
 
-export async function instanceExtraSetEnabled(slug: string, path: string, enabled: boolean) {
-  if (!isDesktop()) return
-  await invoke("instance_extra_set_enabled", { slug, path, enabled })
+export async function instanceExtraSetEnabled(
+  slug: string,
+  path: string,
+  enabled: boolean,
+) {
+  if (!isDesktop()) return;
+  await invoke("instance_extra_set_enabled", { slug, path, enabled });
 }
 
 export async function instanceExtraDelete(slug: string, path: string) {
-  if (!isDesktop()) return
-  await invoke("instance_extra_delete", { slug, path })
+  if (!isDesktop()) return;
+  await invoke("instance_extra_delete", { slug, path });
 }
 
-export async function instanceBrowse(slug: string, rel: string): Promise<DirEntry[]> {
-  if (!isDesktop()) return mockDirEntries(rel)
+export async function instanceBrowse(
+  slug: string,
+  rel: string,
+): Promise<DirEntry[]> {
+  if (!isDesktop()) return mockDirEntries(rel);
   try {
-    return await invoke<DirEntry[]>("instance_browse", { slug, rel })
+    return await invoke<DirEntry[]>("instance_browse", { slug, rel });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
-export async function instanceDeletePath(slug: string, rel: string): Promise<void> {
-  if (!isDesktop()) return
+export async function instanceDeletePath(
+  slug: string,
+  rel: string,
+): Promise<void> {
+  if (!isDesktop()) return;
   try {
-    await invoke("instance_delete_path", { slug, rel })
+    await invoke("instance_delete_path", { slug, rel });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Reveal a path in the OS file manager. `rel` may be "" for the game folder. */
 export async function instanceReveal(slug: string, rel: string): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    await invoke("instance_reveal", { slug, rel })
+    await invoke("instance_reveal", { slug, rel });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1686,11 +1923,11 @@ export async function instanceReveal(slug: string, rel: string): Promise<void> {
  *  backups are kept — this is not the whole-pack deletion `localPackDelete` is.
  *  The caller must not offer this while the game is running. */
 export async function instanceDelete(slug: string): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    await invoke("instance_delete", { slug })
+    await invoke("instance_delete", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1708,66 +1945,76 @@ export async function provideFile(
         code: "wrong_hash",
         expectedHint: "Test file hint",
         message: "Hash mismatch",
-      }
-      throw err
+      };
+      throw err;
     }
-    return { satisfied: true }
+    return { satisfied: true };
   }
   try {
     // The Rust command reads the expected hash/hint from the instance marker,
     // keyed by slug — no pack id or session needed.
-    return await invoke<ProvideFileResult>("instance_provide_file", { slug, path, sourceFile })
+    return await invoke<ProvideFileResult>("instance_provide_file", {
+      slug,
+      path,
+      sourceFile,
+    });
   } catch (err) {
-    throw err as ProvideFileError
+    throw err as ProvideFileError;
   }
 }
 
 /** A screenshot on disk. `rel` is the handle `screenshotImage` takes back. */
 export type Screenshot = {
-  name: string
-  rel: string
-  size: number
-  modified: number
-}
+  name: string;
+  rel: string;
+  size: number;
+  modified: number;
+};
 
 /** Every screenshot in this instance, newest first. */
 export async function instanceScreenshots(slug: string): Promise<Screenshot[]> {
-  if (!isDesktop()) return []
+  if (!isDesktop()) return [];
   try {
-    return await invoke<Screenshot[]>("instance_screenshots", { slug })
+    return await invoke<Screenshot[]>("instance_screenshots", { slug });
   } catch {
-    return []
+    return [];
   }
 }
 
 /** One screenshot as a data: URL, or null if it is gone. Never throws — a
  *  thumbnail that will not load is cosmetic. */
-export async function screenshotImage(slug: string, rel: string): Promise<string | null> {
-  if (!isDesktop()) return rel
+export async function screenshotImage(
+  slug: string,
+  rel: string,
+): Promise<string | null> {
+  if (!isDesktop()) return rel;
   try {
-    return await invoke<string | null>("screenshot_image", { slug, rel })
+    return await invoke<string | null>("screenshot_image", { slug, rel });
   } catch {
-    return null
+    return null;
   }
 }
 
 export async function instanceWorlds(slug: string): Promise<World[]> {
-  if (!isDesktop()) return mockWorlds()
+  if (!isDesktop()) return mockWorlds();
   try {
-    return await invoke<World[]>("instance_worlds", { slug })
+    return await invoke<World[]>("instance_worlds", { slug });
   } catch {
-    return []
+    return [];
   }
 }
 
 /** Fetch a world's icon as a data: URL, or null if not present. Never throws:
  *  a missing icon is cosmetic. */
-export async function worldIcon(slug: string, folder: string): Promise<string | null> {
-  if (!isDesktop()) return null
+export async function worldIcon(
+  slug: string,
+  folder: string,
+): Promise<string | null> {
+  if (!isDesktop()) return null;
   try {
-    return await invoke<string | null>("world_icon", { slug, folder })
+    return await invoke<string | null>("world_icon", { slug, folder });
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -1775,23 +2022,25 @@ export async function worldIcon(slug: string, folder: string): Promise<string | 
  *  a version id and nothing else, so this is the only way an installed managed
  *  pack can show a mod's name, icon or author. */
 export async function catalogVersionsByIds(ids: string[]): Promise<ModFile[]> {
-  if (!isDesktop() || ids.length === 0) return []
+  if (!isDesktop() || ids.length === 0) return [];
   try {
-    return await invoke<ModFile[]>("catalog_versions_by_ids", { ids })
+    return await invoke<ModFile[]>("catalog_versions_by_ids", { ids });
   } catch {
-    return []
+    return [];
   }
 }
 
 /** Identify jars by SHA-512. Each returned file carries the hash that was asked
  *  about, so the caller can match an answer back to the file on disk. Hashes
  *  Modrinth does not know are simply absent — a private build is not an error. */
-export async function catalogVersionsByHashes(hashes: string[]): Promise<ModFile[]> {
-  if (!isDesktop() || hashes.length === 0) return []
+export async function catalogVersionsByHashes(
+  hashes: string[],
+): Promise<ModFile[]> {
+  if (!isDesktop() || hashes.length === 0) return [];
   try {
-    return await invoke<ModFile[]>("catalog_versions_by_hashes", { hashes })
+    return await invoke<ModFile[]>("catalog_versions_by_hashes", { hashes });
   } catch {
-    return []
+    return [];
   }
 }
 
@@ -1806,52 +2055,60 @@ export async function catalogVersionsByHashes(hashes: string[]): Promise<ModFile
  *  written to a console nobody can open, so "the icons are blank" had no
  *  observable cause at all. The Logs screen is the diagnostic surface a player
  *  (and whoever is debugging their report) can actually reach. */
-let iconFailureSink: ((message: string) => void) | null = null
+let iconFailureSink: ((message: string) => void) | null = null;
 
-export function setIconFailureSink(sink: ((message: string) => void) | null): void {
-  iconFailureSink = sink
+export function setIconFailureSink(
+  sink: ((message: string) => void) | null,
+): void {
+  iconFailureSink = sink;
 }
 
 /** Reports an icon the WEBVIEW refused, as opposed to one the cache could not
  *  produce. Deliberately separate from the failure above: the cache writing the
  *  file and the webview agreeing to render it are different things, and a bug
  *  in either one shows up as the same blank square. */
-export function reportIconFailure(attemptedSrc: string, remoteUrl: string): void {
+export function reportIconFailure(
+  attemptedSrc: string,
+  remoteUrl: string,
+): void {
   // A data: URL carries the whole image; log its head, never the payload.
-  const shown = attemptedSrc.length > 120 ? `${attemptedSrc.slice(0, 120)}…` : attemptedSrc
+  const shown =
+    attemptedSrc.length > 120 ? `${attemptedSrc.slice(0, 120)}…` : attemptedSrc;
   iconFailureSink?.(
     `El webview rechazó el icono. URL generada: ${shown || "(vacía)"} — origen: ${remoteUrl || "(desconocido)"}`,
-  )
+  );
 }
 
 /** Logged once per session so the shape of the generated URL is on the record.
  *  Every remaining explanation for "the bytes exist but nothing renders" is a
  *  property of this string — the scheme, the MIME — and it has never been
  *  visible anywhere. */
-let loggedFirstIconUrl = false
+let loggedFirstIconUrl = false;
 
 /** Resolves catalog art to a `data:` URL via the on-disk cache (icons.rs).
  *  Nothing here touches the asset protocol: data: URLs need no scope, which is
  *  the property the previous two icon systems lacked. */
 export async function iconSrc(url: string): Promise<string | null> {
-  if (!isDesktop()) return url
+  if (!isDesktop()) return url;
   try {
-    const data = await invoke<string>("icon_cache", { url })
+    const data = await invoke<string>("icon_cache", { url });
     if (!loggedFirstIconUrl) {
-      loggedFirstIconUrl = true
-      const head = data.slice(0, data.indexOf(",") + 1)
-      iconFailureSink?.(`Diagnóstico: primer icono servido como ${head}… (${data.length} caracteres)`)
+      loggedFirstIconUrl = true;
+      const head = data.slice(0, data.indexOf(",") + 1);
+      iconFailureSink?.(
+        `Diagnóstico: primer icono servido como ${head}… (${data.length} caracteres)`,
+      );
     }
-    return data
+    return data;
   } catch (err) {
     // Non-fatal — the caller falls back to the remote URL — but not silent.
     // Three different faults (the command missing, the download failing, the
     // cache being unwritable) all present as a blank square, and only this
     // message tells them apart.
-    const detail = (err as { message?: string })?.message ?? String(err)
-    console.error("icon_cache failed for", url, err)
-    iconFailureSink?.(`No se pudo cachear el icono ${url}: ${detail}`)
-    return null
+    const detail = (err as { message?: string })?.message ?? String(err);
+    console.error("icon_cache failed for", url, err);
+    iconFailureSink?.(`No se pudo cachear el icono ${url}: ${detail}`);
+    return null;
   }
 }
 
@@ -1859,11 +2116,14 @@ export async function iconSrc(url: string): Promise<string | null> {
  *  the boundary); resolves to the chosen path, or throws if the player
  *  cancelled. */
 export async function exportMrpack(slug: string): Promise<string> {
-  if (!isDesktop()) throw asFailure({ message: "La exportación solo funciona en la aplicación de escritorio." })
+  if (!isDesktop())
+    throw asFailure({
+      message: "La exportación solo funciona en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<string>("export_mrpack", { slug })
+    return await invoke<string>("export_mrpack", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1871,34 +2131,43 @@ export async function exportMrpack(slug: string): Promise<string> {
  *  "unsupported" — a server-ready pack minus the client-only mods. Same native
  *  save dialog; resolves to the chosen path, or throws if cancelled. */
 export async function exportServerMrpack(slug: string): Promise<string> {
-  if (!isDesktop()) throw asFailure({ message: "La exportación solo funciona en la aplicación de escritorio." })
+  if (!isDesktop())
+    throw asFailure({
+      message: "La exportación solo funciona en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<string>("export_server_mrpack", { slug })
+    return await invoke<string>("export_server_mrpack", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Fork a local pack: new manifest, new slug, and a copy of the installed
  *  files. Local packs only — see the Rust side for why a managed pack cannot
  *  be duplicated in place. */
-export async function localPackDuplicate(slug: string, name: string): Promise<PackManifest> {
-  if (!isDesktop()) throw asFailure({ message: "Duplicar solo funciona en la aplicación de escritorio." })
+export async function localPackDuplicate(
+  slug: string,
+  name: string,
+): Promise<PackManifest> {
+  if (!isDesktop())
+    throw asFailure({
+      message: "Duplicar solo funciona en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<PackManifest>("local_pack_duplicate", { slug, name })
+    return await invoke<PackManifest>("local_pack_duplicate", { slug, name });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 export type Backup = {
-  id: string
-  kind: "instance" | "world"
-  label: string
-  createdAt: string
-  world?: string
-  sizeBytes: number
-}
+  id: string;
+  kind: "instance" | "world";
+  label: string;
+  createdAt: string;
+  world?: string;
+  sizeBytes: number;
+};
 
 /** Snapshot the whole instance, or one world when `world` names a save folder. */
 export async function backupCreate(
@@ -1906,73 +2175,96 @@ export async function backupCreate(
   label: string,
   world?: string,
 ): Promise<Backup> {
-  if (!isDesktop()) throw asFailure({ message: "Las copias solo funcionan en la aplicación de escritorio." })
+  if (!isDesktop())
+    throw asFailure({
+      message: "Las copias solo funcionan en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<Backup>("backup_create", { slug, world: world ?? null, label })
+    return await invoke<Backup>("backup_create", {
+      slug,
+      world: world ?? null,
+      label,
+    });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 export async function backupList(slug: string): Promise<Backup[]> {
-  if (!isDesktop()) return []
+  if (!isDesktop()) return [];
   try {
-    return await invoke<Backup[]>("backup_list", { slug })
+    return await invoke<Backup[]>("backup_list", { slug });
   } catch {
     // A listing that throws would leave the panel stuck on its spinner; an
     // empty list at least renders the "no backups yet" state.
-    return []
+    return [];
   }
 }
 
 export async function backupRestore(slug: string, id: string): Promise<void> {
-  if (!isDesktop()) throw asFailure({ message: "Las copias solo funcionan en la aplicación de escritorio." })
+  if (!isDesktop())
+    throw asFailure({
+      message: "Las copias solo funcionan en la aplicación de escritorio.",
+    });
   try {
-    await invoke("backup_restore", { slug, id })
+    await invoke("backup_restore", { slug, id });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 export async function backupDelete(slug: string, id: string): Promise<void> {
-  if (!isDesktop()) throw asFailure({ message: "Las copias solo funcionan en la aplicación de escritorio." })
+  if (!isDesktop())
+    throw asFailure({
+      message: "Las copias solo funcionan en la aplicación de escritorio.",
+    });
   try {
-    await invoke("backup_delete", { slug, id })
+    await invoke("backup_delete", { slug, id });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 export type ImportMrpackResult = {
-  manifest: PackManifest
+  manifest: PackManifest;
   /** True when the imported pack's name collided with one already in the
    *  library and was given a suffix — show a non-blocking notice, never a
    *  silent rename. */
-  renamed: boolean
-}
+  renamed: boolean;
+};
 
 /** Opens the native file-picker itself; throws if the player cancelled, the
  *  file was not a valid .mrpack, or its loader is unsupported. Accepts both a
  *  pack this launcher exported and a plain Modrinth one, which the Rust side
  *  converts. */
 export async function importMrpack(): Promise<ImportMrpackResult> {
-  if (!isDesktop()) throw asFailure({ message: "La importación solo funciona en la aplicación de escritorio." })
+  if (!isDesktop())
+    throw asFailure({
+      message: "La importación solo funciona en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<ImportMrpackResult>("import_mrpack")
+    return await invoke<ImportMrpackResult>("import_mrpack");
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Import straight off Modrinth. `source` may be a modpack page URL, a version
  *  URL, a bare project slug, or a direct link to a .mrpack. Downloading happens
  *  on the Rust side, so no CSP allowance is needed for the CDN. */
-export async function importMrpackUrl(source: string): Promise<ImportMrpackResult> {
-  if (!isDesktop()) throw asFailure({ message: "La importación solo funciona en la aplicación de escritorio." })
+export async function importMrpackUrl(
+  source: string,
+): Promise<ImportMrpackResult> {
+  if (!isDesktop())
+    throw asFailure({
+      message: "La importación solo funciona en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<ImportMrpackResult>("import_mrpack_url", { url: source })
+    return await invoke<ImportMrpackResult>("import_mrpack_url", {
+      url: source,
+    });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -1981,72 +2273,86 @@ export async function importMrpackUrl(source: string): Promise<ImportMrpackResul
 /** Open the native image picker and set a local pack's icon. Resolves to
  *  `true` when a file was chosen, `false` if the player cancelled. */
 export async function localPackIconSet(slug: string): Promise<boolean> {
-  if (!isDesktop()) return false
+  if (!isDesktop()) return false;
   try {
-    return await invoke<boolean>("local_pack_icon_set", { slug })
+    return await invoke<boolean>("local_pack_icon_set", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Clear a local pack's icon. */
 export async function localPackIconClear(slug: string): Promise<void> {
-  if (!isDesktop()) return
+  if (!isDesktop()) return;
   try {
-    await invoke("local_pack_icon_clear", { slug })
+    await invoke("local_pack_icon_clear", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Get a local pack's icon as a data: URL, or null if not set. */
 export async function localPackIcon(slug: string): Promise<string | null> {
-  if (!isDesktop()) return null
+  if (!isDesktop()) return null;
   try {
-    return await invoke<string | null>("local_pack_icon", { slug })
+    return await invoke<string | null>("local_pack_icon", { slug });
   } catch {
-    return null
+    return null;
   }
 }
 
 /** List gallery images for a local pack (filenames in gallery/ dir). */
 export async function localPackGalleryList(slug: string): Promise<string[]> {
-  if (!isDesktop()) return []
+  if (!isDesktop()) return [];
   try {
-    return await invoke<string[]>("local_pack_gallery_list", { slug })
+    return await invoke<string[]>("local_pack_gallery_list", { slug });
   } catch {
-    return []
+    return [];
   }
 }
 
 /** Open the native image picker and add the chosen image to a local pack's
  *  gallery. Resolves to the stored filename, or `null` if cancelled. */
-export async function localPackGalleryAdd(slug: string): Promise<string | null> {
-  if (!isDesktop()) throw asFailure({ message: "Solo funciona en la aplicación de escritorio." })
+export async function localPackGalleryAdd(
+  slug: string,
+): Promise<string | null> {
+  if (!isDesktop())
+    throw asFailure({
+      message: "Solo funciona en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<string | null>("local_pack_gallery_add", { slug })
+    return await invoke<string | null>("local_pack_gallery_add", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Remove an image from a local pack's gallery. */
-export async function localPackGalleryRemove(slug: string, filename: string): Promise<void> {
-  if (!isDesktop()) return
+export async function localPackGalleryRemove(
+  slug: string,
+  filename: string,
+): Promise<void> {
+  if (!isDesktop()) return;
   try {
-    await invoke("local_pack_gallery_remove", { slug, filename })
+    await invoke("local_pack_gallery_remove", { slug, filename });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Get a gallery image as a data: URL, or null if not found. */
-export async function localPackGalleryImage(slug: string, filename: string): Promise<string | null> {
-  if (!isDesktop()) return null
+export async function localPackGalleryImage(
+  slug: string,
+  filename: string,
+): Promise<string | null> {
+  if (!isDesktop()) return null;
   try {
-    return await invoke<string | null>("local_pack_gallery_image", { slug, filename })
+    return await invoke<string | null>("local_pack_gallery_image", {
+      slug,
+      filename,
+    });
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -2054,32 +2360,47 @@ export async function localPackGalleryImage(slug: string, filename: string): Pro
 
 /** Open the native .zip picker and add the chosen archive as a bundled world
  *  under `folder`. Resolves to `true` when added, `false` if cancelled. */
-export async function localPackWorldAddZip(slug: string, folder: string): Promise<boolean> {
-  if (!isDesktop()) throw asFailure({ message: "Solo funciona en la aplicación de escritorio." })
+export async function localPackWorldAddZip(
+  slug: string,
+  folder: string,
+): Promise<boolean> {
+  if (!isDesktop())
+    throw asFailure({
+      message: "Solo funciona en la aplicación de escritorio.",
+    });
   try {
-    return await invoke<boolean>("local_pack_world_add_zip", { slug, folder })
+    return await invoke<boolean>("local_pack_world_add_zip", { slug, folder });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Promote an installed world into a local pack's bundled worlds. */
-export async function localPackWorldPromote(slug: string, worldFolder: string): Promise<void> {
-  if (!isDesktop()) throw asFailure({ message: "Solo funciona en la aplicación de escritorio." })
+export async function localPackWorldPromote(
+  slug: string,
+  worldFolder: string,
+): Promise<void> {
+  if (!isDesktop())
+    throw asFailure({
+      message: "Solo funciona en la aplicación de escritorio.",
+    });
   try {
-    await invoke("local_pack_world_promote", { slug, worldFolder })
+    await invoke("local_pack_world_promote", { slug, worldFolder });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Remove a bundled world from a local pack. */
-export async function localPackWorldRemove(slug: string, folder: string): Promise<void> {
-  if (!isDesktop()) return
+export async function localPackWorldRemove(
+  slug: string,
+  folder: string,
+): Promise<void> {
+  if (!isDesktop()) return;
   try {
-    await invoke("local_pack_world_remove", { slug, folder })
+    await invoke("local_pack_world_remove", { slug, folder });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
@@ -2087,98 +2408,103 @@ export async function localPackWorldRemove(slug: string, folder: string): Promis
 
 /** Get the current status of an emulator (resolved path and source, or stale override). */
 export async function emulatorStatus(kind: "mgba" | "melonds"): Promise<any> {
-  if (!isDesktop()) return mockEmulatorStatus(kind)
+  if (!isDesktop()) return mockEmulatorStatus(kind);
   try {
-    return await invoke("emulator_status", { kind })
+    return await invoke("emulator_status", { kind });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Set an override path for an emulator. */
-export async function emulatorSetPath(kind: "mgba" | "melonds", path: string): Promise<any> {
-  if (!isDesktop()) return mockEmulatorStatus(kind)
+export async function emulatorSetPath(
+  kind: "mgba" | "melonds",
+  path: string,
+): Promise<any> {
+  if (!isDesktop()) return mockEmulatorStatus(kind);
   try {
-    return await invoke("emulator_set_path", { kind, path })
+    return await invoke("emulator_set_path", { kind, path });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Clear the override path for an emulator (fall back to auto-detection). */
-export async function emulatorClearPath(kind: "mgba" | "melonds"): Promise<any> {
-  if (!isDesktop()) return mockEmulatorStatus(kind)
+export async function emulatorClearPath(
+  kind: "mgba" | "melonds",
+): Promise<any> {
+  if (!isDesktop()) return mockEmulatorStatus(kind);
   try {
-    return await invoke("emulator_clear_path", { kind })
+    return await invoke("emulator_clear_path", { kind });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Get the list of configured ROM directories. */
 export async function romDirsGet(): Promise<string[]> {
-  if (!isDesktop()) return mockRomDirs
+  if (!isDesktop()) return mockRomDirs;
   try {
-    return await invoke<string[]>("rom_dirs_get")
+    return await invoke<string[]>("rom_dirs_get");
   } catch {
-    return []
+    return [];
   }
 }
 
 /** Add a ROM directory to the search list. */
 export async function romDirsAdd(dir: string): Promise<string[]> {
   if (!isDesktop()) {
-    if (!mockRomDirs.includes(dir)) mockRomDirs.push(dir)
-    return [...mockRomDirs]
+    if (!mockRomDirs.includes(dir)) mockRomDirs.push(dir);
+    return [...mockRomDirs];
   }
   try {
-    return await invoke<string[]>("rom_dirs_add", { dir })
+    return await invoke<string[]>("rom_dirs_add", { dir });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Remove a ROM directory from the search list. */
 export async function romDirsRemove(dir: string): Promise<string[]> {
   if (!isDesktop()) {
-    const idx = mockRomDirs.indexOf(dir)
-    if (idx >= 0) mockRomDirs.splice(idx, 1)
-    return [...mockRomDirs]
+    const idx = mockRomDirs.indexOf(dir);
+    if (idx >= 0) mockRomDirs.splice(idx, 1);
+    return [...mockRomDirs];
   }
   try {
-    return await invoke<string[]>("rom_dirs_remove", { dir })
+    return await invoke<string[]>("rom_dirs_remove", { dir });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Scan for user-provided files in the player's ROM library. */
 export async function instanceUserFilesScan(slug: string): Promise<any> {
-  if (!isDesktop()) return mockInstanceUserFilesScan(slug)
+  if (!isDesktop()) return mockInstanceUserFilesScan(slug);
   try {
-    return await invoke("instance_user_files_scan", { slug })
+    return await invoke("instance_user_files_scan", { slug });
   } catch (err) {
-    throw asFailure(err)
+    throw asFailure(err);
   }
 }
 
 /** Open a native file picker. Resolves to the chosen file path, or null if cancelled. */
 export async function filePicker(): Promise<string | null> {
-  if (!isDesktop()) return null
+  if (!isDesktop()) return null;
   try {
-    return await invoke<string | null>("file_picker")
+    return await invoke<string | null>("file_picker");
   } catch {
-    return null
+    return null;
   }
 }
 
 /** Open a native folder picker. Resolves to the chosen folder path, or null if cancelled. */
 export async function folderPicker(): Promise<string | null> {
-  if (!isDesktop()) return null
+  if (!isDesktop()) return null;
   try {
-    return await invoke<string | null>("folder_picker")
+    return await invoke<string | null>("folder_picker");
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -2190,11 +2516,14 @@ export async function saveDialog(
   suggestedName: string,
   filters?: Array<[string, string[]]>,
 ): Promise<string | null> {
-  if (!isDesktop()) return null
+  if (!isDesktop()) return null;
   try {
-    return await invoke<string | null>("save_dialog", { suggestedName, filters })
+    return await invoke<string | null>("save_dialog", {
+      suggestedName,
+      filters,
+    });
   } catch {
-    return null
+    return null;
   }
 }
 
@@ -2206,13 +2535,13 @@ export async function saveDialog(
  *  — `tool-host.ts` translates that into `ToolApiError` so tool code sees the
  *  same failure type it does on the web. */
 export async function toolApiRequest<T = unknown>(request: {
-  path: string
-  method?: string
-  body?: unknown
-  query?: Record<string, string>
-  auth?: "optional" | "required"
+  path: string;
+  method?: string;
+  body?: unknown;
+  query?: Record<string, string>;
+  auth?: "optional" | "required";
 }): Promise<T> {
-  return await invoke<T>("tool_api_request", { request })
+  return await invoke<T>("tool_api_request", { request });
 }
 
 /** Chunked write session for tool exports. A Schematic Compat `.prefab` can run
@@ -2222,76 +2551,80 @@ export async function toolApiRequest<T = unknown>(request: {
 export const saveStream = {
   async begin(path: string): Promise<string> {
     try {
-      return await invoke<string>("save_stream_begin", { path })
+      return await invoke<string>("save_stream_begin", { path });
     } catch (err) {
-      throw asFailure(err)
+      throw asFailure(err);
     }
   },
   async chunk(token: string, chunk: Uint8Array): Promise<void> {
     try {
       // Tauri v2 serialises a number[] for Vec<u8>; the copy is per-chunk, not
       // per-file, which is what keeps peak memory flat.
-      await invoke("save_stream_chunk", { token, chunk: Array.from(chunk) })
+      await invoke("save_stream_chunk", { token, chunk: Array.from(chunk) });
     } catch (err) {
-      throw asFailure(err)
+      throw asFailure(err);
     }
   },
   async finish(token: string): Promise<void> {
     try {
-      await invoke("save_stream_finish", { token })
+      await invoke("save_stream_finish", { token });
     } catch (err) {
-      throw asFailure(err)
+      throw asFailure(err);
     }
   },
   async abort(token: string): Promise<void> {
     try {
-      await invoke("save_stream_abort", { token })
+      await invoke("save_stream_abort", { token });
     } catch (err) {
-      throw asFailure(err)
+      throw asFailure(err);
     }
   },
-}
+};
 
 /** Get the emulator ROM slot's instance-relative path for a pack.
  *  Returns null for non-emulator packs or when the marker is not yet written. */
 export async function instanceRomSlot(slug: string): Promise<string | null> {
-  if (!isDesktop()) return null
+  if (!isDesktop()) return null;
   try {
-    return await invoke<string | null>("instance_rom_slot", { slug })
+    return await invoke<string | null>("instance_rom_slot", { slug });
   } catch {
-    return null
+    return null;
   }
 }
 
 // ── Randomizer Functions ───────────────────────────────────────────────────
 
 export type RandomizerAssignment = {
-  eventId: string
-  status: "pending" | "claimed" | "patched" | "verified"
-  cleanRomSha512: string
-  outputSha512?: string
-}
+  eventId: string;
+  status: "pending" | "claimed" | "patched" | "verified";
+  cleanRomSha512: string;
+  outputSha512?: string;
+};
 
 /** Get the player's assignment for a pack's active randomizer event.
  *  Returns null if the pack has no active event (404).
  *  Status comes back as pending/claimed on first call, automatically claimed. */
-export async function getRandomizerAssignment(packId: string): Promise<RandomizerAssignment | null> {
+export async function getRandomizerAssignment(
+  packId: string,
+): Promise<RandomizerAssignment | null> {
   if (!isDesktop()) {
     return {
       eventId: "mock-event-123",
       status: "claimed",
       cleanRomSha512: "abc123def456",
       outputSha512: undefined,
-    }
+    };
   }
   try {
-    return await invoke<RandomizerAssignment>("randomizer_get_assignment", { packId })
+    return await invoke<RandomizerAssignment>("randomizer_get_assignment", {
+      packId,
+    });
   } catch (err: any) {
     // 404 means no active event for this pack
     if (err?.code === "not_found" || err?.message?.includes("404")) {
-      return null
+      return null;
     }
-    throw err
+    throw err;
   }
 }
 
@@ -2299,19 +2632,19 @@ export async function getRandomizerAssignment(packId: string): Promise<Randomize
 export async function hashFile(filePath: string): Promise<string> {
   if (!isDesktop()) {
     // Browser mock: return a dummy hash
-    return "a".repeat(128)
+    return "a".repeat(128);
   }
   try {
-    return await invoke<string>("hash_file", { path: filePath })
+    return await invoke<string>("hash_file", { path: filePath });
   } catch (err) {
-    throw err
+    throw err;
   }
 }
 
 export type RandomizerRomResult = {
-  outputPath: string
-  outputSha512: string
-}
+  outputPath: string;
+  outputSha512: string;
+};
 
 /** Download the player's randomized ROM. The server generates it on first
  *  request and streams it; Rust streams it to a temp file, verifies it against
@@ -2327,9 +2660,12 @@ export async function downloadRandomizerRom(
     return {
       outputPath: `/tmp/randomized_mock_${eventId}.gba`,
       outputSha512: "b".repeat(128),
-    }
+    };
   }
-  return await invoke<RandomizerRomResult>("randomizer_download_rom", { eventId, romPath })
+  return await invoke<RandomizerRomResult>("randomizer_download_rom", {
+    eventId,
+    romPath,
+  });
 }
 
 /** Place a downloaded randomized ROM into the instance ROM slot AND update the
@@ -2343,25 +2679,30 @@ export async function randomizerPlaceRom(
   romPath: string,
   expectedSha512: string,
 ): Promise<void> {
-  if (!isDesktop()) return
-  await invoke("randomizer_place_rom", { slug, tempPath, romPath, expectedSha512 })
+  if (!isDesktop()) return;
+  await invoke("randomizer_place_rom", {
+    slug,
+    tempPath,
+    romPath,
+    expectedSha512,
+  });
 }
 
 /** Whether the instance's ROM slot actually holds a file on disk — a real
  *  presence check, not a marker inference. Never throws: a missing ROM reads as
  *  "not present". */
 export async function randomizerRomPresent(slug: string): Promise<boolean> {
-  if (!isDesktop()) return false
+  if (!isDesktop()) return false;
   try {
-    return await invoke<boolean>("randomizer_rom_present", { slug })
+    return await invoke<boolean>("randomizer_rom_present", { slug });
   } catch {
-    return false
+    return false;
   }
 }
 
 // ── Mock emulator functions (browser mode) ─────────────────────────────────
 
-let mockRomDirs: string[] = []
+let mockRomDirs: string[] = [];
 
 function mockEmulatorStatus(kind: "mgba" | "melonds"): any {
   if (kind === "melonds") {
@@ -2370,10 +2711,10 @@ function mockEmulatorStatus(kind: "mgba" | "melonds"): any {
         path: "C:\\Games\\EmuDeck\\Emulators\\melonDS\\melonDS.exe",
         source: "emudeck",
       },
-    }
+    };
   }
   // mgba: unresolved for demo purposes
-  return {}
+  return {};
 }
 
 function mockInstanceUserFilesScan(slug: string): any {
@@ -2381,7 +2722,7 @@ function mockInstanceUserFilesScan(slug: string): any {
     return {
       satisfied: [],
       stillMissing: ["roms/pokered.gba"],
-    }
+    };
   }
-  return { satisfied: [], stillMissing: [] }
+  return { satisfied: [], stillMissing: [] };
 }

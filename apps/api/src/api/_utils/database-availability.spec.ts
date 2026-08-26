@@ -11,7 +11,9 @@ import {
  * reason the classifier walks the chain.
  */
 function drizzleQueryError(driverCode: string): Error {
-  const err = new Error('Failed query: select `boffmedia_users`.`id` …') as Error & {
+  const err = new Error(
+    'Failed query: select `boffmedia_users`.`id` …',
+  ) as Error & {
     cause?: unknown;
   };
   err.name = 'DrizzleQueryError';
@@ -34,9 +36,9 @@ describe('isDatabaseUnavailable', () => {
     'PROTOCOL_CONNECTION_LOST',
     'POOL_ENQUEUELIMIT',
   ])('treats %s as unreachable', (code) => {
-    expect(isDatabaseUnavailable(Object.assign(new Error(code), { code }))).toBe(
-      true,
-    );
+    expect(
+      isDatabaseUnavailable(Object.assign(new Error(code), { code })),
+    ).toBe(true);
   });
 
   it('does NOT claim a query the server answered and rejected', () => {
@@ -73,9 +75,11 @@ describe('throwIfDatabaseUnavailable', () => {
     }
     expect(thrown).toBeInstanceOf(ServiceUnavailableException);
     expect((thrown as ServiceUnavailableException).getStatus()).toBe(503);
-    expect((thrown as ServiceUnavailableException).getResponse()).toMatchObject({
-      code: 'SERVICE_DATABASE_UNAVAILABLE',
-    });
+    expect((thrown as ServiceUnavailableException).getResponse()).toMatchObject(
+      {
+        code: 'SERVICE_DATABASE_UNAVAILABLE',
+      },
+    );
   });
 
   it('returns quietly for a wrong password, so the caller still answers 401', () => {

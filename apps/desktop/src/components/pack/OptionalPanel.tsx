@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { Banner, Button, Empty, OptionalChooser, Spinner, toast } from "@boffmedia/ui"
 
@@ -6,12 +6,13 @@ import { useT } from "../../i18n"
 import {
   instanceFeatureSet,
   instanceInstallFiles,
+  instanceModGraph,
   instanceOptionalModel,
   localPackGet,
   packManifest,
   packManifestCached,
 } from "../../runtime"
-import type { OptionalGroup } from "../../services/types"
+import type { ModGraph, OptionalGroup } from "../../services/types"
 import { formatBytes } from "../../utils/format"
 
 // The player's optional-content chooser, wired to the instance — and, for a
@@ -109,6 +110,7 @@ export function OptionalPanel({
   const [source, setSource] = useState<{ manifest: unknown; versionId: string | null } | null>(null)
   const [busy, setBusy] = useState<string[]>([])
   const [deferred, setDeferred] = useState<string[]>([])
+  const [graph, setGraph] = useState<ModGraph | null>(null)
 
   // A LOCAL pack answers out of its MANIFEST, not out of the install marker.
   //
@@ -139,6 +141,10 @@ export function OptionalPanel({
       setSource(next)
       const model = await instanceOptionalModel(slug, next?.manifest, authored)
       if (live) setGroups(model)
+      // After the model, never blocking it: the chooser is fully usable without
+      // the graph, which only adds consequence lines to rows that already work.
+      const g = await instanceModGraph(slug, next?.manifest, authored)
+      if (live) setGraph(g)
     })()
     return () => {
       live = false
@@ -195,6 +201,101 @@ export function OptionalPanel({
     [slug, packId, isLocal, authored, source, onChanged, t],
   )
 
+  /** Per-feature consequences, in the chooser's shape.
+   *
+   *  Two directions from one graph. `breaks`: the reverse edges of every path a
+   *  feature owns, mapped to the FEATURE that would break — a player looking at
+   *  Sodium cannot otherwise learn that Iris needs it. `libraries`: forward
+   *  edges landing on a file no feature owns, which is what makes an
+   *  always-installed jar explicable rather than mysterious. */
+  const consequences = useMemo(() => {
+    if (!graph || !groups) return undefined
+    const nameOf = new Map(groups.flatMap((g) => g.features).map((f) => [f.id, f.name]))
+    const out: Record<string, { breaks?: string[]; libraries?: string[] }> = {}
+
+    for (const feature of groups.flatMap((g) => g.features)) {
+      const owned = new Set(feature.paths)
+      const breaks = new Set<string>()
+      const libraries = new Set<string>()
+
+      for (const edge of graph.edges) {
+        if (owned.has(edge.to)) {
+          const dependent = graph.ownerOf[edge.from]
+          // Only OTHER features: a dependency inside one feature is exactly what
+          // a feature is for, and reporting it would say "Iris breaks Iris".
+          if (dependent && dependent !== feature.id) breaks.add(nameOf.get(dependent) ?? dependent)
+        }
+        if (owned.has(edge.from) && !graph.ownerOf[edge.to]) {
+          libraries.add(edge.to.split("/").pop() ?? edge.to)
+        }
+      }
+
+      if (breaks.size || libraries.size) {
+        out[feature.id] = {
+          breaks: breaks.size ? [...breaks].sort() : undefined,
+          libraries: libraries.size ? [...libraries].sort() : undefined,
+        }
+      }
+    }
+    return out
+  }, [graph, groups])
+
+  const summary = useMemo(() => {
+    const features = (groups ?? []).flatMap((g) => g.features)
+    const enabled = features.filter((f) => f.enabled)
+    return {
+      on: enabled.length,
+      total: features.length,
+      bytes: enabled.reduce((sum, f) => sum + f.size, 0),
+    }
+  }, [groups])
+
+  // One gesture, but N backend calls: `instance_feature_set` resolves ONE
+  // feature against the marker, and a group-wide endpoint would have to
+  // re-implement the `requires` and radio-sibling logic that already lives
+  // there. Sequential rather than concurrent for the same reason — each call
+  // returns the whole state, so two in flight would race to describe a
+  // catalogue that the other one is still changing.
+  const bulk = useCallback(
+    async (groupId: string, enabled: boolean) => {
+      const group = groups?.find((g) => g.id === groupId)
+      if (!group) return
+      const targets = group.features.filter((f) => f.enabled !== enabled).map((f) => f.id)
+      if (targets.length === 0) return
+
+      setBusy(targets)
+      const missing: string[] = []
+      try {
+        for (const id of targets) {
+          // A feature can already have been moved by an earlier iteration —
+          // `requires` pulls dependencies along — so the result of the previous
+          // call, not the list we started from, decides whether this one is
+          // still worth a round trip.
+          const result = await instanceFeatureSet(slug, id, enabled, source?.manifest)
+          setGroups(result.groups)
+          missing.push(...result.missing)
+        }
+
+        if (missing.length > 0) {
+          const fetchFrom = source ?? (await manifestFor(slug, packId, isLocal, false))
+          if (fetchFrom) {
+            const unique = [...new Set(missing)]
+            toast.info(t("optionalDownloading", { count: unique.length }))
+            await instanceInstallFiles(slug, fetchFrom.manifest, unique, fetchFrom.versionId)
+          }
+        }
+        setGroups(await instanceOptionalModel(slug, source?.manifest, authored))
+        onChanged?.()
+      } catch (err) {
+        toast.error((err as { message?: string })?.message ?? t("toggleError"))
+        setGroups(await instanceOptionalModel(slug, source?.manifest, authored))
+      } finally {
+        setBusy([])
+      }
+    },
+    [groups, slug, packId, isLocal, authored, source, onChanged, t],
+  )
+
   if (groups === null) {
     // `role="status"` so the wait is announced rather than being a silent gap
     // between "I opened the tab" and "content appeared".
@@ -228,6 +329,20 @@ export function OptionalPanel({
             {t("optionalTitle")}
           </h2>
           <p className="text-[12px] leading-snug text-txt-muted">{t("optionalSubtitle")}</p>
+          {/* With thirty-odd features across seven groups the subtitle stops
+              being enough to answer "how much of this have I turned on, and
+              what will it cost me". Only the enabled bytes are counted: the
+              total across everything on offer is a number the player cannot
+              act on. */}
+          {summary.total > 0 && (
+            <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-txt-muted">
+              {t("optionalSummary", {
+                on: summary.on,
+                total: summary.total,
+                size: formatBytes(summary.bytes),
+              })}
+            </p>
+          )}
         </div>
 
         {onEdit && (
@@ -255,6 +370,8 @@ export function OptionalPanel({
         <OptionalChooser
           groups={groups}
           onToggle={(id, enabled) => void toggle(id, enabled)}
+          onBulkToggle={(id, enabled) => void bulk(id, enabled)}
+          consequences={consequences}
           busy={busy}
           deferred={deferred}
           layout={layout}

@@ -43,7 +43,9 @@ export class WingullRepository {
     }[]
   > {
     try {
-      const placeholders = WingullRepository.OWNABLE_TYPES.map(() => '?').join(', ');
+      const placeholders = WingullRepository.OWNABLE_TYPES.map(() => '?').join(
+        ', ',
+      );
       const query = `
         SELECT r.name AS regionId, r.type, p.owner_uuid AS ownerUuid, p.owned_since AS ownedSince
         FROM teras_region r

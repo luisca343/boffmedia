@@ -185,6 +185,21 @@ function resolve(
   return interpolate(msg, values, locale)
 }
 
+/** Translate outside React.
+ *
+ *  For code that is not a component and so cannot hold a hook — the app
+ *  provider's launch and install flows, which until now hardcoded Spanish
+ *  strings inline. Reads the CURRENT locale at call time rather than closing
+ *  over one, so a string produced after the player switches language is in the
+ *  language they switched to. */
+export function translate(
+  ns: string | undefined,
+  key: string,
+  values?: Record<string, string | number | Date>,
+): string {
+  return resolve(getLocale(), ns, key, values)
+}
+
 /** The launcher's own `useT`. Pass the screen/namespace once, then call with the
  *  short key: `const t = useT("settings"); t("title")`. */
 export function useT(ns?: string): Translate {

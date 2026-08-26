@@ -412,7 +412,7 @@ export class WingullController {
   }
 
   @Get('owned-regions/:uuid')
-  @ApiOperation({ summary: "Fetch the regions a player owns, by UUID" })
+  @ApiOperation({ summary: 'Fetch the regions a player owns, by UUID' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: "Player's owned regions fetched successfully.",

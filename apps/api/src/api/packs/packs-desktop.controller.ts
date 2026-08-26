@@ -23,11 +23,12 @@ import {
 import { Request } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { UploadFacadeService } from '../boffmedia/util/upload/upload.facade.service';
-import { CreatePackDto, CreatePackVersionDto, UpdatePackDto } from './dto/packs.dto';
 import {
-  BlobUploadEntity,
-  PackIdEntity,
-} from './entities/packs.entity';
+  CreatePackDto,
+  CreatePackVersionDto,
+  UpdatePackDto,
+} from './dto/packs.dto';
+import { BlobUploadEntity, PackIdEntity } from './entities/packs.entity';
 import { DesktopAdminGuard } from './guards/desktop-admin.guard';
 import type { DesktopRequest } from './guards/desktop-auth.guard';
 import { PacksDownloadsService } from './packs-downloads.service';
@@ -132,7 +133,8 @@ export class PacksDesktopController {
     for (const raw of hashes) {
       if (typeof raw !== 'string') continue;
       const sha512 = raw.toLowerCase();
-      if ((await this.downloads.blobSize(sha512)) === null) missing.push(sha512);
+      if ((await this.downloads.blobSize(sha512)) === null)
+        missing.push(sha512);
     }
     return { missing };
   }

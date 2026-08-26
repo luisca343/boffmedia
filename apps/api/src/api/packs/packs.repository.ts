@@ -52,7 +52,10 @@ export class PacksRepository {
     const rows = await this.db
       .select({ name: boffMediaRoles.name })
       .from(boffMediaUserRoles)
-      .innerJoin(boffMediaRoles, eq(boffMediaUserRoles.roleId, boffMediaRoles.id))
+      .innerJoin(
+        boffMediaRoles,
+        eq(boffMediaUserRoles.roleId, boffMediaRoles.id),
+      )
       .where(eq(boffMediaUserRoles.userId, userId));
     return rows.map((r) => r.name);
   }
@@ -317,7 +320,9 @@ export class PacksRepository {
       hydrated.initialFiles = JSON.parse(hydrated.initialFiles) as unknown[];
     }
     if (typeof hydrated.optionalGroups === 'string') {
-      hydrated.optionalGroups = JSON.parse(hydrated.optionalGroups) as unknown[];
+      hydrated.optionalGroups = JSON.parse(
+        hydrated.optionalGroups,
+      ) as unknown[];
     }
     return hydrated;
   }

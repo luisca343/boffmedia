@@ -197,3 +197,83 @@ export interface OptionalGroup {
   select: OptionalSelect
   features: OptionalFeature[]
 }
+
+// ── Mod dependency graph ───────────────────────────────────────────────────
+//
+// Read from the jars on disk (`install/deps.rs`), never from the manifest. The
+// value is catching what an author did NOT write down: Iris hard-requires
+// Sodium, and if Sodium is its own switch with no `requires` to say so, a
+// player turns it off and the game dies at load naming neither feature.
+//
+// Lives here with the rest of the catalogue vocabulary because three surfaces
+// render it — the authoring editor's warning, the Files tab, and the chooser.
+
+/** One "A needs B" edge between two files in the instance. */
+export interface DepEdge {
+  /** Instance path that declares the dependency. */
+  from: string
+  /** Instance path that satisfies it. Empty string when unresolved. */
+  to: string
+  /** The mod id `from` asked for — one file can provide several. */
+  modId: string
+}
+
+/** Why a hard dependency is not satisfied right now. */
+export type BreakReason = "disabled" | "missing"
+
+/** An ENABLED jar whose hard dependency is not satisfied. The pack will not
+ *  start in this state. A DISABLED dependent is never listed: a mod that is off
+ *  cannot fail to load. */
+export interface BrokenDep {
+  from: string
+  /** The file that would satisfy it. Empty when nothing provides it. */
+  to: string
+  modId: string
+  reason: BreakReason
+}
+
+export interface ModJar {
+  path: string
+  /** Mod ids this file declares itself. Empty for a plain library jar with no
+   *  `mods.toml`, which is normal, not a fault. */
+  provides: string[]
+  /** Hard dependencies only. Soft (`optional`) ones are dropped at the source:
+   *  they cannot break a pack by being switched off. */
+  requires: string[]
+  /** Mod ids supplied by jars NESTED inside this one (JarJar). Separate from
+   *  `provides` so a bundled copy never outranks the standalone jar. */
+  bundles: string[]
+  library: boolean
+  /** False when parked as `<name>.jar.disabled`. Disabled jars are scanned, not
+   *  skipped, so "broken because X is off" can be told apart from "X was never
+   *  here" — the two need different words in front of a player. */
+  enabled: boolean
+}
+
+/** A cross-feature hard dependency the catalogue does not declare. */
+export interface MissingRequires {
+  /** Feature that should declare it. */
+  feature: string
+  /** Feature it should point at. */
+  needs: string
+  fromPath: string
+  toPath: string
+  modId: string
+  toIsLibrary: boolean
+}
+
+export interface ModGraph {
+  jars: ModJar[]
+  edges: DepEdge[]
+  /** Required mod ids nothing in the instance provides. Shown, never fatal. */
+  unresolved: DepEdge[]
+  /** What is broken right now, however it got that way — a toggle, a delete, a
+   *  jar removed outside the app, an update that dropped a dependency. */
+  broken: BrokenDep[]
+  missingRequires: MissingRequires[]
+  /** path -> the files that would break without it. Precomputed because every
+   *  user-facing question runs this way round. */
+  dependents: Record<string, string[]>
+  /** path -> the feature owning it. Absent means always installed. */
+  ownerOf: Record<string, string>
+}

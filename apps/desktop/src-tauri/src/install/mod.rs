@@ -18,6 +18,7 @@
 /// Placement is not activation: options.txt and the Iris/Oculus config.
 pub mod activate;
 pub mod crash;
+pub mod deps;
 pub mod emulator;
 pub mod files;
 pub mod game;
@@ -34,7 +35,7 @@ pub mod resolve;
 pub mod runtime;
 pub mod session;
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::sync::{Arc, Mutex as StdMutex};
 
 use serde::{Deserialize, Serialize};
@@ -2801,6 +2802,96 @@ fn import_user_file(
     }
     std::fs::copy(&blob, &dest)?;
     Ok(())
+}
+
+/// The dependency graph of the jars actually on disk, plus the cross-feature
+/// dependencies the catalogue fails to declare.
+///
+/// Read from the jars rather than from the manifest on purpose: a manifest field
+/// would have to be maintained by hand, and the whole value here is catching what
+/// the author did NOT know to write down. Iris hard-requires Sodium; if Sodium is
+/// its own switch and no `requires` says so, a player turns Sodium off and the
+/// game dies at load with a message that names neither feature.
+///
+/// `manifest` is optional and only decides which catalogue the features are read
+/// from — with none supplied the marker answers, the same precedence
+/// `instance_optional_model` uses and for the same reason.
+#[tauri::command]
+pub async fn instance_mod_graph(
+    slug: String,
+    manifest: Option<serde_json::Value>,
+    prefer_manifest: Option<bool>,
+    app: tauri::AppHandle,
+) -> Result<ModGraphView, InstallFailure> {
+    let settings = settings::load(&app);
+    let layout = Layout::new(&app, settings.game_dir())?;
+    let instance = layout.instance(&slug);
+
+    let graph = deps::scan(&instance.mods);
+
+    // Which feature owns each path, and what the catalogue already declares.
+    // Both come from the same groups so they cannot describe different documents.
+    let authored = prefer_manifest.unwrap_or(false) && manifest.is_some();
+    let marker = read_marker(&instance);
+    let groups: Vec<optional::Group> = if let Some(marker) = marker.as_ref().filter(|_| !authored) {
+        marker.optional_groups.clone()
+    } else if let Some(manifest) = manifest.as_ref() {
+        let (groups, _) = model_from_manifest(manifest)?;
+        groups
+    } else {
+        Vec::new()
+    };
+
+    let mut owner_of: BTreeMap<String, String> = BTreeMap::new();
+    let mut declared: BTreeSet<(String, String)> = BTreeSet::new();
+    for group in &groups {
+        for feature in &group.features {
+            for path in &feature.paths {
+                owner_of.insert(instance::normalise(path), feature.id.clone());
+            }
+            for needs in &feature.requires {
+                declared.insert((feature.id.clone(), needs.clone()));
+            }
+        }
+    }
+
+    let missing = deps::missing_requires(&graph, &owner_of, &declared);
+
+    // Reverse edges, precomputed. Every user-facing question runs this way round
+    // ("what needs this library?"), and doing it here means neither the Files tab
+    // nor the chooser has to walk the edge list itself.
+    let mut dependents: BTreeMap<String, Vec<String>> = BTreeMap::new();
+    for edge in &graph.edges {
+        dependents
+            .entry(edge.to.clone())
+            .or_default()
+            .push(edge.from.clone());
+    }
+    for list in dependents.values_mut() {
+        list.sort();
+        list.dedup();
+    }
+
+    Ok(ModGraphView {
+        graph,
+        missing_requires: missing,
+        dependents,
+        owner_of,
+    })
+}
+
+#[derive(Debug, Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ModGraphView {
+    #[serde(flatten)]
+    pub graph: deps::ModGraph,
+    /// Cross-feature hard dependencies with no `requires` to match. The authoring
+    /// warning reads this; an empty list is the healthy state.
+    pub missing_requires: Vec<deps::MissingRequires>,
+    /// path -> the files that would break without it.
+    pub dependents: BTreeMap<String, Vec<String>>,
+    /// path -> the feature that owns it. Absent means always installed.
+    pub owner_of: BTreeMap<String, String>,
 }
 
 #[cfg(test)]

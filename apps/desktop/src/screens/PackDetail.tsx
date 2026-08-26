@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react";
 
 import {
   Badge,
@@ -20,29 +20,29 @@ import {
   Textarea,
   toast,
   DISPLAY_VOICE,
-} from "@boffmedia/ui"
-import type { MenuItem } from "@boffmedia/ui"
+} from "@boffmedia/ui";
+import type { MenuItem } from "@boffmedia/ui";
 
-import { useT } from "../i18n"
-import { CrashDiagnosisCard } from "../components/CrashDiagnosis"
-import { SectionHeader } from "../components/SectionHeader"
-import { VersionPicker, dependenciesOf } from "../components/VersionPicker"
-import type { VersionChoice } from "../components/VersionPicker"
-import { InstanceSpace } from "../components/InstanceSpace"
-import { BrowsePage } from "../components/pack/BrowsePage"
-import { getModule } from "../services/gameModules"
-import { BackupsTab } from "../components/pack/BackupsTab"
-import { ContentTab } from "../components/pack/ContentTab"
-import { OptionalEditorPage } from "../components/pack/OptionalEditorPage"
-import { OptionalPanel } from "../components/pack/OptionalPanel"
-import { PublishDialog } from "../components/pack/PublishDialog"
-import { FilesTab } from "../components/pack/FilesTab"
-import { GalleryTab } from "../components/pack/GalleryTab"
-import { ScreenshotsTab } from "../components/pack/ScreenshotsTab"
-import { WorldsTab } from "../components/pack/WorldsTab"
-import { LogPanel } from "../components/pack/LogPanel"
-import { EmulatorSetupPanel } from "../components/pack/EmulatorSetupPanel"
-import { RandomizerPanel } from "../components/pack/RandomizerPanel"
+import { useT } from "../i18n";
+import { CrashDiagnosisCard } from "../components/CrashDiagnosis";
+import { SectionHeader } from "../components/SectionHeader";
+import { VersionPicker, dependenciesOf } from "../components/VersionPicker";
+import type { VersionChoice } from "../components/VersionPicker";
+import { InstanceSpace } from "../components/InstanceSpace";
+import { BrowsePage } from "../components/pack/BrowsePage";
+import { getModule } from "../services/gameModules";
+import { BackupsTab } from "../components/pack/BackupsTab";
+import { ContentTab } from "../components/pack/ContentTab";
+import { OptionalEditorPage } from "../components/pack/OptionalEditorPage";
+import { OptionalPanel } from "../components/pack/OptionalPanel";
+import { PublishDialog } from "../components/pack/PublishDialog";
+import { FilesTab } from "../components/pack/FilesTab";
+import { GalleryTab } from "../components/pack/GalleryTab";
+import { ScreenshotsTab } from "../components/pack/ScreenshotsTab";
+import { WorldsTab } from "../components/pack/WorldsTab";
+import { LogPanel } from "../components/pack/LogPanel";
+import { EmulatorSetupPanel } from "../components/pack/EmulatorSetupPanel";
+import { RandomizerPanel } from "../components/pack/RandomizerPanel";
 import {
   exportMrpack,
   exportServerMrpack,
@@ -58,11 +58,14 @@ import {
   openUrl,
   provideFile,
   webBaseUrl,
-} from "../runtime"
-import { DeleteLocalPackModal, UninstallPackModal } from "../components/pack/PackDeleteDialogs"
-import { useApp } from "../state/app"
-import { formatBytes, formatDuration, formatWhen } from "../utils/format"
-import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels"
+} from "../runtime";
+import {
+  DeleteLocalPackModal,
+  UninstallPackModal,
+} from "../components/pack/PackDeleteDialogs";
+import { useApp } from "../state/app";
+import { formatBytes, formatDuration, formatWhen } from "../utils/format";
+import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels";
 
 // The pack page follows the Modrinth app's information architecture — header,
 // tabs, dense content — in this launcher's own visual language.
@@ -75,25 +78,29 @@ import { LOADER_LABEL, PHASE_LABEL, STEP_GROUPS } from "../utils/labels"
 
 /** Ticks once a second so the running-time readout advances. */
 function useNow(active: boolean): number {
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => Date.now());
   useEffect(() => {
-    if (!active) return
-    const id = setInterval(() => setNow(Date.now()), 1000)
-    return () => clearInterval(id)
-  }, [active])
-  return now
+    if (!active) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [active]);
+  return now;
 }
 
 /** The pack's own version, as the picker's shape. A pack with no version yet
  *  leaves `minecraft` empty so the picker fills it with Mojang's latest. */
 function choiceOf(
-  latest: { minecraft: string | null; loader: string | null; loaderVersion: string | null } | null,
+  latest: {
+    minecraft: string | null;
+    loader: string | null;
+    loaderVersion: string | null;
+  } | null,
 ): VersionChoice {
   return {
     minecraft: latest?.minecraft ?? "",
     loader: latest?.loader ?? "",
     loaderVersion: latest?.loaderVersion ?? "",
-  }
+  };
 }
 
 /** RF-10: edit is only ever offered for a local pack, and only ever writes
@@ -108,102 +115,128 @@ function EditLocalPackModal({
   pack,
   latest,
 }: {
-  open: boolean
-  onClose: () => void
-  onSaved: () => void
+  open: boolean;
+  onClose: () => void;
+  onSaved: () => void;
   /** Icon edits land on disk immediately (a file dialog, not the Save button),
    *  so the header must re-resolve its icon without waiting for a manifest save. */
-  onIconChanged: () => void
-  pack: { id: string; slug: string; name: string; summary: string | null; description: string | null }
+  onIconChanged: () => void;
+  pack: {
+    id: string;
+    slug: string;
+    name: string;
+    summary: string | null;
+    description: string | null;
+  };
   latest: {
-    name: string
-    minecraft: string | null
-    loader: string | null
-    loaderVersion: string | null
-  } | null
+    name: string;
+    minecraft: string | null;
+    loader: string | null;
+    loaderVersion: string | null;
+  } | null;
 }) {
-  const t = useT("packDetail")
-  const [name, setName] = useState(pack.name)
-  const [summary, setSummary] = useState(pack.summary ?? "")
-  const [description, setDescription] = useState(pack.description ?? "")
-  const [versionName, setVersionName] = useState(latest?.name ?? "")
-  const [choice, setChoice] = useState<VersionChoice>(() => choiceOf(latest))
-  const [loadingVersions, setLoadingVersions] = useState(true)
-  const [saving, setSaving] = useState(false)
-  const [settingIcon, setSettingIcon] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const t = useT("packDetail");
+  const [name, setName] = useState(pack.name);
+  const [summary, setSummary] = useState(pack.summary ?? "");
+  const [description, setDescription] = useState(pack.description ?? "");
+  const [versionName, setVersionName] = useState(latest?.name ?? "");
+  const [choice, setChoice] = useState<VersionChoice>(() => choiceOf(latest));
+  const [loadingVersions, setLoadingVersions] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [settingIcon, setSettingIcon] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    setName(pack.name)
-    setSummary(pack.summary ?? "")
-    setDescription(pack.description ?? "")
-    setVersionName(latest?.name ?? "")
-    setChoice(choiceOf(latest))
-  }, [open, pack.name, pack.summary, pack.description, latest?.name, latest?.minecraft, latest?.loader, latest?.loaderVersion])
+    setName(pack.name);
+    setSummary(pack.summary ?? "");
+    setDescription(pack.description ?? "");
+    setVersionName(latest?.name ?? "");
+    setChoice(choiceOf(latest));
+  }, [
+    open,
+    pack.name,
+    pack.summary,
+    pack.description,
+    latest?.name,
+    latest?.minecraft,
+    latest?.loader,
+    latest?.loaderVersion,
+  ]);
 
   const changeIcon = async () => {
-    setSettingIcon(true)
+    setSettingIcon(true);
     try {
-      const changed = await localPackIconSet(pack.slug)
+      const changed = await localPackIconSet(pack.slug);
       if (changed) {
-        toast.success(t("iconSetSuccess"))
-        onIconChanged()
+        toast.success(t("iconSetSuccess"));
+        onIconChanged();
       }
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? t("iconSetError"))
+      toast.error((err as { message?: string })?.message ?? t("iconSetError"));
     } finally {
-      setSettingIcon(false)
+      setSettingIcon(false);
     }
-  }
+  };
 
   const clearIcon = async () => {
     try {
-      await localPackIconClear(pack.slug)
-      onIconChanged()
+      await localPackIconClear(pack.slug);
+      onIconChanged();
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? t("iconClearError"))
+      toast.error(
+        (err as { message?: string })?.message ?? t("iconClearError"),
+      );
     }
-  }
+  };
 
   const save = async () => {
     if (!name.trim()) {
-      setError(t("nameError"))
-      return
+      setError(t("nameError"));
+      return;
     }
     if (choice.loader && !choice.loaderVersion) {
-      setError(t("loaderVersionError"))
-      return
+      setError(t("loaderVersionError"));
+      return;
     }
-    setSaving(true)
-    setError(null)
+    setSaving(true);
+    setError(null);
     try {
-      const current = await localPackGet(pack.slug)
-      const dependencies = dependenciesOf(choice)
-      const summaryValue = summary.trim() || undefined
-      const descriptionValue = description.trim() || undefined
+      const current = await localPackGet(pack.slug);
+      const dependencies = dependenciesOf(choice);
+      const summaryValue = summary.trim() || undefined;
+      const descriptionValue = description.trim() || undefined;
       await localPackSave({
         ...current,
         pack: {
-          ...(current?.pack ?? { id: pack.id, slug: pack.slug, access: { kind: "public" } }),
+          ...(current?.pack ?? {
+            id: pack.id,
+            slug: pack.slug,
+            access: { kind: "public" },
+          }),
           name: name.trim(),
           slug: pack.slug,
           summary: summaryValue,
           description: descriptionValue,
         },
         version: {
-          ...(current?.version ?? { id: "local-v1", name: "local", createdAt: new Date().toISOString(), files: [] }),
+          ...(current?.version ?? {
+            id: "local-v1",
+            name: "local",
+            createdAt: new Date().toISOString(),
+            files: [],
+          }),
           name: versionName.trim() || current?.version?.name || "1.0",
           dependencies,
         },
-      })
-      onSaved()
-      onClose()
+      });
+      onSaved();
+      onClose();
     } catch (err) {
-      setError((err as { message?: string })?.message ?? t("saveError"))
+      setError((err as { message?: string })?.message ?? t("saveError"));
     } finally {
-      setSaving(false)
+      setSaving(false);
     }
-  }
+  };
 
   return (
     <Modal open={open} onClose={onClose} title={t("editModal")}>
@@ -213,7 +246,12 @@ function EditLocalPackModal({
         </Field>
         <Field label={t("iconLabel")}>
           <div className="flex items-center gap-2">
-            <Button size="sm" icon="upload" loading={settingIcon} onClick={() => void changeIcon()}>
+            <Button
+              size="sm"
+              icon="upload"
+              loading={settingIcon}
+              onClick={() => void changeIcon()}
+            >
               {t("iconSetButton")}
             </Button>
             <Button size="sm" onClick={() => void clearIcon()}>
@@ -268,33 +306,54 @@ function EditLocalPackModal({
         </div>
       </div>
     </Modal>
-  )
+  );
 }
 
-type TabKey = "content" | "optional" | "files" | "worlds" | "gallery" | "screenshots" | "backups" | "logs" | "info"
+type TabKey =
+  | "content"
+  | "optional"
+  | "files"
+  | "worlds"
+  | "gallery"
+  | "screenshots"
+  | "backups"
+  | "logs"
+  | "info";
 
 export function PackDetail() {
-  const t = useT("packDetail")
+  const t = useT("packDetail");
   // The delete / uninstall / open-folder actions are library vocabulary shared
   // with the packs screen, so their labels live in the `packs` namespace.
-  const tk = useT("packs")
+  const tk = useT("packs");
   // The optional-content strings live in the `content` namespace with the rest
   // of the chooser's, so this panel and the Content tab cannot drift apart.
-  const tc = useT("content")
-  const { selected, install, play, repair, stop, game, go, logs, reloadPacks, offline, editIntent, clearEditIntent } =
-    useApp()
-  const now = useNow(game.kind === "running")
-  const [editing, setEditing] = useState(false)
-  const [exporting, setExporting] = useState(false)
-  const [exportingServer, setExportingServer] = useState(false)
-  const [publishing, setPublishing] = useState(false)
-  const [duplicating, setDuplicating] = useState(false)
-  const [showDelete, setShowDelete] = useState(false)
-  const [showUninstall, setShowUninstall] = useState(false)
-  const [tab, setTab] = useState<TabKey>("content")
-  const [browsing, setBrowsing] = useState(false)
-  const [editingOptional, setEditingOptional] = useState(false)
-  const [contentNonce, setContentNonce] = useState(0)
+  const tc = useT("content");
+  const {
+    selected,
+    install,
+    play,
+    repair,
+    stop,
+    game,
+    go,
+    logs,
+    reloadPacks,
+    offline,
+    editIntent,
+    clearEditIntent,
+  } = useApp();
+  const now = useNow(game.kind === "running");
+  const [editing, setEditing] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportingServer, setExportingServer] = useState(false);
+  const [publishing, setPublishing] = useState(false);
+  const [duplicating, setDuplicating] = useState(false);
+  const [showDelete, setShowDelete] = useState(false);
+  const [showUninstall, setShowUninstall] = useState(false);
+  const [tab, setTab] = useState<TabKey>("content");
+  const [browsing, setBrowsing] = useState(false);
+  const [editingOptional, setEditingOptional] = useState(false);
+  const [contentNonce, setContentNonce] = useState(0);
   // An authoring save always mints a new version id, so the instance is
   // outdated the instant it returns. Held locally rather than waiting for
   // `state.kind` to catch up: the rescan behind `reloadPacks` is a round trip,
@@ -303,9 +362,12 @@ export function PackDetail() {
   // is exactly what "I saved three groups and only the first one shows" looks
   // like. Cleared on the same falling edge of `installing` that refreshes the
   // rest of the page, because that is when it stops being true.
-  const [optionalJustSaved, setOptionalJustSaved] = useState(false)
-  const [providingFile, setProvidingFile] = useState<string | null>(null)
-  const [fileError, setFileError] = useState<{ path: string; message: string } | null>(null)
+  const [optionalJustSaved, setOptionalJustSaved] = useState(false);
+  const [providingFile, setProvidingFile] = useState<string | null>(null);
+  const [fileError, setFileError] = useState<{
+    path: string;
+    message: string;
+  } | null>(null);
   // The Content tab's rows describe what is ON DISK, and an install or a launch
   // changes that from outside the tab. Without this the badges an install just
   // made true stay false until the player navigates away and back — which is
@@ -315,18 +377,18 @@ export function PackDetail() {
   // change, so an unrelated re-scan does not refetch the whole list. A launch
   // is covered by the same edge: it re-verifies the instance and emits install
   // progress while it does, so `play` passes through `installing` too.
-  const installPhase = selected?.state.kind
-  const wasInstalling = useRef(false)
+  const installPhase = selected?.state.kind;
+  const wasInstalling = useRef(false);
   useEffect(() => {
     if (installPhase === "installing") {
-      wasInstalling.current = true
-      return
+      wasInstalling.current = true;
+      return;
     }
-    if (!wasInstalling.current) return
-    wasInstalling.current = false
-    setContentNonce((n) => n + 1)
-    setOptionalJustSaved(false)
-  }, [installPhase])
+    if (!wasInstalling.current) return;
+    wasInstalling.current = false;
+    setContentNonce((n) => n + 1);
+    setOptionalJustSaved(false);
+  }, [installPhase]);
 
   /** How many optional groups this pack actually offers, for the one decision
    *  that has to be made BEFORE the panel mounts: whether the tab exists at all.
@@ -347,168 +409,225 @@ export function PackDetail() {
    *  and no manifest fetched here. That case is already served by the
    *  pre-install chooser on the Info tab, which is where the decision is worth
    *  more anyway: declining a 400 MB shaderpack there means never fetching it. */
-  const [optionalGroupCount, setOptionalGroupCount] = useState(0)
-  const scanSlug = selected?.pack.slug ?? null
+  const [optionalGroupCount, setOptionalGroupCount] = useState(0);
+  const scanSlug = selected?.pack.slug ?? null;
   useEffect(() => {
-    if (!scanSlug) return
-    let alive = true
+    if (!scanSlug) return;
+    let alive = true;
     void instanceOptionalModel(scanSlug)
       .then((groups) => {
-        if (alive) setOptionalGroupCount(groups.length)
+        if (alive) setOptionalGroupCount(groups.length);
       })
       .catch(() => {
-        if (alive) setOptionalGroupCount(0)
-      })
+        if (alive) setOptionalGroupCount(0);
+      });
     return () => {
-      alive = false
-    }
-  }, [scanSlug, contentNonce])
+      alive = false;
+    };
+  }, [scanSlug, contentNonce]);
 
   // A local pack's icon is a file on disk (a data: URL), not the manifest's
   // iconUrl; resolve it here so the header prefers it. Re-runs when contentNonce
   // bumps after an icon edit.
-  const [localIcon, setLocalIcon] = useState<string | null>(null)
-  const localSlug = selected?.origin === "local" ? selected.pack.slug : null
+  const [localIcon, setLocalIcon] = useState<string | null>(null);
+  const localSlug = selected?.origin === "local" ? selected.pack.slug : null;
   useEffect(() => {
     if (!localSlug) {
-      setLocalIcon(null)
-      return
+      setLocalIcon(null);
+      return;
     }
-    let alive = true
+    let alive = true;
     void localPackIcon(localSlug).then((data) => {
-      if (alive) setLocalIcon(data)
-    })
+      if (alive) setLocalIcon(data);
+    });
     return () => {
-      alive = false
+      alive = false;
+    };
+  }, [localSlug, contentNonce]);
+
+  // What the pack already holds, for the mod browser: a project id -> the
+  // version id of the file in the manifest. Only Modrinth-sourced files can
+  // answer — an `override` blob or a hand-dropped jar has no project to match a
+  // catalogue row against.
+  //
+  // Read from the manifest rather than from the install marker: the browser adds
+  // TO the manifest, so that is the document its answers have to agree with.
+  const [installedVersions, setInstalledVersions] = useState<
+    Record<string, string>
+  >({});
+  useEffect(() => {
+    if (!localSlug) {
+      setInstalledVersions({});
+      return;
     }
-  }, [localSlug, contentNonce])
+    let alive = true;
+    void localPackGet(localSlug)
+      .then((manifest) => {
+        if (!alive || !manifest) return;
+        const files = (manifest.version?.files ?? []) as Array<{
+          source?: { kind?: string; projectId?: string; versionId?: string };
+        }>;
+        const map: Record<string, string> = {};
+        for (const file of files) {
+          const src = file.source;
+          if (src?.kind === "modrinth" && src.projectId && src.versionId) {
+            map[src.projectId] = src.versionId;
+          }
+        }
+        setInstalledVersions(map);
+      })
+      .catch(() => {
+        /* the browser works without it; every row just keeps its Add button */
+      });
+    return () => {
+      alive = false;
+    };
+  }, [localSlug, contentNonce]);
 
   // The library card's "Edit" navigates here asking the form to open straight
   // away. Consume the one-shot intent (only a local pack has an edit form) and
   // clear it, so a later plain visit to the same pack does not reopen the modal.
   useEffect(() => {
-    if (editIntent && localSlug) setEditing(true)
-    if (editIntent) clearEditIntent()
-  }, [editIntent, localSlug, clearEditIntent])
+    if (editIntent && localSlug) setEditing(true);
+    if (editIntent) clearEditIntent();
+  }, [editIntent, localSlug, clearEditIntent]);
 
   if (!selected) {
     return (
       <div className="px-8 py-7">
-        <Empty
-          icon="cube"
-          title={t("noPackTitle")}
-          lead={t("noPackLead")}
-        >
+        <Empty icon="cube" title={t("noPackTitle")} lead={t("noPackLead")}>
           <Button size="sm" icon="back" onClick={() => go("packs")}>
             {t("backButton")}
           </Button>
         </Empty>
       </div>
-    )
+    );
   }
 
-  const { pack, latest, state, origin } = selected
-  const isLocal = origin === "local"
+  const { pack, latest, state, origin } = selected;
+  const isLocal = origin === "local";
 
   /** Copies the manifest AND the installed files, so the clone is playable
    *  immediately rather than needing a full reinstall. That copy is the slow
    *  part — a large modpack is gigabytes — which is why the menu entry shows a
    *  running label instead of appearing to do nothing. */
   const doDuplicate = async () => {
-    setDuplicating(true)
+    setDuplicating(true);
     try {
-      const copy = await localPackDuplicate(pack.slug, "")
-      toast.success(t("duplicateSuccess", { name: copy.pack.name }))
-      reloadPacks()
+      const copy = await localPackDuplicate(pack.slug, "");
+      toast.success(t("duplicateSuccess", { name: copy.pack.name }));
+      reloadPacks();
     } catch (err) {
-      toast.error((err as { message?: string })?.message ?? t("duplicateError"))
+      toast.error(
+        (err as { message?: string })?.message ?? t("duplicateError"),
+      );
     } finally {
-      setDuplicating(false)
+      setDuplicating(false);
     }
-  }
+  };
 
   const doExport = async (serverOnly: boolean) => {
-    const setFlag = serverOnly ? setExportingServer : setExporting
-    setFlag(true)
+    const setFlag = serverOnly ? setExportingServer : setExporting;
+    setFlag(true);
     try {
-      await (serverOnly ? exportServerMrpack : exportMrpack)(pack.slug)
-      toast.success(t("exportSuccess"))
+      await (serverOnly ? exportServerMrpack : exportMrpack)(pack.slug);
+      toast.success(t("exportSuccess"));
     } catch (err) {
-      const message = (err as { message?: string })?.message
+      const message = (err as { message?: string })?.message;
       if (message !== t("exportCancelled")) {
-        toast.error(message ?? t("exportError"))
+        toast.error(message ?? t("exportError"));
       }
     } finally {
-      setFlag(false)
+      setFlag(false);
     }
-  }
+  };
 
   const handleProvideFile = async (filePath: string) => {
     // Open the native picker for the player's copy of this file; cancel is a no-op.
-    const source = await filePicker()
-    if (!source) return
-    setProvidingFile(filePath)
-    setFileError(null)
+    const source = await filePicker();
+    if (!source) return;
+    setProvidingFile(filePath);
+    setFileError(null);
     try {
-      await provideFile(pack.slug, filePath, source)
-      reloadPacks()
+      await provideFile(pack.slug, filePath, source);
+      reloadPacks();
     } catch (err) {
-      const errObj = err as { code?: string; message?: string; expectedHint?: string }
+      const errObj = err as {
+        code?: string;
+        message?: string;
+        expectedHint?: string;
+      };
       if (errObj.code === "wrong_hash") {
         setFileError({
           path: filePath,
           message: errObj.expectedHint
-            ? t("pack.requiredFiles.wrongHashHint", { hint: errObj.expectedHint })
-            : errObj.message ?? t("pack.requiredFiles.wrongHash"),
-        })
+            ? t("pack.requiredFiles.wrongHashHint", {
+                hint: errObj.expectedHint,
+              })
+            : (errObj.message ?? t("pack.requiredFiles.wrongHash")),
+        });
       } else {
-        toast.error((err as { message?: string })?.message ?? t("pack.requiredFiles.couldNotProvide"))
+        toast.error(
+          (err as { message?: string })?.message ??
+            t("pack.requiredFiles.couldNotProvide"),
+        );
       }
     } finally {
-      setProvidingFile(null)
+      setProvidingFile(null);
     }
-  }
+  };
 
   // The tail is where the stack trace ends up; a crash log's first lines are
   // just the JVM banner.
-  const crashLines = logs.filter((line) => line.level === "error").slice(-12)
-  const installing = state.kind === "installing"
+  const crashLines = logs.filter((line) => line.level === "error").slice(-12);
+  const installing = state.kind === "installing";
   // No published version means nothing to install, whatever the disk says.
   const needsInstall =
-    !!latest && (state.kind === "not-installed" || state.kind === "outdated")
-  const running = game.kind === "running"
+    !!latest && (state.kind === "not-installed" || state.kind === "outdated");
+  const running = game.kind === "running";
   const loader = !latest?.loader
     ? "Vanilla"
-    : `${LOADER_LABEL[latest.loader] ?? latest.loader} ${latest.loaderVersion ?? ""}`.trim()
+    : `${LOADER_LABEL[latest.loader] ?? latest.loader} ${latest.loaderVersion ?? ""}`.trim();
 
   // "Has files on disk": a broken install still has a directory to open and
   // remove, so Open folder / Delete / Uninstall are all offered on it.
   const hasFiles =
-    state.kind === "installed" || state.kind === "outdated" || state.kind === "broken"
+    state.kind === "installed" ||
+    state.kind === "outdated" ||
+    state.kind === "broken";
 
   // Check if there are unsatisfied required user files
   const hasMissingUserFiles =
     (state.kind === "installed" || state.kind === "outdated") &&
     state.missingUserFiles &&
-    state.missingUserFiles.length > 0
+    state.missingUserFiles.length > 0;
 
   // Check if the pack's randomizer ROM is not yet patched
   const randomizerBlocked =
-    (state.kind === "installed" || state.kind === "outdated") && state.randomizerBlocked === true
+    (state.kind === "installed" || state.kind === "outdated") &&
+    state.randomizerBlocked === true;
 
   const openFolder: MenuItem = {
     label: tk("openInstanceFolder"),
     icon: "folder",
     onSelect: () => void instanceReveal(pack.slug, ""),
-  }
+  };
   const localMenuItems: MenuItem[] = [
-    { label: t("editLocalMenu"), icon: "edit", onSelect: () => setEditing(true) },
+    {
+      label: t("editLocalMenu"),
+      icon: "edit",
+      onSelect: () => setEditing(true),
+    },
     {
       label: duplicating ? t("duplicatingMenu") : t("duplicateLocalMenu"),
       icon: "plus",
       onSelect: () => void doDuplicate(),
     },
-    { label: exporting ? t("exportingMenu") : t("exportMenu"), icon: "upload", onSelect: () => void doExport(false) },
+    {
+      label: exporting ? t("exportingMenu") : t("exportMenu"),
+      icon: "upload",
+      onSelect: () => void doExport(false),
+    },
     {
       label: exportingServer ? t("exportingServerMenu") : t("exportServerMenu"),
       icon: "upload",
@@ -518,7 +637,11 @@ export function PackDetail() {
     // on a role the renderer would have to guess at is how a button ends up
     // lying about what it does — a 403 with a real message is more honest than
     // an entry that silently is not there.
-    { label: t("publishMenu"), icon: "globe", onSelect: () => setPublishing(true) },
+    {
+      label: t("publishMenu"),
+      icon: "globe",
+      onSelect: () => setPublishing(true),
+    },
     ...(hasFiles ? [openFolder] : []),
     { sep: true },
     {
@@ -528,7 +651,7 @@ export function PackDetail() {
       disabled: installing,
       onSelect: () => setShowDelete(true),
     },
-  ]
+  ];
   const managedMenuItems: MenuItem[] = [
     // Public packs only, matching the API: password and allowlist packs have no
     // public page at all, so offering the link would open a 404 and quietly
@@ -538,7 +661,8 @@ export function PackDetail() {
           {
             label: t("sharePageMenu"),
             icon: "globe" as const,
-            onSelect: () => void openUrl(`${webBaseUrl()}/app/packs/${pack.slug}`),
+            onSelect: () =>
+              void openUrl(`${webBaseUrl()}/app/packs/${pack.slug}`),
           },
         ]
       : []),
@@ -550,12 +674,12 @@ export function PackDetail() {
       disabled: installing,
       onSelect: () => setShowUninstall(true),
     },
-  ]
+  ];
 
   // Browsing takes over the whole page rather than opening a dialog: the
   // catalog is three panes wide and adding several mods in a row should not
   // mean reopening a modal each time. Only available for game types that support browse.
-  const module = getModule(pack.gameType)
+  const module = getModule(pack.gameType);
   if (browsing && module.supportsBrowse && isLocal && latest?.minecraft) {
     // h-full, not min-h: ModBrowser's result grid owns its scroll, and it can
     // only do that when this page is exactly the shell's height. With min-h the
@@ -567,12 +691,15 @@ export function PackDetail() {
           slug={pack.slug}
           minecraft={latest.minecraft}
           loader={latest.loader}
-          addedProjectIds={[]}
+          // Both derived from the same map, so the grid badge and the version
+          // row can never disagree about what the pack contains.
+          addedProjectIds={Object.keys(installedVersions)}
+          installedVersions={installedVersions}
           onBack={() => setBrowsing(false)}
           onChanged={() => setContentNonce((n) => n + 1)}
         />
       </div>
-    )
+    );
   }
 
   // Same takeover shape as browsing, and for the same reason: the authoring form
@@ -584,12 +711,12 @@ export function PackDetail() {
         slug={pack.slug}
         onBack={() => setEditingOptional(false)}
         onSaved={() => {
-          setOptionalJustSaved(true)
-          setContentNonce((n) => n + 1)
-          reloadPacks()
+          setOptionalJustSaved(true);
+          setContentNonce((n) => n + 1);
+          reloadPacks();
         }}
       />
-    )
+    );
   }
 
   return (
@@ -616,7 +743,8 @@ export function PackDetail() {
                 <>
                   {latest?.minecraft && (
                     <span className="flex items-center gap-1.5">
-                      <Icon name="gamepad" size={12} /> Minecraft {latest.minecraft}
+                      <Icon name="gamepad" size={12} /> Minecraft{" "}
+                      {latest.minecraft}
                     </span>
                   )}
                   {latest?.loader && (
@@ -628,7 +756,9 @@ export function PackDetail() {
               )}
               {module.supportsSetupPanel && latest?.emulatorKind && (
                 <span className="flex items-center gap-1.5">
-                  <Icon name="gamepad" size={12} /> {t(`emulatorSetup.emulatorNames.${latest.emulatorKind}`) ?? "Emulator"}
+                  <Icon name="gamepad" size={12} />{" "}
+                  {t(`emulatorSetup.emulatorNames.${latest.emulatorKind}`) ??
+                    "Emulator"}
                 </span>
               )}
               <span className="flex items-center gap-1.5">
@@ -640,7 +770,9 @@ export function PackDetail() {
               {isLocal && <Badge tone="info">Local</Badge>}
             </div>
             {pack.summary && (
-              <p className="mt-2 max-w-[560px] text-sm text-txt-muted">{pack.summary}</p>
+              <p className="mt-2 max-w-[560px] text-sm text-txt-muted">
+                {pack.summary}
+              </p>
             )}
           </div>
         </div>
@@ -667,7 +799,9 @@ export function PackDetail() {
             // Not `loading`: that primitive hides its label behind the spinner,
             // and a blank orange box during a multi-minute install reads broken.
             <Button variant="pri" size="lg" icon="download" disabled>
-              {t("installingPercent", { percent: Math.round(state.progress.fraction * 100) })}
+              {t("installingPercent", {
+                percent: Math.round(state.progress.fraction * 100),
+              })}
             </Button>
           ) : needsInstall ? (
             <Button
@@ -706,7 +840,9 @@ export function PackDetail() {
           {isLocal ? (
             <Menu label={t("moreActions")} items={localMenuItems} />
           ) : (
-            hasFiles && <Menu label={t("moreActions")} items={managedMenuItems} />
+            hasFiles && (
+              <Menu label={t("moreActions")} items={managedMenuItems} />
+            )
           )}
         </div>
       </header>
@@ -714,16 +850,23 @@ export function PackDetail() {
       {/* ── Live state: never behind a tab ────────────────────────────────── */}
 
       {installing && (
-        <Panel title={t("installingPanel")} aside={<Badge tone="info">{t("inProgress")}</Badge>} className="mb-4">
+        <Panel
+          title={t("installingPanel")}
+          aside={<Badge tone="info">{t("inProgress")}</Badge>}
+          className="mb-4"
+        >
           <Stepper
             steps={STEP_GROUPS.map((g) => g.label)}
-            current={STEP_GROUPS.findIndex((g) => g.phases.includes(state.progress.phase))}
+            current={STEP_GROUPS.findIndex((g) =>
+              g.phases.includes(state.progress.phase),
+            )}
           />
           <div className="mt-5">
             <Progress value={state.progress.fraction * 100} />
             <div className="mt-2 flex items-center justify-between gap-4 text-xs">
               <span className="truncate font-mono text-txt-dim">
-                {PHASE_LABEL[state.progress.phase]} · {state.progress.currentFile}
+                {PHASE_LABEL[state.progress.phase]} ·{" "}
+                {state.progress.currentFile}
               </span>
               <span className="shrink-0 text-txt-muted">
                 {formatBytes(state.progress.downloadedBytes)} /{" "}
@@ -735,11 +878,13 @@ export function PackDetail() {
       )}
 
       {state.kind === "broken" && (
-        <Panel title={t("damagedTitle")} aside={<Badge tone="bad">{t("damaged")}</Badge>} className="mb-4">
+        <Panel
+          title={t("damagedTitle")}
+          aside={<Badge tone="bad">{t("damaged")}</Badge>}
+          className="mb-4"
+        >
           <p className="text-sm text-txt-muted">{state.reason}</p>
-          <p className="mt-2 text-xs text-txt-dim">
-            {t("damageExplanation")}
-          </p>
+          <p className="mt-2 text-xs text-txt-dim">{t("damageExplanation")}</p>
         </Panel>
       )}
 
@@ -749,7 +894,9 @@ export function PackDetail() {
       {module.supportsCrashDiagnosis && game.kind === "crashed" && (
         <Panel
           title={t("crashedTitle")}
-          aside={<Badge tone="bad">{t("crashCode", { code: game.exitCode })}</Badge>}
+          aside={
+            <Badge tone="bad">{t("crashCode", { code: game.exitCode })}</Badge>
+          }
           className="mb-4"
         >
           {/* §9 — the verdict first. The raw lines stay underneath: a wrong
@@ -760,15 +907,18 @@ export function PackDetail() {
               {crashLines.map((line) => line.text).join("\n")}
             </pre>
           ) : (
-            <p className="text-sm text-txt-muted">
-              {t("noErrorLines")}
-            </p>
+            <p className="text-sm text-txt-muted">{t("noErrorLines")}</p>
           )}
           <div className="mt-3 flex items-center gap-2">
             <Button size="sm" icon="list" onClick={() => setTab("logs")}>
               {t("viewLogs")}
             </Button>
-            <Button size="sm" variant="pri" icon="play" onClick={() => void play(pack.id)}>
+            <Button
+              size="sm"
+              variant="pri"
+              icon="play"
+              onClick={() => void play(pack.id)}
+            >
               {t("retry")}
             </Button>
           </div>
@@ -776,7 +926,11 @@ export function PackDetail() {
       )}
 
       {running && (
-        <Panel title={t("sessionPanel")} aside={<Badge tone="ok">{t("running")}</Badge>} className="mb-4">
+        <Panel
+          title={t("sessionPanel")}
+          aside={<Badge tone="ok">{t("running")}</Badge>}
+          className="mb-4"
+        >
           <Stats
             items={[
               { n: formatDuration(now - game.since), l: t("elapsedTime") },
@@ -784,73 +938,82 @@ export function PackDetail() {
               { n: loader, l: t("loader") },
             ]}
           />
-          <p className="mt-3 text-xs text-txt-dim">
-            {t("appClosable")}
-          </p>
+          <p className="mt-3 text-xs text-txt-dim">{t("appClosable")}</p>
         </Panel>
       )}
 
       {/* Required user-provided files panel — for non-emulator packs. Emulator
           packs get the richer EmulatorSetupPanel (above), which owns the ROM
           checklist, so this generic panel is gated off there to avoid double UI. */}
-      {module.supportsMissingFiles !== false && (state.kind === "installed" || state.kind === "outdated") && state.missingUserFiles && state.missingUserFiles.length > 0 && (
-        <Panel
-          title={t("pack.requiredFiles.title")}
-          aside={<Badge tone="info">{state.missingUserFiles.length}</Badge>}
-          className="mb-4"
-        >
-          <div className="space-y-3">
-            {state.missingUserFiles.map((file) => (
-              <div key={file.path} className="rounded border border-line bg-surface-bright p-3">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="text-sm font-medium">{file.hint}</p>
-                    <p className="text-xs text-txt-muted">{file.path}</p>
-                    <p className="text-xs text-txt-dim">{formatBytes(file.fileSize)}</p>
+      {module.supportsMissingFiles !== false &&
+        (state.kind === "installed" || state.kind === "outdated") &&
+        state.missingUserFiles &&
+        state.missingUserFiles.length > 0 && (
+          <Panel
+            title={t("pack.requiredFiles.title")}
+            aside={<Badge tone="info">{state.missingUserFiles.length}</Badge>}
+            className="mb-4"
+          >
+            <div className="space-y-3">
+              {state.missingUserFiles.map((file) => (
+                <div
+                  key={file.path}
+                  className="rounded border border-line bg-surface-bright p-3"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm font-medium">{file.hint}</p>
+                      <p className="text-xs text-txt-muted">{file.path}</p>
+                      <p className="text-xs text-txt-dim">
+                        {formatBytes(file.fileSize)}
+                      </p>
+                    </div>
+                    <Button
+                      size="sm"
+                      loading={providingFile === file.path}
+                      onClick={() => void handleProvideFile(file.path)}
+                    >
+                      {t("pack.requiredFiles.selectFile")}
+                    </Button>
                   </div>
-                  <Button
-                    size="sm"
-                    loading={providingFile === file.path}
-                    onClick={() => void handleProvideFile(file.path)}
-                  >
-                    {t("pack.requiredFiles.selectFile")}
-                  </Button>
+                  {fileError?.path === file.path && (
+                    <p className="mt-2 text-xs text-bad">
+                      {t("pack.requiredFiles.wrongHash")}
+                      {fileError.message ? `: ${fileError.message}` : ""}
+                    </p>
+                  )}
                 </div>
-                {fileError?.path === file.path && (
-                  <p className="mt-2 text-xs text-bad">
-                    {t("pack.requiredFiles.wrongHash")}{fileError.message ? `: ${fileError.message}` : ""}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </Panel>
-      )}
+              ))}
+            </div>
+          </Panel>
+        )}
 
       {/* Emulator setup panel — shown for packs that support it. */}
-      {module.supportsSetupPanel && (state.kind === "installed" || state.kind === "outdated") && (
-        <EmulatorSetupPanel
-          slug={pack.slug}
-          emulatorKind={latest?.emulatorKind}
-          missingFiles={state.missingUserFiles ?? []}
-          onFileProvided={() => {
-            setContentNonce((n) => n + 1)
-            reloadPacks()
-          }}
-          className="mb-4"
-        />
-      )}
+      {module.supportsSetupPanel &&
+        (state.kind === "installed" || state.kind === "outdated") && (
+          <EmulatorSetupPanel
+            slug={pack.slug}
+            emulatorKind={latest?.emulatorKind}
+            missingFiles={state.missingUserFiles ?? []}
+            onFileProvided={() => {
+              setContentNonce((n) => n + 1);
+              reloadPacks();
+            }}
+            className="mb-4"
+          />
+        )}
 
       {/* Randomizer panel — shown for emulator packs with an active event. */}
-      {module.supportsSetupPanel && (state.kind === "installed" || state.kind === "outdated") && (
-        <RandomizerPanel
-          slug={pack.slug}
-          packId={pack.id}
-          missingFiles={state.missingUserFiles ?? []}
-          romBlocked={randomizerBlocked}
-          className="mb-4"
-        />
-      )}
+      {module.supportsSetupPanel &&
+        (state.kind === "installed" || state.kind === "outdated") && (
+          <RandomizerPanel
+            slug={pack.slug}
+            packId={pack.id}
+            missingFiles={state.missingUserFiles ?? []}
+            romBlocked={randomizerBlocked}
+            className="mb-4"
+          />
+        )}
 
       {/* ── Tabs ─────────────────────────────────────────────────────────── */}
 
@@ -861,8 +1024,8 @@ export function PackDetail() {
           { value: "gallery", label: t("galleryTab") },
           { value: "logs", label: t("tabs.logs") },
           { value: "info", label: t("tabs.info") },
-        ]
-        const module = getModule(pack.gameType)
+        ];
+        const module = getModule(pack.gameType);
         const moduleTabs = (module.detailTabs ?? [])
           .map((tab) => ({
             ...tab,
@@ -871,25 +1034,38 @@ export function PackDetail() {
           }))
           // See `optionalGroupCount`: the tab is declared by the module but
           // only earns its place on a pack that has something to put in it.
-          .filter((tab) => tab.value !== "optional" || isLocal || optionalGroupCount > 0)
-        const allTabs = [...moduleTabs, ...baseTabs]
-        const moduleTabValues = moduleTabs.map((t) => t.value)
+          .filter(
+            (tab) =>
+              tab.value !== "optional" || isLocal || optionalGroupCount > 0,
+          );
+        const allTabs = [...moduleTabs, ...baseTabs];
+        const moduleTabValues = moduleTabs.map((t) => t.value);
         return (
           <Tabs
             className="mb-5"
             value={tab}
             onChange={(v) => {
-              const newTab = v as TabKey
+              const newTab = v as TabKey;
               // If switching to a module-specific tab that's not available, reset to the first available
-              if (!moduleTabValues.includes(newTab) && moduleTabValues.length === 0 && ["content", "files", "worlds", "screenshots", "backups"].includes(newTab)) {
-                setTab("gallery")
+              if (
+                !moduleTabValues.includes(newTab) &&
+                moduleTabValues.length === 0 &&
+                [
+                  "content",
+                  "files",
+                  "worlds",
+                  "screenshots",
+                  "backups",
+                ].includes(newTab)
+              ) {
+                setTab("gallery");
               } else {
-                setTab(newTab)
+                setTab(newTab);
               }
             }}
             tabs={allTabs}
           />
-        )
+        );
       })()}
 
       {tab === "content" && (
@@ -923,7 +1099,8 @@ export function PackDetail() {
           // the install pass consumes — so locking them would cost the author
           // the one choice that is worth making before the download.
           pendingInstall={
-            state.kind === "outdated" || (optionalJustSaved && state.kind !== "not-installed")
+            state.kind === "outdated" ||
+            (optionalJustSaved && state.kind !== "not-installed")
           }
           refreshKey={contentNonce}
           onChanged={reloadPacks}
@@ -958,7 +1135,9 @@ export function PackDetail() {
       {/* Available for managed packs too: a backup only ever reads the
           instance, so nothing here can put a server-managed pack out of sync
           the way editing its file list would. */}
-      {tab === "backups" && <BackupsTab slug={pack.slug} packName={pack.name} />}
+      {tab === "backups" && (
+        <BackupsTab slug={pack.slug} packName={pack.name} />
+      )}
 
       {tab === "logs" && <LogPanel lines={logs} />}
 
@@ -966,7 +1145,9 @@ export function PackDetail() {
         <div className="flex flex-col gap-4">
           {pack.description && (
             <Panel title={t("descriptionTitle")}>
-              <p className="whitespace-pre-wrap text-sm text-txt-muted">{pack.description}</p>
+              <p className="whitespace-pre-wrap text-sm text-txt-muted">
+                {pack.description}
+              </p>
             </Panel>
           )}
           {/* The install-time step. Here rather than behind the Install button
@@ -990,11 +1171,29 @@ export function PackDetail() {
             <Panel title={t("info.version")}>
               <DataList
                 rows={[
-                  { label: t("info.latest"), value: latest?.name ?? "—", mono: true },
-                  { label: t("info.published"), value: latest ? formatWhen(latest.createdAt) : "—" },
-                  module.detailTabs?.some((t) => t.value === "content") && { label: t("info.minecraft"), value: latest?.minecraft ?? "—", mono: true },
-                  module.detailTabs?.some((t) => t.value === "content") && { label: t("info.loaderLabel"), value: loader, mono: true },
-                  { label: t("info.filesLabel"), value: latest?.fileCount ?? 0 },
+                  {
+                    label: t("info.latest"),
+                    value: latest?.name ?? "—",
+                    mono: true,
+                  },
+                  {
+                    label: t("info.published"),
+                    value: latest ? formatWhen(latest.createdAt) : "—",
+                  },
+                  module.detailTabs?.some((t) => t.value === "content") && {
+                    label: t("info.minecraft"),
+                    value: latest?.minecraft ?? "—",
+                    mono: true,
+                  },
+                  module.detailTabs?.some((t) => t.value === "content") && {
+                    label: t("info.loaderLabel"),
+                    value: loader,
+                    mono: true,
+                  },
+                  {
+                    label: t("info.filesLabel"),
+                    value: latest?.fileCount ?? 0,
+                  },
                   // Only when the pack offers something, for the same reason
                   // the library card omits it: a zero here tells nobody
                   // anything.
@@ -1046,7 +1245,9 @@ export function PackDetail() {
 
           {/* §9 — rollback and the per-instance runtime. Reference material,
               which is exactly what this tab is for. Module-specific. */}
-          {module.supportsInstanceSpace && <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />}
+          {module.supportsInstanceSpace && (
+            <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />
+          )}
         </div>
       )}
 
@@ -1055,8 +1256,8 @@ export function PackDetail() {
           open={editing}
           onClose={() => setEditing(false)}
           onSaved={() => {
-            reloadPacks()
-            toast.success(t("saveSuccess"))
+            reloadPacks();
+            toast.success(t("saveSuccess"));
           }}
           onIconChanged={() => setContentNonce((n) => n + 1)}
           pack={pack}
@@ -1073,8 +1274,8 @@ export function PackDetail() {
           // The pack no longer exists after this, so there is nothing to return
           // to — send the player back to the library.
           onDone={() => {
-            reloadPacks()
-            go("packs")
+            reloadPacks();
+            go("packs");
           }}
         />
       ) : (
@@ -1090,5 +1291,5 @@ export function PackDetail() {
         />
       )}
     </div>
-  )
+  );
 }

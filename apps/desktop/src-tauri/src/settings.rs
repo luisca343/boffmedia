@@ -65,6 +65,23 @@ pub struct Settings {
     /// the primary path (with the EmuDeck-layout drive scan only as a fallback).
     #[serde(default)]
     pub rom_dirs: Vec<String>,
+    /// Webview zoom, as a factor (0.9 | 1.0 | 1.1 | 1.25). Rust never reads it —
+    /// the renderer applies it through the webview's own `setZoom` — but it
+    /// persists here with the rest.
+    ///
+    /// Zoom rather than a font scale because every size in the UI is a hardcoded
+    /// px value in a Tailwind arbitrary class (238 of them), which no root
+    /// font-size can move. Chromium's zoom scales text, spacing and icons
+    /// together, which is also what keeps the layout coherent instead of
+    /// bursting rows that were laid out around their text.
+    #[serde(default = "default_ui_scale")]
+    pub ui_scale: f32,
+}
+
+/// 1.0. Deliberately not "whatever the OS DPI suggests": Tauri already applies
+/// the system scale factor, so reading it again here would compound it.
+fn default_ui_scale() -> f32 {
+    1.0
 }
 
 fn default_true() -> bool {
@@ -106,6 +123,7 @@ impl Default for Settings {
             backup_before_update: true,
             emulator_paths: std::collections::HashMap::new(),
             rom_dirs: Vec::new(),
+            ui_scale: default_ui_scale(),
         }
     }
 }

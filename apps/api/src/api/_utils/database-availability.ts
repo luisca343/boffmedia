@@ -42,9 +42,14 @@ const MAX_CAUSE_DEPTH = 5;
 export function isDatabaseUnavailable(error: unknown): boolean {
   let current: unknown = error;
 
-  for (let depth = 0; current !== null && current !== undefined && depth < MAX_CAUSE_DEPTH; depth++) {
+  for (
+    let depth = 0;
+    current !== null && current !== undefined && depth < MAX_CAUSE_DEPTH;
+    depth++
+  ) {
     const code = (current as { code?: unknown }).code;
-    if (typeof code === 'string' && TRANSPORT_ERROR_CODES.has(code)) return true;
+    if (typeof code === 'string' && TRANSPORT_ERROR_CODES.has(code))
+      return true;
     current = (current as { cause?: unknown }).cause;
   }
 

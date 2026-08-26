@@ -1,20 +1,20 @@
-"use client"
+"use client";
 
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react";
 
-import { cn } from "../cn"
-import type { Translate } from "../i18n"
-import { Badge } from "../primitives/badge"
-import { Button } from "../primitives/button"
-import { Icon } from "../primitives/icon"
-import { Input } from "../primitives/input"
-import { Modal } from "../primitives/modal"
-import { Seg } from "../primitives/seg"
-import { Select } from "../primitives/select"
-import { Spinner } from "../primitives/spinner"
-import { CatalogIcon } from "./CatalogIcon"
-import { getCatalog } from "./client"
-import { effectiveLoader, isViaConnector } from "./connector"
+import { cn } from "../cn";
+import type { Translate } from "../i18n";
+import { Badge } from "../primitives/badge";
+import { Button } from "../primitives/button";
+import { Icon } from "../primitives/icon";
+import { Input } from "../primitives/input";
+import { Modal } from "../primitives/modal";
+import { Seg } from "../primitives/seg";
+import { Select } from "../primitives/select";
+import { Spinner } from "../primitives/spinner";
+import { CatalogIcon } from "./CatalogIcon";
+import { getCatalog } from "./client";
+import { effectiveLoader, isViaConnector } from "./connector";
 import type {
   CatalogCategory,
   CatalogLoader,
@@ -24,7 +24,7 @@ import type {
   ModPlatform,
   ModProject,
   ModSearchHit,
-} from "./types"
+} from "./types";
 
 // The browse half of the picker: catalog on the left, project detail on the
 // right. Everything is filtered by the pack's Minecraft/loader pair, which is
@@ -38,44 +38,55 @@ import type {
 // twenty results left the grid visibly half-empty and made the first scroll a
 // click. Modrinth's own ceiling is 100, but that is 100 icon fetches on a cold
 // cache for results most players never scroll to.
-const PAGE_SIZE = 50
+const PAGE_SIZE = 50;
 
-const ALL_PLATFORMS: ModPlatform[] = ["modrinth", "curseforge"]
-const ALL_SORTS: CatalogSort[] = ["downloads", "follows", "updated", "relevance", "name"]
-const ALL_TYPES: CatalogProjectType[] = ["mod", "resourcepack", "shader", "datapack"]
+const ALL_PLATFORMS: ModPlatform[] = ["modrinth", "curseforge"];
+const ALL_SORTS: CatalogSort[] = [
+  "downloads",
+  "follows",
+  "updated",
+  "relevance",
+  "name",
+];
+const ALL_TYPES: CatalogProjectType[] = [
+  "mod",
+  "resourcepack",
+  "shader",
+  "datapack",
+];
 
 /** `projectType` is the browser's current tab, carried on the pick because the
  *  target folder cannot be derived from the file alone: a shader and a resource
  *  pack are both a `.zip`, and only the tab the player picked from says which
  *  one this is. */
 export type BrowsePick = {
-  hit: ModSearchHit
-  file: ModFile
-  projectType: CatalogProjectType
+  hit: ModSearchHit;
+  file: ModFile;
+  projectType: CatalogProjectType;
   /** True when this project does not publish the pack's own loader and is only
    *  installable because Connector is on. The host needs it for two things the
    *  file alone cannot answer: whether to pull Connector into the pack, and what
    *  to record on the manifest entry so the pack page can badge it later. */
-  viaConnector: boolean
-}
+  viaConnector: boolean;
+};
 
 /** How a host offers Connector mode. Absent means the pack cannot use it — no
  *  toggle is rendered at all, which is the case for every Fabric or Quilt pack
  *  and for any Minecraft version Connector has not shipped for. */
 export type ConnectorControl = {
-  enabled: boolean
-  onChange: (enabled: boolean) => void
-}
+  enabled: boolean;
+  onChange: (enabled: boolean) => void;
+};
 
 function formatSize(bytes: number): string {
-  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-  return `${Math.max(1, Math.round(bytes / 1024))} KB`
+  if (bytes >= 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+  return `${Math.max(1, Math.round(bytes / 1024))} KB`;
 }
 
 function compactCount(value: number): string {
-  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`
-  if (value >= 1_000) return `${Math.round(value / 1_000)}K`
-  return String(value)
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${Math.round(value / 1_000)}K`;
+  return String(value);
 }
 
 /** Strips the HTML CurseForge returns for its description; Modrinth's markdown
@@ -86,7 +97,7 @@ function toPlainText(value: string): string {
     .replace(/<\/(p|div|li|h\d)>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/\n{3,}/g, "\n\n")
-    .trim()
+    .trim();
 }
 
 export function ModBrowser({
@@ -100,93 +111,118 @@ export function ModBrowser({
   loader,
   connector,
   isAdded,
+  installedVersionOf,
   onAdd,
   busyKey,
 }: {
-  t: Translate
-  platform: ModPlatform
-  onPlatformChange: (platform: ModPlatform) => void
+  t: Translate;
+  platform: ModPlatform;
+  onPlatformChange: (platform: ModPlatform) => void;
   /** Which platforms this host can actually reach. With one entry the toggle
    *  is hidden rather than rendered as a single dead button — the launcher
    *  only ever speaks to Modrinth. */
-  platforms?: ModPlatform[]
+  platforms?: ModPlatform[];
   /** Not every platform supports every sort (Modrinth has no name sort), so
    *  the host narrows the list instead of the browser offering a dead option. */
-  sorts?: CatalogSort[]
-  projectTypes?: CatalogProjectType[]
+  sorts?: CatalogSort[];
+  projectTypes?: CatalogProjectType[];
   /** The pack's target Minecraft version. Required for every type except
    *  `modpack`, which brings its own — see `needsGameVersion`. */
-  gameVersion: string
-  loader?: CatalogLoader
+  gameVersion: string;
+  loader?: CatalogLoader;
   /** Present only when this pack's Minecraft/loader pair can actually run
    *  Connector — the host resolves that with `connectorSupport()`. */
-  connector?: ConnectorControl
-  isAdded: (platform: ModPlatform, projectId: string) => boolean
-  onAdd: (pick: BrowsePick) => void | Promise<void>
-  busyKey: string | null
+  connector?: ConnectorControl;
+  isAdded: (platform: ModPlatform, projectId: string) => boolean;
+  /** The version of this project the pack already has, or null.
+   *
+   *  Project-level `isAdded` cannot answer the question the version list asks:
+   *  a mod can be in the pack at 1.0.6 while the list is showing 1.0.7, and an
+   *  "Añadir" button on the row you are already running is the one row where it
+   *  is wrong. Optional, so a host with no notion of an installed version — the
+   *  web admin building a version from scratch — behaves exactly as before. */
+  installedVersionOf?: (
+    platform: ModPlatform,
+    projectId: string,
+  ) => string | null;
+  onAdd: (pick: BrowsePick) => void | Promise<void>;
+  busyKey: string | null;
 }) {
-  const [query, setQuery] = useState("")
-  const [debounced, setDebounced] = useState("")
-  const [projectType, setProjectType] = useState<CatalogProjectType>(projectTypes[0] ?? "mod")
-  const [sort, setSort] = useState<CatalogSort>(sorts[0] ?? "downloads")
-  const [category, setCategory] = useState("")
-  const [categories, setCategories] = useState<CatalogCategory[]>([])
-  const [hits, setHits] = useState<ModSearchHit[]>([])
-  const [total, setTotal] = useState(0)
-  const [page, setPage] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [selected, setSelected] = useState<ModSearchHit | null>(null)
+  const [query, setQuery] = useState("");
+  const [debounced, setDebounced] = useState("");
+  const [projectType, setProjectType] = useState<CatalogProjectType>(
+    projectTypes[0] ?? "mod",
+  );
+  const [sort, setSort] = useState<CatalogSort>(sorts[0] ?? "downloads");
+  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<CatalogCategory[]>([]);
+  const [hits, setHits] = useState<ModSearchHit[]>([]);
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [selected, setSelected] = useState<ModSearchHit | null>(null);
 
-  const searchSeq = useRef(0)
+  const searchSeq = useRef(0);
 
   useEffect(() => {
-    const timer = setTimeout(() => setDebounced(query.trim()), 350)
-    return () => clearTimeout(timer)
-  }, [query])
+    const timer = setTimeout(() => setDebounced(query.trim()), 350);
+    return () => clearTimeout(timer);
+  }, [query]);
 
   // Connector widens a MOD search and nothing else: it hosts Fabric mods, and a
   // resource pack or shader has no loader to widen in the first place. Scoped to
   // Modrinth because that is the only search with an OR-able loader facet.
   const connectorOn =
-    Boolean(connector?.enabled) && platform === "modrinth" && projectType === "mod"
+    Boolean(connector?.enabled) &&
+    platform === "modrinth" &&
+    projectType === "mod";
 
   // Any filter change restarts paging: appending page 2 of the new filters to
   // page 1 of the old ones is how a picker shows mods that do not match.
   useEffect(() => {
-    setPage(0)
-    setHits([])
-  }, [debounced, platform, projectType, sort, category, gameVersion, loader, connectorOn])
+    setPage(0);
+    setHits([]);
+  }, [
+    debounced,
+    platform,
+    projectType,
+    sort,
+    category,
+    gameVersion,
+    loader,
+    connectorOn,
+  ]);
 
   useEffect(() => {
-    setCategory("")
-    let live = true
+    setCategory("");
+    let live = true;
     void getCatalog()
       .categories(platform, projectType)
       .then((res) => {
-        if (live) setCategories(res)
+        if (live) setCategories(res);
       })
       .catch(() => {
-        if (live) setCategories([])
-      })
+        if (live) setCategories([]);
+      });
     return () => {
-      live = false
-    }
-  }, [platform, projectType])
+      live = false;
+    };
+  }, [platform, projectType]);
 
   // A modpack DEFINES its Minecraft version rather than targeting one, so it
   // is the one type that can be browsed before a version is chosen. Everything
   // else filters by it, and searching without it returns mods that will not
   // load.
-  const needsGameVersion = projectType !== "modpack"
+  const needsGameVersion = projectType !== "modpack";
 
   useEffect(() => {
     if (needsGameVersion && !gameVersion) {
-      setHits([])
-      setTotal(0)
-      return
+      setHits([]);
+      setTotal(0);
+      return;
     }
-    const seq = ++searchSeq.current
-    setLoading(true)
+    const seq = ++searchSeq.current;
+    setLoading(true);
     void getCatalog()
       .search({
         platform,
@@ -204,11 +240,13 @@ export function ModBrowser({
       })
       .catch(() => ({ hits: [], total: 0 }))
       .then((data) => {
-        if (seq !== searchSeq.current) return
-        setHits((current) => (page === 0 ? data.hits : [...current, ...data.hits]))
-        setTotal(data.total)
-        setLoading(false)
-      })
+        if (seq !== searchSeq.current) return;
+        setHits((current) =>
+          page === 0 ? data.hits : [...current, ...data.hits],
+        );
+        setTotal(data.total);
+        setLoading(false);
+      });
   }, [
     platform,
     debounced,
@@ -220,7 +258,7 @@ export function ModBrowser({
     page,
     needsGameVersion,
     connectorOn,
-  ])
+  ]);
 
   // ProjectDetail knows the hit and the file but not which tab they came from,
   // so the browser stamps the type on the way out. One place, rather than a
@@ -234,7 +272,7 @@ export function ModBrowser({
       ...pick,
       projectType,
       viaConnector: isViaConnector(pick.hit, loader, connectorOn),
-    })
+    });
 
   // A Fabric-only project has no NeoForge files, so asking the detail pane for
   // them returns an empty list and the player is shown a mod with nothing to
@@ -244,9 +282,9 @@ export function ModBrowser({
     selected ?? { categories: [], platform: "modrinth" },
     projectType === "mod" ? loader : undefined,
     connectorOn,
-  )
+  );
 
-  const canLoadMore = hits.length > 0 && hits.length < total && !loading
+  const canLoadMore = hits.length > 0 && hits.length < total && !loading;
 
   // Infinite scroll. The sentinel sits after the last card INSIDE the grid,
   // which is the element that actually scrolls (the page itself never grows),
@@ -257,31 +295,31 @@ export function ModBrowser({
   // callback: it is what goes false the moment a page starts loading, and
   // re-running the effect is what disconnects the observer for the duration.
   // Without that, one flick of the wheel queues three pages at once.
-  const listRef = useRef<HTMLUListElement | null>(null)
-  const sentinelRef = useRef<HTMLLIElement | null>(null)
+  const listRef = useRef<HTMLUListElement | null>(null);
+  const sentinelRef = useRef<HTMLLIElement | null>(null);
 
   useEffect(() => {
-    const root = listRef.current
-    const target = sentinelRef.current
-    if (!root || !target || !canLoadMore) return
+    const root = listRef.current;
+    const target = sentinelRef.current;
+    if (!root || !target || !canLoadMore) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries.some((e) => e.isIntersecting)) setPage((p) => p + 1)
+        if (entries.some((e) => e.isIntersecting)) setPage((p) => p + 1);
       },
       // A page ahead of the fold, so the next batch is usually already there
       // by the time the player reaches the bottom.
       { root, rootMargin: "600px 0px" },
-    )
-    observer.observe(target)
-    return () => observer.disconnect()
-  }, [canLoadMore])
+    );
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [canLoadMore]);
 
   if (needsGameVersion && !gameVersion) {
     return (
       <p className="border border-solid border-line bg-panel px-3 py-4 font-body text-[12px] text-txt-dim">
         {t("needMinecraftLead")}
       </p>
-    )
+    );
   }
 
   return (
@@ -293,12 +331,15 @@ export function ModBrowser({
           <Seg
             value={platform}
             onChange={(v) => {
-              onPlatformChange(v as ModPlatform)
-              setSelected(null)
+              onPlatformChange(v as ModPlatform);
+              setSelected(null);
             }}
             options={platforms.map((p) => ({
               value: p,
-              label: p === "modrinth" ? t("platformModrinth") : t("platformCurseforge"),
+              label:
+                p === "modrinth"
+                  ? t("platformModrinth")
+                  : t("platformCurseforge"),
             }))}
           />
         )}
@@ -315,7 +356,10 @@ export function ModBrowser({
               value={projectType}
               onChange={(v) => setProjectType(v as CatalogProjectType)}
               ariaLabel={t("projectType")}
-              options={projectTypes.map((p) => ({ value: p, label: t(`type.${p}`) }))}
+              options={projectTypes.map((p) => ({
+                value: p,
+                label: t(`type.${p}`),
+              }))}
             />
           </div>
         )}
@@ -338,8 +382,8 @@ export function ModBrowser({
               type="checkbox"
               checked={connector.enabled}
               onChange={(e) => {
-                connector.onChange(e.target.checked)
-                setSelected(null)
+                connector.onChange(e.target.checked);
+                setSelected(null);
               }}
               className="size-[13px] accent-[var(--accent)]"
             />
@@ -373,7 +417,9 @@ export function ModBrowser({
                 onClick={() => setCategory("")}
                 className={cn(
                   "w-full px-2 py-[5px] text-left font-body text-[12px]",
-                  category === "" ? "bg-panel-2 text-acc" : "text-txt-dim hover:text-txt",
+                  category === ""
+                    ? "bg-panel-2 text-acc"
+                    : "text-txt-dim hover:text-txt",
                 )}
               >
                 {t("allCategories")}
@@ -386,7 +432,9 @@ export function ModBrowser({
                   onClick={() => setCategory(c.id)}
                   className={cn(
                     "w-full truncate px-2 py-[5px] text-left font-body text-[12px] capitalize",
-                    category === c.id ? "bg-panel-2 text-acc" : "text-txt-dim hover:text-txt",
+                    category === c.id
+                      ? "bg-panel-2 text-acc"
+                      : "text-txt-dim hover:text-txt",
                   )}
                 >
                   {c.name}
@@ -410,16 +458,21 @@ export function ModBrowser({
                 className="bm-scroll grid min-h-0 flex-1 auto-rows-min content-start gap-2 overflow-auto pr-1 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]"
               >
                 {hits.map((hit) => {
-                  const added = isAdded(hit.platform, hit.projectId)
-                  const viaConnector = isViaConnector(hit, loader, connectorOn)
+                  const added = isAdded(hit.platform, hit.projectId);
+                  const viaConnector = isViaConnector(hit, loader, connectorOn);
                   return (
-                    <li key={`${hit.platform}:${hit.projectId}`} className="h-full">
+                    <li
+                      key={`${hit.platform}:${hit.projectId}`}
+                      className="h-full"
+                    >
                       <button
                         type="button"
                         onClick={() => setSelected(hit)}
                         className={cn(
                           "flex h-full w-full items-start gap-2 border border-solid bg-panel px-2 py-2 text-left",
-                          selected?.projectId === hit.projectId ? "border-acc" : "border-line",
+                          selected?.projectId === hit.projectId
+                            ? "border-acc"
+                            : "border-line",
                         )}
                       >
                         <CatalogIcon src={hit.iconUrl} size={40} />
@@ -454,11 +507,15 @@ export function ModBrowser({
                         </span>
                       </button>
                     </li>
-                  )
+                  );
                 })}
                 {/* Zero-height and spanning every column so it never disturbs
                     the grid's flow, but still a real box the observer can see. */}
-                <li ref={sentinelRef} aria-hidden className="col-span-full h-px" />
+                <li
+                  ref={sentinelRef}
+                  aria-hidden
+                  className="col-span-full h-px"
+                />
               </ul>
               {/* Kept as a fallback, not as the primary affordance: the
                   observer normally fires first, and this is what a player who
@@ -466,7 +523,11 @@ export function ModBrowser({
                   IntersectionObserver) still has to click. */}
               {canLoadMore && (
                 <div className="mt-2 flex shrink-0 justify-center">
-                  <Button size="sm" variant="ghost" onClick={() => setPage((p) => p + 1)}>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setPage((p) => p + 1)}
+                  >
                     {t("loadMore", { shown: hits.length, total })}
                   </Button>
                 </div>
@@ -495,12 +556,13 @@ export function ModBrowser({
           loader={detailLoader}
           viaConnector={isViaConnector(selected, loader, connectorOn)}
           onClose={() => setSelected(null)}
+          installedVersionOf={installedVersionOf}
           onAdd={addPick}
           busyKey={busyKey}
         />
       )}
     </div>
-  )
+  );
 }
 
 function ProjectDetail({
@@ -510,34 +572,39 @@ function ProjectDetail({
   loader,
   viaConnector,
   onClose,
+  installedVersionOf,
   onAdd,
   busyKey,
 }: {
-  t: Translate
-  hit: ModSearchHit
-  gameVersion: string
-  loader?: CatalogLoader
+  t: Translate;
+  hit: ModSearchHit;
+  gameVersion: string;
+  loader?: CatalogLoader;
   /** Shown as a badge here too: this is the last screen before the mod is
    *  added, so it is the right place to say it is a Fabric jar. */
-  viaConnector: boolean
-  onClose: () => void
+  viaConnector: boolean;
+  onClose: () => void;
   /** Deliberately narrower than `BrowsePick`: the detail pane has no idea which
    *  tab it was opened from, and the browser stamps `projectType` on before
    *  handing the pick to the host. */
-  onAdd: (pick: { hit: ModSearchHit; file: ModFile }) => void | Promise<void>
-  busyKey: string | null
+  installedVersionOf?: (
+    platform: ModPlatform,
+    projectId: string,
+  ) => string | null;
+  onAdd: (pick: { hit: ModSearchHit; file: ModFile }) => void | Promise<void>;
+  busyKey: string | null;
 }) {
-  const [project, setProject] = useState<ModProject | null>(null)
-  const [files, setFiles] = useState<ModFile[]>([])
-  const [loading, setLoading] = useState(true)
-  const [showAllFiles, setShowAllFiles] = useState(false)
+  const [project, setProject] = useState<ModProject | null>(null);
+  const [files, setFiles] = useState<ModFile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showAllFiles, setShowAllFiles] = useState(false);
 
   useEffect(() => {
-    let live = true
-    setLoading(true)
-    setProject(null)
-    setFiles([])
-    const catalog = getCatalog()
+    let live = true;
+    setLoading(true);
+    setProject(null);
+    setFiles([]);
+    const catalog = getCatalog();
 
     void Promise.all([
       catalog.project(hit.platform, hit.projectId).catch(() => null),
@@ -551,17 +618,19 @@ function ProjectDetail({
         })
         .catch(() => [] as ModFile[]),
     ]).then(([detail, fileList]) => {
-      if (!live) return
-      setProject(detail)
-      setFiles(fileList)
-      setLoading(false)
-    })
+      if (!live) return;
+      setProject(detail);
+      setFiles(fileList);
+      setLoading(false);
+    });
     return () => {
-      live = false
-    }
-  }, [hit.platform, hit.projectId, gameVersion, loader, showAllFiles])
+      live = false;
+    };
+  }, [hit.platform, hit.projectId, gameVersion, loader, showAllFiles]);
 
-  const description = project ? toPlainText(project.description || project.summary) : ""
+  const description = project
+    ? toPlainText(project.description || project.summary)
+    : "";
   return (
     <Modal
       open
@@ -582,7 +651,9 @@ function ProjectDetail({
           <div className="flex items-start gap-3">
             <CatalogIcon src={hit.iconUrl} size={56} />
             <div className="min-w-0 flex-1">
-              <p className="font-body text-[12px] text-txt-dim">{hit.summary}</p>
+              <p className="font-body text-[12px] text-txt-dim">
+                {hit.summary}
+              </p>
               <span className="mt-1 flex items-center gap-2 font-mono text-[10px] text-txt-muted">
                 <Icon name="download" size={11} />
                 {compactCount(hit.downloads)}
@@ -600,12 +671,16 @@ function ProjectDetail({
                   the player is already looking. */}
               {viaConnector && <Badge tone="new">{t("loaderFabric")}</Badge>}
               {project?.clientSide && project.clientSide !== "unknown" && (
-                <Badge tone={project.clientSide === "required" ? "info" : "warn"}>
+                <Badge
+                  tone={project.clientSide === "required" ? "info" : "warn"}
+                >
                   {t(`side.client.${project.clientSide}`)}
                 </Badge>
               )}
               {project?.serverSide && project.serverSide !== "unknown" && (
-                <Badge tone={project.serverSide === "required" ? "info" : "warn"}>
+                <Badge
+                  tone={project.serverSide === "required" ? "info" : "warn"}
+                >
                   {t(`side.server.${project.serverSide}`)}
                 </Badge>
               )}
@@ -628,25 +703,41 @@ function ProjectDetail({
             </p>
           )}
 
-          {project && (project.sourceUrl || project.issuesUrl || project.websiteUrl) && (
-            <div className="mt-auto flex flex-wrap gap-3 pt-2 font-mono text-[11px]">
-              {project.sourceUrl && (
-                <a href={project.sourceUrl} target="_blank" rel="noreferrer" className="text-acc">
-                  {t("linkSource")}
-                </a>
-              )}
-              {project.issuesUrl && (
-                <a href={project.issuesUrl} target="_blank" rel="noreferrer" className="text-acc">
-                  {t("linkIssues")}
-                </a>
-              )}
-              {project.websiteUrl && (
-                <a href={project.websiteUrl} target="_blank" rel="noreferrer" className="text-acc">
-                  {t("linkWebsite")}
-                </a>
-              )}
-            </div>
-          )}
+          {project &&
+            (project.sourceUrl || project.issuesUrl || project.websiteUrl) && (
+              <div className="mt-auto flex flex-wrap gap-3 pt-2 font-mono text-[11px]">
+                {project.sourceUrl && (
+                  <a
+                    href={project.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-acc"
+                  >
+                    {t("linkSource")}
+                  </a>
+                )}
+                {project.issuesUrl && (
+                  <a
+                    href={project.issuesUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-acc"
+                  >
+                    {t("linkIssues")}
+                  </a>
+                )}
+                {project.websiteUrl && (
+                  <a
+                    href={project.websiteUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-acc"
+                  >
+                    {t("linkWebsite")}
+                  </a>
+                )}
+              </div>
+            )}
         </aside>
 
         <section className="flex min-h-0 flex-1 flex-col p-4 md:overflow-hidden">
@@ -669,15 +760,21 @@ function ProjectDetail({
               <Spinner size={12} /> {t("loadingFiles")}
             </span>
           ) : files.length === 0 ? (
-            <p className="font-body text-[12px] text-txt-dim">{t("noCompatibleFiles")}</p>
+            <p className="font-body text-[12px] text-txt-dim">
+              {t("noCompatibleFiles")}
+            </p>
           ) : (
             <ul className="bm-scroll flex min-h-0 flex-1 flex-col gap-1 md:overflow-y-auto">
               {files.map((file) => {
-                const key = `${hit.platform}:${hit.projectId}:${file.fileId}`
-                const busy = busyKey === key
+                // Compared against `fileId`, which for Modrinth IS the version
+                // id — the same value the manifest's `source.versionId` holds.
+                const installedVersion =
+                  installedVersionOf?.(hit.platform, hit.projectId) ?? null;
+                const key = `${hit.platform}:${hit.projectId}:${file.fileId}`;
+                const busy = busyKey === key;
                 const requiredDeps = file.dependencies.filter(
                   (d) => d.relation === "required",
-                ).length
+                ).length;
                 return (
                   <li
                     key={file.fileId}
@@ -692,7 +789,16 @@ function ProjectDetail({
                     <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-txt-muted">
                       {file.fileName}
                     </span>
-                    {file.downloadable ? (
+                    {installedVersion === file.fileId ? (
+                      /* The version the pack already has. A badge rather than a
+                         disabled button: disabled reads as "not allowed yet"
+                         and invites a second click, where this is a statement of
+                         fact. Every OTHER version keeps its button — picking one
+                         is how an update or a downgrade is done. */
+                      <Badge tone="ok" className="shrink-0">
+                        {t("installed")}
+                      </Badge>
+                    ) : file.downloadable ? (
                       <Button
                         size="sm"
                         icon="plus"
@@ -706,8 +812,8 @@ function ProjectDetail({
                         // purpose — the host toasts the reason, and closing
                         // would hide the row it refers to.
                         onClick={async () => {
-                          await onAdd({ hit, file })
-                          onClose()
+                          await onAdd({ hit, file });
+                          onClose();
                         }}
                         className="shrink-0"
                       >
@@ -734,11 +840,13 @@ function ProjectDetail({
                       <span>{formatSize(file.fileSize)}</span>
                       <span>{file.datePublished.slice(0, 10)}</span>
                       {requiredDeps > 0 && (
-                        <Badge tone="info">{t("depsCount", { count: requiredDeps })}</Badge>
+                        <Badge tone="info">
+                          {t("depsCount", { count: requiredDeps })}
+                        </Badge>
                       )}
                     </span>
                   </li>
-                )
+                );
               })}
             </ul>
           )}
@@ -751,5 +859,5 @@ function ProjectDetail({
         </section>
       </div>
     </Modal>
-  )
+  );
 }
