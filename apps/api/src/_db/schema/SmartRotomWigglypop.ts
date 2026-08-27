@@ -198,9 +198,24 @@ export const wigglypopOrders = mysqlTable(
     escrowTxId: int('escrow_tx_id'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+    /**
+     * Optional idempotency key, scoped to the buyer. NULL means "never
+     * deduplicate", so an unkeyed order behaves exactly as before. A retry with
+     * the same key receives the original order instead of buying twice.     *
+     * The UNIQUE below spans (actor, key), NOT the key alone. Scoped to the key
+     * only, one caller's key would match another caller's row: the second user
+     * would be handed back the FIRST user's record and their own operation would
+     * silently never happen. A composite UNIQUE still permits many NULL keys,
+     * because NULL never equals NULL in MySQL.
+     */
+    idempotencyKey: varchar('idempotency_key', { length: 255 }),
   },
   (t) => ({
     buyerIdx: index('wp_orders_buyer_idx').on(t.buyerUuid),
+    idempotencyUq: uniqueIndex('wp_orders_idempotency_uq').on(
+      t.buyerUuid,
+      t.idempotencyKey,
+    ),
     escrowFk: foreignKey({
       name: 'wp_orders_escrow_fk',
       columns: [t.escrowTxId],

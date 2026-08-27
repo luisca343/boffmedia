@@ -122,9 +122,10 @@ export class WigglypopFacadeService {
   createOrder(
     dto: CreateOrderDto,
     actor?: ActorContext,
+    idempotencyKey?: string,
   ): Promise<WigglypopOrderEntity> {
     assertActsAsSelf(dto.buyerUuid, actor);
-    return this.orders.create(dto);
+    return this.orders.create(dto, { idempotencyKey });
   }
 
   getUserOrders(uuid: string): Promise<WigglypopOrderEntity[]> {

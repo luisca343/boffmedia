@@ -179,7 +179,13 @@ describe('ChatappController — integration (ValidationPipe + GlobalExceptionFil
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getMessages).toHaveBeenCalledWith(5);
+      // getMessages now also carries keyset pagination (limit, before);
+      // unspecified in this request, so they arrive undefined.
+      expect(mockFacade.getMessages).toHaveBeenCalledWith(
+        5,
+        undefined,
+        undefined,
+      );
     });
   });
 

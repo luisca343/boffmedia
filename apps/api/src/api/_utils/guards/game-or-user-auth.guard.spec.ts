@@ -3,12 +3,8 @@ import { UnauthorizedException } from '@nestjs/common';
 // Mutable mock of the validated env the guard reads.
 const mockEnv: {
   TERAS_API_TOKEN?: string;
-  ENFORCE_MONEY_AUTH: boolean;
-  MC_WORLD: string;
 } = {
   TERAS_API_TOKEN: 'super-secret',
-  ENFORCE_MONEY_AUTH: false,
-  MC_WORLD: 'world-uuid',
 };
 
 jest.mock('@/config/env', () => ({
@@ -34,7 +30,6 @@ describe('GameOrUserAuthGuard', () => {
 
   beforeEach(() => {
     mockEnv.TERAS_API_TOKEN = 'super-secret';
-    mockEnv.ENFORCE_MONEY_AUTH = false;
     guard = new GameOrUserAuthGuard();
   });
 
@@ -97,14 +92,7 @@ describe('GameOrUserAuthGuard', () => {
     );
   });
 
-  it('accepts the legacy tripwire while enforcement is off', async () => {
-    const req: any = { headers: {}, body: { server: 'world-uuid' } };
-    await expect(guard.canActivate(ctxFor(req))).resolves.toBe(true);
-    expect(req.serverAuthed).toBeUndefined();
-  });
-
-  it('rejects the tripwire once enforcement is on', async () => {
-    mockEnv.ENFORCE_MONEY_AUTH = true;
+  it('rejects the legacy tripwire (no longer supported)', async () => {
     const req: any = { headers: {}, body: { server: 'world-uuid' } };
     await expect(guard.canActivate(ctxFor(req))).rejects.toBeInstanceOf(
       UnauthorizedException,

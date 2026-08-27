@@ -216,7 +216,11 @@ describe('ParticipantsService', () => {
       await expect(service.getEventParticipants(20)).resolves.toEqual(
         participants,
       );
-      expect(mockRepo.findEventParticipants).toHaveBeenCalledWith(20);
+      // Second argument is the pagination options, absent in this call.
+      expect(mockRepo.findEventParticipants).toHaveBeenCalledWith(
+        20,
+        undefined,
+      );
     });
   });
 

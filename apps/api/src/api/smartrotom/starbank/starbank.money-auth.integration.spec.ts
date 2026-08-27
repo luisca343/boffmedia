@@ -4,6 +4,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
+import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const request = require('supertest') as typeof import('supertest');
 
@@ -12,11 +13,9 @@ const MC_WORLD = '1ee7e5f6-8e50-4b49-9ee6-b26cc1b5f365';
 const JWT_SECRET = 'test-jwt-secret-at-least-32-characters-long';
 const SESSION_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
 
-// Mutable so a single suite can exercise the flag in both positions — the whole
-// point is the DIFFERENCE the flag makes.
+// Mutable env mock for tests.
 const mockEnv = {
   TERAS_API_TOKEN: SERVER_TOKEN as string | undefined,
-  ENFORCE_MONEY_AUTH: true,
   MC_WORLD,
   JWT_SECRET,
 };
@@ -74,7 +73,7 @@ const transferBody = (extra: Record<string, unknown> = {}) => ({
  * Here the guard, the strategy and `resolveActor` all run for real, so the
  * suite fails if the identity stops reaching the actor.
  */
-describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
+describe('starbank money auth — guard contracts', () => {
   let app: INestApplication;
   let jwt: JwtService;
 
@@ -94,6 +93,13 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
         {
           provide: BoffMediaUsersFacadeService,
           useValue: { getUserById: jest.fn().mockResolvedValue({ id: 1 }) },
+        },
+        {
+          // JwtStrategy now reads the account's session_version on every
+          // request (one query that covers both "user exists" and "token not
+          // revoked"). 0 matches a token minted without an `sv` claim.
+          provide: BoffMediaUsersRepository,
+          useValue: { getSessionVersion: jest.fn().mockResolvedValue(0) },
         },
         JwtStrategy,
         ResponseInterceptor,
@@ -120,7 +126,6 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockEnv.ENFORCE_MONEY_AUTH = true;
     mockEnv.TERAS_API_TOKEN = SERVER_TOKEN;
   });
 
@@ -130,30 +135,18 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
     jwt.sign({ sub: 1, username: 'tester', roles: [], mcUuid });
 
   describe('the legacy body.server tripwire', () => {
-    it('is refused when the flag is on', async () => {
+    it('is no longer accepted (legacy path removed)', async () => {
       await request(app.getHttpServer())
         .post(TRANSFER)
         .send(transferBody({ server: MC_WORLD }))
         .expect(401);
     });
 
-    it('is refused on the transitional guard too', async () => {
+    it('is also rejected on the server-only routes', async () => {
       await request(app.getHttpServer())
         .post(SHOP)
         .send({ server: MC_WORLD })
         .expect(401);
-    });
-
-    // Pins the flag as the thing that closes it: same request, flag off, admitted.
-    it('is still accepted when the flag is off', async () => {
-      mockEnv.ENFORCE_MONEY_AUTH = false;
-
-      const res = await request(app.getHttpServer())
-        .post(TRANSFER)
-        .send(transferBody({ server: MC_WORLD }));
-
-      expect(res.status).not.toBe(401);
-      expect(mockFacade.transfer).toHaveBeenCalled();
     });
   });
 
@@ -171,6 +164,7 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
         10,
         'integration test transfer',
         { serverAuthed: true },
+        undefined,
       );
     });
 
@@ -212,6 +206,7 @@ describe('starbank money auth — ENFORCE_MONEY_AUTH contract', () => {
         10,
         'integration test transfer',
         { serverAuthed: false, mcUuid: SESSION_UUID },
+        undefined,
       );
     });
 

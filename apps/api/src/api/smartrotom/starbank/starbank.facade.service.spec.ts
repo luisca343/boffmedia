@@ -273,6 +273,7 @@ describe('StarbankFacadeService', () => {
           concept: 'test transfer',
         },
         undefined,
+        undefined,
       );
       // Only MAIN account should trigger balance sync
       expect(wingullFacadeService.updateBalance).toHaveBeenCalledTimes(1);

@@ -29,9 +29,13 @@ export class MessageService {
     private readonly chatMessageRepository: IMessageRepository,
   ) {}
 
-  async getMessages(chatId: number): Promise<RotomMessage[]> {
+  async getMessages(
+    chatId: number,
+    limit: number = 50,
+    before?: number,
+  ): Promise<RotomMessage[]> {
     const messages =
-      await this.chatMessageRepository.findChatMessagesAscending(chatId);
+      await this.chatMessageRepository.findChatMessagesAscending(chatId, limit, before);
 
     return messages.map((message) => ({
       id: message.id,

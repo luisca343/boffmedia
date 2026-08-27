@@ -304,9 +304,16 @@ export class TournamentsRepository {
   }
 
   async softDelete(id: number): Promise<void> {
+    // When soft-deleting, rename the slug to free it for reuse. A deleted
+    // tournament is invisible to all queries (filtered by isNull(deletedAt)),
+    // but the slug column is globally unique. By appending a deleted marker,
+    // we keep the row findable by id and audit logs while unblocking the slug.
     await this.db
       .update(boffMediaTournaments)
-      .set({ deletedAt: new Date() })
+      .set({
+        deletedAt: new Date(),
+        slug: sql`CONCAT(${boffMediaTournaments.slug}, '__deleted_', ${id})`,
+      })
       .where(eq(boffMediaTournaments.id, id));
   }
 
@@ -369,10 +376,61 @@ export class TournamentsRepository {
       .where(eq(boffMediaTournamentParticipants.id, id));
   }
 
-  async removeParticipant(id: number): Promise<void> {
-    await this.db
-      .delete(boffMediaTournamentParticipants)
-      .where(eq(boffMediaTournamentParticipants.id, id));
+  /**
+   * Hard-delete a participant only if they have no matches referencing them.
+   * Use a row lock to make the check and delete atomic. The check prevents a
+   * participant who was seeded into a bracket from being deleted, which would
+   * leave matches with empty slots that standings and advancement silently skip.
+   *
+   * Returns false if the delete was refused (participant in matches);
+   * true if the delete succeeded.
+   */
+  async removeParticipant(
+    id: number,
+  ): Promise<{ success: boolean; reason?: string }> {
+    return this.db.transaction(async (tx) => {
+      const [p] = await tx
+        .select()
+        .from(boffMediaTournamentParticipants)
+        .where(eq(boffMediaTournamentParticipants.id, id))
+        .for('update');
+
+      if (!p) {
+        return { success: false, reason: 'not_found' };
+      }
+
+      // Check if this participant is referenced by any match as a player or result.
+      // This must be under the lock to prevent a concurrent bracket generation
+      // from seeding this participant between the check and the delete.
+      const matches = await tx
+        .select({ id: boffMediaTournamentMatches.id })
+        .from(boffMediaTournamentMatches)
+        .where(
+          and(
+            eq(boffMediaTournamentMatches.tournamentId, p.tournamentId),
+            sql`(
+              ${boffMediaTournamentMatches.topParticipantId} = ${id}
+              OR ${boffMediaTournamentMatches.botParticipantId} = ${id}
+              OR ${boffMediaTournamentMatches.winnerParticipantId} = ${id}
+              OR ${boffMediaTournamentMatches.proposedByParticipantId} = ${id}
+            )`,
+          ),
+        )
+        .limit(1);
+
+      if (matches.length > 0) {
+        return {
+          success: false,
+          reason: 'in_bracket',
+        };
+      }
+
+      await tx
+        .delete(boffMediaTournamentParticipants)
+        .where(eq(boffMediaTournamentParticipants.id, id));
+
+      return { success: true };
+    });
   }
 
   // ── roster ──────────────────────────────────────────────────────────────────
@@ -479,26 +537,51 @@ export class TournamentsRepository {
    *
    * Every settlement patch carries a fresh `reportedAt`, so the row always
    * changes when it matches and mysql2's `affectedRows` is a faithful "I won".
+   *
+   * For amends (allowResolved=true), optional `expectedVersion` enables
+   * optimistic concurrency: the update succeeds only if the match has not been
+   * amended again since the admin last loaded it. Omit for non-amend paths.
    */
   async claimSettlement(
     matchId: number,
     patch: Partial<typeof boffMediaTournamentMatches.$inferInsert>,
-    opts: { allowResolved: boolean },
+    opts: {
+      allowResolved: boolean;
+      expectedVersion?: number;
+    },
   ): Promise<boolean> {
+    const conditions = [eq(boffMediaTournamentMatches.id, matchId)];
+
+    // For non-amend paths: enforce that the match is not yet settled.
+    if (!opts.allowResolved) {
+      conditions.push(
+        notInArray(boffMediaTournamentMatches.status, ['completed', 'bye']),
+      );
+    }
+
+    // For amend paths with optimistic concurrency: enforce version match.
+    //
+    // Fail closed. `allowResolved` drops the status guard, so the version IS the
+    // guard on this path; treating a missing version as "no condition" would
+    // leave the bare `WHERE id = ?` that lets two concurrent amends overwrite
+    // one another. A caller that reaches here without one is a programming
+    // error, not a request to skip the check.
+    if (opts.allowResolved) {
+      if (opts.expectedVersion === undefined) {
+        throw new Error(
+          'claimSettlement: an amend requires expectedVersion (optimistic concurrency)',
+        );
+      }
+      conditions.push(
+        eq(boffMediaTournamentMatches.version, opts.expectedVersion),
+      );
+    }
+
     const [res] = await this.db
       .update(boffMediaTournamentMatches)
       .set(patch)
-      .where(
-        opts.allowResolved
-          ? eq(boffMediaTournamentMatches.id, matchId)
-          : and(
-              eq(boffMediaTournamentMatches.id, matchId),
-              notInArray(boffMediaTournamentMatches.status, [
-                'completed',
-                'bye',
-              ]),
-            ),
-      );
+      .where(and(...conditions));
+
     return res.affectedRows > 0;
   }
 

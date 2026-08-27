@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ImageUploadService } from './image-upload.service';
 import { FileUploadService } from './file-upload.service';
+import { AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
 
 const mockFileUploadService = {
   validateFileType: jest.fn(),
@@ -22,6 +23,11 @@ const makeFile = (
     size,
     path: `/tmp/${name}`,
   }) as Express.Multer.File;
+
+const makeActor = (userId = 1): AuthPrincipal => ({
+  userId,
+  username: `user${userId}`,
+});
 
 describe('ImageUploadService', () => {
   let service: ImageUploadService;
@@ -47,6 +53,7 @@ describe('ImageUploadService', () => {
   describe('uploadImage()', () => {
     it('uploads valid image and returns response', async () => {
       const file = makeFile();
+      const actor = makeActor();
       const uploadResult = {
         filename: 'photo.jpg',
         path: '/uploads/photo.jpg',
@@ -58,42 +65,49 @@ describe('ImageUploadService', () => {
       mockFileUploadService.validateFileSize.mockResolvedValue(true);
       mockFileUploadService.uploadFile.mockResolvedValue(uploadResult);
 
-      const result = await service.uploadImage({ file });
+      const result = await service.uploadImage({ file, actor });
 
       expect(result.url).toBe('/uploads/photo.jpg');
       expect(mockFileUploadService.uploadFile).toHaveBeenCalled();
     });
 
     it('throws when no file is provided', async () => {
-      await expect(service.uploadImage({ file: null as any })).rejects.toThrow(
-        'No image file provided',
-      );
+      const actor = makeActor();
+      await expect(
+        service.uploadImage({ file: null as any, actor }),
+      ).rejects.toThrow('No image file provided');
     });
 
     it('throws when file type is not an allowed image type', async () => {
+      const actor = makeActor();
       mockFileUploadService.validateFileType.mockResolvedValue(false);
 
       await expect(
-        service.uploadImage({ file: makeFile('doc.pdf') }),
+        service.uploadImage({ file: makeFile('doc.pdf'), actor }),
       ).rejects.toThrow('Only image files');
     });
 
     it('throws when file exceeds default size limit (5MB)', async () => {
+      const actor = makeActor();
       mockFileUploadService.validateFileType.mockResolvedValue(true);
       mockFileUploadService.validateFileSize.mockResolvedValue(false);
 
       await expect(
-        service.uploadImage({ file: makeFile('big.jpg', 10 * 1024 * 1024) }),
+        service.uploadImage({
+          file: makeFile('big.jpg', 10 * 1024 * 1024),
+          actor,
+        }),
       ).rejects.toThrow('Image size must be less than');
     });
 
     it('uses custom maxSizeInMB when provided', async () => {
       const file = makeFile();
+      const actor = makeActor();
       mockFileUploadService.validateFileType.mockResolvedValue(true);
       mockFileUploadService.validateFileSize.mockResolvedValue(true);
       mockFileUploadService.uploadFile.mockResolvedValue({} as any);
 
-      await service.uploadImage({ file, maxSizeInMB: 10 });
+      await service.uploadImage({ file, maxSizeInMB: 10, actor });
 
       expect(mockFileUploadService.validateFileSize).toHaveBeenCalledWith(
         file,
@@ -106,14 +120,16 @@ describe('ImageUploadService', () => {
 
   describe('deleteImage()', () => {
     it('delegates deletion to FileUploadService', async () => {
+      const actor = makeActor();
       mockFileUploadService.deleteFile.mockResolvedValue({ success: true });
 
-      await expect(service.deleteImage('', 'photo.jpg')).resolves.toEqual({
+      await expect(service.deleteImage('', 'photo.jpg', actor)).resolves.toEqual({
         success: true,
       });
       expect(mockFileUploadService.deleteFile).toHaveBeenCalledWith(
         '',
         'photo.jpg',
+        actor,
       );
     });
   });
@@ -122,14 +138,20 @@ describe('ImageUploadService', () => {
 
   describe('getImageInfo()', () => {
     it('delegates to FileUploadService', async () => {
+      const actor = makeActor();
       mockFileUploadService.getFileInfo.mockResolvedValue({
         exists: true,
         size: 512,
       });
 
       await expect(
-        service.getImageInfo('', 'photo.jpg'),
+        service.getImageInfo('', 'photo.jpg', actor),
       ).resolves.toMatchObject({ exists: true });
+      expect(mockFileUploadService.getFileInfo).toHaveBeenCalledWith(
+        '',
+        'photo.jpg',
+        actor,
+      );
     });
   });
 

@@ -66,6 +66,7 @@ export class TeamsService {
       await tx.addMember({
         teamId: result.insertId,
         participantId: leaderParticipant.id,
+        eventId,
         role: 'leader' as const,
       });
       return result.insertId;
@@ -139,26 +140,27 @@ export class TeamsService {
       `Joined team ${teamId}`,
     );
 
-    // 3. Check if participant is already in a team for this event
-    const existingTeam = await this.teamsRepository.findParticipantTeamInEvent(
-      participant.id,
-      eventId,
-    );
-
-    if (existingTeam.length > 0) {
-      throw new ConflictException(
-        'Participant is already in a team for this event',
-      );
-    }
-
-    // 4. Add participant to team members
+    // 3. Add participant to team members. The unique constraint on
+    // (event_id, participant_id) enforces "one team per participant per
+    // event", so concurrent races join different teams will conflict here
+    // rather than silently splitting the member across both.
     const memberData = {
       teamId,
       participantId: participant.id,
+      eventId,
       role: 'member' as const,
     };
 
-    await this.teamsRepository.addMember(memberData);
+    try {
+      await this.teamsRepository.addMember(memberData);
+    } catch (error) {
+      if (error instanceof Error && error.message.includes('already in a team')) {
+        throw new ConflictException(
+          'Participant is already in a team for this event',
+        );
+      }
+      throw error;
+    }
 
     return this.teamsRepository.findMember(teamId, participant.id);
   }
@@ -193,8 +195,11 @@ export class TeamsService {
     return { success: true };
   }
 
-  async getTeamMembers(teamId: number): Promise<any[]> {
-    return this.teamsRepository.findTeamMembers(teamId);
+  async getTeamMembers(
+    teamId: number,
+    pagination?: { limit?: number; offset?: number },
+  ): Promise<any[]> {
+    return this.teamsRepository.findTeamMembers(teamId, pagination);
   }
   /**
    * Recompute the team's cached score.

@@ -4,20 +4,20 @@ import { CreateUserDto } from '../../dto/create-user.dto';
 
 // Entity types for responses (without password, the internal soft-delete marker,
 // the forum presence marker — lastSeenAt is read directly by the forum, never
-// surfaced through the general user reads — or the internal launcher revocation
-// counter, which the user selects never fetch).
+// surfaced through the general user reads — or the internal revocation counters,
+// which the user selects never fetch).
 export type BoffMediaUserSafe = Omit<
   BoffMediaUser,
-  'password' | 'deletedAt' | 'lastSeenAt' | 'desktopTokenVersion'
+  'password' | 'deletedAt' | 'lastSeenAt' | 'desktopTokenVersion' | 'sessionVersion'
 >;
 
 // Complex query result types. Keeps `password` (for credential checks) but not
-// the internal soft-delete / presence markers, matching the repository's select
-// clause.
+// the internal soft-delete / presence markers / revocation counters, matching the
+// repository's select clause.
 export interface FullUserData {
   boffmedia_users: Omit<
     BoffMediaUser,
-    'deletedAt' | 'lastSeenAt' | 'desktopTokenVersion'
+    'deletedAt' | 'lastSeenAt' | 'desktopTokenVersion' | 'sessionVersion'
   >;
   rotom_users: RotomUser | null;
 }
@@ -77,4 +77,8 @@ export interface IBoffMediaUsersRepository {
 
   // ==================== STATISTICS ====================
   getUserCount(): Promise<number>;
+
+  // ==================== SESSION REVOCATION ====================
+  getSessionVersion(userId: number): Promise<number | null>;
+  bumpSessionVersion(userId: number): Promise<void>;
 }

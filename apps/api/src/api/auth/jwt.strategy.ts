@@ -1,4 +1,5 @@
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
+import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
@@ -11,7 +12,10 @@ import { env } from '@/config/env';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly usersService: BoffMediaUsersFacadeService) {
+  constructor(
+    private readonly usersService: BoffMediaUsersFacadeService,
+    private readonly usersRepository: BoffMediaUsersRepository,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
@@ -28,10 +32,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       throw new UnauthorizedException();
     }
 
-    const user = await this.usersService.getUserById(payload.sub);
-    if (!user) {
+    // Verify the session version. This replaces the user existence check that was
+    // here before: getSessionVersion covers both concerns in one query (user exists +
+    // not soft-deleted + current version is valid). The claim is `sv`, and tokens
+    // minted before this feature was deployed carry no `sv` claim — treat a missing
+    // `sv` as 0 so the backward-compatibility window closes automatically as old
+    // tokens expire (in 15 minutes for access tokens, 7 days for refresh tokens).
+    const embeddedVersion = payload.sv ?? 0;
+    const currentVersion = await this.usersRepository.getSessionVersion(payload.sub);
+    if (currentVersion === null || currentVersion !== embeddedVersion) {
       throw new UnauthorizedException();
     }
+
     return {
       userId: payload.sub,
       username: payload.username,

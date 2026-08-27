@@ -34,6 +34,7 @@ describe('EventsService', () => {
       | 'delete'
       | 'softDelete'
       | 'softDeleteChildren'
+      | 'hasAttachedTournaments'
     >
   >;
 
@@ -50,6 +51,9 @@ describe('EventsService', () => {
       delete: jest.fn(),
       softDelete: jest.fn(),
       softDeleteChildren: jest.fn(),
+      // Deleting an event is refused while a tournament hangs off it, so the
+      // happy-path tests below have to say there is none.
+      hasAttachedTournaments: jest.fn().mockResolvedValue(false),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -212,6 +216,14 @@ describe('EventsService', () => {
       await service.deleteEvent(1);
 
       expect(callOrder).toEqual(['children', 'parent']);
+    });
+
+    it('refuses to delete an event that still has a tournament attached', async () => {
+      eventsRepository.hasAttachedTournaments.mockResolvedValue(true);
+
+      await expect(service.deleteEvent(1)).rejects.toThrow();
+      expect(eventsRepository.softDelete).not.toHaveBeenCalled();
+      expect(eventsRepository.softDeleteChildren).not.toHaveBeenCalled();
     });
   });
 

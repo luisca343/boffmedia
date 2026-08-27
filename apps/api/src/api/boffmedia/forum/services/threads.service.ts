@@ -1,4 +1,5 @@
 import {
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -83,20 +84,55 @@ export class ThreadsService {
 
   // Toggle: one vote per (user, thread). Returns the caller's new vote state and
   // the resulting (clamped) thread total.
+  //
+  // Race condition fix: Instead of check-then-insert, we attempt the insert directly.
+  // The database unique constraint on (thread_id, user_id) ensures idempotency:
+  // - If the vote doesn't exist, INSERT succeeds and we count it as a new vote.
+  // - If the vote already exists, INSERT fails with a duplicate-key error; we
+  //   then remove the vote (toggle off) instead.
+  //
+  // This eliminates the TOCTOU window between the check and the insert.
   async toggleVote(threadId: number, userId: number): Promise<ForumVoteResult> {
-    const existing = await this.votesRepo.find(userId, threadId);
     let voted: boolean;
-    if (existing) {
-      await this.votesRepo.remove(userId, threadId);
-      await this.repo.adjustVoteCount(threadId, -1);
-      voted = false;
-    } else {
+    try {
+      // Attempt to insert the vote.
       await this.votesRepo.add(userId, threadId);
+      // If we reach here, the vote was new.
       await this.repo.adjustVoteCount(threadId, 1);
       voted = true;
+    } catch (err) {
+      // Check if this is a duplicate-key error (vote already exists).
+      // The global exception filter handles ER_DUP_ENTRY, so we check for both
+      // the raw MySQL error and the wrapped HttpException.
+      if (this.isDuplicateKeyError(err)) {
+        // Vote already exists, so toggle it off.
+        await this.votesRepo.remove(userId, threadId);
+        await this.repo.adjustVoteCount(threadId, -1);
+        voted = false;
+      } else {
+        // Some other error; re-throw it.
+        throw err;
+      }
     }
     const votes = await this.repo.getVoteCount(threadId);
     return { voted, votes };
+  }
+
+  // Detects whether an error is a duplicate-key error from the database.
+  // Matches both raw MySQL2 errors and wrapped HttpExceptions.
+  private isDuplicateKeyError(err: unknown): boolean {
+    if (typeof err !== 'object' || err === null) return false;
+    const e = err as Record<string, unknown>;
+    // MySQL2 native error code
+    if (e['code'] === 'ER_DUP_ENTRY') return true;
+    // Message-based check (covers error wrappers that preserve the message)
+    if (
+      typeof e['message'] === 'string' &&
+      e['message'].includes('Duplicate entry')
+    ) {
+      return true;
+    }
+    return false;
   }
 
   // Author-or-admin only (checked here, not in the controller). postId marks a

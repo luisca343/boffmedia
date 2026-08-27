@@ -92,11 +92,35 @@ function computeBadge(
 
 @Injectable()
 export class DivergenceService {
+  /** In-process cache for divergence results, keyed by regulation+tournament+month+cutoff.
+   * TTL is 10 minutes (600000ms). This is per-instance; multi-instance deployments will
+   * have independent caches. For a distributed cache, use Redis or similar. */
+  private readonly cache = new Map<
+    string,
+    { result: DivergenceResult; timestamp: number }
+  >();
+  private readonly CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
+
   constructor(
     private readonly smogonService: SmogonService,
     private readonly limitlessService: LimitlessService,
     private readonly regulationsRepository: VgcRegulationsRepository,
   ) {}
+
+  /** Generate a cache key from divergence query parameters. */
+  private getCacheKey(params: {
+    regulationId: string;
+    tournamentId?: number;
+    month?: string;
+    cutoff?: number;
+  }): string {
+    return `${params.regulationId}:${params.tournamentId ?? 'combined'}:${params.month ?? 'latest'}:${params.cutoff ?? 'default'}`;
+  }
+
+  /** Check if a cached entry is still valid (not expired). */
+  private isCacheValid(timestamp: number): boolean {
+    return Date.now() - timestamp < this.CACHE_TTL_MS;
+  }
 
   async compareLadderVsTournament(params: {
     regulationId: string;
@@ -104,6 +128,12 @@ export class DivergenceService {
     month?: string;
     cutoff?: number;
   }): Promise<DivergenceResult> {
+    const cacheKey = this.getCacheKey(params);
+    const cached = this.cache.get(cacheKey);
+
+    if (cached && this.isCacheValid(cached.timestamp)) {
+      return cached.result;
+    }
     const regulation = await this.regulationsRepository.findById(
       params.regulationId,
     );
@@ -169,7 +199,7 @@ export class DivergenceService {
       })
       .sort((a, b) => b.absDeltaPercent - a.absDeltaPercent);
 
-    return {
+    const result: DivergenceResult = {
       regulationId: params.regulationId,
       tournamentId: params.tournamentId ?? null,
       ladderFormat: regulation.formatId,
@@ -178,5 +208,10 @@ export class DivergenceService {
       rowCount: rows.length,
       rows,
     };
+
+    // Store in cache for 10 minutes.
+    this.cache.set(cacheKey, { result, timestamp: Date.now() });
+
+    return result;
   }
 }

@@ -19,7 +19,6 @@ import { Request } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 import { GameServerAuthGuard } from '@api/_utils/guards/game-server-auth.guard';
-import { GameServerTransitionalAuthGuard } from '@api/_utils/guards/game-server-transitional-auth.guard';
 import { resolveActor, assertActsAsSelf } from '@api/_utils/auth/actor';
 import {
   ApiTags,
@@ -346,12 +345,20 @@ export class StarbankController {
     @Body(ValidationPipe) transferDto: CreateTransferDto,
     @Req() req: Request,
   ): Promise<void> {
+    // Read Idempotency-Key header to enable retry safety: if the same key is
+    // submitted twice, the second request receives the original result without
+    // performing a second transfer.
+    const idempotencyKey = (
+      req.headers['idempotency-key'] as string | undefined
+    )?.trim();
+
     return await this.starbankFacadeService.transfer(
       transferDto.from,
       transferDto.to,
       transferDto.amount,
       transferDto.concept,
       resolveActor(req),
+      idempotencyKey,
     );
   }
 
@@ -393,15 +400,14 @@ export class StarbankController {
   }
 
   @Post('shop')
-  @UseGuards(GameServerTransitionalAuthGuard)
+  @UseGuards(GameServerAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Process shop transaction (buy/sell)',
     description:
       'Process a purchase or sale transaction with an NPC shop. Mints/moves ' +
-      "money on the mod's behalf, so it is server-only: the mod's Bearer, or " +
-      'the transitional `server` tripwire while ENFORCE_MONEY_AUTH is off. ' +
-      'Never user-reachable — it carries no ownership check.',
+      "money on the mod's behalf, so it is server-only: requires the mod's " +
+      "Bearer token. Never user-reachable — it carries no ownership check.",
   })
   @ApiBody({ type: CreateShopTransactionDto })
   @ApiResponse({
@@ -423,7 +429,7 @@ export class StarbankController {
   }
 
   @Post('trainerdefeat')
-  @UseGuards(GameServerTransitionalAuthGuard)
+  @UseGuards(GameServerAuthGuard)
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Process trainer defeat reward',

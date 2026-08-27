@@ -1,4 +1,10 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import {
   CHAT_REPOSITORY_TOKEN,
   CHAT_MEMBER_REPOSITORY_TOKEN,
@@ -57,7 +63,11 @@ export class GroupService {
   ): Promise<Group> {
     const chat = await this.chatRepository.findChatById(groupId);
     if (!chat) {
-      throw new Error('Group not found');
+      throw new NotFoundException({
+        message: 'Group not found',
+        code: ApiErrorCode.CHAT_NOT_FOUND,
+        userMessage: 'No se encontró el chat.',
+      });
     }
 
     const userInChat = await this.chatMemberRepository.findUserInChat(
@@ -83,23 +93,15 @@ export class GroupService {
   ): Promise<void> {
     const chat = await this.chatRepository.findChatById(groupId);
     if (!chat) {
-      throw new Error('Group not found');
+      throw new NotFoundException({
+        message: 'Group not found',
+        code: ApiErrorCode.CHAT_NOT_FOUND,
+        userMessage: 'No se encontró el chat.',
+      });
     }
 
-    // Validate requesting user has access to add members (for group chats)
-    if (chat.type === 3) {
-      // Group chat
-      const requestingUserInChat =
-        await this.chatMemberRepository.findUserInChat(
-          groupId,
-          requestingUserUuid,
-        );
-      if (!requestingUserInChat) {
-        throw new Error(
-          'User does not have permission to add members to this group',
-        );
-      }
-    }
+    this.assertMembershipIsMutable(chat);
+    await this.assertRequesterIsMember(groupId, requestingUserUuid);
 
     // Check if user is already a member
     const existingMember = await this.chatMemberRepository.findUserInChat(
@@ -107,7 +109,11 @@ export class GroupService {
       uuid,
     );
     if (existingMember) {
-      throw new Error('User is already a member of this group');
+      throw new ConflictException({
+        message: 'User is already a member of this group',
+        code: ApiErrorCode.CHAT_GROUP_NO_ACCESS,
+        userMessage: 'Esta persona ya está en el grupo.',
+      });
     }
 
     await this.chatMemberRepository.addChatMember(groupId, uuid);
@@ -120,21 +126,18 @@ export class GroupService {
   ): Promise<void> {
     const chat = await this.chatRepository.findChatById(groupId);
     if (!chat) {
-      throw new Error('Group not found');
+      throw new NotFoundException({
+        message: 'Group not found',
+        code: ApiErrorCode.CHAT_NOT_FOUND,
+        userMessage: 'No se encontró el chat.',
+      });
     }
 
-    // Users can remove themselves, or group members can remove others in group chats
-    if (uuid !== requestingUserUuid && chat.type === 3) {
-      const requestingUserInChat =
-        await this.chatMemberRepository.findUserInChat(
-          groupId,
-          requestingUserUuid,
-        );
-      if (!requestingUserInChat) {
-        throw new Error(
-          'User does not have permission to remove members from this group',
-        );
-      }
+    // Both leaving and removing someone else are membership changes, so the
+    // same rule covers them: only a group has a roster to change at all.
+    this.assertMembershipIsMutable(chat);
+    if (uuid !== requestingUserUuid) {
+      await this.assertRequesterIsMember(groupId, requestingUserUuid);
     }
 
     const existingMember = await this.chatMemberRepository.findUserInChat(
@@ -142,10 +145,52 @@ export class GroupService {
       uuid,
     );
     if (!existingMember) {
-      throw new Error('User is not a member of this group');
+      throw new NotFoundException({
+        message: 'User is not a member of this group',
+        code: ApiErrorCode.CHAT_NOT_MEMBER,
+        userMessage: 'Esta persona no está en el grupo.',
+      });
     }
 
     await this.chatMemberRepository.removeChatMember(groupId, uuid);
+  }
+
+  /**
+   * Only a group (type 3) has a roster that can change. Type 0 is a public
+   * room with no membership, type 1 is saved-messages (one person by
+   * definition) and type 2 is a DM, which IS its two participants — adding a
+   * third would silently turn a private conversation into a group.
+   *
+   * The previous check ran only for type 3, so every other type fell straight
+   * through to the write with no permission check at all.
+   */
+  private assertMembershipIsMutable(chat: { type: number }): void {
+    if (chat.type !== 3) {
+      throw new ForbiddenException({
+        message: `Chat type ${chat.type} has fixed membership`,
+        code: ApiErrorCode.CHAT_MEMBERSHIP_FIXED,
+        userMessage: 'La lista de miembros de este chat no se puede modificar.',
+      });
+    }
+  }
+
+  /** Only someone already in the group may change who else is in it. */
+  private async assertRequesterIsMember(
+    groupId: number,
+    requestingUserUuid: string,
+  ): Promise<void> {
+    const requestingUserInChat =
+      await this.chatMemberRepository.findUserInChat(
+        groupId,
+        requestingUserUuid,
+      );
+    if (!requestingUserInChat) {
+      throw new ForbiddenException({
+        message: 'User does not have permission to manage this group',
+        code: ApiErrorCode.CHAT_GROUP_NO_ACCESS,
+        userMessage: 'No tienes acceso a este grupo.',
+      });
+    }
   }
 
   async setPinned(

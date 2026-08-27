@@ -5,15 +5,27 @@ import {
   HttpStatus,
   UnauthorizedException,
   UseGuards,
+  Req,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiErrorCode, userError } from '@/common/errors/user-error';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
+import { JwtAuthGuard } from './jwt-auth.guard';
+import {
+  CurrentUser,
+  AuthPrincipal,
+} from '@api/_utils/decorators/current-user.decorator';
 import { AuthService } from './auth.service';
 import { PasswordResetService } from './password-reset.service';
 import { EmailVerificationService } from './email-verification.service';
+import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { CreateUserDto } from '@api/boffmedia/users/dto/create-user.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { GoogleCallbackDto } from './dto/google-callback.dto';
@@ -36,11 +48,17 @@ export class AuthController {
     private readonly authService: AuthService,
     private readonly passwordResetService: PasswordResetService,
     private readonly emailVerificationService: EmailVerificationService,
+    private readonly usersRepository: BoffMediaUsersRepository,
   ) {}
 
   @Post('login')
   @UseGuards(AuthThrottlerGuard)
-  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  // Keyed on the submitted username, not the IP (see AuthThrottlerGuard), so
+  // this is 5 guesses per minute against one account rather than a shared
+  // budget. A person who has genuinely mistyped their password twice is not
+  // inconvenienced; 14 400 offline-free guesses a day was more room than a
+  // targeted attacker needs.
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -67,7 +85,9 @@ export class AuthController {
 
   @Post('refresh')
   @UseGuards(AuthThrottlerGuard)
-  @Throttle({ default: { ttl: 60_000, limit: 30 } })
+  // A client refreshes on expiry and on 401, never in a loop; 30/min was sized
+  // for a retry storm rather than for normal use.
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiOperation({ summary: 'Refresh JWT token' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -167,6 +187,30 @@ export class AuthController {
   })
   async resendVerification(@Body() dto: ResendVerificationDto) {
     await this.emailVerificationService.sendVerification(dto.email);
+    return { success: true };
+  }
+
+  // ==================== SESSION REVOCATION ====================
+
+  @Post('signout-everywhere')
+  // JwtAuthGuard explicitly, because the class is @Public(): that skips the
+  // global guard, so without this `req.user` is never populated and the route
+  // answers 401 to a perfectly valid Bearer token. Every other route on this
+  // controller genuinely is anonymous; this one is the exception.
+  @UseGuards(JwtAuthGuard, AuthThrottlerGuard)
+  @ApiBearerAuth('JWT')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
+  @ApiOperation({ summary: 'Sign out from all devices (invalidate all sessions)' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Signed out from all devices.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Not authenticated.',
+  })
+  async signoutEverywhere(@CurrentUser() user: AuthPrincipal) {
+    await this.usersRepository.bumpSessionVersion(user.userId);
     return { success: true };
   }
 }

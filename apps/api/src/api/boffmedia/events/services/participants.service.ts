@@ -163,14 +163,20 @@ export class ParticipantsService {
     );
   }
 
-  async getEventParticipants(eventId: number): Promise<
+  async getEventParticipants(
+    eventId: number,
+    pagination?: { limit?: number; offset?: number },
+  ): Promise<
     (EventParticipant & {
       nickname: string;
       avatar: string;
       userId: number;
     })[]
   > {
-    return this.participantsRepository.findEventParticipants(eventId);
+    return this.participantsRepository.findEventParticipants(
+      eventId,
+      pagination,
+    );
   }
 
   async leaveEvent(eventId: number, participantId: number): Promise<void> {

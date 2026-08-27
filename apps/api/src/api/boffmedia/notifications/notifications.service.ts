@@ -31,14 +31,15 @@ export class NotificationsService {
     };
   }
 
-  /** The current user's notifications, newest first. */
-  async list(userId: number, limit = 30): Promise<NotificationEntity[]> {
+  /** The current user's notifications, newest first. Default limit 50, max 100. */
+  async list(userId: number, limit = 50): Promise<NotificationEntity[]> {
+    const cappedLimit = Math.min(Math.max(limit, 1), 100);
     const rows = await this.db
       .select()
       .from(boffMediaNotifications)
       .where(eq(boffMediaNotifications.userId, userId))
       .orderBy(desc(boffMediaNotifications.createdAt))
-      .limit(limit);
+      .limit(cappedLimit);
     return rows.map((r) => this.toEntity(r));
   }
 
@@ -141,15 +142,20 @@ export class NotificationsService {
       return { created: 1 };
     }
 
-    // Broadcast: one row per user.
+    // Broadcast: one row per user, batched into chunks of 500 to avoid
+    // overwhelming the insert statement for large user bases.
     const users = await this.db
       .select({ id: boffMediaUsers.id })
       .from(boffMediaUsers);
     if (users.length === 0) return { created: 0 };
 
-    await this.db
-      .insert(boffMediaNotifications)
-      .values(users.map((u) => ({ ...base, userId: u.id })));
+    const CHUNK_SIZE = 500;
+    for (let i = 0; i < users.length; i += CHUNK_SIZE) {
+      const chunk = users.slice(i, i + CHUNK_SIZE);
+      await this.db
+        .insert(boffMediaNotifications)
+        .values(chunk.map((u) => ({ ...base, userId: u.id })));
+    }
     return { created: users.length };
   }
 }

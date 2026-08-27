@@ -34,13 +34,12 @@ export class DungeonsService {
   }
 
   async getPlayerStats(uuid: string): Promise<DungeonPlayerStats> {
-    const ranking = await this.repository.findTopPlayers(RANK_LOOKUP_DEPTH);
-    const entry = ranking.find((player) => player.uuid === uuid);
+    const stats = await this.repository.findPlayerStatsWithRank(uuid);
 
-    if (!entry) {
+    if (!stats) {
       throw new NotFoundException(`No dungeon runs found for ${uuid}`);
     }
 
-    return { ...entry, mejorPartida: await this.repository.findBestRun(uuid) };
+    return stats;
   }
 }

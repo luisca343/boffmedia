@@ -32,6 +32,7 @@ import {
   boffMediaEvents,
 } from '@/_db/schema/BoffMediaEvents';
 import { Logger } from 'nestjs-pino';
+import { AuditService } from '@api/_repositories/audit.service';
 
 /**
  * Drizzle wraps driver errors in a query error and hangs the real mysql2 error
@@ -53,6 +54,7 @@ export class RandomizerRepository {
     private readonly logger: Logger,
 
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+    @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
   // ==================== CONFIGS ====================
@@ -570,6 +572,10 @@ export class RandomizerRepository {
 
   // ==================== AUDIT ====================
 
+  /**
+   * Delegates to the unified AuditService to maintain a consistent code path
+   * across all audit domains (boffmedia, packs, randomizer, gobierno).
+   */
   async appendAudit(row: {
     configId?: number | null;
     assignmentId?: number | null;
@@ -577,24 +583,14 @@ export class RandomizerRepository {
     actor?: string | null;
     meta?: Record<string, unknown> | null;
   }): Promise<void> {
-    try {
-      await this.db
-        .insert(randomizerAudit)
-        .values({
-          configId: row.configId || null,
-          assignmentId: row.assignmentId || null,
-          action: row.action,
-          actor: row.actor || null,
-          meta: row.meta || null,
-        } as RandomizerAudit)
-        .execute();
-    } catch (error: any) {
-      this.logger.error('Failed to append audit record:', error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Audit append failed: ${error.message}`);
-    }
+    await this.auditService.record({
+      domain: 'randomizer',
+      configId: row.configId || null,
+      assignmentId: row.assignmentId || null,
+      action: row.action,
+      actor: row.actor || null,
+      metadata: row.meta || null,
+    });
   }
 
   /**

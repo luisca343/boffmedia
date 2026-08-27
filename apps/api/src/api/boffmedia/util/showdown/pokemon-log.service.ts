@@ -1,6 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { google, sheets_v4 } from 'googleapis';
-import axios from 'axios';
+import { env } from '@/config/env';
+import { safeFetch } from '@api/_utils/http/safe-fetch';
 
 export interface PokemonTeam {
   pokemon: string[];
@@ -26,8 +27,9 @@ export class PokemonLogService {
     let errors = 0;
 
     try {
+      const keyFile = env.POKEMON_LOG_SERVICE_KEY_FILE || 'boffmedia-b6e4f721c326.json';
       const auth = new google.auth.GoogleAuth({
-        keyFile: 'boffmedia-b6e4f721c326.json',
+        keyFile,
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
       });
 
@@ -74,7 +76,8 @@ export class PokemonLogService {
           const logData = await this.fetchLogData(cellValue);
 
           // Parse log data
-          const parsedLog = this.parseShowdownLog(logData);
+          const localPlayerName = env.POKEMON_LOG_LOCAL_PLAYER || 'Luisca343';
+          const parsedLog = this.parseShowdownLog(logData, localPlayerName);
 
           if (parsedLog) {
             parsedLog.row = actualRowNumber;
@@ -116,22 +119,28 @@ export class PokemonLogService {
       // Add .log if not present
       const logUrl = url.endsWith('.log') ? url : `${url}.log`;
 
-      const response = await axios.get(logUrl, {
+      // Pokémon Showdown replay server is the only expected source.
+      // This prevents SSRF attacks by restricting to the known replay domain.
+      const logData = await safeFetch(logUrl, {
+        allowedHosts: ['replay.pokemonshowdown.com'],
         timeout: 10000,
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        maxBytes: 10_000_000, // 10 MB limit for a log file
+        axiosConfig: {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+          },
         },
       });
 
-      return response.data;
+      return logData;
     } catch (error: any) {
       this.logger.error(`Error fetching log data from ${url}:`, error.message);
       throw error;
     }
   }
 
-  parseShowdownLog(logData: string): ParsedLog | null {
+  parseShowdownLog(logData: string, localPlayerName: string = 'Luisca343'): ParsedLog | null {
     const lines = logData.split('\n');
     let rivalPlayer = '';
     let rivalPlayerName = '';
@@ -148,7 +157,7 @@ export class PokemonLogService {
         const playerKey = parts[2]; // p1 or p2
         const playerName = parts[3];
 
-        if (playerName === 'Luisca343') {
+        if (playerName === localPlayerName) {
           luiscaPlayer = playerKey;
         } else {
           rivalPlayer = playerKey;

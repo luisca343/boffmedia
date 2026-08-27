@@ -17,6 +17,7 @@ import { TournamentSummary } from '../entities/tournament.entity';
 import { ListTournamentsQueryDto } from '../dto/list-tournaments-query.dto';
 import { slugify } from '../tournaments.mapper';
 import type { TournamentStatus } from '../tournaments.types';
+import { ApiErrorCode, userError } from '@/common/errors/user-error';
 
 @Injectable()
 export class TournamentsService {
@@ -180,6 +181,25 @@ export class TournamentsService {
           ? 'A completed tournament cannot reopen'
           : `A tournament cannot go from ${t.status} to ${status}`,
       );
+    }
+
+    // When reopening (backwards transition), check if the parent event is
+    // completed; if so, refuse the reopen. A completed event is finalized
+    // and cannot have a reopened tournament — players' seeding and bracket
+    // assumptions would be invalidated.
+    const rank = (s: TournamentStatus): number =>
+      s === 'completed' ? 2 : s === 'live' ? 1 : 0;
+    const backwards = rank(status) < rank(t.status);
+    if (backwards && t.eventId) {
+      const eventContext = await this.repo.findEventContext(t.eventId);
+      if (eventContext && eventContext.status === 'completed') {
+        throw new BadRequestException(
+          userError(
+            ApiErrorCode.TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT,
+            'Cannot reopen: this tournament belongs to a completed event',
+          ),
+        );
+      }
     }
 
     // Reviving a cancelled tournament is only safe while nothing was played:

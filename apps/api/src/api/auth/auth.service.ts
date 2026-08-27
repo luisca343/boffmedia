@@ -1,4 +1,5 @@
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
+import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Logger } from 'nestjs-pino';
@@ -10,6 +11,7 @@ export class AuthService {
     private readonly logger: Logger,
 
     private readonly usersService: BoffMediaUsersFacadeService,
+    private readonly usersRepository: BoffMediaUsersRepository,
     private readonly jwtService: JwtService,
   ) {}
 
@@ -35,12 +37,22 @@ export class AuthService {
     // session belonging to an admin would otherwise reach the admin API. Website
     // (unscoped) sessions keep their real roles.
     const isIngame = scope === TOKEN_TYPE.INGAME;
+
+    // Fetch the current session version for website sessions. In-game sessions
+    // do not use session version — they prove only a Minecraft identity, not
+    // account ownership.
+    let sessionVersion: number | undefined;
+    if (!isIngame) {
+      sessionVersion = (await this.usersRepository.getSessionVersion(user.id)) ?? 0;
+    }
+
     const payload = {
       username: user.name,
       sub: user.id,
       email: user.email,
       roles: isIngame ? [] : user.roles,
       mcUuid: user.mcUuid,
+      ...(sessionVersion !== undefined ? { sv: sessionVersion } : {}),
     };
 
     return {
@@ -142,6 +154,14 @@ export class AuthService {
       const scope: typeof TOKEN_TYPE.INGAME | undefined =
         payload.scope === TOKEN_TYPE.INGAME ? TOKEN_TYPE.INGAME : undefined;
 
+      // For website sessions, fetch the current session version. In-game sessions
+      // are narrowed and do not use session version — they prove only Minecraft
+      // identity, not account ownership.
+      let sessionVersion: number | undefined;
+      if (!scope) {
+        sessionVersion = (await this.usersRepository.getSessionVersion(user.id)) ?? 0;
+      }
+
       const newPayload = {
         username: user.username,
         sub: user.id,
@@ -150,6 +170,7 @@ export class AuthService {
         // reintroduce them from the DB.
         roles: scope === TOKEN_TYPE.INGAME ? [] : roles,
         mcUuid: user.uuid,
+        ...(sessionVersion !== undefined ? { sv: sessionVersion } : {}),
       };
 
       return {

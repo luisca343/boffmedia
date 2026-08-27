@@ -1,7 +1,6 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaAudit, AuditSubject } from '@/_db/schema/BoffMediaEvents';
+import { Inject, Injectable } from '@nestjs/common';
+import { AuditSubject } from '@/_db/schema/BoffMediaEvents';
+import { AuditService } from '@api/_repositories/audit.service';
 
 /**
  * Admin audit trail for the boffmedia module (events + tournaments).
@@ -10,13 +9,14 @@ import { boffMediaAudit, AuditSubject } from '@/_db/schema/BoffMediaEvents';
  * describing, which would turn an observability gap into an outage. A failure
  * is logged at error level instead, because a silently missing row is exactly
  * what makes an audit trail worthless later.
+ *
+ * Delegates to the unified AuditService to maintain a consistent code path
+ * across all audit domains (boffmedia, packs, randomizer, gobierno).
  */
 @Injectable()
 export class AuditRepository {
-  private readonly logger = new Logger(AuditRepository.name);
-
   constructor(
-    @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>,
+    @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
   async record(
@@ -26,20 +26,13 @@ export class AuditRepository {
     actorUserId: number | null,
     meta?: Record<string, unknown>,
   ): Promise<void> {
-    try {
-      await this.db.insert(boffMediaAudit).values({
-        subjectType,
-        subjectId,
-        action,
-        actorUserId,
-        meta: meta ?? null,
-      });
-    } catch (error) {
-      this.logger.error(
-        `Audit write FAILED for ${subjectType}#${subjectId} ${action}: ${
-          error instanceof Error ? error.message : String(error)
-        }`,
-      );
-    }
+    await this.auditService.record({
+      domain: 'boffmedia',
+      actor: actorUserId,
+      subjectType,
+      subjectId,
+      action,
+      metadata: meta,
+    });
   }
 }

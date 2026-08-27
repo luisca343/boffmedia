@@ -43,7 +43,24 @@ export class AppService {
     return LoggingUtil.getInstance().toggleLogging();
   }
 
-  async getHealth() {
+  /**
+   * Public health check: minimal status for load balancers and uptime monitors.
+   * Detailed diagnostics are reserved for admins (via getHealthAdmin).
+   */
+  async getHealth(): Promise<{ status: 'ok' | 'degraded' }> {
+    const dbHealth = await this.checkDatabaseConnection();
+    const status =
+      dbHealth.status === 'error' ? 'degraded' : ('ok' as const);
+    return { status };
+  }
+
+  /**
+   * Admin health check: comprehensive system diagnostics.
+   * Exposes memory usage, database latency, Wingull API status, uptime, and
+   * response times. Gated behind admin role to prevent operational detail
+   * leaking to anonymous callers.
+   */
+  async getHealthAdmin() {
     const startTime = Date.now();
     const health = {
       status: 'ok',

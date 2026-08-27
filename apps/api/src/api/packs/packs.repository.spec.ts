@@ -1,5 +1,6 @@
 import { drizzle } from 'drizzle-orm/mysql2';
 import { PacksRepository } from './packs.repository';
+import { AuditService } from '@api/_repositories/audit.service';
 
 // There is no database in this suite. Instead the repository is driven over a
 // REAL drizzle builder wired to a stub mysql2 client, so the SQL it emits —
@@ -28,7 +29,8 @@ const harness = () => {
   };
 
   const client: any = { query: run, execute: run };
-  const repo = new PacksRepository(drizzle(client) as never);
+  const mockAuditService = { record: jest.fn() } as any;
+  const repo = new PacksRepository(drizzle(client) as never, mockAuditService);
 
   return {
     repo,

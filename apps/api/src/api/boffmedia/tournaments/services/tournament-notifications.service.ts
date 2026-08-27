@@ -1,17 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
+import { OutboxRepository } from '@api/outbox/repositories/outbox.repository';
 import { Tournament, TournamentMatch } from '@/_db/schema/BoffMediaTournaments';
 
 /**
  * Tournament notification producers. Every method is best-effort: a
  * notification failure must never fail the action that triggered it.
+ *
+ * Notifications are enqueued to the outbox so failures are retried and visible.
+ * The dispatcher will invoke the actual notification delivery.
  */
 @Injectable()
 export class TournamentNotificationsService {
   constructor(
     private readonly repo: TournamentsRepository,
     private readonly notifications: NotificationsService,
+    private readonly outbox: OutboxRepository,
   ) {}
 
   /**
@@ -20,6 +25,9 @@ export class TournamentNotificationsService {
    * notifications used to stack a duplicate in the user's list each time.
    * Omit it for genuinely repeatable events (a match becoming ready again
    * after an amend is real news).
+   *
+   * Enqueues the notification to the outbox. The dispatcher will deliver it
+   * and retry on failure. Best-effort: an enqueue failure is logged and swallowed.
    */
   private async notifyUser(
     userId: number,
@@ -29,8 +37,9 @@ export class TournamentNotificationsService {
     dedupeKey?: string,
   ): Promise<void> {
     try {
-      await this.notifications.create(
-        { userId, type: 'tournament', title, body, link },
+      await this.outbox.enqueue(
+        'notification:create',
+        { userId, type: 'tournament', title, body, link, dedupeKey },
         dedupeKey,
       );
     } catch {

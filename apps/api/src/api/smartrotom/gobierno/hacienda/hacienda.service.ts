@@ -120,12 +120,24 @@ export class HaciendaService {
     return this.toMultaEntity(m, names);
   }
 
-  async createMulta(dto: CreateMultaDto): Promise<GobiernoMultaEntity> {
+  async createMulta(dto: CreateMultaDto, actor?: ActorContext): Promise<GobiernoMultaEntity> {
+    // Authorization: an officer can only issue a fine as themselves. ROTOM_ADMIN can
+    // issue on behalf of any officer (authorization is enforced at the controller
+    // guard level; here we just confirm for non-admin users).
+    if (actor && !actor.serverAuthed && actor.mcUuid) {
+      if (actor.mcUuid !== dto.issuedBy) {
+        throw new BadRequestException({
+          message: 'Officers may only issue fines as themselves',
+          userMessage: 'Solo puedes emitir multas a tu nombre.',
+        });
+      }
+    }
+
     const m = await this.haciendaRepository.createMulta(dto);
     await this.auditoriaService.log({
-      actorUuid: dto.issuedBy,
+      actorUuid: actor?.mcUuid || dto.issuedBy,
       action: 'create',
-      target: `multa ${m.code}`,
+      target: `multa ${m.code} (${m.amount})`,
       dep: 'hacienda',
     });
     return this.getMulta(m.id);
@@ -134,6 +146,7 @@ export class HaciendaService {
   async updateMulta(
     id: number,
     dto: UpdateMultaDto,
+    actor?: ActorContext,
   ): Promise<GobiernoMultaEntity> {
     const existing = await this.haciendaRepository.findMulta(id);
     if (!existing) throw new NotFoundException(`Multa ${id} not found`);
@@ -142,15 +155,30 @@ export class HaciendaService {
         `Multa ${existing.code} is already ${existing.status}`,
       );
     }
+
+    // Authorization: only the issuing official or an admin can edit a fine.
+    // The GameOrUserAuthGuard ensures actor.mcUuid is the signed-in player.
+    // ROTOM_ADMIN bypasses the official check (role-based authorization is enforced
+    // at the controller guard level; here we just confirm the actor is authorized).
+    if (actor && !actor.serverAuthed && actor.mcUuid) {
+      if (actor.mcUuid !== existing.issuedByUuid) {
+        throw new BadRequestException({
+          message: 'Only the issuing official or an admin can edit a fine',
+          userMessage: 'No tienes permiso para editar esta multa.',
+        });
+      }
+    }
+
+    const oldAmount = existing.amount;
     await this.haciendaRepository.updateMulta(id, {
       amount: dto.amount,
       reason: dto.reason,
       denunciaId: dto.denunciaId,
     });
     await this.auditoriaService.log({
-      actorUuid: existing.issuedByUuid,
+      actorUuid: actor?.mcUuid || existing.issuedByUuid,
       action: 'update',
-      target: `multa ${existing.code}`,
+      target: `multa ${existing.code} (${oldAmount} → ${dto.amount})`,
       dep: 'hacienda',
     });
     return this.getMulta(id);

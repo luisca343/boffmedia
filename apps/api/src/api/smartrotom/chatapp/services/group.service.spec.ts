@@ -229,13 +229,37 @@ describe('GroupService', () => {
         service.addMemberToGroup(1, 'new-uuid', UUID),
       ).rejects.toThrow('already a member');
     });
+
+    it('throws when adding member to public chat (type=0)', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 0)); // public chat
+
+      await expect(
+        service.addMemberToGroup(1, 'new-uuid', UUID),
+      ).rejects.toThrow('fixed membership');
+    });
+
+    it('throws when adding member to saved messages (type=1)', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 1)); // saved messages
+
+      await expect(
+        service.addMemberToGroup(1, 'new-uuid', UUID),
+      ).rejects.toThrow('fixed membership');
+    });
+
+    it('throws when adding member to direct message (type=2)', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 2)); // DM
+
+      await expect(
+        service.addMemberToGroup(1, 'new-uuid', UUID),
+      ).rejects.toThrow('fixed membership');
+    });
   });
 
   // ─── removeMemberFromGroup ────────────────────────────────────────────────────
 
   describe('removeMemberFromGroup()', () => {
-    it('allows user to remove themselves', async () => {
-      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 3));
+    it('allows user to remove themselves from group chat', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 3)); // group
       mockMemberRepo.findUserInChat.mockResolvedValue(makeMember(UUID));
       mockMemberRepo.removeChatMember.mockResolvedValue(undefined);
 
@@ -255,6 +279,39 @@ describe('GroupService', () => {
       await expect(
         service.removeMemberFromGroup(1, 'nonmember', UUID),
       ).rejects.toThrow('not a member');
+    });
+
+    it('throws when removing another user from public chat (type=0)', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 0)); // public
+
+      await expect(
+        service.removeMemberFromGroup(1, 'other-uuid', UUID),
+      ).rejects.toThrow('fixed membership');
+    });
+
+    it('throws when removing another user from saved messages (type=1)', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 1)); // saved messages
+
+      await expect(
+        service.removeMemberFromGroup(1, 'other-uuid', UUID),
+      ).rejects.toThrow('fixed membership');
+    });
+
+    it('throws when removing another user from direct message (type=2)', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 2)); // DM
+
+      await expect(
+        service.removeMemberFromGroup(1, 'other-uuid', UUID),
+      ).rejects.toThrow('fixed membership');
+    });
+
+    it('throws when user tries to remove themselves from non-group chat', async () => {
+      mockChatRepo.findChatById.mockResolvedValue(makeChat(1, 2)); // DM
+      mockMemberRepo.findUserInChat.mockResolvedValue(makeMember(UUID)); // exists
+
+      await expect(
+        service.removeMemberFromGroup(1, UUID, UUID),
+      ).rejects.toThrow('fixed membership');
     });
   });
 });

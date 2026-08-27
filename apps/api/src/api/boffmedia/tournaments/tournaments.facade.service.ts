@@ -230,9 +230,10 @@ export class TournamentsFacadeService {
     id: number,
     matchId: number,
     dto: ReportMatchDto,
+    actorUserId?: number | null,
   ): Promise<TournamentDetail> {
     const before = await this.tournaments.getById(id);
-    await this.matches.report(id, matchId, dto);
+    await this.matches.report(id, matchId, dto, actorUserId);
     const t = await this.tournaments.getById(id);
     if (
       t.status === 'completed' &&

@@ -355,15 +355,18 @@ describe('TcgController — integration (ValidationPipe + GlobalExceptionFilter)
   // ── GET /tools/ptcgp/users/:userId/cards/history ────────────────────────
 
   describe('GET /tools/ptcgp/users/:userId/cards/history', () => {
-    it('returns 200 and delegates to facade.getUserCardHistory', async () => {
+    it('returns 200 and uses authenticated user id, ignoring path parameter', async () => {
       mockFacade.getUserCardHistory.mockResolvedValue([]);
 
+      // Note: path parameter is 42, but authenticated user id is 1 (from test middleware)
+      // The endpoint should use the authenticated user's id, not the path parameter
       const res = await request(app.getHttpServer()).get(
         '/tools/ptcgp/users/42/cards/history',
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getUserCardHistory).toHaveBeenCalledWith(42);
+      // Should call with authenticated user id (1), not the path parameter (42)
+      expect(mockFacade.getUserCardHistory).toHaveBeenCalledWith(1);
     });
   });
 

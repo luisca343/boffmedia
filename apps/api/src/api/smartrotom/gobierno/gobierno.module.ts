@@ -5,6 +5,7 @@ import {
   STARBANK_TRANSACTION_REPOSITORY_TOKEN,
 } from '@api/_utils/repositories/interfaces/repository.token';
 import { WingullModule } from '../wingull/wingull.module';
+import { AuditService } from '@api/_repositories/audit.service';
 import { StarbankAccountRepository } from '../starbank/repositories/starbank-account.repository';
 import { StarbankTransactionRepository } from '../starbank/repositories/starbank-transaction.repository';
 
@@ -70,6 +71,9 @@ import { AdministracionController } from './administracion/administracion.contro
     AdministracionController,
   ],
   providers: [
+    // Unified audit service across all domains
+    AuditService,
+
     // Reused directly from StarBank (fresh instances, same DB) so TreasuryService can settle
     // real transactions without StarbankModule needing to export its internal tokens.
     {

@@ -56,6 +56,7 @@ export class StarbankTransactionService {
   async transfer(
     transferDto: CreateTransferDto,
     actor?: ActorContext,
+    idempotencyKey?: string,
   ): Promise<void> {
     await this.assertOwnsAccount(transferDto.from, actor);
 
@@ -109,6 +110,7 @@ export class StarbankTransactionService {
       amount: transferDto.amount,
       reason: transferDto.concept,
       type: TransactionType.TRANSFERENCIA,
+      idempotencyKey,
     };
 
     const result = await this.transactionRepository.create(transactionData);

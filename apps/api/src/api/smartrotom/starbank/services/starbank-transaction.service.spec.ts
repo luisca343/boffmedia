@@ -324,6 +324,94 @@ describe('StarbankTransactionService', () => {
     });
   });
 
+  describe('transfer() with idempotency', () => {
+    const transferDto: CreateTransferDto = {
+      from: 1,
+      to: 2,
+      amount: 100,
+      concept: 'test-transfer',
+    };
+
+    it('should accept idempotency key and pass to repository', async () => {
+      accountRepository.findById
+        .mockResolvedValueOnce(mockAccount(1, 500))
+        .mockResolvedValueOnce(mockAccount(2, 100));
+      transactionRepository.create.mockResolvedValue({ success: true });
+
+      const idempotencyKey = 'transfer:test-key';
+      await service.transfer(transferDto, undefined, idempotencyKey);
+
+      expect(transactionRepository.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          from: 1,
+          to: 2,
+          amount: 100,
+          idempotencyKey,
+        }),
+      );
+    });
+
+    it('should replay identical transfer and return success', async () => {
+      // Setup for first call (2 findById calls) and second call (2 findById calls)
+      accountRepository.findById
+        .mockResolvedValueOnce(mockAccount(1, 500))
+        .mockResolvedValueOnce(mockAccount(2, 100))
+        .mockResolvedValueOnce(mockAccount(1, 500))
+        .mockResolvedValueOnce(mockAccount(2, 100));
+      // Simulate replay: repository returns success with same transaction ID
+      transactionRepository.create.mockResolvedValue({
+        success: true,
+        transactionId: 123,
+      });
+
+      const idempotencyKey = 'transfer:replay-key';
+      await service.transfer(transferDto, undefined, idempotencyKey);
+      // Second request with same key
+      await service.transfer(transferDto, undefined, idempotencyKey);
+
+      // Both calls should succeed
+      expect(transactionRepository.create).toHaveBeenCalledTimes(2);
+      expect(transactionRepository.create).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ idempotencyKey }),
+      );
+      expect(transactionRepository.create).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ idempotencyKey }),
+      );
+    });
+
+    it('should not move money twice on replay (idempotent at repository level)', async () => {
+      // Setup for first call (2 findById calls) and second call (2 findById calls)
+      accountRepository.findById
+        .mockResolvedValueOnce(mockAccount(1, 500))
+        .mockResolvedValueOnce(mockAccount(2, 100))
+        .mockResolvedValueOnce(mockAccount(1, 500))
+        .mockResolvedValueOnce(mockAccount(2, 100));
+      // First call creates transaction with id 123
+      // Second call (replay) returns the same id without creating a new one
+      transactionRepository.create
+        .mockResolvedValueOnce({ success: true, transactionId: 123 })
+        .mockResolvedValueOnce({ success: true, transactionId: 123 });
+
+      const idempotencyKey = 'transfer:money-once-key';
+      await service.transfer(transferDto, undefined, idempotencyKey);
+      await service.transfer(transferDto, undefined, idempotencyKey);
+
+      // Repository is called twice, but returns the same transactionId both times
+      expect(transactionRepository.create).toHaveBeenCalledTimes(2);
+      // Both calls have the same idempotency key
+      expect(transactionRepository.create).toHaveBeenNthCalledWith(
+        1,
+        expect.objectContaining({ idempotencyKey }),
+      );
+      expect(transactionRepository.create).toHaveBeenNthCalledWith(
+        2,
+        expect.objectContaining({ idempotencyKey }),
+      );
+    });
+  });
+
   describe('getAccountTransactions()', () => {
     it('should return transactions for an account', async () => {
       const mockTxns = [

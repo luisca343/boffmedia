@@ -539,6 +539,7 @@ export class EventsController {
   })
   async getTeamMembers(
     @Param('teamId') teamId: number,
+    @Query() pagination: PaginationQueryDto,
     @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<TeamMember[]> {
     const includePrivate =
@@ -547,6 +548,7 @@ export class EventsController {
       teamId,
       includePrivate,
       req.user?.userId,
+      pagination,
     );
   }
 
@@ -712,6 +714,7 @@ export class EventsController {
   })
   async getEventParticipants(
     @Param('eventId') eventId: number,
+    @Query() pagination: PaginationQueryDto,
     @Req() req: { user?: { roles?: string[]; userId?: number } },
   ): Promise<Participant[]> {
     const includePrivate =
@@ -720,6 +723,7 @@ export class EventsController {
       eventId,
       includePrivate,
       req.user?.userId,
+      pagination,
     );
   }
 

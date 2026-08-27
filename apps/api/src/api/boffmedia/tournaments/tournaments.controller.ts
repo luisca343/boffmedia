@@ -419,8 +419,9 @@ export class TournamentsController {
     @Param('id', ParseIntPipe) id: number,
     @Param('mid', ParseIntPipe) mid: number,
     @Body() dto: ReportMatchDto,
+    @Req() req: AuthedRequest,
   ): Promise<TournamentDetail> {
-    return this.facade.report(id, mid, dto);
+    return this.facade.report(id, mid, dto, req.user.userId);
   }
 
   @Post(':id/status')

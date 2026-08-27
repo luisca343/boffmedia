@@ -5,6 +5,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { gobiernoAuditoria } from '@/_db/schema/SmartRotomGobierno';
 import { ListAuditoriaQueryDto } from './dto/list-auditoria-query.dto';
 import { resolvePageSize } from './dto/paged-query.dto';
+import { AuditService } from '@api/_repositories/audit.service';
 
 export interface CreateAuditoriaData {
   actorUuid: string;
@@ -18,15 +19,21 @@ export interface CreateAuditoriaData {
 export class AuditoriaRepository {
   constructor(
     @Inject(DRIZZLE) private readonly db: MySql2Database<Record<string, never>>,
+    @Inject(AuditService) private readonly auditService: AuditService,
   ) {}
 
+  /**
+   * Delegates to the unified AuditService to maintain a consistent code path
+   * across all audit domains (boffmedia, packs, randomizer, gobierno).
+   */
   async log(data: CreateAuditoriaData): Promise<void> {
-    await this.db.insert(gobiernoAuditoria).values({
-      actorUuid: data.actorUuid,
+    await this.auditService.record({
+      domain: 'gobierno',
+      actor: data.actorUuid,
       action: data.action,
       target: data.target,
       dep: data.dep,
-      source: data.source || 'gobierno',
+      source: data.source,
     });
   }
 

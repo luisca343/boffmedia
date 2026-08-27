@@ -553,6 +553,10 @@ export const boffMediaTournamentMatches = mysqlTable(
       PROPOSAL_STATE.DISPUTED,
     ]),
     judgeRequestedAt: timestamp('judge_requested_at'),
+    // Optimistic concurrency control: incremented on every settlement/amend.
+    // Admin amends use this to ensure the match hasn't changed since they last
+    // loaded it; a conflict (409) tells them to reload the match.
+    version: int('version').notNull().default(0),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
@@ -594,28 +598,28 @@ export const boffMediaTournamentMatches = mysqlTable(
       foreignColumns: [boffMediaTournamentParticipants.id],
       name: 'tm_top_fk',
     })
-      .onDelete('set null')
+      .onDelete('restrict')
       .onUpdate('cascade'),
     botFk: foreignKey({
       columns: [t.botParticipantId],
       foreignColumns: [boffMediaTournamentParticipants.id],
       name: 'tm_bot_fk',
     })
-      .onDelete('set null')
+      .onDelete('restrict')
       .onUpdate('cascade'),
     winnerFk: foreignKey({
       columns: [t.winnerParticipantId],
       foreignColumns: [boffMediaTournamentParticipants.id],
       name: 'tm_win_fk',
     })
-      .onDelete('set null')
+      .onDelete('restrict')
       .onUpdate('cascade'),
     proposerFk: foreignKey({
       columns: [t.proposedByParticipantId],
       foreignColumns: [boffMediaTournamentParticipants.id],
       name: 'tm_prop_fk',
     })
-      .onDelete('set null')
+      .onDelete('restrict')
       .onUpdate('cascade'),
     nextFk: foreignKey({
       columns: [t.nextMatchId],

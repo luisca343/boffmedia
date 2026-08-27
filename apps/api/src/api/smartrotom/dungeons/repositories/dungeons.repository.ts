@@ -153,4 +153,98 @@ export class DungeonsRepository implements IDungeonsRepository {
       maldiciones: this.parseCurses(row.maldiciones),
     };
   }
+
+  /**
+   * Compute the player's aggregated stats and rank. Rank is calculated by counting
+   * how many distinct players rank higher using the same ordering: completions first,
+   * stage depth, then speed. NULL times sort last (below all completed times).
+   * Ties: two players with identical stats get adjacent ranks (no rank skipping).
+   */
+  async findPlayerStatsWithRank(uuid: string): Promise<(DungeonRankingEntry & { mejorPartida: DungeonBestRun | null }) | null> {
+    // Compute the player's aggregated stats
+    const statsRows = await this.db
+      .select({
+        uuid: dungeonRunPlayers.uuid,
+        nombre:
+          sql<string>`SUBSTRING_INDEX(GROUP_CONCAT(${dungeonRunPlayers.nombre} ORDER BY ${dungeonRunPlayers.runId} DESC), ',', 1)`.as(
+            'nombre',
+          ),
+        partidas: RUNS.as('partidas'),
+        completadas: COMPLETED.as('completadas'),
+        mejorEtapa: BEST_STAGE.as('mejorEtapa'),
+        mejorPisos:
+          sql<number>`COALESCE(MAX(${dungeonRuns.pisosSuperados}), 0)`.as(
+            'mejorPisos',
+          ),
+        mejorTiempoMs: BEST_TIME.as('mejorTiempoMs'),
+        muertes: sql<number>`COALESCE(SUM(${dungeonRunPlayers.muertes}), 0)`.as(
+          'muertes',
+        ),
+        abandonos:
+          sql<number>`COALESCE(SUM(${dungeonRunPlayers.abandono}), 0)`.as(
+            'abandonos',
+          ),
+      })
+      .from(dungeonRunPlayers)
+      .innerJoin(dungeonRuns, eq(dungeonRuns.id, dungeonRunPlayers.runId))
+      .where(eq(dungeonRunPlayers.uuid, uuid))
+      .groupBy(dungeonRunPlayers.uuid);
+
+    if (statsRows.length === 0) return null;
+
+    const statsRow = statsRows[0];
+
+    // Compute the player's rank: count how many distinct players rank higher.
+    // Uses the same ordering as findTopPlayers: completed runs (desc), best stage (desc),
+    // times available (asc NULL), then speed (asc).
+    const rankRows = await this.db
+      .select({
+        rank: sql<number>`CAST(1 + COUNT(DISTINCT ranked_players.uuid) AS UNSIGNED)`.as('rank'),
+      })
+      .from(
+        this.db
+          .select({
+            uuid: dungeonRunPlayers.uuid,
+            completadas: COMPLETED,
+            mejorEtapa: BEST_STAGE,
+            mejorTiempoMs: BEST_TIME,
+            partidas: RUNS,
+          })
+          .from(dungeonRunPlayers)
+          .innerJoin(dungeonRuns, eq(dungeonRuns.id, dungeonRunPlayers.runId))
+          .groupBy(dungeonRunPlayers.uuid)
+          .as('ranked_players'),
+      )
+      .where(
+        sql`(ranked_players.completadas > ${Number(statsRow.completadas) || 0}
+          OR (ranked_players.completadas = ${Number(statsRow.completadas) || 0}
+            AND ranked_players.mejorEtapa > ${Number(statsRow.mejorEtapa) || 0})
+          OR (ranked_players.completadas = ${Number(statsRow.completadas) || 0}
+            AND ranked_players.mejorEtapa = ${Number(statsRow.mejorEtapa) || 0}
+            AND ranked_players.mejorTiempoMs IS NOT NULL
+            AND ${
+              statsRow.mejorTiempoMs !== null
+                ? sql`ranked_players.mejorTiempoMs < ${Number(statsRow.mejorTiempoMs)}`
+                : sql`1=1`
+            }))`,
+      );
+
+    const rankRow = rankRows[0];
+    const mejorPartida = await this.findBestRun(uuid);
+
+    return {
+      rank: Number(rankRow?.rank ?? 1),
+      uuid: statsRow.uuid,
+      nombre: statsRow.nombre,
+      partidas: Number(statsRow.partidas) || 0,
+      completadas: Number(statsRow.completadas) || 0,
+      mejorEtapa: Number(statsRow.mejorEtapa) || 0,
+      mejorPisos: Number(statsRow.mejorPisos) || 0,
+      mejorTiempoMs:
+        statsRow.mejorTiempoMs === null ? null : Number(statsRow.mejorTiempoMs),
+      muertes: Number(statsRow.muertes) || 0,
+      abandonos: Number(statsRow.abandonos) || 0,
+      mejorPartida,
+    };
+  }
 }

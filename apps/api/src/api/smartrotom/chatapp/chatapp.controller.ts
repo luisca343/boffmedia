@@ -138,18 +138,26 @@ export class ChatappController {
   @ApiParam({ name: 'chatId', description: 'Chat ID' })
   @ApiQuery({
     name: 'limit',
-    description: 'Maximum number of messages',
+    description: 'Maximum number of messages (default 50, max 100)',
+    required: false,
+  })
+  @ApiQuery({
+    name: 'before',
+    description: 'Load messages before this message ID (keyset pagination)',
     required: false,
   })
   async getMessages(
     @Param('chatId') chatId: string,
-    @Query('limit') _limit?: string,
+    @Query('limit') limitStr?: string,
+    @Query('before') beforeStr?: string,
   ): Promise<RotomMessage[]> {
     const chatIdNum = parseInt(chatId, 10);
     if (isNaN(chatIdNum)) {
       throw new Error('Invalid chat ID');
     }
-    return await this.chatappFacadeService.getMessages(chatIdNum);
+    const limit = limitStr ? parseInt(limitStr, 10) : undefined;
+    const before = beforeStr ? parseInt(beforeStr, 10) : undefined;
+    return await this.chatappFacadeService.getMessages(chatIdNum, limit, before);
   }
 
   @Post('messages/:chatId')

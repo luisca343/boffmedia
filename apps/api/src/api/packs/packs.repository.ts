@@ -26,6 +26,7 @@ import {
   boffMediaUsers,
 } from '@/_db/schema/BoffMedia';
 import type { AuditAction } from './types/packs.types';
+import { AuditService } from '@api/_repositories/audit.service';
 
 /**
  * Who is asking for a pack. The Boffmedia account is the real principal;
@@ -40,7 +41,10 @@ export interface PackPrincipal {
 
 @Injectable()
 export class PacksRepository {
-  constructor(@Inject(DRIZZLE) private readonly db: MySql2Database) {}
+  constructor(
+    @Inject(DRIZZLE) private readonly db: MySql2Database,
+    @Inject(AuditService) private readonly auditService: AuditService,
+  ) {}
 
   /** The role names an account holds.
    *
@@ -716,7 +720,10 @@ export class PacksRepository {
   // ── Audit ────────────────────────────────────────────────────────────────
 
   /** `userId` is the acting account. When omitted it falls back to `meta.actorId`
-   *  so pre-existing admin call sites record their actor without changing shape. */
+   *  so pre-existing admin call sites record their actor without changing shape.
+   *
+   * Delegates to the unified AuditService to maintain a consistent code path
+   * across all audit domains (boffmedia, packs, randomizer, gobierno). */
   async audit(
     action: AuditAction,
     packId: string | null,
@@ -730,9 +737,14 @@ export class PacksRepository {
         : typeof meta?.actorId === 'number'
           ? meta.actorId
           : null;
-    await this.db
-      .insert(packAudit)
-      .values({ action, packId, userId: actor, uuid, meta: meta ?? null });
+    await this.auditService.record({
+      domain: 'pack',
+      actor,
+      action,
+      packId,
+      uuid,
+      metadata: meta,
+    });
   }
 
   async listAudit(packId: string, limit: number) {

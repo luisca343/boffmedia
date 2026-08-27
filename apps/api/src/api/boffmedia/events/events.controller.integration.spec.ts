@@ -710,10 +710,13 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
+      // Trailing {} is the pagination DTO: the request sends no limit/offset,
+      // so it arrives as an empty object rather than being absent.
       expect(mockFacade.getTeamMembers).toHaveBeenCalledWith(
         3,
         false,
         undefined,
+        {},
       );
     });
   });
@@ -897,10 +900,13 @@ describe('EventsController — integration (ValidationPipe + GlobalExceptionFilt
       );
 
       expect(res.status).toBe(200);
+      // Trailing {} is the pagination DTO: the request sends no limit/offset,
+      // so it arrives as an empty object rather than being absent.
       expect(mockFacade.getEventParticipants).toHaveBeenCalledWith(
         5,
         false,
         undefined,
+        {},
       );
     });
   });

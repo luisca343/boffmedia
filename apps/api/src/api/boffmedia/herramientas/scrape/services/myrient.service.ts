@@ -6,6 +6,7 @@ import { access, mkdir, readdir, stat } from 'fs/promises';
 import * as path from 'path';
 import { pipeline } from 'stream/promises';
 import { laboonPath } from '@/config/paths';
+import { safeFetch, safeFetchStream } from '@api/_utils/http/safe-fetch';
 import { GameFileEntry } from '../entities/game-file.entity';
 import { EuropeAggregateResult } from '../entities/europe-aggregate.entity';
 import { DownloadResult } from '../entities/download-result.entity';
@@ -286,14 +287,23 @@ export class MyrientScrapeService {
   /**
    * Generic scraper for any Myrient h5ai directory listing URL.
    * Works for any catalog page that follows the same HTML structure.
+   *
+   * SSRF protection: URLs must be from myrient.erista.me (the Myrient service domain).
    */
   async scrapeDirectoryListing(url: string): Promise<GameFileEntry[]> {
-    const { data: html } = await axios.get<string>(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)',
-        Accept: 'text/html,application/xhtml+xml',
-      },
+    // Fetch using safe-fetch to enforce SSRF protection: HTTPS-only, host allowlist,
+    // and IP range validation. The response is buffered, so maxBytes serves as a
+    // reasonable upper bound for HTML catalog pages.
+    const html = await safeFetch(url, {
+      allowedHosts: ['myrient.erista.me'],
       timeout: 30_000,
+      maxBytes: 50_000_000, // 50 MB limit for HTML catalog
+      axiosConfig: {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)',
+          Accept: 'text/html,application/xhtml+xml',
+        },
+      },
     });
 
     const $ = cheerio.load(html);
@@ -355,7 +365,10 @@ export class MyrientScrapeService {
    * Uses HTTP streaming so even multi-GiB files are written in chunks without
    * loading the entire file into memory.
    *
-   * @param url  Full URL to the zip/cia/3ds file to download.
+   * SSRF protection: URLs must be from myrient.erista.me (the Myrient service domain).
+   * This is an admin-only route, so the caller has already been authenticated.
+   *
+   * @param url  Full URL to the zip/cia/3ds file to download (must be from Myrient).
    * @returns    Metadata about the saved file.
    */
   async downloadGame(url: string): Promise<DownloadResult> {
@@ -366,12 +379,18 @@ export class MyrientScrapeService {
     const filename = decodeURIComponent(url.split('/').pop() ?? 'unknown');
     const filePath = path.join(townPath, filename);
 
-    const response = await axios.get<NodeJS.ReadableStream>(url, {
-      responseType: 'stream',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)',
-      },
+    // Fetch using safe-fetch to enforce SSRF protection: HTTPS-only, host allowlist,
+    // and IP range validation. For streaming downloads, callers are responsible for
+    // piping to a stream that enforces the byte limit.
+    const response = await safeFetchStream(url, {
+      allowedHosts: ['myrient.erista.me'],
       timeout: 0, // no timeout – files can be several GiB
+      maxBytes: 50_000_000_000, // 50 GB limit for game files
+      axiosConfig: {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)',
+        },
+      },
     });
 
     const writeStream = createWriteStream(filePath);

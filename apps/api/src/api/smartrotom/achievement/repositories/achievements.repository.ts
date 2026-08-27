@@ -73,6 +73,8 @@ export class AchievementsRepository
   }
 
   async findUserAchievements(uuid: string): Promise<any[]> {
+    // List view: exclude the large replay payload (fetch on demand in detail view).
+    // Includes team info for display but not the full replay data.
     return this.db
       .select({
         id: rotomAchievements.id,
@@ -87,7 +89,6 @@ export class AchievementsRepository
         completedAt: rotomUserAchievements.completedAt,
         uuid: rotomUserAchievements.uuid,
         team: rotomReplays.team1,
-        replay: rotomReplays.replay,
         target: rotomAchievements.target,
         order: rotomAchievements.order,
       })

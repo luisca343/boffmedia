@@ -188,4 +188,12 @@ export class Event {
     required: false,
   })
   modules?: EventModules;
+
+  @ApiProperty({
+    example: 42,
+    description: 'Number of participants in the event. Only populated by list endpoints.',
+    required: false,
+    type: Number,
+  })
+  participantCount?: number;
 }

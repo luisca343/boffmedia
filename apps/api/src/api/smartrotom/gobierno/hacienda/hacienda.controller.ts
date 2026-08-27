@@ -83,8 +83,11 @@ export class HaciendaController {
   @ApiOperation({ summary: 'Issue a multa' })
   @ApiBody({ type: CreateMultaDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: GobiernoMultaEntity })
-  async createMulta(@Body() dto: CreateMultaDto): Promise<GobiernoMultaEntity> {
-    return this.haciendaService.createMulta(dto);
+  async createMulta(
+    @Body() dto: CreateMultaDto,
+    @Req() req: Request,
+  ): Promise<GobiernoMultaEntity> {
+    return this.haciendaService.createMulta(dto, resolveActor(req));
   }
 
   @Patch('multas/:id')
@@ -98,8 +101,9 @@ export class HaciendaController {
   async updateMulta(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: UpdateMultaDto,
+    @Req() req: Request,
   ): Promise<GobiernoMultaEntity> {
-    return this.haciendaService.updateMulta(id, dto);
+    return this.haciendaService.updateMulta(id, dto, resolveActor(req));
   }
 
   @Delete('multas/:id')

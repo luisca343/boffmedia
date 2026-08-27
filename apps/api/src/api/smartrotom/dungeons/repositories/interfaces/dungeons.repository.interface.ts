@@ -1,4 +1,4 @@
-import { DungeonBestRun } from '../../entities/dungeon-player-stats.entity';
+import { DungeonBestRun, DungeonPlayerStats } from '../../entities/dungeon-player-stats.entity';
 import { DungeonRankingEntry } from '../../entities/dungeon-ranking-entry.entity';
 
 export interface DungeonRunRow {
@@ -32,4 +32,6 @@ export interface IDungeonsRepository {
   findTopPlayers(limit?: number): Promise<DungeonRankingEntry[]>;
 
   findBestRun(uuid: string): Promise<DungeonBestRun | null>;
+
+  findPlayerStatsWithRank(uuid: string): Promise<DungeonPlayerStats | null>;
 }

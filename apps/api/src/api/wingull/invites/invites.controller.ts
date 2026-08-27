@@ -16,6 +16,7 @@ import {
   ApiParam,
   ApiBody,
 } from '@nestjs/swagger';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { InvitesFacadeService } from './invites.facade.service';
 import { RegistrationData } from './services/registration.service';
 import { CreateInviteBodyDto } from './dto/create-invite-body.dto';
@@ -26,9 +27,6 @@ import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
 
 @ApiTags('Wingull | Invites')
-// Redeeming an invite is deliberately public (that is the point of an invite
-// code); minting and revoking them are administrative.
-@Public()
 @Controller('wingull/invites')
 export class InvitesController {
   constructor(private readonly invitesFacadeService: InvitesFacadeService) {}
@@ -69,11 +67,18 @@ export class InvitesController {
     );
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Get()
-  @ApiOperation({ summary: 'Get all invites' })
+  @ApiOperation({ summary: 'Get all invites (admin only)' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Invites retrieved successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -83,11 +88,18 @@ export class InvitesController {
     return await this.invitesFacadeService.getAllInvites();
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Get('statistics')
-  @ApiOperation({ summary: 'Get invite statistics' })
+  @ApiOperation({ summary: 'Get invite statistics (admin only)' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Statistics retrieved successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -97,8 +109,11 @@ export class InvitesController {
     return await this.invitesFacadeService.getInviteStatistics();
   }
 
+  @Public()
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Get(':id')
-  @ApiOperation({ summary: 'Get invite by ID' })
+  @ApiOperation({ summary: 'Get invite by ID (for redemption)' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Invite retrieved successfully.',
@@ -106,6 +121,10 @@ export class InvitesController {
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: 'Invite not found.',
+  })
+  @ApiResponse({
+    status: HttpStatus.TOO_MANY_REQUESTS,
+    description: 'Rate limit exceeded.',
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -126,11 +145,18 @@ export class InvitesController {
     return invite;
   }
 
+  @Public()
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Get(':id/validate')
   @ApiOperation({ summary: 'Validate invite by ID' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Invite validation result.',
+  })
+  @ApiResponse({
+    status: HttpStatus.TOO_MANY_REQUESTS,
+    description: 'Rate limit exceeded.',
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -141,11 +167,18 @@ export class InvitesController {
     return await this.invitesFacadeService.validateInvite(id);
   }
 
+  @Public()
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Get(':id/can-register')
   @ApiOperation({ summary: 'Check if invite can be used for registration' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Registration eligibility checked.',
+  })
+  @ApiResponse({
+    status: HttpStatus.TOO_MANY_REQUESTS,
+    description: 'Rate limit exceeded.',
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -158,6 +191,9 @@ export class InvitesController {
 
   // ==================== REGISTRATION OPERATIONS ====================
 
+  @Public()
+  @UseGuards(ThrottlerGuard)
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Post(':id/register')
   @ApiOperation({ summary: 'Register a new user with invite' })
   @ApiResponse({
@@ -175,6 +211,10 @@ export class InvitesController {
   @ApiResponse({
     status: HttpStatus.CONFLICT,
     description: 'User already exists.',
+  })
+  @ApiResponse({
+    status: HttpStatus.TOO_MANY_REQUESTS,
+    description: 'Rate limit exceeded.',
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -257,11 +297,18 @@ export class InvitesController {
 
   // ==================== USER INVITE OPERATIONS ====================
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Get('user/:uuid')
-  @ApiOperation({ summary: 'Get invites by user UUID' })
+  @ApiOperation({ summary: 'Get invites by user UUID (admin only)' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User invites retrieved successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,
@@ -272,11 +319,18 @@ export class InvitesController {
     return await this.invitesFacadeService.getUserInvites(uuid);
   }
 
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @RequireSession()
   @Get('username/:username')
-  @ApiOperation({ summary: 'Get invites by username' })
+  @ApiOperation({ summary: 'Get invites by username (admin only)' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Username invites retrieved successfully.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: 'Unauthorized.',
   })
   @ApiResponse({
     status: HttpStatus.INTERNAL_SERVER_ERROR,

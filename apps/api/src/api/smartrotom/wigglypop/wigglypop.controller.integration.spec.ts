@@ -4,14 +4,15 @@ import { PassportModule } from '@nestjs/passport';
 import { Reflector } from '@nestjs/core';
 import { Logger } from 'nestjs-pino';
 import { JwtService } from '@nestjs/jwt';
+import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const request = require('supertest') as typeof import('supertest');
 
 /**
- * The validated env, mutable per test. Both guards read `ENFORCE_MONEY_AUTH` and
- * `MC_WORLD` at call time and `JwtStrategy` reads `JWT_SECRET` at construction,
- * so this is the only seam the suite needs: every guard, strategy, pipe and
- * ownership check exercised below is the production one.
+ * The validated env, mutable per test. Guards read `MC_WORLD` at call time and
+ * `JwtStrategy` reads `JWT_SECRET` at construction, so this is the only seam
+ * the suite needs: every guard, strategy, pipe and ownership check exercised
+ * below is the production one.
  *
  * Deliberately NO `.overrideGuard()` anywhere in this file — the guard is the
  * subject. The sibling `*.controller.integration.spec.ts` suites stub it out
@@ -22,12 +23,10 @@ const mockEnv: {
   JWT_SECRET: string;
   TERAS_API_TOKEN?: string;
   MC_WORLD: string;
-  ENFORCE_MONEY_AUTH: boolean;
 } = {
   JWT_SECRET: 'wigglypop-integration-secret',
   TERAS_API_TOKEN: 'the-mods-opaque-token',
   MC_WORLD: '5b8d2f3c-1a4e-4c9b-9d2f-3e7a8b1c4d5e',
-  ENFORCE_MONEY_AUTH: true,
 };
 
 jest.mock('@/config/env', () => ({
@@ -144,6 +143,13 @@ describe('WigglypopController — auth integration (real guard, real JWT, real o
               .mockResolvedValue({ id: 1, username: 'tester' }),
           },
         },
+        {
+          // JwtStrategy now reads the account's session_version on every
+          // request (one query covering both "user exists" and "token not
+          // revoked"). 0 matches a token minted without an `sv` claim.
+          provide: BoffMediaUsersRepository,
+          useValue: { getSessionVersion: jest.fn().mockResolvedValue(0) },
+        },
         { provide: Logger, useValue: mockLogger },
         Reflector,
       ],
@@ -167,14 +173,13 @@ describe('WigglypopController — auth integration (real guard, real JWT, real o
 
   beforeEach(() => {
     jest.clearAllMocks();
-    mockEnv.ENFORCE_MONEY_AUTH = true;
     mockEnv.TERAS_API_TOKEN = 'the-mods-opaque-token';
     listings.create.mockResolvedValue({ id: 1, sellerUuid: OWN_UUID });
   });
 
-  // ─── The legacy tripwire is dead ─────────────────────────────────────────────
+  // ─── The legacy tripwire is permanently removed ────────────────────────────
 
-  it('401s an anonymous request carrying only the legacy body.server tripwire', async () => {
+  it('rejects an anonymous request carrying the legacy body.server tripwire', async () => {
     const res = await send('post', LISTINGS_URL, {
       ...validListing(OWN_UUID),
       server: mockEnv.MC_WORLD,
@@ -184,26 +189,11 @@ describe('WigglypopController — auth integration (real guard, real JWT, real o
     expect(listings.create).not.toHaveBeenCalled();
   });
 
-  it('401s an anonymous request with no credential at all', async () => {
+  it('rejects an anonymous request with no credential at all', async () => {
     const res = await send('post', LISTINGS_URL, validListing(OWN_UUID));
 
     expect(res.status).toBe(401);
     expect(listings.create).not.toHaveBeenCalled();
-  });
-
-  // The counterfactual. Without it the two tests above would still pass if the
-  // route 401'd for some unrelated reason, and "the flag is what closed the
-  // tripwire" would be asserted but not proven.
-  it('ENFORCE_MONEY_AUTH=false still admits that same tripwire request — the flag is what closed it', async () => {
-    mockEnv.ENFORCE_MONEY_AUTH = false;
-
-    const res = await send('post', LISTINGS_URL, {
-      ...validListing(OWN_UUID),
-      server: mockEnv.MC_WORLD,
-    });
-
-    expect(res.status).toBe(201);
-    expect(listings.create).toHaveBeenCalledTimes(1);
   });
 
   // ─── The website session ─────────────────────────────────────────────────────

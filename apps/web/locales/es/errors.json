@@ -9,6 +9,7 @@
     "CHAT_MESSAGE_NOT_EDITABLE": "No puedes editar este mensaje.",
     "CHAT_MESSAGE_NOT_DELETABLE": "No puedes eliminar este mensaje.",
     "CHAT_GROUP_NO_ACCESS": "No tienes acceso a este grupo.",
+    "CHAT_MEMBERSHIP_FIXED": "La lista de miembros de este chat no se puede modificar.",
     "BANK_ACCOUNT_NOT_OWNED": "No puedes transferir desde una cuenta que no es tuya.",
     "BANK_AMOUNT_NOT_POSITIVE": "El importe debe ser mayor que cero.",
     "BANK_SAME_ACCOUNT": "No puedes transferir a la misma cuenta.",
@@ -31,7 +32,14 @@
     "EVENT_REOPEN_BLOCKED_BY_RANDOMIZER": "No se puede reabrir: el evento tiene un randomizer que ya no es borrador. Ciérralo o elimínalo antes.",
     "TOURNAMENT_PARTICIPANT_IN_BRACKET": "Ese participante ya está en el cuadro. Cambia su estado a retirado o descalificado en vez de borrarlo.",
     "MATCH_SETTLED_CONCURRENTLY": "La partida se resolvió mientras enviabas el resultado. Vuelve a cargarla antes de corregirla.",
+    "MATCH_AMENDMENT_CONFLICT": "La partida fue corregida por otro administrador. Vuelve a cargarla antes de corregirla de nuevo.",
     "TOURNAMENT_TEAMSHEET_REQUIRED": "Envía tu lista de equipo antes de hacer check-in.",
-    "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": "Este torneo pertenece a un evento: únete al evento antes de inscribirte."
+    "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": "Este torneo pertenece a un evento: únete al evento antes de inscribirte.",
+    "TOURNAMENT_PROPOSAL_ALREADY_EXISTS": "Ya hay un resultado propuesto para esta partida.",
+    "TOURNAMENT_PROPOSAL_AUTO_VERIFIED": "La propuesta ya se auto-verificó — pide a un juez que la corrija.",
+    "TOURNAMENT_PROPOSAL_INVALIDATED": "La propuesta quedó invalidada por un cambio en la partida.",
+    "TOURNAMENT_PROPOSAL_SETTLED_CONCURRENTLY": "La propuesta ya se resolvió mientras enviabas la disputa.",
+    "EVENT_DELETE_BLOCKED_BY_TOURNAMENT": "No se puede eliminar este evento: tiene un torneo anexo. Elimina o desvincula el torneo primero.",
+    "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": "No se puede cambiar un torneo cuyo evento padre ya ha finalizado."
   }
 }

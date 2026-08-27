@@ -8,20 +8,20 @@ import { Request } from 'express';
 import { extractBearer, matchesServerToken } from '../auth/server-token';
 
 /**
- * For routes only the Minecraft mod may call. Accepts exactly one credential:
- * the mod's opaque Bearer (`TERAS_API_TOKEN`). No JWT branch — no user should
- * reach these — and **no `body.server` tripwire**.
+ * For routes only the Minecraft server may call. Accepts exactly one credential:
+ * the server's opaque Bearer token (`TERAS_API_TOKEN`). No JWT branch — no user
+ * should reach these routes.
  *
- * That last point is the reason this exists rather than reusing
- * `GameOrUserAuthGuard`. That guard still honours `body.server === MC_WORLD`
- * while `ENFORCE_MONEY_AUTH` is false — a transitional concession so routes that
- * predate the auth rollout keep working. `MC_WORLD` ships in the browser bundle,
- * so on a route that *spends*, inheriting that fallback would let any stranger
- * burn a player's rewards with one request. A new route has no legacy caller to
- * protect and must never take that path.
+ * Used for:
+ * - Money routes (starbank: shop, trainerdefeat) that mint/move currency on the
+ *   server's say-so with no ownership check — a user would allow any player to
+ *   pay themselves.
+ * - General server-only operations (users, caja, dungeons, karts, etc.) where
+ *   only the mod should perform administrative writes.
  *
  * Same credential as GameOrUserAuthGuard, different policy: one mechanism, two
- * levels of trust.
+ * levels of trust. This guard never accepts the MC_WORLD tripwire (browser-shipped
+ * credential), which would compromise the money routes' security model.
  */
 @Injectable()
 export class GameServerAuthGuard implements CanActivate {

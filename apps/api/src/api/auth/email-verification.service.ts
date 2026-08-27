@@ -7,6 +7,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { boffMediaEmailVerifications } from '@/_db/schema/BoffMediaAuth';
 import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { MailService } from '@api/mail/mail.service';
+import { OutboxRepository } from '@api/outbox/repositories/outbox.repository';
 
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -17,6 +18,7 @@ export class EmailVerificationService {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
     private readonly usersRepository: BoffMediaUsersRepository,
     private readonly mail: MailService,
+    private readonly outbox: OutboxRepository,
     private readonly logger: Logger,
   ) {}
 
@@ -42,8 +44,12 @@ export class EmailVerificationService {
   }
 
   /**
-   * Create + email a token for a known user (no existence/verified checks).
+   * Create + enqueue a verification token for a known user (no existence/verified checks).
    * `locale` is the user's stored preference; omitting it sends Spanish.
+   *
+   * The verification token is stored and the mail is enqueued atomically, so
+   * a rolled-back transaction leaves no orphaned mail task. The dispatcher will
+   * send the verification email and retry on failure.
    */
   async issue(
     userId: number,
@@ -53,23 +59,33 @@ export class EmailVerificationService {
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + TOKEN_TTL_MS);
 
-    await this.db
-      .update(boffMediaEmailVerifications)
-      .set({ usedAt: new Date() })
-      .where(
-        and(
-          eq(boffMediaEmailVerifications.userId, userId),
-          isNull(boffMediaEmailVerifications.usedAt),
-        ),
-      );
-    await this.db.insert(boffMediaEmailVerifications).values({
-      userId,
-      email,
-      tokenHash: this.hash(token),
-      expiresAt,
-    });
+    await this.db.transaction(async (tx) => {
+      await tx
+        .update(boffMediaEmailVerifications)
+        .set({ usedAt: new Date() })
+        .where(
+          and(
+            eq(boffMediaEmailVerifications.userId, userId),
+            isNull(boffMediaEmailVerifications.usedAt),
+          ),
+        );
+      await tx.insert(boffMediaEmailVerifications).values({
+        userId,
+        email,
+        tokenHash: this.hash(token),
+        expiresAt,
+      });
 
-    await this.mail.sendEmailVerification(email, token, locale);
+      // Enqueue mail inside the transaction so a rolled-back token creation
+      // doesn't leave orphaned mail. Use a dedupeKey so a retried issue() call
+      // doesn't queue duplicate mails.
+      await this.outbox.enqueueTx(
+        tx,
+        'mail:send-verification',
+        { to: email, token, locale: locale ?? undefined },
+        `verify:${userId}:${email}`,
+      );
+    });
   }
 
   /** Consume a verification token and mark the user's email verified. */

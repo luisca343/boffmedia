@@ -150,14 +150,17 @@ export class ParticipantsRepository {
     return result[0];
   }
 
-  async findEventParticipants(eventId: number): Promise<
+  async findEventParticipants(
+    eventId: number,
+    pagination?: { limit?: number; offset?: number },
+  ): Promise<
     (EventParticipant & {
       nickname: string;
       avatar: string;
       userId: number;
     })[]
   > {
-    return this.db
+    const query = this.db
       .select({
         id: boffMediaEventParticipants.id,
         participantId: boffMediaEventParticipants.participantId,
@@ -175,7 +178,21 @@ export class ParticipantsRepository {
         boffMediaParticipants,
         eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
       )
-      .where(eq(boffMediaEventParticipants.eventId, eventId)) as any;
+      .where(eq(boffMediaEventParticipants.eventId, eventId));
+
+    // Apply pagination if provided, otherwise return all (backward compatible)
+    if (pagination?.limit !== undefined) {
+      query.limit(pagination.limit);
+    }
+    if (pagination?.offset !== undefined) {
+      query.offset(pagination.offset);
+    }
+
+    return (await query) as unknown as (EventParticipant & {
+      nickname: string;
+      avatar: string;
+      userId: number;
+    })[];
   }
 
   /** The membership row for a *user* (not a participant) in one event — the

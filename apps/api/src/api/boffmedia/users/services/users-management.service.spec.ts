@@ -22,6 +22,7 @@ const mockRepo = {
   deleteUser: jest.fn(),
   getUserRoles: jest.fn(),
   getUserCount: jest.fn(),
+  bumpSessionVersion: jest.fn(),
 };
 
 const mockPasswordService = {
@@ -288,6 +289,68 @@ describe('BoffMediaUsersManagementService', () => {
       mockRepo.getUserCount.mockRejectedValue(new Error('DB error'));
 
       await expect(service.getUserCount()).resolves.toBe(0);
+    });
+  });
+
+  // ─── changePassword ───────────────────────────────────────────────────────────────
+
+  describe('changePassword()', () => {
+    it('changes password and bumps session version', async () => {
+      mockRepo.findUserById.mockResolvedValue(mockUser);
+      mockRepo.findFullUserByUsernameWithPassword.mockResolvedValue(
+        mockFullUser,
+      );
+      mockPasswordService.verifyPassword.mockResolvedValue(true);
+      mockPasswordService.validatePassword.mockReturnValue({
+        isValid: true,
+        errors: [],
+        strength: 'strong',
+      });
+      mockRepo.updateUser.mockResolvedValue(mockUser);
+      mockRepo.bumpSessionVersion.mockResolvedValue(undefined);
+
+      const result = await service.changePassword(1, 'OldPass1!', 'NewPass1!');
+
+      expect(result.success).toBe(true);
+      expect(mockPasswordService.hashPassword).toHaveBeenCalledWith('NewPass1!');
+      expect(mockRepo.updateUser).toHaveBeenCalledWith(
+        1,
+        expect.objectContaining({ password: '$hashed$' }),
+      );
+      expect(mockRepo.bumpSessionVersion).toHaveBeenCalledWith(1);
+    });
+
+    it('rejects invalid new password without bumping session version', async () => {
+      mockRepo.findUserById.mockResolvedValue(mockUser);
+      mockRepo.findFullUserByUsernameWithPassword.mockResolvedValue(
+        mockFullUser,
+      );
+      mockPasswordService.verifyPassword.mockResolvedValue(true);
+      mockPasswordService.validatePassword.mockReturnValue({
+        isValid: false,
+        errors: ['Password must be at least 8 characters'],
+        strength: 'weak',
+      });
+
+      await expect(
+        service.changePassword(1, 'OldPass1!', 'weak'),
+      ).rejects.toThrow('Password validation failed');
+
+      expect(mockRepo.bumpSessionVersion).not.toHaveBeenCalled();
+    });
+
+    it('rejects wrong current password without bumping session version', async () => {
+      mockRepo.findUserById.mockResolvedValue(mockUser);
+      mockRepo.findFullUserByUsernameWithPassword.mockResolvedValue(
+        mockFullUser,
+      );
+      mockPasswordService.verifyPassword.mockResolvedValue(false);
+
+      await expect(
+        service.changePassword(1, 'WrongPass1!', 'NewPass1!'),
+      ).rejects.toThrow('Current password is incorrect');
+
+      expect(mockRepo.bumpSessionVersion).not.toHaveBeenCalled();
     });
   });
 });

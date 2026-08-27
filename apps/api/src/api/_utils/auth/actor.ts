@@ -6,8 +6,7 @@ import { ApiErrorCode } from '@/common/errors/error-codes.generated';
  * Who is performing a money/admin action, as resolved by GameOrUserAuthGuard.
  * `serverAuthed` = the trusted game server (ownership checks skipped).
  * Otherwise `mcUuid` identifies the signed-in user; when it is present,
- * ownership MUST be enforced. `mcUuid` is undefined only on the transitional
- * tripwire path (ENFORCE_MONEY_AUTH off), where ownership is not yet enforced.
+ * ownership MUST be enforced.
  */
 export interface ActorContext {
   serverAuthed: boolean;
@@ -21,8 +20,8 @@ export function resolveActor(
   return { serverAuthed: false, mcUuid: req.user?.mcUuid };
 }
 
-// The trusted server and the transitional tripwire path carry no identity, so there is
-// nothing to compare against and ownership cannot be enforced on them.
+// The trusted server carries no identity, so there is nothing to compare against
+// and ownership cannot be enforced on it.
 export function assertActsAsSelf(claimed: string, actor?: ActorContext): void {
   if (!actor || actor.serverAuthed || !actor.mcUuid) return;
   if (claimed !== actor.mcUuid) {

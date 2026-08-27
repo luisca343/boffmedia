@@ -18,7 +18,7 @@ CREATE TABLE `boffmedia_users` (
 	`password` varchar(255),
 	`email` varchar(255) NOT NULL,
 	`uuid` char(36),
-	`profile_picture` varchar(255) NOT NULL DEFAULT 'https://cdn.boffmedia.es/default-profile.png',
+	`profile_picture` varchar(255) NOT NULL DEFAULT '/boffmedia/img/profile.png',
 	`cover_image` varchar(255),
 	`bio` text,
 	`google_id` varchar(255),
@@ -28,6 +28,7 @@ CREATE TABLE `boffmedia_users` (
 	`email_verified` boolean NOT NULL DEFAULT false,
 	`locale` varchar(8),
 	`desktop_token_version` int NOT NULL DEFAULT 0,
+	`session_version` int NOT NULL DEFAULT 0,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	`last_seen_at` timestamp,
@@ -81,6 +82,17 @@ CREATE TABLE `boffmedia_achievements` (
 	CONSTRAINT `boffmedia_achievements_id` PRIMARY KEY(`id`)
 );
 --> statement-breakpoint
+CREATE TABLE `boffmedia_audit` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`subject_type` enum('event','tournament','participant','match') NOT NULL,
+	`subject_id` int NOT NULL,
+	`action` varchar(48) NOT NULL,
+	`actor_user_id` int,
+	`meta` json,
+	`at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
+	CONSTRAINT `boffmedia_audit_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
 CREATE TABLE `boffmedia_event_invites` (
 	`code` varchar(32) NOT NULL,
 	`event_id` int NOT NULL,
@@ -126,10 +138,12 @@ CREATE TABLE `boffmedia_event_suggestions` (
 CREATE TABLE `boffmedia_event_team_members` (
 	`team_id` int NOT NULL,
 	`participant_id` int NOT NULL,
+	`event_id` int NOT NULL,
 	`role` enum('leader','member') NOT NULL DEFAULT 'member',
 	`joined_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
-	CONSTRAINT `boffmedia_event_team_members_team_id_participant_id_pk` PRIMARY KEY(`team_id`,`participant_id`)
+	CONSTRAINT `boffmedia_event_team_members_team_id_participant_id_pk` PRIMARY KEY(`team_id`,`participant_id`),
+	CONSTRAINT `etm_event_participant_uq` UNIQUE(`event_id`,`participant_id`)
 );
 --> statement-breakpoint
 CREATE TABLE `boffmedia_event_teams` (
@@ -263,8 +277,27 @@ CREATE TABLE `boffmedia_notifications` (
 	`body` text,
 	`link` varchar(512),
 	`read_at` timestamp,
+	`dedupe_key` varchar(120),
 	`created_at` timestamp NOT NULL DEFAULT (now()),
-	CONSTRAINT `boffmedia_notifications_id` PRIMARY KEY(`id`)
+	CONSTRAINT `boffmedia_notifications_id` PRIMARY KEY(`id`),
+	CONSTRAINT `notif_dedupe_uq` UNIQUE(`dedupe_key`)
+);
+--> statement-breakpoint
+CREATE TABLE `boffmedia_outbox` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`topic` varchar(100) NOT NULL,
+	`payload` json NOT NULL,
+	`dedupe_key` varchar(255),
+	`attempt_count` int NOT NULL DEFAULT 0,
+	`next_attempt_at` timestamp NOT NULL DEFAULT (now()),
+	`status` enum('pending','processing','delivered','failed') NOT NULL DEFAULT 'pending',
+	`claimed_by` varchar(36),
+	`last_error` text,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`delivered_at` timestamp,
+	CONSTRAINT `boffmedia_outbox_id` PRIMARY KEY(`id`),
+	CONSTRAINT `outbox_dedupe_uq` UNIQUE(`dedupe_key`)
 );
 --> statement-breakpoint
 CREATE TABLE `boffmedia_tournament_groups` (
@@ -318,6 +351,7 @@ CREATE TABLE `boffmedia_tournament_matches` (
 	`proposal_expires_at` timestamp,
 	`proposal_state` enum('pending','disputed'),
 	`judge_requested_at` timestamp,
+	`version` int NOT NULL DEFAULT 0,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `boffmedia_tournament_matches_id` PRIMARY KEY(`id`)
@@ -340,7 +374,7 @@ CREATE TABLE `boffmedia_tournament_participants` (
 	`verified` boolean NOT NULL DEFAULT false,
 	`teamsheet` text,
 	`checked_in_at` timestamp,
-	`status` enum('active','eliminated','withdrew','disqualified') NOT NULL DEFAULT 'active',
+	`status` enum('active','eliminated','withdrew','disqualified','dropped') NOT NULL DEFAULT 'active',
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
 	CONSTRAINT `boffmedia_tournament_participants_id` PRIMARY KEY(`id`),
@@ -356,7 +390,8 @@ CREATE TABLE `boffmedia_tournament_phase_entrants` (
 	`source_record` varchar(16),
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `boffmedia_tournament_phase_entrants_id` PRIMARY KEY(`id`),
-	CONSTRAINT `tpe_phase_participant_uq` UNIQUE(`phase_id`,`participant_id`)
+	CONSTRAINT `tpe_phase_participant_uq` UNIQUE(`phase_id`,`participant_id`),
+	CONSTRAINT `tpe_phase_seed_uq` UNIQUE(`phase_id`,`seed`)
 );
 --> statement-breakpoint
 CREATE TABLE `boffmedia_tournament_phases` (
@@ -380,7 +415,8 @@ CREATE TABLE `boffmedia_tournament_phases` (
 	`end_date` timestamp,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
-	CONSTRAINT `boffmedia_tournament_phases_id` PRIMARY KEY(`id`)
+	CONSTRAINT `boffmedia_tournament_phases_id` PRIMARY KEY(`id`),
+	CONSTRAINT `tph_tournament_order_uq` UNIQUE(`tournament_id`,`phase_order`)
 );
 --> statement-breakpoint
 CREATE TABLE `boffmedia_tournament_roster` (
@@ -414,6 +450,9 @@ CREATE TABLE `boffmedia_tournaments` (
 	`rules` text,
 	`prizes` text,
 	`check_in_open` boolean NOT NULL DEFAULT false,
+	`teamsheet_required` boolean NOT NULL DEFAULT false,
+	`entry_deadline` timestamp,
+	`teamsheet_locked_at` timestamp,
 	`banner` varchar(255),
 	`icon` varchar(255),
 	`hue` int,
@@ -425,6 +464,19 @@ CREATE TABLE `boffmedia_tournaments` (
 	`deleted_at` timestamp,
 	CONSTRAINT `boffmedia_tournaments_id` PRIMARY KEY(`id`),
 	CONSTRAINT `boffmedia_tournaments_slug_unique` UNIQUE(`slug`)
+);
+--> statement-breakpoint
+CREATE TABLE `boffmedia_uploads` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`owner_user_id` int NOT NULL,
+	`subdir` varchar(128) NOT NULL DEFAULT '',
+	`filename` varchar(128) NOT NULL,
+	`mimetype` varchar(100) NOT NULL,
+	`size` int NOT NULL,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`deleted_at` timestamp,
+	CONSTRAINT `boffmedia_uploads_id` PRIMARY KEY(`id`),
+	CONSTRAINT `bu_location_uq` UNIQUE(`subdir`,`filename`)
 );
 --> statement-breakpoint
 CREATE TABLE `desktop_device_codes` (
@@ -544,6 +596,7 @@ CREATE TABLE `pack_versions` (
 	`zomboid` json,
 	`stardew` json,
 	`initial_files` json,
+	`optional_groups` json,
 	`published` boolean NOT NULL DEFAULT false,
 	`notes` text,
 	`created_by` int,
@@ -647,9 +700,23 @@ CREATE TABLE `boffmedia_sharex_images` (
 	`app` varchar(32) NOT NULL,
 	`name` char(10) NOT NULL,
 	`extension` varchar(4) NOT NULL,
-	`key` char(32) NOT NULL,
+	`token_id` int,
+	`key` char(32),
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	CONSTRAINT `boffmedia_sharex_images_id` PRIMARY KEY(`id`)
+);
+--> statement-breakpoint
+CREATE TABLE `boffmedia_sharex_tokens` (
+	`id` int AUTO_INCREMENT NOT NULL,
+	`label` varchar(64) NOT NULL,
+	`token_hash` char(64) NOT NULL,
+	`created_by` int,
+	`used_at` timestamp,
+	`deleted_at` timestamp,
+	`created_at` timestamp NOT NULL DEFAULT (now()),
+	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	CONSTRAINT `boffmedia_sharex_tokens_id` PRIMARY KEY(`id`),
+	CONSTRAINT `sxt_token_hash_uq` UNIQUE(`token_hash`)
 );
 --> statement-breakpoint
 CREATE TABLE `rotom_achievements` (
@@ -1463,7 +1530,9 @@ CREATE TABLE `rotom_starbank_transactions` (
 	`reason` varchar(255) NOT NULL,
 	`type` varchar(32) NOT NULL,
 	`date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP(),
-	CONSTRAINT `rotom_starbank_transactions_id` PRIMARY KEY(`id`)
+	`idempotency_key` varchar(255),
+	CONSTRAINT `rotom_starbank_transactions_id` PRIMARY KEY(`id`),
+	CONSTRAINT `sb_tx_idempotency_uq` UNIQUE(`from_account_id`,`idempotency_key`)
 );
 --> statement-breakpoint
 CREATE TABLE `rotom_starbank_user_accounts` (
@@ -1600,8 +1669,10 @@ CREATE TABLE `rotom_wigglypop_orders` (
 	`escrow_tx_id` int,
 	`created_at` timestamp NOT NULL DEFAULT (now()),
 	`updated_at` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,
+	`idempotency_key` varchar(255),
 	CONSTRAINT `rotom_wigglypop_orders_id` PRIMARY KEY(`id`),
-	CONSTRAINT `rotom_wigglypop_orders_code_unique` UNIQUE(`code`)
+	CONSTRAINT `rotom_wigglypop_orders_code_unique` UNIQUE(`code`),
+	CONSTRAINT `wp_orders_idempotency_uq` UNIQUE(`buyer_uuid`,`idempotency_key`)
 );
 --> statement-breakpoint
 CREATE TABLE `rotom_wigglypop_reviews` (
@@ -1916,6 +1987,7 @@ ALTER TABLE `boffmedia_event_participants` ADD CONSTRAINT `ep_event_fk` FOREIGN 
 ALTER TABLE `boffmedia_event_suggestions` ADD CONSTRAINT `es_proposer_fk` FOREIGN KEY (`proposer_user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_event_team_members` ADD CONSTRAINT `etm_team_fk` FOREIGN KEY (`team_id`) REFERENCES `boffmedia_event_teams`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_event_team_members` ADD CONSTRAINT `etm_participant_fk` FOREIGN KEY (`participant_id`) REFERENCES `boffmedia_participants`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `boffmedia_event_team_members` ADD CONSTRAINT `etm_event_fk` FOREIGN KEY (`event_id`) REFERENCES `boffmedia_events`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_event_teams` ADD CONSTRAINT `boffmedia_event_teams_event_id_boffmedia_events_id_fk` FOREIGN KEY (`event_id`) REFERENCES `boffmedia_events`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_events` ADD CONSTRAINT `boffmedia_events_parent_id_boffmedia_events_id_fk` FOREIGN KEY (`parent_id`) REFERENCES `boffmedia_events`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_events` ADD CONSTRAINT `boffmedia_events_game_id_boffmedia_games_id_fk` FOREIGN KEY (`game_id`) REFERENCES `boffmedia_games`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
@@ -1937,10 +2009,10 @@ ALTER TABLE `boffmedia_tournament_match_messages` ADD CONSTRAINT `tmm_u_fk` FORE
 ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_t_fk` FOREIGN KEY (`tournament_id`) REFERENCES `boffmedia_tournaments`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_phase_fk` FOREIGN KEY (`phase_id`) REFERENCES `boffmedia_tournament_phases`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_group_fk` FOREIGN KEY (`group_id`) REFERENCES `boffmedia_tournament_groups`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_top_fk` FOREIGN KEY (`top_participant_id`) REFERENCES `boffmedia_tournament_participants`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_bot_fk` FOREIGN KEY (`bot_participant_id`) REFERENCES `boffmedia_tournament_participants`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_win_fk` FOREIGN KEY (`winner_participant_id`) REFERENCES `boffmedia_tournament_participants`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
-ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_prop_fk` FOREIGN KEY (`proposed_by_participant_id`) REFERENCES `boffmedia_tournament_participants`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_top_fk` FOREIGN KEY (`top_participant_id`) REFERENCES `boffmedia_tournament_participants`(`id`) ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_bot_fk` FOREIGN KEY (`bot_participant_id`) REFERENCES `boffmedia_tournament_participants`(`id`) ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_win_fk` FOREIGN KEY (`winner_participant_id`) REFERENCES `boffmedia_tournament_participants`(`id`) ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_prop_fk` FOREIGN KEY (`proposed_by_participant_id`) REFERENCES `boffmedia_tournament_participants`(`id`) ON DELETE restrict ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_next_fk` FOREIGN KEY (`next_match_id`) REFERENCES `boffmedia_tournament_matches`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_tournament_matches` ADD CONSTRAINT `tm_lnext_fk` FOREIGN KEY (`loser_next_match_id`) REFERENCES `boffmedia_tournament_matches`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_tournament_participants` ADD CONSTRAINT `tp_t_fk` FOREIGN KEY (`tournament_id`) REFERENCES `boffmedia_tournaments`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
@@ -1953,6 +2025,7 @@ ALTER TABLE `boffmedia_tournament_roster` ADD CONSTRAINT `tr_p_fk` FOREIGN KEY (
 ALTER TABLE `boffmedia_tournament_roster` ADD CONSTRAINT `tr_user_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_tournaments` ADD CONSTRAINT `t_game_fk` FOREIGN KEY (`game_id`) REFERENCES `boffmedia_games`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `boffmedia_tournaments` ADD CONSTRAINT `t_event_fk` FOREIGN KEY (`event_id`) REFERENCES `boffmedia_events`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `boffmedia_uploads` ADD CONSTRAINT `boffmedia_uploads_owner_user_id_boffmedia_users_id_fk` FOREIGN KEY (`owner_user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `desktop_device_codes` ADD CONSTRAINT `ddc_user_fk` FOREIGN KEY (`user_id`) REFERENCES `boffmedia_users`(`id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `discord_quotes` ADD CONSTRAINT `discord_quotes_discord_id_discord_users_user_id_fk` FOREIGN KEY (`discord_id`) REFERENCES `discord_users`(`user_id`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `rotom_ficusai_messages` ADD CONSTRAINT `rotom_ficusai_messages_uuid_rotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `rotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
@@ -1968,6 +2041,8 @@ ALTER TABLE `tools_randomizer_audit` ADD CONSTRAINT `raud_assignment_fk` FOREIGN
 ALTER TABLE `tools_randomizer_configs` ADD CONSTRAINT `rc_event_fk` FOREIGN KEY (`event_id`) REFERENCES `boffmedia_events`(`id`) ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `tools_randomizer_configs` ADD CONSTRAINT `rc_rom_fk` FOREIGN KEY (`rom_id`) REFERENCES `tools_randomizer_roms`(`id`) ON DELETE restrict ON UPDATE no action;--> statement-breakpoint
 ALTER TABLE `tools_randomizer_presets` ADD CONSTRAINT `rp_updated_by_fk` FOREIGN KEY (`updated_by`) REFERENCES `boffmedia_users`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `boffmedia_sharex_images` ADD CONSTRAINT `boffmedia_sharex_images_token_id_boffmedia_sharex_tokens_id_fk` FOREIGN KEY (`token_id`) REFERENCES `boffmedia_sharex_tokens`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
+ALTER TABLE `boffmedia_sharex_tokens` ADD CONSTRAINT `boffmedia_sharex_tokens_created_by_boffmedia_users_id_fk` FOREIGN KEY (`created_by`) REFERENCES `boffmedia_users`(`id`) ON DELETE set null ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `rotom_arcade_streaks` ADD CONSTRAINT `rotom_arcade_streaks_uuid_rotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `rotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `rotom_inventory` ADD CONSTRAINT `rotom_inventory_uuid_rotom_users_uuid_fk` FOREIGN KEY (`uuid`) REFERENCES `rotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
 ALTER TABLE `rotom_notifications` ADD CONSTRAINT `rotom_notifications_user_uuid_rotom_users_uuid_fk` FOREIGN KEY (`user_uuid`) REFERENCES `rotom_users`(`uuid`) ON DELETE cascade ON UPDATE cascade;--> statement-breakpoint
@@ -2069,6 +2144,8 @@ CREATE INDEX `prt_token_idx` ON `boffmedia_password_reset_tokens` (`token_hash`)
 CREATE INDEX `prt_user_idx` ON `boffmedia_password_reset_tokens` (`user_id`);--> statement-breakpoint
 CREATE INDEX `a_event_idx` ON `boffmedia_achievements` (`event_id`);--> statement-breakpoint
 CREATE INDEX `a_category_idx` ON `boffmedia_achievements` (`category`);--> statement-breakpoint
+CREATE INDEX `ba_subject_idx` ON `boffmedia_audit` (`subject_type`,`subject_id`,`at`);--> statement-breakpoint
+CREATE INDEX `ba_actor_idx` ON `boffmedia_audit` (`actor_user_id`);--> statement-breakpoint
 CREATE INDEX `ei_event_idx` ON `boffmedia_event_invites` (`event_id`);--> statement-breakpoint
 CREATE INDEX `ep_event_idx` ON `boffmedia_event_participants` (`event_id`);--> statement-breakpoint
 CREATE INDEX `ep_participant_idx` ON `boffmedia_event_participants` (`participant_id`);--> statement-breakpoint
@@ -2088,6 +2165,9 @@ CREATE INDEX `ft_category_idx` ON `boffmedia_forum_threads` (`category_id`);--> 
 CREATE INDEX `ft_last_post_idx` ON `boffmedia_forum_threads` (`last_post_at`);--> statement-breakpoint
 CREATE INDEX `notif_user_idx` ON `boffmedia_notifications` (`user_id`);--> statement-breakpoint
 CREATE INDEX `notif_user_read_idx` ON `boffmedia_notifications` (`user_id`,`read_at`);--> statement-breakpoint
+CREATE INDEX `outbox_topic_idx` ON `boffmedia_outbox` (`topic`);--> statement-breakpoint
+CREATE INDEX `outbox_status_idx` ON `boffmedia_outbox` (`status`);--> statement-breakpoint
+CREATE INDEX `outbox_next_attempt_idx` ON `boffmedia_outbox` (`next_attempt_at`,`status`);--> statement-breakpoint
 CREATE INDEX `tg_tournament_idx` ON `boffmedia_tournament_groups` (`tournament_id`);--> statement-breakpoint
 CREATE INDEX `tg_phase_idx` ON `boffmedia_tournament_groups` (`phase_id`);--> statement-breakpoint
 CREATE INDEX `tmm_match_idx` ON `boffmedia_tournament_match_messages` (`match_id`);--> statement-breakpoint
@@ -2095,15 +2175,16 @@ CREATE INDEX `tm_phase_idx` ON `boffmedia_tournament_matches` (`phase_id`);--> s
 CREATE INDEX `tm_bracket_idx` ON `boffmedia_tournament_matches` (`tournament_id`,`bracket`,`round_number`);--> statement-breakpoint
 CREATE INDEX `tm_group_idx` ON `boffmedia_tournament_matches` (`group_id`);--> statement-breakpoint
 CREATE INDEX `tm_next_idx` ON `boffmedia_tournament_matches` (`next_match_id`);--> statement-breakpoint
+CREATE INDEX `tm_proposal_idx` ON `boffmedia_tournament_matches` (`tournament_id`,`proposal_state`);--> statement-breakpoint
 CREATE INDEX `tp_user_idx` ON `boffmedia_tournament_participants` (`user_id`);--> statement-breakpoint
 CREATE INDEX `tp_seed_idx` ON `boffmedia_tournament_participants` (`tournament_id`,`seed`);--> statement-breakpoint
 CREATE INDEX `tp_group_idx` ON `boffmedia_tournament_participants` (`group_id`);--> statement-breakpoint
-CREATE INDEX `tph_tournament_idx` ON `boffmedia_tournament_phases` (`tournament_id`,`phase_order`);--> statement-breakpoint
 CREATE INDEX `tr_participant_idx` ON `boffmedia_tournament_roster` (`participant_id`);--> statement-breakpoint
 CREATE INDEX `t_game_idx` ON `boffmedia_tournaments` (`game_id`);--> statement-breakpoint
 CREATE INDEX `t_event_idx` ON `boffmedia_tournaments` (`event_id`);--> statement-breakpoint
 CREATE INDEX `t_status_idx` ON `boffmedia_tournaments` (`status`);--> statement-breakpoint
 CREATE INDEX `t_format_idx` ON `boffmedia_tournaments` (`format`);--> statement-breakpoint
+CREATE INDEX `bu_owner_idx` ON `boffmedia_uploads` (`owner_user_id`);--> statement-breakpoint
 CREATE INDEX `ddc_user_idx` ON `desktop_device_codes` (`user_id`);--> statement-breakpoint
 CREATE INDEX `ddc_expires_idx` ON `desktop_device_codes` (`expires_at`);--> statement-breakpoint
 CREATE INDEX `desktop_releases_target_published_idx` ON `desktop_releases` (`target`,`published`);--> statement-breakpoint
@@ -2127,6 +2208,7 @@ CREATE INDEX `rc_rom_idx` ON `tools_randomizer_configs` (`rom_id`);--> statement
 CREATE INDEX `rr_platform_idx` ON `tools_randomizer_roms` (`game_platform`);--> statement-breakpoint
 CREATE INDEX `rotom_inventory_owner_item_idx` ON `rotom_inventory` (`uuid`,`item_id`,`used`);--> statement-breakpoint
 CREATE INDEX `rotom_inventory_reservation_idx` ON `rotom_inventory` (`reservation_id`,`reserved_at`);--> statement-breakpoint
+CREATE INDEX `rcm_chat_id_idx` ON `rotom_chat_messages` (`chat_id`,`id`);--> statement-breakpoint
 CREATE INDEX `rotom_news_published_idx` ON `rotom_news` (`published`,`created_at`);--> statement-breakpoint
 CREATE INDEX `rotom_news_featured_idx` ON `rotom_news` (`featured`,`created_at`);--> statement-breakpoint
 CREATE INDEX `drp_uuid_idx` ON `rotom_dungeon_run_players` (`uuid`);--> statement-breakpoint
@@ -2173,4 +2255,8 @@ CREATE INDEX `tools_vgc_limitless_tournaments_regulation_status_idx` ON `tools_v
 CREATE INDEX `tools_vgc_pastes_repository_regulation_paste_idx` ON `tools_vgc_pastes_repository` (`regulation_id`,`paste_id`);--> statement-breakpoint
 CREATE INDEX `tools_vgc_pokepastes_format_idx` ON `tools_vgc_pokepastes` (`format_id`);--> statement-breakpoint
 CREATE INDEX `tools_vgc_regulations_active_idx` ON `tools_vgc_regulations` (`active`);--> statement-breakpoint
-CREATE INDEX `tools_vgc_regulations_format_idx` ON `tools_vgc_regulations` (`format_id`);
+CREATE INDEX `tools_vgc_regulations_format_idx` ON `tools_vgc_regulations` (`format_id`);--> statement-breakpoint
+CREATE INDEX `vgc_matches_user_idx` ON `tools_vgc_matches` (`user_id`);--> statement-breakpoint
+CREATE INDEX `vgc_series_user_idx` ON `tools_vgc_series` (`user_id`);--> statement-breakpoint
+CREATE INDEX `vgc_sessions_user_idx` ON `tools_vgc_sessions` (`user_id`);--> statement-breakpoint
+CREATE INDEX `vgc_presets_user_idx` ON `tools_vgc_team_presets` (`user_id`);

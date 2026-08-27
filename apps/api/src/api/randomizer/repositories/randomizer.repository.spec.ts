@@ -1,5 +1,6 @@
 import { Logger } from 'nestjs-pino';
 import { RandomizerRepository } from './randomizer.repository';
+import { AuditService } from '@api/_repositories/audit.service';
 
 /**
  * `getPublishedEmulatorRom` is the gate every randomizer config passes through:
@@ -32,7 +33,8 @@ describe('RandomizerRepository.getPublishedEmulatorRom', () => {
       }),
     };
     const logger = { debug: jest.fn(), error: jest.fn() } as unknown as Logger;
-    return new RandomizerRepository(logger, db as never);
+    const mockAuditService = { record: jest.fn() } as any;
+    return new RandomizerRepository(logger, db as never, mockAuditService);
   }
 
   const version = (over: Record<string, unknown> = {}) => ({

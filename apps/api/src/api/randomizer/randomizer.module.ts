@@ -4,6 +4,7 @@ import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Logger } from 'nestjs-pino';
+import { AuditService } from '@api/_repositories/audit.service';
 
 // Repository
 import { RandomizerRepository } from './repositories/randomizer.repository';
@@ -40,6 +41,9 @@ import { PacksModule } from '@api/packs/packs.module';
     PacksModule,
   ],
   providers: [
+    // Unified audit service across all domains
+    AuditService,
+
     // Repository with token binding
     {
       provide: RANDOMIZER_REPOSITORY_TOKEN,

@@ -56,12 +56,27 @@ export class AppController {
    * The container HEALTHCHECK and any external prober call this unauthenticated,
    * so it must stay @Public(). It answers 200 even when a dependency is down —
    * `status` carries the degradation — so a database blip cannot restart-loop
-   * the container.
+   * the container. Only returns minimal status; detailed diagnostics require
+   * admin role (see GET /health/admin).
    */
   @Public()
   @Get('health')
   async getHealth() {
     return this.appService.getHealth();
+  }
+
+  /**
+   * Admin-only health diagnostics: memory usage, connection latencies, uptime,
+   * response times, and per-service status. Gated behind admin role because
+   * these details could aid reconnaissance (e.g. "process is low on memory",
+   * "database connection is slow", "Wingull API is unreachable").
+   */
+  @Get('health/admin')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  async getHealthAdmin() {
+    return this.appService.getHealthAdmin();
   }
 
   /**

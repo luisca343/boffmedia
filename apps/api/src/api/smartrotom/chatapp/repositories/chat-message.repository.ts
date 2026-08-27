@@ -34,8 +34,16 @@ export class ChatMessageRepository {
       .limit(limit);
   }
 
-  async findChatMessagesAscending(chatId: number): Promise<ChatMessage[]> {
-    return this.db
+  async findChatMessagesAscending(
+    chatId: number,
+    limit: number = 50,
+    before?: number,
+  ): Promise<ChatMessage[]> {
+    // Keyset pagination: load messages with id < before (or all if before is omitted),
+    // in descending order for efficiency, then reverse in JS to match the ascending contract.
+    // Hard limit: 100 messages per page.
+    const actualLimit = Math.min(Math.max(1, limit), 100);
+    let query = this.db
       .select({
         id: rotomChatMessages.id,
         content: rotomChatMessages.content,
@@ -44,8 +52,17 @@ export class ChatMessageRepository {
         type: rotomChatMessages.type,
       })
       .from(rotomChatMessages)
-      .where(eq(rotomChatMessages.chatId, chatId))
-      .orderBy(asc(rotomChatMessages.createdAt));
+      .where(
+        before
+          ? and(eq(rotomChatMessages.chatId, chatId), sql`${rotomChatMessages.id} < ${before}`)
+          : eq(rotomChatMessages.chatId, chatId),
+      )
+      .orderBy(desc(rotomChatMessages.id))
+      .limit(actualLimit);
+
+    const results = await query;
+    // Reverse to match ascending order (caller expects newest messages last).
+    return results.reverse();
   }
 
   async createMessage(messageData: {

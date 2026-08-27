@@ -1,4 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
+import { AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
 import {
   FileUploadService,
   FileUploadRequest,
@@ -64,15 +65,17 @@ export class ImageUploadService {
   async deleteImage(
     path: string,
     filename: string,
+    actor: AuthPrincipal,
   ): Promise<{ success: boolean }> {
-    return this.fileUploadService.deleteFile(path, filename);
+    return this.fileUploadService.deleteFile(path, filename, actor);
   }
 
   async getImageInfo(
     path: string,
     filename: string,
+    actor: AuthPrincipal,
   ): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
-    return this.fileUploadService.getFileInfo(path, filename);
+    return this.fileUploadService.getFileInfo(path, filename, actor);
   }
 
   getSupportedImageTypes(): string[] {

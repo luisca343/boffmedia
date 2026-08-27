@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, desc, eq, inArray, ne, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
@@ -197,6 +197,56 @@ export class WigglypopTradingRepository {
       .set({ status, respondedAt: new Date() })
       .where(eq(wigglypopTradeOffers.id, id));
     return (await this.findTrade(id)) as WigglypopTradeOffer;
+  }
+
+  /**
+   * Atomically accepts a trade and marks the listing sold in a single transaction.
+   * Two concurrent acceptTrade calls on different trades for the SAME listing will
+   * race; the first wins with an atomic claim of the listing from 'activo' → 'vendido',
+   * and the second fails with an affectedRows === 0 check, triggering a rollback and
+   * the "no longer available" error.
+   */
+  async acceptTradeAtomic(
+    tradeId: number,
+    listingId: number,
+  ): Promise<WigglypopTradeOffer> {
+    return this.db.transaction(async (tx) => {
+      // Atomically claim the trade offer from 'pendiente' to 'aceptada'.
+      const tradeResult = await tx
+        .update(wigglypopTradeOffers)
+        .set({ status: 'aceptada', respondedAt: new Date() })
+        .where(
+          and(
+            eq(wigglypopTradeOffers.id, tradeId),
+            eq(wigglypopTradeOffers.status, 'pendiente'),
+          ),
+        );
+
+      if (tradeResult[0].affectedRows === 0) {
+        throw new BadRequestException(
+          'This trade is no longer available (already accepted or rejected)',
+        );
+      }
+
+      // Atomically claim the listing from 'activo' to 'vendido'.
+      const listingResult = await tx
+        .update(wigglypopListings)
+        .set({ status: 'vendido' })
+        .where(
+          and(
+            eq(wigglypopListings.id, listingId),
+            eq(wigglypopListings.status, 'activo'),
+          ),
+        );
+
+      if (listingResult[0].affectedRows === 0) {
+        throw new BadRequestException(
+          'This listing is no longer available (already accepted or sold)',
+        );
+      }
+
+      return (await this.findTrade(tradeId)) as WigglypopTradeOffer;
+    });
   }
 
   // ─── Watchlist ──────────────────────────────────────────────────────────────

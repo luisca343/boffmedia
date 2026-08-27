@@ -17,6 +17,7 @@ import { AchievementsRepository } from '../../_repositories/boffmedia/achievemen
 import { ParticipantsRepository } from '../../_repositories/boffmedia/participants.repository';
 import { TeamsRepository } from '../../_repositories/boffmedia/teams.repository';
 import { AuditRepository } from '../../_repositories/boffmedia/audit.repository';
+import { AuditService } from '../../_repositories/audit.service';
 
 // Import all domain services
 import { EventsService } from './services/events.service';
@@ -34,6 +35,9 @@ import { EventsFacadeService } from './events.facade.service';
 
 @Module({
   providers: [
+    // Unified audit service across all domains
+    AuditService,
+
     // Repositories
     EventsRepository,
     EventInvitesRepository,

@@ -171,6 +171,7 @@ export const boffMediaEventTeamMembers = mysqlTable(
   {
     teamId: int('team_id'),
     participantId: int('participant_id'),
+    eventId: int('event_id').notNull(),
     role: mysqlEnum('role', ['leader', 'member']).notNull().default('member'),
     joinedAt: timestamp('joined_at')
       .notNull()
@@ -181,6 +182,12 @@ export const boffMediaEventTeamMembers = mysqlTable(
     return {
       pk: primaryKey({ columns: [table.teamId, table.participantId] }),
       roleIdx: index('etm_role_idx').on(table.teamId, table.role),
+      // One team per participant per event: enforces that a participant cannot
+      // be a member of two different teams in the same event.
+      eventParticipantUq: unique('etm_event_participant_uq').on(
+        table.eventId,
+        table.participantId,
+      ),
       teamFk: foreignKey({
         columns: [table.teamId],
         foreignColumns: [boffMediaEventTeams.id],
@@ -192,6 +199,13 @@ export const boffMediaEventTeamMembers = mysqlTable(
         columns: [table.participantId],
         foreignColumns: [boffMediaParticipants.id],
         name: 'etm_participant_fk',
+      })
+        .onDelete('cascade')
+        .onUpdate('cascade'),
+      eventFk: foreignKey({
+        columns: [table.eventId],
+        foreignColumns: [boffMediaEvents.id],
+        name: 'etm_event_fk',
       })
         .onDelete('cascade')
         .onUpdate('cascade'),

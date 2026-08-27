@@ -184,6 +184,44 @@ export class WigglypopCustodyService {
    *
    * If ANY take fails, everything already taken is handed straight back to its seller and the
    * buyer is charged NOTHING — no escrow hold has happened yet at that point.
+   *
+   * ⚠️  CRITICAL: Failure modes when WIGGLYPOP_ATOMIC_CUSTODY is ON.
+   *
+   * The atomic path has NO outbox pattern and NO compensation saga. A failure between
+   * phases leaves goods and money separated and unreconcilable:
+   *
+   * • Phase A (TAKE) succeeds, Phase B (CHARGE) fails → Phase A is reversed (giveLine restores).
+   *   SAFE.
+   *
+   * • Phase B (CHARGE) succeeds, Phase C (GIVE) fails BEFORE payment → goods are with market,
+   *   money is in escrow, but buyer has nothing and seller is not paid. The line is marked
+   *   'pendiente' with takenPayload persisted, but recovery requires MANUAL intervention or a
+   *   replay mechanism (the code here does NOT auto-retry).
+   *   UNSAFE. Goods and money are separated with no automatic path to reconciliation.
+   *
+   * • Phase B (CHARGE) succeeds, Phase C (GIVE) fails AFTER at least one payout → goods and
+   *   money are both out but UNEVENLY DISTRIBUTED. Some sellers are paid while buyers are
+   *   incomplete. Recovery by hand.
+   *   UNSAFE. The invariant (goods paid, or money refunded) is broken.
+   *
+   * A follow-up saga MUST:
+   *
+   *   1. Wrap take+charge+give+payout in an outbox transaction: a single row inserted ATOMICALLY
+   *      with the escrow hold, keyed by (orderId, lineId), marked with the phase number it
+   *      reached.
+   *
+   *   2. On restart or error, query the outbox to detect incomplete orders and replay from the
+   *      last-completed phase. Replays are idempotent because every phase is guarded by the DB
+   *      state it changed (order.status, line.deliveryStatus, settleTxId).
+   *
+   *   3. CRITICAL: take and charge MUST be atomic (same transaction), so a charge-failed recovery
+   *      can assume all takes were rolled back. TODAY they are separate phases — Phase A's success
+   *      triggers a restore on Phase B's failure, but if the restore call itself is lost (network
+   *      failure, process crash), goods are orphaned.
+   *
+   *   4. The saga must run either on a cron (every N minutes, pick up incomplete outbox rows) or
+   *      as part of order teardown (POST /order/:id/confirm/retry or similar), never inside
+   *      settleNewOrder — that leaves the buyer's request hanging if the saga fails.
    */
   private async settleAtomic(order: OrderWithLines): Promise<OrderWithLines> {
     if (order.status === 'completado') return order; // idempotent
@@ -208,6 +246,7 @@ export class WigglypopCustodyService {
       }
     } catch (error: any) {
       // Nothing was charged. Put back whatever we already took, and stop.
+      // GUARD: if restore fails, we stop here and fail HARD. See settleAtomic docstring.
       await this.restore(taken);
       await this.ordersRepository.setAllLinesDelivery(order.id, 'cancelado');
       await this.ordersRepository.setStatus(order.id, 'cancelado');

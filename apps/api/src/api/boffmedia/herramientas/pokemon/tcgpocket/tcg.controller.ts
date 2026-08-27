@@ -516,18 +516,23 @@ export class TcgController {
     return this.tcgFacade.removeUserCard(user.userId, cardId);
   }
 
+  @RequireSession()
   @Get('users/:userId/cards/history')
   @ApiOperation({ summary: 'Get user card history' })
-  @ApiParam({ name: 'userId', description: 'User ID', example: 'user123' })
+  @ApiParam({ name: 'userId', description: 'User ID (ignored, uses authenticated user)', example: 'user123' })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User card history retrieved successfully.',
     type: [TcgUserCardHistory],
   })
   async getUserCardHistory(
-    @Param('userId') userId: number,
+    @Param('userId') _userId: number,
+    @CurrentUser() user: AuthPrincipal,
   ): Promise<TcgUserCardHistory[]> {
-    return this.tcgFacade.getUserCardHistory(userId);
+    // This route is now protected and returns only the authenticated user's history,
+    // regardless of the userId parameter. The parameter is kept for backward compatibility
+    // with existing client paths, but is ignored to prevent IDOR.
+    return this.tcgFacade.getUserCardHistory(user.userId);
   }
 
   @Get('migrate')

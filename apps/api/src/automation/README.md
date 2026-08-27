@@ -62,12 +62,6 @@ GET /automation/twitch/streams/user/username
 ```
 Get current stream information for a specific user and check if it contains wingull content.
 
-#### Debug User Stream
-```http
-GET /automation/twitch/debug/check-user/username
-```
-Debug endpoint to analyze a specific user's stream and show detailed wingull content analysis.
-
 #### Manage Monitored Users
 ```http
 POST /automation/twitch/monitor/user/username
@@ -173,12 +167,7 @@ Extend the `NotificationService` to add new notification types:
    curl http://localhost:34301/automation/twitch/status
    ```
 
-3. **Check if a specific user is streaming wingull content:**
-   ```bash
-   curl http://localhost:34301/automation/twitch/debug/check-user/pokimane
-   ```
-
-4. **Trigger immediate check:**
+3. **Trigger immediate check:**
    ```bash
    curl -X POST http://localhost:34301/automation/twitch/check-now
    ```
@@ -196,7 +185,7 @@ Extend the `NotificationService` to add new notification types:
 
 3. **Streams not detected**
    - Verify the monitored users are actually streaming
-   - Check if their streams contain "wingull" in title, tags, or game: `GET /automation/twitch/debug/check-user/username`
+   - Check if their streams contain "wingull" in title, tags, or game
    - Use manual check to test: `POST /automation/twitch/check-now`
 
 ## Performance Notes

@@ -10,6 +10,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
@@ -506,6 +507,7 @@ export class VgcMetaController {
 
   @Public()
   @Get('divergence')
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiOperation({
     summary:
       'Compare Smogon ladder usage vs Limitless tournament usage for a regulation',

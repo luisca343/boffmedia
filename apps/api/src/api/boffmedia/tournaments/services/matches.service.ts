@@ -2,12 +2,14 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ConflictException,
 } from '@nestjs/common';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
 import { TournamentMatch } from '@/_db/schema/BoffMediaTournaments';
 import { ReportMatchDto } from '../dto/report-match.dto';
 import { effectiveBestOf } from '../match-report.util';
 import { TournamentNotificationsService } from './tournament-notifications.service';
+import { AuditRepository } from '@api/_repositories/boffmedia/audit.repository';
 import type { MatchStatus } from '../tournaments.types';
 import { ApiErrorCode, userError } from '@/common/errors/user-error';
 
@@ -36,6 +38,24 @@ export interface SettleOptions {
    * it flushes them after ITS commit. Omit and they are sent here.
    */
   notifications?: TournamentMatch[];
+  /**
+   * The version of the match when the amend was initiated (optimistic concurrency).
+   * For amends, if the match was amended again since, the claim fails (version mismatch).
+   */
+  expectedVersion?: number;
+  /**
+   * The userId of the admin performing an amend, for the audit trail.
+   * Required when amend:true.
+   */
+  actorUserId?: number | null;
+  /**
+   * The previous result (for audit trail). Required when amend:true.
+   */
+  previousResult?: {
+    winnerId: number | null;
+    topScore: number | null;
+    botScore: number | null;
+  };
 }
 
 @Injectable()
@@ -43,6 +63,7 @@ export class MatchesService {
   constructor(
     private readonly repo: TournamentsRepository,
     private readonly notify: TournamentNotificationsService,
+    private readonly audit: AuditRepository,
   ) {}
 
   /** Admin reports a result; returns the winner id (or null for a draw). */
@@ -50,6 +71,7 @@ export class MatchesService {
     tournamentId: number,
     matchId: number,
     dto: ReportMatchDto,
+    actorUserId?: number | null,
   ): Promise<{ success: boolean; winnerParticipantId: number | null }> {
     const match = await this.repo.findMatch(matchId);
     if (!match || match.tournamentId !== tournamentId) {
@@ -94,9 +116,30 @@ export class MatchesService {
           botScore: winnerIsTop ? 0 : 1,
           status: 'completed',
         },
-        { amend: alreadyResolved },
+        {
+          amend: alreadyResolved,
+          expectedVersion: alreadyResolved ? dto.amendVersion : undefined,
+          actorUserId: alreadyResolved ? actorUserId : undefined,
+          previousResult: alreadyResolved
+            ? {
+                winnerId: match.winnerParticipantId,
+                topScore: match.topScore,
+                botScore: match.botScore,
+              }
+            : undefined,
+        },
       );
-      if (!applied) throw MatchesService.settledConcurrently();
+      if (!applied) {
+        if (alreadyResolved && dto.amendVersion !== undefined) {
+          throw new ConflictException(
+            userError(
+              ApiErrorCode.MATCH_AMENDMENT_CONFLICT,
+              'The match was amended by another admin. Reload it and try again.',
+            ),
+          );
+        }
+        throw MatchesService.settledConcurrently();
+      }
       return { success: true, winnerParticipantId: dto.winnerParticipantId };
     }
 
@@ -137,9 +180,30 @@ export class MatchesService {
         botScore: dto.botScore,
         status: 'completed',
       },
-      { amend: alreadyResolved },
+      {
+        amend: alreadyResolved,
+        expectedVersion: alreadyResolved ? dto.amendVersion : undefined,
+        actorUserId: alreadyResolved ? actorUserId : undefined,
+        previousResult: alreadyResolved
+          ? {
+              winnerId: match.winnerParticipantId,
+              topScore: match.topScore,
+              botScore: match.botScore,
+            }
+          : undefined,
+      },
     );
-    if (!applied) throw MatchesService.settledConcurrently();
+    if (!applied) {
+      if (alreadyResolved && dto.amendVersion !== undefined) {
+        throw new ConflictException(
+          userError(
+            ApiErrorCode.MATCH_AMENDMENT_CONFLICT,
+            'The match was amended by another admin. Reload it and try again.',
+          ),
+        );
+      }
+      throw MatchesService.settledConcurrently();
+    }
 
     return { success: true, winnerParticipantId: winnerId };
   }
@@ -178,6 +242,9 @@ export class MatchesService {
         s,
         opts.amend ?? false,
         notifications,
+        opts.expectedVersion,
+        opts.actorUserId,
+        opts.previousResult,
       );
       if (!opts.notifications) await this.flushNotifications(notifications);
       return applied;
@@ -185,7 +252,16 @@ export class MatchesService {
 
     const notifications: TournamentMatch[] = [];
     const applied = await this.repo.transaction((tx) =>
-      this.settleWithin(tx, match, s, opts.amend ?? false, notifications),
+      this.settleWithin(
+        tx,
+        match,
+        s,
+        opts.amend ?? false,
+        notifications,
+        opts.expectedVersion,
+        opts.actorUserId,
+        opts.previousResult,
+      ),
     );
     // Only after the settlement is durable — a rolled-back transaction must not
     // leave players notified about a match that never became ready.
@@ -197,6 +273,8 @@ export class MatchesService {
    * The settlement itself, against a caller-supplied (transaction-scoped) repo.
    * Returns false when the claim lost: another writer resolved this match first
    * and has already propagated its result, so this call must not advance anyone.
+   *
+   * For amends, writes an audit row and uses optimistic concurrency (version).
    */
   private async settleWithin(
     repo: TournamentsRepository,
@@ -204,6 +282,9 @@ export class MatchesService {
     s: Settlement,
     amend: boolean,
     notifications: TournamentMatch[],
+    expectedVersion?: number,
+    actorUserId?: number | null,
+    previousResult?: { winnerId: number | null; topScore: number | null; botScore: number | null },
   ): Promise<boolean> {
     const claimed = await repo.claimSettlement(
       match.id,
@@ -213,6 +294,8 @@ export class MatchesService {
         winnerParticipantId: s.winnerId,
         status: s.status,
         reportedAt: new Date(),
+        // Increment version on every settlement: both normal claims and amends.
+        version: match.version + 1,
         // Any settlement (rival confirm, admin report/amend, forfeit, bye)
         // supersedes whatever self-report proposal was open on the match.
         proposedByParticipantId: null,
@@ -223,9 +306,30 @@ export class MatchesService {
         proposalExpiresAt: null,
         proposalState: null,
       },
-      { allowResolved: amend },
+      {
+        allowResolved: amend,
+        expectedVersion: expectedVersion,
+      },
     );
     if (!claimed) return false;
+
+    // Write an audit row for amends, recording what changed.
+    if (amend && actorUserId !== undefined) {
+      await this.audit.record(
+        'match',
+        match.id,
+        'amend',
+        actorUserId,
+        {
+          previous: previousResult,
+          new: {
+            winnerId: s.winnerId,
+            topScore: s.topScore,
+            botScore: s.botScore,
+          },
+        },
+      );
+    }
 
     if (s.winnerId == null) return true; // draw (league/group/swiss) — nothing to advance
 

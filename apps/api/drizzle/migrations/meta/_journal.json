@@ -5,50 +5,8 @@
     {
       "idx": 0,
       "version": "5",
-      "when": 1787208874673,
-      "tag": "0000_initial",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "5",
-      "when": 1787236610800,
-      "tag": "0001_safe_wrecker",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "5",
-      "when": 1787307448446,
-      "tag": "0002_profile_picture_default",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "5",
-      "when": 1787667796180,
-      "tag": "0003_pack_versions_optional_groups",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "5",
-      "when": 1787843515459,
-      "tag": "0004_audit_and_tournament_uniques",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "5",
-      "when": 1787845008981,
-      "tag": "0005_notification_dedupe_key",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "5",
-      "when": 1787846265291,
-      "tag": "0006_tournament_entry_flow",
+      "when": 1787863526188,
+      "tag": "0000_grey_madame_hydra",
       "breakpoints": true
     }
   ]

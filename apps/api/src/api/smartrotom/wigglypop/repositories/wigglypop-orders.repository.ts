@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, desc, eq, inArray, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
@@ -57,6 +57,9 @@ export class WigglypopOrdersRepository {
    * Flipping the listings in a service-side loop after the order commits is
    * wrong: a failure between the two leaves a paid-for order whose listings are
    * still `disponible`, i.e. sellable twice.
+   *
+   * If an idempotency key is provided and an order with that key already exists,
+   * returns the existing order without creating a duplicate.
    */
   async create(
     order: {
@@ -66,10 +69,35 @@ export class WigglypopOrdersRepository {
       fee: number;
       total: number;
       status: string;
+      idempotencyKey?: string;
     },
     lines: NewOrderLine[],
     reserveListings: number[] = [],
   ): Promise<OrderWithLines> {
+    const { idempotencyKey } = order;
+
+    // If an idempotency key is provided, check if this order already exists.
+    // MySQL allows NULL in UNIQUE indexes, so only non-NULL keys trigger the lookup.
+    if (idempotencyKey) {
+      const existing = await this.db
+        .select({ id: wigglypopOrders.id })
+        .from(wigglypopOrders)
+        .where(
+          and(
+            eq(wigglypopOrders.idempotencyKey, idempotencyKey),
+            // Scoped to the buyer: without this, a key collision would hand one
+            // buyer another buyer's full order — lines, totals and all.
+            eq(wigglypopOrders.buyerUuid, order.buyerUuid),
+          ),
+        )
+        .limit(1);
+
+      if (existing.length > 0) {
+        // Idempotent replay: return the existing order without creating a duplicate.
+        return (await this.findById(existing[0].id)) as OrderWithLines;
+      }
+    }
+
     const orderId = await this.db.transaction(async (tx) => {
       const inserted = await tx.insert(wigglypopOrders).values({
         code: order.code,
@@ -78,6 +106,7 @@ export class WigglypopOrdersRepository {
         fee: order.fee,
         total: order.total,
         status: order.status,
+        idempotencyKey: idempotencyKey ?? null,
       });
       const id = inserted[0].insertId;
 
@@ -87,11 +116,27 @@ export class WigglypopOrdersRepository {
           .values(lines.map((l) => ({ ...l, orderId: id })));
       }
 
+      // Atomically claim every listing from 'activo' to 'reservado' in the same transaction.
+      // The priceLine() check outside this tx is a fast-fail optimization, but this conditional
+      // UPDATE is the only place that actually prevents a race — two concurrent buyers both
+      // seeing 'activo' and both trying to claim the same listing. If any listing fails to claim
+      // (already reserved by another buyer), roll back the entire order.
       for (const listingId of reserveListings) {
-        await tx
+        const result = await tx
           .update(wigglypopListings)
           .set({ status: 'reservado' })
-          .where(eq(wigglypopListings.id, listingId));
+          .where(
+            and(
+              eq(wigglypopListings.id, listingId),
+              eq(wigglypopListings.status, 'activo'),
+            ),
+          );
+
+        if (result[0].affectedRows === 0) {
+          throw new BadRequestException(
+            'One or more listings are no longer available (reservado)',
+          );
+        }
       }
 
       return id;

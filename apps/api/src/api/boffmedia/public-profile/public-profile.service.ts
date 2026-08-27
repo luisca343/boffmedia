@@ -1,6 +1,6 @@
 import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq } from 'drizzle-orm';
+import { eq, and, isNull } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   boffMediaUsers,
@@ -18,7 +18,8 @@ export class PublicProfileService {
 
   /**
    * Public-safe profile by handle (username). Exposes ONLY public identity —
-   * never email, password, or OAuth ids. Per-user trophies/activity are served
+   * never email, password, or OAuth ids. Excludes soft-deleted users to prevent
+   * leaking PII-scrubbed accounts. Per-user trophies/activity are served
    * by the already-public `/events/users/:id/{trophies,activity}` endpoints.
    */
   async getByHandle(handle: string): Promise<PublicProfileEntity> {
@@ -32,7 +33,12 @@ export class PublicProfileService {
         memberSince: boffMediaUsers.createdAt,
       })
       .from(boffMediaUsers)
-      .where(eq(boffMediaUsers.username, handle));
+      .where(
+        and(
+          eq(boffMediaUsers.username, handle),
+          isNull(boffMediaUsers.deletedAt),
+        ),
+      );
 
     if (!user) {
       throw new NotFoundException('Profile not found');

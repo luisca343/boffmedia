@@ -151,6 +151,7 @@ describe('TeamsService', () => {
         expect.objectContaining({
           teamId: 1,
           participantId: 5,
+          eventId: 10,
           role: 'leader',
         }),
       );
@@ -234,6 +235,7 @@ describe('TeamsService', () => {
         expect.objectContaining({
           teamId: 1,
           participantId: 5,
+          eventId: 10,
           role: 'member',
         }),
       );
@@ -251,14 +253,15 @@ describe('TeamsService', () => {
     });
 
     it('throws when participant is already in a team for this event', async () => {
-      mockTeamsRepo.findParticipantTeamInEvent.mockResolvedValue([
-        { teamId: 2 },
-      ]);
+      // The unique constraint on (event_id, participant_id) causes addMember to
+      // throw when a participant is already in a team for this event.
+      const error = new Error('Participant is already in a team for this event');
+      mockTeamsRepo.addMember.mockRejectedValueOnce(error);
 
       await expect(service.joinTeam(10, 1, 1)).rejects.toThrow(
         'Participant is already in a team for this event',
       );
-      expect(mockTeamsRepo.addMember).not.toHaveBeenCalled();
+      expect(mockTeamsRepo.addMember).toHaveBeenCalled();
     });
 
     it('refuses a removed player at the membership gate before any team read/write (F-11)', async () => {

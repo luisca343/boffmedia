@@ -1,5 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
+import { AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
 import {
   FileUploadService,
   FileUploadRequest,
@@ -38,9 +39,10 @@ export class UploadFacadeService {
   async deleteImage(
     path: string,
     filename: string,
+    actor: AuthPrincipal,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const result = await this.imageUploadService.deleteImage(path, filename);
+      const result = await this.imageUploadService.deleteImage(path, filename, actor);
       return {
         success: result.success,
         message: result.success
@@ -59,9 +61,10 @@ export class UploadFacadeService {
   async getImageInfo(
     path: string,
     filename: string,
+    actor: AuthPrincipal,
   ): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
     try {
-      return await this.imageUploadService.getImageInfo(path, filename);
+      return await this.imageUploadService.getImageInfo(path, filename, actor);
     } catch (error: any) {
       this.logger.error(`Error getting image info for ${filename}:`, error);
       // A typed HTTP error (404/403/409…) has to reach the client as itself;
@@ -90,9 +93,10 @@ export class UploadFacadeService {
   async deleteFile(
     path: string,
     filename: string,
+    actor: AuthPrincipal,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const result = await this.fileUploadService.deleteFile(path, filename);
+      const result = await this.fileUploadService.deleteFile(path, filename, actor);
       return {
         success: result.success,
         message: result.success
@@ -111,9 +115,10 @@ export class UploadFacadeService {
   async getFileInfo(
     path: string,
     filename: string,
+    actor: AuthPrincipal,
   ): Promise<{ exists: boolean; size?: number; createdAt?: Date }> {
     try {
-      return await this.fileUploadService.getFileInfo(path, filename);
+      return await this.fileUploadService.getFileInfo(path, filename, actor);
     } catch (error: any) {
       this.logger.error(`Error getting file info for ${filename}:`, error);
       // A typed HTTP error (404/403/409…) has to reach the client as itself;

@@ -72,9 +72,13 @@ export class ChatappFacadeService {
 
   // ==================== MESSAGE MANAGEMENT ====================
 
-  async getMessages(chatId: number): Promise<RotomMessage[]> {
+  async getMessages(
+    chatId: number,
+    limit?: number,
+    before?: number,
+  ): Promise<RotomMessage[]> {
     try {
-      return await this.messageService.getMessages(chatId);
+      return await this.messageService.getMessages(chatId, limit, before);
     } catch (error: any) {
       this.logger.error(`Error getting messages for chat ${chatId}:`, error);
       // A typed HTTP error (404/403/409…) has to reach the client as itself;

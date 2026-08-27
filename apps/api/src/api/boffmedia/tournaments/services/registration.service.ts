@@ -144,7 +144,16 @@ export class RegistrationService {
         'Cannot withdraw once the tournament has started',
       );
     }
-    await this.repo.removeParticipant(existing.id);
+    const result = await this.repo.removeParticipant(existing.id);
+    if (!result.success) {
+      throw new BadRequestException(
+        userError(
+          ApiErrorCode.TOURNAMENT_PARTICIPANT_IN_BRACKET,
+          'Participant is in bracket',
+          'This entrant is already in the bracket — set their status to withdrew or disqualified instead of deleting them',
+        ),
+      );
+    }
     return { success: true };
   }
 
@@ -183,16 +192,14 @@ export class RegistrationService {
     id: number,
   ): Promise<{ success: boolean }> {
     await this.mustOwnParticipant(tournamentId, id);
-    // A seeded entrant is referenced by matches whose participant FKs are
-    // ON DELETE SET NULL, so deleting one leaves half-empty matches that
-    // standings and advancement silently skip — the phase can then "complete"
-    // with a hole in it. Withdrawal keeps the row and its record intact.
-    const matches = await this.repo.listMatches(tournamentId);
-    if (
-      matches.some(
-        (m) => m.topParticipantId === id || m.botParticipantId === id,
-      )
-    ) {
+    // A seeded entrant would be referenced by matches. The repository now
+    // atomically checks this under a row lock before deleting, refusing with
+    // a reason code if the check fails. This is the last layer that validates
+    // the bracket constraint — the database FK itself now enforces RESTRICT,
+    // making it impossible for a concurrent operation to seed this participant
+    // between the check and the delete.
+    const result = await this.repo.removeParticipant(id);
+    if (!result.success) {
       throw new BadRequestException(
         userError(
           ApiErrorCode.TOURNAMENT_PARTICIPANT_IN_BRACKET,
@@ -200,7 +207,6 @@ export class RegistrationService {
         ),
       );
     }
-    await this.repo.removeParticipant(id);
     return { success: true };
   }
 

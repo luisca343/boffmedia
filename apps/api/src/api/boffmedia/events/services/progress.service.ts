@@ -5,16 +5,18 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   boffMediaParticipantProgress,
   boffMediaParticipants,
+  boffMediaEventTeams,
+  boffMediaEventTeamMembers,
+  boffMediaAchievements,
   ParticipantProgress,
   validateParticipantCanReceiveAchievement,
 } from '@/_db/schema/BoffMediaEvents';
 import { AchievementsService } from './achievements.service';
-import { TeamsService } from './teams.service';
 import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 
 // LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
@@ -23,9 +25,27 @@ export class ProgressService {
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
     private readonly achievementsService: AchievementsService,
-    private readonly teamsService: TeamsService,
     private readonly notificationsService: NotificationsService,
   ) {}
+
+  /**
+   * Run `fn` against a transaction-scoped copy of this service, so multi-step
+   * writes commit together or not at all. This allows updateProgress to update
+   * team scores atomically with the progress insert.
+   */
+  async transaction<T>(
+    fn: (service: ProgressService) => Promise<T>,
+  ): Promise<T> {
+    return this.db.transaction((tx) =>
+      fn(
+        new ProgressService(
+          tx as unknown as MySql2Database<Record<string, never>>,
+          this.achievementsService,
+          this.notificationsService,
+        ),
+      ),
+    );
+  }
 
   async updateProgress(
     participantId: number,
@@ -89,9 +109,12 @@ export class ProgressService {
         lastUpdated: new Date(),
       } as any);
 
-    // 4. If completed and team exists, update team score
+    // 4. If completed and team exists, atomically update team score with a
+    // correlated subquery. This replaces the post-write call to
+    // teamsService.updateTeamScore so two concurrent unlocks of the same team
+    // cannot lose an update.
     if (isCompleted && teamId) {
-      await this.teamsService.updateTeamScore(teamId);
+      await this.updateTeamScoreAtomic(teamId);
     }
 
     // 4b. Notify the participant's user on a fresh unlock (best-effort).
@@ -111,6 +134,36 @@ export class ProgressService {
       );
 
     return result[0];
+  }
+
+  /**
+   * Atomically recompute and update a team's total score in one statement. The
+   * sum matches TeamsRepository.calculateTeamScore exactly (only counting
+   * completed achievements from this event), but executes inside whatever
+   * transaction context the caller provided, so concurrent award updates cannot
+   * race and lose each other.
+   */
+  private async updateTeamScoreAtomic(teamId: number): Promise<void> {
+    await this.db
+      .update(boffMediaEventTeams)
+      .set({
+        totalScore: sql`(
+          SELECT COALESCE(SUM(${boffMediaAchievements.points}), 0)
+          FROM ${boffMediaParticipantProgress}
+          INNER JOIN ${boffMediaEventTeamMembers}
+            ON ${boffMediaEventTeamMembers.participantId} = ${boffMediaParticipantProgress.participantId}
+          INNER JOIN ${boffMediaEventTeams}
+            ON ${boffMediaEventTeams.id} = ${boffMediaEventTeamMembers.teamId}
+          INNER JOIN ${boffMediaAchievements}
+            ON ${boffMediaAchievements.id} = ${boffMediaParticipantProgress.achievementId}
+            AND ${boffMediaAchievements.eventId} = ${boffMediaEventTeams.eventId}
+            AND ${boffMediaAchievements.deletedAt} IS NULL
+          WHERE ${boffMediaEventTeamMembers.teamId} = ${teamId}
+            AND ${boffMediaParticipantProgress.isCompleted} = true
+        )`,
+        updatedAt: new Date(),
+      } as any)
+      .where(eq(boffMediaEventTeams.id, teamId));
   }
 
   /**

@@ -12,7 +12,6 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { uploadsPath } from '@/config/paths';
 import {
   ApiTags,
   ApiOperation,
@@ -24,12 +23,107 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { diskStorage } from 'multer';
-import { extname } from 'path';
-import { mkdir } from 'fs/promises';
+import { mkdir, open, unlink } from 'fs/promises';
 
 import { UploadFacadeService } from './upload.facade.service';
 import { UploadImageDto, UploadFileDto, DeleteFileDto } from './dto/upload.dto';
 import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
+import { CurrentUser, AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
+import {
+  ALLOWED_FILE_EXTENSIONS,
+  ALLOWED_IMAGE_EXTENSIONS,
+  extensionMatchesSniff,
+  extensionOf,
+  resolveWithinUploads,
+  safeFilename,
+  safeSubdir,
+  sniffImageExtension,
+} from './safe-path';
+
+/**
+ * Multer storage used by both upload routes.
+ *
+ * Both callbacks run as the request body streams in — before the global
+ * `ValidationPipe`, and before any service code — so this is the only layer that
+ * can stop a traversal. Previously `destination` and `filename` took
+ * `req.body.path` / `req.body.filename` verbatim, and multer writes to
+ * `join(destination, filename)`: a filename of `../../../public/evil.html` put
+ * attacker bytes outside the uploads root. The service's own `validateFilename`
+ * did reject it, but only afterwards, and throwing there left the file exactly
+ * where multer had already put it.
+ */
+function safeDiskStorage(allowed: ReadonlySet<string>) {
+  return diskStorage({
+    destination: async (req, _file, callback) => {
+      try {
+        const subdir = safeSubdir((req.body as Record<string, unknown>)?.path);
+        const uploadPath = resolveWithinUploads(subdir);
+        await mkdir(uploadPath, { recursive: true });
+        callback(null, uploadPath);
+      } catch (error: any) {
+        callback(error, '');
+      }
+    },
+    filename: (req, file, callback) => {
+      try {
+        callback(
+          null,
+          safeFilename(
+            (req.body as Record<string, unknown>)?.filename,
+            file.originalname,
+            allowed,
+          ),
+        );
+      } catch (error: any) {
+        callback(error, '');
+      }
+    },
+  });
+}
+
+function imageFileFilter(
+  _req: unknown,
+  file: { originalname: string; mimetype: string },
+  callback: (error: Error | null, acceptFile: boolean) => void,
+): void {
+  const declaredType = (file.mimetype ?? '').toLowerCase();
+  const extension = extensionOf(file.originalname ?? '');
+
+  if (
+    !declaredType.startsWith('image/') ||
+    !ALLOWED_IMAGE_EXTENSIONS.has(extension)
+  ) {
+    return callback(
+      new BadRequestException('Only image files are allowed!'),
+      false,
+    );
+  }
+  callback(null, true);
+}
+
+/**
+ * Confirms the bytes really are the image type the extension claims, and
+ * removes the file if they are not. The extension check above is on a
+ * client-supplied name; this reads the file multer just wrote, so a `.png`
+ * carrying HTML or a script is deleted before anything can serve it.
+ */
+async function assertImageContent(file: Express.Multer.File): Promise<void> {
+  const head = Buffer.alloc(16);
+  const handle = await open(file.path, 'r');
+  try {
+    await handle.read(head, 0, head.length, 0);
+  } finally {
+    await handle.close();
+  }
+
+  const sniffed = sniffImageExtension(head);
+  if (!sniffed || !extensionMatchesSniff(extensionOf(file.filename), sniffed)) {
+    await unlink(file.path).catch(() => undefined);
+    throw new BadRequestException(
+      'That file is not a valid image. Upload a JPG, PNG, GIF or WebP.',
+    );
+  }
+}
 
 @ApiTags('BoffMedia 🛠 | Upload')
 @Controller('upload')
@@ -72,48 +166,8 @@ export class UploadController {
   })
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: async (req, file, callback) => {
-          try {
-            const pathValue = Array.isArray(req.body.path)
-              ? req.body.path[0]
-              : req.body.path;
-            const uploadPath = pathValue
-              ? uploadsPath(pathValue)
-              : uploadsPath();
-
-            await mkdir(uploadPath, { recursive: true });
-            callback(null, uploadPath);
-          } catch (error: any) {
-            callback(error, '');
-          }
-        },
-        filename: (req, file, callback) => {
-          try {
-            const providedFilename = Array.isArray(req.body.filename)
-              ? req.body.filename[0]
-              : req.body.filename;
-
-            if (providedFilename) {
-              callback(null, providedFilename);
-            } else {
-              const generatedFilename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`;
-              callback(null, generatedFilename);
-            }
-          } catch (error: any) {
-            callback(error, '');
-          }
-        },
-      }),
-      fileFilter: (req, file, callback) => {
-        if (!file.originalname.match(/\.(jpg|jpeg|png|gif|webp)$/)) {
-          return callback(
-            new BadRequestException('Only image files are allowed!'),
-            false,
-          );
-        }
-        callback(null, true);
-      },
+      storage: safeDiskStorage(ALLOWED_IMAGE_EXTENSIONS),
+      fileFilter: imageFileFilter,
       limits: {
         fileSize: 5 * 1024 * 1024, // 5MB limit
       },
@@ -124,19 +178,29 @@ export class UploadController {
     @Body('path') path?: string | string[],
     @Body('filename') filename?: string | string[],
     @Body('maxSizeInMB') maxSizeInMB?: number,
+    @CurrentUser() actor?: AuthPrincipal,
   ) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
 
-    const pathString = Array.isArray(path) ? path[0] : path;
-    const filenameString = Array.isArray(filename) ? filename[0] : filename;
+    if (!actor) {
+      throw new BadRequestException('Authentication required');
+    }
 
+    await assertImageContent(file);
+
+    // multer has already validated both values and written the bytes to a
+    // location inside the uploads root. Reuse exactly what it produced instead
+    // of re-deriving from the raw body, so there is only one sanitised value in
+    // play and the service's move becomes a no-op rather than a second chance
+    // to go somewhere else.
     const result = await this.uploadFacadeService.uploadImage({
       file,
-      path: pathString,
-      filename: filenameString,
+      path: safeSubdir(path),
+      filename: file.filename,
       maxSizeInMB: maxSizeInMB || 5,
+      actor,
     });
 
     return {
@@ -160,39 +224,7 @@ export class UploadController {
   })
   @UseInterceptors(
     FileInterceptor('file', {
-      storage: diskStorage({
-        destination: async (req, file, callback) => {
-          try {
-            const pathValue = Array.isArray(req.body.path)
-              ? req.body.path[0]
-              : req.body.path;
-            const uploadPath = pathValue
-              ? uploadsPath(pathValue)
-              : uploadsPath();
-
-            await mkdir(uploadPath, { recursive: true });
-            callback(null, uploadPath);
-          } catch (error: any) {
-            callback(error, '');
-          }
-        },
-        filename: (req, file, callback) => {
-          try {
-            const providedFilename = Array.isArray(req.body.filename)
-              ? req.body.filename[0]
-              : req.body.filename;
-
-            if (providedFilename) {
-              callback(null, providedFilename);
-            } else {
-              const generatedFilename = `${Date.now()}-${Math.round(Math.random() * 1e9)}${extname(file.originalname)}`;
-              callback(null, generatedFilename);
-            }
-          } catch (error: any) {
-            callback(error, '');
-          }
-        },
-      }),
+      storage: safeDiskStorage(ALLOWED_FILE_EXTENSIONS),
       limits: {
         fileSize: 10 * 1024 * 1024, // 10MB limit for general files
       },
@@ -202,18 +234,23 @@ export class UploadController {
     @UploadedFile() file: Express.Multer.File,
     @Body('path') path?: string | string[],
     @Body('filename') filename?: string | string[],
+    @CurrentUser() actor?: AuthPrincipal,
   ) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
 
-    const pathString = Array.isArray(path) ? path[0] : path;
-    const filenameString = Array.isArray(filename) ? filename[0] : filename;
+    if (!actor) {
+      throw new BadRequestException('Authentication required');
+    }
 
+    // As in uploadImage: multer already produced sanitised values, so pass
+    // those on rather than the raw body fields.
     const result = await this.uploadFacadeService.uploadFile({
       file,
-      path: pathString,
-      filename: filenameString,
+      path: safeSubdir(path),
+      filename: file.filename,
+      actor,
     });
 
     return {
@@ -236,10 +273,18 @@ export class UploadController {
     status: HttpStatus.BAD_REQUEST,
     description: 'File not found.',
   })
-  async deleteFile(@Body() deleteFileDto: DeleteFileDto) {
+  async deleteFile(
+    @Body() deleteFileDto: DeleteFileDto,
+    @CurrentUser() actor?: AuthPrincipal,
+  ) {
+    if (!actor) {
+      throw new BadRequestException('Authentication required');
+    }
+
     const result = await this.uploadFacadeService.deleteFile(
       deleteFileDto.path || '',
       deleteFileDto.filename,
+      actor,
     );
 
     return {
@@ -260,14 +305,20 @@ export class UploadController {
   async getFileInfo(
     @Query('path') path?: string,
     @Query('filename') filename?: string,
+    @CurrentUser() actor?: AuthPrincipal,
   ) {
     if (!filename) {
       throw new BadRequestException('Filename is required');
     }
 
+    if (!actor) {
+      throw new BadRequestException('Authentication required');
+    }
+
     const result = await this.uploadFacadeService.getFileInfo(
       path || '',
       filename,
+      actor,
     );
 
     return {

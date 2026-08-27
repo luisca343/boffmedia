@@ -58,7 +58,30 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
   async create(
     transactionData: CreateTransactionData,
   ): Promise<{ success: boolean; message?: string; transactionId?: number }> {
-    const { from: fromId, to: toId, amount } = transactionData;
+    const { from: fromId, to: toId, amount, idempotencyKey } = transactionData;
+
+    // If an idempotency key is provided, check if this transaction already exists.
+    // MySQL allows NULL in UNIQUE indexes, so only non-NULL keys trigger the lookup.
+    if (idempotencyKey) {
+      const existing = await this.db
+        .select({ id: starBankTransactions.id })
+        .from(starBankTransactions)
+        .where(
+          and(
+            eq(starBankTransactions.idempotencyKey, idempotencyKey),
+            // Scoped to the paying account: a bare key match would return a
+            // different user's transaction and drop this transfer entirely.
+            eq(starBankTransactions.fromAccountId, fromId),
+          ),
+        )
+        .limit(1);
+
+      if (existing.length > 0) {
+        // Idempotent replay: return the existing transaction without creating a duplicate.
+        return { success: true, transactionId: existing[0].id };
+      }
+    }
+
     try {
       // The debit, credit and ledger insert must be one atomic unit, and the
       // balance read must hold a row lock until the write commits — otherwise
@@ -120,6 +143,7 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
             reason: transactionData.reason,
             type: transactionData.type,
             date: new Date(),
+            idempotencyKey: idempotencyKey ?? null,
           })
           .execute();
 
@@ -127,6 +151,29 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
       });
     } catch (error: any) {
       // The transaction has rolled back — no partial balance change persisted.
+      // UNIQUE constraint violation on idempotencyKey means a concurrent request won the
+      // race; just return success with no ID since the original is already persisted.
+      if (error.code === 'ER_DUP_ENTRY' && idempotencyKey) {
+        this.logger.debug(
+          `Idempotency key ${idempotencyKey} already exists — returning existing transaction`,
+        );
+        const existing = await this.db
+          .select({ id: starBankTransactions.id })
+          .from(starBankTransactions)
+          .where(
+          and(
+            eq(starBankTransactions.idempotencyKey, idempotencyKey),
+            // Scoped to the paying account: a bare key match would return a
+            // different user's transaction and drop this transfer entirely.
+            eq(starBankTransactions.fromAccountId, fromId),
+          ),
+        )
+          .limit(1);
+        if (existing.length > 0) {
+          return { success: true, transactionId: existing[0].id };
+        }
+      }
+
       this.logger.error('Failed to create transaction:', error);
       return {
         success: false,

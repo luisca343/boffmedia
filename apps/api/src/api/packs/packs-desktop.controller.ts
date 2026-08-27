@@ -21,7 +21,11 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Request } from 'express';
+import { mkdir } from 'fs/promises';
+import { diskStorage } from 'multer';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { UploadFacadeService } from '../boffmedia/util/upload/upload.facade.service';
 import {
   CreatePackDto,
@@ -31,8 +35,45 @@ import {
 import { BlobUploadEntity, PackIdEntity } from './entities/packs.entity';
 import { DesktopAdminGuard } from './guards/desktop-admin.guard';
 import type { DesktopRequest } from './guards/desktop-auth.guard';
+import {
+  resolveWithinUploads,
+  safeFilename,
+  ALLOWED_IMAGE_EXTENSIONS,
+} from '../boffmedia/util/upload/safe-path';
 import { PacksDownloadsService } from './packs-downloads.service';
 import { PacksService } from './packs.service';
+
+/**
+ * Desktop image storage for pack uploads (icons and gallery images).
+ *
+ * Matches the web upload endpoint's security policy: validated paths and
+ * filenames through the multer engine, before the request body reaches service
+ * code. The storage is shared between both transports so the allowlists,
+ * filename rules, and directory layout are one implementation.
+ */
+function desktopImageStorage() {
+  return diskStorage({
+    destination: async (_req, _file, callback) => {
+      try {
+        const uploadPath = resolveWithinUploads('packs');
+        await mkdir(uploadPath, { recursive: true });
+        callback(null, uploadPath);
+      } catch (error: any) {
+        callback(error, '');
+      }
+    },
+    filename: (_req, file, callback) => {
+      try {
+        callback(
+          null,
+          safeFilename(undefined, file.originalname, ALLOWED_IMAGE_EXTENSIONS),
+        );
+      } catch (error: any) {
+        callback(error, '');
+      }
+    },
+  });
+}
 
 /**
  * Publishing a pack from the desktop app.
@@ -71,6 +112,25 @@ export class PacksDesktopController {
    *  to it, so the audit trail does not care which client made the change. */
   private actorId(req: DesktopRequest): number | null {
     return req.desktopClient?.userId ?? null;
+  }
+
+  /**
+   * Create an AuthPrincipal from the desktop client for upload ownership tracking.
+   *
+   * The desktop endpoint is guarded by DesktopAdminGuard, so all callers are
+   * implicitly BOFF_ADMIN. We synthesize the role so ownership checks (which
+   * allow owner or admin) work correctly.
+   */
+  private desktopPrincipal(req: DesktopRequest): AuthPrincipal {
+    const client = req.desktopClient;
+    if (!client) {
+      throw new BadRequestException('Desktop client not authenticated');
+    }
+    return {
+      userId: client.userId,
+      username: client.username,
+      roles: [USER_ROLES.BOFF_ADMIN],
+    };
   }
 
   // ── Packs ────────────────────────────────────────────────────────────────
@@ -171,6 +231,7 @@ export class PacksDesktopController {
   @ApiConsumes('multipart/form-data')
   @UseInterceptors(
     FileInterceptor('file', {
+      storage: desktopImageStorage(),
       // 5 MB, matching /upload/image. A pack icon is a 512px PNG; anything near
       // this ceiling is a mistake worth refusing early.
       limits: { fileSize: 5 * 1024 * 1024 },
@@ -178,12 +239,14 @@ export class PacksDesktopController {
   )
   async uploadImage(
     @UploadedFile() file: Express.Multer.File,
+    @Req() req: DesktopRequest,
   ): Promise<{ url: string; filename: string }> {
     if (!file) throw new BadRequestException('No se recibió ninguna imagen');
     const result = await this.uploads.uploadImage({
       file,
       path: 'packs',
       maxSizeInMB: 5,
+      actor: this.desktopPrincipal(req),
     });
     return { url: result.url, filename: result.filename };
   }

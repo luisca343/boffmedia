@@ -432,6 +432,7 @@ export class EventsFacadeService {
     teamId: number,
     includePrivate = false,
     userId?: number,
+    pagination?: { limit?: number; offset?: number },
   ): Promise<TeamMember[]> {
     const team = (await this.teamsService.getTeamById(
       teamId,
@@ -441,8 +442,8 @@ export class EventsFacadeService {
     }
     await this.assertTeamEventVisible(team.eventId, includePrivate, userId);
 
-    // Get raw team members data
-    const rawMembers = await this.teamsService.getTeamMembers(teamId);
+    // Get raw team members data with pagination
+    const rawMembers = await this.teamsService.getTeamMembers(teamId, pagination);
 
     // Transform to match TeamMember entity
     return rawMembers.map((member) => ({
@@ -768,8 +769,11 @@ export class EventsFacadeService {
       }
     }
 
-    await this.eventInvitesService.consume(code);
-    try {
+    // Consume and join in the same transaction: if the join fails (e.g., a
+    // concurrent admin removal after pre-validation), the use is not burned
+    // because it rolls back with the failed join. No compensation needed.
+    await this.db.transaction(async () => {
+      await this.eventInvitesService.consume(code);
       // bypassVisibility: the invitation IS the authorisation to join a private
       // event — that is the entire point of the code. The comment is a marker,
       // never the code itself; echoing it would leak live invite codes to anyone
@@ -779,14 +783,8 @@ export class EventsFacadeService {
         { userId, comment: 'invite' },
         { bypassVisibility: true },
       );
-    } catch (error) {
-      // The consume and the join live in different repositories, so they cannot
-      // share a transaction. Compensate instead: without this a join that fails
-      // between the two (a race with an admin removal, a database blip) burns a
-      // use with nothing to show for it, and there is no admin "restore use".
-      await this.eventInvitesService.releaseUse(code);
-      throw error;
-    }
+    });
+
     return { eventId: invite.eventId };
   }
 
@@ -794,6 +792,7 @@ export class EventsFacadeService {
     eventId: number,
     includePrivate = false,
     userId?: number,
+    pagination?: { limit?: number; offset?: number },
   ): Promise<Participant[]> {
     const eventVisible = await this.eventsService.validateEventVisible(
       eventId,
@@ -805,9 +804,12 @@ export class EventsFacadeService {
       throw new NotFoundException('Event not found');
     }
 
-    // Get raw participants data
+    // Get raw participants data with pagination
     const rawParticipants =
-      await this.participantsService.getEventParticipants(eventId);
+      await this.participantsService.getEventParticipants(
+        eventId,
+        pagination,
+      );
 
     // Transform to match Participant entity. `comment` is admin-only: old rows
     // stored the literal invite code in it, so echoing it publicly leaked live
@@ -871,12 +873,16 @@ export class EventsFacadeService {
       );
     }
 
-    await this.progressService.updateProgress(
-      updateProgressDto.participantId,
-      updateProgressDto.achievementId,
-      updateProgressDto.progress,
-      updateProgressDto.teamId,
-    );
+    // Run the progress update in a transaction so the score update is atomic
+    // with the progress insert.
+    await this.progressService.transaction(async (tx) => {
+      await tx.updateProgress(
+        updateProgressDto.participantId,
+        updateProgressDto.achievementId,
+        updateProgressDto.progress,
+        updateProgressDto.teamId,
+      );
+    });
 
     return { success: true };
   }

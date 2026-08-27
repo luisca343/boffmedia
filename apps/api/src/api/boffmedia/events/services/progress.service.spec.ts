@@ -1,7 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ProgressService } from './progress.service';
 import { AchievementsService } from './achievements.service';
-import { TeamsService } from './teams.service';
 import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 
@@ -9,6 +8,21 @@ jest.mock('@/_db/schema/BoffMediaEvents', () => ({
   boffMediaParticipantProgress: {
     participantId: 'participantId',
     achievementId: 'achievementId',
+    isCompleted: 'isCompleted',
+  },
+  boffMediaEventTeams: {
+    id: 'id',
+    eventId: 'eventId',
+  },
+  boffMediaEventTeamMembers: {
+    teamId: 'teamId',
+    participantId: 'participantId',
+  },
+  boffMediaAchievements: {
+    id: 'id',
+    eventId: 'eventId',
+    points: 'points',
+    deletedAt: 'deletedAt',
   },
   validateParticipantCanReceiveAchievement: jest.fn(),
 }));
@@ -23,18 +37,20 @@ const mockOnDuplicateKeyUpdate = jest.fn();
 const mockValues = jest
   .fn()
   .mockReturnValue({ onDuplicateKeyUpdate: mockOnDuplicateKeyUpdate });
+const mockUpdateWhere = jest.fn().mockResolvedValue(undefined);
+const mockUpdateSet = jest.fn().mockReturnValue({ where: mockUpdateWhere });
+const mockUpdate = jest.fn().mockReturnValue({ set: mockUpdateSet });
+const mockTransaction = jest.fn();
 
 const mockDb = {
   select: jest.fn().mockReturnValue({ from: mockFrom }),
   insert: jest.fn().mockReturnValue({ values: mockValues }),
+  update: mockUpdate,
+  transaction: mockTransaction,
 };
 
 const mockAchievementsService = {
   getAchievementById: jest.fn(),
-};
-
-const mockTeamsService = {
-  updateTeamScore: jest.fn(),
 };
 
 const mockProgress = {
@@ -75,7 +91,6 @@ describe('ProgressService', () => {
         ProgressService,
         { provide: DRIZZLE, useValue: mockDb },
         { provide: AchievementsService, useValue: mockAchievementsService },
-        { provide: TeamsService, useValue: mockTeamsService },
         { provide: NotificationsService, useValue: { create: jest.fn() } },
       ],
     }).compile();
@@ -132,24 +147,32 @@ describe('ProgressService', () => {
       );
     });
 
-    it('updates team score when achievement is completed and teamId is provided', async () => {
+    it('updates team score atomically when achievement is completed and teamId is provided', async () => {
       mockWhere.mockResolvedValue([{ ...mockProgress, isCompleted: true }]);
 
       await service.updateProgress(1, 2, 5, 99);
 
-      expect(mockTeamsService.updateTeamScore).toHaveBeenCalledWith(99);
+      // Team score update should have been called
+      expect(mockDb.update).toHaveBeenCalled();
+      expect(mockUpdateSet).toHaveBeenCalled();
     });
 
     it('does not update team score when not completed', async () => {
+      mockWhere.mockResolvedValue([mockProgress]);
+
       await service.updateProgress(1, 2, 2, 99);
 
-      expect(mockTeamsService.updateTeamScore).not.toHaveBeenCalled();
+      // Team score update should not have been called
+      expect(mockDb.update).not.toHaveBeenCalled();
     });
 
     it('does not update team score when completed but no teamId', async () => {
+      mockWhere.mockResolvedValue([{ ...mockProgress, isCompleted: true }]);
+
       await service.updateProgress(1, 2, 5);
 
-      expect(mockTeamsService.updateTeamScore).not.toHaveBeenCalled();
+      // Team score update should not have been called
+      expect(mockDb.update).not.toHaveBeenCalled();
     });
 
     it('throws when participant is not eligible for achievement', async () => {

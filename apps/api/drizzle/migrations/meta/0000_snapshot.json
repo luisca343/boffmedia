@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "6acf65bd-595b-47ed-b0f7-eb6fb0807c55",
+  "id": "7fc31abb-ba33-4446-98f2-af642bab76e6",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "boffmedia_roles": {
@@ -151,7 +151,7 @@
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
-          "default": "'https://cdn.boffmedia.es/default-profile.png'"
+          "default": "'/boffmedia/img/profile.png'"
         },
         "cover_image": {
           "name": "cover_image",
@@ -212,6 +212,14 @@
         },
         "desktop_token_version": {
           "name": "desktop_token_version",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "session_version": {
+          "name": "session_version",
           "type": "int",
           "primaryKey": false,
           "notNull": true,
@@ -657,6 +665,90 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
+    "boffmedia_audit": {
+      "name": "boffmedia_audit",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "subject_type": {
+          "name": "subject_type",
+          "type": "enum('event','tournament','participant','match')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subject_id": {
+          "name": "subject_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "action": {
+          "name": "action",
+          "type": "varchar(48)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "actor_user_id": {
+          "name": "actor_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "meta": {
+          "name": "meta",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "at": {
+          "name": "at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP()"
+        }
+      },
+      "indexes": {
+        "ba_subject_idx": {
+          "name": "ba_subject_idx",
+          "columns": [
+            "subject_type",
+            "subject_id",
+            "at"
+          ],
+          "isUnique": false
+        },
+        "ba_actor_idx": {
+          "name": "ba_actor_idx",
+          "columns": [
+            "actor_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "boffmedia_audit_id": {
+          "name": "boffmedia_audit_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "boffmedia_event_invites": {
       "name": "boffmedia_event_invites",
       "columns": {
@@ -1047,6 +1139,13 @@
           "notNull": true,
           "autoincrement": false
         },
+        "event_id": {
+          "name": "event_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "role": {
           "name": "role",
           "type": "enum('leader','member')",
@@ -1109,6 +1208,19 @@
           ],
           "onDelete": "cascade",
           "onUpdate": "cascade"
+        },
+        "etm_event_fk": {
+          "name": "etm_event_fk",
+          "tableFrom": "boffmedia_event_team_members",
+          "tableTo": "boffmedia_events",
+          "columnsFrom": [
+            "event_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
         }
       },
       "compositePrimaryKeys": {
@@ -1120,7 +1232,15 @@
           ]
         }
       },
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "etm_event_participant_uq": {
+          "name": "etm_event_participant_uq",
+          "columns": [
+            "event_id",
+            "participant_id"
+          ]
+        }
+      },
       "checkConstraint": {}
     },
     "boffmedia_event_teams": {
@@ -2263,6 +2383,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "dedupe_key": {
+          "name": "dedupe_key",
+          "type": "varchar(120)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -2287,6 +2414,13 @@
             "read_at"
           ],
           "isUnique": false
+        },
+        "notif_dedupe_uq": {
+          "name": "notif_dedupe_uq",
+          "columns": [
+            "dedupe_key"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -2307,6 +2441,143 @@
       "compositePrimaryKeys": {
         "boffmedia_notifications_id": {
           "name": "boffmedia_notifications_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "boffmedia_outbox": {
+      "name": "boffmedia_outbox",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "topic": {
+          "name": "topic",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "payload": {
+          "name": "payload",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "dedupe_key": {
+          "name": "dedupe_key",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "attempt_count": {
+          "name": "attempt_count",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "next_attempt_at": {
+          "name": "next_attempt_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('pending','processing','delivered','failed')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "claimed_by": {
+          "name": "claimed_by",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_error": {
+          "name": "last_error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        },
+        "delivered_at": {
+          "name": "delivered_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "outbox_topic_idx": {
+          "name": "outbox_topic_idx",
+          "columns": [
+            "topic"
+          ],
+          "isUnique": false
+        },
+        "outbox_status_idx": {
+          "name": "outbox_status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        },
+        "outbox_next_attempt_idx": {
+          "name": "outbox_next_attempt_idx",
+          "columns": [
+            "next_attempt_at",
+            "status"
+          ],
+          "isUnique": false
+        },
+        "outbox_dedupe_uq": {
+          "name": "outbox_dedupe_uq",
+          "columns": [
+            "dedupe_key"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "boffmedia_outbox_id": {
+          "name": "boffmedia_outbox_id",
           "columns": [
             "id"
           ]
@@ -2719,6 +2990,14 @@
           "notNull": false,
           "autoincrement": false
         },
+        "version": {
+          "name": "version",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -2765,6 +3044,14 @@
           "name": "tm_next_idx",
           "columns": [
             "next_match_id"
+          ],
+          "isUnique": false
+        },
+        "tm_proposal_idx": {
+          "name": "tm_proposal_idx",
+          "columns": [
+            "tournament_id",
+            "proposal_state"
           ],
           "isUnique": false
         }
@@ -2819,7 +3106,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "tm_bot_fk": {
@@ -2832,7 +3119,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "tm_win_fk": {
@@ -2845,7 +3132,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "tm_prop_fk": {
@@ -2858,7 +3145,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "set null",
+          "onDelete": "restrict",
           "onUpdate": "cascade"
         },
         "tm_next_fk": {
@@ -3018,7 +3305,7 @@
         },
         "status": {
           "name": "status",
-          "type": "enum('active','eliminated','withdrew','disqualified')",
+          "type": "enum('active','eliminated','withdrew','disqualified','dropped')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false,
@@ -3186,6 +3473,14 @@
           "columns": [
             "phase_id",
             "participant_id"
+          ],
+          "isUnique": true
+        },
+        "tpe_phase_seed_uq": {
+          "name": "tpe_phase_seed_uq",
+          "columns": [
+            "phase_id",
+            "seed"
           ],
           "isUnique": true
         }
@@ -3382,13 +3677,13 @@
         }
       },
       "indexes": {
-        "tph_tournament_idx": {
-          "name": "tph_tournament_idx",
+        "tph_tournament_order_uq": {
+          "name": "tph_tournament_order_uq",
           "columns": [
             "tournament_id",
             "phase_order"
           ],
-          "isUnique": false
+          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -3660,6 +3955,28 @@
           "autoincrement": false,
           "default": false
         },
+        "teamsheet_required": {
+          "name": "teamsheet_required",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "entry_deadline": {
+          "name": "entry_deadline",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "teamsheet_locked_at": {
+          "name": "teamsheet_locked_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "banner": {
           "name": "banner",
           "type": "varchar(255)",
@@ -3801,6 +4118,111 @@
           ]
         }
       },
+      "checkConstraint": {}
+    },
+    "boffmedia_uploads": {
+      "name": "boffmedia_uploads",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "owner_user_id": {
+          "name": "owner_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "subdir": {
+          "name": "subdir",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "''"
+        },
+        "filename": {
+          "name": "filename",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "mimetype": {
+          "name": "mimetype",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "size": {
+          "name": "size",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "bu_owner_idx": {
+          "name": "bu_owner_idx",
+          "columns": [
+            "owner_user_id"
+          ],
+          "isUnique": false
+        },
+        "bu_location_uq": {
+          "name": "bu_location_uq",
+          "columns": [
+            "subdir",
+            "filename"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "boffmedia_uploads_owner_user_id_boffmedia_users_id_fk": {
+          "name": "boffmedia_uploads_owner_user_id_boffmedia_users_id_fk",
+          "tableFrom": "boffmedia_uploads",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "owner_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_uploads_id": {
+          "name": "boffmedia_uploads_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
       "checkConstraint": {}
     },
     "desktop_device_codes": {
@@ -4717,6 +5139,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "optional_groups": {
+          "name": "optional_groups",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "published": {
           "name": "published",
           "type": "boolean",
@@ -5584,11 +6013,18 @@
           "notNull": true,
           "autoincrement": false
         },
+        "token_id": {
+          "name": "token_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "key": {
           "name": "key",
           "type": "char(32)",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
         },
         "created_at": {
@@ -5601,10 +6037,122 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "boffmedia_sharex_images_token_id_boffmedia_sharex_tokens_id_fk": {
+          "name": "boffmedia_sharex_images_token_id_boffmedia_sharex_tokens_id_fk",
+          "tableFrom": "boffmedia_sharex_images",
+          "tableTo": "boffmedia_sharex_tokens",
+          "columnsFrom": [
+            "token_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
       "compositePrimaryKeys": {
         "boffmedia_sharex_images_id": {
           "name": "boffmedia_sharex_images_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "boffmedia_sharex_tokens": {
+      "name": "boffmedia_sharex_tokens",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "label": {
+          "name": "label",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "token_hash": {
+          "name": "token_hash",
+          "type": "char(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "used_at": {
+          "name": "used_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "sxt_token_hash_uq": {
+          "name": "sxt_token_hash_uq",
+          "columns": [
+            "token_hash"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "boffmedia_sharex_tokens_created_by_boffmedia_users_id_fk": {
+          "name": "boffmedia_sharex_tokens_created_by_boffmedia_users_id_fk",
+          "tableFrom": "boffmedia_sharex_tokens",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_sharex_tokens_id": {
+          "name": "boffmedia_sharex_tokens_id",
           "columns": [
             "id"
           ]
@@ -6738,7 +7286,16 @@
           "default": "(now())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "rcm_chat_id_idx": {
+          "name": "rcm_chat_id_idx",
+          "columns": [
+            "chat_id",
+            "id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "rotom_chat_messages_chat_id_rotom_chats_id_fk": {
           "name": "rotom_chat_messages_chat_id_rotom_chats_id_fk",
@@ -11798,6 +12355,13 @@
           "notNull": true,
           "autoincrement": false,
           "default": "CURRENT_TIMESTAMP()"
+        },
+        "idempotency_key": {
+          "name": "idempotency_key",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -11823,6 +12387,14 @@
             "date"
           ],
           "isUnique": false
+        },
+        "sb_tx_idempotency_uq": {
+          "name": "sb_tx_idempotency_uq",
+          "columns": [
+            "from_account_id",
+            "idempotency_key"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -12956,6 +13528,13 @@
           "autoincrement": false,
           "onUpdate": true,
           "default": "(now())"
+        },
+        "idempotency_key": {
+          "name": "idempotency_key",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -12965,6 +13544,14 @@
             "buyer_uuid"
           ],
           "isUnique": false
+        },
+        "wp_orders_idempotency_uq": {
+          "name": "wp_orders_idempotency_uq",
+          "columns": [
+            "buyer_uuid",
+            "idempotency_key"
+          ],
+          "isUnique": true
         }
       },
       "foreignKeys": {
@@ -14763,7 +15350,15 @@
           "default": "(now())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vgc_matches_user_idx": {
+          "name": "vgc_matches_user_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "tools_vgc_matches_session_id_tools_vgc_sessions_id_fk": {
           "name": "tools_vgc_matches_session_id_tools_vgc_sessions_id_fk",
@@ -14909,7 +15504,15 @@
           "default": "(now())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vgc_series_user_idx": {
+          "name": "vgc_series_user_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "tools_vgc_series_session_id_tools_vgc_sessions_id_fk": {
           "name": "tools_vgc_series_session_id_tools_vgc_sessions_id_fk",
@@ -15064,7 +15667,15 @@
           "default": "(now())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vgc_sessions_user_idx": {
+          "name": "vgc_sessions_user_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "tools_vgc_sessions_user_id_boffmedia_users_id_fk": {
           "name": "tools_vgc_sessions_user_id_boffmedia_users_id_fk",
@@ -15170,7 +15781,15 @@
           "default": "(now())"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "vgc_presets_user_idx": {
+          "name": "vgc_presets_user_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        }
+      },
       "foreignKeys": {
         "tools_vgc_team_presets_user_id_boffmedia_users_id_fk": {
           "name": "tools_vgc_team_presets_user_id_boffmedia_users_id_fk",

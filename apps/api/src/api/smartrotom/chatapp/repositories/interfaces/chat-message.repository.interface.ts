@@ -2,7 +2,11 @@ import { ChatMessage } from '../chatapp.repository';
 
 export interface IMessageRepository {
   findChatMessages(chatId: number, limit?: number): Promise<ChatMessage[]>;
-  findChatMessagesAscending(chatId: number): Promise<ChatMessage[]>;
+  findChatMessagesAscending(
+    chatId: number,
+    limit?: number,
+    before?: number,
+  ): Promise<ChatMessage[]>;
   createMessage(messageData: {
     chatId: number;
     content: string;

@@ -9,6 +9,7 @@
     "CHAT_MESSAGE_NOT_EDITABLE": "You can't edit this message.",
     "CHAT_MESSAGE_NOT_DELETABLE": "You can't delete this message.",
     "CHAT_GROUP_NO_ACCESS": "You don't have access to this group.",
+    "CHAT_MEMBERSHIP_FIXED": "This chat’s member list cannot be changed.",
     "BANK_ACCOUNT_NOT_OWNED": "You can't transfer from an account that isn't yours.",
     "BANK_AMOUNT_NOT_POSITIVE": "The amount must be greater than zero.",
     "BANK_SAME_ACCOUNT": "You can't transfer to the same account.",
@@ -31,7 +32,14 @@
     "EVENT_REOPEN_BLOCKED_BY_RANDOMIZER": "Cannot reopen: this event has a randomizer that is no longer a draft. Close or delete it first.",
     "TOURNAMENT_PARTICIPANT_IN_BRACKET": "That entrant is already in the bracket. Set their status to withdrew or disqualified instead of deleting them.",
     "MATCH_SETTLED_CONCURRENTLY": "The match was settled while you were submitting. Reload it before correcting the result.",
+    "MATCH_AMENDMENT_CONFLICT": "The match was corrected by another admin. Reload it before correcting again.",
     "TOURNAMENT_TEAMSHEET_REQUIRED": "Submit your teamsheet before checking in.",
-    "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": "This tournament belongs to an event — join the event before registering."
+    "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": "This tournament belongs to an event — join the event before registering.",
+    "TOURNAMENT_PROPOSAL_ALREADY_EXISTS": "There's already a proposed result for this match.",
+    "TOURNAMENT_PROPOSAL_AUTO_VERIFIED": "The proposal was auto-verified — ask a judge to correct it.",
+    "TOURNAMENT_PROPOSAL_INVALIDATED": "The proposal is no longer valid due to a match amendment.",
+    "TOURNAMENT_PROPOSAL_SETTLED_CONCURRENTLY": "The proposal was settled while you were disputing it.",
+    "EVENT_DELETE_BLOCKED_BY_TOURNAMENT": "Cannot delete this event — it has an attached tournament. Delete or detach the tournament first.",
+    "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": "That tournament belongs to an event that is already completed, so it cannot be reopened."
   }
 }

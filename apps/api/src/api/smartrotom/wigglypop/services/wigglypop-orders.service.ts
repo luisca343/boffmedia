@@ -20,6 +20,7 @@ import {
   computeFee,
 } from './wigglypop-custody.service';
 import { WigglypopNotifyService } from './wigglypop-notify.service';
+import { OutboxRepository } from '@api/outbox/repositories/outbox.repository';
 import { generateWpCode } from '../_shared/code.util';
 import { CreateOrderDto, isItemsKind } from '../dto/wigglypop.dto';
 import {
@@ -38,6 +39,7 @@ export class WigglypopOrdersService {
     private readonly listingsService: WigglypopListingsService,
     private readonly custody: WigglypopCustodyService,
     private readonly notify: WigglypopNotifyService,
+    private readonly outbox: OutboxRepository,
   ) {}
 
   // ─── Entity mapping ─────────────────────────────────────────────────────────
@@ -101,10 +103,13 @@ export class WigglypopOrdersService {
    * A public POST /orders can never set it, because it is not on CreateOrderDto — an auction is
    * otherwise unbuyable at its asking price, which is what stops a bidder from simply paying the
    * starting bid and skipping the auction entirely.
+   *
+   * If an idempotency key is provided, the order is idempotent: a retry with the same key
+   * returns the original order without creating a duplicate.
    */
   async create(
     dto: CreateOrderDto,
-    opts: { closingAuction?: boolean } = {},
+    opts: { closingAuction?: boolean; idempotencyKey?: string } = {},
   ): Promise<WigglypopOrderEntity> {
     const listingIds = dto.lines.map((l) => l.listingId);
     if (new Set(listingIds).size !== listingIds.length) {
@@ -143,6 +148,7 @@ export class WigglypopOrdersService {
         fee,
         total: subtotal + fee,
         status: 'escrow',
+        idempotencyKey: opts.idempotencyKey,
       },
       lines,
       // Off the shelf while the order is in flight, in the SAME transaction as
@@ -151,6 +157,18 @@ export class WigglypopOrdersService {
       lines.map((l) => l.listingId),
     );
 
+    // Settlement stays SYNCHRONOUS and deliberately so.
+    //
+    // `settleNewOrder` is what actually charges the buyer into escrow. Moving it
+    // to the outbox made `create` return an order with no `escrowTxId` and skip
+    // `notifySale`, so the buyer walked away with a confirmed order they had not
+    // paid for and money moved up to a dispatcher tick later — or never, if the
+    // enqueue itself failed after the order had committed.
+    //
+    // The outbox earns its keep on the genuinely remote, retryable half: the
+    // game-server take/give calls behind WIGGLYPOP_ATOMIC_CUSTODY (currently
+    // off). Its `wigglypop:settle-order` handler stays registered for that, and
+    // must not be wired here without also making the buyer's charge part of it.
     const settled = await this.custody.settleNewOrder(order);
     await this.notifySale(settled, byId);
 
@@ -161,6 +179,11 @@ export class WigglypopOrdersService {
    * Turns a listing into a priced order line, refusing everything that must not be bought this
    * way. An auction is NOT purchasable at its asking price — that would sidestep the bidding —
    * unless the seller set an explicit buy-now.
+   *
+   * The status check here is a cheap fast-fail; the REAL guard against overselling is in
+   * the ordersRepository.create() transaction, which atomically claims each listing with a
+   * conditional UPDATE `WHERE status = 'activo'`. Never delete this check to "avoid duplication" —
+   * it catches races early.
    */
   private priceLine(
     listing: ListingWithContents,

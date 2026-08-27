@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ScheduleModule } from '@nestjs/schedule';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
+import { OutboxModule } from '@api/outbox/outbox.module';
 import {
   STARBANK_ACCOUNT_REPOSITORY_TOKEN,
   STARBANK_TRANSACTION_REPOSITORY_TOKEN,
@@ -32,6 +33,7 @@ import { WigglypopController } from './wigglypop.controller';
   imports: [
     DrizzleModule,
     LoggerModule,
+    OutboxModule,
     // WingullModule gives the PC reads that prove a seller owns what they list, and the
     // give/take bridge the atomic custody path uses.
     WingullModule,

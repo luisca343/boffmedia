@@ -4,6 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Logger } from 'nestjs-pino';
 import { AuthService } from './auth.service';
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
+import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 
 jest.mock('@/config/env', () => ({
   env: {
@@ -46,6 +47,9 @@ describe('AuthService', () => {
       | 'linkMinecraftAccount'
     >
   >;
+  let usersRepository: jest.Mocked<
+    Pick<BoffMediaUsersRepository, 'getSessionVersion'>
+  >;
   let jwtService: jest.Mocked<Pick<JwtService, 'sign' | 'verify'>>;
 
   beforeEach(async () => {
@@ -58,6 +62,10 @@ describe('AuthService', () => {
       createFromGoogle: jest.fn(),
       createMinecraftUser: jest.fn(),
       linkMinecraftAccount: jest.fn(),
+    };
+
+    const mockUsersRepository = {
+      getSessionVersion: jest.fn().mockResolvedValue(0),
     };
 
     const mockJwtService = {
@@ -73,12 +81,14 @@ describe('AuthService', () => {
           useValue: { log: jest.fn(), error: jest.fn(), warn: jest.fn() },
         },
         { provide: BoffMediaUsersFacadeService, useValue: mockUsersService },
+        { provide: BoffMediaUsersRepository, useValue: mockUsersRepository },
         { provide: JwtService, useValue: mockJwtService },
       ],
     }).compile();
 
     service = module.get<AuthService>(AuthService);
     usersService = module.get(BoffMediaUsersFacadeService);
+    usersRepository = module.get(BoffMediaUsersRepository);
     jwtService = module.get(JwtService);
   });
 
@@ -141,6 +151,37 @@ describe('AuthService', () => {
       expect(access).toMatchObject({ typ: 'ingame' });
       expect(refresh).toMatchObject({ typ: 'refresh', scope: 'ingame' });
     });
+
+    it('includes the session version (sv) claim in website session tokens', async () => {
+      usersRepository.getSessionVersion.mockResolvedValue(2);
+
+      await service.login(fullUser);
+
+      const [access] = jwtService.sign.mock.calls[0];
+      const [refresh] = jwtService.sign.mock.calls[1];
+      expect(access).toMatchObject({ sv: 2 });
+      expect(refresh).toMatchObject({ sv: 2 });
+    });
+
+    it('omits the session version claim from in-game session tokens', async () => {
+      usersRepository.getSessionVersion.mockResolvedValue(2);
+
+      await service.login(fullUser, 'ingame');
+
+      const [access] = jwtService.sign.mock.calls[0];
+      const [refresh] = jwtService.sign.mock.calls[1];
+      expect(access).not.toHaveProperty('sv');
+      expect(refresh).not.toHaveProperty('sv');
+    });
+
+    it('defaults session version to 0 when repository returns null', async () => {
+      usersRepository.getSessionVersion.mockResolvedValue(null);
+
+      await service.login(fullUser);
+
+      const [access] = jwtService.sign.mock.calls[0];
+      expect(access).toMatchObject({ sv: 0 });
+    });
   });
 
   describe('refreshToken()', () => {
@@ -198,6 +239,41 @@ describe('AuthService', () => {
       await expect(service.refreshToken('an-access-token')).rejects.toThrow(
         UnauthorizedException,
       );
+    });
+
+    it('includes the session version (sv) claim in refreshed website session tokens', async () => {
+      jwtService.verify.mockReturnValue({ sub: 1, username: 'TrainerAsh', typ: 'refresh' });
+      usersService.getUserWithIntegrations.mockResolvedValue(
+        mockUserWithIntegrations as any,
+      );
+      usersRepository.getSessionVersion.mockResolvedValue(3);
+
+      await service.refreshToken('valid-refresh-token');
+
+      const [access] = jwtService.sign.mock.calls[0];
+      const [refresh] = jwtService.sign.mock.calls[1];
+      expect(access).toMatchObject({ sv: 3 });
+      expect(refresh).toMatchObject({ sv: 3 });
+    });
+
+    it('omits the session version claim from refreshed in-game session tokens', async () => {
+      jwtService.verify.mockReturnValue({
+        sub: 1,
+        username: 'TrainerAsh',
+        typ: 'refresh',
+        scope: 'ingame',
+      });
+      usersService.getUserWithIntegrations.mockResolvedValue(
+        mockUserWithIntegrations as any,
+      );
+      usersRepository.getSessionVersion.mockResolvedValue(3);
+
+      await service.refreshToken('valid-ingame-refresh-token');
+
+      const [access] = jwtService.sign.mock.calls[0];
+      const [refresh] = jwtService.sign.mock.calls[1];
+      expect(access).not.toHaveProperty('sv');
+      expect(refresh).not.toHaveProperty('sv');
     });
 
     it('should keep an ingame session narrowed across a refresh', async () => {

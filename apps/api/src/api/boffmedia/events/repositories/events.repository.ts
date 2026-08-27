@@ -97,15 +97,30 @@ export class EventsRepository {
       }
     }
 
+    // Subquery: count participants per event (those with active membership)
+    const participantCountSubquery = this.db
+      .select({
+        eventId: boffMediaEventParticipants.eventId,
+        count: sql<number>`COUNT(*)`,
+      })
+      .from(boffMediaEventParticipants)
+      .groupBy(boffMediaEventParticipants.eventId)
+      .as('participant_count');
+
     const query = this.db
       .select({
         ...this.eventSelect,
         gameName: boffMediaGames.title,
         parentEventName: parentEvent.title,
+        participantCount: participantCountSubquery.count,
       })
       .from(boffMediaEvents)
       .leftJoin(boffMediaGames, eq(boffMediaGames.id, boffMediaEvents.gameId))
       .leftJoin(parentEvent, eq(parentEvent.id, boffMediaEvents.parentId))
+      .leftJoin(
+        participantCountSubquery,
+        eq(participantCountSubquery.eventId, boffMediaEvents.id),
+      )
       .where(and(...conditions))
       // Deterministic order so pagination is stable (matches prior PK order).
       .orderBy(boffMediaEvents.id)
@@ -206,6 +221,24 @@ export class EventsRepository {
           : null,
       tournament: tournaments[0] ?? null,
     };
+  }
+
+  /**
+   * Check if any non-soft-deleted tournaments are attached to this event.
+   * The lifecycle rule is: an event cannot be deleted while tournaments depend on it.
+   */
+  async hasAttachedTournaments(eventId: number): Promise<boolean> {
+    const [row] = await this.db
+      .select({ count: sql<number>`1` })
+      .from(boffMediaTournaments)
+      .where(
+        and(
+          eq(boffMediaTournaments.eventId, eventId),
+          isNull(boffMediaTournaments.deletedAt),
+        ),
+      )
+      .limit(1);
+    return !!row;
   }
 
   /** Correlated EXISTS: the user holds an active membership in the outer event. */

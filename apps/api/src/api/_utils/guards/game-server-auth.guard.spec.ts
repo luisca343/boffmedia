@@ -2,12 +2,8 @@ import { UnauthorizedException } from '@nestjs/common';
 
 const mockEnv: {
   TERAS_API_TOKEN?: string;
-  ENFORCE_MONEY_AUTH: boolean;
-  MC_WORLD: string;
 } = {
   TERAS_API_TOKEN: 'server-token',
-  ENFORCE_MONEY_AUTH: false,
-  MC_WORLD: 'world-uuid',
 };
 
 jest.mock('@/config/env', () => ({
@@ -33,7 +29,6 @@ describe('GameServerAuthGuard', () => {
 
   beforeEach(() => {
     mockEnv.TERAS_API_TOKEN = 'server-token';
-    mockEnv.ENFORCE_MONEY_AUTH = false;
     guard = new GameServerAuthGuard();
   });
 
@@ -46,9 +41,10 @@ describe('GameServerAuthGuard', () => {
     expect(req.serverAuthed).toBe(true);
   });
 
-  it('REJECTS the MC_WORLD tripwire even while ENFORCE_MONEY_AUTH is off', () => {
-    // The whole reason this guard exists. MC_WORLD ships in the browser bundle;
-    // honouring it here would let any stranger spend another player's rewards.
+  it('REJECTS the MC_WORLD tripwire (never supported by this guard)', () => {
+    // The whole reason this guard exists: it never accepts the tripwire. MC_WORLD
+    // ships in the browser bundle; honouring it here would let any stranger
+    // spend another player's rewards.
     const req: any = { headers: {}, body: { server: 'world-uuid' } };
     expect(() => guard.canActivate(ctxFor(req))).toThrow(UnauthorizedException);
     expect(req.serverAuthed).toBeUndefined();

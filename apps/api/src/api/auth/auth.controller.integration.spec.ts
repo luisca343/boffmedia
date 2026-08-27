@@ -11,6 +11,7 @@ import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
+import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 
 const mockLogger = {
   log: jest.fn(),
@@ -37,6 +38,11 @@ const mockEmailVerificationService = {
   verify: jest.fn(),
 };
 
+const mockUsersRepository = {
+  bumpSessionVersion: jest.fn().mockResolvedValue(undefined),
+  getSessionVersion: jest.fn().mockResolvedValue(0),
+};
+
 describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
 
@@ -54,6 +60,13 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
           useValue: mockEmailVerificationService,
         },
         { provide: Logger, useValue: mockLogger },
+        // Injected for /auth/signout-everywhere, which bumps the caller's
+        // session version. Stubbed here: this suite covers validation and the
+        // exception filter, not revocation behaviour.
+        {
+          provide: BoffMediaUsersRepository,
+          useValue: mockUsersRepository,
+        },
         ResponseInterceptor,
         Reflector,
       ],

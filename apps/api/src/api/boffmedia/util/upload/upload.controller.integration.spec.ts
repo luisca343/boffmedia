@@ -90,7 +90,11 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
         .send({ filename: 'test.jpg', path: 'avatars' });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.deleteFile).toHaveBeenCalledWith('avatars', 'test.jpg');
+      expect(mockFacade.deleteFile).toHaveBeenCalledWith(
+        'avatars',
+        'test.jpg',
+        expect.objectContaining({ userId: 1, username: 'tester' }),
+      );
     });
 
     it('returns 200 when path is omitted (defaults to empty string)', async () => {
@@ -104,7 +108,11 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
         .send({ filename: 'test.jpg' });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.deleteFile).toHaveBeenCalledWith('', 'test.jpg');
+      expect(mockFacade.deleteFile).toHaveBeenCalledWith(
+        '',
+        'test.jpg',
+        expect.objectContaining({ userId: 1, username: 'tester' }),
+      );
     });
   });
 
@@ -127,6 +135,7 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
       expect(mockFacade.getFileInfo).toHaveBeenCalledWith(
         'avatars',
         'test.jpg',
+        expect.objectContaining({ userId: 1, username: 'tester' }),
       );
     });
 
@@ -149,7 +158,11 @@ describe('UploadController — integration (ValidationPipe + GlobalExceptionFilt
         .query({ filename: 'test.jpg' });
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getFileInfo).toHaveBeenCalledWith('', 'test.jpg');
+      expect(mockFacade.getFileInfo).toHaveBeenCalledWith(
+        '',
+        'test.jpg',
+        expect.objectContaining({ userId: 1, username: 'tester' }),
+      );
     });
   });
 

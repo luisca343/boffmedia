@@ -55,18 +55,6 @@ export const env = z
     // without it; when unset, server auth is unavailable and the mod is locked out
     // (JWT still works). NOT a JWT — see GameOrUserAuthGuard.
     TERAS_API_TOKEN: z.string().optional(),
-    // Closes the legacy `body.server === MC_WORLD` tripwire. Read by BOTH
-    // GameServerTransitionalAuthGuard and GameOrUserAuthGuard — grep the flag,
-    // not either guard.
-    //
-    // Mod and web are both ready: the mod already sends its Bearer on all four
-    // flag-sensitive routes, and wigglypopService moved to the authed helpers.
-    // Still requires `TerasConfig.apiToken` on the game server to equal
-    // TERAS_API_TOKEN here — both default to empty and fail silently/closed.
-    ENFORCE_MONEY_AUTH: z
-      .enum(['true', 'false'])
-      .default('true')
-      .transform((v) => v === 'true'),
     // Wigglypop marketplace. OFF until the game server ships /takepokemon + /takeitems.
     // While it is off, a sale only moves money (buyer → escrow → seller) and the two players
     // hand the Pokémon over in-game themselves; the API never calls givePokemon, because
@@ -140,6 +128,24 @@ export const env = z
     RANDOMIZER_SHIM_JAR: z.string().optional(),
     RANDOMIZER_SHIM_MAX_CONCURRENCY: z.coerce.number().default(2),
     RANDOMIZER_SHIM_TIMEOUT_MS: z.coerce.number().default(30000),
+
+    // Pokémon Showdown log scraper
+    // Google Sheets API key file path (relative to cwd or absolute).
+    POKEMON_LOG_SERVICE_KEY_FILE: z.string().optional(),
+    // The Pokémon Showdown username to identify as the local player in battle logs.
+    POKEMON_LOG_LOCAL_PLAYER: z.string().optional(),
+
+    // Data retention windows: daily sweep removes old rows beyond their retention
+    // period. Set any to 0 to disable that sweep. All times are parsed as positive
+    // integers; durations are in days for notifications/invites, months for audits.
+    // Deletes are bounded by LIMIT and loop until fewer rows match; a first run
+    // against a large table will not lock it for minutes or blow the binlog.
+    RETENTION_NOTIFICATIONS_DAYS: z.coerce.number().default(90), // read only
+    RETENTION_AUDIT_MONTHS: z.coerce.number().default(12), // boffmedia + pack + randomizer
+    RETENTION_GOBIERNO_AUDIT_MONTHS: z.coerce.number().default(12), // rotom_gobierno_auditoria
+    RETENTION_EVENT_INVITES_GRACE_DAYS: z.coerce.number().default(30), // expired + grace
+    RETENTION_NOTE_VERSIONS_KEEP: z.coerce.number().default(20), // most recent N per note
+    RETENTION_OUTBOX_DAYS: z.coerce.number().default(30), // DELIVERED rows only; failed ones are kept
   })
   .superRefine((cfg, ctx) => {
     // In production a missing/localhost WEB_URL would silently ship localhost

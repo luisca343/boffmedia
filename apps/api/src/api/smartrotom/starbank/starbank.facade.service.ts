@@ -89,6 +89,7 @@ export class StarbankFacadeService {
     amount: number,
     concept: string,
     actor?: ActorContext,
+    idempotencyKey?: string,
   ): Promise<void> {
     const transferDto: CreateTransferDto = {
       from,
@@ -97,7 +98,7 @@ export class StarbankFacadeService {
       concept,
     };
 
-    await this.transactionService.transfer(transferDto, actor);
+    await this.transactionService.transfer(transferDto, actor, idempotencyKey);
 
     // Update balance in game after successful transfer (non-blocking)
     try {

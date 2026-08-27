@@ -18,12 +18,15 @@ export const ApiErrorCode = {
   BANK_TRANSFER_FAILED: 'BANK_TRANSFER_FAILED',
   CHAT_CALL_NO_PARTICIPANTS: 'CHAT_CALL_NO_PARTICIPANTS',
   CHAT_GROUP_NO_ACCESS: 'CHAT_GROUP_NO_ACCESS',
+  CHAT_MEMBERSHIP_FIXED: 'CHAT_MEMBERSHIP_FIXED',
   CHAT_MESSAGE_NOT_DELETABLE: 'CHAT_MESSAGE_NOT_DELETABLE',
   CHAT_MESSAGE_NOT_EDITABLE: 'CHAT_MESSAGE_NOT_EDITABLE',
   CHAT_NOT_FOUND: 'CHAT_NOT_FOUND',
   CHAT_NOT_MEMBER: 'CHAT_NOT_MEMBER',
+  EVENT_DELETE_BLOCKED_BY_TOURNAMENT: 'EVENT_DELETE_BLOCKED_BY_TOURNAMENT',
   EVENT_LIFECYCLE_FORWARD_ONLY: 'EVENT_LIFECYCLE_FORWARD_ONLY',
   EVENT_REOPEN_BLOCKED_BY_RANDOMIZER: 'EVENT_REOPEN_BLOCKED_BY_RANDOMIZER',
+  MATCH_AMENDMENT_CONFLICT: 'MATCH_AMENDMENT_CONFLICT',
   MATCH_SETTLED_CONCURRENTLY: 'MATCH_SETTLED_CONCURRENTLY',
   SERVICE_DATABASE_UNAVAILABLE: 'SERVICE_DATABASE_UNAVAILABLE',
   TAXI_INSUFFICIENT_FUNDS: 'TAXI_INSUFFICIENT_FUNDS',
@@ -35,6 +38,13 @@ export const ApiErrorCode = {
   TOURNAMENT_CHECKIN_CLOSED: 'TOURNAMENT_CHECKIN_CLOSED',
   TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED: 'TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED',
   TOURNAMENT_PARTICIPANT_IN_BRACKET: 'TOURNAMENT_PARTICIPANT_IN_BRACKET',
+  TOURNAMENT_PROPOSAL_ALREADY_EXISTS: 'TOURNAMENT_PROPOSAL_ALREADY_EXISTS',
+  TOURNAMENT_PROPOSAL_AUTO_VERIFIED: 'TOURNAMENT_PROPOSAL_AUTO_VERIFIED',
+  TOURNAMENT_PROPOSAL_INVALIDATED: 'TOURNAMENT_PROPOSAL_INVALIDATED',
+  TOURNAMENT_PROPOSAL_SETTLED_CONCURRENTLY:
+    'TOURNAMENT_PROPOSAL_SETTLED_CONCURRENTLY',
+  TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT:
+    'TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT',
   TOURNAMENT_TEAMSHEET_LOCKED: 'TOURNAMENT_TEAMSHEET_LOCKED',
   TOURNAMENT_TEAMSHEET_REQUIRED: 'TOURNAMENT_TEAMSHEET_REQUIRED',
 } as const;
@@ -58,14 +68,20 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   BANK_TRANSFER_FAILED: 'No se pudo completar la transferencia.',
   CHAT_CALL_NO_PARTICIPANTS: 'No hay nadie más en el chat para llamar.',
   CHAT_GROUP_NO_ACCESS: 'No tienes acceso a este grupo.',
+  CHAT_MEMBERSHIP_FIXED:
+    'La lista de miembros de este chat no se puede modificar.',
   CHAT_MESSAGE_NOT_DELETABLE: 'No puedes eliminar este mensaje.',
   CHAT_MESSAGE_NOT_EDITABLE: 'No puedes editar este mensaje.',
   CHAT_NOT_FOUND: 'No se encontró el chat.',
   CHAT_NOT_MEMBER: 'No formas parte de este chat.',
+  EVENT_DELETE_BLOCKED_BY_TOURNAMENT:
+    'No se puede eliminar este evento: tiene un torneo anexo. Elimina o desvincula el torneo primero.',
   EVENT_LIFECYCLE_FORWARD_ONLY:
     'El ciclo de vida del evento solo avanza. Marca «reabrir» si de verdad quieres retrocederlo.',
   EVENT_REOPEN_BLOCKED_BY_RANDOMIZER:
     'No se puede reabrir: el evento tiene un randomizer que ya no es borrador. Ciérralo o elimínalo antes.',
+  MATCH_AMENDMENT_CONFLICT:
+    'La partida fue corregida por otro administrador. Vuelve a cargarla antes de corregirla de nuevo.',
   MATCH_SETTLED_CONCURRENTLY:
     'La partida se resolvió mientras enviabas el resultado. Vuelve a cargarla antes de corregirla.',
   SERVICE_DATABASE_UNAVAILABLE:
@@ -82,6 +98,16 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
     'Este torneo pertenece a un evento: únete al evento antes de inscribirte.',
   TOURNAMENT_PARTICIPANT_IN_BRACKET:
     'Ese participante ya está en el cuadro. Cambia su estado a retirado o descalificado en vez de borrarlo.',
+  TOURNAMENT_PROPOSAL_ALREADY_EXISTS:
+    'Ya hay un resultado propuesto para esta partida.',
+  TOURNAMENT_PROPOSAL_AUTO_VERIFIED:
+    'La propuesta ya se auto-verificó — pide a un juez que la corrija.',
+  TOURNAMENT_PROPOSAL_INVALIDATED:
+    'La propuesta quedó invalidada por un cambio en la partida.',
+  TOURNAMENT_PROPOSAL_SETTLED_CONCURRENTLY:
+    'La propuesta ya se resolvió mientras enviabas la disputa.',
+  TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT:
+    'No se puede cambiar un torneo cuyo evento padre ya ha finalizado.',
   TOURNAMENT_TEAMSHEET_LOCKED:
     'Las listas de equipo están bloqueadas: el torneo ya ha empezado.',
   TOURNAMENT_TEAMSHEET_REQUIRED:

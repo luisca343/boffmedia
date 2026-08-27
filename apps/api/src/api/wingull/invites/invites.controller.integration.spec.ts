@@ -1,6 +1,7 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { Reflector } from '@nestjs/core';
+import { ThrottlerGuard } from '@nestjs/throttler';
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const request = require('supertest') as typeof import('supertest');
 import { InvitesController } from './invites.controller';
@@ -46,12 +47,15 @@ describe('InvitesController — integration (ValidationPipe + GlobalExceptionFil
       ],
     })
       // Guards are stubbed: this suite is about validation and error
-      // shape, not about who may call the route.
+      // shape, not about who may call the route. Throttler is also stubbed
+      // to avoid rate-limit failures in tests.
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(RolesGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(GameOrUserAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(ThrottlerGuard)
       .useValue({ canActivate: () => true })
       .compile();
 

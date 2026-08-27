@@ -1,6 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, Min } from 'class-validator';
+import {
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  Min,
+  ValidateIf,
+} from 'class-validator';
 
 /**
  * Report a match result. `topScore`/`botScore` are games won by each side.
@@ -46,4 +52,20 @@ export class ReportMatchDto {
   @IsOptional()
   @IsBoolean()
   amend?: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      'The version of the match when loaded (optimistic concurrency for amends). ' +
+      'Required when amend:true. If the match was amended by another admin, ' +
+      'the call fails with 409 Conflict; reload the match and try again.',
+  })
+  // Mandatory precisely when it protects something. Left optional, an amend
+  // that simply omits it would fall through to an unconditional
+  // `WHERE id = ?` — which is the concurrent-overwrite bug this field exists
+  // to close, so "optional" would have quietly preserved it.
+  @ValidateIf((o: ReportMatchDto) => o.amend === true)
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  amendVersion?: number;
 }

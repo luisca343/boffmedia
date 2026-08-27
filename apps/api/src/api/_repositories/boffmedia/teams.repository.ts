@@ -176,12 +176,39 @@ export class TeamsRepository {
   }
 
   // Team Members
+  /**
+   * Add a participant to a team. To enforce "one team per participant per event",
+   * this requires the caller to supply eventId. Concurrently racing joins of the
+   * same participant to different teams in the same event will hit the unique
+   * constraint on (event_id, participant_id) and must surface the "already in a
+   * team" error rather than a raw MySQL error.
+   */
   async addMember(memberData: Partial<EventTeamMember>): Promise<void> {
-    await this.db.insert(boffMediaEventTeamMembers).values({
-      ...memberData,
-      joinedAt: new Date(),
-      updatedAt: new Date(),
-    } as EventTeamMember);
+    try {
+      await this.db.insert(boffMediaEventTeamMembers).values({
+        ...memberData,
+        joinedAt: new Date(),
+        updatedAt: new Date(),
+      } as EventTeamMember);
+    } catch (error) {
+      // Map 1062 (Duplicate entry) to the domain error
+      if (this.isDuplicateEntry(error)) {
+        throw new Error(
+          'Participant is already in a team for this event',
+        );
+      }
+      throw error;
+    }
+  }
+
+  private isDuplicateEntry(err: unknown): boolean {
+    if (typeof err !== 'object' || err === null) return false;
+    const e = err as { code?: unknown; errno?: unknown; message?: unknown };
+    return (
+      e.code === 'ER_DUP_ENTRY' ||
+      e.errno === 1062 ||
+      (typeof e.message === 'string' && e.message.includes('Duplicate entry'))
+    );
   }
 
   async removeMember(teamId: number, participantId: number): Promise<void> {
@@ -211,8 +238,11 @@ export class TeamsRepository {
     return result[0];
   }
 
-  async findTeamMembers(teamId: number): Promise<any[]> {
-    const result = await this.db
+  async findTeamMembers(
+    teamId: number,
+    pagination?: { limit?: number; offset?: number },
+  ): Promise<any[]> {
+    const query = this.db
       .select({
         teamId: boffMediaEventTeamMembers.teamId,
         participantId: boffMediaEventTeamMembers.participantId,
@@ -230,6 +260,16 @@ export class TeamsRepository {
         eq(boffMediaParticipants.id, boffMediaEventTeamMembers.participantId),
       )
       .where(eq(boffMediaEventTeamMembers.teamId, teamId));
+
+    // Apply pagination if provided, otherwise return all (backward compatible)
+    if (pagination?.limit !== undefined) {
+      query.limit(pagination.limit);
+    }
+    if (pagination?.offset !== undefined) {
+      query.offset(pagination.offset);
+    }
+
+    const result = await query;
 
     // Ensure all required fields are present
     return result.map((member) => ({
@@ -253,6 +293,7 @@ export class TeamsRepository {
       .select({
         teamId: boffMediaEventTeamMembers.teamId,
         participantId: boffMediaEventTeamMembers.participantId,
+        eventId: boffMediaEventTeamMembers.eventId,
         role: boffMediaEventTeamMembers.role,
         joinedAt: boffMediaEventTeamMembers.joinedAt,
         updatedAt: boffMediaEventTeamMembers.updatedAt,

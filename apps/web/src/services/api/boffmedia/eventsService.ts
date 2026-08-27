@@ -189,8 +189,14 @@ export class EventsService {
   /**
    * Get team members
    */
-  static getTeamMembers(teamId: number) {
-    return apiGET<TeamMember[]>(`/events/teams/${teamId}/members`);
+  static getTeamMembers(teamId: number, limit?: number, offset?: number) {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append('limit', String(limit));
+    if (offset !== undefined) params.append('offset', String(offset));
+    const query = params.toString();
+    return apiGET<TeamMember[]>(
+      query ? `/events/teams/${teamId}/members?${query}` : `/events/teams/${teamId}/members`
+    );
   }
   
   /**
@@ -298,8 +304,14 @@ export class EventsService {
   /**
    * Get all participants for an event
    */
-  static getEventParticipants(eventId: number) {
-    return apiAuthedAutoGET<Participant[]>(`/events/${eventId}/participants`);
+  static getEventParticipants(eventId: number, limit?: number, offset?: number) {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append('limit', String(limit));
+    if (offset !== undefined) params.append('offset', String(offset));
+    const query = params.toString();
+    return apiAuthedAutoGET<Participant[]>(
+      query ? `/events/${eventId}/participants?${query}` : `/events/${eventId}/participants`
+    );
   }
 
   // ==================== PROGRESS OPERATIONS ====================

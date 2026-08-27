@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
+import { OutboxModule } from '@api/outbox/outbox.module';
 import { TournamentsController } from './tournaments.controller';
 import { TournamentsFacadeService } from './tournaments.facade.service';
 import { TournamentsRepository } from './repositories/tournaments.repository';
@@ -17,7 +18,7 @@ import { TournamentNotificationsService } from './services/tournament-notificati
 import { TournamentAnnouncerService } from './services/tournament-announcer.service';
 
 @Module({
-  imports: [DrizzleModule, NotificationsModule],
+  imports: [DrizzleModule, NotificationsModule, OutboxModule],
   controllers: [TournamentsController],
   providers: [
     TournamentsRepository,

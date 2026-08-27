@@ -50,6 +50,11 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
   // the value at mint time; the guard rejects a token whose embedded value no
   // longer matches. Incrementing it invalidates every outstanding session at once.
   desktopTokenVersion: int('desktop_token_version').notNull().default(0),
+  // Coarse revocation counter for website sessions. Every website JWT embeds
+  // the value at mint time; the guard rejects a token whose embedded value no
+  // longer matches. Incrementing it invalidates every outstanding session at once.
+  // Mirrors the desktop pattern — see desktopTokenVersion above.
+  sessionVersion: int('session_version').notNull().default(0),
   createdAt: timestamp('created_at', { mode: 'date' }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { mode: 'date' })
     .notNull()

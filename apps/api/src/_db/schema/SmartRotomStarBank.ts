@@ -75,11 +75,27 @@ export const starBankTransactions = mysqlTable(
     date: timestamp('date')
       .notNull()
       .default(sql`CURRENT_TIMESTAMP()`),
+    /**
+     * Optional idempotency key, scoped to the paying account. NULL means "never
+     * deduplicate", so an unkeyed transaction behaves exactly as before. A retry
+     * with the same key receives the original transaction instead of moving money
+     * a second time.     *
+     * The UNIQUE below spans (actor, key), NOT the key alone. Scoped to the key
+     * only, one caller's key would match another caller's row: the second user
+     * would be handed back the FIRST user's record and their own operation would
+     * silently never happen. A composite UNIQUE still permits many NULL keys,
+     * because NULL never equals NULL in MySQL.
+     */
+    idempotencyKey: varchar('idempotency_key', { length: 255 }),
   },
   (t) => ({
     dateIdx: index('sb_tx_date_idx').on(t.date),
     fromIdx: index('sb_tx_from_idx').on(t.fromAccountId, t.date),
     toIdx: index('sb_tx_to_idx').on(t.toAccountId, t.date),
+    idempotencyUq: uniqueIndex('sb_tx_idempotency_uq').on(
+      t.fromAccountId,
+      t.idempotencyKey,
+    ),
     fromFk: foreignKey({
       name: 'sb_tx_from_fk',
       columns: [t.fromAccountId],

@@ -42,8 +42,28 @@ interface MatchCtx {
   maxWinnersRound: Map<number, number>; // phaseId → highest winners round
 }
 
+/**
+ * How long to reuse an unchanged tournament's standings. Short on purpose:
+ * a new match result changes the cache key anyway, so this only bounds the
+ * window in which two identical polls both recompute. Note: this cache is
+ * per-instance (per process); there is no shared cache across instances.
+ */
+const STANDINGS_CACHE_TTL_MS = 5_000;
+
+interface CachedStandings<T> {
+  data: T;
+  expires: number;
+}
+
 @Injectable()
 export class StandingsService {
+  /**
+   * Per-instance cache of computed standings, keyed by tournament ID + phase ID +
+   * participant count + settled match count + latest reportedAt timestamp.
+   * Invalidated whenever a settlement or advancement commits.
+   */
+  private readonly standingsCache = new Map<string, CachedStandings<any>>();
+
   constructor(
     private readonly repo: TournamentsRepository,
     private readonly entry: EntryService,
@@ -328,7 +348,7 @@ export class StandingsService {
               ctx,
             )
           : ph.format === 'groups'
-            ? this.phaseGroupsView(ph, phMatches, cmap, groups)
+            ? this.phaseGroupsView(t.id, ph, phMatches, cmap, groups)
             : this.buildFormatView(
                 ph.format,
                 phParticipants,
@@ -413,6 +433,7 @@ export class StandingsService {
    * `participants.groupId` is transient and may belong to a later phase.
    */
   private phaseGroupsView(
+    tournamentId: number,
     ph: TournamentPhase,
     phMatches: TournamentMatch[],
     cmap: Map<number, Competitor>,
@@ -438,6 +459,7 @@ export class StandingsService {
           total: gMatches.length,
           advance: g.advanceCount,
           standings: this.tableOf(
+            tournamentId,
             memberIds,
             gMatches,
             cmap,
@@ -489,7 +511,7 @@ export class StandingsService {
   ): object {
     if (t.format === 'groups') {
       return {
-        groups: this.groupsView(participants, matches, cmap, groups),
+        groups: this.groupsView(t.id, participants, matches, cmap, groups),
         knockout: matches.some((m) => m.bracket === 'winners')
           ? { rounds: this.roundsOf(matches, 'winners', cmap, ctx) }
           : null,
@@ -530,6 +552,7 @@ export class StandingsService {
         };
       case 'roundrobin':
         return this.leagueView(
+          t.id,
           participants.map((p) => p.id),
           matches.filter((m) => m.bracket === 'league'),
           cmap,
@@ -537,6 +560,7 @@ export class StandingsService {
       case 'swiss':
         return {
           standings: this.tableOf(
+            t.id,
             participants.map((p) => p.id),
             matches.filter((m) => m.bracket === 'swiss'),
             cmap,
@@ -649,13 +673,54 @@ export class StandingsService {
     );
   }
 
+  /**
+   * Compute standings with caching. The key includes the number of settled
+   * matches and the latest reportedAt, so any new result invalidates the cache
+   * immediately; the TTL only bounds how long an unchanged tournament's
+   * standings are reused.
+   */
+  private cachedComputeStandings(
+    tournamentId: number,
+    participantIds: number[],
+    matches: TournamentMatch[],
+    profile: TournamentPhase['tiebreakProfile'] = 'points',
+  ): ReturnType<typeof computeStandings> {
+    let settled = 0;
+    let latest = 0;
+    for (const m of matches) {
+      if (m.status !== 'completed' && m.status !== 'bye') continue;
+      settled++;
+      const at = m.reportedAt ? m.reportedAt.getTime() : 0;
+      if (at > latest) latest = at;
+    }
+    const key = `${tournamentId}:${profile}:${participantIds.length}:${settled}:${latest}`;
+    const now = Date.now();
+    const hit = this.standingsCache.get(key);
+    if (hit && hit.expires > now) return hit.data;
+
+    const rows = computeStandings(participantIds, matches, profile);
+    // Bounded: a busy server must not accumulate one entry per tournament per
+    // result forever. Cheapest correct eviction — drop everything expired.
+    if (this.standingsCache.size > 256) {
+      for (const [k, v] of this.standingsCache) {
+        if (v.expires <= now) this.standingsCache.delete(k);
+      }
+    }
+    this.standingsCache.set(key, {
+      data: rows,
+      expires: now + STANDINGS_CACHE_TTL_MS,
+    });
+    return rows;
+  }
+
   private tableOf(
+    tournamentId: number,
     participantIds: number[],
     matches: TournamentMatch[],
     cmap: Map<number, Competitor>,
     profile: TournamentPhase['tiebreakProfile'] = 'points',
   ): Standing[] {
-    return computeStandings(participantIds, matches, profile).map((s) => ({
+    return this.cachedComputeStandings(tournamentId, participantIds, matches, profile).map((s) => ({
       rank: s.rank,
       c: cmap.get(s.participantId)!,
       played: s.played,
@@ -700,11 +765,12 @@ export class StandingsService {
   }
 
   private leagueView(
+    tournamentId: number,
     participantIds: number[],
     matches: TournamentMatch[],
     cmap: Map<number, Competitor>,
   ): LeagueView {
-    const table = this.tableOf(participantIds, matches, cmap);
+    const table = this.tableOf(tournamentId, participantIds, matches, cmap);
     const orderedIds = table.map((s) => Number(s.c.id));
     return {
       table,
@@ -715,6 +781,7 @@ export class StandingsService {
   }
 
   private groupsView(
+    tournamentId: number,
     participants: TournamentParticipant[],
     matches: TournamentMatch[],
     cmap: Map<number, Competitor>,
@@ -733,7 +800,7 @@ export class StandingsService {
         done: gMatches.filter((m) => m.status === 'completed').length,
         total: gMatches.length,
         advance: g.advanceCount,
-        standings: this.tableOf(memberIds, gMatches, cmap),
+        standings: this.tableOf(tournamentId, memberIds, gMatches, cmap),
       };
     });
   }

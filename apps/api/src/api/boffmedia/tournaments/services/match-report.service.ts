@@ -252,7 +252,10 @@ export class MatchReportService {
     });
     if (!claimed) {
       throw new BadRequestException(
-        'Ya hay un resultado propuesto para esta partida',
+        userError(
+          ApiErrorCode.TOURNAMENT_PROPOSAL_ALREADY_EXISTS,
+          'A proposal is already pending on this match',
+        ),
       );
     }
 
@@ -278,7 +281,10 @@ export class MatchReportService {
       // Auto-verify beat the rival to it — confirming the same result is moot.
       if (dto.accept) return { success: true };
       throw new BadRequestException(
-        'La propuesta ya se auto-verificó — pide a un juez que la corrija',
+        userError(
+          ApiErrorCode.TOURNAMENT_PROPOSAL_AUTO_VERIFIED,
+          'The proposal was auto-verified by the expiry sweep',
+        ),
       );
     }
     const me = await this.mustBeMatchPlayer(tournamentId, matchId, userId);
@@ -302,7 +308,10 @@ export class MatchReportService {
     ) {
       await this.clearProposal(matchId);
       throw new BadRequestException(
-        'La propuesta quedó invalidada por un cambio en la partida',
+        userError(
+          ApiErrorCode.TOURNAMENT_PROPOSAL_INVALIDATED,
+          'The proposal is no longer valid due to a match amendment',
+        ),
       );
     }
 
@@ -316,7 +325,10 @@ export class MatchReportService {
       );
       if (!disputed) {
         throw new BadRequestException(
-          'La propuesta ya se resolvió mientras enviabas la disputa',
+          userError(
+            ApiErrorCode.TOURNAMENT_PROPOSAL_SETTLED_CONCURRENTLY,
+            'The proposal was settled while you were disputing it',
+          ),
         );
       }
       await this.sysMessage(

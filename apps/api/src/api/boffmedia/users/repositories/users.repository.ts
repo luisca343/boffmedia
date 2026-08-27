@@ -1,6 +1,6 @@
 import { HttpException, Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, isNull, or } from 'drizzle-orm';
+import { and, eq, isNull, or, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   BoffMediaUser,
@@ -718,6 +718,56 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
     } catch (error: any) {
       this.logger.error('Failed to get user count:', error);
       return 0;
+    }
+  }
+
+  // ==================== SESSION REVOCATION ====================
+
+  /**
+   * Current website session revocation counter, or null if the account is gone
+   * or soft-deleted. Single keyed lookup — the guard runs this on every website
+   * request that carries a user claim, and the design trades a cache miss for
+   * one round trip per logout scenario (password change, password reset, or an
+   * explicit sign-out-everywhere).
+   *
+   * Returns null in two cases: user does not exist, or is soft-deleted (deletedAt
+   * IS NOT NULL). Both are rejections — a non-existent user and a deleted one
+   * should not be in an active session.
+   */
+  async getSessionVersion(userId: number): Promise<number | null> {
+    try {
+      const rows = await this.db
+        .select({ v: boffMediaUsers.sessionVersion })
+        .from(boffMediaUsers)
+        .where(
+          and(eq(boffMediaUsers.id, userId), isNull(boffMediaUsers.deletedAt)),
+        )
+        .limit(1);
+      return rows.length > 0 ? rows[0].v : null;
+    } catch (error: any) {
+      this.logger.error(`Failed to get session version for user ${userId}:`, error);
+      if (error instanceof HttpException) throw error;
+      throw new Error(`Failed to get session version: ${error.message}`);
+    }
+  }
+
+  /**
+   * Increment the website session revocation counter, invalidating every
+   * outstanding session at once. Used by password change, password reset,
+   * and explicit sign-out-everywhere.
+   */
+  async bumpSessionVersion(userId: number): Promise<void> {
+    try {
+      await this.db
+        .update(boffMediaUsers)
+        .set({
+          sessionVersion: sql`${boffMediaUsers.sessionVersion} + 1`,
+        })
+        .where(eq(boffMediaUsers.id, userId));
+    } catch (error: any) {
+      this.logger.error(`Failed to bump session version for user ${userId}:`, error);
+      if (error instanceof HttpException) throw error;
+      throw new Error(`Failed to bump session version: ${error.message}`);
     }
   }
 }

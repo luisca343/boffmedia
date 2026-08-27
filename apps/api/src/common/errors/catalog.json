@@ -65,6 +65,10 @@
       "es": "No puedes editar este mensaje.",
       "where": "smartrotom/chatapp/services/message.service.ts"
     },
+    "CHAT_MEMBERSHIP_FIXED": {
+      "es": "La lista de miembros de este chat no se puede modificar.",
+      "where": "smartrotom/chatapp/services/group.service.ts"
+    },
     "CHAT_NOT_FOUND": {
       "es": "No se encontró el chat.",
       "where": "smartrotom/chatapp"
@@ -125,6 +129,10 @@
       "es": "La partida se resolvió mientras enviabas el resultado. Vuelve a cargarla antes de corregirla.",
       "where": "boffmedia/tournaments/services/matches.service.ts"
     },
+    "MATCH_AMENDMENT_CONFLICT": {
+      "es": "La partida fue corregida por otro administrador. Vuelve a cargarla antes de corregirla de nuevo.",
+      "where": "boffmedia/tournaments/services/matches.service.ts"
+    },
     "TOURNAMENT_TEAMSHEET_REQUIRED": {
       "es": "Envía tu lista de equipo antes de hacer check-in.",
       "where": "boffmedia/tournaments/services/registration.service.ts"
@@ -132,6 +140,30 @@
     "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": {
       "es": "Este torneo pertenece a un evento: únete al evento antes de inscribirte.",
       "where": "boffmedia/tournaments/services/registration.service.ts"
+    },
+    "TOURNAMENT_PROPOSAL_ALREADY_EXISTS": {
+      "es": "Ya hay un resultado propuesto para esta partida.",
+      "where": "boffmedia/tournaments/services/match-report.service.ts"
+    },
+    "TOURNAMENT_PROPOSAL_AUTO_VERIFIED": {
+      "es": "La propuesta ya se auto-verificó — pide a un juez que la corrija.",
+      "where": "boffmedia/tournaments/services/match-report.service.ts"
+    },
+    "TOURNAMENT_PROPOSAL_INVALIDATED": {
+      "es": "La propuesta quedó invalidada por un cambio en la partida.",
+      "where": "boffmedia/tournaments/services/match-report.service.ts"
+    },
+    "TOURNAMENT_PROPOSAL_SETTLED_CONCURRENTLY": {
+      "es": "La propuesta ya se resolvió mientras enviabas la disputa.",
+      "where": "boffmedia/tournaments/services/match-report.service.ts"
+    },
+    "EVENT_DELETE_BLOCKED_BY_TOURNAMENT": {
+      "es": "No se puede eliminar este evento: tiene un torneo anexo. Elimina o desvincula el torneo primero.",
+      "where": "boffmedia/events/services/events.service.ts"
+    },
+    "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": {
+      "es": "No se puede cambiar un torneo cuyo evento padre ya ha finalizado.",
+      "where": "boffmedia/tournaments/services/tournaments.service.ts"
     }
   }
 }

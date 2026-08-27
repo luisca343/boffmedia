@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -34,6 +35,7 @@ export class SuggestionsController {
   constructor(private readonly service: SuggestionsService) {}
 
   @Post()
+  @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @UseGuards(JwtAuthGuard)
   @ApiOperation({ summary: 'Submit an event suggestion' })
   @ApiResponse({ status: 201, type: CreateSuggestionResultEntity })

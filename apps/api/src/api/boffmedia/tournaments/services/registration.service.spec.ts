@@ -65,6 +65,7 @@ describe('RegistrationService', () => {
   describe('removeParticipant', () => {
     beforeEach(() => {
       repo.findParticipant.mockResolvedValue({ id: 5, tournamentId: 1 });
+      repo.removeParticipant.mockResolvedValue({ success: true });
     });
 
     it('deletes an entrant that is not in the bracket yet', async () => {
@@ -75,16 +76,18 @@ describe('RegistrationService', () => {
     });
 
     it('refuses once the entrant is seeded into a match', async () => {
-      // The participant FKs are ON DELETE SET NULL, so deleting here would
-      // leave a half-empty match that standings and advancement skip silently.
-      repo.listMatches.mockResolvedValue([
-        { id: 1, topParticipantId: 5, botParticipantId: 6 },
-      ]);
+      // The repository atomically checks that the participant is not in any match
+      // under a row lock before deleting. The database FK (now RESTRICT) enforces
+      // this at the schema level.
+      repo.removeParticipant.mockResolvedValue({
+        success: false,
+        reason: 'in_bracket',
+      });
 
       await expect(service.removeParticipant(1, 5)).rejects.toThrow(
         BadRequestException,
       );
-      expect(repo.removeParticipant).not.toHaveBeenCalled();
+      expect(repo.removeParticipant).toHaveBeenCalledWith(5);
     });
   });
 

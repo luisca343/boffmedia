@@ -7,10 +7,9 @@ import esWigglypop from "../../../locales/es/smartrotom/wigglypop.json"
 /**
  * Wigglypop — does the SESSION actually reach the API?
  *
- * Every mutation on this controller sits behind `GameOrUserAuthGuard`, and since
- * `ENFORCE_MONEY_AUTH` defaults to true the legacy `body.server === MC_WORLD`
- * tripwire no longer admits anybody. So the marketplace works if and only if the
- * production chain works:
+ * Every mutation on this controller sits behind `GameOrUserAuthGuard`, which
+ * requires a valid Bearer token (JWT or server token). The marketplace works if
+ * and only if the production auth chain works:
  *
  *   rotomAuthedPATCH → sessionToken() → next-auth getSession() → authedRequest()
  *

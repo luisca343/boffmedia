@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { GlobalThrottlerGuard } from '@api/_utils/guards/global-throttler.guard';
+import { RetentionModule } from '@api/retention/retention.module';
 import { ResponseInterceptor } from './api/_utils/interceptors/response.interceptor';
 import { JwtAuthGuard } from './api/auth/jwt-auth.guard';
 import { AppController } from './app.controller';
@@ -86,9 +88,21 @@ import { publicPath } from '@/config/paths';
       defaultMetrics: { enabled: true },
       path: METRICS_PATH,
     }),
-    // Rate limiting is available app-wide but only enforced where ThrottlerGuard is
-    // applied (auth routes) — a global guard would throttle SSE/tool streams too.
+    // Rate limiting: 120 requests/minute, enforced in two layers.
+    //
+    // `GlobalThrottlerGuard` (below) covers every SIGNED-IN caller, keyed on the
+    // account. It skips anonymous and mod traffic, because behind the Next.js
+    // proxy there is no usable per-caller IP to key those on — the reason this
+    // was previously left per-route. Long-lived SSE/tool streams are one request
+    // each, so they sit far inside the limit.
+    //
+    // Routes that must limit ANONYMOUS callers still carry their own
+    // `@Throttle` (auth, invite redemption, suggestions, tool aggregations),
+    // since the global guard cannot see them.
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 120 }]),
+    // Daily purge of notifications, audit trails, expired invites and note
+    // versions. Housekeeping only — every read path is correct without it.
+    RetentionModule,
     // Register the validated env object under the `env` namespace so
     // `configService.get('env')` resolves it (the randomizer runner/shim gate on it).
     ConfigModule.forRoot({ load: [() => ({ env })] }),
@@ -171,6 +185,14 @@ import { publicPath } from '@/config/paths';
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
     },
+    // Registered AFTER JwtAuthGuard on purpose: APP_GUARDs run in registration
+    // order, and this one keys on `req.user`, which the guard above populates.
+    // It deliberately covers only signed-in traffic — see the class comment for
+    // why an IP-keyed global limit is unworkable behind the Next.js proxy.
+    {
+      provide: APP_GUARD,
+      useClass: GlobalThrottlerGuard,
+    },
   ],
   exports: [ConfigService],
 })
@@ -195,19 +217,17 @@ export class AppModule implements NestModule {
           path: 'smartrotom/starbank/accounts/{*path}',
           method: RequestMethod.PATCH,
         },
-        // Server-only money routes owning their own auth
-        // (GameServerTransitionalAuthGuard: Bearer, or the tripwire only while
-        // ENFORCE_MONEY_AUTH is off). The guard reads `body.server` itself, so
-        // the middleware must not also gate them or it would 403 the eventual
+        // Server-only money routes owning their own auth (GameServerAuthGuard:
+        // Bearer token only). The middleware must not gate them or it would 403 the
         // Bearer-only, no-`server` call.
         { path: 'smartrotom/starbank/shop', method: RequestMethod.POST },
         {
           path: 'smartrotom/starbank/trainerdefeat',
           method: RequestMethod.POST,
         },
-        // Money routes guarded by GameOrUserAuthGuard own their own auth (JWT,
-        // server key, or transitional tripwire) — the middleware would 403 the
-        // JWT-only path that has no `server` in the body.
+        // Money routes guarded by GameOrUserAuthGuard own their own auth (JWT or
+        // server key) — the middleware would 403 the JWT-only path that has no
+        // `server` in the body.
         { path: 'smartrotom/starbank/transfer', method: RequestMethod.POST },
         {
           path: 'smartrotom/starbank/transfer/from-main',

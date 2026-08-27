@@ -3,6 +3,7 @@ import { Logger } from 'nestjs-pino';
 import { UploadFacadeService } from './upload.facade.service';
 import { FileUploadService } from './services/file-upload.service';
 import { ImageUploadService } from './services/image-upload.service';
+import { AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
 
 const mockFileUploadService = {
   uploadFile: jest.fn(),
@@ -30,6 +31,11 @@ const makeFile = (name = 'photo.jpg', size = 1024) =>
     size,
     path: `/tmp/${name}`,
   }) as Express.Multer.File;
+
+const makeActor = (userId = 1): AuthPrincipal => ({
+  userId,
+  username: `user${userId}`,
+});
 
 const uploadResult = {
   filename: 'photo.jpg',
@@ -71,22 +77,24 @@ describe('UploadFacadeService', () => {
 
   describe('uploadImage()', () => {
     it('delegates to ImageUploadService', async () => {
+      const actor = makeActor();
       mockImageUploadService.uploadImage.mockResolvedValue(uploadResult);
 
-      const result = await service.uploadImage({ file: makeFile() });
+      const result = await service.uploadImage({ file: makeFile(), actor });
 
       expect(result.url).toBe('/uploads/photo.jpg');
       expect(mockImageUploadService.uploadImage).toHaveBeenCalled();
     });
 
     it('wraps and re-throws on error', async () => {
+      const actor = makeActor();
       mockImageUploadService.uploadImage.mockRejectedValue(
         new Error('disk full'),
       );
 
-      await expect(service.uploadImage({ file: makeFile() })).rejects.toThrow(
-        'Failed to upload image',
-      );
+      await expect(
+        service.uploadImage({ file: makeFile(), actor }),
+      ).rejects.toThrow('Failed to upload image');
     });
   });
 
@@ -94,22 +102,24 @@ describe('UploadFacadeService', () => {
 
   describe('deleteImage()', () => {
     it('returns success message on successful deletion', async () => {
+      const actor = makeActor();
       mockImageUploadService.deleteImage.mockResolvedValue({ success: true });
 
-      const result = await service.deleteImage('', 'photo.jpg');
+      const result = await service.deleteImage('', 'photo.jpg', actor);
 
       expect(result.success).toBe(true);
       expect(result.message).toContain('deleted successfully');
     });
 
     it('wraps and re-throws on error', async () => {
+      const actor = makeActor();
       mockImageUploadService.deleteImage.mockRejectedValue(
         new Error('not found'),
       );
 
-      await expect(service.deleteImage('', 'photo.jpg')).rejects.toThrow(
-        'Failed to delete image',
-      );
+      await expect(
+        service.deleteImage('', 'photo.jpg', actor),
+      ).rejects.toThrow('Failed to delete image');
     });
   });
 
@@ -117,21 +127,23 @@ describe('UploadFacadeService', () => {
 
   describe('uploadFile()', () => {
     it('delegates to FileUploadService', async () => {
+      const actor = makeActor();
       mockFileUploadService.uploadFile.mockResolvedValue(uploadResult);
 
-      const result = await service.uploadFile({ file: makeFile() });
+      const result = await service.uploadFile({ file: makeFile(), actor });
 
       expect(result.url).toBe('/uploads/photo.jpg');
     });
 
     it('wraps and re-throws on error', async () => {
+      const actor = makeActor();
       mockFileUploadService.uploadFile.mockRejectedValue(
         new Error('quota exceeded'),
       );
 
-      await expect(service.uploadFile({ file: makeFile() })).rejects.toThrow(
-        'Failed to upload file',
-      );
+      await expect(
+        service.uploadFile({ file: makeFile(), actor }),
+      ).rejects.toThrow('Failed to upload file');
     });
   });
 
@@ -139,9 +151,10 @@ describe('UploadFacadeService', () => {
 
   describe('deleteFile()', () => {
     it('returns success message', async () => {
+      const actor = makeActor();
       mockFileUploadService.deleteFile.mockResolvedValue({ success: true });
 
-      const result = await service.deleteFile('', 'doc.pdf');
+      const result = await service.deleteFile('', 'doc.pdf', actor);
 
       expect(result.success).toBe(true);
       expect(result.message).toContain('deleted successfully');

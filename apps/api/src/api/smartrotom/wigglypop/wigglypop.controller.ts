@@ -248,7 +248,14 @@ export class WigglypopController {
     @Body() dto: CreateOrderDto,
     @Req() req: Request,
   ): Promise<WigglypopOrderEntity> {
-    return this.wigglypop.createOrder(dto, resolveActor(req));
+    // Read Idempotency-Key header to enable retry safety: if the same key is
+    // submitted twice, the second request receives the original order without
+    // creating a duplicate.
+    const idempotencyKey = (
+      req.headers['idempotency-key'] as string | undefined
+    )?.trim();
+
+    return this.wigglypop.createOrder(dto, resolveActor(req), idempotencyKey);
   }
 
   @Get('orders/user/:uuid')

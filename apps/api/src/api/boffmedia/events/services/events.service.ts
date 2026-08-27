@@ -121,6 +121,20 @@ export class EventsService {
   }
 
   async deleteEvent(id: number): Promise<void> {
+    // Check if any tournaments are attached; the lifecycle rule is that events
+    // with dependent tournaments cannot be deleted — the tournaments would become
+    // orphaned and violate the composition contract.
+    const hasAttachedTournaments =
+      await this.eventsRepository.hasAttachedTournaments(id);
+    if (hasAttachedTournaments) {
+      throw new BadRequestException(
+        userError(
+          ApiErrorCode.EVENT_DELETE_BLOCKED_BY_TOURNAMENT,
+          'Cannot delete an event with attached tournaments',
+        ),
+      );
+    }
+
     // First, soft delete all child events
     await this.eventsRepository.softDeleteChildren(id);
 

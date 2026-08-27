@@ -8,7 +8,7 @@ import { StarbankFacadeService } from './starbank.facade.service';
 import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
-import { GameServerTransitionalAuthGuard } from '@api/_utils/guards/game-server-transitional-auth.guard';
+import { GameServerAuthGuard } from '@api/_utils/guards/game-server-auth.guard';
 import { Reflector } from '@nestjs/core';
 
 const mockLogger = {
@@ -50,11 +50,11 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
       ],
     })
       // The money routes are guarded (transfer/accounts by GameOrUserAuthGuard;
-      // shop/trainerdefeat by GameServerTransitionalAuthGuard). This suite
+      // shop/trainerdefeat by GameServerAuthGuard). This suite
       // exercises validation + envelope, so let both guards through.
       .overrideGuard(GameOrUserAuthGuard)
       .useValue({ canActivate: () => true })
-      .overrideGuard(GameServerTransitionalAuthGuard)
+      .overrideGuard(GameServerAuthGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -174,7 +174,7 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
       expect(mockFacade.transfer).toHaveBeenCalledWith(1, 2, 100, 'payment', {
         mcUuid: TEST_MC_UUID,
         serverAuthed: false,
-      });
+      }, undefined);
     });
   });
 

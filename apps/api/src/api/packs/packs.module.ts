@@ -19,6 +19,7 @@ import { PacksController } from './packs.controller';
 import { PacksDesktopController } from './packs-desktop.controller';
 import { PacksRepository } from './packs.repository';
 import { PacksService } from './packs.service';
+import { AuditService } from '@api/_repositories/audit.service';
 
 @Module({
   imports: [
@@ -45,6 +46,9 @@ import { PacksService } from './packs.service';
     DesktopAuthController,
   ],
   providers: [
+    // Unified audit service across all domains
+    AuditService,
+
     PacksRepository,
     PacksService,
     PacksAuthService,

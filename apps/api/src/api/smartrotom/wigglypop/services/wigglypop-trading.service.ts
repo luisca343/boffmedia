@@ -374,6 +374,9 @@ export class WigglypopTradingService {
    * to escrow in the meantime, so there is nothing partial to do. The two players swap in-game
    * themselves, exactly as they do today. Nothing here calls givePokemon: doing so with no
    * matching take would hand the seller's mon to the proposer while the seller kept it.
+   *
+   * Two concurrent acceptTrade calls on different trade offers on the SAME listing will race —
+   * the atomic transaction ensures only one succeeds. The loser sees "no longer available".
    */
   async acceptTrade(
     id: number,
@@ -389,9 +392,18 @@ export class WigglypopTradingService {
     if (trade.status !== 'pendiente') {
       throw new BadRequestException(`This trade is already ${trade.status}`);
     }
+    if (listing.status !== 'activo') {
+      throw new BadRequestException(
+        `"${listing.title}" is no longer available (${listing.status})`,
+      );
+    }
 
-    const updated = await this.tradingRepository.setTradeStatus(id, 'aceptada');
-    await this.listingsRepository.setStatus(listing.id, 'vendido');
+    // Atomic claim: accept the trade AND mark the listing sold in one transaction.
+    // If the listing was already claimed by another concurrent trade acceptance, this throws.
+    const updated = await this.tradingRepository.acceptTradeAtomic(
+      id,
+      listing.id,
+    );
     await this.notify.tradeAccepted(
       trade.proposerUuid,
       listing.id,

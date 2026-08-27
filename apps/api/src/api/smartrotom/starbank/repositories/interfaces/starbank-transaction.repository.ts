@@ -7,6 +7,7 @@ export interface CreateTransactionData {
   amount: number;
   reason: string;
   type: TransactionType;
+  idempotencyKey?: string;
 }
 
 export interface IStarbankTransactionRepository {

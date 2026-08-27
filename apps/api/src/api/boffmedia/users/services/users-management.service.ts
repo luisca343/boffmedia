@@ -497,6 +497,8 @@ export class BoffMediaUsersManagementService {
 
     const hashed = await this.passwordService.hashPassword(newPassword);
     await this.usersRepository.updateUser(id, { password: hashed });
+    // Invalidate all outstanding web sessions: password change signs the user out everywhere.
+    await this.usersRepository.bumpSessionVersion(id);
     return { success: true };
   }
 

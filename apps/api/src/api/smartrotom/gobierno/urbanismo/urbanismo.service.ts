@@ -237,16 +237,27 @@ export class UrbanismoService {
       );
     }
 
-    await this.urbanismoRepository.upsertParcela({
-      regionId: dto.regionId,
-      town: dto.town,
-      number: dto.number,
-      zonaId: dto.zonaId ?? null,
-      status: dto.status,
-      taxAmount: dto.taxAmount,
-      taxDueAt: dto.taxDueAt,
-      notes: dto.notes,
-    });
+    try {
+      await this.urbanismoRepository.upsertParcela({
+        regionId: dto.regionId,
+        town: dto.town,
+        number: dto.number,
+        zonaId: dto.zonaId ?? null,
+        status: dto.status,
+        taxAmount: dto.taxAmount,
+        taxDueAt: dto.taxDueAt,
+        notes: dto.notes,
+      });
+    } catch (error: any) {
+      // MySQL error 1062: Duplicate entry for unique key constraint
+      if (error?.code === 'ER_DUP_ENTRY') {
+        throw new BadRequestException({
+          message: `A plot metadata entry already exists for ${dto.town} plot ${dto.number}`,
+          userMessage: 'Ya existe una parcela registrada para este terreno.',
+        });
+      }
+      throw error;
+    }
 
     await this.auditoriaService.log({
       actorUuid: dto.actorUuid || 'system',

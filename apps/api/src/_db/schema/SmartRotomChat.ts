@@ -2,6 +2,7 @@ import {
   char,
   boolean,
   foreignKey,
+  index,
   int,
   mysqlTable,
   primaryKey,
@@ -50,24 +51,35 @@ export const rotomChatMembers = mysqlTable(
 
 export type RotomChatMember = typeof rotomChatMembers.$inferSelect;
 
-export const rotomChatMessages = mysqlTable('rotom_chat_messages', {
-  id: int('id').primaryKey().autoincrement(),
-  chatId: int('chat_id')
-    .notNull()
-    .references(() => rotomChats.id, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  senderUUID: char('sender_uuid', { length: 36 })
-    .notNull()
-    .references(() => rotomUsers.uuid, {
-      onDelete: 'cascade',
-      onUpdate: 'cascade',
-    }),
-  content: text('content').notNull(),
-  type: varchar('type', { length: 255 }).default('text'),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-});
+export const rotomChatMessages = mysqlTable(
+  'rotom_chat_messages',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    chatId: int('chat_id')
+      .notNull()
+      .references(() => rotomChats.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    senderUUID: char('sender_uuid', { length: 36 })
+      .notNull()
+      .references(() => rotomUsers.uuid, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    content: text('content').notNull(),
+    type: varchar('type', { length: 255 }).default('text'),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  // Keyset pagination reads one chat newest-first (`WHERE chat_id = ?
+  // AND id < ? ORDER BY id DESC LIMIT n`). With only the chat_id foreign-key
+  // index MySQL matched the chat and then filesorted the whole conversation to
+  // find the newest page; the composite lets it walk the index backwards and
+  // stop after `n` rows.
+  (table) => ({
+    chatMessageKeysetIdx: index('rcm_chat_id_idx').on(table.chatId, table.id),
+  }),
+);
 
 export type RotomChatMessage = typeof rotomChatMessages.$inferSelect;
 
