@@ -24,10 +24,17 @@ import { ThrottlerGuard } from '@nestjs/throttler';
  *    into the proxy-IP bucket described above, so a global limit here would be
  *    the very outage it is meant to prevent. Public routes that actually need
  *    limiting carry an explicit `@Throttle` instead — auth, invite redemption,
- *    suggestions, and the expensive tool aggregations. Enabling `trust proxy`
- *    (and trusting `X-Forwarded-For` from the known proxy only) would let this
- *    guard cover anonymous traffic too; that is a deployment decision, not one
- *    to make silently here.
+ *    suggestions, and the expensive tool aggregations.
+ *
+ * **Do not "fix" the anonymous gap by enabling `trust proxy`.** The API is
+ * reachable directly, not only through the Next server, so `X-Forwarded-For` is
+ * caller-controlled: trusting it would let anyone mint a fresh throttle key per
+ * request and bypass every limit here — including the explicit `@Throttle`
+ * routes above, which today are the only thing standing in front of auth. That
+ * is strictly worse than the present gap, where anonymous traffic is unlimited
+ * but no key can be forged. The order matters: restrict ingress so the API is
+ * only reachable through the proxy, and only then trust the header from that
+ * one address.
  */
 @Injectable()
 export class GlobalThrottlerGuard extends ThrottlerGuard {

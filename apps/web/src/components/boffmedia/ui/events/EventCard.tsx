@@ -90,12 +90,12 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
               {formatEventDate(event.startDate, intlLocale)}
             </span>
           )}
-          {/* participant count — NOT in the list API yet (the detail page fetches
-              participants separately) → rendered only when supplied. [deferred] */}
-          {event.participants != null && (
+          {/* participant count — the list endpoint supplies it; the detail
+              endpoint does not, so still render only when present. */}
+          {event.participantCount != null && (
             <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px]/none font-medium uppercase tracking-[0.05em] text-txt-muted">
               <Icon name="users" size={13} className="text-txt-dim" />
-              {formatNumber(event.participants)}
+              {formatNumber(event.participantCount)}
             </span>
           )}
         </div>

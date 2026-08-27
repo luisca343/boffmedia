@@ -345,11 +345,12 @@ export const DEMO_TOOLS: ToolCardData[] = [
 // Showcase demo game — carries fields the games API lacks (short·events·players·hue). [deferred]
 export const DEMO_GAME: GameLike = { id: 1, title: "Pokémon VGC", description: "Combates dobles oficiales de la comunidad.", icon: null, createdAt: "2024-01-10", hue: "hsl(18 90% 55%)", short: "VGC", events: 12, players: 3400 }
 
-// Showcase demo events — carry participants·organizer·hue for the full card. [deferred]
+// Showcase demo events — carry participantCount·organizer·hue for the full card.
+// organizer and hue are still [deferred]; the count now comes from the real API.
 export const DEMO_EVENTS: EventLike[] = [
-  { id: 1, title: "Copa Relámpago VGC", description: "Torneo dobles Regulación H, suizo + top cut.", gameName: "Pokémon VGC", startDate: "2026-07-20", status: "upcoming", type: "event", participants: 96, hue: "hsl(18 90% 55%)", organizer: { role: "coorg", name: "Liga VGC España", avatar: "L" } },
-  { id: 2, title: "Liga Wingull · Jornada 3", description: "Serie semanal de la comunidad.", gameName: "Pokémon VGC", startDate: "2026-07-01", status: "active", type: "event", participants: 48, hue: "hsl(18 90% 55%)", organizer: { role: "boffmedia", name: "Boffmedia", avatar: "B" } },
-  { id: 3, title: "Liga TCG Pocket · Temporada 2", description: "Liga mensual con puntuación acumulada y un sobre garantizado por participación.", gameName: "TCG Pocket", startDate: "2026-05-09", endDate: "2026-05-30", status: "completed", type: "server", participants: 147, hue: "hsl(265 60% 66%)", organizer: { role: "platform", name: "Smash Barcelona", avatar: "S" } },
+  { id: 1, title: "Copa Relámpago VGC", description: "Torneo dobles Regulación H, suizo + top cut.", gameName: "Pokémon VGC", startDate: "2026-07-20", status: "upcoming", type: "event", participantCount: 96, hue: "hsl(18 90% 55%)", organizer: { role: "coorg", name: "Liga VGC España", avatar: "L" } },
+  { id: 2, title: "Liga Wingull · Jornada 3", description: "Serie semanal de la comunidad.", gameName: "Pokémon VGC", startDate: "2026-07-01", status: "active", type: "event", participantCount: 48, hue: "hsl(18 90% 55%)", organizer: { role: "boffmedia", name: "Boffmedia", avatar: "B" } },
+  { id: 3, title: "Liga TCG Pocket · Temporada 2", description: "Liga mensual con puntuación acumulada y un sobre garantizado por participación.", gameName: "TCG Pocket", startDate: "2026-05-09", endDate: "2026-05-30", status: "completed", type: "server", participantCount: 147, hue: "hsl(265 60% 66%)", organizer: { role: "platform", name: "Smash Barcelona", avatar: "S" } },
 ]
 
 // earned·globalPct·earnedDate are per-user progress the catalogue API lacks. [deferred]

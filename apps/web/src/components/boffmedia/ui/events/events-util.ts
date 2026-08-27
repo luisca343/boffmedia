@@ -24,12 +24,16 @@ export interface EventLike {
   endDate?: string | null
   status?: string | null
   type?: string | null
+  /**
+   * Active participants, as counted by the events list endpoint. Optional
+   * because the showcase supplies its own demo values and the detail endpoint
+   * does not return it — consumers must still degrade when it is absent.
+   */
+  participantCount?: number | null
   // ── Fields the events API does NOT provide yet — optional + deferred. ────────
   // Populated only in the showcase (demo data). On real pages they are absent and
   // every consumer must degrade gracefully. Remove the "[deferred]" note once the
-  // backend/DTO exposes them. See docs/BOFFMEDIA_V3_DEFERRED.md.
-  /** [deferred] Participant count — the list endpoint has none (detail fetches participants separately). */
-  participants?: number | null
+  // backend/DTO exposes them.
   /** [deferred] Organizer — not in the event model at all. */
   organizer?: EventOrganizerData | null
   /** [deferred] Per-game hue (CSS colour) — no game→hue field on the DTO; falls back to the brand accent. */
