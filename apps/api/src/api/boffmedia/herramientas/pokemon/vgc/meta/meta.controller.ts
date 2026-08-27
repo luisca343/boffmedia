@@ -166,21 +166,6 @@ export class VgcMetaController {
   // --- Champions (VGCPastes) -------------------------------------------------
 
   @Public()
-  @Get('champions/available')
-  @ApiOperation({
-    summary: 'List Champions regulations that have imported data',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Available regulation list returned.',
-    type: ChampionsRegulationDto,
-    isArray: true,
-  })
-  getAvailableChampionsRegulations() {
-    return this.facade.getAvailableChampionsRegulations();
-  }
-
-  @Public()
   @Get('champions')
   @ApiOperation({ summary: 'Get Champions usage data from VGCPastes' })
   @ApiResponse({
@@ -424,6 +409,25 @@ export class VgcMetaController {
     return this.facade.getRegulations();
   }
 
+  @Get('regulations/all')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiOperation({
+    summary:
+      '[Admin] List every regulation, including soft-disabled ones. ' +
+      'The public list filters to active, so this is the only way to find ' +
+      'and re-enable a regulation that was switched off.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Full regulation list returned.',
+    type: ChampionsRegulationDto,
+    isArray: true,
+  })
+  getAllRegulations() {
+    return this.facade.getAllRegulations();
+  }
+
   @Post('regulations')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN)
@@ -440,6 +444,7 @@ export class VgcMetaController {
       name: dto.name,
       gameType: dto.gameType ?? null,
       hasVgcPastesGid: Boolean(dto.vgcPastesGid),
+      active: dto.active ?? true,
     });
     return this.facade.upsertRegulation(dto);
   }

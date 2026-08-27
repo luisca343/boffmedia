@@ -8,7 +8,7 @@ export type CreateParcelaDto = {
      */
     server?: string;
     /**
-     * The exact WorldGuard region id
+     * The exact Teras region id
      */
     regionId: string;
     town: string;

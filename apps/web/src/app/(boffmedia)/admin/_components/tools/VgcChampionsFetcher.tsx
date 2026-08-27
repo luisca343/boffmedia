@@ -56,6 +56,7 @@ export function VgcChampionsFetcher() {
   const [newFormatId, setNewFormatId] = useState("")
   const [newName, setNewName] = useState("")
   const [newGid, setNewGid] = useState("")
+  const [newActive, setNewActive] = useState(true)
 
   useEffect(() => {
     const existing = available.find((r) => r.id === newRegulationId.trim())
@@ -65,9 +66,28 @@ export function VgcChampionsFetcher() {
     if (!newGid) setNewGid(existing.vgcPastesGid ?? "")
   }, [newRegulationId, available])
 
+  // formatId defaults to id server-side; showing that here keeps the two fields
+  // from looking like two unrelated things you must both invent.
+  const effectiveFormatId = newFormatId.trim() || newRegulationId.trim()
+
+  const loadIntoForm = (r: ChampionsRegulation) => {
+    setNewRegulationId(r.id)
+    setNewFormatId(r.formatId ?? "")
+    setNewName(r.name ?? "")
+    setNewGid(r.vgcPastesGid ?? "")
+    setNewActive(Boolean(r.active ?? true))
+    setError(null)
+    setSuccess(null)
+  }
+
   const loadAvailable = (silent = false) => {
     if (!silent) setLoading(true)
-    VgcMetaService.getAvailableChampionsRegulations()
+    // Admin list, not the public one: `active: false` regulations must stay
+    // visible here or there is no way to switch one back on.
+    const request = token
+      ? VgcRegulationsAdminService.getAllRegulations(token)
+      : VgcMetaService.getRegulations()
+    request
       .then((res) => setAvailable(res.data ?? []))
       .catch(() => setError(t("champions.loadErr")))
       .finally(() => {
@@ -77,7 +97,8 @@ export function VgcChampionsFetcher() {
 
   useEffect(() => {
     loadAvailable()
-  }, [])
+     
+  }, [token])
 
   useEffect(() => {
     if (!refreshing && !fetchingPastes) return
@@ -137,7 +158,7 @@ export function VgcChampionsFetcher() {
       setError(t("invalidSession"))
       return
     }
-    if (!newRegulationId.trim() || !newFormatId.trim() || !newName.trim()) {
+    if (!newRegulationId.trim() || !newName.trim()) {
       setError(t("champions.missingFields"))
       return
     }
@@ -146,8 +167,9 @@ export function VgcChampionsFetcher() {
       await VgcRegulationsAdminService.upsertRegulation(
         {
           id: newRegulationId.trim(),
-          formatId: newFormatId.trim(),
+          formatId: effectiveFormatId,
           name: newName.trim(),
+          active: newActive,
           ...(newGid.trim() ? { vgcPastesGid: newGid.trim() } : {}),
         },
         token,
@@ -157,10 +179,14 @@ export function VgcChampionsFetcher() {
       setNewFormatId("")
       setNewName("")
       setNewGid("")
+      setNewActive(true)
       loadAvailable(true)
       window.dispatchEvent(new CustomEvent("vgc-regulations-updated"))
-    } catch {
-      setError(t("champions.saveErr"))
+    } catch (e) {
+      // The API rejects an unknown formatId with a Spanish userMessage listing
+      // the valid ones — far more useful than the generic fallback.
+      const userMessage = (e as { userMessage?: string })?.userMessage
+      setError(userMessage ?? t("champions.saveErr"))
     } finally {
       setAddingRegulation(false)
     }
@@ -172,11 +198,28 @@ export function VgcChampionsFetcher() {
 
       <AvPanel title={t("champions.registerTitle")} icon="plus">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Input value={newRegulationId} onChange={(e) => setNewRegulationId(e.target.value)} placeholder={t("champions.idPlaceholder")} />
-          <Input value={newFormatId} onChange={(e) => setNewFormatId(e.target.value)} placeholder={t("champions.formatPlaceholder")} />
-          <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t("champions.namePlaceholder")} />
-          <Input value={newGid} onChange={(e) => setNewGid(e.target.value)} placeholder={t("champions.gidPlaceholder")} />
+          <div className="space-y-1">
+            <Input value={newRegulationId} onChange={(e) => setNewRegulationId(e.target.value)} placeholder={t("champions.idPlaceholder")} />
+            <p className="text-[11px] text-txt-dim">{t("champions.idHint")}</p>
+          </div>
+          <div className="space-y-1">
+            <Input value={newFormatId} onChange={(e) => setNewFormatId(e.target.value)} placeholder={effectiveFormatId || t("champions.formatPlaceholder")} />
+            <p className="text-[11px] text-txt-dim">{t("champions.formatHint")}</p>
+          </div>
+          <div className="space-y-1">
+            <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t("champions.namePlaceholder")} />
+            <p className="text-[11px] text-txt-dim">{t("champions.nameHint")}</p>
+          </div>
+          <div className="space-y-1">
+            <Input value={newGid} onChange={(e) => setNewGid(e.target.value)} placeholder={t("champions.gidPlaceholder")} />
+            <p className="text-[11px] text-txt-dim">{t("champions.gidHint")}</p>
+          </div>
         </div>
+        <label className="mt-3 flex items-center gap-2 text-xs text-txt-muted cursor-pointer">
+          <input type="checkbox" checked={newActive} onChange={(e) => setNewActive(e.target.checked)} className="accent-accent" />
+          {t("champions.activeLabel")}
+        </label>
+        <p className="mt-1 text-[11px] text-txt-dim">{t("champions.activeHint")}</p>
         <div className="mt-4">
           <Button size="sm" loading={addingRegulation} disabled={addingRegulation} onClick={handleUpsertRegulation}>
             {addingRegulation ? t("champions.saving") : t("champions.save")}
@@ -217,9 +260,14 @@ export function VgcChampionsFetcher() {
                   const isFetching = fetchingPastes === regulation.id
                   const status = statusPill(regulation)
                   return (
-                    <tr key={regulation.id} className="border-b border-solid border-line last:border-b-0 hover:bg-panel-2 transition-colors">
+                    <tr key={regulation.id} className={`border-b border-solid border-line last:border-b-0 hover:bg-panel-2 transition-colors ${regulation.active ? "" : "opacity-55"}`}>
                       <td className="px-4 py-3">
-                        <p className="text-xs font-medium">{regulation.name}</p>
+                        <p className="text-xs font-medium">
+                          {regulation.name}
+                          {regulation.active ? null : (
+                            <span className="ml-2 text-[10px] uppercase tracking-wide text-txt-dim">{t("champions.inactiveTag")}</span>
+                          )}
+                        </p>
                         <p className="text-txt-dim text-[11px] font-mono">{regulation.id}</p>
                         <p className="text-txt-dim text-[11px] font-mono">{regulation.formatId}</p>
                         {regulation?.importTeamCount ? (
@@ -238,6 +286,9 @@ export function VgcChampionsFetcher() {
                       </td>
                       <td className="px-3 py-3 text-right">
                         <div className="flex items-center justify-end gap-2">
+                          <Button size="sm" variant="ghost" icon="edit" onClick={() => loadIntoForm(regulation)}>
+                            {t("champions.edit")}
+                          </Button>
                           <Button
                             size="sm"
                             icon="refresh"

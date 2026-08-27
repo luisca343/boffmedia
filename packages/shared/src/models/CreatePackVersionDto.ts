@@ -23,6 +23,10 @@ export type CreatePackVersionDto = {
      * PackFile[] instalados solo en la primera instalación (initialFiles) — validado con @boffmedia/pack-schema
      */
     initialFiles?: Array<Record<string, any>>;
+    /**
+     * OptionalGroup[] — el contenido opcional que el jugador elige, validado con @boffmedia/pack-schema. La unidad es una FEATURE (varios archivos, una decisión), no un archivo suelto.
+     */
+    optionalGroups?: Array<Record<string, any>>;
 };
 export namespace CreatePackVersionDto {
     export enum loader {

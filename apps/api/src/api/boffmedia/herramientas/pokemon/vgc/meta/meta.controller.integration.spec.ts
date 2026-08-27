@@ -49,7 +49,6 @@ const mockFacade = {
   getSmogonUsage: jest.fn(),
   getSmogonUsageList: jest.fn(),
   getSmogonDetail: jest.fn(),
-  getAvailableChampionsRegulations: jest.fn(),
   getChampionsUsage: jest.fn(),
   getChampionsUsageList: jest.fn(),
   getChampionsPasteDetail: jest.fn(),
@@ -253,19 +252,6 @@ describe('VgcMetaController — integration (ValidationPipe + GlobalExceptionFil
   });
 
   // ── Champions endpoints ─────────────────────────────────────────────────
-
-  describe('GET /tools/vgc/meta/champions/available', () => {
-    it('returns 200 and delegates to facade.getAvailableChampionsRegulations', async () => {
-      mockFacade.getAvailableChampionsRegulations.mockResolvedValue([]);
-
-      const res = await request(app.getHttpServer()).get(
-        '/tools/vgc/meta/champions/available',
-      );
-
-      expect(res.status).toBe(200);
-      expect(mockFacade.getAvailableChampionsRegulations).toHaveBeenCalled();
-    });
-  });
 
   describe('GET /tools/vgc/meta/champions', () => {
     it('returns 200 and delegates to facade.getChampionsUsage', async () => {

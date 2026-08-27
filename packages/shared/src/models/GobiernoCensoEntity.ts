@@ -10,7 +10,7 @@ export type GobiernoCensoEntity = {
      */
     standing: GobiernoCensoEntity.standing;
     /**
-     * Number of parcelas owned (from WorldGuard)
+     * Number of parcelas owned (from the Teras region catalog)
      */
     parcelas: number;
     /**

@@ -1,7 +1,21 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Decoration, ArmorPiece, Weapon, Charm } from '../../types';
 import { useLocale, useToolT } from "../../i18n"
-import { MhWildsService } from '../../service';
+import { MhWildsService, type ApiResponse } from '../../service';
+
+/**
+ * The service NEVER throws on a failed request: it resolves an envelope with
+ * `success: false` and no `data`. `response.data!` therefore stored `undefined`
+ * in state, the try/catch saw nothing wrong, and the lookup-map memos below
+ * crashed on `.forEach` — a dead API took the whole planner page down instead
+ * of showing its own error state. Every fetch goes through this instead.
+ */
+function listOrThrow<T>(response: ApiResponse<T[]>): T[] {
+  if (!response.success || !Array.isArray(response.data)) {
+    throw new Error(response.error || response.message || `Request failed (${response.statusCode})`);
+  }
+  return response.data;
+}
 
 // Define a type for the server-side skill data
 export interface ServerSkill {
@@ -91,7 +105,7 @@ export function useGameData() {
     setLoadingDecorations(true);
     try {
       const response = await MhWildsService.getDecorations(locale);
-      setDecorations(response.data!);
+      setDecorations(listOrThrow(response));
       setDecorationsError(null);
     } catch (err) {
       console.error("Error fetching decorations:", err);
@@ -106,7 +120,7 @@ export function useGameData() {
     setLoadingWeapons(true);
     try {
       const response = await MhWildsService.getWeapons(locale);
-      setWeapons(response.data!);
+      setWeapons(listOrThrow(response));
       setWeaponsError(null);
     } catch (err) {
       console.error("Error fetching weapons:", err);
@@ -121,7 +135,7 @@ export function useGameData() {
     setLoadingArmor(true);
     try {
       const response = await MhWildsService.getArmor(locale);
-      setArmor(response.data!);
+      setArmor(listOrThrow(response));
       setArmorError(null);
     } catch (err) {
       console.error("Error fetching armor:", err);
@@ -140,7 +154,7 @@ export function useGameData() {
       // Create a lookup map by both ID and name for faster access
       const skillsMap: Record<string, EnhancedSkill> = {};
       
-      response.data!.forEach((skill: ServerSkill) => {
+      listOrThrow(response).forEach((skill: ServerSkill) => {
         // Calculate max level for each skill
         const maxLevel = skill.ranks.reduce((max, rank) => 
           rank.level > max ? rank.level : max, 0);
@@ -172,7 +186,7 @@ export function useGameData() {
     setLoadingCharms(true);
     try {
       const response = await MhWildsService.getCharms(locale);
-      setCharms(response.data!);
+      setCharms(listOrThrow(response));
       setCharmsError(null);
     } catch (err) {
       console.error("Error fetching charms:", err);

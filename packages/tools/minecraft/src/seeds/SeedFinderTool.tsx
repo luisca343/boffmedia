@@ -33,6 +33,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Banner, Button, Checkbox, Field, Input, Panel, Seg, Select } from "@boffmedia/ui";
 import { ASSET } from "@boffmedia/asset-paths";
+import { saveFile } from "@boffmedia/tool-kit";
 
 import { SEED_FINDER_NS, useToolT } from "../i18n";
 import { CURATED_PACKS, resolvePackConflicts } from "./_lib/packSource";
@@ -42,7 +43,14 @@ import { blocksPerPixel, gridSpacingFor, type Quality } from "./_lib/mapMath";
 import { readViewState, teleportCommand, writeViewState, type ViewState } from "./_lib/urlState";
 import type { LoadStackResult, TileMode, WorkerPackRef } from "./_lib/worker/seeds-api";
 import { searchPoolTarget } from "./_lib/pool";
-import { hasPrefilter } from "./_lib/search";
+import { hasPrefilter, IDLE_PROGRESS } from "./_lib/search";
+import {
+  buildRunBundle,
+  packMismatch,
+  packStack,
+  parseRunBundle,
+  runBundleCsv,
+} from "./_lib/runBundle";
 import { useSeedsEngine } from "./_hooks/useSeedsEngine";
 import { SeedMap, type HoverInfo } from "./_components/SeedMap";
 import { MapHud } from "./_components/MapHud";
@@ -53,6 +61,23 @@ import { useSpecEvaluation } from "./_hooks/useSpecEvaluation";
 import { useSeedSearch } from "./_hooks/useSeedSearch";
 import { fromCoreSpec, scanHash, toCoreSpec, type UiSpec } from "./_spec/model";
 import { DEFAULT_PRESET } from "./_spec/presets";
+
+/**
+ * Enough of a `UiSpec` to hand to the editor.
+ *
+ * The same three fields `useNamedSpecs` checks, for the same reason: a bundle
+ * is a file off disk, and the editor indexes `locations` unguarded.
+ */
+function isUiSpec(value: unknown): value is UiSpec {
+  return (
+    !!value &&
+    typeof value === "object" &&
+    "origin" in value &&
+    "scan" in value &&
+    "locations" in value &&
+    Array.isArray((value as UiSpec).locations)
+  );
+}
 
 /** Vanilla is not optional: without it there are no base density functions to override. */
 const REQUIRED_PACK = "vanilla";
@@ -363,7 +388,105 @@ export function SeedFinderTool() {
     return sample;
   }, [engine, loaded, coreSpec]);
 
-  const search = useSeedSearch(engine?.pool ?? null, coreSpec);
+  const search = useSeedSearch(engine?.pool ?? null, coreSpec, spec);
+
+  const [importedRun, setImportedRun] = useState<{
+    exportedAt: string;
+    packMismatch: readonly string[];
+  } | null>(null);
+  const [importError, setImportError] = useState<string | null>(null);
+
+  /**
+   * Write the run out, through the host rather than an `<a download>` — an
+   * anchor click is inert in the launcher's webview, so the button would look
+   * like it worked and write nothing.
+   *
+   * The specs come from the search's own snapshot, never from the editor:
+   * exporting the spec currently on screen would attach whatever has been
+   * typed since the search ran to results it did not judge.
+   */
+  const exportRun = useCallback(
+    async (format: "json" | "csv") => {
+      if (!search.hits.length) return;
+      const stamp = new Date();
+      const name = `seed-run-${stamp.toISOString().slice(0, 19).replace(/[:T]/g, "-")}`;
+
+      if (format === "csv") {
+        await saveFile({
+          suggestedName: `${name}.csv`,
+          data: new Blob([runBundleCsv(search.hits)], { type: "text/csv;charset=utf-8" }),
+          mimeType: "text/csv",
+          filters: [{ name: "CSV", extensions: ["csv"] }],
+        });
+        return;
+      }
+
+      const bundle = buildRunBundle({
+        packs: packStack(enabled),
+        // A snapshot is missing only for an imported run whose file predates
+        // the field; the editor's copy is the honest fallback there.
+        uiSpec: search.snapshot?.ui ?? spec,
+        coreSpec: search.snapshot?.core ?? coreSpec,
+        progress: search.progress,
+        hits: search.hits,
+        exportedAt: stamp.toISOString(),
+      });
+      await saveFile({
+        suggestedName: `${name}.json`,
+        data: new Blob([JSON.stringify(bundle)], { type: "application/json" }),
+        mimeType: "application/json",
+        filters: [{ name: "JSON", extensions: ["json"] }],
+      });
+    },
+    [search.hits, search.snapshot, search.progress, enabled, spec, coreSpec],
+  );
+
+  /**
+   * Open a run and take on its spec.
+   *
+   * The editor is replaced by the spec that judged these seeds — reading a
+   * score against a different spec is the mismatch the frozen snapshot exists
+   * to prevent. The pack stack is NOT switched: a mismatch is reported and the
+   * results open anyway, so a run whose packs have since been rebuilt is still
+   * readable and is visibly labelled as measured against other data.
+   */
+  const openRun = useCallback(
+    async (file: File) => {
+      setImportError(null);
+      try {
+        const bundle = parseRunBundle(await file.text());
+        // The editor's own state where the file has it, so the panel comes
+        // back exactly as it was left. `fromCoreSpec` is the fallback, and
+        // deliberately second: the round-trip through it is the step that has
+        // been seen to change a spec, so it is used only when there is no
+        // `ui` to prefer.
+        setSpec(isUiSpec(bundle.spec.ui) ? bundle.spec.ui : fromCoreSpec(bundle.spec.core as Record<string, unknown>));
+        search.load(
+          bundle.hits,
+          {
+            ...IDLE_PROGRESS,
+            total: bundle.run.total,
+            checked: bundle.run.checked,
+            evaluated: bundle.run.evaluated,
+            hits: bundle.run.hits,
+            dropped: bundle.run.dropped,
+            elapsedMs: bundle.run.elapsedMs,
+            attrition: bundle.run.attrition,
+          },
+          { core: bundle.spec.core, ui: bundle.spec.ui },
+        );
+        setImportedRun({
+          exportedAt: bundle.exportedAt,
+          packMismatch: packMismatch(bundle.packs, packStack(enabled)),
+        });
+        setTab("search");
+      } catch (e) {
+        setImportedRun(null);
+        setImportError(e instanceof Error ? e.message : String(e));
+      }
+    },
+    [search, enabled],
+  );
 
   /**
    * What one seed costs for the spec on screen, kept from the last COLD
@@ -378,6 +501,14 @@ export function SeedFinderTool() {
     const r = evaluation.result;
     if (r?.cold && typeof r.costMs === "number" && r.costMs > 0) setPerSeedMs(r.costMs);
   }, [evaluation.result]);
+
+  // Cleared whenever a real search starts, so the imported banner cannot
+  // outlive the results it describes.
+  const startSearch = useCallback(() => {
+    setImportedRun(null);
+    setImportError(null);
+    search.start(searchCount, { survivorRate: survivorRate ?? undefined, workerTarget, perSeedMs });
+  }, [search, searchCount, survivorRate, workerTarget, perSeedMs]);
 
   // A spec with no prefilter evaluates every seed in full, so the survivor rate
   // the meter measures does not apply to it.
@@ -460,15 +591,13 @@ export function SeedFinderTool() {
               onWorkerTargetChange={setWorkerTarget}
               stackBytes={loaded?.bytes ?? 0}
               stackLoadMs={loaded ? loaded.ms.fetch + loaded.ms.build : 0}
-              onStart={() =>
-                search.start(searchCount, {
-                  survivorRate: survivorRate ?? undefined,
-                  workerTarget,
-                  perSeedMs,
-                })
-              }
+              onStart={startSearch}
               onStop={search.stop}
               ready={!!loaded && spec.locations.length > 0}
+              onExportRun={(format) => void exportRun(format)}
+              onOpenRun={(file) => void openRun(file)}
+              importedRun={importedRun}
+              importError={importError}
               seedOnMap={seed}
               onPickSeed={pickSeed}
               onFocusSite={showSite}

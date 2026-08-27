@@ -7,7 +7,7 @@ export function useChampionsRegulations(): ChampionsRegulation[] {
   const [regulations, setRegulations] = useState<ChampionsRegulation[]>([]);
 
   useEffect(() => {
-    VgcMetaService.getAvailableChampionsRegulations()
+    VgcMetaService.getRegulations()
       .then((res) => setRegulations(res.data ?? []))
       .catch(() => setRegulations([]));
   }, []);

@@ -4,6 +4,8 @@ import { useLocale, useTranslations } from "next-intl"
 import { configureToolHost, createWebToolHost } from "@boffmedia/tool-kit"
 import { configureUi } from "@boffmedia/ui"
 
+import { env } from "@/config/env.public"
+
 // Runs at import time, once per module graph. Next builds the server and the
 // client bundles separately, so this module has to be reachable from BOTH —
 // see `UiRuntime` in the root layout, which is a client component, and the
@@ -27,5 +29,9 @@ configureUi({
 // invoked from client components, but constructing them server-side is
 // pointless and `createWebStorage` would be handed no `localStorage`.
 if (typeof window !== "undefined") {
-  configureToolHost(createWebToolHost({ apiBaseUrl: process.env.NEXT_PUBLIC_API_URL ?? "/api" }))
+  // NEXT_PUBLIC_API — the same base every `services/http` call uses. There is
+  // no NEXT_PUBLIC_API_URL in this app: reading one left the host on the
+  // "/api" default, a relative base `new URL()` rejects outright, so every
+  // tool request through the `api` capability threw before it was sent.
+  configureToolHost(createWebToolHost({ apiBaseUrl: env.NEXT_PUBLIC_API }))
 }

@@ -8,9 +8,9 @@ export type UpsertRegulationDto = {
      */
     id: string;
     /**
-     * @pkmn/sim format ID
+     * @pkmn/sim format ID. Defaults to `id` when omitted. Must resolve in the Dex or the request is rejected with 400.
      */
-    formatId: string;
+    formatId?: string;
     /**
      * Display name
      */
@@ -20,6 +20,10 @@ export type UpsertRegulationDto = {
      * Google Sheet GID for VGCPastes data (null = no sheet)
      */
     vgcPastesGid?: string | null;
+    /**
+     * Soft-disable switch. false hides the regulation from every picker without deleting its imported data. Defaults to true.
+     */
+    active?: boolean;
 };
 export namespace UpsertRegulationDto {
     export enum gameType {

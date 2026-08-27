@@ -18,9 +18,16 @@
  * Results are the seeds that PASSED, ranked by score. Seeds that failed are not
  * listed at all: the spec is the filter, so a list of things it rejected would
  * be a list of everything.
+ *
+ * The results also leave and come back as a file, from the header of the panel
+ * that lists them. A search costs an hour of a real machine and lived, until
+ * now, only until the tab was reloaded; a run bundle makes that hour something
+ * you can keep, send to somebody, and open again to audit seed by seed. The
+ * panel itself only picks the file and shows what came of it — see
+ * `_lib/runBundle.ts` for what is in one and why.
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button, Panel, Seg } from "@boffmedia/ui";
 
 import type { Translate } from "@boffmedia/ui/i18n";
@@ -59,6 +66,24 @@ export interface SearchPanelProps {
   onStop: () => void;
   /** Locations present in the spec, so a hit can be checked against real names. */
   ready: boolean;
+  /**
+   * Write the results out. `json` is the round-trippable run bundle; `csv` is
+   * the flat table, which cannot come back.
+   */
+  onExportRun: (format: "json" | "csv") => void;
+  /** Read a run bundle back in. The panel only picks the file. */
+  onOpenRun: (file: File) => void;
+  /**
+   * Set while the listed hits came from a file rather than from this session.
+   * `packMismatch` names the packs whose bytes differ from what is loaded now —
+   * the results still show, because refusing to open a run whose packs have
+   * since been rebuilt would make old audits unreadable, but a map drawn from
+   * different worldgen data than the one that scored these seeds cannot be
+   * allowed to look like agreement.
+   */
+  importedRun: { exportedAt: string; packMismatch: readonly string[] } | null;
+  /** Last import failure, already translated. */
+  importError: string | null;
   seedOnMap: string;
   onPickSeed: (seed: string) => void;
   onFocusSite: (x: number, z: number) => void;
@@ -71,6 +96,19 @@ function formatDuration(ms: number, t: Translate): string {
   const m = Math.round(s / 60);
   if (m < 60) return t("search.minutes", { n: m });
   return t("search.hours", { n: (m / 60).toFixed(1) });
+}
+
+/**
+ * The bundle's timestamp, in the reader's own locale.
+ *
+ * Rendered from an ISO string the file carries, so a run exported in one
+ * timezone reads correctly when it is opened in another. An unparseable or
+ * missing stamp falls back to the raw text rather than printing "Invalid Date".
+ */
+function formatStamp(iso: string): string {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? iso : d.toLocaleString();
 }
 
 export function SearchPanel({
@@ -89,12 +127,21 @@ export function SearchPanel({
   onStart,
   onStop,
   ready,
+  onExportRun,
+  onOpenRun,
+  importedRun,
+  importError,
   seedOnMap,
   onPickSeed,
   onFocusSite,
   t,
 }: SearchPanelProps) {
   const { running, checked, total, evaluated, elapsedMs, etaMs, workers } = progress;
+
+  // The only way a browser opens a file picker is a click on a real input, so
+  // one is kept hidden and clicked from the button beside the results.
+  const fileRef = useRef<HTMLInputElement | null>(null);
+  const pickFile = () => fileRef.current?.click();
 
   /**
    * How large the pool will grow, read after mount rather than during render.
@@ -230,12 +277,72 @@ export function SearchPanel({
       <Panel
         title={t("search.results")}
         aside={
-          <span className="font-mono text-[11px] text-txt-dim">
-            {hits.length}
-            {dropped > 0 ? ` (+${dropped})` : ""}
-          </span>
+          <>
+            <span className="font-mono text-[11px] text-txt-dim">
+              {hits.length}
+              {dropped > 0 ? ` (+${dropped})` : ""}
+            </span>
+            {/* Beside the count they act on. Export is disabled with nothing to
+                write; opening a run is not, because an empty list is exactly
+                when somebody wants to load one. */}
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={!hits.length || running}
+              onClick={() => onExportRun("json")}
+              title={t("run.export.json")}
+            >
+              {t("run.export.jsonShort")}
+            </Button>
+            <Button
+              size="sm"
+              variant="ghost"
+              disabled={!hits.length || running}
+              onClick={() => onExportRun("csv")}
+              title={t("run.export.csv")}
+            >
+              {t("run.export.csvShort")}
+            </Button>
+            <Button size="sm" variant="ghost" disabled={running} onClick={pickFile}>
+              {t("run.open")}
+            </Button>
+            {/* Off-screen rather than absent: the file input is the only way a
+                browser will open a picker, and styling one is not worth it. */}
+            <input
+              ref={fileRef}
+              type="file"
+              accept="application/json,.json"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                // Cleared so re-opening the SAME file fires `change` again;
+                // without this a failed import cannot be retried.
+                e.target.value = "";
+                if (file) onOpenRun(file);
+              }}
+            />
+          </>
         }
       >
+        {importedRun ? (
+          <div className="mb-2.5 grid gap-1 border border-line-2 bg-base px-2.5 py-2">
+            <p className="font-mono text-[10px] leading-snug text-txt-dim">
+              {t("run.imported", { date: formatStamp(importedRun.exportedAt) })}
+            </p>
+            {importedRun.packMismatch.length ? (
+              <p className="font-mono text-[10px] leading-snug text-danger">
+                {t("run.packMismatch", { packs: importedRun.packMismatch.join(", ") })}
+              </p>
+            ) : null}
+          </div>
+        ) : null}
+
+        {importError ? (
+          <p className="mb-2.5 font-mono text-[10px] leading-snug text-danger">
+            {t("run.openFailed", { message: importError })}
+          </p>
+        ) : null}
+
         {/* Above the list, at reading size, because a ranked table of seeds
             with scores reads as a verified result and nothing here has been
             opened in Minecraft. The per-hit row carries the /tp checklist that

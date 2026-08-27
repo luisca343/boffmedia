@@ -1,4 +1,10 @@
-﻿import { Injectable, NotFoundException } from '@nestjs/common';
+﻿import {
+  BadRequestException,
+  Injectable,
+  Logger,
+  NotFoundException,
+} from '@nestjs/common';
+import { Dex } from '@pkmn/sim';
 import { FetchSmogonDto } from './dto/fetch-smogon.dto';
 import { SmogonService } from './services/smogon.service';
 import { VgcPastesService } from './services/vgcpastes.service';
@@ -21,9 +27,15 @@ import { PersonalMetaAnalyticsService } from './services/personal-meta-analytics
 import { DivergenceService } from './services/divergence.service';
 import { QueryPersonalMetaDto } from './dto/query-personal-meta.dto';
 import { QueryDivergenceDto } from './dto/query-divergence.dto';
+import {
+  initChampionsMod,
+  listChampionsFormatIds,
+} from '../champions.mod';
 
 @Injectable()
 export class VgcMetaFacadeService {
+  private readonly logger = new Logger(VgcMetaFacadeService.name);
+
   constructor(
     private readonly smogonService: SmogonService,
     private readonly vgcPastesService: VgcPastesService,
@@ -105,10 +117,6 @@ export class VgcMetaFacadeService {
   }
 
   // â”€â”€â”€ Champions (VGCPastes) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-
-  async getAvailableChampionsRegulations() {
-    return this.vgcPastesService.getAvailableRegulations();
-  }
 
   async getChampionsUsage(dto: QueryChampionsDto) {
     const regulation = await this.regulationsRepository.findById(
@@ -311,15 +319,55 @@ export class VgcMetaFacadeService {
     return this.regulationsRepository.findActive();
   }
 
+  /** Admin-only: includes soft-disabled regulations. */
+  async getAllRegulations() {
+    return this.regulationsRepository.findAll();
+  }
+
   async upsertRegulation(dto: UpsertRegulationDto) {
+    // formatId defaults to id: the two are the same string whenever the sim's
+    // format id is short enough to double as our shorthand PK.
+    const formatId = dto.formatId?.trim() || dto.id.trim();
+
+    // Reject unknown formats here rather than letting the row save and then
+    // 404 later from /champions/:id/{pokemon,speed-tiers,game-data}, which all
+    // go through Dex.forFormat(regulation.formatId).
+    initChampionsMod();
+    const format = Dex.formats.get(formatId);
+    const existing = await this.regulationsRepository.findById(dto.id.trim());
+    // Only block on CREATE. A row that predates this check may point at an
+    // unregistered format (its rules-based endpoints 404); refusing the save
+    // would also lock an admin out of editing its name, GID or active flag.
+    if (!format.exists && !existing) {
+      throw new BadRequestException({
+        message:
+          `Format "${formatId}" is not registered in @pkmn/sim. ` +
+          `Champions formats must be declared in champions.mod.ts. ` +
+          `Known Champions formats: ${listChampionsFormatIds().join(', ')}.`,
+        userMessage:
+          `El formato "${formatId}" no existe en el simulador. ` +
+          `Formatos Champions disponibles: ${listChampionsFormatIds().join(', ')}.`,
+      });
+    }
+
     await this.regulationsRepository.upsert({
-      id: dto.id,
-      formatId: dto.formatId,
+      id: dto.id.trim(),
+      formatId,
       name: dto.name,
-      gameType: dto.gameType,
+      // The sim is the authority on game type; the DTO value is only a hint.
+      gameType: format.exists ? (format.gameType ?? dto.gameType) : dto.gameType,
       vgcPastesGid: dto.vgcPastesGid,
+      active: dto.active,
     });
-    return this.regulationsRepository.findById(dto.id);
+    const saved = await this.regulationsRepository.findById(dto.id.trim());
+    if (!format.exists) {
+      this.logger.warn(
+        `Regulation "${dto.id}" points at unregistered format "${formatId}". ` +
+          `Its legality, speed-tier and game-data endpoints will 404 until the ` +
+          `format is declared in champions.mod.ts.`,
+      );
+    }
+    return saved;
   }
 
   // ─── Species Teams ──────────────────────────────────────────────────────────

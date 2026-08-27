@@ -3,7 +3,6 @@
 import { useTranslations } from "next-intl"
 import { DkBar, DkTitle, DkDivider, DkSeg, DkSelect, DkSpacer, DkChip } from "@/components/boffmedia/ui/tools/datakit"
 import type { SmogonSnapshot, ChampionsRegulation, LimitlessTournament } from "@/services/api/boffmedia/vgcService"
-import { ENABLE_PREVIEW_FORMATS } from "../constants"
 import { fmtCount } from "../_lib/meta-types"
 
 interface VgcToolbarProps {
@@ -50,9 +49,16 @@ export function VgcToolbar({
   const t = useTranslations("vgc.meta")
 
   const sortedRegulations = [...regulations].sort((a, b) => b.id.localeCompare(a.id))
-  const previewRegulations = ENABLE_PREVIEW_FORMATS ? sortedRegulations.filter((r) => Boolean(r.vgcPastesGid)) : []
-  const isPreviewFormat = previewRegulations.some((r) => r.id === format)
-  const regulationNameByFormatId = new Map(sortedRegulations.map((r) => [r.formatId, r.name]))
+  // A registered regulation is ALWAYS keyed by its own id in the picker, never
+  // by formatId — otherwise a regulation whose id and formatId are the same
+  // string (the common case) would produce two identical-looking options.
+  const regulationById = new Map(sortedRegulations.map((r) => [r.id, r]))
+  const regulationByFormatId = new Map(sortedRegulations.map((r) => [r.formatId, r]))
+  // Older URLs carry a bare formatId — resolve those to the regulation too so
+  // the picker still highlights the right option.
+  const selectedRegulation = regulationById.get(format) ?? regulationByFormatId.get(format)
+  const resolvedFormat = selectedRegulation?.formatId ?? format
+  const selectValue = selectedRegulation?.id ?? format
 
   const latestMonthByFormat = new Map<string, string>()
   for (const s of snapshots) {
@@ -65,8 +71,13 @@ export function VgcToolbar({
     return monthB.localeCompare(monthA) || a.localeCompare(b)
   })
 
-  const availableMonths = [...new Set(snapshots.filter((s) => s.formatId === format).map((s) => s.month))].sort().reverse()
-  const existingCutoffs = new Set(snapshots.filter((s) => s.formatId === format).map((s) => s.cutoff))
+  // Smogon is the preferred source whenever a snapshot exists; the VGCPastes
+  // sheet is the fallback for regulations that have no ladder data yet.
+  const hasSnapshot = snapshots.some((s) => s.formatId === resolvedFormat)
+  const isChampionsFormat = Boolean(selectedRegulation?.vgcPastesGid) && !hasSnapshot
+
+  const availableMonths = [...new Set(snapshots.filter((s) => s.formatId === resolvedFormat).map((s) => s.month))].sort().reverse()
+  const existingCutoffs = new Set(snapshots.filter((s) => s.formatId === resolvedFormat).map((s) => s.cutoff))
   const availableCutoffs = VALID_CUTOFFS.filter((c) => existingCutoffs.has(c))
   const cutoffValue = availableCutoffs.includes(cutoff as (typeof VALID_CUTOFFS)[number])
     ? String(cutoff)
@@ -82,22 +93,19 @@ export function VgcToolbar({
 
   const handleFormatSelect = (value: string) => {
     if (value === format) return
-    const previewReg = previewRegulations.find((r) => r.id === value)
-    if (previewReg) {
-      onFormatChange(value, "", 1760)
-      return
-    }
-    const snapshot = pickLatestSnapshot(value, cutoff)
-    if (snapshot) {
-      onFormatChange(snapshot.formatId, snapshot.month, snapshot.cutoff)
-      return
-    }
-    onFormatChange(value, "", 1760)
+    // Keep the picked key in the URL (regulation id or bare formatId) and only
+    // resolve it to a formatId when looking the snapshot up.
+    const snapshot = pickLatestSnapshot(regulationById.get(value)?.formatId ?? value, cutoff)
+    onFormatChange(value, snapshot?.month ?? "", snapshot?.cutoff ?? 1760)
   }
 
   const formatOptions = [
-    ...uniqueFormats.map((id) => ({ value: id, label: regulationNameByFormatId.get(id) ?? formatLabels[id] ?? id })),
-    ...previewRegulations.map((r) => ({ value: r.id, label: r.name })),
+    // One option per regulation…
+    ...sortedRegulations.map((r) => ({ value: r.id, label: r.name })),
+    // …plus any snapshot whose format has no regulation registered for it.
+    ...uniqueFormats
+      .filter((id) => !regulationByFormatId.has(id))
+      .map((id) => ({ value: id, label: formatLabels[id] ?? id })),
   ]
 
   const tournamentOptions = [
@@ -125,8 +133,8 @@ export function VgcToolbar({
       />
       {tab === "stats" ? (
         <>
-          <DkSelect value={format} ariaLabel={t("pickers.format")} minWidth="180px" onChange={handleFormatSelect} options={formatOptions} />
-          {!isPreviewFormat && uniqueFormats.length > 0 && (
+          <DkSelect value={selectValue} ariaLabel={t("pickers.format")} minWidth="180px" onChange={handleFormatSelect} options={formatOptions} />
+          {!isChampionsFormat && availableCutoffs.length > 0 && (
             <>
               <DkSelect
                 value={month || "__all__"}

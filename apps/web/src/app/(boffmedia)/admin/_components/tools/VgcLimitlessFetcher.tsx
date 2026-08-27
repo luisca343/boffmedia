@@ -63,7 +63,7 @@ export function VgcLimitlessFetcher() {
   }
 
   const loadRegulations = () => {
-    VgcMetaService.getAvailableChampionsRegulations()
+    VgcMetaService.getRegulations()
       .then((res) => {
         const regs = res.data ?? []
         setRegulations(regs)

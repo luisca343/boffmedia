@@ -561,7 +561,7 @@
         "noPreviousVersions": "Sin versiones anteriores."
       },
       "sessionType": {
-        "ladder": "Clasificatoria",
+        "ladder": "Ladder",
         "tournament": "Torneo"
       },
       "tournament": {
@@ -805,7 +805,7 @@
     },
     "meta": {
       "title": "Análisis de Meta",
-      "subtitle": "Uso en la escalera y composición de equipos desde Smogon Stats",
+      "subtitle": "Uso en el Ladder y composición de equipos, según Smogon Stats",
       "formats": {
         "gen9vgc2026regi": "VGC 2026 Reg I",
         "gen9vgc2026regh": "VGC 2026 Reg H",
@@ -901,16 +901,16 @@
           "badge": "Insignia"
         },
         "badges": {
-          "ladderTrap": "Trampa de ladder",
-          "ladderTrapTitle": "Alto uso en escalera, bajo en torneos — puede estar sobrevalorado en top-cut",
+          "ladderTrap": "Trampa de Ladder",
+          "ladderTrapTitle": "Muy usado en el Ladder y poco en torneos — puede estar sobrevalorado en top cut",
           "tournamentStaple": "Pilar de torneo",
-          "tournamentStapleTitle": "Bajo uso en escalera, alto en torneos — infravalorado en la escalera"
+          "tournamentStapleTitle": "Poco usado en el Ladder y mucho en torneos — infravalorado en el Ladder"
         },
         "emptyTitle": "Sin datos de divergencia",
-        "note": "Compara el uso en el <b>ladder</b> ({format} · {month} · 1630+ ELO) con el uso en <b>torneos</b>. Δ positivo = más usado en torneo."
+        "note": "Compara el uso en el <b>Ladder</b> ({format} · {month} · 1630+ ELO) con el uso en <b>torneos</b>. Δ positivo = más usado en torneo."
       },
       "refresh": "Actualizar",
-      "footer": "Datos de Smogon Stats · Actualización mensual · Corte por defecto: 1760",
+      "footer": "Datos de Smogon Stats · Actualización mensual · Corte de ELO por defecto: 1760",
       "barTitle": "Meta VGC",
       "barSub": {
         "ladder": "Ladder · Smogon",
@@ -923,13 +923,13 @@
         "aggregate": "Agregado",
         "players": "Jugadores",
         "divergence": "Divergencia",
-        "championsPreviewNotice": "Datos de vista previa desde VGCPastes; el uso es orientativo."
+        "championsNotice": "Uso calculado a partir de los equipos importados de VGCPastes, no del Ladder de Smogon."
       },
       "cutoff": {
         "all": "Todos los ELO"
       },
       "chip": {
-        "battles": "{count} batallas",
+        "battles": "{count} combates",
         "teams": "{count} equipos"
       },
       "aria": {
@@ -937,7 +937,7 @@
         "tournamentView": "Vista de torneo",
         "usageRanking": "Ranking de uso",
         "standings": "Clasificación del torneo",
-        "divergence": "Divergencia escalera–torneo"
+        "divergence": "Divergencia Ladder–torneos"
       },
       "list": {
         "appearances": "{count} apariciones"

@@ -73,7 +73,8 @@ export class VgcMetaService {
     return apiAuthedDELETE<void>(`/tools/vgc/meta/smogon/snapshot?${params}`, token);
   }
 
-  static getAvailableChampionsRegulations() {
+  /** Every active regulation. Sole source for regulation pickers. */
+  static getRegulations() {
     return apiGET<ChampionsRegulation[]>('/tools/vgc/meta/regulations');
   }
 
@@ -222,6 +223,11 @@ export class VgcRegulationsAdminService {
   static upsertRegulation(payload: UpsertRegulationPayload, token: string) {
     return apiAuthedPOST<ChampionsRegulation>('/tools/vgc/meta/regulations', payload, token);
   }
+
+  /** Includes soft-disabled regulations — the public list does not. */
+  static getAllRegulations(token: string) {
+    return apiAuthedGET<ChampionsRegulation[]>('/tools/vgc/meta/regulations/all', token);
+  }
 }
 
 // ─── Limitless types ─────────────────────────────────────────────────────────
@@ -235,8 +241,9 @@ export type SpeedTierEntry = SpeedTierEntryDto;
 export type VgcPokemon = VgcPokemonDto;
 
 export class VgcService {
+  /** @see VgcMetaService.getRegulations — same endpoint, kept for VGC-tool callers. */
   static getChampionsRegulations() {
-    return apiGET<ChampionsRegulation[]>('/tools/vgc/meta/regulations');
+    return VgcMetaService.getRegulations();
   }
 
   static getChampionsSpeedTiers(regulationId: string) {

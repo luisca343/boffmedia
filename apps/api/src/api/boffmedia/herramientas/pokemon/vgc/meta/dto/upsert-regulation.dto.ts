@@ -5,6 +5,7 @@ import {
   MaxLength,
   IsOptional,
   IsIn,
+  IsBoolean,
 } from 'class-validator';
 
 export class UpsertRegulationDto {
@@ -17,14 +18,16 @@ export class UpsertRegulationDto {
   @MaxLength(64)
   id!: string;
 
-  @ApiProperty({
+  @ApiPropertyOptional({
     example: 'gen9championsvgc2026regma',
-    description: '@pkmn/sim format ID',
+    description:
+      '@pkmn/sim format ID. Defaults to `id` when omitted. Must resolve in ' +
+      'the Dex or the request is rejected with 400.',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @MaxLength(128)
-  formatId!: string;
+  formatId?: string;
 
   @ApiProperty({
     example: '[Gen 9 Champions] VGC 2026 Reg M-A',
@@ -51,4 +54,14 @@ export class UpsertRegulationDto {
   @IsString()
   @MaxLength(32)
   vgcPastesGid?: string | null;
+
+  @ApiPropertyOptional({
+    example: true,
+    description:
+      'Soft-disable switch. false hides the regulation from every picker ' +
+      'without deleting its imported data. Defaults to true.',
+  })
+  @IsOptional()
+  @IsBoolean()
+  active?: boolean;
 }

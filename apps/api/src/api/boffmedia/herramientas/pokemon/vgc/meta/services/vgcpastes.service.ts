@@ -81,10 +81,6 @@ export class VgcPastesService {
     private readonly pokepasteService: PokepasteService,
   ) {}
 
-  async getAvailableRegulations() {
-    return this.regulationsRepository.findActive();
-  }
-
   async refreshRegulation(
     regulationId: string,
     gid: string,

@@ -128,6 +128,18 @@ export const messages = {
           "poolShort": "La búsqueda consiguió {got} hilos de los {asked} pedidos; la estimación previa contaba con más.",
           "ceiling": "Una sesión cubre decenas de miles de semillas, no millones. Esto no busca «la mejor semilla que existe»."
         },
+        "run": {
+          "open": "Abrir",
+          "export": {
+            "json": "Guardar la búsqueda completa: las semillas, sus medidas y la configuración que las juzgó. Se puede volver a abrir aquí.",
+            "jsonShort": "JSON",
+            "csv": "Guardar una tabla con una fila por semilla, para una hoja de cálculo. No se puede volver a abrir aquí.",
+            "csvShort": "CSV"
+          },
+          "imported": "Resultados abiertos desde un archivo, exportados el {date}. La configuración del editor es la que juzgó estas semillas.",
+          "packMismatch": "Estos paquetes no coinciden con los que están cargados ahora: {packs}. Los resultados se midieron sobre otros datos de generación, así que el mapa puede no darles la razón.",
+          "openFailed": "No se pudo abrir el archivo: {message}"
+        },
         "spec": {
           "group": {
             "water": "Tierra y agua",
@@ -766,6 +778,18 @@ export const messages = {
           "unverified": "None of these seeds has ever been opened in Minecraft: they are measurements against the worldgen data, not verified worlds. Open a result to copy its /tp commands and see for yourself.",
           "poolShort": "The search got {got} threads of the {asked} asked for; the earlier estimate assumed more.",
           "ceiling": "A session covers tens of thousands of seeds, not millions. This does not find “the best seed there is”."
+        },
+        "run": {
+          "open": "Open",
+          "export": {
+            "json": "Save the whole search: the seeds, their measurements and the spec that judged them. Can be opened here again.",
+            "jsonShort": "JSON",
+            "csv": "Save a table with one row per seed, for a spreadsheet. Cannot be opened here again.",
+            "csvShort": "CSV"
+          },
+          "imported": "Results opened from a file, exported {date}. The spec in the editor is the one that judged these seeds.",
+          "packMismatch": "These packs do not match the ones loaded now: {packs}. The results were measured against different worldgen data, so the map may not agree with them.",
+          "openFailed": "Could not open the file: {message}"
         },
         "spec": {
           "group": {

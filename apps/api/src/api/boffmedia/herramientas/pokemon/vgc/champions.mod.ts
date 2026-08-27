@@ -39,7 +39,25 @@ export function initChampionsMod(): void {
 
   // Extend the BASE Dex format list so Dex.formats.get('gen9championsvgc2026regma')
   // and friends work globally across the app.
-  Dex.formats.extend([
+  Dex.formats.extend([...CHAMPIONS_FORMATS] as any[]);
+
+  initialized = true;
+}
+
+/**
+ * The format ids this mod registers, e.g. 'gen9championsvgc2026regma'.
+ *
+ * Used to tell an admin which values `formatId` may take when registering a
+ * regulation — the sim derives the id by lowercasing the name and stripping
+ * everything that is not alphanumeric.
+ */
+export function listChampionsFormatIds(): string[] {
+  return CHAMPIONS_FORMATS.map((f) =>
+    f.name.toLowerCase().replace(/[^a-z0-9]+/g, ''),
+  );
+}
+
+const CHAMPIONS_FORMATS = [
     {
       name: '[Gen 9 Champions] VGC 2026 Reg M-A',
       mod: 'champions',
@@ -83,7 +101,4 @@ export function initChampionsMod(): void {
       searchShow: false,
       ruleset: ['Standard Draft'],
     },
-  ] as any[]);
-
-  initialized = true;
-}
+] as const;

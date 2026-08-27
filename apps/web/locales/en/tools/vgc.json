@@ -910,7 +910,7 @@
         "note": "Compares <b>ladder</b> usage ({format} · {month} · 1630+ ELO) with <b>tournament</b> usage. Positive Δ = more used in tournaments."
       },
       "refresh": "Refresh",
-      "footer": "Data from Smogon Stats · Updated monthly · Default cutoff: 1760",
+      "footer": "Data from Smogon Stats · Updated monthly · Default ELO cutoff: 1760",
       "barTitle": "VGC Meta",
       "barSub": {
         "ladder": "Ladder · Smogon",
@@ -923,7 +923,7 @@
         "aggregate": "Aggregate",
         "players": "Players",
         "divergence": "Divergence",
-        "championsPreviewNotice": "Preview data from VGCPastes; usage is indicative."
+        "championsNotice": "Usage computed from the imported VGCPastes teams, not from the Smogon ladder."
       },
       "cutoff": {
         "all": "All ELO"

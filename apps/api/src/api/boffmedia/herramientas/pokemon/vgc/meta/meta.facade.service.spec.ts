@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { VgcMetaFacadeService } from './meta.facade.service';
 import { SmogonService } from './services/smogon.service';
 import { VgcPastesService } from './services/vgcpastes.service';
@@ -22,7 +22,6 @@ const mockSmogonService = {
 };
 
 const mockVgcPastesService = {
-  getAvailableRegulations: jest.fn(),
   getUsageList: jest.fn(),
   getUsageEntries: jest.fn(),
   refreshRegulation: jest.fn(),
@@ -329,6 +328,48 @@ describe('VgcMetaFacadeService', () => {
 
       expect(mockRegulationsRepository.upsert).toHaveBeenCalled();
       expect(result).toEqual(mockRegulation);
+    });
+
+    it('defaults formatId to id when omitted', async () => {
+      mockRegulationsRepository.upsert.mockResolvedValue(undefined);
+      mockRegulationsRepository.findById.mockResolvedValue(mockRegulation);
+
+      await service.upsertRegulation({
+        id: 'gen9vgc2024regg',
+        name: 'Reg G',
+      });
+
+      expect(mockRegulationsRepository.upsert).toHaveBeenCalledWith(
+        expect.objectContaining({ formatId: 'gen9vgc2024regg' }),
+      );
+    });
+
+    it('rejects a formatId the sim does not know on create', async () => {
+      // No existing row: this is a create, so the unknown format is fatal.
+      mockRegulationsRepository.findById.mockResolvedValue(null);
+
+      await expect(
+        service.upsertRegulation({
+          id: 'vgc2026regzz',
+          formatId: 'notaformat',
+          name: 'Nope',
+        }),
+      ).rejects.toThrow(BadRequestException);
+
+      expect(mockRegulationsRepository.upsert).not.toHaveBeenCalled();
+    });
+
+    it('allows editing an existing row whose format is unregistered', async () => {
+      mockRegulationsRepository.findById.mockResolvedValue(mockRegulation);
+      mockRegulationsRepository.upsert.mockResolvedValue(undefined);
+
+      await service.upsertRegulation({
+        id: 'vgc2026regzz',
+        formatId: 'notaformat',
+        name: 'Still editable',
+      });
+
+      expect(mockRegulationsRepository.upsert).toHaveBeenCalled();
     });
   });
 

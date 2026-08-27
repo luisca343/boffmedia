@@ -38,21 +38,30 @@ function GameSwitch({ slug }: { slug: string }) {
   if (!hub || !game) return null
 
   return (
-    <div ref={ref} className="relative p-3">
+    // The rail header is the same rung as a tool's `ToolStrip`: they sit side by
+    // side, both under the Navbar, and their bottom hairlines are read as ONE
+    // line across the shell. So its height is `--tool-bar-h`, not whatever the
+    // switcher button plus a `p-3` gutter happened to add up to (74px against
+    // the bar's 58 — the step was visible on every tool page).
+    <div ref={ref} className="relative flex h-[var(--tool-bar-h,58px)] items-center px-3">
       <button
         type="button"
         aria-expanded={open}
         aria-haspopup="true"
         title={tShell("switchGame", { game: t(game.nameKey) })}
         onClick={() => setOpen((v) => !v)}
-        className="group/sw cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] flex w-full items-center gap-3 whitespace-nowrap border border-solid border-line bg-panel py-[7px] pl-[6px] pr-[10px] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
+        // `py-[5px]` (not the old 7) is what lets the 34px seal live inside a
+        // 58px row with air left over on both sides.
+        className="group/sw cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] flex w-full items-center gap-3 whitespace-nowrap border border-solid border-line bg-panel py-[5px] pl-[6px] pr-[10px] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
       >
         <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} bare />
         <span className="min-w-0 flex-1 text-left font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
         <Icon name="chevronDown" size={16} className={cn("flex-none text-txt-muted transition-transform duration-[140ms]", open && "rotate-180")} />
       </button>
       {open && (
-        <div className="absolute left-3 top-[calc(100%_-_6px)] z-[130] min-w-[228px] border border-solid border-line-2 bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.6)] animate-[bm-menu-in_0.16s_ease-out] motion-reduce:animate-none">
+        // `top-full` keeps the old 6px gap under the button: the row is now 58px
+        // tall around a 46px button, so its bottom edge is 6px above the row's.
+        <div className="absolute left-3 top-full z-[130] min-w-[228px] border border-solid border-line-2 bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.6)] animate-[bm-menu-in_0.16s_ease-out] motion-reduce:animate-none">
           {HUB_SLUGS.map((s) => {
             const g = getGameEntry(s)
             if (!g) return null
@@ -316,12 +325,15 @@ export function ToolShell({ slug, children }: ToolShellProps) {
       {mobileOpen && <div className="fixed inset-0 z-[79] bg-[var(--scrim)] lg:hidden" onClick={() => setMobileOpen(false)} />}
 
       <div className="min-w-0 flex-1">
-        <div className="sticky top-[var(--nav-h)] z-40 flex items-center gap-3 border-b border-solid border-line bg-base-2 px-[22px] py-3 lg:hidden">
+        {/* Same rung as the rail header above and as a tool's own bar: one height
+            token, so the phone bar does not read as a third, taller band. `min-h`
+            rather than `h` because a long breadcrumb is allowed to grow it. */}
+        <div className="sticky top-[var(--nav-h)] z-40 flex min-h-[var(--tool-bar-h,58px)] items-center gap-3 border-b border-solid border-line bg-base-2 px-[22px] py-[6px] lg:hidden">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label={tShell("openToolsMenu")}
-            className="cut-tag cut-tag-edge flex items-center gap-3 border border-solid border-line bg-panel py-[7px] pl-[6px] pr-[10px]"
+            className="cut-tag cut-tag-edge flex flex-none items-center gap-3 border border-solid border-line bg-panel py-[5px] pl-[6px] pr-[10px]"
           >
             <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} bare />
             <span className="font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>

@@ -108,7 +108,15 @@ export function createWebApi(baseUrl: string): ToolApi {
   return {
     async request<T>(path: string, init?: ToolApiRequest): Promise<T> {
       const method = init?.method ?? "GET";
-      const url = new URL(path.replace(/^\//, ""), baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`);
+      // `new URL()` REJECTS a relative base outright, and "/api" — this
+      // capability's own default — is exactly that. Resolve it against the
+      // page origin first so a same-origin base works instead of throwing a
+      // raw TypeError before the request is ever sent.
+      const root = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+      const base = /^[a-z][a-z0-9+.-]*:/i.test(root)
+        ? root
+        : new URL(root, window.location.origin).toString();
+      const url = new URL(path.replace(/^\//, ""), base);
       for (const [key, value] of Object.entries(init?.query ?? {})) {
         if (value !== undefined) url.searchParams.set(key, String(value));
       }
@@ -120,10 +128,14 @@ export function createWebApi(baseUrl: string): ToolApi {
           headers: init?.body === undefined ? undefined : { "content-type": "application/json" },
           body: init?.body === undefined ? undefined : JSON.stringify(init.body),
           signal: init?.signal,
-          // The browser IS the session here: the cookie for the API origin is
-          // what `auth` selects between on the launcher side, so there is
-          // nothing extra to attach for either mode.
-          credentials: "include",
+          // NOT `credentials: "include"`. The API is a different origin and its
+          // `enableCors()` (apps/api/src/main.ts) sends no
+          // `Access-Control-Allow-Credentials`, so "include" made the browser
+          // block every response — a 200 on the wire, "Failed to fetch" in the
+          // page. Nothing is lost: the web session is a NextAuth Bearer JWT,
+          // not a cookie on the API origin, and the launcher does not come
+          // through here at all — it proxies through Rust precisely because
+          // its webview has no such cookie either.
         });
       } catch (err) {
         // An AbortError is the caller's own doing — it must stay an

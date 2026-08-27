@@ -23,7 +23,7 @@ import { MvList } from "./MvList";
 import { MvDetail } from "./MvDetail";
 import { MvPlayers } from "./MvPlayers";
 import { MvDivergence } from "./MvDivergence";
-import { ENABLE_PREVIEW_FORMATS, FORMAT_LABELS } from "../constants";
+import { FORMAT_LABELS } from "../constants";
 import { toUsageEntry, toPokeData, toPlayerEntry, toDivergenceResult, toTeamEntry, toTeamSlot } from "../_lib/vgc-adapter";
 import type { PokeData, TeamSlot } from "../_lib/meta-types";
 
@@ -43,16 +43,16 @@ export function MetaLayoutClient() {
   // ── Determine format source — wait until both lists load before activating ─
   const snapshots   = useSmogonSnapshots();
   const regulations = useChampionsRegulations();
+  // `format` is a regulation id for registered regulations; older URLs may
+  // still carry the bare formatId, so accept either key.
   const selectedRegulation = useMemo(
-    () => regulations.find((r) => r.id === format),
+    () => regulations.find((r) => r.id === format) ?? regulations.find((r) => r.formatId === format),
     [regulations, format],
   );
-  const isPreviewFormat = useMemo(
-    () => ENABLE_PREVIEW_FORMATS && Boolean(selectedRegulation?.vgcPastesGid),
-    [selectedRegulation],
-  );
+  // `format` carries a regulation id when one is registered, a bare Smogon
+  // formatId otherwise. Snapshots are only ever keyed by formatId.
   const resolvedSmogonFormat = useMemo(
-    () => (selectedRegulation && !selectedRegulation.vgcPastesGid ? selectedRegulation.formatId : format),
+    () => selectedRegulation?.formatId ?? format,
     [selectedRegulation, format],
   );
   const teamsRegulationId = useMemo(
@@ -63,12 +63,18 @@ export function MetaLayoutClient() {
     () => snapshots.some((s) => s.formatId === resolvedSmogonFormat),
     [snapshots, resolvedSmogonFormat],
   );
+  // Smogon wins whenever a ladder snapshot exists; the VGCPastes sheet is the
+  // fallback for regulations that have no ladder data imported yet.
+  const isChampionsFormat = useMemo(
+    () => Boolean(selectedRegulation?.vgcPastesGid) && !isSmogonFormat,
+    [selectedRegulation, isSmogonFormat],
+  );
 
   // ── Data hooks — inactive tab/source receives empty string and skips fetch ─
   const { entries: ladderEntries,    entriesMap: ladderMap,    loading: ladderLoading,    error: ladderError    } =
-    useSmogonUsage(tab === "stats" && isSmogonFormat && !isPreviewFormat ? resolvedSmogonFormat : "", month, cutoff);
+    useSmogonUsage(tab === "stats" && isSmogonFormat && !isChampionsFormat ? resolvedSmogonFormat : "", month, cutoff);
   const { entries: championsEntries, entriesMap: championsMap, loading: championsLoading, error: championsError } =
-    useChampionsUsage(tab === "stats" && isPreviewFormat ? format : "");
+    useChampionsUsage(tab === "stats" && isChampionsFormat ? format : "");
 
   // ── Limitless hooks ────────────────────────────────────────────────────────
   const { tournaments } = useLimitlessTournaments(
@@ -110,10 +116,10 @@ export function MetaLayoutClient() {
   const { result: divergenceResult, loading: divergenceLoading } =
     useDivergence(divergenceRegulation, divergenceTournamentId, "", DEFAULT_CUTOFF);
 
-  const entries    = tab === "tournament" ? tournamentEntries : isPreviewFormat ? championsEntries : ladderEntries;
-  const entriesMap = tab === "tournament" ? tournamentMap     : isPreviewFormat ? championsMap     : ladderMap;
-  const loading    = tab === "tournament" ? tournamentLoading : isPreviewFormat ? championsLoading : ladderLoading;
-  const error      = tab === "tournament" ? tournamentError   : isPreviewFormat ? championsError   : ladderError;
+  const entries    = tab === "tournament" ? tournamentEntries : isChampionsFormat ? championsEntries : ladderEntries;
+  const entriesMap = tab === "tournament" ? tournamentMap     : isChampionsFormat ? championsMap     : ladderMap;
+  const loading    = tab === "tournament" ? tournamentLoading : isChampionsFormat ? championsLoading : ladderLoading;
+  const error      = tab === "tournament" ? tournamentError   : isChampionsFormat ? championsError   : ladderError;
 
   // ── Navigation hook — buildUrl, auto-navigation effects, all handlers ──────
   const { speciesId, view, handleSelect, handleTabChange, handleFormatChange, handleOptionsApply, handleRegulationChange, handleTournamentChange, handleViewChange, handleBack } =
@@ -121,8 +127,8 @@ export function MetaLayoutClient() {
 
   // ── Paste-derived data for preview formats ────────────────────────────────
   const { detail: pasteDetail } = useChampionsPasteDetail(
-    isPreviewFormat ? speciesId : undefined,
-    isPreviewFormat ? format    : undefined,
+    isChampionsFormat ? speciesId : undefined,
+    isChampionsFormat ? format    : undefined,
   );
 
   // ── Adapt data ─────────────────────────────────────────────────────────────
@@ -151,7 +157,7 @@ export function MetaLayoutClient() {
     const id = selectedEntry?.id ?? speciesId;
     if (!id) return null;
     const base = pokeMap[id] ?? null;
-    if (!base || !isPreviewFormat || !pasteDetail) return base;
+    if (!base || !isChampionsFormat || !pasteDetail) return base;
     return {
       ...base,
       abilities: pasteDetail.abilities.length > 0 ? pasteDetail.abilities.map((a) => ({ name: a.name, pct: a.percent })) : base.abilities,
@@ -160,7 +166,7 @@ export function MetaLayoutClient() {
       tera:      pasteDetail.teraTypes.length > 0 ? pasteDetail.teraTypes.map((a) => ({ name: a.name, pct: a.percent })) : base.tera,
       spreads:   pasteDetail.spreads.length   > 0 ? pasteDetail.spreads.map((s) => ({ nature: s.nature, ev: s.spread.split("/").map(Number), pct: s.percent })) : base.spreads,
     };
-  }, [pokeMap, selectedEntry, speciesId, isPreviewFormat, pasteDetail]);
+  }, [pokeMap, selectedEntry, speciesId, isChampionsFormat, pasteDetail]);
 
   const adaptedPlayers = useMemo(
     () => standingsPlayers.map((p) => toPlayerEntry(p, new Map(), t("adapter.teraNone"))),
@@ -173,7 +179,7 @@ export function MetaLayoutClient() {
   );
 
   // ── Teams for selected Pokémon ─────────────────────────────────────────────
-  const resolvedTeamsRegId = isPreviewFormat ? format : teamsRegulationId;
+  const resolvedTeamsRegId = isChampionsFormat ? format : teamsRegulationId;
   const { teams: speciesTeams, loading: teamsLoading } = useSpeciesTeams(
     speciesId || undefined,
     resolvedTeamsRegId,
@@ -292,10 +298,10 @@ export function MetaLayoutClient() {
         onViewChange={handleViewChange}
       />
 
-      {tab === "stats" && isPreviewFormat && (
+      {tab === "stats" && isChampionsFormat && (
         <div className="flex flex-none items-center gap-2 border-b border-solid border-warn/20 bg-warn/5 px-3 py-2 text-[12px] text-warn">
           <Icon name="info" size={14} className="flex-none" />
-          {t("tabs.championsPreviewNotice")}
+          {t("tabs.championsNotice")}
         </div>
       )}
       {body}

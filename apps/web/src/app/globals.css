@@ -452,6 +452,13 @@ html { scroll-behavior: smooth; background: var(--bg); }
 :root {
   --tool-vh: calc(100dvh - var(--nav-h));
   --tool-sticky-top: var(--nav-h);
+  /* Height of a tool's sticky bar (`ToolStrip`). It had a `58px` fallback at
+     every call site and no definition anywhere, so the token was decorative and
+     the chassis that reads it could never actually be retuned. It is defined
+     here for the same reason `--nav-h` is: anything that has to line up WITH a
+     tool bar — ToolShell's rail header, mhwilds' roster column — subtracts it
+     rather than repeating the number. */
+  --tool-bar-h: 58px;
 }
 body {
   margin: 0;

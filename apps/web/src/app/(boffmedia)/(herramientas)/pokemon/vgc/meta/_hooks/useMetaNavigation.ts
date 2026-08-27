@@ -8,7 +8,6 @@ import {
   PokemonUsageDetail,
   SmogonSnapshot,
 } from "@/services/api/boffmedia/vgcService";
-import { ENABLE_PREVIEW_FORMATS } from "../constants";
 
 const BASE_PATH      = "/pokemon/vgc/meta";
 export const DEFAULT_CUTOFF = 1760;
@@ -128,13 +127,6 @@ export function useMetaNavigation({
   const tournamentId = searchParams.get("tournamentId") ?? "";
   const view         = searchParams.get("view")         ?? "aggregate";
 
-  const selectedRegulation = useMemo(
-    () => regulations.find((r) => r.id === format),
-    [regulations, format],
-  );
-
-  const isDisabledPreviewFormat = !ENABLE_PREVIEW_FORMATS && Boolean(selectedRegulation?.vgcPastesGid);
-
   useEffect(() => {
     const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
     const updateViewport = () => setIsDesktop(mediaQuery.matches);
@@ -147,64 +139,28 @@ export function useMetaNavigation({
     };
   }, []);
 
-  // If preview formats are disabled but URL still points to one, force fallback.
-  useEffect(() => {
-    if (tab !== "stats") return;
-    if (!isDisabledPreviewFormat) return;
-
-    const fallbackFormat = selectedRegulation?.formatId;
-    if (!fallbackFormat) return;
-
-    const fallback = pickBestSnapshot(snapshots, fallbackFormat, month, cutoff);
-    if (!fallback) return;
-
-    const nextUrl = buildUrl({
-      speciesId,
-      tab,
-      format: fallback.formatId,
-      month: fallback.month,
-      cutoff: fallback.cutoff,
-      regulation,
-      tournamentId,
-      view,
-    });
-
-    const currentUrl = buildUrl({
-      speciesId,
-      tab,
-      format,
-      month,
-      cutoff,
-      regulation,
-      tournamentId,
-      view,
-    });
-
-    if (nextUrl !== currentUrl) {
-      router.replace(nextUrl);
-    }
-  }, [
-    tab,
-    isDisabledPreviewFormat,
-    selectedRegulation,
-    snapshots,
-    format,
-    month,
-    cutoff,
-    router,
-    speciesId,
-    regulation,
-    tournamentId,
-    view,
-  ]);
-
   // Auto-navigate when Stats tab has no format: default to latest regulation (Champions), fall back to first Smogon snapshot
   useEffect(() => {
     if (tab !== "stats") return;
     if (searchParams.get("format")) return;
-    const previewRegulation = ENABLE_PREVIEW_FORMATS ? regulations.find((r) => Boolean(r.vgcPastesGid)) : undefined;
-    if (previewRegulation) {
-      router.replace(buildUrl({ speciesId, tab, format: previewRegulation.id, month: "", cutoff: DEFAULT_CUTOFF, regulation, tournamentId, view }));
+    // Prefer the newest registered regulation and key the URL by its id; the
+    // layout decides whether that resolves to Smogon or VGCPastes data.
+    const defaultRegulation = [...regulations].sort((a, b) => b.id.localeCompare(a.id))[0];
+    const snapshot = defaultRegulation
+      ? pickBestSnapshot(snapshots, defaultRegulation.formatId, "", cutoff)
+      : null;
+
+    if (defaultRegulation) {
+      router.replace(buildUrl({
+        speciesId,
+        tab,
+        format: defaultRegulation.id,
+        month: snapshot?.month ?? "",
+        cutoff: snapshot?.cutoff ?? DEFAULT_CUTOFF,
+        regulation,
+        tournamentId,
+        view,
+      }));
     } else if (snapshots.length > 0) {
       const first = snapshots[0];
       router.replace(buildUrl({
@@ -226,7 +182,7 @@ export function useMetaNavigation({
     if (regulations.length > 0 && !searchParams.get("regulation")) {
       router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation: regulations[0].id, tournamentId, view }));
     }
-  }, [regulations]);  
+  }, [regulations, tab, searchParams, speciesId, format, month, cutoff, tournamentId, view, router]);
 
   // Auto-navigate to first tournament when Tournament tab has a regulation but no tournamentId
   useEffect(() => {
@@ -234,7 +190,7 @@ export function useMetaNavigation({
     if (tournaments.length > 0 && !searchParams.get("tournamentId")) {
       router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation, tournamentId: String(tournaments[0].id), view }));
     }
-  }, [tournaments]);  
+  }, [tournaments, tab, searchParams, speciesId, format, month, cutoff, regulation, view, router]);
 
   // Auto-navigate to first Pokémon when list loads and no selection
   useEffect(() => {
@@ -257,14 +213,15 @@ export function useMetaNavigation({
   const handleTabChange = useCallback(
     (newTab: string) => {
       if (newTab === "stats") {
-        // Default to first Champions preview regulation (must have VGCPastes GID),
-        // otherwise fall back to first Smogon snapshot.
-        const previewRegulation = ENABLE_PREVIEW_FORMATS ? regulations.find((r) => Boolean(r.vgcPastesGid)) : undefined;
-        const defaultFormat = previewRegulation
-          ? previewRegulation.id
-          : snapshots.length > 0 ? snapshots[0].formatId : "";
-        const defaultMonth  = previewRegulation ? "" : (snapshots[0]?.month ?? "");
-        const defaultCutoff = previewRegulation ? DEFAULT_CUTOFF : (snapshots[0]?.cutoff ?? DEFAULT_CUTOFF);
+        // Same default as the auto-navigate effect: newest regulation by id,
+        // falling back to the first Smogon snapshot when none is registered.
+        const defaultRegulation = [...regulations].sort((a, b) => b.id.localeCompare(a.id))[0];
+        const snapshot = defaultRegulation
+          ? pickBestSnapshot(snapshots, defaultRegulation.formatId, "", cutoff)
+          : snapshots[0] ?? null;
+        const defaultFormat = defaultRegulation?.id ?? snapshot?.formatId ?? "";
+        const defaultMonth  = snapshot?.month ?? "";
+        const defaultCutoff = snapshot?.cutoff ?? DEFAULT_CUTOFF;
         router.push(buildUrl({ speciesId: undefined, tab: newTab, format: defaultFormat, month: defaultMonth, cutoff: defaultCutoff, regulation, tournamentId: "", view: "aggregate" }));
       } else if (newTab === "tournament") {
         // Default to first regulation + first tournament
