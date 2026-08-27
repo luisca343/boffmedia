@@ -1,29 +1,17 @@
 import {
   ConflictException,
-  Inject,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, sql } from 'drizzle-orm';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import {
-  boffMediaParticipantProgress,
-  boffMediaParticipants,
-  boffMediaEventTeams,
-  boffMediaEventTeamMembers,
-  boffMediaAchievements,
-  ParticipantProgress,
-  validateParticipantCanReceiveAchievement,
-} from '@/_db/schema/BoffMediaEvents';
+import { ParticipantProgress } from '@/_db/schema/BoffMediaEvents';
 import { AchievementsService } from './achievements.service';
 import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
+import { ProgressRepository } from '../repositories/progress.repository';
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class ProgressService {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+    private readonly progressRepository: ProgressRepository,
     private readonly achievementsService: AchievementsService,
     private readonly notificationsService: NotificationsService,
   ) {}
@@ -36,10 +24,10 @@ export class ProgressService {
   async transaction<T>(
     fn: (service: ProgressService) => Promise<T>,
   ): Promise<T> {
-    return this.db.transaction((tx) =>
+    return this.progressRepository.runInTransaction((txRepository) =>
       fn(
         new ProgressService(
-          tx as unknown as MySql2Database<Record<string, never>>,
+          txRepository,
           this.achievementsService,
           this.notificationsService,
         ),
@@ -54,10 +42,9 @@ export class ProgressService {
     teamId?: number,
   ): Promise<ParticipantProgress> {
     // 1. Validate participant can receive this achievement
-    const canReceive = await validateParticipantCanReceiveAchievement(
+    const canReceive = await this.progressRepository.canReceiveAchievement(
       participantId,
       achievementId,
-      this.db,
     );
     if (!canReceive) {
       throw new ConflictException(
@@ -73,16 +60,10 @@ export class ProgressService {
     }
 
     // Was it already completed? (so we only notify on the transition)
-    const [existing] = await this.db
-      .select({ isCompleted: boffMediaParticipantProgress.isCompleted })
-      .from(boffMediaParticipantProgress)
-      .where(
-        and(
-          eq(boffMediaParticipantProgress.participantId, participantId),
-          eq(boffMediaParticipantProgress.achievementId, achievementId),
-        ),
-      );
-    const wasCompleted = existing?.isCompleted === true;
+    const wasCompleted = await this.progressRepository.isCompleted(
+      participantId,
+      achievementId,
+    );
 
     // 3. Update progress. Clamped: the DTO only bounds progress at >= 0, so a
     //    mistyped 999 on a 5-step achievement would otherwise be stored as-is
@@ -91,30 +72,20 @@ export class ProgressService {
     const isCompleted = clamped >= achievement.maxProgress;
     const completedAt = isCompleted ? new Date() : null;
 
-    await this.db
-      .insert(boffMediaParticipantProgress)
-      .values({
-        participantId,
-        achievementId,
-        currentProgress: clamped,
-        isCompleted,
-        completedAt,
-        lastUpdated: new Date(),
-        createdAt: new Date(),
-      } as ParticipantProgress)
-      .onDuplicateKeyUpdate({
-        currentProgress: clamped,
-        isCompleted,
-        completedAt,
-        lastUpdated: new Date(),
-      } as any);
+    await this.progressRepository.upsertProgress({
+      participantId,
+      achievementId,
+      currentProgress: clamped,
+      isCompleted,
+      completedAt,
+    });
 
     // 4. If completed and team exists, atomically update team score with a
     // correlated subquery. This replaces the post-write call to
     // teamsService.updateTeamScore so two concurrent unlocks of the same team
     // cannot lose an update.
     if (isCompleted && teamId) {
-      await this.updateTeamScoreAtomic(teamId);
+      await this.progressRepository.recomputeTeamScore(teamId);
     }
 
     // 4b. Notify the participant's user on a fresh unlock (best-effort).
@@ -123,47 +94,7 @@ export class ProgressService {
     }
 
     // 5. Return updated progress
-    const result = await this.db
-      .select()
-      .from(boffMediaParticipantProgress)
-      .where(
-        and(
-          eq(boffMediaParticipantProgress.participantId, participantId),
-          eq(boffMediaParticipantProgress.achievementId, achievementId),
-        ),
-      );
-
-    return result[0];
-  }
-
-  /**
-   * Atomically recompute and update a team's total score in one statement. The
-   * sum matches TeamsRepository.calculateTeamScore exactly (only counting
-   * completed achievements from this event), but executes inside whatever
-   * transaction context the caller provided, so concurrent award updates cannot
-   * race and lose each other.
-   */
-  private async updateTeamScoreAtomic(teamId: number): Promise<void> {
-    await this.db
-      .update(boffMediaEventTeams)
-      .set({
-        totalScore: sql`(
-          SELECT COALESCE(SUM(${boffMediaAchievements.points}), 0)
-          FROM ${boffMediaParticipantProgress}
-          INNER JOIN ${boffMediaEventTeamMembers}
-            ON ${boffMediaEventTeamMembers.participantId} = ${boffMediaParticipantProgress.participantId}
-          INNER JOIN ${boffMediaEventTeams}
-            ON ${boffMediaEventTeams.id} = ${boffMediaEventTeamMembers.teamId}
-          INNER JOIN ${boffMediaAchievements}
-            ON ${boffMediaAchievements.id} = ${boffMediaParticipantProgress.achievementId}
-            AND ${boffMediaAchievements.eventId} = ${boffMediaEventTeams.eventId}
-            AND ${boffMediaAchievements.deletedAt} IS NULL
-          WHERE ${boffMediaEventTeamMembers.teamId} = ${teamId}
-            AND ${boffMediaParticipantProgress.isCompleted} = true
-        )`,
-        updatedAt: new Date(),
-      } as any)
-      .where(eq(boffMediaEventTeams.id, teamId));
+    return this.progressRepository.findProgress(participantId, achievementId);
   }
 
   /**
@@ -175,12 +106,8 @@ export class ProgressService {
     achievement: { name: string; itemType: string; eventId: number | null },
   ): Promise<void> {
     try {
-      const [participant] = await this.db
-        .select({ userId: boffMediaParticipants.userId })
-        .from(boffMediaParticipants)
-        .where(eq(boffMediaParticipants.id, participantId));
-
-      const userId = participant?.userId;
+      const userId =
+        await this.progressRepository.findParticipantUserId(participantId);
       if (!userId) return; // anonymous participant — nobody to notify
 
       await this.notificationsService.create({
@@ -204,25 +131,12 @@ export class ProgressService {
     participantId: number,
     achievementId: number,
   ): Promise<ParticipantProgress> {
-    const result = await this.db
-      .select()
-      .from(boffMediaParticipantProgress)
-      .where(
-        and(
-          eq(boffMediaParticipantProgress.participantId, participantId),
-          eq(boffMediaParticipantProgress.achievementId, achievementId),
-        ),
-      );
-
-    return result[0];
+    return this.progressRepository.findProgress(participantId, achievementId);
   }
 
   async getAllParticipantProgress(
     participantId: number,
   ): Promise<ParticipantProgress[]> {
-    return this.db
-      .select()
-      .from(boffMediaParticipantProgress)
-      .where(eq(boffMediaParticipantProgress.participantId, participantId));
+    return this.progressRepository.findAllProgress(participantId);
   }
 }

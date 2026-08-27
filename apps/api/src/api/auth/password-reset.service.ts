@@ -1,26 +1,20 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, isNull } from 'drizzle-orm';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { Logger } from 'nestjs-pino';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaPasswordResetTokens } from '@/_db/schema/BoffMediaAuth';
 import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { PasswordService } from './password.service';
 import { MailService } from '@api/mail/mail.service';
-import { OutboxRepository } from '@api/outbox/repositories/outbox.repository';
+import { PasswordResetTokensRepository } from './repositories/password-reset-tokens.repository';
 
 const TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class PasswordResetService {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+    private readonly tokens: PasswordResetTokensRepository,
     private readonly usersRepository: BoffMediaUsersRepository,
     private readonly passwordService: PasswordService,
     private readonly mail: MailService,
-    private readonly outbox: OutboxRepository,
     private readonly logger: Logger,
   ) {}
 
@@ -50,32 +44,12 @@ export class PasswordResetService {
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + TOKEN_TTL_MS);
 
-    await this.db.transaction(async (tx) => {
-      // Invalidate the user's prior unused tokens, then store the new hash.
-      await tx
-        .update(boffMediaPasswordResetTokens)
-        .set({ usedAt: new Date() })
-        .where(
-          and(
-            eq(boffMediaPasswordResetTokens.userId, user.id),
-            isNull(boffMediaPasswordResetTokens.usedAt),
-          ),
-        );
-      await tx.insert(boffMediaPasswordResetTokens).values({
-        userId: user.id,
-        tokenHash: this.hash(token),
-        expiresAt,
-      });
-
-      // Enqueue mail inside the transaction so a rolled-back token creation
-      // doesn't leave orphaned mail. Use a dedupeKey so a retried requestReset() call
-      // doesn't queue duplicate mails.
-      await this.outbox.enqueueTx(
-        tx,
-        'mail:send-password-reset',
-        { to: user.email, token, locale: user.locale ?? undefined },
-        `reset:${user.id}:${user.email}`,
-      );
+    // The repository invalidates prior tokens, stores the new hash and enqueues
+    // the mail in one transaction, so a rolled-back token leaves no mail behind.
+    await this.tokens.replaceActiveToken(user.id, this.hash(token), expiresAt, {
+      topic: 'mail:send-password-reset',
+      payload: { to: user.email, token, locale: user.locale ?? undefined },
+      dedupeKey: `reset:${user.id}:${user.email}`,
     });
   }
 
@@ -89,11 +63,7 @@ export class PasswordResetService {
     token: string,
     newPassword: string,
   ): Promise<{ success: boolean; username: string }> {
-    const [row] = await this.db
-      .select()
-      .from(boffMediaPasswordResetTokens)
-      .where(eq(boffMediaPasswordResetTokens.tokenHash, this.hash(token)))
-      .limit(1);
+    const row = await this.tokens.findByTokenHash(this.hash(token));
 
     if (!row || row.usedAt || row.expiresAt.getTime() < Date.now()) {
       throw new BadRequestException('Invalid or expired reset token');
@@ -108,10 +78,7 @@ export class PasswordResetService {
     await this.usersRepository.updateUser(row.userId, { password: hashed });
     // Invalidate all outstanding web sessions: password reset signs the user out everywhere.
     await this.usersRepository.bumpSessionVersion(row.userId);
-    await this.db
-      .update(boffMediaPasswordResetTokens)
-      .set({ usedAt: new Date() })
-      .where(eq(boffMediaPasswordResetTokens.id, row.id));
+    await this.tokens.markUsed(row.id);
 
     const user = await this.usersRepository.findUserById(row.userId);
     return { success: true, username: user?.username ?? '' };

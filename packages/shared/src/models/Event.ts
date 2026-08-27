@@ -84,6 +84,10 @@ export type Event = {
      * Optional modules present on this event. Only populated by the single-event endpoint — the list endpoint omits it.
      */
     modules?: EventModules;
+    /**
+     * Number of participants in the event. Only populated by list endpoints.
+     */
+    participantCount?: number;
 };
 export namespace Event {
     /**

@@ -8,6 +8,7 @@ import { TournamentAnnouncerService } from '@api/boffmedia/tournaments/services/
 import { TournamentsRepository } from '@api/boffmedia/tournaments/repositories/tournaments.repository';
 import { WigglypopCustodyService } from '@api/smartrotom/wigglypop/services/wigglypop-custody.service';
 import { WigglypopOrdersRepository } from '@api/smartrotom/wigglypop/repositories/wigglypop-orders.repository';
+import { WigglypopSagaService } from '@api/smartrotom/wigglypop/services/wigglypop-saga.service';
 import { MailService } from '@api/mail/mail.service';
 
 type Handler = (payload: Record<string, unknown>) => Promise<void>;
@@ -38,6 +39,7 @@ export class OutboxService {
     @Optional() private readonly tournamentsRepo?: TournamentsRepository,
     @Optional() private readonly custody?: WigglypopCustodyService,
     @Optional() private readonly ordersRepo?: WigglypopOrdersRepository,
+    @Optional() private readonly saga?: WigglypopSagaService,
     @Optional() private readonly mail?: MailService,
   ) {
     // Handlers are registered by topic. Topics are explicit to keep the
@@ -62,6 +64,12 @@ export class OutboxService {
     );
     this.register('wigglypop:cancel-order', (payload) =>
       this.handleWigglypopCancel(payload),
+    );
+    // R5 — the retryable half of atomic custody. settleAtomic charges the buyer
+    // and then enqueues this; the handler gives the goods to the buyer and pays
+    // the sellers, one conditional write at a time.
+    this.register('wigglypop:deliver-order', (payload) =>
+      this.handleWigglypopDeliver(payload),
     );
     this.register('mail:send-verification', (payload) =>
       this.handleMailVerification(payload),
@@ -221,6 +229,19 @@ export class OutboxService {
       throw new Error(`Order ${orderId} not found`);
     }
     await this.custody.cancelOrder(order);
+  }
+
+  /**
+   * Delivery for an atomic-custody order. Deliberately thin: the saga throws
+   * while the order is still owed something, and that throw is what keeps the
+   * outbox row pending so the dispatcher tries again with backoff.
+   */
+  private async handleWigglypopDeliver(payload: Record<string, unknown>): Promise<void> {
+    if (!this.saga) {
+      throw new Error('WigglypopSagaService not wired into OutboxModule');
+    }
+    const { orderId } = payload as { orderId: number };
+    await this.saga.deliverOrder(orderId);
   }
 
   private async handleMailVerification(payload: Record<string, unknown>): Promise<void> {

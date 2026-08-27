@@ -12,6 +12,8 @@ import { ResponseInterceptor } from './api/_utils/interceptors/response.intercep
 import { JwtAuthGuard } from './api/auth/jwt-auth.guard';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { HealthRepository } from '@api/_utils/health/health.repository';
+import { AuditModule } from '@api/_repositories/audit.module';
 import { ConfigModule } from '@nestjs/config';
 import { env } from './config/env';
 import { PrometheusModule } from '@willsoto/nestjs-prometheus';
@@ -79,6 +81,9 @@ import { publicPath } from '@/config/paths';
 
 @Module({
   imports: [
+    // Global: provides AuditService/AuditRepository to every module, including
+    // the ones that reach an audit writer transitively without knowing it.
+    AuditModule,
     // The module owns this route, so no Nest guard or @Public() decorator
     // applies to it: METRICS_PATH is unauthenticated wherever the port is
     // reachable. It must be restricted at the reverse proxy — Prometheus
@@ -171,6 +176,7 @@ import { publicPath } from '@/config/paths';
   controllers: [AppController],
   providers: [
     AppService,
+    HealthRepository,
     {
       provide: ConfigService,
       useClass: ConfigService,

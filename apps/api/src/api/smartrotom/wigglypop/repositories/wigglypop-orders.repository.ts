@@ -1,6 +1,6 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, desc, eq, inArray, sql } from 'drizzle-orm';
+import { and, desc, eq, inArray, lt, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   wigglypopListings,
@@ -210,6 +210,74 @@ export class WigglypopOrdersRepository {
       .update(wigglypopOrderLines)
       .set(set)
       .where(eq(wigglypopOrderLines.id, lineId));
+  }
+
+  /**
+   * Move a line's delivery state ONLY if it is still in one of `expected`, and
+   * report whether this call is the one that moved it.
+   *
+   * This is the saga's claim primitive, and the reason it is a conditional
+   * UPDATE rather than a read-then-write: two dispatcher instances (or a retry
+   * racing the original request) can reach the same line at the same moment,
+   * and an unconditional write would let both proceed to give the same Pokémon
+   * away. Losing the race returns `false`, which every caller treats as "someone
+   * else owns this line now" — never as an error.
+   */
+  async setLineDeliveryIf(
+    lineId: number,
+    expected: string | string[],
+    deliveryStatus: string,
+    extra?: { settleTxId?: number; confirmedAt?: Date; takenPayload?: unknown },
+  ): Promise<boolean> {
+    const from = Array.isArray(expected) ? expected : [expected];
+    const set: Record<string, unknown> = { deliveryStatus };
+    if (extra?.settleTxId !== undefined) set.settleTxId = extra.settleTxId;
+    if (extra?.confirmedAt !== undefined) set.confirmedAt = extra.confirmedAt;
+    if (extra?.takenPayload !== undefined)
+      set.takenPayload = extra.takenPayload;
+
+    const [result] = await this.db
+      .update(wigglypopOrderLines)
+      .set(set)
+      .where(
+        and(
+          eq(wigglypopOrderLines.id, lineId),
+          inArray(wigglypopOrderLines.deliveryStatus, from),
+        ),
+      );
+    return (result as { affectedRows?: number }).affectedRows === 1;
+  }
+
+  /**
+   * Orders parked in a non-terminal state and untouched for `staleMs`.
+   *
+   * The staleness window is what separates a crashed attempt from one that is
+   * simply still running: an order the current process is working on right now
+   * has just been written to, so it never appears here. Without the window the
+   * sweeper would escalate live orders out from under themselves.
+   */
+  async findStalled(staleMs: number, limit = 50): Promise<OrderWithLines[]> {
+    const cutoff = new Date(Date.now() - staleMs);
+    const orders = await this.db
+      .select()
+      .from(wigglypopOrders)
+      .where(
+        and(
+          inArray(wigglypopOrders.status, ['escrow', 'transferido']),
+          lt(wigglypopOrders.updatedAt, cutoff),
+        ),
+      )
+      .orderBy(wigglypopOrders.id)
+      .limit(limit);
+    return this.withLines(orders);
+  }
+
+  /** Bumps `updatedAt` so an order the saga is actively working is not swept. */
+  async touch(id: number): Promise<void> {
+    await this.db
+      .update(wigglypopOrders)
+      .set({ updatedAt: new Date() })
+      .where(eq(wigglypopOrders.id, id));
   }
 
   async setAllLinesDelivery(

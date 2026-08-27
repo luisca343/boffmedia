@@ -58,12 +58,22 @@ export const env = z
     // Wigglypop marketplace. OFF until the game server ships /takepokemon + /takeitems.
     // While it is off, a sale only moves money (buyer → escrow → seller) and the two players
     // hand the Pokémon over in-game themselves; the API never calls givePokemon, because
-    // without a matching take that would DUPLICATE the mon. Flip it on only once both
-    // plugin routes exist — see WigglypopCustodyService.
+    // without a matching take that would DUPLICATE the mon.
+    //
+    // The compensation saga this flag used to be waiting on now exists
+    // (WigglypopSagaService): delivery is outbox-driven, every phase writes an intent
+    // marker before its call, and an interrupted call is escalated rather than replayed.
+    // The remaining blocker is the plugin itself — both routes still 404, so flipping this
+    // on today fails every take. See WigglypopCustodyService.
     WIGGLYPOP_ATOMIC_CUSTODY: z
       .enum(['true', 'false'])
       .default('false')
       .transform((v) => v === 'true'),
+    // How long an atomic order may sit mid-delivery before the saga sweeper calls
+    // it crashed. It MUST outlast the outbox's own retry ladder (1s + 5s + 30s +
+    // 5m + 1h ≈ 65 min), or the sweeper escalates orders the dispatcher is still
+    // legitimately retrying and a human gets paged for nothing.
+    WIGGLYPOP_SAGA_STALE_MINUTES: z.coerce.number().default(120),
 
     // Discord / StreamElements
     DISCORD_KEY: z.string(),

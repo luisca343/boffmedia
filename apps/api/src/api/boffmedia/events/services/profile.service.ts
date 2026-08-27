@@ -1,15 +1,6 @@
-import { Injectable, Inject } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, desc, eq, inArray, isNull } from 'drizzle-orm';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import {
-  boffMediaParticipants,
-  boffMediaParticipantProgress,
-  boffMediaAchievements,
-  boffMediaEventParticipants,
-  boffMediaEvents,
-} from '@/_db/schema/BoffMediaEvents';
+import { Injectable } from '@nestjs/common';
 import { EventsRepository } from '../repositories/events.repository';
+import { ProfileRepository } from '../repositories/profile.repository';
 
 export interface UserTrophy {
   id: number;
@@ -38,11 +29,10 @@ export interface UserActivityItem {
   at: string;
 }
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class ProfileService {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+    private readonly profileRepository: ProfileRepository,
     private readonly eventsRepository: EventsRepository,
   ) {}
 
@@ -60,11 +50,7 @@ export class ProfileService {
 
   /** Resolve every participant row bound to a BoffMedia user id. */
   private async getParticipantIds(userId: number): Promise<number[]> {
-    const rows = await this.db
-      .select({ id: boffMediaParticipants.id })
-      .from(boffMediaParticipants)
-      .where(eq(boffMediaParticipants.userId, userId));
-    return rows.map((r) => r.id);
+    return this.profileRepository.findParticipantIds(userId);
   }
 
   /**
@@ -77,16 +63,7 @@ export class ProfileService {
   ): Promise<UserTrophies> {
     const participantIds = await this.getParticipantIds(userId);
 
-    const fullCatalogue = await this.db
-      .select()
-      .from(boffMediaAchievements)
-      .where(
-        and(
-          isNull(boffMediaAchievements.deletedAt),
-          eq(boffMediaAchievements.hidden, false),
-        ),
-      )
-      .orderBy(boffMediaAchievements.order);
+    const fullCatalogue = await this.profileRepository.findVisibleCatalogue();
 
     // Private-event achievements are invisible to viewers who cannot see the
     // event — the trophy case is public.
@@ -100,21 +77,9 @@ export class ProfileService {
 
     // Map of achievementId -> completedAt for this user's completed progress.
     const completed = new Map<number, Date | null>();
-    if (participantIds.length > 0) {
-      const progress = await this.db
-        .select({
-          achievementId: boffMediaParticipantProgress.achievementId,
-          completedAt: boffMediaParticipantProgress.completedAt,
-        })
-        .from(boffMediaParticipantProgress)
-        .where(
-          and(
-            inArray(boffMediaParticipantProgress.participantId, participantIds),
-            eq(boffMediaParticipantProgress.isCompleted, true),
-          ),
-        );
-      for (const p of progress) completed.set(p.achievementId, p.completedAt);
-    }
+    const progress =
+      await this.profileRepository.findCompletedProgress(participantIds);
+    for (const p of progress) completed.set(p.achievementId, p.completedAt);
 
     const trophies: UserTrophy[] = catalogue.map((a) => ({
       id: a.id,
@@ -160,51 +125,10 @@ export class ProfileService {
     const participantIds = await this.getParticipantIds(userId);
     if (participantIds.length === 0) return [];
 
-    const rawUnlocks = await this.db
-      .select({
-        name: boffMediaAchievements.name,
-        icon: boffMediaAchievements.icon,
-        points: boffMediaAchievements.points,
-        eventId: boffMediaAchievements.eventId,
-        at: boffMediaParticipantProgress.completedAt,
-      })
-      .from(boffMediaParticipantProgress)
-      .innerJoin(
-        boffMediaAchievements,
-        eq(
-          boffMediaAchievements.id,
-          boffMediaParticipantProgress.achievementId,
-        ),
-      )
-      .where(
-        and(
-          inArray(boffMediaParticipantProgress.participantId, participantIds),
-          eq(boffMediaParticipantProgress.isCompleted, true),
-        ),
-      )
-      .orderBy(desc(boffMediaParticipantProgress.completedAt))
-      .limit(limit);
-
-    const rawJoins = await this.db
-      .select({
-        name: boffMediaEvents.title,
-        icon: boffMediaEvents.icon,
-        eventId: boffMediaEvents.id,
-        at: boffMediaEventParticipants.createdAt,
-      })
-      .from(boffMediaEventParticipants)
-      .innerJoin(
-        boffMediaEvents,
-        eq(boffMediaEvents.id, boffMediaEventParticipants.eventId),
-      )
-      .where(
-        and(
-          inArray(boffMediaEventParticipants.participantId, participantIds),
-          isNull(boffMediaEvents.deletedAt),
-        ),
-      )
-      .orderBy(desc(boffMediaEventParticipants.createdAt))
-      .limit(limit);
+    const [rawUnlocks, rawJoins] = await Promise.all([
+      this.profileRepository.findRecentUnlocks(participantIds, limit),
+      this.profileRepository.findRecentJoins(participantIds, limit),
+    ]);
 
     // A private event's title (and its achievements) must not surface in a
     // public timeline for viewers who cannot see the event.

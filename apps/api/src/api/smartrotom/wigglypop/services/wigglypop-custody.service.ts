@@ -12,6 +12,9 @@ import {
   WigglypopListingsRepository,
 } from '../repositories/wigglypop-listings.repository';
 import { isItemsKind } from '../dto/wigglypop.dto';
+import { DELIVERY } from '../_shared/custody-state';
+import { OutboxRepository } from '@api/outbox/repositories/outbox.repository';
+import type { WigglypopOrderLine } from '@/_db/schema/SmartRotomWigglypop';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Settlement. The single most dangerous code in Wigglypop, and the reason the whole feature
@@ -63,6 +66,7 @@ export class WigglypopCustodyService {
     private readonly wingull: WingullFacadeService,
     private readonly ordersRepository: WigglypopOrdersRepository,
     private readonly listingsRepository: WigglypopListingsRepository,
+    private readonly outbox: OutboxRepository,
   ) {}
 
   isAtomic(): boolean {
@@ -179,49 +183,33 @@ export class WigglypopCustodyService {
   // ─── ATOMIC ─────────────────────────────────────────────────────────────────
 
   /**
-   * Take → charge → give → pay. Ordered so the buyer's money is only ever touched once every
-   * seller's goods are already in the market's hands.
+   * Take → charge → hand off. Ordered so the buyer's money is only ever touched
+   * once every seller's goods are already in the market's hands, and so a failed
+   * take charges the buyer nothing at all.
    *
-   * If ANY take fails, everything already taken is handed straight back to its seller and the
-   * buyer is charged NOTHING — no escrow hold has happened yet at that point.
+   * **Delivery is deliberately NOT part of this call.** Phases A and B are
+   * synchronous because the buyer's request has to end knowing whether they were
+   * charged. Phase C — giving the goods to the buyer and paying the sellers — is
+   * enqueued on the outbox and driven by `WigglypopSagaService`, because it is the
+   * genuinely remote, retryable half: running it inline would leave the buyer's
+   * HTTP request hanging on the game server, and a failure there would surface as
+   * a 500 on an order that was already fully paid for.
    *
-   * ⚠️  CRITICAL: Failure modes when WIGGLYPOP_ATOMIC_CUSTODY is ON.
+   * Every phase writes an INTENT marker before the call it names (see DELIVERY in
+   * `_shared/custody-state.ts`). That is what makes recovery deterministic rather
+   * than a guess:
    *
-   * The atomic path has NO outbox pattern and NO compensation saga. A failure between
-   * phases leaves goods and money separated and unreconcilable:
+   *   • A call that RETURNS an error did not land. The marker is rolled back and
+   *     the step is retried — by the outbox, with backoff.
+   *   • A call that never returned (crash, OOM kill) leaves its intent marker
+   *     behind. The sweeper finds it and escalates to `revision`, because the API
+   *     genuinely cannot tell whether it landed, and both guesses are expensive:
+   *     re-giving mints a second Pokémon, re-paying pays a seller twice.
    *
-   * • Phase A (TAKE) succeeds, Phase B (CHARGE) fails → Phase A is reversed (giveLine restores).
-   *   SAFE.
-   *
-   * • Phase B (CHARGE) succeeds, Phase C (GIVE) fails BEFORE payment → goods are with market,
-   *   money is in escrow, but buyer has nothing and seller is not paid. The line is marked
-   *   'pendiente' with takenPayload persisted, but recovery requires MANUAL intervention or a
-   *   replay mechanism (the code here does NOT auto-retry).
-   *   UNSAFE. Goods and money are separated with no automatic path to reconciliation.
-   *
-   * • Phase B (CHARGE) succeeds, Phase C (GIVE) fails AFTER at least one payout → goods and
-   *   money are both out but UNEVENLY DISTRIBUTED. Some sellers are paid while buyers are
-   *   incomplete. Recovery by hand.
-   *   UNSAFE. The invariant (goods paid, or money refunded) is broken.
-   *
-   * A follow-up saga MUST:
-   *
-   *   1. Wrap take+charge+give+payout in an outbox transaction: a single row inserted ATOMICALLY
-   *      with the escrow hold, keyed by (orderId, lineId), marked with the phase number it
-   *      reached.
-   *
-   *   2. On restart or error, query the outbox to detect incomplete orders and replay from the
-   *      last-completed phase. Replays are idempotent because every phase is guarded by the DB
-   *      state it changed (order.status, line.deliveryStatus, settleTxId).
-   *
-   *   3. CRITICAL: take and charge MUST be atomic (same transaction), so a charge-failed recovery
-   *      can assume all takes were rolled back. TODAY they are separate phases — Phase A's success
-   *      triggers a restore on Phase B's failure, but if the restore call itself is lost (network
-   *      failure, process crash), goods are orphaned.
-   *
-   *   4. The saga must run either on a cron (every N minutes, pick up incomplete outbox rows) or
-   *      as part of order teardown (POST /order/:id/confirm/retry or similar), never inside
-   *      settleNewOrder — that leaves the buyer's request hanging if the saga fails.
+   * The one asymmetry worth knowing: TAKES are safely retryable and GIVES are
+   * not. A take is guarded by the `pokemonKey` recorded at listing time, so the
+   * plugin refuses a second take of a slot that no longer matches. A give carries
+   * no such key, so the saga never retries one it is not certain failed.
    */
   private async settleAtomic(order: OrderWithLines): Promise<OrderWithLines> {
     if (order.status === 'completado') return order; // idempotent
@@ -235,7 +223,7 @@ export class WigglypopCustodyService {
     const taken: TakenLine[] = [];
     try {
       for (const line of order.lines) {
-        if (line.deliveryStatus === 'confirmado') continue; // replay guard
+        if (line.deliveryStatus !== DELIVERY.PENDING) continue; // replay guard
         const listing = byListing.get(line.listingId);
         if (!listing) {
           throw new BadRequestException(
@@ -246,9 +234,8 @@ export class WigglypopCustodyService {
       }
     } catch (error: any) {
       // Nothing was charged. Put back whatever we already took, and stop.
-      // GUARD: if restore fails, we stop here and fail HARD. See settleAtomic docstring.
       await this.restore(taken);
-      await this.ordersRepository.setAllLinesDelivery(order.id, 'cancelado');
+      await this.cancelUntouchedLines(order);
       await this.ordersRepository.setStatus(order.id, 'cancelado');
       await this.releaseListings(order);
       throw new BadRequestException(
@@ -262,7 +249,7 @@ export class WigglypopCustodyService {
     } catch (error: any) {
       // The buyer cannot pay. The sellers must not lose their Pokémon over it.
       await this.restore(taken);
-      await this.ordersRepository.setAllLinesDelivery(order.id, 'cancelado');
+      await this.cancelUntouchedLines(order);
       await this.ordersRepository.setStatus(order.id, 'cancelado');
       await this.releaseListings(order);
       throw new BadRequestException(
@@ -270,46 +257,29 @@ export class WigglypopCustodyService {
       );
     }
 
-    // Phase C — hand the goods to the buyer and pay the sellers.
+    // Phase C — handed to the saga. The order parks at `transferido`: goods with
+    // the market, money in escrow, delivery owed.
     //
-    // Past this point a failure can no longer be undone cleanly: the money is in escrow and the
-    // goods are out of the sellers' PCs. A give that fails is logged loudly and the line is left
-    // `pendiente` with its takenPayload persisted, so it can be replayed or refunded by hand
-    // against what actually left the PC. It is deliberately NOT silently swallowed.
-    for (const t of taken) {
-      const line = order.lines.find((l) => l.id === t.lineId);
-      if (!line) continue;
-      try {
-        await this.giveLine(order.buyerUuid, t);
-        await this.payOutLine(
-          order,
-          line.id,
-          line.sellerUuid,
-          line.lineTotal,
-          t,
-        );
-      } catch (error: any) {
-        this.logger.error(
-          `Wigglypop ${order.code} line #${line.id}: goods were taken and the buyer was charged, ` +
-            `but delivery/payout failed (${error?.message}). Payload persisted for manual replay.`,
-        );
-        await this.ordersRepository.setLineDelivery(line.id, 'pendiente', {
-          takenPayload: t as unknown,
-        });
-      }
+    // The enqueue is what makes the hand-off durable. If this process dies on the
+    // next line, the row is already on the queue and the dispatcher picks it up;
+    // if the enqueue itself fails, the sweeper still finds the order stalled in
+    // `transferido` and resumes it. Two independent paths to the same place,
+    // because losing delivery entirely is the failure that costs a Pokémon.
+    await this.ordersRepository.setStatus(order.id, 'transferido');
+    try {
+      await this.outbox.enqueue(
+        'wigglypop:deliver-order',
+        { orderId: order.id },
+        `wigglypop:deliver:${order.id}`,
+      );
+    } catch (error: any) {
+      // A duplicate key here means delivery is ALREADY queued — that is success,
+      // not failure. Anything else is left to the sweeper.
+      this.logger.warn(
+        `Wigglypop ${order.code}: delivery enqueue did not take (${error?.message}); ` +
+          `the sweeper will pick the order up.`,
+      );
     }
-
-    const settled = (await this.ordersRepository.findById(
-      order.id,
-    )) as OrderWithLines;
-    const allDone = settled.lines.every(
-      (l) => l.deliveryStatus === 'confirmado',
-    );
-    await this.ordersRepository.setStatus(
-      order.id,
-      allDone ? 'completado' : 'transferido',
-    );
-    if (allDone) await this.markListingsSold(settled);
 
     return (await this.ordersRepository.findById(order.id)) as OrderWithLines;
   }
@@ -319,36 +289,77 @@ export class WigglypopCustodyService {
     sellerUuid: string,
     listing: ListingWithContents,
   ): Promise<TakenLine> {
-    if (isItemsKind(listing.kind)) {
-      const { taken } = await this.wingull.takeItems(
-        sellerUuid,
-        listing.items.map((i) => ({ id: i.itemId, amount: i.qty })),
+    // Intent first: if the process dies inside the plugin call below, this marker
+    // is the only evidence that a take may have happened.
+    const claimed = await this.ordersRepository.setLineDeliveryIf(
+      lineId,
+      DELIVERY.PENDING,
+      DELIVERY.TAKING,
+    );
+    if (!claimed) {
+      throw new BadRequestException(
+        `Line #${lineId} is no longer takeable — another attempt owns it`,
       );
-      await this.ordersRepository.setLineDelivery(lineId, 'transferido', {
-        takenPayload: { taken } as unknown,
-      });
-      return { lineId, sellerUuid, kind: listing.kind, items: taken };
     }
 
-    // A `mon` listing holds exactly one; a `bundle` may hold several. Every one of them is
-    // taken against the pokemonKey recorded at listing time — the plugin refuses the take if
-    // the slot no longer matches, which is what makes the sale unraceable.
-    const specs: string[] = [];
-    for (const mon of listing.mons) {
-      const { pokespec } = await this.wingull.takePokemon(
-        sellerUuid,
-        mon.sourceBox,
-        mon.sourceIndex,
-        mon.pokemonKey,
-      );
-      specs.push(pokespec);
-    }
+    try {
+      if (isItemsKind(listing.kind)) {
+        const { taken } = await this.wingull.takeItems(
+          sellerUuid,
+          listing.items.map((i) => ({ id: i.itemId, amount: i.qty })),
+        );
+        await this.ordersRepository.setLineDeliveryIf(
+          lineId,
+          DELIVERY.TAKING,
+          DELIVERY.TAKEN,
+          { takenPayload: { taken } as unknown },
+        );
+        return { lineId, sellerUuid, kind: listing.kind, items: taken };
+      }
 
-    const pokespec = specs.join('\n');
-    await this.ordersRepository.setLineDelivery(lineId, 'transferido', {
-      takenPayload: { specs } as unknown,
-    });
-    return { lineId, sellerUuid, kind: listing.kind, pokespec };
+      // A `mon` listing holds exactly one; a `bundle` may hold several. Every one of them is
+      // taken against the pokemonKey recorded at listing time — the plugin refuses the take if
+      // the slot no longer matches, which is what makes the sale unraceable.
+      const specs: string[] = [];
+      for (const mon of listing.mons) {
+        const { pokespec } = await this.wingull.takePokemon(
+          sellerUuid,
+          mon.sourceBox,
+          mon.sourceIndex,
+          mon.pokemonKey,
+        );
+        specs.push(pokespec);
+      }
+
+      const pokespec = specs.join('\n');
+      await this.ordersRepository.setLineDeliveryIf(
+        lineId,
+        DELIVERY.TAKING,
+        DELIVERY.TAKEN,
+        { takenPayload: { specs } as unknown },
+      );
+      return { lineId, sellerUuid, kind: listing.kind, pokespec };
+    } catch (error) {
+      // The call came back and said no, so nothing left the seller's PC. Roll the
+      // intent marker back so this line is cleanly retryable.
+      //
+      // A multi-mon bundle is the exception and is NOT rolled back: earlier mons in
+      // the loop may already be out of the PC with no payload recorded for them, so
+      // it goes to review rather than pretending the line is untouched.
+      const partial = !isItemsKind(listing.kind) && listing.mons.length > 1;
+      await this.ordersRepository.setLineDeliveryIf(
+        lineId,
+        DELIVERY.TAKING,
+        partial ? DELIVERY.REVIEW : DELIVERY.PENDING,
+      );
+      if (partial) {
+        this.logger.error(
+          `Wigglypop line #${lineId}: a bundle take failed part-way through. Some Pokémon may ` +
+            `already have left ${sellerUuid}'s PC with no payload recorded — sent to review.`,
+        );
+      }
+      throw error;
+    }
   }
 
   private async giveLine(buyerUuid: string, t: TakenLine): Promise<void> {
@@ -368,24 +379,218 @@ export class WigglypopCustodyService {
   }
 
   /**
+   * Rebuilds the take payload a line recorded, so a resumed saga gives the buyer
+   * what actually left the seller's PC rather than what the listing said it would.
+   */
+  takenFromLine(line: WigglypopOrderLine): TakenLine | null {
+    const payload = line.takenPayload as {
+      taken?: Array<{ id: string; amount: number }>;
+      specs?: string[];
+    } | null;
+    if (!payload) return null;
+    if (isItemsKind(line.kind)) {
+      return payload.taken
+        ? {
+            lineId: line.id,
+            sellerUuid: line.sellerUuid,
+            kind: line.kind,
+            items: payload.taken,
+          }
+        : null;
+    }
+    return payload.specs?.length
+      ? {
+          lineId: line.id,
+          sellerUuid: line.sellerUuid,
+          kind: line.kind,
+          pokespec: payload.specs.join('\n'),
+        }
+      : null;
+  }
+
+  /**
+   * Give one taken line to the buyer. Claims the line first, so a dispatcher and
+   * a retry cannot both hand the same Pokémon over.
+   *
+   * Returns false when another attempt owns the line — a normal outcome, not an
+   * error. Throws only when the give itself failed, having first rolled the marker
+   * back to `tomado` so the outbox can retry it safely.
+   */
+  async deliverLine(
+    buyerUuid: string,
+    line: WigglypopOrderLine,
+    t: TakenLine,
+  ): Promise<boolean> {
+    const claimed = await this.ordersRepository.setLineDeliveryIf(
+      line.id,
+      DELIVERY.TAKEN,
+      DELIVERY.GIVING,
+    );
+    if (!claimed) return false;
+
+    try {
+      await this.giveLine(buyerUuid, t);
+    } catch (error) {
+      // The give came back as a failure, so the buyer received nothing. Back to
+      // `tomado`, which is retryable. This is the ONLY path that makes a give
+      // retryable: an INTERRUPTED give stays in `entregando` and is escalated by
+      // the sweeper instead of being tried again.
+      await this.ordersRepository.setLineDeliveryIf(
+        line.id,
+        DELIVERY.GIVING,
+        DELIVERY.TAKEN,
+      );
+      throw error;
+    }
+
+    await this.ordersRepository.setLineDeliveryIf(
+      line.id,
+      DELIVERY.GIVING,
+      DELIVERY.GIVEN,
+    );
+    return true;
+  }
+
+  /**
+   * Closes off the lines a failed sale never got to.
+   *
+   * Conditional on `pendiente` and not a blanket write, because a blanket one
+   * would also flip any line already sent to `revision` — quietly erasing the
+   * single flag telling a human that goods are unaccounted for.
+   */
+  private async cancelUntouchedLines(order: OrderWithLines): Promise<void> {
+    for (const line of order.lines) {
+      await this.ordersRepository.setLineDeliveryIf(
+        line.id,
+        DELIVERY.PENDING,
+        DELIVERY.CANCELLED,
+      );
+    }
+  }
+
+  /**
    * Hands taken goods back to the sellers they came from. Best-effort per line: one seller's
-   * restore failing must not abandon the rest, so each is logged and the loop continues.
+   * restore failing must not abandon the rest, so each is escalated and the loop continues.
    */
   private async restore(taken: TakenLine[]): Promise<void> {
     for (const t of taken) {
-      try {
-        await this.giveLine(t.sellerUuid, t);
-        await this.ordersRepository.setLineDelivery(t.lineId, 'cancelado');
-      } catch (error: any) {
-        this.logger.error(
-          `Wigglypop rollback FAILED for line #${t.lineId}: could not return the goods to ` +
-            `seller ${t.sellerUuid} (${error?.message}). Payload: ${JSON.stringify(t)}`,
-        );
-      }
+      await this.restoreLine(t);
+    }
+  }
+
+  /**
+   * One seller's goods, handed back. A restore that FAILS goes to review rather
+   * than being logged and forgotten: the goods are out of the seller's PC and the
+   * market is holding them, which is exactly the state nobody notices until the
+   * seller complains.
+   */
+  async restoreLine(t: TakenLine): Promise<void> {
+    const claimed = await this.ordersRepository.setLineDeliveryIf(
+      t.lineId,
+      [DELIVERY.TAKEN, DELIVERY.GIVEN],
+      DELIVERY.RESTORING,
+    );
+    if (!claimed) return;
+
+    try {
+      await this.giveLine(t.sellerUuid, t);
+      await this.ordersRepository.setLineDeliveryIf(
+        t.lineId,
+        DELIVERY.RESTORING,
+        DELIVERY.CANCELLED,
+      );
+    } catch (error: any) {
+      await this.ordersRepository.setLineDeliveryIf(
+        t.lineId,
+        DELIVERY.RESTORING,
+        DELIVERY.REVIEW,
+      );
+      this.logger.error(
+        `Wigglypop rollback FAILED for line #${t.lineId}: could not return the goods to ` +
+          `seller ${t.sellerUuid} (${error?.message}). Sent to review. Payload: ${JSON.stringify(t)}`,
+      );
     }
   }
 
   // ─── Shared ─────────────────────────────────────────────────────────────────
+
+  /**
+   * Escrow → seller for one taken line, on the atomic path.
+   *
+   * Split from `payOutLine` because the guard is different. The manual path can
+   * lean on `settleTxId` alone: nothing else is in flight, so "already has a tx
+   * id" fully answers "already paid". Here a crash between `escrow.release` and
+   * the row write would leave a paid seller with no tx id recorded, and a naive
+   * retry would pay them a second time — so the intent marker goes down FIRST and
+   * an interrupted payout is escalated by the sweeper rather than retried.
+   *
+   * Returns false when another attempt owns the line.
+   */
+  async payOutTakenLine(
+    order: OrderWithLines,
+    line: WigglypopOrderLine,
+  ): Promise<boolean> {
+    if (line.settleTxId) return false; // already paid out
+
+    const claimed = await this.ordersRepository.setLineDeliveryIf(
+      line.id,
+      DELIVERY.GIVEN,
+      DELIVERY.PAYING,
+    );
+    if (!claimed) return false;
+
+    let txId: number;
+    try {
+      txId = await this.escrow.release(
+        line.sellerUuid,
+        line.lineTotal,
+        `Wigglypop ${order.code} — venta`,
+      );
+    } catch (error) {
+      // The release refused, so no money moved. Back to `entregado`, retryable.
+      await this.ordersRepository.setLineDeliveryIf(
+        line.id,
+        DELIVERY.PAYING,
+        DELIVERY.GIVEN,
+      );
+      throw error;
+    }
+
+    await this.ordersRepository.setLineDeliveryIf(
+      line.id,
+      DELIVERY.PAYING,
+      DELIVERY.CONFIRMED,
+      { settleTxId: txId, confirmedAt: new Date() },
+    );
+    return true;
+  }
+
+  /**
+   * Park a line where only a human can move it, and say why on the way.
+   *
+   * Reaching this is not a bug in itself — it is the saga refusing to guess about
+   * goods or money it cannot account for. What matters is that it is loud and
+   * that the payload survives, because the recovery is manual and someone has to
+   * be able to see what left whose PC.
+   */
+  async escalate(
+    line: WigglypopOrderLine,
+    reason: string,
+    detail?: string,
+  ): Promise<void> {
+    const moved = await this.ordersRepository.setLineDeliveryIf(
+      line.id,
+      line.deliveryStatus,
+      DELIVERY.REVIEW,
+    );
+    if (!moved) return;
+    this.logger.error(
+      `Wigglypop line #${line.id} (order ${line.orderId}, seller ${line.sellerUuid}) needs manual ` +
+        `review — ${reason}. It was interrupted in '${line.deliveryStatus}'. ` +
+        `takenPayload: ${JSON.stringify(line.takenPayload ?? null)}` +
+        (detail ? ` — ${detail}` : ''),
+    );
+  }
 
   /** Escrow → seller for one line. The `settleTxId` it writes is the double-payout guard. */
   private async payOutLine(
@@ -405,6 +610,47 @@ export class WigglypopCustodyService {
       confirmedAt: new Date(),
       takenPayload: takenPayload as unknown,
     });
+  }
+
+  /**
+   * Re-reads an atomic order and settles it into whatever terminal state its
+   * lines now justify.
+   *
+   * `revision` wins over `completado` even when every other line is paid: an
+   * order that needed a human on one line is not a finished order, and marking it
+   * complete would hide the one thing somebody has to act on. Listings are only
+   * marked sold when the whole order landed — a half-delivered order leaves them
+   * reserved, because releasing them would let a second buyer purchase goods that
+   * are already out of the seller's PC.
+   */
+  async finalizeAtomicOrder(orderId: number): Promise<OrderWithLines> {
+    const settled = (await this.ordersRepository.findById(
+      orderId,
+    )) as OrderWithLines;
+
+    const needsReview = settled.lines.some(
+      (l) => l.deliveryStatus === DELIVERY.REVIEW,
+    );
+    const allDone = settled.lines.every(
+      (l) => l.deliveryStatus === DELIVERY.CONFIRMED,
+    );
+    const allCancelled = settled.lines.every(
+      (l) => l.deliveryStatus === DELIVERY.CANCELLED,
+    );
+
+    const status = needsReview
+      ? 'revision'
+      : allDone
+        ? 'completado'
+        : allCancelled
+          ? 'cancelado'
+          : 'transferido';
+
+    await this.ordersRepository.setStatus(orderId, status);
+    if (allDone) await this.markListingsSold(settled);
+    if (allCancelled) await this.releaseListings(settled);
+
+    return (await this.ordersRepository.findById(orderId)) as OrderWithLines;
   }
 
   private async markListingsSold(order: OrderWithLines): Promise<void> {

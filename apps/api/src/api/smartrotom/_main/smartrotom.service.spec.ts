@@ -2,13 +2,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from 'nestjs-pino';
 import { SmartrotomService } from './smartrotom.service';
 import { StarbankFacadeService } from '../starbank/starbank.facade.service';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { ArceuspeakRepository } from './repositories/arceuspeak.repository';
 
-const mockSelect = { from: jest.fn().mockReturnThis(), execute: jest.fn() };
-const mockInsert = { values: jest.fn().mockReturnThis(), execute: jest.fn() };
-const mockDb = {
-  select: jest.fn().mockReturnValue(mockSelect),
-  insert: jest.fn().mockReturnValue(mockInsert),
+const mockRepository = {
+  findAll: jest.fn(),
+  insert: jest.fn(),
 };
 
 const mockStarbank = {
@@ -22,16 +20,12 @@ describe('SmartrotomService', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    mockDb.select.mockReturnValue(mockSelect);
-    mockDb.insert.mockReturnValue(mockInsert);
-    mockSelect.from.mockReturnThis();
-    mockInsert.values.mockReturnThis();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         SmartrotomService,
         { provide: Logger, useValue: mockLogger },
-        { provide: DRIZZLE, useValue: mockDb },
+        { provide: ArceuspeakRepository, useValue: mockRepository },
         { provide: StarbankFacadeService, useValue: mockStarbank },
       ],
     }).compile();
@@ -44,29 +38,28 @@ describe('SmartrotomService', () => {
   });
 
   describe('getArceuspeak()', () => {
-    it('queries the arceuspeak table', async () => {
+    it('returns the stored arceuspeak rows', async () => {
       const rows = [{ name: 'pikachu', value: 'Pika!', format: 'text' }];
-      mockSelect.execute.mockResolvedValue(rows);
+      mockRepository.findAll.mockResolvedValue(rows);
 
       const result = await service.getArceuspeak();
 
-      expect(mockDb.select).toHaveBeenCalled();
+      expect(mockRepository.findAll).toHaveBeenCalled();
       expect(result).toEqual(rows);
     });
   });
 
   describe('createOrUpdateArceuspeak()', () => {
     it('inserts a new arceuspeak record', async () => {
-      mockInsert.execute.mockResolvedValue({ insertId: 1 });
+      mockRepository.insert.mockResolvedValue(undefined);
 
       await service.createOrUpdateArceuspeak('pikachu', 'Pika Pika!', 'text');
 
-      expect(mockDb.insert).toHaveBeenCalled();
-      expect(mockInsert.values).toHaveBeenCalledWith({
-        name: 'pikachu',
-        value: 'Pika Pika!',
-        format: 'text',
-      });
+      expect(mockRepository.insert).toHaveBeenCalledWith(
+        'pikachu',
+        'Pika Pika!',
+        'text',
+      );
     });
   });
 });

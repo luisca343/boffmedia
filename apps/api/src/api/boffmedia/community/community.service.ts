@@ -1,138 +1,31 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, desc, eq, isNull, or, sql } from 'drizzle-orm';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaUsers } from '@/_db/schema/BoffMedia';
-import {
-  boffMediaEvents,
-  boffMediaParticipants,
-  boffMediaAchievements,
-  boffMediaParticipantProgress,
-  boffMediaEventParticipants,
-  EVENT_STATUS,
-} from '@/_db/schema/BoffMediaEvents';
+import { Injectable } from '@nestjs/common';
 import {
   ActivityItemEntity,
   SiteStatsEntity,
 } from './entities/community.entity';
+import { CommunityRepository } from './repositories/community.repository';
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class CommunityService {
-  constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
-  ) {}
+  constructor(private readonly repo: CommunityRepository) {}
 
   /** Aggregate site-wide counters for the landing HUD. */
   async getSiteStats(): Promise<SiteStatsEntity> {
-    const [[users], [events], [activeEvents], [participants], [achievements]] =
-      await Promise.all([
-        this.db
-          .select({ c: sql<number>`COUNT(*)` })
-          .from(boffMediaUsers)
-          // Exclude GDPR soft-deleted tombstones from the public count.
-          .where(isNull(boffMediaUsers.deletedAt)),
-        this.db
-          .select({ c: sql<number>`COUNT(*)` })
-          .from(boffMediaEvents)
-          .where(isNull(boffMediaEvents.deletedAt)),
-        this.db
-          .select({ c: sql<number>`COUNT(*)` })
-          .from(boffMediaEvents)
-          .where(
-            and(
-              isNull(boffMediaEvents.deletedAt),
-              eq(boffMediaEvents.status, EVENT_STATUS.ACTIVE),
-            ),
-          ),
-        this.db
-          .select({ c: sql<number>`COUNT(*)` })
-          .from(boffMediaParticipants),
-        this.db
-          .select({ c: sql<number>`COUNT(*)` })
-          .from(boffMediaAchievements)
-          .where(isNull(boffMediaAchievements.deletedAt)),
-      ]);
-
-    return {
-      users: Number(users?.c ?? 0),
-      events: Number(events?.c ?? 0),
-      activeEvents: Number(activeEvents?.c ?? 0),
-      participants: Number(participants?.c ?? 0),
-      achievements: Number(achievements?.c ?? 0),
-    };
+    return this.repo.countSiteStats();
   }
 
   /**
    * Site-wide recent activity feed: achievement unlocks + event registrations
    * across every participant, newest first.
+   *
+   * Both halves are fetched at `limit` and merged, so the newest `limit` items
+   * overall survive the sort even when one kind dominates the other.
    */
   async getActivity(limit = 15): Promise<ActivityItemEntity[]> {
-    // The feed is anonymous, so private events never surface here: neither
-    // their titles (joins) nor their achievements (unlocks).
-    const unlocks = await this.db
-      .select({
-        actor: boffMediaParticipants.nickname,
-        name: boffMediaAchievements.name,
-        icon: boffMediaAchievements.icon,
-        at: boffMediaParticipantProgress.completedAt,
-      })
-      .from(boffMediaParticipantProgress)
-      .innerJoin(
-        boffMediaAchievements,
-        and(
-          eq(
-            boffMediaAchievements.id,
-            boffMediaParticipantProgress.achievementId,
-          ),
-          isNull(boffMediaAchievements.deletedAt),
-        ),
-      )
-      .innerJoin(
-        boffMediaParticipants,
-        eq(
-          boffMediaParticipants.id,
-          boffMediaParticipantProgress.participantId,
-        ),
-      )
-      .leftJoin(
-        boffMediaEvents,
-        eq(boffMediaEvents.id, boffMediaAchievements.eventId),
-      )
-      .where(
-        and(
-          eq(boffMediaParticipantProgress.isCompleted, true),
-          or(
-            isNull(boffMediaAchievements.eventId),
-            eq(boffMediaEvents.visibility, 'public'),
-          ),
-        ),
-      )
-      .orderBy(desc(boffMediaParticipantProgress.completedAt))
-      .limit(limit);
-
-    const joins = await this.db
-      .select({
-        actor: boffMediaParticipants.nickname,
-        name: boffMediaEvents.title,
-        icon: boffMediaEvents.icon,
-        at: boffMediaEventParticipants.createdAt,
-      })
-      .from(boffMediaEventParticipants)
-      .innerJoin(
-        boffMediaEvents,
-        and(
-          eq(boffMediaEvents.id, boffMediaEventParticipants.eventId),
-          isNull(boffMediaEvents.deletedAt),
-          eq(boffMediaEvents.visibility, 'public'),
-        ),
-      )
-      .innerJoin(
-        boffMediaParticipants,
-        eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
-      )
-      .orderBy(desc(boffMediaEventParticipants.createdAt))
-      .limit(limit);
+    const [unlocks, joins] = await Promise.all([
+      this.repo.findRecentUnlocks(limit),
+      this.repo.findRecentJoins(limit),
+    ]);
 
     const items: ActivityItemEntity[] = [
       ...unlocks

@@ -9,6 +9,8 @@ import { JwtStrategy } from './jwt.strategy';
 import { AuthService } from './auth.service';
 import { PasswordResetService } from './password-reset.service';
 import { EmailVerificationService } from './email-verification.service';
+import { EmailVerificationsRepository } from './repositories/email-verifications.repository';
+import { PasswordResetTokensRepository } from './repositories/password-reset-tokens.repository';
 import { AuthController } from './auth.controller';
 import { MinecraftController } from './minecraft.controller';
 import { MinecraftLinkService } from './minecraft-link.service';
@@ -18,6 +20,7 @@ import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
 import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
 import { PasswordModule } from './password.module';
 import { MailModule } from '@api/mail/mail.module';
+import { OutboxModule } from '@api/outbox/outbox.module';
 import { TokenSweeperService } from './token-sweeper.service';
 import { TokenSweeperRepository } from './repositories/token-sweeper.repository';
 
@@ -30,6 +33,9 @@ import { TokenSweeperRepository } from './repositories/token-sweeper.repository'
     BoffMediaUsersModule,
     PasswordModule,
     MailModule,
+    // Email verification and password reset enqueue their mail inside the same
+    // transaction that stores the token.
+    OutboxModule,
     // Microsoft's device-code endpoints and Mojang's sessionserver.
     HttpModule,
     JwtModule.register({
@@ -43,7 +49,9 @@ import { TokenSweeperRepository } from './repositories/token-sweeper.repository'
     JwtStrategy,
     AuthService,
     PasswordResetService,
+    PasswordResetTokensRepository,
     EmailVerificationService,
+    EmailVerificationsRepository,
     MinecraftLinkService,
     MinecraftHandshakeService,
     TokenSweeperService,

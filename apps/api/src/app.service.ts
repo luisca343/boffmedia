@@ -8,14 +8,12 @@ import fs from 'fs/promises';
 import path from 'path';
 import axios from 'axios';
 import { PokemonDataManagementService } from '@api/smartrotom/pokemon/services/pokemon-data-management.service';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { MySql2Database } from 'drizzle-orm/mysql2';
+import { HealthRepository } from '@api/_utils/health/health.repository';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
 import { publicPath } from '@/config/paths';
 import { ASSET, assetUrl } from '@/config/asset-url';
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class AppService {
   private imageCache: { [key: string]: string } = {};
@@ -30,7 +28,7 @@ export class AppService {
 
     private configService: ConfigService,
     private pokemonService: PokemonDataManagementService,
-    @Inject(DRIZZLE) private db: MySql2Database,
+    private readonly healthRepository: HealthRepository,
   ) {
     this.loadCache();
   }
@@ -95,7 +93,7 @@ export class AppService {
     const startTime = Date.now();
     try {
       // Execute a simple query to check database connectivity
-      await this.db.execute('SELECT 1');
+      await this.healthRepository.ping();
       return {
         status: 'ok',
         responseTime: `${Date.now() - startTime}ms`,

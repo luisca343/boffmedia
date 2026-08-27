@@ -1,22 +1,17 @@
-import { Inject, Injectable, NotFoundException } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { desc, eq } from 'drizzle-orm';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaEventSuggestions } from '@/_db/schema/BoffMediaEvents';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateSuggestionDto } from './dto/create-suggestion.dto';
 import { ReviewSuggestionDto } from './dto/review-suggestion.dto';
 import { SuggestionEntity } from './entities/suggestion.entity';
+import {
+  SuggestionRow,
+  SuggestionsRepository,
+} from './repositories/suggestions.repository';
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class SuggestionsService {
-  constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
-  ) {}
+  constructor(private readonly repo: SuggestionsRepository) {}
 
-  private toEntity(
-    row: typeof boffMediaEventSuggestions.$inferSelect,
-  ): SuggestionEntity {
+  private toEntity(row: SuggestionRow): SuggestionEntity {
     return {
       id: row.id,
       proposerUserId: row.proposerUserId,
@@ -40,30 +35,24 @@ export class SuggestionsService {
     dto: CreateSuggestionDto,
     proposerUserId: number | null,
   ): Promise<{ success: boolean; id: number }> {
-    const result = await this.db
-      .insert(boffMediaEventSuggestions)
-      .values({
-        proposerUserId,
-        title: dto.title,
-        gameName: dto.gameName,
-        type: dto.type,
-        description: dto.description,
-        additionalInfo: dto.additionalInfo ?? null,
-        suggestedDate: dto.suggestedDate ? new Date(dto.suggestedDate) : null,
-        endDate: dto.endDate ? new Date(dto.endDate) : null,
-        maxParticipants: dto.maxParticipants ?? null,
-      })
-      .execute();
+    const id = await this.repo.insert({
+      proposerUserId,
+      title: dto.title,
+      gameName: dto.gameName,
+      type: dto.type,
+      description: dto.description,
+      additionalInfo: dto.additionalInfo ?? null,
+      suggestedDate: dto.suggestedDate ? new Date(dto.suggestedDate) : null,
+      endDate: dto.endDate ? new Date(dto.endDate) : null,
+      maxParticipants: dto.maxParticipants ?? null,
+    });
 
-    return { success: true, id: result[0].insertId };
+    return { success: true, id };
   }
 
   /** Admin: all suggestions, newest first. */
   async list(): Promise<SuggestionEntity[]> {
-    const rows = await this.db
-      .select()
-      .from(boffMediaEventSuggestions)
-      .orderBy(desc(boffMediaEventSuggestions.createdAt));
+    const rows = await this.repo.findAll();
     return rows.map((r) => this.toEntity(r));
   }
 
@@ -72,16 +61,9 @@ export class SuggestionsService {
     id: number,
     dto: ReviewSuggestionDto,
   ): Promise<SuggestionEntity> {
-    await this.db
-      .update(boffMediaEventSuggestions)
-      .set({ status: dto.status, reviewNote: dto.reviewNote ?? null })
-      .where(eq(boffMediaEventSuggestions.id, id))
-      .execute();
+    await this.repo.setReview(id, dto.status, dto.reviewNote ?? null);
 
-    const [row] = await this.db
-      .select()
-      .from(boffMediaEventSuggestions)
-      .where(eq(boffMediaEventSuggestions.id, id));
+    const row = await this.repo.findById(id);
     if (!row) throw new NotFoundException('Suggestion not found');
     return this.toEntity(row);
   }

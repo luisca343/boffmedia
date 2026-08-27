@@ -6,10 +6,9 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { EventsService } from './services/events.service';
 import { FindEventsFilters } from './repositories/events.repository';
+import { EventsUnitOfWorkRepository } from './repositories/events-unit-of-work.repository';
 import { GamesService } from './services/games.service';
 import { AchievementsService } from './services/achievements.service';
 import { TeamsService } from './services/teams.service';
@@ -50,11 +49,10 @@ import {
   TeamLeaderboardEntry,
 } from './entities/leaderboard.entity';
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class EventsFacadeService {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+    private readonly unitOfWork: EventsUnitOfWorkRepository,
     private readonly eventsService: EventsService,
     private readonly gamesService: GamesService,
     private readonly achievementsService: AchievementsService,
@@ -769,10 +767,17 @@ export class EventsFacadeService {
       }
     }
 
-    // Consume and join in the same transaction: if the join fails (e.g., a
-    // concurrent admin removal after pre-validation), the use is not burned
-    // because it rolls back with the failed join. No compensation needed.
-    await this.db.transaction(async () => {
+    // ⚠️  This transaction does NOT currently cover the two calls inside it.
+    //
+    // `consume` and `joinEvent` both run their queries through their own
+    // injected connections, so they execute outside this unit of work: if the
+    // join throws, the invite has ALREADY been committed as used and is burned.
+    // The comment that stood here previously claimed the opposite.
+    //
+    // Fixing it means threading `tx` through EventInvitesService.consume and the
+    // joinEvent chain — see EventsUnitOfWorkRepository. The boundary is kept in
+    // place so that change has somewhere to land.
+    await this.unitOfWork.run(async () => {
       await this.eventInvitesService.consume(code);
       // bypassVisibility: the invitation IS the authorisation to join a private
       // event — that is the entire point of the code. The comment is a marker,

@@ -11,6 +11,10 @@ import { TournamentsModule } from '../tournaments/tournaments.module';
 
 // Import all repositories
 import { EventsRepository } from './repositories/events.repository';
+import { EventsUnitOfWorkRepository } from './repositories/events-unit-of-work.repository';
+import { ProfileRepository } from './repositories/profile.repository';
+import { ProgressRepository } from './repositories/progress.repository';
+import { LeaderboardsRepository } from './repositories/leaderboards.repository';
 import { EventInvitesRepository } from './repositories/event-invites.repository';
 import { GamesRepository } from '../../_repositories/boffmedia/games.repository';
 import { AchievementsRepository } from '../../_repositories/boffmedia/achievements.repository';
@@ -40,6 +44,10 @@ import { EventsFacadeService } from './events.facade.service';
 
     // Repositories
     EventsRepository,
+    EventsUnitOfWorkRepository,
+    ProfileRepository,
+    ProgressRepository,
+    LeaderboardsRepository,
     EventInvitesRepository,
     GamesRepository,
     AchievementsRepository,

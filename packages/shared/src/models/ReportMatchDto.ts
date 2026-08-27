@@ -23,5 +23,9 @@ export type ReportMatchDto = {
      * Correct an already-resolved match. Allowed only while its successors (next/loser-next targets, later swiss rounds) are still unplayed.
      */
     amend?: boolean;
+    /**
+     * The version of the match when loaded (optimistic concurrency for amends). Required when amend:true. If the match was amended by another admin, the call fails with 409 Conflict; reload the match and try again.
+     */
+    amendVersion?: number;
 };
 

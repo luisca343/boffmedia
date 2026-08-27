@@ -1,12 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { rotomArceuSpeak } from '@/_db/schema/SmartRotom';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { MySql2Database } from 'drizzle-orm/mysql2';
+import { Injectable } from '@nestjs/common';
 import { StarbankFacadeService } from '../starbank/starbank.facade.service';
 import { DailyRewardsConfig } from '../arcade/entities/daily-rewards.entity';
 import { Logger } from 'nestjs-pino';
+import { ArceuspeakRepository } from './repositories/arceuspeak.repository';
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class SmartrotomService {
   private rewardsConfig: DailyRewardsConfig;
@@ -14,18 +11,15 @@ export class SmartrotomService {
   constructor(
     private readonly logger: Logger,
 
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+    private readonly arceuspeakRepository: ArceuspeakRepository,
     private starbankService: StarbankFacadeService,
   ) {}
 
   async getArceuspeak() {
-    return await this.db.select().from(rotomArceuSpeak).execute();
+    return this.arceuspeakRepository.findAll();
   }
 
   async createOrUpdateArceuspeak(name: string, value: string, format: string) {
-    return await this.db
-      .insert(rotomArceuSpeak)
-      .values({ name, value, format })
-      .execute();
+    return this.arceuspeakRepository.insert(name, value, format);
   }
 }

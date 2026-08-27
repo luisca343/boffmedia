@@ -9,6 +9,7 @@ import { WigglypopEscrowService } from './wigglypop-escrow.service';
 import { WingullFacadeService } from '../../wingull/wingull.facade.service';
 import { WigglypopOrdersRepository } from '../repositories/wigglypop-orders.repository';
 import { WigglypopListingsRepository } from '../repositories/wigglypop-listings.repository';
+import { OutboxRepository } from '@api/outbox/repositories/outbox.repository';
 
 // The env module is read at call time by isAtomic(), so the flag is swapped per-test here.
 jest.mock('@/config/env', () => ({
@@ -90,8 +91,12 @@ describe('WigglypopCustodyService', () => {
     setEscrowTx: jest.fn(),
     setStatus: jest.fn(),
     setLineDelivery: jest.fn(),
+    setLineDeliveryIf: jest.fn(),
     setAllLinesDelivery: jest.fn(),
+    touch: jest.fn(),
+    findStalled: jest.fn(),
   };
+  const outbox = { enqueue: jest.fn(), enqueueTx: jest.fn() };
   const listingsRepository = {
     findManyByIds: jest.fn(),
     findById: jest.fn(),
@@ -107,6 +112,10 @@ describe('WigglypopCustodyService', () => {
     escrow.release.mockResolvedValue(9002);
     escrow.refund.mockResolvedValue(9003);
     ordersRepository.findById.mockImplementation(async () => makeOrder());
+    // The conditional writes are the saga's claim primitive: `true` means "this
+    // call won the line". Tests that need a lost race override it explicitly.
+    ordersRepository.setLineDeliveryIf.mockResolvedValue(true);
+    outbox.enqueue.mockResolvedValue(1);
     listingsRepository.findManyByIds.mockResolvedValue([makeListing()]);
     listingsRepository.findById.mockResolvedValue(makeListing());
 
@@ -121,6 +130,7 @@ describe('WigglypopCustodyService', () => {
         { provide: WingullFacadeService, useValue: wingull },
         { provide: WigglypopOrdersRepository, useValue: ordersRepository },
         { provide: WigglypopListingsRepository, useValue: listingsRepository },
+        { provide: OutboxRepository, useValue: outbox },
       ],
     }).compile();
 
@@ -303,13 +313,7 @@ describe('WigglypopCustodyService', () => {
       expect(service.isAtomic()).toBe(true);
     });
 
-    it('takes from the seller, charges the buyer, gives to the buyer, pays the seller', async () => {
-      ordersRepository.findById.mockResolvedValue(
-        makeOrder({
-          lines: [{ ...makeOrder().lines[0], deliveryStatus: 'confirmado' }],
-        }),
-      );
-
+    it('takes from the seller and charges the buyer, then hands delivery to the saga', async () => {
       await service.settleNewOrder(makeOrder());
 
       // Took the exact mon that was listed, at the slot it was listed from, against its hash.
@@ -319,19 +323,80 @@ describe('WigglypopCustodyService', () => {
         10250,
         expect.any(String),
       );
-      expect(wingull.givePokemon).toHaveBeenCalledWith(
-        BUYER,
-        'garchomp lvl:100',
-        true,
+      // Delivery is enqueued, NOT performed here. Doing it inline would hang the
+      // buyer's request on the game server and turn a delivery failure into a 500
+      // on an order that is already paid for.
+      expect(outbox.enqueue).toHaveBeenCalledWith(
+        'wigglypop:deliver-order',
+        { orderId: 1 },
+        'wigglypop:deliver:1',
       );
-      expect(escrow.release).toHaveBeenCalledWith(
-        SELLER,
-        10000,
-        expect.any(String),
-      );
+      expect(wingull.givePokemon).not.toHaveBeenCalled();
+      expect(escrow.release).not.toHaveBeenCalled();
       expect(ordersRepository.setStatus).toHaveBeenLastCalledWith(
         1,
-        'completado',
+        'transferido',
+      );
+    });
+
+    it('writes the intent marker BEFORE the take, so a crash leaves evidence', async () => {
+      const order: string[] = [];
+      ordersRepository.setLineDeliveryIf.mockImplementation(
+        async (_id: number, _from: unknown, to: string) => {
+          order.push(to);
+          return true;
+        },
+      );
+      wingull.takePokemon.mockImplementation(async () => {
+        order.push('takePokemon');
+        return { pokespec: 'garchomp lvl:100' };
+      });
+
+      await service.settleNewOrder(makeOrder());
+
+      expect(order.slice(0, 3)).toEqual(['tomando', 'takePokemon', 'tomado']);
+    });
+
+    it('rolls the marker back to pendiente when the take REFUSES, so it can be retried', async () => {
+      wingull.takePokemon.mockRejectedValue(new Error('slot mismatch'));
+
+      await expect(service.settleNewOrder(makeOrder())).rejects.toThrow(
+        BadRequestException,
+      );
+
+      expect(ordersRepository.setLineDeliveryIf).toHaveBeenCalledWith(
+        11,
+        'tomando',
+        'pendiente',
+      );
+    });
+
+    it('sends a PARTLY taken bundle to review instead of pretending it is untouched', async () => {
+      listingsRepository.findManyByIds.mockResolvedValue([
+        makeListing({
+          kind: 'bundle',
+          mons: [
+            { id: 1, listingId: 101, pokemonKey: 'a', sourceBox: 1, sourceIndex: 1, dex: 1 },
+            { id: 2, listingId: 101, pokemonKey: 'b', sourceBox: 1, sourceIndex: 2, dex: 2 },
+          ],
+        }),
+      ]);
+      // The first mon leaves the PC; the second take refuses. There is no payload
+      // recorded for the one that already moved.
+      wingull.takePokemon
+        .mockResolvedValueOnce({ pokespec: 'garchomp lvl:100' })
+        .mockRejectedValueOnce(new Error('slot mismatch'));
+
+      await expect(
+        service.settleNewOrder(
+          makeOrder({ lines: [{ ...makeOrder().lines[0], kind: 'bundle' }] }),
+        ),
+      ).rejects.toThrow(BadRequestException);
+
+      expect(ordersRepository.setLineDeliveryIf).toHaveBeenCalledWith(
+        11,
+        'tomando',
+        'revision',
       );
     });
 
@@ -454,10 +519,14 @@ describe('WigglypopCustodyService', () => {
       expect(wingull.takeItems).toHaveBeenCalledWith(SELLER, [
         { id: 'pixelmon:rare_candy', amount: 10 },
       ]);
-      // The buyer gets the 6 that really existed, not the 10 the listing claimed.
-      expect(wingull.giveItems).toHaveBeenCalledWith(BUYER, [
-        { id: 'pixelmon:rare_candy', amount: 6 },
-      ]);
+      // What was ACTUALLY taken is persisted, because that — not the listing
+      // snapshot — is what the saga will hand the buyer once it delivers.
+      expect(ordersRepository.setLineDeliveryIf).toHaveBeenCalledWith(
+        11,
+        'tomando',
+        'tomado',
+        { takenPayload: { taken: [{ id: 'pixelmon:rare_candy', amount: 6 }] } },
+      );
     });
 
     it('does not re-take or re-charge a line that already completed', async () => {

@@ -9,7 +9,7 @@ import { EventInvitesService } from './services/event-invites.service';
 import { ProgressService } from './services/progress.service';
 import { LeaderboardsService } from './services/leaderboards.service';
 import { ProfileService } from './services/profile.service';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { EventsUnitOfWorkRepository } from './repositories/events-unit-of-work.repository';
 
 const mockEvent = { id: 1, name: 'Tournament', gameId: 1, parentId: null };
 const mockGame = { id: 1, name: 'Pokémon VGC' };
@@ -180,7 +180,13 @@ describe('EventsFacadeService', () => {
         { provide: ProgressService, useValue: mockProgressService },
         { provide: LeaderboardsService, useValue: mockLeaderboardsService },
         { provide: ProfileService, useValue: mockProfileService },
-        { provide: DRIZZLE, useValue: {} },
+        {
+          // Runs the callback straight through. The real one opens a
+          // transaction, but see EventsUnitOfWorkRepository: it does not
+          // currently cover the service calls made inside it anyway.
+          provide: EventsUnitOfWorkRepository,
+          useValue: { run: (work: any) => work({}) },
+        },
       ],
     }).compile();
 

@@ -1,24 +1,18 @@
-import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, isNull } from 'drizzle-orm';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { Logger } from 'nestjs-pino';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaEmailVerifications } from '@/_db/schema/BoffMediaAuth';
 import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { MailService } from '@api/mail/mail.service';
-import { OutboxRepository } from '@api/outbox/repositories/outbox.repository';
+import { EmailVerificationsRepository } from './repositories/email-verifications.repository';
 
 const TOKEN_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-// LEGACY_DIRECT_DB: pre-dates the repository rule; extract a repository when next touched
 @Injectable()
 export class EmailVerificationService {
   constructor(
-    @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
+    private readonly verifications: EmailVerificationsRepository,
     private readonly usersRepository: BoffMediaUsersRepository,
     private readonly mail: MailService,
-    private readonly outbox: OutboxRepository,
     private readonly logger: Logger,
   ) {}
 
@@ -59,52 +53,32 @@ export class EmailVerificationService {
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + TOKEN_TTL_MS);
 
-    await this.db.transaction(async (tx) => {
-      await tx
-        .update(boffMediaEmailVerifications)
-        .set({ usedAt: new Date() })
-        .where(
-          and(
-            eq(boffMediaEmailVerifications.userId, userId),
-            isNull(boffMediaEmailVerifications.usedAt),
-          ),
-        );
-      await tx.insert(boffMediaEmailVerifications).values({
-        userId,
-        email,
-        tokenHash: this.hash(token),
-        expiresAt,
-      });
-
-      // Enqueue mail inside the transaction so a rolled-back token creation
-      // doesn't leave orphaned mail. Use a dedupeKey so a retried issue() call
-      // doesn't queue duplicate mails.
-      await this.outbox.enqueueTx(
-        tx,
-        'mail:send-verification',
-        { to: email, token, locale: locale ?? undefined },
-        `verify:${userId}:${email}`,
-      );
-    });
+    // The repository writes the token and enqueues the mail in one transaction,
+    // so a rolled-back token leaves no mail promising a dead link. The dedupeKey
+    // keeps a retried issue() from queuing the same mail twice.
+    await this.verifications.replaceActiveToken(
+      userId,
+      email,
+      this.hash(token),
+      expiresAt,
+      {
+        topic: 'mail:send-verification',
+        payload: { to: email, token, locale: locale ?? undefined },
+        dedupeKey: `verify:${userId}:${email}`,
+      },
+    );
   }
 
   /** Consume a verification token and mark the user's email verified. */
   async verify(token: string): Promise<{ success: boolean }> {
-    const [row] = await this.db
-      .select()
-      .from(boffMediaEmailVerifications)
-      .where(eq(boffMediaEmailVerifications.tokenHash, this.hash(token)))
-      .limit(1);
+    const row = await this.verifications.findByTokenHash(this.hash(token));
 
     if (!row || row.usedAt || row.expiresAt.getTime() < Date.now()) {
       throw new BadRequestException('Invalid or expired verification token');
     }
 
     await this.usersRepository.updateUser(row.userId, { emailVerified: true });
-    await this.db
-      .update(boffMediaEmailVerifications)
-      .set({ usedAt: new Date() })
-      .where(eq(boffMediaEmailVerifications.id, row.id));
+    await this.verifications.markUsed(row.id);
 
     return { success: true };
   }

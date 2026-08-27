@@ -240,7 +240,9 @@ export class WigglypopController {
     description:
       'Moves REAL StarBank money: buyer → the market escrow account. What happens next depends ' +
       'on WIGGLYPOP_ATOMIC_CUSTODY. Today (flag off) the order parks at `escrow`, the players ' +
-      'hand the Pokémon over in-game, and the seller is only paid when the buyer confirms.',
+      'hand the Pokémon over in-game, and the seller is only paid when the buyer confirms. ' +
+      'With the flag on, the goods are taken from the sellers before the buyer is charged and ' +
+      'the order parks at `transferido`, with delivery driven asynchronously by the custody saga.',
   })
   @ApiBody({ type: CreateOrderDto })
   @ApiResponse({ status: HttpStatus.CREATED, type: WigglypopOrderEntity })
