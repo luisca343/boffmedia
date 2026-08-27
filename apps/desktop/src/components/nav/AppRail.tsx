@@ -3,6 +3,7 @@ import { Icon, type IconName } from "@boffmedia/ui"
 import { useT } from "../../i18n"
 import { type Section, useApp } from "../../state/app"
 import { AccountSwitcher } from "../AccountSwitcher"
+import { McAccountSwitcher } from "../McAccountSwitcher"
 
 // The rail is the APP SECTION rail, not a pack filter.
 //
@@ -167,6 +168,12 @@ export function AppRail() {
 
       <div className="my-2 h-px w-8 bg-line" />
 
+      {/* Two identities, two chips, in the order they depend on each other: the
+          Minecraft link sits under the Boffmedia principal that owns it. Before
+          this, the Boffmedia chip was the only account surface in the rail, so a
+          player who had just linked Minecraft looked at a chip still saying
+          "Inicia sesión" and read it as the link having failed. */}
+      <McAccountSwitcher />
       <AccountSwitcher />
     </nav>
   )

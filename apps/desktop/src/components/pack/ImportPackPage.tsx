@@ -1,10 +1,10 @@
 import { useCallback, useState } from "react"
 
 import {
+  BackLink,
   Button,
   type BrowsePick,
   Field,
-  Icon,
   Input,
   ModBrowser,
   Spinner,
@@ -123,14 +123,11 @@ export function ImportPackPage({
     // grows, which keeps ModBrowser's infinite-scroll sentinel in view and
     // chain-loads pages forever. Bounded, the result grid scrolls instead.
     <div className="flex h-full flex-col gap-4 px-8 py-7">
+      {/* The bare `BackLink` atom, not a `SectionBar`: like BrowsePage, this
+          link shares its row with a labelled field, and the bar owns a whole
+          row of its own. */}
       <div className="flex flex-wrap items-end gap-3">
-        <button
-          type="button"
-          onClick={onBack}
-          className="mb-1 flex items-center gap-1.5 text-xs uppercase tracking-[0.1em] text-txt-muted hover:text-accent-bright"
-        >
-          <Icon name="back" size={13} /> {t("backButton")}
-        </button>
+        <BackLink label={t("backButton")} onBack={onBack} className="mb-1" />
         <span className="flex-1" />
         <Button size="sm" icon="upload" loading={fileBusy} onClick={() => void importFromFile()}>
           {t("fileButton")}

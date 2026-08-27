@@ -190,6 +190,20 @@ const es = {
     empty: "No hay herramientas disponibles.",
     notFound: "Esa herramienta ya no existe.",
     back: "Volver a herramientas",
+    search: "Buscar herramienta…",
+    noResults: "Sin resultados",
+    noResultsFor: "Ninguna herramienta coincide con «{query}».",
+    toolCount: "{count, plural, one {# herramienta} other {# herramientas}}",
+    badgeNew: "Nuevo",
+    badgeSoon: "Pronto",
+    // Section per game, the way the site's hub groups them. A domain with no
+    // registered tools never renders, so listing one here costs nothing.
+    domains: {
+      mhwilds: { name: "Monster Hunter Wilds", tagline: "Planificadores y bases de datos de caza" },
+      minecraft: { name: "Minecraft", tagline: "Esquemas, compatibilidad y mundos generados" },
+      pokemon: { name: "Pokémon", tagline: "Calculadoras, generadores y bases de datos" },
+      misc: { name: "Otras herramientas", tagline: "Utilidades y recursos generales" },
+    },
   },
 
   boffSignin: {
@@ -234,8 +248,8 @@ const es = {
     consulting: "Contactando con Microsoft…",
     copyCodeLabel: "Copia este código — lo necesitarás en el navegador:",
     copyCodeButton: "Copiar código",
-    browserStep: "Abre Microsoft en tu navegador. El código va ya incluido en el enlace.",
-    browserButton: "Abrir en el navegador",
+    browserStep: "Abre Microsoft en tu navegador y pega el código. El botón lo copia al portapapeles al abrirlo.",
+    browserButton: "Copiar código y abrir",
     linkButton: "Copiar enlace",
     confirmWaiting: "Esperando confirmación…",
     cancelButton: "Cancelar",
@@ -253,11 +267,25 @@ const es = {
   accountSwitcher: {
     removeLabel: "Quitar {username}",
     removeTitle: "Quitar cuenta",
+    // The signed-out rail button. Missing until now, so the rail rendered the
+    // raw key `accountSwitcher.signIn` as its tooltip and its accessible name.
+    signIn: "Iniciar sesión",
     addAccount: "Añadir cuenta",
     signOut: "Cerrar sesión",
     signOutAll: "Cerrar todas las sesiones",
     switching: "Cambiando…",
     switchLabel: "Cambiar de cuenta",
+  },
+
+  // El chip de MINECRAFT del rail. Namespace propio y no `accountSwitcher`:
+  // son dos credenciales distintas y compartir textos acabaría diciendo
+  // "cerrar sesión" donde lo correcto es "desvincular".
+  mcAccount: {
+    title: "Minecraft",
+    linkTitle: "Vincular cuenta de Minecraft",
+    addAccount: "Vincular otra cuenta",
+    unlink: "Desvincular esta cuenta",
+    unlinkLabel: "Desvincular {username}",
   },
 
   titlebar: {
@@ -1395,6 +1423,20 @@ const en = {
     empty: "No tools available.",
     notFound: "That tool no longer exists.",
     back: "Back to tools",
+    search: "Search tools…",
+    noResults: "No results",
+    noResultsFor: "No tool matches “{query}”.",
+    toolCount: "{count, plural, one {# tool} other {# tools}}",
+    badgeNew: "New",
+    badgeSoon: "Soon",
+    // Section per game, the way the site's hub groups them. A domain with no
+    // registered tools never renders, so listing one here costs nothing.
+    domains: {
+      mhwilds: { name: "Monster Hunter Wilds", tagline: "Hunt planners and databases" },
+      minecraft: { name: "Minecraft", tagline: "Schematics, compatibility and world generation" },
+      pokemon: { name: "Pokémon", tagline: "Calculators, generators and databases" },
+      misc: { name: "Other tools", tagline: "General utilities and resources" },
+    },
   },
 
   boffSignin: {
@@ -1439,8 +1481,8 @@ const en = {
     consulting: "Contacting Microsoft…",
     copyCodeLabel: "Copy this code — you'll need it in the browser:",
     copyCodeButton: "Copy code",
-    browserStep: "Open Microsoft in your browser. The code is already included in the link.",
-    browserButton: "Open in browser",
+    browserStep: "Open Microsoft in your browser and paste the code. The button copies it to your clipboard as it opens.",
+    browserButton: "Copy code & open",
     linkButton: "Copy link",
     confirmWaiting: "Waiting for confirmation…",
     cancelButton: "Cancel",
@@ -1458,11 +1500,25 @@ const en = {
   accountSwitcher: {
     removeLabel: "Remove {username}",
     removeTitle: "Remove account",
+    // The signed-out rail button. Missing until now, so the rail rendered the
+    // raw key `accountSwitcher.signIn` as its tooltip and its accessible name.
+    signIn: "Sign in",
     addAccount: "Add account",
     signOut: "Sign out",
     signOutAll: "Sign out all sessions",
     switching: "Switching…",
     switchLabel: "Switch account",
+  },
+
+  // The MINECRAFT chip in the rail. Its own namespace rather than
+  // `accountSwitcher`: these are two different credentials, and sharing the
+  // strings would end up saying "sign out" where "unlink" is what happens.
+  mcAccount: {
+    title: "Minecraft",
+    linkTitle: "Link a Minecraft account",
+    addAccount: "Link another account",
+    unlink: "Unlink this account",
+    unlinkLabel: "Unlink {username}",
   },
 
   titlebar: {

@@ -1,19 +1,22 @@
+"use client"
+
 import * as React from "react"
-import { cn } from "@/lib/utils"
-import { ToolCard } from "./ToolCard"
-import type { ToolCardData } from "./tools-data"
+import { useTranslations } from "next-intl"
+import { ToolGrid as UiToolGrid, type ToolCardData } from "@boffmedia/ui"
 
 /**
  * Responsive card grid shared by the hub and the category landings. `variant`
  * switches the card skin (and column sizing) — «fila» compact rows (default) or
- * «señal» rich cards. Mirrors `.tx-grid[data-cardvariant]` from tools.css.
+ * «señal» rich cards.
+ *
+ * Like `ToolCard`, this exists only to bind the host's badge copy; the layout
+ * and the card live in `@boffmedia/ui`.
  */
 export function ToolGrid({ tools, variant = "fila" }: { tools: ToolCardData[]; variant?: "senal" | "fila" }) {
-  return (
-    <div className={cn("grid grid-cols-1 gap-4", variant === "fila" ? "sm:grid-cols-[repeat(auto-fill,minmax(380px,1fr))]" : "sm:grid-cols-[repeat(auto-fill,minmax(320px,1fr))]")}>
-      {tools.map((t) => (
-        <ToolCard key={t.key} tool={t} variant={variant} />
-      ))}
-    </div>
+  const tCard = useTranslations("toolsUi.card")
+  const labels = React.useMemo(
+    () => ({ isNew: tCard("new"), soon: tCard("soon"), popular: tCard("popular") }),
+    [tCard],
   )
+  return <UiToolGrid tools={tools} variant={variant} labels={labels} />
 }

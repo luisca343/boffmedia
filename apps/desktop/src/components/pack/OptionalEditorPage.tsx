@@ -4,12 +4,12 @@ import {
   Banner,
   Button,
   OptionalGroupsEditor,
+  SectionBar,
   Spinner,
   toast,
   type EditableFile,
 } from "@boffmedia/ui"
 
-import { SectionHeader } from "../SectionHeader"
 import { useT } from "../../i18n"
 import { instanceModGraph, localPackGet } from "../../runtime"
 import { optionalGroupProblems, saveOptionalGroups } from "../../services/localPackEdit"
@@ -123,8 +123,13 @@ export function OptionalEditorPage({
     // h-full so the page is exactly the shell's height and the form owns its own
     // scroll — the file pickers inside are `max-h` scrollers, and they only
     // behave when their ancestor is not free to grow.
-    <div className="flex h-full flex-col px-8 py-7">
-      <SectionHeader
+    <div className="flex h-full flex-col">
+      {/* Full-bleed, so the page padding sits on the body wrapper below rather
+          than on this root — the bar's hairline has to reach both edges.
+          `actions` carries Cancel/Save because those belong to the act of
+          LEAVING this editor; nothing else may be hoisted up here. */}
+      <SectionBar
+        bordered
         label={t("optionalEditor.backToPack")}
         onBack={onBack}
         title={t("optionalEditor.pageTitle")}
@@ -140,6 +145,7 @@ export function OptionalEditorPage({
         }
       />
 
+      <div className="flex min-h-0 flex-1 flex-col px-8 py-7">
       {/* Stated once, at the top, rather than repeated per group: every save
           bumps the version id, so this is true of the whole page and not of any
           one thing on it. */}
@@ -176,6 +182,7 @@ export function OptionalEditorPage({
             t={t}
           />
         )}
+      </div>
       </div>
     </div>
   )

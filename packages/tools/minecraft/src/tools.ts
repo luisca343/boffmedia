@@ -16,7 +16,11 @@ export const schematicCompatTool: ToolManifest = {
   id: "minecraft.schematic-compat",
   domain: "minecraft",
   titleKey: `${SCHEMATIC_COMPAT_NS}.appName`,
-  descriptionKey: `${SCHEMATIC_COMPAT_NS}.appTagline`,
+  // `appDescription`, not `appTagline`: the tagline is the GAME ("Minecraft ·
+  // Hytale"), which a host that groups its listing by game has already said in
+  // the section header. A card needs to say what the tool does.
+  descriptionKey: `${SCHEMATIC_COMPAT_NS}.appDescription`,
+  categoryKey: `${SCHEMATIC_COMPAT_NS}.appCategory`,
   icon: "cube",
   route: "/minecraft/schematic-compat",
   // A WebGL canvas cannot size itself from content: these two want a bounded
@@ -35,7 +39,8 @@ export const schematicViewerTool: ToolManifest = {
   id: "minecraft.schematic-viewer",
   domain: "minecraft",
   titleKey: `${SCHEMATIC_VIEWER_NS}.appName`,
-  descriptionKey: `${SCHEMATIC_VIEWER_NS}.appTagline`,
+  descriptionKey: `${SCHEMATIC_VIEWER_NS}.appDescription`,
+  categoryKey: `${SCHEMATIC_VIEWER_NS}.appCategory`,
   icon: "cube",
   route: "/minecraft/schematic-viewer",
   // A WebGL canvas cannot size itself from content: these two want a bounded
@@ -52,7 +57,9 @@ export const seedFinderTool: ToolManifest = {
   id: "minecraft.seeds",
   domain: "minecraft",
   titleKey: `${SEED_FINDER_NS}.appName`,
-  descriptionKey: `${SEED_FINDER_NS}.appTagline`,
+  descriptionKey: `${SEED_FINDER_NS}.appDescription`,
+  categoryKey: `${SEED_FINDER_NS}.appCategory`,
+  isNew: true,
   icon: "cube",
   route: "/minecraft/seeds",
   // The map owns the screen: controls sit beside it and only the sidebar

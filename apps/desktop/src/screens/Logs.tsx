@@ -36,7 +36,7 @@ export function Logs() {
       {/* §9 — one paste with the launcher/pack/Java context on top, so a report
           is a block of text a player can send, not a screenshot of scrollback. */}
       <ToolHeader
-        className="mb-5"
+        className="mb-6"
         title={t("title")}
         actions={
           <Button size="sm" icon="copy" onClick={() => void copyReport()} disabled={logs.length === 0}>

@@ -1,30 +1,25 @@
-import type * as React from "react"
 import { getGameEntry, getLandingItems } from "@/data/games"
 import { hubConfig } from "@/data/hub"
-import type { IconName } from "@boffmedia/ui"
+import { hueColorOf, hueStyle, type ToolCardData as UiToolCardData } from "@boffmedia/ui"
+
+// The card, the grid, the seal and the hue formula now live in `@boffmedia/ui`
+// so the launcher renders the same hub. Re-exported so the site's existing
+// imports keep working.
+export { hueColorOf, hueStyle }
 
 /** Games shown in the v3 tools hub, in order. */
 export const HUB_SLUGS = ["pokemon", "mhwilds", "otros", "minecraft"] as const
 
 export type HubSlug = (typeof HUB_SLUGS)[number]
 
-export interface ToolCardData {
-  key: string
-  title: string
-  desc: string
-  features: string[]
-  icon: IconName
+/** The shared card data plus the fields only the site's landings use — the
+ *  featured hero and its feature chips have no counterpart in the launcher. */
+export interface ToolCardData extends UiToolCardData {
   href: string
-  isNew?: boolean
-  popularity?: "high" | "medium" | "low"
-  hueColor: string
+  features: string[]
   featured?: boolean
   heroImage?: string
   iconSrc?: string
-  /** Category / game label shown in the «señal» skin head. */
-  cat?: string
-  /** Not wired yet — renders muted with a «Pronto» badge. */
-  soon?: boolean
 }
 
 export interface HubGame {
@@ -39,12 +34,6 @@ export interface HubGame {
   href: string
   tools: ToolCardData[]
 }
-
-export const hueColorOf = (hue: number) => `hsl(${hue} 62% 58%)`
-
-/** Inline style setting the game-hue custom property consumed by tool components. */
-export const hueStyle = (color: string): React.CSSProperties =>
-  ({ ["--ghue" as string]: color }) as React.CSSProperties
 
 const normHref = (href: string) => (href.startsWith("/") ? href : `/${href}`)
 

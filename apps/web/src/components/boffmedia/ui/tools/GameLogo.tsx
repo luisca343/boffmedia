@@ -1,49 +1,33 @@
 "use client"
 
 import * as React from "react"
-import { cn } from "@/lib/utils"
-import { hueStyle } from "./tools-data"
+import { GameLogo as UiGameLogo, type GameLogoProps as UiGameLogoProps } from "@boffmedia/ui"
 import { ArtImage } from "./ArtImage"
 
-export interface GameLogoProps {
-  label: string
-  hueColor: string
-  size?: "sm" | "lg"
-  className?: string
-  /** Real game icon image; falls back to the letter seal if missing/broken. */
-  imageSrc?: string
-  /** Drop the seal frame (cut, border, tinted plate) and show the bare icon. */
-  bare?: boolean
+export interface GameLogoProps extends Omit<UiGameLogoProps, "art"> {
+  size?: "sm" | "md" | "lg"
 }
 
-// --cut-w mirrors the border width so the redrawn chamfer strokes match it.
-const SIZES = {
-  sm: { box: "w-[34px] h-[34px] text-[11px] [--cut:6px] [--cut-w:1.5px]", border: "border-[1.5px]", px: "34px" },
-  md: { box: "w-14 h-14 text-[15px] [--cut:9px] [--cut-w:2px]", border: "border-2", px: "56px" },
-  lg: { box: "w-[104px] h-[104px] text-[17px] [--cut:9px] [--cut-w:2px]", border: "border-2", px: "104px" },
-} as const
+const SIZE_PX = { sm: "34px", md: "56px", lg: "104px" } as const
 
-/** The game seal — its icon (or letter) in the game's hue, with the diagonal cut. */
+/**
+ * The game seal, drawn by `@boffmedia/ui` but with the art routed through
+ * `next/image`.
+ *
+ * The package renders a plain `<img>` so a Tauri host works with no wiring; on
+ * the web that would bypass the image optimiser, so the `art` slot takes an
+ * `ArtImage` instead — the one difference between the two hosts.
+ */
 export function GameLogo({ label, hueColor, size, className, imageSrc, bare }: GameLogoProps) {
-  const dim = SIZES[size ?? "md"]
-  const framed = !(bare && imageSrc)
+  const px = SIZE_PX[size ?? "md"]
   return (
-    <span
-      style={hueStyle(hueColor)}
-      className={cn(
-        "relative grid flex-none place-items-center font-display font-extrabold italic uppercase leading-none tracking-[0.02em] text-[var(--ghue)]",
-        // No overflow-hidden when framed: the clip-path already clips the art,
-        // and overflow would trim the chamfer strokes off their own corners.
-        !framed && "overflow-hidden",
-        framed && [
-          dim.border,
-          "cut-seal cut-seal-edge [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_12%,var(--bg))]",
-        ],
-        dim.box,
-        className,
-      )}
-    >
-      <ArtImage src={imageSrc} sizes={dim.px} fallback={label} fit="contain" />
-    </span>
+    <UiGameLogo
+      label={label}
+      hueColor={hueColor}
+      size={size}
+      className={className}
+      bare={bare}
+      art={imageSrc ? <ArtImage src={imageSrc} sizes={px} fallback={label} fit="contain" /> : undefined}
+    />
   )
 }

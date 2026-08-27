@@ -376,39 +376,35 @@ function reducer(s: State, a: Action): State {
     // than dispatching both because the pair would blank the shell for a frame
     // and bounce the player back to the packs list; the ONE thing that must
     // still happen is dropping the packs, for the same reason as below.
+    // NEITHER of these touches the pack library, and that is a correction.
+    //
+    // Both used to clear `packs`, on the reasoning that "entitlements are
+    // per-UUID and showing the previous user's list would leak pack names".
+    // That was true when the MINECRAFT account was the launcher's principal. It
+    // is not any more: the library is filtered by the BOFFMEDIA account (see
+    // `packs_list`, which keys both the request and its offline cache on
+    // `active_boff_id`), and these two actions leave that account alone by
+    // design. So there is nothing to leak — and the load effect keys on
+    // `boffAccountId`, so a cleared list had nothing to refill it. The library
+    // simply went empty until the player found the retry button.
+    //
+    // It never bit before because switching Minecraft accounts was unreachable:
+    // the roster existed in Rust with no UI in front of it. The rail's chip
+    // makes it a one-click action, which is exactly what would have surfaced it.
     case "account/switched":
       return {
         ...s,
         account: a.account,
-        packs: [],
-        packsError: null,
-        packsPartial: null,
         // A switch runs the full refresh chain, so reaching this action at all
         // proves the network is back.
         offline: false,
-        packsLoading: false,
-        selectedPackId: null,
       };
     case "signout":
-      // Never keep packs across accounts: entitlements are per-UUID and
-      // showing the previous user's list would leak pack names.
-      return {
-        ...s,
-        account: null,
-        packs: [],
-        packsError: null,
-        packsPartial: null,
-        packsLoading: false,
-        // Signing out ends offline mode: the next account has to prove itself
-        // through the real chain, and a stale flag would tell the shell to keep
-        // hiding install buttons for a player who is fully online.
-        offline: false,
-        // The BOFFMEDIA principal is untouched here — only the Minecraft
-        // sub-credential went — so the section the player is in stays valid.
-        // Only `pack` is dropped, along with the id it pointed at.
-        view: s.view === "pack" ? "packs" : s.view,
-        selectedPackId: null,
-      };
+      // The BOFFMEDIA principal is untouched here — only the Minecraft
+      // sub-credential went — so the player's place in the app stays valid,
+      // including an open pack. It is still installed and still theirs; the
+      // launch button will simply ask for a link again.
+      return { ...s, account: null };
     case "packs/loading":
       return { ...s, packsLoading: true, packsError: null };
     case "packs/load":
@@ -936,15 +932,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         source: "app",
         text: `Sesión iniciada como ${account.username}`,
       });
+      // The link worked but could not be written down. Said out loud, because
+      // the consequence lands LATER — at the next launch, as another request to
+      // link — and a player who was never told will read that as the launcher
+      // being broken.
+      if (account.warning) {
+        toast.warn(account.warning, { duration: 9000 });
+        log({ level: "warn", source: "app", text: account.warning });
+      }
       return true;
     } catch (err) {
       const failure = err as { message?: string };
+      const message = failure?.message ?? "No se pudo vincular tu cuenta de Minecraft.";
       dispatch({ type: "signin/cancel" });
-      log({
-        level: "error",
-        source: "app",
-        text: failure?.message ?? "No se pudo iniciar sesión.",
-      });
+      // A TOAST, not just a log line. `signin/cancel` closes the code screen
+      // outright, so without this the failure is indistinguishable from success
+      // — which is exactly how a link that never completed came to look like one
+      // that had, right up until the next pack launch asked again.
+      toast.error(message, { duration: 9000 });
+      log({ level: "error", source: "app", text: message });
       return false;
     }
   }, [log]);
@@ -1169,6 +1175,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           source: "app",
           text: `Sesión restaurada: ${account.username}`,
         });
+        if (account.warning) {
+          toast.warn(account.warning, { duration: 9000 });
+          log({ level: "warn", source: "app", text: account.warning });
+        }
       })
       .catch(async (err: { message?: string; needsSignin?: boolean }) => {
         // Surfaced on the sign-in screen as well as the log: a player must
@@ -1194,6 +1204,58 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       })
       .finally(openGate);
   }, [log, goOffline, goBoffOffline]);
+
+  // Re-resolve the MINECRAFT session whenever the BOFFMEDIA account changes.
+  //
+  // These are two separate credentials, but the Minecraft roster is SCOPED to
+  // the Boffmedia account that linked it (`accounts_<id>.json`, auth/accounts.rs)
+  // and `boff_switch`/`boff_sign_in` deliberately drop the live Minecraft
+  // session, since it belonged to the departing account. Nothing then restored
+  // the incoming account's own linked identity: the silent restore runs once, at
+  // boot, behind `restoreStarted`. So signing into Boffmedia — including the very
+  // first sign-in on a fresh install — left the launcher holding no Minecraft
+  // session at all, and the next pack launch asked the player to link an account
+  // that was already sitting in the roster, linked.
+  //
+  // Silent by design: this is not the boot path. A failure here means "no
+  // Minecraft account linked under this one yet", which is a perfectly ordinary
+  // state the launch prompt already handles — it must not raise the sign-in
+  // screen's restore banner or drop anyone into offline mode.
+  const mcRestoredForBoff = React.useRef<number | null | undefined>(undefined);
+  React.useEffect(() => {
+    if (!state.bootAuthDone) return;
+    if (mcRestoredForBoff.current === undefined) {
+      // First pass after boot: the boot restore already covered this account.
+      mcRestoredForBoff.current = boffAccountId;
+      return;
+    }
+    if (mcRestoredForBoff.current === boffAccountId) return;
+    mcRestoredForBoff.current = boffAccountId;
+    if (boffAccountId === null) return;
+
+    void authRestore()
+      .then((account) => {
+        if (!account) return;
+        dispatch({ type: "signin/done", account });
+        log({
+          level: "info",
+          source: "app",
+          text: `Cuenta de Minecraft vinculada: ${account.username}`,
+        });
+        if (account.warning) {
+          toast.warn(account.warning, { duration: 9000 });
+        }
+      })
+      .catch((err: { message?: string }) => {
+        log({
+          level: "info",
+          source: "app",
+          text:
+            err?.message ??
+            "No hay ninguna cuenta de Minecraft vinculada a esta cuenta.",
+        });
+      });
+  }, [state.bootAuthDone, boffAccountId, log]);
 
   // The MANAGED half of the library needs a Boffmedia account (the server
   // filters by that account's entitlements); the local half never did. So the

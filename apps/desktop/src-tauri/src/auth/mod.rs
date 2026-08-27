@@ -27,6 +27,13 @@ pub struct AccountView {
     pub username: String,
     /// Full skin sheet URL, empty when the player has no skin. See McSession.
     pub skin_url: String,
+    /// Set when the identity resolved but could not be written down. The player
+    /// IS signed in — the session in memory is live and the game will launch —
+    /// but the link will not survive a restart, so the renderer says so instead
+    /// of pretending nothing happened. `None` on the happy path, and skipped on
+    /// the wire so the renderer sees the field only when it means something.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub warning: Option<String>,
 }
 
 /// A roster row for the switcher. Separate from `AccountView` because it
@@ -50,7 +57,60 @@ impl From<&McSession> for AccountView {
             uuid: s.uuid.clone(),
             username: s.username.clone(),
             skin_url: s.skin_url.clone(),
+            warning: None,
         }
+    }
+}
+
+/// What `persist_session` managed to write down.
+struct Persisted {
+    /// False when the refresh token did not reach the credential store, which
+    /// is the half that decides whether the link survives a restart.
+    token_saved: bool,
+    /// Player-facing, already worded for the log and the toast.
+    warning: Option<String>,
+}
+
+/// Write a resolved identity through to disk: the refresh token to the OS
+/// credential store, the name and face to the roster.
+///
+/// BEST-EFFORT ON PURPOSE, and this is the whole point of the function. It used
+/// to be three `?`s inline, so a credential store that refused the write failed
+/// the entire sign-in — after the player had already finished on microsoft.com.
+/// The live session was then thrown away along with it, the code screen just
+/// closed, and the launcher asked for the link again at the next pack launch
+/// with nothing on screen to explain why. A session that cannot be SAVED is
+/// still a session that can be PLAYED; only the surviving-a-restart part is
+/// lost, and that is what the warning says.
+///
+/// The roster row is written even when the token was not: the switcher should
+/// show the account you are actually signed in as, and a row whose token is
+/// missing is already a case `auth_restore`/`auth_switch` prune on sight.
+fn persist_session(app: &tauri::AppHandle, session: &McSession) -> Persisted {
+    let token_err = store::save_refresh_token_for(&session.uuid, &session.refresh_token).err();
+
+    let mut roster = accounts::load(app);
+    accounts::upsert_active(&mut roster, &session.uuid, &session.username, &session.skin_url);
+    let roster_err = accounts::save(app, &roster).err();
+
+    let warning = match (&token_err, &roster_err) {
+        (None, None) => None,
+        (Some(err), _) => Some(format!(
+            "Has entrado como {}, pero no se pudo guardar la sesión en el almacén \
+             de credenciales del sistema ({err}). Podrás jugar ahora, pero tendrás \
+             que vincular la cuenta otra vez la próxima vez que abras la app.",
+            session.username
+        )),
+        (None, Some(message)) => Some(format!(
+            "Has entrado como {}, pero no se pudo guardar la lista de cuentas \
+             ({message}).",
+            session.username
+        )),
+    };
+
+    Persisted {
+        token_saved: token_err.is_none(),
+        warning,
     }
 }
 
@@ -146,24 +206,20 @@ pub async fn auth_await(
     let (ms_access, refresh) = msa::poll_for_tokens(&code).await?;
     let session = msa::minecraft_session(&ms_access, refresh).await?;
 
-    // Persist ONLY the refresh token, and only after the whole chain succeeded —
-    // storing earlier would leave a token behind for an account that turned out
-    // to have no Java profile. Keyed by UUID, so signing in as a second player
-    // ADDS an account instead of evicting the first.
-    store::save_refresh_token_for(&session.uuid, &session.refresh_token)?;
-    let mut roster = accounts::load(&app);
-    accounts::upsert_active(&mut roster, &session.uuid, &session.username, &session.skin_url);
-    accounts::save(&app, &roster).map_err(|message| AuthFailure {
-        message,
-        needs_signin: false,
-    })?;
-
     *state.pending.lock().await = None;
-    // Signing into Minecraft is a sub-step of launching a Minecraft pack now,
-    // NOT the launcher session. It links (or relinks) an MSA identity under the
+
+    // THE LIVE SESSION FIRST, persistence second. The player has finished with
+    // Microsoft by this point and the identity is fully resolved; nothing that
+    // happens to a disk or a keychain afterwards should be able to take that
+    // away from them. See `persist_session`.
+    //
+    // Signing into Minecraft is a sub-step of launching a Minecraft pack, NOT
+    // the launcher session. It links (or relinks) an MSA identity under the
     // active Boffmedia account, so it must leave the Boffmedia session — and the
     // pack library that keys on it — completely untouched.
-    let view = AccountView::from(&session);
+    let mut view = AccountView::from(&session);
+    let persisted = persist_session(&app, &session);
+    view.warning = persisted.warning;
     *state.session.lock().await = Some(session);
     Ok(view)
 }
@@ -189,14 +245,20 @@ pub async fn auth_open_verification(state: tauri::State<'_, AuthState>) -> Resul
             needs_signin: true,
         })?;
 
-    // `?otc=` pre-fills the code on microsoft.com/link, so the common path is
-    // one click rather than transcribing the code by hand. An endpoint that
-    // does not understand the parameter just shows its normal entry form.
-    let url = format!("{}?otc={}", code.verification_uri, code.user_code);
-
+    // EXACTLY the URL Microsoft handed us, with nothing appended.
+    //
+    // This used to add `?otc=<user_code>` to pre-fill the code, on the theory
+    // that an endpoint which does not understand the parameter would just show
+    // its normal entry form. It does not: microsoft.com/link answers the
+    // pre-filled link with "that code is invalid" — while the very same URL,
+    // copied and pasted by hand, works. So the button was the ONE path through
+    // this screen that could not complete, and the copy button beside it was
+    // the workaround. The code goes to the clipboard from the renderer instead
+    // (see SignIn.tsx), which costs a paste and always works.
+    //
     // Detached: `open::that` waits on the spawned process, which would hold
     // this command open for as long as the browser runs.
-    open::that_detached(&url).map_err(|e| AuthFailure {
+    open::that_detached(&code.verification_uri).map_err(|e| AuthFailure {
         message: format!("No se pudo abrir el navegador: {e}"),
         needs_signin: false,
     })
@@ -294,24 +356,25 @@ pub async fn auth_restore(
     };
 
     let session = msa::minecraft_session(&ms_access, new_refresh).await?;
-    // Microsoft rotates refresh tokens; persisting the new one is what keeps
-    // silent sign-in working past the first refresh.
-    store::save_refresh_token_for(&session.uuid, &session.refresh_token)?;
 
-    // The UUID is only knowable here, which is why the legacy entry cannot be
-    // migrated at startup: it is an opaque token until the chain resolves it.
-    // Clearing it last means an interrupted migration retries next launch
-    // instead of stranding the account with no token under either key.
-    accounts::upsert_active(&mut roster, &session.uuid, &session.username, &session.skin_url);
-    accounts::save(&app, &roster).map_err(|message| AuthFailure {
-        message,
-        needs_signin: false,
-    })?;
-    if migrating {
-        store::clear_refresh_token()?;
+    // Microsoft rotates refresh tokens; persisting the new one is what keeps
+    // silent sign-in working past the first refresh. Best-effort for the same
+    // reason as in `auth_await`: this restore has ALREADY succeeded, and a
+    // credential store that refuses the rotated token must cost the player the
+    // next launch at worst, not this one. The UUID is only knowable here, which
+    // is why the legacy entry cannot be migrated at startup — it is an opaque
+    // token until the chain resolves it.
+    let mut view = AccountView::from(&session);
+    let persisted = persist_session(&app, &session);
+    view.warning = persisted.warning;
+
+    // Clearing the legacy entry LAST, and only once the per-UUID one is really
+    // there: an interrupted (or refused) migration retries next launch instead
+    // of stranding the account with no token under either key.
+    if migrating && persisted.token_saved {
+        let _ = store::clear_refresh_token();
     }
 
-    let view = AccountView::from(&session);
     *state.session.lock().await = Some(session);
     Ok(Some(view))
 }
@@ -438,17 +501,13 @@ pub async fn auth_switch(
     };
 
     let session = msa::minecraft_session(&ms_access, new_refresh).await?;
-    store::save_refresh_token_for(&session.uuid, &session.refresh_token)?;
-    accounts::upsert_active(&mut roster, &session.uuid, &session.username, &session.skin_url);
-    accounts::save(&app, &roster).map_err(|message| AuthFailure {
-        message,
-        needs_signin: false,
-    })?;
 
     // A Minecraft identity is a LINKED credential under the active Boffmedia
     // account now, not the launcher session — switching it leaves the Boffmedia
-    // session (and the pack library that keys on it) alone.
-    let view = AccountView::from(&session);
+    // session (and the pack library that keys on it) alone. Persistence is
+    // best-effort here too: the switch itself has already worked.
+    let mut view = AccountView::from(&session);
+    view.warning = persist_session(&app, &session).warning;
     *state.session.lock().await = Some(session);
     Ok(view)
 }

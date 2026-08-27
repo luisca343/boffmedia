@@ -172,6 +172,11 @@ export type Account = {
    *  PNG, not a head render. `<PlayerHead>` crops the head out of it in CSS.
    *  Empty when the account has never set a skin. */
   skinUrl: string
+  /** Present only when the identity resolved but could not be WRITTEN DOWN —
+   *  the session is live and the game will launch, but the link may not survive
+   *  a restart. Absent on the happy path (Rust skips the field), so the mere
+   *  presence of it is the signal. */
+  warning?: string
 }
 
 /** The device-code flow the user completes in a browser. */

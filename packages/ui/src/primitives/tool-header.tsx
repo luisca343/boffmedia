@@ -1,5 +1,6 @@
 import * as React from "react"
 import { cn } from "../cn"
+import { getLink } from "../i18n"
 import { Icon, type IconName } from "./icon"
 
 /**
@@ -292,6 +293,117 @@ export function ToolHeader({
  *  the wrapper anyway — an empty row that still spends its margin and reads as a
  *  stray gap. Every optional slot in this file goes through this instead. */
 const present = (node: React.ReactNode) => node !== null && node !== undefined && node !== false && node !== ""
+
+/**
+ * The height of a `SectionBar`, as a token rather than a literal.
+ *
+ * A view that owns the full viewport subtracts this from `100dvh` to build its
+ * scrollport (`--tool-vh`). Respelling `37px` at such a call site is a silent
+ * breakage waiting for the next height change: the bar moves, the scrollport
+ * does not, and nothing errors — it just scrolls wrong.
+ */
+export const SECTION_BAR_H = "37px"
+
+/**
+ * "Go up one level", on its own.
+ *
+ * The bare atom, for the two views whose back link shares a row with something
+ * else (a labelled field) and therefore cannot use the bar. Everything else
+ * gets it through `SectionBar`, which is what makes the affordance look and
+ * behave identically wherever it appears.
+ */
+export function BackLink({
+  label,
+  onBack,
+  href,
+  className,
+}: {
+  label: React.ReactNode
+  /** Click handler for a host that navigates by state (the launcher). */
+  onBack?: () => void
+  /** Href for a host that navigates by URL. Ignored when `onBack` is given. */
+  href?: string
+  className?: string
+}) {
+  const cls = cn(
+    "inline-flex items-center gap-1.5 text-xs uppercase tracking-[0.1em] text-txt-muted transition-colors hover:text-accent-bright",
+    className,
+  )
+  const inner = (
+    <>
+      <Icon name="back" size={13} /> {label}
+    </>
+  )
+  if (!onBack && href) {
+    const Link = getLink()
+    return (
+      <Link href={href} className={cls}>
+        {inner}
+      </Link>
+    )
+  }
+  return (
+    <button type="button" onClick={onBack} className={cls}>
+      {inner}
+    </button>
+  )
+}
+
+/**
+ * The depth-one navigation row: back link, optionally the name of where you
+ * are, optionally the controls that belong to LEAVING.
+ *
+ * Deliberately NOT built on `ToolStrip`. A tool bar is 58px because it carries
+ * a seal over a title over a sub-line; a row whose whole job is "go up one
+ * level" has no business being that tall, and the first attempt at sharing the
+ * chassis produced exactly that — a header three times the weight of the thing
+ * it labels. The two bars only ever agreed on having a border. What is shared
+ * is the ATOM (`BackLink`), not the chassis.
+ *
+ * Corollary for `actions`: a view's PRIMARY action stays in the body next to
+ * what it acts on. This slot is for controls that belong to the act of leaving
+ * — an editor's Cancel/Save — never for hoisting a Play or Install button up
+ * into the navigation row.
+ */
+export function SectionBar({
+  label,
+  onBack,
+  href,
+  title,
+  actions,
+  bordered = false,
+  className,
+}: {
+  label: React.ReactNode
+  onBack?: () => void
+  href?: string
+  /** Where you are. Quiet body-size text: the bar navigates, it does not shout. */
+  title?: React.ReactNode
+  actions?: React.ReactNode
+  /** A view that owns the full height (a tool) needs the row to read as a fixed
+   *  bar. One that scrolls with its page (a pack) does not want a rule cutting
+   *  across its own heading. */
+  bordered?: boolean
+  className?: string
+}) {
+  return (
+    <div
+      className={cn(
+        bordered
+          ? // Explicit height, not padding — see `SECTION_BAR_H`.
+            "flex h-[var(--section-bar-h,37px)] shrink-0 items-center gap-3 border-b border-solid border-line px-4"
+          : "mb-4 flex items-center gap-3",
+        className,
+      )}
+    >
+      <BackLink label={label} onBack={onBack} href={href} />
+      {present(title) && (
+        <span className="min-w-0 flex-1 truncate text-sm font-medium text-txt">{title}</span>
+      )}
+      {present(actions) && <div className="ml-auto flex items-center gap-2">{actions}</div>}
+    </div>
+  )
+}
 
 export interface ToolBarProps {
   /** Sticks the row under the host chrome. Use for a bar that must survive a

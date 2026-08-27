@@ -154,6 +154,13 @@ export function SignIn() {
                       variant="pri"
                       icon="external"
                       onClick={() => {
+                        // The code goes to the clipboard in the SAME click.
+                        // Microsoft rejects a pre-filled `?otc=` link (see
+                        // auth_open_verification), so the browser lands on the
+                        // plain entry form and the only thing left to do there
+                        // is paste — which is why this button copies rather than
+                        // leaving the player to come back for the copy button.
+                        void copyText(deviceCode.userCode)
                         void authOpenVerification(deviceCode.verificationUri).catch(
                           () => undefined,
                         )

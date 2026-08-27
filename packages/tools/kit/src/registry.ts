@@ -26,6 +26,18 @@ export interface ToolManifest {
   descriptionKey: string;
   /** Lucide-style icon name; hosts map it to their own icon set. */
   icon: string;
+  /**
+   * Message key for the short kind-of-thing label a listing shows above the
+   * title ("Bestiary", "Planner", "3D viewer").
+   *
+   * Declarative like the rest of the manifest: a host that groups tools by
+   * domain still needs to tell two tools in the same domain apart at a glance,
+   * and deriving that from the id would encode a naming convention no package
+   * has agreed to.
+   */
+  categoryKey?: string;
+  /** Flags the tool as new in a host's listing. */
+  isNew?: boolean;
   component: LazyExoticComponent<ComponentType<Record<string, never>>>;
   /** Hosts hide (or disable) a tool whose capabilities they cannot provide. */
   requiredCapabilities?: ToolCapability[];

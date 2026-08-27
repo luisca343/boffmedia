@@ -13,6 +13,8 @@ export const messages = {
       "seedFinder": {
         "appName": "Buscador de Semillas",
         "appTagline": "Minecraft · mundos generados",
+        "appCategory": "Generación",
+        "appDescription": "Encuentra semillas por bioma, estructuras y condiciones del mundo.",
         "title": "Buscador de Semillas",
         "description": "Explora la generación de mundo de una semilla en el navegador, con tus datapacks",
         "stack": {
@@ -354,6 +356,8 @@ export const messages = {
       "schematicCompat": {
         "appName": "Schematic Compat",
         "appTagline": "Minecraft · Hytale",
+        "appCategory": "Conversión",
+        "appDescription": "Convierte schematics entre versiones de Minecraft, mod loaders y Hytale.",
         "title": "Herramienta de Compatibilidad de Schematics",
         "description": "Convierte schematics entre versiones de Minecraft y mod loaders",
         "features": {
@@ -580,6 +584,8 @@ export const messages = {
         },
         "appName": "Schematic Viewer",
         "appTagline": "Minecraft · Hytale",
+        "appCategory": "Visor 3D",
+        "appDescription": "Abre cualquier schematic y recórrelo en 3D antes de construirlo.",
         "workbench": {
           "setupTab": "Configuración",
           "previewTab": "Visor"
@@ -664,6 +670,8 @@ export const messages = {
       "seedFinder": {
         "appName": "Seed Finder",
         "appTagline": "Minecraft · world generation",
+        "appCategory": "Generation",
+        "appDescription": "Find seeds by biome, structures and world conditions.",
         "title": "Seed Finder",
         "description": "Explore a seed's world generation in the browser, with your own datapacks",
         "stack": {
@@ -1005,6 +1013,8 @@ export const messages = {
       "schematicCompat": {
         "appName": "Schematic Compat",
         "appTagline": "Minecraft · Hytale",
+        "appCategory": "Conversion",
+        "appDescription": "Convert schematics between Minecraft versions, mod loaders and Hytale.",
         "title": "Schematic Compatibility Tool",
         "description": "Convert schematics between Minecraft versions and mod loaders",
         "features": {
@@ -1231,6 +1241,8 @@ export const messages = {
         },
         "appName": "Schematic Viewer",
         "appTagline": "Minecraft · Hytale",
+        "appCategory": "3D viewer",
+        "appDescription": "Open any schematic and walk through it in 3D before building it.",
         "workbench": {
           "setupTab": "Setup",
           "previewTab": "Viewer"

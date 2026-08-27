@@ -452,15 +452,21 @@ export const messages = {
         "manifest": {
           "planner": {
             "name": "Planificador de Builds",
-            "tagline": "Monster Hunter Wilds"
+            "tagline": "Monster Hunter Wilds",
+            "category": "Planificador",
+            "description": "Construye y optimiza sets de armadura, talismanes y habilidades."
           },
           "tree": {
             "name": "Árbol de Armas",
-            "tagline": "Monster Hunter Wilds"
+            "tagline": "Monster Hunter Wilds",
+            "category": "Progresión",
+            "description": "Árboles de mejora y estadísticas de todas las armas del juego."
           },
           "bestiary": {
             "name": "Bestiario",
-            "tagline": "Monster Hunter Wilds"
+            "tagline": "Monster Hunter Wilds",
+            "category": "Base de datos",
+            "description": "Información detallada de cada monstruo: debilidades, partes y recompensas."
           }
         }
       }
@@ -908,15 +914,21 @@ export const messages = {
         "manifest": {
           "planner": {
             "name": "Build Planner",
-            "tagline": "Monster Hunter Wilds"
+            "tagline": "Monster Hunter Wilds",
+            "category": "Planner",
+            "description": "Build and optimise armour sets, talismans and skills."
           },
           "tree": {
             "name": "Weapon Tree",
-            "tagline": "Monster Hunter Wilds"
+            "tagline": "Monster Hunter Wilds",
+            "category": "Progression",
+            "description": "Upgrade trees and stats for every weapon in the game."
           },
           "bestiary": {
             "name": "Bestiary",
-            "tagline": "Monster Hunter Wilds"
+            "tagline": "Monster Hunter Wilds",
+            "category": "Database",
+            "description": "Detailed information on every monster: weaknesses, parts and rewards."
           }
         }
       }

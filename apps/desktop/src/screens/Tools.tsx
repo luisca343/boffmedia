@@ -1,9 +1,22 @@
-import { Suspense, useMemo, type CSSProperties } from "react"
-import { Icon, isIconName, Spinner, ToolHeader, type IconName } from "@boffmedia/ui"
-import { getTool, listTools, type ToolManifest } from "@boffmedia/tool-kit"
+import { Suspense, useMemo, useState, type CSSProperties } from "react"
+import {
+  Empty,
+  hueColorOf,
+  isIconName,
+  SearchInput,
+  SectionBar,
+  SECTION_BAR_H,
+  Spinner,
+  ToolGrid,
+  ToolGroupHead,
+  ToolHeader,
+  type IconName,
+  type ToolCardData,
+} from "@boffmedia/ui"
+import { getTool, listTools, type ToolDomain, type ToolManifest } from "@boffmedia/tool-kit"
 
 import { useT } from "../i18n"
-import { SectionHeader } from "../components/SectionHeader"
+import { TOOL_DOMAIN_META, TOOL_DOMAIN_ORDER } from "../data/toolDomains"
 import { useApp } from "../state/app"
 
 // This screen has NO per-tool wiring. It renders whatever the domain packages
@@ -29,44 +42,99 @@ function iconOf(tool: ToolManifest): IconName {
   return isIconName(tool.icon) ? tool.icon : ICON_FALLBACK
 }
 
-function ToolCard({ tool }: { tool: ToolManifest }) {
-  const t = useT()
-  const { go } = useApp()
-
-  return (
-    <button
-      onClick={() => go("tool", undefined, { toolId: tool.id })}
-      className="group flex items-start gap-3 rounded-lg border border-line bg-surface p-4 text-left transition-colors hover:border-accent hover:bg-surface-bright"
-    >
-      <span className="mt-0.5 text-txt-muted transition-colors group-hover:text-accent">
-        <Icon name={iconOf(tool)} size={22} />
-      </span>
-      <span className="min-w-0">
-        <span className="block truncate font-medium text-txt">{t(tool.titleKey)}</span>
-        <span className="block truncate text-sm text-txt-muted">{t(tool.descriptionKey)}</span>
-      </span>
-    </button>
-  )
-}
-
 export function Tools() {
   const t = useT("tools")
+  const tRoot = useT()
+  const { go } = useApp()
+  const [query, setQuery] = useState("")
+
   // The registry is populated by the import-time side effect in `tool-host.ts`'s
   // sibling registration (see main.tsx) — reading it in a memo keeps the sort
   // out of every render.
   const tools = useMemo(() => listTools().filter(supported), [])
 
+  // The manifest carries message KEYS; the cards want display text. Resolving
+  // once here is also what makes the search work on what the player can see
+  // rather than on key names.
+  const cards = useMemo(() => {
+    const byDomain = new Map<ToolDomain, ToolCardData[]>()
+    for (const tool of tools) {
+      const meta = TOOL_DOMAIN_META[tool.domain]
+      const card: ToolCardData = {
+        key: tool.id,
+        title: tRoot(tool.titleKey),
+        desc: tRoot(tool.descriptionKey),
+        cat: tool.categoryKey ? tRoot(tool.categoryKey) : undefined,
+        icon: iconOf(tool),
+        isNew: tool.isNew,
+        hueColor: hueColorOf(meta.hue),
+      }
+      const bucket = byDomain.get(tool.domain)
+      if (bucket) bucket.push(card)
+      else byDomain.set(tool.domain, [card])
+    }
+    return byDomain
+  }, [tools, tRoot])
+
+  const labels = useMemo(() => ({ isNew: t("badgeNew"), soon: t("badgeSoon") }), [t])
+
+  const groups = useMemo(
+    () =>
+      TOOL_DOMAIN_ORDER.filter((d) => cards.has(d)).map((domain) => ({
+        domain,
+        meta: TOOL_DOMAIN_META[domain],
+        tools: cards.get(domain) ?? [],
+      })),
+    [cards],
+  )
+
+  const term = query.trim().toLowerCase()
+  const results = term
+    ? [...cards.values()]
+        .flat()
+        .filter((c) => c.title.toLowerCase().includes(term) || c.desc.toLowerCase().includes(term))
+    : null
+
+  const open = (card: ToolCardData) => go("tool", undefined, { toolId: card.key })
+
   return (
-    <div className="mx-auto w-full max-w-3xl p-6">
-      {/* Was `text-xl font-semibold` — not even the display face. */}
-      <ToolHeader title={t("title")} sub={t("subtitle")} />
+    <div className="flex h-full min-h-0 flex-col overflow-y-auto px-8 py-7">
+      <ToolHeader
+        className="mb-6"
+        title={t("title")}
+        sub={t("subtitle")}
+        actions={
+          tools.length > 0 ? (
+            <div className="w-[280px]">
+              <SearchInput value={query} onChange={setQuery} placeholder={t("search")} size="sm" />
+            </div>
+          ) : undefined
+        }
+      />
 
       {tools.length === 0 ? (
-        <p className="mt-6 text-sm text-txt-muted">{t("empty")}</p>
+        <p className="text-sm text-txt-muted">{t("empty")}</p>
+      ) : results ? (
+        results.length === 0 ? (
+          <Empty icon="search" title={t("noResults")} lead={t("noResultsFor", { query: query.trim() })} />
+        ) : (
+          <ToolGrid tools={results} variant="senal" labels={labels} onSelect={open} />
+        )
       ) : (
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          {tools.map((tool) => (
-            <ToolCard key={tool.id} tool={tool} />
+        // Grouped by game, the way the site's hub is: with six tools across two
+        // games, the game IS the thing a player navigates by.
+        <div className="flex flex-col gap-9">
+          {groups.map((g) => (
+            <section key={g.domain}>
+              <ToolGroupHead
+                name={tRoot(g.meta.nameKey)}
+                tagline={tRoot(g.meta.taglineKey)}
+                hueColor={hueColorOf(g.meta.hue)}
+                logoLabel={g.meta.logoLabel}
+                count={t("toolCount", { count: g.tools.length })}
+              />
+              <ToolGrid tools={g.tools} variant="senal" labels={labels} onSelect={open} />
+            </section>
           ))}
         </div>
       )}
@@ -101,7 +169,7 @@ export function ToolView() {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
-      <SectionHeader
+      <SectionBar
         bordered
         label={t("back")}
         onBack={() => go("tools")}
@@ -116,14 +184,16 @@ export function ToolView() {
           Wilds tools could not scroll at all.
 
           `--tool-vh` / `--tool-sticky-top` are this host's half of the deal (see
-          MhBar). The scrollport starts below the 40px titlebar and the 37px
-          bordered SectionHeader, and nothing overlays its top edge — so the
-          sticky offset is 0, which is NOT the same number as the chrome height.
-          One variable could not serve both. */}
+          MhBar). The scrollport starts below the 40px titlebar and the bordered
+          SectionBar, whose height is read from `SECTION_BAR_H` rather than
+          respelled — a bar-height change that misses this silently drifts the
+          scrollport. Nothing overlays its top edge, so the sticky offset is 0,
+          which is NOT the same number as the chrome height: one variable could
+          not serve both. */}
       <div
         style={
           {
-            "--tool-vh": "calc(100dvh - 40px - 37px)",
+            "--tool-vh": `calc(100dvh - 40px - ${SECTION_BAR_H})`,
             "--tool-sticky-top": "0px",
           } as CSSProperties
         }

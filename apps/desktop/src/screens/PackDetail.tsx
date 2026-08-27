@@ -14,6 +14,7 @@ import {
   Modal,
   Panel,
   Progress,
+  SectionBar,
   Stats,
   Stepper,
   Tabs,
@@ -25,7 +26,6 @@ import type { MenuItem } from "@boffmedia/ui";
 
 import { useT } from "../i18n";
 import { CrashDiagnosisCard } from "../components/CrashDiagnosis";
-import { SectionHeader } from "../components/SectionHeader";
 import { VersionPicker, dependenciesOf } from "../components/VersionPicker";
 import type { VersionChoice } from "../components/VersionPicker";
 import { InstanceSpace } from "../components/InstanceSpace";
@@ -720,9 +720,14 @@ export function PackDetail() {
   }
 
   return (
-    <div className="px-8 py-7">
-      <SectionHeader label={t("libraryBack")} onBack={() => go("packs")} />
+    // The bar is full-bleed — it owns its own gutter and its hairline has to
+    // reach both edges — so the page padding lives on the body wrapper below it
+    // rather than on this root. Same shape as ToolView, which is the point: one
+    // depth-one chassis, whatever the section.
+    <div>
+      <SectionBar bordered label={t("libraryBack")} onBack={() => go("packs")} />
 
+      <div className="px-8 py-7">
       <header className="mb-5 flex flex-wrap items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-4">
           <CatalogIcon src={localIcon ?? pack.iconUrl ?? undefined} size={64} />
@@ -1290,6 +1295,7 @@ export function PackDetail() {
           onDone={reloadPacks}
         />
       )}
+      </div>
     </div>
   );
 }
