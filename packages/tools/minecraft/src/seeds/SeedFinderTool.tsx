@@ -330,7 +330,12 @@ export function SeedFinderTool() {
   const engineRef = useRef(engine);
   engineRef.current = engine;
   const getEngine = useCallback(() => engineRef.current, []);
-  const engineReady = engine !== null;
+  /**
+   * The stack the LIVE engine holds, which lags `stackKey` by one commit on a
+   * pack change. `SeedMap` keys its whole Leaflet map on this, so it must not
+   * be `stackKey` — see the note on `SeedsEngine.key`.
+   */
+  const engineKey = engine?.key ?? "";
 
   const audit = loaded?.inspect;
   const unknown = audit?.unknownTypes.length ?? 0;
@@ -742,7 +747,7 @@ export function SeedFinderTool() {
           {hydrated ? (
             <SeedMap
               getEngine={getEngine}
-              engineKey={engineReady ? stackKey : ""}
+              engineKey={engineKey}
               styler={styler}
               mode={mode}
               hillshade={hillshade}

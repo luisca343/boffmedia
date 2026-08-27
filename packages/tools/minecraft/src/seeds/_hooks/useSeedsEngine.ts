@@ -19,13 +19,26 @@ import { LocalWorld } from "../_lib/localWorld";
 export interface SeedsEngine {
   pool: SeedsPool;
   local: LocalWorld;
+  /**
+   * The stack this engine was actually BUILT for, which is not the same thing
+   * as the stack the tool currently wants — and consumers must key on this one.
+   *
+   * Ticking a pack changes `stackKey` one commit before this effect replaces
+   * the engine, and React runs a child's effects before its parent's. A child
+   * keyed on `stackKey` therefore rebuilds against the OUTGOING engine, whose
+   * pool is disposed moments later by the cleanup below, and then never re-runs
+   * because by the time the new engine arrives its key has not changed again.
+   * The map held a terminated pool, queued tiles nobody would ever answer, and
+   * went blank for the rest of the session.
+   */
+  key: string;
 }
 
 export function useSeedsEngine(stackKey: string): SeedsEngine | null {
   const [engine, setEngine] = useState<SeedsEngine | null>(null);
 
   useEffect(() => {
-    const next: SeedsEngine = { pool: new SeedsPool(), local: new LocalWorld() };
+    const next: SeedsEngine = { pool: new SeedsPool(), local: new LocalWorld(), key: stackKey };
     setEngine(next);
     return () => {
       setEngine(null);

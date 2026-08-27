@@ -360,6 +360,13 @@ export class SeedsPool {
    * worker, which is what makes returning to a previous zoom instant.
    */
   requestTile(key: string, req: TileRequest): Promise<TileGrid | null> {
+    // A disposed pool has no idle workers, so `pump` can never dispatch: without
+    // this the task would sit in the queue and its promise would never settle,
+    // Leaflet would never get its `done()`, and the map would be blank with
+    // nothing anywhere saying why. That is exactly how holding a stale engine
+    // presented itself. Null is the same answer a cancelled tile gets.
+    if (this.disposed) return Promise.resolve(null);
+
     const cacheKey = cacheKeyFor(req);
     const cached = this.cache.get(cacheKey);
     if (cached) {
