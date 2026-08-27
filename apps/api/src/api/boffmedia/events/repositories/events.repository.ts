@@ -15,6 +15,7 @@ import {
 // depending on the randomizer *module* here would close a cycle, since the
 // randomizer already depends on events.
 import { randomizerConfigs } from '@/_db/schema/Randomizer';
+import { boffMediaTournaments } from '@/_db/schema/BoffMediaTournaments';
 
 const ACTIVE_MEMBERSHIP_STATUSES = [
   PARTICIPANT_STATUS.REGISTERED,
@@ -165,12 +166,37 @@ export class EventsRepository {
    */
   async findModules(eventId: number): Promise<{
     randomizer: 'open' | 'closed' | 'published' | null;
+    tournament: {
+      id: number;
+      slug: string;
+      name: string;
+      status: string;
+    } | null;
   }> {
-    const rows = await this.db
-      .select({ status: randomizerConfigs.status })
-      .from(randomizerConfigs)
-      .where(eq(randomizerConfigs.eventId, eventId))
-      .limit(1);
+    const [rows, tournaments] = await Promise.all([
+      this.db
+        .select({ status: randomizerConfigs.status })
+        .from(randomizerConfigs)
+        .where(eq(randomizerConfigs.eventId, eventId))
+        .limit(1),
+      // Same schema-level reach as the randomizer above, and for the same
+      // reason: the tournaments module already depends on events.
+      this.db
+        .select({
+          id: boffMediaTournaments.id,
+          slug: boffMediaTournaments.slug,
+          name: boffMediaTournaments.name,
+          status: boffMediaTournaments.status,
+        })
+        .from(boffMediaTournaments)
+        .where(
+          and(
+            eq(boffMediaTournaments.eventId, eventId),
+            isNull(boffMediaTournaments.deletedAt),
+          ),
+        )
+        .limit(1),
+    ]);
 
     const status = rows[0]?.status;
     return {
@@ -178,6 +204,7 @@ export class EventsRepository {
         status === 'open' || status === 'closed' || status === 'published'
           ? status
           : null,
+      tournament: tournaments[0] ?? null,
     };
   }
 

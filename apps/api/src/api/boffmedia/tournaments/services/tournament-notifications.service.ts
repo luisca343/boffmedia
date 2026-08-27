@@ -14,20 +14,25 @@ export class TournamentNotificationsService {
     private readonly notifications: NotificationsService,
   ) {}
 
+  /**
+   * `dedupeKey` makes a notification idempotent for producers that can run
+   * twice on the same fact — advance can be re-run, and the champion/phase
+   * notifications used to stack a duplicate in the user's list each time.
+   * Omit it for genuinely repeatable events (a match becoming ready again
+   * after an amend is real news).
+   */
   private async notifyUser(
     userId: number,
     title: string,
     body: string,
     link: string,
+    dedupeKey?: string,
   ): Promise<void> {
     try {
-      await this.notifications.create({
-        userId,
-        type: 'tournament',
-        title,
-        body,
-        link,
-      });
+      await this.notifications.create(
+        { userId, type: 'tournament', title, body, link },
+        dedupeKey,
+      );
     } catch {
       // swallow — notifications are best-effort
     }
@@ -43,6 +48,7 @@ export class TournamentNotificationsService {
           'El torneo ha comenzado',
           t.name,
           `/torneos/${t.slug}`,
+          `t:${t.id}:start:${p.userId}`,
         );
       }
     } catch {
@@ -59,6 +65,7 @@ export class TournamentNotificationsService {
           '¡Has ganado el torneo!',
           t.name,
           `/torneos/${t.slug}`,
+          `t:${t.id}:champion:${champ.userId}`,
         );
       }
     } catch {
@@ -71,6 +78,7 @@ export class TournamentNotificationsService {
     t: Tournament,
     qualifiedIds: number[],
     eliminatedIds: number[],
+    phaseId: number | null = null,
   ): Promise<void> {
     try {
       const advanced = new Set(qualifiedIds);
@@ -85,6 +93,7 @@ export class TournamentNotificationsService {
           advanced.has(pid) ? 'Has pasado de fase' : 'Has quedado eliminado',
           t.name,
           `/torneos/${t.slug}`,
+          `t:${t.id}:phase:${phaseId}:${p.userId}`,
         );
       }
     } catch {

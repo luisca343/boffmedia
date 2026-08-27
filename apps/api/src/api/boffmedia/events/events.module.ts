@@ -4,6 +4,10 @@ import { ResponseModule } from '@api/_utils/response/response.module';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { LifecycleSweeperService } from '../lifecycle-sweeper.service';
+import { LifecycleSweeperRepository } from '../lifecycle-sweeper.repository';
+import { TournamentsModule } from '../tournaments/tournaments.module';
 
 // Import all repositories
 import { EventsRepository } from './repositories/events.repository';
@@ -12,6 +16,7 @@ import { GamesRepository } from '../../_repositories/boffmedia/games.repository'
 import { AchievementsRepository } from '../../_repositories/boffmedia/achievements.repository';
 import { ParticipantsRepository } from '../../_repositories/boffmedia/participants.repository';
 import { TeamsRepository } from '../../_repositories/boffmedia/teams.repository';
+import { AuditRepository } from '../../_repositories/boffmedia/audit.repository';
 
 // Import all domain services
 import { EventsService } from './services/events.service';
@@ -36,6 +41,8 @@ import { EventsFacadeService } from './events.facade.service';
     AchievementsRepository,
     ParticipantsRepository,
     TeamsRepository,
+    AuditRepository,
+    LifecycleSweeperRepository,
 
     // Domain services
     EventsService,
@@ -50,6 +57,9 @@ import { EventsFacadeService } from './events.facade.service';
 
     // Facade service
     EventsFacadeService,
+
+    // The clock: activates dated events, closes elapsed windows, sweeps.
+    LifecycleSweeperService,
   ],
   controllers: [EventsController],
   exports: [
@@ -67,6 +77,14 @@ import { EventsFacadeService } from './events.facade.service';
     LeaderboardsService,
     ProfileService,
   ],
-  imports: [ResponseModule, LoggerModule, DrizzleModule, NotificationsModule],
+  imports: [
+    ResponseModule,
+    LoggerModule,
+    DrizzleModule,
+    NotificationsModule,
+    ScheduleModule.forRoot(),
+    // For EntryService: the sweeper freezes tournament fields at their deadline.
+    TournamentsModule,
+  ],
 })
 export class EventsModule {}

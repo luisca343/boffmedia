@@ -4,6 +4,7 @@ import { TeamsRepository } from '../../../_repositories/boffmedia/teams.reposito
 import { ParticipantsService } from './participants.service';
 
 const mockTeamsRepo = {
+  transaction: jest.fn(),
   findAll: jest.fn(),
   findByEventId: jest.fn(),
   findById: jest.fn(),
@@ -17,6 +18,14 @@ const mockTeamsRepo = {
   updateScore: jest.fn(),
   findMember: jest.fn(),
 };
+
+// createTeam runs the team insert + leader seat in one transaction. The mock
+// runs the callback against the repo itself, so the assertions below still see
+// the individual create/addMember calls. Assigned after the literal because it
+// refers back to it.
+mockTeamsRepo.transaction.mockImplementation(
+  (fn: (repo: typeof mockTeamsRepo) => unknown) => fn(mockTeamsRepo),
+);
 
 const mockParticipantsService = {
   getOrCreateParticipantByUserId: jest.fn(),

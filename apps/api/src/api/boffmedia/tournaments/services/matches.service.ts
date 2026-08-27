@@ -9,6 +9,7 @@ import { ReportMatchDto } from '../dto/report-match.dto';
 import { effectiveBestOf } from '../match-report.util';
 import { TournamentNotificationsService } from './tournament-notifications.service';
 import type { MatchStatus } from '../tournaments.types';
+import { ApiErrorCode, userError } from '@/common/errors/user-error';
 
 const ELIMINATION: ReadonlySet<string> = new Set([
   'winners',
@@ -23,6 +24,18 @@ export interface Settlement {
   topScore: number | null;
   botScore: number | null;
   status: MatchStatus;
+}
+
+export interface SettleOptions {
+  /** Correcting an already-resolved match: skip the "not yet settled" guard. */
+  amend?: boolean;
+  /** Transaction-scoped repo when the caller already owns a transaction. */
+  repo?: TournamentsRepository;
+  /**
+   * Sink for match-ready notifications when the caller owns the transaction —
+   * it flushes them after ITS commit. Omit and they are sent here.
+   */
+  notifications?: TournamentMatch[];
 }
 
 @Injectable()
@@ -70,13 +83,20 @@ export class MatchesService {
         );
       }
       const winnerIsTop = dto.winnerParticipantId === match.topParticipantId;
-      await this.settle(match, {
-        winnerId: dto.winnerParticipantId,
-        loserId: winnerIsTop ? match.botParticipantId : match.topParticipantId,
-        topScore: winnerIsTop ? 1 : 0,
-        botScore: winnerIsTop ? 0 : 1,
-        status: 'completed',
-      });
+      const applied = await this.settle(
+        match,
+        {
+          winnerId: dto.winnerParticipantId,
+          loserId: winnerIsTop
+            ? match.botParticipantId
+            : match.topParticipantId,
+          topScore: winnerIsTop ? 1 : 0,
+          botScore: winnerIsTop ? 0 : 1,
+          status: 'completed',
+        },
+        { amend: alreadyResolved },
+      );
+      if (!applied) throw MatchesService.settledConcurrently();
       return { success: true, winnerParticipantId: dto.winnerParticipantId };
     }
 
@@ -108,15 +128,34 @@ export class MatchesService {
           ? match.botParticipantId
           : match.topParticipantId;
 
-    await this.settle(match, {
-      winnerId,
-      loserId,
-      topScore: dto.topScore,
-      botScore: dto.botScore,
-      status: 'completed',
-    });
+    const applied = await this.settle(
+      match,
+      {
+        winnerId,
+        loserId,
+        topScore: dto.topScore,
+        botScore: dto.botScore,
+        status: 'completed',
+      },
+      { amend: alreadyResolved },
+    );
+    if (!applied) throw MatchesService.settledConcurrently();
 
     return { success: true, winnerParticipantId: winnerId };
+  }
+
+  /**
+   * The admin's report lost the race to a rival confirm or a proposal expiry
+   * between `report`'s status check and the settlement claim. Correcting the
+   * now-settled match is a deliberate amend, not a retry of the same call.
+   */
+  private static settledConcurrently(): BadRequestException {
+    return new BadRequestException(
+      userError(
+        ApiErrorCode.MATCH_SETTLED_CONCURRENTLY,
+        'Match was settled while this report was in flight (pass amend:true to correct it)',
+      ),
+    );
   }
 
   /**
@@ -124,33 +163,79 @@ export class MatchesService {
    * `nextMatch` slot, drop the loser into `loserNextMatch` (double-elim), and
    * crown the champion when a bracket final resolves. Reused for bye auto-advance.
    */
-  async settle(match: TournamentMatch, s: Settlement): Promise<void> {
-    await this.repo.updateMatch(match.id, {
-      topScore: s.topScore,
-      botScore: s.botScore,
-      winnerParticipantId: s.winnerId,
-      status: s.status,
-      reportedAt: new Date(),
-      // Any settlement (rival confirm, admin report/amend, forfeit, bye)
-      // supersedes whatever self-report proposal was open on the match.
-      proposedByParticipantId: null,
-      proposedTopScore: null,
-      proposedBotScore: null,
-      proposedGames: null,
-      proposedAt: null,
-      proposalExpiresAt: null,
-      proposalState: null,
-    });
+  async settle(
+    match: TournamentMatch,
+    s: Settlement,
+    opts: SettleOptions = {},
+  ): Promise<boolean> {
+    // Caller already owns a transaction (bracket build): run inline on its repo
+    // and hand it the notifications so they fire on its commit, not ours.
+    if (opts.repo) {
+      const notifications = opts.notifications ?? [];
+      const applied = await this.settleWithin(
+        opts.repo,
+        match,
+        s,
+        opts.amend ?? false,
+        notifications,
+      );
+      if (!opts.notifications) await this.flushNotifications(notifications);
+      return applied;
+    }
 
-    if (s.winnerId == null) return; // draw (league/group/swiss) — nothing to advance
+    const notifications: TournamentMatch[] = [];
+    const applied = await this.repo.transaction((tx) =>
+      this.settleWithin(tx, match, s, opts.amend ?? false, notifications),
+    );
+    // Only after the settlement is durable — a rolled-back transaction must not
+    // leave players notified about a match that never became ready.
+    if (applied) await this.flushNotifications(notifications);
+    return applied;
+  }
+
+  /**
+   * The settlement itself, against a caller-supplied (transaction-scoped) repo.
+   * Returns false when the claim lost: another writer resolved this match first
+   * and has already propagated its result, so this call must not advance anyone.
+   */
+  private async settleWithin(
+    repo: TournamentsRepository,
+    match: TournamentMatch,
+    s: Settlement,
+    amend: boolean,
+    notifications: TournamentMatch[],
+  ): Promise<boolean> {
+    const claimed = await repo.claimSettlement(
+      match.id,
+      {
+        topScore: s.topScore,
+        botScore: s.botScore,
+        winnerParticipantId: s.winnerId,
+        status: s.status,
+        reportedAt: new Date(),
+        // Any settlement (rival confirm, admin report/amend, forfeit, bye)
+        // supersedes whatever self-report proposal was open on the match.
+        proposedByParticipantId: null,
+        proposedTopScore: null,
+        proposedBotScore: null,
+        proposedGames: null,
+        proposedAt: null,
+        proposalExpiresAt: null,
+        proposalState: null,
+      },
+      { allowResolved: amend },
+    );
+    if (!claimed) return false;
+
+    if (s.winnerId == null) return true; // draw (league/group/swiss) — nothing to advance
 
     if (match.nextMatchId && match.nextMatchSlot) {
-      await this.repo.setMatchSlot(
+      await repo.setMatchSlot(
         match.nextMatchId,
         match.nextMatchSlot,
         s.winnerId,
       );
-      await this.markReadyIfComplete(match.nextMatchId);
+      await this.markReadyIfComplete(repo, match.nextMatchId, notifications);
     }
 
     if (
@@ -158,12 +243,16 @@ export class MatchesService {
       match.loserNextMatchSlot &&
       s.loserId != null
     ) {
-      await this.repo.setMatchSlot(
+      await repo.setMatchSlot(
         match.loserNextMatchId,
         match.loserNextMatchSlot,
         s.loserId,
       );
-      await this.markReadyIfComplete(match.loserNextMatchId);
+      await this.markReadyIfComplete(
+        repo,
+        match.loserNextMatchId,
+        notifications,
+      );
     }
 
     // A decisive bracket final (no onward match) crowns the champion the moment
@@ -179,41 +268,62 @@ export class MatchesService {
     if (match.phaseId == null) {
       // Legacy phase-less match: original single-shot behavior.
       if (isDecisiveFinal) {
-        await this.repo.update(match.tournamentId, {
+        await repo.update(match.tournamentId, {
           championParticipantId: s.winnerId,
           status: 'completed',
         });
       }
-      return;
+      return true;
     }
 
     if (
       isDecisiveFinal &&
-      (await this.isFinalPhase(match.tournamentId, match.phaseId))
+      (await this.isFinalPhase(repo, match.tournamentId, match.phaseId))
     ) {
-      await this.repo.update(match.tournamentId, {
+      await repo.update(match.tournamentId, {
         championParticipantId: s.winnerId,
       });
     }
     if (isDecisiveFinal || match.bracket === 'third') {
-      await this.maybeCompletePhase(match.tournamentId, match.phaseId);
+      await this.maybeCompletePhase(repo, match.tournamentId, match.phaseId);
     }
+    return true;
+  }
+
+  /** Fire deferred match-ready notifications once the settlement is committed. */
+  private async flushNotifications(matches: TournamentMatch[]): Promise<void> {
+    for (const m of matches) await this.notifyReady(m);
+  }
+
+  /**
+   * Send one deferred match-ready notification. Public so a caller that owns
+   * the transaction (bracket build, advancement) can flush its own queue after
+   * committing, instead of notifying from inside the transaction.
+   */
+  async notifyReady(match: TournamentMatch): Promise<void> {
+    await this.notify.notifyMatchReady(match);
+  }
+
+  /** Flush a whole deferred queue — the caller's transaction has committed. */
+  async flushReady(matches: TournamentMatch[]): Promise<void> {
+    await this.flushNotifications(matches);
   }
 
   /** Complete the phase (and tournament, on the last one) once fully resolved. */
   private async maybeCompletePhase(
+    repo: TournamentsRepository,
     tournamentId: number,
     phaseId: number,
   ): Promise<void> {
-    const phaseMatches = await this.repo.listMatchesByPhase(phaseId);
+    const phaseMatches = await repo.listMatchesByPhase(phaseId);
     if (
       phaseMatches.some((m) => m.status !== 'completed' && m.status !== 'bye')
     ) {
       return;
     }
-    await this.repo.updatePhase(phaseId, { status: 'completed' });
-    if (await this.isFinalPhase(tournamentId, phaseId)) {
-      await this.repo.update(tournamentId, { status: 'completed' });
+    await repo.updatePhase(phaseId, { status: 'completed' });
+    if (await this.isFinalPhase(repo, tournamentId, phaseId)) {
+      await repo.update(tournamentId, { status: 'completed' });
     }
   }
 
@@ -242,11 +352,12 @@ export class MatchesService {
 
   /** True for a legacy phase-less match or a match in the highest-order phase. */
   private async isFinalPhase(
+    repo: TournamentsRepository,
     tournamentId: number,
     phaseId: number | null,
   ): Promise<boolean> {
     if (phaseId == null) return true;
-    const phases = await this.repo.listPhases(tournamentId);
+    const phases = await repo.listPhases(tournamentId);
     if (phases.length === 0) return true;
     const maxOrder = Math.max(...phases.map((p) => p.phaseOrder));
     const phase = phases.find((p) => p.id === phaseId);
@@ -325,16 +436,21 @@ export class MatchesService {
     }
   }
 
-  private async markReadyIfComplete(matchId: number): Promise<void> {
-    const m = await this.repo.findMatch(matchId);
+  private async markReadyIfComplete(
+    repo: TournamentsRepository,
+    matchId: number,
+    notifications: TournamentMatch[],
+  ): Promise<void> {
+    const m = await repo.findMatch(matchId);
     if (!m) return;
     if (
       m.status === 'pending' &&
       m.topParticipantId != null &&
       m.botParticipantId != null
     ) {
-      await this.repo.setMatchStatus(matchId, 'ready');
-      await this.notify.notifyMatchReady(m);
+      await repo.setMatchStatus(matchId, 'ready');
+      // Queued, not sent: the transaction can still roll back under us.
+      notifications.push(m);
     }
   }
 }

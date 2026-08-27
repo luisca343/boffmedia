@@ -117,7 +117,14 @@ export class LeaderboardsService {
         boffMediaParticipants.avatar,
         boffMediaParticipants.userId,
       )
-      .orderBy(desc(sql<number>`total_points`), desc(sql<Date>`last_updated`));
+      .orderBy(
+        desc(sql<number>`total_points`),
+        desc(sql<Date>`last_updated`),
+        // Stable final key: without it two players on the same points and the
+        // same timestamp swap places between requests, which reads as the
+        // leaderboard moving when nothing has happened.
+        boffMediaParticipants.id,
+      );
 
     // Add ranking
     return this.addRankingToResults(results);
@@ -186,7 +193,14 @@ export class LeaderboardsService {
         boffMediaParticipants.avatar,
         boffMediaParticipants.userId,
       )
-      .orderBy(desc(sql<number>`total_points`), desc(sql<Date>`last_updated`));
+      .orderBy(
+        desc(sql<number>`total_points`),
+        desc(sql<Date>`last_updated`),
+        // Stable final key: without it two players on the same points and the
+        // same timestamp swap places between requests, which reads as the
+        // leaderboard moving when nothing has happened.
+        boffMediaParticipants.id,
+      );
 
     // Add ranking
     return this.addRankingToResults(results);

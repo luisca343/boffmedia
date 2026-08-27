@@ -25,6 +25,8 @@ export function LiveReportPanel({
   const majority = Math.ceil(bestOf / 2)
   const [games, setGames] = React.useState<(string | null)[]>(() => Array(bestOf).fill(null))
   const [busy, setBusy] = React.useState(false)
+  // Closes the double-click window that `busy` alone leaves open.
+  const inFlight = React.useRef(false)
   React.useEffect(() => {
     setGames((g) => (g.length === bestOf ? g : Array(bestOf).fill(null)))
   }, [bestOf])
@@ -71,19 +73,25 @@ export function LiveReportPanel({
   }
 
   const submit = async () => {
-    if (!decisive || busy) return
+    // `busy` is state and updates asynchronously, so two fast clicks both see
+    // false; the ref closes that window. Duplicate proposals need a judge.
+    if (!decisive || busy || inFlight.current) return
+    inFlight.current = true
     setBusy(true)
     const str = games.filter((g): g is string => g != null).join("")
     const r = await TournamentsService.propose(detail.tournamentId, detail.id, str)
     setBusy(false)
+    inFlight.current = false
     if (r.error) toast.error(r.error)
     else onChanged()
   }
   const verdict = async (accept: boolean) => {
-    if (busy) return
+    if (busy || inFlight.current) return
+    inFlight.current = true
     setBusy(true)
     const r = await TournamentsService.confirm(detail.tournamentId, detail.id, accept)
     setBusy(false)
+    inFlight.current = false
     if (r.error) toast.error(r.error)
     else onChanged()
   }

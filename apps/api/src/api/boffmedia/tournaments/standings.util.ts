@@ -202,3 +202,48 @@ export function standingsForEntrants(
     .filter((r) => set.has(r.participantId))
     .map((r, i) => ({ ...r, rank: i + 1 }));
 }
+
+/**
+ * The advancement rule, as a pure function over an already-ranked table.
+ *
+ * Lives here rather than inside the advancement service because two callers
+ * need the same answer: `advance` (which acts on it) and the tournament detail
+ * projection (which shows players who is currently making the cut). The web
+ * used to reimplement all four branches to render that highlight, so a change
+ * to the rule silently disagreed with the bracket until someone noticed.
+ *
+ * Requires `standings` in rank order — every branch is positional.
+ */
+export interface AdvanceRule {
+  advanceType: 'all' | 'top_n' | 'record' | 'top_or_record' | null;
+  advanceCount: number | null;
+  advanceMaxLosses: number | null;
+}
+
+export function selectQualifiers<T extends { l: number }>(
+  rule: AdvanceRule,
+  standings: T[],
+): T[] {
+  switch (rule.advanceType) {
+    case 'top_n':
+      return standings.slice(0, rule.advanceCount ?? standings.length);
+    case 'record': {
+      const cap = rule.advanceMaxLosses ?? Number.MAX_SAFE_INTEGER;
+      const eligible = standings.filter((s) => s.l <= cap);
+      return rule.advanceCount != null
+        ? eligible.slice(0, rule.advanceCount)
+        : eligible;
+    }
+    case 'top_or_record': {
+      // Union: the top N by standings OR anyone at ≤ maxLosses losses.
+      // Standings are sorted, so both sets are contiguous from the top — the
+      // qualifier count is max(N, #{≤maxLosses}), i.e. an asymmetric cut.
+      const n = rule.advanceCount ?? 0;
+      const cap = rule.advanceMaxLosses ?? Number.MAX_SAFE_INTEGER;
+      return standings.filter((s, i) => i < n || s.l <= cap);
+    }
+    case 'all':
+    default:
+      return standings;
+  }
+}

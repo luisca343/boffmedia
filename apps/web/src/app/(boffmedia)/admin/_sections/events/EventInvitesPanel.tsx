@@ -27,7 +27,7 @@ export function EventInvitesPanel({
     try {
       const res = await EventsService.getEventInvites(eventId)
       setRows(res.success ? (res.data ?? []) : [])
-      if (!res.success) setError(res.error ?? t("loadError"))
+      if (!res.success) setError(res.userMessage ?? t("loadError"))
     } catch (e) {
       setRows([])
       setError(e instanceof Error ? e.message : String(e))
@@ -47,8 +47,11 @@ export function EventInvitesPanel({
         Math.max(1, Number(maxUses) || 1),
         expiresAt ? new Date(expiresAt).toISOString() : undefined,
       )
-      if (res.error) setError(res.error)
-      await load()
+      // `error` is the machine code (CONFLICT, BAD_REQUEST); only
+      // `userMessage` is meant to be read. And a failed mutation changed
+      // nothing, so re-listing after one just hid the failure.
+      if (!res.success) setError(res.userMessage ?? t("actionError"))
+      else await load()
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {
@@ -61,8 +64,11 @@ export function EventInvitesPanel({
     setError(null)
     try {
       const res = await EventsService.revokeEventInvite(code)
-      if (res.error) setError(res.error)
-      await load()
+      // `error` is the machine code (CONFLICT, BAD_REQUEST); only
+      // `userMessage` is meant to be read. And a failed mutation changed
+      // nothing, so re-listing after one just hid the failure.
+      if (!res.success) setError(res.userMessage ?? t("actionError"))
+      else await load()
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {

@@ -121,6 +121,8 @@ export function TorneoDetailView({
         </div>
       </header>
 
+      <EventGate detail={tn} />
+      <EntryChecklist detail={tn} />
       <MyMatchBanner detail={tn} />
 
       {tn.rules && <FoldBlock title={t("detail.rulesTitle")} body={tn.rules} />}
@@ -134,6 +136,101 @@ export function TorneoDetailView({
 
       {preStart ? <RegistrationRoster detail={tn} /> : <TorneoView detail={tn} />}
     </main>
+  )
+}
+
+/**
+ * A tournament composed into an event draws its field from that event, so a
+ * non-member's register button will be refused. Say so where they can act on
+ * it, with the link, instead of after a failed request.
+ */
+function EventGate({ detail }: { detail: TournamentDetailApi }) {
+  const t = useTranslations("torneos.entry")
+  const ev = detail.event
+  if (!ev) return null
+  const open = detail.status === "draft" || detail.status === "registration"
+  if (!open || ev.viewerIsMember || detail.viewerParticipantId != null) return null
+
+  return (
+    <div className="cut-seal cut-seal-edge [--cut-line:var(--warn)] [--cut:8px] mb-6 flex flex-wrap items-center gap-3 border border-solid border-warn bg-warn-soft px-4 py-3">
+      <Icon name="alert" size={16} className="flex-none text-warn" />
+      <span className="flex-1 font-body text-[14px] text-txt">
+        {t("eventGate", { event: ev.title })}
+      </span>
+      <Button size="sm" variant="pri" href={`/eventos/${ev.id}`}>
+        {t("eventGateCta")}
+      </Button>
+    </div>
+  )
+}
+
+/**
+ * Registering is an intention; entering is the commitment the pairings are
+ * built from. The server sends exactly what is still missing, so this is a
+ * checklist rather than a second implementation of the rule.
+ */
+function EntryChecklist({ detail }: { detail: TournamentDetailApi }) {
+  const t = useTranslations("torneos.entry")
+  if (detail.viewerParticipantId == null) return null
+  if (detail.status !== "draft" && detail.status !== "registration") return null
+
+  const gaps = detail.viewerEntryGaps ?? []
+  const steps: { key: string; done: boolean }[] = [
+    { key: "registered", done: true },
+    ...(detail.teamsheetRequired
+      ? [{ key: "teamsheet", done: !gaps.includes("teamsheet") }]
+      : []),
+    { key: "checkin", done: !gaps.includes("check-in") },
+  ]
+  const entered = gaps.length === 0
+
+  return (
+    <div
+      className={cn(
+        "cut-seal cut-seal-edge [--cut:8px] mb-6 border border-solid px-4 py-3",
+        entered
+          ? "[--cut-line:var(--good)] border-good bg-good-soft"
+          : "[--cut-line:var(--accent-line)] border-accent-line bg-accent-soft",
+      )}
+    >
+      <div className="mb-2 flex items-center gap-2">
+        <Icon
+          name={entered ? "check" : "clock"}
+          size={16}
+          className={cn("flex-none", entered ? "text-good" : "text-accent-bright")}
+        />
+        <span className="font-body text-[14px] font-semibold text-txt">
+          {entered ? t("enteredTitle") : t("pendingTitle")}
+        </span>
+      </div>
+      <ul className="flex flex-wrap gap-x-5 gap-y-1">
+        {steps.map((s) => (
+          <li
+            key={s.key}
+            className={cn(
+              "flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.06em]",
+              s.done ? "text-txt-muted" : "text-txt",
+            )}
+          >
+            <Icon
+              name={s.done ? "check" : "minus"}
+              size={12}
+              className={s.done ? "text-good" : "text-txt-dim"}
+            />
+            {t(`step.${s.key}`)}
+          </li>
+        ))}
+      </ul>
+      {!entered && (
+        <p className="mt-2 font-body text-[12.5px] leading-[1.45] text-txt-muted">
+          {detail.entryDeadline
+            ? t("pendingLeadDeadline", {
+                date: new Date(detail.entryDeadline).toLocaleString(),
+              })
+            : t("pendingLead")}
+        </p>
+      )}
+    </div>
   )
 }
 

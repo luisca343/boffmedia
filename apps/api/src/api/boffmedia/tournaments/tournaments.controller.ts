@@ -91,7 +91,7 @@ export class TournamentsController {
     @Param('slug') slug: string,
     @Req() req: MaybeAuthedRequest,
   ): Promise<TournamentDetail> {
-    return this.facade.getBySlug(slug, req.user?.userId);
+    return this.facade.getBySlug(slug, req.user?.userId, this.isAdmin(req));
   }
 
   @Public()
@@ -335,10 +335,11 @@ export class TournamentsController {
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update an entrant (seed/score/status/group).' })
   updateParticipant(
+    @Param('id', ParseIntPipe) id: number,
     @Param('pid', ParseIntPipe) pid: number,
     @Body() dto: UpdateParticipantDto,
   ): Promise<Competitor> {
-    return this.facade.updateParticipant(pid, dto);
+    return this.facade.updateParticipant(id, pid, dto);
   }
 
   @Delete(':id/participants/:pid')
@@ -347,9 +348,49 @@ export class TournamentsController {
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Remove an entrant.' })
   removeParticipant(
+    @Param('id', ParseIntPipe) id: number,
     @Param('pid', ParseIntPipe) pid: number,
   ): Promise<{ success: boolean }> {
-    return this.facade.removeParticipant(pid);
+    return this.facade.removeParticipant(id, pid);
+  }
+
+  @Get(':id/entries/preview')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary:
+      'Who would enter and who would be dropped if the field were resolved now. Read-only — generate shows this before it commits.',
+  })
+  entryPreview(@Param('id', ParseIntPipe) id: number) {
+    return this.facade.entryPreview(id);
+  }
+
+  @Post(':id/entries/resolve')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary:
+      'Resolve the field now: drop everyone who has not entered, lock teamsheets and close both windows. Generate does this automatically.',
+  })
+  resolveEntries(@Param('id', ParseIntPipe) id: number) {
+    return this.facade.resolveEntries(id);
+  }
+
+  @Post(':id/participants/:pid/readmit')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary:
+      'Put a dropped entrant back into the field. Only while no bracket exists — after that the field is what the pairings were built from.',
+  })
+  readmit(
+    @Param('id', ParseIntPipe) id: number,
+    @Param('pid', ParseIntPipe) pid: number,
+  ): Promise<{ success: boolean }> {
+    return this.facade.readmit(id, pid);
   }
 
   @Post(':id/generate')

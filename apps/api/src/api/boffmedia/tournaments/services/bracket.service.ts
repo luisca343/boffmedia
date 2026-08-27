@@ -1,6 +1,7 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable, Optional } from '@nestjs/common';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
-import { MatchesService } from './matches.service';
+import { MatchesService, SettleOptions } from './matches.service';
+import { EntryService } from './entry.service';
 import {
   computeStandings,
   matchesForPhaseChain,
@@ -8,6 +9,7 @@ import {
 } from '../standings.util';
 import {
   Tournament,
+  TournamentMatch,
   TournamentParticipant,
   TournamentPhase,
 } from '@/_db/schema/BoffMediaTournaments';
@@ -19,12 +21,69 @@ export class BracketService {
   constructor(
     private readonly repo: TournamentsRepository,
     private readonly matches: MatchesService,
+    private readonly entry: EntryService,
+    /**
+     * Only set on transaction-scoped clones (see `within`). Match-ready
+     * notifications raised by bye auto-advance queue here so the outermost
+     * caller can send them after ITS commit — a rolled-back build must not
+     * leave players notified about matches that no longer exist.
+     *
+     * `@Optional()` is load-bearing, not decoration: Nest reads the emitted
+     * `design:paramtypes` and tries to inject every constructor argument, so a
+     * TypeScript default value alone leaves it resolving `Array` as a provider
+     * and the whole app fails to boot. Nest never constructs this class with a
+     * sink — only `within()` does.
+     */
+    @Optional()
+    private readonly notificationSink: TournamentMatch[] | null = null,
   ) {}
+
+  /**
+   * A copy of this service bound to a transaction-scoped repository. Every
+   * builder below writes through `this.repo`, so re-binding the field is what
+   * puts a whole bracket build inside one transaction without threading a repo
+   * argument through a dozen private methods.
+   */
+  private within(
+    repo: TournamentsRepository,
+    sink: TournamentMatch[],
+  ): BracketService {
+    return new BracketService(repo, this.matches, this.entry, sink);
+  }
+
+  /** Settle options that keep bye auto-advance inside the caller's transaction. */
+  private settleOpts(): SettleOptions {
+    return this.notificationSink
+      ? { repo: this.repo, notifications: this.notificationSink }
+      : {};
+  }
+
+  private async flush(sink: TournamentMatch[]): Promise<void> {
+    for (const m of sink) await this.matches.notifyReady(m);
+  }
 
   async generate(t: Tournament, dto: GenerateBracketDto): Promise<void> {
     if (t.status === 'completed' || t.status === 'cancelled') {
       throw new BadRequestException('Tournament is closed');
     }
+    // Freeze the field before seeding anything: registered-but-not-entered
+    // players become `dropped` and teamsheets lock, so the bracket is built
+    // from exactly the set the players were told it would be. A preview build
+    // is a rehearsal and must not drop anyone.
+    if (!dto.preview) await this.entry.resolve(t.id);
+    const sink: TournamentMatch[] = [];
+    await this.repo.transaction(async (tx) => {
+      // Serialise structural writes on this tournament for the whole build.
+      await tx.lockTournament(t.id);
+      await this.within(tx, sink).generateWithin(t, dto);
+    });
+    await this.flush(sink);
+  }
+
+  private async generateWithin(
+    t: Tournament,
+    dto: GenerateBracketDto,
+  ): Promise<void> {
     const phases = await this.repo.listPhases(t.id);
     const live = phases.find((p) => p.status === 'live');
 
@@ -55,8 +114,14 @@ export class BracketService {
     const orderedIds = (await this.repo.listPhaseEntrants(live.id)).map(
       (e) => e.participantId,
     );
-    await this.buildPhase(t, live, orderedIds, dto);
-    if (!dto.preview) await this.repo.update(t.id, { status: 'live' });
+    await this.buildPhaseCore(t, live, orderedIds, dto);
+    if (!dto.preview) {
+      await this.repo.update(t.id, {
+        status: 'live',
+        registrationOpen: false,
+        checkInOpen: false,
+      });
+    }
   }
 
   /** Seed + freeze phase-1 entrants and build its structure (also reshuffles). */
@@ -66,6 +131,9 @@ export class BracketService {
     dto: GenerateBracketDto,
   ): Promise<void> {
     await this.repo.clearPhaseEntrants(phase.id);
+    // `active` is already the entered field on a real generate — `entry.resolve`
+    // dropped everyone who had not entered before we got here. `onlyCheckedIn`
+    // still narrows a PREVIEW build, which deliberately drops nobody.
     const active = (await this.repo.listParticipants(t.id)).filter(
       (p) =>
         p.status === 'active' && (!dto.onlyCheckedIn || p.checkedInAt != null),
@@ -81,20 +149,59 @@ export class BracketService {
         seed: i + 1,
       })),
     );
-    await this.buildPhase(t, phase, orderedIds, dto);
+    await this.buildPhaseCore(t, phase, orderedIds, dto);
     await this.repo.updatePhase(phase.id, { status: 'live' });
     // Preview builds keep the tournament out of the public "live" state.
-    if (!dto.preview) await this.repo.update(t.id, { status: 'live' });
+    // Going live also closes both entry windows: the field is now seeded, so a
+    // late registration or check-in could not be reflected in the bracket.
+    if (!dto.preview) {
+      await this.repo.update(t.id, {
+        status: 'live',
+        registrationOpen: false,
+        checkInOpen: false,
+      });
+    }
+  }
+
+  /**
+   * Transactional entry point: build one phase's structure. Callers that
+   * already own a transaction use `buildPhaseWithin` so the build commits (or
+   * rolls back) together with whatever else they are doing — advancement flips
+   * the phase to live in the same transaction that creates its matches.
+   */
+  async buildPhase(
+    t: Tournament,
+    phase: TournamentPhase,
+    orderedIds: number[],
+    dto: GenerateBracketDto,
+  ): Promise<void> {
+    const sink: TournamentMatch[] = [];
+    await this.repo.transaction(async (tx) => {
+      await tx.lockTournament(t.id);
+      await this.within(tx, sink).buildPhaseCore(t, phase, orderedIds, dto);
+    });
+    await this.flush(sink);
+  }
+
+  /** Build a phase inside a transaction the caller owns. */
+  async buildPhaseWithin(
+    repo: TournamentsRepository,
+    sink: TournamentMatch[],
+    t: Tournament,
+    phase: TournamentPhase,
+    orderedIds: number[],
+    dto: GenerateBracketDto,
+  ): Promise<void> {
+    await this.within(repo, sink).buildPhaseCore(t, phase, orderedIds, dto);
   }
 
   /**
    * Build the structure for one phase from its ordered entrant ids, tagging the
-   * new matches with the phase. Reused by phase-1 activation (generate) and by
-   * the advancement service when it opens the next phase. Legacy `groups`
-   * tournaments (always single-phase) keep their whole-tournament code path;
-   * `groups` as a PHASE format is the multi-phase group stage.
+   * new matches with the phase. Legacy `groups` tournaments (always
+   * single-phase) keep their whole-tournament code path; `groups` as a PHASE
+   * format is the multi-phase group stage.
    */
-  async buildPhase(
+  private async buildPhaseCore(
     t: Tournament,
     phase: TournamentPhase,
     orderedIds: number[],
@@ -376,13 +483,17 @@ export class BracketService {
       if (hasTop && hasBot) {
         await this.repo.setMatchStatus(m.id, 'ready');
       } else if (hasTop || hasBot) {
-        await this.matches.settle(m, {
-          winnerId: (m.topParticipantId ?? m.botParticipantId)!,
-          loserId: null,
-          topScore: null,
-          botScore: null,
-          status: 'bye',
-        });
+        await this.matches.settle(
+          m,
+          {
+            winnerId: (m.topParticipantId ?? m.botParticipantId)!,
+            loserId: null,
+            topScore: null,
+            botScore: null,
+            status: 'bye',
+          },
+          this.settleOpts(),
+        );
       }
     }
     return matchIds;
@@ -816,13 +927,17 @@ export class BracketService {
       if (b == null) {
         const m = await this.repo.findMatch(id);
         if (m) {
-          await this.matches.settle(m, {
-            winnerId: a,
-            loserId: null,
-            topScore: 1,
-            botScore: 0,
-            status: 'bye',
-          });
+          await this.matches.settle(
+            m,
+            {
+              winnerId: a,
+              loserId: null,
+              topScore: 1,
+              botScore: 0,
+              status: 'bye',
+            },
+            this.settleOpts(),
+          );
         }
       }
     }

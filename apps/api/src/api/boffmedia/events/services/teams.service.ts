@@ -52,25 +52,24 @@ export class TeamsService {
       `Created team ${createTeamDto.name}`,
     );
 
-    // 3. Create the team
-    const teamData = {
-      eventId,
-      name: createTeamDto.name,
-      tag: createTeamDto.tag,
-      icon: createTeamDto.icon,
-    };
-
-    const result = await this.teamsRepository.create(teamData);
-    const teamId = result.insertId;
-
-    // 4. Add leader as team member with leader role
-    const memberData = {
-      teamId,
-      participantId: leaderParticipant.id,
-      role: 'leader' as const,
-    };
-
-    await this.teamsRepository.addMember(memberData);
+    // 3-4. Create the team and seat its leader atomically. A team whose leader
+    // insert failed is not a usable team — it has no owner, cannot be joined
+    // through any code path that checks leadership, and needed manual SQL to
+    // clean up.
+    const teamId = await this.teamsRepository.transaction(async (tx) => {
+      const result = await tx.create({
+        eventId,
+        name: createTeamDto.name,
+        tag: createTeamDto.tag,
+        icon: createTeamDto.icon,
+      });
+      await tx.addMember({
+        teamId: result.insertId,
+        participantId: leaderParticipant.id,
+        role: 'leader' as const,
+      });
+      return result.insertId;
+    });
 
     return this.getTeamById(teamId);
   }
@@ -197,9 +196,19 @@ export class TeamsService {
   async getTeamMembers(teamId: number): Promise<any[]> {
     return this.teamsRepository.findTeamMembers(teamId);
   }
+  /**
+   * Recompute the team's cached score.
+   *
+   * The sum and the write happen in one transaction: two members completing an
+   * achievement at the same moment used to read the same total and write it
+   * twice, losing one of the two updates permanently (the column is what the
+   * team leaderboard sorts on, and nothing ever recomputed it afterwards).
+   */
   async updateTeamScore(teamId: number): Promise<void> {
-    const totalScore = await this.teamsRepository.calculateTeamScore(teamId);
-    await this.teamsRepository.updateScore(teamId, totalScore);
+    await this.teamsRepository.transaction(async (tx) => {
+      const totalScore = await tx.calculateTeamScore(teamId);
+      await tx.updateScore(teamId, totalScore);
+    });
   }
 
   async validateTeamExists(teamId: number): Promise<boolean> {

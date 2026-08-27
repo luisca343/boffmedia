@@ -25,6 +25,13 @@
     "TAXI_INSUFFICIENT_FUNDS": "You do not have enough balance for this trip.",
     "TAXI_UNSAFE_ARRIVAL": "There is nowhere safe to drop you off at that stop.",
     "TAXI_IN_DUNGEON_RUN": "You cannot take a taxi during a dungeon run.",
-    "TAXI_SERVER_BUSY": "The server did not answer in time. You have not been charged."
+    "TAXI_SERVER_BUSY": "The server did not answer in time. You have not been charged.",
+    "TOURNAMENT_TEAMSHEET_LOCKED": "Teamsheets are locked — the tournament has already started.",
+    "EVENT_LIFECYCLE_FORWARD_ONLY": "The event lifecycle only moves forward. Tick \"reopen\" if you really mean to move it back.",
+    "EVENT_REOPEN_BLOCKED_BY_RANDOMIZER": "Cannot reopen: this event has a randomizer that is no longer a draft. Close or delete it first.",
+    "TOURNAMENT_PARTICIPANT_IN_BRACKET": "That entrant is already in the bracket. Set their status to withdrew or disqualified instead of deleting them.",
+    "MATCH_SETTLED_CONCURRENTLY": "The match was settled while you were submitting. Reload it before correcting the result.",
+    "TOURNAMENT_TEAMSHEET_REQUIRED": "Submit your teamsheet before checking in.",
+    "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": "This tournament belongs to an event — join the event before registering."
   }
 }

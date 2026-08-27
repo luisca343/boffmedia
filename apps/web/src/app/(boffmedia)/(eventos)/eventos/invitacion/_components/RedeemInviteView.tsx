@@ -66,7 +66,12 @@ export function RedeemInviteView() {
                 <Input
                   value={code}
                   placeholder="A1B2C3D4E5F60718293A"
-                  onChange={(e) => setCode(e.target.value)}
+                  // Normalised as typed: the endpoint is throttled to 10/min, so a
+                // pasted code with stray whitespace or lowercase used to burn
+                // attempts and lock the user out for a minute.
+                onChange={(e) =>
+                  setCode(e.target.value.toUpperCase().replace(/[^A-F0-9]/g, "").slice(0, 20))
+                }
                   onKeyDown={(e) => {
                     if (e.key === "Enter") redeem()
                   }}

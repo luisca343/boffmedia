@@ -64,4 +64,23 @@ export class EventInvitesRepository {
       );
     return result[0].affectedRows > 0;
   }
+
+  /**
+   * Give a consumed use back. The join that follows `consume` lives in a
+   * different repository, so the two cannot share a transaction without
+   * threading one through three of them; this is the compensating half of that
+   * pair instead. Guarded at `uses > 0` so a double compensation cannot drive
+   * the counter negative and hand out a free use.
+   */
+  async releaseUse(code: string): Promise<void> {
+    await this.db
+      .update(boffMediaEventInvites)
+      .set({ uses: sql`${boffMediaEventInvites.uses} - 1` })
+      .where(
+        and(
+          eq(boffMediaEventInvites.code, code),
+          sql`${boffMediaEventInvites.uses} > 0`,
+        ),
+      );
+  }
 }

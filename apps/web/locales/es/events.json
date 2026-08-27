@@ -84,7 +84,15 @@
       "randomlockeParticipants": "{count, plural, one {# participante} other {# participantes}}",
       "leave": "Salir del evento",
       "left": "Has salido del evento.",
-      "leaveConfirm": "Al salir perderás el acceso al pack que te daba este evento. ¿Continuar?"
+      "leaveConfirm": "Al salir perderás el acceso al pack que te daba este evento. ¿Continuar?",
+      "tournamentCta": "Ver el torneo",
+      "tournamentStatus": {
+        "draft": "Borrador",
+        "registration": "Inscripciones abiertas",
+        "live": "En juego",
+        "completed": "Finalizado",
+        "cancelled": "Cancelado"
+      }
     },
     "organizer": {
       "tagOfficial": "Oficial",

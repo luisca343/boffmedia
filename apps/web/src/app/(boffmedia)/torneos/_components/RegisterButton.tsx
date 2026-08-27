@@ -162,6 +162,9 @@ function TeamRegisterModal({
                 <button
                   type="button"
                   onClick={() => setMembers((cur) => cur.filter((_, j) => j !== i))}
+                  // The glyph is the only content, so a screen reader announces
+                  // "button" with nothing to distinguish one row from another.
+                  aria-label={t("teamRemoveMember", { n: i + 1 })}
                   className="px-1 text-txt-dim transition-colors hover:text-bad"
                 >
                   ✕

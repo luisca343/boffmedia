@@ -6,6 +6,7 @@ import { Button, Select, Spinner } from "@boffmedia/ui"
 import { AvAlert, AvPanel, AvPill } from "../../_components/ui/av-kit"
 import { cn } from "@/lib/utils"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import type { ApiResponse } from "@/services/http/core"
 import type { Participant } from "@boffmedia/shared"
 
 type Status = "registered" | "confirmed" | "declined" | "removed"
@@ -29,7 +30,7 @@ export function ParticipantsPanel({ eventId }: { eventId: number }) {
     try {
       const res = await EventsService.getEventParticipants(eventId)
       setRows(res.success ? (res.data ?? []) : [])
-      if (!res.success) setError(res.error ?? t("loadError"))
+      if (!res.success) setError(res.userMessage ?? t("loadError"))
     } catch (e) {
       setRows([])
       setError(e instanceof Error ? e.message : String(e))
@@ -40,13 +41,19 @@ export function ParticipantsPanel({ eventId }: { eventId: number }) {
     load()
   }, [load])
 
-  const run = async (participantId: number, fn: () => Promise<{ error?: string }>) => {
+  const run = async (
+    participantId: number,
+    fn: () => Promise<ApiResponse<unknown>>
+  ) => {
     setBusy(participantId)
     setError(null)
     try {
       const res = await fn()
-      if (res.error) setError(res.error)
-      await load()
+      // `error` is the machine code (CONFLICT, BAD_REQUEST); only
+      // `userMessage` is meant to be read. And a failed mutation changed
+      // nothing, so re-listing after one just hid the failure.
+      if (!res.success) setError(res.userMessage ?? t("actionError"))
+      else await load()
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e))
     } finally {

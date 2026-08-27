@@ -1,6 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, desc, eq, inArray, isNull, like, lt, sql } from 'drizzle-orm';
+import {
+  and,
+  desc,
+  eq,
+  inArray,
+  isNull,
+  like,
+  lt,
+  notInArray,
+  sql,
+} from 'drizzle-orm';
 import { alias } from 'drizzle-orm/mysql-core';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
@@ -21,7 +31,12 @@ import {
   TournamentPhaseEntrant,
   TournamentMatchMessage,
 } from '@/_db/schema/BoffMediaTournaments';
-import { boffMediaGames } from '@/_db/schema/BoffMediaEvents';
+import {
+  boffMediaGames,
+  boffMediaEvents,
+  boffMediaEventParticipants,
+  boffMediaParticipants,
+} from '@/_db/schema/BoffMediaEvents';
 import { boffMediaUsers } from '@/_db/schema/BoffMedia';
 import type {
   MatchSlot,
@@ -212,6 +227,82 @@ export class TournamentsRepository {
       .where(eq(boffMediaTournaments.id, id));
   }
 
+  /**
+   * Take a write lock on the tournament row for the rest of the transaction.
+   *
+   * Bracket generation and phase advancement are multi-statement reads-then-writes
+   * over the same rows: without this, two concurrent generates (an admin
+   * double-click is enough) interleave their entrant freeze and match inserts,
+   * and the orphan back-tag can claim the other's matches. Serialising on the
+   * parent row is cheaper than locking every match, and every writer of a
+   * tournament's structure passes through here.
+   *
+   * Must be called inside a transaction — outside one the lock is released
+   * immediately and buys nothing.
+   */
+  async lockTournament(id: number): Promise<Tournament | undefined> {
+    const [row] = await this.db
+      .select()
+      .from(boffMediaTournaments)
+      .where(eq(boffMediaTournaments.id, id))
+      .for('update');
+    return row;
+  }
+
+  /**
+   * Does this user hold an active membership (registered|confirmed) in the
+   * event the tournament hangs off?
+   *
+   * Schema-level import of the events tables rather than a dependency on the
+   * events module: the events module already reaches into the randomizer schema
+   * the same way, and a Nest-level dependency here would be a new cycle.
+   */
+  /** The event a tournament hangs off, for the detail's cross-link + gating. */
+  async findEventContext(
+    eventId: number,
+  ): Promise<
+    | { id: number; title: string; visibility: string; status: string }
+    | undefined
+  > {
+    const [row] = await this.db
+      .select({
+        id: boffMediaEvents.id,
+        title: boffMediaEvents.title,
+        visibility: boffMediaEvents.visibility,
+        status: boffMediaEvents.status,
+      })
+      .from(boffMediaEvents)
+      .where(
+        and(eq(boffMediaEvents.id, eventId), isNull(boffMediaEvents.deletedAt)),
+      );
+    return row;
+  }
+
+  async hasActiveEventMembership(
+    eventId: number,
+    userId: number,
+  ): Promise<boolean> {
+    const [row] = await this.db
+      .select({ one: sql`1` })
+      .from(boffMediaEventParticipants)
+      .innerJoin(
+        boffMediaParticipants,
+        eq(boffMediaParticipants.id, boffMediaEventParticipants.participantId),
+      )
+      .where(
+        and(
+          eq(boffMediaEventParticipants.eventId, eventId),
+          eq(boffMediaParticipants.userId, userId),
+          inArray(boffMediaEventParticipants.status, [
+            'registered',
+            'confirmed',
+          ]),
+        ),
+      )
+      .limit(1);
+    return row != null;
+  }
+
   async softDelete(id: number): Promise<void> {
     await this.db
       .update(boffMediaTournaments)
@@ -378,6 +469,39 @@ export class TournamentsRepository {
       .where(eq(boffMediaTournamentMatches.id, id));
   }
 
+  /**
+   * Atomically write a settlement onto a match. A normal settle refuses a match
+   * that is already resolved, so the three writers that can land on one match
+   * (rival confirm, proposal expiry, admin report) cannot each propagate the
+   * same result — the loser gets `false` instead of silently re-advancing a
+   * winner into the next round. An amend deliberately targets a resolved match,
+   * so it skips the status guard; `matches.report` gates that on `assertAmendable`.
+   *
+   * Every settlement patch carries a fresh `reportedAt`, so the row always
+   * changes when it matches and mysql2's `affectedRows` is a faithful "I won".
+   */
+  async claimSettlement(
+    matchId: number,
+    patch: Partial<typeof boffMediaTournamentMatches.$inferInsert>,
+    opts: { allowResolved: boolean },
+  ): Promise<boolean> {
+    const [res] = await this.db
+      .update(boffMediaTournamentMatches)
+      .set(patch)
+      .where(
+        opts.allowResolved
+          ? eq(boffMediaTournamentMatches.id, matchId)
+          : and(
+              eq(boffMediaTournamentMatches.id, matchId),
+              notInArray(boffMediaTournamentMatches.status, [
+                'completed',
+                'bye',
+              ]),
+            ),
+      );
+    return res.affectedRows > 0;
+  }
+
   async setMatchSlot(
     matchId: number,
     slot: MatchSlot,
@@ -483,6 +607,33 @@ export class TournamentsRepository {
           eq(boffMediaTournamentMatches.id, matchId),
           eq(boffMediaTournamentMatches.proposalState, 'pending'),
           lt(boffMediaTournamentMatches.proposalExpiresAt, now),
+          inArray(boffMediaTournamentMatches.status, ['ready', 'live']),
+        ),
+      );
+    return res.affectedRows > 0;
+  }
+
+  /**
+   * Atomically flip a still-pending proposal to disputed. Guarded the same way
+   * as the claims above: an admin report or an expiry sweep that lands first
+   * must not be re-opened into a dispute on an already-settled match.
+   */
+  async claimDispute(
+    matchId: number,
+    proposedByParticipantId: number,
+    judgeRequestedAt: Date,
+  ): Promise<boolean> {
+    const [res] = await this.db
+      .update(boffMediaTournamentMatches)
+      .set({ proposalState: 'disputed', judgeRequestedAt })
+      .where(
+        and(
+          eq(boffMediaTournamentMatches.id, matchId),
+          eq(boffMediaTournamentMatches.proposalState, 'pending'),
+          eq(
+            boffMediaTournamentMatches.proposedByParticipantId,
+            proposedByParticipantId,
+          ),
           inArray(boffMediaTournamentMatches.status, ['ready', 'live']),
         ),
       );

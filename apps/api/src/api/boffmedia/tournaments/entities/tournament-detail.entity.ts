@@ -14,6 +14,27 @@ import type {
  * { groups } / LeagueView / LeaderboardView — matched to the web `Tn*` VM types.
  * Typed loosely here (discriminated on `format`); the web adapters narrow it.
  */
+/** The event a tournament hangs off, for cross-linking and access messaging. */
+export class TournamentEventContext {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  title: string;
+
+  @ApiProperty({ enum: ['public', 'private'] })
+  visibility: string;
+
+  @ApiProperty({ enum: ['upcoming', 'active', 'completed'] })
+  status: string;
+
+  @ApiProperty({
+    description:
+      'True when the viewer holds an active membership. False means registration will be refused until they join the event.',
+  })
+  viewerIsMember: boolean;
+}
+
 export class TournamentDetail {
   @ApiProperty()
   id: number;
@@ -51,6 +72,34 @@ export class TournamentDetail {
 
   @ApiProperty({ nullable: true })
   eventId: number | null;
+
+  @ApiProperty({
+    type: TournamentEventContext,
+    required: false,
+    nullable: true,
+    description:
+      'The event this tournament is composed into, when it has one. An attached tournament draws its field from the event: registering requires an active membership, and a private event makes its tournament private too.',
+  })
+  event: TournamentEventContext | null;
+
+  @ApiProperty({
+    description:
+      'Entry requires a submitted teamsheet as well as check-in (VGC).',
+  })
+  teamsheetRequired: boolean;
+
+  @ApiProperty({
+    nullable: true,
+    description:
+      'When the field is resolved: everyone not entered by then is dropped.',
+  })
+  entryDeadline: string | null;
+
+  @ApiProperty({
+    nullable: true,
+    description: 'Set once the field is resolved; teamsheets are frozen after.',
+  })
+  teamsheetLockedAt: string | null;
 
   @ApiProperty({ nullable: true })
   description: string | null;
@@ -107,6 +156,14 @@ export class TournamentDetail {
       'anonymous / not registered. Drives the register/withdraw control.',
   })
   viewerParticipantId: string | null;
+
+  @ApiProperty({
+    type: [String],
+    enum: ['teamsheet', 'check-in'],
+    description:
+      "What the signed-in viewer's registration is still missing before it counts as an entry, in the order they fix it. Empty means entered (or not registered at all — check viewerParticipantId). Everyone still short of this when the field is resolved is dropped.",
+  })
+  viewerEntryGaps: string[];
 
   @ApiProperty({
     nullable: true,

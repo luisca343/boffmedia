@@ -40,6 +40,10 @@ export type PhaseView = {
      */
     qualifiedCount: Record<string, any> | null;
     /**
+     * Competitor ids currently making the cut under this phase advancement rule, server-computed from the same function `advance` uses. Empty on a phase with no rule. Clients render the cut from this instead of reimplementing the rule.
+     */
+    projectedQualifierIds: Array<string>;
+    /**
      * Per-format render model for this phase.
      */
     view: Record<string, any>;

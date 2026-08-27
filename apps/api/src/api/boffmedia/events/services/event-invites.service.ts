@@ -55,6 +55,11 @@ export class EventInvitesService {
     return invite;
   }
 
+  /** Compensation for a redemption that failed after the use was consumed. */
+  async releaseUse(code: string): Promise<void> {
+    await this.repository.releaseUse(code);
+  }
+
   /**
    * Burns one use and returns the event it belongs to. The atomic conditional
    * UPDATE stays the concurrency arbiter: two redemptions of a single-use code

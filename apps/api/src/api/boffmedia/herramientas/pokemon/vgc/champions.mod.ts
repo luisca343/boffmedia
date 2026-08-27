@@ -58,47 +58,47 @@ export function listChampionsFormatIds(): string[] {
 }
 
 const CHAMPIONS_FORMATS = [
-    {
-      name: '[Gen 9 Champions] VGC 2026 Reg M-A',
-      mod: 'champions',
-      gameType: 'doubles',
-      bestOfDefault: true,
-      ruleset: ['Flat Rules', 'VGC Timer', 'Open Team Sheets'],
-    },
-    {
-      name: '[Gen 9 Champions] VGC 2026 Reg M-A (Bo3)',
-      mod: 'champions',
-      gameType: 'doubles',
-      ruleset: [
-        'Flat Rules',
-        'VGC Timer',
-        'Force Open Team Sheets',
-        'Best of = 3',
-      ],
-    },
-    {
-      name: '[Gen 9 Champions] BSS Reg M-A',
-      mod: 'champions',
-      bestOfDefault: true,
-      ruleset: ['Flat Rules', 'VGC Timer'],
-    },
-    {
-      name: '[Gen 9 Champions] OU',
-      mod: 'champions',
-      ruleset: ['Standard'],
-      banlist: [
-        'AG',
-        'Uber',
-        'Moody',
-        'Baton Pass',
-        'Last Respects',
-        'Shed Tail',
-      ],
-    },
-    {
-      name: '[Gen 9 Champions] Draft',
-      mod: 'champions',
-      searchShow: false,
-      ruleset: ['Standard Draft'],
-    },
+  {
+    name: '[Gen 9 Champions] VGC 2026 Reg M-A',
+    mod: 'champions',
+    gameType: 'doubles',
+    bestOfDefault: true,
+    ruleset: ['Flat Rules', 'VGC Timer', 'Open Team Sheets'],
+  },
+  {
+    name: '[Gen 9 Champions] VGC 2026 Reg M-A (Bo3)',
+    mod: 'champions',
+    gameType: 'doubles',
+    ruleset: [
+      'Flat Rules',
+      'VGC Timer',
+      'Force Open Team Sheets',
+      'Best of = 3',
+    ],
+  },
+  {
+    name: '[Gen 9 Champions] BSS Reg M-A',
+    mod: 'champions',
+    bestOfDefault: true,
+    ruleset: ['Flat Rules', 'VGC Timer'],
+  },
+  {
+    name: '[Gen 9 Champions] OU',
+    mod: 'champions',
+    ruleset: ['Standard'],
+    banlist: [
+      'AG',
+      'Uber',
+      'Moody',
+      'Baton Pass',
+      'Last Respects',
+      'Shed Tail',
+    ],
+  },
+  {
+    name: '[Gen 9 Champions] Draft',
+    mod: 'champions',
+    searchShow: false,
+    ruleset: ['Standard Draft'],
+  },
 ] as const;

@@ -21,6 +21,9 @@ export const PARTICIPANT_STATUS: { value: TnParticipantStatus; labelKey: string 
   { value: "eliminated", labelKey: "constants.participantEliminated" },
   { value: "withdrew", labelKey: "constants.participantWithdrew" },
   { value: "disqualified", labelKey: "constants.participantDisqualified" },
+  // Set by entry resolution, not chosen by an admin — but selectable so a
+  // wrongly-dropped entrant can be put back by hand as well as via `readmit`.
+  { value: "dropped", labelKey: "constants.participantDropped" },
 ]
 
 export const VGC_PRESET: { nameKey: string; format: TnPhaseFormat; rounds?: number; advanceType?: TnAdvanceType; advanceMaxLosses?: number; tiebreakProfile?: "points" | "resistance"; carryStandings?: boolean; advanceCount?: number; thirdPlace?: boolean }[] = [

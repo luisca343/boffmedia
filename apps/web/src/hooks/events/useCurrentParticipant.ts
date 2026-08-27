@@ -1,4 +1,4 @@
-import { useRotomRequest } from "@/hooks/useRotomRequest"
+import { useRotomRequestGated } from "@/hooks/useRotomRequest"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useMemo } from "react"
@@ -14,9 +14,16 @@ export function useCurrentParticipant(eventId: number) {
   const { session } = useBoffSession()
   const userId = session?.user?.id
 
-  const shouldFetch = eventId && userId
+  // Gated, not just computed: an anonymous viewer has no participation to find,
+  // so fetching the whole participant list on every event page was work whose
+  // result was thrown away.
+  const shouldFetch = Boolean(eventId && userId)
 
-  const { data, error, isLoading, refetch } = useRotomRequest(EventsService.getEventParticipants, eventId)
+  const { data, error, isLoading, refetch } = useRotomRequestGated(
+    shouldFetch,
+    EventsService.getEventParticipants,
+    eventId
+  )
 
   const { participant, activeCount } = useMemo(() => {
     const rows: Participant[] = data ?? []

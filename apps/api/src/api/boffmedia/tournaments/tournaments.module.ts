@@ -11,6 +11,7 @@ import { MatchesService } from './services/matches.service';
 import { StandingsService } from './services/standings.service';
 import { PhasesService } from './services/phases.service';
 import { AdvancementService } from './services/advancement.service';
+import { EntryService } from './services/entry.service';
 import { MatchReportService } from './services/match-report.service';
 import { TournamentNotificationsService } from './services/tournament-notifications.service';
 import { TournamentAnnouncerService } from './services/tournament-announcer.service';
@@ -27,11 +28,14 @@ import { TournamentAnnouncerService } from './services/tournament-announcer.serv
     StandingsService,
     PhasesService,
     AdvancementService,
+    EntryService,
     MatchReportService,
     TournamentNotificationsService,
     TournamentAnnouncerService,
     TournamentsFacadeService,
   ],
-  exports: [TournamentsFacadeService],
+  // EntryService is exported for the lifecycle sweeper, which resolves a
+  // tournament's field when its entry deadline passes.
+  exports: [TournamentsFacadeService, EntryService],
 })
 export class TournamentsModule {}

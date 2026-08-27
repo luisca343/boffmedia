@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils"
 import { Badge, Button, Empty, Icon, Panel, Spinner, toast } from "@boffmedia/ui"
 import { AchievementItem, EventBanner, formatEventDate } from "@/components/boffmedia/ui/events"
 import { useGetEvent } from "@/hooks/events/useGetEvent"
+import type { EventModules } from "@boffmedia/shared"
 import { useGetEventAchievements } from "@/hooks/events/useGetEventAchievements"
 import { useGetLeaderboard } from "@/hooks/events/useGetLeaderboard"
 import { useCurrentParticipant } from "@/hooks/events/useCurrentParticipant"
@@ -22,6 +23,9 @@ export function EventDetailView({ id }: { id: number }) {
   const { isParticipating, status: memberStatus, activeCount, refetch: refetchParts } = useCurrentParticipant(id)
   const { session } = useBoffSession()
   const [joining, setJoining] = React.useState(false)
+  // Guards join/leave against a double click landing two requests. Declared
+  // with the other hooks: the early returns below must not skip it.
+  const inFlight = React.useRef(false)
 
   if (isLoading) {
     return (
@@ -49,6 +53,10 @@ export function EventDetailView({ id }: { id: number }) {
   const joined = isParticipating
 
   async function handleJoin() {
+    // A ref, not the `joining` state: setState is async, so two clicks in the
+    // same tick both read `joining === false` and both reach the network.
+    if (inFlight.current) return
+    inFlight.current = true
     setJoining(true)
     try {
       const res = await EventsService.joinEvent(id, {})
@@ -63,6 +71,7 @@ export function EventDetailView({ id }: { id: number }) {
     } catch {
       toast.error(t("error.title"))
     } finally {
+      inFlight.current = false
       setJoining(false)
     }
   }
@@ -71,6 +80,8 @@ export function EventDetailView({ id }: { id: number }) {
     // Membership is what entitles the account to the event's pack, so leaving
     // withdraws that access on the launcher's next check.
     if (!window.confirm(t("detail.leaveConfirm"))) return
+    if (inFlight.current) return
+    inFlight.current = true
     setJoining(true)
     try {
       const res = await EventsService.leaveEvent(id)
@@ -83,6 +94,7 @@ export function EventDetailView({ id }: { id: number }) {
     } catch {
       toast.error(t("error.title"))
     } finally {
+      inFlight.current = false
       setJoining(false)
     }
   }
@@ -201,6 +213,39 @@ export function EventDetailView({ id }: { id: number }) {
           just to fetch a config that is usually absent. Drafts read as null
           server-side, so they stay invisible here. */}
       {event.modules?.randomizer && <RandomlockeSection eventId={id} />}
+
+      <EventTournamentCard modules={event.modules} />
     </main>
+  )
+}
+
+/**
+ * The tournament composed into this event, when there is one.
+ *
+ * Derived from `tournaments.event_id` server-side (the same satellite-table
+ * rule as the randomizer), so the event page and the tournament page always
+ * agree about whether they are related — the FK used to exist and be read by
+ * nothing at all.
+ */
+function EventTournamentCard({ modules }: { modules?: EventModules }) {
+  const t = useTranslations("events.detail")
+  const tn = modules?.tournament
+  if (!tn) return null
+
+  return (
+    <Panel className="mt-6">
+      <div className="flex flex-wrap items-center gap-3 p-4">
+        <Icon name="trophy" size={18} className="flex-none text-accent-bright" />
+        <div className="flex-1">
+          <h2 className="font-body text-[15px] font-semibold text-txt">{tn.name}</h2>
+          <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+            {t(`tournamentStatus.${tn.status}`)}
+          </p>
+        </div>
+        <Button size="sm" variant="pri" href={`/torneos/${tn.slug}`}>
+          {t("tournamentCta")}
+        </Button>
+      </div>
+    </Panel>
   )
 }

@@ -104,6 +104,34 @@
     "TOURNAMENT_CHECKIN_CLOSED": {
       "es": "El check-in no está abierto.",
       "where": "boffmedia/tournaments/services/registration.service.ts"
+    },
+    "TOURNAMENT_TEAMSHEET_LOCKED": {
+      "es": "Las listas de equipo están bloqueadas: el torneo ya ha empezado.",
+      "where": "boffmedia/tournaments/services/match-report.service.ts"
+    },
+    "EVENT_LIFECYCLE_FORWARD_ONLY": {
+      "es": "El ciclo de vida del evento solo avanza. Marca «reabrir» si de verdad quieres retrocederlo.",
+      "where": "boffmedia/events/services/events.service.ts"
+    },
+    "EVENT_REOPEN_BLOCKED_BY_RANDOMIZER": {
+      "es": "No se puede reabrir: el evento tiene un randomizer que ya no es borrador. Ciérralo o elimínalo antes.",
+      "where": "boffmedia/events/services/events.service.ts"
+    },
+    "TOURNAMENT_PARTICIPANT_IN_BRACKET": {
+      "es": "Ese participante ya está en el cuadro. Cambia su estado a retirado o descalificado en vez de borrarlo.",
+      "where": "boffmedia/tournaments/services/registration.service.ts"
+    },
+    "MATCH_SETTLED_CONCURRENTLY": {
+      "es": "La partida se resolvió mientras enviabas el resultado. Vuelve a cargarla antes de corregirla.",
+      "where": "boffmedia/tournaments/services/matches.service.ts"
+    },
+    "TOURNAMENT_TEAMSHEET_REQUIRED": {
+      "es": "Envía tu lista de equipo antes de hacer check-in.",
+      "where": "boffmedia/tournaments/services/registration.service.ts"
+    },
+    "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": {
+      "es": "Este torneo pertenece a un evento: únete al evento antes de inscribirte.",
+      "where": "boffmedia/tournaments/services/registration.service.ts"
     }
   }
 }

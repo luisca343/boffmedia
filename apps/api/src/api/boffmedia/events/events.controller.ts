@@ -175,8 +175,12 @@ export class EventsController {
   async setEventStatus(
     @Param('id', ParseIntPipe) id: number,
     @Body() dto: SetEventStatusDto,
+    @Req() req: { user?: { userId?: number } },
   ): Promise<Event> {
-    return this.eventsFacadeService.setEventStatus(id, dto.status);
+    return this.eventsFacadeService.setEventStatus(id, dto.status, {
+      reopen: dto.reopen,
+      actorUserId: req.user?.userId ?? null,
+    });
   }
 
   // ==================== EVENT INVITATIONS ====================

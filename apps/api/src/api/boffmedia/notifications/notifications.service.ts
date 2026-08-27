@@ -111,7 +111,10 @@ export class NotificationsService {
    * `userId` is omitted. Reusable by other services (event/achievement
    * producers) — not just the admin endpoint.
    */
-  async create(dto: CreateNotificationDto): Promise<{ created: number }> {
+  async create(
+    dto: CreateNotificationDto,
+    dedupeKey?: string,
+  ): Promise<{ created: number }> {
     const base = {
       type: dto.type,
       title: dto.title,
@@ -120,9 +123,21 @@ export class NotificationsService {
     };
 
     if (dto.userId != null) {
-      await this.db
-        .insert(boffMediaNotifications)
-        .values({ ...base, userId: dto.userId });
+      const row = { ...base, userId: dto.userId, dedupeKey: dedupeKey ?? null };
+      if (dedupeKey) {
+        // Idempotent: a retried producer (a re-run advance, a redelivered job)
+        // refreshes the existing notification instead of stacking a duplicate
+        // in the user's list. `readAt` is deliberately untouched — re-sending
+        // must not mark something the user already read as unread again.
+        await this.db
+          .insert(boffMediaNotifications)
+          .values(row)
+          .onDuplicateKeyUpdate({
+            set: { title: row.title, body: row.body, link: row.link },
+          });
+        return { created: 1 };
+      }
+      await this.db.insert(boffMediaNotifications).values(row);
       return { created: 1 };
     }
 

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EventsService } from './events.service';
 import { EventsRepository } from '../repositories/events.repository';
+import { AuditRepository } from '@api/_repositories/boffmedia/audit.repository';
 import { CreateEventDto } from '../dto/create-event.dto';
 
 const mockEvent = {
@@ -55,6 +56,7 @@ describe('EventsService', () => {
       providers: [
         EventsService,
         { provide: EventsRepository, useValue: mockEventsRepository },
+        { provide: AuditRepository, useValue: { record: jest.fn() } },
       ],
     }).compile();
 

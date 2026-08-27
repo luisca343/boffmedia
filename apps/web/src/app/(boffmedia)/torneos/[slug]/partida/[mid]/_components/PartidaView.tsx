@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useVisiblePoll } from "@/hooks/useVisiblePoll"
 import Link from "next/link"
 import { use } from "react"
 import { useTranslations } from "next-intl"
@@ -76,11 +77,7 @@ export function PartidaView({
 
   // Poll while the match is open so the rival's proposal/verdict shows up.
   const open = detail != null && detail.status !== "completed" && detail.status !== "bye"
-  React.useEffect(() => {
-    if (!open) return
-    const id = setInterval(() => refetch(), 10000)
-    return () => clearInterval(id)
-  }, [open, refetch])
+  useVisiblePoll(refetch, 10000, open)
 
   if (loading) {
     return (

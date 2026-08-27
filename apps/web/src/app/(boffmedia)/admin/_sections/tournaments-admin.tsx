@@ -51,6 +51,23 @@ function Manage({ slug, onBack }: { slug: string; onBack: () => void }) {
     setStatus("completed")
   }
   const generate = async (preview = false) => {
+    // A real generate freezes the field first: anyone who registered but never
+    // entered is dropped. That is irreversible once the bracket exists, so show
+    // the split and get a yes before committing to it.
+    if (!preview) {
+      const pv = await TournamentsService.entryPreview(tn.id)
+      if (pv.success && pv.data) {
+        const { entered, dropped } = pv.data
+        if (
+          dropped.length > 0 &&
+          !confirm(
+            t("confirmEntryCut", { entered: entered.length, dropped: dropped.length }),
+          )
+        ) {
+          return
+        }
+      }
+    }
     const body: Record<string, unknown> = { seeding }
     if (preview) body.preview = true
     if (onlyCheckedIn) body.onlyCheckedIn = true

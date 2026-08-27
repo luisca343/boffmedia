@@ -26,6 +26,7 @@ export namespace UpdateParticipantDto {
         ELIMINATED = 'eliminated',
         WITHDREW = 'withdrew',
         DISQUALIFIED = 'disqualified',
+        DROPPED = 'dropped',
     }
 }
 

@@ -19,10 +19,12 @@ import {
   validGamesString,
 } from '../match-report.util';
 import { computeStandings, matchesForPhaseChain } from '../standings.util';
+import type { TiebreakProfile } from '../tournaments.types';
 import { toCompetitor } from '../tournaments.mapper';
 import { ProposeReportDto } from '../dto/propose-report.dto';
 import { ConfirmReportDto } from '../dto/confirm-report.dto';
 import { TeamsheetDto, TeamsheetMonDto } from '../dto/teamsheet.dto';
+import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import {
   MatchDetail,
   MatchProposalView,
@@ -33,10 +35,23 @@ import { MatchMessageView } from '../entities/match-message.entity';
 // Fallback window when a tournament doesn't set its own `autoVerifyMinutes`.
 const DEFAULT_AUTO_VERIFY_MINUTES = 10;
 
+/**
+ * How long an unchanged tournament's standings are reused. Short on purpose:
+ * a new result changes the cache key anyway, so this only bounds the window in
+ * which two identical polls both recompute.
+ */
+const STANDINGS_TTL_MS = 5_000;
+
 type ViewerRole = 'top' | 'bot' | 'spectator' | 'admin';
 
 @Injectable()
 export class MatchReportService {
+  /** Shared across instances on purpose: one cache per process, not per request. */
+  private static readonly standingsCache = new Map<
+    string,
+    { rows: ReturnType<typeof computeStandings>; expires: number }
+  >();
+
   constructor(
     private readonly repo: TournamentsRepository,
     private readonly matches: MatchesService,
@@ -76,7 +91,9 @@ export class MatchReportService {
     const chain = phase
       ? matchesForPhaseChain(phase.id, phases, allMatches)
       : allMatches;
-    const rows = computeStandings(
+    const rows = this.cachedStandings(
+      t.id,
+      phase?.id ?? null,
       participants.map((p) => p.id),
       chain,
       phase?.tiebreakProfile ?? 'points',
@@ -144,6 +161,50 @@ export class MatchReportService {
           ? (cmap.get(t.championParticipantId) ?? null)
           : null,
     };
+  }
+
+  /**
+   * Standings for the match page, memoised for a few seconds.
+   *
+   * The match page loads every participant, phase and match of the tournament
+   * and recomputes full standings just to show two W-L records — and every
+   * viewer polls it. The cache key includes the number of settled matches and
+   * the latest `reportedAt`, so any new result invalidates it immediately;
+   * the TTL only bounds how long an unchanged tournament is recomputed for.
+   */
+  private cachedStandings(
+    tournamentId: number,
+    phaseId: number | null,
+    participantIds: number[],
+    chain: TournamentMatch[],
+    tiebreak: TiebreakProfile,
+  ): ReturnType<typeof computeStandings> {
+    let settled = 0;
+    let latest = 0;
+    for (const m of chain) {
+      if (m.status !== 'completed' && m.status !== 'bye') continue;
+      settled++;
+      const at = m.reportedAt ? m.reportedAt.getTime() : 0;
+      if (at > latest) latest = at;
+    }
+    const key = `${tournamentId}:${phaseId ?? 'none'}:${tiebreak}:${participantIds.length}:${settled}:${latest}`;
+    const now = Date.now();
+    const hit = MatchReportService.standingsCache.get(key);
+    if (hit && hit.expires > now) return hit.rows;
+
+    const rows = computeStandings(participantIds, chain, tiebreak);
+    // Bounded: a busy server must not accumulate one entry per tournament per
+    // result forever. Cheapest correct eviction — drop everything expired.
+    if (MatchReportService.standingsCache.size > 256) {
+      for (const [k, v] of MatchReportService.standingsCache) {
+        if (v.expires <= now) MatchReportService.standingsCache.delete(k);
+      }
+    }
+    MatchReportService.standingsCache.set(key, {
+      rows,
+      expires: now + STANDINGS_TTL_MS,
+    });
+    return rows;
   }
 
   // ── proposals ─────────────────────────────────────────────────────────────
@@ -246,10 +307,18 @@ export class MatchReportService {
     }
 
     if (!dto.accept) {
-      await this.repo.updateMatch(matchId, {
-        proposalState: 'disputed',
-        judgeRequestedAt: new Date(),
-      });
+      // Conditional: an admin report or an expiry sweep may have settled the
+      // match between the reads above and this write.
+      const disputed = await this.repo.claimDispute(
+        matchId,
+        match.proposedByParticipantId,
+        new Date(),
+      );
+      if (!disputed) {
+        throw new BadRequestException(
+          'La propuesta ya se resolvió mientras enviabas la disputa',
+        );
+      }
       await this.sysMessage(
         matchId,
         `${me.name} ha disputado el resultado — un juez lo revisará`,
@@ -445,6 +514,26 @@ export class MatchReportService {
     userId: number,
     dto: TeamsheetDto,
   ): Promise<{ success: boolean }> {
+    const t = await this.mustFindTournament(tournamentId);
+    // Open-teamsheet format: the opponent is shown this list on the match page,
+    // so it must be frozen once the field is resolved. Editing afterwards would
+    // let a player show one team and bring another.
+    if (t.teamsheetLockedAt != null) {
+      throw new BadRequestException(
+        userError(
+          ApiErrorCode.TOURNAMENT_TEAMSHEET_LOCKED,
+          'Teamsheets are locked for this tournament',
+        ),
+      );
+    }
+    if (t.status === 'live' || t.status === 'completed') {
+      throw new BadRequestException(
+        userError(
+          ApiErrorCode.TOURNAMENT_TEAMSHEET_LOCKED,
+          'Teamsheets are locked once the tournament starts',
+        ),
+      );
+    }
     const me = await this.repo.findParticipantByUser(tournamentId, userId);
     if (!me) throw new NotFoundException('Not registered in this tournament');
     await this.repo.updateParticipant(me.id, {
@@ -476,6 +565,11 @@ export class MatchReportService {
     ) {
       return null;
     }
+    // An unconfirmed proposal is not a result yet: only the two players and a
+    // judge may read it. The match page is @OptionalAuth, so without this a
+    // spectator (or the winner's next-round rival) learns the games and score
+    // before the opponent has verified them.
+    if (role === 'spectator') return null;
     return {
       byParticipantId: String(match.proposedByParticipantId),
       mine: viewer != null && viewer.id === match.proposedByParticipantId,

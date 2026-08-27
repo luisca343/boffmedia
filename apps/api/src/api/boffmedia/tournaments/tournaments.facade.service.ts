@@ -1,4 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { TournamentsService } from './services/tournaments.service';
 import { RegistrationService } from './services/registration.service';
 import { BracketService } from './services/bracket.service';
@@ -6,6 +10,7 @@ import { MatchesService } from './services/matches.service';
 import { StandingsService } from './services/standings.service';
 import { PhasesService } from './services/phases.service';
 import { AdvancementService } from './services/advancement.service';
+import { EntryService } from './services/entry.service';
 import { MatchReportService } from './services/match-report.service';
 import { TournamentNotificationsService } from './services/tournament-notifications.service';
 import { TournamentAnnouncerService } from './services/tournament-announcer.service';
@@ -45,6 +50,7 @@ export class TournamentsFacadeService {
     private readonly notify: TournamentNotificationsService,
     private readonly announcer: TournamentAnnouncerService,
     private readonly repo: TournamentsRepository,
+    private readonly entry: EntryService,
   ) {}
 
   list(query: ListTournamentsQueryDto): Promise<TournamentSummary[]> {
@@ -55,9 +61,41 @@ export class TournamentsFacadeService {
     return this.tournaments.mine(userId);
   }
 
-  async getBySlug(slug: string, userId?: number): Promise<TournamentDetail> {
+  async getBySlug(
+    slug: string,
+    userId?: number,
+    isAdmin = false,
+  ): Promise<TournamentDetail> {
     const row = await this.tournaments.getMetaBySlug(slug);
-    return this.standings.buildDetail(row, userId);
+    const detail = await this.standings.buildDetail(row, userId);
+    // A tournament composed into a private event inherits its privacy — that
+    // inheritance is the whole reason to attach one, since tournaments have no
+    // visibility of their own. Not-found rather than forbidden, matching how
+    // the events module hides a private event's sub-resources.
+    if (
+      detail.event?.visibility === 'private' &&
+      !isAdmin &&
+      !detail.event.viewerIsMember
+    ) {
+      throw new NotFoundException('Tournament not found');
+    }
+    return detail;
+  }
+
+  // ── entry flow (Limitless-style) ──────────────────────────────────────────
+  /** Admin preview: how the field splits right now, changing nothing. */
+  entryPreview(id: number) {
+    return this.entry.preview(id);
+  }
+
+  /** Admin: put a dropped entrant back in, while no bracket exists yet. */
+  readmit(id: number, pid: number): Promise<{ success: boolean }> {
+    return this.entry.readmit(id, pid);
+  }
+
+  /** Admin: resolve the field now, without generating the bracket. */
+  resolveEntries(id: number) {
+    return this.entry.resolve(id);
   }
 
   async getParticipants(slug: string): Promise<Competitor[]> {
@@ -108,6 +146,7 @@ export class TournamentsFacadeService {
         t,
         res.qualifiedParticipantIds,
         res.eliminatedParticipantIds,
+        res.nextPhaseId,
       );
       await this.notifyCurrentRoundReady(id);
     }
@@ -155,14 +194,18 @@ export class TournamentsFacadeService {
   }
 
   updateParticipant(
+    tournamentId: number,
     pid: number,
     dto: UpdateParticipantDto,
   ): Promise<Competitor> {
-    return this.registration.updateParticipant(pid, dto);
+    return this.registration.updateParticipant(tournamentId, pid, dto);
   }
 
-  removeParticipant(pid: number): Promise<{ success: boolean }> {
-    return this.registration.removeParticipant(pid);
+  removeParticipant(
+    tournamentId: number,
+    pid: number,
+  ): Promise<{ success: boolean }> {
+    return this.registration.removeParticipant(tournamentId, pid);
   }
 
   async generate(
@@ -283,8 +326,15 @@ export class TournamentsFacadeService {
   ): Promise<TournamentDetail> {
     const all = await this.repo.listMatches(id);
     const own = new Set(all.map((m) => m.id));
+    // Unknown ids used to be skipped silently, so scheduling a match from the
+    // wrong tournament (a stale admin tab) returned 200 and changed nothing.
+    const foreign = dto.matchIds.filter((mid) => !own.has(mid));
+    if (foreign.length > 0) {
+      throw new BadRequestException(
+        `These matches do not belong to this tournament: ${foreign.join(', ')}`,
+      );
+    }
     for (const mid of dto.matchIds) {
-      if (!own.has(mid)) continue;
       await this.repo.updateMatch(mid, {
         scheduledAt: dto.scheduledAt ?? null,
       });

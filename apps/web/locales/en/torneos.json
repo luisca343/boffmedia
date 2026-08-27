@@ -67,7 +67,8 @@
       "teamMemberPlaceholder": "Player {n}",
       "teamAddMember": "+ Add member",
       "teamNameRequired": "Team name is required",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "teamRemoveMember": "Remove player {n}"
     },
     "match": {
       "notFound": "Match not found",
@@ -84,7 +85,8 @@
       "judgeFallback": "Staff",
       "playerFallback": "Player",
       "placeholder": "Type a message… (share your battle ID)",
-      "send": "Send"
+      "send": "Send",
+      "loadFailed": "Could not load the chat. Retrying in a few seconds."
     },
     "report": {
       "title": "Report matches",
@@ -217,6 +219,19 @@
       "groups": "Groups + knockout",
       "roundrobin": "League (round robin)",
       "leaderboard": "Free leaderboard"
+    },
+    "entry": {
+      "eventGate": "This tournament is part of the \"{event}\" event. Join the event to register.",
+      "eventGateCta": "View the event",
+      "pendingTitle": "Your registration does not count as an entry yet",
+      "enteredTitle": "You're in: you'll be in the pairings",
+      "pendingLead": "Finish the remaining steps before the field closes, or you will be left out of the bracket.",
+      "pendingLeadDeadline": "Finish the remaining steps before {date}, or you will be left out of the bracket.",
+      "step": {
+        "registered": "Registered",
+        "teamsheet": "Team submitted",
+        "checkin": "Checked in"
+      }
     }
   }
 }

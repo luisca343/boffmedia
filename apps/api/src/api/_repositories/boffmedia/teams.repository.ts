@@ -19,6 +19,21 @@ export class TeamsRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
+  /**
+   * Run `fn` against a transaction-scoped copy of this repository, so a
+   * multi-statement write commits together or not at all. Same shape as
+   * `TournamentsRepository.transaction`.
+   */
+  async transaction<T>(fn: (repo: TeamsRepository) => Promise<T>): Promise<T> {
+    return this.db.transaction((tx) =>
+      fn(
+        new TeamsRepository(
+          tx as unknown as MySql2Database<Record<string, never>>,
+        ),
+      ),
+    );
+  }
+
   async findAll(): Promise<EventTeam[]> {
     return this.db
       .select({

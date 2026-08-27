@@ -12,7 +12,15 @@ export type TnFormat = 'single' | 'double' | 'groups' | 'roundrobin' | 'swiss' |
 export type TnKind = 'solo' | 'team' | 'entry'
 export type TnStatus = 'draft' | 'registration' | 'live' | 'completed' | 'cancelled'
 export type TnMetric = 'score' | 'time'
-export type TnParticipantStatus = 'active' | 'eliminated' | 'withdrew' | 'disqualified'
+// `dropped` = registered but never entered (missed check-in, or the teamsheet
+// on a teamsheet-required tournament) when the field was resolved. Distinct
+// from `withdrew`, which is the player's own decision.
+export type TnParticipantStatus =
+  | 'active'
+  | 'eliminated'
+  | 'withdrew'
+  | 'disqualified'
+  | 'dropped'
 
 export interface TnRosterMember { id: number; userId: number | null; name: string; role: string | null }
 
@@ -178,6 +186,23 @@ export interface TnAdvanceRuleApi {
   count: number | null
 }
 
+export type TnEntryGap = "teamsheet" | "check-in"
+
+/** Participant ids either side of the entry cut. */
+export interface TnEntryResolutionApi {
+  entered: number[]
+  dropped: number[]
+}
+
+export interface TnEventContextApi {
+  id: number
+  title: string
+  visibility: "public" | "private"
+  status: "upcoming" | "active" | "completed"
+  /** False → registering will be refused until they join the event. */
+  viewerIsMember: boolean
+}
+
 export interface TnPhaseApi {
   id: number
   order: number
@@ -193,6 +218,12 @@ export interface TnPhaseApi {
   advance: TnAdvanceRuleApi | null
   entrantCount: number
   qualifiedCount: number | null
+  /**
+   * Competitor ids currently making the cut, computed by the server with the
+   * same function `advance` uses. Render the cut line from this — the web used
+   * to reimplement the rule and could disagree with the actual bracket.
+   */
+  projectedQualifierIds: string[]
   view: TnViewApi
 }
 
@@ -224,6 +255,13 @@ export interface TournamentDetailApi {
   gameId: number | null
   gameTitle: string | null
   eventId: number | null
+  /** The event this tournament is composed into, when it has one. */
+  event: TnEventContextApi | null
+  /** Entry requires a teamsheet as well as check-in (VGC). */
+  teamsheetRequired: boolean
+  entryDeadline: string | null
+  /** Non-null once the field is resolved: teamsheets are frozen. */
+  teamsheetLockedAt: string | null
   description: string | null
   rules: string | null
   prizes: string | null
@@ -240,6 +278,12 @@ export interface TournamentDetailApi {
   champion: TnCompetitorApi | null
   participants: TnCompetitorApi[]
   viewerParticipantId: string | null
+  /**
+   * What the viewer's registration still needs before it counts as an entry.
+   * Empty means entered. Everyone still short of this when the field is
+   * resolved is dropped rather than seeded.
+   */
+  viewerEntryGaps: TnEntryGap[]
   myMatchId: number | null
   podium: TnCompetitorApi[]
   activePhaseId: number | null
@@ -359,6 +403,24 @@ export class TournamentsService {
   }
   static removeParticipant(id: number, pid: number) {
     return apiAuthedAutoDELETE<{ success: boolean }>(`/tournaments/${id}/participants/${pid}`)
+  }
+
+  // Entry flow: who actually plays. Registering is an intention; entering is
+  // the commitment the pairings are built from.
+  /** Read-only split of the field as it stands. Shown before generate commits. */
+  static entryPreview(id: number) {
+    return apiAuthedAutoGET<TnEntryResolutionApi>(`/tournaments/${id}/entries/preview`)
+  }
+  /** Freeze the field now: drop the un-entered, lock teamsheets, close windows. */
+  static resolveEntries(id: number) {
+    return apiAuthedAutoPOST<TnEntryResolutionApi>(`/tournaments/${id}/entries/resolve`, {})
+  }
+  /** Put a dropped entrant back, while no bracket exists yet. */
+  static readmit(id: number, pid: number) {
+    return apiAuthedAutoPOST<{ success: boolean }>(
+      `/tournaments/${id}/participants/${pid}/readmit`,
+      {},
+    )
   }
   static generate(id: number, body: Record<string, unknown> = {}) {
     return apiAuthedAutoPOST<TournamentDetailApi>(`/tournaments/${id}/generate`, body)

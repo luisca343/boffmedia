@@ -11,6 +11,7 @@ import {
   boolean,
   unique,
   AnyMySqlColumn,
+  json,
 } from 'drizzle-orm/mysql-core';
 import { boffMediaUsers } from './BoffMedia';
 import { packs } from './Packs';
@@ -478,3 +479,48 @@ export async function validateParticipantCanReceiveAchievement(
 
   return !!eventParticipant;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Admin audit trail for the boffmedia module (events + tournaments).
+//
+// One table rather than one per module: the questions worth asking after the
+// fact ("who reopened this?", "who amended that match?") are the same shape for
+// both, and a single trail is one place to read instead of a union. Modelled on
+// `pack_audit`, including its deliberate lack of FKs — the trail must outlive
+// the row it points at, which is exactly when it is most worth reading.
+export const AUDIT_SUBJECT = {
+  EVENT: 'event',
+  TOURNAMENT: 'tournament',
+  PARTICIPANT: 'participant',
+  MATCH: 'match',
+} as const;
+
+export type AuditSubject = (typeof AUDIT_SUBJECT)[keyof typeof AUDIT_SUBJECT];
+
+export const boffMediaAudit = mysqlTable(
+  'boffmedia_audit',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    subjectType: mysqlEnum('subject_type', [
+      AUDIT_SUBJECT.EVENT,
+      AUDIT_SUBJECT.TOURNAMENT,
+      AUDIT_SUBJECT.PARTICIPANT,
+      AUDIT_SUBJECT.MATCH,
+    ]).notNull(),
+    subjectId: int('subject_id').notNull(),
+    /** Dotted action, e.g. `event.status`, `event.reopen`, `match.amend`. */
+    action: varchar('action', { length: 48 }).notNull(),
+    /** The Boffmedia account that acted, when known (null for system jobs). */
+    actorUserId: int('actor_user_id'),
+    meta: json('meta').$type<Record<string, unknown>>(),
+    at: timestamp('at')
+      .notNull()
+      .default(sql`CURRENT_TIMESTAMP()`),
+  },
+  (t) => ({
+    subjectIdx: index('ba_subject_idx').on(t.subjectType, t.subjectId, t.at),
+    actorIdx: index('ba_actor_idx').on(t.actorUserId),
+  }),
+);
+
+export type BoffMediaAuditRow = typeof boffMediaAudit.$inferSelect;

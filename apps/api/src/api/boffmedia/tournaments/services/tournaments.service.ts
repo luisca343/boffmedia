@@ -43,6 +43,8 @@ export class TournamentsService {
       rules: dto.rules ?? null,
       prizes: dto.prizes ?? null,
       checkInOpen: dto.checkInOpen ?? false,
+      teamsheetRequired: dto.teamsheetRequired ?? false,
+      entryDeadline: dto.entryDeadline ?? null,
       banner: dto.banner ?? null,
       icon: dto.icon ?? null,
       hue: dto.hue ?? null,
@@ -127,6 +129,8 @@ export class TournamentsService {
         'rules',
         'prizes',
         'checkInOpen',
+        'teamsheetRequired',
+        'entryDeadline',
         'banner',
         'icon',
         'hue',
@@ -148,11 +152,48 @@ export class TournamentsService {
     return { success: true };
   }
 
+  /**
+   * Allowed lifecycle moves. Only `completed → *` used to be refused, which let
+   * a live tournament be dropped back to `registration` — new entrants then
+   * join a field the bracket was already built from, and nothing reconciles the
+   * two. Cancelling is always available; a cancelled tournament may be revived
+   * to draft, but only while it has no matches (checked below).
+   */
+  private static readonly TRANSITIONS: Readonly<
+    Record<TournamentStatus, readonly TournamentStatus[]>
+  > = {
+    draft: ['registration', 'live', 'cancelled'],
+    registration: ['draft', 'live', 'cancelled'],
+    live: ['completed', 'cancelled'],
+    completed: [],
+    cancelled: ['draft'],
+  };
+
   async setStatus(id: number, status: TournamentStatus): Promise<Tournament> {
     const t = await this.getById(id);
-    if (t.status === 'completed' && status !== 'completed') {
-      throw new BadRequestException('A completed tournament cannot reopen');
+    if (t.status === status) return t;
+
+    const allowed = TournamentsService.TRANSITIONS[t.status] ?? [];
+    if (!allowed.includes(status)) {
+      throw new BadRequestException(
+        t.status === 'completed'
+          ? 'A completed tournament cannot reopen'
+          : `A tournament cannot go from ${t.status} to ${status}`,
+      );
     }
+
+    // Reviving a cancelled tournament is only safe while nothing was played:
+    // its bracket, standings and eliminations would otherwise be resurrected
+    // half-way through.
+    if (t.status === 'cancelled') {
+      const matches = await this.repo.listMatches(id);
+      if (matches.length > 0) {
+        throw new BadRequestException(
+          'This tournament already has a bracket — delete it instead of reviving it',
+        );
+      }
+    }
+
     await this.repo.update(id, { status });
     return this.getById(id);
   }

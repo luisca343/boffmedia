@@ -5,9 +5,11 @@ import {
 } from '@nestjs/common';
 import { TournamentsRepository } from '../repositories/tournaments.repository';
 import { BracketService } from './bracket.service';
+import { MatchesService } from './matches.service';
 import {
   computeStandings,
   matchesForPhaseChain,
+  selectQualifiers,
   standingsForEntrants,
 } from '../standings.util';
 import {
@@ -43,6 +45,7 @@ export class AdvancementService {
   constructor(
     private readonly repo: TournamentsRepository,
     private readonly bracket: BracketService,
+    private readonly matches: MatchesService,
   ) {}
 
   async advance(tournamentId: number): Promise<AdvanceResult> {
@@ -138,7 +141,7 @@ export class AdvancementService {
     const qualifiers =
       live.format === 'groups'
         ? await this.groupPhaseQualifiers(live, phaseMatches, activeSet)
-        : this.selectQualifiers(live, standings);
+        : selectQualifiers(live, standings);
     if (qualifiers.length < 2) {
       throw new BadRequestException(
         'Advancement rule yields fewer than 2 qualifiers — adjust results or the rule',
@@ -151,8 +154,18 @@ export class AdvancementService {
       .map((e) => e.participantId)
       .filter((id) => activeSet.has(id) && !qualifierIds.has(id));
 
-    // 6-7. Freeze qualifiers as next-phase entrants, eliminate the rest, flip phases.
+    // 6-8. Freeze qualifiers as next-phase entrants, eliminate the rest, flip
+    // phases AND build the next structure — all in one transaction.
+    //
+    // The build used to run after this transaction committed, with a comment
+    // claiming a crash was recoverable by re-running advance. It was not: this
+    // transaction marks the next phase live and seeds its entrants, and advance
+    // finds "the phase to advance" by looking for a successor with no entrants,
+    // so after the commit there was nothing left for a retry to latch onto. A
+    // failed build now rolls the phase flip back with it.
+    const sink: TournamentMatch[] = [];
     await this.repo.transaction(async (tx) => {
+      await tx.lockTournament(tournamentId);
       await tx.addPhaseEntrants(
         qualifiers.map((q, i) => ({
           phaseId: next.id,
@@ -169,16 +182,17 @@ export class AdvancementService {
       }
       await tx.updatePhase(live.id, { status: 'completed' });
       await tx.updatePhase(next.id, { status: 'live' });
+      await this.bracket.buildPhaseWithin(
+        tx,
+        sink,
+        t,
+        { ...next, status: 'live' },
+        qualifiers.map((q) => q.participantId),
+        {},
+      );
     });
-
-    // 8. Build the next phase's structure. Idempotent: a crash here is recovered
-    // by re-running generate/advance (buildPhase wipes the phase and rebuilds).
-    await this.bracket.buildPhase(
-      t,
-      { ...next, status: 'live' },
-      qualifiers.map((q) => q.participantId),
-      {},
-    );
+    // Committed: now it is safe to tell players their next match is ready.
+    await this.matches.flushReady(sink);
 
     return {
       completed: false,
@@ -267,33 +281,5 @@ export class AdvancementService {
       if (!any) break;
     }
     return out;
-  }
-
-  private selectQualifiers(
-    phase: TournamentPhase,
-    standings: Ranked[],
-  ): Ranked[] {
-    switch (phase.advanceType) {
-      case 'top_n':
-        return standings.slice(0, phase.advanceCount ?? standings.length);
-      case 'record': {
-        const cap = phase.advanceMaxLosses ?? Number.MAX_SAFE_INTEGER;
-        const eligible = standings.filter((s) => s.l <= cap);
-        return phase.advanceCount != null
-          ? eligible.slice(0, phase.advanceCount)
-          : eligible;
-      }
-      case 'top_or_record': {
-        // Union: the top N by standings OR anyone at ≤ maxLosses losses.
-        // Standings are sorted, so both sets are contiguous from the top — the
-        // qualifier count is max(N, #{≤maxLosses}), i.e. an asymmetric cut.
-        const n = phase.advanceCount ?? 0;
-        const cap = phase.advanceMaxLosses ?? Number.MAX_SAFE_INTEGER;
-        return standings.filter((s, i) => i < n || s.l <= cap);
-      }
-      case 'all':
-      default:
-        return standings;
-    }
   }
 }

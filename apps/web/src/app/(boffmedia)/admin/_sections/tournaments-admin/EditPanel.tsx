@@ -43,6 +43,9 @@ export function EditPanel({
   const [autoVerify, setAutoVerify] = useState<number | "">(detail.autoVerifyMinutes ?? "")
   const [maxParticipants, setMaxParticipants] = useState<number | "">(detail.maxParticipants ?? "")
   const [regOpen, setRegOpen] = useState(detail.registrationOpen)
+  // Entry flow: what a registration must satisfy to count as an entry.
+  const [teamsheetRequired, setTeamsheetRequired] = useState(detail.teamsheetRequired)
+  const [entryDeadline, setEntryDeadline] = useState(toLocal(detail.entryDeadline))
   const [startDate, setStartDate] = useState(toLocal(detail.startDate))
   const [endDate, setEndDate] = useState(toLocal(detail.endDate))
   const [busy, setBusy] = useState(false)
@@ -61,6 +64,8 @@ export function EditPanel({
       autoVerifyMinutes: autoVerify === "" ? null : autoVerify,
       maxParticipants: maxParticipants === "" ? null : maxParticipants,
       registrationOpen: regOpen,
+      teamsheetRequired,
+      entryDeadline: entryDeadline ? new Date(entryDeadline).toISOString() : null,
       startDate: startDate ? new Date(startDate).toISOString() : null,
       endDate: endDate ? new Date(endDate).toISOString() : null,
     }
@@ -106,6 +111,23 @@ export function EditPanel({
                 value={regOpen ? "yes" : "no"}
                 options={[{ value: "yes", label: t("regOpen") }, { value: "no", label: t("regClosed") }]}
                 onChange={(v) => setRegOpen(v === "yes")}
+              />
+            </Field>
+            <Field label={t("teamsheetRequired")}>
+              <Select
+                value={teamsheetRequired ? "yes" : "no"}
+                options={[
+                  { value: "no", label: t("teamsheetOptional") },
+                  { value: "yes", label: t("teamsheetMandatory") },
+                ]}
+                onChange={(v) => setTeamsheetRequired(v === "yes")}
+              />
+            </Field>
+            <Field label={t("entryDeadline")}>
+              <Input
+                type="datetime-local"
+                value={entryDeadline}
+                onChange={(e) => setEntryDeadline(e.target.value)}
               />
             </Field>
             <Field label={t("startDate")}>

@@ -81,6 +81,13 @@ export class PhaseView {
   qualifiedCount: number | null;
 
   @ApiProperty({
+    type: [String],
+    description:
+      'Competitor ids currently making the cut under this phase advancement rule, server-computed from the same function `advance` uses. Empty on a phase with no rule. Clients render the cut from this instead of reimplementing the rule.',
+  })
+  projectedQualifierIds: string[];
+
+  @ApiProperty({
     type: 'object',
     additionalProperties: true,
     description: 'Per-format render model for this phase.',

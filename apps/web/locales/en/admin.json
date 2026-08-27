@@ -93,7 +93,9 @@
         "tabConfig": "Configuration",
         "lifecycleDesc": "The event's status. Only an active event can hold an open randomizer config.",
         "randomizerSection": "Randomizer",
-        "randomizerSectionDesc": "Randomizer configuration and participant assignments."
+        "randomizerSectionDesc": "Randomizer configuration and participant assignments.",
+        "reopenConfirm": "This moves the event back from {from} to {to}. Only do this if it was closed by mistake. Continue?",
+        "statusFailed": "Could not change the event status."
       },
       "participants": {
         "title": "Members",
@@ -109,7 +111,8 @@
           "confirmed": "Confirmed",
           "declined": "Declined",
           "removed": "Removed"
-        }
+        },
+        "actionError": "Could not complete the action."
       },
       "invites": {
         "title": "Invitations",
@@ -126,7 +129,8 @@
         "spent": "Spent",
         "uses": "{used}/{max} used",
         "copy": "Copy code",
-        "revoke": "Revoke"
+        "revoke": "Revoke",
+        "actionError": "Could not complete the action."
       },
       "manage": "Manage"
     },
@@ -1143,8 +1147,14 @@
       "participantDisqualified": "Disqualified",
       "vgcDay1": "Day 1 — Swiss",
       "vgcDay2": "Day 2 — Swiss",
-      "vgcTopCut": "Top Cut"
-    }
+      "vgcTopCut": "Top Cut",
+      "participantDropped": "Did not enter"
+    },
+    "teamsheetRequired": "Teamsheet",
+    "teamsheetOptional": "Optional",
+    "teamsheetMandatory": "Required to enter (VGC)",
+    "entryDeadline": "Entry deadline",
+    "confirmEntryCut": "{entered} players have entered and {dropped} will be left out for not completing check-in or their teamsheet. Re-admitting someone is only possible until the bracket is generated. Continue?"
   },
   "data": {
     "editLabel": "Edit",

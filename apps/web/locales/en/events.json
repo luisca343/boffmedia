@@ -84,7 +84,15 @@
       "randomlockeParticipants": "{count, plural, one {# participant} other {# participants}}",
       "leave": "Leave event",
       "left": "You have left the event.",
-      "leaveConfirm": "Leaving withdraws any pack access this event granted you. Continue?"
+      "leaveConfirm": "Leaving withdraws any pack access this event granted you. Continue?",
+      "tournamentCta": "View the tournament",
+      "tournamentStatus": {
+        "draft": "Draft",
+        "registration": "Registration open",
+        "live": "Live",
+        "completed": "Finished",
+        "cancelled": "Cancelled"
+      }
     },
     "organizer": {
       "tagOfficial": "Official",

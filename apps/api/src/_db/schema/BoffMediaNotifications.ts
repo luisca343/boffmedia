@@ -1,5 +1,6 @@
 import {
   index,
+  uniqueIndex,
   int,
   mysqlEnum,
   mysqlTable,
@@ -42,11 +43,20 @@ export const boffMediaNotifications = mysqlTable(
     body: text('body'),
     link: varchar('link', { length: 512 }),
     readAt: timestamp('read_at'),
+    /**
+     * Optional idempotency key, e.g. `tournament:12:champion:34`. NULL means
+     * "never deduplicate" — MySQL allows many NULLs in a UNIQUE index, so an
+     * unkeyed notification behaves exactly as before. Producers that can be
+     * retried (a re-run advance, a redelivered job) pass one so the second
+     * attempt updates the existing row instead of creating a twin.
+     */
+    dedupeKey: varchar('dedupe_key', { length: 120 }),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
     userIdx: index('notif_user_idx').on(t.userId),
     userReadIdx: index('notif_user_read_idx').on(t.userId, t.readAt),
+    dedupeUq: uniqueIndex('notif_dedupe_uq').on(t.dedupeKey),
   }),
 );
 

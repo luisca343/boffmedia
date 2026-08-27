@@ -13,9 +13,11 @@ import {
 import {
   computeStandings,
   matchesForPhaseChain,
+  selectQualifiers,
   standingsForEntrants,
 } from '../standings.util';
 import { effectiveBestOf } from '../match-report.util';
+import { EntryService } from './entry.service';
 import { toCompetitor } from '../tournaments.mapper';
 import { Competitor } from '../entities/competitor.entity';
 import { MatchView } from '../entities/match.entity';
@@ -26,7 +28,10 @@ import {
   LeagueView,
 } from '../entities/standings.entity';
 import { LbEntry } from '../entities/leaderboard.entity';
-import { TournamentDetail } from '../entities/tournament-detail.entity';
+import {
+  TournamentDetail,
+  TournamentEventContext,
+} from '../entities/tournament-detail.entity';
 import { PhaseView } from '../entities/phase.entity';
 import type { PhaseStatus, TournamentFormat } from '../tournaments.types';
 
@@ -39,7 +44,10 @@ interface MatchCtx {
 
 @Injectable()
 export class StandingsService {
-  constructor(private readonly repo: TournamentsRepository) {}
+  constructor(
+    private readonly repo: TournamentsRepository,
+    private readonly entry: EntryService,
+  ) {}
 
   private buildMatchCtx(
     tBestOf: number,
@@ -131,6 +139,12 @@ export class StandingsService {
       gameId: t.gameId,
       gameTitle: t.gameTitle,
       eventId: t.eventId,
+      event: await this.eventContext(t.eventId, viewerUserId),
+      teamsheetRequired: t.teamsheetRequired,
+      entryDeadline: t.entryDeadline ? t.entryDeadline.toISOString() : null,
+      teamsheetLockedAt: t.teamsheetLockedAt
+        ? t.teamsheetLockedAt.toISOString()
+        : null,
       description: t.description,
       rules: t.rules,
       prizes: t.prizes,
@@ -152,6 +166,9 @@ export class StandingsService {
       viewerParticipantId: viewerParticipant
         ? String(viewerParticipant.id)
         : null,
+      viewerEntryGaps: viewerParticipant
+        ? this.entry.gapsFor(t, viewerParticipant)
+        : [],
       myMatchId: myMatch?.id ?? null,
       podium: this.buildPodium(t, phases, participants, matches, cmap),
       activePhaseId,
@@ -270,6 +287,8 @@ export class StandingsService {
           advance: null,
           entrantCount: participants.length,
           qualifiedCount: null,
+          // No advancement rule on a synthesised single phase, so no cut.
+          projectedQualifierIds: [],
           view: this.buildView(t, participants, matches, cmap, groups, ctx),
         },
       ];
@@ -343,9 +362,50 @@ export class StandingsService {
           : null,
         entrantCount: phEntrants.length,
         qualifiedCount,
+        projectedQualifierIds: this.projectedQualifiers(ph, view),
         view,
       };
     });
+  }
+
+  /**
+   * The event this tournament is composed into, plus whether the viewer is a
+   * member of it. The web needs both to say "join the event first" instead of
+   * showing a register button that will be refused.
+   */
+  private async eventContext(
+    eventId: number | null,
+    viewerUserId?: number,
+  ): Promise<TournamentEventContext | null> {
+    if (eventId == null) return null;
+    const ev = await this.repo.findEventContext(eventId);
+    if (!ev) return null;
+    const viewerIsMember =
+      viewerUserId != null &&
+      (await this.repo.hasActiveEventMembership(eventId, viewerUserId));
+    return { ...ev, viewerIsMember };
+  }
+
+  /**
+   * Who is currently making the cut in this phase, from the same rule
+   * `advance` applies. Sent so clients can highlight the cut without
+   * reimplementing four branches of advancement logic that then drift.
+   */
+  private projectedQualifiers(
+    ph: TournamentPhase,
+    view: { standings?: Standing[] } | null,
+  ): string[] {
+    if (ph.advanceType == null) return [];
+    const standings = view?.standings;
+    if (!standings?.length) return [];
+    return selectQualifiers(
+      {
+        advanceType: ph.advanceType,
+        advanceCount: ph.advanceCount,
+        advanceMaxLosses: ph.advanceMaxLosses,
+      },
+      standings,
+    ).map((s) => s.c.id);
   }
 
   /**

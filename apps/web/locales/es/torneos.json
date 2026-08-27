@@ -67,7 +67,8 @@
       "teamMemberPlaceholder": "Jugador {n}",
       "teamAddMember": "+ Añadir miembro",
       "teamNameRequired": "El nombre del equipo es obligatorio",
-      "cancel": "Cancelar"
+      "cancel": "Cancelar",
+      "teamRemoveMember": "Quitar al jugador {n}"
     },
     "match": {
       "notFound": "Partida no encontrada",
@@ -84,7 +85,8 @@
       "judgeFallback": "Staff",
       "playerFallback": "Jugador",
       "placeholder": "Escribe un mensaje… (comparte tu ID de batalla)",
-      "send": "Enviar"
+      "send": "Enviar",
+      "loadFailed": "No se ha podido cargar el chat. Se reintentará en unos segundos."
     },
     "report": {
       "title": "Reportar partidas",
@@ -217,6 +219,19 @@
       "groups": "Grupos + eliminatoria",
       "roundrobin": "Liga (todos contra todos)",
       "leaderboard": "Clasificación libre"
+    },
+    "entry": {
+      "eventGate": "Este torneo forma parte del evento «{event}». Únete al evento para poder inscribirte.",
+      "eventGateCta": "Ver el evento",
+      "pendingTitle": "Tu inscripción aún no cuenta como participación",
+      "enteredTitle": "Estás dentro: entras en el sorteo de emparejamientos",
+      "pendingLead": "Completa los pasos pendientes antes de que se cierre el cupo, o quedarás fuera del cuadro.",
+      "pendingLeadDeadline": "Completa los pasos pendientes antes del {date}, o quedarás fuera del cuadro.",
+      "step": {
+        "registered": "Inscrito",
+        "teamsheet": "Equipo enviado",
+        "checkin": "Check-in"
+      }
     }
   }
 }

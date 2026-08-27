@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Competitor } from './Competitor';
 import type { PhaseView } from './PhaseView';
+import type { TournamentEventContext } from './TournamentEventContext';
 export type TournamentDetail = {
     id: number;
     slug: string;
@@ -16,6 +17,22 @@ export type TournamentDetail = {
     gameId: Record<string, any> | null;
     gameTitle: Record<string, any> | null;
     eventId: Record<string, any> | null;
+    /**
+     * The event this tournament is composed into, when it has one. An attached tournament draws its field from the event: registering requires an active membership, and a private event makes its tournament private too.
+     */
+    event?: TournamentEventContext | null;
+    /**
+     * Entry requires a submitted teamsheet as well as check-in (VGC).
+     */
+    teamsheetRequired: boolean;
+    /**
+     * When the field is resolved: everyone not entered by then is dropped.
+     */
+    entryDeadline: Record<string, any> | null;
+    /**
+     * Set once the field is resolved; teamsheets are frozen after.
+     */
+    teamsheetLockedAt: Record<string, any> | null;
     description: Record<string, any> | null;
     rules: Record<string, any> | null;
     /**
@@ -44,6 +61,10 @@ export type TournamentDetail = {
      * The signed-in caller's own participant id (stringified), or null when anonymous / not registered. Drives the register/withdraw control.
      */
     viewerParticipantId: Record<string, any> | null;
+    /**
+     * What the signed-in viewer's registration is still missing before it counts as an entry, in the order they fix it. Empty means entered (or not registered at all — check viewerParticipantId). Everyone still short of this when the field is resolved is dropped.
+     */
+    viewerEntryGaps: Array<'teamsheet' | 'check-in'>;
     /**
      * The caller's currently playable (ready/live) match id — the 'Tu partida' banner.
      */

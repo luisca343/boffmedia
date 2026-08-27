@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { DkBracket, DkSeg } from "@/components/boffmedia/ui/tools/datakit"
@@ -33,6 +33,16 @@ export function TorneoView({ detail }: { detail: TournamentDetailApi }) {
     detail.activePhaseId ?? phases[0]?.id ?? 0,
   )
 
+  // The page polls, so a phase can go live while this is open. Follow the
+  // server's active phase unless the viewer has picked a tab themselves —
+  // without this the bracket kept showing the previous phase until someone
+  // clicked, which is the most visible moment of a tournament to get wrong.
+  const [pinned, setPinned] = useState(false)
+  const serverActive = detail.activePhaseId ?? null
+  useEffect(() => {
+    if (!pinned && serverActive != null) setActiveId(serverActive)
+  }, [pinned, serverActive])
+
   // Single-phase (incl. every legacy tournament) renders exactly as before, from
   // the tournament format + the legacy `view`.
   if (single) {
@@ -57,7 +67,10 @@ export function TorneoView({ detail }: { detail: TournamentDetailApi }) {
       <DkSeg
         size="sm"
         value={String(active.id)}
-        onChange={(v) => setActiveId(Number(v))}
+        onChange={(v) => {
+          setPinned(true)
+          setActiveId(Number(v))
+        }}
         ariaLabel={t("view.phaseAriaLabel")}
         options={phases.map((p) => ({
           value: String(p.id),
@@ -199,29 +212,6 @@ function GroupsBlock({
  * already ordered by the phase's tiebreak profile, so this mirrors the engine's
  * `selectQualifiers` exactly (byes counted as wins, no losses).
  */
-function qualifiedIds(
-  standings: TnStandingApi[],
-  advance: TnAdvanceRuleApi | null,
-): Set<string> {
-  if (!advance || advance.type === "all")
-    return new Set(standings.map((s) => s.c.id))
-  if (advance.type === "top_n")
-    return new Set(
-      standings.slice(0, advance.count ?? standings.length).map((s) => s.c.id),
-    )
-  const cap = advance.maxLosses ?? Number.MAX_SAFE_INTEGER
-  if (advance.type === "top_or_record") {
-    // Union: top N by standings OR anyone at ≤ maxLosses losses.
-    const n = advance.count ?? 0
-    return new Set(
-      standings.filter((s, i) => i < n || s.l <= cap).map((s) => s.c.id),
-    )
-  }
-  // record: everyone at ≤ maxLosses, optionally capped by standings order.
-  let elig = standings.filter((s) => s.l <= cap)
-  if (advance.count != null) elig = elig.slice(0, advance.count)
-  return new Set(elig.map((s) => s.c.id))
-}
 
 function SwissBlock({
   view,
@@ -233,8 +223,11 @@ function SwissBlock({
   t: ReturnType<typeof useTranslations>
 }) {
   const rows = view.standings ?? []
+  // Server-computed: the advancement rule lives in one place now. `advance` is
+  // still read below, but only to LABEL the cut ("top 8", "X-2 or better") —
+  // never to decide who is above it.
   const advance = phase?.advance ?? null
-  const qualified = qualifiedIds(rows, advance)
+  const qualified = new Set(phase?.projectedQualifierIds ?? [])
   const completed = phase?.status === "completed"
   // Index of the last qualifying row (in display order) → cut-line position.
   let lastCut = -1

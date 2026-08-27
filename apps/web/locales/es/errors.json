@@ -25,6 +25,13 @@
     "TAXI_INSUFFICIENT_FUNDS": "No tienes saldo suficiente para este viaje.",
     "TAXI_UNSAFE_ARRIVAL": "No hay un sitio seguro donde dejarte en esa parada.",
     "TAXI_IN_DUNGEON_RUN": "No puedes coger un taxi durante una mazmorra.",
-    "TAXI_SERVER_BUSY": "El servidor no ha respondido a tiempo. No se te ha cobrado nada."
+    "TAXI_SERVER_BUSY": "El servidor no ha respondido a tiempo. No se te ha cobrado nada.",
+    "TOURNAMENT_TEAMSHEET_LOCKED": "Las listas de equipo están bloqueadas: el torneo ya ha empezado.",
+    "EVENT_LIFECYCLE_FORWARD_ONLY": "El ciclo de vida del evento solo avanza. Marca «reabrir» si de verdad quieres retrocederlo.",
+    "EVENT_REOPEN_BLOCKED_BY_RANDOMIZER": "No se puede reabrir: el evento tiene un randomizer que ya no es borrador. Ciérralo o elimínalo antes.",
+    "TOURNAMENT_PARTICIPANT_IN_BRACKET": "Ese participante ya está en el cuadro. Cambia su estado a retirado o descalificado en vez de borrarlo.",
+    "MATCH_SETTLED_CONCURRENTLY": "La partida se resolvió mientras enviabas el resultado. Vuelve a cargarla antes de corregirla.",
+    "TOURNAMENT_TEAMSHEET_REQUIRED": "Envía tu lista de equipo antes de hacer check-in.",
+    "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": "Este torneo pertenece a un evento: únete al evento antes de inscribirte."
   }
 }

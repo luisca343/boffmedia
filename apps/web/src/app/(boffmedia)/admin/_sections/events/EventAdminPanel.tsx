@@ -5,6 +5,8 @@ import { useTranslations } from "next-intl"
 import { Button } from "@boffmedia/ui"
 import { AvAlert, AvPill, AvSectionHead } from "../../_components/ui/av-kit"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { ApiError } from "@/services/http/core"
+import { useApiError } from "@/hooks/useApiError"
 import { EventRandomizerPanel } from "./randomizer/EventRandomizerPanel"
 import { ParticipantsPanel } from "./ParticipantsPanel"
 import { EventInvitesPanel } from "./EventInvitesPanel"
@@ -29,21 +31,33 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: () => void }) {
   const t = useTranslations("admin.events.panel")
+  const apiError = useApiError()
   const eventId = Number(event.id)
   const [status, setStatus] = useState<EventStatus>(event.status as EventStatus)
   const [tab, setTab] = useState<Tab>("config")
   const [busy, setBusy] = useState<EventStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
 
+  // The lifecycle runs forward; going back is a real but deliberate action, so
+  // it asks first and sends `reopen`. The server still refuses a reopen while a
+  // non-draft randomizer config is attached — this only saves a round trip on
+  // the accidental click.
+  const RANK: Record<EventStatus, number> = { upcoming: 0, active: 1, completed: 2 }
+
   const move = async (next: EventStatus) => {
+    const backwards = RANK[next] < RANK[status]
+    if (backwards && !window.confirm(t("reopenConfirm", { from: t(`status.${status}`), to: t(`status.${next}`) }))) {
+      return
+    }
     setBusy(next)
     setError(null)
     try {
-      const res = await EventsService.setEventStatus(eventId, next)
-      if (res.error) setError(res.error)
+      const res = await EventsService.setEventStatus(eventId, next, backwards)
+      // Render the server's user-facing text, never its machine `error` code.
+      if (!res.success) setError(apiError(new ApiError(res), t("statusFailed")))
       else setStatus(next)
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e))
+      setError(apiError(e, t("statusFailed")))
     } finally {
       setBusy(null)
     }

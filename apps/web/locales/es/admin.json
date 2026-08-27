@@ -93,7 +93,9 @@
         "tabConfig": "Configuración",
         "lifecycleDesc": "El estado del evento. Solo un evento activo puede tener una configuración de randomizer abierta.",
         "randomizerSection": "Randomizer",
-        "randomizerSectionDesc": "Configuración del randomizer y asignaciones de los participantes."
+        "randomizerSectionDesc": "Configuración del randomizer y asignaciones de los participantes.",
+        "reopenConfirm": "Vas a retroceder el evento de {from} a {to}. Solo debería hacerse si se cerró por error. ¿Continuar?",
+        "statusFailed": "No se pudo cambiar el estado del evento."
       },
       "participants": {
         "title": "Miembros",
@@ -109,7 +111,8 @@
           "confirmed": "Confirmado",
           "declined": "Rechazado",
           "removed": "Expulsado"
-        }
+        },
+        "actionError": "No se pudo completar la acción."
       },
       "invites": {
         "title": "Invitaciones",
@@ -126,7 +129,8 @@
         "spent": "Agotado",
         "uses": "{used}/{max} usados",
         "copy": "Copiar código",
-        "revoke": "Revocar"
+        "revoke": "Revocar",
+        "actionError": "No se pudo completar la acción."
       },
       "manage": "Gestionar"
     },
@@ -1143,8 +1147,14 @@
       "participantDisqualified": "Descalificado",
       "vgcDay1": "Día 1 — Suizo",
       "vgcDay2": "Día 2 — Suizo",
-      "vgcTopCut": "Top Cut"
-    }
+      "vgcTopCut": "Top Cut",
+      "participantDropped": "Sin entrar"
+    },
+    "teamsheetRequired": "Lista de equipo",
+    "teamsheetOptional": "Opcional",
+    "teamsheetMandatory": "Obligatoria para entrar (VGC)",
+    "entryDeadline": "Cierre del cupo",
+    "confirmEntryCut": "{entered} jugadores han entrado y {dropped} quedarán fuera por no completar el check-in o la lista de equipo. Se puede readmitir a alguien solo hasta que se genere el cuadro. ¿Continuar?"
   },
   "data": {
     "editLabel": "Editar",

@@ -46,6 +46,14 @@ export type CreateTournamentDto = {
      * Player check-in window open.
      */
     checkInOpen?: boolean;
+    /**
+     * Entry requires a submitted teamsheet as well as check-in (VGC). Set explicitly — it is NOT derived from the game, whose title is free text.
+     */
+    teamsheetRequired?: boolean;
+    /**
+     * When the field is frozen: everyone who has not entered by then is dropped and teamsheets lock. Omit to resolve on generate only.
+     */
+    entryDeadline?: string;
     banner?: string;
     icon?: string;
     hue?: number;

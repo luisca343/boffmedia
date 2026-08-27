@@ -130,6 +130,32 @@ export class PhasesService {
         'A groups phase cannot carry standings — records are per group',
       );
     }
+    // Format and advancement rule were validated independently, so a
+    // combination that cannot work was accepted here and failed much later
+    // inside `advance` with a generic message.
+    if (dto.advanceType != null) {
+      // A leaderboard phase ranks by a submitted metric and plays no matches;
+      // there is nothing for a record-based rule to read.
+      if (
+        dto.format === 'leaderboard' &&
+        (dto.advanceType === 'record' || dto.advanceType === 'top_or_record')
+      ) {
+        throw new BadRequestException(
+          'A leaderboard phase has no match records — use "all" or "top_n"',
+        );
+      }
+      if (
+        (dto.advanceType === 'top_n' || dto.advanceType === 'top_or_record') &&
+        (dto.advanceCount == null || dto.advanceCount < 1)
+      ) {
+        throw new BadRequestException(
+          `advanceType "${dto.advanceType}" needs an advanceCount of at least 1`,
+        );
+      }
+    }
+    if (dto.format === 'swiss' && dto.rounds != null && dto.rounds < 1) {
+      throw new BadRequestException('A swiss phase needs at least one round');
+    }
     return {
       tournamentId,
       phaseOrder: order,

@@ -134,6 +134,24 @@ export class CreateTournamentDto {
   @IsBoolean()
   checkInOpen?: boolean;
 
+  @ApiPropertyOptional({
+    description:
+      'Entry requires a submitted teamsheet as well as check-in (VGC). Set explicitly — it is NOT derived from the game, whose title is free text.',
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  teamsheetRequired?: boolean;
+
+  @ApiPropertyOptional({
+    description:
+      'When the field is frozen: everyone who has not entered by then is dropped and teamsheets lock. Omit to resolve on generate only.',
+  })
+  @IsOptional()
+  @Type(() => Date)
+  @IsDate()
+  entryDeadline?: Date;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()

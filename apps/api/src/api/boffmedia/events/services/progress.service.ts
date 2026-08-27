@@ -64,8 +64,11 @@ export class ProgressService {
       );
     const wasCompleted = existing?.isCompleted === true;
 
-    // 3. Update progress
-    const isCompleted = progress >= achievement.maxProgress;
+    // 3. Update progress. Clamped: the DTO only bounds progress at >= 0, so a
+    //    mistyped 999 on a 5-step achievement would otherwise be stored as-is
+    //    and read back as a nonsensical "999/5" everywhere it is displayed.
+    const clamped = Math.min(progress, achievement.maxProgress);
+    const isCompleted = clamped >= achievement.maxProgress;
     const completedAt = isCompleted ? new Date() : null;
 
     await this.db
@@ -73,14 +76,14 @@ export class ProgressService {
       .values({
         participantId,
         achievementId,
-        currentProgress: progress,
+        currentProgress: clamped,
         isCompleted,
         completedAt,
         lastUpdated: new Date(),
         createdAt: new Date(),
       } as ParticipantProgress)
       .onDuplicateKeyUpdate({
-        currentProgress: progress,
+        currentProgress: clamped,
         isCompleted,
         completedAt,
         lastUpdated: new Date(),

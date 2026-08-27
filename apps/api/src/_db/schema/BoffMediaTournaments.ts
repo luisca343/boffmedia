@@ -46,6 +46,14 @@ export const TOURNAMENT_PARTICIPANT_STATUS = {
   ELIMINATED: 'eliminated',
   WITHDREW: 'withdrew',
   DISQUALIFIED: 'disqualified',
+  /**
+   * Registered but never entered: they missed check-in (and, on a
+   * teamsheet-required tournament, never submitted a team) by the time the
+   * field was resolved. Distinct from `withdrew`, which is the player's own
+   * decision — an admin re-admits a `dropped` entrant before generate.
+   * Appended last on purpose: MySQL stores ENUM by ordinal position.
+   */
+  DROPPED: 'dropped',
 } as const;
 
 export const MATCH_BRACKET = {
@@ -177,6 +185,23 @@ export const boffMediaTournaments = mysqlTable(
     // Manual check-in window: admin opens it; only checked-in entrants can be
     // kept at generate time (GenerateBracketDto.onlyCheckedIn).
     checkInOpen: boolean('check_in_open').notNull().default(false),
+    /**
+     * Entry requires a submitted teamsheet as well as check-in (VGC). Set by
+     * the admin, NOT derived from the game: `boffmedia_games.title` is free
+     * text and there is no regulation column to read.
+     */
+    teamsheetRequired: boolean('teamsheet_required').notNull().default(false),
+    /**
+     * When the field is resolved: everyone who has not entered by then is
+     * dropped and teamsheets lock. Null → resolution happens on generate only.
+     */
+    entryDeadline: timestamp('entry_deadline'),
+    /**
+     * Set when the field was resolved. Non-null means teamsheets are frozen —
+     * an open-teamsheet format shows the opponent your list, so it must not
+     * change after pairings exist.
+     */
+    teamsheetLockedAt: timestamp('teamsheet_locked_at'),
     banner: varchar('banner', { length: 255 }),
     icon: varchar('icon', { length: 255 }),
     hue: int('hue'),
@@ -275,6 +300,7 @@ export const boffMediaTournamentParticipants = mysqlTable(
       TOURNAMENT_PARTICIPANT_STATUS.ELIMINATED,
       TOURNAMENT_PARTICIPANT_STATUS.WITHDREW,
       TOURNAMENT_PARTICIPANT_STATUS.DISQUALIFIED,
+      TOURNAMENT_PARTICIPANT_STATUS.DROPPED,
     ])
       .notNull()
       .default(TOURNAMENT_PARTICIPANT_STATUS.ACTIVE),
@@ -404,7 +430,13 @@ export const boffMediaTournamentPhases = mysqlTable(
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },
   (t) => ({
-    tournamentIdx: index('tph_tournament_idx').on(t.tournamentId, t.phaseOrder),
+    // UNIQUE, not a plain index: advancement finds the next phase by
+    // `phaseOrder + 1` and bracket generation by the minimum order, so two
+    // phases sharing an order make "which phase is next" ambiguous.
+    tournamentIdx: uniqueIndex('tph_tournament_order_uq').on(
+      t.tournamentId,
+      t.phaseOrder,
+    ),
     tournamentFk: foreignKey({
       columns: [t.tournamentId],
       foreignColumns: [boffMediaTournaments.id],
@@ -435,6 +467,9 @@ export const boffMediaTournamentPhaseEntrants = mysqlTable(
       t.phaseId,
       t.participantId,
     ),
+    // Seeds are 1..N within a phase and drive every pairing algorithm; a
+    // duplicate silently produces a wrong bracket rather than an error.
+    seedUnique: uniqueIndex('tpe_phase_seed_uq').on(t.phaseId, t.seed),
     phaseFk: foreignKey({
       columns: [t.phaseId],
       foreignColumns: [boffMediaTournamentPhases.id],
@@ -530,6 +565,9 @@ export const boffMediaTournamentMatches = mysqlTable(
     ),
     groupIdx: index('tm_group_idx').on(t.groupId),
     nextIdx: index('tm_next_idx').on(t.nextMatchId),
+    // The expired-proposal sweep filters exactly these two columns; without
+    // this it scans every match of the tournament on each generate/advance.
+    proposalIdx: index('tm_proposal_idx').on(t.tournamentId, t.proposalState),
     tournamentFk: foreignKey({
       columns: [t.tournamentId],
       foreignColumns: [boffMediaTournaments.id],

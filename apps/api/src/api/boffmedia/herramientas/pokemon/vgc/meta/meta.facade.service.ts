@@ -27,10 +27,7 @@ import { PersonalMetaAnalyticsService } from './services/personal-meta-analytics
 import { DivergenceService } from './services/divergence.service';
 import { QueryPersonalMetaDto } from './dto/query-personal-meta.dto';
 import { QueryDivergenceDto } from './dto/query-divergence.dto';
-import {
-  initChampionsMod,
-  listChampionsFormatIds,
-} from '../champions.mod';
+import { initChampionsMod, listChampionsFormatIds } from '../champions.mod';
 
 @Injectable()
 export class VgcMetaFacadeService {
@@ -355,7 +352,9 @@ export class VgcMetaFacadeService {
       formatId,
       name: dto.name,
       // The sim is the authority on game type; the DTO value is only a hint.
-      gameType: format.exists ? (format.gameType ?? dto.gameType) : dto.gameType,
+      gameType: format.exists
+        ? (format.gameType ?? dto.gameType)
+        : dto.gameType,
       vgcPastesGid: dto.vgcPastesGid,
       active: dto.active,
     });

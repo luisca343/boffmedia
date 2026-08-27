@@ -5,6 +5,23 @@ import { ApiProperty } from '@nestjs/swagger';
  * tables that already key on `event_id` — never stored on the event row, so it
  * cannot drift from the thing it describes.
  */
+/** Just enough of the composed tournament to link to it from the event page. */
+export class EventTournamentSummary {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  slug: string;
+
+  @ApiProperty()
+  name: string;
+
+  @ApiProperty({
+    enum: ['draft', 'registration', 'live', 'completed', 'cancelled'],
+  })
+  status: string;
+}
+
 export class EventModules {
   @ApiProperty({
     // Explicit `type`, same reason as `Event.packId`: swagger cannot infer a
@@ -18,6 +35,15 @@ export class EventModules {
     nullable: true,
   })
   randomizer: 'open' | 'closed' | 'published' | null;
+
+  @ApiProperty({
+    type: EventTournamentSummary,
+    required: false,
+    nullable: true,
+    description:
+      'The tournament composed into this event, or null. Derived from tournaments.event_id — the same satellite-table rule as the randomizer, so it cannot drift from the thing it describes.',
+  })
+  tournament: EventTournamentSummary | null;
 }
 
 export class Event {

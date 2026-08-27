@@ -29,6 +29,7 @@ describe('EventsFacadeService', () => {
       | 'updateEvent'
       | 'deleteEvent'
       | 'validateEventExists'
+      | 'getModules'
       | 'validateEventVisible'
     >
   >;
@@ -102,6 +103,9 @@ describe('EventsFacadeService', () => {
       updateEvent: jest.fn(),
       deleteEvent: jest.fn(),
       validateEventExists: jest.fn(),
+      getModules: jest
+        .fn()
+        .mockResolvedValue({ randomizer: null, tournament: null }),
       validateEventVisible: jest.fn(),
       // Private-event filtering helper the facade calls for row-level lists;
       // default to "nothing hidden" so plain list assertions stay simple.
@@ -280,11 +284,28 @@ describe('EventsFacadeService', () => {
   describe('deleteEvent', () => {
     it('should delete an event when it exists', async () => {
       eventsService.validateEventExists.mockResolvedValue(true);
+      eventsService.getModules.mockResolvedValue({
+        randomizer: null,
+        tournament: null,
+      });
       eventsService.deleteEvent.mockResolvedValue(undefined);
 
       await service.deleteEvent(1);
 
       expect(eventsService.deleteEvent).toHaveBeenCalledWith(1);
+    });
+
+    it('refuses while a tournament is composed into the event', async () => {
+      // Soft-delete does not fire the FK, so the tournament would survive its
+      // event and keep running with its access rules gone.
+      eventsService.validateEventExists.mockResolvedValue(true);
+      eventsService.getModules.mockResolvedValue({
+        randomizer: null,
+        tournament: { id: 7, slug: 'copa', name: 'Copa', status: 'live' },
+      });
+
+      await expect(service.deleteEvent(1)).rejects.toThrow('Copa');
+      expect(eventsService.deleteEvent).not.toHaveBeenCalled();
     });
 
     it('should throw if event not found', async () => {
@@ -443,7 +464,9 @@ describe('EventsFacadeService', () => {
   describe('updateAchievement', () => {
     it('should update achievement when both event and achievement exist', async () => {
       eventsService.validateEventExists.mockResolvedValue(true);
-      achievementsService.validateAchievementExists.mockResolvedValue(true);
+      achievementsService.getAchievementById.mockResolvedValue(
+        mockAchievement as any,
+      );
       achievementsService.updateAchievement.mockResolvedValue(
         mockAchievement as any,
       );
@@ -453,6 +476,19 @@ describe('EventsFacadeService', () => {
       } as any);
 
       expect(result).toEqual(mockAchievement);
+    });
+
+    it('refuses an achievement that belongs to another event', async () => {
+      eventsService.validateEventExists.mockResolvedValue(true);
+      // Achievement 1 lives on event 1; the route addresses event 2.
+      achievementsService.getAchievementById.mockResolvedValue(
+        mockAchievement as any,
+      );
+
+      await expect(
+        service.updateAchievement(2, 1, { name: 'Updated' } as any),
+      ).rejects.toThrow('Achievement not found');
+      expect(achievementsService.updateAchievement).not.toHaveBeenCalled();
     });
 
     it('should throw if event not found', async () => {

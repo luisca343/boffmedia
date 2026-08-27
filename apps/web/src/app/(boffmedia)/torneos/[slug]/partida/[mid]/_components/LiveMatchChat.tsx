@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useVisiblePoll } from "@/hooks/useVisiblePoll"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Button, toast } from "@boffmedia/ui"
@@ -19,25 +20,33 @@ export function LiveMatchChat({
   const { session } = useBoffSession()
   const meUserId = session?.user?.id ? Number(session.user.id) : null
   const [msgs, setMsgs] = React.useState<TnMatchMessageApi[]>([])
+  const [loadError, setLoadError] = React.useState(false)
   const [input, setInput] = React.useState("")
   const bodyRef = React.useRef<HTMLDivElement>(null)
   const lastId = msgs.length ? msgs[msgs.length - 1].id : 0
 
   const load = React.useCallback(async () => {
     const r = await TournamentsService.getMessages(detail.tournamentId, detail.id, 0)
-    if (r.data) setMsgs(r.data)
+    // An empty chat and a chat that failed to load look identical, so a lost
+    // session used to read as "nobody has said anything".
+    if (r.success && r.data) {
+      setMsgs(r.data)
+      setLoadError(false)
+    } else {
+      setLoadError(true)
+    }
   }, [detail.tournamentId, detail.id])
   React.useEffect(() => {
     load()
   }, [load])
 
-  React.useEffect(() => {
-    const id = setInterval(async () => {
+  useVisiblePoll(
+    React.useCallback(async () => {
       const r = await TournamentsService.getMessages(detail.tournamentId, detail.id, lastId)
       if (r.data?.length) setMsgs((cur) => [...cur, ...r.data!.filter((m) => !cur.some((c) => c.id === m.id))])
-    }, 8000)
-    return () => clearInterval(id)
-  }, [detail.tournamentId, detail.id, lastId])
+    }, [detail.tournamentId, detail.id, lastId]),
+    8000
+  )
 
   React.useEffect(() => {
     const el = bodyRef.current
@@ -78,7 +87,9 @@ export function LiveMatchChat({
       </div>
       <div ref={bodyRef} className="flex h-[320px] flex-col gap-2.5 overflow-y-auto bg-base p-4">
         {msgs.length === 0 && (
-          <p className="m-auto font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">{t("empty")}</p>
+          <p className="m-auto font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+            {loadError ? t("loadFailed") : t("empty")}
+          </p>
         )}
         {msgs.map((m) => {
           if (m.kind === "sys")

@@ -1,5 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
+  IsBoolean,
   IsDateString,
   IsEnum,
   IsInt,
@@ -15,6 +16,15 @@ export class SetEventStatusDto {
   @ApiProperty({ enum: ['upcoming', 'active', 'completed'] })
   @IsEnum(['upcoming', 'active', 'completed'])
   status: 'upcoming' | 'active' | 'completed';
+
+  @ApiPropertyOptional({
+    description:
+      'Required to move the lifecycle backwards (e.g. completed → active). Audited, and refused while the event has a non-draft randomizer config — reopening would re-arm seed minting against published settings.',
+    default: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  reopen?: boolean;
 }
 
 export class SetParticipantStatusDto {

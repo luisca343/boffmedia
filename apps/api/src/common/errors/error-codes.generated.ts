@@ -22,6 +22,9 @@ export const ApiErrorCode = {
   CHAT_MESSAGE_NOT_EDITABLE: 'CHAT_MESSAGE_NOT_EDITABLE',
   CHAT_NOT_FOUND: 'CHAT_NOT_FOUND',
   CHAT_NOT_MEMBER: 'CHAT_NOT_MEMBER',
+  EVENT_LIFECYCLE_FORWARD_ONLY: 'EVENT_LIFECYCLE_FORWARD_ONLY',
+  EVENT_REOPEN_BLOCKED_BY_RANDOMIZER: 'EVENT_REOPEN_BLOCKED_BY_RANDOMIZER',
+  MATCH_SETTLED_CONCURRENTLY: 'MATCH_SETTLED_CONCURRENTLY',
   SERVICE_DATABASE_UNAVAILABLE: 'SERVICE_DATABASE_UNAVAILABLE',
   TAXI_INSUFFICIENT_FUNDS: 'TAXI_INSUFFICIENT_FUNDS',
   TAXI_IN_DUNGEON_RUN: 'TAXI_IN_DUNGEON_RUN',
@@ -30,6 +33,10 @@ export const ApiErrorCode = {
   TAXI_STOP_NOT_FOUND: 'TAXI_STOP_NOT_FOUND',
   TAXI_UNSAFE_ARRIVAL: 'TAXI_UNSAFE_ARRIVAL',
   TOURNAMENT_CHECKIN_CLOSED: 'TOURNAMENT_CHECKIN_CLOSED',
+  TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED: 'TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED',
+  TOURNAMENT_PARTICIPANT_IN_BRACKET: 'TOURNAMENT_PARTICIPANT_IN_BRACKET',
+  TOURNAMENT_TEAMSHEET_LOCKED: 'TOURNAMENT_TEAMSHEET_LOCKED',
+  TOURNAMENT_TEAMSHEET_REQUIRED: 'TOURNAMENT_TEAMSHEET_REQUIRED',
 } as const;
 
 export type ApiErrorCode = (typeof ApiErrorCode)[keyof typeof ApiErrorCode];
@@ -55,6 +62,12 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   CHAT_MESSAGE_NOT_EDITABLE: 'No puedes editar este mensaje.',
   CHAT_NOT_FOUND: 'No se encontró el chat.',
   CHAT_NOT_MEMBER: 'No formas parte de este chat.',
+  EVENT_LIFECYCLE_FORWARD_ONLY:
+    'El ciclo de vida del evento solo avanza. Marca «reabrir» si de verdad quieres retrocederlo.',
+  EVENT_REOPEN_BLOCKED_BY_RANDOMIZER:
+    'No se puede reabrir: el evento tiene un randomizer que ya no es borrador. Ciérralo o elimínalo antes.',
+  MATCH_SETTLED_CONCURRENTLY:
+    'La partida se resolvió mientras enviabas el resultado. Vuelve a cargarla antes de corregirla.',
   SERVICE_DATABASE_UNAVAILABLE:
     'El servicio no está disponible ahora mismo. Vuelve a intentarlo en unos minutos.',
   TAXI_INSUFFICIENT_FUNDS: 'No tienes saldo suficiente para este viaje.',
@@ -65,4 +78,12 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   TAXI_STOP_NOT_FOUND: 'Esa parada de taxi ya no existe.',
   TAXI_UNSAFE_ARRIVAL: 'No hay un sitio seguro donde dejarte en esa parada.',
   TOURNAMENT_CHECKIN_CLOSED: 'El check-in no está abierto.',
+  TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED:
+    'Este torneo pertenece a un evento: únete al evento antes de inscribirte.',
+  TOURNAMENT_PARTICIPANT_IN_BRACKET:
+    'Ese participante ya está en el cuadro. Cambia su estado a retirado o descalificado en vez de borrarlo.',
+  TOURNAMENT_TEAMSHEET_LOCKED:
+    'Las listas de equipo están bloqueadas: el torneo ya ha empezado.',
+  TOURNAMENT_TEAMSHEET_REQUIRED:
+    'Envía tu lista de equipo antes de hacer check-in.',
 };

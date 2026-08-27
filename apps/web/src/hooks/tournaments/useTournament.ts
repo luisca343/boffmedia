@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useVisiblePoll } from "@/hooks/useVisiblePoll"
 import { useRotomRequest } from "@/hooks/useRotomRequest"
 import { TournamentsService } from "@/services/api/boffmedia/tournamentsService"
 
@@ -16,11 +16,7 @@ export function useTournament(slug: string) {
   )
 
   const live = data?.status === "live"
-  useEffect(() => {
-    if (!live) return
-    const id = setInterval(() => refetch(), 20000)
-    return () => clearInterval(id)
-  }, [live, refetch])
+  useVisiblePoll(refetch, 20000, live)
 
   return {
     tournament: data,

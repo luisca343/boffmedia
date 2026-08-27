@@ -78,8 +78,8 @@ export class EventsService {
   /**
    * Create a new event
    */
-  static createEvent(data: any) {
-    return apiAuthedAutoPOST<any>('/events/event', data);
+  static createEvent(data: CreateEventDto) {
+    return apiAuthedAutoPOST<Event>('/events/event', data);
   }
   
   /**
@@ -227,9 +227,17 @@ export class EventsService {
   /**
    * Set the event's lifecycle status. Owned by the events module — the
    * randomizer now requires an active event rather than activating one.
+   *
+   * `reopen` is required to move the lifecycle backwards (completed → active).
+   * The server audits it and refuses while a non-draft randomizer config is
+   * attached, so the flag is a confirmation, not an override.
    */
-  static setEventStatus(eventId: number, status: 'upcoming' | 'active' | 'completed') {
-    return apiAuthedAutoPOST<Event>(`/events/event/${eventId}/status`, { status });
+  static setEventStatus(
+    eventId: number,
+    status: 'upcoming' | 'active' | 'completed',
+    reopen = false
+  ) {
+    return apiAuthedAutoPOST<Event>(`/events/event/${eventId}/status`, { status, reopen });
   }
 
   // ==================== EVENT INVITATIONS ====================

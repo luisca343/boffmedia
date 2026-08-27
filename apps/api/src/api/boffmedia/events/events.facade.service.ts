@@ -165,6 +165,17 @@ export class EventsFacadeService {
       throw new NotFoundException('Event not found');
     }
 
+    // An event owns its modules' lifecycle, and soft-delete does not fire FK
+    // rules: `tournaments.event_id` is ON DELETE SET NULL, which only reacts to
+    // a hard delete. Without this the tournament stays listed and playable with
+    // its event gone, and its private-event access rules silently evaporate.
+    const { tournament } = await this.eventsService.getModules(id);
+    if (tournament) {
+      throw new ConflictException(
+        `This event has a tournament attached (${tournament.name}). Delete or detach the tournament first.`,
+      );
+    }
+
     return this.eventsService.deleteEvent(id);
   }
 
@@ -298,15 +309,14 @@ export class EventsFacadeService {
     id: number,
     updateAchievementDto: UpdateEventAchievementDto,
   ): Promise<EventAchievement> {
-    const [eventExists, achievementExists] = await Promise.all([
-      this.eventsService.validateEventExists(eventId),
-      this.achievementsService.validateAchievementExists(id),
-    ]);
-
+    const eventExists = await this.eventsService.validateEventExists(eventId);
     if (!eventExists) {
       throw new NotFoundException('Event not found');
     }
-    if (!achievementExists) {
+    // Scoped to the event in the route, same reason as updateProgress: the
+    // path says `/:eventId/achievements/:id` and must mean it.
+    const achievement = await this.achievementsService.getAchievementById(id);
+    if (!achievement || achievement.eventId !== eventId) {
       throw new NotFoundException('Achievement not found');
     }
 
@@ -640,6 +650,19 @@ export class EventsFacadeService {
       });
     }
 
+    // Leaving deletes the participation row, and trophies, progress and the
+    // activity timeline all hang off it. On a finished event that is not "I
+    // withdraw", it is erasing a record the player earned — and, when the event
+    // gated a pack, the entitlement that came with it.
+    const event = await this.eventsService.getEventById(eventId, true);
+    if (event?.status === EVENT_STATUS.COMPLETED) {
+      throw new ForbiddenException({
+        message: 'Event is completed',
+        userMessage:
+          'Este evento ya ha finalizado: tu participación forma parte del historial y no puede borrarse.',
+      });
+    }
+
     await this.participantsService.leaveEvent(
       eventId,
       participation.participantId,
@@ -677,8 +700,13 @@ export class EventsFacadeService {
   async setEventStatus(
     eventId: number,
     status: 'upcoming' | 'active' | 'completed',
+    opts: { reopen?: boolean; actorUserId?: number | null } = {},
   ): Promise<Event> {
-    return this.eventsService.setStatus(eventId, status) as unknown as Event;
+    return this.eventsService.setStatus(
+      eventId,
+      status,
+      opts,
+    ) as unknown as Event;
   }
 
   // ==================== EVENT INVITATIONS ====================
@@ -741,15 +769,24 @@ export class EventsFacadeService {
     }
 
     await this.eventInvitesService.consume(code);
-    // bypassVisibility: the invitation IS the authorisation to join a private
-    // event — that is the entire point of the code. The comment is a marker,
-    // never the code itself; echoing it would leak live invite codes to anyone
-    // who can read the participants list.
-    await this.joinEvent(
-      invite.eventId,
-      { userId, comment: 'invite' },
-      { bypassVisibility: true },
-    );
+    try {
+      // bypassVisibility: the invitation IS the authorisation to join a private
+      // event — that is the entire point of the code. The comment is a marker,
+      // never the code itself; echoing it would leak live invite codes to anyone
+      // who can read the participants list.
+      await this.joinEvent(
+        invite.eventId,
+        { userId, comment: 'invite' },
+        { bypassVisibility: true },
+      );
+    } catch (error) {
+      // The consume and the join live in different repositories, so they cannot
+      // share a transaction. Compensate instead: without this a join that fails
+      // between the two (a race with an admin removal, a database blip) burns a
+      // use with nothing to show for it, and there is no admin "restore use".
+      await this.eventInvitesService.releaseUse(code);
+      throw error;
+    }
     return { eventId: invite.eventId };
   }
 
@@ -802,18 +839,24 @@ export class EventsFacadeService {
     eventId: number,
     updateProgressDto: UpdateProgressDto,
   ): Promise<{ success: boolean }> {
-    const [eventExists, achievementExists] = await Promise.all([
-      this.eventsService.validateEventExists(eventId),
-      this.achievementsService.validateAchievementExists(
-        updateProgressDto.achievementId,
-      ),
-    ]);
-
-    if (!eventExists) {
+    const event = await this.eventsService.getEventById(eventId, true);
+    if (!event) {
       throw new NotFoundException('Event not found');
     }
-    if (!achievementExists) {
+    // The achievement must belong to THIS event. The route promises that
+    // scoping and the participant check below assumes it: without it a wrong id
+    // in the admin UI silently awards points on another event's achievement.
+    const achievement = await this.achievementsService.getAchievementById(
+      updateProgressDto.achievementId,
+    );
+    if (!achievement || achievement.eventId !== eventId) {
       throw new NotFoundException('Achievement not found');
+    }
+    // Final standings stay final: scoring stops when the event closes.
+    if (event.status === EVENT_STATUS.COMPLETED) {
+      throw new ForbiddenException(
+        'This event is completed — its results can no longer change',
+      );
     }
 
     // Validate participant is in the event
