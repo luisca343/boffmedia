@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Competitor } from './competitor.entity';
 import { PhaseView } from './phase.entity';
+import { TeamsheetMonDto } from '../dto/teamsheet.dto';
 import type {
   TournamentFormat,
   CompetitorKind,
@@ -97,7 +98,8 @@ export class TournamentDetail {
 
   @ApiProperty({
     nullable: true,
-    description: 'Set once the field is resolved; teamsheets are frozen after.',
+    description:
+      'Set once the field is resolved (the un-entered are dropped). Not a teamsheet lock: sheets stay editable until the tournament goes live.',
   })
   teamsheetLockedAt: string | null;
 
@@ -164,6 +166,14 @@ export class TournamentDetail {
       "What the signed-in viewer's registration is still missing before it counts as an entry, in the order they fix it. Empty means entered (or not registered at all — check viewerParticipantId). Everyone still short of this when the field is resolved is dropped.",
   })
   viewerEntryGaps: string[];
+
+  @ApiProperty({
+    type: [TeamsheetMonDto],
+    nullable: true,
+    description:
+      "The signed-in viewer's own teamsheet, so they can review and correct it while it is still editable. Null when they have not submitted one, are not registered, or are anonymous. Never carries anyone else's sheet — an opponent's is only revealed on the match page.",
+  })
+  viewerTeamsheet: TeamsheetMonDto[] | null;
 
   @ApiProperty({
     nullable: true,

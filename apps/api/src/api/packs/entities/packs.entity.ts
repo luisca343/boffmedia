@@ -33,6 +33,14 @@ export class DesktopSessionUserEntity {
     description: 'Solo si la cuenta tiene Minecraft vinculado.',
   })
   mcUuid!: string | null;
+
+  @ApiProperty({
+    example: 'https://boffmedia.es/uploads/profiles/42.png?v=1756375200000',
+    nullable: true,
+    description:
+      'URL ABSOLUTA del avatar, o null si la cuenta nunca ha puesto uno (la app dibuja su monograma). Se absolutiza aquí porque la columna guarda rutas relativas además de URLs de Discord/Twitch, y en `tauri://localhost` una ruta relativa no resuelve a nada. El `?v=` es `updated_at`: la caché de iconos del launcher indexa por URL y no caduca, así que sin él un avatar cambiado nunca se refrescaría.',
+  })
+  avatarUrl!: string | null;
 }
 
 export class DevicePollEntity {

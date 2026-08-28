@@ -3,6 +3,7 @@ import {
   TournamentRosterMember,
 } from '@/_db/schema/BoffMediaTournaments';
 import { Competitor, RosterMember } from './entities/competitor.entity';
+import { TeamsheetMonDto } from './dto/teamsheet.dto';
 
 /** ISO alpha-2 country code → regional-indicator flag emoji (null if invalid). */
 export function flagEmoji(country: string | null): string | null {
@@ -40,6 +41,24 @@ export function toCompetitor(
     verified: p.verified,
     roster: roster && roster.length ? roster.map(toRosterMember) : undefined,
   };
+}
+
+/**
+ * Stored teamsheet JSON → mons, or null when the participant has none.
+ *
+ * The column is free-form JSON written by an older writer, so a corrupt row
+ * reads as "no teamsheet" rather than breaking the whole payload it sits in.
+ */
+export function parseTeamsheet(
+  p: TournamentParticipant | undefined | null,
+): TeamsheetMonDto[] | null {
+  if (!p?.teamsheet) return null;
+  try {
+    const mons = JSON.parse(p.teamsheet) as TeamsheetMonDto[];
+    return Array.isArray(mons) && mons.length ? mons : null;
+  } catch {
+    return null;
+  }
 }
 
 /** Slugify a tournament name (ascii, dash-separated, lowercased). */

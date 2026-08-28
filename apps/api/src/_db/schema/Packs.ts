@@ -117,6 +117,14 @@ export const packVersions = mysqlTable(
     // are one decision. Validated by the shared zod schema on write, which is
     // also where the nine cross-field rules live.
     optionalGroups: json('optional_groups').$type<unknown[]>(),
+    // { memoryMib?, jvmArgs? } — the heap and JVM flags this version RECOMMENDS.
+    // Nullable and Minecraft-only (validated by the shared zod schema on write,
+    // which also holds the JVM-argument allowlist).
+    //
+    // A recommendation, not a setting: the launcher seeds a brand-new instance
+    // with it and never re-applies it, so editing this does NOT re-tune anyone
+    // who has already installed the pack.
+    runtime: json('runtime').$type<Record<string, unknown>>(),
     /** Draft versions are invisible to launchers — publishing is a deliberate act. */
     published: boolean('published').notNull().default(false),
     notes: text('notes'),

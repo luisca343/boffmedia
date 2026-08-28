@@ -960,6 +960,25 @@
             ],
             "additionalProperties": false
           }
+        },
+        "runtime": {
+          "type": "object",
+          "properties": {
+            "memoryMib": {
+              "type": "integer",
+              "minimum": 512,
+              "maximum": 65536
+            },
+            "jvmArgs": {
+              "maxItems": 32,
+              "type": "array",
+              "items": {
+                "type": "string",
+                "maxLength": 256
+              }
+            }
+          },
+          "additionalProperties": false
         }
       },
       "required": [

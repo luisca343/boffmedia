@@ -2,7 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
-export type PlayerAppDto = {
+export type PlayerScopeDto = {
     /**
      * Server UUID (automatically added by middleware)
      */
@@ -11,9 +11,5 @@ export type PlayerAppDto = {
      * Target player's Minecraft uuid. Admin-only; defaults to the caller.
      */
     uuid?: string;
-    /**
-     * The id of the app
-     */
-    id: number;
 };
 

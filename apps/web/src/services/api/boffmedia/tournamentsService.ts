@@ -90,6 +90,8 @@ export interface TnMatchDetailApi extends TnMatchApi {
   proposal: TnMatchProposalApi | null
   judgeRequestedAt: string | null
   opponentTeamsheet: TnMonApi[] | null
+  /** The viewer's own sheet, already frozen by the time a match exists. */
+  viewerTeamsheet: TnMonApi[] | null
   champion: TnCompetitorApi | null
 }
 
@@ -284,6 +286,8 @@ export interface TournamentDetailApi {
    * resolved is dropped rather than seeded.
    */
   viewerEntryGaps: TnEntryGap[]
+  /** The viewer's own teamsheet, editable until the field resolves. */
+  viewerTeamsheet: TnMonApi[] | null
   myMatchId: number | null
   podium: TnCompetitorApi[]
   activePhaseId: number | null

@@ -18,7 +18,7 @@ import {
 } from '../standings.util';
 import { effectiveBestOf } from '../match-report.util';
 import { EntryService } from './entry.service';
-import { toCompetitor } from '../tournaments.mapper';
+import { parseTeamsheet, toCompetitor } from '../tournaments.mapper';
 import { Competitor } from '../entities/competitor.entity';
 import { MatchView } from '../entities/match.entity';
 import {
@@ -189,6 +189,7 @@ export class StandingsService {
       viewerEntryGaps: viewerParticipant
         ? this.entry.gapsFor(t, viewerParticipant)
         : [],
+      viewerTeamsheet: parseTeamsheet(viewerParticipant),
       myMatchId: myMatch?.id ?? null,
       podium: this.buildPodium(t, phases, participants, matches, cmap),
       activePhaseId,

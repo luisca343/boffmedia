@@ -4,6 +4,7 @@
 /* eslint-disable */
 import type { Competitor } from './Competitor';
 import type { PhaseView } from './PhaseView';
+import type { TeamsheetMonDto } from './TeamsheetMonDto';
 import type { TournamentEventContext } from './TournamentEventContext';
 export type TournamentDetail = {
     id: number;
@@ -30,7 +31,7 @@ export type TournamentDetail = {
      */
     entryDeadline: Record<string, any> | null;
     /**
-     * Set once the field is resolved; teamsheets are frozen after.
+     * Set once the field is resolved (the un-entered are dropped). Not a teamsheet lock: sheets stay editable until the tournament goes live.
      */
     teamsheetLockedAt: Record<string, any> | null;
     description: Record<string, any> | null;
@@ -65,6 +66,10 @@ export type TournamentDetail = {
      * What the signed-in viewer's registration is still missing before it counts as an entry, in the order they fix it. Empty means entered (or not registered at all — check viewerParticipantId). Everyone still short of this when the field is resolved is dropped.
      */
     viewerEntryGaps: Array<'teamsheet' | 'check-in'>;
+    /**
+     * The signed-in viewer's own teamsheet, so they can review and correct it while it is still editable. Null when they have not submitted one, are not registered, or are anonymous. Never carries anyone else's sheet — an opponent's is only revealed on the match page.
+     */
+    viewerTeamsheet: Array<TeamsheetMonDto> | null;
     /**
      * The caller's currently playable (ready/live) match id — the 'Tu partida' banner.
      */

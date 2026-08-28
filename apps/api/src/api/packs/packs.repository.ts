@@ -75,6 +75,25 @@ export class PacksRepository {
     return row ? row.v : null;
   }
 
+  /** The raw `profile_picture` column plus the row's `updated_at`, which is what
+   *  `desktopAvatarUrl` stamps onto the URL so the launcher's never-expiring icon cache
+   *  refetches after a change. Kept raw on purpose: building the URL is that
+   *  helper's job, and a repository that reached for the environment would be
+   *  untestable without it. */
+  async getAvatarSource(
+    userId: number,
+  ): Promise<{ picture: string | null; updatedAt: Date | null }> {
+    const [row] = await this.db
+      .select({
+        picture: boffMediaUsers.profilePicture,
+        updatedAt: boffMediaUsers.updatedAt,
+      })
+      .from(boffMediaUsers)
+      .where(eq(boffMediaUsers.id, userId))
+      .limit(1);
+    return { picture: row?.picture ?? null, updatedAt: row?.updatedAt ?? null };
+  }
+
   async incrementLauncherTokenVersion(userId: number): Promise<void> {
     await this.db
       .update(boffMediaUsers)
@@ -327,6 +346,12 @@ export class PacksRepository {
       hydrated.optionalGroups = JSON.parse(
         hydrated.optionalGroups,
       ) as unknown[];
+    }
+    if (typeof hydrated.runtime === 'string') {
+      hydrated.runtime = JSON.parse(hydrated.runtime) as Record<
+        string,
+        unknown
+      >;
     }
     return hydrated;
   }

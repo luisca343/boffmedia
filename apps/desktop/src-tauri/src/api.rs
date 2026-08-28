@@ -152,6 +152,13 @@ pub struct BoffAccount {
     pub username: String,
     #[serde(default)]
     pub mc_uuid: Option<String>,
+    /// Absolute URL of the website avatar, already resolved by the API — a
+    /// relative path would resolve against `tauri://localhost` and fetch
+    /// nothing. None when the account has never set one, which is the signal
+    /// for the renderer to draw its monogram instead of a shared silhouette.
+    /// `default` so a response from an API older than this field still parses.
+    #[serde(default)]
+    pub avatar_url: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -175,6 +182,8 @@ pub struct BoffAccountEntry {
     #[serde(default)]
     pub mc_uuid: Option<String>,
     #[serde(default)]
+    pub avatar_url: Option<String>,
+    #[serde(default)]
     pub active: bool,
 }
 
@@ -195,6 +204,12 @@ struct BoffRosterEntry {
     username: String,
     #[serde(default)]
     mc_uuid: Option<String>,
+    /// Cached so the switcher can draw a face for an account with no live
+    /// session, and offline. `default` because rosters written before avatars
+    /// existed have no such field and must still parse — losing the whole
+    /// roster over a cosmetic would sign every account out.
+    #[serde(default)]
+    avatar_url: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
@@ -243,11 +258,18 @@ fn upsert_active_boff(roster: &mut BoffRoster, account: &BoffAccount) {
         Some(existing) => {
             existing.username = account.username.clone();
             existing.mc_uuid = account.mc_uuid.clone();
+            // A None incoming avatar DOES clear the cached one, unlike the
+            // Minecraft roster's skin. Here None is a real answer from `/me`
+            // meaning "this account has no avatar", not "we failed to learn
+            // one" — so keeping a stale face would outlive the player
+            // deleting theirs.
+            existing.avatar_url = account.avatar_url.clone();
         }
         None => roster.accounts.push(BoffRosterEntry {
             id: account.id,
             username: account.username.clone(),
             mc_uuid: account.mc_uuid.clone(),
+            avatar_url: account.avatar_url.clone(),
         }),
     }
     roster.active = Some(account.id);
@@ -733,6 +755,7 @@ pub async fn boff_accounts(app: tauri::AppHandle) -> Result<Vec<BoffAccountEntry
             id: a.id,
             username: a.username.clone(),
             mc_uuid: a.mc_uuid.clone(),
+            avatar_url: a.avatar_url.clone(),
             active: roster.active == Some(a.id),
         })
         .collect())
@@ -897,6 +920,7 @@ pub async fn boff_offline(
         id: entry.id,
         username: entry.username.clone(),
         mc_uuid: entry.mc_uuid.clone(),
+        avatar_url: entry.avatar_url.clone(),
     })
 }
 
@@ -1511,6 +1535,48 @@ mod tests {
     // BOFF_API_URL is process-global; two tests mutating it in parallel race and
     // one reads the other's value. Serialise every env-touching test on this lock.
     static ENV_LOCK: Mutex<()> = Mutex::new(());
+
+    fn boff(id: i64, username: &str, avatar: Option<&str>) -> BoffAccount {
+        BoffAccount {
+            id,
+            username: username.into(),
+            mc_uuid: None,
+            avatar_url: avatar.map(str::to_string),
+        }
+    }
+
+    #[test]
+    fn a_roster_written_before_avatars_still_parses() {
+        // A real boff_accounts.json from an older build. If this stops
+        // deserialising, every Boffmedia account on that machine disappears
+        // behind the sign-in screen over a cosmetic field.
+        let raw = br#"{"active":1,"accounts":[{"id":1,"username":"Trainer"}]}"#;
+        let roster: BoffRoster = serde_json::from_slice(raw).expect("legacy roster must parse");
+        assert_eq!(roster.accounts.len(), 1);
+        assert!(roster.accounts[0].avatar_url.is_none());
+    }
+
+    #[test]
+    fn an_upsert_caches_the_avatar_for_the_switcher() {
+        let mut roster = BoffRoster::default();
+        upsert_active_boff(&mut roster, &boff(1, "Trainer", Some("https://a.test/1.png")));
+        assert_eq!(
+            roster.accounts[0].avatar_url.as_deref(),
+            Some("https://a.test/1.png")
+        );
+    }
+
+    #[test]
+    fn a_removed_avatar_clears_the_cached_one() {
+        // Unlike the Minecraft roster's skin, None here is `/me` ANSWERING
+        // "this account has no avatar" — so a stale face must not outlive the
+        // player deleting theirs.
+        let mut roster = BoffRoster::default();
+        upsert_active_boff(&mut roster, &boff(1, "Trainer", Some("https://a.test/1.png")));
+        upsert_active_boff(&mut roster, &boff(1, "Trainer", None));
+        assert!(roster.accounts[0].avatar_url.is_none());
+        assert_eq!(roster.accounts.len(), 1, "an upsert must not duplicate");
+    }
 
     #[test]
     fn base_url_has_no_trailing_slash() {

@@ -289,6 +289,22 @@ export class CreatePackVersionDto {
   @IsOptional()
   @IsArray()
   optionalGroups?: unknown[];
+
+  @ApiPropertyOptional({
+    description:
+      'PackRuntime — { memoryMib?, jvmArgs? }: la memoria y los parámetros de JVM que ' +
+      'esta versión RECOMIENDA. Solo Minecraft. Cada parámetro se valida contra la lista ' +
+      'permitida de @boffmedia/pack-schema: se rechazan -Xmx (usa memoryMib; el valor ' +
+      'resuelto se añade el último y ganaría) y todo lo que pueda ejecutar un comando o ' +
+      'cargar código sin verificar (-javaagent, -XX:OnError, …). ' +
+      'Es una recomendación: el lanzador la usa para inicializar una instancia nueva y no ' +
+      'la vuelve a aplicar, así que editarla no re-configura a quien ya tiene el pack.',
+    type: 'object',
+    additionalProperties: true,
+  })
+  @IsOptional()
+  @IsObject()
+  runtime?: Record<string, unknown>;
 }
 
 /** Grant to an account. The normal path — a pack is a Boffmedia entitlement. */

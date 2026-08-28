@@ -196,6 +196,9 @@ export const MOCK_SETTINGS: Settings = {
   packLayout: "card",
   backupBeforeUpdate: true,
   uiScale: 1,
+  // Non-empty in the browser mock so `dev:renderer` exercises the inherit path
+  // and the flag chips actually render without a desktop build.
+  jvmArgs: ["-XX:+UseG1GC"],
 }
 
 /** Browser-mode library. The desktop equivalent is `loadPackEntries`, which

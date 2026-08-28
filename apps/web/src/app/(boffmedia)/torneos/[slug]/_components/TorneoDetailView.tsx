@@ -4,7 +4,7 @@ import Link from "next/link"
 import { use, useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Field, Input, Modal, toast, Icon, Spinner } from "@boffmedia/ui"
+import { Badge, Button, Field, Input, Modal, toast, Icon, Spinner } from "@boffmedia/ui"
 import { TnFormatBadge, TnEntrant, TnPodium } from "@/components/boffmedia/ui/tournaments"
 import { useTournament } from "@/hooks/tournaments/useTournament"
 import { useFormat } from "@boffmedia/ui/useFormat"
@@ -14,6 +14,7 @@ import {
 } from "@/services/api/boffmedia/tournamentsService"
 import { TorneoView } from "../../_components/TorneoView"
 import { RegisterButton } from "../../_components/RegisterButton"
+import { TeamsheetButton, TeamsheetViewButton } from "../../_components/TeamsheetEditor"
 import * as A from "../../_lib/adapt"
 
 const STATUS_TONE: Record<string, string> = {
@@ -122,7 +123,7 @@ export function TorneoDetailView({
       </header>
 
       <EventGate detail={tn} />
-      <EntryChecklist detail={tn} />
+      <EntryChecklist detail={tn} onChange={refetch} />
       <MyMatchBanner detail={tn} />
 
       {tn.rules && <FoldBlock title={t("detail.rulesTitle")} body={tn.rules} />}
@@ -169,10 +170,24 @@ function EventGate({ detail }: { detail: TournamentDetailApi }) {
  * built from. The server sends exactly what is still missing, so this is a
  * checklist rather than a second implementation of the rule.
  */
-function EntryChecklist({ detail }: { detail: TournamentDetailApi }) {
+function EntryChecklist({
+  detail,
+  onChange,
+}: {
+  detail: TournamentDetailApi
+  onChange: () => void
+}) {
   const t = useTranslations("torneos.entry")
   if (detail.viewerParticipantId == null) return null
   if (detail.status !== "draft" && detail.status !== "registration") return null
+
+  // Resolution can happen at an entry deadline, well before the start: from
+  // then on this player is out of the field but can still fix what they were
+  // missing, so say so instead of showing the ordinary pending copy.
+  const me = detail.participants.find(
+    (p) => p.id === detail.viewerParticipantId,
+  )
+  const droppedOut = me?.status === "dropped"
 
   const gaps = detail.viewerEntryGaps ?? []
   const steps: { key: string; done: boolean }[] = [
@@ -182,53 +197,75 @@ function EntryChecklist({ detail }: { detail: TournamentDetailApi }) {
       : []),
     { key: "checkin", done: !gaps.includes("check-in") },
   ]
-  const entered = gaps.length === 0
+  const entered = gaps.length === 0 && !droppedOut
 
   return (
     <div
       className={cn(
         "cut-seal cut-seal-edge [--cut:8px] mb-6 border border-solid px-4 py-3",
-        entered
-          ? "[--cut-line:var(--good)] border-good bg-good-soft"
+        droppedOut
+          ? "[--cut-line:var(--bad)] border-bad bg-bad-soft"
+          : entered
+          ? "[--cut-line:var(--ok)] border-ok bg-ok-soft"
           : "[--cut-line:var(--accent-line)] border-accent-line bg-accent-soft",
       )}
     >
       <div className="mb-2 flex items-center gap-2">
         <Icon
-          name={entered ? "check" : "clock"}
+          name={droppedOut ? "alert" : entered ? "check" : "clock"}
           size={16}
-          className={cn("flex-none", entered ? "text-good" : "text-accent-bright")}
+          className={cn(
+            "flex-none",
+            droppedOut ? "text-bad" : entered ? "text-ok" : "text-accent-bright",
+          )}
         />
         <span className="font-body text-[14px] font-semibold text-txt">
-          {entered ? t("enteredTitle") : t("pendingTitle")}
+          {droppedOut
+            ? t("droppedTitle")
+            : entered
+              ? t("enteredTitle")
+              : t("pendingTitle")}
         </span>
       </div>
-      <ul className="flex flex-wrap gap-x-5 gap-y-1">
+      {/* Done in green, everything else neutral: green is the only colour in
+          the row, so what is left to do reads without parsing the labels. */}
+      <ul className="flex flex-wrap gap-2">
         {steps.map((s) => (
-          <li
-            key={s.key}
-            className={cn(
-              "flex items-center gap-1.5 font-mono text-[11px] uppercase tracking-[0.06em]",
-              s.done ? "text-txt-muted" : "text-txt",
-            )}
-          >
-            <Icon
-              name={s.done ? "check" : "minus"}
-              size={12}
-              className={s.done ? "text-good" : "text-txt-dim"}
-            />
-            {t(`step.${s.key}`)}
+          <li key={s.key}>
+            <Badge
+              tone={s.done ? "ok" : "default"}
+              className="inline-flex items-center gap-1.5"
+            >
+              <Icon
+                name={s.done ? "check" : "minus"}
+                size={11}
+                className="flex-none"
+              />
+              {t(`step.${s.key}`)}
+            </Badge>
           </li>
         ))}
       </ul>
       {!entered && (
         <p className="mt-2 font-body text-[12.5px] leading-[1.45] text-txt-muted">
-          {detail.entryDeadline
-            ? t("pendingLeadDeadline", {
-                date: new Date(detail.entryDeadline).toLocaleString(),
-              })
-            : t("pendingLead")}
+          {droppedOut
+            ? t("droppedLead")
+            : detail.entryDeadline
+              ? t("pendingLeadDeadline", {
+                  date: new Date(detail.entryDeadline).toLocaleString(),
+                })
+              : t("pendingLead")}
         </p>
+      )}
+      {detail.teamsheetRequired && (
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-solid border-line pt-3">
+          <TeamsheetButton
+            tournamentId={detail.id}
+            sheet={detail.viewerTeamsheet}
+            onSaved={onChange}
+          />
+          <TeamsheetViewButton sheet={detail.viewerTeamsheet} />
+        </div>
       )}
     </div>
   )

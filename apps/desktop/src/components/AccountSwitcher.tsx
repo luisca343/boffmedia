@@ -4,6 +4,7 @@ import { createPortal } from "react-dom"
 import { Icon, Spinner } from "@boffmedia/ui"
 
 import { useT } from "../i18n"
+import { useCachedImage } from "./useCachedImage"
 import { useApp } from "../state/app"
 
 // The account avatar button at the foot of the rail, and the switcher flyout it
@@ -15,11 +16,48 @@ import { useApp } from "../state/app"
 // The panel is portaled to document.body because the rail scrolls, and an
 // in-tree absolute-positioned panel would be clipped by the overflow.
 
-/** A monogram avatar. `/packs/launcher/me` returns no avatar URL, so the
- *  Boffmedia identity is drawn as the first letter of the username rather than
- *  a Minecraft head — which would be the wrong identity entirely. */
-function BoffAvatar({ username, size = 32 }: { username: string; size?: number }) {
+/** The Boffmedia identity's face — the website avatar when the account has one,
+ *  and a monogram of the first letter otherwise. Never a Minecraft head, which
+ *  would be the wrong identity entirely.
+ *
+ *  The bytes come through `useCachedImage`, not straight into <img>: the avatar
+ *  is served from our own asset origin, which this project configures as an
+ *  `http://` URL, and the webview's `img-src 'self' data: https:` blocks that
+ *  outright. See that hook for why the cache is consulted FIRST here and last
+ *  in CatalogIcon.
+ *
+ *  The monogram is not merely a placeholder for a missing image: `avatarUrl` is
+ *  null precisely when the account still has the SHIPPED DEFAULT picture, and
+ *  three accounts drawn as the same silhouette are three rows the player cannot
+ *  tell apart. A letter distinguishes them. It also stands in for the moment
+ *  before the cache answers, which is a disk read once the avatar has been seen
+ *  on this machine. */
+export function BoffAvatar({
+  username,
+  avatarUrl,
+  size = 32,
+}: {
+  username: string
+  avatarUrl?: string | null
+  size?: number
+}) {
+  const { src, failed, onError } = useCachedImage(avatarUrl)
   const letter = (username.trim()[0] ?? "?").toUpperCase()
+
+  if (src && !failed) {
+    return (
+      <img
+        src={src}
+        alt=""
+        width={size}
+        height={size}
+        onError={onError}
+        className="cut-seal shrink-0 bg-panel-2 object-cover"
+        style={{ width: size, height: size }}
+      />
+    )
+  }
+
   return (
     <span
       className="cut-seal grid shrink-0 place-items-center bg-accent font-display font-bold text-accent-ink"
@@ -108,14 +146,29 @@ export function AccountSwitcher() {
         aria-expanded={open}
         aria-haspopup="menu"
         title={boffAccount.username}
-        className="flex h-10 w-10 items-center justify-center shrink-0 rounded transition-colors hover:bg-surface-bright"
+        className="relative flex h-10 w-10 items-center justify-center shrink-0 rounded transition-colors hover:bg-surface-bright"
       >
         {switchingBoffAccount ? (
           <span className="cut-seal grid h-8 w-8 place-items-center bg-accent text-accent-ink">
             <Spinner size={14} />
           </span>
         ) : (
-          <BoffAvatar username={boffAccount.username} size={32} />
+          <>
+            <BoffAvatar
+              username={boffAccount.username}
+              avatarUrl={boffAccount.avatarUrl}
+              size={32}
+            />
+            {/* Matches the Minecraft chip above it: at 32px an avatar alone
+                does not say "menu", and these two are the rail's only
+                controls that open one. */}
+            <span
+              className="pointer-events-none absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-panel-2 text-txt-dim"
+              aria-hidden
+            >
+              <Icon name="chevronRight" size={9} />
+            </span>
+          </>
         )}
       </button>
 
@@ -134,7 +187,7 @@ export function AccountSwitcher() {
             <ul className="flex flex-col">
               {/* Current account header */}
               <li className="flex items-center gap-2 px-3 py-2 border-b border-line">
-                <BoffAvatar username={boffAccount.username} size={24} />
+                <BoffAvatar username={boffAccount.username} avatarUrl={boffAccount.avatarUrl} size={24} />
                 <div className="min-w-0 flex-1">
                   <p className="block truncate text-[12px] font-semibold text-txt">
                     {boffAccount.username}
@@ -157,7 +210,7 @@ export function AccountSwitcher() {
                     }}
                     className="flex min-w-0 flex-1 items-center gap-2 text-left disabled:opacity-50"
                   >
-                    <BoffAvatar username={entry.username} size={24} />
+                    <BoffAvatar username={entry.username} avatarUrl={entry.avatarUrl} size={24} />
                     <span className="min-w-0 truncate text-[12px] text-txt">{entry.username}</span>
                   </button>
                 </li>

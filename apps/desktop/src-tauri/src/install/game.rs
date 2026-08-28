@@ -112,9 +112,18 @@ pub fn install(prepared: &Prepared, reporter: &Reporter) -> Result<base::Game, I
         )));
     }
 
-    // -Xmx last so it wins over anything the version metadata set. This is the
-    // RESOLVED value — the pack's own override, the heuristic, or the global
-    // setting, in that order — not the global slider.
+    // Tuning flags BEFORE the heap, and the heap last, both deliberately.
+    //
+    // These have already passed `jvm_args::judge` in `runtime::resolve` — this
+    // is the only place they reach argv, and it does not re-check them, so the
+    // sanitizing must stay on the resolve path rather than moving here.
+    game.jvm_args.extend(prepared.runtime.jvm_args.iter().cloned());
+
+    // -Xmx last so it wins over anything the version metadata set — AND over
+    // anything above, which is why a pack's own `-Xmx` is refused at publish
+    // time instead of being silently swallowed here. This is the RESOLVED
+    // value — the pack's own override, the heuristic, or the global setting, in
+    // that order — not the global slider.
     game.jvm_args.push(prepared.runtime.xmx_arg());
     session::patch_game_args(&mut game, &prepared.session);
 

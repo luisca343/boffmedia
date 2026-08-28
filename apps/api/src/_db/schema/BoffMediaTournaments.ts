@@ -193,13 +193,16 @@ export const boffMediaTournaments = mysqlTable(
     teamsheetRequired: boolean('teamsheet_required').notNull().default(false),
     /**
      * When the field is resolved: everyone who has not entered by then is
-     * dropped and teamsheets lock. Null → resolution happens on generate only.
+     * dropped. Null → resolution happens on generate only.
      */
     entryDeadline: timestamp('entry_deadline'),
     /**
-     * Set when the field was resolved. Non-null means teamsheets are frozen —
-     * an open-teamsheet format shows the opponent your list, so it must not
-     * change after pairings exist.
+     * Set when the field was resolved. Despite the column name this is the
+     * "field already resolved" marker, not a teamsheet lock: the sweeper reads
+     * it so a second tick cannot re-drop an already-frozen field. Teamsheets
+     * themselves stay editable until the tournament goes live — see
+     * MatchReportService.setTeamsheet. Renaming it costs a migration for no
+     * behaviour, so the meaning is recorded here instead.
      */
     teamsheetLockedAt: timestamp('teamsheet_locked_at'),
     banner: varchar('banner', { length: 255 }),

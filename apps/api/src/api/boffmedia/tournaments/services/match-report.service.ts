@@ -20,7 +20,7 @@ import {
 } from '../match-report.util';
 import { computeStandings, matchesForPhaseChain } from '../standings.util';
 import type { TiebreakProfile } from '../tournaments.types';
-import { toCompetitor } from '../tournaments.mapper';
+import { parseTeamsheet, toCompetitor } from '../tournaments.mapper';
 import { ProposeReportDto } from '../dto/propose-report.dto';
 import { ConfirmReportDto } from '../dto/confirm-report.dto';
 import { TeamsheetDto, TeamsheetMonDto } from '../dto/teamsheet.dto';
@@ -112,13 +112,17 @@ export class MatchReportService {
     );
     const bestOf = effectiveBestOf(match, phase, t.bestOf, maxWinnersRound);
 
-    // Opponent's open teamsheet — participants of this match only.
+    // Open teamsheets — participants of this match only. The viewer's own is
+    // sent back so the match page can show what they registered: by the time a
+    // match exists the sheet is locked, so it is a read-only reminder.
     let opponentTeamsheet: TeamsheetMonDto[] | null = null;
+    let viewerTeamsheet: TeamsheetMonDto[] | null = null;
     if (role === 'top' || role === 'bot') {
       const oppId =
         role === 'top' ? match.botParticipantId : match.topParticipantId;
       const opp = participants.find((p) => p.id === oppId);
-      opponentTeamsheet = this.parseTeamsheet(opp);
+      opponentTeamsheet = parseTeamsheet(opp);
+      viewerTeamsheet = parseTeamsheet(viewer);
     }
 
     return {
@@ -156,6 +160,7 @@ export class MatchReportService {
         ? match.judgeRequestedAt.toISOString()
         : null,
       opponentTeamsheet,
+      viewerTeamsheet,
       champion:
         t.championParticipantId != null
           ? (cmap.get(t.championParticipantId) ?? null)
@@ -527,17 +532,13 @@ export class MatchReportService {
     dto: TeamsheetDto,
   ): Promise<{ success: boolean }> {
     const t = await this.mustFindTournament(tournamentId);
-    // Open-teamsheet format: the opponent is shown this list on the match page,
-    // so it must be frozen once the field is resolved. Editing afterwards would
-    // let a player show one team and bring another.
-    if (t.teamsheetLockedAt != null) {
-      throw new BadRequestException(
-        userError(
-          ApiErrorCode.TOURNAMENT_TEAMSHEET_LOCKED,
-          'Teamsheets are locked for this tournament',
-        ),
-      );
-    }
+    // The start is the only lock. An open teamsheet is revealed on the match
+    // page and nowhere else, and no match exists until generate — so up to that
+    // moment nobody has seen anyone's list and a player is only ever correcting
+    // their own. `teamsheetLockedAt` deliberately does NOT gate this: it is set
+    // when the field resolves, which an entry deadline can trigger well before
+    // the tournament starts, and freezing sheets there bought no secrecy while
+    // stranding anyone who wanted to fix a typo.
     if (t.status === 'live' || t.status === 'completed') {
       throw new BadRequestException(
         userError(
@@ -592,18 +593,6 @@ export class MatchReportService {
       state: match.proposalState,
       expiresAt: (match.proposalExpiresAt ?? new Date()).toISOString(),
     };
-  }
-
-  private parseTeamsheet(
-    p: TournamentParticipant | undefined,
-  ): TeamsheetMonDto[] | null {
-    if (!p?.teamsheet) return null;
-    try {
-      const mons = JSON.parse(p.teamsheet) as TeamsheetMonDto[];
-      return Array.isArray(mons) && mons.length ? mons : null;
-    } catch {
-      return null;
-    }
   }
 
   private async sysMessage(matchId: number, body: string): Promise<void> {

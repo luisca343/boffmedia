@@ -26,6 +26,8 @@ import type { VersionChoice } from "../components/VersionPicker"
 import {
   exportMrpack,
   exportServerMrpack,
+  exportServerZip,
+  onServerZipProgress,
   instanceReveal,
   localPackDuplicate,
   localPackSave,
@@ -136,6 +138,9 @@ function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "c
   const [deleting, setDeleting] = useState(false)
   const [uninstalling, setUninstalling] = useState(false)
   const [duplicating, setDuplicating] = useState(false)
+  // null = not running. Ships the mod jars themselves, so it is a minutes-long
+  // job and a spinner would read as a hang.
+  const [serverZip, setServerZip] = useState<{ done: number; total: number } | null>(null)
 
   const doDuplicate = async () => {
     setDuplicating(true)
@@ -160,6 +165,27 @@ function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "c
     }
   }
 
+  const doExportServerZip = async () => {
+    setServerZip({ done: 0, total: 0 })
+    const stop = onServerZipProgress((e) => {
+      if (e.slug === pack.slug) setServerZip({ done: e.done, total: e.total })
+    })
+    try {
+      const report = await exportServerZip(pack.slug)
+      toast.success(
+        report.skipped.length > 0
+          ? tp("exportServerZipSkipped", { count: report.skipped.length })
+          : tp("exportServerZipSuccess"),
+      )
+    } catch (err) {
+      const message = (err as { message?: string })?.message
+      if (message !== tp("exportCancelled")) toast.error(message ?? tp("exportServerZipError"))
+    } finally {
+      stop()
+      setServerZip(null)
+    }
+  }
+
   const openFolder: MenuItem = {
     label: t("openInstanceFolder"),
     icon: "folder",
@@ -175,6 +201,14 @@ function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "c
         },
         { label: tp("exportMenu"), icon: "upload", onSelect: () => void doExport(false) },
         { label: tp("exportServerMenu"), icon: "upload", onSelect: () => void doExport(true) },
+        {
+          label: serverZip
+            ? tp("exportingServerZipMenu", { done: serverZip.done, total: serverZip.total })
+            : tp("exportServerZipMenu"),
+          icon: "server",
+          disabled: serverZip !== null,
+          onSelect: () => void doExportServerZip(),
+        },
         ...(installed ? [openFolder] : []),
         { sep: true },
         {

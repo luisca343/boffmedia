@@ -6,8 +6,9 @@
 // refinements, so `emit-schema.mjs` silently drops them; anything added to
 // PackManifest as a `.superRefine` is invisible to the generated types and must
 // be mirrored here: duplicate target paths, the bundled-world folder rules, the
-// game-type exclusivity engine, `patched`, the emulator arm, `initialFiles`, and
-// the nine optional-content rules in `validate_optional`.
+// game-type exclusivity engine, `patched`, the emulator arm, `initialFiles`, the
+// `runtime` block's JVM-argument allowlist, and the nine optional-content rules
+// in `validate_optional`.
 //
 // If you add a refinement in boffmedia.ts, add it here too — nothing enforces
 // that pairing automatically, which is why both files say so.
@@ -59,6 +60,10 @@ pub enum ManifestError {
     SpecBlockMismatch,
     #[error("non-Minecraft packs cannot include dependencies or worlds")]
     ForbiddenForNonMinecraft,
+    #[error("`runtime` is minecraft-only — there is no JVM to configure")]
+    RuntimeNotMinecraft,
+    #[error("runtime.jvmArgs rejected: {0} ({1})")]
+    RuntimeJvmArg(String, &'static str),
     #[error("initialFiles cannot contain user-provided sources")]
     InitialFilesCannotBeUserProvided,
     #[error("initialFiles source must be override or url: {0}")]
@@ -126,7 +131,38 @@ pub fn parse_manifest(raw: &str) -> Result<PackManifest, ManifestError> {
     validate_patched(&manifest)?;
     validate_emulator(&manifest)?;
     validate_optional(&manifest)?;
+    validate_runtime(&manifest)?;
     Ok(manifest)
+}
+
+/// Mirrors the `runtime` refinements in boffmedia.ts: the block is Minecraft-only
+/// (an emulator pack has no JVM), and every `jvmArgs` entry must pass the same
+/// allowlist the dashboard applies at publish time.
+///
+/// This is a REJECTION, not a filter. `runtime::seed_from_pack` also sanitizes
+/// and merely drops what it cannot accept, and the two are not redundant: this
+/// refuses a manifest that should never have been published, while the seed path
+/// tolerates one published before a rule existed. A pack that fails here does
+/// not install at all, which is the correct answer for a manifest our own
+/// dashboard would refuse to emit.
+fn validate_runtime(manifest: &PackManifest) -> Result<(), ManifestError> {
+    let runtime = match manifest.version.runtime.as_ref() {
+        Some(rt) => rt,
+        None => return Ok(()),
+    };
+    let is_minecraft = matches!(
+        &manifest.pack.game_type,
+        None | Some(PackManifestPackGameType::Minecraft)
+    );
+    if !is_minecraft {
+        return Err(ManifestError::RuntimeNotMinecraft);
+    }
+    for arg in &runtime.jvm_args {
+        if let Err((arg, why)) = crate::install::jvm_args::judge(arg.as_str()) {
+            return Err(ManifestError::RuntimeJvmArg(arg, why.reason()));
+        }
+    }
+    Ok(())
 }
 
 /// Case-insensitive, separator-normalized path key — the same normalization the
@@ -671,6 +707,78 @@ mod tests {
         let err =
             parse_manifest(&manifest_json("mods/sodium.jar", Some("mods/Sodium.jar"))).unwrap_err();
         assert!(matches!(err, ManifestError::DuplicatePath(_)));
+    }
+
+    fn manifest_with_runtime(runtime_json: &str, game_type: Option<&str>) -> String {
+        let (gt, deps, spec) = match game_type {
+            None => (String::new(), r#""dependencies":{"minecraft":"1.21.4","neoforge":"21.4.30"},"#.to_string(), String::new()),
+            Some(kind) => (
+                format!(r#","gameType":"{kind}""#),
+                String::new(),
+                r#""emulator":{"kind":"mgba","rom":"roms/x.gba"},"#.to_string(),
+            ),
+        };
+        let files = match game_type {
+            None => String::new(),
+            Some(_) => format!(
+                r#"{{"path":"roms/x.gba","sha512":"{s}","fileSize":10,"env":{{"client":"required","server":"unsupported"}},"source":{{"kind":"user-provided","hint":"Tu ROM"}}}}"#,
+                s = "a".repeat(128)
+            ),
+        };
+        format!(
+            r#"{{"formatVersion":1,
+                "pack":{{"id":"pk","slug":"boff-smp","name":"Boff SMP","access":{{"kind":"public"}}{gt}}},
+                "version":{{"id":"v1","name":"1.0","createdAt":"2026-07-30T12:00:00Z",
+                  {deps}{spec}
+                  "files":[{files}],
+                  "runtime":{runtime_json}}}}}"#
+        )
+    }
+
+    #[test]
+    fn accepts_a_runtime_block_of_real_tuning_flags() {
+        let m = manifest_with_runtime(
+            r#"{"memoryMib":8192,"jvmArgs":["-XX:+UseG1GC","-Xms2G","--add-opens=java.base/java.lang=ALL-UNNAMED"]}"#,
+            None,
+        );
+        let parsed = parse_manifest(&m).expect("should parse");
+        let runtime = parsed.version.runtime.expect("runtime present");
+        assert_eq!(runtime.memory_mib, Some(8192));
+        assert_eq!(runtime.jvm_args.len(), 3);
+    }
+
+    #[test]
+    fn rejects_a_manifest_whose_runtime_smuggles_an_agent() {
+        // The generated types cannot express this — emit-schema.mjs drops zod
+        // refinements — so if this test fails, validate_runtime stopped running.
+        let m = manifest_with_runtime(r#"{"jvmArgs":["-javaagent:evil.jar"]}"#, None);
+        let err = parse_manifest(&m).unwrap_err();
+        assert!(matches!(err, ManifestError::RuntimeJvmArg(_, _)), "{err:?}");
+    }
+
+    #[test]
+    fn rejects_a_runtime_that_sets_the_heap_through_jvm_args() {
+        let m = manifest_with_runtime(r#"{"jvmArgs":["-Xmx8G"]}"#, None);
+        match parse_manifest(&m).unwrap_err() {
+            ManifestError::RuntimeJvmArg(arg, _) => assert_eq!(arg, "-Xmx8G"),
+            other => panic!("expected RuntimeJvmArg, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn rejects_a_runtime_block_on_a_non_minecraft_pack() {
+        let m = manifest_with_runtime(r#"{"memoryMib":4096}"#, Some("emulator"));
+        let err = parse_manifest(&m).unwrap_err();
+        assert!(matches!(err, ManifestError::RuntimeNotMinecraft), "{err:?}");
+    }
+
+    #[test]
+    fn a_manifest_without_a_runtime_block_still_parses() {
+        assert!(parse_manifest(&manifest_json("mods/sodium.jar", None))
+            .unwrap()
+            .version
+            .runtime
+            .is_none());
     }
 
     fn manifest_with_worlds(worlds_json: &str) -> String {

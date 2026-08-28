@@ -249,6 +249,11 @@ export type Settings = {
    *  through CSS: every size in the UI is a hardcoded px value in a Tailwind
    *  arbitrary class, which no root font-size can move. */
   uiScale: UiScale
+  /** JVM tuning flags applied to every pack that has not set its own.
+   *  Stored raw and sanitized when a launch resolves them, so a flag the
+   *  allowlist refuses stays visible in the field instead of vanishing as
+   *  the player types it. Never contains `-Xmx` — that is `memoryMib`. */
+  jvmArgs: string[]
 }
 
 /** The offered zoom steps. A closed set rather than a free number so every value
@@ -279,6 +284,20 @@ export type JavaChoice =
   | { mode: "auto" }
   | { mode: "custom"; path: string }
 
+/** This pack's JVM tuning flags. Two states, not three: nothing can compute a
+ *  GC flag, so there is no `auto` to offer. `{ mode: "custom", args: [] }` is a
+ *  real value meaning "no flags, ignore the global list" — distinct from
+ *  `inherit`, which takes them. */
+export type JvmChoice = { mode: "inherit" } | { mode: "custom"; args: string[] }
+
+/** One argument's verdict from `jvmArgsCheck`. `reason` arrives already
+ *  translated by Rust, so the renderer never maps a rejection kind to text. */
+export type JvmArgVerdict = {
+  arg: string
+  ok: boolean
+  reason: string | null
+}
+
 /** What a launch would actually use, plus what fed the heuristic. */
 export type ResolvedRuntime = {
   heapMib: number
@@ -286,6 +305,10 @@ export type ResolvedRuntime = {
   /** Null = the launcher installs and manages the JVM. */
   javaPath: string | null
   javaSource: RuntimeSource
+  /** The flags that will precede `-Xmx` on the command line. Already
+   *  sanitized — anything the allowlist refused is absent here. */
+  jvmArgs: string[]
+  jvmSource: RuntimeSource
   modCount: number
   totalRamMib: number
   /** What the heuristic would pick even when an explicit value won. */
@@ -295,11 +318,14 @@ export type ResolvedRuntime = {
 /** The per-pack runtime panel's whole state. Mirrors Rust's
  *  `install::InstanceRuntime`. */
 export type InstanceRuntime = {
-  over: { memory: MemoryChoice; java: JavaChoice }
+  over: { memory: MemoryChoice; java: JavaChoice; jvm: JvmChoice }
   effective: ResolvedRuntime
   globalMemoryMib: number
   globalMemoryAuto: boolean
   globalJavaPath: string | null
+  /** So "heredar" can name the flags it would inherit rather than sending the
+   *  player to Ajustes to find out. */
+  globalJvmArgs: string[]
 }
 
 /** A version this machine can roll back to. Mirrors Rust's

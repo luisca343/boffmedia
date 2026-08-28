@@ -43,6 +43,8 @@ import type {
   InstallState,
   InstanceRuntime,
   JavaChoice,
+  JvmArgVerdict,
+  JvmChoice,
   LoaderVersion,
   LogLine,
   Activation,
@@ -72,6 +74,8 @@ export type {
   GameVersion,
   InstanceRuntime,
   JavaChoice,
+  JvmArgVerdict,
+  JvmChoice,
   LoaderVersion,
   MemoryChoice,
   OptionalFeature,
@@ -234,6 +238,13 @@ export interface BoffAccount {
   id: number;
   username: string;
   mcUuid: string | null;
+  /** The website avatar, as an ABSOLUTE url — the API resolves it, because
+   *  the column holds relative paths as often as Discord CDN urls and a
+   *  relative one resolves against `tauri://localhost` and fetches nothing.
+   *  Null when the account never set one: the switcher draws its monogram,
+   *  which keeps several accounts distinguishable where a shared default
+   *  silhouette would not. */
+  avatarUrl: string | null;
 }
 
 /** A row in the Boffmedia account switcher: only `active` has the live session
@@ -249,6 +260,7 @@ const MOCK_BOFF_ACCOUNT: BoffAccount = {
   id: 1,
   username: "Trainer",
   mcUuid: MOCK_ACCOUNT.uuid,
+  avatarUrl: null,
 };
 
 /** The website this launcher belongs to. Used for the links the launcher hands
@@ -1342,9 +1354,10 @@ function mockRecommend(modCount: number, totalRamMib: number): number {
   return Math.max(Math.floor(chosen / 512) * 512, 1024);
 }
 
-const mockRuntime: { memory: MemoryChoice; java: JavaChoice } = {
+const mockRuntime: { memory: MemoryChoice; java: JavaChoice; jvm: JvmChoice } = {
   memory: { mode: "inherit" },
   java: { mode: "inherit" },
+  jvm: { mode: "inherit" },
 };
 
 function mockResolve(): InstanceRuntime {
@@ -1368,6 +1381,14 @@ function mockResolve(): InstanceRuntime {
         ? [null, "override"]
         : [MOCK_SETTINGS.javaPath, "global"];
 
+  // The mock does NOT re-implement the allowlist: `jvmArgsCheck` falls through
+  // to a permissive answer in the browser, and the real judging is Rust's. A
+  // second grammar in TS would be a second grammar to keep in step.
+  const [jvmArgs, jvmSource]: [string[], RuntimeSource] =
+    mockRuntime.jvm.mode === "custom"
+      ? [mockRuntime.jvm.args, "override"]
+      : [MOCK_SETTINGS.jvmArgs, "global"];
+
   return {
     over: { ...mockRuntime },
     effective: {
@@ -1375,6 +1396,8 @@ function mockResolve(): InstanceRuntime {
       memorySource,
       javaPath,
       javaSource,
+      jvmArgs,
+      jvmSource,
       modCount,
       totalRamMib: MOCK_TOTAL_RAM_MIB,
       recommendedMib,
@@ -1382,6 +1405,7 @@ function mockResolve(): InstanceRuntime {
     globalMemoryMib,
     globalMemoryAuto: MOCK_SETTINGS.memoryAuto,
     globalJavaPath: MOCK_SETTINGS.javaPath,
+    globalJvmArgs: MOCK_SETTINGS.jvmArgs,
   };
 }
 
@@ -1403,10 +1427,12 @@ export async function instanceRuntimeSet(
   slug: string,
   memory: MemoryChoice,
   java: JavaChoice,
+  jvm: JvmChoice,
 ): Promise<InstanceRuntime> {
   if (!isDesktop()) {
     mockRuntime.memory = memory;
     mockRuntime.java = java;
+    mockRuntime.jvm = jvm;
     return mockResolve();
   }
   try {
@@ -1414,9 +1440,24 @@ export async function instanceRuntimeSet(
       slug,
       memory,
       java,
+      jvm,
     });
   } catch (err) {
     throw asFailure(err);
+  }
+}
+
+/** Judge JVM flags without storing them, so the field can mark a bad one as it
+ *  is typed rather than after a failed launch. One grammar, in Rust — the
+ *  browser fallback accepts everything rather than maintaining a second copy
+ *  that could disagree with the one that actually runs. */
+export async function jvmArgsCheck(args: string[]): Promise<JvmArgVerdict[]> {
+  const permissive = () => args.map((arg) => ({ arg, ok: true, reason: null }));
+  if (!isDesktop()) return permissive();
+  try {
+    return await invoke<JvmArgVerdict[]>("jvm_args_check", { args });
+  } catch {
+    return permissive();
   }
 }
 
@@ -2137,6 +2178,48 @@ export async function exportServerMrpack(slug: string): Promise<string> {
     });
   try {
     return await invoke<string>("export_server_mrpack", { slug });
+  } catch (err) {
+    throw asFailure(err);
+  }
+}
+
+export const EVENT_SERVER_ZIP_PROGRESS = "server-zip-progress";
+
+export type ServerZipProgressEvent = {
+  slug: string;
+  done: number;
+  total: number;
+  file: string;
+};
+
+export type ServerZipSkippedFile = { path: string; reason: string };
+
+export type ServerZipReport = {
+  path: string;
+  fileCount: number;
+  totalBytes: number;
+  skipped: ServerZipSkippedFile[];
+  minecraft: string;
+  loader: string | null;
+  loaderVersion: string | null;
+  worldFolder: string | null;
+};
+
+export const onServerZipProgress = (fn: (e: ServerZipProgressEvent) => void) =>
+  subscribe<ServerZipProgressEvent>(EVENT_SERVER_ZIP_PROGRESS, fn);
+
+/** The other server shape: a CurseForge-style unzip-and-run directory, jars
+ *  included, with a start script that installs the modloader server on first
+ *  boot. {@link exportServerMrpack} ships URLs and needs mrpack-install or a
+ *  host panel to do anything; this ships bytes and needs nothing. Minutes and
+ *  hundreds of megabytes, hence the progress event. */
+export async function exportServerZip(slug: string): Promise<ServerZipReport> {
+  if (!isDesktop())
+    throw asFailure({
+      message: "La exportación solo funciona en la aplicación de escritorio.",
+    });
+  try {
+    return await invoke<ServerZipReport>("export_server_zip", { slug });
   } catch (err) {
     throw asFailure(err);
   }

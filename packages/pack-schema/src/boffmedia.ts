@@ -274,6 +274,179 @@ export type OptionalGroup = z.infer<typeof OptionalGroup>
  *  absent. One place owns the default so no consumer re-implements it. */
 export const selectOf = (group: OptionalGroup): OptionalSelect => group.select ?? "any"
 
+// ── Pack-bundled JVM runtime ───────────────────────────────────────────────
+//
+// A pack may RECOMMEND a heap size and a set of JVM tuning flags. Two things
+// about this are deliberate and easy to get wrong later:
+//
+//   IT IS A SEED, NOT A SETTING. The launcher writes these into the instance's
+//   `.boff-runtime.json` on first install and never touches them again — not on
+//   update, not on repair. From that moment the values belong to the player.
+//   A pack that "fixes its GC flags" in 1.4.2 therefore does NOT silently
+//   re-tune an instance somebody has already adjusted.
+//
+//   THE ALLOWLIST IS NOT PARANOIA ABOUT ARBITRARY CODE. A modpack already ships
+//   mod jars, so "the pack can run code" is a given. Two capabilities are NOT a
+//   given, and both come free with an unfiltered arg list:
+//     1. `-XX:OnError=` / `-XX:OnOutOfMemoryError=` run an arbitrary OS command,
+//        not Java — a shell, outside the JVM, on a crash the player will read as
+//        the pack being buggy.
+//     2. Every byte a pack ships goes through `files[]`: a declared source, a
+//        sha512, our blob store. `-javaagent:C:\Users\x\Downloads\evil.jar`
+//        loads code that was never in the manifest and was never hashed.
+//   The allowlist exists to keep both of those out, which is why it is a
+//   positive grammar rather than a list of bad strings.
+
+/** Longest single argument accepted. Real tuning flags are far under this;
+ *  anything longer is a payload, not a flag. */
+export const JVM_ARG_MAX_LEN = 256
+
+/** Most args a pack may ship. G1 tuning takes ~10; 32 is generous and bounds
+ *  both the manifest and the argv the launcher builds. */
+export const JVM_ARGS_MAX = 32
+
+/** Why a proposed argument was rejected. Carried out of `sanitizeJvmArgs` so the
+ *  dashboard can explain a publish failure and the launcher can log a drop. */
+export type JvmArgRejection = "heap" | "denied" | "malformed"
+
+export type JvmArgVerdict =
+  | { ok: true; arg: string }
+  | JvmArgRejected
+
+/** The refused arm on its own, so `sanitizeJvmArgs().dropped` carries `reason`
+ *  without every caller having to re-narrow the union. */
+export type JvmArgRejected = { ok: false; arg: string; reason: JvmArgRejection }
+
+/** Flags that can run a command or load code from an unverified path. Matched
+ *  case-insensitively and by prefix, so `-XX:onerror=` and `-javaagent:x` are
+ *  both caught before the grammar below ever sees them. */
+const JVM_DENY_PREFIXES = [
+  "-javaagent",
+  "-agentlib",
+  "-agentpath",
+  "-xx:onerror",
+  "-xx:onoutofmemoryerror",
+  "-xx:flightrecorderoptions",
+  "-xx:startflightrecording",
+  "-xx:+startflightrecording",
+  "-xx:compilecommand",
+  "-xbootclasspath",
+  "-xshare",
+  "-cp",
+  "-classpath",
+  "--class-path",
+  "--patch-module",
+  "--module-path",
+  "--upgrade-module-path",
+]
+
+/** `-D` keys reserved to the platform and the launcher. A pack has no business
+ *  setting `java.library.path` or `java.security.manager`; mod-facing keys
+ *  (`fml.*`, `mixin.*`) stay allowed. */
+const JVM_DENY_PROPERTY_PREFIXES = ["java.", "javax.", "jdk.", "sun.", "boffmedia."]
+
+const SIZE = String.raw`\d{1,6}[kKmMgG]?`
+/** `-Xms2G`, `-Xmn512M`, `-Xss1M`. `-Xmx` is deliberately NOT here. */
+const RE_X_SIZE = new RegExp(String.raw`^-X(ms|mn|ss)${SIZE}$`)
+/** `-XX:+UseG1GC`, `-XX:-OmitStackTraceInFastThrow`. */
+const RE_XX_BOOL = /^-XX:[+-][A-Za-z0-9_]{1,64}$/
+/** `-XX:MaxGCPauseMillis=50`. The value grammar excludes `/`, `\`, `:` and
+ *  whitespace, so no `-XX:Something=<path>` can be expressed at all. */
+const RE_XX_VALUE = /^-XX:[A-Za-z0-9_]{1,64}=[A-Za-z0-9_.%-]{1,64}$/
+/** `-Dmixin.debug=true`. Same no-path rule on the value. */
+const RE_PROPERTY = /^-D([A-Za-z0-9_.-]{1,64})=([A-Za-z0-9_.,%+-]{0,128})$/
+/** `--add-opens=java.base/java.lang=ALL-UNNAMED`. The `/` here is a module
+ *  separator, not a filesystem path — the grammar admits no drive letter, no
+ *  leading slash and no `..`. Allowed because modern loaders genuinely need it
+ *  and it grants nothing a mod jar does not already have. */
+const RE_ADD_MODULE = /^--add-(opens|exports)=[A-Za-z0-9_.]{1,64}\/[A-Za-z0-9_.$]{1,64}=[A-Za-z0-9_.,$-]{1,64}$/
+
+/** Judge one argument. Order matters: `-Xmx` and the deny list are checked
+ *  BEFORE the grammar, so a rejected flag reports why it was rejected rather
+ *  than the generic "malformed". */
+export const judgeJvmArg = (raw: string): JvmArgVerdict => {
+  const arg = raw.trim()
+  if (arg.length === 0 || arg.length > JVM_ARG_MAX_LEN) return { ok: false, arg, reason: "malformed" }
+
+  const lower = arg.toLowerCase()
+
+  // `-Xmx` is not dangerous — it is UNREACHABLE. The launcher appends the
+  // resolved heap last so it beats anything the version metadata set, so a
+  // pack's own `-Xmx` would be silently overridden. Rejecting it here turns a
+  // mystery into a publish error that names `memoryMib`.
+  if (lower.startsWith("-xmx")) return { ok: false, arg, reason: "heap" }
+
+  // A prefix match ends at a non-word character, so `-Xbootclasspath/a:` and
+  // `-XX:OnError=` are both caught while a longer legitimate flag that merely
+  // starts with the same letters is not.
+  const denied = (prefix: string) =>
+    lower === prefix ||
+    (lower.startsWith(prefix) && !/[a-z0-9_]/.test(lower.charAt(prefix.length)))
+
+  if (JVM_DENY_PREFIXES.some(denied)) return { ok: false, arg, reason: "denied" }
+
+  // The reserved-property check runs BEFORE the grammar so that
+  // `-Djava.library.path=C:\evil` reports "denied" (the honest reason) rather
+  // than "malformed" (which it also is, since the value holds a path).
+  if (lower.startsWith("-d")) {
+    const key = arg.slice(2).split("=", 1)[0].toLowerCase()
+    if (JVM_DENY_PROPERTY_PREFIXES.some((p) => key.startsWith(p))) {
+      return { ok: false, arg, reason: "denied" }
+    }
+  }
+
+  if (
+    RE_PROPERTY.test(arg) ||
+    RE_X_SIZE.test(arg) ||
+    RE_XX_BOOL.test(arg) ||
+    RE_XX_VALUE.test(arg) ||
+    RE_ADD_MODULE.test(arg)
+  ) {
+    return { ok: true, arg }
+  }
+  return { ok: false, arg, reason: "malformed" }
+}
+
+/** Split a proposed arg list into what survives and what does not.
+ *
+ *  Called in two places for two purposes: the dashboard rejects a publish when
+ *  anything is dropped, and the launcher re-runs it at seed time and logs the
+ *  drops. The second is not redundant — an instance can be seeded from a
+ *  manifest published before a rule existed. */
+export const sanitizeJvmArgs = (
+  args: readonly string[],
+): { kept: string[]; dropped: JvmArgRejected[] } => {
+  const kept: string[] = []
+  const dropped: JvmArgRejected[] = []
+  const seen = new Set<string>()
+  for (const raw of args.slice(0, JVM_ARGS_MAX)) {
+    const verdict = judgeJvmArg(raw)
+    if (!verdict.ok) {
+      dropped.push(verdict)
+      continue
+    }
+    // A duplicated flag is not an error, but passing it twice is noise in the
+    // argv and in every crash report that quotes it.
+    if (seen.has(verdict.arg)) continue
+    seen.add(verdict.arg)
+    kept.push(verdict.arg)
+  }
+  return { kept, dropped }
+}
+
+/** The runtime block a pack version may carry. Both fields optional: a pack that
+ *  only wants to say "this needs 8 GB" ships no args, and one that only wants
+ *  GC flags ships no heap. Minecraft-only (superRefine) — an emulator pack has
+ *  no JVM to configure. */
+export const PackRuntime = z.object({
+  /** Recommended max heap, seeded into the instance as an explicit choice.
+   *  Bounded by the same clamp the launcher applies to every heap. */
+  memoryMib: z.number().int().min(512).max(65536).optional(),
+  /** Tuning flags, every one of which must pass `judgeJvmArg` (superRefine). */
+  jvmArgs: z.array(z.string().max(JVM_ARG_MAX_LEN)).max(JVM_ARGS_MAX).optional(),
+})
+export type PackRuntime = z.infer<typeof PackRuntime>
+
 export const PackVersion = z.object({
   /** Opaque, server-assigned. Not semver — packs version on their own clock. */
   id: z.string().min(1),
@@ -311,6 +484,12 @@ export const PackVersion = z.object({
    *  `files[]` (superRefine). Generalizes the bundled-worlds idea without
    *  touching the `worlds` mechanism. */
   initialFiles: z.array(PackFile).optional(),
+  /** Heap and JVM flags this version RECOMMENDS. Seeded into the instance on
+   *  first install and owned by the player from then on — never re-applied on
+   *  update. Minecraft-only (superRefine); every arg must pass `judgeJvmArg`
+   *  (superRefine). See the `PackRuntime` comment for why the allowlist is a
+   *  grammar rather than a blocklist. */
+  runtime: PackRuntime.optional(),
 })
 export type PackVersion = z.infer<typeof PackVersion>
 
@@ -569,6 +748,13 @@ export const PackManifest = z
           message: `\`worlds\` is minecraft-only (gameType is "${gameType}")`,
         })
       }
+      if (v.runtime !== undefined) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["version", "runtime"],
+          message: `\`runtime\` is minecraft-only (gameType is "${gameType}") — there is no JVM to configure`,
+        })
+      }
       if (specSlots[gameType] === undefined) {
         ctx.addIssue({
           code: "custom",
@@ -579,6 +765,27 @@ export const PackManifest = z
       for (const kind of ["emulator", "zomboid", "stardew"] as const) {
         if (kind !== gameType) forbidSpec(kind)
       }
+    }
+
+    // ---- runtime.jvmArgs allowlist ----
+    // Rejected at PUBLISH time, per argument, with the reason attached: an
+    // author who typed `-Xmx6G` gets told to use `memoryMib`, not a generic
+    // "invalid". The launcher re-checks at seed time (a manifest can predate a
+    // rule), so this is the friendly gate rather than the security boundary.
+    for (const [i, arg] of (v.runtime?.jvmArgs ?? []).entries()) {
+      const verdict = judgeJvmArg(arg)
+      if (verdict.ok) continue
+      const why =
+        verdict.reason === "heap"
+          ? "set `runtime.memoryMib` instead — the launcher appends the resolved -Xmx last, so this would be ignored"
+          : verdict.reason === "denied"
+            ? "this flag can run a command or load code from a path no manifest verified"
+            : "not a recognised JVM tuning flag"
+      ctx.addIssue({
+        code: "custom",
+        path: ["version", "runtime", "jvmArgs", i],
+        message: `${arg}: ${why}`,
+      })
     }
 
     // ---- initialFiles rules ----

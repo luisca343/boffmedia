@@ -86,6 +86,14 @@ export class MatchDetail extends MatchView {
   })
   opponentTeamsheet: TeamsheetMonDto[] | null;
 
+  @ApiProperty({
+    type: [TeamsheetMonDto],
+    nullable: true,
+    description:
+      "The caller's own open teamsheet, for the two participants of this match. Read-only here: teamsheets lock when the field is resolved, before any match exists.",
+  })
+  viewerTeamsheet: TeamsheetMonDto[] | null;
+
   @ApiProperty({ type: Competitor, nullable: true })
   champion: Competitor | null;
 }

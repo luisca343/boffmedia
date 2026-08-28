@@ -36,6 +36,7 @@ export function ListAndCreate({ onSelect }: { onSelect: (slug: string) => void }
   const [groupCount, setGroupCount] = useState(2)
   const [advanceCount, setAdvanceCount] = useState(2)
   const [maxParticipants, setMaxParticipants] = useState<number | "">("")
+  const [teamsheetRequired, setTeamsheetRequired] = useState(false)
   const [phases, setPhases] = useState<TnPhaseInput[]>([])
   const [busy, setBusy] = useState(false)
 
@@ -49,6 +50,7 @@ export function ListAndCreate({ onSelect }: { onSelect: (slug: string) => void }
       competitorKind: kind,
       bestOf,
       registrationOpen: true,
+      teamsheetRequired,
     }
     if (headlineFormat === "leaderboard") { body.metric = metric; body.unit = unit }
     if (headlineFormat === "groups") { body.groupCount = groupCount; body.advanceCount = advanceCount }
@@ -104,6 +106,16 @@ export function ListAndCreate({ onSelect }: { onSelect: (slug: string) => void }
           )}
           <Field label={t("maxParticipantsOpt")}>
             <Input type="number" min={2} value={maxParticipants} onChange={(e) => setMaxParticipants(e.target.value === "" ? "" : Math.max(2, +e.target.value))} />
+          </Field>
+          <Field label={t("teamsheetRequired")}>
+            <Select
+              value={teamsheetRequired ? "yes" : "no"}
+              options={[
+                { value: "no", label: t("teamsheetOptional") },
+                { value: "yes", label: t("teamsheetMandatory") },
+              ]}
+              onChange={(v) => setTeamsheetRequired(v === "yes")}
+            />
           </Field>
         </div>
 

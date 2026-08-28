@@ -146,6 +146,10 @@ pub struct PlannedMinecraft {
     /// including an unparseable version string (fail-safe: not skipping the
     /// menu is better than a launch the client refuses to parse).
     pub quick_play: Option<String>,
+    /// The heap/JVM flags this VERSION recommends, lifted out of the manifest.
+    /// Consumed exactly once — to seed a brand-new instance — and ignored on
+    /// every later install of the same pack; see `runtime::seed_from_pack`.
+    pub runtime: super::runtime::PackRuntime,
 }
 
 /// Backward-compat alias for Minecraft plans.
@@ -291,7 +295,23 @@ fn plan_minecraft(manifest: &PackManifest) -> Result<PlannedMinecraft, InstallFa
         optional_groups: super::optional::model_of(manifest),
         total_bytes,
         quick_play,
+        runtime: pack_runtime(manifest),
     })
+}
+
+/// Lift `version.runtime` into the launcher's own type. Not sanitized here —
+/// `runtime::seed_from_pack` does that, so the drops can be logged next to the
+/// instance they were dropped for rather than in a resolver with no reporter.
+fn pack_runtime(manifest: &PackManifest) -> super::runtime::PackRuntime {
+    match manifest.version.runtime.as_ref() {
+        None => super::runtime::PackRuntime::default(),
+        Some(rt) => super::runtime::PackRuntime {
+            // The schema bounds this to 512..=65536, and `runtime::resolve`
+            // clamps again; the cast cannot lose a meaningful value.
+            memory_mib: rt.memory_mib.map(|mib| mib.max(0) as u32),
+            jvm_args: rt.jvm_args.iter().map(|a| a.to_string()).collect(),
+        },
+    }
 }
 
 pub(crate) fn fetch_for(source: &Source, _path: &str) -> Result<Fetch, InstallFailure> {

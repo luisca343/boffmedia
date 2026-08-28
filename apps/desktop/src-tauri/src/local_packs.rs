@@ -131,7 +131,7 @@ fn free_slug(dir: &Path, base: &str) -> String {
     }
 }
 
-fn read_manifest(dir: &Path) -> Result<PackManifest, InstallFailure> {
+pub(crate) fn read_manifest(dir: &Path) -> Result<PackManifest, InstallFailure> {
     let raw = std::fs::read_to_string(dir.join(MANIFEST_FILE))
         .map_err(|e| InstallFailure::message(format!("No se pudo leer el pack: {e}")))?;
     parse_manifest(&raw)
@@ -613,15 +613,27 @@ async fn export_mrpack_impl(
             .map_err(|e| InstallFailure::message(format!("No se pudo escribir «{}»: {e}", embed.path)))?;
     }
 
-    // Export bundled worlds to overrides/saves/<folder>/ (Prism-compatible)
+    // Bundled worlds. A CLIENT reads every save under `saves/`, so all of them
+    // ship there (Prism-compatible). A DEDICATED SERVER reads exactly one, by
+    // name, from `level-name` at its own root — `saves/` is a client-side
+    // convention it never looks in — so the server export puts the first world
+    // at the root through `server-overrides/` and writes the `level-name` that
+    // points at it. Without that pairing a bundled world is inert on a server
+    // and nothing says so.
+    let mut server_level_name: Option<String> = None;
     for world in &manifest.version.worlds {
         let world_folder = world.folder.as_str();
+        if server_only && server_level_name.is_some() {
+            // A server runs one world; a second would be dead weight in a zip
+            // that already ships every mod jar it needs.
+            continue;
+        }
         let local = crate::install::files::local_blob_path(&layout, &world.sha512.as_str());
         let world_zip_bytes = if local.is_file() {
             std::fs::read(&local).ok()
         } else {
-            // For managed packs, try to fetch from the API
-            crate::api::fetch_pack_file(
+            // For managed packs, try to fetch from the API.
+            match crate::api::fetch_pack_file(
                 &app,
                 &manifest.pack.id.to_string(),
                 None,
@@ -631,25 +643,53 @@ async fn export_mrpack_impl(
                 None,
             )
             .await
-            .ok()
-            .and_then(|r| tokio::runtime::Handle::current().block_on(r.bytes()).ok())
-            .map(|b| b.to_vec())
+            {
+                // `.await`, not `Handle::block_on`: this is already inside the
+                // runtime, where block_on panics rather than returning an Err.
+                Ok(response) => response.bytes().await.ok().map(|b| b.to_vec()),
+                Err(_) => None,
+            }
         };
 
         if let Some(bytes) = world_zip_bytes {
-            // Extract the zip contents directly into overrides/saves/<folder>/
+            let prefix = if server_only {
+                format!("server-overrides/{world_folder}")
+            } else {
+                format!("overrides/saves/{world_folder}")
+            };
             if let Ok(mut world_archive) = zip::ZipArchive::new(std::io::Cursor::new(&bytes)) {
                 for i in 0..world_archive.len() {
                     if let Ok(mut file) = world_archive.by_index(i) {
                         let file_path = file.name();
                         if !file_path.is_empty() {
-                            let entry_path = format!("overrides/saves/{}/{}", world_folder, file_path);
+                            let entry_path = format!("{prefix}/{file_path}");
                             let _ = zip.start_file(&entry_path, options);
                             let _ = std::io::copy(&mut file, &mut zip);
                         }
                     }
                 }
+                if server_only {
+                    server_level_name = Some(world_folder.to_string());
+                }
             }
+        }
+    }
+
+    // The other half of the world fix: the save is at the server's root under
+    // its own name, so `level-name` has to name it. Skipped when the pack ships
+    // its own `server.properties` — an author who wrote one meant it.
+    if let Some(level) = &server_level_name {
+        let authored = manifest
+            .version
+            .files
+            .iter()
+            .any(|f| f.path.as_str().eq_ignore_ascii_case("server.properties"));
+        if !authored {
+            let body = format!(
+                "# Generado por Boffmedia App al exportar el pack de servidor.\nlevel-name={level}\n"
+            );
+            let _ = zip.start_file("server-overrides/server.properties", options);
+            let _ = zip.write_all(body.as_bytes());
         }
     }
 

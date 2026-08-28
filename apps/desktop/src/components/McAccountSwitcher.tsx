@@ -84,9 +84,15 @@ export function McAccountSwitcher() {
         onClick={() => void signIn()}
         title={t("linkTitle")}
         aria-label={t("linkTitle")}
-        className="mb-2 flex h-10 w-10 shrink-0 items-center justify-center rounded text-txt-muted transition-colors hover:bg-surface-bright hover:text-txt disabled:opacity-50"
+        className="relative mb-2 flex h-10 w-10 shrink-0 items-center justify-center rounded text-txt-muted transition-colors hover:bg-surface-bright hover:text-txt disabled:opacity-50"
       >
         <Icon name="cube" size={20} />
+        {/* A bare cube in a rail of glyphs reads as one more nav destination.
+            The corner plus is what says "this adds an account" without a label
+            the 64px rail has no room for. */}
+        <span className="pointer-events-none absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-accent text-accent-ink">
+          <Icon name="plus" size={9} />
+        </span>
       </button>
     )
   }
@@ -102,14 +108,25 @@ export function McAccountSwitcher() {
         aria-expanded={open}
         aria-haspopup="menu"
         title={`${t("title")} · ${account.username}`}
-        className="mb-2 flex h-10 w-10 shrink-0 items-center justify-center rounded transition-colors hover:bg-surface-bright"
+        className="relative mb-2 flex h-10 w-10 shrink-0 items-center justify-center rounded transition-colors hover:bg-surface-bright"
       >
         {switchingAccount ? (
           <span className="cut-seal grid h-8 w-8 place-items-center bg-panel-2 text-txt">
             <Spinner size={14} />
           </span>
         ) : (
-          <PlayerHead skinUrl={account.skinUrl} username={account.username} size={32} />
+          <>
+            <PlayerHead skinUrl={account.skinUrl} username={account.username} size={32} />
+            {/* Two 32px faces stacked in the rail look like decoration, not
+                controls, and nothing said either one opened a menu. The caret
+                is the only affordance that fits at this size. */}
+            <span
+              className="pointer-events-none absolute -bottom-0.5 -right-0.5 grid h-3.5 w-3.5 place-items-center rounded-full bg-panel-2 text-txt-dim"
+              aria-hidden
+            >
+              <Icon name="chevronRight" size={9} />
+            </span>
+          </>
         )}
       </button>
 

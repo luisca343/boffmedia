@@ -20,8 +20,11 @@ import {
   instanceRuntime,
   instanceRuntimeSet,
   instanceVersions,
+  jvmArgsCheck,
   type InstanceRuntime,
   type JavaChoice,
+  type JvmArgVerdict,
+  type JvmChoice,
   type MemoryChoice,
   type OptionalFile,
   type RetainedVersion,
@@ -61,6 +64,11 @@ const SOURCE_TONE: Record<RuntimeSource, "info" | "warn" | "ok"> = {
 
 const gib = (mib: number) => `${(mib / 1024).toFixed(1).replace(".", ",")} GB`
 
+/** Split the flags field the way a shell would, minus the quoting: every
+ *  accepted flag is a single whitespace-free token, so anything a quote could
+ *  protect is something the allowlist refuses anyway. */
+const splitArgs = (text: string): string[] => text.split(/\s+/).filter(Boolean)
+
 export function InstanceSpace({ slug, password, onChanged }: Props) {
   const t = useT("instanceSpace")
   const [optional, setOptional] = useState<OptionalFile[] | null>(null)
@@ -68,6 +76,11 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
   const [runtime, setRuntime] = useState<InstanceRuntime | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  // The flags field is a free-text draft rather than a render of `over.jvm.args`:
+  // round-tripping through split/join would eat the space the player just typed
+  // between two flags.  `null` = "show whatever the server last said".
+  const [jvmDraft, setJvmDraft] = useState<string | null>(null)
+  const [jvmVerdicts, setJvmVerdicts] = useState<JvmArgVerdict[]>([])
 
   const SOURCE_LABEL: Record<RuntimeSource, string> = {
     global: t("sourceGlobal"),
@@ -79,6 +92,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
     void instanceOptional(slug).then(setOptional)
     void instanceVersions(slug).then(setVersions)
     void instanceRuntime(slug).then(setRuntime)
+    setJvmDraft(null)
   }, [slug])
 
   useEffect(refresh, [refresh])
@@ -109,18 +123,38 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
     }
   }
 
-  const saveRuntime = async (memory: MemoryChoice, java: JavaChoice) => {
+  const saveRuntime = async (memory: MemoryChoice, java: JavaChoice, jvm: JvmChoice) => {
     setError(null)
     // Optimistic, so dragging the slider does not lag a round trip behind the
     // finger. The server's answer replaces it, resolved values and all.
-    setRuntime((current) => (current ? { ...current, over: { memory, java } } : current))
+    setRuntime((current) => (current ? { ...current, over: { memory, java, jvm } } : current))
     try {
-      setRuntime(await instanceRuntimeSet(slug, memory, java))
+      setRuntime(await instanceRuntimeSet(slug, memory, java, jvm))
     } catch (err) {
       setError((err as { message?: string })?.message ?? t("saveConfigError"))
       void instanceRuntime(slug).then(setRuntime)
     }
   }
+
+  // Judged by Rust, on every edit, so a refused flag is marked as it is typed
+  // rather than after a launch that quietly dropped it. Deliberately NOT a
+  // second copy of the grammar in TS: one rule, in the place that enforces it.
+  const jvmMode = runtime?.over.jvm.mode
+  const jvmArgsText =
+    jvmDraft ?? (runtime?.over.jvm.mode === "custom" ? runtime.over.jvm.args.join(" ") : "")
+  useEffect(() => {
+    if (jvmMode !== "custom") {
+      setJvmVerdicts([])
+      return
+    }
+    let live = true
+    void jvmArgsCheck(splitArgs(jvmArgsText)).then((v) => {
+      if (live) setJvmVerdicts(v)
+    })
+    return () => {
+      live = false
+    }
+  }, [jvmArgsText, jvmMode])
 
   const pinned = versions?.find((v) => v.current)
 
@@ -218,7 +252,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
           question the panel exists to answer, and "6,0 GB (automático, 214
           mods)" beats a slider the player has to interpret. */}
       <Panel
-        title={`${t("memory")} · Java`}
+        title={`${t("memory")} · Java · JVM`}
         aside={
           runtime ? (
             <Badge tone={SOURCE_TONE[runtime.effective.memorySource]}>
@@ -268,6 +302,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                       ? { mode: "auto" }
                       : { mode: "inherit" },
                   runtime.over.java,
+                  runtime.over.jvm,
                 )
               }
             />
@@ -280,7 +315,9 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                   step={512}
                   unit=" MiB"
                   value={runtime.over.memory.mib}
-                  onChange={(mib) => void saveRuntime({ mode: "fixed", mib }, runtime.over.java)}
+                  onChange={(mib) =>
+                    void saveRuntime({ mode: "fixed", mib }, runtime.over.java, runtime.over.jvm)
+                  }
                 />
                 <p className="mt-2 text-xs text-txt-dim">
                   {t("recommendedMemory", { gib: gib(runtime.effective.recommendedMib) })}
@@ -312,6 +349,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                     : mode === "auto"
                       ? { mode: "auto" }
                       : { mode: "inherit" },
+                  runtime.over.jvm,
                 )
               }
             />
@@ -325,10 +363,11 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                   value={runtime.over.java.path}
                   placeholder={t("customJavaPlaceholder")}
                   onChange={(e) =>
-                    void saveRuntime(runtime.over.memory, {
-                      mode: "custom",
-                      path: e.target.value,
-                    })
+                    void saveRuntime(
+                      runtime.over.memory,
+                      { mode: "custom", path: e.target.value },
+                      runtime.over.jvm,
+                    )
                   }
                 />
               </Field>
@@ -340,6 +379,66 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                     ? t("javaGlobal", { path: runtime.globalJavaPath })
                     : t("javaManaged")}
               </p>
+            )}
+
+            <Divider label={t("jvmDivider")} className="my-4" />
+            <Seg
+              options={[
+                { value: "inherit", label: t("inherit") },
+                { value: "custom", label: t("manual") },
+              ]}
+              value={runtime.over.jvm.mode}
+              onChange={(mode) => {
+                // Switching to "custom" starts from what is CURRENTLY in force,
+                // not from empty: the player is adjusting the flags they can
+                // see, and handing them a blank box would silently drop the
+                // pack's own recommendation the moment they opened it.
+                const args = mode === "custom" ? runtime.effective.jvmArgs : []
+                setJvmDraft(mode === "custom" ? args.join(" ") : null)
+                void saveRuntime(
+                  runtime.over.memory,
+                  runtime.over.java,
+                  mode === "custom" ? { mode: "custom", args } : { mode: "inherit" },
+                )
+              }}
+            />
+            {runtime.over.jvm.mode === "custom" ? (
+              <Field className="mt-3" label={t("jvmCustomLabel")} hint={t("jvmCustomHint")}>
+                <Input
+                  value={jvmArgsText}
+                  placeholder={t("jvmCustomPlaceholder")}
+                  onChange={(e) => {
+                    setJvmDraft(e.target.value)
+                    void saveRuntime(runtime.over.memory, runtime.over.java, {
+                      mode: "custom",
+                      args: splitArgs(e.target.value),
+                    })
+                  }}
+                />
+              </Field>
+            ) : (
+              <p className="mt-3 text-xs text-txt-dim">
+                {runtime.globalJvmArgs.length
+                  ? t("jvmGlobal", { args: runtime.globalJvmArgs.join(" ") })
+                  : t("jvmInheritNone")}
+              </p>
+            )}
+            {/* Refusals are listed rather than silently filtered. A flag that
+                vanished from the command line without a word is the failure
+                mode this whole feature has to avoid. */}
+            {jvmVerdicts.some((v) => !v.ok) && (
+              <ul className="mt-2 flex flex-col gap-1" role="alert">
+                {jvmVerdicts
+                  .filter((v) => !v.ok)
+                  .map((v) => (
+                    <li key={v.arg} className="text-[11px] text-bad">
+                      {t("jvmRejected", { arg: v.arg, reason: v.reason ?? "" })}
+                    </li>
+                  ))}
+              </ul>
+            )}
+            {runtime.over.jvm.mode === "custom" && runtime.effective.jvmArgs.length === 0 && (
+              <p className="mt-2 text-xs text-txt-dim">{t("jvmEmpty")}</p>
             )}
           </>
         )}

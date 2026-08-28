@@ -76,6 +76,16 @@ pub struct Settings {
     /// bursting rows that were laid out around their text.
     #[serde(default = "default_ui_scale")]
     pub ui_scale: f32,
+    /// JVM tuning flags applied to every pack that has not set its own. Stored
+    /// raw and sanitized on the way OUT (`runtime::resolve`), not on the way in:
+    /// a player who pastes a flag the allowlist refuses should still see what
+    /// they pasted in Ajustes rather than have the field silently eat it.
+    ///
+    /// Never contains `-Xmx` — that is `memory_mib`, and `jvm_args::judge`
+    /// rejects it because the resolved heap is appended last and would win.
+    /// `#[serde(default)]` so a settings.json without the key loads unchanged.
+    #[serde(default)]
+    pub jvm_args: Vec<String>,
 }
 
 /// 1.0. Deliberately not "whatever the OS DPI suggests": Tauri already applies
@@ -124,6 +134,9 @@ impl Default for Settings {
             emulator_paths: std::collections::HashMap::new(),
             rom_dirs: Vec::new(),
             ui_scale: default_ui_scale(),
+            // Empty, not a curated GC preset: a default the player never chose
+            // is a default nobody can debug when the game behaves oddly.
+            jvm_args: Vec::new(),
         }
     }
 }

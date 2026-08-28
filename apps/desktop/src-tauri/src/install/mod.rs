@@ -24,6 +24,7 @@ pub mod files;
 pub mod game;
 pub mod initial;
 pub mod instance;
+pub mod jvm_args;
 /// Optional content: the feature model a player chooses from.
 pub mod optional;
 pub mod patch;
@@ -50,7 +51,7 @@ use paths::{InstancePaths, Layout};
 use process::RunningGame;
 use progress::{Phase, Reporter};
 use resolve::PlannedFile;
-use runtime::{JavaChoice, MemoryChoice, ResolvedRuntime, RuntimeOverride};
+use runtime::{JavaChoice, JvmChoice, MemoryChoice, ResolvedRuntime, RuntimeOverride};
 
 /// Serialisable failure for the renderer.
 ///
@@ -380,6 +381,11 @@ async fn prepare(
         .build()
         .map_err(|e| InstallFailure::message(format!("No se pudo crear el cliente HTTP: {e}")))?;
 
+    // Before resolving: if this instance has never had a runtime file, adopt
+    // whatever the pack recommends as its starting point. Once. See
+    // `runtime::seed_from_pack` for why this is not a resolution step.
+    seed_runtime_from_pack(&instance, &plan.runtime);
+
     // The heap and JVM this pack will actually use. Resolved once, here,
     // so install and launch can never disagree, and computed from the pack's
     // OWN mod count: the plan on a first install, the marker afterwards (which
@@ -417,6 +423,32 @@ fn resolve_runtime(
         mod_count,
         runtime::total_ram_mib_or_assumed(),
     )
+}
+
+/// Adopt the pack's recommended heap and JVM flags, but ONLY for an instance
+/// that has no runtime file at all.
+///
+/// The file's existence is the whole test, and it is the right one: every path
+/// that records a player's choice goes through `write_runtime_override`, so a
+/// file present means a human has decided something — including deciding to
+/// inherit. No file means nobody has, and the pack's author is the best
+/// available source of an opinion.
+///
+/// Deliberately silent on failure. A pack recommendation that cannot be written
+/// costs the player a default, not an install; refusing to install a working
+/// pack over it would be the worse trade.
+fn seed_runtime_from_pack(instance: &InstancePaths, pack: &runtime::PackRuntime) {
+    if pack.is_empty() || instance.runtime.exists() {
+        return;
+    }
+    let (over, dropped) = runtime::seed_from_pack(pack);
+    for (arg, why) in &dropped {
+        // Into the launcher log, not swallowed: an author whose flag vanished
+        // needs to find out from somewhere, and this is the only place a
+        // manifest published before the rule existed will ever say so.
+        eprintln!("[runtime] parámetro JVM del pack descartado: {arg} ({})", why.reason());
+    }
+    let _ = write_runtime_override(instance, &over);
 }
 
 /// Never fails: a corrupt or absent override file means "inherit", which is
@@ -2179,6 +2211,9 @@ pub struct InstanceRuntime {
     pub global_memory_mib: u32,
     pub global_memory_auto: bool,
     pub global_java_path: Option<String>,
+    /// So "heredar" in the JVM field can name the flags it would inherit,
+    /// for the same reason `global_memory_mib` exists.
+    pub global_jvm_args: Vec<String>,
 }
 
 fn instance_runtime_view(
@@ -2194,6 +2229,7 @@ fn instance_runtime_view(
         global_memory_mib: settings.memory_mib,
         global_memory_auto: settings.memory_auto,
         global_java_path: settings.java_path().map(str::to_string),
+        global_jvm_args: settings.jvm_args.clone(),
     }
 }
 
@@ -2221,14 +2257,47 @@ pub async fn instance_runtime_set(
     slug: String,
     memory: MemoryChoice,
     java: JavaChoice,
+    jvm: JvmChoice,
     app: tauri::AppHandle,
 ) -> Result<InstanceRuntime, InstallFailure> {
     let settings = settings::load(&app);
     let layout = Layout::new(&app, settings.game_dir())?;
     let instance = layout.instance(&slug);
 
-    write_runtime_override(&instance, &RuntimeOverride { memory, java })?;
+    // Stored as typed, sanitized on the way out. The player sees the flag they
+    // pasted echoed back with the refusal shown beside it, which is how they
+    // learn it was refused; silently deleting it from the field would read as
+    // the panel being broken.
+    write_runtime_override(&instance, &RuntimeOverride { memory, java, jvm })?;
     Ok(instance_runtime_view(&settings, &instance))
+}
+
+/// Judge a list of JVM flags without storing them, so the runtime panel and the
+/// settings screen can mark the bad ones AS THE PLAYER TYPES rather than after
+/// a failed launch. The same `jvm_args::judge` the installer uses — there is no
+/// second, looser rule for the UI.
+#[tauri::command]
+pub async fn jvm_args_check(args: Vec<String>) -> Vec<JvmArgVerdict> {
+    args.iter()
+        .map(|arg| match jvm_args::judge(arg) {
+            Ok(_) => JvmArgVerdict { arg: arg.clone(), ok: true, reason: None },
+            Err((_, why)) => JvmArgVerdict {
+                arg: arg.clone(),
+                ok: false,
+                reason: Some(why.reason().to_string()),
+            },
+        })
+        .collect()
+}
+
+/// One line of `jvm_args_check`'s answer. `reason` is already the player-facing
+/// Spanish phrase, so the renderer never maps a rejection kind to text.
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct JvmArgVerdict {
+    pub arg: String,
+    pub ok: bool,
+    pub reason: Option<String>,
 }
 
 // ── User-provided files ──────────────────────────────────────────────────────

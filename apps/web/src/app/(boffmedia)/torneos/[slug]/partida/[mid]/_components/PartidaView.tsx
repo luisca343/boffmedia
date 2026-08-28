@@ -135,7 +135,7 @@ export function PartidaView({
             {opp._pk?.length ? (
               <TmTeamsheet opp={opp} onCalc={() => window.open("https://calc.pokemonshowdown.com", "_blank")} />
             ) : null}
-            <MyTeamsheetCard tournamentId={detail.tournamentId} />
+            <MyTeamsheetCard mons={detail.viewerTeamsheet} />
           </>
         ) : (
           <SpectatorSummary detail={detail} showChat={detail.viewerRole === "admin"} onChanged={refetch} />

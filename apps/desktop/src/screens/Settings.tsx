@@ -16,6 +16,7 @@ import {
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 
+import { PlayerHead } from "../components/PlayerHead";
 import { useT } from "../i18n";
 import {
   getRuntimeInfo,
@@ -27,6 +28,8 @@ import {
   romDirsRemove,
   filePicker,
   folderPicker,
+  jvmArgsCheck,
+  type JvmArgVerdict,
 } from "../runtime";
 import { UI_SCALES, type UiScale } from "../services/types";
 import { checkForUpdates, useUpdates } from "../services/updates";
@@ -36,15 +39,24 @@ import { elidePath, formatBytes } from "../utils/format";
 // Wrong Java version is the single most common launcher support ticket, hence
 // the explicit, visible Java row rather than silent detection.
 
+/** Same tokenisation the per-pack panel uses: every accepted flag is a single
+ *  whitespace-free token, so there is nothing a quote could usefully protect. */
+const splitArgs = (text: string): string[] => text.split(/\s+/).filter(Boolean);
+
 export function Settings() {
   const {
     settings,
     patchSettings,
     account,
+    accounts,
     boffAccount,
     revalidate,
     revalidating,
     removeAccount,
+    switchAccount,
+    signIn,
+    signingIn,
+    sessionBusy,
     signOut,
     switchingAccount,
   } = useApp();
@@ -63,6 +75,21 @@ export function Settings() {
   useEffect(() => {
     setMemoryDraft(String(settings.memoryMib));
   }, [settings.memoryMib]);
+  /** Free-text draft for the same reason `memoryDraft` is one: committing on
+   *  every keystroke would re-split "-Xms2G -XX" the moment the space is typed
+   *  and fight the cursor. Committed on blur. */
+  const [jvmDraft, setJvmDraft] = useState(settings.jvmArgs.join(" "));
+  const [jvmVerdicts, setJvmVerdicts] = useState<JvmArgVerdict[]>([]);
+  // Judged as typed, by Rust — the renderer holds no second copy of the grammar.
+  useEffect(() => {
+    let live = true;
+    void jvmArgsCheck(splitArgs(jvmDraft)).then((v) => {
+      if (live) setJvmVerdicts(v);
+    });
+    return () => {
+      live = false;
+    };
+  }, [jvmDraft]);
   const [mgbaStatus, setMgbaStatus] = useState<any>(null);
   const [melondsStatus, setMelondsStatus] = useState<any>(null);
   const [romFolders, setRomFolders] = useState<string[]>([]);
@@ -353,6 +380,41 @@ export function Settings() {
                 {settings.javaPath ? t("java.manualHint") : t("java.autoHint")}
               </span>
             </div>
+          </Panel>
+
+          <Panel
+            title={t("jvm.title")}
+            aside={
+              <Badge tone={settings.jvmArgs.length ? "warn" : "ok"}>
+                {settings.jvmArgs.length
+                  ? t("jvm.count", { count: settings.jvmArgs.length })
+                  : t("jvm.none")}
+              </Badge>
+            }
+          >
+            {/* A free-text field, like every other launcher's — but judged by
+              the same Rust allowlist the installer applies, so a refused flag
+              is named HERE instead of disappearing at launch. */}
+            <Field label={t("jvm.label")} hint={t("jvm.hint")}>
+              <Input
+                value={jvmDraft}
+                placeholder={t("jvm.placeholder")}
+                onChange={(e) => setJvmDraft(e.target.value)}
+                onBlur={() => patchSettings({ jvmArgs: splitArgs(jvmDraft) })}
+              />
+            </Field>
+            {jvmVerdicts.some((v) => !v.ok) && (
+              <ul className="mt-2 flex flex-col gap-1" role="alert">
+                {jvmVerdicts
+                  .filter((v) => !v.ok)
+                  .map((v) => (
+                    <li key={v.arg} className="text-[11px] text-bad">
+                      {t("jvm.rejected", { arg: v.arg, reason: v.reason ?? "" })}
+                    </li>
+                  ))}
+              </ul>
+            )}
+            <p className="mt-2 text-xs text-txt-dim">{t("jvm.memoryNote")}</p>
           </Panel>
 
           <Panel title={t("install.title")}>
@@ -658,69 +720,114 @@ export function Settings() {
 
             <Divider className="my-4" />
 
-            {/* The linked Minecraft identity: a sub-credential asked for at launch
-              time, not the launcher principal. This is the only surface that
-              keeps unlink (auth_remove) and sign-out-everywhere (auth_logout)
-              reachable now that the old Minecraft account picker is gone. */}
-            <p className="mb-2 text-sm font-medium">
+            {/* The linked Minecraft identities: sub-credentials asked for at
+              launch time, not the launcher principal.
+
+              This is a LIST, and that is the point. auth_accounts/auth_switch
+              have supported several linked accounts since the roster landed,
+              but this panel used to render exactly one of them with an
+              "Unlink" button — so the only account surface anyone goes
+              looking for stated, in as many words, that you get one Minecraft
+              account. The rail chip had the real switcher, hidden behind a
+              32px avatar. Adding is the same device flow either way: the
+              roster keys on UUID, so it appends rather than replacing. */}
+            <p className="mb-1 text-sm font-medium">
               {t("account.linkedMinecraft")}
             </p>
-            {account ? (
-              <>
-                <DataList
-                  rows={[
-                    { label: t("account.user"), value: account.username },
-                    {
-                      label: t("account.uuid"),
-                      value: account.uuid,
-                      mono: true,
-                      wide: true,
-                    },
-                  ]}
-                />
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <Button
+            <p className="mb-3 text-xs text-txt-dim">
+              {t("account.minecraftLead")}
+            </p>
+
+            {/* `accounts` is the roster; `account` is the one holding a live
+              session. Falling back to a single synthesised row keeps the panel
+              truthful when the roster file could not be read — authAccounts
+              swallows that and returns [] rather than blocking the shell. */}
+            {(accounts.length > 0
+              ? accounts
+              : account
+                ? [{ ...account, active: true }]
+                : []
+            ).map((entry) => {
+              const isActive = entry.uuid === account?.uuid;
+              return (
+                <div
+                  key={entry.uuid}
+                  className="flex items-center gap-3 border-b border-line py-2 last:border-b-0"
+                >
+                  <PlayerHead
+                    skinUrl={entry.skinUrl}
+                    username={entry.username}
+                    size={32}
+                  />
+                  <div className="min-w-0 flex-1">
+                    <p className="flex items-center gap-2 truncate text-sm">
+                      {entry.username}
+                      {isActive && (
+                        <Badge tone="ok">
+                          {t("account.minecraftActive")}
+                        </Badge>
+                      )}
+                    </p>
+                    <p className="truncate font-mono text-[10px] text-txt-dim">
+                      {entry.uuid}
+                    </p>
+                  </div>
+                  {/* Switching runs the full MSA refresh chain and swaps the
+                    session the game launches with, so it must not overlap an
+                    install or a running game (sessionBusy). */}
+                  {!isActive && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      disabled={switchingAccount || sessionBusy || signingIn}
+                      onClick={() => void switchAccount(entry.uuid)}
+                    >
+                      {t("account.useMinecraft")}
+                    </Button>
+                  )}
+                  <IconButton
+                    name="x"
                     size="sm"
                     variant="ghost"
-                    icon="x"
-                    disabled={switchingAccount}
-                    onClick={() => void removeAccount(account.uuid)}
-                  >
-                    {t("account.unlinkMinecraft")}
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    icon="logout"
-                    onClick={() => signOut()}
-                  >
-                    {t("account.signOutEverywhere")}
-                  </Button>
+                    label={t("account.unlinkMinecraft")}
+                    title={t("account.unlinkMinecraft")}
+                    disabled={switchingAccount || sessionBusy}
+                    onClick={() => void removeAccount(entry.uuid)}
+                  />
                 </div>
-                <p className="mt-2 text-xs text-txt-dim">
-                  {t("account.signOutEverywhereHint")}
-                </p>
-              </>
-            ) : (
-              <>
-                <p className="text-xs text-txt-dim">
-                  {t("account.minecraftNone")}
-                </p>
-                <div className="mt-3">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    icon="logout"
-                    onClick={() => signOut()}
-                  >
-                    {t("account.signOutEverywhere")}
-                  </Button>
-                </div>
-                <p className="mt-2 text-xs text-txt-dim">
-                  {t("account.signOutEverywhereHint")}
-                </p>
-              </>
+              );
+            })}
+
+            {accounts.length === 0 && !account && (
+              <p className="text-xs text-txt-dim">
+                {t("account.minecraftNone")}
+              </p>
             )}
+
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              {/* Always present, linked accounts or none: this is the
+                affordance that was missing entirely. */}
+              <Button
+                size="sm"
+                variant="ghost"
+                icon="plus"
+                disabled={switchingAccount || sessionBusy || signingIn}
+                onClick={() => void signIn()}
+              >
+                {t("account.addMinecraft")}
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                icon="logout"
+                onClick={() => signOut()}
+              >
+                {t("account.signOutEverywhere")}
+              </Button>
+            </div>
+            <p className="mt-2 text-xs text-txt-dim">
+              {t("account.signOutEverywhereHint")}
+            </p>
             <p className="mt-3 text-xs text-txt-dim">{t("account.note")}</p>
           </Panel>
         </Section>

@@ -419,6 +419,7 @@ export type { PlaceBidDto } from './models/PlaceBidDto';
 export type { PlayerAppDto } from './models/PlayerAppDto';
 export type { PlayerHistory } from './models/PlayerHistory';
 export type { PlayerRankInfo } from './models/PlayerRankInfo';
+export type { PlayerScopeDto } from './models/PlayerScopeDto';
 export type { PlayerStatistics } from './models/PlayerStatistics';
 export type { PlayerStats } from './models/PlayerStats';
 export type { PlayGameDto } from './models/PlayGameDto';

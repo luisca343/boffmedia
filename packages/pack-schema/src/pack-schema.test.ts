@@ -8,6 +8,8 @@ import {
   loaderOf,
   optionalModelOf,
   optionalWarnings,
+  judgeJvmArg,
+  sanitizeJvmArgs,
   selectOf,
 } from "./index.js"
 
@@ -685,5 +687,134 @@ describe("optionalModelOf", () => {
 
   it("returns the authored groups unchanged when nothing is optional", () => {
     expect(optionalModelOf(PackManifest.parse(manifest()).version)).toEqual([])
+  })
+})
+
+describe("runtime.jvmArgs", () => {
+  const withArgs = (...jvmArgs: string[]) => {
+    const m = manifest()
+    m.version.runtime = { jvmArgs }
+    return m
+  }
+
+  it("accepts the tuning flags a real modpack ships", () => {
+    const args = [
+      "-Xms2G",
+      "-Xmn512M",
+      "-Xss1M",
+      "-XX:+UseG1GC",
+      "-XX:-OmitStackTraceInFastThrow",
+      "-XX:MaxGCPauseMillis=50",
+      "-XX:G1NewSizePercent=20",
+      "-Dmixin.debug=true",
+      "-Dfml.ignorePatchDiscrepancies=true",
+      "--add-opens=java.base/java.lang=ALL-UNNAMED",
+    ]
+    expect(sanitizeJvmArgs(args).dropped).toEqual([])
+    expect(PackManifest.parse(withArgs(...args)).version.runtime?.jvmArgs).toEqual(args)
+  })
+
+  it("refuses -Xmx with a reason that names memoryMib", () => {
+    // Not a security rule: game.rs appends the RESOLVED heap last so it beats
+    // version metadata, which means a pack's own -Xmx could never take effect.
+    // Silently ignoring it would be the worst outcome of the three.
+    expect(judgeJvmArg("-Xmx8G")).toEqual({ ok: false, arg: "-Xmx8G", reason: "heap" })
+    const parsed = PackManifest.safeParse(withArgs("-Xmx8G"))
+    expect(parsed.success).toBe(false)
+    expect(parsed.error?.issues[0].message).toContain("memoryMib")
+    expect(parsed.error?.issues[0].path).toEqual(["version", "runtime", "jvmArgs", 0])
+  })
+
+  it("refuses every flag that runs a command or loads unhashed code", () => {
+    // The two capabilities a mod jar does NOT already have: spawning an OS
+    // process, and loading a jar that never went through files[]/sha512.
+    for (const arg of [
+      "-javaagent:C:\\Users\\x\\Downloads\\evil.jar",
+      "-agentlib:jdwp=transport=dt_socket,server=y,address=5005",
+      "-agentpath:/tmp/x.so",
+      "-XX:OnError=cmd /c calc.exe",
+      "-XX:OnOutOfMemoryError=kill -9 %p",
+      "-XX:StartFlightRecording=filename=/tmp/x.jfr",
+      "-XX:CompileCommand=print,*.*",
+      "-Xbootclasspath/a:/tmp/x.jar",
+      "-cp:/tmp/x.jar",
+      "--patch-module=java.base=/tmp/x.jar",
+      "--module-path=/tmp",
+    ]) {
+      expect(judgeJvmArg(arg), arg).toMatchObject({ ok: false, reason: "denied" })
+    }
+    // Case is not a bypass.
+    expect(judgeJvmArg("-XX:onerror=calc")).toMatchObject({ ok: false, reason: "denied" })
+    expect(judgeJvmArg("-JavaAgent:x.jar")).toMatchObject({ ok: false, reason: "denied" })
+  })
+
+  it("refuses platform -D keys but keeps mod-facing ones", () => {
+    for (const arg of [
+      "-Djava.library.path=C:\\evil",
+      "-Djava.security.manager=allow",
+      "-Djdk.attach.allowAttachSelf=true",
+      "-Dsun.misc.x=1",
+      "-Dboffmedia.session=stolen",
+    ]) {
+      expect(judgeJvmArg(arg), arg).toMatchObject({ ok: false, reason: "denied" })
+    }
+    expect(judgeJvmArg("-Dmixin.debug.verbose=true").ok).toBe(true)
+  })
+
+  it("admits no filesystem path through any accepted shape", () => {
+    // The grammar, not the deny list, is what makes this true: every value
+    // pattern excludes `/`, `\` and `:`. --add-opens is the one exception and
+    // its `/` is a module separator with no drive letter and no `..`.
+    for (const arg of [
+      "-XX:HeapDumpPath=C:\\Users\\x",
+      "-XX:LogFile=/tmp/x",
+      "-Dfoo=/etc/passwd",
+      "-Dfoo=C:\\x",
+      "--add-opens=../../evil/x=ALL-UNNAMED",
+    ]) {
+      expect(judgeJvmArg(arg), arg).toMatchObject({ ok: false })
+    }
+  })
+
+  it("drops junk, dedupes, and caps the list", () => {
+    const { kept, dropped } = sanitizeJvmArgs([
+      "-XX:+UseG1GC",
+      "-XX:+UseG1GC",
+      "  -Xms2G  ",
+      "rm -rf /",
+      "",
+      "-XX:+UseZGC" + "x".repeat(300),
+    ])
+    expect(kept).toEqual(["-XX:+UseG1GC", "-Xms2G"])
+    expect(dropped.map((d) => d.reason)).toEqual(["malformed", "malformed", "malformed"])
+    expect(sanitizeJvmArgs(Array(50).fill("-XX:+UseG1GC")).kept).toHaveLength(1)
+  })
+
+  it("is minecraft-only", () => {
+    const m = manifest()
+    m.pack.gameType = "emulator"
+    m.version.dependencies = undefined
+    m.version.emulator = { kind: "mgba", rom: "roms/x.gba" }
+    m.version.files = [
+      {
+        path: "roms/x.gba",
+        sha512,
+        fileSize: 10,
+        env: { client: "required", server: "unsupported" },
+        source: { kind: "user-provided", hint: "Your ROM" },
+      },
+    ]
+    m.version.runtime = { memoryMib: 4096 }
+    const parsed = PackManifest.safeParse(m)
+    expect(parsed.success).toBe(false)
+    expect(parsed.error?.issues.some((i) => i.path.join(".") === "version.runtime")).toBe(true)
+  })
+
+  it("accepts a memory-only runtime block", () => {
+    const m = manifest()
+    m.version.runtime = { memoryMib: 8192 }
+    expect(PackManifest.parse(m).version.runtime).toEqual({ memoryMib: 8192 })
+    m.version.runtime = { memoryMib: 128 }
+    expect(PackManifest.safeParse(m).success).toBe(false)
   })
 })

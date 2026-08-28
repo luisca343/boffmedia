@@ -81,6 +81,31 @@ impl Default for JavaChoice {
     }
 }
 
+/// Per-pack JVM tuning flags. Only TWO states, not three, and that asymmetry is
+/// deliberate: there is no heuristic that can invent GC flags, so an `Auto`
+/// variant would have nothing to compute. `Custom { args: [] }` is a real and
+/// distinct value — "this pack runs with no extra flags, ignore the global
+/// list" — which is why an empty vec is not folded back into `Inherit`.
+///
+/// `-Xmx` never appears here. The resolved heap is appended last by
+/// `game::install` so it beats the version metadata, so an `-Xmx` in this list
+/// would be silently overridden; `jvm_args::judge` rejects it for that reason.
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(tag = "mode", rename_all = "camelCase")]
+pub enum JvmChoice {
+    Inherit,
+    #[serde(rename_all = "camelCase")]
+    Custom {
+        args: Vec<String>,
+    },
+}
+
+impl Default for JvmChoice {
+    fn default() -> Self {
+        JvmChoice::Inherit
+    }
+}
+
 /// The per-instance file. Every field `#[serde(default)]`: a file written by a
 /// future build with more fields, or by this one with fewer, must still parse —
 /// a failed parse here silently resets the player's choices back to global.
@@ -89,6 +114,7 @@ impl Default for JavaChoice {
 pub struct RuntimeOverride {
     pub memory: MemoryChoice,
     pub java: JavaChoice,
+    pub jvm: JvmChoice,
 }
 
 /// What actually gets used, plus enough context for the UI to explain it.
@@ -100,6 +126,12 @@ pub struct ResolvedRuntime {
     /// None = let portablemc find or install a JVM.
     pub java_path: Option<String>,
     pub java_source: RuntimeSource,
+    /// Tuning flags to pass BEFORE the resolved `-Xmx`. Already sanitized:
+    /// whatever ends up here has passed `jvm_args::judge`, so no consumer needs
+    /// to re-check it and no code path can reach argv without going through the
+    /// allowlist.
+    pub jvm_args: Vec<String>,
+    pub jvm_source: RuntimeSource,
     /// What the heuristic was fed. Shown next to the number so "6 GB
     /// (automático, 214 mods)" is verifiable rather than magic.
     pub mod_count: usize,
@@ -132,7 +164,18 @@ impl ResolvedRuntime {
             (None, RuntimeSource::Override) => "Java: gestionado por el launcher (este pack)".into(),
             (None, _) => "Java: gestionado por el launcher".into(),
         };
-        format!("Memoria: {gib:.1} GB ({how}). {java}.")
+        let jvm = if self.jvm_args.is_empty() {
+            String::new()
+        } else {
+            // The flags go in the log verbatim: "the game runs worse since the
+            // update" is unanswerable without knowing which flags were live.
+            let whose = match self.jvm_source {
+                RuntimeSource::Override => "este pack",
+                _ => "ajustes generales",
+            };
+            format!(" JVM ({whose}): {}.", self.jvm_args.join(" "))
+        };
+        format!("Memoria: {gib:.1} GB ({how}). {java}.{jvm}")
     }
 }
 
@@ -264,6 +307,21 @@ pub fn resolve(
         ),
     };
 
+    // Sanitized on the way OUT rather than only on the way in. The file on disk
+    // is hand-editable and a settings.json is hand-editable, so the allowlist
+    // has to sit on the path to argv — not merely on the paths that write to
+    // those files.
+    let (jvm_args, jvm_source) = match &over.jvm {
+        JvmChoice::Custom { args } => (
+            super::jvm_args::sanitize(args).0,
+            RuntimeSource::Override,
+        ),
+        JvmChoice::Inherit => (
+            super::jvm_args::sanitize(&settings.jvm_args).0,
+            RuntimeSource::Global,
+        ),
+    };
+
     ResolvedRuntime {
         // Same clamp as the global setting, applied here so every consumer of
         // `heap_mib` — not just `xmx_arg` — sees a sane number.
@@ -271,10 +329,66 @@ pub fn resolve(
         memory_source,
         java_path,
         java_source,
+        jvm_args,
+        jvm_source,
         mod_count,
         total_ram_mib,
         recommended_mib: recommended,
     }
+}
+
+// ── Pack-bundled defaults ──────────────────────────────────────────────────
+
+/// What a pack version recommends, already lifted out of the manifest.
+/// `resolve.rs` fills it; nothing here reads the generated schema types.
+#[derive(Debug, Clone, Default, PartialEq, Eq)]
+pub struct PackRuntime {
+    pub memory_mib: Option<u32>,
+    pub jvm_args: Vec<String>,
+}
+
+impl PackRuntime {
+    pub fn is_empty(&self) -> bool {
+        self.memory_mib.is_none() && self.jvm_args.is_empty()
+    }
+}
+
+/// Turn a pack's recommendation into the override an instance starts life with.
+///
+/// THIS IS A SEED, NOT A RESOLUTION STEP. It runs once, when the instance has no
+/// `.boff-runtime.json` at all, and the values it writes are indistinguishable
+/// afterwards from ones the player typed — which is the point. A pack that
+/// changes its flags in a later version does NOT re-tune an instance somebody
+/// has already adjusted, because this is never consulted again.
+///
+/// The consequence to be aware of: an instance installed before the pack shipped
+/// a `runtime` block has no file either, so it is seeded on its next
+/// install/update. That is the only chance it will ever get, and it still cannot
+/// overwrite a choice — a player who has opened the runtime panel has a file.
+///
+/// Returns the override to write and the arguments that were refused, so the
+/// caller can log them. Sanitizing here as well as at publish time is not
+/// belt-and-braces: a manifest can predate a rule.
+pub fn seed_from_pack(pack: &PackRuntime) -> (RuntimeOverride, Vec<(String, super::jvm_args::Rejection)>) {
+    let (kept, dropped) = super::jvm_args::sanitize(&pack.jvm_args);
+    let over = RuntimeOverride {
+        memory: match pack.memory_mib {
+            Some(mib) => MemoryChoice::Fixed { mib },
+            None => MemoryChoice::Inherit,
+        },
+        // Never seeded. A pack cannot know where this player keeps their JDKs,
+        // and the launcher installs the right one anyway.
+        java: JavaChoice::Inherit,
+        // An empty kept list after the pack asked for flags is still `Custom`:
+        // the pack expressed an intent and every flag was refused, which the
+        // player should see as "no flags" rather than as the global list.
+        jvm: if pack.jvm_args.is_empty() {
+            JvmChoice::Inherit
+        } else {
+            JvmChoice::Custom { args: kept }
+        },
+    };
+    (over, dropped)
 }
 
 // ── Physical RAM ───────────────────────────────────────────────────────────
@@ -422,6 +536,7 @@ mod tests {
             java: JavaChoice::Custom {
                 path: "/opt/jdk21/bin/java".into(),
             },
+            jvm: JvmChoice::Inherit,
         };
         let resolved = resolve(&settings(4096, Some("/usr/bin/java"), true), &over, 300, 8192);
 
@@ -464,6 +579,7 @@ mod tests {
             &RuntimeOverride {
                 memory: MemoryChoice::Auto,
                 java: JavaChoice::Auto,
+                jvm: JvmChoice::Inherit,
             },
             300,
             16384,
@@ -480,6 +596,7 @@ mod tests {
             &RuntimeOverride {
                 memory: MemoryChoice::Fixed { mib: 2048 },
                 java: JavaChoice::Custom { path: "  ".into() },
+                jvm: JvmChoice::Inherit,
             },
             300,
             16384,
@@ -511,6 +628,7 @@ mod tests {
             &RuntimeOverride {
                 memory: MemoryChoice::Fixed { mib: 0 },
                 java: JavaChoice::Inherit,
+                jvm: JvmChoice::Inherit,
             },
             10,
             8192,
@@ -528,6 +646,7 @@ mod tests {
         let over = RuntimeOverride::default();
         assert_eq!(over.memory, MemoryChoice::Inherit);
         assert_eq!(over.java, JavaChoice::Inherit);
+        assert_eq!(over.jvm, JvmChoice::Inherit);
 
         // And a partial file — one key, written by a future or older build —
         // must parse rather than reset the other one.
@@ -535,6 +654,9 @@ mod tests {
             serde_json::from_str(r#"{"memory":{"mode":"auto"}}"#).expect("a partial file must load");
         assert_eq!(partial.memory, MemoryChoice::Auto);
         assert_eq!(partial.java, JavaChoice::Inherit);
+        // Written before `jvm` existed: it must default, not fail the parse and
+        // reset the memory choice the player made.
+        assert_eq!(partial.jvm, JvmChoice::Inherit);
 
         let empty: RuntimeOverride = serde_json::from_str("{}").expect("an empty file must load");
         assert_eq!(empty, RuntimeOverride::default());
@@ -545,11 +667,13 @@ mod tests {
         let raw = serde_json::to_string(&RuntimeOverride {
             memory: MemoryChoice::Fixed { mib: 8192 },
             java: JavaChoice::Custom { path: "/j".into() },
+            jvm: JvmChoice::Custom { args: vec!["-XX:+UseG1GC".into()] },
         })
         .unwrap();
         assert!(raw.contains(r#""mode":"fixed""#), "{raw}");
         assert!(raw.contains(r#""mib":8192"#), "{raw}");
         assert!(raw.contains(r#""mode":"custom""#), "{raw}");
+        assert!(raw.contains(r#""args":["-XX:+UseG1GC"]"#), "{raw}");
 
         let resolved = serde_json::to_string(&resolve(
             &Settings::default(),
@@ -563,12 +687,145 @@ mod tests {
             "memorySource",
             "javaPath",
             "javaSource",
+            "jvmArgs",
+            "jvmSource",
             "modCount",
             "totalRamMib",
             "recommendedMib",
         ] {
             assert!(resolved.contains(key), "missing {key} in {resolved}");
         }
+    }
+
+    // ── jvm args ───────────────────────────────────────────────────────────
+
+    #[test]
+    fn a_pack_without_a_choice_inherits_the_global_flags_sanitized() {
+        let mut global = settings(6144, None, false);
+        global.jvm_args = vec![
+            "-XX:+UseG1GC".into(),
+            // A hand-edited settings.json is exactly as untrusted as a manifest,
+            // so the allowlist has to sit on the resolve path, not only on the
+            // paths that write these files.
+            "-XX:OnError=calc.exe".into(),
+        ];
+        let resolved = resolve(&global, &RuntimeOverride::default(), 10, 16384);
+        assert_eq!(resolved.jvm_args, vec!["-XX:+UseG1GC".to_string()]);
+        assert_eq!(resolved.jvm_source, RuntimeSource::Global);
+    }
+
+    #[test]
+    fn a_pack_with_its_own_flags_does_not_also_get_the_global_ones() {
+        // Replace, not merge. Merging would make "why is this flag set?"
+        // unanswerable without opening two screens, and two GC selections in one
+        // argv is a launch failure rather than a compromise.
+        let mut global = settings(6144, None, false);
+        global.jvm_args = vec!["-XX:+UseSerialGC".into()];
+        let resolved = resolve(
+            &global,
+            &RuntimeOverride {
+                jvm: JvmChoice::Custom { args: vec!["-XX:+UseG1GC".into()] },
+                ..Default::default()
+            },
+            10,
+            16384,
+        );
+        assert_eq!(resolved.jvm_args, vec!["-XX:+UseG1GC".to_string()]);
+        assert_eq!(resolved.jvm_source, RuntimeSource::Override);
+    }
+
+    #[test]
+    fn an_empty_custom_list_means_no_flags_not_inherit_the_global_ones() {
+        let mut global = settings(6144, None, false);
+        global.jvm_args = vec!["-XX:+UseSerialGC".into()];
+        let resolved = resolve(
+            &global,
+            &RuntimeOverride { jvm: JvmChoice::Custom { args: vec![] }, ..Default::default() },
+            10,
+            16384,
+        );
+        assert!(resolved.jvm_args.is_empty(), "an explicit empty list is a choice");
+        assert_eq!(resolved.jvm_source, RuntimeSource::Override);
+    }
+
+    #[test]
+    fn the_resolved_flags_reach_the_summary_so_a_support_thread_can_see_them() {
+        let resolved = resolve(
+            &Settings::default(),
+            &RuntimeOverride {
+                jvm: JvmChoice::Custom { args: vec!["-XX:+UseG1GC".into()] },
+                ..Default::default()
+            },
+            10,
+            16384,
+        );
+        assert!(resolved.summary().contains("-XX:+UseG1GC"), "{}", resolved.summary());
+        // And nothing is appended when there are none.
+        let bare = resolve(&Settings::default(), &RuntimeOverride::default(), 10, 16384);
+        assert!(!bare.summary().contains("JVM ("), "{}", bare.summary());
+    }
+
+    // ── pack seeding ───────────────────────────────────────────────────────
+
+    #[test]
+    fn a_pack_recommendation_becomes_an_ordinary_player_choice() {
+        let (over, dropped) = seed_from_pack(&PackRuntime {
+            memory_mib: Some(8192),
+            jvm_args: vec!["-XX:+UseG1GC".into(), "-Xms2G".into()],
+        });
+        assert!(dropped.is_empty());
+        assert_eq!(over.memory, MemoryChoice::Fixed { mib: 8192 });
+        assert_eq!(
+            over.jvm,
+            JvmChoice::Custom { args: vec!["-XX:+UseG1GC".into(), "-Xms2G".into()] }
+        );
+        // Java is never seeded: a pack cannot know where this player keeps a JDK.
+        assert_eq!(over.java, JavaChoice::Inherit);
+    }
+
+    #[test]
+    fn a_pack_cannot_seed_a_flag_the_allowlist_refuses() {
+        // A manifest can predate a rule, so the launcher re-checks what the
+        // dashboard already rejected — and reports what it dropped.
+        let (over, dropped) = seed_from_pack(&PackRuntime {
+            memory_mib: None,
+            jvm_args: vec![
+                "-XX:+UseG1GC".into(),
+                "-javaagent:evil.jar".into(),
+                "-Xmx16G".into(),
+            ],
+        });
+        assert_eq!(over.jvm, JvmChoice::Custom { args: vec!["-XX:+UseG1GC".into()] });
+        assert_eq!(dropped.len(), 2);
+        assert_eq!(dropped[0].1, crate::install::jvm_args::Rejection::Denied);
+        assert_eq!(dropped[1].1, crate::install::jvm_args::Rejection::Heap);
+    }
+
+    #[test]
+    fn a_pack_that_asks_for_nothing_seeds_nothing() {
+        assert!(PackRuntime::default().is_empty());
+        let (over, _) = seed_from_pack(&PackRuntime::default());
+        assert_eq!(over, RuntimeOverride::default());
+
+        // Memory-only and flags-only packs each leave the other field inheriting.
+        let (mem_only, _) = seed_from_pack(&PackRuntime { memory_mib: Some(4096), jvm_args: vec![] });
+        assert_eq!(mem_only.jvm, JvmChoice::Inherit);
+        let (args_only, _) =
+            seed_from_pack(&PackRuntime { memory_mib: None, jvm_args: vec!["-Xms1G".into()] });
+        assert_eq!(args_only.memory, MemoryChoice::Inherit);
+    }
+
+    #[test]
+    fn a_pack_whose_every_flag_was_refused_seeds_an_explicit_empty_list() {
+        // NOT `Inherit`. The pack expressed an intent and it was fully refused;
+        // falling back to the player's global flags would run flags the pack
+        // never asked for, which is the one outcome nobody chose.
+        let (over, dropped) = seed_from_pack(&PackRuntime {
+            memory_mib: None,
+            jvm_args: vec!["-javaagent:evil.jar".into()],
+        });
+        assert_eq!(over.jvm, JvmChoice::Custom { args: vec![] });
+        assert_eq!(dropped.len(), 1);
     }
 
     // ── mod counting ───────────────────────────────────────────────────────

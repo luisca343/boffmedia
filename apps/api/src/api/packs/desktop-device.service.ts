@@ -8,6 +8,7 @@ import {
 import { randomBytes } from 'crypto';
 import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
+import { desktopAvatarUrl } from './desktop-avatar';
 import { DesktopDeviceRepository } from './desktop-device.repository';
 import { PacksAuthService } from './packs-auth.service';
 import { PacksRepository } from './packs.repository';
@@ -37,7 +38,12 @@ export type DevicePollResult =
   | {
       status: 'approved';
       token: string;
-      user: { id: number; username: string; mcUuid: string | null };
+      user: {
+        id: number;
+        username: string;
+        mcUuid: string | null;
+        avatarUrl: string | null;
+      };
     };
 
 /**
@@ -186,6 +192,10 @@ export class DesktopDeviceService {
         id: user.id,
         username: user.username,
         mcUuid: user.uuid ?? null,
+        // Sent with the approval so the rail draws the right face immediately.
+        // Waiting for the next `me` would mean a monogram for the whole first
+        // session after signing in.
+        avatarUrl: desktopAvatarUrl(user.profilePicture, user.updatedAt),
       },
     };
   }

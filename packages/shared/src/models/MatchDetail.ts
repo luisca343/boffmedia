@@ -48,6 +48,10 @@ export type MatchDetail = {
      * Opponent's open teamsheet — only for the two participants and admins.
      */
     opponentTeamsheet: Array<TeamsheetMonDto> | null;
+    /**
+     * The caller's own open teamsheet, for the two participants of this match. Read-only here: teamsheets lock when the field is resolved, before any match exists.
+     */
+    viewerTeamsheet: Array<TeamsheetMonDto> | null;
     champion: Competitor | null;
 };
 export namespace MatchDetail {

@@ -164,12 +164,8 @@ export class LauncherController {
       'El launcher lo llama al arrancar: una sesión de 30 días sobrevive a muchos motivos para revocarla, y enterarse al iniciar es mejor que enterarse a mitad de una instalación.',
   })
   @ApiResponse({ status: HttpStatus.OK, type: DesktopSessionUserEntity })
-  me(@Req() req: DesktopRequest): DesktopSessionUserEntity {
-    return {
-      id: req.desktopClient!.userId,
-      username: req.desktopClient!.username,
-      mcUuid: req.desktopClient!.mcUuid ?? null,
-    };
+  async me(@Req() req: DesktopRequest): Promise<DesktopSessionUserEntity> {
+    return this.packs.desktopSessionUser(req.desktopClient!);
   }
 
   @Get('packs')

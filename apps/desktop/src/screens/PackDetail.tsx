@@ -46,6 +46,8 @@ import { RandomizerPanel } from "../components/pack/RandomizerPanel";
 import {
   exportMrpack,
   exportServerMrpack,
+  exportServerZip,
+  onServerZipProgress,
   instanceOptionalModel,
   instanceReveal,
   localPackDuplicate,
@@ -346,6 +348,12 @@ export function PackDetail() {
   const [editing, setEditing] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [exportingServer, setExportingServer] = useState(false);
+  // null = not running. The ZIP export ships the mod jars themselves, so it is
+  // a minutes-long, hundreds-of-megabytes job and needs a real counter.
+  const [serverZip, setServerZip] = useState<{
+    done: number;
+    total: number;
+  } | null>(null);
   const [publishing, setPublishing] = useState(false);
   const [duplicating, setDuplicating] = useState(false);
   const [showDelete, setShowDelete] = useState(false);
@@ -542,6 +550,29 @@ export function PackDetail() {
     }
   };
 
+  const doExportServerZip = async () => {
+    setServerZip({ done: 0, total: 0 });
+    const stop = onServerZipProgress((e) => {
+      if (e.slug === pack.slug) setServerZip({ done: e.done, total: e.total });
+    });
+    try {
+      const report = await exportServerZip(pack.slug);
+      toast.success(
+        report.skipped.length > 0
+          ? t("exportServerZipSkipped", { count: report.skipped.length })
+          : t("exportServerZipSuccess"),
+      );
+    } catch (err) {
+      const message = (err as { message?: string })?.message;
+      if (message !== t("exportCancelled")) {
+        toast.error(message ?? t("exportServerZipError"));
+      }
+    } finally {
+      stop();
+      setServerZip(null);
+    }
+  };
+
   const handleProvideFile = async (filePath: string) => {
     // Open the native picker for the player's copy of this file; cancel is a no-op.
     const source = await filePicker();
@@ -632,6 +663,17 @@ export function PackDetail() {
       label: exportingServer ? t("exportingServerMenu") : t("exportServerMenu"),
       icon: "upload",
       onSelect: () => void doExport(true),
+    },
+    {
+      label: serverZip
+        ? t("exportingServerZipMenu", {
+            done: serverZip.done,
+            total: serverZip.total,
+          })
+        : t("exportServerZipMenu"),
+      icon: "server",
+      disabled: serverZip !== null,
+      onSelect: () => void doExportServerZip(),
     },
     // Offered to everyone; the API is what enforces BOFF_ADMIN. Hiding it based
     // on a role the renderer would have to guess at is how a button ends up

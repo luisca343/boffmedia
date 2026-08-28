@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCachedImage } from "./useCachedImage"
 
 // The player's face, cropped out of the raw Minecraft skin sheet.
 //
@@ -13,9 +13,21 @@ import { useEffect, useState } from "react"
 // 64×32 skins are still legal, and letting the height follow the aspect ratio
 // puts the head in the same place on both layouts.
 //
-// The CSP (`img-src 'self' data: https:`) already allows textures.minecraft.net,
-// so this needs none of the icon cache in icons.rs — that exists for catalog art
-// on arbitrary hosts, which is a different problem.
+// The sheet is fetched through the icon cache (icons.rs) rather than handed to
+// <img> directly. The CSP does allow textures.minecraft.net, so that is not the
+// reason here — these two are:
+//
+//   * OFFLINE. The roster caches `skin_url` so the switcher can draw faces with
+//     no live session, which is exactly the state where a remote <img> is a
+//     blank square. Caching the bytes is what makes that cached URL mean
+//     anything.
+//   * A failure becomes VISIBLE. `useCachedImage` reports a refused sheet to
+//     the Logs screen. Before, a face that would not load and an account with
+//     no skin were the same monogram, with nothing to tell them apart.
+//
+// Staleness, which the cache never expires, is a non-issue for skins: a
+// textures.minecraft.net URL is content-addressed, so changing skin changes the
+// URL and therefore the cache key.
 
 /** A monogram, for a player with no skin and for a sheet that fails to load.
  *  Never a default Steve: a wrong face reads as the wrong ACCOUNT, which is
@@ -42,12 +54,13 @@ export function PlayerHead({
   username: string
   size?: number
 }) {
-  const [failed, setFailed] = useState(false)
-  // A switcher row can be re-keyed onto a different player; without this the
-  // previous player's load failure would blank the new one's face.
-  useEffect(() => setFailed(false), [skinUrl])
+  // Re-keying a switcher row onto a different player is handled inside the
+  // hook: it restarts on every url change, so the previous player's failure
+  // never blanks the new one's face.
+  const { src, failed, onError } = useCachedImage(skinUrl)
 
-  if (!skinUrl || failed) return <Monogram username={username} size={size} />
+  if (!skinUrl || !src || failed)
+    return <Monogram username={username} size={size} />
 
   return (
     <span
@@ -56,9 +69,9 @@ export function PlayerHead({
       aria-hidden
     >
       <img
-        src={skinUrl}
+        src={src}
         alt=""
-        onError={() => setFailed(true)}
+        onError={onError}
         className="absolute max-w-none"
         style={{
           width: size * 8,

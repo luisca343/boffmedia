@@ -20,8 +20,10 @@ import { AvPanel, AvPill } from "../ui/av-kit"
 import {
   type AdminPack,
   type PackLoader,
+  type PackRuntimeInput,
   PacksService,
 } from "@/services/api/boffmedia/packsService"
+import { judgeJvmArg } from "@boffmedia/pack-schema"
 import { parsePackArchive } from "./import-pack"
 import { ModSelector, type SelectedMod } from "./mod-selector"
 import { overrideFileEntry, uploadOverrideBlob } from "./upload-blob"
@@ -211,6 +213,10 @@ export function VersionEditor({
   const [mods, setMods] = useState<SelectedMod[]>([])
   const [worlds, setWorlds] = useState<BundledWorld[]>([])
   const [optionalGroups, setOptionalGroups] = useState<OptionalGroup[]>([])
+  // Free text, split on submit: the same shape the launcher's own field uses,
+  // and the same `judgeJvmArg` decides what survives on both ends.
+  const [jvmMemory, setJvmMemory] = useState("")
+  const [jvmArgs, setJvmArgs] = useState("")
   const [extraJson, setExtraJson] = useState("")
   const [busy, setBusy] = useState(false)
   const [showSnapshots, setShowSnapshots] = useState(false)
@@ -288,11 +294,25 @@ export function VersionEditor({
       // part of a version to author, and a clone that dropped them would
       // silently turn every optional file back into a required one.
       setOptionalGroups((version.optionalGroups ?? []) as OptionalGroup[])
+      // Restored on a clone too: a cloned version that dropped the pack's heap
+      // recommendation would size every new install from the vanilla floor.
+      const rt = version.runtime as PackRuntimeInput | undefined
+      setJvmMemory(rt?.memoryMib ? String(rt.memoryMib) : "")
+      setJvmArgs(rt?.jvmArgs?.join(" ") ?? "")
     })
     return () => {
       live = false
     }
   }, [sourceVersionId, pack.id, mode, t])
+
+  const splitJvmArgs = useMemo(
+    () => jvmArgs.split(/\s+/).filter(Boolean),
+    [jvmArgs],
+  )
+  const rejectedJvmArgs = useMemo(
+    () => splitJvmArgs.filter((a) => !judgeJvmArg(a).ok),
+    [splitJvmArgs],
+  )
 
   const { versions: gameVersions, loading: loadingGame } = useGameVersions()
   const { versions: loaderVersions, loading: loadingLoader } = useLoaderVersions(
@@ -534,6 +554,7 @@ export function VersionEditor({
         emulator?: { kind: EmulatorKind; rom: string; args?: string[] }
         initialFiles?: unknown[]
         optionalGroups?: unknown[]
+        runtime?: PackRuntimeInput
       } = {
         name: (emu ? emu.name : name).trim(),
         files: [...modFiles, ...overrides, ...extra],
@@ -545,6 +566,18 @@ export function VersionEditor({
         // Omitted when empty so a pack with no optional content serialises to
         // exactly the manifest shape every existing launcher installs from.
         if (optionalGroups.length > 0) payload.optionalGroups = optionalGroups
+        // Minecraft-only and omitted when empty, so a version that recommends
+        // nothing serialises to exactly the shape launchers already install
+        // from. Refused flags are dropped here as well as flagged above: the
+        // API would reject the whole publish over one of them.
+        const memoryMib = Number(jvmMemory)
+        const runtime: PackRuntimeInput = {
+          ...(Number.isFinite(memoryMib) && memoryMib > 0 ? { memoryMib } : {}),
+          ...(splitJvmArgs.length > 0
+            ? { jvmArgs: splitJvmArgs.filter((a) => judgeJvmArg(a).ok) }
+            : {}),
+        }
+        if (Object.keys(runtime).length > 0) payload.runtime = runtime
         payload.minecraft = minecraft.trim()
         payload.loader = (loader || undefined) as PackLoader | undefined
         payload.loaderVersion = loader ? loaderVersion.trim() : undefined
@@ -812,6 +845,54 @@ export function VersionEditor({
                   />
                 </Field>
               </div>
+            </section>
+            {/* A RECOMMENDATION the launcher seeds an instance with once, not a
+                setting it enforces — see `runtime::seed_from_pack`. Editing it
+                later cannot re-tune anyone who already installed the pack, which
+                is why the lead says so rather than leaving the author to guess. */}
+            <section className="border border-solid border-line bg-panel-2 p-4">
+              <div className="mb-4 flex items-start gap-3">
+                <span className="grid size-8 shrink-0 place-items-center border border-solid border-line-2 bg-panel text-accent">
+                  <Icon name="sliders" size={15} />
+                </span>
+                <div>
+                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                    {t("jvmSection")}
+                  </h3>
+                  <p className="mt-1 max-w-[80ch] text-[12px] leading-[1.45] text-txt-dim">
+                    {t("jvmSectionLead")}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-[minmax(0,0.5fr)_minmax(0,1.5fr)]">
+                <Field label={t("jvmMemory")} hint={t("jvmMemoryHint")}>
+                  <Input
+                    type="number"
+                    min={512}
+                    max={65536}
+                    step={512}
+                    value={jvmMemory}
+                    onChange={(e) => setJvmMemory(e.target.value)}
+                    placeholder="8192"
+                  />
+                </Field>
+                <Field label={t("jvmArgs")} hint={t("jvmArgsHint")}>
+                  <Input
+                    value={jvmArgs}
+                    onChange={(e) => setJvmArgs(e.target.value)}
+                    placeholder={t("jvmArgsPlaceholder")}
+                  />
+                </Field>
+              </div>
+              {/* Named, not silently dropped: the API would reject the publish
+                  anyway, and finding out at submit time with a path like
+                  `version.runtime.jvmArgs.3` is a worse way to learn it. */}
+              {rejectedJvmArgs.length > 0 && (
+                <p className="mt-3 text-[12px] leading-[1.45] text-bad" role="alert">
+                  {t("jvmArgsRejected", { args: rejectedJvmArgs.join(" ") })}
+                </p>
+              )}
             </section>
 
             <section className="flex flex-wrap items-center gap-3 border border-dashed border-line-2 bg-panel-2 px-4 py-3">

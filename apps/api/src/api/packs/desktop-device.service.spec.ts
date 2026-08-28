@@ -43,6 +43,11 @@ const user = (over: Record<string, unknown> = {}) => ({
   username: 'TrainerAsh',
   uuid: UUID,
   emailVerified: true,
+  // Already absolute, as an OAuth avatar is: the approval must pass it through
+  // untouched. The relative-path and cache-busting branches belong to
+  // `desktop-avatar.spec.ts`, which is where the asset origin belongs too.
+  profilePicture: 'https://cdn.discordapp.com/avatars/1/a.png',
+  updatedAt: new Date('2026-08-28T10:00:00.000Z'),
   ...over,
 });
 
@@ -210,7 +215,12 @@ describe('DesktopDeviceService', () => {
       expect(result).toEqual({
         status: 'approved',
         token: 'signed.jwt.token',
-        user: { id: 7, username: 'TrainerAsh', mcUuid: UUID },
+        user: {
+          id: 7,
+          username: 'TrainerAsh',
+          mcUuid: UUID,
+          avatarUrl: 'https://cdn.discordapp.com/avatars/1/a.png',
+        },
       });
     });
 

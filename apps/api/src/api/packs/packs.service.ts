@@ -10,6 +10,7 @@ import * as bcrypt from 'bcrypt';
 import { randomBytes } from 'crypto';
 import { PackManifest } from '@boffmedia/pack-schema';
 import { PackPrincipal, PacksRepository } from './packs.repository';
+import { desktopAvatarUrl } from './desktop-avatar';
 import { RandomizerPackLinkRepository } from '@api/_repositories/randomizer/pack-link.repository';
 import type { GameType, PackAccessKind, PackLoader } from '@/_db/schema/Packs';
 import {
@@ -59,6 +60,32 @@ export class PacksService {
   }
 
   // ── Launcher-facing ──────────────────────────────────────────────────────
+
+  /** The account behind a desktop session, for `GET packs/launcher/me`.
+   *
+   *  The avatar costs one extra row read rather than riding in the JWT: that
+   *  token lives 30 days, and an avatar baked into it would keep showing the
+   *  old face for a month after the player changed it. `me` is called once at
+   *  launcher startup, so the read is not on any hot path.
+   */
+  async desktopSessionUser(principal: {
+    userId: number;
+    username: string;
+    mcUuid?: string | null;
+  }): Promise<{
+    id: number;
+    username: string;
+    mcUuid: string | null;
+    avatarUrl: string | null;
+  }> {
+    const avatar = await this.repo.getAvatarSource(principal.userId);
+    return {
+      id: principal.userId,
+      username: principal.username,
+      mcUuid: principal.mcUuid ?? null,
+      avatarUrl: desktopAvatarUrl(avatar.picture, avatar.updatedAt),
+    };
+  }
 
   /** NULL column → 'minecraft'. One place owns the default so no consumer
    *  re-implements it. */
@@ -221,6 +248,7 @@ export class PacksService {
       stardew?: unknown;
       initialFiles?: unknown[] | null;
       optionalGroups?: unknown[] | null;
+      runtime?: Record<string, unknown> | null;
     },
   ): Record<string, unknown> {
     const out: Record<string, unknown> = {};
@@ -241,6 +269,11 @@ export class PacksService {
     // shape every existing launcher already installs from.
     if (v.optionalGroups && v.optionalGroups.length > 0)
       out.optionalGroups = v.optionalGroups;
+    // Minecraft-only (the zod superRefine rejects it elsewhere — an emulator
+    // pack has no JVM), and omitted when empty so a manifest that recommends
+    // nothing stays byte-identical to the shape launchers already install from.
+    if (gameType === 'minecraft' && v.runtime && Object.keys(v.runtime).length > 0)
+      out.runtime = v.runtime;
     return out;
   }
 
@@ -723,6 +756,7 @@ export class PacksService {
       stardew?: unknown;
       initialFiles?: unknown[];
       optionalGroups?: unknown[];
+      runtime?: Record<string, unknown>;
     }
   > {
     const version = await this.repo.findVersion(versionId);
@@ -751,6 +785,7 @@ export class PacksService {
       ...(version.optionalGroups
         ? { optionalGroups: version.optionalGroups }
         : {}),
+      ...(version.runtime ? { runtime: version.runtime } : {}),
     };
   }
 
@@ -790,6 +825,7 @@ export class PacksService {
       stardew: pv.stardew ?? null,
       initialFiles: pv.initialFiles ?? null,
       optionalGroups: pv.optionalGroups ?? null,
+      runtime: pv.runtime ?? null,
       notes: dto.notes ?? null,
     });
     await this.repo.audit(AUDIT.VERSION_UPDATED, packId, null, {
@@ -864,6 +900,7 @@ export class PacksService {
           stardew: dto.stardew,
           initialFiles: dto.initialFiles,
           optionalGroups: dto.optionalGroups,
+          runtime: dto.runtime,
         }),
       },
     };
@@ -906,6 +943,7 @@ export class PacksService {
       stardew: pv.stardew ?? null,
       initialFiles: pv.initialFiles ?? null,
       optionalGroups: pv.optionalGroups ?? null,
+      runtime: pv.runtime ?? null,
       notes: dto.notes ?? null,
       published: false,
       createdBy: actorId,

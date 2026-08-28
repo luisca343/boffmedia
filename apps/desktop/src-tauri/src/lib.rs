@@ -34,6 +34,7 @@ pub mod pack;
 /// Publishing a local pack to the registry (Phase 6).
 pub mod publish;
 pub mod randomizer;
+pub mod server_pack;
 pub mod settings;
 pub mod tool_api;
 pub mod worlds;
@@ -141,6 +142,7 @@ pub fn run() {
             // Per-instance Java runtime + memory.
             install::instance_runtime,
             install::instance_runtime_set,
+            install::jvm_args_check,
             // User-provided files.
             install::instance_provide_file,
             // Emulator ROM library sweep + resolution + settings.
@@ -192,6 +194,7 @@ pub fn run() {
             backups::backup_delete,
             local_packs::export_mrpack,
             local_packs::export_server_mrpack,
+            server_pack::export_server_zip,
             local_packs::import_mrpack,
             local_packs::import_mrpack_url,
             // Version pickers for local packs. Upstream-direct: the API's own

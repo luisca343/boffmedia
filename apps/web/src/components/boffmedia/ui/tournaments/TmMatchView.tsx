@@ -340,7 +340,7 @@ function TmMatchChat({ me, opp, feed }: { me: TmPlayer; opp: TmPlayer; feed: str
   )
 }
 
-function TmMonCard({ mon }: { mon: TmMon }) {
+export function TmMonCard({ mon }: { mon: TmMon }) {
   const t = useTranslations("common.tournaments")
   return (
     <div className="grid border border-solid border-line bg-base">

@@ -22,6 +22,16 @@ export type PackLoader = 'forge' | 'neoforge' | 'fabric-loader' | 'quilt-loader'
 // @boffmedia/pack-schema via `pnpm generate:shared` once the API DTO is live.
 export type GameType = 'minecraft' | 'emulator' | 'zomboid' | 'stardew';
 
+/** The heap and JVM flags a version RECOMMENDS. Declared here rather than
+ *  imported from @boffmedia/pack-schema for the reason above — but the
+ *  ALLOWLIST is imported, not re-declared: `judgeJvmArg` is one grammar shared
+ *  by the editor, the API's zod pass and the launcher, and a second copy is
+ *  exactly how the dashboard would start accepting flags the launcher drops. */
+export interface PackRuntimeInput {
+  memoryMib?: number;
+  jvmArgs?: string[];
+}
+
 /** A pack's Quick Play target — present only for "server packs". Port defaults
  *  to the vanilla 25565 when omitted. */
 export interface ServerAddress {
@@ -186,6 +196,9 @@ export interface CreateVersionInput {
    *  like the rest of the manifest payload: the API's zod pass is the authority,
    *  and a second shape declared here is a second thing to keep in step. */
   optionalGroups?: unknown[];
+  /** The heap and JVM flags this version recommends. Typed concretely rather
+   *  than as `unknown` because the editor reads both fields back on a clone. */
+  runtime?: PackRuntimeInput;
 }
 
 // The catalog vocabulary is shared with apps/desktop, which browses mods too
@@ -288,6 +301,7 @@ export class PacksService {
         emulator?: { kind: 'mgba' | 'melonds'; rom: string; args?: string[] };
         initialFiles?: unknown[];
         optionalGroups?: unknown[];
+        runtime?: PackRuntimeInput;
       }
     >(`/packs/admin/${packId}/versions/${versionId}`);
   }
