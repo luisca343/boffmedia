@@ -151,14 +151,14 @@ export class PokemonImageService {
 
     const url = `assets/pixelmon/textures/${sprite.split(':')[1]}`;
     const defaultDirDef = publicPath(
-      'smartrotom/packs/default_resourcepack',
+      'smartrotom/packs/default_resourcepack_9.4.0',
       url,
     );
     const publicDir = publicPath('smartrotom/packs/resourcepack', url);
 
     if (fs.existsSync(defaultDirDef))
       return {
-        url: path.join('/smartrotom/packs/default_resourcepack', url),
+        url: path.join('/smartrotom/packs/default_resourcepack_9.4.0', url),
         type: 'sprite',
         status,
         showImg,
@@ -171,7 +171,7 @@ export class PokemonImageService {
         showImg,
       };
     return {
-      url: '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png',
+      url: '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png',
       status,
       showImg,
     };
@@ -191,7 +191,7 @@ export class PokemonImageService {
     try {
       const pokemon = this.pokemonDataService.getSpeciesByDex(pokemonId);
       if (!pokemon) {
-        return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+        return '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
       }
 
       const form =
@@ -223,7 +223,7 @@ export class PokemonImageService {
       }
 
       if (!palette) {
-        return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+        return '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
       }
 
       // Handle special case for Minior
@@ -233,26 +233,26 @@ export class PokemonImageService {
           : (palette as any).sprite?.resource || (palette as any).sprite;
 
       if (!spriteResource) {
-        return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+        return '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
       }
 
       const url = `assets/pixelmon/textures/${spriteResource.split(':')[1]}`;
       const defaultDirDef = publicPath(
-        'smartrotom/packs/default_resourcepack',
+        'smartrotom/packs/default_resourcepack_9.4.0',
         url,
       );
       const publicDir = publicPath('smartrotom/packs/resourcepack', url);
 
       if (fs.existsSync(defaultDirDef)) {
-        return path.join('/smartrotom/packs/default_resourcepack', url);
+        return path.join('/smartrotom/packs/default_resourcepack_9.4.0', url);
       }
       if (fs.existsSync(publicDir)) {
         return path.join('/smartrotom/packs/resourcepack', url);
       }
 
-      return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+      return '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
     } catch (_error: any) {
-      return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+      return '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
     }
   }
 }

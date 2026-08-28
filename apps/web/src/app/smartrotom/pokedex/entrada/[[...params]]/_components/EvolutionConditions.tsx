@@ -2,6 +2,7 @@ import React from "react"
 import { Evolution } from "@/types/Pokemon"
 import { InfoIcon } from "lucide-react"
 import { ItemSprite } from "../../../_components/PokemonSprite"
+import { getTranslatedBiomeName, isVisibleBiome } from "@/utils/pokemonTranslations"
 
 export function getEvolutionMethod(evolution: Evolution, t: any) {
   const conditions = [] as React.ReactNode[]
@@ -77,9 +78,13 @@ function addConditionByType(condition: any, conditionKey: string, conditions: Re
       const biomeStrs = condition.biomes as string[]
       const biomes = [] as string[]
       biomeStrs.forEach((biome) => {
-        if (biome.includes("biomesoplenty") || biome.includes("terraforged")) return
-        biomes.push(t(biome.replace(" ", "_").replace(":", "_")))
+        if (!isVisibleBiome(biome)) return
+        biomes.push(getTranslatedBiomeName(biome, t))
       })
+      // Every biome sat in a disabled dimension (Milcery's End-only Alcremie
+      // form is the one real case), so this branch cannot happen here. A
+      // "specific biomes" hint with an empty tooltip would be worse than none.
+      if (biomes.length === 0) break
       conditions.push(
         <span
           key={conditionKey}

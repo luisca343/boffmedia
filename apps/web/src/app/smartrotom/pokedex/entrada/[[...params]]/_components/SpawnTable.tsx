@@ -3,9 +3,20 @@ import { SpawnInfo } from "../../../_types/spawnInfo"
 import { useTranslations } from "next-intl"
 import { MapPinIcon } from "lucide-react"
 import { RARITY_META } from "../../../_utils/dexMeta"
+import { readBiomeKeys, getTranslatedBiomeName, isVisibleBiome } from "@/utils/pokemonTranslations"
 
 export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
   const t = useTranslations("pokedex")
+
+  // A spawn that had biome conditions but has none left after filtering is
+  // unreachable on this server - every biome it named is in a disabled
+  // dimension or a mod we do not run. Rendering it as "unknown biome" would
+  // claim the Pokemon spawns somewhere it does not. Spawns with no biome
+  // condition at all are unrestricted and always kept.
+  const visibleSpawns = spawns.filter((spawn) => {
+    const biomes = readBiomeKeys(spawn.condition)
+    return biomes.length === 0 || biomes.some(isVisibleBiome)
+  })
 
   function getRarityMeta(rarity: number) {
     if (rarity < 1) return RARITY_META.legendary
@@ -15,7 +26,7 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
     return RARITY_META.common
   }
 
-  if (spawns.length === 0) {
+  if (visibleSpawns.length === 0) {
     return (
       <div className="bg-white/[0.02] border border-white/[0.05] rounded-xl p-8 text-center">
         <MapPinIcon className="h-12 w-12 mx-auto text-pk-surface-400 mb-3" />
@@ -27,11 +38,11 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
 
   return (
     <div className="flex flex-col gap-3">
-      {spawns.map((spawn, index) => {
+      {visibleSpawns.map((spawn, index) => {
         const meta = getRarityMeta(spawn.rarity)
-        const biomas = spawn.condition?.stringBiomes
-          ?.filter((biome) => !biome.includes("biomesoplenty") && !biome.includes("terraforged"))
-          .map((biome) => ({ biome, translated: t(`${biome.replace(" ", "_").replace(":", "_")}`) }))
+        const biomas = readBiomeKeys(spawn.condition)
+          .filter(isVisibleBiome)
+          .map((biome) => ({ biome, translated: getTranslatedBiomeName(biome, t) }))
 
         const times = spawn.condition?.times?.map((time) => t(`${time.toLowerCase()}`)) || [t("spawn_any_time")]
         const method = spawn.stringLocationTypes?.[0] || t("spawnTable.methodGround")

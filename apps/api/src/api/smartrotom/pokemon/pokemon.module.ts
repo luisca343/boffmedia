@@ -10,6 +10,7 @@ import { POKEMON_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/re
 
 // Import existing services (keep the original file-based services)
 import { BaseDataService } from './services/data/base-data.service';
+import { BiomeTagService } from './services/data/biome-tag.service';
 import { PokemonDataService } from './services/data/pokemon-data.service';
 import { MoveDataService } from './services/data/move-data.service';
 import { SpawnDataService } from './services/data/spawn-data.service';
@@ -51,6 +52,7 @@ const logger = pino({ name: 'util' });
 
     // Existing file-based services
     BaseDataService,
+    BiomeTagService,
     PokemonDataService,
     MoveDataService,
     SpawnDataService,

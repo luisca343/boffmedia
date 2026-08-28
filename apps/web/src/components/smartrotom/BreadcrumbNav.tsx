@@ -6,7 +6,7 @@ import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.share
 
 import React from "react";
 import { SmartRotomBadge } from "./ui";
-import { breadcrumbRewrite } from "@/utils/breadcrumb-rewrite";
+import { breadcrumbRewrite, breadcrumbSpan } from "@/utils/breadcrumb-rewrite";
 
 export default function BreadcrumbNav({className} : {className?: string}){
     const path = usePathname()
@@ -48,7 +48,11 @@ function isNavigable(label: string){
 
 function navigate(router: AppRouterInstance, parts: string[], index: number, navigable: boolean){
     if(!navigable) return
-    const path = getHref('smartrotom', parts.slice(1, index + 1).join('/'))
+    // A crumb can cover more than one segment (a biome id containing a slash),
+    // so the target is the crumb's own end, not index + 1 - otherwise the link
+    // points at half an id and lands on an empty page.
+    const end = index + breadcrumbSpan(parts, index)
+    const path = getHref('smartrotom', parts.slice(1, end).join('/'))
     router.push(path)
 }
 

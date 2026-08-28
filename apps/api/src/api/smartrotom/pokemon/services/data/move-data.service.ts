@@ -18,7 +18,7 @@ export class MoveDataService extends BaseDataService {
   async loadMoveData() {
     const startingTime = Date.now();
     const defaultDir = publicPath(
-      'smartrotom/packs/default_datapack/data/pixelmon/moves',
+      'smartrotom/packs/default_datapack_9.4.0/data/pixelmon/moves',
     );
     const publicDir = publicPath(
       'smartrotom/packs/datapack/data/pixelmon/moves',

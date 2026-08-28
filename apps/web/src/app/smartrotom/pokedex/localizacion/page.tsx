@@ -3,9 +3,8 @@ import { getTranslations } from "next-intl/server"
 import Link from "next/link"
 import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead, MetaStat } from "../_components/PageHead"
-import { TypeChip } from "../_components/ui"
 import { resolveBiome } from "../_data/biomes"
-import { getTranslatedBiomeName } from "@/utils/pokemonTranslations"
+import { getTranslatedBiomeName, isVisibleBiome } from "@/utils/pokemonTranslations"
 import { MapIcon } from "lucide-react"
 
 export default async function LocalizacionPage() {
@@ -13,7 +12,7 @@ export default async function LocalizacionPage() {
   const res = await PokemonService.getBiomes()
   const raw = (res.success ? res.data : undefined) ?? []
   const biomes = raw
-    .filter((b) => !b.name.includes("biomesoplenty") && !b.name.includes("terraforged"))
+    .filter((b) => isVisibleBiome(b.name))
     .sort((a, b) => b.count - a.count)
   const total = biomes.reduce((a, b) => a + b.count, 0)
   const max = Math.max(1, ...biomes.map((b) => b.count))
@@ -39,7 +38,10 @@ export default async function LocalizacionPage() {
           return (
             <Link
               key={b.name}
-              href={`/smartrotom/pokedex/localizacion/${b.name}`}
+              // A slash in the id (`terralith:cave/fungal_caves`) has to stay a real path
+              // separator - %2F gets normalised and redirected - so the route is a
+              // catch-all and only the text within each segment is encoded.
+              href={`/smartrotom/pokedex/localizacion/${b.name.split("/").map(encodeURIComponent).join("/")}`}
               className="relative rounded-xl p-[14px_16px] min-h-[116px] flex flex-col gap-2 overflow-hidden border border-transparent transition-transform hover:-translate-y-0.5"
               style={{ background: `linear-gradient(135deg, ${m.color}, color-mix(in oklab, ${m.color} 60%, #000))`, color: m.textLight ? "#fff" : "rgba(0,0,0,.85)" }}
             >
@@ -48,11 +50,10 @@ export default async function LocalizacionPage() {
                 {m.glyph}
               </span>
               <span className="font-pk-display font-bold text-base leading-tight mt-auto relative">{getTranslatedBiomeName(b.name, t)}</span>
-              <div className="flex items-center justify-between gap-2.5 relative">
+              <div className="flex items-center gap-2.5 relative">
                 <span className="flex items-baseline gap-1.5 text-xs opacity-90">
                   <b className="font-pk-display font-bold text-lg tabular-nums">{b.count}</b> {t("localizacion_pokemon")}
                 </span>
-                <TypeChip type={m.type} size="sm" />
               </div>
               <div className="h-1 rounded-sm bg-black/25 overflow-hidden relative">
                 <div className="h-full bg-white/70" style={{ width: `${(b.count / max) * 100}%` }} />

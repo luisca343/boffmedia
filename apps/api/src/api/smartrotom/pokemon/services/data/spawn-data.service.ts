@@ -5,12 +5,15 @@ import { SpawnInfos } from '../../interfaces/pokemon.interface';
 import { SpawnInfo } from '../../entities/pokemon-spawn.entity';
 import { Logger } from 'nestjs-pino';
 import { publicPath } from '@/config/paths';
+import { BiomeTagService } from './biome-tag.service';
+import { readBiomeKeys } from '../../utils/biome-keys';
 
 @Injectable()
 export class SpawnDataService extends BaseDataService {
   constructor(
     private readonly logger: Logger,
     private readonly pokemonDataService: PokemonDataService,
+    private readonly biomeTagService: BiomeTagService,
   ) {
     super();
   }
@@ -20,12 +23,21 @@ export class SpawnDataService extends BaseDataService {
   private spawnByForm: { [key: string]: SpawnInfo[] } = {};
   private spawnByPalette: { [key: string]: SpawnInfo[] } = {};
   private spawnByPokemonAndForm: { [key: string]: SpawnInfo[] } = {};
+  /** Keyed by category label or literal biome id, exactly as the condition reads. */
   private spawnByBiome: { [key: string]: SpawnInfo[] } = {};
+  /** Keyed by concrete biome id, after expanding category tags. */
+  private spawnByResolvedBiome: { [key: string]: SpawnInfo[] } = {};
 
   async loadSpawnData() {
     const startingTime = Date.now();
+
+    // Categories are tag references in 9.4.0, so the tag table has to exist
+    // before any spawnInfo is indexed against it.
+    await this.biomeTagService.loadBiomeTags();
+
     const folders = [
       'caverock',
+      'curry',
       'fishing',
       'forage',
       'grass',
@@ -40,7 +52,7 @@ export class SpawnDataService extends BaseDataService {
 
     for (const folder of folders) {
       const defaultDir = publicPath(
-        'smartrotom/packs/default_datapack/data/pixelmon/spawning',
+        'smartrotom/packs/default_datapack_9.4.0/data/pixelmon/spawning',
         folder,
       );
       const publicDir = publicPath(
@@ -66,7 +78,7 @@ export class SpawnDataService extends BaseDataService {
       if (spawnInfo.typeID !== 'pokemon') return;
 
       const species = spawnInfo.spec.split('species:')[1].toLowerCase();
-      const biomes = spawnInfo.condition?.stringBiomes;
+      const biomes = readBiomeKeys(spawnInfo.condition);
 
       const regex =
         /(?<species>[\w-]+)(?: form:(?<form>\w+))?(?: palette:(?<palette>\w+))?/;
@@ -97,6 +109,16 @@ export class SpawnDataService extends BaseDataService {
     biomes?.forEach((biome) => {
       if (!this.spawnByBiome[biome]) this.spawnByBiome[biome] = [];
       this.spawnByBiome[biome].push(spawnInfo);
+
+      // A category covers many biomes and many categories overlap, so the same
+      // spawnInfo reaches one biome more than once - dedupe on the way in.
+      this.biomeTagService.resolveBiomeReference(biome).forEach((resolved) => {
+        if (!this.spawnByResolvedBiome[resolved]) {
+          this.spawnByResolvedBiome[resolved] = [];
+        }
+        const bucket = this.spawnByResolvedBiome[resolved];
+        if (bucket[bucket.length - 1] !== spawnInfo) bucket.push(spawnInfo);
+      });
     });
   }
 
@@ -140,8 +162,7 @@ export class SpawnDataService extends BaseDataService {
   getBiomesByPokemon(name: string): string[] {
     const spawnInfos = this.getSpawnByPokemon(name);
     return spawnInfos.reduce((acc: string[], spawnInfo: SpawnInfo) => {
-      const biomes = spawnInfo.condition?.stringBiomes || [];
-      return [...acc, ...biomes];
+      return [...acc, ...readBiomeKeys(spawnInfo.condition)];
     }, []);
   }
 
@@ -161,8 +182,50 @@ export class SpawnDataService extends BaseDataService {
     return this.spawnByPokemonAndForm[pokemonID] || [];
   }
 
+  /**
+   * Spawns for a biome, by category label or by concrete biome id.
+   *
+   * Category labels (`all_forests`, `mesas`) are what the Pokedex has always
+   * linked to, so they win. A concrete id (`minecraft:badlands`) falls through
+   * to the resolved index, which is what makes /localizacion/minecraft:badlands
+   * answerable at all.
+   */
   getSpawnByBiome(biome: string): SpawnInfo[] {
-    return this.spawnByBiome[biome] || [];
+    return this.spawnByBiome[biome] || this.spawnByResolvedBiome[biome] || [];
+  }
+
+  /** Spawns for a concrete biome id only, ignoring category labels. */
+  getSpawnByResolvedBiome(biome: string): SpawnInfo[] {
+    return this.spawnByResolvedBiome[biome] || [];
+  }
+
+  /** Every concrete biome id that has at least one spawn, with its spawn count. */
+  getAllResolvedBiomes(): { [key: string]: number } {
+    const counts = Object.fromEntries(
+      Object.entries(this.spawnByResolvedBiome).map(([biome, spawns]) => [
+        biome,
+        spawns.length,
+      ]),
+    );
+
+    return Object.fromEntries(
+      Object.entries(counts).sort(([, a], [, b]) => b - a),
+    );
+  }
+
+  /** Concrete biome ids a Pokemon can spawn in, categories already expanded. */
+  getResolvedBiomesByPokemon(name: string): string[] {
+    const out = new Set<string>();
+    for (const spawnInfo of this.getSpawnByPokemon(name)) {
+      for (const biome of readBiomeKeys(spawnInfo.condition)) {
+        for (const resolved of this.biomeTagService.resolveBiomeReference(
+          biome,
+        )) {
+          out.add(resolved);
+        }
+      }
+    }
+    return [...out];
   }
 
   getAllSpawns(): { [key: string]: SpawnInfo[] } {
@@ -175,14 +238,12 @@ export class SpawnDataService extends BaseDataService {
 
     for (const [_pokemonId, spawnInfos] of Object.entries(allSpawns)) {
       spawnInfos.forEach((spawnInfo) => {
-        if (spawnInfo.condition?.stringBiomes) {
-          spawnInfo.condition.stringBiomes.forEach((biome) => {
-            if (!biomes[biome]) {
-              biomes[biome] = 0;
-            }
-            biomes[biome]++;
-          });
-        }
+        readBiomeKeys(spawnInfo.condition).forEach((biome) => {
+          if (!biomes[biome]) {
+            biomes[biome] = 0;
+          }
+          biomes[biome]++;
+        });
       });
     }
 

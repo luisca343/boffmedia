@@ -12,7 +12,7 @@ import TypeBadge from "@/components/shared/pokemon/TypeBadge";
 import MoveDataElement from "./MoveData";
 
 import { getStatColor, statToPercentage, getTotalStatColor } from "@/lib/pokemonColors";
-import { getTranslatedMoveName, getTranslatedMoveCategory, getTranslatedBiomeName } from "@/utils/pokemonTranslations";
+import { getTranslatedMoveName, getTranslatedMoveCategory, getTranslatedBiomeName, filterVisibleBiomes } from "@/utils/pokemonTranslations";
 import { useSpriteManifestStore } from "@/stores/spriteManifestStore";
 
 import { PokemonStats } from "../types";
@@ -304,10 +304,7 @@ export default function PokemonDataCard({ data }: PokemonDataCardProps) {
   const { getSprite } = useSpriteManifestStore();
   const spriteInfo = getSprite({ id, form });
 
-  const filteredBiomes = useMemo(
-    () => (habitat || []).filter((b) => !b.includes("biomesoplenty") && !b.includes("terraforged")),
-    [habitat]
-  );
+  const filteredBiomes = useMemo(() => filterVisibleBiomes(habitat || []), [habitat]);
 
   const availableTabs = useMemo(() => {
     const tabs = [{ id: "overview", label: "Resumen" }];

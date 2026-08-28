@@ -25,13 +25,31 @@ function classifyRarity(p: number) {
 function statusKey(s: PokedexStatus) {
   return s === PokedexStatus.CAUGHT ? "caught" : s === PokedexStatus.SHINY ? "shiny" : s === PokedexStatus.SEEN ? "seen" : "unknown"
 }
+/** A segment that is not valid percent-encoding is already literal - keep it. */
+function decodeSegment(segment: string) {
+  try {
+    return decodeURIComponent(segment)
+  } catch {
+    return segment
+  }
+}
 function fmtPct(p: number) {
   return p < 0.01 ? p.toFixed(4) : p.toFixed(2)
 }
 
 export default function BiomeDetailPage() {
-  const params = useParams<{ id: string }>()
-  const biomeId = decodeURIComponent(params.id)
+  // Catch-all, not [id]: two Terralith biomes carry a slash in their id
+  // (`terralith:cave/fungal_caves`). A single dynamic segment cannot hold one,
+  // and %2F does not survive - Next normalises it back to a separator and
+  // redirects, so the slash has to stay a real separator and be rejoined here.
+  //
+  // useParams() hands back the segments still PERCENT-ENCODED, so `teras:x`
+  // arrives as `teras%3Ax`. Left encoded it matches no translation key and the
+  // API call re-encodes it to `%253A`, which is why every namespaced biome came
+  // back empty. Decode per segment, after the split, never across it.
+  const params = useParams<{ id: string | string[] }>()
+  const segments = Array.isArray(params.id) ? params.id : params.id ? [params.id] : []
+  const biomeId = segments.map(decodeSegment).join("/")
   const t = useTranslations("pokedex")
   const { pokemon } = useGetPokemonByBiome(biomeId)
   const { getPokemonStatus, getVisibility } = usePokedexData()

@@ -64,6 +64,9 @@ export interface SpawnInfo {
   typeID: string;
   spec: string;
   condition?: {
+    /** Pixelmon 9.4.0+. Tag references (`#pixelmon:spawning/mesas`) or literal ids. */
+    biomes?: string[];
+    /** Pixelmon 1.16.5 and the live overlay. Still present on 2 spawnInfos in 9.4.0. */
     stringBiomes?: string[];
   };
   spawnType?: string;

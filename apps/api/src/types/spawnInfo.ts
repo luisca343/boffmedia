@@ -5,7 +5,10 @@ export interface HeldItem {
 
 export interface Condition {
   times: string[];
-  stringBiomes: string[];
+  /** Pixelmon 9.4.0+. Tag references (`#pixelmon:spawning/mesas`) or literal ids. */
+  biomes?: string[];
+  /** Pixelmon 1.16.5 and the live overlay. Still present on 2 spawnInfos in 9.4.0. */
+  stringBiomes?: string[];
 }
 
 export interface SpawnInfo {

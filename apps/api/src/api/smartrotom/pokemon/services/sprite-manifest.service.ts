@@ -14,7 +14,7 @@ export class SpriteManifestService extends BaseDataService {
 
   // Base paths for resourcepacks
   private readonly DEFAULT_RESOURCEPACK_PATH = publicPath(
-    'smartrotom/packs/default_resourcepack',
+    'smartrotom/packs/default_resourcepack_9.4.0',
   );
   private readonly CUSTOM_RESOURCEPACK_PATH = publicPath(
     'smartrotom/packs/resourcepack',
@@ -203,7 +203,7 @@ export class SpriteManifestService extends BaseDataService {
       if (!spriteResource) {
         // Use missingno as fallback
         this.manifest.sprites[key] = {
-          path: '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png',
+          path: '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png',
           isDefault: true,
         };
         this.manifest.count.default++;
@@ -232,7 +232,7 @@ export class SpriteManifestService extends BaseDataService {
         this.manifest.count.custom++;
       } else if (fs.existsSync(defaultResourcePath)) {
         finalPath = path.join(
-          '/smartrotom/packs/default_resourcepack',
+          '/smartrotom/packs/default_resourcepack_9.4.0',
           resourcePath,
         );
         isDefault = true;
@@ -240,7 +240,7 @@ export class SpriteManifestService extends BaseDataService {
       } else {
         // Fallback to missingno if sprite not found
         finalPath =
-          '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+          '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
         isDefault = true;
         this.manifest.count.default++;
       }
@@ -254,7 +254,7 @@ export class SpriteManifestService extends BaseDataService {
       this.logger.warn(`Failed to process sprite for ${key}: ${error.message}`);
       // Add a fallback entry
       this.manifest.sprites[key] = {
-        path: '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png',
+        path: '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png',
         isDefault: true,
       };
       this.manifest.count.default++;
@@ -291,7 +291,7 @@ export class SpriteManifestService extends BaseDataService {
   ): string {
     // Ensure manifest is loaded
     if (!this.manifest || !this.manifest.sprites) {
-      return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+      return '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
     }
 
     const key = `${pokemonId}:${formName}:${paletteName}`;
@@ -320,7 +320,7 @@ export class SpriteManifestService extends BaseDataService {
     }
 
     // Fallback to missingno
-    return '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+    return '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
   }
 
   /**

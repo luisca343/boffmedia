@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from 'nestjs-pino';
 import { SpawnDataService } from './spawn-data.service';
 import { PokemonDataService } from './pokemon-data.service';
+import { BiomeTagService } from './biome-tag.service';
 
 const mockLogger = { log: jest.fn(), warn: jest.fn(), error: jest.fn() };
 
@@ -10,13 +11,22 @@ const mockPokemonDataService = {
   getSpeciesByName: jest.fn(),
 };
 
+const mockBiomeTagService = {
+  loadBiomeTags: jest.fn().mockResolvedValue(undefined),
+  // Categories expand to one stand-in biome so the resolved index is exercised
+  // without dragging the real tag files into a unit test.
+  resolveBiomeReference: jest.fn((raw: string) =>
+    raw.includes(':') ? [raw] : [`minecraft:${raw}`],
+  ),
+};
+
 const makeSpawnData = (overrides: Partial<any> = {}) => ({
   spawnInfos: [
     {
       typeID: 'pokemon',
       spec: 'species:pikachu',
       rarity: 10,
-      condition: { stringBiomes: ['forest', 'plains'] },
+      condition: { biomes: ['#pixelmon:spawning/forests', 'minecraft:plains'] },
       ...overrides,
     },
   ],
@@ -37,6 +47,7 @@ describe('SpawnDataService', () => {
         SpawnDataService,
         { provide: Logger, useValue: mockLogger },
         { provide: PokemonDataService, useValue: mockPokemonDataService },
+        { provide: BiomeTagService, useValue: mockBiomeTagService },
       ],
     }).compile();
 
@@ -57,7 +68,7 @@ describe('SpawnDataService', () => {
 
       await service.loadSpawnData();
 
-      // 7 non-banned folders (11 total minus legendaries, megas, npcs, grass)
+      // 8 non-banned folders (12 total minus legendaries, megas, npcs, grass)
       expect(service.getSpawnByDex(25).length).toBeGreaterThan(0);
       expect(service.getSpawnByPokemon('pikachu_base').length).toBeGreaterThan(
         0,
@@ -115,8 +126,9 @@ describe('SpawnDataService', () => {
 
     it('getBiomesByPokemon returns biomes for pikachu_base', () => {
       const biomes = service.getBiomesByPokemon('pikachu_base');
-      expect(biomes).toContain('forest');
-      expect(biomes).toContain('plains');
+      // The `#pixelmon:spawning/` prefix is stripped on read; literal ids pass through.
+      expect(biomes).toContain('forests');
+      expect(biomes).toContain('minecraft:plains');
     });
 
     it('getAllSpawns returns all indexed spawns', () => {
@@ -126,7 +138,7 @@ describe('SpawnDataService', () => {
 
     it('getAllBiomes returns sorted biome counts', () => {
       const biomes = service.getAllBiomes();
-      expect(biomes['forest']).toBeGreaterThan(0);
+      expect(biomes['forests']).toBeGreaterThan(0);
     });
 
     it('getSpawnByForm returns spawns by form name', () => {
@@ -135,7 +147,7 @@ describe('SpawnDataService', () => {
     });
 
     it('getSpawnByBiome returns spawns for a biome', () => {
-      const spawns = service.getSpawnByBiome('forest');
+      const spawns = service.getSpawnByBiome('forests');
       expect(spawns.length).toBeGreaterThan(0);
     });
   });

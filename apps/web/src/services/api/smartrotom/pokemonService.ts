@@ -196,7 +196,10 @@ export class PokemonService {
    * Get Pokemon found in a specific biome
    */
   static getPokemonByBiome(name: string) {
-    return rotomGET(`/pokemon/biome/${name}`);
+    // Must be encoded: `terralith:cave/fungal_caves` contains a slash, and a raw
+    // one 404s against the `biome/:name` route. Express does not normalise %2F,
+    // so the encoded form reaches the param intact.
+    return rotomGET(`/pokemon/biome/${encodeURIComponent(name)}`);
   }
 
   /**

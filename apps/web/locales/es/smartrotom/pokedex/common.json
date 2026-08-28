@@ -1,5 +1,8 @@
 {
   "pokedex": {
+    "category_physical": "Físico",
+    "category_special": "Especial",
+    "category_status": "Estado",
     "stat_hp": "PS",
     "stat_attack": "Atq",
     "stat_defense": "Def",

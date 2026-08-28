@@ -10,12 +10,28 @@ const logger = pino({ name: 'base-data' });
 export class BaseDataService {
   constructor() {}
 
+  /**
+   * List a directory, treating "does not exist" as "contributes nothing".
+   *
+   * The custom overlay only carries the folders it actually overrides - it has
+   * no `spawning/curry/`, for instance - so a hard readdir would abort the whole
+   * load for a folder the overlay simply has no opinion about.
+   */
+  private async readdirIfPresent(dir: string): Promise<string[]> {
+    try {
+      return await fsPromises.readdir(dir);
+    } catch (error: any) {
+      if (error?.code === 'ENOENT' || error?.code === 'ENOTDIR') return [];
+      throw error;
+    }
+  }
+
   protected async readJsonFiles(
     defaultDir: string,
     publicDir: string,
   ): Promise<any[]> {
-    const defaultFiles = await fsPromises.readdir(defaultDir);
-    const publicFiles = await fsPromises.readdir(publicDir);
+    const defaultFiles = await this.readdirIfPresent(defaultDir);
+    const publicFiles = await this.readdirIfPresent(publicDir);
     const allFiles = [...new Set([...defaultFiles, ...publicFiles])];
 
     const jsonData = await Promise.all(

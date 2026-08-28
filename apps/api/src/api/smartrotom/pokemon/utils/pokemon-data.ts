@@ -40,7 +40,7 @@ export class PokemonData {
   async loadPokemonData() {
     const startingTime = Date.now();
     const defaultDirDef = publicPath(
-      'smartrotom/packs/default_datapack/data/pixelmon/species',
+      'smartrotom/packs/default_datapack_9.4.0/data/pixelmon/species',
     );
     const publicDir = publicPath(
       'smartrotom/packs/datapack/data/pixelmon/species',

@@ -32,11 +32,23 @@ export class SpawnCondition {
   weathers?: string[];
 
   @ApiProperty({
-    description: 'Biome conditions',
+    description:
+      'Biome conditions (Pixelmon 9.4.0+). Tag references or literal biome ids.',
+    type: [String],
+    example: ['#pixelmon:spawning/redwoods', 'biomesoplenty:seasonal_forest'],
+    required: false,
+  })
+  biomes?: string[];
+
+  @ApiProperty({
+    description:
+      'Biome conditions, legacy key. Pixelmon 1.16.5 and the custom overlay ' +
+      'use it exclusively; 9.4.0 keeps it on 2 spawnInfos. Read both.',
     type: [String],
     example: ['redwoods', 'biomesoplenty:seasonal_forest'],
+    required: false,
   })
-  stringBiomes: string[];
+  stringBiomes?: string[];
 }
 
 export class SpawnInfo {

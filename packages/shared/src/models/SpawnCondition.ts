@@ -12,8 +12,12 @@ export type SpawnCondition = {
      */
     weathers?: Array<string>;
     /**
-     * Biome conditions
+     * Biome conditions (Pixelmon 9.4.0+). Tag references or literal biome ids.
      */
-    stringBiomes: Array<string>;
+    biomes?: Array<string>;
+    /**
+     * Biome conditions, legacy key. Pixelmon 1.16.5 and the custom overlay use it exclusively; 9.4.0 keeps it on 2 spawnInfos. Read both.
+     */
+    stringBiomes?: Array<string>;
 };
 

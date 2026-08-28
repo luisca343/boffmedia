@@ -110,7 +110,7 @@ export async function getPokemonSprite(
   }
   const sprite = getSpriteURL(paletteData, id).split(":")[1]
 
-  const defaultUrl = `${SPRITES_BASE_URL}/default_resourcepack/assets/pixelmon/textures/${sprite}`
+  const defaultUrl = `${SPRITES_BASE_URL}/default_resourcepack_9.4.0/assets/pixelmon/textures/${sprite}`
   const fallbackUrl = `${SPRITES_BASE_URL}/resourcepack/assets/pixelmon/textures/${sprite}`
 
   try {

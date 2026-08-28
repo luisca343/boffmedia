@@ -19,7 +19,7 @@ const mockPokemonDataService = {
 };
 
 const MISSINGNO =
-  '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+  '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
 
 const makeManifest = (sprites: Record<string, any> = {}) => ({
   sprites,

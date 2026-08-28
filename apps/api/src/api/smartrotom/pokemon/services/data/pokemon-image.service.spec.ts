@@ -19,7 +19,7 @@ const mockPokemonRepository = {
 };
 
 const MISSING_SPRITE =
-  '/smartrotom/packs/default_resourcepack/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
+  '/smartrotom/packs/default_resourcepack_9.4.0/assets/pixelmon/textures/pokemon/000_missingno/all/base/none/sprite.png';
 
 const mockForm = {
   name: 'base',
@@ -113,7 +113,7 @@ describe('PokemonImageService', () => {
 
       const result = service.getSimpleSprite(25, 'base', 'none');
 
-      expect(result).toContain('default_resourcepack');
+      expect(result).toContain('default_resourcepack_9.4.0');
     });
 
     it('returns custom resourcepack path when only custom sprite exists', () => {
