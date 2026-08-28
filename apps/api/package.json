@@ -38,7 +38,8 @@
     "generate:models": "openapi --input http://localhost:34301/api-json --output ./src/generated --exportModels true --exportServices false --exportCore false",
     "generate:shared": "openapi --input http://localhost:34301/api-json --output ../../packages/shared/src --exportModels true --exportServices false --exportCore false",
     "fix-pnpm": "powershell -ExecutionPolicy Bypass -File ./fix-pnpm.ps1",
-    "convert-mod": "node ../../node_modules/ts-node/dist/bin.js -P scripts/convert-showdown-mod/tsconfig.json scripts/convert-showdown-mod/index.ts"
+    "convert-mod": "node ../../node_modules/ts-node/dist/bin.js -P scripts/convert-showdown-mod/tsconfig.json scripts/convert-showdown-mod/index.ts",
+    "add-regulation": "node ../../node_modules/ts-node/dist/bin.js -P scripts/add-regulation/tsconfig.json scripts/add-regulation/index.ts"
   },
   "dependencies": {
     "@boffmedia/asset-paths": "workspace:*",

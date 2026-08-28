@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "ts-node": {
+    "esm": false,
+    "transpileOnly": true
+  },
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "ES2021",
+    "strict": false,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "outDir": "../../dist/scripts",
+    "rootDir": ".."
+  },
+  "include": [
+    "./**/*.ts",
+    "../convert-showdown-mod/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

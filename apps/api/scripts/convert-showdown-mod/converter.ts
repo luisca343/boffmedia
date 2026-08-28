@@ -230,6 +230,32 @@ function stripCosmeticFormStubs(bodyText: string, fileName: string): string {
   return out.join('\n');
 }
 
+/**
+ * True when a converted table contains any executable code — a method, a
+ * function expression or an arrow — as opposed to being pure data.
+ *
+ * Pure tables (pokedex, learnsets, formats-data) type-check cleanly and are left
+ * fully checked; only the code-bearing ones get a suppression header.
+ */
+function containsExecutableCode(root: ts.Node): boolean {
+  let found = false;
+  const visit = (node: ts.Node): void => {
+    if (found) return;
+    if (
+      ts.isMethodDeclaration(node) ||
+      ts.isFunctionExpression(node) ||
+      ts.isArrowFunction(node) ||
+      ts.isFunctionDeclaration(node)
+    ) {
+      found = true;
+      return;
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(root);
+  return found;
+}
+
 // ---------------------------------------------------------------------------
 // Public API
 // ---------------------------------------------------------------------------
@@ -309,6 +335,21 @@ export function convertFile(filePath: string, rawSource: string): ConversionResu
   const importStatement = `import type {${allImportedTypes.join(', ')}} from '@pkmn/sim';`;
 
   const lines: string[] = [];
+
+  // Showdown's battle handlers rely on `this` rebinding and on effect fields
+  // that @pkmn/sim's Modded* interfaces do not declare, so a code-bearing table
+  // cannot type-check against them however it is annotated. This is vendored
+  // upstream source, not ours, and every upstream release adds handlers — so
+  // suppress on any table that carries executable code rather than curating a
+  // list of file names that silently falls behind.
+  if (containsExecutableCode(bodyWrapper)) {
+    lines.push('/* eslint-disable @typescript-eslint/ban-ts-comment */');
+    lines.push(
+      `// @ts-nocheck — vendored Pokémon Showdown ${baseName.replace(/\.ts$/, '')} ` +
+        `mod table: battle-engine callbacks are not statically typeable against @pkmn/sim.`,
+    );
+  }
+
   lines.push(importStatement);
   lines.push('');
   if (config.note) {

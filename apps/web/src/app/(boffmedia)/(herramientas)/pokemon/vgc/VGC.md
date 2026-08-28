@@ -12,6 +12,7 @@
 
 | Date | Author | Change |
 |---|---|---|
+| 2026-08-28 | Champions mod generated end-to-end; Reg M-B added | Added `pnpm add-regulation "<upstream format name>"` (`apps/api/scripts/add-regulation/`), which sparse-clones Showdown, re-resolves every tracked format, follows each format's `mod` + `Scripts.inherit` chain, converts all needed mod dirs, emits the species backfill and writes `mod/registry.generated.ts` + `mod/.source.json`. `champions.mod.ts` is now a thin consumer with no hand-written format list. Discovered upstream had rehomed Reg M-A from `champions` to `championsregma` while `champions` advanced to Reg M-B — so registering M-B against the existing tables would have given it M-A's legality silently; the mod tree was regenerated for both. Also found two undocumented steps now encoded in the generator: `mod/pokedex.ts` is a backfill from Showdown's **base** pokedex (53 species missing from `@pkmn/sim` 0.9.38, was a full 534 KB override, now a 24 KB delta), and generated files were being hand-patched with `@ts-nocheck` after conversion — `converter.ts` now emits it automatically for code-bearing tables only. Registered: `gen9championsvgc2026regmb`, `...regmbbo3`, `gen9championsbssregmb`. Verified `pnpm type-check` 9/9, 119 VGC tests, and M-A/M-B resolving to different dexes with 44 species differing in tier. |
 | 2026-04-28 | OQ-T5 UX tweak: always-visible speed panel | Updated tracker match `SpeedTierWidget` to be always visible (removed collapse/expand toggle and collapsed summary) by UX preference. Kept live Tailwind/Scarf/Trick Room toggles and speed ordering behavior intact. |
 | 2026-04-28 | OQ-T5: In-match speed panel implemented | Added collapsible in-match speed panel in tracker match workspace (`SpeedTierWidget`) for both team columns. Uses local species base speeds with `calcSpeedStat` + `applyMods`; includes Tailwind/Scarf/Trick Room toggles and collapsed summary (`count` + effective speed range). No API calls required. |
 | 2026-04-28 | OQ-T6 rollback: non-clickable Pokémon in tracker lists | Reverted clickable Pokémon behavior in tracker session views by user request. Opponent sprites in MatchRow and species rows in SessionStats `PokemonUsageTable` are display-only again (no links to meta pages). |
@@ -255,6 +256,62 @@ Each standing object:
 ### RK9 (Future — Low Priority)
 `https://rk9.gg/event/pokemon-euic-2026` / `https://rk9.gg/pairings/{id}`  
 Pairings companion feature only. Not meta aggregation.
+
+---
+
+### Champions Mod (`@pkmn/sim`) — generated, never hand-edited
+
+**Source:** `smogon/pokemon-showdown` → `data/mods/champions/` + `data/pokedex.ts` + `config/formats.ts`.
+There is no package or API for this; the only source of truth is TypeScript in that repo.
+
+**Adding a regulation** (from `apps/api/`):
+```bash
+pnpm add-regulation "[Gen 9 Champions] VGC 2026 Reg M-B"
+```
+Then review the diff, run `pnpm type-check`, and commit. Flags: `--dry-run`, `--source <checkout>`
+(skip the network), `--ref <branch|sha>` (pin upstream), `--forget "<name>"` (stop tracking a format).
+
+Everything under `mod/` plus `mod/registry.generated.ts` is generated output. `champions.mod.ts` is a thin
+consumer of that registry — it holds no format list of its own. Editing any of it by hand is lost on the
+next run.
+
+**Why the script re-resolves *every* tracked format, not just the new one.**
+A format's `mod` is not stable across regulations. Upstream advanced `champions` to mean the *current*
+regulation and rehomed the previous one to a new mod:
+
+| upstream mod | contents |
+|---|---|
+| `champions` | the current regulation's data — full tables |
+| `championsregma` | `{inherit: 'champions', gen: 9}` + 4 delta files, pinning Reg M-A |
+
+`config/formats.ts` repointed Reg M-A to `championsregma` at the same time. A generator that touched only
+the newly added format would leave Reg M-A pointing at Reg M-B's data — wrong legality, no error, no
+visible diff. Re-resolving the whole tracked set (persisted in `mod/.source.json`) makes that
+self-correcting. If a tracked format disappears upstream the run fails loudly rather than writing a
+partial tree.
+
+**The pipeline is two-source.** `mod/pokedex.ts` is *not* a Showdown mod file —
+`data/mods/champions/pokedex.ts` has never existed. The Champions Megas live in Showdown's **base**
+`data/pokedex.ts`, and `@pkmn/sim` lags master, so any species newer than the installed sim is simply
+absent at runtime and the `formats-data` tiers referencing it resolve to nothing. The generator emits
+only the species missing from the installed sim and attaches them to the root mod, so descendants inherit
+them and sim upgrades still take effect for everything else. A full-pokedex override would work but would
+freeze species data against the sim permanently.
+
+**Generated files carry `@ts-nocheck` when — and only when — they contain executable code.** Showdown's
+battle handlers rebind `this` and use effect fields that `@pkmn/sim`'s `Modded*` interfaces do not
+declare, so a code-bearing table cannot type-check however it is annotated. `converter.ts` detects this
+from the AST rather than keeping a list of file names: upstream keeps adding handlers, and `items.ts`
+crossed that line between two regenerations. Pure-data tables (`pokedex`, `learnsets`, `formats-data`)
+stay fully type-checked.
+
+**Provenance** lives in `mod/.source.json` and in the `registry.generated.ts` header: upstream commit and
+date, `@pkmn/sim` version, tracked formats, resolved mods, and the exact backfilled species. Check it
+first when Champions legality looks wrong — a stale `upstreamCommit` is the usual answer.
+
+**What still needs a redeploy anyway:** a new mechanic (item effect, ability handler, battle script) is
+code, so it ships through this generator like everything else. The script removes the guesswork, not the
+deploy.
 
 ---
 
