@@ -2,7 +2,12 @@
   "admin": {
     "shell": {
       "brand": "Admin",
-      "live": "Live"
+      "live": "Live",
+      "env": {
+        "production": "Production",
+        "staging": "Staging",
+        "development": "Local"
+      }
     },
     "nav": {
       "portal": "Portal",

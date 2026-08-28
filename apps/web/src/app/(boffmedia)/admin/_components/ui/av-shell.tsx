@@ -4,6 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName, Spinner } from "@boffmedia/ui"
+import { AvPill } from "./av-kit"
 
 export interface AvNavItem {
   id: string
@@ -28,9 +29,34 @@ interface AvShellProps {
   fluid?: boolean
 }
 
+/* Which database am I about to mutate? NEXT_PUBLIC_* is inlined at build time,
+ * so this resolves per-deploy, not per-request. Unset falls back to NODE_ENV,
+ * which can only ever tell development from "some build" — set NEXT_PUBLIC_ENV
+ * explicitly on staging or staging will label itself PROD. */
+type AdminEnv = "production" | "staging" | "development"
+
+const ENVS: readonly AdminEnv[] = ["production", "staging", "development"]
+
+/* Validated, not cast: an empty or misspelt NEXT_PUBLIC_ENV would sail past a
+ * `??` and land on a missing message key, which throws — a typo in a CI secret
+ * must not be able to blank the admin console. */
+const raw = process.env.NEXT_PUBLIC_ENV
+const ENV: AdminEnv = ENVS.includes(raw as AdminEnv)
+  ? (raw as AdminEnv)
+  : process.env.NODE_ENV === "production"
+    ? "production"
+    : "development"
+
+/* Tone tracks blast radius, not novelty: prod is the one where a mistake is
+ * permanent, so it is the one that stays coloured. */
+const ENV_TONE: Record<AdminEnv, "rose" | "amber" | "muted"> = {
+  production: "rose",
+  staging: "amber",
+  development: "muted",
+}
+
 export function AvShell({ nav, section, onNavigate, children, loading, fluid }: AvShellProps) {
   const t = useTranslations("admin.shell")
-  const allItems = nav.flatMap((g) => g.items)
 
   return (
     <div className="grid h-full [grid-template-columns:1fr] md:[grid-template-columns:244px_minmax(0,1fr)] bg-base">
@@ -39,13 +65,16 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
           (var(--nav-h)); the rail gets a viewport-bounded height and scrolls
           internally instead of scrolling away with the document. */}
       <aside className="hidden md:flex sticky top-[var(--nav-h)] self-start h-[calc(100dvh_-_var(--nav-h))] overflow-y-auto flex-col border-r border-solid border-line bg-base-2 pb-6 bm-scroll">
-        <div className="sticky top-0 z-[2] flex items-center gap-[11px] pt-[18px] pb-[20px] px-5 border-b border-solid border-line bg-base-2">
-          <span className="grid place-items-center w-[30px] h-[30px] bg-accent text-accent-ink shrink-0">
-            <Icon name="bolt" size={17} />
-          </span>
-          <span className="font-display text-[20px] font-extrabold italic leading-none uppercase tracking-[0.01em]">
+        {/* Wordmark only. The site Navbar right above already carries the brand
+            lockup, and accent is reserved for the active item — a filled accent
+            mark here would out-shout the one thing in the rail that means
+            something. The border-b is load-bearing: it is the scroll edge for
+            the internally-scrolling rail. */}
+        <div className="sticky top-0 z-[2] flex items-center justify-between gap-3 pt-[18px] pb-[20px] px-5 border-b border-solid border-line bg-base-2">
+          <span className="font-display text-[20px] font-extrabold italic leading-none uppercase tracking-[0.01em] text-txt-dim">
             {t("brand")}
           </span>
+          <AvPill tone={ENV_TONE[ENV]}>{t(`env.${ENV}`)}</AvPill>
         </div>
 
         <nav className="pt-[14px]">
@@ -82,24 +111,35 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
       {/* h-full, not h-screen: the parent layout already sizes the section
           to fill the viewport minus the Navbar. h-screen would overflow. */}
       <div className={cn("min-w-0", fluid && "flex h-full min-h-0 flex-col overflow-hidden")}>
-        {/* Mobile section tabs */}
-        <div className="md:hidden flex gap-1 overflow-x-auto py-2.5 px-4 border-b border-solid border-line bg-base-2 sticky top-[var(--nav-h)] z-[4] [scrollbar-width:none]">
-          {allItems.map(({ id, label, icon }) => {
-            const on = id === section
-            return (
-              <button
-                key={id}
-                onClick={() => onNavigate(id)}
-                className={cn(
-                  "inline-flex items-center gap-1.5 py-2 px-3 whitespace-nowrap font-mono text-[12px] font-semibold leading-none uppercase tracking-[0.05em] border border-solid shrink-0",
-                  on ? "text-accent border-accent-line bg-accent-soft" : "text-txt-muted border-line",
-                )}
-              >
-                <Icon name={icon} size={13} />
-                {label}
-              </button>
-            )
-          })}
+        {/* Mobile section tabs. Grouped, not flattened: the desktop rail's group
+            headers are the only thing that disambiguates "Config" (manga) from
+            "Releases" (app), so the strip carries them too rather than dumping
+            13 unlabelled chips into one scroller. */}
+        <div className="md:hidden flex items-center gap-1 overflow-x-auto py-2.5 px-4 border-b border-solid border-line bg-base-2 sticky top-[var(--nav-h)] z-[4] [scrollbar-width:none]">
+          {nav.map((group, gi) => (
+            <React.Fragment key={group.label}>
+              {gi > 0 && <span aria-hidden className="self-stretch w-px mx-1.5 bg-line shrink-0" />}
+              <span className="font-mono text-[9px] font-semibold leading-none uppercase tracking-[0.18em] text-txt-dim whitespace-nowrap shrink-0 pr-0.5">
+                {group.label}
+              </span>
+              {group.items.map(({ id, label, icon }) => {
+                const on = id === section
+                return (
+                  <button
+                    key={id}
+                    onClick={() => onNavigate(id)}
+                    className={cn(
+                      "inline-flex items-center gap-1.5 py-2 px-3 whitespace-nowrap font-mono text-[12px] font-semibold leading-none uppercase tracking-[0.05em] border border-solid shrink-0",
+                      on ? "text-accent border-accent-line bg-accent-soft" : "text-txt-muted border-line",
+                    )}
+                  >
+                    <Icon name={icon} size={13} />
+                    {label}
+                  </button>
+                )
+              })}
+            </React.Fragment>
+          ))}
         </div>
 
         <div
