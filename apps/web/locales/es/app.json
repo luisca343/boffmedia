@@ -90,6 +90,8 @@
     "continue": "Continuar",
     "notFound": "Ese código no es válido o ha caducado.",
     "failed": "No se ha podido completar la solicitud.",
+    "verifyTitle": "Verifica tu correo",
+    "verifyLead": "Autorizar una app requiere una cuenta con el correo verificado. Abre el enlace que te hemos enviado y vuelve a pulsar Autorizar.",
     "confirmLead": "Esta app podrá ver e instalar los packs a los que tenga derecho tu cuenta. No podrá modificar tu cuenta.",
     "client": "App",
     "unknownClient": "App sin identificar",

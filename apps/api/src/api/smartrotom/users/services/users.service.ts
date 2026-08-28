@@ -10,6 +10,8 @@ import { CreateSmartrotomUserDto } from '../dto/create-user.dto';
 import { UpdateSmartrotomUserDto } from '../dto/update-user.dto';
 import { IUsersRepository } from '../repositories/interfaces/users-repository.interface';
 import { USERS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { Logger } from 'nestjs-pino';
+import { RookerService } from '../../rooker/rooker.service';
 
 export interface UserCreationResult {
   user: RotomUser;
@@ -21,7 +23,43 @@ export class UsersService {
   constructor(
     @Inject(USERS_REPOSITORY_TOKEN)
     private readonly usersRepository: IUsersRepository,
+    private readonly rookerService: RookerService,
+    private readonly logger: Logger,
   ) {}
+
+  /**
+   * Every new player gets a Rooker handle, derived from their username.
+   *
+   * This lives here rather than in the facade because there are two doors into user
+   * creation — `POST /users` (findOrCreateUser) and the full new-player setup
+   * (initializeUserAndAccounts) — and only one of them goes through the facade. This
+   * method is what both of them share.
+   *
+   * Non-fatal, matching how the Saved Messages chat is provisioned: a player must not
+   * fail to exist because a social handle could not be minted. A warning here means
+   * someone is left without a profile, which the backfill
+   * (`drizzle/seed/06-rooker.sql`, or `seed/rooker.ts`) then repairs.
+   */
+  private async provisionRookerProfile(user: RotomUser): Promise<void> {
+    try {
+      const handle = await this.rookerService.ensureProfile(
+        user.uuid,
+        user.username,
+      );
+      if (handle) {
+        this.logger.log(`Rooker profile @${handle} created for ${user.uuid}`);
+      } else {
+        this.logger.warn(
+          `No free Rooker handle for ${user.uuid} (${user.username}) — ` +
+            'run the rooker backfill to give them one.',
+        );
+      }
+    } catch (error: any) {
+      this.logger.warn(
+        `Failed to create Rooker profile for ${user.uuid}, continuing anyway: ${error.message}`,
+      );
+    }
+  }
 
   // ==================== USER MANAGEMENT ====================
 
@@ -63,7 +101,9 @@ export class UsersService {
       );
     }
 
-    return this.usersRepository.create(createUserDto);
+    const created = await this.usersRepository.create(createUserDto);
+    await this.provisionRookerProfile(created);
+    return created;
   }
 
   async findOrCreateUser(
@@ -88,6 +128,7 @@ export class UsersService {
     }
 
     const newUser = await this.usersRepository.create(createUserDto);
+    await this.provisionRookerProfile(newUser);
     return { user: newUser, isNew: true };
   }
 

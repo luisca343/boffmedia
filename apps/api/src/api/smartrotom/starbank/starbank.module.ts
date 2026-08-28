@@ -7,6 +7,7 @@ import { StarbankAccountRepository } from './repositories/starbank-account.repos
 import { StarbankTransactionRepository } from './repositories/starbank-transaction.repository';
 import { StarbankAccountService } from './services/starbank-account.service';
 import { StarbankTransactionService } from './services/starbank-transaction.service';
+import { StarbankHouseAccountService } from './services/starbank-house-account.service';
 import { StarbankFacadeService } from './starbank.facade.service';
 import { StarbankController } from './starbank.controller';
 import {
@@ -31,6 +32,9 @@ import {
     // Service providers
     StarbankAccountService,
     StarbankTransactionService,
+    // Resolves the ownerless house accounts by (type, name); StarbankTransactionService
+    // settles its mint/burn flows against the SYSTEM one.
+    StarbankHouseAccountService,
 
     // Facade provider
     StarbankFacadeService,

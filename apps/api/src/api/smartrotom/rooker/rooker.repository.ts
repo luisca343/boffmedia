@@ -660,6 +660,26 @@ export class RookerRepository {
     return rows[0]?.uuid ?? null;
   }
 
+  /**
+   * A plain INSERT, deliberately not {@link upsertProfile}.
+   *
+   * The table has two unique keys — `uuid` (the PK) and `handle`. With
+   * `ON DUPLICATE KEY UPDATE`, a handle that collides with a *different* player's row
+   * makes MySQL update THAT row instead of inserting ours: the colliding player gets
+   * their own handle rewritten and the new player still ends up with no profile. A bare
+   * insert surfaces the collision as ER_DUP_ENTRY, which is what lets the caller move on
+   * to the next candidate handle.
+   */
+  async insertProfile(
+    uuid: string,
+    handle: string,
+    displayName: string | null,
+  ): Promise<void> {
+    await this.db
+      .insert(rookerProfiles)
+      .values({ uuid, handle, displayName });
+  }
+
   async upsertProfile(
     uuid: string,
     values: {

@@ -152,6 +152,10 @@
       "failed": "Could not link the account.",
       "cancel": "Cancel",
       "close": "Close"
+    },
+    "emailUnverified": {
+      "title": "Email not verified",
+      "lead": "Verify your email so you can authorize the app and recover your account if you lose your password."
     }
   }
 }

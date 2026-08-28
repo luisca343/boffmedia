@@ -23,6 +23,7 @@ import {
   SuggestionItem,
   TrendItem,
 } from './types/rooker.types';
+import { baseHandle, handleCandidates } from './handle';
 
 // Every Rooker notification lands in the generic rotom_notifications table under
 // this single type — the GET filter keys off it exactly.
@@ -30,6 +31,13 @@ const NOTIF_TYPE = 'rooker';
 
 const MAX_HASHTAGS_PER_POST = 10;
 const MAX_REPLIES = 100;
+
+/**
+ * How many handles ensureProfile() will try before giving up. Each one is a round trip,
+ * and needing more than this means a genuinely pathological pile-up on one base name —
+ * at which point failing and logging beats hammering the database.
+ */
+const MAX_HANDLE_ATTEMPTS = 25;
 
 @Injectable()
 export class RookerService {
@@ -293,6 +301,45 @@ export class RookerService {
     const profile = await this.repo.findProfileByUuid(uuid);
     if (!profile) return null;
     return this.getProfile(profile.handle, uuid);
+  }
+
+  /**
+   * Give a player a profile if they do not have one, deriving the handle from their
+   * username. Idempotent — an existing profile is returned untouched, never renamed.
+   *
+   * Called when a SmartRotom user is created, because a player without a profile is in a
+   * dead end rather than merely incomplete: the composer is hidden, their profile page
+   * 404s for everyone, and the only route to the "edit profile" form is their own profile
+   * page — so they cannot create one themselves.
+   *
+   * Returns the handle, or null if every candidate it was willing to try was taken.
+   */
+  async ensureProfile(uuid: string, username: string): Promise<string | null> {
+    const existing = await this.repo.findProfileByUuid(uuid);
+    if (existing) return existing.handle;
+
+    const base = baseHandle(username);
+    let attempts = 0;
+
+    for (const candidate of handleCandidates(base)) {
+      if (++attempts > MAX_HANDLE_ATTEMPTS) break;
+
+      // Cheap pre-check: skips a doomed insert for the common case of a handle that is
+      // simply already taken. It is not the guarantee — the unique index below is.
+      if (await this.repo.findHandleOwner(candidate)) continue;
+
+      try {
+        await this.repo.insertProfile(uuid, candidate, username);
+        return candidate;
+      } catch (error: any) {
+        // Two players registering at once can both clear the pre-check and race for the
+        // same handle. The loser takes the next candidate rather than failing.
+        if (error?.code === 'ER_DUP_ENTRY') continue;
+        throw error;
+      }
+    }
+
+    return null;
   }
 
   async getProfile(handle: string, viewer?: string): Promise<ProfileView> {

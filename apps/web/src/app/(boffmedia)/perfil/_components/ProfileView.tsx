@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import {
   Badge,
+  Banner,
   Button,
   Empty,
   Panel,
@@ -27,6 +28,7 @@ import { useBoffSession } from "@/services/useBoffSession"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
 import { useUserActivity, useUserTrophies } from "@/hooks/profile/useProfileStats"
+import { ResendVerificationButton } from "@/components/boffmedia/ui/auth"
 import { useProfileEditor } from "./useProfileEditor"
 import { LinkedAccountsPanel } from "./LinkedAccountsPanel"
 import { ProfileTournamentsTab } from "./ProfileTournamentsTab"
@@ -234,6 +236,24 @@ export function ProfileView({
         <ProfileTournamentsTab />
       ) : (
         <>
+          {/* Read from the profile fetch, not the session: the JWT caches
+              `user` until the next refresh, so a banner keyed off it would
+              still be up after the player verified. `full` is refetched. */}
+          {full?.emailVerified === false && (
+            <Banner
+              tone="warn"
+              title={t("emailUnverified.title")}
+              className="mb-[18px]"
+              actions={
+                user.email ? (
+                  <ResendVerificationButton email={user.email} size="sm" />
+                ) : undefined
+              }
+            >
+              {t("emailUnverified.lead")}
+            </Banner>
+          )}
+
           <ProfileHero
             name={user.name || "—"}
             handle={handle}

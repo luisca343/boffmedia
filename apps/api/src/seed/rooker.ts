@@ -9,37 +9,18 @@ import { rotomUsers } from '../_db/schema/SmartRotom';
 import { rookerProfiles } from '../_db/schema/SmartRotomRooker';
 import pino from 'pino';
 
+// The same derivation the runtime uses when a player is created — one definition, so a
+// backfilled handle and a freshly minted one can never disagree.
+import {
+  baseHandle,
+  dedupeHandle,
+} from '../api/smartrotom/rooker/handle';
+
 const logger = pino({ name: 'rooker-seed' });
 
 // Profiles are the only thing seeded. Trinos are NOT fabricated — the feed starts
 // empty and real players fill it. What makes Rooker usable on day one is that every
 // existing rotom_user already has a handle to be mentioned, followed and searched by.
-
-const HANDLE_MIN = 3;
-const HANDLE_MAX = 32;
-
-// The handle column is the identity users see: ^[a-z0-9_]{3,32}$.
-function baseHandle(username: string): string {
-  const cleaned = username
-    .toLowerCase()
-    .replace(/[^a-z0-9_]/g, '_')
-    .slice(0, HANDLE_MAX);
-  return cleaned.length >= HANDLE_MIN
-    ? cleaned
-    : cleaned.padEnd(HANDLE_MIN, '_');
-}
-
-// Two players can share a sanitised handle ("Ash!" and "ash?" both → "ash_").
-// The first one keeps it; the rest get a numeric suffix that fits inside 32 chars.
-function dedupe(base: string, taken: Set<string>): string {
-  if (!taken.has(base)) return base;
-  for (let n = 2; ; n++) {
-    const suffix = String(n);
-    const trimmed = base.slice(0, HANDLE_MAX - suffix.length);
-    const candidate = `${trimmed}${suffix}`;
-    if (!taken.has(candidate)) return candidate;
-  }
-}
 
 export async function main() {
   const DATABASE_URL = env.DATABASE_URL;
@@ -71,7 +52,7 @@ export async function main() {
 
   let created = 0;
   for (const user of pending) {
-    const handle = dedupe(baseHandle(user.username), taken);
+    const handle = dedupeHandle(baseHandle(user.username), taken);
     taken.add(handle);
 
     await db.insert(rookerProfiles).values({

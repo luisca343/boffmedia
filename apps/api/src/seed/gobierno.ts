@@ -17,7 +17,14 @@ const logger = pino({ name: 'gobierno-seed' });
 // script updates the existing rows in place rather than duplicating them. Percentage-based
 // rates (captura) have no fixed `amount`; what's actually collected always derives from the
 // StarBank ledger, never from this column.
-const TASAS = [
+export const GOB_ROLES = [
+  'GOBIERNO',
+  'GOB_AGENTE',
+  'GOB_INSPECTOR',
+  'GOB_ALCALDE',
+] as const;
+
+export const TASAS = [
   {
     code: 'TAS-PARCELA',
     concept: 'Impuesto de parcela',
@@ -64,12 +71,7 @@ export async function main() {
 
   // ── Roles ──────────────────────────────────────────────────────────────────
   logger.info('Seeding gobierno roles…');
-  for (const name of [
-    'GOBIERNO',
-    'GOB_AGENTE',
-    'GOB_INSPECTOR',
-    'GOB_ALCALDE',
-  ]) {
+  for (const name of GOB_ROLES) {
     await db
       .insert(boffMediaRoles)
       .values({ name })

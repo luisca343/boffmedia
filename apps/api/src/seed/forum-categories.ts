@@ -13,7 +13,7 @@ const logger = pino({ name: 'seed-forum' });
 // Admin-seeded forum categories. Idempotent: upserts by slug so re-running
 // syncs label/icon/hue/position edits without duplicating rows. `locked`
 // categories are read-only to non-admins.
-const CATEGORIES = [
+export const CATEGORIES = [
   {
     slug: 'anuncios',
     name: 'Anuncios',

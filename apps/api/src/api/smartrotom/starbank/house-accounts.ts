@@ -4,8 +4,8 @@ import { AccountType } from './enums/account-type.enum';
  * The ownerless accounts the economy is built on.
  *
  * These have no row in `rotom_starbank_user_accounts` — no player owns them — and every other
- * money flow settles against one of them. They exist because a migration inserts them, not
- * because some service happened to be called first: an account that only appears on first use
+ * money flow settles against one of them. They exist because `pnpm run seed:house-accounts`
+ * inserts them, not because some service happened to be called first: an account that only appears on first use
  * is an account that can be missing exactly when the flow that needs it runs.
  *
  * `type` identifies the singletons; SERVICE accounts are one-per-app and are told apart by

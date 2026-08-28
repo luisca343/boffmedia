@@ -4,7 +4,7 @@
  * three shared storage roots at the same relative paths they use in production:
  *
  *   public/      read-only asset tree      -> apps/api/public, apps/web/public
- *   var/uploads/ hot user content          -> apps/api/var/uploads
+ *   var/uploads/ hot user content          -> apps/api/var/uploads, apps/web/var/uploads
  *   laboon/      large cold blobs          -> apps/api/laboon
  *
  * The three are separate because their storage differs: uploads are read on
@@ -82,19 +82,39 @@ for (const sub of ['sharex', 'profiles', 'chat', 'mhwilds', 'starbank']) {
   fs.mkdirSync(path.join(uploads, sub), { recursive: true });
 }
 
-// Only `uploads` is shared. `apps/api/var/cache` stays per-checkout, matching
-// the container layout where var/ holds both and only uploads is a volume.
-fs.mkdirSync(path.join(root, 'apps', 'api', 'var'), { recursive: true });
+// Only `uploads` is shared. `apps/*/var/cache` stays per-checkout, matching the
+// container layout where var/ holds both and only uploads is a volume.
+//
+// `existsSync` follows the link, so a junction whose target has been deleted
+// reads as absent and `symlinkSync` would then fail EEXIST on the entry that is
+// still there. `lstatSync` sees the entry itself, so a dangling link is
+// detected and replaced rather than crashing the script — the state you land in
+// when a cleanup removes the ignored root `var/` and leaves the links behind.
+for (const app of ['api', 'web']) {
+  fs.mkdirSync(path.join(root, 'apps', app, 'var'), { recursive: true });
 
-const apiUploads = path.join(root, 'apps', 'api', 'var', 'uploads');
-if (fs.existsSync(apiUploads)) {
-  const stat = fs.lstatSync(apiUploads);
-  if (stat.isSymbolicLink() || (isWindows && stat.isDirectory())) {
-    console.log(`✔  Already linked: ${apiUploads}`);
-  } else {
-    console.warn(`⚠  Not a link, leaving untouched: ${apiUploads}`);
+  const link = path.join(root, 'apps', app, 'var', 'uploads');
+  let entry = null;
+  try {
+    entry = fs.lstatSync(link);
+  } catch {
+    /* nothing there */
   }
-} else {
-  fs.symlinkSync(uploads, apiUploads, linkType);
-  console.log(`✔  Created ${isWindows ? 'junction' : 'symlink'}: ${apiUploads} → ${uploads}`);
+
+  if (entry) {
+    const isLink = entry.isSymbolicLink() || (isWindows && entry.isDirectory());
+    if (isLink && fs.existsSync(link)) {
+      console.log(`✔  Already linked: ${link}`);
+      continue;
+    }
+    if (!isLink) {
+      console.warn(`⚠  Not a link, leaving untouched: ${link}`);
+      continue;
+    }
+    fs.rmSync(link, { recursive: true, force: true });
+    console.log(`   Removed dangling link: ${link}`);
+  }
+
+  fs.symlinkSync(uploads, link, linkType);
+  console.log(`✔  Created ${isWindows ? 'junction' : 'symlink'}: ${link} → ${uploads}`);
 }

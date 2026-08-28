@@ -24,17 +24,33 @@ interface ErrorResponse {
   path: string;
 }
 
+/**
+ * Drizzle does not rethrow the mysql2 error: it wraps it in its own, whose
+ * message is only `Failed query: <sql>
+params: ...` and which carries no
+ * `code`. The driver error — the one holding `ER_DUP_ENTRY` and the "Duplicate
+ * entry" text — sits on `.cause`, and a transaction can nest another wrapper on
+ * top of that. Both checks below therefore run against every link in the chain;
+ * testing only the outermost error is what made unique-key collisions escape as
+ * 500 Internal Server Error instead of 409 Conflict.
+ */
+const MAX_CAUSE_DEPTH = 5;
+
 function isDuplicateEntryError(err: unknown): boolean {
-  if (typeof err !== 'object' || err === null) return false;
-  const e = err as Record<string, unknown>;
-  // MySQL2 native error
-  if (e['code'] === 'ER_DUP_ENTRY') return true;
-  // Fallback: message-based check (covers TypeORM/Drizzle wrappers)
-  if (
-    typeof e['message'] === 'string' &&
-    e['message'].includes('Duplicate entry')
-  )
-    return true;
+  let current = err;
+  for (let depth = 0; depth < MAX_CAUSE_DEPTH; depth++) {
+    if (typeof current !== 'object' || current === null) return false;
+    const e = current as Record<string, unknown>;
+    // MySQL2 native error
+    if (e['code'] === 'ER_DUP_ENTRY') return true;
+    // Fallback: message-based check, for drivers that only carry the text
+    if (
+      typeof e['message'] === 'string' &&
+      e['message'].includes('Duplicate entry')
+    )
+      return true;
+    current = e['cause'];
+  }
   return false;
 }
 

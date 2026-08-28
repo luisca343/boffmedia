@@ -2,13 +2,13 @@ import {
   index,
   uniqueIndex,
   int,
-  json,
   mysqlEnum,
   mysqlTable,
   text,
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
+import { jsonColumn } from './_json';
 
 /**
  * Outbox table for transactional side effects (R3 — post-commit side effects are
@@ -26,7 +26,10 @@ export const boffMediaOutbox = mysqlTable(
   {
     id: int('id').primaryKey().autoincrement(),
     topic: varchar('topic', { length: 100 }).notNull(),
-    payload: json('payload').$type<Record<string, unknown>>().notNull(),
+    // `jsonColumn`, not drizzle's `json()`: on MariaDB the latter reads back
+    // as a raw string, so every handler's `const { to } = payload` silently
+    // produced undefined. See ./_json.ts.
+    payload: jsonColumn('payload').$type<Record<string, unknown>>().notNull(),
     /**
      * Optional deduplication key (e.g. `mail:verify:user123`, `wigglypop:order:999`).
      * NULL means "never deduplicate". A unique index on dedupeKey allows multiple NULLs,

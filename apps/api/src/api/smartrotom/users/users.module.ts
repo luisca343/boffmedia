@@ -9,9 +9,17 @@ import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { StarbankModule } from '../starbank/starbank.module';
 import { USERS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { ChatappModule } from '../chatapp/chatapp.module';
+// Provides RookerService, which mints a handle for every new player.
+import { RookerModule } from '../rooker/rooker.module';
 
 @Module({
-  imports: [LoggerModule, DrizzleModule, StarbankModule, ChatappModule],
+  imports: [
+    LoggerModule,
+    DrizzleModule,
+    StarbankModule,
+    ChatappModule,
+    RookerModule,
+  ],
   controllers: [UsersController],
   providers: [
     UsersFacadeService,

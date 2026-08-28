@@ -20,6 +20,8 @@ import { StarBankTransaction } from '../entities/starbank-transaction.entity';
 import { IStarbankAccountRepository } from '../repositories/interfaces/starbank-account.repository';
 import { IStarbankTransactionRepository } from '../repositories/interfaces/starbank-transaction.repository';
 import { Logger } from 'nestjs-pino';
+import { StarbankHouseAccountService } from './starbank-house-account.service';
+import { SYSTEM_ACCOUNT } from '../house-accounts';
 import { ApiErrorCode } from '@/common/errors/error-codes.generated';
 
 @Injectable()
@@ -31,7 +33,21 @@ export class StarbankTransactionService {
     private readonly accountRepository: IStarbankAccountRepository,
     @Inject(STARBANK_TRANSACTION_REPOSITORY_TOKEN)
     private readonly transactionRepository: IStarbankTransactionRepository,
+    private readonly houseAccounts: StarbankHouseAccountService,
   ) {}
+
+  /**
+   * The SYSTEM account's id — the mint/burn counterparty every flow below settles against.
+   *
+   * These four flows used to pass a literal `0` here, from before the house accounts were
+   * real rows. `0` is not an account: ids are AUTO_INCREMENT so none is ever 0, and
+   * `from_account_id` is an FK, so every one of them failed at the lookup with
+   * "Source account not found" rather than minting anything. Resolution is by type, which is
+   * also what makes a rename of the account harmless.
+   */
+  private systemAccountId(): Promise<number> {
+    return this.houseAccounts.resolveAccountId(SYSTEM_ACCOUNT);
+  }
 
   /**
    * A user (non-server actor with a known mcUuid) may only move money out of an
@@ -175,7 +191,7 @@ export class StarbankTransactionService {
     }
 
     const transactionData = {
-      from: 0, // System account
+      from: await this.systemAccountId(),
       to: accountId,
       amount: amount,
       reason: concept,
@@ -256,7 +272,7 @@ export class StarbankTransactionService {
 
       const transactionData = {
         from: mainAccount.id,
-        to: 0, // System account
+        to: await this.systemAccountId(),
         amount: total,
         reason: `Compra de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName}`,
         type: TransactionType.COMPRA,
@@ -272,7 +288,7 @@ export class StarbankTransactionService {
       );
 
       const transactionData = {
-        from: 0, // System account
+        from: await this.systemAccountId(),
         to: mainAccount.id,
         amount: total,
         reason: `Venta de ${shopDto.count} ${shopDto.itemName} a ${shopDto.npcName}`,
@@ -312,7 +328,7 @@ export class StarbankTransactionService {
     }
 
     const transactionData = {
-      from: 0, // System account
+      from: await this.systemAccountId(),
       to: mainAccount.id,
       amount: diff,
       reason: 'Derrota de entrenador',

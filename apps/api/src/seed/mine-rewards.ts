@@ -51,7 +51,7 @@ type Reward = {
 
 // The board is 10 rows x 18 cols (jugar/page.tsx) and only 5 rewards are placed per
 // game, so footprints stay between 1x1 and 3x2. width = columns, height = rows.
-const REWARDS: Reward[] = [
+export const REWARDS: Reward[] = [
   // ── Gemas ────────────────────────────────────────────────────────────────────
   // Highest single-item value: best score, `epic` rarity, still scarce in aggregate
   // because there are only five of them against ~65 cheaper rows.

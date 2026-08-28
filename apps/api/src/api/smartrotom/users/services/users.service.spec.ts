@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
 import { USERS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { Logger } from 'nestjs-pino';
+import { RookerService } from '../../rooker/rooker.service';
 
 const mockRepo = {
   findAll: jest.fn(),
@@ -15,6 +17,9 @@ const mockRepo = {
   getUserCount: jest.fn(),
 };
 
+const mockRooker = { ensureProfile: jest.fn() };
+const mockLogger = { log: jest.fn(), warn: jest.fn(), error: jest.fn() };
+
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 const mockUser = {
   id: 1,
@@ -28,10 +33,13 @@ describe('UsersService (SmartRotom)', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    mockRooker.ensureProfile.mockResolvedValue('trainerash');
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UsersService,
         { provide: USERS_REPOSITORY_TOKEN, useValue: mockRepo },
+        { provide: RookerService, useValue: mockRooker },
+        { provide: Logger, useValue: mockLogger },
       ],
     }).compile();
 
@@ -167,6 +175,66 @@ describe('UsersService (SmartRotom)', () => {
   });
 
   // ─── updateUser ───────────────────────────────────────────────────────────────
+
+  // ─── Rooker provisioning ──────────────────────────────────────────────────────
+  // A player without a Rooker profile is in a dead end, not merely incomplete: the
+  // composer is hidden and the only route to the "create profile" form is their own
+  // profile page, which does not exist. So creation has to mint one.
+
+  describe('Rooker profile provisioning', () => {
+    const dto = { uuid: VALID_UUID, username: 'TrainerAsh' } as any;
+
+    beforeEach(() => {
+      mockRepo.findByUuid.mockResolvedValue(null);
+      mockRepo.findByUsername.mockResolvedValue(null);
+      mockRepo.create.mockResolvedValue(mockUser);
+    });
+
+    it('mints a handle when createUser() makes a user', async () => {
+      await service.createUser(dto);
+
+      expect(mockRooker.ensureProfile).toHaveBeenCalledWith(
+        VALID_UUID,
+        'TrainerAsh',
+      );
+    });
+
+    it('mints a handle when findOrCreateUser() makes a user', async () => {
+      await service.findOrCreateUser(dto);
+
+      expect(mockRooker.ensureProfile).toHaveBeenCalledWith(
+        VALID_UUID,
+        'TrainerAsh',
+      );
+    });
+
+    it('does not touch Rooker when the user already existed', async () => {
+      mockRepo.findByUuid.mockResolvedValue(mockUser);
+
+      await expect(service.findOrCreateUser(dto)).resolves.toEqual({
+        user: mockUser,
+        isNew: false,
+      });
+      expect(mockRooker.ensureProfile).not.toHaveBeenCalled();
+    });
+
+    it('still returns the user when Rooker throws', async () => {
+      mockRooker.ensureProfile.mockRejectedValue(new Error('rooker is down'));
+
+      await expect(service.findOrCreateUser(dto)).resolves.toEqual({
+        user: mockUser,
+        isNew: true,
+      });
+      expect(mockLogger.warn).toHaveBeenCalled();
+    });
+
+    it('warns, but still returns the user, when no handle was free', async () => {
+      mockRooker.ensureProfile.mockResolvedValue(null);
+
+      await expect(service.createUser(dto)).resolves.toEqual(mockUser);
+      expect(mockLogger.warn).toHaveBeenCalled();
+    });
+  });
 
   describe('updateUser()', () => {
     it('updates user when no conflicts', async () => {

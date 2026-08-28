@@ -5,6 +5,10 @@
       "es": "No puedes actuar en nombre de otro jugador.",
       "where": "api/_utils/auth/actor.ts"
     },
+    "AUTH_EMAIL_NOT_VERIFIED": {
+      "es": "Verifica tu correo antes de continuar. Te hemos enviado un enlace al registrarte.",
+      "where": "api/packs/desktop-device.service.ts"
+    },
     "AUTH_INVALID_CREDENTIALS": {
       "es": "Usuario o contraseña incorrectos.",
       "where": "api/auth/auth.controller.ts"

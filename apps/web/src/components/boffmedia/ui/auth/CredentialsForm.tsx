@@ -17,7 +17,9 @@ import { isPasswordValid } from "./passwordPolicy"
 interface CredentialsFormProps {
   isRegister: boolean
   redirect: string
-  onRegistered: () => void
+  /** Receives the address the account was created with, so the screen can
+   *  offer a resend without asking for it again. */
+  onRegistered: (email: string) => void
 }
 
 type Values = {
@@ -79,7 +81,7 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
         if (res.success) {
           // Fire off the verification email (best-effort — never blocks the flow).
           AuthService.resendVerification(values.email!).catch(() => {})
-          onRegistered()
+          onRegistered(values.email!)
         } else toast.error(res.error || t("errors.register"))
       } catch {
         toast.error(t("errors.generic"))

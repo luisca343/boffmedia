@@ -90,6 +90,8 @@
     "continue": "Continue",
     "notFound": "That code is not valid or has expired.",
     "failed": "Could not complete the request.",
+    "verifyTitle": "Verify your email",
+    "verifyLead": "Authorizing an app requires a verified email address. Open the link we sent you, then press Authorize again.",
     "confirmLead": "This app will be able to see and install the packs your account is entitled to. It will not be able to change your account.",
     "client": "App",
     "unknownClient": "Unidentified app",

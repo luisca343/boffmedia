@@ -91,7 +91,12 @@ export const env = z
     // Email (Resend). When RESEND_API_KEY is unset the MailService logs the
     // email to the console instead of sending (dev fallback).
     RESEND_API_KEY: z.string().optional(),
-    MAIL_FROM: z.string().default('BoffMedia <no-reply@boffmedia.com>'),
+    // boffmedia.es — the domain actually verified in Resend, and the one the
+    // rest of the app uses (production cookies are pinned to .boffmedia.es).
+    // The old .com default made Resend refuse every send with a 403, which
+    // MailService logs and swallows: the outbox then marked the row delivered
+    // and no email existed anywhere.
+    MAIL_FROM: z.string().default('BoffMedia <no-reply@boffmedia.es>'),
 
     // Third-party APIs
     GEMINI_API_KEY: z.string().optional(),

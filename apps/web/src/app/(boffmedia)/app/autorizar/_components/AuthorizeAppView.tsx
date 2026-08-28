@@ -3,7 +3,9 @@
 import * as React from "react"
 import { useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Button, Field, Icon, Input, Panel, Spinner, toast } from "@boffmedia/ui"
+import { ApiErrorCode } from "@boffmedia/shared/error-codes"
+import { Banner, Button, Field, Icon, Input, Panel, Spinner, toast } from "@boffmedia/ui"
+import { ResendVerificationButton } from "@/components/boffmedia/ui/auth"
 import { useBoffSession } from "@/services/useBoffSession"
 import {
   DesktopAuthService,
@@ -30,6 +32,10 @@ export function AuthorizeAppView() {
   const [phase, setPhase] = React.useState<Phase>("code")
   const [busy, setBusy] = React.useState(false)
   const [error, setError] = React.useState<string | null>(null)
+  // Approving is the one action here gated on a verified email. The API says so
+  // with AUTH_EMAIL_NOT_VERIFIED, which is what lets this screen offer a resend
+  // in place of the dead end the bare message used to be.
+  const [needsVerification, setNeedsVerification] = React.useState(false)
 
   const lookup = React.useCallback(
     async (raw: string) => {
@@ -73,9 +79,11 @@ export function AuthorizeAppView() {
         ? await DesktopAuthService.approve(code)
         : await DesktopAuthService.deny(code)
       if (!res.success) {
+        setNeedsVerification(res.code === ApiErrorCode.AUTH_EMAIL_NOT_VERIFIED)
         setError(res.userMessage ?? res.error ?? t("failed"))
         return
       }
+      setNeedsVerification(false)
       setPhase(approve ? "approved" : "denied")
       if (approve) toast.success(t("approvedToast"))
     } catch (e) {
@@ -144,7 +152,21 @@ export function AuthorizeAppView() {
                 </div>
               </div>
 
-              {error && <p className="text-bad text-[14px]">{error}</p>}
+              {needsVerification ? (
+                <Banner
+                  tone="warn"
+                  title={t("verifyTitle")}
+                  actions={
+                    session.user.email ? (
+                      <ResendVerificationButton email={session.user.email} size="sm" />
+                    ) : undefined
+                  }
+                >
+                  {t("verifyLead")}
+                </Banner>
+              ) : (
+                error && <p className="text-bad text-[14px]">{error}</p>
+              )}
 
               <div className="grid grid-cols-2 gap-3">
                 <Button variant="ghost" loading={busy} onClick={() => decide(false)}>

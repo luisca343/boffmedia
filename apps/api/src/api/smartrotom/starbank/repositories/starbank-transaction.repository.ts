@@ -33,8 +33,8 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
 
   /**
    * The SYSTEM account's id, resolved inside the caller's transaction so a mint and the lock it
-   * takes stay in one atomic unit. Seeded by migration 0040; a missing row is a failed
-   * migration, and failing is better than writing an FK-violating ledger row.
+   * takes stay in one atomic unit. Seeded by `pnpm run seed:house-accounts`; a missing row means
+   * that seed has not run, and failing is better than writing an FK-violating ledger row.
    */
   private async systemAccountId(
     tx: Pick<MySql2Database<Record<string, never>>, 'select'>,

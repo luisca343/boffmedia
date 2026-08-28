@@ -2,6 +2,7 @@
   "apiErrors": {
     "generic": "Something went wrong. Please try again.",
     "ACTOR_NOT_SELF": "You can't act on another player's behalf.",
+    "AUTH_EMAIL_NOT_VERIFIED": "Verify your email before continuing. We sent you a link when you signed up.",
     "AUTH_INVALID_CREDENTIALS": "Incorrect username or password.",
     "CHAT_NOT_FOUND": "Chat not found.",
     "CHAT_NOT_MEMBER": "You're not part of this chat.",

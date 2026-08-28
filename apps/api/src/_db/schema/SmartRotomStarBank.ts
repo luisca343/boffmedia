@@ -37,7 +37,7 @@ export const starBankAccounts = mysqlTable(
     type: mysqlEnum('type', STARBANK_ACCOUNT_TYPES).notNull(),
     image: varchar('image', { length: 255 }),
   },
-  // A unique `(type, name)` is what keeps the house accounts (seed/house-accounts.ts)
+  // A unique `(type, name)` is what keeps the house accounts (src/seed/house-accounts.ts)
   // singleton: it makes every house-account insert idempotent by construction,
   // while still allowing many USER accounts and one SERVICE row per service
   // name. An application-level `WHERE NOT EXISTS` races and cannot be trusted.

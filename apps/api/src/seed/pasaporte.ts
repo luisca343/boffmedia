@@ -16,22 +16,22 @@ const logger = pino({ name: 'pasaporte-seed' });
 // never opens the app never gets a row. What has to exist up front is the cycle the
 // standings are measured inside, and the weight/tier of each achievement.
 
-const SEASON_NUMBER = 7;
-const SEASON_NAME = 'Ciclo de Otoño';
-const SEASON_DAYS = 90;
+export const SEASON_NUMBER = 7;
+export const SEASON_NAME = 'Ciclo de Otoño';
+export const SEASON_DAYS = 90;
 
 // Game-design data: what an achievement is WORTH, by category. The columns default to
 // (10, 'bronce'), so the backfill only touches rows still sitting at that default —
 // re-running this never overwrites a value someone tuned by hand.
-const CATEGORY_WEIGHTS: Record<string, { tier: string; points: number }> = {
+export const CATEGORY_WEIGHTS: Record<string, { tier: string; points: number }> = {
   Gimnasios: { tier: 'plata', points: 25 },
   Ligas: { tier: 'oro', points: 50 },
   'Frente Batalla': { tier: 'platino', points: 100 },
 };
-const DEFAULT_WEIGHT = { tier: 'bronce', points: 10 };
+export const DEFAULT_WEIGHT = { tier: 'bronce', points: 10 };
 
-const DEFAULT_POINTS = 10;
-const DEFAULT_TIER = 'bronce';
+export const DEFAULT_POINTS = 10;
+export const DEFAULT_TIER = 'bronce';
 
 export async function main() {
   const DATABASE_URL = env.DATABASE_URL;

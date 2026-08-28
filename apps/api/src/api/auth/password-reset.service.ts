@@ -42,14 +42,21 @@ export class PasswordResetService {
     if (!user) return;
 
     const token = crypto.randomBytes(32).toString('hex');
+    const tokenHash = this.hash(token);
     const expiresAt = new Date(Date.now() + TOKEN_TTL_MS);
 
     // The repository invalidates prior tokens, stores the new hash and enqueues
     // the mail in one transaction, so a rolled-back token leaves no mail behind.
-    await this.tokens.replaceActiveToken(user.id, this.hash(token), expiresAt, {
+    //
+    // Keyed on the token hash rather than the account, for the reason spelled
+    // out in EmailVerificationService.issue(): `outbox_dedupe_uq` is unique over
+    // every row regardless of status, so an account-stable key let each user
+    // request exactly one password reset EVER — every later attempt died on
+    // ER_DUP_ENTRY inside the transaction.
+    await this.tokens.replaceActiveToken(user.id, tokenHash, expiresAt, {
       topic: 'mail:send-password-reset',
       payload: { to: user.email, token, locale: user.locale ?? undefined },
-      dedupeKey: `reset:${user.id}:${user.email}`,
+      dedupeKey: `reset:${user.id}:${tokenHash}`,
     });
   }
 

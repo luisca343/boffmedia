@@ -38,8 +38,8 @@ export class StarbankHouseAccountService {
   ) {}
 
   /**
-   * The account's id. Migration 0040 inserts every house account, so this is a lookup and not
-   * a create-if-missing: a missing row means the migration has not run, and failing loudly
+   * The account's id. `pnpm run seed:house-accounts` inserts every house account, so this is a
+   * lookup and not a create-if-missing: a missing row means that seed has not run, and failing loudly
    * beats silently minting a second treasury.
    */
   async resolveAccountId(account: HouseAccount): Promise<number> {
@@ -60,7 +60,7 @@ export class StarbankHouseAccountService {
     if (!existing) {
       throw new NotFoundException(
         `House account "${account.name}" (${account.type}) does not exist. ` +
-          'Run the pending migrations, or `pnpm seed:house-accounts`.',
+          'Run `pnpm run seed:house-accounts`.',
       );
     }
     this.resolved.set(key, existing.id);

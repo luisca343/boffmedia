@@ -19,9 +19,9 @@ const logger = pino({ name: 'house-accounts-seed' });
 /**
  * Re-asserts the ownerless accounts every money flow settles against.
  *
- * Migration 0040 already inserts them; this exists so a hand-restored or partially seeded
- * database can be brought back in line without a migration re-run. Idempotent, and it never
- * touches balances — only existence.
+ * The authoritative seed: no migration inserts these, so a database that has never run this
+ * script has no SYSTEM account and every mint/burn fails. Idempotent — safe to re-run on a
+ * hand-restored or partially seeded database — and it never touches balances, only existence.
  */
 export async function seedHouseAccounts(
   db: MySql2Database<Record<string, never>>,

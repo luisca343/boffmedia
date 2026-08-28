@@ -29,6 +29,8 @@
     "seed:system": "node ../../node_modules/ts-node/dist/bin.js -r tsconfig-paths/register src/seed/system.ts",
     "seed:dev": "node ../../node_modules/ts-node/dist/bin.js -r tsconfig-paths/register src/seed/dev.ts",
     "seed:house-accounts": "node ../../node_modules/ts-node/dist/bin.js -r tsconfig-paths/register src/seed/house-accounts.ts",
+    "seed:sql": "node ../../node_modules/ts-node/dist/bin.js -r tsconfig-paths/register src/seed/generate-sql.ts",
+    "check:seed-sql": "node ../../node_modules/ts-node/dist/bin.js -r tsconfig-paths/register src/seed/generate-sql.ts --check",
     "generate": "drizzle-kit generate",
     "migrate": "drizzle-kit migrate",
     "push": "drizzle-kit push",

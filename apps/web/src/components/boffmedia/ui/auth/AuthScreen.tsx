@@ -5,9 +5,10 @@ import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { signIn } from "next-auth/react"
-import { AuthProviderBtn, Divider, Icon, toast } from "@boffmedia/ui"
+import { AuthProviderBtn, Button, Divider, Icon, toast } from "@boffmedia/ui"
 import { ASSET, staticAsset } from "@/lib/assets"
 import { CredentialsForm } from "./CredentialsForm"
+import { ResendVerificationButton } from "./ResendVerificationButton"
 
 const GRID_BG: React.CSSProperties = {
   backgroundImage: [
@@ -48,6 +49,11 @@ export function AuthScreen({
   const params = useSearchParams()
   const redirect = params.get("redirect") || "/"
   const [isRegister, setIsRegister] = React.useState(params.get("mode") === "register")
+  // Set once sign-up succeeds. A new account is unverified and the link expires
+  // in 24h, so the screen stops here on a "check your inbox" panel instead of
+  // dropping the player back on a login form that will let them in anyway and
+  // then fail at the first thing that needs a verified address.
+  const [registeredEmail, setRegisteredEmail] = React.useState<string | null>(null)
 
   // Surface (once) whatever NextAuth redirected here with, then strip the code
   // from the URL so a refresh does not re-announce a failure already handled.
@@ -70,8 +76,15 @@ export function AuthScreen({
     router.replace(s ? `/entrar?${s}` : "/entrar", { scroll: false })
   }
 
-  function onRegistered() {
+  function onRegistered(email: string) {
     toast.success(t("success.registerVerify"))
+    setRegisteredEmail(email)
+  }
+
+  // Leaving the panel puts the form back in login mode, which is where someone
+  // who just created an account is headed next.
+  function leaveRegistered() {
+    setRegisteredEmail(null)
     switchMode(false)
   }
 
@@ -100,52 +113,77 @@ export function AuthScreen({
 
         <div className="flex flex-col gap-1.5">
           <h1 className="text-[30px]/[1.02] tracking-[0.01em] max-[480px]:text-[25px]">
-            {isRegister ? t("register.title") : t("login.title")}
+            {registeredEmail
+              ? t("registered.title")
+              : isRegister
+                ? t("register.title")
+                : t("login.title")}
           </h1>
           <p className="font-body text-[14px]/[1.5] not-italic normal-case text-txt-muted">
-            {isRegister ? t("register.subtitle") : t("login.subtitle")}
+            {registeredEmail
+              ? t.rich("registered.subtitle", {
+                  address: registeredEmail,
+                  b: (chunks) => <b className="text-txt">{chunks}</b>,
+                })
+              : isRegister
+                ? t("register.subtitle")
+                : t("login.subtitle")}
           </p>
         </div>
 
-        <div className="flex flex-col gap-2.5">
-          <AuthProviderBtn provider="google" block onClick={() => signIn("google", { callbackUrl: redirect })}>
-            {t("providers.google")}
-          </AuthProviderBtn>
-          {discordEnabled ? (
-            <AuthProviderBtn provider="discord" block onClick={() => signIn("discord", { callbackUrl: redirect })}>
-              {t("providers.discord")}
-            </AuthProviderBtn>
-          ) : (
-            <AuthProviderBtn provider="discord" block soon title={t("providers.soon")} onClick={soonHint("discord")}>
-              {t("providers.discord")}
-            </AuthProviderBtn>
-          )}
-          {twitchEnabled && (
-            <AuthProviderBtn provider="twitch" block onClick={() => signIn("twitch", { callbackUrl: redirect })}>
-              {t("providers.twitch")}
-            </AuthProviderBtn>
-          )}
-        </div>
+        {registeredEmail ? (
+          <div className="flex flex-col gap-[13px]">
+            <p className="font-body text-[13.5px]/[1.55] not-italic normal-case text-txt-muted">
+              {t("registered.hint")}
+            </p>
+            <ResendVerificationButton email={registeredEmail} variant="pri" className="w-full" />
+            <Button variant="ghost" className="w-full" onClick={leaveRegistered}>
+              {t("registered.goLogin")}
+            </Button>
+          </div>
+        ) : (
+          <>
+            <div className="flex flex-col gap-2.5">
+              <AuthProviderBtn provider="google" block onClick={() => signIn("google", { callbackUrl: redirect })}>
+                {t("providers.google")}
+              </AuthProviderBtn>
+              {discordEnabled ? (
+                <AuthProviderBtn provider="discord" block onClick={() => signIn("discord", { callbackUrl: redirect })}>
+                  {t("providers.discord")}
+                </AuthProviderBtn>
+              ) : (
+                <AuthProviderBtn provider="discord" block soon title={t("providers.soon")} onClick={soonHint("discord")}>
+                  {t("providers.discord")}
+                </AuthProviderBtn>
+              )}
+              {twitchEnabled && (
+                <AuthProviderBtn provider="twitch" block onClick={() => signIn("twitch", { callbackUrl: redirect })}>
+                  {t("providers.twitch")}
+                </AuthProviderBtn>
+              )}
+            </div>
 
-        <Divider label={t("divider")} />
+            <Divider label={t("divider")} />
 
-        <CredentialsForm
-          key={isRegister ? "register" : "login"}
-          isRegister={isRegister}
-          redirect={redirect}
-          onRegistered={onRegistered}
-        />
+            <CredentialsForm
+              key={isRegister ? "register" : "login"}
+              isRegister={isRegister}
+              redirect={redirect}
+              onRegistered={onRegistered}
+            />
 
-        <p className="mt-0.5 text-center font-body text-[13.5px]/none not-italic normal-case text-txt-muted">
-          {isRegister ? t("switch.toLoginQ") : t("switch.toRegisterQ")}
-          <button
-            type="button"
-            onClick={() => switchMode(!isRegister)}
-            className="ml-[7px] font-body text-[13.5px] font-bold text-accent hover:text-accent-bright hover:underline"
-          >
-            {isRegister ? t("switch.toLoginA") : t("switch.toRegisterA")}
-          </button>
-        </p>
+            <p className="mt-0.5 text-center font-body text-[13.5px]/none not-italic normal-case text-txt-muted">
+              {isRegister ? t("switch.toLoginQ") : t("switch.toRegisterQ")}
+              <button
+                type="button"
+                onClick={() => switchMode(!isRegister)}
+                className="ml-[7px] font-body text-[13.5px] font-bold text-accent hover:text-accent-bright hover:underline"
+              >
+                {isRegister ? t("switch.toLoginA") : t("switch.toRegisterA")}
+              </button>
+            </p>
+          </>
+        )}
       </div>
 
       <Link

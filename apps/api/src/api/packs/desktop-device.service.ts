@@ -6,6 +6,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { randomBytes } from 'crypto';
+import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
 import { DesktopDeviceRepository } from './desktop-device.repository';
 import { PacksAuthService } from './packs-auth.service';
@@ -213,11 +214,13 @@ export class DesktopDeviceService {
     const user = await this.users.getUserById(userId);
     if (!user) throw new NotFoundException('Cuenta no encontrada');
     if (!user.emailVerified) {
-      throw new ForbiddenException({
-        message: 'Email not verified',
-        userMessage:
+      throw new ForbiddenException(
+        userError(
+          ApiErrorCode.AUTH_EMAIL_NOT_VERIFIED,
+          'Email not verified',
           'Verifica tu correo antes de autorizar la app. Te hemos enviado un enlace al registrarte.',
-      });
+        ),
+      );
     }
 
     if (!(await this.repo.decide(this.normalize(userCode), 'approved', userId)))

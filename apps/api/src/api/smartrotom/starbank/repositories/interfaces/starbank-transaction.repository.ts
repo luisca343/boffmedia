@@ -16,7 +16,7 @@ export interface IStarbankTransactionRepository {
   ): Promise<{ success: boolean; message?: string; transactionId?: number }>;
   /**
    * Atomically set an account's balance to an absolute target, ledgering the
-   * signed delta as an AJUSTE against the virtual system account 0. Reads the
+   * signed delta as an AJUSTE against the SYSTEM house account. Reads the
    * balance under a row lock in the same transaction as the write, so there is
    * no read-modify-write race. `delta`/`newBalance` are populated on success.
    */

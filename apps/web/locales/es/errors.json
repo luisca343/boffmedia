@@ -2,6 +2,7 @@
   "apiErrors": {
     "generic": "Algo ha ido mal. Inténtalo de nuevo.",
     "ACTOR_NOT_SELF": "No puedes actuar en nombre de otro jugador.",
+    "AUTH_EMAIL_NOT_VERIFIED": "Verifica tu correo antes de continuar. Te hemos enviado un enlace al registrarte.",
     "AUTH_INVALID_CREDENTIALS": "Usuario o contraseña incorrectos.",
     "CHAT_NOT_FOUND": "No se encontró el chat.",
     "CHAT_NOT_MEMBER": "No formas parte de este chat.",

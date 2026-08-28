@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from 'nestjs-pino';
 import { StarbankTransactionService } from './starbank-transaction.service';
+import { StarbankHouseAccountService } from './starbank-house-account.service';
 import {
   STARBANK_ACCOUNT_REPOSITORY_TOKEN,
   STARBANK_TRANSACTION_REPOSITORY_TOKEN,
@@ -8,6 +9,8 @@ import {
 import { TransactionType } from '../enums/transaction-type.enum';
 import { CreateTransferDto } from '../dto/create-transfer.dto';
 import { CreateShopTransactionDto } from '../dto/create-shop-transaction.dto';
+
+const SYSTEM_ID = 2;
 
 const mockAccount = (id: number, balance: number) => ({
   id,
@@ -35,6 +38,7 @@ describe('StarbankTransactionService', () => {
     getUserBalance: jest.Mock;
     checkAccountExists: jest.Mock;
   };
+  let houseAccounts: { resolveAccountId: jest.Mock };
   let transactionRepository: {
     create: jest.Mock;
     findByAccountId: jest.Mock;
@@ -60,6 +64,8 @@ describe('StarbankTransactionService', () => {
       checkAccountExists: jest.fn(),
     };
 
+    houseAccounts = { resolveAccountId: jest.fn().mockResolvedValue(SYSTEM_ID) };
+
     transactionRepository = {
       create: jest.fn(),
       findByAccountId: jest.fn(),
@@ -83,6 +89,12 @@ describe('StarbankTransactionService', () => {
         {
           provide: STARBANK_TRANSACTION_REPOSITORY_TOKEN,
           useValue: transactionRepository,
+        },
+        {
+          // The SYSTEM account is a seeded row, so the id is whatever the seed assigned —
+          // any non-zero id exercises the same code path.
+          provide: StarbankHouseAccountService,
+          useValue: houseAccounts,
         },
       ],
     }).compile();
@@ -284,7 +296,7 @@ describe('StarbankTransactionService', () => {
         service.processShopTransaction(buyDto),
       ).resolves.toBeUndefined();
       expect(transactionRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ from: 10, to: 0, amount: 200 }),
+        expect.objectContaining({ from: 10, to: SYSTEM_ID, amount: 200 }),
       );
     });
 
@@ -311,7 +323,7 @@ describe('StarbankTransactionService', () => {
         service.processShopTransaction(sellDto),
       ).resolves.toBeUndefined();
       expect(transactionRepository.create).toHaveBeenCalledWith(
-        expect.objectContaining({ from: 0, to: 10, amount: 200 }),
+        expect.objectContaining({ from: SYSTEM_ID, to: 10, amount: 200 }),
       );
     });
 

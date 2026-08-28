@@ -152,6 +152,10 @@
       "failed": "No se ha podido vincular la cuenta.",
       "cancel": "Cancelar",
       "close": "Cerrar"
+    },
+    "emailUnverified": {
+      "title": "Correo sin verificar",
+      "lead": "Verifica tu correo para poder autorizar la app y recuperar tu cuenta si pierdes la contraseña."
     }
   }
 }

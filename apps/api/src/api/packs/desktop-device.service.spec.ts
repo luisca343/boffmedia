@@ -9,6 +9,7 @@ import { PacksAuthService } from './packs-auth.service';
 import { PacksRepository } from './packs.repository';
 import { BoffMediaUsersFacadeService } from '@api/boffmedia/users/users.facade.service';
 import { AUDIT } from './types/packs.types';
+import { ApiErrorCode } from '@/common/errors/user-error';
 
 // The device-authorization flow is how a launcher session comes into existence.
 // Every test here is about one of the three things that must not go wrong:
@@ -302,9 +303,13 @@ describe('DesktopDeviceService', () => {
       users.getUserById.mockResolvedValue(
         user({ emailVerified: false }) as never,
       );
-      await expect(service.approve('BCDF-GHJK', 7)).rejects.toBeInstanceOf(
-        ForbiddenException,
-      );
+      const err = await service.approve('BCDF-GHJK', 7).catch((e) => e);
+      expect(err).toBeInstanceOf(ForbiddenException);
+      // The web keys its "resend the verification email" button off this code
+      // (AuthorizeAppView), so it is contract, not just a log detail.
+      expect((err as ForbiddenException).getResponse()).toMatchObject({
+        code: ApiErrorCode.AUTH_EMAIL_NOT_VERIFIED,
+      });
       expect(repo.decide).not.toHaveBeenCalled();
     });
 

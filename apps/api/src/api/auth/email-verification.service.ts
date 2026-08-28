@@ -51,20 +51,29 @@ export class EmailVerificationService {
     locale?: string | null,
   ): Promise<void> {
     const token = crypto.randomBytes(32).toString('hex');
+    const tokenHash = this.hash(token);
     const expiresAt = new Date(Date.now() + TOKEN_TTL_MS);
 
     // The repository writes the token and enqueues the mail in one transaction,
-    // so a rolled-back token leaves no mail promising a dead link. The dedupeKey
-    // keeps a retried issue() from queuing the same mail twice.
+    // so a rolled-back token leaves no mail promising a dead link.
+    //
+    // The dedupeKey names THIS TOKEN's mail, not the account. `outbox_dedupe_uq`
+    // is unique across every row whatever its status, so the old
+    // `verify:<userId>:<email>` — identical on every call — meant the first
+    // verification mail an account ever sent permanently blocked the second: a
+    // resend hit ER_DUP_ENTRY and rolled the whole transaction back. It could
+    // not have deduped a retry either, since each issue() mints a fresh token,
+    // so the mail body differs every time. Keyed on the hash, a retry of the
+    // same issue() still collapses to one mail and a genuine resend goes out.
     await this.verifications.replaceActiveToken(
       userId,
       email,
-      this.hash(token),
+      tokenHash,
       expiresAt,
       {
         topic: 'mail:send-verification',
         payload: { to: email, token, locale: locale ?? undefined },
-        dedupeKey: `verify:${userId}:${email}`,
+        dedupeKey: `verify:${userId}:${tokenHash}`,
       },
     );
   }
