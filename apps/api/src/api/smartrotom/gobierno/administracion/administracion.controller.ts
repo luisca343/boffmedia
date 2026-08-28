@@ -69,7 +69,7 @@ export class AdministracionController {
 
   @Post('npc-skins')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create an NPC skin config' })
   @ApiBody({ type: CreateNpcSkinDto })
@@ -82,7 +82,7 @@ export class AdministracionController {
 
   @Patch('npc-skins/:skin')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update an NPC skin config' })
   @ApiParam({ name: 'skin', type: String })
@@ -97,7 +97,7 @@ export class AdministracionController {
 
   @Delete('npc-skins/:skin')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete an NPC skin config' })
   @ApiParam({ name: 'skin', type: String })
@@ -124,7 +124,7 @@ export class AdministracionController {
 
   @Post('megafonia/send')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Broadcast a message to the in-game global chat and record it',
@@ -162,7 +162,7 @@ export class AdministracionController {
 
   @Post('carteles')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Save a sign config' })
   @ApiBody({ type: CreateCartelDto })
@@ -175,7 +175,7 @@ export class AdministracionController {
 
   @Patch('carteles/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Update a cartel' })
   @ApiParam({ name: 'id', type: Number })
@@ -190,7 +190,7 @@ export class AdministracionController {
 
   @Delete('carteles/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Delete a cartel' })
   @ApiParam({ name: 'id', type: Number })

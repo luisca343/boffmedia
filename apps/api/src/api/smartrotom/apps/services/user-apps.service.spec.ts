@@ -19,7 +19,6 @@ describe('UserAppsService', () => {
     addUserApp: jest.Mock;
     removeUserApp: jest.Mock;
     updateOrder: jest.Mock;
-    resetOrderExcept: jest.Mock;
   };
   let appsRepository: { findById: jest.Mock };
 
@@ -31,7 +30,6 @@ describe('UserAppsService', () => {
       addUserApp: jest.fn(),
       removeUserApp: jest.fn(),
       updateOrder: jest.fn(),
-      resetOrderExcept: jest.fn(),
     };
 
     appsRepository = { findById: jest.fn() };
@@ -94,7 +92,36 @@ describe('UserAppsService', () => {
       expect(result).toEqual({ success: true });
       expect(appsRepository.findById).toHaveBeenCalledWith(appId);
       expect(userAppsRepository.findUserApp).toHaveBeenCalledWith(uuid, appId);
-      expect(userAppsRepository.addUserApp).toHaveBeenCalled();
+      // Slot 0, not 1. `order` is the 0-based grid cell, so starting the scan at
+      // 1 left the first app a player was ever given in the SECOND slot.
+      expect(userAppsRepository.addUserApp).toHaveBeenCalledWith(uuid, appId, 0);
+    });
+
+    it('fills the lowest FREE cell, not the next one up', async () => {
+      appsRepository.findById.mockResolvedValue(mockApp);
+      userAppsRepository.findUserApp.mockResolvedValue(null);
+      userAppsRepository.findByPlayerUuid.mockResolvedValue([
+        { appId: 7, order: 0 },
+        { appId: 8, order: 2 },
+      ]);
+      userAppsRepository.addUserApp.mockResolvedValue(undefined);
+
+      await service.addAppToPlayer(uuid, appId);
+
+      expect(userAppsRepository.addUserApp).toHaveBeenCalledWith(uuid, appId, 1);
+    });
+
+    it('throws ConflictException when every grid cell is taken', async () => {
+      appsRepository.findById.mockResolvedValue(mockApp);
+      userAppsRepository.findUserApp.mockResolvedValue(null);
+      userAppsRepository.findByPlayerUuid.mockResolvedValue(
+        Array.from({ length: 48 }, (_, i) => ({ appId: 100 + i, order: i })),
+      );
+
+      await expect(service.addAppToPlayer(uuid, appId)).rejects.toThrow(
+        ConflictException,
+      );
+      expect(userAppsRepository.addUserApp).not.toHaveBeenCalled();
     });
 
     it('should throw BadRequestException for empty uuid', async () => {
@@ -191,8 +218,8 @@ describe('UserAppsService', () => {
   describe('orderAppsForPlayer', () => {
     const uuid = 'test-uuid';
     const order = [
-      { id: 1, order: 1 },
-      { id: 2, order: 2 },
+      { id: 1, order: 0 },
+      { id: 2, order: 1 },
     ];
 
     it('should order apps successfully', async () => {
@@ -205,7 +232,6 @@ describe('UserAppsService', () => {
       expect(result).toEqual({ success: true });
       expect(userAppsRepository.findByPlayerUuid).toHaveBeenCalledWith(uuid);
       expect(userAppsRepository.updateOrder).toHaveBeenCalledTimes(2);
-      expect(userAppsRepository.resetOrderExcept).not.toHaveBeenCalled();
     });
 
     it('should throw BadRequestException for empty uuid', async () => {
@@ -226,22 +252,49 @@ describe('UserAppsService', () => {
       ).rejects.toThrow(BadRequestException);
     });
 
-    it('should filter out non-existing apps and reset remainder', async () => {
+    it('ignores unknown app ids and compacts the omitted ones into free cells', async () => {
       const existingApps = [{ appId: 1 }, { appId: 3 }];
       userAppsRepository.findByPlayerUuid.mockResolvedValue(existingApps);
       userAppsRepository.updateOrder.mockResolvedValue(undefined);
-      userAppsRepository.resetOrderExcept.mockResolvedValue(undefined);
 
       await service.orderAppsForPlayer(order, uuid);
 
-      // order has ids [1, 2]; existingApps has [1, 3] — only id 1 is valid
-      expect(userAppsRepository.updateOrder).toHaveBeenCalledTimes(1);
-      expect(userAppsRepository.updateOrder).toHaveBeenCalledWith(uuid, 1, 1);
-      // app 3 is in existingApps but not in validOrder — reset its order
-      expect(userAppsRepository.resetOrderExcept).toHaveBeenCalledWith(
-        uuid,
-        [3],
-      );
+      // order names ids [1, 2]; the player owns [1, 3] — only id 1 is placed
+      // explicitly, at the slot the payload asked for.
+      expect(userAppsRepository.updateOrder).toHaveBeenCalledWith(uuid, 1, 0);
+      // App 3 was left out of the payload. It must land in the lowest free cell.
+      // The old code passed [3] to `resetOrderExcept`, which resets everything
+      // NOT in that list — so it wiped app 1's brand-new order and parked it at
+      // 999, off the end of the grid, where the dock stops rendering it.
+      expect(userAppsRepository.updateOrder).toHaveBeenCalledWith(uuid, 3, 1);
+      expect(userAppsRepository.updateOrder).toHaveBeenCalledTimes(2);
+    });
+
+    it('rejects a slot outside the grid instead of hiding the app', async () => {
+      userAppsRepository.findByPlayerUuid.mockResolvedValue([{ appId: 1 }]);
+
+      await expect(
+        service.orderAppsForPlayer([{ id: 1, order: 999 }], uuid),
+      ).rejects.toThrow(BadRequestException);
+      expect(userAppsRepository.updateOrder).not.toHaveBeenCalled();
+    });
+
+    it('rejects two apps claiming the same cell', async () => {
+      userAppsRepository.findByPlayerUuid.mockResolvedValue([
+        { appId: 1 },
+        { appId: 2 },
+      ]);
+
+      await expect(
+        service.orderAppsForPlayer(
+          [
+            { id: 1, order: 3 },
+            { id: 2, order: 3 },
+          ],
+          uuid,
+        ),
+      ).rejects.toThrow(BadRequestException);
+      expect(userAppsRepository.updateOrder).not.toHaveBeenCalled();
     });
   });
 });

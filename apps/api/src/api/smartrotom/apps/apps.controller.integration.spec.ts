@@ -41,6 +41,16 @@ const mockApp = { id: 1, name: 'ChatApp', url: 'chatapp', active: true };
 describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
   let app: INestApplication;
 
+  const SELF_UUID = '67d9b543-5ac9-41e1-a8a5-20d7689e24a4';
+  const OTHER_UUID = 'b1d2c3e4-5f60-4a7b-8c9d-0e1f2a3b4c5d';
+  const ADMIN_PRINCIPAL = {
+    userId: 1,
+    username: 'tester',
+    roles: ['BOFF_ADMIN', 'ROTOM_ADMIN'],
+    mcUuid: SELF_UUID,
+  };
+  let principal: Record<string, unknown> = { ...ADMIN_PRINCIPAL };
+
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
       controllers: [AppsController],
@@ -71,17 +81,10 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
     // runs as a signed-in caller; the guards themselves are unit-tested.
 
+    // Mutable so a test can run as a non-admin: `adminTargetUuid` is enforced in
+    // the handler, not in a guard, so overriding RolesGuard does not cover it.
     app.use((req: any, _res: any, next: any) => {
-      req.user = {
-        userId: 1,
-
-        username: 'tester',
-
-        roles: ['BOFF_ADMIN', 'ROTOM_ADMIN'],
-
-        mcUuid: '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-      };
-
+      req.user = { ...principal };
       next();
     });
     app.useGlobalPipes(
@@ -101,6 +104,7 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
 
   beforeEach(() => {
     jest.resetAllMocks();
+    principal = { ...ADMIN_PRINCIPAL };
   });
 
   // ── GET /smartrotom/apps ─────────────────────────────────────────────────
@@ -289,7 +293,7 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
   // ── POST /smartrotom/apps/player — GetPlayerAppsDto ──────────────────────
 
   describe('POST /smartrotom/apps/player', () => {
-    it("takes no body: it lists the CALLER's apps", async () => {
+    it("with no body it lists the CALLER's apps", async () => {
       (mockFacade.getAppsForPlayer as jest.Mock).mockResolvedValue([]);
 
       const res = await request(app.getHttpServer())
@@ -297,11 +301,30 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
         .send({});
 
       expect(res.status).toBe(201);
-      // The uuid must not be a body field: that lets any caller list (and
-      // reorder) somebody else's dock.
-      expect(mockFacade.getAppsForPlayer).toHaveBeenCalledWith(
-        '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-      );
+      // The owner defaults to the principal, never to anything in the request.
+      expect(mockFacade.getAppsForPlayer).toHaveBeenCalledWith(SELF_UUID);
+    });
+
+    it('lets an ADMIN list another player’s dock via the body uuid', async () => {
+      (mockFacade.getAppsForPlayer as jest.Mock).mockResolvedValue([]);
+
+      const res = await request(app.getHttpServer())
+        .post('/smartrotom/apps/player')
+        .send({ uuid: OTHER_UUID });
+
+      expect(res.status).toBe(201);
+      expect(mockFacade.getAppsForPlayer).toHaveBeenCalledWith(OTHER_UUID);
+    });
+
+    it('403s a NON-admin that names another player, rather than silently using their own dock', async () => {
+      principal = { ...ADMIN_PRINCIPAL, roles: ['GOBIERNO'] };
+
+      const res = await request(app.getHttpServer())
+        .post('/smartrotom/apps/player')
+        .send({ uuid: OTHER_UUID });
+
+      expect(res.status).toBe(403);
+      expect(mockFacade.getAppsForPlayer).not.toHaveBeenCalled();
     });
   });
 
@@ -340,10 +363,29 @@ describe('AppsController — integration (ValidationPipe + GlobalExceptionFilter
         .send({ id: 1 });
 
       expect(res.status).toBeLessThan(300);
-      expect(mockFacade.addAppToPlayer).toHaveBeenCalledWith(
-        '67d9b543-5ac9-41e1-a8a5-20d7689e24a4',
-        1,
-      );
+      expect(mockFacade.addAppToPlayer).toHaveBeenCalledWith(SELF_UUID, 1);
+    });
+
+    it('adds to the NAMED player when an admin sends a uuid', async () => {
+      mockFacade.addAppToPlayer.mockResolvedValue({ success: true });
+
+      const res = await request(app.getHttpServer())
+        .post('/smartrotom/apps/player/add')
+        .send({ id: 1, uuid: OTHER_UUID });
+
+      expect(res.status).toBeLessThan(300);
+      expect(mockFacade.addAppToPlayer).toHaveBeenCalledWith(OTHER_UUID, 1);
+    });
+
+    it('403s a non-admin naming another player', async () => {
+      principal = { ...ADMIN_PRINCIPAL, roles: ['GOBIERNO'] };
+
+      const res = await request(app.getHttpServer())
+        .post('/smartrotom/apps/player/add')
+        .send({ id: 1, uuid: OTHER_UUID });
+
+      expect(res.status).toBe(403);
+      expect(mockFacade.addAppToPlayer).not.toHaveBeenCalled();
     });
   });
 

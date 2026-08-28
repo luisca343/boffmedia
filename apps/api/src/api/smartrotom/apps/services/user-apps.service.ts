@@ -12,6 +12,11 @@ import {
   APPS_REPOSITORY_TOKEN,
   USER_APPS_REPOSITORY_TOKEN,
 } from '@api/_utils/repositories/interfaces/repository.token';
+import {
+  APP_GRID_SLOTS,
+  firstFreeSlot,
+  isGridSlot,
+} from '../app-grid.constants';
 
 @Injectable()
 export class UserAppsService {
@@ -53,11 +58,25 @@ export class UserAppsService {
       throw new ConflictException('App already added to player');
     }
 
-    const appOrder = await this.userAppsRepository.findByPlayerUuid(uuid);
-    let order = 1;
-    const usedOrders = new Set(appOrder.map((a) => a.order));
-    while (usedOrders.has(order) && order <= 36) {
-      order++;
+    // The lowest FREE cell, counting from 0. This scan used to start at 1, which
+    // is why the very first app a player was given landed in the second slot and
+    // cell 0 could only ever be filled by dragging something into it. It also
+    // stopped at 36 while the grid has APP_GRID_SLOTS cells, and on overflow fell
+    // out of the loop and inserted the out-of-range value anyway.
+    // `order` is nullable in the schema, and a null one is not occupying a cell —
+    // it is a row the dock cannot place. Treat it as free so the next add does not
+    // skip a slot on its account.
+    const dock = await this.userAppsRepository.findByPlayerUuid(uuid);
+    const taken = new Set(
+      dock
+        .map((a) => a.order)
+        .filter((o): o is number => o !== null && o !== undefined),
+    );
+    const order = firstFreeSlot(taken);
+    if (order === null) {
+      throw new ConflictException(
+        `The player's dock is full (${APP_GRID_SLOTS} slots)`,
+      );
     }
 
     await this.userAppsRepository.addUserApp(uuid, appId, order);
@@ -92,32 +111,48 @@ export class UserAppsService {
       throw new BadRequestException('Order data is required');
     }
 
-    // Get existing apps for the player
+    // An id the player does not own is ignored, but a bad SLOT is rejected: a cell
+    // outside the grid does not sort last, it makes the app vanish from the dock,
+    // and two apps sharing a cell silently hides one of them. Both used to be
+    // written straight through from the client.
     const existingApps = await this.userAppsRepository.findByPlayerUuid(uuid);
     const existingAppIds = new Set(existingApps.map((app) => app.appId));
+    const validOrder = order.filter((app) => existingAppIds.has(Number(app.id)));
 
-    // Filter out any apps that are not in the existing set
-    const validOrder = order.filter((app) =>
-      existingAppIds.has(Number(app.id)),
-    );
+    const claimed = new Set<number>();
+    for (const app of validOrder) {
+      const slot = Number(app.order);
+      if (!isGridSlot(slot)) {
+        throw new BadRequestException(
+          `Slot ${app.order} is outside the ${APP_GRID_SLOTS}-cell grid`,
+        );
+      }
+      if (claimed.has(slot)) {
+        throw new BadRequestException(`Slot ${slot} was assigned twice`);
+      }
+      claimed.add(slot);
+    }
 
-    // Update the order of existing apps
     for (const app of validOrder) {
       await this.userAppsRepository.updateOrder(
         uuid,
         Number(app.id),
-        app.order,
+        Number(app.order),
       );
     }
 
-    // Reset order for apps not in the valid order list
-    const validAppIds = validOrder.map((app) => Number(app.id));
-    const appsToReset = Array.from(existingAppIds).filter(
-      (id) => !validAppIds.includes(id),
-    );
-
-    if (appsToReset.length > 0) {
-      await this.userAppsRepository.resetOrderExcept(uuid, appsToReset);
+    // Apps the payload left out are compacted into the lowest free cells. They used
+    // to be handed to `resetOrderExcept(uuid, appsToReset)`, which resets everything
+    // NOT in the list it is given — so it wiped the order just written for the apps
+    // that WERE ordered, and parked them at 999, past the end of the grid.
+    const placed = new Set(validOrder.map((app) => Number(app.id)));
+    for (const appId of existingAppIds) {
+      if (placed.has(appId)) continue;
+      const slot = firstFreeSlot(claimed);
+      // Dock full: leave the app where it is rather than move it out of the grid.
+      if (slot === null) break;
+      claimed.add(slot);
+      await this.userAppsRepository.updateOrder(uuid, appId, slot);
     }
 
     return { success: true };

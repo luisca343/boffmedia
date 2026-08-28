@@ -11,7 +11,10 @@ import { useActiveDragItem, useDndSensors, COLLISION_STRATEGIES, DROP_ANIMATIONS
 import AppSlot from './AppSlot'
 import { App } from "./App"
 import { useTranslations } from "next-intl"
-// Grid configuration - 6 apps per row
+// Grid configuration. `app.order` IS the 0-based index into these cells, so this
+// size is a contract with the API, not a local layout choice: keep it in step with
+// `APP_GRID_COLS/ROWS` in apps/api/src/api/smartrotom/apps/app-grid.constants.ts,
+// which is what picks the slot for a newly added app.
 const GRID_COLS = 8
 const GRID_ROWS = 6
 const TOTAL_SLOTS = GRID_COLS * GRID_ROWS
@@ -36,13 +39,30 @@ export default function AppGrid({ apps, setApps, className }: AppGridProps) {
     
     // Sort apps by their order and place them in the grid
     const sortedApps = [...apps].sort((a, b) => (a.order || 0) - (b.order || 0))
+
+    // An app whose stored order is off the grid, or whose cell is already taken,
+    // used to be dropped here without a trace. The API no longer produces either,
+    // but rows written before that fix still exist, so place the strays in the
+    // first free cell rather than let them vanish from the player's dock.
+    const strays: SmartRotomAppExtended[] = []
     sortedApps.forEach((app) => {
       const position = app.order || 0
-      if (position < TOTAL_SLOTS) {
+      if (position >= 0 && position < TOTAL_SLOTS && slots[position] === null) {
         slots[position] = app
+      } else {
+        strays.push(app)
       }
     })
-    
+
+    if (strays.length) {
+      let cursor = 0
+      for (const app of strays) {
+        while (cursor < TOTAL_SLOTS && slots[cursor] !== null) cursor++
+        if (cursor >= TOTAL_SLOTS) break
+        slots[cursor] = app
+      }
+    }
+
     return slots
   }
 

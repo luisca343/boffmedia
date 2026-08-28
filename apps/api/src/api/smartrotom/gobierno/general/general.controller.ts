@@ -112,8 +112,13 @@ export class GeneralController {
 
   // ==================== AUDITORIA ====================
 
+  // Was @Public(): the whole government audit trail was readable with no session
+  // at all. It stays open to any officer because /gobierno/auditoria (AuditoriaBoard)
+  // is a non-restricted page — only the anonymous access is closed here.
   @Get('auditoria')
-  @Public()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'List the append-only audit log' })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoAuditoriaListEntity })
   async listAuditoria(

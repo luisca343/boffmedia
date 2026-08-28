@@ -96,7 +96,9 @@ export class TaxiController {
 
   @Post('admin/teleport')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.GOBIERNO, USER_ROLES.ROTOM_ADMIN)
+  // Administración surface: ROTOM_ADMIN (or a Boffmedia admin) only — a plain
+  // GOBIERNO officer must not be able to teleport players.
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth()
   @ApiOperation({
     summary: 'Move a player to a stop, as a moderation action',

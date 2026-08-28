@@ -32,10 +32,14 @@ export const useAdminApps = () =>
     queryFn: () => rotomAuthedGETOrThrow<SmartRotomApp[]>("/apps"),
   })
 
+// The uuid goes in the BODY, not just the query key: `/apps/player*` takes the
+// owner from the session unless the body names one, so without it every read and
+// write here landed on the admin's own dock while the screen showed the selected
+// player's name. Naming another player is admin-only server-side.
 export const useAdminPlayerApps = (uuid: string | null) =>
   useQuery({
     queryKey: adminKeys.playerApps(uuid ?? ""),
-    queryFn: () => rotomAuthedPOSTOrThrow<SmartRotomApp[]>("/apps/player", {}),
+    queryFn: () => rotomAuthedPOSTOrThrow<SmartRotomApp[]>("/apps/player", { uuid }),
     enabled: !!uuid,
   })
 
@@ -44,7 +48,7 @@ export const useAdminAddApp = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ uuid, id }: { uuid: string; id: number }) =>
-      rotomAuthedPOSTOrThrow("/apps/player/add", { id }),
+      rotomAuthedPOSTOrThrow("/apps/player/add", { id, uuid }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
       toast.success(t("apps.appAnadida"))
@@ -58,7 +62,7 @@ export const useAdminRemoveApp = () => {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: ({ uuid, id }: { uuid: string; id: number }) =>
-      rotomAuthedPOSTOrThrow("/apps/player/remove", { id }),
+      rotomAuthedPOSTOrThrow("/apps/player/remove", { id, uuid }),
     onSuccess: (_d, { uuid }) => {
       qc.invalidateQueries({ queryKey: adminKeys.playerApps(uuid) })
       toast.info(t("apps.appEliminada"))

@@ -9,7 +9,17 @@ import {
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
-import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { WingullFacadeService } from './wingull.facade.service';
 import { UuidDto } from '../_dto/smartrotom-request-dto';
 import { Weather } from './entities/weather.entity';
@@ -347,7 +357,14 @@ export class WingullController {
   // World endpoints
   //=====================================================
 
+  // The one non-anonymous read on this controller: TPS/memory/player counts back
+  // the Gobierno > Administracion > Rendimiento page, so it follows that section's
+  // gate rather than the class-level @Public(). An explicitly declared guard still
+  // runs under @Public() (see the note on the controller).
   @Get('performance')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.ROTOM_ADMIN, USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth()
   @ApiOperation({ summary: 'Get server performance data' })
   @ApiResponse({
     status: HttpStatus.OK,

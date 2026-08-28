@@ -15,14 +15,18 @@ import { AppsFacadeService } from './apps.facade.service';
 import { UpdateAppDto } from './dto/update-app.dto';
 import { CreateAppDto } from './dto/create-app.dto';
 import { OrderAppDto } from './dto/order-apps.dto';
-import { PlayerAppDto } from './dto/player-app.dto';
+import { PlayerAppDto, PlayerScopeDto } from './dto/player-app.dto';
 import { RotomApp } from './entities/app.entity';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
 import { Logger } from 'nestjs-pino';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
-import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  type AuthPrincipal,
+} from '@api/_utils/decorators/current-user.decorator';
+import { adminTargetUuid } from '@api/_utils/auth/actor';
 
 @ApiTags('SmartRotom | Apps')
 // The app registry (create/rename/activate/delete) is an admin surface and is
@@ -175,19 +179,28 @@ export class AppsController {
   }
 
   // ==================== PLAYER APP MANAGEMENT ====================
-  // These four are the player's own dock, not the registry: a session is
-  // enough, and the owner comes from it. @Roles() with no argument clears the
-  // class-level admin requirement for the handler.
+  // These three are a player's dock, not the registry: a session is enough, and
+  // the owner comes from it. A body `uuid` names ANOTHER player's dock and is
+  // admin-only — `adminTargetUuid` rejects a non-admin that sends one instead of
+  // quietly falling back to their own rows, which is what made the Gobierno
+  // "Apps de jugador" screen edit the admin's own dock under another player's
+  // name. @Roles() with no argument clears the class-level admin requirement.
 
   @Post('player')
-  @ApiOperation({ summary: 'Get apps for a player' })
+  @ApiOperation({ summary: "Get the apps on a player's dock" })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Apps found for player successfully.',
     type: [RotomApp],
   })
-  async getForPlayer(@CurrentMcUuid() uuid: string): Promise<RotomApp[]> {
-    return this.appsFacadeService.getAppsForPlayer(uuid);
+  @ApiBody({ type: PlayerScopeDto, required: false })
+  async getForPlayer(
+    @Body() scope: PlayerScopeDto,
+    @CurrentUser() principal: AuthPrincipal,
+  ): Promise<RotomApp[]> {
+    return this.appsFacadeService.getAppsForPlayer(
+      adminTargetUuid(principal, scope?.uuid),
+    );
   }
 
   @Post('player/add')
@@ -199,10 +212,13 @@ export class AppsController {
   })
   @ApiBody({ type: PlayerAppDto })
   async addAppToPlayer(
-    @Body() { id }: PlayerAppDto,
-    @CurrentMcUuid() uuid: string,
+    @Body() { id, uuid: target }: PlayerAppDto,
+    @CurrentUser() principal: AuthPrincipal,
   ): Promise<SuccessResponse> {
-    return this.appsFacadeService.addAppToPlayer(uuid, id);
+    return this.appsFacadeService.addAppToPlayer(
+      adminTargetUuid(principal, target),
+      id,
+    );
   }
 
   @Post('player/remove')
@@ -214,10 +230,13 @@ export class AppsController {
   })
   @ApiBody({ type: PlayerAppDto })
   async removeAppFromPlayer(
-    @Body() { id }: PlayerAppDto,
-    @CurrentMcUuid() uuid: string,
+    @Body() { id, uuid: target }: PlayerAppDto,
+    @CurrentUser() principal: AuthPrincipal,
   ): Promise<SuccessResponse> {
-    return this.appsFacadeService.removeAppFromPlayer(uuid, id);
+    return this.appsFacadeService.removeAppFromPlayer(
+      adminTargetUuid(principal, target),
+      id,
+    );
   }
 
   // ==================== APP ORDERING ====================
@@ -230,10 +249,13 @@ export class AppsController {
     type: SuccessResponse,
   })
   @ApiBody({ type: OrderAppDto })
+  // Self-only by design: no screen reorders somebody else's dock, so this route
+  // takes no target uuid.
   async order(
     @Body() orderDto: OrderAppDto,
-    @CurrentMcUuid() uuid: string,
+    @CurrentUser() principal: AuthPrincipal,
   ): Promise<SuccessResponse> {
+    const uuid = adminTargetUuid(principal, undefined);
     const result = await this.appsFacadeService.orderApps(orderDto.order, uuid);
     return {
       success: result.success,

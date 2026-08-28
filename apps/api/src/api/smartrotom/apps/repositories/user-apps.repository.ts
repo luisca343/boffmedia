@@ -33,10 +33,12 @@ export class UserAppsRepository implements IUserAppsRepository {
     return result[0] || null;
   }
 
+  // `order` is required on purpose. It used to default to 999, which is past the
+  // end of the grid, so a caller that forgot it created a row the dock never shows.
   async addUserApp(
     uuid: string,
     appId: number,
-    order: number = 999,
+    order: number,
   ): Promise<RotomUserApp> {
     const _result = await this.db.insert(rotomUserApps).values({
       uuid,
@@ -65,38 +67,16 @@ export class UserAppsRepository implements IUserAppsRepository {
       .where(and(eq(rotomUserApps.uuid, uuid), eq(rotomUserApps.appId, appId)));
   }
 
-  async resetOrderExcept(uuid: string, excludeAppIds: number[]): Promise<void> {
-    this.logger.log(
-      'Resetting order for user:',
-      uuid,
-      'excluding apps:',
-      excludeAppIds,
-    );
-    if (excludeAppIds.length === 0) {
-      await this.db
-        .update(rotomUserApps)
-        .set({ order: 999 } as RotomUserApp)
-        .where(eq(rotomUserApps.uuid, uuid));
-    } else {
-      await this.db
-        .update(rotomUserApps)
-        .set({ order: 999 } as RotomUserApp)
-        .where(
-          and(
-            eq(rotomUserApps.uuid, uuid),
-            sql`${rotomUserApps.appId} NOT IN (${excludeAppIds})`,
-          ),
-        );
-    }
-  }
-
   async getAppsForPlayer(uuid: string): Promise<any[]> {
     return this.db
       .select({
         id: rotomApps.id,
         url: rotomApps.url,
         name: rotomApps.name,
-        order: sql`COALESCE(${rotomUserApps.order}, 999)`.as('order'),
+        // The WHERE below already restricts to this player's rows, so `order` is
+        // never null here and the fallback is unreachable; it is 0 rather than the
+        // old 999 so no code path can produce an off-grid slot.
+        order: sql`COALESCE(${rotomUserApps.order}, 0)`.as('order'),
         is_user_app:
           sql`CASE WHEN ${rotomUserApps.uuid} IS NOT NULL THEN 1 ELSE 0 END`.as(
             'is_user_app',

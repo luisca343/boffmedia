@@ -15,12 +15,23 @@ export async function wingullGET<T>(url: string): Promise<ApiResponse<T>> {
   return apiGET<T>(`/wingull${url}`);
 }
 
+// `/wingull/performance` is the one read on this controller that is role-gated
+// (Administracion > Rendimiento). Anonymous `wingullGET` 401s there, so admin
+// reads need the session Bearer.
+export async function wingullAuthedGET<T>(url: string): Promise<ApiResponse<T>> {
+  return authedRequest<T>("GET", `${getApiUrl()}/wingull${url}`, await sessionToken());
+}
+
 export async function wingullPOST<T>(url: string, data: any): Promise<ApiResponse<T>> {
   return authedRequest<T>("POST", `${getApiUrl()}/wingull${url}`, await sessionToken(), data);
 }
 
 export async function wingullGETOrThrow<T>(url: string): Promise<T> {
   return orThrow(wingullGET<T>(url));
+}
+
+export async function wingullAuthedGETOrThrow<T>(url: string): Promise<T> {
+  return orThrow(wingullAuthedGET<T>(url));
 }
 
 export async function wingullPOSTOrThrow<T>(url: string, data: any): Promise<T> {

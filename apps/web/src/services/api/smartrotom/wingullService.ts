@@ -1,5 +1,5 @@
 import { PlayerStats, PokemonW, Region, SuccessResponse, TaxiStop, TeleportPlayerDto, Weather, Performance } from '@boffmedia/shared';
-import { wingullGET, wingullPOST, ApiResponse, rotomPOST } from '@/services/boffAPI';
+import { wingullGET, wingullAuthedGET, wingullPOST, ApiResponse, rotomPOST } from '@/services/boffAPI';
 import { 
     BattleTeamData, 
     BattleTeam, 
@@ -92,8 +92,10 @@ export class WingullService {
     /**
     * Get server performance data
     */
+    // Authed, not anonymous: the route is gated to ROTOM_ADMIN / BOFF_ADMIN
+    // (Gobierno > Administracion > Rendimiento) and 401s without a Bearer.
     static getPerformance() {
-        return wingullGET<Performance>('/performance');
+        return wingullAuthedGET<Performance>('/performance');
     }
     
     /**
