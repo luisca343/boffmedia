@@ -266,10 +266,17 @@ There is no package or API for this; the only source of truth is TypeScript in t
 
 **Adding a regulation** (from `apps/api/`):
 ```bash
+pnpm add-regulation --list                              # find the exact upstream name
 pnpm add-regulation "[Gen 9 Champions] VGC 2026 Reg M-B"
 ```
-Then review the diff, run `pnpm type-check`, and commit. Flags: `--dry-run`, `--source <checkout>`
-(skip the network), `--ref <branch|sha>` (pin upstream), `--forget "<name>"` (stop tracking a format).
+Formats are addressed by their **exact** upstream `name` — `--list [substring]` prints every match with
+its derived id, its mod, and whether it is already tracked. Then review the diff, run `pnpm type-check`,
+and commit. Other flags: `--dry-run`, `--source <checkout>` (skip the network), `--ref <branch|sha>`
+(pin upstream), `--forget "<name>"` (stop tracking a format).
+
+Registering the format is only half of it — the regulation also needs a **row in `vgc_regulations`**,
+created from the admin UI once the regenerated API is deployed. That row carries the per-regulation
+VGCPastes GID, which has to be looked up by hand (see the VGCPastes section above).
 
 Everything under `mod/` plus `mod/registry.generated.ts` is generated output. `champions.mod.ts` is a thin
 consumer of that registry — it holds no format list of its own. Editing any of it by hand is lost on the

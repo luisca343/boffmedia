@@ -181,6 +181,22 @@ function convertMod(
   const written: string[] = [];
   console.log(`\n  mod ${modId} -> ${relativeImport(VGC_DIR, outDir)}/`);
 
+  // The conversion loop iterates FILE_CONFIGS, so a data table upstream adds
+  // that we have no config for would be skipped without a word — the exact
+  // silent-drift shape this generator exists to prevent. Fail on it instead.
+  const unknown = fs
+    .readdirSync(sourceDir)
+    .filter((f) => f.endsWith('.ts') && !FILE_CONFIGS[f]);
+  if (unknown.length) {
+    fail(
+      `data/mods/${modId} contains ${unknown.length} file(s) this generator ` +
+        `does not know how to convert: ${unknown.join(', ')}.\n` +
+        `  Upstream added a data table. Add an entry for each to FILE_CONFIGS ` +
+        `in scripts/convert-showdown-mod/config.ts (and to MOD_DATA_KEYS here ` +
+        `if it must reach Dex.mod()), then re-run.`,
+    );
+  }
+
   for (const fileName of Object.keys(FILE_CONFIGS)) {
     const sourcePath = path.join(sourceDir, fileName);
     if (!fs.existsSync(sourcePath)) continue;
@@ -358,7 +374,15 @@ function main(): void {
   const ref = valueOf('--ref') ?? 'master';
   const sourceDir = valueOf('--source');
   const forget = valueOf('--forget');
-  const FLAGS_WITH_VALUES = ['--ref', '--source', '--forget'];
+  // --list takes an OPTIONAL substring, so distinguish "absent" from "empty",
+  // and do not swallow a following flag as if it were the filter.
+  const rawList = valueOf('--list');
+  const listFilter = argv.includes('--list')
+    ? rawList && !rawList.startsWith('--')
+      ? rawList
+      : ''
+    : undefined;
+  const FLAGS_WITH_VALUES = ['--ref', '--source', '--forget', '--list'];
   const positional = argv.filter(
     (a, i) => !a.startsWith('--') && !FLAGS_WITH_VALUES.includes(argv[i - 1]),
   );
@@ -384,6 +408,26 @@ function main(): void {
 
   // -- Resolve every tracked format against upstream -------------------------
   const upstreamFormats = loadUpstreamFormats(upstream.dir);
+
+  // A format is addressed by its exact upstream name, which nobody can guess
+  // when a new regulation drops. --list is how you find the string to pass.
+  if (listFilter !== undefined) {
+    const needle = (listFilter || 'Champions').toLowerCase();
+    const matches = [...upstreamFormats.values()]
+      .filter((f) => f.name.toLowerCase().includes(needle))
+      .sort((a, b) => a.name.localeCompare(b.name));
+    console.log(`\nUpstream formats matching "${needle}":\n`);
+    for (const f of matches) {
+      const mark = tracked.has(f.name) ? '*' : ' ';
+      console.log(
+        `  ${mark} ${f.name.padEnd(42)} ${toFormatId(f.name).padEnd(32)} [mod: ${f.mod ?? 'base'}]`,
+      );
+    }
+    console.log(`\n  ${matches.length} match(es); * = already tracked.`);
+    console.log('  Add one with:  pnpm add-regulation "<name>"');
+    return;
+  }
+
   const resolved: UpstreamFormat[] = [];
 
   for (const name of tracked) {
@@ -392,7 +436,8 @@ function main(): void {
       fail(
         `Format "${name}" no longer exists upstream at ${ref}.\n` +
           `  It is still tracked, so nothing was written. Either correct the ` +
-          `name or drop it with:\n    pnpm add-regulation --forget "${name}"`,
+          `name or drop it with:\n    pnpm add-regulation --forget "${name}"\n` +
+          `  To see what upstream offers:\n    pnpm add-regulation --list`,
       );
     }
     resolved.push(format);
