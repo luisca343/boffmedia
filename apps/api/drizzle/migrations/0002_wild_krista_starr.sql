@@ -1,0 +1,1 @@
+ALTER TABLE `boffmedia_tournaments` ADD `teamsheet_visibility` enum('private','participants','public') DEFAULT 'private' NOT NULL;

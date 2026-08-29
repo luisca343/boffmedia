@@ -1,36 +1,22 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Panel, Field, Input, Select, Button, toast, Spinner } from "@boffmedia/ui"
-import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
-import { useTournaments } from "@/hooks/tournaments/useTournaments"
-import { UsersService } from "@/services/api/boffmedia/usersService"
-import {
-  TournamentsService,
-  type TnFormat,
-  type TnKind,
-  type TnMatchApi,
-  type TnStatus,
-  type TnPhaseApi,
-  type TnPhaseInput,
-  type TnPhaseFormat,
-  type TnAdvanceType,
-  type TnParticipantStatus,
-  type TnCompetitorApi,
-} from "@/services/api/boffmedia/tournamentsService"
-import { FORMATS, KINDS, PHASE_FORMATS, ADVANCE_TYPE_OPTIONS, PARTICIPANT_STATUS, VGC_PRESET, PHASE_STATUS_TONE } from "./constants"
-import { SectionHead } from "./shared"
+import { Button, toast } from "@boffmedia/ui"
+import { AvPanel, AvPill } from "../../_components/ui/av-kit"
+import { TournamentsService, type TnMatchApi } from "@/services/api/boffmedia/tournamentsService"
 import { RoundScheduler } from "./PhasesEditor"
 
 export function ReportPanel({
   tid,
+  slug,
   bestOf,
   matches,
   onReported,
 }: {
   tid: number
+  slug: string
   bestOf: number
   matches: TnMatchApi[]
   onReported: () => void
@@ -118,8 +104,21 @@ export function ReportPanel({
     })
 
   if (matches.length === 0) return null
+  const disputed = matches.filter((m) => m.proposalState === "disputed")
+  const judge = matches.filter((m) => m.judgeRequestedAt && m.proposalState !== "disputed")
+
   return (
-    <Panel title={t("reportResults", { count: reportable.length })}>
+    <div>
+      {/* A disputed result or a judge request is someone waiting on staff, so
+          it comes first and links straight through to the table. */}
+      {(disputed.length > 0 || judge.length > 0) && (
+        <AvPanel title={t("attention.title")} icon="alert" aside={<AvPill tone={disputed.length ? "rose" : "amber"}>{disputed.length + judge.length}</AvPill>}>
+          <AttentionList slug={slug} title={t("reportDisputed", { count: disputed.length })} items={disputed} tone="bad" />
+          <AttentionList slug={slug} title={t("judgeRequested", { count: judge.length })} items={judge} tone="warn" />
+        </AvPanel>
+      )}
+
+      <AvPanel title={t("pendingTitle")} icon="play" aside={<AvPill tone={reportable.length ? "accent" : "muted"}>{reportable.length}</AvPill>}>
       {reportable.length === 0 ? (
         <p className="py-2 font-mono text-[12px] text-txt-dim">
           {waiting.length > 0
@@ -161,23 +160,11 @@ export function ReportPanel({
           {t("reportLocked", { count: waiting.length })}
         </p>
       )}
-
-      {(() => {
-        const disputed = matches.filter((m) => m.proposalState === "disputed")
-        if (!disputed.length) return null
-        return (
-          <div className="mt-3 border border-solid border-bad bg-bad-soft px-3 py-2 font-mono text-[11px] text-bad">
-            {t("reportDisputed", { count: disputed.length })}
-          </div>
-        )
-      })()}
+      </AvPanel>
 
       {resolved.length > 0 && (
-        <details className="mt-3 border-t border-dashed border-line pt-2">
-          <summary className="cursor-pointer font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
-            {t("correctResults", { count: resolved.length })}
-          </summary>
-          <div className="mt-2 grid gap-1.5">
+        <AvPanel title={t("resultsTitle")} icon="check" aside={<AvPill>{resolved.length}</AvPill>}>
+          <div className="grid gap-1.5">
             {resolved.map((m) => {
               const editing = amendId === m.id
               const s = scores[m.id] ?? { a: "", b: "" }
@@ -207,8 +194,48 @@ export function ReportPanel({
               )
             })}
           </div>
-        </details>
+        </AvPanel>
       )}
-    </Panel>
+    </div>
+  )
+}
+
+/**
+ * Matches that need a human: disputes and judge calls. Each row links to the
+ * match page, which is where an admin can read the chat and settle it.
+ */
+function AttentionList({
+  slug,
+  title,
+  items,
+  tone,
+}: {
+  slug: string
+  title: string
+  items: TnMatchApi[]
+  tone: "bad" | "warn"
+}) {
+  if (!items.length) return null
+  return (
+    <div className="[&+&]:mt-3">
+      <p className={cn("m-0 mb-1.5 font-mono text-[11px] font-semibold", tone === "bad" ? "text-bad" : "text-warn")}>
+        {title}
+      </p>
+      <div className="grid gap-1">
+        {items.map((m) => (
+          <a
+            key={m.id}
+            href={`/torneos/${slug}/partida/${m.id}`}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center gap-2 border border-solid border-line bg-base px-2 py-1 font-body text-[12px] transition-colors hover:border-accent-line"
+          >
+            <span className="min-w-0 flex-1 truncate text-right">{m.top?.name ?? "—"}</span>
+            <span className="font-mono text-[10px] text-txt-dim">vs</span>
+            <span className="min-w-0 flex-1 truncate">{m.bot?.name ?? "—"}</span>
+          </a>
+        ))}
+      </div>
+    </div>
   )
 }

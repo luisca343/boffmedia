@@ -101,7 +101,7 @@ export class EventsRepository {
     const participantCountSubquery = this.db
       .select({
         eventId: boffMediaEventParticipants.eventId,
-        count: sql<number>`COUNT(*)`,
+        count: sql<number>`COUNT(*)`.as('count'),
       })
       .from(boffMediaEventParticipants)
       .groupBy(boffMediaEventParticipants.eventId)

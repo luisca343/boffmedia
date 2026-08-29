@@ -10,6 +10,7 @@ import {
 import {
   Tournament,
   boffMediaTournaments,
+  TEAMSHEET_VISIBILITY,
 } from '@/_db/schema/BoffMediaTournaments';
 import { CreateTournamentDto } from '../dto/create-tournament.dto';
 import { UpdateTournamentDto } from '../dto/update-tournament.dto';
@@ -45,6 +46,8 @@ export class TournamentsService {
       prizes: dto.prizes ?? null,
       checkInOpen: dto.checkInOpen ?? false,
       teamsheetRequired: dto.teamsheetRequired ?? false,
+      teamsheetVisibility:
+        dto.teamsheetVisibility ?? TEAMSHEET_VISIBILITY.PRIVATE,
       entryDeadline: dto.entryDeadline ?? null,
       banner: dto.banner ?? null,
       icon: dto.icon ?? null,
@@ -131,6 +134,7 @@ export class TournamentsService {
         'prizes',
         'checkInOpen',
         'teamsheetRequired',
+        'teamsheetVisibility',
         'entryDeadline',
         'banner',
         'icon',

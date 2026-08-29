@@ -88,6 +88,7 @@ const ICONS = {
   dice: <g><rect x="4" y="4" width="16" height="16" rx="4" /><circle cx="9" cy="9" r="1" /><circle cx="15" cy="9" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="9" cy="15" r="1" /><circle cx="15" cy="15" r="1" /></g>,
   discord: <g><path d="M8.4 6.6c-2 .3-3.6 1-4.4 1.8-1.3 2.3-1.8 5-1.5 7.6 1.4 1.1 2.9 1.9 4.6 2.2l.9-1.5M15.6 6.6c2 .3 3.6 1 4.4 1.8 1.3 2.3 1.8 5 1.5 7.6-1.4 1.1-2.9 1.9-4.6 2.2l-.9-1.5M7 16.8c3.2 1.5 6.8 1.5 10 0M8.4 6.6C10.7 6.1 13.3 6.1 15.6 6.6" /><circle cx="9" cy="12.4" r="1.25" /><circle cx="15" cy="12.4" r="1.25" /></g>,
   google: <g><path d="M21.4 12.3c0 5-3.5 8.7-9.4 8.7a9 9 0 1 1 6.2-15.5" /><path d="M21.4 12.3H12" /></g>,
+  wheel: <g><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3" /><path d="M12 3v3M12 18v3M3 12h3m12 0h3M6.4 6.4l2.1 2.1M15.5 15.5l2.1 2.1M6.4 17.6l2.1-2.1M15.5 8.5l2.1-2.1" /></g>,
   steam: <g><circle cx="12" cy="12" r="9" /><circle cx="15.6" cy="8.6" r="2.4" /><circle cx="8.1" cy="14.9" r="1.7" /><path d="m9.6 13.9 4.1-2.9" /></g>,
   twitch: <g><path d="M4 3 3 6v11h4v3l3-3h4l5-5V3z" /><path d="M11 7v5M15 7v5" /></g>,
   camera: <g><path d="M3 8.5A1.5 1.5 0 0 1 4.5 7H8l1.4-2.2h5.2L16 7h3.5A1.5 1.5 0 0 1 21 8.5v9A1.5 1.5 0 0 1 19.5 19h-15A1.5 1.5 0 0 1 3 17.5z" /><circle cx="12" cy="13" r="3.4" /></g>,
@@ -101,6 +102,9 @@ const ICONS = {
   upload: <path d="M12 16V4m0 0L7 9m5-5l5 5M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" />,
   server: <g><rect x="4" y="4" width="16" height="7" rx="1" /><rect x="4" y="13" width="16" height="7" rx="1" /><path d="M7.5 7.5h.01M7.5 16.5h.01" /></g>,
   more: <g><circle cx="12" cy="5" r="1.4" /><circle cx="12" cy="12" r="1.4" /><circle cx="12" cy="19" r="1.4" /></g>,
+  volume: <g><path d="M5 9v6a2 2 0 0 0 2 2h2l3 3v-11l-3 3H7a2 2 0 0 0-2 2" /><path d="M16 8a5 5 0 0 1 0 8M18.5 4.5a9 9 0 0 1 0 15" /></g>,
+  mute: <g><path d="M5 9v6a2 2 0 0 0 2 2h2l3 3v-11l-3 3H7a2 2 0 0 0-2 2M16 6l6 12M22 6l-6 12" /></g>,
+  skip: <g><path d="M7 4.5v15l12-7.5z" /><path d="M20 5v14" /></g>,
 } satisfies Record<string, React.ReactNode>
 
 /** Every valid icon name — use this to type icon fields so typos fail at compile time. */

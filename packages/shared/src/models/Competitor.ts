@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { RosterMember } from './RosterMember';
+import type { TeamsheetMonDto } from './TeamsheetMonDto';
 export type Competitor = {
     /**
      * Stringified participant id.
@@ -36,6 +37,14 @@ export type Competitor = {
      */
     verified: boolean;
     roster?: Array<RosterMember>;
+    /**
+     * This entrant's open teamsheet, or null when the caller may not read it. Sent to admins always, and to the audience named by the tournament's `teamsheetVisibility` — but never before the tournament is live, so no one builds a team against a roster they have already read. Populated only on the tournament detail; the participants list never carries sheets.
+     */
+    teamsheet: Array<TeamsheetMonDto> | null;
+    /**
+     * What this registration is still missing before it counts as an entry — who is about to be dropped, and why. Admin-only: null for everyone else. A player reads their own through `viewerEntryGaps`.
+     */
+    entryGaps: Array<'teamsheet' | 'check-in'> | null;
 };
 export namespace Competitor {
     export enum kind {

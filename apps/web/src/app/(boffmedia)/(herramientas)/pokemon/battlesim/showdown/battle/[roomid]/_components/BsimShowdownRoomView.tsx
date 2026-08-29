@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { ConfirmDialog } from '@boffmedia/ui';
 import { useState, useRef, useEffect, useCallback, use } from 'react';
 import { useShowdownBattle, getGlobalUsername } from '@/app/battlesim/_hooks/useShowdownBattle';
 import { BattleCanvas } from '@/app/battlesim/_components/BattleCanvas';
@@ -13,7 +14,7 @@ import { useChoiceMechanics } from '@/app/battlesim/_hooks/useChoiceMechanics';
 import { BattleStage } from '@/app/battlesim/_components/BattleStage';
 import { BattleActionDock } from '@/app/battlesim/_components/BattleActionDock';
 import { LogChatRail } from '@/app/battlesim/_components/LogChatRail';
-import { useFullscreen } from '@/app/battlesim/_hooks/useFullscreen';
+import { useFullscreen } from '@/hooks/useFullscreen';
 import type { BattleRequest } from '@/app/battlesim/types';
 import { BattleShell } from '../../../../_components/BattleShell';
 
@@ -58,7 +59,11 @@ export function BsimShowdownRoomView({ params }: { params: Promise<{ roomid: str
     }
   }, [p1Name, p2Name, session, initScene, pov]);
 
-  const handleForfeit = () => { if (confirm(t('connection.forfeitConfirm'))) forfeit(); };
+  // Forfeiting ends the match with no undo, so it asks in a real dialog
+  // rather than a native confirm the battle canvas cannot style.
+  const [confirmForfeit, setConfirmForfeit] = useState(false);
+  const handleForfeit = () => setConfirmForfeit(true);
+  const doForfeit = () => { setConfirmForfeit(false); forfeit(); };
 
   useEffect(() => {
     if (state?.battleComplete && !savedReplayId && !savingReplay) {
@@ -175,6 +180,16 @@ export function BsimShowdownRoomView({ params }: { params: Promise<{ roomid: str
           fullscreen={isFullscreen}
         />
       </BattleStage>
+
+      <ConfirmDialog
+        open={confirmForfeit}
+        tone="error"
+        title={t('connection.forfeitTitle')}
+        body={t('connection.forfeitConfirm')}
+        confirmLabel={t('connection.forfeitCta')}
+        onConfirm={doForfeit}
+        onClose={() => setConfirmForfeit(false)}
+      />
     </BattleShell>
   );
 }

@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button } from "@boffmedia/ui"
-import { AvAlert, AvPill, AvSectionHead } from "../../_components/ui/av-kit"
+import { Button, ConfirmDialog } from "@boffmedia/ui"
+import { AvAlert, AvPanel, AvPill, AvSectionHead, AvViewLink } from "../../_components/ui/av-kit"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { ApiError } from "@/services/http/core"
 import { useApiError } from "@/hooks/useApiError"
@@ -21,14 +21,6 @@ const STATUS_TONE: Record<EventStatus, "amber" | "green" | "muted"> = {
   completed: "muted",
 }
 
-function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <h3 className="text-xs text-txt-dim uppercase tracking-[0.08em] font-mono mb-1 pb-2 border-b border-solid border-line">
-      {children}
-    </h3>
-  )
-}
-
 export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: () => void }) {
   const t = useTranslations("admin.events.panel")
   const apiError = useApiError()
@@ -36,6 +28,7 @@ export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: (
   const [status, setStatus] = useState<EventStatus>(event.status as EventStatus)
   const [tab, setTab] = useState<Tab>("config")
   const [busy, setBusy] = useState<EventStatus | null>(null)
+  const [pendingMove, setPendingMove] = useState<EventStatus | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   // The lifecycle runs forward; going back is a real but deliberate action, so
@@ -44,11 +37,12 @@ export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: (
   // the accidental click.
   const RANK: Record<EventStatus, number> = { upcoming: 0, active: 1, completed: 2 }
 
-  const move = async (next: EventStatus) => {
+  const move = (next: EventStatus) =>
+    RANK[next] < RANK[status] ? setPendingMove(next) : run(next)
+
+  const run = async (next: EventStatus) => {
     const backwards = RANK[next] < RANK[status]
-    if (backwards && !window.confirm(t("reopenConfirm", { from: t(`status.${status}`), to: t(`status.${next}`) }))) {
-      return
-    }
+    setPendingMove(null)
     setBusy(next)
     setError(null)
     try {
@@ -77,6 +71,7 @@ export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: (
         actions={
           <div className="flex items-center gap-2 flex-wrap">
             <AvPill tone={STATUS_TONE[status] ?? "muted"}>{t(`status.${status}`)}</AvPill>
+            <AvViewLink href={`/eventos/${event.id}`} label={t("viewPage")} />
             <Button variant="ghost" size="sm" icon="back" onClick={onBack}>
               {t("back")}
             </Button>
@@ -99,40 +94,56 @@ export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: (
 
       {tab === "config" && (
         <div>
-          <SectionLabel>{t("lifecycle")}</SectionLabel>
-          <p className="text-[13px] text-txt-muted mb-3">{t("lifecycleDesc")}</p>
-          <div className="flex items-center gap-2 flex-wrap mb-6">
-            {(["upcoming", "active", "completed"] as EventStatus[]).map((s) => (
-              <Button
-                key={s}
-                size="sm"
-                variant={status === s ? "pri" : "ghost"}
-                loading={busy === s}
-                disabled={status === s}
-                onClick={() => move(s)}
-              >
-                {t(`status.${s}`)}
-              </Button>
-            ))}
-          </div>
-          {error && <AvAlert tone="error" className="mb-4">{error}</AvAlert>}
+          <AvPanel title={t("lifecycle")}>
+            <div>
+              <p className="text-[13px] text-txt-muted mb-3">{t("lifecycleDesc")}</p>
+              <div className="flex items-center gap-2 flex-wrap mb-4">
+                {(["upcoming", "active", "completed"] as EventStatus[]).map((s) => (
+                  <Button
+                    key={s}
+                    size="sm"
+                    variant={status === s ? "pri" : "ghost"}
+                    loading={busy === s}
+                    disabled={status === s}
+                    onClick={() => move(s)}
+                  >
+                    {t(`status.${s}`)}
+                  </Button>
+                ))}
+              </div>
+              {error && <AvAlert tone="error">{error}</AvAlert>}
+            </div>
+          </AvPanel>
 
-          <SectionLabel>{t("randomizerSection")}</SectionLabel>
-          <p className="text-[13px] text-txt-muted mb-3">{t("randomizerSectionDesc")}</p>
-          {/* Opening a randomizer config requires an active event — it no longer
-              activates one as a side effect, so say so before the attempt fails. */}
-          {status !== "active" && (
-            <AvAlert tone="warning" className="mb-4">
-              {t("notActiveNotice")}
-            </AvAlert>
-          )}
-          <EventRandomizerPanel event={event} onBack={onBack} embedded />
+          <AvPanel title={t("randomizerSection")}>
+            <div>
+              <p className="text-[13px] text-txt-muted mb-3">{t("randomizerSectionDesc")}</p>
+              {/* Opening a randomizer config requires an active event — it no longer
+                  activates one as a side effect, so say so before the attempt fails. */}
+              {status !== "active" && (
+                <AvAlert tone="warning" className="mb-4">
+                  {t("notActiveNotice")}
+                </AvAlert>
+              )}
+              <EventRandomizerPanel event={event} onBack={onBack} embedded />
+            </div>
+          </AvPanel>
         </div>
       )}
       {tab === "participants" && <ParticipantsPanel eventId={eventId} />}
       {tab === "invites" && (
         <EventInvitesPanel eventId={eventId} isPrivate={event.visibility === "private"} />
       )}
+
+      <ConfirmDialog
+        open={pendingMove != null}
+        title={t("reopenTitle")}
+        body={pendingMove ? t("reopenConfirm", { from: t(`status.${status}`), to: t(`status.${pendingMove}`) }) : null}
+        confirmLabel={t("reopenCta")}
+        busy={busy != null}
+        onConfirm={() => pendingMove && run(pendingMove)}
+        onClose={() => setPendingMove(null)}
+      />
     </div>
   )
 }

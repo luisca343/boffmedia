@@ -7,6 +7,7 @@ import { MONO_LABEL, Sample, Section } from "../showcase-shared"
 import { AV_CHART_C, DEMO_MEMBERS, DEMO_PIPELINE, aiCurve } from "../showcase-data"
 import {
   AvAlert,
+  AvAttention,
   AvKpi,
   AvKpis,
   AvLiveDot,
@@ -14,7 +15,13 @@ import {
   AvMetrics,
   AvPanel,
   AvPill,
+  AvSwitchRow,
   AvSectionHead,
+  AvProgressBar,
+  AvStickyBar,
+  AvJobPanel,
+  AvJobStatusPill,
+  formatAdminDate,
 } from "@/app/(boffmedia)/admin/_components/ui/av-kit"
 import {
   AvChartFrame,
@@ -79,6 +86,26 @@ export function AdminChapter() {
         <Sample title="Pipeline" code="<AvPipeline stages active onNav>" col>
           <div className="w-full">
             <AvPipeline stages={DEMO_PIPELINE} active="ai-pretrain" onNav={() => {}} />
+          </div>
+        </Sample>
+        <Sample title="Ventanas" code="<AvSwitchRow label on reading hint action>" col note={<>Una ventana que el operador abre y cierra. El estado se imprime junto al control que lo cambia: un botón que dice «Cerrar» es una afirmación sobre el estado, y cuando era falsa no había dónde verlo.</>}>
+          <div className="w-full max-w-[460px]">
+            <AvSwitchRow label="Inscripción" on reading="Abierta" action={<Button size="sm">Cerrar</Button>} />
+            <AvSwitchRow label="Check-in" on={false} reading="Cerrado" action={<Button size="sm">Abrir</Button>} />
+            <AvSwitchRow label="Cupo" on reading="Abierto" hint="Cerrar el cupo deja fuera a quien no haya completado la entrada." action={<Button size="sm">Cerrar cupo</Button>} />
+          </div>
+        </Sample>
+        <Sample title="Atención" code="<AvAttention items empty>" col note={<>Lo que necesita a una persona, cada cosa con el clic que empieza a arreglarla. La lista vacía también es un resultado y lo dice.</>}>
+          <div className="w-full max-w-[560px] grid gap-4">
+            <AvAttention
+              items={[
+                { id: 1, tone: "error", text: "2 partidas están en disputa.", action: { label: "Ver partidas", onClick: () => {} } },
+                { id: 2, tone: "warning", text: "3 inscritos no han completado los pasos de entrada.", action: { label: "Ver participantes", onClick: () => {} } },
+                { id: 3, tone: "info", text: "El cupo se cierra en 6 horas." },
+              ]}
+              empty="Todo en orden."
+            />
+            <AvAttention items={[]} empty="Todo en orden: nada requiere tu intervención ahora mismo." />
           </div>
         </Sample>
       </Section>
@@ -220,6 +247,58 @@ export function AdminChapter() {
         <Sample title="Toast y diálogo" code="toast() · <Modal>" note={<>El toaster imperativo y el diálogo del handoff se cubren con los primitivos del sistema <code>toast()</code> y <code>Modal</code> (ya mostrados en Primitivas · Menús y avisos).</>}>
           <Button icon="bell" onClick={() => toast({ tone: "ok", title: "Cambios guardados", msg: "La clasificación se recalculó." })}>Lanzar aviso</Button>
           <Button variant="danger" icon="trash" onClick={() => setConfirm(true)}>Confirmar borrado</Button>
+        </Sample>
+      </Section>
+
+      <Section
+        id="admjobs"
+        kicker="Admin"
+        title="Trabajos y progreso"
+        lead={<>Componentes para operaciones de larga duración: <code>AvProgressBar</code> para el progreso visual, <code>AvJobStatusPill</code> para el estado, y <code>AvJobPanel</code> como panel estándar para un trabajo con progreso, estado y acciones.</>}
+      >
+        <Sample title="Barra de progreso" code="<AvProgressBar value max tone label>" col>
+          <div className="w-full grid gap-4">
+            <div>
+              <p className="mb-2 text-xs text-txt-dim">Progreso (predeterminado)</p>
+              <AvProgressBar value={65} max={100} label="65/100" />
+            </div>
+            <div>
+              <p className="mb-2 text-xs text-txt-dim">En ejecución (accent)</p>
+              <AvProgressBar value={42} max={100} tone="accent" label="42/100" />
+            </div>
+            <div>
+              <p className="mb-2 text-xs text-txt-dim">Completado (verde)</p>
+              <AvProgressBar value={100} max={100} tone="green" label="100/100" />
+            </div>
+            <div>
+              <p className="mb-2 text-xs text-txt-dim">Error (rose)</p>
+              <AvProgressBar value={23} max={100} tone="rose" label="Error en 23/100" />
+            </div>
+          </div>
+        </Sample>
+        <Sample title="Píldoras de estado de trabajo" code="<AvJobStatusPill status>" col>
+          <div className="flex flex-wrap gap-2">
+            <AvJobStatusPill status="idle" />
+            <AvJobStatusPill status="queued" />
+            <AvJobStatusPill status="running" />
+            <AvJobStatusPill status="done" />
+            <AvJobStatusPill status="error" />
+            <AvJobStatusPill status="cancelled" />
+          </div>
+        </Sample>
+        <Sample title="Panel de trabajo" code="<AvJobPanel title status progress actions>" col>
+          <div className="w-full">
+            <AvJobPanel
+              title="Importar torneo"
+              desc="Descargando decklists y agregando estadísticas de uso."
+              status="running"
+              progress={{ value: 28, max: 100, label: "28/100 descargas" }}
+              actions={<Button variant="ghost" size="sm">Cancelar</Button>}
+              meta={
+                <AvMetric value="2m 14s" label="tiempo transcurrido" tone="accent" />
+              }
+            />
+          </div>
         </Sample>
       </Section>
 

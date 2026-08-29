@@ -1,27 +1,48 @@
+"use client"
+
 import * as React from "react"
 import { cn } from "../cn"
 
+export type AvatarSize = "sm" | "md" | "lg"
+
 export interface AvatarProps {
+  /** Initials (or any glyph). Also the fallback when `src` is unset or fails. */
   children: React.ReactNode
-  lg?: boolean
+  /** A picture. Falls back to `children` if it fails to load. */
+  src?: string | null
+  alt?: string
+  /** 24 / 36 / 64 px. `sm` fits a 32px table row or a picker line. */
+  size?: AvatarSize
   accent?: boolean
   className?: string
 }
 
-export function Avatar({ children, lg, accent, className }: AvatarProps) {
+const SIZE: Record<AvatarSize, string> = {
+  sm: "h-6 w-6 text-[10px] [--cut:5px]",
+  md: "h-9 w-9 text-[13px]",
+  lg: "h-16 w-16 text-[22px]",
+}
+
+export function Avatar({ children, src, alt = "", size = "md", accent, className }: AvatarProps) {
+  const [broken, setBroken] = React.useState(false)
+  const showImg = !!src && !broken
   return (
     <span
       className={cn(
-        "inline-grid place-items-center border border-solid font-display font-bold uppercase leading-none shrink-0",
+        "inline-grid place-items-center overflow-hidden border border-solid font-display font-bold uppercase leading-none shrink-0",
         "cut-seal cut-seal-edge [--cut:8px]",
-        lg ? "h-16 w-16 text-[22px]" : "h-9 w-9 text-[13px]",
+        SIZE[size],
         accent
           ? "bg-accent border-accent [--cut-line:var(--accent)] text-accent-ink"
           : "bg-panel-2 border-line-2 [--cut-line:var(--line-2)]",
         className,
       )}
     >
-      {children}
+      {showImg ? (
+        <img src={src!} alt={alt} onError={() => setBroken(true)} className="h-full w-full object-cover" />
+      ) : (
+        children
+      )}
     </span>
   )
 }
@@ -29,10 +50,10 @@ export function Avatar({ children, lg, accent, className }: AvatarProps) {
 export interface AvatarGroupProps {
   items: (string | { label: string; accent?: boolean })[]
   max?: number
-  lg?: boolean
+  size?: AvatarSize
 }
 
-export function AvatarGroup({ items, max = 5, lg }: AvatarGroupProps) {
+export function AvatarGroup({ items, max = 5, size = "md" }: AvatarGroupProps) {
   const shown = items.slice(0, max)
   const extra = items.length - shown.length
   return (
@@ -40,13 +61,13 @@ export function AvatarGroup({ items, max = 5, lg }: AvatarGroupProps) {
       {shown.map((it, i) => {
         const o = typeof it === "string" ? { label: it } : it
         return (
-          <Avatar key={i} lg={lg} accent={o.accent}>
+          <Avatar key={i} size={size} accent={o.accent}>
             {o.label}
           </Avatar>
         )
       })}
       {extra > 0 && (
-        <Avatar lg={lg} className="bg-panel font-mono font-semibold text-[11px] text-txt-muted">
+        <Avatar size={size} className="bg-panel font-mono font-semibold text-[11px] text-txt-muted">
           +{extra}
         </Avatar>
       )}

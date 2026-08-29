@@ -60,6 +60,7 @@ const minecraftModule: GameModule = {
     { value: "worlds", label: "tabs.worlds" },
     { value: "screenshots", label: "tabs.screenshots" },
     { value: "backups", label: "tabs.backups" },
+    { value: "settings", label: "tabs.settings" },
   ],
 }
 

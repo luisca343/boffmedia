@@ -102,7 +102,7 @@ export function LeaderTable({
                 </td>
                 <td className={td}>
                   <span className="inline-flex items-center gap-3">
-                    <Avatar accent={rank <= 3} className="!h-8 !w-8 !text-[12px]">{p.avatar}</Avatar>
+                    <Avatar accent={rank <= 3} className="h-8 w-8 text-[12px]">{p.avatar}</Avatar>
                     <b className="font-display text-[16px]/none font-bold uppercase tracking-[0.01em]">{p.nickname}</b>
                   </span>
                 </td>

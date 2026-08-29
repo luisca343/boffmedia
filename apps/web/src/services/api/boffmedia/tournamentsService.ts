@@ -39,6 +39,10 @@ export interface TnCompetitorApi {
   score: number | null
   verified: boolean
   roster?: TnRosterMember[]
+  /** Their open teamsheet, or null when the caller may not read it. */
+  teamsheet: TnMonApi[] | null
+  /** What this registration still lacks. Admin-only; null for everyone else. */
+  entryGaps: TnEntryGap[] | null
 }
 
 export interface TnMatchApi {
@@ -55,6 +59,8 @@ export interface TnMatchApi {
   bestOf: number
   scheduledAt: string | null
   proposalState: 'pending' | 'disputed' | null
+  /** Set when a player asked for a judge at this table. */
+  judgeRequestedAt: string | null
 }
 
 export interface TnMatchProposalApi {
@@ -190,6 +196,8 @@ export interface TnAdvanceRuleApi {
 
 export type TnEntryGap = "teamsheet" | "check-in"
 
+export type TnTeamsheetVisibility = "private" | "participants" | "public"
+
 /** Participant ids either side of the entry cut. */
 export interface TnEntryResolutionApi {
   entered: number[]
@@ -261,6 +269,8 @@ export interface TournamentDetailApi {
   event: TnEventContextApi | null
   /** Entry requires a teamsheet as well as check-in (VGC). */
   teamsheetRequired: boolean
+  /** Who may read other entrants' sheets once the tournament is live. */
+  teamsheetVisibility: TnTeamsheetVisibility
   entryDeadline: string | null
   /** Non-null once the field is resolved: teamsheets are frozen. */
   teamsheetLockedAt: string | null

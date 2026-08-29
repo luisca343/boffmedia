@@ -48,7 +48,7 @@ export function FeatureToggle({
           type="button"
           onClick={toggle}
           aria-pressed={!!on}
-          className="flex min-w-0 flex-1 items-start gap-3.5 text-left"
+          className="flex min-w-0 flex-1 items-start gap-3.5 text-left focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-[3px]"
         >
           {icon != null && (
             <span className="grid size-[38px] shrink-0 place-items-center border border-solid border-line-2 bg-panel text-txt">

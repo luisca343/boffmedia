@@ -7,6 +7,7 @@ import type {
   CompetitorKind,
   TournamentStatus,
   TournamentMetric,
+  TeamsheetVisibility,
 } from '../tournaments.types';
 
 /**
@@ -88,6 +89,13 @@ export class TournamentDetail {
       'Entry requires a submitted teamsheet as well as check-in (VGC).',
   })
   teamsheetRequired: boolean;
+
+  @ApiProperty({
+    enum: ['private', 'participants', 'public'],
+    description:
+      "Who may read other entrants' teamsheets once the tournament is live. `private` keeps them to the owner, their current opponent and admins. Never applies before the start.",
+  })
+  teamsheetVisibility: TeamsheetVisibility;
 
   @ApiProperty({
     nullable: true,

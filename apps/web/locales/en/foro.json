@@ -50,6 +50,7 @@
       "edit": "Edit",
       "delete": "Delete",
       "confirmDelete": "Delete this message? This action cannot be undone.",
+      "confirmDeleteTitle": "Delete post",
       "loadMore": "Load more",
       "closedNotice": "This thread is closed",
       "replyTitle": "Reply",

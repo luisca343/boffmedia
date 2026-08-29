@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Button, Empty, Icon, Input, Modal, Spinner, toast } from "@boffmedia/ui"
-import { AvPanel, AvSectionHead } from "../_components/ui/av-kit"
+import { Button, ConfirmDialog, Empty, Icon, Input, Spinner, Tabs, toast } from "@boffmedia/ui"
+import { AvPanel, AvSectionHead, formatAdminDate } from "../_components/ui/av-kit"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import type { RandomizerPreset } from "@/services/api/boffmedia/randomizer.types"
 import { RandomizerEditor } from "./randomizer/randomizer-editor"
@@ -128,7 +128,7 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
                     <Icon name="settings" size={13} />
                     <span>{t("chrome.nSettings", { count })}</span>
                     <span className="text-line-2">·</span>
-                    <span>{new Date(preset.updatedAt).toLocaleDateString()}</span>
+                    <span>{formatAdminDate(preset.updatedAt)}</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 p-3 border-t border-solid border-line bg-panel-2">
@@ -167,30 +167,14 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
         />
       )}
 
-      <Modal
+      <ConfirmDialog
         open={presetToDelete !== null}
-        onClose={() => setPresetToDelete(null)}
-        size="sm"
         title={t("chrome.deleteConfirmTitle")}
-        footer={
-          <>
-            <Button variant="ghost" onClick={() => setPresetToDelete(null)}>
-              {t("chrome.cancel")}
-            </Button>
-            <Button
-              variant="danger"
-              icon="trash"
-              onClick={() => presetToDelete && handleDelete(presetToDelete.id)}
-            >
-              {t("chrome.confirmDelete")}
-            </Button>
-          </>
-        }
-      >
-        <p className="text-[14px] leading-[1.5] text-txt-muted">
-          {t("chrome.deleteConfirmMsg", { name: presetToDelete?.name ?? "" })}
-        </p>
-      </Modal>
+        body={t("chrome.deleteConfirmMsg", { name: presetToDelete?.name ?? "" })}
+        tone="error"
+        onClose={() => setPresetToDelete(null)}
+        onConfirm={() => presetToDelete && handleDelete(presetToDelete.id)}
+      />
     </div>
   )
 }
@@ -223,34 +207,21 @@ export function RandomizerAdmin() {
       <AvSectionHead
         title={t("title")}
         desc={t("desc")}
-        actions={
-          <div className="flex gap-2">
-            <Button
-              variant={view === "presets" ? "pri" : "ghost"}
-              size="sm"
-              onClick={() => handleViewChange("presets")}
-            >
-              {t("chrome.presets")}
-            </Button>
-            <Button
-              variant={view === "editor" ? "pri" : "ghost"}
-              size="sm"
-              onClick={() => handleViewChange("editor")}
-            >
-              {t("chrome.editor")}
-            </Button>
-            <Button
-              variant={view === "roms" ? "pri" : "ghost"}
-              size="sm"
-              onClick={() => handleViewChange("roms")}
-            >
-              {t("chrome.roms")}
-            </Button>
-          </div>
-        }
       />
 
-      <div className="mt-5">
+      <div className="mb-5 shrink-0">
+        <Tabs
+          value={view}
+          onChange={handleViewChange}
+          tabs={[
+            { value: "presets", label: t("chrome.presets") },
+            { value: "editor", label: t("chrome.editor") },
+            { value: "roms", label: t("chrome.roms") },
+          ]}
+        />
+      </div>
+
+      <div>
         {view === "presets" && <PresetsView onLoad={handleLoadPreset} />}
         {view === "editor" && (
           <RandomizerEditor

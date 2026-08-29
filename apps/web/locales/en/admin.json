@@ -34,8 +34,10 @@
       "new": "New",
       "newEntity": "New {singular}",
       "actions": "Actions",
+      "viewAction": "View page",
       "editAction": "Edit",
       "deleteAction": "Delete",
+      "viewPage": "View page",
       "cancel": "Cancel",
       "loading": "Loading {plural}…",
       "errorTitle": "Failed to load {plural}",
@@ -86,6 +88,7 @@
       "panel": {
         "desc": "Configuration, members and invites for this event.",
         "back": "Back",
+        "viewPage": "View page",
         "lifecycle": "Lifecycle",
         "notActiveNotice": "This event is not active. Players can join, but a randomizer config cannot be opened until you activate it.",
         "tabParticipants": "Members",
@@ -100,6 +103,8 @@
         "randomizerSection": "Randomizer",
         "randomizerSectionDesc": "Randomizer configuration and participant assignments.",
         "reopenConfirm": "This moves the event back from {from} to {to}. Only do this if it was closed by mistake. Continue?",
+        "reopenTitle": "Reopen the event",
+        "reopenCta": "Reopen",
         "statusFailed": "Could not change the event status."
       },
       "participants": {
@@ -223,6 +228,10 @@
         "eventHint": "Select the event this team will belong to.",
         "eventLoading": "Loading events…",
         "eventPlaceholder": "Select an event",
+        "leaderLabel": "Team leader",
+        "leaderHint": "The user who will lead the team and be seated as its first member.",
+        "leaderLoading": "Loading users…",
+        "leaderPlaceholder": "Select a user",
         "iconLabel": "Icon URL (optional)",
         "iconHint": "URL of the image to use as the team icon."
       },
@@ -467,7 +476,9 @@
         "updateMetadata": "Update metadata",
         "updatingMetadata": "Updating…",
         "okN": "{n} ok",
-        "errN": "{n} err"
+        "errN": "{n} err",
+        "cbz": "CBZ",
+        "epub": "EPUB"
       },
       "config": {
         "title": "Manga settings",
@@ -798,7 +809,8 @@
       "icon": {
         "label": "Pack icon",
         "upload": "Upload image",
-        "urlFallback": "Or paste a URL"
+        "urlFallback": "Or paste a URL",
+        "uploadFailed": "Upload failed"
       },
       "gallery": {
         "label": "Gallery",
@@ -807,7 +819,8 @@
         "altPlaceholder": "Describe this image for accessibility…",
         "remove": "Remove",
         "maxAlt": "Max 256 characters",
-        "uploadFailed": "Could not upload the image."
+        "uploadFailed": "Could not upload the image.",
+        "maxImages": "Maximum 15 images"
       },
       "worlds": {
         "label": "Bundled worlds",
@@ -963,6 +976,16 @@
         "review": "Review"
       }
     },
+    "job": {
+      "status": {
+        "idle": "Idle",
+        "queued": "Queued",
+        "running": "Running",
+        "done": "Done",
+        "error": "Error",
+        "cancelled": "Cancelled"
+      }
+    },
     "releases": {
       "title": "App releases",
       "desc": "Upload signed bundles and decide when they appear in the update feed.",
@@ -1015,7 +1038,11 @@
       "unpublishFailed": "Could not unpublish",
       "hashCopied": "Hash copied",
       "hashCopyFailed": "Could not copy the hash",
-      "copyHash": "Copy hash"
+      "copyHash": "Copy hash",
+      "confirmPublish": "Publish release",
+      "confirmPublishLead": "Publish version {version} so it appears in the update feed?",
+      "confirmUnpublish": "Unpublish release",
+      "confirmUnpublishLead": "Unpublish version {version}? It will be hidden from the update feed."
     }
   },
   "tournaments": {
@@ -1023,17 +1050,115 @@
     "subtitle": "Create and manage community tournaments",
     "notFound": "Tournament not found.",
     "back": "Back",
-    "viewPage": "View page ↗",
+    "viewPage": "View page",
     "participants": "Participants",
     "checkIn": "Check-in",
     "matches": "Matches",
     "phase": "Phase",
     "round": "Round",
     "champion": "Champion",
-    "lifecycle": "Lifecycle",
     "openReg": "Open registration",
     "closeCheckIn": "Close check-in",
     "openCheckIn": "Open check-in",
+    "closeReg": "Close registration",
+    "colSeed": "#",
+    "colParticipant": "Entrant",
+    "colEntry": "Entry",
+    "colStatus": "Status",
+    "colVerified": "Verification",
+    "colActions": "Actions",
+    "guestName": "Guest without an account…",
+    "entryTeam": "Team",
+    "remove": "Remove",
+    "noEntrants": "No entrants yet",
+    "tabOverview": "Overview",
+    "tabConfig": "Settings",
+    "tabParticipants": "Entrants",
+    "tabMatches": "Matches",
+    "stage": {
+      "draft": "Draft",
+      "registration": "Registration",
+      "live": "Live",
+      "completed": "Finished"
+    },
+    "statusLabel": {
+      "draft": "Draft",
+      "registration": "Registration open",
+      "live": "Live",
+      "completed": "Finished",
+      "cancelled": "Cancelled"
+    },
+    "next": {
+      "report": "Report results ({count})",
+      "reopen": "Reopen as draft"
+    },
+    "attention": {
+      "title": "Attention",
+      "clear": "All clear: nothing needs you right now.",
+      "regInconsistent": "Registration is flagged open, but the tournament is still a draft: nobody can sign up.",
+      "missingSteps": "{count, plural, one {# entrant has} other {# entrants have}} not finished the entry steps and will be left out when the field closes.",
+      "droppedReadmittable": "{count, plural, one {# entrant was} other {# entrants were}} left out of the field. They can be re-admitted until the bracket is generated.",
+      "deadlinePassedUnresolved": "The entry deadline has passed and the field is still open.",
+      "deadlineSoon": "The field closes in {hours, plural, one {# hour} other {# hours}}.",
+      "startSoonCheckInClosed": "The tournament starts in {hours, plural, one {# hour} other {# hours}} and check-in is still closed.",
+      "disputed": "{count, plural, one {# match is} other {# matches are}} disputed.",
+      "judgeCalls": "{count, plural, one {# table has} other {# tables have}} asked for a judge.",
+      "draftBracketUnpublished": "A bracket was generated as a draft that players cannot see yet.",
+      "go": {
+        "openReg": "Open registration",
+        "publish": "Publish",
+        "matches": "View matches",
+        "participants": "View entrants",
+        "resolve": "Close the field",
+        "openCheckIn": "Open check-in"
+      }
+    },
+    "windows": {
+      "title": "Windows",
+      "fieldHint": "Closing the field drops anyone who has not finished entering. It is final."
+    },
+    "entered": "Entered",
+    "noTeam": "No team",
+    "groupIdentity": "Identity",
+    "groupRules": "Format & rules",
+    "groupEntry": "Registration & entry",
+    "groupDates": "Dates",
+    "teamsheetVisibilityHint": "Sheets are only revealed once the tournament starts.",
+    "entryDeadlineHint": "When it passes, the field closes on its own.",
+    "cancelTournament": "Cancel tournament",
+    "confirmCancel": "Cancel “{name}”? Players will stop seeing it as active. It can be reopened as a draft while nothing has been played.",
+    "confirmCancelTitle": "Cancel tournament",
+    "tournamentCancelled": "Tournament cancelled",
+    "dangerCancelHint": "Takes it off the calendar without deleting anything. Reversible while no bracket exists.",
+    "dangerDeleteHint": "Deletes the tournament, its registrations and its matches. Cannot be undone.",
+    "confirmFinalizeTitle": "Finish tournament",
+    "confirmDeleteTitle": "Delete tournament",
+    "confirmResolveTitle": "Close the field",
+    "matchesEmptyTitle": "No bracket yet",
+    "matchesEmpty": "Generate the bracket to start reporting results. First, check in Overview who would be left out.",
+    "bracketTitle": "Bracket & standings",
+    "pendingTitle": "Pending report",
+    "resultsTitle": "Results",
+    "fieldLabel": "Field",
+    "fieldOpen": "Open",
+    "fieldClosed": "Closed",
+    "generateTitle": "Generate the bracket",
+    "loadingPreview": "Working out the split…",
+    "readmit": "Re-admit",
+    "judgeRequested": "{count} table(s) asked for a judge",
+    "teamsheetVisibility": "Teamsheet visibility",
+    "teamsheetVisPrivate": "Private (opponent and staff only)",
+    "teamsheetVisParticipants": "Open to entrants",
+    "teamsheetVisPublic": "Public",
+    "readmitted": "Entrant re-admitted",
+    "gapTeamsheet": "no team",
+    "gapCheckIn": "no check-in",
+    "regNowOpen": "Registration open",
+    "regNowClosed": "Registration closed",
+    "resolveField": "Close the field",
+    "confirmResolve": "The field will be frozen: {entered} entrants are in and {dropped} are left out for not finishing the steps. The bracket is not generated yet. Continue?",
+    "fieldResolved": "Field closed · {dropped} left out",
+    "stageDanger": "Danger zone",
     "generate": "Generate",
     "generateRound": "Generate round {done}/{total}",
     "generateDraft": "Generate (draft)",
@@ -1046,8 +1171,6 @@
     "onlyCheckedIn": "Checked-in only",
     "finalize": "Finalize",
     "delete": "Delete",
-    "editTournament": "Edit tournament",
-    "hide": "Hide",
     "edit": "Edit",
     "name": "Name",
     "banner": "Banner (URL)",
@@ -1120,16 +1243,12 @@
     "clearSchedule": "Clear schedule",
     "roundScheduled": "Round scheduled",
     "scheduleCleared": "Schedule cleared",
-    "reportResults": "Report results ({count} ready)",
     "reportWaiting": "Complete the current round to unlock the next.",
     "reportNone": "No matches ready to report.",
     "reportLocked": "{count} match{count, plural, one {} other {es}} in later rounds — unlocked after closing the current round.",
     "reportDisputed": "{count} match{count, plural, one {} other {es}} in dispute — review the table chat and resolve with manual report.",
-    "correctResults": "Correct results ({count})",
     "correct": "Correct",
     "resultRequired": "Enter the result",
-    "stateCurrent": "Current state",
-    "stateBracket": "bracket and standings",
     "confirmFinalize": "Finalize «{name}»? It cannot be reopened.",
     "confirmDelete": "Delete «{name}»? This action cannot be undone.",
     "statusUpdated": "Status: {status}",
@@ -1167,7 +1286,16 @@
     "teamsheetOptional": "Optional",
     "teamsheetMandatory": "Required to enter (VGC)",
     "entryDeadline": "Entry deadline",
-    "confirmEntryCut": "{entered} players have entered and {dropped} will be left out for not completing check-in or their teamsheet. Re-admitting someone is only possible until the bracket is generated. Continue?"
+    "confirmEntryCut": "{entered} players have entered and {dropped} will be left out for not completing check-in or their teamsheet. Re-admitting someone is only possible until the bracket is generated. Continue?",
+    "singular": "tournament",
+    "plural": "tournaments",
+    "searchTournaments": "Search tournaments…",
+    "colName": "Name",
+    "colFormat": "Format",
+    "colEntrants": "Entrants",
+    "colDate": "Start date",
+    "manage": "Manage",
+    "createTournamentDesc": "Fill in the form to add a new tournament."
   },
   "data": {
     "editLabel": "Edit",

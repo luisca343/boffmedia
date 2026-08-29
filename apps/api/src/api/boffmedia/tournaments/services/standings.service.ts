@@ -9,6 +9,7 @@ import {
   TournamentParticipant,
   TournamentPhase,
   TournamentPhaseEntrant,
+  TEAMSHEET_VISIBILITY,
 } from '@/_db/schema/BoffMediaTournaments';
 import {
   computeStandings,
@@ -89,9 +90,34 @@ export class StandingsService {
     };
   }
 
+  /**
+   * May this caller read teamsheets that are not their own?
+   *
+   * An admin always can — they run the event. Everyone else is bound by two
+   * independent gates, and BOTH must open: the tournament has to have started
+   * (a sheet read during registration is a sheet you can build against, and
+   * sheets stay editable until the start), and `teamsheetVisibility` has to
+   * name the caller's audience. The owner's own sheet and the current
+   * opponent's are not routed through here — they have their own paths.
+   */
+  private canReadOthersTeamsheets(
+    t: TournamentListRow,
+    isAdmin: boolean,
+    viewerIsEntrant: boolean,
+  ): boolean {
+    if (isAdmin) return true;
+    if (t.status !== 'live' && t.status !== 'completed') return false;
+    if (t.teamsheetVisibility === TEAMSHEET_VISIBILITY.PUBLIC) return true;
+    return (
+      t.teamsheetVisibility === TEAMSHEET_VISIBILITY.PARTICIPANTS &&
+      viewerIsEntrant
+    );
+  }
+
   async buildDetail(
     t: TournamentListRow,
     viewerUserId?: number,
+    isAdmin = false,
   ): Promise<TournamentDetail> {
     const participants = await this.repo.listParticipants(t.id);
     const teamIds = participants
@@ -105,9 +131,26 @@ export class StandingsService {
       else rosterByParticipant.set(r.participantId, [r]);
     }
 
+    const viewerIsEntrant =
+      viewerUserId != null &&
+      participants.some((p) => p.userId === viewerUserId);
+    const revealTeamsheets = this.canReadOthersTeamsheets(
+      t,
+      isAdmin,
+      viewerIsEntrant,
+    );
+
     const cmap = new Map<number, Competitor>();
     for (const p of participants) {
-      cmap.set(p.id, toCompetitor(p, rosterByParticipant.get(p.id)));
+      cmap.set(
+        p.id,
+        toCompetitor(p, rosterByParticipant.get(p.id), {
+          teamsheet: revealTeamsheets ? parseTeamsheet(p) : null,
+          // Who is about to be dropped and why — an operational view, so it
+          // stays with the admin even on a fully public teamsheet tournament.
+          entryGaps: isAdmin ? this.entry.gapsFor(t, p) : null,
+        }),
+      );
     }
 
     const matches = await this.repo.listMatches(t.id);
@@ -161,6 +204,7 @@ export class StandingsService {
       eventId: t.eventId,
       event: await this.eventContext(t.eventId, viewerUserId),
       teamsheetRequired: t.teamsheetRequired,
+      teamsheetVisibility: t.teamsheetVisibility,
       entryDeadline: t.entryDeadline ? t.entryDeadline.toISOString() : null,
       teamsheetLockedAt: t.teamsheetLockedAt
         ? t.teamsheetLockedAt.toISOString()
@@ -653,6 +697,9 @@ export class StandingsService {
       ),
       scheduledAt: m.scheduledAt ? m.scheduledAt.toISOString() : null,
       proposalState: m.proposalState,
+      judgeRequestedAt: m.judgeRequestedAt
+        ? m.judgeRequestedAt.toISOString()
+        : null,
     };
   }
 

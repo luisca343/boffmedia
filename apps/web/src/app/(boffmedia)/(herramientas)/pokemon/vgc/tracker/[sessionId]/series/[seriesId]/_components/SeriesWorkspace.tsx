@@ -19,7 +19,7 @@ import type { Series, SeriesGame, MatchNote, MatchResult, MatchSlot, OutcomeTag 
 import { TeamPanel } from '../../../[matchId]/_components/TeamPanel';
 import { SpeedTierWidget } from '../../../[matchId]/_components/SpeedTierWidget';
 import { SeriesNotesPanel } from './SeriesNotesPanel';
-import { TrSub, TR_OUTCOME_ORDER, TR_OUTCOME_TONE } from '../../../../_components/ui/tr-ui';
+import { TrSub, TR_OUTCOME_ORDER, TR_OUTCOME_TONE, HDR_INPUT_UNDERLINE } from '../../../../_components/ui/tr-ui';
 
 interface Props {
   series: Series;
@@ -27,8 +27,6 @@ interface Props {
   regulationId: string;
   onSave: (series: Series) => Promise<void>;
 }
-
-const HDR_INPUT = 'border-0 border-b border-solid border-line-2 bg-transparent font-body text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent';
 
 export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId, onSave }: Props) {
   const t = useTranslations('vgc.tracker');
@@ -180,12 +178,12 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1">
             <span className="font-mono text-[11px] text-txt-muted">{t('workspace.roundPrefix')}</span>
-            <input value={roundInput} onChange={(e) => setRoundInput(e.target.value)} onBlur={() => { const n = parseInt(roundInput, 10); update({ roundNumber: isNaN(n) ? undefined : n }); }} placeholder="—" className={cn(HDR_INPUT, 'w-8 text-center font-mono text-[13px]')} />
+            <input value={roundInput} onChange={(e) => setRoundInput(e.target.value)} onBlur={() => { const n = parseInt(roundInput, 10); update({ roundNumber: isNaN(n) ? undefined : n }); }} placeholder="—" className={cn(HDR_INPUT_UNDERLINE, 'w-8 text-center font-mono text-[13px]')} />
           </span>
           <span className="text-txt-dim">·</span>
-          <input value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT, 'min-w-0 max-w-[160px] flex-1 py-[2px] text-[13px]')} />
+          <input value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT_UNDERLINE, 'min-w-0 max-w-[160px] flex-1 py-[2px] text-[13px]')} />
           <span className="text-txt-dim">·</span>
-          <input value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT, 'min-w-0 max-w-[120px] flex-1 py-[2px] text-[12px] text-txt-muted')} />
+          <input value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT_UNDERLINE, 'min-w-0 max-w-[120px] flex-1 py-[2px] text-[12px] text-txt-muted')} />
         </div>
         <DkSpacer />
         <span className="inline-flex items-center gap-[6px]">

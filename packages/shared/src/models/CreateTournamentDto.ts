@@ -51,6 +51,10 @@ export type CreateTournamentDto = {
      */
     teamsheetRequired?: boolean;
     /**
+     * Who may read other entrants' teamsheets once the tournament is live. Independent of `teamsheetRequired` — a tournament can demand sheets and keep them private, or publish sheets it never demanded. Never reveals anything before the start.
+     */
+    teamsheetVisibility?: CreateTournamentDto.teamsheetVisibility;
+    /**
      * When the field is frozen: everyone who has not entered by then is dropped and teamsheets lock. Omit to resolve on generate only.
      */
     entryDeadline?: string;
@@ -81,6 +85,14 @@ export namespace CreateTournamentDto {
     export enum metric {
         SCORE = 'score',
         TIME = 'time',
+    }
+    /**
+     * Who may read other entrants' teamsheets once the tournament is live. Independent of `teamsheetRequired` — a tournament can demand sheets and keep them private, or publish sheets it never demanded. Never reveals anything before the start.
+     */
+    export enum teamsheetVisibility {
+        PRIVATE = 'private',
+        PARTICIPANTS = 'participants',
+        PUBLIC = 'public',
     }
 }
 

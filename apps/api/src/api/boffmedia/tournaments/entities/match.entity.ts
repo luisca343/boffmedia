@@ -60,4 +60,13 @@ export class MatchView {
     description: 'Active self-report proposal state, if any.',
   })
   proposalState: ProposalState | null;
+
+  @ApiProperty({
+    nullable: true,
+    type: String,
+    format: 'date-time',
+    description:
+      'When a player asked for a judge at this table, if they have. Carried on the flat list so the admin panel can surface open requests without opening every match.',
+  })
+  judgeRequestedAt: string | null;
 }

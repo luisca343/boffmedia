@@ -41,6 +41,24 @@ export const TOURNAMENT_METRIC = {
   TIME: 'time',
 } as const;
 
+/**
+ * Who may read an entrant's open teamsheet, beyond the two people who always
+ * can: its owner, and the opponent of the match they are currently in.
+ *
+ * Orthogonal to `teamsheetRequired` — a tournament can demand sheets and keep
+ * them private, or publish sheets it never demanded. Reveal is gated on the
+ * start as well: see StandingsService, which withholds every sheet until the
+ * tournament is live so nobody builds a team against a roster they have read.
+ */
+export const TEAMSHEET_VISIBILITY = {
+  /** Owner + current opponent + admins. The default, and today's behaviour. */
+  PRIVATE: 'private',
+  /** Every entrant of this tournament sees every entrant's sheet. */
+  PARTICIPANTS: 'participants',
+  /** Anyone, signed in or not — the sheets become part of the public page. */
+  PUBLIC: 'public',
+} as const;
+
 export const TOURNAMENT_PARTICIPANT_STATUS = {
   ACTIVE: 'active',
   ELIMINATED: 'eliminated',
@@ -191,6 +209,17 @@ export const boffMediaTournaments = mysqlTable(
      * text and there is no regulation column to read.
      */
     teamsheetRequired: boolean('teamsheet_required').notNull().default(false),
+    /**
+     * How widely the entrants' sheets are published once the tournament
+     * starts. Independent of `teamsheetRequired`.
+     */
+    teamsheetVisibility: mysqlEnum('teamsheet_visibility', [
+      TEAMSHEET_VISIBILITY.PRIVATE,
+      TEAMSHEET_VISIBILITY.PARTICIPANTS,
+      TEAMSHEET_VISIBILITY.PUBLIC,
+    ])
+      .notNull()
+      .default(TEAMSHEET_VISIBILITY.PRIVATE),
     /**
      * When the field is resolved: everyone who has not entered by then is
      * dropped. Null → resolution happens on generate only.

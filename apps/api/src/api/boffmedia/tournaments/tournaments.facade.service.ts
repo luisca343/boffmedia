@@ -67,7 +67,7 @@ export class TournamentsFacadeService {
     isAdmin = false,
   ): Promise<TournamentDetail> {
     const row = await this.tournaments.getMetaBySlug(slug);
-    const detail = await this.standings.buildDetail(row, userId);
+    const detail = await this.standings.buildDetail(row, userId, isAdmin);
     // A tournament composed into a private event inherits its privacy — that
     // inheritance is the whole reason to attach one, since tournaments have no
     // visibility of their own. Not-found rather than forbidden, matching how

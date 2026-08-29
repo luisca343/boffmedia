@@ -12,15 +12,19 @@ import {
   Spinner,
   Icon,
   toast,
+  Table,
+  type SortState,
 } from "@boffmedia/ui"
-import { AvPanel } from "./av-kit"
+import { AvPanel, AvViewLink } from "./av-kit"
 
 export interface AvCrudColumn<T> {
   key: string
   label: string
-  width?: number | string
+  width?: string
   render?: (item: T) => React.ReactNode
   className?: string
+  sortable?: boolean
+  sortValue?: (item: T) => number | string
 }
 
 export interface AvCrudFormProps<T> {
@@ -36,13 +40,15 @@ interface AvCrudProps<T extends { id: number | string }> {
   FormComponent: React.ComponentType<AvCrudFormProps<T>>
   onCreate: (data: unknown) => Promise<void>
   onUpdate: (id: number | string, data: unknown) => Promise<void>
-  onDelete: (id: number | string) => Promise<void>
+  onDelete?: (id: number | string) => Promise<void>
   searchFields: (keyof T)[]
   entityName: { singular: string; plural: string }
   columns: AvCrudColumn<T>[]
   searchPlaceholder?: string
   /** Extra per-row controls rendered before the built-in edit/delete icons. */
   rowActions?: (item: T) => React.ReactNode
+  /** Optional link to the public page of this entity. */
+  viewHref?: (item: T) => string | null | undefined
 }
 
 export function AdminCrud<T extends { id: number | string }>({
@@ -56,6 +62,7 @@ export function AdminCrud<T extends { id: number | string }>({
   columns,
   searchPlaceholder,
   rowActions,
+  viewHref,
 }: AvCrudProps<T>) {
   const t = useTranslations("admin.crud")
   const singular = entityName.singular
@@ -67,17 +74,32 @@ export function AdminCrud<T extends { id: number | string }>({
   const [editOpen, setEditOpen] = React.useState(false)
   const [deleteOpen, setDeleteOpen] = React.useState(false)
   const [submitting, setSubmitting] = React.useState(false)
+  const [sort, setSort] = React.useState<SortState | null>(null)
 
-  const filtered = items
-    ? searchTerm
-      ? items.filter((item) =>
-          searchFields.some((field) => {
-            const val = item[field]
-            return typeof val === "string" && val.toLowerCase().includes(searchTerm.toLowerCase())
-          }),
-        )
-      : items
-    : []
+  const filtered = React.useMemo(() => {
+    let result = items
+      ? searchTerm
+        ? items.filter((item) =>
+            searchFields.some((field) => {
+              const val = item[field]
+              return typeof val === "string" && val.toLowerCase().includes(searchTerm.toLowerCase())
+            }),
+          )
+        : items
+      : []
+
+    if (!sort) return result
+
+    const col = columns.find((c) => c.key === sort.key)
+    return [...result].sort((a, b) => {
+      const aVal = col?.sortValue ? col.sortValue(a) : (a[sort.key as keyof T] as unknown as string | number)
+      const bVal = col?.sortValue ? col.sortValue(b) : (b[sort.key as keyof T] as unknown as string | number)
+      const aNum = parseFloat(String(aVal).replace(/[^\d.-]/g, ""))
+      const bNum = parseFloat(String(bVal).replace(/[^\d.-]/g, ""))
+      if (!isNaN(aNum) && !isNaN(bNum)) return (aNum - bNum) * sort.dir
+      return String(aVal).localeCompare(String(bVal)) * sort.dir
+    })
+  }, [items, sort, searchTerm, searchFields, columns])
 
   const handleCreate = async (data: unknown) => {
     setSubmitting(true)
@@ -110,7 +132,7 @@ export function AdminCrud<T extends { id: number | string }>({
   }
 
   const handleDelete = async () => {
-    if (!selected) return
+    if (!selected || !onDelete) return
     setSubmitting(true)
     try {
       await onDelete(selected.id)
@@ -189,68 +211,61 @@ export function AdminCrud<T extends { id: number | string }>({
           )}
         </Empty>
       ) : (
-        <div className="border border-solid border-line bg-panel overflow-x-auto">
-          <table className="w-full border-collapse text-sm min-w-[560px]">
-            <thead>
-              <tr className="bg-panel-2">
-                {columns.map((col) => (
-                  <th
-                    key={col.key}
-                    style={{ width: col.width }}
-                    className={cn(
-                      "text-left font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-txt-muted py-[11px] px-[14px] border-b border-solid border-line",
-                      col.className,
-                    )}
-                  >
-                    {col.label}
-                  </th>
-                ))}
-                <th className={cn(rowActions ? "text-right" : "w-[92px] text-right", " font-mono text-[10px] font-bold uppercase tracking-[0.1em] text-txt-muted py-[11px] px-[14px] border-b border-solid border-line")}>
-                  {t("actions")}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((item) => (
-                <tr
-                  key={String(item.id)}
-                  className="border-b border-solid border-line last:border-b-0 hover:bg-panel-2 transition-colors"
+        <Table
+          columns={[
+            ...columns.map((col) => ({
+              key: col.key,
+              label: col.label,
+              width: col.width,
+              sortable: col.sortable,
+              className: col.className,
+            })),
+            {
+              key: "actions",
+              label: t("actions"),
+              srOnly: !rowActions,
+              width: rowActions ? undefined : "92px",
+            },
+          ]}
+          rows={filtered.map((item) => ({
+            ...Object.fromEntries(
+              columns.map((col) => [col.key, col.render ? col.render(item) : String(item[col.key as keyof T] ?? "")]),
+            ),
+            actions: (
+              <div className="flex justify-end items-center gap-1.5">
+                {rowActions?.(item)}
+                {viewHref && viewHref(item) && (
+                  <AvViewLink href={viewHref(item)!} compact aria-label={t("viewAction")} />
+                )}
+                <button
+                  aria-label={t("editAction")}
+                  onClick={() => {
+                    setSelected(item)
+                    setEditOpen(true)
+                  }}
+                  className="grid place-items-center w-8 h-8 border border-solid border-line-2 text-txt-muted hover:text-accent hover:border-accent-line transition-colors"
                 >
-                  {columns.map((col) => (
-                    <td key={col.key} className={cn("py-[10px] px-[14px] align-middle", col.className)}>
-                      {col.render ? col.render(item) : String(item[col.key as keyof T] ?? "")}
-                    </td>
-                  ))}
-                  <td className="py-[10px] px-[14px] text-right">
-                    <div className="flex justify-end items-center gap-1.5">
-                      {rowActions?.(item)}
-                      <button
-                        aria-label={t("editAction")}
-                        onClick={() => {
-                          setSelected(item)
-                          setEditOpen(true)
-                        }}
-                        className="grid place-items-center w-8 h-8 border border-solid border-line-2 text-txt-muted hover:text-accent hover:border-accent-line transition-colors"
-                      >
-                        <Icon name="edit" size={15} />
-                      </button>
-                      <button
-                        aria-label={t("deleteAction")}
-                        onClick={() => {
-                          setSelected(item)
-                          setDeleteOpen(true)
-                        }}
-                        className="grid place-items-center w-8 h-8 border border-solid border-line-2 text-txt-muted hover:text-bad hover:border-bad transition-colors"
-                      >
-                        <Icon name="trash" size={15} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  <Icon name="edit" size={15} />
+                </button>
+                {onDelete && (
+                  <button
+                    aria-label={t("deleteAction")}
+                    onClick={() => {
+                      setSelected(item)
+                      setDeleteOpen(true)
+                    }}
+                    className="grid place-items-center w-8 h-8 border border-solid border-line-2 text-txt-muted hover:text-bad hover:border-bad transition-colors"
+                  >
+                    <Icon name="trash" size={15} />
+                  </button>
+                )}
+              </div>
+            ),
+          }))}
+          rowKey={(r) => String((r as T & { id: number | string }).id)}
+          sort={sort}
+          onSortChange={setSort}
+        />
       )}
 
       {/* Create */}
@@ -289,39 +304,41 @@ export function AdminCrud<T extends { id: number | string }>({
       </Modal>
 
       {/* Delete */}
-      <Modal
-        open={deleteOpen}
-        onClose={() => {
-          setDeleteOpen(false)
-          setSelected(null)
-        }}
-        title={t("deleteTitle")}
-        size="sm"
-        footer={
-          <>
-            <Button
-              variant="ghost"
-              onClick={() => {
-                setDeleteOpen(false)
-                setSelected(null)
-              }}
-            >
-              {t("cancel")}
-            </Button>
-            <Button variant="danger" loading={submitting} disabled={submitting} onClick={handleDelete}>
-              {t("deleteAction")}
-            </Button>
-          </>
-        }
-      >
-        <p className="text-[13px] text-txt-muted">{t("deleteConfirm", { singular })}</p>
-        {selected && (
-          <div className="mt-4 p-3 border border-solid border-line bg-base-2">
-            <p className="font-medium">{String(selected[searchFields[0] as keyof T] ?? "")}</p>
-            <p className="font-mono text-[11px] text-txt-dim mt-1">ID: {selected.id}</p>
-          </div>
-        )}
-      </Modal>
+      {onDelete && (
+        <Modal
+          open={deleteOpen}
+          onClose={() => {
+            setDeleteOpen(false)
+            setSelected(null)
+          }}
+          title={t("deleteTitle")}
+          size="sm"
+          footer={
+            <>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setDeleteOpen(false)
+                  setSelected(null)
+                }}
+              >
+                {t("cancel")}
+              </Button>
+              <Button variant="danger" loading={submitting} disabled={submitting} onClick={handleDelete}>
+                {t("deleteAction")}
+              </Button>
+            </>
+          }
+        >
+          <p className="text-[13px] text-txt-muted">{t("deleteConfirm", { singular })}</p>
+          {selected && (
+            <div className="mt-4 p-3 border border-solid border-line bg-base-2">
+              <p className="font-medium">{String(selected[searchFields[0] as keyof T] ?? "")}</p>
+              <p className="font-mono text-[11px] text-txt-dim mt-1">ID: {selected.id}</p>
+            </div>
+          )}
+        </Modal>
+      )}
     </div>
   )
 }

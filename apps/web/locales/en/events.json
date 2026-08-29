@@ -40,6 +40,7 @@
     },
     "detail": {
       "back": "Events",
+      "leaveTitle": "Leave the event",
       "about": "About the event",
       "achievements": "Achievements",
       "leaderboard": "Ranking",

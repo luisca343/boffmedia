@@ -13,16 +13,19 @@ export type PackCardLayout = "card" | "compact" | "row"
  *  runtime, so it renders identically in the launcher, in web admin and in the
  *  styleguide.
  *
- *  One component, three FIXED-HEIGHT shells behind `layout`
- *  (PACK_CARD_FIXED_HEIGHT.md — every card in a grid is pixel-identical in height):
- *  - `card`    — 150px cover art on top, 420px tall. Store / discovery grids.
- *  - `compact` — no art; the header gains a seal with the `icon` glyph. 272px tall.
- *  - `row`     — horizontal, 150px art rail, 150px tall. Dense library lists.
+ *  One component, three shells behind `layout`:
+ *  - `card`    — 2:1 cover art on top, vertical body. Store / discovery grids.
+ *  - `compact` — no art; the header gains a seal with the `icon` glyph. Dense grids.
+ *  - `row`     — horizontal: square art rail, one-line body, controls on the right.
+ *                Library lists.
  *
- *  Equal-height rule: the shell has an explicit height, every internal region is
- *  flex:none with a reserved size (title & description clamp to 2 lines but also
- *  min-height 2 lines; the signal slot is always ≥40px; the meta line never
- *  wraps), and only the footer's mt-auto absorbs the slack. */
+ *  Heights are CONTENT-DRIVEN. Nothing is reserved for an absent region: a pack
+ *  with no summary and no server does not carry an empty two-line box and an
+ *  empty 40px slot between its title and its footer — that reservation is what
+ *  made a bare card read as hollow. Equal heights in a grid come from the grid
+ *  itself: the shell is `h-full`, so grid-row stretch makes every card in a row
+ *  the same height, and the footer group (`mt-auto`) pins to the bottom edge so
+ *  buttons stay flush across the row whatever the bodies hold. */
 export interface PackCardProps {
   /** Full-bleed cover art — e.g. a `<CatalogIcon/>` or `<img>`. Ignored by
    *  `layout="compact"`. */
@@ -38,7 +41,7 @@ export interface PackCardProps {
   type?: PackCardType
   layout?: PackCardLayout
   /** The online/offline `ServerStatus` strip. Typically only for server packs.
-   *  Renders inside the fixed-height signal slot; a live `progress` outranks it. */
+   *  Renders in the signal slot; a live `progress` outranks it. */
   serverStatus?: React.ReactNode
   summary?: React.ReactNode
   /** Install progress region (bar + phase text), composed by the host. Highest
@@ -47,20 +50,20 @@ export interface PackCardProps {
   /** Broken-state message, composed by the host. Shown as a one-line note in the
    *  signal slot when neither `progress` nor `serverStatus` claim it. */
   error?: React.ReactNode
-  /** Entries of the single mono meta line — access · version · files · size.
-   *  ONE line: truncates, never wraps. */
+  /** Entries of the mono meta line — access · version · files · size. Wraps in
+   *  card/compact, stays on one line in row. */
   badges?: React.ReactNode
-  /** Last-played / playtime. Pinned to the right end of the meta line, never
-   *  wrapped below it. */
+  /** Last-played / playtime. Pinned to the right end of the meta line. */
   footerMeta?: React.ReactNode
-  /** Corner note over the cover art — e.g. the slug. Card/row only. */
+  /** Corner note over the cover art — e.g. the slug. Card only. */
   artNote?: React.ReactNode
   /** Top-left overlay on the art — small pills / ribbons. Card/row only. */
   ribbon?: React.ReactNode
   /** Dims the art behind a lock (no-access state). Card/row only. */
   locked?: boolean
-  /** The primary state-driven button (Install / Play / Repair …). The first
-   *  action stretches full width; extra icon actions keep their natural size. */
+  /** The primary state-driven button (Install / Play / Repair …). In card and
+   *  compact the first action stretches full width; in row every action keeps
+   *  its natural size. */
   actions?: React.ReactNode
   /** The kebab menu. Clicks inside it never navigate the card. */
   menu?: React.ReactNode
@@ -76,15 +79,10 @@ const STRIPE: React.CSSProperties = {
   backgroundColor: "var(--bg-2)",
 }
 
-// Shell heights per layout — the floor of the equal-height rule. Every internal
-// region is flex:none with a reserved size, so the natural content height is
-// already uniform across a grid; `min-h` pins that floor without ever clipping
-// the footer when the reserved regions (+ the button's shadow) sum a hair over.
-// Grid rows then stretch every card to the tallest, keeping bottoms flush.
 const SHELL: Record<PackCardLayout, string> = {
-  card: "min-h-[420px] w-[300px] flex-col",
-  compact: "min-h-[272px] w-[300px] flex-col",
-  row: "min-h-[150px] w-full flex-row items-stretch",
+  card: "h-full w-full flex-col",
+  compact: "h-full w-full flex-col",
+  row: "min-h-[104px] w-full flex-row items-stretch",
 }
 
 export function PackCard({
@@ -116,7 +114,11 @@ export function PackCard({
     <div
       className={cn(
         "relative grid shrink-0 place-items-center overflow-hidden border-solid border-line",
-        row ? "w-[150px] border-r" : "h-[150px] border-b",
+        // The art itself (an <img> from the host) eases in on hover — a small
+        // motion that makes a grid of static covers feel touchable.
+        "[&_img]:transition-transform [&_img]:duration-300 [&_img]:ease-out",
+        onOpen && "group-hover:[&_img]:scale-[1.04]",
+        row ? "w-[104px] self-stretch border-r" : "aspect-[2/1] w-full border-b",
       )}
       style={art == null ? STRIPE : undefined}
     >
@@ -128,22 +130,21 @@ export function PackCard({
         </span>
       )}
       {ribbon != null && <span className="absolute left-0 top-0 flex gap-1.5 p-2">{ribbon}</span>}
-      {artNote != null && (
+      {artNote != null && !row && (
         <span className="absolute bottom-2 left-2.5 font-mono text-[9px] uppercase tracking-[0.1em] text-txt-dim">
           {artNote}
         </span>
       )}
       {locked && (
         <span className="absolute inset-0 grid place-items-center bg-[color-mix(in_srgb,var(--bg)_68%,transparent)] text-txt-muted backdrop-blur-[1px]">
-          <Icon name="lock" size={24} />
+          <Icon name="lock" size={row ? 18 : 24} />
         </span>
       )}
     </div>
   )
 
   // The polymorphic signal slot: exactly one occupant — a live install progress,
-  // else the server strip, else a one-line broken note, else reserved emptiness.
-  // The wrapper keeps its 40px floor in every case so cards never disagree.
+  // else the server strip, else a one-line broken note, else nothing at all.
   const signal =
     progress != null ? (
       <div>{progress}</div>
@@ -155,17 +156,106 @@ export function PackCard({
       </div>
     ) : null
 
-  return (
-    <div
-      role={onOpen ? "button" : undefined}
-      onClick={onOpen}
-      className={cn(
-        "flex overflow-hidden border border-solid border-line bg-panel transition-[border-color] duration-[140ms]",
-        SHELL[layout],
-        onOpen && "cursor-pointer hover:border-line-2",
-        className,
+  const titleNode = (
+    <div className="min-w-0 flex-1">
+      <div
+        className={cn(
+          "font-display font-extrabold italic uppercase leading-[1.02] tracking-[0.01em] text-txt",
+          row ? "truncate text-[17px]" : compact ? "line-clamp-2 text-[17px]" : "line-clamp-2 text-[19px]",
+        )}
+      >
+        {title}
+      </div>
+      {slug != null && (
+        <div className="mt-[3px] truncate font-mono text-[10px] tracking-[0.06em] text-txt-dim">{slug}</div>
       )}
-    >
+    </div>
+  )
+
+  const meta =
+    badges != null || footerMeta != null ? (
+      <div
+        className={cn(
+          "flex items-center gap-x-2.5 gap-y-1.5 font-mono text-[11px] text-txt-muted",
+          row ? "overflow-hidden whitespace-nowrap" : "flex-wrap border-t border-solid border-line pt-3",
+        )}
+      >
+        <span className={cn("flex items-center gap-2.5", row ? "min-w-0 overflow-hidden" : "flex-wrap gap-y-1.5")}>
+          {badges}
+        </span>
+        {footerMeta != null && (
+          // Row: pinned to the right end of the single line. Card/compact: its
+          // own right-aligned line, truncated — "played · playtime · size" is
+          // longer than a 280px card, and clipping it mid-word is worse than a
+          // second line.
+          <span
+            className={cn(
+              "ml-auto text-txt-dim",
+              row ? "shrink-0 whitespace-nowrap" : "min-w-0 basis-full truncate text-right",
+            )}
+          >
+            {footerMeta}
+          </span>
+        )}
+      </div>
+    ) : null
+
+  // Stops the button and the kebab from bubbling to onOpen — otherwise every
+  // menu open also navigates away.
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation()
+
+  const shell = cn(
+    "group flex overflow-hidden border border-solid border-line bg-panel transition-[border-color,transform,box-shadow] duration-[140ms]",
+    SHELL[layout],
+    onOpen &&
+      "cursor-pointer hover:-translate-y-[2px] hover:border-line-2 hover:shadow-[0_12px_28px_rgba(0,0,0,0.28)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-accent",
+    className,
+  )
+
+  const interactive = onOpen
+    ? {
+        role: "button" as const,
+        tabIndex: 0,
+        onClick: onOpen,
+        onKeyDown: (e: React.KeyboardEvent) => {
+          if (e.target !== e.currentTarget) return
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault()
+            onOpen()
+          }
+        },
+      }
+    : {}
+
+  if (row) {
+    return (
+      <div {...interactive} className={shell}>
+        {cover}
+
+        <div className="flex min-w-0 flex-1 items-center gap-4 px-4 py-3">
+          <div className="flex min-w-0 flex-1 flex-col gap-1.5">
+            {titleNode}
+            {summary != null && (
+              <div className="truncate text-[12.5px] leading-[1.4] text-txt-muted">{summary}</div>
+            )}
+            {signal}
+            {meta}
+          </div>
+
+          {(stateBadge != null || actions != null || menu != null) && (
+            <div className="flex shrink-0 items-center gap-2.5" onClick={stop} onKeyDown={stop}>
+              {stateBadge}
+              {actions}
+              {menu}
+            </div>
+          )}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div {...interactive} className={shell}>
       {cover}
 
       <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[10px] p-3.5">
@@ -182,51 +272,28 @@ export function PackCard({
               {locked ? <Icon name="lock" size={16} /> : (icon ?? <Icon name="cube" size={18} />)}
             </span>
           )}
-          <div className="min-w-0 flex-1">
-            <div
-              className={cn(
-                "font-display font-extrabold italic uppercase leading-[1.02] tracking-[0.01em] text-txt",
-                compact ? "text-[17px]" : "text-[19px]",
-                // A 1-line title occupies the same box as a 2-line one — the
-                // min-height is 2 line-boxes (2 × 1.02em), not the content.
-                row ? "line-clamp-1" : "line-clamp-2 min-h-[2.04em]",
-              )}
-            >
-              {title}
-            </div>
-            {slug != null && (
-              <div className="mt-[3px] truncate font-mono text-[10px] tracking-[0.06em] text-txt-dim">{slug}</div>
-            )}
-          </div>
+          {titleNode}
           {stateBadge != null && <span className="shrink-0">{stateBadge}</span>}
         </div>
 
-        {!row && (
-          // Reserved even when empty: a short or missing description still holds
-          // its 2-line box (2 × 1.5em) so the regions below never shift.
-          <div className="line-clamp-2 min-h-[3em] shrink-0 text-[13.5px] leading-[1.5] text-txt-muted">
-            {summary}
-          </div>
+        {summary != null && (
+          <div className="line-clamp-2 text-[13.5px] leading-[1.5] text-txt-muted">{summary}</div>
         )}
 
-        {!row && <div className="flex min-h-[40px] shrink-0 flex-col justify-center">{signal}</div>}
+        {signal}
 
-        {(badges != null || footerMeta != null) && (
-          <div className="flex shrink-0 items-center gap-3 overflow-hidden whitespace-nowrap border-t border-solid border-line pt-3 font-mono text-[11px] text-txt-muted">
-            <span className="flex min-w-0 items-center gap-2.5 overflow-hidden">{badges}</span>
-            {footerMeta != null && <span className="ml-auto shrink-0 text-txt-dim">{footerMeta}</span>}
-          </div>
-        )}
-
-        {(actions != null || menu != null) && (
-          <div
-            className="mt-auto flex shrink-0 items-stretch gap-2.5"
-            // A click on the button OR the kebab must not bubble to onOpen —
-            // otherwise every menu open also navigates away.
-            onClick={(e) => e.stopPropagation()}
-          >
-            <span className="flex min-w-0 flex-1 items-center gap-2.5 [&>*:first-child]:flex-1">{actions}</span>
-            {menu != null && <span className="flex shrink-0 items-center">{menu}</span>}
+        {(meta != null || actions != null || menu != null) && (
+          // The footer group: meta line + controls, pinned to the bottom so a
+          // grid row of cards with different bodies still ends in one flush line
+          // of buttons.
+          <div className="mt-auto flex flex-col gap-[10px] pt-1">
+            {meta}
+            {(actions != null || menu != null) && (
+              <div className="flex items-stretch gap-2.5" onClick={stop} onKeyDown={stop}>
+                <span className="flex min-w-0 flex-1 items-center gap-2.5 [&>*:first-child]:flex-1">{actions}</span>
+                {menu != null && <span className="flex shrink-0 items-center">{menu}</span>}
+              </div>
+            )}
           </div>
         )}
       </div>

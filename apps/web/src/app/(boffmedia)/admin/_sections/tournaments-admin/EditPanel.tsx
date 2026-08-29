@@ -1,39 +1,39 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { cn } from "@/lib/utils"
-import { Panel, Field, Input, Select, Button, toast, Spinner } from "@boffmedia/ui"
-import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
-import { useTournaments } from "@/hooks/tournaments/useTournaments"
-import { useTournament } from "@/hooks/tournaments/useTournament"
-import { UsersService } from "@/services/api/boffmedia/usersService"
+import { Field, Input, Select, Button, toast } from "@boffmedia/ui"
+import { AvPanel } from "../../_components/ui/av-kit"
 import {
   TournamentsService,
-  type TnFormat,
-  type TnKind,
-  type TnMatchApi,
-  type TnStatus,
-  type TnPhaseApi,
-  type TnPhaseInput,
-  type TnPhaseFormat,
-  type TnAdvanceType,
-  type TnParticipantStatus,
-  type TnCompetitorApi,
+  type TnTeamsheetVisibility,
+  type TournamentDetailApi,
 } from "@/services/api/boffmedia/tournamentsService"
-import { FORMATS, KINDS, PHASE_FORMATS, ADVANCE_TYPE_OPTIONS, PARTICIPANT_STATUS, VGC_PRESET, PHASE_STATUS_TONE } from "./constants"
-import { SectionHead } from "./shared"
 
+const TEXTAREA = "w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
+
+/**
+ * The settings form, in fieldsets. One draft, one save: the four panels are
+ * groupings of the same form, not four forms.
+ *
+ * `registrationOpen` is deliberately not here. The window is flipped from the
+ * overview, and a form that also carried it would quietly overwrite that
+ * switch with whatever value it loaded with.
+ */
 export function EditPanel({
   detail,
   onChange,
 }: {
-  detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
+  detail: TournamentDetailApi
   onChange: () => void
 }) {
   const t = useTranslations("tournaments")
-  const toLocal = (iso: string | null) =>
-    iso ? new Date(iso).toISOString().slice(0, 16) : ""
+  const toLocal = (iso: string | null) => {
+    if (!iso) return ""
+    const d = new Date(iso)
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+    return d.toISOString().slice(0, 16)
+  }
   const [name, setName] = useState(detail.name)
   const [description, setDescription] = useState(detail.description ?? "")
   const [rules, setRules] = useState(detail.rules ?? "")
@@ -42,19 +42,17 @@ export function EditPanel({
   const [bestOf, setBestOf] = useState(detail.bestOf)
   const [autoVerify, setAutoVerify] = useState<number | "">(detail.autoVerifyMinutes ?? "")
   const [maxParticipants, setMaxParticipants] = useState<number | "">(detail.maxParticipants ?? "")
-  const [regOpen, setRegOpen] = useState(detail.registrationOpen)
-  // Entry flow: what a registration must satisfy to count as an entry.
   const [teamsheetRequired, setTeamsheetRequired] = useState(detail.teamsheetRequired)
+  const [teamsheetVisibility, setTeamsheetVisibility] = useState<TnTeamsheetVisibility>(detail.teamsheetVisibility)
   const [entryDeadline, setEntryDeadline] = useState(toLocal(detail.entryDeadline))
   const [startDate, setStartDate] = useState(toLocal(detail.startDate))
   const [endDate, setEndDate] = useState(toLocal(detail.endDate))
   const [busy, setBusy] = useState(false)
-  const [open, setOpen] = useState(false)
 
   const save = async () => {
     if (!name.trim()) return toast.error(t("nameRequired"))
     setBusy(true)
-    const body: Record<string, unknown> = {
+    const r = await TournamentsService.update(detail.id, {
       name: name.trim(),
       description: description.trim() || null,
       rules: rules.trim() || null,
@@ -63,32 +61,20 @@ export function EditPanel({
       bestOf,
       autoVerifyMinutes: autoVerify === "" ? null : autoVerify,
       maxParticipants: maxParticipants === "" ? null : maxParticipants,
-      registrationOpen: regOpen,
       teamsheetRequired,
+      teamsheetVisibility,
       entryDeadline: entryDeadline ? new Date(entryDeadline).toISOString() : null,
       startDate: startDate ? new Date(startDate).toISOString() : null,
       endDate: endDate ? new Date(endDate).toISOString() : null,
-    }
-    const r = await TournamentsService.update(detail.id, body)
+    })
     setBusy(false)
     if (r.error) toast.error(r.error)
     else { toast.success(t("tournamentUpdated")); onChange() }
   }
 
   return (
-    <Panel
-      title={t("editTournament")}
-      aside={
-        <button
-          type="button"
-          onClick={() => setOpen((o) => !o)}
-          className="font-mono text-[11px] text-accent transition-opacity hover:opacity-70"
-        >
-          {open ? t("hide") : t("edit")}
-        </button>
-      }
-    >
-      {open && (
+    <div>
+      <AvPanel title={t("groupIdentity")} icon="edit">
         <div className="grid gap-3">
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label={t("name")}>
@@ -97,6 +83,16 @@ export function EditPanel({
             <Field label={t("banner")}>
               <Input value={banner} onChange={(e) => setBanner(e.target.value)} placeholder="https://…" />
             </Field>
+          </div>
+          <Field label={t("description")}>
+            <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className={TEXTAREA} />
+          </Field>
+        </div>
+      </AvPanel>
+
+      <AvPanel title={t("groupRules")} icon="sliders">
+        <div className="grid gap-3">
+          <div className="grid gap-3 sm:grid-cols-3">
             <Field label={t("bestOf")}>
               <Input type="number" min={1} value={bestOf} onChange={(e) => setBestOf(Math.max(1, +e.target.value || 1))} />
             </Field>
@@ -106,67 +102,59 @@ export function EditPanel({
             <Field label={t("autoVerify")}>
               <Input type="number" min={1} value={autoVerify} onChange={(e) => setAutoVerify(e.target.value === "" ? "" : Math.max(1, +e.target.value))} placeholder="10" />
             </Field>
-            <Field label={t("registration")}>
-              <Select
-                value={regOpen ? "yes" : "no"}
-                options={[{ value: "yes", label: t("regOpen") }, { value: "no", label: t("regClosed") }]}
-                onChange={(v) => setRegOpen(v === "yes")}
-              />
-            </Field>
-            <Field label={t("teamsheetRequired")}>
-              <Select
-                value={teamsheetRequired ? "yes" : "no"}
-                options={[
-                  { value: "no", label: t("teamsheetOptional") },
-                  { value: "yes", label: t("teamsheetMandatory") },
-                ]}
-                onChange={(v) => setTeamsheetRequired(v === "yes")}
-              />
-            </Field>
-            <Field label={t("entryDeadline")}>
-              <Input
-                type="datetime-local"
-                value={entryDeadline}
-                onChange={(e) => setEntryDeadline(e.target.value)}
-              />
-            </Field>
-            <Field label={t("startDate")}>
-              <Input type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
-            </Field>
-            <Field label={t("endDate")}>
-              <Input type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
-            </Field>
           </div>
-          <Field label={t("description")}>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={2}
-              className="w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
-            />
-          </Field>
           <Field label={t("rules")}>
-            <textarea
-              value={rules}
-              onChange={(e) => setRules(e.target.value)}
-              rows={3}
-              className="w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
-            />
+            <textarea value={rules} onChange={(e) => setRules(e.target.value)} rows={3} className={TEXTAREA} />
           </Field>
           <Field label={t("prizes")}>
-            <textarea
-              value={prizes}
-              onChange={(e) => setPrizes(e.target.value)}
-              rows={2}
-              placeholder={t("prizesPlaceholder")}
-              className="w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
+            <textarea value={prizes} onChange={(e) => setPrizes(e.target.value)} rows={2} placeholder={t("prizesPlaceholder")} className={TEXTAREA} />
+          </Field>
+        </div>
+      </AvPanel>
+
+      <AvPanel title={t("groupEntry")} icon="users">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Field label={t("teamsheetRequired")}>
+            <Select
+              value={teamsheetRequired ? "yes" : "no"}
+              options={[
+                { value: "no", label: t("teamsheetOptional") },
+                { value: "yes", label: t("teamsheetMandatory") },
+              ]}
+              onChange={(v) => setTeamsheetRequired(v === "yes")}
             />
           </Field>
-          <div className="flex justify-end">
-            <Button variant="pri" size="sm" disabled={busy} onClick={save}>{t("saveChanges")}</Button>
-          </div>
+          <Field label={t("teamsheetVisibility")} hint={t("teamsheetVisibilityHint")}>
+            <Select
+              value={teamsheetVisibility}
+              options={[
+                { value: "private", label: t("teamsheetVisPrivate") },
+                { value: "participants", label: t("teamsheetVisParticipants") },
+                { value: "public", label: t("teamsheetVisPublic") },
+              ]}
+              onChange={(v) => setTeamsheetVisibility(v as TnTeamsheetVisibility)}
+            />
+          </Field>
+          <Field label={t("entryDeadline")} hint={t("entryDeadlineHint")}>
+            <Input type="datetime-local" value={entryDeadline} onChange={(e) => setEntryDeadline(e.target.value)} />
+          </Field>
         </div>
-      )}
-    </Panel>
+      </AvPanel>
+
+      <AvPanel title={t("groupDates")} icon="calendar">
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Field label={t("startDate")}>
+            <Input type="datetime-local" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+          </Field>
+          <Field label={t("endDate")}>
+            <Input type="datetime-local" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+          </Field>
+        </div>
+      </AvPanel>
+
+      <div className="mb-[18px] flex justify-end">
+        <Button variant="pri" size="sm" icon="check" disabled={busy} onClick={save}>{t("saveChanges")}</Button>
+      </div>
+    </div>
   )
 }

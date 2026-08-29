@@ -27,6 +27,10 @@ export type TournamentDetail = {
      */
     teamsheetRequired: boolean;
     /**
+     * Who may read other entrants' teamsheets once the tournament is live. `private` keeps them to the owner, their current opponent and admins. Never applies before the start.
+     */
+    teamsheetVisibility: TournamentDetail.teamsheetVisibility;
+    /**
      * When the field is resolved: everyone not entered by then is dropped.
      */
     entryDeadline: Record<string, any> | null;
@@ -115,6 +119,14 @@ export namespace TournamentDetail {
     export enum metric {
         SCORE = 'score',
         TIME = 'time',
+    }
+    /**
+     * Who may read other entrants' teamsheets once the tournament is live. `private` keeps them to the owner, their current opponent and admins. Never applies before the start.
+     */
+    export enum teamsheetVisibility {
+        PRIVATE = 'private',
+        PARTICIPANTS = 'participants',
+        PUBLIC = 'public',
     }
 }
 

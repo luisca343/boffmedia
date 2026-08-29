@@ -32,6 +32,10 @@ export type MatchDetail = {
      * Active self-report proposal state, if any.
      */
     proposalState: MatchDetail.proposalState | null;
+    /**
+     * When a player asked for a judge at this table, if they have. Carried on the flat list so the admin panel can surface open requests without opening every match.
+     */
+    judgeRequestedAt: string | null;
     tournamentId: number;
     slug: string;
     tournamentName: string;
@@ -43,7 +47,6 @@ export type MatchDetail = {
     topRecord: MatchSideRecord | null;
     botRecord: MatchSideRecord | null;
     proposal?: MatchProposalView | null;
-    judgeRequestedAt: string | null;
     /**
      * Opponent's open teamsheet — only for the two participants and admins.
      */

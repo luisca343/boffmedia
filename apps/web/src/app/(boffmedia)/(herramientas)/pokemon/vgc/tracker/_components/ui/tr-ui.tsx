@@ -134,3 +134,6 @@ export function TrSub({ children, className }: { children: React.ReactNode; clas
 export function TrNone({ children }: { children: React.ReactNode }) {
   return <p className="m-0 py-1 font-mono text-[11.5px] leading-[1.5] text-txt-dim">{children}</p>
 }
+
+// ─── header input styles (underline variant) ─────────────────────────────────────
+export const HDR_INPUT_UNDERLINE = 'border-0 border-b border-solid border-line-2 bg-transparent font-body text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent'

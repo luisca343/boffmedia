@@ -5,7 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Badge, Button, Empty, Icon, IconButton, Spinner } from "@boffmedia/ui"
+import { Badge, Button, ConfirmDialog, Empty, Icon, IconButton, Spinner } from "@boffmedia/ui"
 import { Byline, fmtNum, ForumComposer, ForumMarkdown } from "@/components/boffmedia/ui/community"
 import { useForumThread } from "@/hooks/forum/useForumThread"
 import { useForumThreadPosts } from "@/hooks/forum/useForumThreadPosts"
@@ -148,8 +148,14 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
     })
   }
 
-  const handleDelete = (postId: number) => {
-    if (typeof window !== "undefined" && !window.confirm(t("confirmDelete"))) return
+  // Holds the post awaiting confirmation, so the dialog knows what it is about
+  // to delete and no row has to keep state of its own.
+  const [pendingDelete, setPendingDelete] = React.useState<number | null>(null)
+  const handleDelete = (postId: number) => setPendingDelete(postId)
+  const confirmDelete = () => {
+    const postId = pendingDelete
+    setPendingDelete(null)
+    if (postId == null) return
     deletePost(postId).then((res) => {
       if (res) {
         refetchThread()
@@ -297,8 +303,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
                           <IconButton
                             name="edit"
                             label={t("edit")}
-                            size={15}
-                            className="h-8 w-8"
+                            size="sm"
                             onClick={() => {
                               setEditError(null)
                               setEditingId(post.id)
@@ -308,8 +313,8 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
                             <IconButton
                               name="trash"
                               label={t("delete")}
-                              size={15}
-                              className="h-8 w-8 hover:border-bad hover:text-bad"
+                              size="sm"
+                              className="hover:border-bad hover:text-bad"
                               onClick={() => handleDelete(post.id)}
                             />
                           )}
@@ -350,6 +355,16 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
           </Button>
         </div>
       )}
+
+      <ConfirmDialog
+        open={pendingDelete != null}
+        tone="error"
+        title={t("confirmDeleteTitle")}
+        body={t("confirmDelete")}
+        confirmLabel={t("delete")}
+        onConfirm={confirmDelete}
+        onClose={() => setPendingDelete(null)}
+      />
     </main>
   )
 }

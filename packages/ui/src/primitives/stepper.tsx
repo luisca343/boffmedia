@@ -5,18 +5,42 @@ import { Icon } from "./icon"
 export interface StepperProps {
   steps: string[]
   current: number
+  /** Stretch across the container and colour the trail behind the current
+   *  step — a page's lifecycle spine rather than an inline progress note.
+   *  Labels stay visible at every width in this mode: a rail has the room. */
+  rail?: boolean
+  /** Dim the whole thing: the process stopped (cancelled, abandoned) and the
+   *  badge next to it says why. */
+  muted?: boolean
   className?: string
 }
 
 /** Linear progress: done = check, active = accent, pending = grey. */
-export function Stepper({ steps, current, className }: StepperProps) {
+export function Stepper({ steps, current, rail, muted, className }: StepperProps) {
   return (
-    <div className={cn("inline-flex items-center shrink-0", className)} role="list">
+    <div
+      className={cn(
+        "items-center",
+        rail ? "flex w-full" : "inline-flex shrink-0",
+        muted && "opacity-40",
+        className,
+      )}
+      role="list"
+    >
       {steps.map((s, i) => {
-        const state = i < current ? "done" : i === current ? "active" : "idle"
+        const state = !muted && i === current ? "active" : i < current ? "done" : "idle"
         return (
           <React.Fragment key={s}>
-            {i > 0 && <span className="w-[22px] h-px bg-line-2 shrink-0" />}
+            {i > 0 && (
+              <span
+                aria-hidden
+                className={cn(
+                  "h-px shrink-0",
+                  rail ? "min-w-4 flex-1 mx-1" : "w-[22px]",
+                  rail && i <= current && !muted ? "bg-ok" : "bg-line-2",
+                )}
+              />
+            )}
             <span
               role="listitem"
               className={cn(
@@ -35,7 +59,12 @@ export function Stepper({ steps, current, className }: StepperProps) {
               >
                 {state === "done" ? <Icon name="check" size={11} /> : i + 1}
               </span>
-              <span className="font-mono text-[10px] tracking-[0.1em] uppercase font-semibold max-[1100px]:hidden">
+              <span
+                className={cn(
+                  "font-mono text-[10px] tracking-[0.1em] uppercase font-semibold",
+                  !rail && "max-[1100px]:hidden",
+                )}
+              >
                 {s}
               </span>
             </span>

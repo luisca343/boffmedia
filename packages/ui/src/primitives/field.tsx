@@ -9,13 +9,16 @@ export interface FieldProps {
   children: React.ReactNode
 }
 
-/** Props a control might already carry that give it an accessible name. If any
- *  is present the child is left alone — an explicit name at the call site is a
- *  deliberate choice and outranks the one derived here. */
-type NameableProps = {
+/** Props a control might already carry. The first three give it an accessible
+ *  name: if any is present the child is left alone — an explicit name at the
+ *  call site is a deliberate choice and outranks the one derived here. The last
+ *  two are merged with (description) or yield to (invalid state) what is set. */
+type ControlProps = {
   "aria-label"?: unknown
   "aria-labelledby"?: unknown
   label?: unknown
+  "aria-describedby"?: string
+  "aria-invalid"?: boolean | "true" | "false" | "grammar" | "spelling"
 }
 
 /**
@@ -28,13 +31,15 @@ type NameableProps = {
  * with nothing at all. The text appears on screen, review passes, and the input
  * is announced as unnamed. There were 153 of those before this changed.
  *
- * **Why `aria-label` and not `htmlFor`.** A real `htmlFor` needs a unique id,
- * which needs `useId`, which is a hook — and this file has no `"use client"`.
- * Adding one would push ~150 call sites' worth of consumers across the
- * server/client boundary to fix a naming bug, which is far too much blast radius
- * for the problem. `Select` already solved it exactly this way (it derives its
- * own `aria-label` from its `label` prop before delegating here), so this is the
- * codebase's existing answer rather than a new one.
+ * **Why `aria-label` and not `htmlFor`.** `htmlFor` needs an `id` on the
+ * control's ROOT element. Children here range from bare `<input>`s to
+ * composites that spread props onto a wrapper, and an id that lands on a
+ * wrapper associates the label with nothing — silently, the exact failure this
+ * component exists to prevent — and ~150 call sites are too much blast radius
+ * to audit for it. `Select` already solved naming exactly this way (it derives
+ * its own `aria-label` from its `label` prop before delegating here), so this is
+ * the codebase's existing answer rather than a new one. (`useId` itself is fine
+ * in Server Components; the hint/error id below relies on that.)
  *
  * What that trades away: clicking the label text does not focus the control.
  * That is a convenience rather than the defect — and it never worked here
@@ -45,7 +50,7 @@ export function Field({ label, hint, error, className, children }: FieldProps) {
   // several controls has no single thing the label belongs to, and guessing
   // would name the wrong one.
   const only = React.Children.count(children) === 1 ? children : null
-  const child = React.isValidElement<NameableProps>(only) ? only : null
+  const child = React.isValidElement<ControlProps>(only) ? only : null
   const alreadyNamed =
     child != null &&
     (child.props["aria-label"] !== undefined ||
@@ -56,15 +61,33 @@ export function Field({ label, hint, error, className, children }: FieldProps) {
   // and those call sites keep exactly today's behaviour rather than being handed
   // a wrong name.
   const applied = child != null && typeof label === "string" && !alreadyNamed
-  const labelled = applied
-    ? React.cloneElement(child, { "aria-label": label as string })
-    : children
+
+  const hintId = React.useId()
+  const described = Boolean(hint || error)
+
+  // One clone carrying everything the wrapper knows about its control: the
+  // derived name (when it applies), the hint/error text as its description and
+  // the invalid state. Each is merged with, never written over, what the call
+  // site already set — an explicit `aria-describedby` keeps its own ids too.
+  const labelled =
+    child != null && (applied || described)
+      ? React.cloneElement(child, {
+          ...(applied && { "aria-label": label as string }),
+          ...(described && {
+            "aria-describedby": [child.props["aria-describedby"], hintId].filter(Boolean).join(" "),
+          }),
+          ...(error && child.props["aria-invalid"] === undefined && { "aria-invalid": true }),
+        })
+      : children
 
   return (
     <div
       className={cn(
         "grid gap-2",
-        error && "[&_input]:border-bad [&_textarea]:border-bad [&_select]:border-bad",
+        // The cut stroke is painted from --cut-line, not from the border, so an
+        // invalid control has to recolour both or its corner stays grey.
+        error &&
+          "[&_input]:border-bad [&_textarea]:border-bad [&_select]:border-bad [&_input]:[--cut-line:var(--bad)] [&_textarea]:[--cut-line:var(--bad)] [&_select]:[--cut-line:var(--bad)]",
         className,
       )}
     >
@@ -84,8 +107,8 @@ export function Field({ label, hint, error, className, children }: FieldProps) {
         </label>
       )}
       {labelled}
-      {(hint || error) && (
-        <span className={cn("font-body text-[12px] leading-[1.4]", error ? "text-bad" : "text-txt-dim")}>
+      {described && (
+        <span id={hintId} className={cn("font-body text-[12px] leading-[1.4]", error ? "text-bad" : "text-txt-dim")}>
           {error || hint}
         </span>
       )}

@@ -3,7 +3,7 @@
 import { useTranslations } from "next-intl"
 import { Icon } from "@boffmedia/ui"
 import { AdminCrud } from "../_components/ui/av-crud"
-import { AvSectionHead } from "../_components/ui/av-kit"
+import { AvSectionHead, formatAdminDate } from "../_components/ui/av-kit"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { GameForm } from "./forms/GameForm"
@@ -27,6 +27,7 @@ export function GamesAdmin() {
         onDelete={async (id) => { await EventsService.deleteGame(Number(id)) }}
         searchFields={["title", "description"]}
         entityName={{ singular: t("singular"), plural: t("plural") }}
+        viewHref={(g) => `/juegos/${g.id}`}
         columns={[
           { key: "title", label: t("colGame"), render: (g) => (
             <div className="flex items-center gap-3">
@@ -44,7 +45,7 @@ export function GamesAdmin() {
             <p className="text-sm text-txt-muted truncate max-w-md">{g.description}</p>
           )},
           { key: "createdAt", label: t("colDate"), render: (g) => (
-            <span className="text-sm text-txt-muted font-mono">{new Date(g.createdAt).toLocaleDateString()}</span>
+            <span className="text-sm text-txt-muted font-mono">{formatAdminDate(g.createdAt)}</span>
           )},
         ]}
       />

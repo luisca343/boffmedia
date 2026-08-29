@@ -20,10 +20,21 @@ export interface TooltipProps {
 }
 
 export function Tooltip({ label, side = "top", children, className }: TooltipProps) {
+  const tooltipId = React.useId()
+
+  // Clone children if it's a valid React element to apply aria-describedby
+  let trigger = children
+  if (React.isValidElement(children)) {
+    const existingDescribedBy = (children.props as any)["aria-describedby"]
+    const describedBy = existingDescribedBy ? `${existingDescribedBy} ${tooltipId}` : tooltipId
+    trigger = React.cloneElement(children, { "aria-describedby": describedBy } as any)
+  }
+
   return (
     <span className={cn("group relative inline-flex", className)}>
-      {children}
+      {trigger}
       <span
+        id={tooltipId}
         role="tooltip"
         className={cn(
           "absolute z-[90] whitespace-nowrap pointer-events-none",

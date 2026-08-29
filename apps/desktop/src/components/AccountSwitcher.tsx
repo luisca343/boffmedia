@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, type CSSProperties } from "react"
 import { createPortal } from "react-dom"
 
 import { Icon, Spinner } from "@boffmedia/ui"
@@ -32,6 +32,15 @@ import { useApp } from "../state/app"
  *  tell apart. A letter distinguishes them. It also stands in for the moment
  *  before the cache answers, which is a disk read once the avatar has been seen
  *  on this machine. */
+/** `.cut-seal` chamfers with the GLOBAL `--cut` (10px), a size picked for
+ *  buttons and chips. On a 32px avatar that is a 31% cut and reads as the seal
+ *  shape; on the 24px flyout rows the same 10px is 42% of the edge and the
+ *  square collapses into a lozenge. Scale the cut with the box instead — the
+ *  ratio is the one the 32px rail avatar already has, so that one is untouched. */
+function sealCut(size: number): CSSProperties {
+  return { "--cut": `${Math.max(3, Math.round(size * 0.3))}px` } as CSSProperties
+}
+
 export function BoffAvatar({
   username,
   avatarUrl,
@@ -53,7 +62,7 @@ export function BoffAvatar({
         height={size}
         onError={onError}
         className="cut-seal shrink-0 bg-panel-2 object-cover"
-        style={{ width: size, height: size }}
+        style={{ width: size, height: size, ...sealCut(size) }}
       />
     )
   }
@@ -61,7 +70,7 @@ export function BoffAvatar({
   return (
     <span
       className="cut-seal grid shrink-0 place-items-center bg-accent font-display font-bold text-accent-ink"
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.44) }}
+      style={{ width: size, height: size, fontSize: Math.round(size * 0.44), ...sealCut(size) }}
       aria-hidden
     >
       {letter}

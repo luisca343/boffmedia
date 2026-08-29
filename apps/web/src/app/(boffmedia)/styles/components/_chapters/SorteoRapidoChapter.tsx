@@ -3,9 +3,7 @@
 import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
 import { Button } from "@boffmedia/ui"
-import { SrtPanel, SrtPanelHead, SrtRow, SrtSeedTag, SrtWeight, SrtWinnerList } from "@/app/(boffmedia)/(herramientas)/otros/sorteos/_components/ui/srt-kit"
-import type { Entrant } from "@/app/(boffmedia)/(herramientas)/otros/sorteos/_lib/useSorteos"
-import SpinnerAnimation from "@/app/(boffmedia)/(herramientas)/otros/sorteos/_components/spinner/SpinnerAnimation"
+import { SrtNumberStepper, SrtEntrantRow, SrtSeedTag, SrtWinnerList, SrtReelStage, SrtWheelStage, SrtSpotlightStage, type Entrant, type SrtDrawParticipant } from "@/components/boffmedia/ui/giveaways"
 
 const DEMO_POOL: Entrant[] = [
   { id: "a", name: "AxelCraft", weight: 3 },
@@ -16,28 +14,67 @@ const DEMO_POOL: Entrant[] = [
   { id: "f", name: "Lumaflux", weight: 2 },
 ]
 
-// Self-contained spinner preview: «Girar» picks a random winner and remounts
-// the reel (fresh key) so useBaseSpinnerAnimation replays with its tick/win sound.
-function SpinnerDemo() {
+// Self-contained reel preview: «Girar» picks a random winner and remounts
+// the reel (fresh key) so useSrtReel replays with its tick/win sound.
+function ReelDemo() {
+  const participants: SrtDrawParticipant[] = DEMO_POOL.map((e) => ({ name: e.name, weight: e.weight }))
   const names = DEMO_POOL.map((e) => e.name)
-  const [spin, setSpin] = React.useState<{ id: number; winner: string } | null>(null)
+  const [spin, setSpin] = React.useState<{ id: number; winner: string; mode: "reel" | "wheel" | "spotlight" } | null>(null)
   const [running, setRunning] = React.useState(false)
-  const start = () => {
+  const [muted, setMuted] = React.useState(false)
+  const start = (mode: "reel" | "wheel" | "spotlight") => {
     const winner = names[Math.floor(Math.random() * names.length)]
-    setSpin((s) => ({ id: (s?.id ?? 0) + 1, winner }))
+    setSpin((s) => ({ id: (s?.id ?? 0) + 1, winner, mode }))
     setRunning(true)
   }
   return (
     <div className="grid w-full max-w-[560px] gap-4">
-      <SpinnerAnimation
-        key={spin?.id ?? "idle"}
-        participants={names}
-        winner={spin?.winner ?? null}
-        onComplete={() => setRunning(false)}
-      />
-      <div className="flex justify-center">
-        <Button variant="pri" icon="bolt" onClick={start} disabled={running}>
-          {spin ? "Girar de nuevo" : "Girar"}
+      {spin && (
+        <>
+          {spin.mode === "reel" && (
+            <SrtReelStage
+              key={`reel-${spin.id}`}
+              participants={participants}
+              winners={[spin.winner]}
+              weighted={true}
+              muted={muted}
+              onMutedChange={setMuted}
+              onComplete={() => setRunning(false)}
+            />
+          )}
+          {spin.mode === "wheel" && (
+            <SrtWheelStage
+              key={`wheel-${spin.id}`}
+              participants={participants}
+              winners={[spin.winner]}
+              weighted={true}
+              muted={muted}
+              onMutedChange={setMuted}
+              onComplete={() => setRunning(false)}
+            />
+          )}
+          {spin.mode === "spotlight" && (
+            <SrtSpotlightStage
+              key={`spotlight-${spin.id}`}
+              participants={participants}
+              winners={[spin.winner]}
+              weighted={true}
+              muted={muted}
+              onMutedChange={setMuted}
+              onComplete={() => setRunning(false)}
+            />
+          )}
+        </>
+      )}
+      <div className="flex justify-center gap-2">
+        <Button variant="pri" icon="bolt" onClick={() => start("reel")} disabled={running && !!spin}>
+          {spin?.mode === "reel" ? "Girar de nuevo" : "Carrete"}
+        </Button>
+        <Button variant="default" onClick={() => start("wheel")} disabled={running && !!spin}>
+          {spin?.mode === "wheel" ? "Girar de nuevo" : "Ruleta"}
+        </Button>
+        <Button variant="default" onClick={() => start("spotlight")} disabled={running && !!spin}>
+          {spin?.mode === "spotlight" ? "Girar de nuevo" : "Foco"}
         </Button>
       </div>
     </div>
@@ -55,10 +92,10 @@ export function SorteoRapidoChapter() {
         id="srqspin"
         kicker="Sorteo rápido"
         title="Ruleta del sorteo"
-        lead={<>La animación del sorteo (<code>SpinnerAnimation</code>): una tira horizontal que decelera hasta el ganador, con su sonido de tic/victoria. Restilizada a v3 «Señal» — grafito + naranja de marca, cortes diagonales, indicador REC en directo — conservando la física del carrete (<code>useBaseSpinnerAnimation</code>). Pulsa <em>Girar</em> para reproducirla.</>}
+        lead={<>La animación del sorteo (<code>SrtReelStage</code>): una tira horizontal que decelera hasta el ganador, con su sonido de tic/victoria. Restilizada a v3 «Señal» — grafito + naranja de marca, cortes diagonales, indicador REC en directo — conservando la física del carrete (<code>useSrtReel</code>). Pulsa <em>Girar</em> para reproducirla.</>}
       >
-        <Sample title="Carrete en directo" code="<SpinnerAnimation participants winner onComplete>" col>
-          <SpinnerDemo />
+        <Sample title="Carrete en directo" code="<SrtReelStage participants winners muted onMutedChange onComplete>" col>
+          <ReelDemo />
         </Sample>
       </Section>
 
@@ -66,45 +103,39 @@ export function SorteoRapidoChapter() {
         id="srqrow"
         kicker="Sorteo rápido"
         title="Fila de participante"
-        lead={<>El sorteo rápido (spinner ponderado) se arma con el kit <code>srt-*</code>. La fila de participante (<code>SrtRow</code>) admite renombrar (doble clic), peso y quitar; el paso de peso (<code>SrtWeight</code>) es reutilizable suelto. <em>Nota:</em> el sistema de sorteos con tarjetas/premios/requisitos del handoff no está en el producto — el sorteo local es el spinner. [aplazado]</>}
+        lead={<>El sorteo rápido (spinner ponderado) se arma con el kit <code>srt-*</code> movido a <code>@/components/boffmedia/ui/giveaways</code>. La fila de participante (<code>SrtEntrantRow</code>) admite renombrar (doble clic), peso y quitar; el paso de peso (<code>SrtNumberStepper</code>) es reutilizable suelto. <em>Nota:</em> el sistema de sorteos con tarjetas/premios/requisitos del handoff no está en el producto — el sorteo local es el spinner. [aplazado]</>}
       >
-        <Sample title="Chasis y filas" code="<SrtPanel> · <SrtPanelHead> · <SrtRow>" col>
+        <Sample title="Chasis y filas" code="<Panel> · <SrtEntrantRow>" col>
           <div className="w-full max-w-[520px]">
-            <SrtPanel>
-              <SrtPanelHead
-                icon="users"
-                title="Participantes"
-                right={
-                  <label className="flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.1em] text-txt-muted">
-                    <input type="checkbox" checked={weighted} onChange={(e) => setWeighted(e.target.checked)} />
-                    Ponderado
-                  </label>
-                }
-              />
-              <div>
-                {pool.map((e, i) => (
-                  <SrtRow
-                    key={e.id}
-                    index={i + 1}
-                    entrant={e}
-                    weighted={weighted}
-                    won={false}
-                    removeLabel="Quitar"
-                    onRename={(name) => setPool((p) => p.map((x) => (x.id === e.id ? { ...x, name } : x)))}
-                    onWeight={(weight) => setPool((p) => p.map((x) => (x.id === e.id ? { ...x, weight } : x)))}
-                    onRemove={() => setPool((p) => p.filter((x) => x.id !== e.id))}
-                  />
-                ))}
-                {pool.length === 0 && (
-                  <p className="px-[14px] py-4 text-center font-mono text-[12px] text-txt-dim">Sin participantes.</p>
-                )}
+            {/* Simplified demo: Panel is from @boffmedia/ui, SrtEntrantRow is from giveaways */}
+            <div className="border border-line bg-panel">
+              <div className="border-b border-line px-[20px] py-[15px]">
+                <h3 className="flex items-center gap-[10px] font-display text-[16px] font-bold not-italic uppercase tracking-[0.04em] text-txt">
+                  Participantes
+                </h3>
               </div>
-            </SrtPanel>
+              <ul role="list" className="divide-y divide-line">
+                {pool.map((e, i) => (
+                  <li key={e.id}>
+                    <SrtEntrantRow
+                      index={i + 1}
+                      entrant={e}
+                      weighted={weighted}
+                      won={false}
+                      removeLabel="Quitar"
+                      onRename={(name) => setPool((p) => p.map((x) => (x.id === e.id ? { ...x, name } : x)))}
+                      onWeight={(weight) => setPool((p) => p.map((x) => (x.id === e.id ? { ...x, weight } : x)))}
+                      onRemove={() => setPool((p) => p.filter((x) => x.id !== e.id))}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </Sample>
-        <Sample title="Paso de peso" code="<SrtWeight value onChange>">
-          <SrtWeight value={w} onChange={setW} />
-          <SrtWeight value={w} onChange={setW} sm />
+        <Sample title="Paso de peso" code="<SrtNumberStepper value onChange>">
+          <SrtNumberStepper value={w} onChange={setW} />
+          <SrtNumberStepper value={w} onChange={setW} size="sm" />
         </Sample>
       </Section>
 

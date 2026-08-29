@@ -16,6 +16,7 @@ export interface DisclosureProps {
 
 export function Disclosure({ title, icon, sub, defaultOpen = false, badge, children, className }: DisclosureProps) {
   const [open, setOpen] = React.useState(defaultOpen)
+  const panelId = React.useId()
   return (
     <div
       className={cn(
@@ -27,6 +28,7 @@ export function Disclosure({ title, icon, sub, defaultOpen = false, badge, child
       <button
         type="button"
         aria-expanded={open}
+        aria-controls={panelId}
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-3 w-full py-[14px] px-4 cursor-pointer bg-transparent text-txt text-left hover:bg-panel-2 focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:-outline-offset-2"
       >
@@ -47,10 +49,10 @@ export function Disclosure({ title, icon, sub, defaultOpen = false, badge, child
         <Icon
           name="chevronDown"
           size={16}
-          className={cn("text-txt-muted flex-none transition-transform duration-[260ms]", open && "rotate-180")}
+          className={cn("text-txt-muted flex-none transition-transform duration-[260ms] motion-reduce:transition-none", open && "rotate-180")}
         />
       </button>
-      <div hidden={!open} className="pt-1 px-4 pb-[18px] border-t border-solid border-line">
+      <div id={panelId} hidden={!open} className="pt-1 px-4 pb-[18px] border-t border-solid border-line">
         {children}
       </div>
     </div>

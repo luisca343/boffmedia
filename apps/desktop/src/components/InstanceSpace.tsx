@@ -10,45 +10,36 @@ import {
   Panel,
   Seg,
   Slider,
-  Toggle,
+  Stats,
 } from "@boffmedia/ui"
 
 import {
-  instanceOptional,
-  instanceOptionalSet,
-  instanceRevert,
   instanceRuntime,
   instanceRuntimeSet,
-  instanceVersions,
   jvmArgsCheck,
   type InstanceRuntime,
   type JavaChoice,
   type JvmArgVerdict,
   type JvmChoice,
   type MemoryChoice,
-  type OptionalFile,
-  type RetainedVersion,
   type RuntimeSource,
 } from "../runtime"
 import { useT } from "../i18n"
-import { formatBytes, formatWhen } from "../utils/format"
 
-// "locked vs. user space" and "pack version pinning + rollback".
+// Per-instance Java runtime + memory settings for the Settings tab.
 //
-// A separate component rather than more of PackDetail: both features read the
-// instance marker on the Rust side and neither belongs to the install state
-// machine in state/app.tsx, which owns progress events and nothing else.
+// A separate component rather than more of PackDetail: it reads the instance
+// marker on the Rust side and neither belongs to the install state machine
+// in state/app.tsx, which owns progress events and nothing else.
 //
 // Everything here goes through runtime.ts, so `dev:renderer` renders it against
 // the in-process simulation and the screen stays browser-runnable.
 
 type Props = {
   slug: string
-  /** Pack password, if any — a revert re-downloads through the same
-   *  entitlement-checked route an install uses. */
+  /** Pack password, if any — not used by RuntimePanel but kept for interface compatibility. */
   password?: string
-  /** Called after a revert so the library's install state stops claiming the
-   *  version that was just rolled back. */
+  /** Called after runtime changes (not used here but kept for interface compatibility). */
   onChanged?: () => void
 }
 
@@ -69,10 +60,8 @@ const gib = (mib: number) => `${(mib / 1024).toFixed(1).replace(".", ",")} GB`
  *  protect is something the allowlist refuses anyway. */
 const splitArgs = (text: string): string[] => text.split(/\s+/).filter(Boolean)
 
-export function InstanceSpace({ slug, password, onChanged }: Props) {
+export function RuntimePanel({ slug, password, onChanged }: Props) {
   const t = useT("instanceSpace")
-  const [optional, setOptional] = useState<OptionalFile[] | null>(null)
-  const [versions, setVersions] = useState<RetainedVersion[] | null>(null)
   const [runtime, setRuntime] = useState<InstanceRuntime | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -89,39 +78,11 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
   }
 
   const refresh = useCallback(() => {
-    void instanceOptional(slug).then(setOptional)
-    void instanceVersions(slug).then(setVersions)
     void instanceRuntime(slug).then(setRuntime)
     setJvmDraft(null)
   }, [slug])
 
   useEffect(refresh, [refresh])
-
-  const toggle = async (file: OptionalFile) => {
-    setError(null)
-    setBusy(file.path)
-    try {
-      setOptional(await instanceOptionalSet(slug, file.path, !file.enabled))
-    } catch (err) {
-      setError((err as { message?: string })?.message ?? t("saveSelectionError"))
-    } finally {
-      setBusy(null)
-    }
-  }
-
-  const revert = async (version: RetainedVersion) => {
-    setError(null)
-    setBusy(version.versionId)
-    try {
-      await instanceRevert(slug, version.versionId, password)
-      refresh()
-      onChanged?.()
-    } catch (err) {
-      setError((err as { message?: string })?.message ?? t("revertError"))
-    } finally {
-      setBusy(null)
-    }
-  }
 
   const saveRuntime = async (memory: MemoryChoice, java: JavaChoice, jvm: JvmChoice) => {
     setError(null)
@@ -156,137 +117,68 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
     }
   }, [jvmArgsText, jvmMode])
 
-  const pinned = versions?.find((v) => v.current)
-
   return (
-    <div className="mt-4 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
-      <Panel
-        title={t("optionalMods")}
-        aside={optional?.length ? <Badge tone="info">{optional.length}</Badge> : null}
-      >
-        {optional === null ? (
-          <p className="text-sm text-txt-muted">{t("loading")}</p>
-        ) : optional.length === 0 ? (
-          <Empty
-            icon="cube"
-            title={t("noOptional")}
-            lead={t("noOptionalDetail")}
+    // Two columns: memory and Java are short forms that read side by side; the
+    // resolved summary and the JVM flags (a long free-text field) span both.
+    <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr))]">
+      {/* What this pack will actually launch with, BEFORE the controls: that is
+          the question the tab exists to answer. */}
+      {runtime !== null && (
+        <Panel className="col-span-full">
+          <Stats
+            className="w-full [&>div]:flex-1"
+            items={[
+              {
+                n: (
+                  <span>
+                    {gib(runtime.effective.heapMib)}{" "}
+                    <Badge
+                      tone={SOURCE_TONE[runtime.effective.memorySource]}
+                      className="ml-2 inline-block"
+                    >
+                      {SOURCE_LABEL[runtime.effective.memorySource]}
+                    </Badge>
+                  </span>
+                ),
+                l: t("memory"),
+              },
+              {
+                n: runtime.effective.javaPath
+                  ? runtime.effective.javaPath.split(/[\/\\]/).pop() ?? "Java"
+                  : t("javaTileManaged"),
+                l: "Java",
+              },
+              {
+                n: gib(runtime.effective.totalRamMib),
+                l: "RAM",
+              },
+            ]}
           />
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {optional.map((file) => (
-              <li key={file.path} className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate font-mono text-xs text-txt">{file.name}</p>
-                  <p className="text-[11px] text-txt-dim">{formatBytes(file.size)}</p>
-                </div>
-                <Toggle
-                  on={file.enabled}
-                  onChange={() => void toggle(file)}
-                  ariaLabel={t("toggleFileLabel", { name: file.name })}
-                />
-              </li>
-            ))}
-          </ul>
-        )}
-        <Divider label={t("spaceDivider")} className="my-4" />
-        {/* The single most important thing this panel can say. Players assume
-            an update wipes the folder, and then never add anything to it. */}
-        <p className="text-xs text-txt-dim" dangerouslySetInnerHTML={{ __html: t("spaceWarning") }} />
-      </Panel>
+          <p className="mt-3 text-xs text-txt-dim">
+            {runtime.effective.memorySource === "auto"
+              ? t("memoryAutoDetail", { count: runtime.effective.modCount })
+              : runtime.effective.memorySource === "override"
+                ? t("memoryOverrideDetail")
+                : t("memoryGlobalDetail")}
+          </p>
+        </Panel>
+      )}
 
-      <Panel
-        title={t("savedVersions")}
-        aside={pinned ? <Badge tone="ok">{pinned.versionName}</Badge> : null}
-      >
-        {versions === null ? (
-          <p className="text-sm text-txt-muted">{t("loading")}</p>
-        ) : versions.length === 0 ? (
-          <Empty
-            icon="clock"
-            title={t("noVersions")}
-            lead={t("noVersionsDetail")}
-          />
-        ) : (
-          <ul className="flex flex-col gap-2">
-            {versions.map((version) => (
-              <li key={version.versionId} className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <p className="truncate font-mono text-xs text-txt">
-                    {version.versionName}
-                    {version.current && (
-                      <span className="ml-2 text-[11px] uppercase tracking-[0.1em] text-txt-dim">
-                        {t("currentVersion")}
-                      </span>
-                    )}
-                  </p>
-                  <p className="text-[11px] text-txt-dim">
-                    {formatWhen(version.installedAt)} · {t("versionFileCount", { count: version.fileCount })} ·{" "}
-                    {version.minecraft}
-                  </p>
-                </div>
-                {!version.current && (
-                  <Button
-                    size="sm"
-                    icon="back"
-                    // A version installed before the launcher recorded file
-                    // lists has nothing to replay; offering the button would
-                    // promise a rollback that cannot happen.
-                    disabled={!version.revertible || busy !== null}
-                    loading={busy === version.versionId}
-                    onClick={() => void revert(version)}
-                  >
-                    {t("revertButton")}
-                  </Button>
-                )}
-              </li>
-            ))}
-          </ul>
-        )}
-        <Divider label={t("costDivider")} className="my-4" />
-        <p className="text-xs text-txt-dim" dangerouslySetInnerHTML={{ __html: t("costWarning") }} />
-      </Panel>
-
-      {/* §9 — per-instance Java runtime + memory. The resolved values sit at the
-          top, BEFORE the controls: what this pack will launch with is the
-          question the panel exists to answer, and "6,0 GB (automático, 214
-          mods)" beats a slider the player has to interpret. */}
-      <Panel
-        title={`${t("memory")} · Java · JVM`}
-        aside={
-          runtime ? (
-            <Badge tone={SOURCE_TONE[runtime.effective.memorySource]}>
-              {SOURCE_LABEL[runtime.effective.memorySource]}
-            </Badge>
-          ) : null
-        }
-      >
-        {runtime === null ? (
-          <p className="text-sm text-txt-muted">{t("loading")}</p>
-        ) : (
-          <>
-            <p className="text-sm text-txt">
-              <strong className="font-display text-[20px] tracking-[0.04em]">
-                {gib(runtime.effective.heapMib)}
-              </strong>{" "}
-              <span className="text-txt-muted">
-                (
-                {runtime.effective.memorySource === "auto"
-                  ? t("memoryAutoDetail", { count: runtime.effective.modCount })
-                  : runtime.effective.memorySource === "override"
-                    ? t("memoryOverrideDetail")
-                    : t("memoryGlobalDetail")}
-                )
-              </span>
+      {runtime === null ? (
+        <p className="col-span-full text-sm text-txt-muted">{t("loading")}</p>
+      ) : (
+        <>
+          {/* Memory section */}
+          <Panel title={t("memoryDivider")}>
+            <p className="mb-3 text-xs text-txt-dim">
+              {runtime.over.memory.mode === "auto"
+                ? t("autoMemory", { count: runtime.effective.modCount })
+                : runtime.over.memory.mode === "inherit"
+                  ? runtime.globalMemoryAuto
+                    ? t("globalMemoryAuto")
+                    : t("globalMemoryMib", { gib: gib(runtime.globalMemoryMib) })
+                  : t("recommendedMemory", { gib: gib(runtime.effective.recommendedMib) })}
             </p>
-            <p className="mt-1 text-xs text-txt-dim">
-              {runtime.effective.javaPath
-                ? t("javaPath", { path: runtime.effective.javaPath })
-                : t("javaManagedJava")}{" "}
-              · {SOURCE_LABEL[runtime.effective.javaSource].toLowerCase()} · {t("javaRAM", { gib: gib(runtime.effective.totalRamMib) })}
-            </p>
-
-            <Divider label={t("memoryDivider")} className="my-4" />
             <Seg
               options={[
                 { value: "inherit", label: t("inherit") },
@@ -306,7 +198,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                 )
               }
             />
-            {runtime.over.memory.mode === "fixed" ? (
+            {runtime.over.memory.mode === "fixed" && (
               <div className="mt-3">
                 <Slider
                   label={t("memory")}
@@ -319,21 +211,21 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                     void saveRuntime({ mode: "fixed", mib }, runtime.over.java, runtime.over.jvm)
                   }
                 />
-                <p className="mt-2 text-xs text-txt-dim">
-                  {t("recommendedMemory", { gib: gib(runtime.effective.recommendedMib) })}
-                </p>
               </div>
-            ) : (
-              <p className="mt-3 text-xs text-txt-dim">
-                {runtime.over.memory.mode === "auto"
-                  ? t("autoMemory", { count: runtime.effective.modCount })
-                  : runtime.globalMemoryAuto
-                    ? t("globalMemoryAuto")
-                    : t("globalMemoryMib", { gib: gib(runtime.globalMemoryMib) })}
-              </p>
             )}
+          </Panel>
 
-            <Divider label={t("javaDivider")} className="my-4" />
+          {/* Java section */}
+          <Panel title={t("javaDivider")}>
+            <p className="mb-3 text-xs text-txt-dim">
+              {runtime.over.java.mode === "auto"
+                ? t("javaAuto")
+                : runtime.over.java.mode === "inherit"
+                  ? runtime.globalJavaPath
+                    ? t("javaGlobal", { path: runtime.globalJavaPath })
+                    : t("javaManaged")
+                  : ""}
+            </p>
             <Seg
               options={[
                 { value: "inherit", label: t("inherit") },
@@ -353,7 +245,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                 )
               }
             />
-            {runtime.over.java.mode === "custom" ? (
+            {runtime.over.java.mode === "custom" && (
               <Field
                 className="mt-3"
                 label={t("customJavaLabel")}
@@ -371,17 +263,18 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                   }
                 />
               </Field>
-            ) : (
-              <p className="mt-3 text-xs text-txt-dim">
-                {runtime.over.java.mode === "auto"
-                  ? t("javaAuto")
-                  : runtime.globalJavaPath
-                    ? t("javaGlobal", { path: runtime.globalJavaPath })
-                    : t("javaManaged")}
-              </p>
             )}
+          </Panel>
 
-            <Divider label={t("jvmDivider")} className="my-4" />
+          {/* JVM section */}
+          <Panel title={t("jvmDivider")} className="col-span-full">
+            <p className="mb-3 text-xs text-txt-dim">
+              {runtime.over.jvm.mode === "inherit"
+                ? runtime.globalJvmArgs.length
+                  ? t("jvmGlobal", { args: runtime.globalJvmArgs.join(" ") })
+                  : t("jvmInheritNone")
+                : ""}
+            </p>
             <Seg
               options={[
                 { value: "inherit", label: t("inherit") },
@@ -402,7 +295,7 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                 )
               }}
             />
-            {runtime.over.jvm.mode === "custom" ? (
+            {runtime.over.jvm.mode === "custom" && (
               <Field className="mt-3" label={t("jvmCustomLabel")} hint={t("jvmCustomHint")}>
                 <Input
                   value={jvmArgsText}
@@ -416,12 +309,6 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
                   }}
                 />
               </Field>
-            ) : (
-              <p className="mt-3 text-xs text-txt-dim">
-                {runtime.globalJvmArgs.length
-                  ? t("jvmGlobal", { args: runtime.globalJvmArgs.join(" ") })
-                  : t("jvmInheritNone")}
-              </p>
             )}
             {/* Refusals are listed rather than silently filtered. A flag that
                 vanished from the command line without a word is the failure
@@ -440,14 +327,14 @@ export function InstanceSpace({ slug, password, onChanged }: Props) {
             {runtime.over.jvm.mode === "custom" && runtime.effective.jvmArgs.length === 0 && (
               <p className="mt-2 text-xs text-txt-dim">{t("jvmEmpty")}</p>
             )}
-          </>
-        )}
-      </Panel>
+          </Panel>
 
-      {error && (
-        <p className="col-span-full text-sm text-bad" role="alert">
-          {error}
-        </p>
+          {error && (
+            <p className="col-span-full text-sm text-bad" role="alert">
+              {error}
+            </p>
+          )}
+        </>
       )}
     </div>
   )

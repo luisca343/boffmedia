@@ -14,6 +14,9 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
   iconRight?: IconName
   loading?: boolean
   href?: string
+  /** Anchor-only attributes; only meaningful together with `href`. */
+  target?: React.HTMLAttributeAnchorTarget
+  rel?: string
 }
 
 /** Colours travel as --cut-line / --cut-fill rather than a CSS border or
@@ -64,7 +67,7 @@ export const BTN_VARIANTS: Record<ButtonVariant, string> = {
 export const BTN_BASE = cn(
   "cut-frame cut-frame-tag [--cut-w:1px]",
   "relative inline-flex items-center justify-center whitespace-nowrap select-none no-underline",
-  "transition-[color,transform] duration-[140ms] active:translate-y-px",
+  "transition-[color,transform] duration-[140ms] active:translate-y-px motion-reduce:active:translate-y-0",
   "before:transition-[background] before:duration-[140ms] after:transition-[background] after:duration-[140ms]",
   "outline-none focus-visible:[--cut-w:3px]",
 )

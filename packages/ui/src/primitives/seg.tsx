@@ -25,6 +25,7 @@ export function Seg({ options, value, onChange, className }: SegProps) {
             className={cn(
               "font-mono text-[11px] font-semibold leading-none uppercase tracking-[0.08em] py-[9px] px-[14px]",
               "border-r border-solid border-line last:border-r-0 transition-[background,color] duration-[140ms]",
+              "focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-[3px]",
               on ? "bg-accent text-accent-ink" : "text-txt-muted",
             )}
           >

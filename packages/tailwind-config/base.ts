@@ -14,58 +14,93 @@ export const fontFamily = {
   mono: ["IBM Plex Mono", "ui-monospace", "monospace"],
 }
 
+/**
+ * A design token, with working `/opacity` modifiers.
+ *
+ * Every token here is a `var(--x)` holding a hex or rgba. Tailwind cannot apply
+ * an opacity modifier to that: `parseColor("var(--bad)")` returns null and the
+ * utility is dropped from the build ENTIRELY — silently. `border-bad/40` emitted
+ * no CSS at all, and because tailwind-merge treats it as a border-color class it
+ * also stripped whatever real colour it replaced, leaving `border-color` to fall
+ * back to `currentColor`. That is how a danger panel got a white border.
+ *
+ * A function token gets called by Tailwind with the alpha it wants, so we can
+ * answer with `color-mix`. Base utilities are deliberately left byte-identical:
+ * for those Tailwind passes its own `var(--tw-*-opacity)` variable, and wrapping
+ * every colour in the codebase in a `color-mix` to support a modifier nobody
+ * used there would be a much larger change than the bug warrants.
+ */
+/** Tailwind passes the alpha as a CSS string for most utilities, but the
+ *  gradient plugin's `transparentTo()` passes the NUMBER 0 — so this is not
+ *  always a string, and must never be treated as one without coercing. */
+type Alpha = { opacityValue?: string | number }
+
+/** Tailwind calls a colour function at build time with the alpha it wants, but
+ *  its published types only model plain strings — so the return is cast. The
+ *  cast is contained here so both consuming configs stay type-clean. */
+const tok = (value: string): string =>
+  (({ opacityValue }: Alpha = {}) => {
+    if (opacityValue === undefined) return value
+    const alpha = String(opacityValue)
+    // A base utility: Tailwind hands us its own `--tw-*-opacity` variable and
+    // sets it to 1. Answer with the plain token so every existing colour
+    // utility in the codebase keeps byte-identical output.
+    if (alpha.startsWith("var(--tw-")) return value
+    return `color-mix(in srgb, ${value} calc(${alpha} * 100%), transparent)`
+  }) as unknown as string
+
 export const colors = {
   // ── Surfaces ──────────────────────────────────────────────────────────────
   // bg-base, bg-base-2, bg-base-deep
-  base: "var(--bg)",
-  "base-2": "var(--bg-2)",
-  "base-deep": "var(--bg-deep)",
+  base: tok("var(--bg)"),
+  "base-2": tok("var(--bg-2)"),
+  "base-deep": tok("var(--bg-deep)"),
   panel: {
-    DEFAULT: "var(--panel)",
-    2: "var(--panel-2)",
+    DEFAULT: tok("var(--panel)"),
+    2: tok("var(--panel-2)"),
   },
 
   // ── Hairlines / borders ───────────────────────────────────────────────────
   // border-line, border-line-2
   line: {
-    DEFAULT: "var(--line)",
-    2: "var(--line-2)",
+    DEFAULT: tok("var(--line)"),
+    2: tok("var(--line-2)"),
   },
 
   // ── Text ──────────────────────────────────────────────────────────────────
   // text-txt, text-txt-muted, text-txt-dim
   txt: {
-    DEFAULT: "var(--text)",
-    muted: "var(--muted)",
-    dim: "var(--dim)",
+    DEFAULT: tok("var(--text)"),
+    muted: tok("var(--muted)"),
+    dim: tok("var(--dim)"),
   },
 
   // ── Brand accent (orange) ─────────────────────────────────────────────────
   // bg-accent, text-accent, bg-accent-soft, border-accent-line
   accent: {
-    DEFAULT: "var(--accent)",
-    bright: "var(--accent-bright)",
-    soft: "var(--accent-soft)",
-    line: "var(--accent-line)",
-    ink: "var(--naranja-ink)",
+    DEFAULT: tok("var(--accent)"),
+    bright: tok("var(--accent-bright)"),
+    soft: tok("var(--accent-soft)"),
+    line: tok("var(--accent-line)"),
+    ink: tok("var(--naranja-ink)"),
   },
 
   // ── Status ────────────────────────────────────────────────────────────────
   ok: {
-    DEFAULT: "var(--ok)",
-    soft: "var(--ok-soft)",
+    DEFAULT: tok("var(--ok)"),
+    soft: tok("var(--ok-soft)"),
   },
   warn: {
-    DEFAULT: "var(--warn)",
-    soft: "var(--warn-soft)",
+    DEFAULT: tok("var(--warn)"),
+    soft: tok("var(--warn-soft)"),
   },
   bad: {
-    DEFAULT: "var(--bad)",
-    soft: "var(--bad-soft)",
+    DEFAULT: tok("var(--bad)"),
+    soft: tok("var(--bad-soft)"),
   },
   signal: {
-    DEFAULT: "var(--info)",
-    soft: "var(--info-soft)",
+    DEFAULT: tok("var(--info)"),
+    soft: tok("var(--info-soft)"),
   },
 }
 
@@ -74,7 +109,22 @@ export const colors = {
  *  Boffmedia-only layer. Size via --cut/--cut-lg/--cut-tag; override
  *  per-instance with e.g. `[--cut:4px]`. */
 export const geometry = plugin(({ addComponents }) => {
-  /** A --cut-w-wide band along one diagonal of a box, painted as a gradient so
+  /** Every diagonal stroke is drawn DIAG times the axis stroke. Two things
+   *  thin a non-axis-aligned line that the borders it continues never suffer:
+   *  it cannot sit on the pixel grid, so a 1px line is spread across two
+   *  pixel columns at ~50% each, and its outer edge lies exactly on the
+   *  clip-path, whose antialiasing fades the outer half-pixel. At 1px that
+   *  rendered as a dotted line beside solid borders. The target weight is √2,
+   *  the chamfer weight `.cut-frame` already has by construction (an inner
+   *  box inset by --cut-w on both axes puts its 45° edge --cut-w·√2 from the
+   *  outer one), so the `-edge` utilities and the frames share one optical
+   *  weight — but exactly √2 is a knife edge: on a 45° chamfer it puts the
+   *  band's inner edge on the pixel-centre lattice and a 1x screen rounds it
+   *  back to one pixel per row. 1.5 sits just past that and renders the same
+   *  two pixels per row a frame's chamfer does. */
+  const DIAG = "1.5"
+  const wd = `calc(var(--cut-w, 1px) * ${DIAG})`
+  /** A wd-wide band along one diagonal of a box, painted as a gradient so
    *  the colour can come from a custom property. `dir` is the gradient direction,
    *  which CSS defines as perpendicular to the diagonal joining the two corners
    *  it does NOT point at — so `to top right` bands the main (TL→BR) diagonal
@@ -84,20 +134,18 @@ export const geometry = plugin(({ addComponents }) => {
    *  `lo` = the low-percentage side (toward the gradient's origin corner), `hi`
    *  = the high side. The band is laid entirely on that side, never centred on
    *  the diagonal — the diagonal is exactly where the clip-path cuts, so a
-   *  centred band loses its outer half and renders at --cut-w / 2, which is what
-   *  makes a stroke read thinner than the border it continues. A CSS border
-   *  sits inside the border box; so does this.
+   *  centred band loses its outer half and renders at half width. A CSS
+   *  border sits inside the border box; so does this.
    *
    *  Each utility below passes its own `side` rather than deriving one: the
    *  answer depends on the shape, not just on which corner the pseudo is
    *  anchored to (`.cut-edge-slant`'s two halves sit on opposite sides while
    *  sharing a direction). */
   const band = (dir: string, side: "lo" | "hi") => {
-    const w = "var(--cut-w, 1px)"
     const c = "var(--cut-line, var(--line))"
     return side === "lo"
-      ? `linear-gradient(${dir}, transparent calc(50% - ${w}), ${c} 0 50%, transparent 0)`
-      : `linear-gradient(${dir}, transparent 50%, ${c} 0 calc(50% + ${w}), transparent 0)`
+      ? `linear-gradient(${dir}, transparent calc(50% - ${wd}), ${c} 0 50%, transparent 0)`
+      : `linear-gradient(${dir}, transparent 50%, ${c} 0 calc(50% + ${wd}), transparent 0)`
   }
   /** Places a chamfer stroke over one corner. Sized off the shape's own token
    *  and pulled out by --cut-w, because an absolutely positioned pseudo is laid
@@ -116,6 +164,25 @@ export const geometry = plugin(({ addComponents }) => {
     ...corner,
   })
   const out = "calc(var(--cut-w, 1px) * -1)"
+  /** One slanted side of a `.cut` parallelogram: the border box, clipped to a
+   *  strip straddling the slant line. Both slants lean the same way — left
+   *  runs (--cut, 0)→(0, 100%), right runs (100%, 0)→(100% − --cut, 100%) —
+   *  which is what makes the shape a parallelogram rather than a trapezoid.
+   *  The strip's outer points sit past the
+   *  edge (negative / >100% coordinates are fine in a polygon) so the shape's
+   *  clip, not this one, decides where the stroke ends. */
+  const slant = (side: "l" | "r") => ({
+    content: '""',
+    position: "absolute" as const,
+    inset: out,
+    background: "var(--cut-line, var(--line))",
+    clipPath:
+      side === "l"
+        ? `polygon(calc(var(--cut) - ${wd}) 0, calc(var(--cut) + ${wd}) 0, ${wd} 100%, calc(${wd} * -1) 100%)`
+        : `polygon(calc(100% - ${wd}) 0, calc(100% + ${wd}) 0, calc(100% - var(--cut) + ${wd}) 100%, calc(100% - var(--cut) - ${wd}) 100%)`,
+    zIndex: "2",
+    pointerEvents: "none" as const,
+  })
 
   addComponents({
     ".cut": {
@@ -167,14 +234,21 @@ export const geometry = plugin(({ addComponents }) => {
     // real paint, --cut-fill must name the surface the element sits on; a
     // genuinely transparent shape is not expressible here.
     //
-    // The inner clip reuses --cut over a box shortened by 2*--cut-w, so the slant
-    // is a hair steeper than the outer one: at the sizes the primitives use
-    // (--cut 3-10px, height 20-56px) the stroke drifts well under half a pixel.
+    // The inner clip reuses --cut over a box shortened by 2*--cut-w vertically
+    // and 2*--cut-ix horizontally, so the slant is a hair steeper than the
+    // outer one: at the sizes the primitives use (--cut 3-10px, height 20-56px)
+    // the stroke drifts well under half a pixel. --cut-ix is the horizontal
+    // inset, and so the slant's horizontal thickness: DIAG·--cut-w here, because
+    // the slant's outer edge is antialiased by the clip and a 1px diagonal
+    // reads thinner than the 1px rules above and below it (see DIAG). The
+    // chamfer variants reset it — their diagonals already come out at √2 from
+    // the plain inset, the weight DIAG is matched to.
     //
     // The shape lives in --cut-path so the `.cut-frame-*` variants below can
     // restroke every other cut geometry off one implementation.
     ".cut-frame": {
       "--cut-path": "polygon(var(--cut) 0, 100% 0, calc(100% - var(--cut)) 100%, 0 100%)",
+      "--cut-ix": wd,
       position: "relative",
       border: "0",
       background: "transparent",
@@ -193,7 +267,7 @@ export const geometry = plugin(({ addComponents }) => {
       "&::before": {
         content: '""',
         position: "absolute",
-        inset: "var(--cut-w, 1px)",
+        inset: "var(--cut-w, 1px) var(--cut-ix, var(--cut-w, 1px))",
         zIndex: "-1",
         background: "var(--cut-fill, var(--panel))",
         clipPath: "var(--cut-path)",
@@ -207,17 +281,21 @@ export const geometry = plugin(({ addComponents }) => {
     // is the same optical weight a mitred CSS border has.
     ".cut-frame-corner": {
       "--cut-path": "polygon(0 0, calc(100% - var(--cut-lg)) 0, 100% var(--cut-lg), 100% 100%, 0 100%)",
+      "--cut-ix": "var(--cut-w, 1px)",
     },
     ".cut-frame-seal": {
+      "--cut-ix": "var(--cut-w, 1px)",
       "--cut-path":
         "polygon(var(--cut) 0, 100% 0, 100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, 0 100%, 0 var(--cut))",
     },
     ".cut-frame-tag": {
+      "--cut-ix": "var(--cut-w, 1px)",
       "--cut-path":
         "polygon(0 0, 100% 0, 100% calc(100% - var(--cut-tag, 8px)), calc(100% - var(--cut-tag, 8px)) 100%, 0 100%)",
     },
     // Both corners of the leading edge chamfered (banners, heroes).
     ".cut-frame-notch": {
+      "--cut-ix": "var(--cut-w, 1px)",
       "--cut-path":
         "polygon(0 0, calc(100% - var(--cut-lg)) 0, 100% var(--cut-lg), 100% 100%, var(--cut-lg) 100%, 0 calc(100% - var(--cut-lg)))",
     },
@@ -227,8 +305,8 @@ export const geometry = plugin(({ addComponents }) => {
     // stroke; the pseudo insets shift because an absolutely positioned child
     // resolves against the PADDING box, which the padding has just shrunk.
     ".cut-frame-inset": {
-      padding: "var(--cut-w, 1px)",
-      "&::after": { inset: "calc(var(--cut-w, 1px) * -1)" },
+      padding: "var(--cut-w, 1px) var(--cut-ix, var(--cut-w, 1px))",
+      "&::after": { inset: "calc(var(--cut-w, 1px) * -1) calc(var(--cut-ix, var(--cut-w, 1px)) * -1)" },
       "&::before": { inset: "0" },
     },
     // ── chamfer strokes ────────────────────────────────────────────────────
@@ -250,6 +328,26 @@ export const geometry = plugin(({ addComponents }) => {
     ".cut-tag-edge": {
       position: "relative",
       "&::after": edge("var(--cut-tag, 8px)", "to bottom right", "lo", { bottom: out, right: out }),
+    },
+    // Replaced elements (<input>, <select>, <textarea>) never render ::after, so
+    // the stroke above silently vanishes on every native form control while the
+    // clip-path still cuts the corner. Paint the same band as a background tile
+    // instead, anchored to the border box (where clip-path measures from) so the
+    // tile's diagonal lands exactly on the cut. `bg-*` utilities only set
+    // background-color, so the image layers on top of them without a fight.
+    //
+    // A control that needs its own image layers (Select's caret) must not set
+    // `background-image` itself — that would replace this one. It hands them
+    // over through --ctl-bg / --ctl-bg-size / --ctl-bg-pos instead and they are
+    // stacked above the band; `none` is a valid (empty) image layer, so the
+    // defaults cost nothing.
+    "input.cut-tag-edge, select.cut-tag-edge, textarea.cut-tag-edge": {
+      backgroundImage: `var(--ctl-bg, none), ${band("to bottom right", "lo")}`,
+      backgroundSize: "var(--ctl-bg-size, auto), var(--cut-tag, 8px) var(--cut-tag, 8px)",
+      backgroundPosition: "var(--ctl-bg-pos, 0 0), right bottom",
+      backgroundRepeat: "no-repeat",
+      backgroundOrigin: "border-box",
+      backgroundClip: "border-box",
     },
     // One-off chamfers that do not match a named shape: pick the corner and
     // size it with --cut-e (e.g. `cut-edge-bl [--cut-e:10px]`).
@@ -283,37 +381,33 @@ export const geometry = plugin(({ addComponents }) => {
     },
     // The parallelogram is the one shape whose left and right edges ARE the
     // diagonals, so the clip is right to discard those two borders — but then
-    // nothing strokes the slants. Each is the anti-diagonal of a --cut-wide,
-    // full-height box, so the same gradient band draws it at any height.
-    // The two slants keep OPPOSITE sides while sharing a direction — the
-    // parallelogram's interior is right of the left slant and left of the right
-    // one — which is why `side` is passed per pseudo rather than derived from
-    // the anchor corner.
+    // nothing strokes the slants. Each slant is a pseudo covering the whole
+    // border box (the same box the element's clip-path measures from, so
+    // --cut means the same thing in both), clipped to a strip 2·wd wide
+    // centred on the slant line. The element's clip discards the outer half,
+    // leaving a stroke wd wide (measured horizontally) inside the shape whose
+    // only antialiased edge is the clip's own.
+    //
+    // Not a gradient band like the chamfers above: a band lives inside a
+    // --cut-wide box whose anti-diagonal is the slant, and where that
+    // diagonal meets the box's top or bottom the interior side of the stroke
+    // falls OUTSIDE the box, so the top rows of a left slant (and the bottom
+    // rows of a right one) went unpainted — the stroke stopped short of the
+    // horizontal rule it was meant to meet. A strip starts where the rule
+    // does.
     ".cut-edge-slant": {
       position: "relative",
-      "&::before": {
-        ...edge("var(--cut)", "to bottom right", "hi", { top: out, left: out }),
-        height: "calc(100% + var(--cut-w, 1px) * 2)",
-      },
-      "&::after": {
-        ...edge("var(--cut)", "to bottom right", "lo", { top: out, right: out }),
-        height: "calc(100% + var(--cut-w, 1px) * 2)",
-      },
+      "&::before": slant("l"),
+      "&::after": slant("r"),
     },
     // Half-parallelograms: only one side is slanted, the other stays square.
     ".cut-edge-slant-l": {
       position: "relative",
-      "&::after": {
-        ...edge("var(--cut)", "to bottom right", "hi", { top: out, left: out }),
-        height: "calc(100% + var(--cut-w, 1px) * 2)",
-      },
+      "&::after": slant("l"),
     },
     ".cut-edge-slant-r": {
       position: "relative",
-      "&::after": {
-        ...edge("var(--cut)", "to bottom right", "lo", { top: out, right: out }),
-        height: "calc(100% + var(--cut-w, 1px) * 2)",
-      },
+      "&::after": slant("r"),
     },
   })
 })

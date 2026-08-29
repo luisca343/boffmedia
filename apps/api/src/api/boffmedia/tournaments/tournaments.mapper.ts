@@ -21,9 +21,20 @@ export function toRosterMember(r: TournamentRosterMember): RosterMember {
   return { id: r.id, userId: r.userId, name: r.name, role: r.role };
 }
 
+/**
+ * Viewer-scoped extras. Both default to null, so every caller that does not
+ * deliberately pass them (the match page, the public participants list) cannot
+ * leak a sheet by omission.
+ */
+export interface CompetitorExtras {
+  teamsheet?: TeamsheetMonDto[] | null;
+  entryGaps?: string[] | null;
+}
+
 export function toCompetitor(
   p: TournamentParticipant,
   roster?: TournamentRosterMember[],
+  extras?: CompetitorExtras,
 ): Competitor {
   return {
     id: String(p.id),
@@ -40,6 +51,8 @@ export function toCompetitor(
     score: p.score,
     verified: p.verified,
     roster: roster && roster.length ? roster.map(toRosterMember) : undefined,
+    teamsheet: extras?.teamsheet ?? null,
+    entryGaps: extras?.entryGaps ?? null,
   };
 }
 

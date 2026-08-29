@@ -14,12 +14,12 @@ function useAchievementsList() {
   return { data: achievements as Achievement[] | undefined, error, isLoading, refetch }
 }
 
-const RARITY: Record<string, string> = {
-  bronze: "text-amber-300 border-amber-700/50 bg-amber-700/20",
-  silver: "text-slate-300 border-slate-400/40 bg-slate-400/15",
-  gold: "text-yellow-300 border-yellow-500/40 bg-yellow-500/15",
-  platinum: "text-cyan-300 border-cyan-500/40 bg-cyan-500/15",
-  diamond: "text-sky-300 border-sky-500/40 bg-sky-500/15",
+const RARITY_TONE: Record<string, "amber" | "default" | "accent"> = {
+  bronze: "amber",
+  silver: "default",
+  gold: "amber",
+  platinum: "accent",
+  diamond: "accent",
 }
 
 export function AchievementsAdmin() {
@@ -30,6 +30,7 @@ export function AchievementsAdmin() {
       <AdminCrud<Achievement>
         useList={useAchievementsList}
         FormComponent={AchievementForm}
+        viewHref={() => "/logros"}
         onCreate={async (data: any) => {
           const { id, eventId, ...createData } = data
           await EventsService.createAchievement(eventId, createData)
@@ -37,9 +38,6 @@ export function AchievementsAdmin() {
         onUpdate={async (id, data: any) => {
           const { id: _id, eventId, ...updateData } = data
           await EventsService.updateAchievement(eventId, Number(id), updateData)
-        }}
-        onDelete={async () => {
-          /* achievement deletion endpoint not wired — see admin roadmap */
         }}
         searchFields={["name", "description"]}
         entityName={{ singular: t("singular"), plural: t("plural") }}
@@ -59,7 +57,7 @@ export function AchievementsAdmin() {
             <span className="text-sm font-mono text-txt-muted">{a.points}</span>
           )},
           { key: "rarity", label: t("colRarity"), render: (a) => (
-            <AvPill tone="default" className={RARITY[a.rarity ?? ""]}>
+            <AvPill tone={RARITY_TONE[a.rarity ?? ""] ?? "default"}>
               {a.rarity ?? "—"}
             </AvPill>
           )},

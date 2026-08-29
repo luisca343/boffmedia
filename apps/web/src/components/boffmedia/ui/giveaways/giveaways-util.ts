@@ -89,8 +89,8 @@ export const SRT_SOURCE: Record<SrtSourceKey, { icon: IconName }> = {
   manual: { icon: "list" },
 }
 
-// Weighted-reel segment colours (mirrors SRT_REEL_COLORS).
-export const SRT_REEL_COLORS = ["var(--accent)", "#4da3ff", "#7c5cff", "#34d377", "#ffb224", "#ff6f9c", "#2dd4bf", "#c084fc"]
+// Weighted-reel segment colours (re-exported from draw-util to avoid duplication).
+export { SRT_COLORS as SRT_REEL_COLORS } from "./draw-util"
 
 // Fixed reference «now» so lifecycle status is deterministic (demo data). [deferred]
 export const SRT_NOW = new Date("2026-07-09T12:00:00")

@@ -13,6 +13,7 @@ import {
   TIEBREAK_PROFILE,
   PROPOSAL_STATE,
   MATCH_MESSAGE_KIND,
+  TEAMSHEET_VISIBILITY,
 } from '@/_db/schema/BoffMediaTournaments';
 
 export type TournamentFormat =
@@ -23,6 +24,8 @@ export type TournamentStatus =
   (typeof TOURNAMENT_STATUS)[keyof typeof TOURNAMENT_STATUS];
 export type TournamentMetric =
   (typeof TOURNAMENT_METRIC)[keyof typeof TOURNAMENT_METRIC];
+export type TeamsheetVisibility =
+  (typeof TEAMSHEET_VISIBILITY)[keyof typeof TEAMSHEET_VISIBILITY];
 export type ParticipantStatus =
   (typeof TOURNAMENT_PARTICIPANT_STATUS)[keyof typeof TOURNAMENT_PARTICIPANT_STATUS];
 export type MatchBracket = (typeof MATCH_BRACKET)[keyof typeof MATCH_BRACKET];

@@ -11,10 +11,22 @@ export const INPUT_BASE = cn(
   "disabled:opacity-[0.42] disabled:cursor-not-allowed",
 )
 
-export type InputProps = React.InputHTMLAttributes<HTMLInputElement>
+/** The compact scale, shared with Select: the 32px box Button and IconButton
+ *  use for `sm`, so a toolbar of mixed controls sits on one line. Declared once
+ *  here rather than as `h-8 py-0 …` overrides at every call site — those only
+ *  worked by out-arguing INPUT_BASE through tailwind-merge. */
+export const INPUT_SM = "h-8 py-0 px-2.5 text-[12.5px]"
 
-export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input({ className, ...props }, ref) {
-  return <input ref={ref} className={cn(INPUT_BASE, className)} {...props} />
+export type InputSize = "sm" | "md"
+
+/** The native `size` attribute (a character width nobody set) gives way to the
+ *  control scale, matching Button. */
+export type InputProps = Omit<React.InputHTMLAttributes<HTMLInputElement>, "size"> & {
+  size?: InputSize
+}
+
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Input({ className, size, ...props }, ref) {
+  return <input ref={ref} className={cn(INPUT_BASE, size === "sm" && INPUT_SM, className)} {...props} />
 })
 
 export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>

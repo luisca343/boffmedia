@@ -2,15 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-
-// Shared compact input chassis.
-export const INPUT_CLASS = cn(
-  "w-full font-body text-[13px]/[1.3] text-txt",
-  "bg-base [[data-theme=light]_&]:bg-panel-2 border border-solid border-line-2 px-[10px] py-[7px]",
-  "cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:7px]",
-  "transition-[border-color] duration-[140ms] outline-none focus:border-accent",
-  "placeholder:text-txt-dim",
-)
+import { Input as KitInput, Select as KitSelect, type SelectOption, type InputProps as KitInputProps } from "@boffmedia/ui"
 
 // labelled field wrapper.
 export function Field({ label, children, className }: { label: React.ReactNode; children: React.ReactNode; className?: string }) {
@@ -24,27 +16,16 @@ export function Field({ label, children, className }: { label: React.ReactNode; 
 
 export const Input = React.forwardRef<
   HTMLInputElement,
-  React.InputHTMLAttributes<HTMLInputElement> & { error?: boolean }
->(function Input({ className, error, type, ...props }, ref) {
+  KitInputProps & { error?: boolean }
+>(function Input({ className, error, ...props }, ref) {
   return (
-    <input
+    <KitInput
       ref={ref}
-      type={type}
-      className={cn(INPUT_CLASS, type === "number" && "font-mono text-[12px]", error && "border-bad", className)}
+      className={cn(props.type === "number" && "font-mono", error && "border-bad", className)}
       {...props}
     />
   )
 })
-
-// CSS-drawn caret for the select.
-const CARET: React.CSSProperties = {
-  appearance: "none",
-  backgroundImage:
-    "linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%)",
-  backgroundPosition: "calc(100% - 14px) 55%, calc(100% - 10px) 55%",
-  backgroundSize: "4px 4px",
-  backgroundRepeat: "no-repeat",
-}
 
 export interface SelectProps {
   value: string
@@ -55,24 +36,20 @@ export interface SelectProps {
 }
 
 export function Select({ value, options, onChange, ariaLabel, className }: SelectProps) {
+  const selectOptions: SelectOption[] = options.map((o) => {
+    const v = typeof o === "object" ? o.value : o
+    const l = typeof o === "object" ? o.label : o
+    return { value: v, label: l }
+  })
+
   return (
-    <select
-      className={cn(INPUT_CLASS, "cursor-pointer pr-[26px]", className)}
-      style={CARET}
+    <KitSelect
       value={value}
-      aria-label={ariaLabel}
-      onChange={(e) => onChange(e.target.value)}
-    >
-      {options.map((o) => {
-        const v = typeof o === "object" ? o.value : o
-        const l = typeof o === "object" ? o.label : o
-        return (
-          <option key={v} value={v}>
-            {l}
-          </option>
-        )
-      })}
-    </select>
+      options={selectOptions}
+      onChange={onChange}
+      ariaLabel={ariaLabel}
+      className={className}
+    />
   )
 }
 

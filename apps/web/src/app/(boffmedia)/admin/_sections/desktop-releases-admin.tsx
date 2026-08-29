@@ -2,14 +2,14 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Empty, Field, Icon, Input, ReleaseRow, Select, Spinner, Textarea, toast } from "@boffmedia/ui"
+import { Button, ConfirmDialog, Empty, Field, Icon, Input, ReleaseRow, Select, Spinner, Textarea, toast } from "@boffmedia/ui"
 import type { DesktopReleaseEntity } from "@boffmedia/shared"
 
 import {
   DesktopReleasesService,
   type DesktopTarget,
 } from "@/services/api/boffmedia/desktopReleasesService"
-import { AvAlert, AvKpi, AvKpis, AvPanel, AvPill, AvSectionHead } from "../_components/ui/av-kit"
+import { AvAlert, AvKpi, AvKpis, AvPanel, AvPill, AvSectionHead, formatAdminDate } from "../_components/ui/av-kit"
 
 const VERSION_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/
 
@@ -49,6 +49,7 @@ export function DesktopReleasesAdmin() {
   const [signatureFile, setSignatureFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
   const [busyId, setBusyId] = useState<number | null>(null)
+  const [confirmPublish, setConfirmPublish] = useState<DesktopReleaseEntity | null>(null)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -117,31 +118,37 @@ export function DesktopReleasesAdmin() {
     }
   }
 
-  const togglePublished = async (release: DesktopReleaseEntity) => {
-    setBusyId(release.id)
+  const handleConfirmPublish = async () => {
+    if (!confirmPublish) return
+    setBusyId(confirmPublish.id)
     try {
-      const response = release.published
-        ? await DesktopReleasesService.unpublish(release.id)
-        : await DesktopReleasesService.publish(release.id)
+      const response = confirmPublish.published
+        ? await DesktopReleasesService.unpublish(confirmPublish.id)
+        : await DesktopReleasesService.publish(confirmPublish.id)
       if (!response.success) {
         toast({
           tone: "bad",
-          title: release.published ? t("unpublishFailed") : t("publishFailed"),
+          title: confirmPublish.published ? t("unpublishFailed") : t("publishFailed"),
           msg: response.userMessage ?? t("tryAgain"),
         })
         return
       }
-      toast({ tone: "ok", title: release.published ? t("unpublished") : t("published") })
+      toast({ tone: "ok", title: confirmPublish.published ? t("unpublished") : t("published") })
+      setConfirmPublish(null)
       await reload()
     } catch {
       toast({
         tone: "bad",
-        title: release.published ? t("unpublishFailed") : t("publishFailed"),
+        title: confirmPublish.published ? t("unpublishFailed") : t("publishFailed"),
         msg: t("tryAgain"),
       })
     } finally {
       setBusyId(null)
     }
+  }
+
+  const togglePublished = (release: DesktopReleaseEntity) => {
+    setConfirmPublish(release)
   }
 
   const copyHash = async (hash: string) => {
@@ -259,7 +266,7 @@ export function DesktopReleasesAdmin() {
                     hashFull={release.artifactSha512}
                     onCopyHash={() => void copyHash(release.artifactSha512)}
                     copyLabel={t("copyHash")}
-                    date={publishedAt ? new Date(publishedAt).toLocaleDateString() : undefined}
+                    date={publishedAt ? formatAdminDate(publishedAt) : undefined}
                     actions={
                       <Button size="sm" variant={release.published ? "ghost" : "pri"} icon={release.published ? "x" : "check"} loading={busyId === release.id} onClick={() => void togglePublished(release)}>
                         {release.published ? t("unpublish") : t("publish")}
@@ -272,6 +279,15 @@ export function DesktopReleasesAdmin() {
           )}
         </AvPanel>
       </div>
+
+      <ConfirmDialog
+        open={confirmPublish !== null}
+        title={confirmPublish?.published ? t("confirmUnpublish") : t("confirmPublish")}
+        body={confirmPublish ? t(confirmPublish.published ? "confirmUnpublishLead" : "confirmPublishLead", { version: confirmPublish.version }) : ""}
+        tone={confirmPublish?.published ? "error" : "warning"}
+        onClose={() => setConfirmPublish(null)}
+        onConfirm={() => void handleConfirmPublish()}
+      />
     </div>
   )
 }

@@ -1,9 +1,11 @@
+import { useEffect, useState } from "react"
 import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useTranslations } from "next-intl"
 import { Button, Field, Input, Select } from "@boffmedia/ui"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
+import { UsersService } from "@/services/api/boffmedia/usersService"
 
 const teamSchema = z.object({
   id: z.number().optional(),
@@ -11,6 +13,7 @@ const teamSchema = z.object({
   tag: z.string().max(5).optional(),
   icon: z.string().optional(),
   eventId: z.number(),
+  leaderId: z.number().int().min(1),
 })
 
 export type TeamFormValues = z.infer<typeof teamSchema>
@@ -26,14 +29,36 @@ interface TeamFormProps {
 export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, submitLabel }: TeamFormProps) {
   const t = useTranslations("admin.form")
   const { events, isLoading: isLoadingEvents } = useGetEvents()
+  const [users, setUsers] = useState<{ id: number; username: string }[]>([])
+  const [isLoadingUsers, setIsLoadingUsers] = useState(true)
+  useEffect(() => {
+    let cancelled = false
+    UsersService.getUsers(2000)
+      .then((r) => {
+        if (cancelled) return
+        const list = (r.data as { users?: { id: number; username: string }[] } | undefined)?.users ?? []
+        setUsers(list.map((u) => ({ id: u.id, username: u.username })))
+      })
+      .finally(() => {
+        if (!cancelled) setIsLoadingUsers(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
   const { register, handleSubmit, control, formState: { errors } } = useForm<TeamFormValues>({
     resolver: zodResolver(teamSchema),
-    defaultValues: defaultValues || { name: "", tag: "", icon: "", eventId: 0 },
+    defaultValues: defaultValues || { name: "", tag: "", icon: "", eventId: 0, leaderId: 0 },
   })
 
   const eventOptions = [
     { value: "", label: isLoadingEvents ? t("team.eventLoading") : t("team.eventPlaceholder") },
     ...(events?.map((e) => ({ value: String(e.id), label: e.title })) ?? []),
+  ]
+
+  const leaderOptions = [
+    { value: "", label: isLoadingUsers ? t("team.leaderLoading") : t("team.leaderPlaceholder") },
+    ...users.map((u) => ({ value: String(u.id), label: u.username })),
   ]
 
   return (
@@ -62,13 +87,29 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
         )}
       />
 
+      <Controller
+        control={control}
+        name="leaderId"
+        render={({ field }) => (
+          <Select
+            label={t("team.leaderLabel")}
+            hint={t("team.leaderHint")}
+            error={errors.leaderId?.message}
+            value={field.value ? String(field.value) : ""}
+            options={leaderOptions}
+            disabled={isLoadingUsers}
+            onChange={(v) => field.onChange(v ? Number(v) : 0)}
+          />
+        )}
+      />
+
       <Field label={t("team.iconLabel")} hint={t("team.iconHint")} error={errors.icon?.message}>
         <Input placeholder="https://example.com/icon.jpg" {...register("icon")} />
       </Field>
 
       <div className="flex justify-end gap-2.5 pt-2">
         <Button type="button" variant="ghost" onClick={onCancel}>{t("cancel")}</Button>
-        <Button type="submit" variant="pri" loading={isSubmitting} disabled={isSubmitting || isLoadingEvents}>{submitLabel}</Button>
+        <Button type="submit" variant="pri" loading={isSubmitting} disabled={isSubmitting || isLoadingEvents || isLoadingUsers}>{submitLabel}</Button>
       </div>
     </form>
   )

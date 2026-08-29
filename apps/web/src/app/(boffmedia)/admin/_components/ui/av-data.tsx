@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, Avatar, Badge, IconButton, Spinner, type IconName } from "@boffmedia/ui"
+import { Icon, Avatar, Badge, IconButton, Spinner, Table, type IconName, type SortState } from "@boffmedia/ui"
 import { useFormat } from "@boffmedia/ui/useFormat"
 import { AvPill, AvLiveDot } from "./av-kit"
 
@@ -27,8 +27,8 @@ export function RowActions({ onEdit, onDelete }: { onEdit?: () => void; onDelete
   const t = useTranslations("data")
   return (
     <div className="flex flex-none items-center gap-1.5">
-      <IconButton name="edit" label={t("editLabel")} size={15} className="!h-8 !w-8" onClick={onEdit} />
-      <IconButton name="trash" label={t("deleteLabel")} size={15} className="!h-8 !w-8" onClick={onDelete} />
+      <IconButton name="edit" label={t("editLabel")} size="sm" onClick={onEdit} />
+      <IconButton name="trash" label={t("deleteLabel")} size="sm" onClick={onDelete} />
     </div>
   )
 }
@@ -112,9 +112,9 @@ export function MemberRow({
         </div>
       </div>
       <div className="flex flex-none items-center gap-1.5">
-        <IconButton name="eye" label={t("viewProfile")} size={15} className="!h-8 !w-8" onClick={onView} />
-        {member.status !== "banned" && <IconButton name="minus" label={t("muteLabel")} size={15} className="!h-8 !w-8" onClick={onMute} />}
-        <IconButton name="shield" label={t("banLabel")} size={15} className="!h-8 !w-8" onClick={onBan} />
+        <IconButton name="eye" label={t("viewProfile")} size="sm" onClick={onView} />
+        {member.status !== "banned" && <IconButton name="minus" label={t("muteLabel")} size="sm" onClick={onMute} />}
+        <IconButton name="shield" label={t("banLabel")} size="sm" onClick={onBan} />
       </div>
     </AvRow>
   )
@@ -138,16 +138,20 @@ export function AvDataGrid<T extends Record<string, React.ReactNode> & { id?: nu
 }: {
   columns: AvColumn<T>[]
   rows: T[]
-  initialSort?: { key: string; dir: 1 | -1 }
+  initialSort?: SortState
 }) {
-  const [sort, setSort] = React.useState<{ key: string; dir: 1 | -1 } | null>(initialSort || null)
-  const toggle = (c: AvColumn<T>) =>
-    setSort((s) => (s && s.key === c.key ? (s.dir === 1 ? { key: c.key, dir: -1 } : null) : { key: c.key, dir: 1 }))
-  let view = rows
-  if (sort) {
+  // The markup was a byte-for-byte copy of the kit's `Table`; only the sorting
+  // was ever its own. `Table` now draws the affordance and reports intent, so
+  // this keeps just the part that is genuinely local: how a column compares.
+  const [sort, setSort] = React.useState<SortState | null>(initialSort ?? null)
+
+  const view = React.useMemo(() => {
+    if (!sort) return rows
     const col = columns.find((c) => c.key === sort.key)
-    const val = (r: T) => (col && col.sortValue ? col.sortValue(r) : (r[sort.key] as unknown as string | number))
-    view = [...rows].sort((a, b) => {
+    // A cell is a ReactNode, so a column that renders one sorts by `sortValue`
+    // when it has one and by the stringified node otherwise.
+    const val = (r: T) => (col?.sortValue ? col.sortValue(r) : (r[sort.key] as unknown as string | number))
+    return [...rows].sort((a, b) => {
       const x = val(a)
       const y = val(b)
       const nx = parseFloat(String(x).replace(/[^\d.-]/g, ""))
@@ -155,55 +159,22 @@ export function AvDataGrid<T extends Record<string, React.ReactNode> & { id?: nu
       if (!isNaN(nx) && !isNaN(ny)) return (nx - ny) * sort.dir
       return String(x).localeCompare(String(y)) * sort.dir
     })
-  }
+  }, [rows, columns, sort])
+
   return (
-    <div className="w-full overflow-x-auto">
-      <table className="w-full min-w-[420px] border-collapse border border-solid border-line bg-panel">
-        <thead>
-          <tr>
-            {columns.map((c) => {
-              const sorted = sort?.key === c.key
-              return (
-                <th
-                  key={c.key}
-                  aria-sort={sorted ? (sort!.dir === 1 ? "ascending" : "descending") : undefined}
-                  className={cn(
-                    "border-b-2 border-solid border-line-2 bg-panel-2 px-4 py-3 text-left font-mono text-[10px]/none font-semibold uppercase tracking-[0.14em] text-txt-muted",
-                    c.align === "right" && "text-right",
-                  )}
-                >
-                  {c.sortable ? (
-                    <button type="button" onClick={() => toggle(c)} className="inline-flex items-center gap-1.5 uppercase tracking-[inherit] hover:text-txt">
-                      {c.label}
-                      <Icon name="chevron" size={13} className={cn(sorted ? "text-accent" : "text-txt-dim", sorted && sort!.dir === -1 && "[transform:scaleY(-1)]")} />
-                    </button>
-                  ) : (
-                    c.label
-                  )}
-                </th>
-              )
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {view.map((r, i) => (
-            <tr key={r.id != null ? r.id : i} className="transition-[background] duration-[140ms] hover:bg-panel-2">
-              {columns.map((c) => (
-                <td
-                  key={c.key}
-                  className={cn(
-                    "border-b border-solid border-line px-4 py-3 text-[15px] [tr:last-child_&]:border-b-0",
-                    c.align === "right" && "text-right font-mono text-[13px]/none",
-                  )}
-                >
-                  {r[c.key]}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+    <Table
+      columns={columns.map((c) => ({
+        key: c.key,
+        label: c.label,
+        align: c.align,
+        sortable: c.sortable,
+        numeric: c.align === "right",
+      }))}
+      rows={view}
+      rowKey={(r, i) => ((r as T).id != null ? ((r as T).id as React.Key) : i)}
+      sort={sort}
+      onSortChange={setSort}
+    />
   )
 }
 

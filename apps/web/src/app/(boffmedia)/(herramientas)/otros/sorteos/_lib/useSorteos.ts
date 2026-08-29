@@ -1,77 +1,14 @@
 "use client"
 
 import * as React from "react"
+import { type Entrant, type HistoryRound, type Draw, type Phase, hashSeed, makeRng, pickWinners, parseLine, oddsOf, initials } from "@/components/boffmedia/ui/giveaways/draw-util"
+import { type SrtDrawMode, SRT_DRAW_MODES } from "@/components/boffmedia/ui/giveaways/draw-stage"
 
-export interface Entrant {
-  id: string
-  name: string
-  weight: number
-}
-export interface HistoryRound {
-  round: number
-  seed: string
-  at: number
-  winners: { name: string; weight: number }[]
-}
-export interface Draw {
-  seed: string
-  winners: Entrant[]
-  pool: Entrant[]
-  weighted: boolean
-}
-export type Phase = "setup" | "spin" | "reveal"
-export type DrawMode = "reel" | "wheel" | "spot"
+// Re-export for backward compatibility
+export type { Entrant, HistoryRound, Draw, Phase, SrtDrawMode }
+export { hashSeed, makeRng, pickWinners, parseLine, oddsOf, initials, SRT_DRAW_MODES }
 
 const LS_KEY = "bm_srt_v1"
-
-/* ── deterministic PRNG (mulberry32) — same seed + same list ⇒ same result ── */
-export function hashSeed(str: string): number {
-  const s = String(str)
-  let h = 1779033703 ^ s.length
-  for (let i = 0; i < s.length; i++) {
-    h = Math.imul(h ^ s.charCodeAt(i), 3432918353)
-    h = (h << 13) | (h >>> 19)
-  }
-  return h >>> 0
-}
-export function makeRng(seed: number): () => number {
-  let a = seed >>> 0
-  return function () {
-    a |= 0
-    a = (a + 0x6d2b79f5) | 0
-    let t = Math.imul(a ^ (a >>> 15), 1 | a)
-    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-export function pickWinners(pool: Entrant[], n: number, rng: () => number, weighted: boolean): Entrant[] {
-  const items = pool.slice()
-  const out: Entrant[] = []
-  for (let k = 0; k < n && items.length; k++) {
-    const total = items.reduce((s, e) => s + (weighted ? Math.max(1, e.weight || 1) : 1), 0)
-    let r = rng() * total
-    let idx = 0
-    for (let i = 0; i < items.length; i++) {
-      r -= weighted ? Math.max(1, items[i].weight || 1) : 1
-      idx = i
-      if (r <= 0) break
-    }
-    out.push(items[idx])
-    items.splice(idx, 1)
-  }
-  return out
-}
-export function oddsOf(pool: Entrant[], entrant: Entrant, weighted: boolean): number {
-  const total = pool.reduce((s, e) => s + (weighted ? Math.max(1, e.weight || 1) : 1), 0) || 1
-  const w = weighted ? Math.max(1, entrant.weight || 1) : 1
-  return (w / total) * 100
-}
-export function initials(name: string): string {
-  const parts = String(name || "").trim().split(/\s+/).filter(Boolean)
-  if (!parts.length) return "?"
-  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
-  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase()
-}
 
 let UID = 0
 function uid() {
@@ -80,24 +17,11 @@ function uid() {
 function make(name: string, weight?: number): Entrant {
   return { id: uid(), name: name.trim(), weight: Math.max(1, weight || 1) }
 }
-// "Nombre" | "Nombre, 3" | "Nombre x3"
-export function parseLine(line: string): Entrant | null {
-  let s = line.trim()
-  if (!s) return null
-  let weight = 1
-  const m = s.match(/^(.*?)[,;]\s*(\d{1,3})\s*$/) || s.match(/^(.*?)\s*[x×]\s*(\d{1,3})\s*$/i)
-  if (m) {
-    s = m[1].trim()
-    weight = parseInt(m[2], 10) || 1
-  }
-  if (!s) return null
-  return make(s, weight)
-}
 
 interface Persisted {
   entrants: Entrant[]
   history: HistoryRound[]
-  cfg: { weighted?: boolean; exclude?: boolean; winnerCount?: number; drawMode?: DrawMode }
+  cfg: { weighted?: boolean; exclude?: boolean; winnerCount?: number; sound?: boolean; drawMode?: SrtDrawMode }
 }
 function load(): Persisted {
   if (typeof window === "undefined") return { entrants: [], history: [], cfg: {} }
@@ -121,7 +45,8 @@ export function useSorteos() {
   const [weighted, setWeighted] = React.useState(false)
   const [exclude, setExclude] = React.useState(true)
   const [winnerCount, setWinnerCount] = React.useState(1)
-  const [drawMode, setDrawMode] = React.useState<DrawMode>("reel")
+  const [sound, setSound] = React.useState(true)
+  const [drawMode, setDrawMode] = React.useState<SrtDrawMode>("reel")
 
   const [phase, setPhase] = React.useState<Phase>("setup")
   const [draw, setDraw] = React.useState<Draw | null>(null)
@@ -134,18 +59,22 @@ export function useSorteos() {
     setWeighted(!!s.cfg.weighted)
     setExclude(s.cfg.exclude !== false)
     setWinnerCount(s.cfg.winnerCount || 1)
-    setDrawMode(s.cfg.drawMode || "reel")
+    setSound(s.cfg.sound !== false)
+    const mode = s.cfg.drawMode || "reel"
+    if (SRT_DRAW_MODES.includes(mode)) {
+      setDrawMode(mode)
+    }
     setReady(true)
   }, [])
 
   React.useEffect(() => {
     if (!ready) return // don't clobber storage before the load effect has run
     try {
-      localStorage.setItem(LS_KEY, JSON.stringify({ entrants, history, cfg: { weighted, exclude, winnerCount, drawMode } }))
+      localStorage.setItem(LS_KEY, JSON.stringify({ entrants, history, cfg: { weighted, exclude, winnerCount, sound, drawMode } }))
     } catch {
       /* noop */
     }
-  }, [ready, entrants, history, weighted, exclude, winnerCount, drawMode])
+  }, [ready, entrants, history, weighted, exclude, winnerCount, sound, drawMode])
 
   const wonNames = React.useMemo(() => new Set(history.flatMap((r) => r.winners.map((w) => w.name))), [history])
   const pool = React.useMemo(() => (exclude ? entrants.filter((e) => !wonNames.has(e.name)) : entrants), [entrants, exclude, wonNames])
@@ -160,8 +89,9 @@ export function useSorteos() {
     setEntrants((p) => [...p, make(n, weight)])
   }, [])
   const addBulk = React.useCallback((text: string) => {
-    const rows = text.split("\n").map(parseLine).filter((r): r is Entrant => r != null)
-    if (!rows.length) return 0
+    const parsed = text.split("\n").map(parseLine).filter((r): r is { name: string; weight: number } => r != null)
+    if (!parsed.length) return 0
+    const rows = parsed.map((r) => make(r.name, r.weight))
     setEntrants((p) => [...p, ...rows])
     return rows.length
   }, [])
@@ -191,36 +121,45 @@ export function useSorteos() {
     setPhase("spin")
   }, [pool, effCount, weighted])
 
+  const drawRef = React.useRef<Draw | null>(null)
   const onLand = React.useCallback(() => {
     setPhase("reveal")
-    setDraw((d) => {
-      if (!d) return d
+    // Use the ref to capture the draw value; don't call setHistory inside a setDraw updater
+    // (side effects in updaters cause duplicated rows under StrictMode).
+    if (drawRef.current) {
+      const d = drawRef.current
       setHistory((h) => [
         { round: h.length + 1, seed: d.seed, at: Date.now(), winners: d.winners.map((w) => ({ name: w.name, weight: w.weight })) },
         ...h,
       ])
-      return d
-    })
+    }
   }, [])
+
+  // Update the ref whenever draw changes, so onLand can access it.
+  React.useEffect(() => {
+    drawRef.current = draw
+  }, [draw])
 
   const drawAgain = React.useCallback(() => {
     setPhase("setup")
     setDraw(null)
   }, [])
+
   const removeDrawn = React.useCallback(() => {
-    setDraw((d) => {
-      if (d) {
-        const ids = new Set(d.winners.map((w) => w.id))
-        setEntrants((p) => p.filter((e) => !ids.has(e.id)))
-      }
-      return null
-    })
+    let removed = 0
+    if (drawRef.current) {
+      const ids = new Set(drawRef.current.winners.map((w) => w.id))
+      removed = drawRef.current.winners.length
+      setEntrants((p) => p.filter((e) => !ids.has(e.id)))
+    }
+    setDraw(null)
     setPhase("setup")
+    return removed
   }, [])
 
   return {
-    entrants, history, weighted, exclude, winnerCount, drawMode,
-    setWeighted, setExclude, setWinnerCount, setDrawMode,
+    entrants, history, weighted, exclude, winnerCount, sound, drawMode,
+    setWeighted, setExclude, setWinnerCount, setSound, setDrawMode,
     phase, draw, pool, maxWinners, effCount, totalWeight, wonNames,
     addOne, addBulk, rename, setWeight, removeOne, shuffle, clearAll, resetHistory,
     runDraw, onLand, drawAgain, removeDrawn,

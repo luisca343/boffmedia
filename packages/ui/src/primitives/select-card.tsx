@@ -25,6 +25,7 @@ export function SelectCard({ selected, onChange, title, description, icon, class
       className={cn(
         "flex items-start gap-3 border border-solid bg-panel p-[15px] text-left",
         "transition-[border-color,background] duration-[140ms]",
+        "focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-[3px]",
         selected ? "border-accent bg-accent-soft" : "border-line-2 hover:border-accent-line",
         className,
       )}

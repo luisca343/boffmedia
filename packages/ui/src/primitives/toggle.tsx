@@ -24,7 +24,7 @@ export function Toggle({ on, onChange, label, ariaLabel, className }: ToggleProp
       aria-checked={!!on}
       aria-label={label ? undefined : ariaLabel}
       onClick={() => onChange?.(!on)}
-      className={cn("inline-flex items-center gap-3 cursor-pointer", className)}
+      className={cn("inline-flex items-center gap-3 cursor-pointer focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-[3px]", className)}
     >
       <span
         className={cn(

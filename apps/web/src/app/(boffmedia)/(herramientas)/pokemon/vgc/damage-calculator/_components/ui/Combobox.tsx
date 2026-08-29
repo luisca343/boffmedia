@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { INPUT_CLASS } from "./controls"
+import { Input } from "@boffmedia/ui"
 
 export interface ComboboxProps<T> {
   value: string
@@ -74,8 +74,7 @@ export function Combobox<T>({
 
   return (
     <div className="relative min-w-0" ref={ref}>
-      <input
-        className={INPUT_CLASS}
+      <Input
         value={q}
         placeholder={placeholder}
         role="combobox"

@@ -3,11 +3,10 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Button, Icon } from "@boffmedia/ui"
+import { Button, Icon, Input } from "@boffmedia/ui"
 import { SideDrawer } from "./ui/SideDrawer"
 import { Callout } from "./ui/Callout"
 import { PokemonSprite } from "./ui/PokemonSprite"
-import { INPUT_CLASS } from "./ui/controls"
 import { useCalculatorStore } from "../_store/calculatorStore"
 
 // save / load / delete team groups (localStorage-backed).
@@ -36,8 +35,7 @@ export function SavedDrawer({ onClose }: { onClose: () => void }) {
   return (
     <SideDrawer title={ts("title")} icon="bookmark" onClose={onClose}>
       <div className="mb-4 flex gap-2">
-        <input
-          className={INPUT_CLASS}
+        <Input
           value={name}
           placeholder={ts("namePlaceholder")}
           aria-label={ts("namePlaceholder")}

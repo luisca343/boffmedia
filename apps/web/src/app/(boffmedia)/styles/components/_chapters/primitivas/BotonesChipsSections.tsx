@@ -105,10 +105,13 @@ export function BotonesChipsSections() {
             </Button>
           )}
         </Sample>
-        <Sample title="Avatares" code="<Avatar> · <AvatarGroup items max>">
+        <Sample title="Avatares" code="<Avatar size src> · <AvatarGroup items max>" note={<>Tres tamaños (24 / 36 / 64) y una imagen opcional que cae a las iniciales si falla. <code>sm</code> entra en una fila de tabla de 32 px o en una línea de selector.</>}>
+          <Avatar size="sm">AX</Avatar>
           <Avatar>AX</Avatar>
           <Avatar accent>NV</Avatar>
-          <Avatar lg>KR</Avatar>
+          <Avatar size="lg">KR</Avatar>
+          <Avatar src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><rect width='36' height='36' fill='%23ff5c0a'/><circle cx='18' cy='14' r='6' fill='%23120a04'/><path d='M6 34c2-8 22-8 24 0z' fill='%23120a04'/></svg>" alt="">AX</Avatar>
+          <Avatar size="sm" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'><rect width='36' height='36' fill='%23ff5c0a'/><circle cx='18' cy='14' r='6' fill='%23120a04'/><path d='M6 34c2-8 22-8 24 0z' fill='%23120a04'/></svg>" alt="">AX</Avatar>
           <AvatarGroup items={["AX", { label: "NV", accent: true }, "KR", "JR", "MG", "CL", "ZZ"]} max={5} />
         </Sample>
         <Sample title="Caja de icono" code="<IconBox icon tone size>" note={<>El patrón «icono en caja tintada»; los tonos semánticos siguen reservados a estado.</>}>

@@ -4,7 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Sample, Section } from "../../showcase-shared"
 import { DEMO_NOTIFS } from "../../showcase-data"
-import { Button, Crumbs, Pagination, Seg, Tabs } from "@boffmedia/ui"
+import { Button, Crumbs, Pagination, Seg, Stepper, Tabs } from "@boffmedia/ui"
 import { AccountMenu } from "@/components/boffmedia/ui/navigation/AccountNav"
 import { LangSwitcher } from "@/components/boffmedia/ui/navigation/LangSwitcher"
 import { NavDropdown } from "@/components/boffmedia/ui/navigation/NavDropdown"
@@ -31,6 +31,13 @@ export function NavegacionSections() {
               { value: "cores", label: "Parejas", count: 32 },
             ]}
           />
+        </Sample>
+        <Sample title="Pasos" code="<Stepper steps current rail muted>" col note={<>En línea para una nota de progreso; con <code>rail</code> se estira a lo ancho y colorea el tramo recorrido: la espina de una página con ciclo de vida. <code>muted</code> apaga todo cuando el proceso se cancela y la etiqueta de al lado dice por qué.</>}>
+          <div className="grid w-full gap-4">
+            <Stepper steps={["Datos", "Equipo", "Confirmar"]} current={1} />
+            <Stepper rail steps={["Borrador", "Inscripción", "En juego", "Finalizado"]} current={1} />
+            <Stepper rail muted steps={["Borrador", "Inscripción", "En juego", "Finalizado"]} current={1} />
+          </div>
         </Sample>
         <Sample title="Segmentado" code="<Seg>">
           <Seg value={seg} onChange={setSeg} options={[{ value: "dia", label: "Día" }, { value: "semana", label: "Semana" }, { value: "mes", label: "Mes" }]} />

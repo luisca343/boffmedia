@@ -42,7 +42,9 @@
       "joiningBattle": "Uniéndose al combate…",
       "waitingBattle": "Esperando a que comience el combate…",
       "reconnecting": "Reconectando (intento {attempt}/{max})…",
-      "forfeitConfirm": "¿Seguro que quieres rendirte?"
+      "forfeitConfirm": "¿Seguro que quieres rendirte?",
+      "forfeitTitle": "Rendirse",
+      "forfeitCta": "Rendirse"
     },
     "dock": {
       "waitingOpponent": "Esperando al rival…",

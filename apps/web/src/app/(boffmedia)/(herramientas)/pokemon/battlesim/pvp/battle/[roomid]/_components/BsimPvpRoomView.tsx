@@ -1,6 +1,7 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { ConfirmDialog } from '@boffmedia/ui';
 import { useState, useRef, useEffect, useCallback, use } from 'react';
 import { Protocol } from '@pkmn/protocol';
 import { Socket } from 'socket.io-client';
@@ -15,7 +16,7 @@ import { BattleConnectionState } from '@/app/battlesim/_components/BattleConnect
 import { BattleStage } from '@/app/battlesim/_components/BattleStage';
 import { BattleActionDock } from '@/app/battlesim/_components/BattleActionDock';
 import { LogChatRail } from '@/app/battlesim/_components/LogChatRail';
-import { useFullscreen } from '@/app/battlesim/_hooks/useFullscreen';
+import { useFullscreen } from '@/hooks/useFullscreen';
 import type { ChatPanelMessage } from '@/app/battlesim/_components/ChatPanel';
 import { BattleShell } from '../../../../_components/BattleShell';
 
@@ -142,12 +143,15 @@ export function BsimPvpRoomView({ params }: { params: Promise<{ roomid: string }
     if (socket) socket.emit('chatMessage', { roomId: decodedRoomId, message });
   }, [decodedRoomId]);
 
-  const handleForfeit = useCallback(() => {
-    if (confirm(t('connection.forfeitConfirm'))) {
-      const socket = getGlobalSocket();
-      if (socket) socket.emit('forfeit', { roomId: decodedRoomId });
-    }
-  }, [decodedRoomId, t]);
+  // Forfeiting ends the match with no undo, so it asks in a real dialog
+  // rather than a native confirm the battle canvas cannot style.
+  const [confirmForfeit, setConfirmForfeit] = useState(false);
+  const handleForfeit = useCallback(() => setConfirmForfeit(true), []);
+  const doForfeit = useCallback(() => {
+    setConfirmForfeit(false);
+    const socket = getGlobalSocket();
+    if (socket) socket.emit('forfeit', { roomId: decodedRoomId });
+  }, [decodedRoomId]);
 
   const state = session?.getState();
   const bsx = useBSXLayout(state ?? null);
@@ -244,6 +248,16 @@ export function BsimPvpRoomView({ params }: { params: Promise<{ roomid: string }
           fullscreen={isFullscreen}
         />
       </BattleStage>
+
+      <ConfirmDialog
+        open={confirmForfeit}
+        tone="error"
+        title={t('connection.forfeitTitle')}
+        body={t('connection.forfeitConfirm')}
+        confirmLabel={t('connection.forfeitCta')}
+        onConfirm={doForfeit}
+        onClose={() => setConfirmForfeit(false)}
+      />
     </BattleShell>
   );
 }

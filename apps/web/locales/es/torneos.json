@@ -125,6 +125,8 @@
       "title": "Mi equipo",
       "update": "Actualizar",
       "view": "Ver equipo",
+      "ofPlayer": "Equipo de {name}",
+      "rosterTitle": "Hojas de equipo ({count})",
       "close": "Cerrar",
       "submit": "Enviar equipo",
       "locked": "Bloqueada",

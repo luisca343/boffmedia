@@ -34,8 +34,10 @@
       "new": "Nuevo",
       "newEntity": "Nuevo {singular}",
       "actions": "Acciones",
+      "viewAction": "Ver página",
       "editAction": "Editar",
       "deleteAction": "Eliminar",
+      "viewPage": "Ver página",
       "cancel": "Cancelar",
       "loading": "Cargando {plural}…",
       "errorTitle": "Error al cargar {plural}",
@@ -86,6 +88,7 @@
       "panel": {
         "desc": "Configuración, miembros e invitaciones de este evento.",
         "back": "Volver",
+        "viewPage": "Ver página",
         "lifecycle": "Ciclo de vida",
         "notActiveNotice": "Este evento no está activo. Los jugadores pueden unirse, pero no podrás abrir una configuración de randomizer hasta activarlo.",
         "tabParticipants": "Miembros",
@@ -100,6 +103,8 @@
         "randomizerSection": "Randomizer",
         "randomizerSectionDesc": "Configuración del randomizer y asignaciones de los participantes.",
         "reopenConfirm": "Vas a retroceder el evento de {from} a {to}. Solo debería hacerse si se cerró por error. ¿Continuar?",
+        "reopenTitle": "Reabrir el evento",
+        "reopenCta": "Reabrir",
         "statusFailed": "No se pudo cambiar el estado del evento."
       },
       "participants": {
@@ -223,6 +228,10 @@
         "eventHint": "Selecciona el evento al que pertenecerá este equipo.",
         "eventLoading": "Cargando eventos…",
         "eventPlaceholder": "Selecciona un evento",
+        "leaderLabel": "Líder del equipo",
+        "leaderHint": "El usuario que liderará el equipo y será su primer miembro.",
+        "leaderLoading": "Cargando usuarios…",
+        "leaderPlaceholder": "Selecciona un usuario",
         "iconLabel": "Icono URL (opcional)",
         "iconHint": "URL de la imagen que se usará como icono del equipo."
       },
@@ -467,7 +476,9 @@
         "updateMetadata": "Actualizar metadatos",
         "updatingMetadata": "Actualizando…",
         "okN": "{n} ok",
-        "errN": "{n} err"
+        "errN": "{n} err",
+        "cbz": "CBZ",
+        "epub": "EPUB"
       },
       "config": {
         "title": "Configuración de manga",
@@ -798,7 +809,8 @@
       "icon": {
         "label": "Icono del pack",
         "upload": "Subir imagen",
-        "urlFallback": "O pegar una URL"
+        "urlFallback": "O pegar una URL",
+        "uploadFailed": "Error al subir"
       },
       "gallery": {
         "label": "Galería",
@@ -807,7 +819,8 @@
         "altPlaceholder": "Describe esta imagen para accesibilidad…",
         "remove": "Quitar",
         "maxAlt": "Máximo 256 caracteres",
-        "uploadFailed": "No se pudo subir la imagen."
+        "uploadFailed": "No se pudo subir la imagen.",
+        "maxImages": "Máximo 15 imágenes"
       },
       "worlds": {
         "label": "Mundos incluidos",
@@ -963,6 +976,16 @@
         "review": "Revisión"
       }
     },
+    "job": {
+      "status": {
+        "idle": "En espera",
+        "queued": "Encolado",
+        "running": "En ejecución",
+        "done": "Completado",
+        "error": "Error",
+        "cancelled": "Cancelado"
+      }
+    },
     "releases": {
       "title": "Releases de la app",
       "desc": "Sube bundles firmados y decide cuándo aparecen en el feed de actualización.",
@@ -1015,7 +1038,11 @@
       "unpublishFailed": "No se pudo despublicar",
       "hashCopied": "Hash copiado",
       "hashCopyFailed": "No se ha podido copiar el hash",
-      "copyHash": "Copiar hash"
+      "copyHash": "Copiar hash",
+      "confirmPublish": "Publicar release",
+      "confirmPublishLead": "¿Publicar la versión {version} para que aparezca en el feed de actualización?",
+      "confirmUnpublish": "Despublicar release",
+      "confirmUnpublishLead": "¿Despublicar la versión {version}? Se ocultará del feed de actualización."
     }
   },
   "tournaments": {
@@ -1023,17 +1050,115 @@
     "subtitle": "Crea y gestiona torneos de la comunidad",
     "notFound": "Torneo no encontrado.",
     "back": "Volver",
-    "viewPage": "Ver página ↗",
+    "viewPage": "Ver página",
     "participants": "Participantes",
     "checkIn": "Check-in",
     "matches": "Partidas",
     "phase": "Fase",
     "round": "Ronda",
     "champion": "Campeón",
-    "lifecycle": "Ciclo de vida",
     "openReg": "Abrir inscripción",
     "closeCheckIn": "Cerrar check-in",
     "openCheckIn": "Abrir check-in",
+    "closeReg": "Cerrar inscripción",
+    "colSeed": "#",
+    "colParticipant": "Participante",
+    "colEntry": "Entrada",
+    "colStatus": "Estado",
+    "colVerified": "Verificación",
+    "colActions": "Acciones",
+    "guestName": "Invitado sin cuenta…",
+    "entryTeam": "Equipo",
+    "remove": "Quitar",
+    "noEntrants": "Todavía no hay participantes",
+    "tabOverview": "Resumen",
+    "tabConfig": "Configuración",
+    "tabParticipants": "Participantes",
+    "tabMatches": "Partidas",
+    "stage": {
+      "draft": "Borrador",
+      "registration": "Inscripción",
+      "live": "En juego",
+      "completed": "Finalizado"
+    },
+    "statusLabel": {
+      "draft": "Borrador",
+      "registration": "Inscripción abierta",
+      "live": "En juego",
+      "completed": "Finalizado",
+      "cancelled": "Cancelado"
+    },
+    "next": {
+      "report": "Reportar resultados ({count})",
+      "reopen": "Reabrir como borrador"
+    },
+    "attention": {
+      "title": "Atención",
+      "clear": "Todo en orden: nada requiere tu intervención ahora mismo.",
+      "regInconsistent": "La inscripción figura como abierta, pero el torneo sigue en borrador: nadie puede inscribirse.",
+      "missingSteps": "{count, plural, one {# inscrito no ha completado} other {# inscritos no han completado}} los pasos de entrada y {count, plural, one {quedará} other {quedarán}} fuera al cerrar el cupo.",
+      "droppedReadmittable": "{count, plural, one {# participante quedó} other {# participantes quedaron}} fuera del cupo. Se puede readmitir hasta que se genere el cuadro.",
+      "deadlinePassedUnresolved": "El cierre del cupo ya ha pasado y el cupo sigue abierto.",
+      "deadlineSoon": "El cupo se cierra en {hours, plural, one {# hora} other {# horas}}.",
+      "startSoonCheckInClosed": "El torneo empieza en {hours, plural, one {# hora} other {# horas}} y el check-in sigue cerrado.",
+      "disputed": "{count, plural, one {# partida está} other {# partidas están}} en disputa.",
+      "judgeCalls": "{count, plural, one {# mesa ha} other {# mesas han}} pedido juez.",
+      "draftBracketUnpublished": "Hay un cuadro generado como borrador que los jugadores aún no ven.",
+      "go": {
+        "openReg": "Abrir inscripción",
+        "publish": "Publicar",
+        "matches": "Ver partidas",
+        "participants": "Ver participantes",
+        "resolve": "Cerrar cupo",
+        "openCheckIn": "Abrir check-in"
+      }
+    },
+    "windows": {
+      "title": "Ventanas",
+      "fieldHint": "Cerrar el cupo deja fuera a quien no haya completado la entrada. Es definitivo."
+    },
+    "entered": "Entrados",
+    "noTeam": "Sin equipo",
+    "groupIdentity": "Identidad",
+    "groupRules": "Formato y reglas",
+    "groupEntry": "Inscripción y entrada",
+    "groupDates": "Fechas",
+    "teamsheetVisibilityHint": "Las hojas solo se revelan cuando el torneo empieza.",
+    "entryDeadlineHint": "Al llegar, el cupo se cierra solo.",
+    "cancelTournament": "Cancelar torneo",
+    "confirmCancel": "¿Cancelar «{name}»? Los jugadores dejarán de verlo como activo. Se puede reabrir como borrador si no se ha jugado nada.",
+    "confirmCancelTitle": "Cancelar torneo",
+    "tournamentCancelled": "Torneo cancelado",
+    "dangerCancelHint": "Lo retira del calendario sin borrar nada. Reversible mientras no exista cuadro.",
+    "dangerDeleteHint": "Borra el torneo, sus inscripciones y sus partidas. No se puede deshacer.",
+    "confirmFinalizeTitle": "Finalizar torneo",
+    "confirmDeleteTitle": "Eliminar torneo",
+    "confirmResolveTitle": "Cerrar el cupo",
+    "matchesEmptyTitle": "Aún no hay cuadro",
+    "matchesEmpty": "Genera el cuadro para empezar a reportar resultados. Antes, revisa en Resumen quién quedaría fuera.",
+    "bracketTitle": "Cuadro y clasificación",
+    "pendingTitle": "Pendientes de reportar",
+    "resultsTitle": "Resultados",
+    "fieldLabel": "Cupo",
+    "fieldOpen": "Abierto",
+    "fieldClosed": "Cerrado",
+    "generateTitle": "Generar el cuadro",
+    "loadingPreview": "Calculando el reparto…",
+    "readmit": "Readmitir",
+    "judgeRequested": "{count} mesa(s) han pedido juez",
+    "teamsheetVisibility": "Visibilidad de las hojas",
+    "teamsheetVisPrivate": "Privadas (solo rival y organización)",
+    "teamsheetVisParticipants": "Abiertas a los participantes",
+    "teamsheetVisPublic": "Públicas",
+    "readmitted": "Participante readmitido",
+    "gapTeamsheet": "falta equipo",
+    "gapCheckIn": "falta check-in",
+    "regNowOpen": "Inscripción abierta",
+    "regNowClosed": "Inscripción cerrada",
+    "resolveField": "Cerrar cupo",
+    "confirmResolve": "Se cerrará el cupo: {entered} participantes entran y {dropped} quedan fuera por no completar los pasos. El cuadro no se genera todavía. ¿Continuar?",
+    "fieldResolved": "Cupo cerrado · {dropped} fuera",
+    "stageDanger": "Zona de riesgo",
     "generate": "Generar",
     "generateRound": "Generar ronda {done}/{total}",
     "generateDraft": "Generar (borrador)",
@@ -1046,8 +1171,6 @@
     "onlyCheckedIn": "Solo con check-in",
     "finalize": "Finalizar",
     "delete": "Eliminar",
-    "editTournament": "Editar torneo",
-    "hide": "Ocultar",
     "edit": "Editar",
     "name": "Nombre",
     "banner": "Banner (URL)",
@@ -1120,16 +1243,12 @@
     "clearSchedule": "Borrar horario",
     "roundScheduled": "Ronda programada",
     "scheduleCleared": "Horario borrado",
-    "reportResults": "Reportar resultados ({count} listos)",
     "reportWaiting": "Completa la ronda actual para desbloquear la siguiente.",
     "reportNone": "No hay partidas listas para reportar.",
     "reportLocked": "🔒 {count} partida{count, plural, one {} other {s}} en rondas posteriores — se desbloquean al cerrar la ronda actual.",
     "reportDisputed": "⚠ {count} partida{count, plural, one {} other {s}} en disputa — revisa el chat de mesa y resuelve con el reporte manual.",
-    "correctResults": "Corregir resultados ({count})",
     "correct": "Corregir",
     "resultRequired": "Introduce el resultado",
-    "stateCurrent": "Estado actual",
-    "stateBracket": "cuadro y clasificación",
     "confirmFinalize": "¿Finalizar «{name}»? No podrá reabrirse.",
     "confirmDelete": "¿Eliminar «{name}»? Esta acción no se puede deshacer.",
     "statusUpdated": "Estado: {status}",
@@ -1167,7 +1286,16 @@
     "teamsheetOptional": "Opcional",
     "teamsheetMandatory": "Obligatoria para entrar (VGC)",
     "entryDeadline": "Cierre del cupo",
-    "confirmEntryCut": "{entered} jugadores han entrado y {dropped} quedarán fuera por no completar el check-in o la lista de equipo. Se puede readmitir a alguien solo hasta que se genere el cuadro. ¿Continuar?"
+    "confirmEntryCut": "{entered} jugadores han entrado y {dropped} quedarán fuera por no completar el check-in o la lista de equipo. Se puede readmitir a alguien solo hasta que se genere el cuadro. ¿Continuar?",
+    "singular": "torneo",
+    "plural": "torneos",
+    "searchTournaments": "Buscar torneos…",
+    "colName": "Nombre",
+    "colFormat": "Formato",
+    "colEntrants": "Participantes",
+    "colDate": "Fecha de inicio",
+    "manage": "Gestionar",
+    "createTournamentDesc": "Rellena el formulario para añadir un nuevo torneo."
   },
   "data": {
     "editLabel": "Editar",

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Button, Icon, Spinner } from "@boffmedia/ui"
 import { AdminCrud } from "../_components/ui/av-crud"
-import { AvPanel, AvSectionHead, AvPill } from "../_components/ui/av-kit"
+import { AvPanel, AvSectionHead, AvPill, formatAdminDate } from "../_components/ui/av-kit"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { orThrow } from "@/services/http/core"
@@ -142,6 +142,7 @@ export function EventsAdmin() {
         }}
         searchFields={["title", "description"]}
         entityName={{ singular: t("singular"), plural: t("plural") }}
+        viewHref={(e) => `/eventos/${e.id}`}
         columns={[
           { key: "title", label: t("colEvent"), render: (e) => (
             <div className="flex items-center gap-3">
@@ -176,7 +177,7 @@ export function EventsAdmin() {
           }},
           { key: "startDate", label: t("colStart"), render: (e) => (
             <span className="text-sm text-txt-muted font-mono">
-              {e.startDate ? new Date(e.startDate).toLocaleDateString() : "—"}
+              {formatAdminDate(e.startDate)}
             </span>
           )},
         ]}

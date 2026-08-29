@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
-import { Icon, type IconName } from "@boffmedia/ui"
+import { Icon, Input, type IconName } from "@boffmedia/ui"
 import { DkSprite } from "@/components/boffmedia/ui/tools/datakit";
 import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types";
 import type { SpeedTierEntry } from "@/services/api/boffmedia/vgcService";
@@ -56,13 +56,15 @@ export function SpdInput({
 }) {
   const t = useTranslations("vgc.speed");
   return (
-    <div
-      className={cn("cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:8px] ", "inline-flex min-w-0 items-center gap-2 border border-solid border-line-2 bg-base px-[10px] text-txt-dim transition-[border-color] focus-within:border-accent",
-        className,
+    // The kit Input is the box; icon and clear button overlay it the way
+    // SearchInput does, so the compound keeps the chassis (cut, stroke, focus)
+    // without re-declaring it here.
+    <div className={cn("relative inline-flex min-w-0", className)}>
+      {icon && (
+        <Icon name={icon} size={15} className="pointer-events-none absolute left-[10px] top-1/2 -translate-y-1/2 text-txt-dim" />
       )}
-    >
-      {icon && <Icon name={icon} size={15} className="flex-none" />}
-      <input
+      <Input
+        size="sm"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
@@ -70,12 +72,18 @@ export function SpdInput({
         min={type === "number" ? 1 : undefined}
         max={type === "number" ? 999 : undefined}
         className={cn(
-          "min-w-0 flex-1 border-0 bg-transparent py-[9px] text-[13px] font-medium leading-none text-txt outline-none placeholder:text-txt-dim",
           type === "number" ? "font-mono tabular-nums" : "font-body",
+          icon && "pl-8",
+          onClear && "pr-8",
         )}
       />
       {onClear && value && (
-        <button type="button" aria-label={t("clearInput")} onClick={onClear} className="grid place-items-center p-1 text-txt-dim transition-colors hover:text-txt">
+        <button
+          type="button"
+          aria-label={t("clearInput")}
+          onClick={onClear}
+          className="absolute right-1 top-1/2 grid -translate-y-1/2 place-items-center p-1 text-txt-dim transition-colors hover:text-txt"
+        >
           <Icon name="x" size={14} />
         </button>
       )}

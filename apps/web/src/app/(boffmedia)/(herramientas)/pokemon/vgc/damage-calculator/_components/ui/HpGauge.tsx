@@ -1,7 +1,7 @@
 "use client"
 
 import { cn } from "@/lib/utils"
-import { INPUT_CLASS } from "./controls"
+import { Input } from "@boffmedia/ui"
 
 export interface HpGaugeProps {
   current: number
@@ -21,8 +21,8 @@ export function HpGauge({ current, max, label, resetLabel, onChange, onReset }: 
       <div className="flex items-baseline gap-2">
         <span className="flex-none font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{label}</span>
         {onChange ? (
-          <input
-            className={cn(INPUT_CLASS, "w-[58px] text-right font-mono text-[12px]")}
+          <Input
+            className="w-[58px] text-right font-mono text-[12px]"
             type="number"
             min={1}
             max={max}

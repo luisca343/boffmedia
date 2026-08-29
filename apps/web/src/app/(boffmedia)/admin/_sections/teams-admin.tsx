@@ -1,9 +1,11 @@
 "use client"
 
+import { useState, useMemo } from "react"
 import { useTranslations } from "next-intl"
 import { AdminCrud } from "../_components/ui/av-crud"
 import { AvSectionHead, AvPill } from "../_components/ui/av-kit"
 import { useGetTeams } from "@/hooks/events/useGetTeams"
+import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { TeamForm } from "./forms/TeamForm"
 import type { Team } from "@boffmedia/shared"
@@ -21,6 +23,15 @@ const STATUS: Record<string, "green" | "rose" | "amber"> = {
 
 export function TeamsAdmin() {
   const tr = useTranslations("admin.teams")
+  const { events } = useGetEvents()
+  const eventMap = useMemo(() => {
+    const map: Record<number, string> = {}
+    events?.forEach((e) => {
+      map[e.id] = e.title
+    })
+    return map
+  }, [events])
+
   return (
     <div>
       <AvSectionHead title={tr("title")} desc={tr("desc")} />
@@ -28,15 +39,13 @@ export function TeamsAdmin() {
         useList={useTeamsList}
         FormComponent={TeamForm}
         onCreate={async (data: any) => {
-          const { id, ...teamData } = data
-          await EventsService.createTeam(data.eventId, teamData)
+          // eventId travels in the URL — the DTO forbids it in the body.
+          const { id, eventId, ...teamData } = data
+          await EventsService.createTeam(eventId, teamData)
         }}
         onUpdate={async (id, data: any) => {
-          const { id: _id, ...teamData } = data as any
-          await EventsService.updateTeam(data.eventId, Number(id), teamData)
-        }}
-        onDelete={async () => {
-          /* team deletion endpoint not wired — see admin roadmap */
+          const { id: _id, eventId, ...teamData } = data as any
+          await EventsService.updateTeam(eventId, Number(id), teamData)
         }}
         searchFields={["name", "tag"]}
         entityName={{ singular: tr("singular"), plural: tr("plural") }}
@@ -48,7 +57,7 @@ export function TeamsAdmin() {
             </div>
           )},
           { key: "eventId", label: tr("colEventId"), render: (t) => (
-            <span className="text-sm text-txt-muted font-mono">#{t.eventId}</span>
+            <span className="text-sm text-txt-muted font-mono">{eventMap[t.eventId] || `#${t.eventId}`}</span>
           )},
           { key: "status", label: tr("colStatus"), render: (t) => (
             <AvPill tone={STATUS[t.status ?? ""] ?? "muted"}>{t.status ?? "—"}</AvPill>

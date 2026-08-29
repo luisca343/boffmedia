@@ -50,6 +50,7 @@
       "edit": "Editar",
       "delete": "Eliminar",
       "confirmDelete": "¿Eliminar este mensaje? Esta acción no se puede deshacer.",
+      "confirmDeleteTitle": "Eliminar mensaje",
       "loadMore": "Cargar más",
       "closedNotice": "Este hilo está cerrado",
       "replyTitle": "Responder",

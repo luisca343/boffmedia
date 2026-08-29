@@ -1,17 +1,20 @@
 import * as React from "react"
 import { cn } from "../cn"
-import { INPUT_BASE } from "./input"
+import { INPUT_BASE, INPUT_SM } from "./input"
 import { Field } from "./field"
 
 // CSS-drawn caret (two 45°/135° gradients), matching .sn-select in components.css.
-const CARET_STYLE: React.CSSProperties = {
+// Handed to the chassis as --ctl-bg layers rather than set as `background-image`:
+// a native <select> cannot render ::after, so `.cut-tag-edge` paints its corner
+// stroke as a background layer on form controls, and a direct `background-image`
+// here would replace it (see the geometry plugin in @boffmedia/tailwind-config).
+const CARET_STYLE = {
   appearance: "none",
-  backgroundImage:
+  "--ctl-bg":
     "linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%)",
-  backgroundPosition: "calc(100% - 18px) 55%, calc(100% - 13px) 55%",
-  backgroundSize: "5px 5px",
-  backgroundRepeat: "no-repeat",
-}
+  "--ctl-bg-pos": "calc(100% - 18px) 55%, calc(100% - 13px) 55%",
+  "--ctl-bg-size": "5px 5px, 5px 5px",
+} as React.CSSProperties
 
 export interface SelectOption {
   value: string
@@ -28,6 +31,8 @@ export interface SelectProps {
   disabled?: boolean
   ariaLabel?: string
   id?: string
+  /** `sm` is the 32px control scale shared with Input and Button. */
+  size?: "sm" | "md"
   className?: string
 }
 
@@ -41,11 +46,12 @@ export function Select({
   disabled,
   ariaLabel,
   id,
+  size,
   className,
 }: SelectProps) {
   const sel = (
     <select
-      className={cn(INPUT_BASE, "pr-9", className)}
+      className={cn(INPUT_BASE, size === "sm" ? cn(INPUT_SM, "pr-8") : "pr-9", className)}
       style={CARET_STYLE}
       value={value}
       disabled={disabled}

@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Button, Modal, toast } from "@boffmedia/ui"
+import { Button, IconButton, Modal, toast } from "@boffmedia/ui"
 import { TmMonCard } from "@/components/boffmedia/ui/tournaments"
 import {
   TournamentsService,
@@ -158,21 +158,39 @@ export function TeamsheetGrid({ mons }: { mons: TnMonApi[] }) {
   )
 }
 
-/** Read the submitted team in full, without opening the paste editor. */
-export function TeamsheetViewButton({ sheet }: { sheet: TnMonApi[] | null }) {
+/**
+ * Read a submitted team in full, without opening the paste editor. Pass `name`
+ * when the sheet is someone else's — the modal is titled "my team" otherwise,
+ * and this button is reused for opponents' sheets on an open-teamsheet
+ * tournament and for every entrant in the admin panel.
+ */
+export function TeamsheetViewButton({
+  sheet,
+  name,
+  compact,
+}: {
+  sheet: TnMonApi[] | null
+  name?: string
+  /** Icon-only, for table rows where a labelled button would not fit. */
+  compact?: boolean
+}) {
   const t = useTranslations("torneos.teamsheet")
   const [open, setOpen] = React.useState(false)
   if (!sheet?.length) return null
 
   return (
     <>
-      <Button size="sm" icon="eye" onClick={() => setOpen(true)}>
-        {t("view")}
-      </Button>
+      {compact ? (
+        <IconButton size="sm" variant="ghost" name="eye" label={t("view")} onClick={() => setOpen(true)} />
+      ) : (
+        <Button size="sm" icon="eye" onClick={() => setOpen(true)}>
+          {t("view")}
+        </Button>
+      )}
       <Modal
         open={open}
         onClose={() => setOpen(false)}
-        title={t("title")}
+        title={name ? t("ofPlayer", { name }) : t("title")}
         size="lg"
         footer={
           <div className="flex justify-end">

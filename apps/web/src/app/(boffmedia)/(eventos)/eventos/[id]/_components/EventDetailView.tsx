@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Badge, Button, Empty, Icon, Panel, Spinner, toast } from "@boffmedia/ui"
+import { Badge, Button, ConfirmDialog, Empty, Icon, Panel, Spinner, toast } from "@boffmedia/ui"
 import { AchievementItem, EventBanner, formatEventDate } from "@/components/boffmedia/ui/events"
 import { useGetEvent } from "@/hooks/events/useGetEvent"
 import type { EventModules } from "@boffmedia/shared"
@@ -26,6 +26,7 @@ export function EventDetailView({ id }: { id: number }) {
   // Guards join/leave against a double click landing two requests. Declared
   // with the other hooks: the early returns below must not skip it.
   const inFlight = React.useRef(false)
+  const [confirmLeave, setConfirmLeave] = React.useState(false)
 
   if (isLoading) {
     return (
@@ -76,10 +77,10 @@ export function EventDetailView({ id }: { id: number }) {
     }
   }
 
+  // Membership is what entitles the account to the event's pack, so leaving
+  // withdraws that access on the launcher's next check — worth a real dialog.
   async function handleLeave() {
-    // Membership is what entitles the account to the event's pack, so leaving
-    // withdraws that access on the launcher's next check.
-    if (!window.confirm(t("detail.leaveConfirm"))) return
+    setConfirmLeave(false)
     if (inFlight.current) return
     inFlight.current = true
     setJoining(true)
@@ -161,7 +162,7 @@ export function EventDetailView({ id }: { id: number }) {
                     size="sm"
                     icon="logout"
                     loading={joining}
-                    onClick={handleLeave}
+                    onClick={() => setConfirmLeave(true)}
                   >
                     {t("detail.leave")}
                   </Button>
@@ -215,6 +216,16 @@ export function EventDetailView({ id }: { id: number }) {
       {event.modules?.randomizer && <RandomlockeSection eventId={id} />}
 
       <EventTournamentCard modules={event.modules} />
+
+      <ConfirmDialog
+        open={confirmLeave}
+        title={t("detail.leaveTitle")}
+        body={t("detail.leaveConfirm")}
+        confirmLabel={t("detail.leave")}
+        busy={joining}
+        onConfirm={handleLeave}
+        onClose={() => setConfirmLeave(false)}
+      />
     </main>
   )
 }

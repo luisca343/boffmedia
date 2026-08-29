@@ -1,28 +1,20 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
+import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Panel, Field, Input, Select, Button, toast, Spinner } from "@boffmedia/ui"
-import { TnFormatBadge } from "@/components/boffmedia/ui/tournaments"
-import { useTournaments } from "@/hooks/tournaments/useTournaments"
-import { useTournament } from "@/hooks/tournaments/useTournament"
-import { UsersService } from "@/services/api/boffmedia/usersService"
+import { ConfirmDialog, Field, Input, Select, Button, toast } from "@boffmedia/ui"
 import {
   TournamentsService,
-  type TnFormat,
-  type TnKind,
   type TnMatchApi,
-  type TnStatus,
   type TnPhaseApi,
   type TnPhaseInput,
   type TnPhaseFormat,
   type TnAdvanceType,
-  type TnParticipantStatus,
-  type TnCompetitorApi,
+  type TournamentDetailApi,
 } from "@/services/api/boffmedia/tournamentsService"
-import { FORMATS, KINDS, PHASE_FORMATS, ADVANCE_TYPE_OPTIONS, PARTICIPANT_STATUS, VGC_PRESET, PHASE_STATUS_TONE } from "./constants"
-import { SectionHead } from "./shared"
+import { PHASE_FORMATS, ADVANCE_TYPE_OPTIONS, VGC_PRESET, PHASE_STATUS_TONE } from "./constants"
+import { AvPanel, AvPill } from "../../_components/ui/av-kit"
 
 export function PhasesEditor({
   phases,
@@ -92,12 +84,13 @@ export function PhasesManager({
   detail,
   onChange,
 }: {
-  detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
+  detail: TournamentDetailApi
   onChange: () => void
 }) {
   const t = useTranslations("tournaments")
   const phases = (detail.phases ?? []).filter((p) => p.id > 0)
   const [editingId, setEditingId] = useState<number | null>(null)
+  const [toDelete, setToDelete] = useState<TnPhaseApi | null>(null)
   const canAppend = detail.status !== "completed" && detail.status !== "cancelled"
 
   if (phases.length === 0) return null
@@ -110,23 +103,37 @@ export function PhasesManager({
     })
     if (r.error) toast.error(r.error); else { toast.success(t("phaseAdded")); onChange() }
   }
-  const removePhase = async (p: TnPhaseApi) => {
-    if (!confirm(t("phaseConfirmDelete", { name: p.name }))) return
-    const r = await TournamentsService.removePhase(detail.id, p.id)
+  const removePhase = async () => {
+    if (!toDelete) return
+    const r = await TournamentsService.removePhase(detail.id, toDelete.id)
+    setToDelete(null)
     if (r.error) toast.error(r.error); else { toast(t("phaseDeleted")); onChange() }
   }
 
   return (
-    <Panel
+    <AvPanel
       title={t("phases")}
+      icon="layers"
       aside={
-        canAppend ? (
-          <button type="button" onClick={append} className="font-mono text-[11px] text-accent transition-opacity hover:opacity-70">
-            {t("phaseAppend")}
-          </button>
-        ) : undefined
+        <>
+          <AvPill>{phases.length}</AvPill>
+          {canAppend && (
+            <button type="button" onClick={append} className="font-mono text-[11px] text-accent transition-opacity hover:opacity-70">
+              {t("phaseAppend")}
+            </button>
+          )}
+        </>
       }
     >
+      <ConfirmDialog
+        open={toDelete != null}
+        tone="error"
+        title={t("phases")}
+        body={toDelete ? t("phaseConfirmDelete", { name: toDelete.name }) : null}
+        confirmLabel={t("delete")}
+        onConfirm={removePhase}
+        onClose={() => setToDelete(null)}
+      />
       <div className="grid gap-2">
         {phases.map((p) => {
           const isLast = p.order === maxOrder
@@ -153,7 +160,7 @@ export function PhasesManager({
                   {p.status === "pending" && (
                     <>
                       <button type="button" onClick={() => setEditingId(p.id)} className="font-mono text-[10px] text-accent transition-opacity hover:opacity-70">{t("edit")}</button>
-                      <button type="button" onClick={() => removePhase(p)} className="text-txt-dim transition-colors hover:text-bad">✕</button>
+                      <button type="button" onClick={() => setToDelete(p)} className="text-txt-dim transition-colors hover:text-bad">✕</button>
                     </>
                   )}
                 </div>
@@ -169,7 +176,7 @@ export function PhasesManager({
           )
         })}
       </div>
-    </Panel>
+    </AvPanel>
   )
 }
 
@@ -180,7 +187,7 @@ function PhaseRowEditor({
   onClose,
   onChange,
 }: {
-  detail: NonNullable<ReturnType<typeof useTournament>["tournament"]>
+  detail: TournamentDetailApi
   phase: TnPhaseApi
   isLast: boolean
   onClose: () => void

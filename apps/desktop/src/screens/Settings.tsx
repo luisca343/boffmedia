@@ -14,8 +14,9 @@ import {
   ToolHeader,
 } from "@boffmedia/ui";
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
+import { BoffAvatar } from "../components/AccountSwitcher";
 import { PlayerHead } from "../components/PlayerHead";
 import { useT } from "../i18n";
 import {
@@ -50,6 +51,7 @@ export function Settings() {
     account,
     accounts,
     boffAccount,
+    boffAccountList,
     revalidate,
     revalidating,
     removeAccount,
@@ -59,6 +61,11 @@ export function Settings() {
     sessionBusy,
     signOut,
     switchingAccount,
+    switchBoffAccount,
+    switchingBoffAccount,
+    boffSignIn,
+    boffSignOut,
+    boffSigningIn,
   } = useApp();
   const { phase, update, error } = useUpdates();
   const t = useT("settings");
@@ -90,6 +97,41 @@ export function Settings() {
       live = false;
     };
   }, [jvmDraft]);
+
+  // Section navigation state and tracking
+  const [activeSection, setActiveSection] = useState("settings-appearance");
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  // IntersectionObserver to track which section is most visible
+  useEffect(() => {
+    const scrollContainer = document.querySelector("main");
+    if (!scrollContainer) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Find the section that is most visible
+        const visibleEntries = entries.filter((e) => e.isIntersecting);
+        if (visibleEntries.length > 0) {
+          const mostVisible = visibleEntries.reduce((prev, current) =>
+            prev.intersectionRatio > current.intersectionRatio ? prev : current
+          );
+          setActiveSection(
+            mostVisible.target.id || "settings-appearance"
+          );
+        }
+      },
+      {
+        root: scrollContainer,
+        threshold: 0.3,
+      }
+    );
+
+    Object.values(sectionRefs.current).forEach((el) => {
+      if (el) observer.observe(el);
+    });
+
+    return () => observer.disconnect();
+  }, []);
   const [mgbaStatus, setMgbaStatus] = useState<any>(null);
   const [melondsStatus, setMelondsStatus] = useState<any>(null);
   const [romFolders, setRomFolders] = useState<string[]>([]);
@@ -229,12 +271,55 @@ export function Settings() {
     };
   };
 
+  const handleSectionClick = useCallback((id: string) => {
+    const el = sectionRefs.current[id];
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
+  const boffLocked = switchingBoffAccount || sessionBusy || boffSigningIn;
+
   return (
     <div className="px-8 py-7">
       <ToolHeader className="mb-6" title={t("title")} />
 
-      <div className="mx-auto flex w-full max-w-[760px] flex-col gap-10">
+      <div className="mx-auto flex w-full gap-8">
+        {/* Sticky section navigation - hidden below 900px */}
+        <nav className="hidden w-48 lg:block">
+          <div className="sticky top-0 self-start">
+            <ul className="flex flex-col gap-2">
+              {[
+                { id: "settings-appearance", key: "sections.appearance.title" },
+                { id: "settings-game", key: "sections.game.title" },
+                { id: "settings-emulators", key: "sections.emulators.title" },
+                { id: "settings-account", key: "sections.account.title" },
+                { id: "settings-app", key: "sections.app.title" },
+              ].map((section) => (
+                <li key={section.id}>
+                  <button
+                    onClick={() => handleSectionClick(section.id)}
+                    className={`w-full text-left font-mono text-[11px] uppercase tracking-[0.1em] border-l-2 pl-3 py-1 transition-colors ${
+                      activeSection === section.id
+                        ? "border-accent text-accent"
+                        : "border-transparent text-txt-muted hover:text-txt"
+                    }`}
+                  >
+                    {t(section.key)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </nav>
+
+        {/* Main content column */}
+        <div className="flex-1 flex flex-col gap-10 max-w-[760px]">
         <Section
+          id="settings-appearance"
+          sectionRef={(el) => {
+            if (el) sectionRefs.current["settings-appearance"] = el;
+          }}
           title={t("sections.appearance.title")}
           lead={t("sections.appearance.lead")}
         >
@@ -293,6 +378,10 @@ export function Settings() {
         </Section>
 
         <Section
+          id="settings-game"
+          sectionRef={(el) => {
+            if (el) sectionRefs.current["settings-game"] = el;
+          }}
           title={t("sections.game.title")}
           lead={t("sections.game.lead")}
         >
@@ -467,6 +556,10 @@ export function Settings() {
         </Section>
 
         <Section
+          id="settings-emulators"
+          sectionRef={(el) => {
+            if (el) sectionRefs.current["settings-emulators"] = el;
+          }}
           title={t("sections.emulators.title")}
           lead={t("sections.emulators.lead")}
         >
@@ -527,8 +620,7 @@ export function Settings() {
                               <IconButton
                                 name="folder"
                                 label={t("emulators.change")}
-                                size={15}
-                                className="!h-8 !w-8"
+                                size="sm"
                                 onClick={() =>
                                   void handleEmulatorLocate("mgba")
                                 }
@@ -536,8 +628,7 @@ export function Settings() {
                               <IconButton
                                 name="x"
                                 label={t("emulators.clear")}
-                                size={15}
-                                className="!h-8 !w-8"
+                                size="sm"
                                 onClick={() => void handleEmulatorClear("mgba")}
                               />
                             </>
@@ -593,8 +684,7 @@ export function Settings() {
                               <IconButton
                                 name="folder"
                                 label={t("emulators.change")}
-                                size={15}
-                                className="!h-8 !w-8"
+                                size="sm"
                                 onClick={() =>
                                   void handleEmulatorLocate("melonds")
                                 }
@@ -602,8 +692,7 @@ export function Settings() {
                               <IconButton
                                 name="x"
                                 label={t("emulators.clear")}
-                                size={15}
-                                className="!h-8 !w-8"
+                                size="sm"
                                 onClick={() =>
                                   void handleEmulatorClear("melonds")
                                 }
@@ -646,8 +735,8 @@ export function Settings() {
                     <IconButton
                       name="x"
                       label={t("emulators.removeFolder")}
-                      size={15}
-                      className="!h-8 !w-8 shrink-0"
+                      size="sm"
+                      className="shrink-0"
                       onClick={() => void handleRemoveRomFolder(folder)}
                     />
                   </div>
@@ -679,16 +768,91 @@ export function Settings() {
         </Section>
 
         <Section
+          id="settings-account"
+          sectionRef={(el) => {
+            if (el) sectionRefs.current["settings-account"] = el;
+          }}
           title={t("sections.account.title")}
           lead={t("sections.account.lead")}
         >
           <Panel>
+            {/* Boffmedia account roster */}
+            <div className="mb-4">
+              <p className="mb-3 text-sm font-medium">
+                {t("account.boffAccounts")}
+              </p>
+              {boffAccountList.length > 0 ? (
+                <div className="space-y-2">
+                  {boffAccountList.map((entry) => {
+                    const isActive = entry.id === boffAccount?.id;
+                    return (
+                      <div
+                        key={entry.id}
+                        className="flex items-center gap-3 border-b border-line py-2 last:border-b-0"
+                      >
+                        <BoffAvatar
+                          username={entry.username}
+                          avatarUrl={entry.avatarUrl}
+                          size={32}
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="flex items-center gap-2 truncate text-sm font-semibold">
+                            {entry.username}
+                            {isActive && (
+                              <Badge tone="ok">
+                                {t("account.boffActive")}
+                              </Badge>
+                            )}
+                          </p>
+                          <p className="truncate font-mono text-[10px] text-txt-dim">
+                            #{entry.id}
+                          </p>
+                        </div>
+                        {!isActive && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            disabled={boffLocked}
+                            onClick={() => void switchBoffAccount(entry.id)}
+                          >
+                            {t("account.useBoffAccount")}
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="text-xs text-txt-dim">
+                  {t("account.minecraftNone")}
+                </p>
+              )}
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon="plus"
+                  disabled={boffLocked}
+                  onClick={() => void boffSignIn()}
+                >
+                  {t("account.addBoffAccount")}
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon="logout"
+                  disabled={boffLocked || !boffAccount}
+                  onClick={() => void boffSignOut()}
+                >
+                  {t("account.signOutBoff")}
+                </Button>
+              </div>
+            </div>
+
+            <Divider className="my-4" />
+
             <DataList
               rows={[
-                {
-                  label: t("account.boffAccount"),
-                  value: boffAccount?.username ?? "—",
-                },
                 {
                   label: t("account.token"),
                   value: t("account.tokenValue"),
@@ -832,7 +996,14 @@ export function Settings() {
           </Panel>
         </Section>
 
-        <Section title={t("sections.app.title")} lead={t("sections.app.lead")}>
+        <Section
+          id="settings-app"
+          sectionRef={(el) => {
+            if (el) sectionRefs.current["settings-app"] = el;
+          }}
+          title={t("sections.app.title")}
+          lead={t("sections.app.lead")}
+        >
           <Panel title={t("updates.title")}>
             <DataList
               rows={[
@@ -867,6 +1038,7 @@ export function Settings() {
             </div>
           </Panel>
         </Section>
+        </div>
       </div>
     </div>
   );
@@ -879,16 +1051,24 @@ export function Settings() {
  *  what the group is for, so a player scanning for "where do I change the
  *  language" can skip four sections without reading a single control. */
 function Section({
+  id,
   title,
   lead,
   children,
+  sectionRef,
 }: {
+  id: string;
   title: string;
   lead?: string;
   children: ReactNode;
+  sectionRef?: (el: HTMLElement | null) => void;
 }) {
   return (
-    <section className="flex flex-col gap-3">
+    <section
+      id={id}
+      ref={sectionRef}
+      className="flex flex-col gap-3 scroll-mt-6"
+    >
       <header className="flex flex-col gap-[2px] border-b border-solid border-line pb-2">
         <h2 className="font-display text-[15px] font-bold uppercase tracking-[0.06em] text-txt">
           {title}

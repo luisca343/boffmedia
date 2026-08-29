@@ -28,7 +28,7 @@ import { useT } from "../i18n";
 import { CrashDiagnosisCard } from "../components/CrashDiagnosis";
 import { VersionPicker, dependenciesOf } from "../components/VersionPicker";
 import type { VersionChoice } from "../components/VersionPicker";
-import { InstanceSpace } from "../components/InstanceSpace";
+import { RuntimePanel } from "../components/InstanceSpace";
 import { BrowsePage } from "../components/pack/BrowsePage";
 import { getModule } from "../services/gameModules";
 import { BackupsTab } from "../components/pack/BackupsTab";
@@ -319,6 +319,7 @@ type TabKey =
   | "gallery"
   | "screenshots"
   | "backups"
+  | "settings"
   | "logs"
   | "info";
 
@@ -1083,7 +1084,8 @@ export function PackDetail() {
           // only earns its place on a pack that has something to put in it.
           .filter(
             (tab) =>
-              tab.value !== "optional" || isLocal || optionalGroupCount > 0,
+              (tab.value !== "optional" || isLocal || optionalGroupCount > 0) &&
+              (tab.value !== "settings" || module.supportsInstanceSpace),
           );
         const allTabs = [...moduleTabs, ...baseTabs];
         const moduleTabValues = moduleTabs.map((t) => t.value);
@@ -1103,6 +1105,7 @@ export function PackDetail() {
                   "worlds",
                   "screenshots",
                   "backups",
+                  "settings",
                 ].includes(newTab)
               ) {
                 setTab("gallery");
@@ -1184,6 +1187,10 @@ export function PackDetail() {
           the way editing its file list would. */}
       {tab === "backups" && (
         <BackupsTab slug={pack.slug} packName={pack.name} />
+      )}
+
+      {tab === "settings" && module.supportsInstanceSpace && (
+        <RuntimePanel slug={pack.slug} />
       )}
 
       {tab === "logs" && <LogPanel lines={logs} />}
@@ -1290,11 +1297,6 @@ export function PackDetail() {
             </Panel>
           </div>
 
-          {/* §9 — rollback and the per-instance runtime. Reference material,
-              which is exactly what this tab is for. Module-specific. */}
-          {module.supportsInstanceSpace && (
-            <InstanceSpace slug={pack.slug} onChanged={reloadPacks} />
-          )}
         </div>
       )}
 

@@ -72,6 +72,8 @@
     "primitives": {
       "dismiss": "Dismiss",
       "close": "Close",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
       "copy": "Copy",
       "copied": "Copied",
       "copyCode": "Copy code",
@@ -235,6 +237,19 @@
       "wonWith": "Won with {tickets, plural, one {# ticket} other {# tickets}} · {odds}% odds",
       "watchDraw": "Watch how it was drawn",
       "share": "Share",
+      "reel": {
+        "live": "Live",
+        "landedTag": "Winner",
+        "spinning": "Drawing!",
+        "spinningOf": "Drawing winner {i} of {n}",
+        "landed": "{name}!",
+        "winnerOf": "Winner {i}/{n}",
+        "skip": "Skip animation",
+        "soundOn": "Mute sound",
+        "soundOff": "Unmute sound",
+        "labelsHidden": "{n} participants · labels hidden",
+        "othersN": "+{n} more"
+      },
       "prize": {
         "key": {
           "label": "Game key"

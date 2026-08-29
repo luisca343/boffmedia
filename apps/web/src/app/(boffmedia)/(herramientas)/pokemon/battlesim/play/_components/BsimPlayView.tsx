@@ -14,7 +14,7 @@ import { BattleConnectionState } from '@/app/battlesim/_components/BattleConnect
 import { BattleStage } from '@/app/battlesim/_components/BattleStage';
 import { BattleActionDock } from '@/app/battlesim/_components/BattleActionDock';
 import { BattleLogPanel } from '@/app/battlesim/_components/BattleLogPanel';
-import { useFullscreen } from '@/app/battlesim/_hooks/useFullscreen';
+import { useFullscreen } from '@/hooks/useFullscreen';
 import { cn } from '@/lib/utils';
 import { DkSelect } from '@/components/boffmedia/ui/tools/datakit';
 import { Empty, Icon } from '@boffmedia/ui';

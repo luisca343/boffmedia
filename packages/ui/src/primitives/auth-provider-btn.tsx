@@ -51,7 +51,7 @@ export function AuthProviderBtn({
         "relative inline-flex items-center justify-center gap-2.5 select-none",
         "px-[19px] py-[13px]",
         "font-display font-bold not-italic text-[13.5px]/none tracking-[0.05em]",
-        "transition-[color,transform,filter] duration-[140ms] active:translate-y-px",
+        "transition-[color,transform,filter] duration-[140ms] active:translate-y-px motion-reduce:active:translate-y-0",
         "before:transition-[background] before:duration-[140ms] after:transition-[background] after:duration-[140ms]",
         brand
           ? "text-[color:var(--pvink)] [--cut-line:var(--pv)] [--cut-fill:var(--pv)] hover:brightness-110"

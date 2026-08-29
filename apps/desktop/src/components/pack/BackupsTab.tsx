@@ -1,16 +1,19 @@
 import { useCallback, useEffect, useState } from "react"
 
-import { Badge, Button, Empty, Icon, Spinner, toast } from "@boffmedia/ui"
+import { Badge, Button, Divider, Empty, Icon, Panel, Spinner, toast } from "@boffmedia/ui"
 
 import { useT } from "../../i18n"
 import {
   type Backup,
   type World,
+  type RetainedVersion,
   backupCreate,
   backupDelete,
   backupList,
   backupRestore,
   instanceWorlds,
+  instanceVersions,
+  instanceRevert,
 } from "../../runtime"
 import { formatBytes } from "../../utils/format"
 
@@ -27,15 +30,22 @@ function formatWhen(iso: string): string {
 
 export function BackupsTab({ slug, packName }: { slug: string; packName: string }) {
   const t = useT("backups")
+  const tis = useT("instanceSpace")
   const [backups, setBackups] = useState<Backup[]>([])
   const [worlds, setWorlds] = useState<World[]>([])
+  const [versions, setVersions] = useState<RetainedVersion[] | null>(null)
   const [loading, setLoading] = useState(true)
   const [busy, setBusy] = useState<string | null>(null)
 
   const reload = useCallback(async () => {
-    const [list, saves] = await Promise.all([backupList(slug), instanceWorlds(slug).catch(() => [])])
+    const [list, saves, versionList] = await Promise.all([
+      backupList(slug),
+      instanceWorlds(slug).catch(() => []),
+      instanceVersions(slug).catch(() => []),
+    ])
     setBackups(list)
     setWorlds(saves)
+    setVersions(versionList)
     setLoading(false)
   }, [slug])
 
@@ -86,6 +96,18 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
       await reload()
     } catch (err) {
       toast.error((err as { message?: string })?.message ?? t("deleteError"))
+    } finally {
+      setBusy(null)
+    }
+  }
+
+  const revert = async (version: RetainedVersion) => {
+    setBusy(version.versionId)
+    try {
+      await instanceRevert(slug, version.versionId)
+      await reload()
+    } catch (err) {
+      toast.error((err as { message?: string })?.message ?? tis("revertError"))
     } finally {
       setBusy(null)
     }
@@ -186,6 +208,56 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
           ))}
         </ul>
       )}
+
+      {/* Saved versions section */}
+      <Panel
+        title={tis("savedVersions")}
+        aside={versions?.find((v) => v.current) ? <Badge tone="ok">{versions.find((v) => v.current)?.versionName}</Badge> : null}
+      >
+        {versions === null ? (
+          <p className="text-sm text-txt-muted">{tis("loading")}</p>
+        ) : versions.length === 0 ? (
+          <Empty
+            icon="clock"
+            title={tis("noVersions")}
+            lead={tis("noVersionsDetail")}
+          />
+        ) : (
+          <ul className="flex flex-col gap-2">
+            {versions.map((version) => (
+              <li key={version.versionId} className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate font-mono text-xs text-txt">
+                    {version.versionName}
+                    {version.current && (
+                      <span className="ml-2 text-[11px] uppercase tracking-[0.1em] text-txt-dim">
+                        {tis("currentVersion")}
+                      </span>
+                    )}
+                  </p>
+                  <p className="text-[11px] text-txt-dim">
+                    {formatWhen(version.installedAt)} · {tis("versionFileCount", { count: version.fileCount })} ·{" "}
+                    {version.minecraft}
+                  </p>
+                </div>
+                {!version.current && (
+                  <Button
+                    size="sm"
+                    icon="back"
+                    disabled={!version.revertible || busy !== null}
+                    loading={busy === version.versionId}
+                    onClick={() => void revert(version)}
+                  >
+                    {tis("revertButton")}
+                  </Button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+        <Divider label={tis("costDivider")} className="my-4" />
+        <p className="text-xs text-txt-dim" dangerouslySetInnerHTML={{ __html: tis("costWarning") }} />
+      </Panel>
     </div>
   )
 }

@@ -72,6 +72,8 @@
     "primitives": {
       "dismiss": "Descartar",
       "close": "Cerrar",
+      "cancel": "Cancelar",
+      "confirm": "Confirmar",
       "copy": "Copiar",
       "copied": "Copiado",
       "copyCode": "Copiar código",
@@ -235,6 +237,19 @@
       "wonWith": "Ganó con {tickets, plural, one {# ticket} other {# tickets}} · {odds}% de probabilidad",
       "watchDraw": "Ver cómo se sorteó",
       "share": "Compartir",
+      "reel": {
+        "live": "En directo",
+        "landedTag": "Ganador",
+        "spinning": "¡Sorteando!",
+        "spinningOf": "Sorteando ganador {i} de {n}",
+        "landed": "¡{name}!",
+        "winnerOf": "Ganador {i}/{n}",
+        "skip": "Saltar animación",
+        "soundOn": "Silenciar sonido",
+        "soundOff": "Activar sonido",
+        "labelsHidden": "{n} participantes · etiquetas ocultas",
+        "othersN": "+{n} más"
+      },
       "prize": {
         "key": {
           "label": "Clave de juego"

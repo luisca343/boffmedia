@@ -3,10 +3,11 @@
 import * as React from "react"
 import { cn } from "@/lib/utils"
 import { MONO_LABEL, Sample, Section } from "../../showcase-shared"
-import { Banner, Button, Checkbox, Field, IconButton, Input, Menu, Modal, Popover, Select, toast } from "@boffmedia/ui"
+import { Banner, Button, Checkbox, ConfirmDialog, Field, IconButton, Input, Menu, Modal, Popover, Select, toast } from "@boffmedia/ui"
 
 export function MenusSections() {
   const [modalOpen, setModalOpen] = React.useState(false)
+  const [confirmOpen, setConfirmOpen] = React.useState<"warning" | "error" | null>(null)
   const [bannerOpen, setBannerOpen] = React.useState(true)
   return (
     <Section
@@ -82,6 +83,28 @@ export function MenusSections() {
             <span className="text-txt-muted text-[13px]">Equipo Volt · 12 480 pts · 3 logros</span>
           </div>
         </Popover>
+      </Sample>
+      <Sample
+        title="Confirmación"
+        code="<ConfirmDialog open title body tone confirmLabel busy onConfirm onClose>"
+        note={<>Sustituye a <code>window.confirm()</code>: tono, foco y estilo del kit, y el botón de confirmar en <code>danger</code> cuando no hay vuelta atrás. Se queda abierto hasta <code>onClose</code>, así que una acción que falla lo deja en pantalla.</>}
+      >
+        <Button icon="lock" onClick={() => setConfirmOpen("warning")}>Cerrar el cupo</Button>
+        <Button variant="danger" icon="trash" onClick={() => setConfirmOpen("error")}>Eliminar torneo</Button>
+        <ConfirmDialog
+          open={confirmOpen != null}
+          tone={confirmOpen ?? "warning"}
+          title={confirmOpen === "error" ? "Eliminar torneo" : "Cerrar el cupo"}
+          body={confirmOpen === "error"
+            ? "Se borrará «Copa Boffmedia» con sus inscripciones y partidas. No se puede deshacer."
+            : "12 participantes entran y 3 quedan fuera por no completar los pasos. El cuadro no se genera todavía."}
+          confirmLabel={confirmOpen === "error" ? "Eliminar" : "Cerrar cupo"}
+          onConfirm={() => {
+            setConfirmOpen(null)
+            toast({ tone: "ok", title: "Hecho", msg: "Acción confirmada." })
+          }}
+          onClose={() => setConfirmOpen(null)}
+        />
       </Sample>
       <Sample
         title="Diálogo modal"

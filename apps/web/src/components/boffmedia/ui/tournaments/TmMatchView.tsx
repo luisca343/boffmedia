@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, Button, toast } from "@boffmedia/ui"
+import { Icon, Button, toast, Input } from "@boffmedia/ui"
 import { DkFlag, DkLive, DkSprite, DkType } from "@/components/boffmedia/ui/tools/datakit"
 import { useFormat } from "@boffmedia/ui/useFormat"
 import type { TnCompetitor } from "./tournaments-util"
@@ -327,8 +327,9 @@ function TmMatchChat({ me, opp, feed }: { me: TmPlayer; opp: TmPlayer; feed: str
         })}
       </div>
       <div className="flex gap-2.5 border-t border-solid border-line bg-panel px-4 py-3">
-        <input
-          className="min-w-0 flex-1 border border-solid border-line-2 bg-base px-3 py-2.5 font-body text-[13.5px]/[1.3] text-txt focus:border-accent-line focus:outline focus:outline-2 focus:outline-accent-line"
+        <Input
+          size="sm"
+          className="min-w-0 flex-1"
           value={input}
           placeholder={t("tableChatPlaceholder")}
           onChange={(e) => setInput(e.target.value)}

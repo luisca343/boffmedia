@@ -125,6 +125,7 @@ export function TorneoDetailView({
       <EventGate detail={tn} />
       <EntryChecklist detail={tn} onChange={refetch} />
       <MyMatchBanner detail={tn} />
+      <OpenTeamsheets detail={tn} />
 
       {tn.rules && <FoldBlock title={t("detail.rulesTitle")} body={tn.rules} />}
       {tn.prizes && <FoldBlock title={t("detail.prizesTitle")} body={tn.prizes} open />}
@@ -268,6 +269,39 @@ function EntryChecklist({
         </div>
       )}
     </div>
+  )
+}
+
+/**
+ * Every entrant's sheet, on a tournament that publishes them.
+ *
+ * Purely payload-driven: the server only fills `participants[].teamsheet` when
+ * this viewer is allowed to read it AND the tournament has started, so there is
+ * no visibility rule to re-implement here — sheets present means show them.
+ */
+function OpenTeamsheets({ detail }: { detail: TournamentDetailApi }) {
+  const t = useTranslations("torneos.teamsheet")
+  const withSheets = detail.participants.filter((p) => p.teamsheet?.length)
+  if (!withSheets.length) return null
+
+  return (
+    <details className="group mb-6 border border-solid border-line bg-panel" open>
+      <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-muted">
+        {t("rosterTitle", { count: withSheets.length })}
+        <span className="transition-transform group-open:rotate-90">›</span>
+      </summary>
+      <div className="grid gap-1.5 border-t border-solid border-line p-4 sm:grid-cols-2 lg:grid-cols-3">
+        {withSheets.map((p) => (
+          <div
+            key={p.id}
+            className="flex items-center gap-2 border border-solid border-line bg-base px-3 py-2"
+          >
+            <span className="min-w-0 flex-1 truncate font-body text-[13px]">{p.name}</span>
+            <TeamsheetViewButton sheet={p.teamsheet} name={p.name} />
+          </div>
+        ))}
+      </div>
+    </details>
   )
 }
 

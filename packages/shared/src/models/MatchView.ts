@@ -29,6 +29,10 @@ export type MatchView = {
      * Active self-report proposal state, if any.
      */
     proposalState: MatchView.proposalState | null;
+    /**
+     * When a player asked for a judge at this table, if they have. Carried on the flat list so the admin panel can surface open requests without opening every match.
+     */
+    judgeRequestedAt: string | null;
 };
 export namespace MatchView {
     export enum bracket {

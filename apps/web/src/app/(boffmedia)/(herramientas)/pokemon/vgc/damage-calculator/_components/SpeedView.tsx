@@ -4,10 +4,9 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { calcStat, Generations } from "@smogon/calc"
 import { cn } from "@/lib/utils"
-import { Icon, Seg } from "@boffmedia/ui"
+import { Icon, Seg, Input } from "@boffmedia/ui"
 import { PokemonSprite } from "./ui/PokemonSprite"
 import { TogglePill } from "./ui/TogglePill"
-import { INPUT_CLASS } from "./ui/controls"
 import { ATK_COLOR, DEF_COLOR, cssVars } from "./ui/theme"
 import { useCalculatorStore } from "../_store/calculatorStore"
 import { useLegalPokemon } from "../_hooks/useLegalPokemon"
@@ -162,8 +161,8 @@ export function SpeedView() {
             />
           )}
           {!showRivals && (
-            <input
-              className={cn(INPUT_CLASS, "max-w-[240px]")}
+            <Input
+              className="max-w-[240px]"
               value={filter}
               placeholder={t("filterPlaceholder")}
               aria-label={t("filterPlaceholder")}

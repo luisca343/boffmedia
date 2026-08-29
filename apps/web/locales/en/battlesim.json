@@ -42,7 +42,9 @@
       "joiningBattle": "Joining battle…",
       "waitingBattle": "Waiting for battle to start…",
       "reconnecting": "Reconnecting (attempt {attempt}/{max})…",
-      "forfeitConfirm": "Are you sure you want to forfeit?"
+      "forfeitConfirm": "Are you sure you want to forfeit?",
+      "forfeitTitle": "Forfeit the match",
+      "forfeitCta": "Forfeit"
     },
     "dock": {
       "waitingOpponent": "Waiting for opponent…",

@@ -1,7 +1,7 @@
 "use client"
 
 import { Sample, Section } from "../showcase-shared"
-import { Badge, Button, CodeBlock, DataList, Empty, Panel, Ph, Progress, Rank, RankRow, SearchInput, Seg, Select, Skeleton, StatChip, Stats, Table, Third, ToolBar, ToolBarSpacer, ToolHeader, ToolSeal, ToolTitle } from "@boffmedia/ui"
+import { Avatar, Badge, Button, CodeBlock, DataList, Empty, IconButton, Input, Panel, Ph, Progress, Rank, RankRow, SearchInput, Seg, Select, Skeleton, StatChip, Stats, Table, Third, ToolBar, ToolBarSpacer, ToolBarDivider, ToolHeader, ToolSeal, ToolTitle, ToolStrip, BackLink, SectionBar } from "@boffmedia/ui"
 
 export function PatronesChapter() {
 
@@ -94,6 +94,37 @@ export function PatronesChapter() {
                 </div>
               </Sample>
 
+              <Sample title="Franja con título y sub-fila" code={'<ToolStrip sub>'} col note={<>La barra fija que encabeza una herramienta: sticky por defecto. La fila inferior <code>sub</code> alberga filtros, tabs o controles secundarios. El interior es un flex que distribuye sus hijos sin más; <code>ml-auto</code> empuja lo que sigue a la derecha.</>}>
+                <div className="w-full border border-solid border-line">
+                  <ToolStrip sub={<>
+                    <Seg value="m" onChange={() => {}} options={[{ value: "s", label: "S" }, { value: "m", label: "M" }, { value: "l", label: "L" }]} />
+                    <Button size="sm">Aplicar</Button>
+                  </>}>
+                    <SearchInput value="" onChange={() => {}} placeholder="Buscar…" className="min-w-[200px] flex-1" />
+                    <ToolBarSpacer />
+                    <Seg value="asc" onChange={() => {}} options={[{ value: "asc", label: "A–Z" }, { value: "desc", label: "Z–A" }]} />
+                  </ToolStrip>
+                </div>
+              </Sample>
+
+              <Sample title="Enlace atrás" code={'<BackLink label href|onBack>'} note={<>«Atrás» + icono de flecha. El átomo que aparece aislado en formularios o compartiendo fila con otro control. Su forma completa es <code>SectionBar</code>.</>}>
+                <BackLink label="Anterior" href="#" />
+              </Sample>
+
+              <Sample title="Barra de sección" code={'<SectionBar label title actions bordered>'} col note={<>Barra de profundidad 1: enlace atrás, opcionalmente nombre de la sección, opcionalmente acciones (Guardar/Cancelar). <code>bordered</code> la hace fixed (altura explícita); sin él, fluye con la página (altura mínima).</>}>
+                <div className="w-full">
+                  <SectionBar label="Volver" title="Editar equipo" actions={<Button size="sm" variant="pri">Guardar</Button>} bordered />
+                </div>
+              </Sample>
+
+              <Sample title="Divisor de barra" code={'<ToolBarDivider>'} note={<>Línea vertical fina (1px) que agrupa controles en una <code>ToolBar</code>. Ejemplo: búsqueda · divisor · opciones de vista.</>}>
+                <div className="flex items-center gap-3 p-4 border border-solid border-line bg-panel">
+                  <SearchInput value="" onChange={() => {}} placeholder="Buscar…" className="w-[160px]" />
+                  <ToolBarDivider />
+                  <Seg value="m" onChange={() => {}} options={[{ value: "s", label: "S" }, { value: "m", label: "M" }]} />
+                </div>
+              </Sample>
+
               <Sample title="Métrica y sello" code={'<StatChip variant> · <ToolSeal hue>'}>
                 <StatChip icon="gift" value={12} label="gratis" tone="ok" />
                 <StatChip icon="flame" value="48 €" label="ahorrado" tone="accent" />
@@ -152,6 +183,34 @@ export function PatronesChapter() {
                     { player: "RotomChef", game: "VGC", ach: <Badge tone="ok">31</Badge>, pts: "4 820" },
                     { player: "EnderQueen", game: "Minecraft", ach: <Badge tone="ok">28</Badge>, pts: "4 510" },
                     { player: "TeraBlast", game: "VGC", ach: <Badge tone="ok">26</Badge>, pts: "4 180" },
+                  ]}
+                />
+              </Sample>
+              <Sample title="Tabla densa" code="<Table dense columns={[{ align, width, srOnly }]}>" col note={<>La tabla de trabajo: celdas ajustadas a un control de 32 px, cabeceras en gris tenue y columnas con <code>width</code> / <code>align</code>. Un <code>Input</code>, un <code>Select</code> y un <code>Button</code> en <code>size=&quot;sm&quot;</code> caben en la fila sin estirarla.</>}>
+                <Table
+                  dense
+                  columns={[
+                    { key: "seed", label: "#", width: "64px", align: "center" },
+                    { key: "who", label: "Participante" },
+                    { key: "entry", label: "Entrada" },
+                    { key: "status", label: "Estado", width: "176px" },
+                    { key: "actions", label: "Acciones", width: "88px", align: "right", srOnly: true },
+                  ]}
+                  rows={[
+                    {
+                      seed: <Input size="sm" defaultValue="1" className="w-12 text-center font-mono" aria-label="Seed" />,
+                      who: <span className="flex items-center gap-2"><Avatar size="sm">R</Avatar><span className="font-semibold">RotomChef</span> 🇪🇸</span>,
+                      entry: <span className="flex gap-1"><Badge tone="ok">✓ check-in</Badge><Badge tone="ok">✓ equipo</Badge></span>,
+                      status: <Select size="sm" value="active" options={[{ value: "active", label: "Activo" }, { value: "dropped", label: "Fuera" }]} ariaLabel="Estado" />,
+                      actions: <span className="inline-flex gap-1"><IconButton size="sm" variant="ghost" name="eye" label="Ver" /><IconButton size="sm" variant="ghost" name="x" label="Quitar" /></span>,
+                    },
+                    {
+                      seed: <Input size="sm" placeholder="—" className="w-12 text-center font-mono" aria-label="Seed" />,
+                      who: <span className="flex items-center gap-2"><Avatar size="sm">E</Avatar><span className="font-semibold">EnderQueen</span></span>,
+                      entry: <span className="flex gap-1"><Badge tone="warn">falta check-in</Badge><Badge tone="ok">✓ equipo</Badge></span>,
+                      status: <Select size="sm" value="active" options={[{ value: "active", label: "Activo" }, { value: "dropped", label: "Fuera" }]} ariaLabel="Estado" />,
+                      actions: <span className="inline-flex gap-1"><IconButton size="sm" variant="ghost" name="eye" label="Ver" /><IconButton size="sm" variant="ghost" name="x" label="Quitar" /></span>,
+                    },
                   ]}
                 />
               </Sample>

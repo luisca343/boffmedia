@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, Field, Icon, Input, Modal, Textarea, toast } from "@boffmedia/ui"
+import { Button, Field, Icon, Input, Textarea, toast } from "@boffmedia/ui"
 import { AvPanel, AvPill } from "../ui/av-kit"
 import { type AdminPack, type GalleryImage, type GameType, PacksService } from "@/services/api/boffmedia/packsService"
 import { apiUpload } from "@/services/http/boff-client"
@@ -140,7 +140,7 @@ export function PackForm({
       }
       setIconUrl(res.data.url)
     } catch (e) {
-      toast({ tone: "bad", title: t("icon.label"), msg: "Upload failed" })
+      toast({ tone: "bad", title: t("icon.label"), msg: t("icon.uploadFailed") })
     } finally {
       setUploadingIcon(false)
     }
@@ -148,7 +148,7 @@ export function PackForm({
 
   const addGalleryImage = async (file: File) => {
     if (gallery.length >= 15) {
-      toast({ tone: "warn", title: t("gallery.label"), msg: "Maximum 15 images" })
+      toast({ tone: "warn", title: t("gallery.label"), msg: t("gallery.maxImages") })
       return
     }
     setUploadingGallery(true)
@@ -581,57 +581,5 @@ export function PackForm({
         </div>
       </div>
     </AvPanel>
-  )
-}
-
-/** The one place a modal is still right: a destructive yes/no that must block
- *  the click that opened it. Everything else in Packs is a pane. */
-export function ConfirmModal({
-  open,
-  title,
-  lead,
-  onClose,
-  onConfirm,
-}: {
-  open: boolean
-  title: string
-  lead?: string
-  onClose: () => void
-  onConfirm: () => void | Promise<void>
-}) {
-  const t = useTranslations("admin.packs")
-  const [busy, setBusy] = useState(false)
-
-  return (
-    <Modal
-      open={open}
-      onClose={onClose}
-      title={title}
-      footer={
-        <>
-          <Button variant="ghost" onClick={onClose}>
-            {t("cancel")}
-          </Button>
-          <Button
-            variant="pri"
-            icon="check"
-            loading={busy}
-            onClick={async () => {
-              setBusy(true)
-              try {
-                await onConfirm()
-                onClose()
-              } finally {
-                setBusy(false)
-              }
-            }}
-          >
-            {t("confirm")}
-          </Button>
-        </>
-      }
-    >
-      <p className="text-sm text-txt-dim">{lead ?? t("confirmLead")}</p>
-    </Modal>
   )
 }

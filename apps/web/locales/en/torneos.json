@@ -125,6 +125,8 @@
       "title": "My team sheet",
       "update": "Update",
       "view": "View team",
+      "ofPlayer": "{name}'s team",
+      "rosterTitle": "Teamsheets ({count})",
       "close": "Close",
       "submit": "Submit team",
       "locked": "Locked",

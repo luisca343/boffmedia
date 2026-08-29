@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Sample, Section } from "../../showcase-shared"
-import { Checkbox, Disclosure, Field, Input, OptionGroup, Progress, RadioGroup, SearchInput, Select, Slider, Textarea, Toggle } from "@boffmedia/ui"
+import { Button, Checkbox, Disclosure, Field, IconButton, Input, OptionGroup, Progress, RadioGroup, SearchInput, Select, Slider, Textarea, Toggle } from "@boffmedia/ui"
 
 export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; setRng: React.Dispatch<React.SetStateAction<number>> }) {
   const [sq, setSq] = React.useState("")
@@ -39,11 +39,95 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
             </Field>
           </div>
         </Sample>
+        <Sample title="Escala compacta" code="<Input size=&quot;sm&quot;> · <Select size=&quot;sm&quot;>" col note={<>El chasis de 32 px que ya usan <code>Button</code> e <code>IconButton</code> en <code>sm</code>: en una barra de herramientas, un campo, un selector y un botón quedan en una sola línea. Antes esto se conseguía sobrescribiendo <code>h-8 py-0…</code> en cada sitio.</>}>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <Input size="sm" placeholder="Invitado sin cuenta…" className="w-44" aria-label="Nombre" />
+            <Input size="sm" placeholder="#" className="w-14 text-center font-mono" aria-label="Seed" />
+            <Select size="sm" value="es" onChange={() => {}} options={[{ value: "es", label: "ES" }, { value: "fr", label: "FR" }]} ariaLabel="País" />
+            <Button size="sm" icon="plus">Añadir</Button>
+            <IconButton size="sm" variant="ghost" name="x" label="Quitar" />
+          </div>
+        </Sample>
         <Sample title="Área de texto" code="<Field> + <Textarea>" col note={<>Entrada multilínea con el mismo chasis; crece en vertical con <code>resize</code>.</>}>
           <div className="w-full max-w-[440px]">
             <Field label="Notas del equipo" hint="Visible solo para ti.">
               <Textarea rows={3} placeholder="Anota leads, coberturas, ideas de EV…" />
             </Field>
+          </div>
+        </Sample>
+        <Sample title="Matriz de estados" code="Input / Select / Textarea — todos los estados" col note={<>Los chasis nativos textuales pintan su trazo inferior como capa de fondo (limitación del navegador: los elementos reemplazados no tienen <code>::after</code>). Si necesitas un <code>background-image</code> personalizado (p.ej. degradado, patrón), úsalo a través de <code>--ctl-bg</code> / <code>--ctl-bg-size</code> / <code>--ctl-bg-pos</code> en lugar de <code>background-image</code> directo; un <code>background-image</code> directo sustituye la capa del trazo y el corte queda sin borde.</>}>
+          <div className="w-full space-y-6">
+            <div className="grid gap-4">
+              <div className="text-[12px] font-mono font-semibold uppercase tracking-[0.1em] text-txt-dim mb-2">Input</div>
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Defecto (vacío)</span>
+                  <Input placeholder="Placeholder…" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Con valor</span>
+                  <Input defaultValue="Incineroar" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Solo placeholder</span>
+                  <Input placeholder="Buscar juego…" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Deshabilitado</span>
+                  <Input disabled placeholder="No disponible…" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Compacto (sm)</span>
+                  <Input size="sm" placeholder="Seed…" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Dentro de Field + hint</span>
+                  <Field label="Código" hint="Por ejemplo: ROT-2026">
+                    <Input placeholder="Código…" />
+                  </Field>
+                </div>
+                <div className="sm:col-span-2 lg:col-span-1">
+                  <span className="text-[11px] text-txt-muted block mb-2">Field + error</span>
+                  <Field label="Email" error="Ese email ya existe.">
+                    <Input defaultValue="user@" placeholder="tu@email…" />
+                  </Field>
+                </div>
+              </div>
+            </div>
+            <div className="grid gap-4">
+              <div className="text-[12px] font-mono font-semibold uppercase tracking-[0.1em] text-txt-dim mb-2">Select</div>
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Defecto</span>
+                  <Select value="vgc" onChange={() => {}} ariaLabel="Juego" options={[{ value: "vgc", label: "Pokémon VGC" }, { value: "mc", label: "Minecraft" }]} />
+                </div>
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Deshabilitado</span>
+                  <Select disabled value="vgc" onChange={() => {}} ariaLabel="Juego" options={[{ value: "vgc", label: "Pokémon VGC" }]} />
+                </div>
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Compacto (sm)</span>
+                  <Select size="sm" value="es" onChange={() => {}} ariaLabel="País" options={[{ value: "es", label: "ES" }, { value: "fr", label: "FR" }]} />
+                </div>
+                <div className="sm:col-span-2 lg:col-span-1">
+                  <span className="text-[11px] text-txt-muted block mb-2">Field + error</span>
+                  <Select label="Regulación" error="Selecciona una regulación válida." value="" onChange={() => {}} options={[{ value: "h", label: "H" }, { value: "g", label: "G" }]} />
+                </div>
+              </div>
+            </div>
+            <div className="grid gap-4">
+              <div className="text-[12px] font-mono font-semibold uppercase tracking-[0.1em] text-txt-dim mb-2">Textarea</div>
+              <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Defecto</span>
+                  <Textarea rows={2} placeholder="Escribe una nota…" />
+                </div>
+                <div>
+                  <span className="text-[11px] text-txt-muted block mb-2">Deshabilitado</span>
+                  <Textarea disabled rows={2} placeholder="No editable…" />
+                </div>
+              </div>
+            </div>
           </div>
         </Sample>
         <Sample title="Interruptores" code="<Toggle>">

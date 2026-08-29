@@ -40,6 +40,7 @@
     },
     "detail": {
       "back": "Eventos",
+      "leaveTitle": "Salir del evento",
       "about": "Sobre el evento",
       "achievements": "Logros",
       "leaderboard": "Clasificación",

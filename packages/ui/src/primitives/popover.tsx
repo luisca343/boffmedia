@@ -41,6 +41,7 @@ export function Popover({ trigger, align = "start", side = "bottom", ariaLabel, 
             setOpen((v) => !v)
           }
         }}
+        className="focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-[3px]"
       >
         {trigger}
       </span>

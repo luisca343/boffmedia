@@ -3,9 +3,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Badge, Button, Empty, Field, Icon, Input, PackListItem, Spinner, Tabs, toast, VersionRow } from "@boffmedia/ui"
-import { AvMetric, AvPanel, AvPill, AvSectionHead } from "../_components/ui/av-kit"
-import { ConfirmModal, PackForm } from "../_components/packs/pack-form"
+import { Badge, Button, ConfirmDialog, Empty, Field, Icon, Input, PackListItem, Spinner, Tabs, toast, VersionRow } from "@boffmedia/ui"
+import { AvKpi, AvKpis, AvMetric, AvPanel, AvPill, AvSectionHead, AvViewLink, formatAdminDate } from "../_components/ui/av-kit"
+import { PackForm } from "../_components/packs/pack-form"
 import { PackServerEditor } from "../_components/packs/pack-server-editor"
 import { VersionEditor } from "../_components/packs/version-editor"
 import {
@@ -19,6 +19,8 @@ import {
   type PackVersionRow,
   PacksService,
 } from "@/services/api/boffmedia/packsService"
+
+type ConfirmAction = "revoke" | "revokeUuid" | null
 
 // Pack authoring lives here, not in the launcher. The desktop
 // app only installs and plays; creating packs, cutting versions and granting
@@ -154,7 +156,7 @@ function VersionsTab({
                   </>
                 )
               }
-              date={new Date(v.createdAt).toLocaleDateString()}
+              date={formatAdminDate(v.createdAt)}
               actions={<>
                 <Button size="sm" variant="ghost" icon="copy" onClick={() => onCloneVersion(v.id)}>{t("clone")}</Button>
                 {!v.published && <>
@@ -168,10 +170,11 @@ function VersionsTab({
         </div>
       )}
 
-      <ConfirmModal
+      <ConfirmDialog
         open={confirmDelete !== null}
         title={t("confirmDeleteVersion")}
-        lead={confirmDelete ? t("confirmDeleteVersionLead", { name: confirmDelete.name }) : undefined}
+        body={confirmDelete ? t("confirmDeleteVersionLead", { name: confirmDelete.name }) : ""}
+        tone="error"
         onClose={() => setConfirmDelete(null)}
         onConfirm={() => (confirmDelete ? remove(confirmDelete.id) : undefined)}
       />
@@ -339,7 +342,7 @@ function AccessTab({ pack }: { pack: AdminPack }) {
               >
                 <span className="font-mono text-[12px] text-txt">{row.uuid}</span>
                 <span className="ml-auto font-mono text-[11px] text-txt-dim">
-                  {new Date(row.grantedAt).toLocaleDateString()}
+                  {formatAdminDate(row.grantedAt)}
                 </span>
                 <Button
                   size="sm"
@@ -393,7 +396,7 @@ function AccessTab({ pack }: { pack: AdminPack }) {
                 {t(row.source === "invite" ? "sourceInvite" : "sourceAdmin")}
               </AvPill>
               <span className="ml-auto font-mono text-[11px] text-txt-dim">
-                {new Date(row.grantedAt).toLocaleDateString()}
+                {formatAdminDate(row.grantedAt)}
               </span>
               <Button
                 size="sm"
@@ -408,10 +411,10 @@ function AccessTab({ pack }: { pack: AdminPack }) {
         </div>
       )}
 
-      <ConfirmModal
+      <ConfirmDialog
         open={confirmRevoke !== null}
         title={t("confirmRevokeAccess")}
-        lead={
+        body={
           confirmRevoke !== null
             ? t("confirmRevokeUserLead", {
                 name:
@@ -419,8 +422,9 @@ function AccessTab({ pack }: { pack: AdminPack }) {
                     (r) => r.userId === confirmRevoke.userId && r.source === confirmRevoke.source,
                   )?.username ?? String(confirmRevoke.userId),
               })
-            : undefined
+            : ""
         }
+        tone="error"
         onClose={() => setConfirmRevoke(null)}
         onConfirm={() =>
           confirmRevoke !== null
@@ -429,12 +433,13 @@ function AccessTab({ pack }: { pack: AdminPack }) {
         }
       />
 
-      <ConfirmModal
+      <ConfirmDialog
         open={confirmRevokeUuid !== null}
         title={t("confirmRevokeAccess")}
-        lead={
-          confirmRevokeUuid ? t("confirmRevokeAccessLead", { uuid: confirmRevokeUuid }) : undefined
+        body={
+          confirmRevokeUuid ? t("confirmRevokeAccessLead", { uuid: confirmRevokeUuid }) : ""
         }
+        tone="error"
         onClose={() => setConfirmRevokeUuid(null)}
         onConfirm={() => (confirmRevokeUuid ? revoke(confirmRevokeUuid) : undefined)}
       />
@@ -538,10 +543,11 @@ function InvitesTab({ pack }: { pack: AdminPack }) {
         </div>
       )}
 
-      <ConfirmModal
+      <ConfirmDialog
         open={confirmRevoke !== null}
         title={t("confirmRevokeInvite")}
-        lead={confirmRevoke ? t("confirmRevokeInviteLead", { code: confirmRevoke }) : undefined}
+        body={confirmRevoke ? t("confirmRevokeInviteLead", { code: confirmRevoke }) : ""}
+        tone="error"
         onClose={() => setConfirmRevoke(null)}
         onConfirm={async () => {
           if (!confirmRevoke) return
@@ -571,7 +577,7 @@ function AuditTab({ pack }: { pack: AdminPack }) {
       {rows.map((row) => (
         <div key={row.id} className="flex items-center gap-3 border-b border-line py-2 last:border-0">
           <span className="font-mono text-[11px] text-txt-dim">
-            {new Date(row.at).toLocaleString()}
+            {formatAdminDate(row.at, { time: true })}
           </span>
           <AvPill>{row.action}</AvPill>
           {row.uuid && <span className="font-mono text-[11px] text-txt-muted">{row.uuid}</span>}
@@ -660,46 +666,31 @@ export function PacksAdmin() {
         <AvSectionHead
           title={t("title")}
           desc={t("desc")}
-          actions={
-            <>
-              {/* Counts as an inline strip: three KPI cards cost ~110px of
-                  height that the pack list wants more than the numbers do. */}
-              <span className="flex items-center gap-4 border border-solid border-line bg-panel px-4 py-2.5">
-                {[
-                  [t("kpiPacks"), totals.packs],
-                  [t("kpiVersions"), totals.versions],
-                  [t("kpiGrants"), totals.grants],
-                ].map(([label, value]) => (
-                  <span key={String(label)} className="flex flex-col gap-0.5">
-                    <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-txt-dim">
-                      {label}
-                    </span>
-                    <span className="font-display text-[19px] font-extrabold leading-none text-txt">
-                      {value}
-                    </span>
-                  </span>
-                ))}
-              </span>
-              {view !== "detail" && (
-                <Button
-                  variant="ghost"
-                  icon="back"
-                  onClick={() => go({ view: null, version: null })}
-                >
-                  {t("backToPack")}
-                </Button>
-              )}
-              <Button
-                variant="pri"
-                icon="plus"
-                disabled={view === "new-pack"}
-                onClick={() => go({ pack: null, view: "new-pack", version: null })}
-              >
-                {t("newPack")}
-              </Button>
-            </>
-          }
         />
+        <AvKpis className="mb-5">
+          <AvKpi label={t("kpiPacks")} value={totals.packs} icon="cube" />
+          <AvKpi label={t("kpiVersions")} value={totals.versions} icon="layers" />
+          <AvKpi label={t("kpiGrants")} value={totals.grants} icon="users" />
+        </AvKpis>
+        <div className="mb-5 flex gap-2 flex-wrap">
+          {view !== "detail" && (
+            <Button
+              variant="ghost"
+              icon="back"
+              onClick={() => go({ view: null, version: null })}
+            >
+              {t("backToPack")}
+            </Button>
+          )}
+          <Button
+            variant="pri"
+            icon="plus"
+            disabled={view === "new-pack"}
+            onClick={() => go({ pack: null, view: "new-pack", version: null })}
+          >
+            {t("newPack")}
+          </Button>
+        </div>
       </div>
 
       <div className="grid min-h-0 flex-1 gap-4 [grid-template-columns:minmax(0,300px)_minmax(0,1fr)] max-[1100px]:grid-cols-1 max-[1100px]:overflow-auto">
@@ -729,7 +720,7 @@ export function PacksAdmin() {
             <Empty icon="cube" title={t("noPacks")} lead={t("noPacksLead")} />
           )}
           {packs && packs.length > 0 && filtered.length === 0 && (
-            <p className="font-body text-[12px] text-txt-dim">{t("noPackMatches")}</p>
+            <Empty icon="search" title={t("noPackMatches")} />
           )}
           <div className="bm-scroll flex min-h-0 flex-1 flex-col gap-1 overflow-auto pr-1">
             {filtered.map((p) => (
@@ -746,6 +737,7 @@ export function PacksAdmin() {
                   {p.gameType !== "minecraft" && <AvPill tone="info" icon="layers">{t(`gameType.${p.gameType}`)}</AvPill>}
                   <AvPill tone={p.latestVersionId ? "ok" : "warn"}>{p.latestVersionId ? t("live") : t("noPublished")}</AvPill>
                   {p.archived && <AvPill tone="bad">{t("archived")}</AvPill>}
+                  <AvViewLink href={`/app/packs/${p.slug}`} compact />
                 </>}
                 count={<>{p.versionCount} {t("versionsShort")} · {p.aclCount} {t("grantsShort")}</>}
               />
@@ -811,6 +803,7 @@ export function PacksAdmin() {
                 <Badge tone={pack.latestVersionId ? "ok" : "warn"}>
                   {pack.latestVersionId ? t("live") : t("noPublished")}
                 </Badge>
+                <AvViewLink href={`/app/packs/${pack.slug}`} />
                 <Button
                   size="sm"
                   variant="ghost"

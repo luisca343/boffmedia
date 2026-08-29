@@ -16,11 +16,13 @@ import {
   TOURNAMENT_FORMAT,
   COMPETITOR_KIND,
   TOURNAMENT_METRIC,
+  TEAMSHEET_VISIBILITY,
 } from '@/_db/schema/BoffMediaTournaments';
 import type {
   TournamentFormat,
   CompetitorKind,
   TournamentMetric,
+  TeamsheetVisibility,
 } from '../tournaments.types';
 import { CreatePhaseDto } from './create-phase.dto';
 
@@ -142,6 +144,16 @@ export class CreateTournamentDto {
   @IsOptional()
   @IsBoolean()
   teamsheetRequired?: boolean;
+
+  @ApiPropertyOptional({
+    enum: Object.values(TEAMSHEET_VISIBILITY),
+    description:
+      "Who may read other entrants' teamsheets once the tournament is live. Independent of `teamsheetRequired` — a tournament can demand sheets and keep them private, or publish sheets it never demanded. Never reveals anything before the start.",
+    default: TEAMSHEET_VISIBILITY.PRIVATE,
+  })
+  @IsOptional()
+  @IsEnum(TEAMSHEET_VISIBILITY)
+  teamsheetVisibility?: TeamsheetVisibility;
 
   @ApiPropertyOptional({
     description:

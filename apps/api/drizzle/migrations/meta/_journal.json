@@ -15,6 +15,13 @@
       "when": 1787936885305,
       "tag": "0001_add_pack_version_runtime",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787949181600,
+      "tag": "0002_wild_krista_starr",
+      "breakpoints": true
     }
   ]
 }

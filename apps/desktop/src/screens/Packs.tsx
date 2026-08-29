@@ -317,7 +317,9 @@ function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "c
             <AccessBadge entry={entry} />
             <span className="font-mono text-[11px] text-txt-dim">
               {latest
-                ? `${latest.minecraft} · ${t("filesCount", { count: latest.fileCount })}`
+                ? // A non-Minecraft pack (emulator, Stardew…) has no `minecraft`
+                  // version; its own version name is the one that means something.
+                  `${latest.minecraft ?? latest.name} · ${t("filesCount", { count: latest.fileCount })}`
                 : t("noPublishedVersion")}
             </span>
             {/* Only when there is something to choose. A "0 opciones" chip on
@@ -705,8 +707,10 @@ export function Packs() {
       <div
         className={
           settings.packLayout === "row"
-            ? "flex flex-col gap-3"
-            : "grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]"
+            ? "flex flex-col gap-2"
+            : settings.packLayout === "compact"
+              ? "grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]"
+              : "grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]"
         }
       >
         {shown.map((entry) => (
