@@ -2,76 +2,13 @@ import type * as React from "react"
 import type { IconName } from "@boffmedia/ui"
 
 // v3 «Señal» — Mewgenics «Papel y tinta» Codex shared meta + pure helpers.
-// Two palettes ship as CSS-var bundles applied on a scope wrapper: MEW_VARS is
-// the default ink-violet "paper" desk (showcase), MEW_SENAL_VARS is the v3
-// graphite + orange skin (the real /otros/mewgenics tool) — desk/accent pull from
-// the v3 design tokens, the bone-paper sticker cards stay. Per-entity tint still
-// arrives via inline --h (hue). The hand fonts (Luckiest Guy display / Shantell
-// Sans hand) are self-hosted in styles/fonts.css; the stacks keep system fallbacks.
-
-const WOB = {
-  "--wob-a": "255px 15px 225px 15px / 15px 225px 15px 255px",
-  "--wob-b": "15px 225px 15px 255px / 255px 15px 225px 15px",
-  "--wob-c": "18px 165px 22px 155px / 155px 18px 175px 22px",
-  "--wob-sm": "12px 18px 10px 16px / 16px 10px 18px 12px",
-  "--mwp-hard": "0 4px 0 rgba(0,0,0,0.35)",
-  "--mwf-disp": '"Luckiest Guy","Arial Rounded MT Bold",cursive',
-  "--mwf-hand": '"Shantell Sans","Trebuchet MS",cursive',
-} as const
-
-// bone paper (light sticker cards) — shared across both skins
-const PAPER = {
-  "--mwp-paper": "#f2e9d3",
-  "--mwp-paper-2": "#eadfc4",
-  "--mwp-paper-3": "#dccdaa",
-  "--mwp-good": "#47823f",
-  "--mwp-warn": "#a86f14",
-  "--mwp-bad": "#bf3333",
-} as const
-
-export const MEW_VARS = {
-  "--mwp-night": "#191322",
-  "--mwp-night-2": "#201a2e",
-  "--mwp-night-3": "#2a2240",
-  "--mwp-nline": "#3a2f55",
-  "--mwp-cream": "#f0e7d4",
-  "--mwp-cream-dim": "#a89bbd",
-  ...PAPER,
-  "--mwp-ink": "#33253d",
-  "--mwp-ink-soft": "#6e6078",
-  "--mwp-ink-line": "rgba(51,37,61,0.32)",
-  "--mwp-red": "#d13a50",
-  "--mwp-red-deep": "#97223a",
-  "--mwp-pink": "#ef7d9d",
-  "--mwp-tape": "rgba(245,238,220,0.28)",
-  ...WOB,
-} as React.CSSProperties
-
-// v3 «Señal» skin — desk + accent map onto the Boffmedia v3 tokens
-// (theme-reactive, with hex fallbacks); the cream index cards are retained.
-export const MEW_SENAL_VARS = {
-  "--mwp-night": "var(--base-deep, #0b0d11)",
-  "--mwp-night-2": "var(--base-2, #12151b)",
-  "--mwp-night-3": "var(--panel, #181c24)",
-  "--mwp-nline": "var(--line, #2a3140)",
-  "--mwp-cream": "var(--txt, #f2f4f8)",
-  "--mwp-cream-dim": "var(--txt-muted, #9aa3b2)",
-  ...PAPER,
-  "--mwp-ink": "#191d24",
-  "--mwp-ink-soft": "#5f6774",
-  "--mwp-ink-line": "rgba(25,29,36,0.32)",
-  "--mwp-red": "var(--accent, #ff5c0a)",
-  "--mwp-red-deep": "#b23c00",
-  "--mwp-pink": "var(--accent-bright, #ff7a33)",
-  "--mwp-tape": "rgba(140,148,162,0.26)",
-  ...WOB,
-} as React.CSSProperties
+// Token sets have moved to CSS skins in globals.css (.mew-skin and .mew-skin-violet)
+// to keep them themeable and centralised. The hand fonts (Luckiest Guy display /
+// Shantell Sans hand) are self-hosted in styles/fonts.css.
 
 export interface MewMeta {
   hue: number
-  label: string
-  singular?: string
-  icon?: IconName
+  key: string
   rank?: number
 }
 
@@ -97,6 +34,11 @@ export const MEW_CATS: MewCat[] = [
   { key: "events", file: "events.json", icon: "compass", hue: 150 },
   { key: "classes", file: "classes.json", icon: "star", hue: 96 },
   { key: "maps", file: "maps.json", icon: "map", hue: 174 },
+  { key: "furniture", file: "furniture.json", icon: "home", hue: 280 },
+  { key: "mutations", file: "mutations.json", icon: "sparkles", hue: 120 },
+  { key: "sets", file: "set_bonuses.json", icon: "layers", hue: 260 },
+  { key: "story_cats", file: "story_cats.json", icon: "book", hue: 45 },
+  { key: "statuses", file: null, icon: "flame", hue: 50 },
 ]
 
 /** Message key for a category's chrome: `cat.<key>.label|singular|desc`. */
@@ -106,37 +48,40 @@ const CATBY: Record<string, MewCat> = {}
 MEW_CATS.forEach((c) => { CATBY[c.key] = c })
 
 const RARITY: Record<string, MewMeta> = {
-  common: { hue: 220, label: "Común", rank: 1 },
-  uncommon: { hue: 150, label: "Poco común", rank: 2 },
-  rare: { hue: 210, label: "Raro", rank: 3 },
-  very_rare: { hue: 285, label: "Muy raro", rank: 4 },
-  consumable_common: { hue: 40, label: "Consumible", rank: 1 },
-  consumable_uncommon: { hue: 150, label: "Consumible+", rank: 2 },
-  consumable_rare: { hue: 210, label: "Consumible★", rank: 3 },
-  consumable_very_rare: { hue: 285, label: "Consumible★★", rank: 4 },
-  quest: { hue: 96, label: "Misión", rank: 3 },
-  sidequest: { hue: 96, label: "Sub-misión", rank: 2 },
+  common: { hue: 220, key: "data.rarity.common", rank: 1 },
+  uncommon: { hue: 150, key: "data.rarity.uncommon", rank: 2 },
+  rare: { hue: 210, key: "data.rarity.rare", rank: 3 },
+  very_rare: { hue: 285, key: "data.rarity.very_rare", rank: 4 },
+  consumable_common: { hue: 40, key: "data.rarity.consumable_common", rank: 1 },
+  consumable_uncommon: { hue: 150, key: "data.rarity.consumable_uncommon", rank: 2 },
+  consumable_rare: { hue: 210, key: "data.rarity.consumable_rare", rank: 3 },
+  consumable_very_rare: { hue: 285, key: "data.rarity.consumable_very_rare", rank: 4 },
+  quest: { hue: 96, key: "data.rarity.quest", rank: 3 },
+  sidequest: { hue: 96, key: "data.rarity.sidequest", rank: 2 },
 }
 const FACTION: Record<string, MewMeta> = {
-  enemies: { hue: 355, label: "Enemigo" },
-  solitary_enemies: { hue: 20, label: "Solitario" },
-  allies: { hue: 150, label: "Aliado" },
-  birds: { hue: 200, label: "Pájaro" },
-  cavemen: { hue: 40, label: "Cavernícola" },
-  mammoths: { hue: 25, label: "Mamut" },
-  sabertooths: { hue: 300, label: "Dientes de sable" },
-  kaiju1: { hue: 320, label: "Kaiju" },
-  kaiju2: { hue: 320, label: "Kaiju" },
-  third_party: { hue: 230, label: "Neutral" },
-  none: { hue: 230, label: "Objeto" },
+  enemies: { hue: 355, key: "data.faction.enemies" },
+  solitary_enemies: { hue: 20, key: "data.faction.solitary_enemies" },
+  allies: { hue: 150, key: "data.faction.allies" },
+  birds: { hue: 200, key: "data.faction.birds" },
+  cavemen: { hue: 40, key: "data.faction.cavemen" },
+  mammoths: { hue: 25, key: "data.faction.mammoths" },
+  sabertooths: { hue: 300, key: "data.faction.sabertooths" },
+  kaiju1: { hue: 320, key: "data.faction.kaiju1" },
+  kaiju2: { hue: 320, key: "data.faction.kaiju2" },
+  third_party: { hue: 230, key: "data.faction.third_party" },
+  none: { hue: 230, key: "data.faction.none" },
 }
+// `code` is the game's canonical 3-letter stat id — it keys BOTH the i18n
+// abbreviations (`stat.<code>`) and the token glyphs in ui_map.tokens, neither
+// of which is localized. Never derive it from a localized abbreviation.
 const STATS = [
-  { key: "strength", abbr: "FUE", label: "Fuerza" },
-  { key: "dexterity", abbr: "DES", label: "Destreza" },
-  { key: "constitution", abbr: "CON", label: "Constitución" },
-  { key: "intelligence", abbr: "INT", label: "Inteligencia" },
-  { key: "speed", abbr: "VEL", label: "Velocidad" },
-  { key: "charisma", abbr: "CAR", label: "Carisma" },
+  { key: "strength", code: "str" },
+  { key: "dexterity", code: "dex" },
+  { key: "constitution", code: "con" },
+  { key: "intelligence", code: "int" },
+  { key: "speed", code: "spd" },
+  { key: "charisma", code: "cha" },
 ]
 
 export const MEW_STATMOD: Record<string, string> = {
@@ -148,8 +93,8 @@ export const MEW_STATMOD: Record<string, string> = {
 export const MEW = {
   cats: MEW_CATS,
   catBy: CATBY,
-  rarity: (r?: string): MewMeta => RARITY[r || ""] || { hue: 230, label: r ? String(r) : "—", rank: 0 },
-  faction: (f?: string): MewMeta => FACTION[f || ""] || { hue: 230, label: f ? String(f) : "—" },
+  rarity: (r?: string): MewMeta => RARITY[r || ""] || { hue: 230, key: r ? String(r) : "—", rank: 0 },
+  faction: (f?: string): MewMeta => FACTION[f || ""] || { hue: 230, key: f ? String(f) : "—" },
   meta: { STATS, STATMOD: MEW_STATMOD, RARITY, FACTION },
 }
 
@@ -170,6 +115,90 @@ export function mewHuman(k?: string): string {
     return s.replace(/_/g, " ").toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()).trim()
   }
   return s.replace(/([a-z0-9])([A-Z])/g, "$1 $2").replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2").replace(/_/g, " ").trim()
+}
+
+/** Resolve a rarity key to its localized label. */
+export function mewRarityLabel(t: (k: string) => string, rarity?: string): string {
+  const m = MEW.rarity(rarity)
+  if (m.key.startsWith("data.")) return t(m.key)
+  return m.key || "—"
+}
+
+/** Resolve a faction key to its localized label. */
+export function mewFactionLabel(t: (k: string) => string, faction?: string): string {
+  const m = MEW.faction(faction)
+  if (m.key.startsWith("data.")) return t(m.key)
+  return m.key || "—"
+}
+
+/** Resolve a stat modifier key to its localized label. */
+export function mewStatModLabel(t: (k: string) => string, modKey?: string): string {
+  const statModMap: Record<string, string> = {
+    "str": "data.statMod.str",
+    "dex": "data.statMod.dex",
+    "con": "data.statMod.con",
+    "int": "data.statMod.int",
+    "spd": "data.statMod.spd",
+    "cha": "data.statMod.cha",
+    "lck": "data.statMod.lck",
+    "speed": "data.statMod.speed",
+    "shield": "data.statMod.shield",
+    "max_health": "data.statMod.max_health",
+    "durability": "data.statMod.durability",
+    "max_durability": "data.statMod.max_durability",
+  }
+  const i18nKey = statModMap[modKey || ""]
+  return i18nKey ? t(i18nKey) : (modKey ? mewHuman(modKey) : "")
+}
+
+/** Resolve a stat name (luck, strength, etc) to its localized label. */
+export function mewStatNameLabel(t: (k: string) => string, statKey?: string): string {
+  const statNameMap: Record<string, string> = {
+    "strength": "data.statName.strength",
+    "dexterity": "data.statName.dexterity",
+    "constitution": "data.statName.constitution",
+    "intelligence": "data.statName.intelligence",
+    "speed": "data.statName.speed",
+    "charisma": "data.statName.charisma",
+    "luck": "data.statName.luck",
+  }
+  const i18nKey = statNameMap[statKey || ""]
+  return i18nKey ? t(i18nKey) : (statKey ? mewHuman(statKey) : "")
+}
+
+/** Resolve a token key to its localized label. */
+export function mewTokenLabelI18n(t: (k: string) => string, v: string): string {
+  const k = String(v || "").toLowerCase()
+  const tokenKey = MEW_TOKEN_LABEL[k]
+  if (!tokenKey) return mewHuman(v)
+  // Map token keys to i18n paths
+  const tokenI18nMap: Record<string, string> = {
+    "FUE": "data.token.str",
+    "DES": "data.token.dex",
+    "CON": "data.token.con",
+    "INT": "data.token.int",
+    "VEL": "data.token.spd",
+    "CAR": "data.token.cha",
+    "SUE": "data.token.lck",
+    "Escudo": "data.token.shield",
+    "Escudo divino": "data.token.divineshield",
+    "Salud": "data.token.health",
+    "Maná": "data.token.mana",
+    "Crít": "data.token.crit",
+    "Bloqueo": "data.token.block",
+    "Agotamiento": "data.token.exhaustion",
+  }
+  const i18nKey = tokenI18nMap[tokenKey]
+  return i18nKey ? t(i18nKey) : tokenKey
+}
+
+/** The nine cat body parts mutations are grouped by. */
+export const MEW_BODY_PARTS = ["body", "ears", "eyes", "eyebrows", "head", "legs", "mouth", "tail", "texture"]
+
+/** Localized body-part name; falls back to humanising an unknown part. */
+export function mewBodyPartLabel(t: (k: string) => string, part: string): string {
+  const k = String(part || "").toLowerCase()
+  return MEW_BODY_PARTS.includes(k) ? t(`filter.mutations.${k}`) : mewHuman(part)
 }
 
 export function mewTokenLabel(v: string): string {
@@ -308,6 +337,10 @@ export interface MewRec {
   items?: Record<string, unknown>
   options?: MewEventOption[]
   members?: { id: string; name: string; kind: string }[]
+  body_part?: string
+  pieces_required?: number
+  special?: boolean
+  removed?: boolean
   // normalization keys (localisation) + numeric stat mods live on the record too
   [extra: string]: unknown
 }

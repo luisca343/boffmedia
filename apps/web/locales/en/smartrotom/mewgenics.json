@@ -11,27 +11,35 @@
       "entriesLoading": "Unearthing the codex…",
       "randomTitle": "Open a random entry",
       "random": "Random",
-      "tabsAriaLabel": "Categories",
-      "trail": "Trail"
+      "cursorToggleTitle": "Toggle custom cursor",
+      "soundToggleTitle": "Toggle sound effects",
+      "catBuilderTitle": "Open Cat Builder",
+      "catBuilder": "Cat Builder",
+      "tabsAriaLabel": "Categories"
     },
     "roster": {
       "count": "{count, plural, one {{count} {singular}} other {{count} {label}}}",
       "searchPlaceholder": "Search in {category}…",
+      "searchLabel": "Search in {category}",
+      "clearSearch": "Clear search",
       "viewGrid": "Grid",
       "viewList": "List",
       "sortLabel": "Sort",
       "filterAll": "All",
-      "kbdEntries": "entries",
+      "filters": "Filters",
+      "favoritesLabel": "★ Favorites ({count})",
+      "clearFilters": "Clear filters",
+      "loadMoreHint": "{remaining} more results",
       "kbdCategory": "category",
       "kbdSearch": "search",
       "showingCap": "· showing {n}",
+      "loadMore": "Load more",
       "loadingAbilities": "Loading abilities…",
       "abilitiesErrorTitle": "Abilities unavailable",
       "abilitiesErrorLead": "Could not load abilities.json.",
       "emptyTitle": "No results",
       "emptyLead": "Adjust the search or filters.",
-      "overflowHint": "Narrow your search to see the rest.",
-      "emptyPick": "Pick a {category}"
+      "overflowHint": "Narrow your search to see the rest."
     },
     "panel": {
       "data": "Data",
@@ -51,6 +59,7 @@
       "passivesGranted": "Passives granted",
       "use": "Use",
       "sets": "Sets",
+      "setMembers": "Set pieces",
       "carriers": "Carried by",
       "baseEffect": "Base Effect",
       "ranks": "Ranks",
@@ -62,7 +71,11 @@
       "bosses": "Bosses",
       "enemyPools": "Enemy Pools",
       "itemPools": "Item Pools",
-      "choices": "Choices"
+      "choices": "Choices",
+      "whereToGet": "Where to Get It",
+      "shops": "Shops",
+      "classCharacters": "Characters",
+      "effects": "Effects"
     },
     "label": {
       "id": "ID",
@@ -126,7 +139,30 @@
       "failure": "Failure",
       "result": "Result",
       "noRef": "No card in the database",
-      "bossLabel": "Bosses"
+      "bossLabel": "Bosses",
+      "data": "Data",
+      "special": "Special",
+      "removed": "Removed",
+      "bodyPart": "Body Part",
+      "properties": "Properties",
+      "piecesRequired": "Pieces Required",
+      "storyCat": "Story Category",
+      "comfort": "Comfort",
+      "appeal": "Appeal",
+      "stimulation": "Stimulation",
+      "evolution": "Evolution",
+      "champion": "Champion",
+      "setFamily": "Furniture Family",
+      "mutationNumber": "Mutation #",
+      "health": "Health",
+      "ability": "Ability",
+      "cost": "Cost",
+      "group": "Group",
+      "panHint": "Drag to explore the map",
+      "viewFull": "View full size",
+      "noData": "The game data holds nothing more for this entry.",
+      "unique": "Unique",
+      "eliteValue": "Elite value"
     },
     "targetMode": {
       "none": "No target",
@@ -210,6 +246,39 @@
         "label": "Class",
         "general": "General"
       },
+      "subject": "Subject",
+      "act": "Act",
+      "furniture": {
+        "stat": "Primary Stat",
+        "special": "Special",
+        "comfort": "Comfort",
+        "appeal": "Appeal",
+        "stimulation": "Stimulation",
+        "health": "Health",
+        "evolution": "Evolution",
+        "removed": "Removed",
+        "normal": "Normal"
+      },
+      "mutations": {
+        "bodyPart": "Body Part",
+        "body": "Body",
+        "ears": "Ears",
+        "eyes": "Eyes",
+        "eyebrows": "Eyebrows",
+        "head": "Head",
+        "legs": "Legs",
+        "mouth": "Mouth",
+        "tail": "Tail",
+        "texture": "Texture"
+      },
+      "statuses": {
+        "kind": "Type",
+        "weather": "Weather",
+        "injuries": "Injuries",
+        "elite_buffs": "Elite Buffs"
+      }
+    },
+    "browse": {
       "act": "Act"
     },
     "sort": {
@@ -217,7 +286,12 @@
       "rarity": "Rarity",
       "kind": "Type",
       "hp": "Health",
-      "faction": "Faction"
+      "faction": "Faction",
+      "furniture": {
+        "comfort": "Comfort",
+        "appeal": "Appeal",
+        "stimulation": "Stimulation"
+      }
     },
     "cat": {
       "items": {
@@ -259,13 +333,190 @@
         "label": "Maps",
         "singular": "map",
         "desc": "Areas by act and chapter: enemies, bosses, items and events."
+      },
+      "furniture": {
+        "label": "Furniture",
+        "singular": "furniture",
+        "desc": "Room decorations with comfort, appeal, stimulation, health and evolution bonuses."
+      },
+      "mutations": {
+        "label": "Mutations",
+        "singular": "mutation",
+        "desc": "Body part mutations with stat modifiers and passive effects."
+      },
+      "sets": {
+        "label": "Sets",
+        "singular": "set",
+        "desc": "Equipment sets with bonuses for wearing multiple pieces."
+      },
+      "story_cats": {
+        "label": "Story Cats",
+        "singular": "cat",
+        "desc": "Named story cats, bosses and champion variants."
+      },
+      "statuses": {
+        "label": "Statuses",
+        "singular": "status",
+        "desc": "Weather, injuries and elite buffs with their effects."
       }
     },
     "fiche": {
       "back": "Back to {category}",
       "prev": "Previous entry",
       "next": "Next entry",
-      "position": "{n} of {total}"
+      "position": "{n} of {total}",
+      "share": "Copy link",
+      "shareCopied": "Link copied",
+      "favAdd": "Add to favorites",
+      "favRemove": "Remove from favorites",
+      "trailLabel": "History"
+    },
+    "common": {
+      "moreCount": "{n} more",
+      "openLightbox": "View image",
+      "closeLightbox": "Close",
+      "copy": "Copy",
+      "copied": "Copied"
+    },
+    "data": {
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "very_rare": "Very Rare",
+        "consumable_common": "Consumable",
+        "consumable_uncommon": "Consumable+",
+        "consumable_rare": "Consumable★",
+        "consumable_very_rare": "Consumable★★",
+        "quest": "Quest",
+        "sidequest": "Side Quest"
+      },
+      "faction": {
+        "enemies": "Enemy",
+        "solitary_enemies": "Solitary",
+        "allies": "Ally",
+        "birds": "Bird",
+        "cavemen": "Caveman",
+        "mammoths": "Mammoth",
+        "sabertooths": "Saber-tooth",
+        "kaiju1": "Kaiju",
+        "kaiju2": "Kaiju",
+        "third_party": "Neutral",
+        "none": "Object"
+      },
+      "statName": {
+        "strength": "Strength",
+        "dexterity": "Dexterity",
+        "constitution": "Constitution",
+        "intelligence": "Intelligence",
+        "speed": "Speed",
+        "charisma": "Charisma",
+        "luck": "Luck"
+      },
+      "statMod": {
+        "str": "Strength",
+        "dex": "Dexterity",
+        "con": "Constitution",
+        "int": "Intelligence",
+        "spd": "Speed",
+        "cha": "Charisma",
+        "lck": "Luck",
+        "speed": "Speed",
+        "shield": "Shield",
+        "max_health": "Max Health",
+        "durability": "Durability",
+        "max_durability": "Max Durability"
+      },
+      "kind": {
+        "weapon": "Weapon",
+        "head": "Head",
+        "face": "Face",
+        "neck": "Neck",
+        "trinket": "Trinket",
+        "modifier": "Modifier",
+        "armor": "Armor"
+      },
+      "token": {
+        "shield": "Shield",
+        "divineshield": "Divine Shield",
+        "str": "STR",
+        "dex": "DEX",
+        "con": "CON",
+        "int": "INT",
+        "spd": "SPD",
+        "cha": "CHA",
+        "lck": "LCK",
+        "health": "Health",
+        "mana": "Mana",
+        "crit": "Crit",
+        "block": "Block",
+        "exhaustion": "Exhaustion"
+      },
+      "statAbbr": {
+        "pa": "AP",
+        "pm": "MP",
+        "pv": "HP"
+      }
+    },
+    "builder": {
+      "equipment": "Equipment",
+      "equipmentNotImplemented": "Equipment overlays coming soon",
+      "export": "Export PNG",
+      "exporting": "Exporting...",
+      "palette": "Palette",
+      "parts": {
+        "body": "Body",
+        "claws": "Claws",
+        "ears": "Ears",
+        "eyebrows": "Eyebrows",
+        "eyes": "Eyes",
+        "head": "Head",
+        "legs": "Legs",
+        "mouth": "Mouth",
+        "tail": "Tail",
+        "texture": "Texture"
+      },
+      "partsTitle": "Cat Parts",
+      "pose": {
+        "eyes": {
+          "closed": "Closed",
+          "open": "Open"
+        },
+        "mouth": {
+          "normal": "Normal",
+          "open": "Open",
+          "smile": "Smile"
+        }
+      },
+      "poseEyesLabel": "Eyes",
+      "poseMouthLabel": "Mouth",
+      "poseTitle": "Pose",
+      "presets": "Story Cats",
+      "randomize": "Randomize",
+      "tab": {
+        "equipment": "Equipment",
+        "palette": "Palette",
+        "parts": "Parts",
+        "presets": "Presets"
+      },
+      "title": "Mewgenics Cat Builder",
+      "search": "Search parts…",
+      "none": "None",
+      "clear": "Clear",
+      "noResults": "No parts match",
+      "partOf": "{n} of {total}",
+      "equipHead": "Head item",
+      "equipFace": "Face item",
+      "equipNeck": "Neck item",
+      "equipWeapon": "Weapon",
+      "equipTrinket": "Trinket",
+      "equipOnCat": "Worn on the cat",
+      "equipSideOnly": "Shown beside the cat",
+      "slot": "Slot",
+      "loadingParts": "Loading parts…",
+      "paletteStandard": "Standard (genetics)",
+      "paletteSpecial": "Story & special",
+      "equipHeld": "Held gear (not worn)"
     }
   }
 }

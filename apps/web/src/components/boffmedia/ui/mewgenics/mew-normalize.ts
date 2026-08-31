@@ -221,3 +221,247 @@ export function compactAbility(a: Raw): MewRec {
   if (a.bonus_passives) rec.bonus = a.bonus_passives
   return rec
 }
+
+// The room stats ship Capitalized in furniture_effects.gon (`Comfort: 1`);
+// the UI keys them lowercase (label.comfort etc). A handful of one-off idols
+// carry bespoke effect keys (FoodStorage, FightRisk, …) — those keep their
+// original casing and humanize in the view.
+const FURNITURE_STATS: Record<string, string> = {
+  Comfort: "comfort", Appeal: "appeal", Stimulation: "stimulation",
+  Health: "health", Evolution: "evolution",
+  FoodStorage: "FoodStorage", FightBonusRewards: "FightBonusRewards",
+  FightRisk: "FightRisk", BreedSuppression: "BreedSuppression",
+}
+
+export function normFurniture(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const stats: Record<string, number> = {}
+    Object.entries(FURNITURE_STATS).forEach(([rawKey, key]) => {
+      if (typeof r[rawKey] === "number" && r[rawKey] !== 0) stats[key] = r[rawKey]
+    })
+    const rec: MewRec = {
+      id: r._id,
+      name: mewCleanName(T(r.name_key, r.name_en)) || mewHuman(r._id),
+      desc: T(r.desc_key, r.desc_en),
+      stats,
+      set: r.set,
+      special: r.special || false,
+      removed: r.removed || false,
+    }
+    rec.nk = r.name_key
+    rec.dk = r.desc_key
+    return rec
+  })
+}
+
+export function normMutations(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const statMods: Record<string, unknown> = {}
+    Object.entries(r).forEach(([k, v]) => {
+      if (k.match(/^(str|dex|con|int|spd|cha|lck|max_health|shield|durability)$/)) {
+        statMods[k] = v
+      }
+    })
+    // Mutations carry no name in the game files, only a description and a
+    // per-body-part number. Humanising the id would leak the English body part
+    // into every locale, so prefer the localized description and fall back to
+    // the bare number, with body_part shown as a badge.
+    const desc = r.desc_en ? T(r.desc_key, r.desc_en) : ""
+    const rec: MewRec = {
+      id: r._id,
+      name: mewCleanName(T(r.name_key, r.name_en)) || mewCleanName(desc) || `#${r.num ?? r._id}`,
+      desc,
+      body_part: r.body_part,
+      statMods: Object.keys(statMods).length ? statMods : undefined,
+      passives: r.passives,
+    }
+    rec.nk = r.name_key
+    rec.dk = r.desc_key
+    return rec
+  })
+}
+
+export function normSets(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const statMods: Record<string, unknown> = {}
+    Object.entries(r).forEach(([k, v]) => {
+      if (k.match(/^(str|dex|con|int|spd|cha|lck|max_health|shield|durability)$/)) {
+        statMods[k] = v
+      }
+    })
+    const rec: MewRec = {
+      id: r._id,
+      name: mewCleanName(T(r.name_key, r.name_en)) || mewHuman(r._id),
+      desc: T(r.desc_key, r.desc_en),
+      pieces_required: r.pieces_required,
+      statMods: Object.keys(statMods).length ? statMods : undefined,
+      passives: r.passives,
+    }
+    rec.nk = r.name_key
+    rec.dk = r.desc_key
+    return rec
+  })
+}
+
+/** Appearance fields of a story cat: the part frame numbers the cat builder
+ *  composites. Dropping these made every preset fall back to the default cat. */
+const STORY_CAT_PARTS = [
+  "default_frame", "texture", "claws", "palette", "body", "head", "tail",
+  "leg1", "leg2", "arm1", "arm2", "lefteye", "righteye", "lefteyebrow",
+  "righteyebrow", "leftear", "rightear", "mouth",
+] as const
+
+export function normStoryCats(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const rec: MewRec = {
+      id: r._id,
+      name: mewCleanName(T(r.name_key, r.name_en)) || mewHuman(r._id),
+      desc: T(r.desc_key, r.desc_en),
+    }
+    for (const key of STORY_CAT_PARTS) {
+      const v = r[key]
+      if (typeof v === "number") rec[key] = v
+    }
+    if (typeof r.voice === "string") rec.voice = r.voice
+    rec.nk = r.name_key
+    rec.dk = r.desc_key
+    return rec
+  })
+}
+
+export function normItemPools(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const rec: MewRec = {
+      id: r._id,
+      name: mewHuman(r._id),
+      items: r.items || [],
+    }
+    return rec
+  })
+}
+
+export function normShops(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const rec: MewRec = {
+      id: r._id,
+      name: mewCleanName(T(r.name_key, r.name_en)) || mewHuman(r._id),
+      meta: r.meta || {},
+      itemRarityCosts: r.item_rarity_costs || {},
+      itemGroups: r.item_groups || {},
+      breakdown: r.breakdown || {},
+      stockFillOrder: r.stock_fill_order || {},
+    }
+    rec.nk = r.name_key
+    return rec
+  })
+}
+
+export function normWorld(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const rec: MewRec = {
+      id: r._id,
+      name: mewHuman(r._id),
+      nodes: r,
+    }
+    return rec
+  })
+}
+
+export function normSpawns(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const editor = r.editor || {}
+    const rec: MewRec = {
+      id: r._id,
+      name: editor.name || mewHuman(r._id),
+      editor,
+      utility: r.utility,
+      object: r.object,
+      value: r.value,
+    }
+    return rec
+  })
+}
+
+export function normMusic(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const rec: MewRec = {
+      id: r._id,
+      name: r.title || mewHuman(r._id),
+      title: r.title,
+      map: r.map,
+      battle: r.battle,
+      boss: r.boss,
+      event: r.event,
+      midi: r.midi,
+      intro: r.intro,
+    }
+    return rec
+  })
+}
+
+export function normWeather(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const rec: MewRec = {
+      id: r._id,
+      name: mewCleanName(T(r.name_key, r.name_en)) || mewHuman(r._id),
+      desc: T(r.desc_key, r.desc_en),
+      effects: r.effects,
+    }
+    rec.nk = r.name_key
+    rec.dk = r.desc_key
+    return rec
+  })
+}
+
+export function normInjuries(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const rec: MewRec = {
+      id: r._id,
+      name: mewCleanName(T(r.name_key, r.name_en)) || mewHuman(r._id),
+      desc: T(r.desc_key, r.desc_en),
+      // stat penalties ({str:-1,…}) — same shape mutations use for statMods
+      statMods: r.stats && Object.keys(r.stats).length ? r.stats : undefined,
+    }
+    rec.nk = r.name_key
+    rec.dk = r.desc_key
+    return rec
+  })
+}
+
+export function normEliteBuffs(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    // The same buff id appears once per elite tier (elite_type differs), so
+    // the tier is part of the identity — without it ids collide.
+    // These records carry no name_key/name_en at all — the display name is the
+    // humanized id, which repeats across tiers ("Absorbant" exists for both
+    // regular and boss elites). The tier is the only thing telling them apart,
+    // so it rides along in the name; it is raw game data, not UI copy.
+    const base = mewCleanName(T(r.name_key, r.name_en)) || mewHuman(r._id)
+    const rec: MewRec = {
+      id: r.elite_type ? `${r._id}@${r.elite_type}` : r._id,
+      name: r.elite_type === "boss" ? `${base} (boss)` : base,
+      desc: T(r.desc_key, r.desc_en),
+      // elite buffs never carry desc text — the passives ARE the content
+      passives: r.passives,
+      value: r.value,
+      unique: !!r.unique,
+    }
+    if (r.elite_type) rec.elite_type = r.elite_type
+    rec.nk = r.name_key
+    rec.dk = r.desc_key
+    return rec
+  })
+}
+
+export function normProgressionUnlocks(raw: Raw[]): MewRec[] {
+  return raw.map((r) => {
+    const rec: MewRec = {
+      id: r._id,
+      name: mewCleanName(T(r.name_key, r.name_en)) || mewHuman(r._id),
+      desc: T(r.desc_key, r.desc_en),
+    }
+    rec.nk = r.name_key
+    rec.dk = r.desc_key
+    return rec
+  })
+}

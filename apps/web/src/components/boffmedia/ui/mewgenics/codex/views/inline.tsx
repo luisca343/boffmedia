@@ -68,13 +68,13 @@ export function MewAbilityInline({ id, onNav, label }: { id: string; onNav: NavF
       {range && factLabel(t("inline.rangeAbbr"), range)}
       {dmg.damage != null && factLabel(t("inline.damageAbbr"), String(dmg.damage))}
       {dmg.heal != null && factLabel(t("inline.healAbbr"), String(dmg.heal))}
-      {effNames.length > 0 && factLabel(t("inline.appliesAbbr"), effNames.slice(0, 4).join(" · "))}
+      {effNames.length > 0 && factLabel(t("inline.appliesAbbr"), effNames.slice(0, 4).join(" · ") + (effNames.length > 4 ? " +" + (effNames.length - 4) : ""))}
     </>
   )
   const badges = (
     <>
-      {cost.act_points != null && <MiniFlag icon="bolt">{cost.act_points} PA</MiniFlag>}
-      {cost.move_points ? <MiniFlag icon="compass">{cost.move_points} PM</MiniFlag> : null}
+      {cost.act_points != null && <MiniFlag icon="bolt">{cost.act_points} {t("data.statAbbr.pa")}</MiniFlag>}
+      {cost.move_points ? <MiniFlag icon="compass">{cost.move_points} {t("data.statAbbr.pm")}</MiniFlag> : null}
     </>
   )
   const hasFacts = !!(tgt.target_mode || range || dmg.damage != null || dmg.heal != null || effNames.length)
@@ -97,7 +97,7 @@ export function MewItemInline({ id, onNav }: { id: string; onNav: NavFn }) {
     <>
       {it.shield != null && factLabel(t("inline.shieldAbbr"), String(it.shield))}
       {it.durability != null && factLabel(t("inline.durabilityAbbr"), String(it.durability))}
-      {passNames.length > 0 && factLabel(t("inline.passivesAbbr"), passNames.slice(0, 4).join(" · "))}
+      {passNames.length > 0 && factLabel(t("inline.passivesAbbr"), passNames.slice(0, 4).join(" · ") + (passNames.length > 4 ? " +" + (passNames.length - 4) : ""))}
     </>
   )
   const hasFacts = it.shield != null || it.durability != null || passNames.length > 0

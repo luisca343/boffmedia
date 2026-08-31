@@ -95,7 +95,11 @@
       },
       "mewgenics": {
         "title": "Mewgenics Codex",
-        "description": "The complete Mewgenics database: items, bestiary, abilities, passives, statuses, events, classes and maps."
+        "description": "The complete Mewgenics database: items, bestiary, abilities, passives, statuses, events, classes and maps.",
+        "builder": {
+          "title": "Mewgenics Cat Builder",
+          "description": "Build and customize your own cat from Mewgenics parts, palettes, and poses"
+        }
       },
       "steamfree": {
         "title": "Free on Steam",

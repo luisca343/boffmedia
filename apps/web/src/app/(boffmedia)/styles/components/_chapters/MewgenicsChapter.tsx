@@ -19,7 +19,6 @@ import {
   MewStats,
   MewText,
   MewTile,
-  MEW_VARS,
   type MewRec,
 } from "@/components/boffmedia/ui/mewgenics"
 
@@ -54,7 +53,7 @@ export function MewgenicsChapter() {
   const [rars, setRars] = React.useState<string[]>(["rare"])
 
   return (
-    <div style={MEW_VARS}>
+    <div className="mew-skin-violet">
       <Section
         id="mewpapel"
         kicker="Mewgenics"

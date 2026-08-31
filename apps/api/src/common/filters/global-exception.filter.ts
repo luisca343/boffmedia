@@ -58,7 +58,33 @@ function isDuplicateEntryError(err: unknown): boolean {
 export class GlobalExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: Logger) {}
 
-  catch(exception: unknown, host: ArgumentsHost): void {
+  catch(exception: unknown, host: ArgumentsHost): unknown {
+    // Global filters are NOT http-only — Nest applies them to every external
+    // context as well. Necord binds each Discord listener/command through
+    // `ExternalContextCreator` with `{ guards, interceptors, filters }`, and
+    // calls it as `contextCallback(eventArgs, discovery)`. A throw in there
+    // therefore arrives here with `host.getArgs()` = `[eventArgs, ListenerDiscovery]`:
+    // `getResponse()` hands back the ListenerDiscovery, not an Express Response.
+    // `response.status(...)` then threw INSIDE this filter, escaped as an
+    // uncaughtException and hit main.ts's exit-on-fatal handler — one Discord
+    // message was enough to stop the whole API. Log and stop here instead;
+    // there is no response to write to, and the truthy return keeps Nest's
+    // ExternalExceptionFilter from rethrowing into an unhandledRejection.
+    const contextType = host.getType<string>();
+    if (contextType !== 'http') {
+      this.logger.error(
+        {
+          err:
+            exception instanceof Error
+              ? { message: exception.message, stack: exception.stack }
+              : exception,
+          contextType,
+        },
+        'Unhandled exception outside an HTTP context',
+      );
+      return true;
+    }
+
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();

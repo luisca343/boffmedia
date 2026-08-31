@@ -20,6 +20,15 @@ export class ResponseInterceptor implements NestInterceptor {
   constructor(private reflector: Reflector) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    // Same external-context caveat as JwtAuthGuard/GlobalExceptionFilter: an
+    // APP_INTERCEPTOR also wraps Necord's Discord handlers, where there is no
+    // request/response and the `{ success, statusCode, data }` envelope is
+    // meaningless (it would replace a handler's return value and log a
+    // "[SUCCESS]" line per Discord event).
+    if (context.getType<string>() !== 'http') {
+      return next.handle();
+    }
+
     const skipEnvelope = this.reflector.getAllAndOverride<boolean>(
       SKIP_ENVELOPE_METADATA_KEY,
       [context.getHandler(), context.getClass()],

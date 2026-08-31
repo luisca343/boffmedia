@@ -1,11 +1,13 @@
 "use client"
 
+import * as React from "react"
 import { Icon, type IconName } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
 import { MewText, MewPanel } from "../../MewAtoms"
+import { mewPortraitSrc } from "../../mew-art"
 import { mewHuman, type MewEventOption } from "../../mew-util"
 import { MewEffectVal, MewFlag, type NavFn } from "../MewRefs"
-import { MewCol, MewDesc, MewDetail, MewHero, type ViewProps } from "./scaffold"
+import { MewDesc, MewDetail, MewHero, MewSections, type ViewProps } from "./scaffold"
 
 const MEW_REWARD_KEY: Record<string, string> = {
   get_item_from_pool: "reward.getItemFromPool", get_item: "reward.getItem", get_parasite: "reward.getParasite",
@@ -39,9 +41,9 @@ function MewReward({ entry, onNav, t }: { entry: Record<string, unknown>; onNav:
 
 function MewOutcome({ outcome, tone, tag, icon, onNav, t }: { outcome?: MewEventOption["good"]; tone?: "good" | "bad"; tag: string; icon: IconName; onNav: NavFn; t: (k: string) => string }) {
   if (!outcome || !outcome.entries.length) return null
-  const toneCls = tone === "good" ? "bg-[#e4eed6] [&_.otag]:text-[color:var(--mwp-good)]" : tone === "bad" ? "bg-[#f6d9d3] [&_.otag]:text-[color:var(--mwp-bad)]" : "bg-[color:var(--mwp-paper)]"
+  const toneCls = tone === "good" ? "bg-[color:var(--mwp-paper-good-light)] [&_.otag]:text-[color:var(--mwp-good)]" : tone === "bad" ? "bg-[color:var(--mwp-paper-bad-light)] [&_.otag]:text-[color:var(--mwp-bad)]" : "bg-[color:var(--mwp-paper)]"
   return (
-    <div className={"flex flex-col gap-2 border-l-2 border-dashed border-[color:var(--mwp-ink-line)] px-3.5 py-3 first:border-l-0 max-[900px]:border-l-0 max-[900px]:border-t-2 " + toneCls}>
+    <div className={"flex flex-col gap-2 border-l-2 border-dashed border-[color:var(--mwp-ink-line)] px-3.5 py-3 first:border-l-0 " + toneCls}>
       <span className="otag inline-flex items-center gap-1.5 text-[10.5px]/none uppercase tracking-[0.08em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)] [&_svg]:text-current">
         <Icon name={icon} size={12} />{tag}
       </span>
@@ -53,12 +55,25 @@ function MewOutcome({ outcome, tone, tag, icon, onNav, t }: { outcome?: MewEvent
 export function EventView({ rec, onNav }: ViewProps) {
   const t = useTranslations("mewgenics")
   const options = rec.options || []
+  const subjectPortrait = React.useMemo(() => rec.subject ? mewPortraitSrc(rec.subject) : null, [rec.subject])
+
   return (
-    <MewDetail>
+    <MewDetail id={rec.id}>
+      {subjectPortrait && (
+        <div className="[grid-column:1/-1] mb-3 flex justify-center">
+          <div className="[border-radius:var(--wob-a)] border-2 border-solid border-[color:var(--mwp-ink)] [box-shadow:0_6px_0_var(--mwp-shadow-lg)]">
+            <img
+              src={subjectPortrait}
+              alt={rec.subject || rec.name}
+              className="h-auto max-h-[400px] w-auto object-contain"
+            />
+          </div>
+        </div>
+      )}
       <MewHero cat="events" rec={rec} badges={rec.subject ? <MewFlag icon="eye">{mewHuman(rec.subject)}</MewFlag> : undefined} />
       <MewDesc>{rec.prompt}</MewDesc>
-      <MewCol single>
-        <MewPanel title={t("panel.choices")} icon="compass" count={options.length}>
+      <MewSections>
+        <MewPanel title={t("panel.choices")} icon="compass" count={options.length} span="full">
           <div className="flex flex-col gap-3.5">
             {options.map((o) => (
               <div className="overflow-hidden border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-2)] [border-radius:var(--wob-c)]" key={o.id}>
@@ -66,7 +81,7 @@ export function EventView({ rec, onNav }: ViewProps) {
                   <span className="text-[16px]/none text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)]">{o.label}</span>
                   {o.stat && <span className="text-[11.5px]/none font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">{t("label.check")} <b className="text-[color:var(--mwp-red-deep)]">{MEW_STAT_ABBR_KEY[o.stat] ? t(MEW_STAT_ABBR_KEY[o.stat]) : mewHuman(o.stat)}</b></span>}
                 </div>
-                <div className="grid grid-cols-2 max-[900px]:grid-cols-1">
+                <div className="grid [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
                   <MewOutcome outcome={o.good} tone="good" tag={t("label.success")} icon="check" onNav={onNav} t={t} />
                   <MewOutcome outcome={o.bad} tone="bad" tag={t("label.failure")} icon="x" onNav={onNav} t={t} />
                   <MewOutcome outcome={o.flat} tag={t("label.result")} icon="arrow" onNav={onNav} t={t} />
@@ -75,7 +90,7 @@ export function EventView({ rec, onNav }: ViewProps) {
             ))}
           </div>
         </MewPanel>
-      </MewCol>
+      </MewSections>
     </MewDetail>
   )
 }

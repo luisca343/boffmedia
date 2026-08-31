@@ -5,10 +5,23 @@ import { mewHuman, type MewRec } from "./mew-util"
 // separate so the normalizers (which localize) and the resolvers (which index)
 // depend only on this, not on each other or the load orchestration.
 
+/** Publish stamp of the loaded dataset (manifest.version), or "" before the
+ *  manifest arrives. The extractor rewrites every file in place at the same
+ *  paths, so without this a browser keeps serving the previous build from
+ *  cache — which is how freshly fixed cat equipment stayed invisible. */
+let datasetVersion = ""
+
+export function setMewDatasetVersion(v: string | undefined) {
+  if (v && v !== datasetVersion) datasetVersion = v
+}
+
 /** Resolve a dataset file under the Mewgenics asset prefix. A joiner, not a
  *  bare prefix: the prefix carries no trailing slash, so concatenating onto it
  *  silently produces `/boffmedia/tools/mewgenicsitems.json`. */
-export const mewUrl = (path: string) => staticAsset(ASSET.boffmedia.tools.mewgenics, path)
+export const mewUrl = (path: string) => {
+  const url = staticAsset(ASSET.boffmedia.tools.mewgenics, path)
+  return datasetVersion ? `${url}?v=${datasetVersion}` : url
+}
 
 // raw wiki_data JSON is genuinely untyped external input the normalizers re-type
 export type Raw = Record<string, any>
@@ -19,6 +32,13 @@ export interface MewIndex {
   lowerChar: Record<string, MewRec>
   effect: Record<string, { kind: string; rec: MewRec }>
   abilAll: Record<string, MewRec>
+  keywordAppliedBy?: Record<string, MewRec[]> // keyword id → abilities that apply it
+  passiveGrantedBy?: Record<string, { kind: string; recs: MewRec[] }> // passive id → {kind, recs} that grant it
+  classToCharacters?: Record<string, MewRec[]> // class id → characters of that class
+  abilityUsedBy?: Record<string, { chars: MewRec[]; classes: MewRec[] }> // ability id → {chars, classes} that use it
+  itemToSources?: Record<string, { pools: MewRec[]; shops: MewRec[] }> // item id → {pools, shops}
+  characterToMaps?: Record<string, MewRec[]> // character id → maps containing them
+  mapToMusic?: Record<string, MewRec | null> // map id → music record
 }
 
 export const store = {
@@ -29,8 +49,9 @@ export const store = {
   rev: 0,
   promise: null as Promise<void> | null,
   allAbilities: [] as MewRec[],
-  remoteState: { abilities: "idle" as "idle" | "loading" | "ready" | "error" },
+  remoteState: { abilities: "idle" as "idle" | "loading" | "ready" | "error", extras: "idle" as "idle" | "loading" | "ready" | "error" },
   subs: new Set<() => void>(),
+  itemSources: null as Record<string, { from_pools?: string[]; from_shops?: string[]; from_pools_count?: number; from_shops_count?: number; total_source_count?: number }> | null,
 }
 
 export function emit() {

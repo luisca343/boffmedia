@@ -22,6 +22,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   canActivate(context: ExecutionContext) {
+    // APP_GUARDs also run on non-HTTP external contexts, and Necord routes
+    // every Discord event/command through one. There `switchToHttp()` returns
+    // the event args, so passport-jwt read `request.headers.authorization` off
+    // an array and threw. There is no HTTP request to authenticate here —
+    // Discord's own permissions are the boundary. (GlobalThrottlerGuard already
+    // bails the same way; this guard was the one that did not.)
+    if (context.getType<string>() !== 'http') return true;
+
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),

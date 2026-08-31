@@ -53,10 +53,22 @@ const nextConfig = {
         const oneHour = [
             { key: 'Cache-Control', value: 'public, max-age=3600' },
         ];
+        // Long-lived but revalidated: served from cache for an hour, then
+        // checked with a conditional request (cheap 304s) instead of being
+        // trusted blindly for a year.
+        const revalidating = [
+            { key: 'Cache-Control', value: 'public, max-age=3600, must-revalidate' },
+        ];
         return [
             { source: '/boffmedia/fonts/:path*', headers: immutable },
             { source: '/boffmedia/brand/:path*', headers: immutable },
-            { source: '/boffmedia/tools/:path*', headers: immutable },
+            // NOT immutable: tool datasets are regenerated in place by their
+            // extractors and republished to the same paths, so an immutable
+            // year-long TTL pinned browsers to old data forever (it silently
+            // blanked cat equipment after a dataset rebuild). Cache hard, but
+            // let the browser revalidate; callers that append a dataset
+            // version to the URL get a fresh copy immediately.
+            { source: '/boffmedia/tools/:path*', headers: revalidating },
             { source: '/smartrotom/img/:path*', headers: immutable },
             { source: '/smartrotom/packs/:path*', headers: immutable },
             { source: '/jcef/:path*', headers: immutable },

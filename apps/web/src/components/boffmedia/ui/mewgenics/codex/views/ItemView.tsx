@@ -2,19 +2,24 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { MewPanel, MewKind, MewRarity } from "../../MewAtoms"
+import { cn } from "@/lib/utils"
+import { MewPanel, MewKind, MewRarity, MewTile } from "../../MewAtoms"
 import { select } from "../../mew-store"
-import { MEW_STATMOD, mewHuman, mewSubItemName } from "../../mew-util"
+import { MEW_STATMOD, mewHuman, mewStatModLabel, mewSubItemName, type MewRec } from "../../mew-util"
 import { MewEffects, MewFlag, MewRefList } from "../MewRefs"
 import { MewAbilityInline } from "./inline"
-import { MewCol, MewDesc, MewDetail, MewFacts, MewFlags, MewGrid2, MewHero, MewSubLabel, MewTag, num, rows, type ViewProps } from "./scaffold"
+import { MewDesc, MewDetail, MewFacts, MewFlags, MewHero, MewMoreTag, MewSections, MewSubLabel, MewTag, mewTruncate, num, rows, type ViewProps } from "./scaffold"
 
 export function ItemView({ rec, onNav }: ViewProps) {
   const t = useTranslations("mewgenics")
   const statRows = Object.keys(MEW_STATMOD)
     .filter((k) => rec[k] != null)
-    .map((k) => ({ label: MEW_STATMOD[k], value: (num(rec, k)! > 0 ? "+" : "") + rec[k] }))
-  const users = React.useMemo(() => select.charactersUsingItem(rec.id).slice(0, 12), [rec.id])
+    .map((k) => ({ label: mewStatModLabel(t, k), value: (num(rec, k)! > 0 ? "+" : "") + rec[k] }))
+  const usersAll = React.useMemo(() => select.charactersUsingItem(rec.id), [rec.id])
+  const { list: users, more: usersMore } = mewTruncate(usersAll, 12)
+  const sources = select.itemSources2(rec.id)
+  const poolRecs = sources.pools || []
+  const shopRecs = sources.shops || []
   const flags: React.ReactNode[] = []
   if (rec.consumable) flags.push(<MewFlag key="c" icon="drop" tone="warn">{t("label.consumable")}</MewFlag>)
   if (rec.cursed) flags.push(<MewFlag key="k" icon="skull" tone="bad">{t("label.cursed")}</MewFlag>)
@@ -26,68 +31,109 @@ export function ItemView({ rec, onNav }: ViewProps) {
   const passN = rec.passives ? Object.keys(rec.passives).length : 0
 
   return (
-    <MewDetail>
+    <MewDetail id={rec.id}>
       <MewHero cat="items" rec={rec} badges={<>{rec.kind && <MewKind kind={rec.kind} />}{rec.rarity && <MewRarity rarity={rec.rarity} />}</>} />
       <MewDesc>{rec.desc}</MewDesc>
       {flags.length > 0 && <MewFlags>{flags}</MewFlags>}
-      <MewGrid2>
-        <MewCol>
-          {statRows.length > 0 && (
-            <MewPanel title={t("panel.mods")} icon="sliders"><MewFacts rows={statRows} /></MewPanel>
-          )}
-          {passN > 0 && (
-            <MewPanel title={t("panel.passivesGranted")} icon="shield" count={passN}>
-              <MewEffects map={rec.passives} onNav={onNav} />
-            </MewPanel>
-          )}
-          {(rec.ability || rec.attack) && (
-            <MewPanel title={t("panel.use")} icon="bolt">
-              <div className="flex flex-col">
-                {rec.ability && <MewAbilityInline id={rec.ability} onNav={onNav} label={mewSubItemName(select.name(rec.ability), rec.name)} />}
-                {rec.attack && <MewAbilityInline id={rec.attack} onNav={onNav} />}
-              </div>
-            </MewPanel>
-          )}
-        </MewCol>
-        <MewCol>
-          <MewPanel title={t("panel.data")} icon="database">
-            <MewFacts
-              rows={rows([
-                { label: t("label.type"), value: rec.kind ? <MewKind kind={rec.kind} /> : "—" },
-                { label: t("label.rarity"), value: rec.rarity ? <MewRarity rarity={rec.rarity} /> : "—" },
-                rec.shield != null && { label: t("label.shield"), value: rec.shield },
-                rec.durability != null && { label: t("label.durability"), value: rec.durability },
-                { label: t("label.id"), value: rec.id, mono: true },
-              ])}
-            />
+      <MewSections>
+        {statRows.length > 0 && (
+          <MewPanel title={t("panel.mods")} icon="sliders"><MewFacts rows={statRows} /></MewPanel>
+        )}
+        {passN > 0 && (
+          <MewPanel title={t("panel.passivesGranted")} icon="shield" count={passN}>
+            <MewEffects map={rec.passives} onNav={onNav} />
           </MewPanel>
-          {sets.length > 0 && (
-            <MewPanel title={t("panel.sets")} icon="layers" count={sets.length}>
-              <div className="flex flex-col gap-3">
-                {sets.map((s) => {
-                  const set = select.set(s)
-                  return (
-                    <div key={s}>
-                      <MewSubLabel n={set.members?.length}>{mewHuman(s)}</MewSubLabel>
-                      <MewRefList ids={(set.members || []).map((m) => m.id)} cat="items" icon="sword" onNav={onNav} />
+        )}
+        {(rec.ability || rec.attack) && (
+          <MewPanel title={t("panel.use")} icon="bolt">
+            <div className="flex flex-col">
+              {rec.ability && <MewAbilityInline id={rec.ability} onNav={onNav} label={mewSubItemName(select.name(rec.ability), rec.name)} />}
+              {rec.attack && <MewAbilityInline id={rec.attack} onNav={onNav} />}
+            </div>
+          </MewPanel>
+        )}
+        {(poolRecs.length > 0 || shopRecs.length > 0) && (
+          <MewPanel title={t("panel.whereToGet")} icon="map" span="full">
+            <div className="flex flex-col gap-3 text-[13px]">
+              {poolRecs.length > 0 && (
+                <div>
+                  <div className="text-sm font-bold text-[color:var(--mwp-ink-soft)] mb-1.5">{t("panel.itemPools")} ({poolRecs.length})</div>
+                  <div className="flex flex-wrap gap-2">{poolRecs.map((p) => <span key={p.id} title={Array.isArray(p.items) ? p.items.join(", ") : ""}><MewTag>{mewHuman(p.id)}</MewTag></span>)}</div>
+                </div>
+              )}
+              {shopRecs.length > 0 && (
+                <div>
+                  <div className="text-sm font-bold text-[color:var(--mwp-ink-soft)] mb-1.5">{t("panel.shops")} ({shopRecs.length})</div>
+                  <div className="flex flex-wrap gap-2">{shopRecs.map((s) => <MewTag key={s.id}>{s.name || mewHuman(s.id)}</MewTag>)}</div>
+                </div>
+              )}
+            </div>
+          </MewPanel>
+        )}
+        <MewPanel title={t("panel.data")} icon="database">
+          <MewFacts
+            rows={rows([
+              { label: t("label.type"), value: rec.kind ? <MewKind kind={rec.kind} /> : "—" },
+              { label: t("label.rarity"), value: rec.rarity ? <MewRarity rarity={rec.rarity} /> : "—" },
+              rec.shield != null && { label: t("label.shield"), value: rec.shield },
+              rec.durability != null && { label: t("label.durability"), value: rec.durability },
+            ])}
+          />
+        </MewPanel>
+        {sets.length > 0 && (
+          <MewPanel title={t("panel.sets")} icon="layers" count={sets.length} span="full">
+            <div className="flex flex-col gap-4">
+              {sets.map((s) => {
+                const set = select.set(s)
+                const members = set.members || []
+                return (
+                  <div key={s}>
+                    <MewSubLabel n={members.length}>{mewHuman(s)}</MewSubLabel>
+                    <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(88px,1fr))]">
+                      {members.map((member) => {
+                        const item = select.get("items", member.id)
+                        const isCurrentItem = member.id === rec.id
+                        return item ? (
+                          <button
+                            key={member.id}
+                            type="button"
+                            onClick={() => onNav("items", member.id)}
+                            className={cn(
+                              "relative flex flex-col items-center gap-1 border-2 border-solid p-1.5",
+                              isCurrentItem
+                                ? "border-[color:var(--mwp-red)] bg-[color:var(--mwp-paper-good-light)]"
+                                : "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)]",
+                              "text-center cursor-pointer hover:shadow-md transition-all [border-radius:var(--wob-b)]",
+                              "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+                            )}
+                          >
+                            <MewTile cat="items" rec={item} size={56} frame="slot" />
+                            <span className="text-[10px]/[1.1] font-semibold max-w-[70px] text-[color:var(--mwp-ink)]">{item.name}</span>
+                            {isCurrentItem && <span className="absolute top-0 right-0 text-[10px] font-bold bg-[color:var(--mwp-red)] text-white px-1 py-0.5 [border-radius:0_2px_0_4px]">★</span>}
+                          </button>
+                        ) : null
+                      })}
                     </div>
-                  )
-                })}
-              </div>
-            </MewPanel>
-          )}
-          {Array.isArray(rec.global_tags) && rec.global_tags.length > 0 && (
-            <MewPanel title={t("panel.tags")} icon="bookmark">
-              <div className="flex flex-wrap gap-1.5">{rec.global_tags.map((t) => <MewTag key={t}>{mewHuman(t)}</MewTag>)}</div>
-            </MewPanel>
-          )}
-          {users.length > 0 && (
-            <MewPanel title={t("panel.carriers")} icon="paw" count={users.length}>
+                  </div>
+                )
+              })}
+            </div>
+          </MewPanel>
+        )}
+        {Array.isArray(rec.global_tags) && rec.global_tags.length > 0 && (
+          <MewPanel title={t("panel.tags")} icon="bookmark">
+            <div className="flex flex-wrap gap-1.5">{rec.global_tags.map((t) => <MewTag key={t}>{mewHuman(t)}</MewTag>)}</div>
+          </MewPanel>
+        )}
+        {users.length > 0 && (
+          <MewPanel title={t("panel.carriers")} icon="paw" count={usersAll.length} span="full">
+            <div className="flex flex-wrap gap-1.5">
               <MewRefList ids={users.map((u) => u.id)} cat="characters" icon="paw" onNav={onNav} />
-            </MewPanel>
-          )}
-        </MewCol>
-      </MewGrid2>
+              {usersMore > 0 && <MewMoreTag n={usersMore} />}
+            </div>
+          </MewPanel>
+        )}
+      </MewSections>
     </MewDetail>
   )
 }

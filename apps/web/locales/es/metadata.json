@@ -95,7 +95,11 @@
       },
       "mewgenics": {
         "title": "Codex Mewgenics",
-        "description": "Base de datos completa de Mewgenics: objetos, bestiario, habilidades, pasivas, estados, eventos, clases y mapas."
+        "description": "Base de datos completa de Mewgenics: objetos, bestiario, habilidades, pasivas, estados, eventos, clases y mapas.",
+        "builder": {
+          "title": "Constructor de Gatos Mewgenics",
+          "description": "Construye y personaliza tu propio gato con partes, paletas y poses de Mewgenics"
+        }
       },
       "steamfree": {
         "title": "Gratis en Steam",

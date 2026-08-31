@@ -155,3 +155,5 @@ export default getRequestConfig(async () => {
       locale === DEFAULT_LOCALE ? messages : deepMerge(await load(DEFAULT_LOCALE), messages),
   };
 });
+
+// touched to refresh dev-server message graph (mewgenics builder keys)

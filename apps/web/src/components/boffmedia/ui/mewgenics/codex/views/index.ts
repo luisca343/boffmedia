@@ -8,6 +8,11 @@ import { KeywordView } from "./KeywordView"
 import { EventView } from "./EventView"
 import { ClassView } from "./ClassView"
 import { MapView } from "./MapView"
+import { FurnitureView } from "./FurnitureView"
+import { MutationView } from "./MutationView"
+import { SetView } from "./SetView"
+import { StoryCatView } from "./StoryCatView"
+import { StatusView } from "./StatusView"
 
 // Category → detail fiche. Open for extension (add a category + view here) without
 // touching the codex shell, which just looks up MEW_DETAIL[cat].
@@ -20,4 +25,9 @@ export const MEW_DETAIL: Record<string, ComponentType<ViewProps>> = {
   events: EventView,
   classes: ClassView,
   maps: MapView,
+  furniture: FurnitureView,
+  mutations: MutationView,
+  sets: SetView,
+  story_cats: StoryCatView,
+  statuses: StatusView,
 }

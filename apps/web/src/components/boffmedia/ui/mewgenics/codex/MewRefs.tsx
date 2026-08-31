@@ -97,7 +97,7 @@ export function MewEffects({ map, onNav, empty }: { map?: Record<string, unknown
         let keyNode: React.ReactNode
         if (eff && onNav) {
           const btn = (
-            <button type="button" onClick={() => onNav(eff.kind, eff.rec.id)} className="cursor-pointer border-0 bg-transparent p-0 text-left text-[13.5px]/[1.35] font-bold text-[color:var(--mwp-red-deep)] underline decoration-wavy decoration-[color-mix(in_srgb,var(--mwp-red)_55%,transparent)] underline-offset-[3px] [font-family:var(--mwf-hand)] hover:decoration-[color:var(--mwp-red)]">
+            <button type="button" onClick={() => onNav(eff.kind, eff.rec.id)} className="cursor-pointer border-0 bg-transparent p-0 text-left text-[13.5px]/[1.35] font-bold text-[color:var(--mwp-red-deep)] underline decoration-wavy decoration-[color-mix(in_srgb,var(--mwp-red)_55%,transparent)] underline-offset-[3px] [font-family:var(--mwf-hand)] transition-all hover:decoration-[color:var(--mwp-red)] active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0">
               {eff.rec.name}
             </button>
           )
@@ -125,14 +125,14 @@ export function MewEffects({ map, onNav, empty }: { map?: Record<string, unknown
 export function MewFlag({ icon, children, tone }: { icon?: IconName; children: React.ReactNode; tone?: "good" | "warn" | "bad" }) {
   const toneCls =
     tone === "good"
-      ? "bg-[#dcebcf] [&_svg]:text-[color:var(--mwp-good)]"
+      ? "bg-[color:var(--mwp-paper-good)] [&_svg]:text-[color:var(--mwp-good)]"
       : tone === "warn"
-        ? "bg-[#f4e3bd] [&_svg]:text-[color:var(--mwp-warn)]"
+        ? "bg-[color:var(--mwp-paper-warn)] [&_svg]:text-[color:var(--mwp-warn)]"
         : tone === "bad"
-          ? "bg-[#f3cfc9] [&_svg]:text-[color:var(--mwp-bad)]"
+          ? "bg-[color:var(--mwp-paper-bad)] [&_svg]:text-[color:var(--mwp-bad)]"
           : "bg-[color:var(--mwp-paper-2)] [&_svg]:text-[color:var(--mwp-ink-soft)]"
   return (
-    <span className={"inline-flex items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] px-2.5 pb-1 pt-[5px] text-[11.5px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_rgba(0,0,0,0.3)] " + toneCls}>
+    <span className={"inline-flex items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] px-2.5 pb-1 pt-[5px] text-[11.5px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-sm)] " + toneCls}>
       {icon && <Icon name={icon} size={12} />}
       {children}
     </span>
