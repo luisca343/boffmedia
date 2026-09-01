@@ -364,7 +364,7 @@ async function applyPalette(ctx: CanvasRenderingContext2D, w: number, h: number,
 // ---- component -------------------------------------------------------------
 
 export const MewCat = React.forwardRef<HTMLCanvasElement, CatCompositorProps>(
-  ({ parts, palette, pose = {}, equipment, size = 400 }, ref) => {
+  ({ parts, palette, pose = {}, equipment, size = 400, background, tightFit }, ref) => {
     const localRef = useRef<HTMLCanvasElement>(null)
     const canvasRef = (ref as React.RefObject<HTMLCanvasElement>) || localRef
     const [error, setError] = useState<string | null>(null)
@@ -427,6 +427,63 @@ export const MewCat = React.forwardRef<HTMLCanvasElement, CatCompositorProps>(
             ctx.clearRect(0, 0, canvas.width, canvas.height)
             setError(null)
             return
+          }
+
+          // `part_bounds` is one rect per CLIP, not per frame: FFDec exports every
+          // frame of a clip on that clip's shared canvas, so all 384 ear frames
+          // report the same 216-unit box while the ear drawn inside it is a
+          // fraction of that. Framing from the union of those canvases leaves the
+          // cat at ~50% of its box with the slack piled on whichever side has the
+          // widest empty canvas.
+          //
+          // There is no per-frame ink box anywhere in the data, so `tightFit`
+          // measures one: draw the cat parts into a 256px probe and read the
+          // pixels that actually got painted. ~14 drawImage calls and a 65k-pixel
+          // alpha scan — the palette pass already walks more than that.
+          if (tightFit) {
+            const P = 256
+            const probe = document.createElement("canvas")
+            probe.width = P
+            probe.height = P
+            const pctx = probe.getContext("2d", { willReadFrequently: true })
+            if (pctx) {
+              const pk = Math.min(P / (x1 - x0), P / (y1 - y0))
+              const pfit: RigMatrix = {
+                sx: pk, sy: pk, r0: 0, r1: 0,
+                tx: (P - pk * (x1 + x0)) / 2,
+                ty: (P - pk * (y1 + y0)) / 2,
+              }
+              for (const d of drawable) {
+                // Same exclusions as the union: equipment must not size the view,
+                // and the fur swatch is masked to the cat when it is really drawn,
+                // so its raw rectangle would defeat the whole measurement.
+                if (EQUIPMENT_CLIPS.has(d.clip) || d.clip === "CatTexture") continue
+                const m = mul(pfit, d.matrix)
+                pctx.setTransform(m.sx, m.r0, m.r1, m.sy, m.tx, m.ty)
+                pctx.drawImage(d.img, d.bb[0], d.bb[1], d.bb[2] - d.bb[0], d.bb[3] - d.bb[1])
+              }
+              pctx.setTransform(1, 0, 0, 1, 0, 0)
+              const px = pctx.getImageData(0, 0, P, P).data
+              let ix0 = P, iy0 = P, ix1 = -1, iy1 = -1
+              for (let y = 0; y < P; y++) {
+                for (let x = 0; x < P; x++) {
+                  if (px[(y * P + x) * 4 + 3] > 8) {
+                    if (x < ix0) ix0 = x
+                    if (x > ix1) ix1 = x
+                    if (y < iy0) iy0 = y
+                    if (y > iy1) iy1 = y
+                  }
+                }
+              }
+              // One probe pixel of margin on each side, and only trust a
+              // measurement that found real ink.
+              if (ix1 > ix0 && iy1 > iy0) {
+                x0 = (ix0 - 1 - pfit.tx) / pk
+                y0 = (iy0 - 1 - pfit.ty) / pk
+                x1 = (ix1 + 1 - pfit.tx) / pk
+                y1 = (iy1 + 1 - pfit.ty) / pk
+              }
+            }
           }
 
           const pad = size * 0.06
@@ -531,8 +588,8 @@ export const MewCat = React.forwardRef<HTMLCanvasElement, CatCompositorProps>(
       <>
         <canvas
           ref={canvasRef}
-          className="border-2 border-solid border-[color:var(--mwp-ink)] [border-radius:var(--wob-sm)] bg-[color:var(--mwp-paper)]"
-          style={{ width: size, height: size, maxWidth: "100%" }}
+          className={`border-2 border-solid border-[color:var(--mwp-ink)] [border-radius:var(--wob-sm)]${background ? "" : " bg-[color:var(--mwp-paper)]"}`}
+          style={{ width: size, height: size, maxWidth: "100%", background }}
         />
         {held.length > 0 && (
           <div className="mt-2 flex items-center gap-2">

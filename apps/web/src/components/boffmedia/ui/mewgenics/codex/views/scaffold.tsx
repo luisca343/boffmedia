@@ -33,6 +33,18 @@ export function MewFacts({ rows: r, className }: DataListProps) {
   return <DataList rows={r} className={cn(MEW_FACTS_CLS, className)} />
 }
 
+/**
+ * The two-column fiche grid: a sticky hero rail (column 1) beside the content
+ * (column 2).
+ *
+ * INVARIANT — never give a direct child `grid-column: 1/-1`. MewHero is placed
+ * explicitly at `grid-row: 1 / span 9`, so a full-width child cannot fit in
+ * rows 1-9 and auto-placement drops it to row 10, pushing the content column
+ * down with it. That is what produced the ~600px of dead space above the
+ * character and furniture entries. Large art goes through MewHero's `media`
+ * slot; wide panels use MewPanel's `span="full"`, which spans the *inner*
+ * MewSections grid, not this one.
+ */
 export function MewDetail({ children, id }: { children: React.ReactNode; id?: string }) {
   return (
     <>
@@ -69,7 +81,7 @@ const MEW_AREA_ART: Record<string, string> = {
   tutorial: "UI_tutoral",
 }
 
-export function MewHero({ cat, rec, badges, title, sub, tip, backdrop }: { cat: string; rec: MewRec; badges?: React.ReactNode; title?: string; sub?: React.ReactNode; tip?: string; backdrop?: string | null }) {
+export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: { cat: string; rec: MewRec; badges?: React.ReactNode; title?: string; sub?: React.ReactNode; tip?: string; backdrop?: string | null; media?: React.ReactNode }) {
   const [showLightbox, setShowLightbox] = React.useState(false)
   const [artError, setArtError] = React.useState(false)
   const closeButtonRef = React.useRef<HTMLButtonElement>(null)
@@ -190,6 +202,14 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop }: { cat: 
             </div>
           ) : null}
         </div>
+        {/* Large per-category art (portrait, furniture render, event subject).
+            It lives INSIDE the hero, never as a `grid-column:1/-1` sibling —
+            see MewDetail for why a full-width sibling opens a dead 9-row gap. */}
+        {media ? (
+          <div className="mt-1 flex w-full justify-center border-t-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] pt-[15px]">
+            {media}
+          </div>
+        ) : null}
       </header>
 
       {/* Lightbox with focus trap */}
@@ -247,6 +267,35 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop }: { cat: 
         </div>
       )}
     </>
+  )
+}
+
+/** Framed art block for the hero `media` slot — one frame for every category. */
+export function MewHeroMedia({ src, alt, max = 240 }: { src: string; alt: string; max?: number }) {
+  return (
+    <span className="inline-block max-w-full border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-2)] p-1.5 [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-md)]">
+      <img src={src} alt={alt} style={{ maxHeight: max }} className="block h-auto w-auto max-w-full object-contain" />
+    </span>
+  )
+}
+
+/**
+ * Compact numeric facts. MewFacts (DataList) pushes the label hard left and the
+ * value hard right, which strands them at opposite ends of a wide panel; this
+ * pairs each label with its own value in a cell and reflows into columns, so a
+ * six-stat block reads as a block instead of a sparse ladder.
+ */
+export function MewFactGrid({ rows: r, min = 148 }: { rows: Row[]; min?: number }) {
+  if (!r.length) return null
+  return (
+    <dl className="m-0 grid gap-x-3 gap-y-px" style={{ gridTemplateColumns: `repeat(auto-fit,minmax(${min}px,1fr))` }}>
+      {r.map((row, i) => (
+        <div className="flex items-baseline justify-between gap-2 border-b-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] py-[7px]" key={i}>
+          <dt className="min-w-0 truncate text-[10.5px]/[1.2] uppercase tracking-[0.06em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">{row.label}</dt>
+          <dd className={cn("m-0 flex-none text-right", row.mono !== false ? "font-mono text-[13px]/[1.2] font-bold text-[color:var(--mwp-ink)]" : "text-[12.5px]/[1.2] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)]")}>{row.value}</dd>
+        </div>
+      ))}
+    </dl>
   )
 }
 

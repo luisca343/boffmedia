@@ -116,7 +116,12 @@ export function useMewCodex() {
   const filtered = React.useMemo(() => {
     const term = debouncedQ.trim().toLowerCase()
     const favOnly = filters.__fav === "1"
+    // 488 of 760 mutations are bare numbered stat rolls (`numbered`, set by the
+    // normalizer from the absence of a description AND a passive). They bury
+    // the 272 real ones, so they are folded away until asked for.
+    const showNumbered = filters.__numbered === "1"
     const out = list.filter((r) => {
+      if (r.numbered && !showNumbered) return false
       for (const fd of filterDefs) {
         const fv = filters[fd.key]
         if (fv && fd.from(r) !== fv) return false
@@ -137,6 +142,11 @@ export function useMewCodex() {
   }, [list, debouncedQ, filters, sort, cat, favIds])
 
   const shown = filtered.slice(0, shownCount)
+  /** How many records the numbered-mutation fold is currently hiding. */
+  const numberedHidden = React.useMemo(
+    () => (filters.__numbered === "1" ? 0 : list.reduce((n, r) => n + (r.numbered ? 1 : 0), 0)),
+    [list, filters.__numbered],
+  )
   const selRec = selId ? select.get(cat, selId) : null
   const canLoadMore = shownCount < filtered.length
 
@@ -382,7 +392,7 @@ export function useMewCodex() {
     cat, selId, q, filters, sort, view, trail, shownCount, favIds, cursorEnabled, soundEnabled,
     setQ, setFilters, setSort, setView, setCursorEnabled, setSoundEnabled,
     searchRef, codexRef,
-    filterOpts, filtered, shown, selRec, total, abilitiesLoading,
+    filterOpts, filtered, shown, selRec, total, abilitiesLoading, numberedHidden,
     prevRec, nextRec,
     pick, back, pickCat, onNav, randomPick, loadMore, canLoadMore, isFav, toggleFav, playSound,
   }

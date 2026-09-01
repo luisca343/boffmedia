@@ -98,6 +98,110 @@ export const MEW = {
   meta: { STATS, STATMOD: MEW_STATMOD, RARITY, FACTION },
 }
 
+/**
+ * Class colours, read straight out of the game's `palette.png`: each class
+ * declares a `graphics.palette` row index and the row's mid-tone is the colour
+ * the cat is actually painted in. Sampled once (column 3 of the row, the middle
+ * shade) rather than at runtime — the palette lives on the static asset host,
+ * so a canvas read of it would taint on a cross-origin NEXT_PUBLIC_STATIC_URL.
+ *
+ * Keyed by palette index, not by class name, so any entity carrying a palette
+ * (story cats included) resolves through the same table.
+ */
+const MEW_PALETTE_INK: Record<number, string> = {
+  50: "#375133", // Hunter    — moss
+  51: "#645431", // Tank      — brass
+  52: "#f6f4f4", // Medic     — bone white
+  53: "#ebe7a3", // Thief     — pale gold
+  54: "#9f6565", // Fighter   — brick
+  55: "#9493b8", // Mage      — periwinkle
+  62: "#4e415f", // Psychic   — violet
+  63: "#97dfcb", // Tinkerer  — mint
+  64: "#8f3747", // Butcher   — blood
+  65: "#4d362d", // Druid     — bark
+  66: "#3b3b3b", // Monk      — slate
+  68: "#1b1b1b", // Necromancer — pitch
+}
+
+/** Relative luminance (sRGB, WCAG). */
+function mewLuma(hex: string): number {
+  const n = parseInt(hex.slice(1), 16)
+  const ch = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
+    const c = v / 255
+    return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4)
+  })
+  return 0.2126 * ch[0] + 0.7152 * ch[1] + 0.0722 * ch[2]
+}
+
+/**
+ * The class's colour, and a version of it that stays legible as ink on the
+ * cream paper. Medic's palette is bone-white and Necromancer's is near-black;
+ * both are the right colour and the wrong contrast, so the readable variant is
+ * mixed toward ink or lifted toward paper only as far as it has to be.
+ */
+export function mewClassColor(palette?: number): { raw: string; readable: string } | null {
+  if (palette == null) return null
+  const raw = MEW_PALETTE_INK[palette]
+  if (!raw) return null
+  const l = mewLuma(raw)
+  // Cream paper sits around L≈0.82; anything lighter than ~0.5 needs darkening
+  // to read on it, anything under ~0.03 gets lifted so it is not a black blob.
+  const readable =
+    l > 0.5 ? `color-mix(in srgb, ${raw} 62%, var(--mwp-ink))`
+    : l < 0.03 ? `color-mix(in srgb, ${raw} 72%, var(--mwp-paper))`
+    : raw
+  return { raw, readable }
+}
+
+/**
+ * Status glyph colours. All 126 statuses share three line-art glyphs (one per
+ * kind), so an untinted grid is a wall of identical skulls. The tint is taken
+ * from the data wherever the data has one:
+ *
+ *  - elite buffs → `EliteFlatTint`, the RGB multiplier the game applies to the
+ *    elite's own sprite. Multiplying a neutral grey by it reproduces the tint
+ *    the player sees in combat.
+ *  - weather → its effect keys, which name the phenomenon (Rain, Snow,
+ *    FireStorm, RandomLightning…).
+ *  - injuries → one wound tone; they are all the same kind of harm.
+ */
+const MEW_WEATHER_HUE: Record<string, number> = {
+  Rain: 205, AcidRain: 88, Snow: 195, Windy: 170, FireStorm: 18, Meteornado: 26,
+  RandomLightning: 52, LowerAmbientLight: 260, SpawnVolcanoOnBattleStart: 12,
+  FactionUprising: 340, StatusCharactersOnRoundEnd: 300,
+  CharacterTypeGainsStatusAtBattleStart: 285, SpawnExtraThingsOnBattleStart: 150,
+}
+
+function mewTintToHex(t: unknown[]): string | null {
+  const c = t.slice(0, 3).map((v) => (typeof v === "number" ? v : 1))
+  if (c.length < 3) return null
+  // A mid grey stands in for the sprite the multiplier is applied to.
+  const px = c.map((m) => Math.max(0, Math.min(255, Math.round(168 * m))))
+  // A tint that lands on pure grey carries no colour information — skip it so
+  // deliberately monochrome buffs stay monochrome.
+  if (px[0] === px[1] && px[1] === px[2]) return null
+  return "#" + px.map((v) => v.toString(16).padStart(2, "0")).join("")
+}
+
+/** A CSS colour for a status glyph, or null to leave it monochrome. */
+export function mewStatusColor(rec: MewRec): string | null {
+  const kind = typeof rec.status_kind === "string" ? rec.status_kind : ""
+  if (kind === "injuries") return "hsl(352 46% 42%)"
+  if (kind === "elite_buffs") {
+    const p = rec.passives as Record<string, unknown> | undefined
+    const tint = p && Array.isArray(p.EliteFlatTint) ? mewTintToHex(p.EliteFlatTint as unknown[]) : null
+    return tint || "hsl(276 40% 46%)"
+  }
+  if (kind === "weather") {
+    const eff = rec.effects as Record<string, unknown> | undefined
+    for (const k of Object.keys(eff || {})) {
+      if (MEW_WEATHER_HUE[k] != null) return `hsl(${MEW_WEATHER_HUE[k]} 48% 40%)`
+    }
+    return "hsl(205 42% 42%)"
+  }
+  return null
+}
+
 export const MEW_KIND_LABEL: Record<string, string> = { weapon: "Arma", head: "Cabeza", face: "Cara", neck: "Cuello", trinket: "Abalorio", modifier: "Modificador", armor: "Armadura" }
 
 const MEW_TOKEN_LABEL: Record<string, string> = {
@@ -341,12 +445,22 @@ export interface MewRec {
   pieces_required?: number
   special?: boolean
   removed?: boolean
+  /** Mutation with no description and no passive — a bare numbered stat roll. */
+  numbered?: boolean
+  /** palette.png row index (classes, story cats) — the entity's colour ramp. */
+  palette?: number
+  /** Alternate intro prompts a world counter switches between (events). */
+  introVariants?: { prompt: string; when?: string }[]
   // normalization keys (localisation) + numeric stat mods live on the record too
   [extra: string]: unknown
 }
 
 export interface MewEventReward {
   prompt?: string
+  /** `common` | `rare` when the branch came from a `reward { common rare }` map. */
+  tier?: string
+  /** Relative weight inside a `random_pool`. */
+  weight?: number
   [k: string]: unknown
 }
 // an outcome flattens the raw good/bad/flat branch (reward-map | random_pool |
@@ -357,8 +471,17 @@ export interface MewEventOutcome {
 export interface MewEventOption {
   id: string
   label: string
+  /** The tested stat: one of the seven real stats, `none`, or the `coins` /
+   *  `quest` pseudo-stats (an entry cost, not a roll). */
   stat?: string
   good?: MewEventOutcome
   bad?: MewEventOutcome
   flat?: MewEventOutcome
+  /** Flat success chance (0…1) that replaces the stat roll entirely. */
+  fixedChance?: number
+  /** Entry cost for the `coins` / `quest` pseudo-stats. */
+  statMin?: number
+  statMax?: number
+  /** Raw gating requirements the game checks before offering the option. */
+  reqs?: Record<string, unknown>
 }

@@ -32,9 +32,9 @@ export const CX_FILTERS: Record<string, FilterDef[]> = {
     { key: "cls", label: "filter.cls.label", from: (r) => r.cls || "—", labelFn: (v) => (v === "—" ? "filter.cls.general" : mewHuman(v)) },
   ],
   keywords: [],
-  events: [
-    { key: "subject", label: "filter.subject", from: (r) => r.subject || "", labelFn: (v) => v },
-  ],
+  // Events deliberately have no facets: the only field they carried was the raw
+  // `subject_frame` art id, which is an asset name, not something to browse by.
+  events: [],
   classes: [],
   maps: [
     { key: "act", label: "filter.act", from: (r) => String(r.act || ""), labelKey: "browse.act", labelFn: (v) => "browse.act" },

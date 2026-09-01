@@ -11,4 +11,6 @@ export {
   type RigMatrix,
   type PartBoundsRect,
 } from "./types"
-export { loadCatPartsPlacements, loadCatPartsManifest, mewCatSvgUrl, mewPaletteUrl } from "./data-loader"
+export { loadCatPartsPlacements, loadCatPartsManifest, loadCatPartsFrames, mewCatSvgUrl, mewPaletteUrl } from "./data-loader"
+export type { CatPartsFrameIndex } from "./data-loader"
+export { mewStoryCatAppearance, MEW_DEFAULT_CAT_PARTS, MEW_DEFAULT_PALETTE } from "./story-cat"

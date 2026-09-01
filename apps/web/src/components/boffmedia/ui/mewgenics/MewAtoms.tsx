@@ -4,7 +4,7 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@boffmedia/ui"
-import { MEW, MEW_KIND_LABEL, MEW_TOKEN_ICON, mewFactionLabel, mewHueFor, mewHuman, mewIsRawKey, mewMonogram, mewParseText, mewRarityLabel, mewStatNameLabel, mewTokenLabelI18n, type MewRec } from "./mew-util"
+import { MEW, MEW_KIND_LABEL, MEW_TOKEN_ICON, mewClassColor, mewFactionLabel, mewHueFor, mewHuman, mewIsRawKey, mewMonogram, mewParseText, mewRarityLabel, mewStatNameLabel, mewStatusColor, mewTokenLabelI18n, type MewRec } from "./mew-util"
 import { mewArtSrc, mewTokenSrc, mewUiSrc, mewCursor, mewFurnitureArt } from "./mew-art"
 import { select } from "./mew-store"
 
@@ -49,6 +49,16 @@ export function MewText({ children, muted, className }: { children?: React.React
 
 export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artProp }: { cat: string; rec: MewRec; size?: number; glyph?: IconName; frame?: "blob" | "slot"; art?: string | null }) {
   const hue = mewHueFor(cat, rec)
+  // Classes and statuses ship ONE flat white glyph each (or one per kind), so
+  // the roster reads as a wall of identical marks. Both carry a real colour in
+  // the game data — a palette row / an EliteFlatTint or weather effect — and
+  // the glyphs are single-colour line art, so a CSS mask repaints them exactly
+  // without touching art that is genuinely multi-coloured.
+  const tint = React.useMemo(() => {
+    if (cat === "classes") return mewClassColor(typeof rec.palette === "number" ? rec.palette : undefined)?.readable ?? null
+    if (cat === "statuses") return mewStatusColor(rec)
+    return null
+  }, [cat, rec])
   const ico = glyph || (MEW.catBy[cat] ? (MEW.catBy[cat].icon as IconName) : "info")
   const [err, setErr] = React.useState(false)
 
@@ -79,14 +89,35 @@ export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artPr
           ? "bg-[color:var(--mwp-paper-2)] [border-radius:10px_12px_11px_13px]"
           : "[background:radial-gradient(120%_120%_at_30%_18%,hsl(var(--h)_58%_88%),hsl(var(--h)_46%_74%))] [border-radius:48%_52%_45%_55%/55%_45%_52%_48%]",
       )}>
-      {art ? (
+      {art && tint ? (
+        <span
+          style={{
+            backgroundColor: tint,
+            WebkitMaskImage: `url(${art})`,
+            maskImage: `url(${art})`,
+            WebkitMaskRepeat: "no-repeat",
+            maskRepeat: "no-repeat",
+            WebkitMaskPosition: "center",
+            maskPosition: "center",
+            WebkitMaskSize: "contain",
+            maskSize: "contain",
+          }}
+          className="block h-full w-full p-[9%]"
+        />
+      ) : art ? (
         <img src={art} alt="" width={size} height={size} loading="lazy" onError={() => setErr(true)} className="block h-full w-full object-contain p-[9%] [filter:drop-shadow(0_2px_3px_var(--mwp-shadow-ink-drop))]" />
       ) : (
         <>
-          <span className="mt-[8%] text-[hsl(var(--h)_55%_22%)] [font-family:var(--mwf-disp)]" style={{ fontSize: Math.max(12, Math.min(24, Math.round(size * 0.44))) }}>
+          {/* No glyph shipped for this record (every weather status, for one —
+              the token set has no weather mark). The monogram still carries the
+              tint so the theme colour reads consistently across the roster. */}
+          <span
+            className="mt-[8%] text-[hsl(var(--h)_55%_22%)] [font-family:var(--mwf-disp)]"
+            style={{ fontSize: Math.max(12, Math.min(24, Math.round(size * 0.44))), ...(tint ? { color: tint } : {}) }}
+          >
             {mewMonogram(rec.name, rec.id)}
           </span>
-          <span className="absolute bottom-[5%] right-[8%] text-[hsl(var(--h)_45%_28%/0.55)]">
+          <span className="absolute bottom-[5%] right-[8%] text-[hsl(var(--h)_45%_28%/0.55)]" style={tint ? { color: tint, opacity: 0.7 } : undefined}>
             <Icon name={ico} size={Math.round(size * 0.34)} />
           </span>
         </>
@@ -131,17 +162,38 @@ export function MewKind({ kind }: { kind: string }) {
   )
 }
 
+/** Class chip, tinted with the class's own palette colour (see mewClassColor). */
 export function MewClass({ cls }: { cls: string }) {
   const classLabel = mewHuman(cls)
   const src = mewTokenSrc(cls)
+  const rec = select.get("classes", cls)
+  const color = mewClassColor(typeof rec?.palette === "number" ? rec.palette : undefined)
   return (
-    <span className="inline-flex items-center gap-[5px] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[5px] text-[11px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">
+    <span
+      style={color ? { borderColor: color.readable, color: color.readable } : undefined}
+      className="inline-flex items-center gap-[5px] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[5px] text-[11px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"
+    >
       {src ? (
-        <img src={src} alt="" width={10} height={10} className="flex-none object-contain" aria-hidden />
+        color ? (
+          <span
+            aria-hidden
+            style={{
+              backgroundColor: color.readable,
+              WebkitMaskImage: `url(${src})`,
+              maskImage: `url(${src})`,
+              WebkitMaskRepeat: "no-repeat", maskRepeat: "no-repeat",
+              WebkitMaskPosition: "center", maskPosition: "center",
+              WebkitMaskSize: "contain", maskSize: "contain",
+            }}
+            className="block h-[11px] w-[11px] flex-none"
+          />
+        ) : (
+          <img src={src} alt="" width={10} height={10} className="flex-none object-contain" aria-hidden />
+        )
       ) : (
         <Icon name="star" size={10} className="text-[color:var(--mwp-ink-soft)]" />
       )}
-      {classLabel}
+      <span className="text-[color:var(--mwp-ink)]">{classLabel}</span>
     </span>
   )
 }

@@ -108,19 +108,44 @@ export function buildIndex() {
       })
     }
   })
-  ;(d.shops || []).forEach((s) => {
-    if (s.itemGroups && typeof s.itemGroups === "object") {
-      Object.values(s.itemGroups).forEach((group: any) => {
-        if (group && typeof group === "object") {
-          Object.values(group).forEach((item: any) => {
-            if (item && typeof item === "object" && item.pool) {
-              if (!idx.itemToSources![String(item.pool)]) idx.itemToSources![String(item.pool)] = { pools: [], shops: [] }
-              idx.itemToSources![String(item.pool)].shops.push(s)
-            }
-          })
-        }
-      })
+  // A shop stocks FROM a pool, so its slots name pools, not items. Keying the
+  // index by the pool name (as this did) filed every shop under an id no item
+  // has, and the "shops" row on an item was therefore almost always empty —
+  // resolve the pool to its members and file the shop under each one.
+  idx.shopStock = {}
+  const poolItems: Record<string, string[]> = {}
+  ;(d.item_pools || []).forEach((p) => {
+    if (Array.isArray(p.items)) poolItems[p.id] = p.items as string[]
+  })
+  const poolMembers = (pool: string): string[] => {
+    if (poolItems[pool]) return poolItems[pool]
+    // Shops name pool *families* ("tracy_houseshop_common"); the extracted
+    // pools are suffixed per chapter ("..._0", "..._1"), so match the prefix.
+    const out: string[] = []
+    for (const key of Object.keys(poolItems)) {
+      if (key.startsWith(pool + "_")) out.push(...poolItems[key])
     }
+    // A slot can also name one specific item outright (AncestorsSkull,
+    // MoneyBag_Large, …) rather than a pool.
+    if (!out.length && idx.byCat.items[pool]) return [pool]
+    return out
+  }
+  ;(d.shops || []).forEach((s) => {
+    if (!s.itemGroups || typeof s.itemGroups !== "object") return
+    const seen = new Set<string>()
+    Object.values(s.itemGroups).forEach((group: any) => {
+      if (!group || typeof group !== "object") return
+      Object.values(group).forEach((slot: any) => {
+        if (!slot || typeof slot !== "object" || !slot.pool) return
+        poolMembers(String(slot.pool)).forEach((itemId) => {
+          if (seen.has(itemId)) return
+          seen.add(itemId)
+          if (!idx.itemToSources![itemId]) idx.itemToSources![itemId] = { pools: [], shops: [] }
+          idx.itemToSources![itemId].shops.push(s)
+        })
+      })
+    })
+    idx.shopStock![s.id] = [...seen]
   })
 
   // character → maps (enemies, bosses, minibosses, or via spawns if available)
@@ -242,6 +267,10 @@ export const select = {
   },
   itemSources2(itemId: string): { pools: MewRec[]; shops: MewRec[] } {
     return store.index?.itemToSources?.[itemId] || { pools: [], shops: [] }
+  },
+  /** Every item a shop can stock, resolved through its pool slots. */
+  shopStock(shopId: string): string[] {
+    return store.index?.shopStock?.[shopId] || []
   },
   characterToMaps(characterId: string): MewRec[] {
     return store.index?.characterToMaps?.[characterId] || []

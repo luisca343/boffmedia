@@ -8,7 +8,7 @@ import { MewData } from "../../mew-store"
 import { mewHuman, type MewRec } from "../../mew-util"
 import { MewEffects, MewFlag, MewRefList } from "../MewRefs"
 import { MewAbilityInline } from "./inline"
-import { MewDetail, MewFacts, MewHero, MewMoreTag, MewSections, MewSubLabel, mewTruncate, rows, type ViewProps } from "./scaffold"
+import { MewDetail, MewFacts, MewHero, MewHeroMedia, MewMoreTag, MewSections, MewSubLabel, mewTruncate, rows, type ViewProps } from "./scaffold"
 
 export function CharacterView({ rec, onNav }: ViewProps) {
   const t = useTranslations("mewgenics")
@@ -21,21 +21,11 @@ export function CharacterView({ rec, onNav }: ViewProps) {
 
   return (
     <MewDetail id={rec.id}>
-      {portraitSrc && (
-        <div className="[grid-column:1/-1] mb-3 flex justify-center">
-          <div className="[border-radius:var(--wob-a)] border-2 border-solid border-[color:var(--mwp-ink)] [box-shadow:0_6px_0_var(--mwp-shadow-lg)]">
-            <img
-              src={portraitSrc}
-              alt={rec.name}
-              className="h-auto max-h-[400px] w-auto object-contain"
-            />
-          </div>
-        </div>
-      )}
       <MewHero
         cat="characters"
         rec={rec}
         tip={rec.tip}
+        media={portraitSrc ? <MewHeroMedia src={portraitSrc} alt={rec.name} max={260} /> : undefined}
         badges={
           <>
             {rec.faction && <MewFaction faction={rec.faction} />}

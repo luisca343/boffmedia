@@ -39,7 +39,10 @@
       "abilitiesErrorLead": "Could not load abilities.json.",
       "emptyTitle": "No results",
       "emptyLead": "Adjust the search or filters.",
-      "overflowHint": "Narrow your search to see the rest."
+      "overflowHint": "Narrow your search to see the rest.",
+      "mutationFold": "Mutations",
+      "mutationNamedOnly": "Named only",
+      "mutationShowAll": "Show numbered"
     },
     "panel": {
       "data": "Data",
@@ -201,7 +204,51 @@
       "heal": "Heal",
       "gainXp": "Experience",
       "addCat": "Add cat",
-      "removeCat": "Remove cat"
+      "removeCat": "Remove cat",
+      "line": {
+        "gainCoins": "Gain {n} coins",
+        "gainFood": "Gain {n} food",
+        "gainXp": "Gain {n} XP",
+        "loseCoins": "Lose {n} coins",
+        "getItem": "Get an item",
+        "getItemFromPool": "Get a random item from",
+        "equipItem": "Get and equip",
+        "equipItemFromPool": "Get and equip an item from",
+        "getParasite": "Get a parasite",
+        "getParasiteFromPool": "Get a parasite from",
+        "loseItem": "Lose an item",
+        "loseAllItems": "Lose all equipped items",
+        "damage": "Take {n} damage",
+        "selfDamage": "Take {n} self damage",
+        "partyDamage": "The party takes {n} damage",
+        "kill": "Dies",
+        "heal": "Heal {n}",
+        "partyHeal": "The party heals {n}",
+        "fullHeal": "Fully healed",
+        "injury": "Receive an injury",
+        "gainDisorder": "Gain a disorder",
+        "gainDisorderFromPool": "Gain a disorder from",
+        "randomMutation": "Gain a random mutation",
+        "mutation": "Gain the mutation",
+        "permanentStats": "Permanent stat change",
+        "selfStatusNextFight": "Starts the next fight with",
+        "partyStatusNextFight": "The party starts the next fight with",
+        "gainFamiliar": "Gain a familiar",
+        "addCat": "A cat joins",
+        "removeCat": "Lose a cat",
+        "spawnUnitNextFight": "Spawns in the next fight",
+        "allyAmbush": "Allied ambush in the next fights",
+        "ambush": "Ambush in the next fights",
+        "battle": "Start a battle",
+        "shopNow": "A shop opens",
+        "eventNow": "Another event happens",
+        "eventNowSameCat": "Another event with the same cat",
+        "nextEventBonus": "Bonus on the next event",
+        "counterUp": "Counter +{n}",
+        "counterDown": "Counter −{n}",
+        "setToken": "Set a token",
+        "setFlag": "Set a flag"
+      }
     },
     "pop": {
       "noDesc": "No description in the data.",
@@ -460,7 +507,6 @@
     },
     "builder": {
       "equipment": "Equipment",
-      "equipmentNotImplemented": "Equipment overlays coming soon",
       "export": "Export PNG",
       "exporting": "Exporting...",
       "palette": "Palette",
@@ -474,7 +520,8 @@
         "legs": "Legs",
         "mouth": "Mouth",
         "tail": "Tail",
-        "texture": "Texture"
+        "texture": "Texture",
+        "arms": "Arms"
       },
       "partsTitle": "Cat Parts",
       "pose": {
@@ -490,19 +537,11 @@
       },
       "poseEyesLabel": "Eyes",
       "poseMouthLabel": "Mouth",
-      "poseTitle": "Pose",
       "presets": "Story Cats",
       "randomize": "Randomize",
-      "tab": {
-        "equipment": "Equipment",
-        "palette": "Palette",
-        "parts": "Parts",
-        "presets": "Presets"
-      },
       "title": "Mewgenics Cat Builder",
       "search": "Search parts…",
       "none": "None",
-      "clear": "Clear",
       "noResults": "No parts match",
       "partOf": "{n} of {total}",
       "equipHead": "Head item",
@@ -512,11 +551,83 @@
       "equipTrinket": "Trinket",
       "equipOnCat": "Worn on the cat",
       "equipSideOnly": "Shown beside the cat",
-      "slot": "Slot",
       "loadingParts": "Loading parts…",
       "paletteStandard": "Standard (genetics)",
       "paletteSpecial": "Story & special",
-      "equipHeld": "Held gear (not worn)"
+      "stageBg": "Backdrop",
+      "stageBgOption": {
+        "night": "Night",
+        "paper": "Paper",
+        "grid": "Checker"
+      },
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "zoomFit": "Fit to stage",
+      "close": "Close",
+      "searchPresets": "Search story cats…",
+      "searchItems": "Search items…",
+      "presetCustom": "Custom cat",
+      "paletteAll": "All {n}",
+      "undo": "Undo",
+      "reset": "Reset",
+      "copyLink": "Copy link",
+      "copied": "Copied!",
+      "backToCodex": "Back to the codex"
+    },
+    "event": {
+      "calc": {
+        "title": "Chance calculator",
+        "intro": "Set the cat's stats: each option uses its own, and the lowest/highest-stat modifier is worked out for you.",
+        "difficulty": "Difficulty",
+        "difficultyNote": "Difficulty is not present in the extracted game data — leave it at 0 unless you want to model a harder check.",
+        "lowest": "lowest",
+        "highest": "highest",
+        "reset": "Reset",
+        "success": "Success",
+        "rare": "Rare",
+        "fixed": "Fixed chance",
+        "checkOf": "{stat} check",
+        "difficultyShort": "Diff",
+        "luckOnly": "Luck only",
+        "noRoll": "No roll",
+        "tierOnly": "Guaranteed outcome",
+        "isLowest": "their lowest stat",
+        "isHighest": "their highest stat",
+        "decrease": "Decrease {stat}",
+        "increase": "Increase {stat}"
+      },
+      "outcome": {
+        "goodRare": "Good rare",
+        "goodCommon": "Good common",
+        "badCommon": "Bad common",
+        "badRare": "Bad rare"
+      },
+      "tier": {
+        "common": "Common",
+        "rare": "Rare",
+        "weight": "weight"
+      },
+      "intro": {
+        "title": "Intro text",
+        "counter": "Counter"
+      },
+      "req": {
+        "title": "Requirements",
+        "counterMax": "counter ≤ {n}",
+        "counterMin": "counter ≥ {n}",
+        "counterRange": "counter {a}–{b}",
+        "slotEquipped": "has equipped: {slot}"
+      },
+      "cost": "Costs {n} {what}"
+    },
+    "source": {
+      "hint": "Hover or tab a source to see what it holds."
+    },
+    "storyCat": {
+      "appearance": "Appearance",
+      "voice": "Voice",
+      "pitch": "Pitch",
+      "openInBuilder": "Open in the builder"
     }
   }
 }

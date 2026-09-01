@@ -8,7 +8,15 @@ import { select } from "../../mew-store"
 import { MEW_STATMOD, mewHuman, mewStatModLabel, mewSubItemName, type MewRec } from "../../mew-util"
 import { MewEffects, MewFlag, MewRefList } from "../MewRefs"
 import { MewAbilityInline } from "./inline"
+import { MewSourceChip } from "./SourcePop"
 import { MewDesc, MewDetail, MewFacts, MewFlags, MewHero, MewMoreTag, MewSections, MewSubLabel, MewTag, mewTruncate, num, rows, type ViewProps } from "./scaffold"
+
+/** Pool ids carry engine flags (`general_!autorarity`); `!x` is a switch, not a
+ *  word, so drop it rather than printing it at the reader. */
+function mewPoolLabel(id: string): string {
+  const clean = String(id).split("_").filter((w) => !w.startsWith("!")).join("_")
+  return mewHuman(clean || id)
+}
 
 export function ItemView({ rec, onNav }: ViewProps) {
   const t = useTranslations("mewgenics")
@@ -54,17 +62,45 @@ export function ItemView({ rec, onNav }: ViewProps) {
         )}
         {(poolRecs.length > 0 || shopRecs.length > 0) && (
           <MewPanel title={t("panel.whereToGet")} icon="map" span="full">
-            <div className="flex flex-col gap-3 text-[13px]">
+            <div className="flex flex-col gap-3.5 text-[13px]">
+              <p className="m-0 text-[11.5px]/[1.4] italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">{t("source.hint")}</p>
               {poolRecs.length > 0 && (
                 <div>
-                  <div className="text-sm font-bold text-[color:var(--mwp-ink-soft)] mb-1.5">{t("panel.itemPools")} ({poolRecs.length})</div>
-                  <div className="flex flex-wrap gap-2">{poolRecs.map((p) => <span key={p.id} title={Array.isArray(p.items) ? p.items.join(", ") : ""}><MewTag>{mewHuman(p.id)}</MewTag></span>)}</div>
+                  <MewSubLabel n={poolRecs.length}>{t("panel.itemPools")}</MewSubLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {poolRecs.map((p) => (
+                      <MewSourceChip
+                        key={p.id}
+                        label={mewPoolLabel(p.id)}
+                        icon="layers"
+                        ids={Array.isArray(p.items) ? (p.items as string[]) : []}
+                        count={Array.isArray(p.items) ? p.items.length : 0}
+                        currentId={rec.id}
+                        onNav={onNav}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
               {shopRecs.length > 0 && (
                 <div>
-                  <div className="text-sm font-bold text-[color:var(--mwp-ink-soft)] mb-1.5">{t("panel.shops")} ({shopRecs.length})</div>
-                  <div className="flex flex-wrap gap-2">{shopRecs.map((s) => <MewTag key={s.id}>{s.name || mewHuman(s.id)}</MewTag>)}</div>
+                  <MewSubLabel n={shopRecs.length}>{t("panel.shops")}</MewSubLabel>
+                  <div className="flex flex-wrap gap-2">
+                    {shopRecs.map((sh) => {
+                      const stock = select.shopStock(sh.id)
+                      return (
+                        <MewSourceChip
+                          key={sh.id}
+                          label={sh.name || mewHuman(sh.id)}
+                          icon="gift"
+                          ids={stock}
+                          count={stock.length}
+                          currentId={rec.id}
+                          onNav={onNav}
+                        />
+                      )
+                    })}
+                  </div>
                 </div>
               )}
             </div>

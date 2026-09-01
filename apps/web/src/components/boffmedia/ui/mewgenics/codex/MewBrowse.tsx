@@ -21,7 +21,7 @@ function Kbd({ children }: { children: React.ReactNode }) {
  */
 export function MewBrowse({ codex }: { codex: MewCodexModel }) {
   const t = useTranslations("mewgenics")
-  const { cat, catDef, q, setQ, view, setView, sort, setSort, filters, setFilters, filterOpts, filtered, shown, abilitiesLoading, searchRef, pick, favIds, toggleFav, isFav, loadMore, canLoadMore, cursorEnabled, playSound } = codex
+  const { cat, catDef, q, setQ, view, setView, sort, setSort, filters, setFilters, filterOpts, filtered, shown, abilitiesLoading, numberedHidden, searchRef, pick, favIds, toggleFav, isFav, loadMore, canLoadMore, cursorEnabled, playSound } = codex
 
   const hasFiltersOrSearch = q || Object.values(filters).some((v) => v)
 
@@ -141,6 +141,20 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
               { value: "1", label: t("roster.favoritesLabel", { count: catFavCount }) },
             ]}
             onChange={(v) => setFilters((f) => ({ ...f, __fav: v as string }))}
+          />
+        </div>
+      )}
+
+      {(numberedHidden > 0 || filters.__numbered === "1") && (
+        <div className="mb-4">
+          <MewChips
+            label={t("roster.mutationFold")}
+            value={filters.__numbered || ""}
+            options={[
+              { value: "", label: t("roster.mutationNamedOnly") },
+              { value: "1", label: t("roster.mutationShowAll") },
+            ]}
+            onChange={(v) => setFilters((f) => ({ ...f, __numbered: v as string }))}
           />
         </div>
       )}

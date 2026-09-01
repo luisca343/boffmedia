@@ -31,6 +31,14 @@ export interface CatCompositorProps {
   }
   equipment?: CatEquipment
   size?: number
+  /** Canvas backdrop (any CSS `background` value). Defaults to the paper the
+   *  codex fiche uses; the builder passes its own so the stage reads as one
+   *  surface instead of a cream square floating in a dark box. */
+  background?: string
+  /** Frame the cat by the pixels it actually paints instead of by the clip
+   *  canvases `part_bounds` reports. Costs one 256px probe render; opt-in so
+   *  the codex's tuned card art keeps its existing framing. */
+  tightFit?: boolean
 }
 
 // 2D affine matrix as emitted by the extractor:

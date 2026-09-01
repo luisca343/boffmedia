@@ -6,7 +6,7 @@ import { MewPanel, MewNote, MewTile } from "../../MewAtoms"
 import { MEW_STATMOD, mewHuman, mewStatModLabel } from "../../mew-util"
 import { mewFurnitureArt } from "../../mew-art"
 import { select, MewData } from "../../mew-store"
-import { MewDesc, MewDetail, MewFacts, MewHero, MewSections, MewSubLabel, num, rows, type ViewProps } from "./scaffold"
+import { MewDesc, MewDetail, MewFactGrid, MewHero, MewHeroMedia, MewSections, MewSubLabel, num, rows, type ViewProps } from "./scaffold"
 
 export function FurnitureView({ rec, onNav }: ViewProps) {
   const t = useTranslations("mewgenics")
@@ -40,23 +40,12 @@ export function FurnitureView({ rec, onNav }: ViewProps) {
 
   return (
     <MewDetail id={rec.id}>
-      {furnitureArt && (
-        <div className="[grid-column:1/-1] mb-3 flex justify-center">
-          <div className="[border-radius:var(--wob-a)] border-2 border-solid border-[color:var(--mwp-ink)] [box-shadow:0_6px_0_var(--mwp-shadow-lg)] bg-[color:var(--mwp-paper)]">
-            <img
-              src={furnitureArt}
-              alt={rec.name}
-              className="block max-h-[260px] w-auto max-w-full object-contain p-4"
-            />
-          </div>
-        </div>
-      )}
-      <MewHero cat="furniture" rec={rec} />
+      <MewHero cat="furniture" rec={rec} media={furnitureArt ? <MewHeroMedia src={furnitureArt} alt={rec.name} max={200} /> : undefined} />
       <MewDesc>{rec.desc}</MewDesc>
       <MewSections>
         {statRows.length > 0 && (
           <MewPanel title={t("panel.stats")} icon="home">
-            <MewFacts rows={statRows} />
+            <MewFactGrid rows={statRows} />
           </MewPanel>
         )}
         {flagNotes.length > 0 && (

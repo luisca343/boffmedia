@@ -123,11 +123,63 @@ function cleanReward(e: Raw): MewEventReward {
 function normBranch(b: Raw | undefined): MewEventOutcome | undefined {
   if (!b || typeof b !== "object") return undefined
   let rawEntries: Raw[]
-  if (b.reward && typeof b.reward === "object") rawEntries = Object.values(b.reward)
-  else if (Array.isArray(b.random_pool)) rawEntries = b.random_pool
-  else rawEntries = [b]
-  const entries = rawEntries.map(cleanReward).filter((e) => e.prompt || Object.keys(e).some((k) => k !== "prompt"))
+  let tiers: (string | undefined)[]
+  if (b.reward && typeof b.reward === "object") {
+    // `reward { common {...} rare {...} }` — the key IS the rarity tier and the
+    // whole chance breakdown hangs off it, so it must survive the flattening.
+    const pairs = Object.entries(b.reward as Record<string, Raw>)
+    rawEntries = pairs.map(([, v]) => v)
+    tiers = pairs.map(([k]) => k)
+  } else if (Array.isArray(b.random_pool)) {
+    rawEntries = b.random_pool
+    tiers = rawEntries.map(() => undefined)
+  } else {
+    rawEntries = [b]
+    tiers = [undefined]
+  }
+  const entries = rawEntries
+    .map((e, i) => {
+      const out = cleanReward(e)
+      if (tiers[i]) out.tier = tiers[i]
+      if (typeof e.weight === "number") out.weight = e.weight
+      return out
+    })
+    .filter((e) => e.prompt || Object.keys(e).some((k) => k !== "prompt" && k !== "tier" && k !== "weight"))
   return entries.length ? { entries } : undefined
+}
+
+/** `50%` / `0.5` / `50` → 0.5. Fixed-chance options write it as a percent string. */
+function normPct(v: unknown): number | undefined {
+  if (typeof v === "number") return v > 1 ? v / 100 : v
+  if (typeof v === "string") {
+    const m = v.trim().match(/^(-?[\d.]+)\s*%?$/)
+    if (!m) return undefined
+    const n = Number(m[1])
+    if (!isFinite(n)) return undefined
+    return v.includes("%") || n > 1 ? n / 100 : n
+  }
+  return undefined
+}
+
+/** The setup block's conditional prompts — the game swaps the intro text as a
+ *  world counter advances, and the wiki lists each variant. */
+function normIntroVariants(setup: Raw | undefined): { prompt: string; when?: string }[] {
+  const list = setup && Array.isArray(setup.conditional_reward) ? setup.conditional_reward : []
+  const out: { prompt: string; when?: string }[] = []
+  for (const c of list as Raw[]) {
+    const p = c?.reward?.prompt
+    if (typeof p !== "string") continue
+    const text = T(p, "")
+    if (!text || out.some((o) => o.prompt === text)) continue
+    const req = c.requirements || {}
+    let when: string | undefined
+    const range = req.counter_range, min = req.counter_minimum, max = req.counter_maximum
+    if (Array.isArray(range)) when = range[1] === range[2] ? `= ${range[1]}` : `${range[1]}–${range[2]}`
+    else if (Array.isArray(min)) when = `≥ ${min[1]}`
+    else if (Array.isArray(max)) when = `≤ ${max[1]}`
+    out.push({ prompt: text, when })
+  }
+  return out
 }
 export function normEvents(raw: Raw[]): MewRec[] {
   return raw
@@ -138,13 +190,28 @@ export function normEvents(raw: Raw[]): MewRec[] {
         const bad = normBranch(o.bad)
         // options with no good/bad carry their rewards directly → a single flat outcome
         const flat = good || bad ? normBranch(o.flat) : normBranch(o)
-        return { id: oid, label: mewCleanName(T(o.label, o.label)), stat: o.stat, good, bad, flat }
+        return {
+          id: oid,
+          label: mewCleanName(T(o.label, o.label)),
+          stat: o.stat,
+          good,
+          bad,
+          flat,
+          // chance inputs: `fixed_chance` overrides the stat roll entirely;
+          // stat_min/max are the entry cost for `coins`/`quest` pseudo-stats.
+          fixedChance: normPct(o.fixed_chance),
+          statMin: typeof o.stat_min === "number" ? o.stat_min : undefined,
+          statMax: typeof o.stat_max === "number" ? o.stat_max : undefined,
+          reqs: o.requirements && Object.keys(o.requirements).length ? (o.requirements as Record<string, unknown>) : undefined,
+        }
       })
+      const introVariants = normIntroVariants(main.setup)
       const rec: MewRec = {
         id: r._id,
         name: mewCleanName(T(r.title_key, r.title_en)) || mewHuman(r._id),
         subject: r.intro?.subject_frame,
-        prompt: T(main.prompt, ""),
+        prompt: T(main.prompt, "") || introVariants[0]?.prompt || "",
+        introVariants: introVariants.length > 1 ? introVariants : undefined,
         options,
       }
       rec.titlek = r.title_key
@@ -165,6 +232,9 @@ export function normClasses(raw: Raw[]): MewRec[] {
       groups: r.ability_groups,
       passivePool: r.passive_pool,
       statMods: r.stat_mods,
+      // palette.png row index — the class's own in-game colour ramp. Jester
+      // ships an array (it borrows every other class's palette).
+      palette: typeof r.graphics?.palette === "number" ? r.graphics.palette : undefined,
     }
     return rec
   })
@@ -274,6 +344,11 @@ export function normMutations(raw: Raw[]): MewRec[] {
       body_part: r.body_part,
       statMods: Object.keys(statMods).length ? statMods : undefined,
       passives: r.passives,
+      // 488 of 760 mutations are bare stat rolls with no description and no
+      // passive — the game names them only by number. Flag them from the data
+      // (no desc AND no passive) so the roster can fold them away by default;
+      // never infer this from the "#123" display name, which is synthesised.
+      numbered: !desc && !r.passives,
     }
     rec.nk = r.name_key
     rec.dk = r.desc_key

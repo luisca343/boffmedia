@@ -31,6 +31,8 @@ export interface MewIndex {
   byCat: Record<string, Record<string, MewRec>>
   lowerChar: Record<string, MewRec>
   effect: Record<string, { kind: string; rec: MewRec }>
+  /** shop id → every item id it can stock (its pool slots, resolved). */
+  shopStock?: Record<string, string[]>
   abilAll: Record<string, MewRec>
   keywordAppliedBy?: Record<string, MewRec[]> // keyword id → abilities that apply it
   passiveGrantedBy?: Record<string, { kind: string; recs: MewRec[] }> // passive id → {kind, recs} that grant it

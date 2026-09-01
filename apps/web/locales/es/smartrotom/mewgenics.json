@@ -39,7 +39,10 @@
       "abilitiesErrorLead": "No se pudo cargar abilities.json.",
       "emptyTitle": "Sin resultados",
       "emptyLead": "Ajusta la búsqueda o los filtros.",
-      "overflowHint": "Refina la búsqueda para ver el resto."
+      "overflowHint": "Refina la búsqueda para ver el resto.",
+      "mutationFold": "Mutaciones",
+      "mutationNamedOnly": "Solo con nombre",
+      "mutationShowAll": "Mostrar numeradas"
     },
     "panel": {
       "data": "Datos",
@@ -201,7 +204,51 @@
       "heal": "Cura",
       "gainXp": "Experiencia",
       "addCat": "Añade gato",
-      "removeCat": "Pierde gato"
+      "removeCat": "Pierde gato",
+      "line": {
+        "gainCoins": "Gana {n} monedas",
+        "gainFood": "Gana {n} de comida",
+        "gainXp": "Gana {n} de experiencia",
+        "loseCoins": "Pierde {n} monedas",
+        "getItem": "Consigue un objeto",
+        "getItemFromPool": "Consigue un objeto aleatorio de",
+        "equipItem": "Consigue y equipa",
+        "equipItemFromPool": "Consigue y equipa un objeto de",
+        "getParasite": "Recibe un parásito",
+        "getParasiteFromPool": "Recibe un parásito de",
+        "loseItem": "Pierde un objeto",
+        "loseAllItems": "Pierde todo el equipo",
+        "damage": "Recibe {n} de daño",
+        "selfDamage": "Se hace {n} de daño",
+        "partyDamage": "El grupo recibe {n} de daño",
+        "kill": "Muere",
+        "heal": "Se cura {n}",
+        "partyHeal": "El grupo se cura {n}",
+        "fullHeal": "Se cura por completo",
+        "injury": "Sufre una lesión",
+        "gainDisorder": "Adquiere un trastorno",
+        "gainDisorderFromPool": "Adquiere un trastorno de",
+        "randomMutation": "Recibe una mutación aleatoria",
+        "mutation": "Recibe la mutación",
+        "permanentStats": "Cambio permanente de estadísticas",
+        "selfStatusNextFight": "Empieza el siguiente combate con",
+        "partyStatusNextFight": "El grupo empieza el siguiente combate con",
+        "gainFamiliar": "Consigue un familiar",
+        "addCat": "Se une un gato",
+        "removeCat": "Pierdes un gato",
+        "spawnUnitNextFight": "Aparece en el siguiente combate",
+        "allyAmbush": "Emboscada aliada en los próximos combates",
+        "ambush": "Emboscada en los próximos combates",
+        "battle": "Comienza un combate",
+        "shopNow": "Se abre una tienda",
+        "eventNow": "Ocurre otro evento",
+        "eventNowSameCat": "Ocurre otro evento con el mismo gato",
+        "nextEventBonus": "Bonificación en el siguiente evento",
+        "counterUp": "Contador +{n}",
+        "counterDown": "Contador −{n}",
+        "setToken": "Marca un token",
+        "setFlag": "Activa una marca"
+      }
     },
     "pop": {
       "noDesc": "Sin descripción en los datos.",
@@ -460,7 +507,6 @@
     },
     "builder": {
       "equipment": "Equipo",
-      "equipmentNotImplemented": "Los equipamientos vendrán pronto",
       "export": "Exportar PNG",
       "exporting": "Exportando...",
       "palette": "Paleta",
@@ -474,7 +520,8 @@
         "legs": "Patas",
         "mouth": "Boca",
         "tail": "Cola",
-        "texture": "Textura"
+        "texture": "Textura",
+        "arms": "Brazos"
       },
       "partsTitle": "Partes del Gato",
       "pose": {
@@ -490,19 +537,11 @@
       },
       "poseEyesLabel": "Ojos",
       "poseMouthLabel": "Boca",
-      "poseTitle": "Pose",
       "presets": "Gatos de Historia",
       "randomize": "Aleatorio",
-      "tab": {
-        "equipment": "Equipo",
-        "palette": "Paleta",
-        "parts": "Partes",
-        "presets": "Preajustes"
-      },
       "title": "Constructor de Gatos Mewgenics",
       "search": "Buscar partes…",
       "none": "Ninguno",
-      "clear": "Quitar",
       "noResults": "No hay partes que coincidan",
       "partOf": "{n} de {total}",
       "equipHead": "Objeto de cabeza",
@@ -512,11 +551,83 @@
       "equipTrinket": "Abalorio",
       "equipOnCat": "Puesto en el gato",
       "equipSideOnly": "Mostrado junto al gato",
-      "slot": "Ranura",
       "loadingParts": "Cargando partes…",
       "paletteStandard": "Estándar (genética)",
       "paletteSpecial": "Historia y especiales",
-      "equipHeld": "Equipo en mano (no puesto)"
+      "stageBg": "Fondo",
+      "stageBgOption": {
+        "night": "Noche",
+        "paper": "Papel",
+        "grid": "Cuadrícula"
+      },
+      "zoomIn": "Acercar",
+      "zoomOut": "Alejar",
+      "zoomFit": "Ajustar al escenario",
+      "close": "Cerrar",
+      "searchPresets": "Buscar gatos…",
+      "searchItems": "Buscar objetos…",
+      "presetCustom": "Gato personalizado",
+      "paletteAll": "Ver las {n}",
+      "undo": "Deshacer",
+      "reset": "Reiniciar",
+      "copyLink": "Copiar enlace",
+      "copied": "¡Copiado!",
+      "backToCodex": "Volver al códice"
+    },
+    "event": {
+      "calc": {
+        "title": "Calculadora de probabilidad",
+        "intro": "Ajusta las estadísticas del gato: cada opción usa la suya y el modificador de stat más bajo/alto se deduce solo.",
+        "difficulty": "Dificultad",
+        "difficultyNote": "La dificultad no aparece en los datos extraídos del juego; déjala en 0 salvo que quieras simular una tirada más dura.",
+        "lowest": "la más baja",
+        "highest": "la más alta",
+        "reset": "Reiniciar",
+        "success": "Éxito",
+        "rare": "Raro",
+        "fixed": "Probabilidad fija",
+        "checkOf": "Tirada de {stat}",
+        "difficultyShort": "Dif",
+        "luckOnly": "Solo suerte",
+        "noRoll": "Sin tirada",
+        "tierOnly": "Resultado garantizado",
+        "isLowest": "su stat más bajo",
+        "isHighest": "su stat más alto",
+        "decrease": "Bajar {stat}",
+        "increase": "Subir {stat}"
+      },
+      "outcome": {
+        "goodRare": "Bien raro",
+        "goodCommon": "Bien común",
+        "badCommon": "Mal común",
+        "badRare": "Mal raro"
+      },
+      "tier": {
+        "common": "Común",
+        "rare": "Raro",
+        "weight": "peso"
+      },
+      "intro": {
+        "title": "Textos de introducción",
+        "counter": "Contador"
+      },
+      "req": {
+        "title": "Requisitos",
+        "counterMax": "contador ≤ {n}",
+        "counterMin": "contador ≥ {n}",
+        "counterRange": "contador {a}–{b}",
+        "slotEquipped": "lleva equipado: {slot}"
+      },
+      "cost": "Cuesta {n} {what}"
+    },
+    "source": {
+      "hint": "Pasa el cursor (o tabula) por una fuente para ver lo que contiene."
+    },
+    "storyCat": {
+      "appearance": "Apariencia",
+      "voice": "Voz",
+      "pitch": "Tono",
+      "openInBuilder": "Abrir en el constructor"
     }
   }
 }

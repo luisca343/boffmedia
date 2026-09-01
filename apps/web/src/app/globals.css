@@ -659,6 +659,18 @@ html[data-scrolling], .bm-scroll[data-scrolling], .bm-scroll:hover { --sb-cur: v
   background-blend-mode: normal, multiply;
 }
 
+/* Number field for the event chance stepper. The native spinner arrows are
+   both ugly here and variable-width, which is exactly what we are removing. */
+.mew-num::-webkit-outer-spin-button,
+.mew-num::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.mew-num {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .mew-rule {
   position: relative;
 }
