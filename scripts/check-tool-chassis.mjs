@@ -107,8 +107,23 @@ for (const r of ROOTS) {
       // which is what silently drifted the mhwilds roster and `--dk-bar-h`.
       // `var(--tool-vh)` is a READ; `"--tool-vh":` is the host DECLARING it, which
       // is exactly what a host is supposed to do. Only reads can drift.
+      //
+      // Two narrowings, both from false positives this rule produced on code
+      // that was already correct:
+      //
+      //  * `var(--tool-vh, 100dvh)`'s FALLBACK is not a drifting literal — it is
+      //    what the token means when a host forgot to set it. Fallbacks are
+      //    stripped before the test, which also covers `var(--tool-sticky-top,0px)`.
+      //  * The literal has to be in a height or an offset, not merely somewhere
+      //    on the same line. A `text-[13px]` beside a `min-h-[var(--tool-vh)]`
+      //    was reported as a bar height, sending readers after a bug that was
+      //    never there.
       const offsets = text.includes("var(--tool-sticky-top") || text.includes("var(--tool-vh")
-      if (offsets && /\b\d+px\b/.test(text) && !text.includes("--tool-bar-h")) {
+      const literal = text.replace(/var\(--[^)]*\)/g, "")
+      const inOffset =
+        /\b(?:top|bottom|h|min-h|max-h)-\[[^\]]*\b\d+px\b/.test(literal) ||
+        /calc\([^)]*\b\d+px\b/.test(literal)
+      if (offsets && inOffset && !text.includes("--tool-bar-h")) {
         report(file, n, "bar-height", "Literal height in a bar offset. Read `var(--tool-bar-h)` instead — a literal drifts silently when the bar changes.")
       }
 

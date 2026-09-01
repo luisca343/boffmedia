@@ -21,6 +21,10 @@ export type MatchDto = {
     turnCount?: number;
     opponentArchetype?: string;
     updatedAt?: number;
+    /**
+     * Epoch ms on the device that last wrote this row. The value conflict detection compares — never `updatedAt`, which is the server clock.
+     */
+    clientUpdatedAt?: number;
 };
 export namespace MatchDto {
     export enum format {

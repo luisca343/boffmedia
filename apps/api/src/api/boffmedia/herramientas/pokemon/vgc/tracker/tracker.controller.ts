@@ -6,10 +6,17 @@ import {
   Param,
   Post,
   Put,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiOperation,
+  ApiParam,
+  ApiQuery,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { TrackerService } from './tracker.service';
 import {
@@ -75,8 +82,23 @@ export class TrackerController {
 
   @Delete('presets/:id')
   @ApiOperation({ summary: 'Delete a team preset' })
-  deletePreset(@Param('id') id: string, @Req() req: any) {
-    return this.service.deletePreset(req.user.userId, id);
+  @ApiQuery({
+    name: 'clientDeletedAt',
+    required: false,
+    description:
+      "Epoch ms on the deleting device. Stored as the tombstone's timestamp so a " +
+      'later offline edit of the same row can be told apart from an earlier one.',
+  })
+  deletePreset(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Query('clientDeletedAt') clientDeletedAt?: string,
+  ) {
+    return this.service.deletePreset(
+      req.user.userId,
+      id,
+      clientDeletedAt ? Number(clientDeletedAt) : undefined,
+    );
   }
 
   // ─── Sessions ────────────────────────────────────────────────────────────────
@@ -105,8 +127,23 @@ export class TrackerController {
 
   @Delete('sessions/:id')
   @ApiOperation({ summary: 'Delete a session and its matches' })
-  deleteSession(@Param('id') id: string, @Req() req: any) {
-    return this.service.deleteSession(req.user.userId, id);
+  @ApiQuery({
+    name: 'clientDeletedAt',
+    required: false,
+    description:
+      "Epoch ms on the deleting device. Stored as the tombstone's timestamp so a " +
+      'later offline edit of the same row can be told apart from an earlier one.',
+  })
+  deleteSession(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Query('clientDeletedAt') clientDeletedAt?: string,
+  ) {
+    return this.service.deleteSession(
+      req.user.userId,
+      id,
+      clientDeletedAt ? Number(clientDeletedAt) : undefined,
+    );
   }
 
   // ─── Matches ─────────────────────────────────────────────────────────────────
@@ -141,8 +178,23 @@ export class TrackerController {
 
   @Delete('matches/:id')
   @ApiOperation({ summary: 'Delete a match' })
-  deleteMatch(@Param('id') id: string, @Req() req: any) {
-    return this.service.deleteMatch(req.user.userId, id);
+  @ApiQuery({
+    name: 'clientDeletedAt',
+    required: false,
+    description:
+      "Epoch ms on the deleting device. Stored as the tombstone's timestamp so a " +
+      'later offline edit of the same row can be told apart from an earlier one.',
+  })
+  deleteMatch(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Query('clientDeletedAt') clientDeletedAt?: string,
+  ) {
+    return this.service.deleteMatch(
+      req.user.userId,
+      id,
+      clientDeletedAt ? Number(clientDeletedAt) : undefined,
+    );
   }
 
   // ─── Series ──────────────────────────────────────────────────────────────────
@@ -172,7 +224,22 @@ export class TrackerController {
 
   @Delete('series/:id')
   @ApiOperation({ summary: 'Delete a series' })
-  deleteSeries(@Param('id') id: string, @Req() req: any) {
-    return this.service.deleteSeries(req.user.userId, id);
+  @ApiQuery({
+    name: 'clientDeletedAt',
+    required: false,
+    description:
+      "Epoch ms on the deleting device. Stored as the tombstone's timestamp so a " +
+      'later offline edit of the same row can be told apart from an earlier one.',
+  })
+  deleteSeries(
+    @Param('id') id: string,
+    @Req() req: any,
+    @Query('clientDeletedAt') clientDeletedAt?: string,
+  ) {
+    return this.service.deleteSeries(
+      req.user.userId,
+      id,
+      clientDeletedAt ? Number(clientDeletedAt) : undefined,
+    );
   }
 }

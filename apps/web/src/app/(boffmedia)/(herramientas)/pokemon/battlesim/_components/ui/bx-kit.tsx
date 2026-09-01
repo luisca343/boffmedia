@@ -9,7 +9,7 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@boffmedia/ui"
 import { DkSprite } from "@/components/boffmedia/ui/tools/datakit"
-import { spriteUrl, handleSpriteError } from "@/features/vgc-tracker/types"
+import { spriteUrl, handleSpriteError } from "@boffmedia/tools-pokemon"
 import {
   tyColor, tyLabel, CAT_ES, STATUS_ES, STATUS_LONG, BOOST_ES, hpTone, effLabel, effMult, speedOrder,
   type BxMon, type BxMove, type BxTickEv, type BxTeamHP, type OrderSlot,

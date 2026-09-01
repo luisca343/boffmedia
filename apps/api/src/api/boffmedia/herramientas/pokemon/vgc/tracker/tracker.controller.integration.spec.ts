@@ -187,6 +187,9 @@ describe('TrackerController — integration (ValidationPipe + GlobalExceptionFil
       expect(mockService.deletePreset).toHaveBeenCalledWith(
         MOCK_USER_ID,
         'preset-uuid',
+        // No `clientDeletedAt` on the query string: the service stamps the
+        // tombstone with its own clock rather than refusing the delete.
+        undefined,
       );
     });
   });
@@ -254,6 +257,26 @@ describe('TrackerController — integration (ValidationPipe + GlobalExceptionFil
       expect(mockService.deleteSession).toHaveBeenCalledWith(
         MOCK_USER_ID,
         'sess-1',
+        // No `clientDeletedAt` on the query string: the service stamps the
+        // tombstone with its own clock rather than refusing the delete.
+        undefined,
+      );
+    });
+
+    it('passes clientDeletedAt through as a number', async () => {
+      mockService.deleteSession.mockResolvedValue(undefined);
+
+      const res = await request(app.getHttpServer()).delete(
+        '/tools/vgc/tracker/sessions/sess-1?clientDeletedAt=1735689600000',
+      );
+
+      expect(res.status).toBe(200);
+      // A NUMBER, not the string the query string carried: it is compared
+      // against a later edit's stamp, and '2' > '10' in string order.
+      expect(mockService.deleteSession).toHaveBeenCalledWith(
+        MOCK_USER_ID,
+        'sess-1',
+        1735689600000,
       );
     });
   });
@@ -347,6 +370,9 @@ describe('TrackerController — integration (ValidationPipe + GlobalExceptionFil
       expect(mockService.deleteMatch).toHaveBeenCalledWith(
         MOCK_USER_ID,
         'match-uuid',
+        // No `clientDeletedAt` on the query string: the service stamps the
+        // tombstone with its own clock rather than refusing the delete.
+        undefined,
       );
     });
   });
@@ -410,6 +436,9 @@ describe('TrackerController — integration (ValidationPipe + GlobalExceptionFil
       expect(mockService.deleteSeries).toHaveBeenCalledWith(
         MOCK_USER_ID,
         'series-uuid',
+        // No `clientDeletedAt` on the query string: the service stamps the
+        // tombstone with its own clock rather than refusing the delete.
+        undefined,
       );
     });
   });

@@ -1,6 +1,8 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
-import { DamageCalculatorView } from "./_components/DamageCalculatorView"
+import { Suspense } from "react"
+import { DamageCalculatorView } from "@boffmedia/tools-pokemon"
+import { VgcRouted } from "../_components/VgcRouted"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pageMeta.herramientas")
@@ -8,5 +10,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
-  return <DamageCalculatorView />
+  return (
+    <Suspense>
+      <VgcRouted>
+        <DamageCalculatorView />
+      </VgcRouted>
+    </Suspense>
+  )
 }

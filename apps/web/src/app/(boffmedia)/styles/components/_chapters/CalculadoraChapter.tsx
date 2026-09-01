@@ -17,10 +17,10 @@ import {
   StatEditor,
   TogglePill,
   TypeBadge,
-} from "@/app/(boffmedia)/(herramientas)/pokemon/vgc/damage-calculator/_components/ui"
-import type { CalcPokemon } from "@/app/(boffmedia)/(herramientas)/pokemon/vgc/damage-calculator/_types/calculator"
-import { defaultPokemon } from "@/app/(boffmedia)/(herramientas)/pokemon/vgc/damage-calculator/_store/slices/calcSlice"
-import { MvType } from "@/app/(boffmedia)/(herramientas)/pokemon/vgc/meta/_components/MvBits"
+  MvType,
+  defaultPokemon,
+  type CalcPokemon,
+} from "@boffmedia/tools-pokemon"
 
 // Demo species for the combobox (name · slug · English types). [deferred]
 const CX_SPECIES = [

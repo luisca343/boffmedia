@@ -19,6 +19,10 @@ export type SeriesDto = {
     seriesResult?: SeriesDto.seriesResult;
     notes: Array<MatchNoteDto>;
     updatedAt?: number;
+    /**
+     * Epoch ms on the device that last wrote this row. The value conflict detection compares — never `updatedAt`, which is the server clock.
+     */
+    clientUpdatedAt?: number;
 };
 export namespace SeriesDto {
     export enum seriesResult {

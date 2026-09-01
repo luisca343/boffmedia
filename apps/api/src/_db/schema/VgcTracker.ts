@@ -61,6 +61,22 @@ export const vgcTeamPresets = mysqlTable(
     versions: text('versions').notNull().default('[]'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+    /**
+     * Sync bookkeeping, shared by all four tracker tables.
+     *
+     * `clientUpdatedAt` is the CLIENT's epoch-ms stamp for the last write this
+     * row accepted, and it is what conflict detection compares — never
+     * `updated_at`. `updated_at` is the server's clock; a device whose clock is
+     * five minutes slow would 409 on every write forever if it were compared
+     * against one. Two client stamps at least share a clock domain.
+     *
+     * `deletedAt` is a tombstone, also the client's stamp. A hard DELETE is
+     * invisible to a device that is offline when it happens: its copy survives,
+     * looks local-only on the next pull, and gets pushed straight back. The row
+     * has to stay long enough to be told about.
+     */
+    clientUpdatedAt: bigint('client_updated_at', { mode: 'number' }),
+    deletedAt: bigint('deleted_at', { mode: 'number' }),
   },
   (t) => ({
     userIdx: index('vgc_presets_user_idx').on(t.userId),
@@ -91,6 +107,9 @@ export const vgcSessions = mysqlTable(
     sessionNotes: text('session_notes'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+    /** See the note on `tools_vgc_team_presets`. */
+    clientUpdatedAt: bigint('client_updated_at', { mode: 'number' }),
+    deletedAt: bigint('deleted_at', { mode: 'number' }),
   },
   (t) => ({
     userIdx: index('vgc_sessions_user_idx').on(t.userId),
@@ -124,6 +143,9 @@ export const vgcMatches = mysqlTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
     completedAt: timestamp('completed_at'),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+    /** See the note on `tools_vgc_team_presets`. */
+    clientUpdatedAt: bigint('client_updated_at', { mode: 'number' }),
+    deletedAt: bigint('deleted_at', { mode: 'number' }),
   },
   (t) => ({
     userIdx: index('vgc_matches_user_idx').on(t.userId),
@@ -160,6 +182,9 @@ export const vgcSeries = mysqlTable(
     seriesResult: varchar('series_result', { length: 8 }),
     notes: text('notes').notNull().default('[]'),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+    /** See the note on `tools_vgc_team_presets`. */
+    clientUpdatedAt: bigint('client_updated_at', { mode: 'number' }),
+    deletedAt: bigint('deleted_at', { mode: 'number' }),
   },
   (t) => ({
     userIdx: index('vgc_series_user_idx').on(t.userId),

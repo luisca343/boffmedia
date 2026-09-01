@@ -70,6 +70,13 @@ export class TeamPresetDto {
 
   @ApiProperty({ type: PresetVersionDto, isArray: true })
   versions!: PresetVersionDto[];
+  @ApiPropertyOptional({
+    description:
+      'Epoch ms on the device that last wrote this row. The value conflict ' +
+      'detection compares — never `updatedAt`, which is the server clock.',
+  })
+  clientUpdatedAt?: number;
+
 }
 
 export class MatchSlotDto {
@@ -150,6 +157,13 @@ export class SessionDto {
 
   @ApiPropertyOptional()
   updatedAt?: number;
+  @ApiPropertyOptional({
+    description:
+      'Epoch ms on the device that last wrote this row. The value conflict ' +
+      'detection compares — never `updatedAt`, which is the server clock.',
+  })
+  clientUpdatedAt?: number;
+
 }
 
 export class MatchDto {
@@ -200,6 +214,13 @@ export class MatchDto {
 
   @ApiPropertyOptional()
   updatedAt?: number;
+  @ApiPropertyOptional({
+    description:
+      'Epoch ms on the device that last wrote this row. The value conflict ' +
+      'detection compares — never `updatedAt`, which is the server clock.',
+  })
+  clientUpdatedAt?: number;
+
 }
 
 export class SeriesGameDto {
@@ -270,6 +291,28 @@ export class SeriesDto {
 
   @ApiPropertyOptional()
   updatedAt?: number;
+  @ApiPropertyOptional({
+    description:
+      'Epoch ms on the device that last wrote this row. The value conflict ' +
+      'detection compares — never `updatedAt`, which is the server clock.',
+  })
+  clientUpdatedAt?: number;
+
+}
+
+/** Ids the account has deleted, per table. See `TrackerSyncDataDto.deleted`. */
+export class TrackerDeletedIdsDto {
+  @ApiProperty({ type: String, isArray: true })
+  sessions!: string[];
+
+  @ApiProperty({ type: String, isArray: true })
+  matches!: string[];
+
+  @ApiProperty({ type: String, isArray: true })
+  series!: string[];
+
+  @ApiProperty({ type: String, isArray: true })
+  presets!: string[];
 }
 
 export class TrackerSyncDataDto {
@@ -284,4 +327,12 @@ export class TrackerSyncDataDto {
 
   @ApiProperty({ type: TeamPresetDto, isArray: true })
   presets!: TeamPresetDto[];
+
+  @ApiProperty({
+    type: TrackerDeletedIdsDto,
+    description:
+      'Rows this account has deleted. A client removes these locally instead ' +
+      'of treating them as local-only work to push back up.',
+  })
+  deleted!: TrackerDeletedIdsDto;
 }

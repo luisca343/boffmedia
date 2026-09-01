@@ -17,6 +17,10 @@ export type SessionDto = {
     sessionNotes?: string;
     createdAt?: number;
     updatedAt?: number;
+    /**
+     * Epoch ms on the device that last wrote this row. The value conflict detection compares — never `updatedAt`, which is the server clock.
+     */
+    clientUpdatedAt?: number;
 };
 export namespace SessionDto {
     export enum type {

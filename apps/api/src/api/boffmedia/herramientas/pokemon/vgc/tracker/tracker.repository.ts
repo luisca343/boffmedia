@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { and, eq, desc } from 'drizzle-orm';
+import { and, eq, desc, isNull, isNotNull } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   vgcSessions,
@@ -25,12 +25,27 @@ export class TrackerRepository {
   // ─── Presets ────────────────────────────────────────────────────────────────
 
   async findPresets(userId?: number): Promise<VgcTeamPreset[]> {
-    const query = this.db.select().from(vgcTeamPresets);
-    if (userId !== undefined)
-      return query.where(eq(vgcTeamPresets.userId, userId));
+    const query = this.db
+      .select()
+      .from(vgcTeamPresets)
+      .where(
+        userId === undefined
+          ? isNull(vgcTeamPresets.deletedAt)
+          : and(
+              eq(vgcTeamPresets.userId, userId),
+              isNull(vgcTeamPresets.deletedAt),
+            ),
+      );
     return query;
   }
 
+  /**
+   * By id, tombstones INCLUDED.
+   *
+   * Every caller is a write path deciding what to do about this row, and
+   * "already deleted" is the answer it most needs — hiding it would turn an
+   * upsert over a tombstone into a silent resurrection.
+   */
   async findPreset(id: string): Promise<VgcTeamPreset | undefined> {
     const [row] = await this.db
       .select()
@@ -50,6 +65,8 @@ export class TrackerRepository {
     versions?: any[];
     createdAt?: Date;
     updatedAt?: Date;
+    clientUpdatedAt?: number;
+    deletedAt?: number | null;
   }): Promise<void> {
     const row = {
       id: data.id,
@@ -62,6 +79,8 @@ export class TrackerRepository {
       versions: JSON.stringify(data.versions ?? []),
       createdAt: data.createdAt,
       updatedAt: data.updatedAt,
+      clientUpdatedAt: data.clientUpdatedAt,
+      deletedAt: data.deletedAt,
     };
 
     await this.db
@@ -76,26 +95,32 @@ export class TrackerRepository {
           currentVersion: data.currentVersion ?? 1,
           versions: JSON.stringify(data.versions ?? []),
           updatedAt: data.updatedAt,
+          clientUpdatedAt: data.clientUpdatedAt,
+          deletedAt: data.deletedAt,
         },
       });
   }
 
-  async deletePreset(id: string, userId: number): Promise<void> {
+  /** Soft — see the tombstone note on the schema. */
+  async deletePreset(id: string, userId: number, at: number): Promise<void> {
     await this.db
-      .delete(vgcTeamPresets)
+      .update(vgcTeamPresets)
+      .set({ deletedAt: at })
       .where(and(eq(vgcTeamPresets.id, id), eq(vgcTeamPresets.userId, userId)));
   }
 
   // ─── Sessions ────────────────────────────────────────────────────────────────
 
   async findSessions(userId?: number): Promise<VgcSession[]> {
-    const query = this.db
+    return this.db
       .select()
       .from(vgcSessions)
+      .where(
+        userId === undefined
+          ? isNull(vgcSessions.deletedAt)
+          : and(eq(vgcSessions.userId, userId), isNull(vgcSessions.deletedAt)),
+      )
       .orderBy(desc(vgcSessions.startedAt));
-    if (userId !== undefined)
-      return query.where(eq(vgcSessions.userId, userId));
-    return query;
   }
 
   async findSession(id: string): Promise<VgcSession | undefined> {
@@ -115,10 +140,41 @@ export class TrackerRepository {
       .onDuplicateKeyUpdate({ set: data as any });
   }
 
-  async deleteSession(id: string, userId: number): Promise<void> {
-    await this.db
-      .delete(vgcSessions)
-      .where(and(eq(vgcSessions.id, id), eq(vgcSessions.userId, userId)));
+  /**
+   * Soft, and it has to cascade by hand.
+   *
+   * The FK's `ON DELETE CASCADE` only fires for a real DELETE, so a
+   * soft-deleted session would leave its matches and series live: they would
+   * come back in the next sync pull as rows whose parent is gone, and any
+   * device that had already dropped them locally would push them again.
+   */
+  async deleteSession(id: string, userId: number, at: number): Promise<void> {
+    await Promise.all([
+      this.db
+        .update(vgcSessions)
+        .set({ deletedAt: at })
+        .where(and(eq(vgcSessions.id, id), eq(vgcSessions.userId, userId))),
+      this.db
+        .update(vgcMatches)
+        .set({ deletedAt: at })
+        .where(
+          and(
+            eq(vgcMatches.sessionId, id),
+            eq(vgcMatches.userId, userId),
+            isNull(vgcMatches.deletedAt),
+          ),
+        ),
+      this.db
+        .update(vgcSeries)
+        .set({ deletedAt: at })
+        .where(
+          and(
+            eq(vgcSeries.sessionId, id),
+            eq(vgcSeries.userId, userId),
+            isNull(vgcSeries.deletedAt),
+          ),
+        ),
+    ]);
   }
 
   // ─── Matches ─────────────────────────────────────────────────────────────────
@@ -127,7 +183,7 @@ export class TrackerRepository {
     return this.db
       .select()
       .from(vgcMatches)
-      .where(eq(vgcMatches.sessionId, sessionId))
+      .where(and(eq(vgcMatches.sessionId, sessionId), isNull(vgcMatches.deletedAt)))
       .orderBy(desc(vgcMatches.createdAt));
   }
 
@@ -156,6 +212,8 @@ export class TrackerRepository {
     opponentElo?: number;
     notes: MatchNoteData[];
     completedAt?: Date;
+    clientUpdatedAt?: number;
+    deletedAt?: number | null;
   }): Promise<void> {
     const row = {
       ...data,
@@ -169,9 +227,10 @@ export class TrackerRepository {
       .onDuplicateKeyUpdate({ set: row as any });
   }
 
-  async deleteMatch(id: string, userId: number): Promise<void> {
+  async deleteMatch(id: string, userId: number, at: number): Promise<void> {
     await this.db
-      .delete(vgcMatches)
+      .update(vgcMatches)
+      .set({ deletedAt: at })
       .where(and(eq(vgcMatches.id, id), eq(vgcMatches.userId, userId)));
   }
 
@@ -181,7 +240,7 @@ export class TrackerRepository {
     return this.db
       .select()
       .from(vgcSeries)
-      .where(eq(vgcSeries.sessionId, sessionId))
+      .where(and(eq(vgcSeries.sessionId, sessionId), isNull(vgcSeries.deletedAt)))
       .orderBy(desc(vgcSeries.createdAt));
   }
 
@@ -207,6 +266,8 @@ export class TrackerRepository {
     games: any[];
     seriesResult?: string;
     notes: any[];
+    clientUpdatedAt?: number;
+    deletedAt?: number | null;
   }): Promise<void> {
     const row = {
       ...data,
@@ -221,42 +282,96 @@ export class TrackerRepository {
       .onDuplicateKeyUpdate({ set: row as any });
   }
 
-  async deleteSeries(id: string, userId: number): Promise<void> {
+  async deleteSeries(id: string, userId: number, at: number): Promise<void> {
     await this.db
-      .delete(vgcSeries)
+      .update(vgcSeries)
+      .set({ deletedAt: at })
       .where(and(eq(vgcSeries.id, id), eq(vgcSeries.userId, userId)));
   }
 
   // ─── Sync ─────────────────────────────────────────────────────────────────────
 
+  /**
+   * Everything one account holds: the live rows, and the ids of the rows it has
+   * deleted.
+   *
+   * The tombstone ids are the half that makes deleting work across devices. A
+   * device that was offline for the delete cannot tell "deleted" from "never
+   * synced" by absence alone — both look like a row the server does not have —
+   * and it guesses "never synced" and pushes it back. So absence stops being
+   * the signal and the id list becomes it.
+   */
   async findAllByUser(userId: number): Promise<{
     sessions: VgcSession[];
     matches: VgcMatch[];
     series: VgcSeries[];
     presets: VgcTeamPreset[];
+    deleted: {
+      sessions: string[];
+      matches: string[];
+      series: string[];
+      presets: string[];
+    };
   }> {
-    const [sessions, matches, seriesList, presets] = await Promise.all([
+    const live = <T extends typeof vgcSessions | typeof vgcMatches | typeof vgcSeries | typeof vgcTeamPresets>(
+      table: T,
+    ) => and(eq(table.userId, userId), isNull(table.deletedAt));
+
+    const tombstones = <T extends typeof vgcSessions | typeof vgcMatches | typeof vgcSeries | typeof vgcTeamPresets>(
+      table: T,
+    ) =>
+      this.db
+        .select({ id: table.id })
+        .from(table as any)
+        .where(and(eq(table.userId, userId), isNotNull(table.deletedAt)));
+
+    const [
+      sessions,
+      matches,
+      seriesList,
+      presets,
+      deletedSessions,
+      deletedMatches,
+      deletedSeries,
+      deletedPresets,
+    ] = await Promise.all([
       this.db
         .select()
         .from(vgcSessions)
-        .where(eq(vgcSessions.userId, userId))
+        .where(live(vgcSessions))
         .orderBy(desc(vgcSessions.startedAt)),
       this.db
         .select()
         .from(vgcMatches)
-        .where(eq(vgcMatches.userId, userId))
+        .where(live(vgcMatches))
         .orderBy(desc(vgcMatches.createdAt)),
       this.db
         .select()
         .from(vgcSeries)
-        .where(eq(vgcSeries.userId, userId))
+        .where(live(vgcSeries))
         .orderBy(desc(vgcSeries.createdAt)),
       this.db
         .select()
         .from(vgcTeamPresets)
-        .where(eq(vgcTeamPresets.userId, userId))
+        .where(live(vgcTeamPresets))
         .orderBy(desc(vgcTeamPresets.createdAt)),
+      tombstones(vgcSessions),
+      tombstones(vgcMatches),
+      tombstones(vgcSeries),
+      tombstones(vgcTeamPresets),
     ]);
-    return { sessions, matches, series: seriesList, presets };
+
+    return {
+      sessions,
+      matches,
+      series: seriesList,
+      presets,
+      deleted: {
+        sessions: deletedSessions.map((r) => r.id),
+        matches: deletedMatches.map((r) => r.id),
+        series: deletedSeries.map((r) => r.id),
+        presets: deletedPresets.map((r) => r.id),
+      },
+    };
   }
 }

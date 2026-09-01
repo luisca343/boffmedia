@@ -29,6 +29,13 @@
       "when": 1787949181601,
       "tag": "0003_repoint_tcg_artwork_paths",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1787949181602,
+      "tag": "0004_vgc_tracker_sync_columns",
+      "breakpoints": true
     }
   ]
 }

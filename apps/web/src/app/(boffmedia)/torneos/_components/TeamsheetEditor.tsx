@@ -8,7 +8,7 @@ import {
   TournamentsService,
   type TnMonApi,
 } from "@/services/api/boffmedia/tournamentsService"
-import { parseShowdownPaste } from "@/features/vgc-tracker/showdown-parse"
+import { parseShowdownPaste } from "@boffmedia/tools-pokemon"
 
 /**
  * Mons → the Showdown export they came from.

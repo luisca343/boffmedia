@@ -7,47 +7,17 @@
  * that may be replaying an edit made an hour earlier on a train, so the API's
  * `PUT` became a real upsert and this is the only shape the tool queues.
  *
- * The `ApiResponse` envelope and the NON-throwing contract are kept as
- * `@/services/boffAPI` had them, so the call sites moved across unchanged.
+ * The `ApiResponse` envelope and the NON-throwing contract live in `../api`
+ * and are kept as `@/services/boffAPI` had them, so the call sites moved across
+ * unchanged.
  */
 
-import { toolApi, ToolApiError } from "@boffmedia/tool-kit";
 import type { TcgCard } from "@boffmedia/shared";
 
-export interface ApiResponse<T = unknown> {
-  statusCode: number;
-  message?: string;
-  userMessage?: string;
-  code?: string;
-  data?: T;
-  error?: string;
-  success: boolean;
-}
-
-async function request<T>(
-  path: string,
-  init?: {
-    method?: "GET" | "POST" | "PUT" | "DELETE";
-    body?: unknown;
-    query?: Record<string, string | number | undefined>;
-    auth?: "optional" | "required";
-  },
-): Promise<ApiResponse<T>> {
-  try {
-    return await toolApi().request<ApiResponse<T>>(path, init);
-  } catch (err) {
-    if (err instanceof ToolApiError) {
-      return {
-        success: false,
-        statusCode: err.status,
-        error: err.message,
-        userMessage: err.message,
-        code: err.code,
-      };
-    }
-    throw err;
-  }
-}
+// The envelope and the non-throwing `request` are shared with the VGC services
+// — one door for the whole package.
+export { type ApiResponse } from "../api";
+import { request } from "../api";
 
 /** One set's worth of cards, as `series/:id/cards/grouped` returns them. */
 export interface SeriesCardsGroup {

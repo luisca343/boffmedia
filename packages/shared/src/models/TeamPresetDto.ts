@@ -14,5 +14,9 @@ export type TeamPresetDto = {
     updatedAt: number;
     currentVersion: number;
     versions: Array<PresetVersionDto>;
+    /**
+     * Epoch ms on the device that last wrote this row. The value conflict detection compares — never `updatedAt`, which is the server clock.
+     */
+    clientUpdatedAt?: number;
 };
 

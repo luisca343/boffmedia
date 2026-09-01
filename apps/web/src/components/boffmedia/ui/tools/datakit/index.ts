@@ -1,21 +1,8 @@
-// Shared data-tool kit (dk-*): the common chassis for VGC Meta, Torneos and the
-// VGC Tracker. Import from this barrel:
-//   import { DkApp, DkBar, DkStat, DkTrend } from "@/components/boffmedia/ui/tools/datakit"
-export * from "./utils"
-export * from "./hooks"
-export * from "./DkSprite"
-export * from "./DkFlag"
-export * from "./DkLive"
-export * from "./DkBracket"
-export * from "./DkShell"
-export * from "./DkControls"
-export * from "./DkSelect"
-export * from "./DkStat"
-export * from "./DkCharts"
-export * from "./DkFeedback"
-export * from "./DkTable"
-export * from "./DkBarList"
-export * from "./DkType"
-export * from "./DkTeam"
-export * from "./DkCopy"
-export * from "./DkExtras"
+// The datakit now lives in @boffmedia/ui — it is the chassis for VGC, which
+// ships in @boffmedia/tools-pokemon and therefore has to render in the desktop
+// app too, where `@/` and next-intl do not exist.
+//
+// This barrel stays because ~20 web-only call sites (Torneos, the profile
+// pages, the styles gallery) import from this path. New code should import
+// from "@boffmedia/ui" directly.
+export * from "@boffmedia/ui/datakit"

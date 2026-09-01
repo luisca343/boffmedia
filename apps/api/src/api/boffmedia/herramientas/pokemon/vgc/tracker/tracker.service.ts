@@ -29,19 +29,73 @@ function toMs(value: Date | number | null | undefined): number | undefined {
 export class TrackerService {
   constructor(private readonly repo: TrackerRepository) {}
 
+  /**
+   * Refuse a write that is older than the one already stored.
+   *
+   * Both sides are CLIENT stamps. Comparing the incoming one against
+   * `updated_at` — the server's own clock — was the same bug in two disguises:
+   * a device running slow 409'd on writes that were perfectly fresh, and a
+   * device running fast overwrote newer data without ever being asked. Two
+   * client clocks can still disagree, but they disagree by seconds rather than
+   * by whatever the server's drift happens to be.
+   *
+   * A row that predates the column (NULL) has no version to compare, so it is
+   * accepted: the first write after this shipped is what establishes one.
+   */
   private ensureNoConflict(
     label: string,
     clientUpdatedAt: number | undefined,
-    serverUpdatedAt: Date | number | null | undefined,
+    storedClientUpdatedAt: number | null | undefined,
   ): void {
     if (clientUpdatedAt === undefined) return;
-    const serverMs = toMs(serverUpdatedAt);
-    if (serverMs === undefined) return;
-    if (clientUpdatedAt < serverMs) {
+    if (storedClientUpdatedAt == null) return;
+    if (clientUpdatedAt < storedClientUpdatedAt) {
       throw new ConflictException(
         `${label} has a newer server version. Pull latest data and retry the write.`,
       );
     }
+  }
+
+  /**
+   * A child cannot be written under a session that has been deleted.
+   *
+   * Unconditionally, unlike `resolveTombstone` — a later stamp does NOT earn
+   * the write here. Deleting a session is a decision about the whole group;
+   * editing one match inside it is subordinate to that, and letting the finer
+   * act win would leave a match whose parent the next pull reports as gone.
+   * Refused as a conflict, so the client refreshes and drops both.
+   */
+  private ensureParentAlive(
+    sessionId: string,
+    deletedAt: number | null | undefined,
+  ): void {
+    if (deletedAt == null) return;
+    throw new ConflictException(
+      `Session "${sessionId}" was deleted on another device. Pull latest data before writing.`,
+    );
+  }
+
+  /**
+   * What an upsert should do when the row it targets is a tombstone.
+   *
+   * Deleting on one device while another edits the same row offline is a real
+   * race with no answer that is right for everyone, so the rule is: the later
+   * intent wins. An edit stamped AFTER the delete resurrects the row — someone
+   * demonstrably wanted it after it was gone, and refusing would throw their
+   * work away. An edit stamped before it is a write the deleter has already
+   * superseded, and it is refused as a conflict so the client pulls, sees the
+   * tombstone, and drops its copy.
+   */
+  private resolveTombstone(
+    label: string,
+    clientUpdatedAt: number | undefined,
+    deletedAt: number | null | undefined,
+  ): void {
+    if (deletedAt == null) return;
+    if (clientUpdatedAt !== undefined && clientUpdatedAt > deletedAt) return;
+    throw new ConflictException(
+      `${label} was deleted on another device. Pull latest data before writing.`,
+    );
   }
 
   private ensureOwnership(
@@ -71,7 +125,12 @@ export class TrackerService {
       this.ensureNoConflict(
         `Preset "${id}"`,
         dto.clientUpdatedAt,
-        existing.updatedAt,
+        existing.clientUpdatedAt,
+      );
+      this.resolveTombstone(
+        `Preset "${id}"`,
+        dto.clientUpdatedAt,
+        existing.deletedAt,
       );
     }
 
@@ -86,14 +145,32 @@ export class TrackerService {
       versions: dto.versions,
       createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
       updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : undefined,
+      // Persist the version this write establishes, and clear any tombstone —
+      // reaching here means `resolveTombstone` judged the edit to be the later
+      // intent.
+      clientUpdatedAt: dto.clientUpdatedAt,
+      deletedAt: null,
     });
   }
 
-  async deletePreset(userId: number, id: string): Promise<void> {
+  /**
+   * `clientDeletedAt` is the deleting device's clock, not ours, because it is
+   * what a later edit is compared against — see `resolveTombstone`.
+   *
+   * Deleting something already deleted is a success, not a 404. The queue
+   * replays, a device can be told to delete a row twice, and answering the
+   * second one with an error turns a delete that worked into a red banner.
+   */
+  async deletePreset(
+    userId: number,
+    id: string,
+    clientDeletedAt?: number,
+  ): Promise<void> {
     const existing = await this.repo.findPreset(id);
     if (!existing) throw new NotFoundException(`Preset "${id}" not found.`);
     this.ensureOwnership(existing.userId, userId, `Preset "${id}"`);
-    await this.repo.deletePreset(id, userId);
+    if (existing.deletedAt != null) return;
+    await this.repo.deletePreset(id, userId, clientDeletedAt ?? Date.now());
   }
 
   // ─── Sessions ────────────────────────────────────────────────────────────────
@@ -112,7 +189,12 @@ export class TrackerService {
       this.ensureNoConflict(
         `Session "${dto.id}"`,
         dto.clientUpdatedAt,
-        existing.updatedAt,
+        existing.clientUpdatedAt,
+      );
+      this.resolveTombstone(
+        `Session "${dto.id}"`,
+        dto.clientUpdatedAt,
+        existing.deletedAt,
       );
     }
 
@@ -130,14 +212,32 @@ export class TrackerService {
       tournamentName: dto.tournamentName,
       limitlessTournamentId: dto.limitlessTournamentId,
       sessionNotes: dto.sessionNotes,
+      // Persist the version this write establishes, and clear any tombstone —
+      // reaching here means `resolveTombstone` judged the edit to be the later
+      // intent.
+      clientUpdatedAt: dto.clientUpdatedAt,
+      deletedAt: null,
     });
   }
 
-  async deleteSession(userId: number, id: string): Promise<void> {
+  /**
+   * `clientDeletedAt` is the deleting device's clock, not ours, because it is
+   * what a later edit is compared against — see `resolveTombstone`.
+   *
+   * Deleting something already deleted is a success, not a 404. The queue
+   * replays, a device can be told to delete a row twice, and answering the
+   * second one with an error turns a delete that worked into a red banner.
+   */
+  async deleteSession(
+    userId: number,
+    id: string,
+    clientDeletedAt?: number,
+  ): Promise<void> {
     const existing = await this.repo.findSession(id);
     if (!existing) throw new NotFoundException(`Session "${id}" not found.`);
     this.ensureOwnership(existing.userId, userId, `Session "${id}"`);
-    await this.repo.deleteSession(id, userId);
+    if (existing.deletedAt != null) return;
+    await this.repo.deleteSession(id, userId, clientDeletedAt ?? Date.now());
   }
 
   // ─── Matches ─────────────────────────────────────────────────────────────────
@@ -158,6 +258,7 @@ export class TrackerService {
     if (!session)
       throw new NotFoundException(`Session "${dto.sessionId}" not found.`);
     this.ensureOwnership(session.userId, userId, `Session "${dto.sessionId}"`);
+    this.ensureParentAlive(dto.sessionId, session.deletedAt);
 
     const existing = await this.repo.findMatch(dto.id);
     if (existing) {
@@ -165,7 +266,12 @@ export class TrackerService {
       this.ensureNoConflict(
         `Match "${dto.id}"`,
         dto.clientUpdatedAt,
-        existing.updatedAt,
+        existing.clientUpdatedAt,
+      );
+      this.resolveTombstone(
+        `Match "${dto.id}"`,
+        dto.clientUpdatedAt,
+        existing.deletedAt,
       );
     }
 
@@ -186,6 +292,11 @@ export class TrackerService {
       notes: dto.notes ?? [],
       createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
       completedAt: dto.completedAt ? new Date(dto.completedAt) : undefined,
+      // Persist the version this write establishes, and clear any tombstone —
+      // reaching here means `resolveTombstone` judged the edit to be the later
+      // intent.
+      clientUpdatedAt: dto.clientUpdatedAt,
+      deletedAt: null,
     });
   }
 
@@ -197,6 +308,8 @@ export class TrackerService {
     const existing = await this.repo.findMatch(id);
     if (!existing) throw new NotFoundException(`Match "${id}" not found.`);
     this.ensureOwnership(existing.userId, userId, `Match "${id}"`);
+    if (existing.deletedAt != null)
+      throw new NotFoundException(`Match "${id}" not found.`);
     await this.repo.upsertMatch({
       id,
       sessionId: existing.sessionId ?? '',
@@ -222,11 +335,24 @@ export class TrackerService {
     return this.repo.findMatch(id) as Promise<VgcMatch>;
   }
 
-  async deleteMatch(userId: number, id: string): Promise<void> {
+  /**
+   * `clientDeletedAt` is the deleting device's clock, not ours, because it is
+   * what a later edit is compared against — see `resolveTombstone`.
+   *
+   * Deleting something already deleted is a success, not a 404. The queue
+   * replays, a device can be told to delete a row twice, and answering the
+   * second one with an error turns a delete that worked into a red banner.
+   */
+  async deleteMatch(
+    userId: number,
+    id: string,
+    clientDeletedAt?: number,
+  ): Promise<void> {
     const existing = await this.repo.findMatch(id);
     if (!existing) throw new NotFoundException(`Match "${id}" not found.`);
     this.ensureOwnership(existing.userId, userId, `Match "${id}"`);
-    await this.repo.deleteMatch(id, userId);
+    if (existing.deletedAt != null) return;
+    await this.repo.deleteMatch(id, userId, clientDeletedAt ?? Date.now());
   }
 
   // ─── Series ──────────────────────────────────────────────────────────────────
@@ -250,6 +376,7 @@ export class TrackerService {
     if (!session)
       throw new NotFoundException(`Session "${dto.sessionId}" not found.`);
     this.ensureOwnership(session.userId, userId, `Session "${dto.sessionId}"`);
+    this.ensureParentAlive(dto.sessionId, session.deletedAt);
 
     const existing = await this.repo.findSeries(dto.id);
     if (existing) {
@@ -257,7 +384,12 @@ export class TrackerService {
       this.ensureNoConflict(
         `Series "${dto.id}"`,
         dto.clientUpdatedAt,
-        existing.updatedAt,
+        existing.clientUpdatedAt,
+      );
+      this.resolveTombstone(
+        `Series "${dto.id}"`,
+        dto.clientUpdatedAt,
+        existing.deletedAt,
       );
     }
 
@@ -278,14 +410,32 @@ export class TrackerService {
       games: dto.games ?? [],
       seriesResult: dto.seriesResult,
       notes: dto.notes ?? [],
+      // Persist the version this write establishes, and clear any tombstone —
+      // reaching here means `resolveTombstone` judged the edit to be the later
+      // intent.
+      clientUpdatedAt: dto.clientUpdatedAt,
+      deletedAt: null,
     });
   }
 
-  async deleteSeries(userId: number, id: string): Promise<void> {
+  /**
+   * `clientDeletedAt` is the deleting device's clock, not ours, because it is
+   * what a later edit is compared against — see `resolveTombstone`.
+   *
+   * Deleting something already deleted is a success, not a 404. The queue
+   * replays, a device can be told to delete a row twice, and answering the
+   * second one with an error turns a delete that worked into a red banner.
+   */
+  async deleteSeries(
+    userId: number,
+    id: string,
+    clientDeletedAt?: number,
+  ): Promise<void> {
     const existing = await this.repo.findSeries(id);
     if (!existing) throw new NotFoundException(`Series "${id}" not found.`);
     this.ensureOwnership(existing.userId, userId, `Series "${id}"`);
-    await this.repo.deleteSeries(id, userId);
+    if (existing.deletedAt != null) return;
+    await this.repo.deleteSeries(id, userId, clientDeletedAt ?? Date.now());
   }
 
   // ─── Sync ─────────────────────────────────────────────────────────────────────
@@ -335,6 +485,9 @@ export class TrackerService {
         typeof p.versions === 'string' ? JSON.parse(p.versions) : p.versions,
     }));
 
-    return { sessions, matches, series, presets };
+    // `deleted` is what lets a client tell a row it never had from one it is
+    // meant to drop. Without it, absence means both, and the client guesses
+    // "push it back" — which is how a delete on one device undid itself.
+    return { sessions, matches, series, presets, deleted: raw.deleted };
   }
 }

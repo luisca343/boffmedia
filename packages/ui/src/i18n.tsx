@@ -78,6 +78,24 @@ export function useRootT(): Translate {
   return runtime.useTranslateRoot()
 }
 
+/**
+ * A translator BOUND to `namespace`, over the host's root message store.
+ *
+ * The seam only hands back an unbound translator, but almost every call site
+ * outside the primitives was written against next-intl's namespace-bound one
+ * (`useTranslations("common.dkExtras")`). Binding here rather than at each call
+ * site is what let the datakit move into this package without touching a single
+ * `t("…")` — only the namespace string at the top of each component changed.
+ */
+export function useNsT(namespace: string): Translate {
+  const t = runtime.useTranslateRoot()
+  return React.useCallback(
+    (key: string, values?: Record<string, string | number | Date>) =>
+      t(`${namespace}.${key}`, values),
+    [t, namespace],
+  )
+}
+
 export function useUiLocale(): string {
   return runtime.useLocale()
 }

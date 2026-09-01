@@ -12,6 +12,7 @@
     "./locale": "./src/locale.ts",
     "./useFormat": "./src/useFormat.ts",
     "./catalog": "./src/catalog/index.ts",
+    "./datakit": "./src/datakit/index.ts",
     "./hooks/*": "./src/hooks/*.ts",
     "./primitives/*": "./src/primitives/*.tsx"
   },
