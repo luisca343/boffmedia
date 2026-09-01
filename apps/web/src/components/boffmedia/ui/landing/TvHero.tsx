@@ -7,7 +7,7 @@ import { Button, CountUp } from "@boffmedia/ui"
 import { ASSET, staticAsset } from "@/lib/assets"
 import { FxParticles } from "./travesia-fx"
 import { BEAMS, Grain, LINE_INNER, LINE_MASK, PRI_GLOW, tvGoTo } from "./landing-shared"
-import { TV3_HUD } from "./landing-data"
+import { TV3_STATS_FLOOR } from "./landing-data"
 import { useTvMouseVar } from "./landing-hooks"
 import { useSiteStats } from "@/hooks/community/useCommunity"
 
@@ -16,19 +16,36 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
   const artRef = React.useRef<HTMLDivElement>(null)
   useTvMouseVar(artRef)
   const { stats } = useSiteStats()
-  // Real site stats feed the HUD; falls back to the editorial placeholders
-  // while loading or if the API is unavailable (keeps the hero visually stable).
-  const hud = stats
-    ? [
-        { k: t("hudCommunityLabel"), big: String(stats.users), suf: "+", sub: t("hudCommunityRegistered"), live: false },
-        {
+  // Real site stats only. There used to be an editorial fallback here ("412+
+  // jugadores activos", "Temporada 04") to keep the hero visually stable while
+  // the API loaded — but a made-up player count is exactly the kind of thing a
+  // visitor can catch us on, so the HUD now renders nothing until /stats/site
+  // answers.
+  // …and each tile also has to clear TV3_STATS_FLOOR: a truthful "1+ usuarios
+  // registrados" reads worse than no tile at all. Per tile, not per row, so
+  // whichever number is ready stands on its own. A LIVE event is exempt — it
+  // reports something happening now rather than how big the site is.
+  const showUsers = Boolean(stats && stats.users >= TV3_STATS_FLOOR.users)
+  const showEvents = Boolean(
+    stats && (stats.activeEvents > 0 || stats.events >= TV3_STATS_FLOOR.events),
+  )
+  const hud = !stats
+    ? []
+    : [
+        showUsers && {
+          k: t("hudCommunityLabel"),
+          big: String(stats.users),
+          suf: "+",
+          sub: t("hudCommunityRegistered"),
+          live: false,
+        },
+        showEvents && {
           k: t("hudEventsLabel"),
           big: String(stats.activeEvents > 0 ? stats.activeEvents : stats.events),
           sub: stats.activeEvents > 0 ? t("hudEventsLive") : t("hudEventsTotal"),
           live: stats.activeEvents > 0,
         },
-      ]
-    : TV3_HUD
+      ].filter((h): h is { k: string; big: string; suf?: string; sub: string; live: boolean } => Boolean(h))
   return (
     <section className="relative z-[1] grid min-h-screen items-center overflow-hidden pb-24 pt-[118px]" id="tv-hero">
       {lvl >= 2 && <FxParticles density={density} />}
@@ -80,6 +97,7 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
               {t("ctaMap")}
             </Button>
           </div>
+          {hud.length > 0 && (
           <div data-reveal style={{ ["--i"]: 3 } as React.CSSProperties} className="mt-10 flex gap-3.5 max-[820px]:flex-wrap">
             {hud.map((h) => (
               <div
@@ -88,16 +106,17 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
               >
                 <span className="inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
                   {h.live && <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" aria-hidden="true" />}
-                  {"tk" in h ? t(`${h.tk}Label`) : h.k}
+                  {h.k}
                 </span>
                 <span className="mb-[3px] mt-2 block font-display text-[30px] font-extrabold leading-none text-txt tabular-nums">
                   <CountUp value={h.big} />
                   {h.suf && <b>{h.suf}</b>}
                 </span>
-                <span className="block font-body text-[12px] font-normal leading-[1.3] text-txt-muted">{"tk" in h ? t(`${h.tk}Sub`) : h.sub}</span>
+                <span className="block font-body text-[12px] font-normal leading-[1.3] text-txt-muted">{h.sub}</span>
               </div>
             ))}
           </div>
+          )}
         </div>
         <div
           className="relative grid min-h-[500px] place-items-center max-[980px]:order-first max-[980px]:min-h-[360px]"
@@ -116,10 +135,14 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
           />
           <img className="relative z-[2] w-[min(100%,500px)] max-[980px]:w-[min(80%,360px)] [filter:drop-shadow(0_26px_44px_rgba(0,0,0,0.55))_drop-shadow(0_0_56px_rgba(255,92,10,0.30))] [[data-theme=light]_&]:[filter:drop-shadow(0_22px_38px_rgba(20,23,28,0.28))_drop-shadow(0_0_46px_rgba(240,78,0,0.22))] [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:will-change-transform [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:[transform:perspective(950px)_rotateY(calc(var(--mx,0)*9deg))_rotateX(calc(var(--my,0)*-7deg))] opacity-[0.67]" src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" aria-hidden="true" />
 
-          <div className="absolute left-[-6%] top-[12%] z-[3] inline-flex items-center gap-2 border border-solid border-line-2 border-l-[3px] border-l-accent px-3 py-2 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#f2f4f8] [background:rgba(0,0,0,0.82)] cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:7px] animate-[tv-bob_5s_ease-in-out_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:[background:rgba(16,19,24,0.9)] max-[980px]:left-0">
-            <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" />
-            {t("tagActive")}
-          </div>
+          {/* Same claim as the community tile, in words — so it lives or dies by
+              the same floor. Absolutely positioned, so hiding it shifts nothing. */}
+          {showUsers && (
+            <div className="absolute left-[-6%] top-[12%] z-[3] inline-flex items-center gap-2 border border-solid border-line-2 border-l-[3px] border-l-accent px-3 py-2 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#f2f4f8] [background:rgba(0,0,0,0.82)] cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:7px] animate-[tv-bob_5s_ease-in-out_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:[background:rgba(16,19,24,0.9)] max-[980px]:left-0">
+              <i className="h-1.5 w-1.5 rounded-full bg-ok animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" />
+              {t("tagActive")}
+            </div>
+          )}
           <div className="absolute bottom-[16%] right-[-4%] z-[3] inline-flex items-center gap-2 border border-solid border-line-2 border-l-[3px] border-l-accent px-3 py-2 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[#f2f4f8] [animation-delay:-2.5s] [background:rgba(0,0,0,0.82)] cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:7px] animate-[tv-bob_5s_ease-in-out_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:[background:rgba(16,19,24,0.9)] max-[980px]:right-0">
             {t("tagStops")}
           </div>

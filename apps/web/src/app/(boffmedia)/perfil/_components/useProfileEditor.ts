@@ -14,6 +14,13 @@ const MAX_IMAGE_MB = 5
 
 type EditorUser = { name?: string | null; email?: string | null } | null | undefined
 
+/** A picked image awaiting its crop. `src` is an object URL owned by this hook. */
+export interface CropTarget {
+  kind: "avatar" | "cover"
+  file: File
+  src: string
+}
+
 export function useProfileEditor({
   userId,
   user,
@@ -30,6 +37,9 @@ export function useProfileEditor({
   const [saving, setSaving] = React.useState(false)
   const [uploading, setUploading] = React.useState(false)
   const [coverUploading, setCoverUploading] = React.useState(false)
+  // The picked file waits here while the user frames it; nothing is uploaded
+  // until the crop is confirmed, so cancelling costs no request.
+  const [cropTarget, setCropTarget] = React.useState<CropTarget | null>(null)
   const [avatarOverride, setAvatarOverride] = React.useState<string | null>(null)
   const [coverOverride, setCoverOverride] = React.useState<string | null>(null)
   const [values, setValues] = React.useState<AccountFormValues>({ name: "", email: "", bio: "" })
@@ -132,15 +142,8 @@ export function useProfileEditor({
     }
   }
 
-  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !userId) return
-    const invalid = validateImage(file)
-    if (invalid) {
-      toast.error(invalid)
-      if (fileRef.current) fileRef.current.value = ""
-      return
-    }
+  async function uploadAvatar(file: File) {
+    if (!userId) return
     setUploading(true)
     try {
       const up = await UploadService.uploadProfileImage(file, String(userId))
@@ -171,15 +174,8 @@ export function useProfileEditor({
     }
   }
 
-  async function handleCoverFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file || !userId) return
-    const invalid = validateImage(file)
-    if (invalid) {
-      toast.error(invalid)
-      if (coverRef.current) coverRef.current.value = ""
-      return
-    }
+  async function uploadCover(file: File) {
+    if (!userId) return
     setCoverUploading(true)
     try {
       const up = await UploadService.uploadCoverImage(file, String(userId))
@@ -204,6 +200,45 @@ export function useProfileEditor({
       if (coverRef.current) coverRef.current.value = ""
     }
   }
+
+  // Both pickers land here: validate, then hand the file to the cropper. The
+  // input is reset immediately so re-picking the same file fires `change` again.
+  function pickImage(kind: CropTarget["kind"], e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    const input = kind === "avatar" ? fileRef.current : coverRef.current
+    if (input) input.value = ""
+    if (!file || !userId) return
+    const invalid = validateImage(file)
+    if (invalid) {
+      toast.error(invalid)
+      return
+    }
+    setCropTarget((prev) => {
+      if (prev) URL.revokeObjectURL(prev.src)
+      return { kind, file, src: URL.createObjectURL(file) }
+    })
+  }
+
+  const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => pickImage("avatar", e)
+  const handleCoverFile = (e: React.ChangeEvent<HTMLInputElement>) => pickImage("cover", e)
+
+  function cancelCrop() {
+    setCropTarget((prev) => {
+      if (prev) URL.revokeObjectURL(prev.src)
+      return null
+    })
+  }
+
+  async function confirmCrop(file: File) {
+    const kind = cropTarget?.kind
+    cancelCrop()
+    if (kind === "avatar") await uploadAvatar(file)
+    else if (kind === "cover") await uploadCover(file)
+  }
+
+  // A picked-but-never-confirmed crop still holds an object URL when the page
+  // unmounts.
+  React.useEffect(() => () => cancelCrop(), [])
 
   async function handleUnlink(provider: "google" | "discord" | "steam" | "twitch") {
     if (!userId) return
@@ -241,6 +276,9 @@ export function useProfileEditor({
     handleSave,
     handleFile,
     handleCoverFile,
+    cropTarget,
+    cancelCrop,
+    confirmCrop,
     handleUnlink,
   }
 }

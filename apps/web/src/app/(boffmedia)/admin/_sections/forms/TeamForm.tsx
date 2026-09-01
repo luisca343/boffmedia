@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useTranslations } from "next-intl"
 import { Button, Field, Input, Select } from "@boffmedia/ui"
+import { ImageUploadField } from "@/components/shared/media/ImageUploadField"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { UsersService } from "@/services/api/boffmedia/usersService"
 
@@ -103,9 +104,23 @@ export function TeamForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
         )}
       />
 
-      <Field label={t("team.iconLabel")} hint={t("team.iconHint")} error={errors.icon?.message}>
-        <Input placeholder="https://example.com/icon.jpg" {...register("icon")} />
-      </Field>
+      <Controller
+        control={control}
+        name="icon"
+        render={({ field }) => (
+          <ImageUploadField
+            label={t("team.iconLabel")}
+            hint={t("team.iconHint")}
+            error={errors.icon?.message}
+            value={field.value ?? ""}
+            onChange={field.onChange}
+            folder="teams"
+            cropAspect={1}
+            /* A crest reads like an Avatar, and that primitive is a `.cut-seal`. */
+            shape="seal"
+          />
+        )}
+      />
 
       <div className="flex justify-end gap-2.5 pt-2">
         <Button type="button" variant="ghost" onClick={onCancel}>{t("cancel")}</Button>

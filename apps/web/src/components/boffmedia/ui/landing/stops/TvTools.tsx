@@ -3,7 +3,6 @@ import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, Button } from "@boffmedia/ui"
-import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_MONO, CTA_ROW, GLARE, PRI_GLOW } from "../landing-shared"
 import { TV3_TOOLS, TV3_TOOL_COUNT } from "../landing-data"
@@ -15,7 +14,6 @@ export function TvTools() {
       id="tv-cp1"
       n="01"
       side="l"
-      kick={<Decode text={t("kick")} />}
       title={t.rich("title", { em: (chunks) => <em>{chunks}</em> })}
       lead={t("lead")}
     >

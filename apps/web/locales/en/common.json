@@ -114,7 +114,10 @@
       "dropImageHere": "Drop the image here",
       "remove": "Remove",
       "supportedFormats": "Supported formats: {formats}",
-      "maxSize": "Maximum size: {maxSize}MB"
+      "maxSize": "Maximum size: {maxSize}MB",
+      "upload": "Upload image",
+      "uploaded": "Image uploaded",
+      "uploadError": "The image could not be uploaded"
     },
     "baseStatBars": {
       "title": "Base stats"
@@ -369,12 +372,30 @@
       "aGame": "a game",
       "justNow": "just now",
       "status": {
-        "playing": { "label": "Playing", "verb": "Playing" },
-        "played": { "label": "Played", "verb": "Completed" },
-        "backlog": { "label": "Backlog", "verb": "Backlogged" },
-        "wishlist": { "label": "Wishlist", "verb": "Wishlisted" },
-        "shelved": { "label": "Shelved", "verb": "Shelved" },
-        "retired": { "label": "Retired", "verb": "Retired" }
+        "playing": {
+          "label": "Playing",
+          "verb": "Playing"
+        },
+        "played": {
+          "label": "Played",
+          "verb": "Completed"
+        },
+        "backlog": {
+          "label": "Backlog",
+          "verb": "Backlogged"
+        },
+        "wishlist": {
+          "label": "Wishlist",
+          "verb": "Wishlisted"
+        },
+        "shelved": {
+          "label": "Shelved",
+          "verb": "Shelved"
+        },
+        "retired": {
+          "label": "Retired",
+          "verb": "Retired"
+        }
       }
     },
     "bestiary": {
@@ -412,8 +433,14 @@
         "unfavorable": "Generally unfavorable"
       },
       "via": {
-        "sorteo": { "label": "Giveaway", "short": "Giveaway" },
-        "manual": { "label": "Manual delivery", "short": "Manual" }
+        "sorteo": {
+          "label": "Giveaway",
+          "short": "Giveaway"
+        },
+        "manual": {
+          "label": "Manual delivery",
+          "short": "Manual"
+        }
       }
     },
     "profile": {
@@ -799,6 +826,13 @@
     "editor": {
       "untitled": "Untitled",
       "saved": "Changes saved to {title}"
+    },
+    "imageCrop": {
+      "title": "Adjust image",
+      "hint": "Drag to move · scroll to zoom",
+      "zoom": "Zoom",
+      "cancel": "Cancel",
+      "apply": "Apply"
     }
   }
 }

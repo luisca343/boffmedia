@@ -5,7 +5,6 @@ export function TvCP({
   id,
   n,
   side,
-  kick,
   title,
   lead,
   children,
@@ -13,7 +12,6 @@ export function TvCP({
   id: string
   n: string
   side: "l" | "r"
-  kick: React.ReactNode
   title: React.ReactNode
   lead?: string
   children: React.ReactNode
@@ -48,11 +46,10 @@ export function TvCP({
           {n}
         </span>
         <div>
-          <span className="inline-flex items-center gap-[9px] font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.14em] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-colors duration-[260ms] ease-linear before:h-[2px] before:w-5 before:bg-current before:content-['']">
-            {kick}
-          </span>
-          {/* display treatment from data-ds base styles; zone-tinted em stroke kept local */}
-          <h3 className="mb-2.5 mt-3 leading-[0.98] text-txt [font-size:clamp(30px,3.4vw,46px)] [&_em]:text-transparent [&_em]:[-webkit-text-stroke:1.5px_rgba(var(--zr),var(--zg),var(--zb),1)]">
+          {/* display treatment from data-ds base styles; zone-tinted em stroke kept local.
+              No kicker line above it — the stroked numeral to the left already
+              marks the section, so mt-0 keeps the title optically on the numeral. */}
+          <h3 className="mb-2.5 mt-0 leading-[0.98] text-txt [font-size:clamp(30px,3.4vw,46px)] [&_em]:text-transparent [&_em]:[-webkit-text-stroke:1.5px_rgba(var(--zr),var(--zg),var(--zb),1)]">
             {title}
           </h3>
           {lead && (

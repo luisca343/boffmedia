@@ -14,14 +14,30 @@ export const PRI_GLOW = "shadow-[0_6px_26px_rgba(255,92,10,0.32)] hover:shadow-[
 export const GLARE =
   "before:pointer-events-none before:absolute before:inset-0 before:z-[1] before:opacity-0 before:transition-opacity before:duration-[220ms] before:content-[''] before:[background:radial-gradient(240px_circle_at_var(--gx,50%)_var(--gy,50%),rgba(255,255,255,0.07),transparent_65%)] hover:before:opacity-100 [[data-theme=light]_&]:before:[background:radial-gradient(240px_circle_at_var(--gx,50%)_var(--gy,50%),rgba(255,92,10,0.07),transparent_65%)]"
 
-/* HUD identity frame for the route's hero panels: top scanner sweep (::after)
-   that scales in on approach + zone-tinted border on .near. No corner brackets —
-   in the handoff these panels are `.sn-glare`, whose ::before (higher specificity)
-   overrides the bracket background, so brackets never actually render. The glare
-   lives on ::before via `GLARE` + `data-glare`; this frame only uses ::after. */
-export const HUD_FRAME =
-  "after:pointer-events-none after:absolute after:left-0 after:right-0 after:top-0 after:z-[6] after:h-[2px] after:origin-left after:scale-x-0 after:transition-transform after:duration-[600ms] after:ease-[cubic-bezier(0.16,1,0.3,1)] after:content-[''] after:[background:linear-gradient(90deg,transparent,rgba(var(--zr),var(--zg),var(--zb),0.9),transparent)] group-[.near]:after:scale-x-100 " +
-  "group-[.near]:border-[rgba(var(--zr),var(--zg),var(--zb),0.4)]"
+/* HUD identity frame for the route's hero panels: zone-tinted border on .near.
+   No corner brackets — in the handoff these panels are `.sn-glare`, whose
+   ::before (higher specificity) overrides the bracket background, so brackets
+   never actually render.
+
+   The scanner sweep is the CHILD `<HudSweep/>` below, not a pseudo. An element
+   has exactly two, and these panels already spend both: ::before on `GLARE`,
+   ::after on their chamfer stroke (`cut-edge-bl` / `cut-corner-edge`). While the
+   sweep also lived on ::after it won — Tailwind's utilities layer outranks the
+   components layer the `cut-*-edge` strokes are registered in — and silently
+   erased the stroke, so both panels rendered their cut corner unbordered. Keep
+   any future decoration on this frame a child element for the same reason. */
+export const HUD_FRAME = "group-[.near]:border-[rgba(var(--zr),var(--zg),var(--zb),0.4)]"
+
+/* Top scanner sweep: scales in when the parent stop gains `.near`. Lives inside
+   the panel it decorates, which must be `relative` (every HUD_FRAME panel is). */
+export function HudSweep() {
+  return (
+    <i
+      aria-hidden="true"
+      className="pointer-events-none absolute left-0 right-0 top-0 z-[6] h-[2px] origin-left scale-x-0 transition-transform duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] [background:linear-gradient(90deg,transparent,rgba(var(--zr),var(--zg),var(--zb),0.9),transparent)] group-[.near]:scale-x-100"
+    />
+  )
+}
 
 /* hero headline masked-line reveal */
 export const LINE_MASK = "block overflow-hidden pb-[0.10em] pr-[0.12em] -mb-[0.10em]"

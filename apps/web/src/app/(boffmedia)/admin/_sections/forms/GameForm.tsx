@@ -1,8 +1,9 @@
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useTranslations } from "next-intl"
 import { Button, Field, Input, Textarea } from "@boffmedia/ui"
+import { ImageUploadField } from "@/components/shared/media/ImageUploadField"
 
 const gameSchema = z.object({
   id: z.number().optional(),
@@ -26,7 +27,7 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
   // `validation` is a root namespace in admin.json, not nested under `admin` —
   // scoping to "admin.validation" resolved to admin.admin.validation.* and rendered raw keys.
   const tv = useTranslations("validation")
-  const { register, handleSubmit, formState: { errors } } = useForm<GameFormValues>({
+  const { register, handleSubmit, control, formState: { errors } } = useForm<GameFormValues>({
     resolver: zodResolver(gameSchema),
     defaultValues: defaultValues || { title: "", description: "", icon: "" },
   })
@@ -41,9 +42,22 @@ export function GameForm({ defaultValues, isSubmitting, onSubmit, onCancel, subm
         <Textarea placeholder={t("game.descPlaceholder")} {...register("description")} />
       </Field>
 
-      <Field label={t("game.iconLabel")} hint={t("game.iconHint")} error={errors.icon?.message}>
-        <Input placeholder="https://example.com/icon.jpg" {...register("icon")} />
-      </Field>
+      <Controller
+        control={control}
+        name="icon"
+        render={({ field }) => (
+          <ImageUploadField
+            label={t("game.iconLabel")}
+            hint={t("game.iconHint")}
+            error={errors.icon?.message}
+            value={field.value ?? ""}
+            onChange={field.onChange}
+            folder="games"
+            /* Game key art is shown at 16:8 on the card and the game hero. */
+            cropAspect={2}
+          />
+        )}
+      />
 
       <div className="flex justify-end gap-2.5 pt-2">
         <Button type="button" variant="ghost" onClick={onCancel}>{t("cancel")}</Button>

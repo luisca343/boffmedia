@@ -197,7 +197,7 @@
         "meta": "Finish"
       },
       "minimap": {
-        "ariaLabel": "Journey map"
+        "ariaLabel": "Section map"
       },
       "countdown": {
         "days": "Days",
@@ -207,28 +207,23 @@
         "ariaLabel": "Countdown to next event"
       },
       "hero": {
-        "titleLine1": "Start the",
-        "titleEmphasis": "journey",
-        "titleLine2suffix": "gamer",
-        "lead": "Tools, tournaments, giveaways and community linked in a single journey. Scroll down and let it carry you — every stop lights the next.",
-        "ctaStart": "Begin the journey",
-        "ctaMap": "View the map",
+        "titleLine1": "Everything you",
+        "titleEmphasis": "play",
+        "titleLine2suffix": "in one place",
+        "lead": "Tools, tournaments, giveaways and community. Everything we do at Boffmedia, gathered right below.",
+        "ctaStart": "Explore",
+        "ctaMap": "View sections",
         "hudCommunityLabel": "Community",
         "hudCommunityRegistered": "registered users",
         "hudEventsLabel": "Events",
         "hudEventsLive": "live now",
         "hudEventsTotal": "total",
-        "hudFallbackGameLabel": "Session",
-        "hudFallbackGameSub": "active players",
-        "hudFallbackSeasonLabel": "Season",
-        "hudFallbackSeasonSub": "on air",
-        "tagActive": "Journey active",
-        "tagStops": "7 stops · 1 community",
-        "scrollCta": "Scroll to start",
-        "scrollAriaLabel": "Start the journey"
+        "tagActive": "Community active",
+        "tagStops": "5 sections · 1 community",
+        "scrollCta": "Scroll to see it",
+        "scrollAriaLabel": "Go to the first section"
       },
       "tools": {
-        "kick": "Stop 01 · Your toolkit",
         "title": "The <em>toolbox</em>",
         "lead": "Calculators, simulators and trackers built by and for the community. Fine-tune before every match.",
         "modulesActive": "{count} active modules",
@@ -260,7 +255,6 @@
         }
       },
       "smartrotom": {
-        "kick": "Stop 02 · Featured product",
         "title": "Smart<em>Rotom</em>",
         "lead": "Your in-game smartphone, now in the browser too. Pokédex, maps, economy and messages synced live with your game.",
         "demoAriaLabel": "SmartRotom demo",
@@ -272,15 +266,14 @@
         "ctaNotify": "Notify me"
       },
       "torneos": {
-        "kick": "Stop 03 · Competition",
-        "title": "Tournaments every <em>week</em>",
-        "lead": "Live brackets, season ranking and a regional grand final with 96 spots. Glory is earned on the server.",
+        "title": "Climb the <em>ranking</em>",
+        "lead": "Live brackets, season ranking and a regional grand final. Glory is earned on the server.",
         "finalLabel": "Grand final · Bo3",
-        "team1Name": "Team Volt",
+        "team1Name": "Luisca",
         "team1Seed": "Seed #1",
-        "team2Name": "Team Aqua",
+        "team2Name": "SrKamina",
         "team2Seed": "Seed #2",
-        "mapInGame": "Map 4 · In game",
+        "mapInGame": "Game 3 · In game",
         "nextBroadcast": "Next broadcast ·",
         "ctaTournaments": "View tournaments",
         "ctaRanking": "View ranking",
@@ -288,28 +281,26 @@
         "fallbackDate": "14 JUL 2026 · 18:00"
       },
       "juegos": {
-        "kick": "Stop 04 · Servers",
         "title": "Choose your <em>game</em>",
-        "lead": "Three worlds, one community. Your next adventure starts at one of these stops.",
+        "lead": "Three worlds, one community. Your next adventure starts in one of them.",
         "enterWorld": "Enter the world",
         "wingull": {
           "n": "Pixelmon Wingull 2",
           "d": "The definitive Pokémon adventure inside Minecraft.",
-          "tag": "Badge — Season 04"
+          "tag": "Badge — Pixelmon"
         },
         "bingo": {
           "n": "Minecraft Bingo",
           "d": "Team objective races, fast editions.",
-          "tag": "Competitive — Weekly"
+          "tag": "Competitive — Seasonal"
         },
         "zomboff": {
           "n": "Project ZomBOFF",
           "d": "Cooperative survival in an infected world.",
-          "tag": "Survival — Special nights"
+          "tag": "Survival — Co-op"
         }
       },
       "comunidad": {
-        "kick": "Stop 05 · More than a server",
         "title": "A <em>living</em> community",
         "leadWithParticipants": "Teams, clans, giveaways and special events. {count} players already compete; only your name is missing from the ranking.",
         "leadNoParticipants": "Teams, clans, giveaways and special events — only your name is missing from the ranking.",
@@ -318,29 +309,24 @@
         "chipTeams": "Teams and clans",
         "ctaJoin": "Join",
         "ctaDiscord": "Discord",
-        "feedWin1": "AxelCraft won a ranked match",
-        "feedGift1": "Key delivered to NovaPixel in the giveaway",
-        "feedJoin1": "Kira_07 joined Team Volt",
-        "feedWin2": "MintLeaf entered the top 5 of the season",
+        "feedEmpty": "No recent activity yet",
         "feedAchievement": "{actor} unlocked {name}",
         "feedJoin": "{actor} joined {name}"
       },
       "meta": {
-        "kicker": "End of the journey · Beginning of everything",
         "titleStart": "Join the",
         "titleEmphasis": "community",
-        "lead": "Create your account, join the Discord and start your own journey alongside the Pixelmon community.",
+        "lead": "Create your account, join the Discord and play with the Pixelmon community.",
         "ctaRegister": "Create free account",
         "ctaDiscord": "Join Discord"
       }
     },
     "topbar": {
       "live": "LIVE",
-      "item1": "Pixelmon Wingull 2 Tournament — 14 Jun",
-      "item2": "Minecraft Bingo · Quick edition — 21 Jun",
-      "item3": "Project ZomBOFF · Survival — 28 Jun",
-      "item4": "Ranking: <em>AxelCraft</em> leads with 12,480 pts",
-      "item5": "SmartRotom — coming soon"
+      "item1": "Pixelmon Wingull 2 tournaments · live brackets",
+      "item2": "Minecraft Bingo · quick editions",
+      "item3": "Project ZomBOFF · co-op survival",
+      "item4": "SmartRotom — coming soon"
     }
   }
 }

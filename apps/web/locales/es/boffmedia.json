@@ -197,7 +197,7 @@
         "meta": "Meta"
       },
       "minimap": {
-        "ariaLabel": "Mapa del recorrido"
+        "ariaLabel": "Mapa de secciones"
       },
       "countdown": {
         "days": "Días",
@@ -207,28 +207,23 @@
         "ariaLabel": "Cuenta atrás al próximo evento"
       },
       "hero": {
-        "titleLine1": "Empieza la",
-        "titleEmphasis": "travesía",
-        "titleLine2suffix": "gamer",
-        "lead": "Herramientas, torneos, sorteos y comunidad enlazados en un único recorrido. Baja y déjate llevar: cada parada enciende la siguiente.",
-        "ctaStart": "Comenzar el recorrido",
-        "ctaMap": "Ver el mapa",
+        "titleLine1": "Todo lo que",
+        "titleEmphasis": "juegas",
+        "titleLine2suffix": "en un sitio",
+        "lead": "Herramientas, torneos, sorteos y comunidad. Todo lo que hacemos en Boffmedia, reunido aquí abajo.",
+        "ctaStart": "Explorar",
+        "ctaMap": "Ver secciones",
         "hudCommunityLabel": "Comunidad",
         "hudCommunityRegistered": "usuarios registrados",
         "hudEventsLabel": "Eventos",
         "hudEventsLive": "en directo",
         "hudEventsTotal": "en total",
-        "hudFallbackGameLabel": "Partida",
-        "hudFallbackGameSub": "jugadores activos",
-        "hudFallbackSeasonLabel": "Temporada",
-        "hudFallbackSeasonSub": "en emisión",
-        "tagActive": "Recorrido activo",
-        "tagStops": "7 paradas · 1 comunidad",
-        "scrollCta": "Baja para empezar",
-        "scrollAriaLabel": "Empezar el recorrido"
+        "tagActive": "Comunidad activa",
+        "tagStops": "5 secciones · 1 comunidad",
+        "scrollCta": "Baja para verlo",
+        "scrollAriaLabel": "Ir a la primera sección"
       },
       "tools": {
-        "kick": "Parada 01 · Tu equipo",
         "title": "Caja de <em>herramientas</em>",
         "lead": "Calculadoras, simuladores y trackers hechos por y para la comunidad. Afina antes de cada combate.",
         "modulesActive": "{count} módulos activos",
@@ -260,7 +255,6 @@
         }
       },
       "smartrotom": {
-        "kick": "Parada 02 · Producto destacado",
         "title": "Smart<em>Rotom</em>",
         "lead": "Tu smartphone del juego, también en el navegador. Pokédex, mapas, economía y mensajes sincronizados en vivo con tu partida.",
         "demoAriaLabel": "Demo de SmartRotom",
@@ -272,15 +266,14 @@
         "ctaNotify": "Avisadme"
       },
       "torneos": {
-        "kick": "Parada 03 · Competición",
-        "title": "Torneos cada <em>semana</em>",
-        "lead": "Brackets en directo, ranking por temporada y una gran final regional con 96 plazas. La gloria se gana en el servidor.",
+        "title": "Sube en el <em>ranking</em>",
+        "lead": "Brackets en directo, ranking por temporada y una gran final regional. La gloria se gana en el servidor.",
         "finalLabel": "Gran final · Bo3",
-        "team1Name": "Equipo Volt",
+        "team1Name": "Luisca",
         "team1Seed": "Semilla #1",
-        "team2Name": "Equipo Aqua",
+        "team2Name": "SrKamina",
         "team2Seed": "Semilla #2",
-        "mapInGame": "Mapa 4 · En juego",
+        "mapInGame": "Partida 3 · En juego",
         "nextBroadcast": "Próxima emisión ·",
         "ctaTournaments": "Ver torneos",
         "ctaRanking": "Ver ranking",
@@ -288,28 +281,26 @@
         "fallbackDate": "14 JUL 2026 · 18:00"
       },
       "juegos": {
-        "kick": "Parada 04 · Servidores",
         "title": "Elige tu <em>partida</em>",
-        "lead": "Tres mundos, una misma comunidad. Tu próxima aventura empieza en una de estas paradas.",
+        "lead": "Tres mundos, una misma comunidad. Tu próxima aventura empieza en uno de ellos.",
         "enterWorld": "Entrar al mundo",
         "wingull": {
           "n": "Pixelmon Wingull 2",
           "d": "La aventura Pokémon definitiva dentro de Minecraft.",
-          "tag": "Insignia — Temporada 04"
+          "tag": "Insignia — Pixelmon"
         },
         "bingo": {
           "n": "Minecraft Bingo",
           "d": "Carreras de objetivos por equipos, ediciones rápidas.",
-          "tag": "Competitivo — Semanal"
+          "tag": "Competitivo — Por temporadas"
         },
         "zomboff": {
           "n": "Project ZomBOFF",
           "d": "Supervivencia cooperativa en un mundo infectado.",
-          "tag": "Survival — Noches especiales"
+          "tag": "Survival — Cooperativo"
         }
       },
       "comunidad": {
-        "kick": "Parada 05 · Más que un servidor",
         "title": "Una comunidad <em>viva</em>",
         "leadWithParticipants": "Equipos, clanes, sorteos y eventos especiales. {count} jugadores ya compiten; solo falta tu nombre en el ranking.",
         "leadNoParticipants": "Equipos, clanes, sorteos y eventos especiales; solo falta tu nombre en el ranking.",
@@ -318,29 +309,24 @@
         "chipTeams": "Equipos y clanes",
         "ctaJoin": "Unirme",
         "ctaDiscord": "Discord",
-        "feedWin1": "AxelCraft ganó un combate ranked",
-        "feedGift1": "Key entregada a NovaPixel en el sorteo",
-        "feedJoin1": "Kira_07 se unió al Equipo Volt",
-        "feedWin2": "MintLeaf entró al top 5 de la temporada",
+        "feedEmpty": "Aún no hay actividad reciente",
         "feedAchievement": "{actor} desbloqueó {name}",
         "feedJoin": "{actor} se unió a {name}"
       },
       "meta": {
-        "kicker": "Fin del recorrido · Principio de todo",
         "titleStart": "Únete a la",
         "titleEmphasis": "comunidad",
-        "lead": "Crea tu cuenta, entra al Discord y empieza tu propio recorrido junto a la comunidad Pixelmon.",
+        "lead": "Crea tu cuenta, entra al Discord y juega con la comunidad Pixelmon.",
         "ctaRegister": "Crear cuenta gratis",
         "ctaDiscord": "Entrar al Discord"
       }
     },
     "topbar": {
       "live": "EN VIVO",
-      "item1": "Torneo Pixelmon Wingull 2 — 14 Jun",
-      "item2": "Minecraft Bingo · Edición rápida — 21 Jun",
-      "item3": "Project ZomBOFF · Supervivencia — 28 Jun",
-      "item4": "Ranking: <em>AxelCraft</em> lidera con 12 480 pts",
-      "item5": "SmartRotom — próximamente"
+      "item1": "Torneos Pixelmon Wingull 2 · brackets en directo",
+      "item2": "Minecraft Bingo · ediciones rápidas",
+      "item3": "Project ZomBOFF · supervivencia cooperativa",
+      "item4": "SmartRotom — próximamente"
     }
   }
 }

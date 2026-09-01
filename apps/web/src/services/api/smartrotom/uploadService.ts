@@ -7,6 +7,13 @@ interface UploadResponse {
   url: string;
 }
 
+/**
+ * Uploads subdirectories used by the admin content forms. A closed union rather
+ * than a free string: `path` reaches multer's `destination`, and keeping the set
+ * enumerated here is what stops a caller from inventing a new folder per form.
+ */
+export type UploadFolder = "events" | "games" | "teams" | "tournaments"
+
 export class UploadService {
   /**
    * Upload an image file
@@ -34,6 +41,22 @@ export class UploadService {
       path: `profiles`,
       filename: `${userId}-${Date.now()}.${ext}`
     });
+  }
+
+  /**
+   * Upload an image for an admin-managed content record (event, game, team…).
+   *
+   * The filename is generated rather than taken from the picked file: two admins
+   * uploading their own `banner.jpg` would otherwise overwrite each other, since
+   * the API writes to `uploads/<path>/<filename>` with no collision check.
+   */
+  static uploadContentImage(file: File, folder: UploadFolder) {
+    const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
+    const rand = Math.random().toString(36).slice(2, 8)
+    return apiUpload(file, {
+      path: folder,
+      filename: `${folder}-${Date.now()}-${rand}.${ext}`,
+    })
   }
 
   /**

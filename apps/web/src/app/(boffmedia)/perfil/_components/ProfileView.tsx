@@ -24,6 +24,7 @@ import {
   type StatTileData,
   type TrophyData,
 } from "@/components/boffmedia/ui/profile"
+import { ImageCropDialog } from "@/components/shared/media/ImageCropDialog"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetLeaderboards } from "@/hooks/events/useGetLeaderboards"
@@ -91,6 +92,9 @@ export function ProfileView({
     handleSave,
     handleFile,
     handleCoverFile,
+    cropTarget,
+    cancelCrop,
+    confirmCrop,
     handleUnlink,
   } = useProfileEditor({ userId, user, update })
 
@@ -273,6 +277,21 @@ export function ProfileView({
           />
           <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFile} />
           <input ref={coverRef} type="file" accept="image/*" className="hidden" onChange={handleCoverFile} />
+
+          {/* The avatar is chamfered (`.cut-seal`) exactly as ProfileHero clips it —
+              nothing on Boffmedia is a circle. The cover band is 236px tall across
+              the full width, so ~4:1 is what actually gets seen. */}
+          <ImageCropDialog
+            open={Boolean(cropTarget)}
+            src={cropTarget?.src ?? null}
+            file={cropTarget?.file ?? null}
+            aspect={cropTarget?.kind === "cover" ? 4 : 1}
+            shape={cropTarget?.kind === "cover" ? "square" : "seal"}
+            title={cropTarget?.kind === "cover" ? t("cover.change") : t("avatar.change")}
+            busy={uploading || coverUploading}
+            onCancel={cancelCrop}
+            onConfirm={confirmCrop}
+          />
 
           {stats.length > 0 && (
             <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(148px,1fr))]">

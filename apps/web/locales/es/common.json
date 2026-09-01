@@ -114,7 +114,10 @@
       "dropImageHere": "Suelta la imagen aquí",
       "remove": "Eliminar",
       "supportedFormats": "Formatos soportados: {formats}",
-      "maxSize": "Tamaño máximo: {maxSize}MB"
+      "maxSize": "Tamaño máximo: {maxSize}MB",
+      "upload": "Subir imagen",
+      "uploaded": "Imagen subida",
+      "uploadError": "No se pudo subir la imagen"
     },
     "baseStatBars": {
       "title": "Estadísticas base"
@@ -369,12 +372,30 @@
       "aGame": "un juego",
       "justNow": "ahora",
       "status": {
-        "playing": { "label": "Jugando", "verb": "Jugando" },
-        "played": { "label": "Jugado", "verb": "Completado" },
-        "backlog": { "label": "Pendiente", "verb": "Pendiente" },
-        "wishlist": { "label": "Deseado", "verb": "Deseado" },
-        "shelved": { "label": "Abandonado", "verb": "Abandonado" },
-        "retired": { "label": "Descartado", "verb": "Descartado" }
+        "playing": {
+          "label": "Jugando",
+          "verb": "Jugando"
+        },
+        "played": {
+          "label": "Jugado",
+          "verb": "Completado"
+        },
+        "backlog": {
+          "label": "Pendiente",
+          "verb": "Pendiente"
+        },
+        "wishlist": {
+          "label": "Deseado",
+          "verb": "Deseado"
+        },
+        "shelved": {
+          "label": "Abandonado",
+          "verb": "Abandonado"
+        },
+        "retired": {
+          "label": "Descartado",
+          "verb": "Descartado"
+        }
       }
     },
     "bestiary": {
@@ -412,8 +433,14 @@
         "unfavorable": "Generalmente desfavorable"
       },
       "via": {
-        "sorteo": { "label": "Sorteo", "short": "Sorteo" },
-        "manual": { "label": "Entrega manual", "short": "Manual" }
+        "sorteo": {
+          "label": "Sorteo",
+          "short": "Sorteo"
+        },
+        "manual": {
+          "label": "Entrega manual",
+          "short": "Manual"
+        }
       }
     },
     "profile": {
@@ -799,6 +826,13 @@
     "editor": {
       "untitled": "Sin título",
       "saved": "Cambios guardados en {title}"
+    },
+    "imageCrop": {
+      "title": "Ajustar imagen",
+      "hint": "Arrastra para mover · rueda para acercar",
+      "zoom": "Zoom",
+      "cancel": "Cancelar",
+      "apply": "Aplicar"
     }
   }
 }

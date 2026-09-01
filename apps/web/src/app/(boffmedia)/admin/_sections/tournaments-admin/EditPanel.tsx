@@ -4,6 +4,7 @@ import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { Field, Input, Select, Button, toast } from "@boffmedia/ui"
 import { AvPanel } from "../../_components/ui/av-kit"
+import { ImageUploadField } from "@/components/shared/media/ImageUploadField"
 import {
   TournamentsService,
   type TnTeamsheetVisibility,
@@ -80,9 +81,14 @@ export function EditPanel({
             <Field label={t("name")}>
               <Input value={name} onChange={(e) => setName(e.target.value)} />
             </Field>
-            <Field label={t("banner")}>
-              <Input value={banner} onChange={(e) => setBanner(e.target.value)} placeholder="https://…" />
-            </Field>
+            <ImageUploadField
+              label={t("banner")}
+              value={banner}
+              onChange={setBanner}
+              folder="tournaments"
+              /* The tournament page renders the banner in a 3:1 box. */
+              cropAspect={3}
+            />
           </div>
           <Field label={t("description")}>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} className={TEXTAREA} />

@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 import { useTranslations } from "next-intl"
 import { Button, Field, Input, Select } from "@boffmedia/ui"
+import { ImageUploadField } from "@/components/shared/media/ImageUploadField"
 import { useGetEvents } from "@/hooks/events/useGetEvents"
 import { useGetGames } from "@/hooks/events/useGetGames"
 import { PacksService, type AdminPack } from "@/services/api/boffmedia/packsService"
@@ -228,13 +229,38 @@ export function EventForm({ defaultValues, isSubmitting, onSubmit, onCancel, sub
         />
       </div>
 
-      <Field label={t("event.iconLabel")} hint={t("event.iconHint")} error={errors.icon?.message}>
-        <Input placeholder="https://example.com/icon.jpg" {...register("icon")} />
-      </Field>
+      <Controller
+        control={control}
+        name="icon"
+        render={({ field }) => (
+          <ImageUploadField
+            label={t("event.iconLabel")}
+            hint={t("event.iconHint")}
+            error={errors.icon?.message}
+            value={field.value ?? ""}
+            onChange={field.onChange}
+            folder="events"
+            cropAspect={1}
+          />
+        )}
+      />
 
-      <Field label={t("event.bannerLabel")} hint={t("event.bannerHint")} error={errors.banner?.message}>
-        <Input placeholder="https://example.com/banner.jpg" {...register("banner")} />
-      </Field>
+      <Controller
+        control={control}
+        name="banner"
+        render={({ field }) => (
+          <ImageUploadField
+            label={t("event.bannerLabel")}
+            hint={t("event.bannerHint")}
+            error={errors.banner?.message}
+            value={field.value ?? ""}
+            onChange={field.onChange}
+            folder="events"
+            /* The card art and the event header both crop to 16:8. */
+            cropAspect={2}
+          />
+        )}
+      />
 
       <div className="flex justify-end gap-2.5 pt-2">
         <Button type="button" variant="ghost" onClick={onCancel}>{t("cancel")}</Button>

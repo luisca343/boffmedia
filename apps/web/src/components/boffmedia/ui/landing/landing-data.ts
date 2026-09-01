@@ -25,16 +25,6 @@ export const TV3_STOPS = [
   { id: "tv-meta", n: "06", t: "Meta", tk: "meta" },
 ]
 
-// Fallback for the landing HUD only — `TvHero` renders real site stats from
-// `useSiteStats` (GET /stats/site) and drops to these while the API loads or is
-// unavailable, so the hero stays visually stable.
-// NOTE: HUD labels are translated at render time in TvHero via useTranslations;
-// these values are only the numeric fallbacks shown while loading.
-export const TV3_HUD = [
-  { k: "Partida", big: "412", suf: "+", sub: "jugadores activos", live: true, tk: "hudFallbackGame" },
-  { k: "Temporada", big: "04", sub: "en emisión", tk: "hudFallbackSeason" },
-]
-
 /** Real tool count across every hub game (drives the landing "utilidades" stat). */
 export const TV3_TOOL_COUNT = HUB_SLUGS.reduce((n, slug) => n + getLandingItems(slug).length, 0)
 
@@ -66,20 +56,27 @@ export const TV3_FEATS = ["Multiplataforma", "Pokédex viva", "Economía en vivo
 export const TV3_EVENT = { title: "Torneo Regional — Wingull 2", date: "14 JUL 2026 · 18:00", tk: "fallback" }
 export const TV3_EVENT_TS = new Date("2026-07-14T18:00:00").getTime()
 
-// TV3_GAMES stays editorial (no games-showcase API). TV3_FEED below is only the
-// fallback for `TvComunidad`'s activity ticker, which renders real activity from
-// `useSiteActivity` (GET /activity) when available.
+// TV3_GAMES stays editorial: there is no games-showcase API, and these three
+// servers are real. Unlike the stats and the activity ticker, nothing here is a
+// stand-in for data we could have fetched.
 export const TV3_GAMES = [
   { n: "Pixelmon Wingull 2", d: "La aventura Pokémon definitiva dentro de Minecraft.", tag: "Insignia — Temporada 04", img: staticAsset(ASSET.boffmedia.img, 'personajes.webp'), tk: "wingull" },
   { n: "Minecraft Bingo", d: "Carreras de objetivos por equipos, ediciones rápidas.", tag: "Competitivo — Semanal", ph: "Minecraft Bingo", tk: "bingo" },
   { n: "Project ZomBOFF", d: "Supervivencia cooperativa en un mundo infectado.", tag: "Survival — Noches especiales", ph: "Project ZomBOFF", tk: "zomboff" },
 ]
 
-export const TV3_FEED = [
-  { k: "win", t: "AxelCraft ganó un combate ranked", ln: "border-l-ok", tp: "bg-ok", tk: "feedWin1" },
-  { k: "gift", t: "Key entregada a NovaPixel en el sorteo", ln: "border-l-warn", tp: "bg-warn", tk: "feedGift1" },
-  { k: "join", t: "Kira_07 se unió al Equipo Volt", ln: "border-l-signal", tp: "bg-signal", tk: "feedJoin1" },
-  { k: "win", t: "MintLeaf entró al top 5 de la temporada", ln: "border-l-ok", tp: "bg-ok", tk: "feedWin2" },
-]
+/**
+ * Floors the landing's community numbers have to clear before they are shown.
+ *
+ * The stats themselves are real (see the comments in `TvHero` / `TvComunidad`
+ * about the editorial fallbacks that used to sit there) — the problem is that a
+ * true "1+ usuarios registrados" undersells the site harder than saying nothing
+ * does. Below the floor the surface renders its count-free variant; above it the
+ * number appears on its own, with nothing to remember to switch back on.
+ *
+ * `events` is only consulted for the TOTAL: a live event is a signal rather than
+ * a size claim, so one running event still shows.
+ */
+export const TV3_STATS_FLOOR = { users: 25, events: 3, participants: 10 }
 
 export const DISCORD = "https://discord.gg/TWqjNHQz7d"

@@ -3,7 +3,6 @@ import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon } from "@boffmedia/ui"
-import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { GLARE } from "../landing-shared"
 import { TV3_GAMES } from "../landing-data"
@@ -16,7 +15,6 @@ export function TvJuegos() {
       id="tv-cp4"
       n="04"
       side="r"
-      kick={<Decode text={t("kick")} />}
       title={t.rich("title", { em: (chunks) => <em>{chunks}</em> })}
       lead={t("lead")}
     >

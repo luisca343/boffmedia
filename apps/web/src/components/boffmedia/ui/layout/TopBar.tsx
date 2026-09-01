@@ -4,7 +4,9 @@ import { Clock, Ticker } from "@boffmedia/ui"
 
 // Keys, not literals — a module-scope `t()` would freeze whichever locale loaded
 // first. `Ticker` renders each item as HTML, so the <em> stroke rides in the value.
-const TICKER_KEYS = ["item1", "item2", "item3", "item4", "item5"] as const
+// Four, not five: the old item4 was an invented ranking line ("AxelCraft lidera
+// con 12 480 pts"). The remaining items are evergreen — no dates to go stale.
+const TICKER_KEYS = ["item1", "item2", "item3", "item4"] as const
 
 export function TopBar() {
   // Server Component: `useTranslations` is sync-valid here, so no "use client"

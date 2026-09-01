@@ -2,7 +2,6 @@ import { ASSET, staticAsset } from '@/lib/assets';
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Button } from "@boffmedia/ui"
-import { Decode } from "../travesia-fx"
 import { TvCP } from "../TvCP"
 import { CTA_ROW, PRI_GLOW } from "../landing-shared"
 import { TV3_FEATS } from "../landing-data"
@@ -15,7 +14,6 @@ export function TvSmartRotom() {
       id="tv-cp2"
       n="02"
       side="r"
-      kick={<Decode text={t("kick")} />}
       title={t.rich("title", { em: (chunks) => <em>{chunks}</em> })}
       lead={t("lead")}
     >

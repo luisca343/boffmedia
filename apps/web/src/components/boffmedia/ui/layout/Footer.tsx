@@ -115,12 +115,16 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="flex flex-wrap items-center gap-x-[18px] gap-y-2.5 border-t border-line pb-[22px] pt-[15px] font-mono text-[11px] font-medium leading-none tracking-[0.07em] text-txt-dim">
+        {/* Right-aligned: with the clock block below commented out there is no
+            `ml-auto` element left for the copyright to sit opposite, so the row
+            justifies to the end instead. */}
+        <div className="flex flex-wrap items-center justify-end gap-x-[18px] gap-y-2.5 border-t border-line pb-[22px] pt-[15px] font-mono text-[11px] font-medium leading-none tracking-[0.07em] text-txt-dim">
           <span className="text-txt-muted">© 2026 Boffmedia</span>
           <span className="inline-flex items-center gap-[7px] uppercase">
             <i aria-hidden="true" className="h-[5px] w-[5px] shrink-0 rotate-45 bg-accent" />
             Boffmedia v3.0
           </span>
+          {/* 
           <div className="ml-auto flex items-center gap-[18px] uppercase max-[619px]:ml-0 max-[619px]:w-full">
             <span className="inline-flex items-center gap-[7px] tabular-nums text-txt-muted">
               <i aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-ok animate-[bm-livedot_2s_ease-in-out_infinite] motion-reduce:animate-none" />
@@ -128,6 +132,7 @@ export function Footer() {
             </span>
             <span>Madrid · UTC+2</span>
           </div>
+        */}
         </div>
       </div>
     </footer>
