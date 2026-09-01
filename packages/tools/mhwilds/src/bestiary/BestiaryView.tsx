@@ -4,7 +4,7 @@ import * as React from "react"
 import { useToolT } from "../i18n"
 import { cn } from "@boffmedia/ui/cn"
 import { Icon, Empty, Spinner, ToolTitle } from "@boffmedia/ui"
-import { MhApp, MhBar, MhBody, MhSeal, MhSearch, MhPanel, MhLabel, MhTypeChip } from "../ui/mh-kit"
+import { MhApp, MhBar, MhBody, MhSeal, MhSearch, MhPanel, MhLabel, MhLoadError, MhTypeChip } from "../ui/mh-kit"
 import { elementColor } from "../ui/mh-helpers"
 import type { MhMonster } from "../types"
 import { useMonsters } from "./useMonsters"
@@ -102,7 +102,7 @@ export function BestiaryView() {
         {loading ? (
           <div className="grid place-items-center py-24"><Spinner size={30} className="text-[var(--mh)]" /></div>
         ) : error ? (
-          <div className="py-16"><Empty icon="alert" title={t("errorTitle")} lead={error} /></div>
+          <div className="py-16"><MhLoadError title={t("errorTitle")} detail={error} /></div>
         ) : (
           // Master/detail: the roster is a sticky, self-scrolling column and the
           // detail rides the page scroll — MhApp does not bound their height.

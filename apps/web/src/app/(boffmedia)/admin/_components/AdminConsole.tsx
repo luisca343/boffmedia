@@ -15,7 +15,7 @@ import { TournamentsAdmin } from "../_sections/tournaments-admin"
 import { PacksAdmin } from "../_sections/packs-admin"
 import { DesktopReleasesAdmin } from "../_sections/desktop-releases-admin"
 import { RandomizerAdmin } from "../_sections/randomizer-admin"
-import { TcgpScraper } from "../_sections/tcgp-admin/TcgpScraper"
+import { TcgpSync } from "../_sections/tcgp-admin/TcgpSync"
 import { VgcMetaPanel } from "../_sections/vgc-admin/VgcMetaPanel"
 import MangaDownloader from "../_sections/manga-admin/MangaDownloader"
 import MangaLibrary from "../_sections/manga-admin/MangaLibrary"
@@ -102,7 +102,7 @@ function AdminContent() {
       {section === "packs"             && <PacksAdmin />}
       {section === "releases"          && <DesktopReleasesAdmin />}
       {section === "randomizer"        && <RandomizerAdmin />}
-      {section === "tcgp"              && <TcgpScraper />}
+      {section === "tcgp"              && <TcgpSync />}
       {section === "vgc-meta"          && <VgcMetaPanel />}
       {section === "manga-downloader"  && <MangaDownloader />}
       {section === "manga-library"     && <MangaLibrary />}

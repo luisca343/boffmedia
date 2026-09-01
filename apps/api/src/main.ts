@@ -120,6 +120,12 @@ async function bootstrap() {
   // here rather than above, despite being the production machine.
   const DEV_ONLY_ORIGINS = [
     'http://localhost:3000',
+    // apps/desktop's renderer in browser mode (`pnpm --filter desktop
+    // dev:renderer`, the port in tauri.conf.json's devUrl). The packaged app
+    // never needs this — its tool calls are proxied through Rust, which is not
+    // a browser and has no origin — but in dev the renderer IS a page, so every
+    // API-backed tool is unusable there without it.
+    'http://localhost:5273',
     'http://local.boffmedia.es',
     'http://smartrotom.local.boffmedia.es',
     'http://148.251.3.244:34333',

@@ -134,6 +134,30 @@ export interface ToolStorage {
  */
 export type ToolAssetUrl = (path: string) => string;
 
+/**
+ * Whether the tool can reach anything beyond this machine.
+ *
+ * This exists because "the list is empty" and "the list could not be fetched"
+ * look identical on screen, and the tools have been shipping the first when
+ * they meant the second. A tool that knows the difference can say so.
+ *
+ * Two facts are folded into one answer on purpose. The browser's own
+ * `navigator.onLine` only knows whether the machine has a link; the desktop
+ * shell additionally knows whether the Boffmedia API is answering, which is the
+ * failure a player actually hits (a working wifi connection and a 502 upstream
+ * is indistinguishable from an outage, from inside a tool). A host reports
+ * offline when EITHER is true, because either one means the same thing to the
+ * tool: do not expect an answer.
+ */
+export interface ToolNetwork {
+  isOnline(): boolean;
+  /** Subscribe to changes; returns the unsubscribe. */
+  subscribe(listener: (online: boolean) => void): () => void;
+}
+
+import type { ToolData } from "./data";
+import type { ToolSession } from "./session";
+
 export interface ToolHost {
   saveFile(request: SaveFileRequest): Promise<SaveFileResult>;
   /** Open a URL in the system browser (the launcher already does this). */
@@ -141,6 +165,11 @@ export interface ToolHost {
   storage: ToolStorage;
   api: ToolApi;
   assetUrl: ToolAssetUrl;
+  network: ToolNetwork;
+  /** Durable per-tool storage and the outbound write queue. See `data.ts`. */
+  data: ToolData;
+  /** Who is using the tool, if anyone. See `session.ts`. */
+  session: ToolSession;
 }
 
 export type ToolCapability = keyof ToolHost;
@@ -186,4 +215,22 @@ export function toolApi(): ToolApi {
 /** See {@link ToolAssetUrl}. */
 export function assetUrl(path: string): string {
   return getToolHost().assetUrl(path);
+}
+
+export function toolNetwork(): ToolNetwork {
+  return getToolHost().network;
+}
+
+/** This tool's durable document store. `namespace` is the tool's id. */
+export function toolDb(namespace: string) {
+  return getToolHost().data.db(namespace);
+}
+
+/** This tool's outbound write queue. `namespace` is the tool's id. */
+export function toolOutbox(namespace: string) {
+  return getToolHost().data.outbox(namespace);
+}
+
+export function toolSession(): ToolSession {
+  return getToolHost().session;
 }

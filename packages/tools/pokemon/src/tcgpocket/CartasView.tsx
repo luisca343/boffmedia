@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { useTranslations } from "next-intl"
+
 import { Button, Select, SearchInput, Seg, Toggle, Empty, ToolBar, ToolBarSpacer } from "@boffmedia/ui"
-import type { TcgCard } from "@boffmedia/shared"
-import type { TcgpData } from "../_lib/useTcgpCards"
-import { normType, rarityMeta, typeColor, cssVars, TYPE_ORDER } from "../_lib/tcgp-maps"
+import type { TcgCard } from "./service"
+import type { TcgpData } from "./useTcgpCards"
+import { normType, rarityMeta, typeColor, cssVars, TYPE_ORDER } from "./tcgp-maps"
 import { TcgCardGrid, TcgSetProgress, TcgTypePip, type Density } from "./tcgp-kit"
+import { TCGP_NS, optionalT, useToolT } from "../i18n"
 
 const PAGE = 60
 
@@ -18,8 +19,8 @@ interface Props {
 }
 
 export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
-  const t = useTranslations("tcgpocket")
-  const tl = (key: string, fallback: string) => (t.has(key as never) ? t(key as never) : fallback)
+  const t = useToolT(TCGP_NS)
+  const tl = (key: string, fallback: string) => optionalT(t, key, fallback)
   const [q, setQ] = useState(initialQ || "")
   const [setF, setSetF] = useState("")
   const [catF, setCatF] = useState("")

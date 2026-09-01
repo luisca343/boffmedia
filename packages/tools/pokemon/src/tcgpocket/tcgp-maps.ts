@@ -1,5 +1,6 @@
 import type * as React from "react"
-import { ASSET, staticAsset } from "@/lib/assets"
+import { ASSET, joinAssetPath } from "@boffmedia/asset-paths"
+import { assetUrl } from "@boffmedia/tool-kit"
 
 // Inline CSS custom properties (--tc etc.) — @types/react rejects `--x` keys on
 // style objects, so route them through one localized cast (mirrors the calc kit).
@@ -129,5 +130,5 @@ export function timeAgo(iso: string, locale: string): string {
 // placeholder) — see TcgCardArt in the kit. The downloader stores one file per
 // locale, so the locale is part of the filename rather than a directory.
 export function localCardArt(setId: string, id: string, locale = 'en'): string {
-  return staticAsset(ASSET.boffmedia.tools.tcg, 'cards', setId, `${id}_${locale}.webp`)
+  return assetUrl(joinAssetPath(ASSET.boffmedia.tools.tcg, 'cards', setId, `${id}_${locale}.webp`))
 }

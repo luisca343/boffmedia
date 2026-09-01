@@ -1,8 +1,9 @@
 "use client"
 
 import React, { useEffect } from "react"
-import { useToolT } from "../i18n"
-import { Icon, IconButton, SearchInput, ToolSeal, ToolStrip, type IconName } from "@boffmedia/ui"
+import { useToolOnline } from "@boffmedia/tool-kit"
+import { MHWILDS_NS, useToolT } from "../i18n"
+import { Empty, Icon, IconButton, SearchInput, ToolSeal, ToolStrip, type IconName } from "@boffmedia/ui"
 import {
   MH_VARS, rarClamp, rarVar, rarInk, elementColor, SK_COLOR, skillCategory,
   SHARP_ORDER, RES_ORDER,
@@ -591,5 +592,40 @@ export function MhDrawer({
         <div className="flex-1 overflow-y-auto py-3 px-4 pb-10">{children}</div>
       </aside>
     </>
+  )
+}
+
+/**
+ * A failed data load, said once and said correctly.
+ *
+ * Every screen here reads its game data from the API, so the interesting
+ * question on a failure is not which call broke but whether there is a network
+ * at all. With none, the transport's own message ("Failed to fetch") is noise
+ * and "try again" is advice the player cannot act on, so this says what is
+ * actually true and drops the retry.
+ *
+ * On the desktop the shell puts the same verdict in a banner above the tool.
+ * Agreeing with it is the point: two different explanations for one outage read
+ * as two separate faults. On the web there is no such banner, which is why this
+ * lives in the package rather than in a host.
+ */
+export function MhLoadError({
+  title,
+  detail,
+  children,
+}: {
+  title: string
+  detail?: string
+  children?: React.ReactNode
+}) {
+  const t = useToolT(MHWILDS_NS)
+  const online = useToolOnline()
+  if (!online) {
+    return <Empty icon="alert" title={t("app.offlineTitle")} lead={t("app.offlineLead")} />
+  }
+  return (
+    <Empty icon="alert" title={title} lead={detail}>
+      {children}
+    </Empty>
   )
 }

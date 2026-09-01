@@ -230,13 +230,31 @@ export class TcgService {
 
   // ==================== USER CARDS OPERATIONS ====================
 
-  async getUserCards(userName: string): Promise<any[]> {
+  /**
+   * A player's collection, addressed by numeric id OR by username.
+   *
+   * The route param is called `userName`, but every sibling route on the
+   * controller (`PUT`/`DELETE /users/:userId/cards/...`) takes an id, and the
+   * ported tool sends an id here too. This used to do
+   * `(await getUserByUsername(id))!.id` — for an id that lookup returns
+   * undefined and the `!` turned it into a TypeError, surfaced to the app as a
+   * 500 "Database operation failed". Accept both, and answer 404 when the user
+   * genuinely is not there.
+   */
+  async getUserCards(userIdOrName: string): Promise<any[]> {
     try {
-      if (!userName || userName.trim().length === 0) {
-        throw new BadRequestException('User Name is required');
+      const identifier = userIdOrName?.trim();
+      if (!identifier) {
+        throw new BadRequestException('A user id or username is required');
       }
 
-      const userId = (await this.usersService.getUserByUsername(userName))!.id;
+      const userId = /^\d+$/.test(identifier)
+        ? Number(identifier)
+        : (await this.usersService.getUserByUsername(identifier))?.id;
+
+      if (!userId) {
+        throw new NotFoundException(`User ${identifier} not found`);
+      }
 
       const tcgUserCards = await this.tcgRepository.getUserCards(userId);
 
@@ -265,7 +283,11 @@ export class TcgService {
 
       return tcgUserCards;
     } catch (error: any) {
-      if (error instanceof BadRequestException) {
+      // A missing user is a 404, not a database failure.
+      if (
+        error instanceof BadRequestException ||
+        error instanceof NotFoundException
+      ) {
         throw error;
       }
       this.errorService.handleDatabaseError(error, 'Get user cards');
@@ -335,24 +357,41 @@ export class TcgService {
         userId,
         cardId,
       );
-      if (!existingUserCard) {
-        throw new NotFoundException(
-          `User ${userId} does not own card ${cardId}`,
-        );
-      }
 
-      const quantityChange = updateDto.quantity - existingUserCard.quantity;
+      // An UPSERT, which is what PUT means: make the resource be this. It used
+      // to 404 when the row was absent, and that is unusable for the desktop
+      // app's offline queue — a player who adds a card on a train sends the
+      // write when they reconnect, by which time "did the row exist when they
+      // clicked" is not a question anyone can answer. Replaying the intent
+      // ("this card's quantity is 4") always can be.
+      //
+      // The same property makes a repeat harmless: the queue is at-least-once
+      // (see tool_db.rs), so the second delivery of the same PUT has to land on
+      // the same state rather than double the count the way POST does.
+      const current = existingUserCard?.quantity ?? 0;
+      const quantityChange = updateDto.quantity - current;
 
       if (updateDto.quantity === 0) {
-        // Remove card entirely
-        await this.tcgRepository.removeUserCard(userId, cardId);
-      } else {
-        // Update quantity
+        // Already absent is already the requested state — a no-op, not a 404,
+        // so a replayed removal succeeds instead of wedging the queue.
+        if (existingUserCard) {
+          await this.tcgRepository.removeUserCard(userId, cardId);
+        }
+      } else if (existingUserCard) {
         await this.tcgRepository.updateUserCardQuantity(
           userId,
           cardId,
           updateDto.quantity,
         );
+      } else {
+        // Creating, so the card itself has to be real — `addUserCard` checks
+        // this on its own path and the check belongs on every path that can
+        // insert, or a typo'd id becomes a row nothing can render.
+        const cardExists = await this.tcgRepository.checkIfCardExists(cardId);
+        if (!cardExists) {
+          throw new BadRequestException(`Card with ID ${cardId} does not exist`);
+        }
+        await this.tcgRepository.addUserCard(userId, cardId, updateDto.quantity);
       }
 
       // Add to history if there was a change

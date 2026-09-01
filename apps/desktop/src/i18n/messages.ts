@@ -207,7 +207,11 @@ const es = {
   // (@boffmedia/tools-*), which is merged into this store in ./index.tsx.
   tools: {
     title: "Herramientas",
-    subtitle: "Las herramientas de Boffmedia, disponibles sin conexión.",
+    subtitle: "Las herramientas de Boffmedia, en la app.",
+    // Shown over a tool that needs the server when there is none. Named for
+    // what the player can do about it, not for the transport that failed.
+    offlineTitle: "Sin conexión con el servidor",
+    offlineBody: "Esta herramienta carga sus datos de Boffmedia. Lo que ya esté en pantalla sigue funcionando; para el resto, vuelve a intentarlo cuando haya conexión.",
     empty: "No hay herramientas disponibles.",
     notFound: "Esa herramienta ya no existe.",
     back: "Volver a herramientas",
@@ -1480,7 +1484,9 @@ const en = {
 
   tools: {
     title: "Tools",
-    subtitle: "The Boffmedia tools, available offline.",
+    subtitle: "The Boffmedia tools, in the app.",
+    offlineTitle: "No connection to the server",
+    offlineBody: "This tool loads its data from Boffmedia. Whatever is already on screen keeps working; for the rest, try again once you are back online.",
     empty: "No tools available.",
     notFound: "That tool no longer exists.",
     back: "Back to tools",

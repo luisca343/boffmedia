@@ -2627,6 +2627,76 @@ export async function toolApiRequest<T = unknown>(request: {
   return await invoke<T>("tool_api_request", { request });
 }
 
+// ── Tool data (tool_db.rs) ─────────────────────────────────────────────────
+// Documents cross as JSON TEXT in both directions: the Rust side stores them
+// opaquely on purpose, so the shell never has to know a tool's shape.
+
+export type ToolDocRow = { id: string; value: string; updatedAt: number };
+
+export type ToolOutboxRow = {
+  opId: string;
+  ns: string;
+  method: string;
+  path: string;
+  body?: unknown;
+  dedupeKey?: string | null;
+  createdAt: number;
+  attempts: number;
+  lastError?: string | null;
+};
+
+export type ToolFlushWire = {
+  sent: number;
+  rejected: Array<{ opId: string; ns: string; path: string; status: number; message: string }>;
+  remaining: number;
+  stopped?: string | null;
+};
+
+export function toolDbGet(ns: string, collection: string, id: string): Promise<string | null> {
+  return invoke<string | null>("tool_db_get", { ns, collection, id });
+}
+
+export function toolDbPut(
+  ns: string,
+  collection: string,
+  id: string,
+  value: string,
+): Promise<void> {
+  return invoke("tool_db_put", { ns, collection, id, value });
+}
+
+export function toolDbRemove(ns: string, collection: string, id: string): Promise<void> {
+  return invoke("tool_db_remove", { ns, collection, id });
+}
+
+export function toolDbList(ns: string, collection: string): Promise<ToolDocRow[]> {
+  return invoke<ToolDocRow[]>("tool_db_list", { ns, collection });
+}
+
+export function toolDbClear(ns: string, collection: string): Promise<void> {
+  return invoke("tool_db_clear", { ns, collection });
+}
+
+export function toolOutboxEnqueue(op: {
+  ns: string;
+  method: string;
+  path: string;
+  body?: unknown;
+  dedupeKey?: string;
+}): Promise<string> {
+  return invoke<string>("tool_outbox_enqueue", { op });
+}
+
+export function toolOutboxPending(ns?: string): Promise<ToolOutboxRow[]> {
+  return invoke<ToolOutboxRow[]>("tool_outbox_pending", { ns: ns ?? null });
+}
+
+/** Replay the queue. `ns` omitted flushes every tool's — what the shell does
+ *  when the API comes back, since one connection returning fixes all of them. */
+export function toolOutboxFlush(ns?: string): Promise<ToolFlushWire> {
+  return invoke<ToolFlushWire>("tool_outbox_flush", { ns: ns ?? null });
+}
+
 /** Chunked write session for tool exports. A Schematic Compat `.prefab` can run
  *  to multiple GB, so the payload is pushed chunk by chunk instead of crossing
  *  the IPC boundary as one message. Errors propagate (unlike the pickers): a

@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import { Suspense } from "react"
-import { TcgpApp } from "../_components/TcgpApp"
+import { TcgpRouted } from "../_components/TcgpRouted"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pageMeta.herramientas")
@@ -11,7 +11,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function TcgpColeccionPage() {
   return (
     <Suspense>
-      <TcgpApp view="coleccion" />
+      <TcgpRouted view="coleccion" />
     </Suspense>
   )
 }

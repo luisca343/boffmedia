@@ -1,14 +1,15 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { useLocale, useTranslations } from "next-intl"
+
 import { Button, Panel, SearchInput, Select, Toggle, Banner, Empty, Icon, ToolBar, ToolBarSpacer } from "@boffmedia/ui"
-import { useBoffSession } from "@/services/useBoffSession"
-import type { TcgCard } from "@boffmedia/shared"
-import type { TcgpData } from "../_lib/useTcgpCards"
-import { useBestPack } from "../_lib/useBestPack"
-import { padNum, timeAgo } from "../_lib/tcgp-maps"
+import { useToolPending, useToolSession } from "@boffmedia/tool-kit"
+import type { TcgCard } from "./service"
+import type { TcgpData } from "./useTcgpCards"
+import { useBestPack } from "./useBestPack"
+import { padNum, timeAgo } from "./tcgp-maps"
 import { TcgCardGrid, TcgBar, TcgOddsTable, TcgTypePip, type OddsTableRow } from "./tcgp-kit"
+import { TCGP_NS, useLocale, optionalT, useToolT } from "../i18n"
 
 interface Collection {
   owned: Record<string, number>
@@ -65,8 +66,8 @@ function CGroup({ set, cards, effective, editable, hideMissing, onAdd, onRemove,
 }
 
 function BestPackPanel({ viewerName }: { viewerName: string | null }) {
-  const t = useTranslations("tcgpocket")
-  const tl = (key: string, fallback: string) => (t.has(key as never) ? t(key as never) : fallback)
+  const t = useToolT(TCGP_NS)
+  const tl = (key: string, fallback: string) => optionalT(t, key, fallback)
   const { rows, loading, error, run } = useBestPack(viewerName)
 
   const tableRows: OddsTableRow[] = (rows || []).slice(0, 6).map((r) => ({
@@ -105,16 +106,17 @@ function BestPackPanel({ viewerName }: { viewerName: string | null }) {
 }
 
 export function ColeccionView({ data, collection, username, onOpenCard }: Props) {
-  const t = useTranslations("tcgpocket")
+  const t = useToolT(TCGP_NS)
   const locale = useLocale()
-  const { session } = useBoffSession()
+  const { user, signIn } = useToolSession()
+  const pending = useToolPending("pokemon.tcgpocket")
   const { owned, effective, setChange, dirtyCount, discard, save, saving, editable, loggedIn, recent } = collection
 
   const [q, setQ] = useState("")
   const [setF, setSetF] = useState("")
   const [hideMissing, setHideMissing] = useState(false)
 
-  const viewerName = username || session?.user?.name || null
+  const viewerName = username || user?.name || null
 
   const totals = useMemo(() => {
     const total = data.cards.length
@@ -131,19 +133,36 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
       .filter((g) => g.cards.length)
   }, [data.sets, q, setF])
 
-  // Own collection but not logged in → prompt sign-in.
-  if (!username && !loggedIn) {
-    return (
-      <div className="grid min-h-[40vh] place-items-center">
-        <Empty icon="lock" title={t("app.coleccion.loginTitle")} lead={t("app.coleccion.loginLead")}>
-          <Button variant="pri" icon="user" href="/entrar">{t("app.coleccion.login")}</Button>
-        </Empty>
-      </div>
-    )
-  }
-
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
+      {/* Signed out is a STATE, not a wall. This used to return a sign-in
+          screen instead of the collection, which meant a player with no account
+          had nothing at all — and in the desktop app, where the whole Tools
+          section is usable without one, that reads as broken rather than
+          gated. The collection below is real: it lives on this device, it is
+          editable, and signing in is what makes it follow them elsewhere. */}
+      {!username && !loggedIn && (
+        <Banner
+          tone="info"
+          icon="user"
+          title={t("app.coleccion.localTitle")}
+          className="mb-5"
+          actions={
+            <Button size="sm" variant="pri" icon="user" onClick={signIn}>
+              {t("app.coleccion.localSignIn")}
+            </Button>
+          }
+        >
+          {t("app.coleccion.localLead")}
+        </Banner>
+      )}
+      {/* What has not reached the server yet. Only worth saying when there IS a
+          server to reach — signed out, nothing is owed to anyone. */}
+      {loggedIn && pending > 0 && (
+        <Banner tone="warn" icon="refresh" className="mb-5">
+          {t("app.coleccion.pendingSync", { count: pending })}
+        </Banner>
+      )}
       {/* No header, by the same rule as CartasView. Whose gallery this is — the
           one thing the tab row cannot say — is carried by the Banner below. */}
       <p className="mb-5 max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">

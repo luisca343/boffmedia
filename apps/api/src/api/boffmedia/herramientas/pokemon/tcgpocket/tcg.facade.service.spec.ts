@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TcgFacadeService } from './tcg.facade.service';
 import { TcgService } from './services/tcg.service';
+import { TcgSyncService } from './services/tcg-sync.service';
 
 const mockTcgService = {
   getSetsForSeriesFromDb: jest.fn(),
@@ -20,6 +21,11 @@ const mockTcgService = {
   migrateOldUserCards: jest.fn(),
 };
 
+const mockTcgSyncService = {
+  getStatus: jest.fn(),
+  run: jest.fn(),
+};
+
 describe('TcgFacadeService', () => {
   let service: TcgFacadeService;
 
@@ -30,6 +36,7 @@ describe('TcgFacadeService', () => {
       providers: [
         TcgFacadeService,
         { provide: TcgService, useValue: mockTcgService },
+        { provide: TcgSyncService, useValue: mockTcgSyncService },
       ],
     }).compile();
 

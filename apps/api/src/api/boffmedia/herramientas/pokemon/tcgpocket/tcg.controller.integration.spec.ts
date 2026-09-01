@@ -11,6 +11,7 @@ import { Logger } from 'nestjs-pino';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { DesktopOrUserAuthGuard } from '@api/packs/guards/desktop-or-user-auth.guard';
 
 const mockLogger = {
   log: jest.fn(),
@@ -40,6 +41,8 @@ const mockFacade = {
   removeUserCard: jest.fn(),
   getUserCardHistory: jest.fn(),
   migrateOldUserCards: jest.fn(),
+  getSyncStatus: jest.fn(),
+  runSync: jest.fn(),
 };
 
 describe('TcgController — integration (ValidationPipe + GlobalExceptionFilter)', () => {
@@ -62,6 +65,10 @@ describe('TcgController — integration (ValidationPipe + GlobalExceptionFilter)
       .overrideGuard(RolesGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(GameOrUserAuthGuard)
+      .useValue({ canActivate: () => true })
+      // The collection routes accept a website OR a desktop session; which one
+      // is which is the guard's own suite, not this one's.
+      .overrideGuard(DesktopOrUserAuthGuard)
       .useValue({ canActivate: () => true })
       .compile();
 
@@ -370,7 +377,162 @@ describe('TcgController — integration (ValidationPipe + GlobalExceptionFilter)
     });
   });
 
-  // ── GlobalExceptionFilter — error shape contract ─────────────────────────
+  // -- Row shape: Drizzle camelCase vs merged snake_case --------------------
+
+  describe('row shape tolerance', () => {
+    // The repository hands back Drizzle rows (schema property names) while the
+    // fetch/merge services build the external API's snake_case. Reading one
+    // convention silently produced `undefined`, which JSON.stringify DROPS - so
+    // the field vanished from the payload rather than erroring anywhere.
+
+    it('keeps setId and localId when the row uses Drizzle property names', async () => {
+      mockFacade.getCardsForSetFromDb.mockResolvedValue([
+        {
+          id: 'P-A-001',
+          setId: 'P-A',
+          localId: '001',
+          name_es: 'Poción',
+          name_en: 'Potion',
+          image_es: '/boffmedia/tools/tcg/cards/P-A/P-A-001_es.webp',
+          set_name_es: 'Promo-A',
+        },
+      ]);
+
+      const res = await request(app.getHttpServer()).get(
+        '/tools/ptcgp/sets/P-A/cards?locale=es',
+      );
+
+      expect(res.status).toBe(200);
+      // Without these the client builds its artwork URL as /cards/undefined/...
+      expect(res.body[0].setId).toBe('P-A');
+      expect(res.body[0].localId).toBe('001');
+      expect(res.body[0].image).toBe(
+        '/boffmedia/tools/tcg/cards/P-A/P-A-001_es.webp',
+      );
+    });
+
+    it('still reads a row that uses the merged snake_case shape', async () => {
+      mockFacade.getCardsForSetFromDb.mockResolvedValue([
+        { id: 'A1-001', set_id: 'A1', local_id: '001', name_en: 'Bulbasaur' },
+      ]);
+
+      const res = await request(app.getHttpServer()).get(
+        '/tools/ptcgp/sets/A1/cards',
+      );
+
+      expect(res.body[0].setId).toBe('A1');
+      expect(res.body[0].localId).toBe('001');
+    });
+
+    it('returns a card that has no artwork instead of a null hole in the array', async () => {
+      // tcgdex publishes no image for many promos; those cards must still list.
+      mockFacade.getCardsForSetFromDb.mockResolvedValue([
+        { id: 'P-A-074', setId: 'P-A', localId: '074', name_es: 'Horsea' },
+      ]);
+
+      const res = await request(app.getHttpServer()).get(
+        '/tools/ptcgp/sets/P-A/cards?locale=es',
+      );
+
+      expect(res.body).toHaveLength(1);
+      expect(res.body[0]).not.toBeNull();
+      expect(res.body[0].id).toBe('P-A-074');
+    });
+
+    it('gives a set its name and card counts from a Drizzle row', async () => {
+      mockFacade.getSetsForSeriesFromDb.mockResolvedValue([
+        {
+          id: 'A1',
+          nameEs: 'Genes Formidables',
+          nameEn: 'Genetic Apex',
+          logo: 'https://assets.tcgdex.net/en/tcgp/A1/logo',
+          symbol: null,
+          cardCountOfficial: 226,
+          cardCountTotal: 286,
+        },
+      ]);
+
+      const res = await request(app.getHttpServer()).get(
+        '/tools/ptcgp/series/tcgp/sets?locale=es',
+      );
+
+      // This endpoint used to answer {id, logo, symbol} and nothing else.
+      expect(res.body[0]).toEqual(
+        expect.objectContaining({
+          id: 'A1',
+          name: 'Genes Formidables',
+          cardCountOfficial: 226,
+          cardCountTotal: 286,
+        }),
+      );
+    });
+
+    it('falls back to the English set name when the locale has none', async () => {
+      mockFacade.getSetsForSeriesFromDb.mockResolvedValue([
+        { id: 'A1', nameEn: 'Genetic Apex', nameEs: '', cardCountTotal: 286 },
+      ]);
+
+      const res = await request(app.getHttpServer()).get(
+        '/tools/ptcgp/series/tcgp/sets?locale=es',
+      );
+
+      expect(res.body[0].name).toBe('Genetic Apex');
+    });
+  });
+
+  // -- Selective sync (admin) ----------------------------------------------
+
+  describe('GET /tools/ptcgp/admin/sync/status', () => {
+    it('returns 200 and passes the series through', async () => {
+      mockFacade.getSyncStatus.mockResolvedValue({ seriesId: 'tcgp', sets: [] });
+
+      const res = await request(app.getHttpServer()).get(
+        '/tools/ptcgp/admin/sync/status?seriesId=tcgp',
+      );
+
+      expect(res.status).toBe(200);
+      expect(mockFacade.getSyncStatus).toHaveBeenCalledWith('tcgp');
+    });
+  });
+
+  describe('POST /tools/ptcgp/admin/sync/stream', () => {
+    it('streams one SSE frame per event and forwards the selection', async () => {
+      mockFacade.runSync.mockImplementation(async function* () {
+        yield { type: 'start', seriesId: 'tcgp', stages: ['cards'], sets: [] };
+        yield {
+          type: 'done',
+          cancelled: false,
+          durationMs: 5,
+          counts: { downloaded: 1, updated: 0, skipped: 0, failed: 0 },
+          failures: [],
+        };
+      });
+
+      const res = await request(app.getHttpServer())
+        .post('/tools/ptcgp/admin/sync/stream')
+        .send({ seriesId: 'tcgp', cards: true, images: false, setIds: ['A1'] });
+
+      expect(res.status).toBe(200);
+      expect(res.headers['content-type']).toContain('text/event-stream');
+      expect(res.text).toContain('data: {"type":"start"');
+      expect(res.text).toContain('"type":"done"');
+      expect(mockFacade.runSync).toHaveBeenCalledWith(
+        expect.objectContaining({ cards: true, images: false, setIds: ['A1'] }),
+        expect.any(Function),
+      );
+    });
+
+    it('rejects a malformed selection before any fetching starts', async () => {
+      const res = await request(app.getHttpServer())
+        .post('/tools/ptcgp/admin/sync/stream')
+        .send({ cards: 'yes', setIds: 'A1' });
+
+      expect(res.status).toBe(400);
+      expect(mockFacade.runSync).not.toHaveBeenCalled();
+    });
+  });
+
+  // -- GlobalExceptionFilter - error shape contract -------------------------
 
   describe('GlobalExceptionFilter — error shape contract', () => {
     it('all error responses include statusCode, error, message, timestamp, path', async () => {

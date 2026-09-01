@@ -1,13 +1,14 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { useLocale, useTranslations } from "next-intl"
+
 import { Button, Panel, Icon, SearchInput, DISPLAY_VOICE } from "@boffmedia/ui"
-import { cn } from "@/lib/utils"
-import type { TcgpData } from "../_lib/useTcgpCards"
-import type { RecentUpdate } from "../_lib/useCollection"
-import { rarityMeta, timeAgo, padNum } from "../_lib/tcgp-maps"
+import { cn } from "@boffmedia/ui/cn"
+import type { TcgpData } from "./useTcgpCards"
+import type { RecentUpdate } from "./useCollection"
+import { rarityMeta, timeAgo, padNum } from "./tcgp-maps"
 import { TcgRing, TcgStatTile, TcgSetProgress, TcgTypePip } from "./tcgp-kit"
+import { TCGP_NS, useLocale, useToolT } from "../i18n"
 
 interface Props {
   data: TcgpData
@@ -24,7 +25,7 @@ function isEx(name: string): boolean {
 }
 
 export function PanelView({ data, owned, effective, recent, loggedIn, go, onGallery }: Props) {
-  const t = useTranslations("tcgpocket")
+  const t = useToolT(TCGP_NS)
   const locale = useLocale()
   const [user, setUser] = useState("")
 

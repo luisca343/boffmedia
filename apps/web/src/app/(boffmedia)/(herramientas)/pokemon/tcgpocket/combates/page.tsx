@@ -10,7 +10,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function TcgpCombatesPage() {
-  const t = await getTranslations("tcgpocket")
+  // `tools.tcgpocket`, not `tcgpocket`: the strings moved into
+  // @boffmedia/tools-pokemon with the tool, and the host merges that catalog in
+  // under the package namespace.
+  const t = await getTranslations("tools.tcgpocket")
   return (
     <div className="mx-auto grid min-h-[60vh] w-full max-w-[1400px] place-items-center p-[clamp(18px,3vw,34px)]">
       <Empty icon="sword" title={t("app.combates.title")} lead={t("app.combates.lead")}>

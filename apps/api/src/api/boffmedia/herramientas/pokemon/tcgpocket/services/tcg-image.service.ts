@@ -4,6 +4,15 @@ import axios from 'axios';
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { publicPath } from '@/config/paths';
+import { ASSET } from '@boffmedia/asset-paths';
+
+// The URL prefix that serves what we write. `apps/web/public` is a symlink to
+// the repo's `public/`, so a file written to publicPath('boffmedia','tools',
+// 'tcg', ...) is served at `/boffmedia/tools/tcg/...`. These used to return
+// `/img/games/tcg/...`, a path that stopped existing in the public/ reorg —
+// the files downloaded fine and every stored URL pointed at nothing, which is
+// why no card art rendered.
+const TCG_URL = ASSET.boffmedia.tools.tcg;
 
 @Injectable()
 export class TcgImageService {
@@ -24,7 +33,7 @@ export class TcgImageService {
           });
           await fs.writeFile(logoFilename, response.data);
           // Store path WITHOUT /public prefix
-          set.logo_local = `/img/games/tcg/sets/${set.id}/logo.webp`;
+          set.logo_local = `${TCG_URL}/sets/${set.id}/logo.webp`;
         } catch (err: any) {
           this.logger.warn(
             `[TCG] Failed to download logo for set ${set.id}:`,
@@ -44,7 +53,7 @@ export class TcgImageService {
           });
           await fs.writeFile(symbolFilename, response.data);
           // Store path WITHOUT /public prefix
-          set.symbol_local = `/img/games/tcg/sets/${set.id}/symbol.webp`;
+          set.symbol_local = `${TCG_URL}/sets/${set.id}/symbol.webp`;
         } catch (err: any) {
           this.logger.warn(
             `[TCG] Failed to download symbol for set ${set.id}:`,
@@ -85,7 +94,7 @@ export class TcgImageService {
       });
       await fs.writeFile(imageFilename, response.data);
 
-      return `/img/games/tcg/cards/${setId}/${cardId}_${locale}.webp`;
+      return `${TCG_URL}/cards/${setId}/${cardId}_${locale}.webp`;
     } catch (err: any) {
       this.logger.warn(
         `[TCG] Failed to download ${locale} image for card ${cardId}:`,

@@ -8,7 +8,11 @@ import {
   Query,
   Body,
   HttpStatus,
+  Res,
+  UseGuards,
+  HttpCode,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import {
   ApiTags,
@@ -31,6 +35,11 @@ import {
   AuthPrincipal,
 } from '@api/_utils/decorators/current-user.decorator';
 import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
+import { RolesGuard } from '@api/_utils/guards/roles.guard';
+import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { TcgSyncRequestDto, TcgSyncStatus } from './dto/tcg-sync.dto';
+import { DesktopOrUserAuthGuard } from '@api/packs/guards/desktop-or-user-auth.guard';
 
 @ApiTags('BoffMedia 🛠 | Pokemon TCG Pocket')
 @Public()
@@ -43,6 +52,27 @@ export class TcgController {
 
   // ==================== HELPER METHODS ====================
 
+  // Rows reach this controller in TWO shapes and always have: Drizzle selects
+  // return the schema's JS property names (`setId`, `nameEn`, `cardCountTotal`),
+  // while the fetch/merge services build the external API's snake_case. Reading
+  // only one of them yields `undefined`, and `undefined` is DROPPED by
+  // JSON.stringify — which is how `/series/:id/sets` came to answer
+  // `{id, logo, symbol}` with no name and no counts at all, and how every card
+  // lost its `setId` (the client builds its artwork fallback URL from that, so it
+  // requested `/cards/undefined/...`). Read both, everywhere.
+  private either<T>(row: any, camel: string, snake: string): T | undefined {
+    return row?.[camel] ?? row?.[snake];
+  }
+
+  /** A set's name in the requested locale, whichever shape the row arrived in. */
+  private setName(set: any, locale: string): string {
+    const localized =
+      locale === 'es'
+        ? (set?.nameEs ?? set?.name_es)
+        : (set?.nameEn ?? set?.name_en);
+    return localized || set?.nameEn || set?.name_en || set?.id;
+  }
+
   private safeParse(jsonString: string | null): any {
     if (!jsonString) return null;
     try {
@@ -53,19 +83,29 @@ export class TcgController {
   }
 
   private parseCardData(card: any, locale: string): TcgCard {
-    if (!card[`image_es`]) {
-      this.logger.warn(
-        `[TCG] No image found for card ${card.id} in locale ${locale}`,
-      );
-      return null as unknown as TcgCard;
+    // Artwork falls back across locales, and a card without any is still a card.
+    //
+    // This used to test `image_es` regardless of the locale asked for and return
+    // `null` when it was empty, so every card whose ES artwork was missing became
+    // a null hole in the array the clients map over — which is why cards vanished
+    // from the tool. tcgdex genuinely ships only one locale's asset for many
+    // promos, so that condition is normal, not an error. (The fallback also read
+    // `card.image_local_en`, a key the repository never selects: it aliases the
+    // columns to `image_en` / `image_es`.)
+    const image =
+      card[`image_${locale}`] ?? card.image_en ?? card.image_es ?? null;
+
+    if (!image) {
+      this.logger.warn(`[TCG] No artwork stored for card ${card.id}`);
     }
+
     return {
       id: card.id,
-      setId: card.set_id,
+      setId: this.either<string>(card, 'setId', 'set_id')!,
       setName: card[`set_name_${locale}`] || card.set_name_en,
-      localId: card.local_id,
+      localId: this.either<string>(card, 'localId', 'local_id')!,
       name: card[`name_${locale}`] || card.name_en,
-      image: card[`image_${locale}`] || card.image_local_en,
+      image,
       category: card.category,
       illustrator: card.illustrator,
       rarity: card.rarity,
@@ -118,11 +158,14 @@ export class TcgController {
     const sets = await this.tcgFacade.getSetsForSeriesFromDb(seriesId);
     return sets.map((set) => ({
       id: set.id,
-      name: set[`name_${locale}`] || set.name_en,
+      name: this.setName(set, locale),
       logo: set.logo,
       symbol: set.symbol,
-      cardCountOfficial: set.card_count_official,
-      cardCountTotal: set.card_count_total,
+      cardCountOfficial:
+        this.either<number>(set, 'cardCountOfficial', 'card_count_official') ??
+        0,
+      cardCountTotal:
+        this.either<number>(set, 'cardCountTotal', 'card_count_total') ?? 0,
     }));
   }
 
@@ -202,7 +245,7 @@ export class TcgController {
 
       groupedCards.push({
         setId: set.id,
-        setName: set[`name_${locale}`] || set.name_en,
+        setName: this.setName(set, locale),
         cardCount: mappedCards.length,
         cards: mappedCards,
       });
@@ -427,7 +470,115 @@ export class TcgController {
 
     return results;
   }
+  // ==================== SELECTIVE SYNC (ADMIN) ====================
+
+  // `@RequireSession()` is what actually locks these down: the controller is
+  // `@Public()` as a whole, which would turn a route-level `@UseGuards(JwtAuthGuard)`
+  // into a no-op (see jwt-auth.guard.ts). It flips the public flag back off so the
+  // global guard authenticates, and RolesGuard then sees a populated `req.user`.
+
+  @RequireSession()
+  @UseGuards(RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Get('admin/sync/status')
+  @ApiOperation({
+    summary: 'Compare the stored catalogue against the remote one',
+    description:
+      'Per-set counts of cards and artwork, stored versus available, so the ' +
+      'admin screen can show what is missing, partial or already up to date ' +
+      'before anything is downloaded.',
+  })
+  @ApiQuery({
+    name: 'seriesId',
+    required: false,
+    description: 'Series to inspect',
+    example: 'tcgp',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Sync status retrieved.',
+    type: TcgSyncStatus,
+  })
+  async getSyncStatus(
+    @Query('seriesId') seriesId?: string,
+  ): Promise<TcgSyncStatus> {
+    return this.tcgFacade.getSyncStatus(seriesId);
+  }
+
+  @RequireSession()
+  @UseGuards(RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Post('admin/sync/stream')
+  // A stream is a 200, not a 201: nothing is created at this URL.
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Run a selective sync, streaming progress via SSE',
+    description:
+      'Each selected data type (series, sets, cards, images) runs as its own ' +
+      'stage over the selected sets. A set that fails is reported and the run ' +
+      'continues, so a partial failure never forces a full restart. Events are ' +
+      'JSON objects with a `type` field: start, stage, set, item or done.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'SSE stream of sync progress events.',
+  })
+  async streamSync(
+    @Body() dto: TcgSyncRequestDto,
+    @Res() res: Response,
+  ): Promise<void> {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    // Nginx buffers SSE into uselessness otherwise: the whole run would arrive
+    // as one blob at the end, which is exactly the experience being replaced.
+    res.setHeader('X-Accel-Buffering', 'no');
+    res.flushHeaders();
+
+    // Closing the browser tab must stop the work, not leave it walking every
+    // remaining set at 250ms a card.
+    let cancelled = false;
+    res.on('close', () => {
+      cancelled = true;
+    });
+
+    try {
+      for await (const event of this.tcgFacade.runSync(dto, () => cancelled)) {
+        if (cancelled) break;
+        res.write(`data: ${JSON.stringify(event)}\n\n`);
+      }
+    } catch (error: any) {
+      this.logger.error('[TCG] Sync stream failed:', error);
+      if (!cancelled) {
+        res.write(
+          `data: ${JSON.stringify({
+            type: 'done',
+            cancelled: false,
+            durationMs: 0,
+            counts: { downloaded: 0, updated: 0, skipped: 0, failed: 1 },
+            failures: [
+              {
+                stage: 'series',
+                scope: dto.seriesId || 'tcgp',
+                // First line only: a driver error carries the whole statement.
+                message: String(error?.message ?? error).split('\n')[0].slice(0, 240),
+              },
+            ],
+          })}\n\n`,
+        );
+      }
+    } finally {
+      res.end();
+    }
+  }
+
   // ==================== USER CARDS OPERATIONS ====================
+
+  // These four are reachable from the website AND from the desktop app, whose
+  // token is a different type with its own revocation counter — so they take
+  // `DesktopOrUserAuthGuard` instead of `@RequireSession()`. Note the guard only
+  // runs because the controller is `@Public()`: `@RequireSession()` would make
+  // the global JwtAuthGuard reject the app's token first.
 
   @Get('users/:userName/cards')
   @ApiOperation({ summary: 'Get user cards' })
@@ -443,7 +594,7 @@ export class TcgController {
     return this.tcgFacade.getUserCards(userName);
   }
 
-  @RequireSession()
+  @UseGuards(DesktopOrUserAuthGuard)
   @Post('users/cards')
   @ApiOperation({ summary: 'Add card to user collection' })
   @ApiResponse({
@@ -467,19 +618,25 @@ export class TcgController {
     });
   }
 
-  @RequireSession()
+  @UseGuards(DesktopOrUserAuthGuard)
   @Put('users/:userId/cards/:cardId')
-  @ApiOperation({ summary: 'Update user card quantity' })
+  @ApiOperation({
+    summary: 'Set user card quantity (upsert)',
+    description:
+      'Makes the collection entry be exactly this quantity: creates it when ' +
+      'absent, removes it at 0. Idempotent by design — the desktop app queues ' +
+      'these while offline and replays them at least once.',
+  })
   @ApiParam({ name: 'userId', description: 'User ID', example: 'user123' })
   @ApiParam({ name: 'cardId', description: 'Card ID', example: 'tcgp-A1-001' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'User card quantity updated successfully.',
+    description: 'User card quantity set successfully.',
     type: SuccessResponse,
   })
   @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: 'User does not own this card.',
+    status: HttpStatus.BAD_REQUEST,
+    description: 'The card does not exist.',
   })
   async updateUserCardQuantity(
     @Param('userId') _userId: number,
@@ -494,7 +651,7 @@ export class TcgController {
     );
   }
 
-  @RequireSession()
+  @UseGuards(DesktopOrUserAuthGuard)
   @Delete('users/:userId/cards/:cardId')
   @ApiOperation({ summary: 'Remove card from user collection' })
   @ApiParam({ name: 'userId', description: 'User ID', example: 'user123' })
@@ -516,7 +673,7 @@ export class TcgController {
     return this.tcgFacade.removeUserCard(user.userId, cardId);
   }
 
-  @RequireSession()
+  @UseGuards(DesktopOrUserAuthGuard)
   @Get('users/:userId/cards/history')
   @ApiOperation({ summary: 'Get user card history' })
   @ApiParam({ name: 'userId', description: 'User ID (ignored, uses authenticated user)', example: 'user123' })

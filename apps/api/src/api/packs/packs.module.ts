@@ -7,6 +7,7 @@ import { RandomizerPackLinkModule } from '@api/_repositories/randomizer/pack-lin
 import { UploadModule } from '@api/boffmedia/util/upload/upload.module';
 import { DesktopAdminGuard } from './guards/desktop-admin.guard';
 import { DesktopAuthGuard } from './guards/desktop-auth.guard';
+import { DesktopOrUserAuthGuard } from './guards/desktop-or-user-auth.guard';
 import { DesktopAuthController } from './desktop-auth.controller';
 import { LauncherController } from './launcher.controller';
 import { DesktopDeviceRepository } from './desktop-device.repository';
@@ -60,11 +61,14 @@ import { AuditService } from '@api/_repositories/audit.service';
     DesktopAuthGuard,
     // Composes on DesktopAuthGuard, so both are providers here.
     DesktopAdminGuard,
+    // Tool routes the app writes to accept either credential.
+    DesktopOrUserAuthGuard,
   ],
   exports: [
     PacksService,
     PacksDownloadsService,
     DesktopAuthGuard,
+    DesktopOrUserAuthGuard,
     // A guard named in another module's @UseGuards() is instantiated in THAT
     // module's injector, so every dependency it has must be exported from here
     // too — exporting the guard alone is not enough. These two are the guard's

@@ -1,17 +1,19 @@
-// AUTO-EXTRACTED from apps/web/locales/{es,en}/tools/pmdsky/{common,dungeons}.json.
-// This package OWNS these keys — the web catalog does not carry them.
+// AUTO-EXTRACTED from apps/web/locales/{es,en}/tools/. This package OWNS these
+// keys — the web catalog does not carry them.
 //
-// Namespace: `tools.pmdsky.*`, matching the `tools.<tool>.*` convention
-// @boffmedia/tools-minecraft and @boffmedia/tools-mhwilds use. Shape is nested,
-// which is what both hosts want: next-intl in apps/web and
-// `useToolT("<namespace>")` in apps/desktop.
+//   tools.pmdsky.*    — from tools/pmdsky/{common,dungeons}.json
+//   tools.tcgpocket.* — from tools/tcgpocket/common.json
 //
-// The two source files merged into one tree: `common` carries the field labels
-// plus `questTypes.*` / `rewardTypes.*`, `dungeons` hangs its names off numeric
-// ids. They were only ever separate files so the web could scope the 204 dungeon
-// names to this route; a package catalog is loaded as one unit.
+// One file, and one plain object literal, deliberately: `scripts/check-i18n.mjs`
+// reads this catalog by slicing the text between the assignment and `as const`
+// and running it through JSON.parse, so it can verify key parity without
+// executing TypeScript. A catalog assembled from parts at runtime type-checks
+// and then makes that check crash — which is why this is one file rather than
+// one per tool.
 //
-// The `manifest.*` block carries the registry's per-tool title and description.
+// Both tools' `manifest.*` blocks carry their registry title and description,
+// and TCG Pocket's `app.coleccion.*` gained the strings the offline-first
+// collection needs (a queued save, a rejected sync, the local-only banner).
 //
 // Spanish is the source of truth; English is the translation.
 
@@ -380,6 +382,277 @@ export const messages = {
           "category": "Generador",
           "description": "Crea correos secretos y misiones para Pokémon Mundo Misterioso: Exploradores del Cielo."
         }
+      },
+      "tcgpocket": {
+        "loading": "Cargando...",
+        "geneticapex": "Genes Formidables",
+        "promo-a": "Promo A",
+        "mythicalisland": "Isla Singular",
+        "space-timesmackdown": "Pugna Espaciotemporal",
+        "triumphantlight": "Luz Triunfal",
+        "shiningrevelry": "Festival Brillante",
+        "packs": {
+          "mewtwo": "Mewtwo - Genes Formidables",
+          "charizard": "Charizard - Genes Formidables",
+          "pikachu": "Pikachu - Genes Formidables",
+          "mew": "Mew - Isla Singular",
+          "dialga": "Dialga - Pugna Espaciotemporal",
+          "palkia": "Palkia - Pugna Espaciotemporal",
+          "arceus": "Arceus - Luz Triunfal"
+        },
+        "item": {
+          "xp": "XP",
+          "packhourglass": "Reloj de Arena de Sobres",
+          "wonderhourglass": "Reloj de Arena mágico",
+          "shopticket": "Cupón de Tienda",
+          "shinedust": "Polvo Iris"
+        },
+        "mewQuest": "Mew Inmersivo",
+        "heroAlt": "Pokémon TCG Pocket",
+        "logoAlt": "Logo de TCG Pocket",
+        "heading": {
+          "title": "Herramientas para",
+          "highlight": "TCG Pocket",
+          "subtitle": "Explora tu colección, consulta todas las cartas y optimiza tus combates"
+        },
+        "quickSearch": {
+          "title": "Consulta rápida",
+          "description": "Ingresa un nombre de usuario para ver su galería de cartas",
+          "placeholder": "Nombre de usuario",
+          "searchButton": "Buscar"
+        },
+        "viewGallery": {
+          "title": "Ver Galería",
+          "description": "Explora tu colección de cartas"
+        },
+        "cardsList": {
+          "title": "Lista de Cartas",
+          "description": "Navega por todas las cartas disponibles",
+          "pageTitle": "Todas las Cartas",
+          "noResults": "No se encontraron cartas que coincidan con la búsqueda."
+        },
+        "battles": {
+          "title": "Combates individuales",
+          "description": "Comprueba los equipos y recompensas"
+        },
+        "common": {
+          "access": "Acceder"
+        },
+        "types": {
+          "grass": "Planta",
+          "fire": "Fuego",
+          "water": "Agua",
+          "lightning": "Eléctrico",
+          "psychic": "Psíquico",
+          "fighting": "Lucha",
+          "darkness": "Oscuridad",
+          "metal": "Metal",
+          "dragon": "Dragón",
+          "colorless": "Incoloro"
+        },
+        "cardDetail": {
+          "loading": "Cargando...",
+          "number": "Número",
+          "expansion": "Expansión",
+          "rarity": "Rareza",
+          "type": "Tipo",
+          "hp": "PS",
+          "weakness": "Debilidad",
+          "retreatCost": "Coste de Retirada"
+        },
+        "gallery": {
+          "notFound": {
+            "title": "Galería no encontrada",
+            "description": "Esta galería no existe o todavía no tiene cartas."
+          },
+          "recentCards": "Cartas Recientes",
+          "noCards": "No se encontraron cartas.",
+          "saveChanges": "Guardar Cambios",
+          "unknownCard": "Carta Desconocida",
+          "errors": {
+            "recentUpdates": "No se pudieron obtener las actualizaciones recientes. Inténtalo de nuevo más tarde.",
+            "bestPack": "No se pudo obtener el mejor pack. Por favor, intenta de nuevo."
+          },
+          "header": {
+            "title": "Galería de {username}",
+            "cardCount": "{count} cartas en la colección"
+          },
+          "options": {
+            "hideMissing": "Ocultar cartas faltantes",
+            "showAmounts": "Mostrar cantidades",
+            "selectEvent": "Seleccionar evento",
+            "allCards": "Todas las cartas",
+            "bestPack": "Recomendar Mejor Sobre"
+          },
+          "recentUpdates": {
+            "title": "Actualizaciones Recientes",
+            "noUpdates": "No hay actualizaciones recientes",
+            "loadMore": "Cargar Más"
+          }
+        },
+        "filter": {
+          "searchPlaceholder": "Buscar cartas por nombre o número",
+          "expansionPlaceholder": "Filtrar por expansión",
+          "allExpansions": "Todas las expansiones"
+        },
+        "bestPack": {
+          "dialogTitle": "Probabilidades de Nuevas Cartas por Pack",
+          "bestPackGeneral": "El mejor sobre para obtener nuevas cartas es: {packName}",
+          "bestPackEvent": "El mejor sobre para obtener nuevas cartas de '{eventName}' es: {packName}",
+          "missingCardsCount": "Cartas faltantes: {missing} de {total}",
+          "missingCardsList": "Lista de cartas faltantes:",
+          "availableIn": "Disponible en:",
+          "table": {
+            "packName": "Nombre del Sobre",
+            "card": "Carta {number}",
+            "total": "Total"
+          }
+        },
+        "app": {
+          "tagline": "Colección · Meta · Sobres",
+          "searchCards": "Buscar carta…",
+          "showing": "Mostrando {shown} de {total} cartas",
+          "clearFilters": "Limpiar filtros",
+          "loadMore": "Cargar más ({n} restantes)",
+          "ownedOnly": "Solo mías",
+          "errorTitle": "No se pudo cargar",
+          "errorLead": "No pudimos cargar la base de datos de cartas. Inténtalo de nuevo más tarde.",
+          "empty": {
+            "title": "Sin resultados",
+            "lead": "Prueba con otro término o quita algún filtro."
+          },
+          "tabs": {
+            "panel": "Panel",
+            "cartas": "Cartas",
+            "coleccion": "Colección",
+            "sobres": "Sobres"
+          },
+          "filters": {
+            "expansion": "Expansión",
+            "allSets": "Todas las expansiones",
+            "category": "Categoría",
+            "allCategories": "Todas las categorías"
+          },
+          "category": {
+            "pokemon": "Pokémon",
+            "trainer": "Entrenador",
+            "supporter": "Partidario",
+            "item": "Objeto",
+            "energy": "Energía"
+          },
+          "stage": {
+            "basic": "Básica",
+            "stage1": "Fase 1",
+            "stage2": "Fase 2"
+          },
+          "sort": {
+            "label": "Orden",
+            "num": "Número",
+            "name": "Nombre",
+            "rarity": "Rareza",
+            "hp": "PS"
+          },
+          "cartas": {
+            "title": "Lista de cartas",
+            "lead": "Base de datos completa · {cards} cartas en {sets} expansiones."
+          },
+          "panel": {
+            "collection": "Colección",
+            "lead": "Explora cada expansión, sigue tu colección carta a carta, calcula qué sobre te conviene abrir y consulta galerías de otros jugadores. Todo en un solo panel.",
+            "exploreCards": "Explorar cartas",
+            "myCollection": "Mi colección",
+            "openPacks": "Ver sobres",
+            "owned": "Poseídas",
+            "ofTotal": "de {total} cartas",
+            "expansions": "Expansiones",
+            "activeSets": "series activas",
+            "exCards": "Cartas ex",
+            "specialArt": "ilustraciones especiales",
+            "crowns": "Coronas",
+            "maxRarity": "máxima rareza",
+            "dupes": "Repetidas",
+            "forTrade": "para intercambio",
+            "progressBySet": "Progreso por expansión",
+            "viewCollection": "Ver colección",
+            "playerGallery": "Galería de jugador",
+            "galleryHint": "Consulta la colección pública de cualquier jugador de la comunidad.",
+            "usernamePlaceholder": "Nombre de usuario…",
+            "view": "Ver",
+            "recentActivity": "Actividad reciente",
+            "loginForActivity": "Inicia sesión para seguir tu actividad.",
+            "noActivity": "Sin movimientos todavía."
+          },
+          "coleccion": {
+            "myTitle": "Mi colección",
+            "galleryTitle": "Galería · {user}",
+            "summary": "{have} de {total} cartas · {pct}% completado · {dupes} repetidas.",
+            "viewingGallery": "Viendo la galería de {user}",
+            "readOnly": "Solo lectura.",
+            "backToMine": "Volver a la mía",
+            "searchPlaceholder": "Buscar en la colección…",
+            "hideMissing": "Ocultar faltantes",
+            "loginTitle": "Inicia sesión",
+            "loginLead": "Accede para seguir tu colección carta a carta y guardar tus cambios.",
+            "login": "Iniciar sesión",
+            "unsaved": "{count, plural, one {cambio sin guardar} other {cambios sin guardar}}",
+            "discard": "Descartar",
+            "saveChanges": "Guardar cambios",
+            "saving": "Guardando…",
+            "saveSuccess": "Cambios guardados",
+            "saveError": "No se pudieron guardar los cambios",
+            "bestPack": "Analizador de sobres",
+            "bestPackHint": "Según tu colección, calculamos el sobre con más probabilidad de darte una carta que aún no tienes.",
+            "analyze": "Analizar",
+            "analyzing": "Analizando…",
+            "bestPackEmpty": "No hay datos suficientes para analizar los sobres.",
+            "newCardOdds": "{odds} de carta nueva por sobre.",
+            "pack": "Sobre",
+            "new": "Nueva",
+            "best": "Mejor",
+            "slot": "{n}.ª",
+            "saveQueued": "Guardado en este dispositivo. Se sincronizará cuando vuelva la conexión.",
+            "syncRejected": "El servidor rechazó un cambio: {detail}",
+            "localTitle": "Tu colección, en este dispositivo",
+            "localLead": "Puedes usarla sin cuenta. Inicia sesión con Boffmedia para sincronizarla y verla desde cualquier sitio.",
+            "localSignIn": "Iniciar sesión",
+            "pendingSync": "{count, plural, one {# cambio sin sincronizar} other {# cambios sin sincronizar}}"
+          },
+          "sobres": {
+            "title": "Sobres",
+            "lead": "Cada expansión reparte sus cartas en uno o varios sobres. Ábrelos para ver qué cartas contienen.",
+            "cardCount": "{count} cartas",
+            "packCards": "Cartas del sobre",
+            "noPackCards": "Este sobre no tiene cartas registradas.",
+            "noPacks": "Sin sobres registrados para esta expansión.",
+            "tileAria": "Sobre {name} · {setId}"
+          },
+          "combates": {
+            "title": "Combates",
+            "lead": "Los combates en solitario llegarán pronto, cuando su fuente de datos esté disponible.",
+            "back": "Volver al panel"
+          },
+          "drawer": {
+            "prev": "Anterior",
+            "next": "Siguiente",
+            "close": "Cerrar",
+            "inCollection": "en tu colección",
+            "owned": "en la colección",
+            "notOwned": "No la tienes",
+            "number": "Número",
+            "expansion": "Expansión",
+            "type": "Tipo",
+            "hp": "Puntos de salud",
+            "weakness": "Debilidad",
+            "retreat": "Coste de retirada",
+            "availableIn": "Disponible en",
+            "illustrator": "Ilustrador"
+          }
+        },
+        "manifest": {
+          "name": "TCG Pocket",
+          "category": "Colección",
+          "description": "Explora las cartas, sigue tu colección y descubre qué sobre te conviene abrir."
+        }
       }
     }
   },
@@ -746,6 +1019,277 @@ export const messages = {
           "name": "Wonder Mail Generator",
           "category": "Generator",
           "description": "Craft secret mail and missions for Pokémon Mystery Dungeon: Explorers of Sky."
+        }
+      },
+      "tcgpocket": {
+        "loading": "Loading...",
+        "geneticapex": "Genetic Apex",
+        "promo-a": "Promo A",
+        "mythicalisland": "Mythical Island",
+        "space-timesmackdown": "Space-Time Smackdown",
+        "triumphantlight": "Triumphant Light",
+        "shiningrevelry": "Shining Revelry",
+        "packs": {
+          "mewtwo": "Mewtwo - Genetic Apex",
+          "charizard": "Charizard - Genetic Apex",
+          "pikachu": "Pikachu - Genetic Apex",
+          "mew": "Mew - Mythical Island",
+          "dialga": "Dialga - Space-Time Smackdown",
+          "palkia": "Palkia - Space-Time Smackdown",
+          "arceus": "Arceus - Triumphant Light"
+        },
+        "item": {
+          "xp": "XP",
+          "packhourglass": "Pack Hourglass",
+          "wonderhourglass": "Wonder Hourglass",
+          "shopticket": "Shop Ticket",
+          "shinedust": "Shinedust"
+        },
+        "mewQuest": "Immersive Mew",
+        "heroAlt": "Pokémon TCG Pocket",
+        "logoAlt": "TCG Pocket Logo",
+        "heading": {
+          "title": "Tools for",
+          "highlight": "TCG Pocket",
+          "subtitle": "Explore your collection, check all cards and optimize your battles"
+        },
+        "quickSearch": {
+          "title": "Quick Search",
+          "description": "Enter a username to see their card gallery",
+          "placeholder": "Username",
+          "searchButton": "Search"
+        },
+        "viewGallery": {
+          "title": "View Gallery",
+          "description": "Explore your card collection"
+        },
+        "cardsList": {
+          "title": "Card List",
+          "description": "Browse all available cards",
+          "pageTitle": "All Cards",
+          "noResults": "No cards found matching your search criteria."
+        },
+        "battles": {
+          "title": "Individual Battles",
+          "description": "Check teams and rewards"
+        },
+        "common": {
+          "access": "Access"
+        },
+        "types": {
+          "grass": "Grass",
+          "fire": "Fire",
+          "water": "Water",
+          "lightning": "Lightning",
+          "psychic": "Psychic",
+          "fighting": "Fighting",
+          "darkness": "Darkness",
+          "metal": "Metal",
+          "dragon": "Dragon",
+          "colorless": "Colorless"
+        },
+        "cardDetail": {
+          "loading": "Loading...",
+          "number": "Number",
+          "expansion": "Expansion",
+          "rarity": "Rarity",
+          "type": "Type",
+          "hp": "HP",
+          "weakness": "Weakness",
+          "retreatCost": "Retreat Cost"
+        },
+        "gallery": {
+          "notFound": {
+            "title": "Gallery not found",
+            "description": "This gallery doesn't exist or doesn't have any cards yet."
+          },
+          "recentCards": "Recent Cards",
+          "noCards": "No cards found.",
+          "saveChanges": "Save Changes",
+          "unknownCard": "Unknown Card",
+          "errors": {
+            "recentUpdates": "Failed to fetch recent updates. Please try again later.",
+            "bestPack": "Couldn't get the best pack. Please try again."
+          },
+          "header": {
+            "title": "{username}'s Gallery",
+            "cardCount": "{count} cards in collection"
+          },
+          "options": {
+            "hideMissing": "Hide missing cards",
+            "showAmounts": "Show amounts",
+            "selectEvent": "Select event",
+            "allCards": "All cards",
+            "bestPack": "Recommend Best Pack"
+          },
+          "recentUpdates": {
+            "title": "Recent Updates",
+            "noUpdates": "No recent updates",
+            "loadMore": "Load More"
+          }
+        },
+        "filter": {
+          "searchPlaceholder": "Search cards by name or number",
+          "expansionPlaceholder": "Filter by expansion",
+          "allExpansions": "All expansions"
+        },
+        "bestPack": {
+          "dialogTitle": "New Card Probabilities by Pack",
+          "bestPackGeneral": "The best pack to get new cards is: {packName}",
+          "bestPackEvent": "The best pack to get new cards from '{eventName}' is: {packName}",
+          "missingCardsCount": "Missing cards: {missing} of {total}",
+          "missingCardsList": "List of missing cards:",
+          "availableIn": "Available in:",
+          "table": {
+            "packName": "Pack Name",
+            "card": "Card {number}",
+            "total": "Total"
+          }
+        },
+        "app": {
+          "tagline": "Collection · Meta · Packs",
+          "searchCards": "Search card…",
+          "showing": "Showing {shown} of {total} cards",
+          "clearFilters": "Clear filters",
+          "loadMore": "Load more ({n} left)",
+          "ownedOnly": "Owned only",
+          "errorTitle": "Couldn't load",
+          "errorLead": "We couldn't load the card database. Please try again later.",
+          "empty": {
+            "title": "No results",
+            "lead": "Try another term or remove a filter."
+          },
+          "tabs": {
+            "panel": "Panel",
+            "cartas": "Cards",
+            "coleccion": "Collection",
+            "sobres": "Packs"
+          },
+          "filters": {
+            "expansion": "Expansion",
+            "allSets": "All expansions",
+            "category": "Category",
+            "allCategories": "All categories"
+          },
+          "category": {
+            "pokemon": "Pokémon",
+            "trainer": "Trainer",
+            "supporter": "Supporter",
+            "item": "Item",
+            "energy": "Energy"
+          },
+          "stage": {
+            "basic": "Basic",
+            "stage1": "Stage 1",
+            "stage2": "Stage 2"
+          },
+          "sort": {
+            "label": "Sort",
+            "num": "Number",
+            "name": "Name",
+            "rarity": "Rarity",
+            "hp": "HP"
+          },
+          "cartas": {
+            "title": "Card list",
+            "lead": "Full database · {cards} cards across {sets} expansions."
+          },
+          "panel": {
+            "collection": "Collection",
+            "lead": "Explore every expansion, track your collection card by card, work out which pack is worth opening and browse other players' galleries. All in one panel.",
+            "exploreCards": "Explore cards",
+            "myCollection": "My collection",
+            "openPacks": "View packs",
+            "owned": "Owned",
+            "ofTotal": "of {total} cards",
+            "expansions": "Expansions",
+            "activeSets": "active sets",
+            "exCards": "ex cards",
+            "specialArt": "special art",
+            "crowns": "Crowns",
+            "maxRarity": "highest rarity",
+            "dupes": "Duplicates",
+            "forTrade": "for trading",
+            "progressBySet": "Progress by expansion",
+            "viewCollection": "View collection",
+            "playerGallery": "Player gallery",
+            "galleryHint": "Look up any community player's public collection.",
+            "usernamePlaceholder": "Username…",
+            "view": "View",
+            "recentActivity": "Recent activity",
+            "loginForActivity": "Sign in to track your activity.",
+            "noActivity": "No changes yet."
+          },
+          "coleccion": {
+            "myTitle": "My collection",
+            "galleryTitle": "Gallery · {user}",
+            "summary": "{have} of {total} cards · {pct}% complete · {dupes} duplicates.",
+            "viewingGallery": "Viewing {user}'s gallery",
+            "readOnly": "Read only.",
+            "backToMine": "Back to mine",
+            "searchPlaceholder": "Search the collection…",
+            "hideMissing": "Hide missing",
+            "loginTitle": "Sign in",
+            "loginLead": "Sign in to track your collection card by card and save your changes.",
+            "login": "Sign in",
+            "unsaved": "{count, plural, one {unsaved change} other {unsaved changes}}",
+            "discard": "Discard",
+            "saveChanges": "Save changes",
+            "saving": "Saving…",
+            "saveSuccess": "Changes saved",
+            "saveError": "Could not save changes",
+            "bestPack": "Pack analyzer",
+            "bestPackHint": "Based on your collection, we work out the pack most likely to give you a card you don't own yet.",
+            "analyze": "Analyze",
+            "analyzing": "Analyzing…",
+            "bestPackEmpty": "Not enough data to analyze the packs.",
+            "newCardOdds": "{odds} for a new card per pack.",
+            "pack": "Pack",
+            "new": "New",
+            "best": "Best",
+            "slot": "{n}",
+            "saveQueued": "Saved on this device. It will sync when you are back online.",
+            "syncRejected": "The server refused a change: {detail}",
+            "localTitle": "Your collection, on this device",
+            "localLead": "You can use it with no account. Sign in with Boffmedia to sync it and see it anywhere.",
+            "localSignIn": "Sign in",
+            "pendingSync": "{count, plural, one {# change not synced} other {# changes not synced}}"
+          },
+          "sobres": {
+            "title": "Packs",
+            "lead": "Each expansion splits its cards across one or more packs. Open them to see what they contain.",
+            "cardCount": "{count} cards",
+            "packCards": "Pack cards",
+            "noPackCards": "This pack has no registered cards.",
+            "noPacks": "No packs registered for this expansion.",
+            "tileAria": "Pack {name} · {setId}"
+          },
+          "combates": {
+            "title": "Battles",
+            "lead": "Solo battles are coming soon, once their data source is available.",
+            "back": "Back to panel"
+          },
+          "drawer": {
+            "prev": "Previous",
+            "next": "Next",
+            "close": "Close",
+            "inCollection": "in your collection",
+            "owned": "in collection",
+            "notOwned": "Not owned",
+            "number": "Number",
+            "expansion": "Expansion",
+            "type": "Type",
+            "hp": "Hit points",
+            "weakness": "Weakness",
+            "retreat": "Retreat cost",
+            "availableIn": "Available in",
+            "illustrator": "Illustrator"
+          }
+        },
+        "manifest": {
+          "name": "TCG Pocket",
+          "category": "Collection",
+          "description": "Browse the cards, track your collection and see which pack is worth opening."
         }
       }
     }

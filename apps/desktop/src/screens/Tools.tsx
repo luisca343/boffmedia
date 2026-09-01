@@ -1,5 +1,6 @@
 import { Suspense, useMemo, useState, type CSSProperties } from "react"
 import {
+  Banner,
   Empty,
   hueColorOf,
   isIconName,
@@ -13,7 +14,13 @@ import {
   type IconName,
   type ToolCardData,
 } from "@boffmedia/ui"
-import { getTool, listTools, type ToolDomain, type ToolManifest } from "@boffmedia/tool-kit"
+import {
+  getTool,
+  listTools,
+  useToolOnline,
+  type ToolDomain,
+  type ToolManifest,
+} from "@boffmedia/tool-kit"
 
 import { useT } from "../i18n"
 import { TOOL_DOMAIN_META, TOOL_DOMAIN_ORDER } from "../data/toolDomains"
@@ -149,6 +156,7 @@ export function ToolView() {
   const t = useT("tools")
   const tRoot = useT()
   const { selectedToolId, go } = useApp()
+  const online = useToolOnline()
   const tool = selectedToolId ? getTool(selectedToolId) : undefined
 
   if (!tool) {
@@ -175,6 +183,20 @@ export function ToolView() {
         onBack={() => go("tools")}
         title={tRoot(tool.titleKey)}
       />
+      {/* Said HERE and only for tools that need the server, which is why it is
+          not the shell's `OfflineNotice`: that one is about the pack library
+          and is deliberately suppressed outside Play. A tool with no `api`
+          capability (the schematic pair, PMD Sky) is unaffected by an outage
+          and must not be told it is broken.
+
+          Above the tool rather than instead of it: whatever the tool already
+          has on screen still works, and replacing it with an error would throw
+          away state the player can still use. */}
+      {!online && (tool.requiredCapabilities ?? []).includes("api") && (
+        <Banner tone="warn" icon="alert" title={t("offlineTitle")} className="m-4 mb-0">
+          {t("offlineBody")}
+        </Banner>
+      )}
       {/* The manifest's `layout` decides this, and it is not cosmetic.
           `viewport` tools (the schematic pair) fill a bounded box and scroll
           their own panes, so an auto-scrolling parent would let them size to

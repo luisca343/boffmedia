@@ -37,6 +37,8 @@ pub mod randomizer;
 pub mod server_pack;
 pub mod settings;
 pub mod tool_api;
+pub mod tool_assets;
+pub mod tool_db;
 pub mod worlds;
 pub mod status;
 pub mod updates;
@@ -84,6 +86,11 @@ pub fn run() {
         .plugin(tauri_plugin_updater::Builder::new().build())
         // RF-06/RF-07 file pickers for local pack export/import.
         .plugin(tauri_plugin_dialog::init())
+        // The shared asset tree, cached on disk and served to the renderer.
+        // NOT the asset protocol icons.rs warns about — a registered scheme has
+        // no scope to keep aligned with the data root, which is the alignment
+        // that silently broke twice. See tool_assets.rs.
+        .register_asynchronous_uri_scheme_protocol(tool_assets::SCHEME, tool_assets::handle)
         .setup(|app| {
             // Before anything reads the tree: bring an install up to the
             // current layout under `%APPDATA%\Boffmedia[ Dev]`, flattening
@@ -93,6 +100,11 @@ pub fn run() {
             // Icons need no setup here: icon_cache returns data: URLs, so
             // there is no asset-protocol scope to align with the custom data
             // root (an alignment that silently broke twice — see icons.rs).
+            //
+            // The tool asset cache does need one thing: sweeps otherwise only
+            // happen on a write, so a cache left over the cap by a session that
+            // then wrote nothing would stay over it forever.
+            tool_assets::sweep_on_startup(&handle);
             Ok(())
         })
         .manage(updates::UpdateState::default())
@@ -100,6 +112,7 @@ pub fn run() {
         .manage(api::ApiState::default())
         .manage(install::InstallManager::default())
         .manage(dialogs::SaveSessions::default())
+        .manage(tool_db::DbState::default())
         .invoke_handler(tauri::generate_handler![
             runtime_info,
             auth::auth_begin,
@@ -112,6 +125,14 @@ pub fn run() {
             auth::auth_remove,
             auth::auth_open_verification,
             auth::open_url,
+            tool_db::tool_db_get,
+            tool_db::tool_db_put,
+            tool_db::tool_db_remove,
+            tool_db::tool_db_list,
+            tool_db::tool_db_clear,
+            tool_db::tool_outbox_enqueue,
+            tool_db::tool_outbox_pending,
+            tool_db::tool_outbox_flush,
             api::boff_device_start,
             api::boff_device_poll,
             api::boff_device_cancel,

@@ -1,16 +1,11 @@
 "use client"
 
 import { useCallback, useState } from "react"
-import { boffPOST } from "@/services/boffAPI"
+import { TcgpService, type BestPackResult, type PackProbabilities } from "./service"
 
-export interface PackProbabilities {
-  newCardProbabilities: number[]
-  aggregateProbability: number
-}
-export interface BestPackResult {
-  bestPack?: { name?: string }
-  allPackProbabilities: Record<string, PackProbabilities>
-}
+// Both shapes are the API's, so they are declared beside the call in
+// `service.ts` and re-exported here for the views that read them.
+export type { BestPackResult, PackProbabilities }
 
 export interface OddsRow {
   pack: string
@@ -32,7 +27,7 @@ export function useBestPack(username: string | null | undefined) {
     setLoading(true)
     setError(null)
     try {
-      const res = await boffPOST<BestPackResult>("/herramientas/ptcgp/best-pack", { username })
+      const res = await TcgpService.getBestPack(username)
       const data = res?.data
       if (!data?.allPackProbabilities) {
         setError(res?.message || "no-data")

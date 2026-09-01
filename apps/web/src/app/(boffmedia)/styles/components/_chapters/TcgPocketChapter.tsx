@@ -10,7 +10,7 @@ import {
   TcgSetProgress,
   TcgStatTile,
   TcgTypePip,
-} from "@/app/(boffmedia)/(herramientas)/pokemon/tcgpocket/_components/tcgp-kit"
+} from "@boffmedia/tools-pokemon"
 import { DEMO_CARDS, DEMO_ODDS } from "./tcgpocket-demo"
 
 const TYPES: [string, string][] = [

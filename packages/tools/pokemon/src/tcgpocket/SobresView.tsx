@@ -1,12 +1,13 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { useTranslations } from "next-intl"
+
 import { Button, Panel, Empty } from "@boffmedia/ui"
-import type { TcgCard } from "@boffmedia/shared"
-import type { TcgpData, TcgpSet } from "../_lib/useTcgpCards"
-import { typeColor } from "../_lib/tcgp-maps"
+import type { TcgCard } from "./service"
+import type { TcgpData, TcgpSet } from "./useTcgpCards"
+import { typeColor } from "./tcgp-maps"
 import { TcgPackTile, TcgCardGrid } from "./tcgp-kit"
+import { TCGP_NS, useToolT } from "../i18n"
 
 interface Props {
   data: TcgpData
@@ -24,7 +25,7 @@ function PackDetail({ set, pack, effective, onBack, onOpenCard }: {
   onBack: () => void
   onOpenCard: (card: TcgCard, list: TcgCard[]) => void
 }) {
-  const t = useTranslations("tcgpocket")
+  const t = useToolT(TCGP_NS)
   const cards = useMemo(() => set.cards.filter((c) => (c.boosters || []).some((b) => b.name === pack)), [set.cards, pack])
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
@@ -52,7 +53,7 @@ function PackDetail({ set, pack, effective, onBack, onOpenCard }: {
 }
 
 export function SobresView({ data, effective, initialSetId, onOpenCard }: Props) {
-  const t = useTranslations("tcgpocket")
+  const t = useToolT(TCGP_NS)
   const [sel, setSel] = useState<{ setId: string; pack: string } | null>(null)
 
   const sets = initialSetId ? data.sets.filter((s) => s.id === initialSetId) : data.sets

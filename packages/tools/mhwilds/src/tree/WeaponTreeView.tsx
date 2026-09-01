@@ -6,7 +6,8 @@ import { Button, Chip, Empty, Icon, Select, Spinner, ToolTitle } from "@boffmedi
 import { useWeaponTreeData } from "./useWeaponTreeData"
 import {
   MhApp, MhBar, MhBarSide, MhBody, MhWrap, MhSeal, MhModes, MhSrc, MhSearch,
-  MhTypeChip, MhNodeCard, MhDrawer, MhRarity, MhStat3, MhElement, MhMaterial, MhLabel, MhMeter,
+  MhTypeChip, MhNodeCard, MhDrawer, MhRarity, MhStat3, MhElement, MhMaterial, MhLabel, MhLoadError,
+  MhMeter,
 } from "../ui/mh-kit"
 import { WEAPON_TYPES, weaponAttack, firstSpecial, elementColor } from "../ui/mh-helpers"
 
@@ -207,9 +208,9 @@ export function WeaponTreeView() {
     return (
       <MhApp>
         <div className="flex-1 grid place-items-center">
-          <Empty icon="alert" title={t("tree.loadError")} lead={error}>
+          <MhLoadError title={t("tree.loadError")} detail={error}>
             <Button size="sm" variant="pri" icon="refresh" onClick={() => refreshData()}>{t("build_planner.retry")}</Button>
-          </Empty>
+          </MhLoadError>
         </div>
       </MhApp>
     )

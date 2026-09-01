@@ -53,7 +53,7 @@ pub struct ToolApiRequest {
 /// confused deputy. Tools are first-party code, so this is a guard rail rather
 /// than a defence against a live attacker, but the check costs nothing and the
 /// alternative fails silently and badly.
-fn normalize_path(path: &str) -> Result<String, ApiError> {
+pub(crate) fn normalize_path(path: &str) -> Result<String, ApiError> {
     let trimmed = path.trim();
     if !trimmed.starts_with('/') {
         return Err(ApiError::Message(format!(
@@ -70,7 +70,7 @@ fn normalize_path(path: &str) -> Result<String, ApiError> {
     Ok(trimmed.to_string())
 }
 
-fn parse_method(method: Option<&str>) -> Result<reqwest::Method, ApiError> {
+pub(crate) fn parse_method(method: Option<&str>) -> Result<reqwest::Method, ApiError> {
     match method.unwrap_or("GET").to_ascii_uppercase().as_str() {
         "GET" => Ok(reqwest::Method::GET),
         "POST" => Ok(reqwest::Method::POST),

@@ -9,6 +9,7 @@ import { TcgErrorService } from './tcg-error.service';
 import { TcgConfigService } from './tcg-config.service';
 import { Logger } from 'nestjs-pino';
 import { publicPath } from '@/config/paths';
+import { ASSET } from '@boffmedia/asset-paths';
 
 @Injectable()
 export class TcgFetchService {
@@ -231,7 +232,23 @@ export class TcgFetchService {
     }
   }
 
-  async fetchAndMergeCardsForSet(setId: string): Promise<any[]> {
+  /**
+   * Full card data for one set, both locales merged.
+   *
+   * `withImages` defaults to true so the legacy "fetch everything" endpoints keep
+   * behaving as they always did, but the selective sync passes `false`: artwork is
+   * its own stage there, so an admin can refresh card text without re-pulling
+   * hundreds of megabytes of images. `onCard` reports progress per card so the
+   * stream can show which card a long set is on.
+   */
+  async fetchAndMergeCardsForSet(
+    setId: string,
+    opts: {
+      withImages?: boolean;
+      onCard?: (done: number, total: number, cardId: string) => void;
+    } = {},
+  ): Promise<any[]> {
+    const withImages = opts.withImages !== false;
     try {
       this.errorService.validateSetId(setId);
 
@@ -332,21 +349,23 @@ export class TcgFetchService {
           }
         }
 
-        // Download images immediately after fetching card data
-        const [imageLocalEn, imageLocalEs] = await Promise.all([
-          this.downloadCardImage(
-            { image: enCard.image },
-            brief.id,
-            setId,
-            'en',
-          ),
-          this.downloadCardImage(
-            { image: esCard?.image },
-            brief.id,
-            setId,
-            'es',
-          ),
-        ]);
+        // Artwork only when this call owns it (see `withImages` above).
+        const [imageLocalEn, imageLocalEs] = withImages
+          ? await Promise.all([
+              this.downloadCardImage(
+                { image: enCard.image },
+                brief.id,
+                setId,
+                'en',
+              ),
+              this.downloadCardImage(
+                { image: esCard?.image },
+                brief.id,
+                setId,
+                'es',
+              ),
+            ])
+          : [null, null];
 
         // Merge card data with local image paths
         const merged = {
@@ -377,6 +396,7 @@ export class TcgFetchService {
         };
 
         mergedCards.push(merged);
+        opts.onCard?.(i + 1, mergedBriefs.length, brief.id);
 
         // Rate limit: wait 250ms between requests
         await new Promise((res) => setTimeout(res, 250));
@@ -392,6 +412,45 @@ export class TcgFetchService {
       }
       this.errorService.handleApiError(error, 'Fetch and merge cards for set');
     }
+  }
+
+  /**
+   * Remote artwork base URLs for every card of a set, per locale.
+   *
+   * The card rows only keep the LOCAL path, so the images stage cannot know
+   * where to re-download from. One brief request per locale answers it for the
+   * whole set — far cheaper than re-fetching each card's detail endpoint.
+   */
+  async fetchCardImageUrlsForSet(
+    setId: string,
+  ): Promise<Map<string, { en: string | null; es: string | null }>> {
+    this.errorService.validateSetId(setId);
+    const urls = new Map<string, { en: string | null; es: string | null }>();
+
+    const enRes = await firstValueFrom(
+      this.httpService.get(this.configService.getSetUrl('en', setId)),
+    );
+    for (const card of enRes.data.cards || []) {
+      urls.set(card.id, { en: card.image ?? null, es: null });
+    }
+
+    try {
+      const esRes = await firstValueFrom(
+        this.httpService.get(this.configService.getSetUrl('es', setId)),
+      );
+      for (const card of esRes.data.cards || []) {
+        const entry = urls.get(card.id);
+        if (entry) entry.es = card.image ?? null;
+        else urls.set(card.id, { en: null, es: card.image ?? null });
+      }
+    } catch (esError) {
+      if ((esError as any).response?.status !== 404) throw esError;
+      this.logger.warn(
+        `[TCG] ES locale not available for set ${setId}, images will be EN only`,
+      );
+    }
+
+    return urls;
   }
 
   // Add this helper method to the TcgFetchService class
@@ -424,7 +483,7 @@ export class TcgFetchService {
       });
       await fs.writeFile(imageFilename, response.data);
 
-      return `/img/games/tcg/cards/${setId}/${cardId}_${locale}.webp`;
+      return `${ASSET.boffmedia.tools.tcg}/cards/${setId}/${cardId}_${locale}.webp`;
     } catch (err: any) {
       this.logger.warn(
         `[TCG] Failed to download ${locale} image for card ${cardId}:`,

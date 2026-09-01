@@ -1,9 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useLocale } from "next-intl"
-import { PtcgpService } from "@/services/api/boffmedia/ptcgpService"
-import type { TcgCard } from "@boffmedia/shared"
+import { useLocale } from "../i18n"
+import { TcgpService, type TcgCard } from "./service"
 
 const SERIES = "tcgp"
 
@@ -37,7 +36,8 @@ function derivePacks(cards: TcgCard[]): { id: string; name: string }[] {
 }
 
 async function load(locale: string): Promise<TcgpData> {
-  const res = await PtcgpService.getAllCardsForSeriesGrouped(SERIES, locale)
+  const res = await TcgpService.getGroupedCards(SERIES, locale)
+  if (!res.success) throw new Error(res.userMessage ?? res.error ?? "tcgp: cards unavailable")
   const groups = (res.data || []).filter(Boolean)
 
   const sets: TcgpSet[] = groups.map((g) => {

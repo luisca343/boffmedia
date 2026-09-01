@@ -13,7 +13,7 @@
  * React/UI dependency.
  */
 
-import { useRootT, type Translate } from "@boffmedia/ui/i18n";
+import { useRootT, useUiLocale, type Translate } from "@boffmedia/ui/i18n";
 
 export function useToolT(namespace: string): Translate {
   // `useRootT`, not `useT`: the latter is bound to `common.primitives`, which
@@ -23,5 +23,27 @@ export function useToolT(namespace: string): Translate {
     t(`${namespace}.${key}`, values);
 }
 
+/** The host's active locale ("es" / "en"). Used as an API query param and to
+ *  pick which language's card art to ask for. */
+export function useLocale(): string {
+  return useUiLocale();
+}
+
 /** Message-key namespaces owned by this package. */
 export const PMDSKY_NS = "tools.pmdsky";
+export const TCGP_NS = "tools.tcgpocket";
+
+/**
+ * A translation for a key that may simply not exist — booster names, which come
+ * from the API and are only partly covered by the catalog.
+ *
+ * next-intl's translator answers `t.has(key)` for this; the host-agnostic one
+ * does not, and adding it would put a second method into a seam whose whole
+ * value is being one function. Both hosts return the full dotted KEY when they
+ * cannot resolve one (apps/desktop's `resolve`, next-intl's own behaviour), so
+ * that is what "missing" is detected by.
+ */
+export function optionalT(t: Translate, key: string, fallback: string): string {
+  const value = t(key);
+  return value === key || value.endsWith(`.${key}`) ? fallback : value;
+}

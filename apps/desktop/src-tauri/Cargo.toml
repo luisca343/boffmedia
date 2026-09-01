@@ -75,6 +75,11 @@ flate2 = "1"
 # RF-06/RF-07 file pickers (export destination, import source). No dialog
 # plugin existed before this feature.
 tauri-plugin-dialog = "2"
+# tool_db.rs — durable tool storage and the outbound write queue. `bundled`
+# compiles SQLite into the binary rather than trusting whatever the player's
+# machine happens to have (Windows ships none at all), which is the only way a
+# queued write is guaranteed to still be there after an update.
+rusqlite = { version = "0.32", features = ["bundled"] }
 # §6 file verification. portablemc's downloader only checks sha1, but every file
 # in a Boffmedia manifest carries a mandatory sha512 (packages/pack-schema), so
 # the pack payload is downloaded and verified by install/files.rs instead.

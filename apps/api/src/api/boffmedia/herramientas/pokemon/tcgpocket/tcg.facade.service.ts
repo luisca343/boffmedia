@@ -1,10 +1,26 @@
 import { Injectable } from '@nestjs/common';
 import { TcgService } from './services/tcg.service';
+import { TcgSyncService } from './services/tcg-sync.service';
+import { TcgSyncRequestDto } from './dto/tcg-sync.dto';
 import { AddUserCardDto, UpdateUserCardQuantityDto } from './dto/user-card.dto';
 
 @Injectable()
 export class TcgFacadeService {
-  constructor(private readonly tcgService: TcgService) {}
+  constructor(
+    private readonly tcgService: TcgService,
+    private readonly tcgSyncService: TcgSyncService,
+  ) {}
+
+  // ==================== SELECTIVE SYNC ====================
+
+  async getSyncStatus(seriesId?: string) {
+    return this.tcgSyncService.getStatus(seriesId);
+  }
+
+  runSync(dto: TcgSyncRequestDto, isCancelled: () => boolean) {
+    return this.tcgSyncService.run(dto, isCancelled);
+  }
+
   async getSetsForSeriesFromDb(seriesId: string) {
     return this.tcgService.getSetsForSeriesFromDb(seriesId);
   }

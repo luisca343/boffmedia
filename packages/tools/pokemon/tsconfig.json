@@ -13,6 +13,7 @@
     "resolveJsonModule": true,
     "paths": {
       "@boffmedia/asset-paths": ["../../asset-paths/src/index.ts"],
+      "@boffmedia/shared": ["../../shared/src/index.ts"],
       "@boffmedia/tool-kit": ["../kit/src/index.ts"],
       "@boffmedia/ui": ["../../ui/src/index.ts"],
       "@boffmedia/ui/*": ["../../ui/src/*"]

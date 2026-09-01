@@ -32,7 +32,9 @@ export const messages = {
         "weaponType": "Tipo de Arma",
         "app": {
           "source": "API · caché",
-          "loading": "Cargando"
+          "loading": "Cargando",
+          "offlineTitle": "Sin conexión",
+          "offlineLead": "Estos datos vienen de Boffmedia. Vuelve a abrir la herramienta cuando tengas conexión."
         },
         "tree": {
           "titlePrefix": "Árbol de",
@@ -494,7 +496,9 @@ export const messages = {
         "weaponType": "Weapon Type",
         "app": {
           "source": "API · cached",
-          "loading": "Loading"
+          "loading": "Loading",
+          "offlineTitle": "No connection",
+          "offlineLead": "This data comes from Boffmedia. Open the tool again once you are back online."
         },
         "tree": {
           "titlePrefix": "Weapon",

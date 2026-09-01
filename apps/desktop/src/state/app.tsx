@@ -4,6 +4,11 @@ import { toast } from "@boffmedia/ui";
 
 import { setLocale, translate } from "../i18n";
 import {
+  setToolBackendReachable,
+  setToolSessionAccount,
+  setToolSignIn,
+} from "../tool-host";
+import {
   MOCK_ACCOUNT,
   MOCK_DEVICE_CODE,
   MOCK_SETTINGS,
@@ -1011,6 +1016,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     return status;
   }, []);
 
+  // Sign-in here is the device flow, not a route, so the tools get the shell's
+  // own action rather than a URL.
+  React.useEffect(() => {
+    setToolSignIn(() => {
+      void boffSignIn();
+    });
+    return () => setToolSignIn(null);
+  }, [boffSignIn]);
+
+  // The tools get the same verdict. A tool cannot run this probe itself — it is
+  // the shell's, and it is unauthenticated precisely so it answers for everyone
+  // — so the result is published into the tool host, where `useToolOnline`
+  // reads it. "unknown"/"checking" count as reachable: a probe in flight is not
+  // evidence of an outage, and flashing an offline notice on every boot would
+  // train players to ignore it.
+  React.useEffect(() => {
+    setToolBackendReachable(
+      state.backendStatus !== "unreachable" && state.backendStatus !== "down",
+    );
+  }, [state.backendStatus]);
+
   // On boot, then on a cadence only while it is BAD. Polling a healthy server
   // every half minute forever would be traffic spent to learn nothing: a
   // server that goes down mid-session announces itself through the next real
@@ -1803,6 +1829,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     state.bootPacksDone
   );
   const hasSession = !!state.boffAccount || state.offline;
+
+  // The tools get the same account. Published rather than read, for the same
+  // reason the backend verdict is: the tool host is configured at import time
+  // and cannot reach a React context. `booting` maps to "loading" so a tool
+  // never paints its signed-out branch over a session still being restored from
+  // the credential store.
+  React.useEffect(() => {
+    const account = state.boffAccount;
+    setToolSessionAccount(
+      account
+        ? {
+            id: String(account.id),
+            name: account.username,
+            avatarUrl: account.avatarUrl ?? null,
+          }
+        : null,
+      booting,
+    );
+  }, [state.boffAccount, booting]);
+
 
   // The signed-out landing redirect to Tools is GONE. It existed for one
   // reason: Play was a sign-in wall, and dropping a player on a wall is worse

@@ -1,4 +1,4 @@
-import { apiGET, apiPOST, apiPUT, apiDELETE } from '@/services/boffAPI';
+import { apiGET, apiPOST, apiPUT, apiDELETE, apiAuthedAutoGET, getApiUrl, sessionToken } from '@/services/boffAPI';
 import type {
   TcgSeries,
   TcgSet,
@@ -39,6 +39,84 @@ interface UserCardHistoryEntity {
   variant: string | null;
   timestamp: Date;
 }
+
+
+// ==================== SELECTIVE SYNC (ADMIN) ====================
+
+export type TcgSyncStage = 'series' | 'sets' | 'cards' | 'images';
+
+export type TcgSyncSetState = 'missing' | 'cards-partial' | 'images-partial' | 'ok';
+
+export interface TcgSyncSetStatus {
+  id: string;
+  name: string;
+  inDb: boolean;
+  cardsRemote: number;
+  cardsInDb: number;
+  imagesEn: number;
+  imagesEs: number;
+  /** Cards with artwork in at least one locale. */
+  imagesAny: number;
+  /** Cards with no artwork at all. */
+  imagesMissing: number;
+  state: TcgSyncSetState;
+}
+
+export interface TcgSyncStatus {
+  seriesId: string;
+  remoteAvailable: boolean;
+  remoteError?: string | null;
+  setsRemote: number;
+  setsInDb: number;
+  cardsRemote: number;
+  cardsInDb: number;
+  imagesPresent: number;
+  imagesExpected: number;
+  sets: TcgSyncSetStatus[];
+}
+
+export interface TcgSyncRequest {
+  seriesId?: string;
+  series?: boolean;
+  sets?: boolean;
+  cards?: boolean;
+  images?: boolean;
+  setIds?: string[];
+  force?: boolean;
+}
+
+export interface TcgSyncCounts {
+  downloaded: number;
+  updated: number;
+  skipped: number;
+  failed: number;
+}
+
+export interface TcgSyncFailure {
+  stage: TcgSyncStage;
+  scope: string;
+  message: string;
+}
+
+/** Mirrors `TcgSyncEvent` in the API's tcg-sync.service.ts. */
+export type TcgSyncEvent =
+  | { type: 'start'; seriesId: string; stages: TcgSyncStage[]; sets: Array<{ id: string; name: string }> }
+  | { type: 'stage'; stage: TcgSyncStage; state: 'running' | 'done' | 'error'; message?: string; counts?: TcgSyncCounts }
+  | {
+      type: 'set';
+      stage: 'cards' | 'images';
+      setId: string;
+      setName: string;
+      index: number;
+      total: number;
+      state: 'running' | 'done' | 'skipped' | 'error';
+      counts?: TcgSyncCounts;
+      message?: string;
+      /** Cards upstream publishes no artwork for. Not a failure - an absence. */
+      unavailable?: number;
+    }
+  | { type: 'item'; stage: 'cards' | 'images'; setId: string; done: number; total: number; label?: string }
+  | { type: 'done'; cancelled: boolean; durationMs: number; counts: TcgSyncCounts; failures: TcgSyncFailure[] };
 
 export class PtcgpService {
   // ==================== DATABASE OPERATIONS ====================
@@ -216,6 +294,68 @@ export class PtcgpService {
     } catch (error) {
       console.error('Failed to initialize series data:', error);
       throw error;
+    }
+  }
+
+
+  // ==================== SELECTIVE SYNC (ADMIN) ====================
+
+  /**
+   * Stored versus available, per set. Read before syncing so the admin sees what
+   * is missing, partial or already up to date.
+   */
+  static getSyncStatus(seriesId: string = 'tcgp') {
+    return apiAuthedAutoGET<TcgSyncStatus>(
+      `/tools/ptcgp/admin/sync/status?seriesId=${encodeURIComponent(seriesId)}`,
+    );
+  }
+
+  /**
+   * Runs a selective sync, calling `onEvent` for each SSE frame as it arrives.
+   * Pass an `AbortSignal` to stop the run: the API watches for the disconnect and
+   * halts instead of finishing the remaining sets.
+   */
+  static async streamSync(
+    request: TcgSyncRequest,
+    onEvent: (event: TcgSyncEvent) => void,
+    signal?: AbortSignal,
+  ): Promise<void> {
+    const res = await fetch(`${getApiUrl()}/tools/ptcgp/admin/sync/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${await sessionToken()}`,
+      },
+      body: JSON.stringify(request),
+      cache: 'no-store',
+      signal,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Sync failed to start (HTTP ${res.status})`);
+    }
+    if (!res.body) throw new Error('No response body from sync stream.');
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() ?? ''; // keep the incomplete tail for the next chunk
+
+      for (const line of lines) {
+        if (!line.startsWith('data: ')) continue;
+        try {
+          onEvent(JSON.parse(line.slice(6)) as TcgSyncEvent);
+        } catch {
+          // malformed frame - skip
+        }
+      }
     }
   }
 

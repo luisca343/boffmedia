@@ -21,6 +21,10 @@ import axios from 'axios';
 
 const mockLogger = { log: jest.fn(), warn: jest.fn(), error: jest.fn() };
 
+// The stored URL must match where the file is written: publicPath('boffmedia',
+// 'tools','tcg',...) is served at ASSET.boffmedia.tools.tcg, because apps/web/public
+// is a symlink to the repo's public/. These assertions previously pinned the
+// pre-reorg `/img/games/tcg/...` prefix, which is how a broken path shipped.
 describe('TcgImageService', () => {
   let service: TcgImageService;
 
@@ -54,8 +58,8 @@ describe('TcgImageService', () => {
       expect(fs.mkdir).toHaveBeenCalled();
       expect(axios.get).toHaveBeenCalledTimes(2);
       expect(fs.writeFile).toHaveBeenCalledTimes(2);
-      expect(sets[0].logo_local).toBe('/img/games/tcg/sets/sv1/logo.webp');
-      expect(sets[0].symbol_local).toBe('/img/games/tcg/sets/sv1/symbol.webp');
+      expect(sets[0].logo_local).toBe('/boffmedia/tools/tcg/sets/sv1/logo.webp');
+      expect(sets[0].symbol_local).toBe('/boffmedia/tools/tcg/sets/sv1/symbol.webp');
     });
 
     it('sets logo_local to null when logo download fails', async () => {
@@ -95,7 +99,7 @@ describe('TcgImageService', () => {
         'en',
       );
 
-      expect(result).toBe('/img/games/tcg/cards/sv1/sv1-1_en.webp');
+      expect(result).toBe('/boffmedia/tools/tcg/cards/sv1/sv1-1_en.webp');
       expect(axios.get).toHaveBeenCalledWith('https://cdn/sv1-1/high.webp', {
         responseType: 'arraybuffer',
       });
@@ -125,10 +129,10 @@ describe('TcgImageService', () => {
         'sv1-1',
         'sv1',
         'en',
-        '/img/games/tcg/cards/sv1/sv1-1_en.webp',
+        '/boffmedia/tools/tcg/cards/sv1/sv1-1_en.webp',
       );
 
-      expect(result).toBe('/img/games/tcg/cards/sv1/sv1-1_en.webp');
+      expect(result).toBe('/boffmedia/tools/tcg/cards/sv1/sv1-1_en.webp');
       expect(axios.get).not.toHaveBeenCalled();
     });
 
@@ -140,7 +144,7 @@ describe('TcgImageService', () => {
         'en',
       );
 
-      expect(result).toBe('/img/games/tcg/cards/sv1/sv1-1_en.webp');
+      expect(result).toBe('/boffmedia/tools/tcg/cards/sv1/sv1-1_en.webp');
     });
   });
 
@@ -161,10 +165,10 @@ describe('TcgImageService', () => {
 
       expect(axios.get).toHaveBeenCalledTimes(2);
       expect(cards[0].image_local_en).toBe(
-        '/img/games/tcg/cards/sv1/sv1-1_en.webp',
+        '/boffmedia/tools/tcg/cards/sv1/sv1-1_en.webp',
       );
       expect(cards[0].image_local_es).toBe(
-        '/img/games/tcg/cards/sv1/sv1-1_es.webp',
+        '/boffmedia/tools/tcg/cards/sv1/sv1-1_es.webp',
       );
     });
 
@@ -173,8 +177,8 @@ describe('TcgImageService', () => {
         {
           id: 'sv1-1',
           image: 'https://cdn/sv1-1',
-          image_local_en: '/img/games/tcg/cards/sv1/sv1-1_en.webp',
-          image_local_es: '/img/games/tcg/cards/sv1/sv1-1_es.webp',
+          image_local_en: '/boffmedia/tools/tcg/cards/sv1/sv1-1_en.webp',
+          image_local_es: '/boffmedia/tools/tcg/cards/sv1/sv1-1_es.webp',
         },
       ];
 

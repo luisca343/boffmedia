@@ -10,7 +10,7 @@
 import { lazy } from "react";
 import type { ToolManifest } from "@boffmedia/tool-kit";
 
-import { PMDSKY_NS } from "./i18n";
+import { PMDSKY_NS, TCGP_NS } from "./i18n";
 
 export const pmdSkyTool: ToolManifest = {
   id: "pokemon.pmdsky",
@@ -34,4 +34,21 @@ export const pmdSkyTool: ToolManifest = {
   ),
 };
 
-export const pokemonTools: ToolManifest[] = [pmdSkyTool];
+export const tcgPocketTool: ToolManifest = {
+  id: "pokemon.tcgpocket",
+  domain: "pokemon",
+  titleKey: `${TCGP_NS}.manifest.name`,
+  descriptionKey: `${TCGP_NS}.manifest.description`,
+  categoryKey: `${TCGP_NS}.manifest.category`,
+  icon: "cards",
+  route: "/pokemon/tcgpocket",
+  // The card database comes from the API. The COLLECTION does not — it is read
+  // from and written to the local store, and synced through the outbox — so a
+  // player with no connection still has a working collection, just not a
+  // browsable card list they have never loaded.
+  requiredCapabilities: ["api"],
+  layout: "document",
+  component: lazy(() => import("./tcgpocket/TcgpApp").then((m) => ({ default: m.TcgpApp }))),
+};
+
+export const pokemonTools: ToolManifest[] = [pmdSkyTool, tcgPocketTool];

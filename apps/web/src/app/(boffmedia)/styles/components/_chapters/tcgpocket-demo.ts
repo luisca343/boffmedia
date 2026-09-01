@@ -2,7 +2,7 @@
 // API (TcgCard); here we cast minimal literals to feed the real TcgCardFace /
 // TcgOddsTable specimens. Art falls back to the CSS placeholder. [deferred]
 import type { TcgCard } from "@boffmedia/shared"
-import type { OddsTableRow } from "@/app/(boffmedia)/(herramientas)/pokemon/tcgpocket/_components/tcgp-kit"
+import type { OddsTableRow } from "@boffmedia/tools-pokemon"
 
 const card = (c: {
   id: string; localId: string; name: string; rarity: string; setId: string

@@ -1,13 +1,13 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
-import { useTranslations } from "next-intl"
+
 import { Icon, Spinner, Empty, SearchInput, ToolSeal, ToolStrip, ToolTitle, type IconName } from "@boffmedia/ui"
-import { cn } from "@/lib/utils"
-import type { TcgCard } from "@boffmedia/shared"
-import { useTcgpCards } from "../_lib/useTcgpCards"
-import { useCollection } from "../_lib/useCollection"
+import { cn } from "@boffmedia/ui/cn"
+import { TCGP_NS, useToolT } from "../i18n"
+import type { TcgCard } from "./service"
+import { useTcgpCards } from "./useTcgpCards"
+import { useCollection } from "./useCollection"
 import { TcgCardDrawer } from "./tcgp-kit"
 import { PanelView } from "./PanelView"
 import { CartasView } from "./CartasView"
@@ -16,13 +16,6 @@ import { SobresView } from "./SobresView"
 
 export type TcgpView = "panel" | "cartas" | "coleccion" | "sobres"
 
-const BASE = "/pokemon/tcgpocket"
-const ROUTES: Record<TcgpView, string> = {
-  panel: BASE,
-  cartas: `${BASE}/cartas`,
-  coleccion: `${BASE}/coleccion`,
-  sobres: `${BASE}/sobres`,
-}
 const TABS: { key: TcgpView; icon: IconName }[] = [
   { key: "panel", icon: "home" },
   { key: "cartas", icon: "cards" },
@@ -30,19 +23,46 @@ const TABS: { key: TcgpView; icon: IconName }[] = [
   { key: "sobres", icon: "inbox" },
 ]
 
-interface Props {
-  view: TcgpView
+export interface TcgpAppProps {
+  /**
+   * Which tab to show. Optional, and that is the whole host seam: apps/web has
+   * a route per tab and passes the one the URL names, while the launcher has no
+   * URLs and lets the component remember. A host that passes `view` must also
+   * pass `onViewChange`, or the tabs will appear to do nothing.
+   */
+  view?: TcgpView
+  onViewChange?: (view: TcgpView) => void
   /** sobres/[expansion] deep-link. */
   expansion?: string
   /** cartas/[...params] deep-link — open this card's drawer on load. */
   cardId?: string
+  /** Prefilled card search (web's `?q=`). */
+  query?: string
+  /** Whose collection to show read-only (web's `?u=`). */
+  galleryUser?: string | null
+  /** Web pushes a route; the launcher swaps its own state. */
+  onGalleryUserChange?: (user: string | null) => void
+  /** Web pushes `?q=` onto the cards route. */
+  onQueryChange?: (query: string) => void
 }
 
-export function TcgpApp({ view, expansion, cardId }: Props) {
-  const t = useTranslations("tcgpocket")
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const galleryUser = view === "coleccion" ? searchParams.get("u") : null
+export function TcgpApp({
+  view: viewProp,
+  onViewChange,
+  expansion,
+  cardId,
+  query = "",
+  galleryUser: galleryUserProp,
+  onGalleryUserChange,
+  onQueryChange,
+}: TcgpAppProps) {
+  const t = useToolT(TCGP_NS)
+  // Uncontrolled by default. The launcher never passes `view`, so the tabs work
+  // there with no routing at all; on the web the prop always wins.
+  const [ownView, setOwnView] = useState<TcgpView>(viewProp ?? "panel")
+  const [ownGalleryUser, setOwnGalleryUser] = useState<string | null>(null)
+  const view = viewProp ?? ownView
+  const galleryUser = view === "coleccion" ? (galleryUserProp ?? ownGalleryUser) : null
 
   const { data, loading, error } = useTcgpCards()
   const collection = useCollection({ username: galleryUser || undefined, byId: data?.byId })
@@ -58,10 +78,24 @@ export function TcgpApp({ view, expansion, cardId }: Props) {
     if (cardId && data?.byId[cardId]) setDrawer({ card: data.byId[cardId], list: data.cards })
   }, [cardId, data])
 
-  const nav = (key: TcgpView) => router.push(ROUTES[key])
+  const nav = (key: TcgpView) => {
+    setOwnView(key)
+    onViewChange?.(key)
+  }
   const openCard = (card: TcgCard, list: TcgCard[]) => setDrawer({ card, list })
-  const goGallery = (user: string) => router.push(`${ROUTES.coleccion}?u=${encodeURIComponent(user)}`)
-  const submitSearch = () => { if (search.trim()) router.push(`${ROUTES.cartas}?q=${encodeURIComponent(search.trim())}`) }
+  const goGallery = (user: string) => {
+    setOwnGalleryUser(user)
+    setOwnView("coleccion")
+    onGalleryUserChange?.(user)
+    onViewChange?.("coleccion")
+  }
+  const submitSearch = () => {
+    const q = search.trim()
+    if (!q) return
+    setOwnView("cartas")
+    onViewChange?.("cartas")
+    onQueryChange?.(q)
+  }
 
   const drawerEditable = view === "coleccion" && !galleryUser && collection.editable
 
@@ -119,7 +153,7 @@ export function TcgpApp({ view, expansion, cardId }: Props) {
               <Empty icon="alert" title={t("app.errorTitle")} lead={t("app.errorLead")} />
             </div>
           ) : view === "cartas" ? (
-            <CartasView data={data} effective={collection.effective} initialQ={searchParams.get("q") || ""} onOpenCard={openCard} />
+            <CartasView data={data} effective={collection.effective} initialQ={query || (view === "cartas" ? search.trim() : "")} onOpenCard={openCard} />
           ) : view === "coleccion" ? (
             <ColeccionView data={data} collection={collection} username={galleryUser} onOpenCard={openCard} />
           ) : view === "sobres" ? (

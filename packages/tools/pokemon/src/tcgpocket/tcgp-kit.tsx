@@ -1,14 +1,16 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { useLocale, useTranslations } from "next-intl"
-import { cn } from "@/lib/utils"
+
+import { cn } from "@boffmedia/ui/cn"
 import { Icon, type IconName } from "@boffmedia/ui"
-import type { TcgCard } from "@boffmedia/shared"
-import { ASSET, staticAsset } from "@/lib/assets"
+import type { TcgCard } from "./service"
+import { ASSET, joinAssetPath } from "@boffmedia/asset-paths"
+import { assetUrl } from "@boffmedia/tool-kit"
+import { optionalT, TCGP_NS, useLocale, useToolT } from "../i18n"
 import {
   cssVars, typeColor, typeGlyph, normType, normStage, rarityMeta, isPokemon, pct, padNum, localCardArt,
-} from "../_lib/tcgp-maps"
+} from "./tcgp-maps"
 
 // ── Type pip ─────────────────────────────────────────────────────────────────
 export function TcgTypePip({ type, size = 20, title }: { type: string; size?: number; title?: string }) {
@@ -118,8 +120,8 @@ export interface CardFaceProps {
   onOpen?: (c: TcgCard) => void
 }
 export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim, onAdd, onRemove, onOpen }: CardFaceProps) {
-  const t = useTranslations("tcgpocket")
-  const tl = (key: string, fallback: string) => (t.has(key as never) ? t(key as never) : fallback)
+  const t = useToolT(TCGP_NS)
+  const tl = (key: string, fallback: string) => optionalT(t, key, fallback)
   const r = rarityMeta(card.rarity)
   const missing = dim != null ? dim : count === 0
   const pk = isPokemon(card)
@@ -293,10 +295,12 @@ export function TcgSetProgress({ label, sub, have, total }: { label: string; sub
 
 // ── Pack tile (real pack art with CSS booster fallback) ──────────────────────
 function packArt(setId: string, name: string): string {
-  return staticAsset(ASSET.boffmedia.img, 'games/tcgpocket/packs', setId, `${name.toLowerCase()}.png`)
+  // Through the host: same origin on the web, the cached `boffasset://` scheme
+  // in the app, which is what keeps 147 MB of art off the installer.
+  return assetUrl(joinAssetPath(ASSET.boffmedia.img, 'games/tcgpocket/packs', setId, `${name.toLowerCase()}.png`))
 }
 export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string; name: string; meta?: string; hue?: string; onOpen?: () => void }) {
-  const t = useTranslations("tcgpocket")
+  const t = useToolT(TCGP_NS)
   const c = hue || typeColor("fire")
   const [failed, setFailed] = useState(false)
   return (

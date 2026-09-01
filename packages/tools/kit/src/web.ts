@@ -6,6 +6,9 @@
  * Nothing here imports `next/*` — this is plain DOM code.
  */
 
+import { createWebData } from "./web-data";
+import { createToolSession } from "./session";
+import type { ToolSession } from "./session";
 import { ToolApiError } from "./host";
 import type {
   SaveFileData,
@@ -14,6 +17,7 @@ import type {
   ToolApi,
   ToolApiRequest,
   ToolHost,
+  ToolNetwork,
   ToolStorage,
 } from "./host";
 
@@ -163,6 +167,32 @@ export function createWebApi(baseUrl: string): ToolApi {
 }
 
 /**
+ * The browser's own view of connectivity.
+ *
+ * `navigator.onLine` is famously weak — it reports a link, not reachability, so
+ * a captive portal or a dead upstream still reads as online. It is kept anyway
+ * because the failure it DOES catch (the laptop's wifi is off) is the common
+ * one, and because a false "online" costs a failed request the tool already
+ * handles, while a false "offline" would hide a working tool behind a notice.
+ * The desktop host layers the API's real reachability on top of this.
+ */
+export function createWebNetwork(): ToolNetwork {
+  return {
+    isOnline: () => (typeof navigator === "undefined" ? true : navigator.onLine),
+    subscribe(listener) {
+      const online = () => listener(true);
+      const offline = () => listener(false);
+      window.addEventListener("online", online);
+      window.addEventListener("offline", offline);
+      return () => {
+        window.removeEventListener("online", online);
+        window.removeEventListener("offline", offline);
+      };
+    },
+  };
+}
+
+/**
  * The web's `assetUrl`: the identity. apps/web serves the asset tree itself, so
  * a root-relative path already points at it and rewriting it to an absolute url
  * would only break local development against a different port.
@@ -171,13 +201,32 @@ export function webAssetUrl(path: string): string {
   return path;
 }
 
-/** Convenience for hosts that want every browser default at once. */
-export function createWebToolHost(options?: { apiBaseUrl?: string }): ToolHost {
+/**
+ * Convenience for hosts that want every browser default at once.
+ *
+ * `session` has no browser default worth inventing — who is signed in is the
+ * host's own business (next-auth here, the device flow in the app) — so a host
+ * with accounts passes its own store. The fallback reports `anonymous` and
+ * offers no sign-in, which is the truth for a host that has no accounts and
+ * keeps every tool rendering rather than throwing.
+ */
+export function createWebToolHost(options?: {
+  apiBaseUrl?: string;
+  session?: ToolSession;
+}): ToolHost {
+  const api = createWebApi(options?.apiBaseUrl ?? "/api");
+  const fallback = createToolSession({ signIn: () => {} });
+  fallback.publish({ status: "anonymous" });
   return {
     saveFile: webSaveFile,
     openUrl: webOpenUrl,
     storage: createWebStorage(),
-    api: createWebApi(options?.apiBaseUrl ?? "/api"),
+    api,
     assetUrl: webAssetUrl,
+    network: createWebNetwork(),
+    // The queue replays through the same `api` this host uses, so a flush is
+    // subject to exactly the auth and error handling every other call is.
+    data: createWebData(() => api),
+    session: options?.session ?? fallback.session,
   };
 }

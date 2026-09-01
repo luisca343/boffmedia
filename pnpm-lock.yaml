@@ -920,6 +920,9 @@ importers:
       '@boffmedia/asset-paths':
         specifier: workspace:*
         version: link:../../asset-paths
+      '@boffmedia/shared':
+        specifier: workspace:*
+        version: link:../../shared
       '@boffmedia/tool-kit':
         specifier: workspace:*
         version: link:../kit

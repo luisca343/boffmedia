@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
 import { Suspense } from "react"
-import { TcgpApp } from "../../_components/TcgpApp"
+import { TcgpRouted } from "../../_components/TcgpRouted"
 
 // Deep link — /cartas/<setId>/<cardId> (or /cartas/<cardId>). Opens the card's
 // detail drawer over the card browser.
@@ -15,7 +15,7 @@ export default function TcgpCardDeepLink({ params }: { params: { params: string[
   const cardId = parts.length > 1 ? parts[parts.length - 1] : parts[0]
   return (
     <Suspense>
-      <TcgpApp view="cartas" cardId={cardId} />
+      <TcgpRouted view="cartas" cardId={cardId} />
     </Suspense>
   )
 }
