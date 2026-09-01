@@ -11,11 +11,24 @@ interface AudioSource {
 const SFX_KEYS = ["hover", "select", "open", "close", "tab"] as const
 type SfxKey = (typeof SFX_KEYS)[number]
 
+/**
+ * Master switch for every Mewgenics sound. Off by owner's decision — the codex
+ * ships silent for now.
+ *
+ * It gates the hook AND the chrome's toggle button (MewChrome imports it), so
+ * there is no control that promises audio it will never play. Flip this one
+ * constant to bring the whole feature back; nothing else was removed. Typed
+ * `boolean` rather than left as a literal so the guards below are not narrowed
+ * to dead branches.
+ */
+export const MEW_SOUND_ENABLED: boolean = false
+
 export function useMewSounds(enabled: boolean) {
   const poolRef = React.useRef<Partial<Record<SfxKey, HTMLAudioElement>>>({})
   const loadedRef = React.useRef(false)
 
   const playSound = React.useCallback((key: string) => {
+    if (!MEW_SOUND_ENABLED) return
     if (!SFX_KEYS.includes(key as SfxKey)) return
     if (!enabled) return
 

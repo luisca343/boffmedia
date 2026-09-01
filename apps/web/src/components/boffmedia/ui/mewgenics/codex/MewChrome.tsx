@@ -6,6 +6,7 @@ import Link from "next/link"
 import { Icon } from "@boffmedia/ui"
 import { MewData } from "../mew-store"
 import { MEW_CATS, mewCatKey } from "../mew-util"
+import { MEW_SOUND_ENABLED } from "./useMewSounds"
 import type { MewCodexModel } from "./useMewCodex"
 
 // Presentational chrome strips driven by the codex model: brand/actions bar, the
@@ -50,16 +51,18 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
         >
           <Icon name="search" size={16} />
         </button>
-        <button
-          type="button"
-          onClick={() => setSoundEnabled(!soundEnabled)}
-          title={t("chrome.soundToggleTitle")}
-          aria-label={t("chrome.soundToggleTitle")}
-          aria-pressed={soundEnabled}
-          className={`grid h-[40px] w-[40px] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 ${soundEnabled ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]" : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]"}`}
-        >
-          <Icon name="volume" size={16} />
-        </button>
+        {MEW_SOUND_ENABLED && (
+          <button
+            type="button"
+            onClick={() => setSoundEnabled(!soundEnabled)}
+            title={t("chrome.soundToggleTitle")}
+            aria-label={t("chrome.soundToggleTitle")}
+            aria-pressed={soundEnabled}
+            className={`grid h-[40px] w-[40px] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 ${soundEnabled ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]" : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]"}`}
+          >
+            <Icon name="volume" size={16} />
+          </button>
+        )}
         <Link
           href="/otros/mewgenics/builder"
           title={t("chrome.catBuilderTitle")}
