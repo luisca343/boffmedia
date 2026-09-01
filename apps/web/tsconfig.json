@@ -46,6 +46,12 @@
       "@boffmedia/tools-mhwilds/*": [
         "../../packages/tools/mhwilds/src/*"
       ],
+      "@boffmedia/tools-pokemon": [
+        "../../packages/tools/pokemon/src"
+      ],
+      "@boffmedia/tools-pokemon/*": [
+        "../../packages/tools/pokemon/src/*"
+      ],
       "@boffmedia/ui": [
         "../../packages/ui/src"
       ],

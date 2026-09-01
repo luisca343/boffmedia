@@ -1,7 +1,6 @@
 "use client"
 
 import * as React from "react"
-import { useTranslations } from "next-intl"
 import {
   Button,
   Select,
@@ -14,17 +13,20 @@ import {
   Icon,
   ToolHeader,
 } from "@boffmedia/ui"
-import { getFloors } from "@/tools/pmd-sky/DungeonData"
-import { useWmV3 } from "../_lib/useWmV3"
-import { WmSection, WmStars, WmPokePicker, WmTicket, WmCombo } from "./ui/wm-kit"
+import { saveFile } from "@boffmedia/tool-kit"
+
+import { PMDSKY_NS, useToolT } from "../i18n"
+import { getFloors } from "./DungeonData"
+import { useWmV3 } from "./useWmV3"
+import { WmSection, WmStars, WmPokePicker, WmTicket, WmCombo } from "./wm-kit"
 
 export function PmdSkyView() {
-  // Both pmdsky catalogs are namespaced under `pmdsky` (common.json carries the
-  // field labels plus `questTypes.*` / `rewardTypes.*`; dungeons.json hangs its
-  // numeric ids off `pmdsky.dungeons.*`), so one scoped translator serves all of
-  // them. A root translator here would put ~40 keys at the message root.
-  const t = useTranslations("pmdsky")
-  const tApp = useTranslations("pmdsky.app")
+  // The package catalog merges both source files under one namespace (field
+  // labels plus `questTypes.*` / `rewardTypes.*` beside `dungeons.*`), so one
+  // bound translator serves all of them. A root translator here would make
+  // every call site spell the namespace out again.
+  const t = useToolT(PMDSKY_NS)
+  const tApp = useToolT(`${PMDSKY_NS}.app`)
   const ctx = useWmV3(t, tApp)
 
   const {
@@ -48,6 +50,9 @@ export function PmdSkyView() {
     setShared(true)
     setTimeout(() => setShared(false), 1600)
   }
+  // Through the host capability rather than an anchor click: the launcher
+  // webview cannot start a download, and this way the desktop gets its native
+  // save dialog for free.
   const exportTxt = () => {
     const body = [
       `// WONDER MAIL S — ${region}`,
@@ -55,25 +60,21 @@ export function PmdSkyView() {
       "",
       summary.map((r) => `${r.k}: ${r.v}`).join("\n"),
     ].join("\n")
-    const blob = new Blob([body], { type: "text/plain" })
-    const a = document.createElement("a")
-    a.href = URL.createObjectURL(blob)
-    a.download = "wonder-mail.txt"
-    document.body.appendChild(a)
-    a.click()
-    setTimeout(() => {
-      URL.revokeObjectURL(a.href)
-      a.remove()
-    }, 0)
+    void saveFile({
+      suggestedName: "wonder-mail.txt",
+      data: new Blob([body], { type: "text/plain" }),
+      mimeType: "text/plain",
+      filters: [{ name: "Text", extensions: ["txt"] }],
+    })
   }
 
   const floorError = issues.find((i) => i.field === "floor")?.msg
 
   return (
-    <div className="flex min-w-0 flex-col bg-base min-h-[calc(100dvh_-_var(--nav-h))]">
+    <div className="flex min-w-0 flex-col bg-base min-h-[var(--tool-vh,100%)]">
       {/* ── top bar. An App surface: it owns the viewport and carries a persistent
            region control, so it is a `bar`, and it sticks to `--tool-sticky-top`
-           (via ToolStrip) rather than hardcoding `--nav-h`. ─────────────────── */}
+           (via ToolStrip) rather than to a host-defined nav height. ─────────────────── */}
       <ToolHeader
         density="bar"
         icon="compass"

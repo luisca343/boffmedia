@@ -1,0 +1,26 @@
+{
+  "name": "@boffmedia/tools-pokemon",
+  "version": "0.0.1",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./catalog": "./src/catalog/index.ts",
+    "./*": "./src/*"
+  },
+  "dependencies": {
+    "@boffmedia/asset-paths": "workspace:*",
+    "@boffmedia/tool-kit": "workspace:*",
+    "@boffmedia/ui": "workspace:*",
+    "zustand": "^4.5.0"
+  },
+  "peerDependencies": {
+    "react": ">=19",
+    "react-dom": ">=19"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3"
+  }
+}

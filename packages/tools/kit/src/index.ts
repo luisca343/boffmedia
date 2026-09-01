@@ -1,4 +1,5 @@
 export {
+  assetUrl,
   configureToolHost,
   getToolHost,
   hasToolHost,
@@ -15,6 +16,7 @@ export type {
   ToolApi,
   ToolApiAuth,
   ToolApiRequest,
+  ToolAssetUrl,
   ToolCapability,
   ToolHost,
   ToolStorage,
@@ -27,6 +29,7 @@ export {
   createWebApi,
   createWebStorage,
   createWebToolHost,
+  webAssetUrl,
   webOpenUrl,
   webSaveFile,
 } from "./web";

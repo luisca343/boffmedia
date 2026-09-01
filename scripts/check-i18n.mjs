@@ -559,7 +559,12 @@ for (const file of spanishSources) {
 // because it gained a next-intl import for its page metadata, not because its
 // body was translated. Its copy is still hardcoded Spanish and this check can
 // no longer see it — extract it and the number stays honest.
-const HARDCODED_ES_BASELINE = 36;
+// 2026-09-01: 36 -> 34. The PMD Sky screens left apps/web for
+// @boffmedia/tools-pokemon; this scan only covers apps/web, so the two files
+// are out of its reach now rather than translated. Their strings do go through
+// the package catalog, so nothing regressed - but the number is not evidence of
+// that either way.
+const HARDCODED_ES_BASELINE = 34;
 const hardcodedCount = hardcodedSpanish.length;
 if (hardcodedCount > HARDCODED_ES_BASELINE) {
   for (const { rel, sample } of hardcodedSpanish.slice(0, 40)) {

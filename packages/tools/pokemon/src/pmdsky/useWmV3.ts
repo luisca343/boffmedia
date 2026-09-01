@@ -2,9 +2,9 @@
 
 import * as React from "react"
 import type { IconName } from "@boffmedia/ui"
-import { useFormStore, type SkyFormData } from "@/tools/pmd-sky/store"
-import { useSkyFormHandlers } from "@/tools/pmd-sky/_hooks"
-import { generateWonderMail } from "@/tools/pmd-sky/Generate"
+import { useFormStore, type SkyFormData } from "./store"
+import { useSkyFormHandlers } from "./_hooks"
+import { generateWonderMail } from "./Generate"
 import {
   missionTypes,
   getQuestData,
@@ -14,10 +14,10 @@ import {
   getClientIsTarget,
   getUseTargetItem,
   givesItem,
-} from "@/tools/pmd-sky/QuestData"
-import { getValidDungeons, getFloors } from "@/tools/pmd-sky/DungeonData"
-import { getValidPokemon } from "@/tools/pmd-sky/PokemonData"
-import { getItemData } from "@/tools/pmd-sky/ItemData"
+} from "./QuestData"
+import { getValidDungeons, getFloors } from "./DungeonData"
+import { getValidPokemon } from "./PokemonData"
+import { getItemData } from "./ItemData"
 
 type Tr = (key: string) => string
 

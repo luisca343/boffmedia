@@ -22,6 +22,7 @@ const PACKAGES = [
   'packages/tools/kit',
   'packages/tools/minecraft',
   'packages/tools/mhwilds',
+  'packages/tools/pokemon',
 ];
 function getAvailableMemoryMB() {
   try {

@@ -16,8 +16,14 @@
  * changes its name and a stale copy here would be fetched forever under the
  * old URL.
  *
- * The file list comes from `bundles.generated.ts` — the same manifest the
- * renderer imports — so a bundle this app lacks is an error at build time
+ * PMD Sky's species portraits ride along for the same reason, and are the whole
+ * reason that tool needs no `api` capability: 533 files of ~1.5 KB, one per
+ * species, out of a 75 MB tree that carries sixteen emotions each. That ratio is
+ * what makes this set worth bundling and Mewgenics' 389 MB not — the general
+ * answer for the heavy trees is a caching asset protocol, not this script.
+ *
+ * Both file lists come from the packages' own generated modules — the same ones
+ * the renderer imports — so an asset this app lacks is an error at build time
  * instead of a 404 in a webview with no console open.
  */
 import fs from "node:fs"
@@ -75,4 +81,66 @@ console.log(
   `[tool-assets] seeds: ${wanted.length} bundle(s) ready` +
     (copied ? `, ${copied} copied` : "") +
     (pruned ? `, ${pruned} stale removed` : ""),
+)
+
+// ── PMD Sky portraits ────────────────────────────────────────────────────────
+
+const PORTRAITS = path.join(repo, "packages/tools/pokemon/src/pmdsky/portraits.ts")
+const PORTRAIT_SRC = path.join(repo, "apps/web/public/smartrotom/img/pmd/portrait")
+const PORTRAIT_DEST = path.join(here, "..", "public", "smartrotom", "img", "pmd", "portrait")
+/** Where a fresh clone gets them: `apps/*​/public` is gitignored, so the web
+ *  app's tree may simply not exist on this machine. */
+const PORTRAIT_URL = "https://boffmedia.es/smartrotom/img/pmd/portrait"
+
+const portraitSrc = fs.readFileSync(PORTRAITS, "utf8")
+// Only the table's own body: the prose around it talks about dex numbers too.
+const portraitMap = portraitSrc.slice(portraitSrc.indexOf("PMD_INDEX_TO_DEX"), portraitSrc.indexOf("\n};"))
+const dexes = [
+  ...new Set([...portraitMap.matchAll(/\d+:\s*(\d+)/g)].map((m) => m[1].padStart(4, "0"))),
+]
+
+if (!dexes.length) {
+  console.error(`[tool-assets] no dex ids found in ${path.relative(repo, PORTRAITS)} — has it been generated?`)
+  process.exit(1)
+}
+
+let pCopied = 0
+let pFetched = 0
+const pFailed = []
+for (const dex of dexes) {
+  const to = path.join(PORTRAIT_DEST, dex, "Normal.png")
+  // Frozen game art under a stable name: present means correct.
+  if (fs.existsSync(to)) continue
+  fs.mkdirSync(path.dirname(to), { recursive: true })
+  const from = path.join(PORTRAIT_SRC, dex, "Normal.png")
+  if (fs.existsSync(from)) {
+    fs.copyFileSync(from, to)
+    pCopied++
+    continue
+  }
+  try {
+    const res = await fetch(`${PORTRAIT_URL}/${dex}/Normal.png`)
+    if (!res.ok) throw new Error(`HTTP ${res.status}`)
+    fs.writeFileSync(to, Buffer.from(await res.arrayBuffer()))
+    pFetched++
+  } catch (err) {
+    pFailed.push(`  ${dex}  ${err instanceof Error ? err.message : String(err)}`)
+  }
+}
+
+if (pFailed.length) {
+  console.error(
+    `[tool-assets] ${pFailed.length} PMD portrait(s) could not be obtained, from neither\n` +
+      `  ${path.relative(repo, PORTRAIT_SRC)}\n` +
+      `nor ${PORTRAIT_URL}:\n` +
+      pFailed.join("\n") +
+      `\n\nThe app would ship with blank portrait frames, so this is a build error.`,
+  )
+  process.exit(1)
+}
+
+console.log(
+  `[tool-assets] pmdsky: ${dexes.length} portrait(s) ready` +
+    (pCopied ? `, ${pCopied} copied` : "") +
+    (pFetched ? `, ${pFetched} downloaded` : ""),
 )

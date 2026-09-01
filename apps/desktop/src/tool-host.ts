@@ -11,6 +11,7 @@
 // `lazy()` component references, so the heavy code stays behind the split.
 import { minecraftTools } from "@boffmedia/tools-minecraft/tools"
 import { mhwildsTools } from "@boffmedia/tools-mhwilds/tools"
+import { pokemonTools } from "@boffmedia/tools-pokemon/tools"
 import {
   configureToolHost,
   createWebApi,
@@ -27,7 +28,7 @@ import {
   type ToolApiRequest,
 } from "@boffmedia/tool-kit"
 
-import { isDesktop, openUrl, saveStream, saveDialog, toolApiRequest } from "./runtime"
+import { isDesktop, openUrl, saveStream, saveDialog, toolApiRequest, webBaseUrl } from "./runtime"
 
 /** 4 MiB — big enough that per-chunk IPC overhead disappears against disk
  *  throughput, small enough that no single message is a memory spike. */
@@ -122,6 +123,36 @@ const desktopApi: ToolApi = {
   },
 }
 
+/**
+ * Asset-tree prefixes this app SHIPS, synced into `public/` by
+ * `scripts/sync-tool-assets.mjs`. They must resolve against the renderer's own
+ * origin, so they are the one thing `desktopAssetUrl` leaves alone — sending
+ * them to boffmedia.es would trade a file that is already on disk for a
+ * network round-trip that fails offline.
+ *
+ * Keep this list in step with what that script actually copies. A prefix listed
+ * here but not synced is a blank image; a prefix synced but not listed is a
+ * pointless download.
+ */
+const LOCAL_ASSET_PREFIXES = ["/boffmedia/tools/seeds/", "/smartrotom/img/pmd/portrait/"]
+
+/**
+ * The desktop `assetUrl`. The shared asset tree is addressed by root-relative
+ * paths, which resolve against `tauri://localhost` here — where only what this
+ * app ships is served — so anything not shipped is rehomed onto the website's
+ * origin. In browser dev mode the renderer is not on that origin either, so it
+ * takes the same path.
+ *
+ * Anything already absolute (an `asset:` url the shell cached, a CDN link)
+ * passes through: a caller should not have to know which kind it is holding.
+ */
+function desktopAssetUrl(path: string): string {
+  if (!path) return path
+  if (/^[a-z][a-z0-9+.-]*:/i.test(path)) return path
+  if (LOCAL_ASSET_PREFIXES.some((prefix) => path.startsWith(prefix))) return path
+  return `${webBaseUrl().replace(/\/$/, "")}${path.startsWith("/") ? "" : "/"}${path}`
+}
+
 configureToolHost({
   // Browser dev mode (`dev:renderer`) has no Rust side, so it falls back to the
   // ordinary blob download — every tool screen stays browser-runnable.
@@ -134,11 +165,12 @@ configureToolHost({
   api: isDesktop()
     ? desktopApi
     : createWebApi(import.meta.env.VITE_API_URL ?? "https://api.boffmedia.es"),
+  assetUrl: desktopAssetUrl,
 })
 
 // The Tools hub renders from the registry, so a domain package becomes visible
 // by being registered here and nowhere else.
-registerTools([...minecraftTools, ...mhwildsTools])
+registerTools([...minecraftTools, ...mhwildsTools, ...pokemonTools])
 
 // Dev-only console handle for the capabilities: it exercises a capability
 // directly, without having to drive a tool UI to the screen that happens to use

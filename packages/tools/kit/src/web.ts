@@ -162,6 +162,15 @@ export function createWebApi(baseUrl: string): ToolApi {
   };
 }
 
+/**
+ * The web's `assetUrl`: the identity. apps/web serves the asset tree itself, so
+ * a root-relative path already points at it and rewriting it to an absolute url
+ * would only break local development against a different port.
+ */
+export function webAssetUrl(path: string): string {
+  return path;
+}
+
 /** Convenience for hosts that want every browser default at once. */
 export function createWebToolHost(options?: { apiBaseUrl?: string }): ToolHost {
   return {
@@ -169,5 +178,6 @@ export function createWebToolHost(options?: { apiBaseUrl?: string }): ToolHost {
     openUrl: webOpenUrl,
     storage: createWebStorage(),
     api: createWebApi(options?.apiBaseUrl ?? "/api"),
+    assetUrl: webAssetUrl,
   };
 }

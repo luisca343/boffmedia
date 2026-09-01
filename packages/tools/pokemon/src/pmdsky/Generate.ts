@@ -1,7 +1,5 @@
-import { advance } from "@react-three/fiber";
 import { NIDORAN_FEMALE, NIDORAN_MALE, femaleOnlyPokemon, isValidClient, maleOnlyPokemon } from "./PokemonData";
 import { SkyFormData } from "./store";
-import { isValid } from "zod";
 
 const bitValues = "&67NPR89F0+#STXY45MCHJ-K12=%3Q@W"
 

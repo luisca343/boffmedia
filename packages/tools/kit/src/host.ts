@@ -118,12 +118,29 @@ export interface ToolStorage {
   remove(key: string): Promise<void>;
 }
 
+/**
+ * Where the shared asset tree lives, from the point of view of the document the
+ * tool is rendering into.
+ *
+ * The tree (`@boffmedia/asset-paths`, and every url the API returns inside a
+ * payload) is addressed by ROOT-RELATIVE paths — `/smartrotom/img/...`. On the
+ * web that resolves against the page origin, which serves those bytes. In the
+ * launcher it resolves against `tauri://localhost`, where nothing is served and
+ * the image silently renders as a broken frame, so the desktop host prefixes
+ * the website's origin instead.
+ *
+ * A path that is already absolute is returned untouched, so a tool may pass an
+ * api-supplied url through without first deciding which kind it got.
+ */
+export type ToolAssetUrl = (path: string) => string;
+
 export interface ToolHost {
   saveFile(request: SaveFileRequest): Promise<SaveFileResult>;
   /** Open a URL in the system browser (the launcher already does this). */
   openUrl(url: string): Promise<void> | void;
   storage: ToolStorage;
   api: ToolApi;
+  assetUrl: ToolAssetUrl;
 }
 
 export type ToolCapability = keyof ToolHost;
@@ -164,4 +181,9 @@ export function toolStorage(): ToolStorage {
 
 export function toolApi(): ToolApi {
   return getToolHost().api;
+}
+
+/** See {@link ToolAssetUrl}. */
+export function assetUrl(path: string): string {
+  return getToolHost().assetUrl(path);
 }

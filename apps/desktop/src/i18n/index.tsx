@@ -6,6 +6,7 @@ import { openUrl } from "../runtime"
 
 import { messages as toolsMinecraftMessages } from "@boffmedia/tools-minecraft/catalog"
 import { messages as toolsMhwildsMessages } from "@boffmedia/tools-mhwilds/catalog"
+import { messages as toolsPokemonMessages } from "@boffmedia/tools-pokemon/catalog"
 
 import { messages } from "./messages"
 
@@ -67,8 +68,16 @@ function flatten(node: unknown, prefix: string, out: Dict): Dict {
 // wins a collision, which is the direction that lets the launcher override a
 // tool string without editing the package.
 const FLAT: Record<AppLocale, Dict> = {
-  es: flatten(messages.es, "", flatten(toolsMhwildsMessages.es, "", flatten(toolsMinecraftMessages.es, "", {}))),
-  en: flatten(messages.en, "", flatten(toolsMhwildsMessages.en, "", flatten(toolsMinecraftMessages.en, "", {}))),
+  es: flatten(
+    messages.es,
+    "",
+    flatten(toolsPokemonMessages.es, "", flatten(toolsMhwildsMessages.es, "", flatten(toolsMinecraftMessages.es, "", {}))),
+  ),
+  en: flatten(
+    messages.en,
+    "",
+    flatten(toolsPokemonMessages.en, "", flatten(toolsMhwildsMessages.en, "", flatten(toolsMinecraftMessages.en, "", {}))),
+  ),
 }
 
 /** Index of the `}` matching the `{` at `open`, or -1 if unbalanced. Branch

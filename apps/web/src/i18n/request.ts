@@ -2,6 +2,7 @@ import { getRequestConfig } from 'next-intl/server';
 import { cookies, headers } from 'next/headers';
 import { messages as toolsMinecraftMessages } from '@boffmedia/tools-minecraft/catalog';
 import { messages as toolsMhwildsMessages } from '@boffmedia/tools-mhwilds/catalog';
+import { messages as toolsPokemonMessages } from '@boffmedia/tools-pokemon/catalog';
 import { ALL_NAMESPACES } from './manifest.generated';
 import { namespacesFor, PATHNAME_HEADER } from './scopes';
 
@@ -142,7 +143,8 @@ export default getRequestConfig(async () => {
     // manifest, which only knows about files under locales/ — the payload is a
     // few hundred keys.
     const withMinecraft = deepMerge(fromFiles, toolsMinecraftMessages[loc] as DeepMergeable);
-    return deepMerge(withMinecraft, toolsMhwildsMessages[loc] as DeepMergeable);
+    const withMhwilds = deepMerge(withMinecraft, toolsMhwildsMessages[loc] as DeepMergeable);
+    return deepMerge(withMhwilds, toolsPokemonMessages[loc] as DeepMergeable);
   };
 
   const messages = await load(locale);
