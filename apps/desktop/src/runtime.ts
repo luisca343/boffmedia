@@ -65,6 +65,15 @@ import type {
   RuntimeSource,
   ServerStatus,
   Settings,
+  ToolPackAvailable,
+  ToolPackDoneEvent,
+  ToolPackErrorEvent,
+  ToolPackInstalled,
+  ToolPackPhase,
+  ToolPackProgress,
+  ToolPackSource,
+  ToolPackStatus,
+  ToolPackSummary,
 } from "./services/types";
 
 export type {
@@ -90,6 +99,15 @@ export type {
   RomScanResult,
   RuntimeSource,
   ServerStatus,
+  ToolPackAvailable,
+  ToolPackDoneEvent,
+  ToolPackErrorEvent,
+  ToolPackInstalled,
+  ToolPackPhase,
+  ToolPackProgress,
+  ToolPackSource,
+  ToolPackStatus,
+  ToolPackSummary,
 };
 
 // The single boundary between the renderer and the Rust shell. Keeping it in
@@ -655,6 +673,14 @@ export const EVENT_GAME_STATE = "game://state";
  *  events are row-level and must not put the pack card into "instalando". */
 export const EVENT_CONTENT_FILE = "content://file";
 
+/** A tool pack's install progress/outcome — see `tool_packs.rs` and
+ *  `ToolManifest.dataPack` in `@boffmedia/tool-kit`. Namespaced `pack://`
+ *  rather than reusing `install://` because these describe a single asset
+ *  archive for one tool, not a whole modpack instance. */
+export const EVENT_PACK_PROGRESS = "pack://progress";
+export const EVENT_PACK_DONE = "pack://done";
+export const EVENT_PACK_ERROR = "pack://error";
+
 /** One file of an add-a-mod install. `path` is instance-relative, normalised
  *  the same way `instance_content` normalises the paths the Content tab already
  *  holds, so the two can be matched row for row. */
@@ -737,6 +763,12 @@ export const onGameState = (fn: (state: GameState) => void) =>
   subscribe<GameState>(EVENT_GAME_STATE, fn);
 export const onContentFile = (fn: (e: ContentFileEvent) => void) =>
   subscribe<ContentFileEvent>(EVENT_CONTENT_FILE, fn);
+export const onPackProgress = (fn: (e: ToolPackProgress) => void) =>
+  subscribe<ToolPackProgress>(EVENT_PACK_PROGRESS, fn);
+export const onPackDone = (fn: (e: ToolPackDoneEvent) => void) =>
+  subscribe<ToolPackDoneEvent>(EVENT_PACK_DONE, fn);
+export const onPackError = (fn: (e: ToolPackErrorEvent) => void) =>
+  subscribe<ToolPackErrorEvent>(EVENT_PACK_ERROR, fn);
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -2743,6 +2775,64 @@ export async function instanceRomSlot(slug: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+// ── Tool asset packs (tool_packs.rs) ────────────────────────────────────────
+// Wrappers for the pack manager a tool opts into via `ToolManifest.dataPack`
+// (`@boffmedia/tool-kit`). Every one of these is meaningless in a browser tab
+// — dev:renderer reaches assets through the Vite proxy, not a Rust cache — so
+// each falls back to the "nothing installed, nothing reachable" answer rather
+// than throwing, except `install`, which a caller can only have reached by
+// acting on a gate that should never have rendered outside the shell.
+
+/** Installed + available versions for one tool's data pack, per
+ *  `ToolManifest.dataPack.id`. Never rejects: an unreachable index resolves
+ *  with `available: null, source: "offline"` (see `tool_packs.rs`). */
+export async function toolPacksStatus(tool: string): Promise<ToolPackStatus> {
+  if (!isDesktop()) return { installed: null, available: null, source: "offline" };
+  return await invoke<ToolPackStatus>("tool_packs_status", { tool });
+}
+
+/** Start (or resume) downloading a tool's data pack. Progress arrives via
+ *  `onPackProgress`/`onPackDone`/`onPackError`, not this promise's resolution
+ *  — it settles once the request is accepted, not once the pack is ready. */
+export async function toolPacksInstall(tool: string): Promise<void> {
+  if (!isDesktop()) {
+    throw new Error("El gestor de packs solo está disponible dentro de la app de escritorio.");
+  }
+  await invoke("tool_packs_install", { tool });
+}
+
+/** Cancel an install in flight. A no-op (not an error) if none is running. */
+export async function toolPacksCancel(tool: string): Promise<void> {
+  if (!isDesktop()) return;
+  await invoke("tool_packs_cancel", { tool });
+}
+
+/** Delete an installed pack entirely, reverting the tool to the asset cache. */
+export async function toolPacksRemove(tool: string): Promise<void> {
+  if (!isDesktop()) return;
+  await invoke("tool_packs_remove", { tool });
+}
+
+/** Every tool pack currently on disk — what the Settings Storage section
+ *  lists. */
+export async function toolPacksList(): Promise<ToolPackSummary[]> {
+  if (!isDesktop()) return [];
+  return await invoke<ToolPackSummary[]>("tool_packs_list");
+}
+
+/** Bytes currently held by the `boffasset://` disk cache (loose, per-file
+ *  assets — separate from any installed pack). */
+export async function assetCacheBytes(): Promise<number> {
+  if (!isDesktop()) return 0;
+  return await invoke<number>("asset_cache_bytes");
+}
+
+/** Empty the `boffasset://` disk cache. Does not touch installed packs. */
+export async function assetCacheClear(): Promise<void> {
+  if (!isDesktop()) return;
+  await invoke("asset_cache_clear");
 }
 
 // ── Randomizer Functions ───────────────────────────────────────────────────

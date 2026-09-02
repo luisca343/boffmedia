@@ -6,13 +6,16 @@ import {
   Field,
   IconButton,
   Input,
+  Modal,
   Panel,
+  Progress,
   Seg,
   Slider,
   Toggle,
   toast,
   ToolHeader,
 } from "@boffmedia/ui";
+import { listTools } from "@boffmedia/tool-kit";
 import type { ReactNode } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -30,9 +33,21 @@ import {
   filePicker,
   folderPicker,
   jvmArgsCheck,
+  toolPacksList,
+  toolPacksRemove,
+  assetCacheBytes,
+  assetCacheClear,
+  onPackProgress,
+  onPackDone,
+  onPackError,
   type JvmArgVerdict,
 } from "../runtime";
-import { UI_SCALES, type UiScale } from "../services/types";
+import {
+  UI_SCALES,
+  type ToolPackProgress,
+  type ToolPackSummary,
+  type UiScale,
+} from "../services/types";
 import { checkForUpdates, useUpdates } from "../services/updates";
 import { useApp } from "../state/app";
 import { elidePath, formatBytes } from "../utils/format";
@@ -73,6 +88,10 @@ export function Settings() {
   // rather than a dotted key: a `common.`-prefixed key handed to `t` resolves to
   // `settings.common.…`, misses, and renders the raw dotted string to the user.
   const tCommon = useT("common");
+  // Unbound, for the tool-package `tools.*` keys a pack's `dataPack.labelKey`
+  // or `titleKey` points into — the same root every tool catalog is flattened
+  // onto (see `i18n/index.tsx`).
+  const tRoot = useT();
   const [version, setVersion] = useState<string | null>(null);
   /** The number field's own text while it is being typed in. Held separately so
    *  a half-typed "1" on the way to "12288" is not clamped to the minimum under
@@ -137,6 +156,115 @@ export function Settings() {
   const [romFolders, setRomFolders] = useState<string[]>([]);
   const [loadingEmulators, setLoadingEmulators] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
+
+  // ── Storage (tool asset packs + boffasset cache) ────────────────────────
+  const [toolPacks, setToolPacks] = useState<ToolPackSummary[]>([]);
+  const [cacheBytes, setCacheBytes] = useState(0);
+  const [loadingStorage, setLoadingStorage] = useState(true);
+  const [clearingCache, setClearingCache] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<ToolPackSummary | null>(
+    null,
+  );
+  const [deletingPack, setDeletingPack] = useState(false);
+  // Keyed by `ToolPackProgress.tool` — installs now start silently in the
+  // background the moment a tool opens (`useToolPack`), so this is the only
+  // place any of that becomes visible. A record rather than one value:
+  // nothing stops two different tools' packs from downloading at once.
+  const [packProgress, setPackProgress] = useState<
+    Record<string, ToolPackProgress>
+  >({});
+
+  const loadStorage = useCallback(async () => {
+    setLoadingStorage(true);
+    try {
+      const [list, bytes] = await Promise.all([
+        toolPacksList(),
+        assetCacheBytes(),
+      ]);
+      setToolPacks(list);
+      setCacheBytes(bytes);
+    } catch (err) {
+      // Degrades to an empty section rather than blocking the rest of
+      // Settings — a browser tab or a first run with no packs yet is a valid
+      // state, not an error worth a banner.
+      console.error("Failed to load tool packs:", err);
+    } finally {
+      setLoadingStorage(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void loadStorage();
+  }, [loadStorage]);
+
+  useEffect(() => {
+    const offs = [
+      onPackProgress((e) =>
+        setPackProgress((prev) => ({ ...prev, [e.tool]: e })),
+      ),
+      onPackDone((e) => {
+        setPackProgress((prev) => {
+          const { [e.tool]: _omit, ...rest } = prev;
+          return rest;
+        });
+        void loadStorage();
+      }),
+      onPackError((e) =>
+        setPackProgress((prev) => {
+          const { [e.tool]: _omit, ...rest } = prev;
+          return rest;
+        }),
+      ),
+    ];
+    return () => offs.forEach((off) => off());
+  }, [loadStorage]);
+
+  /** A pack's display name, resolved through the tool registry rather than
+   *  shown as the raw `tool` key: `ToolManifest.dataPack.labelKey` (or the
+   *  manifest's own `titleKey` when a pack declares no label of its own) is
+   *  what the gate and this row must agree on. */
+  const packLabel = useCallback(
+    (tool: string): string => {
+      const manifest = listTools().find((m) => m.dataPack?.id === tool);
+      if (!manifest) return tool;
+      return tRoot(manifest.dataPack?.labelKey ?? manifest.titleKey);
+    },
+    [tRoot],
+  );
+
+  const handleDeletePack = async () => {
+    if (!pendingDelete) return;
+    setDeletingPack(true);
+    try {
+      await toolPacksRemove(pendingDelete.tool);
+      toast.success(
+        t("storage.deleteSuccess", { name: packLabel(pendingDelete.tool) }),
+      );
+      setPendingDelete(null);
+      void loadStorage();
+    } catch (err) {
+      toast.error(
+        (err as { message?: string })?.message ?? t("storage.deleteError"),
+      );
+    } finally {
+      setDeletingPack(false);
+    }
+  };
+
+  const handleClearCache = async () => {
+    setClearingCache(true);
+    try {
+      await assetCacheClear();
+      setCacheBytes(0);
+      toast.success(t("storage.cacheClearSuccess"));
+    } catch (err) {
+      toast.error(
+        (err as { message?: string })?.message ?? t("storage.cacheClearError"),
+      );
+    } finally {
+      setClearingCache(false);
+    }
+  };
 
   useEffect(() => {
     // Null in a browser tab, where there is no shell to ask.
@@ -294,6 +422,7 @@ export function Settings() {
                 { id: "settings-game", key: "sections.game.title" },
                 { id: "settings-emulators", key: "sections.emulators.title" },
                 { id: "settings-account", key: "sections.account.title" },
+                { id: "settings-storage", key: "sections.storage.title" },
                 { id: "settings-app", key: "sections.app.title" },
               ].map((section) => (
                 <li key={section.id}>
@@ -997,6 +1126,108 @@ export function Settings() {
         </Section>
 
         <Section
+          id="settings-storage"
+          sectionRef={(el) => {
+            if (el) sectionRefs.current["settings-storage"] = el;
+          }}
+          title={t("sections.storage.title")}
+          lead={t("sections.storage.lead")}
+        >
+          <Panel title={t("storage.packsTitle")}>
+            {loadingStorage ? (
+              <p className="text-xs text-txt-dim">{t("storage.loading")}</p>
+            ) : toolPacks.length === 0 &&
+              Object.keys(packProgress).length === 0 ? (
+              <p className="text-xs text-txt-dim">{t("storage.noPacks")}</p>
+            ) : (
+              <div className="space-y-2">
+                {toolPacks.map((pack) => (
+                  <div
+                    key={pack.tool}
+                    className="flex items-center justify-between gap-3 rounded border border-line bg-surface-bright p-3"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">
+                        {packLabel(pack.tool)}
+                      </p>
+                      <p className="font-mono text-[11px] text-txt-dim">
+                        {t("storage.version", { version: pack.version })}
+                        {" · "}
+                        {formatBytes(pack.bytes)}
+                      </p>
+                    </div>
+                    <IconButton
+                      name="trash"
+                      label={t("storage.delete")}
+                      size="sm"
+                      onClick={() => setPendingDelete(pack)}
+                    />
+                  </div>
+                ))}
+                {/* One row per pack currently downloading in the background
+                    (`useToolPack`, triggered by opening the tool) — this is
+                    now the ONLY place any of that becomes visible. It can
+                    name a pack not yet in `toolPacks` above (a first
+                    install) or one already listed (a silent update). */}
+                {Object.values(packProgress).map((progress) => {
+                  const total = progress.total ?? 0;
+                  const downloaded = progress.downloaded ?? 0;
+                  const pct = total > 0 ? (downloaded / total) * 100 : 0;
+                  return (
+                    <div
+                      key={progress.tool}
+                      className="rounded border border-line bg-surface-bright p-3"
+                    >
+                      <div className="mb-2 flex items-center justify-between gap-3">
+                        <p className="truncate text-sm font-medium">
+                          {packLabel(progress.tool)}
+                        </p>
+                        <span className="text-[11px] text-txt-dim">
+                          {t(`storage.phase.${progress.phase}`)}
+                        </span>
+                      </div>
+                      <Progress value={pct} aria-label={t("storage.downloading")} />
+                      <div className="mt-1 flex items-center justify-between text-[11px] text-txt-dim">
+                        <span>
+                          {t("storage.progressOf", {
+                            downloaded: formatBytes(downloaded),
+                            total: formatBytes(total),
+                          })}
+                        </span>
+                        <span>{Math.round(pct)}%</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Panel>
+
+          <Panel title={t("storage.cacheTitle")}>
+            <DataList
+              rows={[
+                { label: t("storage.cacheSize"), value: formatBytes(cacheBytes) },
+              ]}
+            />
+            <div className="mt-3">
+              <Button
+                size="sm"
+                variant="ghost"
+                icon="trash"
+                loading={clearingCache}
+                disabled={cacheBytes === 0}
+                onClick={() => void handleClearCache()}
+              >
+                {t("storage.cacheClear")}
+              </Button>
+            </div>
+            <p className="mt-2 text-[11px] text-txt-dim">
+              {t("storage.cacheHint")}
+            </p>
+          </Panel>
+        </Section>
+
+        <Section
           id="settings-app"
           sectionRef={(el) => {
             if (el) sectionRefs.current["settings-app"] = el;
@@ -1040,6 +1271,34 @@ export function Settings() {
         </Section>
         </div>
       </div>
+
+      <Modal
+        open={!!pendingDelete}
+        onClose={() => setPendingDelete(null)}
+        title={t("storage.deleteTitle")}
+      >
+        <div className="flex flex-col gap-4">
+          <p className="text-sm text-txt-muted">
+            {t("storage.deleteWarning", {
+              name: pendingDelete ? packLabel(pendingDelete.tool) : "",
+            })}
+          </p>
+          <div className="flex justify-end gap-2">
+            <Button size="sm" onClick={() => setPendingDelete(null)}>
+              {t("storage.cancelButton")}
+            </Button>
+            <Button
+              size="sm"
+              variant="danger"
+              icon="trash"
+              loading={deletingPack}
+              onClick={() => void handleDeletePack()}
+            >
+              {t("storage.deleteButton")}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

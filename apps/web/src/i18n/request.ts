@@ -3,6 +3,7 @@ import { cookies, headers } from 'next/headers';
 import { messages as toolsMinecraftMessages } from '@boffmedia/tools-minecraft/catalog';
 import { messages as toolsMhwildsMessages } from '@boffmedia/tools-mhwilds/catalog';
 import { messages as toolsPokemonMessages } from '@boffmedia/tools-pokemon/catalog';
+import { messages as toolsMewgenicsMessages } from '@boffmedia/tools-mewgenics/catalog';
 import { ALL_NAMESPACES } from './manifest.generated';
 import { namespacesFor, PATHNAME_HEADER } from './scopes';
 
@@ -144,7 +145,8 @@ export default getRequestConfig(async () => {
     // few hundred keys.
     const withMinecraft = deepMerge(fromFiles, toolsMinecraftMessages[loc] as DeepMergeable);
     const withMhwilds = deepMerge(withMinecraft, toolsMhwildsMessages[loc] as DeepMergeable);
-    return deepMerge(withMhwilds, toolsPokemonMessages[loc] as DeepMergeable);
+    const withPokemon = deepMerge(withMhwilds, toolsPokemonMessages[loc] as DeepMergeable);
+    return deepMerge(withPokemon, toolsMewgenicsMessages[loc] as DeepMergeable);
   };
 
   const messages = await load(locale);

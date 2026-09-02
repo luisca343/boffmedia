@@ -14,7 +14,7 @@ const nextConfig = {
     output: "standalone",
 
     // @boffmedia/ui ships TypeScript source, not a build.
-    transpilePackages: ['@boffmedia/ui', '@boffmedia/tool-kit', '@boffmedia/tools-minecraft', '@boffmedia/tools-mhwilds', '@boffmedia/tools-pokemon'],
+    transpilePackages: ['@boffmedia/ui', '@boffmedia/tool-kit', '@boffmedia/tools-minecraft', '@boffmedia/tools-mhwilds', '@boffmedia/tools-pokemon', '@boffmedia/tools-mewgenics'],
     typescript: {
         ignoreBuildErrors: true,
     },
@@ -69,6 +69,14 @@ const nextConfig = {
             // let the browser revalidate; callers that append a dataset
             // version to the URL get a fresh copy immediately.
             { source: '/boffmedia/tools/:path*', headers: revalidating },
+            // Packs are content-versioned by filename (mewgenics-<version>.zip),
+            // so they are immutable — but index.json is rewritten in place on
+            // every publish and must stay revalidating. Order matters: Next
+            // applies every matching rule and the LAST one wins for a given
+            // header key, so this pair must sit after the tools rule above,
+            // and index.json's rule must sit after the packs/:path* rule.
+            { source: '/boffmedia/tools/packs/:path*', headers: immutable },
+            { source: '/boffmedia/tools/packs/index.json', headers: revalidating },
             { source: '/smartrotom/img/:path*', headers: immutable },
             { source: '/smartrotom/packs/:path*', headers: immutable },
             { source: '/jcef/:path*', headers: immutable },

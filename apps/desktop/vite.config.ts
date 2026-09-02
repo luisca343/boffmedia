@@ -2,7 +2,35 @@ import react from "@vitejs/plugin-react"
 import { resolve } from "node:path"
 import { defineConfig } from "vite"
 
+import { isBundledAsset } from "./src/bundled-assets.generated"
+
 const host = process.env.TAURI_DEV_HOST
+
+/**
+ * Where `dev:renderer` borrows the shared asset tree from.
+ *
+ * The launcher proper reads it through the `boffasset://` scheme, which the
+ * Rust side serves from an on-disk cache. Browser dev mode has no Rust side, so
+ * it used to point straight at the website — which works for an `<img>` and
+ * NOT for a `fetch()`: boffmedia.es sends no `Access-Control-Allow-Origin`, so
+ * every JSON dataset a tool loads (Mewgenics' is 37 files) failed with a bare
+ * "Failed to fetch" and the tool showed its own "check the path exists" error.
+ * Proxying makes those requests same-origin, which is the only thing CORS was
+ * ever objecting to.
+ */
+const ASSET_UPSTREAM = process.env.VITE_WEB_BASE_URL || "https://boffmedia.es"
+
+const assetProxy = {
+  target: ASSET_UPSTREAM,
+  changeOrigin: true,
+  // A bundled prefix is served by Vite's own static middleware instead: the
+  // bytes are already in public/, and going to the network for them would make
+  // dev mode fail in exactly the case the bundling exists to survive. The test
+  // is the same generated one the runtime router uses (`bundled-assets`), so
+  // dev and the built app cannot disagree about what this app ships.
+  bypass: (req: { url?: string }) =>
+    isBundledAsset((req.url ?? "").split("?")[0]) ? req.url : null,
+}
 
 export default defineConfig({
   plugins: [react()],
@@ -23,6 +51,13 @@ export default defineConfig({
     // src-tauri has its own watcher; letting Vite watch it too causes reload
     // storms on every Rust rebuild.
     watch: { ignored: ["**/src-tauri/**"] },
+    // Only in dev: the built app never sees these (it has the scheme).
+    proxy: {
+      "/boffmedia": assetProxy,
+      "/smartrotom": assetProxy,
+      "/uploads": assetProxy,
+      "/blog": assetProxy,
+    },
   },
   resolve: {
     alias: {

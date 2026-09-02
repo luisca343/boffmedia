@@ -25,6 +25,8 @@ import {
 import { useT } from "../i18n"
 import { TOOL_DOMAIN_META, TOOL_DOMAIN_ORDER } from "../data/toolDomains"
 import { useApp } from "../state/app"
+import { useToolPack } from "../components/useToolPack"
+import { isDesktop } from "../runtime"
 
 // This screen has NO per-tool wiring. It renders whatever the domain packages
 // registered, so adding a tool is a manifest entry plus a catalog merge, with
@@ -33,8 +35,20 @@ import { useApp } from "../state/app"
 /** Capabilities this host actually provides. A tool declaring something absent
  *  is hidden rather than offered and then failing at click time. `api` is listed
  *  because `tool-host.ts` routes it through the authenticated Rust proxy
- *  (`tool_api.rs`), which is what the MH Wilds tools need to load their data. */
-const HOST_CAPABILITIES = new Set(["saveFile", "openUrl", "storage", "api"])
+ *  (`tool_api.rs`), which is what the MH Wilds tools need to load their data.
+ *  `data`, `network` and `assetUrl` are implemented too (see `tool-host.ts`) —
+ *  their absence here was a latent bug: any manifest declaring one of them was
+ *  silently hidden from the launcher's own listing. */
+const HOST_CAPABILITIES = new Set([
+  "saveFile",
+  "openUrl",
+  "storage",
+  "api",
+  "siteUrl",
+  "data",
+  "network",
+  "assetUrl",
+])
 
 function supported(tool: ToolManifest): boolean {
   return (tool.requiredCapabilities ?? []).every((c) => HOST_CAPABILITIES.has(c))
@@ -159,6 +173,14 @@ export function ToolView() {
   const online = useToolOnline()
   const tool = selectedToolId ? getTool(selectedToolId) : undefined
 
+  // Only a desktop host with a manifest that opts in ever prefetches anything
+  // — dev:renderer reaches the loose tree through the Vite proxy, and the web
+  // host ignores `dataPack` entirely. The hook is purely a side effect: the
+  // tool below mounts unconditionally, whatever the pack's state is (RF4,
+  // seamless revision 2026-09-02 — no gate, no button, nothing shown here).
+  const packId = isDesktop() ? tool?.dataPack?.id : undefined
+  useToolPack(packId)
+
   if (!tool) {
     return (
       <div className="p-6">
@@ -223,6 +245,9 @@ export function ToolView() {
           (tool.layout ?? "document") === "viewport" ? "overflow-hidden" : "overflow-y-auto"
         }`}
       >
+        {/* Always mounted, whatever the tool's data pack state is — the pack
+            is a silent background prefetch (`useToolPack`), never a reason to
+            withhold the tool itself. `Suspense` is only for the lazy chunk. */}
         <Suspense
           fallback={
             <div className="flex h-full items-center justify-center">

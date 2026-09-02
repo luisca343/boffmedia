@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
-import { MewCatBuilder } from "./_components/MewCatBuilder"
+import { MewRouted } from "../_components/MewRouted"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pageMeta.herramientas")
@@ -11,5 +11,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function MewgenicsBuilderPage() {
-  return <MewCatBuilder />
+  return <MewRouted screen="builder" />
 }

@@ -36,6 +36,7 @@ export const ASSET = {
       mewgenics: '/boffmedia/tools/mewgenics',
       mhwilds: '/boffmedia/tools/mhwilds',
       seeds: '/boffmedia/tools/seeds',
+      packs: '/boffmedia/tools/packs',
     },
   },
   uploads: {

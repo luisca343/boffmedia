@@ -454,3 +454,66 @@ export type LoaderVersion = {
   latest: boolean
   recommended: boolean
 }
+
+// ── Tool asset packs (tool_packs.rs) ───────────────────────────────────────
+// A tool's own heavy-art bundle (`ToolManifest.dataPack` in
+// @boffmedia/tool-kit), kept deliberately separate from the InstalledPack /
+// PackSummary types above: those describe a whole modpack instance, these
+// describe one versioned archive published alongside a Boffmedia tool
+// (Mewgenics today) and resolved through `boffasset://` ahead of the network.
+
+/** What is on disk right now for one tool, or `null` if nothing is. */
+export type ToolPackInstalled = {
+  version: string
+  bytes: number
+}
+
+/** What the published index currently offers for one tool, or `null` when it
+ *  could not be learned (see `ToolPackStatus.source`). */
+export type ToolPackAvailable = {
+  version: string
+  bytes: number
+  sha256: string
+}
+
+/** Where `available` came from: a cached copy of the index, a fresh network
+ *  fetch, or neither reachable — mirrors `ToolNetwork`'s isOnline/API-down
+ *  fold in `@boffmedia/tool-kit`, so a tool cannot mistake "nothing to
+ *  install" for "could not check". */
+export type ToolPackSource = "cached" | "network" | "offline"
+
+export type ToolPackStatus = {
+  installed: ToolPackInstalled | null
+  available: ToolPackAvailable | null
+  source: ToolPackSource
+}
+
+/** One row of `tool_packs_list` — every tool pack currently on disk. */
+export type ToolPackSummary = {
+  tool: string
+  version: string
+  bytes: number
+}
+
+export type ToolPackPhase = "download" | "verify" | "extract"
+
+/** Payload of `pack://progress`. `total` always comes from the published
+ *  index, never from a response header — see the note on `ToolPackAvailable`. */
+export type ToolPackProgress = {
+  tool: string
+  downloaded: number
+  total: number
+  phase: ToolPackPhase
+}
+
+/** Payload of `pack://done`. */
+export type ToolPackDoneEvent = {
+  tool: string
+  version: string
+}
+
+/** Payload of `pack://error`. */
+export type ToolPackErrorEvent = {
+  tool: string
+  message: string
+}

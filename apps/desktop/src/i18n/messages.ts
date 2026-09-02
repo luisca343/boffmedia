@@ -150,6 +150,10 @@ const es = {
         title: "Cuenta",
         lead: "Tu cuenta de Boffmedia y la de Minecraft vinculada.",
       },
+      storage: {
+        title: "Almacenamiento",
+        lead: "Los packs de arte de las herramientas y la caché de recursos.",
+      },
       app: {
         title: "Aplicación",
         lead: "Versión instalada y actualizaciones.",
@@ -233,6 +237,36 @@ const es = {
         system: "Sistema",
         path: "PATH",
       },
+    },
+    // Tool asset packs + the boffasset:// disk cache. Packs install silently
+    // in the background the moment a tool opens (`useToolPack.ts`) — this
+    // section is the only place any of that ever becomes visible: installed
+    // rows, a live progress row while one downloads, and the asset cache.
+    storage: {
+      packsTitle: "Packs de herramientas",
+      loading: "Cargando…",
+      noPacks: "No hay ningún pack instalado todavía.",
+      version: "v{version}",
+      delete: "Eliminar",
+      deleteTitle: "Eliminar pack",
+      deleteWarning: "Se eliminará el pack de «{name}». La herramienta seguirá funcionando cargando su contenido bajo demanda.",
+      deleteButton: "Eliminar",
+      deleteSuccess: "Pack de «{name}» eliminado.",
+      deleteError: "No se pudo eliminar el pack.",
+      cancelButton: "Cancelar",
+      downloading: "Descargando",
+      phase: {
+        download: "Descargando…",
+        verify: "Comprobando…",
+        extract: "Extrayendo…",
+      },
+      progressOf: "{downloaded} de {total}",
+      cacheTitle: "Caché de recursos",
+      cacheSize: "Espacio usado",
+      cacheClear: "Vaciar caché",
+      cacheHint: "Elimina los archivos sueltos descargados bajo demanda. No afecta a los packs instalados.",
+      cacheClearSuccess: "Caché vaciada.",
+      cacheClearError: "No se pudo vaciar la caché.",
     },
   },
 
@@ -1461,6 +1495,10 @@ const en = {
         title: "Account",
         lead: "Your Boffmedia account and the linked Minecraft one.",
       },
+      storage: {
+        title: "Storage",
+        lead: "Tool art packs and the asset cache.",
+      },
       app: {
         title: "Application",
         lead: "Installed version and updates.",
@@ -1542,6 +1580,32 @@ const en = {
         system: "System",
         path: "PATH",
       },
+    },
+    storage: {
+      packsTitle: "Tool packs",
+      loading: "Loading…",
+      noPacks: "No pack installed yet.",
+      version: "v{version}",
+      delete: "Delete",
+      deleteTitle: "Delete pack",
+      deleteWarning: "The pack for “{name}” will be removed. The tool will keep working, loading its content on demand.",
+      deleteButton: "Delete",
+      deleteSuccess: "Pack for “{name}” deleted.",
+      deleteError: "Could not delete the pack.",
+      cancelButton: "Cancel",
+      downloading: "Downloading",
+      phase: {
+        download: "Downloading…",
+        verify: "Verifying…",
+        extract: "Extracting…",
+      },
+      progressOf: "{downloaded} of {total}",
+      cacheTitle: "Asset cache",
+      cacheSize: "Space used",
+      cacheClear: "Clear cache",
+      cacheHint: "Removes loose files downloaded on demand. Does not affect installed packs.",
+      cacheClearSuccess: "Cache cleared.",
+      cacheClearError: "Could not clear the cache.",
     },
   },
 

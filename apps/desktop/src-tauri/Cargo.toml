@@ -53,10 +53,12 @@ portablemc = "5.0"
 keyring = { version = "3", features = ["apple-native", "windows-native", "sync-secret-service"] }
 # §5's auth chain is hand-rolled (portablemc::msa cannot surface the refresh
 # token for the keychain), so the launcher makes these calls itself.
-reqwest = { version = "0.12", features = ["json", "multipart"] }
+reqwest = { version = "0.12", features = ["json", "multipart", "gzip", "brotli"] }
 # "net" + "io-util": the hand-rolled SLP client (status.rs) opens a raw
 # TcpStream and writes/reads varints over it directly, no HTTP involved.
-tokio = { version = "1", features = ["time", "sync", "net", "io-util"] }
+# "fs": tool_assets.rs reads and writes the on-disk asset cache off the
+# protocol thread instead of blocking a tokio worker with std::fs.
+tokio = { version = "1", features = ["time", "sync", "net", "io-util", "fs"] }
 # status.rs: a pack that declares a bare host (no port) is behind a Minecraft
 # SRV record; the ping resolves `_minecraft._tcp.<host>` to the real host+port.
 # The SLP wire is hand-rolled, but SRV needs a real DNS resolver, and rolling
@@ -106,6 +108,13 @@ libc = "0.2"
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = ["Win32_System_SystemInformation"] }
+
+[dev-dependencies]
+# tool_assets.rs's network tests run a one-shot fake HTTP server on a real
+# TcpListener and drive it with #[tokio::test]; "net"/"io-util" above already
+# cover the server's own socket I/O, but the test attribute and its runtime
+# need these two on top. Dev-only: a release build never sees them.
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 
 [features]
 # Enabled by `tauri build --debug`.

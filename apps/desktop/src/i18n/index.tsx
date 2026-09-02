@@ -7,6 +7,7 @@ import { openUrl } from "../runtime"
 import { messages as toolsMinecraftMessages } from "@boffmedia/tools-minecraft/catalog"
 import { messages as toolsMhwildsMessages } from "@boffmedia/tools-mhwilds/catalog"
 import { messages as toolsPokemonMessages } from "@boffmedia/tools-pokemon/catalog"
+import { messages as toolsMewgenicsMessages } from "@boffmedia/tools-mewgenics/catalog"
 
 import { messages } from "./messages"
 
@@ -71,12 +72,20 @@ const FLAT: Record<AppLocale, Dict> = {
   es: flatten(
     messages.es,
     "",
-    flatten(toolsPokemonMessages.es, "", flatten(toolsMhwildsMessages.es, "", flatten(toolsMinecraftMessages.es, "", {}))),
+    flatten(
+      toolsMewgenicsMessages.es,
+      "",
+      flatten(toolsPokemonMessages.es, "", flatten(toolsMhwildsMessages.es, "", flatten(toolsMinecraftMessages.es, "", {}))),
+    ),
   ),
   en: flatten(
     messages.en,
     "",
-    flatten(toolsPokemonMessages.en, "", flatten(toolsMhwildsMessages.en, "", flatten(toolsMinecraftMessages.en, "", {}))),
+    flatten(
+      toolsMewgenicsMessages.en,
+      "",
+      flatten(toolsPokemonMessages.en, "", flatten(toolsMhwildsMessages.en, "", flatten(toolsMinecraftMessages.en, "", {}))),
+    ),
   ),
 }
 

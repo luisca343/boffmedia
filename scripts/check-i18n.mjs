@@ -485,15 +485,15 @@ const SPANISH_ALLOW = {
     "RARITY_TIERS strings ARE the API's values, not labels for them",
   "app/smartrotom/gobierno/_components/seguridad/severity.ts":
     "TO_ENGLISH maps the API's Spanish wire vocabulary; the Spanish side is the wire, not copy",
-  // Game taxonomy maps. Pokémon type names, Monster Hunter ailments and Mewgenics
-  // rarities are game data, not copy — the do-not-translate glossary in
-  // .claude/context/i18n.md covers exactly these.
+  // Game taxonomy maps. Pokémon type names and Monster Hunter ailments are game
+  // data, not copy — the do-not-translate glossary in .claude/context/i18n.md
+  // covers exactly these. (Mewgenics' rarity map was here until the tool moved
+  // to @boffmedia/tools-mewgenics; this check only reads apps/web.)
   "app/smartrotom/pokedex/_utils/typeColors.ts": "Pokémon type names are game data",
   "app/(boffmedia)/(herramientas)/pokemon/battlesim/_lib/bx-helpers.ts":
     "Pokémon type names are game data",
   "components/boffmedia/ui/mh-db/mh-db-util.ts":
     "Monster Hunter ailment/element taxonomy — game data",
-  "components/boffmedia/ui/mewgenics/mew-util.ts": "Mewgenics rarity taxonomy — game data",
 };
 
 const SPANISH_ACCENT_RE = /[áéíóúüñÁÉÍÓÚÜÑ¿¡]/;

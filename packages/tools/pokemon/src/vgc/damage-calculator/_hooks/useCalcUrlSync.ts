@@ -1,7 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { assetUrl } from '@boffmedia/tool-kit'
+import { siteUrl } from '@boffmedia/tool-kit'
 import { toast } from '@boffmedia/ui'
 import { useVgcNav } from "../../routing";
 import { useVgcT } from "../../i18n";
@@ -21,7 +21,7 @@ import { encodeCalcUrl, decodeCalcUrl, URL_PARAM } from '../_lib/urlSerializer'
  * not tidiness. In the desktop app `window.location` is the shell's own
  * `index.html`: the share link built from it pointed at a file nobody else can
  * open, and `history.replaceState` rewrote the shell's address instead of the
- * tool's. `assetUrl` resolves a site path to the public origin (identity on the
+ * tool's. `siteUrl` resolves a site path to the public origin (identity on the
  * web, the website's origin in the desktop app), and the router owns the
  * address in both.
  */
@@ -80,10 +80,16 @@ export function useCalcUrlSync() {
     if (!encoded) return
 
     // A share link has to be openable by someone else, so it is built against
-    // the PUBLIC site: `assetUrl` is the identity on the web and the website's
+    // the PUBLIC site: `siteUrl` is the identity on the web and the website's
     // origin in the desktop app.
+    //
+    // It was `assetUrl` until 2026-09-01, which answers a different question —
+    // where the BYTES are — and in the packaged app that is the `boffasset://`
+    // cache, an origin that exists only inside that one process. The link
+    // copied there was dead for whoever it was pasted to. (It looked right in
+    // `dev:renderer`, where `assetUrl` happens to fall back to the web base.)
     const shareUrl = new URL(
-      assetUrl(`${path}?${URL_PARAM}=${encoded}`),
+      siteUrl(`${path}?${URL_PARAM}=${encoded}`),
       typeof window === 'undefined' ? undefined : window.location.origin,
     ).toString()
 

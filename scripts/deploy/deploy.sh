@@ -25,7 +25,9 @@ set -euo pipefail
 SERVICE="${1:?usage: deploy.sh <api|web> <tag>}"
 TAG="${2:?usage: deploy.sh <api|web> <tag>}"
 
-# ─── CONFIRM THESE AGAINST THE RUNNING CONTAINERS BEFORE FIRST USE ───────────
+# ─── WEB BINDS CONFIRMED (docker inspect boffmedia-web, 2026-09-02) ─────────
+# ─── API BINDS UNCONFIRMED — see the comment above the /srv/boffmedia/public
+#     line below before using the api branch ───────────────────────────────
 # Print the current flags with:
 #   docker inspect boffmedia-server --format '{{json .HostConfig.Binds}} {{json .HostConfig.PortBindings}}'
 case "$SERVICE" in
@@ -35,6 +37,12 @@ case "$SERVICE" in
     RUN_FLAGS=(
       -p 34301:34301
       --env-file /etc/boffmedia/api.env
+      # /srv/boffmedia/public does NOT exist on the host (confirmed 2026-09-02).
+      # /mnt/public is the only public root that exists (docker inspect boffmedia-web, 2026-09-02).
+      # The running boffmedia-server container must therefore carry different,
+      # undeclared binds. Do NOT guess a replacement — before using this
+      # branch, replace the line below with the output of:
+      #   docker inspect boffmedia-server --format '{{json .HostConfig.Binds}}'
       -v /srv/boffmedia/public:/app/public:ro
       -v /srv/boffmedia/uploads:/app/var/uploads
       -v /mnt/laboon:/app/laboon
@@ -47,6 +55,10 @@ case "$SERVICE" in
     IMAGE="luisca343/boffmedia-web2"
     RUN_FLAGS=(
       -p 34333:3000
+      -v /mnt/public:/app/apps/web/public
+      -v /mnt/public:/app/public
+      -v /docker/config/boffmedia/web.env:/app/.env.local
+      -v /docker/config/boffmedia/web.env:/app/apps/web/.env.local
       --restart unless-stopped
     )
     ;;

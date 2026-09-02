@@ -135,6 +135,21 @@ export interface ToolStorage {
 export type ToolAssetUrl = (path: string) => string;
 
 /**
+ * A path on the PUBLIC WEBSITE, resolved to something a human can open.
+ *
+ * This is not `assetUrl` and the difference bites: `assetUrl` sends a
+ * root-relative path to wherever the BYTES live, which in the launcher is the
+ * `boffasset://` cache — an origin that exists only inside that one process.
+ * A share link built with it is dead the moment it leaves the machine, which is
+ * exactly what "copy link" produces. `siteUrl` resolves against the website
+ * instead, so the result is openable by the person it was pasted to.
+ *
+ * Identity on the web (the page IS the site). An already-absolute url is
+ * returned untouched.
+ */
+export type ToolSiteUrl = (path: string) => string;
+
+/**
  * Whether the tool can reach anything beyond this machine.
  *
  * This exists because "the list is empty" and "the list could not be fetched"
@@ -165,6 +180,8 @@ export interface ToolHost {
   storage: ToolStorage;
   api: ToolApi;
   assetUrl: ToolAssetUrl;
+  /** See {@link ToolSiteUrl} — for links a person will open, not for bytes. */
+  siteUrl: ToolSiteUrl;
   network: ToolNetwork;
   /** Durable per-tool storage and the outbound write queue. See `data.ts`. */
   data: ToolData;
@@ -215,6 +232,11 @@ export function toolApi(): ToolApi {
 /** See {@link ToolAssetUrl}. */
 export function assetUrl(path: string): string {
   return getToolHost().assetUrl(path);
+}
+
+/** See {@link ToolSiteUrl}. */
+export function siteUrl(path: string): string {
+  return getToolHost().siteUrl(path);
 }
 
 export function toolNetwork(): ToolNetwork {

@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
-import { MewCodex } from "@/components/boffmedia/ui/mewgenics/codex"
+import { MewRouted } from "./_components/MewRouted"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pageMeta.herramientas")
@@ -8,5 +8,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function MewgenicsPage() {
-  return <MewCodex />
+  return <MewRouted screen="codex" />
 }

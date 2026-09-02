@@ -65,6 +65,19 @@ export interface ToolManifest {
    * view state off `id` instead.
    */
   route?: string;
+  /**
+   * Declares that the tool has an optional heavy-art bundle it can fetch as a
+   * single versioned archive instead of many individual asset requests. Purely
+   * declarative data — this package does no downloading — read by a host that
+   * knows how to gate on it (the desktop launcher's pack manager) and ignored
+   * by hosts that do not (the web, which serves the loose tree directly).
+   */
+  dataPack?: {
+    /** Matches the `tool` key the pack manager and the pack index use. */
+    id: string;
+    /** Message key for the pack's display name in gate/settings UI. */
+    labelKey?: string;
+  };
 }
 
 const registry = new Map<string, ToolManifest>();

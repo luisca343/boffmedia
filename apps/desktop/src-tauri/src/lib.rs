@@ -39,6 +39,7 @@ pub mod settings;
 pub mod tool_api;
 pub mod tool_assets;
 pub mod tool_db;
+pub mod tool_packs;
 pub mod worlds;
 pub mod status;
 pub mod updates;
@@ -113,6 +114,7 @@ pub fn run() {
         .manage(install::InstallManager::default())
         .manage(dialogs::SaveSessions::default())
         .manage(tool_db::DbState::default())
+        .manage(tool_packs::PackState::default())
         .invoke_handler(tauri::generate_handler![
             runtime_info,
             auth::auth_begin,
@@ -133,6 +135,13 @@ pub fn run() {
             tool_db::tool_outbox_enqueue,
             tool_db::tool_outbox_pending,
             tool_db::tool_outbox_flush,
+            tool_packs::tool_packs_status,
+            tool_packs::tool_packs_install,
+            tool_packs::tool_packs_cancel,
+            tool_packs::tool_packs_remove,
+            tool_packs::tool_packs_list,
+            tool_packs::asset_cache_bytes,
+            tool_packs::asset_cache_clear,
             api::boff_device_start,
             api::boff_device_poll,
             api::boff_device_cancel,

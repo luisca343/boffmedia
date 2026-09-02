@@ -202,6 +202,15 @@ export function webAssetUrl(path: string): string {
 }
 
 /**
+ * The web's `siteUrl`: also the identity, and for the same reason — the page
+ * the tool is rendering in IS the public site, so a root-relative path is
+ * already a link someone else can open. Only the desktop host has to do work.
+ */
+export function webSiteUrl(path: string): string {
+  return path;
+}
+
+/**
  * Convenience for hosts that want every browser default at once.
  *
  * `session` has no browser default worth inventing — who is signed in is the
@@ -223,6 +232,7 @@ export function createWebToolHost(options?: {
     storage: createWebStorage(),
     api,
     assetUrl: webAssetUrl,
+    siteUrl: webSiteUrl,
     network: createWebNetwork(),
     // The queue replays through the same `api` this host uses, so a flush is
     // subject to exactly the auth and error handling every other call is.

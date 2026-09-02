@@ -3,6 +3,8 @@
    first paint. */
 @import "@boffmedia/tailwind-config/base.css";
 @import "@boffmedia/tailwind-config/fonts.css";
+/* The Mewgenics codex ships its own palette and paper with the tool. */
+@import "@boffmedia/tools-mewgenics/mew-skin.css";
 
 @tailwind base;
 @tailwind components;
