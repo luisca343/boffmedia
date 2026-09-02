@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
-import { KeysView } from "./_components/KeysView";
+import { KeysGate } from "./_components/KeysGate"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pageMeta.herramientas")
@@ -8,5 +8,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function KeysPage() {
-  return <KeysView />;
+  return <KeysGate />
 }

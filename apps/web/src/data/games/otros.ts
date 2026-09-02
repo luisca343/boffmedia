@@ -1,4 +1,5 @@
 import { ASSET, staticAsset } from '@/lib/assets';
+import { USER_ROLES } from "@boffmedia/shared/roles";
 import type { GameEntry } from "./types";
 
 export const otros: GameEntry = {
@@ -45,6 +46,10 @@ export const otros: GameEntry = {
           nameKey: "games.otros.tools.keys",
           href: "/otros/keys",
           sidebarIcon: "gamepad",
+          // Boffmedia's own key inventory, not the viewer's. `/steamkeys` is
+          // gated to BOFF_ADMIN in apps/api; this keeps the card and the
+          // sidebar entry out of everyone else's way.
+          requiredRoles: [USER_ROLES.BOFF_ADMIN],
           landing: {
             icon: "",
             fallbackIcon: "key",

@@ -7,7 +7,8 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@boffmedia/ui"
 import { useDismiss } from "@boffmedia/ui/hooks/use-dismiss"
-import { getGameEntry, type GameEntry } from "@/data/games"
+import { getGameEntry, toolsVisibleTo, type GameEntry } from "@/data/games"
+import { useViewerRoles } from "@/services/useBoffSession"
 import { hubConfig } from "@/data/hub"
 import { HUB_SLUGS, hueColorOf, hueStyle } from "./tools-data"
 import { GameLogo } from "./GameLogo"
@@ -240,6 +241,8 @@ export function ToolShell({ slug, children }: ToolShellProps) {
   const pathname = usePathname() || ""
   const game = getGameEntry(slug)
   const hub = hubConfig[slug]
+  // Listing only — the API refuses an unauthorised call regardless.
+  const roles = useViewerRoles()
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const [pinned, setPinned] = React.useState(false)
 
@@ -276,7 +279,7 @@ export function ToolShell({ slug, children }: ToolShellProps) {
     return game.categories
       .map((c) => ({
         name: t(c.nameKey),
-        items: c.tools
+        items: toolsVisibleTo(c.tools, roles)
           .filter((tool) => tool.showInSidebar !== false)
           .map((tool) => ({
             href: tool.href,
@@ -286,7 +289,7 @@ export function ToolShell({ slug, children }: ToolShellProps) {
           })),
       }))
       .filter((g) => g.items.length > 0)
-  }, [game, t])
+  }, [game, t, roles])
 
   const bleed = React.useMemo(() => isBleedRoute(game, pathname), [game, pathname])
 

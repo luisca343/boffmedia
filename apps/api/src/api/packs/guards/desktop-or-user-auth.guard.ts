@@ -77,12 +77,18 @@ export class DesktopOrUserAuthGuard extends AuthGuard('jwt') {
         });
       }
 
-      // No roles: an app session is an identity, not a set of powers. A route
-      // needing roles must take a website session.
+      // Roles ARE resolved for an app session, reversing an earlier stance
+      // here ("an app session is an identity, not a set of powers"). That rule
+      // was conservative rather than a boundary, and it made one whole class of
+      // route impossible: reachable from both surfaces AND role-gated. The
+      // desktop token carries no roles of its own — it is not a website session
+      // — so they come from the database, exactly as DesktopAdminGuard already
+      // resolves them for pack publishing. Nothing is granted that the same
+      // human does not already hold on the website.
       const user: AuthPrincipal = {
         userId: principal.userId,
         username: principal.username,
-        roles: [],
+        roles: await this.packsRepo.rolesOf(principal.userId),
         tokenType: 'launcher',
         ...(principal.mcUuid ? { mcUuid: principal.mcUuid } : {}),
       };

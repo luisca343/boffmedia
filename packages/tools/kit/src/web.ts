@@ -16,6 +16,7 @@ import type {
   SaveFileResult,
   ToolApi,
   ToolApiRequest,
+  ToolStreamRequest,
   ToolHost,
   ToolNetwork,
   ToolStorage,
@@ -109,21 +110,29 @@ async function errorMessage(response: Response, fallback: string): Promise<strin
 
 /** Direct `fetch` against the public API — what the web tools do today. */
 export function createWebApi(baseUrl: string): ToolApi {
+  // Shared by `request` and `stream` so the two cannot drift on how a path
+  // becomes a URL — the relative-base trap below is subtle enough that a second
+  // copy of it would eventually be a second bug.
+  const urlFor = (path: string, query?: ToolApiRequest["query"]): URL => {
+    // `new URL()` REJECTS a relative base outright, and "/api" — this
+    // capability's own default — is exactly that. Resolve it against the
+    // page origin first so a same-origin base works instead of throwing a
+    // raw TypeError before the request is ever sent.
+    const root = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+    const base = /^[a-z][a-z0-9+.-]*:/i.test(root)
+      ? root
+      : new URL(root, window.location.origin).toString();
+    const url = new URL(path.replace(/^\//, ""), base);
+    for (const [key, value] of Object.entries(query ?? {})) {
+      if (value !== undefined) url.searchParams.set(key, String(value));
+    }
+    return url;
+  };
+
   return {
     async request<T>(path: string, init?: ToolApiRequest): Promise<T> {
       const method = init?.method ?? "GET";
-      // `new URL()` REJECTS a relative base outright, and "/api" — this
-      // capability's own default — is exactly that. Resolve it against the
-      // page origin first so a same-origin base works instead of throwing a
-      // raw TypeError before the request is ever sent.
-      const root = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-      const base = /^[a-z][a-z0-9+.-]*:/i.test(root)
-        ? root
-        : new URL(root, window.location.origin).toString();
-      const url = new URL(path.replace(/^\//, ""), base);
-      for (const [key, value] of Object.entries(init?.query ?? {})) {
-        if (value !== undefined) url.searchParams.set(key, String(value));
-      }
+      const url = urlFor(path, init?.query);
 
       let response: Response;
       try {
@@ -162,6 +171,68 @@ export function createWebApi(baseUrl: string): ToolApi {
         );
       }
       return (await response.json()) as T;
+    },
+
+    async stream<T>(path: string, init: ToolStreamRequest<T>): Promise<void> {
+      const method = init.method ?? "POST";
+      const url = urlFor(path, init.query);
+
+      let response: Response;
+      try {
+        response = await fetch(url, {
+          method,
+          headers: init.body === undefined ? undefined : { "content-type": "application/json" },
+          body: init.body === undefined ? undefined : JSON.stringify(init.body),
+          signal: init.signal,
+          // A progress stream that is served from cache is a progress stream
+          // for a job that is not running.
+          cache: "no-store",
+        });
+      } catch (err) {
+        if (err instanceof DOMException && err.name === "AbortError") throw err;
+        throw new ToolApiError(err instanceof Error ? err.message : `${method} ${path} failed`, {
+          code: "server_unreachable",
+        });
+      }
+
+      if (!response.ok) {
+        throw new ToolApiError(
+          await errorMessage(response, `${method} ${url.pathname} failed: ${response.status}`),
+          {
+            status: response.status,
+            needsSignin: response.status === 401,
+            code: response.status >= 500 ? "server_down" : undefined,
+          },
+        );
+      }
+      if (!response.body) {
+        throw new ToolApiError(`${method} ${url.pathname} returned no stream`, {
+          status: response.status,
+        });
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      for (;;) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        // The last element is whatever came after the final newline — an
+        // incomplete line the next chunk finishes. Parsing it now would drop a
+        // frame every time one straddles a chunk boundary.
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          try {
+            init.onMessage(JSON.parse(line.slice(6)) as T);
+          } catch {
+            // Malformed frame — skipped, not thrown. See `ToolStreamRequest`.
+          }
+        }
+      }
     },
   };
 }
@@ -211,6 +282,18 @@ export function webSiteUrl(path: string): string {
 }
 
 /**
+ * The web's `apiUrl`: the configured API base plus the path. Unlike `assetUrl`
+ * and `siteUrl` this is NOT the identity even on the web — the API is a
+ * different origin from the page, so a root-relative path would address the
+ * website and 404.
+ */
+export function createWebApiUrl(baseUrl: string) {
+  const base = baseUrl.replace(/\/+$/, "");
+  return (path: string): string =>
+    /^[a-z][a-z0-9+.-]*:/i.test(path) ? path : `${base}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+/**
  * Convenience for hosts that want every browser default at once.
  *
  * `session` has no browser default worth inventing — who is signed in is the
@@ -223,7 +306,8 @@ export function createWebToolHost(options?: {
   apiBaseUrl?: string;
   session?: ToolSession;
 }): ToolHost {
-  const api = createWebApi(options?.apiBaseUrl ?? "/api");
+  const apiBaseUrl = options?.apiBaseUrl ?? "/api";
+  const api = createWebApi(apiBaseUrl);
   const fallback = createToolSession({ signIn: () => {} });
   fallback.publish({ status: "anonymous" });
   return {
@@ -233,6 +317,7 @@ export function createWebToolHost(options?: {
     api,
     assetUrl: webAssetUrl,
     siteUrl: webSiteUrl,
+    apiUrl: createWebApiUrl(apiBaseUrl),
     network: createWebNetwork(),
     // The queue replays through the same `api` this host uses, so a flush is
     // subject to exactly the auth and error handling every other call is.

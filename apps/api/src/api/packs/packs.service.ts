@@ -77,13 +77,25 @@ export class PacksService {
     username: string;
     mcUuid: string | null;
     avatarUrl: string | null;
+    roles: string[];
   }> {
-    const avatar = await this.repo.getAvatarSource(principal.userId);
+    // Two independent lookups, so they go out together rather than one after
+    // the other: the launcher calls this on every boot and neither answer
+    // depends on the other.
+    const [avatar, roles] = await Promise.all([
+      this.repo.getAvatarSource(principal.userId),
+      // The desktop token carries no roles — it is not a website session — so
+      // they are resolved from the database here, exactly as DesktopAdminGuard
+      // does. Sent to the app for LISTING only; every protected route still
+      // checks the role itself.
+      this.repo.rolesOf(principal.userId),
+    ]);
     return {
       id: principal.userId,
       username: principal.username,
       mcUuid: principal.mcUuid ?? null,
       avatarUrl: desktopAvatarUrl(avatar.picture, avatar.updatedAt),
+      roles,
     };
   }
 

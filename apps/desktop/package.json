@@ -24,6 +24,7 @@
     "@boffmedia/tools-mhwilds": "workspace:*",
     "@boffmedia/tools-minecraft": "workspace:*",
     "@boffmedia/tools-mewgenics": "workspace:*",
+    "@boffmedia/tools-misc": "workspace:*",
     "@boffmedia/tools-pokemon": "workspace:*",
     "@boffmedia/ui": "workspace:*",
     "@tauri-apps/api": "^2.1.1",

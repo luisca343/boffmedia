@@ -19,3 +19,14 @@ export function staticAsset(prefix: string, ...segments: string[]): string {
   const base = (env.NEXT_PUBLIC_STATIC_URL ?? '').replace(/\/+$/, '');
   return `${base}${joinAssetPath(prefix, ...segments)}`;
 }
+
+/**
+ * Resolve an ALREADY-BUILT root-relative asset path, for callers holding a path
+ * rather than a prefix plus segments — `@boffmedia/ui`'s `assetUrl` seam, whose
+ * packages build the path with `joinAssetPath` and hand it over resolved by the
+ * host. Same origin rule as {@link staticAsset}, expressed once.
+ */
+export function staticAssetUrl(path: string): string {
+  const base = (env.NEXT_PUBLIC_STATIC_URL ?? '').replace(/\/+$/, '');
+  return `${base}${path}`;
+}

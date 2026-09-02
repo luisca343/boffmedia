@@ -16,8 +16,10 @@ import {
 } from "@boffmedia/ui"
 import {
   getTool,
+  getToolHost,
   listTools,
   useToolOnline,
+  useToolSession,
   type ToolDomain,
   type ToolManifest,
 } from "@boffmedia/tool-kit"
@@ -39,16 +41,13 @@ import { isDesktop } from "../runtime"
  *  `data`, `network` and `assetUrl` are implemented too (see `tool-host.ts`) —
  *  their absence here was a latent bug: any manifest declaring one of them was
  *  silently hidden from the launcher's own listing. */
-const HOST_CAPABILITIES = new Set([
-  "saveFile",
-  "openUrl",
-  "storage",
-  "api",
-  "siteUrl",
-  "data",
-  "network",
-  "assetUrl",
-])
+/** DERIVED from the configured host rather than hand-listed, because the
+ *  hand-list was wrong twice: `data`, `network` and `assetUrl` were implemented
+ *  and missing from it, and every manifest declaring one was silently dropped
+ *  from this listing. A capability exists exactly when `tool-host.ts` put it on
+ *  the host object, so ask the object. `tool-host.ts` runs its
+ *  `configureToolHost` at import time (see main.tsx), long before this renders. */
+const HOST_CAPABILITIES = new Set<string>(Object.keys(getToolHost()))
 
 function supported(tool: ToolManifest): boolean {
   return (tool.requiredCapabilities ?? []).every((c) => HOST_CAPABILITIES.has(c))
@@ -69,10 +68,16 @@ export function Tools() {
   const { go } = useApp()
   const [query, setQuery] = useState("")
 
+  // Listing only — the API refuses an unauthorised call whether or not the tile
+  // was drawn. What this buys is a grid that does not advertise a door this
+  // account cannot open. An offline restore carries no roles, so a role-gated
+  // tool stays hidden until a live session says otherwise.
+  const roles = useToolSession().user?.roles
+
   // The registry is populated by the import-time side effect in `tool-host.ts`'s
   // sibling registration (see main.tsx) — reading it in a memo keeps the sort
   // out of every render.
-  const tools = useMemo(() => listTools().filter(supported), [])
+  const tools = useMemo(() => listTools({ roles }).filter(supported), [roles])
 
   // The manifest carries message KEYS; the cards want display text. Resolving
   // once here is also what makes the search work on what the player can see
@@ -255,7 +260,22 @@ export function ToolView() {
             </div>
           }
         >
-          <Component />
+          {/* `gutter` tools bring no padding of their own — on the site they get
+              it from `ToolShell`, which this host has no counterpart for. The
+              clamp is the datakit's (`--dk-pad`), not the site's wider one, so a
+              gutter-less tool lines up with the VGC and MH Wilds tools already
+              in this window rather than with a full-width web page.
+
+              INSIDE `Suspense` and around the component only: wrapping the
+              scrollport instead would pad the offline banner and, for a
+              `viewport` tool, shrink the box it is supposed to fill exactly. */}
+          {tool.gutter ? (
+            <div className="px-[clamp(14px,2vw,32px)] pb-10">
+              <Component />
+            </div>
+          ) : (
+            <Component />
+          )}
         </Suspense>
       </div>
     </div>

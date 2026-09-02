@@ -159,6 +159,17 @@ pub struct BoffAccount {
     /// `default` so a response from an API older than this field still parses.
     #[serde(default)]
     pub avatar_url: Option<String>,
+    /// What the account may SEE, not what it may do — the Tools grid hides an
+    /// admin-only tool from an account without the role. Authorisation stays
+    /// with the API, which refuses the call either way.
+    ///
+    /// Deliberately NOT cached in the roster: roles change server-side, and a
+    /// stale copy would either hide a tool from someone who was just promoted
+    /// or offer one to someone who was just demoted. It arrives fresh with the
+    /// sign-in approval and again from `/me` on every boot, which is exactly
+    /// when the Tools grid is built. `default` so an older API still parses.
+    #[serde(default)]
+    pub roles: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -921,6 +932,10 @@ pub async fn boff_offline(
         username: entry.username.clone(),
         mc_uuid: entry.mc_uuid.clone(),
         avatar_url: entry.avatar_url.clone(),
+        // The roster does not cache roles (see the field), so an offline
+        // restore reports none — which hides the admin-only tools rather than
+        // offering ones whose every call needs a server that is not answering.
+        roles: Vec::new(),
     })
 }
 
@@ -1542,6 +1557,7 @@ mod tests {
             username: username.into(),
             mc_uuid: None,
             avatar_url: avatar.map(str::to_string),
+            roles: Vec::new(),
         }
     }
 

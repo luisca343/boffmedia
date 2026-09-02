@@ -5,6 +5,7 @@ import { configureToolHost, createToolSession, createWebToolHost } from "@boffme
 import { configureUi } from "@boffmedia/ui"
 
 import { env } from "@/config/env.public"
+import { staticAssetUrl } from "@/lib/assets"
 
 // Runs at import time, once per module graph. Next builds the server and the
 // client bundles separately, so this module has to be reachable from BOTH —
@@ -16,8 +17,16 @@ configureUi({
   // Unbound — workspace tool packages resolve their own `tools.*` keys through
   // this. next-intl's `useTranslations()` with no namespace is root-scoped.
   useTranslateRoot: () => useTranslations(),
+  // The markup-aware half of the same translator, for the few messages that
+  // carry emphasis spans. A host without one falls back to rendering tags out
+  // of the formatted string; next-intl does it properly, so hand it over.
+  useTranslateRootRich: () => useTranslations().rich,
   useLocale,
   Link,
+  // Where the shared asset tree lives from this host's point of view. The web
+  // serves it itself, so this is `staticAsset`'s origin rule and nothing more;
+  // the launcher points the same seam at its `boffasset://` cache.
+  assetUrl: staticAssetUrl,
 })
 
 // The tool-package host contract (@boffmedia/tool-kit). On the web every

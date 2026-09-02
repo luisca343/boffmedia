@@ -154,6 +154,108 @@ pub async fn tool_api_request(
     })
 }
 
+/// A server-sent-events call, forwarded frame by frame over an IPC channel.
+///
+/// Separate from `tool_api_request` because that command reads the whole
+/// response before returning: for a stream that means every frame lands at
+/// once, after the job it was narrating has already finished — a progress bar
+/// that fills in one jump when the work is over.
+///
+/// NO total `.timeout()`, and that omission is the load-bearing part rather
+/// than an oversight. `reqwest`'s `.timeout()` bounds the ENTIRE request, body
+/// included, so a 20-second control timeout would kill a bulk download exactly
+/// 20 seconds in — the same trap the pack downloader hit. The shared client's
+/// `connect_timeout` still bounds the part that should be bounded: getting a
+/// response at all.
+#[tauri::command]
+pub async fn tool_api_stream(
+    api: tauri::State<'_, ApiState>,
+    request: ToolApiRequest,
+    on_message: tauri::ipc::Channel<serde_json::Value>,
+) -> Result<(), ApiError> {
+    let path = normalize_path(&request.path)?;
+    // Defaults to POST rather than GET: the endpoints that stream progress are
+    // the ones being handed a job to do.
+    let method = parse_method(Some(request.method.as_deref().unwrap_or("POST")))?;
+
+    let token = match request.auth {
+        ToolAuth::Required => Some(api.current_token().await?),
+        ToolAuth::Optional => api.current_token().await.ok(),
+    };
+
+    let mut builder = api
+        .http()
+        .request(method, format!("{}{}", base_url(), path));
+
+    if !request.query.is_empty() {
+        builder = builder.query(&request.query);
+    }
+    if let Some(token) = &token {
+        builder = builder.bearer_auth(token);
+    }
+    if let Some(body) = &request.body {
+        builder = builder.json(body);
+    }
+
+    let mut res = builder.send().await?;
+
+    if res.status() == reqwest::StatusCode::UNAUTHORIZED {
+        // Same rule as `tool_api_request`: only drop the session if we actually
+        // sent one.
+        if token.is_some() {
+            api.forget_session().await;
+        }
+        return Err(ApiError::NeedsSignin(
+            error_message(res, "Tu sesión ha caducado. Vuelve a iniciar sesión.").await,
+        ));
+    }
+
+    if !res.status().is_success() {
+        return Err(response_error(res, "La petición a la API falló.").await);
+    }
+
+    // SSE frames are line-delimited, and a chunk boundary lands wherever TCP
+    // put it — so the tail after the last newline is held back until the next
+    // chunk completes it. Dropping it instead loses one frame per boundary,
+    // which for a progress stream means a bar that skips.
+    let mut buffer = String::new();
+    while let Some(chunk) = res.chunk().await? {
+        buffer.push_str(&String::from_utf8_lossy(&chunk));
+        while let Some(index) = buffer.find('\n') {
+            let line: String = buffer.drain(..=index).collect();
+            let line = line.trim_end_matches(['\n', '\r']);
+            let Some(payload) = line.strip_prefix("data: ") else {
+                continue;
+            };
+            // A malformed frame is SKIPPED, never fatal: abandoning a long
+            // server-side job over one bad line would be the worse failure, and
+            // it matches what the web implementation has always done.
+            if let Ok(value) = serde_json::from_str::<serde_json::Value>(payload) {
+                // A send failure means the renderer dropped the channel — the
+                // tool navigated away. Stop reading rather than draining a
+                // stream nobody is listening to.
+                if on_message.send(value).is_err() {
+                    return Ok(());
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Where the API lives, for the renderer's `apiUrl` capability.
+///
+/// The renderer cannot work this out for itself: `base_url()` reads the RUNTIME
+/// `BOFF_API_URL`, while anything baked into the bundle is fixed at build time,
+/// so a shell pointed at a staging API would hand out links to production.
+/// Asked once at boot and cached there — this is a url builder, and a builder
+/// cannot await.
+#[tauri::command]
+pub fn tool_api_base_url() -> String {
+    base_url()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

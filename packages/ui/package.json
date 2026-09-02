@@ -13,10 +13,13 @@
     "./useFormat": "./src/useFormat.ts",
     "./catalog": "./src/catalog/index.ts",
     "./datakit": "./src/datakit/index.ts",
+    "./giveaways": "./src/giveaways/index.ts",
+    "./messages": "./src/messages/index.ts",
     "./hooks/*": "./src/hooks/*.ts",
     "./primitives/*": "./src/primitives/*.tsx"
   },
   "dependencies": {
+    "@boffmedia/asset-paths": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "react-markdown": "^10.1.0",

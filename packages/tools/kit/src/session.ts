@@ -26,6 +26,23 @@ export interface ToolSessionUser {
   id: string;
   name: string;
   avatarUrl?: string | null;
+  /**
+   * The account's roles, for HOST-SIDE VISIBILITY ONLY — see
+   * `ToolManifest.requiredRoles`.
+   *
+   * This is the one exception to the "no roles" rule above, and the boundary
+   * is worth stating precisely, because the rule itself is still right: a tool
+   * must not branch on these. Deciding whether a request is ALLOWED belongs to
+   * the API and nowhere else; deciding whether a tile is worth putting in
+   * front of someone is a listing concern the host cannot answer without them.
+   * Hiding a tool a player can never open is a courtesy, not a control — the
+   * endpoint behind it refuses them either way.
+   *
+   * Empty for an anonymous session, and empty is also what a host that cannot
+   * resolve roles reports: a listing that silently drops an admin tool is a
+   * far better failure than one that offers a tool whose every call 403s.
+   */
+  roles?: string[];
 }
 
 export interface ToolSession {
@@ -49,6 +66,15 @@ export interface ToolSession {
  * provider exists — so the host holds this store and pushes into it, exactly as
  * the desktop does for `network`.
  */
+/** Order-insensitive: two hosts may list the same roles differently. */
+function sameRoles(a: string[] | undefined, b: string[] | undefined): boolean {
+  if (a === b) return true;
+  if (!a || !b || a.length !== b.length) return false;
+  const left = [...a].sort();
+  const right = [...b].sort();
+  return left.every((role, index) => role === right[index]);
+}
+
 export function createToolSession(options: { signIn: () => void }): {
   session: ToolSession;
   publish(next: { status: ToolSessionStatus; user?: ToolSessionUser | null }): void;
@@ -76,7 +102,12 @@ export function createToolSession(options: { signIn: () => void }): {
         next.status === status &&
         nextUser?.id === user?.id &&
         nextUser?.name === user?.name &&
-        nextUser?.avatarUrl === user?.avatarUrl
+        nextUser?.avatarUrl === user?.avatarUrl &&
+        // Compared by VALUE: roles arrive as a fresh array on every publish, so
+        // an identity check here would notify on every render — and skipping
+        // the comparison entirely would leave a listing showing yesterday's
+        // tiles after a role change.
+        sameRoles(nextUser?.roles, user?.roles)
       ) {
         return;
       }

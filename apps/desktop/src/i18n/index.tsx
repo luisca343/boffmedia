@@ -8,6 +8,8 @@ import { messages as toolsMinecraftMessages } from "@boffmedia/tools-minecraft/c
 import { messages as toolsMhwildsMessages } from "@boffmedia/tools-mhwilds/catalog"
 import { messages as toolsPokemonMessages } from "@boffmedia/tools-pokemon/catalog"
 import { messages as toolsMewgenicsMessages } from "@boffmedia/tools-mewgenics/catalog"
+import { messages as toolsMiscMessages } from "@boffmedia/tools-misc/catalog"
+import { messages as uiMessages } from "@boffmedia/ui/messages"
 
 import { messages } from "./messages"
 
@@ -64,29 +66,31 @@ function flatten(node: unknown, prefix: string, out: Dict): Dict {
   return out
 }
 
-// Workspace tool packages own their own catalogs, so they are
-// flattened in FIRST and the launcher's own messages land on top — a host key
-// wins a collision, which is the direction that lets the launcher override a
-// tool string without editing the package.
+// Workspace packages own their own catalogs — the tool packages, and
+// `@boffmedia/ui` for what the design system itself renders (the giveaways
+// kit) — so they are flattened in FIRST and the launcher's own messages land
+// on top. A host key wins a collision, which is the direction that lets the
+// launcher override a package string without editing the package.
+//
+// A LIST rather than nested `flatten(` calls: at six catalogs the pyramid had
+// stopped being readable, and adding one more meant re-indenting all of it.
+// Order is bottom-up — last flattened wins.
+const CATALOGS = [
+  toolsMinecraftMessages,
+  toolsMhwildsMessages,
+  toolsPokemonMessages,
+  toolsMewgenicsMessages,
+  toolsMiscMessages,
+  uiMessages,
+  messages,
+] as const
+
+const flatFor = (locale: AppLocale): Dict =>
+  CATALOGS.reduce<Dict>((acc, catalog) => flatten(catalog[locale], "", acc), {})
+
 const FLAT: Record<AppLocale, Dict> = {
-  es: flatten(
-    messages.es,
-    "",
-    flatten(
-      toolsMewgenicsMessages.es,
-      "",
-      flatten(toolsPokemonMessages.es, "", flatten(toolsMhwildsMessages.es, "", flatten(toolsMinecraftMessages.es, "", {}))),
-    ),
-  ),
-  en: flatten(
-    messages.en,
-    "",
-    flatten(
-      toolsMewgenicsMessages.en,
-      "",
-      flatten(toolsPokemonMessages.en, "", flatten(toolsMhwildsMessages.en, "", flatten(toolsMinecraftMessages.en, "", {}))),
-    ),
-  ),
+  es: flatFor("es"),
+  en: flatFor("en"),
 }
 
 /** Index of the `}` matching the `{` at `open`, or -1 if unbalanced. Branch

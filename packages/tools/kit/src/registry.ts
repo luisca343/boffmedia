@@ -42,6 +42,22 @@ export interface ToolManifest {
   /** Hosts hide (or disable) a tool whose capabilities they cannot provide. */
   requiredCapabilities?: ToolCapability[];
   /**
+   * Roles an account must hold for a host to LIST this tool. Any one of them
+   * is enough; absent (the normal case) means everybody sees it.
+   *
+   * Listing, and only listing. The API is what refuses the request — every
+   * endpoint behind a tool declared here carries its own role guard, and would
+   * refuse an unauthorised caller whether or not the tile was ever drawn. What
+   * this buys is a hub that does not advertise a door nobody can open, which
+   * is the whole of the problem: an admin-only tool sitting in a player's Tools
+   * grid reads as a bug long before anyone clicks it.
+   *
+   * A host that cannot resolve roles at all treats every entry here as "hide",
+   * because offering a tool whose every call 403s is the worse of the two
+   * wrong answers.
+   */
+  requiredRoles?: string[];
+  /**
    * How the tool expects to be sized and scrolled — the one structural thing a
    * host cannot guess from the manifest alone.
    *
@@ -60,6 +76,26 @@ export interface ToolManifest {
    * (true of the only two that existed at the time).
    */
   layout?: ToolLayout;
+  /**
+   * The tool has NO gutter of its own and wants the host to supply its
+   * standard one. Absent (the default) means the tool pads itself.
+   *
+   * This exists because the two hosts disagree, and the disagreement is
+   * invisible until a tool is opened in the second one. `apps/web` wraps every
+   * tool in `ToolShell`, which pads by DEFAULT and is escaped per route with
+   * `bleed`. The launcher pads NOTHING: it hands the tool the full width and
+   * expects it to bring its own — which most do, out of their chassis
+   * (`--dk-pad` in the datakit, `--mew-gutter` in Mewgenics).
+   *
+   * A tool written for the web alone therefore has no gutter in its own markup
+   * and renders flush to both window edges in the launcher, looking broken
+   * while type-checking perfectly. The five `misc.*` tools were exactly that.
+   *
+   * Opt-IN rather than a flipped default on purpose: nine shipped tools already
+   * pad themselves, and making the launcher pad by default would have doubled
+   * every one of their gutters to fix five.
+   */
+  gutter?: boolean;
   /**
    * Route segment used by hosts that have URLs (web). The launcher keys its
    * view state off `id` instead.
@@ -88,10 +124,25 @@ export function registerTools(manifests: ToolManifest[]): void {
   }
 }
 
-export function listTools(filter?: { domain?: ToolDomain }): ToolManifest[] {
+/**
+ * Whether an account holding `roles` may SEE this tool. See
+ * {@link ToolManifest.requiredRoles} — visibility, never permission.
+ *
+ * Note the default: with no roles supplied, a role-gated tool is hidden. That
+ * asymmetry is deliberate. Every existing call site passes nothing, and the
+ * safe reading of "I do not know who this is" for an admin tool is "not them".
+ */
+export function isToolVisibleTo(manifest: ToolManifest, roles?: string[]): boolean {
+  if (!manifest.requiredRoles?.length) return true;
+  if (!roles?.length) return false;
+  return manifest.requiredRoles.some((role) => roles.includes(role));
+}
+
+export function listTools(filter?: { domain?: ToolDomain; roles?: string[] }): ToolManifest[] {
   const all = [...registry.values()];
   const scoped = filter?.domain ? all.filter((t) => t.domain === filter.domain) : all;
-  return scoped.sort((a, b) => a.id.localeCompare(b.id));
+  const visible = scoped.filter((t) => isToolVisibleTo(t, filter?.roles));
+  return visible.sort((a, b) => a.id.localeCompare(b.id));
 }
 
 export function getTool(id: string): ToolManifest | undefined {

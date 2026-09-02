@@ -8,6 +8,7 @@ import { Icon, IconButton } from "@boffmedia/ui"
 import { LangSwitcher } from "./LangSwitcher"
 import { MobileAccount } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections, type NavSection } from "./nav-data"
+import { useViewerRoles } from "@/services/useBoffSession"
 
 function sectionItems(sections: NavSection[]) {
   return sections.map((s) => ({
@@ -71,7 +72,8 @@ function NavAccordion({ label, sections, onNavigate }: { label: string; sections
 export function MobileNav({ pathname }: { pathname: string }) {
   const t = useTranslations()
   const tNav = useTranslations("nav.v3")
-  const toolsSections = React.useMemo(() => buildToolsSections(t), [t])
+  const roles = useViewerRoles()
+  const toolsSections = React.useMemo(() => buildToolsSections(t, roles), [t, roles])
   const comunidadSections = React.useMemo(() => buildComunidadSections(t), [t])
   const [open, setOpen] = React.useState(false)
 

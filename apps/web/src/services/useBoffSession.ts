@@ -52,3 +52,14 @@ export const useBoffSession = () => {
     update, // next-auth session update — refreshes the JWT in place, no page reload
   }
 }
+
+/**
+ * Just the viewer's roles, for the listings that hide a role-gated tool
+ * (`ToolEntry.requiredRoles`). `undefined` while the session is still loading
+ * and for a signed-out viewer — which `toolsVisibleTo` reads as "hide", so an
+ * admin card never flashes at everyone for a frame before the session lands.
+ */
+export function useViewerRoles(): readonly string[] | undefined {
+  const { data: session } = useSession()
+  return session?.user?.roles
+}

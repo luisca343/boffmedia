@@ -14,6 +14,7 @@ import { NotifBell } from "./NotifBell"
 import { MobileNav } from "./MobileNav"
 import { AccountNav } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections } from "./nav-data"
+import { useViewerRoles } from "@/services/useBoffSession"
 
 function useTheme() {
   const [theme, setTheme] = React.useState<"dark" | "light">("dark")
@@ -41,7 +42,8 @@ export function Navbar() {
   const { theme, toggle } = useTheme()
   const t = useTranslations()
   const tNav = useTranslations("nav.v3")
-  const toolsSections = React.useMemo(() => buildToolsSections(t), [t])
+  const roles = useViewerRoles()
+  const toolsSections = React.useMemo(() => buildToolsSections(t, roles), [t, roles])
   const comunidadSections = React.useMemo(() => buildComunidadSections(t), [t])
 
   return (

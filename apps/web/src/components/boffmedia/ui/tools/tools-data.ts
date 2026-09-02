@@ -39,14 +39,16 @@ const normHref = (href: string) => (href.startsWith("/") ? href : `/${href}`)
 
 type T = (key: string, values?: Record<string, string | number | Date>) => string
 
-/** Build one hub game (metadata + landing tools), translated via a root `t`. */
-export function buildHubGame(slug: string, t: T): HubGame | null {
+/** Build one hub game (metadata + landing tools), translated via a root `t`.
+ *  `roles` is the viewer's, and drops the tools they are not meant to see —
+ *  omitting it hides every role-gated tool. */
+export function buildHubGame(slug: string, t: T, roles?: readonly string[]): HubGame | null {
   const game = getGameEntry(slug)
   const hub = hubConfig[slug]
   if (!game || !hub) return null
 
   const hueColor = hueColorOf(hub.hue)
-  const tools: ToolCardData[] = getLandingItems(slug).map((item) => {
+  const tools: ToolCardData[] = getLandingItems(slug, roles).map((item) => {
     const base = `${hub.toolNs}.${item.key}`
     return {
       key: item.key,
@@ -78,8 +80,8 @@ export function buildHubGame(slug: string, t: T): HubGame | null {
   }
 }
 
-export function buildHubGames(t: T): HubGame[] {
-  return HUB_SLUGS.map((s) => buildHubGame(s, t)).filter((g): g is HubGame => g !== null)
+export function buildHubGames(t: T, roles?: readonly string[]): HubGame[] {
+  return HUB_SLUGS.map((s) => buildHubGame(s, t, roles)).filter((g): g is HubGame => g !== null)
 }
 
 export interface ExtLinkData {
@@ -97,8 +99,8 @@ export interface CategoryData extends HubGame {
 }
 
 /** Build a game/category landing page's data (banner · featured · tools · external links). */
-export function buildCategory(slug: string, t: T): CategoryData | null {
-  const g = buildHubGame(slug, t)
+export function buildCategory(slug: string, t: T, roles?: readonly string[]): CategoryData | null {
+  const g = buildHubGame(slug, t, roles)
   const game = getGameEntry(slug)
   const hub = hubConfig[slug]
   if (!g || !game || !hub) return null

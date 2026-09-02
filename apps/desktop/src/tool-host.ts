@@ -13,6 +13,7 @@ import { minecraftTools } from "@boffmedia/tools-minecraft/tools"
 import { mhwildsTools } from "@boffmedia/tools-mhwilds/tools"
 import { pokemonTools } from "@boffmedia/tools-pokemon/tools"
 import { mewgenicsTools } from "@boffmedia/tools-mewgenics/tools"
+import { miscTools } from "@boffmedia/tools-misc/tools"
 import {
   configureToolHost,
   createToolSession,
@@ -37,7 +38,9 @@ import {
   type ToolOutboxOp,
   type ToolSessionUser,
   type ToolApiRequest,
+  type ToolStreamRequest,
 } from "@boffmedia/tool-kit"
+import { configureUi } from "@boffmedia/ui"
 
 import {
   isDesktop,
@@ -45,6 +48,9 @@ import {
   saveStream,
   saveDialog,
   toolApiRequest,
+  toolApiStream,
+  toolApiBaseUrl,
+  loadToolApiBaseUrl,
   toolDbClear,
   toolDbGet,
   toolDbList,
@@ -164,6 +170,34 @@ const desktopApi: ToolApi = {
     } catch (err) {
       const wire = err as WireApiError
       throw new ToolApiError(wire?.message ?? `${init?.method ?? "GET"} ${path} failed`, {
+        needsSignin: wire?.needs_signin === true,
+        code: wire?.code,
+      })
+    }
+  },
+
+  async stream<T>(path: string, init: ToolStreamRequest<T>): Promise<void> {
+    const query: Record<string, string> = {}
+    for (const [key, value] of Object.entries(init.query ?? {})) {
+      if (value !== undefined) query[key] = String(value)
+    }
+    // `signal` is not forwarded, for the same reason as `request` above: a
+    // Tauri command cannot be cancelled mid-flight. The frames simply stop
+    // being delivered once the tool drops the channel with it.
+    try {
+      await toolApiStream<T>(
+        {
+          path,
+          method: init.method ?? "POST",
+          body: init.body,
+          query,
+          auth: init.auth ?? "optional",
+        },
+        init.onMessage,
+      )
+    } catch (err) {
+      const wire = err as WireApiError
+      throw new ToolApiError(wire?.message ?? `${init.method ?? "POST"} ${path} failed`, {
         needsSignin: wire?.needs_signin === true,
         code: wire?.code,
       })
@@ -444,6 +478,13 @@ export function setToolSessionAccount(user: ToolSessionUser | null, restoring = 
   )
 }
 
+// `@boffmedia/ui` has the same seam for the same reason — the giveaways kit
+// inside it loads audio from the shared tree — and `configureUi` merges
+// partials, so setting one field here does not disturb the translator wiring
+// `./i18n` registers. Done from this module rather than that one so
+// `desktopAssetUrl` stays private to the file that owns the asset origin.
+configureUi({ assetUrl: desktopAssetUrl })
+
 configureToolHost({
   // Browser dev mode (`dev:renderer`) has no Rust side, so it falls back to the
   // ordinary blob download — every tool screen stays browser-runnable.
@@ -456,14 +497,33 @@ configureToolHost({
   api: isDesktop() ? desktopApi : createWebApi(webModeApiBase()),
   assetUrl: desktopAssetUrl,
   siteUrl: desktopSiteUrl,
+  // Not `desktopAssetUrl` and not `desktopSiteUrl`: a download link must point
+  // at the API that serves the file, which is neither the on-disk asset cache
+  // nor the website. `toolApiBaseUrl()` is the runtime value Rust resolved.
+  apiUrl: (path) =>
+    /^[a-z][a-z0-9+.-]*:/i.test(path)
+      ? path
+      : `${toolApiBaseUrl()}${path.startsWith("/") ? path : `/${path}`}`,
   network: desktopNetwork,
   data: desktopData,
   session: toolSessionStore.session,
 })
 
+// Fire-and-forget, from the module that owns the API seam rather than from the
+// shell's boot gates: `apiUrl` has a correct build-time fallback, so nothing has
+// to WAIT on this — it only replaces that fallback with the runtime value once
+// Rust answers. Blocking boot on a url builder would be the wrong trade.
+void loadToolApiBaseUrl()
+
 // The Tools hub renders from the registry, so a domain package becomes visible
 // by being registered here and nowhere else.
-registerTools([...minecraftTools, ...mhwildsTools, ...pokemonTools, ...mewgenicsTools])
+registerTools([
+  ...minecraftTools,
+  ...mhwildsTools,
+  ...pokemonTools,
+  ...mewgenicsTools,
+  ...miscTools,
+])
 
 // Dev-only console handle for the capabilities: it exercises a capability
 // directly, without having to drive a tool UI to the screen that happens to use
@@ -486,7 +546,11 @@ if (import.meta.env.DEV) {
         img.src = src
       }),
     host: () => getToolHost(),
-    tools: () => listTools().map((t) => t.id),
+    // Role-filtered like the grid is, so the two agree. A `requiredRoles` tool
+    // is absent here for the same reason it is absent there — not registered
+    // is a different fault from not visible, and conflating them sends you
+    // looking in the wrong file.
+    tools: () => listTools({ roles: getToolHost().session.user()?.roles }).map((t) => t.id),
     // The offline data seam, exercisable without a tool that writes yet.
     db: (ns: string) => getToolHost().data.db(ns),
     outbox: (ns: string) => getToolHost().data.outbox(ns),

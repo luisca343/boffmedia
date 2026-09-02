@@ -1,4 +1,4 @@
-import { getGameEntry, getToolHref } from "@/data/games"
+import { getGameEntry, getToolHref, toolsVisibleTo } from "@/data/games"
 import { hubConfig } from "@/data/hub"
 import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data"
 import type { IconName } from "@boffmedia/ui"
@@ -42,7 +42,7 @@ export const PRIMARY_NAV: NavEntry[] = [
  * routes and names) — adding a game/tool there updates this menu, the hub,
  * the category landings and the shell sidebar together.
  */
-export function buildToolsSections(t: T): NavSection[] {
+export function buildToolsSections(t: T, roles?: readonly string[]): NavSection[] {
   return HUB_SLUGS.flatMap((slug) => {
     const game = getGameEntry(slug)
     const hub = hubConfig[slug]
@@ -56,7 +56,7 @@ export function buildToolsSections(t: T): NavSection[] {
           .map((c) => ({
             name: t(c.nameKey),
             href: c.href,
-            items: c.tools
+            items: toolsVisibleTo(c.tools, roles)
               .filter((tool) => tool.showInSidebar !== false)
               .map((tool) => ({ label: t(tool.nameKey), href: tool.href, icon: tool.sidebarIcon })),
           }))

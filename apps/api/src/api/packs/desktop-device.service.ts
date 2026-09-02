@@ -43,6 +43,7 @@ export type DevicePollResult =
         username: string;
         mcUuid: string | null;
         avatarUrl: string | null;
+        roles: string[];
       };
     };
 
@@ -196,6 +197,11 @@ export class DesktopDeviceService {
         // Waiting for the next `me` would mean a monogram for the whole first
         // session after signing in.
         avatarUrl: desktopAvatarUrl(user.profilePicture, user.updatedAt),
+        // Same reasoning, with a sharper edge: the app hides admin-only tools
+        // from an account with no roles, so waiting for the next `me` would
+        // mean an admin signing in and finding those tools missing until they
+        // restart — indistinguishable from a bug.
+        roles: await this.packsRepo.rolesOf(user.id),
       },
     };
   }

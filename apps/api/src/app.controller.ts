@@ -5,6 +5,7 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
+import { DesktopOrUserAuthGuard } from '@api/packs/guards/desktop-or-user-auth.guard';
 import { AppService } from './app.service';
 import { promises as fs } from 'fs';
 import { join } from 'path';
@@ -108,7 +109,23 @@ export class AppController {
     return await this.appService.blogicons();
   }
 
+  /**
+   * El inventario de claves de Steam de Boffmedia. Solo BOFF_ADMIN.
+   *
+   * `@Public()` se queda: marca la ruta como exenta del `JwtAuthGuard` GLOBAL,
+   * que rechaza un token de la app por su claim `typ` antes de que ningún guard
+   * de aquí llegue a ejecutarse. La autenticación real son los dos guards de
+   * debajo — mismo patrón que `packs/launcher/me`.
+   *
+   * `DesktopOrUserAuthGuard` acepta las dos credenciales (sesión web y sesión de
+   * la app) y rellena `req.user.roles` en ambos casos, que es lo que
+   * `RolesGuard` lee. Las dos superficies muestran esta herramienta, así que
+   * las dos tienen que poder autenticarse contra ella.
+   */
   @Public()
+  @UseGuards(DesktopOrUserAuthGuard, RolesGuard)
+  @Roles(USER_ROLES.BOFF_ADMIN)
+  @ApiBearerAuth('JWT')
   @Get('steamkeys')
   async steamkeys() {
     return await this.appService.steamKeys();

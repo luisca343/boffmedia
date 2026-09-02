@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
-import { SorteosView } from "./_components/SorteosView";
+import { SorteosView } from "@boffmedia/tools-misc"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pageMeta.herramientas")
@@ -8,5 +8,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function SorteosPage() {
-  return <SorteosView />;
+  return <SorteosView />
 }

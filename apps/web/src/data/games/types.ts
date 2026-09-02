@@ -1,4 +1,5 @@
 import type { IconName } from "@boffmedia/ui"
+import type { UserRole } from "@boffmedia/shared/roles"
 
 export interface LandingCardConfig {
   icon: string;
@@ -25,6 +26,21 @@ export interface ToolEntry {
    * least that many path segments below `href` (e.g. 2 → session/match views).
    */
   bleed?: boolean | number;
+  /**
+   * Roles a viewer must hold for this tool to be LISTED — any one of them is
+   * enough; absent (the normal case) means everybody sees it.
+   *
+   * Listing, and only listing: the API behind the tool carries its own role
+   * guard and refuses an unauthorised caller whether or not the card was ever
+   * drawn. What this buys is a hub that does not advertise a door nobody can
+   * open. Deliberately NOT applied to the route-shape lookups (`getToolHref`,
+   * the shell's bleed resolution) — someone who reaches the page anyway should
+   * still get the right layout and the API's refusal, not a broken screen.
+   *
+   * Mirrors `ToolManifest.requiredRoles` in `@boffmedia/tool-kit`, which is the
+   * same decision for the launcher's own grid.
+   */
+  requiredRoles?: UserRole[];
   landing?: LandingCardConfig;
 }
 

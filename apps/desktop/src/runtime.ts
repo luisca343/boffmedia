@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core";
+import { Channel, invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -263,6 +263,11 @@ export interface BoffAccount {
    *  which keeps several accounts distinguishable where a shared default
    *  silhouette would not. */
   avatarUrl: string | null;
+  /** What this account may SEE — the Tools grid hides an admin-only tool from
+   *  an account without the role. Never a permission: the API refuses the call
+   *  either way. Empty for an offline restore, since the roster does not cache
+   *  roles (they arrive with the sign-in approval and again from `/me`). */
+  roles: string[];
 }
 
 /** A row in the Boffmedia account switcher: only `active` has the live session
@@ -279,6 +284,16 @@ const MOCK_BOFF_ACCOUNT: BoffAccount = {
   username: "Trainer",
   mcUuid: MOCK_ACCOUNT.uuid,
   avatarUrl: null,
+  // Admin, so that any browser-dev path which DOES adopt this account can reach
+  // the admin-only tools. Costs nothing: the account is a fiction that never
+  // leaves the renderer, and the real API refuses the calls regardless.
+  //
+  // Note what this does NOT do today: the boot restore in `state/app.tsx`
+  // returns early when `!isDesktop()`, so `dev:renderer` never dispatches
+  // `boff/done` and the tool session stays `anonymous`. A `requiredRoles` tool
+  // (Steam Keys) is therefore hidden in browser dev — the fail-safe working as
+  // designed, but it means that one screen cannot be worked on there.
+  roles: ["BOFF_ADMIN"],
 };
 
 /** The website this launcher belongs to. Used for the links the launcher hands
@@ -2657,6 +2672,57 @@ export async function toolApiRequest<T = unknown>(request: {
   auth?: "optional" | "required";
 }): Promise<T> {
   return await invoke<T>("tool_api_request", { request });
+}
+
+/** Where the API lives, for the `apiUrl` capability — the ABSOLUTE base a
+ *  download link is built on. Cached because a url builder cannot await, and
+ *  asked of Rust because only Rust reads the runtime `BOFF_API_URL`: anything
+ *  baked into this bundle is fixed at build time, so a shell pointed at a
+ *  staging API would otherwise hand out production links.
+ *
+ *  Until `loadToolApiBaseUrl()` resolves — and in browser dev mode, which has no
+ *  Rust side — this falls back to the build-time value, which is the right
+ *  answer in every ordinary build and merely a stale one in the odd case. */
+let toolApiBase: string | null = null;
+
+export function toolApiBaseUrl(): string {
+  if (toolApiBase) return toolApiBase;
+  const configured = import.meta.env.VITE_API_URL as string | undefined;
+  if (configured && configured.trim()) return configured.trim().replace(/\/+$/, "");
+  return import.meta.env.DEV ? "http://localhost:34301" : "https://api.boffmedia.es";
+}
+
+/** Called once at boot. Best-effort: a failure leaves the fallback above in
+ *  place rather than blocking a shell that is otherwise fine. */
+export async function loadToolApiBaseUrl(): Promise<void> {
+  if (!isDesktop()) return;
+  try {
+    const base = await invoke<string>("tool_api_base_url");
+    if (base && base.trim()) toolApiBase = base.trim().replace(/\/+$/, "");
+  } catch {
+    // Keep the fallback.
+  }
+}
+
+/** One proxied tool API call whose answer arrives in pieces (server-sent
+ *  events). Rust reads the stream and forwards each `data:` frame's parsed JSON
+ *  over an IPC channel; this resolves once the stream ends.
+ *
+ *  Not a variant of `toolApiRequest`: that one returns the whole body, which
+ *  for a stream means one delivery after the job has already finished. */
+export async function toolApiStream<T = unknown>(
+  request: {
+    path: string;
+    method?: string;
+    body?: unknown;
+    query?: Record<string, string>;
+    auth?: "optional" | "required";
+  },
+  onMessage: (data: T) => void,
+): Promise<void> {
+  const channel = new Channel<T>();
+  channel.onmessage = onMessage;
+  await invoke<void>("tool_api_stream", { request, onMessage: channel });
 }
 
 // ── Tool data (tool_db.rs) ─────────────────────────────────────────────────

@@ -91,6 +91,26 @@ export class ToolApiError extends Error {
 }
 
 /**
+ * A call whose answer arrives in pieces. See {@link ToolApi.stream}.
+ *
+ * `onMessage` replaces the resolved value rather than supplementing it: a
+ * stream has no single body to return, and buffering one would defeat the
+ * entire point of asking for a stream.
+ */
+export interface ToolStreamRequest<T = unknown> extends ToolApiRequest {
+  /**
+   * Called once per frame, in arrival order, with the frame's `data:` payload
+   * already parsed from JSON.
+   *
+   * A frame that is not valid JSON is SKIPPED rather than thrown, because a
+   * long server-side job must not be abandoned over one malformed line — and
+   * because that is exactly what the web implementation this seam replaces has
+   * always done.
+   */
+  onMessage: (data: T) => void;
+}
+
+/**
  * The API seam. Web resolves this to a plain `fetch` against the public
  * API; the launcher routes it through an authenticated Rust proxy (the browser
  * cannot reach the OS keychain where its session JWT lives, and the webview
@@ -105,6 +125,22 @@ export class ToolApiError extends Error {
 export interface ToolApi {
   /** Path is relative to the host's API root, e.g. `/scrape/myrient`. */
   request<T = unknown>(path: string, init?: ToolApiRequest): Promise<T>;
+  /**
+   * A server-sent-events call: the response is a sequence of `data:` frames
+   * carrying JSON, and the promise settles when the stream ends.
+   *
+   * Separate from `request` rather than a flag on it because the two cannot
+   * share a return type — `request` resolves WITH the body, and there is no
+   * body here to resolve with. Progress for a long server-side job (Myrient's
+   * bulk download is the first) is the case this exists for.
+   *
+   * The launcher cannot reuse its ordinary proxy for this: that command reads
+   * the whole response and hands it back as one value, which for a stream
+   * means every frame arrives at once, after the job it was reporting on has
+   * already finished. So it streams natively instead and forwards frames over
+   * an IPC channel.
+   */
+  stream<T = unknown>(path: string, init: ToolStreamRequest<T>): Promise<void>;
 }
 
 /**
@@ -150,6 +186,24 @@ export type ToolAssetUrl = (path: string) => string;
 export type ToolSiteUrl = (path: string) => string;
 
 /**
+ * A path on the API, resolved to an ABSOLUTE url a browser can be pointed at.
+ *
+ * The third and last of the URL resolvers, and it exists because the first two
+ * cannot answer this question: `assetUrl` names where the shared asset TREE is
+ * (the launcher's on-disk cache), `siteUrl` names where the WEBSITE is, and
+ * neither is where the API serves a file from.
+ *
+ * This is for links a person opens — a download the host hands to a browser or
+ * to the system — NOT for making requests. A request goes through
+ * {@link ToolApi}, which is the only thing that attaches the session; a url
+ * built here carries no credential, so it must only ever address a public
+ * endpoint. The Myrient library's `serve-file` is the first: the response is a
+ * `Content-Disposition: attachment` of a file that can run to several GB, which
+ * is precisely the case that must not be pulled through a JSON call.
+ */
+export type ToolApiUrl = (path: string) => string;
+
+/**
  * Whether the tool can reach anything beyond this machine.
  *
  * This exists because "the list is empty" and "the list could not be fetched"
@@ -182,6 +236,8 @@ export interface ToolHost {
   assetUrl: ToolAssetUrl;
   /** See {@link ToolSiteUrl} — for links a person will open, not for bytes. */
   siteUrl: ToolSiteUrl;
+  /** See {@link ToolApiUrl} — a public API url to open, never to request. */
+  apiUrl: ToolApiUrl;
   network: ToolNetwork;
   /** Durable per-tool storage and the outbound write queue. See `data.ts`. */
   data: ToolData;
@@ -237,6 +293,11 @@ export function assetUrl(path: string): string {
 /** See {@link ToolSiteUrl}. */
 export function siteUrl(path: string): string {
   return getToolHost().siteUrl(path);
+}
+
+/** See {@link ToolApiUrl}. */
+export function apiUrl(path: string): string {
+  return getToolHost().apiUrl(path);
 }
 
 export function toolNetwork(): ToolNetwork {

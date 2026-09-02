@@ -9,6 +9,7 @@ import { TxSection } from "./TxSection"
 import { ArtImage } from "./ArtImage"
 import { Bleed } from "./ToolShell"
 import { buildCategory, hueStyle, type CategoryData, type ExtLinkData } from "./tools-data"
+import { useViewerRoles } from "@/services/useBoffSession"
 
 // ── full-bleed game banner (real key-art image) ──────────────────────────────
 export function GameBanner({ cat }: { cat: CategoryData }) {
@@ -142,7 +143,8 @@ export function CategoryLanding({ slug }: { slug: string }) {
   const t = useTranslations()
   const tCat = useTranslations("toolsUi.category")
   const tHub = useTranslations("toolsUi.hub")
-  const cat = React.useMemo(() => buildCategory(slug, t), [slug, t])
+  const roles = useViewerRoles()
+  const cat = React.useMemo(() => buildCategory(slug, t, roles), [slug, t, roles])
   if (!cat) return null
 
   return (

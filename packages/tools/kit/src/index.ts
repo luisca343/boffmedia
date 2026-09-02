@@ -1,4 +1,5 @@
 export {
+  apiUrl,
   assetUrl,
   siteUrl,
   configureToolHost,
@@ -21,8 +22,10 @@ export type {
   ToolApi,
   ToolApiAuth,
   ToolApiRequest,
+  ToolApiUrl,
   ToolAssetUrl,
   ToolSiteUrl,
+  ToolStreamRequest,
   ToolCapability,
   ToolHost,
   ToolNetwork,
@@ -46,11 +49,12 @@ export type { ToolSession, ToolSessionStatus, ToolSessionUser } from "./session"
 export { useToolOnline, useToolPending, useToolSession } from "./hooks";
 export type { ToolSessionView } from "./hooks";
 
-export { getTool, listTools, registerTools } from "./registry";
+export { getTool, isToolVisibleTo, listTools, registerTools } from "./registry";
 export type { ToolDomain, ToolLayout, ToolManifest } from "./registry";
 
 export {
   createWebApi,
+  createWebApiUrl,
   createWebNetwork,
   createWebStorage,
   createWebToolHost,

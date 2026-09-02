@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "target": "ES2017",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@boffmedia/asset-paths": ["../../asset-paths/src/index.ts"],
+      "@boffmedia/shared": ["../../shared/src/index.ts"],
+      "@boffmedia/tool-kit": ["../kit/src/index.ts"],
+      "@boffmedia/ui": ["../../ui/src/index.ts"],
+      "@boffmedia/ui/*": ["../../ui/src/*"]
+    }
+  },
+  "include": ["src/**/*.ts", "src/**/*.tsx"],
+  "exclude": ["node_modules"]
+}

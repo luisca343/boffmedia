@@ -1843,6 +1843,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             id: String(account.id),
             name: account.username,
             avatarUrl: account.avatarUrl ?? null,
+            // Listing only — see `ToolSessionUser.roles`. This is what lets the
+            // Tools grid leave out a tool the account could never open.
+            roles: account.roles ?? [],
           }
         : null,
       booting,
