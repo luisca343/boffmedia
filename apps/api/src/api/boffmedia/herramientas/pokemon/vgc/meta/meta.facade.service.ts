@@ -5,6 +5,7 @@
   NotFoundException,
 } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
+import { initChampionsMod, listChampionsFormatIds } from '@boffmedia/battle-core';
 import { FetchSmogonDto } from './dto/fetch-smogon.dto';
 import { SmogonService } from './services/smogon.service';
 import { VgcPastesService } from './services/vgcpastes.service';
@@ -27,7 +28,6 @@ import { PersonalMetaAnalyticsService } from './services/personal-meta-analytics
 import { DivergenceService } from './services/divergence.service';
 import { QueryPersonalMetaDto } from './dto/query-personal-meta.dto';
 import { QueryDivergenceDto } from './dto/query-divergence.dto';
-import { initChampionsMod, listChampionsFormatIds } from '../champions.mod';
 
 @Injectable()
 export class VgcMetaFacadeService {

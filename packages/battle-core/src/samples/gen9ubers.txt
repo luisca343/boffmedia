@@ -1,0 +1,59 @@
+Koraidon @ Clear Amulet
+Ability: Orichalcum Pulse
+Tera Type: Fire
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Collision Course
+- Flare Blitz
+- Scale Shot
+- Swords Dance
+
+Zacian-Crowned @ Rusted Sword
+Ability: Intrepid Sword
+Tera Type: Flying
+EVs: 252 Atk / 4 SpD / 252 Spe
+Jolly Nature
+- Behemoth Blade
+- Play Rough
+- Close Combat
+- Swords Dance
+
+Necrozma-Dusk-Mane @ Leftovers
+Ability: Prism Armor
+Tera Type: Fairy
+EVs: 252 HP / 252 Atk / 4 SpD
+Adamant Nature
+- Sunsteel Strike
+- Earthquake
+- Dragon Dance
+- Morning Sun
+
+Ho-Oh @ Heavy-Duty Boots
+Ability: Regenerator
+Tera Type: Grass
+EVs: 248 HP / 8 Atk / 252 SpD
+Careful Nature
+- Sacred Fire
+- Brave Bird
+- Recover
+- Whirlwind
+
+Arceus-Fairy @ Pixie Plate
+Ability: Multitype
+Tera Type: Fairy
+EVs: 252 HP / 4 SpD / 252 Spe
+Timid Nature
+- Judgment
+- Calm Mind
+- Recover
+- Taunt
+
+Eternatus @ Black Sludge
+Ability: Pressure
+Tera Type: Flying
+EVs: 252 HP / 4 SpA / 252 Spe
+Timid Nature
+- Dynamax Cannon
+- Sludge Bomb
+- Recover
+- Toxic Spikes

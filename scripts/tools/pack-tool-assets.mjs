@@ -94,8 +94,15 @@ function relPosix(p) {
 // ── walk the built tree ──────────────────────────────────────────────────
 // Excludes the gitignored build stamp: it is build-local bookkeeping, never
 // published content.
+//
+// Also excludes anything the tree's own manifest.json lists under `excluded`.
+// That field is how a build script says "this file is on disk but is not part
+// of the tool" — battlesim's 158 MB unreferenced background GIF is the reason
+// it exists. `public/` is gitignored and hand-synced, so the file cannot simply
+// be deleted from the repo; without this the packer happily shipped a 191 MB
+// archive of a 42 MB tool.
 
-function walkTree(dir) {
+function walkTree(dir, excluded = new Set()) {
   const rels = []
   const stack = [dir]
   while (stack.length) {
@@ -107,7 +114,9 @@ function walkTree(dir) {
         continue
       }
       if (entry.name === ".build-stamp.toon") continue
-      rels.push(relPosix(path.relative(dir, full)))
+      const rel = relPosix(path.relative(dir, full))
+      if (excluded.has(rel)) continue
+      rels.push(rel)
     }
   }
   return rels
@@ -190,14 +199,18 @@ async function main() {
     process.exit(1)
   }
 
-  const relPaths = walkTree(TOOL_DIR)
+  const excluded = new Set(
+    Array.isArray(manifest.excluded) ? manifest.excluded.filter((p) => typeof p === "string") : [],
+  )
+  const relPaths = walkTree(TOOL_DIR, excluded)
   if (relPaths.length === 0) {
     console.error(`[pack-tool-assets] ${TOOL_DIR} is empty — refusing to pack nothing`)
     process.exit(1)
   }
   relPaths.sort() // deterministic entry order
 
-  console.log(`[pack-tool-assets] tool=${TOOL} dataset=${version} files=${relPaths.length} out=${path.relative(REPO, OUT_DIR)}`)
+  const excludedNote = excluded.size ? ` excluded=${excluded.size}` : ""
+  console.log(`[pack-tool-assets] tool=${TOOL} dataset=${version} files=${relPaths.length}${excludedNote} out=${path.relative(REPO, OUT_DIR)}`)
 
   // Hash every file (streamed, bounded concurrency — the tree is never
   // buffered as a whole).

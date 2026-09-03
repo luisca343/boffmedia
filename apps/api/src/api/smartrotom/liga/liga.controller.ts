@@ -262,12 +262,10 @@ export class LigaController {
     return await this.ligaFacadeService.registerForTournament(registration);
   }
 
-  // ==================== LEGACY ENDPOINTS (for backward compatibility) ====================
-
-  @Get('replay/:id')
-  @ApiOperation({ summary: 'Get replay by ID (legacy endpoint)' })
-  async getLegacyReplay(@Param('id') id: number) {
-    // Maintains backward compatibility with the original endpoint
-    return await this.ligaFacadeService.getReplayById(id);
-  }
+  // The `GET replay/:id` duplicate that used to sit here was removed
+  // (2026-09-02). It registered the identical path as the handler near the top
+  // of this class, so Nest resolved that one first and this was unreachable —
+  // while still emitting a SECOND OpenAPI operation on the same path, which
+  // `pnpm generate:shared` then had to reconcile. It also typed `id` as
+  // `number` with no ParseIntPipe, so it would have received a string anyway.
 }

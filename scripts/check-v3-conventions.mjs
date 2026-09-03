@@ -83,8 +83,10 @@ const LEGACY_UI = ["apps/web/src/components/ui/"];
 // Measured for the first time on 2026-08-23, for the same reason as
 // CROSS_DS_BASELINE above — the file listing had never returned anything.
 const ORPHAN_LEGACY_BASELINE = {
-  "apps/web/src/app/battlesim/_components/PokemonDetail.tsx": 3,
-  "apps/web/src/app/battlesim/_components/PokemonElement.tsx": 1,
+  // The two battlesim entries are gone (2026-09-02): the engine moved to
+  // @boffmedia/tools-battlesim, where the legacy shadcn primitives it used are
+  // not reachable at all — PokemonDetail now renders @boffmedia/ui's Popover
+  // and Tabs, and PokemonElement its Button.
   "apps/web/src/app/wingull/_components/MovingSection.tsx": 1,
   "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionForm.tsx": 5,
   "apps/web/src/app/wingull/invitacion/[id]/_components/InvitacionNoEncontrada.tsx": 2,

@@ -11,6 +11,8 @@ import axios from 'axios';
 import { Actions } from '@pkmn/login';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
+import { allowedOrigins } from '@/config/cors-origins';
+import { BattleTicketService } from './battle-ticket.service';
 
 interface ShowdownClientEntry {
   socket: Socket;
@@ -23,11 +25,39 @@ interface ShowdownClientEntry {
 const MAX_RECONNECT_ATTEMPTS = 5;
 const BASE_RECONNECT_DELAY_MS = 1000;
 
-@WebSocketGateway({ namespace: '/showdown', cors: true })
+@WebSocketGateway({
+  namespace: '/showdown',
+  // Not `cors: true`: socket.io handles CORS itself, so the wildcard bypassed
+  // the allowlist in main.ts and left the relay open to any origin.
+  cors: { origin: allowedOrigins(env.NODE_ENV === 'production'), credentials: false },
+})
 export class ShowdownGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
-  constructor(private readonly logger: Logger) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly tickets: BattleTicketService,
+  ) {}
+
+  afterInit(server: Server): void {
+    // D5/§5.1.5: the relay now requires a Boffmedia session. It opens a real
+    // upstream socket to Pokémon Showdown per client and forwards credentials
+    // through it, so leaving it unauthenticated made this API an open proxy
+    // that anyone could point at PS from any origin.
+    server.use((socket: Socket, next: (err?: Error) => void) => {
+      const ticket = (socket.handshake.auth as { ticket?: unknown } | undefined)?.ticket;
+      if (typeof ticket !== 'string' || !ticket) {
+        next(new Error('unauthorized'));
+        return;
+      }
+      try {
+        this.tickets.verify(ticket);
+        next();
+      } catch {
+        next(new Error('unauthorized'));
+      }
+    });
+  }
 
   @WebSocketServer() server: Server;
 
@@ -113,9 +143,6 @@ export class ShowdownGateway
       );
       return;
     }
-    this.logger.log(
-      `sendToShowdown: forwarding to PS for client ${clientId}: ${payload.substring(0, 80)}`,
-    );
     entry.showdownWs.send(payload);
   }
 
@@ -131,7 +158,10 @@ export class ShowdownGateway
         password,
         challstr,
       });
-      this.logger.log(`Login request to PS for ${username}: ${action.url}`);
+      // Username, the PS response body and the /trn assertion were all logged
+      // at info level here. The assertion is a bearer credential for that PS
+      // account; the username identifies the player. Only the outcome is logged.
+      this.logger.log('PS login attempt');
       const response = await axios({
         url: action.url,
         method: action.method,
@@ -140,16 +170,15 @@ export class ShowdownGateway
         responseType: action.responseType,
       });
 
-      this.logger.log(`PS login response: ${response.data.substring(0, 120)}`);
       const cmd = action.onResponse(response.data);
       if (cmd) {
-        this.logger.log(`Login assertion cmd: ${cmd.substring(0, 100)}`);
         const clientId = this.getClientId(client);
         if (clientId) {
           const entry = this.clients.get(clientId);
           if (entry?.showdownWs?.readyState === WebSocket.OPEN) {
             entry.showdownWs.send(cmd);
             client.emit('loginSuccess', cmd);
+            this.logger.log('PS login success');
           } else {
             client.emit('loginError', 'Not connected to Showdown server');
           }
@@ -158,7 +187,7 @@ export class ShowdownGateway
         client.emit('loginError', 'Login failed: No command returned');
       }
     } catch (error: any) {
-      this.logger.error('Login error:', error.message);
+      this.logger.error('PS login failed');
       client.emit(
         'loginError',
         error.message || 'An error occurred during login',
@@ -180,8 +209,8 @@ export class ShowdownGateway
 
     showdownWs.on('message', (data) => {
       const msg = data.toString();
-      // Log ALL messages from PS for debugging
-      this.logger.log(`PS→client ${clientId}: ${msg.substring(0, 200)}`);
+      // Deliberately NOT logged. Every frame from PS was written at info level,
+      // which includes the player's private messages and their battle chat.
       entry.socket.emit('showdownMessage', msg);
     });
 

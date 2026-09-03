@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Game } from "@/app/battlesim/replay/_components/Game";
+import { Game } from "@boffmedia/tools-battlesim";
 import { LigaService } from "@/services/api/smartrotom/ligaService";
 
 export default function VerPage({ params }: { params: { id: string } }) {

@@ -3,7 +3,7 @@
 // Fails on: an unmarked service injecting DRIZZLE, marker count above baseline, or a stale
 // marker (present but DRIZZLE gone — otherwise the count would never ratchet down).
 import { readFileSync, readdirSync, statSync } from "node:fs";
-import { join } from "node:path";
+import { join, sep } from "node:path";
 
 const ROOT = "apps/api/src";
 const MARKER = "LEGACY_DIRECT_DB";
@@ -11,7 +11,10 @@ const INJECT_DRIZZLE = "@Inject(DRIZZLE)";
 
 // Lower this — never raise it — as services are migrated to repositories.
 // 2026-07-18: player + netfluis dropped (they never used DRIZZLE), 14 → 12.
-const LEGACY_BASELINE = 12;
+// 2026-09-02: the last markers were already gone from the tree; the constant
+// had simply not been ratcheted down after them, so the check had been failing
+// on a clean checkout. 12 → 0.
+const LEGACY_BASELINE = 0;
 
 const SKIP_DIRS = new Set(["node_modules", "dist", ".next", "generated"]);
 
@@ -49,8 +52,14 @@ for (const file of serviceFiles(ROOT)) {
   const src = readFileSync(file, "utf8");
   const injects = src.includes(INJECT_DRIZZLE);
   const hasMarker = src.includes(MARKER);
+  // A file already under `_repositories/` IS the data-access layer this rule
+  // exists to push work into, so telling it to "extract a repository" asks it
+  // to extract itself. `audit.service.ts` is the case in point: four inserts
+  // across four audit tables, no business logic, and fourteen call sites that
+  // depend on the name. Injecting DRIZZLE is its whole job.
+  const isRepositoryLayer = file.split(sep).includes("_repositories");
 
-  if (injects && !hasMarker) unannotated.push(file);
+  if (injects && !hasMarker && !isRepositoryLayer) unannotated.push(file);
   if (hasMarker) marked.push(file);
   if (hasMarker && !injects) {
     violations.push(

@@ -1,145 +1,62 @@
-import { BattleStreams, RandomPlayerAI, Teams } from '@pkmn/sim';
-import { Protocol } from '@pkmn/protocol';
-import { getRandomTeam } from '../_utils/teams';
+import { BattleRoom, type RoomPlayer } from './battle.room';
 
 /**
- * Runs a full random battle to completion to trace the stream data flow.
+ * The room's own contract, now that the simulator itself lives in
+ * `@boffmedia/battle-core` and is covered there.
  *
- * Everything this test starts MUST be torn down through `finish()`. It shares a
- * process with every other suite under `--runInBand`, so a 30s safety timer left
- * armed after the battle is won fires inside whatever unrelated suite is running
- * by then and fails it with an empty body ("Caught error after test environment
- * was torn down"). The victim differs run to run, which reads as a random flake.
+ * The old suite here was a "diagnostic" that traced raw `@pkmn` stream chunks —
+ * it tested the library, not this file, and none of it survived the engine
+ * move. What matters at this layer is the two guards a client can drive: an
+ * unknown format string, and a team format with no team.
  */
-describe('BattleRoom — diagnostic', () => {
-  it('should trace the stream data flow', (done) => {
-    const team1 = getRandomTeam();
-    const team2 = getRandomTeam();
 
-    const streams = BattleStreams.getPlayerStreams(
-      new BattleStreams.BattleStream(),
-    );
+const P1: RoomPlayer = { userId: 1, name: 'Alice' };
+const P2: RoomPlayer = { userId: 2, name: 'Bob' };
 
-    const ai = new RandomPlayerAI(streams.p2);
-    void ai.start();
+const noopCallbacks = () => ({
+  onProtocol: jest.fn(),
+  onRequestP1: jest.fn(),
+  onRequestP2: jest.fn(),
+  onBattleEnd: jest.fn(),
+  onError: jest.fn(),
+});
 
-    const spec = { formatid: 'gen9randombattle' };
-    const p1spec = { name: 'Player', team: Teams.pack(team1) };
-    const p2spec = { name: 'Bot', team: Teams.pack(team2) };
+describe('BattleRoom', () => {
+  it('refuses a format the format table does not know', async () => {
+    const room = new BattleRoom('r1', 'gen9notarealformat', P1, P2, noopCallbacks());
+    await expect(room.start()).rejects.toThrow('unknown_format');
+  });
 
-    // `done` must run exactly once, and nothing may outlive it.
-    let settled = false;
-    const pending = new Set<ReturnType<typeof setTimeout>>();
+  it('refuses a team format when a side brought no team', async () => {
+    // `gen9ou` has no random generator: without a packed team there is nothing
+    // to start the battle with, and the old code handed the empty string to the
+    // simulator and let it fail somewhere less legible.
+    const room = new BattleRoom('r2', 'gen9ou', P1, P2, noopCallbacks());
+    await expect(room.start()).rejects.toThrow('team_required');
+  });
 
-    const finish = (err?: Error) => {
-      if (settled) return;
-      settled = true;
-      for (const t of pending) clearTimeout(t);
-      pending.clear();
-      // The streams are deliberately NOT destroyed: the sim closes them itself
-      // once the battle ends, and tearing omniscient down early while p1/p2 are
-      // still draining throws `Push after end of read stream` and kills the run.
-      // Only the timers can outlive the test, so only the timers are cleared.
-      done(err);
-    };
+  it('maps an account id to the side it is playing', () => {
+    const room = new BattleRoom('r3', 'gen9randombattle', P1, P2, noopCallbacks());
+    expect(room.sideOf(1)).toBe('p1');
+    expect(room.sideOf(2)).toBe('p2');
+    // A spectator, or anyone else at all.
+    expect(room.sideOf(999)).toBeNull();
+  });
 
-    let omniscientLines = 0;
-    let p1Chunks = 0;
-    let requestCount = 0;
-    let winReceived = false;
+  it('runs a random-format battle and reports a winner', async () => {
+    const callbacks = noopCallbacks();
+    const room = new BattleRoom('r4', 'gen9randombattle', P1, P2, callbacks);
+    await room.start();
+    expect(room.status).toBe('active');
 
-    // Read omniscient
-    void (async () => {
-      try {
-        for await (const chunk of streams.omniscient) {
-          for (const line of chunk.split('\n')) {
-            if (!line.trim()) continue;
-            omniscientLines++;
-            const { args } = Protocol.parseBattleLine(line);
-            if (args[0] === 'win') {
-              winReceived = true;
-              finish();
-              return;
-            }
-          }
-        }
-      } catch (e: any) {
-        finish(new Error(`Omniscient error: ${e.message}`));
-      }
-    })();
+    // Both sides concede-by-default until someone wins; forfeiting p1 is the
+    // shortest path to a real ending through the real simulator.
+    await room.forfeit('p1');
+    await new Promise((resolve) => setTimeout(resolve, 500));
 
-    // Read p1
-    void (async () => {
-      try {
-        for await (const chunk of streams.p1) {
-          p1Chunks++;
-          const trimmed = chunk.trim();
-          if (!trimmed) continue;
-
-          // Try to find request lines in the chunk
-          for (const line of trimmed.split('\n')) {
-            const { args } = Protocol.parseBattleLine(line);
-            if (args[0] === 'request') {
-              requestCount++;
-              const request = JSON.parse(args[1] as string);
-
-              // The raw sim request has no `requestType` field — derive it the
-              // same way production (battle.room.ts) does.
-              if (!request.requestType) {
-                if (request.active) {
-                  request.requestType = 'move';
-                } else if (request.teamPreview) {
-                  request.requestType = 'team';
-                } else if (request.side) {
-                  request.requestType = 'switch';
-                }
-              }
-
-              // Auto-play: choose first available move or switch
-              const turn = setTimeout(() => {
-                pending.delete(turn);
-                if (settled) return;
-                if (request.requestType === 'move' && request.active) {
-                  const moves = request.active[0].moves;
-                  const moveIndex = moves.findIndex((m: any) => !m.disabled);
-                  if (moveIndex >= 0) {
-                    streams.p1.write(`move ${moveIndex + 1}`);
-                  }
-                } else if (request.requestType === 'switch' && request.side) {
-                  const switchIndex = request.side.pokemon.findIndex(
-                    (p: any, _i: number) =>
-                      !p.active && !p.condition.includes('fnt'),
-                  );
-                  if (switchIndex >= 0) {
-                    streams.p1.write(`switch ${switchIndex + 1}`);
-                  }
-                } else if (request.requestType === 'team') {
-                  streams.p1.write('team 1');
-                }
-              }, 10);
-              pending.add(turn);
-            }
-          }
-        }
-      } catch (e: any) {
-        finish(new Error(`P1 error: ${e.message}`));
-      }
-    })();
-
-    // Start battle
-    void streams.omniscient.write(
-      `>start ${JSON.stringify(spec)}\n>player p1 ${JSON.stringify(p1spec)}\n>player p2 ${JSON.stringify(p2spec)}`,
-    );
-
-    // Safety timeout — tracked in `pending`, so `finish()` clears it and it
-    // cannot outlive the test.
-    const safety = setTimeout(() => {
-      finish(
-        new Error(
-          `Timeout: omniscientLines=${omniscientLines}, p1Chunks=${p1Chunks}, requestCount=${requestCount}, winReceived=${winReceived}`,
-        ),
-      );
-    }, 30_000);
-    pending.add(safety);
-  }, 35_000);
+    expect(callbacks.onBattleEnd).toHaveBeenCalled();
+    expect(room.status).toBe('finished');
+    // The log is what gets persisted; an empty one means a truncated replay.
+    expect(room.replay.length).toBeGreaterThan(0);
+  }, 30_000);
 });

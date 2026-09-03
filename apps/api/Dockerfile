@@ -18,6 +18,10 @@ COPY packages/shared/package.json ./packages/shared/
 COPY packages/pack-schema ./packages/pack-schema
 # Same reason as pack-schema above: asset-paths compiles on install.
 COPY packages/asset-paths ./packages/asset-paths
+# And again for battle-core: apps/api imports the battle engine, the format
+# allowlist and the team validator as COMPILED CJS, produced by this package's
+# own `prepare` script during install. A manifest-only copy fails that tsc run.
+COPY packages/battle-core ./packages/battle-core
 COPY apps/api/package.json ./apps/api/
 
 RUN pnpm install --no-frozen-lockfile

@@ -2,6 +2,7 @@ import * as dotenv from 'dotenv';
 dotenv.config();
 
 import { env } from './config/env';
+import { allowedOrigins } from './config/cors-origins';
 import * as express from 'express';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
@@ -105,36 +106,10 @@ async function bootstrap() {
     }),
   );
 
-  // Origins allowed to READ responses from this API. Kept split because an
-  // origin list is a capability list: any origin on it can read authenticated
-  // responses, so a production list that admits localhost extends that to any
-  // page running on any developer's machine.
-  const PUBLIC_ORIGINS = [
-    'https://lizardon.es',
-    'https://boffmedia.es',
-    'https://ficuslab.es',
-    'https://blog.ficuslab.es',
-  ];
-  // Never reachable by a real user: hosts-file names, and the production box
-  // addressed directly by IP over plaintext HTTP — which is why that one is
-  // here rather than above, despite being the production machine.
-  const DEV_ONLY_ORIGINS = [
-    'http://localhost:3000',
-    // apps/desktop's renderer in browser mode (`pnpm --filter desktop
-    // dev:renderer`, the port in tauri.conf.json's devUrl). The packaged app
-    // never needs this — its tool calls are proxied through Rust, which is not
-    // a browser and has no origin — but in dev the renderer IS a page, so every
-    // API-backed tool is unusable there without it.
-    'http://localhost:5273',
-    'http://local.boffmedia.es',
-    'http://smartrotom.local.boffmedia.es',
-    'http://148.251.3.244:34333',
-  ];
-  app.enableCors({
-    origin: isProduction
-      ? PUBLIC_ORIGINS
-      : [...PUBLIC_ORIGINS, ...DEV_ONLY_ORIGINS],
-  });
+  // The allowlist lives in config/cors-origins so the websocket gateways can
+  // apply the SAME list. They previously declared `cors: true`, a wildcard that
+  // bypasses this call entirely — socket.io handles its own CORS.
+  app.enableCors({ origin: allowedOrigins(isProduction) });
   // JSON body cap. File uploads go through multer/FileInterceptor (multipart),
   // not express.json, so this only bounds JSON payloads — 5mb is very generous
   // for those while cutting the DoS surface from the previous 50mb. Bump a

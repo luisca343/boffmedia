@@ -8,7 +8,12 @@ on:
       - 'apps/web/**'
       - 'packages/shared/**'
       - 'packages/pack-schema/**'
+      - 'packages/battle-core/**'
       - 'packages/ui/**'
+      # Every tool package apps/web transpiles and renders. Absent until
+      # 2026-09-02, so a tool-only change shipped nothing until some other
+      # path happened to trigger a deploy.
+      - 'packages/tools/**'
       - 'packages/tailwind-config/**'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'

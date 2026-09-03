@@ -36,6 +36,13 @@
       "when": 1787949181602,
       "tag": "0004_vgc_tracker_sync_columns",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1788363027375,
+      "tag": "0005_battlesim_replays_teams",
+      "breakpoints": true
     }
   ]
 }

@@ -101,3 +101,74 @@
   --sb-hover: rgba(20, 23, 28, 0.42);
   --sb-drag: var(--accent);
 }
+
+/* ===========================================================================
+   SHARED KEYFRAMES — every `animate-[bm-*]` reachable from @boffmedia/ui or a
+   packages/tools/* package.
+
+   They live HERE, not in apps/web/src/styles/animations.css, because
+   apps/desktop loads this file (src/index.css) and never loads the web's
+   animations sheet. A keyframe defined only there is silently inert in the
+   launcher: the class compiles, the animation runs, nothing moves. Skeleton
+   shimmer, toasts, menus, modals and the battlesim HUD all fell in that hole.
+
+   The web still loads both sheets; these definitions were DELETED from
+   animations.css in the same change so no name is declared twice.
+   Web-only keyframes (bm-nd-*, bm-livedot, bm-drop, lv4-*, tv-*, dk-*, sch*,
+   sysload-*) stay in animations.css — nothing outside apps/web uses them.
+   =========================================================================== */
+
+/* kit — spinner, pulse, skeleton shimmer, ticker marquee */
+@keyframes bm-spin { to { transform: rotate(360deg); } }
+@keyframes bm-pulse { 50% { opacity: 0.72; } }
+@keyframes bm-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -120% 0; } }
+@keyframes bm-tick { to { transform: translateX(-100%); } }
+
+/* kit — surface entrances (menu, toast, modal, drawer, fade) */
+@keyframes bm-menu-in { from { opacity: 0; transform: translateY(-4px); } }
+@keyframes bm-toast-in { from { opacity: 0; transform: translateX(16px); } }
+@keyframes bm-modal-in { from { opacity: 0; transform: translateY(14px) scale(0.98); } }
+@keyframes bm-fade { from { opacity: 0; } }
+/* One definition: animations.css carried two near-identical ones (28px / 30px). */
+@keyframes bm-drawer-in { from { opacity: 0; transform: translateX(28px); } }
+
+/* tools — code-block scanline, preview-stage bob, giveaway confetti */
+@keyframes bm-scan { 0% { top: -25%; } 100% { top: 115%; } }
+@keyframes bm-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }
+@keyframes bm-srt-conf { 0% { opacity: 0; transform: translateY(-10px) rotate(0deg); } 10% { opacity: 1; } 80% { opacity: 0.85; } 100% { opacity: 0; transform: translateY(560px) rotate(540deg); } }
+
+/* battlesim «Bx» HUD — plate hit flash + low-timer blink */
+@keyframes bm-hitflash { 0%, 100% { background: color-mix(in srgb, var(--panel) 88%, transparent); } 40% { background: color-mix(in srgb, var(--bad) 22%, var(--panel)); } }
+@keyframes bm-blink { 50% { opacity: 0.35; } }
+
+/* ---------------------------------------------------------------------------
+   REDUCED MOTION. apps/web's globals.css deliberately collapses TRANSITIONS
+   only and leaves animations running so loading indicators keep indicating, and
+   apps/desktop has no such rule at all — so the neutralisation lives here, with
+   the keyframes it neutralises.
+
+   Redefining each keyframe with a no-op body (CSS cannot select elements by
+   animation-name) makes the animation inert wherever it is used — the body is
+   `animation-timing-function` rather than `{}` so a minifier cannot drop the
+   rule as empty and resurrect the original,
+   in both hosts, without needing every call site to remember
+   `motion-reduce:animate-none`. Call sites should still carry it.
+
+   bm-spin is INTENTIONALLY not neutralised: a frozen spinner reads as a hung
+   app, and its rotation is information, not decoration.
+   --------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes bm-pulse { from, to { animation-timing-function: linear; } }
+  @keyframes bm-shimmer { from, to { animation-timing-function: linear; } }
+  @keyframes bm-tick { from, to { animation-timing-function: linear; } }
+  @keyframes bm-menu-in { from, to { animation-timing-function: linear; } }
+  @keyframes bm-toast-in { from, to { animation-timing-function: linear; } }
+  @keyframes bm-modal-in { from, to { animation-timing-function: linear; } }
+  @keyframes bm-fade { from, to { animation-timing-function: linear; } }
+  @keyframes bm-drawer-in { from, to { animation-timing-function: linear; } }
+  @keyframes bm-scan { from, to { animation-timing-function: linear; } }
+  @keyframes bm-bob { from, to { animation-timing-function: linear; } }
+  @keyframes bm-srt-conf { from, to { animation-timing-function: linear; } }
+  @keyframes bm-hitflash { from, to { animation-timing-function: linear; } }
+  @keyframes bm-blink { from, to { animation-timing-function: linear; } }
+}

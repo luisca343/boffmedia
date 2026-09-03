@@ -9,6 +9,7 @@ import { messages as toolsMhwildsMessages } from "@boffmedia/tools-mhwilds/catal
 import { messages as toolsPokemonMessages } from "@boffmedia/tools-pokemon/catalog"
 import { messages as toolsMewgenicsMessages } from "@boffmedia/tools-mewgenics/catalog"
 import { messages as toolsMiscMessages } from "@boffmedia/tools-misc/catalog"
+import { messages as toolsBattlesimMessages } from "@boffmedia/tools-battlesim/catalog"
 import { messages as uiMessages } from "@boffmedia/ui/messages"
 
 import { messages } from "./messages"
@@ -81,6 +82,7 @@ const CATALOGS = [
   toolsPokemonMessages,
   toolsMewgenicsMessages,
   toolsMiscMessages,
+  toolsBattlesimMessages,
   uiMessages,
   messages,
 ] as const

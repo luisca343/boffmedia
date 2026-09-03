@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
+import { initChampionsMod } from '@boffmedia/battle-core';
 import { VgcRegulationsRepository } from './meta/repositories/regulations.repository';
-import { initChampionsMod } from './champions.mod';
 
 export interface Gen9MoveEntry {
   name: string;

@@ -1,117 +1,172 @@
 import { BattleGateway } from './battle.gateway';
 
-function mockSocket() {
-  return { emit: jest.fn(), id: Math.random().toString(36).slice(2) } as any;
+/**
+ * These cover the reason M2 exists: the gateway used to trust whatever identity
+ * the client sent. Every test here is a thing that WAS possible.
+ *
+ * The old suite tested chat fan-out through the hand-rolled `clients` Map. That
+ * Map is gone — fan-out is socket.io rooms now — so those tests could only have
+ * been kept by reintroducing the design they described.
+ */
+
+function mockSocket(user?: { userId: number; name: string }) {
+  const socket: any = {
+    emit: jest.fn(),
+    join: jest.fn(),
+    id: Math.random().toString(36).slice(2),
+  };
+  if (user) socket.battleUser = user;
+  return socket;
 }
 
 function mockLogger() {
+  return { log: jest.fn(), error: jest.fn(), warn: jest.fn(), debug: jest.fn() } as any;
+}
+
+function mockServer(sockets: any[] = []) {
+  const emit = jest.fn();
   return {
-    log: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-    debug: jest.fn(),
+    to: jest.fn(() => ({ emit })),
+    sockets: new Map(sockets.map((s) => [s.id, s])),
+    use: jest.fn(),
+    __roomEmit: emit,
   } as any;
 }
 
-describe('BattleGateway — chatMessage', () => {
-  let gateway: BattleGateway;
-  let p1Socket: any;
-  let p2Socket: any;
-  let strangerSocket: any;
+function makeGateway(tickets: any = {}, server = mockServer()) {
+  const gateway = new BattleGateway(
+    mockLogger(),
+    { leaveQueue: jest.fn(), joinQueue: jest.fn(), getQueueSize: jest.fn(() => 0) } as any,
+    tickets as any,
+    { recordPvpReplay: jest.fn() } as any,
+  );
+  (gateway as any).server = server;
+  return gateway;
+}
 
+describe('BattleGateway — handshake', () => {
+  it('refuses a socket that presents no ticket', () => {
+    const server = mockServer();
+    const gateway = makeGateway({ verify: jest.fn() }, server);
+    gateway.afterInit(server);
+
+    const middleware = server.use.mock.calls[0][0];
+    const next = jest.fn();
+    middleware({ handshake: { auth: {} } } as any, next);
+
+    expect(next).toHaveBeenCalledWith(expect.any(Error));
+    expect(next.mock.calls[0][0].message).toBe('unauthorized');
+  });
+
+  it('refuses a socket whose ticket does not verify', () => {
+    const server = mockServer();
+    const verify = jest.fn(() => {
+      throw new Error('expired');
+    });
+    const gateway = makeGateway({ verify }, server);
+    gateway.afterInit(server);
+
+    const middleware = server.use.mock.calls[0][0];
+    const next = jest.fn();
+    middleware({ handshake: { auth: { ticket: 'forged' } } } as any, next);
+
+    expect(next.mock.calls[0][0].message).toBe('unauthorized');
+  });
+
+  it('attaches the identity from the ticket, not from the payload', () => {
+    const server = mockServer();
+    const verify = jest.fn(() => ({ userId: 7, name: 'Alice' }));
+    const gateway = makeGateway({ verify }, server);
+    gateway.afterInit(server);
+
+    const middleware = server.use.mock.calls[0][0];
+    const socket: any = { handshake: { auth: { ticket: 'good', userId: 999 } } };
+    const next = jest.fn();
+    middleware(socket, next);
+
+    expect(next).toHaveBeenCalledWith();
+    expect(socket.battleUser).toEqual({ userId: 7, name: 'Alice' });
+  });
+});
+
+describe('BattleGateway — a battle belongs to its players', () => {
   const ROOM = 'room-1';
+  let gateway: BattleGateway;
+  let alice: any;
+  let mallory: any;
 
   beforeEach(() => {
-    gateway = new BattleGateway(mockLogger(), {} as any, {} as any);
+    alice = mockSocket({ userId: 1, name: 'Alice' });
+    mallory = mockSocket({ userId: 99, name: 'Mallory' });
+    gateway = makeGateway({}, mockServer([alice, mallory]));
 
-    p1Socket = mockSocket();
-    p2Socket = mockSocket();
-    strangerSocket = mockSocket();
-
-    gateway.handleRegister(p1Socket, { clientId: 'alice' });
-    gateway.handleRegister(p2Socket, { clientId: 'bob' });
-    gateway.handleRegister(strangerSocket, { clientId: 'mallory' });
-
-    // Place alice and bob in the same room
-    const clients = (gateway as any).clients as Map<string, any>;
-    clients.get('alice').roomIds.set(ROOM, 'p1');
-    clients.get('bob').roomIds.set(ROOM, 'p2');
-
-    // Clear the 'connected' emits from registration
-    p1Socket.emit.mockClear();
-    p2Socket.emit.mockClear();
-    strangerSocket.emit.mockClear();
-  });
-
-  it('broadcasts a chat message to both room members with sender and timestamp', () => {
-    gateway.handleChatMessage(p1Socket, { roomId: ROOM, message: 'hola!' });
-
-    for (const sock of [p1Socket, p2Socket]) {
-      expect(sock.emit).toHaveBeenCalledWith(
-        'chatMessage',
-        expect.objectContaining({
-          roomId: ROOM,
-          sender: 'alice',
-          message: 'hola!',
-          timestamp: expect.any(Number),
-        }),
-      );
-    }
-    expect(strangerSocket.emit).not.toHaveBeenCalledWith(
-      'chatMessage',
-      expect.anything(),
-    );
-  });
-
-  it('rejects messages from clients outside the room', () => {
-    gateway.handleChatMessage(strangerSocket, {
-      roomId: ROOM,
-      message: 'intrusión',
+    // A live room Alice (p1) is playing in and Mallory is not.
+    (gateway as any).rooms.set(ROOM, {
+      id: ROOM,
+      format: 'gen9randombattle',
+      status: 'active',
+      replay: '',
+      sideOf: (userId: number) => (userId === 1 ? 'p1' : null),
+      currentRequest: () => null,
+      choose: jest.fn(),
+      forfeit: jest.fn(),
+      undo: jest.fn(),
     });
+    alice.emit.mockClear();
+    mallory.emit.mockClear();
+  });
 
-    expect(strangerSocket.emit).toHaveBeenCalledWith(
-      'error',
-      expect.objectContaining({ roomId: ROOM, message: 'Not in this battle' }),
-    );
-    expect(p1Socket.emit).not.toHaveBeenCalledWith(
-      'chatMessage',
-      expect.anything(),
-    );
-    expect(p2Socket.emit).not.toHaveBeenCalledWith(
-      'chatMessage',
-      expect.anything(),
+  it('refuses a choice from someone who is not in the battle', async () => {
+    await gateway.handleMakeChoice(mallory, { roomId: ROOM, choice: 'move 1' });
+
+    const room = (gateway as any).rooms.get(ROOM);
+    expect(room.choose).not.toHaveBeenCalled();
+    expect(mallory.emit).toHaveBeenCalledWith('error', { code: 'not_in_battle' });
+  });
+
+  it('resolves the side from the socket identity, never from the payload', async () => {
+    // Alice plays p1. Claiming to be p2 must not move p2's Pokémon.
+    await gateway.handleMakeChoice(alice, { roomId: ROOM, choice: 'move 1', side: 'p2' } as any);
+
+    const room = (gateway as any).rooms.get(ROOM);
+    expect(room.choose).toHaveBeenCalledWith('p1', 'move 1');
+  });
+
+  it('refuses to resume a battle the caller has no side in', () => {
+    gateway.handleResume(mallory, { roomId: ROOM });
+
+    expect(mallory.emit).toHaveBeenCalledWith('error', { code: 'not_in_battle' });
+    expect(mallory.join).not.toHaveBeenCalled();
+  });
+
+  it('resumes the caller onto their OWN side', () => {
+    gateway.handleResume(alice, { roomId: ROOM });
+
+    expect(alice.join).toHaveBeenCalledWith(ROOM);
+    expect(alice.emit).toHaveBeenCalledWith(
+      'resumed',
+      expect.objectContaining({ roomId: ROOM, side: 'p1' }),
     );
   });
 
-  it('ignores empty messages and truncates messages over 300 chars', () => {
-    gateway.handleChatMessage(p1Socket, { roomId: ROOM, message: '   ' });
-    expect(p2Socket.emit).not.toHaveBeenCalled();
+  it('stamps chat with the authenticated name rather than a supplied one', () => {
+    const server = (gateway as any).server;
+    gateway.handleChat(alice, { roomId: ROOM, message: 'gg', sender: 'Bob' } as any);
 
-    const long = 'x'.repeat(500);
-    gateway.handleChatMessage(p1Socket, { roomId: ROOM, message: long });
-    expect(p2Socket.emit).toHaveBeenCalledWith(
+    expect(server.to).toHaveBeenCalledWith(ROOM);
+    expect(server.__roomEmit).toHaveBeenCalledWith(
       'chatMessage',
-      expect.objectContaining({ message: 'x'.repeat(300) }),
+      expect.objectContaining({ sender: 'Alice', message: 'gg' }),
     );
   });
 
-  it('delivers to the current socket after a reconnect', () => {
-    const newP2Socket = mockSocket();
-    gateway.handleRegister(newP2Socket, { clientId: 'bob' });
-    newP2Socket.emit.mockClear();
+  it('truncates an over-long chat message and drops an empty one', () => {
+    const server = (gateway as any).server;
+    gateway.handleChat(alice, { roomId: ROOM, message: 'x'.repeat(500) });
+    expect(server.__roomEmit.mock.calls[0][1].message).toHaveLength(300);
 
-    gateway.handleChatMessage(p1Socket, {
-      roomId: ROOM,
-      message: 'sigues ahí?',
-    });
-
-    expect(newP2Socket.emit).toHaveBeenCalledWith(
-      'chatMessage',
-      expect.objectContaining({ message: 'sigues ahí?' }),
-    );
-    expect(p2Socket.emit).not.toHaveBeenCalledWith(
-      'chatMessage',
-      expect.anything(),
-    );
+    server.__roomEmit.mockClear();
+    gateway.handleChat(alice, { roomId: ROOM, message: '   ' });
+    expect(server.__roomEmit).not.toHaveBeenCalled();
   });
 });

@@ -8,6 +8,7 @@ on:
       - 'apps/api/**'
       - 'packages/shared/**'
       - 'packages/pack-schema/**'
+      - 'packages/battle-core/**'
       - 'pnpm-lock.yaml'
       - 'pnpm-workspace.yaml'
 

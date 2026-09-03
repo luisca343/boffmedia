@@ -26,7 +26,7 @@
       }
     ],
     "security": {
-      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: boffasset: http://boffasset.localhost; media-src 'self' boffasset: http://boffasset.localhost; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https://cdn.jsdelivr.net boffasset: http://boffasset.localhost"
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: boffasset: http://boffasset.localhost; media-src 'self' boffasset: http://boffasset.localhost; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https://api.boffmedia.es wss://api.boffmedia.es https://cdn.jsdelivr.net boffasset: http://boffasset.localhost"
     }
   },
   "plugins": {
@@ -39,7 +39,13 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "app", "dmg", "deb", "appimage"],
+    "targets": [
+      "nsis",
+      "app",
+      "dmg",
+      "deb",
+      "appimage"
+    ],
     "createUpdaterArtifacts": true,
     "icon": [
       "icons/32x32.png",
@@ -56,7 +62,10 @@
         "uninstallerHeaderImage": "installer/nsis-header.bmp",
         "sidebarImage": "installer/nsis-sidebar.bmp",
         "installerHooks": "installer/hooks.nsh",
-        "languages": ["Spanish", "English"],
+        "languages": [
+          "Spanish",
+          "English"
+        ],
         "customLanguageFiles": {
           "Spanish": "installer/lang/Spanish.nsh",
           "English": "installer/lang/English.nsh"

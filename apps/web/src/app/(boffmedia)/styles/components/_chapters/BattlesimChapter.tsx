@@ -24,8 +24,8 @@ import {
   BxTeraBtn,
   BxTick,
   BxType,
-} from "@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_components/ui/bx-kit"
-import { tyColor, TYPE_ES } from "@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_lib/bx-helpers"
+} from "@boffmedia/tools-battlesim"
+import { tyColor, TYPE_ES } from "@boffmedia/tools-battlesim"
 import { DEX, STAT_ES, bxMon, finalStat } from "./battlesim-demo"
 
 function PlateDemo() {

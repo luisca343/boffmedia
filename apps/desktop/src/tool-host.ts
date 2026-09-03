@@ -14,6 +14,7 @@ import { mhwildsTools } from "@boffmedia/tools-mhwilds/tools"
 import { pokemonTools } from "@boffmedia/tools-pokemon/tools"
 import { mewgenicsTools } from "@boffmedia/tools-mewgenics/tools"
 import { miscTools } from "@boffmedia/tools-misc/tools"
+import { battlesimToolsFor } from "@boffmedia/tools-battlesim/tools"
 import {
   configureToolHost,
   createToolSession,
@@ -523,6 +524,9 @@ registerTools([
   ...pokemonTools,
   ...mewgenicsTools,
   ...miscTools,
+  // D5: showdownProxy false — the PS relay is a website-only arrangement,
+  // and this makes its screens unreachable here rather than merely unlisted.
+  ...battlesimToolsFor({ showdownProxy: false }),
 ])
 
 // Dev-only console handle for the capabilities: it exercises a capability

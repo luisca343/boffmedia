@@ -7,14 +7,12 @@
  *   pnpm add-regulation --forget "[Gen 9 Champions] Draft"
  *   pnpm add-regulation --ref master --source ../../pokemon-showdown
  *
- * The script tracks a SET of format names (persisted in mod/.source.json) and
- * re-resolves every one of them against upstream on each run. That is
- * deliberate: a format's `mod` is not stable across regulations — upstream
- * moved Reg M-A from `champions` to `championsregma` when Reg M-B took over the
- * `champions` name — so regenerating only the newly added format would leave
- * every existing regulation pointing at another regulation's data, with no
- * error and no visible diff. Re-resolving all of them makes that class of drift
- * self-correcting.
+ * The script tracks a SET of format names (persisted in packages/battle-core/src/mods/champions/.source.json)
+ * and re-resolves every one of them against upstream on each run. That is deliberate: a format's `mod` is
+ * not stable across regulations — upstream moved Reg M-A from `champions` to `championsregma` when Reg M-B
+ * took over the `champions` name — so regenerating only the newly added format would leave every existing
+ * regulation pointing at another regulation's data, with no error and no visible diff. Re-resolving all of
+ * them makes that class of drift self-correcting.
  *
  * Everything it writes is generated. Review the diff, then commit.
  */
@@ -43,11 +41,11 @@ import { resolveUpstream, UpstreamSource } from './upstream';
 // Paths & constants
 // ---------------------------------------------------------------------------
 
-const VGC_DIR = path.resolve(
+// Output path changed: champions mod data now lives in @boffmedia/battle-core
+const MOD_DIR = path.resolve(
   __dirname,
-  '../../src/api/boffmedia/herramientas/pokemon/vgc',
+  '../../../packages/battle-core/src/mods/champions',
 );
-const MOD_DIR = path.join(VGC_DIR, 'mod');
 const PROVENANCE_FILE = path.join(MOD_DIR, '.source.json');
 const REGISTRY_FILE = path.join(MOD_DIR, 'registry.generated.ts');
 const CACHE_DIR = path.join(os.tmpdir(), 'boffmedia-showdown-src');

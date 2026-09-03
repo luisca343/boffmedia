@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@boffmedia/asset-paths": "workspace:*",
+    "@boffmedia/battle-core": "workspace:*",
     "@boffmedia/pack-schema": "workspace:*",
     "@discordjs/builders": "^1.14.0",
     "@discordjs/voice": "^0.19.2",

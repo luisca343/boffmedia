@@ -8,5 +8,10 @@
         "https://api.ficuslab.es/desktop/updates/{{target}}-{{arch}}/{{current_version}}"
       ]
     }
+  },
+  "app": {
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: boffasset: http://boffasset.localhost; media-src 'self' boffasset: http://boffasset.localhost; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost http://localhost:34301 ws://localhost:34301 https://api.boffmedia.es wss://api.boffmedia.es https://cdn.jsdelivr.net boffasset: http://boffasset.localhost"
+    }
   }
 }

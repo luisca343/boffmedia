@@ -4,7 +4,7 @@
 
 import { useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
-import { Game } from "@/app/battlesim/replay/_components/Game"
+import { Game } from "@boffmedia/tools-battlesim"
 import { Modal } from "./ui"
 
 /**

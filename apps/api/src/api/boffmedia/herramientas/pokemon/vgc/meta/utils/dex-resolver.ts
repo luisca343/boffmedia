@@ -1,6 +1,5 @@
 import { Dex } from '@pkmn/sim';
-
-import { initChampionsMod } from '../../champions.mod';
+import { initChampionsMod } from '@boffmedia/battle-core';
 
 /**
  * Returns a format-aware Dex instance for the given formatId.

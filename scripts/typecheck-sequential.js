@@ -18,6 +18,7 @@ const PACKAGES = [
   'apps/desktop',
   'packages/ui',
   'packages/pack-schema',
+  'packages/battle-core',
   'packages/asset-paths',
   'packages/tools/kit',
   'packages/tools/minecraft',
@@ -25,6 +26,7 @@ const PACKAGES = [
   'packages/tools/pokemon',
   'packages/tools/mewgenics',
   'packages/tools/misc',
+  'packages/tools/battlesim',
 ];
 function getAvailableMemoryMB() {
   try {

@@ -52,6 +52,12 @@
       "@boffmedia/tools-mewgenics/*": [
         "../../packages/tools/mewgenics/src/*"
       ],
+      "@boffmedia/tools-battlesim": [
+        "../../packages/tools/battlesim/src"
+      ],
+      "@boffmedia/tools-battlesim/*": [
+        "../../packages/tools/battlesim/src/*"
+      ],
       "@boffmedia/tools-pokemon": [
         "../../packages/tools/pokemon/src"
       ],

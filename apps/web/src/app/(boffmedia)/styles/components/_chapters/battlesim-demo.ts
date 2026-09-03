@@ -2,7 +2,7 @@
 // a `bxMon` factory mirroring the engine's `freshMon`. Feeds the live Bx*
 // specimens (plate, key, bench, score, order, slot). English type keys to match
 // bx-helpers' TYPE_HEX/TYPE_ES. [deferred] — real battles use the engine.
-import type { BxMon, BxMove } from "@/app/(boffmedia)/(herramientas)/pokemon/battlesim/_lib/bx-helpers"
+import type { BxMon, BxMove } from "@boffmedia/tools-battlesim"
 
 type DexEntry = {
   id: string

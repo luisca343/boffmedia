@@ -327,7 +327,11 @@ export function ToolShell({ slug, children }: ToolShellProps) {
 
       {mobileOpen && <div className="fixed inset-0 z-[79] bg-[var(--scrim)] lg:hidden" onClick={() => setMobileOpen(false)} />}
 
-      <div className="min-w-0 flex-1">
+      {/* Below lg the phone bar right under this line sits INSIDE the box the
+          page gives a tool, so the tool's viewport and its sticky offset both
+          have to shrink by that bar — or a viewport tool (battlesim) overflows
+          the window by exactly one bar and the page scrolls. */}
+      <div className="min-w-0 flex-1 max-lg:[--tool-sticky-top:calc(var(--nav-h)_+_var(--tool-bar-h,58px))] max-lg:[--tool-vh:calc(100dvh_-_var(--nav-h)_-_var(--tool-bar-h,58px))]">
         {/* Same rung as the rail header above and as a tool's own bar: one height
             token, so the phone bar does not read as a third, taller band. `min-h`
             rather than `h` because a long breadcrumb is allowed to grow it. */}

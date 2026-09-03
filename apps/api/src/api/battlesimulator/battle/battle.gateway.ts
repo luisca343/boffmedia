@@ -7,618 +7,591 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from 'nestjs-pino';
-import {
-  BattleRoom,
-  BattleEndResult,
-  BattleRoomCallbacks,
-  TimerConfig,
-} from './battle.room';
-import { Protocol } from '@pkmn/protocol';
-import { AchievementFacadeService } from '@api/smartrotom/achievement/achievement.facade.service';
+import { randomUUID } from 'node:crypto';
+import { isKnownFormat, validateTeam, unpackTeam } from '@boffmedia/battle-core';
+
+import { env } from '@/config/env';
+import { allowedOrigins } from '@/config/cors-origins';
+import { BattleRoom, type RoomPlayer } from './battle.room';
 import { MatchmakingService } from './matchmaking.service';
+import { BattleTicketService, type BattlePrincipal } from '../battle-ticket.service';
+import { BattlesimRepository } from '../battlesim.repository';
 
-interface ClientState {
-  socket: Socket;
-  roomIds: Map<string, 'p1' | 'p2'>;
-  playerId: string;
+/**
+ * PvP battles over a websocket.
+ *
+ * WHAT THIS FIXES. The gateway had no authentication at all. `JwtAuthGuard` is
+ * global but returns true for a non-HTTP context, so it never applied here;
+ * identity was the `clientId` string the client sent in `register`, which meant
+ * anyone could claim to be anyone, take over another player's room through
+ * `reconnect`, and read their battle. `cors: true` bypassed the origin
+ * allowlist on top of that.
+ *
+ * Now: a socket presents a 60-second ticket minted over the authenticated HTTP
+ * path (`POST battlesimulator/ws-ticket`), `io.use` verifies it once at
+ * connection time, and `socket.data.user` is the ONLY identity any handler
+ * reads. No handler takes an id from its payload.
+ *
+ * Fan-out is through real socket.io rooms rather than a hand-rolled loop over a
+ * Map, which is also what makes spectating work: a spectator joins the room and
+ * receives live protocol like everyone else, instead of the one-shot snapshot
+ * they used to get and then never an update again.
+ */
+
+/** Per-account limits. Generous for a person, hostile to a script. */
+const MAX_ROOMS_PER_USER = 3;
+const CREATE_WINDOW_MS = 60_000;
+const MAX_CREATES_PER_WINDOW = 10;
+/** How long a finished room sticks around so both players can read the result. */
+const ROOM_TTL_AFTER_END_MS = 5 * 60_000;
+const REAPER_INTERVAL_MS = 60_000;
+/** A disconnected player may come back to a live battle for this long. */
+const RECONNECT_GRACE_MS = 30_000;
+/** An unanswered challenge stops being answerable. */
+const CHALLENGE_TTL_MS = 2 * 60_000;
+
+declare module 'socket.io' {
+  interface Socket {
+    /** Set once, by the middleware, from a signed ticket. Never from a payload. */
+    battleUser?: BattlePrincipal;
+  }
 }
 
-interface PendingChallenge {
-  from: string;
-  to: string;
-  format: string;
-  timestamp: number;
-}
-
-@WebSocketGateway({ namespace: '/battle', cors: true })
+@WebSocketGateway({
+  namespace: '/battle',
+  // NOT `cors: true`. socket.io does its own CORS, so the wildcard here
+  // bypassed `app.enableCors()` entirely and left the namespace open to any
+  // origin on the internet.
+  cors: { origin: allowedOrigins(env.NODE_ENV === 'production'), credentials: false },
+})
 export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
-  constructor(
-    private readonly logger: Logger,
-    private readonly achievementFacade: AchievementFacadeService,
-    private readonly matchmaking: MatchmakingService,
-  ) {}
-
   @WebSocketServer() server: Server;
 
-  private clients: Map<string, ClientState> = new Map();
-  private rooms: Map<string, BattleRoom> = new Map();
-  private disconnectTimers: Map<string, NodeJS.Timeout> = new Map();
-  private pendingChallenges: Map<string, PendingChallenge> = new Map();
+  /** roomId -> room. */
+  private rooms = new Map<string, BattleRoom>();
+  /** userId -> roomIds they hold a side in. */
+  private userRooms = new Map<number, Set<string>>();
+  /** userId -> createBattle timestamps inside the current window. */
+  private createLog = new Map<number, number[]>();
+  /** userId -> timer that forfeits their rooms if they do not come back. */
+  private graceTimers = new Map<number, NodeJS.Timeout>();
+  /** "challengerId:targetId" -> the offer. Reaped with the rooms. */
+  private pendingChallenges = new Map<
+    string,
+    { from: BattlePrincipal; to: BattlePrincipal; format: string; team?: string; at: number }
+  >();
+  /** userId -> their live sockets. One account can have two tabs open. */
+  private connections = new Map<number, Set<Socket>>();
+  private reaper: NodeJS.Timeout | null = null;
 
-  private readonly RECONNECT_GRACE_MS = 30_000;
+  constructor(
+    private readonly logger: Logger,
+    private readonly matchmaking: MatchmakingService,
+    private readonly tickets: BattleTicketService,
+    private readonly repo: BattlesimRepository,
+  ) {}
 
-  handleConnection(_client: Socket) {
-    // Don't register here — wait for 'register' event with clientId
-  }
-
-  @SubscribeMessage('register')
-  handleRegister(client: Socket, payload: { clientId: string }): void {
-    const playerId = payload.clientId;
-
-    const existing = this.clients.get(playerId);
-    if (existing) {
-      const timer = this.disconnectTimers.get(playerId);
-      if (timer) {
-        clearTimeout(timer);
-        this.disconnectTimers.delete(playerId);
+  afterInit(server: Server): void {
+    // The whole authentication story, in one place: a connection either proves
+    // who it is here or never reaches a handler.
+    server.use((socket: Socket, next: (err?: Error) => void) => {
+      const ticket = (socket.handshake.auth as { ticket?: unknown } | undefined)?.ticket;
+      if (typeof ticket !== 'string' || !ticket) {
+        next(new Error('unauthorized'));
+        return;
       }
-      existing.socket = client;
-      client.emit('connected', { playerId, reconnected: true });
-      return;
-    }
-
-    this.clients.set(playerId, {
-      socket: client,
-      roomIds: new Map(),
-      playerId,
-    });
-    client.emit('connected', { playerId });
-  }
-
-  handleDisconnect(client: Socket) {
-    const state = this.getClientState(client);
-    if (!state) return;
-
-    if (state.roomIds.size > 0) {
-      const playerId = state.playerId;
-      const timer = setTimeout(() => {
-        this.logger.log(
-          `Grace period expired for ${playerId}, forfeiting ${state.roomIds.size} rooms`,
-        );
-        for (const [roomId, side] of state.roomIds.entries()) {
-          const room = this.rooms.get(roomId);
-          if (room && room.getStatus() === 'active') {
-            room.forfeit(side);
-          }
-          this.cleanupRoom(roomId);
-        }
-        state.roomIds.clear();
-        this.clients.delete(playerId);
-        this.disconnectTimers.delete(playerId);
-      }, this.RECONNECT_GRACE_MS);
-
-      this.disconnectTimers.set(playerId, timer);
-    } else {
-      this.clients.delete(state.playerId);
-    }
-  }
-
-  @SubscribeMessage('createBattle')
-  handleCreateBattle(
-    client: Socket,
-    payload?: {
-      format?: string;
-      roomId?: string;
-      timer?: Partial<TimerConfig>;
-    },
-  ): void {
-    const state = this.getClientState(client);
-    if (!state) return;
-
-    const roomId = payload?.roomId || crypto.randomUUID();
-
-    const playerId = state.playerId;
-    const callbacks: BattleRoomCallbacks = {
-      onProtocol: (line: string) => {
-        const sock = this.clients.get(playerId)?.socket;
-        sock?.emit('protocol', { roomId, line });
-      },
-      onRequestP1: (request: Protocol.Request) => {
-        const sock = this.clients.get(playerId)?.socket;
-        sock?.emit('request', { roomId, request });
-      },
-      onBattleEnd: async (result: BattleEndResult) => {
-        let replayId: number | undefined;
-        try {
-          const replayResult = await this.achievementFacade.createReplay({
-            side1: result.side1,
-            side2: result.side2,
-            team1: JSON.stringify(result.team1),
-            team2: JSON.stringify(result.team2),
-            replay: result.replay,
-            winner: result.winner,
-          });
-          replayId = replayResult.insertId;
-          this.logger.log(`Replay saved: ${replayId}`);
-        } catch (err: any) {
-          this.logger.error(`Failed to save replay: ${err.message}`);
-        }
-        const sock = this.clients.get(playerId)?.socket;
-        sock?.emit('battleEnd', { roomId, ...result, replayId });
-        this.cleanupRoom(roomId);
-      },
-      onError: (error: string) => {
-        this.logger.error(`Battle error [${roomId}]: ${error}`);
-        const sock = this.clients.get(playerId)?.socket;
-        sock?.emit('error', { roomId, message: error });
-      },
-      onTimerUpdate: (timerState) => {
-        const sock = this.clients.get(playerId)?.socket;
-        sock?.emit('timerUpdate', { roomId, ...timerState });
-      },
-    };
-
-    const room = new BattleRoom(roomId, callbacks, this.logger, payload?.timer);
-    this.rooms.set(roomId, room);
-    state.roomIds.set(roomId, 'p1');
-
-    room
-      .create(payload?.format || 'gen9randombattle')
-      .then(() => {
-        client.emit('battleCreated', {
-          roomId,
-          format: payload?.format || 'gen9randombattle',
-        });
-      })
-      .catch((err) => {
-        this.logger.error(`Failed to create battle: ${err.message}`);
-        client.emit('error', {
-          roomId,
-          message: `Failed to create battle: ${err.message}`,
-        });
-        this.cleanupRoom(roomId);
-      });
-  }
-
-  @SubscribeMessage('makeChoice')
-  handleMakeChoice(
-    client: Socket,
-    payload: { roomId: string; choice: string },
-  ): void {
-    const state = this.getClientState(client);
-    if (!state) return;
-
-    const side = state.roomIds.get(payload.roomId);
-    if (!side) {
-      client.emit('error', {
-        roomId: payload.roomId,
-        message: 'Not in this battle',
-      });
-      return;
-    }
-
-    const room = this.rooms.get(payload.roomId);
-    if (!room) {
-      client.emit('error', {
-        roomId: payload.roomId,
-        message: 'Battle not found',
-      });
-      return;
-    }
-
-    room.playerChoice(payload.choice, side);
-  }
-
-  @SubscribeMessage('forfeit')
-  handleForfeit(client: Socket, payload: { roomId: string }): void {
-    const state = this.getClientState(client);
-    if (!state) return;
-
-    const side = state.roomIds.get(payload.roomId);
-    if (!side) {
-      client.emit('error', {
-        roomId: payload.roomId,
-        message: 'Not in this battle',
-      });
-      return;
-    }
-
-    const room = this.rooms.get(payload.roomId);
-    if (room && room.getStatus() === 'active') {
-      room.forfeit(side);
-    }
-  }
-
-  @SubscribeMessage('spectate')
-  handleSpectate(client: Socket, payload: { roomId: string }): void {
-    const room = this.rooms.get(payload.roomId);
-    if (!room) {
-      client.emit('error', { message: 'Battle not found' });
-      return;
-    }
-
-    const state = this.getClientState(client);
-    const side = state?.roomIds.get(payload.roomId);
-
-    client.emit('spectateJoined', {
-      roomId: payload.roomId,
-      replay: room.getReplay(),
-      status: room.getStatus(),
-      currentRequest: side ? room.getCurrentRequest(side) : null,
-    });
-  }
-
-  @SubscribeMessage('undoChoice')
-  handleUndoChoice(client: Socket, payload: { roomId: string }): void {
-    const state = this.getClientState(client);
-    if (!state) return;
-
-    const side = state.roomIds.get(payload?.roomId);
-    if (!side) {
-      client.emit('error', {
-        roomId: payload?.roomId,
-        message: 'Not in this battle',
-      });
-      return;
-    }
-
-    const room = this.rooms.get(payload.roomId);
-    if (!room) {
-      client.emit('error', {
-        roomId: payload.roomId,
-        message: 'Battle not found',
-      });
-      return;
-    }
-
-    room.undoChoice(side);
-  }
-
-  @SubscribeMessage('chatMessage')
-  handleChatMessage(
-    client: Socket,
-    payload: { roomId: string; message: string },
-  ): void {
-    const state = this.getClientState(client);
-    if (!state) return;
-
-    if (!payload?.roomId || !state.roomIds.has(payload.roomId)) {
-      client.emit('error', {
-        roomId: payload?.roomId,
-        message: 'Not in this battle',
-      });
-      return;
-    }
-
-    const text = String(payload.message ?? '')
-      .trim()
-      .slice(0, 300);
-    if (!text) return;
-
-    const data = {
-      roomId: payload.roomId,
-      sender: state.playerId,
-      message: text,
-      timestamp: Date.now(),
-    };
-
-    // Resolve current sockets at emit time so reconnected clients receive chat.
-    for (const other of this.clients.values()) {
-      if (other.roomIds.has(payload.roomId)) {
-        other.socket.emit('chatMessage', data);
+      try {
+        socket.battleUser = this.tickets.verify(ticket);
+        next();
+      } catch {
+        // The client's response to every failure here is the same — get a new
+        // ticket — so the reason is not worth leaking.
+        next(new Error('unauthorized'));
       }
-    }
+    });
+
+    this.reaper = setInterval(() => this.reap(), REAPER_INTERVAL_MS);
+    this.reaper.unref?.();
   }
 
-  // ─── Matchmaking Events ───
+  handleConnection(client: Socket): void {
+    // The middleware has already run, so an unauthenticated socket never
+    // reaches here — but a socket with no identity is still not registered.
+    const user = client.battleUser;
+    if (!user) return;
+    const set = this.connections.get(user.userId) ?? new Set<Socket>();
+    set.add(client);
+    this.connections.set(user.userId, set);
+  }
+
+  handleDisconnect(client: Socket): void {
+    const user = client.battleUser;
+    if (!user) return;
+
+    const set = this.connections.get(user.userId);
+    if (set) {
+      set.delete(client);
+      if (!set.size) this.connections.delete(user.userId);
+    }
+    // Another tab is still connected, so this is not a disconnect for the
+    // account and nothing should be forfeited.
+    if (this.connections.has(user.userId)) return;
+
+    this.matchmaking.leaveQueue(user.userId);
+
+    const held = this.userRooms.get(user.userId);
+    if (!held?.size) return;
+
+    // A dropped connection is not a forfeit yet: reconnects are common and a
+    // battle should survive a tunnel. If they do not `resume` in time, every
+    // live room they hold is conceded so the opponent is not stuck.
+    const existing = this.graceTimers.get(user.userId);
+    if (existing) clearTimeout(existing);
+
+    const timer = setTimeout(() => {
+      this.graceTimers.delete(user.userId);
+      for (const roomId of [...(this.userRooms.get(user.userId) ?? [])]) {
+        const room = this.rooms.get(roomId);
+        const side = room?.sideOf(user.userId);
+        if (room && side && room.status === 'active') {
+          void room.forfeit(side);
+        }
+      }
+    }, RECONNECT_GRACE_MS);
+    timer.unref?.();
+    this.graceTimers.set(user.userId, timer);
+  }
+
+  // ── matchmaking ───────────────────────────────────────────────────────────
 
   @SubscribeMessage('joinQueue')
-  handleJoinQueue(client: Socket, payload: { format?: string }): void {
-    const state = this.getClientState(client);
-    if (!state) return;
+  async handleJoinQueue(
+    client: Socket,
+    payload: { format?: unknown; team?: unknown },
+  ): Promise<void> {
+    const user = client.battleUser;
+    if (!user) return;
 
-    const format = payload?.format || 'gen9randombattle';
-
-    // Check if already in a battle
-    if (state.roomIds.size > 0) {
-      client.emit('error', { message: 'You are already in a battle' });
+    const format = typeof payload?.format === 'string' ? payload.format : '';
+    if (!isKnownFormat(format)) {
+      client.emit('error', { code: 'unknown_format' });
       return;
     }
 
-    const result = this.matchmaking.joinQueue({
-      playerId: state.playerId,
+    const team = typeof payload?.team === 'string' ? payload.team : undefined;
+    const problems = this.checkTeam(format, team);
+    if (problems) {
+      // The one place a detailed message IS the answer: the player has to know
+      // which Pokémon is illegal to fix it.
+      client.emit('teamRejected', { format, problems });
+      return;
+    }
+
+    if ((this.userRooms.get(user.userId)?.size ?? 0) >= MAX_ROOMS_PER_USER) {
+      client.emit('error', { code: 'too_many_battles' });
+      return;
+    }
+
+    const match = this.matchmaking.joinQueue({
+      playerId: String(user.userId),
       socketId: client.id,
       format,
       joinedAt: Date.now(),
+      team,
+      name: user.name,
     });
 
-    if (result) {
-      // Match found — create PvP room
-      this.createPvPRoom(result.player1, result.player2, result.format);
-    } else {
-      client.emit('queueJoined', {
-        format,
-        position: this.matchmaking.getQueueSize(format),
-      });
+    if (!match) {
+      client.emit('queueJoined', { format, position: this.matchmaking.getQueueSize(format) });
+      return;
     }
+
+    await this.createRoom(
+      { userId: Number(match.player1.playerId), name: match.player1.name ?? 'Player', team: match.player1.team },
+      { userId: Number(match.player2.playerId), name: match.player2.name ?? 'Player', team: match.player2.team },
+      match.format,
+    );
   }
 
   @SubscribeMessage('leaveQueue')
   handleLeaveQueue(client: Socket): void {
-    const state = this.getClientState(client);
-    if (!state) return;
-
-    this.matchmaking.leaveQueue(state.playerId);
+    const user = client.battleUser;
+    if (!user) return;
+    this.matchmaking.leaveQueue(user.userId);
     client.emit('queueLeft');
   }
 
-  @SubscribeMessage('getQueueStatus')
-  handleGetQueueStatus(client: Socket): void {
-    client.emit('queueStatus', this.matchmaking.getAllQueueSizes());
-  }
-
-  // ─── Challenge Events ───
+  // ── direct challenges ─────────────────────────────────────────────────────
+  //
+  // Addressed by USERNAME, which is the account-era replacement for the
+  // client-generated id players used to copy to each other. A challenge only
+  // works between two people who are both online, so the target is resolved
+  // against the live connection map rather than the database — there is nothing
+  // useful to look up about someone who is not here.
 
   @SubscribeMessage('challengePlayer')
-  handleChallengePlayer(
+  handleChallenge(
     client: Socket,
-    payload: { targetPlayerId: string; format?: string },
+    payload: { targetName?: unknown; format?: unknown; team?: unknown },
   ): void {
-    const state = this.getClientState(client);
-    if (!state) return;
+    const user = client.battleUser;
+    if (!user) return;
 
-    const target = this.clients.get(payload.targetPlayerId);
-    if (!target) {
-      client.emit('error', { message: 'Player not found' });
+    const format = typeof payload?.format === 'string' ? payload.format : '';
+    if (!isKnownFormat(format)) {
+      client.emit('error', { code: 'unknown_format' });
       return;
     }
 
-    if (target.playerId === state.playerId) {
-      client.emit('error', { message: 'Cannot challenge yourself' });
+    const targetName = String(payload?.targetName ?? '').trim().slice(0, 32);
+    const target = this.findConnectedByName(targetName);
+    if (!target || target.userId === user.userId) {
+      // Same answer for "not online", "no such account" and "yourself": none of
+      // them is worth confirming to someone probing for usernames.
+      client.emit('error', { code: 'player_unavailable' });
       return;
     }
 
-    const format = payload?.format || 'gen9randombattle';
-    const challengeKey = `${state.playerId}:${target.playerId}`;
+    const team = typeof payload?.team === 'string' ? payload.team : undefined;
+    const problems = this.checkTeam(format, team);
+    if (problems) {
+      client.emit('teamRejected', { format, problems });
+      return;
+    }
 
-    this.pendingChallenges.set(challengeKey, {
-      from: state.playerId,
-      to: target.playerId,
+    this.pendingChallenges.set(`${user.userId}:${target.userId}`, {
+      from: user,
+      to: target,
       format,
-      timestamp: Date.now(),
+      team,
+      at: Date.now(),
     });
 
-    target.socket.emit('challengeReceived', {
-      from: state.playerId,
-      format,
-    });
-
-    client.emit('challengeSent', { to: target.playerId, format });
+    this.emitToUser(target.userId, 'challengeReceived', { from: user.name, format });
+    client.emit('challengeSent', { to: target.name, format });
   }
 
   @SubscribeMessage('acceptChallenge')
-  handleAcceptChallenge(
+  async handleAcceptChallenge(
     client: Socket,
-    payload: { fromPlayerId: string },
-  ): void {
-    const state = this.getClientState(client);
-    if (!state) return;
+    payload: { fromName?: unknown; team?: unknown },
+  ): Promise<void> {
+    const user = client.battleUser;
+    if (!user) return;
 
-    const challengeKey = `${payload.fromPlayerId}:${state.playerId}`;
-    const challenge = this.pendingChallenges.get(challengeKey);
+    const fromName = String(payload?.fromName ?? '').trim();
+    const challenger = this.findConnectedByName(fromName);
+    const key = challenger ? `${challenger.userId}:${user.userId}` : '';
+    const challenge = key ? this.pendingChallenges.get(key) : undefined;
+    if (!challenge || !challenger) {
+      client.emit('error', { code: 'challenge_expired' });
+      return;
+    }
+    this.pendingChallenges.delete(key);
 
-    if (!challenge) {
-      client.emit('error', { message: 'Challenge not found or expired' });
+    const team = typeof payload?.team === 'string' ? payload.team : undefined;
+    const problems = this.checkTeam(challenge.format, team);
+    if (problems) {
+      client.emit('teamRejected', { format: challenge.format, problems });
       return;
     }
 
-    this.pendingChallenges.delete(challengeKey);
+    this.matchmaking.leaveQueue(challenger.userId);
+    this.matchmaking.leaveQueue(user.userId);
 
-    const challenger = this.clients.get(payload.fromPlayerId);
-    if (!challenger) {
-      client.emit('error', { message: 'Challenger is no longer online' });
-      return;
-    }
-
-    // Remove both from queue if they were in one
-    this.matchmaking.leaveQueue(challenger.playerId);
-    this.matchmaking.leaveQueue(state.playerId);
-
-    this.createPvPRoom(
-      {
-        playerId: challenger.playerId,
-        socketId: challenger.socket.id,
-      },
-      {
-        playerId: state.playerId,
-        socketId: client.id,
-      },
+    await this.createRoom(
+      { userId: challenger.userId, name: challenger.name, team: challenge.team },
+      { userId: user.userId, name: user.name, team },
       challenge.format,
     );
   }
 
   @SubscribeMessage('rejectChallenge')
-  handleRejectChallenge(
-    client: Socket,
-    payload: { fromPlayerId: string },
-  ): void {
-    const state = this.getClientState(client);
-    if (!state) return;
-
-    const challengeKey = `${payload.fromPlayerId}:${state.playerId}`;
-    const challenge = this.pendingChallenges.get(challengeKey);
-
-    if (challenge) {
-      this.pendingChallenges.delete(challengeKey);
-      const challenger = this.clients.get(payload.fromPlayerId);
-      challenger?.socket.emit('challengeRejected', {
-        by: state.playerId,
-      });
+  handleRejectChallenge(client: Socket, payload: { fromName?: unknown }): void {
+    const user = client.battleUser;
+    if (!user) return;
+    const challenger = this.findConnectedByName(String(payload?.fromName ?? '').trim());
+    if (!challenger) return;
+    const key = `${challenger.userId}:${user.userId}`;
+    if (this.pendingChallenges.delete(key)) {
+      this.emitToUser(challenger.userId, 'challengeRejected', { by: user.name });
     }
   }
 
-  @SubscribeMessage('reconnect')
-  handleReconnect(
+  // ── in-battle ─────────────────────────────────────────────────────────────
+
+  @SubscribeMessage('makeChoice')
+  async handleMakeChoice(
     client: Socket,
-    payload: { playerId: string; roomId: string },
-  ): void {
-    const existingState = this.clients.get(payload.playerId);
-    if (!existingState) {
-      client.emit('error', { message: 'Session not found' });
+    payload: { roomId?: unknown; choice?: unknown },
+  ): Promise<void> {
+    const ctx = this.contextFor(client, payload?.roomId);
+    if (!ctx) return;
+    const choice = typeof payload?.choice === 'string' ? payload.choice.slice(0, 120) : '';
+    if (!choice) return;
+    await ctx.room.choose(ctx.side, choice);
+  }
+
+  @SubscribeMessage('undoChoice')
+  async handleUndoChoice(client: Socket, payload: { roomId?: unknown }): Promise<void> {
+    const ctx = this.contextFor(client, payload?.roomId);
+    if (!ctx) return;
+    await ctx.room.undo(ctx.side);
+  }
+
+  @SubscribeMessage('forfeit')
+  async handleForfeit(client: Socket, payload: { roomId?: unknown }): Promise<void> {
+    const ctx = this.contextFor(client, payload?.roomId);
+    if (!ctx) return;
+    await ctx.room.forfeit(ctx.side);
+  }
+
+  @SubscribeMessage('chatMessage')
+  handleChat(client: Socket, payload: { roomId?: unknown; message?: unknown }): void {
+    const ctx = this.contextFor(client, payload?.roomId);
+    if (!ctx) return;
+    const text = String(payload?.message ?? '').trim().slice(0, 300);
+    if (!text) return;
+    // `sender` is the authenticated name, not anything the client supplied.
+    this.server.to(ctx.room.id).emit('chatMessage', {
+      roomId: ctx.room.id,
+      sender: ctx.user.name,
+      message: text,
+      timestamp: Date.now(),
+    });
+  }
+
+  /**
+   * Rejoin a battle after a reconnect.
+   *
+   * Replaces `reconnect{playerId, roomId}`, which took over whatever account
+   * the payload named. This one only ever resumes the socket's OWN side.
+   */
+  @SubscribeMessage('resume')
+  handleResume(client: Socket, payload: { roomId?: unknown }): void {
+    const user = client.battleUser;
+    if (!user) return;
+    const roomId = typeof payload?.roomId === 'string' ? payload.roomId : '';
+    const room = this.rooms.get(roomId);
+    const side = room?.sideOf(user.userId) ?? null;
+    if (!room || !side) {
+      client.emit('error', { code: 'not_in_battle' });
       return;
     }
 
-    const timer = this.disconnectTimers.get(payload.playerId);
+    const timer = this.graceTimers.get(user.userId);
     if (timer) {
       clearTimeout(timer);
-      this.disconnectTimers.delete(payload.playerId);
+      this.graceTimers.delete(user.userId);
     }
 
-    existingState.socket = client;
-
-    const room = this.rooms.get(payload.roomId);
-    if (room) {
-      const existingSide = existingState.roomIds.get(payload.roomId) ?? 'p1';
-      existingState.roomIds.set(payload.roomId, existingSide);
-      client.emit('reconnected', {
-        roomId: payload.roomId,
-        status: room.getStatus(),
-        side: existingSide,
-      });
-      const pendingRequest = room.getCurrentRequest(existingSide);
-      if (pendingRequest) {
-        client.emit('request', {
-          roomId: payload.roomId,
-          request: pendingRequest,
-        });
-      }
-    }
+    void client.join(roomId);
+    client.emit('resumed', {
+      roomId,
+      side,
+      status: room.status,
+      replay: room.replay,
+    });
+    const pending = room.currentRequest(side);
+    if (pending) client.emit('request', { roomId, request: pending });
   }
 
-  private createPvPRoom(
-    p1: { playerId: string; socketId: string },
-    p2: { playerId: string; socketId: string },
-    format: string,
-  ): void {
-    const p1Client = this.clients.get(p1.playerId);
-    const p2Client = this.clients.get(p2.playerId);
-
-    if (!p1Client || !p2Client) {
-      this.logger.error('Cannot create PvP room: player client not found');
+  /**
+   * Watch a battle you are not in.
+   *
+   * Joins the socket.io room, so from here on the spectator receives the same
+   * live `protocol` stream as the players. Previously this returned one
+   * snapshot and then nothing, which looked like a frozen battle.
+   */
+  @SubscribeMessage('spectate')
+  handleSpectate(client: Socket, payload: { roomId?: unknown }): void {
+    if (!client.battleUser) return;
+    const roomId = typeof payload?.roomId === 'string' ? payload.roomId : '';
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      client.emit('error', { code: 'battle_not_found' });
       return;
     }
+    void client.join(roomId);
+    client.emit('spectateJoined', {
+      roomId,
+      status: room.status,
+      replay: room.replay,
+      format: room.format,
+    });
+  }
 
-    const roomId = crypto.randomUUID();
+  // ── internals ─────────────────────────────────────────────────────────────
 
-    const p1Id = p1.playerId;
-    const p2Id = p2.playerId;
+  /** Resolves the socket's room and side, or emits and returns null. */
+  private contextFor(
+    client: Socket,
+    rawRoomId: unknown,
+  ): { user: BattlePrincipal; room: BattleRoom; side: 'p1' | 'p2' } | null {
+    const user = client.battleUser;
+    if (!user) return null;
+    const roomId = typeof rawRoomId === 'string' ? rawRoomId : '';
+    const room = this.rooms.get(roomId);
+    if (!room) {
+      client.emit('error', { code: 'battle_not_found' });
+      return null;
+    }
+    const side = room.sideOf(user.userId);
+    if (!side) {
+      // Covers both "not your battle" and spectators trying to act.
+      client.emit('error', { code: 'not_in_battle' });
+      return null;
+    }
+    return { user, room, side };
+  }
 
-    const callbacks: BattleRoomCallbacks = {
-      onProtocol: (line: string) => {
-        const s1 = this.clients.get(p1Id)?.socket;
-        const s2 = this.clients.get(p2Id)?.socket;
-        s1?.emit('protocol', { roomId, line });
-        s2?.emit('protocol', { roomId, line });
-      },
-      onRequestP1: (request: Protocol.Request) => {
-        const s1 = this.clients.get(p1Id)?.socket;
-        s1?.emit('request', { roomId, request });
-      },
-      onRequestP2: (request: Protocol.Request) => {
-        const s2 = this.clients.get(p2Id)?.socket;
-        s2?.emit('request', { roomId, request });
-      },
-      onBattleEnd: async (result: BattleEndResult) => {
-        let replayId: number | undefined;
-        try {
-          const replayResult = await this.achievementFacade.createReplay({
-            side1: result.side1,
-            side2: result.side2,
-            team1: JSON.stringify(result.team1),
-            team2: JSON.stringify(result.team2),
-            replay: result.replay,
-            winner: result.winner,
-          });
-          replayId = replayResult.insertId;
-          this.logger.log(`PvP Replay saved: ${replayId}`);
-        } catch (err: any) {
-          this.logger.error(`Failed to save PvP replay: ${err.message}`);
-        }
+  /** Server-side legality, the half a client cannot be trusted with (D12). */
+  private checkTeam(format: string, packed?: string): string[] | null {
+    if (!packed) return null;
+    const team = unpackTeam(packed);
+    if (!team) return ['El equipo no se pudo leer.'];
+    const result = validateTeam(format, team);
+    return result.ok ? null : result.problems;
+  }
 
-        const endPayload = { roomId, ...result, replayId };
-        const s1 = this.clients.get(p1Id)?.socket;
-        const s2 = this.clients.get(p2Id)?.socket;
-        s1?.emit('battleEnd', endPayload);
-        s2?.emit('battleEnd', endPayload);
-        this.cleanupRoom(roomId);
-      },
-      onError: (error: string) => {
-        this.logger.error(`PvP Battle error [${roomId}]: ${error}`);
-        const s1 = this.clients.get(p1Id)?.socket;
-        const s2 = this.clients.get(p2Id)?.socket;
-        s1?.emit('error', { roomId, message: error });
-        s2?.emit('error', { roomId, message: error });
-      },
-      onTimerUpdate: (timerState) => {
-        const payload = { roomId, ...timerState };
-        const s1 = this.clients.get(p1Id)?.socket;
-        const s2 = this.clients.get(p2Id)?.socket;
-        s1?.emit('timerUpdate', payload);
-        s2?.emit('timerUpdate', payload);
-      },
-    };
+  private rateLimited(userId: number): boolean {
+    const now = Date.now();
+    const recent = (this.createLog.get(userId) ?? []).filter((t) => now - t < CREATE_WINDOW_MS);
+    if (recent.length >= MAX_CREATES_PER_WINDOW) {
+      this.createLog.set(userId, recent);
+      return true;
+    }
+    recent.push(now);
+    this.createLog.set(userId, recent);
+    return false;
+  }
 
+  private async createRoom(p1: RoomPlayer, p2: RoomPlayer, format: string): Promise<void> {
+    if (this.rateLimited(p1.userId) || this.rateLimited(p2.userId)) return;
+
+    const roomId = randomUUID();
     const room = new BattleRoom(
       roomId,
-      callbacks,
+      format,
+      p1,
+      p2,
+      {
+        onProtocol: (line) => this.server.to(roomId).emit('protocol', { roomId, line }),
+        // A request is private to one side — it names that player's whole team
+        // — so it goes to their socket, never to the room.
+        onRequestP1: (request) => this.emitToUser(p1.userId, 'request', { roomId, request }),
+        onRequestP2: (request) => this.emitToUser(p2.userId, 'request', { roomId, request }),
+        onTimerUpdate: (state) => this.server.to(roomId).emit('timerUpdate', { roomId, ...state }),
+        onError: (code) => this.server.to(roomId).emit('error', { roomId, code }),
+        onBattleEnd: (result) => {
+          void this.persistReplay(room, result.winner, result.log);
+          this.server.to(roomId).emit('battleEnd', { roomId, winner: result.winner });
+          this.release(roomId);
+        },
+      },
       this.logger,
-      undefined,
-      'pvp',
     );
+
     this.rooms.set(roomId, room);
-    p1Client.roomIds.set(roomId, 'p1');
-    p2Client.roomIds.set(roomId, 'p2');
+    this.hold(p1.userId, roomId);
+    this.hold(p2.userId, roomId);
 
-    room
-      .create(format)
-      .then(() => {
-        const battlePayload = { roomId, format, mode: 'pvp' as const };
-        const s1 = this.clients.get(p1Id)?.socket;
-        const s2 = this.clients.get(p2Id)?.socket;
-        s1?.emit('battleCreated', { ...battlePayload, side: 'p1' });
-        s2?.emit('battleCreated', { ...battlePayload, side: 'p2' });
-      })
-      .catch((err) => {
-        this.logger.error(`Failed to create PvP battle: ${err.message}`);
-        const s1 = this.clients.get(p1Id)?.socket;
-        const s2 = this.clients.get(p2Id)?.socket;
-        s1?.emit('error', {
-          roomId,
-          message: `Failed to create battle: ${err.message}`,
-        });
-        s2?.emit('error', {
-          roomId,
-          message: `Failed to create battle: ${err.message}`,
-        });
-        this.cleanupRoom(roomId);
+    for (const [userId, side] of [
+      [p1.userId, 'p1'],
+      [p2.userId, 'p2'],
+    ] as const) {
+      for (const socket of this.socketsOf(userId)) void socket.join(roomId);
+      this.emitToUser(userId, 'battleCreated', { roomId, format, side });
+    }
+
+    try {
+      await room.start();
+    } catch (error) {
+      this.logger.error(
+        `[battle ${roomId}] failed to start: ${error instanceof Error ? error.message : 'unknown'}`,
+      );
+      this.server.to(roomId).emit('error', { roomId, code: 'battle_start_failed' });
+      this.rooms.delete(roomId);
+      this.release(roomId);
+    }
+  }
+
+  /** Every connected socket belonging to an account. */
+  private socketsOf(userId: number): Socket[] {
+    return [...(this.connections.get(userId) ?? [])];
+  }
+
+  /** An online account by display name, case-insensitively. */
+  private findConnectedByName(name: string): BattlePrincipal | null {
+    if (!name) return null;
+    const wanted = name.toLowerCase();
+    for (const sockets of this.connections.values()) {
+      for (const socket of sockets) {
+        if (socket.battleUser?.name.toLowerCase() === wanted) return socket.battleUser;
+      }
+    }
+    return null;
+  }
+
+  private emitToUser(userId: number, event: string, payload: unknown): void {
+    for (const socket of this.socketsOf(userId)) socket.emit(event, payload);
+  }
+
+  private hold(userId: number, roomId: string): void {
+    const set = this.userRooms.get(userId) ?? new Set<string>();
+    set.add(roomId);
+    this.userRooms.set(userId, set);
+  }
+
+  /** Drops the room from both players' holdings; the room object itself is
+   *  kept until the reaper takes it, so a late `resume` still finds the result. */
+  private release(roomId: string): void {
+    for (const [userId, set] of this.userRooms) {
+      if (set.delete(roomId) && set.size === 0) this.userRooms.delete(userId);
+    }
+  }
+
+  /**
+   * Persists the finished battle for BOTH accounts.
+   *
+   * The old path wrote display names into `rotom_replays.side1/side2` and never
+   * called `createUserReplay`, so a PvP battle produced a row nobody owned and
+   * neither player could find.
+   */
+  private async persistReplay(room: BattleRoom, winner: string, log: string): Promise<void> {
+    try {
+      await this.repo.recordPvpReplay({
+        format: room.format,
+        p1: room.p1,
+        p2: room.p2,
+        winner,
+        log,
+        playedAt: Date.now(),
       });
+    } catch (error) {
+      // A lost replay must not take the battle's ending down with it.
+      this.logger.error(
+        `[battle ${room.id}] replay not saved: ${error instanceof Error ? error.message : 'unknown'}`,
+      );
+    }
   }
 
-  private getClientState(client: Socket): ClientState | undefined {
-    for (const state of this.clients.values()) {
-      if (state.socket === client) return state;
+  /** Frees finished rooms. Without this the Maps only ever grew. */
+  private reap(): void {
+    const now = Date.now();
+    for (const [roomId, room] of this.rooms) {
+      if (room.finishedAt && now - room.finishedAt > ROOM_TTL_AFTER_END_MS) {
+        this.rooms.delete(roomId);
+        this.release(roomId);
+      }
     }
-    return undefined;
-  }
-
-  private cleanupRoom(roomId: string): void {
-    const room = this.rooms.get(roomId);
-    if (!room) return;
-
-    for (const [, state] of this.clients.entries()) {
-      state.roomIds.delete(roomId);
+    for (const [key, challenge] of this.pendingChallenges) {
+      if (now - challenge.at > CHALLENGE_TTL_MS) this.pendingChallenges.delete(key);
     }
-
-    this.rooms.delete(roomId);
+    for (const [userId, stamps] of this.createLog) {
+      const recent = stamps.filter((t) => now - t < CREATE_WINDOW_MS);
+      if (recent.length) this.createLog.set(userId, recent);
+      else this.createLog.delete(userId);
+    }
   }
 }

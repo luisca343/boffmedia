@@ -1,0 +1,2287 @@
+// AUTO-EXTRACTED from apps/web/locales/{es,en}/battlesim.json.
+// This package OWNS these keys — the web catalog no longer carries them.
+//
+// The namespace moved from `battlesim.*` to `tools.battlesim.*`, matching every
+// other tool package. No message text changed: only the namespace each
+// component binds, which is one line per component.
+//
+// One file, and one plain object literal, deliberately: `scripts/check-i18n.mjs`
+// reads this catalog by slicing the text between the assignment and `as const`
+// and running it through JSON.parse, so it can verify key parity without
+// executing TypeScript. An import, a spread or a template string here makes the
+// whole catalog invisible to that check rather than failing it loudly.
+//
+// Spanish is the source of truth; English is the translation.
+
+export const messages = {
+  "es": {
+    "tools": {
+      "battlesim": {
+        "landing": {
+          "title": "Simulador de Combates",
+          "subtitle": "Mira repeticiones, juega contra la IA o combate en Pokémon Showdown",
+          "play": "Jugar",
+          "playDesc": "Combate contra un oponente IA",
+          "pvp": "PvP",
+          "pvpDesc": "Combate contra otros jugadores en nuestro servidor",
+          "showdown": "Showdown Online",
+          "showdownDesc": "Juega en el servidor oficial de Pokémon Showdown",
+          "replays": "Repeticiones",
+          "replaysDesc": "Mira repeticiones de combates guardados",
+          "calc": "Calculadora",
+          "calcDesc": "Calculadora de daño",
+          "resume": "Combate PvP en curso — reanudar"
+        },
+        "header": {
+          "lobby": "Lobby",
+          "forfeit": "Rendirse",
+          "vs": "vs",
+          "fullscreen": "Pantalla completa",
+          "exitFullscreen": "Salir de pantalla completa",
+          "opponent": "Rival",
+          "aria": "Cabecera de combate",
+          "modes": {
+            "ai": "VS IA",
+            "pvp": "PVP",
+            "showdown": "SHOWDOWN",
+            "replay": "REPETICIÓN"
+          }
+        },
+        "connection": {
+          "error": "Error",
+          "unknownError": "Error desconocido",
+          "tryAgain": "Reintentar",
+          "backToLobby": "Volver al lobby",
+          "connectingServer": "Conectando al servidor de combate…",
+          "loadingBattle": "Cargando combate…",
+          "connectingShowdown": "Conectando al servidor de Showdown…",
+          "authenticating": "Autenticando…",
+          "joiningBattle": "Uniéndose al combate…",
+          "waitingBattle": "Esperando a que comience el combate…",
+          "reconnecting": "Reconectando (intento {attempt}/{max})…",
+          "forfeitConfirm": "¿Seguro que quieres rendirte?",
+          "forfeitTitle": "Rendirse",
+          "forfeitCta": "Rendirse"
+        },
+        "dock": {
+          "waitingOpponent": "Esperando al rival…",
+          "teamPreview": "Vista previa del equipo — se enviará el orden por defecto",
+          "confirmTeam": "Confirmar equipo",
+          "switch": "Cambiar",
+          "forcedSwitch": "Cambio forzado",
+          "trapped": " (atrapado)",
+          "undo": "Deshacer",
+          "undoHint": "Cancela la elección enviada (antes de que se resuelva el turno)",
+          "aria": "Acciones de combate",
+          "mechanics": {
+            "terastallize": "Teracristalización",
+            "mega": "Mega Evolución",
+            "dynamax": "Dynamax",
+            "zmove": "Movimiento Z"
+          }
+        },
+        "log": {
+          "label": "Registro de combate",
+          "showAll": "Mostrar todo ({count})",
+          "empty": "Sin eventos",
+          "events": "{count} eventos",
+          "filterAll": "Todo",
+          "filterDamage": "Daño",
+          "filterSwitches": "Cambios",
+          "filterField": "Campo",
+          "collapsePrevious": "− Anteriores",
+          "hidden": "Registro oculto — actívalo con el botón del ojo",
+          "tab": "Registro"
+        },
+        "chat": {
+          "tab": "Chat",
+          "placeholder": "Escribe un mensaje…",
+          "battlePlaceholder": "Di algo…",
+          "send": "Enviar",
+          "empty": "Aún no hay mensajes",
+          "battleEmpty": "El chat del combate aparecerá aquí",
+          "unread": "{count} mensajes sin leer",
+          "lobbyPlaceholder": "Escribe un mensaje…",
+          "lobbyEmpty": "Aún no hay mensajes. El chat aparecerá aquí al conectar con el lobby.",
+          "aria": "Chat"
+        },
+        "end": {
+          "victory": "¡VICTORIA!",
+          "defeat": "DERROTA",
+          "tie": "EMPATE",
+          "winner": "GANADOR",
+          "turn": "Turno {turn}",
+          "backToStart": "Volver al inicio",
+          "youWon": "¡Has ganado!",
+          "itsATie": "¡Empate!",
+          "playerWon": "¡{name} ha ganado!",
+          "playAgain": "Jugar otra vez",
+          "watchReplay": "Ver repetición",
+          "savingReplay": "Guardando repetición…",
+          "replaySaved": "¡Repetición guardada!",
+          "saveReplay": "Guardar repetición"
+        },
+        "play": {
+          "title": "Simulador de Combates",
+          "subtitle": "Juega un combate Pokémon contra un oponente IA",
+          "start": "Empezar combate",
+          "newTab": "+ Nuevo",
+          "won": "Ganado",
+          "lost": "Perdido",
+          "tie": "Empate",
+          "turn": "Turno {turn}",
+          "yourTurn": " — ¡Tu turno!",
+          "teamLabel": "Equipo",
+          "usingSample": "Sin equipos propios en este formato — se usará uno de ejemplo.",
+          "needsTeam": "Este formato necesita un equipo. Crea uno en la pestaña Equipos."
+        },
+        "app": {
+          "tagline": "Simulador de combates",
+          "tabs": {
+            "lobby": "Lobby",
+            "equipos": "Equipos",
+            "repeticiones": "Repeticiones",
+            "aria": "Secciones del simulador"
+          },
+          "lobby": {
+            "kick": "Simulador de combates · VGC",
+            "title": "A la batalla",
+            "modeLabel": "Modo de juego",
+            "formatLabel": "Formato",
+            "launch": {
+              "ia": "Batallar",
+              "pvp": "Buscar combate",
+              "showdown": "Buscar combate"
+            },
+            "modes": {
+              "ia": {
+                "label": "Entrenamiento",
+                "sub": "Contra la IA, sin presión",
+                "note": "Combate contra un oponente controlado por la IA. Sin ranking."
+              },
+              "pvp": {
+                "label": "Clasificatoria",
+                "sub": "Emparejamiento PvP",
+                "note": "Emparejamiento contra otros jugadores en nuestro servidor."
+              },
+              "showdown": {
+                "label": "Showdown",
+                "sub": "Servidor externo",
+                "note": "Combate en el servidor oficial de Pokémon Showdown."
+              }
+            },
+            "tiles": {
+              "builder": "Team Builder",
+              "builderSub": "Crea y edita equipos",
+              "replays": "Repeticiones",
+              "replaysSub": "Revive tus combates",
+              "ladder": "Escalera",
+              "ladderSub": "Clasificación global"
+            }
+          },
+          "soon": {
+            "title": "Próximamente",
+            "equipos": "El Team Builder llegará en una próxima actualización.",
+            "repeticiones": "El visor de repeticiones llegará en una próxima actualización."
+          },
+          "equipos": {
+            "title": "Equipos de combate",
+            "lead": "Tus equipos de combate Pixelmon viven en el PC de SmartRotom: créalos, ordénalos y actívalos allí.",
+            "cta": "Abrir el PC en SmartRotom"
+          }
+        },
+        "tabs": {
+          "aria": "Pestañas abiertas",
+          "home": "Inicio",
+          "teams": "Equipos",
+          "replays": "Repeticiones",
+          "new": "Nuevo combate",
+          "close": "Cerrar {label}",
+          "room": {
+            "ai": "VS IA",
+            "pvp": "PvP",
+            "showdown": "Showdown",
+            "replay": "Repetición"
+          },
+          "state": {
+            "loading": "Cargando",
+            "running": "En curso",
+            "yourTurn": "Te toca",
+            "finished": "Terminado",
+            "error": "Error",
+            "open": "Abierto"
+          }
+        },
+        "canvas": {
+          "turn": "Turno {turn}"
+        },
+        "tb": {
+          "title": "Equipos",
+          "count": "{count, plural, one {# equipo} other {# equipos}}",
+          "searchPh": "Buscar equipos…",
+          "filterAria": "Filtrar por formato",
+          "filterAll": "Todos",
+          "otherFormats": "Otros",
+          "formatLabel": "Formato",
+          "nameLabel": "Nombre",
+          "new": "Nuevo equipo",
+          "import": "Importar",
+          "export": "Exportar",
+          "play": "Jugar",
+          "edit": "Editar",
+          "duplicate": "Duplicar",
+          "rename": "Renombrar",
+          "delete": "Borrar",
+          "cancel": "Cancelar",
+          "load": "Cargar",
+          "more": "Más acciones",
+          "backToList": "Volver a la lista",
+          "newTeamName": "Equipo nuevo",
+          "importedName": "Equipo importado",
+          "noMatch": "Ningún equipo coincide con la búsqueda.",
+          "noMatchLead": "Prueba con otro nombre o quita el filtro de formato.",
+          "clearFilters": "Quitar filtros",
+          "playDisabled": "Añade al menos un Pokémon para poder jugar con este equipo.",
+          "hasProblem": "con problemas",
+          "slotsAria": "Pokémon del equipo: {list}",
+          "slotsEmpty": "Equipo vacío",
+          "empty": {
+            "title": "Aún no tienes equipos",
+            "lead": "Crea uno desde cero o pega un equipo de Showdown para empezar."
+          },
+          "importModal": {
+            "title": "Importar equipo",
+            "placeholder": "Pega aquí el equipo en formato Showdown…",
+            "error": "No se pudo leer el equipo. Comprueba que está en formato Showdown.",
+            "replaceNote": "Reemplaza los seis huecos de este equipo con el texto pegado."
+          },
+          "validity": {
+            "title": "Legalidad",
+            "ok": "Legal",
+            "problems": "{count, plural, one {# problema} other {# problemas}}",
+            "empty": "Sin construir",
+            "checking": "Comprobando…",
+            "none": "Sin problemas para este formato.",
+            "slot": "Hueco {n}",
+            "team": "Equipo",
+            "goTo": "Ir al hueco {n}"
+          },
+          "toast": {
+            "exported": "Equipo copiado al portapapeles",
+            "exportFailed": "No se pudo copiar al portapapeles",
+            "imported": "Equipo importado",
+            "duplicated": "Equipo duplicado",
+            "deleted": "Equipo borrado",
+            "restored": "Equipo restaurado",
+            "undo": "Deshacer"
+          },
+          "deleteDialog": {
+            "title": "Borrar equipo",
+            "body": "Se borrará «{name}». Podrás deshacerlo durante unos segundos.",
+            "confirm": "Borrar"
+          },
+          "remote": {
+            "changed": "Este equipo cambió en otro dispositivo.",
+            "load": "Cargar"
+          },
+          "sync": {
+            "aria": "Estado del equipo",
+            "action": "Sincronizar",
+            "saved": "Guardado",
+            "savedHint": "Los cambios se guardan solos en este dispositivo.",
+            "syncing": "Sincronizando…",
+            "syncingHint": "Subiendo este equipo a tu cuenta…",
+            "synced": "Sincronizado",
+            "syncedHint": "Guardado en este dispositivo y en tu cuenta.",
+            "pending": "Pendiente",
+            "pendingHint": "Guardado aquí. Falta subirlo a tu cuenta: se enviará al salir del editor o al pulsar Sincronizar.",
+            "error": "No se pudo sincronizar",
+            "errorHint": "El servidor rechazó este equipo. Sigue guardado en este dispositivo; vuelve a intentarlo.",
+            "localOnly": "Solo local · Inicia sesión",
+            "localOnlyHint": "Este equipo se guarda solo en este dispositivo. Inicia sesión para tenerlo en todos."
+          },
+          "editor": {
+            "nameAria": "Nombre del equipo",
+            "renameHint": "Pulsa para renombrar",
+            "slots": "Equipo",
+            "analysis": "Cobertura",
+            "moveUp": "Subir",
+            "moveDown": "Bajar",
+            "duplicateSlot": "Duplicar Pokémon",
+            "removeSlot": "Quitar Pokémon",
+            "add": "Añadir",
+            "slotN": "Hueco {n}",
+            "emptyTitle": "Elige un Pokémon",
+            "emptyLead": "Este hueco está vacío. Busca una especie para empezar a construir el set.",
+            "railAria": "Huecos del equipo",
+            "kicker": "Set {n}"
+          },
+          "set": {
+            "species": "Pokémon",
+            "changeSpecies": "Cambiar",
+            "clearSpecies": "Quitar",
+            "ability": "Habilidad",
+            "hidden": "Oculta",
+            "otherAbility": "Otra…",
+            "item": "Objeto",
+            "noItem": "Sin objeto",
+            "clearItem": "Quitar objeto",
+            "moves": "Movimientos",
+            "moveN": "Movimiento {n}",
+            "clearMove": "Quitar movimiento {n}",
+            "details": "Detalles",
+            "level": "Nivel",
+            "gender": "Género",
+            "genderAny": "Cualq.",
+            "genderM": "Macho",
+            "genderF": "Hembra",
+            "shiny": "Variocolor",
+            "tera": "Teratipo",
+            "teraNone": "Sin teratipo",
+            "nature": "Naturaleza",
+            "evs": "EVs",
+            "sp": "SP",
+            "spName": "Puntos de Estadística",
+            "ivs": "IVs",
+            "advanced": "Avanzado",
+            "budget": "Presupuesto",
+            "remaining": "{n} restantes",
+            "over": "{n} de más",
+            "spRemaining": "{n} SP restantes",
+            "spOver": "{n} SP de más",
+            "ivsLocked": "En este formato los IVs son siempre {n}.",
+            "levelLocked": "Nivel fijo en este formato.",
+            "baseStats": "Estadísticas base",
+            "total": "Total",
+            "final": "Final",
+            "power": "Pot.",
+            "accuracy": "Prec.",
+            "pp": "PP",
+            "evAria": "EVs de {stat}",
+            "spAria": "SP de {stat}",
+            "ivAria": "IVs de {stat}"
+          },
+          "picker": {
+            "species": "Elegir Pokémon",
+            "move": "Elegir movimiento",
+            "item": "Elegir objeto",
+            "ability": "Elegir habilidad",
+            "searchSpecies": "Buscar Pokémon…",
+            "searchMove": "Buscar movimiento…",
+            "searchItem": "Buscar objeto…",
+            "searchAbility": "Buscar habilidad…",
+            "showing": "Mostrando {shown} de {total}",
+            "recents": "Recientes",
+            "noResults": "Sin resultados",
+            "illegal": "Ilegal",
+            "loadingMoves": "Cargando movimientos legales…",
+            "allTypes": "Todos",
+            "typeFilter": "Filtrar por tipo",
+            "catFilter": "Filtrar por categoría",
+            "bst": "TBE",
+            "hint": "↑↓ navegar · Enter elegir · Esc cerrar",
+            "listAria": "Resultados"
+          },
+          "coverage": {
+            "lead": "Miembros débiles, resistentes o inmunes a cada tipo atacante.",
+            "type": "Tipo",
+            "weak": "Débil",
+            "resist": "Resiste",
+            "immune": "Inmune",
+            "emptyLead": "Añade Pokémon para ver la cobertura defensiva."
+          },
+          "stats": {
+            "hp": "PS",
+            "atk": "Ataque",
+            "def": "Defensa",
+            "spa": "Ataque Esp.",
+            "spd": "Defensa Esp.",
+            "spe": "Velocidad"
+          },
+          "statsShort": {
+            "hp": "PS",
+            "atk": "Atq",
+            "def": "Def",
+            "spa": "AtE",
+            "spd": "DfE",
+            "spe": "Vel"
+          },
+          "cat": {
+            "Physical": "Físico",
+            "Special": "Especial",
+            "Status": "Estado"
+          },
+          "types": {
+            "Normal": "Normal",
+            "Fire": "Fuego",
+            "Water": "Agua",
+            "Electric": "Eléctrico",
+            "Grass": "Planta",
+            "Ice": "Hielo",
+            "Fighting": "Lucha",
+            "Poison": "Veneno",
+            "Ground": "Tierra",
+            "Flying": "Volador",
+            "Psychic": "Psíquico",
+            "Bug": "Bicho",
+            "Rock": "Roca",
+            "Ghost": "Fantasma",
+            "Dragon": "Dragón",
+            "Dark": "Siniestro",
+            "Steel": "Acero",
+            "Fairy": "Hada",
+            "Stellar": "Astral"
+          },
+          "natures": {
+            "hardy": "Fuerte",
+            "lonely": "Huraña",
+            "brave": "Audaz",
+            "adamant": "Firme",
+            "naughty": "Pícara",
+            "bold": "Osada",
+            "docile": "Dócil",
+            "relaxed": "Plácida",
+            "impish": "Agitada",
+            "lax": "Floja",
+            "timid": "Miedosa",
+            "hasty": "Activa",
+            "serious": "Seria",
+            "jolly": "Alegre",
+            "naive": "Ingenua",
+            "modest": "Modesta",
+            "mild": "Afable",
+            "quiet": "Mansa",
+            "bashful": "Tímida",
+            "rash": "Alocada",
+            "calm": "Serena",
+            "gentle": "Amable",
+            "sassy": "Grosera",
+            "careful": "Cauta",
+            "quirky": "Rara"
+          }
+        },
+        "replay": {
+          "invalidId": "ID de repetición no válido",
+          "notFound": "Repetición no encontrada",
+          "loadFailed": "No se pudo cargar la repetición",
+          "pasteManually": "Pegar repetición manualmente"
+        },
+        "pvp": {
+          "title": "Combate PvP",
+          "subtitle": "Combate contra otros jugadores en nuestro servidor",
+          "status": {
+            "connecting": "Conectando…",
+            "connected": "Conectado",
+            "idle": "Inactivo",
+            "searching": "Buscando…",
+            "inBattle": "En combate",
+            "error": "Error",
+            "disconnected": "Desconectado"
+          },
+          "incomingChallenges": "Retos entrantes",
+          "challengedYou": "te ha retado a {format}",
+          "accept": "Aceptar",
+          "reject": "Rechazar",
+          "findMatch": {
+            "title": "Buscar partida",
+            "desc": "Únete a la cola de emparejamiento y te emparejaremos con otro jugador.",
+            "button": "Buscar partida"
+          },
+          "searching": "Buscando rival…",
+          "cancel": "Cancelar",
+          "challenge": {
+            "title": "Retar jugador",
+            "desc": "Envía un reto directo a un jugador concreto.",
+            "placeholder": "ID del jugador",
+            "button": "Retar"
+          },
+          "yourId": {
+            "title": "Tu ID de jugador",
+            "desc": "Comparte este ID para que tus amigos puedan retarte directamente."
+          }
+        },
+        "showdown": {
+          "title": "Lobby de Showdown",
+          "subtitle": "Juega en el servidor oficial de Showdown",
+          "status": {
+            "disconnected": "Desconectado",
+            "inBattle": "En combate",
+            "loggedIn": "Conectado como {name}",
+            "connecting": "Conectando…",
+            "reconnecting": "Reconectando…",
+            "error": "Error"
+          },
+          "incomingChallenges": "Retos entrantes",
+          "challengedYou": "te ha retado a {format}",
+          "login": {
+            "title": "Inicia sesión en Showdown",
+            "username": "Usuario",
+            "password": "Contraseña",
+            "button": "Entrar",
+            "connecting": "Conectando al servidor de Showdown…",
+            "waitingChallstr": "Esperando la cadena de reto…"
+          },
+          "lobbyChat": "Chat del lobby",
+          "battle": {
+            "title": "Combate",
+            "desc": "Encuentra un rival aleatorio en el servidor oficial de Showdown.",
+            "button": "Buscar combate"
+          },
+          "challenge": {
+            "title": "Retar jugador",
+            "desc": "Reta a un jugador concreto a un combate.",
+            "placeholder": "Nombre del jugador"
+          },
+          "online": "Usuarios en línea ({count})",
+          "onlineTitle": "Usuarios en línea",
+          "onlineLoading": "Cargando usuarios…",
+          "you": "(tú)",
+          "connectedAs": "Conectado como {name} — sim3.psim.us"
+        },
+        "replays": {
+          "search": "Buscar por jugador…",
+          "scope": "Ámbito",
+          "recent": "Recientes",
+          "mine": "Mías",
+          "winner": "Ganador",
+          "errorTitle": "No se pudieron cargar las repeticiones",
+          "errorLead": "El servicio de repeticiones no está disponible ahora mismo. Inténtalo más tarde.",
+          "emptyTitle": "Aún no hay repeticiones",
+          "emptyLead": "Los combates que termines aparecerán aquí.",
+          "emptySearch": "Ninguna repetición coincide con tu búsqueda.",
+          "logHidden": "Registro oculto — actívalo con el botón del ojo",
+          "ctl": {
+            "timeline": "Línea de tiempo del combate",
+            "turnOf": "Turno {turn} de {total}",
+            "controls": "Controles de reproducción",
+            "play": "Reproducir",
+            "pause": "Pausar",
+            "restart": "Reiniciar",
+            "prevTurn": "Turno anterior",
+            "nextTurn": "Turno siguiente",
+            "pov": "Vista: {side}",
+            "player1": "Jugador 1",
+            "player2": "Jugador 2",
+            "toggleLog": "Mostrar/ocultar registro",
+            "simulate": "Simular ataque",
+            "goToTurn": "Ir al turno",
+            "goToTurnAria": "Ir al turno",
+            "speed": "Velocidad"
+          },
+          "loader": {
+            "title": "Carga una repetición de Pokémon Showdown",
+            "placeholder": "Pega aquí el texto completo de la repetición",
+            "load": "Cargar repetición",
+            "hint": "Copia y pega el texto completo de la repetición de Pokémon Showdown.",
+            "errorEmpty": "Pega un texto de repetición válido.",
+            "errorFormat": "Formato de repetición no válido. Se espera texto de Showdown con líneas |player| y |turn|.",
+            "errorUnknown": "Ha ocurrido un error desconocido.",
+            "side1": "Jugador 1",
+            "side2": "Jugador 2"
+          }
+        },
+        "field": {
+          "aria": "Condiciones de campo",
+          "cond": {
+            "sunnyday": "Sol",
+            "desolateland": "Sol abrasador",
+            "raindance": "Lluvia",
+            "primordialsea": "Diluvio",
+            "sandstorm": "Tormenta arena",
+            "hail": "Granizo",
+            "snow": "Nieve",
+            "deltastream": "Turbulencias",
+            "electricterrain": "C. Eléctrico",
+            "grassyterrain": "C. Hierba",
+            "mistyterrain": "C. Niebla",
+            "psychicterrain": "C. Psíquico",
+            "trickroom": "Espacio Raro",
+            "magicroom": "Zona Mágica",
+            "wonderroom": "Zona Extraña",
+            "gravity": "Gravedad"
+          }
+        },
+        "avatar": {
+          "alt": "avatar"
+        },
+        "sprite": {
+          "altFallback": "Pokémon"
+        },
+        "replayError": {
+          "title": "Error en la repetición",
+          "message": "Algo ha fallado al cargar la repetición.",
+          "retry": "Reintentar"
+        },
+        "battle": {
+          "you": "TÚ",
+          "foe": "RIVAL",
+          "turn": "Turno {turn}",
+          "turnShort": "T{turn}",
+          "turnAnnounce": "Comienza el turno {turn}",
+          "header": {
+            "back": "Volver",
+            "battles": "Combates",
+            "newBattle": "Nuevo combate",
+            "closeBattle": "Cerrar combate {id}",
+            "closeLiveTitle": "¿Cerrar este combate?",
+            "closeLiveBody": "El combate sigue en curso. Si lo cierras, se perderá.",
+            "closeLiveCta": "Cerrar",
+            "timerYou": "Tu tiempo: {sec} s",
+            "timerFoe": "Tiempo del rival: {sec} s",
+            "openLog": "Registro y chat",
+            "room": "Sala {id}",
+            "spectators": "{count} espectadores",
+            "won": "Ganado",
+            "lost": "Perdido",
+            "tie": "Empate",
+            "live": "En curso",
+            "connecting": "Conectando"
+          },
+          "score": {
+            "alive": "{alive} de {total} en pie"
+          },
+          "hp": {
+            "critical": "CRÍTICO",
+            "low": "Bajo"
+          },
+          "dock": {
+            "aria": "Acciones de combate",
+            "moves": "Movimientos",
+            "switch": "Cambiar",
+            "team": "Equipo",
+            "orderFor": "Orden para {name}",
+            "ordering": "Eligiendo",
+            "chooseTarget": "Elige objetivo",
+            "chooseTargetHint": "Pulsa una placa del campo o uno de estos botones. Esc para volver.",
+            "targetFoe": "Rival {n}",
+            "targetAlly": "Aliado",
+            "targetSelf": "Uno mismo",
+            "waiting": "Esperando al rival…",
+            "sent": "Órdenes enviadas",
+            "undo": "Deshacer",
+            "undoHint": "Cancela la orden enviada (antes de que se resuelva el turno)",
+            "pass": "Pasar",
+            "noPp": "Sin PP",
+            "locked": "Bloqueado",
+            "trapped": "Atrapado: no puedes cambiar",
+            "inBattle": "En combate",
+            "fainted": "Debilitado",
+            "reserved": "Elegido",
+            "noBench": "No quedan Pokémon en el banquillo",
+            "forcedSwitch": "Elige quién entra",
+            "forcedSwitchFor": "Elige quién entra por {name}",
+            "rejected": "El servidor rechazó la orden. Elige de nuevo.",
+            "spectating": "Estás viendo el combate como espectador",
+            "legend": {
+              "moves": "movimiento",
+              "bench": "cambio",
+              "tera": "tera",
+              "mega": "mega",
+              "dyna": "dynamax",
+              "z": "mov. Z",
+              "esc": "atrás"
+            },
+            "mech": {
+              "terastallize": "Teracristalizar",
+              "mega": "Mega",
+              "dynamax": "Dynamax",
+              "zmove": "Movimiento Z",
+              "megaHint": "Mega Evolucionar este turno",
+              "dynamaxHint": "Dynamax durante 3 turnos",
+              "zmoveHint": "Usar Movimiento Z (una vez por combate)",
+              "armed": "{name} armado: pulsa un movimiento"
+            }
+          },
+          "preview": {
+            "title": "Vista previa",
+            "leadDoubles": "Elige {picks} Pokémon en orden: los {leads} primeros salen al campo.",
+            "leadSingles": "Elige quién sale primero; el resto seguirá en este orden.",
+            "yourTeam": "Tu equipo",
+            "foeTeam": "Equipo rival",
+            "confirm": "Confirmar",
+            "hintDefault": "Se enviará el orden mostrado",
+            "hintPicked": "{n} en el orden elegido",
+            "defaultOrder": "Orden por defecto",
+            "clear": "Borrar",
+            "picked": "{n} de {picks} elegidos",
+            "lead": "Titular",
+            "timeLeft": "Tiempo para elegir",
+            "foeHidden": "El rival aún no ha mostrado su equipo."
+          },
+          "intro": {
+            "title": "Repetición",
+            "play": "Reproducir",
+            "vs": "VS"
+          },
+          "end": {
+            "aria": "Fin del combate",
+            "victory": "VICTORIA",
+            "defeat": "DERROTA",
+            "tie": "EMPATE",
+            "subtitleWin": "{name} gana en el turno {turn}",
+            "subtitleTie": "Empate en el turno {turn}",
+            "finalTeams": "Equipos finales",
+            "rematch": "Revancha",
+            "replayAgain": "Ver de nuevo",
+            "watchReplay": "Ver repetición",
+            "backToLobby": "Volver al lobby",
+            "ko": "KO"
+          },
+          "fx": {
+            "crit": "¡CRÍTICO!",
+            "miss": "¡Falló!",
+            "super": "¡Muy eficaz!",
+            "resisted": "Poco eficaz…",
+            "immune": "No afecta",
+            "tera": "¡Teracristal {type}!",
+            "mega": "¡Megaevolución!",
+            "primal": "¡Regresión primigenia!",
+            "burst": "¡Ultraexplosión!",
+            "zmove": "¡Movimiento Z!",
+            "zbroken": "¡Protección rota!",
+            "cured": "Curado"
+          },
+          "labels": {
+            "protect": "PROT",
+            "cat": {
+              "phys": "Físico",
+              "spec": "Especial",
+              "status": "Estado"
+            },
+            "status": {
+              "brn": "QUE",
+              "par": "PAR",
+              "psn": "ENV",
+              "tox": "TOX",
+              "slp": "DOR",
+              "frz": "CON",
+              "fnt": "KO"
+            },
+            "statusLong": {
+              "brn": "Quemado",
+              "par": "Paralizado",
+              "psn": "Envenenado",
+              "tox": "Gravemente envenenado",
+              "slp": "Dormido",
+              "frz": "Congelado",
+              "fnt": "Debilitado"
+            },
+            "boost": {
+              "atk": "Atq",
+              "def": "Def",
+              "spa": "AtE",
+              "spd": "DfE",
+              "spe": "Vel",
+              "accuracy": "Prec",
+              "evasion": "Evas"
+            },
+            "eff": {
+              "immune": "Inmune",
+              "super": "Eficaz",
+              "x4": "×4",
+              "resist": "Resiste",
+              "x025": "×¼"
+            },
+            "stat": {
+              "hp": "PS",
+              "atk": "Ataque",
+              "def": "Defensa",
+              "spa": "At. Esp.",
+              "spd": "Def. Esp.",
+              "spe": "Velocidad",
+              "accuracy": "Precisión",
+              "evasion": "Evasión"
+            }
+          },
+          "types": {
+            "Normal": "Normal",
+            "Fire": "Fuego",
+            "Water": "Agua",
+            "Electric": "Eléctrico",
+            "Grass": "Planta",
+            "Ice": "Hielo",
+            "Fighting": "Lucha",
+            "Poison": "Veneno",
+            "Ground": "Tierra",
+            "Flying": "Volador",
+            "Psychic": "Psíquico",
+            "Bug": "Bicho",
+            "Rock": "Roca",
+            "Ghost": "Fantasma",
+            "Dragon": "Dragón",
+            "Dark": "Siniestro",
+            "Steel": "Acero",
+            "Fairy": "Hada",
+            "Stellar": "Astral"
+          },
+          "side": {
+            "stealthrock": "Trampa Rocas",
+            "spikes": "Púas",
+            "toxicspikes": "Púas Tóxicas",
+            "stickyweb": "Red Viscosa",
+            "reflect": "Reflejo",
+            "lightscreen": "Pantalla de Luz",
+            "auroraveil": "Velo Aurora",
+            "tailwind": "Viento Afín",
+            "safeguard": "Velo Sagrado",
+            "mist": "Neblina",
+            "luckychant": "Conjuro"
+          },
+          "logTx": {
+            "opposing": "{name} rival",
+            "yourTeam": "tu equipo",
+            "foeTeam": "el equipo rival",
+            "startBattle": "¡Comienza el combate entre {a} y {b}!",
+            "win": "¡{name} gana el combate!",
+            "tie": "Empate entre {a} y {b}.",
+            "switchInOwn": "¡Adelante, {name}!",
+            "switchIn": "¡{trainer} saca a {name}!",
+            "switchOutOwn": "¡{name}, vuelve!",
+            "switchOut": "¡{trainer} retira a {name}!",
+            "drag": "¡{name} sale al campo a la fuerza!",
+            "faint": "¡{name} se ha debilitado!",
+            "move": "¡{name} usa {move}!",
+            "ability": "[{ability} de {name}]",
+            "cantMove": "¡{name} no puede moverse!",
+            "cant": "¡{name} no puede usar {move}!",
+            "fail": "¡Pero ha fallado!",
+            "noTarget": "Pero no había objetivo…",
+            "crit": "¡Un golpe crítico!",
+            "critOn": "¡Un golpe crítico a {name}!",
+            "superEff": "¡Es supereficaz!",
+            "superEffOn": "¡Es supereficaz contra {name}!",
+            "resisted": "No es muy eficaz…",
+            "resistedOn": "No es muy eficaz contra {name}.",
+            "immune": "No afecta a {name}…",
+            "noEffect": "¡No ha tenido efecto!",
+            "unaffected": "¡A {name} no le afecta!",
+            "miss": "¡{name} ha esquivado el ataque!",
+            "missNo": "¡El ataque de {name} ha fallado!",
+            "ohko": "¡KO de un solo golpe!",
+            "hit1": "¡Ha golpeado 1 vez!",
+            "hits": "¡Ha golpeado {n} veces!",
+            "dmgPct": "({name} pierde un {pct} de sus PS)",
+            "dmg": "(¡{name} recibe daño!)",
+            "dmgItemOwn": "¡{name} se hace daño con su {item}!",
+            "dmgItemFoe": "¡{name} recibe daño por el {item} de {source}!",
+            "dmgMove": "¡{name} sufre daño por {move}!",
+            "heal": "{name} recupera PS.",
+            "healLittle": "¡{name} recupera algo de PS con {item}!",
+            "healEffect": "¡{name} recupera PS con {effect}!",
+            "hpFull": "¡{name} tiene los PS al máximo!",
+            "boost1": "¡{stat} de {name} sube!",
+            "boost2": "¡{stat} de {name} sube mucho!",
+            "boost3": "¡{stat} de {name} sube muchísimo!",
+            "boost0": "{stat} de {name} no puede subir más.",
+            "unboost1": "¡{stat} de {name} baja!",
+            "unboost2": "¡{stat} de {name} baja mucho!",
+            "unboost3": "¡{stat} de {name} baja muchísimo!",
+            "unboost0": "{stat} de {name} no puede bajar más.",
+            "clearBoost": "¡Los cambios de estadísticas de {name} desaparecen!",
+            "tera": "¡{name} teracristaliza al tipo {type}!",
+            "alreadyBurned": "¡{name} ya está quemado!",
+            "alreadyParalyzed": "¡{name} ya está paralizado!",
+            "alreadyPoisoned": "¡{name} ya está envenenado!",
+            "alreadyAsleep": "¡{name} ya está dormido!",
+            "alreadyFrozen": "¡{name} ya está congelado!",
+            "alreadyConfused": "¡{name} ya está confuso!",
+            "burned": "¡{name} sufre quemaduras!",
+            "burnDamage": "¡{name} sufre daño por la quemadura!",
+            "burnHealed": "¡{name} se ha curado la quemadura!",
+            "paralyzed": "¡{name} está paralizado y puede que no pueda moverse!",
+            "paralyzedCant": "¡{name} está paralizado y no puede moverse!",
+            "paraCured": "¡{name} se ha curado la parálisis!",
+            "poisoned": "¡{name} ha sido envenenado!",
+            "badlyPoisoned": "¡{name} ha sido gravemente envenenado!",
+            "poisonDamage": "¡{name} sufre daño por el veneno!",
+            "poisonCured": "¡{name} se ha curado el envenenamiento!",
+            "asleep": "¡{name} se ha dormido!",
+            "fastAsleep": "{name} está profundamente dormido.",
+            "wokeUp": "¡{name} se ha despertado!",
+            "frozen": "¡{name} se ha congelado!",
+            "frozenCant": "¡{name} está congelado!",
+            "thawed": "¡{name} se ha descongelado!",
+            "confused": "¡{name} se ha confundido!",
+            "confusedActivate": "¡{name} está confuso!",
+            "confusedEnd": "¡{name} ha salido de su confusión!",
+            "confusedHurt": "¡Se ha herido a sí mismo en su confusión!",
+            "flinched": "¡{name} se ha amedrentado y no puede moverse!",
+            "protected": "¡{name} se ha protegido!",
+            "srStart": "¡Trampa Rocas rodea a {name}!",
+            "srEnd": "¡Trampa Rocas ha desaparecido alrededor de {name}!",
+            "srDamage": "¡Las rocas puntiagudas dañan a {name}!",
+            "spikesStart": "¡Se esparcen Púas alrededor de {name}!",
+            "spikesEnd": "¡Las Púas han desaparecido alrededor de {name}!",
+            "spikesDamage": "¡{name} sufre daño por las Púas!",
+            "tspikesStart": "¡Se esparcen Púas Tóxicas alrededor de {name}!",
+            "tspikesEnd": "¡Las Púas Tóxicas han desaparecido alrededor de {name}!",
+            "webStart": "¡Se extiende una Red Viscosa alrededor de {name}!",
+            "webEnd": "¡La Red Viscosa ha desaparecido alrededor de {name}!",
+            "webCaught": "¡{name} ha caído en la Red Viscosa!",
+            "reflectStart": "¡Reflejo protege a {name} de los ataques físicos!",
+            "reflectEnd": "¡El Reflejo de {name} se ha desvanecido!",
+            "screenStart": "¡Pantalla de Luz protege a {name} de los ataques especiales!",
+            "screenEnd": "¡La Pantalla de Luz de {name} se ha desvanecido!",
+            "tailwindStart": "¡Viento Afín sopla a favor de {name}!",
+            "tailwindEnd": "¡El Viento Afín de {name} ha cesado!",
+            "trickroomStart": "¡{name} ha distorsionado las dimensiones!",
+            "trickroomEnd": "Las dimensiones vuelven a la normalidad.",
+            "electricTerrain": "¡Una corriente eléctrica recorre el campo!",
+            "grassyTerrain": "¡La hierba cubre el campo!",
+            "mistyTerrain": "¡La niebla envuelve el campo!",
+            "psychicTerrain": "¡El campo se vuelve extraño!",
+            "seeded": "¡{name} ha sido infestado!",
+            "seedDamage": "¡Drenadoras absorbe los PS de {name}!",
+            "knockOff": "¡{name} ha desprendido el {item} de {target}!",
+            "typeChange": "¡{name} cambia al tipo {type}!",
+            "effectStart": "({effect} empieza a afectar a {name})",
+            "effectEnd": "¡{name} se ha librado de {effect}!",
+            "effectActivate": "({effect} se activa)",
+            "sandStart": "¡Se ha desatado una tormenta de arena!",
+            "sandUpkeep": "(La tormenta de arena arrecia.)",
+            "sandEnd": "La tormenta de arena ha cesado.",
+            "sandDamage": "¡{name} sufre daño por la tormenta de arena!",
+            "rainStart": "¡Ha empezado a llover!",
+            "rainUpkeep": "(Sigue lloviendo.)",
+            "rainEnd": "Ha dejado de llover.",
+            "sunStart": "¡La luz solar se ha intensificado!",
+            "sunUpkeep": "(La luz solar es intensa.)",
+            "sunEnd": "La luz solar se ha normalizado.",
+            "hailStart": "¡Ha empezado a granizar!",
+            "hailUpkeep": "(El granizo sigue cayendo.)",
+            "hailEnd": "Ha dejado de granizar.",
+            "hailDamage": "¡{name} sufre daño por el granizo!",
+            "snowStart": "¡Ha empezado a nevar!",
+            "snowUpkeep": "(Sigue nevando.)",
+            "snowEnd": "Ha dejado de nevar."
+          },
+          "log": {
+            "aria": "Registro del combate",
+            "latest": "Última línea del registro",
+            "turn": "Turno {turn}",
+            "collapse": "Plegar turno {turn}",
+            "expand": "Desplegar turno {turn}"
+          },
+          "rail": {
+            "log": "Registro",
+            "chat": "Chat",
+            "actions": "Acciones",
+            "open": "Abrir registro",
+            "close": "Cerrar",
+            "unread": "{count} sin leer"
+          },
+          "mon": {
+            "details": "Detalles de {name}",
+            "level": "Nv. {level}",
+            "ability": "Habilidad",
+            "item": "Objeto",
+            "moves": "Movimientos",
+            "known": "conocidos",
+            "stats": "Estadísticas base",
+            "boosts": "Cambios de stat",
+            "hp": "PS",
+            "unknown": "—",
+            "unrevealed": "Sin revelar",
+            "close": "Cerrar"
+          },
+          "play": {
+            "setupTitle": "Nuevo combate",
+            "setupLead": "Elige un formato y, si hace falta, un equipo. La IA usará otro de tus equipos o uno de ejemplo.",
+            "format": "Formato",
+            "team": "Tu equipo",
+            "start": "Empezar",
+            "sample": "Equipo de ejemplo",
+            "sampleHint": "Sin equipos propios en este formato: se usará uno de ejemplo.",
+            "noTeams": "Este formato necesita un equipo y no hay ninguno.",
+            "createTeam": "Crear equipo",
+            "retry": "Reintentar",
+            "back": "Volver al lobby"
+          }
+        },
+        "bx": {
+          "spreadAllTag": "ÁREA · TODOS",
+          "spreadTag": "ÁREA",
+          "teraUsedTitle": "Teracristal ya usado en este combate",
+          "teraArmTitle": "Teracristalizar este turno",
+          "effective": "¡EFICAZ!",
+          "resisted": "resistido",
+          "logAria": "Registro del combate",
+          "teamStatusAria": "Estado del equipo",
+          "priorityNote": "La prioridad puede alterarlo",
+          "noOrder": "Sin orden",
+          "clearOrderAria": "Borrar orden",
+          "add": "Añadir",
+          "orderProjected": "Orden previsto",
+          "chosen": "ELEGIDO",
+          "teraTypeTitle": "Teratipo {type}",
+          "teraUsedLabel": "Tera usado",
+          "teraArmedLabel": "Tera {type} ✓",
+          "teraLabel": "Tera {type}",
+          "timerAria": "{sec} segundos",
+          "switchTo": "Cambio → {name}",
+          "targetAll": "todos",
+          "targetBoth": "ambos rivales"
+        },
+        "hub": {
+          "gate": {
+            "online": "En línea",
+            "needsAccount": "Requiere cuenta",
+            "offline": "Sin conexión",
+            "checking": "Comprobando…",
+            "signIn": "Iniciar sesión",
+            "signInReason": "Necesitas una cuenta de Boffmedia para jugar en línea.",
+            "offlineReason": "Sin conexión a internet. El entrenamiento contra la IA sigue disponible.",
+            "playAiInstead": "Entrenar contra la IA"
+          },
+          "team": {
+            "label": "Equipo",
+            "pickAria": "Elegir equipo",
+            "legal": "Legal",
+            "problems": "{count, plural, one {# problema} other {# problemas}}",
+            "checking": "Comprobando…",
+            "sample": "Usaremos un equipo de ejemplo hasta que crees el tuyo.",
+            "noneTitle": "Aún no tienes equipos para este formato",
+            "create": "Crear equipo"
+          },
+          "tiles": {
+            "aria": "Accesos rápidos",
+            "ladderNote": "Se abre en la web"
+          },
+          "queue": {
+            "title": "Buscando rival",
+            "position": "Puesto {n} en la cola",
+            "positionUnknown": "En la cola",
+            "elapsed": "{time} buscando",
+            "cancel": "Cancelar búsqueda",
+            "slowTitle": "Está tardando más de lo normal",
+            "slowLead": "Puede que ahora mismo no haya nadie más buscando este formato.",
+            "playAi": "Jugar contra la IA mientras tanto",
+            "needsTeam": "Este formato necesita un equipo",
+            "goToTeams": "Ir a Equipos",
+            "teamRejectedTitle": "El servidor ha rechazado tu equipo",
+            "editTeam": "Editar equipo",
+            "retry": "Reintentar"
+          },
+          "challenge": {
+            "sent": "Reto enviado a {name}",
+            "sentAnon": "Reto enviado",
+            "rejected": "{name} ha rechazado tu reto",
+            "accepted": "Has aceptado el reto de {name}"
+          },
+          "replays": {
+            "sourceLocal": "Este dispositivo",
+            "sourceAccount": "Cuenta",
+            "offlineTitle": "Sin conexión",
+            "offlineLead": "No podemos cargar las repeticiones recientes sin conexión. Las de este dispositivo siguen disponibles.",
+            "showMine": "Ver las mías",
+            "loadMore": "Cargar más",
+            "shown": "{shown} de {total}",
+            "rowActions": "Acciones de la repetición",
+            "delete": "Eliminar",
+            "share": "Copiar enlace",
+            "shared": "Enlace copiado",
+            "shareFailed": "No se pudo copiar el enlace",
+            "deleted": "Repetición eliminada",
+            "deleteTitle": "Eliminar repetición",
+            "deleteBody": "Esta repetición se eliminará de este dispositivo. No se puede deshacer.",
+            "deleteRemoteNote": "Las repeticiones de tu cuenta solo se ocultan aquí: todavía no se pueden borrar del servidor.",
+            "back": "Volver a las repeticiones",
+            "markerKo": "KO",
+            "loading": "Cargando repetición…",
+            "clearSearch": "Borrar la búsqueda",
+            "goPlay": "Jugar un combate"
+          },
+          "conn": {
+            "loading": "Cargando",
+            "connecting": "Conectando",
+            "reconnecting": "Reconectando",
+            "queue": "En cola",
+            "slow": "Esto tarda más de lo normal.",
+            "retry": "Reintentar"
+          },
+          "showdown": {
+            "challengeSent": "Reto enviado a {name}",
+            "formatsLoading": "Cargando formatos…"
+          }
+        },
+        "errors": {
+          "loading": "Cargando…",
+          "signin_required": {
+            "title": "Inicia sesión",
+            "lead": "Necesitas una cuenta de Boffmedia para jugar en línea y guardar tus equipos y repeticiones."
+          },
+          "offline": {
+            "title": "Sin conexión",
+            "lead": "No hay conexión a internet. Los combates contra la IA y tus equipos guardados siguen disponibles."
+          },
+          "connect_failed": {
+            "title": "No se pudo conectar",
+            "lead": "El servidor de combate no responde. Comprueba tu conexión y vuelve a intentarlo."
+          },
+          "worker_failed": {
+            "title": "El motor de combate falló",
+            "lead": "No se pudo iniciar el simulador en tu navegador. Recarga la página; si vuelve a fallar, prueba con otro navegador."
+          },
+          "ticket_denied": {
+            "title": "Acceso denegado",
+            "lead": "Tu pase para esta sala ha caducado o no es válido. Vuelve al lobby y busca combate de nuevo."
+          },
+          "rejected_by": {
+            "title": "Reto rechazado",
+            "lead": "{name} ha rechazado el combate.",
+            "someone": "El otro jugador"
+          },
+          "not_found": {
+            "title": "No encontrado",
+            "lead": "Esto ya no existe o el enlace no es correcto."
+          },
+          "unknown": {
+            "title": "Algo ha salido mal",
+            "lead": "No hemos podido completar la acción. Vuelve a intentarlo en unos segundos."
+          }
+        },
+        "manifest": {
+          "title": "Simulador de Combates",
+          "description": "Juega contra la IA, combate a otros jugadores o conecta a Pokémon Showdown",
+          "category": "Herramientas"
+        }
+      }
+    }
+  },
+  "en": {
+    "tools": {
+      "battlesim": {
+        "landing": {
+          "title": "Battle Simulator",
+          "subtitle": "Watch replays, play against AI, or battle on Pokémon Showdown",
+          "play": "Play",
+          "playDesc": "Battle against an AI opponent",
+          "pvp": "PvP",
+          "pvpDesc": "Battle other players on our server",
+          "showdown": "Showdown Online",
+          "showdownDesc": "Play on the official Pokémon Showdown server",
+          "replays": "Replays",
+          "replaysDesc": "Watch saved battle replays",
+          "calc": "Calculator",
+          "calcDesc": "Damage calculator",
+          "resume": "PvP battle in progress — resume"
+        },
+        "header": {
+          "lobby": "Lobby",
+          "forfeit": "Forfeit",
+          "vs": "vs",
+          "fullscreen": "Fullscreen",
+          "exitFullscreen": "Exit fullscreen",
+          "opponent": "Opponent",
+          "aria": "Battle header",
+          "modes": {
+            "ai": "VS AI",
+            "pvp": "PVP",
+            "showdown": "SHOWDOWN",
+            "replay": "REPLAY"
+          }
+        },
+        "connection": {
+          "error": "Error",
+          "unknownError": "Unknown error",
+          "tryAgain": "Try Again",
+          "backToLobby": "Back to Lobby",
+          "connectingServer": "Connecting to battle server…",
+          "loadingBattle": "Loading battle…",
+          "connectingShowdown": "Connecting to Showdown server…",
+          "authenticating": "Authenticating…",
+          "joiningBattle": "Joining battle…",
+          "waitingBattle": "Waiting for battle to start…",
+          "reconnecting": "Reconnecting (attempt {attempt}/{max})…",
+          "forfeitConfirm": "Are you sure you want to forfeit?",
+          "forfeitTitle": "Forfeit the match",
+          "forfeitCta": "Forfeit"
+        },
+        "dock": {
+          "waitingOpponent": "Waiting for opponent…",
+          "teamPreview": "Team Preview — sending default order",
+          "confirmTeam": "Confirm Team",
+          "switch": "Switch",
+          "forcedSwitch": "Forced Switch",
+          "trapped": " (trapped)",
+          "undo": "Undo",
+          "undoHint": "Cancel the submitted choice (before the turn resolves)",
+          "aria": "Battle actions",
+          "mechanics": {
+            "terastallize": "Terastallize",
+            "mega": "Mega Evolution",
+            "dynamax": "Dynamax",
+            "zmove": "Z-Move"
+          }
+        },
+        "log": {
+          "label": "Battle log",
+          "showAll": "Show all ({count})",
+          "empty": "No events",
+          "events": "{count} events",
+          "filterAll": "All",
+          "filterDamage": "Damage",
+          "filterSwitches": "Switches",
+          "filterField": "Field",
+          "collapsePrevious": "− Previous",
+          "hidden": "Log hidden — toggle with the eye button",
+          "tab": "Log"
+        },
+        "chat": {
+          "tab": "Chat",
+          "placeholder": "Type a message…",
+          "battlePlaceholder": "Say something…",
+          "send": "Send",
+          "empty": "No messages yet",
+          "battleEmpty": "Battle chat will appear here",
+          "unread": "{count} unread messages",
+          "lobbyPlaceholder": "Type a message…",
+          "lobbyEmpty": "No messages yet. Chat appears here once connected to the lobby.",
+          "aria": "Chat"
+        },
+        "end": {
+          "victory": "VICTORY!",
+          "defeat": "DEFEAT",
+          "tie": "TIE",
+          "winner": "WINNER",
+          "turn": "Turn {turn}",
+          "backToStart": "Back to Start",
+          "youWon": "You won!",
+          "itsATie": "It's a tie!",
+          "playerWon": "{name} won!",
+          "playAgain": "Play Again",
+          "watchReplay": "Watch Replay",
+          "savingReplay": "Saving replay…",
+          "replaySaved": "Replay saved!",
+          "saveReplay": "Save replay"
+        },
+        "play": {
+          "title": "Battle Simulator",
+          "subtitle": "Play a Pokémon battle against an AI opponent",
+          "start": "Start Battle",
+          "newTab": "+ New",
+          "won": "Won",
+          "lost": "Lost",
+          "tie": "Tie",
+          "turn": "Turn {turn}",
+          "yourTurn": " — Your turn!",
+          "teamLabel": "Team",
+          "usingSample": "No teams of your own in this format — a sample will be used.",
+          "needsTeam": "This format needs a team. Build one in the Teams tab."
+        },
+        "app": {
+          "tagline": "Battle simulator",
+          "tabs": {
+            "lobby": "Lobby",
+            "equipos": "Teams",
+            "repeticiones": "Replays",
+            "aria": "Simulator sections"
+          },
+          "lobby": {
+            "kick": "Battle simulator · VGC",
+            "title": "To battle",
+            "modeLabel": "Game mode",
+            "formatLabel": "Format",
+            "launch": {
+              "ia": "Battle",
+              "pvp": "Find match",
+              "showdown": "Find match"
+            },
+            "modes": {
+              "ia": {
+                "label": "Training",
+                "sub": "Against the AI, no pressure",
+                "note": "Battle an AI-controlled opponent. Unranked."
+              },
+              "pvp": {
+                "label": "Ranked",
+                "sub": "PvP matchmaking",
+                "note": "Matchmaking against other players on our server."
+              },
+              "showdown": {
+                "label": "Showdown",
+                "sub": "External server",
+                "note": "Battle on the official Pokémon Showdown server."
+              }
+            },
+            "tiles": {
+              "builder": "Team Builder",
+              "builderSub": "Create and edit teams",
+              "replays": "Replays",
+              "replaysSub": "Relive your battles",
+              "ladder": "Ladder",
+              "ladderSub": "Global ranking"
+            }
+          },
+          "soon": {
+            "title": "Coming soon",
+            "equipos": "The Team Builder is coming in a future update.",
+            "repeticiones": "The replay viewer is coming in a future update."
+          },
+          "equipos": {
+            "title": "Battle teams",
+            "lead": "Your Pixelmon battle teams live in the SmartRotom PC — create, arrange and activate them there.",
+            "cta": "Open the PC in SmartRotom"
+          }
+        },
+        "tabs": {
+          "aria": "Open tabs",
+          "home": "Home",
+          "teams": "Teams",
+          "replays": "Replays",
+          "new": "New battle",
+          "close": "Close {label}",
+          "room": {
+            "ai": "VS AI",
+            "pvp": "PvP",
+            "showdown": "Showdown",
+            "replay": "Replay"
+          },
+          "state": {
+            "loading": "Loading",
+            "running": "In progress",
+            "yourTurn": "Your turn",
+            "finished": "Finished",
+            "error": "Error",
+            "open": "Open"
+          }
+        },
+        "canvas": {
+          "turn": "Turn {turn}"
+        },
+        "tb": {
+          "title": "Teams",
+          "count": "{count, plural, one {# team} other {# teams}}",
+          "searchPh": "Search teams…",
+          "filterAria": "Filter by format",
+          "filterAll": "All",
+          "otherFormats": "Other",
+          "formatLabel": "Format",
+          "nameLabel": "Name",
+          "new": "New team",
+          "import": "Import",
+          "export": "Export",
+          "play": "Play",
+          "edit": "Edit",
+          "duplicate": "Duplicate",
+          "rename": "Rename",
+          "delete": "Delete",
+          "cancel": "Cancel",
+          "load": "Load",
+          "more": "More actions",
+          "backToList": "Back to the list",
+          "newTeamName": "New team",
+          "importedName": "Imported team",
+          "noMatch": "No team matches your search.",
+          "noMatchLead": "Try another name, or clear the format filter.",
+          "clearFilters": "Clear filters",
+          "playDisabled": "Add at least one Pokémon before you can play with this team.",
+          "hasProblem": "has problems",
+          "slotsAria": "Team Pokémon: {list}",
+          "slotsEmpty": "Empty team",
+          "empty": {
+            "title": "You have no teams yet",
+            "lead": "Build one from scratch, or paste a Showdown team to get started."
+          },
+          "importModal": {
+            "title": "Import team",
+            "placeholder": "Paste the team here in Showdown format…",
+            "error": "The team could not be read. Check that it is in Showdown format.",
+            "replaceNote": "Replaces all six slots of this team with the pasted text."
+          },
+          "validity": {
+            "title": "Legality",
+            "ok": "Legal",
+            "problems": "{count, plural, one {# problem} other {# problems}}",
+            "empty": "Not built",
+            "checking": "Checking…",
+            "none": "No problems for this format.",
+            "slot": "Slot {n}",
+            "team": "Team",
+            "goTo": "Go to slot {n}"
+          },
+          "toast": {
+            "exported": "Team copied to the clipboard",
+            "exportFailed": "Could not copy to the clipboard",
+            "imported": "Team imported",
+            "duplicated": "Team duplicated",
+            "deleted": "Team deleted",
+            "restored": "Team restored",
+            "undo": "Undo"
+          },
+          "deleteDialog": {
+            "title": "Delete team",
+            "body": "“{name}” will be deleted. You can undo this for a few seconds.",
+            "confirm": "Delete"
+          },
+          "remote": {
+            "changed": "This team changed on another device.",
+            "load": "Load"
+          },
+          "sync": {
+            "aria": "Team status",
+            "action": "Sync",
+            "saved": "Saved",
+            "savedHint": "Changes save themselves on this device.",
+            "syncing": "Syncing…",
+            "syncingHint": "Uploading this team to your account…",
+            "synced": "Synced",
+            "syncedHint": "Saved on this device and on your account.",
+            "pending": "Pending",
+            "pendingHint": "Saved here. Still to reach your account: it is sent when you leave the editor or press Sync.",
+            "error": "Couldn't sync",
+            "errorHint": "The server refused this team. It is still saved on this device; try again.",
+            "localOnly": "Local only · Sign in",
+            "localOnlyHint": "This team is saved on this device only. Sign in to have it on all of them."
+          },
+          "editor": {
+            "nameAria": "Team name",
+            "renameHint": "Click to rename",
+            "slots": "Team",
+            "analysis": "Coverage",
+            "moveUp": "Move up",
+            "moveDown": "Move down",
+            "duplicateSlot": "Duplicate Pokémon",
+            "removeSlot": "Remove Pokémon",
+            "add": "Add",
+            "slotN": "Slot {n}",
+            "emptyTitle": "Choose a Pokémon",
+            "emptyLead": "This slot is empty. Search for a species to start building the set.",
+            "railAria": "Team slots",
+            "kicker": "Set {n}"
+          },
+          "set": {
+            "species": "Pokémon",
+            "changeSpecies": "Change",
+            "clearSpecies": "Remove",
+            "ability": "Ability",
+            "hidden": "Hidden",
+            "otherAbility": "Other…",
+            "item": "Item",
+            "noItem": "No item",
+            "clearItem": "Remove item",
+            "moves": "Moves",
+            "moveN": "Move {n}",
+            "clearMove": "Remove move {n}",
+            "details": "Details",
+            "level": "Level",
+            "gender": "Gender",
+            "genderAny": "Any",
+            "genderM": "Male",
+            "genderF": "Female",
+            "shiny": "Shiny",
+            "tera": "Tera type",
+            "teraNone": "No Tera type",
+            "nature": "Nature",
+            "evs": "EVs",
+            "sp": "SP",
+            "spName": "Stat Points",
+            "ivs": "IVs",
+            "advanced": "Advanced",
+            "budget": "Budget",
+            "remaining": "{n} left",
+            "over": "{n} over",
+            "spRemaining": "{n} SP left",
+            "spOver": "{n} SP over",
+            "ivsLocked": "IVs are always {n} in this format.",
+            "levelLocked": "Level is fixed in this format.",
+            "baseStats": "Base stats",
+            "total": "Total",
+            "final": "Final",
+            "power": "Pow.",
+            "accuracy": "Acc.",
+            "pp": "PP",
+            "evAria": "{stat} EVs",
+            "spAria": "{stat} SP",
+            "ivAria": "{stat} IVs"
+          },
+          "picker": {
+            "species": "Choose a Pokémon",
+            "move": "Choose a move",
+            "item": "Choose an item",
+            "ability": "Choose an ability",
+            "searchSpecies": "Search Pokémon…",
+            "searchMove": "Search moves…",
+            "searchItem": "Search items…",
+            "searchAbility": "Search abilities…",
+            "showing": "Showing {shown} of {total}",
+            "recents": "Recent",
+            "noResults": "No results",
+            "illegal": "Illegal",
+            "loadingMoves": "Loading legal moves…",
+            "allTypes": "All",
+            "typeFilter": "Filter by type",
+            "catFilter": "Filter by category",
+            "bst": "BST",
+            "hint": "↑↓ navigate · Enter pick · Esc close",
+            "listAria": "Results"
+          },
+          "coverage": {
+            "lead": "Team members weak, resistant or immune to each attacking type.",
+            "type": "Type",
+            "weak": "Weak",
+            "resist": "Resist",
+            "immune": "Immune",
+            "emptyLead": "Add Pokémon to see the defensive coverage."
+          },
+          "stats": {
+            "hp": "HP",
+            "atk": "Attack",
+            "def": "Defense",
+            "spa": "Sp. Atk",
+            "spd": "Sp. Def",
+            "spe": "Speed"
+          },
+          "statsShort": {
+            "hp": "HP",
+            "atk": "Atk",
+            "def": "Def",
+            "spa": "SpA",
+            "spd": "SpD",
+            "spe": "Spe"
+          },
+          "cat": {
+            "Physical": "Physical",
+            "Special": "Special",
+            "Status": "Status"
+          },
+          "types": {
+            "Normal": "Normal",
+            "Fire": "Fire",
+            "Water": "Water",
+            "Electric": "Electric",
+            "Grass": "Grass",
+            "Ice": "Ice",
+            "Fighting": "Fighting",
+            "Poison": "Poison",
+            "Ground": "Ground",
+            "Flying": "Flying",
+            "Psychic": "Psychic",
+            "Bug": "Bug",
+            "Rock": "Rock",
+            "Ghost": "Ghost",
+            "Dragon": "Dragon",
+            "Dark": "Dark",
+            "Steel": "Steel",
+            "Fairy": "Fairy",
+            "Stellar": "Stellar"
+          },
+          "natures": {
+            "hardy": "Hardy",
+            "lonely": "Lonely",
+            "brave": "Brave",
+            "adamant": "Adamant",
+            "naughty": "Naughty",
+            "bold": "Bold",
+            "docile": "Docile",
+            "relaxed": "Relaxed",
+            "impish": "Impish",
+            "lax": "Lax",
+            "timid": "Timid",
+            "hasty": "Hasty",
+            "serious": "Serious",
+            "jolly": "Jolly",
+            "naive": "Naive",
+            "modest": "Modest",
+            "mild": "Mild",
+            "quiet": "Quiet",
+            "bashful": "Bashful",
+            "rash": "Rash",
+            "calm": "Calm",
+            "gentle": "Gentle",
+            "sassy": "Sassy",
+            "careful": "Careful",
+            "quirky": "Quirky"
+          }
+        },
+        "replay": {
+          "invalidId": "Invalid replay ID",
+          "notFound": "Replay not found",
+          "loadFailed": "Failed to load replay",
+          "pasteManually": "Paste replay manually"
+        },
+        "pvp": {
+          "title": "PvP Battle",
+          "subtitle": "Battle other players on our server",
+          "status": {
+            "connecting": "Connecting…",
+            "connected": "Connected",
+            "idle": "Idle",
+            "searching": "Searching…",
+            "inBattle": "In battle",
+            "error": "Error",
+            "disconnected": "Disconnected"
+          },
+          "incomingChallenges": "Incoming challenges",
+          "challengedYou": "challenged you to {format}",
+          "accept": "Accept",
+          "reject": "Reject",
+          "findMatch": {
+            "title": "Find match",
+            "desc": "Join the matchmaking queue and get paired with another player.",
+            "button": "Find match"
+          },
+          "searching": "Searching for opponent…",
+          "cancel": "Cancel",
+          "challenge": {
+            "title": "Challenge player",
+            "desc": "Send a direct challenge to a specific player.",
+            "placeholder": "Player ID",
+            "button": "Challenge"
+          },
+          "yourId": {
+            "title": "Your player ID",
+            "desc": "Share this ID so friends can challenge you directly."
+          }
+        },
+        "showdown": {
+          "title": "Showdown Lobby",
+          "subtitle": "Play on the official Showdown server",
+          "status": {
+            "disconnected": "Disconnected",
+            "inBattle": "In battle",
+            "loggedIn": "Logged in as {name}",
+            "connecting": "Connecting…",
+            "reconnecting": "Reconnecting…",
+            "error": "Error"
+          },
+          "incomingChallenges": "Incoming challenges",
+          "challengedYou": "challenged you to {format}",
+          "login": {
+            "title": "Log in to Showdown",
+            "username": "Username",
+            "password": "Password",
+            "button": "Log in",
+            "connecting": "Connecting to Showdown server…",
+            "waitingChallstr": "Waiting for challenge string…"
+          },
+          "lobbyChat": "Lobby chat",
+          "battle": {
+            "title": "Battle",
+            "desc": "Find a random opponent on the official Showdown server.",
+            "button": "Find battle"
+          },
+          "challenge": {
+            "title": "Challenge player",
+            "desc": "Challenge a specific player to a battle.",
+            "placeholder": "Player name"
+          },
+          "online": "Online users ({count})",
+          "onlineTitle": "Online users",
+          "onlineLoading": "Loading users…",
+          "you": "(you)",
+          "connectedAs": "Connected as {name} — sim3.psim.us"
+        },
+        "replays": {
+          "search": "Search by player…",
+          "scope": "Scope",
+          "recent": "Recent",
+          "mine": "Mine",
+          "winner": "Winner",
+          "errorTitle": "Could not load replays",
+          "errorLead": "The replay service is unavailable right now. Try again later.",
+          "emptyTitle": "No replays yet",
+          "emptyLead": "Battles you finish will show up here.",
+          "emptySearch": "No replays match your search.",
+          "logHidden": "Log hidden — toggle with the eye button",
+          "ctl": {
+            "timeline": "Battle timeline",
+            "turnOf": "Turn {turn} of {total}",
+            "controls": "Playback controls",
+            "play": "Play",
+            "pause": "Pause",
+            "restart": "Restart",
+            "prevTurn": "Previous turn",
+            "nextTurn": "Next turn",
+            "pov": "POV: {side}",
+            "player1": "Player 1",
+            "player2": "Player 2",
+            "toggleLog": "Toggle log",
+            "simulate": "Simulate attack",
+            "goToTurn": "Go to turn",
+            "goToTurnAria": "Go to turn",
+            "speed": "Speed"
+          },
+          "loader": {
+            "title": "Load a Pokémon Showdown replay",
+            "placeholder": "Paste the entire replay text here",
+            "load": "Load replay",
+            "hint": "Copy and paste the complete replay text from Pokémon Showdown.",
+            "errorEmpty": "Please paste a valid replay text.",
+            "errorFormat": "Invalid replay format. Expected Showdown replay text with |player| and |turn| lines.",
+            "errorUnknown": "An unknown error occurred.",
+            "side1": "Player 1",
+            "side2": "Player 2"
+          }
+        },
+        "field": {
+          "aria": "Field conditions",
+          "cond": {
+            "sunnyday": "Sun",
+            "desolateland": "Harsh Sunlight",
+            "raindance": "Rain",
+            "primordialsea": "Heavy Rain",
+            "sandstorm": "Sandstorm",
+            "hail": "Hail",
+            "snow": "Snow",
+            "deltastream": "Strong Winds",
+            "electricterrain": "Electric Terrain",
+            "grassyterrain": "Grassy Terrain",
+            "mistyterrain": "Misty Terrain",
+            "psychicterrain": "Psychic Terrain",
+            "trickroom": "Trick Room",
+            "magicroom": "Magic Room",
+            "wonderroom": "Wonder Room",
+            "gravity": "Gravity"
+          }
+        },
+        "avatar": {
+          "alt": "avatar"
+        },
+        "sprite": {
+          "altFallback": "Pokemon"
+        },
+        "replayError": {
+          "title": "Replay Error",
+          "message": "Something went wrong loading the replay.",
+          "retry": "Try Again"
+        },
+        "battle": {
+          "you": "YOU",
+          "foe": "FOE",
+          "turn": "Turn {turn}",
+          "turnShort": "T{turn}",
+          "turnAnnounce": "Turn {turn} begins",
+          "header": {
+            "back": "Back",
+            "battles": "Battles",
+            "newBattle": "New battle",
+            "closeBattle": "Close battle {id}",
+            "closeLiveTitle": "Close this battle?",
+            "closeLiveBody": "The battle is still running. Closing it forfeits.",
+            "closeLiveCta": "Close",
+            "timerYou": "Your time: {sec} s",
+            "timerFoe": "Opponent's time: {sec} s",
+            "openLog": "Log and chat",
+            "room": "Room {id}",
+            "spectators": "{count} spectators",
+            "won": "Won",
+            "lost": "Lost",
+            "tie": "Tie",
+            "live": "Live",
+            "connecting": "Connecting"
+          },
+          "score": {
+            "alive": "{alive} of {total} standing"
+          },
+          "hp": {
+            "critical": "CRITICAL",
+            "low": "Low"
+          },
+          "dock": {
+            "aria": "Battle actions",
+            "moves": "Moves",
+            "switch": "Switch",
+            "team": "Team",
+            "orderFor": "Order for {name}",
+            "ordering": "Choosing",
+            "chooseTarget": "Choose a target",
+            "chooseTargetHint": "Click a plate on the field or one of these buttons. Esc to go back.",
+            "targetFoe": "Foe {n}",
+            "targetAlly": "Ally",
+            "targetSelf": "Self",
+            "waiting": "Waiting for the opponent…",
+            "sent": "Orders sent",
+            "undo": "Undo",
+            "undoHint": "Cancel the order you sent (before the turn resolves)",
+            "pass": "Pass",
+            "noPp": "No PP",
+            "locked": "Locked",
+            "trapped": "Trapped: you cannot switch",
+            "inBattle": "In battle",
+            "fainted": "Fainted",
+            "reserved": "Chosen",
+            "noBench": "No Pokémon left on the bench",
+            "forcedSwitch": "Choose who comes in",
+            "forcedSwitchFor": "Choose who replaces {name}",
+            "rejected": "The server rejected that order. Choose again.",
+            "spectating": "You are watching this battle as a spectator",
+            "legend": {
+              "moves": "move",
+              "bench": "switch",
+              "tera": "tera",
+              "mega": "mega",
+              "dyna": "dynamax",
+              "z": "Z-move",
+              "esc": "back"
+            },
+            "mech": {
+              "terastallize": "Terastallize",
+              "mega": "Mega",
+              "dynamax": "Dynamax",
+              "zmove": "Z-Move",
+              "megaHint": "Mega Evolve this turn",
+              "dynamaxHint": "Dynamax for 3 turns",
+              "zmoveHint": "Use a Z-Move (once per battle)",
+              "armed": "{name} armed: pick a move"
+            }
+          },
+          "preview": {
+            "title": "Team preview",
+            "leadDoubles": "Pick {picks} Pokémon in order: the first {leads} lead.",
+            "leadSingles": "Pick who leads; the rest follow in this order.",
+            "yourTeam": "Your team",
+            "foeTeam": "Opponent's team",
+            "confirm": "Confirm",
+            "hintDefault": "The order shown will be sent",
+            "hintPicked": "{n} in the order you picked",
+            "defaultOrder": "Default order",
+            "clear": "Clear",
+            "picked": "{n} of {picks} picked",
+            "lead": "Lead",
+            "timeLeft": "Time to choose",
+            "foeHidden": "The opponent has not revealed their team yet."
+          },
+          "intro": {
+            "title": "Replay",
+            "play": "Play",
+            "vs": "VS"
+          },
+          "end": {
+            "aria": "Battle over",
+            "victory": "VICTORY",
+            "defeat": "DEFEAT",
+            "tie": "TIE",
+            "subtitleWin": "{name} wins on turn {turn}",
+            "subtitleTie": "Tie on turn {turn}",
+            "finalTeams": "Final teams",
+            "rematch": "Rematch",
+            "replayAgain": "Watch again",
+            "watchReplay": "Watch replay",
+            "backToLobby": "Back to lobby",
+            "ko": "KO"
+          },
+          "fx": {
+            "crit": "CRITICAL!",
+            "miss": "Missed!",
+            "super": "Super effective!",
+            "resisted": "Not very effective…",
+            "immune": "No effect",
+            "tera": "Tera {type}!",
+            "mega": "Mega Evolution!",
+            "primal": "Primal Reversion!",
+            "burst": "Ultra Burst!",
+            "zmove": "Z-Move!",
+            "zbroken": "Protection broken!",
+            "cured": "Cured"
+          },
+          "labels": {
+            "protect": "PROT",
+            "cat": {
+              "phys": "Physical",
+              "spec": "Special",
+              "status": "Status"
+            },
+            "status": {
+              "brn": "BRN",
+              "par": "PAR",
+              "psn": "PSN",
+              "tox": "TOX",
+              "slp": "SLP",
+              "frz": "FRZ",
+              "fnt": "KO"
+            },
+            "statusLong": {
+              "brn": "Burned",
+              "par": "Paralyzed",
+              "psn": "Poisoned",
+              "tox": "Badly poisoned",
+              "slp": "Asleep",
+              "frz": "Frozen",
+              "fnt": "Fainted"
+            },
+            "boost": {
+              "atk": "Atk",
+              "def": "Def",
+              "spa": "SpA",
+              "spd": "SpD",
+              "spe": "Spe",
+              "accuracy": "Acc",
+              "evasion": "Eva"
+            },
+            "eff": {
+              "immune": "Immune",
+              "super": "Effective",
+              "x4": "×4",
+              "resist": "Resists",
+              "x025": "×¼"
+            },
+            "stat": {
+              "hp": "HP",
+              "atk": "Attack",
+              "def": "Defense",
+              "spa": "Sp. Atk",
+              "spd": "Sp. Def",
+              "spe": "Speed",
+              "accuracy": "Accuracy",
+              "evasion": "Evasiveness"
+            }
+          },
+          "types": {
+            "Normal": "Normal",
+            "Fire": "Fire",
+            "Water": "Water",
+            "Electric": "Electric",
+            "Grass": "Grass",
+            "Ice": "Ice",
+            "Fighting": "Fighting",
+            "Poison": "Poison",
+            "Ground": "Ground",
+            "Flying": "Flying",
+            "Psychic": "Psychic",
+            "Bug": "Bug",
+            "Rock": "Rock",
+            "Ghost": "Ghost",
+            "Dragon": "Dragon",
+            "Dark": "Dark",
+            "Steel": "Steel",
+            "Fairy": "Fairy",
+            "Stellar": "Stellar"
+          },
+          "side": {
+            "stealthrock": "Stealth Rock",
+            "spikes": "Spikes",
+            "toxicspikes": "Toxic Spikes",
+            "stickyweb": "Sticky Web",
+            "reflect": "Reflect",
+            "lightscreen": "Light Screen",
+            "auroraveil": "Aurora Veil",
+            "tailwind": "Tailwind",
+            "safeguard": "Safeguard",
+            "mist": "Mist",
+            "luckychant": "Lucky Chant"
+          },
+          "logTx": {
+            "opposing": "the opposing {name}",
+            "yourTeam": "your team",
+            "foeTeam": "the opposing team",
+            "startBattle": "Battle started between {a} and {b}!",
+            "win": "{name} won the battle!",
+            "tie": "Tie between {a} and {b}.",
+            "switchInOwn": "Go! {name}!",
+            "switchIn": "{trainer} sent out {name}!",
+            "switchOutOwn": "{name}, come back!",
+            "switchOut": "{trainer} withdrew {name}!",
+            "drag": "{name} was dragged out!",
+            "faint": "{name} fainted!",
+            "move": "{name} used {move}!",
+            "ability": "[{name}'s {ability}]",
+            "cantMove": "{name} can't move!",
+            "cant": "{name} can't use {move}!",
+            "fail": "But it failed!",
+            "noTarget": "But there was no target…",
+            "crit": "A critical hit!",
+            "critOn": "A critical hit on {name}!",
+            "superEff": "It's super effective!",
+            "superEffOn": "It's super effective on {name}!",
+            "resisted": "It's not very effective…",
+            "resistedOn": "It's not very effective on {name}.",
+            "immune": "It doesn't affect {name}…",
+            "noEffect": "It had no effect!",
+            "unaffected": "{name} is unaffected!",
+            "miss": "{name} avoided the attack!",
+            "missNo": "{name}'s attack missed!",
+            "ohko": "It's a one-hit KO!",
+            "hit1": "Hit 1 time!",
+            "hits": "Hit {n} times!",
+            "dmgPct": "({name} lost {pct} of its health)",
+            "dmg": "({name} was hurt!)",
+            "dmgItemOwn": "{name} was hurt by its {item}!",
+            "dmgItemFoe": "{name} was hurt by {source}'s {item}!",
+            "dmgMove": "{name} is hurt by {move}!",
+            "heal": "{name} had its HP restored.",
+            "healLittle": "{name} restored a little HP using its {item}!",
+            "healEffect": "{name} restored HP using its {effect}!",
+            "hpFull": "{name}'s HP is full!",
+            "boost1": "{name}'s {stat} rose!",
+            "boost2": "{name}'s {stat} rose sharply!",
+            "boost3": "{name}'s {stat} rose drastically!",
+            "boost0": "{name}'s {stat} won't go any higher.",
+            "unboost1": "{name}'s {stat} fell!",
+            "unboost2": "{name}'s {stat} fell harshly!",
+            "unboost3": "{name}'s {stat} fell severely!",
+            "unboost0": "{name}'s {stat} won't go any lower.",
+            "clearBoost": "{name}'s stat changes were removed!",
+            "tera": "{name} Terastallized into the {type} type!",
+            "alreadyBurned": "{name} is already burned!",
+            "alreadyParalyzed": "{name} is already paralyzed!",
+            "alreadyPoisoned": "{name} is already poisoned!",
+            "alreadyAsleep": "{name} is already asleep!",
+            "alreadyFrozen": "{name} is already frozen solid!",
+            "alreadyConfused": "{name} is already confused!",
+            "burned": "{name} was burned!",
+            "burnDamage": "{name} was hurt by its burn!",
+            "burnHealed": "{name}'s burn was healed!",
+            "paralyzed": "{name} is paralyzed! It may be unable to move!",
+            "paralyzedCant": "{name} is paralyzed! It can't move!",
+            "paraCured": "{name} was cured of paralysis!",
+            "poisoned": "{name} was poisoned!",
+            "badlyPoisoned": "{name} was badly poisoned!",
+            "poisonDamage": "{name} was hurt by poison!",
+            "poisonCured": "{name} was cured of its poisoning!",
+            "asleep": "{name} fell asleep!",
+            "fastAsleep": "{name} is fast asleep.",
+            "wokeUp": "{name} woke up!",
+            "frozen": "{name} was frozen solid!",
+            "frozenCant": "{name} is frozen solid!",
+            "thawed": "{name} thawed out!",
+            "confused": "{name} became confused!",
+            "confusedActivate": "{name} is confused!",
+            "confusedEnd": "{name} snapped out of its confusion!",
+            "confusedHurt": "It hurt itself in its confusion!",
+            "flinched": "{name} flinched and couldn't move!",
+            "protected": "{name} protected itself!",
+            "srStart": "Pointed stones float in the air around {name}!",
+            "srEnd": "The pointed stones disappeared from around {name}!",
+            "srDamage": "Pointed stones dug into {name}!",
+            "spikesStart": "Spikes were scattered on the ground all around {name}!",
+            "spikesEnd": "The spikes disappeared from the ground around {name}!",
+            "spikesDamage": "{name} was hurt by the spikes!",
+            "tspikesStart": "Poison spikes were scattered on the ground all around {name}!",
+            "tspikesEnd": "The poison spikes disappeared from the ground around {name}!",
+            "webStart": "A sticky web has been laid out on the ground around {name}!",
+            "webEnd": "The sticky web has disappeared from the ground around {name}!",
+            "webCaught": "{name} was caught in a sticky web!",
+            "reflectStart": "Reflect made {name} stronger against physical moves!",
+            "reflectEnd": "{name}'s Reflect wore off!",
+            "screenStart": "Light Screen made {name} stronger against special moves!",
+            "screenEnd": "{name}'s Light Screen wore off!",
+            "tailwindStart": "The Tailwind blew from behind {name}!",
+            "tailwindEnd": "{name}'s Tailwind petered out!",
+            "trickroomStart": "{name} twisted the dimensions!",
+            "trickroomEnd": "The twisted dimensions returned to normal!",
+            "electricTerrain": "An electric current ran across the battlefield!",
+            "grassyTerrain": "Grass grew to cover the battlefield!",
+            "mistyTerrain": "Mist swirled around the battlefield!",
+            "psychicTerrain": "The battlefield got weird!",
+            "seeded": "{name} was seeded!",
+            "seedDamage": "{name}'s health is sapped by Leech Seed!",
+            "knockOff": "{name} knocked off {target}'s {item}!",
+            "typeChange": "{name}'s type changed to {type}!",
+            "effectStart": "({effect} started on {name})",
+            "effectEnd": "{name} was freed from {effect}!",
+            "effectActivate": "({effect} activated)",
+            "sandStart": "A sandstorm kicked up!",
+            "sandUpkeep": "(The sandstorm is raging.)",
+            "sandEnd": "The sandstorm subsided.",
+            "sandDamage": "{name} is buffeted by the sandstorm!",
+            "rainStart": "It started to rain!",
+            "rainUpkeep": "(Rain continues to fall.)",
+            "rainEnd": "The rain stopped.",
+            "sunStart": "The sunlight turned harsh!",
+            "sunUpkeep": "(The sunlight is strong.)",
+            "sunEnd": "The harsh sunlight faded.",
+            "hailStart": "It started to hail!",
+            "hailUpkeep": "(The hail is crashing down.)",
+            "hailEnd": "The hail stopped.",
+            "hailDamage": "{name} is buffeted by the hail!",
+            "snowStart": "It started to snow!",
+            "snowUpkeep": "(Snow continues to fall.)",
+            "snowEnd": "The snow stopped."
+          },
+          "log": {
+            "aria": "Battle log",
+            "latest": "Latest log line",
+            "turn": "Turn {turn}",
+            "collapse": "Collapse turn {turn}",
+            "expand": "Expand turn {turn}"
+          },
+          "rail": {
+            "log": "Log",
+            "chat": "Chat",
+            "actions": "Actions",
+            "open": "Open log",
+            "close": "Close",
+            "unread": "{count} unread"
+          },
+          "mon": {
+            "details": "Details for {name}",
+            "level": "Lv. {level}",
+            "ability": "Ability",
+            "item": "Item",
+            "moves": "Moves",
+            "known": "known",
+            "stats": "Base stats",
+            "boosts": "Stat changes",
+            "hp": "HP",
+            "unknown": "—",
+            "unrevealed": "Unrevealed",
+            "close": "Close"
+          },
+          "play": {
+            "setupTitle": "New battle",
+            "setupLead": "Pick a format and, if it needs one, a team. The AI plays another of your teams or a sample.",
+            "format": "Format",
+            "team": "Your team",
+            "start": "Start",
+            "sample": "Sample team",
+            "sampleHint": "No teams of yours for this format: a sample will be used.",
+            "noTeams": "This format needs a team and there is none.",
+            "createTeam": "Create a team",
+            "retry": "Retry",
+            "back": "Back to lobby"
+          }
+        },
+        "bx": {
+          "spreadAllTag": "AREA · ALL",
+          "spreadTag": "AREA",
+          "teraUsedTitle": "Terastal already used this battle",
+          "teraArmTitle": "Terastallize this turn",
+          "effective": "SUPER EFFECTIVE!",
+          "resisted": "resisted",
+          "logAria": "Battle log",
+          "teamStatusAria": "Team status",
+          "priorityNote": "Priority can change this",
+          "noOrder": "No order",
+          "clearOrderAria": "Clear order",
+          "add": "Add",
+          "orderProjected": "Projected order",
+          "chosen": "CHOSEN",
+          "teraTypeTitle": "Tera type {type}",
+          "teraUsedLabel": "Tera used",
+          "teraArmedLabel": "Tera {type} ✓",
+          "teraLabel": "Tera {type}",
+          "timerAria": "{sec} seconds",
+          "switchTo": "Switch → {name}",
+          "targetAll": "all",
+          "targetBoth": "both opponents"
+        },
+        "hub": {
+          "gate": {
+            "online": "Online",
+            "needsAccount": "Account needed",
+            "offline": "Offline",
+            "checking": "Checking…",
+            "signIn": "Sign in",
+            "signInReason": "You need a Boffmedia account to play online.",
+            "offlineReason": "No internet connection. Training against the AI still works.",
+            "playAiInstead": "Train against the AI"
+          },
+          "team": {
+            "label": "Team",
+            "pickAria": "Choose a team",
+            "legal": "Legal",
+            "problems": "{count, plural, one {# problem} other {# problems}}",
+            "checking": "Checking…",
+            "sample": "We will use a sample team until you build your own.",
+            "noneTitle": "You have no team for this format yet",
+            "create": "Create a team"
+          },
+          "tiles": {
+            "aria": "Quick access",
+            "ladderNote": "Opens on the website"
+          },
+          "queue": {
+            "title": "Looking for an opponent",
+            "position": "Position {n} in the queue",
+            "positionUnknown": "In the queue",
+            "elapsed": "{time} searching",
+            "cancel": "Cancel search",
+            "slowTitle": "This is taking longer than usual",
+            "slowLead": "There may be nobody else searching this format right now.",
+            "playAi": "Play against the AI in the meantime",
+            "needsTeam": "This format needs a team",
+            "goToTeams": "Go to Teams",
+            "teamRejectedTitle": "The server rejected your team",
+            "editTeam": "Edit team",
+            "retry": "Try again"
+          },
+          "challenge": {
+            "sent": "Challenge sent to {name}",
+            "sentAnon": "Challenge sent",
+            "rejected": "{name} declined your challenge",
+            "accepted": "You accepted {name}'s challenge"
+          },
+          "replays": {
+            "sourceLocal": "This device",
+            "sourceAccount": "Account",
+            "offlineTitle": "Offline",
+            "offlineLead": "Recent replays cannot be loaded without a connection. The ones on this device are still here.",
+            "showMine": "Show mine",
+            "loadMore": "Load more",
+            "shown": "{shown} of {total}",
+            "rowActions": "Replay actions",
+            "delete": "Delete",
+            "share": "Copy link",
+            "shared": "Link copied",
+            "shareFailed": "Could not copy the link",
+            "deleted": "Replay deleted",
+            "deleteTitle": "Delete replay",
+            "deleteBody": "This replay will be removed from this device. This cannot be undone.",
+            "deleteRemoteNote": "Account replays are only hidden here: they cannot be deleted from the server yet.",
+            "back": "Back to replays",
+            "markerKo": "KO",
+            "loading": "Loading replay…",
+            "clearSearch": "Clear search",
+            "goPlay": "Play a battle"
+          },
+          "conn": {
+            "loading": "Loading",
+            "connecting": "Connecting",
+            "reconnecting": "Reconnecting",
+            "queue": "In queue",
+            "slow": "This is taking longer than usual.",
+            "retry": "Try again"
+          },
+          "showdown": {
+            "challengeSent": "Challenge sent to {name}",
+            "formatsLoading": "Loading formats…"
+          }
+        },
+        "errors": {
+          "loading": "Loading…",
+          "signin_required": {
+            "title": "Sign in",
+            "lead": "You need a Boffmedia account to play online and to save your teams and replays."
+          },
+          "offline": {
+            "title": "You're offline",
+            "lead": "There's no internet connection. AI battles and your saved teams still work."
+          },
+          "connect_failed": {
+            "title": "Couldn't connect",
+            "lead": "The battle server isn't responding. Check your connection and try again."
+          },
+          "worker_failed": {
+            "title": "The battle engine failed",
+            "lead": "The simulator couldn't start in your browser. Reload the page; if it keeps failing, try another browser."
+          },
+          "ticket_denied": {
+            "title": "Access denied",
+            "lead": "Your pass for this room has expired or isn't valid. Go back to the lobby and search for a battle again."
+          },
+          "rejected_by": {
+            "title": "Challenge declined",
+            "lead": "{name} declined the battle.",
+            "someone": "The other player"
+          },
+          "not_found": {
+            "title": "Not found",
+            "lead": "This no longer exists, or the link isn't right."
+          },
+          "unknown": {
+            "title": "Something went wrong",
+            "lead": "We couldn't complete that. Try again in a few seconds."
+          }
+        },
+        "manifest": {
+          "title": "Battle Simulator",
+          "description": "Play against AI, battle other players, or connect to Pokémon Showdown",
+          "category": "Tools"
+        }
+      }
+    }
+  }
+} as const;
+
+export type ToolsBattlesimLocale = typeof messages;
