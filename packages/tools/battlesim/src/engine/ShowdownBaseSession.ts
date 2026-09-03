@@ -17,6 +17,9 @@ export class ShowdownBaseSession extends BattleSession {
   constructor(roomId: string, callbacks: SessionCallbacks, showdownSocket: Socket) {
     super(roomId, callbacks);
     this.showdownSocket = showdownSocket;
+    // Pokemon Showdown paces this battle: nothing arrives until both players
+    // have chosen, so the viewer must not be the brake. See `livePaced`.
+    this.livePaced = true;
   }
 
   override addLine(line: string): void {

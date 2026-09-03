@@ -99,9 +99,15 @@ export function BsimPvpView() {
   useEffect(() => {
     if (status === 'inBattle' && activeRoomId && !activeSession) {
       if (activeSide) pvp.setRoomSide(activeRoomId, activeSide);
+      // The PvP server paces this battle exactly as Showdown does — it will not
+      // send the next turn until both players have chosen — so the viewer must
+      // not be the brake. Without this, anything that arrives while you are
+      // still deciding (most importantly the opponent forfeiting, or the
+      // battle ending) is queued behind your own choice and never shown.
       const session = new BattleSession(activeRoomId, {
         onUpdate: triggerUpdate, onRequest: () => triggerUpdate(), onBattleEnd: () => triggerUpdate(),
       });
+      session.livePaced = true;
       session.status = 'active';
       // Handed to the room screen through the provider. This used to travel on
       // `window.__pvp_sessions`, which nothing owned and nothing cleaned up.

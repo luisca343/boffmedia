@@ -51,9 +51,15 @@ export function BsimPvpRoomView() {
 
     let sess = getRoomSession(decodedRoomId);
     if (!sess) {
+      // The PvP server paces this battle exactly as Showdown does — it will not
+      // send the next turn until both players have chosen — so the viewer must
+      // not be the brake. Without this, anything that arrives while you are
+      // still deciding (most importantly the opponent forfeiting, or the
+      // battle ending) is queued behind your own choice and never shown.
       sess = new BattleSession(decodedRoomId, {
         onUpdate: triggerUpdate, onRequest: () => triggerUpdate(), onBattleEnd: () => triggerUpdate(),
       });
+      sess.livePaced = true;
       sess.status = 'active';
       setRoomSession(decodedRoomId, sess);
     } else {

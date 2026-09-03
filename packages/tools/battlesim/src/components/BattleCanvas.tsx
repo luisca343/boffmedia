@@ -36,6 +36,16 @@ interface BattleCanvasProps {
     currentAction?: number;
     battleLog?: string | null;
     showFullInfo?: boolean;
+    /**
+     * Bumped by the session on every visible change.
+     *
+     * Load-bearing despite being unread: this component is `memo`'d and every
+     * other prop keeps its identity for the whole battle (`battle` is mutated
+     * in place, never replaced), so without a value that actually changes the
+     * shallow compare skips every re-render and the field freezes between
+     * turns. See `BattleSession.revision`.
+     */
+    revision?: number;
     initScene?: (gameElement: HTMLElement) => void;
     liveMode?: boolean;
     liveStatus?: 'idle' | 'connecting' | 'active' | 'finished' | 'error';

@@ -160,7 +160,7 @@ export function LiveBattle({ state, pov, mode, formatLabel, roomLabel, onChoice,
 
   const canvas = (
     <BattleCanvas
-      battle={state.battle} pov={pov} liveMode liveStatus={state.status} battleComplete={finished}
+      battle={state.battle} revision={state.revision} pov={pov} liveMode liveStatus={state.status} battleComplete={finished}
       initScene={initScene} fit="contain" targeting={targeting} aimedFoe={aiming} compact={layout === 'mobile'}
     />
   );
