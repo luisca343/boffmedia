@@ -82,7 +82,7 @@ export function PmdSkyView() {
         actions={
           <>
             <span className="flex items-center gap-2">
-              <span className="font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
+              <span className="font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
                 {tApp("region")}
               </span>
               <Seg
@@ -105,15 +105,15 @@ export function PmdSkyView() {
       />
 
       {/* ── body: builder + ticket ──────────────────────────────────────────── */}
-      <div className="min-h-0 flex-1 px-[clamp(18px,2.4vw,40px)] pb-[60px] pt-[22px]">
-        <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-start gap-[22px] min-[961px]:grid-cols-[minmax(0,1fr)_minmax(340px,400px)]">
+      <div className="min-h-0 flex-1 px-[clamp(1.125rem,2.4vw,2.5rem)] pb-[3.75rem] pt-[1.375rem]">
+        <div className="mx-auto grid max-w-[77.5rem] grid-cols-1 items-start gap-[1.375rem] min-[961px]:grid-cols-[minmax(0,1fr)_minmax(21.25rem,25rem)]">
           {/* CONSTRUCTOR */}
           <div className="flex min-w-0 flex-col gap-4">
             <WmSection
               n="01"
               icon="list"
               title={tApp("secType")}
-              aside={<span className="max-w-[22ch] text-right font-mono text-[11px] leading-[1.3] text-txt-muted">{questLabel}</span>}
+              aside={<span className="max-w-[22ch] text-right font-mono text-[0.6875rem] leading-[1.3] text-txt-muted">{questLabel}</span>}
             >
               <OptionGroup
                 options={questOptions}
@@ -139,13 +139,13 @@ export function PmdSkyView() {
               icon="globe"
               title={tApp("secLocation")}
               aside={
-                <span className="inline-flex items-center gap-[9px]">
+                <span className="inline-flex items-center gap-[0.5625rem]">
                   <WmStars n={difficulty} />
-                  <span className="font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted">{diffLabel}</span>
+                  <span className="font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted">{diffLabel}</span>
                 </span>
               }
             >
-              <div className="grid grid-cols-2 gap-[14px] max-[560px]:grid-cols-1">
+              <div className="grid grid-cols-2 gap-[0.875rem] max-[560px]:grid-cols-1">
                 <Field label={t("DUNGEON")}>
                   <WmCombo
                     value={dungeonLabel(form.dungeon)}
@@ -173,7 +173,7 @@ export function PmdSkyView() {
             </WmSection>
 
             <WmSection n="03" icon="users" title={tApp("secPokemon")}>
-              <div className="grid grid-cols-2 gap-[14px] max-[560px]:grid-cols-1">
+              <div className="grid grid-cols-2 gap-[0.875rem] max-[560px]:grid-cols-1">
                 <WmPokePicker
                   label={t("CLIENT_POKEMON")}
                   valueLabel={pokeLabel(form.clientPokemon)}
@@ -198,7 +198,7 @@ export function PmdSkyView() {
               {issues
                 .filter((i) => i.field === "target")
                 .map((i, k) => (
-                  <div key={k} className="mt-[10px]">
+                  <div key={k} className="mt-[0.625rem]">
                     <Banner tone={i.tone}>{i.msg}</Banner>
                   </div>
                 ))}
@@ -211,7 +211,7 @@ export function PmdSkyView() {
                 options={rewardTypes}
                 onChange={setRewardType}
               />
-              <div className="mt-3 grid grid-cols-2 gap-[14px] max-[560px]:grid-cols-1">
+              <div className="mt-3 grid grid-cols-2 gap-[0.875rem] max-[560px]:grid-cols-1">
                 <Select
                   label={t("TARGET_ITEM")}
                   value={String(form.targetItem)}
@@ -234,8 +234,8 @@ export function PmdSkyView() {
             <Disclosure title={tApp("advanced")} icon="settings" sub={tApp("advancedSub")}>
               <div className="flex items-center gap-4 py-1">
                 <div className="min-w-0 flex-1">
-                  <div className="font-body text-[13px] font-semibold leading-[1.2] text-txt">{tApp("euTitle")}</div>
-                  <div className="mt-[3px] font-body text-[12px] leading-[1.45] text-txt-dim">{tApp("euSub")}</div>
+                  <div className="font-body text-[0.8125rem] font-semibold leading-[1.2] text-txt">{tApp("euTitle")}</div>
+                  <div className="mt-[3px] font-body text-[0.75rem] leading-[1.45] text-txt-dim">{tApp("euSub")}</div>
                 </div>
                 <Toggle
                   on={form.europeanVersion}
@@ -248,7 +248,7 @@ export function PmdSkyView() {
 
           {/* BILLETE + ACCIONES */}
           <aside className="min-w-0">
-            <div className="flex flex-col gap-[14px] min-[961px]:sticky min-[961px]:top-[22px]">
+            <div className="flex flex-col gap-[0.875rem] min-[961px]:sticky min-[961px]:top-[1.375rem]">
               <WmTicket
                 status={status}
                 codeLines={ctx.codeLines}
@@ -264,18 +264,18 @@ export function PmdSkyView() {
               />
 
               <div className="border border-solid border-line bg-panel">
-                <div className="flex items-center gap-2 border-b border-solid border-line px-[14px] py-[11px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
+                <div className="flex items-center gap-2 border-b border-solid border-line px-[0.875rem] py-[0.6875rem] font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
                   <Icon name="list" size={13} />
                   {tApp("summaryHead")}
                 </div>
-                <dl className="m-0 px-[14px] py-[6px]">
+                <dl className="m-0 px-[0.875rem] py-[0.375rem]">
                   {summary.map((r, i) => (
                     <div
                       key={i}
-                      className="flex items-baseline justify-between gap-3 border-b border-solid border-[color-mix(in_srgb,var(--line)_55%,transparent)] py-[7px] last:border-b-0"
+                      className="flex items-baseline justify-between gap-3 border-b border-solid border-[color-mix(in_srgb,var(--line)_55%,transparent)] py-[0.4375rem] last:border-b-0"
                     >
-                      <dt className="flex-none font-mono text-[11px] font-medium uppercase leading-[1.2] tracking-[0.06em] text-txt-dim">{r.k}</dt>
-                      <dd className="m-0 min-w-0 text-right font-body text-[13px] font-semibold leading-[1.3] text-txt">{r.v}</dd>
+                      <dt className="flex-none font-mono text-[0.6875rem] font-medium uppercase leading-[1.2] tracking-[0.06em] text-txt-dim">{r.k}</dt>
+                      <dd className="m-0 min-w-0 text-right font-body text-[0.8125rem] font-semibold leading-[1.3] text-txt">{r.v}</dd>
                     </div>
                   ))}
                 </dl>
@@ -287,7 +287,7 @@ export function PmdSkyView() {
                 </Banner>
               )}
 
-              <div className="flex flex-col gap-[10px]">
+              <div className="flex flex-col gap-[0.625rem]">
                 <Button
                   variant="pri"
                   icon={status === "loading" ? "refresh" : "bolt"}
@@ -298,7 +298,7 @@ export function PmdSkyView() {
                   {status === "ready" ? tApp("regenerate") : status === "loading" ? tApp("generating") : tApp("generate")}
                 </Button>
                 {status === "ready" && (
-                  <div className="grid grid-cols-2 gap-[10px]">
+                  <div className="grid grid-cols-2 gap-[0.625rem]">
                     <Button size="sm" icon={shared ? "check" : "link"} onClick={share} className="justify-center">
                       {shared ? tApp("copied") : tApp("share")}
                     </Button>

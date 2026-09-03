@@ -69,7 +69,7 @@ export function BiomeFilter({ biomeIds, styler, selected, onChange, labels }: Bi
         <p className="text-xs text-txt-dim">{labels.count}</p>
       ) : null}
 
-      <div className="max-h-[280px] overflow-y-auto border border-line-2">
+      <div className="max-h-[17.5rem] overflow-y-auto border border-line-2">
         {rows.length === 0 ? (
           <p className="p-3 text-center text-xs text-txt-dim">{labels.empty}</p>
         ) : (

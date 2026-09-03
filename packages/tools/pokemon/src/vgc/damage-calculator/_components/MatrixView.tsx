@@ -58,7 +58,7 @@ export function MatrixView() {
 
   return (
     <div>
-      <div className="mb-[14px] flex flex-wrap items-center gap-[14px]">
+      <div className="mb-[0.875rem] flex flex-wrap items-center gap-[0.875rem]">
         <Seg
           value={dir}
           onChange={(v) => setDir(v as Dir)}
@@ -67,12 +67,12 @@ export function MatrixView() {
             { value: "mvt", label: t("tabs.threatsTeam") },
           ]}
         />
-        <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("ui.matrixHint")}</span>
+        <span className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("ui.matrixHint")}</span>
       </div>
 
       <FieldBar field={field} setField={setField} setAtkSide={setAttackerSide} setDefSide={setDefenderSide} />
 
-      <div className="grid grid-cols-[210px_minmax(0,1fr)_210px] items-start gap-4 max-[1280px]:grid-cols-1">
+      <div className="grid grid-cols-[13.125rem_minmax(0,1fr)_13.125rem] items-start gap-4 max-[1280px]:grid-cols-1">
         <TeamSlots
           label={isTvM ? t("ui.myTeam") : t("ui.threats")}
           color={ATK_COLOR}

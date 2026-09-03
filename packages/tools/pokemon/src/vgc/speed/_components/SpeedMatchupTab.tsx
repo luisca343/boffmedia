@@ -53,7 +53,7 @@ function ResultBadge({ mySpeed, opponentSpeed, t }: { mySpeed: number; opponentS
         : "border-warn/40 bg-warn/15 text-warn";
   const label = result === "faster" ? `▲ ${t("faster")} +${diff}` : result === "slower" ? `▼ ${t("slower")} ${diff}` : `= ${t("tie")}`;
   return (
-    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap border border-solid px-2.5 py-1 font-mono text-[11px] font-bold", style)}>{label}</span>
+    <span className={cn("inline-flex items-center gap-1 whitespace-nowrap border border-solid px-2.5 py-1 font-mono text-[0.6875rem] font-bold", style)}>{label}</span>
   );
 }
 
@@ -101,7 +101,7 @@ export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillCo
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[1fr_2fr]">
       {/* Opponent */}
-      <SpdPanel icon="target" title={t("opponentTitle")} bodyClassName="grid gap-[14px]">
+      <SpdPanel icon="target" title={t("opponentTitle")} bodyClassName="grid gap-[0.875rem]">
         <SpdMonSearch
           speedTiers={speedTiers}
           loading={loading}
@@ -112,8 +112,8 @@ export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillCo
         />
 
         {refSpeeds.length > 0 && (
-          <div className="grid gap-[6px]">
-            <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("referenceSpeed")}</span>
+          <div className="grid gap-[0.375rem]">
+            <span className="font-mono text-[0.5625rem] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("referenceSpeed")}</span>
             <div className="flex flex-wrap gap-1.5">
               {refSpeeds.map((chip) => (
                 <button
@@ -121,7 +121,7 @@ export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillCo
                   type="button"
                   onClick={() => setOpponent((prev) => ({ ...prev, speed: String(chip.value) }))}
                   className={cn(
-                    "border border-solid px-2 py-[3px] font-mono text-[11px] transition-[color,background,border-color]",
+                    "border border-solid px-2 py-[3px] font-mono text-[0.6875rem] transition-[color,background,border-color]",
                     opponent.speed === String(chip.value) ? "border-accent-line bg-accent-soft text-accent-bright" : "border-line-2 text-txt-muted hover:text-txt",
                   )}
                 >
@@ -132,20 +132,20 @@ export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillCo
           </div>
         )}
 
-        <div className="grid gap-[6px]">
-          <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("opponentManual")}</span>
+        <div className="grid gap-[0.375rem]">
+          <span className="font-mono text-[0.5625rem] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("opponentManual")}</span>
           <SpdInput icon="bolt" type="number" value={opponent.speed} onChange={(v) => setOpponent((prev) => ({ ...prev, speed: v }))} placeholder={t("opponentSpeedPlaceholder")} className="w-full" />
         </div>
 
-        <div className="grid gap-[6px]">
-          <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("opponentModifiers")}</span>
+        <div className="grid gap-[0.375rem]">
+          <span className="font-mono text-[0.5625rem] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("opponentModifiers")}</span>
           <SpdModifiers modifiers={opponent.mods} onChange={(m) => setOpponent((prev) => ({ ...prev, mods: m }))} />
         </div>
 
         <div className="border border-solid border-line bg-base px-4 py-4 text-center">
-          <div className="mb-1 font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("effectiveSpeed")}</div>
-          <div className="font-display text-[46px] font-extrabold italic leading-none tabular-nums text-txt">{opponentEffective !== null ? opponentEffective : "—"}</div>
-          {opponent.name && <div className="mt-1.5 font-mono text-[11px] text-txt-muted">{opponent.name}</div>}
+          <div className="mb-1 font-mono text-[0.5625rem] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("effectiveSpeed")}</div>
+          <div className="font-display text-[2.875rem] font-extrabold italic leading-none tabular-nums text-txt">{opponentEffective !== null ? opponentEffective : "—"}</div>
+          {opponent.name && <div className="mt-1.5 font-mono text-[0.6875rem] text-txt-muted">{opponent.name}</div>}
         </div>
       </SpdPanel>
 
@@ -154,7 +154,7 @@ export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillCo
         icon="users"
         title={`${t("myTeamTitle")} (${team.length}/6)`}
         aside={
-          <button type="button" onClick={() => setTeam(team.map((m) => ({ ...m, name: "", speed: "", mods: DEFAULT_MODIFIERS })))} className="font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-txt-dim transition-colors hover:text-bad">
+          <button type="button" onClick={() => setTeam(team.map((m) => ({ ...m, name: "", speed: "", mods: DEFAULT_MODIFIERS })))} className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-txt-dim transition-colors hover:text-bad">
             {t("clearTeam")}
           </button>
         }
@@ -164,9 +164,9 @@ export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillCo
           {team.map((member, idx) => {
             const effective = calcEffective(member.speed, member.mods);
             return (
-              <div key={member.id} className="grid gap-2.5 px-[14px] py-3">
+              <div key={member.id} className="grid gap-2.5 px-[0.875rem] py-3">
                 <div className="flex items-center gap-2">
-                  <span className="w-4 flex-none text-center font-mono text-[11px] text-txt-dim">{idx + 1}</span>
+                  <span className="w-4 flex-none text-center font-mono text-[0.6875rem] text-txt-dim">{idx + 1}</span>
                   <SpdInput value={member.name} onChange={(v) => updateMember(member.id, { name: v })} placeholder={t("teamMemberName")} className="flex-1" />
                   <SpdInput type="number" value={member.speed} onChange={(v) => updateMember(member.id, { speed: v })} placeholder={t("teamMemberSpeed")} className="w-28" />
                   <button type="button" onClick={() => removeMember(member.id)} className="grid flex-none place-items-center p-1.5 text-txt-dim transition-colors hover:text-bad">
@@ -174,12 +174,12 @@ export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillCo
                   </button>
                 </div>
                 <div className="flex flex-wrap items-center gap-3 pl-6">
-                  <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("effectiveSpeed")}</span>
-                  <span className="min-w-[2.5rem] font-mono text-[17px] font-bold tabular-nums text-txt">
-                    {effective !== null ? effective : <span className="text-[15px] text-txt-dim">—</span>}
+                  <span className="font-mono text-[0.5625rem] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("effectiveSpeed")}</span>
+                  <span className="min-w-[2.5rem] font-mono text-[1.0625rem] font-bold tabular-nums text-txt">
+                    {effective !== null ? effective : <span className="text-[0.9375rem] text-txt-dim">—</span>}
                   </span>
                   {opponentEffective !== null && effective !== null && <ResultBadge mySpeed={effective} opponentSpeed={opponentEffective} t={t} />}
-                  {opponentEffective === null && <span className="font-mono text-[11px] italic text-txt-dim">{t("noOpponent")}</span>}
+                  {opponentEffective === null && <span className="font-mono text-[0.6875rem] italic text-txt-dim">{t("noOpponent")}</span>}
                   {member.name && (
                     <DkSprite src={spriteUrl(member.name)} alt={member.name} size={22} onError={handleSpriteError} className="ml-auto" />
                   )}
@@ -192,8 +192,8 @@ export function SpeedMatchupTab({ speedTiers, loading, prefillEntry, onPrefillCo
           })}
         </div>
         {team.length < 6 && (
-          <div className="border-t border-solid border-line px-[14px] py-3">
-            <button type="button" onClick={addMember} className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+          <div className="border-t border-solid border-line px-[0.875rem] py-3">
+            <button type="button" onClick={addMember} className="inline-flex items-center gap-1.5 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
               <Icon name="plus" size={14} />
               {t("addMember")}
             </button>

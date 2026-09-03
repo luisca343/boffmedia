@@ -9,7 +9,7 @@ import { cn } from "@/lib/utils"
 // down. A primitive only resolves its tokens inside its own scope root, so every
 // specimen renders inside `<Scope>` — see below.
 
-export const MONO_LABEL = "font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-sr-txt-muted"
+export const MONO_LABEL = "font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-sr-txt-muted"
 
 // The showcase's own chrome speaks the `sr-*` chrome vocabulary — the frame around
 // the apps, never an app's palette. Specimens inside `<Scope>` speak their own.
@@ -20,7 +20,7 @@ export const HEAD4 = "font-display font-bold uppercase tracking-[0.02em] leading
 export const GRP_KEY = "sr-sc-chapter"
 export const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
 export const sideLink =
-  "block font-mono text-[12px] font-semibold leading-none uppercase tracking-[0.1em] no-underline py-[10px] px-[14px] border-l-[3px] border-solid transition-[color,border-color,background] duration-[140ms] cursor-pointer"
+  "block font-mono text-[0.75rem] font-semibold leading-none uppercase tracking-[0.1em] no-underline py-[0.625rem] px-[0.875rem] border-l-[3px] border-solid transition-[color,border-color,background] duration-[140ms] cursor-pointer"
 
 // ── scope roots ─────────────────────────────────────────────────────────────
 // Each app's tokens only resolve inside its scope root, so a specimen rendered
@@ -183,7 +183,7 @@ export function Sample({
       motion={motion}
       skin={canvas}
       className={cn(
-        padded && "p-[26px]",
+        padded && "p-[1.625rem]",
         canvas && app !== "sr" && "border border-solid border-sr-line",
         "flex flex-wrap gap-4 items-center",
         col && "flex-col items-stretch flex-nowrap",
@@ -195,10 +195,10 @@ export function Sample({
   )
 
   return (
-    <div className="border border-solid border-sr-line bg-sr-panel mb-[22px]">
-      <div className="flex items-center gap-3 py-[10px] px-4 border-b border-solid border-sr-line bg-sr-panel-2">
-        <h4 className={cn(HEAD4, "text-[14px]/[1.05] tracking-[0.08em] text-sr-txt")}>{title}</h4>
-        {code && <code className="ml-auto font-mono text-[11px] font-medium leading-none text-sr-txt-dim">{code}</code>}
+    <div className="border border-solid border-sr-line bg-sr-panel mb-[1.375rem]">
+      <div className="flex items-center gap-3 py-[0.625rem] px-4 border-b border-solid border-sr-line bg-sr-panel-2">
+        <h4 className={cn(HEAD4, "text-[0.875rem]/[1.05] tracking-[0.08em] text-sr-txt")}>{title}</h4>
+        {code && <code className="ml-auto font-mono text-[0.6875rem] font-medium leading-none text-sr-txt-dim">{code}</code>}
       </div>
       {/*
         An app's canvas is INSET as a framed stage rather than painted across the whole
@@ -209,7 +209,7 @@ export function Sample({
       */}
       {canvas && app !== "sr" ? <div className="p-3 bg-sr-panel">{stage}</div> : stage}
       {note && (
-        <div className="font-body text-[13px] leading-[1.6] text-sr-txt-muted py-3 px-4 border-t border-dashed border-sr-line [&_code]:font-mono [&_code]:text-[12px] [&_code]:font-medium [&_code]:text-sr-accent">
+        <div className="font-body text-[0.8125rem] leading-[1.6] text-sr-txt-muted py-3 px-4 border-t border-dashed border-sr-line [&_code]:font-mono [&_code]:text-[0.75rem] [&_code]:font-medium [&_code]:text-sr-accent">
           {note}
         </div>
       )}
@@ -231,11 +231,11 @@ export function Section({
   children: React.ReactNode
 }) {
   return (
-    <section id={id} className="mb-[74px] scroll-mt-[120px]">
+    <section id={id} className="mb-[4.625rem] scroll-mt-[120px]">
       <Kicker>{kicker}</Kicker>
-      <h2 className={cn(DISPLAY, "text-sr-txt text-[clamp(30px,8vw,42px)]/[0.92] mt-[10px] mb-2")}>{title}</h2>
+      <h2 className={cn(DISPLAY, "text-sr-txt text-[clamp(1.875rem,8vw,2.625rem)]/[0.92] mt-[0.625rem] mb-2")}>{title}</h2>
       {lead && (
-        <p className="text-sr-txt-muted max-w-[66ch] mb-7 text-[15px] [&_code]:font-mono [&_code]:text-[13px] [&_code]:text-sr-accent">
+        <p className="text-sr-txt-muted max-w-[66ch] mb-7 text-[0.9375rem] [&_code]:font-mono [&_code]:text-[0.8125rem] [&_code]:text-sr-accent">
           {lead}
         </p>
       )}
@@ -248,8 +248,8 @@ export function Section({
 // showcase owns this one rather than reaching across to Boffmedia's.
 export function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-2 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.16em] text-sr-accent">
-      <i className="h-[7px] w-[7px] rotate-45 bg-sr-accent" />
+    <span className="inline-flex items-center gap-2 font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.16em] text-sr-accent">
+      <i className="h-[0.4375rem] w-[0.4375rem] rotate-45 bg-sr-accent" />
       {children}
     </span>
   )
@@ -262,7 +262,7 @@ export function Swatches({ tokens }: { tokens: readonly (readonly [string, strin
       {tokens.map(([cls, name]) => (
         <div key={cls + name} className="border border-solid border-sr-line">
           <i className={cn("block h-16", cls)} />
-          <div className="bg-sr-panel-2 px-[11px] py-[9px] font-mono text-[10px] font-medium leading-[1.5] text-sr-txt-muted">
+          <div className="bg-sr-panel-2 px-[0.6875rem] py-[0.5625rem] font-mono text-[0.625rem] font-medium leading-[1.5] text-sr-txt-muted">
             <b className="block font-semibold text-sr-txt">{name}</b>
             {cls}
           </div>

@@ -102,10 +102,10 @@ export function WpBasesChapter() {
       >
         <Sample title="Fredoka · display" code="font-wp-display" app="wp">
           <div className="flex flex-col gap-2">
-            <span className="font-wp-display text-[28px] font-semibold text-wp-fg">
+            <span className="font-wp-display text-[1.75rem] font-semibold text-wp-fg">
               Wigglypop — Mercado Rotom
             </span>
-            <span className="font-wp-display text-[21px] font-semibold text-wp-fg">
+            <span className="font-wp-display text-[1.3125rem] font-semibold text-wp-fg">
               Cabecera de página · 21px/600
             </span>
             <span className="font-wp-display text-base font-semibold text-wp-fg">
@@ -124,7 +124,7 @@ export function WpBasesChapter() {
             <span className="font-wp text-sm font-semibold text-wp-fg">Cuerpo · 600 (reposo)</span>
             <span className="font-wp text-sm font-bold text-wp-fg">Énfasis · 700</span>
             <span className="font-wp text-sm font-extrabold text-wp-fg">Etiqueta / botón · 800</span>
-            <span className="font-wp text-[11px] font-black uppercase tracking-[.1em] text-wp-fg-subtle">
+            <span className="font-wp text-[0.6875rem] font-black uppercase tracking-[.1em] text-wp-fg-subtle">
               Kicker · 900 versalitas
             </span>
           </div>
@@ -160,7 +160,7 @@ export function WpBasesChapter() {
             ].map(([cls, label]) => (
               <div key={cls} className="flex flex-col items-center gap-2">
                 <div className={`h-16 w-16 border-wp border-wp-line/46 bg-white ${cls}`} />
-                <span className="font-wp text-[11px] font-bold text-wp-fg-muted">{label}</span>
+                <span className="font-wp text-[0.6875rem] font-bold text-wp-fg-muted">{label}</span>
               </div>
             ))}
           </div>
@@ -177,7 +177,7 @@ export function WpBasesChapter() {
             ].map(([cls, label]) => (
               <div key={cls} className="flex flex-col items-center gap-2">
                 <div className={`h-16 w-24 rounded-wp border-wp border-wp-line/24 bg-white ${cls}`} />
-                <span className="font-wp text-[11px] font-bold text-wp-fg-muted">{label}</span>
+                <span className="font-wp text-[0.6875rem] font-bold text-wp-fg-muted">{label}</span>
               </div>
             ))}
           </div>
@@ -198,7 +198,7 @@ export function WpBasesChapter() {
                 <div
                   className={`wp-wall wp-wall-${w} wp-dots h-14 w-14 rounded-wp-sm border-wp border-wp-line/24`}
                 />
-                <span className="font-wp text-[10px] font-bold text-wp-fg-subtle">{w}</span>
+                <span className="font-wp text-[0.625rem] font-bold text-wp-fg-subtle">{w}</span>
               </div>
             ))}
           </div>
@@ -211,10 +211,10 @@ export function WpBasesChapter() {
           note="La firma del sistema es el SOBREPASO. `wp-pop` escala más allá de 1 antes de asentarse: ese 8% de más sobre la curva `ease-wp` es lo que hace que una tarjeta se sienta hinchada y no meramente animada. `ease-wp-soft` NO sobrepasa y es la que va en lo que se desvanece o desliza, donde un rebote parecería un fallo."
         >
           <div className="flex gap-3">
-            <div className="animate-wp-pop rounded-wp border-wp border-wp-line/46 bg-white px-4 py-3 font-wp text-[13px] font-extrabold text-wp-fg shadow-wp-soft motion-reduce:animate-none">
+            <div className="animate-wp-pop rounded-wp border-wp border-wp-line/46 bg-white px-4 py-3 font-wp text-[0.8125rem] font-extrabold text-wp-fg shadow-wp-soft motion-reduce:animate-none">
               wp-pop
             </div>
-            <div className="animate-wp-floaty rounded-wp border-wp border-wp-line/46 bg-white px-4 py-3 font-wp text-[13px] font-extrabold text-wp-fg shadow-wp-soft motion-reduce:animate-none">
+            <div className="animate-wp-floaty rounded-wp border-wp border-wp-line/46 bg-white px-4 py-3 font-wp text-[0.8125rem] font-extrabold text-wp-fg shadow-wp-soft motion-reduce:animate-none">
               wp-floaty
             </div>
           </div>

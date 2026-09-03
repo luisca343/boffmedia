@@ -29,14 +29,14 @@ export function SubHeader({ title, subtitle, back = false, right }: SubHeaderPro
           type="button"
           onClick={() => router.back()}
           aria-label={t("common.back")}
-          className="grid h-[34px] w-[34px] flex-none place-items-center rounded-full text-rk-fg transition-colors hover:bg-rk-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-rk-accent"
+          className="grid h-[2.125rem] w-[2.125rem] flex-none place-items-center rounded-full text-rk-fg transition-colors hover:bg-rk-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-rk-accent"
         >
           <Icon name="back" size={20} />
         </button>
       )}
       <div className="min-w-0 flex-1">
-        <h1 className="truncate text-[18px] font-bold leading-[1.1] text-rk-fg">{title}</h1>
-        {subtitle && <p className="truncate text-[12.5px] text-rk-fg-subtle">{subtitle}</p>}
+        <h1 className="truncate text-[1.125rem] font-bold leading-[1.1] text-rk-fg">{title}</h1>
+        {subtitle && <p className="truncate text-[0.78125rem] text-rk-fg-subtle">{subtitle}</p>}
       </div>
       {right}
     </div>

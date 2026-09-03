@@ -27,7 +27,7 @@ export function TrackerMatchView({ sessionId, matchId }: Props) {
 
   if (!match) {
     return (
-      <div className="grid min-h-[var(--tool-vh,100dvh)] place-items-center font-mono text-[13px] text-txt-muted">
+      <div className="grid min-h-[var(--tool-vh,100dvh)] place-items-center font-mono text-[0.8125rem] text-txt-muted">
         {t('workspace.matchNotFound')}
       </div>
     );

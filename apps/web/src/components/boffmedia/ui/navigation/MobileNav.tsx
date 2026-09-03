@@ -29,7 +29,7 @@ function NavAccordion({ label, sections, onNavigate }: { label: string; sections
         type="button"
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
-        className="flex w-full items-center justify-between py-3.5 font-display text-[17px] font-bold uppercase leading-none tracking-[0.06em] text-txt"
+        className="flex w-full items-center justify-between py-3.5 font-display text-[1.0625rem] font-bold uppercase leading-none tracking-[0.06em] text-txt"
       >
         {label}
         <Icon
@@ -45,7 +45,7 @@ function NavAccordion({ label, sections, onNavigate }: { label: string; sections
               <Link
                 href={g.href}
                 onClick={onNavigate}
-                className="flex items-center gap-2 px-1 py-1.5 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.16em] text-txt-muted no-underline"
+                className="flex items-center gap-2 px-1 py-1.5 font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.16em] text-txt-muted no-underline"
               >
                 <i aria-hidden="true" className="h-1.5 w-1.5 shrink-0 rotate-45 bg-[hsl(var(--ghue,22)_72%_56%)]" style={{ ["--ghue"]: g.hue ?? 22 } as React.CSSProperties} />
                 {g.title}
@@ -55,7 +55,7 @@ function NavAccordion({ label, sections, onNavigate }: { label: string; sections
                   key={it.href}
                   href={it.href}
                   onClick={onNavigate}
-                  className="flex items-center gap-2.5 px-1 py-2 font-body text-[14px] font-medium leading-none text-txt-muted no-underline transition-colors duration-[140ms] hover:text-txt"
+                  className="flex items-center gap-2.5 px-1 py-2 font-body text-[0.875rem] font-medium leading-none text-txt-muted no-underline transition-colors duration-[140ms] hover:text-txt"
                 >
                   <Icon name={it.icon || "wrench"} size={15} className="shrink-0 text-txt-dim" />
                   {it.label}
@@ -129,7 +129,7 @@ export function MobileNav({ pathname }: { pathname: string }) {
                     key={n.route}
                     href={n.route}
                     onClick={close}
-                    className="border-b border-line py-3.5 font-display text-[17px] font-bold uppercase leading-none tracking-[0.06em] text-txt no-underline"
+                    className="border-b border-line py-3.5 font-display text-[1.0625rem] font-bold uppercase leading-none tracking-[0.06em] text-txt no-underline"
                   >
                     {tNav(n.labelKey)}
                   </Link>

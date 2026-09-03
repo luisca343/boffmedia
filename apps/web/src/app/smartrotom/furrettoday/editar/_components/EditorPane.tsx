@@ -76,7 +76,7 @@ export function EditorPane({
   if (!article) {
     return (
       <EmptyState
-        className="min-h-[420px]"
+        className="min-h-[26.25rem]"
         title={t("emptyTitle")}
         message={t("emptyMessage")}
         actionLabel={t("emptyAction")}
@@ -181,7 +181,7 @@ function EditorPaneContent({
           aria-label={t("editor.titleAria")}
           value={form.title}
           onChange={(e) => set("title", e.target.value)}
-          className="font-ft-display w-full border-0 bg-transparent p-0 text-[clamp(32px,4vw,48px)] leading-none tracking-[0.02em] text-ft-ink outline-none"
+          className="font-ft-display w-full border-0 bg-transparent p-0 text-[clamp(2rem,4vw,3rem)] leading-none tracking-[0.02em] text-ft-ink outline-none"
         />
         <input
           aria-label={t("editor.leadAria")}
@@ -260,9 +260,9 @@ function EditorPaneContent({
 
       <div
         className="ft-article rounded-ft border-ft-hair border-ft-ink mx-5 my-3 overflow-hidden
-          [&_.ck-editor\_\_editable]:min-h-[460px] [&_.ck-editor\_\_editable]:bg-white
+          [&_.ck-editor\_\_editable]:min-h-[28.75rem] [&_.ck-editor\_\_editable]:bg-white
           [&_.ck-editor\_\_editable]:px-9 [&_.ck-editor\_\_editable]:py-8
-          [&_.ck-editor\_\_editable]:text-[17px] [&_.ck-editor\_\_editable]:leading-[1.7]
+          [&_.ck-editor\_\_editable]:text-[1.0625rem] [&_.ck-editor\_\_editable]:leading-[1.7]
           [&_.ck-editor\_\_editable]:border-0 [&_.ck-editor\_\_editable]:shadow-none
           [&_.ck-editor\_\_editable]:outline-none [&_.ck-editor\_\_top]:border-0
           [&_.ck-editor\_\_top]:border-b [&_.ck-editor\_\_top]:border-dashed

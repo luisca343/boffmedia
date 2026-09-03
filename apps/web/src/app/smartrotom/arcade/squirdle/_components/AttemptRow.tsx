@@ -23,7 +23,7 @@ export function AttemptRow({ guess, target, name, revealed }: AttemptRowProps) {
   return (
     <div
       className={cn(
-        "grid grid-cols-5 gap-1.5 rounded-xl md:grid-cols-[76px_1fr_1.2fr_1.2fr_.9fr_.9fr] md:gap-2",
+        "grid grid-cols-5 gap-1.5 rounded-xl md:grid-cols-[4.75rem_1fr_1.2fr_1.2fr_.9fr_.9fr] md:gap-2",
         revealed && "bg-ar-lime/[.06] p-1.5 ring-1 ring-ar-lime/40 md:p-1",
       )}
     >
@@ -35,7 +35,7 @@ export function AttemptRow({ guess, target, name, revealed }: AttemptRowProps) {
         )}
       >
         <PixelArt sprite={creatureSprite(tone)} scale={2} className="shrink-0" />
-        <span className="truncate font-ar-mono text-[10px] leading-tight text-ar-ink-dim md:text-center md:text-[8.5px]">
+        <span className="truncate font-ar-mono text-[0.625rem] leading-tight text-ar-ink-dim md:text-center md:text-[0.53125rem]">
           {name}
         </span>
       </div>

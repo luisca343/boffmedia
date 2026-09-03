@@ -13,7 +13,7 @@ import { getTargetMode, abilityRange } from "./ability-format"
 
 function MiniFlag({ icon, children }: { icon?: IconName; children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1 border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper)] px-1.5 py-px text-[10.5px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:7px_9px_8px_10px] [&_svg]:text-[color:var(--mwp-ink-soft)]">
+    <span className="inline-flex items-center gap-1 border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper)] px-1.5 py-px text-[0.65625rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:7px_9px_8px_10px] [&_svg]:text-[color:var(--mwp-ink-soft)]">
       {icon && <Icon name={icon} size={10} />}
       {children}
     </span>
@@ -30,14 +30,14 @@ function InlineShell({ cat, id, rec, badges, facts, desc, onNav }: { cat: string
         <MewTile cat={cat} rec={rec as never} size={42} />
         <span className="flex min-w-0 flex-1 flex-col gap-1">
           <span className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[14px]/[1.15] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] group-hover:text-[color:var(--mwp-red-deep)]">{rec.name}</span>
+            <span className="text-[0.875rem]/[1.15] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] group-hover:text-[color:var(--mwp-red-deep)]">{rec.name}</span>
             {badges}
           </span>
-          {clipped ? <MewText muted className="text-[12.5px]/[1.4]">{clipped}</MewText> : null}
+          {clipped ? <MewText muted className="text-[0.78125rem]/[1.4]">{clipped}</MewText> : null}
         </span>
         <Icon name="arrow" size={13} className="flex-none text-[color:var(--mwp-ink-soft)] group-hover:text-[color:var(--mwp-red)]" />
       </button>
-      {facts ? <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[11.5px]/[1.3] text-[color:var(--mwp-ink-soft)]">{facts}</div> : null}
+      {facts ? <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[0.71875rem]/[1.3] text-[color:var(--mwp-ink-soft)]">{facts}</div> : null}
     </div>
   )
 }
@@ -45,7 +45,7 @@ function InlineShell({ cat, id, rec, badges, facts, desc, onNav }: { cat: string
 function factLabel(label: string, value: React.ReactNode) {
   return (
     <span className="inline-flex items-baseline gap-1">
-      <b className="font-sans text-[10px] uppercase tracking-[0.05em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">{label}</b>
+      <b className="font-sans text-[0.625rem] uppercase tracking-[0.05em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">{label}</b>
       <span className="font-bold text-[color:var(--mwp-ink)]">{value}</span>
     </span>
   )

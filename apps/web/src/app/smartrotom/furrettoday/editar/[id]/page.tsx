@@ -23,11 +23,11 @@ export default function EditArticlePage({
 
   if (status === "loading") {
     return (
-      <div className="mx-auto max-w-[1400px] px-6 py-10">
-        <Skeleton className="h-[220px] w-full" />
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[360px_minmax(0,1fr)]">
-          <Skeleton className="h-[560px] w-full" />
-          <Skeleton className="h-[560px] w-full" />
+      <div className="mx-auto max-w-[87.5rem] px-6 py-10">
+        <Skeleton className="h-[13.75rem] w-full" />
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[22.5rem_minmax(0,1fr)]">
+          <Skeleton className="h-[35rem] w-full" />
+          <Skeleton className="h-[35rem] w-full" />
         </div>
       </div>
     );
@@ -35,7 +35,7 @@ export default function EditArticlePage({
 
   if (!canManageNews) {
     return (
-      <div className="mx-auto max-w-[1400px] px-6 py-16">
+      <div className="mx-auto max-w-[87.5rem] px-6 py-16">
         <EmptyState
           title={t("deniedTitle")}
           message={t("deniedMessage")}

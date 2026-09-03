@@ -93,11 +93,11 @@ export function SrBasesChapter() {
       >
         <Sample title="Los seis" code="SMARTROTOM_V3.md §0" col>
           <div className="w-full overflow-x-auto">
-            <div className="min-w-[640px]">
+            <div className="min-w-[40rem]">
               <div
                 className={cn(
                   MONO_LABEL,
-                  "grid grid-cols-[1.5fr_0.7fr_1.1fr_2fr] gap-4 border-b border-solid border-sr-line pb-[10px] text-sr-txt-dim",
+                  "grid grid-cols-[1.5fr_0.7fr_1.1fr_2fr] gap-4 border-b border-solid border-sr-line pb-[0.625rem] text-sr-txt-dim",
                 )}
               >
                 <span>Sistema</span>
@@ -110,13 +110,13 @@ export function SrBasesChapter() {
                   key={s.ns}
                   className="grid grid-cols-[1.5fr_0.7fr_1.1fr_2fr] items-baseline gap-4 border-b border-dashed border-sr-line py-3 last:border-b-0"
                 >
-                  <span className="text-[14px] leading-[1.3]">
-                    <b className={cn(HEAD4, "block text-[14px] text-sr-txt")}>{s.name}</b>
-                    <small className="font-mono text-[10px] leading-none text-sr-txt-dim">{s.what}</small>
+                  <span className="text-[0.875rem] leading-[1.3]">
+                    <b className={cn(HEAD4, "block text-[0.875rem] text-sr-txt")}>{s.name}</b>
+                    <small className="font-mono text-[0.625rem] leading-none text-sr-txt-dim">{s.what}</small>
                   </span>
-                  <code className="font-mono text-[12px] font-semibold leading-none text-sr-accent">{s.ns}</code>
-                  <code className="font-mono text-[11px] leading-[1.4] text-sr-txt-muted">{s.scope}</code>
-                  <span className="font-body text-[12px] leading-[1.5] text-sr-txt-muted">{s.backing}</span>
+                  <code className="font-mono text-[0.75rem] font-semibold leading-none text-sr-accent">{s.ns}</code>
+                  <code className="font-mono text-[0.6875rem] leading-[1.4] text-sr-txt-muted">{s.scope}</code>
+                  <span className="font-body text-[0.75rem] leading-[1.5] text-sr-txt-muted">{s.backing}</span>
                 </div>
               ))}
             </div>
@@ -150,8 +150,8 @@ export function SrBasesChapter() {
               ],
             ].map(([t, d]) => (
               <div key={t} className="border-l-4 border-l-sr-accent border-y-0 border-r-0 border-solid bg-sr-panel-2 py-3 px-4">
-                <b className={cn(HEAD4, "block text-[13px] text-sr-txt")}>{t}</b>
-                <span className="font-body text-[13px] leading-[1.6] text-sr-txt-muted">{d}</span>
+                <b className={cn(HEAD4, "block text-[0.8125rem] text-sr-txt")}>{t}</b>
+                <span className="font-body text-[0.8125rem] leading-[1.6] text-sr-txt-muted">{d}</span>
               </div>
             ))}
           </div>
@@ -186,13 +186,13 @@ export function SrBasesChapter() {
             </>
           }
         >
-          <span className="cut [--cut:7px] bg-sr-accent px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-sr-accent-ink">
+          <span className="cut [--cut:7px] bg-sr-accent px-4 py-2 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-sr-accent-ink">
             accent · ink
           </span>
-          <span className="cut cut-edge-slant [--cut:7px] [--cut-line:var(--sr-accent-line)] border border-solid border-sr-accent-line bg-sr-accent-soft px-4 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-sr-accent-bright">
+          <span className="cut cut-edge-slant [--cut:7px] [--cut-line:var(--sr-accent-line)] border border-solid border-sr-accent-line bg-sr-accent-soft px-4 py-2 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-sr-accent-bright">
             accent-soft · line
           </span>
-          <span className="font-body text-[14px] text-sr-txt-muted">← cambia con el tema activo</span>
+          <span className="font-body text-[0.875rem] text-sr-txt-muted">← cambia con el tema activo</span>
         </Sample>
 
         <Sample title="Estado" code="ok · warn · bad">
@@ -204,7 +204,7 @@ export function SrBasesChapter() {
             <span
               key={label}
               className={cn(
-                "border-y-0 border-r-0 border-l-4 border-solid bg-sr-panel-2 px-4 py-[10px] font-mono text-[12px] font-semibold uppercase tracking-[0.1em]",
+                "border-y-0 border-r-0 border-l-4 border-solid bg-sr-panel-2 px-4 py-[0.625rem] font-mono text-[0.75rem] font-semibold uppercase tracking-[0.1em]",
                 tone,
               )}
             >
@@ -227,7 +227,7 @@ export function SrBasesChapter() {
         }
       >
         <Sample title="Escala" code="Saira Condensed · Saira · IBM Plex Mono" col>
-          <div className="grid w-full gap-[18px]">
+          <div className="grid w-full gap-[1.125rem]">
             {[
               [
                 "Display / 800 italic / 40–72px",
@@ -251,14 +251,14 @@ export function SrBasesChapter() {
                 "Primitiva / display 700 recto / 11–15px",
                 <span
                   key="d"
-                  className="font-display text-[14px] font-bold not-italic uppercase leading-none tracking-[0.08em] text-sr-txt"
+                  className="font-display text-[0.875rem] font-bold not-italic uppercase leading-none tracking-[0.08em] text-sr-txt"
                 >
                   Botones y badges nunca en cursiva
                 </span>,
               ],
               [
                 "Cuerpo / Saira 400 / 13–15px",
-                <span key="e" className="max-w-[52ch] font-body text-[15px] leading-[1.6] text-sr-txt-muted">
+                <span key="e" className="max-w-[52ch] font-body text-[0.9375rem] leading-[1.6] text-sr-txt-muted">
                   El chrome es el marco alrededor de las apps: nav, migas, ajustes y estados de carga.
                 </span>,
               ],
@@ -271,9 +271,9 @@ export function SrBasesChapter() {
             ].map(([meta, node], i) => (
               <div
                 key={i}
-                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-sr-line pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[230px_1fr] sm:gap-[22px]"
+                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-sr-line pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[14.375rem_1fr] sm:gap-[1.375rem]"
               >
-                <span className="font-mono text-[11px] font-medium leading-[1.6] text-sr-txt-dim">
+                <span className="font-mono text-[0.6875rem] font-medium leading-[1.6] text-sr-txt-dim">
                   {meta as React.ReactNode}
                 </span>
                 {node as React.ReactNode}
@@ -309,16 +309,16 @@ export function SrBasesChapter() {
           }
         >
           {CUTS.map(([label, clip, token]) => (
-            <div key={label} className="grid gap-[6px]">
+            <div key={label} className="grid gap-[0.375rem]">
               <div
                 className={cn(
-                  "grid h-[72px] w-[130px] place-items-center border border-solid border-sr-line-2 bg-sr-panel-2 font-mono text-[10px] font-medium uppercase leading-none tracking-[0.08em] text-sr-txt-muted",
+                  "grid h-[4.5rem] w-[8.125rem] place-items-center border border-solid border-sr-line-2 bg-sr-panel-2 font-mono text-[0.625rem] font-medium uppercase leading-none tracking-[0.08em] text-sr-txt-muted",
                   clip,
                 )}
               >
                 {label}
               </div>
-              <code className="font-mono text-[10px] leading-none text-sr-txt-dim">{token}</code>
+              <code className="font-mono text-[0.625rem] leading-none text-sr-txt-dim">{token}</code>
             </div>
           ))}
         </Sample>
@@ -329,7 +329,7 @@ export function SrBasesChapter() {
               <div
                 key={s}
                 className={cn(
-                  "border-y-0 border-r-0 border-l-4 border-solid bg-sr-panel-2 py-[11px] px-4 font-mono text-[12px] font-semibold uppercase tracking-[0.1em]",
+                  "border-y-0 border-r-0 border-l-4 border-solid bg-sr-panel-2 py-[0.6875rem] px-4 font-mono text-[0.75rem] font-semibold uppercase tracking-[0.1em]",
                   s === "Activo" ? "border-l-sr-accent text-sr-txt" : "border-l-sr-line text-sr-txt-dim",
                 )}
               >

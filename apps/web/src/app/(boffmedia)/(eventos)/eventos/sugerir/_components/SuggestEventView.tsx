@@ -75,17 +75,17 @@ export function SuggestEventView() {
   }, [])
 
   return (
-    <main className="wrap pb-[90px] pt-[34px]">
+    <main className="wrap pb-[5.625rem] pt-[2.125rem]">
       <div className="mb-6">
         <span className="mono-label">{t("kicker")}</span>
-        <h1 className="mt-2 text-[clamp(44px,6vw,72px)]">{t("title")}</h1>
-        <p className="mt-3 max-w-[64ch] font-body text-[16px]/[1.55] text-txt-muted">{t("lead")}</p>
+        <h1 className="mt-2 text-[clamp(2.75rem,6vw,4.5rem)]">{t("title")}</h1>
+        <p className="mt-3 max-w-[64ch] font-body text-[1rem]/[1.55] text-txt-muted">{t("lead")}</p>
       </div>
 
       {submitted ? (
         <SuggestSuccess onReset={reset} />
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start">
+        <div className="grid gap-6 lg:grid-cols-[1fr_20rem] lg:items-start">
           <SuggestForm data={data} onChange={set} onSubmit={submit} submitting={submitting} />
           <Guidelines />
         </div>

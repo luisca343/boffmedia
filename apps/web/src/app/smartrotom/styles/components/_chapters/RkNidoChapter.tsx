@@ -71,7 +71,7 @@ export function RkNidoChapter() {
             {REACTIONS.map((r) => (
               <div key={r.type} className="flex flex-col items-center gap-1.5">
                 <ReactionGlyph type={r.type} size={28} active />
-                <span className="text-[11px] text-rk-fg-subtle">{REACTION_LABEL[r.type]}</span>
+                <span className="text-[0.6875rem] text-rk-fg-subtle">{REACTION_LABEL[r.type]}</span>
               </div>
             ))}
           </div>
@@ -115,7 +115,7 @@ export function RkNidoChapter() {
         }
       >
         <Sample title="ActionBtn" code='<ActionBtn icon="reply" tone="accent" count />' app="rk">
-          <div className="flex max-w-[440px] items-center justify-between">
+          <div className="flex max-w-[27.5rem] items-center justify-between">
             <ActionBtn icon="reply" label="Responder" count={318} tone="accent" />
             <ActionBtn icon="retrino" label="Retrinar" count={1240} tone="rt" active fillActive={false} />
             <ActionBtn icon="bookmark" label="Guardar" tone="accent" />

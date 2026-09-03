@@ -46,7 +46,7 @@ export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose:
         {mon && <MonRow mon={mon} />}
 
         <div className="my-5 text-center">
-          <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+          <div className="font-wp text-[0.6875rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
             {t("modal.bid.yourBid")}
           </div>
           <Price amount={amount} size={34} />
@@ -61,7 +61,7 @@ export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose:
           >
             <Icon name="minus" size={16} />
           </Button>
-          <div className="wp-num flex-1 rounded-[10px] border border-wp-line/24 bg-wp-panel-2 py-2.5 text-center font-wp text-[15px] text-wp-fg">
+          <div className="wp-num flex-1 rounded-[10px] border border-wp-line/24 bg-wp-panel-2 py-2.5 text-center font-wp text-[0.9375rem] text-wp-fg">
             ₽{fmt(amount)}
           </div>
           <Button
@@ -73,13 +73,13 @@ export function BidModal({ listing: L, onClose }: { listing: WpListing; onClose:
           </Button>
         </div>
 
-        <div className="mt-2 text-center font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+        <div className="mt-2 text-center font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
           {t("modal.bid.minIncrementNote", { step: fmt(step) })}
         </div>
 
         <Button
           variant="primary"
-          className="mt-4 w-full py-[13px]"
+          className="mt-4 w-full py-[0.8125rem]"
           disabled={insufficient || placeBid.isPending}
           onClick={() =>
             placeBid.mutate({ listingId: L.id, amount }, { onSuccess: onClose })

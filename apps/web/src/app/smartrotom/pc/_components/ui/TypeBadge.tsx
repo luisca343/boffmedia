@@ -21,7 +21,7 @@ export function TypeBadge({ type, size = "md" }: TypeBadgeProps) {
     <span
       className={[
         "inline-flex items-center rounded-pc-pill font-pc font-bold tracking-[.02em]",
-        size === "sm" ? "px-[7px] py-[2px] text-[10px]" : "px-[9px] py-[3px] text-[11px]",
+        size === "sm" ? "px-[0.4375rem] py-[2px] text-[0.625rem]" : "px-[0.5625rem] py-[3px] text-[0.6875rem]",
       ].join(" ")}
       style={{ background: c, color: fg, boxShadow: `0 2px 8px -2px ${c}99` }}
     >

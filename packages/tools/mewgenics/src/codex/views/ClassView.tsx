@@ -48,7 +48,7 @@ function MewAbilityTable({ ids, onNav }: { ids?: string[]; onNav: NavFn }) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-[12px] border-collapse">
+      <table className="w-full text-[0.75rem] border-collapse">
         <thead>
           <tr className="border-b-2 border-[color:var(--mwp-ink-line)]">
             <th className="text-left px-2 py-2 font-semibold text-[color:var(--mwp-ink-soft)]">{t("label.ability")}</th>
@@ -69,7 +69,7 @@ function MewAbilityTable({ ids, onNav }: { ids?: string[]; onNav: NavFn }) {
               <td className="px-2 py-2 text-center text-[color:var(--mwp-ink-soft)]">{row.cost}</td>
               <td className="px-2 py-2 text-center text-[color:var(--mwp-ink-soft)]">{row.range}</td>
               <td className="px-2 py-2 text-center text-[color:var(--mwp-ink-soft)]">{row.damage}</td>
-              <td className="px-2 py-2 text-center text-[color:var(--mwp-ink-soft)] text-[11px]">{row.group}</td>
+              <td className="px-2 py-2 text-center text-[color:var(--mwp-ink-soft)] text-[0.6875rem]">{row.group}</td>
             </tr>
           ))}
         </tbody>

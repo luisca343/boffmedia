@@ -30,8 +30,8 @@ export function Summary({
           <Empty icon="sword" title={t("build_planner.no_weapon")} lead={t("build_planner.no_weapon_lead")} />
         ) : (
           <>
-            <div className="font-display text-[15px] leading-tight font-bold uppercase tracking-[0.02em] mb-0.5 not-italic">{weapon.name}</div>
-            <div className="font-mono text-[11px] leading-none text-txt-muted mb-3">{t(`weapons.${weapon.kind}`)}</div>
+            <div className="font-display text-[0.9375rem] leading-tight font-bold uppercase tracking-[0.02em] mb-0.5 not-italic">{weapon.name}</div>
+            <div className="font-mono text-[0.6875rem] leading-none text-txt-muted mb-3">{t(`weapons.${weapon.kind}`)}</div>
             <MhStat3 items={[
               { value: weaponAttack(weapon), label: t("attack"), mod: "attack" },
               { value: `${weapon.affinity >= 0 ? "+" : ""}${weapon.affinity}%`, label: t("affinity"), color: weapon.affinity >= 0 ? "var(--ok)" : "var(--bad)" },
@@ -52,7 +52,7 @@ export function Summary({
       <MhPanel title={t("defense")} icon="shield">
         <div className="flex items-end gap-3.5 mb-3">
           <div>
-            <div className="font-display text-[34px] leading-none italic font-extrabold text-[var(--info)]">{stats.defenseMin}</div>
+            <div className="font-display text-[2.125rem] leading-none italic font-extrabold text-[var(--info)]">{stats.defenseMin}</div>
             <MhLabel className="mt-1.5 mb-0">{t("build_planner.base_defense")}</MhLabel>
           </div>
         </div>

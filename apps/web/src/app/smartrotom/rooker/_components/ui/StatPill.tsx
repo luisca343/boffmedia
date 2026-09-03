@@ -32,9 +32,9 @@ export function StatPill({ value, label, icon, tone = "accent", filled = false }
     <div className="min-w-0 flex-1 rounded-rk-md border border-rk-line bg-rk-card px-1.5 py-2.5 text-center">
       <div className="flex items-center justify-center gap-1.5">
         <Icon name={icon} size={14} fill={filled} className={cn("flex-none", TONE[tone])} />
-        <span className="text-[18px] font-bold tabular-nums text-rk-fg">{value}</span>
+        <span className="text-[1.125rem] font-bold tabular-nums text-rk-fg">{value}</span>
       </div>
-      <div className="mt-0.5 text-[11px] font-semibold tracking-[.02em] text-rk-fg-subtle">{label}</div>
+      <div className="mt-0.5 text-[0.6875rem] font-semibold tracking-[.02em] text-rk-fg-subtle">{label}</div>
     </div>
   )
 }

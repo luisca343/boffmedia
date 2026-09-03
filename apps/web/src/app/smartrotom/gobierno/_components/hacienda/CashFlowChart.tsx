@@ -46,7 +46,7 @@ export function CashFlowChart({ series }: { series: Tesoreria["series"] }) {
         icon="signal"
         dep="hacienda"
         right={
-          <div className="flex items-center gap-3 font-gt-mono text-[10.5px] text-gt-ink-500">
+          <div className="flex items-center gap-3 font-gt-mono text-[0.65625rem] text-gt-ink-500">
             <span className="flex items-center gap-1.5">
               <span className={`h-2.5 w-2.5 rounded-[2px] ${TONES.civic.solidBg}`} /> {t("tesoreria.ingresos")}
             </span>

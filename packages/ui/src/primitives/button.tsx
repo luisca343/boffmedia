@@ -76,7 +76,7 @@ export const BTN_BASE = cn(
  *  padding, so a Button, an IconButton and an Input line up in a toolbar
  *  whatever type each of them carries. */
 export const BTN_BOX: Record<ButtonSize, string> = {
-  sm: "h-8 px-[14px] [--cut-tag:8px]",
+  sm: "h-8 px-[0.875rem] [--cut-tag:8px]",
   md: "h-10 px-5 [--cut-tag:10px]",
   lg: "h-12 px-7 [--cut-tag:12px]",
 }
@@ -86,9 +86,9 @@ export const BTN_BOX: Record<ButtonSize, string> = {
 const TYPE: Record<ButtonSize, string> = {
   // line-height is pinned to 1 via the `/none` token: a bare `leading-none` is
   // stripped by tailwind-merge when it sits next to an arbitrary `text-[..px]`.
-  sm: "text-[12px]/none",
-  md: "text-[13px]/none",
-  lg: "text-[15px]/none",
+  sm: "text-[0.75rem]/none",
+  md: "text-[0.8125rem]/none",
+  lg: "text-[0.9375rem]/none",
 }
 
 const GAP: Record<ButtonSize, string> = { sm: "gap-1.5", md: "gap-2", lg: "gap-2.5" }

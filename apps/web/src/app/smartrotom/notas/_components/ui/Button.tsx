@@ -3,7 +3,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 type Variant = "primary" | "ghost";
 
 const BASE =
-  "inline-flex h-9 items-center justify-center gap-2 rounded-nt-md px-3.5 text-[13.5px] font-[550] transition-all disabled:opacity-50 disabled:pointer-events-none";
+  "inline-flex h-9 items-center justify-center gap-2 rounded-nt-md px-3.5 text-[0.84375rem] font-[550] transition-all disabled:opacity-50 disabled:pointer-events-none";
 
 const VARIANT: Record<Variant, string> = {
   primary:
@@ -40,7 +40,7 @@ export function IconButton({
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
-      className={`inline-flex h-8 min-w-8 items-center justify-center gap-1.5 rounded-nt-sm border border-transparent px-[7px] text-[13px] transition-all ${
+      className={`inline-flex h-8 min-w-8 items-center justify-center gap-1.5 rounded-nt-sm border border-transparent px-[0.4375rem] text-[0.8125rem] transition-all ${
         active
           ? "bg-nt-accent/15 text-nt-accent-fg"
           : "text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"

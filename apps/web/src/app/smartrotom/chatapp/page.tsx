@@ -335,11 +335,11 @@ function EmptyConversation() {
     <section className="relative flex min-w-0 flex-1 flex-col bg-ca-wallpaper">
       <div className="ca-doodle pointer-events-none absolute inset-0" />
       <div className="relative z-[1] flex flex-1 flex-col items-center justify-center gap-4 p-10 text-center">
-        <div className="grid h-[92px] w-[92px] place-items-center rounded-full bg-ca-accent/[.14] text-ca-accent-soft">
+        <div className="grid h-[5.75rem] w-[5.75rem] place-items-center rounded-full bg-ca-accent/[.14] text-ca-accent-soft">
           <Icon name="message" size={42} />
         </div>
-        <h3 className="text-[22px] font-semibold text-ca-50">{t("empty.noConversation")}</h3>
-        <p className="max-w-[360px] text-[14.5px] leading-[1.6] text-ca-400">
+        <h3 className="text-[1.375rem] font-semibold text-ca-50">{t("empty.noConversation")}</h3>
+        <p className="max-w-[22.5rem] text-[0.90625rem] leading-[1.6] text-ca-400">
           {t("empty.noConversationBody")}
         </p>
       </div>

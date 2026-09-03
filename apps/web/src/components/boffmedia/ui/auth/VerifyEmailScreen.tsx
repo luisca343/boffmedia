@@ -46,14 +46,14 @@ export function VerifyEmailScreen() {
 
   return (
     <AuthShell title={t("verify.title")}>
-      <div className="flex flex-col gap-[15px]">
-        <p className={`font-body text-[14px]/[1.55] not-italic normal-case ${message.tone}`}>
+      <div className="flex flex-col gap-[0.9375rem]">
+        <p className={`font-body text-[0.875rem]/[1.55] not-italic normal-case ${message.tone}`}>
           {message.text}
         </p>
 
         {canResend && (
-          <div className="flex flex-col gap-[11px]">
-            <p className="font-body text-[13.5px]/[1.5] not-italic normal-case text-txt-muted">
+          <div className="flex flex-col gap-[0.6875rem]">
+            <p className="font-body text-[0.84375rem]/[1.5] not-italic normal-case text-txt-muted">
               {sent ? t("resend.sentLead") : t("verify.resendLead")}
             </p>
             <Field label={t("fields.email")}>

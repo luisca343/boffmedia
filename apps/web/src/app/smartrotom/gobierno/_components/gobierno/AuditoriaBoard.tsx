@@ -87,7 +87,7 @@ export function AuditoriaBoard() {
             ...AUDIT_DEPS.map((d) => ({ value: d, label: t(DEPARTMENTS[d].labelKey) })),
           ]}
         />
-        <div className="w-full max-w-[200px]">
+        <div className="w-full max-w-[12.5rem]">
           <Select
             value={actorUuid}
             onChange={setFilter(setActorUuid)}
@@ -95,10 +95,10 @@ export function AuditoriaBoard() {
             options={[{ value: "", label: t("auditoria.todos") }, ...(oficiales ?? []).map((o) => ({ value: o.uuid, label: o.username }))]}
           />
         </div>
-        <div className="w-full max-w-[150px]">
+        <div className="w-full max-w-[9.375rem]">
           <Field type="date" value={dateFrom} onChange={setFilter(setDateFrom)} label={t("auditoria.desde")} />
         </div>
-        <div className="w-full max-w-[150px]">
+        <div className="w-full max-w-[9.375rem]">
           <Field type="date" value={dateTo} onChange={setFilter(setDateTo)} label={t("auditoria.hasta")} />
         </div>
       </div>
@@ -127,7 +127,7 @@ export function AuditoriaBoard() {
                 const meta = (DEPARTMENTS as Partial<Record<string, { labelKey: string; tone: Tone }>>)[a.dep]
                 return (
                   <TR key={a.id}>
-                    <TD className="whitespace-nowrap font-gt-mono text-[11px] text-gt-ink-500">
+                    <TD className="whitespace-nowrap font-gt-mono text-[0.6875rem] text-gt-ink-500">
                       {fmtDateTime(a.createdAt, intlLocale)}
                     </TD>
                     <TD>
@@ -142,11 +142,11 @@ export function AuditoriaBoard() {
                       </button>
                     </TD>
                     <TD>
-                      <span className="font-gt-mono text-[10px] font-bold uppercase tracking-[.08em] text-gt-ink-600">
+                      <span className="font-gt-mono text-[0.625rem] font-bold uppercase tracking-[.08em] text-gt-ink-600">
                         {a.action}
                       </span>
                     </TD>
-                    <TD className="text-[12.5px]">{a.target}</TD>
+                    <TD className="text-[0.78125rem]">{a.target}</TD>
                     <TD>
                       <Badge tone={meta?.tone ?? "default"}>{meta ? t(meta.labelKey) : a.dep}</Badge>
                     </TD>

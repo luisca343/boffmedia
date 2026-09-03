@@ -26,23 +26,23 @@ export function ShareDialog({
 
   return (
     <Overlay onClose={onClose} align="center">
-      <div className={`${MODAL_PANEL} w-[460px] max-w-[92vw]`}>
-        <div className="flex items-center gap-2.5 border-b border-nt-border px-[18px] py-4">
+      <div className={`${MODAL_PANEL} w-[28.75rem] max-w-[92vw]`}>
+        <div className="flex items-center gap-2.5 border-b border-nt-border px-[1.125rem] py-4">
           <Icon name="share" size={17} className="text-nt-accent-fg" />
-          <h3 className="m-0 flex-1 truncate text-[16px] font-[650] text-nt-fg">
+          <h3 className="m-0 flex-1 truncate text-[1rem] font-[650] text-nt-fg">
             {t("share.title")} «{note.title}»
           </h3>
           <button onClick={onClose} aria-label={t("common.close")} className="text-nt-fg-subtle hover:text-nt-fg">
             <Icon name="x" size={18} />
           </button>
         </div>
-        <div className="p-[18px]">
+        <div className="p-[1.125rem]">
           <div className="mb-4 flex items-center gap-2">
             <input
               value={uuid}
               onChange={(e) => setUuid(e.target.value)}
               placeholder={t("share.trainerUuid")}
-              className="h-9 flex-1 rounded-nt-md border border-nt-border bg-nt-bg-2 px-3 text-[13px] text-nt-fg outline-none placeholder:text-nt-fg-subtle focus:border-nt-accent"
+              className="h-9 flex-1 rounded-nt-md border border-nt-border bg-nt-bg-2 px-3 text-[0.8125rem] text-nt-fg outline-none placeholder:text-nt-fg-subtle focus:border-nt-accent"
             />
             <button
               disabled={!uuid.trim()}
@@ -50,13 +50,13 @@ export function ShareDialog({
                 onShare(uuid.trim());
                 setUuid("");
               }}
-              className="inline-flex h-9 items-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[13px] font-[550] text-white disabled:opacity-50 hover:enabled:brightness-[1.06]"
+              className="inline-flex h-9 items-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[0.8125rem] font-[550] text-white disabled:opacity-50 hover:enabled:brightness-[1.06]"
             >
               <Icon name="plus" size={14} /> {t("share.add")}
             </button>
           </div>
 
-          <div className="mb-2 font-nt-display text-[10px] font-semibold uppercase tracking-[.12em] text-nt-fg-subtle">
+          <div className="mb-2 font-nt-display text-[0.625rem] font-semibold uppercase tracking-[.12em] text-nt-fg-subtle">
             {t("share.shareWith")}
           </div>
           {note.sharedWith.length ? (
@@ -64,7 +64,7 @@ export function ShareDialog({
               {note.sharedWith.map((u) => (
                 <div key={u} className="flex items-center gap-2.5 rounded-nt-md px-1.5 py-2 hover:bg-nt-hover">
                   <Avatar name={u} color={`rgb(${COLOR_RGB[hashColor(u)]})`} size={30} />
-                  <span className="flex-1 truncate text-[13px] text-nt-fg">{u}</span>
+                  <span className="flex-1 truncate text-[0.8125rem] text-nt-fg">{u}</span>
                   <button
                     onClick={() => onUnshare(u)}
                     className="text-nt-fg-subtle hover:text-nt-c-error"
@@ -76,7 +76,7 @@ export function ShareDialog({
               ))}
             </div>
           ) : (
-            <p className="m-0 text-[13px] text-nt-fg-subtle">{t("share.onlyYou")}</p>
+            <p className="m-0 text-[0.8125rem] text-nt-fg-subtle">{t("share.onlyYou")}</p>
           )}
 
           <button
@@ -85,10 +85,10 @@ export function ShareDialog({
           >
             <Icon name={note.public ? "globe" : "lock"} size={16} className="text-nt-accent-fg" />
             <span className="flex-1">
-              <span className="block text-[13px] font-medium text-nt-fg">
+              <span className="block text-[0.8125rem] font-medium text-nt-fg">
                 {note.public ? t("share.public") : t("share.private")}
               </span>
-              <span className="block text-[11.5px] text-nt-fg-muted">
+              <span className="block text-[0.71875rem] text-nt-fg-muted">
                 {note.public ? t("share.publicDesc") : t("share.privateDesc")}
               </span>
             </span>
@@ -99,7 +99,7 @@ export function ShareDialog({
             >
               <span
                 className={`absolute top-0.5 h-4 w-4 rounded-full bg-white transition-all ${
-                  note.public ? "left-[18px]" : "left-0.5"
+                  note.public ? "left-[1.125rem]" : "left-0.5"
                 }`}
               />
             </span>

@@ -11,7 +11,7 @@ function Comment({ c }: { c: YtComment }) {
       <Avatar src={c.authorAvatar} name={c.author} size={38} />
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 text-xs text-mw-fg-mute">
-          <strong className="text-[13px] text-mw-fg">{c.author}</strong>
+          <strong className="text-[0.8125rem] text-mw-fg">{c.author}</strong>
           <span>{relativeTime(c.publishedAt)}</span>
         </div>
         <p className="my-1.5 whitespace-pre-line text-sm leading-[1.55] text-mw-fg">{c.text}</p>

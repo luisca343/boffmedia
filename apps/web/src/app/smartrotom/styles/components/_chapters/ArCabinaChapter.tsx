@@ -52,18 +52,18 @@ export function ArCabinaChapter() {
             return (
               <div
                 key={r}
-                className="grid h-[92px] w-[92px] place-items-center rounded-xl text-center"
+                className="grid h-[5.75rem] w-[5.75rem] place-items-center rounded-xl text-center"
                 style={{
                   background: `linear-gradient(180deg, ${skin.bg}, rgba(0,0,0,0.4))`,
                   border: `1px solid ${skin.bd}`,
                   boxShadow: `inset 0 0 22px ${skin.bd}`,
                 }}
               >
-                <span className="font-ar-display text-[18px]" style={{ color: skin.fg }}>
+                <span className="font-ar-display text-[1.125rem]" style={{ color: skin.fg }}>
                   ◈
                 </span>
                 <span
-                  className="font-ar-mono text-[9px] uppercase tracking-[0.12em]"
+                  className="font-ar-mono text-[0.5625rem] uppercase tracking-[0.12em]"
                   style={{ color: skin.fg }}
                 >
                   {skin.name}
@@ -120,19 +120,19 @@ export function ArCabinaChapter() {
         </Sample>
 
         <Sample title="Día de racha" code="Panel + Tag + ItemImage" app="ar">
-          <Panel tone="cyan" tight className="w-[200px] text-center">
-            <div className="font-ar-display text-[8px] uppercase tracking-[0.18em] text-ar-cyan">Día 04</div>
-            <div className="mx-auto my-2 grid h-[60px] w-[60px] place-items-center rounded-xl border border-ar-cyan/40 bg-ar-cyan/10 font-ar-display text-[20px] text-ar-cyan motion-reduce:animate-none animate-ar-float">
+          <Panel tone="cyan" tight className="w-[12.5rem] text-center">
+            <div className="font-ar-display text-[0.5rem] uppercase tracking-[0.18em] text-ar-cyan">Día 04</div>
+            <div className="mx-auto my-2 grid h-[3.75rem] w-[3.75rem] place-items-center rounded-xl border border-ar-cyan/40 bg-ar-cyan/10 font-ar-display text-[1.25rem] text-ar-cyan motion-reduce:animate-none animate-ar-float">
               ★
             </div>
-            <div className="font-ar-mono text-[10px] text-ar-ink">500 monedas</div>
+            <div className="font-ar-mono text-[0.625rem] text-ar-ink">500 monedas</div>
           </Panel>
-          <Panel tone="deep" tight className="w-[200px] text-center opacity-70">
-            <div className="font-ar-display text-[8px] uppercase tracking-[0.18em] text-ar-ink-muted">Día 02</div>
-            <div className="mx-auto my-2 grid h-[60px] w-[60px] place-items-center rounded-xl border border-white/10 font-ar-display text-[20px] text-ar-lime">
+          <Panel tone="deep" tight className="w-[12.5rem] text-center opacity-70">
+            <div className="font-ar-display text-[0.5rem] uppercase tracking-[0.18em] text-ar-ink-muted">Día 02</div>
+            <div className="mx-auto my-2 grid h-[3.75rem] w-[3.75rem] place-items-center rounded-xl border border-white/10 font-ar-display text-[1.25rem] text-ar-lime">
               ✓
             </div>
-            <div className="font-ar-mono text-[10px] text-ar-ink-dim">Reclamado</div>
+            <div className="font-ar-mono text-[0.625rem] text-ar-ink-dim">Reclamado</div>
           </Panel>
         </Sample>
       </Section>

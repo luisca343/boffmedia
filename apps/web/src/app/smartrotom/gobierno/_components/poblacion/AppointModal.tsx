@@ -50,13 +50,13 @@ export function AppointModal({ onClose }: { onClose: () => void }) {
     >
       <div className="space-y-4">
         <div>
-          <span className="mb-1.5 block font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+          <span className="mb-1.5 block font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
             {t("poblacion.ciudadano")}
           </span>
           {selected ? (
             <Sunken className="flex items-center gap-2.5 px-3 py-2">
               <Avatar user={selected.username} size={28} />
-              <span className="flex-1 text-[13px] font-semibold text-gt-ink-900">{selected.username}</span>
+              <span className="flex-1 text-[0.8125rem] font-semibold text-gt-ink-900">{selected.username}</span>
               <button
                 type="button"
                 onClick={() => setSelected(null)}
@@ -75,7 +75,7 @@ export function AppointModal({ onClose }: { onClose: () => void }) {
                 icon="search"
               />
               {results.length > 0 && (
-                <div className="mt-1.5 max-h-[180px] overflow-y-auto rounded-gt-sm border border-gt-line">
+                <div className="mt-1.5 max-h-[11.25rem] overflow-y-auto rounded-gt-sm border border-gt-line">
                   {results.map((c) => (
                     <button
                       key={c.uuid}
@@ -87,7 +87,7 @@ export function AppointModal({ onClose }: { onClose: () => void }) {
                       className="flex w-full items-center gap-2.5 border-b border-gt-line-soft px-3 py-2 text-left last:border-b-0 hover:bg-gt-paper-1"
                     >
                       <Avatar user={c.username} size={24} />
-                      <span className="text-[12.5px] text-gt-ink-800">{c.username}</span>
+                      <span className="text-[0.78125rem] text-gt-ink-800">{c.username}</span>
                     </button>
                   ))}
                 </div>

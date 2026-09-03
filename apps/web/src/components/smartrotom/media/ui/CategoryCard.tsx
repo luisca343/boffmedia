@@ -26,14 +26,14 @@ export function CategoryCard({ g, className }: { g: CategoryCardData; className?
         )}
         <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/70 to-transparent to-60%" />
         {g.viewers && (
-          <span className="absolute left-2 top-2 z-[2] inline-flex items-center gap-1 rounded-mw-sm border border-mw-line-strong bg-black/70 px-[7px] py-[3px] font-mono text-[11px] font-bold text-white">
+          <span className="absolute left-2 top-2 z-[2] inline-flex items-center gap-1 rounded-mw-sm border border-mw-line-strong bg-black/70 px-[0.4375rem] py-[3px] font-mono text-[0.6875rem] font-bold text-white">
             <PulseDot /> {g.viewers}
           </span>
         )}
       </div>
       <div className="px-1 pb-1 pt-2.5">
-        <h4 className="m-0 line-clamp-2 text-[13px] font-semibold leading-[1.3]">{g.name}</h4>
-        {g.streams != null && <div className="mt-1 text-[11px] text-mw-fg-faint">{g.streams} canales</div>}
+        <h4 className="m-0 line-clamp-2 text-[0.8125rem] font-semibold leading-[1.3]">{g.name}</h4>
+        {g.streams != null && <div className="mt-1 text-[0.6875rem] text-mw-fg-faint">{g.streams} canales</div>}
       </div>
     </Link>
   )

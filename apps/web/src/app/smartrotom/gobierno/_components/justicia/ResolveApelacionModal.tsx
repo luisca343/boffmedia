@@ -59,7 +59,7 @@ export function ResolveApelacionModal({
       }
     >
       <div className="space-y-3">
-        <p className="text-[13px] leading-relaxed text-gt-ink-700">
+        <p className="text-[0.8125rem] leading-relaxed text-gt-ink-700">
           {overturning
             ? t("justicia.anularDescription", {
                 username: target.player.username,

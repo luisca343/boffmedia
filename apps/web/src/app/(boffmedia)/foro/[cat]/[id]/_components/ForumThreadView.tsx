@@ -23,7 +23,7 @@ const PAGE = 20
 
 function ErrorNote({ children }: { children: React.ReactNode }) {
   return (
-    <p className="mb-2.5 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[12px] font-medium text-bad cut-tag cut-tag-edge [--cut-line:var(--bad)]">
+    <p className="mb-2.5 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[0.75rem] font-medium text-bad cut-tag cut-tag-edge [--cut-line:var(--bad)]">
       {children}
     </p>
   )
@@ -165,8 +165,8 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
   }
 
   return (
-    <main data-ds="boffmedia" className="wrap pb-[90px] pt-6">
-      <nav className="mb-5 flex flex-wrap items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim">
+    <main data-ds="boffmedia" className="wrap pb-[5.625rem] pt-6">
+      <nav className="mb-5 flex flex-wrap items-center gap-2 font-mono text-[0.6875rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim">
         <Link href="/foro" className="no-underline transition-colors hover:text-txt">
           {t("breadcrumb")}
         </Link>
@@ -190,10 +190,10 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
           )}
           {thread.solved && <Badge tone="ok">{t("solved")}</Badge>}
         </div>
-        <h1 className="text-[clamp(28px,4vw,42px)]">{thread.title}</h1>
+        <h1 className="text-[clamp(1.75rem,4vw,2.625rem)]">{thread.title}</h1>
         <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-3">
           <Byline author={toAuthor(thread.author)} when={thread.createdAt} now={now} link={false} />
-          <span className="flex items-center gap-4 font-mono text-[11px]/none font-medium uppercase tracking-[0.08em] text-txt-muted">
+          <span className="flex items-center gap-4 font-mono text-[0.6875rem]/none font-medium uppercase tracking-[0.08em] text-txt-muted">
             <span className="inline-flex items-center gap-1.5">
               <Icon name="list" size={13} className="text-accent" /> {t("repliesCount", { count: thread.replies })}
             </span>
@@ -209,7 +209,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
               disabled={voting}
               aria-pressed={hasVoted}
               className={cn(
-                "inline-flex items-center gap-2 border border-solid py-[9px] px-3.5 cut-tag cut-tag-edge font-mono text-[12px] font-semibold uppercase tracking-[0.08em]",
+                "inline-flex items-center gap-2 border border-solid py-[0.5625rem] px-3.5 cut-tag cut-tag-edge font-mono text-[0.75rem] font-semibold uppercase tracking-[0.08em]",
                 "transition-[color,border-color,background] duration-[140ms]",
                 hasVoted
                   ? "border-accent [--cut-line:var(--accent)] bg-accent-soft text-accent"
@@ -338,18 +338,18 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
       )}
 
       {thread.locked ? (
-        <div className="mt-8 flex items-center justify-center gap-2 border border-solid border-line bg-panel-2 py-4 px-5 cut-corner cut-corner-edge font-mono text-[12px] font-semibold uppercase tracking-[0.08em] text-txt-muted">
+        <div className="mt-8 flex items-center justify-center gap-2 border border-solid border-line bg-panel-2 py-4 px-5 cut-corner cut-corner-edge font-mono text-[0.75rem] font-semibold uppercase tracking-[0.08em] text-txt-muted">
           <Icon name="lock" size={14} /> {t("closedNotice")}
         </div>
       ) : loggedIn ? (
         <div className="mt-8">
-          <h2 className="mb-3 font-display text-[18px] font-bold uppercase not-italic tracking-[0.03em] text-txt">{t("replyTitle")}</h2>
+          <h2 className="mb-3 font-display text-[1.125rem] font-bold uppercase not-italic tracking-[0.03em] text-txt">{t("replyTitle")}</h2>
           {replyError && <ErrorNote>{replyError}</ErrorNote>}
           <ForumComposer key={replyKey} submitLabel={t("replySubmit")} busy={replying} onSubmit={handleReply} />
         </div>
       ) : (
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3 border border-solid border-line bg-panel py-5 px-5 cut-corner cut-corner-edge text-center">
-          <span className="font-body text-[14px] text-txt-muted">{t("joinConversation")}</span>
+          <span className="font-body text-[0.875rem] text-txt-muted">{t("joinConversation")}</span>
           <Button variant="pri" size="sm" icon="user" href="/entrar">
             {t("loginToReply")}
           </Button>

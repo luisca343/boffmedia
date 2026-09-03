@@ -20,25 +20,25 @@ export function FieldBar({ field, setField, setAtkSide, setDefSide }: Props) {
   const t = useVgcT("calc.field")
   const Divider = () => <span className="w-px self-stretch bg-line" aria-hidden="true" />
   return (
-    <div className="mb-4 flex flex-wrap items-center gap-[10px] border border-solid border-line bg-panel px-[14px] py-[10px]">
-      <div className="flex flex-wrap gap-[5px]" role="group" aria-label={t("format")}>
+    <div className="mb-4 flex flex-wrap items-center gap-[0.625rem] border border-solid border-line bg-panel px-[0.875rem] py-[0.625rem]">
+      <div className="flex flex-wrap gap-[0.3125rem]" role="group" aria-label={t("format")}>
         <TogglePill on={field.format === "Doubles"} label={t("doubles")} onClick={() => setField({ format: "Doubles" })} />
         <TogglePill on={field.format === "Singles"} label={t("singles")} onClick={() => setField({ format: "Singles" })} />
       </div>
       <Divider />
-      <div className="flex flex-wrap gap-[5px]" role="group" aria-label={t("weather")}>
+      <div className="flex flex-wrap gap-[0.3125rem]" role="group" aria-label={t("weather")}>
         {WEATHERS.map((w) => (
           <TogglePill key={w} on={field.weather === w} label={t(`weathers.${w}`)} onClick={() => setField({ weather: field.weather === w ? "None" : w })} />
         ))}
       </div>
       <Divider />
-      <div className="flex flex-wrap gap-[5px]" role="group" aria-label={t("terrain")}>
+      <div className="flex flex-wrap gap-[0.3125rem]" role="group" aria-label={t("terrain")}>
         {TERRAINS.map((tr) => (
           <TogglePill key={tr} on={field.terrain === tr} label={t(`terrains.${tr}`)} onClick={() => setField({ terrain: field.terrain === tr ? "None" : tr })} />
         ))}
       </div>
       <Divider />
-      <div className="flex flex-wrap gap-[5px]" role="group" aria-label={t("conditions")}>
+      <div className="flex flex-wrap gap-[0.3125rem]" role="group" aria-label={t("conditions")}>
         <TogglePill on={field.trickRoom} label={t("pill.Trick Room")} onClick={() => setField({ trickRoom: !field.trickRoom })} />
         <TogglePill on={field.attackerSide.helpingHand} label={t("pill.Helping Hand")} tone={ATK_COLOR} onClick={() => setAtkSide({ helpingHand: !field.attackerSide.helpingHand })} />
         <TogglePill on={field.attackerSide.tailwind} label={t("pill.Tailwind")} tone={ATK_COLOR} onClick={() => setAtkSide({ tailwind: !field.attackerSide.tailwind })} />

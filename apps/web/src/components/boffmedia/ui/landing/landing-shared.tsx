@@ -48,8 +48,8 @@ export const LINE_INNER =
 export const BEAMS =
   "absolute rounded-full blur-[8px] will-change-transform animate-[lv4-spin_70s_linear_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:opacity-50 [background:conic-gradient(from_210deg_at_50%_50%,transparent,rgba(255,122,51,0.15),transparent_30%,transparent_60%,rgba(255,178,36,0.11),transparent_80%)]"
 
-export const CTA_ROW = "mt-[22px] flex flex-wrap items-center gap-3.5"
-export const CTA_MONO = "font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim"
+export const CTA_ROW = "mt-[1.375rem] flex flex-wrap items-center gap-3.5"
+export const CTA_MONO = "font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim"
 
 /* SVG-noise grain — data-URI kept as inline style (quotes/spaces break arbitrary values) */
 const GRAIN_STYLE: React.CSSProperties = {
@@ -92,16 +92,16 @@ export function TvCountdown({ to = TV3_EVENT_TS, compact }: { to?: number; compa
           key={p.l}
           className={cn(
             "relative border border-solid border-line text-center before:absolute before:left-0 before:right-0 before:top-0 before:h-[var(--bar,0px)] before:bg-accent before:content-['']",
-            compact ? "min-w-[48px] bg-[#0d1015] px-1.5 pb-1.5 pt-2" : "min-w-[66px] bg-panel px-2.5 pb-2.5 pt-3",
+            compact ? "min-w-[3rem] bg-[#0d1015] px-1.5 pb-1.5 pt-2" : "min-w-[4.125rem] bg-panel px-2.5 pb-2.5 pt-3",
           )}
         >
           <span
-            className={cn("block font-display font-bold leading-none text-txt tabular-nums", compact ? "text-[22px]" : "text-[34px]")}
+            className={cn("block font-display font-bold leading-none text-txt tabular-nums", compact ? "text-[1.375rem]" : "text-[2.125rem]")}
             suppressHydrationWarning
           >
             {String(p.n).padStart(2, "0")}
           </span>
-          <span className="mt-[5px] block font-mono text-[10px] font-medium uppercase leading-none tracking-[0.14em] text-txt-dim">{p.l}</span>
+          <span className="mt-[0.3125rem] block font-mono text-[0.625rem] font-medium uppercase leading-none tracking-[0.14em] text-txt-dim">{p.l}</span>
         </span>
       ))}
     </div>

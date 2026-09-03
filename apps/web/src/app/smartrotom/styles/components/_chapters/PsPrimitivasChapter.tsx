@@ -85,10 +85,10 @@ export function PsPrimitivasChapter() {
             <Icon name="sparkle" className="h-4 w-4" />
           </IconButton>
           <NavButton aria-label="Página anterior">
-            <Icon name="chevL" className="h-[19px] w-[19px]" />
+            <Icon name="chevL" className="h-[1.1875rem] w-[1.1875rem]" />
           </NavButton>
           <NavButton aria-label="Página siguiente" disabled>
-            <Icon name="chevR" className="h-[19px] w-[19px]" />
+            <Icon name="chevR" className="h-[1.1875rem] w-[1.1875rem]" />
           </NavButton>
         </Sample>
 
@@ -116,8 +116,8 @@ export function PsPrimitivasChapter() {
               ] as const
             ).map((name) => (
               <span key={name} className="flex flex-col items-center gap-1.5">
-                <Icon name={name} className="h-[22px] w-[22px]" />
-                <span className="font-ps-mono text-[9px] text-ps-chrome-subtle">{name}</span>
+                <Icon name={name} className="h-[1.375rem] w-[1.375rem]" />
+                <span className="font-ps-mono text-[0.5625rem] text-ps-chrome-subtle">{name}</span>
               </span>
             ))}
           </div>
@@ -152,8 +152,8 @@ export function PsPrimitivasChapter() {
           <ToastHost />
           {modal && (
             <Modal title="REPETICIÓN · GIMNASIO ROCA" onClose={() => setModal(false)}>
-              <div className="p-[18px]">
-                <p className="font-ps text-[13px] leading-relaxed text-ps-chrome-muted">
+              <div className="p-[1.125rem]">
+                <p className="font-ps text-[0.8125rem] leading-relaxed text-ps-chrome-muted">
                   La hoja es CROMO, no una página: tarjeta azul noche, filete de oro y tipografía de
                   mostrador. Pintarla de papel la convertiría en una hoja suelta del libro, que es
                   precisamente lo que no es.
@@ -203,8 +203,8 @@ export function PsPrimitivasChapter() {
               <Stat icon="swords" label="Combates" value="412" sub="41 victorias" />
             </div>
             <Card className="mt-2.5">
-              <p className="text-[12px] text-ps-ink-soft">
-                Una <code className="font-ps-mono text-[11px]">Card</code> vacía, para lo que no es
+              <p className="text-[0.75rem] text-ps-ink-soft">
+                Una <code className="font-ps-mono text-[0.6875rem]">Card</code> vacía, para lo que no es
                 una cifra.
               </p>
             </Card>
@@ -235,7 +235,7 @@ export function PsPrimitivasChapter() {
           col
           note="El número y la autoridad emisora van en la esquina EXTERIOR (donde los busca el pulgar) y la vuelta al índice en la INTERIOR, para que no choquen nunca a través del lomo. Es absoluto: aquí se ve dentro de una hoja con altura fijada a propósito."
         >
-          <Leaf accent="gild" className="h-[130px]">
+          <Leaf accent="gild" className="h-[8.125rem]">
             <Folio side="right" page="07" onIndex={() => toast("Al Índice")} />
           </Leaf>
         </Sample>
@@ -249,11 +249,11 @@ export function PsPrimitivasChapter() {
         >
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
             <Leaf accent="plum">
-              <Skeleton className="mb-2.5 h-[34px]" />
-              <Skeleton className="mb-2 h-[52px]" />
-              <Skeleton className="h-[52px]" />
+              <Skeleton className="mb-2.5 h-[2.125rem]" />
+              <Skeleton className="mb-2 h-[3.25rem]" />
+              <Skeleton className="h-[3.25rem]" />
             </Leaf>
-            <Leaf accent="teal" className="min-h-[172px]">
+            <Leaf accent="teal" className="min-h-[10.75rem]">
               <EmptyState
                 icon="globe"
                 title="Sin sellos todavía"
@@ -343,13 +343,13 @@ export function PsPrimitivasChapter() {
         >
           <div className="grid w-full grid-cols-1 gap-4 lg:grid-cols-2">
             <Leaf accent="oxblood" className="flex flex-col">
-              <p className="mb-2 font-ps-mono text-[10px] uppercase tracking-[.2em] text-ps-ink-faint">
+              <p className="mb-2 font-ps-mono text-[0.625rem] uppercase tracking-[.2em] text-ps-ink-faint">
                 En reposo
               </p>
               <Mrz lines={PS_DEMO_MRZ} />
             </Leaf>
             <Leaf accent="oxblood" className="flex flex-col">
-              <p className="mb-2 font-ps-mono text-[10px] uppercase tracking-[.2em] text-ps-ink-faint">
+              <p className="mb-2 font-ps-mono text-[0.625rem] uppercase tracking-[.2em] text-ps-ink-faint">
                 Bajo inspección
               </p>
               <Mrz lines={PS_DEMO_MRZ} inspecting />

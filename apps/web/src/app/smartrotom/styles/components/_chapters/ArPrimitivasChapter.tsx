@@ -34,7 +34,7 @@ function Controls() {
           { value: "strong", label: "Intenso" },
         ]}
       />
-      <div className="w-[220px]">
+      <div className="w-[13.75rem]">
         <Input placeholder="Adivina la criatura…" aria-label="Búsqueda de ejemplo" />
       </div>
     </>
@@ -134,19 +134,19 @@ export function ArPrimitivasChapter() {
       >
         <Sample title="Tonos" code="<Panel tone tight glow />" app="ar" grid>
           <Panel tone="void">
-            <div className="font-ar-display text-[10px] uppercase tracking-[0.18em] text-ar-cyan">void</div>
+            <div className="font-ar-display text-[0.625rem] uppercase tracking-[0.18em] text-ar-cyan">void</div>
             <p className="mt-2 font-ar text-xs text-ar-ink-dim">El panel por defecto.</p>
           </Panel>
           <Panel tone="deep">
-            <div className="font-ar-display text-[10px] uppercase tracking-[0.18em] text-ar-violet-2">deep</div>
+            <div className="font-ar-display text-[0.625rem] uppercase tracking-[0.18em] text-ar-violet-2">deep</div>
             <p className="mt-2 font-ar text-xs text-ar-ink-dim">Para lo que va dentro de otro panel.</p>
           </Panel>
           <Panel tone="cyan">
-            <div className="font-ar-display text-[10px] uppercase tracking-[0.18em] text-ar-cyan">cyan</div>
+            <div className="font-ar-display text-[0.625rem] uppercase tracking-[0.18em] text-ar-cyan">cyan</div>
             <p className="mt-2 font-ar text-xs text-ar-ink-dim">Héroe, marcador, sistema.</p>
           </Panel>
           <Panel tone="magenta">
-            <div className="font-ar-display text-[10px] uppercase tracking-[0.18em] text-ar-magenta-2">magenta</div>
+            <div className="font-ar-display text-[0.625rem] uppercase tracking-[0.18em] text-ar-magenta-2">magenta</div>
             <p className="mt-2 font-ar text-xs text-ar-ink-dim">Inventario, botín, lo que está vivo.</p>
           </Panel>
         </Sample>
@@ -235,7 +235,7 @@ export function ArPrimitivasChapter() {
         <Sample title="Skeleton" code="<Skeleton className />" app="ar" col>
           <div className="grid w-full grid-cols-7 gap-2.5">
             {Array.from({ length: 7 }, (_, i) => (
-              <Skeleton key={i} className="h-[104px]" />
+              <Skeleton key={i} className="h-[6.5rem]" />
             ))}
           </div>
         </Sample>

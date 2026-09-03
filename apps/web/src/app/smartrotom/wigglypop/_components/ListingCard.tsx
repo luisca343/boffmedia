@@ -37,7 +37,7 @@ function FormatLine({ L }: { L: WpListing }) {
     return (
       <div className="flex items-center justify-between gap-1.5">
         <div>
-          <div className="font-wp text-[10px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+          <div className="font-wp text-[0.625rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
             {t("common.bidsCount", { count: L.bids ?? 0 })}
           </div>
           <Price amount={L.currentBid ?? L.price} size={16} />
@@ -51,7 +51,7 @@ function FormatLine({ L }: { L: WpListing }) {
     return (
       <div className="flex items-center justify-between gap-1.5">
         <div>
-          <div className="font-wp text-[10px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+          <div className="font-wp text-[0.625rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
             {t("card.offerPriceLabel")}
           </div>
           <Price amount={L.price} size={16} />
@@ -67,10 +67,10 @@ function FormatLine({ L }: { L: WpListing }) {
   if (L.format === "trade") {
     return (
       <div>
-        <div className="mb-0.5 font-wp text-[10px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+        <div className="mb-0.5 font-wp text-[0.625rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
           {t("card.seeksLabel")}
         </div>
-        <div className="flex flex-wrap items-center gap-1.5 font-wp text-[12.5px] font-semibold text-wp-fg">
+        <div className="flex flex-wrap items-center gap-1.5 font-wp text-[0.78125rem] font-semibold text-wp-fg">
           <Icon name="swap" size={13} className="text-wp-teal" />
           {(L.wants ?? []).join(" · ")}
           {L.tradePlus && <span className="text-wp-fg-subtle">{t("card.tradePlusExtra")}</span>}
@@ -85,7 +85,7 @@ function FormatLine({ L }: { L: WpListing }) {
     <div className="flex items-baseline gap-2">
       <Price amount={L.price} size={18} />
       {under && (
-        <span className="font-wp text-[11px] font-bold text-wp-green">
+        <span className="font-wp text-[0.6875rem] font-bold text-wp-green">
           −{Math.round((1 - L.price / L.value) * 100)}%
         </span>
       )}
@@ -131,7 +131,7 @@ export function ListingCard({
       aria-pressed={watched}
       className={cn(
         "disabled:pointer-events-none disabled:opacity-60",
-        "absolute right-2.5 top-2.5 z-[5] flex h-[34px] w-[34px] items-center justify-center rounded-wp-pill border-wp",
+        "absolute right-2.5 top-2.5 z-[5] flex h-[2.125rem] w-[2.125rem] items-center justify-center rounded-wp-pill border-wp",
         "shadow-[0_4px_10px_-5px_rgba(120,70,100,.4)] transition-all duration-150 ease-wp",
         "hover:scale-110 motion-reduce:transform-none",
         watched
@@ -158,36 +158,36 @@ export function ListingCard({
         )}
       >
         <div className={cn("absolute inset-x-0 top-0 z-[3] h-1", RARITY_STRIP[L.rarity])} />
-        <div className="grid grid-cols-[90px_1fr_auto] items-center gap-4 px-[15px] py-3">
-          <SpriteStage mon={mon} dots={false} className="h-[90px] w-[90px] rounded-[14px]">
+        <div className="grid grid-cols-[5.625rem_1fr_auto] items-center gap-4 px-[0.9375rem] py-3">
+          <SpriteStage mon={mon} dots={false} className="h-[5.625rem] w-[5.625rem] rounded-[14px]">
             <Sprite mon={mon} className="relative z-[2] h-[76%] w-[76%]" />
           </SpriteStage>
 
           <div className="min-w-0">
             <div className="mb-1 flex items-center gap-2">
-              <span className="font-wp text-[15px] font-bold text-wp-fg">
+              <span className="font-wp text-[0.9375rem] font-bold text-wp-fg">
                 {mon.shiny && <span className="text-wp-teal">✦ </span>}
                 {mon.name}
               </span>
-              <span className="wp-num font-wp text-[12px] text-wp-fg-subtle">{t("common.levelDot", { level: mon.level })}</span>
+              <span className="wp-num font-wp text-[0.75rem] text-wp-fg-subtle">{t("common.levelDot", { level: mon.level })}</span>
               <RarityBadge rarity={L.rarity} />
             </div>
             <div className="flex flex-wrap items-center gap-1.5">
               {mon.types.map((ty) => (
                 <TypeBadge key={ty} type={ty} size="sm" />
               ))}
-              <Chip className="text-[10.5px]">{mon.nature}</Chip>
-              <span className="wp-num font-wp text-[11.5px] text-wp-fg-muted">{t("card.ivPercent", { pct: mon.ivPct })}</span>
+              <Chip className="text-[0.65625rem]">{mon.nature}</Chip>
+              <span className="wp-num font-wp text-[0.71875rem] text-wp-fg-muted">{t("card.ivPercent", { pct: mon.ivPct })}</span>
               <IVMeter ivs={mon.ivs} />
             </div>
-            <div className="mt-1.5 flex items-center gap-2 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+            <div className="mt-1.5 flex items-center gap-2 font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
               <span>{L.seller.username}</span>
               <span>· {number(L.views)} {t("common.viewsSuffix")}</span>
             </div>
           </div>
 
-          <div className="min-w-[140px] text-right">
-            <Chip className="mb-1.5 text-[10.5px]">
+          <div className="min-w-[8.75rem] text-right">
+            <Chip className="mb-1.5 text-[0.65625rem]">
               <Icon name={FORMAT_ICON[L.format]} size={12} />
               {t(FORMAT_LABEL_KEY[L.format])}
             </Chip>
@@ -258,7 +258,7 @@ export function ListingCard({
           <div className="font-wp-display text-base font-semibold leading-tight text-wp-fg">
             {mon.name}
           </div>
-          <span className="wp-num mt-0.5 whitespace-nowrap font-wp text-[11.5px] text-wp-fg-subtle">
+          <span className="wp-num mt-0.5 whitespace-nowrap font-wp text-[0.71875rem] text-wp-fg-subtle">
             {t("common.levelDot", { level: mon.level })}
           </span>
         </div>
@@ -271,7 +271,7 @@ export function ListingCard({
         </div>
 
         {!compact && (
-          <div className="flex items-center gap-2 font-wp text-[11.5px] font-semibold text-wp-fg-muted">
+          <div className="flex items-center gap-2 font-wp text-[0.71875rem] font-semibold text-wp-fg-muted">
             <span className="wp-num">{t("card.ivPercent", { pct: mon.ivPct })}</span>
             <IVMeter ivs={mon.ivs} />
             <span className="ml-auto text-wp-fg-subtle">{mon.nature}</span>
@@ -283,10 +283,10 @@ export function ListingCard({
         </div>
 
         <div className="mt-auto flex items-center justify-between border-t border-wp-line/24 pt-2.5">
-          <span className="min-w-0 truncate font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+          <span className="min-w-0 truncate font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
             {L.seller.username}
           </span>
-          <span className="flex items-center gap-1 font-wp text-[11px] font-semibold text-wp-fg-subtle">
+          <span className="flex items-center gap-1 font-wp text-[0.6875rem] font-semibold text-wp-fg-subtle">
             <Icon name="bookmark" size={11} />
             <span className="wp-num">{fmt(L.watchers)}</span>
           </span>

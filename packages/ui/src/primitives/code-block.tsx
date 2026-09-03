@@ -42,7 +42,7 @@ export function CodeBlock({ lines, label, copyText, scan = false, tone, actions,
       {(label || copyText != null) && (
         <div className="flex items-center gap-2 py-2 px-3 border-b border-solid border-[color-mix(in_srgb,var(--line-2)_60%,transparent)] bg-[color-mix(in_srgb,var(--panel)_40%,transparent)]">
           {label && (
-            <span className="inline-flex items-center gap-[6px] font-mono text-[10px] font-semibold leading-none uppercase tracking-[0.12em] text-txt-muted">
+            <span className="inline-flex items-center gap-[0.375rem] font-mono text-[0.625rem] font-semibold leading-none uppercase tracking-[0.12em] text-txt-muted">
               <Icon name="code" size={13} />
               {label}
             </span>
@@ -54,8 +54,8 @@ export function CodeBlock({ lines, label, copyText, scan = false, tone, actions,
             onClick={copy}
             aria-label={t("copyCode")}
             className={cn(
-              "inline-flex items-center gap-[5px] font-mono text-[11px] font-semibold leading-none tracking-[0.04em] cursor-pointer",
-              "cut-frame [--cut:4px] [--cut-w:1px] py-[7px] px-[10px]",
+              "inline-flex items-center gap-[0.3125rem] font-mono text-[0.6875rem] font-semibold leading-none tracking-[0.04em] cursor-pointer",
+              "cut-frame [--cut:4px] [--cut-w:1px] py-[0.4375rem] px-[0.625rem]",
               // The header sits on a translucent panel wash over --bg-deep.
               "[--cut-fill:color-mix(in_srgb,var(--panel)_40%,var(--bg-deep))]",
               "transition-[color] duration-[140ms]",
@@ -72,14 +72,14 @@ export function CodeBlock({ lines, label, copyText, scan = false, tone, actions,
       )}
       <div
         className={cn(
-          "relative py-4 px-[18px] font-mono text-[18px] font-bold leading-[1.7] tracking-[0.18em] break-all",
+          "relative py-4 px-[1.125rem] font-mono text-[1.125rem] font-bold leading-[1.7] tracking-[0.18em] break-all",
           tone === "accent" ? "text-accent-bright" : "text-txt",
         )}
       >
         {scan && (
           <span
             aria-hidden="true"
-            className="absolute left-0 right-0 top-0 h-[34px] pointer-events-none [background:linear-gradient(180deg,color-mix(in_srgb,var(--accent)_22%,transparent),transparent)] animate-[bm-scan_1.4s_ease-in-out_infinite] motion-reduce:hidden"
+            className="absolute left-0 right-0 top-0 h-[2.125rem] pointer-events-none [background:linear-gradient(180deg,color-mix(in_srgb,var(--accent)_22%,transparent),transparent)] animate-[bm-scan_1.4s_ease-in-out_infinite] motion-reduce:hidden"
           />
         )}
         {arr.map((l, i) => (

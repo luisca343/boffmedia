@@ -48,14 +48,14 @@ export function ComunidadChapter() {
           </div>
         </Sample>
         <Sample title="Rejilla y lista" code={`variant="grid" · "row" · "mini"`} col>
-          <div className="grid w-full gap-[18px]">
-            <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
+          <div className="grid w-full gap-[1.125rem]">
+            <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18.75rem,1fr))]">
               {CM_POSTS.slice(2, 5).map((p) => (
                 <PostCard key={p.id} post={p} variant="grid" onOpen={noop} />
               ))}
             </div>
             <PostCard post={CM_POSTS[6]} variant="row" onOpen={noop} />
-            <div className="max-w-[340px] border border-solid border-line bg-panel px-4 py-1.5">
+            <div className="max-w-[21.25rem] border border-solid border-line bg-panel px-4 py-1.5">
               {CM_POSTS.slice(0, 2).map((p) => (
                 <PostCard key={p.id} post={p} variant="mini" onOpen={noop} />
               ))}
@@ -80,7 +80,7 @@ export function ComunidadChapter() {
           ))}
         </Sample>
         <Sample title="Byline" code="<Byline author when>" col>
-          <div className="grid gap-[14px]">
+          <div className="grid gap-[0.875rem]">
             <Byline author={CM_AUTHORS[1]} when={CM_POSTS[0].publishedAt} onOpen={noop} />
             <Byline author={CM_AUTHORS[2]} sub={CM_AUTHORS[2].role} size={38} onOpen={noop} />
           </div>

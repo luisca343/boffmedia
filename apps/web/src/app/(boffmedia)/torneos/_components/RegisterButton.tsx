@@ -146,7 +146,7 @@ function TeamRegisterModal({
           </Field>
         </div>
         <div className="grid gap-1.5">
-          <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+          <span className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
             {t("teamMembersLabel")}
           </span>
           {members.map((m, i) => (
@@ -175,7 +175,7 @@ function TeamRegisterModal({
           <button
             type="button"
             onClick={() => setMembers((cur) => [...cur, ""])}
-            className="justify-self-start font-mono text-[11px] text-accent transition-opacity hover:opacity-70"
+            className="justify-self-start font-mono text-[0.6875rem] text-accent transition-opacity hover:opacity-70"
           >
             {t("teamAddMember")}
           </button>

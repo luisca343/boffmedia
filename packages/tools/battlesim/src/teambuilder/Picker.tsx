@@ -297,9 +297,9 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
 
   return (
     <Modal open={open} onClose={onClose} title={t(`picker.${kind}`)} size="lg" bodyClassName="p-0 overflow-hidden flex flex-col">
-      <div className="grid gap-[10px] border-b border-solid border-line px-4 pb-3 pt-[14px]">
+      <div className="grid gap-[0.625rem] border-b border-solid border-line px-4 pb-3 pt-[0.875rem]">
         <div className="relative">
-          <Icon name="search" size={15} className="pointer-events-none absolute left-[11px] top-1/2 -translate-y-1/2 text-txt-dim" />
+          <Icon name="search" size={15} className="pointer-events-none absolute left-[0.6875rem] top-1/2 -translate-y-1/2 text-txt-dim" />
           <Input
             ref={inputRef}
             size="sm"
@@ -315,19 +315,19 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={onKeyDown}
-            className="h-[38px] pl-9 text-[13px]"
+            className="h-[2.375rem] pl-9 text-[0.8125rem]"
           />
         </div>
         {(kind === "species" || kind === "move") && (
           <div className="grid gap-2">
-            <div role="radiogroup" aria-label={t("picker.typeFilter")} className="flex flex-wrap gap-[5px]">
+            <div role="radiogroup" aria-label={t("picker.typeFilter")} className="flex flex-wrap gap-[0.3125rem]">
               <button
                 type="button"
                 role="radio"
                 aria-checked={!typeFilter}
                 onClick={() => setTypeFilter("")}
                 className={cn(
-                  "cut cut-edge-slant [--cut:3px] inline-flex h-8 items-center border border-solid px-[10px] font-mono text-[9px]/none font-semibold uppercase tracking-[0.08em] transition-[background,color,border-color] duration-[140ms]",
+                  "cut cut-edge-slant [--cut:3px] inline-flex h-8 items-center border border-solid px-[0.625rem] font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.08em] transition-[background,color,border-color] duration-[140ms]",
                   !typeFilter
                     ? "border-accent [--cut-line:var(--accent)] bg-accent text-accent-ink"
                     : "border-line-2 [--cut-line:var(--line-2)] bg-base text-txt-muted hover:text-txt",
@@ -341,7 +341,7 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
               ))}
             </div>
             {kind === "move" && (
-              <div role="radiogroup" aria-label={t("picker.catFilter")} className="flex gap-[5px]">
+              <div role="radiogroup" aria-label={t("picker.catFilter")} className="flex gap-[0.3125rem]">
                 {(["Physical", "Special", "Status"] as const).map((c) => {
                   const on = catFilter === c;
                   return (
@@ -352,7 +352,7 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
                       aria-checked={on}
                       onClick={() => setCatFilter(on ? "" : c)}
                       className={cn(
-                        "cut-tag cut-tag-edge [--cut-tag:6px] inline-flex h-8 items-center gap-1 border border-solid px-[10px] font-mono text-[9px]/none font-semibold uppercase tracking-[0.08em] transition-[background,color,border-color] duration-[140ms]",
+                        "cut-tag cut-tag-edge [--cut-tag:6px] inline-flex h-8 items-center gap-1 border border-solid px-[0.625rem] font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.08em] transition-[background,color,border-color] duration-[140ms]",
                         on
                           ? "border-accent [--cut-line:var(--accent)] bg-accent-soft text-accent"
                           : "border-line-2 [--cut-line:var(--line-2)] bg-base text-txt-muted hover:text-txt",
@@ -376,15 +376,15 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
         aria-label={t("picker.listAria")}
         tabIndex={-1}
         onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
-        className="relative h-[min(56dvh,460px)] overflow-y-auto overscroll-contain"
+        className="relative h-[min(56dvh,28.75rem)] overflow-y-auto overscroll-contain"
       >
         {loading ? (
-          <p aria-live="polite" className="m-0 flex items-center justify-center gap-2 px-4 py-10 font-body text-[13px] text-txt-dim">
+          <p aria-live="polite" className="m-0 flex items-center justify-center gap-2 px-4 py-10 font-body text-[0.8125rem] text-txt-dim">
             <Spinner size={14} />
             {t("picker.loadingMoves")}
           </p>
         ) : entries.length === 0 ? (
-          <p className="m-0 px-4 py-10 text-center font-body text-[13px] text-txt-dim">{t("picker.noResults")}</p>
+          <p className="m-0 px-4 py-10 text-center font-body text-[0.8125rem] text-txt-dim">{t("picker.noResults")}</p>
         ) : (
           <div style={{ height: entries.length * ROW_H }} className="relative">
             {entries.slice(start, end).map((entry, i) => {
@@ -395,9 +395,9 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
                     key={`h-${start + i}`}
                     role="presentation"
                     style={{ top, height: ROW_H }}
-                    className="absolute inset-x-0 flex items-end gap-2 px-4 pb-[6px]"
+                    className="absolute inset-x-0 flex items-end gap-2 px-4 pb-[0.375rem]"
                   >
-                    <span className="font-mono text-[10px]/none font-bold uppercase tracking-[0.1em] text-txt-dim">{entry.label}</span>
+                    <span className="font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.1em] text-txt-dim">{entry.label}</span>
                     <span className="mb-[3px] h-px flex-1 bg-line" />
                   </div>
                 );
@@ -416,7 +416,7 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
                   onMouseMove={() => !isActive && setActive(optionIndex)}
                   onClick={() => pick(row.id)}
                   className={cn(
-                    "absolute inset-x-0 flex cursor-pointer items-center gap-[10px] border-l-[3px] px-4 transition-[background,border-color] duration-[140ms]",
+                    "absolute inset-x-0 flex cursor-pointer items-center gap-[0.625rem] border-l-[3px] px-4 transition-[background,border-color] duration-[140ms]",
                     isActive ? "bg-accent-soft" : "hover:bg-panel-2",
                     // The red edge is a second, non-colour-blind-safe cue only;
                     // the ILEGAL tag inside the row carries the meaning in text.
@@ -432,7 +432,7 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
         )}
       </div>
 
-      <div className="flex items-center gap-3 border-t border-solid border-line px-4 py-[9px] font-mono text-[10px]/none tabular-nums text-txt-dim">
+      <div className="flex items-center gap-3 border-t border-solid border-line px-4 py-[0.5625rem] font-mono text-[0.625rem]/none tabular-nums text-txt-dim">
         <span aria-live="polite">{t("picker.showing", { shown: options.length, total })}</span>
         <span className="flex-1" />
         <span className="hidden min-[560px]:inline">{t("picker.hint")}</span>
@@ -451,7 +451,7 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
 function IllegalTag() {
   const t = useToolT(TB_NS);
   return (
-    <b className="cut cut-edge-slant [--cut:3px] flex-none border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-[5px] py-[3px] font-mono text-[8.5px]/none font-bold uppercase tracking-[0.08em] text-bad">
+    <b className="cut cut-edge-slant [--cut:3px] flex-none border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-[0.3125rem] py-[3px] font-mono text-[0.53125rem]/none font-bold uppercase tracking-[0.08em] text-bad">
       {t("picker.illegal")}
     </b>
   );
@@ -463,10 +463,10 @@ function RowBody({ kind, row, illegal }: { kind: PickerKind; row: Row; illegal?:
     return (
       <>
         <img src={speciesSprite(row.name)} alt="" width={36} height={36} loading="lazy" onError={handleSpriteError} className={cn("h-9 w-9 flex-none object-contain", illegal && "opacity-60 saturate-[0.4]")} />
-        <span className={cn("min-w-0 flex-1 truncate font-display text-[13px]/none font-bold uppercase tracking-[0.03em]", illegal ? "text-txt-muted" : "text-txt")}>{row.name}</span>
+        <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", illegal ? "text-txt-muted" : "text-txt")}>{row.name}</span>
         {illegal && <IllegalTag />}
         <BxTypeRow types={row.types ?? []} small />
-        <span className="w-[56px] flex-none text-right font-mono text-[10px]/none text-txt-dim">
+        <span className="w-[3.5rem] flex-none text-right font-mono text-[0.625rem]/none text-txt-dim">
           <b className="text-txt-muted">{row.num}</b> {t("picker.bst")}
         </span>
       </>
@@ -475,11 +475,11 @@ function RowBody({ kind, row, illegal }: { kind: PickerKind; row: Row; illegal?:
   if (kind === "move") {
     return (
       <>
-        <span className={cn("min-w-0 flex-1 truncate font-display text-[13px]/none font-bold uppercase tracking-[0.03em]", illegal ? "text-txt-muted" : "text-txt")}>{row.name}</span>
+        <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", illegal ? "text-txt-muted" : "text-txt")}>{row.name}</span>
         {illegal && <IllegalTag />}
         <span className="hidden min-[560px]:inline-flex">{row.cat && <BxCat cat={CAT_KEY[row.cat] ?? "status"} />}</span>
         <BxType type={row.types?.[0] ?? "Normal"} small />
-        <span className="grid w-[120px] flex-none grid-cols-3 text-right font-mono text-[10px]/none tabular-nums text-txt-muted">
+        <span className="grid w-[7.5rem] flex-none grid-cols-3 text-right font-mono text-[0.625rem]/none tabular-nums text-txt-muted">
           {row.figures?.map((f, i) => <span key={i}>{f}</span>)}
         </span>
       </>
@@ -493,16 +493,16 @@ function RowBody({ kind, row, illegal }: { kind: PickerKind; row: Row; illegal?:
           {style ? <span style={style} className="block" /> : <i className="h-2 w-2 bg-line-2" />}
         </span>
         <span className="grid min-w-0 flex-1 gap-[3px]">
-          <span className="truncate font-display text-[13px]/none font-bold uppercase tracking-[0.03em] text-txt">{row.name}</span>
-          {row.sub && <span className="truncate font-body text-[11px]/none text-txt-dim">{row.sub}</span>}
+          <span className="truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em] text-txt">{row.name}</span>
+          {row.sub && <span className="truncate font-body text-[0.6875rem]/none text-txt-dim">{row.sub}</span>}
         </span>
       </>
     );
   }
   return (
     <span className="grid min-w-0 flex-1 gap-[3px]">
-      <span className="truncate font-display text-[13px]/none font-bold uppercase tracking-[0.03em] text-txt">{row.name}</span>
-      {row.sub && <span className="truncate font-body text-[11px]/none text-txt-dim">{row.sub}</span>}
+      <span className="truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em] text-txt">{row.name}</span>
+      {row.sub && <span className="truncate font-body text-[0.6875rem]/none text-txt-dim">{row.sub}</span>}
     </span>
   );
 }

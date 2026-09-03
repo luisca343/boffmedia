@@ -84,7 +84,7 @@ export function StructuresSection() {
             : undefined
       }
       className={cn(
-        "shrink-0 py-[1px] px-1.5 font-mono text-[9px] font-bold tracking-[0.08em] uppercase border border-solid",
+        "shrink-0 py-[1px] px-1.5 font-mono text-[0.5625rem] font-bold tracking-[0.08em] uppercase border border-solid",
         BADGE_CLASS[verdict],
       )}
     >
@@ -93,10 +93,10 @@ export function StructuresSection() {
   );
 
   return (
-    <section className="flex flex-col gap-[7px]">
-      <div className="flex items-center gap-2 font-mono text-[10.5px] tracking-[0.12em] uppercase text-txt-muted">
+    <section className="flex flex-col gap-[0.4375rem]">
+      <div className="flex items-center gap-2 font-mono text-[0.65625rem] tracking-[0.12em] uppercase text-txt-muted">
         {t("header")}
-        <span className="grid place-items-center min-w-[18px] h-4 px-1 bg-panel-2 text-txt-dim font-semibold">
+        <span className="grid place-items-center min-w-[1.125rem] h-4 px-1 bg-panel-2 text-txt-dim font-semibold">
           {structures.length}
         </span>
       </div>
@@ -131,8 +131,8 @@ export function StructuresSection() {
                 >
                   <Icon name={isExpanded ? "chevronDown" : "chevronRight"} size={14} />
                 </button>
-                <span className="font-mono text-[12px] text-txt truncate">{g.type}</span>
-                <span className="font-mono text-[11px] text-txt-dim">
+                <span className="font-mono text-[0.75rem] text-txt truncate">{g.type}</span>
+                <span className="font-mono text-[0.6875rem] text-txt-dim">
                   {t("instances", { count: g.instances.length })}
                 </span>
                 <span className="flex-1" />
@@ -152,15 +152,15 @@ export function StructuresSection() {
                         onClick={() => toggleInstance(idx)}
                         onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), toggleInstance(idx))}
                         className={cn(
-                          "flex items-center gap-2 py-1.5 pl-[38px] pr-2.5 cursor-pointer transition-[background] duration-[140ms]",
+                          "flex items-center gap-2 py-1.5 pl-[2.375rem] pr-2.5 cursor-pointer transition-[background] duration-[140ms]",
                           isSel
                             ? "bg-accent-soft text-accent-bright shadow-[inset_0_0_0_1px_var(--accent-line)]"
                             : "text-txt-muted hover:bg-panel-2",
                         )}
                       >
-                        <span className="font-mono text-[11px] truncate">{label}</span>
+                        <span className="font-mono text-[0.6875rem] truncate">{label}</span>
                         <span className="flex-1" />
-                        <span className="font-mono text-[10.5px] text-txt-dim">
+                        <span className="font-mono text-[0.65625rem] text-txt-dim">
                           {t("tiles", { count: s.tileCount })}
                         </span>
                       </div>

@@ -87,7 +87,7 @@ function TcgCardArt({ card, glyphLabel }: { card: TcgCard; glyphLabel: string })
         {typeGlyph(card.types?.[0])}
       </span>
       <span
-        className="absolute inset-x-0 bottom-[5px] text-center font-mono text-[7px] font-semibold uppercase leading-none tracking-[0.16em]"
+        className="absolute inset-x-0 bottom-[0.3125rem] text-center font-mono text-[0.4375rem] font-semibold uppercase leading-none tracking-[0.16em]"
         style={{ color: "color-mix(in srgb, var(--tc) 78%, var(--text))" }}
       >
         {glyphLabel}
@@ -159,21 +159,21 @@ export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim
       })}
     >
       {/* top row — stage/category · name · PS */}
-      <div className="flex items-baseline gap-[6px] px-2 pb-1 pt-[7px]">
-        <span className="flex-none font-mono text-[8px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim">
+      <div className="flex items-baseline gap-[0.375rem] px-2 pb-1 pt-[0.4375rem]">
+        <span className="flex-none font-mono text-[0.5rem] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim">
           {pk ? stageLabel : catLabel}
         </span>
-        <span className="flex-1 truncate font-display text-[12px] font-bold leading-none tracking-[0.01em] text-txt">{card.name}</span>
+        <span className="flex-1 truncate font-display text-[0.75rem] font-bold leading-none tracking-[0.01em] text-txt">{card.name}</span>
         {pk && card.hp != null && (
-          <span className="inline-flex flex-none items-baseline gap-[2px] font-mono text-[12px] font-bold leading-none text-txt">
-            <small className="text-[7px] text-txt-muted">PS</small>{card.hp}
+          <span className="inline-flex flex-none items-baseline gap-[2px] font-mono text-[0.75rem] font-bold leading-none text-txt">
+            <small className="text-[0.4375rem] text-txt-muted">PS</small>{card.hp}
           </span>
         )}
       </div>
 
       {/* art window — real art when present, glyph «señal» otherwise */}
       <div
-        className="relative mx-[7px] grid flex-1 place-items-center overflow-hidden rounded-[5px] border border-solid"
+        className="relative mx-[0.4375rem] grid flex-1 place-items-center overflow-hidden rounded-[5px] border border-solid"
         aria-hidden="true"
         style={{
           borderColor: `color-mix(in srgb, ${c} 30%, transparent)`,
@@ -182,27 +182,27 @@ export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim
       >
         <TcgCardArt card={card} glyphLabel={typeLabel} />
         {isEx && (
-          <span className="absolute left-[6px] top-[5px] font-display text-[12px] font-extrabold italic leading-none text-accent [text-shadow:0_0_8px_var(--accent-soft)]">ex</span>
+          <span className="absolute left-[0.375rem] top-[0.3125rem] font-display text-[0.75rem] font-extrabold italic leading-none text-accent [text-shadow:0_0_8px_var(--accent-soft)]">ex</span>
         )}
       </div>
 
       {/* foot — type pips · rarity · set·id */}
-      <div className="flex items-center gap-[5px] px-2 pb-[7px] pt-[5px]">
+      <div className="flex items-center gap-[0.3125rem] px-2 pb-[0.4375rem] pt-[0.3125rem]">
         <span className="inline-flex gap-[3px]">
           {(card.types || []).map((ty) => <TcgTypePip key={ty} type={ty} size={16} />)}
         </span>
         <TcgRarityMarks rarity={card.rarity} size={9} />
-        <span className="ml-auto font-mono text-[8px] font-semibold leading-none tracking-[0.04em] text-txt-dim">{card.setId}·{padNum(card.localId || card.id)}</span>
+        <span className="ml-auto font-mono text-[0.5rem] font-semibold leading-none tracking-[0.04em] text-txt-dim">{card.setId}·{padNum(card.localId || card.id)}</span>
       </div>
 
       {/* count badge / add-lock */}
       {!editable && count > 0 && showAmounts && (
-        <span className="absolute right-[11px] top-[32px] z-[3] rounded-full border border-solid border-line-2 bg-base-deep/80 px-[6px] py-[3px] font-mono text-[11px] font-bold leading-none text-txt backdrop-blur-sm">
+        <span className="absolute right-[0.6875rem] top-[2rem] z-[3] rounded-full border border-solid border-line-2 bg-base-deep/80 px-[0.375rem] py-[3px] font-mono text-[0.6875rem] font-bold leading-none text-txt backdrop-blur-sm">
           ×{count}
         </span>
       )}
       {missing && !editable && (
-        <span className="absolute right-[11px] top-[30px] z-[3] grid h-6 w-6 place-items-center rounded-full border border-dashed border-line-2 bg-base-deep/70 text-txt-dim">
+        <span className="absolute right-[0.6875rem] top-[1.875rem] z-[3] grid h-6 w-6 place-items-center rounded-full border border-dashed border-line-2 bg-base-deep/70 text-txt-dim">
           <Icon name="plus" size={16} />
         </span>
       )}
@@ -210,11 +210,11 @@ export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim
       {/* editor */}
       {editable && (
         <div
-          className="absolute inset-x-0 bottom-0 z-[4] flex items-center justify-between gap-[6px] bg-[linear-gradient(0deg,var(--bg-deep),color-mix(in_srgb,var(--bg-deep)_10%,transparent))] px-[9px] py-[7px]"
+          className="absolute inset-x-0 bottom-0 z-[4] flex items-center justify-between gap-[0.375rem] bg-[linear-gradient(0deg,var(--bg-deep),color-mix(in_srgb,var(--bg-deep)_10%,transparent))] px-[0.5625rem] py-[0.4375rem]"
           onClick={(e) => e.stopPropagation()}
         >
           <StepBtn dir="minus" label="−1" disabled={count === 0} onClick={() => onRemove?.(card)} />
-          <span className="font-mono text-[15px] font-bold text-txt">{count}</span>
+          <span className="font-mono text-[0.9375rem] font-bold text-txt">{count}</span>
           <StepBtn dir="plus" label="+1" onClick={() => onAdd?.(card)} />
         </div>
       )}
@@ -268,7 +268,7 @@ export function TcgCardGrid({
 // ── Progress bar / set progress ──────────────────────────────────────────────
 export function TcgBar({ pct: p, hue }: { pct: number; hue?: string }) {
   return (
-    <div className="h-[7px] overflow-hidden rounded-full bg-line">
+    <div className="h-[0.4375rem] overflow-hidden rounded-full bg-line">
       <div
         className="h-full rounded-full transition-[width] duration-500"
         style={{ width: `${p}%`, background: hue ? `linear-gradient(90deg, color-mix(in srgb, ${hue} 70%, var(--accent)), ${hue})` : "linear-gradient(90deg, var(--accent-bright), var(--accent))" }}
@@ -280,13 +280,13 @@ export function TcgBar({ pct: p, hue }: { pct: number; hue?: string }) {
 export function TcgSetProgress({ label, sub, have, total }: { label: string; sub?: string; have: number; total: number }) {
   const p = total ? Math.round((have / total) * 100) : 0
   return (
-    <div className="grid gap-[7px]">
-      <div className="flex items-baseline gap-[10px]">
-        <span className="font-display text-[14px] font-bold uppercase leading-none tracking-[0.02em] text-txt">{label}</span>
-        {sub && <span className="font-mono text-[11px] leading-none text-txt-dim">{sub}</span>}
+    <div className="grid gap-[0.4375rem]">
+      <div className="flex items-baseline gap-[0.625rem]">
+        <span className="font-display text-[0.875rem] font-bold uppercase leading-none tracking-[0.02em] text-txt">{label}</span>
+        {sub && <span className="font-mono text-[0.6875rem] leading-none text-txt-dim">{sub}</span>}
         <span className="flex-1" />
-        <span className="font-mono text-[13px] leading-none text-txt-muted">{have}<span className="text-txt-dim">/{total}</span></span>
-        <span className="min-w-[38px] text-right font-mono text-[13px] font-bold leading-none text-accent">{p}%</span>
+        <span className="font-mono text-[0.8125rem] leading-none text-txt-muted">{have}<span className="text-txt-dim">/{total}</span></span>
+        <span className="min-w-[2.375rem] text-right font-mono text-[0.8125rem] font-bold leading-none text-accent">{p}%</span>
       </div>
       <TcgBar pct={p} />
     </div>
@@ -313,20 +313,20 @@ export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string;
       }}
     >
       <span className="pointer-events-none absolute inset-0 z-[1]" style={{ background: "linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.14) 46%, transparent 60%)" }} />
-      <span className="cut [--cut:3px] absolute left-[9px] top-[9px] z-[2] bg-white/90 px-[6px] py-[3px] font-display text-[12px] font-extrabold uppercase leading-none tracking-[0.04em] text-accent-ink">{setId}</span>
+      <span className="cut [--cut:3px] absolute left-[0.5625rem] top-[0.5625rem] z-[2] bg-white/90 px-[0.375rem] py-[3px] font-display text-[0.75rem] font-extrabold uppercase leading-none tracking-[0.04em] text-accent-ink">{setId}</span>
       <span className="relative z-0 grid flex-1 place-items-center">
         {failed ? (
           <>
-            <span className="pointer-events-none absolute inset-x-0 top-[14%] h-[6px] opacity-50 [background:repeating-linear-gradient(90deg,rgba(255,255,255,0.5)_0_3px,transparent_3px_7px)]" aria-hidden="true" />
-            <span className="text-[46px] text-white/85" style={{ textShadow: "0 0 16px rgba(255,255,255,0.4)" }}>◆</span>
+            <span className="pointer-events-none absolute inset-x-0 top-[14%] h-[0.375rem] opacity-50 [background:repeating-linear-gradient(90deg,rgba(255,255,255,0.5)_0_3px,transparent_3px_7px)]" aria-hidden="true" />
+            <span className="text-[2.875rem] text-white/85" style={{ textShadow: "0 0 16px rgba(255,255,255,0.4)" }}>◆</span>
           </>
         ) : (
           <img src={packArt(setId, name)} alt={name} loading="lazy" className="h-full w-full object-contain p-2" onError={() => setFailed(true)} />
         )}
       </span>
-      <span className="relative z-[2] bg-gradient-to-t from-base-deep to-transparent px-[11px] pb-3 pt-[10px]">
-        <b className="block truncate font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em] text-white">{name}</b>
-        {meta && <small className="font-mono text-[10px] font-medium leading-tight tracking-[0.05em] text-white/65">{meta}</small>}
+      <span className="relative z-[2] bg-gradient-to-t from-base-deep to-transparent px-[0.6875rem] pb-3 pt-[0.625rem]">
+        <b className="block truncate font-display text-[0.9375rem] font-bold uppercase leading-none tracking-[0.02em] text-white">{name}</b>
+        {meta && <small className="font-mono text-[0.625rem] font-medium leading-tight tracking-[0.05em] text-white/65">{meta}</small>}
       </span>
     </button>
   )
@@ -336,13 +336,13 @@ export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string;
 export function TcgStatTile({ icon, label, value, sub, hue }: { icon?: IconName; label: string; value: React.ReactNode; sub?: string; hue?: string }) {
   return (
     <div
-      className="cut-corner cut-corner-edge [--cut-lg:10px] relative flex flex-col gap-[3px] border border-solid border-line bg-panel px-4 py-[15px]"
+      className="cut-corner cut-corner-edge [--cut-lg:10px] relative flex flex-col gap-[3px] border border-solid border-line bg-panel px-4 py-[0.9375rem]"
       style={{ borderLeft: `3px solid ${hue || "var(--accent)"}` }}
     >
-      {icon && <span className="absolute right-[13px] top-[13px]" style={{ color: hue || "var(--accent)" }}><Icon name={icon} size={17} /></span>}
-      <span className="font-display text-[30px] font-bold leading-none text-txt">{value}</span>
-      <span className="font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-muted">{label}</span>
-      {sub && <span className="mt-[3px] text-[12px] leading-snug text-txt-dim">{sub}</span>}
+      {icon && <span className="absolute right-[0.8125rem] top-[0.8125rem]" style={{ color: hue || "var(--accent)" }}><Icon name={icon} size={17} /></span>}
+      <span className="font-display text-[1.875rem] font-bold leading-none text-txt">{value}</span>
+      <span className="font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.08em] text-txt-muted">{label}</span>
+      {sub && <span className="mt-[3px] text-[0.75rem] leading-snug text-txt-dim">{sub}</span>}
     </div>
   )
 }
@@ -383,26 +383,26 @@ export function TcgOddsTable({ rows, slotLabels, aggLabel, packLabel, bestLabel 
       <table className="w-full border-collapse [font-variant-numeric:tabular-nums]">
         <thead>
           <tr>
-            <th className="border-b border-solid border-line bg-panel-2 px-[14px] py-[11px] text-left font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted">{packLabel}</th>
+            <th className="border-b border-solid border-line bg-panel-2 px-[0.875rem] py-[0.6875rem] text-left font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted">{packLabel}</th>
             {slotLabels.map((s) => (
-              <th key={s} className="border-b border-solid border-line bg-panel-2 px-[14px] py-[11px] text-right font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted">{s}</th>
+              <th key={s} className="border-b border-solid border-line bg-panel-2 px-[0.875rem] py-[0.6875rem] text-right font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted">{s}</th>
             ))}
-            <th className="border-b border-solid border-line bg-panel-2 px-[14px] py-[11px] text-right font-mono text-[10px] font-bold uppercase leading-none tracking-[0.1em] text-txt">{aggLabel}</th>
+            <th className="border-b border-solid border-line bg-panel-2 px-[0.875rem] py-[0.6875rem] text-right font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.1em] text-txt">{aggLabel}</th>
           </tr>
         </thead>
         <tbody>
           {rows.map((r, i) => (
             <tr key={r.pack} className={r.best ? "bg-accent-soft" : ""}>
-              <td className="border-b border-solid border-line px-[14px] py-[11px] text-[13px] text-txt">
+              <td className="border-b border-solid border-line px-[0.875rem] py-[0.6875rem] text-[0.8125rem] text-txt">
                 <span className="flex items-center gap-2">
                   {r.pack}
-                  {r.best && <span className="inline-flex items-center gap-1 font-mono text-[9px] font-semibold uppercase tracking-[0.06em] text-accent"><Icon name="trophy" size={11} />{bestLabel}</span>}
+                  {r.best && <span className="inline-flex items-center gap-1 font-mono text-[0.5625rem] font-semibold uppercase tracking-[0.06em] text-accent"><Icon name="trophy" size={11} />{bestLabel}</span>}
                 </span>
               </td>
               {r.perSlot.map((p, j) => (
-                <td key={j} className="border-b border-solid border-line px-[14px] py-[11px] text-right font-mono text-[13px] text-txt-muted">{pct(p)}</td>
+                <td key={j} className="border-b border-solid border-line px-[0.875rem] py-[0.6875rem] text-right font-mono text-[0.8125rem] text-txt-muted">{pct(p)}</td>
               ))}
-              <td className={cn("border-b border-solid border-line px-[14px] py-[11px] text-right font-mono text-[13px] font-bold", r.best ? "text-accent" : "text-txt")}>{pct(r.aggregate)}</td>
+              <td className={cn("border-b border-solid border-line px-[0.875rem] py-[0.6875rem] text-right font-mono text-[0.8125rem] font-bold", r.best ? "text-accent" : "text-txt")}>{pct(r.aggregate)}</td>
             </tr>
           ))}
         </tbody>
@@ -446,11 +446,11 @@ export function TcgCardDrawer({ card, list, count, editable, labels, onAdd, onRe
       <div className="fixed inset-0 z-[200] bg-scrim backdrop-blur-[3px]" onClick={onClose} />
       <aside
         role="dialog" aria-label={card.name}
-        className="fixed inset-y-0 right-0 z-[201] flex w-[min(560px,94vw)] flex-col border-l border-solid border-line-2 bg-base shadow-2xl animate-[bm-drawer-in_.24s_cubic-bezier(0.2,0.7,0.3,1)] motion-reduce:animate-none"
+        className="fixed inset-y-0 right-0 z-[201] flex w-[min(35rem,94vw)] flex-col border-l border-solid border-line-2 bg-base shadow-2xl animate-[bm-drawer-in_.24s_cubic-bezier(0.2,0.7,0.3,1)] motion-reduce:animate-none"
       >
-        <div className="flex items-center gap-3 border-b border-solid border-line px-[18px] py-[15px]">
-          <span className="cut cut-edge-slant [--cut-line:var(--accent)] [--cut:3px] bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{card.setId}</span>
-          <b className="font-display text-[18px] font-bold uppercase leading-none tracking-[0.03em] text-txt">{card.name}</b>
+        <div className="flex items-center gap-3 border-b border-solid border-line px-[1.125rem] py-[0.9375rem]">
+          <span className="cut cut-edge-slant [--cut-line:var(--accent)] [--cut:3px] bg-accent px-[0.4375rem] py-1 font-display text-[0.75rem] font-bold leading-none text-accent-ink">{card.setId}</span>
+          <b className="font-display text-[1.125rem] font-bold uppercase leading-none tracking-[0.03em] text-txt">{card.name}</b>
           <div className="ml-auto flex gap-1">
             <button type="button" aria-label={labels.prev} onClick={() => step(-1)} className="grid h-8 w-8 place-items-center rounded border border-solid border-line-2 text-txt-muted hover:text-txt"><Icon name="back" size={15} /></button>
             <button type="button" aria-label={labels.next} onClick={() => step(1)} className="grid h-8 w-8 place-items-center rounded border border-solid border-line-2 text-txt-muted hover:text-txt"><Icon name="arrow" size={15} /></button>
@@ -458,19 +458,19 @@ export function TcgCardDrawer({ card, list, count, editable, labels, onAdd, onRe
           </div>
         </div>
 
-        <div className="grid flex-1 grid-cols-1 content-start gap-[22px] overflow-y-auto p-[18px] sm:grid-cols-[minmax(0,200px)_1fr]">
+        <div className="grid flex-1 grid-cols-1 content-start gap-[1.375rem] overflow-y-auto p-[1.125rem] sm:grid-cols-[minmax(0,12.5rem)_1fr]">
           <div className="sm:sticky sm:top-0">
             <TcgCardFace card={card} count={count} showAmounts={count > 0} dim={false} />
-            <div className="mt-[14px] flex items-center gap-3 border border-solid border-line bg-panel px-[14px] py-3">
+            <div className="mt-[0.875rem] flex items-center gap-3 border border-solid border-line bg-panel px-[0.875rem] py-3">
               {editable ? (
                 <>
                   <StepBtn dir="minus" label="−1" disabled={count === 0} onClick={() => onRemove?.(card)} />
-                  <b className="min-w-[34px] text-center font-mono text-[22px] font-bold text-txt">{count}</b>
+                  <b className="min-w-[2.125rem] text-center font-mono text-[1.375rem] font-bold text-txt">{count}</b>
                   <StepBtn dir="plus" label="+1" onClick={() => onAdd?.(card)} />
-                  <span className="font-mono text-[11px] font-semibold uppercase leading-snug tracking-[0.06em] text-txt-muted">{labels.inCollection}</span>
+                  <span className="font-mono text-[0.6875rem] font-semibold uppercase leading-snug tracking-[0.06em] text-txt-muted">{labels.inCollection}</span>
                 </>
               ) : (
-                <span className={cn("font-mono text-[12px] font-semibold", count ? "text-ok" : "text-txt-dim")}>
+                <span className={cn("font-mono text-[0.75rem] font-semibold", count ? "text-ok" : "text-txt-dim")}>
                   {count ? `×${count} ${labels.owned}` : labels.notOwned}
                 </span>
               )}
@@ -480,7 +480,7 @@ export function TcgCardDrawer({ card, list, count, editable, labels, onAdd, onRe
           <div className="grid content-start gap-4">
             <div className="flex flex-wrap items-center gap-2">
               <TcgRarityMarks rarity={card.rarity} size={12} />
-              <span className="font-mono text-[12px] text-txt-muted">{r.raw}</span>
+              <span className="font-mono text-[0.75rem] text-txt-muted">{r.raw}</span>
             </div>
             <Spec2>
               <Spec k={labels.number} v={`${card.setId} · #${padNum(card.localId || card.id)}`} />
@@ -489,16 +489,16 @@ export function TcgCardDrawer({ card, list, count, editable, labels, onAdd, onRe
             {pk && (
               <Spec2>
                 {card.types?.[0] && <Spec k={labels.type} v={<><TcgTypePip type={card.types[0]} size={22} />{card.types.join(" · ")}</>} />}
-                {card.hp != null && <Spec k={labels.hp} v={<span className="font-mono text-[18px] font-bold text-txt">{card.hp} PS</span>} />}
+                {card.hp != null && <Spec k={labels.hp} v={<span className="font-mono text-[1.125rem] font-bold text-txt">{card.hp} PS</span>} />}
                 {card.weaknesses?.[0] && <Spec k={labels.weakness} v={<><TcgTypePip type={card.weaknesses[0].type} size={22} />{card.weaknesses[0].type} <span className="font-mono text-txt-muted">{card.weaknesses[0].value}</span></>} />}
                 {card.retreat != null && <Spec k={labels.retreat} v={card.retreat ? Array.from({ length: card.retreat }).map((_, i) => <TcgTypePip key={i} type="colorless" size={20} />) : "—"} />}
               </Spec2>
             )}
             {card.boosters && card.boosters.length > 0 && (
-              <Spec k={labels.availableIn} v={<span className="flex flex-wrap gap-1">{card.boosters.map((b) => <span key={b.id} className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:3px] border border-solid border-line-2 px-2 py-1 font-mono text-[11px] text-txt-muted">{b.name}</span>)}</span>} />
+              <Spec k={labels.availableIn} v={<span className="flex flex-wrap gap-1">{card.boosters.map((b) => <span key={b.id} className="cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:3px] border border-solid border-line-2 px-2 py-1 font-mono text-[0.6875rem] text-txt-muted">{b.name}</span>)}</span>} />
             )}
             {card.illustrator && <Spec k={labels.illustrator} v={card.illustrator} />}
-            {card.description && <p className="border-l-2 border-solid border-accent-line pl-3 text-[14px] italic leading-relaxed text-txt-muted">{card.description}</p>}
+            {card.description && <p className="border-l-2 border-solid border-accent-line pl-3 text-[0.875rem] italic leading-relaxed text-txt-muted">{card.description}</p>}
           </div>
         </div>
       </aside>
@@ -508,9 +508,9 @@ export function TcgCardDrawer({ card, list, count, editable, labels, onAdd, onRe
 
 function Spec({ k, v }: { k: string; v: React.ReactNode }) {
   return (
-    <div className="grid gap-[5px]">
-      <span className="font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted">{k}</span>
-      <span className="flex flex-wrap items-center gap-2 text-[15px] leading-snug text-txt">{v}</span>
+    <div className="grid gap-[0.3125rem]">
+      <span className="font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted">{k}</span>
+      <span className="flex flex-wrap items-center gap-2 text-[0.9375rem] leading-snug text-txt">{v}</span>
     </div>
   )
 }

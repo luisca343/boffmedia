@@ -39,7 +39,7 @@ export function SrtDrawHead({
       <h2
         className={cn(
           "font-display font-bold italic uppercase tracking-[0.01em] transition-colors",
-          size === "large" ? "text-[clamp(24px,3vw,40px)]" : "text-lg",
+          size === "large" ? "text-[clamp(1.5rem,3vw,2.5rem)]" : "text-lg",
         )}
         aria-live="polite"
       >
@@ -77,12 +77,12 @@ export function SrtDrawControls({
           {landedWinners.map((name, idx) => (
             <div
               key={`${idx}-${name}`}
-              className="flex flex-none items-center gap-2 border border-line-2 bg-panel-2 px-[10px] py-[7px]"
+              className="flex flex-none items-center gap-2 border border-line-2 bg-panel-2 px-[0.625rem] py-[0.4375rem]"
             >
-              <Avatar className="h-[24px] w-[24px] flex-none text-[10px]">{initials(name)}</Avatar>
+              <Avatar className="h-[1.5rem] w-[1.5rem] flex-none text-[0.625rem]">{initials(name)}</Avatar>
               <div className="flex min-w-0 flex-col">
                 <span className="truncate font-mono text-xs font-medium text-txt">{name}</span>
-                <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-muted">
+                <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-muted">
                   {t("winnerOf", { i: idx + 1, n: totalWinners })}
                 </span>
               </div>

@@ -16,8 +16,8 @@ const TONE_VAR: Record<IconBoxTone, string> = {
 
 const SIZE: Record<IconBoxSize, string> = {
   sm: "w-7 h-7",
-  md: "w-[38px] h-[38px]",
-  lg: "w-[52px] h-[52px]",
+  md: "w-[2.375rem] h-[2.375rem]",
+  lg: "w-[3.25rem] h-[3.25rem]",
 }
 
 export interface IconBoxProps {

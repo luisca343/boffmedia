@@ -44,16 +44,16 @@ export function TvComunidad() {
       <div
         data-glare
         className={cn(
-          "relative border border-solid border-line px-6 pb-6 pt-[22px] backdrop-blur-[6px] [background:rgba(10,12,16,0.5)] cut-bl cut-edge-bl [--cut-e:16px] [[data-theme=light]_&]:[background:rgba(255,255,255,0.55)]",
+          "relative border border-solid border-line px-6 pb-6 pt-[1.375rem] backdrop-blur-[6px] [background:rgba(10,12,16,0.5)] cut-bl cut-edge-bl [--cut-e:16px] [[data-theme=light]_&]:[background:rgba(255,255,255,0.55)]",
           GLARE,
           HUD_FRAME,
         )}
       >
         <HudSweep />
-        <div className="mb-[18px] grid gap-2" aria-hidden="true">
+        <div className="mb-[1.125rem] grid gap-2" aria-hidden="true">
           {feed.length === 0 && (
-            <span className="flex items-center gap-2.5 border-l-2 border-solid border-l-line-2 bg-panel px-3 py-[9px] font-body text-[13px] font-medium leading-[1.3] text-txt-muted">
-              <i className="h-[7px] w-[7px] flex-none rounded-full bg-line-2" />
+            <span className="flex items-center gap-2.5 border-l-2 border-solid border-l-line-2 bg-panel px-3 py-[0.5625rem] font-body text-[0.8125rem] font-medium leading-[1.3] text-txt-muted">
+              <i className="h-[0.4375rem] w-[0.4375rem] flex-none rounded-full bg-line-2" />
               {t("feedEmpty")}
             </span>
           )}
@@ -61,17 +61,17 @@ export function TvComunidad() {
             <span
               key={i}
               className={cn(
-                "flex items-center gap-2.5 border-l-2 border-solid bg-panel px-3 py-[9px] font-body text-[13px] font-medium leading-[1.3] text-txt",
+                "flex items-center gap-2.5 border-l-2 border-solid bg-panel px-3 py-[0.5625rem] font-body text-[0.8125rem] font-medium leading-[1.3] text-txt",
                 f.ln,
               )}
               style={{ ["--i"]: i } as React.CSSProperties}
             >
-              <i className={cn("h-[7px] w-[7px] flex-none rounded-full animate-[lv4-blink_2s_infinite] motion-reduce:animate-none", f.tp)} />
+              <i className={cn("h-[0.4375rem] w-[0.4375rem] flex-none rounded-full animate-[lv4-blink_2s_infinite] motion-reduce:animate-none", f.tp)} />
               {f.t}
             </span>
           ))}
         </div>
-        <div className="mb-[18px] flex flex-wrap gap-2">
+        <div className="mb-[1.125rem] flex flex-wrap gap-2">
           <Chip>{t("chipForum")}</Chip>
           <Chip>{t("chipSorteos")}</Chip>
           <Chip>{t("chipTeams")}</Chip>

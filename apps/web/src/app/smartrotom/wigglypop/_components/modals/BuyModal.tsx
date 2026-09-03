@@ -83,7 +83,7 @@ export function BuyModal({ listing: L, onClose }: { listing: WpListing; onClose:
 
         <Button
           variant="primary"
-          className="mt-4 w-full py-[13px]"
+          className="mt-4 w-full py-[0.8125rem]"
           disabled={insufficient || createOrder.isPending}
           onClick={() =>
             createOrder.mutate([{ listingId: L.id, qty: 1 }], {

@@ -5,7 +5,7 @@ import { cn } from "@boffmedia/ui/cn";
 
 function Caption({ children }: { children: React.ReactNode }) {
   return (
-    <div className="absolute left-1/2 bottom-2.5 -translate-x-1/2 flex items-center gap-2.5 font-mono text-[10px] text-txt-dim whitespace-nowrap py-1 px-2.5 bg-[color-mix(in_srgb,var(--panel)_70%,transparent)] border border-line">
+    <div className="absolute left-1/2 bottom-2.5 -translate-x-1/2 flex items-center gap-2.5 font-mono text-[0.625rem] text-txt-dim whitespace-nowrap py-1 px-2.5 bg-[color-mix(in_srgb,var(--panel)_70%,transparent)] border border-line">
       {children}
     </div>
   );

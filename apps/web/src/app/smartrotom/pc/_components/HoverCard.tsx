@@ -38,19 +38,19 @@ export function HoverCard({ mon, rect }: HoverCardProps) {
       className="pointer-events-none fixed z-[9998] animate-pc-pop rounded-xl border border-pc-line-strong bg-pc-panel-solid px-3 py-2.5 font-pc text-pc-fg shadow-[0_24px_60px_-20px_rgb(0_0_0_/_.8)] motion-reduce:animate-none"
     >
       <div className="flex items-center gap-2.5">
-        <span className="flex h-[52px] w-[52px] flex-none items-center justify-center rounded-[10px] bg-white/[.04]">
-          <Sprite dex={p.dex} form={p.form} palette={p.palette} className="h-[46px] w-[46px]" />
+        <span className="flex h-[3.25rem] w-[3.25rem] flex-none items-center justify-center rounded-[10px] bg-white/[.04]">
+          <Sprite dex={p.dex} form={p.form} palette={p.palette} className="h-[2.875rem] w-[2.875rem]" />
         </span>
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="truncate text-[13.5px] font-bold">{displayName(p)}</span>
+            <span className="truncate text-[0.84375rem] font-bold">{displayName(p)}</span>
             {isShiny(p) && (
               <span className="flex-none text-pc-gold">
                 <Icon name="sparkles" size={12} fill="rgb(var(--pc-gold))" />
               </span>
             )}
           </div>
-          <div className="font-pc-mono text-[11px] text-pc-fg-subtle">
+          <div className="font-pc-mono text-[0.6875rem] text-pc-fg-subtle">
             #{String(p.dex).padStart(3, "0")} · Nv {p.level}
           </div>
         </div>
@@ -64,7 +64,7 @@ export function HoverCard({ mon, rect }: HoverCardProps) {
         </div>
       )}
 
-      <div className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1 text-[11.5px] text-pc-fg-muted">
+      <div className="mt-2.5 flex flex-wrap gap-x-3 gap-y-1 text-[0.71875rem] text-pc-fg-muted">
         <span>
           {t("detail.nature")}: <b className="text-pc-fg">{p.nature || "—"}</b>
         </span>
@@ -76,7 +76,7 @@ export function HoverCard({ mon, rect }: HoverCardProps) {
         </span>
       </div>
 
-      <div className="mt-2 font-pc-mono text-[10.5px] text-pc-fg-subtle">
+      <div className="mt-2 font-pc-mono text-[0.65625rem] text-pc-fg-subtle">
         {t("team.dragHint")}
       </div>
     </div>

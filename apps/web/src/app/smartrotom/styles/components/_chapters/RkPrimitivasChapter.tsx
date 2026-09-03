@@ -188,7 +188,7 @@ export function RkPrimitivasChapter() {
               aria-label="Caracteres"
               className="w-56 accent-[rgb(var(--rk-accent))]"
             />
-            <span className="font-mono text-[12px] tabular-nums text-rk-fg-subtle">{chars}/280</span>
+            <span className="font-mono text-[0.75rem] tabular-nums text-rk-fg-subtle">{chars}/280</span>
           </div>
         </Sample>
       </Section>

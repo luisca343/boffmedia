@@ -37,7 +37,7 @@ export function NumberStepper({ value, onChange, min = 0, max = 999, step = 1, e
         step={step}
         aria-label={ariaLabel}
         onChange={(e) => set(parseInt(e.target.value, 10))}
-        className="w-[52px] border-0 bg-transparent px-0.5 py-[7px] text-center font-mono text-[12px]/none text-txt outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+        className="w-[3.25rem] border-0 bg-transparent px-0.5 py-[0.4375rem] text-center font-mono text-[0.75rem]/none text-txt outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
       />
       <button type="button" tabIndex={-1} aria-label="+" onClick={() => set((value || 0) + step)} className={btn}>
         <Icon name="plus" size={12} />

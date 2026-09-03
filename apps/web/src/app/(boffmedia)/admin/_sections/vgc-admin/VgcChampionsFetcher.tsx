@@ -40,7 +40,7 @@ const statusPill = (r: ChampionsRegulation | undefined, t: (key: string, opts?: 
   }
 }
 
-const TH = "text-left font-mono text-[10px] uppercase tracking-[0.08em] text-txt-muted font-semibold py-2.5 px-4 border-b border-solid border-line"
+const TH = "text-left font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-muted font-semibold py-2.5 px-4 border-b border-solid border-line"
 
 export function VgcChampionsFetcher() {
   const t = useTranslations("admin.vgc")
@@ -200,26 +200,26 @@ export function VgcChampionsFetcher() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div className="space-y-1">
             <Input value={newRegulationId} onChange={(e) => setNewRegulationId(e.target.value)} placeholder={t("champions.idPlaceholder")} />
-            <p className="text-[11px] text-txt-dim">{t("champions.idHint")}</p>
+            <p className="text-[0.6875rem] text-txt-dim">{t("champions.idHint")}</p>
           </div>
           <div className="space-y-1">
             <Input value={newFormatId} onChange={(e) => setNewFormatId(e.target.value)} placeholder={effectiveFormatId || t("champions.formatPlaceholder")} />
-            <p className="text-[11px] text-txt-dim">{t("champions.formatHint")}</p>
+            <p className="text-[0.6875rem] text-txt-dim">{t("champions.formatHint")}</p>
           </div>
           <div className="space-y-1">
             <Input value={newName} onChange={(e) => setNewName(e.target.value)} placeholder={t("champions.namePlaceholder")} />
-            <p className="text-[11px] text-txt-dim">{t("champions.nameHint")}</p>
+            <p className="text-[0.6875rem] text-txt-dim">{t("champions.nameHint")}</p>
           </div>
           <div className="space-y-1">
             <Input value={newGid} onChange={(e) => setNewGid(e.target.value)} placeholder={t("champions.gidPlaceholder")} />
-            <p className="text-[11px] text-txt-dim">{t("champions.gidHint")}</p>
+            <p className="text-[0.6875rem] text-txt-dim">{t("champions.gidHint")}</p>
           </div>
         </div>
         <label className="mt-3 flex items-center gap-2 text-xs text-txt-muted cursor-pointer">
           <input type="checkbox" checked={newActive} onChange={(e) => setNewActive(e.target.checked)} className="accent-accent" />
           {t("champions.activeLabel")}
         </label>
-        <p className="mt-1 text-[11px] text-txt-dim">{t("champions.activeHint")}</p>
+        <p className="mt-1 text-[0.6875rem] text-txt-dim">{t("champions.activeHint")}</p>
         <div className="mt-4">
           <Button size="sm" loading={addingRegulation} disabled={addingRegulation} onClick={handleUpsertRegulation}>
             {addingRegulation ? t("champions.saving") : t("champions.save")}
@@ -244,13 +244,13 @@ export function VgcChampionsFetcher() {
                   <p className="text-xs font-medium">
                     {regulation.name}
                     {regulation.active ? null : (
-                      <span className="ml-2 text-[10px] uppercase tracking-wide text-txt-dim">{t("champions.inactiveTag")}</span>
+                      <span className="ml-2 text-[0.625rem] uppercase tracking-wide text-txt-dim">{t("champions.inactiveTag")}</span>
                     )}
                   </p>
-                  <p className="text-txt-dim text-[11px] font-mono">{regulation.id}</p>
-                  <p className="text-txt-dim text-[11px] font-mono">{regulation.formatId}</p>
+                  <p className="text-txt-dim text-[0.6875rem] font-mono">{regulation.id}</p>
+                  <p className="text-txt-dim text-[0.6875rem] font-mono">{regulation.formatId}</p>
                   {regulation?.importTeamCount ? (
-                    <p className="text-txt-dim text-[11px]">{t("champions.teamsImported", { count: regulation.importTeamCount ?? 0 })}</p>
+                    <p className="text-txt-dim text-[0.6875rem]">{t("champions.teamsImported", { count: regulation.importTeamCount ?? 0 })}</p>
                   ) : null}
                 </div>
               ),
@@ -258,7 +258,7 @@ export function VgcChampionsFetcher() {
                 <div className="space-y-1">
                   <AvPill tone={statusPill(regulation, t).tone}>{statusPill(regulation, t).text}</AvPill>
                   {regulation?.importError ? (
-                    <p className="text-[11px] text-bad max-w-56 truncate" title={regulation.importError}>
+                    <p className="text-[0.6875rem] text-bad max-w-56 truncate" title={regulation.importError}>
                       {regulation.importError}
                     </p>
                   ) : null}

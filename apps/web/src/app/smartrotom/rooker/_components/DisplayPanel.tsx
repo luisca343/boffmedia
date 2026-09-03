@@ -21,7 +21,7 @@ import { ACCENTS, type RookerAccent } from "../_utils/display"
 function Row({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="space-y-2">
-      <div className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{label}</div>
+      <div className="text-[0.8125rem] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{label}</div>
       {children}
     </div>
   )
@@ -49,7 +49,7 @@ function Choice<T extends string>({
             onClick={() => onChange(o.value)}
             aria-pressed={on}
             className={cn(
-              "flex-1 rounded-rk-md border px-3 py-2.5 text-[14px] font-bold transition-colors",
+              "flex-1 rounded-rk-md border px-3 py-2.5 text-[0.875rem] font-bold transition-colors",
               on
                 ? "border-rk-accent bg-rk-accent/12 text-rk-fg"
                 : "border-rk-line-strong bg-rk-card text-rk-fg-muted hover:bg-rk-hover",
@@ -79,7 +79,7 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
           "text-rk-fg transition-colors hover:bg-rk-hover",
           compact
             ? "grid h-8 w-8 place-items-center rounded-full text-rk-fg-muted"
-            : "flex w-fit max-w-full items-center gap-[18px] rounded-rk-pill px-4 py-[11px] text-[20px]",
+            : "flex w-fit max-w-full items-center gap-[1.125rem] rounded-rk-pill px-4 py-[0.6875rem] text-[1.25rem]",
         )}
       >
         <Icon name="settings" size={compact ? 20 : 26} stroke={2} />
@@ -88,7 +88,7 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
 
       <Modal open={open} onClose={() => setOpen(false)} label={t("display.modalLabel")}>
         <div className="flex items-center justify-between border-b border-rk-line px-4 py-3">
-          <h2 className="text-[17px] font-extrabold text-rk-fg">{t("display.title")}</h2>
+          <h2 className="text-[1.0625rem] font-extrabold text-rk-fg">{t("display.title")}</h2>
           <button
             type="button"
             onClick={() => setOpen(false)}
@@ -110,7 +110,7 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
                 { value: "lightsout", label: t("display.background.options.lightsout") },
               ]}
             />
-            <p className="text-[12.5px] leading-relaxed text-rk-fg-subtle">
+            <p className="text-[0.78125rem] leading-relaxed text-rk-fg-subtle">
               {mode === "light" ? t("display.background.lightHint") : t("display.background.darkHint")}
             </p>
           </Row>
@@ -190,7 +190,7 @@ export function DisplayPanel({ compact = false }: { compact?: boolean }) {
                 { value: "simple", label: t("display.reactionsSetting.options.simple") },
               ]}
             />
-            <p className="text-[12.5px] leading-relaxed text-rk-fg-subtle">
+            <p className="text-[0.78125rem] leading-relaxed text-rk-fg-subtle">
               {t("display.reactionsSetting.hint")}
             </p>
           </Row>

@@ -42,8 +42,8 @@ export function WaypointPicker({
         <Icon name="mappin" size={20} />
       </span>
       <span className="min-w-0">
-        <span className="block truncate text-[14.5px] font-semibold text-ca-50">{title}</span>
-        <span className="block font-ca-mono text-[12px] text-ca-400">{coords}</span>
+        <span className="block truncate text-[0.90625rem] font-semibold text-ca-50">{title}</span>
+        <span className="block font-ca-mono text-[0.75rem] text-ca-400">{coords}</span>
       </span>
     </button>
   );
@@ -51,7 +51,7 @@ export function WaypointPicker({
   return (
     <Modal title={t("locationPicker.title")} icon="mappin" onClose={close}>
       {loading ? (
-        <div className="py-10 text-center text-[13.5px] text-ca-500">{t("locationPicker.loading")}</div>
+        <div className="py-10 text-center text-[0.84375rem] text-ca-500">{t("locationPicker.loading")}</div>
       ) : (
         <div className="flex flex-col gap-1">
           {current && (
@@ -67,7 +67,7 @@ export function WaypointPicker({
             />
           ))}
           {waypoints.length === 0 && !current && (
-            <div className="py-10 text-center text-[13.5px] text-ca-500">{t("locationPicker.noWaypoints")}</div>
+            <div className="py-10 text-center text-[0.84375rem] text-ca-500">{t("locationPicker.noWaypoints")}</div>
           )}
         </div>
       )}

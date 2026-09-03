@@ -19,7 +19,7 @@ export function OfficialClock() {
 
   return (
     <div className="hidden text-right sm:block">
-      <div className="font-gt-mono text-[8.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+      <div className="font-gt-mono text-[0.53125rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
         {t("common.horaOficial")}
       </div>
       <span className="font-gt-mono text-base tabular-nums tracking-[.04em] text-gt-ink-700">
@@ -28,7 +28,7 @@ export function OfficialClock() {
             {pad(now.getHours())}
             <span className="animate-gt-blink motion-reduce:animate-none">:</span>
             {pad(now.getMinutes())}
-            <span className="text-[11px] text-gt-ink-400">:{pad(now.getSeconds())}</span>
+            <span className="text-[0.6875rem] text-gt-ink-400">:{pad(now.getSeconds())}</span>
           </>
         ) : (
           <span className="text-gt-ink-300">--:--</span>

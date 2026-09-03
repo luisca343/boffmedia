@@ -13,7 +13,7 @@ export function Chip({ active, badge, className, type = "button", children, ...r
     <button
       type={type}
       className={cn(
-        "flex flex-none items-center gap-1.5 whitespace-nowrap rounded-full border border-transparent px-[13px] py-1.5 text-[13.5px] transition-all duration-[120ms]",
+        "flex flex-none items-center gap-1.5 whitespace-nowrap rounded-full border border-transparent px-[0.8125rem] py-1.5 text-[0.84375rem] transition-all duration-[120ms]",
         active
           ? "bg-ca-accent/[.14] font-semibold text-ca-accent-soft"
           : "bg-ca-800 font-medium text-ca-400 hover:bg-ca-700/70",
@@ -23,7 +23,7 @@ export function Chip({ active, badge, className, type = "button", children, ...r
     >
       {children}
       {badge != null && (
-        <span className="rounded-full bg-ca-accent px-[5px] text-[10.5px] font-bold text-ca-on-accent">{badge}</span>
+        <span className="rounded-full bg-ca-accent px-[0.3125rem] text-[0.65625rem] font-bold text-ca-on-accent">{badge}</span>
       )}
     </button>
   );

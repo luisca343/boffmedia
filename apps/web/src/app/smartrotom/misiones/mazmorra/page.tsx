@@ -16,9 +16,9 @@ export default function MazmorraPage() {
 
   return (
     <div className="flex min-h-full flex-col pt-1.5">
-      <div className="mb-[18px] text-center">
+      <div className="mb-[1.125rem] text-center">
         <Label className="text-ms-gold-1">{t("eyebrow")}</Label>
-        <h1 className="my-1 font-ms-display text-[38px] text-ms-paper-1 [text-shadow:0_2px_12px_rgba(0,0,0,.6)]">
+        <h1 className="my-1 font-ms-display text-[2.375rem] text-ms-paper-1 [text-shadow:0_2px_12px_rgba(0,0,0,.6)]">
           {t("title")}
         </h1>
         <div className="text-sm italic text-ms-paper-3">{t("subtitle")}</div>
@@ -27,7 +27,7 @@ export default function MazmorraPage() {
         </div>
       </div>
 
-      <div className="mx-auto w-full max-w-[800px]">
+      <div className="mx-auto w-full max-w-[50rem]">
         {isLoading ? (
           <BoardLoading>{t("loading")}</BoardLoading>
         ) : error ? (

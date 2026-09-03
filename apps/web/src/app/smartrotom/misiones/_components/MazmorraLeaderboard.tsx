@@ -30,14 +30,14 @@ export function MazmorraLeaderboard({
   const t = useTranslations("misiones.mazmorra.leaderboard")
 
   return (
-    <Paper tilt={-0.3} className="relative mb-7 px-[22px] py-[18px]">
+    <Paper tilt={-0.3} className="relative mb-7 px-[1.375rem] py-[1.125rem]">
       <Label className="text-ms-gold-3">{t("title")}</Label>
 
       {ranking.length === 0 ? (
         <EmptyBoard>{t("empty")}</EmptyBoard>
       ) : (
         <div className="mt-3 flex flex-col gap-1.5">
-          <div className="grid grid-cols-[2.5rem_1fr_5rem_5rem_5rem] gap-2.5 px-2.5 pb-1.5 font-ms-uppercase text-[10px] uppercase tracking-[.14em] text-ms-ink-3">
+          <div className="grid grid-cols-[2.5rem_1fr_5rem_5rem_5rem] gap-2.5 px-2.5 pb-1.5 font-ms-uppercase text-[0.625rem] uppercase tracking-[.14em] text-ms-ink-3">
             <span>{t("columns.rank")}</span>
             <span>{t("columns.player")}</span>
             <span className="text-right">{t("columns.floors")}</span>
@@ -65,7 +65,7 @@ export function MazmorraLeaderboard({
                 <span className="text-right text-ms-ink-2">
                   {entry.completadas}/{entry.partidas}
                 </span>
-                <span className="text-right font-ms-mono text-[13px] text-ms-gold-3">
+                <span className="text-right font-ms-mono text-[0.8125rem] text-ms-gold-3">
                   {formatClearTime(entry.mejorTiempoMs)}
                 </span>
               </div>

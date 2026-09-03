@@ -62,8 +62,8 @@ export function ItemView({ rec, onNav }: ViewProps) {
         )}
         {(poolRecs.length > 0 || shopRecs.length > 0) && (
           <MewPanel title={t("panel.whereToGet")} icon="map" span="full">
-            <div className="flex flex-col gap-3.5 text-[13px]">
-              <p className="m-0 text-[11.5px]/[1.4] italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">{t("source.hint")}</p>
+            <div className="flex flex-col gap-3.5 text-[0.8125rem]">
+              <p className="m-0 text-[0.71875rem]/[1.4] italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">{t("source.hint")}</p>
               {poolRecs.length > 0 && (
                 <div>
                   <MewSubLabel n={poolRecs.length}>{t("panel.itemPools")}</MewSubLabel>
@@ -125,7 +125,7 @@ export function ItemView({ rec, onNav }: ViewProps) {
                 return (
                   <div key={s}>
                     <MewSubLabel n={members.length}>{mewHuman(s)}</MewSubLabel>
-                    <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(88px,1fr))]">
+                    <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(5.5rem,1fr))]">
                       {members.map((member) => {
                         const item = select.get("items", member.id)
                         const isCurrentItem = member.id === rec.id
@@ -144,8 +144,8 @@ export function ItemView({ rec, onNav }: ViewProps) {
                             )}
                           >
                             <MewTile cat="items" rec={item} size={56} frame="slot" />
-                            <span className="text-[10px]/[1.1] font-semibold max-w-[70px] text-[color:var(--mwp-ink)]">{item.name}</span>
-                            {isCurrentItem && <span className="absolute top-0 right-0 text-[10px] font-bold bg-[color:var(--mwp-red)] text-white px-1 py-0.5 [border-radius:0_2px_0_4px]">★</span>}
+                            <span className="text-[0.625rem]/[1.1] font-semibold max-w-[4.375rem] text-[color:var(--mwp-ink)]">{item.name}</span>
+                            {isCurrentItem && <span className="absolute top-0 right-0 text-[0.625rem] font-bold bg-[color:var(--mwp-red)] text-white px-1 py-0.5 [border-radius:0_2px_0_4px]">★</span>}
                           </button>
                         ) : null
                       })}

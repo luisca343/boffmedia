@@ -37,33 +37,33 @@ function MtRow({ tn }: { tn: MyTournamentApi }) {
   return (
     <Link
       href={`/torneos/${tn.slug}`}
-      className="group flex items-center gap-[14px] border border-solid border-line border-l-[3px] bg-panel px-[14px] py-3 transition-colors hover:bg-panel-2"
+      className="group flex items-center gap-[0.875rem] border border-solid border-line border-l-[3px] bg-panel px-[0.875rem] py-3 transition-colors hover:bg-panel-2"
       style={{ borderLeftColor: `hsl(${hue} 55% 48%)` }}
     >
       <span
-        className="grid h-10 w-10 flex-none place-items-center border border-solid font-mono text-[12px]/none font-extrabold tracking-[0.04em]"
+        className="grid h-10 w-10 flex-none place-items-center border border-solid font-mono text-[0.75rem]/none font-extrabold tracking-[0.04em]"
         style={{ color: `hsl(${hue} 65% 64%)`, background: `hsl(${hue} 55% 46% / 0.14)`, borderColor: `hsl(${hue} 55% 46% / 0.3)` }}
       >
         {seal}
       </span>
       <div className="grid min-w-0 flex-1 gap-1">
-        <div className="flex items-center gap-[9px]">
-          <b className="truncate font-display text-[15px]/[1.1] font-bold tracking-[0.01em]">{tn.name}</b>
+        <div className="flex items-center gap-[0.5625rem]">
+          <b className="truncate font-display text-[0.9375rem]/[1.1] font-bold tracking-[0.01em]">{tn.name}</b>
           {tn.isChampion && (
             <span
-              className="flex-none border border-solid px-1.5 py-[3px] font-mono text-[9px]/none font-bold uppercase tracking-[0.08em]"
+              className="flex-none border border-solid px-1.5 py-[3px] font-mono text-[0.5625rem]/none font-bold uppercase tracking-[0.08em]"
               style={{ color: `hsl(${hue} 65% 64%)`, borderColor: `hsl(${hue} 55% 46% / 0.4)` }}
             >
               {t("tournaments.champion")}
             </span>
           )}
         </div>
-        <span className="inline-flex items-center gap-2 font-mono text-[12px]/none font-medium text-txt-muted">
+        <span className="inline-flex items-center gap-2 font-mono text-[0.75rem]/none font-medium text-txt-muted">
           <DkLive status={bucket} size="sm" />
           {sub}
         </span>
       </div>
-      <span className="grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-line-2 bg-base text-txt-muted transition-colors group-hover:border-accent-line group-hover:text-accent-bright">
+      <span className="grid h-[2.125rem] w-[2.125rem] flex-none place-items-center border border-solid border-line-2 bg-base text-txt-muted transition-colors group-hover:border-accent-line group-hover:text-accent-bright">
         <Icon name="arrow" size={15} />
       </span>
     </Link>
@@ -103,7 +103,7 @@ export function ProfileTournamentsTab() {
         <TourLive {...featured.tour} hue={featured.hue} action={featured.action} liveLabel={t("live.badge")} className="mb-4" />
       )}
 
-      <div className="grid gap-[18px]">
+      <div className="grid gap-[1.125rem]">
         {groups.map(([bucket, label]) => {
           const rows = list.filter(
             (tn) => (BUCKET_OF[tn.status] ?? "done") === bucket && tn.slug !== featured?.slug,
@@ -111,9 +111,9 @@ export function ProfileTournamentsTab() {
           if (!rows.length) return null
           return (
             <div key={bucket}>
-              <div className="mb-[9px] flex items-center gap-2.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.14em] text-txt-muted">
+              <div className="mb-[0.5625rem] flex items-center gap-2.5 font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.14em] text-txt-muted">
                 {label}
-                <span className="grid h-[18px] min-w-[18px] place-items-center border border-solid border-line bg-panel-2 px-[5px] text-[10px] text-txt-dim">
+                <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center border border-solid border-line bg-panel-2 px-[0.3125rem] text-[0.625rem] text-txt-dim">
                   {rows.length}
                 </span>
                 <span className="h-px flex-1 bg-line" />

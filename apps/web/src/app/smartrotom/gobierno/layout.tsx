@@ -44,7 +44,7 @@ export default function GobiernoLayout({ children }: { children: ReactNode }) {
         <div className="flex min-h-0 flex-1 flex-col md:flex-row">
           <GobiernoNav />
           <main className="gt-scroll min-h-0 min-w-0 flex-1 overflow-y-auto">
-            <div className="mx-auto max-w-[1320px] px-4 pb-10 pt-4 md:px-[26px] md:pb-10 md:pt-[22px]">
+            <div className="mx-auto max-w-[82.5rem] px-4 pb-10 pt-4 md:px-[1.625rem] md:pb-10 md:pt-[1.375rem]">
               {children}
             </div>
           </main>

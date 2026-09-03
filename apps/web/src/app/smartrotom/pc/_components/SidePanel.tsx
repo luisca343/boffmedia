@@ -24,7 +24,7 @@ export function SidePanel({ onOpenLivingDex }: SidePanelProps) {
   const [tab, setTab] = useState<Tab>("team")
 
   return (
-    <Panel className="flex w-[300px] flex-none flex-col overflow-hidden">
+    <Panel className="flex w-[18.75rem] flex-none flex-col overflow-hidden">
       <CollectionProgress onOpenLivingDex={onOpenLivingDex} />
 
       <div role="tablist" aria-label={t("team.title")} className="flex flex-none gap-1.5 p-2">

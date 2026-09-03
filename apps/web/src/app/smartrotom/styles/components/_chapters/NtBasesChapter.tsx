@@ -70,7 +70,7 @@ const ACCENT_NAMES: Record<string, string> = {
 
 function DocDemo({ serif }: { serif?: boolean }) {
   return (
-    <div className={cn("nt-doc nt-scroll max-h-[440px] min-h-0 overflow-auto p-7", serif && "serif")}>
+    <div className={cn("nt-doc nt-scroll max-h-[27.5rem] min-h-0 overflow-auto p-7", serif && "serif")}>
       <h1>Arquitectura de Notas</h1>
       <p className="lead">
         Un documento es sólo HTML: el editor escribe sobre <code>.nt-doc</code> y la prosa se resuelve
@@ -167,9 +167,9 @@ export function NtBasesChapter() {
                 style={{ ["--nt-accent" as string]: triplet(hex), ["--nt-accent-fg" as string]: triplet(hex) }}
               >
                 <div className="h-9 rounded-nt-sm bg-nt-accent" />
-                <div className="mt-2.5 text-[12px] font-[550] text-nt-accent-fg">Enlace wiki</div>
-                <div className="mt-1 font-nt-mono text-[10px] text-nt-fg-subtle">{hex}</div>
-                <div className="mt-0.5 text-[11px] text-nt-fg-muted">{ACCENT_NAMES[hex] ?? "Personalizado"}</div>
+                <div className="mt-2.5 text-[0.75rem] font-[550] text-nt-accent-fg">Enlace wiki</div>
+                <div className="mt-1 font-nt-mono text-[0.625rem] text-nt-fg-subtle">{hex}</div>
+                <div className="mt-0.5 text-[0.6875rem] text-nt-fg-muted">{ACCENT_NAMES[hex] ?? "Personalizado"}</div>
               </div>
             ))}
           </div>
@@ -183,17 +183,17 @@ export function NtBasesChapter() {
         lead="Cuatro voces: Inter para la interfaz, Orbitron para las marcas de la app, IBM Plex Mono para código y atajos, y un serif del sistema para el modo lectura. La prosa del editor no se compone con utilidades: es la clase de componente `.nt-doc`, porque el HTML editable se estiliza por descendencia."
       >
         <Sample title="Escala" code="font-nt · font-nt-display · font-nt-mono · font-nt-read" app="nt" col>
-          <div className="grid w-full gap-[18px]">
+          <div className="grid w-full gap-[1.125rem]">
             {[
-              ["Marca / Orbitron 700 / 20–28px", <span key="a" className="font-nt-display text-[26px] font-bold tracking-tight text-nt-fg">Notas</span>],
-              ["Título / Inter 650 / 21–32px", <span key="b" className="text-[28px] font-[650] leading-tight tracking-[-.02em] text-nt-fg">Arquitectura de Notas</span>],
-              ["Interfaz / Inter 400–550 / 13–16px", <span key="c" className="max-w-[52ch] text-[14px] text-nt-fg-muted">Las notas se enlazan entre sí; el grafo se reconstruye al guardar.</span>],
-              ["Dato / Plex Mono 400–500 / 10–13px", <span key="d" className="font-nt-mono text-[12px] text-nt-fg-subtle">actualizado hace 4 min · 3 retroenlaces</span>],
-              ["Lectura / serif 400 / 18px", <span key="e" className="max-w-[46ch] font-nt-read text-[18px] leading-[1.65] text-nt-fg">El modo serif cambia sólo la prosa, nunca el chrome.</span>],
+              ["Marca / Orbitron 700 / 20–28px", <span key="a" className="font-nt-display text-[1.625rem] font-bold tracking-tight text-nt-fg">Notas</span>],
+              ["Título / Inter 650 / 21–32px", <span key="b" className="text-[1.75rem] font-[650] leading-tight tracking-[-.02em] text-nt-fg">Arquitectura de Notas</span>],
+              ["Interfaz / Inter 400–550 / 13–16px", <span key="c" className="max-w-[52ch] text-[0.875rem] text-nt-fg-muted">Las notas se enlazan entre sí; el grafo se reconstruye al guardar.</span>],
+              ["Dato / Plex Mono 400–500 / 10–13px", <span key="d" className="font-nt-mono text-[0.75rem] text-nt-fg-subtle">actualizado hace 4 min · 3 retroenlaces</span>],
+              ["Lectura / serif 400 / 18px", <span key="e" className="max-w-[46ch] font-nt-read text-[1.125rem] leading-[1.65] text-nt-fg">El modo serif cambia sólo la prosa, nunca el chrome.</span>],
             ].map(([meta, node], i) => (
               <div
                 key={i}
-                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-nt-border pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[230px_1fr] sm:gap-[22px]"
+                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-nt-border pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[14.375rem_1fr] sm:gap-[1.375rem]"
               >
                 <span className={cn(MONO_LABEL, "text-nt-fg-subtle")}>{meta as React.ReactNode}</span>
                 {node as React.ReactNode}

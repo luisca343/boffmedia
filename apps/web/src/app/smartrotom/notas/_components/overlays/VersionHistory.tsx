@@ -24,19 +24,19 @@ export function VersionHistory({
 
   return (
     <Overlay onClose={onClose} align="center">
-      <div className={`${MODAL_PANEL} w-[460px] max-w-[92vw]`}>
-        <div className="flex items-center gap-2.5 border-b border-nt-border px-[18px] py-4">
+      <div className={`${MODAL_PANEL} w-[28.75rem] max-w-[92vw]`}>
+        <div className="flex items-center gap-2.5 border-b border-nt-border px-[1.125rem] py-4">
           <Icon name="history" size={17} className="text-nt-accent-fg" />
-          <h3 className="m-0 flex-1 truncate text-[16px] font-[650] text-nt-fg">{t("history.title")}</h3>
+          <h3 className="m-0 flex-1 truncate text-[1rem] font-[650] text-nt-fg">{t("history.title")}</h3>
           <button onClick={onClose} aria-label={t("common.close")} className="text-nt-fg-subtle hover:text-nt-fg">
             <Icon name="x" size={18} />
           </button>
         </div>
-        <div className="nt-scroll max-h-[420px] overflow-auto p-2.5">
+        <div className="nt-scroll max-h-[26.25rem] overflow-auto p-2.5">
           {isLoading ? (
-            <div className="px-3 py-10 text-center text-[13px] text-nt-fg-subtle">{t("history.loading")}</div>
+            <div className="px-3 py-10 text-center text-[0.8125rem] text-nt-fg-subtle">{t("history.loading")}</div>
           ) : versions.length === 0 ? (
-            <div className="px-3 py-10 text-center text-[13px] leading-[1.6] text-nt-fg-subtle">
+            <div className="px-3 py-10 text-center text-[0.8125rem] leading-[1.6] text-nt-fg-subtle">
               {t("history.empty")}
               <br />
               {t("history.emptyHint")}
@@ -46,7 +46,7 @@ export function VersionHistory({
               <div key={v.id} className="group flex gap-3 rounded-nt-md px-3.5 py-3 hover:bg-nt-hover">
                 <div className="flex flex-col items-center">
                   <span
-                    className={`mt-1 h-[11px] w-[11px] flex-none rounded-full border-2 border-nt-accent ${
+                    className={`mt-1 h-[0.6875rem] w-[0.6875rem] flex-none rounded-full border-2 border-nt-accent ${
                       i === 0 ? "bg-nt-accent" : "bg-nt-bg-2"
                     }`}
                   />
@@ -54,12 +54,12 @@ export function VersionHistory({
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-[13px] font-medium text-nt-fg">
+                    <span className="truncate text-[0.8125rem] font-medium text-nt-fg">
                       {v.label || (i === 0 ? t("history.current") : t("history.version", { num: versions.length - i }))}
                     </span>
-                    <span className="text-[11px] tabular-nums text-nt-fg-subtle">{t("history.words", { count: v.words })}</span>
+                    <span className="text-[0.6875rem] tabular-nums text-nt-fg-subtle">{t("history.words", { count: v.words })}</span>
                   </div>
-                  <div className="mt-0.5 text-[11.5px] text-nt-fg-subtle">{fullDate(toMs(v.createdAt), locale)}</div>
+                  <div className="mt-0.5 text-[0.71875rem] text-nt-fg-subtle">{fullDate(toMs(v.createdAt), locale)}</div>
                 </div>
                 {i !== 0 && (
                   <button
@@ -67,7 +67,7 @@ export function VersionHistory({
                       onRestore(v.id);
                       onClose();
                     }}
-                    className="self-center rounded-nt-sm border border-nt-border bg-nt-hover px-2.5 py-1 text-[12px] text-nt-fg-muted opacity-0 transition-opacity hover:text-nt-fg group-hover:opacity-100"
+                    className="self-center rounded-nt-sm border border-nt-border bg-nt-hover px-2.5 py-1 text-[0.75rem] text-nt-fg-muted opacity-0 transition-opacity hover:text-nt-fg group-hover:opacity-100"
                   >
                     {t("history.restoreBtn")}
                   </button>

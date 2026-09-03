@@ -73,28 +73,28 @@ export function BattlePreview({ team, foeTeam, foeUnknown = 0, picks, leads, tim
 
   return (
     <div role="dialog" aria-modal="false" aria-label={t("battle.preview.title")} className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-base/90 p-3 backdrop-blur-[3px] sm:p-5">
-      <div className="mx-auto flex w-full max-w-[920px] flex-col gap-3 animate-[bm-modal-in_260ms_ease_both] motion-reduce:animate-none">
+      <div className="mx-auto flex w-full max-w-[57.5rem] min-[2240px]:max-w-[75rem] flex-col gap-3 animate-[bm-modal-in_260ms_ease_both] motion-reduce:animate-none">
         <BsimSection
           kicker={t("battle.preview.picked", { n: order.length, picks: wanted })}
           icon="layers"
           title={t("battle.preview.title")}
           aside={timer != null ? (
-            <span className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.1em] text-txt-dim">
+            <span className="flex items-center gap-2 font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-dim">
               <span className="hidden sm:inline">{t("battle.preview.timeLeft")}</span>
               <BxRing sec={timer} max={timerMax} size={36} label={t("battle.preview.timeLeft")} />
             </span>
           ) : undefined}
         >
-          <p className="m-0 mb-3 font-body text-[13px] leading-[1.45] text-txt-muted">
+          <p className="m-0 mb-3 font-body text-[0.8125rem] leading-[1.45] text-txt-muted">
             {leads > 1 ? t("battle.preview.leadDoubles", { picks: wanted, leads }) : t("battle.preview.leadSingles")}
           </p>
 
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="grid content-start gap-2">
-              <h4 className="m-0 flex items-center gap-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
+              <h4 className="m-0 flex items-center gap-2 font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
                 <i aria-hidden className="h-2 w-2 bg-accent" />{t("battle.preview.yourTeam")}{youName ? ` · ${youName}` : ""}
               </h4>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 min-[1600px]:grid-cols-4">
                 {team.map((mon, i) => {
                   const slot = i + 1
                   const pos = order.indexOf(slot)
@@ -109,21 +109,21 @@ export function BattlePreview({ team, foeTeam, foeUnknown = 0, picks, leads, tim
                       dim={!picked && order.length >= wanted}
                       onClick={() => toggle(slot)}
                       label={`${mon.name}${picked ? `, ${pos + 1}` : ""}${isLead ? `, ${t("battle.preview.lead")}` : ""}`}
-                      aside={isLead ? <b className="flex-none bg-accent-soft px-[5px] py-[3px] font-mono text-[8px] font-bold uppercase leading-none tracking-[0.1em] text-accent-bright">{t("battle.preview.lead")}</b> : <kbd className="flex-none font-mono text-[9.5px] text-txt-dim">{slot}</kbd>}
+                      aside={isLead ? <b className="flex-none bg-accent-soft px-[0.3125rem] py-[3px] font-mono text-[0.5rem] font-bold uppercase leading-none tracking-[0.1em] text-accent-bright">{t("battle.preview.lead")}</b> : <kbd className="flex-none font-mono text-[0.59375rem] text-txt-dim">{slot}</kbd>}
                     />
                   )
                 })}
               </div>
             </div>
             <div className="grid content-start gap-2">
-              <h4 className="m-0 flex items-center gap-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
+              <h4 className="m-0 flex items-center gap-2 font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
                 <i aria-hidden className="h-2 w-2 bg-bad" />{t("battle.preview.foeTeam")}{foeName ? ` · ${foeName}` : ""}
               </h4>
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 min-[1600px]:grid-cols-4">
                 {foeTeam.map((mon, i) => <BxSlot key={mon.id + i} mon={{ name: mon.species || mon.name, types: mon.types, species: mon.species }} />)}
                 {Array.from({ length: Math.max(0, foeUnknown) }, (_, i) => <BxUnknownSlot key={"unk" + i} />)}
                 {foeTeam.length === 0 && foeUnknown === 0 && (
-                  <span className="col-span-full font-mono text-[11px] text-txt-dim">{t("battle.preview.foeHidden")}</span>
+                  <span className="col-span-full font-mono text-[0.6875rem] text-txt-dim">{t("battle.preview.foeHidden")}</span>
                 )}
               </div>
             </div>
@@ -137,7 +137,7 @@ export function BattlePreview({ team, foeTeam, foeUnknown = 0, picks, leads, tim
             {order.length > 0 && <Button variant="ghost" onClick={useDefault}>{t("battle.preview.defaultOrder")}</Button>}
             {order.length > 0 && <Button variant="ghost" size="sm" onClick={() => setOrder([])}>{t("battle.preview.clear")}</Button>}
             <span className="flex-1" />
-            <span className="font-mono text-[10px] uppercase leading-none tracking-[0.1em] text-txt-dim">
+            <span className="font-mono text-[0.625rem] uppercase leading-none tracking-[0.1em] text-txt-dim">
               {order.length === 0 ? t("battle.preview.hintDefault") : t("battle.preview.hintPicked", { n: order.length })}
             </span>
           </div>

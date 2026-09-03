@@ -10,7 +10,7 @@ export function PatronesChapter() {
             <Section id="paneles" kicker="Patrones" title="Paneles">
               <Sample title="Panel con cabecera" code="<Panel title aside>" col>
                 <Panel title="Próximos eventos" aside={<Badge tone="live">En vivo</Badge>}>
-                  <p className="text-txt-muted text-[14px]">El contenido vive aquí. La esquina superior derecha lleva el corte de 16px — la firma del sistema.</p>
+                  <p className="text-txt-muted text-[0.875rem]">El contenido vive aquí. La esquina superior derecha lleva el corte de 16px — la firma del sistema.</p>
                 </Panel>
               </Sample>
               <Sample title="Tercio inferior (fila de evento)" code="<Third>" col>
@@ -86,8 +86,8 @@ export function PatronesChapter() {
                     }
                     note="Mostrando 60 de 1 284"
                   >
-                    <SearchInput value="" onChange={() => {}} placeholder="Buscar carta…" className="min-w-[200px] flex-1" />
-                    <Select value="num" onChange={() => {}} ariaLabel="Orden" className="w-auto min-w-[180px]" options={[{ value: "num", label: "Orden: Número" }]} />
+                    <SearchInput value="" onChange={() => {}} placeholder="Buscar carta…" className="min-w-[12.5rem] flex-1" />
+                    <Select value="num" onChange={() => {}} ariaLabel="Orden" className="w-auto min-w-[11.25rem]" options={[{ value: "num", label: "Orden: Número" }]} />
                     <ToolBarSpacer />
                     <Seg value="m" onChange={() => {}} options={[{ value: "s", label: "S" }, { value: "m", label: "M" }, { value: "l", label: "L" }]} />
                   </ToolBar>
@@ -100,7 +100,7 @@ export function PatronesChapter() {
                     <Seg value="m" onChange={() => {}} options={[{ value: "s", label: "S" }, { value: "m", label: "M" }, { value: "l", label: "L" }]} />
                     <Button size="sm">Aplicar</Button>
                   </>}>
-                    <SearchInput value="" onChange={() => {}} placeholder="Buscar…" className="min-w-[200px] flex-1" />
+                    <SearchInput value="" onChange={() => {}} placeholder="Buscar…" className="min-w-[12.5rem] flex-1" />
                     <ToolBarSpacer />
                     <Seg value="asc" onChange={() => {}} options={[{ value: "asc", label: "A–Z" }, { value: "desc", label: "Z–A" }]} />
                   </ToolStrip>
@@ -119,7 +119,7 @@ export function PatronesChapter() {
 
               <Sample title="Divisor de barra" code={'<ToolBarDivider>'} note={<>Línea vertical fina (1px) que agrupa controles en una <code>ToolBar</code>. Ejemplo: búsqueda · divisor · opciones de vista.</>}>
                 <div className="flex items-center gap-3 p-4 border border-solid border-line bg-panel">
-                  <SearchInput value="" onChange={() => {}} placeholder="Buscar…" className="w-[160px]" />
+                  <SearchInput value="" onChange={() => {}} placeholder="Buscar…" className="w-[10rem]" />
                   <ToolBarDivider />
                   <Seg value="m" onChange={() => {}} options={[{ value: "s", label: "S" }, { value: "m", label: "M" }]} />
                 </div>
@@ -155,8 +155,8 @@ export function PatronesChapter() {
                     { cls: "cut-seal cut-seal-edge [--cut-line:var(--line-2)]", name: ".cut-seal", use: "Avisos y tiras de notificación (Banner)" },
                   ].map((g) => (
                     <div key={g.name} className={`${g.cls} border border-solid border-line-2 bg-panel p-4`}>
-                      <code className="font-mono text-[12px] font-semibold text-accent">{g.name}</code>
-                      <p className="mt-1 text-[13px] leading-[1.45] text-txt-muted">{g.use}</p>
+                      <code className="font-mono text-[0.75rem] font-semibold text-accent">{g.name}</code>
+                      <p className="mt-1 text-[0.8125rem] leading-[1.45] text-txt-muted">{g.use}</p>
                     </div>
                   ))}
                 </div>
@@ -215,13 +215,13 @@ export function PatronesChapter() {
                 />
               </Sample>
               <Sample title="Progreso" code="<Progress>" col>
-                <div className="grid gap-[14px]">
+                <div className="grid gap-[0.875rem]">
                   <Progress value={62} />
                   <Progress value={28} />
                 </div>
               </Sample>
               <Sample title="Lista de datos" code="<DataList rows>" col note={<>Pares etiqueta/valor para fichas y detalles; el valor va a la derecha, con opción <code>mono</code>, <code>icon</code> y filas <code>wide</code> a línea completa.</>}>
-                <div className="w-full max-w-[440px]">
+                <div className="w-full max-w-[27.5rem]">
                   <DataList
                     rows={[
                       { label: "Formato", value: "Dobles VGC", icon: "gamepad" },
@@ -234,7 +234,7 @@ export function PatronesChapter() {
                 </div>
               </Sample>
               <Sample title="Bloque de código" code="<CodeBlock lines label copyText scan>" col note={<>Bloque monoespaciado con cabecera y botón de copiar; <code>scan</code> añade el barrido de sintonización y <code>tone=&quot;accent&quot;</code> tiñe el texto.</>}>
-                <div className="w-full max-w-[440px]">
+                <div className="w-full max-w-[27.5rem]">
                   <CodeBlock
                     label="Código · US / JP"
                     tone="accent"
@@ -260,7 +260,7 @@ export function PatronesChapter() {
                 <Ph label="key art — personajes wingull 2" style={{ width: 300, height: 140 }} />
               </Sample>
               <Sample title="Skeleton" code="<Skeleton w h avatar>" col note={<>La base genérica de carga que las herramientas especializan (listas, carátulas, huecos de equipo). Se detiene con reduce-motion.</>}>
-                <div className="flex gap-[14px] items-center w-full max-w-[420px]">
+                <div className="flex gap-[0.875rem] items-center w-full max-w-[26.25rem]">
                   <Skeleton w={48} h={48} avatar />
                   <div className="flex-1 grid gap-2">
                     <Skeleton w="60%" h={13} />

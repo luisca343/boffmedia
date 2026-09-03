@@ -153,7 +153,7 @@ export function BestiarioChapter() {
         lead={<>La tarjeta de monstruo (<code>MonsterCard</code>) en variante rejilla y fila, teñida por especie y con nivel de amenaza. La insignia de amenaza (<code>MhThreatBadge</code>), la etiqueta de especie (<code>MhSpeciesTag</code>) y las estrellas (<code>MhStars</code>) son átomos reutilizables. <em>threat</em>, <em>título</em> e <em>insignia</em> son campos editoriales <code>[deferred]</code>, opcionales cuando la API no los da.</>}
       >
         <Sample title="Tarjeta de monstruo — rejilla / fila" code="<MonsterCard m active onClick>" col>
-          <div className="grid gap-[10px] w-full [grid-template-columns:repeat(auto-fit,minmax(160px,180px))]">
+          <div className="grid gap-[0.625rem] w-full [grid-template-columns:repeat(auto-fit,minmax(10rem,11.25rem))]">
             <MonsterCard m={rathalos} active={active === 1} onClick={() => setActive(1)} />
             <MonsterCard m={arkveld} active={active === 2} onClick={() => setActive(2)} />
           </div>
@@ -180,17 +180,17 @@ export function BestiarioChapter() {
         lead={<>La rejilla de debilidad elemental (<code>MhWeaknessGrid</code>), la vulnerabilidad a estados (<code>MhStatusVulns</code>), y el análisis de puntos de impacto en dos densidades: escaneo casual (<code>MhHitzoneScan</code>) y tabla exacta (<code>MhHitzoneTable</code>).</>}
       >
         <Sample title="Rejilla de debilidad elemental" code="<MhWeaknessGrid weaknesses>" col>
-          <div className="w-full max-w-[620px]">
+          <div className="w-full max-w-[38.75rem]">
             <MhWeaknessGrid weaknesses={rathWeak} />
           </div>
         </Sample>
         <Sample title="Vulnerabilidad a estados" code="<MhStatusVulns statuses>" col>
-          <div className="w-full max-w-[420px]">
+          <div className="w-full max-w-[26.25rem]">
             <MhStatusVulns statuses={ANJA_STATUSES} />
           </div>
         </Sample>
         <Sample title="Escaneo casual de hitzones" code="<MhHitzoneScan hitzones>" col note="Vista guiada: ordena las partes por mejor daño físico. En modo Analista se cambia por la tabla exacta.">
-          <div className="w-full max-w-[520px]">
+          <div className="w-full max-w-[32.5rem]">
             <MhHitzoneScan hitzones={RATH_HITZONES} />
           </div>
         </Sample>
@@ -253,7 +253,7 @@ export function BestiarioChapter() {
           </MhTag2>
         </Sample>
         <Sample title="Ataque peligroso → respuesta" code="<MhDangerCard danger>" col>
-          <div className="w-full max-w-[460px]">
+          <div className="w-full max-w-[28.75rem]">
             <MhDangerCard danger={RATH_DANGER} />
           </div>
         </Sample>

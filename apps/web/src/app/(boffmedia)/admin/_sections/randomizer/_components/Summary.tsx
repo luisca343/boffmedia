@@ -51,10 +51,10 @@ function SummaryBody({ onSave, onRun }: { onSave: () => void; onRun: () => void 
 
   return (
     <>
-      <div className="flex items-center gap-2.5 py-3 px-4 border-b border-solid border-line font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-txt-muted">
+      <div className="flex items-center gap-2.5 py-3 px-4 border-b border-solid border-line font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-txt-muted">
         <Icon name="sliders" size={15} className="text-accent" />
         <span>{t("chrome.changes")}</span>
-        <span className="ml-auto grid place-items-center min-w-[22px] h-5 px-1.5 bg-accent text-accent-ink text-[11px] font-bold">
+        <span className="ml-auto grid place-items-center min-w-[1.375rem] h-5 px-1.5 bg-accent text-accent-ink text-[0.6875rem] font-bold">
           {rows.length}
         </span>
         <button
@@ -75,7 +75,7 @@ function SummaryBody({ onSave, onRun }: { onSave: () => void; onRun: () => void 
               type="button"
               onClick={() => goToField(FIELD_INDEX[warn.field]?.category.id ?? "general", warn.field)}
               className={cn(
-                "flex items-start gap-2 py-2.5 px-4 border-l-2 border-solid text-left text-[12px] leading-[1.4] cursor-pointer",
+                "flex items-start gap-2 py-2.5 px-4 border-l-2 border-solid text-left text-[0.75rem] leading-[1.4] cursor-pointer",
                 WARN_STYLES[warn.level],
               )}
             >
@@ -90,14 +90,14 @@ function SummaryBody({ onSave, onRun }: { onSave: () => void; onRun: () => void 
         {rows.length === 0 ? (
           <div className="flex flex-col items-center gap-2.5 py-10 px-5 text-center text-txt-dim">
             <Icon name="check" size={28} />
-            <p className="text-[13px] leading-[1.5]">{t("chrome.summaryEmpty")}</p>
+            <p className="text-[0.8125rem] leading-[1.5]">{t("chrome.summaryEmpty")}</p>
           </div>
         ) : (
           grouped.map((catRows) => {
             const cat = catRows[0].category
             return (
               <div key={cat.id}>
-                <div className="flex items-center gap-2 pt-2.5 px-4 pb-1 font-mono text-[9.5px] font-bold uppercase tracking-[0.12em] text-txt-dim">
+                <div className="flex items-center gap-2 pt-2.5 px-4 pb-1 font-mono text-[0.59375rem] font-bold uppercase tracking-[0.12em] text-txt-dim">
                   <Icon name={cat.icon} size={12} className="text-accent" />
                   <span>{t(cat.labelKey)}</span>
                 </div>
@@ -106,18 +106,18 @@ function SummaryBody({ onSave, onRun }: { onSave: () => void; onRun: () => void 
                     <button
                       type="button"
                       onClick={() => goToField(cat.id, r.control.field)}
-                      className="flex-1 min-w-0 text-left text-[12.5px] text-txt hover:text-accent-bright truncate cursor-pointer border-0 bg-transparent"
+                      className="flex-1 min-w-0 text-left text-[0.78125rem] text-txt hover:text-accent-bright truncate cursor-pointer border-0 bg-transparent"
                     >
                       {t(r.control.labelKey)}
                     </button>
-                    <span className="font-mono text-[11px] text-accent whitespace-nowrap">
+                    <span className="font-mono text-[0.6875rem] text-accent whitespace-nowrap">
                       {humanValue(r.control, r.value, t)}
                     </span>
                     <button
                       type="button"
                       onClick={() => ui.resetField(r.control.field)}
                       title={t("chrome.resetField")}
-                      className="grid place-items-center w-[18px] h-[18px] border-0 bg-transparent text-txt-dim hover:text-bad cursor-pointer shrink-0"
+                      className="grid place-items-center w-[1.125rem] h-[1.125rem] border-0 bg-transparent text-txt-dim hover:text-bad cursor-pointer shrink-0"
                     >
                       <Icon name="x" size={13} />
                     </button>
@@ -160,7 +160,7 @@ export function SummaryDrawer({ onSave, onRun }: { onSave: () => void; onRun: ()
       )}
       <aside
         className={cn(
-          "fixed top-0 right-0 z-[70] h-screen w-[360px] max-w-[92vw] flex flex-col border-l border-solid border-line bg-panel shadow-2xl",
+          "fixed top-0 right-0 z-[70] h-screen w-[22.5rem] max-w-[92vw] flex flex-col border-l border-solid border-line bg-panel shadow-2xl",
           "transition-transform duration-[260ms]",
           ui.summaryOpen ? "translate-x-0" : "translate-x-[105%]",
         )}

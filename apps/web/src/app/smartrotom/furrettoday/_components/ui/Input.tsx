@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 
 const BASE =
-  "font-ft-ui border-ft w-full min-w-0 rounded-ft-pill border-ft-ink bg-white px-4 py-3 text-[15px] " +
+  "font-ft-ui border-ft w-full min-w-0 rounded-ft-pill border-ft-ink bg-white px-4 py-3 text-[0.9375rem] " +
   "shadow-ft-pop-sm placeholder:text-ft-ink/45 focus:border-ft-pink focus:outline-none";
 
 export const Input = forwardRef<

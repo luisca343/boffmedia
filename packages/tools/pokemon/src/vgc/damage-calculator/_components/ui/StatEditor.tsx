@@ -15,7 +15,7 @@ type BaseStats = Record<StatKey, number>
 
 // Compact cell control.
 const CELL =
-  "w-full cut-tag cut-tag-edge [--cut-tag:5px] [--cut-line:var(--line-2)] border border-solid border-line-2 bg-base [[data-theme=light]_&]:bg-panel-2 px-[7px] py-[5px] font-mono text-[11px] text-txt outline-none focus:border-accent focus:[--cut-line:var(--accent)]"
+  "w-full cut-tag cut-tag-edge [--cut-tag:5px] [--cut-line:var(--line-2)] border border-solid border-line-2 bg-base [[data-theme=light]_&]:bg-panel-2 px-[0.4375rem] py-[0.3125rem] font-mono text-[0.6875rem] text-txt outline-none focus:border-accent focus:[--cut-line:var(--accent)]"
 
 const CELL_CARET: React.CSSProperties = {
   backgroundImage:
@@ -56,12 +56,12 @@ export function StatEditor({
   const set = (obj: "boosts" | "ivs" | "evs", k: StatKey, v: number, lo: number, hi: number) =>
     onChange({ [obj]: { ...poke[obj], [k]: Math.min(hi, Math.max(lo, v)) } } as Partial<CalcPokemon>)
 
-  const th = "border-b border-solid border-line px-1.5 py-1 font-mono text-[9px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim"
+  const th = "border-b border-solid border-line px-1.5 py-1 font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.12em] text-txt-dim"
   const td = "border-b border-solid border-[color-mix(in_srgb,var(--line)_50%,transparent)] px-1.5 py-1"
 
   return (
     <div>
-      <table className="w-full border-collapse font-mono text-[12px]/[1.2]">
+      <table className="w-full border-collapse font-mono text-[0.75rem]/[1.2]">
         <thead>
           <tr>
             <th className={cn(th, "text-left")}>{t("colStat")}</th>
@@ -90,7 +90,7 @@ export function StatEditor({
                       value={poke.boosts[k as BoostKey]}
                       aria-label={`${t("colStage")} ${labels[k]}`}
                       onChange={(e) => set("boosts", k, parseInt(e.target.value, 10), -6, 6)}
-                      className={cn(CELL, "cursor-pointer appearance-none pr-[22px]")}
+                      className={cn(CELL, "cursor-pointer appearance-none pr-[1.375rem]")}
                       style={CELL_CARET}
                     >
                       {STAGES.map((v) => (
@@ -133,7 +133,7 @@ export function StatEditor({
         </tbody>
       </table>
       <div
-        className={cn("flex items-center gap-2 pt-1.5 font-mono text-[11px]/[1.3] text-txt-dim", over && "text-bad")}
+        className={cn("flex items-center gap-2 pt-1.5 font-mono text-[0.6875rem]/[1.3] text-txt-dim", over && "text-bad")}
         role={over ? "alert" : undefined}
       >
         {over && <Icon name="alert" size={13} />}

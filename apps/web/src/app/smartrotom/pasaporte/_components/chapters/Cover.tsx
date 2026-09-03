@@ -26,13 +26,13 @@ export function Cover({ profile }: { profile?: Passport | null }) {
       className="ps-buckram ps-emboss relative flex h-full w-full flex-col items-center justify-between overflow-hidden px-[8%] py-[7%] text-ps-chrome-fg"
     >
       <div className="relative z-[2] text-center">
-        <p className="font-ps-mono text-[11px] uppercase tracking-[.42em] text-ps-gild/85">
+        <p className="font-ps-mono text-[0.6875rem] uppercase tracking-[.42em] text-ps-gild/85">
           Gobierno de Teras
         </p>
-        <h1 className="ps-foil mt-2 font-ps-display text-[clamp(34px,7vh,64px)] leading-[.98] tracking-[.14em]">
+        <h1 className="ps-foil mt-2 font-ps-display text-[clamp(2.125rem,7vh,4rem)] leading-[.98] tracking-[.14em]">
           PASAPORTE
         </h1>
-        <p className="mt-2 font-ps-mono text-[11px] uppercase tracking-[.34em] text-ps-chrome-fg/60">
+        <p className="mt-2 font-ps-mono text-[0.6875rem] uppercase tracking-[.34em] text-ps-chrome-fg/60">
           {t("cover.subtitle")}
         </p>
       </div>
@@ -61,19 +61,19 @@ export function Cover({ profile }: { profile?: Passport | null }) {
             alt=""
             aria-hidden="true"
             draggable={false}
-            className="h-[124px] w-auto drop-shadow-[0_0_16px_rgba(244,227,161,.28)]"
+            className="h-[7.75rem] w-auto drop-shadow-[0_0_16px_rgba(244,227,161,.28)]"
           />
         </span>
-        <span className="ps-num absolute -bottom-1.5 whitespace-nowrap font-ps-display text-[14px] font-bold text-ps-gild-hi [text-shadow:0_1px_3px_rgba(0,0,0,.6)]">
+        <span className="ps-num absolute -bottom-1.5 whitespace-nowrap font-ps-display text-[0.875rem] font-bold text-ps-gild-hi [text-shadow:0_1px_3px_rgba(0,0,0,.6)]">
           {t("cover.complete", { pct })}
         </span>
       </div>
 
       <div className="relative z-[2] w-full text-center">
-        <p className="ps-foil font-ps-ceremony text-[clamp(20px,3.4vh,30px)] tracking-[.02em]">
+        <p className="ps-foil font-ps-ceremony text-[clamp(1.25rem,3.4vh,1.875rem)] tracking-[.02em]">
           {profile?.username ?? "—"}
         </p>
-        <div className="ps-num mt-2.5 flex justify-center gap-4 font-ps-mono text-[10.5px] uppercase tracking-[.12em] text-ps-chrome-fg/60">
+        <div className="ps-num mt-2.5 flex justify-center gap-4 font-ps-mono text-[0.65625rem] uppercase tracking-[.12em] text-ps-chrome-fg/60">
           <span>
             {t("cover.id")} <b className="font-bold text-ps-gild">{profile?.trainerId ?? "—"}</b>
           </span>
@@ -86,7 +86,7 @@ export function Cover({ profile }: { profile?: Passport | null }) {
         </div>
       </div>
 
-      <p className="ps-loop absolute bottom-[26px] left-1/2 z-[2] flex -translate-x-1/2 items-center gap-[7px] font-ps-mono text-[10px] tracking-[.2em] text-ps-chrome-fg/40 animate-ps-hint motion-reduce:animate-none">
+      <p className="ps-loop absolute bottom-[1.625rem] left-1/2 z-[2] flex -translate-x-1/2 items-center gap-[0.4375rem] font-ps-mono text-[0.625rem] tracking-[.2em] text-ps-chrome-fg/40 animate-ps-hint motion-reduce:animate-none">
         <Icon name="book" className="h-3.5 w-3.5" />
         {t("cover.hint")}
       </p>

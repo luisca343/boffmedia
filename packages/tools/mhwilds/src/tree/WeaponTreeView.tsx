@@ -198,7 +198,7 @@ export function WeaponTreeView() {
         <div className="flex-1 grid place-items-center">
           <div className="flex flex-col items-center gap-3">
             <Spinner />
-            <span className="font-mono text-[12px] uppercase tracking-[0.14em] text-[var(--mh-bright)]">{t("app.loading")}…</span>
+            <span className="font-mono text-[0.75rem] uppercase tracking-[0.14em] text-[var(--mh-bright)]">{t("app.loading")}…</span>
           </div>
         </div>
       </MhApp>
@@ -219,7 +219,7 @@ export function WeaponTreeView() {
   return (
     <MhApp>
       <MhBar>
-        <div className="flex items-center gap-[11px] min-w-0">
+        <div className="flex items-center gap-[0.6875rem] min-w-0">
           <MhSeal name="tree" />
           <ToolTitle
             title={
@@ -244,7 +244,7 @@ export function WeaponTreeView() {
       </MhBar>
 
       {/* type rail */}
-      <div className="flex gap-3 items-center flex-wrap px-[clamp(16px,2.4vw,36px)] py-[11px] border-b border-line bg-base-2">
+      <div className="flex gap-3 items-center flex-wrap px-[clamp(1rem,2.4vw,2.25rem)] py-[0.6875rem] border-b border-line bg-base-2">
         <div className="flex gap-1.5 flex-wrap flex-1">
           {availableTypes.map((k) => (
             <MhTypeChip key={k} icon="sword" label={t(`weapons.${k}`)} count={treeByKind[k].length} on={type === k} onClick={() => setType(k)} />
@@ -256,18 +256,18 @@ export function WeaponTreeView() {
       </div>
 
       {/* filter strip */}
-      <div className="flex gap-2.5 items-center flex-wrap px-[clamp(16px,2.4vw,36px)] py-2.5 border-b border-line">
-        <div className="flex-1 min-w-[220px] max-w-[340px]"><MhSearch value={q} onChange={setQ} placeholder={t("tree.searchWeapon")} /></div>
-        <Select ariaLabel={t("rarity")} value={fRar} onChange={setFRar} options={rarOptions} className="min-w-[130px]" />
-        <Select ariaLabel={t("element")} value={fEl} onChange={setFEl} options={elOptions} className="min-w-[140px]" />
+      <div className="flex gap-2.5 items-center flex-wrap px-[clamp(1rem,2.4vw,2.25rem)] py-2.5 border-b border-line">
+        <div className="flex-1 min-w-[13.75rem] max-w-[21.25rem]"><MhSearch value={q} onChange={setQ} placeholder={t("tree.searchWeapon")} /></div>
+        <Select ariaLabel={t("rarity")} value={fRar} onChange={setFRar} options={rarOptions} className="min-w-[8.125rem]" />
+        <Select ariaLabel={t("element")} value={fEl} onChange={setFEl} options={elOptions} className="min-w-[8.75rem]" />
         <Chip on={pathMode} onClick={() => setPathMode((v) => !v)}>
           <Icon name="trending" size={13} className="inline align-[-2px] mr-1" />{t("tree.upgradePath")}
         </Chip>
         <span className="flex-1" />
         <span className="inline-flex items-center gap-2">
-          <span className="font-mono text-[11px] leading-none text-txt-muted">{t("tree.progress")}</span>
-          <MhMeter pct={total ? (ownedCount / total) * 100 : 0} className="w-[90px]" />
-          <b className="font-mono text-[12px] leading-none">{ownedCount}/{total}</b>
+          <span className="font-mono text-[0.6875rem] leading-none text-txt-muted">{t("tree.progress")}</span>
+          <MhMeter pct={total ? (ownedCount / total) * 100 : 0} className="w-[5.625rem]" />
+          <b className="font-mono text-[0.75rem] leading-none">{ownedCount}/{total}</b>
         </span>
       </div>
 
@@ -314,14 +314,14 @@ export function WeaponTreeView() {
                 })}
               </div>
 
-              <div className="absolute left-3.5 bottom-3.5 z-[6] font-mono text-[11px] leading-none text-txt-dim bg-panel border border-line py-[7px] px-2.5 flex items-center gap-[7px]">
+              <div className="absolute left-3.5 bottom-3.5 z-[6] font-mono text-[0.6875rem] leading-none text-txt-dim bg-panel border border-line py-[0.4375rem] px-2.5 flex items-center gap-[0.4375rem]">
                 <Icon name="target" size={13} />{t("tree.dragHint")}
               </div>
-              <div className="absolute right-3.5 bottom-3.5 flex flex-col gap-[5px] z-[6]">
-                <button type="button" onClick={() => zoom(1)} aria-label={t("tree.zoomIn")} className="w-[38px] h-[38px] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="plus" size={16} /></button>
-                <div className="font-mono text-[10px] leading-none text-center text-txt-dim py-[3px]">{Math.round(xf.scale * 100)}%</div>
-                <button type="button" onClick={() => zoom(-1)} aria-label={t("tree.zoomOut")} className="w-[38px] h-[38px] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="minus" size={16} /></button>
-                <button type="button" onClick={fit} aria-label={t("tree.fit")} title={t("tree.fit")} className="w-[38px] h-[38px] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="grid" size={15} /></button>
+              <div className="absolute right-3.5 bottom-3.5 flex flex-col gap-[0.3125rem] z-[6]">
+                <button type="button" onClick={() => zoom(1)} aria-label={t("tree.zoomIn")} className="w-[2.375rem] h-[2.375rem] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="plus" size={16} /></button>
+                <div className="font-mono text-[0.625rem] leading-none text-center text-txt-dim py-[3px]">{Math.round(xf.scale * 100)}%</div>
+                <button type="button" onClick={() => zoom(-1)} aria-label={t("tree.zoomOut")} className="w-[2.375rem] h-[2.375rem] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="minus" size={16} /></button>
+                <button type="button" onClick={fit} aria-label={t("tree.fit")} title={t("tree.fit")} className="w-[2.375rem] h-[2.375rem] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="grid" size={15} /></button>
               </div>
             </div>
           </div>
@@ -363,15 +363,15 @@ function TreeOutline({ roots, ownedSet, matches, sel, onSel }: { roots: Node[]; 
             type="button"
             onClick={() => onSel(String(node.id))}
             style={{ marginLeft: matches ? 0 : depth * 20 }}
-            className={`grid grid-cols-[1fr_auto] items-center gap-3 py-[9px] px-3 bg-panel border text-left transition-colors hover:bg-panel-2 ${sel === String(node.id) ? "border-[var(--mh)]" : "border-line hover:border-line-2"}`}
+            className={`grid grid-cols-[1fr_auto] items-center gap-3 py-[0.5625rem] px-3 bg-panel border text-left transition-colors hover:bg-panel-2 ${sel === String(node.id) ? "border-[var(--mh)]" : "border-line hover:border-line-2"}`}
           >
             <span className="flex items-center gap-2 min-w-0">
               {ownedSet[String(node.id)] && <Icon name="check" size={13} className="text-[var(--mh-bright)]" />}
               <MhRarity rarity={node.rarity} />
-              <b className="font-body text-[13px] leading-tight truncate">{node.name}</b>
-              {(!node.children || !node.children.length) && <span className="text-txt-dim font-mono text-[12px] leading-none">· {t("tree.final").toLowerCase()}</span>}
+              <b className="font-body text-[0.8125rem] leading-tight truncate">{node.name}</b>
+              {(!node.children || !node.children.length) && <span className="text-txt-dim font-mono text-[0.75rem] leading-none">· {t("tree.final").toLowerCase()}</span>}
             </span>
-            <span className="flex gap-3 font-mono text-[11px] leading-none text-txt-muted flex-none">
+            <span className="flex gap-3 font-mono text-[0.6875rem] leading-none text-txt-muted flex-none">
               <span><Icon name="sword" size={11} className="inline align-[-1px]" /> {weaponAttack(node)}</span>
               {sp && <span style={{ color: elementColor(sp.type) }}>{sp.value}</span>}
             </span>
@@ -417,19 +417,19 @@ function TreeDetail({ node, roots, nodesById, owned, onToggleOwned, onClose, onG
       {sp && <div className="mt-3"><MhElement type={sp.type} value={sp.value} hidden={sp.hidden} label={t(sp.type)} /></div>}
 
       {parent && (
-        <div className="mt-[18px]">
+        <div className="mt-[1.125rem]">
           <MhLabel>{t("tree.improvesFrom")}</MhLabel>
-          <button type="button" onClick={() => onGoTo(String(parent.id))} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[9px] px-3 bg-panel border border-line text-left hover:border-line-2">
-            <span className="flex items-center gap-2 min-w-0"><Icon name="back" size={13} className="text-txt-dim" /><MhRarity rarity={parent.rarity} /><b className="font-body text-[13px] leading-tight truncate">{parent.name}</b></span>
-            <span className="font-mono text-[11px] leading-none text-txt-muted">{weaponAttack(parent)}</span>
+          <button type="button" onClick={() => onGoTo(String(parent.id))} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[0.5625rem] px-3 bg-panel border border-line text-left hover:border-line-2">
+            <span className="flex items-center gap-2 min-w-0"><Icon name="back" size={13} className="text-txt-dim" /><MhRarity rarity={parent.rarity} /><b className="font-body text-[0.8125rem] leading-tight truncate">{parent.name}</b></span>
+            <span className="font-mono text-[0.6875rem] leading-none text-txt-muted">{weaponAttack(parent)}</span>
           </button>
         </div>
       )}
 
       {stepMats.length > 0 && (
-        <div className="mt-[18px]">
+        <div className="mt-[1.125rem]">
           <MhLabel>{parent ? t("tree.upgradeMaterials") : t("tree.craftMaterials")}{zenny ? ` · ${zenny.toLocaleString()}z` : ""}</MhLabel>
-          <div className="flex flex-col gap-[5px]">
+          <div className="flex flex-col gap-[0.3125rem]">
             {stepMats.map((m: any, i: number) => (
               <MhMaterial key={m.item?.id ?? i} name={m.item?.name ?? "?"} rarity={m.item?.rarity} quantity={m.quantity ?? 1} />
             ))}
@@ -438,13 +438,13 @@ function TreeDetail({ node, roots, nodesById, owned, onToggleOwned, onClose, onG
       )}
 
       {node.children && node.children.length > 0 && (
-        <div className="mt-[18px]">
+        <div className="mt-[1.125rem]">
           <MhLabel>{t("tree.improvesTo")}</MhLabel>
           <div className="flex flex-col gap-1">
             {node.children.map((c: Node) => (
-              <button key={c.id} type="button" onClick={() => onGoTo(String(c.id))} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[9px] px-3 bg-panel border border-line text-left hover:border-line-2">
-                <span className="flex items-center gap-2 min-w-0"><Icon name="chevronRight" size={13} className="text-[var(--mh-bright)]" /><MhRarity rarity={c.rarity} /><b className="font-body text-[13px] leading-tight truncate">{c.name}</b></span>
-                <span className="font-mono text-[11px] leading-none text-txt-muted">{weaponAttack(c)}</span>
+              <button key={c.id} type="button" onClick={() => onGoTo(String(c.id))} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[0.5625rem] px-3 bg-panel border border-line text-left hover:border-line-2">
+                <span className="flex items-center gap-2 min-w-0"><Icon name="chevronRight" size={13} className="text-[var(--mh-bright)]" /><MhRarity rarity={c.rarity} /><b className="font-body text-[0.8125rem] leading-tight truncate">{c.name}</b></span>
+                <span className="font-mono text-[0.6875rem] leading-none text-txt-muted">{weaponAttack(c)}</span>
               </button>
             ))}
           </div>

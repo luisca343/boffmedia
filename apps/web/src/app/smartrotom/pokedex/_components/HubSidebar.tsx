@@ -28,31 +28,31 @@ export function HubSidebar() {
   ]
 
   return (
-    <aside className="hidden lg:flex flex-col w-[260px] shrink-0 bg-white/[0.015] border-r border-white/[0.05] p-[18px_14px] gap-[22px]">
-      <div className="flex items-center gap-[10px] pb-[14px] px-2 border-b border-white/[0.05]">
+    <aside className="hidden lg:flex flex-col w-[16.25rem] shrink-0 bg-white/[0.015] border-r border-white/[0.05] p-[18px_14px] gap-[1.375rem]">
+      <div className="flex items-center gap-[0.625rem] pb-[0.875rem] px-2 border-b border-white/[0.05]">
         <div className="w-8 h-8 rounded-[10px] bg-gradient-to-br from-pk-primary-400 to-pk-primary-700 grid place-items-center shadow-[0_4px_12px_rgba(249,115,22,0.3)]">
           <PokeballIcon size={18} color="white" />
         </div>
         <div className="flex flex-col gap-px">
           <b className="font-pk-display text-sm font-bold text-pk-surface-50 tracking-tight">Pokédex</b>
-          <span className="font-pk-mono text-[10px] text-pk-surface-500 tracking-widest uppercase">SmartRotom</span>
+          <span className="font-pk-mono text-[0.625rem] text-pk-surface-500 tracking-widest uppercase">SmartRotom</span>
         </div>
       </div>
 
       <NavSection items={NAV_DATA} label={t("sidebar_data")} pathname={pathname} />
       <NavSection items={NAV_REF} label={t("sidebar_reference")} pathname={pathname} />
 
-      <div className="mt-auto flex flex-col gap-[10px] p-3 bg-white/[0.02] border border-white/[0.05] rounded-[10px]">
-        <div className="flex items-center gap-[10px] text-xs">
-          <div className="w-7 h-7 rounded-md bg-gradient-to-br from-[#84cc16] to-[#16a34a] grid place-items-center font-pk-display font-bold text-[13px] text-white">
+      <div className="mt-auto flex flex-col gap-[0.625rem] p-3 bg-white/[0.02] border border-white/[0.05] rounded-[10px]">
+        <div className="flex items-center gap-[0.625rem] text-xs">
+          <div className="w-7 h-7 rounded-md bg-gradient-to-br from-[#84cc16] to-[#16a34a] grid place-items-center font-pk-display font-bold text-[0.8125rem] text-white">
             {session?.user?.name?.[0]?.toUpperCase() || "U"}
           </div>
           <div className="flex flex-col gap-px min-w-0">
-            <b className="text-[12.5px] text-pk-surface-100">{session?.user?.name || t("sidebar.userFallback")}</b>
-            <span className="text-[10.5px] text-pk-surface-500 font-pk-mono">{t("sidebar_connected")} · server-01</span>
+            <b className="text-[0.78125rem] text-pk-surface-100">{session?.user?.name || t("sidebar.userFallback")}</b>
+            <span className="text-[0.65625rem] text-pk-surface-500 font-pk-mono">{t("sidebar_connected")} · server-01</span>
           </div>
         </div>
-        <button className="flex items-center gap-[11px] px-2 py-1.5 rounded-md text-xs text-pk-surface-300 hover:text-pk-surface-100 hover:bg-white/[0.04] transition-colors">
+        <button className="flex items-center gap-[0.6875rem] px-2 py-1.5 rounded-md text-xs text-pk-surface-300 hover:text-pk-surface-100 hover:bg-white/[0.04] transition-colors">
           <SettingsIcon className="w-3.5 h-3.5" />
           {t("sidebar_settings")}
         </button>
@@ -64,7 +64,7 @@ export function HubSidebar() {
 function NavSection({ items, label, pathname }: { items: NavItem[]; label: string; pathname: string }) {
   return (
     <nav className="flex flex-col gap-0.5">
-      <div className="font-pk-mono text-[10px] tracking-[0.12em] uppercase text-pk-surface-500 px-[10px] pb-1.5">
+      <div className="font-pk-mono text-[0.625rem] tracking-[0.12em] uppercase text-pk-surface-500 px-[0.625rem] pb-1.5">
         {label}
       </div>
       {items.map((item) => {
@@ -77,16 +77,16 @@ function NavSection({ items, label, pathname }: { items: NavItem[]; label: strin
           <Link
             key={item.href}
             href={item.href}
-            className={`flex items-center gap-[11px] py-[9px] px-[10px] rounded-lg text-[13.5px] font-medium transition-colors ${
+            className={`flex items-center gap-[0.6875rem] py-[0.5625rem] px-[0.625rem] rounded-lg text-[0.84375rem] font-medium transition-colors ${
               isActive
                 ? "bg-pk-primary-400/[0.12] text-pk-primary-200 shadow-[inset_0_0_0_1px_rgba(249,115,22,0.25)]"
                 : "text-pk-surface-300 hover:text-pk-surface-100 hover:bg-white/[0.04]"
             }`}
           >
-            <Icon className={`w-[18px] h-[18px] ${isActive ? "text-pk-primary-300" : "text-pk-surface-400"}`} />
+            <Icon className={`w-[1.125rem] h-[1.125rem] ${isActive ? "text-pk-primary-300" : "text-pk-surface-400"}`} />
             {item.label}
             {item.tail && (
-              <span className="ml-auto font-pk-mono text-[10px] text-pk-surface-500 bg-white/[0.04] px-1.5 py-0.5 rounded">
+              <span className="ml-auto font-pk-mono text-[0.625rem] text-pk-surface-500 bg-white/[0.04] px-1.5 py-0.5 rounded">
                 {item.tail}
               </span>
             )}

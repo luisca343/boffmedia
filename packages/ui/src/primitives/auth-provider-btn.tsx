@@ -49,8 +49,8 @@ export function AuthProviderBtn({
       className={cn(
         "cut-frame [--cut:7px] [--cut-w:1px]",
         "relative inline-flex items-center justify-center gap-2.5 select-none",
-        "px-[19px] py-[13px]",
-        "font-display font-bold not-italic text-[13.5px]/none tracking-[0.05em]",
+        "px-[1.1875rem] py-[0.8125rem]",
+        "font-display font-bold not-italic text-[0.84375rem]/none tracking-[0.05em]",
         "transition-[color,transform,filter] duration-[140ms] active:translate-y-px motion-reduce:active:translate-y-0",
         "before:transition-[background] before:duration-[140ms] after:transition-[background] after:duration-[140ms]",
         brand

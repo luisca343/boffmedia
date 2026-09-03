@@ -39,15 +39,15 @@ export function OficialesBoard() {
       />
 
       {isLoading ? (
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18.75rem,1fr))]">
           {Array.from({ length: 4 }, (_, i) => (
-            <Skeleton key={i} className="h-[132px]" />
+            <Skeleton key={i} className="h-[8.25rem]" />
           ))}
         </div>
       ) : sorted.length === 0 ? (
         <Empty icon="badge" title={t("poblacion.emptyOficiales")} sub={t("poblacion.emptyOficialesSub")} />
       ) : (
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18.75rem,1fr))]">
           {sorted.map((o) => (
             <OficialCard key={o.uuid} oficial={o} isMe={o.uuid === officer.uuid} canManage={officer.isAdmin} />
           ))}

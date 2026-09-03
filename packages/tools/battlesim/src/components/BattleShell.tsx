@@ -108,12 +108,12 @@ export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(function
           </div>
 
           {desktop && rail && (
-            <aside className="flex w-[340px] min-w-0 shrink-0 flex-col border-l border-solid border-line bg-panel">
+            <aside className="flex w-[21.25rem] min-w-0 shrink-0 flex-col border-l border-solid border-line bg-panel">
               {rail}
             </aside>
           )}
           {tablet && rail && railOpen && (
-            <aside className="absolute inset-y-0 right-0 z-20 flex w-[min(380px,100%)] flex-col border-l border-solid border-line bg-panel animate-[bm-drawer-in_200ms_ease_both] motion-reduce:animate-none">
+            <aside className="absolute inset-y-0 right-0 z-20 flex w-[min(23.75rem,100%)] flex-col border-l border-solid border-line bg-panel animate-[bm-drawer-in_200ms_ease_both] motion-reduce:animate-none">
               {rail}
             </aside>
           )}

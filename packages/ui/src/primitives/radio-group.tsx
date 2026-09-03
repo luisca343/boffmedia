@@ -50,7 +50,7 @@ export function RadioGroup({ value, onChange, options = [], ariaLabel, className
             onClick={() => pick(i)}
             onKeyDown={(e) => roving.onKeyDown(e, i, pick)}
             className={cn(
-              "group relative flex w-full items-start gap-[10px] py-[8px] pr-3 pl-[11px] text-left cursor-pointer",
+              "group relative flex w-full items-start gap-[0.625rem] py-[0.5rem] pr-3 pl-[0.6875rem] text-left cursor-pointer",
               // The accent bar is a left border that is always laid out and only
               // coloured when chosen, so selecting a row cannot shift the text.
               "border-0 border-l-[3px] border-solid border-l-transparent bg-transparent",
@@ -67,7 +67,7 @@ export function RadioGroup({ value, onChange, options = [], ariaLabel, className
               className={cn(
                 // Centred against the label's own line box (13px x 1.15 ≈ 15px)
                 // rather than nudged down by a hardcoded margin.
-                "flex-none grid place-items-center w-[13px] h-[13px] mt-[1px] self-start border border-solid rotate-45",
+                "flex-none grid place-items-center w-[0.8125rem] h-[0.8125rem] mt-[1px] self-start border border-solid rotate-45",
                 "transition-[border-color] duration-[140ms]",
                 // `group-[&:enabled:hover]`, not `group-hover:enabled`: the
                 // latter compiles to `:enabled` on this span, which is not a
@@ -77,7 +77,7 @@ export function RadioGroup({ value, onChange, options = [], ariaLabel, className
             >
               <i
                 className={cn(
-                  "w-[6px] h-[6px] bg-accent transition-[opacity,transform] duration-[140ms]",
+                  "w-[0.375rem] h-[0.375rem] bg-accent transition-[opacity,transform] duration-[140ms]",
                   on ? "opacity-100" : "opacity-0 scale-[0.4]",
                 )}
               />
@@ -85,14 +85,14 @@ export function RadioGroup({ value, onChange, options = [], ariaLabel, className
             <span className="grid gap-[2px] min-w-0">
               <b
                 className={cn(
-                  "font-display text-[13px] font-bold leading-[1.15] tracking-[0.03em] uppercase",
+                  "font-display text-[0.8125rem] font-bold leading-[1.15] tracking-[0.03em] uppercase",
                   "transition-[color] duration-[140ms]",
                   on ? "text-txt" : "text-txt-muted group-[&:enabled:hover]:text-txt",
                 )}
               >
                 {o.label}
               </b>
-              {o.desc && <small className="font-body text-[11.5px] leading-[1.35] text-txt-dim">{o.desc}</small>}
+              {o.desc && <small className="font-body text-[0.71875rem] leading-[1.35] text-txt-dim">{o.desc}</small>}
             </span>
           </button>
         )

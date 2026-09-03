@@ -45,7 +45,7 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
   };
 
   // The section card every other screen in the tool uses, at the tool's narrow
-  // measure. This was a hand-rolled panel with a bare `<h2 className="text-[22px]">`
+  // measure. This was a hand-rolled panel with a bare `<h2 className="text-[1.375rem]">`
   // that got its weight, its italic and its uppercase from apps/web's
   // `[data-ds] h2` rule — a rule that exists on the website and nowhere in the
   // launcher, where the title rendered as 22px body text.
@@ -60,13 +60,13 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
             aria-label={t('replays.loader.title')}
             aria-invalid={error ? true : undefined}
             spellCheck={false}
-            className="min-h-[220px] font-mono text-[12.5px] leading-[1.5]"
+            className="min-h-[13.75rem] font-mono text-[0.78125rem] leading-[1.5]"
           />
           {error && <Banner tone="error">{error}</Banner>}
           <Button variant="pri" icon="upload" className="w-full" disabled={!replayText.trim()} onClick={handleLoadReplay}>
             {t('replays.loader.load')}
           </Button>
-          <p className="m-0 text-center font-mono text-[10px] leading-[1.4] text-txt-dim">{t('replays.loader.hint')}</p>
+          <p className="m-0 text-center font-mono text-[0.625rem] leading-[1.4] text-txt-dim">{t('replays.loader.hint')}</p>
         </div>
       </BsimSection>
     </div>
@@ -220,7 +220,7 @@ export function Game({replayData}: {battleName?: string, replayData?: ReplayData
             )}
             {savedReplayId && (
               <>
-                <span className="inline-flex items-center gap-1.5 font-mono text-[11px] text-ok">
+                <span className="inline-flex items-center gap-1.5 font-mono text-[0.6875rem] text-ok">
                   <Icon name="check" size={13} />{t('end.replaySaved')}
                 </span>
                 {/* The address used to be printed raw, as text nobody could
@@ -246,7 +246,7 @@ export function Game({replayData}: {battleName?: string, replayData?: ReplayData
             activeTurn={!isPlaying && battle.turn > 0 ? battle.turn : undefined}
           />
         ) : (
-          <p className="cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line)] m-0 border border-solid border-line py-4 text-center font-mono text-[11px] text-txt-dim">
+          <p className="cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line)] m-0 border border-solid border-line py-4 text-center font-mono text-[0.6875rem] text-txt-dim">
             {t('replays.logHidden')}
           </p>
         )}

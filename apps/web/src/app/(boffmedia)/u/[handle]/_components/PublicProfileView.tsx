@@ -80,7 +80,7 @@ export function PublicProfileView({ handle }: { handle: string }) {
 
   if (state === "loading") {
     return (
-      <main className="wrap grid min-h-[60vh] place-items-center pb-[90px] pt-[34px]">
+      <main className="wrap grid min-h-[60vh] place-items-center pb-[5.625rem] pt-[2.125rem]">
         <span className="inline-flex items-center gap-3 text-txt-muted">
           <Spinner /> {t("public.loading")}
         </span>
@@ -90,7 +90,7 @@ export function PublicProfileView({ handle }: { handle: string }) {
 
   if (state === "notfound" || !profile) {
     return (
-      <main className="wrap pb-[90px] pt-[64px]">
+      <main className="wrap pb-[5.625rem] pt-[4rem]">
         <Empty icon="users" title={t("public.notFoundTitle")} lead={t("public.notFoundBody")} />
       </main>
     )
@@ -156,10 +156,10 @@ export function PublicProfileView({ handle }: { handle: string }) {
   )
 
   return (
-    <main className="wrap pb-[90px] pt-[34px]">
-      <div className="mb-[22px]">
+    <main className="wrap pb-[5.625rem] pt-[2.125rem]">
+      <div className="mb-[1.375rem]">
         <span className="mono-label">{t("kicker")}</span>
-        <h1 className="mt-2 text-[clamp(46px,5.4vw,64px)]">{t("public.title", { name: profile.name })}</h1>
+        <h1 className="mt-2 text-[clamp(2.875rem,5.4vw,4rem)]">{t("public.title", { name: profile.name })}</h1>
       </div>
 
       <ProfileHero
@@ -178,7 +178,7 @@ export function PublicProfileView({ handle }: { handle: string }) {
       </div>
 
       {stats.length > 0 && (
-        <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(148px,1fr))]">
+        <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(9.25rem,1fr))]">
           {stats.map((s) => (
             <StatTile key={s.label} {...s} />
           ))}

@@ -278,7 +278,7 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
   const benchCols = mobile ? 'grid-cols-2' : 'grid-cols-2 min-[720px]:grid-cols-3';
 
   return (
-    <section aria-label={t('battle.dock.aria')} className="flex flex-col gap-2 p-2 sm:gap-[10px] sm:p-3">
+    <section aria-label={t('battle.dock.aria')} className="flex flex-col gap-2 p-2 sm:gap-[0.625rem] sm:p-3">
       {/* Persistent header: segments + timer + hotkey legend */}
       <div className="flex flex-wrap items-center gap-2">
         <div role="tablist" aria-label={t('battle.dock.aria')} className="cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line-2)] inline-flex border border-solid border-line-2 bg-base">
@@ -286,7 +286,7 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
             const on = showSeg === s.id;
             return (
               <button key={s.id} type="button" role="tab" aria-selected={on} disabled={!s.enabled} onClick={() => setSeg(s.id)}
-                className={cn(BSIM_FOCUS, 'h-8 px-3 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.08em] transition-colors duration-[140ms] focus-visible:outline-offset-[-3px] disabled:cursor-not-allowed disabled:opacity-40',
+                className={cn(BSIM_FOCUS, 'h-8 px-3 font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.08em] transition-colors duration-[140ms] focus-visible:outline-offset-[-3px] disabled:cursor-not-allowed disabled:opacity-40',
                   on ? 'bg-accent text-accent-ink' : 'text-txt-muted hover:text-txt')}>
                 {s.label}
               </button>
@@ -318,7 +318,7 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
               selectLabel={s.mon ? t('battle.dock.orderFor', { name: s.mon.name }) : undefined} />
           ))}
           {(sent || !isWaiting) && (
-            <span role="status" className="ml-auto inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.08em] text-txt-dim">
+            <span role="status" className="ml-auto inline-flex items-center gap-2 font-mono text-[0.65625rem] uppercase tracking-[0.08em] text-txt-dim">
               <i aria-hidden className="h-2 w-2 bg-warn [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" />
               {sent ? t('battle.dock.sent') : ''} {t('battle.dock.waiting')}
               {sent && onUndo && !bsx.noCancel && <Button variant="ghost" size="sm" icon="back" title={t('battle.dock.undoHint')} onClick={() => { onUndo(); setSent(false); }}>{t('battle.dock.undo')}</Button>}
@@ -327,30 +327,30 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
         </div>
       )}
       {slots.length === 0 && !isWaiting && (
-        <span role="status" className="inline-flex items-center gap-2 font-mono text-[10.5px] uppercase tracking-[0.08em] text-txt-dim">
+        <span role="status" className="inline-flex items-center gap-2 font-mono text-[0.65625rem] uppercase tracking-[0.08em] text-txt-dim">
           <i aria-hidden className="h-2 w-2 bg-warn [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" />{t('battle.dock.waiting')}
         </span>
       )}
 
-      {spectator && <p className="m-0 font-mono text-[11px] text-txt-dim">{t('battle.dock.spectating')}</p>}
+      {spectator && <p className="m-0 font-mono text-[0.6875rem] text-txt-dim">{t('battle.dock.spectating')}</p>}
 
       {/* Target mode */}
       {pending && (
         <div role="status" className="flex flex-wrap items-center gap-2 border border-solid border-warn bg-warn-soft p-2">
-          <b className="font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-txt">{t('battle.dock.chooseTarget')}</b>
-          <span className="font-mono text-[10px] text-txt-muted">{pending.name}</span>
+          <b className="font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.04em] text-txt">{t('battle.dock.chooseTarget')}</b>
+          <span className="font-mono text-[0.625rem] text-txt-muted">{pending.name}</span>
           <span className="flex flex-wrap gap-1">
             {pending.options.map((o) => (
               <Button key={o.code} size="sm" variant={o.side === 'foe' ? 'danger' : 'default'} onClick={() => pending && (onTargetingPick(o.code))}>{o.label}</Button>
             ))}
           </span>
           <Button size="sm" variant="ghost" onClick={escape}>{t('battle.dock.legend.esc')}</Button>
-          <span className="w-full font-mono text-[10px] text-txt-dim">{t('battle.dock.chooseTargetHint')}</span>
+          <span className="w-full font-mono text-[0.625rem] text-txt-dim">{t('battle.dock.chooseTargetHint')}</span>
         </div>
       )}
 
       {mech && !pending && (
-        <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex w-fit items-center gap-2 border border-solid border-accent-line bg-accent-soft px-[10px] py-[6px] font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-accent-bright">
+        <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex w-fit items-center gap-2 border border-solid border-accent-line bg-accent-soft px-[0.625rem] py-[0.375rem] font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.06em] text-accent-bright">
           {t('battle.dock.mech.armed', { name: t(`battle.dock.mech.${mech}`) })}
         </span>
       )}
@@ -358,7 +358,7 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
       {/* Body */}
       {canAct && showSeg === 'moves' && slot && (
         <div className="flex flex-col gap-2">
-          {slot.trapped && <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-warn">{t('battle.dock.trapped')}</span>}
+          {slot.trapped && <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-warn">{t('battle.dock.trapped')}</span>}
           <div className={cn('grid gap-2', moveCols)}>
             {activeMoves.map((move: BSXKeyMove, i) => (
               <BxKey key={(move.id ?? move.name) + i} move={move} hotkey={i + 1} tera={mech === 'terastallize'} target={bsx.bsxFoe}
@@ -384,10 +384,10 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
 
       {canAct && showSeg === 'switch' && (
         <div className="flex flex-col gap-2">
-          <span className="font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
+          <span className="font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
             {bsx.requestType === 'switch' ? (slot?.mon ? t('battle.dock.forcedSwitchFor', { name: slot.mon.name }) : t('battle.dock.forcedSwitch')) : t('battle.dock.switch')}
           </span>
-          {!benchAvailable && <p className="m-0 font-body text-[12px] text-txt-dim">{t('battle.dock.noBench')}</p>}
+          {!benchAvailable && <p className="m-0 font-body text-[0.75rem] text-txt-dim">{t('battle.dock.noBench')}</p>}
           <div className={cn('grid gap-2', benchCols)}>
             {bsx.bsxBench.map((mon, i) => {
               const n = i + 1;
@@ -401,7 +401,7 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
       )}
 
       {canAct && showSeg === 'team' && (
-        <p className="m-0 font-body text-[12.5px] text-txt-muted">{t('battle.preview.leadSingles')}</p>
+        <p className="m-0 font-body text-[0.78125rem] text-txt-muted">{t('battle.preview.leadSingles')}</p>
       )}
     </section>
   );

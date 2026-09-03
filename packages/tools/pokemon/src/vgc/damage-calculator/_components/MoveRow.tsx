@@ -42,7 +42,7 @@ export function MoveRow({
   ]
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)_100px_86px_62px_30px] items-center gap-[6px] max-[560px]:grid-cols-[minmax(0,1fr)_100px_30px]">
+    <div className="grid grid-cols-[minmax(0,1fr)_6.25rem_5.375rem_3.875rem_1.875rem] items-center gap-[0.375rem] max-[560px]:grid-cols-[minmax(0,1fr)_6.25rem_1.875rem]">
       <Combobox<MoveData>
         value={move.name}
         placeholder={t("movePlaceholder", { n: idx + 1 })}

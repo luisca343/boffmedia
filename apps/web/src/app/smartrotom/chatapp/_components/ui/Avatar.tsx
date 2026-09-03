@@ -8,7 +8,7 @@ export function Presence({ status, className }: { status: PresenceStatus; classN
   return (
     <span
       className={cn(
-        "absolute bottom-0 right-0 h-[13px] w-[13px] rounded-full border-[2.5px] border-ca-panel",
+        "absolute bottom-0 right-0 h-[0.8125rem] w-[0.8125rem] rounded-full border-[2.5px] border-ca-panel",
         status === "online" ? "bg-ca-online" : status === "ingame" ? "bg-ca-accent" : "bg-ca-400",
         className,
       )}

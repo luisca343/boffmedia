@@ -23,7 +23,7 @@ export interface ArModalProps {
 /** The arcade's scope-root classes, for the shared `ModalShell`'s portal. */
 export const AR_SCOPE = "ar-app font-ar text-ar-ink"
 
-const SIZE = { sm: "max-w-[420px]", md: "max-w-[560px]", lg: "max-w-[760px]" } as const
+const SIZE = { sm: "max-w-[26.25rem]", md: "max-w-[35rem]", lg: "max-w-[47.5rem]" } as const
 
 const TONE = {
   cyan: "border-ar-cyan/40 shadow-[0_0_60px_-12px_rgb(var(--ar-cyan)/.45)]",
@@ -67,7 +67,7 @@ export function Modal({
       <div className="relative z-[1] flex items-start justify-between gap-4 border-b border-white/[.07] p-5">
         <div>
           {kicker && (
-            <div className="mb-2 font-ar-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ar-cyan">
+            <div className="mb-2 font-ar-mono text-[0.625rem] font-bold uppercase tracking-[0.18em] text-ar-cyan">
               {kicker}
             </div>
           )}
@@ -83,7 +83,7 @@ export function Modal({
         </button>
       </div>
 
-      <div className="ar-scroll relative z-[1] max-h-[60vh] overflow-y-auto p-5 font-ar text-[13px] leading-relaxed text-ar-ink-dim">
+      <div className="ar-scroll relative z-[1] max-h-[60vh] overflow-y-auto p-5 font-ar text-[0.8125rem] leading-relaxed text-ar-ink-dim">
         {children}
       </div>
 

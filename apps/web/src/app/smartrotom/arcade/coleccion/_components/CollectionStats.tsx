@@ -46,7 +46,7 @@ export function CollectionStats({ items }: CollectionStatsProps) {
       />
 
       <Panel tone="deep" tight>
-        <div className="mb-2.5 font-ar-display text-[8px] uppercase tracking-[0.12em] text-ar-violet-2">
+        <div className="mb-2.5 font-ar-display text-[0.5rem] uppercase tracking-[0.12em] text-ar-violet-2">
           {t("coleccion.stats.byRarity")}
         </div>
         <ul className="flex flex-col gap-1.5">
@@ -55,7 +55,7 @@ export function CollectionStats({ items }: CollectionStatsProps) {
             return (
               <li key={rarity} className="flex items-center gap-2.5">
                 <span
-                  className="w-[76px] shrink-0 font-ar-mono text-[10px] uppercase tracking-[0.08em]"
+                  className="w-[4.75rem] shrink-0 font-ar-mono text-[0.625rem] uppercase tracking-[0.08em]"
                   style={{ color: skin.fg }}
                 >
                   {t(skin.nameKey)}
@@ -70,7 +70,7 @@ export function CollectionStats({ items }: CollectionStatsProps) {
                     }}
                   />
                 </span>
-                <span className="w-6 shrink-0 text-right font-ar-mono text-[11px] tabular-nums text-ar-ink-dim">
+                <span className="w-6 shrink-0 text-right font-ar-mono text-[0.6875rem] tabular-nums text-ar-ink-dim">
                   {count}
                 </span>
               </li>

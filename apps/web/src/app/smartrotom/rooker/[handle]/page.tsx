@@ -65,7 +65,7 @@ export default function ProfilePage() {
     return (
       <div>
         <SubHeader title={t("profile.title")} back />
-        <Skeleton className="h-[130px] rounded-none" />
+        <Skeleton className="h-[8.125rem] rounded-none" />
         <div className="p-4">
           <Skeleton className="h-20 w-20 rounded-full" />
         </div>
@@ -101,7 +101,7 @@ export default function ProfilePage() {
 
       {/* The banner. Its tint is the partner's — a data-driven colour, so it is an
           inline gradient rather than a class (§4). */}
-      <div className="relative h-[130px] overflow-hidden bg-gradient-to-br from-rk-accent/40 to-rk-card">
+      <div className="relative h-[8.125rem] overflow-hidden bg-gradient-to-br from-rk-accent/40 to-rk-card">
         {profile.partnerPokemonId && (
           <div className="absolute -bottom-2 right-3 opacity-90">
             <Sprite
@@ -130,7 +130,7 @@ export default function ProfilePage() {
               <Link
                 href="/smartrotom/chatapp"
                 aria-label={t("profile.sendMessageAriaLabel")}
-                className="grid h-[38px] w-[38px] place-items-center rounded-full border border-rk-line-strong text-rk-fg transition-colors hover:bg-rk-hover"
+                className="grid h-[2.375rem] w-[2.375rem] place-items-center rounded-full border border-rk-line-strong text-rk-fg transition-colors hover:bg-rk-hover"
               >
                 <Icon name="mail" size={17} />
               </Link>
@@ -148,18 +148,18 @@ export default function ProfilePage() {
 
         <div className="mt-2">
           <div className="flex flex-wrap items-center gap-1.5">
-            <span className="text-[21px] font-extrabold text-rk-fg">{name}</span>
+            <span className="text-[1.3125rem] font-extrabold text-rk-fg">{name}</span>
             {profile.isVerified && <Verified size={17} />}
           </div>
-          <div className="text-[14.5px] text-rk-fg-subtle">@{profile.handle}</div>
+          <div className="text-[0.90625rem] text-rk-fg-subtle">@{profile.handle}</div>
 
           {profile.bio && (
-            <p className="mt-2.5 whitespace-pre-wrap text-[14.5px] leading-relaxed text-rk-fg">
+            <p className="mt-2.5 whitespace-pre-wrap text-[0.90625rem] leading-relaxed text-rk-fg">
               {profile.bio}
             </p>
           )}
 
-          <div className="mt-2.5 flex flex-wrap gap-4 text-[13.5px] text-rk-fg-subtle">
+          <div className="mt-2.5 flex flex-wrap gap-4 text-[0.84375rem] text-rk-fg-subtle">
             {profile.link && (
               <a
                 href={profile.link}
@@ -177,7 +177,7 @@ export default function ProfilePage() {
             </span>
           </div>
 
-          <div className="mt-2.5 flex gap-4 text-[14px]">
+          <div className="mt-2.5 flex gap-4 text-[0.875rem]">
             <span className="text-rk-fg-subtle">
               <b className="text-rk-fg">{exact(profile.counts.following)}</b> {t("profile.countsFollowing")}
             </span>
@@ -204,7 +204,7 @@ export default function ProfilePage() {
                 isMe ? (
                   <Link
                     href="/smartrotom/rooker/vitrina"
-                    className="text-[13px] font-bold text-rk-accent hover:underline"
+                    className="text-[0.8125rem] font-bold text-rk-accent hover:underline"
                   >
                     {t("profile.viewCollection")}
                   </Link>

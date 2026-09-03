@@ -36,7 +36,7 @@ function MewCharacterCard({ id, onNav }: { id: string; onNav: NavFn }) {
       )}
     >
       <MewTile cat="characters" rec={char as MewRec} size={60} frame="slot" />
-      <span className="text-[11.5px]/[1.2] font-semibold max-w-[85px] text-[color:var(--mwp-ink)]">{char.name}</span>
+      <span className="text-[0.71875rem]/[1.2] font-semibold max-w-[5.3125rem] text-[color:var(--mwp-ink)]">{char.name}</span>
     </button>
   )
 }
@@ -80,7 +80,7 @@ export function MapView({ rec, onNav }: ViewProps) {
             {rec.bosses && rec.bosses.length > 0 && (
               <div className="mb-3">
                 <MewSubLabel>{t("label.bossLabel")}</MewSubLabel>
-                <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(80px,1fr))]">
+                <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(5rem,1fr))]">
                   {rec.bosses.map((id) => (
                     <MewCharacterCard key={id} id={id} onNav={onNav} />
                   ))}
@@ -90,7 +90,7 @@ export function MapView({ rec, onNav }: ViewProps) {
             {rec.minibosses && rec.minibosses.length > 0 && (
               <div>
                 <MewSubLabel>{t("label.minibosses")}</MewSubLabel>
-                <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(80px,1fr))]">
+                <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(5rem,1fr))]">
                   {rec.minibosses.map((id) => (
                     <MewCharacterCard key={id} id={id} onNav={onNav} />
                   ))}
@@ -157,7 +157,7 @@ export function MapView({ rec, onNav }: ViewProps) {
             className="max-h-[70vh] max-w-[90vw] [image-rendering:pixelated] block object-contain"
           />
           <div className="text-center">
-            <div className="text-[clamp(16px,2vw,28px)] font-bold text-white [font-family:var(--mwf-disp)] [text-wrap:balance]">
+            <div className="text-[clamp(1rem,2vw,1.75rem)] font-bold text-white [font-family:var(--mwf-disp)] [text-wrap:balance]">
               {rec.name}
             </div>
           </div>

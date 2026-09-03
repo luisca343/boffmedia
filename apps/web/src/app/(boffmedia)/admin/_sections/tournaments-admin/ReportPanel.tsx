@@ -120,7 +120,7 @@ export function ReportPanel({
 
       <AvPanel title={t("pendingTitle")} icon="play" aside={<AvPill tone={reportable.length ? "accent" : "muted"}>{reportable.length}</AvPill>}>
       {reportable.length === 0 ? (
-        <p className="py-2 font-mono text-[12px] text-txt-dim">
+        <p className="py-2 font-mono text-[0.75rem] text-txt-dim">
           {waiting.length > 0
             ? t("reportWaiting")
             : t("reportNone")}
@@ -130,7 +130,7 @@ export function ReportPanel({
           {orderedGroups.map(([key, g]) => (
             <div key={key} className="grid gap-1.5">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
+                <span className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em] text-txt-dim">
                   {g.label} · {g.items.length}
                 </span>
                 <RoundScheduler tid={tid} items={g.items} onScheduled={onReported} />
@@ -140,14 +140,14 @@ export function ReportPanel({
                 const filled = s.a !== "" && s.b !== ""
                 return (
                   <div key={m.id} className="flex flex-wrap items-center gap-2 border border-solid border-line bg-base px-2 py-1.5">
-                    <span className="min-w-[80px] flex-1 truncate text-right font-body text-[12px]">{m.top?.name}</span>
-                    <input type="number" min={0} value={s.a} onChange={(e) => setScore(m.id, { a: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" placeholder="–" />
-                    <span className="font-mono text-[11px] text-txt-dim">–</span>
-                    <input type="number" min={0} value={s.b} onChange={(e) => setScore(m.id, { b: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" placeholder="–" />
-                    <span className="min-w-[80px] flex-1 truncate font-body text-[12px]">{m.bot?.name}</span>
+                    <span className="min-w-[5rem] flex-1 truncate text-right font-body text-[0.75rem]">{m.top?.name}</span>
+                    <input type="number" min={0} value={s.a} onChange={(e) => setScore(m.id, { a: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[0.75rem]" placeholder="–" />
+                    <span className="font-mono text-[0.6875rem] text-txt-dim">–</span>
+                    <input type="number" min={0} value={s.b} onChange={(e) => setScore(m.id, { b: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[0.75rem]" placeholder="–" />
+                    <span className="min-w-[5rem] flex-1 truncate font-body text-[0.75rem]">{m.bot?.name}</span>
                     <Button size="sm" disabled={!filled} onClick={() => report(m)}>OK</Button>
-                    <button type="button" onClick={() => forfeit(m, "top")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[9px] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`W.O. ${m.top?.name}`}>W.O. ↑</button>
-                    <button type="button" onClick={() => forfeit(m, "bot")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[9px] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`W.O. ${m.bot?.name}`}>W.O. ↓</button>
+                    <button type="button" onClick={() => forfeit(m, "top")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[0.5625rem] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`W.O. ${m.top?.name}`}>W.O. ↑</button>
+                    <button type="button" onClick={() => forfeit(m, "bot")} className="border border-solid border-line px-1.5 py-0.5 font-mono text-[0.5625rem] uppercase text-txt-dim transition-colors hover:border-line-2 hover:text-txt" title={`W.O. ${m.bot?.name}`}>W.O. ↓</button>
                   </div>
                 )
               })}
@@ -156,7 +156,7 @@ export function ReportPanel({
         </div>
       )}
       {waiting.length > 0 && (
-        <p className="mt-3 border-t border-dashed border-line pt-2 font-mono text-[10px] text-txt-dim">
+        <p className="mt-3 border-t border-dashed border-line pt-2 font-mono text-[0.625rem] text-txt-dim">
           {t("reportLocked", { count: waiting.length })}
         </p>
       )}
@@ -171,24 +171,24 @@ export function ReportPanel({
               const filled = s.a !== "" && s.b !== ""
               return (
                 <div key={m.id} className="flex flex-wrap items-center gap-2 border border-solid border-line bg-base px-2 py-1.5">
-                  <span className="min-w-[80px] flex-1 truncate text-right font-body text-[12px]">{m.top?.name}</span>
+                  <span className="min-w-[5rem] flex-1 truncate text-right font-body text-[0.75rem]">{m.top?.name}</span>
                   {editing ? (
                     <>
-                      <input type="number" min={0} value={s.a} onChange={(e) => setScore(m.id, { a: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" />
-                      <span className="font-mono text-[11px] text-txt-dim">–</span>
-                      <input type="number" min={0} value={s.b} onChange={(e) => setScore(m.id, { b: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[12px]" />
+                      <input type="number" min={0} value={s.a} onChange={(e) => setScore(m.id, { a: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[0.75rem]" />
+                      <span className="font-mono text-[0.6875rem] text-txt-dim">–</span>
+                      <input type="number" min={0} value={s.b} onChange={(e) => setScore(m.id, { b: e.target.value })} className="w-12 border border-line bg-panel px-1 py-0.5 text-center font-mono text-[0.75rem]" />
                     </>
                   ) : (
-                    <span className="font-mono text-[12px] text-txt-muted">{m.g1 ?? 0}–{m.g2 ?? 0}</span>
+                    <span className="font-mono text-[0.75rem] text-txt-muted">{m.g1 ?? 0}–{m.g2 ?? 0}</span>
                   )}
-                  <span className="min-w-[80px] flex-1 truncate font-body text-[12px]">{m.bot?.name}</span>
+                  <span className="min-w-[5rem] flex-1 truncate font-body text-[0.75rem]">{m.bot?.name}</span>
                   {editing ? (
                     <>
                       <Button size="sm" disabled={!filled} onClick={() => report(m, true)}>{t("save")}</Button>
-                      <button type="button" onClick={() => setAmendId(null)} className="font-mono text-[10px] text-txt-dim hover:text-txt">{t("cancel")}</button>
+                      <button type="button" onClick={() => setAmendId(null)} className="font-mono text-[0.625rem] text-txt-dim hover:text-txt">{t("cancel")}</button>
                     </>
                   ) : (
-                    <button type="button" onClick={() => { setAmendId(m.id); setScore(m.id, { a: String(m.g1 ?? 0), b: String(m.g2 ?? 0) }) }} className="font-mono text-[10px] text-accent transition-opacity hover:opacity-70">{t("correct")}</button>
+                    <button type="button" onClick={() => { setAmendId(m.id); setScore(m.id, { a: String(m.g1 ?? 0), b: String(m.g2 ?? 0) }) }} className="font-mono text-[0.625rem] text-accent transition-opacity hover:opacity-70">{t("correct")}</button>
                   )}
                 </div>
               )
@@ -218,7 +218,7 @@ function AttentionList({
   if (!items.length) return null
   return (
     <div className="[&+&]:mt-3">
-      <p className={cn("m-0 mb-1.5 font-mono text-[11px] font-semibold", tone === "bad" ? "text-bad" : "text-warn")}>
+      <p className={cn("m-0 mb-1.5 font-mono text-[0.6875rem] font-semibold", tone === "bad" ? "text-bad" : "text-warn")}>
         {title}
       </p>
       <div className="grid gap-1">
@@ -228,10 +228,10 @@ function AttentionList({
             href={`/torneos/${slug}/partida/${m.id}`}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-2 border border-solid border-line bg-base px-2 py-1 font-body text-[12px] transition-colors hover:border-accent-line"
+            className="flex items-center gap-2 border border-solid border-line bg-base px-2 py-1 font-body text-[0.75rem] transition-colors hover:border-accent-line"
           >
             <span className="min-w-0 flex-1 truncate text-right">{m.top?.name ?? "—"}</span>
-            <span className="font-mono text-[10px] text-txt-dim">vs</span>
+            <span className="font-mono text-[0.625rem] text-txt-dim">vs</span>
             <span className="min-w-0 flex-1 truncate">{m.bot?.name ?? "—"}</span>
           </a>
         ))}

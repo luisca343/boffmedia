@@ -77,7 +77,7 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
     return (
       <>
         <PageHead eyebrow={t("logros.eyebrow")} title={t("logros.title")} />
-        <Skeleton className="mb-3 h-[92px]" />
+        <Skeleton className="mb-3 h-[5.75rem]" />
         {Array.from({ length: 4 }, (_, i) => (
           <Skeleton key={i} className="mb-2 h-9" />
         ))}
@@ -111,13 +111,13 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
 
       <Card className="mb-3 flex items-center justify-between gap-3.5 px-4 py-3.5">
         <div className="min-w-0">
-          <div className="font-ps-mono text-[10px] uppercase tracking-[.22em] text-ps-ink-faint">
+          <div className="font-ps-mono text-[0.625rem] uppercase tracking-[.22em] text-ps-ink-faint">
             {t("logros.points")}
           </div>
-          <div className="ps-foil ps-num mt-0.5 font-ps-ceremony text-[clamp(34px,5.4vh,46px)] leading-[.95]">
+          <div className="ps-foil ps-num mt-0.5 font-ps-ceremony text-[clamp(2.125rem,5.4vh,2.875rem)] leading-[.95]">
             {points}
           </div>
-          <div className="ps-num mt-1 text-[11px] text-ps-ink-soft">
+          <div className="ps-num mt-1 text-[0.6875rem] text-ps-ink-soft">
             {t("logros.pointsSub", { total: totalPoints, own: own.length, all: all.length })}
           </div>
         </div>
@@ -136,7 +136,7 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
               strokeDashoffset={offset.toFixed(1)}
             />
           </svg>
-          <span className="ps-num absolute font-ps-display text-[14px] font-extrabold text-ps-gild-lo">
+          <span className="ps-num absolute font-ps-display text-[0.875rem] font-extrabold text-ps-gild-lo">
             {pct}%
           </span>
         </div>
@@ -149,16 +149,16 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
           return (
             <div
               key={tier}
-              className="flex items-center gap-[7px] rounded-[9px] border border-ps-ink/22 bg-white/[.32] px-2 py-[7px]"
+              className="flex items-center gap-[0.4375rem] rounded-[9px] border border-ps-ink/22 bg-white/[.32] px-2 py-[0.4375rem]"
             >
               <Medal tier={tier} size={22} />
               <div className="min-w-0">
-                <div className="truncate text-[9.5px] uppercase tracking-[.06em] text-ps-ink-soft">
+                <div className="truncate text-[0.59375rem] uppercase tracking-[.06em] text-ps-ink-soft">
                   {t(`tiers.${tier}`)}
                 </div>
-                <div className="ps-num font-ps-mono text-[14px] font-bold leading-none text-ps-ink">
+                <div className="ps-num font-ps-mono text-[0.875rem] font-bold leading-none text-ps-ink">
                   {owned}
-                  <span className="text-[10px] font-normal text-ps-ink-faint">/{count}</span>
+                  <span className="text-[0.625rem] font-normal text-ps-ink-faint">/{count}</span>
                 </div>
               </div>
             </div>
@@ -166,17 +166,17 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
         })}
       </div>
 
-      <SectionLabel className="mt-3 text-[13px]">{t("logros.categoryProgress")}</SectionLabel>
-      <div className="flex flex-col gap-[7px]">
+      <SectionLabel className="mt-3 text-[0.8125rem]">{t("logros.categoryProgress")}</SectionLabel>
+      <div className="flex flex-col gap-[0.4375rem]">
         {categoriesOf(all).map((category) => {
           const list = all.filter((l) => l.category === category)
           const done = list.filter((l) => !!l.completed).length
           return (
             <div key={category}>
-              <div className="mb-[3px] flex items-center gap-[7px] text-[11.5px]">
+              <div className="mb-[3px] flex items-center gap-[0.4375rem] text-[0.71875rem]">
                 <span aria-hidden="true" className={cn("h-2 w-2 flex-none rounded-full", catInk(category))} />
                 <span className="flex-1 text-ps-ink-soft">{category}</span>
-                <span className="ps-num font-ps-mono text-[10.5px] text-ps-ink-faint">
+                <span className="ps-num font-ps-mono text-[0.65625rem] text-ps-ink-faint">
                   {done}/{list.length}
                 </span>
               </div>
@@ -194,15 +194,15 @@ export function LogrosResumen({ logros, loading }: { logros?: Logro[] | null; lo
 
       {rarest && (
         <>
-          <SectionLabel className="mt-2.5 text-[13px]">{t("logros.rarest")}</SectionLabel>
+          <SectionLabel className="mt-2.5 text-[0.8125rem]">{t("logros.rarest")}</SectionLabel>
           <Card className="flex items-center gap-3">
             <Medal tier={rarest.tier} size={46} />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="truncate font-ps-ceremony text-[16px]">{rarest.name}</span>
+                <span className="truncate font-ps-ceremony text-[1rem]">{rarest.name}</span>
                 <RarityBadge rarity={rarest.rarity} showPct />
               </div>
-              <p className="mt-0.5 line-clamp-2 text-[11px] text-ps-ink-soft">{rarest.description}</p>
+              <p className="mt-0.5 line-clamp-2 text-[0.6875rem] text-ps-ink-soft">{rarest.description}</p>
             </div>
             <PtsChip points={rarest.points} />
           </Card>
@@ -220,9 +220,9 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
     return (
       <>
         <PageHead eyebrow={t("logros.eyebrowCollection")} title={t("logros.title")} />
-        <div className="grid grid-cols-2 gap-[9px]">
+        <div className="grid grid-cols-2 gap-[0.5625rem]">
           {Array.from({ length: 8 }, (_, i) => (
-            <Skeleton key={i} className="h-[54px]" />
+            <Skeleton key={i} className="h-[3.375rem]" />
           ))}
         </div>
       </>
@@ -253,7 +253,7 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
     <>
       <PageHead eyebrow={t("logros.eyebrowCollection")} title={t("logros.title")} />
 
-      <div className="ps-scroll grid min-h-0 flex-1 grid-cols-2 content-start gap-[9px] overflow-y-auto pb-7 pr-1">
+      <div className="ps-scroll grid min-h-0 flex-1 grid-cols-2 content-start gap-[0.5625rem] overflow-y-auto pb-7 pr-1">
         {cards.map((logro) => {
           const done = !!logro.completed
           const pct = logro.target > 0 ? Math.min(100, Math.round((logro.progress / logro.target) * 100)) : 0
@@ -274,7 +274,7 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
                 )
               }
               className={cn(
-                "relative flex items-center gap-[9px] overflow-hidden rounded-[10px] border border-ps-ink/22 py-2 pl-3 pr-2.5 text-left",
+                "relative flex items-center gap-[0.5625rem] overflow-hidden rounded-[10px] border border-ps-ink/22 py-2 pl-3 pr-2.5 text-left",
                 "bg-gradient-to-b from-white/50 to-white/[.18] transition-transform duration-200",
                 "hover:-translate-y-0.5 hover:shadow-[0_4px_10px_rgba(80,60,30,.14)] motion-reduce:transition-none motion-reduce:hover:transform-none",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-chapter",
@@ -294,7 +294,7 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
                 <span className="flex items-center justify-between gap-1.5">
                   <span
                     className={cn(
-                      "truncate font-ps-ceremony text-[13px]",
+                      "truncate font-ps-ceremony text-[0.8125rem]",
                       done ? "text-ps-ink" : "text-ps-ink-soft",
                     )}
                   >
@@ -307,7 +307,7 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
                   <span className="mt-1 flex items-center gap-1.5">
                     <span
                       aria-hidden="true"
-                      className="grid h-[15px] w-[15px] flex-none place-items-center rounded-full bg-ps-ok text-[10px] text-white"
+                      className="grid h-[0.9375rem] w-[0.9375rem] flex-none place-items-center rounded-full bg-ps-ok text-[0.625rem] text-white"
                     >
                       ✓
                     </span>
@@ -326,7 +326,7 @@ export function LogrosColeccion({ logros, loading }: { logros?: Logro[] | null; 
                         target: logro.target,
                       })}
                     />
-                    <span className="ps-num mt-[3px] block font-ps-mono text-[9px] text-ps-ink-faint">
+                    <span className="ps-num mt-[3px] block font-ps-mono text-[0.5625rem] text-ps-ink-faint">
                       {fmt(logro.progress, locale)} / {fmt(logro.target, locale)}
                     </span>
                   </>

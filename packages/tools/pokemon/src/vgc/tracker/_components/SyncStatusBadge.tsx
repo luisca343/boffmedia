@@ -12,16 +12,16 @@ export function SyncStatusBadge() {
 
   if (syncStatus === "conflict") {
     return (
-      <div className="grid max-w-[280px] gap-2 border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft p-3 text-bad shadow-[var(--shadow)]">
-        <p className="inline-flex items-center gap-[6px] font-mono text-[10px] font-semibold uppercase tracking-[0.12em]">
+      <div className="grid max-w-[17.5rem] gap-2 border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft p-3 text-bad shadow-[var(--shadow)]">
+        <p className="inline-flex items-center gap-[0.375rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.12em]">
           <Icon name="alert" size={12} />
           {t("conflict")}
         </p>
-        <p className="font-body text-[12px] leading-[1.5] text-txt-muted">{conflictMessage ?? t("conflictHint")}</p>
+        <p className="font-body text-[0.75rem] leading-[1.5] text-txt-muted">{conflictMessage ?? t("conflictHint")}</p>
         <button
           type="button"
           onClick={() => void refreshNow()}
-          className="justify-self-start border border-solid border-bad bg-bad px-[10px] py-[6px] font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-white transition-opacity hover:opacity-90"
+          className="justify-self-start border border-solid border-bad bg-bad px-[0.625rem] py-[0.375rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-white transition-opacity hover:opacity-90"
         >
           {t("refreshFromCloud")}
         </button>
@@ -40,7 +40,7 @@ export function SyncStatusBadge() {
 
   return (
     <div
-      className={`cut cut-edge-slant [--cut:3px] inline-flex select-none items-center gap-[6px] border border-solid px-[9px] py-[5px] font-mono text-[9px] font-bold uppercase tracking-[0.14em] ${tone}`}
+      className={`cut cut-edge-slant [--cut:3px] inline-flex select-none items-center gap-[0.375rem] border border-solid px-[0.5625rem] py-[0.3125rem] font-mono text-[0.5625rem] font-bold uppercase tracking-[0.14em] ${tone}`}
       title={syncStatus === "idle" ? t("synced") : syncStatus === "syncing" ? t("syncing") : t("error")}
     >
       <Icon
@@ -52,7 +52,7 @@ export function SyncStatusBadge() {
       {/* What the device still owes the server. "Saved" with a silent queue
           behind it is the kind of half-truth that gets found out later. */}
       {pendingCount > 0 && (
-        <span className="border-l border-solid border-current/30 pl-[6px] opacity-80">
+        <span className="border-l border-solid border-current/30 pl-[0.375rem] opacity-80">
           {t("pending", { count: pendingCount })}
         </span>
       )}

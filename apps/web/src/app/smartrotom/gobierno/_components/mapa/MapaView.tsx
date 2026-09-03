@@ -65,7 +65,7 @@ export function MapaView() {
   const loading = loadingParcelas || loadingZonas || loadingRegions
 
   return (
-    <div className="flex h-[calc(100dvh-210px)] min-h-[560px] flex-col animate-gt-pop motion-reduce:animate-none">
+    <div className="flex h-[calc(100dvh-13.125rem)] min-h-[35rem] flex-col animate-gt-pop motion-reduce:animate-none">
       <PageHead
         kicker={t("urbanismo.parcelasKicker")}
         title={t("mapa.titulo")}
@@ -84,9 +84,9 @@ export function MapaView() {
       />
 
       <div className="flex min-h-0 flex-1 flex-col gap-4 lg:flex-row">
-        <div className="relative min-h-[320px] flex-1 overflow-hidden rounded-gt border border-gt-line-strong shadow-gt">
+        <div className="relative min-h-[20rem] flex-1 overflow-hidden rounded-gt border border-gt-line-strong shadow-gt">
           {loading ? (
-            <div className="grid h-full place-items-center text-[13px] text-gt-ink-400">{t("mapa.cargandoCatastro")}</div>
+            <div className="grid h-full place-items-center text-[0.8125rem] text-gt-ink-400">{t("mapa.cargandoCatastro")}</div>
           ) : (
             <MapaCanvas
               parcelas={parcelas}
@@ -105,7 +105,7 @@ export function MapaView() {
           <MapaLegend t={t} />
         </div>
 
-        <div className="gt-scroll min-h-[240px] w-full flex-none overflow-y-auto rounded-gt border border-gt-line bg-gt-paper-0 p-4 shadow-gt lg:min-h-0 lg:w-[320px]">
+        <div className="gt-scroll min-h-[15rem] w-full flex-none overflow-y-auto rounded-gt border border-gt-line bg-gt-paper-0 p-4 shadow-gt lg:min-h-0 lg:w-[20rem]">
           {selectedPlot ? (
             <PlotPanel plot={selectedPlot} center={selectedPlotCenter} onClose={() => setSelectedPlotId(null)} />
           ) : selectedZona ? (
@@ -138,8 +138,8 @@ function MapaLegend({ t }: { t: ReturnType<typeof useTranslations> }) {
 
 function LegendItem({ swatch, children }: { swatch: string; children: ReactNode }) {
   return (
-    <span className="flex items-center gap-1.5 font-gt-mono text-[11px] text-gt-ink-600">
-      <span className={`h-[11px] w-[11px] rounded-[3px] ${swatch}`} />
+    <span className="flex items-center gap-1.5 font-gt-mono text-[0.6875rem] text-gt-ink-600">
+      <span className={`h-[0.6875rem] w-[0.6875rem] rounded-[3px] ${swatch}`} />
       {children}
     </span>
   )

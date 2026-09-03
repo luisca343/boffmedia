@@ -83,7 +83,7 @@ export function SteamGallery({
   }
 
   return (
-    <div className="grid gap-[10px]">
+    <div className="grid gap-[0.625rem]">
       <div className="relative aspect-video overflow-hidden border border-line-2 bg-base-2">
         {isVideo(current) ? (
           <video key={"v" + i} src={videoSrc(current)} controls className="h-full w-full object-cover" />
@@ -100,7 +100,7 @@ export function SteamGallery({
         )}
       </div>
       {shots.length > 1 && (
-        <div className="grid grid-cols-4 gap-[8px]">
+        <div className="grid grid-cols-4 gap-[0.5rem]">
           {shots.map((s, k) => (
             <button
               key={k}
@@ -130,9 +130,9 @@ export function SteamGallery({
 
 export function SteamFact({ k, children }: { k: string; children: React.ReactNode }) {
   return (
-    <div className="flex flex-col gap-[5px] bg-panel px-[13px] py-[11px] transition-colors duration-[120ms] hover:bg-panel-2">
-      <span className="font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim">{k}</span>
-      <span className="font-display text-[13px] font-semibold leading-[1.3] text-txt">{children}</span>
+    <div className="flex flex-col gap-[0.3125rem] bg-panel px-[0.8125rem] py-[0.6875rem] transition-colors duration-[120ms] hover:bg-panel-2">
+      <span className="font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim">{k}</span>
+      <span className="font-display text-[0.8125rem] font-semibold leading-[1.3] text-txt">{children}</span>
     </div>
   )
 }

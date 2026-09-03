@@ -25,10 +25,10 @@ export function Panel({ title, aside, media, flat, hover, className, bodyClassNa
       {...rest}
     >
       {(title || media) && (
-        <header className="flex items-center gap-3 py-[14px] px-5 border-b border-solid border-line">
+        <header className="flex items-center gap-3 py-[0.875rem] px-5 border-b border-solid border-line">
           {media && <span className="flex shrink-0 items-center">{media}</span>}
           {title && (
-            <h3 className="min-w-0 font-display text-[16px] font-bold not-italic leading-none uppercase tracking-[0.04em]">
+            <h3 className="min-w-0 font-display text-[1rem] font-bold not-italic leading-none uppercase tracking-[0.04em]">
               {title}
             </h3>
           )}

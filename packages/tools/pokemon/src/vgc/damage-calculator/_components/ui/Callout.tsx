@@ -8,7 +8,7 @@ export function Callout({ tone = "info", children }: { tone?: "info" | "warn"; c
   return (
     <div
       className={cn(
-        "cut-tag cut-tag-edge [--cut-tag:8px] flex items-start gap-[10px] border border-solid px-3 py-[10px] font-body text-[12px]/[1.5] text-txt-muted",
+        "cut-tag cut-tag-edge [--cut-tag:8px] flex items-start gap-[0.625rem] border border-solid px-3 py-[0.625rem] font-body text-[0.75rem]/[1.5] text-txt-muted",
         warn
           ? "border-[color-mix(in_srgb,var(--warn)_35%,transparent)] [--cut-line:color-mix(in_srgb,var(--warn)_35%,transparent)] bg-warn-soft"
           : "border-[color-mix(in_srgb,var(--info)_30%,transparent)] [--cut-line:color-mix(in_srgb,var(--info)_30%,transparent)] bg-signal-soft",

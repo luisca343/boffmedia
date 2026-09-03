@@ -47,7 +47,7 @@ function StarbankLayoutBody({ children }: Readonly<{ children: React.ReactNode }
 
   return (
     <div
-      className="sb-app relative grid h-[calc(100dvh_-_3rem)] w-full min-w-0 grid-cols-1 overflow-hidden bg-sb-bg font-sb text-sb-fg [font-feature-settings:'cv11','ss01','ss03'] md:grid-cols-[256px_1fr]"
+      className="sb-app relative grid h-[calc(100dvh_-_3rem)] w-full min-w-0 grid-cols-1 overflow-hidden bg-sb-bg font-sb text-sb-fg [font-feature-settings:'cv11','ss01','ss03'] md:grid-cols-[16rem_1fr]"
       data-theme={theme}
     >
       <div className="pointer-events-none absolute inset-0 z-0" style={{ background: MESH[theme] }} aria-hidden />
@@ -56,7 +56,7 @@ function StarbankLayoutBody({ children }: Readonly<{ children: React.ReactNode }
 
       <div className="relative z-[1] flex h-full min-w-0 flex-col overflow-y-auto">
         <TopBar currentPage={currentPage} account={activeAccount} accounts={accounts} onSelectAccount={selectAccount} onOpenAccounts={goAccounts} />
-        <div className="mx-auto flex w-full max-w-[1480px] flex-col gap-5 p-4 md:p-7">{children}</div>
+        <div className="mx-auto flex w-full max-w-[92.5rem] flex-col gap-5 p-4 md:p-7">{children}</div>
       </div>
 
       <ToastHost />

@@ -5,7 +5,7 @@ import { damageColor, type DamageTone } from "./theme"
 export function KoVerdict({ text, tone = "dim" }: { text: React.ReactNode; tone?: DamageTone }) {
   return (
     <span
-      className="font-display text-[30px]/none font-extrabold italic uppercase tracking-[0.02em]"
+      className="font-display text-[1.875rem]/none font-extrabold italic uppercase tracking-[0.02em]"
       style={{ color: damageColor(tone) }}
     >
       {text}

@@ -100,18 +100,18 @@ export function StatEditor({
   return (
     <div className="grid gap-4">
       {/* nature */}
-      <div className="grid gap-[7px]">
+      <div className="grid gap-[0.4375rem]">
         <TbKicker>{t("set.nature")}</TbKicker>
         <DkSelect value={nature} options={natureOptions} onChange={(v) => onChange({ nature: v })} ariaLabel={t("set.nature")} className="max-w-none" />
       </div>
 
       {/* budget */}
-      <div className="grid gap-[7px]">
+      <div className="grid gap-[0.4375rem]">
         <div className="flex items-center gap-3">
           <TbKicker>{budgetLabel}</TbKicker>
           <span className="flex-1" />
           <span
-            className={cn("font-mono text-[11px]/none font-semibold tabular-nums", over ? "text-bad" : total === limits.total ? "text-ok" : "text-txt-muted")}
+            className={cn("font-mono text-[0.6875rem]/none font-semibold tabular-nums", over ? "text-bad" : total === limits.total ? "text-ok" : "text-txt-muted")}
             aria-live="polite"
           >
             {total} / {limits.total} · {remainderText}
@@ -121,8 +121,8 @@ export function StatEditor({
       </div>
 
       {/* point rows */}
-      <div role="group" aria-label={sp ? t("set.spName") : t("set.evs")} className="grid gap-[6px]">
-        <div className="grid grid-cols-[52px_minmax(0,1fr)_64px_46px] items-center gap-x-[10px] px-px font-mono text-[9px]/none font-semibold uppercase tracking-[0.06em] text-txt-dim">
+      <div role="group" aria-label={sp ? t("set.spName") : t("set.evs")} className="grid gap-[0.375rem]">
+        <div className="grid grid-cols-[3.25rem_minmax(0,1fr)_4rem_2.875rem] items-center gap-x-[0.625rem] px-px font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.06em] text-txt-dim">
           <span />
           <span />
           <span className="text-right">{budgetLabel}</span>
@@ -134,8 +134,8 @@ export function StatEditor({
           const ev = evs[stat] || 0;
           const final = base ? calcStat(format, stat, base[stat], ivs[stat] ?? 31, ev, set.level || 100, nature) : null;
           return (
-            <div key={stat} className="grid grid-cols-[52px_minmax(0,1fr)_64px_46px] items-center gap-x-[10px]">
-              <span className={cn("inline-flex items-center gap-1 font-mono text-[11px]/none font-bold uppercase tracking-[0.06em]", plus ? "text-ok" : minus ? "text-bad" : "text-txt-muted")}>
+            <div key={stat} className="grid grid-cols-[3.25rem_minmax(0,1fr)_4rem_2.875rem] items-center gap-x-[0.625rem]">
+              <span className={cn("inline-flex items-center gap-1 font-mono text-[0.6875rem]/none font-bold uppercase tracking-[0.06em]", plus ? "text-ok" : minus ? "text-bad" : "text-txt-muted")}>
                 {labels.statShort(stat)}
                 {plus && <span aria-label="+">▲</span>}
                 {minus && <span aria-label="−">▼</span>}
@@ -174,7 +174,7 @@ export function StatEditor({
                 aria-label={pointsAria(stat)}
                 onChange={(e) => setEv(stat, parseInt(e.target.value, 10))}
               />
-              <output className={cn("text-right font-mono text-[13px]/none font-semibold tabular-nums", plus ? "text-ok" : minus ? "text-bad" : "text-txt")}>
+              <output className={cn("text-right font-mono text-[0.8125rem]/none font-semibold tabular-nums", plus ? "text-ok" : minus ? "text-bad" : "text-txt")}>
                 {final ?? "—"}
               </output>
             </div>
@@ -184,12 +184,12 @@ export function StatEditor({
 
       {/* IVs — editable, or the one line that says why not */}
       {limits.lockedIvs !== null ? (
-        <p className="m-0 font-body text-[12px] leading-[1.45] text-txt-dim">{t("set.ivsLocked", { n: limits.lockedIvs })}</p>
+        <p className="m-0 font-body text-[0.75rem] leading-[1.45] text-txt-dim">{t("set.ivsLocked", { n: limits.lockedIvs })}</p>
       ) : (
         <Disclosure title={t("set.advanced")} sub={t("set.ivs")}>
           <div role="group" aria-label={t("set.ivs")} className="grid grid-cols-3 gap-x-3 gap-y-2 pt-3 max-[480px]:grid-cols-2">
             {STAT_IDS.map((stat) => (
-              <label key={stat} className="grid gap-[5px]">
+              <label key={stat} className="grid gap-[0.3125rem]">
                 <TbKicker>{labels.statShort(stat)}</TbKicker>
                 <TbNumInput
                   min={0}

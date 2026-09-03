@@ -70,7 +70,7 @@ export function SbPrimitivasChapter() {
             </>
           }
         >
-          <div className="flex w-full flex-wrap items-center gap-3 bg-sb-700 p-[26px]">
+          <div className="flex w-full flex-wrap items-center gap-3 bg-sb-700 p-[1.625rem]">
             <Button variant="glass">
               <Ico name="qrcode" size={16} /> Escanear QR
             </Button>
@@ -198,7 +198,7 @@ export function SbPrimitivasChapter() {
             </>
           }
         >
-          <div className="w-full max-w-[320px]">
+          <div className="w-full max-w-[20rem]">
             <Label htmlFor="sb-demo-focus">Pulsa aquí</Label>
             <Input id="sb-demo-focus" placeholder="Concepto del envío" />
           </div>
@@ -241,7 +241,7 @@ export function SbPrimitivasChapter() {
             {SB_ACCOUNTS.map((account) => (
               <div key={account.id} className="flex items-center gap-2.5">
                 <AccountAvatar account={account} size={44} />
-                <div className="text-[12px] leading-tight">
+                <div className="text-[0.75rem] leading-tight">
                   <div className="font-semibold text-sb-fg">{account.name}</div>
                   <div className="text-sb-fg-muted">{account.type === "MAIN" ? "Principal" : "Secundaria"}</div>
                 </div>
@@ -249,7 +249,7 @@ export function SbPrimitivasChapter() {
             ))}
             <div className="flex items-center gap-2.5">
               <ContactAvatar name="Gimnasio_Celeste" type="SECONDARY" id={7} size={44} />
-              <div className="text-[12px] leading-tight">
+              <div className="text-[0.75rem] leading-tight">
                 <div className="font-semibold text-sb-fg">Gimnasio Celeste</div>
                 <div className="text-sb-fg-muted">Sin imagen → monograma</div>
               </div>
@@ -284,8 +284,8 @@ export function SbPrimitivasChapter() {
                 }
               />
               <CardBody>
-                <p className="m-0 text-[13.5px] text-sb-fg-2">
-                  Cuerpo con el ritmo por defecto: <code className="font-mono text-[12px]">gap-3.5</code> y
+                <p className="m-0 text-[0.84375rem] text-sb-fg-2">
+                  Cuerpo con el ritmo por defecto: <code className="font-mono text-[0.75rem]">gap-3.5</code> y
                   padding lateral de 20px.
                 </p>
                 <div className="flex items-center gap-2">
@@ -302,12 +302,12 @@ export function SbPrimitivasChapter() {
             <Card flat>
               <SectionHead title="Tarjeta plana" eyebrow="flat" />
               <CardBody>
-                <p className="m-0 text-[13.5px] text-sb-fg-2">
-                  <code className="font-mono text-[12px]">flat</code> quita la sombra: para tarjetas anidadas
+                <p className="m-0 text-[0.84375rem] text-sb-fg-2">
+                  <code className="font-mono text-[0.75rem]">flat</code> quita la sombra: para tarjetas anidadas
                   dentro de otra superficie, donde una segunda sombra ensuciaría.
                 </p>
-                <div className="rounded-sb-md border border-sb-border bg-sb-surface-2 p-3 text-[12.5px] text-sb-fg-muted">
-                  Bloque interior sobre <code className="font-mono text-[11.5px]">sb-surface-2</code>.
+                <div className="rounded-sb-md border border-sb-border bg-sb-surface-2 p-3 text-[0.78125rem] text-sb-fg-muted">
+                  Bloque interior sobre <code className="font-mono text-[0.71875rem]">sb-surface-2</code>.
                 </div>
               </CardBody>
             </Card>
@@ -340,7 +340,7 @@ export function SbPrimitivasChapter() {
                 }
               />
               <CardBody>
-                <p className="m-0 text-[13.5px] text-sb-fg-2">Superficie sobre lienzo, con la misma jerarquía.</p>
+                <p className="m-0 text-[0.84375rem] text-sb-fg-2">Superficie sobre lienzo, con la misma jerarquía.</p>
                 <div className="flex items-center gap-2">
                   <Chip tone="pos" dot>
                     12 ingresos
@@ -355,8 +355,8 @@ export function SbPrimitivasChapter() {
             <Card flat>
               <SectionHead title="Tarjeta plana" eyebrow="flat" />
               <CardBody>
-                <div className="rounded-sb-md border border-sb-border bg-sb-surface-2 p-3 text-[12.5px] text-sb-fg-muted">
-                  Bloque interior sobre <code className="font-mono text-[11.5px]">sb-surface-2</code>.
+                <div className="rounded-sb-md border border-sb-border bg-sb-surface-2 p-3 text-[0.78125rem] text-sb-fg-muted">
+                  Bloque interior sobre <code className="font-mono text-[0.71875rem]">sb-surface-2</code>.
                 </div>
               </CardBody>
             </Card>

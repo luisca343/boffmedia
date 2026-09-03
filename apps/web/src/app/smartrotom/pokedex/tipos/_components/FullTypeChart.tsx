@@ -34,10 +34,10 @@ export default function FullTypeChart() {
   const [hover, setHover] = useState<{ axis: "atk" | "def"; type: string } | null>(null)
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[1fr_220px] gap-[22px] items-start">
+    <div className="grid grid-cols-1 xl:grid-cols-[1fr_13.75rem] gap-[1.375rem] items-start">
       <div className="overflow-x-auto">
-        <div className="grid gap-0.5 bg-white/[0.02] border border-white/[0.05] rounded-[10px] p-2 min-w-[560px]" style={{ gridTemplateColumns: "36px repeat(18, minmax(0, 1fr))" }}>
-          <div className="grid place-items-center text-pk-surface-500 font-pk-mono text-[9px] bg-white/[0.02] rounded aspect-square">A↓D→</div>
+        <div className="grid gap-0.5 bg-white/[0.02] border border-white/[0.05] rounded-[10px] p-2 min-w-[35rem]" style={{ gridTemplateColumns: "36px repeat(18, minmax(0, 1fr))" }}>
+          <div className="grid place-items-center text-pk-surface-500 font-pk-mono text-[0.5625rem] bg-white/[0.02] rounded aspect-square">A↓D→</div>
           {ALL_TYPES.map((tp) => (
             <div
               key={"h-" + tp}
@@ -68,7 +68,7 @@ export default function FullTypeChart() {
                 return (
                   <div
                     key={atk + def}
-                    className="grid place-items-center aspect-square rounded font-pk-mono text-[11px] font-semibold tabular-nums cursor-default"
+                    className="grid place-items-center aspect-square rounded font-pk-mono text-[0.6875rem] font-semibold tabular-nums cursor-default"
                     style={{ ...multStyle(m), ...(hl ? { boxShadow: "inset 0 0 0 1px rgba(249,115,22,.5)" } : {}) }}
                     title={`${t(TYPE_LABEL_KEYS[atk])} → ${t(TYPE_LABEL_KEYS[def])}: ×${m}`}
                   >
@@ -82,16 +82,16 @@ export default function FullTypeChart() {
       </div>
 
       <div className="bg-white/[0.02] border border-white/[0.05] rounded-[10px] p-[16px_18px] flex flex-col gap-2.5">
-        <h4 className="font-pk-mono text-[10px] tracking-[0.1em] uppercase text-pk-surface-500 mb-1">{t("chart_legend")}</h4>
+        <h4 className="font-pk-mono text-[0.625rem] tracking-[0.1em] uppercase text-pk-surface-500 mb-1">{t("chart_legend")}</h4>
         {LEGEND.map((r) => (
-          <div key={r.key} className="flex items-center gap-2.5 text-[12.5px] text-pk-surface-200">
-            <span className="w-6 h-6 rounded grid place-items-center font-pk-mono text-[10px] font-semibold" style={r.style}>
+          <div key={r.key} className="flex items-center gap-2.5 text-[0.78125rem] text-pk-surface-200">
+            <span className="w-6 h-6 rounded grid place-items-center font-pk-mono text-[0.625rem] font-semibold" style={r.style}>
               {r.s}
             </span>
             {t(r.key)}
           </div>
         ))}
-        <div className="text-[11.5px] text-pk-surface-500 leading-[1.5] pt-3 border-t border-white/[0.05] mt-1">
+        <div className="text-[0.71875rem] text-pk-surface-500 leading-[1.5] pt-3 border-t border-white/[0.05] mt-1">
           {t("chart_hint")}
         </div>
       </div>

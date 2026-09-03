@@ -28,7 +28,7 @@ export function Toggle({ on, onChange, label, ariaLabel, className }: ToggleProp
     >
       <span
         className={cn(
-          "relative w-[42px] h-[22px]",
+          "relative w-[2.625rem] h-[1.375rem]",
           "cut-frame [--cut:6px] [--cut-w:1px]",
           "before:transition-[background] before:duration-[140ms] after:transition-[background] after:duration-[140ms]",
           on
@@ -38,16 +38,16 @@ export function Toggle({ on, onChange, label, ariaLabel, className }: ToggleProp
       >
         <i
           className={cn(
-            "absolute top-[3px] w-[14px] h-[14px] transition-[left,background] duration-[140ms]",
+            "absolute top-[3px] w-[0.875rem] h-[0.875rem] transition-[left,background] duration-[140ms]",
             "cut [--cut:3px]",
-            on ? "left-[22px] bg-accent" : "left-1 bg-txt-muted",
+            on ? "left-[1.375rem] bg-accent" : "left-1 bg-txt-muted",
           )}
         />
       </span>
       {label && (
         <span
           className={cn(
-            "font-mono text-[12px] font-semibold leading-none uppercase tracking-[0.08em]",
+            "font-mono text-[0.75rem] font-semibold leading-none uppercase tracking-[0.08em]",
             on ? "text-txt" : "text-txt-muted",
           )}
         >

@@ -86,14 +86,14 @@ function ReferencePanel({
           <button
             type="button"
             onClick={() => onChange(DEFAULT_REF)}
-            className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-txt-dim transition-colors hover:text-bad"
+            className="inline-flex items-center gap-1 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-txt-dim transition-colors hover:text-bad"
           >
             <Icon name="x" size={12} />
             {t("reference.clearRef")}
           </button>
         ) : undefined
       }
-      bodyClassName="grid gap-[14px]"
+      bodyClassName="grid gap-[0.875rem]"
     >
       <div className="grid grid-cols-2 gap-1 border border-solid border-line bg-base p-1">
         {[
@@ -105,7 +105,7 @@ function ReferencePanel({
             type="button"
             onClick={() => onChange({ ...refState, useCustom: m.v })}
             className={cn(
-              "px-3 py-[6px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background]",
+              "px-3 py-[0.375rem] font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background]",
               refState.useCustom === m.v ? "bg-accent text-accent-ink" : "text-txt-muted hover:text-txt",
             )}
           >
@@ -135,8 +135,8 @@ function ReferencePanel({
       )}
 
       {!refState.useCustom && refState.entry && (
-        <div className="grid gap-[6px]">
-          <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("reference.evLabel")}</span>
+        <div className="grid gap-[0.375rem]">
+          <span className="font-mono text-[0.5625rem] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("reference.evLabel")}</span>
           <div className="grid grid-cols-4 gap-1">
             {EV_PRESETS.map((p) => (
               <button
@@ -144,7 +144,7 @@ function ReferencePanel({
                 type="button"
                 onClick={() => onChange({ ...refState, preset: p.key })}
                 className={cn(
-                  "border border-solid py-[6px] font-mono text-[11px] font-semibold transition-[color,background,border-color]",
+                  "border border-solid py-[0.375rem] font-mono text-[0.6875rem] font-semibold transition-[color,background,border-color]",
                   refState.preset === p.key ? "border-accent-line bg-accent-soft text-accent-bright" : "border-line-2 text-txt-muted hover:text-txt",
                 )}
               >
@@ -159,9 +159,9 @@ function ReferencePanel({
 
       {refEffective !== null ? (
         <div className="border border-solid border-accent-line bg-base px-4 pb-4 pt-3 text-center">
-          <div className="mb-1 font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("reference.effectiveSpeed")}</div>
-          <div className="font-display text-[46px] font-extrabold italic leading-none tabular-nums text-accent-bright">{refEffective}</div>
-          <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[11px] text-txt-muted">
+          <div className="mb-1 font-mono text-[0.5625rem] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("reference.effectiveSpeed")}</div>
+          <div className="font-display text-[2.875rem] font-extrabold italic leading-none tabular-nums text-accent-bright">{refEffective}</div>
+          <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5 font-mono text-[0.6875rem] text-txt-muted">
             {refState.entry && (
               <>
                 <DkSprite src={spriteUrl(refState.entry.name)} alt={refState.entry.name} size={20} onError={handleSpriteError} />
@@ -171,13 +171,13 @@ function ReferencePanel({
               </>
             )}
             {hasModifiers(refState.mods) && (
-              <span className="bg-accent-soft px-1.5 py-0.5 text-[10px] font-semibold text-accent-bright">mods</span>
+              <span className="bg-accent-soft px-1.5 py-0.5 text-[0.625rem] font-semibold text-accent-bright">mods</span>
             )}
           </div>
         </div>
       ) : (
         !hasRef && (
-          <div className="border border-dashed border-line-2 px-4 py-5 text-center font-mono text-[11px] leading-relaxed text-txt-dim">
+          <div className="border border-dashed border-line-2 px-4 py-5 text-center font-mono text-[0.6875rem] leading-relaxed text-txt-dim">
             {t("reference.noRef")}
           </div>
         )
@@ -300,10 +300,10 @@ export function SpeedTiersTab({ speedTiers, loading, error, onSelectForMatchup }
 
   const separatorRow = (key: string, allFaster?: boolean) => (
     <tr key={key} className="border-y border-solid border-accent-line">
-      <td colSpan={totalCols} className="!bg-base-2 !py-[7px]">
+      <td colSpan={totalCols} className="!bg-base-2 !py-[0.4375rem]">
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-bad/30" />
-          <div className="flex items-center gap-2 whitespace-nowrap font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-accent-bright">
+          <div className="flex items-center gap-2 whitespace-nowrap font-mono text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-accent-bright">
             <Icon name="bolt" size={13} />
             {t("zones.separator")}: {refEffective}
             {allFaster ? (
@@ -324,7 +324,7 @@ export function SpeedTiersTab({ speedTiers, loading, error, onSelectForMatchup }
   );
 
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+    <div className="grid items-start gap-6 lg:grid-cols-[18.75rem_minmax(0,1fr)]">
       <aside className="lg:sticky lg:top-4">
         <ReferencePanel speedTiers={speedTiers} loading={loading} refState={refState} refEffective={refEffective} onChange={setRefState} />
       </aside>
@@ -334,7 +334,7 @@ export function SpeedTiersTab({ speedTiers, loading, error, onSelectForMatchup }
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <SpdInput icon="search" value={tableSearch} onChange={setTableSearch} placeholder={t("search")} className="w-full sm:max-w-xs" />
           {refEffective !== null ? (
-            <div className="flex flex-wrap items-center gap-3 font-mono text-[11px] sm:ml-auto">
+            <div className="flex flex-wrap items-center gap-3 font-mono text-[0.6875rem] sm:ml-auto">
               <span className="flex items-center gap-1.5 text-bad">
                 <span className="inline-block h-2 w-2 rounded-full bg-bad" />
                 {t("zones.fasterCount", { count: zoneCounts.faster })}
@@ -351,12 +351,12 @@ export function SpeedTiersTab({ speedTiers, loading, error, onSelectForMatchup }
               </span>
             </div>
           ) : (
-            !loading && <p className="font-mono text-[11px] text-txt-dim sm:ml-auto">{t("pokemonCount", { count: filteredSorted.length })}</p>
+            !loading && <p className="font-mono text-[0.6875rem] text-txt-dim sm:ml-auto">{t("pokemonCount", { count: filteredSorted.length })}</p>
           )}
         </div>
 
         {/* Legend */}
-        <div className="flex flex-wrap gap-4 font-mono text-[11px] text-txt-dim">
+        <div className="flex flex-wrap gap-4 font-mono text-[0.6875rem] text-txt-dim">
           <span className="flex items-center gap-1.5">
             <Icon name="star" size={13} className="text-warn" />
             {t("legend.restricted")}
@@ -400,12 +400,12 @@ export function SpeedTiersTab({ speedTiers, loading, error, onSelectForMatchup }
                     >
                       <td className="mono !text-txt-dim">{idx + 1}</td>
                       <td>
-                        <div className="flex min-w-[160px] items-center gap-2">
+                        <div className="flex min-w-[10rem] items-center gap-2">
                           <DkSprite src={spriteUrl(pokemon.name)} alt={pokemon.name} size={34} onError={handleSpriteError} />
                           <span className="flex items-center gap-1 truncate font-semibold">
                             <span className="truncate">{pokemon.name}</span>
                             {isRef && (
-                              <span className="flex-none bg-accent-soft px-1 py-0.5 font-mono text-[8px] font-bold uppercase tracking-[0.1em] text-accent-bright">YOU</span>
+                              <span className="flex-none bg-accent-soft px-1 py-0.5 font-mono text-[0.5rem] font-bold uppercase tracking-[0.1em] text-accent-bright">YOU</span>
                             )}
                             {pokemon.isRestricted && (
                               <span title={t("badge.restrictedTitle")}>
@@ -449,7 +449,7 @@ export function SpeedTiersTab({ speedTiers, loading, error, onSelectForMatchup }
           </DkTable>
         )}
 
-        {!loading && !error && filteredSorted.length > 0 && <p className="text-center font-mono text-[10px] text-txt-dim">{t("footer")}</p>}
+        {!loading && !error && filteredSorted.length > 0 && <p className="text-center font-mono text-[0.625rem] text-txt-dim">{t("footer")}</p>}
       </div>
     </div>
   );
@@ -483,7 +483,7 @@ function ExpandedRow({
       <td colSpan={colSpan} className="!bg-base-2 !px-4 !py-3">
         <div className="flex flex-wrap items-center gap-4">
           <div className="grid gap-1">
-            <span className="font-mono text-[9px] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("expanded.breakdown")}</span>
+            <span className="font-mono text-[0.5625rem] uppercase leading-none tracking-[0.12em] text-txt-dim">{t("expanded.breakdown")}</span>
             <div className="flex flex-wrap gap-1.5">
               {items.map((it) => {
                 if (it.value === null) return null;
@@ -492,19 +492,19 @@ function ExpandedRow({
                   <div
                     key={it.label}
                     className={cn(
-                      "flex items-center gap-1 border border-solid px-2 py-1 font-mono text-[11px]",
+                      "flex items-center gap-1 border border-solid px-2 py-1 font-mono text-[0.6875rem]",
                       zone ? ZONE_CHIP[zone] : "border-line bg-panel text-txt",
                     )}
                   >
-                    <span className="text-[9px] text-txt-dim">{it.label}</span>
+                    <span className="text-[0.5625rem] text-txt-dim">{it.label}</span>
                     <span className="font-bold">{it.value}</span>
-                    {zone && <span className="text-[9px]">{ZONE_MARK[zone]}</span>}
+                    {zone && <span className="text-[0.5625rem]">{ZONE_MARK[zone]}</span>}
                   </div>
                 );
               })}
             </div>
-            {refEffective !== null && <div className="mt-1 font-mono text-[9px] text-txt-dim">{t("expanded.vsRef", { speed: refEffective })}</div>}
-            {refEffective === null && <div className="mt-0.5 font-mono text-[9px] text-txt-dim">{t("expanded.noRef")}</div>}
+            {refEffective !== null && <div className="mt-1 font-mono text-[0.5625rem] text-txt-dim">{t("expanded.vsRef", { speed: refEffective })}</div>}
+            {refEffective === null && <div className="mt-0.5 font-mono text-[0.5625rem] text-txt-dim">{t("expanded.noRef")}</div>}
           </div>
           <Button size="sm" icon="sword" className="ml-auto" onClick={() => onSelectForMatchup(pokemon)}>
             {t("expanded.sendToMatchup")}

@@ -59,7 +59,7 @@ export function BuscadosSection() {
         sub={t("buscados.sectionSub")}
         right={
           active.length > 0 ? (
-            <Badge tone="danger" icon="coins" solid className="px-[11px] py-[7px] text-[12px]">
+            <Badge tone="danger" icon="coins" solid className="px-[0.6875rem] py-[0.4375rem] text-[0.75rem]">
               {t("buscados.bolsaTotal", { amount: money(totalBounty, intlLocale) })}
             </Badge>
           ) : undefined
@@ -69,7 +69,7 @@ export function BuscadosSection() {
       {isLoading ? (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-[280px] w-full" />
+            <Skeleton key={i} className="h-[17.5rem] w-full" />
           ))}
         </div>
       ) : isError ? (
@@ -93,7 +93,7 @@ export function BuscadosSection() {
                 return (
                   <Card key={b.id} className="overflow-hidden border-gt-line-strong p-0">
                     <div className="bg-gt-ink-900 py-2 text-center">
-                      <div className="font-gt-display text-[19px] font-bold tracking-[.22em] text-gt-paper-0">{t("buscados.seBusca")}</div>
+                      <div className="font-gt-display text-[1.1875rem] font-bold tracking-[.22em] text-gt-paper-0">{t("buscados.seBusca")}</div>
                     </div>
                     <div className="bg-gradient-to-b from-gt-paper-1 to-gt-paper-0 p-4 text-center">
                       <div className="relative inline-block">
@@ -102,17 +102,17 @@ export function BuscadosSection() {
                           <Stamp tone={sev.tone}>{t(sev.labelKey)}</Stamp>
                         </div>
                       </div>
-                      <div className="mt-3 font-gt-display text-[21px] font-bold text-gt-ink-900">{b.player.username}</div>
-                      <div className="mx-0 my-2.5 min-h-[34px] text-[12px] italic leading-snug text-gt-ink-600">
+                      <div className="mt-3 font-gt-display text-[1.3125rem] font-bold text-gt-ink-900">{b.player.username}</div>
+                      <div className="mx-0 my-2.5 min-h-[2.125rem] text-[0.75rem] italic leading-snug text-gt-ink-600">
                         {b.offense}
                       </div>
                       <div className="my-2.5 h-px bg-gt-line-strong" />
-                      <div className="font-gt-mono text-[9px] uppercase tracking-[.14em] text-gt-ink-400">{t("buscados.recompensa")}</div>
-                      <div className="font-gt-display text-[30px] font-bold leading-none tabular-nums text-gt-danger">
+                      <div className="font-gt-mono text-[0.5625rem] uppercase tracking-[.14em] text-gt-ink-400">{t("buscados.recompensa")}</div>
+                      <div className="font-gt-display text-[1.875rem] font-bold leading-none tabular-nums text-gt-danger">
                         {money(b.bounty, intlLocale)} ₽
                       </div>
                       {b.lastSeen && (
-                        <div className="my-2 font-gt-mono text-[10.5px] text-gt-ink-400">
+                        <div className="my-2 font-gt-mono text-[0.65625rem] text-gt-ink-400">
                           <Icon name="mapPin" size={11} className="mr-1 inline-block align-[-1px]" />
                           {b.lastSeen}
                         </div>
@@ -147,14 +147,14 @@ export function BuscadosSection() {
                 <TBody>
                   {resolved.map((b) => (
                     <TR key={b.id} onClick={() => openDossier(b.player.uuid)}>
-                      <TD className="font-gt-mono text-[11px] text-gt-ink-400">{b.code}</TD>
+                      <TD className="font-gt-mono text-[0.6875rem] text-gt-ink-400">{b.code}</TD>
                       <TD>
                         <span className="flex items-center gap-2">
                           <Avatar user={b.player.username} size={26} />
                           {b.player.username}
                         </span>
                       </TD>
-                      <TD className="max-w-[280px] truncate text-[12px] text-gt-ink-600">{b.offense}</TD>
+                      <TD className="max-w-[17.5rem] truncate text-[0.75rem] text-gt-ink-600">{b.offense}</TD>
                       <TD className="font-gt-display tabular-nums">{money(b.bounty, intlLocale)} ₽</TD>
                       <TD>
                         <Badge tone={BUSCADO_STATUS[b.status].tone}>{t(BUSCADO_STATUS[b.status].labelKey)}</Badge>
@@ -185,7 +185,7 @@ export function BuscadosSection() {
         }
       >
         {confirming && (
-          <p className="text-[13.5px] leading-relaxed text-gt-ink-700">
+          <p className="text-[0.84375rem] leading-relaxed text-gt-ink-700">
             {t("buscados.captureDescription", {
               username: confirming.player.username,
               amount: money(confirming.bounty, intlLocale),

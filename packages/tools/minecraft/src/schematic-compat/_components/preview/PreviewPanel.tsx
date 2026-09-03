@@ -18,7 +18,7 @@ import { useViewerShortcuts } from "../../../engine/actions";
 function Loading3D() {
   const t = useToolT("tools.schematicCompat");
   return (
-    <div className="absolute inset-0 flex items-center justify-center font-mono text-[11px] text-txt-dim">
+    <div className="absolute inset-0 flex items-center justify-center font-mono text-[0.6875rem] text-txt-dim">
       {t("preview.loading3d")}
     </div>
   );

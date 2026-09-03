@@ -36,11 +36,11 @@ export function EventsView() {
   }, [events, q, filter])
 
   return (
-    <main className="wrap pb-[90px] pt-[34px]">
+    <main className="wrap-wide pb-[5.625rem] pt-[2.125rem]">
       <ToolHeader title={t("title")} sub={t("lead")} />
 
       <ToolBar note={t("count", { count: sorted.length })}>
-        <SearchInput value={q} onChange={setQ} placeholder={t("search")} className="max-w-[360px] flex-1 basis-[240px]" />
+        <SearchInput value={q} onChange={setQ} placeholder={t("search")} className="max-w-[22.5rem] flex-1 basis-[15rem]" />
         <div className="max-w-full overflow-x-auto">
           <Seg
             options={FILTERS.map((f) => ({ value: f, label: t(`filter.${f}`) }))}
@@ -64,7 +64,7 @@ export function EventsView() {
       ) : sorted.length === 0 ? (
         <Empty icon="calendar" title={t("empty.title")} lead={t("empty.lead")} />
       ) : (
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(340px,1fr))] max-[720px]:grid-cols-1">
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(21.25rem,1fr))] max-[720px]:grid-cols-1">
           {sorted.map((e) => (
             <EventCard key={e.id} event={e} />
           ))}

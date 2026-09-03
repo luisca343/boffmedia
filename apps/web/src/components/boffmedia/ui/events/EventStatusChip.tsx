@@ -21,15 +21,15 @@ export function EventStatusChip({ status, label, lg, className }: EventStatusChi
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-[7px] border border-solid font-mono font-bold uppercase tracking-[0.12em]",
+        "inline-flex items-center gap-[0.4375rem] border border-solid font-mono font-bold uppercase tracking-[0.12em]",
         "cut cut-edge-slant [--cut:4px]",
-        lg ? "px-[13px] py-2 text-[11px]/none" : "px-2.5 py-1.5 text-[10px]/none",
+        lg ? "px-[0.8125rem] py-2 text-[0.6875rem]/none" : "px-2.5 py-1.5 text-[0.625rem]/none",
         TONE[status],
         className,
       )}
     >
       {status === "active" && (
-        <i className="h-[7px] w-[7px] rounded-full bg-accent-ink animate-[bm-pulse_1.3s_steps(2)_infinite] motion-reduce:animate-none" />
+        <i className="h-[0.4375rem] w-[0.4375rem] rounded-full bg-accent-ink animate-[bm-pulse_1.3s_steps(2)_infinite] motion-reduce:animate-none" />
       )}
       {label}
     </span>

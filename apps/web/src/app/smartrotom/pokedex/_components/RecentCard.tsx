@@ -55,7 +55,7 @@ export function RecentCard() {
   return (
     <div className="bg-white/[0.025] border border-white/[0.06] rounded-[14px] p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-pk-display font-semibold text-[15px] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
+        <h3 className="font-pk-display font-semibold text-[0.9375rem] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
           <ClockIcon className="w-4 h-4 text-pk-primary-400" />
           {t("recent_title")}
         </h3>
@@ -102,18 +102,18 @@ export function RecentCard() {
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[13.5px] font-semibold text-pk-surface-50">{reg.name || `#${reg.pokemonId}`}</span>
+                    <span className="text-[0.84375rem] font-semibold text-pk-surface-50">{reg.name || `#${reg.pokemonId}`}</span>
                     <StatusPill status={statusKey} size="sm" showLabel={false} />
                     {reg.types?.map((type) => (
                       <TypeChip key={type} type={type} size="sm" showLabel={false} />
                     ))}
                   </div>
-                  <div className="flex items-center gap-2 text-[11.5px] text-pk-surface-400">
+                  <div className="flex items-center gap-2 text-[0.71875rem] text-pk-surface-400">
                     <span className="w-[3px] h-[3px] rounded-full bg-pk-surface-600" />
                     <span>{reg.formId || "base"}</span>
                   </div>
                 </div>
-                <span className="font-pk-mono text-[10.5px] text-pk-surface-500 shrink-0 text-right">
+                <span className="font-pk-mono text-[0.65625rem] text-pk-surface-500 shrink-0 text-right">
                   {timeAgo ? getRelativeTime(timeAgo) : "—"}
                 </span>
               </Link>

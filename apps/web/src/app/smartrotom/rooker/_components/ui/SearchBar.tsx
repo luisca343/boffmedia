@@ -41,7 +41,7 @@ export function SearchBar({ defaultValue = "", onChange, autoFocus, className }:
         if (!onChange && q) router.push(`/smartrotom/rooker/buscar?q=${encodeURIComponent(q)}`)
       }}
       className={cn(
-        "flex h-[42px] items-center gap-2.5 rounded-rk-pill border px-3.5 transition-colors",
+        "flex h-[2.625rem] items-center gap-2.5 rounded-rk-pill border px-3.5 transition-colors",
         focused ? "border-rk-accent bg-rk-bg" : "border-transparent bg-rk-card",
         className,
       )}
@@ -59,14 +59,14 @@ export function SearchBar({ defaultValue = "", onChange, autoFocus, className }:
         autoFocus={autoFocus}
         aria-label={t("searchBar.ariaLabel")}
         placeholder={t("searchBar.placeholder")}
-        className="min-w-0 flex-1 bg-transparent text-[14.5px] text-rk-fg outline-none placeholder:text-rk-fg-subtle"
+        className="min-w-0 flex-1 bg-transparent text-[0.90625rem] text-rk-fg outline-none placeholder:text-rk-fg-subtle"
       />
       {value && (
         <button
           type="button"
           onClick={() => set("")}
           aria-label={t("searchBar.clearAriaLabel")}
-          className="grid h-[18px] w-[18px] flex-none place-items-center rounded-full bg-rk-line-strong text-rk-fg"
+          className="grid h-[1.125rem] w-[1.125rem] flex-none place-items-center rounded-full bg-rk-line-strong text-rk-fg"
         >
           <Icon name="close" size={11} />
         </button>

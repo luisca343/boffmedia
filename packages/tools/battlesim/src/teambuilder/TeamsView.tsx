@@ -28,7 +28,7 @@ import { useTeams } from "./useTeams";
 const OTHER = "__other";
 const ALL = "all";
 
-const GRID = "grid grid-cols-1 gap-[14px] min-[900px]:grid-cols-2 min-[1280px]:grid-cols-3";
+const GRID = "grid gap-[0.875rem] grid-cols-1 min-[900px]:grid-cols-2 min-[1280px]:grid-cols-3 min-[1600px]:grid-cols-4 min-[2240px]:grid-cols-5";
 
 export function TeamsView() {
   const t = useToolT(TB_NS);
@@ -160,7 +160,7 @@ export function TeamsView() {
 
   /* ── List ──────────────────────────────────────────────────────────────── */
   const importFields = (
-    <div className="grid gap-[7px]">
+    <div className="grid gap-[0.4375rem]">
       <TbKicker>{t("formatLabel")}</TbKicker>
       <DkSelect value={importFormat} onChange={setImportFormat} ariaLabel={t("formatLabel")} options={BSIM_TEAM_FORMATS.map((f) => ({ value: f.value, label: f.label }))} className="max-w-none" />
     </div>
@@ -193,8 +193,8 @@ export function TeamsView() {
     return (
       <>
         <DkEmpty icon="layers" title={t("empty.title")} lead={t("empty.lead")} className={BSIM_STATE}>
-          <div className="grid w-full max-w-[320px] gap-3 text-left">
-            <div className="grid gap-[7px]">
+          <div className="grid w-full max-w-[20rem] gap-3 text-left">
+            <div className="grid gap-[0.4375rem]">
               <TbKicker>{t("formatLabel")}</TbKicker>
               <DkSelect value={importFormat} onChange={setImportFormat} ariaLabel={t("formatLabel")} options={BSIM_TEAM_FORMATS.map((f) => ({ value: f.value, label: f.label }))} className="max-w-none" />
             </div>
@@ -220,11 +220,11 @@ export function TeamsView() {
     <div className={cn(BSIM_PAGE, "grid content-start gap-5")}>
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2">
         <div className="flex items-baseline gap-2">
-          <h2 className={cn(DISPLAY_VOICE, "m-0 text-[clamp(22px,3vw,30px)] text-txt")}>{t("title")}</h2>
-          <span className="font-mono text-[11px]/none tabular-nums text-txt-dim">{t("count", { count: teams.teams.length })}</span>
+          <h2 className={cn(DISPLAY_VOICE, "m-0 text-[clamp(1.375rem,3vw,1.875rem)] text-txt")}>{t("title")}</h2>
+          <span className="font-mono text-[0.6875rem]/none tabular-nums text-txt-dim">{t("count", { count: teams.teams.length })}</span>
         </div>
         <span className="flex-1" />
-        <DkSearch value={query} onChange={setQuery} placeholder={t("searchPh")} className="w-[220px] max-[600px]:w-full" />
+        <DkSearch value={query} onChange={setQuery} placeholder={t("searchPh")} className="w-[13.75rem] max-[600px]:w-full" />
         {narrow || filterOptions.length > 5 ? (
           <DkSelect value={filter} onChange={setFilter} options={filterOptions} ariaLabel={t("filterAria")} />
         ) : (
@@ -249,7 +249,7 @@ export function TeamsView() {
           <section key={group.key} aria-label={group.label} className="grid gap-3">
             <div className="flex items-center gap-3">
               <TbKicker className="text-txt-muted">{group.label}</TbKicker>
-              <span className="font-mono text-[10px]/none tabular-nums text-txt-dim">{group.teams.length}</span>
+              <span className="font-mono text-[0.625rem]/none tabular-nums text-txt-dim">{group.teams.length}</span>
               <span className="h-px flex-1 bg-line" />
             </div>
             <div className={GRID}>

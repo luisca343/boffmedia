@@ -197,7 +197,7 @@ export function BsimPvpRoomView() {
       chat={{ messages: chatMessages, onSend: handleSendChat, disabled: state.status !== 'active' }}
       endActions={endActions}
       banner={connection === 'reconnecting' ? (
-        <p role="status" className="m-0 flex items-center gap-2 border-b border-solid border-warn bg-warn-soft px-3 py-2 font-mono text-[11px] uppercase tracking-[0.08em] text-txt">
+        <p role="status" className="m-0 flex items-center gap-2 border-b border-solid border-warn bg-warn-soft px-3 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt">
           <i aria-hidden className="h-2 w-2 bg-warn [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" />{t('battle.header.connecting')}
         </p>
       ) : undefined}

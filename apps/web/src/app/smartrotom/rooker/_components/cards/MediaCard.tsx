@@ -22,7 +22,7 @@ export function MediaCard({ url }: { url: string }) {
 
   if (failed) {
     return (
-      <div className="flex aspect-video items-center justify-center gap-2 rounded-rk border border-rk-line bg-rk-card text-[13px] text-rk-fg-subtle">
+      <div className="flex aspect-video items-center justify-center gap-2 rounded-rk border border-rk-line bg-rk-card text-[0.8125rem] text-rk-fg-subtle">
         <Icon name="image" size={16} />
         {t("card.media.unavailable")}
       </div>

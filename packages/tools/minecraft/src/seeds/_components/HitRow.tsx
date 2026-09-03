@@ -87,7 +87,7 @@ export function HitRow({ hit, current, onPick, onFocusSite, t }: HitRowProps) {
         <button
           type="button"
           onClick={onPick}
-          className="min-w-0 flex-1 truncate text-left font-mono text-[12px] text-txt transition-colors hover:text-accent"
+          className="min-w-0 flex-1 truncate text-left font-mono text-[0.75rem] text-txt transition-colors hover:text-accent"
           title={t("search.showSeed")}
         >
           {hit.seed}
@@ -97,22 +97,22 @@ export function HitRow({ hit, current, onPick, onFocusSite, t }: HitRowProps) {
             so numerically — the count is what decides whether a seed is worth
             opening, and "13/18" answers that faster than "0.82". */}
         {optional.length ? (
-          <span className="shrink-0 font-mono text-[10px] text-txt-dim">
+          <span className="shrink-0 font-mono text-[0.625rem] text-txt-dim">
             {placed}/{optional.length}
           </span>
         ) : null}
 
-        <span className="shrink-0 font-mono text-[11px] font-bold text-accent">
+        <span className="shrink-0 font-mono text-[0.6875rem] font-bold text-accent">
           {hit.score.toFixed(2)}
         </span>
       </div>
 
       {open ? (
         <div className="grid gap-2 border-t border-line-2 p-2">
-          <p className="text-[10px] leading-snug text-txt-dim">{t("search.checklistLead")}</p>
+          <p className="text-[0.625rem] leading-snug text-txt-dim">{t("search.checklistLead")}</p>
 
           {optional.length ? (
-            <p className="text-[10px] leading-snug text-txt-dim">
+            <p className="text-[0.625rem] leading-snug text-txt-dim">
               {t("search.optionalSummary", { placed, total: optional.length })}
             </p>
           ) : null}
@@ -126,14 +126,14 @@ export function HitRow({ hit, current, onPick, onFocusSite, t }: HitRowProps) {
             >
               <div className="flex items-center gap-2">
                 <span
-                  className={`min-w-0 flex-1 truncate font-mono text-[11px] ${
+                  className={`min-w-0 flex-1 truncate font-mono text-[0.6875rem] ${
                     loc.pass ? "text-txt" : "text-txt-dim"
                   }`}
                 >
                   {name}
                 </span>
                 {!loc.pass ? (
-                  <span className="shrink-0 font-mono text-[9px] uppercase tracking-wide text-txt-muted">
+                  <span className="shrink-0 font-mono text-[0.5625rem] uppercase tracking-wide text-txt-muted">
                     {t("search.notPlaced")}
                   </span>
                 ) : null}
@@ -143,12 +143,12 @@ export function HitRow({ hit, current, onPick, onFocusSite, t }: HitRowProps) {
                     onPick();
                     onFocusSite(loc.x, loc.z);
                   }}
-                  className="shrink-0 font-mono text-[10px] text-txt-dim transition-colors hover:text-accent"
+                  className="shrink-0 font-mono text-[0.625rem] text-txt-dim transition-colors hover:text-accent"
                 >
                   {t("spec.action.showOnMap")}
                 </button>
               </div>
-              <code className="block overflow-x-auto whitespace-nowrap font-mono text-[10px] text-txt-muted">
+              <code className="block overflow-x-auto whitespace-nowrap font-mono text-[0.625rem] text-txt-muted">
                 {teleportCommand(loc.x, loc.z)}
               </code>
               {/* Said before the constraints, because it changes what they
@@ -156,13 +156,13 @@ export function HitRow({ hit, current, onPick, onFocusSite, t }: HitRowProps) {
                   when you arrive, and for one that did not they are why it
                   was rejected — at the closest the search could get. */}
               {!loc.pass ? (
-                <p className="text-[10px] leading-snug text-txt-muted">{t("search.notPlacedLead")}</p>
+                <p className="text-[0.625rem] leading-snug text-txt-muted">{t("search.notPlacedLead")}</p>
               ) : null}
               <ul className="grid list-none gap-0.5 p-0">
                 {loc.constraints.map((c, i) => (
                   <li
                     key={`${c.type}-${i}`}
-                    className={`font-mono text-[10px] leading-snug ${
+                    className={`font-mono text-[0.625rem] leading-snug ${
                       c.pass ? "text-txt-dim" : "text-txt-muted"
                     }`}
                   >

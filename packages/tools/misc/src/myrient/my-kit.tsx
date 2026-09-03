@@ -23,24 +23,24 @@ export function MyFileRow({
     <div
       onClick={onToggle}
       className={
-        "flex cursor-pointer items-center gap-[12px] border-t border-[color-mix(in_srgb,var(--line)_60%,transparent)] px-[14px] py-[9px] transition-colors " +
+        "flex cursor-pointer items-center gap-[0.75rem] border-t border-[color-mix(in_srgb,var(--line)_60%,transparent)] px-[0.875rem] py-[0.5625rem] transition-colors " +
         (selected ? "bg-accent-soft" : downloaded ? "bg-ok-soft" : "hover:bg-panel-2")
       }
     >
       <span
         className={
-          "grid h-[15px] w-[15px] flex-none place-items-center border transition-colors " +
+          "grid h-[0.9375rem] w-[0.9375rem] flex-none place-items-center border transition-colors " +
           (selected ? "border-accent bg-accent text-accent-ink" : "border-line-2 bg-base-2 text-transparent")
         }
         aria-hidden
       >
         <Icon name="check" size={11} />
       </span>
-      <span className={"min-w-0 flex-1 truncate font-body text-[13px] " + (downloaded ? "text-ok" : "text-txt")} title={name}>
+      <span className={"min-w-0 flex-1 truncate font-body text-[0.8125rem] " + (downloaded ? "text-ok" : "text-txt")} title={name}>
         {name}
       </span>
       {downloaded && <Icon name="database" size={13} className="flex-none text-ok" aria-label={downloadedLabel} />}
-      <span className="w-[96px] flex-none text-right font-mono text-[11px] text-txt-dim">{size}</span>
+      <span className="w-[6rem] flex-none text-right font-mono text-[0.6875rem] text-txt-dim">{size}</span>
     </div>
   )
 }
@@ -73,17 +73,17 @@ export function MyConsoleGroup({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-[12px] border-b border-line bg-panel-2 px-[16px] py-[12px] text-left transition-colors hover:bg-[color-mix(in_srgb,var(--panel-2)_70%,var(--panel))]"
+        className="flex w-full items-center gap-[0.75rem] border-b border-line bg-panel-2 px-[1rem] py-[0.75rem] text-left transition-colors hover:bg-[color-mix(in_srgb,var(--panel-2)_70%,var(--panel))]"
       >
-        <span className="h-[9px] w-[9px] flex-none rounded-[2px]" style={{ background: color }} />
-        <span className="font-display text-[15px] font-bold not-italic uppercase tracking-[0.02em]" style={{ color }}>
+        <span className="h-[0.5625rem] w-[0.5625rem] flex-none rounded-[2px]" style={{ background: color }} />
+        <span className="font-display text-[0.9375rem] font-bold not-italic uppercase tracking-[0.02em]" style={{ color }}>
           {result.consoleLabel}
         </span>
-        <span className="ml-auto inline-flex flex-none items-center border border-line-2 bg-base-2 px-[8px] py-[4px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-txt-muted">
+        <span className="ml-auto inline-flex flex-none items-center border border-line-2 bg-base-2 px-[0.5rem] py-[0.25rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-txt-muted">
           {gamesLabel(result.count)}
         </span>
         {groupSelected.size > 0 && (
-          <span className="inline-flex flex-none items-center border border-accent-line bg-accent-soft px-[8px] py-[4px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
+          <span className="inline-flex flex-none items-center border border-accent-line bg-accent-soft px-[0.5rem] py-[0.25rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-accent">
             {selectedLabel(groupSelected.size)}
           </span>
         )}
@@ -91,11 +91,11 @@ export function MyConsoleGroup({
       </button>
       {open && (
         <div>
-          <div className="flex items-center gap-[10px] border-b border-line bg-[color-mix(in_srgb,var(--panel-2)_50%,var(--panel))] px-[14px] py-[8px]">
+          <div className="flex items-center gap-[0.625rem] border-b border-line bg-[color-mix(in_srgb,var(--panel-2)_50%,var(--panel))] px-[0.875rem] py-[0.5rem]">
             <button
               type="button"
               onClick={onToggleAll}
-              className="inline-flex items-center gap-[6px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt"
+              className="inline-flex items-center gap-[0.375rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt"
             >
               <Icon name={allSelected ? "x" : "check"} size={12} />
               {allSelected ? deselectAllLabel : selectAllLabel(result.files.length)}

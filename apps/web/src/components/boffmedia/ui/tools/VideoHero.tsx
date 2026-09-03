@@ -49,7 +49,7 @@ export function VideoHero({ src = DEFAULT_SRC, poster = DEFAULT_POSTER, scrim = 
         style={{ opacity: scrim }}
         className="pointer-events-none absolute inset-0 z-[1] [background:linear-gradient(97deg,var(--bg)_18%,color-mix(in_srgb,var(--bg)_72%,transparent)_52%,color-mix(in_srgb,var(--bg)_30%,transparent)_100%),linear-gradient(to_top,var(--bg)_3%,transparent_42%)]"
       />
-      <div className="wrap relative z-[2] pb-16 pt-[76px]">{children}</div>
+      <div className="wrap relative z-[2] pb-16 pt-[4.75rem]">{children}</div>
     </section>
   )
 }

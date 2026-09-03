@@ -96,7 +96,7 @@ export function TrackerHomeView() {
             { value: "tournament", label: t("filters.tournaments"), count: counts.tournament },
           ]}
         />
-        <DkSearch value={q} onChange={setQ} placeholder={t("search.session")} className="min-w-[min(240px,100%)]" />
+        <DkSearch value={q} onChange={setQ} placeholder={t("search.session")} className="min-w-[min(15rem,100%)]" />
         <DkSpacer />
         <Button size="sm" icon="database" onClick={() => setShowExportImport(true)} aria-label={t("exportImport.title")} />
         <Button size="sm" icon="layers" onClick={() => setShowPresets(true)}>
@@ -120,7 +120,7 @@ export function TrackerHomeView() {
             <DkSkelList rows={6} h={62} gap={7} />
           ) : (
             <>
-              <div className="grid gap-[7px]">
+              <div className="grid gap-[0.4375rem]">
                 {active.length === 0 ? (
                   <DkEmpty
                     icon="sword"
@@ -155,18 +155,18 @@ export function TrackerHomeView() {
               </div>
 
               {archived.length > 0 && (
-                <div className="grid gap-[10px]">
+                <div className="grid gap-[0.625rem]">
                   <button
                     type="button"
                     onClick={() => setShowArchived((v) => !v)}
                     aria-expanded={showArchived}
-                    className="inline-flex items-center gap-[7px] justify-self-start border-0 bg-transparent py-[6px] font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim transition-colors hover:text-txt"
+                    className="inline-flex items-center gap-[0.4375rem] justify-self-start border-0 bg-transparent py-[0.375rem] font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim transition-colors hover:text-txt"
                   >
                     <Icon name="chevron" size={13} style={{ transform: showArchived ? "none" : "rotate(-90deg)" }} />
                     {showArchived ? t("archive.hideArchived") : t("archive.showArchived", { count: archived.length })}
                   </button>
                   {showArchived && (
-                    <div className="grid gap-[7px]">
+                    <div className="grid gap-[0.4375rem]">
                       {archived.map((s) => (
                         <TrSessionRow
                           key={s.id}

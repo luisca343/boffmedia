@@ -31,10 +31,10 @@ function effCell(eff: number): React.CSSProperties {
 }
 
 function CoverageTable({ pokes, mode, t }: { pokes: Poke[]; mode: "offense" | "defense"; t: TypesT }) {
-  const cell = "border border-solid border-[color-mix(in_srgb,var(--line)_70%,transparent)] px-[7px] py-[5px] text-center"
+  const cell = "border border-solid border-[color-mix(in_srgb,var(--line)_70%,transparent)] px-[0.4375rem] py-[0.3125rem] text-center"
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse font-mono text-[11px]/none font-semibold">
+      <table className="w-full border-collapse font-mono text-[0.6875rem]/none font-semibold">
         <thead>
           <tr>
             <th className={cell} scope="col" />
@@ -99,7 +99,7 @@ export function TypesView() {
 
   if (!teamP.length && !manyP.length) {
     return (
-      <div className="grid place-items-center gap-[10px] border border-dashed border-line-2 px-5 py-14 text-center font-body text-[13px]/[1.5] text-txt-dim">
+      <div className="grid place-items-center gap-[0.625rem] border border-dashed border-line-2 px-5 py-14 text-center font-body text-[0.8125rem]/[1.5] text-txt-dim">
         <Icon name="shield" size={28} />
         <p>{tv("ui.typesEmpty")}</p>
       </div>
@@ -128,7 +128,7 @@ export function TypesView() {
     return { ...p, w, r, im, q }
   })
 
-  const col = "border border-solid border-line bg-panel px-4 py-[14px] grid gap-2 content-start"
+  const col = "border border-solid border-line bg-panel px-4 py-[0.875rem] grid gap-2 content-start"
 
   return (
     <div className="grid gap-4">
@@ -146,19 +146,19 @@ export function TypesView() {
       )}
 
       {!active.length ? (
-        <div className="grid place-items-center gap-[10px] border border-dashed border-line-2 px-5 py-14 text-center font-body text-[13px]/[1.5] text-txt-dim">
+        <div className="grid place-items-center gap-[0.625rem] border border-dashed border-line-2 px-5 py-14 text-center font-body text-[0.8125rem]/[1.5] text-txt-dim">
           <Icon name="shield" size={26} />
           <p>{isRivals ? t("noThreats") : t("noTeam")}</p>
         </div>
       ) : (
         <>
-          <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
+          <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(18.75rem,1fr))]">
             <div className={col}>
-              <div className="font-mono text-[11px]/none font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent)" }}>
+              <div className="font-mono text-[0.6875rem]/none font-bold uppercase tracking-[0.12em]" style={{ color: "var(--accent)" }}>
                 {isRivals ? t("rivalsCanThreaten") : t("offensiveCoverage")}
               </div>
               {offIns.map((p) => (
-                <div key={p.name} className="flex items-center gap-[10px] font-body text-[12px]/[1.4] text-txt-muted">
+                <div key={p.name} className="flex items-center gap-[0.625rem] font-body text-[0.75rem]/[1.4] text-txt-muted">
                   <PokemonSprite name={p.name} size={26} />
                   <span>
                     {t("canHit")} <b className="font-mono text-txt">{p.se}</b> {t("typesSe")}
@@ -169,11 +169,11 @@ export function TypesView() {
               ))}
             </div>
             <div className={col}>
-              <div className="font-mono text-[11px]/none font-bold uppercase tracking-[0.12em]" style={{ color: "var(--info)" }}>
+              <div className="font-mono text-[0.6875rem]/none font-bold uppercase tracking-[0.12em]" style={{ color: "var(--info)" }}>
                 {isRivals ? t("rivalsVulnerabilities") : t("defensiveProfile")}
               </div>
               {defIns.map((p) => (
-                <div key={p.name} className="flex items-center gap-[10px] font-body text-[12px]/[1.4] text-txt-muted">
+                <div key={p.name} className="flex items-center gap-[0.625rem] font-body text-[0.75rem]/[1.4] text-txt-muted">
                   <PokemonSprite name={p.name} size={26} />
                   <span>
                     {p.im ? <span><b className="font-mono text-txt">{p.im}</b> {t("insightImmune")}, </span> : null}
@@ -185,18 +185,18 @@ export function TypesView() {
             </div>
           </div>
 
-          <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(340px,1fr))]">
+          <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(21.25rem,1fr))]">
             <div className="border border-solid border-line bg-panel">
-              <div className="flex items-baseline gap-[10px] border-b border-solid border-line px-4 py-3 font-display text-[13px]/none font-bold uppercase tracking-[0.05em]" style={{ color: "var(--accent)" }}>
+              <div className="flex items-baseline gap-[0.625rem] border-b border-solid border-line px-4 py-3 font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.05em]" style={{ color: "var(--accent)" }}>
                 {t("offensiveCoverageTitle")}
-                <span className="font-mono text-[10px]/[1.3] font-normal normal-case tracking-normal text-txt-dim">{t("stabVsDefenderType")}</span>
+                <span className="font-mono text-[0.625rem]/[1.3] font-normal normal-case tracking-normal text-txt-dim">{t("stabVsDefenderType")}</span>
               </div>
               <CoverageTable pokes={active} mode="offense" t={t} />
             </div>
             <div className="border border-solid border-line bg-panel">
-              <div className="flex items-baseline gap-[10px] border-b border-solid border-line px-4 py-3 font-display text-[13px]/none font-bold uppercase tracking-[0.05em]" style={{ color: "var(--info)" }}>
+              <div className="flex items-baseline gap-[0.625rem] border-b border-solid border-line px-4 py-3 font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.05em]" style={{ color: "var(--info)" }}>
                 {t("defensiveCoverageTitle")}
-                <span className="font-mono text-[10px]/[1.3] font-normal normal-case tracking-normal text-txt-dim">{t("stabByDefenderType")}</span>
+                <span className="font-mono text-[0.625rem]/[1.3] font-normal normal-case tracking-normal text-txt-dim">{t("stabByDefenderType")}</span>
               </div>
               <CoverageTable pokes={active} mode="defense" t={t} />
             </div>

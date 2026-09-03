@@ -85,7 +85,7 @@ export function MsTableroChapter() {
         </Sample>
         <Sample app="ms" title="Hueco de mochila" code="<SatchelSlot />" note="Lo no obtenido guarda el misterio: gris y con una interrogación.">
           {SATCHEL.slice(0, 5).map((item) => (
-            <div key={item.item} className="w-[96px]">
+            <div key={item.item} className="w-[6rem]">
               <SatchelSlot item={item} />
             </div>
           ))}
@@ -99,7 +99,7 @@ export function MsTableroChapter() {
         lead="La cuerda que ata un encargo con el siguiente. La cadena es real: el juego la guarda como quest.nextQuest hacia delante y requirements.requiredQuests hacia atrás."
       >
         <Sample app="ms" title="Cadena de misiones" code="<QuestChain />" col padded={false}>
-          <div className="p-[26px]">
+          <div className="p-[1.625rem]">
             <QuestChain quest={ACTIVE_QUEST} quests={MS_QUESTS} onSelect={() => {}} />
           </div>
         </Sample>
@@ -118,7 +118,7 @@ export function MsTableroChapter() {
           note="La misma caja que usa <BoardFilters />. Sus chips, su campo de búsqueda y su selector ya nacieron en tinta sobre pergamino (Controls.tsx); lo único que cambió fue la caja que los envuelve — antes madera oscura, ahora pergamino."
         >
           <div className="ms-filters flex w-full flex-wrap items-center gap-3">
-            <SearchField className="max-w-[240px] flex-[1_1_200px]" placeholder="Buscar encargo…" aria-label="Buscar encargo" />
+            <SearchField className="max-w-[15rem] flex-[1_1_200px]" placeholder="Buscar encargo…" aria-label="Buscar encargo" />
             <div className="flex flex-wrap gap-1.5">
               <Chip active>
                 {t(STATUS_LABEL_KEY.ACTIVE)} <span className="opacity-65">(2)</span>
@@ -145,7 +145,7 @@ export function MsTableroChapter() {
           note="El marco de madera envuelve el corcho — igual que en /smartrotom/misiones, donde antes el corcho colgaba sin borde."
           padded={false}
         >
-          <div className="p-[26px]">
+          <div className="p-[1.625rem]">
             <div className="ms-board-frame">
               <div className="ms-cork flex flex-wrap gap-6 p-6">
                 <QuestPaper
@@ -166,7 +166,7 @@ export function MsTableroChapter() {
         </Sample>
 
         <Sample app="ms" title="Rail lateral — panel realzado" code=".ms-wood.ms-side-rail" note="La franja de navegación del tablón: el realce la separa del corcho, igual que un panel clavado sobre la madera.">
-          <div className="ms-wood ms-side-rail flex h-[140px] w-[160px] flex-col items-center justify-center gap-1 border-r-[3px] border-[#050201] p-3 text-center font-ms-uppercase text-[10px] uppercase tracking-[.16em] text-ms-gold-1">
+          <div className="ms-wood ms-side-rail flex h-[8.75rem] w-[10rem] flex-col items-center justify-center gap-1 border-r-[3px] border-[#050201] p-3 text-center font-ms-uppercase text-[0.625rem] uppercase tracking-[.16em] text-ms-gold-1">
             El Tablón
           </div>
         </Sample>
@@ -188,7 +188,7 @@ export function MsTableroChapter() {
             ].map(({ attr, label }) => (
               <div key={label} data-surface={attr} className="text-center">
                 <div className="ms-app ms-tavern h-20 w-full rounded-sm border border-black/40" />
-                <span className="mt-1.5 block font-mono text-[10px] uppercase tracking-wider text-sr-txt-muted">
+                <span className="mt-1.5 block font-mono text-[0.625rem] uppercase tracking-wider text-sr-txt-muted">
                   {label}
                 </span>
               </div>

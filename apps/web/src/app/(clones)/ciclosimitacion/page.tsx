@@ -10,7 +10,7 @@ export default function Page() {
     <div className="font-['Roboto',_sans-serif] text-base text-[#444] bg-white min-h-screen flex flex-col">
       <TopBar />
       <Header />
-      <div className="flex flex-1 pt-[98px]">
+      <div className="flex flex-1 pt-[6.125rem]">
         <Sidebar isSidebarCollapsed={false} />
         <div className={`font-sans text-base text-[#444] bg-white flex-1 ml-60`}>
           <header className="text-black p-4">

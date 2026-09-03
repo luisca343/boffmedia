@@ -16,7 +16,7 @@ import { Icon } from "./Icon"
  * shop. Every control below shares it, so they must never diverge.
  */
 const CONTROL =
-  "w-full rounded-wp-sm border-wp border-wp-line/24 bg-white px-[13px] py-2.5 font-wp text-[13.5px] font-bold text-wp-fg " +
+  "w-full rounded-wp-sm border-wp border-wp-line/24 bg-white px-[0.8125rem] py-2.5 font-wp text-[0.84375rem] font-bold text-wp-fg " +
   "shadow-[inset_0_1px_2px_rgba(223,63,137,.05)] outline-none transition-[border-color,box-shadow,background-color] duration-150 " +
   "placeholder:font-bold placeholder:text-wp-fg-subtle " +
   "hover:border-wp-line/46 focus:border-wp-accent focus:shadow-[0_0_0_4px_rgb(var(--wp-accent)/.13)] " +
@@ -34,7 +34,7 @@ export function PriceInput({
 }: Omit<InputHTMLAttributes<HTMLInputElement>, "type">) {
   return (
     <div className="relative flex-1">
-      <span className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 font-wp font-extrabold text-wp-accent">
+      <span className="pointer-events-none absolute left-[0.8125rem] top-1/2 -translate-y-1/2 font-wp font-extrabold text-wp-accent">
         ₽
       </span>
       <input
@@ -97,16 +97,16 @@ export function Toggle({
       aria-label={label}
       onClick={() => onChange(!on)}
       className={cn(
-        "relative h-[23px] w-10 flex-none rounded-wp-pill transition-colors duration-200",
+        "relative h-[1.4375rem] w-10 flex-none rounded-wp-pill transition-colors duration-200",
         on ? "bg-wp-accent" : "bg-[#f0cede]",
         className,
       )}
     >
       <i
         className={cn(
-          "absolute top-[2.5px] h-[18px] w-[18px] rounded-wp-pill bg-white shadow-[0_2px_4px_rgba(0,0,0,.2)]",
+          "absolute top-[2.5px] h-[1.125rem] w-[1.125rem] rounded-wp-pill bg-white shadow-[0_2px_4px_rgba(0,0,0,.2)]",
           "transition-[left] duration-200 ease-wp motion-reduce:transition-none",
-          on ? "left-[19px]" : "left-[2.5px]",
+          on ? "left-[1.1875rem]" : "left-[2.5px]",
         )}
       />
     </button>
@@ -132,7 +132,7 @@ export function Checkbox({
       aria-checked={on}
       onClick={() => onChange(!on)}
       className={cn(
-        "flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left font-wp text-[13.5px] font-bold",
+        "flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left font-wp text-[0.84375rem] font-bold",
         "transition-colors duration-100 hover:bg-wp-panel-2",
         on ? "text-wp-fg" : "text-wp-fg-muted",
         className,
@@ -140,7 +140,7 @@ export function Checkbox({
     >
       <span
         className={cn(
-          "flex h-[19px] w-[19px] flex-none items-center justify-center rounded-[7px] border-2 text-white transition-colors duration-100",
+          "flex h-[1.1875rem] w-[1.1875rem] flex-none items-center justify-center rounded-[7px] border-2 text-white transition-colors duration-100",
           on ? "border-wp-accent bg-wp-accent" : "border-wp-line/46",
         )}
       >

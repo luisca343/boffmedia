@@ -67,8 +67,8 @@ function Thumb({
         )}
       </span>
       <span className="flex items-center justify-between gap-2 px-2 py-1.5">
-        <span className="truncate font-mono text-[10px] text-txt-dim">{shot.name}</span>
-        <span className="shrink-0 font-mono text-[10px] text-txt-dim">{formatBytes(shot.size)}</span>
+        <span className="truncate font-mono text-[0.625rem] text-txt-dim">{shot.name}</span>
+        <span className="shrink-0 font-mono text-[0.625rem] text-txt-dim">{formatBytes(shot.size)}</span>
       </span>
     </button>
   )
@@ -104,7 +104,7 @@ export function ScreenshotsTab({ slug }: { slug: string }) {
 
   if (loading) {
     return (
-      <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
+      <span className="flex items-center gap-2 py-6 font-mono text-[0.6875rem] text-txt-dim">
         <Spinner size={12} /> {t("reading")}
       </span>
     )
@@ -117,7 +117,7 @@ export function ScreenshotsTab({ slug }: { slug: string }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-[11px] text-txt-dim">
+        <span className="font-mono text-[0.6875rem] text-txt-dim">
           {t("count", { count: shots.length })} ·{" "}
           {formatBytes(shots.reduce((sum, s) => sum + s.size, 0))}
         </span>
@@ -126,11 +126,11 @@ export function ScreenshotsTab({ slug }: { slug: string }) {
         </Button>
       </div>
 
-      <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
+      <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(13.75rem,1fr))]">
         {shots.map((shot) => (
           <li key={shot.rel}>
             <Thumb slug={slug} shot={shot} onOpen={setLightbox} />
-            <p className="mt-1 truncate font-mono text-[10px] text-txt-dim">
+            <p className="mt-1 truncate font-mono text-[0.625rem] text-txt-dim">
               {shot.modified ? formatWhen(new Date(shot.modified).toISOString()) : ""}
             </p>
           </li>

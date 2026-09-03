@@ -31,8 +31,8 @@ export function StopPin({
       aria-label={t("destination", { name: stop.id })}
       aria-pressed={selected}
       className={cn(
-        "absolute z-[12] inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-[7px]",
-        "rounded-tx-pill border border-solid py-1 pl-[5px] pr-[11px] shadow-tx-1",
+        "absolute z-[12] inline-flex -translate-x-1/2 -translate-y-1/2 items-center gap-[0.4375rem]",
+        "rounded-tx-pill border border-solid py-1 pl-[0.3125rem] pr-[0.6875rem] shadow-tx-1",
         "transition-[transform,border-color,box-shadow] duration-200 ease-tx",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tx-accent",
         selected
@@ -42,7 +42,7 @@ export function StopPin({
     >
       <span
         className={cn(
-          "grid h-[25px] w-[25px] place-items-center rounded-full shadow-[0_2px_8px_rgb(0_0_0/0.35)]",
+          "grid h-[1.5625rem] w-[1.5625rem] place-items-center rounded-full shadow-[0_2px_8px_rgb(0_0_0/0.35)]",
           selected
             ? "bg-tx-on-accent text-tx-accent"
             : "bg-[linear-gradient(140deg,rgb(var(--tx-blue-500)),rgb(var(--tx-blue-700)))] text-white",
@@ -88,7 +88,7 @@ export function OffscreenPin({
       title={stop.id}
       aria-label={t("goTo", { name: stop.id })}
       className={cn(
-        "absolute z-[18] grid h-[30px] w-[30px] -translate-x-1/2 -translate-y-1/2 place-items-center",
+        "absolute z-[18] grid h-[1.875rem] w-[1.875rem] -translate-x-1/2 -translate-y-1/2 place-items-center",
         "rounded-full border border-solid shadow-tx-1",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tx-accent",
         selected
@@ -112,10 +112,10 @@ export function PlayerMarker({ x, y, reduceMotion }: { x: number; y: number; red
       aria-hidden="true"
     >
       {!reduceMotion && (
-        <span className="absolute -inset-[14px] rounded-full bg-tx-blue-400 opacity-30 animate-tx-ping motion-reduce:animate-none" />
+        <span className="absolute -inset-[0.875rem] rounded-full bg-tx-blue-400 opacity-30 animate-tx-ping motion-reduce:animate-none" />
       )}
-      <span className="relative grid h-[38px] w-[38px] place-items-center rounded-full border-[2.5px] border-solid border-white bg-[linear-gradient(140deg,rgb(var(--tx-blue-400)),rgb(var(--tx-blue-700)))] shadow-[0_0_16px_rgb(59_130_246/0.7)]">
-        <span className="text-[11px] font-extrabold tracking-[0.3px] text-white">{t("you")}</span>
+      <span className="relative grid h-[2.375rem] w-[2.375rem] place-items-center rounded-full border-[2.5px] border-solid border-white bg-[linear-gradient(140deg,rgb(var(--tx-blue-400)),rgb(var(--tx-blue-700)))] shadow-[0_0_16px_rgb(59_130_246/0.7)]">
+        <span className="text-[0.6875rem] font-extrabold tracking-[0.3px] text-white">{t("you")}</span>
       </span>
     </div>
   )

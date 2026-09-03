@@ -36,7 +36,7 @@ export default function ApelacionesPage() {
       {!isLoading && items.length > 0 && <ApelacionesStats apelaciones={items} />}
 
       {data && data.total > items.length && (
-        <p className="mb-3 font-gt-mono text-[10.5px] text-gt-ink-400">
+        <p className="mb-3 font-gt-mono text-[0.65625rem] text-gt-ink-400">
           {t("apelaciones.mostrando", { shown: items.length, total: data.total })}
         </p>
       )}

@@ -11,7 +11,7 @@ export function TvMinimap({ active }: { active: number }) {
   const tMinimap = useTranslations("boffmedia.landing.minimap")
   return (
     <aside
-      className="group/map fixed left-[22px] top-1/2 z-[560] flex -translate-y-1/2 flex-col gap-[2px] py-1.5 max-[1120px]:hidden"
+      className="group/map fixed left-[1.375rem] top-1/2 z-[560] flex -translate-y-1/2 flex-col gap-[2px] py-1.5 max-[1120px]:hidden"
       aria-label={tMinimap("ariaLabel")}
     >
       <span className="absolute bottom-3.5 left-1.5 top-3.5 w-[2px] overflow-hidden bg-line" aria-hidden="true">
@@ -44,7 +44,7 @@ export function TvMinimap({ active }: { active: number }) {
             />
             <span
               className={cn(
-                "pointer-events-none flex -translate-x-1.5 items-baseline gap-[7px] whitespace-nowrap font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.06em] opacity-0 transition-[opacity,transform,color] duration-[140ms] group-hover/map:translate-x-0 group-hover/map:opacity-100",
+                "pointer-events-none flex -translate-x-1.5 items-baseline gap-[0.4375rem] whitespace-nowrap font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.06em] opacity-0 transition-[opacity,transform,color] duration-[140ms] group-hover/map:translate-x-0 group-hover/map:opacity-100",
                 on ? "translate-x-0 text-txt opacity-100" : "text-txt-dim",
               )}
             >

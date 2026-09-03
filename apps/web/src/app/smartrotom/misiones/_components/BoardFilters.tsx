@@ -21,7 +21,7 @@ export function RegionStrip({
   if (regions.length === 0) return null
 
   return (
-    <div className="mb-[18px]">
+    <div className="mb-[1.125rem]">
       <div className="mb-2.5 flex items-center gap-3 text-ms-gold-1">
         <span className="font-ms-display text-lg tracking-[.04em]">{t("filterByKingdom")}</span>
         <div className="h-px flex-1 bg-gradient-to-r from-ms-gold-3 to-transparent opacity-50" />
@@ -70,7 +70,7 @@ export function BoardFilters({
   return (
     <div className="ms-filters mb-6 flex flex-wrap items-center gap-3">
       <SearchField
-        className="max-w-[320px] flex-[1_1_240px]"
+        className="max-w-[20rem] flex-[1_1_240px]"
         placeholder={t("searchPlaceholder")}
         value={search}
         onChange={(event) => onSearch(event.target.value)}

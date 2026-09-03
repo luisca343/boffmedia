@@ -207,11 +207,11 @@ export function ProfileView({
   )
 
   return (
-    <main className="wrap pb-[90px] pt-[34px]">
-      <div className="mb-[22px] flex flex-wrap items-end justify-between gap-[22px]">
+    <main className="wrap pb-[5.625rem] pt-[2.125rem]">
+      <div className="mb-[1.375rem] flex flex-wrap items-end justify-between gap-[1.375rem]">
         <div>
           <span className="mono-label">{isTours ? t("tours.kicker") : t("kicker")}</span>
-          <h1 className="mt-2 text-[clamp(46px,5.4vw,64px)]">{isTours ? t("tours.title") : t("title")}</h1>
+          <h1 className="mt-2 text-[clamp(2.875rem,5.4vw,4rem)]">{isTours ? t("tours.title") : t("title")}</h1>
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           <Seg
@@ -247,7 +247,7 @@ export function ProfileView({
             <Banner
               tone="warn"
               title={t("emailUnverified.title")}
-              className="mb-[18px]"
+              className="mb-[1.125rem]"
               actions={
                 user.email ? (
                   <ResendVerificationButton email={user.email} size="sm" />
@@ -294,7 +294,7 @@ export function ProfileView({
           />
 
           {stats.length > 0 && (
-            <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(148px,1fr))]">
+            <div className="mb-4 grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(9.25rem,1fr))]">
               {stats.map((s) => (
                 <StatTile key={s.label} {...s} />
               ))}

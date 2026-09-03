@@ -47,22 +47,22 @@ export function ArmeriaMhChapter() {
         }
       >
         <Sample title="Tarjeta de conjunto" code="<MhSetCard set view>" col>
-          <div className="grid w-full max-w-[420px] gap-[9px] [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
+          <div className="grid w-full max-w-[26.25rem] gap-[0.5625rem] [grid-template-columns:repeat(auto-fill,minmax(11.25rem,1fr))]">
             <MhSetCard set={set} active onOpen={() => {}} view="grid" />
             <MhSetCard set={MHDB.armorSet(3)} onOpen={() => {}} view="grid" />
           </div>
-          <div className="mt-2.5 grid w-full max-w-[420px] gap-1.5">
+          <div className="mt-2.5 grid w-full max-w-[26.25rem] gap-1.5">
             <MhSetCard set={MHDB.armorSet(2)} onOpen={() => {}} view="list" />
           </div>
         </Sample>
         <Sample title="Escalera de bonus" code="<MhSetBonusDetail bonus kind>" col>
-          <div className="grid w-full max-w-[440px] gap-2.5">
+          <div className="grid w-full max-w-[27.5rem] gap-2.5">
             {set.bonus && <MhSetBonusDetail bonus={set.bonus} kind="set" activePieces={4} />}
             {MHDB.armorSet(3).group && <MhSetBonusDetail bonus={MHDB.armorSet(3).group!} kind="group" activePieces={2} />}
           </div>
         </Sample>
         <Sample title="Fila de pieza" code="<MhPieceRow piece>" col note="Con <code>activePieces</code>, la escalera de bonus resalta los rangos ya activos; sin él, muestra todos los rangos atenuados.">
-          <div className="grid w-full max-w-[460px] gap-0">
+          <div className="grid w-full max-w-[28.75rem] gap-0">
             <MhPieceRow piece={piece} />
             <MhPieceRow piece={MHDB.armor(105)} />
           </div>
@@ -86,7 +86,7 @@ export function ArmeriaMhChapter() {
           <MhSkillChip skill={MHDB.skill(2)} />
         </Sample>
         <Sample title="Barra de estadística" code="<MhStatBar label value max>" col>
-          <div className="grid w-full max-w-[440px] gap-2">
+          <div className="grid w-full max-w-[27.5rem] gap-2">
             <MhStatBar label="Defensa" value={setProfile.defense.base} max={MH_MAX_DEF} color="var(--info)" />
             <MhStatBar label="Máxima" value={setProfile.defense.max} max={MH_MAX_DEF} color="var(--mh)" />
             <MhStatBar label="Ataque" value={wFire.attack} max={520} color="#ff7a5c" />
@@ -105,16 +105,16 @@ export function ArmeriaMhChapter() {
         }
       >
         <Sample title="Tarjeta de arma" code="<MhWeaponCard weapon selectable>" col>
-          <div className="grid w-full max-w-[440px] gap-[9px] [grid-template-columns:repeat(auto-fill,minmax(160px,1fr))]">
+          <div className="grid w-full max-w-[27.5rem] gap-[0.5625rem] [grid-template-columns:repeat(auto-fill,minmax(10rem,1fr))]">
             <MhWeaponCard weapon={wFire} active onOpen={() => {}} view="grid" selectable selected={sel} onToggleSelect={() => setSel((v) => !v)} />
             <MhWeaponCard weapon={MHDB.weapon(5006)} onOpen={() => {}} view="grid" selectable onToggleSelect={() => {}} />
           </div>
-          <div className="mt-2.5 grid w-full max-w-[440px] gap-1.5">
+          <div className="mt-2.5 grid w-full max-w-[27.5rem] gap-1.5">
             <MhWeaponCard weapon={wCb} onOpen={() => {}} view="list" />
           </div>
         </Sample>
         <Sample title="Afilado + Artesanía" code="<MhSharpHandicraft weapon>" col note="Estado interno: pulsa un nivel de Artesanía y la barra interpola entre el afilado base y el máximo.">
-          <div className="w-full max-w-[440px]">
+          <div className="w-full max-w-[27.5rem]">
             <MhSharpHandicraft weapon={wFire} defaultLevel={2} />
           </div>
         </Sample>
@@ -136,17 +136,17 @@ export function ArmeriaMhChapter() {
         }
       >
         <Sample title="Recubrimientos · arco" code="<MhWeaponExtra weapon>" col>
-          <div className="w-full max-w-[440px]">
+          <div className="w-full max-w-[27.5rem]">
             <MhWeaponExtra weapon={wBow} />
           </div>
         </Sample>
         <Sample title="Vial · espada carga" code="<MhWeaponExtra weapon>" col>
-          <div className="w-full max-w-[440px]">
+          <div className="w-full max-w-[27.5rem]">
             <MhWeaponExtra weapon={wCb} />
           </div>
         </Sample>
         <Sample title="Melodía y cantos · cuerno" code="<MhWeaponExtra weapon>" col>
-          <div className="w-full max-w-[440px]">
+          <div className="w-full max-w-[27.5rem]">
             <MhWeaponExtra weapon={wHh} />
           </div>
         </Sample>

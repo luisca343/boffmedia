@@ -101,7 +101,7 @@ function ReelRun({
           ref={reel.viewportRef}
           className={cn("relative overflow-hidden border border-line-2 bg-base-deep transition-all duration-500", {
             "h-72": size !== "large",
-            "h-[min(56vh,560px)]": size === "large"
+            "h-[min(56vh,35rem)]": size === "large"
           })}
           style={{
             boxShadow: isLanded

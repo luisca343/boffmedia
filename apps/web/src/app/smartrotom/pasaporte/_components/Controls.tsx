@@ -30,18 +30,18 @@ export function Controls({
 
   return (
     <footer className="z-40 flex flex-wrap items-center justify-center gap-3.5 px-4 py-3.5">
-      <div className="flex items-center gap-1 rounded-full border border-ps-gild/18 bg-ps-desk-lo/50 p-[5px]">
+      <div className="flex items-center gap-1 rounded-full border border-ps-gild/18 bg-ps-desk-lo/50 p-[0.3125rem]">
         <NavButton aria-label={t("controls.prevPage")} onClick={onPrev} disabled={page <= 0}>
-          <Icon name="chevL" className="h-[19px] w-[19px]" />
+          <Icon name="chevL" className="h-[1.1875rem] w-[1.1875rem]" />
         </NavButton>
 
-        <p className="ps-num min-w-[92px] text-center font-ps-mono text-[12px] tracking-[.08em] text-ps-chrome-muted">
+        <p className="ps-num min-w-[5.75rem] text-center font-ps-mono text-[0.75rem] tracking-[.08em] text-ps-chrome-muted">
           <b className="font-bold text-ps-gild-hi">{String(page).padStart(2, "0")}</b> /{" "}
           {String(last).padStart(2, "0")}
         </p>
 
         <NavButton aria-label={t("controls.nextPage")} onClick={onNext} disabled={page >= last}>
-          <Icon name="chevR" className="h-[19px] w-[19px]" />
+          <Icon name="chevR" className="h-[1.1875rem] w-[1.1875rem]" />
         </NavButton>
       </div>
 
@@ -54,7 +54,7 @@ export function Controls({
             aria-current={i === page ? "page" : undefined}
             onClick={() => onFlip(i)}
             className={cn(
-              "h-1 w-[22px] rounded-sm transition-colors duration-200 motion-reduce:transition-none",
+              "h-1 w-[1.375rem] rounded-sm transition-colors duration-200 motion-reduce:transition-none",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-gild focus-visible:ring-offset-2 focus-visible:ring-offset-ps-desk",
               i === page
                 ? "bg-ps-gild shadow-[0_0_8px_rgb(var(--ps-gild)/.55)]"

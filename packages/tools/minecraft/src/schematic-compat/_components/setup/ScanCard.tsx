@@ -47,7 +47,7 @@ export function ScanCard({
   return (
     <div
       className={cn(
-        "flex flex-col gap-[10px] p-3 bg-panel border border-solid transition-[border-color] duration-[140ms]",
+        "flex flex-col gap-[0.625rem] p-3 bg-panel border border-solid transition-[border-color] duration-[140ms]",
         "border-l-[3px]",
         role === "target" ? "border-l-signal" : "border-l-accent",
         registry ? "border-[color-mix(in_srgb,var(--ok)_40%,var(--line))]" : "border-line",
@@ -55,7 +55,7 @@ export function ScanCard({
     >
       {/* top: role + game toggle */}
       <div className="flex items-center gap-2">
-        <span className="flex items-center gap-1.5 font-mono text-[10px] tracking-[0.12em] uppercase text-txt-muted">
+        <span className="flex items-center gap-1.5 font-mono text-[0.625rem] tracking-[0.12em] uppercase text-txt-muted">
           <span className={cn("w-1.5 h-1.5 shrink-0", role === "target" ? "bg-signal" : "bg-accent")} />
           {roleLabel}
         </span>
@@ -72,7 +72,7 @@ export function ScanCard({
               disabled={scanning}
               onClick={() => onGame(g.id)}
               className={cn(
-                "inline-flex items-center gap-1 py-1 px-[7px] font-mono text-[10.5px]",
+                "inline-flex items-center gap-1 py-1 px-[0.4375rem] font-mono text-[0.65625rem]",
                 "cursor-pointer transition-colors duration-[140ms] disabled:opacity-50 disabled:cursor-default",
                 game === g.id
                   ? "bg-panel-2 text-txt shadow-[inset_0_0_0_1px_var(--line-2)]"
@@ -97,7 +97,7 @@ export function ScanCard({
               disabled={scanning}
               onClick={() => onMode(m)}
               className={cn(
-                "flex-1 inline-flex items-center justify-center gap-1 py-1 px-[7px] font-mono text-[10.5px]",
+                "flex-1 inline-flex items-center justify-center gap-1 py-1 px-[0.4375rem] font-mono text-[0.65625rem]",
                 "cursor-pointer transition-colors duration-[140ms] disabled:opacity-50 disabled:cursor-default",
                 mode === m
                   ? "bg-panel-2 text-txt shadow-[inset_0_0_0_1px_var(--line-2)]"
@@ -114,7 +114,7 @@ export function ScanCard({
       {/* pick */}
       {vanilla ? (
         <label className="flex flex-col gap-1">
-          <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-txt-dim">
+          <span className="font-mono text-[0.625rem] tracking-[0.12em] uppercase text-txt-dim">
             {t("setup.vanillaVersion")}
           </span>
           <select
@@ -122,7 +122,7 @@ export function ScanCard({
             disabled={scanning}
             onChange={(e) => onVersion?.(e.target.value)}
             className={cn(
-              "w-full p-[9px] bg-base border border-solid border-line-2 font-mono text-[12.5px] text-txt",
+              "w-full p-[0.5625rem] bg-base border border-solid border-line-2 font-mono text-[0.78125rem] text-txt",
               "cursor-pointer transition-[border-color] duration-[140ms]",
               "hover:border-accent-line disabled:opacity-60 disabled:cursor-default",
             )}
@@ -140,8 +140,8 @@ export function ScanCard({
           disabled={scanning}
           onClick={onPick}
           className={cn(
-            "flex items-center justify-center gap-2 p-[9px] w-full bg-base border border-dashed border-line-2",
-            "text-txt-muted text-[13px] cursor-pointer transition-[border-color,color] duration-[140ms]",
+            "flex items-center justify-center gap-2 p-[0.5625rem] w-full bg-base border border-dashed border-line-2",
+            "text-txt-muted text-[0.8125rem] cursor-pointer transition-[border-color,color] duration-[140ms]",
             "enabled:hover:border-accent-line enabled:hover:text-txt disabled:opacity-60 disabled:cursor-default",
           )}
         >
@@ -157,7 +157,7 @@ export function ScanCard({
       )}
 
       {/* result */}
-      <div className="flex items-start gap-2 text-[12px] leading-[1.5] min-h-[18px]">
+      <div className="flex items-start gap-2 text-[0.75rem] leading-[1.5] min-h-[1.125rem]">
         <span
           className={cn(
             "w-2 h-2 rounded-full shrink-0 mt-1",
@@ -171,7 +171,7 @@ export function ScanCard({
                 <b className="text-txt font-semibold">{registry.name}</b> ·{" "}
               </>
             ) : null}
-            <code className="font-mono text-[11px] text-accent-bright">{registry.version}</code>
+            <code className="font-mono text-[0.6875rem] text-accent-bright">{registry.version}</code>
             {registry.loader ? " · " + registry.loader : ""}
             <br />
             {registry.bundled

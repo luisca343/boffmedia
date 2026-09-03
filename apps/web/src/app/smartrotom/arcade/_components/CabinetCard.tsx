@@ -96,7 +96,7 @@ export function CabinetCard({ game, compact }: CabinetCardProps) {
         )}
       >
         <span
-          className={cn("font-ar-display text-[9px] uppercase tracking-[0.18em]", accent.text)}
+          className={cn("font-ar-display text-[0.5625rem] uppercase tracking-[0.18em]", accent.text)}
         >
           ▸ {t(game.categoryKey)}
         </span>
@@ -106,7 +106,7 @@ export function CabinetCard({ game, compact }: CabinetCardProps) {
       <div
         className={cn(
           "ar-scanlines grid place-items-center border-b border-white/[.05] bg-ar-void",
-          compact ? "h-[130px]" : "h-[180px]",
+          compact ? "h-[8.125rem]" : "h-[11.25rem]",
         )}
       >
         <div aria-hidden className={cn("absolute inset-0", accent.crt)} />
@@ -128,7 +128,7 @@ export function CabinetCard({ game, compact }: CabinetCardProps) {
           <span
             className={cn(
               "font-ar-display text-ar-ink",
-              compact ? "text-[11px]" : "text-[13px]",
+              compact ? "text-[0.6875rem]" : "text-[0.8125rem]",
               hot && "ar-chrom",
             )}
           >
@@ -142,7 +142,7 @@ export function CabinetCard({ game, compact }: CabinetCardProps) {
         <div className="flex items-center justify-between">
           <span
             className={cn(
-              "font-ar-display text-[9px] tracking-[0.16em]",
+              "font-ar-display text-[0.5625rem] tracking-[0.16em]",
               hot
                 ? "text-ar-amber motion-reduce:animate-none animate-ar-blink"
                 : "text-ar-ink-muted",
@@ -150,7 +150,7 @@ export function CabinetCard({ game, compact }: CabinetCardProps) {
           >
             INSERT COIN ●
           </span>
-          <span className={cn("inline-flex items-center gap-1 text-[11px] font-semibold", accent.text)}>
+          <span className={cn("inline-flex items-center gap-1 text-[0.6875rem] font-semibold", accent.text)}>
             {t("sidebar.play")} <Icon.Chevron s={12} />
           </span>
         </div>

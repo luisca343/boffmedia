@@ -22,7 +22,7 @@ export function MewtwitchHero({ data }: { data: HeroData }) {
   const { number } = useFormat()
 
   return (
-    <section className="relative h-[480px] overflow-hidden">
+    <section className="relative h-[30rem] overflow-hidden">
       {data.thumb && (
         <div
           className="absolute inset-0 z-0 scale-[1.05] bg-cover bg-center brightness-[0.4] saturate-[1.2]"
@@ -41,18 +41,18 @@ export function MewtwitchHero({ data }: { data: HeroData }) {
         <PulseDot /> <strong className="font-mono">{number(data.viewers)}</strong> {t("hero.viewingNow")}
       </div>
 
-      <div className="relative z-[2] mx-auto flex h-full max-w-[1640px] flex-col justify-center px-6 md:px-10">
-        <div className="max-w-[740px]">
-          <div className="mb-[18px] inline-flex w-max items-center gap-2 rounded-mw-pill border border-mw-accent/40 bg-mw-accent/[.18] px-3 py-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-mw-accent">
+      <div className="relative z-[2] mx-auto flex h-full max-w-[102.5rem] flex-col justify-center px-6 md:px-10">
+        <div className="max-w-[46.25rem]">
+          <div className="mb-[1.125rem] inline-flex w-max items-center gap-2 rounded-mw-pill border border-mw-accent/40 bg-mw-accent/[.18] px-3 py-1.5 font-mono text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-mw-accent">
             <PulseDot /> {data.game} · {t("hero.liveTag")}
           </div>
-          <h1 className="m-0 max-w-[740px] font-mw-display text-[clamp(28px,4vw,50px)] font-extrabold leading-[1.04] tracking-[-0.02em] [text-wrap:balance]">
+          <h1 className="m-0 max-w-[46.25rem] font-mw-display text-[clamp(1.75rem,4vw,3.125rem)] font-extrabold leading-[1.04] tracking-[-0.02em] [text-wrap:balance]">
             {data.title}
           </h1>
-          <div className="mt-[18px] inline-flex items-center gap-3">
+          <div className="mt-[1.125rem] inline-flex items-center gap-3">
             <Avatar src={data.streamerAvatar} name={data.streamer} size={56} ring />
             <div>
-              <div className="inline-flex items-center gap-1.5 text-[15px] font-bold">{data.streamer}</div>
+              <div className="inline-flex items-center gap-1.5 text-[0.9375rem] font-bold">{data.streamer}</div>
               <div className="mt-0.5 text-xs text-mw-fg-mute">
                 {data.game}
                 {data.uptime && ` · ${t("hero.uptimeLive", { uptime: data.uptime })}`}
@@ -60,7 +60,7 @@ export function MewtwitchHero({ data }: { data: HeroData }) {
             </div>
           </div>
           {data.tags.length > 0 && (
-            <div className="my-[14px] flex flex-wrap gap-1.5">
+            <div className="my-[0.875rem] flex flex-wrap gap-1.5">
               {data.tags.map((tag) => (
                 <Tag key={tag}>{tag}</Tag>
               ))}

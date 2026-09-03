@@ -7,8 +7,8 @@ import { Icon } from "./icon"
 // invisible to the sweep that added the chamfer strokes, so every chip carried
 // the corner with nothing drawing its diagonal.
 const BASE = cn(
-  "inline-flex items-center gap-2 whitespace-nowrap border border-solid px-3 py-[7px]",
-  "font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.1em]",
+  "inline-flex items-center gap-2 whitespace-nowrap border border-solid px-3 py-[0.4375rem]",
+  "font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.1em]",
   "cut-tag cut-tag-edge",
   "transition-[color,border-color,background] duration-[140ms]",
 )
@@ -31,13 +31,13 @@ export function Chip({ children, on, onRemove, onClick, href, className }: ChipP
 
   if (onRemove) {
     return (
-      <span className={cn(BASE, "pr-[7px]", tone, className)}>
+      <span className={cn(BASE, "pr-[0.4375rem]", tone, className)}>
         {children}
         <button
           type="button"
           aria-label={`Quitar ${typeof children === "string" ? children : "filtro"}`}
           onClick={onRemove}
-          className="grid place-items-center w-[18px] h-[18px] ml-[2px] p-0 border-0 bg-transparent text-inherit opacity-55 cursor-pointer transition-opacity duration-[140ms] hover:opacity-100"
+          className="grid place-items-center w-[1.125rem] h-[1.125rem] ml-[2px] p-0 border-0 bg-transparent text-inherit opacity-55 cursor-pointer transition-opacity duration-[140ms] hover:opacity-100"
         >
           <Icon name="x" size={11} />
         </button>

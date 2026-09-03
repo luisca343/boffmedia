@@ -42,12 +42,12 @@ export function CompatMeter({
         className="absolute left-0 top-1/2 -translate-y-1/2 flex items-baseline justify-center gap-px pointer-events-none"
         style={{ width: size }}
       >
-        <b className="font-display italic font-extrabold text-[22px] text-txt leading-none">{pct}</b>
-        <small className="font-mono text-[10px] text-txt-dim">%</small>
+        <b className="font-display italic font-extrabold text-[1.375rem] text-txt leading-none">{pct}</b>
+        <small className="font-mono text-[0.625rem] text-txt-dim">%</small>
       </div>
       <div className="flex flex-col gap-[3px] min-w-0">
-        <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-txt-muted">{t("meter.label")}</span>
-        <span className="text-[12.5px] text-txt-dim">
+        <span className="font-mono text-[0.625rem] tracking-[0.1em] uppercase text-txt-muted">{t("meter.label")}</span>
+        <span className="text-[0.78125rem] text-txt-dim">
           <b className="text-txt font-semibold">{resolved}</b>/{total} {t("meter.resolved")}
           {blocked > 0 ? (
             <>

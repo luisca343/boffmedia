@@ -17,7 +17,7 @@ import { AvPill, AvLiveDot } from "./av-kit"
 /* ---- resource row + actions ------------------------------------------------ */
 
 const AV_ROW =
-  "flex items-center gap-[14px] border border-solid border-line border-l-[3px] border-l-line-2 bg-panel px-[15px] py-3 transition-[border-color,background] duration-[140ms] hover:border-line-2 hover:border-l-accent hover:bg-panel-2"
+  "flex items-center gap-[0.875rem] border border-solid border-line border-l-[3px] border-l-line-2 bg-panel px-[0.9375rem] py-3 transition-[border-color,background] duration-[140ms] hover:border-line-2 hover:border-l-accent hover:bg-panel-2"
 
 export function AvRow({ off, className, children }: { off?: boolean; className?: string; children: React.ReactNode }) {
   return <div className={cn(AV_ROW, off && "opacity-55 hover:opacity-80", className)}>{children}</div>
@@ -52,8 +52,8 @@ export function AvResourceRow({
         <Icon name={icon} size={18} />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-[9px] font-display text-[16px]/[1.1] font-bold uppercase">{title}</div>
-        <div className="mt-1 font-mono text-[11px]/[1.3] font-medium tracking-[0.03em] text-txt-muted">{sub}</div>
+        <div className="flex flex-wrap items-center gap-[0.5625rem] font-display text-[1rem]/[1.1] font-bold uppercase">{title}</div>
+        <div className="mt-1 font-mono text-[0.6875rem]/[1.3] font-medium tracking-[0.03em] text-txt-muted">{sub}</div>
       </div>
       {actions && <div className="flex flex-none items-center gap-1.5">{actions}</div>}
     </AvRow>
@@ -99,7 +99,7 @@ export function MemberRow({
     <AvRow off={member.status === "banned"}>
       <Avatar accent={member.role === "Moderador"}>{initials}</Avatar>
       <div className="min-w-0 flex-1">
-        <div className="flex flex-wrap items-center gap-[9px] font-display text-[15px]/[1.1] font-bold uppercase">
+        <div className="flex flex-wrap items-center gap-[0.5625rem] font-display text-[0.9375rem]/[1.1] font-bold uppercase">
           {member.name}
           <Badge tone={member.role === "Moderador" ? "new" : member.roleTone === "info" ? "info" : "default"}>{member.role}</Badge>
           <AvPill tone={st.tone}>
@@ -107,7 +107,7 @@ export function MemberRow({
             {t(st.key)}
           </AvPill>
         </div>
-        <div className="mt-1 font-mono text-[11px]/[1.3] font-medium tracking-[0.03em] text-txt-muted">
+        <div className="mt-1 font-mono text-[0.6875rem]/[1.3] font-medium tracking-[0.03em] text-txt-muted">
           @{member.handle} · {member.games} · {t("from")} {member.joined} · {member.points.toLocaleString()} pts
         </div>
       </div>
@@ -192,22 +192,22 @@ export interface AvPipeStage {
 export function AvPipeline({ stages, active, onNav }: { stages: AvPipeStage[]; active?: string; onNav?: (key: string) => void }) {
   const t = useTranslations("data")
   return (
-    <div className="mb-[18px] flex items-stretch gap-0 overflow-x-auto border border-solid border-line bg-panel p-[5px]">
+    <div className="mb-[1.125rem] flex items-stretch gap-0 overflow-x-auto border border-solid border-line bg-panel p-[0.3125rem]">
       {stages.map((s) => (
         <button
           key={s.key}
           type="button"
           onClick={() => onNav?.(s.key)}
           className={cn(
-            "relative flex min-w-[118px] flex-1 flex-col gap-[7px] px-3 pb-[11px] pt-3 text-left transition-[background] duration-[140ms] hover:bg-panel-2",
+            "relative flex min-w-[7.375rem] flex-1 flex-col gap-[0.4375rem] px-3 pb-[0.6875rem] pt-3 text-left transition-[background] duration-[140ms] hover:bg-panel-2",
             active === s.key && "bg-accent-soft",
-            "[&:not(:last-child)]:after:absolute [&:not(:last-child)]:after:right-0 [&:not(:last-child)]:after:top-1/2 [&:not(:last-child)]:after:h-[34px] [&:not(:last-child)]:after:w-px [&:not(:last-child)]:after:-translate-y-1/2 [&:not(:last-child)]:after:bg-line [&:not(:last-child)]:after:content-['']",
+            "[&:not(:last-child)]:after:absolute [&:not(:last-child)]:after:right-0 [&:not(:last-child)]:after:top-1/2 [&:not(:last-child)]:after:h-[2.125rem] [&:not(:last-child)]:after:w-px [&:not(:last-child)]:after:-translate-y-1/2 [&:not(:last-child)]:after:bg-line [&:not(:last-child)]:after:content-['']",
           )}
         >
           <div className="flex items-center gap-2">
             <span
               className={cn(
-                "grid h-[22px] w-[22px] flex-none place-items-center rounded-full border-[1.5px] border-solid",
+                "grid h-[1.375rem] w-[1.375rem] flex-none place-items-center rounded-full border-[1.5px] border-solid",
                 s.state === "done"
                   ? "border-[color:color-mix(in_srgb,var(--ok)_50%,transparent)] bg-ok-soft text-ok"
                   : s.state === "active"
@@ -217,10 +217,10 @@ export function AvPipeline({ stages, active, onNav }: { stages: AvPipeStage[]; a
             >
               {s.state === "done" ? <Icon name="check" size={12} /> : s.state === "active" ? <Spinner size={11} /> : <Icon name={s.icon} size={11} />}
             </span>
-            <span className="font-display text-[13px]/none font-bold uppercase tracking-[0.03em]">{s.name}</span>
+            <span className="font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]">{s.name}</span>
           </div>
-          <span className="font-mono text-[10px]/none font-medium text-txt-dim">{s.meta}</span>
-          <span className={cn("font-mono text-[8.5px]/none font-bold uppercase tracking-[0.1em]", s.state === "done" ? "text-ok" : s.state === "active" ? "text-accent" : "text-txt-dim")}>
+          <span className="font-mono text-[0.625rem]/none font-medium text-txt-dim">{s.meta}</span>
+          <span className={cn("font-mono text-[0.53125rem]/none font-bold uppercase tracking-[0.1em]", s.state === "done" ? "text-ok" : s.state === "active" ? "text-accent" : "text-txt-dim")}>
             {s.state === "done" ? t("pipelineReady") : s.state === "active" ? t("pipelineActive") : t("pipelineQueued")}
           </span>
         </button>
@@ -251,10 +251,10 @@ export interface AvDistRow {
 
 export function AvLegend({ items }: { items: AvLegendItem[] }) {
   return (
-    <div className="flex flex-wrap gap-[14px]">
+    <div className="flex flex-wrap gap-[0.875rem]">
       {items.map((it, i) => (
-        <span key={i} className="inline-flex items-center gap-1.5 font-mono text-[11px]/none font-medium text-txt-muted">
-          <span className={cn("inline-block w-[14px] border-t-[2.5px]", it.dash ? "border-dashed" : "border-solid")} style={{ borderTopColor: it.color || "var(--accent)" }} />
+        <span key={i} className="inline-flex items-center gap-1.5 font-mono text-[0.6875rem]/none font-medium text-txt-muted">
+          <span className={cn("inline-block w-[0.875rem] border-t-[2.5px]", it.dash ? "border-dashed" : "border-solid")} style={{ borderTopColor: it.color || "var(--accent)" }} />
           {it.label}
         </span>
       ))}
@@ -350,7 +350,7 @@ export function AvChartFrame({
   return (
     <div>
       <div className="flex items-end">
-        <div className="flex flex-none flex-col justify-between pr-2 pt-0.5 text-right font-mono text-[9.5px]/none font-medium text-txt-dim" style={{ height }}>
+        <div className="flex flex-none flex-col justify-between pr-2 pt-0.5 text-right font-mono text-[0.59375rem]/none font-medium text-txt-dim" style={{ height }}>
           {yticks.map((v, i) => (
             <span key={i}>{yFmt(v)}</span>
           ))}
@@ -360,7 +360,7 @@ export function AvChartFrame({
         </div>
       </div>
       {xLabels.length > 0 && (
-        <div className="flex justify-between pl-[2.4rem] pt-1.5 font-mono text-[9.5px]/none font-medium text-txt-dim">
+        <div className="flex justify-between pl-[2.4rem] pt-1.5 font-mono text-[0.59375rem]/none font-medium text-txt-dim">
           {xLabels.map((l, i) => (
             <span key={i}>{l}</span>
           ))}
@@ -381,20 +381,20 @@ export function AvSplitBar({ win = 0, loss = 0, draw = 0, showRate = true, heigh
         {draw > 0 && <span className="bg-[color:var(--dim)]" style={{ width: (draw / total) * 100 + "%" }} />}
         {loss > 0 && <span className="bg-bad" style={{ width: (loss / total) * 100 + "%" }} />}
       </div>
-      {showRate && <span className={cn("flex-none font-mono text-[11px]/none font-bold", wr != null && wr >= 50 ? "text-ok" : wr != null ? "text-bad" : "")}>{wr != null ? wr + "%" : "—"}</span>}
+      {showRate && <span className={cn("flex-none font-mono text-[0.6875rem]/none font-bold", wr != null && wr >= 50 ? "text-ok" : wr != null ? "text-bad" : "")}>{wr != null ? wr + "%" : "—"}</span>}
     </div>
   )
 }
 
 export function AvGpuBar({ name, pct, temp }: { name: React.ReactNode; pct: number; temp?: number }) {
   return (
-    <div className="flex items-center gap-[11px] py-[7px] [&:not(:last-child)]:border-b [&:not(:last-child)]:border-solid [&:not(:last-child)]:border-line">
-      <span className="w-[78px] flex-none font-mono text-[11px]/none font-semibold">{name}</span>
-      <span className="h-[7px] flex-1 overflow-hidden border border-solid border-line bg-panel-2">
+    <div className="flex items-center gap-[0.6875rem] py-[0.4375rem] [&:not(:last-child)]:border-b [&:not(:last-child)]:border-solid [&:not(:last-child)]:border-line">
+      <span className="w-[4.875rem] flex-none font-mono text-[0.6875rem]/none font-semibold">{name}</span>
+      <span className="h-[0.4375rem] flex-1 overflow-hidden border border-solid border-line bg-panel-2">
         <span className="block h-full bg-[linear-gradient(90deg,var(--accent),var(--accent-bright))] transition-[width] duration-[400ms]" style={{ width: pct + "%" }} />
       </span>
-      <span className="w-10 flex-none text-right font-mono text-[11px]/none font-medium text-txt-muted">{pct}%</span>
-      {temp != null && <span className="w-[42px] flex-none text-right font-mono text-[10px]/none font-medium text-txt-dim">{temp}°C</span>}
+      <span className="w-10 flex-none text-right font-mono text-[0.6875rem]/none font-medium text-txt-muted">{pct}%</span>
+      {temp != null && <span className="w-[2.625rem] flex-none text-right font-mono text-[0.625rem]/none font-medium text-txt-dim">{temp}°C</span>}
     </div>
   )
 }
@@ -405,12 +405,12 @@ export function AvDist({ rows, max }: { rows: AvDistRow[]; max?: number }) {
   return (
     <div className="flex flex-col gap-2.5">
       {rows.map((r, i) => (
-        <div key={i} className="grid grid-cols-[132px_1fr_78px] items-center gap-[11px] max-[520px]:grid-cols-[92px_1fr_62px]">
-          <span className="truncate font-body text-[13px]/[1.1] font-semibold">{r.label}</span>
-          <span className="h-[9px] overflow-hidden border border-solid border-line bg-panel-2">
+        <div key={i} className="grid grid-cols-[8.25rem_1fr_4.875rem] items-center gap-[0.6875rem] max-[520px]:grid-cols-[5.75rem_1fr_3.875rem]">
+          <span className="truncate font-body text-[0.8125rem]/[1.1] font-semibold">{r.label}</span>
+          <span className="h-[0.5625rem] overflow-hidden border border-solid border-line bg-panel-2">
             <span className="block h-full" style={{ width: (r.value / peak) * 100 + "%", background: r.color || "var(--accent)" }} />
           </span>
-          <span className="text-right font-mono text-[11px]/none font-medium text-txt-muted">{r.display || formatNumber(r.value)}</span>
+          <span className="text-right font-mono text-[0.6875rem]/none font-medium text-txt-muted">{r.display || formatNumber(r.value)}</span>
         </div>
       ))}
     </div>

@@ -61,7 +61,7 @@ export function Table({ columns, rows, dense, rowKey, sort, onSortChange, classN
       <table
         className={cn(
           "w-full border-collapse bg-panel border border-solid border-line",
-          !dense && "min-w-[420px]",
+          !dense && "min-w-[26.25rem]",
           className,
         )}
       >
@@ -80,8 +80,8 @@ export function Table({ columns, rows, dense, rowKey, sort, onSortChange, classN
                   className={cn(
                     "font-mono font-semibold leading-none uppercase border-b-2 border-solid border-line-2 bg-panel-2",
                     dense
-                      ? "py-2 px-3 text-[9.5px] tracking-[0.14em] text-txt-dim"
-                      : "py-3 px-4 text-[10px] tracking-[0.14em] text-txt-muted",
+                      ? "py-2 px-3 text-[0.59375rem] tracking-[0.14em] text-txt-dim"
+                      : "py-3 px-4 text-[0.625rem] tracking-[0.14em] text-txt-muted",
                     alignOf(c),
                   )}
                 >
@@ -117,8 +117,8 @@ export function Table({ columns, rows, dense, rowKey, sort, onSortChange, classN
                   key={c.key}
                   className={cn(
                     "border-b border-solid border-line [tr:last-child_&]:border-b-0 align-middle",
-                    dense ? "py-1.5 px-3 text-[13px]" : "py-3 px-4 text-[15px]",
-                    c.numeric && "font-mono text-[13px] font-medium leading-none",
+                    dense ? "py-1.5 px-3 text-[0.8125rem]" : "py-3 px-4 text-[0.9375rem]",
+                    c.numeric && "font-mono text-[0.8125rem] font-medium leading-none",
                     alignOf(c),
                     c.className,
                   )}

@@ -59,7 +59,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
   const t = useTranslations("admin.shell")
 
   return (
-    <div className="grid h-full [grid-template-columns:1fr] md:[grid-template-columns:244px_minmax(0,1fr)] bg-base">
+    <div className="grid h-full [grid-template-columns:1fr] md:[grid-template-columns:15.25rem_minmax(0,1fr)] bg-base">
       {/* Desktop rail */}
       {/* The site Navbar is sticky at top 0, so all shell chrome pins below it
           (var(--nav-h)); the rail gets a viewport-bounded height and scrolls
@@ -70,17 +70,17 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
             mark here would out-shout the one thing in the rail that means
             something. The border-b is load-bearing: it is the scroll edge for
             the internally-scrolling rail. */}
-        <div className="sticky top-0 z-[2] flex items-center justify-between gap-3 pt-[18px] pb-[20px] px-5 border-b border-solid border-line bg-base-2">
-          <span className="font-display text-[20px] font-extrabold italic leading-none uppercase tracking-[0.01em] text-txt-dim">
+        <div className="sticky top-0 z-[2] flex items-center justify-between gap-3 pt-[1.125rem] pb-[1.25rem] px-5 border-b border-solid border-line bg-base-2">
+          <span className="font-display text-[1.25rem] font-extrabold italic leading-none uppercase tracking-[0.01em] text-txt-dim">
             {t("brand")}
           </span>
           <AvPill tone={ENV_TONE[ENV]}>{t(`env.${ENV}`)}</AvPill>
         </div>
 
-        <nav className="pt-[14px]">
+        <nav className="pt-[0.875rem]">
           {nav.map((group) => (
-            <div key={group.label} className="pt-[14px] px-3 first:pt-0">
-              <span className="block px-2 pb-2 font-mono text-[9px] font-semibold leading-none uppercase tracking-[0.18em] text-txt-dim">
+            <div key={group.label} className="pt-[0.875rem] px-3 first:pt-0">
+              <span className="block px-2 pb-2 font-mono text-[0.5625rem] font-semibold leading-none uppercase tracking-[0.18em] text-txt-dim">
                 {group.label}
               </span>
               {group.items.map(({ id, label, icon, badge }) => {
@@ -90,7 +90,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
                     key={id}
                     onClick={() => onNavigate(id)}
                     className={cn(
-                      "flex items-center gap-[11px] w-full py-[9px] px-2.5 mb-px text-left font-body text-[13.5px] font-semibold leading-none",
+                      "flex items-center gap-[0.6875rem] w-full py-[0.5625rem] px-2.5 mb-px text-left font-body text-[0.84375rem] font-semibold leading-none",
                       "border-l-[3px] border-solid transition-[color,background,border-color] duration-[140ms]",
                       on
                         ? "text-txt bg-panel border-l-accent"
@@ -99,7 +99,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
                   >
                     <Icon name={icon} size={17} className={cn("shrink-0", on ? "text-accent" : "text-txt-dim")} />
                     <span className="flex-1 min-w-0 truncate">{label}</span>
-                    {badge && <span className="font-mono text-[9px] font-bold text-accent">{badge}</span>}
+                    {badge && <span className="font-mono text-[0.5625rem] font-bold text-accent">{badge}</span>}
                   </button>
                 )
               })}
@@ -119,7 +119,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
           {nav.map((group, gi) => (
             <React.Fragment key={group.label}>
               {gi > 0 && <span aria-hidden className="self-stretch w-px mx-1.5 bg-line shrink-0" />}
-              <span className="font-mono text-[9px] font-semibold leading-none uppercase tracking-[0.18em] text-txt-dim whitespace-nowrap shrink-0 pr-0.5">
+              <span className="font-mono text-[0.5625rem] font-semibold leading-none uppercase tracking-[0.18em] text-txt-dim whitespace-nowrap shrink-0 pr-0.5">
                 {group.label}
               </span>
               {group.items.map(({ id, label, icon }) => {
@@ -129,7 +129,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
                     key={id}
                     onClick={() => onNavigate(id)}
                     className={cn(
-                      "inline-flex items-center gap-1.5 py-2 px-3 whitespace-nowrap font-mono text-[12px] font-semibold leading-none uppercase tracking-[0.05em] border border-solid shrink-0",
+                      "inline-flex items-center gap-1.5 py-2 px-3 whitespace-nowrap font-mono text-[0.75rem] font-semibold leading-none uppercase tracking-[0.05em] border border-solid shrink-0",
                       on ? "text-accent border-accent-line bg-accent-soft" : "text-txt-muted border-line",
                     )}
                   >
@@ -144,7 +144,7 @@ export function AvShell({ nav, section, onNavigate, children, loading, fluid }: 
 
         <div
           className={cn(
-            "p-[26px] max-md:p-[18px_16px]",
+            "p-[1.625rem] max-md:p-[18px_16px]",
             // min-h-0 is what lets a fluid child actually scroll inside the
             // column instead of stretching it past the viewport. Every section
             // spans the full column width now — no reading-measure cap.

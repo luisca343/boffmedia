@@ -37,7 +37,7 @@ export function BadgePage({
 
   return (
     <>
-      <div className="flex items-center gap-[18px] border-b-2 border-ps-ink/22 pb-3.5">
+      <div className="flex items-center gap-[1.125rem] border-b-2 border-ps-ink/22 pb-3.5">
         <WaxSeal
           src={badgeArt(achievement.icon)}
           alt={achievement.name}
@@ -47,9 +47,9 @@ export function BadgePage({
           slam={slam}
         />
         <div className="min-w-0 flex-1">
-          {circuit && <CircuitTag className="mb-[7px]">{circuit}</CircuitTag>}
-          <h2 className="font-ps-ceremony text-[clamp(22px,3.4vh,32px)] leading-[1.04]">{achievement.name}</h2>
-          <p className="ps-num mt-1.5 flex items-center gap-1.5 font-ps-mono text-[11px] tracking-[.06em] text-ps-ink-faint">
+          {circuit && <CircuitTag className="mb-[0.4375rem]">{circuit}</CircuitTag>}
+          <h2 className="font-ps-ceremony text-[clamp(1.375rem,3.4vh,2rem)] leading-[1.04]">{achievement.name}</h2>
+          <p className="ps-num mt-1.5 flex items-center gap-1.5 font-ps-mono text-[0.6875rem] tracking-[.06em] text-ps-ink-faint">
             <Icon name="cal" className="h-3.5 w-3.5" />
             {t("badgePage.obtained", { date: docDate(achievement.completedAt, locale) })}
           </p>
@@ -65,11 +65,11 @@ export function BadgePage({
         </div>
       </div>
 
-      <p className="my-3 text-[12px] text-ps-ink-soft">{achievement.description}</p>
+      <p className="my-3 text-[0.75rem] text-ps-ink-soft">{achievement.description}</p>
 
       {team.length > 0 && (
         <>
-          <SectionLabel className="text-[13px]" count={t("badgePage.teamCount", { count: team.length })}>
+          <SectionLabel className="text-[0.8125rem]" count={t("badgePage.teamCount", { count: team.length })}>
             {t("badgePage.team")}
           </SectionLabel>
           <ul className="flex-1">
@@ -87,19 +87,19 @@ export function BadgePage({
                 >
                   <Sprite dex={mon.dex} form={mon.form} palette={mon.palette} name={mon.name} size={40} />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate font-ps-ceremony text-[13px]">
+                    <div className="truncate font-ps-ceremony text-[0.8125rem]">
                       {mon.name || mon.species}{" "}
-                      <span className="ps-num font-ps-mono text-[9px] text-ps-ink-faint">
+                      <span className="ps-num font-ps-mono text-[0.5625rem] text-ps-ink-faint">
                         {t("common.level", { level: mon.level })}
                       </span>
                     </div>
                     <div className="mt-0.5 flex flex-wrap gap-1">
                       {types.map((typeName, ti) => (
-                        <TypePill key={`${ti}-${typeName}`} type={typeName} className="px-[5px] py-px text-[8px]" />
+                        <TypePill key={`${ti}-${typeName}`} type={typeName} className="px-[0.3125rem] py-px text-[0.5rem]" />
                       ))}
                     </div>
                   </div>
-                  <div className="flex flex-none gap-1.5 font-ps-mono text-[10px] text-ps-ink-soft">
+                  <div className="flex flex-none gap-1.5 font-ps-mono text-[0.625rem] text-ps-ink-soft">
                     {moves.map((move, mi) => (
                       <span key={`${mi}-${move}`}>{move}</span>
                     ))}

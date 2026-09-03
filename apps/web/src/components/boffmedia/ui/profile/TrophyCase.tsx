@@ -9,7 +9,7 @@ export function TrophyCard({ icon, name, meta, rare, done, locked, className }: 
   return (
     <div
       className={cn(
-        "relative border border-solid border-line bg-panel-2 px-[14px] pb-4 pt-5 text-center",
+        "relative border border-solid border-line bg-panel-2 px-[0.875rem] pb-4 pt-5 text-center",
         "cut-bl cut-edge-bl [--cut-e:16px] [--cut-line:var(--line)]",
         "transition-[border-color,transform] duration-[140ms]",
         done && "hover:-translate-y-0.5 hover:border-accent-line hover:[--cut-line:var(--accent-line)]",
@@ -18,13 +18,13 @@ export function TrophyCard({ icon, name, meta, rare, done, locked, className }: 
       )}
     >
       {rare && (
-        <span className="absolute right-[9px] top-[9px] border border-solid border-accent-line bg-accent-soft px-1.5 py-1 font-mono text-[8px]/none font-bold uppercase tracking-[0.1em] text-accent">
+        <span className="absolute right-[0.5625rem] top-[0.5625rem] border border-solid border-accent-line bg-accent-soft px-1.5 py-1 font-mono text-[0.5rem]/none font-bold uppercase tracking-[0.1em] text-accent">
           {rare}
         </span>
       )}
       <span
         className={cn(
-          "mx-auto grid h-[50px] w-[50px] place-items-center cut-seal cut-seal-edge [--cut:10px]",
+          "mx-auto grid h-[3.125rem] w-[3.125rem] place-items-center cut-seal cut-seal-edge [--cut:10px]",
           // The locked chamfer is stroked solid even though its sides are
           // dashed — a 10px stub cannot carry a legible dash pattern, and the
           // alternative is the corner reading as a gap.
@@ -37,14 +37,14 @@ export function TrophyCard({ icon, name, meta, rare, done, locked, className }: 
       </span>
       <div
         className={cn(
-          "mt-[13px] font-display text-[13px]/[1.2] font-bold uppercase tracking-[0.03em]",
+          "mt-[0.8125rem] font-display text-[0.8125rem]/[1.2] font-bold uppercase tracking-[0.03em]",
           locked ? "text-txt-muted" : "text-txt",
         )}
       >
         {name}
       </div>
       {meta && (
-        <div className="mt-1.5 font-mono text-[9px]/[1.3] font-medium uppercase tracking-[0.08em] text-txt-muted">
+        <div className="mt-1.5 font-mono text-[0.5625rem]/[1.3] font-medium uppercase tracking-[0.08em] text-txt-muted">
           {meta}
         </div>
       )}

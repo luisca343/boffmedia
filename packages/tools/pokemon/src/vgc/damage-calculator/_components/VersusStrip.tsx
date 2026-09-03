@@ -69,7 +69,7 @@ function MoveList({
             onClick={() => onPick(i)}
             style={cssVars({ "--cxc": color })}
             className={cn(
-              "cut-tag cut-tag-edge [--cut-tag:7px] flex w-full items-center gap-[10px] border border-solid border-line bg-base px-3 py-2 text-left font-body text-[13px]/none text-txt",
+              "cut-tag cut-tag-edge [--cut-tag:7px] flex w-full items-center gap-[0.625rem] border border-solid border-line bg-base px-3 py-2 text-left font-body text-[0.8125rem]/none text-txt",
               "transition-[border-color,background] duration-[140ms] hover:border-line-2 hover:bg-panel-2",
               "aria-pressed:border-[var(--cxc)] aria-pressed:bg-[color-mix(in_srgb,var(--cxc)_8%,var(--bg))]",
               reversed && "flex-row-reverse text-right",
@@ -77,7 +77,7 @@ function MoveList({
           >
             <span className="min-w-0 flex-1 truncate">{m.name || emptyLabel}</span>
             <span
-              className={cn("whitespace-nowrap font-mono text-[12px]/none font-semibold", reversed ? "mr-auto" : "ml-auto")}
+              className={cn("whitespace-nowrap font-mono text-[0.75rem]/none font-semibold", reversed ? "mr-auto" : "ml-auto")}
               style={{ color: damageColor(tone) }}
             >
               {r && r.max > 0 ? `${r.minPct.toFixed(1)}–${r.maxPct.toFixed(1)}%` : m.name ? "0%" : ""}
@@ -130,10 +130,10 @@ export function VersusStrip({ poke1, poke2, field, useChampions, sel, setSel }: 
   return (
     <section
       aria-label={t("title")}
-      className="cut-corner cut-corner-edge mb-5 grid grid-cols-[minmax(0,1fr)_minmax(280px,340px)_minmax(0,1fr)] border border-solid border-line bg-panel max-[920px]:grid-cols-1"
+      className="cut-corner cut-corner-edge mb-5 grid grid-cols-[minmax(0,1fr)_minmax(17.5rem,21.25rem)_minmax(0,1fr)] border border-solid border-line bg-panel max-[920px]:grid-cols-1"
     >
-      <div className="min-w-0 px-4 py-[14px]">
-        <div className="mb-[10px] flex items-center gap-[10px]">
+      <div className="min-w-0 px-4 py-[0.875rem]">
+        <div className="mb-[0.625rem] flex items-center gap-[0.625rem]">
           <RoleTag color={ATK_COLOR}>{t("ui.attacker")}</RoleTag>
           <MiniCard name={poke1.name} sub={subFor(poke1)} />
         </div>
@@ -146,24 +146,24 @@ export function VersusStrip({ poke1, poke2, field, useChampions, sel, setSel }: 
       >
         {res && move && move.name ? (
           <>
-            <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.14em] text-txt-dim">
+            <span className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.14em] text-txt-dim">
               {atkName} · {move.name}
             </span>
             <KoVerdict text={t(`moveStrip.${koKey}`)} tone={KO_TONE[koKey]} />
-            <span className="font-mono text-[15px]/none font-bold" style={{ color: damageColor(damageTone(res.maxPct)) }}>
+            <span className="font-mono text-[0.9375rem]/none font-bold" style={{ color: damageColor(damageTone(res.maxPct)) }}>
               {res.min}–{res.max} {t("panel.hpLabel")} · {res.minPct.toFixed(1)}–{res.maxPct.toFixed(1)}%
             </span>
             <DamageBar minPct={res.minPct} maxPct={res.maxPct} tone={damageTone(res.maxPct)} />
-            <span className="max-w-[40ch] break-words font-mono text-[12px]/[1.5] text-txt-muted">{res.desc}</span>
+            <span className="max-w-[40ch] break-words font-mono text-[0.75rem]/[1.5] text-txt-muted">{res.desc}</span>
             <CopyButton text={res.desc} label={t("saved.copy")} copiedLabel={t("saved.copied")} />
           </>
         ) : (
-          <span className="font-body text-[13px]/[1.5] text-txt-dim">{t("ui.verdictEmpty")}</span>
+          <span className="font-body text-[0.8125rem]/[1.5] text-txt-dim">{t("ui.verdictEmpty")}</span>
         )}
       </div>
 
-      <div className="min-w-0 px-4 py-[14px] text-right">
-        <div className="mb-[10px] flex flex-row-reverse items-center gap-[10px] max-[920px]:flex-row">
+      <div className="min-w-0 px-4 py-[0.875rem] text-right">
+        <div className="mb-[0.625rem] flex flex-row-reverse items-center gap-[0.625rem] max-[920px]:flex-row">
           <RoleTag color={DEF_COLOR}>{t("ui.defender")}</RoleTag>
           <MiniCard name={poke2.name} sub={subFor(poke2)} />
         </div>

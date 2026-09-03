@@ -168,7 +168,7 @@ export function ListAndCreate({ onSelect }: { onSelect: (slug: string) => void }
 
       {/* Resource header */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <span className="font-mono text-[11px] font-bold leading-none uppercase tracking-[0.08em] text-txt-muted shrink-0">
+        <span className="font-mono text-[0.6875rem] font-bold leading-none uppercase tracking-[0.08em] text-txt-muted shrink-0">
           {tAdminCrud("count", { count: filtered.length, plural: t("plural") })}
         </span>
         <SearchInput
@@ -176,7 +176,7 @@ export function ListAndCreate({ onSelect }: { onSelect: (slug: string) => void }
           onChange={setSearchTerm}
           placeholder={t("searchTournaments")}
           size="sm"
-          className="flex-1 min-w-[200px] max-w-[400px]"
+          className="flex-1 min-w-[12.5rem] max-w-[25rem]"
         />
         <Button icon="plus" variant="pri" size="sm" className="ml-auto" onClick={() => setCreateOpen(true)}>
           {tAdminCrud("new")}
@@ -215,7 +215,7 @@ export function ListAndCreate({ onSelect }: { onSelect: (slug: string) => void }
             name: (
               <div className="flex items-center gap-2 min-w-0">
                 <span className="font-medium">{tn.name}</span>
-                <span className="font-mono text-[10px] text-txt-dim shrink-0">{tn.slug}</span>
+                <span className="font-mono text-[0.625rem] text-txt-dim shrink-0">{tn.slug}</span>
               </div>
             ),
             format: <TnFormatBadge format={tn.format} size="sm" />,
@@ -227,7 +227,7 @@ export function ListAndCreate({ onSelect }: { onSelect: (slug: string) => void }
                 <button
                   aria-label={t("manage")}
                   onClick={() => onSelect(tn.slug)}
-                  className="grid place-items-center px-3 h-8 border border-solid border-line-2 text-txt-muted hover:text-accent hover:border-accent-line transition-colors font-mono text-[10px] font-semibold uppercase tracking-[0.08em]"
+                  className="grid place-items-center px-3 h-8 border border-solid border-line-2 text-txt-muted hover:text-accent hover:border-accent-line transition-colors font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em]"
                 >
                   {t("manage")}
                 </button>
@@ -243,7 +243,7 @@ export function ListAndCreate({ onSelect }: { onSelect: (slug: string) => void }
 
       {/* Create modal */}
       <Modal open={createOpen} onClose={handleCloseModal} title={t("newTournament")}>
-        <p className="text-[13px] text-txt-muted mb-3">{t("createTournamentDesc")}</p>
+        <p className="text-[0.8125rem] text-txt-muted mb-3">{t("createTournamentDesc")}</p>
         <div className="grid gap-3 sm:grid-cols-2 max-h-[60vh] overflow-y-auto">
           <Field label={t("name")}>
             <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Copa Boffmedia" />

@@ -74,10 +74,10 @@ export function CaptureCard({ data }: { data: RookerCapture }) {
             )}
           </div>
 
-          <div className="text-[19px] font-bold capitalize text-rk-fg">{name.toLowerCase()}</div>
+          <div className="text-[1.1875rem] font-bold capitalize text-rk-fg">{name.toLowerCase()}</div>
 
           {data.caughtAt && (
-            <div className="mt-1 flex items-center gap-1.5 text-[12.5px] text-rk-fg-muted">
+            <div className="mt-1 flex items-center gap-1.5 text-[0.78125rem] text-rk-fg-muted">
               <Icon name="calendar" size={12} className="flex-none text-rk-fg-subtle" />
               {t("card.capture.registeredOn", { date: fullTime(data.caughtAt) })}
             </div>

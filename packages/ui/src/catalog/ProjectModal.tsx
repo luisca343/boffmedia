@@ -22,7 +22,7 @@ import type { ModPlatform, ModProject } from "./types";
 
 function Stat({ icon, children }: { icon: IconName; children: React.ReactNode }) {
   return (
-    <span className="flex items-center gap-1 font-mono text-[11px] text-txt-muted">
+    <span className="flex items-center gap-1 font-mono text-[0.6875rem] text-txt-muted">
       <Icon name={icon} size={12} />
       {children}
     </span>
@@ -82,7 +82,7 @@ export function ProjectModal({
           <CatalogIcon src={project?.iconUrl} size={56} />
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             {project?.summary && (
-              <p className="font-body text-[12px] text-txt-dim">
+              <p className="font-body text-[0.75rem] text-txt-dim">
                 {toSummaryText(project.summary)}
               </p>
             )}
@@ -98,7 +98,7 @@ export function ProjectModal({
                   href={link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 font-mono text-[11px] text-accent-bright underline underline-offset-2 hover:text-txt"
+                  className="flex items-center gap-1 font-mono text-[0.6875rem] text-accent-bright underline underline-offset-2 hover:text-txt"
                 >
                   <Icon name="external" size={12} />
                   {t("openOnPlatform")}
@@ -117,7 +117,7 @@ export function ProjectModal({
         {/* Only after loading: showing "no description" while the fetch is
             still running says something false. */}
         {!loading && (failed || !project?.description?.trim()) && (
-          <p className="py-4 font-body text-[12px] text-txt-muted">
+          <p className="py-4 font-body text-[0.75rem] text-txt-muted">
             {t("noDescription")}
           </p>
         )}

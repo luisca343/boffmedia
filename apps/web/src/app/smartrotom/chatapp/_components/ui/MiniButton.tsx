@@ -14,7 +14,7 @@ export function MiniButton({ accent, grow = true, className, type = "button", ch
     <button
       type={type}
       className={cn(
-        "flex items-center justify-center gap-1.5 rounded-ca-md p-2 text-[12.5px] font-semibold transition-colors duration-[120ms]",
+        "flex items-center justify-center gap-1.5 rounded-ca-md p-2 text-[0.78125rem] font-semibold transition-colors duration-[120ms]",
         grow && "flex-1",
         accent
           ? "bg-ca-accent text-ca-on-accent hover:brightness-[1.06]"

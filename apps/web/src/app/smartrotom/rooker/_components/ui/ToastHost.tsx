@@ -29,7 +29,7 @@ export function ToastHost() {
         // mid-sentence.
         role="status"
         aria-live="polite"
-        className="pointer-events-none fixed bottom-7 left-1/2 z-[300] flex -translate-x-1/2 animate-rk-fadeup items-center gap-2.5 whitespace-nowrap rounded-rk-pill bg-rk-accent px-5 py-3 text-[14.5px] font-semibold text-rk-accent-fg shadow-[0_14px_36px_-8px_rgb(0_0_0/.45)] motion-reduce:animate-none"
+        className="pointer-events-none fixed bottom-7 left-1/2 z-[300] flex -translate-x-1/2 animate-rk-fadeup items-center gap-2.5 whitespace-nowrap rounded-rk-pill bg-rk-accent px-5 py-3 text-[0.90625rem] font-semibold text-rk-accent-fg shadow-[0_14px_36px_-8px_rgb(0_0_0/.45)] motion-reduce:animate-none"
       >
         <RookerMark size={20} className="text-rk-accent-fg" />
         {message.msg}

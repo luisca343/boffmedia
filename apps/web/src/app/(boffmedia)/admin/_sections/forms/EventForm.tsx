@@ -126,7 +126,7 @@ export function EventForm({ defaultValues, isSubmitting, onSubmit, onCancel, sub
       <Field label={t("event.descLabel")} hint={t("event.descHint")} error={errors.description?.message}>
         <textarea
           placeholder={t("event.descPlaceholder")}
-          className="w-full font-body text-[15px] leading-[1.4] text-txt bg-base [[data-theme=light]_&]:bg-panel border border-solid border-line-2 py-[11px] px-[14px] cut-tag cut-tag-edge focus:[--cut-line:var(--accent)] [--cut-line:var(--line-2)] min-h-[90px] resize-y outline-none focus:border-accent placeholder:text-txt-dim"
+          className="w-full font-body text-[0.9375rem] leading-[1.4] text-txt bg-base [[data-theme=light]_&]:bg-panel border border-solid border-line-2 py-[0.6875rem] px-[0.875rem] cut-tag cut-tag-edge focus:[--cut-line:var(--accent)] [--cut-line:var(--line-2)] min-h-[5.625rem] resize-y outline-none focus:border-accent placeholder:text-txt-dim"
           {...register("description")}
         />
       </Field>

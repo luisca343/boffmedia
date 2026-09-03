@@ -33,13 +33,13 @@ export function HoloStamp({
     <div
       aria-hidden="true"
       className={cn(
-        "pointer-events-none absolute right-[34px] top-[40%] z-[7] h-[120px] w-[120px] rotate-[-12deg]",
+        "pointer-events-none absolute right-[2.125rem] top-[40%] z-[7] h-[7.5rem] w-[7.5rem] rotate-[-12deg]",
         "transition-all duration-300 motion-reduce:transition-none",
         show ? "scale-100 opacity-75" : "scale-[.7] opacity-0",
         className,
       )}
     >
-      <div className="ps-holo-ring grid h-full w-full place-items-center rounded-full text-center font-ps-mono text-[11px] tracking-[.12em] text-ps-teal-deep">
+      <div className="ps-holo-ring grid h-full w-full place-items-center rounded-full text-center font-ps-mono text-[0.6875rem] tracking-[.12em] text-ps-teal-deep">
         {content}
       </div>
     </div>

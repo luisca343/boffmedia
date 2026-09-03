@@ -44,7 +44,7 @@ export function VersionRow({
   return (
     <div
       className={cn(
-        "flex items-center gap-[14px] border border-solid border-line border-l-[3px] bg-panel px-[14px] py-[11px]",
+        "flex items-center gap-[0.875rem] border border-solid border-line border-l-[3px] bg-panel px-[0.875rem] py-[0.6875rem]",
         "transition-[border-color,background] duration-[140ms] hover:border-line-2 hover:bg-panel-2",
         BAR[status],
         className,
@@ -53,7 +53,7 @@ export function VersionRow({
       {statusIcon != null && (
         <span
           className={cn(
-            "grid size-[34px] shrink-0 place-items-center border border-solid",
+            "grid size-[2.125rem] shrink-0 place-items-center border border-solid",
             status === "live"
               ? "border-accent-line bg-accent-soft text-accent"
               : "border-line-2 bg-panel-2 text-txt-muted",
@@ -64,16 +64,16 @@ export function VersionRow({
       )}
 
       <div className="flex min-w-0 items-baseline gap-2.5">
-        <span className="font-mono text-[15px] font-bold tracking-[0.02em] text-txt">{version}</span>
+        <span className="font-mono text-[0.9375rem] font-bold tracking-[0.02em] text-txt">{version}</span>
         {badges != null && <span className="flex items-center gap-1.5">{badges}</span>}
       </div>
 
       {meta != null && (
-        <span className="hidden whitespace-nowrap font-mono text-[11px] text-txt-dim sm:inline">{meta}</span>
+        <span className="hidden whitespace-nowrap font-mono text-[0.6875rem] text-txt-dim sm:inline">{meta}</span>
       )}
 
       {date != null && (
-        <span className="ml-auto whitespace-nowrap font-mono text-[11px] text-txt-dim">{date}</span>
+        <span className="ml-auto whitespace-nowrap font-mono text-[0.6875rem] text-txt-dim">{date}</span>
       )}
 
       {actions != null && (

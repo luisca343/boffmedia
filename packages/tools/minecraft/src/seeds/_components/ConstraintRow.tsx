@@ -97,7 +97,7 @@ export function ConstraintRow({
       return (
         <label
           key={f.key}
-          className="col-span-2 flex items-center gap-2 border border-line-2 bg-panel px-2.5 py-2 text-[12px] text-txt-muted"
+          className="col-span-2 flex items-center gap-2 border border-line-2 bg-panel px-2.5 py-2 text-[0.75rem] text-txt-muted"
         >
           <input
             type="checkbox"
@@ -106,7 +106,7 @@ export function ConstraintRow({
             className="accent-accent"
           />
           <span>{label}</span>
-          <span className="ml-auto text-[10px] text-txt-dim">{t("spec.field.fineHint")}</span>
+          <span className="ml-auto text-[0.625rem] text-txt-dim">{t("spec.field.fineHint")}</span>
         </label>
       );
     }
@@ -115,13 +115,13 @@ export function ConstraintRow({
       const list = Array.isArray(raw) ? raw : [];
       return (
         <div key={f.key} className="col-span-2 grid gap-1.5">
-          <span className="font-mono text-[10px] uppercase tracking-wide text-txt-dim">{label}</span>
+          <span className="font-mono text-[0.625rem] uppercase tracking-wide text-txt-dim">{label}</span>
           {list.length ? (
             <div className="flex flex-wrap gap-1">
               {list.map((id, i) => (
                 <span
                   key={`${id}-${i}`}
-                  className="flex items-center gap-1.5 border border-line-2 bg-panel py-1 pl-2 pr-1 font-mono text-[11px] text-txt"
+                  className="flex items-center gap-1.5 border border-line-2 bg-panel py-1 pl-2 pr-1 font-mono text-[0.6875rem] text-txt"
                 >
                   {id}
                   <button
@@ -136,7 +136,7 @@ export function ConstraintRow({
               ))}
             </div>
           ) : (
-            <p className="text-[11px] italic text-txt-dim">{t("spec.field.noBiomes")}</p>
+            <p className="text-[0.6875rem] italic text-txt-dim">{t("spec.field.noBiomes")}</p>
           )}
           <Select
             value=""
@@ -199,7 +199,7 @@ export function ConstraintRow({
 
       return (
         <div key={f.key} className="col-span-2 grid gap-2">
-          <span className="font-mono text-[10px] uppercase tracking-wide text-txt-dim">{label}</span>
+          <span className="font-mono text-[0.625rem] uppercase tracking-wide text-txt-dim">{label}</span>
 
           {/* Band visualization */}
           <div className="flex h-6 gap-1 rounded border border-line-2 bg-panel p-1">
@@ -224,7 +224,7 @@ export function ConstraintRow({
           <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
             {/* min slider */}
             <div className="grid gap-1">
-              <span className="text-[10px] text-txt-dim">min</span>
+              <span className="text-[0.625rem] text-txt-dim">min</span>
               <Input
                 type="number"
                 value={bandValue.min ?? ""}
@@ -235,13 +235,13 @@ export function ConstraintRow({
                   const n = e.target.value === "" ? undefined : Number(e.target.value);
                   setValue(f.key, { ...bandValue, min: n });
                 }}
-                className="!py-1 !text-[11px]"
+                className="!py-1 !text-[0.6875rem]"
               />
             </div>
 
             {/* ideal slider */}
             <div className="grid gap-1">
-              <span className="text-[10px] text-txt-dim">ideal</span>
+              <span className="text-[0.625rem] text-txt-dim">ideal</span>
               <Input
                 type="number"
                 value={bandValue.ideal ?? ""}
@@ -252,13 +252,13 @@ export function ConstraintRow({
                   const n = e.target.value === "" ? undefined : Number(e.target.value);
                   setValue(f.key, { ...bandValue, ideal: n });
                 }}
-                className="!py-1 !text-[11px]"
+                className="!py-1 !text-[0.6875rem]"
               />
             </div>
 
             {/* ideal_max slider */}
             <div className="grid gap-1">
-              <span className="text-[10px] text-txt-dim">ideal_max</span>
+              <span className="text-[0.625rem] text-txt-dim">ideal_max</span>
               <Input
                 type="number"
                 value={bandValue.ideal_max ?? ""}
@@ -269,13 +269,13 @@ export function ConstraintRow({
                   const n = e.target.value === "" ? undefined : Number(e.target.value);
                   setValue(f.key, { ...bandValue, ideal_max: n });
                 }}
-                className="!py-1 !text-[11px]"
+                className="!py-1 !text-[0.6875rem]"
               />
             </div>
 
             {/* max slider */}
             <div className="grid gap-1">
-              <span className="text-[10px] text-txt-dim">max</span>
+              <span className="text-[0.625rem] text-txt-dim">max</span>
               <Input
                 type="number"
                 value={bandValue.max ?? ""}
@@ -286,7 +286,7 @@ export function ConstraintRow({
                   const n = e.target.value === "" ? undefined : Number(e.target.value);
                   setValue(f.key, { ...bandValue, max: n });
                 }}
-                className="!py-1 !text-[11px]"
+                className="!py-1 !text-[0.6875rem]"
               />
             </div>
           </div>
@@ -296,7 +296,7 @@ export function ConstraintRow({
 
     return (
       <div key={f.key} className="grid gap-1.5">
-        <span className="font-mono text-[10px] uppercase tracking-wide text-txt-dim">{label}</span>
+        <span className="font-mono text-[0.625rem] uppercase tracking-wide text-txt-dim">{label}</span>
         <div className="flex items-center gap-2">
           <Input
             type="number"
@@ -311,10 +311,10 @@ export function ConstraintRow({
               // change the spec while the user is mid-keystroke.
               setValue(f.key, e.target.value === "" ? "" : Number.isFinite(n) ? n : 0);
             }}
-            className="flex-1 !py-2 !text-[13px]"
+            className="flex-1 !py-2 !text-[0.8125rem]"
           />
           {unitKey ? (
-            <span className="w-14 shrink-0 font-mono text-[10px] text-txt-dim">{t(unitKey)}</span>
+            <span className="w-14 shrink-0 font-mono text-[0.625rem] text-txt-dim">{t(unitKey)}</span>
           ) : null}
         </div>
       </div>
@@ -324,17 +324,17 @@ export function ConstraintRow({
   return (
     <li className="grid gap-3 border border-line-2 bg-base p-3">
       <div className="flex items-start gap-2">
-        <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center bg-line-2 font-mono text-[10px] text-txt-muted">
+        <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center bg-line-2 font-mono text-[0.625rem] text-txt-muted">
           {index + 1}
         </span>
         <div className="min-w-0 flex-1">
           {/* A type outside the vocabulary has no label and no blurb to look
               up; naming it raw beats rendering the missing key itself, which
               is what `spec.constraint.` resolves to. */}
-          <h5 className="font-display text-[13px] font-bold uppercase leading-tight tracking-[0.04em] text-txt">
+          <h5 className="font-display text-[0.8125rem] font-bold uppercase leading-tight tracking-[0.04em] text-txt">
             {spec ? t(`spec.constraint.${spec.label}`) : constraint.type}
           </h5>
-          <p className="mt-0.5 text-[11px] leading-snug text-txt-dim">
+          <p className="mt-0.5 text-[0.6875rem] leading-snug text-txt-dim">
             {spec ? t(`spec.blurb.${spec.label}`) : t("spec.constraint.unknown")}
           </p>
         </div>
@@ -353,7 +353,7 @@ export function ConstraintRow({
 
       {result ? (
         <p
-          className={`flex items-baseline gap-2 border-t border-line-2 pt-2 font-mono text-[11px] leading-snug ${
+          className={`flex items-baseline gap-2 border-t border-line-2 pt-2 font-mono text-[0.6875rem] leading-snug ${
             result.pass ? "text-ok" : "text-danger"
           }`}
         >

@@ -92,8 +92,8 @@ export function MewCodex() {
       </div>
 
       {!ready ? (
-        <div className="flex flex-1 items-center justify-center gap-3 py-24 text-[15px]/none font-semibold text-[color:var(--mwp-cream-dim)]">
-          <span className="h-[22px] w-[22px] animate-spin border-[3px] border-solid border-[color:var(--mwp-nline)] border-t-[color:var(--mwp-red)] [border-radius:50%_45%_52%_48%] motion-reduce:animate-none" />
+        <div className="flex flex-1 items-center justify-center gap-3 py-24 text-[0.9375rem]/none font-semibold text-[color:var(--mwp-cream-dim)]">
+          <span className="h-[1.375rem] w-[1.375rem] animate-spin border-[3px] border-solid border-[color:var(--mwp-nline)] border-t-[color:var(--mwp-red)] [border-radius:50%_45%_52%_48%] motion-reduce:animate-none" />
           {t("loading")}
         </div>
       ) : (

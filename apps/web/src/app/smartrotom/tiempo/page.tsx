@@ -65,7 +65,7 @@ export default function Component() {
   };
 
   return (
-    <div className="w-full max-w-[300px] bg-white rounded-2xl shadow-lg overflow-hidden">
+    <div className="w-full max-w-[18.75rem] bg-white rounded-2xl shadow-lg overflow-hidden">
       <div className="bg-secondary p-3 flex justify-between items-center">
         <h2 className="text-white text-lg font-semibold">{t("title")}</h2>
         <button

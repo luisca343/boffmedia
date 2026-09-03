@@ -37,7 +37,7 @@ export function ChapterRail({
   return (
     <nav
       aria-label={t("chapterRail.nav")}
-      className="group/rail absolute left-[max(18px,3vw)] top-1/2 z-30 flex -translate-y-1/2 flex-col gap-[7px]"
+      className="group/rail absolute left-[max(18px,3vw)] top-1/2 z-30 flex -translate-y-1/2 flex-col gap-[0.4375rem]"
     >
       {chapters.map((c, i) => {
         const isActive = i === active
@@ -48,24 +48,24 @@ export function ChapterRail({
             aria-current={isActive ? "page" : undefined}
             onClick={() => onFlip(c.page)}
             className={cn(
-              "flex w-[46px] items-center gap-[9px] overflow-hidden whitespace-nowrap rounded-l-md rounded-r-[13px] py-[9px] pl-[11px] pr-3.5",
-              "text-left font-ps text-[12px] font-bold tracking-[.03em] text-white",
+              "flex w-[2.875rem] items-center gap-[0.5625rem] overflow-hidden whitespace-nowrap rounded-l-md rounded-r-[13px] py-[0.5625rem] pl-[0.6875rem] pr-3.5",
+              "text-left font-ps text-[0.75rem] font-bold tracking-[.03em] text-white",
               "shadow-[2px_3px_0_rgba(0,0,0,.4)] transition-[width,opacity,transform] duration-200 motion-reduce:transition-none",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-gild focus-visible:ring-offset-2 focus-visible:ring-offset-ps-desk",
               c.tab,
               isActive
-                ? "w-[188px] translate-x-0 opacity-100"
-                : "-translate-x-1.5 opacity-[.62] group-hover/rail:w-[188px] group-hover/rail:translate-x-0 group-hover/rail:opacity-100",
+                ? "w-[11.75rem] translate-x-0 opacity-100"
+                : "-translate-x-1.5 opacity-[.62] group-hover/rail:w-[11.75rem] group-hover/rail:translate-x-0 group-hover/rail:opacity-100",
             )}
           >
             <span
               aria-hidden="true"
               className={cn(
-                "h-[7px] w-[7px] flex-none rounded-full",
+                "h-[0.4375rem] w-[0.4375rem] flex-none rounded-full",
                 isActive ? "bg-white shadow-[0_0_7px_#fff]" : "bg-white/60",
               )}
             />
-            <span className="ps-num font-ps-display text-[12px] opacity-85">{c.no}</span>
+            <span className="ps-num font-ps-display text-[0.75rem] opacity-85">{c.no}</span>
             <span
               className={cn(
                 "transition-opacity duration-200 motion-reduce:transition-none",

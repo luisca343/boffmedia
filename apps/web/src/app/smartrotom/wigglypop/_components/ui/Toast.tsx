@@ -44,7 +44,7 @@ export function ToastHost() {
             )}
           >
             <span className={cn("h-2 w-2 flex-none rounded-wp-pill", DOT[t.kind])} />
-            <span className="font-wp text-[13.5px] font-semibold text-wp-fg">{t.msg}</span>
+            <span className="font-wp text-[0.84375rem] font-semibold text-wp-fg">{t.msg}</span>
           </div>
         ))}
       </div>

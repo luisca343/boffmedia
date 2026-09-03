@@ -28,9 +28,9 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
   if (loading) {
     return (
       <section className={shell}>
-        <div className="px-[var(--dk-pad)] pb-[60px] pt-[18px]">
-          <DkSkel h={86} className="max-w-[560px]" />
-          <div className="mt-[14px] grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] items-start gap-3">
+        <div className="px-[var(--dk-pad)] pb-[3.75rem] pt-[1.125rem]">
+          <DkSkel h={86} className="max-w-[35rem]" />
+          <div className="mt-[0.875rem] grid grid-cols-[repeat(auto-fill,minmax(18.125rem,1fr))] items-start gap-3">
             {[150, 220, 180, 180, 190, 170].map((h, i) => (
               <DkSkel key={i} h={h} />
             ))}
@@ -43,7 +43,7 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
   if (!detail || !entry) {
     return (
       <section className={shell}>
-        <div className="px-[var(--dk-pad)] pb-[60px] pt-[18px]">
+        <div className="px-[var(--dk-pad)] pb-[3.75rem] pt-[1.125rem]">
           <DkEmpty icon="database" title={t("detail.emptyTitle")} lead={t("detail.emptyLead")} />
         </div>
       </section>
@@ -54,15 +54,15 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
 
   return (
     <section className={shell} aria-label={detail.name}>
-      <div className="px-[var(--dk-pad)] pb-[60px] pt-[18px]">
-        <header className="mb-4 flex flex-wrap items-center gap-[14px]">
+      <div className="px-[var(--dk-pad)] pb-[3.75rem] pt-[1.125rem]">
+        <header className="mb-4 flex flex-wrap items-center gap-[0.875rem]">
           {onBack && <DkBack onClick={onBack} label={t("detail.backToList")} />}
-          <span className="grid h-[74px] w-[74px] flex-none place-items-center border border-solid border-line-2 bg-panel cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:12px]">
+          <span className="grid h-[4.625rem] w-[4.625rem] flex-none place-items-center border border-solid border-line-2 bg-panel cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:12px]">
             <DkSprite src={spriteUrl(detail.name)} alt={detail.name} size={62} onError={handleSpriteError} />
           </span>
           <div className="min-w-0">
-            <h2 className="m-0 mb-[7px] font-display text-[34px] font-extrabold uppercase italic leading-none tracking-[0.01em] max-[720px]:text-[27px]">{detail.name}</h2>
-            <div className="flex flex-wrap gap-[5px]">
+            <h2 className="m-0 mb-[0.4375rem] font-display text-[2.125rem] font-extrabold uppercase italic leading-none tracking-[0.01em] max-[720px]:text-[1.6875rem]">{detail.name}</h2>
+            <div className="flex flex-wrap gap-[0.3125rem]">
               {detail.types.map((ty) => (
                 <MvType key={ty} type={ty} />
               ))}
@@ -75,7 +75,7 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
           </div>
         </header>
 
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] items-start gap-3">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(18.125rem,1fr))] items-start gap-3">
           <MvCard title={t("detail.baseStats")}>
             <MvBaseStats base={detail.base} />
           </MvCard>
@@ -91,9 +91,9 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
           <MvCard title={t("detail.abilitiesTeras")}>
             <DkBarList items={detail.abilities.map((m) => ({ name: m.name, pct: m.pct }))} max={4} empty={t("detail.noData")} />
             {tera.length > 0 && (
-              <div className="flex flex-wrap gap-[6px] border-t border-dashed border-line pt-[9px]">
+              <div className="flex flex-wrap gap-[0.375rem] border-t border-dashed border-line pt-[0.5625rem]">
                 {tera.map((x) => (
-                  <span key={x.name} className="inline-flex items-center gap-[6px] border border-solid border-line bg-base py-1 pl-1 pr-[7px] font-mono text-[10px] font-semibold leading-none text-txt-muted">
+                  <span key={x.name} className="inline-flex items-center gap-[0.375rem] border border-solid border-line bg-base py-1 pl-1 pr-[0.4375rem] font-mono text-[0.625rem] font-semibold leading-none text-txt-muted">
                     <MvType type={x.name} small />
                     <b>{x.pct.toFixed(1)}%</b>
                   </span>
@@ -122,13 +122,13 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
 
           <MvCard title={t("detail.spreads")}>
             {detail.spreads.length === 0 ? (
-              <p className="py-2 font-mono text-[12px] leading-[1.5] text-txt-dim">{t("detail.noData")}</p>
+              <p className="py-2 font-mono text-[0.75rem] leading-[1.5] text-txt-dim">{t("detail.noData")}</p>
             ) : (
               <div className="grid">
                 {detail.spreads.map((s, i) => (
-                  <div key={i} className="flex items-center gap-[10px] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-[6px] last:border-b-0">
+                  <div key={i} className="flex items-center gap-[0.625rem] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-[0.375rem] last:border-b-0">
                     <MvSpread nature={s.nature} ev={s.ev} />
-                    <span className="flex-none font-mono text-[11px] font-semibold leading-none text-txt-muted">{s.pct.toFixed(2)}%</span>
+                    <span className="flex-none font-mono text-[0.6875rem] font-semibold leading-none text-txt-muted">{s.pct.toFixed(2)}%</span>
                   </div>
                 ))}
               </div>
@@ -140,13 +140,13 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
           {teamsLoading ? (
             <DkSkel h={120} />
           ) : teams && teams.length > 0 ? (
-            <div className="grid gap-[6px]">
+            <div className="grid gap-[0.375rem]">
               {teams.map((team) => (
                 <MvTeamRow key={team.slug} team={team} />
               ))}
             </div>
           ) : (
-            <p className="py-2 font-mono text-[12px] leading-[1.5] text-txt-dim">{t("detail.noTeams")}</p>
+            <p className="py-2 font-mono text-[0.75rem] leading-[1.5] text-txt-dim">{t("detail.noTeams")}</p>
           )}
         </MvCard>
       </div>
@@ -156,9 +156,9 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
 
 function Kpi({ value, label }: { value: React.ReactNode; label: string }) {
   return (
-    <span className="grid min-w-[74px] justify-items-center gap-[3px] border border-solid border-line bg-panel px-[14px] py-[9px] max-[980px]:flex-1">
-      <b className="font-display text-[19px] font-extrabold italic leading-none">{value}</b>
-      <i className="font-mono text-[8.5px] font-semibold not-italic uppercase leading-none tracking-[0.12em] text-txt-dim">{label}</i>
+    <span className="grid min-w-[4.625rem] justify-items-center gap-[3px] border border-solid border-line bg-panel px-[0.875rem] py-[0.5625rem] max-[980px]:flex-1">
+      <b className="font-display text-[1.1875rem] font-extrabold italic leading-none">{value}</b>
+      <i className="font-mono text-[0.53125rem] font-semibold not-italic uppercase leading-none tracking-[0.12em] text-txt-dim">{label}</i>
     </span>
   )
 }

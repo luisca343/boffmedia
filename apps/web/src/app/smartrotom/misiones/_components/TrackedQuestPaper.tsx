@@ -32,7 +32,7 @@ export function TrackedQuestPaper({
   const rewards = quest.rewards ?? []
 
   return (
-    <Paper tilt={-0.5} className="relative cursor-pointer px-[30px] pb-[22px] pt-[26px]" onClick={onOpen}>
+    <Paper tilt={-0.5} className="relative cursor-pointer px-[1.875rem] pb-[1.375rem] pt-[1.625rem]" onClick={onOpen}>
       <Sparkles count={9} />
 
       <div className="absolute -top-7 left-1/2 z-[8] -translate-x-1/2">
@@ -70,9 +70,9 @@ export function TrackedQuestPaper({
             {level > 0 && t("level", { level })}
             {quest.repeatable && t("repeatable")}
           </Label>
-          <h2 className="mb-1.5 mt-1 font-ms-display text-[28px] leading-tight text-ms-ink-1">{quest.name}</h2>
+          <h2 className="mb-1.5 mt-1 font-ms-display text-[1.75rem] leading-tight text-ms-ink-1">{quest.name}</h2>
 
-          <div className="mb-3 flex flex-wrap items-center gap-2 text-[13px] italic text-ms-ink-3">
+          <div className="mb-3 flex flex-wrap items-center gap-2 text-[0.8125rem] italic text-ms-ink-3">
             <Icon.Quill size={12} />
             <span>{t("commissionedBy")}</span>
             <strong className="font-semibold not-italic text-ms-ink-2">{npc?.name || t("unknown")}</strong>
@@ -89,7 +89,7 @@ export function TrackedQuestPaper({
             <div className="mb-3 flex items-center gap-3 rounded-sm border border-ms-ink-1/30 bg-[rgba(255,240,200,.5)] px-3.5 py-2.5">
               <Icon.Target size={16} />
               <div className="min-w-0 flex-1">
-                <div className="font-ms-uppercase text-[11px] uppercase tracking-[.12em] text-ms-ink-3">{t("next")}</div>
+                <div className="font-ms-uppercase text-[0.6875rem] uppercase tracking-[.12em] text-ms-ink-3">{t("next")}</div>
                 <div className="truncate text-sm font-medium text-ms-ink-1">{next.name}</div>
               </div>
               <span className="shrink-0 font-ms-mono text-sm text-ms-ink-2">
@@ -99,7 +99,7 @@ export function TrackedQuestPaper({
           )}
 
           <div className="flex flex-wrap items-center gap-3.5">
-            <Bar gold value={progress.pct} className="min-w-[120px] flex-1" />
+            <Bar gold value={progress.pct} className="min-w-[7.5rem] flex-1" />
             <span className="font-ms-uppercase text-xs uppercase tracking-[.08em] text-ms-gold-3">
               {progress.pct}%
             </span>

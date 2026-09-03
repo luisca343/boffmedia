@@ -51,10 +51,10 @@ export function RedeemInviteView() {
   }
 
   return (
-    <main className="wrap pb-[90px] pt-6">
-      <div className="mx-auto max-w-[520px]">
+    <main className="wrap pb-[5.625rem] pt-6">
+      <div className="mx-auto max-w-[32.5rem]">
         <Panel title={t("title")}>
-          <p className="mb-5 font-body text-[15px]/[1.6] text-txt-muted text-pretty">{t("lead")}</p>
+          <p className="mb-5 font-body text-[0.9375rem]/[1.6] text-txt-muted text-pretty">{t("lead")}</p>
 
           {!session?.user ? (
             <Button variant="pri" icon="user" href="/entrar" className="w-full">
@@ -90,7 +90,7 @@ export function RedeemInviteView() {
             </div>
           )}
 
-          <p className="mt-5 inline-flex items-center gap-2 font-mono text-[11px]/none uppercase tracking-[0.08em] text-txt-dim">
+          <p className="mt-5 inline-flex items-center gap-2 font-mono text-[0.6875rem]/none uppercase tracking-[0.08em] text-txt-dim">
             <Icon name="info" size={13} /> {t("note")}
           </p>
         </Panel>

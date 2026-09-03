@@ -53,7 +53,7 @@ export function CategoryRail() {
               ui.setQuery("")
             }}
             className={cn(
-              "flex items-center gap-2 py-2 px-3.5 border border-solid font-display font-bold uppercase tracking-[0.04em] text-[13px] cursor-pointer",
+              "flex items-center gap-2 py-2 px-3.5 border border-solid font-display font-bold uppercase tracking-[0.04em] text-[0.8125rem] cursor-pointer",
               "focus-visible:outline-2 focus-visible:outline-accent focus-visible:-outline-offset-2",
               active
                 ? "border-accent-line bg-accent-soft text-accent"
@@ -63,7 +63,7 @@ export function CategoryRail() {
             <Icon name={cat.icon} size={15} className={active ? "text-accent" : "text-txt-dim"} />
             <span>{t(cat.labelKey)}</span>
             {n > 0 && (
-              <span className="grid place-items-center min-w-[18px] h-4 px-1.5 bg-accent text-accent-ink font-mono text-[9.5px] font-bold">
+              <span className="grid place-items-center min-w-[1.125rem] h-4 px-1.5 bg-accent text-accent-ink font-mono text-[0.59375rem] font-bold">
                 {n}
               </span>
             )}

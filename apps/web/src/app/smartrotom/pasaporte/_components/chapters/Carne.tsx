@@ -38,8 +38,8 @@ const QR_DIM = (QR_MODULES + QR_QUIET * 2) * QR_CELL
 function Field({ label, value, wide = false }: { label: string; value: ReactNode; wide?: boolean }) {
   return (
     <div className={cn("min-w-0", wide && "col-span-2")}>
-      <div className="font-ps-mono text-[8px] uppercase tracking-[.14em] text-ps-info-deep/70">{label}</div>
-      <div className="truncate font-ps-ceremony text-[16px] leading-[1.08] text-ps-ink">{value}</div>
+      <div className="font-ps-mono text-[0.5rem] uppercase tracking-[.14em] text-ps-info-deep/70">{label}</div>
+      <div className="truncate font-ps-ceremony text-[1rem] leading-[1.08] text-ps-ink">{value}</div>
     </div>
   )
 }
@@ -47,8 +47,8 @@ function Field({ label, value, wide = false }: { label: string; value: ReactNode
 function Code({ label, value }: { label: string; value: ReactNode }) {
   return (
     <div className="min-w-0">
-      <div className="font-ps-mono text-[8px] uppercase tracking-[.14em] text-ps-info-deep/70">{label}</div>
-      <div className="ps-num truncate font-ps-mono text-[12px] font-bold text-ps-ink">{value}</div>
+      <div className="font-ps-mono text-[0.5rem] uppercase tracking-[.14em] text-ps-info-deep/70">{label}</div>
+      <div className="ps-num truncate font-ps-mono text-[0.75rem] font-bold text-ps-ink">{value}</div>
     </div>
   )
 }
@@ -72,7 +72,7 @@ export function Carne({
     return (
       <>
         <PageHead eyebrow={t("carne.eyebrow")} title={t("carne.title")} />
-        <Skeleton className="h-[300px] rounded-2xl" />
+        <Skeleton className="h-[18.75rem] rounded-2xl" />
       </>
     )
   }
@@ -112,37 +112,37 @@ export function Carne({
         />
         <div
           aria-hidden="true"
-          className="ps-holo pointer-events-none absolute left-1/2 top-[56%] z-[1] grid h-[88px] w-[88px] -translate-x-1/2 -translate-y-1/2 -rotate-12 place-items-center rounded-full font-ps-mono text-[8px] tracking-[.14em] text-ps-info-deep opacity-40 mix-blend-multiply"
+          className="ps-holo pointer-events-none absolute left-1/2 top-[56%] z-[1] grid h-[5.5rem] w-[5.5rem] -translate-x-1/2 -translate-y-1/2 -rotate-12 place-items-center rounded-full font-ps-mono text-[0.5rem] tracking-[.14em] text-ps-info-deep opacity-40 mix-blend-multiply"
         >
-          <Icon name="shield" className="h-[22px] w-[22px]" />
+          <Icon name="shield" className="h-[1.375rem] w-[1.375rem]" />
         </div>
 
         <div style={BAND} className="relative z-[2] flex items-center gap-2.5 px-3.5 py-2.5">
-          <Icon name="globe" className="h-[26px] w-[26px] flex-none text-ps-chrome-fg/80" />
+          <Icon name="globe" className="h-[1.625rem] w-[1.625rem] flex-none text-ps-chrome-fg/80" />
           <div className="min-w-0 flex-1">
-            <div className="truncate font-ps-mono text-[9.5px] tracking-[.2em] text-ps-chrome-fg/70">
+            <div className="truncate font-ps-mono text-[0.59375rem] tracking-[.2em] text-ps-chrome-fg/70">
               {t("carne.bandAuthority")}
             </div>
-            <div className="truncate font-ps-ceremony text-[16px] tracking-[.02em] text-ps-chrome-fg">
+            <div className="truncate font-ps-ceremony text-[1rem] tracking-[.02em] text-ps-chrome-fg">
               {t("carne.bandCardTitle")}
             </div>
           </div>
-          <span className="flex-none rounded-md border border-white/45 px-2.5 py-[3px] font-ps-mono text-[10.5px] font-bold tracking-[.08em] text-ps-chrome-fg">
+          <span className="flex-none rounded-md border border-white/45 px-2.5 py-[3px] font-ps-mono text-[0.65625rem] font-bold tracking-[.08em] text-ps-chrome-fg">
             {t("carne.classA")}
           </span>
         </div>
 
-        <div className="relative z-[2] grid grid-cols-[92px_1fr_92px] items-start gap-3 p-3.5">
+        <div className="relative z-[2] grid grid-cols-[5.75rem_1fr_5.75rem] items-start gap-3 p-3.5">
           <div className="text-center">
-            <div className="rounded-lg border border-ps-info/30 bg-white p-[5px] shadow-[inset_0_0_8px_rgba(40,60,90,.15)]">
+            <div className="rounded-lg border border-ps-info/30 bg-white p-[0.3125rem] shadow-[inset_0_0_8px_rgba(40,60,90,.15)]">
               <PassportPhoto uuid={profile.uuid} />
             </div>
-            <p className="mt-1.5 truncate border-t border-ps-info/30 pt-1 font-ps-ceremony text-[13px] text-ps-info-deep">
+            <p className="mt-1.5 truncate border-t border-ps-info/30 pt-1 font-ps-ceremony text-[0.8125rem] text-ps-info-deep">
               {profile.username}
             </p>
           </div>
 
-          <div className="grid grid-cols-2 content-start gap-x-3 gap-y-[9px]">
+          <div className="grid grid-cols-2 content-start gap-x-3 gap-y-[0.5625rem]">
             <Field label={t("carne.field.name")} value={profile.username} wide />
             <Field label={t("carne.field.docNumber")} value={profile.trainerId} />
             <Field label={t("carne.field.region")} value={profile.region} />
@@ -161,7 +161,7 @@ export function Carne({
               onClick={onScan}
               aria-label={t("carne.scanAria")}
               className={cn(
-                "relative block w-full overflow-hidden rounded-lg border border-ps-info/30 bg-ps-paper p-[5px]",
+                "relative block w-full overflow-hidden rounded-lg border border-ps-info/30 bg-ps-paper p-[0.3125rem]",
                 "shadow-[0_1px_3px_rgba(0,0,0,.15)] transition-shadow duration-300 motion-reduce:transition-none",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-teal",
                 verified
@@ -198,23 +198,23 @@ export function Carne({
                 <span
                   aria-hidden="true"
                   style={SCANLINE}
-                  className="ps-loop pointer-events-none absolute left-[5px] right-[5px] h-4 shadow-[0_0_10px_rgb(var(--ps-teal)/.7)] animate-ps-qrscan motion-reduce:animate-none"
+                  className="ps-loop pointer-events-none absolute left-[0.3125rem] right-[0.3125rem] h-4 shadow-[0_0_10px_rgb(var(--ps-teal)/.7)] animate-ps-qrscan motion-reduce:animate-none"
                 />
               )}
             </button>
             <span
               className={cn(
-                "mt-1.5 flex items-center justify-center gap-1 font-ps-mono text-[8px] tracking-[.1em]",
+                "mt-1.5 flex items-center justify-center gap-1 font-ps-mono text-[0.5rem] tracking-[.1em]",
                 verified ? "text-ps-ok" : "text-ps-info-deep/70",
               )}
             >
-              <Icon name={verified ? "shield" : "scan"} className="h-[11px] w-[11px]" />
+              <Icon name={verified ? "shield" : "scan"} className="h-[0.6875rem] w-[0.6875rem]" />
               {verified ? t("carne.verified") : t("carne.scan")}
             </span>
           </div>
         </div>
 
-        <div className="ps-num relative z-[2] mx-3.5 mb-3.5 overflow-hidden whitespace-nowrap rounded-b-md border-t border-ps-info/25 bg-white/55 px-2 py-1.5 font-ps-mono text-[11px] tracking-[.14em] text-ps-info-deep">
+        <div className="ps-num relative z-[2] mx-3.5 mb-3.5 overflow-hidden whitespace-nowrap rounded-b-md border-t border-ps-info/25 bg-white/55 px-2 py-1.5 font-ps-mono text-[0.6875rem] tracking-[.14em] text-ps-info-deep">
           {carneMrz}
         </div>
       </div>
@@ -222,7 +222,7 @@ export function Carne({
       {/* Modo Inspección has no button — this line is the only place the reader is told the
           key, now that Rotom's marginalia (which used to say it) is gone. Printed instructions
           are what a real document carries anyway. */}
-      <p className="mt-3 px-0.5 text-[11px] leading-[1.45] text-ps-ink-soft">
+      <p className="mt-3 px-0.5 text-[0.6875rem] leading-[1.45] text-ps-ink-soft">
         {t.rich("carne.footer", {
           key: (chunks) => <b className="ps-num font-ps-mono text-ps-ink">{chunks}</b>,
           mode: (chunks) => <b className="text-ps-ink">{chunks}</b>,

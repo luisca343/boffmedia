@@ -28,11 +28,11 @@ export function Identidad({
     return (
       <>
         <PageHead eyebrow={t("identidad.eyebrow")} title={t("identidad.title")} />
-        <div className="flex gap-[18px]">
-          <Skeleton className="h-[200px] w-[120px]" />
-          <div className="grid flex-1 grid-cols-2 gap-[9px]">
+        <div className="flex gap-[1.125rem]">
+          <Skeleton className="h-[12.5rem] w-[7.5rem]" />
+          <div className="grid flex-1 grid-cols-2 gap-[0.5625rem]">
             {Array.from({ length: 4 }, (_, i) => (
-              <Skeleton key={i} className="h-[74px]" />
+              <Skeleton key={i} className="h-[4.625rem]" />
             ))}
           </div>
         </div>
@@ -47,17 +47,17 @@ export function Identidad({
     <>
       <PageHead eyebrow={t("identidad.eyebrow")} title={t("identidad.title")} />
 
-      <div className="flex items-start gap-[18px]">
+      <div className="flex items-start gap-[1.125rem]">
         <div className="flex-none text-center">
           <div className="rounded-[10px] border border-ps-ink/22 bg-white/40 p-1.5 shadow-[inset_0_0_10px_rgba(80,60,30,.12)]">
             <PassportPhoto uuid={profile?.uuid} />
           </div>
-          <p className="mt-[7px] font-ps-ceremony text-[15px]">{profile?.username ?? "—"}</p>
-          <p className="font-ps-mono text-[10px] tracking-[.08em] text-ps-ink-faint">{profile?.title ?? ""}</p>
+          <p className="mt-[0.4375rem] font-ps-ceremony text-[0.9375rem]">{profile?.username ?? "—"}</p>
+          <p className="font-ps-mono text-[0.625rem] tracking-[.08em] text-ps-ink-faint">{profile?.title ?? ""}</p>
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="grid grid-cols-2 gap-[9px]">
+          <div className="grid grid-cols-2 gap-[0.5625rem]">
             <Stat
               icon="clock"
               label={t("identidad.stat.playtime")}
@@ -86,8 +86,8 @@ export function Identidad({
 
           <hr className="my-2.5 border-0 border-t border-dashed border-ps-ink/22" />
 
-          <SectionLabel className="text-[13px]">{t("identidad.sectionMovement")}</SectionLabel>
-          <dl className="grid grid-cols-3 gap-x-2 text-[11px]">
+          <SectionLabel className="text-[0.8125rem]">{t("identidad.sectionMovement")}</SectionLabel>
+          <dl className="grid grid-cols-3 gap-x-2 text-[0.6875rem]">
             {movement.map((row) => (
               <div
                 key={row.key}

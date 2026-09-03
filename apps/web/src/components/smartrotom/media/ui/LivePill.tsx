@@ -20,7 +20,7 @@ export function LivePill({
         "inline-flex items-center gap-1.5 z-[2] whitespace-nowrap font-mw-display font-extrabold uppercase",
         "tracking-[0.12em] text-mw-accent-on bg-mw-accent rounded-mw-md",
         "shadow-[0_4px_12px_rgb(var(--mw-accent)/.35)]",
-        size === "lg" ? "text-xs px-3 py-1.5" : "text-[10px] px-2 py-1",
+        size === "lg" ? "text-xs px-3 py-1.5" : "text-[0.625rem] px-2 py-1",
         className,
       )}
     >

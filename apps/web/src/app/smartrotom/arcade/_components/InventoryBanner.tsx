@@ -25,20 +25,20 @@ export function InventoryBanner() {
     .join(" · ")
 
   return (
-    <Panel tone="magenta" className="relative mb-[22px]">
+    <Panel tone="magenta" className="relative mb-[1.375rem]">
       <div aria-hidden className="ar-horizon opacity-50" />
       <Corners tone="violet" inset={10} size={14} />
 
-      <div className="relative z-[2] flex flex-wrap items-center justify-between gap-[18px]">
-        <div className="flex items-center gap-[18px]">
-          <div className="relative grid h-[60px] w-[60px] place-items-center rounded-[14px] bg-[linear-gradient(135deg,rgb(var(--ar-magenta)),rgb(var(--ar-violet)))] shadow-[0_0_26px_rgb(var(--ar-magenta)/.45)]">
+      <div className="relative z-[2] flex flex-wrap items-center justify-between gap-[1.125rem]">
+        <div className="flex items-center gap-[1.125rem]">
+          <div className="relative grid h-[3.75rem] w-[3.75rem] place-items-center rounded-[14px] bg-[linear-gradient(135deg,rgb(var(--ar-magenta)),rgb(var(--ar-violet)))] shadow-[0_0_26px_rgb(var(--ar-magenta)/.45)]">
             <Icon.Box s={28} className="text-white" />
-            <span className="absolute -right-1.5 -top-1.5 grid h-[22px] w-[22px] place-items-center rounded-full border-2 border-ar-void-3 bg-ar-amber font-ar-display text-[9px] text-[#1c0e00]">
+            <span className="absolute -right-1.5 -top-1.5 grid h-[1.375rem] w-[1.375rem] place-items-center rounded-full border-2 border-ar-void-3 bg-ar-amber font-ar-display text-[0.5625rem] text-[#1c0e00]">
               {total}
             </span>
           </div>
           <div>
-            <div className="mb-1.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-violet-2">
+            <div className="mb-1.5 font-ar-display text-[0.5625rem] uppercase tracking-[0.18em] text-ar-violet-2">
               {t("inventory.title")}
             </div>
             <div className="font-ar text-lg font-bold text-ar-ink">

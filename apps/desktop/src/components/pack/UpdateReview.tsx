@@ -65,7 +65,7 @@ export function UpdateReview({
       footer={
         <div className="flex w-full items-center gap-3">
           {progress && (
-            <span className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
+            <span className="flex items-center gap-2 font-mono text-[0.6875rem] text-txt-dim">
               <Spinner size={12} /> {progress}
             </span>
           )}
@@ -97,7 +97,7 @@ export function UpdateReview({
             label="Seleccionar todo"
           />
           <span className="flex-1" />
-          <span className="font-mono text-[11px] text-txt-dim">
+          <span className="font-mono text-[0.6875rem] text-txt-dim">
             {chosen.length}/{rows.length}
           </span>
         </div>
@@ -113,13 +113,13 @@ export function UpdateReview({
                 <Checkbox checked={on} disabled={busy} onChange={() => toggle(row.path)} />
                 <CatalogIcon src={row.iconUrl} size={32} />
                 <span className="flex min-w-0 flex-1 flex-col gap-[2px]">
-                  <span className="truncate font-display text-[13px] font-bold uppercase tracking-[0.03em]">
+                  <span className="truncate font-display text-[0.8125rem] font-bold uppercase tracking-[0.03em]">
                     {row.name}
                   </span>
                   {/* The from → to pair is the whole point of this screen: the
                       version being left behind is what tells a player whether
                       this is a patch bump or a major jump. */}
-                  <span className="truncate font-mono text-[11px] text-txt-dim">
+                  <span className="truncate font-mono text-[0.6875rem] text-txt-dim">
                     <span className="text-txt-muted">{row.update?.fromLabel ?? row.fileName}</span>
                     {" → "}
                     <span className="text-accent-bright">{row.update?.label}</span>

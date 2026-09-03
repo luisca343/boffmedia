@@ -66,7 +66,7 @@ export function DkSub({ children, className }: { children: React.ReactNode; clas
 /** Right-aligned mono note used inside the sub-bar. */
 export function DkSubNote({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("ml-auto inline-flex items-center gap-[6px] font-mono text-[11px] font-medium leading-[1.4] text-txt-dim", className)}>
+    <span className={cn("ml-auto inline-flex items-center gap-[0.375rem] font-mono text-[0.6875rem] font-medium leading-[1.4] text-txt-dim", className)}>
       {children}
     </span>
   )
@@ -77,7 +77,7 @@ export function DkBody({ children, pad = true, className }: { children: React.Re
     <div
       className={cn(
         "min-h-0 flex-1",
-        pad && "px-[var(--dk-pad)] pb-[60px] pt-4",
+        pad && "px-[var(--dk-pad)] pb-[3.75rem] pt-4",
         className,
       )}
     >
@@ -99,7 +99,7 @@ export function DkSpacer() {
 /** The bar title cluster — `ToolSeal` + `ToolTitle` from the shared kit. */
 export function DkTitle({ icon, label, sub, className }: { icon?: IconName; label: React.ReactNode; sub?: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("flex min-w-0 items-center gap-[10px]", className)}>
+    <div className={cn("flex min-w-0 items-center gap-[0.625rem]", className)}>
       {icon && <ToolSeal icon={icon} />}
       <ToolTitle title={label} sub={sub} />
     </div>
@@ -108,7 +108,7 @@ export function DkTitle({ icon, label, sub, className }: { icon?: IconName; labe
 
 export function DkBack({ onClick, href, label }: { onClick?: () => void; href?: string; label: string }) {
   const cls =
-    "grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-line-2 bg-panel text-txt-muted transition-[color,border-color] hover:border-accent-line hover:text-accent-bright focus-visible:outline-2 focus-visible:outline-accent-line"
+    "grid h-[2.125rem] w-[2.125rem] flex-none place-items-center border border-solid border-line-2 bg-panel text-txt-muted transition-[color,border-color] hover:border-accent-line hover:text-accent-bright focus-visible:outline-2 focus-visible:outline-accent-line"
   if (href) {
     return (
       <a href={href} aria-label={label} title={label} className={cn("cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line-2)] hover:[--cut-line:var(--accent-line)]", cls)}>

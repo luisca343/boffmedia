@@ -27,12 +27,12 @@ export function MazeControls({
   const t = useTranslations("arcade")
   return (
     <Panel tone="cyan" tight>
-      <div className="mb-3 font-ar-display text-[9px] uppercase text-ar-cyan">{t("maze.generator")}</div>
+      <div className="mb-3 font-ar-display text-[0.5625rem] uppercase text-ar-cyan">{t("maze.generator")}</div>
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="maze-size"
-            className="font-ar-mono text-[10px] font-bold uppercase tracking-[0.1em] text-ar-ink-muted"
+            className="font-ar-mono text-[0.625rem] font-bold uppercase tracking-[0.1em] text-ar-ink-muted"
           >
             {t("maze.size")}
           </label>
@@ -41,7 +41,7 @@ export function MazeControls({
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="maze-depth"
-            className="font-ar-mono text-[10px] font-bold uppercase tracking-[0.1em] text-ar-ink-muted"
+            className="font-ar-mono text-[0.625rem] font-bold uppercase tracking-[0.1em] text-ar-ink-muted"
           >
             {t("maze.depth")}
           </label>

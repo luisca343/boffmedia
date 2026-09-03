@@ -71,18 +71,18 @@ export function MapHud({ hover, styler, blocksPerPixel, seaLevel, labels }: MapH
     <>
       <div className="pointer-events-none absolute bottom-3 left-3 z-[500]">
         {hover ? (
-          <div className={`${PANEL} min-w-[248px] px-3 py-2`}>
+          <div className={`${PANEL} min-w-[15.5rem] px-3 py-2`}>
             {style ? (
               <div className="mb-1.5 flex items-center gap-2">
                 <span
                   className="inline-block size-3.5 shrink-0 rounded-[2px] border border-line-2"
                   style={{ backgroundColor: `rgb(${style.color.join(",")})` }}
                 />
-                <span className="truncate text-[13px] font-semibold leading-tight text-txt">{style.label}</span>
+                <span className="truncate text-[0.8125rem] font-semibold leading-tight text-txt">{style.label}</span>
               </div>
             ) : null}
 
-            <div className="flex items-baseline gap-4 font-mono text-[12px] leading-tight tabular-nums">
+            <div className="flex items-baseline gap-4 font-mono text-[0.75rem] leading-tight tabular-nums">
               <span className="text-txt">
                 <span className="text-txt-dim">X</span>{" "}
                 <span className="inline-block min-w-[5ch] text-right">{hover.x}</span>
@@ -93,7 +93,7 @@ export function MapHud({ hover, styler, blocksPerPixel, seaLevel, labels }: MapH
               </span>
             </div>
 
-            <div className="mt-1 flex items-baseline gap-2 font-mono text-[12px] leading-tight tabular-nums">
+            <div className="mt-1 flex items-baseline gap-2 font-mono text-[0.75rem] leading-tight tabular-nums">
               <span className="text-txt">
                 <span className="text-txt-dim">{labels.surface}</span>{" "}
                 <span className="inline-block min-w-[3ch] text-right">{hover.surfaceY}</span>
@@ -111,15 +111,15 @@ export function MapHud({ hover, styler, blocksPerPixel, seaLevel, labels }: MapH
             </div>
           </div>
         ) : (
-          <div className={`${PANEL} px-3 py-2 text-[12px] leading-tight text-txt-dim`}>{labels.hint}</div>
+          <div className={`${PANEL} px-3 py-2 text-[0.75rem] leading-tight text-txt-dim`}>{labels.hint}</div>
         )}
       </div>
 
       <div className="pointer-events-none absolute bottom-3 right-3 z-[500] flex flex-col items-end gap-1.5">
-        <div className={`${PANEL} px-3 py-1.5 font-mono text-[12px] leading-tight text-txt-dim`}>{labels.scale}</div>
+        <div className={`${PANEL} px-3 py-1.5 font-mono text-[0.75rem] leading-tight text-txt-dim`}>{labels.scale}</div>
         <div className={`${PANEL} flex items-center gap-2 px-3 py-1.5`}>
-          <span className="font-mono text-[12px] leading-tight tabular-nums text-txt">{bar.blocks}</span>
-          <span className="relative block h-[8px] border-x-2 border-b-2 border-txt" style={{ width: bar.px }} />
+          <span className="font-mono text-[0.75rem] leading-tight tabular-nums text-txt">{bar.blocks}</span>
+          <span className="relative block h-[0.5rem] border-x-2 border-b-2 border-txt" style={{ width: bar.px }} />
         </div>
       </div>
     </>

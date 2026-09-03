@@ -99,7 +99,7 @@ export default function GameCatalogTable({
       </div>
 
       {/* Stats row */}
-      <div className="flex flex-wrap items-center gap-3 font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted">
+      <div className="flex flex-wrap items-center gap-3 font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-txt-muted">
         <span>{t("gamesFoundN", { n: filtered.length })}</span>
         {downloadedCount > 0 && (
           <span className="flex items-center gap-1 text-ok">
@@ -107,7 +107,7 @@ export default function GameCatalogTable({
           </span>
         )}
         {selected.size > 0 && (
-          <span className="inline-flex items-center border border-accent-line bg-accent-soft px-[8px] py-[3px] text-accent">
+          <span className="inline-flex items-center border border-accent-line bg-accent-soft px-[0.5rem] py-[3px] text-accent">
             {t("selectedN", { n: selected.size })}
           </span>
         )}
@@ -115,24 +115,24 @@ export default function GameCatalogTable({
 
       {/* Table */}
       <div className="overflow-hidden border border-line bg-panel">
-        <div className="flex items-center gap-3 border-b border-line bg-panel-2 px-[14px] py-2">
+        <div className="flex items-center gap-3 border-b border-line bg-panel-2 px-[0.875rem] py-2">
           <button
             type="button"
             onClick={togglePage}
             aria-label={t("selectPage")}
             className={
-              "grid h-[15px] w-[15px] flex-none place-items-center border transition-colors " +
+              "grid h-[0.9375rem] w-[0.9375rem] flex-none place-items-center border transition-colors " +
               (allPageSelected ? "border-accent bg-accent text-accent-ink" : "border-line-2 bg-base-2 text-transparent hover:border-line-2")
             }
           >
             <Icon name="check" size={11} />
           </button>
-          <span className="flex-1 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-txt-muted">{t("colName")}</span>
-          <span className="w-24 text-right font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-txt-muted">{t("colSize")}</span>
+          <span className="flex-1 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-txt-muted">{t("colName")}</span>
+          <span className="w-24 text-right font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-txt-muted">{t("colSize")}</span>
         </div>
 
         {paginated.length === 0 ? (
-          <div className="px-4 py-8 text-center text-[13px] text-txt-muted">
+          <div className="px-4 py-8 text-center text-[0.8125rem] text-txt-muted">
             {hideDownloaded && downloadedCount === files.length ? t("allDownloaded") : t("noGamesTerm")}
           </div>
         ) : (
@@ -152,7 +152,7 @@ export default function GameCatalogTable({
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted">
+        <div className="flex items-center justify-between font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-txt-muted">
           <span>{t("pageOf", { page: page + 1, total: totalPages })}</span>
           <div className="flex gap-1">
             <Button size="sm" variant="ghost" icon="chevron" disabled={page === 0} onClick={() => setPage((p) => p - 1)} aria-label={t("prevPage")} />

@@ -46,10 +46,10 @@ export function AnunciosBoard() {
 
       {isLoading ? (
         <div className="space-y-4">
-          <Skeleton className="h-[190px]" />
-          <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
+          <Skeleton className="h-[11.875rem]" />
+          <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(18.75rem,1fr))]">
             {Array.from({ length: 3 }, (_, i) => (
-              <Skeleton key={i} className="h-[150px]" />
+              <Skeleton key={i} className="h-[9.375rem]" />
             ))}
           </div>
         </div>
@@ -68,7 +68,7 @@ export function AnunciosBoard() {
           {rest.length > 0 && (
             <>
               {pinned.length > 0 && <Bar dep="gold">{t("anuncios.masPublicaciones")}</Bar>}
-              <div className="mt-3 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
+              <div className="mt-3 grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(18.75rem,1fr))]">
                 {rest.map((a) => (
                   <AnuncioCard key={a.id} anuncio={a} onEdit={() => setEditing(a)} onDelete={() => handleDelete(a)} deleting={deleteAnuncio.isPending} />
                 ))}

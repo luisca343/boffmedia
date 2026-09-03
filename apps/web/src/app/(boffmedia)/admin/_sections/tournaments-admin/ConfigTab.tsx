@@ -55,8 +55,8 @@ function DangerRow({ title, hint, action }: { title: string; hint: string; actio
   return (
     <div className="flex items-start justify-between gap-3 border border-solid border-line bg-base p-3">
       <div className="min-w-0">
-        <p className="m-0 font-body text-[13px] font-semibold text-txt">{title}</p>
-        <p className="m-0 mt-0.5 font-body text-[12px] leading-[1.45] text-txt-muted">{hint}</p>
+        <p className="m-0 font-body text-[0.8125rem] font-semibold text-txt">{title}</p>
+        <p className="m-0 mt-0.5 font-body text-[0.75rem] leading-[1.45] text-txt-muted">{hint}</p>
       </div>
       {action}
     </div>

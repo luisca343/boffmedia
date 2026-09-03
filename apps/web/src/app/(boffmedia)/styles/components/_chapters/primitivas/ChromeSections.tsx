@@ -20,7 +20,7 @@ export function ChromeSections() {
           </div>
         </Sample>
         <Sample title="Columna de enlaces" code="<FooterCol title links>" note={<>Cabecera en display + lista con chevron que aparece y desplaza al pasar el cursor.</>}>
-          <div className="min-w-[200px]">
+          <div className="min-w-[12.5rem]">
             <FooterCol
               title="Explorar"
               links={[
@@ -41,7 +41,7 @@ export function ChromeSections() {
           />
         </Sample>
         <Sample title="Reloj en vivo" code="<Clock>" note={<>El reloj de la barra base del pie: se actualiza cada segundo y usa cifras tabulares para no descuadrar. Suelto, sirve para cualquier marca de tiempo en directo.</>}>
-          <span className="inline-flex items-center gap-[10px] font-mono text-[13px] tracking-[0.08em] text-txt-muted">
+          <span className="inline-flex items-center gap-[0.625rem] font-mono text-[0.8125rem] tracking-[0.08em] text-txt-muted">
             <Badge tone="live">En vivo</Badge>
             <Clock className="text-accent" />
           </span>
@@ -55,7 +55,7 @@ export function ChromeSections() {
         lead={<>Las piezas de la pantalla de entrada, reutilizables sueltas: botones de proveedor (<code>AuthProviderBtn</code>), el campo de contraseña con mostrar/ocultar (<code>PasswordField</code>) y el separador con etiqueta (<code>Divider</code>). La pantalla completa vive en <code>/entrar</code>.</>}
       >
         <Sample title="Botón de proveedor" code="<AuthProviderBtn provider>" note={<>Marcas fuertes (Discord, Steam) → relleno de marca; el resto → chasis neutro con la marca en el icono. Los no conectados van en estado <code>soon</code>. <code>block</code> ocupa el ancho.</>}>
-          <div className="grid w-full max-w-[360px] gap-2.5">
+          <div className="grid w-full max-w-[22.5rem] gap-2.5">
             <AuthProviderBtn provider="discord" soon block>
               Discord
             </AuthProviderBtn>
@@ -69,14 +69,14 @@ export function ChromeSections() {
         </Sample>
 
         <Sample title="Separador" code="<Divider label>" col note={<>Separador horizontal; con <code>label</code>, texto centrado en mono entre dos líneas.</>}>
-          <div className="grid w-full max-w-[360px] gap-4">
+          <div className="grid w-full max-w-[22.5rem] gap-4">
             <Divider />
             <Divider label="o con tu correo" />
           </div>
         </Sample>
 
         <Sample title="Contraseña" code="<PasswordField>" col note={<>Input de contraseña con botón mostrar/ocultar (<code>aria-pressed</code>).</>}>
-          <div className="w-full max-w-[360px]">
+          <div className="w-full max-w-[22.5rem]">
             <Field label="Contraseña">
               <PasswordField defaultValue="supersecreto" />
             </Field>
@@ -84,7 +84,7 @@ export function ChromeSections() {
         </Sample>
 
         <Sample title="Pantalla completa" code="/entrar" col note={<>La pantalla real: proveedores (Google + Discord/Steam «próximamente»), formulario de credenciales y cambio login ↔ registro. Conectada a NextAuth.</>}>
-          <div className="w-full overflow-hidden border border-solid border-line [&>div]:!min-h-[560px]">
+          <div className="w-full overflow-hidden border border-solid border-line [&>div]:!min-h-[35rem]">
             <AuthScreen />
           </div>
         </Sample>

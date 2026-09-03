@@ -120,7 +120,7 @@ export function RuntimePanel({ slug, password, onChanged }: Props) {
   return (
     // Two columns: memory and Java are short forms that read side by side; the
     // resolved summary and the JVM flags (a long free-text field) span both.
-    <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(420px,100%),1fr))]">
+    <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(min(26.25rem,100%),1fr))]">
       {/* What this pack will actually launch with, BEFORE the controls: that is
           the question the tab exists to answer. */}
       {runtime !== null && (
@@ -318,7 +318,7 @@ export function RuntimePanel({ slug, password, onChanged }: Props) {
                 {jvmVerdicts
                   .filter((v) => !v.ok)
                   .map((v) => (
-                    <li key={v.arg} className="text-[11px] text-bad">
+                    <li key={v.arg} className="text-[0.6875rem] text-bad">
                       {t("jvmRejected", { arg: v.arg, reason: v.reason ?? "" })}
                     </li>
                   ))}

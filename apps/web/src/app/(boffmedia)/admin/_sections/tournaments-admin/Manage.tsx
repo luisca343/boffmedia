@@ -194,7 +194,7 @@ export function Manage({
         }
       />
 
-      <div className="mb-[18px] border border-solid border-line bg-panel px-4 py-3">
+      <div className="mb-[1.125rem] border border-solid border-line bg-panel px-4 py-3">
         <Stepper
           rail
           muted={tn.status === "cancelled"}
@@ -203,7 +203,7 @@ export function Manage({
         />
       </div>
 
-      <Tabs tabs={tabs} value={tab} onChange={(v) => onTab(v as ManageTab)} className="mb-[18px]" />
+      <Tabs tabs={tabs} value={tab} onChange={(v) => onTab(v as ManageTab)} className="mb-[1.125rem]" />
 
       {tab === "overview" && (
         <OverviewTab tn={tn} matches={matches} actions={overviewActions} />

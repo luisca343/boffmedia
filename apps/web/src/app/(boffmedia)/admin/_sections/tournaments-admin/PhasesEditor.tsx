@@ -40,7 +40,7 @@ export function PhasesEditor({
   return (
     <div className="mt-4 border-t border-dashed border-line pt-3">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-        <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+        <span className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
           {t("phasesHint")}
         </span>
         <div className="flex gap-2">
@@ -51,7 +51,7 @@ export function PhasesEditor({
         </div>
       </div>
       {phases.length === 0 ? (
-        <p className="font-mono text-[11px] text-txt-dim">
+        <p className="font-mono text-[0.6875rem] text-txt-dim">
           {t("noPhases")}
         </p>
       ) : (
@@ -61,7 +61,7 @@ export function PhasesEditor({
             return (
               <div key={i} className="border border-solid border-line bg-base p-2">
                 <div className="mb-2 flex items-center gap-2">
-                  <span className="w-12 font-mono text-[10px] text-txt-dim">{t("phaseN", { n: i + 1 })}</span>
+                  <span className="w-12 font-mono text-[0.625rem] text-txt-dim">{t("phaseN", { n: i + 1 })}</span>
                   <Input value={p.name} onChange={(e) => update(i, { name: e.target.value })} className="flex-1" />
                   <button type="button" onClick={() => move(i, -1)} disabled={i === 0} className="px-1 text-txt-dim transition-colors hover:text-txt disabled:opacity-30">↑</button>
                   <button type="button" onClick={() => move(i, 1)} disabled={isLast} className="px-1 text-txt-dim transition-colors hover:text-txt disabled:opacity-30">↓</button>
@@ -71,7 +71,7 @@ export function PhasesEditor({
               </div>
             )
           })}
-          <p className="font-mono text-[10px] text-txt-dim">
+          <p className="font-mono text-[0.625rem] text-txt-dim">
             {t("phaseLastHint", { format: phases[phases.length - 1].format })}
           </p>
         </div>
@@ -118,7 +118,7 @@ export function PhasesManager({
         <>
           <AvPill>{phases.length}</AvPill>
           {canAppend && (
-            <button type="button" onClick={append} className="font-mono text-[11px] text-accent transition-opacity hover:opacity-70">
+            <button type="button" onClick={append} className="font-mono text-[0.6875rem] text-accent transition-opacity hover:opacity-70">
               {t("phaseAppend")}
             </button>
           )}
@@ -152,20 +152,20 @@ export function PhasesManager({
           return (
             <div key={p.id} className={cn("border border-solid bg-base px-3 py-2", PHASE_STATUS_TONE[p.status] ?? "border-line")}>
               <div className="flex items-center justify-between gap-2">
-                <span className="truncate font-body text-[12.5px] font-semibold">
+                <span className="truncate font-body text-[0.78125rem] font-semibold">
                   {p.order}. {p.name}
                 </span>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-[9px] uppercase tracking-[0.08em]">{p.status}</span>
+                  <span className="font-mono text-[0.5625rem] uppercase tracking-[0.08em]">{p.status}</span>
                   {p.status === "pending" && (
                     <>
-                      <button type="button" onClick={() => setEditingId(p.id)} className="font-mono text-[10px] text-accent transition-opacity hover:opacity-70">{t("edit")}</button>
+                      <button type="button" onClick={() => setEditingId(p.id)} className="font-mono text-[0.625rem] text-accent transition-opacity hover:opacity-70">{t("edit")}</button>
                       <button type="button" onClick={() => setToDelete(p)} className="text-txt-dim transition-colors hover:text-bad">✕</button>
                     </>
                   )}
                 </div>
               </div>
-              <div className="mt-1 font-mono text-[10px] text-txt-dim">
+              <div className="mt-1 font-mono text-[0.625rem] text-txt-dim">
                 {p.format}{p.rounds ? ` · ${p.rounds}r` : ""} · {p.entrantCount}👤
                 {p.qualifiedCount != null ? ` · ${t("advancePerGroup")} ${p.qualifiedCount}` : ""}
                 {p.advance
@@ -219,7 +219,7 @@ function PhaseRowEditor({
   return (
     <div className="border border-solid border-accent-line bg-base p-2">
       <div className="mb-2 flex items-center gap-2">
-        <span className="w-12 font-mono text-[10px] text-txt-dim">{t("phaseN", { n: phase.order })}</span>
+        <span className="w-12 font-mono text-[0.625rem] text-txt-dim">{t("phaseN", { n: phase.order })}</span>
         <Input value={draft.name} onChange={(e) => upd({ name: e.target.value })} className="flex-1" />
       </div>
       <PhaseFields p={draft} isFirst={phase.order === 1} isLast={isLast} upd={upd} />
@@ -322,7 +322,7 @@ function PhaseFields({
               </Field>
             )}
             {advType === "top_or_record" && (
-              <p className="font-mono text-[10px] leading-[1.4] text-txt-dim sm:col-span-3">
+              <p className="font-mono text-[0.625rem] leading-[1.4] text-txt-dim sm:col-span-3">
                 {t.rich("phaseAdvanceHint", { b: (chunks) => <b className="text-txt">{chunks}</b> })}
               </p>
             )}
@@ -367,14 +367,14 @@ export function RoundScheduler({
         type="datetime-local"
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className="border border-solid border-line bg-panel px-1.5 py-0.5 font-mono text-[10.5px] text-txt-muted"
+        className="border border-solid border-line bg-panel px-1.5 py-0.5 font-mono text-[0.65625rem] text-txt-muted"
         title={t("roundScheduler")}
       />
       <button
         type="button"
         disabled={busy}
         onClick={apply}
-        className="font-mono text-[10px] text-accent transition-opacity hover:opacity-70 disabled:opacity-40"
+        className="font-mono text-[0.625rem] text-accent transition-opacity hover:opacity-70 disabled:opacity-40"
       >
         {value ? t("schedule") : existing ? t("clearSchedule") : t("schedule")}
       </button>

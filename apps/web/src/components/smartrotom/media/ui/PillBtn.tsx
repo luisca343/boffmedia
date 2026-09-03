@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
 const base =
-  "inline-flex items-center gap-1.5 h-9 text-[13px] font-semibold rounded-mw-pill text-mw-fg " +
+  "inline-flex items-center gap-1.5 h-9 text-[0.8125rem] font-semibold rounded-mw-pill text-mw-fg " +
   "transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 " +
   "focus-visible:ring-mw-accent focus-visible:ring-offset-2 focus-visible:ring-offset-mw-bg " +
   "bg-[color-mix(in_srgb,rgb(var(--mw-accent))_8%,rgb(var(--mw-800)))] " +
@@ -26,7 +26,7 @@ type AProps = CommonProps & { href: string } & Omit<ComponentProps<typeof Link>,
 
 export function PillBtn(props: BtnProps | AProps) {
   const { active, iconOnly, className, children } = props
-  const classes = cn(base, iconOnly ? "w-9 justify-center px-0" : "px-[14px]", active && on, className)
+  const classes = cn(base, iconOnly ? "w-9 justify-center px-0" : "px-[0.875rem]", active && on, className)
 
   if ("href" in props && props.href != null) {
     const { href, active: _a, iconOnly: _i, className: _c, children: _ch, ...rest } = props

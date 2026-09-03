@@ -86,18 +86,18 @@ export function BulkBar() {
   }
 
   return (
-    <div className="pc-glass fixed bottom-[18px] left-1/2 z-[75] flex max-w-[94vw] -translate-x-1/2 animate-pc-slide-up items-center gap-2 rounded-2xl border-pc-line-strong p-[9px] font-pc text-pc-fg shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)] motion-reduce:animate-none">
+    <div className="pc-glass fixed bottom-[1.125rem] left-1/2 z-[75] flex max-w-[94vw] -translate-x-1/2 animate-pc-slide-up items-center gap-2 rounded-2xl border-pc-line-strong p-[0.5625rem] font-pc text-pc-fg shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)] motion-reduce:animate-none">
       <span className="flex items-center gap-2 pl-1.5 pr-2">
-        <span className="flex h-[26px] min-w-[26px] items-center justify-center rounded-lg bg-pc-cyan px-1.5 font-pc-mono text-[13px] font-extrabold text-[#06222a]">
+        <span className="flex h-[1.625rem] min-w-[1.625rem] items-center justify-center rounded-lg bg-pc-cyan px-1.5 font-pc-mono text-[0.8125rem] font-extrabold text-[#06222a]">
           {n}
         </span>
-        <span className="whitespace-nowrap text-[12.5px] text-pc-fg-muted">{t("bulk.selected", { count: n })}</span>
+        <span className="whitespace-nowrap text-[0.78125rem] text-pc-fg-muted">{t("bulk.selected", { count: n })}</span>
       </span>
 
       <span className="h-6 w-px bg-pc-line" />
 
       {isRunning && progress ? (
-        <span className="px-2 font-pc-mono text-[12.5px] text-pc-fg-muted">
+        <span className="px-2 font-pc-mono text-[0.78125rem] text-pc-fg-muted">
           {progress.label} — {progress.done}/{progress.total}
         </span>
       ) : (
@@ -118,7 +118,7 @@ export function BulkBar() {
               <Icon name="tag" size={16} />
             </Button>
             {menu === "tag" && (
-              <div className="pc-glass absolute bottom-[46px] left-1/2 w-[220px] -translate-x-1/2 rounded-xl p-2.5 shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)]">
+              <div className="pc-glass absolute bottom-[2.875rem] left-1/2 w-[13.75rem] -translate-x-1/2 rounded-xl p-2.5 shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)]">
                 <Input
                   value={tag}
                   onChange={(e) => setTag(e.target.value)}
@@ -147,7 +147,7 @@ export function BulkBar() {
               {t("bulk.moveTo")}…
             </Button>
             {menu === "move" && (
-              <div className="pc-glass absolute bottom-[46px] left-0 max-h-[300px] w-[240px] overflow-auto rounded-xl p-[7px] shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)]">
+              <div className="pc-glass absolute bottom-[2.875rem] left-0 max-h-[18.75rem] w-[15rem] overflow-auto rounded-xl p-[0.4375rem] shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)]">
                 {Array.from({ length: TOTAL_BOXES }, (_, i) => {
                   const filled = boxes[i].filter(Boolean).length
                   const free = POKEMON_PER_BOX - filled
@@ -160,10 +160,10 @@ export function BulkBar() {
                       className="w-full justify-between"
                     >
                       <span className="flex items-center gap-2">
-                        <span className="font-pc-mono text-[11px] text-pc-fg-subtle">{i + 1}</span>
+                        <span className="font-pc-mono text-[0.6875rem] text-pc-fg-subtle">{i + 1}</span>
                         {boxName(boxMeta, i)}
                       </span>
-                      <span className="text-[10.5px] text-pc-fg-subtle">{free} {t("filters.all")}</span>
+                      <span className="text-[0.65625rem] text-pc-fg-subtle">{free} {t("filters.all")}</span>
                     </Button>
                   )
                 })}

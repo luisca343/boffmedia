@@ -62,7 +62,7 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
       >
         <Icon name="bell" size={18} />
         {unread > 0 && (
-          <span className="absolute -right-[5px] -top-[5px] grid h-[17px] min-w-[17px] place-items-center border-2 border-base bg-accent px-1 font-mono text-[10px] font-extrabold leading-none text-accent-ink cut cut-edge-slant [--cut:3px] [--cut-w:2px] [--cut-line:var(--base)]">
+          <span className="absolute -right-[0.3125rem] -top-[0.3125rem] grid h-[1.0625rem] min-w-[1.0625rem] place-items-center border-2 border-base bg-accent px-1 font-mono text-[0.625rem] font-extrabold leading-none text-accent-ink cut cut-edge-slant [--cut:3px] [--cut-w:2px] [--cut-line:var(--base)]">
             {unread}
           </span>
         )}
@@ -72,10 +72,10 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
         <div
           role="menu"
           aria-label={tNav("notifications")}
-          className="cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:10px] absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[340px] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
+          className="cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:10px] absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[21.25rem] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
         >
-          <header className="flex items-center gap-2 border-b border-line px-[15px] pb-[11px] pt-[13px]">
-            <b className="flex-1 font-display text-[13px] font-bold uppercase leading-none tracking-[0.04em] text-txt">
+          <header className="flex items-center gap-2 border-b border-line px-[0.9375rem] pb-[0.6875rem] pt-[0.8125rem]">
+            <b className="flex-1 font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.04em] text-txt">
               {tNav("notifications")}
             </b>
             {items.length > 0 && (
@@ -87,7 +87,7 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
                       setItems((a) => a.map((n) => ({ ...n, read: true })))
                       onMarkAllRead?.()
                     }}
-                    className="font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors duration-[140ms] hover:text-accent"
+                    className="font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors duration-[140ms] hover:text-accent"
                   >
                     {tNav("markRead")}
                   </button>
@@ -98,7 +98,7 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
                     setItems([])
                     onClear?.()
                   }}
-                  className="font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors duration-[140ms] hover:text-accent"
+                  className="font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-colors duration-[140ms] hover:text-accent"
                 >
                   {tNav("clear")}
                 </button>
@@ -107,22 +107,22 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
           </header>
 
           {items.length === 0 ? (
-            <div className="flex flex-col items-center gap-2.5 px-4 py-[34px] text-txt-dim">
+            <div className="flex flex-col items-center gap-2.5 px-4 py-[2.125rem] text-txt-dim">
               <Icon name="bell" size={26} />
-              <span className="font-body text-[13px] font-medium leading-none">{tNav("noNotifications")}</span>
+              <span className="font-body text-[0.8125rem] font-medium leading-none">{tNav("noNotifications")}</span>
             </div>
           ) : (
-            <div className="max-h-[280px] overflow-y-auto">
+            <div className="max-h-[17.5rem] overflow-y-auto">
               {items.map((n) => (
                 <div
                   key={n.id}
                   className={cn(
-                    "group/notif flex items-start gap-[11px] border-b border-line px-[15px] py-3 transition-colors duration-[140ms] hover:bg-panel-2",
+                    "group/notif flex items-start gap-[0.6875rem] border-b border-line px-[0.9375rem] py-3 transition-colors duration-[140ms] hover:bg-panel-2",
                     n.read && "opacity-60",
                   )}
                 >
                   <span
-                    className="mt-px grid h-[30px] w-[30px] shrink-0 place-items-center border border-solid cut cut-edge-slant [--cut:5px]"
+                    className="mt-px grid h-[1.875rem] w-[1.875rem] shrink-0 place-items-center border border-solid cut cut-edge-slant [--cut:5px]"
                     style={{
                       color: TONE_VAR[n.tone],
                       background: `color-mix(in srgb, ${TONE_VAR[n.tone]} 12%, transparent)`,
@@ -133,8 +133,8 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
                     <Icon name={n.icon} size={15} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="font-body text-[13px] leading-[1.4] text-txt">{n.text}</p>
-                    <time className="mt-[3px] block font-mono text-[10.5px] font-medium leading-none tracking-[0.05em] text-txt-dim">
+                    <p className="font-body text-[0.8125rem] leading-[1.4] text-txt">{n.text}</p>
+                    <time className="mt-[3px] block font-mono text-[0.65625rem] font-medium leading-none tracking-[0.05em] text-txt-dim">
                       {n.time}
                     </time>
                   </div>
@@ -145,7 +145,7 @@ export function NotifMenu({ initialItems, onMarkAllRead, onDismiss, onClear }: N
                       setItems((a) => a.filter((x) => x.id !== n.id))
                       onDismiss?.(n.id)
                     }}
-                    className="-mr-1 -mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center text-txt-dim opacity-0 transition-[color,opacity] duration-[140ms] hover:text-bad group-hover/notif:opacity-100"
+                    className="-mr-1 -mt-0.5 grid h-[1.375rem] w-[1.375rem] shrink-0 place-items-center text-txt-dim opacity-0 transition-[color,opacity] duration-[140ms] hover:text-bad group-hover/notif:opacity-100"
                   >
                     <Icon name="x" size={12} />
                   </button>

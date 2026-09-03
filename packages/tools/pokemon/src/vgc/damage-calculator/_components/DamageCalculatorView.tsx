@@ -67,7 +67,7 @@ function DamageCalcShell() {
               options={regs.map((r) => ({ value: r.formatId, label: r.name }))}
               // `Select` is full-width by default; in a bar that eats the row and
               // wraps the buttons onto a second line, doubling the bar's height.
-              className="w-auto min-w-[190px]"
+              className="w-auto min-w-[11.875rem]"
             />
           )}
           <Button size="sm" icon={linkCopied ? "check" : "link"} onClick={copyShareLink}>
@@ -80,7 +80,7 @@ function DamageCalcShell() {
       </ToolStrip>
 
       {/* Body */}
-      <div className="flex-1 px-[clamp(18px,2.4vw,40px)] pb-[60px] pt-5">
+      <div className="flex-1 px-[clamp(1.125rem,2.4vw,2.5rem)] pb-[3.75rem] pt-5">
         {tab === "combate" && <CombatView />}
         {tab === "matriz" && (
           <Suspense fallback={<TabFallback />}>

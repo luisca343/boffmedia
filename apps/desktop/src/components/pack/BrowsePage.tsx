@@ -451,7 +451,7 @@ export function BrowsePage({
             beside it rather than with the top of its own line box. */}
         <BackLink label={t("backButton")} onBack={onBack} className="py-[3px]" />
         <span className="flex-1" />
-        <div className="w-full max-w-[420px]">
+        <div className="w-full max-w-[26.25rem]">
           <Field label={t("linkLabel")} hint={t("linkHint")}>
             <div className="flex gap-2">
               <Input
@@ -499,7 +499,7 @@ export function BrowsePage({
       />
 
       {progress && (
-        <span className="flex shrink-0 items-center gap-2 font-mono text-[11px] text-txt-dim">
+        <span className="flex shrink-0 items-center gap-2 font-mono text-[0.6875rem] text-txt-dim">
           <Spinner size={12} /> {progress}
         </span>
       )}

@@ -20,9 +20,9 @@ const TONE: Record<ArTone, string> = {
 }
 
 const SIZE = {
-  sm: "px-[7px] py-[3px] text-[10px]",
-  md: "px-[9px] py-1 text-[11px]",
-  lg: "px-[11px] py-[5px] text-[12px]",
+  sm: "px-[0.4375rem] py-[3px] text-[0.625rem]",
+  md: "px-[0.5625rem] py-1 text-[0.6875rem]",
+  lg: "px-[0.6875rem] py-[0.3125rem] text-[0.75rem]",
 } as const
 
 export function Tag({ children, tone = "cyan", size = "sm", className }: ArTagProps) {

@@ -190,7 +190,7 @@ export function LiveBattle({ state, pov, mode, formatLabel, roomLabel, onChoice,
         const label = tab === 'actions' ? t('battle.rail.actions') : tab === 'log' ? t('battle.rail.log') : t('battle.rail.chat');
         return (
           <button key={tab} type="button" role="tab" aria-selected={on} tabIndex={on ? 0 : -1} onClick={() => setMobileTab(tab)}
-            className={cn(BSIM_FOCUS, 'relative flex flex-1 items-center justify-center gap-2 font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] transition-colors duration-[140ms] focus-visible:outline-offset-[-3px]',
+            className={cn(BSIM_FOCUS, 'relative flex flex-1 items-center justify-center gap-2 font-mono text-[0.65625rem] font-semibold uppercase tracking-[0.08em] transition-colors duration-[140ms] focus-visible:outline-offset-[-3px]',
               on ? 'text-txt [box-shadow:inset_0_2px_0_var(--accent)]' : 'text-txt-dim')}>
             {label}
             {tab === 'chat' && unread > 0 && !on && <i aria-hidden className="h-2 w-2 bg-accent [clip-path:circle(50%)]" />}

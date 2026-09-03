@@ -29,7 +29,7 @@ export function Modal({ open, onClose, label, children, className }: ModalProps)
       scope={RK_SCOPE}
       scrimClassName="z-[200] flex items-start justify-center bg-black/70 px-3 pb-3 pt-[5%] backdrop-blur-sm"
       className={cn(
-        "w-full max-w-[560px] animate-rk-fadeup overflow-hidden rounded-rk border border-rk-line-strong",
+        "w-full max-w-[35rem] animate-rk-fadeup overflow-hidden rounded-rk border border-rk-line-strong",
         "bg-rk-bg shadow-[0_30px_80px_-20px_rgb(0_0_0/.8)] motion-reduce:animate-none",
         className,
       )}

@@ -15,7 +15,7 @@ export function Crumbs({ items, className }: CrumbsProps) {
   return (
     <nav
       className={cn(
-        "flex items-center gap-[10px] font-mono text-[11px] font-medium leading-none uppercase tracking-[0.1em] text-txt-dim",
+        "flex items-center gap-[0.625rem] font-mono text-[0.6875rem] font-medium leading-none uppercase tracking-[0.1em] text-txt-dim",
         className,
       )}
     >

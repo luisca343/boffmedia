@@ -19,10 +19,10 @@ export function HpGauge({ current, max, label, resetLabel, onChange, onReset }: 
   return (
     <div className="grid gap-1.5">
       <div className="flex items-baseline gap-2">
-        <span className="flex-none font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{label}</span>
+        <span className="flex-none font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{label}</span>
         {onChange ? (
           <Input
-            className="w-[58px] text-right font-mono text-[12px]"
+            className="w-[3.625rem] text-right font-mono text-[0.75rem]"
             type="number"
             min={1}
             max={max}
@@ -31,23 +31,23 @@ export function HpGauge({ current, max, label, resetLabel, onChange, onReset }: 
             onChange={(e) => onChange(Math.min(max, Math.max(1, parseInt(e.target.value, 10) || 1)))}
           />
         ) : (
-          <span className="font-mono text-[12px]/none font-semibold text-txt-muted">{current}</span>
+          <span className="font-mono text-[0.75rem]/none font-semibold text-txt-muted">{current}</span>
         )}
-        <span className="font-mono text-[12px]/none font-semibold text-txt-muted">/ {max}</span>
-        <span className="font-mono text-[12px]/none font-semibold" style={{ color: tone }}>
+        <span className="font-mono text-[0.75rem]/none font-semibold text-txt-muted">/ {max}</span>
+        <span className="font-mono text-[0.75rem]/none font-semibold" style={{ color: tone }}>
           {pct.toFixed(0)}%
         </span>
         {onReset && resetLabel && (
           <button
             type="button"
             onClick={onReset}
-            className="ml-auto border-0 bg-transparent font-mono text-[10px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim hover:text-accent-bright"
+            className="ml-auto border-0 bg-transparent font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim hover:text-accent-bright"
           >
             {resetLabel}
           </button>
         )}
       </div>
-      <div className="h-[9px] overflow-hidden border border-solid border-line-2 bg-base">
+      <div className="h-[0.5625rem] overflow-hidden border border-solid border-line-2 bg-base">
         <div className="h-full transition-[width,background] duration-[260ms]" style={{ width: pct + "%", background: tone }} />
       </div>
     </div>

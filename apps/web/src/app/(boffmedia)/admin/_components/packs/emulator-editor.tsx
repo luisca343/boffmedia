@@ -451,10 +451,10 @@ export function EmulatorEditor({
             <Icon name="edit" size={15} />
           </span>
           <div>
-            <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+            <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
               {t("versionIdentity")}
             </h3>
-            <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+            <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
               {t("versionIdentityLead")}
             </p>
           </div>
@@ -472,10 +472,10 @@ export function EmulatorEditor({
             <Icon name="gamepad" size={15} />
           </span>
           <div>
-            <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+            <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
               {t("emulator.kindSection")}
             </h3>
-            <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+            <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
               {t("emulator.kindSectionLead")}
             </p>
           </div>
@@ -501,10 +501,10 @@ export function EmulatorEditor({
             <Icon name="cube" size={15} />
           </span>
           <div>
-            <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+            <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
               {t("emulator.romSection")}
             </h3>
-            <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+            <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
               {t("emulator.romSectionLead")}
             </p>
           </div>
@@ -558,21 +558,21 @@ export function EmulatorEditor({
                   </Field>
 
                   {!loadingLibrary && romsForPlatform.length === 0 && (
-                    <p className="text-[11px] leading-[1.45] text-txt-muted">
+                    <p className="text-[0.6875rem] leading-[1.45] text-txt-muted">
                       {t("emulator.romLibraryEmpty", { platform: ROM_PLATFORM[kind].toUpperCase() })}
                     </p>
                   )}
                 </>
               ) : (
                 <>
-                  <p className="border-l-2 border-solid border-warn bg-panel px-3 py-2 text-[11px] leading-[1.45] text-txt-muted">
+                  <p className="border-l-2 border-solid border-warn bg-panel px-3 py-2 text-[0.6875rem] leading-[1.45] text-txt-muted">
                     {t("emulator.romSourceFileWarning")}
                   </p>
 
                   <div className="flex flex-wrap items-end gap-3">
-                    <div className="flex-1 min-w-[200px]">
+                    <div className="flex-1 min-w-[12.5rem]">
                       <Field label={t("emulator.romFile")}>
-                        <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+                        <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[0.6875rem] text-txt-dim truncate">
                           {romFile?.file.name || "No file selected"}
                         </div>
                       </Field>
@@ -599,7 +599,7 @@ export function EmulatorEditor({
               )}
 
               {romSpec && (
-                <div className="text-[11px] font-mono text-txt-muted">
+                <div className="text-[0.6875rem] font-mono text-txt-muted">
                   {t("emulator.romInfo", {
                     size: (romSpec.size / (1024 * 1024)).toFixed(1),
                     hash: romSpec.sha512.slice(0, 16) + "…",
@@ -630,9 +630,9 @@ export function EmulatorEditor({
         onChange={(on) => setUseRomhack(on)}
       >
         <div className="flex flex-wrap items-end gap-3">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-[12.5rem]">
             <Field label={t("emulator.baseFile")}>
-              <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+              <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[0.6875rem] text-txt-dim truncate">
                 {baseFile?.file.name || "No file selected"}
               </div>
             </Field>
@@ -657,9 +657,9 @@ export function EmulatorEditor({
         </div>
 
         <div className="flex flex-wrap items-end gap-3">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-[12.5rem]">
             <Field label={t("emulator.patchFile")}>
-              <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+              <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[0.6875rem] text-txt-dim truncate">
                 {patchFile?.name || "No file selected"}
               </div>
             </Field>
@@ -695,9 +695,9 @@ export function EmulatorEditor({
         </Field>
 
         <div className="flex flex-wrap items-end gap-3">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-[12.5rem]">
             <Field label={t("emulator.patchedFile")}>
-              <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+              <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[0.6875rem] text-txt-dim truncate">
                 {patchedRomFile?.file.name || "No file selected"}
               </div>
             </Field>
@@ -743,9 +743,9 @@ export function EmulatorEditor({
         {startingSave && startingSave.file.size !== 0 && (
           <>
             <div className="flex flex-wrap items-end gap-3">
-              <div className="flex-1 min-w-[200px]">
+              <div className="flex-1 min-w-[12.5rem]">
                 <Field label={t("emulator.saveFile")}>
-                  <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[11px] text-txt-dim truncate">
+                  <div className="rounded border border-solid border-line bg-panel px-3 py-2 font-mono text-[0.6875rem] text-txt-dim truncate">
                     {startingSave!.name || "No file selected"}
                   </div>
                 </Field>
@@ -788,10 +788,10 @@ export function EmulatorEditor({
             <Icon name="sliders" size={15} />
           </span>
           <div>
-            <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+            <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
               {t("emulator.advancedSection")}
             </h3>
-            <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+            <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
               {t("emulator.advancedSectionLead")}
             </p>
           </div>
@@ -816,10 +816,10 @@ export function EmulatorEditor({
             <Icon name="gift" size={15} />
           </span>
           <div>
-            <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+            <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
               {t("emulator.biosSection")}
             </h3>
-            <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+            <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
               {t("emulator.biosSectionLead")}
             </p>
           </div>
@@ -852,10 +852,10 @@ export function EmulatorEditor({
                   key={idx}
                   className="flex items-center gap-3 border border-solid border-line bg-panel px-3 py-2"
                 >
-                  <span className="truncate font-mono text-[11px] text-txt-muted">
+                  <span className="truncate font-mono text-[0.6875rem] text-txt-muted">
                     {extra.path}
                   </span>
-                  <span className="ml-auto shrink-0 font-mono text-[11px] text-txt-dim">
+                  <span className="ml-auto shrink-0 font-mono text-[0.6875rem] text-txt-dim">
                     {Math.max(1, Math.round(extra.size / 1024))} KB
                   </span>
                   {/* A required entry blocks launch until the player provides
@@ -864,7 +864,7 @@ export function EmulatorEditor({
                   <button
                     type="button"
                     className={cn(
-                      "shrink-0 border border-solid px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.06em]",
+                      "shrink-0 border border-solid px-2 py-0.5 font-mono text-[0.625rem] uppercase tracking-[0.06em]",
                       extra.required
                         ? "border-warn/50 text-warn"
                         : "border-line text-txt-dim",
@@ -879,7 +879,7 @@ export function EmulatorEditor({
                   </button>
                   <button
                     type="button"
-                    className="shrink-0 font-mono text-[11px] text-txt-dim hover:text-bad"
+                    className="shrink-0 font-mono text-[0.6875rem] text-txt-dim hover:text-bad"
                     onClick={() => setExtraFiles((current) => current.filter((_, i) => i !== idx))}
                   >
                     ×
@@ -899,37 +899,37 @@ export function EmulatorEditor({
               <Icon name="check" size={15} />
             </span>
             <div>
-              <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+              <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
                 {t("emulator.reviewSection")}
               </h3>
-              <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+              <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
                 {t("emulator.reviewSectionLead")}
               </p>
             </div>
           </div>
 
-          <dl className="grid gap-2 text-[13px]">
+          <dl className="grid gap-2 text-[0.8125rem]">
             <div className="flex items-baseline gap-3">
-              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+              <dt className="w-40 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
                 {t("versionName")}
               </dt>
               <dd className="text-txt">{name || "—"}</dd>
             </div>
             <div className="flex items-baseline gap-3">
-              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+              <dt className="w-40 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
                 {t("emulator.kind")}
               </dt>
               <dd className="text-txt">{kind === "mgba" ? "mGBA" : "melonDS"}</dd>
             </div>
             <div className="flex items-baseline gap-3">
-              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+              <dt className="w-40 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
                 {t("emulator.romHint")}
               </dt>
               <dd className="text-txt">{romHint || "—"}</dd>
             </div>
             {!useRomhack && (
               <div className="flex items-baseline gap-3">
-                <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                <dt className="w-40 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
                   {t("emulator.romSourceLabel")}
                 </dt>
                 <dd className="text-txt">
@@ -940,33 +940,33 @@ export function EmulatorEditor({
               </div>
             )}
             <div className="flex items-baseline gap-3">
-              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+              <dt className="w-40 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
                 {t("emulator.romPath")}
               </dt>
-              <dd className="font-mono text-[12px] text-txt">
+              <dd className="font-mono text-[0.75rem] text-txt">
                 {useRomhack ? patchedRomPath : romPath}
               </dd>
             </div>
             {useRomhack && (
               <div className="flex items-baseline gap-3">
-                <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                <dt className="w-40 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
                   {t("emulator.patchFormat")}
                 </dt>
                 <dd className="text-txt">{patchFormat.toUpperCase()}</dd>
               </div>
             )}
             <div className="flex items-baseline gap-3">
-              <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+              <dt className="w-40 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
                 {t("emulator.biosSection")}
               </dt>
               <dd className="text-txt">{extraFiles.length}</dd>
             </div>
             {startingSave && (
               <div className="flex items-baseline gap-3">
-                <dt className="w-40 shrink-0 font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+                <dt className="w-40 shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
                   {t("emulator.startingSave")}
                 </dt>
-                <dd className="font-mono text-[12px] text-txt">{savePath}</dd>
+                <dd className="font-mono text-[0.75rem] text-txt">{savePath}</dd>
               </div>
             )}
           </dl>

@@ -63,10 +63,10 @@ export function ProjectDescription({
     // cannot restyle the page around it.
     <div
       className={cn(
-        "font-body text-[13px] leading-[1.6] text-txt-dim",
-        "[&_h1]:mb-2 [&_h1]:mt-4 [&_h1]:font-display [&_h1]:text-[18px] [&_h1]:font-bold [&_h1]:uppercase [&_h1]:tracking-[0.03em] [&_h1]:text-txt",
-        "[&_h2]:mb-2 [&_h2]:mt-4 [&_h2]:font-display [&_h2]:text-[16px] [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-[0.03em] [&_h2]:text-txt",
-        "[&_h3]:mb-1 [&_h3]:mt-3 [&_h3]:font-display [&_h3]:text-[14px] [&_h3]:font-bold [&_h3]:text-txt",
+        "font-body text-[0.8125rem] leading-[1.6] text-txt-dim",
+        "[&_h1]:mb-2 [&_h1]:mt-4 [&_h1]:font-display [&_h1]:text-[1.125rem] [&_h1]:font-bold [&_h1]:uppercase [&_h1]:tracking-[0.03em] [&_h1]:text-txt",
+        "[&_h2]:mb-2 [&_h2]:mt-4 [&_h2]:font-display [&_h2]:text-[1rem] [&_h2]:font-bold [&_h2]:uppercase [&_h2]:tracking-[0.03em] [&_h2]:text-txt",
+        "[&_h3]:mb-1 [&_h3]:mt-3 [&_h3]:font-display [&_h3]:text-[0.875rem] [&_h3]:font-bold [&_h3]:text-txt",
         "[&_h4]:mb-1 [&_h4]:mt-3 [&_h4]:font-bold [&_h4]:text-txt [&_h5]:font-bold [&_h5]:text-txt [&_h6]:font-bold [&_h6]:text-txt",
         "[&_p]:my-2",
         "[&_strong]:font-bold [&_strong]:text-txt [&_em]:italic",
@@ -81,7 +81,7 @@ export function ProjectDescription({
         "[&_img]:my-2 [&_img]:inline-block [&_img]:h-auto [&_img]:max-w-full [&_img]:rounded",
         "[&_hr]:my-4 [&_hr]:border-line",
         "[&_blockquote]:my-2 [&_blockquote]:border-l-2 [&_blockquote]:border-solid [&_blockquote]:border-accent-line [&_blockquote]:pl-3 [&_blockquote]:italic",
-        "[&_code]:rounded [&_code]:bg-panel-2 [&_code]:px-1 [&_code]:py-[1px] [&_code]:font-mono [&_code]:text-[12px]",
+        "[&_code]:rounded [&_code]:bg-panel-2 [&_code]:px-1 [&_code]:py-[1px] [&_code]:font-mono [&_code]:text-[0.75rem]",
         "[&_pre]:my-2 [&_pre]:overflow-x-auto [&_pre]:rounded [&_pre]:bg-panel-2 [&_pre]:p-2",
         "[&_pre_code]:bg-transparent [&_pre_code]:p-0",
         // The table itself scrolls, not the page — same reason as images.

@@ -36,7 +36,7 @@ export function KeysView() {
   }
 
   return (
-    <main className="pb-[10px]">
+    <main className="pb-[0.625rem]">
       <ToolHeader
         title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
         sub={t("sub")}
@@ -49,8 +49,8 @@ export function KeysView() {
         }
       />
 
-      <ToolBar className="mb-[22px]" note={t("resultCount", { n: list.length })}>
-        <SearchInput value={q} onChange={setQ} placeholder={t("searchPlaceholder")} className="min-w-[230px] flex-1" />
+      <ToolBar className="mb-[1.375rem]" note={t("resultCount", { n: list.length })}>
+        <SearchInput value={q} onChange={setQ} placeholder={t("searchPlaceholder")} className="min-w-[14.375rem] flex-1" />
         <Seg
           value={filter}
           onChange={(v) => setFilter(v as "available" | "all")}
@@ -63,7 +63,7 @@ export function KeysView() {
           value={sort}
           onChange={(v) => setSort(v as typeof sort)}
           ariaLabel={t("sortLabel")}
-          className="w-auto min-w-[160px]"
+          className="w-auto min-w-[10rem]"
           options={[
             { value: "estado", label: t("sortEstado") },
             { value: "stock", label: t("sortStock") },
@@ -74,11 +74,11 @@ export function KeysView() {
 
       {/* ── grid ───────────────────────────────────────────────────────────── */}
       {loading ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-[16px]">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(18.75rem,1fr))] gap-[1rem]">
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="border border-line bg-panel">
               <Skeleton h={130} className="border-0" />
-              <div className="flex flex-col gap-[10px] p-[16px]">
+              <div className="flex flex-col gap-[0.625rem] p-[1rem]">
                 <Skeleton w="70%" h={18} />
                 <Skeleton w="40%" h={12} />
               </div>
@@ -86,7 +86,7 @@ export function KeysView() {
           ))}
         </div>
       ) : list.length ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-[16px] max-[600px]:grid-cols-1">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(18.75rem,1fr))] gap-[1rem] max-[600px]:grid-cols-1">
           {list.map((item) => (
             <KvCard
               key={`${item.name}-${item.given}`}

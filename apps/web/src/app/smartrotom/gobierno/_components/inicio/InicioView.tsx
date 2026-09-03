@@ -37,7 +37,7 @@ export function InicioView() {
         dep="civic"
         right={
           <Button tone="ghost" icon="command" onClick={() => setCmdOpen(true)}>
-            {t("common.search")} <span className="font-gt-mono text-[10px] opacity-70">⌘K</span>
+            {t("common.search")} <span className="font-gt-mono text-[0.625rem] opacity-70">⌘K</span>
           </Button>
         }
       />

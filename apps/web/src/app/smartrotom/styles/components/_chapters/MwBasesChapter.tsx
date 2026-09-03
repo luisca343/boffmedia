@@ -42,7 +42,7 @@ function TintRamp() {
       {TINTS.map(([cls, label]) => (
         <div key={cls} className="rounded-mw-lg border border-mw-line bg-mw-900 p-2">
           <i className={cn("block h-12 rounded-mw-md", cls)} />
-          <span className="mt-2 block font-mono text-[10px] font-medium text-mw-fg-subtle">{label}</span>
+          <span className="mt-2 block font-mono text-[0.625rem] font-medium text-mw-fg-subtle">{label}</span>
         </div>
       ))}
     </div>
@@ -52,13 +52,13 @@ function TintRamp() {
 const TYPE_ROWS: readonly (readonly [string, React.ReactNode])[] = [
   [
     "Display / Orbitron 800 / 26–34px",
-    <span key="a" className="font-mw-display text-[30px] font-extrabold leading-[1.15] tracking-[-0.01em] text-mw-fg">
+    <span key="a" className="font-mw-display text-[1.875rem] font-extrabold leading-[1.15] tracking-[-0.01em] text-mw-fg">
       Directos en curso
     </span>,
   ],
   [
     "Título / Orbitron 700 / 18–22px",
-    <span key="b" className="font-mw-display text-[20px] font-bold leading-[1.2] text-mw-fg">
+    <span key="b" className="font-mw-display text-[1.25rem] font-bold leading-[1.2] text-mw-fg">
       Seguir viendo
     </span>,
   ],
@@ -77,13 +77,13 @@ const TYPE_ROWS: readonly (readonly [string, React.ReactNode])[] = [
   ],
   [
     "Contador / mono 700 / 11px",
-    <span key="e" className="font-mono text-[11px] font-bold text-mw-fg">
+    <span key="e" className="font-mono text-[0.6875rem] font-bold text-mw-fg">
       12 480 espectadores · 27:39
     </span>,
   ],
   [
     "Wordmark / Lexend Mega 800",
-    <span key="f" className="font-mw-wide text-[18px] font-extrabold tracking-[-0.02em] text-mw-accent">
+    <span key="f" className="font-mw-wide text-[1.125rem] font-extrabold tracking-[-0.02em] text-mw-accent">
       Mewtube
     </span>,
   ],
@@ -176,11 +176,11 @@ export function MwBasesChapter() {
         }
       >
         <Sample app="mw" media="mewtube" title="Escala" code="Inter · Orbitron · Lexend Mega" col>
-          <div className="grid w-full gap-[18px]">
+          <div className="grid w-full gap-[1.125rem]">
             {TYPE_ROWS.map(([meta, node]) => (
               <div
                 key={meta}
-                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-mw-line pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[210px_1fr] sm:gap-[22px]"
+                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-mw-line pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[13.125rem_1fr] sm:gap-[1.375rem]"
               >
                 <span className={cn(MONO_LABEL, "normal-case tracking-[0.06em] text-mw-fg-faint")}>{meta}</span>
                 {node}
@@ -195,7 +195,7 @@ export function MwBasesChapter() {
           title="Wordmark · Mewtube"
           code="font-mw-wide"
         >
-          <span className="font-mw-wide text-[26px] font-extrabold tracking-[-0.03em] text-mw-accent">Mewtube</span>
+          <span className="font-mw-wide text-[1.625rem] font-extrabold tracking-[-0.03em] text-mw-accent">Mewtube</span>
         </Sample>
 
         <Sample
@@ -210,7 +210,7 @@ export function MwBasesChapter() {
             </>
           }
         >
-          <span className="font-mw-wide text-[26px] font-extrabold tracking-[-0.03em] text-mw-accent">Mewtwitch</span>
+          <span className="font-mw-wide text-[1.625rem] font-extrabold tracking-[-0.03em] text-mw-accent">Mewtwitch</span>
         </Sample>
       </Section>
     </>

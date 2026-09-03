@@ -20,7 +20,7 @@ export function TypeBadge({
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-wp-pill font-wp font-extrabold capitalize tracking-[.02em]",
-        size === "sm" ? "px-[7px] py-0.5 text-[10px]" : "px-[9px] py-[3px] text-[11px]",
+        size === "sm" ? "px-[0.4375rem] py-0.5 text-[0.625rem]" : "px-[0.5625rem] py-[3px] text-[0.6875rem]",
         className,
       )}
       style={{ background: c, color: t, boxShadow: `0 2px 8px -2px ${c}99` }}

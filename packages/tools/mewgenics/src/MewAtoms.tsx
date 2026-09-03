@@ -18,7 +18,7 @@ function MewTok({ v }: { v: string }) {
   const src = mewTokenSrc(v)
   const ico = MEW_TOKEN_ICON[String(v || "").toLowerCase()]
   return (
-    <span title={label} className="mx-px inline-flex items-center gap-1 align-baseline font-mono text-[10px]/[1.5] font-bold text-[color:inherit]">
+    <span title={label} className="mx-px inline-flex items-center gap-1 align-baseline font-mono text-[0.625rem]/[1.5] font-bold text-[color:inherit]">
       {src ? (
         <img src={src} alt="" width={12} height={12} className="flex-none object-contain" aria-hidden />
       ) : ico ? (
@@ -33,7 +33,7 @@ export function MewText({ children, muted, className }: { children?: React.React
   const raw = children == null ? "" : String(children)
   if (!raw || mewIsRawKey(raw)) return null
   return (
-    <div className={cn("flex flex-col gap-[3px] text-[14px]/[1.52] font-medium [font-family:var(--mwf-hand)] min-[1600px]:text-[15.5px] max-w-[76ch]", muted && "text-[13px] text-[color:var(--mwp-ink-soft)] min-[1600px]:text-[14px]", className)}>
+    <div className={cn("flex flex-col gap-[3px] text-[0.875rem]/[1.52] font-medium [font-family:var(--mwf-hand)] max-w-[76ch]", muted && "text-[0.8125rem] text-[color:var(--mwp-ink-soft)]", className)}>
       {raw.split(/\n/).map((ln, li) => (
         <span className="block" key={li}>
           {mewParseText(ln).map((seg, i) => {
@@ -136,7 +136,7 @@ export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artPr
   )
 }
 
-const STICKER = "inline-flex items-center gap-1.5 border-2 border-solid px-2.5 pb-1 pt-[5px] text-[11px]/none font-bold [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-xs)]"
+const STICKER = "inline-flex items-center gap-1.5 border-2 border-solid px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-xs)]"
 
 export function MewRarity({ rarity }: { rarity: string }) {
   const t = useToolT(MEWGENICS_NS)
@@ -165,7 +165,7 @@ export function MewKind({ kind }: { kind: string }) {
   const t = useToolT(MEWGENICS_NS)
   const kindLabel = MEW_KIND_LABEL[kind] ? t(`data.kind.${kind}`) : mewHuman(kind)
   return (
-    <span className="inline-flex items-center gap-[5px] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[5px] text-[11px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">
+    <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">
       <Icon name="bookmark" size={11} className="text-[color:var(--mwp-ink-soft)]" />
       {kindLabel}
     </span>
@@ -181,7 +181,7 @@ export function MewClass({ cls }: { cls: string }) {
   return (
     <span
       style={color ? { borderColor: color.readable, color: color.readable } : undefined}
-      className="inline-flex items-center gap-[5px] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[5px] text-[11px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"
+      className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"
     >
       {src ? (
         color ? (
@@ -195,7 +195,7 @@ export function MewClass({ cls }: { cls: string }) {
               WebkitMaskPosition: "center", maskPosition: "center",
               WebkitMaskSize: "contain", maskSize: "contain",
             }}
-            className="block h-[11px] w-[11px] flex-none"
+            className="block h-[0.6875rem] w-[0.6875rem] flex-none"
           />
         ) : (
           <img src={src} alt="" width={10} height={10} className="flex-none object-contain" aria-hidden />
@@ -223,15 +223,15 @@ export function MewStats({ stats, max = 10 }: { stats?: Record<string, number>; 
         const abbr = t(abbrKey)
         const glyphSrc = mewTokenSrc(s.code)
         return (
-          <div className="grid grid-cols-[38px_1fr_26px] items-center gap-[9px]" key={s.key} title={statLabel + ": " + s.v}>
-            <span className="flex items-center justify-center gap-1 text-[11px]/none text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">
+          <div className="grid grid-cols-[2.375rem_1fr_1.625rem] items-center gap-[0.5625rem]" key={s.key} title={statLabel + ": " + s.v}>
+            <span className="flex items-center justify-center gap-1 text-[0.6875rem]/none text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">
               {glyphSrc && <img src={glyphSrc} alt="" width={12} height={12} className="flex-none object-contain" aria-hidden />}
               <span>{abbr}</span>
             </span>
-            <span className="h-[13px] overflow-hidden border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-3)] [border-radius:8px_12px_9px_11px]">
+            <span className="h-[0.8125rem] overflow-hidden border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-3)] [border-radius:8px_12px_9px_11px]">
               <i className={cn("block h-full [border-radius:0_6px_8px_0]", s.v > 5 ? "bg-[color:var(--mwp-good)]" : s.v < 5 ? "bg-[color:var(--mwp-warn)]" : "bg-[color:var(--mwp-red)]")} style={{ width: Math.max(4, Math.min(100, (s.v / max) * 100)) + "%" }} />
             </span>
-            <span className="text-right font-mono text-[13px]/none font-bold text-[color:var(--mwp-ink)]">{s.v}</span>
+            <span className="text-right font-mono text-[0.8125rem]/none font-bold text-[color:var(--mwp-ink)]">{s.v}</span>
           </div>
         )
       })}
@@ -243,10 +243,10 @@ export function MewRef({ id, label, icon, count }: { id: string; label?: string;
   const t = useToolT(MEWGENICS_NS)
   const name = label || mewHuman(id)
   return (
-    <span className="inline-flex items-center gap-[5px] border-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-[9px] pb-1 pt-[5px] text-[12px]/[1.15] font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]" title={t("label.noRef")}>
+    <span className="inline-flex items-center gap-[0.3125rem] border-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-[0.5625rem] pb-1 pt-[0.3125rem] text-[0.75rem]/[1.15] font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]" title={t("label.noRef")}>
       {icon && <Icon name={icon} size={12} className="flex-none text-[color:var(--mwp-ink-soft)]" />}
       <span className="min-w-0">{name}</span>
-      {count != null && <span className="pl-[3px] font-mono text-[9px]/none font-bold text-[color:var(--mwp-ink-soft)]">{count}</span>}
+      {count != null && <span className="pl-[3px] font-mono text-[0.5625rem]/none font-bold text-[color:var(--mwp-ink-soft)]">{count}</span>}
     </span>
   )
 }
@@ -259,25 +259,25 @@ export function MewPanel({ title, icon, count, aside, children, className, span 
   return (
     <section className={cn("relative border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [border-radius:var(--wob-b)] [box-shadow:0_5px_0_var(--mwp-shadow-lg)] mew-paper", spanClass, className)}>
       {hasHeader && (
-        <div style={{ marginLeft: "var(--mwp-tab-shift)" } as React.CSSProperties} className="relative z-[1] -mt-3 mr-4 flex w-fit items-center gap-[9px] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-4 pb-[9px] pt-[13px] [border-radius:var(--wob-sm)_var(--wob-sm)_0_0] [box-shadow:0_-2px_0_var(--mwp-shadow-lg)] mew-paper">
+        <div style={{ marginLeft: "var(--mwp-tab-shift)" } as React.CSSProperties} className="relative z-[1] -mt-3 mr-4 flex w-fit items-center gap-[0.5625rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-4 pb-[0.5625rem] pt-[0.8125rem] [border-radius:var(--wob-sm)_var(--wob-sm)_0_0] [box-shadow:0_-2px_0_var(--mwp-shadow-lg)] mew-paper">
           {icon && (
             <span className="grid place-items-center text-[color:var(--mwp-red)]">
               <Icon name={icon} size={14} />
             </span>
           )}
-          {title && <h2 className="m-0 text-[14.5px]/none tracking-[0.05em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] min-[1600px]:text-[16.5px]">{title}</h2>}
-          {count != null && <span className="bg-[color:var(--mwp-red-deep)] px-[7px] py-[3px] font-mono text-[10.5px]/none font-bold text-[color:var(--mwp-paper)] [border-radius:10px_8px_11px_9px] [transform:rotate(2deg)]">{count}</span>}
+          {title && <h2 className="m-0 text-[0.90625rem]/none tracking-[0.05em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)]">{title}</h2>}
+          {count != null && <span className="bg-[color:var(--mwp-red-deep)] px-[0.4375rem] py-[3px] font-mono text-[0.65625rem]/none font-bold text-[color:var(--mwp-paper)] [border-radius:10px_8px_11px_9px] [transform:rotate(2deg)]">{count}</span>}
           {aside && <span className="flex-1">{aside}</span>}
         </div>
       )}
-      <div className={cn("relative px-4 pb-4 after:pointer-events-none after:absolute after:left-[8%] after:right-[8%] after:bottom-[3px] after:h-[2px] after:bg-[color:var(--mwp-accent)] after:opacity-70", hasHeader ? "pt-3" : "pt-[14px]")}>{children}</div>
+      <div className={cn("relative px-4 pb-4 after:pointer-events-none after:absolute after:left-[8%] after:right-[8%] after:bottom-[3px] after:h-[2px] after:bg-[color:var(--mwp-accent)] after:opacity-70", hasHeader ? "pt-3" : "pt-[0.875rem]")}>{children}</div>
     </section>
   )
 }
 
 export function MewNote({ children, icon = "info" }: { children?: React.ReactNode; icon?: IconName }) {
   return (
-    <div className="mt-3 flex items-start gap-2 border-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-3 py-[9px] text-[12.5px]/[1.5] font-medium italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">
+    <div className="mt-3 flex items-start gap-2 border-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-3 py-[0.5625rem] text-[0.78125rem]/[1.5] font-medium italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">
       <Icon name={icon} size={12} className="mt-px flex-none text-[color:var(--mwp-red)]" />
       {children}
     </div>
@@ -370,7 +370,7 @@ export function MewMapBand({ src, alt, onOpenLightbox }: { src: string; alt: str
           style={isDragging ? grabCursorStyleActive : grabCursorStyle}
           className={cn(
             "overflow-x-auto [border-radius:var(--wob-a)] border-2 border-solid border-[color:var(--mwp-ink)] [box-shadow:0_6px_0_var(--mwp-shadow-lg)]",
-            "h-[240px] sm:h-[300px] md:h-[360px] text-center",
+            "h-[15rem] sm:h-[18.75rem] md:h-[22.5rem] text-center",
             isDragging && "select-none"
           )}
         >
@@ -392,7 +392,7 @@ export function MewMapBand({ src, alt, onOpenLightbox }: { src: string; alt: str
             <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-[color:var(--mwp-paper)] to-transparent opacity-40" />
             <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[color:var(--mwp-paper)] to-transparent opacity-40" />
             {/* Hint text at bottom */}
-            <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 bg-[color:var(--mwp-paper)] border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] px-2 py-1 rounded text-[11px] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [box-shadow:0_2px_0_var(--mwp-shadow-xs)]">
+            <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 bg-[color:var(--mwp-paper)] border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] px-2 py-1 rounded text-[0.6875rem] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [box-shadow:0_2px_0_var(--mwp-shadow-xs)]">
               {t("label.panHint")}
             </div>
           </>

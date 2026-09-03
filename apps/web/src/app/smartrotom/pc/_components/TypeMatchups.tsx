@@ -53,12 +53,12 @@ function Group({ label, entries, tone }: { label: string; entries: Entry[]; tone
   if (entries.length === 0) return null
   return (
     <div className="mb-2.5">
-      <div className={`mb-1.5 text-[10.5px] font-bold uppercase tracking-[.05em] ${tone}`}>{label}</div>
+      <div className={`mb-1.5 text-[0.65625rem] font-bold uppercase tracking-[.05em] ${tone}`}>{label}</div>
       <div className="flex flex-wrap gap-1.5">
         {entries.map(([type, mult]) => (
           <span key={type} className="inline-flex items-center gap-1">
             <TypeBadge type={type} size="sm" />
-            <span className="font-pc-mono text-[10px] text-pc-fg-subtle">×{mult}</span>
+            <span className="font-pc-mono text-[0.625rem] text-pc-fg-subtle">×{mult}</span>
           </span>
         ))}
       </div>

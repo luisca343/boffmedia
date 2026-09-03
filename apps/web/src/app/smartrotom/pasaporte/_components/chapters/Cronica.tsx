@@ -16,7 +16,7 @@ export function Cronica({ milestones, loading }: { milestones: Milestone[]; load
       <>
         <PageHead eyebrow={t("cronica.eyebrow")} title={t("cronica.title")} />
         {Array.from({ length: 6 }, (_, i) => (
-          <Skeleton key={i} className="mb-2.5 h-[52px]" />
+          <Skeleton key={i} className="mb-2.5 h-[3.25rem]" />
         ))}
       </>
     )
@@ -48,13 +48,13 @@ export function Cronica({ milestones, loading }: { milestones: Milestone[]; load
           return (
             <li
               key={milestone.id}
-              className="relative grid grid-cols-[50px_32px_1fr] items-stretch gap-[9px] py-1"
+              className="relative grid grid-cols-[3.125rem_2rem_1fr] items-stretch gap-[0.5625rem] py-1"
             >
-              <div className="pt-[5px] text-right">
-                <b className="ps-num block font-ps-ceremony text-[14px] leading-none text-ps-ink">
+              <div className="pt-[0.3125rem] text-right">
+                <b className="ps-num block font-ps-ceremony text-[0.875rem] leading-none text-ps-ink">
                   {date.day} {date.month}
                 </b>
-                <span className="ps-num font-ps-mono text-[9px] text-ps-ink-faint">{date.year}</span>
+                <span className="ps-num font-ps-mono text-[0.5625rem] text-ps-ink-faint">{date.year}</span>
               </div>
 
               <div className="relative flex justify-center">
@@ -62,8 +62,8 @@ export function Cronica({ milestones, loading }: { milestones: Milestone[]; load
                   aria-hidden="true"
                   className={cn(
                     "absolute left-1/2 w-0.5 -translate-x-1/2 bg-gradient-to-b from-ps-gild-lo to-ps-gild opacity-45",
-                    i === 0 ? "top-[15px]" : "-top-1",
-                    i === shown.length - 1 ? "h-[17px]" : "-bottom-1",
+                    i === 0 ? "top-[0.9375rem]" : "-top-1",
+                    i === shown.length - 1 ? "h-[1.0625rem]" : "-bottom-1",
                   )}
                 />
                 <span
@@ -71,12 +71,12 @@ export function Cronica({ milestones, loading }: { milestones: Milestone[]; load
                   className={cn(
                     "relative z-[2] mt-[3px] grid place-items-center rounded-full text-white",
                     "shadow-[0_0_0_3px_rgb(var(--ps-paper)),0_2px_5px_rgba(0,0,0,.25)]",
-                    milestone.big ? "h-9 w-9" : "h-[30px] w-[30px]",
+                    milestone.big ? "h-9 w-9" : "h-[1.875rem] w-[1.875rem]",
                   )}
                 >
                   <Icon
                     name={milestone.icon}
-                    className={milestone.big ? "h-[19px] w-[19px]" : "h-4 w-4"}
+                    className={milestone.big ? "h-[1.1875rem] w-[1.1875rem]" : "h-4 w-4"}
                   />
                 </span>
               </div>
@@ -89,20 +89,20 @@ export function Cronica({ milestones, loading }: { milestones: Milestone[]; load
                     : {}),
                 }}
                 className={cn(
-                  "rounded-[9px] border border-l-[3px] border-ps-ink/22 px-2.5 py-[7px]",
+                  "rounded-[9px] border border-l-[3px] border-ps-ink/22 px-2.5 py-[0.4375rem]",
                   !milestone.big && "bg-gradient-to-b from-white/50 to-white/[.16]",
                 )}
               >
                 <div
                   className={cn(
                     "font-ps-ceremony leading-[1.05]",
-                    milestone.big ? "text-[17px]" : "text-[15px]",
+                    milestone.big ? "text-[1.0625rem]" : "text-[0.9375rem]",
                   )}
                 >
                   {milestone.title}
                 </div>
                 {milestone.desc && (
-                  <p className="mt-0.5 line-clamp-2 text-[10.5px] leading-[1.35] text-ps-ink-soft">
+                  <p className="mt-0.5 line-clamp-2 text-[0.65625rem] leading-[1.35] text-ps-ink-soft">
                     {milestone.desc}
                   </p>
                 )}

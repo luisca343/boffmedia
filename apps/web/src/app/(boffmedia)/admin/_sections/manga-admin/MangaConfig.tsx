@@ -97,8 +97,8 @@ export default function MangaConfig() {
         <div className="flex flex-col gap-4">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-[14px] font-medium text-txt">{t("cronTask")}</p>
-              <p className="mt-0.5 text-[12px] text-txt-dim">{t("cronDesc")}</p>
+              <p className="text-[0.875rem] font-medium text-txt">{t("cronTask")}</p>
+              <p className="mt-0.5 text-[0.75rem] text-txt-dim">{t("cronDesc")}</p>
             </div>
             {loading ? (
               <Spinner size={16} className="text-accent" />
@@ -125,7 +125,7 @@ export default function MangaConfig() {
               {t("save")}
             </Button>
           </div>
-          <p className="-mt-2 font-mono text-[11px] text-txt-dim">
+          <p className="-mt-2 font-mono text-[0.6875rem] text-txt-dim">
             {t("cronDefault")} <span className="text-accent">0 3 * * *</span>
           </p>
 
@@ -133,7 +133,7 @@ export default function MangaConfig() {
             <Button variant="ghost" icon="play" onClick={handleRunNow} loading={triggering} disabled={triggering || loading}>
               {triggering ? t("running") : t("runNow")}
             </Button>
-            {triggerMessage && <p className="text-[12px] text-txt-muted">{triggerMessage}</p>}
+            {triggerMessage && <p className="text-[0.75rem] text-txt-muted">{triggerMessage}</p>}
           </div>
         </div>
       </AvPanel>
@@ -141,12 +141,12 @@ export default function MangaConfig() {
       {/* Series status */}
       <AvPanel title={t("seriesStatus")} icon="book">
         {loading ? (
-          <div className="flex items-center gap-2 py-2 text-[13px] text-txt-muted">
+          <div className="flex items-center gap-2 py-2 text-[0.8125rem] text-txt-muted">
             <Spinner size={16} className="text-accent" />
             {t("loadingConfig")}
           </div>
         ) : seriesEntries.length === 0 ? (
-          <div className="flex items-center gap-2 py-4 text-[13px] text-txt-muted">
+          <div className="flex items-center gap-2 py-4 text-[0.8125rem] text-txt-muted">
             <Icon name="book" size={15} />
             <span>{t("noSeries")}</span>
           </div>
@@ -158,9 +158,9 @@ export default function MangaConfig() {
                 <div key={slug} className="flex items-center gap-3 border border-solid border-line bg-base-2 px-3 py-2.5">
                   <Icon name="book" size={14} className="shrink-0 text-txt-dim" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[14px] font-medium text-txt">{slug}</p>
+                    <p className="truncate text-[0.875rem] font-medium text-txt">{slug}</p>
                     {cfg.lastChecked && (
-                      <p className="mt-0.5 flex items-center gap-1 font-mono text-[10px] text-txt-dim">
+                      <p className="mt-0.5 flex items-center gap-1 font-mono text-[0.625rem] text-txt-dim">
                         <Icon name="clock" size={11} />
                         {t("checked", { date: formatAdminDate(cfg.lastChecked, { time: true }) })}
                       </p>

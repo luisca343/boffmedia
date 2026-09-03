@@ -18,7 +18,7 @@ export function Chip({
     <span
       className={cn(
         "inline-flex items-center gap-1.5 rounded-wp-pill border border-wp-line/24 bg-wp-panel-2",
-        "px-2.5 py-1 font-wp text-[11.5px] font-extrabold text-wp-fg-muted",
+        "px-2.5 py-1 font-wp text-[0.71875rem] font-extrabold text-wp-fg-muted",
         className,
       )}
     >
@@ -38,7 +38,7 @@ export function RarityBadge({ rarity, className }: { rarity: WpRarity; className
   return (
     <span
       className={cn(
-        "font-wp text-[10.5px] font-black uppercase tracking-[.04em]",
+        "font-wp text-[0.65625rem] font-black uppercase tracking-[.04em]",
         RARITY_TEXT[rarity],
         className,
       )}
@@ -73,7 +73,7 @@ export function CornerBadge({
     <span
       className={cn(
         "inline-flex items-center gap-1 rounded-wp-pill px-2.5 py-1",
-        "font-wp text-[10.5px] font-black tracking-[.02em]",
+        "font-wp text-[0.65625rem] font-black tracking-[.02em]",
         "shadow-[0_4px_10px_-4px_rgba(120,70,100,.4)]",
         TONE[tone],
         className,

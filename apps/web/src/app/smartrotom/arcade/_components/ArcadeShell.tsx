@@ -33,7 +33,7 @@ export function ArcadeShell({ children }: { children: ReactNode }) {
       data-scanlines={scanlines}
       data-motion={motion ? "on" : "off"}
     >
-      <div className="mx-auto flex max-w-[1600px] items-start gap-[18px] p-4 md:p-6">
+      <div className="mx-auto flex max-w-[100rem] items-start gap-[1.125rem] p-4 md:p-6">
         <ArcadeSidebar
           boxesOwned={owned}
           rewardReady={Boolean(streak.data && !streak.data.claimedToday)}

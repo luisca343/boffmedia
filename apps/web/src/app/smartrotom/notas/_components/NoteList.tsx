@@ -52,12 +52,12 @@ export function NoteList(props: NoteListProps) {
 
   return (
     <section
-      className="flex w-[300px] flex-none flex-col border-r border-nt-border bg-nt-bg-1 max-md:w-full"
+      className="flex w-[18.75rem] flex-none flex-col border-r border-nt-border bg-nt-bg-1 max-md:w-full"
       aria-label={t("list.title")}
     >
       <div className="border-b border-nt-border px-3.5 pb-2 pt-3">
         <div className="mb-2.5 flex items-center justify-between">
-          <h2 className="m-0 flex items-center gap-2 text-[15px] font-[650] tracking-[-.01em] text-nt-fg">
+          <h2 className="m-0 flex items-center gap-2 text-[0.9375rem] font-[650] tracking-[-.01em] text-nt-fg">
             {view.type === "tag" && (
               <span
                 className="h-2 w-2 rounded-full"
@@ -78,11 +78,11 @@ export function NoteList(props: NoteListProps) {
           </Tooltip>
         </div>
         <div className="relative">
-          <span className="pointer-events-none absolute left-[9px] top-1/2 -translate-y-1/2 text-nt-fg-subtle">
+          <span className="pointer-events-none absolute left-[0.5625rem] top-1/2 -translate-y-1/2 text-nt-fg-subtle">
             <Icon name="search" size={15} />
           </span>
           <input
-            className="h-[34px] w-full rounded-nt-md border border-nt-border bg-nt-bg-2 pl-8 pr-2.5 text-[13px] text-nt-fg outline-none transition-colors placeholder:text-nt-fg-subtle focus:border-nt-accent focus:shadow-[0_0_0_3px_rgb(var(--nt-accent)/.15)]"
+            className="h-[2.125rem] w-full rounded-nt-md border border-nt-border bg-nt-bg-2 pl-8 pr-2.5 text-[0.8125rem] text-nt-fg outline-none transition-colors placeholder:text-nt-fg-subtle focus:border-nt-accent focus:shadow-[0_0_0_3px_rgb(var(--nt-accent)/.15)]"
             placeholder={t("list.searchPlaceholder")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -91,7 +91,7 @@ export function NoteList(props: NoteListProps) {
         </div>
       </div>
 
-      <div className="flex items-center justify-between px-3.5 py-2 text-[12px] text-nt-fg-subtle">
+      <div className="flex items-center justify-between px-3.5 py-2 text-[0.75rem] text-nt-fg-subtle">
         <span>
           {t("list.count", { count: notes.length })}
         </span>
@@ -105,17 +105,17 @@ export function NoteList(props: NoteListProps) {
           {sortOpen && (
             <>
               <div className="fixed inset-0 z-[9]" onClick={() => setSortOpen(false)} />
-              <div className="absolute right-0 top-[120%] z-10 min-w-[150px] rounded-nt-md border border-nt-border-2 bg-nt-elevated p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,.6)]">
+              <div className="absolute right-0 top-[120%] z-10 min-w-[9.375rem] rounded-nt-md border border-nt-border-2 bg-nt-elevated p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,.6)]">
                 {(Object.keys(SORT_LABELS) as SortKey[]).map((k) => (
                   <div
                     key={k}
-                    className="flex h-[30px] cursor-pointer items-center gap-2 rounded-nt-sm px-2 text-[13px] text-nt-fg-muted hover:bg-nt-hover hover:text-nt-fg"
+                    className="flex h-[1.875rem] cursor-pointer items-center gap-2 rounded-nt-sm px-2 text-[0.8125rem] text-nt-fg-muted hover:bg-nt-hover hover:text-nt-fg"
                     onClick={() => {
                       setSort(k);
                       setSortOpen(false);
                     }}
                   >
-                    {sort === k ? <Icon name="check" size={14} /> : <span className="w-[14px]" />}
+                    {sort === k ? <Icon name="check" size={14} /> : <span className="w-[0.875rem]" />}
                     <span>{t(SORT_LABELS[k])}</span>
                   </div>
                 ))}
@@ -127,12 +127,12 @@ export function NoteList(props: NoteListProps) {
 
       <div className="nt-scroll flex-1 overflow-auto px-2 pb-5 pt-1">
         {notes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center gap-2 px-5 py-[50px] text-center text-nt-fg-subtle">
+          <div className="flex flex-col items-center justify-center gap-2 px-5 py-[3.125rem] text-center text-nt-fg-subtle">
             <Icon name="file-text" size={34} className="opacity-40" />
-            <p className="m-0 text-[13.5px]">{search ? t("list.noResults") : t("list.emptyTitle")}</p>
+            <p className="m-0 text-[0.84375rem]">{search ? t("list.noResults") : t("list.emptyTitle")}</p>
             {!search && (
               <button
-                className="mt-1.5 inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[13px] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
+                className="mt-1.5 inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[0.8125rem] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
                 onClick={props.onNew}
                 disabled={props.newBusy}
               >
@@ -154,7 +154,7 @@ export function NoteList(props: NoteListProps) {
                   e.preventDefault();
                   props.onContext(n, e);
                 }}
-                className={`relative mb-[3px] cursor-pointer rounded-nt-md border px-3 py-[11px] transition-colors ${
+                className={`relative mb-[3px] cursor-pointer rounded-nt-md border px-3 py-[0.6875rem] transition-colors ${
                   active
                     ? "border-nt-accent/25 bg-nt-accent/15"
                     : "border-transparent hover:bg-nt-hover"
@@ -162,7 +162,7 @@ export function NoteList(props: NoteListProps) {
               >
                 <div className="flex items-start gap-2">
                   <span
-                    className={`line-clamp-1 flex-1 text-[13.5px] font-semibold leading-[1.35] ${
+                    className={`line-clamp-1 flex-1 text-[0.84375rem] font-semibold leading-[1.35] ${
                       active ? "text-nt-accent-fg" : "text-nt-fg"
                     }`}
                   >
@@ -171,14 +171,14 @@ export function NoteList(props: NoteListProps) {
                   {!!n.pinned && <Icon name="pin" size={13} className="flex-none text-nt-accent-fg" />}
                 </div>
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  <span className="whitespace-nowrap text-[11px] text-nt-fg-subtle">
+                  <span className="whitespace-nowrap text-[0.6875rem] text-nt-fg-subtle">
                     {timeAgo(n.updatedMs)}
                   </span>
                   {noteTags.slice(0, 2).map((t) => (
                     <MiniTag key={t.id} label={t.label} color={t.color} />
                   ))}
                   {noteTags.length > 2 && (
-                    <span className="text-[11px] text-nt-fg-subtle">+{noteTags.length - 2}</span>
+                    <span className="text-[0.6875rem] text-nt-fg-subtle">+{noteTags.length - 2}</span>
                   )}
                   {n.sharedWith.length > 0 && (
                     <span className="ml-auto flex">

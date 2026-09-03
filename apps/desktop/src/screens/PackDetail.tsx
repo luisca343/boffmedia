@@ -775,7 +775,7 @@ export function PackDetail() {
         <div className="flex min-w-0 items-start gap-4">
           <CatalogIcon src={localIcon ?? pack.iconUrl ?? undefined} size={64} />
           <div className="min-w-0">
-            <h1 className={`${DISPLAY_VOICE} text-[30px] text-txt`}>
+            <h1 className={`${DISPLAY_VOICE} text-[1.875rem] text-txt`}>
               {pack.name}
             </h1>
             {/* The reference's metadata strip: the three facts a player checks
@@ -783,7 +783,7 @@ export function PackDetail() {
                 The slug leads it: `name` is a display string that can change between
                 versions, so the slug is the only stable id a player can quote in a
                 report — and it is what the logs, the install dir and the API all use. */}
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[11px] text-txt-muted">
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-[0.6875rem] text-txt-muted">
               <span className="flex items-center gap-1.5">
                 <Icon name="code" size={12} /> {pack.slug}
               </span>
@@ -818,7 +818,7 @@ export function PackDetail() {
               {isLocal && <Badge tone="info">Local</Badge>}
             </div>
             {pack.summary && (
-              <p className="mt-2 max-w-[560px] text-sm text-txt-muted">
+              <p className="mt-2 max-w-[35rem] text-sm text-txt-muted">
                 {pack.summary}
               </p>
             )}
@@ -951,7 +951,7 @@ export function PackDetail() {
               diagnosis must never hide the evidence that disproves it. */}
           <CrashDiagnosisCard diagnosis={game.diagnosis} className="mb-3" />
           {crashLines.length > 0 ? (
-            <pre className="max-h-[180px] overflow-auto rounded-sm border border-line bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-txt-muted">
+            <pre className="max-h-[11.25rem] overflow-auto rounded-sm border border-line bg-black/30 p-3 font-mono text-[0.6875rem] leading-relaxed text-txt-muted">
               {crashLines.map((line) => line.text).join("\n")}
             </pre>
           ) : (
@@ -1221,7 +1221,7 @@ export function PackDetail() {
               />
             </Panel>
           )}
-          <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(320px,1fr))]">
+          <div className="grid gap-4 [grid-template-columns:repeat(auto-fit,minmax(20rem,1fr))]">
             <Panel title={t("info.version")}>
               <DataList
                 rows={[

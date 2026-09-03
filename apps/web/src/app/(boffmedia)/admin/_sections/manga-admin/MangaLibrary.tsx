@@ -73,12 +73,12 @@ function ChapterRow({
         <Checkbox checked={isSelected} onChange={onToggleSelect} disabled={isExporting} />
         <button onClick={onToggleExpand} className="group flex min-w-0 flex-1 items-center gap-2 text-left" aria-expanded={isExpanded}>
           <Icon name="code" size={13} className={cn("shrink-0 transition-colors", isSelected ? "text-accent" : "text-txt-dim group-hover:text-txt")} />
-          <span className={cn("flex-1 truncate text-[14px] font-medium transition-colors", isSelected ? "text-accent" : "text-txt")}>
+          <span className={cn("flex-1 truncate text-[0.875rem] font-medium transition-colors", isSelected ? "text-accent" : "text-txt")}>
             {chapter.slug}
           </span>
         </button>
         <div className="flex shrink-0 items-center gap-1.5">
-          <span className="font-mono text-[10px] tabular-nums text-txt-dim">
+          <span className="font-mono text-[0.625rem] tabular-nums text-txt-dim">
             {isExpanded && chapterPages.length > 0 ? `${includedCount}/${totalPages}` : t("pagesN", { n: totalPages })}
           </span>
           {chapter.hasCbz && <AvPill tone="default">{t("cbz")}</AvPill>}
@@ -92,20 +92,20 @@ function ChapterRow({
       {isExpanded && (
         <div className="flex flex-col gap-2.5 border-t border-solid border-line px-3 py-3">
           {isLoading ? (
-            <div className="flex items-center gap-2 py-1 text-[12px] text-txt-muted">
+            <div className="flex items-center gap-2 py-1 text-[0.75rem] text-txt-muted">
               <Spinner size={14} className="text-accent" />{t("loadingPages")}
             </div>
           ) : hasError ? (
-            <p className="py-1 text-[12px] text-bad">{t("pagesError")}</p>
+            <p className="py-1 text-[0.75rem] text-bad">{t("pagesError")}</p>
           ) : chapterPages.length === 0 ? (
-            <p className="py-1 text-[12px] text-txt-dim">{t("noPages")}</p>
+            <p className="py-1 text-[0.75rem] text-txt-dim">{t("noPages")}</p>
           ) : (
             <>
               <div className="flex flex-wrap items-center gap-1.5">
-                <button onClick={keepAll} className="border border-solid border-line px-2 py-0.5 text-[11px] text-txt-muted transition-colors hover:border-line-2 hover:text-txt">{t("includeAll")}</button>
-                <button onClick={excludeAll} className="border border-solid border-line px-2 py-0.5 text-[11px] text-txt-muted transition-colors hover:border-line-2 hover:text-txt">{t("excludeAll")}</button>
-                <button onClick={invertSelection} className="border border-solid border-line px-2 py-0.5 text-[11px] text-txt-muted transition-colors hover:border-line-2 hover:text-txt">{t("invert")}</button>
-                {excludedSet.size > 0 && <span className="ml-auto text-[11px] text-bad">{t("excludedN", { n: excludedSet.size })}</span>}
+                <button onClick={keepAll} className="border border-solid border-line px-2 py-0.5 text-[0.6875rem] text-txt-muted transition-colors hover:border-line-2 hover:text-txt">{t("includeAll")}</button>
+                <button onClick={excludeAll} className="border border-solid border-line px-2 py-0.5 text-[0.6875rem] text-txt-muted transition-colors hover:border-line-2 hover:text-txt">{t("excludeAll")}</button>
+                <button onClick={invertSelection} className="border border-solid border-line px-2 py-0.5 text-[0.6875rem] text-txt-muted transition-colors hover:border-line-2 hover:text-txt">{t("invert")}</button>
+                {excludedSet.size > 0 && <span className="ml-auto text-[0.6875rem] text-bad">{t("excludedN", { n: excludedSet.size })}</span>}
               </div>
               <div role="group" className="grid grid-cols-6 gap-1 sm:grid-cols-8 md:grid-cols-10">
                 {chapterPages.map((page) => {
@@ -119,7 +119,7 @@ function ChapterRow({
                       aria-pressed={excluded}
                     >
                       <img src={ScrapeService.getChapterImageUrl(seriesSlug, chapter.slug, page.index)} alt="" className="h-full w-full object-cover" loading="lazy" />
-                      <span className="absolute inset-x-0 bottom-0 bg-black/60 py-px text-center text-[7px] leading-none text-white">{page.index + 1}</span>
+                      <span className="absolute inset-x-0 bottom-0 bg-black/60 py-px text-center text-[0.4375rem] leading-none text-white">{page.index + 1}</span>
                       {excluded ? (
                         <div className="absolute inset-0 grid place-items-center bg-bad/80"><Icon name="eye" size={11} className="text-white" /></div>
                       ) : (
@@ -368,8 +368,8 @@ function MangaLibraryInner() {
     <AvStickyBar open={true}>
       <>
         <div className="min-w-0 flex-1">
-          <p className="text-[14px] font-semibold text-txt">{t("selectedN", { count: exportSummary.count })}</p>
-          <p className="font-mono text-[11px] text-txt-muted">
+          <p className="text-[0.875rem] font-semibold text-txt">{t("selectedN", { count: exportSummary.count })}</p>
+          <p className="font-mono text-[0.6875rem] text-txt-muted">
             {exportSummary.totalIncluded < exportSummary.totalPages
               ? t("includedOfN", { included: exportSummary.totalIncluded, total: exportSummary.totalPages })
               : t("includedN", { n: exportSummary.totalIncluded })}
@@ -378,8 +378,8 @@ function MangaLibraryInner() {
 
         {bulk && !bulk.finished && (
           <div className="flex shrink-0 flex-col items-end">
-            <span className="font-mono text-[11px] text-txt-muted">{bulk.done}/{bulk.total}</span>
-            {bulk.currentSlug && <span className="max-w-[8rem] truncate text-[10px] text-txt-dim">{bulk.currentSlug}</span>}
+            <span className="font-mono text-[0.6875rem] text-txt-muted">{bulk.done}/{bulk.total}</span>
+            {bulk.currentSlug && <span className="max-w-[8rem] truncate text-[0.625rem] text-txt-dim">{bulk.currentSlug}</span>}
           </div>
         )}
         {bulk?.finished && (
@@ -389,7 +389,7 @@ function MangaLibraryInner() {
         )}
 
         <Checkbox checked={includeCover} onChange={setIncludeCover} label={t("cover")} />
-        <button onClick={() => setShowAdvanced((v) => !v)} className="shrink-0 font-mono text-[11px] uppercase tracking-[0.06em] text-txt-dim transition-colors hover:text-txt">
+        <button onClick={() => setShowAdvanced((v) => !v)} className="shrink-0 font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-txt-dim transition-colors hover:text-txt">
           {showAdvanced ? t("basic") : t("advanced")}
         </button>
 
@@ -421,7 +421,7 @@ function MangaLibraryInner() {
             title={t("title")}
             actions={
               <div className="flex items-center gap-2">
-                {errorRefreshing && <span className="text-[11px] text-bad">{t("refreshError")}</span>}
+                {errorRefreshing && <span className="text-[0.6875rem] text-bad">{t("refreshError")}</span>}
                 <Button variant="ghost" icon="refresh" onClick={() => doRefresh()} loading={refreshingLibrary} disabled={refreshingLibrary}>
                   {t("refresh")}
                 </Button>
@@ -433,7 +433,7 @@ function MangaLibraryInner() {
           ) : !library?.series.length ? (
             <Empty icon="book" title={t("noSeries")} />
           ) : (
-            <div className="grid gap-[14px] [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
+            <div className="grid gap-[0.875rem] [grid-template-columns:repeat(auto-fill,minmax(9.375rem,1fr))]">
               {library.series.map((series) => (
                 <MgCard
                   key={series.slug}
@@ -479,7 +479,7 @@ function MangaLibraryInner() {
                   <Button variant="ghost" onClick={() => handlePatchMetadata()} loading={patching} disabled={patching}>
                     {patching ? t("applying") : t("applyAllEpub")}
                   </Button>
-                  {patchResult && <p className="text-[12px] text-txt-muted">{t("epubUpdatedN", { updated: patchResult.updated, total: patchResult.total })}</p>}
+                  {patchResult && <p className="text-[0.75rem] text-txt-muted">{t("epubUpdatedN", { updated: patchResult.updated, total: patchResult.total })}</p>}
                 </div>
               </AvPanel>
 
@@ -495,7 +495,7 @@ function MangaLibraryInner() {
               )}
 
               {selectedSeries.chapters.length === 0 ? (
-                <p className="px-1 text-[13px] text-txt-muted">{t("noChapters")}</p>
+                <p className="px-1 text-[0.8125rem] text-txt-muted">{t("noChapters")}</p>
               ) : (
                 <div className="flex flex-col gap-1.5">
                   {selectedSeries.chapters.map((ch) => (

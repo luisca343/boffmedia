@@ -17,8 +17,8 @@ export function CtCover({ game, className, xs = false, children }: { game: CtGam
       <span className="absolute inset-0 grid place-items-center text-txt-dim opacity-50">
         <Icon name={gi} size={xs ? 20 : 38} />
       </span>
-      <span className={cn("absolute left-2 right-2 z-[1] font-display font-extrabold italic uppercase tracking-[0.01em] text-txt [text-shadow:0_1px_8px_rgba(0,0,0,0.55)]", xs ? "bottom-3 left-[5px] right-[5px] line-clamp-2 text-[9px]/[1.02]" : "bottom-5 line-clamp-3 text-[clamp(12px,1.1vw,15px)]/[1.02]")}>{game.title}</span>
-      {!xs && <span className="absolute bottom-1.5 left-2 z-[1] font-mono text-[9px]/none font-semibold tracking-[0.1em] text-txt-muted">{game.year}</span>}
+      <span className={cn("absolute left-2 right-2 z-[1] font-display font-extrabold italic uppercase tracking-[0.01em] text-txt [text-shadow:0_1px_8px_rgba(0,0,0,0.55)]", xs ? "bottom-3 left-[0.3125rem] right-[0.3125rem] line-clamp-2 text-[0.5625rem]/[1.02]" : "bottom-5 line-clamp-3 text-[clamp(0.75rem,1.1vw,0.9375rem)]/[1.02]")}>{game.title}</span>
+      {!xs && <span className="absolute bottom-1.5 left-2 z-[1] font-mono text-[0.5625rem]/none font-semibold tracking-[0.1em] text-txt-muted">{game.year}</span>}
       {children}
     </span>
   )
@@ -39,14 +39,14 @@ export function CtGameCard({ game, variant = "comoda", onOpen }: { game: CtGame;
 
   if (variant === "fila") {
     return (
-      <article onClick={open} tabIndex={0} role="button" onKeyDown={key} className="grid cursor-pointer grid-cols-[42px_1fr_auto_auto] items-center gap-[14px] border border-solid border-line bg-panel px-[14px] py-2.5 transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2 max-[720px]:grid-cols-[42px_1fr]">
+      <article onClick={open} tabIndex={0} role="button" onKeyDown={key} className="grid cursor-pointer grid-cols-[2.625rem_1fr_auto_auto] items-center gap-[0.875rem] border border-solid border-line bg-panel px-[0.875rem] py-2.5 transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2 max-[720px]:grid-cols-[2.625rem_1fr]">
         <CtCover game={game} xs />
         <div className="group min-w-0">
           <div className="flex items-baseline gap-2">
-            <h4 className="font-body text-[15px]/[1.1] font-bold text-txt">{game.title}</h4>
-            <span className="font-mono text-[11px]/none font-semibold text-txt-dim">{game.year}</span>
+            <h4 className="font-body text-[0.9375rem]/[1.1] font-bold text-txt">{game.title}</h4>
+            <span className="font-mono text-[0.6875rem]/none font-semibold text-txt-dim">{game.year}</span>
           </div>
-          <p className="mt-[3px] font-body text-[12px]/[1.3] font-medium text-txt-muted">
+          <p className="mt-[3px] font-body text-[0.75rem]/[1.3] font-medium text-txt-muted">
             {game.developer} · {game.genres.slice(0, 2).join(" · ")}
           </p>
           <div className="mt-1.5">
@@ -69,12 +69,12 @@ export function CtGameCard({ game, variant = "comoda", onOpen }: { game: CtGame;
     <article onClick={open} tabIndex={0} role="button" onKeyDown={key} className="group flex cursor-pointer flex-col outline-none">
       <CtCover game={game} className="transition-[border-color,transform] duration-[140ms] group-hover:border-accent-line group-focus-visible:border-accent-line">
         {s && (
-          <span style={{ "--sc": s.color } as React.CSSProperties} title={t(`status.${status}.label`)} className="absolute left-1.5 top-1.5 z-[3] grid h-[22px] w-[22px] place-items-center bg-[color:var(--sc)] text-accent-ink [box-shadow:0_2px_8px_rgba(0,0,0,0.4)]">
+          <span style={{ "--sc": s.color } as React.CSSProperties} title={t(`status.${status}.label`)} className="absolute left-1.5 top-1.5 z-[3] grid h-[1.375rem] w-[1.375rem] place-items-center bg-[color:var(--sc)] text-accent-ink [box-shadow:0_2px_8px_rgba(0,0,0,0.4)]">
             <Icon name={s.icon} size={12} className={status === "wishlist" ? "fill-current" : undefined} />
           </span>
         )}
         {mine > 0 && (
-          <span className="absolute right-1.5 top-1.5 z-[3] inline-flex items-center gap-0.5 bg-[rgba(0,0,0,0.72)] px-1.5 py-0.5 font-mono text-[10px]/none font-bold text-accent">
+          <span className="absolute right-1.5 top-1.5 z-[3] inline-flex items-center gap-0.5 bg-[rgba(0,0,0,0.72)] px-1.5 py-0.5 font-mono text-[0.625rem]/none font-bold text-accent">
             <Icon name="star" size={10} className="fill-current" />
             {mine}
           </span>
@@ -85,15 +85,15 @@ export function CtGameCard({ game, variant = "comoda", onOpen }: { game: CtGame;
       </CtCover>
       {!poster && (
         <div className="px-0.5 pb-1 pt-2">
-          <h4 className="line-clamp-2 font-body text-[14px]/[1.15] font-bold text-txt group-hover:text-accent">{game.title}</h4>
-          <div className="mt-1 flex items-center gap-1.5 font-body text-[11.5px]/none font-medium text-txt-muted">
+          <h4 className="line-clamp-2 font-body text-[0.875rem]/[1.15] font-bold text-txt group-hover:text-accent">{game.title}</h4>
+          <div className="mt-1 flex items-center gap-1.5 font-body text-[0.71875rem]/none font-medium text-txt-muted">
             <span>{game.year}</span>
             <span className="text-txt-dim">·</span>
             <span>{game.genres[0]}</span>
           </div>
-          <div className="mt-2 flex items-center gap-[7px]">
+          <div className="mt-2 flex items-center gap-[0.4375rem]">
             <CtStars value={game.rating} size={13} />
-            <span className="font-mono text-[12px]/none font-bold text-txt-muted">{game.rating.toFixed(1)}</span>
+            <span className="font-mono text-[0.75rem]/none font-bold text-txt-muted">{game.rating.toFixed(1)}</span>
           </div>
         </div>
       )}

@@ -24,7 +24,7 @@ export default function FurretTodayHome() {
   if (isLoading) {
     return (
       <div className="ft-wrap-wide space-y-6 px-6 py-16">
-        <Skeleton className="h-[420px] w-full" />
+        <Skeleton className="h-[26.25rem] w-full" />
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
           <Skeleton className="h-64 w-full lg:col-span-1" />
           <Skeleton className="h-64 w-full" />

@@ -45,20 +45,20 @@ export function PresetGallery({
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={t("builder.searchPresets")}
-          className="min-w-0 flex-1 border-2 border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] px-2 py-1.5 text-[11px] text-[color:var(--mwp-cream)] [border-radius:var(--wob-sm)] focus:border-[color:var(--mwp-ink)] focus:outline-none"
+          className="min-w-0 flex-1 border-2 border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] px-2 py-1.5 text-[0.6875rem] text-[color:var(--mwp-cream)] [border-radius:var(--wob-sm)] focus:border-[color:var(--mwp-ink)] focus:outline-none"
         />
-        <span className="whitespace-nowrap font-mono text-[10px] text-[color:var(--mwp-cream-dim)]">
+        <span className="whitespace-nowrap font-mono text-[0.625rem] text-[color:var(--mwp-cream-dim)]">
           {shown.length}/{presets.length}
         </span>
       </div>
 
       {shown.length === 0 ? (
-        <div className="flex flex-1 items-center justify-center text-[11px] text-[color:var(--mwp-cream-dim)]">
+        <div className="flex flex-1 items-center justify-center text-[0.6875rem] text-[color:var(--mwp-cream-dim)]">
           {t("builder.noResults")}
         </div>
       ) : (
         <div className="min-h-0 flex-1 overflow-y-auto border-2 border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] p-2 [border-radius:var(--wob-sm)]">
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(116px,1fr))] gap-2">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(7.25rem,1fr))] gap-2">
             {shown.map((preset) => (
               <PresetTile
                 key={String(preset.id)}
@@ -129,7 +129,7 @@ function PresetTile({
           <span className="block h-full w-full" />
         )}
       </span>
-      <span className="w-full truncate text-center text-[10px] font-bold text-[color:var(--mwp-cream)]">
+      <span className="w-full truncate text-center text-[0.625rem] font-bold text-[color:var(--mwp-cream)]">
         {String(preset.name || preset.id)}
       </span>
     </button>

@@ -84,7 +84,7 @@ export function TeamCard({ team, formatLabel, onPlay, onEdit, onDuplicate, onRen
       aria-label={team.name}
       className="cut-corner cut-corner-edge [--cut-lg:14px] [--cut-line:var(--line)] flex min-w-0 flex-col border border-solid border-line bg-panel transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:[--cut-line:var(--accent-line)]"
     >
-      <header className="flex min-h-[50px] items-center gap-2 border-b border-solid border-line px-4 py-2">
+      <header className="flex min-h-[3.125rem] items-center gap-2 border-b border-solid border-line px-4 py-2">
         {renaming ? (
           <Input
             size="sm"
@@ -103,10 +103,10 @@ export function TeamCard({ team, formatLabel, onPlay, onEdit, onDuplicate, onRen
                 setRenaming(false);
               }
             }}
-            className="min-w-0 flex-1 font-display text-[14px] font-bold uppercase"
+            className="min-w-0 flex-1 font-display text-[0.875rem] font-bold uppercase"
           />
         ) : (
-          <h3 className="m-0 min-w-0 flex-1 truncate font-display text-[16px]/none font-bold not-italic uppercase tracking-[0.03em] text-txt">{team.name}</h3>
+          <h3 className="m-0 min-w-0 flex-1 truncate font-display text-[1rem]/none font-bold not-italic uppercase tracking-[0.03em] text-txt">{team.name}</h3>
         )}
         <DkChip className="flex-none">{formatLabel}</DkChip>
       </header>
@@ -118,14 +118,14 @@ export function TeamCard({ team, formatLabel, onPlay, onEdit, onDuplicate, onRen
       <div
         role="img"
         aria-label={species.length ? t("slotsAria", { list: species.join(", ") }) : t("slotsEmpty")}
-        className="flex items-center gap-[6px] px-4 py-[14px]"
+        className="flex items-center gap-[0.375rem] px-4 py-[0.875rem]"
       >
         {Array.from({ length: 6 }, (_, i) => (
           <TbSpriteThumb key={i} name={species[i]} size={44} />
         ))}
       </div>
 
-      <footer className="mt-auto flex flex-wrap items-center gap-2 border-t border-solid border-line px-3 py-[10px]">
+      <footer className="mt-auto flex flex-wrap items-center gap-2 border-t border-solid border-line px-3 py-[0.625rem]">
         <TbValidityChip state={state} title={validation.problems.length ? validation.problems.join("\n") : undefined}>
           {chipText}
         </TbValidityChip>

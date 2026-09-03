@@ -18,7 +18,7 @@ export function SectionHeader({
           {number}
         </span>
         <div className="min-w-0">
-          <div className="font-ft-ui text-[11px] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
+          <div className="font-ft-ui text-[0.6875rem] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
             {eyebrow}
           </div>
           <h2 className="font-ft-display mt-1 text-[clamp(2.25rem,5vw,4rem)] leading-[0.95] tracking-[0.02em]">
@@ -27,7 +27,7 @@ export function SectionHeader({
         </div>
       </div>
       {hint ? (
-        <span className="font-ft-ui hidden shrink-0 self-end pb-2 text-[13px] font-medium uppercase tracking-[0.04em] text-ft-ink/70 md:block">
+        <span className="font-ft-ui hidden shrink-0 self-end pb-2 text-[0.8125rem] font-medium uppercase tracking-[0.04em] text-ft-ink/70 md:block">
           {hint}
         </span>
       ) : null}

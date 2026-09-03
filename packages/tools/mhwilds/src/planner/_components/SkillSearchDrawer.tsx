@@ -78,12 +78,12 @@ export function SkillSearchDrawer({
           <button
             type="button"
             onClick={() => setSelected(null)}
-            className="inline-flex items-center gap-1.5 self-start font-mono text-[11px] uppercase tracking-[0.08em] text-txt-muted hover:text-txt"
+            className="inline-flex items-center gap-1.5 self-start font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-muted hover:text-txt"
           >
             <Icon name="back" size={13} />
             {t("build_planner.skillsearch.all")}
           </button>
-          <div className="font-display text-[16px] leading-tight font-bold uppercase not-italic">{sel.name}</div>
+          <div className="font-display text-[1rem] leading-tight font-bold uppercase not-italic">{sel.name}</div>
           <div className="flex flex-col gap-1.5">
             {sel.sources
               .slice()
@@ -94,8 +94,8 @@ export function SkillSearchDrawer({
                     <Icon name={src.kind === "armor" ? "shield" : "sparkles"} size={13} className="text-txt-muted" />
                   </span>
                   <span className="grid min-w-0 flex-1 gap-0.5">
-                    <span className="truncate font-display text-[13px] leading-tight font-bold uppercase not-italic">{src.item.name}</span>
-                    <span className="font-mono text-[10.5px] leading-none text-txt-muted">
+                    <span className="truncate font-display text-[0.8125rem] leading-tight font-bold uppercase not-italic">{src.item.name}</span>
+                    <span className="font-mono text-[0.65625rem] leading-none text-txt-muted">
                       {t(`build_planner.skillsearch.kind_${src.kind}`)} · +{src.level}
                       {src.kind === "decoration" ? ` · ${t("build_planner.slots")} ${src.decoSlot}` : ""}
                     </span>
@@ -123,7 +123,7 @@ export function SkillSearchDrawer({
               onClick={() => setSelected(s.name)}
               className="flex items-center gap-3 border border-line bg-base-2 px-3 py-2.5 text-left transition-colors hover:border-[var(--mh)]"
             >
-              <span className="min-w-0 flex-1 truncate font-display text-[14px] leading-tight font-bold uppercase not-italic">{s.name}</span>
+              <span className="min-w-0 flex-1 truncate font-display text-[0.875rem] leading-tight font-bold uppercase not-italic">{s.name}</span>
               <MhTag>{t("build_planner.skillsearch.sourceCount", { count: s.sources.length })}</MhTag>
               <Icon name="arrow" size={14} className="shrink-0 text-txt-dim" />
             </button>

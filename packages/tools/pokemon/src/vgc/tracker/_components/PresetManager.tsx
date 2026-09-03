@@ -18,7 +18,7 @@ interface Props {
 
 type PanelMode = "list" | "create" | "edit" | "history"
 
-const VER_TAG = "border border-solid border-line-2 px-[6px] py-px font-mono text-[10px] leading-none text-txt-dim"
+const VER_TAG = "border border-solid border-line-2 px-[0.375rem] py-px font-mono text-[0.625rem] leading-none text-txt-dim"
 
 export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
   const t = useVgcT("tracker")
@@ -127,7 +127,7 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
           <button
             type="button"
             onClick={backToList}
-            className="inline-flex items-center gap-[6px] justify-self-start border-0 bg-transparent font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-txt-dim transition-colors hover:text-txt"
+            className="inline-flex items-center gap-[0.375rem] justify-self-start border-0 bg-transparent font-mono text-[0.65625rem] font-semibold uppercase tracking-[0.1em] text-txt-dim transition-colors hover:text-txt"
           >
             <Icon name="chevron" size={12} style={{ transform: "rotate(90deg)" }} />
             {t("preset.backToList")}
@@ -195,10 +195,10 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
             <div className="border border-solid border-accent-line bg-base p-3">
               <div className="mb-2 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="border border-solid border-accent-line bg-accent-soft px-[6px] py-px font-mono text-[10px] leading-none text-accent-bright">
+                  <span className="border border-solid border-accent-line bg-accent-soft px-[0.375rem] py-px font-mono text-[0.625rem] leading-none text-accent-bright">
                     {t("preset.versionN", { n: historyPreset.currentVersion })}
                   </span>
-                  <span className="font-mono text-[10px] text-txt-muted">{t("preset.currentTag")}</span>
+                  <span className="font-mono text-[0.625rem] text-txt-muted">{t("preset.currentTag")}</span>
                 </div>
                 <span className="flex gap-px">
                   {historyPreset.slots.slice(0, 3).map((s) => (
@@ -206,8 +206,8 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
                   ))}
                 </span>
               </div>
-              <p className="font-body text-[13px] font-medium text-txt">{historyPreset.name}</p>
-              <p className="truncate font-mono text-[11px] text-txt-dim">{historyPreset.slots.map((s) => s.speciesName).join(", ")}</p>
+              <p className="font-body text-[0.8125rem] font-medium text-txt">{historyPreset.name}</p>
+              <p className="truncate font-mono text-[0.6875rem] text-txt-dim">{historyPreset.slots.map((s) => s.speciesName).join(", ")}</p>
             </div>
 
             {[...historyPreset.versions].reverse().map((v, i) => (
@@ -217,13 +217,13 @@ export function PresetManager({ presets, onSave, onDelete, onClose }: Props) {
                   <button
                     type="button"
                     onClick={() => handleRestoreVersion(historyPreset, historyPreset.versions.length - 1 - i)}
-                    className="inline-flex items-center gap-1 font-mono text-[10.5px] text-txt-muted transition-colors hover:text-accent-bright"
+                    className="inline-flex items-center gap-1 font-mono text-[0.65625rem] text-txt-muted transition-colors hover:text-accent-bright"
                   >
                     <Icon name="refresh" size={11} /> {t("buttons.restoreVersion")}
                   </button>
                 </div>
-                <p className="font-body text-[13px] font-medium text-txt">{v.name}</p>
-                <p className="truncate font-mono text-[11px] text-txt-dim">{v.slots.map((s) => s.speciesName).join(", ")}</p>
+                <p className="font-body text-[0.8125rem] font-medium text-txt">{v.name}</p>
+                <p className="truncate font-mono text-[0.6875rem] text-txt-dim">{v.slots.map((s) => s.speciesName).join(", ")}</p>
               </div>
             ))}
 
@@ -259,10 +259,10 @@ function PresetRow({
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <p className="truncate font-display text-[13px] font-bold uppercase leading-none tracking-[0.03em]">{preset.name}</p>
+            <p className="truncate font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.03em]">{preset.name}</p>
             <span className={cn(VER_TAG, "flex-none")}>{t("preset.versionN", { n: preset.currentVersion })}</span>
           </div>
-          <p className="mt-1 truncate font-mono text-[11px] text-txt-dim">{preset.slots.map((s) => s.speciesName).join(", ")}</p>
+          <p className="mt-1 truncate font-mono text-[0.6875rem] text-txt-dim">{preset.slots.map((s) => s.speciesName).join(", ")}</p>
         </div>
         <div className="flex flex-none items-center gap-1">
           <IconBtn icon="edit" label={t("buttons.editPreset")} onClick={onEdit} />
@@ -279,7 +279,7 @@ function PresetRow({
           <button
             type="button"
             onClick={onHistory}
-            className="inline-flex items-center gap-1 font-mono text-[11px] text-txt-muted transition-colors hover:text-accent-bright"
+            className="inline-flex items-center gap-1 font-mono text-[0.6875rem] text-txt-muted transition-colors hover:text-accent-bright"
           >
             <Icon name="refresh" size={11} /> {t("preset.versionHistory")} ({preset.versions.length})
           </button>

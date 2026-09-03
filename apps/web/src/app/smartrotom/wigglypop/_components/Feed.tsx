@@ -75,7 +75,7 @@ export function Feed() {
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <div className="flex-none px-[26px] pt-[18px]">
+      <div className="flex-none px-[1.625rem] pt-[1.125rem]">
         <div className="flex flex-wrap items-center gap-3.5">
           <Tabs
             tabs={FORMAT_TABS.map((tb) => ({ ...tb, label: t(tb.labelKey) }))}
@@ -84,7 +84,7 @@ export function Feed() {
           />
 
           <div className="ml-auto flex items-center gap-2.5">
-            <span className="font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
+            <span className="font-wp text-[0.78125rem] font-semibold text-wp-fg-subtle">
               {/* With a type filter on, the server's `total` counts rows we have since
                   filtered out here — so the honest number is what is actually on screen. */}
               <b className="wp-num text-wp-fg-muted">
@@ -93,15 +93,15 @@ export function Feed() {
               {t("feed.resultsLabel")}
             </span>
 
-            <div className="flex items-center gap-[7px]">
+            <div className="flex items-center gap-[0.4375rem]">
               <Icon name="sort" size={15} className="text-wp-fg-subtle" />
               <select
                 value={f.sort}
                 onChange={(e) => f.setSort(e.target.value as WpSort)}
                 aria-label={t("feed.sortAriaLabel")}
                 className={cn(
-                  "cursor-pointer appearance-none rounded-wp-sm border-wp border-wp-line/24 bg-white py-2 pl-[11px] pr-8",
-                  "font-wp text-[13px] font-bold text-wp-fg outline-none",
+                  "cursor-pointer appearance-none rounded-wp-sm border-wp border-wp-line/24 bg-white py-2 pl-[0.6875rem] pr-8",
+                  "font-wp text-[0.8125rem] font-bold text-wp-fg outline-none",
                   "focus:border-wp-accent focus:shadow-[0_0_0_4px_rgb(var(--wp-accent)/.13)]",
                 )}
               >
@@ -133,9 +133,9 @@ export function Feed() {
             body={userMessageFrom(error, t("common.retryFallback"))}
           />
         ) : isLoading ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(236px,1fr))] gap-[18px] px-[26px] pb-11 pt-5">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(14.75rem,1fr))] gap-[1.125rem] px-[1.625rem] pb-11 pt-5">
             {Array.from({ length: 12 }).map((_, i) => (
-              <Skeleton key={i} className="h-[330px] rounded-wp" />
+              <Skeleton key={i} className="h-[20.625rem] rounded-wp" />
             ))}
           </div>
         ) : listings.length === 0 ? (
@@ -152,10 +152,10 @@ export function Feed() {
         ) : (
           <div
             className={cn(
-              "grid px-[26px] pb-11 pt-5",
+              "grid px-[1.625rem] pb-11 pt-5",
               f.density === "list"
-                ? "grid-cols-1 gap-[11px]"
-                : "grid-cols-[repeat(auto-fill,minmax(236px,1fr))] gap-[18px]",
+                ? "grid-cols-1 gap-[0.6875rem]"
+                : "grid-cols-[repeat(auto-fill,minmax(14.75rem,1fr))] gap-[1.125rem]",
             )}
           >
             {listings.map((L) => (

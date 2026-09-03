@@ -16,8 +16,8 @@ export function SessionNotesEditor({ notes, onSave }: { notes?: string; onSave: 
   }
 
   return (
-    <div className="grid gap-[6px] border border-solid border-line border-l-[3px] border-l-signal bg-panel px-[14px] py-[11px]">
-      <span className="inline-flex items-center gap-[6px] font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.12em] text-signal">
+    <div className="grid gap-[0.375rem] border border-solid border-line border-l-[3px] border-l-signal bg-panel px-[0.875rem] py-[0.6875rem]">
+      <span className="inline-flex items-center gap-[0.375rem] font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.12em] text-signal">
         <Icon name="message" size={12} />
         {t("sessionNotes.label")}
       </span>
@@ -26,7 +26,7 @@ export function SessionNotesEditor({ notes, onSave }: { notes?: string; onSave: 
         onChange={(e) => handleChange(e.target.value)}
         placeholder={t("sessionNotes.placeholder")}
         rows={2}
-        className="w-full resize-none border-0 bg-transparent p-0 font-body text-[12.5px] leading-[1.55] text-txt-muted outline-none placeholder:text-txt-dim"
+        className="w-full resize-none border-0 bg-transparent p-0 font-body text-[0.78125rem] leading-[1.55] text-txt-muted outline-none placeholder:text-txt-dim"
       />
     </div>
   )

@@ -39,7 +39,7 @@ export function ReelSpinner({ tiles, winningPosition, onRevealed }: ReelSpinnerP
 
   return (
     <div
-      className="ar-scanlines relative h-[180px] overflow-hidden rounded-xl border-2 border-ar-cyan/45 bg-[#06031a] shadow-[inset_0_0_60px_rgb(var(--ar-cyan)/.12)]"
+      className="ar-scanlines relative h-[11.25rem] overflow-hidden rounded-xl border-2 border-ar-cyan/45 bg-[#06031a] shadow-[inset_0_0_60px_rgb(var(--ar-cyan)/.12)]"
       role="img"
       aria-label={spin.settled ? t("loot.reelAriaSettled") : t("loot.reelAriaSpinning")}
     >
@@ -57,11 +57,11 @@ export function ReelSpinner({ tiles, winningPosition, onRevealed }: ReelSpinnerP
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 left-0 z-[4] w-[90px] bg-[linear-gradient(90deg,#06031a,transparent)]"
+        className="pointer-events-none absolute inset-y-0 left-0 z-[4] w-[5.625rem] bg-[linear-gradient(90deg,#06031a,transparent)]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-y-0 right-0 z-[4] w-[90px] bg-[linear-gradient(270deg,#06031a,transparent)]"
+        className="pointer-events-none absolute inset-y-0 right-0 z-[4] w-[5.625rem] bg-[linear-gradient(270deg,#06031a,transparent)]"
       />
 
       <div
@@ -95,7 +95,7 @@ export function ReelSpinner({ tiles, winningPosition, onRevealed }: ReelSpinnerP
               }}
             >
               <div
-                className="grid h-[60px] w-[60px] place-items-center overflow-hidden rounded-lg border"
+                className="grid h-[3.75rem] w-[3.75rem] place-items-center overflow-hidden rounded-lg border"
                 style={{
                   background: `radial-gradient(60% 60% at 50% 40%, ${skin.fg}33, transparent 70%)`,
                   borderColor: skin.bd,
@@ -103,7 +103,7 @@ export function ReelSpinner({ tiles, winningPosition, onRevealed }: ReelSpinnerP
               >
                 <ItemImage type={tile.type} itemId={tile.data || tile.id} size={44} />
               </div>
-              <div className="mt-2 line-clamp-2 px-1.5 text-center font-ar-mono text-[10px] leading-tight text-ar-ink-dim">
+              <div className="mt-2 line-clamp-2 px-1.5 text-center font-ar-mono text-[0.625rem] leading-tight text-ar-ink-dim">
                 {getItemName(t, tile.id, tile.type)}
               </div>
             </div>

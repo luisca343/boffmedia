@@ -63,7 +63,7 @@ export default function RookerFeedPage() {
               <PostCard key={post.id} post={post} last={!carded && i === posts.length - 1} />
             ))}
           </div>
-          <p className="flex items-center justify-center gap-2 py-6 text-center text-[13px] text-rk-fg-subtle">
+          <p className="flex items-center justify-center gap-2 py-6 text-center text-[0.8125rem] text-rk-fg-subtle">
             <Icon name="feather" size={14} />
             {t("feed.endOfFeed")}
           </p>

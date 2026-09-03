@@ -11,7 +11,7 @@ export function Guidelines() {
     <Panel title={t("title")} className="lg:sticky lg:top-[calc(var(--nav-h)_+_20px)]">
       <ul className="grid gap-3">
         {ITEMS.map((k) => (
-          <li key={k} className="flex gap-3 font-body text-[14px]/[1.5] text-txt-muted">
+          <li key={k} className="flex gap-3 font-body text-[0.875rem]/[1.5] text-txt-muted">
             <Icon name="check" size={16} className="mt-0.5 shrink-0 text-accent-bright" />
             <span>{t(k)}</span>
           </li>

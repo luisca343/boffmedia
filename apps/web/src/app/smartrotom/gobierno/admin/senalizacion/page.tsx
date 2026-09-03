@@ -92,7 +92,7 @@ export default function SenalizacionPage() {
             {t("senalizacion.configuracion")}
           </Bar>
           <div className="p-4">
-            <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+            <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
               {t("senalizacion.tipoVia")}
             </div>
             <div className="mb-4 flex w-fit gap-1 rounded-gt border border-gt-line-strong bg-gt-paper-2 p-[3px]">
@@ -103,14 +103,14 @@ export default function SenalizacionPage() {
               ))}
             </div>
 
-            <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+            <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
               {t("senalizacion.nombreCartel")}
             </div>
             <div className="mb-3.5">
               <Field value={name} onChange={setName} placeholder={t("senalizacion.nombreCartelPlaceholder")} />
             </div>
 
-            <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+            <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
               {t("senalizacion.nombreVia")}
             </div>
             <div className="mb-4">
@@ -119,9 +119,9 @@ export default function SenalizacionPage() {
 
             <div className="grid gap-2.5">
               {dests.map((d, i) => (
-                <div key={i} className="rounded-gt-sm border border-gt-line bg-gt-paper-2 p-[11px]">
+                <div key={i} className="rounded-gt-sm border border-gt-line bg-gt-paper-2 p-[0.6875rem]">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="font-gt-mono text-[10.5px] font-bold text-gt-ink-500">{i + 1} &gt; Destino</span>
+                    <span className="font-gt-mono text-[0.65625rem] font-bold text-gt-ink-500">{i + 1} &gt; Destino</span>
                     <button
                       type="button"
                       onClick={() => setDests((ds) => ds.filter((_, j) => j !== i))}
@@ -131,7 +131,7 @@ export default function SenalizacionPage() {
                       <Icon name="minus" size={15} />
                     </button>
                   </div>
-                  <div className="grid grid-cols-[2fr_1fr_1.1fr] gap-[7px]">
+                  <div className="grid grid-cols-[2fr_1fr_1.1fr] gap-[0.4375rem]">
                     <Field value={d.dest} onChange={(v) => setDest(i, { dest: v })} placeholder={t("senalizacion.destNombre")} />
                     <Field type="number" mono value={d.dist} onChange={(v) => setDest(i, { dist: v })} placeholder="bq" />
                     <Select value={d.dir} onChange={(v) => setDest(i, { dir: v })} options={DIR_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) }))} />
@@ -145,7 +145,7 @@ export default function SenalizacionPage() {
                 {createCartel.isPending ? t("common.saving") : t("senalizacion.guardarCartel")}
               </Button>
               <div className="mt-2.5 flex gap-1.5">
-                <Field value={url} onChange={() => {}} mono className="text-[11px]" />
+                <Field value={url} onChange={() => {}} mono className="text-[0.6875rem]" />
                 <Button tone="ghost" icon={copiedKey === "draft" ? "check" : "fileText"} onClick={() => copy("draft", url)}>
                   {copiedKey === "draft" ? t("common.copied") : t("common.copy")}
                 </Button>
@@ -155,7 +155,7 @@ export default function SenalizacionPage() {
         </Card>
 
         <Card>
-          <Bar icon="eye" dep="urbanismo" right={<span className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">{t(rt.labelKey)}</span>}>
+          <Bar icon="eye" dep="urbanismo" right={<span className="font-gt-mono text-[0.5625rem] uppercase tracking-[.12em] text-gt-ink-400">{t(rt.labelKey)}</span>}>
             {t("senalizacion.vistaPrevia")}
           </Bar>
           <div
@@ -171,7 +171,7 @@ export default function SenalizacionPage() {
       </div>
 
       <div className="mt-6">
-        <div className="mb-3 font-gt-mono text-[10.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+        <div className="mb-3 font-gt-mono text-[0.65625rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
           {t("senalizacion.cartelesGuardados")}
         </div>
         {isLoading ? (

@@ -192,13 +192,13 @@ export function PackForm({
       <div className="flex min-h-0 flex-1 flex-col gap-5">
         <div className="flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
           <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
-            <span className="font-mono text-[12px] font-bold">01</span>
+            <span className="font-mono text-[0.75rem] font-bold">01</span>
           </span>
           <div className="min-w-0">
-            <p className="font-display text-[15px] font-bold uppercase tracking-[0.04em] text-txt">
+            <p className="font-display text-[0.9375rem] font-bold uppercase tracking-[0.04em] text-txt">
               {editing ? t("editPack") : t("newPackSetup")}
             </p>
-            <p className="mt-1 max-w-[66ch] text-[13px] leading-[1.5] text-txt-dim">
+            <p className="mt-1 max-w-[66ch] text-[0.8125rem] leading-[1.5] text-txt-dim">
               {editing ? t("editPackLead") : t("newPackLead")}
             </p>
           </div>
@@ -212,10 +212,10 @@ export function PackForm({
                   <Icon name="edit" size={15} />
                 </span>
                 <div>
-                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                  <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
                     {t("identitySection")}
                   </h3>
-                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                  <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
                     {t("identitySectionLead")}
                   </p>
                 </div>
@@ -257,7 +257,7 @@ export function PackForm({
                   placeholder={t("description.placeholder")}
                   maxLength={2048}
                 />
-                <div className="mt-1 font-mono text-[10px] text-txt-dim">
+                <div className="mt-1 font-mono text-[0.625rem] text-txt-dim">
                   {t("descriptionCharCount", { current: description.length, max: 2048 })}
                 </div>
               </Field>
@@ -352,7 +352,7 @@ export function PackForm({
                               placeholder={t("gallery.altPlaceholder")}
                               maxLength={256}
                             />
-                            <div className="mt-1 font-mono text-[9px] text-txt-dim">
+                            <div className="mt-1 font-mono text-[0.5625rem] text-txt-dim">
                               {(img.alt?.length ?? 0)} / 256
                             </div>
                           </div>
@@ -382,10 +382,10 @@ export function PackForm({
                   <Icon name="layers" size={15} />
                 </span>
                 <div>
-                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                  <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
                     {t("gameTypeSection")}
                   </h3>
-                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                  <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
                     {t("gameTypeSectionLead")}
                   </p>
                 </div>
@@ -402,7 +402,7 @@ export function PackForm({
                       aria-checked={selected}
                       onClick={() => setGameType(gt)}
                       className={[
-                        "flex min-h-[96px] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms] cursor-pointer",
+                        "flex min-h-[6rem] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms] cursor-pointer",
                         selected
                           ? "border-accent bg-accent-soft"
                           : "border-line hover:border-line-2 hover:bg-panel",
@@ -419,10 +419,10 @@ export function PackForm({
                         <Icon name="cube" size={15} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block font-display text-[13px] font-bold uppercase tracking-[0.04em] text-txt">
+                        <span className="block font-display text-[0.8125rem] font-bold uppercase tracking-[0.04em] text-txt">
                           {t(`gameType.${gt}`)}
                         </span>
-                        <span className="mt-1 block text-[11px] leading-[1.4] text-txt-dim">
+                        <span className="mt-1 block text-[0.6875rem] leading-[1.4] text-txt-dim">
                           {t(`gameTypeLead.${gt}`)}
                         </span>
                       </span>
@@ -433,7 +433,7 @@ export function PackForm({
               </div>
 
               <div className="mt-4 rounded-sm border border-solid border-info-line bg-info-soft px-3 py-2">
-                <p className="text-[12px] leading-[1.5] text-txt-dim">
+                <p className="text-[0.75rem] leading-[1.5] text-txt-dim">
                   {t("gameTypePermanent")}
                 </p>
               </div>
@@ -446,10 +446,10 @@ export function PackForm({
                   <Icon name="shield" size={15} />
                 </span>
                 <div>
-                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                  <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
                     {t("accessSection")}
                   </h3>
-                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                  <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
                     {t("accessSectionLead")}
                   </p>
                 </div>
@@ -472,7 +472,7 @@ export function PackForm({
                       aria-checked={selected}
                       onClick={() => setAccessKind(option.value)}
                       className={[
-                        "flex min-h-[108px] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms]",
+                        "flex min-h-[6.75rem] items-start gap-3 border-2 border-solid p-3 text-left transition-colors duration-[140ms]",
                         selected
                           ? "border-accent bg-accent-soft"
                           : "border-line hover:border-line-2 hover:bg-panel",
@@ -489,10 +489,10 @@ export function PackForm({
                         <Icon name={option.icon} size={15} />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block font-display text-[13px] font-bold uppercase tracking-[0.04em] text-txt">
+                        <span className="block font-display text-[0.8125rem] font-bold uppercase tracking-[0.04em] text-txt">
                           {t(`access.${option.value}`)}
                         </span>
-                        <span className="mt-1 block text-[12px] leading-[1.4] text-txt-dim">
+                        <span className="mt-1 block text-[0.75rem] leading-[1.4] text-txt-dim">
                           {t(`accessLead.${option.value}`)}
                         </span>
                       </span>
@@ -504,7 +504,7 @@ export function PackForm({
 
               {pack?.accessKind === "password" && (
                 <div className="mt-4 rounded-sm border border-solid border-info-border bg-info-soft px-3 py-2">
-                  <p className="text-[12px] leading-[1.5] text-txt-dim">
+                  <p className="text-[0.75rem] leading-[1.5] text-txt-dim">
                     {t("accessPasswordDeprecated")}
                   </p>
                 </div>
@@ -522,16 +522,16 @@ export function PackForm({
                   <Icon name="server" size={15} />
                 </span>
                 <div>
-                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                  <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
                     {t("serverSection")}
                   </h3>
-                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                  <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
                     {t("serverSectionLead")}
                   </p>
                 </div>
               </div>
 
-              <div className="grid max-w-[520px] gap-3 sm:grid-cols-[1fr_140px]">
+              <div className="grid max-w-[32.5rem] gap-3 sm:grid-cols-[1fr_8.75rem]">
                 <Field label={t("serverHost")} hint={t("serverHostHint")}>
                   <Input
                     value={serverHost}
@@ -561,7 +561,7 @@ export function PackForm({
               {slugValid ? slug : t("slugPending")}
             </AvPill>
             {!editing && (
-              <span className="hidden font-mono text-[10px] text-txt-dim sm:inline">{t("slugPreview")}</span>
+              <span className="hidden font-mono text-[0.625rem] text-txt-dim sm:inline">{t("slugPreview")}</span>
             )}
           </div>
           <div className="flex items-center gap-2">

@@ -83,18 +83,18 @@ export function LogPanel({
             lead={t("noLogsDetail")}
           />
         ) : (
-          <div className="max-h-[520px] min-h-0 flex-1 overflow-auto bg-base-deep p-3">
-            <table className="w-full border-collapse font-mono text-[12px] leading-[1.55]">
+          <div className="max-h-[32.5rem] min-h-0 flex-1 overflow-auto bg-base-deep p-3">
+            <table className="w-full border-collapse font-mono text-[0.75rem] leading-[1.55]">
               <tbody>
                 {shown.map((line, i) => (
                   <tr key={`${line.ts}-${i}`} className="align-top">
-                    <td className="w-[74px] select-none pr-3 text-txt-dim">
+                    <td className="w-[4.625rem] select-none pr-3 text-txt-dim">
                       {formatClock(line.ts)}
                     </td>
-                    <td className="w-[64px] select-none pr-3">
+                    <td className="w-[4rem] select-none pr-3">
                       <span className={LEVEL_CLASS[line.level]}>{line.level}</span>
                     </td>
-                    <td className="w-[70px] select-none pr-3 text-txt-dim">{line.source}</td>
+                    <td className="w-[4.375rem] select-none pr-3 text-txt-dim">{line.source}</td>
                     <td className={`whitespace-pre-wrap ${LEVEL_CLASS[line.level]}`}>
                       {line.text}
                     </td>

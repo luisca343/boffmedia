@@ -36,7 +36,7 @@ export function TnPodium({ podium }: { podium: TnCompetitor[] }) {
   if (top.length === 0) return null
   const order = [top[1], top[0], top[2]].filter(Boolean) as TnCompetitor[]
   return (
-    <div className="mx-auto grid w-full max-w-[760px] grid-cols-3 items-end gap-4 max-[720px]:max-w-[380px] max-[720px]:grid-cols-1">
+    <div className="mx-auto grid w-full max-w-[47.5rem] grid-cols-3 items-end gap-4 max-[720px]:max-w-[23.75rem] max-[720px]:grid-cols-1">
       {order.map((c) => {
         const place = top.indexOf(c) + 1
         const first = place === 1
@@ -44,18 +44,18 @@ export function TnPodium({ podium }: { podium: TnCompetitor[] }) {
           <div
             key={c.id}
             className={cn(
-              "relative flex flex-col items-center px-4 pb-[18px] pt-[46px] text-center",
+              "relative flex flex-col items-center px-4 pb-[1.125rem] pt-[2.875rem] text-center",
               "border border-solid bg-panel",
               first
-                ? "border-accent-line [--cut-line:var(--accent-line)] bg-[linear-gradient(to_bottom,var(--accent-soft),var(--panel)_60%)] pt-[54px]"
+                ? "border-accent-line [--cut-line:var(--accent-line)] bg-[linear-gradient(to_bottom,var(--accent-soft),var(--panel)_60%)] pt-[3.375rem]"
                 : "border-line [--cut-line:var(--line)]",
               CUT_POD,
-              "max-[720px]:flex-row max-[720px]:items-center max-[720px]:gap-[14px] max-[720px]:p-4 max-[720px]:text-left",
+              "max-[720px]:flex-row max-[720px]:items-center max-[720px]:gap-[0.875rem] max-[720px]:p-4 max-[720px]:text-left",
             )}
           >
             <span
               className={cn(
-                "absolute left-1/2 top-3 grid h-[34px] w-[34px] -translate-x-1/2 place-items-center font-display text-[18px]/none font-extrabold italic",
+                "absolute left-1/2 top-3 grid h-[2.125rem] w-[2.125rem] -translate-x-1/2 place-items-center font-display text-[1.125rem]/none font-extrabold italic",
                 first ? "bg-accent text-accent-ink [--cut-line:var(--accent)]" : "border border-solid border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt",
                 CUT_PLACE,
                 "max-[720px]:static max-[720px]:translate-x-0",
@@ -66,8 +66,8 @@ export function TnPodium({ podium }: { podium: TnCompetitor[] }) {
             <span className={cn("mb-3 max-[720px]:mb-0", first ? "" : "")}>
               <PodiumAvatar c={c} size={first ? 74 : 60} />
             </span>
-            <span className="font-display text-[19px]/[1.05] font-bold uppercase">{c.name}</span>
-            {c.flag && <span className="mt-1 text-[15px]">{c.flag}</span>}
+            <span className="font-display text-[1.1875rem]/[1.05] font-bold uppercase">{c.name}</span>
+            {c.flag && <span className="mt-1 text-[0.9375rem]">{c.flag}</span>}
           </div>
         )
       })}

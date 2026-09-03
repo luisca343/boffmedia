@@ -34,9 +34,9 @@ function PlateDemo() {
   const [ghost, setGhost] = React.useState(true)
   const foe = bxMon("dragonite", { hp: 62 })
   return (
-    <div className="grid w-[min(300px,100%)] gap-[10px]">
+    <div className="grid w-[min(18.75rem,100%)] gap-[0.625rem]">
       <BxPlate mon={foe} foe slotTag="R1" ghost={ghost ? { min: 28, max: 41, ko: null } : null} />
-      <label className="flex cursor-pointer items-center gap-2 font-mono text-[11px]/none font-medium text-txt-dim">
+      <label className="flex cursor-pointer items-center gap-2 font-mono text-[0.6875rem]/none font-medium text-txt-dim">
         <input type="checkbox" checked={ghost} onChange={(e) => setGhost(e.target.checked)} /> previsión de daño (ghost)
       </label>
     </div>
@@ -48,7 +48,7 @@ function KeyDemo() {
   const mon = bxMon("garchomp")
   const target = bxMon("miraidon")
   return (
-    <div className="grid w-[min(380px,100%)] gap-[7px]">
+    <div className="grid w-[min(23.75rem,100%)] gap-[0.4375rem]">
       {(mon.moves || []).slice(0, 3).map((m, i) => (
         <BxKey key={m.name} move={m} hotkey={String(i + 1)} target={target} selected={sel === i} onClick={() => setSel(i)} />
       ))}
@@ -83,7 +83,7 @@ function TabDemo() {
   const [sel, setSel] = React.useState("replay")
   const [open, setOpen] = React.useState(["replay", "pvp"])
   return (
-    <div className="flex w-[min(520px,100%)] flex-wrap items-center gap-1 border border-solid border-line bg-base-2 p-2">
+    <div className="flex w-[min(32.5rem,100%)] flex-wrap items-center gap-1 border border-solid border-line bg-base-2 p-2">
       <BsimTab icon="home" label="Lobby" selected={sel === "home"} onSelect={() => setSel("home")} />
       <BsimTab icon="layers" label="Equipos" selected={sel === "teams"} onSelect={() => setSel("teams")} />
       {open.includes("replay") && (
@@ -116,7 +116,7 @@ function TabDemo() {
         <button
           type="button"
           onClick={() => setOpen(["replay", "pvp"])}
-          className="h-8 border border-dashed border-line px-3 font-mono text-[10px]/none uppercase tracking-[0.08em] text-txt-dim hover:text-txt"
+          className="h-8 border border-dashed border-line px-3 font-mono text-[0.625rem]/none uppercase tracking-[0.08em] text-txt-dim hover:text-txt"
         >
           restaurar
         </button>
@@ -135,10 +135,10 @@ function SpBarDemo() {
   // AtE are there to show the contrast: with no boost there is nothing to mark.
   const rows: [string, string, number][] = [["atk", "Atq", 130], ["spe", "Vel", 102], ["spa", "AtE", 80]]
   return (
-    <div className="grid w-[min(440px,100%)] gap-[10px]">
+    <div className="grid w-[min(27.5rem,100%)] gap-[0.625rem]">
       {rows.map(([key, label, base]) => (
-        <div key={key} className="grid grid-cols-[34px_1fr_34px] items-center gap-[10px]">
-          <span className="font-mono text-[9px]/none font-semibold uppercase tracking-[0.06em] text-accent-bright">{label}</span>
+        <div key={key} className="grid grid-cols-[2.125rem_1fr_2.125rem] items-center gap-[0.625rem]">
+          <span className="font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.06em] text-accent-bright">{label}</span>
           <TbSpBar
             stat={key}
             currentSp={sp[key]}
@@ -151,10 +151,10 @@ function SpBarDemo() {
             valueText={(n) => `${n} de 32 SP en ${label}`}
             bumpHint={(n) => `${n} saltos de +2`}
           />
-          <span className="text-right font-mono text-[12px]/none font-bold text-txt">{sp[key]}</span>
+          <span className="text-right font-mono text-[0.75rem]/none font-bold text-txt">{sp[key]}</span>
         </div>
       ))}
-      <p className="m-0 font-mono text-[10px]/none text-txt-dim">
+      <p className="m-0 font-mono text-[0.625rem]/none text-txt-dim">
         {spent} / {SP_TOTAL} SP · {SP_TOTAL - spent} restantes
       </p>
     </div>
@@ -212,14 +212,14 @@ export function BattlesimChapter() {
         lead={<>La placa de combatiente concentra identidad, PS, estado y la previsión de daño «fantasma» que aparece al apuntar un movimiento: franjas rayadas para el rango posible y sólidas para el daño seguro.</>}
       >
         <Sample title="Barra de PS con previsión" code="<BxHp pct ghost>" col>
-          <div className="grid w-[min(280px,100%)] gap-3">
+          <div className="grid w-[min(17.5rem,100%)] gap-3">
             <BxHp pct={100} />
             <BxHp pct={62} ghost={{ min: 24, max: 38 }} />
             <BxHp pct={18} />
           </div>
         </Sample>
         <Sample title="Placa aliada" code="<BxPlate mon slotTag>" col>
-          <div className="grid w-[min(300px,100%)] gap-2">
+          <div className="grid w-[min(18.75rem,100%)] gap-2">
             <BxPlate mon={chomp} slotTag="A1" active />
             <BxPlate mon={hands} slotTag="A2" />
           </div>
@@ -228,7 +228,7 @@ export function BattlesimChapter() {
           <PlateDemo />
         </Sample>
         <Sample title="Teracristalizado y debilitado" code="<BxPlate>" col>
-          <div className="grid w-[min(300px,100%)] gap-2">
+          <div className="grid w-[min(18.75rem,100%)] gap-2">
             <BxPlate mon={flutter} slotTag="A1" />
             <BxPlate mon={koMon} foe slotTag="R2" />
           </div>
@@ -245,7 +245,7 @@ export function BattlesimChapter() {
           <KeyDemo />
         </Sample>
         <Sample title="Banquillo" code="<BxBench mon hotkey>" col>
-          <div className="grid w-[min(320px,100%)] gap-[7px]">
+          <div className="grid w-[min(20rem,100%)] gap-[0.4375rem]">
             <BxBench mon={bxMon("amoonguss")} hotkey="5" />
             <BxBench mon={bxMon("rillaboom", { hp: 0, fnt: true })} hotkey="6" />
           </div>
@@ -280,7 +280,7 @@ export function BattlesimChapter() {
         lead={<>El marco del combate: placas de jugador con los seis rombos del equipo, cuenta atrás del turno, probabilidad de victoria turno a turno y condiciones de campo.</>}
       >
         <Sample title="Placa de jugador" code="<BxScore team right>" col>
-          <div className="grid w-[min(340px,100%)] gap-3">
+          <div className="grid w-[min(21.25rem,100%)] gap-3">
             <BxScore name="Alex" handle="@rotomchef" rating={1607} av="AX" tag="tú" team={[chomp, flutter, bxMon("gholdengo"), hands]} />
             <BxScore right name="Kaito" handle="@kaito_vgc" rating={1689} av="KT" team={[bxMon("dragonite", { hp: 62 }), bxMon("miraidon"), koMon, bxMon("kingambit", { hp: 30 })]} />
           </div>
@@ -290,7 +290,7 @@ export function BattlesimChapter() {
           <BxRing sec={7} max={45} />
         </Sample>
         <Sample title="Probabilidad de victoria" code="<BxSpark data>" col>
-          <div className="w-[min(300px,100%)]">
+          <div className="w-[min(18.75rem,100%)]">
             <BxSpark data={[50, 54, 47, 61, 58, 72, 66, 79]} />
           </div>
         </Sample>
@@ -308,7 +308,7 @@ export function BattlesimChapter() {
         lead={<>La telemetría del combate: líneas de registro con barra de tipo, sello de daño y eficacia; cabeceras de turno; y el hueco de equipo que comparten el Team Builder y la previa.</>}
       >
         <Sample title="Registro del combate" code="<BxTick ev>" col note="Cada acción hereda el color de su tipo en la barra izquierda; las líneas de sistema van en cursiva y las críticas se lavan en ámbar.">
-          <div className="grid w-[min(420px,100%)] gap-[2px]">
+          <div className="grid w-[min(26.25rem,100%)] gap-[2px]">
             <BxTick ev={{ turn: 7 }} />
             <BxTick ev={{ who: "ally", type: "Ground", txt: "<b>Garchomp</b> usó Terremoto sobre Kingambit.", dmg: "−38%", eff: "super" }} />
             <BxTick ev={{ who: "foe", type: "Dragon", txt: "<b>Miraidon</b> usó Dracometeoro sobre Garchomp.", dmg: "−52%", crit: true }} />
@@ -317,7 +317,7 @@ export function BattlesimChapter() {
           </div>
         </Sample>
         <Sample title="Hueco de equipo" code="<BxSlot mon order>" col>
-          <div className="grid w-[min(280px,100%)] gap-2">
+          <div className="grid w-[min(17.5rem,100%)] gap-2">
             <BxSlot mon={DEX.garchomp} order={1} onClick={() => {}} />
             <BxSlot mon={null} onClick={() => {}} />
           </div>
@@ -337,43 +337,43 @@ export function BattlesimChapter() {
         lead={<>El rediseño «cliente en vivo»: la consola de juego del lobby y las piezas del Team Builder — píldoras de modo, botón de batalla, accesos rápidos, selector de equipo, cristal de teratipo, control de EVs y celdas de cobertura del análisis.</>}
       >
         <Sample title="Píldoras de modo" code=".bx-modepill" col note="Selector de modo de la consola del lobby: icono, etiqueta y coletilla en una sola línea alineada.">
-          <div className="grid w-[min(440px,100%)] grid-cols-2 gap-2">
-            <button type="button" className="flex min-w-0 items-center gap-[9px] border border-solid border-accent bg-accent-soft px-3 py-[11px] text-left text-txt cut-tag cut-tag-edge [--cut-line:var(--accent)] [--cut-tag:8px]">
+          <div className="grid w-[min(27.5rem,100%)] grid-cols-2 gap-2">
+            <button type="button" className="flex min-w-0 items-center gap-[0.5625rem] border border-solid border-accent bg-accent-soft px-3 py-[0.6875rem] text-left text-txt cut-tag cut-tag-edge [--cut-line:var(--accent)] [--cut-tag:8px]">
               <Icon name="target" size={17} className="flex-none text-accent-bright" />
               <span className="grid min-w-0 gap-[2px]">
-                <b className="font-display text-[12.5px]/none font-bold uppercase tracking-[0.03em]">Entrenamiento</b>
-                <small className="truncate font-mono text-[9px]/[1.2] text-txt-dim">Contra la IA</small>
+                <b className="font-display text-[0.78125rem]/none font-bold uppercase tracking-[0.03em]">Entrenamiento</b>
+                <small className="truncate font-mono text-[0.5625rem]/[1.2] text-txt-dim">Contra la IA</small>
               </span>
             </button>
-            <button type="button" className="flex min-w-0 items-center gap-[9px] border border-solid border-line bg-base px-3 py-[11px] text-left text-txt-muted transition-[color,border-color] hover:border-line-2 hover:text-txt cut-tag cut-tag-edge hover:[--cut-line:var(--line-2)] [--cut-line:var(--line)] [--cut-tag:8px]">
+            <button type="button" className="flex min-w-0 items-center gap-[0.5625rem] border border-solid border-line bg-base px-3 py-[0.6875rem] text-left text-txt-muted transition-[color,border-color] hover:border-line-2 hover:text-txt cut-tag cut-tag-edge hover:[--cut-line:var(--line-2)] [--cut-line:var(--line)] [--cut-tag:8px]">
               <Icon name="sword" size={17} className="flex-none text-txt-dim" />
               <span className="grid min-w-0 gap-[2px]">
-                <b className="font-display text-[12.5px]/none font-bold uppercase tracking-[0.03em]">Clasificatoria</b>
-                <small className="truncate font-mono text-[9px]/[1.2] text-txt-dim">Emparejamiento PvP</small>
+                <b className="font-display text-[0.78125rem]/none font-bold uppercase tracking-[0.03em]">Clasificatoria</b>
+                <small className="truncate font-mono text-[0.5625rem]/[1.2] text-txt-dim">Emparejamiento PvP</small>
               </span>
             </button>
           </div>
         </Sample>
         <Sample title="Botón de batalla y accesos" code=".bx-gobtn · .bx-tile" col note="La acción primaria del lobby es un botón a todo lo ancho con el formato como subtítulo; los accesos llevan a Team Builder y Repeticiones.">
-          <div className="grid w-[min(440px,100%)] gap-[10px]">
+          <div className="grid w-[min(27.5rem,100%)] gap-[0.625rem]">
             <button type="button" className="relative flex w-full items-center justify-center gap-3 overflow-hidden border-0 bg-accent p-4 text-accent-ink transition-[background,transform] hover:-translate-y-px hover:bg-accent-bright cut-tag [--cut-tag:12px]">
               <Icon name="sword" size={22} />
-              <b className="font-display text-[19px]/none font-extrabold italic uppercase tracking-[0.05em]">Batallar</b>
-              <small className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] opacity-70">Dobles VGC</small>
+              <b className="font-display text-[1.1875rem]/none font-extrabold italic uppercase tracking-[0.05em]">Batallar</b>
+              <small className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.08em] opacity-70">Dobles VGC</small>
             </button>
-            <div className="grid grid-cols-2 gap-[10px]">
+            <div className="grid grid-cols-2 gap-[0.625rem]">
               {([["layers", "Team Builder", "2 equipos"], ["play", "Repeticiones", "6 guardadas"]] as const).map(([ic, tit, sub]) => (
-                <button key={tit} type="button" className="grid min-w-0 justify-items-start gap-[5px] border border-solid border-line bg-panel px-4 py-[15px] text-left text-txt-muted transition-[color,border-color,transform] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line)] [--cut-tag:10px]">
+                <button key={tit} type="button" className="grid min-w-0 justify-items-start gap-[0.3125rem] border border-solid border-line bg-panel px-4 py-[0.9375rem] text-left text-txt-muted transition-[color,border-color,transform] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line)] [--cut-tag:10px]">
                   <Icon name={ic} size={20} className="text-accent-bright" />
-                  <b className="font-display text-[14px]/none font-bold uppercase tracking-[0.03em]">{tit}</b>
-                  <small className="font-mono text-[10px]/[1.2] text-txt-dim">{sub}</small>
+                  <b className="font-display text-[0.875rem]/none font-bold uppercase tracking-[0.03em]">{tit}</b>
+                  <small className="font-mono text-[0.625rem]/[1.2] text-txt-dim">{sub}</small>
                 </button>
               ))}
             </div>
           </div>
         </Sample>
         <Sample title="Cristal de teratipo" code=".bx-terachip" col note="Rejilla de los 18 tipos del editor de set; el seleccionado adopta el color canónico del tipo.">
-          <div className="grid w-[min(340px,100%)] grid-cols-3 gap-[5px]">
+          <div className="grid w-[min(21.25rem,100%)] grid-cols-3 gap-[0.3125rem]">
             {TERA_TYPES.map((t) => {
               const on = t === "Steel"
               return (
@@ -382,7 +382,7 @@ export function BattlesimChapter() {
                   type="button"
                   style={{ ["--tyc" as string]: tyColor(t) }}
                   className={
-                    "flex min-w-0 items-center gap-[5px] border border-solid px-[7px] py-[6px] font-mono text-[9.5px]/none font-semibold tracking-[0.02em] transition-[color,border-color,background] " +
+                    "flex min-w-0 items-center gap-[0.3125rem] border border-solid px-[0.4375rem] py-[0.375rem] font-mono text-[0.59375rem]/none font-semibold tracking-[0.02em] transition-[color,border-color,background] " +
                     (on
                       ? "border-[var(--tyc)] text-txt [background:color-mix(in_srgb,var(--tyc)_14%,transparent)] shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--tyc)_45%,transparent)]"
                       : "border-line bg-base text-txt-muted hover:border-[color-mix(in_srgb,var(--tyc)_55%,var(--line))] hover:text-txt")
@@ -396,14 +396,14 @@ export function BattlesimChapter() {
           </div>
         </Sample>
         <Sample title="Control de EVs" code=".bx-ev" col note="Reparto nivel 50 con tope de 508 puntos; el valor final se recalcula en vivo junto a cada barra.">
-          <div className="grid w-[min(380px,100%)] gap-[5px]">
+          <div className="grid w-[min(23.75rem,100%)] gap-[0.3125rem]">
             {EV_ROWS.map(([k, base, ev]) => (
-              <div key={k} className="grid grid-cols-[30px_26px_1fr_46px_30px] items-center gap-2">
-                <span className={"font-mono text-[9px]/none font-semibold uppercase tracking-[0.06em] " + (ev > 0 ? "text-accent-bright" : "text-txt-dim")}>{STAT_ES[k]}</span>
-                <span className="text-right font-mono text-[9.5px]/none text-txt-dim">{base}</span>
+              <div key={k} className="grid grid-cols-[1.875rem_1.625rem_1fr_2.875rem_1.875rem] items-center gap-2">
+                <span className={"font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.06em] " + (ev > 0 ? "text-accent-bright" : "text-txt-dim")}>{STAT_ES[k]}</span>
+                <span className="text-right font-mono text-[0.59375rem]/none text-txt-dim">{base}</span>
                 <input className="h-1 w-full accent-accent" type="range" min={0} max={252} step={4} defaultValue={ev} readOnly aria-label={"EVs " + k} />
-                <input className="w-full border border-solid border-line bg-base px-[5px] py-1 text-center font-mono text-[10px]/none text-txt focus:border-accent-line focus:outline-none" type="number" defaultValue={ev} readOnly aria-label={"EVs " + k + " número"} />
-                <span className="text-right font-mono text-[12px]/none font-bold text-txt">{finalStat(base, k, { [k]: ev })}</span>
+                <input className="w-full border border-solid border-line bg-base px-[0.3125rem] py-1 text-center font-mono text-[0.625rem]/none text-txt focus:border-accent-line focus:outline-none" type="number" defaultValue={ev} readOnly aria-label={"EVs " + k + " número"} />
+                <span className="text-right font-mono text-[0.75rem]/none font-bold text-txt">{finalStat(base, k, { [k]: ev })}</span>
               </div>
             ))}
           </div>
@@ -453,19 +453,19 @@ export function BattlesimChapter() {
           <SpBarDemo />
         </Sample>
         <Sample title="Celdas de cobertura" code=".bx-covcell" col note="Del panel de análisis: mejor eficacia ofensiva del equipo contra cada tipo defensor.">
-          <div className="grid w-[min(440px,100%)] grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-1">
+          <div className="grid w-[min(27.5rem,100%)] grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-1">
             {COVERAGE.map(([t, m]) => (
               <span
                 key={t}
                 style={{ ["--tyc" as string]: tyColor(t) }}
                 className={
-                  "flex min-w-0 items-center gap-[5px] border border-solid bg-base px-[7px] py-[5px] " +
+                  "flex min-w-0 items-center gap-[0.3125rem] border border-solid bg-base px-[0.4375rem] py-[0.3125rem] " +
                   (m >= 2 ? "border-[color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft" : m < 1 ? "border-line opacity-80" : "border-line")
                 }
               >
-                <i className="h-[6px] w-[6px] flex-none bg-[var(--tyc)]" />
-                <b className="min-w-0 flex-1 truncate font-body text-[9.5px]/none text-txt-muted">{TYPE_ES[t]}</b>
-                <em className={"flex-none font-mono text-[10px]/none font-bold not-italic " + (m >= 2 ? "text-ok" : m < 1 ? "text-warn" : "text-txt-dim")}>{m >= 2 ? "2×" : m < 1 ? "½" : "1×"}</em>
+                <i className="h-[0.375rem] w-[0.375rem] flex-none bg-[var(--tyc)]" />
+                <b className="min-w-0 flex-1 truncate font-body text-[0.59375rem]/none text-txt-muted">{TYPE_ES[t]}</b>
+                <em className={"flex-none font-mono text-[0.625rem]/none font-bold not-italic " + (m >= 2 ? "text-ok" : m < 1 ? "text-warn" : "text-txt-dim")}>{m >= 2 ? "2×" : m < 1 ? "½" : "1×"}</em>
               </span>
             ))}
           </div>

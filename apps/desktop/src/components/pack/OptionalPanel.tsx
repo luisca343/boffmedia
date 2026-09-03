@@ -325,17 +325,17 @@ export function OptionalPanel({
     >
       <header className="flex flex-wrap items-start gap-3">
         <div className="flex min-w-0 flex-1 flex-col gap-[2px]">
-          <h2 className="font-display text-[14px] font-bold uppercase tracking-[0.06em]">
+          <h2 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.06em]">
             {t("optionalTitle")}
           </h2>
-          <p className="text-[12px] leading-snug text-txt-muted">{t("optionalSubtitle")}</p>
+          <p className="text-[0.75rem] leading-snug text-txt-muted">{t("optionalSubtitle")}</p>
           {/* With thirty-odd features across seven groups the subtitle stops
               being enough to answer "how much of this have I turned on, and
               what will it cost me". Only the enabled bytes are counted: the
               total across everything on offer is a number the player cannot
               act on. */}
           {summary.total > 0 && (
-            <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-txt-muted">
+            <p className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-muted">
               {t("optionalSummary", {
                 on: summary.on,
                 total: summary.total,

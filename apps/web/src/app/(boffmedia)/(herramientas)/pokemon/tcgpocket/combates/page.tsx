@@ -15,7 +15,7 @@ export default async function TcgpCombatesPage() {
   // under the package namespace.
   const t = await getTranslations("tools.tcgpocket")
   return (
-    <div className="mx-auto grid min-h-[60vh] w-full max-w-[1400px] place-items-center p-[clamp(18px,3vw,34px)]">
+    <div className="mx-auto grid min-h-[60vh] w-full max-w-[87.5rem] place-items-center p-[clamp(1.125rem,3vw,2.125rem)]">
       <Empty icon="sword" title={t("app.combates.title")} lead={t("app.combates.lead")}>
         <Button variant="pri" icon="back" href="/pokemon/tcgpocket">{t("app.combates.back")}</Button>
       </Empty>

@@ -35,12 +35,12 @@ export function PostIt({
       }}
     >
       <span
-        className="absolute -top-2 left-1/2 h-4 w-[50px] -translate-x-1/2 -rotate-3 border border-[rgba(180,150,100,.3)] bg-[rgba(220,200,160,.55)] shadow-[0_2px_3px_rgba(0,0,0,.2)]"
+        className="absolute -top-2 left-1/2 h-4 w-[3.125rem] -translate-x-1/2 -rotate-3 border border-[rgba(180,150,100,.3)] bg-[rgba(220,200,160,.55)] shadow-[0_2px_3px_rgba(0,0,0,.2)]"
         style={{ transform: "translateX(-50%) rotate(-3deg)" }}
       />
       {children}
       {footer && (
-        <div className="mt-2 border-t border-[rgba(60,40,20,.2)] pt-1 text-right text-[11px] opacity-55">{footer}</div>
+        <div className="mt-2 border-t border-[rgba(60,40,20,.2)] pt-1 text-right text-[0.6875rem] opacity-55">{footer}</div>
       )}
     </div>
   )
@@ -73,11 +73,11 @@ export function NewspaperClipping({
         clipPath: "polygon(2% 0%, 98% 1%, 100% 4%, 99% 96%, 97% 100%, 3% 99%, 1% 96%, 2% 4%)",
       }}
     >
-      <div className="mb-1 border-b border-black/40 pb-[3px] text-center font-ms-uppercase text-[8px] uppercase tracking-[.2em] opacity-70">
+      <div className="mb-1 border-b border-black/40 pb-[3px] text-center font-ms-uppercase text-[0.5rem] uppercase tracking-[.2em] opacity-70">
         {source}
       </div>
       <div className="mb-1.5 font-ms-uppercase text-sm font-bold uppercase leading-[1.05] tracking-[.02em]">{headline}</div>
-      <div className="text-justify font-ms text-[9px] leading-[1.4] text-[#2a1810] [column-count:2] [column-gap:6px]">{body}</div>
+      <div className="text-justify font-ms text-[0.5625rem] leading-[1.4] text-[#2a1810] [column-count:2] [column-gap:6px]">{body}</div>
     </div>
   )
 }
@@ -94,7 +94,7 @@ export function Polaroid({ caption = "Ruta 1", tilt = -4, size = 130 }: { captio
         boxShadow: "0 1px 0 rgba(0,0,0,.06), 4px 8px 14px rgba(0,0,0,.4), 12px 20px 28px -10px rgba(0,0,0,.45)",
       }}
     >
-      <span className="absolute -right-2.5 -top-2.5 h-[22px] w-[38px] rotate-[28deg] border border-[rgba(180,150,100,.3)] bg-[rgba(220,200,160,.6)]" />
+      <span className="absolute -right-2.5 -top-2.5 h-[1.375rem] w-[2.375rem] rotate-[28deg] border border-[rgba(180,150,100,.3)] bg-[rgba(220,200,160,.6)]" />
       <div
         className="relative overflow-hidden shadow-[inset_0_0_0_1px_rgba(0,0,0,.4)]"
         style={{ aspectRatio: "1 / 0.95", background: "linear-gradient(135deg, #4a5a2c 0%, #7a8a4a 40%, #c8b86a 90%)" }}
@@ -107,7 +107,7 @@ export function Polaroid({ caption = "Ruta 1", tilt = -4, size = 130 }: { captio
           <path d="M 60 76 L 68 64 L 74 76 Z" fill="#2a1810" />
         </svg>
       </div>
-      <div className="mt-2 text-center font-ms-hand text-[13px] text-[#3a2a18]">{caption}</div>
+      <div className="mt-2 text-center font-ms-hand text-[0.8125rem] text-[#3a2a18]">{caption}</div>
     </div>
   )
 }

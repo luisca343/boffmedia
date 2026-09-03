@@ -63,7 +63,7 @@ export default function MultasPage() {
       )}
 
       {data && data.total > all.length && (
-        <p className="mb-3 font-gt-mono text-[10.5px] text-gt-ink-400">
+        <p className="mb-3 font-gt-mono text-[0.65625rem] text-gt-ink-400">
           {t("hacienda.mostrandoMultas", { shown: all.length, total: data.total })}
         </p>
       )}

@@ -89,7 +89,7 @@ export function StatRadar({ mons }: StatRadarProps) {
             key={locId(m.loc)}
             className="flex items-center gap-1.5 text-xs text-pc-fg"
           >
-            <span className="h-[11px] w-[11px] rounded-[3px]" style={{ background: compareColor(mi) }} />
+            <span className="h-[0.6875rem] w-[0.6875rem] rounded-[3px]" style={{ background: compareColor(mi) }} />
             {displayName(m.pokemon)}
           </span>
         ))}

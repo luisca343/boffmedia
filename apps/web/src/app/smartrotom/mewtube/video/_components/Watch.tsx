@@ -47,19 +47,19 @@ export function Watch({ id }: { id: string }) {
   const tags = (v.snippet as { tags?: string[] }).tags?.slice(0, 3) ?? []
 
   return (
-    <div className="grid grid-cols-1 gap-6 px-4 py-5 lg:grid-cols-[minmax(0,1fr)_340px] md:px-6">
+    <div className="grid grid-cols-1 gap-6 px-4 py-5 lg:grid-cols-[minmax(0,1fr)_21.25rem] md:px-6">
       <div className="min-w-0">
         <NativePlayer ref={playerRef} videoId={id} poster={poster} title={v.snippet.title} chapters={chapters} />
 
-        <h1 className="mb-3.5 mt-[18px] font-mw-display text-2xl font-extrabold leading-[1.25] tracking-[-0.01em] [text-wrap:balance]">
+        <h1 className="mb-3.5 mt-[1.125rem] font-mw-display text-2xl font-extrabold leading-[1.25] tracking-[-0.01em] [text-wrap:balance]">
           {v.snippet.title}
         </h1>
 
-        <div className="flex flex-wrap justify-between gap-4 border-b border-mw-line pb-[18px] pt-3.5">
+        <div className="flex flex-wrap justify-between gap-4 border-b border-mw-line pb-[1.125rem] pt-3.5">
           <div className="flex items-center gap-3">
             <Avatar src={channelAvatar} name={v.snippet.channelTitle} size={44} />
             <div>
-              <div className="inline-flex items-center gap-1.5 text-[15px] font-semibold">
+              <div className="inline-flex items-center gap-1.5 text-[0.9375rem] font-semibold">
                 {v.snippet.channelTitle}
               </div>
               {subs && <div className="text-xs text-mw-fg-mute">{t("video.subscribers", { count: formatCount(subs) })}</div>}
@@ -94,8 +94,8 @@ export function Watch({ id }: { id: string }) {
           </div>
         </div>
 
-        <div className="mt-[18px] rounded-mw-2xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_28%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_6%,rgb(var(--mw-800)))] px-5 py-[18px]">
-          <div className="flex flex-wrap items-center gap-2 text-[13px] text-mw-fg-mute">
+        <div className="mt-[1.125rem] rounded-mw-2xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_28%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_6%,rgb(var(--mw-800)))] px-5 py-[1.125rem]">
+          <div className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-mw-fg-mute">
             {v.statistics && <strong className="font-semibold text-mw-fg">{t("video.views", { count: formatCount(v.statistics.viewCount) })}</strong>}
             <span>·</span>
             <span>{relativeTime(v.snippet.publishedAt)}</span>
@@ -110,16 +110,16 @@ export function Watch({ id }: { id: string }) {
 
           {chapters.length > 0 && (
             <div className="mt-4">
-              <div className="mb-2 inline-flex items-center gap-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.14em] text-mw-fg-faint">
+              <div className="mb-2 inline-flex items-center gap-1.5 font-mono text-[0.6875rem] font-bold uppercase tracking-[0.14em] text-mw-fg-faint">
                 <I.bookmark size={14} /> {t("video.chapters", { count: chapters.length })}
               </div>
-              <div className="grid gap-1 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
+              <div className="grid gap-1 [grid-template-columns:repeat(auto-fill,minmax(13.75rem,1fr))]">
                 {chapters.map((c) => (
                   <button
                     key={c.seconds}
                     type="button"
                     onClick={() => playerRef.current?.seek(c.seconds)}
-                    className="flex items-center gap-2.5 rounded-mw-lg px-2.5 py-2 text-left text-[13px] text-mw-fg-mute transition-colors hover:bg-mw-800 hover:text-mw-fg"
+                    className="flex items-center gap-2.5 rounded-mw-lg px-2.5 py-2 text-left text-[0.8125rem] text-mw-fg-mute transition-colors hover:bg-mw-800 hover:text-mw-fg"
                   >
                     <span className="flex-none font-mono text-xs font-bold text-mw-accent">{c.time}</span>
                     <span className="min-w-0 flex-1 truncate">{c.label}</span>
@@ -134,7 +134,7 @@ export function Watch({ id }: { id: string }) {
       </div>
 
       <aside className="flex flex-col gap-4">
-        <div className="flex items-center justify-between rounded-mw-md border border-[color-mix(in_srgb,rgb(var(--mw-accent))_30%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_8%,rgb(var(--mw-900)))] px-3.5 py-2 text-[13px]">
+        <div className="flex items-center justify-between rounded-mw-md border border-[color-mix(in_srgb,rgb(var(--mw-accent))_30%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_8%,rgb(var(--mw-900)))] px-3.5 py-2 text-[0.8125rem]">
           <span>{t("video.autoplay")}</span>
           <Toggle checked={autoplay} onChange={setAutoplay} label={t("video.autoplay")} />
         </div>

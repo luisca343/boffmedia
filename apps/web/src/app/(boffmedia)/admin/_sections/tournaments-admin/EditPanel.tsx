@@ -11,7 +11,7 @@ import {
   type TournamentDetailApi,
 } from "@/services/api/boffmedia/tournamentsService"
 
-const TEXTAREA = "w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[13px]"
+const TEXTAREA = "w-full resize-y border border-solid border-line bg-base px-2 py-1.5 font-body text-[0.8125rem]"
 
 /**
  * The settings form, in fieldsets. One draft, one save: the four panels are
@@ -158,7 +158,7 @@ export function EditPanel({
         </div>
       </AvPanel>
 
-      <div className="mb-[18px] flex justify-end">
+      <div className="mb-[1.125rem] flex justify-end">
         <Button variant="pri" size="sm" icon="check" disabled={busy} onClick={save}>{t("saveChanges")}</Button>
       </div>
     </div>

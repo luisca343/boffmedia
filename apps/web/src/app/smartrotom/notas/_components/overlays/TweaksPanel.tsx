@@ -18,13 +18,13 @@ function Seg<T extends string>({
 }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <span className="text-[12.5px] text-nt-fg-muted">{label}</span>
+      <span className="text-[0.78125rem] text-nt-fg-muted">{label}</span>
       <div className="flex gap-0.5 rounded-nt-md border border-nt-border bg-nt-bg-1 p-0.5">
         {options.map((o) => (
           <button
             key={o.v}
             onClick={() => onChange(o.v)}
-            className={`rounded-nt-sm px-2.5 py-1 text-[12px] transition-colors ${
+            className={`rounded-nt-sm px-2.5 py-1 text-[0.75rem] transition-colors ${
               value === o.v ? "bg-nt-accent/15 text-nt-accent-fg" : "text-nt-fg-muted hover:text-nt-fg"
             }`}
           >
@@ -44,8 +44,8 @@ export function TweaksPanel() {
   return (
     <div className="fixed bottom-4 left-4 z-[80] max-md:hidden">
       {open && (
-        <div className="mb-2 w-[280px] rounded-nt-xl border border-nt-border-2 bg-nt-panel p-3.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,.7)]">
-          <div className="mb-3 font-nt-display text-[10px] font-semibold uppercase tracking-[.14em] text-nt-fg-subtle">
+        <div className="mb-2 w-[17.5rem] rounded-nt-xl border border-nt-border-2 bg-nt-panel p-3.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,.7)]">
+          <div className="mb-3 font-nt-display text-[0.625rem] font-semibold uppercase tracking-[.14em] text-nt-fg-subtle">
             {t("tweaks.appearance")}
           </div>
           <div className="flex flex-col gap-3">
@@ -59,7 +59,7 @@ export function TweaksPanel() {
               onChange={theme.setTheme}
             />
             <div className="flex items-center justify-between gap-3">
-              <span className="text-[12.5px] text-nt-fg-muted">{t("tweaks.accent")}</span>
+              <span className="text-[0.78125rem] text-nt-fg-muted">{t("tweaks.accent")}</span>
               <div className="flex gap-1.5">
                 {ACCENT_OPTIONS.map((hex) => (
                   <button
@@ -75,7 +75,7 @@ export function TweaksPanel() {
               </div>
             </div>
           </div>
-          <div className="mb-3 mt-4 font-nt-display text-[10px] font-semibold uppercase tracking-[.14em] text-nt-fg-subtle">
+          <div className="mb-3 mt-4 font-nt-display text-[0.625rem] font-semibold uppercase tracking-[.14em] text-nt-fg-subtle">
             {t("tweaks.reading")}
           </div>
           <div className="flex flex-col gap-3">

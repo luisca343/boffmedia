@@ -193,27 +193,27 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
     <div className="grid gap-3">
       <div className="flex items-center gap-2">
         <TbValidityChip state={validityState}>{validityText}</TbValidityChip>
-        <span className="font-mono text-[10px]/none text-txt-dim">{formatOptions.find((o) => o.value === draft.format)?.label}</span>
+        <span className="font-mono text-[0.625rem]/none text-txt-dim">{formatOptions.find((o) => o.value === draft.format)?.label}</span>
       </div>
-      <ul aria-live="polite" aria-atomic="false" className="m-0 grid list-none gap-[6px] p-0">
+      <ul aria-live="polite" aria-atomic="false" className="m-0 grid list-none gap-[0.375rem] p-0">
         {problems.length === 0 && draft.packed && validityState === "ok" && (
-          <li className="font-body text-[13px] leading-[1.45] text-txt-dim">{t("validity.none")}</li>
+          <li className="font-body text-[0.8125rem] leading-[1.45] text-txt-dim">{t("validity.none")}</li>
         )}
         {problems.map((p, i) => (
-          <li key={i} className="grid gap-[3px] border-l-2 border-solid border-bad pl-[9px]">
+          <li key={i} className="grid gap-[3px] border-l-2 border-solid border-bad pl-[0.5625rem]">
             {p.slot !== null ? (
               <button
                 type="button"
                 onClick={() => selectSlot(p.slot as number)}
                 aria-label={t("validity.goTo", { n: p.slot + 1 })}
-                className={cn("m-0 w-fit border-0 bg-transparent p-0 text-left font-mono text-[10px]/none font-bold uppercase tracking-[0.1em] text-bad hover:underline", BSIM_FOCUS)}
+                className={cn("m-0 w-fit border-0 bg-transparent p-0 text-left font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.1em] text-bad hover:underline", BSIM_FOCUS)}
               >
                 {t("validity.slot", { n: p.slot + 1 })} · {draft.sets[p.slot].species}
               </button>
             ) : (
               <TbKicker className="text-bad">{t("validity.team")}</TbKicker>
             )}
-            <span className="font-body text-[13px] leading-[1.4] text-txt-muted">{p.text}</span>
+            <span className="font-body text-[0.8125rem] leading-[1.4] text-txt-muted">{p.text}</span>
           </li>
         ))}
       </ul>
@@ -222,17 +222,17 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
 
   const coveragePanel =
     analysis.members === 0 ? (
-      <p className="m-0 font-body text-[13px] leading-[1.45] text-txt-dim">{t("coverage.emptyLead")}</p>
+      <p className="m-0 font-body text-[0.8125rem] leading-[1.45] text-txt-dim">{t("coverage.emptyLead")}</p>
     ) : (
       <div className="grid gap-2">
-        <p className="m-0 font-body text-[13px] leading-[1.4] text-txt-dim">{t("coverage.lead")}</p>
-        <table className="w-full border-collapse font-mono text-[11px]/none tabular-nums">
+        <p className="m-0 font-body text-[0.8125rem] leading-[1.4] text-txt-dim">{t("coverage.lead")}</p>
+        <table className="w-full border-collapse font-mono text-[0.6875rem]/none tabular-nums">
           <thead>
-            <tr className="text-[9px] uppercase tracking-[0.1em] text-txt-dim">
-              <th scope="col" className="pb-[6px] text-left font-semibold">{t("coverage.type")}</th>
-              <th scope="col" className="pb-[6px] text-right font-semibold">{t("coverage.weak")}</th>
-              <th scope="col" className="pb-[6px] text-right font-semibold">{t("coverage.resist")}</th>
-              <th scope="col" className="pb-[6px] text-right font-semibold">{t("coverage.immune")}</th>
+            <tr className="text-[0.5625rem] uppercase tracking-[0.1em] text-txt-dim">
+              <th scope="col" className="pb-[0.375rem] text-left font-semibold">{t("coverage.type")}</th>
+              <th scope="col" className="pb-[0.375rem] text-right font-semibold">{t("coverage.weak")}</th>
+              <th scope="col" className="pb-[0.375rem] text-right font-semibold">{t("coverage.resist")}</th>
+              <th scope="col" className="pb-[0.375rem] text-right font-semibold">{t("coverage.immune")}</th>
             </tr>
           </thead>
           <tbody>
@@ -240,12 +240,12 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
               const hot = row.weak >= Math.max(2, Math.ceil(analysis.members / 2));
               return (
                 <tr key={row.type} className="border-t border-solid border-line">
-                  <td className="py-[5px]">
+                  <td className="py-[0.3125rem]">
                     <TbTypeChip type={row.type} small label={labels.type(row.type)} />
                   </td>
-                  <td className={cn("py-[5px] text-right", row.weak ? (hot ? "font-bold text-bad" : "text-txt") : "text-txt-dim")}>{row.weak || "·"}</td>
-                  <td className={cn("py-[5px] text-right", row.resist ? "text-ok" : "text-txt-dim")}>{row.resist || "·"}</td>
-                  <td className={cn("py-[5px] text-right", row.immune ? "text-signal" : "text-txt-dim")}>{row.immune || "·"}</td>
+                  <td className={cn("py-[0.3125rem] text-right", row.weak ? (hot ? "font-bold text-bad" : "text-txt") : "text-txt-dim")}>{row.weak || "·"}</td>
+                  <td className={cn("py-[0.3125rem] text-right", row.resist ? "text-ok" : "text-txt-dim")}>{row.resist || "·"}</td>
+                  <td className={cn("py-[0.3125rem] text-right", row.immune ? "text-signal" : "text-txt-dim")}>{row.immune || "·"}</td>
                 </tr>
               );
             })}
@@ -284,8 +284,8 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
       aria-label={t("editor.railAria")}
       className={cn(
         "z-10 -mx-[var(--dk-pad)] border-b border-solid border-line bg-base px-[var(--dk-pad)] py-2",
-        pinStrip && "sticky top-[calc(var(--tool-sticky-top,0px)+var(--tool-bar-h,58px))]",
-        "grid gap-[6px]",
+        pinStrip && "sticky top-[calc(var(--tool-sticky-top,0px)+var(--tool-bar-h,3.625rem))]",
+        "grid gap-[0.375rem]",
         tiny ? "grid-cols-3" : "grid-cols-6",
       )}
     >
@@ -360,7 +360,7 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
           setRenaming(false);
         }
       }}
-      className={cn("h-11 min-w-0 flex-1 py-0 font-display text-[clamp(18px,2.4vw,24px)] font-extrabold italic uppercase leading-none")}
+      className={cn("h-11 min-w-0 flex-1 py-0 font-display text-[clamp(1.125rem,2.4vw,1.5rem)] font-extrabold italic uppercase leading-none")}
     />
   ) : (
     <button
@@ -373,7 +373,7 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
       aria-label={`${t("editor.nameAria")}: ${draft.name}`}
       className={cn("group flex min-h-8 min-w-0 flex-1 items-center gap-2 border-0 bg-transparent p-0 text-left", BSIM_FOCUS)}
     >
-      <h2 className={cn(DISPLAY_VOICE, "m-0 truncate text-[clamp(22px,3vw,30px)] text-txt")}>{draft.name}</h2>
+      <h2 className={cn(DISPLAY_VOICE, "m-0 truncate text-[clamp(1.375rem,3vw,1.875rem)] text-txt")}>{draft.name}</h2>
       <Icon name="edit" size={14} className="flex-none text-txt-dim opacity-0 transition-opacity duration-[140ms] group-hover:opacity-100 group-focus-visible:opacity-100" />
     </button>
   );
@@ -382,7 +382,7 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
     <div className="grid content-start gap-4">
       <header className="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-solid border-line pb-3">
         <DkBack onClick={leave} label={t("backToList")} />
-        <div className="flex min-w-0 flex-1 basis-[220px] items-center gap-2">
+        <div className="flex min-w-0 flex-1 basis-[13.75rem] items-center gap-2">
           {nameBlock}
           <TbSyncChip state={draft.syncState} title={syncHint}>
             {syncWord}
@@ -451,12 +451,12 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
           {centre}
         </>
       ) : twoPane ? (
-        <div className="grid grid-cols-[280px_minmax(0,1fr)] items-start gap-4">
+        <div className="grid grid-cols-[17.5rem_minmax(0,1fr)] min-[1600px]:grid-cols-[18.75rem_minmax(0,1fr)] min-[2240px]:grid-cols-[20rem_minmax(0,1fr)] items-start gap-4">
           {railVertical}
           {centre}
         </div>
       ) : (
-        <div className="grid grid-cols-[280px_minmax(0,1fr)_300px] items-start gap-4">
+        <div className="grid grid-cols-[17.5rem_minmax(0,1fr)_18.75rem] min-[1600px]:grid-cols-[18.75rem_minmax(0,1fr)_21.875rem] min-[2240px]:grid-cols-[20rem_minmax(0,1fr)_25rem] items-start gap-4">
           {railVertical}
           {centre}
           <div className="grid content-start gap-4">

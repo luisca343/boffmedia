@@ -76,10 +76,10 @@ export function SpawnsCard() {
   return (
     <div className="bg-white/[0.025] border border-white/[0.06] rounded-[14px] p-[18px_20px] flex flex-col gap-3.5">
       <div className="flex items-center justify-between flex-wrap gap-2">
-        <h3 className="font-pk-display font-semibold text-[15px] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
+        <h3 className="font-pk-display font-semibold text-[0.9375rem] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
           <CompassIcon className="w-4 h-4 text-pk-primary-400" />
           {t("spawnscard_active")}
-          <span className="inline-flex items-center gap-1.5 font-pk-mono text-[10.5px] text-pk-surface-500">
+          <span className="inline-flex items-center gap-1.5 font-pk-mono text-[0.65625rem] text-pk-surface-500">
             <span className="w-1.5 h-1.5 rounded-full bg-pk-secondary-400 shadow-[0_0_6px_#22d3ee] animate-pulse" />
             {t("spawnscard_updates_in", { tick })}
           </span>
@@ -89,7 +89,7 @@ export function SpawnsCard() {
             <button
               key={f.id}
               onClick={() => setFilter(f.id)}
-              className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors ${
+              className={`px-2.5 py-1 text-[0.6875rem] font-medium rounded-md transition-colors ${
                 filter === f.id
                   ? "bg-pk-primary-400/[0.14] text-pk-primary-200 shadow-[inset_0_0_0_1px_rgba(249,115,22,0.3)]"
                   : "text-pk-surface-300 hover:text-pk-surface-100 hover:bg-white/[0.04]"
@@ -113,7 +113,7 @@ export function SpawnsCard() {
             const meta = RARITY_META[gid]
             return (
               <div key={gid} className="flex flex-col gap-2 mb-3.5 last:mb-0">
-                <div className="flex items-center gap-2.5 text-[11px] tracking-wider uppercase font-pk-mono font-semibold" style={{ color: meta.fg }}>
+                <div className="flex items-center gap-2.5 text-[0.6875rem] tracking-wider uppercase font-pk-mono font-semibold" style={{ color: meta.fg }}>
                   <span className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full" style={{ background: meta.fg, boxShadow: `0 0 6px ${meta.fg}` }} />
                     {t(meta.labelKey)}
@@ -121,7 +121,7 @@ export function SpawnsCard() {
                   </span>
                   <span className="flex-1 h-px bg-white/[0.06]" />
                 </div>
-                <div className="grid grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-2">
+                <div className="grid grid-cols-[repeat(auto-fill,minmax(5.5rem,1fr))] gap-2">
                   {items.map((s, i) => (
                     <SpawnTile
                       key={`${s.dex}-${s.form}-${i}`}

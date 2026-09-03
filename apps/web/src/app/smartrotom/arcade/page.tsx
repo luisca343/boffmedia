@@ -19,8 +19,8 @@ export default function ArcadePage() {
       <InventoryBanner />
       <GameLibrary />
 
-      <footer className="mt-6 flex flex-wrap items-center justify-between gap-2.5 rounded-xl border border-white/[.06] bg-black/35 px-[18px] py-3.5">
-        <span className="font-ar-mono text-[11px] text-ar-ink-muted">
+      <footer className="mt-6 flex flex-wrap items-center justify-between gap-2.5 rounded-xl border border-white/[.06] bg-black/35 px-[1.125rem] py-3.5">
+        <span className="font-ar-mono text-[0.6875rem] text-ar-ink-muted">
           {t("home.footer")}
         </span>
         <span aria-hidden className="inline-flex gap-1.5">

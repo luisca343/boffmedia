@@ -91,7 +91,7 @@ export function RomUploadModal({
             accept=".gba,.nds,.rom,.bin"
             onChange={(e) => setFile(e.currentTarget.files?.[0] || null)}
             disabled={uploading}
-            className="block w-full text-[12px]"
+            className="block w-full text-[0.75rem]"
           />
         </Field>
 

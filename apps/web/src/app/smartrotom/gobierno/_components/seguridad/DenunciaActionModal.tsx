@@ -115,7 +115,7 @@ export function DenunciaActionModal({
   return (
     <Modal open onClose={onClose} title={meta.title} kicker={meta.kicker}>
       {!accused && kind !== "resolver" ? (
-        <p className="text-[13px] text-gt-ink-500">{t("denuncias.action.noInfractor")}</p>
+        <p className="text-[0.8125rem] text-gt-ink-500">{t("denuncias.action.noInfractor")}</p>
       ) : (
         <div className="space-y-3.5">
           {kind === "multa" && (

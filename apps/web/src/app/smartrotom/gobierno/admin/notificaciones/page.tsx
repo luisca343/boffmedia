@@ -125,8 +125,8 @@ function NotificacionesScreen() {
                         className="flex w-full items-center gap-2.5 border-b border-gt-line-soft px-3 py-2.5 text-left last:border-b-0 hover:bg-gt-paper-1"
                       >
                         <Avatar user={u.username} size={24} />
-                        <span className="text-[13px] font-bold text-gt-ink-900">{u.username}</span>
-                        <span className="ml-auto font-gt-mono text-[10.5px] text-gt-ink-400">
+                        <span className="text-[0.8125rem] font-bold text-gt-ink-900">{u.username}</span>
+                        <span className="ml-auto font-gt-mono text-[0.65625rem] text-gt-ink-400">
                           {u.uuid.slice(0, 10)}…
                         </span>
                       </button>
@@ -140,8 +140,8 @@ function NotificacionesScreen() {
                 <div className="mt-2.5 flex items-center gap-2.5 rounded-gt border border-gt-accent/25 bg-gt-accent-tint px-3 py-2.5">
                   <Avatar user={tgt.username} size={32} />
                   <div className="min-w-0">
-                    <div className="text-[13.5px] font-bold text-gt-ink-900">{tgt.username}</div>
-                    <div className="font-gt-mono text-[10px] text-gt-ink-500">{tgt.uuid}</div>
+                    <div className="text-[0.84375rem] font-bold text-gt-ink-900">{tgt.username}</div>
+                    <div className="font-gt-mono text-[0.625rem] text-gt-ink-500">{tgt.uuid}</div>
                   </div>
                   <button
                     type="button"
@@ -169,12 +169,12 @@ function NotificacionesScreen() {
                     key={nt.value}
                     type="button"
                     onClick={() => setType(nt.value)}
-                    className={`flex items-center gap-2.5 rounded-gt border px-[11px] py-2.5 text-left transition-colors ${
+                    className={`flex items-center gap-2.5 rounded-gt border px-[0.6875rem] py-2.5 text-left transition-colors ${
                       on ? `${tone.softBg} ${tone.border} shadow-gt-sm` : "border-gt-line bg-gt-paper-0"
                     }`}
                   >
                     <Icon name={nt.icon} size={17} className={`flex-none ${on ? tone.text : "text-gt-ink-400"}`} />
-                    <span className={`text-[12.5px] font-bold ${on ? "text-gt-ink-900" : "text-gt-ink-600"}`}>
+                    <span className={`text-[0.78125rem] font-bold ${on ? "text-gt-ink-900" : "text-gt-ink-600"}`}>
                       {t(nt.labelKey)}
                     </span>
                   </button>
@@ -189,38 +189,38 @@ function NotificacionesScreen() {
             {t("notificaciones.contenido")}
           </Bar>
           <div className="p-4">
-            <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+            <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
               {t("notificaciones.titulo")} *
             </div>
             <div className="mb-3.5">
               <Field id="notif-title" value={title} onChange={setTitle} placeholder={t("notificaciones.tituloPlaceholder")} />
             </div>
-            <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+            <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
               {t("notificaciones.mensaje")} *
             </div>
             <div className="mb-3.5">
               <TextArea id="notif-body" rows={3} value={body} onChange={setBody} placeholder={t("notificaciones.mensajePlaceholder")} />
             </div>
-            <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+            <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
               {t("notificaciones.enlace")} <span className="normal-case tracking-normal text-gt-ink-300">{t("notificaciones.enlaceOpcional")}</span>
             </div>
             <div className="mb-4">
               <Field id="notif-link" mono value={link} onChange={setLink} placeholder={t("notificaciones.enlacePlaceholder")} />
             </div>
 
-            <Sunken className="mb-3.5 px-[13px] py-[11px]">
-              <div className="mb-2 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
+            <Sunken className="mb-3.5 px-[0.8125rem] py-[0.6875rem]">
+              <div className="mb-2 font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">
                 {t("notificaciones.vistaPrevia")}
               </div>
               <div className="flex items-start gap-2.5">
-                <div className={`grid h-[30px] w-[30px] flex-none place-items-center rounded-[7px] ${TONES[activeType.tone].softBg} border ${TONES[activeType.tone].softBorder}`}>
+                <div className={`grid h-[1.875rem] w-[1.875rem] flex-none place-items-center rounded-[7px] ${TONES[activeType.tone].softBg} border ${TONES[activeType.tone].softBorder}`}>
                   <Icon name={activeType.icon} size={15} className={TONES[activeType.tone].text} />
                 </div>
                 <div className="min-w-0">
-                  <div className="text-[13px] font-bold text-gt-ink-900">
+                  <div className="text-[0.8125rem] font-bold text-gt-ink-900">
                     {title || <span className="text-gt-ink-300">{t("notificaciones.tituloPreview")}</span>}
                   </div>
-                  <div className="mt-0.5 text-[12px] leading-normal text-gt-ink-500">
+                  <div className="mt-0.5 text-[0.75rem] leading-normal text-gt-ink-500">
                     {body || <span className="text-gt-ink-300">{t("notificaciones.mensajePreview")}</span>}
                   </div>
                 </div>
@@ -230,7 +230,7 @@ function NotificacionesScreen() {
             <Button icon="send" tone="gold" className="w-full" disabled={!canSend} onClick={send}>
               {sendNotification.isPending ? t("common.sending") : t("notificaciones.enviarNotificacion")}
             </Button>
-            <div className="mt-2.5 text-center font-gt-mono text-[10px] text-gt-ink-400">
+            <div className="mt-2.5 text-center font-gt-mono text-[0.625rem] text-gt-ink-400">
               {target
                 ? t("notificaciones.llegaUnico")
                 : t("notificaciones.seleccionaDestinatario")}

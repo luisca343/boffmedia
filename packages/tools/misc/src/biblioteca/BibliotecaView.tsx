@@ -33,7 +33,7 @@ export function BibliotecaView() {
   const errorMsg = error === "loadError" || error === "searchError" ? t(error) : error
 
   return (
-    <main className="pb-[10px]">
+    <main className="pb-[0.625rem]">
       <ToolHeader
         className="mb-5"
         title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
@@ -49,9 +49,9 @@ export function BibliotecaView() {
       />
 
       {/* ── control bar: search ────────────────────────────────────────────── */}
-      <form onSubmit={onSubmit} className="mb-[14px] flex flex-wrap items-center gap-[12px]">
-        <div className="relative min-w-[220px] max-w-[420px] flex-1">
-          <Icon name="search" size={16} className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-txt-dim" />
+      <form onSubmit={onSubmit} className="mb-[0.875rem] flex flex-wrap items-center gap-[0.75rem]">
+        <div className="relative min-w-[13.75rem] max-w-[26.25rem] flex-1">
+          <Icon name="search" size={16} className="pointer-events-none absolute left-[0.8125rem] top-1/2 -translate-y-1/2 text-txt-dim" />
           <Input className="pl-10" placeholder={t("searchPlaceholder")} value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
         <Button variant="pri" type="submit" icon={loading ? "refresh" : "search"} loading={loading}>
@@ -60,24 +60,24 @@ export function BibliotecaView() {
       </form>
 
       {/* ── console filter ─────────────────────────────────────────────────── */}
-      <div className="mb-[14px] flex flex-col gap-[10px]">
-        <div className="flex items-center gap-[8px]">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("consoleLabel")}</span>
+      <div className="mb-[0.875rem] flex flex-col gap-[0.625rem]">
+        <div className="flex items-center gap-[0.5rem]">
+          <span className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("consoleLabel")}</span>
           {selectedConsole ? (
-            <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center border border-accent-line bg-accent-soft px-[8px] py-[4px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
+            <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center border border-accent-line bg-accent-soft px-[0.5rem] py-[0.25rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-accent">
               {CONSOLES[selectedConsole]?.shortLabel ?? selectedConsole}
             </span>
           ) : (
-            <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{t("allPlatforms")}</span>
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.06em] text-txt-dim">{t("allPlatforms")}</span>
           )}
         </div>
-        <div className="flex flex-col gap-[8px]">
+        <div className="flex flex-col gap-[0.5rem]">
           {CONSOLE_GROUPS.map(({ mfr, entries }) => (
-            <div key={mfr} className="flex items-start gap-[10px]">
-              <span className="mt-[8px] w-[64px] flex-none text-right font-mono text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: MFR_DOT[mfr as Manufacturer] }}>
+            <div key={mfr} className="flex items-start gap-[0.625rem]">
+              <span className="mt-[0.5rem] w-[4rem] flex-none text-right font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em]" style={{ color: MFR_DOT[mfr as Manufacturer] }}>
                 {mfr}
               </span>
-              <div className="flex flex-wrap gap-[6px]">
+              <div className="flex flex-wrap gap-[0.375rem]">
                 {entries.map(([key, info]) => (
                   <ConsoleChip
                     key={key}
@@ -94,17 +94,17 @@ export function BibliotecaView() {
       </div>
 
       {/* ── region filter ──────────────────────────────────────────────────── */}
-      <div className="mb-[20px]">
+      <div className="mb-[1.25rem]">
         <Disclosure title={t("regionLabel")} icon="filter" sub={regions.length ? regions.join(" · ") : t("regionOptional")}>
-          <div className="flex flex-col gap-[12px]">
-            <div className="flex flex-wrap gap-[6px]">
+          <div className="flex flex-col gap-[0.75rem]">
+            <div className="flex flex-wrap gap-[0.375rem]">
               {COMMON_REGIONS.map((r) => (
                 <RegionChip key={r} label={r} on={regions.includes(r)} onClick={() => toggleRegion(r)} />
               ))}
             </div>
-            <div className="flex gap-[8px]">
+            <div className="flex gap-[0.5rem]">
               <Input
-                className="max-w-[260px]"
+                className="max-w-[16.25rem]"
                 value={custom}
                 onChange={(e) => setCustom(e.target.value)}
                 onKeyDown={(e) => {
@@ -120,12 +120,12 @@ export function BibliotecaView() {
               </Button>
             </div>
             {regions.length > 0 && (
-              <div className="flex flex-wrap items-center gap-[6px]">
-                <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">{t("activeRegions")}</span>
+              <div className="flex flex-wrap items-center gap-[0.375rem]">
+                <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">{t("activeRegions")}</span>
                 {regions.map((r) => (
-                  <span key={r} className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center gap-[6px] border border-accent-line bg-accent-soft py-[4px] pl-[8px] pr-[5px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
+                  <span key={r} className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center gap-[0.375rem] border border-accent-line bg-accent-soft py-[0.25rem] pl-[0.5rem] pr-[0.3125rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-accent">
                     {r}
-                    <button type="button" aria-label={t("removeRegion", { r })} onClick={() => removeRegion(r)} className="grid h-[16px] w-[16px] place-items-center text-accent/70 transition-opacity hover:text-accent">
+                    <button type="button" aria-label={t("removeRegion", { r })} onClick={() => removeRegion(r)} className="grid h-[1rem] w-[1rem] place-items-center text-accent/70 transition-opacity hover:text-accent">
                       <Icon name="x" size={11} />
                     </button>
                   </span>
@@ -138,7 +138,7 @@ export function BibliotecaView() {
 
       {/* ── results ────────────────────────────────────────────────────────── */}
       {error && (
-        <div className="mb-[16px]">
+        <div className="mb-[1rem]">
           <Banner tone="error" title={t("errorTitle")}>
             {errorMsg}
           </Banner>
@@ -146,14 +146,14 @@ export function BibliotecaView() {
       )}
 
       {loading ? (
-        <div className="flex flex-col gap-[12px]">
+        <div className="flex flex-col gap-[0.75rem]">
           <SkeletonGroup />
           <SkeletonGroup />
         </div>
       ) : results ? (
-        <div className="flex flex-col gap-[12px]">
-          <div className="flex flex-wrap items-center justify-between gap-[10px]">
-            <p className="font-body text-[14px] text-txt">
+        <div className="flex flex-col gap-[0.75rem]">
+          <div className="flex flex-wrap items-center justify-between gap-[0.625rem]">
+            <p className="font-body text-[0.875rem] text-txt">
               {results.query ? (
                 <>
                   {t("resultsFor", { q: results.query })?.split(`${results.query}`).map((part: string, i: number, arr: string[]) =>
@@ -167,8 +167,8 @@ export function BibliotecaView() {
               )}
               {selectedConsole && <span className="text-txt-muted"> · {CONSOLES[selectedConsole]?.label}</span>}
             </p>
-            <div className="flex items-center gap-[10px] font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted">
-              <span className="inline-flex items-center gap-[6px] text-ok">
+            <div className="flex items-center gap-[0.625rem] font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-txt-muted">
+              <span className="inline-flex items-center gap-[0.375rem] text-ok">
                 <Icon name="database" size={13} />
                 {t("filesN", { n: results.totalCount })}
               </span>
@@ -184,7 +184,7 @@ export function BibliotecaView() {
           {results.totalCount === 0 ? (
             <Empty icon="database" title={t("emptyTitle")} lead={results.query ? t("emptySearch", { q: results.query }) : t("emptyLead")} />
           ) : (
-            <div className="flex flex-col gap-[12px]">
+            <div className="flex flex-col gap-[0.75rem]">
               {results.consoles.map((c) => (
                 <ConsoleGroup key={c.consoleKey} result={c} filesLabel={filesLabel} downloadLabel={t("download")} defaultOpen={results.consoles.length <= 4} />
               ))}

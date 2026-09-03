@@ -38,13 +38,13 @@ export function CuentaSection() {
 
   return (
     <Panel tone="deep" className="lg:col-span-2">
-      <div className="mb-3.5 font-ar-display text-[9px] uppercase leading-relaxed tracking-[0.12em] text-ar-amber">
+      <div className="mb-3.5 font-ar-display text-[0.5625rem] uppercase leading-relaxed tracking-[0.12em] text-ar-amber">
         {t("ajustes.cuenta.title")}
       </div>
 
       <div className="grid gap-3.5 md:grid-cols-3">
         <AccountCard kicker={t("ajustes.cuenta.uuid")}>
-          <div className="break-all font-ar-mono text-[13px] text-ar-ink">{uuid ?? "—"}</div>
+          <div className="break-all font-ar-mono text-[0.8125rem] text-ar-ink">{uuid ?? "—"}</div>
           <Button
             variant="ghost"
             size="sm"
@@ -61,7 +61,7 @@ export function CuentaSection() {
           {streak.isLoading ? (
             <Skeleton className="h-5 w-40 rounded-md" />
           ) : (
-            <div className="font-ar text-[14px] font-semibold text-ar-ink">{banner ?? "—"}</div>
+            <div className="font-ar text-[0.875rem] font-semibold text-ar-ink">{banner ?? "—"}</div>
           )}
           {/* El único plazo que expone la API es el reinicio diario de la racha; el
               banner no lleva fecha de fin, así que no se anuncia ninguna. */}
@@ -73,7 +73,7 @@ export function CuentaSection() {
         </AccountCard>
 
         <AccountCard kicker={t("ajustes.cuenta.session")}>
-          <div className="font-ar text-[14px] font-semibold text-ar-ink">{t("ajustes.cuenta.connected")}</div>
+          <div className="font-ar text-[0.875rem] font-semibold text-ar-ink">{t("ajustes.cuenta.connected")}</div>
           <Button
             variant="danger"
             size="sm"

@@ -204,12 +204,12 @@ export default function TaxiPage() {
             bottomInset={bottomInset}
             recenterSignal={recenterSignal}
           >
-            {wide && card && <div className="absolute bottom-[18px] left-[18px] z-[25] w-[380px] max-w-[calc(100%-90px)]">{card}</div>}
+            {wide && card && <div className="absolute bottom-[1.125rem] left-[1.125rem] z-[25] w-[23.75rem] max-w-[calc(100%-5.625rem)]">{card}</div>}
           </MapCanvas>
         </div>
 
         {wide ? (
-          <aside className="z-[12] flex w-[404px] shrink-0 flex-col border-l border-solid border-tx-line bg-tx-bg-1/80 backdrop-blur-[20px]">
+          <aside className="z-[12] flex w-[25.25rem] shrink-0 flex-col border-l border-solid border-tx-line bg-tx-bg-1/80 backdrop-blur-[20px]">
             {panel}
           </aside>
         ) : (
@@ -223,7 +223,7 @@ export default function TaxiPage() {
               aria-label={sheetFull ? "Contraer panel" : "Expandir panel"}
               className="grid shrink-0 place-items-center px-0 pb-1.5 pt-2.5"
             >
-              <span className="h-[5px] w-[42px] rounded-[3px] bg-tx-line-2" />
+              <span className="h-[0.3125rem] w-[2.625rem] rounded-[3px] bg-tx-line-2" />
             </button>
             {selectedLive ? (
               <div className="tx-scroll max-h-[86vh] overflow-y-auto px-3.5 pb-4">{card}</div>

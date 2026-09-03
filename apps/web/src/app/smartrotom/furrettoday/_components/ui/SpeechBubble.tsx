@@ -16,7 +16,7 @@ export function SpeechBubble({
       style={{ position: "relative", display: "inline-block", ...style }}
     >
       <div
-        className="border-ft rounded-[20px] border-ft-ink px-[18px] py-3 shadow-ft-pop-sm relative z-[1]"
+        className="border-ft rounded-[20px] border-ft-ink px-[1.125rem] py-3 shadow-ft-pop-sm relative z-[1]"
         style={{ background: fill }}
       >
         {children}

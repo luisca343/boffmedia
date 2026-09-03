@@ -25,11 +25,11 @@ function Section({
 }) {
   return (
     <section className="mb-5">
-      <div className="mb-[11px] flex items-center gap-2">
+      <div className="mb-[0.6875rem] flex items-center gap-2">
         <Icon name={icon} size={15} className="text-pc-accent" />
-        <h3 className="text-[13px] font-bold">{title}</h3>
+        <h3 className="text-[0.8125rem] font-bold">{title}</h3>
         {!!badge && (
-          <span className="rounded-pc-pill bg-pc-accent px-2 py-px text-[11.5px] font-semibold text-white">{badge}</span>
+          <span className="rounded-pc-pill bg-pc-accent px-2 py-px text-[0.71875rem] font-semibold text-white">{badge}</span>
         )}
       </div>
       {children}
@@ -158,7 +158,7 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
           >
             {t("common.clear")}
           </Button>
-          <div className="flex-1 text-right text-[12.5px] text-pc-fg-muted">
+          <div className="flex-1 text-right text-[0.78125rem] text-pc-fg-muted">
             <b className="text-pc-accent">{count}</b> {t("filters.matchCount", { count })}
           </div>
           <Button variant="primary" onClick={apply}>
@@ -168,16 +168,16 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
         </>
       }
     >
-      <div className="p-[18px]">
+      <div className="p-[1.125rem]">
         <Section icon="search" title={t("filters.searchAndSort")}>
           <div className="relative mb-2.5">
-            <Icon name="search" size={15} className="absolute left-[11px] top-[11px] text-pc-fg-subtle" />
+            <Icon name="search" size={15} className="absolute left-[0.6875rem] top-[0.6875rem] text-pc-fg-subtle" />
             <Input
               value={s}
               onChange={(e) => setS(e.target.value)}
               aria-label={t("common.search")}
               placeholder={t("filters.searchPlaceholder")}
-              className="pl-[33px]"
+              className="pl-[2.0625rem]"
             />
           </div>
           <div className="flex gap-2">
@@ -201,7 +201,7 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
         </Section>
 
         <Section icon="grid" title={t("filters.types")} badge={f.types?.length}>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(78px,1fr))] gap-1.5">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(4.875rem,1fr))] gap-1.5">
             {ALL_TYPES.map((t) => {
               const on = (f.types ?? []).includes(t)
               const { c } = typeColor(t)
@@ -252,7 +252,7 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
         </Section>
 
         <Section icon="star" title={t("filters.specialStatus")}>
-          <div className="grid grid-cols-2 gap-[7px]">
+          <div className="grid grid-cols-2 gap-[0.4375rem]">
             <Toggle
               label={t("filters.statusToggles.shiny")}
               icon="sparkles"
@@ -285,7 +285,7 @@ export function FilterPanel({ onClose }: FilterPanelProps) {
         </Section>
 
         <Section icon="users" title={t("filters.gender")}>
-          <div className="grid grid-cols-3 gap-[7px]">
+          <div className="grid grid-cols-3 gap-[0.4375rem]">
             <Toggle
               label={t("filters.genderOptions.male")}
               icon="mars"

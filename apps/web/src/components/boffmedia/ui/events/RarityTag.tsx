@@ -15,7 +15,7 @@ export function RarityTag({ rarity, className }: { rarity: string; className?: s
     <span
       style={{ ["--rc" as string]: m.color, ["--rs" as string]: m.soft } as React.CSSProperties}
       className={cn(
-        "inline-flex items-center px-2 py-[5px] font-mono text-[9.5px]/none font-bold uppercase tracking-[0.12em]",
+        "inline-flex items-center px-2 py-[0.3125rem] font-mono text-[0.59375rem]/none font-bold uppercase tracking-[0.12em]",
         "border border-solid text-[color:var(--rc,var(--muted))] bg-[color:var(--rs,var(--panel-2))]",
         "border-[color:color-mix(in_srgb,var(--rc,var(--line-2))_40%,transparent)]",
         // The stroke repeats the border colour-mix: the two slants are painted

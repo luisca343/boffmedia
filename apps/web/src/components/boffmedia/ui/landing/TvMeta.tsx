@@ -9,7 +9,7 @@ import { DISCORD } from "./landing-data"
 export function TvMeta({ lvl, density }: { lvl: number; density: number }) {
   const t = useTranslations("boffmedia.landing.meta")
   return (
-    <section className="relative z-[1] overflow-hidden pb-[150px] pt-32 text-center" id="tv-meta">
+    <section className="relative z-[1] overflow-hidden pb-[9.375rem] pt-32 text-center" id="tv-meta">
       {lvl >= 2 && (
         <FxParticles
           density={Math.round(density * 0.6)}
@@ -21,8 +21,8 @@ export function TvMeta({ lvl, density }: { lvl: number; density: number }) {
         aria-hidden="true"
       >
         {/* finish star: the single terminal where the spine ends */}
-        <i className="absolute left-1/2 top-0 h-[22px] w-[22px] -translate-x-1/2 rounded-full bg-[rgba(var(--zr),var(--zg),var(--zb),1)] shadow-[0_0_0_9px_rgba(var(--zr),var(--zg),var(--zb),0.12),0_0_0_18px_rgba(var(--zr),var(--zg),var(--zb),0.06),0_0_56px_16px_rgba(var(--zr),var(--zg),var(--zb),0.75)] before:absolute before:left-1/2 before:top-full before:h-[118px] before:w-[2px] before:-translate-x-1/2 before:content-[''] before:[background:linear-gradient(rgba(var(--zr),var(--zg),var(--zb),1),transparent)] after:absolute after:left-1/2 after:top-1/2 after:h-[46px] after:w-[46px] after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:border after:border-solid after:border-[rgba(var(--zr),var(--zg),var(--zb),0.55)] after:content-[''] after:animate-[tv-ping_2.6s_ease-out_infinite] [.no-motion_&]:after:animate-none max-[820px]:left-[18px]" />
-        <i className={cn(BEAMS, "left-[calc(50%_-_550px)] top-[calc(50%_-_640px)] h-[1100px] w-[1100px] opacity-70")} />
+        <i className="absolute left-1/2 top-0 h-[1.375rem] w-[1.375rem] -translate-x-1/2 rounded-full bg-[rgba(var(--zr),var(--zg),var(--zb),1)] shadow-[0_0_0_9px_rgba(var(--zr),var(--zg),var(--zb),0.12),0_0_0_18px_rgba(var(--zr),var(--zg),var(--zb),0.06),0_0_56px_16px_rgba(var(--zr),var(--zg),var(--zb),0.75)] before:absolute before:left-1/2 before:top-full before:h-[7.375rem] before:w-[2px] before:-translate-x-1/2 before:content-[''] before:[background:linear-gradient(rgba(var(--zr),var(--zg),var(--zb),1),transparent)] after:absolute after:left-1/2 after:top-1/2 after:h-[2.875rem] after:w-[2.875rem] after:-translate-x-1/2 after:-translate-y-1/2 after:rounded-full after:border after:border-solid after:border-[rgba(var(--zr),var(--zg),var(--zb),0.55)] after:content-[''] after:animate-[tv-ping_2.6s_ease-out_infinite] [.no-motion_&]:after:animate-none max-[820px]:left-[1.125rem]" />
+        <i className={cn(BEAMS, "left-[calc(50%_-_550px)] top-[calc(50%_-_640px)] h-[68.75rem] w-[68.75rem] opacity-70")} />
         <Grain />
       </div>
       <div className="wrap relative z-[2] px-5 min-[640px]:px-10">
@@ -41,11 +41,11 @@ export function TvMeta({ lvl, density }: { lvl: number; density: number }) {
         <p
           data-reveal
           style={{ ["--i"]: 1 } as React.CSSProperties}
-          className="mx-auto max-w-[52ch] font-body text-[17px] font-normal leading-[1.6] text-txt-muted"
+          className="mx-auto max-w-[52ch] font-body text-[1.0625rem] font-normal leading-[1.6] text-txt-muted"
         >
           {t("lead")}
         </p>
-        <div data-reveal style={{ ["--i"]: 2 } as React.CSSProperties} className="mt-[34px] flex flex-wrap justify-center gap-3.5">
+        <div data-reveal style={{ ["--i"]: 2 } as React.CSSProperties} className="mt-[2.125rem] flex flex-wrap justify-center gap-3.5">
           <Button variant="pri" size="lg" iconRight="arrow" href="/entrar?mode=register" className={PRI_GLOW}>
             {t("ctaRegister")}
           </Button>

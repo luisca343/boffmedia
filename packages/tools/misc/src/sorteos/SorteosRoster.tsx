@@ -103,7 +103,7 @@ export function SorteosRoster({
       title={t("listTitle")}
       media={<Icon name="users" />}
       aside={
-        <span className="font-mono text-[11px] font-semibold tracking-[0.06em] text-txt-muted">
+        <span className="font-mono text-[0.6875rem] font-semibold tracking-[0.06em] text-txt-muted">
           {entrants.length}
           {weighted && ` · ${totalWeight} ${t("tickets")}`}
         </span>
@@ -126,7 +126,7 @@ export function SorteosRoster({
       {/* Tab content */}
       <div className="px-5 py-4 border-b border-line">
         {tab === "single" ? (
-          <form className="flex items-stretch gap-[9px]" onSubmit={handleSubmitSingle}>
+          <form className="flex items-stretch gap-[0.5625rem]" onSubmit={handleSubmitSingle}>
             <Input
               ref={inputFocusRef}
               className="min-w-0 flex-1"
@@ -150,15 +150,15 @@ export function SorteosRoster({
             </Button>
           </form>
         ) : tab === "bulk" ? (
-          <div className="grid gap-[10px]">
+          <div className="grid gap-[0.625rem]">
             <Textarea
               rows={5}
-              className="min-h-[120px] resize-y font-mono text-[13px] leading-[1.6]"
+              className="min-h-[7.5rem] resize-y font-mono text-[0.8125rem] leading-[1.6]"
               placeholder={t("bulkPlaceholder")}
               value={bulk}
               onChange={(e) => setBulk(e.target.value)}
             />
-            <div className="flex items-start gap-[8px] font-mono text-[11px] leading-[1.5] text-txt-dim">
+            <div className="flex items-start gap-[0.5rem] font-mono text-[0.6875rem] leading-[1.5] text-txt-dim">
               <Icon name="info" size={13} className="mt-[1px] flex-none text-signal" />
               <span>{tRich("bulkHint", { code: (c) => <code className="text-txt-muted">{c}</code> })}</span>
             </div>
@@ -207,7 +207,7 @@ export function SorteosRoster({
                 size="sm"
                 icon="x"
                 onClick={() => setPickedFile(null)}
-                className="mt-[12px] w-full"
+                className="mt-[0.75rem] w-full"
               >
                 {t("fileClear")}
               </Button>
@@ -216,7 +216,7 @@ export function SorteosRoster({
         )}
 
         {tab === "single" && (
-          <div className="mt-[10px] flex items-start gap-[8px] font-mono text-[11px] leading-[1.5] text-txt-dim">
+          <div className="mt-[0.625rem] flex items-start gap-[0.5rem] font-mono text-[0.6875rem] leading-[1.5] text-txt-dim">
             <Icon name="info" size={13} className="mt-[1px] flex-none text-signal" />
             <span>{t("singleHint")}</span>
           </div>
@@ -229,16 +229,16 @@ export function SorteosRoster({
           icon="users"
           title={t("listEmpty")}
           lead={t("listEmptyLead")}
-          className="py-[44px]"
+          className="py-[2.75rem]"
         />
       ) : (
         <>
-          <div className="flex items-center justify-end gap-[12px] border-b border-line px-[16px] py-[12px]">
+          <div className="flex items-center justify-end gap-[0.75rem] border-b border-line px-[1rem] py-[0.75rem]">
             <Button variant="ghost" size="sm" icon="refresh" onClick={onShuffle}>
               {t("shuffle")}
             </Button>
           </div>
-          <ul role="list" className="max-h-[420px] overflow-y-auto bm-scroll">
+          <ul role="list" className="max-h-[26.25rem] overflow-y-auto bm-scroll">
             {entrants.map((e, i) => (
               <li key={e.id}>
                 <SrtEntrantRow

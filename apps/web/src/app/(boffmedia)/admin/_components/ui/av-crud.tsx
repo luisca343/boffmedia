@@ -179,7 +179,7 @@ export function AdminCrud<T extends { id: number | string }>({
     <div>
       {/* Resource header */}
       <div className="flex items-center gap-3 mb-4 flex-wrap">
-        <span className="font-mono text-[11px] font-bold leading-none uppercase tracking-[0.08em] text-txt-muted shrink-0">
+        <span className="font-mono text-[0.6875rem] font-bold leading-none uppercase tracking-[0.08em] text-txt-muted shrink-0">
           {t("count", { count: filtered.length, plural })}
         </span>
         <SearchInput
@@ -187,7 +187,7 @@ export function AdminCrud<T extends { id: number | string }>({
           onChange={setSearchTerm}
           placeholder={searchPlaceholder ?? t("searchPlaceholder", { plural })}
           size="sm"
-          className="flex-1 min-w-[200px] max-w-[400px]"
+          className="flex-1 min-w-[12.5rem] max-w-[25rem]"
         />
         <Button icon="plus" variant="pri" size="sm" className="ml-auto" onClick={() => setCreateOpen(true)}>
           {t("new")}
@@ -270,7 +270,7 @@ export function AdminCrud<T extends { id: number | string }>({
 
       {/* Create */}
       <Modal open={createOpen} onClose={() => setCreateOpen(false)} title={t("createTitle", { singular })}>
-        <p className="text-[13px] text-txt-muted mb-3">{t("createDesc", { singular })}</p>
+        <p className="text-[0.8125rem] text-txt-muted mb-3">{t("createDesc", { singular })}</p>
         <FormComponent
           isSubmitting={submitting}
           onSubmit={handleCreate}
@@ -288,7 +288,7 @@ export function AdminCrud<T extends { id: number | string }>({
         }}
         title={t("editTitle", { singular })}
       >
-        <p className="text-[13px] text-txt-muted mb-3">{t("editDesc", { singular })}</p>
+        <p className="text-[0.8125rem] text-txt-muted mb-3">{t("editDesc", { singular })}</p>
         {selected && (
           <FormComponent
             defaultValues={selected as unknown as Partial<T>}
@@ -330,11 +330,11 @@ export function AdminCrud<T extends { id: number | string }>({
             </>
           }
         >
-          <p className="text-[13px] text-txt-muted">{t("deleteConfirm", { singular })}</p>
+          <p className="text-[0.8125rem] text-txt-muted">{t("deleteConfirm", { singular })}</p>
           {selected && (
             <div className="mt-4 p-3 border border-solid border-line bg-base-2">
               <p className="font-medium">{String(selected[searchFields[0] as keyof T] ?? "")}</p>
-              <p className="font-mono text-[11px] text-txt-dim mt-1">ID: {selected.id}</p>
+              <p className="font-mono text-[0.6875rem] text-txt-dim mt-1">ID: {selected.id}</p>
             </div>
           )}
         </Modal>

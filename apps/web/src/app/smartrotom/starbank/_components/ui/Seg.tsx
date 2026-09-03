@@ -16,7 +16,7 @@ export function Seg({ options, value, onChange, className }: { options: SegOptio
           aria-selected={value === o.id}
           onClick={() => onChange(o.id)}
           className={
-            "whitespace-nowrap rounded-[7px] px-3 py-[5px] text-[12px] font-medium transition-colors " +
+            "whitespace-nowrap rounded-[7px] px-3 py-[0.3125rem] text-[0.75rem] font-medium transition-colors " +
             (value === o.id ? "bg-sb-surface text-sb-fg shadow-sb-1" : "text-sb-fg-muted hover:text-sb-fg")
           }
         >

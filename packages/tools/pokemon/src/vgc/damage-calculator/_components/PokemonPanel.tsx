@@ -57,7 +57,7 @@ export function PokemonPanel({ poke, side, onChange, useChampions = false }: Pro
 
   return (
     <div
-      className="cut-corner cut-corner-edge grid gap-[14px] border border-t-[3px] border-solid border-line bg-panel p-4"
+      className="cut-corner cut-corner-edge grid gap-[0.875rem] border border-t-[3px] border-solid border-line bg-panel p-4"
       style={cssVars({ "--cxc": color, borderTopColor: "var(--cxc)" })}
     >
       <div>
@@ -90,7 +90,7 @@ export function PokemonPanel({ poke, side, onChange, useChampions = false }: Pro
             )}
           />
           {entry && (
-            <div className="mt-[7px] flex flex-wrap gap-1">
+            <div className="mt-[0.4375rem] flex flex-wrap gap-1">
               {entry.types.map((tp) => (
                 <TypeBadge key={tp} type={tp} />
               ))}
@@ -147,7 +147,7 @@ export function PokemonPanel({ poke, side, onChange, useChampions = false }: Pro
       </div>
 
       <div className="grid gap-1.5">
-        <div className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em]" style={{ color: "var(--cxc, var(--accent))" }}>
+        <div className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.12em]" style={{ color: "var(--cxc, var(--accent))" }}>
           {t("moves")}
         </div>
         {poke.moves.map((m, i) => (

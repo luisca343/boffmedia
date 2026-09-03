@@ -108,19 +108,19 @@ export function GtPrimitivasChapter() {
             <Bar icon="fileText" dep="seguridad" right={<Badge tone="warn">3 pendientes</Badge>}>
               Denuncias recientes
             </Bar>
-            <div className="p-4 text-[13px] text-gt-ink-600">
+            <div className="p-4 text-[0.8125rem] text-gt-ink-600">
               Una ficha con franja de departamento. El color llega como <code>--gt-dep</code> en línea.
             </div>
           </Card>
 
           <Panel className="w-full p-4">
-            <div className="font-gt-display text-[15px] text-gt-ink-900">Panel</div>
-            <p className="mt-1 text-[12.5px] text-gt-ink-500">Papel de fondo: agrupa sin levantar.</p>
+            <div className="font-gt-display text-[0.9375rem] text-gt-ink-900">Panel</div>
+            <p className="mt-1 text-[0.78125rem] text-gt-ink-500">Papel de fondo: agrupa sin levantar.</p>
           </Panel>
 
           <Sunken className="w-full p-4">
-            <div className="font-gt-display text-[15px] text-gt-ink-900">Cajón hundido</div>
-            <p className="mt-1 text-[12.5px] text-gt-ink-500">Para lo que está guardado, no para lo que actúa.</p>
+            <div className="font-gt-display text-[0.9375rem] text-gt-ink-900">Cajón hundido</div>
+            <p className="mt-1 text-[0.78125rem] text-gt-ink-500">Para lo que está guardado, no para lo que actúa.</p>
           </Sunken>
         </Sample>
 
@@ -178,7 +178,7 @@ export function GtPrimitivasChapter() {
                 ["M-2205", "JessieRocket", "Bloqueo de vía pública", "3.000", "default", "Anulada"],
               ].map(([code, user, reason, amount, tone, label]) => (
                 <TR key={code}>
-                  <TD className="font-gt-mono text-[11px] uppercase tracking-[.1em]">{code}</TD>
+                  <TD className="font-gt-mono text-[0.6875rem] uppercase tracking-[.1em]">{code}</TD>
                   <TD>
                     <span className="flex items-center gap-2">
                       <Avatar user={user} size={24} />
@@ -289,7 +289,7 @@ export function GtPrimitivasChapter() {
           ).map((n) => (
             <span key={n} className="flex flex-col items-center gap-1 text-gt-ink-600" title={n}>
               <Icon name={n} size={20} />
-              <span className="font-gt-mono text-[8.5px] uppercase tracking-[.08em] text-gt-ink-400">{n}</span>
+              <span className="font-gt-mono text-[0.53125rem] uppercase tracking-[.08em] text-gt-ink-400">{n}</span>
             </span>
           ))}
         </Sample>

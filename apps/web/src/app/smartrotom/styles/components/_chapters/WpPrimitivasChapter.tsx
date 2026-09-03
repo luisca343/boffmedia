@@ -97,11 +97,11 @@ export function WpPrimitivasChapter() {
           <ValueBox className="w-full max-w-md">
             <div className="mb-2 flex items-center gap-2">
               <Icon name="wand" size={16} className="text-wp-teal" />
-              <span className="font-wp text-[13px] font-bold text-wp-fg">Valoración SmartRotom</span>
+              <span className="font-wp text-[0.8125rem] font-bold text-wp-fg">Valoración SmartRotom</span>
             </div>
             <div className="flex items-baseline gap-2.5">
               <Price amount={12350} size={22} symbolClassName="text-wp-teal-deep" />
-              <span className="font-wp text-[12.5px] font-bold text-wp-green">
+              <span className="font-wp text-[0.78125rem] font-bold text-wp-green">
                 −8% bajo la valoración
               </span>
             </div>
@@ -170,11 +170,11 @@ export function WpPrimitivasChapter() {
         >
           <div className="flex items-center gap-3">
             <IVMeter ivs={[31, 31, 31, 31, 31, 31]} />
-            <span className="wp-num font-wp text-[12px] text-wp-green">100% · 6IV</span>
+            <span className="wp-num font-wp text-[0.75rem] text-wp-green">100% · 6IV</span>
           </div>
           <div className="flex items-center gap-3">
             <IVMeter ivs={[31, 28, 15, 31, 22, 6]} />
-            <span className="wp-num font-wp text-[12px] text-wp-fg-muted">72%</span>
+            <span className="wp-num font-wp text-[0.75rem] text-wp-fg-muted">72%</span>
           </div>
         </Sample>
 
@@ -194,14 +194,14 @@ export function WpPrimitivasChapter() {
         >
           <Stars value={4.9} />
           <Stars value={3} />
-          <span className="font-wp text-[13px] font-semibold text-wp-fg-subtle">
+          <span className="font-wp text-[0.8125rem] font-semibold text-wp-fg-subtle">
             null → «Vendedor nuevo · sin valoraciones»
           </span>
         </Sample>
 
         <Sample title="Cuenta atrás de subasta" code="<Countdown endsAt>" app="wp">
           <Countdown endsAt={endsAt} />
-          <span className="font-wp text-[12px] font-semibold text-wp-fg-subtle">
+          <span className="font-wp text-[0.75rem] font-semibold text-wp-fg-subtle">
             bajo una hora → se vuelve rosa y cuenta segundos
           </span>
         </Sample>
@@ -296,15 +296,15 @@ export function WpPrimitivasChapter() {
         <Sample title="Interruptores" code="<Toggle> <Checkbox> <Range>" app="wp" col>
           <div className="flex items-center gap-3">
             <Toggle on={toggle} onChange={setToggle} label="Solo shiny" />
-            <span className="font-wp text-[13px] font-bold text-wp-fg-muted">Solo Shiny</span>
+            <span className="font-wp text-[0.8125rem] font-bold text-wp-fg-muted">Solo Shiny</span>
           </div>
           <Checkbox on={check} onChange={setCheck}>
-            <RarityBadge rarity="epico" className="text-[12.5px]" />
+            <RarityBadge rarity="epico" className="text-[0.78125rem]" />
           </Checkbox>
           <div className="w-full max-w-xs">
             <div className="mb-1.5 flex justify-between">
-              <span className="font-wp text-[13px] font-semibold text-wp-fg-muted">Hasta</span>
-              <span className="wp-num font-wp text-[13.5px] text-wp-accent">
+              <span className="font-wp text-[0.8125rem] font-semibold text-wp-fg-muted">Hasta</span>
+              <span className="wp-num font-wp text-[0.84375rem] text-wp-accent">
                 ₽{number(range)}
               </span>
             </div>
@@ -337,7 +337,7 @@ export function WpPrimitivasChapter() {
         </Sample>
 
         <Sample title="Carga" code="<Skeleton>" app="wp" col>
-          <Skeleton className="h-[120px] w-full rounded-wp" />
+          <Skeleton className="h-[7.5rem] w-full rounded-wp" />
           <div className="flex gap-2">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-16" />

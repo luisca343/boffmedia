@@ -25,14 +25,14 @@ export function BoardError({ message }: { message: string }) {
 
   return (
     <div className="grid flex-1 place-items-center py-16">
-      <Paper tilt={-0.6} className="max-w-[520px] px-9 py-8 text-center">
+      <Paper tilt={-0.6} className="max-w-[32.5rem] px-9 py-8 text-center">
         <Label className="justify-center text-ms-seal-available">{t("closedTitle")}</Label>
         <h2 className="mb-1 mt-2 font-ms-display text-2xl text-ms-ink-1">{t("closedHeading")}</h2>
         <Divider glyph="❦" />
-        <p className="mx-auto mb-1 mt-3 max-w-[42ch] text-[15px] italic leading-relaxed text-ms-ink-2">
+        <p className="mx-auto mb-1 mt-3 max-w-[42ch] text-[0.9375rem] italic leading-relaxed text-ms-ink-2">
           {t("closedDescription")}
         </p>
-        <p className="mb-5 font-ms-mono text-[11px] text-ms-ink-3">{message}</p>
+        <p className="mb-5 font-ms-mono text-[0.6875rem] text-ms-ink-3">{message}</p>
         <Button variant="primary" onClick={() => refetch()}>
           <Icon.Scroll size={13} /> {t("retry")}
         </Button>

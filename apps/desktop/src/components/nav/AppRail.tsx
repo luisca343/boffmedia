@@ -152,7 +152,7 @@ export function AppRail() {
         onClick={() => go("logs")}
       >
         {errorCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-bad text-[10px] font-bold text-white">
+          <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-bad text-[0.625rem] font-bold text-white">
             {errorCount > 9 ? "9+" : errorCount}
           </span>
         )}

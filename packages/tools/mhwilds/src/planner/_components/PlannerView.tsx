@@ -145,7 +145,7 @@ export function PlannerView() {
               onBack={() => setMode("build")}
             />
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(330px,380px)] gap-4 items-start">
+            <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(20.625rem,23.75rem)] gap-4 items-start">
               <div className="flex flex-col gap-4">
                 <Loadout
                   slots={SLOTS}
@@ -167,13 +167,13 @@ export function PlannerView() {
                 >
                   <Icon name="search" size={16} className="shrink-0 text-[var(--mh-bright)]" />
                   <span className="grid min-w-0 gap-0.5">
-                    <b className="font-display text-[14px] leading-tight font-bold uppercase">{t("build_planner.skillsearch.ctaTitle")}</b>
-                    <span className="font-mono text-[11px] leading-none text-txt-muted">{t("build_planner.skillsearch.ctaLead")}</span>
+                    <b className="font-display text-[0.875rem] leading-tight font-bold uppercase">{t("build_planner.skillsearch.ctaTitle")}</b>
+                    <span className="font-mono text-[0.6875rem] leading-none text-txt-muted">{t("build_planner.skillsearch.ctaLead")}</span>
                   </span>
                   <Icon name="chevronRight" size={15} className="ml-auto shrink-0 text-txt-dim" />
                 </button>
               </div>
-              <div className="flex flex-col gap-3.5 lg:sticky lg:top-[74px]">
+              <div className="flex flex-col gap-3.5 lg:sticky lg:top-[4.625rem]">
                 <TargetPanel
                   target={targetMon}
                   weapons={weapons}

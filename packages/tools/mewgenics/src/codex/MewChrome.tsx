@@ -27,15 +27,15 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
 
   return (
     <>
-      <div className="flex min-w-0 items-center gap-[13px]">
-        <span className="grid h-[42px] w-[42px] flex-none place-items-center border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [border-radius:55%_45%_50%_50%/50%_55%_45%_50%] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(-5deg)]">
+      <div className="flex min-w-0 items-center gap-[0.8125rem]">
+        <span className="grid h-[2.625rem] w-[2.625rem] flex-none place-items-center border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [border-radius:55%_45%_50%_50%/50%_55%_45%_50%] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(-5deg)]">
           <Icon name="paw" size={22} />
         </span>
         <div className="flex min-w-0 flex-col gap-[3px]">
-          <div className="text-[25px]/[0.9] tracking-[0.02em] text-[color:var(--mwp-cream)] [font-family:var(--mwf-disp)] [text-shadow:2.5px_2.5px_0_var(--mwp-red-deep)]">
+          <div className="text-[1.5625rem]/[0.9] tracking-[0.02em] text-[color:var(--mwp-cream)] [font-family:var(--mwf-disp)] [text-shadow:2.5px_2.5px_0_var(--mwp-red-deep)]">
             {t("codex")} <span className="not-italic text-[color:var(--mwp-pink)]">Mewgenics</span>
           </div>
-          <div className="overflow-hidden text-ellipsis whitespace-nowrap text-[12px]/[1.2] font-medium text-[color:var(--mwp-cream-dim)]">
+          <div className="overflow-hidden text-ellipsis whitespace-nowrap text-[0.75rem]/[1.2] font-medium text-[color:var(--mwp-cream-dim)]">
             {ready ? t("chrome.entries", { total: total.toLocaleString(locale), lang: locale === "en" ? "EN" : "ES" }) : t("chrome.entriesLoading")}
           </div>
         </div>
@@ -47,7 +47,7 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
           title={t("chrome.cursorToggleTitle")}
           aria-label={t("chrome.cursorToggleTitle")}
           aria-pressed={cursorEnabled}
-          className={`grid h-[40px] w-[40px] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 ${cursorEnabled ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]" : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]"}`}
+          className={`grid h-[2.5rem] w-[2.5rem] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 ${cursorEnabled ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]" : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]"}`}
         >
           <Icon name="search" size={16} />
         </button>
@@ -58,7 +58,7 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
             title={t("chrome.soundToggleTitle")}
             aria-label={t("chrome.soundToggleTitle")}
             aria-pressed={soundEnabled}
-            className={`grid h-[40px] w-[40px] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 ${soundEnabled ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]" : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]"}`}
+            className={`grid h-[2.5rem] w-[2.5rem] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 ${soundEnabled ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]" : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]"}`}
           >
             <Icon name="volume" size={16} />
           </button>
@@ -68,7 +68,7 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
         <MewScreenLink
           screen="builder"
           title={t("chrome.catBuilderTitle")}
-          className="inline-flex items-center gap-[7px] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 pb-1.5 pt-[9px] text-[14px]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(-1.5deg)] transition-all hover:[transform:rotate(1deg)_translateY(-1px)] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 [&_svg]:text-[color:var(--mwp-pink)]"
+          className="inline-flex items-center gap-[0.4375rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 pb-1.5 pt-[0.5625rem] text-[0.875rem]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(-1.5deg)] transition-all hover:[transform:rotate(1deg)_translateY(-1px)] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 [&_svg]:text-[color:var(--mwp-pink)]"
         >
           <Icon name="paw" size={16} />
           <span className="max-[760px]:hidden">{t("chrome.catBuilder")}</span>
@@ -79,7 +79,7 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
           disabled={!ready}
           title={t("chrome.randomTitle")}
           aria-label={t("chrome.randomTitle")}
-          className={`inline-flex items-center gap-[7px] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 pb-1.5 pt-[9px] text-[14px]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(1deg)] transition-all hover:[transform:rotate(-2deg)_translateY(-1px)] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 disabled:opacity-45 [&_svg]:text-[color:var(--mwp-red)] ${wobble ? "[animation:mew-wobble-pop_300ms_ease-out]" : ""}`}
+          className={`inline-flex items-center gap-[0.4375rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 pb-1.5 pt-[0.5625rem] text-[0.875rem]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(1deg)] transition-all hover:[transform:rotate(-2deg)_translateY(-1px)] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 disabled:opacity-45 [&_svg]:text-[color:var(--mwp-red)] ${wobble ? "[animation:mew-wobble-pop_300ms_ease-out]" : ""}`}
         >
           <Icon name="sparkles" size={16} />
           <span className="max-[760px]:hidden">{t("chrome.random")}</span>
@@ -142,7 +142,7 @@ export function MewCatTabs({ codex }: { codex: MewCodexModel }) {
               pickCat(c.key)
             }}
             className={
-              "flex flex-none items-center gap-[7px] border-2 border-solid px-3 pb-1.5 pt-[9px] text-[13px]/none tracking-[0.04em] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 " +
+              "flex flex-none items-center gap-[0.4375rem] border-2 border-solid px-3 pb-1.5 pt-[0.5625rem] text-[0.8125rem]/none tracking-[0.04em] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 " +
               (i % 2 ? "[transform:rotate(0.8deg)]" : "[transform:rotate(-0.8deg)]") + " " +
               (on
                 ? "border-[color:var(--mwp-ink)] bg-[hsl(var(--h)_55%_80%)] text-[color:var(--mwp-ink)] [box-shadow:var(--mwp-hard)] [transform:rotate(-1deg)_scale(1.05)] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] [&_svg]:text-[hsl(var(--h)_70%_26%)]"
@@ -151,7 +151,7 @@ export function MewCatTabs({ codex }: { codex: MewCodexModel }) {
           >
             <Icon name={c.icon} size={15} />
             <span>{t(mewCatKey(c.key, "label"))}</span>
-            {ready && <span className={"font-mono text-[var(--mwp-fs-tiny)]/none [border-radius:8px_10px_9px_11px] px-[5px] py-0.5 " + (on ? "bg-[color:var(--mwp-highlight-light)] text-[color:var(--mwp-ink)]" : "bg-[var(--mwp-shadow-xs)] text-inherit")}>{n}</span>}
+            {ready && <span className={"font-mono text-[var(--mwp-fs-tiny)]/none [border-radius:8px_10px_9px_11px] px-[0.3125rem] py-0.5 " + (on ? "bg-[color:var(--mwp-highlight-light)] text-[color:var(--mwp-ink)]" : "bg-[var(--mwp-shadow-xs)] text-inherit")}>{n}</span>}
           </button>
         )
       })}

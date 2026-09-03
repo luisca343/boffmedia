@@ -36,14 +36,14 @@ export function DkSeg({ options, value, onChange, size, ariaLabel, className }: 
             aria-selected={on}
             onClick={() => onChange(o.value)}
             className={cn(
-              "inline-flex items-center gap-[6px] whitespace-nowrap border-0 font-mono font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background]",
-              sm ? "px-[10px] py-[7px] text-[10px]" : "px-[13px] py-[9px] text-[11px]",
+              "inline-flex items-center gap-[0.375rem] whitespace-nowrap border-0 font-mono font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background]",
+              sm ? "px-[0.625rem] py-[0.4375rem] text-[0.625rem]" : "px-[0.8125rem] py-[0.5625rem] text-[0.6875rem]",
               on ? "bg-accent text-accent-ink" : "text-txt-muted hover:text-txt",
             )}
           >
             {o.label}
             {o.count != null && (
-              <span className="bg-[color-mix(in_srgb,currentColor_14%,transparent)] px-[5px] py-[2px] text-[9px]">{o.count}</span>
+              <span className="bg-[color-mix(in_srgb,currentColor_14%,transparent)] px-[0.3125rem] py-[2px] text-[0.5625rem]">{o.count}</span>
             )}
           </button>
         )
@@ -83,7 +83,7 @@ export function DkChip({ icon, tone, children, className }: { icon?: IconName; t
   return (
     <span
       style={{  color: tone }}
-      className={cn("cut cut-edge-slant [--cut:3px]", "inline-flex items-center gap-[6px] whitespace-nowrap border border-solid border-line bg-panel px-[9px] py-[6px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.08em]",
+      className={cn("cut cut-edge-slant [--cut:3px]", "inline-flex items-center gap-[0.375rem] whitespace-nowrap border border-solid border-line bg-panel px-[0.5625rem] py-[0.375rem] font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.08em]",
         !tone && "text-txt-muted",
         className,
       )}

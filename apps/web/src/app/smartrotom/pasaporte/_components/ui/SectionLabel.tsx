@@ -17,12 +17,12 @@ export function SectionLabel({
     <div
       className={cn(
         "mb-2.5 flex items-baseline justify-between gap-2.5 border-b border-ps-ink/22 pb-1.5",
-        "font-ps-ceremony text-[16px] text-ps-ink",
+        "font-ps-ceremony text-[1rem] text-ps-ink",
         className,
       )}
     >
       <span>{children}</span>
-      {count != null && <span className="ps-num font-ps-mono text-[11px] text-ps-ink-faint">{count}</span>}
+      {count != null && <span className="ps-num font-ps-mono text-[0.6875rem] text-ps-ink-faint">{count}</span>}
     </div>
   )
 }

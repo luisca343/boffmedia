@@ -96,7 +96,7 @@ export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: (
         <div>
           <AvPanel title={t("lifecycle")}>
             <div>
-              <p className="text-[13px] text-txt-muted mb-3">{t("lifecycleDesc")}</p>
+              <p className="text-[0.8125rem] text-txt-muted mb-3">{t("lifecycleDesc")}</p>
               <div className="flex items-center gap-2 flex-wrap mb-4">
                 {(["upcoming", "active", "completed"] as EventStatus[]).map((s) => (
                   <Button
@@ -117,7 +117,7 @@ export function EventAdminPanel({ event, onBack }: { event: EventType; onBack: (
 
           <AvPanel title={t("randomizerSection")}>
             <div>
-              <p className="text-[13px] text-txt-muted mb-3">{t("randomizerSectionDesc")}</p>
+              <p className="text-[0.8125rem] text-txt-muted mb-3">{t("randomizerSectionDesc")}</p>
               {/* Opening a randomizer config requires an active event — it no longer
                   activates one as a side effect, so say so before the attempt fails. */}
               {status !== "active" && (

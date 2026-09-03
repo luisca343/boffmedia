@@ -43,20 +43,20 @@ export function PanelView({ data, owned, effective, recent, loggedIn, go, onGall
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
       {/* hero */}
-      <div className="cut-corner cut-corner-edge relative mb-6 grid grid-cols-1 items-center gap-[26px] border border-solid border-line bg-gradient-to-br from-panel to-base-2 p-[clamp(20px,3vw,34px)] sm:grid-cols-[auto_1fr]">
+      <div className="cut-corner cut-corner-edge relative mb-6 grid grid-cols-1 items-center gap-[1.625rem] border border-solid border-line bg-gradient-to-br from-panel to-base-2 p-[clamp(1.25rem,3vw,2.125rem)] sm:grid-cols-[auto_1fr]">
         <div className="justify-self-center">
           <TcgRing pct={stats.pct} size={132}>
-            <b className="font-display text-[30px] font-bold leading-none text-txt">{stats.pct}%</b>
-            <small className="mt-1 block font-mono text-[10px] uppercase tracking-[0.1em] text-txt-muted">{t("app.panel.collection")}</small>
+            <b className="font-display text-[1.875rem] font-bold leading-none text-txt">{stats.pct}%</b>
+            <small className="mt-1 block font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-muted">{t("app.panel.collection")}</small>
           </TcgRing>
         </div>
         <div className="relative">
           {/* Hero rung — this is the section's Landing, not an Index page. */}
-          <h1 className={cn(DISPLAY_VOICE, "text-[clamp(46px,6.5vw,96px)] text-txt")}>
+          <h1 className={cn(DISPLAY_VOICE, "text-[clamp(2.875rem,6.5vw,6rem)] text-txt")}>
             TCG <em>Pocket</em>
           </h1>
-          <p className="mt-2 max-w-[52ch] text-[15px] leading-relaxed text-txt-muted">{t("app.panel.lead")}</p>
-          <div className="mt-[18px] flex flex-wrap gap-[10px]">
+          <p className="mt-2 max-w-[52ch] text-[0.9375rem] leading-relaxed text-txt-muted">{t("app.panel.lead")}</p>
+          <div className="mt-[1.125rem] flex flex-wrap gap-[0.625rem]">
             <Button variant="pri" icon="cards" onClick={() => go("cartas")}>{t("app.panel.exploreCards")}</Button>
             <Button icon="grid" onClick={() => go("coleccion")}>{t("app.panel.myCollection")}</Button>
             <Button variant="ghost" icon="inbox" iconRight="arrow" onClick={() => go("sobres")}>{t("app.panel.openPacks")}</Button>
@@ -87,8 +87,8 @@ export function PanelView({ data, owned, effective, recent, loggedIn, go, onGall
 
         <div className="grid gap-5">
           <Panel title={t("app.panel.playerGallery")}>
-            <p className="mb-3 text-[13px] leading-relaxed text-txt-muted">{t("app.panel.galleryHint")}</p>
-            <div className="flex gap-[10px]">
+            <p className="mb-3 text-[0.8125rem] leading-relaxed text-txt-muted">{t("app.panel.galleryHint")}</p>
+            <div className="flex gap-[0.625rem]">
               <SearchInput value={user} onChange={setUser} onSubmit={submit} placeholder={t("app.panel.usernamePlaceholder")} className="flex-1" />
               <Button variant="pri" icon="arrow" onClick={submit} disabled={!user.trim()}>{t("app.panel.view")}</Button>
             </div>
@@ -96,9 +96,9 @@ export function PanelView({ data, owned, effective, recent, loggedIn, go, onGall
 
           <Panel title={t("app.panel.recentActivity")} aside={<span className="mono-label">{recent.length}</span>}>
             {!loggedIn ? (
-              <p className="py-2 text-[13px] text-txt-dim">{t("app.panel.loginForActivity")}</p>
+              <p className="py-2 text-[0.8125rem] text-txt-dim">{t("app.panel.loginForActivity")}</p>
             ) : recent.length === 0 ? (
-              <p className="py-2 text-[13px] text-txt-dim">{t("app.panel.noActivity")}</p>
+              <p className="py-2 text-[0.8125rem] text-txt-dim">{t("app.panel.noActivity")}</p>
             ) : (
               <div className="grid gap-[2px]">
                 {recent.slice(0, 8).map((u) => {
@@ -106,14 +106,14 @@ export function PanelView({ data, owned, effective, recent, loggedIn, go, onGall
                   const name = card?.name || u.cardName
                   if (!name) return null
                   return (
-                    <div key={u.id} className="flex items-center gap-[10px] border-b border-solid border-line py-[10px] last:border-b-0">
+                    <div key={u.id} className="flex items-center gap-[0.625rem] border-b border-solid border-line py-[0.625rem] last:border-b-0">
                       <TcgTypePip type={card?.types?.[0] || "colorless"} size={18} />
                       <div>
-                        <div className="text-[14px] leading-tight text-txt">{name}</div>
-                        <div className="font-mono text-[11px] leading-none text-txt-dim">{card ? `${card.setId} · #${padNum(card.localId || card.id)}` : ""}</div>
+                        <div className="text-[0.875rem] leading-tight text-txt">{name}</div>
+                        <div className="font-mono text-[0.6875rem] leading-none text-txt-dim">{card ? `${card.setId} · #${padNum(card.localId || card.id)}` : ""}</div>
                       </div>
-                      <span className={"ml-auto font-mono text-[13px] font-bold " + (u.count > 0 ? "text-ok" : "text-bad")}>{u.count > 0 ? "+" : ""}{u.count}</span>
-                      <span className="min-w-[80px] text-right font-mono text-[11px] leading-none text-txt-dim">{timeAgo(u.at, locale)}</span>
+                      <span className={"ml-auto font-mono text-[0.8125rem] font-bold " + (u.count > 0 ? "text-ok" : "text-bad")}>{u.count > 0 ? "+" : ""}{u.count}</span>
+                      <span className="min-w-[5rem] text-right font-mono text-[0.6875rem] leading-none text-txt-dim">{timeAgo(u.at, locale)}</span>
                     </div>
                   )
                 })}

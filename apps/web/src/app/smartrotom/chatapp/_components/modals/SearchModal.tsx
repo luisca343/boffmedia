@@ -46,10 +46,10 @@ export function SearchModal({ chats, myUuid, onClose, onJump }: { chats: ChatVM[
       {!query.trim() && filter === "all" ? (
         <div className="px-2.5 py-8 text-center text-ca-500">
           <Icon name="search" size={34} className="mx-auto opacity-50" />
-          <p className="mt-2.5 text-[13.5px]">{t("searchModal.emptyHint")}</p>
+          <p className="mt-2.5 text-[0.84375rem]">{t("searchModal.emptyHint")}</p>
         </div>
       ) : results.length === 0 ? (
-        <div className="px-2.5 py-8 text-center text-[13.5px] text-ca-500">{t("searchModal.noResults")}</div>
+        <div className="px-2.5 py-8 text-center text-[0.84375rem] text-ca-500">{t("searchModal.noResults")}</div>
       ) : (
         <div className="flex flex-col gap-0.5">
           {results.map(({ chat, message }, i) => (
@@ -57,10 +57,10 @@ export function SearchModal({ chats, myUuid, onClose, onJump }: { chats: ChatVM[
               <Avatar src={chat.image} size={40} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="truncate text-[16px] font-medium text-ca-50">{chat.name}</span>
-                  <span className="ml-auto text-[12px] text-ca-400">{timeOf(message.createdAt)}</span>
+                  <span className="truncate text-[1rem] font-medium text-ca-50">{chat.name}</span>
+                  <span className="ml-auto text-[0.75rem] text-ca-400">{timeOf(message.createdAt)}</span>
                 </div>
-                <div className="truncate text-[14px] text-ca-300">
+                <div className="truncate text-[0.875rem] text-ca-300">
                   {message.uuid === myUuid ? `${t("preview.you")}: ` : ""}
                   {message.type === "text" || message.type === "emoji" || message.type === "chat" ? message.content : message.type}
                 </div>

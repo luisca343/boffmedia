@@ -184,7 +184,7 @@ export function MapaCanvas({
               <text
                 x={x0 + 2}
                 y={y0 - 6}
-                className="font-gt-mono text-[10px] font-bold uppercase"
+                className="font-gt-mono text-[0.625rem] font-bold uppercase"
                 fill={color}
                 opacity={faded ? 0.4 : 1}
                 stroke="rgb(var(--gt-paper-1))"
@@ -225,7 +225,7 @@ export function MapaCanvas({
                 x={proj.x(c.x)}
                 y={proj.y(c.z) + 4}
                 textAnchor="middle"
-                className="font-gt-mono text-[11px] font-bold"
+                className="font-gt-mono text-[0.6875rem] font-bold"
                 fill="rgb(var(--gt-ink-700))"
               >
                 {p.number}
@@ -241,7 +241,7 @@ export function MapaCanvas({
             x={proj.x(c.x)}
             y={proj.y(c.z) - 58}
             textAnchor="middle"
-            className="font-gt-display text-[17px] font-bold"
+            className="font-gt-display text-[1.0625rem] font-bold"
             fill="rgb(var(--gt-ink-900))"
           >
             {townName(t)}
@@ -264,7 +264,7 @@ export function MapaCanvas({
               x={proj.x(at.x)}
               y={proj.y(at.z) + 3.5}
               textAnchor="middle"
-              className="font-gt-mono text-[10px] font-extrabold"
+              className="font-gt-mono text-[0.625rem] font-extrabold"
               fill="#fff"
             >
               !

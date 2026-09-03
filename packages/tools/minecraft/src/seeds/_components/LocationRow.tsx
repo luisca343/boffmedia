@@ -46,18 +46,18 @@ export function LocationRow({ location, result, onOpen, t }: LocationRowProps) {
       className={`grid w-full gap-1.5 border border-l-[3px] bg-base p-2.5 text-left transition-colors hover:border-line hover:bg-panel ${tone}`}
     >
       <div className="flex items-center gap-2">
-        <span className="min-w-0 flex-1 truncate font-mono text-[12px] text-txt">
+        <span className="min-w-0 flex-1 truncate font-mono text-[0.75rem] text-txt">
           {location.name || t("spec.field.locationName")}
         </span>
         {!location.hard ? (
-          <span className="shrink-0 border border-line-2 px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-wide text-txt-dim">
+          <span className="shrink-0 border border-line-2 px-1.5 py-0.5 font-mono text-[0.5625rem] uppercase tracking-wide text-txt-dim">
             {t("spec.field.soft")}
           </span>
         ) : null}
         <Icon name="chevronRight" size={13} className="shrink-0 text-txt-dim" />
       </div>
 
-      <div className="flex items-center gap-2 font-mono text-[10px] text-txt-dim">
+      <div className="flex items-center gap-2 font-mono text-[0.625rem] text-txt-dim">
         <span className={result && !result.pass ? "text-danger" : undefined}>
           {result
             ? t("spec.step.conditionsMet", { passed, total })

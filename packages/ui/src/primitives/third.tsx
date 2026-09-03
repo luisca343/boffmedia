@@ -16,7 +16,7 @@ export function Third({ date, month, title, meta, side, muted, onClick }: ThirdP
     <div
       onClick={onClick}
       className={cn(
-        "flex min-w-0 items-center gap-[18px] border border-solid border-line bg-panel px-5 py-3.5 transition-[background,border-color] duration-[140ms] [border-left-width:var(--bar)]",
+        "flex min-w-0 items-center gap-[1.125rem] border border-solid border-line bg-panel px-5 py-3.5 transition-[background,border-color] duration-[140ms] [border-left-width:var(--bar)]",
         // `.cut-slant-r`, not the inline polygon it replaces — same shape, but
         // the utility comes with the stroke that draws the slant the clip cuts.
         "cut-slant-r cut-edge-slant-r [--cut:14px] [--cut-line:var(--line)]",
@@ -25,23 +25,23 @@ export function Third({ date, month, title, meta, side, muted, onClick }: ThirdP
       )}
     >
       {date && (
-        <div className="min-w-[44px] text-center">
-          <div className={cn("font-display text-[28px] font-extrabold italic leading-none", muted ? "text-txt-muted" : "text-accent")}>
+        <div className="min-w-[2.75rem] text-center">
+          <div className={cn("font-display text-[1.75rem] font-extrabold italic leading-none", muted ? "text-txt-muted" : "text-accent")}>
             {date}
           </div>
           {month && (
-            <small className="mt-1 block font-mono text-[9px] font-medium uppercase leading-none tracking-[0.12em] text-txt-muted">
+            <small className="mt-1 block font-mono text-[0.5625rem] font-medium uppercase leading-none tracking-[0.12em] text-txt-muted">
               {month}
             </small>
           )}
         </div>
       )}
       <div className="min-w-0">
-        <h5 className="overflow-hidden text-ellipsis whitespace-nowrap font-display text-[19px] font-bold uppercase leading-none">
+        <h5 className="overflow-hidden text-ellipsis whitespace-nowrap font-display text-[1.1875rem] font-bold uppercase leading-none">
           {title}
         </h5>
         {meta && (
-          <p className="mt-[5px] font-mono text-[10px] font-medium uppercase leading-[1.4] tracking-[0.08em] text-txt-muted">
+          <p className="mt-[0.3125rem] font-mono text-[0.625rem] font-medium uppercase leading-[1.4] tracking-[0.08em] text-txt-muted">
             {meta}
           </p>
         )}

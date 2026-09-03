@@ -52,7 +52,7 @@ export function SpawnTile({
       >
         {isUnseen && (
           <span
-            className="absolute top-1.5 right-1.5 font-pk-mono text-[8px] font-bold tracking-widest px-1 py-px rounded"
+            className="absolute top-1.5 right-1.5 font-pk-mono text-[0.5rem] font-bold tracking-widest px-1 py-px rounded"
             style={{ background: accent, color: "#030609" }}
           >
             {t("spawntile_new")}
@@ -68,8 +68,8 @@ export function SpawnTile({
             style={{ imageRendering: "pixelated", filter: isUnseen ? `brightness(0) ${SHADOW}` : SHADOW }}
           />
         )}
-        <span className="text-[11px] font-medium text-pk-surface-200 text-center leading-tight">{name}</span>
-        <span className="font-pk-mono text-[11px] tabular-nums font-semibold" style={{ color: accent }}>
+        <span className="text-[0.6875rem] font-medium text-pk-surface-200 text-center leading-tight">{name}</span>
+        <span className="font-pk-mono text-[0.6875rem] tabular-nums font-semibold" style={{ color: accent }}>
           {formatPercentage(spawn.percentage)}%
         </span>
       </Link>

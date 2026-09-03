@@ -39,10 +39,10 @@ export function GameDetailView({ id }: { id: number }) {
   }
 
   return (
-    <main className="wrap pb-[90px] pt-6">
+    <main className="wrap pb-[5.625rem] pt-6">
       <Link
         href="/juegos"
-        className="mb-5 inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
+        className="mb-5 inline-flex items-center gap-2 font-mono text-[0.6875rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
       >
         <Icon name="back" size={14} /> {t("detail.back")}
       </Link>
@@ -50,14 +50,14 @@ export function GameDetailView({ id }: { id: number }) {
       <GameHero game={game} eventCount={gameEvents.length} className="mb-8" />
 
       <div className="mb-4 flex items-center gap-3">
-        <h2 className="text-[clamp(24px,3vw,34px)] text-txt">{t("detail.events")}</h2>
+        <h2 className="text-[clamp(1.5rem,3vw,2.125rem)] text-txt">{t("detail.events")}</h2>
         <span aria-hidden className="h-px flex-1 bg-line" />
       </div>
 
       {gameEvents.length === 0 ? (
-        <p className="font-body text-[14px] text-txt-dim">{t("detail.noEvents")}</p>
+        <p className="font-body text-[0.875rem] text-txt-dim">{t("detail.noEvents")}</p>
       ) : (
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(340px,1fr))] max-[720px]:grid-cols-1">
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(21.25rem,1fr))] max-[720px]:grid-cols-1">
           {gameEvents.map((e) => (
             <EventCard key={e.id} event={e} />
           ))}

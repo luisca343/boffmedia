@@ -19,7 +19,7 @@ export function SearchBar({
   const t = useTranslations("taxi.searchBar")
   return (
     <div className="relative flex shrink-0 items-center gap-2">
-      <span className="pointer-events-none absolute left-[13px] flex text-tx-txt-3">
+      <span className="pointer-events-none absolute left-[0.8125rem] flex text-tx-txt-3">
         <Icon name="search" size={17} stroke={2.2} />
       </span>
       <input
@@ -39,7 +39,7 @@ export function SearchBar({
           type="button"
           onClick={() => onChange("")}
           aria-label={t("clear")}
-          className="absolute right-[58px] flex p-1 text-tx-txt-3 hover:text-tx-txt"
+          className="absolute right-[3.625rem] flex p-1 text-tx-txt-3 hover:text-tx-txt"
         >
           <Icon name="x" size={15} />
         </button>

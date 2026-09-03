@@ -23,7 +23,7 @@ function Ctrl({
   danger?: boolean
 }) {
   return (
-    <div className="flex flex-wrap items-center gap-4 border-b border-solid border-line px-[22px] py-4 last:border-b-0">
+    <div className="flex flex-wrap items-center gap-4 border-b border-solid border-line px-[1.375rem] py-4 last:border-b-0">
       <span
         className={cn(
           "grid h-10 w-10 flex-none place-items-center border border-solid cut cut-edge-slant [--cut:8px]",
@@ -35,8 +35,8 @@ function Ctrl({
         <Icon name={icon} size={18} />
       </span>
       <div className="min-w-0 flex-1">
-        <b className="block font-display text-[14px]/[1.1] font-bold uppercase tracking-[0.02em]">{title}</b>
-        <span className="mt-1 block text-[13px]/[1.4] text-txt-muted">{desc}</span>
+        <b className="block font-display text-[0.875rem]/[1.1] font-bold uppercase tracking-[0.02em]">{title}</b>
+        <span className="mt-1 block text-[0.8125rem]/[1.4] text-txt-muted">{desc}</span>
       </div>
       <span className="flex-none">{end}</span>
     </div>
@@ -49,9 +49,9 @@ export function DataControls() {
   const [marketing, setMarketing] = React.useState(false)
   return (
     <div className="mt-2 border border-solid border-line bg-panel cut-corner cut-corner-edge">
-      <div className="flex items-center gap-3 border-b border-solid border-line px-[22px] py-4">
+      <div className="flex items-center gap-3 border-b border-solid border-line px-[1.375rem] py-4">
         <Icon name="sliders" size={18} className="text-accent" />
-        <h3 className="font-display text-[17px]/none font-bold uppercase tracking-[0.02em]">{t("title")}</h3>
+        <h3 className="font-display text-[1.0625rem]/none font-bold uppercase tracking-[0.02em]">{t("title")}</h3>
         <span className="ml-auto">
           <Badge tone="ok">{t("youDecide")}</Badge>
         </span>

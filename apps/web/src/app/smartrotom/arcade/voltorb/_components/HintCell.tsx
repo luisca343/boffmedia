@@ -18,14 +18,14 @@ export default function HintCell({ info, label }: HintCellProps) {
   return (
     <div
       aria-label={t("voltorb.hintCellAria", { label, coins, voltorbs })}
-      className="flex min-h-[44px] flex-col items-center justify-center gap-0.5 rounded-lg border border-white/10 bg-[linear-gradient(180deg,rgb(255_255_255/.04),transparent)] py-1 font-ar-mono"
+      className="flex min-h-[2.75rem] flex-col items-center justify-center gap-0.5 rounded-lg border border-white/10 bg-[linear-gradient(180deg,rgb(255_255_255/.04),transparent)] py-1 font-ar-mono"
     >
-      <span aria-hidden className="text-[13px] font-bold leading-tight tabular-nums text-ar-ink">
+      <span aria-hidden className="text-[0.8125rem] font-bold leading-tight tabular-nums text-ar-ink">
         {coins}
       </span>
       <span
         aria-hidden
-        className="flex items-center leading-none tabular-nums text-ar-magenta-2 text-[11px]"
+        className="flex items-center leading-none tabular-nums text-ar-magenta-2 text-[0.6875rem]"
       >
         ⚡{voltorbs}
       </span>

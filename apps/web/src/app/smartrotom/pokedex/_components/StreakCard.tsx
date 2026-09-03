@@ -45,7 +45,7 @@ export function StreakCard() {
   return (
     <div className="bg-white/[0.025] border border-white/[0.06] rounded-[14px] p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-pk-display font-semibold text-[15px] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
+        <h3 className="font-pk-display font-semibold text-[0.9375rem] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
           <TrophyIcon className="w-4 h-4 text-pk-primary-400" />
           {t("streak_title")}
         </h3>
@@ -55,9 +55,9 @@ export function StreakCard() {
       </div>
 
       <div className="flex flex-col gap-2.5 p-3.5 bg-[radial-gradient(160px_80px_at_100%_0%,rgba(249,115,22,0.15),transparent_60%)] bg-white/[0.025] border border-pk-primary-400/[0.15] rounded-xl">
-        <div className="font-pk-display font-bold text-[36px] leading-none text-pk-surface-50 flex items-baseline gap-2.5 tabular-nums">
+        <div className="font-pk-display font-bold text-[2.25rem] leading-none text-pk-surface-50 flex items-baseline gap-2.5 tabular-nums">
           {total}
-          <span className="text-[13px] font-pk font-medium text-pk-surface-400">{t("streak_captures_week")}</span>
+          <span className="text-[0.8125rem] font-pk font-medium text-pk-surface-400">{t("streak_captures_week")}</span>
         </div>
 
         <div className="flex gap-[3px] h-7 items-end">
@@ -70,7 +70,7 @@ export function StreakCard() {
             />
           ))}
         </div>
-        <div className="flex gap-[3px] font-pk-mono text-[9px] text-pk-surface-500 uppercase">
+        <div className="flex gap-[3px] font-pk-mono text-[0.5625rem] text-pk-surface-500 uppercase">
           {dayLabels.map((l, i) => (
             <span key={i} className="flex-1 text-center">
               {l}

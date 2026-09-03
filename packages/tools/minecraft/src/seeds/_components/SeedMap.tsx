@@ -66,7 +66,7 @@ export interface HoverInfo {
  * arrow, which is a pseudo-element and cannot be reached any other way.
  */
 const TOOLTIP_CLASS =
-  "!bg-panel !border !border-solid !border-line-2 !text-txt !font-mono !text-[11px] " +
+  "!bg-panel !border !border-solid !border-line-2 !text-txt !font-mono !text-[0.6875rem] " +
   "!shadow-none before:!border-t-panel";
 
 export interface SeedMapProps {

@@ -108,7 +108,7 @@ export function SpecPanel({
             <Spinner size={14} />
           ) : result ? (
             <span
-              className={`font-mono text-[10px] uppercase tracking-wide ${
+              className={`font-mono text-[0.625rem] uppercase tracking-wide ${
                 result.pass ? "text-ok" : "text-danger"
               }`}
             >
@@ -118,7 +118,7 @@ export function SpecPanel({
         }
       >
         <div className="grid gap-3">
-          <p className="text-[11px] leading-snug text-txt-dim">{t("spec.lead")}</p>
+          <p className="text-[0.6875rem] leading-snug text-txt-dim">{t("spec.lead")}</p>
 
           <Field label={t("spec.field.preset")}>
             <Select
@@ -134,7 +134,7 @@ export function SpecPanel({
           {error ? <Banner tone="error">{error}</Banner> : null}
 
           {result ? (
-            <p className="border border-line-2 bg-base px-2.5 py-2 font-mono text-[10px] leading-relaxed text-txt-dim">
+            <p className="border border-line-2 bg-base px-2.5 py-2 font-mono text-[0.625rem] leading-relaxed text-txt-dim">
               {t("spec.verdict.against", { seed: seedLabel })}
               <br />
               {t("spec.verdict.total", { score: result.score.toFixed(2) })}

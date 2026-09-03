@@ -104,7 +104,7 @@ export function TeamsheetButton({
         title={t("title")}
         footer={
           <div className="flex items-center justify-between gap-3">
-            <span className="font-mono text-[11px] text-txt-dim">
+            <span className="font-mono text-[0.6875rem] text-txt-dim">
               {parsed.length ? t("parsedCount", { count: parsed.length }) : t("formatHint")}
             </span>
             <div className="flex gap-2">
@@ -116,7 +116,7 @@ export function TeamsheetButton({
           </div>
         }
       >
-        <p className="mb-3 font-body text-[12.5px] leading-[1.5] text-txt-muted">
+        <p className="mb-3 font-body text-[0.78125rem] leading-[1.5] text-txt-muted">
           {t("info")}
         </p>
         <textarea
@@ -124,7 +124,7 @@ export function TeamsheetButton({
           onChange={(e) => setPaste(e.target.value)}
           rows={12}
           placeholder={"Incineroar @ Safety Goggles\nAbility: Intimidate\nTera Type: Ghost\n- Fake Out\n- Flare Blitz\n…"}
-          className="w-full resize-y border border-solid border-line bg-base px-3 py-2 font-mono text-[12px] leading-[1.5]"
+          className="w-full resize-y border border-solid border-line bg-base px-3 py-2 font-mono text-[0.75rem] leading-[1.5]"
         />
       </Modal>
     </>

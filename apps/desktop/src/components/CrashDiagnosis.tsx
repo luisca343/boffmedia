@@ -60,7 +60,7 @@ export function CrashDiagnosisCard({
         <Icon name="alert" className="mt-[2px] shrink-0 text-warn" />
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="font-display text-[15px] font-bold uppercase tracking-[0.04em] text-txt">
+            <h3 className="font-display text-[0.9375rem] font-bold uppercase tracking-[0.04em] text-txt">
               {loc(`${diagnosis.id}.title`, diagnosis.title)}
             </h3>
             <Badge tone="warn">{getKindLabel(diagnosis.kind)}</Badge>
@@ -75,7 +75,7 @@ export function CrashDiagnosisCard({
               <summary className="cursor-pointer select-none text-xs text-txt-dim">
                 {t("evidenceLabel", { count: diagnosis.evidence.length })}
               </summary>
-              <pre className="mt-2 max-h-[140px] overflow-auto rounded-sm border border-line bg-black/30 p-3 font-mono text-[11px] leading-relaxed text-txt-muted">
+              <pre className="mt-2 max-h-[8.75rem] overflow-auto rounded-sm border border-line bg-black/30 p-3 font-mono text-[0.6875rem] leading-relaxed text-txt-muted">
                 {diagnosis.evidence.join("\n")}
               </pre>
             </details>

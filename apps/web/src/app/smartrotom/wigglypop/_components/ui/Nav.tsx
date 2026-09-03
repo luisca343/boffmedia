@@ -24,7 +24,7 @@ export function Tabs<T extends string>({
     <div
       role="tablist"
       className={cn(
-        "flex gap-1 rounded-wp-pill border-wp border-wp-line/24 bg-white p-[5px] shadow-wp-soft",
+        "flex gap-1 rounded-wp-pill border-wp border-wp-line/24 bg-white p-[0.3125rem] shadow-wp-soft",
         className,
       )}
     >
@@ -37,7 +37,7 @@ export function Tabs<T extends string>({
             aria-selected={active}
             onClick={() => onChange(t.key)}
             className={cn(
-              "inline-flex items-center gap-[7px] rounded-wp-pill px-4 py-2 font-wp text-[13px] font-extrabold",
+              "inline-flex items-center gap-[0.4375rem] rounded-wp-pill px-4 py-2 font-wp text-[0.8125rem] font-extrabold",
               "transition-all duration-150 ease-wp-soft",
               active
                 ? "wp-grad-primary text-white shadow-wp-tab"
@@ -83,7 +83,7 @@ export function Seg<T extends string>({
             aria-label={o.title ?? o.label}
             aria-pressed={active}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded-wp-pill px-[13px] py-2 font-wp text-[13px] font-extrabold transition-colors",
+              "inline-flex items-center gap-1.5 rounded-wp-pill px-[0.8125rem] py-2 font-wp text-[0.8125rem] font-extrabold transition-colors",
               active ? "bg-wp-accent text-white" : "text-wp-fg-muted hover:text-wp-accent-strong",
             )}
           >
@@ -123,7 +123,7 @@ export function Stepper({
             {i > 0 && (
               <span
                 className={cn(
-                  "mx-2.5 h-[2.5px] w-[46px] rounded-wp-pill",
+                  "mx-2.5 h-[2.5px] w-[2.875rem] rounded-wp-pill",
                   done || active ? "bg-wp-green" : "bg-wp-line/24",
                 )}
               />
@@ -131,7 +131,7 @@ export function Stepper({
             <span className="flex items-center gap-2.5">
               <span
                 className={cn(
-                  "flex h-[30px] w-[30px] flex-none items-center justify-center rounded-wp-pill border-2 font-wp text-[13px] font-extrabold",
+                  "flex h-[1.875rem] w-[1.875rem] flex-none items-center justify-center rounded-wp-pill border-2 font-wp text-[0.8125rem] font-extrabold",
                   done
                     ? "border-wp-green bg-wp-green text-white"
                     : active
@@ -143,7 +143,7 @@ export function Stepper({
               </span>
               <span
                 className={cn(
-                  "font-wp text-[13px] font-semibold",
+                  "font-wp text-[0.8125rem] font-semibold",
                   done || active ? "text-wp-fg" : "text-wp-fg-subtle",
                 )}
               >
@@ -176,8 +176,8 @@ export function NavBadge({
   return (
     <span
       className={cn(
-        "absolute -right-0.5 -top-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-wp-pill border-2 border-white px-1",
-        "wp-num font-wp text-[10px] leading-none text-white",
+        "absolute -right-0.5 -top-0.5 flex h-[1.125rem] min-w-[1.125rem] items-center justify-center rounded-wp-pill border-2 border-white px-1",
+        "wp-num font-wp text-[0.625rem] leading-none text-white",
         TONE[tone],
         className,
       )}

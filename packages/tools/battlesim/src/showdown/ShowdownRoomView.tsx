@@ -100,7 +100,7 @@ export function BsimShowdownRoomView() {
       spectator={isSpectator}
       spectatorCount={spectatorCount}
       endActions={endActions}
-      banner={savingReplay ? <p className="m-0 px-3 pt-2 font-mono text-[11px] text-txt-muted">{t('end.savingReplay')}</p> : undefined}
+      banner={savingReplay ? <p className="m-0 px-3 pt-2 font-mono text-[0.6875rem] text-txt-muted">{t('end.savingReplay')}</p> : undefined}
     />
   );
 }

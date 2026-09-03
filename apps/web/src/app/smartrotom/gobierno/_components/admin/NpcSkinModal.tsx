@@ -69,7 +69,7 @@ export function NpcSkinModal({ open, onClose, skin }: { open: boolean; onClose: 
         <Field label={t("skins.nombreSkin")} value={name} onChange={setName} placeholder={t("skins.nombreSkinPlaceholder")} mono />
         <Field label={t("skins.npcsUsan")} value={npcs} onChange={setNpcs} placeholder={t("skins.npcsPlaceholder")} />
         <div>
-          <div className="mb-1.5 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+          <div className="mb-1.5 font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
             {t("skins.rendersCompletados")}
           </div>
           <div className="flex flex-wrap gap-1.5">
@@ -80,7 +80,7 @@ export function NpcSkinModal({ open, onClose, skin }: { open: boolean; onClose: 
                   key={key}
                   type="button"
                   onClick={() => setFlags((s) => ({ ...s, [key]: !s[key] }))}
-                  className={`rounded-gt-sm border px-3 py-1.5 font-gt text-[12.5px] font-bold transition-colors ${
+                  className={`rounded-gt-sm border px-3 py-1.5 font-gt text-[0.78125rem] font-bold transition-colors ${
                     on ? "border-gt-ok bg-gt-ok/12 text-gt-ok" : "border-gt-line-strong bg-gt-paper-0 text-gt-ink-500"
                   }`}
                 >

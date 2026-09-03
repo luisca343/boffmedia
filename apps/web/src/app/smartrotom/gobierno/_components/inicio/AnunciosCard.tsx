@@ -37,19 +37,19 @@ export function AnunciosCard() {
       </Bar>
       <div className="grid gap-2.5 p-3">
         {isLoading ? (
-          Array.from({ length: 2 }, (_, i) => <Skeleton key={i} className="h-[92px]" />)
+          Array.from({ length: 2 }, (_, i) => <Skeleton key={i} className="h-[5.75rem]" />)
         ) : items.length === 0 ? (
           <Empty icon="megaphone" title={t("anuncios.emptyTitle")} sub={t("anuncios.emptyBody")} />
         ) : (
           items.map((e) => (
             <Link key={e.id} href={hrefOf("anuncios")} className="block">
               <Sunken className="p-3 transition-colors hover:bg-gt-paper-1">
-                <div className="mb-[5px] flex items-center gap-[7px]">
+                <div className="mb-[0.3125rem] flex items-center gap-[0.4375rem]">
                   <Badge tone={KIND_TONE[e.kind] ?? "default"}>{KIND_KEY[e.kind] ? t(KIND_KEY[e.kind]) : e.kind}</Badge>
-                  <span className="font-gt-mono text-[10px] text-gt-ink-400">{fmtDate(e.publishedAt, intlLocale)}</span>
+                  <span className="font-gt-mono text-[0.625rem] text-gt-ink-400">{fmtDate(e.publishedAt, intlLocale)}</span>
                 </div>
-                <div className="mb-[3px] font-gt-display text-[14.5px] text-gt-ink-900">{e.title}</div>
-                <div className="line-clamp-2 text-[11.5px] leading-relaxed text-gt-ink-500">{e.body}</div>
+                <div className="mb-[3px] font-gt-display text-[0.90625rem] text-gt-ink-900">{e.title}</div>
+                <div className="line-clamp-2 text-[0.71875rem] leading-relaxed text-gt-ink-500">{e.body}</div>
               </Sunken>
             </Link>
           ))

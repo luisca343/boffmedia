@@ -41,12 +41,12 @@ function ActionRow({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="flex w-full items-center gap-[10px] border border-solid border-line bg-base px-[13px] py-[11px] text-left transition-[border-color,background] hover:border-line-2 hover:bg-panel-2 disabled:opacity-50"
+      className="flex w-full items-center gap-[0.625rem] border border-solid border-line bg-base px-[0.8125rem] py-[0.6875rem] text-left transition-[border-color,background] hover:border-line-2 hover:bg-panel-2 disabled:opacity-50"
     >
       <Icon name={icon} size={16} className={cn("flex-none", iconClass)} />
       <span className="grid min-w-0">
-        <span className="font-body text-[13px] text-txt">{title}</span>
-        {hint && <span className="truncate font-mono text-[11px] text-txt-dim">{hint}</span>}
+        <span className="font-body text-[0.8125rem] text-txt">{title}</span>
+        {hint && <span className="truncate font-mono text-[0.6875rem] text-txt-dim">{hint}</span>}
       </span>
     </button>
   )
@@ -130,11 +130,11 @@ export function ExportImportDialog({ sessionId, sessionLabel, onImportDone, onCl
         />
 
         {result && (
-          <p className="text-center font-mono text-[11px] text-ok">
+          <p className="text-center font-mono text-[0.6875rem] text-ok">
             {t("exportImport.importSuccess", { sessions: result.sessions, matches: result.matches })}
           </p>
         )}
-        {importError && <p className="text-center font-mono text-[11px] text-bad">{importError}</p>}
+        {importError && <p className="text-center font-mono text-[0.6875rem] text-bad">{importError}</p>}
       </div>
     </Modal>
   )

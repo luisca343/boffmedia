@@ -24,11 +24,11 @@ export function CiudadanoCard({ citizen }: { citizen: Ciudadano }) {
         onClick={() => openDossier(citizen.uuid)}
         className="block w-full p-3.5 text-left transition-colors hover:bg-gt-paper-1"
       >
-        <div className="mb-2.5 flex items-center gap-[11px]">
+        <div className="mb-2.5 flex items-center gap-[0.6875rem]">
           <Avatar user={citizen.username} size={44} />
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
-              <span className="truncate font-gt-display text-[15px] font-bold text-gt-ink-900">
+              <span className="truncate font-gt-display text-[0.9375rem] font-bold text-gt-ink-900">
                 {citizen.username}
               </span>
               {citizen.buscado && (
@@ -37,7 +37,7 @@ export function CiudadanoCard({ citizen }: { citizen: Ciudadano }) {
                 </Badge>
               )}
             </div>
-            <div className="mt-0.5 font-gt-mono text-[10px] uppercase tracking-[.08em] text-gt-ink-400">
+            <div className="mt-0.5 font-gt-mono text-[0.625rem] uppercase tracking-[.08em] text-gt-ink-400">
               {firstTown ? townName(firstTown) : t("poblacion.sinResidencia")}
               {restTowns.length > 0 && ` +${restTowns.length}`}
             </div>
@@ -51,7 +51,7 @@ export function CiudadanoCard({ citizen }: { citizen: Ciudadano }) {
               <span className="font-gt-display text-sm font-bold tabular-nums text-gt-ink-900">
                 {citizen.parcelas}
               </span>
-              <span className="font-gt-mono text-[9px] uppercase tracking-[.08em] text-gt-ink-400">
+              <span className="font-gt-mono text-[0.5625rem] uppercase tracking-[.08em] text-gt-ink-400">
                 {t("poblacion.parcelasUnit")}
               </span>
             </span>
@@ -60,7 +60,7 @@ export function CiudadanoCard({ citizen }: { citizen: Ciudadano }) {
                 <span className="font-gt-display text-sm font-bold tabular-nums text-gt-warn">
                   {citizen.multasPendientes}
                 </span>
-                <span className="font-gt-mono text-[9px] uppercase tracking-[.08em] text-gt-ink-400">
+                <span className="font-gt-mono text-[0.5625rem] uppercase tracking-[.08em] text-gt-ink-400">
                   {t("poblacion.multasUnit")}
                 </span>
               </span>

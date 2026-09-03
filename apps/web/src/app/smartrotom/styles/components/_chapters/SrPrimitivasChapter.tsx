@@ -108,11 +108,11 @@ export function SrPrimitivasChapter() {
           }
         >
           <span className="flex items-center gap-2">
-            <span className={cn(HEAD4, "text-[14px] text-sr-txt")}>Notificaciones</span>
+            <span className={cn(HEAD4, "text-[0.875rem] text-sr-txt")}>Notificaciones</span>
             <SmartRotomBadge>12</SmartRotomBadge>
           </span>
           <span className="flex items-center gap-2">
-            <span className={cn(HEAD4, "text-[14px] text-sr-txt")}>Servidor</span>
+            <span className={cn(HEAD4, "text-[0.875rem] text-sr-txt")}>Servidor</span>
             <SmartRotomBadge variant="neutral">Wingull</SmartRotomBadge>
           </span>
         </Sample>
@@ -132,8 +132,8 @@ export function SrPrimitivasChapter() {
       >
         <Sample title="Con cabecera" code="title · aside" grid>
           <SmartRotomPanel title="Ajustes" aside={<SmartRotomBadge variant="neutral">v3</SmartRotomBadge>}>
-            <p className="font-body text-[14px] leading-[1.6] text-sr-txt-muted">
-              La esquina superior derecha va cortada a 16px (<code className="font-mono text-[12px] text-sr-accent">--cut-lg</code>).
+            <p className="font-body text-[0.875rem] leading-[1.6] text-sr-txt-muted">
+              La esquina superior derecha va cortada a 16px (<code className="font-mono text-[0.75rem] text-sr-accent">--cut-lg</code>).
             </p>
           </SmartRotomPanel>
           <SmartRotomPanel
@@ -144,8 +144,8 @@ export function SrPrimitivasChapter() {
               </SmartRotomButton>
             }
           >
-            <p className="font-body text-[14px] leading-[1.6] text-sr-txt-muted">
-              <code className="font-mono text-[12px] text-sr-accent">aside</code> se alinea a la derecha de la
+            <p className="font-body text-[0.875rem] leading-[1.6] text-sr-txt-muted">
+              <code className="font-mono text-[0.75rem] text-sr-accent">aside</code> se alinea a la derecha de la
               cabecera: badges, botones pequeños o un contador.
             </p>
           </SmartRotomPanel>
@@ -164,8 +164,8 @@ export function SrPrimitivasChapter() {
         >
           <SmartRotomPanel>
             <span className={MONO_LABEL}>Sin título</span>
-            <p className="mt-2 font-body text-[14px] leading-[1.6] text-sr-txt-muted">
-              Sin <code className="font-mono text-[12px] text-sr-accent">title</code> no se renderiza la cabecera.
+            <p className="mt-2 font-body text-[0.875rem] leading-[1.6] text-sr-txt-muted">
+              Sin <code className="font-mono text-[0.75rem] text-sr-accent">title</code> no se renderiza la cabecera.
             </p>
           </SmartRotomPanel>
           <SmartRotomPanel flat title="Plano" bodyClassName="p-0">
@@ -173,7 +173,7 @@ export function SrPrimitivasChapter() {
               {["Perfil", "Tema", "Sonido"].map((row) => (
                 <span
                   key={row}
-                  className="border-x-0 border-t-0 border-b border-solid border-sr-line py-[11px] px-4 font-mono text-[12px] uppercase tracking-[0.1em] text-sr-txt-muted last:border-b-0"
+                  className="border-x-0 border-t-0 border-b border-solid border-sr-line py-[0.6875rem] px-4 font-mono text-[0.75rem] uppercase tracking-[0.1em] text-sr-txt-muted last:border-b-0"
                 >
                   {row}
                 </span>
@@ -215,7 +215,7 @@ export function SrPrimitivasChapter() {
           ].map(([label, size, tone]) => (
             <div key={label as string} className="grid justify-items-center gap-2">
               <Loading width={size as number} height={size as number} colorClass={tone as string} />
-              <code className="font-mono text-[10px] leading-none text-sr-txt-dim">{label as string}</code>
+              <code className="font-mono text-[0.625rem] leading-none text-sr-txt-dim">{label as string}</code>
             </div>
           ))}
         </Sample>
@@ -231,7 +231,7 @@ export function SrPrimitivasChapter() {
             </>
           }
         >
-          <div className="h-[220px] w-full border border-solid border-sr-line">
+          <div className="h-[13.75rem] w-full border border-solid border-sr-line">
             <LoadingScreen />
           </div>
         </Sample>

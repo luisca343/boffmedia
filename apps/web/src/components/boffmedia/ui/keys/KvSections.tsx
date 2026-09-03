@@ -7,29 +7,29 @@ import { Icon } from "@boffmedia/ui"
 import { KvPlatforms, KvReview, KvTags } from "./KvAtoms"
 import { kvMetaBand, kvMetaColor, kvReviewBand, type KvInfoData, type KvKey, type KvPriceData } from "./keys-util"
 
-const FACT_K = "font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim"
+const FACT_K = "font-mono text-[0.59375rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim"
 
 export function KvScores({ info }: { info: KvInfoData }) {
   const t = useTranslations("common.keys")
   const hasMeta = info.metacritic != null
-  const cell = "flex min-w-0 flex-col justify-center gap-2.5 bg-panel px-[15px] py-[13px]"
+  const cell = "flex min-w-0 flex-col justify-center gap-2.5 bg-panel px-[0.9375rem] py-[0.8125rem]"
   return (
-    <div className={cn("grid gap-px border border-solid border-line bg-line", hasMeta ? "grid-cols-[minmax(190px,auto)_1fr]" : "grid-cols-1")}>
+    <div className={cn("grid gap-px border border-solid border-line bg-line", hasMeta ? "grid-cols-[minmax(11.875rem,auto)_1fr]" : "grid-cols-1")}>
       {hasMeta && (
         <div className={cell}>
           <span className={FACT_K}>{t("metacritic")}</span>
           <div className="flex items-center gap-3">
-            <span className="inline-grid h-[42px] min-w-[48px] flex-none place-items-center border-2 border-solid px-2 font-display text-[25px]/none font-extrabold italic tabular-nums" style={{ color: kvMetaColor(info.metacritic!), borderColor: kvMetaColor(info.metacritic!) }}>
+            <span className="inline-grid h-[2.625rem] min-w-[3rem] flex-none place-items-center border-2 border-solid px-2 font-display text-[1.5625rem]/none font-extrabold italic tabular-nums" style={{ color: kvMetaColor(info.metacritic!), borderColor: kvMetaColor(info.metacritic!) }}>
               {info.metacritic}
             </span>
-            <span className="font-mono text-[11px]/[1.35] text-txt-muted text-pretty">{t(`meta.${kvMetaBand(info.metacritic!)}`)}</span>
+            <span className="font-mono text-[0.6875rem]/[1.35] text-txt-muted text-pretty">{t(`meta.${kvMetaBand(info.metacritic!)}`)}</span>
           </div>
         </div>
       )}
       <div className={cell}>
         <span className={FACT_K}>{t("steamRating")}</span>
         <KvReview score={info.review} count={info.reviewCount} />
-        <span className="font-mono text-[11px]/[1.35] text-txt-muted text-pretty">{t(`review.${kvReviewBand(info.review)}`)}</span>
+        <span className="font-mono text-[0.6875rem]/[1.35] text-txt-muted text-pretty">{t(`review.${kvReviewBand(info.review)}`)}</span>
       </div>
     </div>
   )
@@ -46,12 +46,12 @@ export function KvInfo({ item }: { item: KvKey }) {
   ]
   return (
     <div className="grid gap-4">
-      <p className="text-[14px]/[1.55] text-txt-muted text-pretty">{item.desc}</p>
+      <p className="text-[0.875rem]/[1.55] text-txt-muted text-pretty">{item.desc}</p>
       <div className="grid grid-cols-2 gap-px border border-solid border-line bg-line max-[600px]:grid-cols-1">
         {facts.map((r) => (
-          <div key={r.label} className="flex flex-col gap-[5px] bg-panel px-[13px] py-[11px] transition-[background] duration-[140ms] hover:bg-panel-2">
+          <div key={r.label} className="flex flex-col gap-[0.3125rem] bg-panel px-[0.8125rem] py-[0.6875rem] transition-[background] duration-[140ms] hover:bg-panel-2">
             <span className={FACT_K}>{r.label}</span>
-            <span className="font-display text-[13px]/[1.3] font-semibold not-italic text-txt">{r.value}</span>
+            <span className="font-display text-[0.8125rem]/[1.3] font-semibold not-italic text-txt">{r.value}</span>
           </div>
         ))}
       </div>
@@ -70,22 +70,22 @@ export function KvPrice({ price }: { price: KvPriceData }) {
   const t = useTranslations("common.keys")
   if (price.isFree) {
     return (
-      <div className="flex flex-col items-start gap-2.5 border border-solid border-line bg-panel-2 p-[22px]">
-        <span className="font-display text-[44px]/[0.9] font-extrabold italic text-ok">{t("free")}</span>
-        <span className="font-mono text-[11px]/none uppercase tracking-[0.06em] text-txt-muted">{t("freeToPlay")}</span>
+      <div className="flex flex-col items-start gap-2.5 border border-solid border-line bg-panel-2 p-[1.375rem]">
+        <span className="font-display text-[2.75rem]/[0.9] font-extrabold italic text-ok">{t("free")}</span>
+        <span className="font-mono text-[0.6875rem]/none uppercase tracking-[0.06em] text-txt-muted">{t("freeToPlay")}</span>
       </div>
     )
   }
   return (
-    <div className="flex flex-col items-start gap-2.5 border border-solid border-line bg-panel-2 p-[22px]">
+    <div className="flex flex-col items-start gap-2.5 border border-solid border-line bg-panel-2 p-[1.375rem]">
       {price.discount > 0 && (
         <div className="inline-flex items-center gap-3">
-          <span className="border border-solid border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft px-[9px] py-1.5 font-display text-[16px]/none font-extrabold italic text-ok">-{price.discount}%</span>
-          <span className="font-mono text-[15px]/none text-txt-dim line-through">{price.initial}</span>
+          <span className="border border-solid border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft px-[0.5625rem] py-1.5 font-display text-[1rem]/none font-extrabold italic text-ok">-{price.discount}%</span>
+          <span className="font-mono text-[0.9375rem]/none text-txt-dim line-through">{price.initial}</span>
         </div>
       )}
-      <span className="font-display text-[44px]/[0.9] font-extrabold italic text-accent">{price.final}</span>
-      <span className="font-mono text-[11px]/none uppercase tracking-[0.06em] text-txt-muted">{price.discount > 0 ? t("currentPrice") : t("regularPrice")} · {t("keyValueSuffix")}</span>
+      <span className="font-display text-[2.75rem]/[0.9] font-extrabold italic text-accent">{price.final}</span>
+      <span className="font-mono text-[0.6875rem]/none uppercase tracking-[0.06em] text-txt-muted">{price.discount > 0 ? t("currentPrice") : t("regularPrice")} · {t("keyValueSuffix")}</span>
     </div>
   )
 }

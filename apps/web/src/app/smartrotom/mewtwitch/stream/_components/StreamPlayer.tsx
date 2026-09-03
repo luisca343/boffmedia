@@ -31,7 +31,7 @@ export function StreamPlayer({ channel, viewers, poster }: { channel: string; vi
       <div className="pointer-events-none absolute left-3.5 top-3.5 z-[2] inline-flex items-center gap-2">
         <LivePill size="lg" className="shadow-[0_4px_14px_rgb(var(--mw-accent)/.35)]" />
         {viewers != null && (
-          <span className="inline-flex items-center gap-1.5 rounded-mw-pill border border-mw-line-strong bg-black/65 px-2.5 py-1 font-mono text-[11px] text-white">
+          <span className="inline-flex items-center gap-1.5 rounded-mw-pill border border-mw-line-strong bg-black/65 px-2.5 py-1 font-mono text-[0.6875rem] text-white">
             <PulseDot /> {number(viewers)}
           </span>
         )}

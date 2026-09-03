@@ -78,7 +78,7 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
       {/* No header: TcgpApp's strip names the tool and its tab row names this
           view, so a second title here would name it twice. The lead stays. */}
-      <p className="mb-5 max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">
+      <p className="mb-5 max-w-[58ch] text-pretty text-[0.9375rem] leading-[1.5] text-txt-muted">
         {t("app.cartas.lead", { cards: data.cards.length, sets: data.sets.length })}
       </p>
 
@@ -89,7 +89,7 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
               const on = types.includes(ty)
               return (
                 <button key={ty} type="button" onClick={() => toggleType(ty)}
-                  className="cut cut-edge-slant [--cut:5px] inline-flex items-center gap-[6px] border border-solid px-[10px] py-[6px] font-mono text-[11px] uppercase tracking-[0.04em] transition-colors"
+                  className="cut cut-edge-slant [--cut:5px] inline-flex items-center gap-[0.375rem] border border-solid px-[0.625rem] py-[0.375rem] font-mono text-[0.6875rem] uppercase tracking-[0.04em] transition-colors"
                   style={cssVars({
                     color: on ? "var(--text)" : "var(--muted)",
                     borderColor: on ? `color-mix(in srgb, ${typeColor(ty)} 65%, transparent)` : "var(--line-2)",
@@ -104,19 +104,19 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
         }
         note={t("app.showing", { shown: Math.min(limit, filtered.length), total: filtered.length })}
       >
-        <SearchInput value={q} onChange={setQ} placeholder={t("app.searchCards")} className="min-w-[200px] flex-1" />
-        <Select value={setF} onChange={setSetF} ariaLabel={t("app.filters.expansion")} className="w-auto min-w-[200px]"
+        <SearchInput value={q} onChange={setQ} placeholder={t("app.searchCards")} className="min-w-[12.5rem] flex-1" />
+        <Select value={setF} onChange={setSetF} ariaLabel={t("app.filters.expansion")} className="w-auto min-w-[12.5rem]"
           options={[{ value: "", label: t("app.filters.allSets") }].concat(data.sets.map((s) => ({ value: s.id, label: `${s.id} · ${s.name}` })))} />
         {categories.length > 1 && (
-          <Select value={catF} onChange={setCatF} ariaLabel={t("app.filters.category")} className="w-auto min-w-[160px]"
+          <Select value={catF} onChange={setCatF} ariaLabel={t("app.filters.category")} className="w-auto min-w-[10rem]"
             options={[{ value: "", label: t("app.filters.allCategories") }].concat(categories.map((c) => ({ value: c, label: tl(`app.category.${c.toLowerCase()}`, c) })))} />
         )}
-        <Select value={sort} onChange={setSort} ariaLabel={t("app.sort.label")} className="w-auto min-w-[180px]"
+        <Select value={sort} onChange={setSort} ariaLabel={t("app.sort.label")} className="w-auto min-w-[11.25rem]"
           options={["num", "name", "rarity", "hp"].map((s) => ({ value: s, label: `${t("app.sort.label")}: ${t(`app.sort.${s}`)}` }))} />
         <ToolBarSpacer />
         <span className="inline-flex items-center gap-2">
           <Toggle on={ownedOnly} onChange={setOwnedOnly} ariaLabel={t("app.ownedOnly")} />
-          <span className="font-mono text-[12px] uppercase tracking-[0.06em] text-txt-muted">{t("app.ownedOnly")}</span>
+          <span className="font-mono text-[0.75rem] uppercase tracking-[0.06em] text-txt-muted">{t("app.ownedOnly")}</span>
         </span>
         <Seg value={density} onChange={(v) => setDensity(v as Density)}
           options={[{ value: "compacta", label: "S" }, { value: "comoda", label: "M" }, { value: "espaciosa", label: "L" }]} />
@@ -136,7 +136,7 @@ export function CartasView({ data, effective, initialQ, onOpenCard }: Props) {
           const pool = s?.cards ?? cards
           const have = pool.filter((c) => effective(c.id) > 0).length
           return (
-            <section key={sid} className="mb-[26px]">
+            <section key={sid} className="mb-[1.625rem]">
               <div className="mb-3"><TcgSetProgress label={s?.name ?? sid} sub={sid} have={have} total={pool.length} /></div>
               <TcgCardGrid cards={cards} effective={effective} allColored density={density} onOpen={(c) => onOpenCard(c, filtered)} />
             </section>

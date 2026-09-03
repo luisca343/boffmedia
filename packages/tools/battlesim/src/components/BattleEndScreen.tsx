@@ -114,18 +114,18 @@ export function BattleEndScreen({ battle, pov, actions, onRestart, winner, youTe
 
   const row = (label: string, members: EndMember[], foeSide: boolean) => (
     <div className="grid min-w-0 gap-2">
-      <span className="flex items-center gap-2 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
+      <span className="flex items-center gap-2 font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
         <i aria-hidden className={cn("h-2 w-2", foeSide ? "bg-bad" : "bg-accent")} />{label}
       </span>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(158px,1fr))] gap-[6px]">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(9.875rem,1fr))] gap-[0.375rem]">
         {members.map((m) =>
           m.mon == null ? (
             <BxUnknownSlot key={m.key} small />
           ) : (
             <BxSlot key={m.key} small mon={m.mon} dim={!!m.mon.fnt}
               aside={m.mon.fnt
-                ? <b className="flex-none font-mono text-[9px] font-bold leading-none text-bad">{t("battle.end.ko")}</b>
-                : <b className="flex-none font-mono text-[9px] font-bold leading-none text-txt-dim">{m.mon.hp}%</b>} />
+                ? <b className="flex-none font-mono text-[0.5625rem] font-bold leading-none text-bad">{t("battle.end.ko")}</b>
+                : <b className="flex-none font-mono text-[0.5625rem] font-bold leading-none text-txt-dim">{m.mon.hp}%</b>} />
           ),
         )}
       </div>
@@ -134,11 +134,11 @@ export function BattleEndScreen({ battle, pov, actions, onRestart, winner, youTe
 
   return (
     <div role="dialog" aria-label={t("battle.end.aria")} className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-base/90 p-3 backdrop-blur-[3px] sm:p-5">
-      <div className="m-auto flex w-full max-w-[760px] flex-col gap-4 animate-[bm-modal-in_320ms_ease_both] motion-reduce:animate-none">
+      <div className="m-auto flex w-full max-w-[47.5rem] min-[2240px]:max-w-[65rem] flex-col gap-4 animate-[bm-modal-in_320ms_ease_both] motion-reduce:animate-none">
         <div className={cn("border border-solid bg-panel p-5 text-center sm:p-7", tone.line)}>
-          <span className={cn("cut cut-edge-slant [--cut:3px] inline-block border border-solid px-2 py-1 font-mono text-[10px] font-bold uppercase leading-none tracking-[0.14em]", tone.text, tone.soft, tone.line)}>{t("battle.turn", { turn: battle.turn })}</span>
-          <h2 className={cn(DISPLAY_VOICE, "m-0 mt-2 text-[clamp(44px,9vw,84px)]", tone.text)}>{title}</h2>
-          <p className="m-0 mt-2 font-mono text-[12px] uppercase tracking-[0.08em] text-txt-muted">{sub}</p>
+          <span className={cn("cut cut-edge-slant [--cut:3px] inline-block border border-solid px-2 py-1 font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.14em]", tone.text, tone.soft, tone.line)}>{t("battle.turn", { turn: battle.turn })}</span>
+          <h2 className={cn(DISPLAY_VOICE, "m-0 mt-2 text-[clamp(2.75rem,9vw,5.25rem)]", tone.text)}>{title}</h2>
+          <p className="m-0 mt-2 font-mono text-[0.75rem] uppercase tracking-[0.08em] text-txt-muted">{sub}</p>
         </div>
 
         <div className="grid gap-4 border border-solid border-line bg-panel p-4 md:grid-cols-2">

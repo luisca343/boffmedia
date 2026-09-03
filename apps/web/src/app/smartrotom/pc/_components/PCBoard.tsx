@@ -136,11 +136,11 @@ export function PCBoard({ onOpenFilters, onShareBox }: PCBoardProps) {
             onFilters={onOpenFilters}
             onClear={clearFilters}
           />
-          <div className="flex flex-1 items-center justify-center overflow-auto p-[clamp(12px,1.7vw,20px)]">
+          <div className="flex flex-1 items-center justify-center overflow-auto p-[clamp(0.75rem,1.7vw,1.25rem)]">
             {results.length === 0 ? (
               <EmptyResults onClear={clearFilters} />
             ) : (
-              <div className="w-full max-w-[660px]">
+              <div className="w-full max-w-[41.25rem]">
                 {/* Results are a view onto the collection, not a place: you cannot drop into one. */}
                 <BoxGrid cells={cells} droppable={false} onHover={onHover} />
               </div>

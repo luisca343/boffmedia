@@ -93,7 +93,7 @@ export function Modal({
         style={{ width }}
         className="pc-glass flex max-h-[90vh] w-full max-w-[96vw] animate-pc-slide-up flex-col overflow-hidden rounded-pc-lg font-pc text-pc-fg motion-reduce:animate-none"
       >
-        <header className="flex flex-none items-center gap-3 border-b border-pc-line px-[18px] py-[15px]">
+        <header className="flex flex-none items-center gap-3 border-b border-pc-line px-[1.125rem] py-[0.9375rem]">
           {icon && (
             <span
               className={`flex h-9 w-9 flex-none items-center justify-center rounded-[10px] border border-pc-line-strong bg-white/5 ${tone}`}
@@ -102,8 +102,8 @@ export function Modal({
             </span>
           )}
           <div className="min-w-0 flex-1">
-            <h2 className="truncate font-pc-display text-[17px] font-bold">{title}</h2>
-            {subtitle && <p className="truncate text-[11.5px] text-pc-fg-subtle">{subtitle}</p>}
+            <h2 className="truncate font-pc-display text-[1.0625rem] font-bold">{title}</h2>
+            {subtitle && <p className="truncate text-[0.71875rem] text-pc-fg-subtle">{subtitle}</p>}
           </div>
           {headerExtra}
           <Button variant="ghost" icon onClick={onClose} aria-label={t("common.close")}>

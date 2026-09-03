@@ -39,12 +39,12 @@ export default function ExpedientesPage() {
       />
 
       {data && data.total > items.length && (
-        <p className="mb-3 font-gt-mono text-[10.5px] text-gt-ink-400">
+        <p className="mb-3 font-gt-mono text-[0.65625rem] text-gt-ink-400">
           {t("expedientes.mostrando", { shown: items.length, total: data.total })}
         </p>
       )}
 
-      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[300px_1fr]">
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-[18.75rem_1fr]">
         <ExpedienteList expedientes={items} isLoading={isLoading} selectedId={selectedId} onSelect={setSelectedId} />
         <ExpedienteDetail expediente={expediente ?? null} isLoading={isLoadingDetail && selectedId != null} />
       </div>

@@ -32,7 +32,7 @@ export function PartThumbnailGrid({
   clipName,
   tileSize = 80,
   minCols = 3,
-  scrollClassName = "h-[320px]",
+  scrollClassName = "h-[20rem]",
   showTitle = true,
   className = "flex flex-col gap-2",
 }: Omit<PartThumbnailGridProps, "clipNamePascal">) {
@@ -159,7 +159,7 @@ export function PartThumbnailGrid({
   return (
     <div className={className}>
       {showTitle && (
-        <div className="text-[11px] font-bold text-[color:var(--mwp-cream-dim)] uppercase">
+        <div className="text-[0.6875rem] font-bold text-[color:var(--mwp-cream-dim)] uppercase">
           {t(`builder.parts.${partKey}`)}
         </div>
       )}
@@ -172,10 +172,10 @@ export function PartThumbnailGrid({
           placeholder={t("builder.search")}
           value={searchInput}
           onChange={(e) => handleSearch(e.target.value)}
-          className="flex-1 px-2 py-1.5 text-[11px] bg-[color:var(--mwp-night-3)] text-[color:var(--mwp-cream)] border-2 border-[color:var(--mwp-nline)] [border-radius:var(--wob-sm)] focus:outline-none focus:border-[color:var(--mwp-ink)]"
+          className="flex-1 px-2 py-1.5 text-[0.6875rem] bg-[color:var(--mwp-night-3)] text-[color:var(--mwp-cream)] border-2 border-[color:var(--mwp-nline)] [border-radius:var(--wob-sm)] focus:outline-none focus:border-[color:var(--mwp-ink)]"
         />
         {frames.length > 0 && (
-          <span className="text-[10px] text-[color:var(--mwp-cream-dim)] whitespace-nowrap">
+          <span className="text-[0.625rem] text-[color:var(--mwp-cream-dim)] whitespace-nowrap">
             {t("builder.partOf", { n: selectedIndex + 1, total: frames.length })}
           </span>
         )}
@@ -183,11 +183,11 @@ export function PartThumbnailGrid({
 
       {/* Virtualized grid */}
       {loading ? (
-        <div className="flex items-center justify-center h-32 text-[11px] text-[color:var(--mwp-cream-dim)]">
+        <div className="flex items-center justify-center h-32 text-[0.6875rem] text-[color:var(--mwp-cream-dim)]">
           {t("builder.loadingParts")}
         </div>
       ) : frames.length === 0 ? (
-        <div className="flex items-center justify-center h-32 text-[11px] text-[color:var(--mwp-cream-dim)]">
+        <div className="flex items-center justify-center h-32 text-[0.6875rem] text-[color:var(--mwp-cream-dim)]">
           {t("builder.noResults")}
         </div>
       ) : (
@@ -266,7 +266,7 @@ function PartTile({
       title={`#${frame}`}
     >
       {/* Frame number label */}
-      <div className="absolute bottom-1 right-1 bg-[color:var(--mwp-night)]/80 px-1 py-0.5 [border-radius:2px] text-[8px] font-mono text-[color:var(--mwp-cream-dim)]">
+      <div className="absolute bottom-1 right-1 bg-[color:var(--mwp-night)]/80 px-1 py-0.5 [border-radius:2px] text-[0.5rem] font-mono text-[color:var(--mwp-cream-dim)]">
         {frame}
       </div>
     </button>

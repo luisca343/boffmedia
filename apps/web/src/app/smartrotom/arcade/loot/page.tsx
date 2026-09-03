@@ -77,10 +77,10 @@ export default function LootPage() {
   if (config.isLoading || inventory.isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-[68px] rounded-2xl" />
+        <Skeleton className="h-[4.25rem] rounded-2xl" />
         <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-          <Skeleton className="h-[380px] rounded-2xl" />
-          <Skeleton className="h-[380px] rounded-2xl" />
+          <Skeleton className="h-[23.75rem] rounded-2xl" />
+          <Skeleton className="h-[23.75rem] rounded-2xl" />
         </div>
       </div>
     )
@@ -89,7 +89,7 @@ export default function LootPage() {
   if (config.isError || boxes.length === 0) {
     return (
       <Panel tone="deep">
-        <p role="alert" className="font-ar-mono text-[12px] text-ar-danger">
+        <p role="alert" className="font-ar-mono text-[0.75rem] text-ar-danger">
           {t("loot.noBoxesLoaded")}
         </p>
         <Button
@@ -126,11 +126,11 @@ export default function LootPage() {
           <div className="flex items-center gap-3.5">
             <Link
               href="/smartrotom/arcade"
-              className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
+              className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
             >
               <Icon.Chevron s={12} dir="left" /> {t("sidebar.arcade")}
             </Link>
-            <span className="ar-chrom font-ar-display text-[15px] text-ar-ink">{t("loot.title")}</span>
+            <span className="ar-chrom font-ar-display text-[0.9375rem] text-ar-ink">{t("loot.title")}</span>
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
@@ -149,7 +149,7 @@ export default function LootPage() {
             )}
             <Link
               href="/smartrotom/arcade/coleccion"
-              className="ar-lift inline-flex items-center gap-2 rounded-lg border border-ar-cyan/45 px-3 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-cyan shadow-[inset_0_0_20px_rgb(var(--ar-cyan)/.08)]"
+              className="ar-lift inline-flex items-center gap-2 rounded-lg border border-ar-cyan/45 px-3 py-1.5 font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ar-cyan shadow-[inset_0_0_20px_rgb(var(--ar-cyan)/.08)]"
             >
               <Icon.Grid s={12} /> {t("loot.miCollection")}
             </Link>
@@ -159,7 +159,7 @@ export default function LootPage() {
 
       {!uuid && (
         <Panel tone="deep" tight className="mb-4">
-          <p role="alert" className="font-ar-mono text-[12px] text-ar-amber">
+          <p role="alert" className="font-ar-mono text-[0.75rem] text-ar-amber">
             {t("common.loginRequiredBoxes")}
           </p>
         </Panel>
@@ -167,7 +167,7 @@ export default function LootPage() {
 
       {openBox.isError && (
         <Panel tone="deep" tight className="mb-4">
-          <p role="alert" className="font-ar-mono text-[12px] text-ar-danger">
+          <p role="alert" className="font-ar-mono text-[0.75rem] text-ar-danger">
             {userMessageFrom(openBox.error, t("loot.boxOpenError"))}
           </p>
         </Panel>

@@ -20,7 +20,7 @@ export function KvArt({ appid, name, kind = "header", src }: { appid?: number; n
       ) : (
         <div className={cn("relative", ART_FB)}>
           <Icon name="gamepad" size={34} />
-          <small className="absolute bottom-2.5 font-mono text-[9px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim">{name}</small>
+          <small className="absolute bottom-2.5 font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim">{name}</small>
         </div>
       )}
     </div>
@@ -32,7 +32,7 @@ export function KvStatus({ given }: { given?: boolean }) {
   return (
     <span
       className={cn(
-        "cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[7px] border border-solid px-[9px] py-1.5 font-mono text-[9.5px]/none font-bold uppercase tracking-[0.1em]",
+        "cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[0.4375rem] border border-solid px-[0.5625rem] py-1.5 font-mono text-[0.59375rem]/none font-bold uppercase tracking-[0.1em]",
         given ? "border-[color-mix(in_srgb,var(--warn)_28%,transparent)] [--cut-line:color-mix(in_srgb,var(--warn)_28%,transparent)] bg-[color-mix(in_srgb,var(--warn)_8%,transparent)] text-txt-dim" : "border-[color-mix(in_srgb,var(--ok)_40%,transparent)] [--cut-line:color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft text-ok",
       )}
     >
@@ -48,8 +48,8 @@ export function KvVia({ via, sm }: { via: KvViaKey; sm?: boolean }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-[7px] border border-solid font-mono font-semibold uppercase",
-        sm ? "px-[7px] py-[5px] text-[9.5px]/none tracking-[0.06em]" : "px-[9px] py-1.5 text-[10px]/none tracking-[0.08em]",
+        "inline-flex items-center gap-[0.4375rem] border border-solid font-mono font-semibold uppercase",
+        sm ? "px-[0.4375rem] py-[0.3125rem] text-[0.59375rem]/none tracking-[0.06em]" : "px-[0.5625rem] py-1.5 text-[0.625rem]/none tracking-[0.08em]",
         via === "sorteo" ? "border-accent-line bg-accent-soft text-accent" : "border-[color-mix(in_srgb,var(--info)_30%,transparent)] bg-[color:var(--info-soft)] text-[color:var(--info)]",
       )}
     >
@@ -65,13 +65,13 @@ export function KvReview({ score, count, sm }: { score: number; count?: number; 
   const color = kvReviewColor(score)
   return (
     <div className="flex items-center gap-2.5">
-      <span className={cn("flex-none font-display font-extrabold italic tabular-nums", sm ? "text-[13px]/none" : "text-[15px]/none")} style={{ color }}>
+      <span className={cn("flex-none font-display font-extrabold italic tabular-nums", sm ? "text-[0.8125rem]/none" : "text-[0.9375rem]/none")} style={{ color }}>
         {score}%
       </span>
-      <span className="h-1.5 min-w-[60px] flex-1 overflow-hidden border border-solid border-line bg-panel-2">
+      <span className="h-1.5 min-w-[3.75rem] flex-1 overflow-hidden border border-solid border-line bg-panel-2">
         <span className="block h-full transition-[width] duration-[420ms]" style={{ width: score + "%", background: color }} />
       </span>
-      {count != null && <span className="flex-none font-mono text-[10px]/none font-medium tracking-[0.03em] text-txt-dim">{t("reviewsCount", { count: number(count) })}</span>}
+      {count != null && <span className="flex-none font-mono text-[0.625rem]/none font-medium tracking-[0.03em] text-txt-dim">{t("reviewsCount", { count: number(count) })}</span>}
     </div>
   )
 }
@@ -81,11 +81,11 @@ export function KvTags({ tags, max }: { tags: string[]; max?: number }) {
   return (
     <div className="flex flex-wrap gap-1.5">
       {list.map((t) => (
-        <span key={t} className="border border-solid border-line-2 bg-panel-2 px-2 py-[5px] font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.05em] text-txt-muted">
+        <span key={t} className="border border-solid border-line-2 bg-panel-2 px-2 py-[0.3125rem] font-mono text-[0.59375rem]/none font-semibold uppercase tracking-[0.05em] text-txt-muted">
           {t}
         </span>
       ))}
-      {max && tags.length > max && <span className="border border-solid border-line-2 bg-panel-2 px-2 py-[5px] font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.05em] text-txt-muted">+{tags.length - max}</span>}
+      {max && tags.length > max && <span className="border border-solid border-line-2 bg-panel-2 px-2 py-[0.3125rem] font-mono text-[0.59375rem]/none font-semibold uppercase tracking-[0.05em] text-txt-muted">+{tags.length - max}</span>}
     </div>
   )
 }
@@ -96,7 +96,7 @@ export function KvPlatforms({ platforms }: { platforms: KvPlatform[] }) {
       {(platforms || []).map((p) => {
         const m = kvPlatformMeta(p)
         return (
-          <span key={p} title={m.label} className="grid h-[26px] w-[26px] place-items-center border border-solid border-line-2 bg-panel-2 text-txt-muted">
+          <span key={p} title={m.label} className="grid h-[1.625rem] w-[1.625rem] place-items-center border border-solid border-line-2 bg-panel-2 text-txt-muted">
             <Icon name={m.icon} size={13} />
           </span>
         )

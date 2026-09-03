@@ -35,7 +35,7 @@ export function SrtWheelPreview({ participants, weighted = false, size = "defaul
       <div className={cn("mx-auto w-full", SRT_WHEEL_SIZES[size])} aria-hidden>
         <SrtWheelSvg segments={segments} showLabels={showLabels} />
         {!showLabels && (
-          <p className="mt-2 text-center font-mono text-[11px] text-txt-muted">
+          <p className="mt-2 text-center font-mono text-[0.6875rem] text-txt-muted">
             {t("labelsHidden", { n: segments.length })}
           </p>
         )}
@@ -51,7 +51,7 @@ export function SrtReelPreview({ participants, size = "default", frame = "panel"
     <SrtDrawFrame variant={frame} className={className}>
       <div className={cn("relative overflow-hidden border border-line-2 bg-base-deep", {
         "h-72": size !== "large",
-        "h-[min(56vh,560px)]": size === "large"
+        "h-[min(56vh,35rem)]": size === "large"
       })} aria-hidden>
         <div className="absolute inset-y-0 left-1/2 -translate-x-1/2 flex h-full items-center">
           {cards.map((p, i) => (
@@ -114,7 +114,7 @@ export function SrtSpotlightPreview({ participants, weighted = false, size = "de
       <div
         className={cn("grid gap-2 overflow-hidden", SRT_SPOTLIGHT_GRID[size], {
           "max-h-[70vh]": size === "large",
-          "max-h-[460px]": size !== "large"
+          "max-h-[28.75rem]": size !== "large"
         })}
         aria-hidden
       >

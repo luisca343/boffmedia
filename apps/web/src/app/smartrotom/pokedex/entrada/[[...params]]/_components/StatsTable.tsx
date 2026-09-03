@@ -36,18 +36,18 @@ export function StatsTable({ pokemon, formIndex }: { pokemon: Pokemon; formIndex
     <div className="flex flex-col w-full">
       <div className="flex items-center gap-3 mb-5">
         <div className="flex items-baseline gap-2">
-          <b className="font-pk-display font-bold text-[26px] tabular-nums" style={{ color: totalStatColor(statTotal) }}>
+          <b className="font-pk-display font-bold text-[1.625rem] tabular-nums" style={{ color: totalStatColor(statTotal) }}>
             {statTotal}
           </b>
-          <span className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_total")}</span>
+          <span className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_total")}</span>
         </div>
       </div>
 
       <div className="grid items-center pb-2 border-b border-white/[0.06]" style={{ gridTemplateColumns: "100px 1fr 56px 56px", gap: "14px" }}>
-        <span className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_stat")}</span>
-        <span className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_base")}</span>
-        <span className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500 text-center">{t("stats_min_lv50")}</span>
-        <span className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500 text-center">{t("stats_max_lv100")}</span>
+        <span className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_stat")}</span>
+        <span className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_base")}</span>
+        <span className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-500 text-center">{t("stats_min_lv50")}</span>
+        <span className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-500 text-center">{t("stats_max_lv100")}</span>
       </div>
 
       {Object.entries(stats).map(([stat, statValue]) => {
@@ -62,12 +62,12 @@ export function StatsTable({ pokemon, formIndex }: { pokemon: Pokemon; formIndex
             className="grid items-center py-2 border-b border-dashed border-white/[0.04] last:border-0"
             style={{ gridTemplateColumns: "100px 1fr 56px 56px", gap: "14px" }}
           >
-            <div className="flex items-center gap-1.5 text-[12px] text-pk-surface-300 font-medium">
+            <div className="flex items-center gap-1.5 text-[0.75rem] text-pk-surface-300 font-medium">
               <span className="w-1 h-3.5 rounded-sm shrink-0" style={{ background: meta.color }} />
               {t(meta.key)}
             </div>
 
-            <div className="relative h-[26px] bg-white/[0.03] rounded overflow-hidden">
+            <div className="relative h-[1.625rem] bg-white/[0.03] rounded overflow-hidden">
               <div
                 className="absolute inset-0 rounded"
                 style={{
@@ -92,7 +92,7 @@ export function StatsTable({ pokemon, formIndex }: { pokemon: Pokemon; formIndex
 
       <div className="mt-5 bg-white/[0.02] border border-white/[0.05] rounded-[10px] overflow-hidden">
         <button
-          className="w-full flex items-center justify-between px-3.5 py-3 text-[12.5px] font-medium text-pk-surface-200 hover:text-pk-surface-50 transition-colors cursor-pointer"
+          className="w-full flex items-center justify-between px-3.5 py-3 text-[0.78125rem] font-medium text-pk-surface-200 hover:text-pk-surface-50 transition-colors cursor-pointer"
           onClick={() => setCalcOpen((o) => !o)}
           aria-expanded={calcOpen}
         >
@@ -105,29 +105,29 @@ export function StatsTable({ pokemon, formIndex }: { pokemon: Pokemon; formIndex
         {calcOpen && (
           <div className="px-3.5 pb-3.5 grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="flex flex-col gap-1">
-              <label className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_level")}</label>
+              <label className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_level")}</label>
               <input
                 type="number"
                 min={1}
                 max={100}
                 value={level}
                 onChange={(e) => setLevel(+e.target.value || 1)}
-                className="bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 font-pk-mono text-[13px] px-2.5 py-1.5 outline-none focus:border-pk-primary-400/50"
+                className="bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 font-pk-mono text-[0.8125rem] px-2.5 py-1.5 outline-none focus:border-pk-primary-400/50"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500">IVs</label>
+              <label className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-500">IVs</label>
               <input
                 type="number"
                 min={0}
                 max={31}
                 value={iv}
                 onChange={(e) => setIv(+e.target.value || 0)}
-                className="bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 font-pk-mono text-[13px] px-2.5 py-1.5 outline-none focus:border-pk-primary-400/50"
+                className="bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 font-pk-mono text-[0.8125rem] px-2.5 py-1.5 outline-none focus:border-pk-primary-400/50"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500">EVs</label>
+              <label className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-500">EVs</label>
               <input
                 type="number"
                 min={0}
@@ -135,15 +135,15 @@ export function StatsTable({ pokemon, formIndex }: { pokemon: Pokemon; formIndex
                 step={4}
                 value={ev}
                 onChange={(e) => setEv(+e.target.value || 0)}
-                className="bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 font-pk-mono text-[13px] px-2.5 py-1.5 outline-none focus:border-pk-primary-400/50"
+                className="bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 font-pk-mono text-[0.8125rem] px-2.5 py-1.5 outline-none focus:border-pk-primary-400/50"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_nature")}</label>
+              <label className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-500">{t("stats_nature")}</label>
               <select
                 value={nature}
                 onChange={(e) => setNature(e.target.value as any)}
-                className="bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 text-[12.5px] px-2.5 py-1.5 outline-none focus:border-pk-primary-400/50"
+                className="bg-white/[0.03] border border-white/[0.07] rounded-[7px] text-pk-surface-100 text-[0.78125rem] px-2.5 py-1.5 outline-none focus:border-pk-primary-400/50"
               >
                 <option value="neutral">{t("stats_neutral")}</option>
                 <option value="positive">{t("stats_positive")}</option>

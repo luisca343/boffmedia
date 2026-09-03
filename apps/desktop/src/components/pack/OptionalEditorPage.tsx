@@ -153,7 +153,7 @@ export function OptionalEditorPage({
         {t("optionalEditor.applyHint")}
       </Banner>
 
-      <p className="mb-4 max-w-[86ch] text-[12px] leading-snug text-txt-muted">
+      <p className="mb-4 max-w-[86ch] text-[0.75rem] leading-snug text-txt-muted">
         {t("optionalEditor.lead")}
       </p>
 

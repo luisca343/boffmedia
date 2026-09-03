@@ -38,7 +38,7 @@ export function UserView({ username }: { username: string }) {
   const loading = tab === "videos" ? videos.isLoading : clips.isLoading
 
   return (
-    <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-8 md:px-10">
+    <div className="mx-auto max-w-[102.5rem] px-4 pb-20 pt-8 md:px-10">
       <div className="mb-6 flex flex-wrap items-center gap-5">
         <Avatar src={u.profile_image_url} name={u.display_name} size={96} ring />
         <div>
@@ -47,7 +47,7 @@ export function UserView({ username }: { username: string }) {
             {u.broadcaster_type === "partner" && <Check size="lg" />}
           </div>
           <div className="mt-1 text-sm text-mw-fg-mute">{compactCount(u.view_count)} {t("user.totalViewsSuffix")}</div>
-          {u.description && <p className="mt-2 max-w-[720px] text-sm text-mw-fg-mute line-clamp-2">{u.description}</p>}
+          {u.description && <p className="mt-2 max-w-[45rem] text-sm text-mw-fg-mute line-clamp-2">{u.description}</p>}
         </div>
       </div>
 
@@ -58,7 +58,7 @@ export function UserView({ username }: { username: string }) {
             type="button"
             onClick={() => setTab(tabKey)}
             className={
-              "-mb-px border-b-2 px-4 py-3 text-[13px] font-semibold transition-colors " +
+              "-mb-px border-b-2 px-4 py-3 text-[0.8125rem] font-semibold transition-colors " +
               (tab === tabKey ? "border-mw-accent text-mw-fg" : "border-transparent text-mw-fg-mute hover:text-mw-fg")
             }
           >
@@ -67,7 +67,7 @@ export function UserView({ username }: { username: string }) {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-[1.125rem] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {loading
           ? Array.from({ length: 8 }).map((_, i) => <CardSkeleton key={i} />)
           : active.map((v) => <VodCard key={v.href} v={v} />)}

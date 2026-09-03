@@ -39,7 +39,7 @@ export function VideoCard({ v, className }: { v: VideoCardData; className?: stri
           />
         )}
         {v.duration && (
-          <span className="absolute bottom-2 right-2 z-[2] rounded-mw-sm bg-black/85 px-1.5 py-[3px] font-mono text-[11px] font-bold text-white">
+          <span className="absolute bottom-2 right-2 z-[2] rounded-mw-sm bg-black/85 px-1.5 py-[3px] font-mono text-[0.6875rem] font-bold text-white">
             {v.duration}
           </span>
         )}

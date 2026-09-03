@@ -20,26 +20,26 @@ export function TreeRenderer({ tree, t, currentDex }: { tree: SubTree; t: any; c
 function EvoNode({ node, form, current }: { node: PokemonEvo; form: string; current: boolean }) {
   return (
     <div
-      className={`flex flex-col items-center gap-2 p-[14px_12px] rounded-xl min-w-[130px] shrink-0 transition-all ${
+      className={`flex flex-col items-center gap-2 p-[14px_12px] rounded-xl min-w-[8.125rem] shrink-0 transition-all ${
         current
           ? "border border-pk-primary-400/50 bg-pk-primary-400/[0.08] shadow-[0_0_18px_rgba(249,115,22,0.15)]"
           : "border border-white/[0.06] bg-white/[0.02] hover:border-pk-primary-400/30 hover:bg-pk-primary-400/[0.04]"
       }`}
     >
       <PokemonSpriteLink id={node.dex} form={form} palette="none" width={64} height={64} hide={true} displayName={true} url={node.spriteUrl} />
-      <span className="font-pk-mono text-[10px] text-pk-surface-500">#{String(node.dex).padStart(3, "0")}</span>
+      <span className="font-pk-mono text-[0.625rem] text-pk-surface-500">#{String(node.dex).padStart(3, "0")}</span>
     </div>
   )
 }
 
 function EvoArrow({ methods, t }: { methods: Evolution[]; t: any }) {
   return (
-    <div className="flex flex-col items-center gap-1 text-pk-surface-500 text-[10.5px] font-pk-mono uppercase tracking-[0.08em] shrink-0">
-      <div className="text-center max-w-[160px]">
+    <div className="flex flex-col items-center gap-1 text-pk-surface-500 text-[0.65625rem] font-pk-mono uppercase tracking-[0.08em] shrink-0">
+      <div className="text-center max-w-[10rem]">
         {methods.length ? (
           methods.map((m, i) => (
             <React.Fragment key={i}>
-              {i > 0 && <div className="text-[8px] text-pk-surface-600 my-0.5">{t("evoTree.or")}</div>}
+              {i > 0 && <div className="text-[0.5rem] text-pk-surface-600 my-0.5">{t("evoTree.or")}</div>}
               {getEvolutionMethod(m, t)}
             </React.Fragment>
           ))

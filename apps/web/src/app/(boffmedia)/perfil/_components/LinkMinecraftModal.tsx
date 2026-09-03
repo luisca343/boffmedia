@@ -102,7 +102,7 @@ export function LinkMinecraftModal({
   return (
     <Modal open={open} onClose={onClose} title={t("title")}>
       <div className="grid gap-4">
-        <p className="font-body text-[14px]/[1.6] text-txt-muted text-pretty">{t("lead")}</p>
+        <p className="font-body text-[0.875rem]/[1.6] text-txt-muted text-pretty">{t("lead")}</p>
 
         {phase === "starting" && (
           <div className="flex items-center justify-center gap-2 py-6">
@@ -113,10 +113,10 @@ export function LinkMinecraftModal({
         {phase === "waiting" && code && (
           <>
             <div className="border border-solid border-line bg-panel-2 p-5 text-center cut-tag cut-tag-edge">
-              <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-txt-dim">
+              <div className="font-mono text-[0.625rem] uppercase tracking-[0.16em] text-txt-dim">
                 {t("codeLabel")}
               </div>
-              <div className="mt-2 font-display text-[34px]/[1] font-extrabold tracking-[0.12em] text-txt">
+              <div className="mt-2 font-display text-[2.125rem]/[1] font-extrabold tracking-[0.12em] text-txt">
                 {code}
               </div>
             </div>
@@ -127,7 +127,7 @@ export function LinkMinecraftModal({
             >
               {t("openMicrosoft")}
             </Button>
-            <p className="inline-flex items-center gap-2 font-mono text-[11px] text-txt-dim">
+            <p className="inline-flex items-center gap-2 font-mono text-[0.6875rem] text-txt-dim">
               <Spinner /> {t("waiting")}
             </p>
           </>
@@ -139,7 +139,7 @@ export function LinkMinecraftModal({
           </p>
         )}
 
-        {phase === "error" && <p className="text-bad text-[14px]">{error}</p>}
+        {phase === "error" && <p className="text-bad text-[0.875rem]">{error}</p>}
 
         <div className="flex justify-end">
           <Button variant="ghost" onClick={onClose}>

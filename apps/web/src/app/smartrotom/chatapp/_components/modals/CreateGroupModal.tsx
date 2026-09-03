@@ -66,7 +66,7 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
       {sel.length > 0 && (
         <div className="mb-3 flex flex-wrap gap-1.5">
           {sel.map((u) => (
-            <span key={u.uuid} className="inline-flex items-center gap-1.5 rounded-full bg-ca-800 py-0.5 pl-0.5 pr-1.5 text-[12.5px] text-ca-100">
+            <span key={u.uuid} className="inline-flex items-center gap-1.5 rounded-full bg-ca-800 py-0.5 pl-0.5 pr-1.5 text-[0.78125rem] text-ca-100">
               <Avatar src={`https://mc-heads.net/avatar/${u.uuid}`} size={22} />
               {u.username}
               <button onClick={() => toggle(u)} aria-label={t("createGroup.remove")}><Icon name="x" size={13} /></button>
@@ -77,20 +77,20 @@ export function CreateGroupModal({ session, onClose, onCreated }: { session: unk
 
       <SearchBox value={query} onChange={setQuery} placeholder={t("createGroup.searchPlayers")} className="mb-3" />
 
-      <div className="ca-scroll flex max-h-[240px] flex-col gap-0.5 overflow-y-auto">
+      <div className="ca-scroll flex max-h-[15rem] flex-col gap-0.5 overflow-y-auto">
         {list.map((u) => {
           const on = !!sel.find((x) => x.uuid === u.uuid);
           return (
             <button key={u.uuid} onClick={() => toggle(u)} className={cn("flex items-center gap-3 rounded-ca-lg p-2 text-left transition-colors hover:bg-ca-500/10", on && "bg-ca-500/[.08]")}>
               <Avatar src={`https://mc-heads.net/avatar/${u.uuid}`} size={38} />
-              <span className="flex-1 text-[14px] font-semibold text-ca-50">{u.username}</span>
-              <span className={cn("grid h-[22px] w-[22px] place-items-center rounded-full border-2", on ? "border-ca-accent bg-ca-accent text-ca-on-accent" : "border-ca-500")}>
+              <span className="flex-1 text-[0.875rem] font-semibold text-ca-50">{u.username}</span>
+              <span className={cn("grid h-[1.375rem] w-[1.375rem] place-items-center rounded-full border-2", on ? "border-ca-accent bg-ca-accent text-ca-on-accent" : "border-ca-500")}>
                 {on && <Icon name="check" size={15} />}
               </span>
             </button>
           );
         })}
-        {list.length === 0 && <div className="py-8 text-center text-[13.5px] text-ca-500">{t("createGroup.noPlayers")}</div>}
+        {list.length === 0 && <div className="py-8 text-center text-[0.84375rem] text-ca-500">{t("createGroup.noPlayers")}</div>}
       </div>
 
       {sel.length > 1 && <Field className="mt-3" placeholder={placeholder} value={name} onChange={(e) => setName(e.target.value)} />}

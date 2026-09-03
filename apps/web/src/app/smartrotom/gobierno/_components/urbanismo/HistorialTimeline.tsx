@@ -44,7 +44,7 @@ export function HistorialTimeline() {
         sub={t("urbanismo.historialSub")}
         right={
           towns.length > 1 ? (
-            <div className="w-[190px]">
+            <div className="w-[11.875rem]">
               <Select
                 value={town}
                 onChange={setTown}
@@ -83,12 +83,12 @@ export function HistorialTimeline() {
               <Bar icon="mapPin" dep="urbanismo">
                 {townName(g.town)} · Parcela #{g.number}
               </Bar>
-              <div className="px-[18px] py-3.5">
+              <div className="px-[1.125rem] py-3.5">
                 {g.entries.map((h, i) => (
                   <div key={h.id} className="flex gap-3.5" style={{ paddingBottom: i < g.entries.length - 1 ? 16 : 0 }}>
                     <div className="flex flex-none flex-col items-center">
                       <span
-                        className="h-[11px] w-[11px] flex-none rounded-full border-2 border-gt-paper-0"
+                        className="h-[0.6875rem] w-[0.6875rem] flex-none rounded-full border-2 border-gt-paper-0"
                         style={{
                           background: i === 0 ? "rgb(var(--gt-civic))" : "rgb(var(--gt-paper-3))",
                           boxShadow: `0 0 0 1.5px ${i === 0 ? "rgb(var(--gt-civic))" : "rgb(var(--gt-line-strong))"}`,
@@ -98,7 +98,7 @@ export function HistorialTimeline() {
                     </div>
                     <div className="flex-1 pb-0.5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="text-[13.5px] text-gt-ink-800">
+                        <span className="text-[0.84375rem] text-gt-ink-800">
                           {h.previousOwner ? (
                             t("urbanismo.transfirió", { from: h.previousOwner.username })
                           ) : (
@@ -108,8 +108,8 @@ export function HistorialTimeline() {
                         </span>
                         {i === 0 && <Badge tone="ok">{t("urbanismo.actual")}</Badge>}
                       </div>
-                      <div className="mt-0.5 font-gt-mono text-[10.5px] text-gt-ink-400">{fmtDateTime(h.changedAt, intlLocale)}</div>
-                      {h.reason && <div className="mt-0.5 text-[12px] italic text-gt-ink-500">{h.reason}</div>}
+                      <div className="mt-0.5 font-gt-mono text-[0.65625rem] text-gt-ink-400">{fmtDateTime(h.changedAt, intlLocale)}</div>
+                      {h.reason && <div className="mt-0.5 text-[0.75rem] italic text-gt-ink-500">{h.reason}</div>}
                     </div>
                   </div>
                 ))}

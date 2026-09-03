@@ -20,17 +20,17 @@ export function TvCP({
     <article
       id={id}
       className={cn(
-        "tv-cp group relative grid grid-cols-2 items-center gap-x-[120px] gap-y-[30px] py-[56px]",
-        "max-[820px]:grid-cols-1 max-[820px]:gap-[22px] max-[820px]:py-[46px] max-[820px]:pl-[44px]",
+        "tv-cp group relative grid grid-cols-2 items-center gap-x-[7.5rem] gap-y-[1.875rem] py-[3.5rem]",
+        "max-[820px]:grid-cols-1 max-[820px]:gap-[1.375rem] max-[820px]:py-[2.875rem] max-[820px]:pl-[2.75rem]",
         /* horizontal branch wiring the body to the spine; lights up on approach */
-        "after:absolute after:top-1/2 after:z-[2] after:h-[2px] after:w-[78px] after:-translate-y-1/2 after:opacity-45 after:transition-[opacity,background] after:duration-[260ms] after:content-[''] [&.near]:after:opacity-100 max-[820px]:after:hidden",
+        "after:absolute after:top-1/2 after:z-[2] after:h-[2px] after:w-[4.875rem] after:-translate-y-1/2 after:opacity-45 after:transition-[opacity,background] after:duration-[260ms] after:content-[''] [&.near]:after:opacity-100 max-[820px]:after:hidden",
         side === "l"
           ? "after:left-1/2 after:[background:linear-gradient(90deg,var(--line-2),transparent)] [&.near]:after:[background:linear-gradient(90deg,rgba(var(--zr),var(--zg),var(--zb),0.9),transparent)]"
           : "after:right-1/2 after:[background:linear-gradient(270deg,var(--line-2),transparent)] [&.near]:after:[background:linear-gradient(270deg,rgba(var(--zr),var(--zg),var(--zb),0.9),transparent)]",
       )}
     >
       <span
-        className="tv-node absolute left-1/2 top-1/2 z-[5] grid h-[26px] w-[26px] -translate-x-1/2 -translate-y-1/2 place-items-center max-[820px]:left-[18px] max-[820px]:top-10"
+        className="tv-node absolute left-1/2 top-1/2 z-[5] grid h-[1.625rem] w-[1.625rem] -translate-x-1/2 -translate-y-1/2 place-items-center max-[820px]:left-[1.125rem] max-[820px]:top-10"
         aria-hidden="true"
       >
         <i className="h-3.5 w-3.5 rounded-full border-2 border-solid border-line-2 bg-base transition-[border-color,background,box-shadow] duration-[260ms] group-[.past]:border-[rgba(var(--zr),var(--zg),var(--zb),1)] group-[.past]:bg-[rgba(var(--zr),var(--zg),var(--zb),1)] group-[.past]:shadow-[0_0_0_5px_rgba(var(--zr),var(--zg),var(--zb),0.15),0_0_20px_rgba(var(--zr),var(--zg),var(--zb),0.7)]" />
@@ -38,7 +38,7 @@ export function TvCP({
       <div
         data-reveal={side === "l" ? "left" : "right"}
         className={cn(
-          "flex items-start gap-[18px] max-[820px]:col-start-1 max-[820px]:row-start-1",
+          "flex items-start gap-[1.125rem] max-[820px]:col-start-1 max-[820px]:row-start-1",
           side === "l" ? "col-start-1 row-start-1" : "col-start-2 row-start-1",
         )}
       >
@@ -53,7 +53,7 @@ export function TvCP({
             {title}
           </h3>
           {lead && (
-            <p className="max-w-[42ch] font-body text-[15.5px] font-normal leading-[1.62] text-txt-muted [text-wrap:pretty]">{lead}</p>
+            <p className="max-w-[42ch] font-body text-[0.96875rem] font-normal leading-[1.62] text-txt-muted [text-wrap:pretty]">{lead}</p>
           )}
         </div>
       </div>

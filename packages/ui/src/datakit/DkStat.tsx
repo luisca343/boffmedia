@@ -25,16 +25,16 @@ export function DkStat({
   return (
     <div
       className={cn(
-        "grid min-w-0 gap-[5px] border border-solid border-line border-t-[3px] bg-panel",
-        small ? "px-3 py-[10px]" : "px-[15px] py-[13px]",
+        "grid min-w-0 gap-[0.3125rem] border border-solid border-line border-t-[3px] bg-panel",
+        small ? "px-3 py-[0.625rem]" : "px-[0.9375rem] py-[0.8125rem]",
         TONE_TOP[tone],
         className,
       )}
     >
-      <b className={cn("font-display font-extrabold italic leading-none tracking-[0.01em]", small ? "text-[19px]" : "text-[26px]")}>
+      <b className={cn("font-display font-extrabold italic leading-none tracking-[0.01em]", small ? "text-[1.1875rem]" : "text-[1.625rem]")}>
         {value}
       </b>
-      <span className="font-mono text-[9px] font-semibold uppercase leading-[1.3] tracking-[0.12em] text-txt-dim">{label}</span>
+      <span className="font-mono text-[0.5625rem] font-semibold uppercase leading-[1.3] tracking-[0.12em] text-txt-dim">{label}</span>
     </div>
   )
 }
@@ -60,13 +60,13 @@ export function DkSplit({
   const rateTone = rate == null ? "text-txt-dim" : rate >= 50 ? "text-ok" : "text-bad"
   return (
     <span className={cn("inline-flex w-full min-w-0 items-center gap-2", className)}>
-      <span className="flex h-[7px] min-w-[40px] flex-1 overflow-hidden border border-solid border-line bg-base">
+      <span className="flex h-[0.4375rem] min-w-[2.5rem] flex-1 overflow-hidden border border-solid border-line bg-base">
         <i style={{ width: pct(win) }} className="block h-full bg-ok" />
         <i style={{ width: pct(draw) }} className="block h-full bg-warn" />
         <i style={{ width: pct(loss) }} className="block h-full bg-bad opacity-80" />
       </span>
       {rate !== undefined && (
-        <span className={cn("w-[38px] flex-none text-right font-mono text-[11px] font-bold leading-none", rateTone)}>
+        <span className={cn("w-[2.375rem] flex-none text-right font-mono text-[0.6875rem] font-bold leading-none", rateTone)}>
           {rate == null ? "—" : `${rate}%`}
         </span>
       )}

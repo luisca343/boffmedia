@@ -29,14 +29,14 @@ export function KeysChapter() {
           <KvVia via="manual" />
         </Sample>
         <Sample title="Valoración y plataformas" code="<KvReview> · <KvPlatforms>" col>
-          <div className="grid w-full max-w-[340px] gap-3">
+          <div className="grid w-full max-w-[21.25rem] gap-3">
             <KvReview score={98} count={358120} />
             <KvReview score={92} count={720100} />
             <KvPlatforms platforms={["win", "mac", "linux"]} />
           </div>
         </Sample>
         <Sample title="Arte de Steam" code={`<KvArt kind="header">`} col note="Si el CDN de Steam no responde, aparece el fallback rayado con el nombre del juego.">
-          <div className="grid w-full max-w-[480px] grid-cols-2 gap-3">
+          <div className="grid w-full max-w-[30rem] grid-cols-2 gap-3">
             <div className="aspect-[460/200] border border-solid border-line">
               <KvArt appid={a.appid} name={a.name} kind="header" />
             </div>
@@ -58,23 +58,23 @@ export function KeysChapter() {
         }
       >
         <Sample title="Info" code="<KvInfo item>" col>
-          <div className="w-full max-w-[480px]">
+          <div className="w-full max-w-[30rem]">
             <KvInfo item={a} />
           </div>
         </Sample>
         <Sample title="Recepción · Metacritic + Steam" code="<KvScores info>" col note="Consolida las dos puntuaciones. Si el juego no tiene Metacritic, la valoración de Steam ocupa todo el ancho.">
-          <div className="grid w-full max-w-[480px] gap-3">
+          <div className="grid w-full max-w-[30rem] gap-3">
             <KvScores info={a.info} />
             <KvScores info={{ ...b.info, metacritic: null }} />
           </div>
         </Sample>
         <Sample title="Precio (con descuento)" code="<KvPrice price>" col>
-          <div className="w-full max-w-[340px]">
+          <div className="w-full max-w-[21.25rem]">
             <KvPrice price={a.price} />
           </div>
         </Sample>
         <Sample title="Media" code="<KvGallery images>" col note="Clic en las miniaturas para cambiar el medio principal. Los medios se sirven del CDN de Steam por appid.">
-          <div className="w-full max-w-[480px]">
+          <div className="w-full max-w-[30rem]">
             <KvGallery images={kvMedia(a.appid)} name={a.name} />
           </div>
         </Sample>
@@ -87,7 +87,7 @@ export function KeysChapter() {
         lead={<>La pieza que puebla el catálogo. <code>&lt;KvCard&gt;</code> combina arte de Steam con estado, valoración, descuento y stock superpuestos, nombre, precio, etiquetas y la vía de entrega al pie. Las entregadas se atenúan.</>}
       >
         <Sample title="Rejilla" code="<KvCard item onOpen>" col>
-          <div className="grid w-full gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
+          <div className="grid w-full gap-4 [grid-template-columns:repeat(auto-fill,minmax(18.75rem,1fr))]">
             <KvCard item={a} onOpen={noop} />
             <KvCard item={b} onOpen={noop} />
           </div>

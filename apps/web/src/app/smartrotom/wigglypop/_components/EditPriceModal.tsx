@@ -40,7 +40,7 @@ export function EditPriceModal({
         <ValueBox className="mb-4">
           <div className="flex items-center gap-2">
             <Icon name="wand" size={15} className="text-wp-teal" />
-            <span className="font-wp text-[12.5px] font-bold text-wp-fg">{t("common.smartRotomSuggests")}</span>
+            <span className="font-wp text-[0.78125rem] font-bold text-wp-fg">{t("common.smartRotomSuggests")}</span>
             <Price amount={ref} size={15} symbolClassName="text-wp-teal-deep" />
             <Button className="ml-auto px-2.5 py-1 text-xs" onClick={() => setPrice(ref)}>
               {t("common.useSuggested")}
@@ -48,7 +48,7 @@ export function EditPriceModal({
           </div>
         </ValueBox>
 
-        <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">
+        <label className="font-wp text-[0.78125rem] font-semibold text-wp-fg-muted">
           {L.format === "auction" ? t("common.initialBid") : t("common.price")} (₽)
         </label>
         <div className="mb-1 mt-1.5 flex items-center gap-2.5">
@@ -72,7 +72,7 @@ export function EditPriceModal({
 
         <Button
           variant="primary"
-          className="mt-5 w-full py-[13px]"
+          className="mt-5 w-full py-[0.8125rem]"
           disabled={!price || update.isPending}
           onClick={() =>
             update.mutate(

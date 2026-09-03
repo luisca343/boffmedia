@@ -81,7 +81,7 @@ function NavButton({ item, active }: { item: NavItem; active: boolean }) {
       href={item.href}
       aria-current={active ? "page" : undefined}
       className={cn(
-        "ar-lift mb-0.5 flex w-full items-center gap-3 rounded-[9px] border border-l-[3px] px-[11px] py-2.5 text-left",
+        "ar-lift mb-0.5 flex w-full items-center gap-3 rounded-[9px] border border-l-[3px] px-[0.6875rem] py-2.5 text-left",
         active
           ? "border-ar-cyan/40 border-l-ar-cyan bg-[linear-gradient(90deg,rgb(var(--ar-cyan)/.16),rgb(var(--ar-cyan)/.02))] text-ar-ink"
           : "border-transparent text-ar-ink-dim hover:bg-white/[.03] hover:text-ar-ink",
@@ -91,19 +91,19 @@ function NavButton({ item, active }: { item: NavItem; active: boolean }) {
         <Glyph s={18} />
       </span>
       <span className="min-w-0 flex-1">
-        <span className={cn("block font-ar text-[13.5px] leading-tight", active ? "font-bold" : "font-semibold")}>
+        <span className={cn("block font-ar text-[0.84375rem] leading-tight", active ? "font-bold" : "font-semibold")}>
           {t(item.labelKey)}
         </span>
-        <span className="mt-0.5 block truncate font-ar-mono text-[10px] text-ar-ink-muted">
+        <span className="mt-0.5 block truncate font-ar-mono text-[0.625rem] text-ar-ink-muted">
           {t(item.hintKey)}
         </span>
       </span>
       {item.badge ? (
-        <span className="grid h-[18px] min-w-[18px] place-items-center rounded-full bg-ar-magenta px-1.5 font-ar-mono text-[10px] font-bold text-white shadow-[0_0_10px_rgb(var(--ar-magenta)/.5)]">
+        <span className="grid h-[1.125rem] min-w-[1.125rem] place-items-center rounded-full bg-ar-magenta px-1.5 font-ar-mono text-[0.625rem] font-bold text-white shadow-[0_0_10px_rgb(var(--ar-magenta)/.5)]">
           {item.badge}
         </span>
       ) : active ? (
-        <span aria-hidden className="text-[9px] text-ar-cyan motion-reduce:animate-none animate-ar-blink">
+        <span aria-hidden className="text-[0.5625rem] text-ar-cyan motion-reduce:animate-none animate-ar-blink">
           ●
         </span>
       ) : null}
@@ -117,20 +117,20 @@ export function ArcadeSidebar(props: ArcadeSidebarProps) {
   const groups = navigation(props)
 
   return (
-    <aside className="ar-scroll sticky top-[18px] hidden max-h-[calc(100vh_-_36px)] w-[236px] shrink-0 self-start overflow-y-auto rounded-2xl border border-ar-violet/[.18] bg-[linear-gradient(180deg,rgb(12_6_38/.75),rgb(6_3_20/.75))] p-3.5 lg:block">
+    <aside className="ar-scroll sticky top-[1.125rem] hidden max-h-[calc(100vh_-_2.25rem)] w-[14.75rem] shrink-0 self-start overflow-y-auto rounded-2xl border border-ar-violet/[.18] bg-[linear-gradient(180deg,rgb(12_6_38/.75),rgb(6_3_20/.75))] p-3.5 lg:block">
       <div className="flex items-center gap-2.5 px-1 pb-3.5 pt-0.5">
-        <div className="grid h-[34px] w-[34px] place-items-center rounded-[9px] bg-[linear-gradient(135deg,rgb(var(--ar-magenta)),rgb(var(--ar-violet)))] shadow-[0_0_16px_rgb(var(--ar-magenta)/.4)]">
+        <div className="grid h-[2.125rem] w-[2.125rem] place-items-center rounded-[9px] bg-[linear-gradient(135deg,rgb(var(--ar-magenta)),rgb(var(--ar-violet)))] shadow-[0_0_16px_rgb(var(--ar-magenta)/.4)]">
           <Icon.Joystick s={17} className="text-white" />
         </div>
         <div>
-          <div className="font-ar-display text-[11px] text-ar-ink">ARCADE</div>
-          <div className="mt-0.5 font-ar-mono text-[10px] text-ar-ink-muted">SmartRotom</div>
+          <div className="font-ar-display text-[0.6875rem] text-ar-ink">ARCADE</div>
+          <div className="mt-0.5 font-ar-mono text-[0.625rem] text-ar-ink-muted">SmartRotom</div>
         </div>
       </div>
 
       {groups.map((g) => (
         <div key={g.groupKey} className="mb-3">
-          <div className="px-1.5 py-1 font-ar-mono text-[10px] uppercase tracking-[0.18em] text-ar-ink-muted">
+          <div className="px-1.5 py-1 font-ar-mono text-[0.625rem] uppercase tracking-[0.18em] text-ar-ink-muted">
             {t(g.groupKey)}
           </div>
           {g.items.map((item) => (
@@ -144,10 +144,10 @@ export function ArcadeSidebar(props: ArcadeSidebarProps) {
       ))}
 
       <div className="mt-1.5 rounded-[10px] border border-dashed border-ar-magenta/30 bg-[linear-gradient(180deg,rgb(var(--ar-magenta)/.08),rgb(var(--ar-violet)/.04))] p-3">
-        <div className="mb-1.5 font-ar-mono text-[10px] font-bold uppercase tracking-wider text-ar-magenta-2">
+        <div className="mb-1.5 font-ar-mono text-[0.625rem] font-bold uppercase tracking-wider text-ar-magenta-2">
           {t("common.freeToPlay")}
         </div>
-        <div className="font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
+        <div className="font-ar-mono text-[0.6875rem] leading-relaxed text-ar-ink-dim">
           {t("common.freeToPlayDesc")}
         </div>
       </div>

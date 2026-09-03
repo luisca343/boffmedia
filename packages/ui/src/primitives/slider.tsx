@@ -37,13 +37,13 @@ export function Slider({
   return (
     <div
       className={cn(
-        "grid grid-cols-[1fr_auto] items-center gap-x-[14px] gap-y-[10px] w-full",
+        "grid grid-cols-[1fr_auto] items-center gap-x-[0.875rem] gap-y-[0.625rem] w-full",
         disabled && "opacity-40 pointer-events-none",
         className,
       )}
     >
       {label && (
-        <span className="col-span-full font-mono text-[11px] font-semibold leading-none uppercase tracking-[0.12em] text-txt-muted">
+        <span className="col-span-full font-mono text-[0.6875rem] font-semibold leading-none uppercase tracking-[0.12em] text-txt-muted">
           {label}
         </span>
       )}
@@ -65,14 +65,14 @@ export function Slider({
           "appearance-none w-full h-2 m-0 cursor-pointer border border-solid border-line",
           "[background:linear-gradient(90deg,var(--accent)_var(--p,50%),var(--panel-2)_var(--p,50%))]",
           "focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-[3px]",
-          "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:h-[18px]",
+          "[&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-[1.125rem] [&::-webkit-slider-thumb]:h-[1.125rem]",
           "[&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:transition-colors",
           "[&::-webkit-slider-thumb]:cut [--cut:4px]",
           "hover:[&::-webkit-slider-thumb]:bg-accent-bright",
-          "[&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:rounded-none",
+          "[&::-moz-range-thumb]:w-[1.125rem] [&::-moz-range-thumb]:h-[1.125rem] [&::-moz-range-thumb]:bg-accent [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:rounded-none",
         )}
       />
-      <output className="font-mono text-[13px] font-semibold leading-none text-accent min-w-[46px] text-right">
+      <output className="font-mono text-[0.8125rem] font-semibold leading-none text-accent min-w-[2.875rem] text-right">
         {val}
         {unit}
       </output>

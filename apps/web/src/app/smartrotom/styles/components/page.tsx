@@ -214,30 +214,30 @@ export default function SmartRotomComponentsShowcase() {
     // real SmartRotom app roots itself the same way (`100dvh` minus the 3rem Rotom nav).
     <div className="flex h-[calc(100dvh_-_3rem)] w-full min-w-0 overflow-hidden bg-sr-bg text-sr-txt">
       <div ref={scrollRef} className="h-full w-full overflow-y-auto overscroll-contain">
-        <main className="mx-auto w-full max-w-[1280px] px-6 md:px-10">
-        <div className="pt-[34px]">
+        <main className="mx-auto w-full max-w-[80rem] px-6 md:px-10">
+        <div className="pt-[2.125rem]">
           <Kicker>Sistema de diseño · SmartRotom</Kicker>
-          <h1 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(40px,11vw,72px)]/[0.92] mt-[14px] mb-[10px] break-words")}>
+          <h1 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(2.5rem,11vw,4.5rem)]/[0.92] mt-[0.875rem] mb-[0.625rem] break-words")}>
             Componentes de <em>SmartRotom</em>
           </h1>
           {/* The count is read off DOMAINS, not written in prose — it has gone stale
               once per migration otherwise. */}
           <p className="text-sr-txt-muted max-w-[68ch]">
             SmartRotom no es un sistema, son <strong className="text-sr-txt">{DOMAINS.length}</strong>: el chrome{" "}
-            <code className="font-mono text-[13px] text-sr-accent">sr-*</code> y un vocabulario de tokens por app (Mewtube
+            <code className="font-mono text-[0.8125rem] text-sr-accent">sr-*</code> y un vocabulario de tokens por app (Mewtube
             y Mewtwitch comparten uno). Cada espécimen se monta dentro de su propia raíz de ámbito, así que se ve
             exactamente como en la app real.
           </p>
           <p className={cn(MONO_LABEL, "mt-3 text-sr-txt-dim normal-case tracking-[0.1em]")}>
             {DOMAINS.length} sistemas · {chapters.length} capítulos · {totalSections} secciones — navega por sistema o pulsa{" "}
-            <kbd className="border border-solid border-sr-line px-[5px] py-px">/</kbd> para buscar
+            <kbd className="border border-solid border-sr-line px-[0.3125rem] py-px">/</kbd> para buscar
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[230px_1fr] gap-8 lg:gap-12 items-start pt-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[14.375rem_1fr] gap-8 lg:gap-12 items-start pt-10">
           {/* ── index ── */}
           <aside className="lg:sticky lg:top-0 max-h-[48vh] lg:max-h-[calc(100dvh_-_8rem)] overflow-hidden flex flex-col lg:pt-1">
-            <div className="flex-none flex items-center gap-[9px] border border-solid border-sr-line bg-sr-panel py-[10px] px-3 mb-3 text-sr-txt-dim transition-[border-color] duration-[140ms] focus-within:border-sr-accent focus-within:text-sr-txt-muted">
+            <div className="flex-none flex items-center gap-[0.5625rem] border border-solid border-sr-line bg-sr-panel py-[0.625rem] px-3 mb-3 text-sr-txt-dim transition-[border-color] duration-[140ms] focus-within:border-sr-accent focus-within:text-sr-txt-muted">
               <SearchGlyph />
               <input
                 ref={findRef}
@@ -252,19 +252,19 @@ export default function SmartRotomComponentsShowcase() {
                   }
                   if (e.key === "Enter" && hits && hits[0]) openHit(hits[0])
                 }}
-                className="flex-1 min-w-0 bg-transparent border-0 outline-0 text-sr-txt font-mono text-[12px] leading-[1.2] tracking-[0.04em] placeholder:text-sr-txt-dim"
+                className="flex-1 min-w-0 bg-transparent border-0 outline-0 text-sr-txt font-mono text-[0.75rem] leading-[1.2] tracking-[0.04em] placeholder:text-sr-txt-dim"
               />
               {q ? (
                 <button
                   type="button"
                   aria-label="Limpiar búsqueda"
                   onClick={() => setQ("")}
-                  className="bg-transparent border-0 cursor-pointer text-sr-txt-muted text-[11px] px-1 py-[2px] hover:text-sr-txt"
+                  className="bg-transparent border-0 cursor-pointer text-sr-txt-muted text-[0.6875rem] px-1 py-[2px] hover:text-sr-txt"
                 >
                   ✕
                 </button>
               ) : (
-                <kbd className="font-mono text-[10px] leading-none text-sr-txt-dim border border-solid border-sr-line px-[6px] py-[3px]">
+                <kbd className="font-mono text-[0.625rem] leading-none text-sr-txt-dim border border-solid border-sr-line px-[0.375rem] py-[3px]">
                   /
                 </kbd>
               )}
@@ -279,17 +279,17 @@ export default function SmartRotomComponentsShowcase() {
                       onClick={() => openHit(h)}
                       className={cn(
                         sideLink,
-                        "grid gap-[5px] border-sr-line text-sr-txt-muted normal-case tracking-[0.04em] leading-[1.2] hover:text-sr-txt hover:bg-sr-panel",
+                        "grid gap-[0.3125rem] border-sr-line text-sr-txt-muted normal-case tracking-[0.04em] leading-[1.2] hover:text-sr-txt hover:bg-sr-panel",
                       )}
                     >
                       {h.label}
-                      <span className="text-[9px] tracking-[0.16em] uppercase text-sr-txt-dim">
+                      <span className="text-[0.5625rem] tracking-[0.16em] uppercase text-sr-txt-dim">
                         {h.dom} · {h.grp}
                       </span>
                     </a>
                   ))
                 ) : (
-                  <span className="py-3 px-[14px] font-mono text-[11px] leading-[1.6] text-sr-txt-dim">
+                  <span className="py-3 px-[0.875rem] font-mono text-[0.6875rem] leading-[1.6] text-sr-txt-dim">
                     Sin resultados para «{q.trim()}»
                   </span>
                 )
@@ -299,19 +299,19 @@ export default function SmartRotomComponentsShowcase() {
                   const dCur = d.chapters.some((g) => chapterKey(g) === grpKey)
                   const meta = DOMAIN_META[d.name]
                   return (
-                    <div key={d.name} className="grid gap-[2px] mt-[14px] first:mt-0">
+                    <div key={d.name} className="grid gap-[2px] mt-[0.875rem] first:mt-0">
                       <button
                         type="button"
                         aria-expanded={dOpen}
                         onClick={() => toggleDom(d.name)}
                         className={cn(
-                          "flex items-center gap-[9px] w-full text-left bg-transparent border-0 cursor-pointer pt-[10px] pr-[14px] pb-2 pl-px font-mono text-[10px] font-bold leading-none tracking-[0.2em] uppercase transition-colors duration-[140ms]",
+                          "flex items-center gap-[0.5625rem] w-full text-left bg-transparent border-0 cursor-pointer pt-[0.625rem] pr-[0.875rem] pb-2 pl-px font-mono text-[0.625rem] font-bold leading-none tracking-[0.2em] uppercase transition-colors duration-[140ms]",
                           dCur ? "text-sr-txt-muted hover:text-sr-txt" : "text-sr-txt-dim hover:text-sr-txt",
                         )}
                       >
                         <span
                           className={cn(
-                            "flex-none w-[7px] h-[7px] rotate-45 transition-colors duration-[140ms]",
+                            "flex-none w-[0.4375rem] h-[0.4375rem] rotate-45 transition-colors duration-[140ms]",
                             dOpen ? "bg-sr-accent" : "bg-sr-line-2",
                           )}
                         />
@@ -335,7 +335,7 @@ export default function SmartRotomComponentsShowcase() {
                                 aria-expanded={open}
                                 onClick={() => (open ? jump(g.sections[0].id) : setGrpKey(key))}
                                 className={cn(
-                                  "flex items-center gap-[9px] w-full text-left bg-transparent border-0 border-l-[3px] border-solid cursor-pointer py-[10px] px-[14px] font-mono text-[11px] font-bold leading-none tracking-[0.14em] uppercase transition-[color,border-color,background] duration-[140ms]",
+                                  "flex items-center gap-[0.5625rem] w-full text-left bg-transparent border-0 border-l-[3px] border-solid cursor-pointer py-[0.625rem] px-[0.875rem] font-mono text-[0.6875rem] font-bold leading-none tracking-[0.14em] uppercase transition-[color,border-color,background] duration-[140ms]",
                                   open
                                     ? "text-sr-txt border-l-sr-accent bg-sr-panel"
                                     : "text-sr-txt-muted border-l-sr-line hover:text-sr-txt hover:bg-sr-panel",
@@ -348,7 +348,7 @@ export default function SmartRotomComponentsShowcase() {
                                   )}
                                 />
                                 {g.name}
-                                <span className="ml-auto font-medium text-[10px] text-sr-txt-dim">{g.sections.length}</span>
+                                <span className="ml-auto font-medium text-[0.625rem] text-sr-txt-dim">{g.sections.length}</span>
                               </button>
                               {open &&
                                 g.sections.map((s) => (
@@ -357,7 +357,7 @@ export default function SmartRotomComponentsShowcase() {
                                     onClick={() => jump(s.id)}
                                     className={cn(
                                       sideLink,
-                                      "pl-[27px]",
+                                      "pl-[1.6875rem]",
                                       active === s.id
                                         ? "text-sr-txt border-l-sr-accent bg-sr-panel"
                                         : "text-sr-txt-muted border-l-sr-line hover:text-sr-txt hover:bg-sr-panel",
@@ -377,7 +377,7 @@ export default function SmartRotomComponentsShowcase() {
           </aside>
 
           {/* ── main ── */}
-          <div className="min-w-0 pb-[90px]">
+          <div className="min-w-0 pb-[5.625rem]">
             {ActiveView ? <ActiveView /> : null}
 
             <div className="flex flex-wrap items-center justify-between gap-4 border-t border-solid border-sr-line pt-6">
@@ -385,31 +385,31 @@ export default function SmartRotomComponentsShowcase() {
                 <button
                   type="button"
                   onClick={() => setGrpKey(chapterKey(chapters[gi - 1]))}
-                  className="grid gap-[7px] text-left bg-sr-panel border border-solid border-sr-line text-sr-txt cursor-pointer py-[14px] px-5 min-w-0 flex-1 sm:flex-none sm:min-w-[190px] transition-[border-color,background] duration-[140ms] hover:border-sr-accent hover:bg-sr-panel-2"
+                  className="grid gap-[0.4375rem] text-left bg-sr-panel border border-solid border-sr-line text-sr-txt cursor-pointer py-[0.875rem] px-5 min-w-0 flex-1 sm:flex-none sm:min-w-[11.875rem] transition-[border-color,background] duration-[140ms] hover:border-sr-accent hover:bg-sr-panel-2"
                 >
-                  <small className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase text-sr-txt-dim">
+                  <small className="font-mono text-[0.625rem] leading-none tracking-[0.16em] uppercase text-sr-txt-dim">
                     Anterior
                   </small>
-                  <b className="font-mono text-[13px] leading-none tracking-[0.1em] uppercase">
+                  <b className="font-mono text-[0.8125rem] leading-none tracking-[0.1em] uppercase">
                     {chapters[gi - 1].dom} · {chapters[gi - 1].name}
                   </b>
                 </button>
               ) : (
                 <span />
               )}
-              <span className="font-mono text-[11px] leading-none tracking-[0.12em] text-sr-txt-dim">
+              <span className="font-mono text-[0.6875rem] leading-none tracking-[0.12em] text-sr-txt-dim">
                 {String(gi + 1).padStart(2, "0")} / {String(chapters.length).padStart(2, "0")}
               </span>
               {gi < chapters.length - 1 ? (
                 <button
                   type="button"
                   onClick={() => setGrpKey(chapterKey(chapters[gi + 1]))}
-                  className="grid gap-[7px] text-right bg-sr-panel border border-solid border-sr-line text-sr-txt cursor-pointer py-[14px] px-5 min-w-0 flex-1 sm:flex-none sm:min-w-[190px] transition-[border-color,background] duration-[140ms] hover:border-sr-accent hover:bg-sr-panel-2"
+                  className="grid gap-[0.4375rem] text-right bg-sr-panel border border-solid border-sr-line text-sr-txt cursor-pointer py-[0.875rem] px-5 min-w-0 flex-1 sm:flex-none sm:min-w-[11.875rem] transition-[border-color,background] duration-[140ms] hover:border-sr-accent hover:bg-sr-panel-2"
                 >
-                  <small className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase text-sr-txt-dim text-right">
+                  <small className="font-mono text-[0.625rem] leading-none tracking-[0.16em] uppercase text-sr-txt-dim text-right">
                     Siguiente
                   </small>
-                  <b className="font-mono text-[13px] leading-none tracking-[0.1em] uppercase">
+                  <b className="font-mono text-[0.8125rem] leading-none tracking-[0.1em] uppercase">
                     {chapters[gi + 1].dom} · {chapters[gi + 1].name}
                   </b>
                 </button>

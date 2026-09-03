@@ -56,7 +56,7 @@ export default function Registro({ params }: { params: Promise<{ params?: string
       {phase === "flash" && <div className="absolute inset-0 bg-white/80 pointer-events-none" />}
 
       <div className="flex flex-col items-center gap-6">
-        <div className="relative w-[240px] h-[240px] grid place-items-center">
+        <div className="relative w-[15rem] h-[15rem] grid place-items-center">
           {corners.map((c, i) => (
             <span key={i} className={`absolute w-7 h-7 border-pk-primary-400/70 ${c}`} />
           ))}

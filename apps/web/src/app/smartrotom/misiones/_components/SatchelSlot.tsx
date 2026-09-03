@@ -26,7 +26,7 @@ export function SatchelSlot({ item }: { item: SatchelItem }) {
     >
       <div className="grid h-full w-full place-items-center focus-visible:outline-none">
         {locked ? (
-          <span aria-hidden className="font-ms-display text-[34px] leading-none text-ms-ink-2">
+          <span aria-hidden className="font-ms-display text-[2.125rem] leading-none text-ms-ink-2">
             ?
           </span>
         ) : (
@@ -35,18 +35,18 @@ export function SatchelSlot({ item }: { item: SatchelItem }) {
       </div>
 
       {!locked && item.count > 1 && (
-        <span className="absolute bottom-1 right-[5px] z-[2] rounded-full border border-ms-gold-4 bg-ms-gold-1 px-[5px] font-ms-mono text-[11px] font-bold leading-[1.4] text-[#1e120a]">
+        <span className="absolute bottom-1 right-[0.3125rem] z-[2] rounded-full border border-ms-gold-4 bg-ms-gold-1 px-[0.3125rem] font-ms-mono text-[0.6875rem] font-bold leading-[1.4] text-[#1e120a]">
           ×{item.count}
         </span>
       )}
 
       <div
         role="tooltip"
-        className="pointer-events-none absolute bottom-[calc(100%_+_6px)] left-1/2 z-[60] w-[150px] -translate-x-1/2 rounded-sm border border-ms-ink-3/50 bg-gradient-to-b from-ms-paper-1 to-ms-paper-3 px-2.5 py-2 text-center opacity-0 shadow-[0_8px_20px_rgba(0,0,0,.5)] transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none"
+        className="pointer-events-none absolute bottom-[calc(100%_+_6px)] left-1/2 z-[60] w-[9.375rem] -translate-x-1/2 rounded-sm border border-ms-ink-3/50 bg-gradient-to-b from-ms-paper-1 to-ms-paper-3 px-2.5 py-2 text-center opacity-0 shadow-[0_8px_20px_rgba(0,0,0,.5)] transition-opacity duration-150 group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none"
       >
-        <div className="font-ms-display text-[13px] text-ms-ink-1">{item.name}</div>
+        <div className="font-ms-display text-[0.8125rem] text-ms-ink-1">{item.name}</div>
         {locked && (
-          <div className="mt-0.5 font-ms-uppercase text-[9px] uppercase tracking-[.12em] text-ms-ink-3">
+          <div className="mt-0.5 font-ms-uppercase text-[0.5625rem] uppercase tracking-[.12em] text-ms-ink-3">
             {t("notObtained")}
           </div>
         )}

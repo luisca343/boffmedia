@@ -76,7 +76,7 @@ export function ParticipantsPanel({ eventId }: { eventId: number }) {
     <AvPanel title={t("title")} icon="users">
       <div className="flex items-baseline gap-2 flex-wrap mb-3">
         <AvPill tone="default">{t("count", { count: rows.length })}</AvPill>
-        <p className="text-xs text-txt-dim flex-1 min-w-[240px]">{t("desc")}</p>
+        <p className="text-xs text-txt-dim flex-1 min-w-[15rem]">{t("desc")}</p>
       </div>
       {error && <AvAlert tone="error" className="mb-3">{error}</AvAlert>}
 
@@ -87,14 +87,14 @@ export function ParticipantsPanel({ eventId }: { eventId: number }) {
           {rows.map((p) => (
             <div key={p.id} className="flex items-center gap-2 px-3 py-1.5">
               <span
-                className={cn("w-[7px] h-[7px] shrink-0 rotate-45", DOT[p.status as Status] ?? "bg-txt-dim")}
+                className={cn("w-[0.4375rem] h-[0.4375rem] shrink-0 rotate-45", DOT[p.status as Status] ?? "bg-txt-dim")}
                 title={t(`status.${p.status}`)}
               />
 
               <span className="font-medium text-sm truncate">
                 {p.nickname ?? `#${p.participantId}`}
               </span>
-              <span className="font-mono text-[11px] text-txt-dim truncate hidden sm:inline">
+              <span className="font-mono text-[0.6875rem] text-txt-dim truncate hidden sm:inline">
                 {t("userId", { id: p.userId ?? "—" })}
               </span>
 
@@ -102,7 +102,7 @@ export function ParticipantsPanel({ eventId }: { eventId: number }) {
 
               <Select
                 value={p.status}
-                className="w-[150px] py-[5px] px-[9px] pr-8 text-[13px]"
+                className="w-[9.375rem] py-[0.3125rem] px-[0.5625rem] pr-8 text-[0.8125rem]"
                 ariaLabel={t("title")}
                 options={(["registered", "confirmed", "declined", "removed"] as Status[]).map((s) => ({
                   value: s,

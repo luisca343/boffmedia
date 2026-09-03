@@ -85,7 +85,7 @@ const FILLED = new Set<IconName>(["star"])
 
 export type IconName = keyof typeof MAP
 
-/** Sized by class (`h-4 w-4`, `h-[17px] w-[17px]`) — `size` is ignored here. */
+/** Sized by class (`h-4 w-4`, `h-[1.0625rem] w-[1.0625rem]`) — `size` is ignored here. */
 export const Icon = makeIconComponent(MAP, {
   sizeless: true,
   strokeWidth: 2,

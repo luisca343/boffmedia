@@ -82,15 +82,15 @@ export function FtBasesChapter() {
         >
           <div className="grid gap-5">
             <div>
-              <div className="font-ft-ui mb-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
+              <div className="font-ft-ui mb-1 text-[0.625rem] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
                 display · Bangers
               </div>
-              <div className="font-ft-display text-[44px] leading-[0.95]">
+              <div className="font-ft-display text-[2.75rem] leading-[0.95]">
                 La Dinastía Furret
               </div>
             </div>
             <div>
-              <div className="font-ft-ui mb-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
+              <div className="font-ft-ui mb-1 text-[0.625rem] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
                 deck · Fraunces
               </div>
               <div className="font-ft-deck text-xl italic text-ft-deck">
@@ -99,7 +99,7 @@ export function FtBasesChapter() {
               </div>
             </div>
             <div>
-              <div className="font-ft-ui mb-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
+              <div className="font-ft-ui mb-1 text-[0.625rem] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
                 cuerpo · Space Grotesk
               </div>
               <div className="font-ft text-base text-ft-body">
@@ -107,10 +107,10 @@ export function FtBasesChapter() {
               </div>
             </div>
             <div>
-              <div className="font-ft-ui mb-1 text-[10px] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
+              <div className="font-ft-ui mb-1 text-[0.625rem] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
                 ui · Inter
               </div>
-              <div className="font-ft-ui text-[13px] font-medium uppercase tracking-[0.04em] text-ft-ink/70">
+              <div className="font-ft-ui text-[0.8125rem] font-medium uppercase tracking-[0.04em] text-ft-ink/70">
                 Portada · Comunidad · 12 min
               </div>
             </div>
@@ -126,7 +126,7 @@ export function FtBasesChapter() {
           <div className="flex flex-wrap items-end gap-8">
             <span className="ft-stamp">01</span>
             <span className="ft-stamp">02</span>
-            <span className="font-ft-display ft-ink-stroke text-[52px] text-ft-yellow">
+            <span className="font-ft-display ft-ink-stroke text-[3.25rem] text-ft-yellow">
               ¡POW!
             </span>
           </div>
@@ -162,7 +162,7 @@ export function FtBasesChapter() {
             <div className="ft-newsprint border-ft h-24 rounded-ft border-ft-ink bg-white" />
             <div className="ft-stripes border-ft h-24 rounded-ft border-ft-ink" />
             <div className="border-ft flex h-24 items-center justify-center rounded-ft border-ft-ink bg-white shadow-ft-pop">
-              <span className="font-ft-ui text-[11px] font-extrabold uppercase tracking-[0.14em]">
+              <span className="font-ft-ui text-[0.6875rem] font-extrabold uppercase tracking-[0.14em]">
                 shadow-ft-pop
               </span>
             </div>

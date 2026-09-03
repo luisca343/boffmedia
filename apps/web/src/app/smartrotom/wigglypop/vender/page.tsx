@@ -21,10 +21,10 @@ export default function SellPage() {
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <div className="flex flex-none flex-wrap items-center gap-4 border-b border-wp-line/24 px-[30px] py-[18px]">
+      <div className="flex flex-none flex-wrap items-center gap-4 border-b border-wp-line/24 px-[1.875rem] py-[1.125rem]">
         <div>
-          <h1 className="font-wp-display text-[21px] font-semibold text-wp-fg">{t("sell.page.title")}</h1>
-          <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
+          <h1 className="font-wp-display text-[1.3125rem] font-semibold text-wp-fg">{t("sell.page.title")}</h1>
+          <p className="mt-0.5 font-wp text-[0.78125rem] font-semibold text-wp-fg-subtle">
             {kind === "mon"
               ? t("sell.page.subtitleMon")
               : t("sell.page.subtitleItem")}
@@ -40,7 +40,7 @@ export default function SellPage() {
         />
       </div>
 
-      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] py-6">
+      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[1.875rem] py-6">
         {kind === "mon" ? <SellMon /> : <SellItem />}
       </div>
     </div>

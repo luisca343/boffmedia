@@ -15,7 +15,7 @@ export function Skeleton({ className }: { className?: string }) {
 export function PostSkeleton() {
   return (
     <div className="flex gap-3 border-b border-rk-line px-4 py-3.5">
-      <Skeleton className="h-[46px] w-[46px] flex-none rounded-full" />
+      <Skeleton className="h-[2.875rem] w-[2.875rem] flex-none rounded-full" />
       <div className="flex-1 space-y-2 py-1">
         <Skeleton className="h-3.5 w-[38%]" />
         <Skeleton className="h-3 w-[92%]" />

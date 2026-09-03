@@ -71,25 +71,25 @@ export function EnvironmentPicker({
           />
           <button
             type="button"
-            className="cut-tag cut-tag-edge hover:[--cut-line:var(--accent)] [--cut-line:var(--line-2)] [--cut-tag:7px] bg-panel border border-line-2 px-3 py-2.5 text-left font-mono text-[11.5px] text-txt hover:border-accent hover:bg-accent-soft disabled:opacity-50"
+            className="cut-tag cut-tag-edge hover:[--cut-line:var(--accent)] [--cut-line:var(--line-2)] [--cut-tag:7px] bg-panel border border-line-2 px-3 py-2.5 text-left font-mono text-[0.71875rem] text-txt hover:border-accent hover:bg-accent-soft disabled:opacity-50"
             onClick={pickInstance}
             disabled={busy}
           >
             {t("setup.pickInstance")}
           </button>
-          <p className="font-mono text-[11px] leading-relaxed text-txt-dim">
+          <p className="font-mono text-[0.6875rem] leading-relaxed text-txt-dim">
             {t("setup.instanceHint")}
           </p>
         </>
       )}
 
       {env.scan ? (
-        <div className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
+        <div className="flex items-center gap-2 font-mono text-[0.6875rem] text-txt-dim">
           <Spinner size={13} />
           {env.scan.msg}
         </div>
       ) : env.isLoading ? (
-        <div className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
+        <div className="flex items-center gap-2 font-mono text-[0.6875rem] text-txt-dim">
           <Spinner size={13} />
           {t("setup.loadingRegistry")}
         </div>
@@ -124,12 +124,12 @@ export function EnvironmentPicker({
       {env.registry?.source === "scanned" && !env.isLoading && (
         <>
           {(env.registry.failedJars ?? 0) > 0 && (
-            <Banner tone="warn" className="text-[12.5px]">
+            <Banner tone="warn" className="text-[0.78125rem]">
               {t("setup.failedJars", { count: env.registry.failedJars ?? 0 })}
             </Banner>
           )}
           {env.registry.textureCount === 0 && (
-            <Banner tone="warn" className="text-[12.5px]">
+            <Banner tone="warn" className="text-[0.78125rem]">
               {t("setup.noTextures")}
             </Banner>
           )}

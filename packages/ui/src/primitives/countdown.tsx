@@ -28,15 +28,15 @@ export function Countdown({ date, compact, className, ns = "events.countdown" }:
 
   const seg = (v: number, l: string) => (
     <span className="inline-flex items-baseline gap-1">
-      <b className={cn("font-display font-extrabold italic leading-none text-txt", compact ? "text-[15px]" : "text-[20px]")}>
+      <b className={cn("font-display font-extrabold italic leading-none text-txt", compact ? "text-[0.9375rem]" : "text-[1.25rem]")}>
         {String(v).padStart(2, "0")}
       </b>
-      <small className="font-mono text-[9px] uppercase leading-none tracking-[0.1em] text-txt-muted">{l}</small>
+      <small className="font-mono text-[0.5625rem] uppercase leading-none tracking-[0.1em] text-txt-muted">{l}</small>
     </span>
   )
 
   return (
-    <span className={cn("inline-flex items-center", compact ? "gap-[7px]" : "gap-[10px]", className)}>
+    <span className={cn("inline-flex items-center", compact ? "gap-[0.4375rem]" : "gap-[0.625rem]", className)}>
       <Icon name="clock" size={13} className="flex-none text-accent" />
       {d > 0 && seg(d, t(`${ns}.days`))}
       {seg(h, t(`${ns}.hours`))}

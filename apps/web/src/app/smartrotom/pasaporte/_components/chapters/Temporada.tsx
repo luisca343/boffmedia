@@ -10,10 +10,10 @@ import { Card, EmptyState, Icon, PageHead, Skeleton } from "../ui"
 
 function Box({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <Card className="px-2 py-[9px] text-center">
-      <div className="font-ps-mono text-[7.5px] uppercase tracking-[.07em] text-ps-ink-faint">{label}</div>
-      <div className="ps-num my-1 font-ps-ceremony text-[21px] leading-none">{value}</div>
-      {sub && <div className="text-[9px] text-ps-ink-soft">{sub}</div>}
+    <Card className="px-2 py-[0.5625rem] text-center">
+      <div className="font-ps-mono text-[0.46875rem] uppercase tracking-[.07em] text-ps-ink-faint">{label}</div>
+      <div className="ps-num my-1 font-ps-ceremony text-[1.3125rem] leading-none">{value}</div>
+      {sub && <div className="text-[0.5625rem] text-ps-ink-soft">{sub}</div>}
     </Card>
   )
 }
@@ -44,7 +44,7 @@ export function Temporada({
     return (
       <>
         <PageHead eyebrow={t("temporada.eyebrow")} title={t("temporada.title")} />
-        <Skeleton className="mx-auto mb-4 h-[150px] w-[150px] rounded-full" />
+        <Skeleton className="mx-auto mb-4 h-[9.375rem] w-[9.375rem] rounded-full" />
         <Skeleton className="mb-2.5 h-10" />
         {Array.from({ length: 3 }, (_, i) => (
           <Skeleton key={i} className="mb-2 h-12" />
@@ -89,7 +89,7 @@ export function Temporada({
     <>
       <PageHead eyebrow={t("temporada.eyebrow")} title={t("temporada.title")} />
 
-      <div className="relative mx-auto mb-3.5 grid h-[158px] w-[158px] place-items-center">
+      <div className="relative mx-auto mb-3.5 grid h-[9.875rem] w-[9.875rem] place-items-center">
         <span
           aria-hidden="true"
           className="ps-holo-gold ps-loop absolute inset-0 rounded-full shadow-[0_7px_20px_rgba(120,90,30,.32),inset_0_0_0_2px_rgba(255,255,255,.45)] animate-ps-spin-slow motion-reduce:animate-none"
@@ -98,22 +98,22 @@ export function Temporada({
           style={{
             background: "radial-gradient(circle at 50% 30%, #fdf3cf, #e6c873 54%, #b8902f)",
           }}
-          className="relative z-[2] grid h-[116px] w-[116px] place-items-center content-center rounded-full border-[3px] border-[#fff6d8] text-center shadow-[inset_0_0_0_3px_rgba(255,255,255,.5),inset_0_-6px_14px_rgba(120,80,20,.35),0_3px_9px_rgba(0,0,0,.3)]"
+          className="relative z-[2] grid h-[7.25rem] w-[7.25rem] place-items-center content-center rounded-full border-[3px] border-[#fff6d8] text-center shadow-[inset_0_0_0_3px_rgba(255,255,255,.5),inset_0_-6px_14px_rgba(120,80,20,.35),0_3px_9px_rgba(0,0,0,.3)]"
         >
-          <span className="ps-foil font-ps-display text-[13px] font-extrabold tracking-[.12em]">
+          <span className="ps-foil font-ps-display text-[0.8125rem] font-extrabold tracking-[.12em]">
             {roman(info.number)}
           </span>
           <Icon name="crown" className="h-10 w-10 text-ps-gild-lo drop-shadow-[0_1px_1px_rgba(255,255,255,.5)]" />
-          <span className="font-ps-ceremony text-[15px] leading-none text-[#5a3f12]">
+          <span className="font-ps-ceremony text-[0.9375rem] leading-none text-[#5a3f12]">
             {s.tier} {s.division}
           </span>
         </div>
-        <span className="absolute -bottom-[7px] left-1/2 z-[3] -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-r from-ps-ribbon to-ps-ribbon-hi px-[15px] py-1 font-ps-display text-[11px] font-extrabold tracking-[.08em] text-white shadow-[0_2px_6px_rgba(0,0,0,.32)]">
+        <span className="absolute -bottom-[0.4375rem] left-1/2 z-[3] -translate-x-1/2 whitespace-nowrap rounded-full bg-gradient-to-r from-ps-ribbon to-ps-ribbon-hi px-[0.9375rem] py-1 font-ps-display text-[0.6875rem] font-extrabold tracking-[.08em] text-white shadow-[0_2px_6px_rgba(0,0,0,.32)]">
           {info.name}
         </span>
       </div>
 
-      <p className="ps-num mb-3 text-center font-ps-mono text-[10.5px] tracking-[.06em] text-ps-ink-faint">
+      <p className="ps-num mb-3 text-center font-ps-mono text-[0.65625rem] tracking-[.06em] text-ps-ink-faint">
         {t("temporada.seasonLine", { number: info.number, date: docDate(info.endsAt, locale) })}
       </p>
 
@@ -135,8 +135,8 @@ export function Temporada({
                 className={cn(
                   "rounded-full border-2 transition-all duration-200 motion-reduce:transition-none",
                   isCurrent
-                    ? "h-[26px] w-[26px] border-white shadow-[0_2px_6px_rgba(0,0,0,.25)]"
-                    : "h-[18px] w-[18px] border-ps-ink/20",
+                    ? "h-[1.625rem] w-[1.625rem] border-white shadow-[0_2px_6px_rgba(0,0,0,.25)]"
+                    : "h-[1.125rem] w-[1.125rem] border-ps-ink/20",
                   done || isCurrent
                     ? TIER_BG[rung.key as StandingTier] ?? "bg-ps-ink/20"
                     : "bg-ps-ink/[.12]",
@@ -145,7 +145,7 @@ export function Temporada({
               />
               <span
                 className={cn(
-                  "font-ps-mono text-[8px] uppercase tracking-[.03em]",
+                  "font-ps-mono text-[0.5rem] uppercase tracking-[.03em]",
                   isCurrent ? "font-bold text-ps-ink" : done ? "text-ps-ink-soft" : "text-ps-ink-faint",
                 )}
               >
@@ -156,8 +156,8 @@ export function Temporada({
         })}
       </ol>
 
-      <Card className="mb-3 px-3.5 py-[11px]">
-        <div className="mb-[7px] flex items-baseline justify-between gap-2 text-[12px] text-ps-ink-soft">
+      <Card className="mb-3 px-3.5 py-[0.6875rem]">
+        <div className="mb-[0.4375rem] flex items-baseline justify-between gap-2 text-[0.75rem] text-ps-ink-soft">
           <span>{nextRung ? t("temporada.progressTo", { name: nextRung.name }) : t("temporada.maxRank")}</span>
           <b className="ps-num font-ps-mono text-ps-ink">
             {s.lp} {s.nextAt ? `/ ${s.nextAt}` : ""} LP
@@ -178,7 +178,7 @@ export function Temporada({
             className="block h-full rounded-md"
           />
         </div>
-        <p className="mt-1.5 text-[10.5px] text-ps-ink-faint">
+        <p className="mt-1.5 text-[0.65625rem] text-ps-ink-faint">
           {s.nextAt
             ? t.rich("temporada.remaining", {
                 n: Math.max(0, s.nextAt - s.lp),
@@ -189,7 +189,7 @@ export function Temporada({
         </p>
       </Card>
 
-      <div className="grid grid-cols-4 gap-[9px]">
+      <div className="grid grid-cols-4 gap-[0.5625rem]">
         <Box label={t("temporada.box.lp")} value={String(s.lp)} sub={t("temporada.box.peak", { n: s.peakLp })} />
         <Box
           label={t("temporada.box.wins")}

@@ -19,7 +19,7 @@ export interface BoxGridProps {
 /** 6 × 5. The one grid every stage renders through — a box, and the results view. */
 export function BoxGrid({ cells, droppable = true, onHover }: BoxGridProps) {
   return (
-    <div className="grid w-full grid-cols-6 gap-[clamp(6px,0.7vw,11px)]">
+    <div className="grid w-full grid-cols-6 gap-[clamp(0.375rem,0.7vw,0.6875rem)]">
       {cells.map((c, i) => (
         <PokemonSlot
           key={c.loc ? locId(c.loc) : `pad-${i}`}

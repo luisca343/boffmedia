@@ -40,16 +40,16 @@ export function HeroBalance({ account, series, weekDelta }: { account: SBAccount
 
       {/* Left */}
       <div className="relative flex flex-col gap-3.5">
-        <div className="inline-flex self-start items-center gap-2 rounded-full border border-white/[0.18] bg-white/[0.12] py-[5px] pl-[5px] pr-[11px] text-[12px] font-medium backdrop-blur-[8px]">
-          <span className="size-[22px] overflow-hidden rounded-full">
+        <div className="inline-flex self-start items-center gap-2 rounded-full border border-white/[0.18] bg-white/[0.12] py-[0.3125rem] pl-[0.3125rem] pr-[0.6875rem] text-[0.75rem] font-medium backdrop-blur-[8px]">
+          <span className="size-[1.375rem] overflow-hidden rounded-full">
             <AccountAvatar account={account} size={22} />
           </span>
           <span>{t("accounts.main")} · {displayName(account.name)}</span>
         </div>
 
-        <div className="text-[12px] uppercase tracking-[0.15em] text-[#c8d4ec]">{t("heroBalance.availableBalance")}</div>
+        <div className="text-[0.75rem] uppercase tracking-[0.15em] text-[#c8d4ec]">{t("heroBalance.availableBalance")}</div>
 
-        <div className="inline-flex items-baseline gap-1.5 font-sb-display text-[clamp(40px,6vw,64px)] font-bold leading-none tracking-[-0.03em] tabular-nums">
+        <div className="inline-flex items-baseline gap-1.5 font-sb-display text-[clamp(2.5rem,6vw,4rem)] font-bold leading-none tracking-[-0.03em] tabular-nums">
           {hide ? "•••••• " : fmtInt(account.balance, locale)}
           <span className="text-[0.42em] font-semibold text-sb-300">¥</span>
           <button
@@ -63,7 +63,7 @@ export function HeroBalance({ account, series, weekDelta }: { account: SBAccount
         </div>
 
         {weekDelta && (
-          <div className="inline-flex items-center gap-1.5 text-[13px] text-[#b6d3ff]">
+          <div className="inline-flex items-center gap-1.5 text-[0.8125rem] text-[#b6d3ff]">
             <span className={weekDelta.pct >= 0 ? "font-semibold text-[#6ee7b7]" : "font-semibold text-[#fca5a5]"}>
               {weekDelta.pct >= 0 ? "▲" : "▼"} {formatMoney(Math.abs(weekDelta.amount))} ({weekDelta.pct.toFixed(1)}%)
             </span>
@@ -80,9 +80,9 @@ export function HeroBalance({ account, series, weekDelta }: { account: SBAccount
       </div>
 
       {/* Right — sparkline */}
-      <div className="relative min-h-[170px]">
+      <div className="relative min-h-[10.625rem]">
         <div className="absolute inset-0 px-2 pb-2 pt-5">
-          <div className="mb-1.5 flex justify-between text-[11px] text-[#9bb3da]">
+          <div className="mb-1.5 flex justify-between text-[0.6875rem] text-[#9bb3da]">
             <span>{t("heroBalance.movementsAgo", { count: series.length })}</span>
             <span>{t("heroBalance.today")}</span>
           </div>

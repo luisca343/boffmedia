@@ -27,8 +27,8 @@ export function Switch({ on, onToggle, label, disabled }: ArSwitchProps) {
     >
       <span
         className={cn(
-          "absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/.4)] transition-[left] duration-150",
-          on ? "left-[22px]" : "left-0.5",
+          "absolute top-0.5 h-[1.125rem] w-[1.125rem] rounded-full bg-white shadow-[0_1px_3px_rgb(0_0_0/.4)] transition-[left] duration-150",
+          on ? "left-[1.375rem]" : "left-0.5",
         )}
       />
     </button>

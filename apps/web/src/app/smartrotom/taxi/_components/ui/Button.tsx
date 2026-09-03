@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
 const BASE =
-  "inline-flex items-center justify-center gap-[9px] whitespace-nowrap transition-[transform,filter,background,color,border-color] duration-150 ease-tx " +
+  "inline-flex items-center justify-center gap-[0.5625rem] whitespace-nowrap transition-[transform,filter,background,color,border-color] duration-150 ease-tx " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tx-accent focus-visible:ring-offset-2 focus-visible:ring-offset-tx-bg-1 " +
   "disabled:pointer-events-none disabled:opacity-55"
 
@@ -14,16 +14,16 @@ const BASE =
 const VARIANTS = {
   // Pay-and-go. Amber gradient, amber glow, dark ink.
   primary:
-    "flex-1 rounded-tx-md px-4 py-[14px] text-[15px] font-extrabold bg-gradient-to-br from-tx-accent to-tx-accent-deep text-tx-on-accent shadow-tx-glow hover:brightness-105 hover:-translate-y-px active:translate-y-0 active:scale-[.99]",
+    "flex-1 rounded-tx-md px-4 py-[0.875rem] text-[0.9375rem] font-extrabold bg-gradient-to-br from-tx-accent to-tx-accent-deep text-tx-on-accent shadow-tx-glow hover:brightness-105 hover:-translate-y-px active:translate-y-0 active:scale-[.99]",
   // The same shape without the spend — "top up", "cancel to a surface".
   secondary:
-    "flex-1 rounded-tx-md px-4 py-[14px] text-[15px] font-extrabold bg-tx-surface-2 border border-solid border-tx-line-2 text-tx-txt hover:brightness-110",
+    "flex-1 rounded-tx-md px-4 py-[0.875rem] text-[0.9375rem] font-extrabold bg-tx-surface-2 border border-solid border-tx-line-2 text-tx-txt hover:brightness-110",
   // The quiet half of a two-button row.
   quiet:
-    "rounded-tx-md px-4 py-[14px] text-sm font-bold bg-tx-surface border border-solid border-tx-line text-tx-txt hover:bg-tx-surface-2",
+    "rounded-tx-md px-4 py-[0.875rem] text-sm font-bold bg-tx-surface border border-solid border-tx-line text-tx-txt hover:bg-tx-surface-2",
   // Square, icon-only, sits beside a primary.
   ghost:
-    "w-[50px] shrink-0 rounded-tx-md bg-tx-surface border border-solid border-tx-line text-tx-txt-2 hover:bg-tx-surface-2 hover:text-tx-txt",
+    "w-[3.125rem] shrink-0 rounded-tx-md bg-tx-surface border border-solid border-tx-line text-tx-txt-2 hover:bg-tx-surface-2 hover:text-tx-txt",
 } as const
 
 export function Button({
@@ -52,7 +52,7 @@ export function IconButton({
       aria-label={label}
       title={label}
       className={cn(
-        "grid h-[38px] w-[38px] shrink-0 place-items-center rounded-tx-pill",
+        "grid h-[2.375rem] w-[2.375rem] shrink-0 place-items-center rounded-tx-pill",
         "bg-tx-surface border border-solid border-tx-line text-tx-txt-2",
         "transition-[background,color,transform] duration-150 ease-tx",
         "hover:bg-tx-surface-2 hover:text-tx-txt active:scale-95",

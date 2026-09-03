@@ -78,7 +78,7 @@ export function ImagePicker({
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="inline-flex items-center gap-1.5 rounded-sb-md border border-sb-border bg-sb-surface px-2.5 py-1.5 text-[12.5px] font-semibold transition-colors hover:border-sb-300 hover:bg-sb-50"
+            className="inline-flex items-center gap-1.5 rounded-sb-md border border-sb-border bg-sb-surface px-2.5 py-1.5 text-[0.78125rem] font-semibold transition-colors hover:border-sb-300 hover:bg-sb-50"
           >
             <Ico name="imagePlus" size={14} />
             {value || currentUrl ? t("cuentas.dialog.imageChange") : t("cuentas.dialog.imageChoose")}
@@ -87,7 +87,7 @@ export function ImagePicker({
             <button
               type="button"
               onClick={() => pick(null)}
-              className="inline-flex items-center gap-1.5 rounded-sb-md border border-sb-border bg-sb-surface px-2.5 py-1.5 text-[12.5px] font-semibold text-sb-fg-muted transition-colors hover:border-sb-neg hover:text-sb-neg"
+              className="inline-flex items-center gap-1.5 rounded-sb-md border border-sb-border bg-sb-surface px-2.5 py-1.5 text-[0.78125rem] font-semibold text-sb-fg-muted transition-colors hover:border-sb-neg hover:text-sb-neg"
             >
               <Ico name="trash" size={14} />
               {t("cuentas.dialog.imageRemove")}
@@ -108,8 +108,8 @@ export function ImagePicker({
         }}
       />
 
-      <div className="mt-1.5 text-[11.5px] text-sb-fg-muted">{t("cuentas.dialog.imageHint")}</div>
-      {error && <div className="mt-1 text-[12.5px] font-medium text-sb-neg">{error}</div>}
+      <div className="mt-1.5 text-[0.71875rem] text-sb-fg-muted">{t("cuentas.dialog.imageHint")}</div>
+      {error && <div className="mt-1 text-[0.78125rem] font-medium text-sb-neg">{error}</div>}
     </div>
   );
 }

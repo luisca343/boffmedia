@@ -49,11 +49,11 @@ export function SorteosHistory({ history, onClearHistory }: SorteosHistoryProps)
 
   return (
     <Panel
-      className="mt-[18px]"
+      className="mt-[1.125rem]"
       title={t("historyTitle")}
       media={<Icon name="trophy" />}
       aside={
-        <div className="flex gap-[8px]">
+        <div className="flex gap-[0.5rem]">
           <Button
             variant="ghost"
             size="sm"
@@ -86,27 +86,27 @@ export function SorteosHistory({ history, onClearHistory }: SorteosHistoryProps)
         {history.map((r) => (
           <div
             key={r.round + "-" + r.seed}
-            className="flex items-center gap-[14px] border-b border-line px-[18px] py-[13px] last:border-b-0"
+            className="flex items-center gap-[0.875rem] border-b border-line px-[1.125rem] py-[0.8125rem] last:border-b-0"
           >
-            <span className="cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:8px] grid h-[40px] w-[40px] flex-none place-items-center border border-accent-line bg-accent-soft font-display text-[15px] font-extrabold italic text-accent">
+            <span className="cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:8px] grid h-[2.5rem] w-[2.5rem] flex-none place-items-center border border-accent-line bg-accent-soft font-display text-[0.9375rem] font-extrabold italic text-accent">
               #{r.round}
             </span>
-            <div className="flex min-w-0 flex-1 flex-wrap gap-[7px]">
+            <div className="flex min-w-0 flex-1 flex-wrap gap-[0.4375rem]">
               {r.winners.map((w, i) => (
                 <span
                   key={i}
-                  className="inline-flex items-center gap-[7px] border border-line-2 bg-panel-2 px-[9px] py-[6px] font-mono text-[12px] font-semibold text-txt"
+                  className="inline-flex items-center gap-[0.4375rem] border border-line-2 bg-panel-2 px-[0.5625rem] py-[0.375rem] font-mono text-[0.75rem] font-semibold text-txt"
                 >
                   <Icon name="trophy" size={12} className="flex-none text-accent" />
                   {w.name}
                 </span>
               ))}
             </div>
-            <div className="grid flex-none gap-[4px] text-right">
-              <span className="font-mono text-[10px] text-txt-dim">
+            <div className="grid flex-none gap-[0.25rem] text-right">
+              <span className="font-mono text-[0.625rem] text-txt-dim">
                 {t("seed")} <b className="text-txt-muted">#{r.seed}</b>
               </span>
-              <time className="font-mono text-[10px] tracking-[0.06em] text-txt-dim">
+              <time className="font-mono text-[0.625rem] tracking-[0.06em] text-txt-dim">
                 {new Date(r.at).toLocaleString(locale, {
                   day: "2-digit",
                   month: "2-digit",

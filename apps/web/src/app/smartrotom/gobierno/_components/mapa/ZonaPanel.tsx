@@ -43,7 +43,7 @@ export function ZonaPanel({
         </button>
       </div>
 
-      <div className="mb-3 flex items-center gap-[11px]">
+      <div className="mb-3 flex items-center gap-[0.6875rem]">
         {kind && (
           <div
             className={`grid h-11 w-11 flex-none place-items-center rounded-gt border ${TONES[kind.tone].softBorder} ${TONES[kind.tone].softBg}`}
@@ -52,26 +52,26 @@ export function ZonaPanel({
           </div>
         )}
         <div className="min-w-0">
-          <h2 className="font-gt-display text-[21px] leading-tight text-gt-ink-900">{zona.name}</h2>
+          <h2 className="font-gt-display text-[1.3125rem] leading-tight text-gt-ink-900">{zona.name}</h2>
           <div className="mt-1 flex items-center gap-1.5">
             {kind && <Badge>{t(kind.labelKey)}</Badge>}
-            <span className="font-gt-mono text-[10px] text-gt-ink-300">#{zona.id}</span>
+            <span className="font-gt-mono text-[0.625rem] text-gt-ink-300">#{zona.id}</span>
           </div>
         </div>
       </div>
 
-      <p className="mb-3.5 text-[12.5px] leading-relaxed text-gt-ink-600">
+      <p className="mb-3.5 text-[0.78125rem] leading-relaxed text-gt-ink-600">
         {zona.description || (kind ? t(kind.descKey) : undefined)}
       </p>
 
       <div className="mb-3.5 rounded-gt-sm border border-gt-line bg-gt-paper-2 p-3">
         <div className="mb-1.5 flex items-center justify-between">
-          <span className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">{t("zonas.ocupacion")}</span>
-          <span className="font-gt-mono text-[12px] font-bold tabular-nums text-gt-ink-800">
+          <span className="font-gt-mono text-[0.5625rem] uppercase tracking-[.12em] text-gt-ink-400">{t("zonas.ocupacion")}</span>
+          <span className="font-gt-mono text-[0.75rem] font-bold tabular-nums text-gt-ink-800">
             {occupied}/{total} · {pct}%
           </span>
         </div>
-        <div className="h-[7px] overflow-hidden rounded-[4px] bg-gt-paper-3">
+        <div className="h-[0.4375rem] overflow-hidden rounded-[4px] bg-gt-paper-3">
           <div
             className={`h-full ${kind ? TONES[kind.tone].solidBg : TONES.urbanismo.solidBg}`}
             style={{ width: `${pct}%` }}
@@ -79,30 +79,30 @@ export function ZonaPanel({
         </div>
       </div>
 
-      <div className="mb-2 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+      <div className="mb-2 font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
         {t("mapa.parcelasDeZona")}
       </div>
       {members.length === 0 ? (
-        <div className="text-[12.5px] italic text-gt-ink-400">{t("mapa.sinParcelasResueltas")}</div>
+        <div className="text-[0.78125rem] italic text-gt-ink-400">{t("mapa.sinParcelasResueltas")}</div>
       ) : (
-        <div className="grid gap-[7px]">
+        <div className="grid gap-[0.4375rem]">
           {members.map((p) => (
             <button
               key={p.regionId}
               type="button"
               onClick={() => onSelectPlot(p)}
-              className="flex w-full items-center gap-[10px] rounded-gt border border-gt-line bg-gt-paper-0 px-[11px] py-[9px] text-left shadow-gt-sm transition-colors hover:bg-gt-paper-1"
+              className="flex w-full items-center gap-[0.625rem] rounded-gt border border-gt-line bg-gt-paper-0 px-[0.6875rem] py-[0.5625rem] text-left shadow-gt-sm transition-colors hover:bg-gt-paper-1"
             >
-              <span className="flex-none font-gt-display text-[15px] font-bold text-gt-ink-900">#{p.number}</span>
+              <span className="flex-none font-gt-display text-[0.9375rem] font-bold text-gt-ink-900">#{p.number}</span>
               {p.owner ? (
                 <>
                   <Avatar user={p.owner.username} size={24} />
-                  <span className="min-w-0 flex-1 truncate text-[13px] font-semibold text-gt-ink-800">
+                  <span className="min-w-0 flex-1 truncate text-[0.8125rem] font-semibold text-gt-ink-800">
                     {p.owner.username}
                   </span>
                 </>
               ) : (
-                <span className="flex-1 text-[12.5px] italic text-gt-ink-400">{t("urbanismo.vacante")}</span>
+                <span className="flex-1 text-[0.78125rem] italic text-gt-ink-400">{t("urbanismo.vacante")}</span>
               )}
               <Badge tone={PARCELA_STATUS[p.status]?.tone ?? "default"}>
                 {PARCELA_STATUS[p.status] ? t(PARCELA_STATUS[p.status].labelKey) : p.status}

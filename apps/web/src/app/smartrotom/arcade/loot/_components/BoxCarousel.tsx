@@ -40,14 +40,14 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
   const neighbours = boxes.length > 1 ? [-1, 0, 1] : [0]
 
   return (
-    <div className="relative flex min-h-[340px] items-center justify-center rounded-[14px] border border-dashed border-white/[.08] bg-[radial-gradient(60%_60%_at_50%_50%,rgb(var(--ar-violet)/.15),transparent_70%)] px-[60px] pb-6 pt-[30px]">
+    <div className="relative flex min-h-[21.25rem] items-center justify-center rounded-[14px] border border-dashed border-white/[.08] bg-[radial-gradient(60%_60%_at_50%_50%,rgb(var(--ar-violet)/.15),transparent_70%)] px-[3.75rem] pb-6 pt-[1.875rem]">
       {boxes.length > 1 && (
         <>
           <button
             type="button"
             onClick={() => step(-1)}
             aria-label={t("loot.selectBox")}
-            className="ar-lift absolute left-3.5 top-1/2 z-[2] grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full border border-ar-cyan/40 bg-black/50 text-ar-cyan"
+            className="ar-lift absolute left-3.5 top-1/2 z-[2] grid h-[2.375rem] w-[2.375rem] -translate-y-1/2 place-items-center rounded-full border border-ar-cyan/40 bg-black/50 text-ar-cyan"
           >
             <Icon.Chevron s={18} dir="left" />
           </button>
@@ -55,7 +55,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
             type="button"
             onClick={() => step(1)}
             aria-label={t("loot.selectBox")}
-            className="ar-lift absolute right-3.5 top-1/2 z-[2] grid h-[38px] w-[38px] -translate-y-1/2 place-items-center rounded-full border border-ar-cyan/40 bg-black/50 text-ar-cyan"
+            className="ar-lift absolute right-3.5 top-1/2 z-[2] grid h-[2.375rem] w-[2.375rem] -translate-y-1/2 place-items-center rounded-full border border-ar-cyan/40 bg-black/50 text-ar-cyan"
           >
             <Icon.Chevron s={18} />
           </button>
@@ -85,7 +85,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
               <div
                 className={cn(
                   "relative mx-auto grid place-items-center",
-                  center ? "h-[180px] w-[180px]" : "h-[120px] w-[120px]",
+                  center ? "h-[11.25rem] w-[11.25rem]" : "h-[7.5rem] w-[7.5rem]",
                   GLOW[tone],
                 )}
               >
@@ -102,15 +102,15 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
 
               {center && (
                 <div className="mt-3.5 text-center">
-                  <div className="ar-chrom font-ar-display text-[15px] leading-relaxed text-ar-ink">
+                  <div className="ar-chrom font-ar-display text-[0.9375rem] leading-relaxed text-ar-ink">
                     {box.name}
                   </div>
-                  <p className="mx-auto mt-2 max-w-[320px] font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
+                  <p className="mx-auto mt-2 max-w-[20rem] font-ar-mono text-[0.6875rem] leading-relaxed text-ar-ink-dim">
                     {box.description}
                   </p>
                   <span
                     className={cn(
-                      "mt-2.5 inline-flex items-center gap-1.5 rounded-[5px] border px-[9px] py-1 font-ar-mono text-[11px] font-bold uppercase tracking-[0.08em]",
+                      "mt-2.5 inline-flex items-center gap-1.5 rounded-[5px] border px-[0.5625rem] py-1 font-ar-mono text-[0.6875rem] font-bold uppercase tracking-[0.08em]",
                       count > 0 ? BADGE[tone] : BADGE.ghost,
                     )}
                   >
@@ -134,7 +134,7 @@ export function BoxCarousel({ boxes, index, onIndex, owned }: BoxCarouselProps) 
               className={cn(
                 "h-2 rounded-sm transition-all duration-200",
                 i === index
-                  ? "w-[22px] bg-ar-cyan shadow-[0_0_10px_rgb(var(--ar-cyan))]"
+                  ? "w-[1.375rem] bg-ar-cyan shadow-[0_0_10px_rgb(var(--ar-cyan))]"
                   : "w-2 bg-white/20",
               )}
             />

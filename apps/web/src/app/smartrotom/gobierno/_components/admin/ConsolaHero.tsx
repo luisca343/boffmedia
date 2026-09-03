@@ -38,7 +38,7 @@ export function ConsolaHero({
   const pad = (n: number) => String(n).padStart(2, "0")
 
   return (
-    <Card dep={dep} className="mb-4 px-[18px] py-[13px]">
+    <Card dep={dep} className="mb-4 px-[1.125rem] py-[0.8125rem]">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex min-w-0 items-center gap-3">
           <div
@@ -48,7 +48,7 @@ export function ConsolaHero({
           </div>
           <div className="min-w-0">
             <div className="font-gt-display text-base font-bold tracking-[.01em] text-gt-ink-900">{title}</div>
-            <div className="mt-[3px] font-gt-mono text-[9px] uppercase tracking-[.14em] text-gt-ink-400">
+            <div className="mt-[3px] font-gt-mono text-[0.5625rem] uppercase tracking-[.14em] text-gt-ink-400">
               {t("chrome.servicioInterno", { code })}
             </div>
           </div>
@@ -66,7 +66,7 @@ export function ConsolaHero({
             )}
           </div>
           {status && (
-            <span className={`flex items-center gap-1.5 font-gt-mono text-[10px] font-bold tracking-[.1em] ${st.text}`}>
+            <span className={`flex items-center gap-1.5 font-gt-mono text-[0.625rem] font-bold tracking-[.1em] ${st.text}`}>
               <span className={`h-2 w-2 rounded-full ${st.dot}`} />
               {status}
             </span>

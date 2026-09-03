@@ -28,14 +28,14 @@ export function ReactionSummary({ reactions }: { reactions: ReactionCounts }) {
           <span
             key={r.type}
             title={`${t(`reactions.${r.type}`)} · ${fmt(reactions[r.type])}`}
-            className="grid h-[22px] w-[22px] place-items-center rounded-full border-2 border-rk-bg bg-rk-card first:ml-0 [&:not(:first-child)]:-ml-[5px]"
+            className="grid h-[1.375rem] w-[1.375rem] place-items-center rounded-full border-2 border-rk-bg bg-rk-card first:ml-0 [&:not(:first-child)]:-ml-[0.3125rem]"
             style={{ zIndex: 10 - i }}
           >
             <ReactionGlyph type={r.type} size={13} active />
           </span>
         ))}
       </div>
-      <span className="text-[13px] font-semibold text-rk-fg-subtle">{fmt(totalReactions(reactions))}</span>
+      <span className="text-[0.8125rem] font-semibold text-rk-fg-subtle">{fmt(totalReactions(reactions))}</span>
     </div>
   )
 }

@@ -32,11 +32,11 @@ export function UpNext({
 
   return (
     <section className="ft-cover-ink py-14">
-      <div className="mx-auto max-w-[1400px] px-6">
+      <div className="mx-auto max-w-[87.5rem] px-6">
         <div className="mb-6 flex items-end justify-between gap-4 border-b-2 border-dashed border-white/30 pb-3">
           <div>
             <Eyebrow className="text-ft-yellow">{t("eyebrow")}</Eyebrow>
-            <h2 className="font-ft-display mt-1 text-[clamp(36px,5vw,56px)] leading-none text-ft-yellow">
+            <h2 className="font-ft-display mt-1 text-[clamp(2.25rem,5vw,3.5rem)] leading-none text-ft-yellow">
               {t("title")}
             </h2>
           </div>

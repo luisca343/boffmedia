@@ -68,7 +68,7 @@ export function ToastStack() {
       role="region"
       aria-label={tr("notifications")}
       aria-live="polite"
-      className="fixed right-[22px] bottom-[22px] z-[900] flex flex-col gap-[10px] max-w-[min(380px,calc(100vw_-_44px))] pointer-events-none"
+      className="fixed right-[1.375rem] bottom-[1.375rem] z-[900] flex flex-col gap-[0.625rem] max-w-[min(23.75rem,calc(100vw_-_2.75rem))] pointer-events-none"
     >
       {items.map((t) => {
         const tone = t.tone || "info"
@@ -78,7 +78,7 @@ export function ToastStack() {
             role="status"
             style={{ ["--tc" as string]: TONE_VAR[tone], boxShadow: "0 18px 44px -20px rgba(0,0,0,0.7)" }}
             className={cn(
-              "pointer-events-auto flex items-start gap-[11px] py-[13px] px-[14px] bg-panel border border-solid border-line-2 border-l-[3px] border-l-[var(--tc)]",
+              "pointer-events-auto flex items-start gap-[0.6875rem] py-[0.8125rem] px-[0.875rem] bg-panel border border-solid border-line-2 border-l-[3px] border-l-[var(--tc)]",
               "cut-tag cut-tag-edge [--cut-tag:9px] [--cut-line:var(--line-2)]",
               "animate-[bm-toast-in_0.22s_cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:animate-none",
             )}
@@ -87,8 +87,8 @@ export function ToastStack() {
               <Icon name={t.icon || TONE_ICON[tone]} size={16} />
             </span>
             <div className="flex-1 flex flex-col gap-[3px] min-w-0">
-              {t.title && <b className="font-display text-[13px] font-bold leading-[1.2] tracking-[0.02em] text-txt">{t.title}</b>}
-              {t.msg && <span className="font-body text-[13px] leading-[1.45] text-txt-muted">{t.msg}</span>}
+              {t.title && <b className="font-display text-[0.8125rem] font-bold leading-[1.2] tracking-[0.02em] text-txt">{t.title}</b>}
+              {t.msg && <span className="font-body text-[0.8125rem] leading-[1.45] text-txt-muted">{t.msg}</span>}
             </div>
             {t.action && (
               <button
@@ -97,7 +97,7 @@ export function ToastStack() {
                   t.action?.onClick?.()
                   remove(t.id)
                 }}
-                className="flex-none self-start mt-px p-0 border-0 bg-transparent font-mono text-[11px] font-bold leading-none uppercase tracking-[0.08em] text-accent cursor-pointer hover:text-accent-bright"
+                className="flex-none self-start mt-px p-0 border-0 bg-transparent font-mono text-[0.6875rem] font-bold leading-none uppercase tracking-[0.08em] text-accent cursor-pointer hover:text-accent-bright"
               >
                 {t.action.label}
               </button>
@@ -106,7 +106,7 @@ export function ToastStack() {
               type="button"
               aria-label={tr("dismiss")}
               onClick={() => remove(t.id)}
-              className="flex-none grid place-items-center w-[22px] h-[22px] -mt-[3px] -mr-1 p-0 border-0 bg-transparent text-txt-dim cursor-pointer hover:text-txt transition-colors"
+              className="flex-none grid place-items-center w-[1.375rem] h-[1.375rem] -mt-[3px] -mr-1 p-0 border-0 bg-transparent text-txt-dim cursor-pointer hover:text-txt transition-colors"
             >
               <Icon name="x" size={13} />
             </button>

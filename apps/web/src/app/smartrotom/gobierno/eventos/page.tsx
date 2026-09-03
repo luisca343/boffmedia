@@ -45,7 +45,7 @@ export default function EventosPage() {
       {isLoading ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 3 }, (_, i) => (
-            <Skeleton key={i} className="h-[280px] w-full" />
+            <Skeleton key={i} className="h-[17.5rem] w-full" />
           ))}
         </div>
       ) : all.length === 0 ? (

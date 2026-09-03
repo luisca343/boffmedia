@@ -21,8 +21,8 @@ export function EmptyState({ icon = "feather", title, body, action }: EmptyState
       <span className="grid h-14 w-14 place-items-center rounded-full bg-rk-accent/12 text-rk-accent">
         <Icon name={icon} size={26} />
       </span>
-      <h3 className="text-[19px] font-extrabold text-rk-fg">{title}</h3>
-      {body && <p className="max-w-[380px] text-[14px] leading-relaxed text-rk-fg-subtle">{body}</p>}
+      <h3 className="text-[1.1875rem] font-extrabold text-rk-fg">{title}</h3>
+      {body && <p className="max-w-[23.75rem] text-[0.875rem] leading-relaxed text-rk-fg-subtle">{body}</p>}
       {action && <div className="mt-1">{action}</div>}
     </div>
   )

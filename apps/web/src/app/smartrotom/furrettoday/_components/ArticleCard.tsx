@@ -14,7 +14,7 @@ export function ArticleCard({ article }: { article: FtArticle }) {
   const t = useTranslations("furrettoday.articleCard");
   return (
     <Card lift className="relative flex h-full flex-col overflow-hidden">
-      <div className="border-ft relative h-[180px] shrink-0 border-x-0 border-t-0 border-b-ft-ink">
+      <div className="border-ft relative h-[11.25rem] shrink-0 border-x-0 border-t-0 border-b-ft-ink">
         <HeroArt
           accent={article.accent}
           src={article.imageUrl}
@@ -28,7 +28,7 @@ export function ArticleCard({ article }: { article: FtArticle }) {
       </div>
 
       <div className="flex flex-grow flex-col gap-2.5 p-5">
-        <h3 className="font-ft-display text-[26px] leading-none tracking-[0.02em]">
+        <h3 className="font-ft-display text-[1.625rem] leading-none tracking-[0.02em]">
           <Link
             href={articleHref(article.id)}
             // Stretched link: the whole card is the hit target, but the accessible

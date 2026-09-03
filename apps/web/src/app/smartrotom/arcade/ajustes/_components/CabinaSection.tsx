@@ -23,7 +23,7 @@ export function CabinaSection() {
   return (
     <>
       <Panel tone="void">
-        <div className="mb-2.5 font-ar-display text-[9px] uppercase leading-relaxed tracking-[0.12em] text-ar-cyan">
+        <div className="mb-2.5 font-ar-display text-[0.5625rem] uppercase leading-relaxed tracking-[0.12em] text-ar-cyan">
           {t("ajustes.cabina.audioMotion")}
         </div>
 
@@ -52,7 +52,7 @@ export function CabinaSection() {
       </Panel>
 
       <Panel tone="void">
-        <div className="mb-2.5 font-ar-display text-[9px] uppercase leading-relaxed tracking-[0.12em] text-ar-magenta-2">
+        <div className="mb-2.5 font-ar-display text-[0.5625rem] uppercase leading-relaxed tracking-[0.12em] text-ar-magenta-2">
           {t("ajustes.cabina.visual")}
         </div>
 
@@ -68,7 +68,7 @@ export function CabinaSection() {
           />
         </SettingsRow>
 
-        <p className="mt-3.5 font-ar-mono text-[10px] leading-relaxed text-ar-ink-muted">
+        <p className="mt-3.5 font-ar-mono text-[0.625rem] leading-relaxed text-ar-ink-muted">
           {t("ajustes.cabina.localNotice")}
         </p>
       </Panel>

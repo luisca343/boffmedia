@@ -62,7 +62,7 @@ export function Sidebar({ collapsed = false, className }: { collapsed?: boolean;
     <aside
       className={cn(
         "flex min-h-0 flex-col border-r bg-[color-mix(in_srgb,rgb(var(--mw-accent))_12%,rgb(var(--mw-bg)))] border-[color-mix(in_srgb,rgb(var(--mw-accent))_30%,var(--mw-hairline))] transition-[width] duration-200",
-        collapsed ? "w-[76px]" : "w-64",
+        collapsed ? "w-[4.75rem]" : "w-64",
         className,
       )}
     >
@@ -79,7 +79,7 @@ export function Sidebar({ collapsed = false, className }: { collapsed?: boolean;
 
         <div className="flex flex-col gap-0.5">
           {!collapsed && (
-            <div className="px-3 pb-2 pt-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[color-mix(in_srgb,rgb(var(--mw-accent))_60%,rgb(var(--mw-fg-faint)))]">
+            <div className="px-3 pb-2 pt-1.5 font-mono text-[0.625rem] font-bold uppercase tracking-[0.14em] text-[color-mix(in_srgb,rgb(var(--mw-accent))_60%,rgb(var(--mw-fg-faint)))]">
               {t("you")}
             </div>
           )}
@@ -90,7 +90,7 @@ export function Sidebar({ collapsed = false, className }: { collapsed?: boolean;
       </div>
 
       {!collapsed && (
-        <div className="flex flex-col gap-1.5 border-t border-mw-line px-4 py-3.5 text-[11px] text-mw-fg-faint">
+        <div className="flex flex-col gap-1.5 border-t border-mw-line px-4 py-3.5 text-[0.6875rem] text-mw-fg-faint">
           <div className="flex items-center justify-between text-mw-fg-mute">
             <span>{t("partOf")}</span>
             <strong className="font-mw-display text-xs font-bold tracking-[0.02em] text-mw-fg">SmartRotom</strong>

@@ -98,10 +98,10 @@ export function DiffPanel() {
       <div className="flex-1 grid place-items-center p-6">
         <div className="text-center text-txt-dim flex flex-col items-center gap-2.5 max-w-[36ch]">
           <Icon name="layers" size={34} className="text-txt-dim opacity-70" />
-          <h3 className="font-display font-extrabold uppercase tracking-[0.02em] text-[22px] text-txt-muted">
+          <h3 className="font-display font-extrabold uppercase tracking-[0.02em] text-[1.375rem] text-txt-muted">
             {t("diff.emptyTitle")}
           </h3>
-          <p className="text-[13px]">{isAnalyzing ? t("diff.analyzing") : t("diff.emptyPrompt")}</p>
+          <p className="text-[0.8125rem]">{isAnalyzing ? t("diff.analyzing") : t("diff.emptyPrompt")}</p>
         </div>
       </div>
     );
@@ -118,7 +118,7 @@ export function DiffPanel() {
   return (
     <div className="flex h-full flex-col">
       {/* diff bar */}
-      <div className="shrink-0 sticky top-0 z-[5] flex flex-col gap-[11px] py-[13px] px-4 border-b border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[8px]">
+      <div className="shrink-0 sticky top-0 z-[5] flex flex-col gap-[0.6875rem] py-[0.8125rem] px-4 border-b border-line bg-[color-mix(in_srgb,var(--bg)_88%,transparent)] backdrop-blur-[8px]">
         <FilterChips chips={chips} active={filter} onToggle={(k) => setFilter(filter === k ? null : k)} />
         <div className="flex items-center gap-2">
           <div className="flex-1 flex items-center gap-2 px-2.5 h-8 bg-panel border border-solid border-line text-txt-dim focus-within:border-accent-line focus-within:text-txt-muted">
@@ -128,7 +128,7 @@ export function DiffPanel() {
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t("diff.searchPlaceholder")}
               aria-label={t("diff.searchPlaceholder")}
-              className="flex-1 min-w-0 font-mono text-[12px] text-txt bg-transparent border-0 outline-none placeholder:text-txt-dim"
+              className="flex-1 min-w-0 font-mono text-[0.75rem] text-txt bg-transparent border-0 outline-none placeholder:text-txt-dim"
             />
           </div>
           <button
@@ -136,7 +136,7 @@ export function DiffPanel() {
             onClick={() => setShowSafe(!showSafe)}
             disabled={filter !== null}
             className={
-              "shrink-0 h-8 px-[11px] border border-solid font-mono text-[11px] cursor-pointer whitespace-nowrap transition-[color,border-color,background] duration-[140ms] disabled:opacity-40 disabled:cursor-default " +
+              "shrink-0 h-8 px-[0.6875rem] border border-solid font-mono text-[0.6875rem] cursor-pointer whitespace-nowrap transition-[color,border-color,background] duration-[140ms] disabled:opacity-40 disabled:cursor-default " +
               (showSafe
                 ? "text-accent-bright border-accent-line bg-accent-soft"
                 : "border-line bg-panel text-txt-muted enabled:hover:text-txt enabled:hover:border-line-2")
@@ -147,7 +147,7 @@ export function DiffPanel() {
           {unresolved > 0 ? (
             <Button variant="ghost" size="sm" icon="layers" onClick={() => setSheet(true)} className="shrink-0">
               {t("diff.bulkRules")}
-              <span className="grid place-items-center min-w-[18px] h-4 px-1 bg-accent text-accent-ink font-mono text-[10px] font-semibold">
+              <span className="grid place-items-center min-w-[1.125rem] h-4 px-1 bg-accent text-accent-ink font-mono text-[0.625rem] font-semibold">
                 {unresolved}
               </span>
             </Button>
@@ -166,7 +166,7 @@ export function DiffPanel() {
       <div ref={listRef} className="flex-1 min-h-0 overflow-y-auto [scrollbar-gutter:stable] py-3.5 px-4 flex flex-col gap-4">
         <StructuresSection />
         {groups.length === 0 ? (
-          <div className="text-center text-[13px] text-txt-dim py-[30px]">{t("diff.noMatching")}</div>
+          <div className="text-center text-[0.8125rem] text-txt-dim py-[1.875rem]">{t("diff.noMatching")}</div>
         ) : (
           groups.map((group) => (
             <GroupGrid
@@ -252,10 +252,10 @@ function GroupGrid({
   const visible = group.entries.slice(start, end);
 
   return (
-    <section className="flex flex-col gap-[7px]">
-      <div className="flex items-center gap-2 font-mono text-[10.5px] tracking-[0.12em] uppercase text-txt-muted">
+    <section className="flex flex-col gap-[0.4375rem]">
+      <div className="flex items-center gap-2 font-mono text-[0.65625rem] tracking-[0.12em] uppercase text-txt-muted">
         {t(STATUS_KEY[group.status])}
-        <span className="grid place-items-center min-w-[18px] h-4 px-1 bg-panel-2 text-txt-dim font-semibold">
+        <span className="grid place-items-center min-w-[1.125rem] h-4 px-1 bg-panel-2 text-txt-dim font-semibold">
           {group.entries.length}
         </span>
       </div>
@@ -271,7 +271,7 @@ function GroupGrid({
       <div
         ref={gridRef}
         style={{ paddingTop: topPad, paddingBottom: bottomPad, height: reservedHeight }}
-        className="grid grid-cols-[repeat(auto-fill,minmax(260px,1fr))] content-start gap-[0.5rem]"
+        className="grid grid-cols-[repeat(auto-fill,minmax(16.25rem,1fr))] content-start gap-[0.5rem]"
       >
         {visible.map((entry) => {
           const sch = toSchEntry(entry);

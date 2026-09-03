@@ -44,7 +44,7 @@ export function OfferModal({ listing: L, onClose }: { listing: WpListing; onClos
         {mon && <MonRow mon={mon} />}
 
         <div className="mb-2 mt-5 text-center">
-          <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+          <div className="font-wp text-[0.6875rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
             {t("modal.offer.yourOffer")}
           </div>
           <Price amount={amount} size={34} />
@@ -59,7 +59,7 @@ export function OfferModal({ listing: L, onClose }: { listing: WpListing; onClos
           onChange={(e) => setAmount(Number(e.target.value))}
         />
 
-        <div className="mt-1 flex justify-between font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+        <div className="mt-1 flex justify-between font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
           <span className="wp-num">₽{fmt(floor)}</span>
           <span className={cn("font-bold", verdict.tone)}>
             {verdict.label} · {t("modal.offer.pctOfValuation", { pct })}
@@ -81,7 +81,7 @@ export function OfferModal({ listing: L, onClose }: { listing: WpListing; onClos
 
         <Button
           variant="primary"
-          className="mt-4 w-full py-[13px]"
+          className="mt-4 w-full py-[0.8125rem]"
           disabled={createOffer.isPending}
           onClick={() =>
             createOffer.mutate({ listingId: L.id, amount }, { onSuccess: onClose })
@@ -93,7 +93,7 @@ export function OfferModal({ listing: L, onClose }: { listing: WpListing; onClos
 
         {/* Nothing is charged now. The seller has to accept, and accepting is what
             creates the order — at which point the escrow is taken. */}
-        <p className="mt-3 text-center font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+        <p className="mt-3 text-center font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
           {t("modal.offer.disclaimer", { seller: L.seller.username })}
         </p>
       </div>

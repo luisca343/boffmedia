@@ -49,7 +49,7 @@ export const OptionCard = React.forwardRef<HTMLButtonElement, OptionCardProps & 
         title={typeof secondary === "string" ? secondary : typeof label === "string" ? label : undefined}
         onClick={onClick}
         className={cn(
-          "group flex items-center gap-[10px] py-[10px] px-[11px] text-left cursor-pointer min-w-0",
+          "group flex items-center gap-[0.625rem] py-[0.625rem] px-[0.6875rem] text-left cursor-pointer min-w-0",
           "cut-frame [--cut-w:1px] [--cut:6px]",
           "transition-[color] duration-[140ms]",
           "before:transition-[background] before:duration-[140ms] after:transition-[background] after:duration-[140ms]",
@@ -75,10 +75,10 @@ export const OptionCard = React.forwardRef<HTMLButtonElement, OptionCardProps & 
         <span className="grid gap-[2px] min-w-0">
           {/* The label wraps rather than truncating — a grid row stretches to its
               tallest card anyway, and a clipped label is worse than a tall row. */}
-          <span className="font-display text-[13px] font-bold leading-[1.15] tracking-[0.02em] uppercase text-txt">
+          <span className="font-display text-[0.8125rem] font-bold leading-[1.15] tracking-[0.02em] uppercase text-txt">
             {label}
           </span>
-          {secondary && <span className="font-mono text-[10.5px] leading-[1.3] text-txt-dim truncate">{secondary}</span>}
+          {secondary && <span className="font-mono text-[0.65625rem] leading-[1.3] text-txt-dim truncate">{secondary}</span>}
         </span>
       </button>
     )

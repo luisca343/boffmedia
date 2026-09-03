@@ -401,7 +401,7 @@ export function KingdomMap() {
 
           {activeRegion && (
             <div
-              className={cn("absolute z-20 w-[280px]", selected ? "pointer-events-auto" : "pointer-events-none")}
+              className={cn("absolute z-20 w-[17.5rem]", selected ? "pointer-events-auto" : "pointer-events-none")}
               style={{
                 left: `calc(${(activeRegion.x / 1000) * 100}% + 18px)`,
                 top: `calc(${(activeRegion.y / 680) * 100}% - 40px)`,
@@ -412,20 +412,20 @@ export function KingdomMap() {
                 <div className="mb-1.5 flex items-center gap-2.5">
                   {activeNpc && <NpcPortrait skin={activeNpc.skin} size={36} />}
                   <div className="min-w-0 flex-1">
-                    <div className="font-ms-display text-[15px] leading-tight text-ms-ink-1">{activeRegion.name}</div>
+                    <div className="font-ms-display text-[0.9375rem] leading-tight text-ms-ink-1">{activeRegion.name}</div>
                   </div>
                 </div>
                 <div className="mb-1.5 flex flex-wrap items-center gap-1">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-ms-ink-3 bg-gradient-to-b from-ms-paper-2 to-ms-paper-3 px-2.5 py-1 font-ms-uppercase text-[9px] uppercase tracking-[.12em] text-ms-ink-2 shadow-[inset_0_1px_0_rgba(255,255,255,.35)]">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-ms-ink-3 bg-gradient-to-b from-ms-paper-2 to-ms-paper-3 px-2.5 py-1 font-ms-uppercase text-[0.5625rem] uppercase tracking-[.12em] text-ms-ink-2 shadow-[inset_0_1px_0_rgba(255,255,255,.35)]">
                     {activeQuests.length} misiones
                   </span>
                   {activeHasActive && (
-                    <span className="inline-flex items-center gap-1.5 rounded-full border border-ms-gold-4 bg-gradient-to-b from-ms-gold-2 to-ms-gold-3 px-2.5 py-1 font-ms-uppercase text-[9px] uppercase tracking-[.12em] text-[#1e120a] shadow-[inset_0_1px_0_rgba(255,255,255,.45)]">
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-ms-gold-4 bg-gradient-to-b from-ms-gold-2 to-ms-gold-3 px-2.5 py-1 font-ms-uppercase text-[0.5625rem] uppercase tracking-[.12em] text-[#1e120a] shadow-[inset_0_1px_0_rgba(255,255,255,.45)]">
                       {t("active")}
                     </span>
                   )}
                   {activeQuests.length > 0 && (
-                    <span className="ml-auto font-ms-uppercase text-[10px] tracking-[.1em] text-ms-gold-3">
+                    <span className="ml-auto font-ms-uppercase text-[0.625rem] tracking-[.1em] text-ms-gold-3">
                       {activeCompleted}/{activeQuests.length} ⚜
                     </span>
                   )}
@@ -435,14 +435,14 @@ export function KingdomMap() {
                     <button
                       key={q.id}
                       onClick={() => open(q)}
-                      className="flex items-center justify-between gap-1.5 rounded-sm border border-ms-ink-3/20 bg-ms-ink-1/5 px-2 py-1.5 text-left font-ms text-[11px] italic text-ms-ink-2 transition-colors hover:bg-ms-ink-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ms-gold-2"
+                      className="flex items-center justify-between gap-1.5 rounded-sm border border-ms-ink-3/20 bg-ms-ink-1/5 px-2 py-1.5 text-left font-ms text-[0.6875rem] italic text-ms-ink-2 transition-colors hover:bg-ms-ink-1/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ms-gold-2"
                     >
                       <span className="min-w-0 flex-1 overflow-hidden text-ellipsis whitespace-nowrap">{q.name}</span>
                       <WaxSeal status={normalizeStatus(q)} size={18} tilt={-10} />
                     </button>
                   ))}
                   {activeQuests.length > 3 && (
-                    <div className="text-center font-ms text-[10px] italic text-ms-ink-3">{t("more", { count: activeQuests.length - 3 })}</div>
+                    <div className="text-center font-ms text-[0.625rem] italic text-ms-ink-3">{t("more", { count: activeQuests.length - 3 })}</div>
                   )}
                 </div>
               </Paper>

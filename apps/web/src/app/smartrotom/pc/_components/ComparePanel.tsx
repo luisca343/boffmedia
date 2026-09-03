@@ -32,7 +32,7 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
       tone="text-pc-violet"
       width={200 + mons.length * 200}
     >
-      <div className="flex justify-center border-b border-pc-line px-[18px] pb-1 pt-4">
+      <div className="flex justify-center border-b border-pc-line px-[1.125rem] pb-1 pt-4">
         <StatRadar mons={mons} />
       </div>
 
@@ -51,8 +51,8 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
                 palette={p.palette}
                 className="mx-auto h-24 w-24"
               />
-              <div className="truncate text-[13.5px] font-bold text-pc-fg">{displayName(p)}</div>
-              <div className="text-[11px] text-pc-fg-subtle">
+              <div className="truncate text-[0.84375rem] font-bold text-pc-fg">{displayName(p)}</div>
+              <div className="text-[0.6875rem] text-pc-fg-subtle">
                 {t("detail.level")} {p.level} · {p.nature}
               </div>
               <div className="mt-1.5 flex justify-center gap-1">
@@ -66,7 +66,7 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
 
         {STAT_KEYS.map((k) => (
           <Fragment key={k}>
-            <div className="flex items-center border-t border-pc-line px-3.5 py-[11px] text-xs text-pc-fg-muted">
+            <div className="flex items-center border-t border-pc-line px-3.5 py-[0.6875rem] text-xs text-pc-fg-muted">
               {STAT_LABELS[k]}
             </div>
             {mons.map((m) => {
@@ -75,10 +75,10 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
               return (
                 <div
                   key={locId(m.loc)}
-                  className="flex items-center gap-2 border-l border-t border-pc-line px-3.5 py-[11px]"
+                  className="flex items-center gap-2 border-l border-t border-pc-line px-3.5 py-[0.6875rem]"
                 >
                   <span
-                    className={`w-8 font-pc-mono text-[13px] font-extrabold ${isBest ? "text-pc-green" : "text-pc-fg"}`}
+                    className={`w-8 font-pc-mono text-[0.8125rem] font-extrabold ${isBest ? "text-pc-green" : "text-pc-fg"}`}
                   >
                     {v}
                   </span>
@@ -93,7 +93,7 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
           </Fragment>
         ))}
 
-        <div className="border-t border-pc-line px-3.5 py-[11px] text-xs font-bold text-pc-fg-muted">
+        <div className="border-t border-pc-line px-3.5 py-[0.6875rem] text-xs font-bold text-pc-fg-muted">
           {t("detail.stats")}
         </div>
         {mons.map((m) => {
@@ -102,7 +102,7 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
             <div
               key={locId(m.loc)}
               className={[
-                "border-l border-t border-pc-line px-3.5 py-[11px] font-pc-mono font-extrabold",
+                "border-l border-t border-pc-line px-3.5 py-[0.6875rem] font-pc-mono font-extrabold",
                 total === bestTotal ? "text-pc-green" : "text-pc-fg",
               ].join(" ")}
             >
@@ -111,11 +111,11 @@ export function ComparePanel({ mons, onClose }: ComparePanelProps) {
           )
         })}
 
-        <div className="border-t border-pc-line px-3.5 py-[11px] text-xs text-pc-fg-muted">{t("detail.stats")}</div>
+        <div className="border-t border-pc-line px-3.5 py-[0.6875rem] text-xs text-pc-fg-muted">{t("detail.stats")}</div>
         {mons.map((m) => (
           <div
             key={locId(m.loc)}
-            className="border-l border-t border-pc-line px-3.5 py-[11px] font-pc-mono font-bold text-pc-fg"
+            className="border-l border-t border-pc-line px-3.5 py-[0.6875rem] font-pc-mono font-bold text-pc-fg"
           >
             {ivPct(m.pokemon)}%
           </div>

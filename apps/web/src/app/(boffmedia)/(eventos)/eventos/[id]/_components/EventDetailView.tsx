@@ -101,37 +101,37 @@ export function EventDetailView({ id }: { id: number }) {
   }
 
   return (
-    <main className="wrap pb-[90px] pt-6">
+    <main className="wrap pb-[5.625rem] pt-6">
       <Link
         href="/eventos"
-        className="mb-5 inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
+        className="mb-5 inline-flex items-center gap-2 font-mono text-[0.6875rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
       >
         <Icon name="back" size={14} /> {t("detail.back")}
       </Link>
 
       <EventBanner event={event} className="mb-6" />
 
-      <div className="grid items-start gap-5 [grid-template-columns:1fr_340px] max-[980px]:grid-cols-1">
+      <div className="grid items-start gap-5 [grid-template-columns:1fr_21.25rem] max-[980px]:grid-cols-1">
         {/* main */}
         <div className="grid min-w-0 gap-5">
           <Panel title={t("detail.about")}>
-            <p className="font-body text-[15px]/[1.6] text-txt-muted text-pretty">{event.description || "—"}</p>
+            <p className="font-body text-[0.9375rem]/[1.6] text-txt-muted text-pretty">{event.description || "—"}</p>
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
-              <span className="inline-flex items-center gap-2 font-mono text-[12px]/none uppercase tracking-[0.06em] text-txt-muted">
+              <span className="inline-flex items-center gap-2 font-mono text-[0.75rem]/none uppercase tracking-[0.06em] text-txt-muted">
                 <Icon name="calendar" size={14} className="text-accent" />
                 {formatEventDate(event.startDate) || "—"}
                 {event.endDate ? ` — ${formatEventDate(event.endDate)}` : ""}
               </span>
-              <span className="inline-flex items-center gap-2 font-mono text-[12px]/none uppercase tracking-[0.06em] text-txt-muted">
+              <span className="inline-flex items-center gap-2 font-mono text-[0.75rem]/none uppercase tracking-[0.06em] text-txt-muted">
                 <Icon name="users" size={14} className="text-accent" />
                 <b className="font-semibold text-txt">{count}</b>
               </span>
             </div>
           </Panel>
 
-          <Panel title={t("detail.achievements")} aside={<span className="font-mono text-[11px] text-txt-dim">{ach.length}</span>}>
+          <Panel title={t("detail.achievements")} aside={<span className="font-mono text-[0.6875rem] text-txt-dim">{ach.length}</span>}>
             {ach.length === 0 ? (
-              <p className="font-body text-[14px] text-txt-dim">{t("detail.empty")}</p>
+              <p className="font-body text-[0.875rem] text-txt-dim">{t("detail.empty")}</p>
             ) : (
               <div className="grid gap-3">
                 {ach.map((a) => (
@@ -144,9 +144,9 @@ export function EventDetailView({ id }: { id: number }) {
 
         {/* aside */}
         <div className="grid gap-5 max-[980px]:grid-cols-2 max-[560px]:grid-cols-1">
-          <div className="border border-solid border-line border-t-[3px] border-t-accent bg-panel p-[22px] text-center cut-corner cut-corner-edge">
-            <div className="font-display text-[52px]/[0.9] font-extrabold italic text-txt">{count}</div>
-            <div className="mt-1.5 font-mono text-[10px]/none uppercase tracking-[0.16em] text-txt-muted">
+          <div className="border border-solid border-line border-t-[3px] border-t-accent bg-panel p-[1.375rem] text-center cut-corner cut-corner-edge">
+            <div className="font-display text-[3.25rem]/[0.9] font-extrabold italic text-txt">{count}</div>
+            <div className="mt-1.5 font-mono text-[0.625rem]/none uppercase tracking-[0.16em] text-txt-muted">
               {t("detail.participants")}
             </div>
             <div className="mt-5">
@@ -170,7 +170,7 @@ export function EventDetailView({ id }: { id: number }) {
               ) : memberStatus === "removed" ? (
                 // The API refuses both join and leave for a removed membership,
                 // so a button here can only produce errors.
-                <p className="font-body text-[13px] text-txt-dim">{t("detail.removedNotice")}</p>
+                <p className="font-body text-[0.8125rem] text-txt-dim">{t("detail.removedNotice")}</p>
               ) : (
                 <Button variant="pri" icon="plus" loading={joining} onClick={handleJoin} className="w-full">
                   {t("detail.participate")}
@@ -181,7 +181,7 @@ export function EventDetailView({ id }: { id: number }) {
 
           <Panel title={t("detail.leaderboard")} bodyClassName="p-0">
             {board.length === 0 ? (
-              <p className="p-5 font-body text-[13px] text-txt-dim">{t("detail.leaderEmpty")}</p>
+              <p className="p-5 font-body text-[0.8125rem] text-txt-dim">{t("detail.leaderEmpty")}</p>
             ) : (
               <div className="grid">
                 {board.slice(0, 10).map((p, i) => (
@@ -192,13 +192,13 @@ export function EventDetailView({ id }: { id: number }) {
                       i < 3 && "bg-[linear-gradient(90deg,var(--accent-soft),transparent_60%)]",
                     )}
                   >
-                    <span className={cn("w-6 flex-none font-display text-[18px]/none font-extrabold italic", i < 3 ? "text-accent" : "text-txt-muted")}>
+                    <span className={cn("w-6 flex-none font-display text-[1.125rem]/none font-extrabold italic", i < 3 ? "text-accent" : "text-txt-muted")}>
                       {i + 1}
                     </span>
-                    <span className="min-w-0 flex-1 truncate font-display text-[14px]/none font-bold uppercase text-txt">
+                    <span className="min-w-0 flex-1 truncate font-display text-[0.875rem]/none font-bold uppercase text-txt">
                       {(p as { nickname?: string }).nickname}
                     </span>
-                    <span className="flex-none font-mono text-[13px]/none font-semibold text-txt">
+                    <span className="flex-none font-mono text-[0.8125rem]/none font-semibold text-txt">
                       {(p as { totalPoints?: number }).totalPoints ?? 0}
                     </span>
                   </div>
@@ -248,8 +248,8 @@ function EventTournamentCard({ modules }: { modules?: EventModules }) {
       <div className="flex flex-wrap items-center gap-3 p-4">
         <Icon name="trophy" size={18} className="flex-none text-accent-bright" />
         <div className="flex-1">
-          <h2 className="font-body text-[15px] font-semibold text-txt">{tn.name}</h2>
-          <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+          <h2 className="font-body text-[0.9375rem] font-semibold text-txt">{tn.name}</h2>
+          <p className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
             {t(`tournamentStatus.${tn.status}`)}
           </p>
         </div>

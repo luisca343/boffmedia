@@ -15,8 +15,8 @@ export const SPOTLIGHT_VISIBLE_CAP = 60
 
 /** Grid geometry per stage size — shared so a preview matches the live draw. */
 export const SRT_SPOTLIGHT_GRID = {
-  default: "grid-cols-[repeat(auto-fill,minmax(112px,1fr))]",
-  large: "grid-cols-[repeat(auto-fill,minmax(140px,1fr))]",
+  default: "grid-cols-[repeat(auto-fill,minmax(7rem,1fr))]",
+  large: "grid-cols-[repeat(auto-fill,minmax(8.75rem,1fr))]",
 } as const
 
 export function SrtSpotlightCard({
@@ -39,7 +39,7 @@ export function SrtSpotlightCard({
           "scale-105 border-accent bg-accent-soft [box-shadow:0_0_30px_color-mix(in_srgb,var(--accent)_34%,transparent)]",
       )}
     >
-      <Avatar className="h-[28px] w-[28px] flex-none text-[10px]">{initials(name)}</Avatar>
+      <Avatar className="h-[1.75rem] w-[1.75rem] flex-none text-[0.625rem]">{initials(name)}</Avatar>
       <span
         className={cn(
           "min-w-0 truncate font-mono text-xs font-medium",
@@ -162,7 +162,7 @@ function SpotlightRun({
           className={cn(
             "grid gap-2 overflow-y-auto bm-scroll",
             SRT_SPOTLIGHT_GRID[size],
-            size === "large" ? "max-h-[70vh]" : "max-h-[460px]",
+            size === "large" ? "max-h-[70vh]" : "max-h-[28.75rem]",
           )}
         >
           {visibleCards.map((name, idx) => {

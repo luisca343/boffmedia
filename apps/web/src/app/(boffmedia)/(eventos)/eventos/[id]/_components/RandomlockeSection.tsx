@@ -74,7 +74,7 @@ export function RandomlockeSection({ eventId }: { eventId: number }) {
   if (loading) {
     return (
       <section className="mb-8">
-        <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-dim mb-4">
+        <h2 className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-txt-dim mb-4">
           {t("randomlockeTitle")}
         </h2>
         <div className="grid place-items-center py-8">
@@ -90,7 +90,7 @@ export function RandomlockeSection({ eventId }: { eventId: number }) {
 
   return (
     <section className="mb-8">
-      <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-dim mb-4">
+      <h2 className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-txt-dim mb-4">
         {t("randomlockeTitle")}
       </h2>
 
@@ -122,17 +122,17 @@ function RandomlockeConfig({
       {/* Header */}
       <div className="px-4 py-3 border-b border-line bg-panel-alt">
         <div className="flex items-center justify-between gap-3 mb-2">
-          <h3 className="font-mono text-[12px] font-semibold uppercase text-txt">
+          <h3 className="font-mono text-[0.75rem] font-semibold uppercase text-txt">
             {config.gameTitle} ({config.gamePlatform.toUpperCase()})
           </h3>
           <div className="flex items-center gap-3 shrink-0">
             {assignments.length > 0 && (
-              <span className="font-mono text-[10px] text-txt-dim">
+              <span className="font-mono text-[0.625rem] text-txt-dim">
                 {t("randomlockeParticipants", { count: assignments.length })}
               </span>
             )}
             <span
-              className={`inline-flex items-center gap-1.5 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] ${
+              className={`inline-flex items-center gap-1.5 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em] ${
                 isPublished ? "text-ok" : "text-accent-bright"
               }`}
             >
@@ -144,7 +144,7 @@ function RandomlockeConfig({
           </div>
         </div>
         {config.romHint && (
-          <p className="font-body text-[11px] text-txt-muted">{config.romHint}</p>
+          <p className="font-body text-[0.6875rem] text-txt-muted">{config.romHint}</p>
         )}
       </div>
 
@@ -168,7 +168,7 @@ function RandomlockeRunningView({
   if (assignments.length === 0) {
     return (
       <div className="px-4 py-6 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
           {t("randomlockeEmpty")}
         </p>
       </div>
@@ -177,13 +177,13 @@ function RandomlockeRunningView({
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full text-[12px]">
+      <table className="w-full text-[0.75rem]">
         <thead>
           <tr className="border-b border-line">
-            <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[10px]">
+            <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[0.625rem]">
               {t("randomlockeParticipant")}
             </th>
-            <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[10px]">
+            <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[0.625rem]">
               {t("randomlockeStatus")}
             </th>
           </tr>
@@ -216,7 +216,7 @@ function RandomlockePublishedView({
   if (assignments.length === 0) {
     return (
       <div className="px-4 py-6 text-center">
-        <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+        <p className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
           {t("randomlockeEmpty")}
         </p>
       </div>
@@ -245,19 +245,19 @@ function RandomlockePublishedView({
   return (
     <div>
       <div className="overflow-x-auto">
-        <table className="w-full text-[12px]">
+        <table className="w-full text-[0.75rem]">
           <thead>
             <tr className="border-b border-line">
-              <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[10px]">
+              <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[0.625rem]">
                 {t("randomlockeParticipant")}
               </th>
-              <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[10px]">
+              <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[0.625rem]">
                 {t("randomlockeSeed")}
               </th>
-              <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[10px]">
+              <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[0.625rem]">
                 {t("randomlockeOutput")}
               </th>
-              <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[10px]">
+              <th className="px-4 py-2 text-left font-mono font-semibold uppercase text-txt-dim text-[0.625rem]">
                 {t("randomlockeLog")}
               </th>
             </tr>
@@ -273,7 +273,7 @@ function RandomlockePublishedView({
                     <span className="text-txt-dim">—</span>
                   )}
                 </td>
-                <td className="px-4 py-2 font-mono text-txt-muted text-[11px]">
+                <td className="px-4 py-2 font-mono text-txt-muted text-[0.6875rem]">
                   {a.outputSha512 ? (
                     <CopyableText
                       text={a.outputSha512.substring(0, 16)}
@@ -295,15 +295,15 @@ function RandomlockePublishedView({
       {/* Verification section */}
       <div className="px-4 py-4 border-t border-line bg-panel-alt">
         <details className="group">
-          <summary className="cursor-pointer font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-txt-muted flex items-center gap-2">
+          <summary className="cursor-pointer font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-txt-muted flex items-center gap-2">
             <span className="transition-transform group-open:rotate-90">›</span>
             {t("randomlockeVerifyTitle")}
           </summary>
 
-          <div className="mt-3 space-y-2 font-body text-[12px] text-txt-muted">
+          <div className="mt-3 space-y-2 font-body text-[0.75rem] text-txt-muted">
             <p>{t("randomlockeVerifyHint")}</p>
 
-            <div className="bg-panel p-3 rounded border border-line-2 font-mono text-[11px] overflow-x-auto">
+            <div className="bg-panel p-3 rounded border border-line-2 font-mono text-[0.6875rem] overflow-x-auto">
               <span className="block mb-1 text-txt-dim">{t("randomlockeVerifyCommand")}</span>
               <code className="text-ok whitespace-nowrap block">
                 java --enable-preview -Xmx4096m -jar fvx.jar cli -i clean.rom -o out.rom -s
@@ -354,7 +354,7 @@ function StatusBadge({
 
   return (
     <span
-      className={`inline-block px-2 py-1 rounded font-mono text-[10px] font-semibold uppercase tracking-[0.06em] ${colors[status]}`}
+      className={`inline-block px-2 py-1 rounded font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] ${colors[status]}`}
     >
       {labels[status]}
     </span>

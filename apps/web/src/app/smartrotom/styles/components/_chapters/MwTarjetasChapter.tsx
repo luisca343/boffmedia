@@ -37,7 +37,7 @@ function CategoryRow() {
 
 function ChatPanel() {
   return (
-    <div className="w-full max-w-[380px] rounded-mw-xl border border-mw-line bg-mw-900 p-3">
+    <div className="w-full max-w-[23.75rem] rounded-mw-xl border border-mw-line bg-mw-900 p-3">
       {MW_CHAT.map((m) => (
         <ChatMessage key={m.id} m={m} />
       ))}

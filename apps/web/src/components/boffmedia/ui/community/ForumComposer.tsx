@@ -61,7 +61,7 @@ export function ForumComposer({
     <div className="border border-solid border-line bg-panel p-4 cut-corner cut-corner-edge">
       {withTitle && (
         <div className="mb-3">
-          <label className="mb-1.5 block font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-muted">
+          <label className="mb-1.5 block font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-txt-muted">
             {t("title")}
           </label>
           <Input
@@ -83,7 +83,7 @@ export function ForumComposer({
           value={tab}
           onChange={(v) => setTab(v as "write" | "preview")}
         />
-        <span className="font-mono text-[11px] font-medium tabular-nums text-txt-dim">
+        <span className="font-mono text-[0.6875rem] font-medium tabular-nums text-txt-dim">
           {body.length}/{BODY_MAX}
         </span>
       </div>
@@ -95,14 +95,14 @@ export function ForumComposer({
           maxLength={BODY_MAX}
           placeholder={t("messagePlaceholder")}
           disabled={busy}
-          className="min-h-[160px] font-mono text-[13px]/[1.6]"
+          className="min-h-[10rem] font-mono text-[0.8125rem]/[1.6]"
         />
       ) : (
-        <div className="min-h-[160px] border border-solid border-line-2 bg-panel-2 p-4 cut-tag cut-tag-edge [--cut-line:var(--line-2)]">
+        <div className="min-h-[10rem] border border-solid border-line-2 bg-panel-2 p-4 cut-tag cut-tag-edge [--cut-line:var(--line-2)]">
           {bodyTrimmed ? (
             <ForumMarkdown>{body}</ForumMarkdown>
           ) : (
-            <p className="font-body text-[14px] italic text-txt-dim">{t("nothingToPreview")}</p>
+            <p className="font-body text-[0.875rem] italic text-txt-dim">{t("nothingToPreview")}</p>
           )}
         </div>
       )}
@@ -116,7 +116,7 @@ export function ForumComposer({
             {t("cancel")}
           </Button>
         )}
-        <span className="ml-auto font-mono text-[11px] font-medium uppercase tracking-[0.08em] text-txt-dim">
+        <span className="ml-auto font-mono text-[0.6875rem] font-medium uppercase tracking-[0.08em] text-txt-dim">
           {titleTooShort ? t("titleMinChars") : t("supportsMarkdown")}
         </span>
       </div>

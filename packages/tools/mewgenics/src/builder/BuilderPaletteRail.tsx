@@ -31,13 +31,13 @@ export function BuilderPaletteRail({
 
   return (
     <section className="flex min-h-0 flex-1 flex-col gap-2 border-2 border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-2)] p-2.5 [border-radius:var(--wob-sm)]">
-      <h2 className="m-0 flex items-baseline gap-1.5 text-[11px] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
+      <h2 className="m-0 flex items-baseline gap-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
         {t("builder.palette")}
-        <span className="font-mono text-[10px] opacity-70">#{selected}</span>
+        <span className="font-mono text-[0.625rem] opacity-70">#{selected}</span>
       </h2>
 
-      <div className="min-h-0 flex-1 overflow-y-auto max-xl:max-h-[92px]">
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(30px,1fr))] gap-1.5">
+      <div className="min-h-0 flex-1 overflow-y-auto max-xl:max-h-[5.75rem]">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(1.875rem,1fr))] gap-1.5">
           {Array.from({ length: shown }, (_, i) => (
             <PaletteSwatch
               key={i}
@@ -53,7 +53,7 @@ export function BuilderPaletteRail({
       <button
         type="button"
         onClick={onOpenAll}
-        className="flex-none border-2 border-dashed border-[color:var(--mwp-nline)] px-1.5 py-1.5 text-[10px] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)]"
+        className="flex-none border-2 border-dashed border-[color:var(--mwp-nline)] px-1.5 py-1.5 text-[0.625rem] font-bold uppercase leading-[1.15] tracking-[0.04em] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)]"
       >
         {t("builder.paletteAll", { n: total })}
       </button>

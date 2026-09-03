@@ -31,14 +31,14 @@ export function SrtSeedTag({ seed, copyLabel, copiedLabel, seedLabel }: SrtSeedT
   }
 
   return (
-    <span className="inline-flex items-center gap-[9px] border border-line-2 bg-panel-2 px-[11px] py-[7px] font-mono text-[11px] font-medium tracking-[0.04em] text-txt-muted">
+    <span className="inline-flex items-center gap-[0.5625rem] border border-line-2 bg-panel-2 px-[0.6875rem] py-[0.4375rem] font-mono text-[0.6875rem] font-medium tracking-[0.04em] text-txt-muted">
       <Icon name="lock" size={13} className="flex-none text-signal" />
       {seedLabel} <code className="font-semibold text-accent">#{seed}</code>
       <button
         type="button"
         onClick={copy}
         aria-label={copyLabel}
-        className="ml-1 inline-flex items-center gap-[5px] border-0 bg-transparent p-0 text-txt-dim transition-colors hover:text-accent"
+        className="ml-1 inline-flex items-center gap-[0.3125rem] border-0 bg-transparent p-0 text-txt-dim transition-colors hover:text-accent"
       >
         <Icon name={ok ? "check" : "copy"} size={12} />
         {ok ? copiedLabel : copyLabel}

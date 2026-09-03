@@ -194,7 +194,7 @@ export function CallStatus() {
       className={`fixed transition-all duration-300 ease-in-out ${
         isExpanded
           ? "inset-0 z-50 flex flex-col"
-          : "left-3 top-16 z-30 w-[320px] max-w-[calc(100vw-24px)] overflow-hidden rounded-[16px] border border-[#2a3942] bg-[#111b21] shadow-[0_24px_60px_-18px_rgba(0,0,0,.55)]"
+          : "left-3 top-16 z-30 w-[20rem] max-w-[calc(100vw-24px)] overflow-hidden rounded-[16px] border border-[#2a3942] bg-[#111b21] shadow-[0_24px_60px_-18px_rgba(0,0,0,.55)]"
       } text-[#e9edef] ${activeCall.caller ? "" : "hidden"}`}
     >
       <audio ref={audioRef} src={staticAsset(ASSET.smartrotom.audio, 'apps/chatapp/denden.mp3')} preload="auto"></audio>

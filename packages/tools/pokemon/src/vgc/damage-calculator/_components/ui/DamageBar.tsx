@@ -6,12 +6,12 @@ export function DamageBar({ minPct = 0, maxPct = 0, tone = "dim" }: { minPct?: n
   const lo = Math.min(100, minPct)
   const hi = Math.min(100, maxPct)
   return (
-    <div className="w-full max-w-[240px]" role="img" aria-label={`${minPct.toFixed(1)}–${maxPct.toFixed(1)}%`}>
+    <div className="w-full max-w-[15rem]" role="img" aria-label={`${minPct.toFixed(1)}–${maxPct.toFixed(1)}%`}>
       <div className="relative h-2 overflow-hidden border border-solid border-line-2 bg-base">
         <span className="absolute inset-y-0 opacity-[0.35]" style={{ left: 0, width: hi + "%", background: c }} />
         <span className="absolute inset-y-0" style={{ left: lo + "%", width: Math.max(1.5, hi - lo) + "%", background: c }} />
       </div>
-      <div className="mt-1 flex justify-between font-mono text-[9px]/none text-txt-dim">
+      <div className="mt-1 flex justify-between font-mono text-[0.5625rem]/none text-txt-dim">
         <span>0%</span>
         <span>50%</span>
         <span>100%</span>

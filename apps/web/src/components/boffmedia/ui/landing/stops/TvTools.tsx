@@ -18,18 +18,18 @@ export function TvTools() {
       lead={t("lead")}
     >
       <div className=" border border-solid border-line backdrop-blur-[6px] [background:rgba(10,12,16,0.5)] cut-tag cut-tag-edge [--cut-tag:12px] [[data-theme=light]_&]:[background:rgba(255,255,255,0.55)]">
-        <div className="flex items-center gap-2.5 border-b border-solid border-line bg-base-deep px-3.5 py-[11px]" aria-hidden="true">
-          <span className="flex gap-[5px]">
-            <i className="h-[9px] w-[9px] rounded-full bg-line-2" />
-            <i className="h-[9px] w-[9px] rounded-full bg-line-2" />
-            <i className="h-[9px] w-[9px] rounded-full bg-line-2" />
+        <div className="flex items-center gap-2.5 border-b border-solid border-line bg-base-deep px-3.5 py-[0.6875rem]" aria-hidden="true">
+          <span className="flex gap-[0.3125rem]">
+            <i className="h-[0.5625rem] w-[0.5625rem] rounded-full bg-line-2" />
+            <i className="h-[0.5625rem] w-[0.5625rem] rounded-full bg-line-2" />
+            <i className="h-[0.5625rem] w-[0.5625rem] rounded-full bg-line-2" />
           </span>
-          <b className="font-mono text-[12px] font-semibold leading-none tracking-[0.05em] text-[#9aa3b2]">toolkit.boff</b>
-          <span className="ml-auto inline-flex items-center gap-[7px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-colors duration-[260ms] ease-linear">
+          <b className="font-mono text-[0.75rem] font-semibold leading-none tracking-[0.05em] text-[#9aa3b2]">toolkit.boff</b>
+          <span className="ml-auto inline-flex items-center gap-[0.4375rem] font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.1em] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-colors duration-[260ms] ease-linear">
             <i className="h-1.5 w-1.5 rounded-full bg-current animate-[lv4-blink_1.6s_infinite] motion-reduce:animate-none" />{t("modulesActive", { count: TV3_TOOLS.length })}
           </span>
         </div>
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-px bg-line max-[520px]:grid-cols-1">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-px bg-line max-[520px]:grid-cols-1">
           {TV3_TOOLS.map((tool) => (
             <Link
               href={tool.href}
@@ -37,21 +37,21 @@ export function TvTools() {
               data-glare
               data-tilt-fx
               className={cn(
-                "group/mod relative flex items-start gap-3.5 overflow-hidden bg-panel px-4 pb-[18px] pt-4 no-underline transition-[background] duration-[260ms] ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:bg-panel-2",
+                "group/mod relative flex items-start gap-3.5 overflow-hidden bg-panel px-4 pb-[1.125rem] pt-4 no-underline transition-[background] duration-[260ms] ease-[cubic-bezier(0.2,0.7,0.3,1)] hover:bg-panel-2",
                 GLARE,
               )}
             >
-              <span className="grid h-[42px] w-[42px] flex-none place-items-center border border-solid border-line-2 bg-[rgba(var(--zr),var(--zg),var(--zb),0.08)] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-[background,box-shadow] duration-[260ms] cut-tag cut-tag-edge [--cut-line:var(--line-2)] group-hover/mod:bg-[rgba(var(--zr),var(--zg),var(--zb),0.16)] group-hover/mod:shadow-[0_0_20px_rgba(var(--zr),var(--zg),var(--zb),0.3)]">
+              <span className="grid h-[2.625rem] w-[2.625rem] flex-none place-items-center border border-solid border-line-2 bg-[rgba(var(--zr),var(--zg),var(--zb),0.08)] text-[rgba(var(--zr),var(--zg),var(--zb),1)] transition-[background,box-shadow] duration-[260ms] cut-tag cut-tag-edge [--cut-line:var(--line-2)] group-hover/mod:bg-[rgba(var(--zr),var(--zg),var(--zb),0.16)] group-hover/mod:shadow-[0_0_20px_rgba(var(--zr),var(--zg),var(--zb),0.3)]">
                 <Icon name={tool.ic} size={20} />
               </span>
-              <span className="flex min-w-0 flex-col gap-[5px]">
+              <span className="flex min-w-0 flex-col gap-[0.3125rem]">
                 <span className="flex items-baseline gap-2">
-                  <i className="font-mono text-[11px] font-bold not-italic leading-none text-[rgba(var(--zr),var(--zg),var(--zb),1)]">
+                  <i className="font-mono text-[0.6875rem] font-bold not-italic leading-none text-[rgba(var(--zr),var(--zg),var(--zb),1)]">
                     {tool.ix}
                   </i>
-                  <b className="font-display text-[16px] font-bold uppercase leading-none tracking-[0.01em] text-txt">{tool.tk ? t(`${tool.tk}.n`) : tool.n}</b>
+                  <b className="font-display text-[1rem] font-bold uppercase leading-none tracking-[0.01em] text-txt">{tool.tk ? t(`${tool.tk}.n`) : tool.n}</b>
                 </span>
-                <small className="font-body text-[12px] font-normal leading-[1.4] text-txt-muted">{tool.tk ? t(`${tool.tk}.d`) : tool.d}</small>
+                <small className="font-body text-[0.75rem] font-normal leading-[1.4] text-txt-muted">{tool.tk ? t(`${tool.tk}.d`) : tool.d}</small>
               </span>
               <span className="absolute right-3.5 top-4 -translate-x-1 text-txt-muted opacity-0 transition-[opacity,transform,color] duration-[140ms] group-hover/mod:translate-x-0 group-hover/mod:opacity-100 group-hover/mod:text-[rgba(var(--zr),var(--zg),var(--zb),1)]">
                 <Icon name="arrow" size={15} />

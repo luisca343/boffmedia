@@ -65,8 +65,8 @@ export function DropZone({
       >
         <Icon name={loadedIcon} size={20} className="text-ok shrink-0" />
         <div className="min-w-0 flex-1">
-          <div className="font-mono text-[12.5px] text-txt font-semibold truncate">{file.name}</div>
-          <div className="font-mono text-[10.5px] text-txt-dim">
+          <div className="font-mono text-[0.78125rem] text-txt font-semibold truncate">{file.name}</div>
+          <div className="font-mono text-[0.65625rem] text-txt-dim">
             {file.size}
             {file.meta ? ` · ${file.meta}` : ""}
           </div>
@@ -100,9 +100,9 @@ export function DropZone({
       )}
     >
       <Icon name="upload" size={22} className={over ? "text-accent-bright" : "text-txt-dim"} />
-      <div className="text-[14px] font-semibold text-txt">{label}</div>
+      <div className="text-[0.875rem] font-semibold text-txt">{label}</div>
       {hint ? (
-        <div className="font-mono text-[10.5px] tracking-[0.04em] text-txt-dim">{hint}</div>
+        <div className="font-mono text-[0.65625rem] tracking-[0.04em] text-txt-dim">{hint}</div>
       ) : null}
     </div>
   )

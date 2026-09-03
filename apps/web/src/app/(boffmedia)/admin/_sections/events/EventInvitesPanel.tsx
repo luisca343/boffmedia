@@ -90,7 +90,7 @@ export function EventInvitesPanel({
           former hints live on `title` instead of pushing the button out of line. */}
       <div className="flex flex-wrap items-center gap-x-3 gap-y-2 border border-solid border-line bg-panel-2 cut-tag cut-tag-edge px-3 py-2 mb-3">
         <label className="flex items-center gap-2" title={t("maxUsesHint")}>
-          <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.08em] text-txt-muted whitespace-nowrap">
+          <span className="font-mono text-[0.59375rem] font-bold uppercase tracking-[0.08em] text-txt-muted whitespace-nowrap">
             {t("maxUsesLabel")}
           </span>
           <Input
@@ -98,19 +98,19 @@ export function EventInvitesPanel({
             min={1}
             value={maxUses}
             onChange={(e) => setMaxUses(e.target.value)}
-            className="w-[80px] py-[5px] px-[9px] text-[13px]"
+            className="w-[5rem] py-[0.3125rem] px-[0.5625rem] text-[0.8125rem]"
           />
         </label>
 
         <label className="flex items-center gap-2" title={t("expiresHint")}>
-          <span className="font-mono text-[9.5px] font-bold uppercase tracking-[0.08em] text-txt-muted whitespace-nowrap">
+          <span className="font-mono text-[0.59375rem] font-bold uppercase tracking-[0.08em] text-txt-muted whitespace-nowrap">
             {t("expiresLabel")}
           </span>
           <Input
             type="datetime-local"
             value={expiresAt}
             onChange={(e) => setExpiresAt(e.target.value)}
-            className="w-[200px] py-[5px] px-[9px] text-[13px]"
+            className="w-[12.5rem] py-[0.3125rem] px-[0.5625rem] text-[0.8125rem]"
           />
         </label>
 
@@ -137,11 +137,11 @@ export function EventInvitesPanel({
           {rows.map((i) => (
             <div key={i.code} className="flex items-center gap-2 px-3 py-1.5">
               <span
-                className={cn("w-[7px] h-[7px] shrink-0 rotate-45", isLive(i) ? "bg-ok" : "bg-txt-dim")}
+                className={cn("w-[0.4375rem] h-[0.4375rem] shrink-0 rotate-45", isLive(i) ? "bg-ok" : "bg-txt-dim")}
                 title={isLive(i) ? t("live") : t("spent")}
               />
               <code className="font-mono text-sm truncate">{i.code}</code>
-              <span className="font-mono text-[11px] text-txt-dim whitespace-nowrap">
+              <span className="font-mono text-[0.6875rem] text-txt-dim whitespace-nowrap">
                 {t("uses", { used: i.uses, max: i.maxUses })}
               </span>
 

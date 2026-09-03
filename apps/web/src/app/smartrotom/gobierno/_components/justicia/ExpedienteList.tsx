@@ -51,18 +51,18 @@ export function ExpedienteList({
             key={c.id}
             type="button"
             onClick={() => onSelect(c.id)}
-            className={`gt-spine w-full rounded-gt border p-[13px] text-left transition-shadow ${
+            className={`gt-spine w-full rounded-gt border p-[0.8125rem] text-left transition-shadow ${
               on ? "border-gt-dep-justicia shadow-gt" : "border-gt-line shadow-gt-sm hover:bg-gt-paper-1"
             }`}
             style={{ ["--gt-dep" as string]: TONES[spineTone].css }}
           >
-            <div className="mb-[7px] flex items-center justify-between">
-              <span className="font-gt-mono text-[10.5px] text-gt-ink-400">{c.code}</span>
+            <div className="mb-[0.4375rem] flex items-center justify-between">
+              <span className="font-gt-mono text-[0.65625rem] text-gt-ink-400">{c.code}</span>
               <Badge tone={st.tone}>{st.label}</Badge>
             </div>
-            <div className="flex items-center gap-[9px]">
+            <div className="flex items-center gap-[0.5625rem]">
               <Avatar user={c.subject.username} size={32} />
-              <div className="min-w-0 font-gt-display text-[13.5px] font-bold leading-tight text-gt-ink-900">
+              <div className="min-w-0 font-gt-display text-[0.84375rem] font-bold leading-tight text-gt-ink-900">
                 {c.title}
               </div>
             </div>

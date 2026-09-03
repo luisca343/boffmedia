@@ -17,7 +17,7 @@ export function LinkedAccountRow({ icon, name, sub, hue, linked, end, className 
   return (
     <div
       className={cn(
-        "flex items-center gap-[14px] border border-solid border-line bg-base px-[15px] py-3 [[data-theme=light]_&]:bg-panel",
+        "flex items-center gap-[0.875rem] border border-solid border-line bg-base px-[0.9375rem] py-3 [[data-theme=light]_&]:bg-panel",
         "cut-tag cut-tag-edge [--cut-line:var(--line)]",
         className,
       )}
@@ -34,13 +34,13 @@ export function LinkedAccountRow({ icon, name, sub, hue, linked, end, className 
       <div className="min-w-0">
         <b
           className={cn(
-            "block font-display text-[15px]/none font-bold uppercase tracking-[0.03em]",
+            "block font-display text-[0.9375rem]/none font-bold uppercase tracking-[0.03em]",
             linked ? "text-txt" : "text-txt-muted",
           )}
         >
           {name}
         </b>
-        <span className="mt-1 block font-mono text-[11px]/none font-medium tracking-[0.04em] text-txt-muted">{sub}</span>
+        <span className="mt-1 block font-mono text-[0.6875rem]/none font-medium tracking-[0.04em] text-txt-muted">{sub}</span>
       </div>
       {end && <span className="ml-auto flex-none">{end}</span>}
     </div>

@@ -38,7 +38,7 @@ export function VgcSubbar({
     return (
       <DkSub>
         <DkChip icon="shield" tone="var(--accent-bright)">{formatLabel}</DkChip>
-        {formatNote && <span className="min-w-0 truncate font-mono text-[11px] leading-[1.4] text-txt-muted">{formatNote}</span>}
+        {formatNote && <span className="min-w-0 truncate font-mono text-[0.6875rem] leading-[1.4] text-txt-muted">{formatNote}</span>}
         <DkSubNote>
           <Icon name="info" size={12} />
           {cutoffLabel}

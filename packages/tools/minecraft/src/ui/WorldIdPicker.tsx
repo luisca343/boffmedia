@@ -77,13 +77,13 @@ export function WorldIdPicker({
             ]}
           />
           {unknownIdCount > 0 && (
-            <Banner tone="warn" className="text-[12.5px]">
+            <Banner tone="warn" className="text-[0.78125rem]">
               {labels.unresolved}
             </Banner>
           )}
           <button
             type="button"
-            className="self-start font-mono text-[11px] text-txt-dim underline underline-offset-2 hover:text-txt"
+            className="self-start font-mono text-[0.6875rem] text-txt-dim underline underline-offset-2 hover:text-txt"
             onClick={onDetach}
             disabled={disabled}
           >
@@ -93,7 +93,7 @@ export function WorldIdPicker({
       ) : (
         <>
           {unknownIdCount > 0 && (
-            <Banner tone="warn" className="text-[12.5px]">
+            <Banner tone="warn" className="text-[0.78125rem]">
               {labels.needed}
             </Banner>
           )}
@@ -104,7 +104,7 @@ export function WorldIdPicker({
             loadedLabel={labels.loaded}
             onPick={() => !disabled && inputRef.current?.click()}
           />
-          <p className="font-mono text-[11px] leading-relaxed text-txt-dim">{labels.caveat}</p>
+          <p className="font-mono text-[0.6875rem] leading-relaxed text-txt-dim">{labels.caveat}</p>
         </>
       )}
     </>

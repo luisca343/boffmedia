@@ -104,7 +104,7 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[15px]" noValidate>
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.9375rem]" noValidate>
       <Field label={t("fields.username")} error={errors.username?.message}>
         <Input placeholder={t("fields.usernamePh")} autoComplete="username" {...register("username")} />
       </Field>
@@ -142,7 +142,7 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
           <button
             type="button"
             onClick={() => router.push("/recuperar")}
-            className="font-body text-[13px] font-medium text-accent hover:text-accent-bright hover:underline"
+            className="font-body text-[0.8125rem] font-medium text-accent hover:text-accent-bright hover:underline"
           >
             {t("forgot")}
           </button>

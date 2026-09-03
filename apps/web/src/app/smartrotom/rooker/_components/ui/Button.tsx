@@ -35,8 +35,8 @@ export function Button({ intent = "accent", children, block, className, ...rest 
     <button
       {...rest}
       className={cn(
-        "inline-flex items-center justify-center gap-2 rounded-rk-pill px-[18px] py-[8px]",
-        "text-[14px] font-bold leading-none",
+        "inline-flex items-center justify-center gap-2 rounded-rk-pill px-[1.125rem] py-[0.5rem]",
+        "text-[0.875rem] font-bold leading-none",
         "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rk-accent",
         INTENT[intent],
         block && "w-full",

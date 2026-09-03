@@ -55,11 +55,11 @@ export function GuessInput({
             autoComplete="off"
             disabled={disabled}
             className={cn(
-              "border-ar-cyan/40 py-3 pl-10 pr-[104px] font-ar text-[14px]",
+              "border-ar-cyan/40 py-3 pl-10 pr-[6.5rem] font-ar text-[0.875rem]",
               "shadow-[inset_0_0_22px_rgb(var(--ar-cyan)/.15)]",
             )}
           />
-          <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-ar-display text-[8px] text-ar-ink-muted">
+          <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 font-ar-display text-[0.5rem] text-ar-ink-muted">
             {Math.min(attempt, MAX_GUESSES)} / {MAX_GUESSES}
           </span>
         </div>
@@ -86,10 +86,10 @@ export function GuessInput({
                 )}
               >
                 <PixelArt sprite={creatureSprite(toneForType(pokemon.type1))} scale={2} />
-                <span className="flex-1 truncate font-ar text-[14px] font-semibold text-ar-ink-dim">
+                <span className="flex-1 truncate font-ar text-[0.875rem] font-semibold text-ar-ink-dim">
                   {nameOf(pokemon.name)}
                 </span>
-                <span className="font-ar-display text-[8px] text-ar-ink-muted">
+                <span className="font-ar-display text-[0.5rem] text-ar-ink-muted">
                   GEN {pokemon.gen}
                 </span>
               </button>

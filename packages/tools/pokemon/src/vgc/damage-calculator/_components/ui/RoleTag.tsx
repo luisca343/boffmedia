@@ -5,7 +5,7 @@ import { cssVars } from "./theme"
 export function RoleTag({ children, color }: { children: React.ReactNode; color?: string }) {
   return (
     <span
-      className="cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[7px] border border-solid px-[9px] py-[5px] font-mono text-[10px]/none font-bold uppercase tracking-[0.14em]"
+      className="cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[0.4375rem] border border-solid px-[0.5625rem] py-[0.3125rem] font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.14em]"
       style={cssVars({
         "--cxc": color,
         color: "var(--cxc, var(--accent))",

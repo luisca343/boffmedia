@@ -33,7 +33,7 @@ export function Label({ children, className }: { children: ReactNode; className?
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 font-ms-uppercase text-[10px] uppercase tracking-[.16em] text-ms-ink-3",
+        "inline-flex items-center gap-1.5 font-ms-uppercase text-[0.625rem] uppercase tracking-[.16em] text-ms-ink-3",
         className,
       )}
     >

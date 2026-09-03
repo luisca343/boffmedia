@@ -56,7 +56,7 @@ export function CompareTray() {
                   type="button"
                   aria-label={`${t("compare.title")} ${displayName(m.pokemon)}`}
                   onClick={() => remove(id)}
-                  className="absolute -right-[5px] -top-[5px] flex h-4 w-4 items-center justify-center rounded-pc-pill bg-pc-rose text-white focus-visible:outline-none"
+                  className="absolute -right-[0.3125rem] -top-[0.3125rem] flex h-4 w-4 items-center justify-center rounded-pc-pill bg-pc-rose text-white focus-visible:outline-none"
                 >
                   <Icon name="x" size={10} stroke={3} />
                 </button>

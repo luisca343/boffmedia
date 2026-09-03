@@ -87,7 +87,7 @@ export function Conversation({
     const prev = ordered[i - 1];
     if (!prev || dayKey(prev.createdAt) !== dayKey(m.createdAt)) {
       rows.push(
-        <div key={`d${m.id}`} className="my-2.5 self-center rounded-ca-md bg-ca-header px-3.5 py-1.5 text-[12.5px] font-medium uppercase tracking-[.02em] text-ca-300 shadow-[0_1px_1px_rgba(0,0,0,.08)]">
+        <div key={`d${m.id}`} className="my-2.5 self-center rounded-ca-md bg-ca-header px-3.5 py-1.5 text-[0.78125rem] font-medium uppercase tracking-[.02em] text-ca-300 shadow-[0_1px_1px_rgba(0,0,0,.08)]">
           {dayLabel(m.createdAt, t, locale)}
         </div>,
       );
@@ -114,16 +114,16 @@ export function Conversation({
     <section className="relative flex min-h-0 min-w-0 flex-1 flex-col bg-ca-wallpaper">
       <div className="ca-doodle pointer-events-none absolute inset-0" />
 
-      <header className="relative z-[2] flex h-[60px] flex-none items-center gap-3.5 border-b border-ca-800 bg-ca-header pl-4 pr-3.5">
+      <header className="relative z-[2] flex h-[3.75rem] flex-none items-center gap-3.5 border-b border-ca-800 bg-ca-header pl-4 pr-3.5">
         <IconButton icon="arrowleft" iconSize={20} className="md:hidden" onClick={onBack} title={t("common.back")} />
         <button onClick={onOpenInfo} className="flex min-w-0 items-center gap-3.5" aria-label={t("conversation.viewInfo")}>
           <Avatar src={chat.image} size={42} presence={isDirect(chat.type) && !isSaved(chat.type) ? chat.presence : undefined} />
           <div className="min-w-0 text-left">
-            <div className="flex items-center gap-1.5 text-[16px] font-semibold text-ca-50">
+            <div className="flex items-center gap-1.5 text-[1rem] font-semibold text-ca-50">
               {chat.name}
               {chat.muted && <Icon name="belloff" size={14} className="text-ca-500" />}
             </div>
-            <div className={cn("flex items-center gap-1.5 text-[12.5px]", st.live ? "text-ca-accent-soft" : "text-ca-400")}>
+            <div className={cn("flex items-center gap-1.5 text-[0.78125rem]", st.live ? "text-ca-accent-soft" : "text-ca-400")}>
               {st.game && <Icon name="cube" size={12} />}
               {typing && <Dots sm className="text-ca-accent-soft" />}
               {st.txt}
@@ -140,15 +140,15 @@ export function Conversation({
 
       {/* [deferred] AI chat summary — no summary API yet; renders only if present */}
       {chat.summary && summaryOpen && (
-        <div className="relative z-[2] mx-auto mt-2.5 flex w-[calc(100%-52px)] max-w-[560px] items-start gap-[11px] rounded-[10px] border-l-4 border-ca-accent bg-ca-bubble-in px-[13px] py-[11px] shadow-ca-bubble">
-          <div className="grid h-[30px] w-[30px] flex-none place-items-center rounded-full bg-ca-accent/[.16] text-ca-accent-soft">
+        <div className="relative z-[2] mx-auto mt-2.5 flex w-[calc(100%-3.25rem)] max-w-[35rem] items-start gap-[0.6875rem] rounded-[10px] border-l-4 border-ca-accent bg-ca-bubble-in px-[0.8125rem] py-[0.6875rem] shadow-ca-bubble">
+          <div className="grid h-[1.875rem] w-[1.875rem] flex-none place-items-center rounded-full bg-ca-accent/[.16] text-ca-accent-soft">
             <Icon name="sparkles" size={17} />
           </div>
           <div className="flex-1">
-            <h5 className="mb-[3px] text-[12px] font-bold text-ca-accent-soft">{t("conversation.summaryTitle")}</h5>
-            <p className="text-[13.5px] leading-[1.5] text-ca-200">{chat.summary}</p>
+            <h5 className="mb-[3px] text-[0.75rem] font-bold text-ca-accent-soft">{t("conversation.summaryTitle")}</h5>
+            <p className="text-[0.84375rem] leading-[1.5] text-ca-200">{chat.summary}</p>
           </div>
-          <IconButton icon="x" iconSize={16} className="h-[30px] w-[30px]" onClick={() => setSummaryOpen(false)} title={t("common.close")} />
+          <IconButton icon="x" iconSize={16} className="h-[1.875rem] w-[1.875rem]" onClick={() => setSummaryOpen(false)} title={t("common.close")} />
         </div>
       )}
 
@@ -157,7 +157,7 @@ export function Conversation({
         {typing && (
           <div className="mt-1.5 flex w-full justify-start gap-2">
             {isGroup && <div className="h-7 w-7 flex-none overflow-hidden rounded-full" />}
-            <div className="rounded-ca-md bg-ca-bubble-in px-3.5 py-[11px] shadow-ca-bubble">
+            <div className="rounded-ca-md bg-ca-bubble-in px-3.5 py-[0.6875rem] shadow-ca-bubble">
               <Dots className="text-ca-accent-soft" />
             </div>
           </div>

@@ -16,8 +16,8 @@ function pagerItems(page: number, total: number): (number | "…")[] {
 }
 
 const BTN = cn(
-  "inline-grid place-items-center min-w-[34px] h-[34px] px-[6px] cursor-pointer",
-  "font-mono text-[12px] font-semibold leading-none text-txt-muted bg-panel border border-solid border-line",
+  "inline-grid place-items-center min-w-[2.125rem] h-[2.125rem] px-[0.375rem] cursor-pointer",
+  "font-mono text-[0.75rem] font-semibold leading-none text-txt-muted bg-panel border border-solid border-line",
   "transition-[color,border-color,background] duration-[140ms]",
   "disabled:opacity-35 disabled:cursor-not-allowed",
   "focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-2",
@@ -36,13 +36,13 @@ export function Pagination({ page, total, onChange, ariaLabel, className }: Pagi
   const resolvedAriaLabel = ariaLabel ?? t("pagination")
   const go = (p: number) => onChange?.(Math.min(total, Math.max(1, p)))
   return (
-    <nav aria-label={resolvedAriaLabel} className={cn("inline-flex items-center gap-[5px]", className)}>
+    <nav aria-label={resolvedAriaLabel} className={cn("inline-flex items-center gap-[0.3125rem]", className)}>
       <button type="button" className={BTN} disabled={page <= 1} aria-label={t("previousPage")} onClick={() => go(page - 1)}>
         <Icon name="back" size={14} />
       </button>
       {pagerItems(page, total).map((p, i) =>
         p === "…" ? (
-          <span key={"e" + i} aria-hidden="true" className="font-mono text-[12px] font-semibold leading-none text-txt-dim px-1">
+          <span key={"e" + i} aria-hidden="true" className="font-mono text-[0.75rem] font-semibold leading-none text-txt-dim px-1">
             …
           </span>
         ) : (

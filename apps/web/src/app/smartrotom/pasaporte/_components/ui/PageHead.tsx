@@ -21,11 +21,11 @@ export function PageHead({
 }) {
   return (
     <div className={cn("mb-3.5", className)}>
-      <div className="flex items-center gap-2 font-ps-mono text-[10.5px] uppercase tracking-[.32em] text-ps-chapter-deep">
+      <div className="flex items-center gap-2 font-ps-mono text-[0.65625rem] uppercase tracking-[.32em] text-ps-chapter-deep">
         <span>{eyebrow}</span>
         <span aria-hidden="true" className="h-px flex-1 bg-gradient-to-r from-ps-chapter to-transparent" />
       </div>
-      <h2 className="mt-[5px] font-ps-ceremony text-[clamp(22px,3.2vh,34px)] font-normal leading-[1.05] tracking-[.01em] text-ps-ink">
+      <h2 className="mt-[0.3125rem] font-ps-ceremony text-[clamp(1.375rem,3.2vh,2.125rem)] font-normal leading-[1.05] tracking-[.01em] text-ps-ink">
         {title}
         {accent && <span className="text-ps-chapter-deep"> {accent}</span>}
       </h2>

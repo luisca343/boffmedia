@@ -17,7 +17,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const BASE =
-  "inline-flex items-center gap-2 whitespace-nowrap rounded-pc-sm border font-pc text-[13.5px] font-semibold " +
+  "inline-flex items-center gap-2 whitespace-nowrap rounded-pc-sm border font-pc text-[0.84375rem] font-semibold " +
   "transition-[transform,background-color,border-color,box-shadow] duration-150 " +
   "active:translate-y-px active:scale-[.99] disabled:pointer-events-none disabled:opacity-40 " +
   "focus-visible:outline-none"
@@ -60,7 +60,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
       type={type}
       className={[
         BASE,
-        icon ? "justify-center p-[9px]" : "px-[14px] py-[9px]",
+        icon ? "justify-center p-[0.5625rem]" : "px-[0.875rem] py-[0.5625rem]",
         active ? activeClass : VARIANTS[variant],
         className,
       ]

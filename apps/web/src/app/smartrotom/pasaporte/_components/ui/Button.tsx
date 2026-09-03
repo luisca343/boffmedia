@@ -5,7 +5,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
 const BASE =
-  "inline-flex h-[38px] items-center gap-[7px] whitespace-nowrap rounded-[10px] border font-ps text-[12.5px] font-semibold tracking-[.02em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-gild focus-visible:ring-offset-2 focus-visible:ring-offset-ps-desk disabled:cursor-default disabled:opacity-50"
+  "inline-flex h-[2.375rem] items-center gap-[0.4375rem] whitespace-nowrap rounded-[10px] border font-ps text-[0.78125rem] font-semibold tracking-[.02em] transition-colors duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-gild focus-visible:ring-offset-2 focus-visible:ring-offset-ps-desk disabled:cursor-default disabled:opacity-50"
 
 const IDLE =
   "border-ps-gild/18 bg-white/[.03] text-ps-chrome-muted hover:border-ps-chrome-subtle hover:bg-white/[.06] hover:text-ps-chrome-fg"
@@ -23,7 +23,7 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 export function Button({ active = false, className, type = "button", children, ...rest }: ButtonProps) {
   return (
-    <button type={type} className={cn(BASE, "px-[13px]", active ? ACTIVE : IDLE, className)} {...rest}>
+    <button type={type} className={cn(BASE, "px-[0.8125rem]", active ? ACTIVE : IDLE, className)} {...rest}>
       {children}
     </button>
   )
@@ -43,7 +43,7 @@ export function IconButton({
       type={type}
       aria-label={ariaLabel}
       aria-pressed={active}
-      className={cn(BASE, "w-[38px] justify-center px-0", active ? ACTIVE : IDLE, className)}
+      className={cn(BASE, "w-[2.375rem] justify-center px-0", active ? ACTIVE : IDLE, className)}
       {...rest}
     >
       {children}

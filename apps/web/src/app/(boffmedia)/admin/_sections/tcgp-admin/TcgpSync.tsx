@@ -237,13 +237,13 @@ export function TcgpSync() {
       />
 
       {statusError && (
-        <AvAlert tone="error" title={t("statusFailed")} className="mb-[18px]">
+        <AvAlert tone="error" title={t("statusFailed")} className="mb-[1.125rem]">
           {statusError}
         </AvAlert>
       )}
 
       {status && !status.remoteAvailable && (
-        <AvAlert tone="warning" title={t("remoteDown")} className="mb-[18px]">
+        <AvAlert tone="warning" title={t("remoteDown")} className="mb-[1.125rem]">
           {t("remoteDownHint")}
           {status.remoteError ? ` — ${status.remoteError}` : ""}
         </AvAlert>
@@ -261,14 +261,14 @@ export function TcgpSync() {
           label={t("kpiCards")}
           value={(status?.cardsInDb ?? 0).toLocaleString()}
           icon="cards"
-          foot={<span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">{t("kpiOfRemote", { count: (status?.cardsRemote ?? 0).toLocaleString() })}</span>}
+          foot={<span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">{t("kpiOfRemote", { count: (status?.cardsRemote ?? 0).toLocaleString() })}</span>}
         />
         <AvKpi
           label={t("kpiImages")}
           value={`${imagesPct}%`}
           icon="camera"
           foot={
-            <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">
               {t("readingImages", {
                 have: (status?.imagesPresent ?? 0).toLocaleString(),
                 total: (status?.imagesExpected ?? 0).toLocaleString(),
@@ -281,7 +281,7 @@ export function TcgpSync() {
           value={outdated}
           icon="alert"
           live={outdated > 0}
-          foot={<span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">{t("kpiPendingFoot")}</span>}
+          foot={<span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">{t("kpiPendingFoot")}</span>}
         />
       </AvKpis>
 
@@ -347,7 +347,7 @@ export function TcgpSync() {
         icon="grid"
         aside={
           <span className="flex items-center gap-2">
-            <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">
               {t("selectedCount", { count: selectedIds.size, total: sets.length })}
             </span>
             <Button variant="ghost" size="sm" disabled={running} onClick={selectAll}>
@@ -363,7 +363,7 @@ export function TcgpSync() {
         }
       >
         {!selection.cards && !selection.images && (
-          <p className="mb-3 text-[12.5px] text-txt-dim">{t("setsIgnored")}</p>
+          <p className="mb-3 text-[0.78125rem] text-txt-dim">{t("setsIgnored")}</p>
         )}
         <SetSyncTable
           sets={sets}
@@ -412,7 +412,7 @@ export function TcgpSync() {
           )}
 
           {job.currentLabel && (
-            <p className="m-0 font-mono text-[11px] text-txt-muted">{job.currentLabel}</p>
+            <p className="m-0 font-mono text-[0.6875rem] text-txt-muted">{job.currentLabel}</p>
           )}
 
           {/* ── 8. summary ─────────────────────────────────────────────── */}
@@ -429,15 +429,15 @@ export function TcgpSync() {
           {/* ── 9. partial failures, retryable on their own ────────────── */}
           {job.failures.length > 0 && (
             <div className="border border-solid border-line-2 border-l-[3px] border-l-bad bg-panel-2 p-3">
-              <p className="m-0 mb-2 font-display text-[13px] font-bold uppercase tracking-[0.03em]">
+              <p className="m-0 mb-2 font-display text-[0.8125rem] font-bold uppercase tracking-[0.03em]">
                 {t("failuresTitle", { count: job.failures.length })}
               </p>
               <ul className="m-0 max-h-40 list-none overflow-y-auto p-0">
                 {job.failures.map((f, i) => (
                   <li key={`${f.scope}-${i}`} className="flex gap-2 border-b border-dashed border-line py-1.5 last:border-b-0">
                     <AvPill tone="rose">{t(`stage.${f.stage}`)}</AvPill>
-                    <span className="font-mono text-[10.5px] font-bold uppercase tracking-[0.08em] text-txt-dim">{f.scope}</span>
-                    <span className="min-w-0 flex-1 truncate text-[12px] text-txt-muted" title={f.message}>
+                    <span className="font-mono text-[0.65625rem] font-bold uppercase tracking-[0.08em] text-txt-dim">{f.scope}</span>
+                    <span className="min-w-0 flex-1 truncate text-[0.75rem] text-txt-muted" title={f.message}>
                       {f.message}
                     </span>
                   </li>
@@ -469,8 +469,8 @@ export function TcgpSync() {
       {/* ── 3 + 6. what will happen, then start it ───────────────────────── */}
       <AvStickyBar open={!running && !plan.empty}>
         <div className="min-w-0 flex-1">
-          <p className="m-0 font-mono text-[10px] uppercase tracking-[0.1em] text-txt-dim">{t("planTitle")}</p>
-          <p className="m-0 text-[13px] text-txt">
+          <p className="m-0 font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-dim">{t("planTitle")}</p>
+          <p className="m-0 text-[0.8125rem] text-txt">
             {t("planLine", {
               sets: plan.setsToProcess.length,
               cards: plan.cardsToFetch.toLocaleString(),
@@ -527,9 +527,9 @@ function DataTypeRow({
       />
       <span className="min-w-0 flex-1">
         <span className="flex flex-wrap items-center gap-2">
-          <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-txt">{label}</span>
+          <span className="font-mono text-[0.65625rem] font-semibold uppercase tracking-[0.1em] text-txt">{label}</span>
           {reading && (
-            <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">{reading}</span>
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">{reading}</span>
           )}
           {warn && checked && (
             <AvPill tone="amber" icon="alert">
@@ -537,7 +537,7 @@ function DataTypeRow({
             </AvPill>
           )}
         </span>
-        <span className="mt-0.5 block font-body text-[11.5px] leading-[1.4] text-txt-dim">{hint}</span>
+        <span className="mt-0.5 block font-body text-[0.71875rem] leading-[1.4] text-txt-dim">{hint}</span>
       </span>
     </label>
   )

@@ -35,10 +35,10 @@ export function TxDetail({ tx, activeAccountId, onClose }: { tx: SBTransaction; 
         <div className="inline-block">
           <ContactAvatar name={tx.displayName} type={tx.displayAccountType} image={tx.displayImage} size={72} />
         </div>
-        <div className="mt-3.5 text-[13px] text-sb-fg-muted">
+        <div className="mt-3.5 text-[0.8125rem] text-sb-fg-muted">
           {out ? t("enviar.to") : t("enviar.from")} <strong className="text-sb-fg">{displayName(tx.displayName)}</strong>
         </div>
-        <div className={cn("mt-2 font-sb-display text-[52px] font-bold tracking-[-0.02em] tabular-nums", out ? "text-sb-neg" : "text-sb-pos")}>
+        <div className={cn("mt-2 font-sb-display text-[3.25rem] font-bold tracking-[-0.02em] tabular-nums", out ? "text-sb-neg" : "text-sb-pos")}>
           {out ? "− " : "+ "}
           {formatMoney(tx.amount)}
         </div>
@@ -47,14 +47,14 @@ export function TxDetail({ tx, activeAccountId, onClose }: { tx: SBTransaction; 
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 rounded-sb-md bg-sb-surface-2 p-[18px] text-[13px]">
+      <div className="flex flex-col gap-3 rounded-sb-md bg-sb-surface-2 p-[1.125rem] text-[0.8125rem]">
         <DetailRow label={t("txDetail.date")} value={fmtDate(tx.date, "long", locale)} />
         <div className="h-px bg-sb-border" />
         <DetailRow label={t("txDetail.time")} value={fmtTime(tx.date, locale)} />
         <div className="h-px bg-sb-border" />
         <DetailRow label={t("txDetail.balanceAfter")} value={formatMoney(balanceAfter(tx, activeAccountId))} strong />
         <div className="h-px bg-sb-border" />
-        <DetailRow label={t("txDetail.reference")} value={<span className="font-mono text-[12px]">{reference(tx)}</span>} />
+        <DetailRow label={t("txDetail.reference")} value={<span className="font-mono text-[0.75rem]">{reference(tx)}</span>} />
         <div className="h-px bg-sb-border" />
         <div className="flex items-center justify-between">
           <span className="text-sb-fg-muted">{t("txDetail.status")}</span>

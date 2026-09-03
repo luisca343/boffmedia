@@ -29,12 +29,12 @@ export function IndicadoresSections({ rng }: { rng: number }) {
           <Spinner size={16} />
           <Spinner size={22} />
           <Spinner size={30} className="text-accent" />
-          <span className="inline-flex items-center gap-[10px] text-txt-muted text-[14px] ml-2">
+          <span className="inline-flex items-center gap-[0.625rem] text-txt-muted text-[0.875rem] ml-2">
             <Spinner size={14} /> Cargando datos…
           </span>
         </Sample>
         <Sample title="Skeleton" code="<Skeleton w h avatar>" col note={<>Se detiene con <code>reduce-motion</code>. Aquí, el esqueleto de una fila de jugador.</>}>
-          <div className="flex gap-[14px] items-center w-full max-w-[420px]">
+          <div className="flex gap-[0.875rem] items-center w-full max-w-[26.25rem]">
             <Skeleton w={48} h={48} avatar />
             <div className="flex-1 grid gap-2">
               <Skeleton w="60%" h={13} />
@@ -65,12 +65,12 @@ export function IndicadoresSections({ rng }: { rng: number }) {
           </Tooltip>
         </Sample>
         <Sample title="Teclas" code="<Kbd>">
-          <span className="inline-flex gap-[6px] items-center">
+          <span className="inline-flex gap-[0.375rem] items-center">
             <Kbd>⌘</Kbd>
             <Kbd>K</Kbd>
           </span>
           <span className={cn(MONO_LABEL, "text-txt-dim normal-case tracking-[0.08em]")}>abre la paleta</span>
-          <span className="inline-flex gap-[6px] items-center ml-[18px]">
+          <span className="inline-flex gap-[0.375rem] items-center ml-[1.125rem]">
             <Kbd>/</Kbd>
           </span>
           <span className={cn(MONO_LABEL, "text-txt-dim normal-case tracking-[0.08em]")}>busca en componentes</span>
@@ -84,7 +84,7 @@ export function IndicadoresSections({ rng }: { rng: number }) {
         lead={<>Sistema global con tokens <code>--sb-*</code>: pista transparente y pulgar rectangular que se aviva al pasar el ratón o mientras hay scroll activo, y se enciende en naranja al arrastrarlo. Funciona en WebKit y Firefox, respeta ambos temas y no necesita clases — para regiones internas usa la clase <code>bm-scroll</code>.</>}
       >
         <Sample title="Región vertical" code="overflow-y-auto · bm-scroll" col note={<>Haz scroll dentro: el pulgar se aviva mientras te desplazas y vuelve a apagarse al parar.</>}>
-          <div className="bm-scroll max-h-[200px] w-full overflow-y-auto border border-solid border-line bg-panel" aria-label="Registro de cambios">
+          <div className="bm-scroll max-h-[12.5rem] w-full overflow-y-auto border border-solid border-line bg-panel" aria-label="Registro de cambios">
             {[
               ["v3.4", "Calculadora de daño: soporte de teracristal"],
               ["v3.3", "Clasificación: filtros por temporada"],
@@ -95,15 +95,15 @@ export function IndicadoresSections({ rng }: { rng: number }) {
               ["v2.8", "Calendario: vista mensual"],
               ["v2.7", "BattleSim: modo entrenamiento"],
             ].map(([v, t]) => (
-              <div key={v} className="flex items-baseline gap-[14px] border-b border-solid border-line px-4 py-[11px] last:border-b-0">
+              <div key={v} className="flex items-baseline gap-[0.875rem] border-b border-solid border-line px-4 py-[0.6875rem] last:border-b-0">
                 <span className={cn(MONO_LABEL, "text-accent")}>{v}</span>
-                <span className="text-[14px] text-txt-muted">{t}</span>
+                <span className="text-[0.875rem] text-txt-muted">{t}</span>
               </div>
             ))}
           </div>
         </Sample>
         <Sample title="Región horizontal" code="overflow-x-auto · bm-scroll" col>
-          <div className="bm-scroll w-full overflow-x-auto border border-solid border-line bg-panel px-4 pt-[14px] pb-[10px]" aria-label="Juegos">
+          <div className="bm-scroll w-full overflow-x-auto border border-solid border-line bg-panel px-4 pt-[0.875rem] pb-[0.625rem]" aria-label="Juegos">
             <div className="flex w-max gap-2">
               {["Pokémon VGC", "Minecraft", "Monster Hunter Wilds", "Pixelmon", "PMD: Sky", "Smash Ultimate", "Mario Kart", "Splatoon 3"].map((g) => (
                 <Chip key={g}>{g}</Chip>
@@ -112,13 +112,13 @@ export function IndicadoresSections({ rng }: { rng: number }) {
           </div>
         </Sample>
         <Sample title="Estados del pulgar" code="--sb-idle · --sb-hover · --sb-drag" col note={<>Los tres tonos van pegados en contraste para que el paso reposo → hover no resulte brusco.</>}>
-          <div className="grid w-full max-w-[420px] gap-3">
+          <div className="grid w-full max-w-[26.25rem] gap-3">
             {[
               ["var(--sb-idle)", "Reposo — discreto sobre el contenido"],
               ["var(--sb-hover)", "Hover / scroll activo"],
               ["var(--sb-drag)", "Arrastre — señal naranja"],
             ].map(([c, l]) => (
-              <div key={l} className="flex items-center gap-[14px]">
+              <div key={l} className="flex items-center gap-[0.875rem]">
                 <span className="h-1.5 w-16 flex-none" style={{ background: c }} />
                 <span className={MONO_LABEL}>{l}</span>
               </div>

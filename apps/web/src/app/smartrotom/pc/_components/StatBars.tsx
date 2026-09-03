@@ -19,14 +19,14 @@ export function StatBars({ pokemon, compact = false }: StatBarsProps) {
       {STAT_KEYS.map((k) => {
         const v = statAt(pokemon.stats, k)
         return (
-          <div key={k} className="flex items-center gap-[9px]">
-            <span className="w-[34px] flex-none font-pc-mono text-[11px] text-pc-fg-subtle">
+          <div key={k} className="flex items-center gap-[0.5625rem]">
+            <span className="w-[2.125rem] flex-none font-pc-mono text-[0.6875rem] text-pc-fg-subtle">
               {STAT_SHORT[k]}
             </span>
-            <span className="w-[34px] flex-none text-right text-[12.5px] font-bold text-pc-fg">{v}</span>
+            <span className="w-[2.125rem] flex-none text-right text-[0.78125rem] font-bold text-pc-fg">{v}</span>
             <Bar pct={Math.min(100, (v / 200) * 100)} tone={statTone(v)} className="flex-1" />
             {!compact && (
-              <span className="w-[78px] flex-none text-right font-pc-mono text-[10px] text-pc-fg-subtle">
+              <span className="w-[4.875rem] flex-none text-right font-pc-mono text-[0.625rem] text-pc-fg-subtle">
                 IV {statAt(pokemon.ivs, k)} · EV {statAt(pokemon.evs, k)}
               </span>
             )}

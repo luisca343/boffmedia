@@ -52,7 +52,7 @@ export function TorneoDetailView({
   if (!tn) {
     return (
       <main className="wrap py-24 text-center">
-        <p className="font-display text-[22px] font-bold uppercase">{t("detail.notFound")}</p>
+        <p className="font-display text-[1.375rem] font-bold uppercase">{t("detail.notFound")}</p>
         <Button href="/torneos" size="sm" className="mt-4">
           {t("detail.backToList")}
         </Button>
@@ -74,20 +74,20 @@ export function TorneoDetailView({
 
       <header className="mb-7 grid gap-3">
         <div className="flex items-center gap-2">
-          <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-txt-dim">
+          <span className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-txt-dim">
             {t("detail.section")}
           </span>
           <span
             className={cn(
-              "inline-flex items-center border border-solid px-2 py-[3px] font-mono text-[10px] font-semibold uppercase tracking-[0.08em] cut cut-edge-slant [--cut:4px]",
+              "inline-flex items-center border border-solid px-2 py-[3px] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em] cut cut-edge-slant [--cut:4px]",
               STATUS_TONE[tn.status] ?? "text-txt-dim border-line [--cut-line:var(--line)]",
             )}
           >
             {t(`status.${tn.status}`)}
           </span>
         </div>
-        <h1 className="text-[clamp(30px,5vw,48px)]">{tn.name}</h1>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[11.5px] text-txt-muted">
+        <h1 className="text-[clamp(1.875rem,5vw,3rem)]">{tn.name}</h1>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 font-mono text-[0.71875rem] text-txt-muted">
           <TnFormatBadge format={tn.format} />
           {tn.gameTitle && <span>{tn.gameTitle}</span>}
           <span>
@@ -111,7 +111,7 @@ export function TorneoDetailView({
           )}
         </div>
         {tn.description && (
-          <p className="max-w-2xl font-body text-[14px] leading-[1.55] text-txt-muted">
+          <p className="max-w-2xl font-body text-[0.875rem] leading-[1.55] text-txt-muted">
             {tn.description}
           </p>
         )}
@@ -156,7 +156,7 @@ function EventGate({ detail }: { detail: TournamentDetailApi }) {
   return (
     <div className="cut-seal cut-seal-edge [--cut-line:var(--warn)] [--cut:8px] mb-6 flex flex-wrap items-center gap-3 border border-solid border-warn bg-warn-soft px-4 py-3">
       <Icon name="alert" size={16} className="flex-none text-warn" />
-      <span className="flex-1 font-body text-[14px] text-txt">
+      <span className="flex-1 font-body text-[0.875rem] text-txt">
         {t("eventGate", { event: ev.title })}
       </span>
       <Button size="sm" variant="pri" href={`/eventos/${ev.id}`}>
@@ -220,7 +220,7 @@ function EntryChecklist({
             droppedOut ? "text-bad" : entered ? "text-ok" : "text-accent-bright",
           )}
         />
-        <span className="font-body text-[14px] font-semibold text-txt">
+        <span className="font-body text-[0.875rem] font-semibold text-txt">
           {droppedOut
             ? t("droppedTitle")
             : entered
@@ -248,7 +248,7 @@ function EntryChecklist({
         ))}
       </ul>
       {!entered && (
-        <p className="mt-2 font-body text-[12.5px] leading-[1.45] text-txt-muted">
+        <p className="mt-2 font-body text-[0.78125rem] leading-[1.45] text-txt-muted">
           {droppedOut
             ? t("droppedLead")
             : detail.entryDeadline
@@ -286,7 +286,7 @@ function OpenTeamsheets({ detail }: { detail: TournamentDetailApi }) {
 
   return (
     <details className="group mb-6 border border-solid border-line bg-panel" open>
-      <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-muted">
+      <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-txt-muted">
         {t("rosterTitle", { count: withSheets.length })}
         <span className="transition-transform group-open:rotate-90">›</span>
       </summary>
@@ -296,7 +296,7 @@ function OpenTeamsheets({ detail }: { detail: TournamentDetailApi }) {
             key={p.id}
             className="flex items-center gap-2 border border-solid border-line bg-base px-3 py-2"
           >
-            <span className="min-w-0 flex-1 truncate font-body text-[13px]">{p.name}</span>
+            <span className="min-w-0 flex-1 truncate font-body text-[0.8125rem]">{p.name}</span>
             <TeamsheetViewButton sheet={p.teamsheet} name={p.name} />
           </div>
         ))}
@@ -318,10 +318,10 @@ function MyMatchBanner({ detail }: { detail: TournamentDetailApi }) {
       className="cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:8px] mb-6 flex items-center gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-3 transition-opacity hover:opacity-85"
     >
       <Icon name="zap" size={16} className="flex-none text-accent-bright" />
-      <span className="flex-1 font-body text-[14px] font-semibold text-txt">
+      <span className="flex-1 font-body text-[0.875rem] font-semibold text-txt">
         {t("myMatchBanner")}
       </span>
-      <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-accent-bright">
+      <span className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-accent-bright">
         {t("myMatchCta")}
       </span>
     </Link>
@@ -428,7 +428,7 @@ function SubmitScoreButton({
           <Field label={t("evidenceLabel")}>
             <Input value={meta} onChange={(e) => setMeta(e.target.value)} placeholder={t("evidencePlaceholder")} />
           </Field>
-          <p className="font-mono text-[10.5px] leading-[1.5] text-txt-dim">
+          <p className="font-mono text-[0.65625rem] leading-[1.5] text-txt-dim">
             {t("note")}
           </p>
         </div>
@@ -440,11 +440,11 @@ function SubmitScoreButton({
 function FoldBlock({ title, body, open }: { title: string; body: string; open?: boolean }) {
   return (
     <details className="group mb-6 border border-solid border-line bg-panel" open={open}>
-      <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-muted">
+      <summary className="flex cursor-pointer list-none items-center justify-between px-4 py-3 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-txt-muted">
         {title}
         <span className="transition-transform group-open:rotate-90">›</span>
       </summary>
-      <p className="whitespace-pre-wrap border-t border-line px-4 py-3 font-body text-[13px] leading-[1.6] text-txt-muted">
+      <p className="whitespace-pre-wrap border-t border-line px-4 py-3 font-body text-[0.8125rem] leading-[1.6] text-txt-muted">
         {body}
       </p>
     </details>
@@ -457,7 +457,7 @@ function RegistrationRoster({ detail }: { detail: TournamentDetailApi }) {
   if (detail.participants.length === 0) {
     return (
       <div className="border border-dashed border-line-2 bg-panel px-6 py-16 text-center">
-        <p className="font-mono text-[12px] uppercase tracking-[0.08em] text-txt-dim">
+        <p className="font-mono text-[0.75rem] uppercase tracking-[0.08em] text-txt-dim">
           {t("rosterEmpty")}
         </p>
       </div>
@@ -465,7 +465,7 @@ function RegistrationRoster({ detail }: { detail: TournamentDetailApi }) {
   }
   return (
     <section className="grid gap-3">
-      <h2 className="font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
+      <h2 className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-txt-dim">
         {t("rosterTitle", { count: detail.participants.length })}
       </h2>
       <div className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">

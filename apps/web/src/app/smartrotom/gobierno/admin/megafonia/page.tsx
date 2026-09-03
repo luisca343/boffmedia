@@ -73,7 +73,7 @@ export default function MegafoniaPage() {
             {t("megafonia.emision")}
           </Bar>
           <div className="p-4">
-            <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+            <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
               {t("megafonia.emisor")}
             </div>
             <div className="mb-3.5">
@@ -88,18 +88,18 @@ export default function MegafoniaPage() {
               )}
             </div>
 
-            <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+            <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
               {t("megafonia.mensaje")}
             </div>
             <div className="mb-2">
               <TextArea rows={4} value={msg} onChange={setMsg} placeholder={t("megafonia.mensajePlaceholder")} />
             </div>
 
-            <Sunken className="mb-3.5 px-[13px] py-[11px]">
-              <div className="mb-1.5 font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">
+            <Sunken className="mb-3.5 px-[0.8125rem] py-[0.6875rem]">
+              <div className="mb-1.5 font-gt-mono text-[0.53125rem] uppercase tracking-[.14em] text-gt-ink-400">
                 {t("megafonia.vistaPrevia")}
               </div>
-              <div className="text-[13.5px] leading-normal">
+              <div className="text-[0.84375rem] leading-normal">
                 <MCText format={sp?.format} fallback={t("megafonia.vistaPreviaDefault")} />
                 <span className="text-gt-ink-800">: {msg || <span className="text-gt-ink-300">…</span>}</span>
               </div>
@@ -135,13 +135,13 @@ export default function MegafoniaPage() {
                   const hs = speakers?.find((x) => x.value === h.speaker)
                   return (
                     <div key={h.id} className="border-b border-gt-line-soft px-4 py-2.5 last:border-b-0">
-                      <Sunken className="px-[11px] py-[7px]">
-                        <span className="text-[12.5px]">
+                      <Sunken className="px-[0.6875rem] py-[0.4375rem]">
+                        <span className="text-[0.78125rem]">
                           <MCText format={hs?.format} fallback={t("megafonia.vistaPreviaDefault")} />
                           <span className="text-gt-ink-800">: {h.text}</span>
                         </span>
                       </Sunken>
-                      <div className="mt-[5px] font-gt-mono text-[9.5px] tabular-nums text-gt-ink-400">
+                      <div className="mt-[0.3125rem] font-gt-mono text-[0.59375rem] tabular-nums text-gt-ink-400">
                         {h.by.username} · {fmtDateTime(h.createdAt, intlLocale)}
                       </div>
                     </div>

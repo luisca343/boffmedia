@@ -21,9 +21,9 @@ import {
 import { TN_GROUP, TN_LB, TN_LEAGUE, TN_MATCH, TN_RADIAL_STEPS, TN_SINGLE, TN_SOLO, TN_TEAM, tnRadialRounds } from "./torneos-demo"
 
 const SLIDER =
-  "h-1.5 flex-1 cursor-pointer appearance-none border border-solid border-line-2 bg-base outline-none [&::-webkit-slider-thumb]:h-[18px] [&::-webkit-slider-thumb]:w-[18px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-panel [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:cut-corner [--cut-lg:4px] [&::-moz-range-thumb]:h-[18px] [&::-moz-range-thumb]:w-[18px] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-none [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-panel [&::-moz-range-thumb]:bg-accent"
-const CTL_LBL = "flex-none font-mono text-[10px]/none font-bold uppercase tracking-[0.14em] text-txt-dim"
-const CTL_VAL = "min-w-[52px] flex-none text-right font-display text-[22px]/none font-extrabold tabular-nums text-accent-bright"
+  "h-1.5 flex-1 cursor-pointer appearance-none border border-solid border-line-2 bg-base outline-none [&::-webkit-slider-thumb]:h-[1.125rem] [&::-webkit-slider-thumb]:w-[1.125rem] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-panel [&::-webkit-slider-thumb]:bg-accent [&::-webkit-slider-thumb]:cut-corner [--cut-lg:4px] [&::-moz-range-thumb]:h-[1.125rem] [&::-moz-range-thumb]:w-[1.125rem] [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:rounded-none [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-panel [&::-moz-range-thumb]:bg-accent"
+const CTL_LBL = "flex-none font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.14em] text-txt-dim"
+const CTL_VAL = "min-w-[3.25rem] flex-none text-right font-display text-[1.375rem]/none font-extrabold tabular-nums text-accent-bright"
 
 export function TorneosChapter() {
   const [seg, setSeg] = React.useState("table")
@@ -38,7 +38,7 @@ export function TorneosChapter() {
     <>
       <Section id="tncompetidor" kicker="Torneos" title="Competidor genérico" lead={<>Una sola pieza sirve para las tres clases de competidor del circuito: jugador en solitario, equipo/escuadra y entrada puntuable. El avatar cae a inicial-en-hue cuando no hay bandera, y la etiqueta de formato rotula cualquier competición. Alimentado con datos de ejemplo. [aplazado]</>}>
         <Sample title="Entidad y avatar" code="<TnEntrant c> · <TnAvatar c>" col>
-          <div className="grid w-full max-w-[360px] gap-2.5">
+          <div className="grid w-full max-w-[22.5rem] gap-2.5">
             <TnEntrant c={TN_SOLO} onOpen={() => {}} />
             <TnEntrant c={TN_TEAM} onOpen={() => {}} />
             <span className="inline-flex gap-2">
@@ -65,7 +65,7 @@ export function TorneosChapter() {
 
       <Section id="tngrupos" kicker="Torneos" title="Grupos, liga y crosstable" lead={<>La tarjeta de grupo y la tabla de liga comparten estructura (V-E-D, diferencia, puntos) con resaltado de plazas de clasificación y forma reciente. El crosstable cruza a todos contra todos en una matriz de resultados.</>}>
         <Sample title="Tarjeta de grupo" code="<TnGroupCard group advance>" col>
-          <div className="w-full max-w-[460px]">
+          <div className="w-full max-w-[28.75rem]">
             <TnGroupCard group={TN_GROUP} advance={2} onOpen={() => {}} />
           </div>
         </Sample>
@@ -87,7 +87,7 @@ export function TorneosChapter() {
 
       <Section id="tnlibre" kicker="Torneos" title="Clasificación libre" lead={<>Para eventos sin cruces — concursos de builds, maratones cronometrados, speedruns: entradas ordenadas por puntuación o tiempo, con podio, barra proporcional y sello de verificación.</>}>
         <Sample title="Leaderboard" code="<TnLeaderboard lb>" col>
-          <div className="w-full max-w-[560px]">
+          <div className="w-full max-w-[35rem]">
             <TnLeaderboard lb={TN_LB} onOpen={() => {}} />
           </div>
         </Sample>
@@ -95,7 +95,7 @@ export function TorneosChapter() {
 
       <Section id="tnradial" kicker="Torneos" title="Cuadro radial" lead={<>Visualización circular para grandes eventos de eliminación: los competidores se reparten en el anillo exterior y los cruces convergen hacia el trofeo central, en dos mitades con huecos arriba y abajo. Cada anillo interior muestra al ganador de cada cruce; pasa el cursor por un competidor para trazar su ruta. Escala de 8 a 256 plazas y resalta al campeón.</>}>
         <Sample title="Radial escalable" code="<TnRadialBracket rounds championId>" col>
-          <div className="grid w-full max-w-[680px] gap-3.5">
+          <div className="grid w-full max-w-[42.5rem] gap-3.5">
             <div className="flex items-center gap-3.5">
               <span className={CTL_LBL}>Plazas</span>
               <input type="range" min={0} max={TN_RADIAL_STEPS.length - 1} step={1} value={radialIdx} aria-label="Número de competidores" onChange={(e) => setRadialIdx(parseInt(e.target.value, 10))} className={SLIDER} />
@@ -103,7 +103,7 @@ export function TorneosChapter() {
             </div>
             <div className="flex flex-wrap gap-1.5">
               {TN_RADIAL_STEPS.map((n, i) => (
-                <button key={n} type="button" onClick={() => setRadialIdx(i)} className={cn("cursor-pointer border border-solid px-2.5 py-1.5 font-mono text-[11px]/none font-semibold transition-colors", i === radialIdx ? "border-accent-line bg-accent-soft text-accent-bright" : "border-line bg-panel text-txt-muted hover:border-line-2 hover:text-txt")}>
+                <button key={n} type="button" onClick={() => setRadialIdx(i)} className={cn("cursor-pointer border border-solid px-2.5 py-1.5 font-mono text-[0.6875rem]/none font-semibold transition-colors", i === radialIdx ? "border-accent-line bg-accent-soft text-accent-bright" : "border-line bg-panel text-txt-muted hover:border-line-2 hover:text-txt")}>
                   {n}
                 </button>
               ))}
@@ -125,7 +125,7 @@ export function TorneosChapter() {
           </div>
         </Sample>
         <Sample title="Reporte entrante — te toca verificar" code={`<TmReportPanel initialScenario="incoming">`} col note={<>Cuando el rival reporta primero, el mismo panel muestra su resultado y ofrece verificar o disputar (lo que avisa a un juez).</>}>
-          <div className="w-full max-w-[620px]">
+          <div className="w-full max-w-[38.75rem]">
             <TmReportPanel me={TN_MATCH.me} opp={TN_MATCH.opp} initialScenario="incoming" onSystem={() => {}} />
           </div>
         </Sample>

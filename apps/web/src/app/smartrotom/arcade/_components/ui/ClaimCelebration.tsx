@@ -58,7 +58,7 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="ar-scanlines relative w-[340px] max-w-[88vw] cursor-default overflow-hidden rounded-[18px] px-7 pb-[26px] pt-[34px] text-center motion-reduce:animate-none animate-ar-pop"
+        className="ar-scanlines relative w-[21.25rem] max-w-[88vw] cursor-default overflow-hidden rounded-[18px] px-7 pb-[1.625rem] pt-[2.125rem] text-center motion-reduce:animate-none animate-ar-pop"
         style={{
           background: `linear-gradient(180deg, ${skin.bg}, rgba(8,4,28,0.96))`,
           border: `1.5px solid ${skin.fg}`,
@@ -70,7 +70,7 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
         {!reduce && (
           <div
             aria-hidden
-            className="pointer-events-none absolute left-1/2 top-16 -ml-[60px] h-[120px] w-[120px] rounded-full animate-ar-celeb-ring"
+            className="pointer-events-none absolute left-1/2 top-16 -ml-[3.75rem] h-[7.5rem] w-[7.5rem] rounded-full animate-ar-celeb-ring"
             style={{ border: `2px solid ${skin.fg}` }}
           />
         )}
@@ -81,7 +81,7 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
             <span
               key={i}
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-[42%] h-[7px] w-[7px] rounded-sm animate-ar-particle"
+              className="pointer-events-none absolute left-1/2 top-[42%] h-[0.4375rem] w-[0.4375rem] rounded-sm animate-ar-particle"
               style={
                 {
                   background: i % 3 === 0 ? "#ffb845" : i % 3 === 1 ? skin.fg : "#00e5ff",
@@ -95,14 +95,14 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
         })}
 
         <div
-          className="relative mb-[18px] font-ar-mono text-[11px] font-bold uppercase tracking-[0.2em]"
+          className="relative mb-[1.125rem] font-ar-mono text-[0.6875rem] font-bold uppercase tracking-[0.2em]"
           style={{ color: skin.fg }}
         >
           {t("celebration.rewardObtained")}
         </div>
 
         <div
-          className="mx-auto mb-4 grid h-[104px] w-[104px] place-items-center overflow-hidden rounded-[18px] font-ar-display text-[44px] motion-reduce:animate-none animate-ar-float"
+          className="mx-auto mb-4 grid h-[6.5rem] w-[6.5rem] place-items-center overflow-hidden rounded-[18px] font-ar-display text-[2.75rem] motion-reduce:animate-none animate-ar-float"
           style={{
             background: `radial-gradient(60% 60% at 50% 40%, ${skin.fg}44, transparent 70%)`,
             border: `1.5px solid ${skin.fg}`,
@@ -114,7 +114,7 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
         </div>
 
         {reward.amount != null && (
-          <div className="mb-1.5 font-ar-display text-[30px] text-ar-ink">
+          <div className="mb-1.5 font-ar-display text-[1.875rem] text-ar-ink">
             {number(display)}
           </div>
         )}
@@ -127,7 +127,7 @@ export function ClaimCelebration({ reward, onClose }: ClaimCelebrationProps) {
           type="button"
           onClick={onClose}
           autoFocus
-          className="ar-lift mt-[22px] w-full rounded-[10px] border border-white/[.18] p-3 font-ar text-xs font-extrabold uppercase tracking-[0.08em] text-[#0a0420]"
+          className="ar-lift mt-[1.375rem] w-full rounded-[10px] border border-white/[.18] p-3 font-ar text-xs font-extrabold uppercase tracking-[0.08em] text-[#0a0420]"
           style={{ background: `linear-gradient(180deg, ${skin.fg}, ${skin.bd})` }}
         >
           {t("celebration.great")}

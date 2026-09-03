@@ -146,11 +146,11 @@ export function RkBasesChapter() {
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <button className="rounded-rk-pill bg-rk-accent px-[18px] py-2 text-[14px] font-bold text-rk-accent-fg">
+              <button className="rounded-rk-pill bg-rk-accent px-[1.125rem] py-2 text-[0.875rem] font-bold text-rk-accent-fg">
                 Trinar
               </button>
-              <span className="text-[14px] text-rk-accent">#NidoCup</span>
-              <span className="rounded-rk-pill bg-rk-accent/12 px-3 py-1 text-[13px] font-bold text-rk-accent">
+              <span className="text-[0.875rem] text-rk-accent">#NidoCup</span>
+              <span className="rounded-rk-pill bg-rk-accent/12 px-3 py-1 text-[0.8125rem] font-bold text-rk-accent">
                 Acento suave
               </span>
             </div>
@@ -174,18 +174,18 @@ export function RkBasesChapter() {
         <Sample title="Las dos caras" code="font-rk · font-rk-chirp" app="rk">
           <div className="space-y-4">
             <div>
-              <div className="mb-1 font-mono text-[10px] uppercase tracking-widest text-rk-fg-subtle">
+              <div className="mb-1 font-mono text-[0.625rem] uppercase tracking-widest text-rk-fg-subtle">
                 Sistema (por defecto)
               </div>
-              <p className="font-rk text-[19px] text-rk-fg">
+              <p className="font-rk text-[1.1875rem] text-rk-fg">
                 DESPUÉS DE 4.200 ENCUENTROS. POR FIN.
               </p>
             </div>
             <div>
-              <div className="mb-1 font-mono text-[10px] uppercase tracking-widest text-rk-fg-subtle">
+              <div className="mb-1 font-mono text-[0.625rem] uppercase tracking-widest text-rk-fg-subtle">
                 Chirp · Hanken Grotesk
               </div>
-              <p className="font-rk-chirp text-[19px] text-rk-fg">
+              <p className="font-rk-chirp text-[1.1875rem] text-rk-fg">
                 DESPUÉS DE 4.200 ENCUENTROS. POR FIN.
               </p>
             </div>
@@ -199,11 +199,11 @@ export function RkBasesChapter() {
           note="El cuerpo de un trino baja a 14px en densidad compacta; el trino abierto sube a 18px. Es el mismo texto en dos rangos, no dos estilos."
         >
           <div className="space-y-2">
-            <p className="text-[20px] font-extrabold text-rk-fg">20 · navegación activa</p>
-            <p className="text-[18px] text-rk-fg">18 · el trino abierto</p>
-            <p className="text-[15px] text-rk-fg">15 · el trino en la línea de tiempo</p>
-            <p className="text-[14px] text-rk-fg-muted">14 · compacto</p>
-            <p className="text-[13px] text-rk-fg-subtle">13 · contadores y sellos de tiempo</p>
+            <p className="text-[1.25rem] font-extrabold text-rk-fg">20 · navegación activa</p>
+            <p className="text-[1.125rem] text-rk-fg">18 · el trino abierto</p>
+            <p className="text-[0.9375rem] text-rk-fg">15 · el trino en la línea de tiempo</p>
+            <p className="text-[0.875rem] text-rk-fg-muted">14 · compacto</p>
+            <p className="text-[0.8125rem] text-rk-fg-subtle">13 · contadores y sellos de tiempo</p>
           </div>
         </Sample>
       </Section>
@@ -222,16 +222,16 @@ export function RkBasesChapter() {
       >
         <Sample title="Radios" code="rounded-rk · rounded-rk-pill" app="rk">
           <div className="flex flex-wrap items-end gap-4">
-            <div className="grid h-20 w-28 place-items-center rounded-rk border border-rk-line bg-rk-card text-[12px] text-rk-fg-muted">
+            <div className="grid h-20 w-28 place-items-center rounded-rk border border-rk-line bg-rk-card text-[0.75rem] text-rk-fg-muted">
               rk · 16px
             </div>
-            <div className="grid h-20 w-28 place-items-center rounded-rk-md border border-rk-line bg-rk-card text-[12px] text-rk-fg-muted">
+            <div className="grid h-20 w-28 place-items-center rounded-rk-md border border-rk-line bg-rk-card text-[0.75rem] text-rk-fg-muted">
               rk-md · 12px
             </div>
-            <div className="grid h-10 w-32 place-items-center rounded-rk-pill bg-rk-accent text-[13px] font-bold text-rk-accent-fg">
+            <div className="grid h-10 w-32 place-items-center rounded-rk-pill bg-rk-accent text-[0.8125rem] font-bold text-rk-accent-fg">
               rk-pill
             </div>
-            <div className="grid h-8 w-16 place-items-center rounded-rk-sm border border-rk-line bg-rk-card text-[11px] text-rk-fg-muted">
+            <div className="grid h-8 w-16 place-items-center rounded-rk-sm border border-rk-line bg-rk-card text-[0.6875rem] text-rk-fg-muted">
               rk-sm
             </div>
           </div>

@@ -71,8 +71,8 @@ export default function Calendario() {
       <>
         <Skeleton className="h-8 w-56" />
         <div className="grid gap-4 md:grid-cols-12">
-          <Skeleton className="h-[520px] rounded-sb-lg md:col-span-8" />
-          <Skeleton className="h-[520px] rounded-sb-lg md:col-span-4" />
+          <Skeleton className="h-[32.5rem] rounded-sb-lg md:col-span-8" />
+          <Skeleton className="h-[32.5rem] rounded-sb-lg md:col-span-4" />
         </div>
       </>
     );
@@ -88,10 +88,10 @@ export default function Calendario() {
 
       <div className="grid gap-4 md:grid-cols-12">
         <Card className="md:col-span-8">
-          <div className="flex items-center justify-between px-5 pb-1 pt-[18px]">
+          <div className="flex items-center justify-between px-5 pb-1 pt-[1.125rem]">
             <div>
-              <div className="mb-0.5 text-[11px] uppercase tracking-[0.1em] text-sb-fg-subtle">{t("calendario.monthlyView")}</div>
-              <h3 className="m-0 font-sb-display text-[18px] font-semibold capitalize">{monthName}</h3>
+              <div className="mb-0.5 text-[0.6875rem] uppercase tracking-[0.1em] text-sb-fg-subtle">{t("calendario.monthlyView")}</div>
+              <h3 className="m-0 font-sb-display text-[1.125rem] font-semibold capitalize">{monthName}</h3>
             </div>
             <div className="flex gap-1.5">
               <Button variant="secondary" size="icon" onClick={() => nav(-1)} aria-label={t("calendario.prevMonth")}><Ico name="arrL" size={14} /></Button>
@@ -103,10 +103,10 @@ export default function Calendario() {
           <CardBody>
             <div className="grid grid-cols-7 gap-1">
               {(t.raw("calendario.dayHeaders") as string[]).map((d: string) => (
-                <div key={d} className="py-2 text-center text-[11px] font-semibold uppercase tracking-[0.08em] text-sb-fg-muted">{d}</div>
+                <div key={d} className="py-2 text-center text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-sb-fg-muted">{d}</div>
               ))}
               {cells.map((c, i) => {
-                if (c.out) return <div key={i} className="flex aspect-square flex-col rounded-sb-sm p-1.5 text-[12px] text-sb-fg-subtle">{c.day}</div>;
+                if (c.out) return <div key={i} className="flex aspect-square flex-col rounded-sb-sm p-1.5 text-[0.75rem] text-sb-fg-subtle">{c.day}</div>;
                 const k = keyOf(new Date(viewYear, viewMonth, c.day));
                 const ev = events.get(k) ?? [];
                 const sel = selected === k;
@@ -116,7 +116,7 @@ export default function Calendario() {
                     type="button"
                     onClick={() => setSelected(sel ? null : k)}
                     className={cn(
-                      "flex aspect-square cursor-pointer flex-col rounded-sb-sm border border-transparent p-1.5 text-[12px] transition-colors",
+                      "flex aspect-square cursor-pointer flex-col rounded-sb-sm border border-transparent p-1.5 text-[0.75rem] transition-colors",
                       sel ? "bg-sb-600 text-white hover:bg-sb-700" : "bg-sb-surface-2 text-sb-fg-2 hover:bg-sb-surface-3",
                       !sel && isToday(c.day) && "border-sb-500 font-bold text-sb-700",
                     )}
@@ -125,7 +125,7 @@ export default function Calendario() {
                     {ev.length > 0 && (
                       <span className="mt-auto flex gap-[3px]">
                         {ev.slice(0, 3).map((e, j) => (
-                          <span key={j} className="size-[5px] rounded-full" style={{ background: sel ? "#fff" : e.type === "in" ? "#059669" : "#dc2626" }} />
+                          <span key={j} className="size-[0.3125rem] rounded-full" style={{ background: sel ? "#fff" : e.type === "in" ? "#059669" : "#dc2626" }} />
                         ))}
                       </span>
                     )}
@@ -146,15 +146,15 @@ export default function Calendario() {
                     <div key={i} className={cn("flex items-center gap-3 py-2", i > 0 && "border-t border-sb-border")}>
                       <span className="size-2 rounded-full" style={{ background: e.category.hex }} />
                       <div className="flex-1">
-                        <div className="text-[13px] font-semibold">{e.reason}</div>
-                        <div className="text-[11.5px] text-sb-fg-muted">{t(`categories.${e.category.id}`)}</div>
+                        <div className="text-[0.8125rem] font-semibold">{e.reason}</div>
+                        <div className="text-[0.71875rem] text-sb-fg-muted">{t(`categories.${e.category.id}`)}</div>
                       </div>
                       <div className={cn("font-semibold tabular-nums", e.type === "in" ? "text-sb-pos" : "text-sb-neg")}>{e.type === "in" ? "+ " : "− "}{formatMoney(e.amount)}</div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-wrap items-center gap-4 text-[12px] text-sb-fg-muted">
+                <div className="flex flex-wrap items-center gap-4 text-[0.75rem] text-sb-fg-muted">
                   <span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-sb-pos-2" /> {t("calendario.income")}</span>
                   <span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-sb-neg-2" /> {t("calendario.expense")}</span>
                   <span>{t("calendario.selectDay")}</span>
@@ -170,8 +170,8 @@ export default function Calendario() {
             <div className="grid size-12 place-items-center rounded-full bg-sb-surface-3 text-sb-fg-subtle">
               <Ico name="cal" size={22} />
             </div>
-            <div className="text-[13px] text-sb-fg-muted">{t("calendario.noScheduledPayments")}</div>
-            <div className="max-w-[220px] text-[12px] text-sb-fg-subtle">{t("calendario.noScheduledPaymentsDesc")}</div>
+            <div className="text-[0.8125rem] text-sb-fg-muted">{t("calendario.noScheduledPayments")}</div>
+            <div className="max-w-[13.75rem] text-[0.75rem] text-sb-fg-subtle">{t("calendario.noScheduledPaymentsDesc")}</div>
           </CardBody>
         </Card>
       </div>

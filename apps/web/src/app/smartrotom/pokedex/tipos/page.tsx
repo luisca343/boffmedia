@@ -12,7 +12,7 @@ export default function TiposPage() {
   const [view, setView] = useState<"chart" | "analysis">("chart")
 
   const toggle = (active: boolean) =>
-    `px-3.5 py-2 rounded-[7px] text-[12.5px] font-medium inline-flex items-center gap-2 transition-colors ${
+    `px-3.5 py-2 rounded-[7px] text-[0.78125rem] font-medium inline-flex items-center gap-2 transition-colors ${
       active
         ? "bg-pk-primary-400/[0.14] text-pk-primary-200 shadow-[inset_0_0_0_1px_rgba(249,115,22,0.3)]"
         : "text-pk-surface-400 hover:text-pk-surface-100 hover:bg-white/[0.04]"

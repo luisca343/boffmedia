@@ -65,7 +65,7 @@ export function ArBasesChapter() {
           note="Dos focos de neón —violeta arriba a la derecha, magenta abajo a la izquierda— sobre un degradado violeta. Es el fondo de toda la app; lo pinta el layout, no las pantallas."
           padded={false}
         >
-          <div className="h-[160px] w-full" />
+          <div className="h-[10rem] w-full" />
         </Sample>
       </Section>
 
@@ -76,48 +76,48 @@ export function ArBasesChapter() {
         lead="Tres voces. Press Start 2P es la tipografía de la marquesina: píxel puro, un solo grosor y una caja por glifo enorme, así que sólo aparece pequeña —rótulos, títulos, marcadores—. Space Grotesk lee. JetBrains Mono cuenta."
       >
         <Sample title="Escala" code="font-ar-display · font-ar · font-ar-mono" app="ar" col>
-          <div className="grid w-full gap-[18px]">
+          <div className="grid w-full gap-[1.125rem]">
             {[
               [
                 "Marquesina / Press Start 2P / 18–28px",
-                <span key="a" className="ar-marquee-text font-ar-display text-[24px] leading-tight">
+                <span key="a" className="ar-marquee-text font-ar-display text-[1.5rem] leading-tight">
                   TU ESTACIÓN RETRO
                 </span>,
               ],
               [
                 "Título / Press Start 2P / 13–18px",
-                <span key="b" className="font-ar-display text-[16px] leading-relaxed text-ar-ink">
+                <span key="b" className="font-ar-display text-[1rem] leading-relaxed text-ar-ink">
                   Gira Voltorb
                 </span>,
               ],
               [
                 "Rótulo / Press Start 2P / 8–10px",
-                <span key="c" className="font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
+                <span key="c" className="font-ar-display text-[0.5625rem] uppercase tracking-[0.18em] text-ar-cyan">
                   ▸ Racha semanal
                 </span>,
               ],
               [
                 "Cuerpo / Space Grotesk 400–700 / 12–14px",
-                <span key="d" className="max-w-[52ch] font-ar text-[13px] leading-relaxed text-ar-ink-dim">
+                <span key="d" className="max-w-[52ch] font-ar text-[0.8125rem] leading-relaxed text-ar-ink-dim">
                   Juega los minijuegos de SmartRotom, sube tu racha y desbloquea cajas del banner activo.
                 </span>,
               ],
               [
                 "Dato / JetBrains Mono 500–700 / 10–13px",
-                <span key="e" className="font-ar-mono text-[12px] font-bold tabular-nums text-ar-amber">
+                <span key="e" className="font-ar-mono text-[0.75rem] font-bold tabular-nums text-ar-amber">
                   REINICIA EN 12h 24m
                 </span>,
               ],
               [
                 "Marcador / Press Start 2P + glow",
-                <span key="f" className="ar-glow-cyan font-ar-display text-[28px] text-ar-ink">
+                <span key="f" className="ar-glow-cyan font-ar-display text-[1.75rem] text-ar-ink">
                   ×108
                 </span>,
               ],
             ].map(([meta, node], i) => (
               <div
                 key={i}
-                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-white/[0.06] pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[260px_1fr] sm:gap-[22px]"
+                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-white/[0.06] pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[16.25rem_1fr] sm:gap-[1.375rem]"
               >
                 <span className={cn(MONO_LABEL, "font-ar-mono text-ar-ink-muted")}>
                   {meta as React.ReactNode}
@@ -134,8 +134,8 @@ export function ArBasesChapter() {
           app="ar"
           note="Press Start 2P sólo tiene un peso (400). Pedirle `font-bold` hace que el navegador lo sintetice y el píxel se emborrona. Para dar énfasis, usa color o un glow —nunca grosor—."
         >
-          <span className="font-ar-display text-[14px] text-ar-ink">Correcto</span>
-          <span className="ar-glow-magenta font-ar-display text-[14px] text-ar-magenta-2">Énfasis</span>
+          <span className="font-ar-display text-[0.875rem] text-ar-ink">Correcto</span>
+          <span className="ar-glow-magenta font-ar-display text-[0.875rem] text-ar-magenta-2">Énfasis</span>
         </Sample>
       </Section>
 
@@ -152,10 +152,10 @@ export function ArBasesChapter() {
           note="La intensidad de las scanlines es un ajuste del jugador: `data-scanlines` en la raíz `.ar-app` («off» · «subtle» · «strong») reescribe `--ar-scan`. Ajustes → Cabina la controla."
           grid
         >
-          <div className="ar-scanlines grid h-28 place-items-center rounded-xl border border-ar-cyan/30 bg-ar-void font-ar-display text-[11px] text-ar-cyan">
+          <div className="ar-scanlines grid h-28 place-items-center rounded-xl border border-ar-cyan/30 bg-ar-void font-ar-display text-[0.6875rem] text-ar-cyan">
             SCANLINES
           </div>
-          <div className="ar-scanlines ar-vignette relative grid h-28 place-items-center rounded-xl border border-ar-magenta/30 bg-ar-void font-ar-display text-[11px] text-ar-magenta-2">
+          <div className="ar-scanlines ar-vignette relative grid h-28 place-items-center rounded-xl border border-ar-magenta/30 bg-ar-void font-ar-display text-[0.6875rem] text-ar-magenta-2">
             + VIÑETA
           </div>
         </Sample>
@@ -167,9 +167,9 @@ export function ArBasesChapter() {
           note="La carretera synthwave: una lámina magenta→cian inclinada en perspectiva y enmascarada en rejilla, más la línea del horizonte. Va en un padre `relative` y el contenido se sube por encima con `relative z-[2]`."
           padded={false}
         >
-          <div className="relative h-[180px] w-full overflow-hidden rounded-xl border border-ar-violet/25 bg-ar-void">
+          <div className="relative h-[11.25rem] w-full overflow-hidden rounded-xl border border-ar-violet/25 bg-ar-void">
             <div aria-hidden className="ar-horizon" />
-            <div className="relative z-[2] grid h-full place-items-center font-ar-display text-[12px] text-ar-ink">
+            <div className="relative z-[2] grid h-full place-items-center font-ar-display text-[0.75rem] text-ar-ink">
               HORIZONTE
             </div>
           </div>
@@ -181,10 +181,10 @@ export function ArBasesChapter() {
           app="ar"
           note="`ar-chrom` desalinea los cañones rojo y azul del tubo: un píxel de magenta a un lado, uno de cian al otro. Es el efecto de «título encendido» y se reserva para titulares y estados hover."
         >
-          <span className="ar-chrom font-ar-display text-[15px] text-ar-ink">ABERRACIÓN</span>
-          <span className="ar-glow-cyan font-ar-display text-[15px] text-ar-cyan">CIAN</span>
-          <span className="ar-glow-magenta font-ar-display text-[15px] text-ar-magenta-2">MAGENTA</span>
-          <span className="ar-glow-amber font-ar-display text-[15px] text-ar-amber">ÁMBAR</span>
+          <span className="ar-chrom font-ar-display text-[0.9375rem] text-ar-ink">ABERRACIÓN</span>
+          <span className="ar-glow-cyan font-ar-display text-[0.9375rem] text-ar-cyan">CIAN</span>
+          <span className="ar-glow-magenta font-ar-display text-[0.9375rem] text-ar-magenta-2">MAGENTA</span>
+          <span className="ar-glow-amber font-ar-display text-[0.9375rem] text-ar-amber">ÁMBAR</span>
         </Sample>
 
         <Sample
@@ -199,13 +199,13 @@ export function ArBasesChapter() {
             </>
           }
         >
-          <span className="font-ar-display text-[10px] text-ar-amber motion-reduce:animate-none animate-ar-blink">
+          <span className="font-ar-display text-[0.625rem] text-ar-amber motion-reduce:animate-none animate-ar-blink">
             INSERT COIN ●
           </span>
-          <span className="grid h-12 w-12 place-items-center rounded-lg border border-ar-violet/50 bg-ar-violet/10 font-ar-display text-[16px] text-ar-violet-2 motion-reduce:animate-none animate-ar-float">
+          <span className="grid h-12 w-12 place-items-center rounded-lg border border-ar-violet/50 bg-ar-violet/10 font-ar-display text-[1rem] text-ar-violet-2 motion-reduce:animate-none animate-ar-float">
             ◈
           </span>
-          <span className="relative grid h-12 w-12 place-items-center rounded-lg border border-ar-cyan/50 bg-ar-cyan/10 font-ar-display text-[16px] text-ar-cyan">
+          <span className="relative grid h-12 w-12 place-items-center rounded-lg border border-ar-cyan/50 bg-ar-cyan/10 font-ar-display text-[1rem] text-ar-cyan">
             ★
             <span
               aria-hidden

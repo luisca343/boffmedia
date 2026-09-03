@@ -80,7 +80,7 @@ export function ResetScreen() {
   if (!token) {
     return (
       <AuthShell title={t("reset.title")}>
-        <p className="font-body text-[14px]/[1.55] not-italic normal-case text-danger">
+        <p className="font-body text-[0.875rem]/[1.55] not-italic normal-case text-danger">
           {t("reset.missingToken")}
         </p>
       </AuthShell>
@@ -90,8 +90,8 @@ export function ResetScreen() {
   return (
     <AuthShell title={t("reset.title")} subtitle={t("reset.subtitle")}>
       {done ? (
-        <div className="flex flex-col gap-[15px]">
-          <p className="font-body text-[14px]/[1.55] not-italic normal-case text-txt-muted">
+        <div className="flex flex-col gap-[0.9375rem]">
+          <p className="font-body text-[0.875rem]/[1.55] not-italic normal-case text-txt-muted">
             {t("reset.success")}
           </p>
           <Button variant="pri" className="w-full" onClick={() => router.replace("/entrar")}>
@@ -99,7 +99,7 @@ export function ResetScreen() {
           </Button>
         </div>
       ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[15px]" noValidate>
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.9375rem]" noValidate>
           <Field label={t("reset.password")} error={errors.password?.message}>
             <PasswordField
               autoComplete="new-password"

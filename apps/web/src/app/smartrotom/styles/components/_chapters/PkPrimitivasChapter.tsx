@@ -56,9 +56,9 @@ export function PkPrimitivasChapter() {
               <TypeGlyph type="psychic" size={20} />
             </span>
           </div>
-          <p className="w-full text-[13px] leading-[1.6] text-pk-surface-400">
+          <p className="w-full text-[0.8125rem] leading-[1.6] text-pk-surface-400">
             <b className="font-semibold text-pk-surface-100">TypeGlyph</b> se puede usar suelto: hereda{" "}
-            <code className="font-pk-mono text-[12px] text-pk-primary-300">currentColor</code>, así que sirve de icono
+            <code className="font-pk-mono text-[0.75rem] text-pk-primary-300">currentColor</code>, así que sirve de icono
             dentro de cualquier tinta.
           </p>
         </Sample>
@@ -87,8 +87,8 @@ export function PkPrimitivasChapter() {
                 className="flex items-center gap-2 rounded-md border border-white/[0.06] bg-white/[0.02] px-2.5 py-2"
               >
                 <i className="h-4 w-4 flex-none rounded-sm" style={{ background: TYPE_COLORS[t] }} />
-                <span className="min-w-0 flex-1 truncate text-[12px] text-pk-surface-300">{TYPE_LABELS[t]}</span>
-                <code className="font-pk-mono text-[10px] uppercase text-pk-surface-500">{TYPE_COLORS[t]}</code>
+                <span className="min-w-0 flex-1 truncate text-[0.75rem] text-pk-surface-300">{TYPE_LABELS[t]}</span>
+                <code className="font-pk-mono text-[0.625rem] uppercase text-pk-surface-500">{TYPE_COLORS[t]}</code>
               </div>
             ))}
           </div>
@@ -182,7 +182,7 @@ export function PkPrimitivasChapter() {
           padded={false}
           note="No es una primitiva sino el marco completo: monta `HubSidebar` (la navegación real, con enlaces que salen de la guía de estilos) y una zona principal que hace scroll por dentro. Espera altura completa, así que aquí se le da un contenedor de 460px; la barra sólo aparece a partir de `lg`. `ScreenShell` es su hermano sin cabecera."
         >
-          <div className="h-[460px] w-full overflow-hidden">
+          <div className="h-[28.75rem] w-full overflow-hidden">
             <SecondaryPageHeader
               eyebrow="Base de datos"
               title="Biomas"

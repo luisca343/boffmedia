@@ -1,7 +1,7 @@
 import type { ButtonHTMLAttributes, HTMLAttributes } from "react"
 
 const SHAPE =
-  "inline-flex items-center gap-1.5 rounded-pc-pill border px-[9px] py-1 font-pc text-[11.5px] font-semibold"
+  "inline-flex items-center gap-1.5 rounded-pc-pill border px-[0.5625rem] py-1 font-pc text-[0.71875rem] font-semibold"
 
 /**
  * The resting skin. It is kept apart from the shape because the lit skin has to

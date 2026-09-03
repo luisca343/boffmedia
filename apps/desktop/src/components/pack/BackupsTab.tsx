@@ -115,7 +115,7 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
 
   if (loading) {
     return (
-      <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
+      <span className="flex items-center gap-2 py-6 font-mono text-[0.6875rem] text-txt-dim">
         <Spinner size={12} /> {t("reading")}
       </span>
     )
@@ -164,14 +164,14 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
             >
               <span className="flex min-w-0 flex-1 flex-col gap-[2px]">
                 <span className="flex items-center gap-2">
-                  <span className="min-w-0 truncate font-display text-[13px] font-bold uppercase tracking-[0.03em]">
+                  <span className="min-w-0 truncate font-display text-[0.8125rem] font-bold uppercase tracking-[0.03em]">
                     {backup.label}
                   </span>
                   <Badge tone={backup.kind === "world" ? "info" : "ok"} className="shrink-0">
                     {backup.kind === "world" ? "Mundo" : "Pack"}
                   </Badge>
                 </span>
-                <span className="truncate font-mono text-[11px] text-txt-dim">
+                <span className="truncate font-mono text-[0.6875rem] text-txt-dim">
                   {formatWhen(backup.createdAt)} · {formatBytes(backup.sizeBytes)}
                 </span>
               </span>
@@ -230,12 +230,12 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
                   <p className="truncate font-mono text-xs text-txt">
                     {version.versionName}
                     {version.current && (
-                      <span className="ml-2 text-[11px] uppercase tracking-[0.1em] text-txt-dim">
+                      <span className="ml-2 text-[0.6875rem] uppercase tracking-[0.1em] text-txt-dim">
                         {tis("currentVersion")}
                       </span>
                     )}
                   </p>
-                  <p className="text-[11px] text-txt-dim">
+                  <p className="text-[0.6875rem] text-txt-dim">
                     {formatWhen(version.installedAt)} · {tis("versionFileCount", { count: version.fileCount })} ·{" "}
                     {version.minecraft}
                   </p>

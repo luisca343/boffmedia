@@ -27,8 +27,8 @@ export function PassiveView({ rec, onNav }: ViewProps) {
           <MewPanel title={t("panel.ranks")} icon="layers" count={rec.ranks.length} span="full">
             <div className="flex flex-col gap-3">
               {rec.ranks.map((rk) => (
-                <div className="grid grid-cols-[28px_1fr] items-start gap-[11px]" key={rk.r}>
-                  <span className="grid h-7 w-7 place-items-center pt-[3px] text-[13px]/none text-[color:var(--mwp-paper)] [font-family:var(--mwf-disp)] [border-radius:50%_45%_52%_48%/48%_52%_45%_50%] border-2 border-solid border-[color:var(--mwp-red-deep)] bg-[color:var(--mwp-red)] [transform:rotate(-3deg)]">{rk.r}</span>
+                <div className="grid grid-cols-[1.75rem_1fr] items-start gap-[0.6875rem]" key={rk.r}>
+                  <span className="grid h-7 w-7 place-items-center pt-[3px] text-[0.8125rem]/none text-[color:var(--mwp-paper)] [font-family:var(--mwf-disp)] [border-radius:50%_45%_52%_48%/48%_52%_45%_50%] border-2 border-solid border-[color:var(--mwp-red-deep)] bg-[color:var(--mwp-red)] [transform:rotate(-3deg)]">{rk.r}</span>
                   <div className="flex min-w-0 flex-col gap-1.5">
                     {rk.desc ? <MewText>{rk.desc}</MewText> : null}
                     {rk.passives && <MewEffects map={rk.passives} onNav={onNav} />}

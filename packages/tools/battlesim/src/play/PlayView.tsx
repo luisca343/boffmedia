@@ -35,7 +35,7 @@ import { useBattleTeams } from './useBattleTeams';
 function Bar({ onBack, title, sub }: { onBack: () => void; title: string; sub?: string }) {
   const t = useToolT(BATTLESIM_NS);
   return (
-    <div className="flex min-h-[var(--tool-bar-h,58px)] shrink-0 items-center gap-3 border-b border-solid border-line bg-panel px-3">
+    <div className="flex min-h-[var(--tool-bar-h,3.625rem)] shrink-0 items-center gap-3 border-b border-solid border-line bg-panel px-3">
       <DkBack onClick={onBack} label={t('battle.header.back')} />
       <DkTitle icon="sword" label={title} sub={sub} />
     </div>
@@ -46,9 +46,9 @@ function TeamCard({ name, packed, selected, onSelect }: { name: string; packed: 
   const sets = useMemo(() => unpackTeam(packed) ?? [], [packed]);
   return (
     <button type="button" onClick={onSelect} aria-pressed={selected}
-      className={cn('cut-tag cut-tag-edge [--cut-tag:10px] [--cut-line:var(--line)]', BSIM_FOCUS_CUT, 'flex min-h-[64px] w-full min-w-0 flex-col gap-2 border border-solid border-line bg-panel p-3 text-left transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:bg-panel-2',
+      className={cn('cut-tag cut-tag-edge [--cut-tag:10px] [--cut-line:var(--line)]', BSIM_FOCUS_CUT, 'flex min-h-[4rem] w-full min-w-0 flex-col gap-2 border border-solid border-line bg-panel p-3 text-left transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:bg-panel-2',
         selected && 'border-accent [--cut-line:var(--accent)] bg-accent-soft')}>
-      <b className="truncate font-display text-[13px] font-bold uppercase leading-none tracking-[0.03em] text-txt">{name}</b>
+      <b className="truncate font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.03em] text-txt">{name}</b>
       <span className="flex flex-wrap gap-1">
         {sets.slice(0, 6).map((s, i) => <DkSprite key={i} src={spriteUrl(s.species)} alt={s.species} size={28} onError={handleSpriteError} />)}
       </span>
@@ -150,11 +150,11 @@ function PlayInner() {
     return (
       <div className="flex h-[var(--tool-vh,100dvh)] min-h-0 flex-col overflow-hidden bg-base text-txt">
         <Bar onBack={backOrHub} title={t('play.title')} sub={t('play.subtitle')} />
-        <div className="min-h-0 flex-1 overflow-y-auto p-[clamp(14px,2vw,32px)]">
-          <div className="mx-auto w-full max-w-[720px]">
+        <div className="min-h-0 flex-1 overflow-y-auto p-[clamp(0.875rem,2vw,2rem)]">
+          <div className="mx-auto w-full max-w-[45rem] min-[1600px]:max-w-[51.75rem] min-[2240px]:max-w-[60rem]">
             <BsimSection kicker={t('header.modes.ai')} icon="target" title={t('battle.play.setupTitle')}>
               <div className="grid gap-4">
-                <p className="m-0 font-body text-[13px] leading-[1.5] text-txt-muted">{t('battle.play.setupLead')}</p>
+                <p className="m-0 font-body text-[0.8125rem] leading-[1.5] text-txt-muted">{t('battle.play.setupLead')}</p>
                 <Select
                   label={t('battle.play.format')}
                   value={selectedFormat}
@@ -164,21 +164,21 @@ function PlayInner() {
                 />
                 {needsTeam && (
                   <div className="grid gap-2">
-                    <span className="font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">{t('battle.play.team')}</span>
+                    <span className="font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">{t('battle.play.team')}</span>
                     {teamOptions.length > 0 ? (
-                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                      <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 min-[1600px]:grid-cols-3">
                         {teamOptions.map((tm) => (
                           <TeamCard key={tm.clientId} name={tm.name} packed={tm.packed} selected={(selectedTeamId ?? teamOptions[0].clientId) === tm.clientId} onSelect={() => setSelectedTeamId(tm.clientId)} />
                         ))}
                       </div>
                     ) : blocked ? (
                       <div className="flex flex-wrap items-center gap-3 border border-solid border-warn bg-warn-soft p-3">
-                        <span className="font-body text-[12.5px] text-txt">{t('battle.play.noTeams')}</span>
+                        <span className="font-body text-[0.78125rem] text-txt">{t('battle.play.noTeams')}</span>
                         <Button size="sm" variant="ghost" icon="layers" onClick={() => nav.replace('hub', { tab: 'equipos' })}>{t('battle.play.createTeam')}</Button>
                       </div>
                     ) : (
                       <div className="flex flex-wrap items-center gap-3 border border-solid border-line bg-base p-3">
-                        <span className="font-body text-[12.5px] text-txt-muted">{t('battle.play.sampleHint')}</span>
+                        <span className="font-body text-[0.78125rem] text-txt-muted">{t('battle.play.sampleHint')}</span>
                         <Button size="sm" variant="ghost" icon="layers" onClick={() => nav.replace('hub', { tab: 'equipos' })}>{t('battle.play.createTeam')}</Button>
                       </div>
                     )}

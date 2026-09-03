@@ -76,7 +76,7 @@ function RowShell({
       className={cn(
         "border-b border-solid border-line last:border-b-0 border-l-2 border-l-transparent",
         "transition-[background,border-color] duration-200",
-        compact ? "py-[9px] px-[14px]" : "py-[13px] px-4",
+        compact ? "py-[0.5625rem] px-[0.875rem]" : "py-[0.8125rem] px-4",
         changed && "border-l-accent bg-accent-soft/[0.45]",
         disabled && "opacity-50",
         flashing && "!bg-accent-soft !border-l-accent",
@@ -84,14 +84,14 @@ function RowShell({
     >
       <div className={cn("flex items-center gap-2.5", inline && "justify-between")}>
         <div className="flex items-center gap-1.5 min-w-0">
-          <span className="font-body text-[14px] font-semibold text-txt">{label}</span>
+          <span className="font-body text-[0.875rem] font-semibold text-txt">{label}</span>
           <InfoTip tipKey={tipKey} />
         </div>
         {inline && control}
       </div>
       {!inline && body && <div className="mt-2.5">{body}</div>}
       {disabled && reason && (
-        <p className="flex items-center gap-1.5 mt-2 font-mono text-[10.5px] tracking-[0.03em] text-warn">
+        <p className="flex items-center gap-1.5 mt-2 font-mono text-[0.65625rem] tracking-[0.03em] text-warn">
           <Icon name="lock" size={12} className="shrink-0" />
           <span>{reason}</span>
         </p>
@@ -99,7 +99,7 @@ function RowShell({
       {warning && (
         <p
           className={cn(
-            "flex items-start gap-1.5 mt-[9px] py-[7px] px-[9px] border-l-2 border-solid text-[11.5px] leading-[1.4]",
+            "flex items-start gap-1.5 mt-[0.5625rem] py-[0.4375rem] px-[0.5625rem] border-l-2 border-solid text-[0.71875rem] leading-[1.4]",
             WARN_STYLES[warning.level],
           )}
         >
@@ -321,7 +321,7 @@ export function ControlRenderer({ control }: { control: RzControl }) {
                     {on && (
                       <Input
                         type="number"
-                        className="w-[92px] font-mono"
+                        className="w-[5.75rem] font-mono"
                         value={num}
                         min={control.min}
                         max={control.max}
@@ -385,7 +385,7 @@ function CustomStarters({ control, disabled, reason }: { control: RzControl; dis
               name={`customStarters.${i}` as "customStarters.0"}
               render={({ field: { value, onChange } }) => (
                 <label className="grid gap-1.5">
-                  <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
+                  <span className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em] text-txt-dim">
                     {t(`opt.customStarter.label${i + 1}`)}
                   </span>
                   <Input
@@ -437,7 +437,7 @@ function BattleStyle({ control }: { control: RzControl }) {
             name="settingBattleStyle.style"
             render={({ field: { value, onChange } }) => (
               <label className="grid gap-1.5">
-                <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
+                <span className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em] text-txt-dim">
                   {t("opt.battleStyleStyle.label")}
                 </span>
                 <Select
@@ -476,12 +476,12 @@ function MiscBitmask() {
             key={key}
             className={cn(
               "flex items-center justify-between gap-2.5 border-b border-solid border-line border-l-2 border-l-transparent",
-              compact ? "py-[9px] px-[14px]" : "py-[13px] px-4",
+              compact ? "py-[0.5625rem] px-[0.875rem]" : "py-[0.8125rem] px-4",
               on && "border-l-accent bg-accent-soft/[0.45]",
             )}
           >
             <div className="flex items-center gap-1.5 min-w-0">
-              <span className="font-body text-[14px] font-semibold text-txt">{t(`opt.${key}.label`)}</span>
+              <span className="font-body text-[0.875rem] font-semibold text-txt">{t(`opt.${key}.label`)}</span>
               <InfoTip tipKey={`opt.${key}.tip`} />
             </div>
             <Toggle on={on} onChange={(v) => setBit(mask, v)} ariaLabel={t(`opt.${key}.label`)} />

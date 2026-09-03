@@ -35,7 +35,7 @@ function isActive(pathname: string, href: string) {
 function NavBadge({ count }: { count: number }) {
   if (!count) return null
   return (
-    <span className="absolute -right-2 -top-1.5 grid h-[17px] min-w-[17px] place-items-center rounded-rk-pill border-2 border-rk-bg bg-rk-accent px-1 text-[10px] font-extrabold text-rk-accent-fg">
+    <span className="absolute -right-2 -top-1.5 grid h-[1.0625rem] min-w-[1.0625rem] place-items-center rounded-rk-pill border-2 border-rk-bg bg-rk-accent px-1 text-[0.625rem] font-extrabold text-rk-accent-fg">
       {count > 99 ? "99+" : count}
     </span>
   )
@@ -63,14 +63,14 @@ export function RookerShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-0 flex-1 justify-center">
-      <div className="flex w-full max-w-[1265px] min-w-0">
+      <div className="flex w-full max-w-[79.0625rem] min-w-0">
         {/* ── Left nav (desktop). Collapses to icons under 1000px, exactly as the
             handoff's breakpoints do, and disappears entirely on mobile. ───────── */}
-        <nav className="sticky top-0 hidden h-full w-[88px] flex-none flex-col items-center border-r border-rk-line px-2 pb-3 pt-1 md:flex xl:w-[275px] xl:items-start xl:px-2">
+        <nav className="sticky top-0 hidden h-full w-[5.5rem] flex-none flex-col items-center border-r border-rk-line px-2 pb-3 pt-1 md:flex xl:w-[17.1875rem] xl:items-start xl:px-2">
           <Link
             href="/smartrotom/rooker"
             aria-label={t("shell.homeAriaLabel")}
-            className="mb-0.5 grid h-[52px] w-[52px] place-items-center rounded-full text-rk-accent transition-colors hover:bg-rk-hover"
+            className="mb-0.5 grid h-[3.25rem] w-[3.25rem] place-items-center rounded-full text-rk-accent transition-colors hover:bg-rk-hover"
           >
             <RookerMark size={48} />
           </Link>
@@ -84,7 +84,7 @@ export function RookerShell({ children }: { children: ReactNode }) {
                   href={item.href}
                   aria-current={on ? "page" : undefined}
                   className={cn(
-                    "flex w-fit max-w-full items-center gap-[18px] rounded-rk-pill px-4 py-[11px] text-[20px] text-rk-fg transition-colors hover:bg-rk-hover",
+                    "flex w-fit max-w-full items-center gap-[1.125rem] rounded-rk-pill px-4 py-[0.6875rem] text-[1.25rem] text-rk-fg transition-colors hover:bg-rk-hover",
                     on ? "font-extrabold" : "font-normal",
                   )}
                 >
@@ -102,7 +102,7 @@ export function RookerShell({ children }: { children: ReactNode }) {
                 href={myHref}
                 aria-current={profileActive ? "page" : undefined}
                 className={cn(
-                  "flex w-fit max-w-full items-center gap-[18px] rounded-rk-pill px-4 py-[11px] text-[20px] text-rk-fg transition-colors hover:bg-rk-hover",
+                  "flex w-fit max-w-full items-center gap-[1.125rem] rounded-rk-pill px-4 py-[0.6875rem] text-[1.25rem] text-rk-fg transition-colors hover:bg-rk-hover",
                   profileActive ? "font-extrabold" : "font-normal",
                 )}
               >
@@ -118,7 +118,7 @@ export function RookerShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => openCompose("text")}
-              className="mt-4 grid h-[52px] w-[52px] place-items-center rounded-rk-pill bg-rk-accent text-[17px] font-bold text-rk-accent-fg transition-[filter] hover:brightness-[.92] xl:h-auto xl:w-full xl:py-[15px]"
+              className="mt-4 grid h-[3.25rem] w-[3.25rem] place-items-center rounded-rk-pill bg-rk-accent text-[1.0625rem] font-bold text-rk-accent-fg transition-[filter] hover:brightness-[.92] xl:h-auto xl:w-full xl:py-[0.9375rem]"
             >
               <span className="hidden xl:inline">{t("compose.submit")}</span>
               <Icon name="feather" size={24} className="xl:hidden" />
@@ -134,10 +134,10 @@ export function RookerShell({ children }: { children: ReactNode }) {
             >
               <Avatar user={{ uuid: me.uuid, username: me.username, partnerPokemonId: me.partnerPokemonId }} size={40} />
               <div className="hidden min-w-0 flex-1 text-left xl:block">
-                <div className="truncate text-[15px] font-bold text-rk-fg">
+                <div className="truncate text-[0.9375rem] font-bold text-rk-fg">
                   {me.displayName || me.username}
                 </div>
-                <div className="truncate text-[14px] text-rk-fg-subtle">@{me.handle}</div>
+                <div className="truncate text-[0.875rem] text-rk-fg-subtle">@{me.handle}</div>
               </div>
               <Icon name="more" size={16} className="hidden flex-none text-rk-fg-subtle xl:block" />
             </Link>
@@ -145,7 +145,7 @@ export function RookerShell({ children }: { children: ReactNode }) {
         </nav>
 
         {/* ── Mobile top bar ─────────────────────────────────────────────────── */}
-        <div className="flex min-w-0 flex-1 flex-col md:max-w-[600px] md:border-r md:border-rk-line">
+        <div className="flex min-w-0 flex-1 flex-col md:max-w-[37.5rem] md:border-r md:border-rk-line">
           <div className="flex items-center justify-between border-b border-rk-line bg-rk-nav px-3.5 py-2 backdrop-blur-md md:hidden">
             {me ? (
               <Link href={myHref} aria-label={t("shell.yourProfileAriaLabel")}>
@@ -156,7 +156,7 @@ export function RookerShell({ children }: { children: ReactNode }) {
             )}
             <div className="flex items-center gap-1.5 text-rk-accent">
               <RookerMark size={32} />
-              <span className="text-[19px] font-extrabold tracking-[-.02em] text-rk-fg">Rooker</span>
+              <span className="text-[1.1875rem] font-extrabold tracking-[-.02em] text-rk-fg">Rooker</span>
             </div>
             <DisplayPanel compact />
           </div>
@@ -165,12 +165,12 @@ export function RookerShell({ children }: { children: ReactNode }) {
             {children}
             {/* Clears the fixed mobile tab bar so the last trino is never trapped
                 underneath it. */}
-            <div className="h-[76px] md:hidden" />
+            <div className="h-[4.75rem] md:hidden" />
           </main>
         </div>
 
         {/* ── Right rail. The handoff hides it below 1095px. ─────────────────── */}
-        <aside className="rk-scroll hidden h-full w-[350px] flex-none overflow-y-auto pl-6 lg:block">
+        <aside className="rk-scroll hidden h-full w-[21.875rem] flex-none overflow-y-auto pl-6 lg:block">
           <RightRail />
         </aside>
       </div>

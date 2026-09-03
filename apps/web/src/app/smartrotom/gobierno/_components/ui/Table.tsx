@@ -7,7 +7,7 @@ import type { ReactNode } from "react"
 export function Table({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <div className={`gt-scroll w-full overflow-x-auto ${className}`}>
-      <table className="w-full border-collapse text-[13px]">{children}</table>
+      <table className="w-full border-collapse text-[0.8125rem]">{children}</table>
     </div>
   )
 }
@@ -19,7 +19,7 @@ export function THead({ children }: { children: ReactNode }) {
 export function TH({ children, className = "" }: { children?: ReactNode; className?: string }) {
   return (
     <th
-      className={`whitespace-nowrap border-b border-gt-line-strong px-3.5 py-[9px] text-left font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400 ${className}`}
+      className={`whitespace-nowrap border-b border-gt-line-strong px-3.5 py-[0.5625rem] text-left font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400 ${className}`}
     >
       {children}
     </th>

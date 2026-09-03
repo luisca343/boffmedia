@@ -291,10 +291,10 @@ export function MewCatBuilder() {
             >
               <Icon name="back" size={16} />
             </MewScreenLink>
-            <span className="grid h-[38px] w-[38px] flex-none place-items-center border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [border-radius:55%_45%_50%_50%/50%_55%_45%_50%] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(-5deg)]">
+            <span className="grid h-[2.375rem] w-[2.375rem] flex-none place-items-center border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [border-radius:55%_45%_50%_50%/50%_55%_45%_50%] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(-5deg)]">
               <Icon name="paw" size={20} />
             </span>
-            <span className="truncate text-[22px]/[0.95] tracking-[0.02em] text-[color:var(--mwp-cream)] [font-family:var(--mwf-disp)] [text-shadow:2.5px_2.5px_0_var(--mwp-red-deep)]">
+            <span className="truncate text-[1.375rem]/[0.95] tracking-[0.02em] text-[color:var(--mwp-cream)] [font-family:var(--mwf-disp)] [text-shadow:2.5px_2.5px_0_var(--mwp-red-deep)]">
               {t("builder.title")}
             </span>
           </div>
@@ -338,7 +338,7 @@ export function MewCatBuilder() {
         className="flex min-h-0 flex-1 flex-col gap-3 p-3 xl:flex-row"
         style={{ paddingBottom: drawer ? drawerH + 12 : undefined }}
       >
-        <div className="order-2 flex min-h-0 flex-col xl:order-1 xl:w-[104px] xl:flex-none">
+        <div className="order-2 flex min-h-0 flex-col xl:order-1 xl:w-[6.5rem] xl:flex-none">
           <BuilderPaletteRail
             selected={state.palette}
             onChange={handlePaletteChange}
@@ -346,7 +346,7 @@ export function MewCatBuilder() {
           />
         </div>
 
-        <div className="order-1 flex min-h-0 flex-1 flex-col xl:order-2 max-xl:h-[58vh] max-xl:min-h-[340px] max-xl:flex-none">
+        <div className="order-1 flex min-h-0 flex-1 flex-col xl:order-2 max-xl:h-[58vh] max-xl:min-h-[21.25rem] max-xl:flex-none">
           <BuilderStage
             state={state}
             canvasRef={canvasRef}
@@ -355,7 +355,7 @@ export function MewCatBuilder() {
           />
         </div>
 
-        <div className="order-3 flex min-h-0 flex-col xl:w-[268px] xl:flex-none">
+        <div className="order-3 flex min-h-0 flex-col xl:w-[16.75rem] xl:flex-none">
           <BuilderSlotRail
             state={state}
             equipItems={equipItems}
@@ -415,7 +415,7 @@ function BarButton({
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="inline-flex items-center gap-[7px] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3 pb-1.5 pt-[9px] text-[13px]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-md)] transition-all hover:-translate-y-px active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-sm)] disabled:opacity-45 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)]"
+      className="inline-flex items-center gap-[0.4375rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3 pb-1.5 pt-[0.5625rem] text-[0.8125rem]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-md)] transition-all hover:-translate-y-px active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-sm)] disabled:opacity-45 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)]"
     >
       <Icon name={icon} size={15} />
       <span className={compact ? "max-[1100px]:hidden" : "max-[760px]:hidden"}>{label}</span>

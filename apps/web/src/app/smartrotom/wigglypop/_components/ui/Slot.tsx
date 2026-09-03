@@ -61,11 +61,11 @@ export function Slot({
         </span>
       )}
       {selected && (
-        <span className="absolute right-1 top-1 z-[4] flex h-[18px] w-[18px] items-center justify-center rounded-wp-pill bg-wp-accent text-white">
+        <span className="absolute right-1 top-1 z-[4] flex h-[1.125rem] w-[1.125rem] items-center justify-center rounded-wp-pill bg-wp-accent text-white">
           <Icon name="check" size={11} stroke={3} />
         </span>
       )}
-      <span className="wp-num absolute bottom-1 right-1 z-[3] rounded-[5px] bg-wp-fg/70 px-1 py-px font-wp text-[9px] text-white">
+      <span className="wp-num absolute bottom-1 right-1 z-[3] rounded-[5px] bg-wp-fg/70 px-1 py-px font-wp text-[0.5625rem] text-white">
         {t("slot.level", { level: mon.level })}
       </span>
     </button>

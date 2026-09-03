@@ -89,14 +89,14 @@ export function AdminChapter() {
           </div>
         </Sample>
         <Sample title="Ventanas" code="<AvSwitchRow label on reading hint action>" col note={<>Una ventana que el operador abre y cierra. El estado se imprime junto al control que lo cambia: un botón que dice «Cerrar» es una afirmación sobre el estado, y cuando era falsa no había dónde verlo.</>}>
-          <div className="w-full max-w-[460px]">
+          <div className="w-full max-w-[28.75rem]">
             <AvSwitchRow label="Inscripción" on reading="Abierta" action={<Button size="sm">Cerrar</Button>} />
             <AvSwitchRow label="Check-in" on={false} reading="Cerrado" action={<Button size="sm">Abrir</Button>} />
             <AvSwitchRow label="Cupo" on reading="Abierto" hint="Cerrar el cupo deja fuera a quien no haya completado la entrada." action={<Button size="sm">Cerrar cupo</Button>} />
           </div>
         </Sample>
         <Sample title="Atención" code="<AvAttention items empty>" col note={<>Lo que necesita a una persona, cada cosa con el clic que empieza a arreglarla. La lista vacía también es un resultado y lo dice.</>}>
-          <div className="w-full max-w-[560px] grid gap-4">
+          <div className="w-full max-w-[35rem] grid gap-4">
             <AvAttention
               items={[
                 { id: 1, tone: "error", text: "2 partidas están en disputa.", action: { label: "Ver partidas", onClick: () => {} } },
@@ -186,7 +186,7 @@ export function AdminChapter() {
         <Sample title="Barras" code="<AvSplitBar> · <AvGpuBar> · <AvDist>" col>
           <div className="grid w-full gap-4">
             <div className="flex items-center gap-3">
-              <span className={cn(MONO_LABEL, "w-[90px] shrink-0")}>Win / loss</span>
+              <span className={cn(MONO_LABEL, "w-[5.625rem] shrink-0")}>Win / loss</span>
               <div className="flex-1">
                 <AvSplitBar win={73} loss={27} height={9} />
               </div>
@@ -224,7 +224,7 @@ export function AdminChapter() {
         <Sample title="Panel denso" code="<AvPanel title icon aside>" col>
           <div className="w-full">
             <AvPanel title="Resumen del torneo" icon="trophy" aside={<AvPill tone="green"><AvLiveDot />En curso</AvPill>}>
-              <p className="text-txt-muted text-[14px]">El contenido de la sección vive aquí, con la esquina superior derecha en corte de 16px.</p>
+              <p className="text-txt-muted text-[0.875rem]">El contenido de la sección vive aquí, con la esquina superior derecha en corte de 16px.</p>
             </AvPanel>
           </div>
         </Sample>
@@ -303,10 +303,10 @@ export function AdminChapter() {
       </Section>
 
       <Modal open={confirm} onClose={() => setConfirm(false)} title="Confirmar borrado" size="sm">
-        <p className="text-[14px]/[1.5] text-txt-muted">
+        <p className="text-[0.875rem]/[1.5] text-txt-muted">
           ¿Seguro que quieres eliminar <strong className="text-txt">Torneo Wingull 2</strong>? Esta acción no se puede deshacer.
         </p>
-        <div className="mt-[18px] flex justify-end gap-2.5">
+        <div className="mt-[1.125rem] flex justify-end gap-2.5">
           <Button variant="ghost" size="sm" onClick={() => setConfirm(false)}>Cancelar</Button>
           <Button
             variant="danger"
@@ -504,7 +504,7 @@ function FeatureToggleSample() {
       onChange={setOn}
     >
       <Field className="mt-4">
-        <label className="block text-[13px] font-medium text-txt-muted mb-2">Usuarios autorizados</label>
+        <label className="block text-[0.8125rem] font-medium text-txt-muted mb-2">Usuarios autorizados</label>
         <DropZone label="Subir lista de UUIDs" hint=".txt" loadedLabel="Archivo cargado" onPick={() => {}} className="mb-3" />
         <Input placeholder="O pega aquí una lista de UUIDs..." />
       </Field>

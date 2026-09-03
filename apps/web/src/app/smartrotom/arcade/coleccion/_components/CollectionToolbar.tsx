@@ -46,7 +46,7 @@ export function CollectionToolbar({
   return (
     <Panel tone="void" tight className="mb-4">
       <div className="flex flex-wrap items-center gap-2.5">
-        <div className="relative min-w-[200px] flex-1">
+        <div className="relative min-w-[12.5rem] flex-1">
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ar-ink-muted">
             <Icon.Search s={14} />
           </span>
@@ -70,7 +70,7 @@ export function CollectionToolbar({
           onClick={() => onRarity("all")}
           aria-pressed={rarity === "all"}
           className={cn(
-            "ar-lift rounded-md border px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em]",
+            "ar-lift rounded-md border px-2.5 py-1.5 font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em]",
             rarity === "all"
               ? "border-ar-cyan/50 bg-ar-cyan/[.18] text-ar-cyan"
               : "border-white/[.08] bg-white/[.04] text-ar-ink-dim hover:text-ar-ink",
@@ -88,7 +88,7 @@ export function CollectionToolbar({
               type="button"
               onClick={() => onRarity(r)}
               aria-pressed={active}
-              className="ar-lift rounded-md border px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em]"
+              className="ar-lift rounded-md border px-2.5 py-1.5 font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em]"
               style={
                 active
                   ? { background: skin.bg, borderColor: skin.bd, color: skin.fg }

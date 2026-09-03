@@ -56,13 +56,13 @@ export default function OrdersPage() {
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <div className="flex flex-none flex-wrap items-center gap-4 border-b border-wp-line/24 px-[30px] py-[18px]">
-        <div className="min-w-[240px] flex-1">
-          <h1 className="flex items-center gap-2.5 whitespace-nowrap font-wp-display text-[21px] font-semibold text-wp-fg">
+      <div className="flex flex-none flex-wrap items-center gap-4 border-b border-wp-line/24 px-[1.875rem] py-[1.125rem]">
+        <div className="min-w-[15rem] flex-1">
+          <h1 className="flex items-center gap-2.5 whitespace-nowrap font-wp-display text-[1.3125rem] font-semibold text-wp-fg">
             <Icon name="history" size={20} className="text-wp-accent" />
             {t("compras.title")}
           </h1>
-          <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
+          <p className="mt-0.5 font-wp text-[0.78125rem] font-semibold text-wp-fg-subtle">
             <span className="wp-num">{all.length}</span> {t("compras.subtitleOrders")} ·{" "}
             <span className="wp-num">₽{fmt(spent)}</span> {t("compras.subtitleSpent")}
           </p>
@@ -70,11 +70,11 @@ export default function OrdersPage() {
         <Tabs tabs={TABS.map((tb) => ({ ...tb, label: t(tb.labelKey) }))} value={tab} onChange={setTab} />
       </div>
 
-      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-5">
+      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[1.875rem] pb-10 pt-5">
         {error ? (
           <EmptyState icon="alert" title={t("compras.errorTitle")} body={userMessageFrom(error, t("common.retryFallback"))} />
         ) : isLoading ? (
-          <div className="grid max-w-[880px] gap-3.5">
+          <div className="grid max-w-[55rem] gap-3.5">
             {Array.from({ length: 3 }).map((_, i) => (
               <Skeleton key={i} className="h-44 rounded-wp-lg" />
             ))}
@@ -86,7 +86,7 @@ export default function OrdersPage() {
             body={t("compras.emptyBody")}
           />
         ) : (
-          <div className="grid max-w-[880px] gap-3.5">
+          <div className="grid max-w-[55rem] gap-3.5">
             {filtered.map((o) => (
               <OrderCard key={o.id} order={o} />
             ))}
@@ -106,23 +106,23 @@ function OrderCard({ order: o }: { order: WpOrder }) {
   const refunded = step === -1
 
   return (
-    <Panel className="rounded-wp-lg p-[18px]">
+    <Panel className="rounded-wp-lg p-[1.125rem]">
       <div className="flex flex-wrap items-center gap-3">
-        <span className="font-wp-display text-[15px] font-semibold text-wp-fg">{o.code}</span>
+        <span className="font-wp-display text-[0.9375rem] font-semibold text-wp-fg">{o.code}</span>
         <span
           className={cn(
-            "rounded-wp-pill px-2.5 py-1 font-wp text-[11px] font-extrabold",
+            "rounded-wp-pill px-2.5 py-1 font-wp text-[0.6875rem] font-extrabold",
             st.text,
             st.bg,
           )}
         >
           {t(st.key)}
         </span>
-        <span className="font-wp text-[12px] font-semibold text-wp-fg-subtle">
+        <span className="font-wp text-[0.75rem] font-semibold text-wp-fg-subtle">
           {timeAgo(o.createdAt)}
         </span>
         <div className="ml-auto flex items-center gap-1.5">
-          <span className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+          <span className="font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
             {t("compras.linesCount", { count: o.lines.length })} ·
           </span>
           <Price amount={o.total} size={17} />
@@ -152,7 +152,7 @@ function OrderCard({ order: o }: { order: WpOrder }) {
                 </span>
               )}
               <div className="min-w-0 flex-1">
-                <div className="truncate font-wp text-[13.5px] font-bold text-wp-fg">
+                <div className="truncate font-wp text-[0.84375rem] font-bold text-wp-fg">
                   {mon?.shiny && <span className="text-wp-teal">✦ </span>}
                   {l.title}
                   {l.kind === "item" && l.qty > 1 && (
@@ -162,18 +162,18 @@ function OrderCard({ order: o }: { order: WpOrder }) {
                     <span className="wp-num font-semibold text-wp-fg-subtle"> · {t("common.levelDot", { level: mon.level })}</span>
                   )}
                 </div>
-                <div className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+                <div className="font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
                   {l.seller.username}
                 </div>
               </div>
-              <span className="wp-num font-wp text-[13.5px] text-wp-fg">₽{fmt(l.lineTotal)}</span>
+              <span className="wp-num font-wp text-[0.84375rem] text-wp-fg">₽{fmt(l.lineTotal)}</span>
             </div>
           )
         })}
       </div>
 
       {refunded ? (
-        <div className="flex items-center gap-2 rounded-xl border border-wp-rose/25 bg-wp-rose/[.08] px-3.5 py-3 font-wp text-[12.5px] font-semibold text-wp-fg-muted">
+        <div className="flex items-center gap-2 rounded-xl border border-wp-rose/25 bg-wp-rose/[.08] px-3.5 py-3 font-wp text-[0.78125rem] font-semibold text-wp-fg-muted">
           <Icon name="arrowL" size={15} className="text-wp-rose" />
           {t("compras.refundedNote")}
         </div>
@@ -182,7 +182,7 @@ function OrderCard({ order: o }: { order: WpOrder }) {
           <Stepper steps={ESCROW_STEP_KEYS.map((k) => t(k))} current={step} className="flex-1" />
           <div className="flex-none">
             {o.status === "escrow" && (
-              <span className="flex items-center gap-1.5 font-wp text-[12px] font-semibold text-wp-fg-subtle">
+              <span className="flex items-center gap-1.5 font-wp text-[0.75rem] font-semibold text-wp-fg-subtle">
                 <Icon name="clock" size={14} />
                 {t("compras.waitingSeller")}
               </span>
@@ -190,7 +190,7 @@ function OrderCard({ order: o }: { order: WpOrder }) {
             {o.status === "transferido" && (
               <Button
                 variant="primary"
-                className="px-3.5 py-2.5 text-[12.5px]"
+                className="px-3.5 py-2.5 text-[0.78125rem]"
                 disabled={confirm.isPending}
                 onClick={() => confirm.mutate(o.id)}
               >
@@ -199,7 +199,7 @@ function OrderCard({ order: o }: { order: WpOrder }) {
               </Button>
             )}
             {o.status === "completado" && (
-              <span className="flex items-center gap-1.5 font-wp text-[12px] font-bold text-wp-green">
+              <span className="flex items-center gap-1.5 font-wp text-[0.75rem] font-bold text-wp-green">
                 <Icon name="shieldCheck" size={15} />
                 {t("compras.paymentReleased")}
               </span>

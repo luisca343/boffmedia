@@ -76,7 +76,7 @@ export function SettingsPage() {
                 </div>
                 <span
                   className={cn(
-                    "text-[10px] font-medium leading-none",
+                    "text-[0.625rem] font-medium leading-none",
                     active ? "text-sr-accent-bright" : "text-sr-txt-muted group-hover:text-sr-txt",
                   )}
                 >
@@ -86,7 +86,7 @@ export function SettingsPage() {
             );
           })}
         </div>
-        <p className="mt-2 flex items-center gap-1.5 text-[10px] leading-none text-sr-txt-dim">
+        <p className="mt-2 flex items-center gap-1.5 text-[0.625rem] leading-none text-sr-txt-dim">
           <Sun size={11} className="text-sr-txt-dim" />
           {t("settings.themeHint")}{" "}
           <strong className="font-medium text-sr-txt-muted">{mode === "dark" ? t("settings.dark") : t("settings.light")}</strong>.
@@ -131,7 +131,7 @@ export function SettingsPage() {
                   <div className="w-2 h-2 rounded-full bg-sr-warn" />
                   <div className="w-2 h-2 rounded-full bg-sr-ok" />
                 </div>
-                <span className="text-[10px] text-sr-txt-muted font-mono">session.json</span>
+                <span className="text-[0.625rem] text-sr-txt-muted font-mono">session.json</span>
               </div>
               {session?.user?.accessToken && (
                 <SmartRotomButton
@@ -143,12 +143,12 @@ export function SettingsPage() {
                   {copied ? (
                     <>
                       <Check size={12} />
-                      <span className="text-[10px]">{t("settings.copied")}</span>
+                      <span className="text-[0.625rem]">{t("settings.copied")}</span>
                     </>
                   ) : (
                     <>
                       <Copy size={12} />
-                      <span className="text-[10px]">{t("settings.token")}</span>
+                      <span className="text-[0.625rem]">{t("settings.token")}</span>
                     </>
                   )}
                 </SmartRotomButton>
@@ -156,7 +156,7 @@ export function SettingsPage() {
             </div>
             {/* JSON content */}
             <div className="p-3 max-h-40 overflow-auto scrollbar-thin">
-              <pre className="text-[11px] leading-relaxed text-sr-txt font-mono whitespace-pre-wrap break-all">
+              <pre className="text-[0.6875rem] leading-relaxed text-sr-txt font-mono whitespace-pre-wrap break-all">
                 {JSON.stringify(session, null, 2)}
               </pre>
             </div>

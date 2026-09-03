@@ -16,7 +16,7 @@ export function Chip({
       type="button"
       className={cn(
         "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-tx-pill px-3 py-2",
-        "text-[13px] font-bold transition-all duration-150",
+        "text-[0.8125rem] font-bold transition-all duration-150",
         "border border-solid focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tx-accent",
         active
           ? "bg-tx-accent text-tx-on-accent border-white [&_svg]:text-tx-on-accent"
@@ -46,8 +46,8 @@ export function FilterChip({
       type="button"
       aria-pressed={active}
       className={cn(
-        "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-tx-pill px-[13px] py-[7px]",
-        "text-[12.5px] font-bold transition-all duration-150",
+        "inline-flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-tx-pill px-[0.8125rem] py-[0.4375rem]",
+        "text-[0.78125rem] font-bold transition-all duration-150",
         "border border-solid focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tx-accent",
         active
           ? "bg-tx-blue-600 border-tx-blue-500 text-white"
@@ -57,7 +57,7 @@ export function FilterChip({
       {...props}
     >
       {children}
-      {count !== undefined && <span className="font-tx-mono text-[11px] opacity-75">{count}</span>}
+      {count !== undefined && <span className="font-tx-mono text-[0.6875rem] opacity-75">{count}</span>}
     </button>
   )
 }
@@ -79,7 +79,7 @@ export function Pill({
     <Tag
       {...(as === "button" ? { type: "button" as const } : {})}
       className={cn(
-        "flex items-center gap-[7px] whitespace-nowrap rounded-tx-pill px-3 py-2 text-[13px] font-bold",
+        "flex items-center gap-[0.4375rem] whitespace-nowrap rounded-tx-pill px-3 py-2 text-[0.8125rem] font-bold",
         "border border-solid transition-[background,border-color,transform] duration-150 ease-tx",
         tone === "money"
           ? "bg-tx-accent-soft border-tx-accent-soft text-tx-money [&_svg]:text-tx-accent"
@@ -98,7 +98,7 @@ export function Pill({
 /** The blue zone badge on a stop row — a real WorldGuard region name. */
 export function RegionTag({ children }: { children: ReactNode }) {
   return (
-    <span className="shrink-0 rounded-md bg-tx-blue-500/[0.16] px-[7px] py-0.5 text-[10px] font-extrabold uppercase tracking-[0.4px] text-tx-blue-400">
+    <span className="shrink-0 rounded-md bg-tx-blue-500/[0.16] px-[0.4375rem] py-0.5 text-[0.625rem] font-extrabold uppercase tracking-[0.4px] text-tx-blue-400">
       {children}
     </span>
   )

@@ -62,8 +62,8 @@ export function TargetPanel({
       >
         <Icon name="skull" size={16} className="shrink-0 text-[var(--mh-bright)]" />
         <span className="grid min-w-0 gap-0.5">
-          <b className="font-display text-[14px] leading-tight font-bold uppercase">{t("build_planner.target.ctaTitle")}</b>
-          <span className="font-mono text-[11px] leading-none text-txt-muted">{t("build_planner.target.ctaLead")}</span>
+          <b className="font-display text-[0.875rem] leading-tight font-bold uppercase">{t("build_planner.target.ctaTitle")}</b>
+          <span className="font-mono text-[0.6875rem] leading-none text-txt-muted">{t("build_planner.target.ctaLead")}</span>
         </span>
         <Icon name="chevronRight" size={15} className="ml-auto shrink-0 text-txt-dim" />
       </button>
@@ -89,8 +89,8 @@ export function TargetPanel({
     >
       <div className="flex items-center gap-3">
         <div className="min-w-0 flex-1">
-          <div className="truncate font-display text-[15px] leading-tight font-bold uppercase not-italic">{target.name}</div>
-          <div className="truncate font-mono text-[11px] leading-none text-txt-muted">{target.species}</div>
+          <div className="truncate font-display text-[0.9375rem] leading-tight font-bold uppercase not-italic">{target.name}</div>
+          <div className="truncate font-mono text-[0.6875rem] leading-none text-txt-muted">{target.species}</div>
         </div>
         <Button size="sm" variant="ghost" icon="edit" onClick={onPick}>
           {t("build_planner.target.change")}
@@ -103,7 +103,7 @@ export function TargetPanel({
           {weaks.map((w) => (
             <span
               key={w.id}
-              className="inline-flex items-center gap-1.5 border border-line bg-base-2 px-2 py-1 font-mono text-[11px] leading-none"
+              className="inline-flex items-center gap-1.5 border border-line bg-base-2 px-2 py-1 font-mono text-[0.6875rem] leading-none"
             >
               <span className="h-2 w-2 rounded-full" style={{ background: elementColor(w.element!) }} />
               {t(w.element!)}
@@ -112,12 +112,12 @@ export function TargetPanel({
           ))}
         </div>
       ) : (
-        <div className="font-mono text-[11px] text-txt-dim">{t("build_planner.target.no_elem_weak")}</div>
+        <div className="font-mono text-[0.6875rem] text-txt-dim">{t("build_planner.target.no_elem_weak")}</div>
       )}
 
       <MhLabel className="mt-3.5">{t("build_planner.target.recommended")}</MhLabel>
       {suggestions.length === 0 ? (
-        <div className="font-mono text-[12px] leading-snug text-txt-dim">{t("build_planner.target.no_suggestions")}</div>
+        <div className="font-mono text-[0.75rem] leading-snug text-txt-dim">{t("build_planner.target.no_suggestions")}</div>
       ) : (
         <div className="flex flex-col gap-1.5">
           {suggestions.map(({ w, el, level }) => (
@@ -126,8 +126,8 @@ export function TargetPanel({
                 <Icon name="sword" size={14} className="text-txt-muted" />
               </span>
               <span className="grid min-w-0 flex-1 gap-0.5">
-                <span className="truncate font-display text-[13px] leading-tight font-bold uppercase not-italic">{w.name}</span>
-                <span className="font-mono text-[10.5px] leading-none" style={{ color: elementColor(el.type) }}>
+                <span className="truncate font-display text-[0.8125rem] leading-tight font-bold uppercase not-italic">{w.name}</span>
+                <span className="font-mono text-[0.65625rem] leading-none" style={{ color: elementColor(el.type) }}>
                   {t(el.type)} {el.damage} · {"★".repeat(level)}
                 </span>
               </span>

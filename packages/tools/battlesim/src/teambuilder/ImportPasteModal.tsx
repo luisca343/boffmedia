@@ -79,7 +79,7 @@ export function ImportPasteModal({
     >
       <div className="grid gap-3">
         {fields}
-        {note && <p className="m-0 font-body text-[13px] leading-[1.45] text-txt-dim">{note}</p>}
+        {note && <p className="m-0 font-body text-[0.8125rem] leading-[1.45] text-txt-dim">{note}</p>}
         <Textarea
           value={text}
           onChange={(e) => {
@@ -90,7 +90,7 @@ export function ImportPasteModal({
           aria-label={t("importModal.title")}
           aria-invalid={error ? true : undefined}
           spellCheck={false}
-          className="min-h-[220px] font-mono text-[12.5px] leading-[1.5]"
+          className="min-h-[13.75rem] font-mono text-[0.78125rem] leading-[1.5]"
         />
         {error && <Banner tone="error">{error}</Banner>}
       </div>

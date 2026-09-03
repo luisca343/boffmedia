@@ -75,7 +75,7 @@ export function MsBasesChapter() {
 
       <Section id="ms-tipografia" kicker="Misiones · ms-*" title="Tipografía" lead="Cinco caras, todas con serifa o manuscritas: el tablón no tiene una sola letra de palo seco.">
         <Sample app="ms" title="Display · Cinzel Decorative" code="font-ms-display" col>
-          <div className="font-ms-display text-[34px] leading-tight text-ms-ink-1">El Tablón</div>
+          <div className="font-ms-display text-[2.125rem] leading-tight text-ms-ink-1">El Tablón</div>
           <div className={cn(MONO_LABEL, "text-ms-ink-3")}>Títulos, nombres de misión, cifras heráldicas</div>
         </Sample>
         <Sample app="ms" title="Cuerpo · EB Garamond" code="font-ms" col>
@@ -86,7 +86,7 @@ export function MsBasesChapter() {
           <div className={cn(MONO_LABEL, "text-ms-ink-3")}>Texto largo — el manuscrito</div>
         </Sample>
         <Sample app="ms" title="Versalitas · IM Fell English SC" code="font-ms-uppercase" col>
-          <div className="font-ms-uppercase text-[13px] uppercase tracking-[.16em] text-ms-ink-2">
+          <div className="font-ms-uppercase text-[0.8125rem] uppercase tracking-[.16em] text-ms-ink-2">
             Recompensa · Objetivos · Vigente
           </div>
           <div className={cn(MONO_LABEL, "text-ms-ink-3")}>Todas las etiquetas del sistema</div>
@@ -108,15 +108,15 @@ export function MsBasesChapter() {
         lead="Las texturas viven en tailwind.config como clases de componente, porque son degradados apilados y ruido SVG que Tailwind no sabe expresar. Todo lo demás son utilidades sobre JSX."
       >
         <Sample app="ms" title="Pergamino" code=".ms-paper" note="Grano por turbulencia + esquinas quemadas. Es la superficie de toda tarjeta.">
-          <div className="ms-paper h-[120px] w-[220px]" />
-          <div className="ms-paper ms-torn h-[120px] w-[220px]" />
+          <div className="ms-paper h-[7.5rem] w-[13.75rem]" />
+          <div className="ms-paper ms-torn h-[7.5rem] w-[13.75rem]" />
         </Sample>
         <Sample app="ms" title="Corcho y madera" code=".ms-cork · .ms-wood" canvas={false}>
-          <div className="ms-cork h-[120px] w-[220px]" />
-          <div className="ms-wood h-[120px] w-[220px]" />
+          <div className="ms-cork h-[7.5rem] w-[13.75rem]" />
+          <div className="ms-wood h-[7.5rem] w-[13.75rem]" />
         </Sample>
         <Sample app="ms" title="Escritorio" code=".ms-desk" note="El fondo sobre el que se lee una carta abierta." canvas={false}>
-          <div className="ms-desk h-[120px] w-full" />
+          <div className="ms-desk h-[7.5rem] w-full" />
         </Sample>
       </Section>
     </>

@@ -18,7 +18,7 @@ export function TypePad({ onSelect, isNotesMode }: TypePadProps) {
           onClick={() => onSelect(type)}
           className={cn(
             "ar-lift rounded-lg border px-3.5 py-2",
-            "font-ar-mono text-[11px] font-bold uppercase tracking-[0.08em]",
+            "font-ar-mono text-[0.6875rem] font-bold uppercase tracking-[0.08em]",
             TYPE_SKIN[type],
             isNotesMode && "border-dashed",
           )}

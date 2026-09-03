@@ -24,16 +24,16 @@ export function NewsroomHeader({
         aria-hidden="true"
         className="ft-halftone-light pointer-events-none absolute inset-0 opacity-20"
       />
-      <div className="relative mx-auto grid max-w-[1400px] grid-cols-1 items-end gap-6 px-6 pb-7 pt-9 md:grid-cols-[1fr_auto]">
+      <div className="relative mx-auto grid max-w-[87.5rem] grid-cols-1 items-end gap-6 px-6 pb-7 pt-9 md:grid-cols-[1fr_auto]">
         <div>
           <Eyebrow className="text-ft-yellow">{t("eyebrow")}</Eyebrow>
           <h1
-            className="font-ft-display mt-1.5 text-[clamp(48px,6vw,80px)] leading-[0.95] text-ft-yellow"
+            className="font-ft-display mt-1.5 text-[clamp(3rem,6vw,5rem)] leading-[0.95] text-ft-yellow"
             style={{ textShadow: "5px 5px 0 #ff2d87" }}
           >
             {t("title")}
           </h1>
-          <p className="font-ft-deck mt-3 max-w-[720px] text-xl italic text-white/85">
+          <p className="font-ft-deck mt-3 max-w-[45rem] text-xl italic text-white/85">
             {t("description")}
           </p>
         </div>

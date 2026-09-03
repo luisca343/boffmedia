@@ -34,7 +34,7 @@ export default function BitacoraPage() {
     <div className="flex min-h-full flex-col">
       <div className="mb-6 mt-2.5 text-center">
         <Label className="text-ms-gold-1">{t("bitacora.eyebrow")}</Label>
-        <h1 className="mb-1.5 mt-1 font-ms-display text-[38px] text-ms-paper-1 [text-shadow:0_2px_12px_rgba(0,0,0,.6)]">
+        <h1 className="mb-1.5 mt-1 font-ms-display text-[2.375rem] text-ms-paper-1 [text-shadow:0_2px_12px_rgba(0,0,0,.6)]">
           {t("bitacora.title")}
         </h1>
         <div className="font-ms text-sm italic text-ms-paper-3">{t("bitacora.subtitle")}</div>
@@ -43,13 +43,13 @@ export default function BitacoraPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-[800px]">
+      <div className="mx-auto max-w-[50rem]">
         <SearchField
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder={t("bitacora.searchPlaceholder")}
           aria-label={t("bitacora.searchAriaLabel")}
-          className="mb-5 max-w-[380px]"
+          className="mb-5 max-w-[23.75rem]"
         />
 
         {filtered.length === 0 ? (

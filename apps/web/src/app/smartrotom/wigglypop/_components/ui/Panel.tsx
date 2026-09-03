@@ -49,7 +49,7 @@ export function BuyPanel({ children, className }: { children: ReactNode; classNa
   return (
     <div
       className={cn(
-        "rounded-wp border-wp border-wp-line/46 bg-white p-[18px] shadow-wp",
+        "rounded-wp border-wp border-wp-line/46 bg-white p-[1.125rem] shadow-wp",
         className,
       )}
     >
@@ -63,7 +63,7 @@ export function DividerLabel({ children, className }: { children: ReactNode; cla
   return (
     <div
       className={cn(
-        "flex items-center gap-3 font-wp text-[11px] font-black uppercase tracking-[.08em] text-wp-fg-subtle",
+        "flex items-center gap-3 font-wp text-[0.6875rem] font-black uppercase tracking-[.08em] text-wp-fg-subtle",
         "before:h-[1.5px] before:flex-1 before:rounded-wp-pill before:bg-wp-line/24 before:content-['']",
         "after:h-[1.5px] after:flex-1 after:rounded-wp-pill after:bg-wp-line/24 after:content-['']",
         className,
@@ -88,13 +88,13 @@ export function PageHead({
   children?: ReactNode
 }) {
   return (
-    <div className="flex flex-none flex-wrap items-center gap-4 border-b border-wp-line/24 px-[30px] py-[18px]">
-      <div className="min-w-[220px] flex-1">
-        <h1 className="flex items-center gap-2.5 font-wp-display text-[21px] font-semibold text-wp-fg">
+    <div className="flex flex-none flex-wrap items-center gap-4 border-b border-wp-line/24 px-[1.875rem] py-[1.125rem]">
+      <div className="min-w-[13.75rem] flex-1">
+        <h1 className="flex items-center gap-2.5 font-wp-display text-[1.3125rem] font-semibold text-wp-fg">
           {icon && <Icon name={icon} size={20} className="text-wp-accent" />}
           {title}
         </h1>
-        {sub && <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">{sub}</p>}
+        {sub && <p className="mt-0.5 font-wp text-[0.78125rem] font-semibold text-wp-fg-subtle">{sub}</p>}
       </div>
       {children}
     </div>
@@ -116,7 +116,7 @@ export function EmptyState({
     <div className="flex flex-col items-center justify-center gap-3 px-5 py-20 text-center text-wp-fg-subtle">
       <Icon name={icon} size={40} />
       <div className="font-wp text-base font-bold text-wp-fg-muted">{title}</div>
-      {body && <div className="font-wp text-[13.5px] font-semibold">{body}</div>}
+      {body && <div className="font-wp text-[0.84375rem] font-semibold">{body}</div>}
       {children && <div className="mt-1 flex gap-2.5">{children}</div>}
     </div>
   )

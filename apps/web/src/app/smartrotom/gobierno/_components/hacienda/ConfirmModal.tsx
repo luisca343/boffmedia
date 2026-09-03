@@ -48,7 +48,7 @@ export function ConfirmModal({
         </>
       }
     >
-      <div className="text-[13.5px] leading-relaxed text-gt-ink-700">{body}</div>
+      <div className="text-[0.84375rem] leading-relaxed text-gt-ink-700">{body}</div>
     </Modal>
   )
 }

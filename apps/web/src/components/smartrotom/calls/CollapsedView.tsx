@@ -52,7 +52,7 @@ export function CollapsedView({
 
       <div className="min-w-0 flex-1">
         <div className="truncate text-sm font-semibold text-[#e9edef]">{name}</div>
-        <div className="flex items-center gap-1.5 text-[11.5px] text-[#8696a0]">
+        <div className="flex items-center gap-1.5 text-[0.71875rem] text-[#8696a0]">
           <PhoneIcon className="h-3 w-3 flex-none" strokeWidth={2} />
           <span className="font-mono tabular-nums" style={{ color: "#53d3a0" }}>{status}</span>
           {usersInCall.length > 1 && <span>· {usersInCall.length}</span>}
@@ -64,21 +64,21 @@ export function CollapsedView({
         title={t("mute")}
         className={`grid h-9 w-9 flex-none place-items-center rounded-full transition-colors ${muted ? "bg-[#00a884] text-white" : "bg-white/[0.14] text-[#e9edef] hover:bg-white/[0.24]"}`}
       >
-        <MicIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+        <MicIcon className="h-[1.125rem] w-[1.125rem]" strokeWidth={2} />
       </button>
 
       {isUserRinging && (
         <button onClick={onJoinCall} title={t("accept")} className="grid h-9 w-9 flex-none place-items-center rounded-full bg-[#25d366] text-white transition-transform hover:brightness-110 active:scale-90">
-          <PhoneIcon className="h-[18px] w-[18px]" strokeWidth={2} />
+          <PhoneIcon className="h-[1.125rem] w-[1.125rem]" strokeWidth={2} />
         </button>
       )}
 
       <button onClick={onExitCall} title={t("hangUp")} className="grid h-9 w-9 flex-none place-items-center rounded-full bg-[#f05454] text-white transition-transform hover:brightness-110 active:scale-90">
-        <PhoneIcon className="h-[18px] w-[18px] rotate-[135deg]" strokeWidth={2} />
+        <PhoneIcon className="h-[1.125rem] w-[1.125rem] rotate-[135deg]" strokeWidth={2} />
       </button>
 
       <button onClick={onExpand} title={t("expand")} className="grid h-9 w-9 flex-none place-items-center rounded-full bg-white/[0.14] text-[#e9edef] transition-colors hover:bg-white/[0.24]">
-        <Maximize2Icon className="h-[18px] w-[18px]" strokeWidth={2} />
+        <Maximize2Icon className="h-[1.125rem] w-[1.125rem]" strokeWidth={2} />
       </button>
     </div>
   )

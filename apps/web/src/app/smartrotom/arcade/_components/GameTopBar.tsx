@@ -67,17 +67,17 @@ export function GameTopBar({ title, accent = "cyan", onHelp, onReset, actions }:
           href="/smartrotom/arcade"
           className={cn(
             "ar-lift inline-flex items-center gap-1.5 rounded-lg border bg-black/40 px-2.5 py-1.5",
-            "font-ar text-[11px] font-semibold uppercase tracking-[0.08em]",
+            "font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em]",
             skin.back,
           )}
         >
           <Icon.Chevron s={12} dir="left" />
           {t("sidebar.arcade")}
         </Link>
-        <span aria-hidden className="h-[18px] w-px bg-white/10" />
+        <span aria-hidden className="h-[1.125rem] w-px bg-white/10" />
         <span className="flex min-w-0 items-center gap-2">
           <Icon.Joystick s={16} className="shrink-0 text-ar-ink-dim" />
-          <span className="ar-marquee-text truncate font-ar-display text-[13px] leading-relaxed">
+          <span className="ar-marquee-text truncate font-ar-display text-[0.8125rem] leading-relaxed">
             {title}
           </span>
         </span>

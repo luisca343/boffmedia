@@ -39,8 +39,8 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
     <>
       <BackToEventos />
 
-      <Card edgeGold className="mb-[18px] overflow-hidden">
-        <div className="grid grid-cols-1 md:grid-cols-[200px_1fr]">
+      <Card edgeGold className="mb-[1.125rem] overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-[12.5rem_1fr]">
           <div className="hidden md:block">
             <BuildSlot icon="building" label={t("eventos.maquetaReto")} className="h-full" />
           </div>
@@ -52,45 +52,45 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
               <Badge tone={status.tone} dot={status.dot}>
                 {status.label}
               </Badge>
-              <span className="font-gt-mono text-[10.5px] text-gt-ink-400">{ev.code}</span>
+              <span className="font-gt-mono text-[0.65625rem] text-gt-ink-400">{ev.code}</span>
               {ev.status === "rating" && (
                 <div className="ml-auto">
                   <Countdown iso={ev.ratingClosesAt} label={t("eventos.valoracionCierraEn")} />
                 </div>
               )}
             </div>
-            {ev.brief && <p className="mb-3.5 max-w-[680px] text-sm leading-relaxed text-gt-ink-700">{ev.brief}</p>}
+            {ev.brief && <p className="mb-3.5 max-w-[42.5rem] text-sm leading-relaxed text-gt-ink-700">{ev.brief}</p>}
             <div className="flex flex-wrap gap-5">
               {ev.prize && (
                 <div>
-                  <div className="mb-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
+                  <div className="mb-0.5 font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">
                     {t("eventos.premioLabel")}
                   </div>
-                  <div className="font-gt-display text-[13.5px] font-bold text-gt-gold-600">{ev.prize}</div>
+                  <div className="font-gt-display text-[0.84375rem] font-bold text-gt-gold-600">{ev.prize}</div>
                 </div>
               )}
               <div>
-                <div className="mb-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
+                <div className="mb-0.5 font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">
                   {t("eventos.participanLabel")}
                 </div>
-                <div className="font-gt-display text-[13.5px] font-bold text-gt-ink-800">
+                <div className="font-gt-display text-[0.84375rem] font-bold text-gt-ink-800">
                   {t("eventos.ciudades", { count: ranked.length, plural: ranked.length === 1 ? "" : "es" })}
                 </div>
               </div>
               {ev.crew && (
                 <div>
-                  <div className="mb-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
+                  <div className="mb-0.5 font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">
                     {t("eventos.cuadrillaLabel")}
                   </div>
-                  <div className="font-gt-display text-[13.5px] font-bold text-gt-ink-800">{ev.crew}</div>
+                  <div className="font-gt-display text-[0.84375rem] font-bold text-gt-ink-800">{ev.crew}</div>
                 </div>
               )}
               {ev.buildClosedAt && (
                 <div>
-                  <div className="mb-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
+                  <div className="mb-0.5 font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">
                     {t("eventos.finConstruccionLabel")}
                   </div>
-                  <div className="font-gt-mono text-[13px] text-gt-ink-700">{fmtDateTime(ev.buildClosedAt)}</div>
+                  <div className="font-gt-mono text-[0.8125rem] text-gt-ink-700">{fmtDateTime(ev.buildClosedAt)}</div>
                 </div>
               )}
             </div>
@@ -129,7 +129,7 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
             <Table>
               <THead>
                 <TR>
-                  <TH className="w-[70px]">{t("eventos.puesto")}</TH>
+                  <TH className="w-[4.375rem]">{t("eventos.puesto")}</TH>
                   <TH>{t("eventos.ciudadObra")}</TH>
                   <TH>{t("eventos.cuadrillaCol")}</TH>
                   <TH className="text-center">{t("eventos.votos")}</TH>
@@ -146,10 +146,10 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
                       </TD>
                       <TD>
                         <div className="min-w-0">
-                          <div className="font-gt-display text-[14.5px] font-bold text-gt-ink-900">
+                          <div className="font-gt-display text-[0.90625rem] font-bold text-gt-ink-900">
                             {r.buildName}
                           </div>
-                          <div className="font-gt-mono text-[10.5px] text-gt-ink-400">
+                          <div className="font-gt-mono text-[0.65625rem] text-gt-ink-400">
                             {townLabel(r.town)}
                             {isWinner && t("eventos.ganadora")}
                           </div>
@@ -169,7 +169,7 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
                         </div>
                       </TD>
                       <TD className="text-center">
-                        <span className="font-gt-mono text-[13px] tabular-nums text-gt-ink-600">{r.votes}</span>
+                        <span className="font-gt-mono text-[0.8125rem] tabular-nums text-gt-ink-600">{r.votes}</span>
                       </TD>
                       <TD className="text-right">
                         <div className="flex justify-end">
@@ -189,10 +189,10 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
           <div className="mt-3.5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {ranked.map((r, i) => (
               <Card key={r.id} dep="urbanismo" className="overflow-hidden">
-                <BuildSlot icon="building" label={t("eventos.obraDe", { town: townLabel(r.town) })} className="h-[120px]" />
+                <BuildSlot icon="building" label={t("eventos.obraDe", { town: townLabel(r.town) })} className="h-[7.5rem]" />
                 <div className="p-3.5">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="font-gt-mono text-[10.5px] text-gt-ink-500">{townLabel(r.town)}</span>
+                    <span className="font-gt-mono text-[0.65625rem] text-gt-ink-500">{townLabel(r.town)}</span>
                     <RankMark rank={i} />
                   </div>
                   <h4 className="mb-1.5 font-gt-display text-base leading-tight text-gt-ink-900">{r.buildName}</h4>
@@ -203,12 +203,12 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
                     {(Object.keys(catLabels) as (keyof typeof catLabels)[]).map((k) => (
                       <div key={k}>
                         <div className="mb-0.5 flex items-center justify-between">
-                          <span className="text-[10.5px] text-gt-ink-500">{catLabels[k]}</span>
-                          <span className="font-gt-mono text-[10px] tabular-nums text-gt-ink-600">
+                          <span className="text-[0.65625rem] text-gt-ink-500">{catLabels[k]}</span>
+                          <span className="font-gt-mono text-[0.625rem] tabular-nums text-gt-ink-600">
                             {r.votes > 0 ? r[k].toFixed(1) : "—"}
                           </span>
                         </div>
-                        <div className="h-[5px] overflow-hidden rounded-full bg-gt-paper-3">
+                        <div className="h-[0.3125rem] overflow-hidden rounded-full bg-gt-paper-3">
                           <div
                             className="h-full bg-gt-dep-urbanismo"
                             style={{ width: `${Math.min(100, (r[k] / 10) * 100)}%` }}
@@ -242,7 +242,7 @@ export function ConstruccionDetail({ ev }: { ev: Evento }) {
           </>
         }
       >
-        <p className="text-[13.5px] leading-relaxed text-gt-ink-700">
+        <p className="text-[0.84375rem] leading-relaxed text-gt-ink-700">
           {t("eventos.cerrarDescription", { title: ev.title })}
         </p>
       </Modal>
@@ -330,7 +330,7 @@ function RegistrarObraModal({
           onChange={setBuilders}
           placeholder={t("eventos.cuadrillaUsuariosPlaceholder")}
         />
-        <div className="flex items-start gap-2 rounded-gt-sm bg-gt-paper-2 p-2.5 text-[11.5px] leading-relaxed text-gt-ink-500">
+        <div className="flex items-start gap-2 rounded-gt-sm bg-gt-paper-2 p-2.5 text-[0.71875rem] leading-relaxed text-gt-ink-500">
           <Icon name="alert" size={13} className="mt-0.5 flex-none text-gt-ink-400" />
           {t("eventos.valoracionHint2")}
         </div>

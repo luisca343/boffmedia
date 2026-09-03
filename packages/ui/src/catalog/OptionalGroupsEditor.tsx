@@ -325,7 +325,7 @@ function GroupEditor({
       <div className="flex flex-wrap items-end gap-3">
         <Field
           label={t("optionalEditor.groupName")}
-          className="min-w-[200px] flex-1"
+          className="min-w-[12.5rem] flex-1"
         >
           <Input
             value={group.name}
@@ -333,7 +333,7 @@ function GroupEditor({
             onChange={(e) => onPatch({ name: e.target.value })}
           />
         </Field>
-        <Field label={t("optionalEditor.selectMode")} className="min-w-[180px]">
+        <Field label={t("optionalEditor.selectMode")} className="min-w-[11.25rem]">
           <Select
             value={group.select}
             options={SELECT_MODES.map((mode) => ({
@@ -361,7 +361,7 @@ function GroupEditor({
       {defaultError && (
         <p
           role="alert"
-          className="font-mono text-[11px] uppercase tracking-[0.06em] text-bad"
+          className="font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-bad"
         >
           {defaultError}
         </p>
@@ -537,7 +537,7 @@ function FeatureEditor({
       <div className="flex flex-wrap items-end gap-3">
         <Field
           label={t("optionalEditor.featureName")}
-          className="min-w-[180px] flex-1"
+          className="min-w-[11.25rem] flex-1"
         >
           <Input
             value={feature.name}
@@ -546,7 +546,7 @@ function FeatureEditor({
         </Field>
         <Field
           label={t("optionalEditor.defaultState")}
-          className="min-w-[170px]"
+          className="min-w-[10.625rem]"
         >
           <Select
             value={feature.default ? "on" : "off"}
@@ -557,7 +557,7 @@ function FeatureEditor({
             onChange={(v) => onPatch({ default: v === "on" })}
           />
         </Field>
-        <Field label={t("optionalEditor.activation")} className="min-w-[170px]">
+        <Field label={t("optionalEditor.activation")} className="min-w-[10.625rem]">
           <Select
             value={feature.activate?.kind ?? "none"}
             options={ACTIVATION_KINDS.map((kind) => ({
@@ -612,7 +612,7 @@ function FeatureEditor({
       {activationError && (
         <p
           role="alert"
-          className="font-mono text-[11px] uppercase tracking-[0.06em] text-bad"
+          className="font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-bad"
         >
           {activationError}
         </p>
@@ -628,7 +628,7 @@ function FeatureEditor({
         // those two features.
         <p
           role="status"
-          className="font-body text-[12px] leading-[1.4] text-warn"
+          className="font-body text-[0.75rem] leading-[1.4] text-warn"
         >
           {featureWarnings
             .map((w) =>
@@ -675,13 +675,13 @@ function FeatureEditor({
             placeholder={t("optionalEditor.pathsFilter", {
               count: files.length,
             })}
-            className="py-[7px] text-[13px]"
+            className="py-[0.4375rem] text-[0.8125rem]"
           />
 
           {hiddenSelected > 0 && (
             <p
               role="status"
-              className="font-body text-[12px] leading-[1.4] text-warn"
+              className="font-body text-[0.75rem] leading-[1.4] text-warn"
             >
               {t("optionalEditor.pathsHiddenSelected", {
                 count: hiddenSelected,
@@ -689,9 +689,9 @@ function FeatureEditor({
             </p>
           )}
 
-          <ul className="bm-scroll flex max-h-[190px] flex-col overflow-auto border border-solid border-line">
+          <ul className="bm-scroll flex max-h-[11.875rem] flex-col overflow-auto border border-solid border-line">
             {visible.length === 0 && (
-              <li className="px-2 py-3 text-center font-body text-[12px] text-txt-dim">
+              <li className="px-2 py-3 text-center font-body text-[0.75rem] text-txt-dim">
                 {t("optionalEditor.pathsNoMatch", { query: filter.trim() })}
               </li>
             )}

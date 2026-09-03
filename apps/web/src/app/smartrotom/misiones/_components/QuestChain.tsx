@@ -23,7 +23,7 @@ function ChainNode({ link, onSelect }: { link: ChainLink; onSelect: (quest: Ques
       type="button"
       disabled={isCurrent}
       onClick={() => onSelect(quest)}
-      className="ms-torn relative w-[200px] shrink-0 border border-ms-ink-1/25 px-3 py-2.5 text-left shadow-[inset_0_0_18px_rgba(80,50,20,.18),0_4px_8px_rgba(0,0,0,.35),0_10px_18px_-6px_rgba(0,0,0,.4)] transition-transform hover:enabled:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ms-gold-2 disabled:cursor-default motion-reduce:transition-none"
+      className="ms-torn relative w-[12.5rem] shrink-0 border border-ms-ink-1/25 px-3 py-2.5 text-left shadow-[inset_0_0_18px_rgba(80,50,20,.18),0_4px_8px_rgba(0,0,0,.35),0_10px_18px_-6px_rgba(0,0,0,.4)] transition-transform hover:enabled:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ms-gold-2 disabled:cursor-default motion-reduce:transition-none"
       style={{
         background: "radial-gradient(ellipse at 50% 50%, rgb(var(--ms-paper-1)), rgb(var(--ms-paper-2)) 80%, rgb(var(--ms-paper-3)))",
         opacity: status === "LOCKED" ? 0.7 : 1,
@@ -33,14 +33,14 @@ function ChainNode({ link, onSelect }: { link: ChainLink; onSelect: (quest: Ques
         <WaxSeal status={status} size={24} tilt={-12} />
       </span>
       {isCurrent && (
-        <span className="absolute -top-1.5 left-2 border border-ms-gold-4 bg-ms-gold-2 px-1.5 font-ms-uppercase text-[8px] uppercase tracking-[.16em] text-[#1e120a]">
+        <span className="absolute -top-1.5 left-2 border border-ms-gold-4 bg-ms-gold-2 px-1.5 font-ms-uppercase text-[0.5rem] uppercase tracking-[.16em] text-[#1e120a]">
           {t("here")}
         </span>
       )}
       <Label className={SEAL_TEXT[status]}>{tStatus(STATUS_LABEL_KEY[status])}</Label>
-      <div className="mt-0.5 font-ms-display text-[13px] leading-[1.15] text-ms-ink-1">{quest.name}</div>
+      <div className="mt-0.5 font-ms-display text-[0.8125rem] leading-[1.15] text-ms-ink-1">{quest.name}</div>
       {level > 0 && (
-        <div className="mt-1 font-ms-uppercase text-[10px] uppercase tracking-[.12em] text-ms-ink-3">{t("level", { level })}</div>
+        <div className="mt-1 font-ms-uppercase text-[0.625rem] uppercase tracking-[.12em] text-ms-ink-3">{t("level", { level })}</div>
       )}
     </button>
   )
@@ -67,7 +67,7 @@ export function QuestChain({
 
   return (
     <div className="ms-scroll w-full overflow-x-auto pb-2">
-      <div className="relative min-h-[110px] pb-2.5 pt-4" style={{ width, paddingInline: PAD_X }}>
+      <div className="relative min-h-[6.875rem] pb-2.5 pt-4" style={{ width, paddingInline: PAD_X }}>
         <svg
           viewBox={`0 0 ${width} 120`}
           width={width}

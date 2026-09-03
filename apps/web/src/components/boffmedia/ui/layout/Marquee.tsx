@@ -11,10 +11,10 @@ function Half({ items }: { items: string[] }) {
       {items.map((it, i) => (
         <span
           key={i}
-          className="mr-12 flex items-center gap-12 whitespace-nowrap font-display text-[40px] font-extrabold italic uppercase leading-none tracking-[0.02em] even:text-transparent even:[-webkit-text-stroke:1px_var(--line-2)]"
+          className="mr-12 flex items-center gap-12 whitespace-nowrap font-display text-[2.5rem] font-extrabold italic uppercase leading-none tracking-[0.02em] even:text-transparent even:[-webkit-text-stroke:1px_var(--line-2)]"
         >
           {it}
-          <i className="not-italic text-[13px] text-accent [-webkit-text-stroke:0]">◆</i>
+          <i className="not-italic text-[0.8125rem] text-accent [-webkit-text-stroke:0]">◆</i>
         </span>
       ))}
     </div>
@@ -23,7 +23,7 @@ function Half({ items }: { items: string[] }) {
 
 export function Marquee({ items, speed = 30 }: MarqueeProps) {
   return (
-    <div className="overflow-hidden border-y border-line bg-base-2 py-[22px]">
+    <div className="overflow-hidden border-y border-line bg-base-2 py-[1.375rem]">
       <div
         className="flex w-max animate-[bm-marquee_var(--mq-dur)_linear_infinite] motion-reduce:animate-none"
         style={{ ["--mq-dur"]: `${speed}s` } as React.CSSProperties}

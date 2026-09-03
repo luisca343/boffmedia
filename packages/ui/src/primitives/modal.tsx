@@ -87,14 +87,14 @@ export function Modal({ open, onClose, title, aside, footer, size, className, bo
         className={cn(
           "w-full my-auto flex flex-col max-h-[calc(100dvh-3rem)] bg-panel border border-solid border-line-2 outline-none cut-corner cut-corner-edge [--cut-line:var(--line-2)]",
           "animate-[bm-modal-in_0.26s_cubic-bezier(0.2,0.8,0.2,1)] motion-reduce:animate-none",
-          size === "sm" ? "max-w-[440px]" : size === "lg" ? "max-w-[760px]" : "max-w-[580px]",
+          size === "sm" ? "max-w-[27.5rem]" : size === "lg" ? "max-w-[47.5rem] min-[2240px]:max-w-[65rem]" : "max-w-[36.25rem]",
           className,
         )}
         style={{ boxShadow: "0 1px 0 var(--accent-line), 0 32px 80px -24px rgba(0,0,0,0.75)" }}
       >
-        <header className="shrink-0 flex items-center gap-3 py-[14px] pl-5 pr-[14px] border-b border-solid border-line">
+        <header className="shrink-0 flex items-center gap-3 py-[0.875rem] pl-5 pr-[0.875rem] border-b border-solid border-line">
           {title && (
-            <h3 id={titleId} className="font-display text-[16px] font-bold not-italic uppercase leading-none tracking-[0.04em]">
+            <h3 id={titleId} className="font-display text-[1rem] font-bold not-italic uppercase leading-none tracking-[0.04em]">
               {title}
             </h3>
           )}
@@ -104,7 +104,7 @@ export function Modal({ open, onClose, title, aside, footer, size, className, bo
               type="button"
               aria-label={t("close")}
               onClick={onClose}
-              className="grid place-items-center w-[26px] h-[26px] p-0 border-0 bg-transparent text-txt-dim cursor-pointer hover:text-txt transition-colors"
+              className="grid place-items-center w-[1.625rem] h-[1.625rem] p-0 border-0 bg-transparent text-txt-dim cursor-pointer hover:text-txt transition-colors"
             >
               <Icon name="x" size={15} />
             </button>
@@ -112,7 +112,7 @@ export function Modal({ open, onClose, title, aside, footer, size, className, bo
         </header>
         <div className={cn("min-h-0 overflow-y-auto p-5", bodyClassName)}>{children}</div>
         {footer && (
-          <footer className="shrink-0 flex items-center justify-end gap-2.5 py-[14px] px-5 border-t border-solid border-line">
+          <footer className="shrink-0 flex items-center justify-end gap-2.5 py-[0.875rem] px-5 border-t border-solid border-line">
             {footer}
           </footer>
         )}

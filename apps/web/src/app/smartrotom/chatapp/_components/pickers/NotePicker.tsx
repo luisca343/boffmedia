@@ -34,9 +34,9 @@ export function DocumentPicker({
     <Modal title={t("notePicker.title")} icon="file" onClose={close}>
       <SearchBox value={query} onChange={setQuery} placeholder={t("notePicker.searchPlaceholder")} className="mb-3" />
       {isLoading ? (
-        <div className="py-10 text-center text-[13.5px] text-ca-500">{t("notePicker.loading")}</div>
+        <div className="py-10 text-center text-[0.84375rem] text-ca-500">{t("notePicker.loading")}</div>
       ) : filtered.length === 0 ? (
-        <div className="py-10 text-center text-[13.5px] text-ca-500">{t("notePicker.noResults")}</div>
+        <div className="py-10 text-center text-[0.84375rem] text-ca-500">{t("notePicker.noResults")}</div>
       ) : (
         <div className="flex flex-col gap-1">
           {filtered.map((n) => (
@@ -49,8 +49,8 @@ export function DocumentPicker({
                 <Icon name="file" size={20} />
               </span>
               <span className="min-w-0">
-                <span className="block truncate text-[14.5px] font-semibold text-ca-50">{n.title || t("notePicker.untitled")}</span>
-                {n.content && <span className="block truncate text-[12.5px] text-ca-400">{n.content}</span>}
+                <span className="block truncate text-[0.90625rem] font-semibold text-ca-50">{n.title || t("notePicker.untitled")}</span>
+                {n.content && <span className="block truncate text-[0.78125rem] text-ca-400">{n.content}</span>}
               </span>
             </button>
           ))}

@@ -93,13 +93,13 @@ export function MhThreatBadge({ threat, showLabel = true, size = "md" }: { threa
         {[1, 2, 3, 4, 5].map((n) => (
           <i
             key={n}
-            className={cn("block", sm ? "w-1 h-[9px]" : "w-[5px] h-[11px]")}
+            className={cn("block", sm ? "w-1 h-[0.5625rem]" : "w-[0.3125rem] h-[0.6875rem]")}
             style={{ transform: "skewX(-12deg)", background: n <= threat ? tier.color : "var(--line-2)" }}
           />
         ))}
       </span>
       {showLabel && (
-        <span className={cn("font-mono font-bold leading-none uppercase tracking-[0.06em]", sm ? "text-[9px]" : "text-[10px]")} style={{ color: tier.color }}>
+        <span className={cn("font-mono font-bold leading-none uppercase tracking-[0.06em]", sm ? "text-[0.5625rem]" : "text-[0.625rem]")} style={{ color: tier.color }}>
           {t(`${tier.key}.label`)}
         </span>
       )}
@@ -112,7 +112,7 @@ export function MhSpeciesTag({ species, icon = true }: { species: string; icon?:
   const s = speciesMeta(species)
   return (
     <span
-      className="inline-flex items-center gap-[5px] px-2 py-1 border border-solid font-mono text-[10px] font-semibold leading-none uppercase tracking-[0.04em]"
+      className="inline-flex items-center gap-[0.3125rem] px-2 py-1 border border-solid font-mono text-[0.625rem] font-semibold leading-none uppercase tracking-[0.04em]"
       style={{ color: `hsl(${s.hue} 45% 74%)`, background: `hsl(${s.hue} 45% 40% / 0.14)`, borderColor: `hsl(${s.hue} 45% 50% / 0.3)` }}
     >
       {icon && <Icon name={s.icon} size={12} />}
@@ -125,8 +125,8 @@ export function MhSpeciesTag({ species, icon = true }: { species: string; icon?:
 export function MhElemBadge({ element, stars, muted }: { element: string; stars?: number; muted?: boolean }) {
   const color = elementColor(element)
   return (
-    <span className={cn("inline-flex items-center gap-1.5 px-[9px] py-[5px] bg-base-2 border border-solid border-line font-mono text-[12px] font-semibold leading-none", muted && "opacity-45")}>
-      <span className="w-[9px] h-[9px] rounded-full flex-none" style={{ background: color, boxShadow: `0 0 8px -1px ${color}` }} />
+    <span className={cn("inline-flex items-center gap-1.5 px-[0.5625rem] py-[0.3125rem] bg-base-2 border border-solid border-line font-mono text-[0.75rem] font-semibold leading-none", muted && "opacity-45")}>
+      <span className="w-[0.5625rem] h-[0.5625rem] rounded-full flex-none" style={{ background: color, boxShadow: `0 0 8px -1px ${color}` }} />
       <span>{cap(element)}</span>
       {stars != null && <MhStars value={stars} max={3} />}
     </span>
@@ -140,7 +140,7 @@ export function Pips({ level, color }: { level: number; color: string }) {
       {[1, 2, 3].map((i) => (
         <i
           key={i}
-          className="w-[14px] h-[6px] -skew-x-12 bg-line-2"
+          className="w-[0.875rem] h-[0.375rem] -skew-x-12 bg-line-2"
           style={i <= level ? { background: color } : undefined}
         />
       ))}
@@ -180,7 +180,7 @@ export function MonsterCard({ m, active, onClick }: { m: MhMonster; active: bool
       )}
     >
       <div
-        className="relative h-[84px] grid place-items-center overflow-hidden"
+        className="relative h-[5.25rem] grid place-items-center overflow-hidden"
         style={{
           background: `radial-gradient(120% 90% at 70% 10%, hsl(${s.hue} 45% 30% / 0.5), transparent 60%), repeating-linear-gradient(135deg, var(--bg-2) 0 8px, var(--panel-2) 8px 16px)`,
         }}
@@ -189,13 +189,13 @@ export function MonsterCard({ m, active, onClick }: { m: MhMonster; active: bool
           <Icon name={s.icon} size={40} />
         </span>
         {m.threat != null && (
-          <span className="absolute top-[7px] left-[7px]">
+          <span className="absolute top-[0.4375rem] left-[0.4375rem]">
             <MhThreatBadge threat={m.threat} size="sm" />
           </span>
         )}
         {m.flagship && (
           <span
-            className="absolute top-[7px] right-[7px] font-mono text-[8px] font-bold leading-none uppercase tracking-[0.05em] text-warn bg-warn-soft border border-solid px-[5px] py-[3px]"
+            className="absolute top-[0.4375rem] right-[0.4375rem] font-mono text-[0.5rem] font-bold leading-none uppercase tracking-[0.05em] text-warn bg-warn-soft border border-solid px-[0.3125rem] py-[3px]"
             style={{ borderColor: "color-mix(in srgb, var(--warn) 40%, transparent)" }}
             title={t("flagshipTitle")}
           >
@@ -204,9 +204,9 @@ export function MonsterCard({ m, active, onClick }: { m: MhMonster; active: bool
         )}
       </div>
       <div className="p-[9px_10px_10px] flex flex-col gap-0.5 min-w-0">
-        <div className="font-display text-[14px] font-bold leading-[1.05] uppercase tracking-[0.01em]">{m.name}</div>
-        {m.title && <div className="font-mono text-[10px] font-medium leading-[1.2] text-txt-muted truncate">{m.title}</div>}
-        <div className="flex items-center justify-between gap-1.5 mt-[7px]">
+        <div className="font-display text-[0.875rem] font-bold leading-[1.05] uppercase tracking-[0.01em]">{m.name}</div>
+        {m.title && <div className="font-mono text-[0.625rem] font-medium leading-[1.2] text-txt-muted truncate">{m.title}</div>}
+        <div className="flex items-center justify-between gap-1.5 mt-[0.4375rem]">
           <MhSpeciesTag species={m.species} />
           <span className="inline-flex gap-[3px]">
             {top.map((w) => (
@@ -231,22 +231,22 @@ export function MonsterRow({ m, active, onClick }: { m: MhMonster; active: boole
       onClick={onClick}
       style={{ borderLeftColor: tc }}
       className={cn(
-        "grid grid-cols-[34px_1fr_auto_auto] items-center gap-2.5 w-full text-left p-[8px_10px] bg-panel border border-solid border-line border-l-[3px] text-inherit cursor-pointer transition-[border-color,background] duration-[140ms] hover:bg-panel-2 hover:border-line-2",
+        "grid grid-cols-[2.125rem_1fr_auto_auto] items-center gap-2.5 w-full text-left p-[8px_10px] bg-panel border border-solid border-line border-l-[3px] text-inherit cursor-pointer transition-[border-color,background] duration-[140ms] hover:bg-panel-2 hover:border-line-2",
         active && "border-[var(--mh)] shadow-[inset_0_0_0_1px_var(--mh)]",
       )}
     >
       <span
-        className="w-[34px] h-[34px] grid place-items-center border border-solid border-line"
+        className="w-[2.125rem] h-[2.125rem] grid place-items-center border border-solid border-line"
         style={{ background: `hsl(${s.hue} 40% 30% / 0.28)`, color: `hsl(${s.hue} 45% 72%)` }}
       >
         <Icon name={s.icon} size={18} />
       </span>
       <span className="min-w-0">
-        <span className="flex items-center gap-[5px] font-display text-[13px] font-bold leading-[1.1] uppercase tracking-[0.01em]">
+        <span className="flex items-center gap-[0.3125rem] font-display text-[0.8125rem] font-bold leading-[1.1] uppercase tracking-[0.01em]">
           <span className="truncate">{m.name}</span>
-          {m.flagship && <span className="text-warn text-[10px] flex-none" title={t("flagship")}>◆</span>}
+          {m.flagship && <span className="text-warn text-[0.625rem] flex-none" title={t("flagship")}>◆</span>}
         </span>
-        <span className="block font-mono text-[10px] font-medium leading-[1.2] text-txt-dim truncate">
+        <span className="block font-mono text-[0.625rem] font-medium leading-[1.2] text-txt-dim truncate">
           {s.label}
           {m.locations[0] ? ` · ${m.locations[0].name}` : ""}
         </span>
@@ -274,9 +274,9 @@ export function WeakCell({ w, best }: { w: MhMonsterWeakness; best: boolean }) {
       style={{ borderTopColor: color, ...(best ? { background: `color-mix(in srgb, ${color} 12%, var(--bg-2))`, boxShadow: `0 0 0 1px color-mix(in srgb, ${color} 40%, transparent)` } : {}) }}
     >
       <span className="w-2.5 h-2.5 rounded-full" style={{ background: immune ? "var(--line-2)" : color }} />
-      <span className="font-mono text-[12px] text-txt capitalize">{vulnLabel(w)}</span>
+      <span className="font-mono text-[0.75rem] text-txt capitalize">{vulnLabel(w)}</span>
       <Pips level={w.level ?? 0} color={color} />
-      {w.condition && <span className="col-span-full font-mono text-[10px] leading-[1.3] text-warn pl-[18px]">{w.condition}</span>}
+      {w.condition && <span className="col-span-full font-mono text-[0.625rem] leading-[1.3] text-warn pl-[1.125rem]">{w.condition}</span>}
     </div>
   )
 }
@@ -285,9 +285,9 @@ export function WeakCell({ w, best }: { w: MhMonsterWeakness; best: boolean }) {
 export function VulnRow({ w }: { w: MhMonsterWeakness }) {
   const color = vulnColor(w)
   return (
-    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-[9px] p-[7px_10px] bg-base-2 border border-solid border-line">
-      <span className="w-[9px] h-[9px] rounded-full" style={{ background: color }} />
-      <span className="font-body text-[12px] font-semibold capitalize">{vulnLabel(w)}</span>
+    <div className="grid grid-cols-[auto_1fr_auto] items-center gap-[0.5625rem] p-[7px_10px] bg-base-2 border border-solid border-line">
+      <span className="w-[0.5625rem] h-[0.5625rem] rounded-full" style={{ background: color }} />
+      <span className="font-body text-[0.75rem] font-semibold capitalize">{vulnLabel(w)}</span>
       <Pips level={w.level ?? 0} color={color} />
     </div>
   )
@@ -298,7 +298,7 @@ export function Tag2({ children, good, dot }: { children: React.ReactNode; good?
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 p-[4px_8px] font-mono text-[11px] leading-none border border-solid",
+        "inline-flex items-center gap-1.5 p-[4px_8px] font-mono text-[0.6875rem] leading-none border border-solid",
         good ? "text-[var(--mh-bright)] border-[var(--mh-line)] bg-panel" : "text-txt-muted bg-base-2 border-line",
       )}
     >

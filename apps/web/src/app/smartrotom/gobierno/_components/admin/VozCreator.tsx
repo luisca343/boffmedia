@@ -98,11 +98,11 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
             onChange={(e) => setFmt(e.target.value)}
             placeholder="Formato §l§f[§6Nombre§f]"
             aria-label={t("megafonia.formato")}
-            className="w-full rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 px-3 py-[9px] font-gt-mono text-[13px] text-gt-ink-900 placeholder:text-gt-ink-400 focus:border-gt-accent focus:outline-none focus:ring-[3px] focus:ring-gt-accent-tint"
+            className="w-full rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 px-3 py-[0.5625rem] font-gt-mono text-[0.8125rem] text-gt-ink-900 placeholder:text-gt-ink-400 focus:border-gt-accent focus:outline-none focus:ring-[3px] focus:ring-gt-accent-tint"
           />
         </div>
 
-        <div className="mb-1.5 font-gt-mono text-[8.5px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+        <div className="mb-1.5 font-gt-mono text-[0.53125rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
           {t("megafonia.colores")}
         </div>
         <div className="mb-2.5 grid grid-cols-8 gap-1">
@@ -113,14 +113,14 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
               title={n}
               onClick={() => insert(c)}
               style={{ background: MC_HEX[c], color: LIGHT_SWATCH.has(c) ? "#000" : "#fff" }}
-              className="h-6 rounded border border-black/20 font-gt-mono text-[9px]"
+              className="h-6 rounded border border-black/20 font-gt-mono text-[0.5625rem]"
             >
               {c}
             </button>
           ))}
         </div>
 
-        <div className="mb-1.5 font-gt-mono text-[8.5px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+        <div className="mb-1.5 font-gt-mono text-[0.53125rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
           {t("megafonia.estilos")}
         </div>
         <div className="mb-3 flex flex-wrap gap-1">
@@ -129,7 +129,7 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
               key={c}
               type="button"
               onClick={() => insert(c)}
-              className="rounded border border-gt-line-strong bg-gt-paper-1 px-[9px] py-1 font-gt-mono text-[10.5px] text-gt-ink-600"
+              className="rounded border border-gt-line-strong bg-gt-paper-1 px-[0.5625rem] py-1 font-gt-mono text-[0.65625rem] text-gt-ink-600"
             >
               {n} §{c}
             </button>
@@ -137,7 +137,7 @@ export function VozCreator({ onCreated, onClose }: { onCreated: (value: string) 
         </div>
 
         <Sunken className="mb-3 px-3 py-2.5">
-          <div className="mb-1 font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">{t("megafonia.resultado")}</div>
+          <div className="mb-1 font-gt-mono text-[0.53125rem] uppercase tracking-[.14em] text-gt-ink-400">{t("megafonia.resultado")}</div>
           <div className="text-sm">
             <MCText format={fmt} fallback="…" />
           </div>

@@ -27,13 +27,13 @@ export function JournalEntry({
 }) {
   const t = useTranslations("misiones.journalEntry")
   return (
-    <Paper tilt={tiltFor(dialog.id)} className="relative py-5 pl-[86px] pr-6">
+    <Paper tilt={tiltFor(dialog.id)} className="relative py-5 pl-[5.375rem] pr-6">
       <FlourishCorners size={20} offset={6} className="text-ms-gold-3/40" />
 
       <div className="absolute left-4 top-4">
         <NpcPortrait skin={npc?.skin} size={56} ring />
       </div>
-      <div className="absolute -top-2.5 left-[60px]">
+      <div className="absolute -top-2.5 left-[3.75rem]">
         <WaxSeal glyph={(npc?.name || "?")[0]} color="rgb(var(--ms-seal-available))" size={32} tilt={-12} />
       </div>
 
@@ -44,7 +44,7 @@ export function JournalEntry({
         </div>
       </div>
 
-      <p className="my-2 border-l-2 border-ms-ink-3 pl-3.5 font-ms text-[15px] italic leading-[1.65] text-ms-ink-1">
+      <p className="my-2 border-l-2 border-ms-ink-3 pl-3.5 font-ms text-[0.9375rem] italic leading-[1.65] text-ms-ink-1">
         &ldquo;{dialog.text}&rdquo;
       </p>
 

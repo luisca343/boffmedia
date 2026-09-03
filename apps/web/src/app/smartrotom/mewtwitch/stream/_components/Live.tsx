@@ -12,9 +12,9 @@ import { ChatPanel } from "./ChatPanel"
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="relative overflow-hidden rounded-mw-xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_30%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_8%,rgb(var(--mw-800)))] px-4 py-3.5 before:absolute before:inset-y-0 before:left-0 before:w-[3px] before:bg-[linear-gradient(to_bottom,rgb(var(--mw-accent)),transparent)] before:content-['']">
-      <span className="font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-mw-fg-faint">{label}</span>
-      <strong className="mt-1 block font-mw-display text-[22px] font-bold tracking-[-0.01em]">{value}</strong>
-      {sub && <em className="text-[11px] not-italic text-mw-fg-mute">{sub}</em>}
+      <span className="font-mono text-[0.6875rem] font-bold uppercase tracking-[0.1em] text-mw-fg-faint">{label}</span>
+      <strong className="mt-1 block font-mw-display text-[1.375rem] font-bold tracking-[-0.01em]">{value}</strong>
+      {sub && <em className="text-[0.6875rem] not-italic text-mw-fg-mute">{sub}</em>}
     </div>
   )
 }
@@ -46,7 +46,7 @@ export function Live({ channel }: { channel: string }) {
     .map(toStreamCard)
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_320px]">
+    <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_20rem]">
       <div className="min-w-0 px-4 pb-16 pt-5 md:px-8">
         <StreamPlayer channel={channel} viewers={s?.viewer_count} poster={twitchThumb(s?.thumbnail_url, 1280, 720)} />
 
@@ -54,7 +54,7 @@ export function Live({ channel }: { channel: string }) {
           <div className="flex items-start gap-4">
             <Avatar src={u?.profile_image_url} name={name} size={56} ring>
               {s && (
-                <span className="absolute -bottom-2 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-mw-pill border-2 border-mw-bg bg-mw-accent px-1.5 py-0.5 text-[9px] font-extrabold tracking-[0.08em] text-white">
+                <span className="absolute -bottom-2 left-1/2 inline-flex -translate-x-1/2 items-center gap-1 whitespace-nowrap rounded-mw-pill border-2 border-mw-bg bg-mw-accent px-1.5 py-0.5 text-[0.5625rem] font-extrabold tracking-[0.08em] text-white">
                   <span className="h-1 w-1 rounded-full bg-white" /> {t("stream.liveBadge")}
                 </span>
               )}
@@ -64,7 +64,7 @@ export function Live({ channel }: { channel: string }) {
                 {name}
                 {u?.broadcaster_type === "partner" && <Check />}
               </div>
-              <h1 className="my-1.5 max-w-[740px] text-[15px] font-medium leading-[1.4] [text-wrap:pretty]">
+              <h1 className="my-1.5 max-w-[46.25rem] text-[0.9375rem] font-medium leading-[1.4] [text-wrap:pretty]">
                 {s?.title ?? t("stream.offline")}
               </h1>
               {s && (
@@ -92,7 +92,7 @@ export function Live({ channel }: { channel: string }) {
         </div>
 
         {s && (
-          <div className="my-[18px] grid grid-cols-2 gap-3 lg:grid-cols-4">
+          <div className="my-[1.125rem] grid grid-cols-2 gap-3 lg:grid-cols-4">
             <Stat label={t("stream.statViewers")} value={compactCount(s.viewer_count)} sub={t("stream.statViewersSub")} />
             <Stat label={t("stream.statFollowers")} value={followers.data != null ? compactCount(followers.data) : "—"} sub={t("stream.statFollowersSub")} />
             <Stat label={t("stream.statTimeLabel")} value={uptimeFrom(startedAt)} sub={startClock ? t("stream.statTimeStarted", { time: startClock }) : undefined} />
@@ -101,7 +101,7 @@ export function Live({ channel }: { channel: string }) {
         )}
 
         {u?.description && (
-          <div className="mb-6 rounded-mw-2xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_28%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_6%,rgb(var(--mw-800)))] px-[22px] py-[18px]">
+          <div className="mb-6 rounded-mw-2xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_28%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_6%,rgb(var(--mw-800)))] px-[1.375rem] py-[1.125rem]">
             <h3 className="mb-2 font-mw-display text-lg">{t("stream.about")}</h3>
             <p className="m-0 whitespace-pre-line text-sm leading-[1.6] text-mw-fg-mute">{u.description}</p>
           </div>
@@ -110,7 +110,7 @@ export function Live({ channel }: { channel: string }) {
         {otherStreams.length > 0 && (
           <section>
             <SectionHeader title={t("stream.otherLive")} />
-            <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid grid-cols-1 gap-[1.125rem] sm:grid-cols-2 xl:grid-cols-4">
               {otherStreams.map((x) => (
                 <StreamCard key={x.href} s={x} />
               ))}

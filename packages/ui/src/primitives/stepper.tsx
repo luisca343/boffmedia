@@ -36,7 +36,7 @@ export function Stepper({ steps, current, rail, muted, className }: StepperProps
                 aria-hidden
                 className={cn(
                   "h-px shrink-0",
-                  rail ? "min-w-4 flex-1 mx-1" : "w-[22px]",
+                  rail ? "min-w-4 flex-1 mx-1" : "w-[1.375rem]",
                   rail && i <= current && !muted ? "bg-ok" : "bg-line-2",
                 )}
               />
@@ -44,14 +44,14 @@ export function Stepper({ steps, current, rail, muted, className }: StepperProps
             <span
               role="listitem"
               className={cn(
-                "inline-flex items-center gap-2 py-[6px] px-[9px] whitespace-nowrap",
+                "inline-flex items-center gap-2 py-[0.375rem] px-[0.5625rem] whitespace-nowrap",
                 state === "active" ? "text-txt" : state === "done" ? "text-txt-muted" : "text-txt-dim",
               )}
             >
               <span
                 className={cn(
                   "cut-tag cut-tag-edge [--cut-tag:5px] grid place-items-center w-5 h-5 shrink-0 border border-solid",
-                  "font-mono text-[10px] font-semibold transition-[background,border-color,color] duration-[140ms]",
+                  "font-mono text-[0.625rem] font-semibold transition-[background,border-color,color] duration-[140ms]",
                   state === "idle" && "border-line-2 [--cut-line:var(--line-2)] bg-panel text-txt-muted",
                   state === "done" && "text-ok bg-ok-soft border-ok [--cut-line:var(--ok)]",
                   state === "active" && "text-accent-ink bg-accent border-accent [--cut-line:var(--accent)]",
@@ -61,7 +61,7 @@ export function Stepper({ steps, current, rail, muted, className }: StepperProps
               </span>
               <span
                 className={cn(
-                  "font-mono text-[10px] tracking-[0.1em] uppercase font-semibold",
+                  "font-mono text-[0.625rem] tracking-[0.1em] uppercase font-semibold",
                   !rail && "max-[1100px]:hidden",
                 )}
               >

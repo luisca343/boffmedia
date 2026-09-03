@@ -178,11 +178,11 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-[1400px] px-6 py-10">
-        <Skeleton className="h-[220px] w-full" />
-        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[360px_minmax(0,1fr)]">
-          <Skeleton className="h-[560px] w-full" />
-          <Skeleton className="h-[560px] w-full" />
+      <div className="mx-auto max-w-[87.5rem] px-6 py-10">
+        <Skeleton className="h-[13.75rem] w-full" />
+        <div className="mt-6 grid grid-cols-1 gap-6 md:grid-cols-[22.5rem_minmax(0,1fr)]">
+          <Skeleton className="h-[35rem] w-full" />
+          <Skeleton className="h-[35rem] w-full" />
         </div>
       </div>
     );
@@ -194,8 +194,8 @@ export function Newsroom({ initialId = null }: { initialId?: number | null }) {
     <div>
       <NewsroomHeader {...counts} />
 
-      <main className="mx-auto max-w-[1400px] px-6 pb-12 pt-6">
-        <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[360px_minmax(0,1fr)]">
+      <main className="mx-auto max-w-[87.5rem] px-6 pb-12 pt-6">
+        <div className="grid grid-cols-1 items-start gap-6 md:grid-cols-[22.5rem_minmax(0,1fr)]">
           <NewsSidebar
             total={articles.length}
             articles={filtered}

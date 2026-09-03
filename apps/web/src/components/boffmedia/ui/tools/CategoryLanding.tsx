@@ -15,7 +15,7 @@ import { useViewerRoles } from "@/services/useBoffSession"
 export function GameBanner({ cat }: { cat: CategoryData }) {
   return (
     <Bleed top className="mb-10">
-      <div style={hueStyle(cat.hueColor)} className="relative flex min-h-[380px] flex-col items-stretch overflow-hidden md:min-h-[460px]">
+      <div style={hueStyle(cat.hueColor)} className="relative flex min-h-[23.75rem] flex-col items-stretch overflow-hidden md:min-h-[28.75rem]">
         <div className="absolute inset-0 z-0 bg-base-2">
           <ArtImage src={cat.banner.image} priority sizes="100vw" />
         </div>
@@ -24,17 +24,17 @@ export function GameBanner({ cat }: { cat: CategoryData }) {
           aria-hidden="true"
           className="pointer-events-none absolute inset-0 z-[1] [background:linear-gradient(to_top,var(--bg)_0%,color-mix(in_srgb,var(--bg)_62%,transparent)_40%,transparent_78%),linear-gradient(102deg,color-mix(in_srgb,var(--bg)_82%,transparent)_4%,color-mix(in_srgb,var(--bg)_20%,transparent)_46%,transparent_66%),radial-gradient(120%_120%_at_92%_8%,color-mix(in_srgb,var(--ghue)_16%,transparent),transparent_52%)]"
         />
-        <div className="relative z-[2] flex flex-1 items-end gap-[26px] px-[var(--pad-x,22px)] pb-[30px] pt-[34px]">
+        <div className="relative z-[2] flex flex-1 items-end gap-[1.625rem] px-[var(--pad-x,22px)] pb-[1.875rem] pt-[2.125rem]">
           <GameLogo label={cat.logoLabel} hueColor={cat.hueColor} size="lg" imageSrc={cat.iconImg} bare className="max-sm:hidden" />
           <div className="min-w-0">
             {/* `prefix` + `highlight` are one sentence, not a label and a title —
                 "Herramientas de" + "Pokémon". They live in the same h1 so the
                 heading is a whole phrase for search and screen readers; the
                 accent-outline `em` carries the emphasis the kicker used to. */}
-            <h1 className="text-[clamp(40px,5.4vw,82px)] leading-[0.9]">
+            <h1 className="text-[clamp(2.5rem,5.4vw,5.125rem)] leading-[0.9]">
               {cat.banner.prefix} <em>{cat.banner.highlight}</em>
             </h1>
-            <p className="mt-[10px] max-w-[66ch] text-[17px] leading-[1.5] text-txt-muted">{cat.banner.subtitle}</p>
+            <p className="mt-[0.625rem] max-w-[66ch] text-[1.0625rem] leading-[1.5] text-txt-muted">{cat.banner.subtitle}</p>
           </div>
         </div>
         <div aria-hidden="true" className="absolute inset-x-0 bottom-0 z-[3] h-[3px] [background:linear-gradient(90deg,var(--ghue)_0%,color-mix(in_srgb,var(--ghue)_30%,transparent)_46%,transparent_78%)]" />
@@ -52,26 +52,26 @@ export function FeaturedTool({ cat }: { cat: CategoryData }) {
   return (
     <div
       style={hueStyle(cat.hueColor)}
-      className="group relative mb-[34px] grid grid-cols-1 border border-solid bg-panel md:grid-cols-[0.82fr_1.18fr] border-[color-mix(in_srgb,var(--ghue)_32%,var(--line))] [--cut-line:color-mix(in_srgb,var(--ghue)_32%,var(--line))] [background:radial-gradient(130%_150%_at_100%_0%,color-mix(in_srgb,var(--ghue)_13%,transparent),transparent_52%),var(--panel)] cut-notch cut-edge-notch [--cut-e:22px] transition-[border-color,box-shadow] duration-300 hover:border-[color-mix(in_srgb,var(--ghue)_52%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--ghue)_52%,var(--line))] hover:shadow-[0_22px_54px_rgba(0,0,0,0.32)]"
+      className="group relative mb-[2.125rem] grid grid-cols-1 border border-solid bg-panel md:grid-cols-[0.82fr_1.18fr] border-[color-mix(in_srgb,var(--ghue)_32%,var(--line))] [--cut-line:color-mix(in_srgb,var(--ghue)_32%,var(--line))] [background:radial-gradient(130%_150%_at_100%_0%,color-mix(in_srgb,var(--ghue)_13%,transparent),transparent_52%),var(--panel)] cut-notch cut-edge-notch [--cut-e:22px] transition-[border-color,box-shadow] duration-300 hover:border-[color-mix(in_srgb,var(--ghue)_52%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--ghue)_52%,var(--line))] hover:shadow-[0_22px_54px_rgba(0,0,0,0.32)]"
     >
       <span aria-hidden="true" className="absolute inset-x-0 top-0 z-[3] h-[3px] [background:linear-gradient(90deg,var(--ghue)_0%,color-mix(in_srgb,var(--ghue)_40%,transparent)_42%,transparent_72%)]" />
-      <span className="absolute left-0 top-0 z-[4] inline-flex items-center gap-[7px] whitespace-nowrap py-2 pl-[14px] pr-[18px] font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-[var(--bg)] bg-[var(--ghue)] cut-slant-r [--cut:13px]">
+      <span className="absolute left-0 top-0 z-[4] inline-flex items-center gap-[0.4375rem] whitespace-nowrap py-2 pl-[0.875rem] pr-[1.125rem] font-mono text-[0.625rem] font-bold uppercase tracking-[0.14em] text-[var(--bg)] bg-[var(--ghue)] cut-slant-r [--cut:13px]">
         <Icon name="star" size={13} />
         {f.isNew ? tCat("featuredNew") : tCat("featured")}
       </span>
 
-      <div className="relative min-h-[220px] border-b border-solid bg-base-2 md:min-h-[300px] md:border-b-0 md:border-r border-[color-mix(in_srgb,var(--ghue)_28%,var(--line))]">
+      <div className="relative min-h-[13.75rem] border-b border-solid bg-base-2 md:min-h-[18.75rem] md:border-b-0 md:border-r border-[color-mix(in_srgb,var(--ghue)_28%,var(--line))]">
         <ArtImage src={art} sizes="(min-width: 768px) 40vw, 100vw" />
         <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-[2] hidden md:block [background:linear-gradient(to_right,transparent_52%,color-mix(in_srgb,var(--panel)_55%,transparent)_88%,var(--panel))]" />
-        <span className="absolute bottom-8 right-[26px] z-[3] grid h-16 w-16 place-items-center border-2 border-solid text-[var(--ghue)] bg-[color-mix(in_srgb,var(--ghue)_16%,var(--bg))] border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] shadow-[0_10px_34px_rgba(0,0,0,0.45)] cut-seal cut-seal-edge [--cut:13px] [--cut-w:2px] [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] transition-transform duration-300 group-hover:-translate-y-1 max-md:right-6 max-md:-bottom-[30px]">
+        <span className="absolute bottom-8 right-[1.625rem] z-[3] grid h-16 w-16 place-items-center border-2 border-solid text-[var(--ghue)] bg-[color-mix(in_srgb,var(--ghue)_16%,var(--bg))] border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] shadow-[0_10px_34px_rgba(0,0,0,0.45)] cut-seal cut-seal-edge [--cut:13px] [--cut-w:2px] [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] transition-transform duration-300 group-hover:-translate-y-1 max-md:right-6 max-md:-bottom-[1.875rem]">
           <Icon name={f.icon} size={26} />
         </span>
       </div>
 
-      <div className="flex flex-col px-[38px] pb-8 pt-[34px]">
-        <h3 className="mb-[14px] text-[clamp(30px,3.2vw,48px)] leading-[0.98]">{f.title}</h3>
-        <p className="max-w-[50ch] text-[15.5px] leading-[1.55] text-txt-muted">{f.desc}</p>
-        <div className="my-[20px] mb-[26px] flex flex-wrap gap-2">
+      <div className="flex flex-col px-[2.375rem] pb-8 pt-[2.125rem]">
+        <h3 className="mb-[0.875rem] text-[clamp(1.875rem,3.2vw,3rem)] leading-[0.98]">{f.title}</h3>
+        <p className="max-w-[50ch] text-[0.96875rem] leading-[1.55] text-txt-muted">{f.desc}</p>
+        <div className="my-[1.25rem] mb-[1.625rem] flex flex-wrap gap-2">
           {f.features.map((x) => (
             <Chip key={x}>{x}</Chip>
           ))}
@@ -99,7 +99,7 @@ export function ExtLinks({ items }: { items: ExtLinkData[] }) {
   const tCat = useTranslations("toolsUi.category")
   if (!items.length) return null
   return (
-    <div className="grid grid-cols-1 gap-[14px] sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]">
+    <div className="grid grid-cols-1 gap-[0.875rem] sm:grid-cols-[repeat(auto-fill,minmax(15rem,1fr))]">
       {items.map((item) => {
         const domain = extDomain(item.href) ?? tCat("externalFallbackDomain")
         return (
@@ -109,14 +109,14 @@ export function ExtLinks({ items }: { items: ExtLinkData[] }) {
             target="_blank"
             rel="noopener noreferrer"
             aria-label={tCat("externalAria", { title: item.title, domain })}
-            className="group/ext relative flex flex-col gap-[11px] border border-dashed border-line-2 bg-panel px-4 pb-[13px] pt-[14px] no-underline transition-[border-color,background,transform] duration-[140ms] hover:-translate-y-[2px] hover:border-[color-mix(in_srgb,var(--info)_55%,var(--line-2))] hover:bg-panel-2 cut-corner [--cut-lg:16px]"
+            className="group/ext relative flex flex-col gap-[0.6875rem] border border-dashed border-line-2 bg-panel px-4 pb-[0.8125rem] pt-[0.875rem] no-underline transition-[border-color,background,transform] duration-[140ms] hover:-translate-y-[2px] hover:border-[color-mix(in_srgb,var(--info)_55%,var(--line-2))] hover:bg-panel-2 cut-corner [--cut-lg:16px]"
           >
             {/* The corner accent IS this card's chamfer stroke — a filled
                 triangle whose hypotenuse lies on the cut, so no `cut-corner-edge`
                 here or the corner reads as a double line. */}
             <span aria-hidden="true" className="absolute right-0 top-0 h-4 w-4 [background:color-mix(in_srgb,var(--info)_30%,var(--panel))] [clip-path:polygon(0_0,100%_100%,0_100%)] transition-colors group-hover/ext:[background:color-mix(in_srgb,var(--info)_60%,var(--panel))]" />
             <span className="flex items-center gap-2">
-              <span className="border border-solid px-[7px] py-1 font-mono text-[9.5px] font-bold uppercase tracking-[0.14em] text-[var(--info)] bg-[color-mix(in_srgb,var(--info)_13%,transparent)] border-[color-mix(in_srgb,var(--info)_38%,transparent)]">
+              <span className="border border-solid px-[0.4375rem] py-1 font-mono text-[0.59375rem] font-bold uppercase tracking-[0.14em] text-[var(--info)] bg-[color-mix(in_srgb,var(--info)_13%,transparent)] border-[color-mix(in_srgb,var(--info)_38%,transparent)]">
                 {tCat("externalTag")}
               </span>
               <span className="ml-auto mr-2 text-txt-dim transition-transform duration-200 group-hover/ext:-translate-y-0.5 group-hover/ext:translate-x-0.5 group-hover/ext:text-[var(--info)]">
@@ -124,10 +124,10 @@ export function ExtLinks({ items }: { items: ExtLinkData[] }) {
               </span>
             </span>
             <span className="min-w-0">
-              <b className="block font-display text-[16px] font-bold uppercase leading-[1.1] tracking-[0.01em] text-txt">{item.title}</b>
-              {item.desc && <span className="mt-1 block text-[12.5px] leading-[1.45] text-txt-muted">{item.desc}</span>}
+              <b className="block font-display text-[1rem] font-bold uppercase leading-[1.1] tracking-[0.01em] text-txt">{item.title}</b>
+              {item.desc && <span className="mt-1 block text-[0.78125rem] leading-[1.45] text-txt-muted">{item.desc}</span>}
             </span>
-            <span className="mt-auto flex items-center gap-[6px] overflow-hidden text-ellipsis whitespace-nowrap border-t border-dashed border-line pt-[10px] font-mono text-[10.5px] tracking-[0.06em] text-txt-dim">
+            <span className="mt-auto flex items-center gap-[0.375rem] overflow-hidden text-ellipsis whitespace-nowrap border-t border-dashed border-line pt-[0.625rem] font-mono text-[0.65625rem] tracking-[0.06em] text-txt-dim">
               <Icon name="globe" size={12} />
               {domain}
             </span>

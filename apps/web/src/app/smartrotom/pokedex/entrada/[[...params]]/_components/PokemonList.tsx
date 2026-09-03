@@ -70,10 +70,10 @@ export default function PokemonList() {
                 <span className="w-5 h-5 rounded bg-pk-primary-400/[0.12] text-pk-primary-300 grid place-items-center">
                   <BookOpenIcon className="w-3 h-3" />
                 </span>
-                <span className="font-pk-mono text-[10.5px] tracking-[0.12em] uppercase text-pk-surface-500">Pokédex</span>
+                <span className="font-pk-mono text-[0.65625rem] tracking-[0.12em] uppercase text-pk-surface-500">Pokédex</span>
               </div>
-              <h1 className="font-pk-display font-bold text-[28px] tracking-tight text-pk-surface-50">{t("dexlist_explore")}</h1>
-              <p className="text-pk-surface-400 text-sm mt-1 max-w-[600px]">
+              <h1 className="font-pk-display font-bold text-[1.75rem] tracking-tight text-pk-surface-50">{t("dexlist_explore")}</h1>
+              <p className="text-pk-surface-400 text-sm mt-1 max-w-[37.5rem]">
                 {t("dexlist_registered", { count: pokemonList.length })}
               </p>
             </div>
@@ -94,7 +94,7 @@ export default function PokemonList() {
             <input
               type="search"
               placeholder={t("dexlist_search_placeholder")}
-              className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] py-2.5 pr-3 pl-9 text-[13px] text-pk-surface-50 outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)] transition-colors"
+              className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] py-2.5 pr-3 pl-9 text-[0.8125rem] text-pk-surface-50 outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)] transition-colors"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -120,7 +120,7 @@ export default function PokemonList() {
                         className="group-hover:-translate-y-0.5 transition-transform"
                       />
                       <div className="text-center mt-1.5 w-full">
-                        <div className="font-pk-mono text-[10px] text-pk-surface-500">#{pokemon.dex.toString().padStart(3, "0")}</div>
+                        <div className="font-pk-mono text-[0.625rem] text-pk-surface-500">#{pokemon.dex.toString().padStart(3, "0")}</div>
                         <div className="text-pk-surface-100 text-xs font-medium truncate w-full">
                           {seen ? t(`pixelmon_${pokemon.name.toLowerCase()}`) || pokemon.name : "???"}
                         </div>

@@ -16,11 +16,11 @@ export interface SrtNumberStepperProps {
 
 export function SrtNumberStepper({ value, onChange, min = 1, max = 99, size = "md", lessLabel, moreLabel, accent }: SrtNumberStepperProps) {
   const set = (v: number) => onChange(Math.max(min, Math.min(max, v)))
-  const sizeClass = size === "sm" ? "h-[26px]" : "h-[30px]"
-  const btnSize = size === "sm" ? "w-[22px]" : "w-[26px]"
+  const sizeClass = size === "sm" ? "h-[1.625rem]" : "h-[1.875rem]"
+  const btnSize = size === "sm" ? "w-[1.375rem]" : "w-[1.625rem]"
   const iconSize = size === "sm" ? 13 : 15
-  const textClass = size === "sm" ? "text-[11px]" : "text-[12px]"
-  const minWidthClass = size === "sm" ? "min-w-[22px]" : "min-w-[26px]"
+  const textClass = size === "sm" ? "text-[0.6875rem]" : "text-[0.75rem]"
+  const minWidthClass = size === "sm" ? "min-w-[1.375rem]" : "min-w-[1.625rem]"
 
   return (
     <div className={`inline-flex items-center border border-line-2 bg-panel-2 ${sizeClass}`}>

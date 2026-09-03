@@ -67,11 +67,11 @@ export function MgCard({
       <MgCover src={cover} alt={title} className="aspect-[3/2]">
         {badge && <span className="absolute left-2 top-2">{badge}</span>}
       </MgCover>
-      <div className="px-[13px] py-[11px]">
-        <p className="truncate font-display text-[15px] font-bold not-italic uppercase leading-[1.15] text-txt transition-colors group-hover:text-accent">
+      <div className="px-[0.8125rem] py-[0.6875rem]">
+        <p className="truncate font-display text-[0.9375rem] font-bold not-italic uppercase leading-[1.15] text-txt transition-colors group-hover:text-accent">
           {title}
         </p>
-        <p className="mt-1 truncate font-mono text-[10px] font-medium uppercase leading-none tracking-[0.06em] text-txt-dim">
+        <p className="mt-1 truncate font-mono text-[0.625rem] font-medium uppercase leading-none tracking-[0.06em] text-txt-dim">
           {meta}
         </p>
       </div>
@@ -100,7 +100,7 @@ export function MgChapter({
       onClick={onClick}
       title={title}
       className={cn(
-        "cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:5px] inline-flex min-w-[40px] items-center justify-center gap-[4px] border border-solid px-[10px] py-[7px] font-mono text-[12px] font-semibold leading-none transition-colors",
+        "cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:5px] inline-flex min-w-[2.5rem] items-center justify-center gap-[0.25rem] border border-solid px-[0.625rem] py-[0.4375rem] font-mono text-[0.75rem] font-semibold leading-none transition-colors",
         state === "on" && "border-accent bg-accent-soft text-accent",
         state === "done" && "border-transparent bg-ok-soft text-ok",
         state === "off" && "border-line-2 bg-base-2 text-txt-muted hover:border-line-2 hover:text-txt",
@@ -133,8 +133,8 @@ export function MgResult({
     >
       <MgCover src={cover} alt={title} className="h-14 w-10 flex-none cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:6px]" />
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[14px] font-medium text-txt transition-colors group-hover:text-accent">{title}</p>
-        {sub && <p className="mt-0.5 truncate font-mono text-[11px] text-txt-dim">{sub}</p>}
+        <p className="truncate text-[0.875rem] font-medium text-txt transition-colors group-hover:text-accent">{title}</p>
+        {sub && <p className="mt-0.5 truncate font-mono text-[0.6875rem] text-txt-dim">{sub}</p>}
       </div>
       <Icon name="chevronRight" size={16} className="flex-none text-txt-dim transition-colors group-hover:text-accent" />
     </button>

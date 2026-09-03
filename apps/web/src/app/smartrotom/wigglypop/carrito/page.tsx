@@ -107,8 +107,8 @@ export default function CartPage() {
     <div className="flex min-w-0 flex-1 flex-col">
       <Head count={count} sellers={sellers} onClear={clear} />
 
-      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-5">
-        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(280px,1fr)]">
+      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[1.875rem] pb-10 pt-5">
+        <div className="grid items-start gap-5 lg:grid-cols-[minmax(0,1.55fr)_minmax(17.5rem,1fr)]">
           <div className="grid gap-2.5">
             {lines.map((l) => {
               const mon = l.listing.mons[0]
@@ -119,22 +119,22 @@ export default function CartPage() {
                     <SpriteStage
                       mon={mon}
                       dots={false}
-                      className="h-[54px] w-[54px] flex-none rounded-[11px]"
+                      className="h-[3.375rem] w-[3.375rem] flex-none rounded-[11px]"
                     >
                       <Sprite mon={mon} className="relative z-[2] h-[78%] w-[78%]" />
                     </SpriteStage>
                   ) : (
-                    <span className="flex h-[54px] w-[54px] flex-none items-center justify-center rounded-[11px] border border-wp-line/24 bg-wp-panel-2">
+                    <span className="flex h-[3.375rem] w-[3.375rem] flex-none items-center justify-center rounded-[11px] border border-wp-line/24 bg-wp-panel-2">
                       <Icon name="package" size={22} className="text-wp-fg-subtle" />
                     </span>
                   )}
 
                   <div className="min-w-0 flex-1">
-                    <div className="font-wp text-[14.5px] font-bold text-wp-fg">
+                    <div className="font-wp text-[0.90625rem] font-bold text-wp-fg">
                       {mon?.shiny && <span className="text-wp-teal">✦ </span>}
                       {l.listing.title}
                     </div>
-                    <div className="mt-1 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+                    <div className="mt-1 font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
                       {l.listing.seller.username}
                       {item && ` · ${t("carrito.unitPriceAbbrev", { price: fmt(item.unitPrice) })}`}
                     </div>
@@ -150,7 +150,7 @@ export default function CartPage() {
                       >
                         <Icon name="minus" size={15} />
                       </Button>
-                      <span className="wp-num min-w-[26px] text-center font-wp text-sm text-wp-fg">
+                      <span className="wp-num min-w-[1.625rem] text-center font-wp text-sm text-wp-fg">
                         {l.qty}
                       </span>
                       <Button iconOnly aria-label={t("common.increase")} onClick={() => setQty(l.key, l.qty + 1)}>
@@ -159,7 +159,7 @@ export default function CartPage() {
                     </div>
                   )}
 
-                  <div className="min-w-[96px] text-right">
+                  <div className="min-w-[6rem] text-right">
                     <Price amount={lineTotal(l)} size={17} />
                   </div>
 
@@ -196,7 +196,7 @@ export default function CartPage() {
 
             <Button
               variant="primary"
-              className="mt-3.5 w-full py-[13px]"
+              className="mt-3.5 w-full py-[0.8125rem]"
               disabled={insufficient}
               onClick={() => setCheckingOut(true)}
             >
@@ -204,7 +204,7 @@ export default function CartPage() {
               {insufficient ? t("common.insufficientBalance") : t("carrito.checkoutButton", { total: fmt(total) })}
             </Button>
 
-            <p className="mt-3 flex items-start gap-2 font-wp text-[11.5px] font-semibold leading-relaxed text-wp-fg-muted">
+            <p className="mt-3 flex items-start gap-2 font-wp text-[0.71875rem] font-semibold leading-relaxed text-wp-fg-muted">
               <Icon name="shieldCheck" size={15} className="mt-px flex-none text-wp-green" />
               {t("carrito.escrowExplain")}
             </p>
@@ -220,24 +220,24 @@ export default function CartPage() {
             onClose={() => setCheckingOut(false)}
           />
           <div className="p-5">
-            <div className="wp-noscroll grid max-h-[240px] gap-2 overflow-y-auto">
+            <div className="wp-noscroll grid max-h-[15rem] gap-2 overflow-y-auto">
               {lines.map((l) => (
                 <div
                   key={l.key}
                   className="flex items-center gap-2.5 rounded-[11px] border border-wp-line/24 bg-wp-panel-2 p-2.5"
                 >
                   <div className="min-w-0 flex-1">
-                    <div className="truncate font-wp text-[13.5px] font-bold text-wp-fg">
+                    <div className="truncate font-wp text-[0.84375rem] font-bold text-wp-fg">
                       {l.listing.title}
                       {l.listing.kind === "item" && l.qty > 1 && (
                         <span className="font-semibold text-wp-fg-subtle"> ×{l.qty}</span>
                       )}
                     </div>
-                    <div className="font-wp text-[11px] font-semibold text-wp-fg-subtle">
+                    <div className="font-wp text-[0.6875rem] font-semibold text-wp-fg-subtle">
                       {l.listing.seller.username}
                     </div>
                   </div>
-                  <span className="wp-num font-wp text-[13.5px] text-wp-fg">
+                  <span className="wp-num font-wp text-[0.84375rem] text-wp-fg">
                     ₽{fmt(lineTotal(l))}
                   </span>
                 </div>
@@ -249,7 +249,7 @@ export default function CartPage() {
               <Row k={t("common.protectionFee")} v={fee} />
               <div className="my-0.5 h-px bg-wp-line/24" />
               <div className="flex items-baseline justify-between">
-                <span className="font-wp text-[15px] font-bold text-wp-fg">{t("common.total")}</span>
+                <span className="font-wp text-[0.9375rem] font-bold text-wp-fg">{t("common.total")}</span>
                 <Price amount={total} size={20} />
               </div>
             </div>
@@ -258,7 +258,7 @@ export default function CartPage() {
 
             <Button
               variant="primary"
-              className="mt-4 w-full py-[13px]"
+              className="mt-4 w-full py-[0.8125rem]"
               disabled={insufficient || createOrder.isPending}
               onClick={pay}
             >
@@ -283,13 +283,13 @@ function Head({
 }) {
   const t = useTranslations("wigglypop")
   return (
-    <div className="flex flex-none items-center gap-3 border-b border-wp-line/24 px-[30px] py-[18px]">
+    <div className="flex flex-none items-center gap-3 border-b border-wp-line/24 px-[1.875rem] py-[1.125rem]">
       <div className="flex-1">
-        <h1 className="flex items-center gap-2.5 font-wp-display text-[21px] font-semibold text-wp-fg">
+        <h1 className="flex items-center gap-2.5 font-wp-display text-[1.3125rem] font-semibold text-wp-fg">
           <Icon name="cart" size={20} className="text-wp-accent" />
           {t("carrito.headTitle")}
         </h1>
-        <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
+        <p className="mt-0.5 font-wp text-[0.78125rem] font-semibold text-wp-fg-subtle">
           {count === 0 ? t("carrito.emptyLabel") : t("carrito.headSubtitle", { count, sellers })}
         </p>
       </div>
@@ -305,7 +305,7 @@ function Head({
 
 function Row({ k, v }: { k: string; v: number }) {
   return (
-    <div className="flex justify-between font-wp text-[13.5px]">
+    <div className="flex justify-between font-wp text-[0.84375rem]">
       <span className={cn("font-semibold text-wp-fg-muted")}>{k}</span>
       <span className="wp-num font-semibold text-wp-fg">₽{fmt(v)}</span>
     </div>

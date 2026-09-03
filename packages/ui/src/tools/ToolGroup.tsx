@@ -42,13 +42,13 @@ export function ToolGroupHead({
   className,
 }: ToolGroupHeadProps) {
   return (
-    <div className={cn("mb-6 flex flex-wrap items-center gap-[18px]", className)}>
+    <div className={cn("mb-6 flex flex-wrap items-center gap-[1.125rem]", className)}>
       <GameLogo label={logoLabel ?? ""} hueColor={hueColor} imageSrc={imageSrc} art={logoArt} />
       <div className={cn("min-w-0", thread ? "flex-none" : "flex-1")}>
-        <h2 className="font-display text-[clamp(28px,3.4vw,44px)] font-extrabold italic uppercase leading-[0.92]">
+        <h2 className="font-display text-[clamp(1.75rem,3.4vw,2.75rem)] font-extrabold italic uppercase leading-[0.92]">
           {name}
         </h2>
-        {tagline && <p className="mt-[5px] text-[15px] text-txt-muted">{tagline}</p>}
+        {tagline && <p className="mt-[0.3125rem] text-[0.9375rem] text-txt-muted">{tagline}</p>}
       </div>
       {thread && <span aria-hidden="true" className="min-w-0 flex-1 border-t border-dashed border-line" />}
       {count != null && <span className="mono-label flex-none max-sm:hidden">{count}</span>}

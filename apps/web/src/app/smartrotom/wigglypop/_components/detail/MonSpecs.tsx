@@ -27,23 +27,23 @@ export function MonSpecs({ mon }: { mon: WpMon }) {
       <Panel className="mt-3.5 p-4">
         <div className="mb-3 flex items-center justify-between">
           <h3 className="font-wp text-sm font-bold text-wp-fg">{t("specs.statsHeading")}</h3>
-          <span className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+          <span className="font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
             {t("specs.statsSubheading")}
           </span>
         </div>
         <div className="grid gap-2.5">
           {STAT_KEYS.map((k, i) => (
             <div key={k} className="grid grid-cols-[1fr_auto] items-center gap-3">
-              <div className="grid grid-cols-[64px_36px_1fr] items-center gap-2.5">
-                <span className="font-wp text-[12px] font-bold text-wp-fg-muted">
+              <div className="grid grid-cols-[4rem_2.25rem_1fr] items-center gap-2.5">
+                <span className="font-wp text-[0.75rem] font-bold text-wp-fg-muted">
                   {t(STAT_LABEL_KEY[k])}
                 </span>
-                <span className="wp-num text-right font-wp text-[12.5px] text-wp-fg">
+                <span className="wp-num text-right font-wp text-[0.78125rem] text-wp-fg">
                   {mon.stats[i] ?? "—"}
                 </span>
                 <StatBar statKey={k} value={mon.stats[i] ?? 0} max={maxStat} />
               </div>
-              <div className="flex gap-1.5 whitespace-nowrap font-wp text-[11px]">
+              <div className="flex gap-1.5 whitespace-nowrap font-wp text-[0.6875rem]">
                 <span className={mon.ivs[i] === 31 ? "wp-num text-wp-green" : "wp-num text-wp-fg-muted"}>
                   {t("specs.ivValue", { value: mon.ivs[i] ?? "—" })}
                 </span>
@@ -67,7 +67,7 @@ export function MonSpecs({ mon }: { mon: WpMon }) {
                     plum dot, not a coloured type dot. Painting it a type we do not
                     know would be a guess dressed up as data (§9). */}
                 <span className="h-2.5 w-2.5 flex-none rounded-[3px] bg-wp-fg-subtle" />
-                <span className="font-wp text-[13px] font-semibold text-wp-fg">
+                <span className="font-wp text-[0.8125rem] font-semibold text-wp-fg">
                   {prettyItem(mv)}
                 </span>
               </div>
@@ -98,11 +98,11 @@ function Spec({
 }) {
   return (
     <div className="rounded-[14px] border-wp border-wp-line/24 bg-white px-3.5 py-3">
-      <div className="font-wp text-[10.5px] font-black uppercase tracking-[.06em] text-wp-fg-subtle">
+      <div className="font-wp text-[0.65625rem] font-black uppercase tracking-[.06em] text-wp-fg-subtle">
         {k}
       </div>
       <div
-        className={`mt-0.5 font-wp text-[14.5px] font-extrabold ${tone ?? (muted ? "text-wp-fg-subtle" : "text-wp-fg")}`}
+        className={`mt-0.5 font-wp text-[0.90625rem] font-extrabold ${tone ?? (muted ? "text-wp-fg-subtle" : "text-wp-fg")}`}
       >
         {v}
       </div>
@@ -120,7 +120,7 @@ export function prettyItem(raw: string): string {
 export function TypeRow({ mon }: { mon: WpMon }) {
   const t = useTranslations("wigglypop")
   return (
-    <div className="mt-2 flex flex-wrap items-center gap-[7px]">
+    <div className="mt-2 flex flex-wrap items-center gap-[0.4375rem]">
       {mon.types.map((ty) => (
         <TypeBadge key={ty} type={ty} />
       ))}

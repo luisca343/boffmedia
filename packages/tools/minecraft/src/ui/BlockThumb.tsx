@@ -189,7 +189,7 @@ export function BlockThumb({
           <div className="h-full w-full animate-pulse bg-panel-2/60" />
         ) : showPlaceholder ? (
           <div
-            className="flex h-full w-full items-center justify-center text-[10px] font-bold text-white/90"
+            className="flex h-full w-full items-center justify-center text-[0.625rem] font-bold text-white/90"
             style={{ backgroundColor: placeholderColor(blockId) }}
           >
             {placeholderGlyph(blockId)}
@@ -215,7 +215,7 @@ export function BlockThumb({
 
       {preview && previewPos ? (
         <div
-          className="pointer-events-none fixed z-[90] flex w-[232px] flex-col gap-2.5 border border-line-2 bg-[color-mix(in_srgb,var(--panel)_96%,transparent)] p-3 shadow-[0_20px_46px_-18px_var(--shadow-color)] backdrop-blur-[18px] animate-[bm-menu-in_0.12s_ease] motion-reduce:animate-none"
+          className="pointer-events-none fixed z-[90] flex w-[14.5rem] flex-col gap-2.5 border border-line-2 bg-[color-mix(in_srgb,var(--panel)_96%,transparent)] p-3 shadow-[0_20px_46px_-18px_var(--shadow-color)] backdrop-blur-[18px] animate-[bm-menu-in_0.12s_ease] motion-reduce:animate-none"
           style={{ left: previewPos.left, top: previewPos.top, bottom: previewPos.bottom }}
         >
           <div className="mx-auto overflow-hidden border border-line/60">
@@ -236,13 +236,13 @@ export function BlockThumb({
             )}
           </div>
           <div className="min-w-0">
-            <div className="truncate font-mono text-[12.5px] font-semibold text-txt">{name}</div>
-            <div className="truncate font-mono text-[10px] text-txt-dim">{namespace}</div>
+            <div className="truncate font-mono text-[0.78125rem] font-semibold text-txt">{name}</div>
+            <div className="truncate font-mono text-[0.625rem] text-txt-dim">{namespace}</div>
           </div>
           {previewRows && previewRows.length > 0 ? (
             <div className="flex flex-col gap-1 border-t border-line pt-2">
               {previewRows.map((r) => (
-                <div key={r.label} className="flex items-baseline justify-between gap-2 text-[10px]">
+                <div key={r.label} className="flex items-baseline justify-between gap-2 text-[0.625rem]">
                   <span className="shrink-0 text-txt-dim">{r.label}</span>
                   <span className="min-w-0 truncate font-mono text-txt-muted">{r.value}</span>
                 </div>

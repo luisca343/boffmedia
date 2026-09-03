@@ -26,15 +26,15 @@ export function Tabs({ tabs, value, onChange, className }: TabsProps) {
             aria-selected={on}
             onClick={() => onChange(t.value)}
             className={cn(
-              "font-display text-[14px] font-bold leading-none uppercase tracking-[0.08em]",
-              "pt-3 px-[18px] pb-[11px] border-b-[3px] border-solid -mb-px transition-[color,border-color] duration-[140ms]",
+              "font-display text-[0.875rem] font-bold leading-none uppercase tracking-[0.08em]",
+              "pt-3 px-[1.125rem] pb-[0.6875rem] border-b-[3px] border-solid -mb-px transition-[color,border-color] duration-[140ms]",
               "focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-[3px]",
               on ? "text-txt border-accent" : "text-txt-muted border-transparent hover:text-txt",
             )}
           >
             {t.label}
             {t.count != null && (
-              <span className={cn("font-mono text-[10px] font-semibold leading-none ml-[7px]", on ? "text-accent" : "text-txt-dim")}>
+              <span className={cn("font-mono text-[0.625rem] font-semibold leading-none ml-[0.4375rem]", on ? "text-accent" : "text-txt-dim")}>
                 {t.count}
               </span>
             )}

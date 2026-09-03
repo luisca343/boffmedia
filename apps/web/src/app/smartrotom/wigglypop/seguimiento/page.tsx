@@ -37,17 +37,17 @@ export default function WatchlistPage() {
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <div className="flex-none border-b border-wp-line/24 px-[30px] py-[18px]">
-        <h1 className="flex items-center gap-2.5 font-wp-display text-[21px] font-semibold text-wp-fg">
+      <div className="flex-none border-b border-wp-line/24 px-[1.875rem] py-[1.125rem]">
+        <h1 className="flex items-center gap-2.5 font-wp-display text-[1.3125rem] font-semibold text-wp-fg">
           <Icon name="bookmark" size={20} className="text-wp-gold" />
           {t("seguimiento.title")}
         </h1>
-        <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
+        <p className="mt-0.5 font-wp text-[0.78125rem] font-semibold text-wp-fg-subtle">
           <span className="wp-num">{rows.length}</span> {t("seguimiento.savedListingsSuffix")}
         </p>
       </div>
 
-      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-[18px]">
+      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[1.875rem] pb-10 pt-[1.125rem]">
         {error ? (
           <EmptyState icon="alert" title={t("seguimiento.errorTitle")} body={userMessageFrom(error, t("common.retryFallback"))} />
         ) : isLoading ? (
@@ -105,7 +105,7 @@ export default function WatchlistPage() {
                             {L.title}
                           </div>
                           {mon && (
-                            <div className="flex items-center gap-1.5 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+                            <div className="flex items-center gap-1.5 font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
                               <span className="wp-num">
                                 {t("common.levelIvPercent", { level: mon.level, pct: mon.ivPct })}
                               </span>
@@ -116,7 +116,7 @@ export default function WatchlistPage() {
                       </div>
                     </TD>
                     <TD>
-                      <Chip className="text-[11px]">
+                      <Chip className="text-[0.6875rem]">
                         <Icon name={FORMAT_ICON[L.format]} size={12} />
                         {t(FORMAT_LABEL_KEY[L.format])}
                       </Chip>
@@ -128,7 +128,7 @@ export default function WatchlistPage() {
                     <TD className="text-right">
                       <Price amount={price} size={14} />
                       {under && (
-                        <div className="font-wp text-[10.5px] font-bold text-wp-green">
+                        <div className="font-wp text-[0.65625rem] font-bold text-wp-green">
                           {t("seguimiento.belowValuationPct", { pct: Math.round((1 - price / L.value) * 100) })}
                         </div>
                       )}

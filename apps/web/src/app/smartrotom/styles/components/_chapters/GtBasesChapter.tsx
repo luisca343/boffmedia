@@ -117,13 +117,13 @@ export function GtBasesChapter() {
       >
         <Sample title="Las tres voces" code="font-gt-display · font-gt · font-gt-mono" app="gt" col>
           <div>
-            <div className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+            <div className="font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
               font-gt-display · Libre Baskerville
             </div>
-            <div className="mt-1 font-gt-display text-[30px] leading-[1.05] text-gt-ink-900">
+            <div className="mt-1 font-gt-display text-[1.875rem] leading-[1.05] text-gt-ink-900">
               Gobierno de Teras
             </div>
-            <div className="mt-1 font-gt-display text-[30px] tabular-nums leading-[1.05] text-gt-ink-900">
+            <div className="mt-1 font-gt-display text-[1.875rem] tabular-nums leading-[1.05] text-gt-ink-900">
               248.600 ₽
             </div>
           </div>
@@ -131,10 +131,10 @@ export function GtBasesChapter() {
           <hr className="gt-rule my-2 w-full" />
 
           <div>
-            <div className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+            <div className="font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
               font-gt · Public Sans
             </div>
-            <p className="mt-1 max-w-[52ch] text-[13.5px] leading-relaxed text-gt-ink-700">
+            <p className="mt-1 max-w-[52ch] text-[0.84375rem] leading-relaxed text-gt-ink-700">
               Toda la interfaz —botones, formularios, filas de tabla, cuerpo de una denuncia— va en Public
               Sans. Es la voz administrativa: legible y sin opinión.
             </p>
@@ -143,10 +143,10 @@ export function GtBasesChapter() {
           <hr className="gt-rule my-2 w-full" />
 
           <div>
-            <div className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+            <div className="font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
               font-gt-mono · Space Mono
             </div>
-            <div className="mt-1.5 flex flex-wrap items-center gap-3 font-gt-mono text-[11px] uppercase tracking-[.12em] text-gt-ink-600">
+            <div className="mt-1.5 flex flex-wrap items-center gap-3 font-gt-mono text-[0.6875rem] uppercase tracking-[.12em] text-gt-ink-600">
               <span>EXP-0042</span>
               <span>M-2210</span>
               <span>B-07</span>
@@ -169,8 +169,8 @@ export function GtBasesChapter() {
               ["4", "Buscados"],
             ].map(([v, l]) => (
               <div key={l}>
-                <div className="font-gt-display text-[30px] leading-[1.05] tabular-nums text-gt-ink-900">{v}</div>
-                <div className="mt-1 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+                <div className="font-gt-display text-[1.875rem] leading-[1.05] tabular-nums text-gt-ink-900">{v}</div>
+                <div className="mt-1 font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
                   {l}
                 </div>
               </div>
@@ -187,12 +187,12 @@ export function GtBasesChapter() {
       >
         <Sample title="Superficies" code="rounded-gt-sm 5px · rounded-gt 8px" app="gt" grid>
           <div className="rounded-gt border border-gt-line bg-gt-paper-0 p-4 shadow-gt">
-            <div className="font-gt-display text-[15px] text-gt-ink-900">Card</div>
-            <p className="mt-1 text-[12.5px] text-gt-ink-500">Papel levantado. Toda ficha del registro.</p>
+            <div className="font-gt-display text-[0.9375rem] text-gt-ink-900">Card</div>
+            <p className="mt-1 text-[0.78125rem] text-gt-ink-500">Papel levantado. Toda ficha del registro.</p>
           </div>
           <div className="rounded-gt border border-gt-line bg-gt-paper-1 p-4">
-            <div className="font-gt-display text-[15px] text-gt-ink-900">Panel</div>
-            <p className="mt-1 text-[12.5px] text-gt-ink-500">Papel de fondo. Agrupa, no destaca.</p>
+            <div className="font-gt-display text-[0.9375rem] text-gt-ink-900">Panel</div>
+            <p className="mt-1 text-[0.78125rem] text-gt-ink-500">Papel de fondo. Agrupa, no destaca.</p>
           </div>
         </Sample>
 
@@ -204,18 +204,18 @@ export function GtBasesChapter() {
           note="`gt-edge-gold` es el filo grabado de una ficha oficial. `gt-spine` es la franja del departamento — su color llega como `--gt-dep` en un `style` en línea, porque es un dato, no una clase. `gt-rule` es el doble filete que separa las secciones de un documento."
         >
           <div className="gt-edge-gold w-full rounded-gt border border-gt-line bg-gt-paper-0 p-4 shadow-gt">
-            <div className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.18em] text-gt-ink-400">
+            <div className="font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.18em] text-gt-ink-400">
               Documento oficial
             </div>
-            <div className="mt-1 font-gt-display text-[17px] text-gt-ink-900">Filo de oro grabado</div>
+            <div className="mt-1 font-gt-display text-[1.0625rem] text-gt-ink-900">Filo de oro grabado</div>
           </div>
 
           <div
             className="gt-spine w-full rounded-gt border border-gt-line bg-gt-paper-0 p-4 shadow-gt-sm"
             style={{ ["--gt-dep" as string]: "rgb(var(--gt-dep-justicia))" }}
           >
-            <div className="font-gt-display text-[15px] text-gt-ink-900">Franja de departamento</div>
-            <p className="mt-1 text-[12.5px] text-gt-ink-500">Justicia · burdeos</p>
+            <div className="font-gt-display text-[0.9375rem] text-gt-ink-900">Franja de departamento</div>
+            <p className="mt-1 text-[0.78125rem] text-gt-ink-500">Justicia · burdeos</p>
           </div>
 
           <hr className="gt-rule w-full" />

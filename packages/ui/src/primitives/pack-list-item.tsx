@@ -49,7 +49,7 @@ export function PackListItem({
         className,
       )}
     >
-      <span className="flex items-start gap-[11px]">
+      <span className="flex items-start gap-[0.6875rem]">
         {media != null && (
           <span className="grid size-9 shrink-0 place-items-center overflow-hidden border border-solid border-line-2 bg-panel text-accent">
             {media}
@@ -57,25 +57,25 @@ export function PackListItem({
         )}
         <span className="min-w-0 flex-1">
           <span className="flex items-start gap-2">
-            <span className="min-w-0 flex-1 font-display text-[15px] font-bold not-italic uppercase leading-[1.05] tracking-[0.04em] text-txt">
+            <span className="min-w-0 flex-1 font-display text-[0.9375rem] font-bold not-italic uppercase leading-[1.05] tracking-[0.04em] text-txt">
               {name}
             </span>
             <Icon name="chevronRight" size={14} className="mt-0.5 shrink-0 text-txt-dim" />
           </span>
           {slug != null && (
-            <span className="mt-[3px] block font-mono text-[10px] tracking-[0.02em] text-txt-dim">{slug}</span>
+            <span className="mt-[3px] block font-mono text-[0.625rem] tracking-[0.02em] text-txt-dim">{slug}</span>
           )}
         </span>
       </span>
 
       {summary != null && (
-        <span className="mt-2 line-clamp-2 block text-[12.5px] leading-[1.4] text-txt-muted">{summary}</span>
+        <span className="mt-2 line-clamp-2 block text-[0.78125rem] leading-[1.4] text-txt-muted">{summary}</span>
       )}
 
       {(badges != null || count != null) && (
-        <span className="mt-[11px] flex flex-wrap items-center gap-1.5 border-t border-solid border-line pt-2.5">
+        <span className="mt-[0.6875rem] flex flex-wrap items-center gap-1.5 border-t border-solid border-line pt-2.5">
           {badges}
-          {count != null && <span className="ml-auto font-mono text-[10px] text-txt-dim">{count}</span>}
+          {count != null && <span className="ml-auto font-mono text-[0.625rem] text-txt-dim">{count}</span>}
         </span>
       )}
     </button>

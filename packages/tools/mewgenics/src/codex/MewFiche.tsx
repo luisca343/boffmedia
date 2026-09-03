@@ -51,7 +51,7 @@ export function MewFiche({ codex }: { codex: MewCodexModel }) {
         disabled={!prevRec}
         title={prevRec ? cxTitle(prevRec) : undefined}
         aria-label={t("fiche.prev")}
-        className="grid h-[44px] w-[44px] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all enabled:hover:border-[color:var(--mwp-ink)] enabled:hover:bg-[color:var(--mwp-paper)] enabled:hover:text-[color:var(--mwp-ink)] enabled:active:translate-y-0.5 enabled:active:border-[color:var(--mwp-nline)] enabled:focus-visible:outline-none enabled:focus-visible:ring-2 enabled:focus-visible:ring-[color:var(--mwp-red)] enabled:focus-visible:ring-offset-0 disabled:opacity-35"
+        className="grid h-[2.75rem] w-[2.75rem] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all enabled:hover:border-[color:var(--mwp-ink)] enabled:hover:bg-[color:var(--mwp-paper)] enabled:hover:text-[color:var(--mwp-ink)] enabled:active:translate-y-0.5 enabled:active:border-[color:var(--mwp-nline)] enabled:focus-visible:outline-none enabled:focus-visible:ring-2 enabled:focus-visible:ring-[color:var(--mwp-red)] enabled:focus-visible:ring-offset-0 disabled:opacity-35"
       >
         <Icon name="back" size={16} />
       </button>
@@ -61,7 +61,7 @@ export function MewFiche({ codex }: { codex: MewCodexModel }) {
         disabled={!nextRec}
         title={nextRec ? cxTitle(nextRec) : undefined}
         aria-label={t("fiche.next")}
-        className="grid h-[44px] w-[44px] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all enabled:hover:border-[color:var(--mwp-ink)] enabled:hover:bg-[color:var(--mwp-paper)] enabled:hover:text-[color:var(--mwp-ink)] enabled:active:translate-y-0.5 enabled:active:border-[color:var(--mwp-nline)] enabled:focus-visible:outline-none enabled:focus-visible:ring-2 enabled:focus-visible:ring-[color:var(--mwp-red)] enabled:focus-visible:ring-offset-0 disabled:opacity-35"
+        className="grid h-[2.75rem] w-[2.75rem] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all enabled:hover:border-[color:var(--mwp-ink)] enabled:hover:bg-[color:var(--mwp-paper)] enabled:hover:text-[color:var(--mwp-ink)] enabled:active:translate-y-0.5 enabled:active:border-[color:var(--mwp-nline)] enabled:focus-visible:outline-none enabled:focus-visible:ring-2 enabled:focus-visible:ring-[color:var(--mwp-red)] enabled:focus-visible:ring-offset-0 disabled:opacity-35"
       >
         <Icon name="arrow" size={16} />
       </button>
@@ -70,7 +70,7 @@ export function MewFiche({ codex }: { codex: MewCodexModel }) {
         onClick={copyLink}
         title={t("fiche.share")}
         aria-label={copied ? t("fiche.shareCopied") : t("fiche.share")}
-        className="grid h-[44px] w-[44px] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:translate-y-0.5 active:border-[color:var(--mwp-nline)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+        className="grid h-[2.75rem] w-[2.75rem] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:translate-y-0.5 active:border-[color:var(--mwp-nline)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
       >
         <Icon name={copied ? "check" : "link"} size={16} />
       </button>
@@ -79,7 +79,7 @@ export function MewFiche({ codex }: { codex: MewCodexModel }) {
         onClick={() => toggleFav(selRec)}
         aria-pressed={isFav(selRec)}
         aria-label={isFav(selRec) ? t("fiche.favRemove") : t("fiche.favAdd")}
-        className="grid h-[44px] w-[44px] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:translate-y-0.5 active:border-[color:var(--mwp-nline)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 aria-pressed:border-[color:var(--mwp-ink)] aria-pressed:bg-[color:var(--mwp-paper)] aria-pressed:text-[color:var(--mwp-red)]"
+        className="grid h-[2.75rem] w-[2.75rem] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:translate-y-0.5 active:border-[color:var(--mwp-nline)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 aria-pressed:border-[color:var(--mwp-ink)] aria-pressed:bg-[color:var(--mwp-paper)] aria-pressed:text-[color:var(--mwp-red)]"
       >
         <Icon name="star" size={16} />
       </button>
@@ -95,7 +95,7 @@ export function MewFiche({ codex }: { codex: MewCodexModel }) {
             playSound("close")
             back()
           }}
-          className="inline-flex flex-none items-center gap-[7px] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3 pb-1.5 pt-[9px] text-[13px]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:var(--mwp-hard)] transition-all hover:-translate-y-[1px] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+          className="inline-flex flex-none items-center gap-[0.4375rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3 pb-1.5 pt-[0.5625rem] text-[0.8125rem]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:var(--mwp-hard)] transition-all hover:-translate-y-[1px] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
         >
           <Icon name="back" size={15} />
           {t("fiche.back", { category: t(mewCatKey(catDef.key, "label")) })}
@@ -104,7 +104,7 @@ export function MewFiche({ codex }: { codex: MewCodexModel }) {
         {/* visited trail with scroll affordance */}
         {trail.length > 1 && (
           <div className="flex min-w-0 flex-1 items-center gap-1.5 relative">
-            <span className="flex-none text-[10px]/none uppercase tracking-[0.08em] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-disp)] flex items-center gap-0.5">
+            <span className="flex-none text-[0.625rem]/none uppercase tracking-[0.08em] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-disp)] flex items-center gap-0.5">
               <Icon name="clock" size={11} className="opacity-75" />
               {t("fiche.trailLabel")}
             </span>
@@ -119,7 +119,7 @@ export function MewFiche({ codex }: { codex: MewCodexModel }) {
                       type="button"
                       onClick={() => onNav(crumb.cat, crumb.id)}
                       title={tc ? t(mewCatKey(tc.key, "label")) : ""}
-                      className={"inline-flex flex-none items-center gap-1.5 border-[1.5px] border-dashed px-[9px] py-1.5 text-[11.5px]/none font-semibold min-h-[28px] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 " + (on ? "border-[color:var(--mwp-cream-dim)] text-[color:var(--mwp-cream)] active:[box-shadow:0_1px_0_rgba(0,0,0,0.2)]" : "border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_rgba(0,0,0,0.15)]")}
+                      className={"inline-flex flex-none items-center gap-1.5 border-[1.5px] border-dashed px-[0.5625rem] py-1.5 text-[0.71875rem]/none font-semibold min-h-[1.75rem] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 " + (on ? "border-[color:var(--mwp-cream-dim)] text-[color:var(--mwp-cream)] active:[box-shadow:0_1px_0_rgba(0,0,0,0.2)]" : "border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_rgba(0,0,0,0.15)]")}
                     >
                       <Icon name={tc ? tc.icon : "paw"} size={11} />
                       {crumb.name}
@@ -133,7 +133,7 @@ export function MewFiche({ codex }: { codex: MewCodexModel }) {
 
         <div className="ml-auto flex flex-none items-center gap-2.5">
           {idx >= 0 && (
-            <span className="text-[11px]/none tracking-[0.06em] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-disp)] max-[620px]:hidden">
+            <span className="text-[0.6875rem]/none tracking-[0.06em] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-disp)] max-[620px]:hidden">
               {t("fiche.position", { n: idx + 1, total: filtered.length })}
             </span>
           )}

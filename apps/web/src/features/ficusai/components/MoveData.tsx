@@ -135,7 +135,7 @@ export default function MoveDataElement({id, isFullPage = false} : {id: string, 
                         </HoverCardContent>
                     </HoverCard>
                 </div>
-                <div className="grid grid-cols-3 grid-rows-2 gap-1 h-14 max-w-[300px] m-auto">
+                <div className="grid grid-cols-3 grid-rows-2 gap-1 h-14 max-w-[18.75rem] m-auto">
                     <Cell isActive={targetInfo.hitsOppositeFoe} hitsAll={targetInfo.hitsAll}>Oponente</Cell>
                     <Cell isActive={targetInfo.hitsAdjacentFoe} hitsAll={targetInfo.hitsAll}>Oponente</Cell>
                     <Cell isActive={targetInfo.hitsExtendedFoe} hitsAll={targetInfo.hitsAll}>Oponente</Cell>

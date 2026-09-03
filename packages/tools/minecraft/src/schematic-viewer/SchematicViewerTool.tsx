@@ -83,7 +83,7 @@ export function SchematicViewerTool() {
               key: "setup",
               label: t("workbench.setupTab"),
               className:
-                "w-[336px] shrink-0 overflow-y-auto overflow-x-hidden border-r border-line bg-base-2 max-[1180px]:w-[300px]",
+                "w-[21rem] shrink-0 overflow-y-auto overflow-x-hidden border-r border-line bg-base-2 max-[1180px]:w-[18.75rem]",
               tabClassName: "overflow-y-auto overflow-x-hidden bg-base-2",
               node: (
                 <SetupSidebar
@@ -100,7 +100,7 @@ export function SchematicViewerTool() {
             {
               key: "preview",
               label: t("workbench.previewTab"),
-              className: "flex min-w-[360px] flex-1 flex-col bg-base",
+              className: "flex min-w-[22.5rem] flex-1 flex-col bg-base",
               tabClassName: "flex flex-col bg-base",
               node: <ViewerPreview />,
             },

@@ -47,10 +47,10 @@ export function NewsSidebar({
 }) {
   const t = useTranslations("furrettoday.newsSidebar");
   return (
-    <CardFlat className="sticky top-[110px] flex max-h-[calc(100vh-140px)] flex-col overflow-hidden">
+    <CardFlat className="sticky top-[6.875rem] flex max-h-[calc(100vh-8.75rem)] flex-col overflow-hidden">
       <div className="border-ft border-x-0 border-t-0 border-b-ft-ink bg-ft-pink p-4 text-white">
         <div className="mb-3 flex items-center justify-between">
-          <span className="font-ft-ui text-[11px] font-extrabold uppercase tracking-[0.18em] text-ft-yellow">
+          <span className="font-ft-ui text-[0.6875rem] font-extrabold uppercase tracking-[0.18em] text-ft-yellow">
             {t("title")}
           </span>
           <Meta className="text-white/85">

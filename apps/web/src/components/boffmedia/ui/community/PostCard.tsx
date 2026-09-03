@@ -9,7 +9,7 @@ import { timeAgo, type BlogCategoryLike, type BlogPostLike } from "./community-u
 // Reading-time chip shared by every card variant (mirrors .bl-read).
 function BlRead({ mins }: { mins: number }) {
   return (
-    <span className="inline-flex items-center gap-1.5 whitespace-nowrap font-mono text-[10px]/none font-medium uppercase tracking-[0.08em] text-txt-dim">
+    <span className="inline-flex items-center gap-1.5 whitespace-nowrap font-mono text-[0.625rem]/none font-medium uppercase tracking-[0.08em] text-txt-dim">
       <Icon name="clock" size={13} className="text-txt-muted" />
       {mins} min
     </span>
@@ -49,19 +49,19 @@ export function PostCard({
         tabIndex={0}
         className="grid cursor-pointer grid-cols-[1.05fr_1fr] items-stretch border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background,transform] duration-[140ms] cut-corner cut-corner-edge hover:[--cut-line:var(--accent-line)] hover:-translate-y-[2px] hover:border-accent-line hover:border-l-accent"
       >
-        <div className="relative min-h-[320px] overflow-hidden bg-panel-2">
+        <div className="relative min-h-[20rem] overflow-hidden bg-panel-2">
           <div aria-hidden className="absolute inset-0 z-0 [background:radial-gradient(120%_90%_at_20%_10%,color-mix(in_srgb,hsl(var(--phue)_72%_45%)_30%,transparent),transparent_60%)]" />
-          <Icon name={post.icon} size={168} className={cn("absolute -bottom-[14px] -right-[14px] z-[1]", glyph)} />
+          <Icon name={post.icon} size={168} className={cn("absolute -bottom-[0.875rem] -right-[0.875rem] z-[1]", glyph)} />
           <div aria-hidden className="pointer-events-none absolute inset-0 z-[2] opacity-50 mix-blend-multiply [background:repeating-linear-gradient(0deg,rgba(0,0,0,0.14)_0_1px,transparent_1px_3px)]" />
           <div aria-hidden className="pointer-events-none absolute inset-0 z-[2] opacity-20 [background-image:radial-gradient(var(--line-2)_1px,transparent_1px)] [background-size:22px_22px]" />
         </div>
-        <div className="flex flex-col gap-[14px] px-8 py-[30px]">
+        <div className="flex flex-col gap-[0.875rem] px-8 py-[1.875rem]">
           <div className="flex items-center gap-2.5">
             <Badge tone="new">{label}</Badge>
-            <span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-txt-muted">Destacado</span>
+            <span className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-txt-muted">Destacado</span>
           </div>
-          <h2 className="text-[clamp(28px,3vw,40px)]">{post.title}</h2>
-          <p className="text-pretty text-[16px]/[1.6] text-txt-muted">{post.excerpt}</p>
+          <h2 className="text-[clamp(1.75rem,3vw,2.5rem)]">{post.title}</h2>
+          <p className="text-pretty text-[1rem]/[1.6] text-txt-muted">{post.excerpt}</p>
           <div className="mt-auto flex items-center justify-between gap-3 pt-2">
             <Byline author={post.author} when={post.publishedAt} onOpen={onOpen} />
             <BlRead mins={post.readMins} />
@@ -79,18 +79,18 @@ export function PostCard({
         onKeyDown={onKey}
         role="button"
         tabIndex={0}
-        className="grid min-w-0 cursor-pointer grid-cols-[116px_1fr] items-stretch border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background] duration-[140ms] cut-slant-r [--cut:14px] cut-edge-slant-r [--cut:14px] hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:border-l-accent hover:bg-panel-2"
+        className="grid min-w-0 cursor-pointer grid-cols-[7.25rem_1fr] items-stretch border border-solid border-line border-l-4 border-l-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,background] duration-[140ms] cut-slant-r [--cut:14px] cut-edge-slant-r [--cut:14px] hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:border-l-accent hover:bg-panel-2"
       >
         <div className="relative grid place-items-center overflow-hidden bg-panel-2">
           <div aria-hidden className="absolute inset-0 [background:radial-gradient(120%_120%_at_50%_0%,color-mix(in_srgb,hsl(var(--phue)_72%_45%)_26%,transparent),transparent_65%)]" />
           <Icon name={post.icon} size={44} className={cn("relative", glyph)} />
         </div>
-        <div className="flex min-w-0 flex-col gap-[7px] px-[18px] py-[15px]">
+        <div className="flex min-w-0 flex-col gap-[0.4375rem] px-[1.125rem] py-[0.9375rem]">
           <span>
             <Badge tone="new">{label}</Badge>
           </span>
-          <h3 className="font-display text-[18px]/[1.15] font-bold uppercase not-italic">{post.title}</h3>
-          <p className="line-clamp-2 text-[14px]/[1.5] text-txt-muted">{post.excerpt}</p>
+          <h3 className="font-display text-[1.125rem]/[1.15] font-bold uppercase not-italic">{post.title}</h3>
+          <p className="line-clamp-2 text-[0.875rem]/[1.5] text-txt-muted">{post.excerpt}</p>
           <div className="mt-[3px] flex items-center justify-between gap-2.5">
             <Byline author={post.author} when={post.publishedAt} onOpen={onOpen} size={26} />
             <BlRead mins={post.readMins} />
@@ -110,12 +110,12 @@ export function PostCard({
         tabIndex={0}
         className="group flex cursor-pointer items-center gap-3 border-b border-solid border-line px-1 py-2.5 last:border-b-0"
       >
-        <span className="grid h-[38px] w-[38px] flex-none place-items-center border border-solid border-line-2 bg-[color-mix(in_srgb,hsl(var(--phue)_70%_50%)_12%,var(--panel-2))] text-[hsl(var(--phue)_74%_62%)] cut-seal cut-seal-edge [--cut-line:var(--line-2)] [--cut:8px]">
+        <span className="grid h-[2.375rem] w-[2.375rem] flex-none place-items-center border border-solid border-line-2 bg-[color-mix(in_srgb,hsl(var(--phue)_70%_50%)_12%,var(--panel-2))] text-[hsl(var(--phue)_74%_62%)] cut-seal cut-seal-edge [--cut-line:var(--line-2)] [--cut:8px]">
           <Icon name={post.icon} size={19} />
         </span>
         <div>
-          <p className="line-clamp-2 font-body text-[14px]/[1.25] font-semibold text-txt group-hover:text-accent-bright">{post.title}</p>
-          <div className="mt-[5px] font-mono text-[9px]/none font-medium uppercase tracking-[0.08em] text-txt-dim">
+          <p className="line-clamp-2 font-body text-[0.875rem]/[1.25] font-semibold text-txt group-hover:text-accent-bright">{post.title}</p>
+          <div className="mt-[0.3125rem] font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.08em] text-txt-dim">
             {label} · <TimeAgoText when={post.publishedAt} />
           </div>
         </div>
@@ -133,18 +133,18 @@ export function PostCard({
       tabIndex={0}
       className="flex min-w-0 cursor-pointer flex-col border border-solid border-line border-t-4 border-t-[hsl(var(--phue)_72%_55%)] bg-panel text-left transition-[border-color,transform] duration-[140ms] cut-corner cut-corner-edge hover:[--cut-line:var(--accent-line)] hover:-translate-y-[3px] hover:border-accent-line"
     >
-      <div className="relative grid h-[132px] place-items-center overflow-hidden bg-panel-2">
+      <div className="relative grid h-[8.25rem] place-items-center overflow-hidden bg-panel-2">
         <div aria-hidden className="absolute inset-0 [background:radial-gradient(120%_100%_at_80%_0%,color-mix(in_srgb,hsl(var(--phue)_72%_45%)_24%,transparent),transparent_62%)]" />
         <Icon name={post.icon} size={54} className={cn("relative", glyph)} />
         <span className="absolute left-2.5 top-2.5 z-[2]">
           <Badge tone="new">{label}</Badge>
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-2 px-[18px] pb-2 pt-4">
-        <h3 className="font-display text-[19px]/[1.12] font-bold uppercase not-italic tracking-[0.01em]">{post.title}</h3>
-        <p className="line-clamp-3 text-[14px]/[1.55] text-txt-muted">{post.excerpt}</p>
+      <div className="flex flex-1 flex-col gap-2 px-[1.125rem] pb-2 pt-4">
+        <h3 className="font-display text-[1.1875rem]/[1.12] font-bold uppercase not-italic tracking-[0.01em]">{post.title}</h3>
+        <p className="line-clamp-3 text-[0.875rem]/[1.55] text-txt-muted">{post.excerpt}</p>
       </div>
-      <div className="mt-auto flex items-center justify-between gap-2.5 border-t border-solid border-line px-[18px] pb-4 pt-3">
+      <div className="mt-auto flex items-center justify-between gap-2.5 border-t border-solid border-line px-[1.125rem] pb-4 pt-3">
         <Byline author={post.author} when={post.publishedAt} onOpen={onOpen} size={26} />
         <BlRead mins={post.readMins} />
       </div>
@@ -173,7 +173,7 @@ export function BlogCatChip({
       onClick={onClick}
       style={{ "--phue": cat.hue } as React.CSSProperties}
       className={cn(
-        "inline-flex items-center gap-2 border border-solid px-[14px] py-[9px] font-mono text-[11px]/none font-semibold uppercase tracking-[0.08em] transition-[color,border-color,background] duration-[140ms] cut-tag cut-tag-edge",
+        "inline-flex items-center gap-2 border border-solid px-[0.875rem] py-[0.5625rem] font-mono text-[0.6875rem]/none font-semibold uppercase tracking-[0.08em] transition-[color,border-color,background] duration-[140ms] cut-tag cut-tag-edge",
         active
           ? "border-[color-mix(in_srgb,hsl(var(--phue)_72%_55%)_55%,var(--line-2))] [--cut-line:color-mix(in_srgb,hsl(var(--phue)_72%_55%)_55%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--phue)_72%_50%)_14%,var(--panel))] text-txt"
           : "border-line-2 [--cut-line:var(--line-2)] bg-panel text-txt-muted hover:bg-panel-2 hover:text-txt",

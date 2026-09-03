@@ -29,7 +29,7 @@ export function num(rec: MewRec, k: string): number | null {
 
 // DataList defaults to the v3 (light) palette; inside the cream paper panels its
 // labels/values must be ink. Override its internals via child selectors.
-const MEW_FACTS_CLS = "[&>div]:border-[color:var(--mwp-ink-line)] [&_dt]:text-[color:var(--mwp-ink-soft)] [&_dt_svg]:text-[color:var(--mwp-ink-soft)] [&_dd]:text-[color:var(--mwp-ink)] min-[1600px]:[&_dd]:text-[14.5px] min-[1600px]:[&_dt]:text-[10.5px]"
+const MEW_FACTS_CLS = "[&>div]:border-[color:var(--mwp-ink-line)] [&_dt]:text-[color:var(--mwp-ink-soft)] [&_dt_svg]:text-[color:var(--mwp-ink-soft)] [&_dd]:text-[color:var(--mwp-ink)]"
 export function MewFacts({ rows: r, className }: DataListProps) {
   return <DataList rows={r} className={cn(MEW_FACTS_CLS, className)} />
 }
@@ -49,7 +49,7 @@ export function MewFacts({ rows: r, className }: DataListProps) {
 export function MewDetail({ children, id }: { children: React.ReactNode; id?: string }) {
   return (
     <>
-      <div className="grid content-start gap-[18px_26px] pb-[84px] pt-[26px] [grid-template-columns:minmax(280px,340px)_minmax(0,1fr)] min-[1600px]:gap-[24px_34px] min-[1600px]:pt-9 min-[1600px]:[grid-template-columns:minmax(320px,400px)_minmax(0,1fr)] max-[1240px]:flex max-[1240px]:flex-col max-[1240px]:gap-4 max-[1240px]:pb-[68px] max-[1240px]:pt-5">
+      <div className="grid content-start gap-[18px_26px] pb-[5.25rem] pt-[1.625rem] [grid-template-columns:minmax(17.5rem,21.25rem)_minmax(0,1fr)] min-[1600px]:gap-[24px_34px] min-[1600px]:pt-9 min-[1600px]:[grid-template-columns:minmax(20rem,25rem)_minmax(0,1fr)] max-[1240px]:flex max-[1240px]:flex-col max-[1240px]:gap-4 max-[1240px]:pb-[4.25rem] max-[1240px]:pt-5">
         {children}
       </div>
       {id && <MewIdCopyLine id={id} />}
@@ -90,7 +90,7 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: 
   const t = useToolT(MEWGENICS_NS)
 
   const hue = MEW.catBy[cat] ? MEW.catBy[cat].hue : 230
-  const tape = "pointer-events-none absolute -top-[11px] h-[22px] w-[76px] border-l border-r border-dashed border-[color:var(--mwp-tape-light)] bg-[color:var(--mwp-tape)]"
+  const tape = "pointer-events-none absolute -top-[0.6875rem] h-[1.375rem] w-[4.75rem] border-l border-r border-dashed border-[color:var(--mwp-tape-light)] bg-[color:var(--mwp-tape)]"
 
   // Per-category art resolution for hero tiles
   const resolvedArt = React.useMemo(() => {
@@ -176,7 +176,7 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: 
             backgroundBlendMode: "normal, normal",
           } : {})
         } as React.CSSProperties}
-        className="sticky z-[2] mt-1.5 flex flex-col items-center gap-[13px] self-start [grid-column:1] [grid-row:1/span_9] [border-radius:var(--wob-a)] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-5 pb-[22px] pt-7 text-center text-[color:var(--mwp-ink)] [box-shadow:0_6px_0_var(--mwp-shadow-lg)] mew-paper max-[1240px]:static max-[1240px]:self-stretch"
+        className="sticky z-[2] mt-1.5 flex flex-col items-center gap-[0.8125rem] self-start [grid-column:1] [grid-row:1/span_9] [border-radius:var(--wob-a)] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-5 pb-[1.375rem] pt-7 text-center text-[color:var(--mwp-ink)] [box-shadow:0_6px_0_var(--mwp-shadow-lg)] mew-paper max-[1240px]:static max-[1240px]:self-stretch"
       >
         {canOpenLightbox ? (
           <button
@@ -191,16 +191,16 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: 
         ) : (
           <MewTile cat={cat} rec={rec} size={112} frame="slot" art={artSrc} />
         )}
-        <div className="flex min-w-0 flex-col items-center gap-[9px]">
+        <div className="flex min-w-0 flex-col items-center gap-[0.5625rem]">
           {badges && <div className="flex flex-wrap items-center justify-center gap-1.5">{badges}</div>}
           {/* Name plate: the game's tooltips put the name in its own outlined
               box on the paper, so the title gets a plate, not a ribbon. */}
-          <div className="inline-block max-w-full border-2 border-solid border-[color:var(--mwp-ink)] bg-[color-mix(in_srgb,var(--mwp-paper)_42%,white)] px-4 pb-[9px] pt-[11px] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-md)] [transform:rotate(-0.6deg)]">
-            <h1 className="m-0 text-[clamp(22px,1.8vw,38px)]/[1.02] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [text-wrap:balance]">{title || rec.name}</h1>
+          <div className="inline-block max-w-full border-2 border-solid border-[color:var(--mwp-ink)] bg-[color-mix(in_srgb,var(--mwp-paper)_42%,white)] px-4 pb-[0.5625rem] pt-[0.6875rem] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-md)] [transform:rotate(-0.6deg)]">
+            <h1 className="m-0 text-[clamp(1.375rem,1.8vw,2.375rem)]/[1.02] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [text-wrap:balance]">{title || rec.name}</h1>
           </div>
-          {sub && <div className="font-mono text-[12px]/[1.3] text-[color:var(--mwp-ink-soft)]">{sub}</div>}
+          {sub && <div className="font-mono text-[0.75rem]/[1.3] text-[color:var(--mwp-ink-soft)]">{sub}</div>}
           {tip ? (
-            <div className="mt-0.5 border-t-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] pt-[11px] text-[color:var(--mwp-ink-soft)]">
+            <div className="mt-0.5 border-t-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] pt-[0.6875rem] text-[color:var(--mwp-ink-soft)]">
               <MewText>{tip}</MewText>
             </div>
           ) : null}
@@ -209,7 +209,7 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: 
             It lives INSIDE the hero, never as a `grid-column:1/-1` sibling —
             see MewDetail for why a full-width sibling opens a dead 9-row gap. */}
         {media ? (
-          <div className="mt-1 flex w-full justify-center border-t-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] pt-[15px]">
+          <div className="mt-1 flex w-full justify-center border-t-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] pt-[0.9375rem]">
             {media}
           </div>
         ) : null}
@@ -250,7 +250,7 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: 
               onError={() => setArtError(true)}
             />
             <div className="text-center">
-              <div className="text-[clamp(16px,2vw,28px)] font-bold text-white [font-family:var(--mwf-disp)] [text-wrap:balance]">
+              <div className="text-[clamp(1rem,2vw,1.75rem)] font-bold text-white [font-family:var(--mwf-disp)] [text-wrap:balance]">
                 {rec.name}
               </div>
             </div>
@@ -309,9 +309,9 @@ export function MewFactGrid({ rows: r, min = 148 }: { rows: Row[]; min?: number 
   return (
     <dl className="m-0 grid gap-x-3 gap-y-px" style={{ gridTemplateColumns: `repeat(auto-fit,minmax(${min}px,1fr))` }}>
       {r.map((row, i) => (
-        <div className="flex items-baseline justify-between gap-2 border-b-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] py-[7px]" key={i}>
-          <dt className="min-w-0 truncate text-[10.5px]/[1.2] uppercase tracking-[0.06em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">{row.label}</dt>
-          <dd className={cn("m-0 flex-none text-right", row.mono !== false ? "font-mono text-[13px]/[1.2] font-bold text-[color:var(--mwp-ink)]" : "text-[12.5px]/[1.2] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)]")}>{row.value}</dd>
+        <div className="flex items-baseline justify-between gap-2 border-b-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] py-[0.4375rem]" key={i}>
+          <dt className="min-w-0 truncate text-[0.65625rem]/[1.2] uppercase tracking-[0.06em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">{row.label}</dt>
+          <dd className={cn("m-0 flex-none text-right", row.mono !== false ? "font-mono text-[0.8125rem]/[1.2] font-bold text-[color:var(--mwp-ink)]" : "text-[0.78125rem]/[1.2] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)]")}>{row.value}</dd>
         </div>
       ))}
     </dl>
@@ -320,13 +320,13 @@ export function MewFactGrid({ rows: r, min = 148 }: { rows: Row[]; min?: number 
 
 export function MewDesc({ children }: { children?: string }) {
   if (!children || /^[A-Z_]+$/.test(children)) return null
-  return <MewText className="mt-1 max-w-[76ch] text-[15.5px]/[1.55] min-[1600px]:text-[17px] [grid-column:2] max-[1240px]:[grid-column:auto]">{children}</MewText>
+  return <MewText className="mt-1 max-w-[76ch] text-[0.96875rem]/[1.55] [grid-column:2] max-[1240px]:[grid-column:auto]">{children}</MewText>
 }
 export function MewFlags({ children }: { children: React.ReactNode }) {
   return <div className="m-0 flex flex-wrap gap-2 [grid-column:2] max-[1240px]:[grid-column:auto]">{children}</div>
 }
 export function MewSections({ children }: { children: React.ReactNode }) {
-  return <div className="mt-1.5 grid items-start gap-[20px_18px] [grid-column:2] [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))] max-[1240px]:mt-0 max-[1240px]:[grid-column:auto] [&>*]:data-[span=full]:[grid-column:1/-1] [&>*]:data-[span=half]:max-[900px]:[grid-column:1/-1]">{children}</div>
+  return <div className="mt-1.5 grid items-start gap-[20px_18px] [grid-column:2] [grid-template-columns:repeat(auto-fit,minmax(18.75rem,1fr))] max-[1240px]:mt-0 max-[1240px]:[grid-column:auto] [&>*]:data-[span=full]:[grid-column:1/-1] [&>*]:data-[span=half]:max-[900px]:[grid-column:1/-1]">{children}</div>
 }
 
 /** New layout primitives for T3 scaffold redesign (not yet in use by views) */
@@ -343,7 +343,7 @@ export function MewAsideColumn({ children }: { children: React.ReactNode }) {
 }
 
 export function MewFicheSectionBar() {
-  return <div className="mt-auto border-t border-dashed border-[color:var(--mwp-ink-line)] pt-3 text-[11px] font-mono text-[color:var(--mwp-ink-soft)] [grid-column:1/-1]" />
+  return <div className="mt-auto border-t border-dashed border-[color:var(--mwp-ink-line)] pt-3 text-[0.6875rem] font-mono text-[color:var(--mwp-ink-soft)] [grid-column:1/-1]" />
 }
 
 export function MewIdCopyLine({ id }: { id: string }) {
@@ -357,11 +357,11 @@ export function MewIdCopyLine({ id }: { id: string }) {
   }, [id])
   return (
     <div className="mt-3 border-t border-dashed border-[color:var(--mwp-ink-line)] pt-2 flex items-center gap-2">
-      <span className="text-[11px] font-mono text-[color:var(--mwp-ink-soft)]">{t("label.id")}: <span className="text-[color:var(--mwp-red-deep)] font-bold">{id}</span></span>
+      <span className="text-[0.6875rem] font-mono text-[color:var(--mwp-ink-soft)]">{t("label.id")}: <span className="text-[color:var(--mwp-red-deep)] font-bold">{id}</span></span>
       <button
         type="button"
         onClick={handleCopy}
-        className="ml-auto text-[10px] px-2 py-1 border border-solid border-[color:var(--mwp-ink-line)] hover:border-[color:var(--mwp-ink)] rounded text-[color:var(--mwp-ink-soft)] hover:text-[color:var(--mwp-ink)] transition-colors"
+        className="ml-auto text-[0.625rem] px-2 py-1 border border-solid border-[color:var(--mwp-ink-line)] hover:border-[color:var(--mwp-ink)] rounded text-[color:var(--mwp-ink-soft)] hover:text-[color:var(--mwp-ink)] transition-colors"
         title={t("label.id")}
       >
         {copied ? t("common.copied") : t("common.copy")}
@@ -371,19 +371,19 @@ export function MewIdCopyLine({ id }: { id: string }) {
 }
 export function MewSubLabel({ children, n }: { children: React.ReactNode; n?: number }) {
   return (
-    <div className="mb-2 flex items-center gap-1.5 text-[11px]/none uppercase tracking-[0.09em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">
+    <div className="mb-2 flex items-center gap-1.5 text-[0.6875rem]/none uppercase tracking-[0.09em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">
       {children}
-      {n != null && <span className="border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-[5px] py-0.5 font-mono text-[9.5px]/none font-bold text-[color:var(--mwp-ink)] [border-radius:8px_10px_9px_11px]">{n}</span>}
+      {n != null && <span className="border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-[0.3125rem] py-0.5 font-mono text-[0.59375rem]/none font-bold text-[color:var(--mwp-ink)] [border-radius:8px_10px_9px_11px]">{n}</span>}
     </div>
   )
 }
 export function MewTag({ children }: { children: React.ReactNode }) {
-  return <span className="border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2 pb-1 pt-[5px] text-[11.5px]/none font-semibold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">{children}</span>
+  return <span className="border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2 pb-1 pt-[0.3125rem] text-[0.71875rem]/none font-semibold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">{children}</span>
 }
 
 export function MewMoreTag({ n }: { n: number }) {
   const t = useToolT(MEWGENICS_NS)
-  return <span className="border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2 pb-1 pt-[5px] text-[10.5px]/none font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">{t("common.moreCount", { n })}</span>
+  return <span className="border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2 pb-1 pt-[0.3125rem] text-[0.65625rem]/none font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">{t("common.moreCount", { n })}</span>
 }
 
 export function mewTruncate<T>(items: T[], max: number): { list: T[]; more: number } {

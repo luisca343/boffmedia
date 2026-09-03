@@ -25,9 +25,9 @@ export interface DkTableProps {
 // `is-click` to a <tr> for the clickable-row hover.
 const TABLE_CHROME = cn(
   "w-full border-collapse",
-  "[&_td]:border-b [&_td]:border-solid [&_td]:border-[color-mix(in_srgb,var(--line)_60%,transparent)] [&_td]:px-3 [&_td]:py-[9px] [&_td]:align-middle [&_td]:font-body [&_td]:text-[13px] [&_td]:font-medium [&_td]:leading-[1.35]",
+  "[&_td]:border-b [&_td]:border-solid [&_td]:border-[color-mix(in_srgb,var(--line)_60%,transparent)] [&_td]:px-3 [&_td]:py-[0.5625rem] [&_td]:align-middle [&_td]:font-body [&_td]:text-[0.8125rem] [&_td]:font-medium [&_td]:leading-[1.35]",
   "[&_tbody_tr:last-child>td]:border-b-0",
-  "[&_td.mono]:font-mono [&_td.mono]:text-[12px] [&_td.mono]:font-semibold",
+  "[&_td.mono]:font-mono [&_td.mono]:text-[0.75rem] [&_td.mono]:font-semibold",
   "[&_tr.is-click]:cursor-pointer [&_tr.is-click]:transition-colors [&_tr.is-click:hover]:bg-panel-2",
 )
 
@@ -43,19 +43,19 @@ export function DkTable({ columns, children, sortKey, sortDir, onSort, minWidth,
                 <th
                   key={c.key}
                   style={{ width: c.w, textAlign: c.align }}
-                  className="sticky top-0 z-[2] whitespace-nowrap border-b border-solid border-line-2 bg-base-2 px-3 py-[10px] text-left font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.14em] text-txt-dim"
+                  className="sticky top-0 z-[2] whitespace-nowrap border-b border-solid border-line-2 bg-base-2 px-3 py-[0.625rem] text-left font-mono text-[0.5625rem] font-semibold uppercase leading-none tracking-[0.14em] text-txt-dim"
                 >
                   {c.sortable && onSort ? (
                     <button
                       type="button"
                       onClick={() => onSort(c.key)}
                       className={cn(
-                        "inline-flex items-center gap-[5px] border-0 bg-transparent p-0 font-[inherit] uppercase tracking-[inherit] transition-colors",
+                        "inline-flex items-center gap-[0.3125rem] border-0 bg-transparent p-0 font-[inherit] uppercase tracking-[inherit] transition-colors",
                         on ? "text-txt" : "text-txt-dim hover:text-txt",
                       )}
                     >
                       {c.label}
-                      <span className={cn("text-[8px]", on ? "text-accent-bright" : "text-txt-dim")}>{on ? (sortDir === "asc" ? "▲" : "▼") : "↕"}</span>
+                      <span className={cn("text-[0.5rem]", on ? "text-accent-bright" : "text-txt-dim")}>{on ? (sortDir === "asc" ? "▲" : "▼") : "↕"}</span>
                     </button>
                   ) : (
                     c.label

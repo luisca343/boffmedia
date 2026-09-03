@@ -16,7 +16,7 @@ export function ToastHost() {
   return (
     <div
       role="status"
-      className="fixed bottom-4 left-1/2 z-[70] flex -translate-x-1/2 animate-in items-center gap-2.5 rounded-sb-md bg-sb-fg px-4 py-2.5 text-[13px] text-white shadow-sb-3 slide-in-from-bottom-2 fade-in animate-duration-200"
+      className="fixed bottom-4 left-1/2 z-[70] flex -translate-x-1/2 animate-in items-center gap-2.5 rounded-sb-md bg-sb-fg px-4 py-2.5 text-[0.8125rem] text-white shadow-sb-3 slide-in-from-bottom-2 fade-in animate-duration-200"
     >
       <Ico name="check" size={14} /> {t.msg}
     </div>

@@ -82,7 +82,7 @@ const STRIPE: React.CSSProperties = {
 const SHELL: Record<PackCardLayout, string> = {
   card: "h-full w-full flex-col",
   compact: "h-full w-full flex-col",
-  row: "min-h-[104px] w-full flex-row items-stretch",
+  row: "min-h-[6.5rem] w-full flex-row items-stretch",
 }
 
 export function PackCard({
@@ -118,20 +118,20 @@ export function PackCard({
         // motion that makes a grid of static covers feel touchable.
         "[&_img]:transition-transform [&_img]:duration-300 [&_img]:ease-out",
         onOpen && "group-hover:[&_img]:scale-[1.04]",
-        row ? "w-[104px] self-stretch border-r" : "aspect-[2/1] w-full border-b",
+        row ? "w-[6.5rem] self-stretch border-r" : "aspect-[2/1] w-full border-b",
       )}
       style={art == null ? STRIPE : undefined}
     >
       {art != null ? (
         art
       ) : (
-        <span className="grid size-[38px] place-items-center border border-solid border-line-2 text-txt-dim">
+        <span className="grid size-[2.375rem] place-items-center border border-solid border-line-2 text-txt-dim">
           {icon ?? <Icon name="cube" size={20} />}
         </span>
       )}
       {ribbon != null && <span className="absolute left-0 top-0 flex gap-1.5 p-2">{ribbon}</span>}
       {artNote != null && !row && (
-        <span className="absolute bottom-2 left-2.5 font-mono text-[9px] uppercase tracking-[0.1em] text-txt-dim">
+        <span className="absolute bottom-2 left-2.5 font-mono text-[0.5625rem] uppercase tracking-[0.1em] text-txt-dim">
           {artNote}
         </span>
       )}
@@ -151,7 +151,7 @@ export function PackCard({
     ) : serverStatus != null ? (
       <div>{serverStatus}</div>
     ) : error != null ? (
-      <div className="truncate border border-solid border-bad/40 bg-bad-soft px-2.5 py-2 text-[11px] text-txt-muted">
+      <div className="truncate border border-solid border-bad/40 bg-bad-soft px-2.5 py-2 text-[0.6875rem] text-txt-muted">
         {error}
       </div>
     ) : null
@@ -161,13 +161,13 @@ export function PackCard({
       <div
         className={cn(
           "font-display font-extrabold italic uppercase leading-[1.02] tracking-[0.01em] text-txt",
-          row ? "truncate text-[17px]" : compact ? "line-clamp-2 text-[17px]" : "line-clamp-2 text-[19px]",
+          row ? "truncate text-[1.0625rem]" : compact ? "line-clamp-2 text-[1.0625rem]" : "line-clamp-2 text-[1.1875rem]",
         )}
       >
         {title}
       </div>
       {slug != null && (
-        <div className="mt-[3px] truncate font-mono text-[10px] tracking-[0.06em] text-txt-dim">{slug}</div>
+        <div className="mt-[3px] truncate font-mono text-[0.625rem] tracking-[0.06em] text-txt-dim">{slug}</div>
       )}
     </div>
   )
@@ -176,7 +176,7 @@ export function PackCard({
     badges != null || footerMeta != null ? (
       <div
         className={cn(
-          "flex items-center gap-x-2.5 gap-y-1.5 font-mono text-[11px] text-txt-muted",
+          "flex items-center gap-x-2.5 gap-y-1.5 font-mono text-[0.6875rem] text-txt-muted",
           row ? "overflow-hidden whitespace-nowrap" : "flex-wrap border-t border-solid border-line pt-3",
         )}
       >
@@ -236,7 +236,7 @@ export function PackCard({
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             {titleNode}
             {summary != null && (
-              <div className="truncate text-[12.5px] leading-[1.4] text-txt-muted">{summary}</div>
+              <div className="truncate text-[0.78125rem] leading-[1.4] text-txt-muted">{summary}</div>
             )}
             {signal}
             {meta}
@@ -258,14 +258,14 @@ export function PackCard({
     <div {...interactive} className={shell}>
       {cover}
 
-      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[10px] p-3.5">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-[0.625rem] p-3.5">
         <div className="flex shrink-0 items-start gap-2.5">
           {compact && (
             // No art region in compact, so the lock cue moves into the seal —
             // without this, `locked` would read only from the state badge.
             <span
               className={cn(
-                "grid size-[38px] shrink-0 place-items-center overflow-hidden border border-solid",
+                "grid size-[2.375rem] shrink-0 place-items-center overflow-hidden border border-solid",
                 locked ? "border-bad/40 bg-bad-soft text-bad" : "border-line-2 bg-panel-2 text-txt",
               )}
             >
@@ -277,7 +277,7 @@ export function PackCard({
         </div>
 
         {summary != null && (
-          <div className="line-clamp-2 text-[13.5px] leading-[1.5] text-txt-muted">{summary}</div>
+          <div className="line-clamp-2 text-[0.84375rem] leading-[1.5] text-txt-muted">{summary}</div>
         )}
 
         {signal}
@@ -286,7 +286,7 @@ export function PackCard({
           // The footer group: meta line + controls, pinned to the bottom so a
           // grid row of cards with different bodies still ends in one flush line
           // of buttons.
-          <div className="mt-auto flex flex-col gap-[10px] pt-1">
+          <div className="mt-auto flex flex-col gap-[0.625rem] pt-1">
             {meta}
             {(actions != null || menu != null) && (
               <div className="flex items-stretch gap-2.5" onClick={stop} onKeyDown={stop}>

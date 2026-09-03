@@ -57,15 +57,15 @@ export default function ItemsPage() {
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <div className="flex-none px-[26px] pt-[18px]">
+      <div className="flex-none px-[1.625rem] pt-[1.125rem]">
         <div className="flex flex-wrap items-center gap-3.5">
           {tabs.length > 1 && <Tabs tabs={tabs} value={cat} onChange={setCat} />}
-          <span className="ml-auto font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
+          <span className="ml-auto font-wp text-[0.78125rem] font-semibold text-wp-fg-subtle">
             <b className="wp-num text-wp-fg-muted">{shown.length}</b> {t("objetos.itemsCountSuffix")}
           </span>
           <Button
             variant="primary"
-            className="px-3.5 py-2 text-[13px]"
+            className="px-3.5 py-2 text-[0.8125rem]"
             onClick={() => router.push("/smartrotom/wigglypop/vender")}
           >
             <Icon name="plus" size={15} />
@@ -75,7 +75,7 @@ export default function ItemsPage() {
 
         <div className="mt-3.5 flex items-start gap-2 rounded-[11px] border border-wp-amber/25 bg-wp-amber/[.08] px-3 py-2.5">
           <Icon name="info" size={15} className="mt-px flex-none text-wp-amber" />
-          <span className="font-wp text-[12.5px] font-semibold leading-relaxed text-wp-fg-muted">
+          <span className="font-wp text-[0.78125rem] font-semibold leading-relaxed text-wp-fg-muted">
             {t("objetos.disclaimer")}
           </span>
         </div>
@@ -85,9 +85,9 @@ export default function ItemsPage() {
         {error ? (
           <EmptyState icon="alert" title={t("objetos.errorTitle")} body={userMessageFrom(error, t("common.retryFallback"))} />
         ) : isLoading ? (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(236px,1fr))] gap-[18px] px-[26px] pb-11 pt-5">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(14.75rem,1fr))] gap-[1.125rem] px-[1.625rem] pb-11 pt-5">
             {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-[200px] rounded-wp" />
+              <Skeleton key={i} className="h-[12.5rem] rounded-wp" />
             ))}
           </div>
         ) : shown.length === 0 ? (
@@ -102,7 +102,7 @@ export default function ItemsPage() {
             </Button>
           </EmptyState>
         ) : (
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(236px,1fr))] gap-[18px] px-[26px] pb-11 pt-5">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(14.75rem,1fr))] gap-[1.125rem] px-[1.625rem] pb-11 pt-5">
             {shown.map((L) => {
               const it = L.items[0]
               if (!it) return null
@@ -126,23 +126,23 @@ export default function ItemsPage() {
                     <div className="font-wp-display text-base font-semibold leading-tight text-wp-fg">
                       {it.name}
                     </div>
-                    <Chip className="self-start text-[10.5px]">{it.category}</Chip>
+                    <Chip className="self-start text-[0.65625rem]">{it.category}</Chip>
 
                     <div className="mt-1 flex items-center justify-between">
                       <Price amount={it.unitPrice} size={17} />
-                      <span className="wp-num font-wp text-[11px] font-semibold text-wp-fg-subtle">
+                      <span className="wp-num font-wp text-[0.6875rem] font-semibold text-wp-fg-subtle">
                         {t("objetos.availableCount", { qty: fmt(it.qty) })}
                       </span>
                     </div>
 
                     <div className="mt-auto flex items-center justify-between border-t border-wp-line/24 pt-2.5">
-                      <span className="truncate font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+                      <span className="truncate font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
                         {L.seller.username}
                       </span>
                       {/* The server rejects buying your own listing, so don't offer
                           the button and then 400 — mark it as yours instead. */}
                       {uuid && L.seller.uuid === uuid ? (
-                        <Chip className="text-[10.5px]">
+                        <Chip className="text-[0.65625rem]">
                           <Icon name="tag" size={11} />
                           {t("common.yourListing")}
                         </Chip>
@@ -151,7 +151,7 @@ export default function ItemsPage() {
                           <Button
                             iconOnly
                             aria-label={t("common.addToCartAria")}
-                            className="h-[30px] w-[30px] p-0"
+                            className="h-[1.875rem] w-[1.875rem] p-0"
                             onClick={() => {
                               addToCart(L)
                               toast(t("toast.addedToCart"), "success")

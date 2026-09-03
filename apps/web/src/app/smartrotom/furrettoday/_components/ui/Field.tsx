@@ -10,7 +10,7 @@ export function Field({
 }) {
   return (
     <label className={`block ${full ? "col-span-full" : ""}`}>
-      <span className="font-ft-ui mb-1.5 block text-[10px] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
+      <span className="font-ft-ui mb-1.5 block text-[0.625rem] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
         {label}
       </span>
       {children}
@@ -29,7 +29,7 @@ export function Eyebrow({
   return (
     <div
       className={[
-        "font-ft-ui text-[11px] font-extrabold uppercase tracking-[0.18em]",
+        "font-ft-ui text-[0.6875rem] font-extrabold uppercase tracking-[0.18em]",
         className ?? "text-ft-pink",
       ].join(" ")}
     >
@@ -49,7 +49,7 @@ export function Meta({
   return (
     <span
       className={[
-        "font-ft-ui text-[13px] font-medium uppercase tracking-[0.04em]",
+        "font-ft-ui text-[0.8125rem] font-medium uppercase tracking-[0.04em]",
         className ?? "text-ft-ink/70",
       ].join(" ")}
     >

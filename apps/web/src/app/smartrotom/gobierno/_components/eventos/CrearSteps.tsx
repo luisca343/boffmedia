@@ -12,11 +12,11 @@ import { RARITY_PTS, RARITY_TIERS, RARITY_TONE, getScoreFields } from "./shared"
 function FLabel({ children, hint, req }: { children: React.ReactNode; hint?: string; req?: boolean }) {
   return (
     <div className="mb-1.5 flex items-center justify-between gap-2">
-      <span className="font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-500">
+      <span className="font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-500">
         {children}
         {req && <span className="text-gt-danger"> *</span>}
       </span>
-      {hint && <span className="font-gt-mono text-[9.5px] text-gt-ink-400">{hint}</span>}
+      {hint && <span className="font-gt-mono text-[0.59375rem] text-gt-ink-400">{hint}</span>}
     </div>
   )
 }
@@ -47,8 +47,8 @@ export function StepTipo({
   ]
   return (
     <div>
-      <h3 className="mb-1 font-gt-display text-[19px] text-gt-ink-900">{t("eventos.tipoEvento")}</h3>
-      <p className="mb-[18px] text-[12.5px] text-gt-ink-500">{t("eventos.tipoEventoHint")}</p>
+      <h3 className="mb-1 font-gt-display text-[1.1875rem] text-gt-ink-900">{t("eventos.tipoEvento")}</h3>
+      <p className="mb-[1.125rem] text-[0.78125rem] text-gt-ink-500">{t("eventos.tipoEventoHint")}</p>
       <div className="grid gap-3">
         {opts.map((o) => {
           const on = type === o.key
@@ -62,7 +62,7 @@ export function StepTipo({
               }`}
             >
               <div className="flex items-start gap-3.5">
-                <span className="grid h-[46px] w-[46px] flex-none place-items-center rounded-[10px] bg-gt-accent/[.14]">
+                <span className="grid h-[2.875rem] w-[2.875rem] flex-none place-items-center rounded-[10px] bg-gt-accent/[.14]">
                   <Icon name={o.icon} size={22} className="text-gt-accent" />
                 </span>
                 <div className="flex-1">
@@ -70,7 +70,7 @@ export function StepTipo({
                     <span className="font-gt-display text-base font-bold text-gt-ink-900">{o.title}</span>
                     {on && <Icon name="checkCircle" size={16} className="text-gt-accent" />}
                   </div>
-                  <p className="mt-1 text-[12.5px] leading-relaxed text-gt-ink-600">{o.desc}</p>
+                  <p className="mt-1 text-[0.78125rem] leading-relaxed text-gt-ink-600">{o.desc}</p>
                 </div>
               </div>
             </button>
@@ -105,7 +105,7 @@ export function ConsDatos({
   const t = useTranslations("gobierno")
   return (
     <div className="grid gap-4">
-      <h3 className="m-0 font-gt-display text-[18px] text-gt-ink-900">{t("eventos.datosReto")}</h3>
+      <h3 className="m-0 font-gt-display text-[1.125rem] text-gt-ink-900">{t("eventos.datosReto")}</h3>
       <Field label={t("eventos.tituloReto")} value={title} onChange={setTitle} placeholder={t("eventos.tituloRetoPlaceholder")} />
       <TextArea
         label={t("eventos.briefing")}
@@ -146,7 +146,7 @@ export function CazaDatos({
   const t = useTranslations("gobierno")
   return (
     <div className="grid gap-4">
-      <h3 className="m-0 font-gt-display text-[18px] text-gt-ink-900">{t("eventos.datosCaceria")}</h3>
+      <h3 className="m-0 font-gt-display text-[1.125rem] text-gt-ink-900">{t("eventos.datosCaceria")}</h3>
       <Field label={t("eventos.titulo")} value={title} onChange={setTitle} placeholder={t("eventos.tituloCazaPlaceholder")} />
       <Field label={t("eventos.zona")} value={zone} onChange={setZone} placeholder={t("eventos.zonaPlaceholder")} />
       <div className="grid grid-cols-3 gap-3">
@@ -154,7 +154,7 @@ export function CazaDatos({
         <Field label={t("eventos.coordZ")} type="number" value={coordsZ} onChange={setCoordsZ} mono />
         <Field label={t("eventos.radio")} type="number" value={radius} onChange={setRadius} mono />
       </div>
-      <div className="flex items-start gap-2 rounded-gt-sm bg-gt-paper-2 p-2.5 text-[11.5px] leading-relaxed text-gt-ink-500">
+      <div className="flex items-start gap-2 rounded-gt-sm bg-gt-paper-2 p-2.5 text-[0.71875rem] leading-relaxed text-gt-ink-500">
         <Icon name="mapPin" size={13} className="mt-0.5 flex-none text-gt-civic" />
         {t("eventos.teletransportHint")}
       </div>
@@ -178,8 +178,8 @@ export function ConsReglas({
   const t = useTranslations("gobierno")
   const badDates = buildClosedAt && ratingClosesAt && !(new Date(ratingClosesAt) > new Date(buildClosedAt))
   return (
-    <div className="grid gap-[18px]">
-      <h3 className="m-0 font-gt-display text-[18px] text-gt-ink-900">{t("eventos.calendario")}</h3>
+    <div className="grid gap-[1.125rem]">
+      <h3 className="m-0 font-gt-display text-[1.125rem] text-gt-ink-900">{t("eventos.calendario")}</h3>
       <div className="grid gap-3">
         <Field label={t("eventos.finConstruccion")} type="datetime-local" value={buildClosedAt} onChange={setBuildClosedAt} mono />
         <Field
@@ -190,12 +190,12 @@ export function ConsReglas({
           mono
         />
         {badDates && (
-          <div className="flex items-center gap-1.5 text-[11.5px] text-gt-danger">
+          <div className="flex items-center gap-1.5 text-[0.71875rem] text-gt-danger">
             <Icon name="alert" size={13} /> {t("eventos.errorFechasConstruccion")}
           </div>
         )}
       </div>
-      <div className="flex items-start gap-2 rounded-gt-sm bg-gt-paper-2 p-2.5 text-[11.5px] leading-relaxed text-gt-ink-500">
+      <div className="flex items-start gap-2 rounded-gt-sm bg-gt-paper-2 p-2.5 text-[0.71875rem] leading-relaxed text-gt-ink-500">
         <Icon name="star" size={13} className="mt-0.5 flex-none text-gt-gold-600" />
         {t("eventos.valoracionHint")}
       </div>
@@ -216,9 +216,9 @@ function WeightRow({
 }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="flex w-[92px] flex-none items-center gap-1.5">
+      <span className="flex w-[5.75rem] flex-none items-center gap-1.5">
         <Icon name={field.icon} size={14} className="text-gt-civic" />
-        <span className="text-[12.5px] font-semibold text-gt-ink-800">{field.label}</span>
+        <span className="text-[0.78125rem] font-semibold text-gt-ink-800">{field.label}</span>
       </span>
       <input
         type="range"
@@ -230,7 +230,7 @@ function WeightRow({
         className="flex-1 cursor-pointer"
         style={{ accentColor: "rgb(var(--gt-civic))" }}
       />
-      <span className="w-[52px] flex-none text-right font-gt-mono text-xs font-bold tabular-nums text-gt-ink-900">
+      <span className="w-[3.25rem] flex-none text-right font-gt-mono text-xs font-bold tabular-nums text-gt-ink-900">
         {value} pts
       </span>
     </div>
@@ -328,14 +328,14 @@ export function CazaReglas({
   const spawnSum = especies.reduce((a, b) => a + (b.spawnPct || 0), 0)
 
   return (
-    <div className="grid gap-[18px]">
-      <h3 className="m-0 font-gt-display text-[18px] text-gt-ink-900">{t("eventos.calendario")}</h3>
+    <div className="grid gap-[1.125rem]">
+      <h3 className="m-0 font-gt-display text-[1.125rem] text-gt-ink-900">{t("eventos.calendario")}</h3>
       <div className="grid grid-cols-2 gap-3">
         <Field label={t("eventos.inicio")} type="datetime-local" value={opensAt} onChange={setOpensAt} mono />
         <Field label={t("eventos.cierre")} type="datetime-local" value={closesAt} onChange={setClosesAt} mono />
       </div>
       {badDates && (
-        <div className="flex items-center gap-1.5 text-[11.5px] text-gt-danger">
+        <div className="flex items-center gap-1.5 text-[0.71875rem] text-gt-danger">
           <Icon name="alert" size={13} /> {t("eventos.errorFechasCaza")}
         </div>
       )}
@@ -343,7 +343,7 @@ export function CazaReglas({
       <div>
         <div className="mb-2.5 flex items-center justify-between">
           <FLabel>{t("eventos.baremoPuntuacion")}</FLabel>
-          <span className="font-gt-mono text-[11px] font-bold tabular-nums text-gt-gold-600">
+          <span className="font-gt-mono text-[0.6875rem] font-bold tabular-nums text-gt-gold-600">
             {t("eventos.maxTotal", { pts: weightSum })}
           </span>
         </div>
@@ -368,7 +368,7 @@ export function CazaReglas({
           </FLabel>
           {especies.length > 0 && (
             <span
-              className={`font-gt-mono text-[11px] font-bold tabular-nums ${
+              className={`font-gt-mono text-[0.6875rem] font-bold tabular-nums ${
                 spawnSum === 100 ? "text-gt-ok" : "text-gt-warn"
               }`}
             >
@@ -387,7 +387,7 @@ export function CazaReglas({
                 <div className="flex min-w-0 items-center gap-2">
                   <span className="font-gt-display text-sm font-bold text-gt-ink-900">{sp.name}</span>
                   <Badge tone={RARITY_TONE[sp.rarity] ?? "default"}>{sp.rarity}</Badge>
-                  <span className="font-gt-mono text-[10.5px] text-gt-ink-400">
+                  <span className="font-gt-mono text-[0.65625rem] text-gt-ink-400">
                     {sp.spawnPct}% · Nv {sp.lvlMin}–{sp.lvlMax}
                   </span>
                 </div>
@@ -415,8 +415,8 @@ export function CazaReglas({
 function RevRow({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="flex items-start justify-between gap-4 border-b border-gt-line-soft py-2 last:border-b-0">
-      <span className="flex-none font-gt-mono text-[9px] uppercase tracking-[.1em] text-gt-ink-400">{k}</span>
-      <span className="text-right text-[12.5px] font-semibold text-gt-ink-800">{v}</span>
+      <span className="flex-none font-gt-mono text-[0.5625rem] uppercase tracking-[.1em] text-gt-ink-400">{k}</span>
+      <span className="text-right text-[0.78125rem] font-semibold text-gt-ink-800">{v}</span>
     </div>
   )
 }
@@ -456,8 +456,8 @@ export function StepRevisar({
   const spawnSum = especies.reduce((a, b) => a + (b.spawnPct || 0), 0)
   return (
     <div>
-      <h3 className="mb-1 font-gt-display text-[18px] text-gt-ink-900">{t("eventos.revisarPublicar")}</h3>
-      <p className="mb-4 text-[12.5px] text-gt-ink-500">{t("eventos.revisarHint")}</p>
+      <h3 className="mb-1 font-gt-display text-[1.125rem] text-gt-ink-900">{t("eventos.revisarPublicar")}</h3>
+      <p className="mb-4 text-[0.78125rem] text-gt-ink-500">{t("eventos.revisarHint")}</p>
       <div className="mb-3.5 rounded-gt border border-gt-line bg-gt-paper-0 px-4 py-1 shadow-gt">
         <RevRow k={t("eventos.tipo")} v={type === "caza" ? t("eventos.tipoCaza") : t("eventos.tipoConstruccion")} />
         <RevRow k={t("eventos.titulo")} v={title || "—"} />
@@ -482,7 +482,7 @@ export function StepRevisar({
         )}
       </div>
       {type === "construccion" && !brief.trim() && (
-        <div className="flex items-start gap-2 rounded-gt-sm bg-gt-warn/[.1] p-2.5 text-[11.5px] leading-relaxed text-gt-ink-600">
+        <div className="flex items-start gap-2 rounded-gt-sm bg-gt-warn/[.1] p-2.5 text-[0.71875rem] leading-relaxed text-gt-ink-600">
           <Icon name="alert" size={13} className="mt-0.5 flex-none text-gt-warn" />
           {t("eventos.faltaBriefing")}
         </div>

@@ -42,7 +42,7 @@ export function OficialCard({ oficial, isMe, canManage }: { oficial: Oficial; is
             </div>
             <div className="mt-1 flex items-center gap-2">
               <Badge tone={meta.tone}>{rankLabel}</Badge>
-              <span className="font-gt-mono text-[10.5px] text-gt-ink-400">
+              <span className="font-gt-mono text-[0.65625rem] text-gt-ink-400">
                 {t("poblacion.placa", { badge: badgeOf(oficial.userId, oficial.rank?.prefix) })}
               </span>
             </div>
@@ -62,7 +62,7 @@ export function OficialCard({ oficial, isMe, canManage }: { oficial: Oficial; is
       </div>
 
       {oficial.roles.length > 1 && (
-        <div className="border-t border-gt-line-soft pt-2.5 font-gt-mono text-[10px] uppercase tracking-[.08em] text-gt-ink-400">
+        <div className="border-t border-gt-line-soft pt-2.5 font-gt-mono text-[0.625rem] uppercase tracking-[.08em] text-gt-ink-400">
           {t("poblacion.ostentaRoles", { count: oficial.roles.length })}
         </div>
       )}

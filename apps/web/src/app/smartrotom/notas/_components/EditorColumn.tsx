@@ -60,30 +60,30 @@ export function EditorColumn(props: EditorColumnProps) {
     return (
       <div className="flex min-w-0 flex-1 flex-col bg-nt-bg-1">
         <div className="flex flex-1 flex-col items-center justify-center p-10 text-center">
-          <span className="mb-[22px] grid h-[76px] w-[76px] place-items-center rounded-nt-2xl bg-nt-accent/15 text-nt-accent-fg">
+          <span className="mb-[1.375rem] grid h-[4.75rem] w-[4.75rem] place-items-center rounded-nt-2xl bg-nt-accent/15 text-nt-accent-fg">
             <Icon name="file-text" size={36} />
           </span>
-          <h1 className="m-0 mb-2.5 font-nt-display text-[24px] font-bold text-nt-fg">{t("editor.welcomeTitle")}</h1>
-          <p className="m-0 mb-6 max-w-[420px] text-[15px] leading-[1.6] text-nt-fg-muted">
+          <h1 className="m-0 mb-2.5 font-nt-display text-[1.5rem] font-bold text-nt-fg">{t("editor.welcomeTitle")}</h1>
+          <p className="m-0 mb-6 max-w-[26.25rem] text-[0.9375rem] leading-[1.6] text-nt-fg-muted">
             {t("editor.welcomeDesc")} <Kbd>⌘K</Kbd> {t("editor.welcomeSearch")}
           </p>
           <div className="flex flex-wrap justify-center gap-2.5">
             <button
               onClick={props.onNew}
               disabled={props.newBusy}
-              className="inline-flex h-9 items-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[13.5px] font-[550] text-white hover:brightness-[1.06]"
+              className="inline-flex h-9 items-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[0.84375rem] font-[550] text-white hover:brightness-[1.06]"
             >
               <Icon name="plus" size={15} /> {t("sidebar.newNote")}
             </button>
             <button
               onClick={props.onOpenTemplates}
-              className="inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[13.5px] font-[550] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
+              className="inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[0.84375rem] font-[550] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
             >
               <Icon name="layers" size={15} /> {t("editor.fromTemplate")}
             </button>
             <button
               onClick={props.onOpenGraph}
-              className="inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[13.5px] font-[550] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
+              className="inline-flex h-9 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[0.84375rem] font-[550] text-nt-fg-muted hover:bg-nt-hover-strong hover:text-nt-fg"
             >
               <Icon name="network" size={15} /> {t("editor.graph")}
             </button>
@@ -115,7 +115,7 @@ export function EditorColumn(props: EditorColumnProps) {
             aria-selected={activeTab === n.id}
             onClick={() => props.onSelectTab(n.id)}
             onAuxClick={(e) => e.button === 1 && props.onCloseTab(n.id)}
-            className={`relative flex min-w-[130px] max-w-[220px] cursor-pointer items-center gap-2 border-r border-nt-border pl-3.5 pr-2.5 text-[13px] transition-colors ${
+            className={`relative flex min-w-[8.125rem] max-w-[13.75rem] cursor-pointer items-center gap-2 border-r border-nt-border pl-3.5 pr-2.5 text-[0.8125rem] transition-colors ${
               activeTab === n.id
                 ? "bg-nt-bg-1 text-nt-fg before:absolute before:inset-x-0 before:top-0 before:h-0.5 before:bg-nt-accent"
                 : "text-nt-fg-muted hover:bg-nt-hover"
@@ -123,7 +123,7 @@ export function EditorColumn(props: EditorColumnProps) {
           >
             <span className="flex-1 truncate">{n.title || t("list.untitled")}</span>
             <span
-              className="grid h-[18px] w-[18px] flex-none place-items-center rounded text-nt-fg-subtle hover:bg-nt-hover-strong hover:text-nt-fg"
+              className="grid h-[1.125rem] w-[1.125rem] flex-none place-items-center rounded text-nt-fg-subtle hover:bg-nt-hover-strong hover:text-nt-fg"
               onClick={(e) => {
                 e.stopPropagation();
                 props.onCloseTab(n.id);

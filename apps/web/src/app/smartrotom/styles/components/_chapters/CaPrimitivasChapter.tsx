@@ -31,13 +31,13 @@ const mcHead = (uuid: string) => `https://mc-heads.net/avatar/${uuid}`
 // under two roots is the cheapest possible proof that the system really themes.
 function ThemePair({ children, stack }: { children: React.ReactNode; stack?: boolean }) {
   return (
-    // `stack` drops to one column per theme. The Modal panel is a fixed `w-[460px]`, so
+    // `stack` drops to one column per theme. The Modal panel is a fixed `w-[28.75rem]`, so
     // in a side-by-side half-column it overflows the stage and gets clipped — anything
     // wider than ~440px has to stack.
     <div className={cn("grid w-full grid-cols-1", !stack && "lg:grid-cols-2")}>
       {(["light", "dark"] as const).map((t) => (
-        <div key={t} className="ca-app bg-ca-panel p-[22px] font-ca text-ca-50 antialiased" data-theme={t}>
-          <div className="mb-4 font-ca-mono text-[10px] uppercase tracking-[0.16em] text-ca-400">
+        <div key={t} className="ca-app bg-ca-panel p-[1.375rem] font-ca text-ca-50 antialiased" data-theme={t}>
+          <div className="mb-4 font-ca-mono text-[0.625rem] uppercase tracking-[0.16em] text-ca-400">
             {t === "light" ? "Claro" : "Oscuro"}
           </div>
           <div className="flex flex-wrap items-center gap-4">{children}</div>
@@ -153,10 +153,10 @@ export function CaPrimitivasChapter() {
           note="Entrada rellena con subrayado de acento (Material clásico). Es un input sin estado propio: pásale value/onChange o defaultValue."
         >
           <ThemePair>
-            <div className="w-full max-w-[300px]">
+            <div className="w-full max-w-[18.75rem]">
               <Field defaultValue="Equipo Wingull" />
             </div>
-            <div className="w-full max-w-[300px]">
+            <div className="w-full max-w-[18.75rem]">
               <Field placeholder="Nombre del grupo…" />
             </div>
           </ThemePair>
@@ -179,7 +179,7 @@ export function CaPrimitivasChapter() {
               value={q}
               onChange={setQ}
               placeholder="Buscar o empezar un chat"
-              className="w-full max-w-[320px]"
+              className="w-full max-w-[20rem]"
               right={
                 q ? (
                   <button
@@ -191,7 +191,7 @@ export function CaPrimitivasChapter() {
                     <Icon name="x" size={14} />
                   </button>
                 ) : (
-                  <kbd className="flex-none font-ca-mono text-[10px] text-ca-500">⌘K</kbd>
+                  <kbd className="flex-none font-ca-mono text-[0.625rem] text-ca-500">⌘K</kbd>
                 )
               }
             />
@@ -200,12 +200,12 @@ export function CaPrimitivasChapter() {
 
         <Sample app="ca" title="Toggle" code="on · onClick" padded={false}>
           <ThemePair>
-            <div className="flex w-full max-w-[320px] flex-col gap-3">
-              <label className="flex items-center gap-3 text-[14.5px] text-ca-100">
+            <div className="flex w-full max-w-[20rem] flex-col gap-3">
+              <label className="flex items-center gap-3 text-[0.90625rem] text-ca-100">
                 <Toggle on={notif} onClick={() => setNotif((s) => !s)} />
                 Notificaciones
               </label>
-              <label className="flex items-center gap-3 text-[14.5px] text-ca-100">
+              <label className="flex items-center gap-3 text-[0.90625rem] text-ca-100">
                 <Toggle on={sound} onClick={() => setSound((s) => !s)} />
                 Sonido de mensaje
               </label>
@@ -252,10 +252,10 @@ export function CaPrimitivasChapter() {
             {PRESENCES.map(([status, label]) => (
               <div key={status} className="flex flex-col items-center gap-2">
                 <Avatar src={mcHead(HEAD)} size={49} presence={status} alt="" />
-                <span className="font-ca-mono text-[10px] uppercase tracking-[0.12em] text-ca-400">{label}</span>
+                <span className="font-ca-mono text-[0.625rem] uppercase tracking-[0.12em] text-ca-400">{label}</span>
               </div>
             ))}
-            <div className="relative h-[13px] w-[13px]">
+            <div className="relative h-[0.8125rem] w-[0.8125rem]">
               <Presence status="online" />
             </div>
           </ThemePair>
@@ -281,7 +281,7 @@ export function CaPrimitivasChapter() {
           }
         >
           <ThemePair stack>
-            <div className="relative h-[360px] w-full overflow-hidden rounded-[12px] bg-ca-wallpaper">
+            <div className="relative h-[22.5rem] w-full overflow-hidden rounded-[12px] bg-ca-wallpaper">
               <div className="ca-doodle pointer-events-none absolute inset-0" />
               {modal ? (
                 <Modal
@@ -299,12 +299,12 @@ export function CaPrimitivasChapter() {
                 >
                   <div className="flex flex-col gap-4">
                     <Field defaultValue="Equipo Wingull" />
-                    <label className="flex items-center gap-3 text-[14.5px] text-ca-100">
+                    <label className="flex items-center gap-3 text-[0.90625rem] text-ca-100">
                       <Toggle on={notif} onClick={() => setNotif((s) => !s)} />
                       Silenciar notificaciones
                     </label>
-                    <p className="text-[13px] leading-[1.5] text-ca-400">
-                      El cuerpo desplaza con <code className="font-ca-mono text-[12px]">.ca-scroll</code>; la cabecera y
+                    <p className="text-[0.8125rem] leading-[1.5] text-ca-400">
+                      El cuerpo desplaza con <code className="font-ca-mono text-[0.75rem]">.ca-scroll</code>; la cabecera y
                       el pie quedan fijos.
                     </p>
                   </div>
@@ -331,17 +331,17 @@ export function CaPrimitivasChapter() {
           }
         >
           <ThemePair>
-            <div className="relative flex h-[300px] w-full items-end rounded-[12px] bg-ca-header p-4">
+            <div className="relative flex h-[18.75rem] w-full items-end rounded-[12px] bg-ca-header p-4">
               <div className="relative">
                 <IconButton icon="paperclip" iconSize={20} title="Adjuntar" active />
-                <Popover className="left-0 min-w-[232px]">
+                <Popover className="left-0 min-w-[14.5rem]">
                   <PopItem>
                     <span className="grid h-10 w-10 flex-none place-items-center rounded-full bg-ca-accent/[.18] text-ca-accent">
                       <Icon name="image" size={18} />
                     </span>
                     <span>
-                      <span className="block text-[14px] font-medium text-ca-50">Fotos y vídeos</span>
-                      <span className="text-[11.5px] text-ca-400">Galería de capturas</span>
+                      <span className="block text-[0.875rem] font-medium text-ca-50">Fotos y vídeos</span>
+                      <span className="text-[0.71875rem] text-ca-400">Galería de capturas</span>
                     </span>
                   </PopItem>
                   <PopItem>
@@ -349,8 +349,8 @@ export function CaPrimitivasChapter() {
                       <Icon name="file" size={18} />
                     </span>
                     <span>
-                      <span className="block text-[14px] font-medium text-ca-50">Documento</span>
-                      <span className="text-[11.5px] text-ca-400">Tus notas</span>
+                      <span className="block text-[0.875rem] font-medium text-ca-50">Documento</span>
+                      <span className="text-[0.71875rem] text-ca-400">Tus notas</span>
                     </span>
                   </PopItem>
                   <PopItem>
@@ -358,8 +358,8 @@ export function CaPrimitivasChapter() {
                       <Icon name="mappin" size={18} />
                     </span>
                     <span>
-                      <span className="block text-[14px] font-medium text-ca-50">Ubicación</span>
-                      <span className="text-[11.5px] text-ca-400">Compartir waypoint</span>
+                      <span className="block text-[0.875rem] font-medium text-ca-50">Ubicación</span>
+                      <span className="text-[0.71875rem] text-ca-400">Compartir waypoint</span>
                     </span>
                   </PopItem>
                 </Popover>
@@ -383,10 +383,10 @@ export function CaPrimitivasChapter() {
           note="Es un shimmer sin forma propia: la forma la da la clase. Se apaga con prefers-reduced-motion."
         >
           <ThemePair>
-            <div className="flex w-full max-w-[380px] flex-col gap-4">
+            <div className="flex w-full max-w-[23.75rem] flex-col gap-4">
               {[0, 1, 2].map((i) => (
-                <div key={i} className="flex items-center gap-[13px]">
-                  <Skeleton className="h-[49px] w-[49px] flex-none rounded-full" />
+                <div key={i} className="flex items-center gap-[0.8125rem]">
+                  <Skeleton className="h-[3.0625rem] w-[3.0625rem] flex-none rounded-full" />
                   <div className="flex min-w-0 flex-1 flex-col gap-2">
                     <Skeleton className="h-3.5 w-1/2" />
                     <Skeleton className="h-3 w-4/5" />
@@ -422,11 +422,11 @@ export function CaPrimitivasChapter() {
           <ThemePair>
             <span className="inline-flex items-center gap-2 text-ca-accent-soft">
               <Dots />
-              <span className="text-[14px]">escribiendo…</span>
+              <span className="text-[0.875rem]">escribiendo…</span>
             </span>
             <span className="inline-flex items-center gap-1.5 text-ca-400">
               <Dots sm />
-              <span className="text-[13px]">Marta está escribiendo</span>
+              <span className="text-[0.8125rem]">Marta está escribiendo</span>
             </span>
           </ThemePair>
         </Sample>

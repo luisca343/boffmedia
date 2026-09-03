@@ -48,7 +48,7 @@ export function MewRefList({ ids = [], cat, icon, onNav, empty }: { ids?: (strin
 }
 
 function MewEmptyNote({ children }: { children: React.ReactNode }) {
-  return <div className="text-[12.5px]/[1.5] font-medium italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">{children}</div>
+  return <div className="text-[0.78125rem]/[1.5] font-medium italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">{children}</div>
 }
 
 function mewFmtNum(n: number) { return (n > 0 ? "+" : "") + n }
@@ -73,7 +73,7 @@ export function MewEffectVal({ v, onNav }: { v: unknown; onNav?: NavFn }): React
   return (
     <span className="inline-flex flex-wrap gap-1.5">
       {Object.entries(v as Record<string, unknown>).map(([k, val]) => (
-        <span key={k} className="inline-flex items-center gap-1 border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-[7px] py-0.5 [border-radius:var(--wob-sm)]">
+        <span key={k} className="inline-flex items-center gap-1 border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-[0.4375rem] py-0.5 [border-radius:var(--wob-sm)]">
           <b className="font-semibold text-[color:var(--mwp-ink-soft)]">{mewSubKeyLabel(k)}</b>
           <MewEffectVal v={val} onNav={onNav} />
         </span>
@@ -97,7 +97,7 @@ export function MewEffects({ map, onNav, empty }: { map?: Record<string, unknown
         let keyNode: React.ReactNode
         if (eff && onNav) {
           const btn = (
-            <button type="button" onClick={() => onNav(eff.kind, eff.rec.id)} className="cursor-pointer border-0 bg-transparent p-0 text-left text-[13.5px]/[1.35] font-bold text-[color:var(--mwp-red-deep)] underline decoration-wavy decoration-[color-mix(in_srgb,var(--mwp-red)_55%,transparent)] underline-offset-[3px] [font-family:var(--mwf-hand)] transition-all hover:decoration-[color:var(--mwp-red)] active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0">
+            <button type="button" onClick={() => onNav(eff.kind, eff.rec.id)} className="cursor-pointer border-0 bg-transparent p-0 text-left text-[0.84375rem]/[1.35] font-bold text-[color:var(--mwp-red-deep)] underline decoration-wavy decoration-[color-mix(in_srgb,var(--mwp-red)_55%,transparent)] underline-offset-[3px] [font-family:var(--mwf-hand)] transition-all hover:decoration-[color:var(--mwp-red)] active:translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0">
               {eff.rec.name}
             </button>
           )
@@ -107,12 +107,12 @@ export function MewEffects({ map, onNav, empty }: { map?: Record<string, unknown
             </MewHoverCard>
           )
         } else {
-          keyNode = <span className="text-[13.5px]/[1.35] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)]">{mewHuman(k)}</span>
+          keyNode = <span className="text-[0.84375rem]/[1.35] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)]">{mewHuman(k)}</span>
         }
         return (
           <div className="flex flex-wrap items-baseline justify-between gap-3 border-b-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] py-2 last:border-b-0" key={k}>
             {keyNode}
-            <span className="flex flex-wrap items-center justify-end gap-1 font-mono text-[12px]/[1.3] font-semibold text-[color:var(--mwp-ink-soft)]">
+            <span className="flex flex-wrap items-center justify-end gap-1 font-mono text-[0.75rem]/[1.3] font-semibold text-[color:var(--mwp-ink-soft)]">
               <MewEffectVal v={v} onNav={onNav} />
             </span>
           </div>
@@ -132,7 +132,7 @@ export function MewFlag({ icon, children, tone }: { icon?: IconName; children: R
           ? "bg-[color:var(--mwp-paper-bad)] [&_svg]:text-[color:var(--mwp-bad)]"
           : "bg-[color:var(--mwp-paper-2)] [&_svg]:text-[color:var(--mwp-ink-soft)]"
   return (
-    <span className={"inline-flex items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] px-2.5 pb-1 pt-[5px] text-[11.5px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-sm)] " + toneCls}>
+    <span className={"inline-flex items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] px-2.5 pb-1 pt-[0.3125rem] text-[0.71875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-sm)] " + toneCls}>
       {icon && <Icon name={icon} size={12} />}
       {children}
     </span>

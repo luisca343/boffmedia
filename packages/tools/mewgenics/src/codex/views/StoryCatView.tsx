@@ -61,7 +61,7 @@ export function StoryCatView({ rec }: ViewProps) {
             <MewFactGrid rows={traitRows} />
             <a
               href={`/otros/mewgenics/builder?preset=${encodeURIComponent(rec.id)}`}
-              className="inline-flex w-fit items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-2)] px-3 pb-1.5 pt-[7px] text-[12px]/none font-bold text-[color:var(--mwp-ink)] no-underline [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-sm)] transition-all hover:-translate-y-px active:translate-y-0.5 active:[box-shadow:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+              className="inline-flex w-fit items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-2)] px-3 pb-1.5 pt-[0.4375rem] text-[0.75rem]/none font-bold text-[color:var(--mwp-ink)] no-underline [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-sm)] transition-all hover:-translate-y-px active:translate-y-0.5 active:[box-shadow:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
               style={clsColor ? { borderColor: clsColor.readable } : undefined}
             >
               <Icon name="edit" size={12} />

@@ -56,23 +56,23 @@ export function BootScreen() {
       <span className="pc-boot-scan" />
 
       <div className="relative z-10 flex flex-col items-center gap-3.5">
-        <div className="relative flex h-[84px] w-[84px] animate-pc-pulse-glow items-center justify-center rounded-[23px] border border-pc-line-strong bg-gradient-to-br from-[#1f3a63] to-[#0c1830] shadow-[inset_0_0_24px_-6px_rgb(79_155_255_/_.7)] motion-reduce:animate-none">
+        <div className="relative flex h-[5.25rem] w-[5.25rem] animate-pc-pulse-glow items-center justify-center rounded-[23px] border border-pc-line-strong bg-gradient-to-br from-[#1f3a63] to-[#0c1830] shadow-[inset_0_0_24px_-6px_rgb(79_155_255_/_.7)] motion-reduce:animate-none">
           <Icon name="boxes" size={42} className="text-pc-accent" />
           <span className="absolute inset-0 animate-pc-boot-spin motion-reduce:animate-none">
-            <i className="absolute -top-[5px] left-1/2 -ml-[5.5px] block h-[11px] w-[11px] rounded-pc-pill bg-pc-cyan shadow-[0_0_12px_rgb(var(--pc-cyan))]" />
+            <i className="absolute -top-[0.3125rem] left-1/2 -ml-[0.34375rem] block h-[0.6875rem] w-[0.6875rem] rounded-pc-pill bg-pc-cyan shadow-[0_0_12px_rgb(var(--pc-cyan))]" />
           </span>
         </div>
         <div className="text-center">
-          <div className="font-pc-display text-[21px] font-bold tracking-[.14em]">
+          <div className="font-pc-display text-[1.3125rem] font-bold tracking-[.14em]">
             SMARTROTOM <span className="text-pc-accent">PC</span>
           </div>
-          <div className="mt-[5px] font-pc-mono text-[11px] tracking-[.06em] text-pc-fg-subtle">
+          <div className="mt-[0.3125rem] font-pc-mono text-[0.6875rem] tracking-[.06em] text-pc-fg-subtle">
             {t("topbar.subtitle")}
           </div>
         </div>
       </div>
 
-      <div className="pc-glass relative z-10 w-[296px] overflow-hidden rounded-[18px] p-[13px] shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)]">
+      <div className="pc-glass relative z-10 w-[18.5rem] overflow-hidden rounded-[18px] p-[0.8125rem] shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)]">
         <span className="pc-wp pc-wp-classic pc-wp-dots opacity-50" />
         <div className="relative z-10 grid grid-cols-6 gap-1.5">
           {Array.from({ length: CELLS }, (_, i) => {
@@ -100,10 +100,10 @@ export function BootScreen() {
         </div>
       </div>
 
-      <div className="relative z-10 w-[296px]">
-        <div className="mb-2 flex items-center justify-between font-pc-mono text-[11.5px]">
+      <div className="relative z-10 w-[18.5rem]">
+        <div className="mb-2 flex items-center justify-between font-pc-mono text-[0.71875rem]">
           <span className="flex items-center gap-2 text-pc-fg-muted">
-            <span className="h-[7px] w-[7px] animate-pc-boot-blink rounded-pc-pill bg-pc-green shadow-[0_0_8px_rgb(var(--pc-green))] motion-reduce:animate-none" />
+            <span className="h-[0.4375rem] w-[0.4375rem] animate-pc-boot-blink rounded-pc-pill bg-pc-green shadow-[0_0_8px_rgb(var(--pc-green))] motion-reduce:animate-none" />
             {phase}
           </span>
           <span className="font-bold text-pc-accent">{pct}%</span>

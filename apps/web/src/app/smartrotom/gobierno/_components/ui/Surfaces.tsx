@@ -63,8 +63,8 @@ export function Bar({
   dep?: Tone
 }) {
   return (
-    <div className="flex items-center justify-between gap-2.5 border-b border-gt-line px-4 py-[11px]">
-      <div className="flex min-w-0 items-center gap-[9px]">
+    <div className="flex items-center justify-between gap-2.5 border-b border-gt-line px-4 py-[0.6875rem]">
+      <div className="flex min-w-0 items-center gap-[0.5625rem]">
         {icon && <Icon name={icon} size={16} className={`flex-none ${dep ? TONES[dep].text : "text-gt-accent"}`} />}
         <span className="truncate font-gt-display text-base font-bold text-gt-ink-900">{children}</span>
       </div>
@@ -93,12 +93,12 @@ export function Stat({
   return (
     <Card dep={tone} className="min-w-0 px-4 py-3.5">
       <div className="flex items-start justify-between">
-        <div className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">{label}</div>
+        <div className="font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">{label}</div>
         {icon && <Icon name={icon} size={15} className={t.text} />}
       </div>
-      <div className="mt-1.5 font-gt-display text-[30px] leading-[1.05] tabular-nums text-gt-ink-900">{value}</div>
+      <div className="mt-1.5 font-gt-display text-[1.875rem] leading-[1.05] tabular-nums text-gt-ink-900">{value}</div>
       {(sub || trend !== undefined) && (
-        <div className="mt-[5px] flex items-center gap-1.5 text-[11.5px] text-gt-ink-500">
+        <div className="mt-[0.3125rem] flex items-center gap-1.5 text-[0.71875rem] text-gt-ink-500">
           {trend !== undefined && trend !== 0 && (
             <Icon
               name={trend > 0 ? "trendUp" : "trendDown"}
@@ -123,12 +123,12 @@ export function Empty({
   sub?: string
 }) {
   return (
-    <div className="flex animate-gt-pop flex-col items-center justify-center gap-[9px] px-6 py-[46px] text-center motion-reduce:animate-none">
-      <Sunken className="grid h-[58px] w-[58px] place-items-center">
+    <div className="flex animate-gt-pop flex-col items-center justify-center gap-[0.5625rem] px-6 py-[2.875rem] text-center motion-reduce:animate-none">
+      <Sunken className="grid h-[3.625rem] w-[3.625rem] place-items-center">
         <Icon name={icon} size={24} className="text-gt-ink-300" />
       </Sunken>
-      <div className="font-gt-display text-[19px] text-gt-ink-700">{title}</div>
-      {sub && <div className="max-w-[340px] text-[12.5px] leading-relaxed text-gt-ink-400">{sub}</div>}
+      <div className="font-gt-display text-[1.1875rem] text-gt-ink-700">{title}</div>
+      {sub && <div className="max-w-[21.25rem] text-[0.78125rem] leading-relaxed text-gt-ink-400">{sub}</div>}
     </div>
   )
 }
@@ -148,13 +148,13 @@ export function PageHead({
   right?: ReactNode
 }) {
   return (
-    <div className="mb-[18px] flex flex-wrap items-end justify-between gap-4">
+    <div className="mb-[1.125rem] flex flex-wrap items-end justify-between gap-4">
       <div>
-        <div className={`mb-[5px] font-gt-mono text-[10.5px] font-bold uppercase tracking-[.22em] ${TONES[dep].text}`}>
+        <div className={`mb-[0.3125rem] font-gt-mono text-[0.65625rem] font-bold uppercase tracking-[.22em] ${TONES[dep].text}`}>
           {kicker}
         </div>
-        <h1 className="font-gt-display text-[30px] leading-[1.05] text-gt-ink-900">{title}</h1>
-        {sub && <p className="mt-1.5 max-w-[560px] text-[13.5px] leading-normal text-gt-ink-500">{sub}</p>}
+        <h1 className="font-gt-display text-[1.875rem] leading-[1.05] text-gt-ink-900">{title}</h1>
+        {sub && <p className="mt-1.5 max-w-[35rem] text-[0.84375rem] leading-normal text-gt-ink-500">{sub}</p>}
       </div>
       {right && <div className="flex items-center gap-2">{right}</div>}
     </div>

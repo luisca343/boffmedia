@@ -141,8 +141,8 @@ function ThemePair({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid w-full grid-cols-1 xl:grid-cols-2">
       {(["light", "dark"] as const).map((t) => (
-        <div key={t} className="ca-app bg-ca-panel p-[22px] font-ca text-ca-50 antialiased" data-theme={t}>
-          <div className="mb-4 font-ca-mono text-[10px] uppercase tracking-[0.16em] text-ca-400">
+        <div key={t} className="ca-app bg-ca-panel p-[1.375rem] font-ca text-ca-50 antialiased" data-theme={t}>
+          <div className="mb-4 font-ca-mono text-[0.625rem] uppercase tracking-[0.16em] text-ca-400">
             {t === "light" ? "Claro" : "Oscuro"}
           </div>
           {children}
@@ -400,7 +400,7 @@ export function CaMensajeriaChapter() {
         >
           <ThemePair>
             <div className="w-full">
-              <div className="relative h-[170px] overflow-hidden rounded-t-[12px] bg-ca-wallpaper">
+              <div className="relative h-[10.625rem] overflow-hidden rounded-t-[12px] bg-ca-wallpaper">
                 <div className="ca-doodle pointer-events-none absolute inset-0" />
               </div>
               <Composer
@@ -427,7 +427,7 @@ export function CaMensajeriaChapter() {
         >
           <ThemePair>
             <div className="w-full">
-              <div className="relative flex h-[130px] items-center justify-center overflow-hidden rounded-t-[12px] bg-ca-wallpaper">
+              <div className="relative flex h-[8.125rem] items-center justify-center overflow-hidden rounded-t-[12px] bg-ca-wallpaper">
                 <div className="ca-doodle pointer-events-none absolute inset-0" />
                 <Button className="relative" onClick={() => setReply(reply ? null : REPLY_TARGET)}>
                   {reply ? "Descartar la respuesta" : "Responder a Marta"}

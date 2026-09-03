@@ -48,18 +48,18 @@ export function GalleryPicker({
       {gallery.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-10 text-center text-ca-500">
           <Icon name="camera" size={34} className="opacity-50" />
-          <p className="text-[13.5px]">{t("gallery.noCaptures")}</p>
+          <p className="text-[0.84375rem]">{t("gallery.noCaptures")}</p>
         </div>
       ) : selected ? (
         <div className="flex flex-col gap-3">
           <div className="overflow-hidden rounded-ca-lg bg-ca-950">
-            <img src={selected.image} alt="" className="max-h-[340px] w-full object-contain" />
+            <img src={selected.image} alt="" className="max-h-[21.25rem] w-full object-contain" />
           </div>
           <input
             value={caption}
             onChange={(e) => setCaption(e.target.value)}
             placeholder={t("gallery.addComment")}
-            className="w-full rounded-ca-md border border-ca-700 bg-ca-search-bg px-3 py-2.5 text-[14px] text-ca-50 outline-none placeholder:text-ca-500 focus:border-ca-accent/50"
+            className="w-full rounded-ca-md border border-ca-700 bg-ca-search-bg px-3 py-2.5 text-[0.875rem] text-ca-50 outline-none placeholder:text-ca-500 focus:border-ca-accent/50"
           />
         </div>
       ) : (
@@ -72,7 +72,7 @@ export function GalleryPicker({
             >
               <img src={s.image} alt="" className="h-full w-full object-cover" />
               {!!s.entities?.length && (
-                <span className="absolute left-1 top-1 rounded bg-black/50 px-1.5 py-px font-ca-mono text-[8.5px] text-ca-online">SCAN</span>
+                <span className="absolute left-1 top-1 rounded bg-black/50 px-1.5 py-px font-ca-mono text-[0.53125rem] text-ca-online">SCAN</span>
               )}
             </button>
           ))}

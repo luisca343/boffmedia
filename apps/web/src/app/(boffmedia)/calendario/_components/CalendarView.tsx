@@ -35,7 +35,7 @@ export function CalendarView() {
   }, [events, locale])
 
   return (
-    <main className="wrap pb-[90px] pt-[34px]">
+    <main className="wrap-wide pb-[5.625rem] pt-[2.125rem]">
       <ToolHeader className="mb-8" title={t("title")} sub={t("lead")} />
 
       {isLoading ? (
@@ -55,9 +55,9 @@ export function CalendarView() {
           {groups.map((g) => (
             <section key={g.label}>
               <div className="mb-4 flex items-center gap-3">
-                <h2 className="text-[clamp(22px,3vw,30px)] text-txt">{g.label}</h2>
+                <h2 className="text-[clamp(1.375rem,3vw,1.875rem)] text-txt">{g.label}</h2>
                 <span aria-hidden className="h-px flex-1 bg-line" />
-                <span className="font-mono text-[10px] font-medium uppercase tracking-[0.14em] text-txt-dim">
+                <span className="font-mono text-[0.625rem] font-medium uppercase tracking-[0.14em] text-txt-dim">
                   {tEv("count", { count: g.items.length })}
                 </span>
               </div>
@@ -75,16 +75,16 @@ export function CalendarView() {
                         status === "completed" && "opacity-70",
                       )}
                     >
-                      <div className="flex w-[54px] flex-none flex-col items-center justify-center border-r border-line pr-4">
-                        <span className="font-display text-[32px]/none font-extrabold italic text-accent">{dm.d}</span>
-                        <span className="mt-1 font-mono text-[9px]/none font-semibold uppercase tracking-[0.12em] text-txt-muted">
+                      <div className="flex w-[3.375rem] flex-none flex-col items-center justify-center border-r border-line pr-4">
+                        <span className="font-display text-[2rem]/none font-extrabold italic text-accent">{dm.d}</span>
+                        <span className="mt-1 font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.12em] text-txt-muted">
                           {dm.m}
                         </span>
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="truncate text-[19px]/[1.05] text-txt">{e.title}</h3>
+                        <h3 className="truncate text-[1.1875rem]/[1.05] text-txt">{e.title}</h3>
                         {e.gameName && (
-                          <span className="mt-1.5 inline-flex items-center gap-1.5 font-mono text-[10.5px]/none font-medium uppercase tracking-[0.06em] text-txt-muted">
+                          <span className="mt-1.5 inline-flex items-center gap-1.5 font-mono text-[0.65625rem]/none font-medium uppercase tracking-[0.06em] text-txt-muted">
                             <Icon name="gamepad" size={12} className="text-txt-dim" />
                             {e.gameName}
                           </span>

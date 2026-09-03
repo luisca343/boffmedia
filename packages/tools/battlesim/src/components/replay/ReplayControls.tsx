@@ -98,7 +98,7 @@ export function ReplayControls({
                     {markers.map((m, i) => (
                         <span
                             key={`${m.kind}-${m.turn}-${i}`}
-                            className="cut-seal [--cut:2px] absolute h-[5px] w-[5px]"
+                            className="cut-seal [--cut:2px] absolute h-[0.3125rem] w-[0.3125rem]"
                             title={`${m.kind === 'ko' ? t('hub.replays.markerKo') : t('log.filterSwitches')} — T${m.turn}`}
                             style={{
                                 left: `${(m.turn / Math.max(1, lastTurn)) * 100}%`,
@@ -130,7 +130,7 @@ export function ReplayControls({
                 </div>
 
                 <div className="mx-auto flex items-center gap-2">
-                    <span className="whitespace-nowrap font-mono text-[11px]/none tabular-nums text-txt-muted">T{battle.turn} / {lastTurn}</span>
+                    <span className="whitespace-nowrap font-mono text-[0.6875rem]/none tabular-nums text-txt-muted">T{battle.turn} / {lastTurn}</span>
                     <DkSeg
                         size="sm"
                         value={String(speed)}

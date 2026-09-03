@@ -15,7 +15,7 @@ const MULT_META: Record<string, { key: string; fg: string; bg: string; label: st
 }
 const ORDER = ["4", "2", "1", "0.5", "0.25", "0"]
 
-const SELECT = "bg-white/[0.03] border border-white/[0.07] rounded-[7px] py-1.5 px-2.5 text-pk-surface-100 text-[13.5px] outline-none focus:border-pk-primary-400/50"
+const SELECT = "bg-white/[0.03] border border-white/[0.07] rounded-[7px] py-1.5 px-2.5 text-pk-surface-100 text-[0.84375rem] outline-none focus:border-pk-primary-400/50"
 
 export default function TypeAnalysis() {
   const t = useTranslations("pokedex")
@@ -34,11 +34,11 @@ export default function TypeAnalysis() {
   }, [type1, type2])
 
   return (
-    <div className="flex flex-col gap-[18px]">
+    <div className="flex flex-col gap-[1.125rem]">
       <div className="bg-white/[0.025] border border-white/[0.06] rounded-xl p-[18px_20px] flex gap-4 items-center flex-wrap">
         <div>
-          <div className="font-pk-mono text-[10px] tracking-[0.1em] uppercase text-pk-surface-500 mb-1.5">{t("analysis_primary_type")}</div>
-          <select value={type1} onChange={(e) => setType1(e.target.value)} className={`${SELECT} min-w-[160px]`}>
+          <div className="font-pk-mono text-[0.625rem] tracking-[0.1em] uppercase text-pk-surface-500 mb-1.5">{t("analysis_primary_type")}</div>
+          <select value={type1} onChange={(e) => setType1(e.target.value)} className={`${SELECT} min-w-[10rem]`}>
             {ALL_TYPES.map((tp) => (
               <option key={tp} value={tp}>
                 {t(TYPE_LABEL_KEYS[tp])}
@@ -48,8 +48,8 @@ export default function TypeAnalysis() {
         </div>
         <div className="font-pk-display text-2xl text-pk-surface-500">+</div>
         <div>
-          <div className="font-pk-mono text-[10px] tracking-[0.1em] uppercase text-pk-surface-500 mb-1.5">{t("analysis_secondary_type")}</div>
-          <select value={type2} onChange={(e) => setType2(e.target.value)} className={`${SELECT} min-w-[180px]`}>
+          <div className="font-pk-mono text-[0.625rem] tracking-[0.1em] uppercase text-pk-surface-500 mb-1.5">{t("analysis_secondary_type")}</div>
+          <select value={type2} onChange={(e) => setType2(e.target.value)} className={`${SELECT} min-w-[11.25rem]`}>
             <option value="">{t("analysis_mono_type")}</option>
             {ALL_TYPES.filter((tp) => tp !== type1).map((tp) => (
               <option key={tp} value={tp}>
@@ -72,7 +72,7 @@ export default function TypeAnalysis() {
       <div className="bg-white/[0.015] border border-white/[0.05] rounded-xl p-[16px_18px]">
         <h4 className="font-pk-display font-semibold text-sm text-pk-surface-50 mb-3.5 pb-3 border-b border-white/[0.05] flex items-center gap-2">
           {t("analysis_damage_received", { type: type2 ? t("analysis_dual") : "" })}
-          <span className="font-pk font-normal text-[11.5px] text-pk-surface-500 ml-auto">
+          <span className="font-pk font-normal text-[0.71875rem] text-pk-surface-500 ml-auto">
             {type2 ? `${t(TYPE_LABEL_KEYS[type1])} + ${t(TYPE_LABEL_KEYS[type2])}` : t(TYPE_LABEL_KEYS[type1])}
           </span>
         </h4>
@@ -83,23 +83,23 @@ export default function TypeAnalysis() {
             return (
               <div
                 key={mult}
-                className="grid grid-cols-[110px_1fr_32px] gap-3 items-center min-h-[46px] rounded-[10px] px-3 py-2.5 border"
+                className="grid grid-cols-[6.875rem_1fr_2rem] gap-3 items-center min-h-[2.875rem] rounded-[10px] px-3 py-2.5 border"
                 style={{ background: meta.bg, borderColor: `color-mix(in oklab, ${meta.fg} 22%, transparent)` }}
               >
                 <div className="flex flex-col border-r pr-2.5" style={{ borderColor: `color-mix(in oklab, ${meta.fg} 18%, transparent)` }}>
                   <span className="font-pk-display font-bold text-lg leading-none tabular-nums" style={{ color: meta.fg }}>
                     {meta.label}
                   </span>
-                  <span className="font-pk-mono text-[10px] tracking-[0.08em] uppercase text-pk-surface-400">{t(meta.key)}</span>
+                  <span className="font-pk-mono text-[0.625rem] tracking-[0.08em] uppercase text-pk-surface-400">{t(meta.key)}</span>
                 </div>
                 <div className="flex flex-wrap gap-1 items-center">
                   {types.length === 0 ? (
-                    <span className="text-[11.5px] text-pk-surface-500 italic">{t("eff_no_types")}</span>
+                    <span className="text-[0.71875rem] text-pk-surface-500 italic">{t("eff_no_types")}</span>
                   ) : (
                     types.map((t) => <TypeChip key={t} type={t} size="sm" />)
                   )}
                 </div>
-                <span className="font-pk-mono text-[11px] font-semibold text-pk-surface-400 bg-black/25 px-1.5 py-0.5 rounded text-center tabular-nums">{types.length}</span>
+                <span className="font-pk-mono text-[0.6875rem] font-semibold text-pk-surface-400 bg-black/25 px-1.5 py-0.5 rounded text-center tabular-nums">{types.length}</span>
               </div>
             )
           })}

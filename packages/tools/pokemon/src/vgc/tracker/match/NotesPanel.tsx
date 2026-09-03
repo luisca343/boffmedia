@@ -43,11 +43,11 @@ export const NotesPanel = forwardRef<NotesPanelHandle, Props>(function NotesPane
   return (
     <div className="flex min-h-0 flex-1 flex-col border border-solid border-line bg-panel">
       {/* Input row */}
-      <div className="flex shrink-0 items-center gap-2 border-b border-solid border-line px-[14px] py-[9px]">
-        <span className="shrink-0 select-none font-mono text-[10px] uppercase tracking-[0.1em] text-txt-dim">
+      <div className="flex shrink-0 items-center gap-2 border-b border-solid border-line px-[0.875rem] py-[0.5625rem]">
+        <span className="shrink-0 select-none font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-dim">
           {phase === 'live' ? (
-            <span className="flex items-center gap-[6px] text-ok">
-              <span className="inline-block h-[6px] w-[6px] rounded-full bg-ok animate-pulse motion-reduce:animate-none" />
+            <span className="flex items-center gap-[0.375rem] text-ok">
+              <span className="inline-block h-[0.375rem] w-[0.375rem] rounded-full bg-ok animate-pulse motion-reduce:animate-none" />
               {t('indicators.live')}
             </span>
           ) : (
@@ -58,25 +58,25 @@ export const NotesPanel = forwardRef<NotesPanelHandle, Props>(function NotesPane
           ref={inputRef}
           onKeyDown={handleKeyDown}
           placeholder={t('placeholders.addNote')}
-          className="flex-1 bg-transparent font-body text-[13px] text-txt outline-none placeholder:text-txt-dim"
+          className="flex-1 bg-transparent font-body text-[0.8125rem] text-txt outline-none placeholder:text-txt-dim"
           autoComplete="off"
           spellCheck={false}
         />
-        <kbd className="hidden select-none border border-solid border-line-2 px-1 py-px font-mono text-[10px] text-txt-dim sm:inline">N</kbd>
+        <kbd className="hidden select-none border border-solid border-line-2 px-1 py-px font-mono text-[0.625rem] text-txt-dim sm:inline">N</kbd>
       </div>
 
       {/* Notes list */}
       {notes.length > 0 && (
-        <div className="flex flex-1 flex-col gap-[9px] overflow-y-auto px-[14px] py-[11px]">
+        <div className="flex flex-1 flex-col gap-[0.5625rem] overflow-y-auto px-[0.875rem] py-[0.6875rem]">
           {[...notes].reverse().map((note) => (
             <div
               key={note.id}
-              className="grid gap-[5px] border border-solid border-line border-l-[3px] bg-base px-[11px] py-[9px]"
+              className="grid gap-[0.3125rem] border border-solid border-line border-l-[3px] bg-base px-[0.6875rem] py-[0.5625rem]"
               style={{ borderLeftColor: note.phase === 'live' ? 'var(--ok)' : note.phase === 'series' ? 'var(--warn)' : 'var(--info)' }}
             >
               <span className="inline-flex items-center gap-2">
                 <span
-                  className="justify-self-start px-[6px] py-[3px] font-mono text-[8.5px] font-semibold uppercase leading-none tracking-[0.12em]"
+                  className="justify-self-start px-[0.375rem] py-[3px] font-mono text-[0.53125rem] font-semibold uppercase leading-none tracking-[0.12em]"
                   style={
                     note.phase === 'live'
                       ? { color: 'var(--ok)', background: 'var(--ok-soft)' }
@@ -87,9 +87,9 @@ export const NotesPanel = forwardRef<NotesPanelHandle, Props>(function NotesPane
                 >
                   {note.phase === 'live' ? t('notePhase.live') : note.phase === 'series' ? t('notePhase.series') : t('notePhase.post')}
                 </span>
-                <span className="font-mono text-[10px] text-txt-dim">{formatTime(note.createdAt)}</span>
+                <span className="font-mono text-[0.625rem] text-txt-dim">{formatTime(note.createdAt)}</span>
               </span>
-              <p className="m-0 font-body text-[12.5px] leading-[1.55] text-txt-muted">{note.text}</p>
+              <p className="m-0 font-body text-[0.78125rem] leading-[1.55] text-txt-muted">{note.text}</p>
             </div>
           ))}
         </div>

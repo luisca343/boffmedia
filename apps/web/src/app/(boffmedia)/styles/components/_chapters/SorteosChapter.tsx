@@ -29,7 +29,7 @@ function ReelDemo({ sorteo }: { sorteo: Sorteo }) {
   const [phase, setPhase] = React.useState<"idle" | "spin" | "done">("done")
   return (
     <div className="w-full">
-      <div className="mb-[14px]">
+      <div className="mb-[0.875rem]">
         <Button
           size="sm"
           icon="play"
@@ -86,7 +86,7 @@ export function SorteosChapter() {
             <SrtPrizeTag type="key" winners={10} />
             <SrtPrizeTag type="nitro" winners={3} />
           </div>
-          <div className="w-full max-w-[320px]">
+          <div className="w-full max-w-[20rem]">
             <SrtTicketMeter tickets={4} max={10} odds={srtOdds(active, 4)} />
           </div>
         </Sample>
@@ -103,7 +103,7 @@ export function SorteosChapter() {
         }
       >
         <Sample title="Rejilla" code="<SrtCard sorteo go>" col>
-          <div className="grid w-full gap-4 [grid-template-columns:repeat(auto-fill,minmax(340px,1fr))]">
+          <div className="grid w-full gap-4 [grid-template-columns:repeat(auto-fill,minmax(21.25rem,1fr))]">
             <SrtCard sorteo={active} onOpen={noop} />
             <SrtCard sorteo={announced} onOpen={noop} />
           </div>
@@ -162,12 +162,12 @@ export function SorteosChapter() {
         }
       >
         <Sample title="Requisitos" code="<SrtReqList requirements>" col>
-          <div className="w-full max-w-[460px]">
+          <div className="w-full max-w-[28.75rem]">
             <SrtReqList requirements={featured.requirements} />
           </div>
         </Sample>
         <Sample title="Pasos" code="<SrtSteps steps>" col>
-          <div className="w-full max-w-[460px]">
+          <div className="w-full max-w-[28.75rem]">
             <SrtSteps steps={featured.steps} />
           </div>
         </Sample>
@@ -187,12 +187,12 @@ export function SorteosChapter() {
           <ReelDemo sorteo={announced} />
         </Sample>
         <Sample title="Ganador" code="<SrtWinnerCard sorteo>" col>
-          <div className="w-full max-w-[460px]">
+          <div className="w-full max-w-[28.75rem]">
             <SrtWinnerCard sorteo={announced} />
           </div>
         </Sample>
         <Sample title="Reglas y semilla" code="<SrtRules rules seed>" col>
-          <div className="w-full max-w-[560px]">
+          <div className="w-full max-w-[35rem]">
             <SrtRules rules={featured.rules} seed={featured.seed} />
           </div>
         </Sample>

@@ -114,7 +114,7 @@ export function CalendarioChapter() {
         }
       >
         <Sample title="Rejilla de estrenos normales" code="<LzPosterCard game onOpen>" col>
-          <div className="grid w-full gap-x-3 gap-y-4 [grid-template-columns:repeat(auto-fill,minmax(158px,1fr))]">
+          <div className="grid w-full gap-x-3 gap-y-4 [grid-template-columns:repeat(auto-fill,minmax(9.875rem,1fr))]">
             {["Gran Turismo 7", "Tunic", "Dead Cells", "No Man's Sky", "Helldivers 2", "Inside"].map((t) => (
               <LzPosterCard key={t} game={byId(t)} onOpen={noop} />
             ))}
@@ -133,13 +133,13 @@ export function CalendarioChapter() {
         }
       >
         <Sample title="Normal y con fecha" code="<LzReleaseCard game showDate wished onWish onOpen>" col>
-          <div className="grid w-full gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(320px,1fr))]">
+          <div className="grid w-full gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(20rem,1fr))]">
             <LzReleaseCard game={big} showDate wished onWish={noop} onOpen={noop} />
             <LzReleaseCard game={a} showDate wished={false} onWish={noop} onOpen={noop} />
           </div>
         </Sample>
         <Sample title="Densa (modal de día)" code="<LzReleaseCard dense>" col>
-          <div className="grid w-full max-w-[460px] gap-2">
+          <div className="grid w-full max-w-[28.75rem] gap-2">
             <LzReleaseCard game={b} dense wished={false} onWish={noop} onOpen={noop} />
             <LzReleaseCard game={a} dense wished onWish={noop} onOpen={noop} />
           </div>
@@ -193,13 +193,13 @@ export function CalendarioChapter() {
                         key={g.id}
                         title={g.title}
                         style={{ "--ph": LZ_PLATFORMS[g.platforms[0]].color } as React.CSSProperties}
-                        className={g.hype >= 5 ? "flex w-full items-center gap-1.5 overflow-hidden border border-solid border-line bg-[color-mix(in_oklab,var(--accent)_8%,var(--panel-2))] py-1 pl-[5px] pr-[7px] text-left" : "flex w-full items-center gap-1.5 overflow-hidden border border-solid border-line bg-panel-2 py-1 pl-[5px] pr-[7px] text-left"}
+                        className={g.hype >= 5 ? "flex w-full items-center gap-1.5 overflow-hidden border border-solid border-line bg-[color-mix(in_oklab,var(--accent)_8%,var(--panel-2))] py-1 pl-[0.3125rem] pr-[0.4375rem] text-left" : "flex w-full items-center gap-1.5 overflow-hidden border border-solid border-line bg-panel-2 py-1 pl-[0.3125rem] pr-[0.4375rem] text-left"}
                       >
                         <span className="w-[3px] flex-none self-stretch bg-[color:var(--ph)]" />
-                        <span className="truncate text-[11.5px] font-semibold">{g.title}</span>
+                        <span className="truncate text-[0.71875rem] font-semibold">{g.title}</span>
                       </span>
                     ))}
-                    {items.length > 3 && <span className="self-start px-0.5 py-[3px] font-mono text-[10px]/none font-semibold tracking-[0.06em] text-txt-muted">+{items.length - 3} más</span>}
+                    {items.length > 3 && <span className="self-start px-0.5 py-[3px] font-mono text-[0.625rem]/none font-semibold tracking-[0.06em] text-txt-muted">+{items.length - 3} más</span>}
                   </div>
                 )
               }}

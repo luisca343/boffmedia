@@ -56,7 +56,7 @@ export function TopNav({
   }
 
   return (
-    <nav className="wp-chrome relative z-40 flex h-[66px] flex-none items-center gap-3 border-b border-wp-line/24 px-[18px] shadow-[0_6px_20px_-16px_rgba(223,63,137,.5)]">
+    <nav className="wp-chrome relative z-40 flex h-[4.125rem] flex-none items-center gap-3 border-b border-wp-line/24 px-[1.125rem] shadow-[0_6px_20px_-16px_rgba(223,63,137,.5)]">
       <Link href="/smartrotom/wigglypop" className="flex flex-none items-center gap-3">
         <span className="wp-grad-mark flex h-10 w-10 items-center justify-center rounded-[14px] shadow-[0_8px_18px_-6px_rgba(223,63,137,.7),inset_0_1px_0_rgba(255,255,255,.5)]">
           {/* The mascot: a speech bubble with Wigglytuff's face — buy, sell, chat. */}
@@ -77,10 +77,10 @@ export function TopNav({
           </svg>
         </span>
         <span>
-          <span className="block font-wp-display text-[22px] font-semibold leading-none text-wp-fg">
+          <span className="block font-wp-display text-[1.375rem] font-semibold leading-none text-wp-fg">
             Wiggly<b className="font-semibold text-wp-accent">pop</b>
           </span>
-          <span className="mt-[3px] block font-wp text-[10px] font-extrabold uppercase tracking-[.1em] text-wp-fg-subtle">
+          <span className="mt-[3px] block font-wp text-[0.625rem] font-extrabold uppercase tracking-[.1em] text-wp-fg-subtle">
             {t("nav.tagline")}
           </span>
         </span>
@@ -100,8 +100,8 @@ export function TopNav({
               href={item.href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "relative inline-flex items-center gap-[7px] rounded-wp-pill border-wp border-transparent px-3.5 py-[9px]",
-                "font-wp text-[13.5px] font-extrabold transition-all duration-150 ease-wp-soft",
+                "relative inline-flex items-center gap-[0.4375rem] rounded-wp-pill border-wp border-transparent px-3.5 py-[0.5625rem]",
+                "font-wp text-[0.84375rem] font-extrabold transition-all duration-150 ease-wp-soft",
                 active
                   ? "wp-grad-primary text-white shadow-wp-tab"
                   : "text-wp-fg-muted hover:bg-wp-panel-2 hover:text-wp-accent-strong",
@@ -115,11 +115,11 @@ export function TopNav({
         })}
       </div>
 
-      <div className="relative min-w-[120px] max-w-[300px] flex-1">
+      <div className="relative min-w-[7.5rem] max-w-[18.75rem] flex-1">
         <Icon
           name="search"
           size={17}
-          className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-wp-fg-subtle"
+          className="pointer-events-none absolute left-[0.8125rem] top-1/2 -translate-y-1/2 text-wp-fg-subtle"
         />
         <input
           value={search}
@@ -130,7 +130,7 @@ export function TopNav({
           placeholder={t("nav.searchPlaceholder")}
           aria-label={t("nav.searchAriaLabel")}
           className={cn(
-            "h-11 w-full rounded-wp-pill border-wp border-wp-line/24 bg-white pl-[42px] pr-4",
+            "h-11 w-full rounded-wp-pill border-wp border-wp-line/24 bg-white pl-[2.625rem] pr-4",
             "font-wp text-sm font-bold text-wp-fg shadow-[inset_0_1px_2px_rgba(223,63,137,.05)]",
             "outline-none transition-[border-color,box-shadow] duration-150",
             "placeholder:text-wp-fg-subtle hover:border-wp-line/46",
@@ -146,15 +146,15 @@ export function TopNav({
         {count > 0 && <NavBadge tone="accent">{count}</NavBadge>}
       </Link>
 
-      <div className="flex flex-none items-center gap-2.5 rounded-wp-pill border-wp border-wp-cream-deep bg-wp-cream py-1.5 pl-[13px] pr-2.5">
+      <div className="flex flex-none items-center gap-2.5 rounded-wp-pill border-wp border-wp-cream-deep bg-wp-cream py-1.5 pl-[0.8125rem] pr-2.5">
         <Icon name="dollar" size={16} className="text-wp-accent" />
         <div>
-          <div className="font-wp text-[9.5px] font-bold uppercase leading-none tracking-[.06em] text-wp-fg-subtle">
+          <div className="font-wp text-[0.59375rem] font-bold uppercase leading-none tracking-[.06em] text-wp-fg-subtle">
             {t("nav.walletLabel")}
           </div>
           {/* Real StarBank balance. `null` while it loads — never a fake 0, which
               would flash "you are broke" at every player on every page load. */}
-          <div className="wp-num font-wp text-[14.5px] text-wp-fg">
+          <div className="wp-num font-wp text-[0.90625rem] text-wp-fg">
             {balance === null ? "—" : `₽${fmt(balance)}`}
           </div>
         </div>

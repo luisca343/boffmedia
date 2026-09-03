@@ -38,11 +38,11 @@ function StatCard({
       <div className="mb-2 flex items-start justify-between">
         <div>
           <div className="font-gt-display text-base font-bold text-gt-ink-900">{label}</div>
-          <div className="font-gt-mono text-[9.5px] text-gt-ink-400">{sub}</div>
+          <div className="font-gt-mono text-[0.59375rem] text-gt-ink-400">{sub}</div>
         </div>
         <Icon name={icon} size={17} className={t.text} />
       </div>
-      <div className={`font-gt-display text-[30px] font-bold leading-none tabular-nums ${t.text}`}>{value}</div>
+      <div className={`font-gt-display text-[1.875rem] font-bold leading-none tabular-nums ${t.text}`}>{value}</div>
       {pct !== null && (
         <div className="mt-2.5 h-1.5 overflow-hidden rounded-[4px] bg-gt-paper-2">
           <div
@@ -83,11 +83,11 @@ export default function RendimientoPage() {
           title={t("rendimiento.title")}
           sub={t("rendimiento.sub")}
         />
-        <Skeleton className="mb-4 h-[62px]" />
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4">
-          <Skeleton className="h-[112px]" />
-          <Skeleton className="h-[112px]" />
-          <Skeleton className="h-[112px]" />
+        <Skeleton className="mb-4 h-[3.875rem]" />
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(11.875rem,1fr))] gap-4">
+          <Skeleton className="h-[7rem]" />
+          <Skeleton className="h-[7rem]" />
+          <Skeleton className="h-[7rem]" />
         </div>
       </>
     )
@@ -115,7 +115,7 @@ export default function RendimientoPage() {
         statusTone={band.tone}
       />
 
-      <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(190px,1fr))] gap-4">
+      <div className="mb-4 grid grid-cols-[repeat(auto-fit,minmax(11.875rem,1fr))] gap-4">
         <StatCard
           label={t("rendimiento.tps")}
           sub={t("rendimiento.tpsSub")}
@@ -149,7 +149,7 @@ export default function RendimientoPage() {
           </Bar>
           <div className="p-4">
             {hist.length ? (
-              <div className="flex h-[130px] items-end gap-[3px]">
+              <div className="flex h-[8.125rem] items-end gap-[3px]">
                 {hist.map((v, i) => (
                   <div
                     key={i}
@@ -162,11 +162,11 @@ export default function RendimientoPage() {
                 ))}
               </div>
             ) : (
-              <div className="grid h-[130px] place-items-center font-gt-mono text-xs text-gt-ink-400">
+              <div className="grid h-[8.125rem] place-items-center font-gt-mono text-xs text-gt-ink-400">
                 {t("rendimiento.esperandoLectura")}
               </div>
             )}
-            <div className="mt-2 flex justify-between font-gt-mono text-[9.5px] tabular-nums text-gt-ink-400">
+            <div className="mt-2 flex justify-between font-gt-mono text-[0.59375rem] tabular-nums text-gt-ink-400">
               <span>{t("rendimiento.maxTps")}</span>
               <span>{t("rendimiento.ahora", { tps: tpsSafe.toFixed(1) })}</span>
             </div>
@@ -177,7 +177,7 @@ export default function RendimientoPage() {
           <Bar icon="server" dep="hacienda">
             {t("rendimiento.estado")}
           </Bar>
-          <div className="p-[18px]">
+          <div className="p-[1.125rem]">
             <div className="mb-3.5 flex items-center gap-2.5">
               <span className={`h-3 w-3 rounded-full ${TONES[band.tone].dot}`} />
               <span className={`font-gt-display text-lg font-bold ${TONES[band.tone].text}`}>{t(band.labelKey)}</span>
@@ -188,7 +188,7 @@ export default function RendimientoPage() {
               [t("rendimiento.actualizado"), time(new Date())],
             ].map(([k, v]) => (
               <div key={k} className="flex items-center justify-between border-b border-gt-line-soft py-2 last:border-b-0">
-                <span className="font-gt-mono text-[11.5px] text-gt-ink-500">{k}</span>
+                <span className="font-gt-mono text-[0.71875rem] text-gt-ink-500">{k}</span>
                 <span className="font-gt-mono text-xs font-bold tabular-nums text-gt-ink-800">{v}</span>
               </div>
             ))}

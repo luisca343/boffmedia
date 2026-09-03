@@ -27,12 +27,12 @@ export function ServerStatus({ status = "unknown", label, address, className }: 
     <div
       className={cn(
         "flex items-center gap-2 border border-solid border-line border-l-[3px] bg-panel-2 px-2.5 py-2",
-        "font-mono text-[10.5px] uppercase leading-none tracking-[0.06em]",
+        "font-mono text-[0.65625rem] uppercase leading-none tracking-[0.06em]",
         STATE[status],
         className,
       )}
     >
-      <span className="size-[7px] shrink-0 rounded-full bg-current" />
+      <span className="size-[0.4375rem] shrink-0 rounded-full bg-current" />
       <span className="min-w-0 truncate">{label}</span>
       {address != null && (
         <span className="ml-auto min-w-0 truncate normal-case tracking-normal text-txt-dim">{address}</span>

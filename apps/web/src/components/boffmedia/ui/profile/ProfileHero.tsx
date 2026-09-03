@@ -59,9 +59,9 @@ export function ProfileHero({
 }: ProfileHeroProps) {
   const t = useTranslations("common.profile")
   return (
-    <div className={cn("relative mb-[22px] border border-solid border-line bg-panel cut-corner cut-corner-edge", className)}>
+    <div className={cn("relative mb-[1.375rem] border border-solid border-line bg-panel cut-corner cut-corner-edge", className)}>
       {/* cover band */}
-      <div className="relative h-[236px] overflow-hidden bg-panel-2">
+      <div className="relative h-[14.75rem] overflow-hidden bg-panel-2">
         {coverUrl && (
           <ArtImage
             src={coverUrl}
@@ -84,8 +84,8 @@ export function ProfileHero({
         <div className="pointer-events-none absolute inset-0 z-[3] bg-[linear-gradient(180deg,rgba(0,0,0,0.28)_0%,rgba(0,0,0,0)_34%,var(--panel)_98%)]" />
 
         {live && (
-          <span className="absolute left-0 top-4 z-[4] inline-flex items-center gap-2 bg-accent py-[7px] pl-5 pr-3.5 font-mono text-[11px]/none font-bold uppercase tracking-[0.16em] text-accent-ink cut-slant-r [--cut:9px]">
-            <i className="h-[7px] w-[7px] rounded-full bg-accent-ink animate-[bm-pulse_1.6s_ease-in-out_infinite] motion-reduce:animate-none" />
+          <span className="absolute left-0 top-4 z-[4] inline-flex items-center gap-2 bg-accent py-[0.4375rem] pl-5 pr-3.5 font-mono text-[0.6875rem]/none font-bold uppercase tracking-[0.16em] text-accent-ink cut-slant-r [--cut:9px]">
+            <i className="h-[0.4375rem] w-[0.4375rem] rounded-full bg-accent-ink animate-[bm-pulse_1.6s_ease-in-out_infinite] motion-reduce:animate-none" />
             {liveLabel ?? t("live")}
           </span>
         )}
@@ -96,7 +96,7 @@ export function ProfileHero({
             aria-label={coverLabel ?? t("changeCover")}
             title={coverLabel ?? t("changeCover")}
             onClick={onCoverClick}
-            className={cn(CAM_BTN, "absolute right-4 top-4 z-[6] h-[38px] w-[38px]")}
+            className={cn(CAM_BTN, "absolute right-4 top-4 z-[6] h-[2.375rem] w-[2.375rem]")}
           >
             <Icon name="camera" size={18} />
           </button>
@@ -104,10 +104,10 @@ export function ProfileHero({
       </div>
 
       {/* lower-third identity */}
-      <div className="relative z-[4] -mt-[68px] flex items-end gap-[26px] px-[30px] pb-[26px] max-[720px]:flex-wrap max-[720px]:gap-[18px] max-[720px]:px-5 max-[720px]:pb-[22px]">
+      <div className="relative z-[4] -mt-[4.25rem] flex items-end gap-[1.625rem] px-[1.875rem] pb-[1.625rem] max-[720px]:flex-wrap max-[720px]:gap-[1.125rem] max-[720px]:px-5 max-[720px]:pb-[1.375rem]">
         {/* positioning wrapper is NOT clipped, so the camera badge escapes the
             avatar's diagonal cut instead of being sheared off by it */}
-        <div className="relative h-[136px] w-[136px] flex-none">
+        <div className="relative h-[8.5rem] w-[8.5rem] flex-none">
           <div
             className={cn(
               "absolute inset-0 border-4 border-solid border-accent bg-panel-2 cut-seal cut-seal-edge [--cut-w:4px] [--cut-line:var(--accent)] [--cut:16px] shadow-[0_16px_38px_-12px_rgba(255,92,10,0.55)]",
@@ -120,7 +120,7 @@ export function ProfileHero({
               alt={name}
               sizes="136px"
               fallback={
-                <span className="absolute inset-0 grid place-items-center bg-panel-2 font-display text-[52px]/none font-extrabold italic text-accent">
+                <span className="absolute inset-0 grid place-items-center bg-panel-2 font-display text-[3.25rem]/none font-extrabold italic text-accent">
                   {initial}
                 </span>
               }
@@ -139,7 +139,7 @@ export function ProfileHero({
                 e.stopPropagation()
                 onAvatarClick?.()
               }}
-              className={cn(CAM_BTN, "absolute -bottom-1 -right-1 z-[5] h-[34px] w-[34px]")}
+              className={cn(CAM_BTN, "absolute -bottom-1 -right-1 z-[5] h-[2.125rem] w-[2.125rem]")}
             >
               <Icon name="camera" size={16} />
             </button>
@@ -147,16 +147,16 @@ export function ProfileHero({
         </div>
 
         <div className="min-w-0 flex-1 pb-1.5">
-          <div className="flex flex-wrap items-center gap-[14px]">
-            <h2 className="font-display text-[clamp(34px,4vw,46px)]/[0.94] font-extrabold italic uppercase text-txt">{name}</h2>
+          <div className="flex flex-wrap items-center gap-[0.875rem]">
+            <h2 className="font-display text-[clamp(2.125rem,4vw,2.875rem)]/[0.94] font-extrabold italic uppercase text-txt">{name}</h2>
             {statusBadge}
           </div>
-          <div className="mt-2.5 font-mono text-[12px]/none font-medium uppercase tracking-[0.1em] text-txt-muted [&_b]:font-semibold [&_b]:text-txt">
+          <div className="mt-2.5 font-mono text-[0.75rem]/none font-medium uppercase tracking-[0.1em] text-txt-muted [&_b]:font-semibold [&_b]:text-txt">
             {handle}
           </div>
-          {tags && <div className="mt-[15px] flex flex-wrap gap-2">{tags}</div>}
+          {tags && <div className="mt-[0.9375rem] flex flex-wrap gap-2">{tags}</div>}
           {bio && (
-            <p className="mt-3 max-w-[62ch] font-body text-[14px]/[1.55] text-pretty text-txt-muted">
+            <p className="mt-3 max-w-[62ch] font-body text-[0.875rem]/[1.55] text-pretty text-txt-muted">
               {bio}
             </p>
           )}
@@ -166,8 +166,8 @@ export function ProfileHero({
           <div className="flex flex-none self-end border border-solid border-line bg-base max-[720px]:w-full max-[720px]:self-stretch">
             {metrics.map((m, i) => (
               <div key={i} className="border-l border-solid border-line px-6 py-3 text-right first:border-l-0 max-[720px]:flex-1">
-                <div className="font-display text-[30px]/none font-extrabold italic text-accent">{m.v}</div>
-                <span className="mt-[7px] block font-mono text-[9px]/none font-medium uppercase tracking-[0.14em] text-txt-muted">
+                <div className="font-display text-[1.875rem]/none font-extrabold italic text-accent">{m.v}</div>
+                <span className="mt-[0.4375rem] block font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.14em] text-txt-muted">
                   {m.l}
                 </span>
               </div>

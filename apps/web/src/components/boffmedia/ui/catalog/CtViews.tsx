@@ -15,7 +15,7 @@ export function CtRatingBars({ game, height = 66 }: { game: CtGame; height?: num
   const dist = ctRatingDist(game)
   const max = Math.max(1, ...dist.counts)
   return (
-    <div className="flex flex-col gap-[5px]">
+    <div className="flex flex-col gap-[0.3125rem]">
       <div className="flex items-end gap-[3px]" style={{ height }}>
         {dist.counts.map((c, i) => (
           <span key={i} className="relative flex h-full flex-1 items-end border border-solid border-line bg-panel-2" title={dist.buckets[i] + "★ · " + number(c)}>
@@ -39,15 +39,15 @@ export function CtListCard({ list, games, onOpen }: { list: { title: string; des
   const t = useTranslations("common.catalog")
   const stack = games.slice(0, 5)
   return (
-    <article onClick={onOpen} tabIndex={0} role="button" onKeyDown={(e) => e.key === "Enter" && onOpen?.()} className="group flex cursor-pointer gap-[14px] border border-solid border-line bg-panel p-[14px] transition-[border-color] duration-[140ms] hover:border-accent-line">
-      <div className="relative h-[84px] w-[84px] flex-none">
+    <article onClick={onOpen} tabIndex={0} role="button" onKeyDown={(e) => e.key === "Enter" && onOpen?.()} className="group flex cursor-pointer gap-[0.875rem] border border-solid border-line bg-panel p-[0.875rem] transition-[border-color] duration-[140ms] hover:border-accent-line">
+      <div className="relative h-[5.25rem] w-[5.25rem] flex-none">
         {stack.length === 0 ? (
           <span className="grid h-full w-full place-items-center border border-dashed border-line-2 bg-panel-2 text-txt-dim">
             <Icon name="layers" size={22} />
           </span>
         ) : (
           stack.map((g, i) => (
-            <span key={g.id} className="absolute top-0 w-[46px] [box-shadow:0_2px_8px_rgba(0,0,0,0.4)]" style={{ left: i * 9, zIndex: i }}>
+            <span key={g.id} className="absolute top-0 w-[2.875rem] [box-shadow:0_2px_8px_rgba(0,0,0,0.4)]" style={{ left: i * 9, zIndex: i }}>
               <CtCover game={g} xs />
             </span>
           ))
@@ -55,11 +55,11 @@ export function CtListCard({ list, games, onOpen }: { list: { title: string; des
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <h4 className="font-body text-[16px]/[1.15] font-bold text-txt group-hover:text-accent">{list.title}</h4>
-          <span className={cn("border border-solid px-1.5 py-[3px] font-mono text-[9px]/none font-semibold uppercase tracking-[0.1em]", list.system ? "border-line text-txt-muted" : "border-accent-line text-accent")}>{list.system ? t("systemList") : t("yourList")}</span>
+          <h4 className="font-body text-[1rem]/[1.15] font-bold text-txt group-hover:text-accent">{list.title}</h4>
+          <span className={cn("border border-solid px-1.5 py-[3px] font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.1em]", list.system ? "border-line text-txt-muted" : "border-accent-line text-accent")}>{list.system ? t("systemList") : t("yourList")}</span>
         </div>
-        {list.desc && <p className="my-[5px] line-clamp-2 font-body text-[12.5px]/[1.4] font-medium text-txt-muted">{list.desc}</p>}
-        <span className="inline-flex items-center gap-[5px] font-mono text-[11px]/none font-semibold text-txt-dim">
+        {list.desc && <p className="my-[0.3125rem] line-clamp-2 font-body text-[0.78125rem]/[1.4] font-medium text-txt-muted">{list.desc}</p>}
+        <span className="inline-flex items-center gap-[0.3125rem] font-mono text-[0.6875rem]/none font-semibold text-txt-dim">
           <Icon name="gamepad" size={12} />
           {games.length} {t("games", { count: games.length })}
         </span>
@@ -73,10 +73,10 @@ export function CtActivityRow({ item, game, onOpen }: { item: CtActivity; game?:
   const t = useTranslations("common.catalog")
   const verb = item.verb || (item.status ? t(`status.${item.status}.verb`).toLowerCase() : t("defaultVerb"))
   return (
-    <div onClick={() => game && onOpen?.(game)} role={onOpen ? "button" : undefined} tabIndex={onOpen ? 0 : undefined} onKeyDown={(e) => onOpen && e.key === "Enter" && game && onOpen(game)} className="flex cursor-pointer gap-3 border-b border-solid border-line px-1 py-[14px] hover:bg-[color-mix(in_oklch,var(--panel)_60%,transparent)]">
-      <span className="grid h-[34px] w-[34px] flex-none place-items-center border border-solid border-line-2 bg-panel-2 font-mono text-[11px]/none font-bold text-txt-muted">{(item.user || "AX").slice(0, 2).toUpperCase()}</span>
+    <div onClick={() => game && onOpen?.(game)} role={onOpen ? "button" : undefined} tabIndex={onOpen ? 0 : undefined} onKeyDown={(e) => onOpen && e.key === "Enter" && game && onOpen(game)} className="flex cursor-pointer gap-3 border-b border-solid border-line px-1 py-[0.875rem] hover:bg-[color-mix(in_oklch,var(--panel)_60%,transparent)]">
+      <span className="grid h-[2.125rem] w-[2.125rem] flex-none place-items-center border border-solid border-line-2 bg-panel-2 font-mono text-[0.6875rem]/none font-bold text-txt-muted">{(item.user || "AX").slice(0, 2).toUpperCase()}</span>
       <div className="min-w-0 flex-1">
-        <p className="flex flex-wrap items-center gap-1.5 font-body text-[14px]/[1.45] font-medium text-txt-muted [&_b]:font-bold [&_b]:text-txt">
+        <p className="flex flex-wrap items-center gap-1.5 font-body text-[0.875rem]/[1.45] font-medium text-txt-muted [&_b]:font-bold [&_b]:text-txt">
           <b>{item.user || "axelcraft"}</b> {verb}{" "}
           <a
             className="cursor-pointer font-semibold text-txt hover:text-accent"
@@ -89,10 +89,10 @@ export function CtActivityRow({ item, game, onOpen }: { item: CtActivity; game?:
           </a>
           {item.rating ? <CtStars value={item.rating} size={12} /> : null}
         </p>
-        {item.review && <p className="mt-1.5 border-l-2 border-solid border-line-2 pl-2.5 font-body text-[13px]/[1.5] font-medium text-txt-muted">“{item.review}”</p>}
-        <span className="mt-1.5 inline-block font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] text-txt-dim">{item.time || t("justNow")}</span>
+        {item.review && <p className="mt-1.5 border-l-2 border-solid border-line-2 pl-2.5 font-body text-[0.8125rem]/[1.5] font-medium text-txt-muted">“{item.review}”</p>}
+        <span className="mt-1.5 inline-block font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.08em] text-txt-dim">{item.time || t("justNow")}</span>
       </div>
-      {game && <CtCover game={game} xs className="w-[34px] flex-none self-start" />}
+      {game && <CtCover game={game} xs className="w-[2.125rem] flex-none self-start" />}
     </div>
   )
 }

@@ -58,7 +58,7 @@ export default function MensajesPage() {
           <Link
             href="/smartrotom/chatapp"
             aria-label={t("messages.openChatApp")}
-            className="grid h-[34px] w-[34px] place-items-center rounded-full text-rk-accent transition-colors hover:bg-rk-accent/12"
+            className="grid h-[2.125rem] w-[2.125rem] place-items-center rounded-full text-rk-accent transition-colors hover:bg-rk-accent/12"
           >
             <Icon name="compose" size={19} />
           </Link>
@@ -94,16 +94,16 @@ export default function MensajesPage() {
               />
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
-                  <span className="truncate text-[14.5px] font-bold text-rk-fg">
+                  <span className="truncate text-[0.90625rem] font-bold text-rk-fg">
                     {other?.username ?? chat.name}
                   </span>
-                  <span className="ml-auto flex-none text-[12.5px] text-rk-fg-subtle">
+                  <span className="ml-auto flex-none text-[0.78125rem] text-rk-fg-subtle">
                     {relTime(last?.createdAt ?? chat.updatedAt)}
                   </span>
                 </div>
                 <p
                   className={cn(
-                    "mt-0.5 truncate text-[13.5px]",
+                    "mt-0.5 truncate text-[0.84375rem]",
                     unread ? "font-semibold text-rk-fg" : "text-rk-fg-subtle",
                   )}
                 >

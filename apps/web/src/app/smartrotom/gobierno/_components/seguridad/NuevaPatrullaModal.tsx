@@ -78,10 +78,10 @@ export function NuevaPatrullaModal({ open, onClose }: { open: boolean; onClose: 
         <Select label={t("seguridad.estadoInicial")} value={status} onChange={setStatus} options={STATUS_OPTIONS} />
 
         <div>
-          <div className="mb-1.5 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+          <div className="mb-1.5 font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
             {t("seguridad.agentesAsignados")}
           </div>
-          <div className="max-h-[180px] space-y-1.5 overflow-y-auto">
+          <div className="max-h-[11.25rem] space-y-1.5 overflow-y-auto">
             {roster.map((o) => {
               const on = officers.includes(o.uuid)
               return (
@@ -89,12 +89,12 @@ export function NuevaPatrullaModal({ open, onClose }: { open: boolean; onClose: 
                   key={o.uuid}
                   type="button"
                   onClick={() => toggle(o.uuid)}
-                  className={`flex w-full items-center gap-2.5 rounded-gt-sm border px-2.5 py-[7px] text-left transition-colors ${
+                  className={`flex w-full items-center gap-2.5 rounded-gt-sm border px-2.5 py-[0.4375rem] text-left transition-colors ${
                     on ? "border-gt-dep-seguridad/35 bg-gt-dep-seguridad/12" : "border-gt-line bg-gt-paper-0 hover:bg-gt-paper-1"
                   }`}
                 >
                   <Avatar user={o.username} size={26} />
-                  <span className="min-w-0 flex-1 truncate text-[12.5px] font-semibold text-gt-ink-800">{o.username}</span>
+                  <span className="min-w-0 flex-1 truncate text-[0.78125rem] font-semibold text-gt-ink-800">{o.username}</span>
                   <Badge tone="default">{o.rankLabel}</Badge>
                 </button>
               )

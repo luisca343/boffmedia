@@ -64,7 +64,7 @@ export function NewArticleModal({
   return (
     <Modal open={open} onClose={onClose} label={t("label")}>
       <form onSubmit={handleSubmit} className="relative overflow-hidden p-6">
-        <div className="font-ft-ui text-[11px] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
+        <div className="font-ft-ui text-[0.6875rem] font-extrabold uppercase tracking-[0.18em] text-ft-pink">
           {t("eyebrow")}
         </div>
         <h3 className="font-ft-display mt-1 text-4xl leading-none">{t("title")}</h3>

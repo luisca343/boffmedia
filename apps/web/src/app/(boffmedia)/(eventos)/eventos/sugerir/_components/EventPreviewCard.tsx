@@ -19,10 +19,10 @@ export function EventPreviewCard({ data }: { data: SuggestFormData }) {
   return (
     <div className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:14px] border border-solid border-line-2 bg-base p-5 [[data-theme=light]_&]:bg-panel">
       <span className="mono-label">{t("title")}</span>
-      <h3 className="mt-2 font-display text-[22px] font-extrabold italic uppercase leading-[0.95] tracking-[-0.005em] text-txt">
+      <h3 className="mt-2 font-display text-[1.375rem] font-extrabold italic uppercase leading-[0.95] tracking-[-0.005em] text-txt">
         {data.title.trim() || t("untitled")}
       </h3>
-      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-body text-[13px] text-txt-muted">
+      <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5 font-body text-[0.8125rem] text-txt-muted">
         <span className="inline-flex items-center gap-1.5">
           <Icon name="gamepad" size={14} />
           {game}
@@ -39,7 +39,7 @@ export function EventPreviewCard({ data }: { data: SuggestFormData }) {
         )}
       </div>
       {data.description.trim() && (
-        <p className="mt-3 line-clamp-3 font-body text-[14px]/[1.5] text-txt-muted">{data.description.trim()}</p>
+        <p className="mt-3 line-clamp-3 font-body text-[0.875rem]/[1.5] text-txt-muted">{data.description.trim()}</p>
       )}
     </div>
   )

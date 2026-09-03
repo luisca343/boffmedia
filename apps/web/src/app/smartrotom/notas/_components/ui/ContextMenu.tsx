@@ -39,7 +39,7 @@ export function ContextMenu({
     <Portal>
       <ThemedLayer>
       <div
-        className="fixed z-[300] min-w-[190px] animate-in fade-in zoom-in-95 overflow-hidden rounded-nt-md border border-nt-border-2 bg-nt-panel p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,.7)]"
+        className="fixed z-[300] min-w-[11.875rem] animate-in fade-in zoom-in-95 overflow-hidden rounded-nt-md border border-nt-border-2 bg-nt-panel p-1.5 shadow-[0_18px_50px_-12px_rgba(0,0,0,.7)]"
         style={{ left: Math.min(x, (typeof window !== "undefined" ? window.innerWidth : 9999) - 210), top: y }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -53,7 +53,7 @@ export function ContextMenu({
                 it.onClick?.();
                 onClose();
               }}
-              className={`flex w-full items-center gap-2.5 rounded-nt-sm px-2.5 py-2 text-[13px] transition-colors ${
+              className={`flex w-full items-center gap-2.5 rounded-nt-sm px-2.5 py-2 text-[0.8125rem] transition-colors ${
                 it.danger
                   ? "text-nt-c-error hover:bg-nt-c-error/10"
                   : "text-nt-fg-muted hover:bg-nt-hover hover:text-nt-fg"

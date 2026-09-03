@@ -37,7 +37,7 @@ export function Leaf({
       style={chapterVars(accent)}
       className={cn(
         "ps-paper-surface relative w-full overflow-hidden rounded-[6px] border border-ps-ink/22",
-        "px-[26px] py-[22px] font-ps text-ps-ink shadow-[0_10px_30px_rgba(0,0,0,.45)]",
+        "px-[1.625rem] py-[1.375rem] font-ps text-ps-ink shadow-[0_10px_30px_rgba(0,0,0,.45)]",
         className,
       )}
     >

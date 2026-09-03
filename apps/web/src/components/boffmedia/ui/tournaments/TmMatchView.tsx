@@ -54,8 +54,8 @@ function copyText(text: string, msg: string) {
 }
 
 export const TM_CARD = "border border-solid border-line bg-panel cut-corner cut-corner-edge [--cut-lg:14px]"
-export const TM_CARD_HEAD = "flex items-center justify-between gap-3 border-b border-solid border-line bg-panel-2 px-4 py-[13px]"
-export const TM_CARD_H3 = "m-0 font-mono text-[13px]/none font-bold uppercase tracking-[0.12em] text-txt"
+export const TM_CARD_HEAD = "flex items-center justify-between gap-3 border-b border-solid border-line bg-panel-2 px-4 py-[0.8125rem]"
+export const TM_CARD_H3 = "m-0 font-mono text-[0.8125rem]/none font-bold uppercase tracking-[0.12em] text-txt"
 const CARD = TM_CARD
 const CARD_HEAD = TM_CARD_HEAD
 const CARD_H3 = TM_CARD_H3
@@ -64,15 +64,15 @@ const GHUE_BORDER = "border-l-[3px] border-l-[hsl(var(--ghue,28)_60%_50%)]"
 export function TmRoundHeader({ comp, roundNo, tableNo, status, bestOf = 3, scheduledAt }: { comp: TmComp; roundNo: React.ReactNode; tableNo: React.ReactNode; status?: string; bestOf?: number; scheduledAt?: string | null }) {
   const t = useTranslations("common.tournaments")
   const { intlLocale } = useFormat()
-  const chip = "inline-flex items-center gap-1.5 border border-solid border-line-2 px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-txt-muted [&_svg]:text-txt-dim"
+  const chip = "inline-flex items-center gap-1.5 border border-solid border-line-2 px-[0.5625rem] py-[0.3125rem] font-mono text-[0.6875rem]/none font-semibold text-txt-muted [&_svg]:text-txt-dim"
   return (
-    <div className={cn("flex flex-wrap items-center justify-between gap-3.5 border border-solid border-line bg-panel px-[18px] py-[15px] cut-corner cut-corner-edge [--cut-lg:14px]", GHUE_BORDER)}>
+    <div className={cn("flex flex-wrap items-center justify-between gap-3.5 border border-solid border-line bg-panel px-[1.125rem] py-[0.9375rem] cut-corner cut-corner-edge [--cut-lg:14px]", GHUE_BORDER)}>
       <div>
-        <span className="mb-[9px] block font-display text-[20px]/[1.05] font-extrabold uppercase tracking-[0.02em]">{comp.title}</span>
+        <span className="mb-[0.5625rem] block font-display text-[1.25rem]/[1.05] font-extrabold uppercase tracking-[0.02em]">{comp.title}</span>
         <div className="flex flex-wrap gap-2">
           <span className={chip}><Icon name="list" size={12} />{t("round")} {roundNo}</span>
           <span className={chip}><Icon name="grid" size={12} />{t("table")} {tableNo}</span>
-          <span className="inline-flex items-center gap-1.5 border border-solid border-[hsl(var(--ghue,28)_60%_50%_/_0.4)] px-[9px] py-[5px] font-mono text-[11px]/none font-semibold text-[hsl(var(--ghue,28)_65%_62%)] [&_svg]:text-[hsl(var(--ghue,28)_65%_62%)]"><Icon name="trophy" size={12} />{t("bestOf", { count: bestOf })}</span>
+          <span className="inline-flex items-center gap-1.5 border border-solid border-[hsl(var(--ghue,28)_60%_50%_/_0.4)] px-[0.5625rem] py-[0.3125rem] font-mono text-[0.6875rem]/none font-semibold text-[hsl(var(--ghue,28)_65%_62%)] [&_svg]:text-[hsl(var(--ghue,28)_65%_62%)]"><Icon name="trophy" size={12} />{t("bestOf", { count: bestOf })}</span>
           {scheduledAt && (
             <span className={chip}>
               <Icon name="clock" size={12} />
@@ -99,19 +99,19 @@ export function TmOpponentCard({ opp, onChat, onTeam }: { opp: TmPlayer; onChat?
           <DkFlag flag={opp.flag} code={opp.country} name={opp.countryName} size={22} />
           <div className="grid min-w-0 gap-1">
             <div className="flex items-center gap-2">
-              <b className="font-display text-[22px]/none font-extrabold tracking-[0.01em]">{opp.name}</b>
+              <b className="font-display text-[1.375rem]/none font-extrabold tracking-[0.01em]">{opp.name}</b>
               <button type="button" className={iconBtn} title={t("chatTableLink")} onClick={onChat}><Icon name="message" size={15} /></button>
               <button type="button" className={iconBtn} title={t("viewTeamSheet")} onClick={onTeam}><Icon name="list" size={15} /></button>
             </div>
-            <span className="font-mono text-[12px]/[1.3] font-medium text-txt-muted">{pts} pts · récord {rec} · {opp.countryName}</span>
+            <span className="font-mono text-[0.75rem]/[1.3] font-medium text-txt-muted">{pts} pts · récord {rec} · {opp.countryName}</span>
           </div>
         </div>
         <div className="grid grid-cols-[auto_auto] items-center gap-x-3 gap-y-1.5">
-          <span className="col-start-1 font-mono text-[9.5px]/none font-bold uppercase tracking-[0.14em] text-txt-dim">{t("inGameName")}</span>
-          <button type="button" className="col-start-2 inline-flex cursor-pointer items-center gap-1.5 justify-self-start border-0 bg-transparent p-0 font-mono text-[10px]/none font-semibold text-info hover:text-accent-bright" onClick={() => copyText(opp.tag || "", t("nameCopied", { name: opp.tag || "" }))}>
+          <span className="col-start-1 font-mono text-[0.59375rem]/none font-bold uppercase tracking-[0.14em] text-txt-dim">{t("inGameName")}</span>
+          <button type="button" className="col-start-2 inline-flex cursor-pointer items-center gap-1.5 justify-self-start border-0 bg-transparent p-0 font-mono text-[0.625rem]/none font-semibold text-info hover:text-accent-bright" onClick={() => copyText(opp.tag || "", t("nameCopied", { name: opp.tag || "" }))}>
             <Icon name="copy" size={12} />{t("copyName")}
           </button>
-          <b className="col-span-2 font-display text-[24px]/none font-extrabold tracking-[0.01em] text-txt">{opp.tag}</b>
+          <b className="col-span-2 font-display text-[1.5rem]/none font-extrabold tracking-[0.01em] text-txt">{opp.tag}</b>
         </div>
       </div>
     </section>
@@ -178,9 +178,9 @@ export function TmReportPanel({ opp, initialScenario, onSystem }: { me?: TmPlaye
 
   const locked = phase !== "edit"
   const shown = phase === "incoming" ? incomingGames : games
-  const pill = "inline-flex items-center gap-1.5 border border-solid px-[9px] py-[5px] font-mono text-[10px]/none font-bold uppercase tracking-[0.06em]"
-  const gbtn = "flex-1 cursor-pointer border border-solid border-line-2 bg-base px-2 py-[11px] font-body text-[13px]/none font-semibold text-txt-muted transition-colors enabled:hover:border-txt-muted enabled:hover:text-txt disabled:cursor-default"
-  const banner = "m-4 flex items-center gap-[11px] p-[14px] font-body text-[13px]/[1.45] [&>b]:font-bold"
+  const pill = "inline-flex items-center gap-1.5 border border-solid px-[0.5625rem] py-[0.3125rem] font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.06em]"
+  const gbtn = "flex-1 cursor-pointer border border-solid border-line-2 bg-base px-2 py-[0.6875rem] font-body text-[0.8125rem]/none font-semibold text-txt-muted transition-colors enabled:hover:border-txt-muted enabled:hover:text-txt disabled:cursor-default"
+  const banner = "m-4 flex items-center gap-[0.6875rem] p-[0.875rem] font-body text-[0.8125rem]/[1.45] [&>b]:font-bold"
 
   return (
     <section className={CARD}>
@@ -201,9 +201,9 @@ export function TmReportPanel({ opp, initialScenario, onSystem }: { me?: TmPlaye
 
       <div className={cn("grid gap-2.5 p-4", locked && "[&_button:not(.on)]:opacity-40")}>
         {[0, 1, 2].map((i) => (
-          <div key={i} className="grid grid-cols-[90px_1fr] items-center gap-4 max-[760px]:grid-cols-[70px_1fr]">
-            <span className="text-right font-mono text-[12px]/none font-bold uppercase tracking-[0.06em] text-txt-muted">{t("game")} {i + 1}</span>
-            <div className="flex max-w-[300px] gap-2.5">
+          <div key={i} className="grid grid-cols-[5.625rem_1fr] items-center gap-4 max-[760px]:grid-cols-[4.375rem_1fr]">
+            <span className="text-right font-mono text-[0.75rem]/none font-bold uppercase tracking-[0.06em] text-txt-muted">{t("game")} {i + 1}</span>
+            <div className="flex max-w-[18.75rem] gap-2.5">
               <button type="button" disabled={locked} onClick={() => setGame(i, "W")} className={cn(gbtn, shown[i] === "W" && "on border-ok bg-ok-soft text-ok")}>{t("victory")}</button>
               <button type="button" disabled={locked} onClick={() => setGame(i, "L")} className={cn(gbtn, shown[i] === "L" && "on border-bad bg-bad-soft text-bad")}>{t("defeat")}</button>
             </div>
@@ -213,25 +213,25 @@ export function TmReportPanel({ opp, initialScenario, onSystem }: { me?: TmPlaye
 
       {phase === "edit" && (
         <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line bg-base px-4 py-3.5">
-          <span className={cn("font-body text-[14px]/[1.3]", decisive ? "font-bold text-txt" : "text-txt-dim")}>{decisive ? resultText : t("markEachGameResult")}</span>
+          <span className={cn("font-body text-[0.875rem]/[1.3]", decisive ? "font-bold text-txt" : "text-txt-dim")}>{decisive ? resultText : t("markEachGameResult")}</span>
           <Button variant="pri" size="sm" icon="check" disabled={!decisive} onClick={submit}>{t("submitReport")}</Button>
         </div>
       )}
 
       {phase === "awaiting" && (
-        <div className="grid gap-[9px] border-t border-solid border-line bg-base px-4 py-3.5">
+        <div className="grid gap-[0.5625rem] border-t border-solid border-line bg-base px-4 py-3.5">
           <div className="flex flex-wrap items-center justify-between gap-3.5">
-            <span className="font-body text-[14px]/[1.3] font-bold text-txt">{resultText}</span>
-            <span className="inline-flex items-center gap-1.5 font-mono text-[12px]/none text-warn"><Icon name="clock" size={12} />{t("autoVerificationCountdown")} <b className="font-bold">{fmtMMSS(countdown)}</b></span>
+            <span className="font-body text-[0.875rem]/[1.3] font-bold text-txt">{resultText}</span>
+            <span className="inline-flex items-center gap-1.5 font-mono text-[0.75rem]/none text-warn"><Icon name="clock" size={12} />{t("autoVerificationCountdown")} <b className="font-bold">{fmtMMSS(countdown)}</b></span>
           </div>
           <div className="h-1 overflow-hidden bg-line"><i className="block h-full bg-warn transition-[width] duration-1000 ease-linear" style={{ width: (countdown / AUTO_VERIFY_SECONDS) * 100 + "%" }} /></div>
-          <p className="m-0 max-w-[68ch] font-body text-[11.5px]/[1.5] text-txt-muted">{t("reportAppearsInstantly", { name: opp.name })}</p>
+          <p className="m-0 max-w-[68ch] font-body text-[0.71875rem]/[1.5] text-txt-muted">{t("reportAppearsInstantly", { name: opp.name })}</p>
         </div>
       )}
 
       {phase === "incoming" && (
         <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line bg-base px-4 py-3.5">
-          <span className="font-body text-[14px]/[1.3] font-bold text-txt">{t("accordingTo", { name: opp.name, losses: incomingGames.filter((g) => g === "L").length, wins: incomingGames.filter((g) => g === "W").length })}</span>
+          <span className="font-body text-[0.875rem]/[1.3] font-bold text-txt">{t("accordingTo", { name: opp.name, losses: incomingGames.filter((g) => g === "L").length, wins: incomingGames.filter((g) => g === "W").length })}</span>
           <span className="inline-flex gap-2.5">
             <Button variant="ghost" size="sm" icon="alert" onClick={() => verifyIncoming(false)}>{t("dispute")}</Button>
             <Button variant="pri" size="sm" icon="check" onClick={() => verifyIncoming(true)}>{t("verify")}</Button>
@@ -303,12 +303,12 @@ function TmMatchChat({ me, opp, feed }: { me: TmPlayer; opp: TmPlayer; feed: str
           {judge ? t("judgeNotified") : t("requestJudge")}
         </Button>
       </div>
-      <div ref={bodyRef} className="flex h-[320px] flex-col gap-2.5 overflow-y-auto bg-base p-4">
+      <div ref={bodyRef} className="flex h-[20rem] flex-col gap-2.5 overflow-y-auto bg-base p-4">
         {msgs.map((m, i) => {
           if (m.k === "sys")
             return (
-              <div key={i} className="mx-auto inline-flex max-w-[82%] items-center gap-2 border border-solid border-[color:color-mix(in_srgb,var(--info)_25%,transparent)] bg-info-soft px-3 py-1.5 text-center font-body text-[11.5px]/[1.3] font-medium text-txt-muted">
-                <span className="font-mono text-[10px]/none font-semibold text-info">{m.t}</span>
+              <div key={i} className="mx-auto inline-flex max-w-[82%] items-center gap-2 border border-solid border-[color:color-mix(in_srgb,var(--info)_25%,transparent)] bg-info-soft px-3 py-1.5 text-center font-body text-[0.71875rem]/[1.3] font-medium text-txt-muted">
+                <span className="font-mono text-[0.625rem]/none font-semibold text-info">{m.t}</span>
                 {m.text}
               </div>
             )
@@ -317,10 +317,10 @@ function TmMatchChat({ me, opp, feed }: { me: TmPlayer; opp: TmPlayer; feed: str
             <div key={i} className={cn("flex max-w-[82%]", m.k === "me" ? "self-end" : "self-start")}>
               <div className={cn("grid gap-[3px] border border-solid px-3 py-2", m.k === "me" ? "border-accent-line bg-accent-soft" : m.k === "judge" ? "border-[color:color-mix(in_srgb,var(--warn)_35%,transparent)] bg-warn-soft" : "border-line bg-panel-2")}>
                 <div className="flex items-baseline gap-2">
-                  <b className={cn("font-mono text-[11px]/none font-bold", m.k === "me" ? "text-accent-bright" : m.k === "judge" ? "text-warn" : "text-txt")}>{who}</b>
-                  <i className="font-mono text-[10px]/none not-italic text-txt-dim">{m.t}</i>
+                  <b className={cn("font-mono text-[0.6875rem]/none font-bold", m.k === "me" ? "text-accent-bright" : m.k === "judge" ? "text-warn" : "text-txt")}>{who}</b>
+                  <i className="font-mono text-[0.625rem]/none not-italic text-txt-dim">{m.t}</i>
                 </div>
-                <p className="m-0 break-words font-body text-[13.5px]/[1.45] text-txt">{m.text}</p>
+                <p className="m-0 break-words font-body text-[0.84375rem]/[1.45] text-txt">{m.text}</p>
               </div>
             </div>
           )
@@ -345,21 +345,21 @@ export function TmMonCard({ mon }: { mon: TmMon }) {
   const t = useTranslations("common.tournaments")
   return (
     <div className="grid border border-solid border-line bg-base">
-      <div className="flex items-center gap-[9px] border-b border-solid border-[hsl(var(--ghue,28)_55%_46%_/_0.32)] bg-[hsl(var(--ghue,28)_55%_46%_/_0.16)] px-[11px] py-2">
+      <div className="flex items-center gap-[0.5625rem] border-b border-solid border-[hsl(var(--ghue,28)_55%_46%_/_0.32)] bg-[hsl(var(--ghue,28)_55%_46%_/_0.16)] px-[0.6875rem] py-2">
         <DkSprite alt={mon.name} size={40} />
-        <b className="min-w-0 flex-1 truncate font-display text-[14px]/[1.05] font-bold tracking-[0.01em]">{mon.name}</b>
+        <b className="min-w-0 flex-1 truncate font-display text-[0.875rem]/[1.05] font-bold tracking-[0.01em]">{mon.name}</b>
         <span className="inline-flex items-center gap-1.5">
-          <i className="font-mono text-[8.5px]/none font-semibold uppercase not-italic tracking-[0.08em] text-txt-dim">Tera</i>
+          <i className="font-mono text-[0.53125rem]/none font-semibold uppercase not-italic tracking-[0.08em] text-txt-dim">Tera</i>
           <DkType type={mon.tera} small />
         </span>
       </div>
       <div className="grid gap-1.5 border-b border-solid border-line px-3 py-2.5">
-        <span className="grid grid-cols-[68px_1fr] gap-2 font-body text-[12px]/[1.3] text-txt"><i className="self-center font-mono text-[8.5px]/[1.4] font-semibold uppercase not-italic tracking-[0.08em] text-txt-dim">{t("item")}</i>{mon.item}</span>
-        <span className="grid grid-cols-[68px_1fr] gap-2 font-body text-[12px]/[1.3] text-txt"><i className="self-center font-mono text-[8.5px]/[1.4] font-semibold uppercase not-italic tracking-[0.08em] text-txt-dim">{t("ability")}</i>{abilityOf(mon)}</span>
+        <span className="grid grid-cols-[4.25rem_1fr] gap-2 font-body text-[0.75rem]/[1.3] text-txt"><i className="self-center font-mono text-[0.53125rem]/[1.4] font-semibold uppercase not-italic tracking-[0.08em] text-txt-dim">{t("item")}</i>{mon.item}</span>
+        <span className="grid grid-cols-[4.25rem_1fr] gap-2 font-body text-[0.75rem]/[1.3] text-txt"><i className="self-center font-mono text-[0.53125rem]/[1.4] font-semibold uppercase not-italic tracking-[0.08em] text-txt-dim">{t("ability")}</i>{abilityOf(mon)}</span>
       </div>
       <ul className="m-0 grid list-none gap-1.5 p-3">
         {mon.moves.map((mv) => (
-          <li key={mv} className="flex items-center gap-2 font-body text-[12.5px]/[1.2] font-medium text-txt-muted">
+          <li key={mv} className="flex items-center gap-2 font-body text-[0.78125rem]/[1.2] font-medium text-txt-muted">
             <span className="h-1 w-1 flex-none rotate-45 bg-[hsl(var(--ghue,28)_60%_55%)]" />
             {mv}
           </li>
@@ -386,7 +386,7 @@ export function TmTeamsheet({ opp, onCalc }: { opp: TmPlayer; onCalc?: () => voi
       <div className="grid grid-cols-3 gap-2.5 p-4 max-[760px]:grid-cols-2 max-[520px]:grid-cols-1">
         {team.map((m) => <TmMonCard key={m.slot != null ? m.slot : m.id || m.name} mon={m} />)}
       </div>
-      <p className="m-0 flex items-center gap-2 px-4 pb-4 font-body text-[11.5px]/[1.5] text-txt-muted [&_svg]:flex-none [&_svg]:text-txt-dim">
+      <p className="m-0 flex items-center gap-2 px-4 pb-4 font-body text-[0.71875rem]/[1.5] text-txt-muted [&_svg]:flex-none [&_svg]:text-txt-dim">
         <Icon name="info" size={12} />{tTeamsheet("viewerHint")}
       </p>
     </section>
@@ -403,7 +403,7 @@ export function TmMatchView({ comp, me, opp, roundNo, tableNo, status, scenario,
     if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: "smooth" })
   }
   return (
-    <div className={cn("grid max-w-[940px] gap-3.5", standalone && "mx-auto")}>
+    <div className={cn("grid max-w-[58.75rem] gap-3.5", standalone && "mx-auto")}>
       <TmRoundHeader comp={comp} roundNo={roundNo} tableNo={tableNo} status={status} />
       <TmOpponentCard opp={opp} onChat={() => scrollTo(chatRef)} onTeam={() => scrollTo(teamRef)} />
       <TmReportPanel me={me} opp={opp} initialScenario={scenario} onSystem={pushSystem} />

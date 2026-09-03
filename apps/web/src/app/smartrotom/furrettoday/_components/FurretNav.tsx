@@ -39,7 +39,7 @@ export function FurretNav() {
 
   return (
     <header className="border-ft sticky top-0 z-40 border-x-0 border-t-0 border-b-ft-ink bg-ft-paper">
-      <div className="mx-auto flex max-w-[1400px] flex-wrap items-center gap-4 px-6 py-3.5">
+      <div className="mx-auto flex max-w-[87.5rem] flex-wrap items-center gap-4 px-6 py-3.5">
         <Link
           href={BASE}
           className="font-ft-display flex shrink-0 items-center gap-2.5 whitespace-nowrap"
@@ -68,7 +68,7 @@ export function FurretNav() {
                 aria-current={active ? "page" : undefined}
                 className={[
                   "font-ft-ui rounded-ft-pill px-3.5 py-2.5",
-                  "text-[11px] font-extrabold uppercase tracking-[0.18em]",
+                  "text-[0.6875rem] font-extrabold uppercase tracking-[0.18em]",
                   active
                     ? "bg-ft-ink text-ft-yellow"
                     : "text-ft-ink hover:bg-ft-ink/5",
@@ -88,7 +88,7 @@ export function FurretNav() {
               }}
               placeholder={t("searchPlaceholder")}
               aria-label={t("search")}
-              className="w-[220px]"
+              className="w-[13.75rem]"
             />
             <Button variant="primary" size="sm" onClick={search}>
               {t("search")}
@@ -99,7 +99,7 @@ export function FurretNav() {
 
       {categories.length > 0 ? (
         <div className="border-t-ft-hair border-dashed border-ft-ink bg-ft-paper-2">
-          <div className="ft-scroll mx-auto flex max-w-[1400px] gap-2 overflow-x-auto px-6 py-3">
+          <div className="ft-scroll mx-auto flex max-w-[87.5rem] gap-2 overflow-x-auto px-6 py-3">
             {categories.map((c) => (
               <Chip
                 key={c.id}

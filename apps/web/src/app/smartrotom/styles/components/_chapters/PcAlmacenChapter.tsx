@@ -78,7 +78,7 @@ export function PcAlmacenChapter() {
               <span className="absolute right-[3px] top-[3px]">
                 <Icon name="venus" size={13} className="text-[#ff7eb6]" />
               </span>
-              <span className="absolute bottom-[3px] left-[3px] h-[7px] w-[7px] rounded-pc-pill bg-pc-amber shadow-[0_0_0_2px_rgb(7_11_22_/_.6)]" />
+              <span className="absolute bottom-[3px] left-[3px] h-[0.4375rem] w-[0.4375rem] rounded-pc-pill bg-pc-amber shadow-[0_0_0_2px_rgb(7_11_22_/_.6)]" />
               <span className="absolute bottom-[3px] right-[3px]">
                 <Icon name="heart" size={12} fill="rgb(var(--pc-rose))" className="text-pc-rose" />
               </span>
@@ -104,10 +104,10 @@ export function PcAlmacenChapter() {
             <div className="relative p-4">
               <div className="mb-3 flex items-center gap-2">
                 <Icon name="box" size={16} className="text-pc-accent" />
-                <span className="font-pc-display text-[15px] font-bold">Océano</span>
-                <span className="ml-auto font-pc-mono text-[11.5px] text-pc-fg-subtle">12/30</span>
+                <span className="font-pc-display text-[0.9375rem] font-bold">Océano</span>
+                <span className="ml-auto font-pc-mono text-[0.71875rem] text-pc-fg-subtle">12/30</span>
               </div>
-              <div className="grid grid-cols-6 gap-[clamp(6px,0.7vw,11px)]">
+              <div className="grid grid-cols-6 gap-[clamp(0.375rem,0.7vw,0.6875rem)]">
                 {Array.from({ length: 30 }, (_, i) => {
                   const dex = i < DEMO.length ? DEMO[i] : undefined
                   return <Slot key={i} dex={dex} state={dex ? "" : "pc-slot-empty"} />

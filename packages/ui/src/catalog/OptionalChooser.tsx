@@ -134,7 +134,7 @@ export function OptionalChooser({
           ? // `auto-fit` rather than a column count, and `items-start` so a
             // two-feature group does not stretch to match a ten-feature one
             // sitting next to it — the gap would then read as a missing card.
-            "grid items-start gap-7 [grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr))]"
+            "grid items-start gap-7 [grid-template-columns:repeat(auto-fit,minmax(min(22.5rem,100%),1fr))]"
           : "flex flex-col gap-7",
         className,
       )}
@@ -218,7 +218,7 @@ function GroupBlock({
         <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
           <h3
             id={groupId}
-            className="min-w-0 flex-1 font-display text-[16px] font-extrabold italic uppercase leading-none tracking-[0.02em] text-txt"
+            className="min-w-0 flex-1 font-display text-[1rem] font-extrabold italic uppercase leading-none tracking-[0.02em] text-txt"
           >
             {group.name}
           </h3>
@@ -227,7 +227,7 @@ function GroupBlock({
               eleven cards. Exclusive groups say nothing — "1 / 3" is the rule
               restated, not information. */}
           {!exclusive && total > 1 && (
-            <span className="shrink-0 border border-solid border-line bg-panel px-1.5 py-[2px] font-mono text-[10.5px] tabular-nums tracking-[0.08em] text-txt-muted">
+            <span className="shrink-0 border border-solid border-line bg-panel px-1.5 py-[2px] font-mono text-[0.65625rem] tabular-nums tracking-[0.08em] text-txt-muted">
               {t("optionalGroupCount", { on, total })}
             </span>
           )}
@@ -249,7 +249,7 @@ function GroupBlock({
         {/* The rule ("pick one") is always stated, in the calm voice of a
             caption; the author's description, when there is one, sits with it
             as the sentence the rule applies to. */}
-        <p className="text-[12.5px] leading-[1.45] text-txt-muted">
+        <p className="text-[0.78125rem] leading-[1.45] text-txt-muted">
           {group.description ? (
             <>
               {group.description}
@@ -306,8 +306,8 @@ function BulkButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "border border-solid border-line px-[7px] py-[3px]",
-        "font-mono text-[10px] uppercase tracking-[0.08em] transition-colors duration-[140ms]",
+        "border border-solid border-line px-[0.4375rem] py-[3px]",
+        "font-mono text-[0.625rem] uppercase tracking-[0.08em] transition-colors duration-[140ms]",
         disabled
           ? "cursor-default text-txt-muted opacity-50"
           : "cursor-pointer text-txt-muted hover:border-accent-line hover:text-txt",
@@ -392,7 +392,7 @@ function FeatureCard({
   }
   if (consequence?.libraries?.length) {
     chips.push(
-      <span key="libs" className="font-mono text-[10.5px] tracking-[0.06em] text-txt-dim">
+      <span key="libs" className="font-mono text-[0.65625rem] tracking-[0.06em] text-txt-dim">
         {t("optionalUsesLibrary", { names: consequence.libraries.join(", ") })}
       </span>,
     );
@@ -406,7 +406,7 @@ function FeatureCard({
 
       <span className="flex min-w-0 flex-1 flex-col text-left">
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
-          <span className="min-w-0 font-display text-[14px] font-bold not-italic uppercase leading-tight tracking-[0.05em] text-txt">
+          <span className="min-w-0 font-display text-[0.875rem] font-bold not-italic uppercase leading-tight tracking-[0.05em] text-txt">
             {feature.name}
           </span>
           {feature.default && (
@@ -441,7 +441,7 @@ function FeatureCard({
         </span>
 
         {feature.description && (
-          <span className="mt-1 block text-[12.5px] leading-[1.45] text-txt-muted">
+          <span className="mt-1 block text-[0.78125rem] leading-[1.45] text-txt-muted">
             {feature.description}
           </span>
         )}
@@ -452,7 +452,7 @@ function FeatureCard({
       </span>
 
       {size && (
-        <span className="shrink-0 self-start font-mono text-[11px] tabular-nums tracking-[0.04em] text-txt-dim">
+        <span className="shrink-0 self-start font-mono text-[0.6875rem] tabular-nums tracking-[0.04em] text-txt-dim">
           {size}
         </span>
       )}
@@ -533,21 +533,21 @@ function FeatureCard({
 function Indicator({ on, exclusive, busy }: { on: boolean; exclusive: boolean; busy: boolean }) {
   if (busy) {
     return (
-      <span aria-hidden className="grid size-[22px] shrink-0 place-items-center self-start text-accent">
+      <span aria-hidden className="grid size-[1.375rem] shrink-0 place-items-center self-start text-accent">
         <Spinner size={14} />
       </span>
     );
   }
   if (exclusive) {
     return (
-      <span aria-hidden className="grid size-[22px] shrink-0 place-items-center self-start">
+      <span aria-hidden className="grid size-[1.375rem] shrink-0 place-items-center self-start">
         <span
           className={cn(
-            "grid size-[16px] rotate-45 place-items-center border border-solid transition-[border-color,background] duration-[140ms]",
+            "grid size-[1rem] rotate-45 place-items-center border border-solid transition-[border-color,background] duration-[140ms]",
             on ? "border-accent bg-accent" : "border-line-2 bg-panel-2",
           )}
         >
-          <span className={cn("size-[6px]", on ? "bg-accent-ink" : "bg-transparent")} />
+          <span className={cn("size-[0.375rem]", on ? "bg-accent-ink" : "bg-transparent")} />
         </span>
       </span>
     );
@@ -556,7 +556,7 @@ function Indicator({ on, exclusive, busy }: { on: boolean; exclusive: boolean; b
     <span
       aria-hidden
       className={cn(
-        "grid size-[22px] shrink-0 place-items-center self-start border border-solid transition-[border-color,background] duration-[140ms]",
+        "grid size-[1.375rem] shrink-0 place-items-center self-start border border-solid transition-[border-color,background] duration-[140ms]",
         on ? "border-accent bg-accent text-accent-ink" : "border-line-2 bg-panel-2 text-transparent",
       )}
     >

@@ -17,7 +17,7 @@ export function Eyebrow({
   return (
     <div
       className={cn(
-        "flex shrink-0 items-center gap-1.5 text-[11.5px] font-extrabold uppercase tracking-[0.6px] text-tx-txt-3",
+        "flex shrink-0 items-center gap-1.5 text-[0.71875rem] font-extrabold uppercase tracking-[0.6px] text-tx-txt-3",
         className,
       )}
     >
@@ -71,7 +71,7 @@ export function Stat({
     <div className="rounded-tx-md bg-tx-surface border border-solid border-tx-line px-2 py-2.5 text-center">
       <div
         className={cn(
-          "mb-[5px] flex items-center justify-center gap-1 text-[10px] font-extrabold uppercase tracking-[0.3px]",
+          "mb-[0.3125rem] flex items-center justify-center gap-1 text-[0.625rem] font-extrabold uppercase tracking-[0.3px]",
           tone === "money" ? "text-tx-money" : "text-tx-txt-3",
         )}
       >
@@ -100,15 +100,15 @@ export function StatBox({
   money?: boolean
 }) {
   return (
-    <div className="rounded-tx-md bg-tx-surface border border-solid border-tx-line p-[13px]">
-      <div className="mb-[9px] grid h-[30px] w-[30px] place-items-center rounded-[9px] bg-tx-surface-2 text-tx-blue-400">
+    <div className="rounded-tx-md bg-tx-surface border border-solid border-tx-line p-[0.8125rem]">
+      <div className="mb-[0.5625rem] grid h-[1.875rem] w-[1.875rem] place-items-center rounded-[9px] bg-tx-surface-2 text-tx-blue-400">
         <Icon name={icon} size={16} stroke={2.2} />
       </div>
-      <div className={cn("font-tx-mono text-[21px] font-extrabold", money ? "text-tx-money" : "text-tx-txt")}>
+      <div className={cn("font-tx-mono text-[1.3125rem] font-extrabold", money ? "text-tx-money" : "text-tx-txt")}>
         {value}
         {suffix && <small className="text-xs font-bold text-tx-txt-3">{suffix}</small>}
       </div>
-      <div className="mt-0.5 text-[11.5px] text-tx-txt-2">{label}</div>
+      <div className="mt-0.5 text-[0.71875rem] text-tx-txt-2">{label}</div>
     </div>
   )
 }
@@ -116,7 +116,7 @@ export function StatBox({
 /** A determinate bar. Blue→amber, the same direction of travel as everything else. */
 export function ProgressBar({ pct, className }: { pct: number; className?: string }) {
   return (
-    <div className={cn("h-[5px] overflow-hidden rounded-[3px] bg-tx-surface-2", className)}>
+    <div className={cn("h-[0.3125rem] overflow-hidden rounded-[3px] bg-tx-surface-2", className)}>
       <span
         className="block h-full rounded-[3px] bg-gradient-to-r from-tx-blue-500 to-tx-accent"
         style={{ width: `${Math.max(0, Math.min(100, pct))}%` }}

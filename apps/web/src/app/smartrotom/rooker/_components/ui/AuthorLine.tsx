@@ -25,20 +25,20 @@ export function AuthorLine({ author, createdAt, compact = false, className }: Au
   const name = author.displayName || author.username
 
   return (
-    <div className={cn("flex min-w-0 flex-wrap items-center gap-x-[5px] gap-y-0", className)}>
+    <div className={cn("flex min-w-0 flex-wrap items-center gap-x-[0.3125rem] gap-y-0", className)}>
       {author.handle ? (
         <Link
           href={`/smartrotom/rooker/${author.handle}`}
           onClick={(e) => e.stopPropagation()}
           className={cn(
             "whitespace-nowrap font-bold text-rk-fg hover:underline",
-            compact ? "text-[14px]" : "text-[15px]",
+            compact ? "text-[0.875rem]" : "text-[0.9375rem]",
           )}
         >
           {name}
         </Link>
       ) : (
-        <span className={cn("whitespace-nowrap font-bold text-rk-fg", compact ? "text-[14px]" : "text-[15px]")}>
+        <span className={cn("whitespace-nowrap font-bold text-rk-fg", compact ? "text-[0.875rem]" : "text-[0.9375rem]")}>
           {name}
         </span>
       )}
@@ -47,17 +47,17 @@ export function AuthorLine({ author, createdAt, compact = false, className }: Au
 
       {author.handle && (
         <span
-          className={cn("whitespace-nowrap text-rk-fg-subtle", compact ? "text-[13px]" : "text-[14px]")}
+          className={cn("whitespace-nowrap text-rk-fg-subtle", compact ? "text-[0.8125rem]" : "text-[0.875rem]")}
         >
           @{author.handle}
         </span>
       )}
-      <span className="text-[13px] text-rk-fg-subtle" aria-hidden="true">
+      <span className="text-[0.8125rem] text-rk-fg-subtle" aria-hidden="true">
         ·
       </span>
       <time
         dateTime={createdAt ?? undefined}
-        className={cn("whitespace-nowrap text-rk-fg-subtle", compact ? "text-[13px]" : "text-[14px]")}
+        className={cn("whitespace-nowrap text-rk-fg-subtle", compact ? "text-[0.8125rem]" : "text-[0.875rem]")}
       >
         {relTime(createdAt)}
       </time>

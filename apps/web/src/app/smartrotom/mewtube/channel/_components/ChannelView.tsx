@@ -9,7 +9,7 @@ import { VideoSection } from "../../_components/VideoSection"
 function Kpi({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <span className="font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-mw-fg-faint">{label}</span>
+      <span className="font-mono text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-mw-fg-faint">{label}</span>
       <strong className="font-mw-display text-lg font-bold">{value}</strong>
     </div>
   )
@@ -36,7 +36,7 @@ export function ChannelView({ id }: { id: string }) {
   return (
     <div>
       {banner && (
-        <div className="relative h-[200px]">
+        <div className="relative h-[12.5rem]">
           <img src={banner} alt="" className="h-full w-full object-cover brightness-[0.7]" />
           <div
             className="absolute inset-0"
@@ -47,8 +47,8 @@ export function ChannelView({ id }: { id: string }) {
           />
         </div>
       )}
-      <div className="mx-auto max-w-[1640px] px-4 pb-20 md:px-10">
-        <div className="grid grid-cols-1 items-start gap-8 pb-6 md:grid-cols-[140px_1fr_auto]" style={banner ? { marginTop: -60 } : { marginTop: 24 }}>
+      <div className="mx-auto max-w-[102.5rem] px-4 pb-20 md:px-10">
+        <div className="grid grid-cols-1 items-start gap-8 pb-6 md:grid-cols-[8.75rem_1fr_auto]" style={banner ? { marginTop: -60 } : { marginTop: 24 }}>
           <Avatar
             src={avatar}
             name={c.snippet.title}
@@ -56,11 +56,11 @@ export function ChannelView({ id }: { id: string }) {
             className="border-4 border-mw-bg shadow-[0_24px_50px_-20px_rgb(var(--mw-accent)/.35)]"
           />
           <div className="min-w-0">
-            <h1 className="mb-1.5 mt-3 inline-flex items-center gap-2.5 font-mw-display text-[36px] font-extrabold tracking-[-0.01em]">
+            <h1 className="mb-1.5 mt-3 inline-flex items-center gap-2.5 font-mw-display text-[2.25rem] font-extrabold tracking-[-0.01em]">
               {c.snippet.title}
               <Check size="lg" />
             </h1>
-            <div className="flex flex-wrap items-center gap-2 text-[13px] text-mw-fg-mute">
+            <div className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-mw-fg-mute">
               {c.snippet.customUrl && <span>{c.snippet.customUrl}</span>}
               <span className="h-1 w-1 rounded-full bg-mw-fg-faint" />
               <span>
@@ -70,7 +70,7 @@ export function ChannelView({ id }: { id: string }) {
               <span>{formatCount(vids)} {t("channel.videos")}</span>
             </div>
             {c.snippet.description && (
-              <p className="my-3 max-w-[720px] whitespace-pre-line text-[13px] text-mw-fg-mute line-clamp-3">
+              <p className="my-3 max-w-[45rem] whitespace-pre-line text-[0.8125rem] text-mw-fg-mute line-clamp-3">
                 {c.snippet.description}
               </p>
             )}
@@ -84,7 +84,7 @@ export function ChannelView({ id }: { id: string }) {
               </PillBtn>
             </div>
           </div>
-          <div className="grid grid-flow-col gap-6 rounded-mw-xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_30%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_8%,rgb(var(--mw-800)))] px-[22px] py-3.5 max-md:justify-start">
+          <div className="grid grid-flow-col gap-6 rounded-mw-xl border border-[color-mix(in_srgb,rgb(var(--mw-accent))_30%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_8%,rgb(var(--mw-800)))] px-[1.375rem] py-3.5 max-md:justify-start">
             <Kpi label={t("channel.views")} value={formatCount(views)} />
             <Kpi label={t("channel.average")} value={formatCount(avg)} />
             {since && <Kpi label={t("channel.activeSince")} value={String(since)} />}

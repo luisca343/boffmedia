@@ -85,17 +85,17 @@ export function LiveMatchChat({
           {judgeRequested ? t("judgeRequested") : t("requestJudge")}
         </Button>
       </div>
-      <div ref={bodyRef} className="flex h-[320px] flex-col gap-2.5 overflow-y-auto bg-base p-4">
+      <div ref={bodyRef} className="flex h-[20rem] flex-col gap-2.5 overflow-y-auto bg-base p-4">
         {msgs.length === 0 && (
-          <p className="m-auto font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+          <p className="m-auto font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
             {loadError ? t("loadFailed") : t("empty")}
           </p>
         )}
         {msgs.map((m) => {
           if (m.kind === "sys")
             return (
-              <div key={m.id} className="mx-auto inline-flex max-w-[82%] items-center gap-2 border border-solid border-[color:color-mix(in_srgb,var(--info)_25%,transparent)] bg-info-soft px-3 py-1.5 text-center font-body text-[11.5px]/[1.3] font-medium text-txt-muted">
-                <span className="font-mono text-[10px]/none font-semibold text-info">{hm(m.createdAt)}</span>
+              <div key={m.id} className="mx-auto inline-flex max-w-[82%] items-center gap-2 border border-solid border-[color:color-mix(in_srgb,var(--info)_25%,transparent)] bg-info-soft px-3 py-1.5 text-center font-body text-[0.71875rem]/[1.3] font-medium text-txt-muted">
+                <span className="font-mono text-[0.625rem]/none font-semibold text-info">{hm(m.createdAt)}</span>
                 {m.body}
               </div>
             )
@@ -105,12 +105,12 @@ export function LiveMatchChat({
             <div key={m.id} className={cn("flex max-w-[82%]", isMe ? "self-end" : "self-start")}>
               <div className={cn("grid gap-[3px] border border-solid px-3 py-2", isMe ? "border-accent-line bg-accent-soft" : isJudge ? "border-[color:color-mix(in_srgb,var(--warn)_35%,transparent)] bg-warn-soft" : "border-line bg-panel-2")}>
                 <div className="flex items-baseline gap-2">
-                  <b className={cn("font-mono text-[11px]/none font-bold", isMe ? "text-accent-bright" : isJudge ? "text-warn" : "text-txt")}>
+                  <b className={cn("font-mono text-[0.6875rem]/none font-bold", isMe ? "text-accent-bright" : isJudge ? "text-warn" : "text-txt")}>
                     {isJudge ? `${m.authorName ?? t("judgeFallback")} · ${t("judgeSuffix")}` : m.authorName ?? t("playerFallback")}
                   </b>
-                  <i className="font-mono text-[10px]/none not-italic text-txt-dim">{hm(m.createdAt)}</i>
+                  <i className="font-mono text-[0.625rem]/none not-italic text-txt-dim">{hm(m.createdAt)}</i>
                 </div>
-                <p className="m-0 break-words font-body text-[13.5px]/[1.45] text-txt">{m.body}</p>
+                <p className="m-0 break-words font-body text-[0.84375rem]/[1.45] text-txt">{m.body}</p>
               </div>
             </div>
           )
@@ -118,7 +118,7 @@ export function LiveMatchChat({
       </div>
       <div className="flex gap-2.5 border-t border-solid border-line bg-panel px-4 py-3">
         <input
-          className="min-w-0 flex-1 border border-solid border-line-2 bg-base px-3 py-2.5 font-body text-[13.5px]/[1.3] text-txt focus:border-accent-line focus:outline focus:outline-2 focus:outline-accent-line"
+          className="min-w-0 flex-1 border border-solid border-line-2 bg-base px-3 py-2.5 font-body text-[0.84375rem]/[1.3] text-txt focus:border-accent-line focus:outline focus:outline-2 focus:outline-accent-line"
           value={input}
           placeholder={t("placeholder")}
           onChange={(e) => setInput(e.target.value)}

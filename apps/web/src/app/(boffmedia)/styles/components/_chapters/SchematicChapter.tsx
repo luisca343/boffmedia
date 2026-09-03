@@ -29,7 +29,7 @@ const DEMO_FILE: DropZoneFile = { name: "castle_gate.litematic", size: "1.2 MB",
 
 function SchToggle({ on, onClick, children }: { on?: boolean; onClick?: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className={cn("h-8 border border-solid px-[11px] font-mono text-[11px] transition-[color,border-color,background] duration-[140ms]", on ? "border-accent-line bg-accent-soft text-accent-bright" : "border-line bg-panel text-txt-muted hover:border-line-2 hover:text-txt")}>
+    <button type="button" onClick={onClick} className={cn("h-8 border border-solid px-[0.6875rem] font-mono text-[0.6875rem] transition-[color,border-color,background] duration-[140ms]", on ? "border-accent-line bg-accent-soft text-accent-bright" : "border-line bg-panel text-txt-muted hover:border-line-2 hover:text-txt")}>
       {children}
     </button>
   )
@@ -46,7 +46,7 @@ function DemoStage() {
           <path d="M100 38 L60 60 L60 104 L100 82 Z" fill="color-mix(in srgb, var(--accent) 9%, transparent)" />
         </g>
       </svg>
-      <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-txt-dim">Vista 3D del esquema · WebGL</span>
+      <span className="font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-dim">Vista 3D del esquema · WebGL</span>
     </div>
   )
 }
@@ -94,7 +94,7 @@ export function SchematicChapter() {
           </div>
         </Sample>
         <Sample title="Medidor de preparación" code="<CompatMeter resolved total blocked>" col note="El tono del anillo cambia: acento mientras faltan reglas, <b>ámbar</b> si quedan bloqueos, <b>verde</b> al 100%.">
-          <div className="flex flex-wrap gap-[22px]">
+          <div className="flex flex-wrap gap-[1.375rem]">
             <CompatMeter resolved={9} total={14} blocked={5} />
             <CompatMeter resolved={14} total={14} blocked={0} />
           </div>
@@ -140,11 +140,11 @@ export function SchematicChapter() {
           />
         </Sample>
         <Sample title="Tile de bloque" code="<AssetThumb id size ring>" note="<code>ring</code> acepta el tono de estado (<code>safe</code> · <code>warn</code> · <code>bad</code>). El respaldo es estable: el ojo aprende a reconocer bloques por su color.">
-          <div className="flex flex-wrap items-end gap-[18px]">
+          <div className="flex flex-wrap items-end gap-[1.125rem]">
             {([["minecraft:stone_bricks", "safe"], ["minecraft:copper_bulb", "warn"], ["create:cogwheel", "bad"], ["botania:livingrock", null], ["mekanism:steel_casing", null]] as const).map(([id, ring]) => (
               <div key={id} className="flex flex-col items-center gap-1.5">
                 <AssetThumb id={id} size={44} ring={ring as SchRing} />
-                <span className="font-mono text-[10px] text-txt-dim">{id.split(":")[1]}</span>
+                <span className="font-mono text-[0.625rem] text-txt-dim">{id.split(":")[1]}</span>
               </div>
             ))}
           </div>
@@ -177,7 +177,7 @@ export function SchematicChapter() {
         lead={<><code>PreviewShell</code> es el marco compartido de cualquier vista 3D de esquemas: cabecera, fondo de rejilla, pantalla completa, conmutador órbita/vuelo, deslizador de capa y el pozo del inspector. El lienzo, la leyenda y el inspector entran como slots; los textos, como props.</>}
       >
         <Sample title="Marco de vista previa" code="<PreviewShell labels stage inspector>" col note="Aquí el escenario es un placeholder isométrico; en la herramienta es el lienzo WebGL real.">
-          <div className="h-[420px] w-full border border-solid border-line">
+          <div className="h-[26.25rem] w-full border border-solid border-line">
             <PreviewShell
               labels={{ title: "Vista previa", fullscreen: "Pantalla completa", exitFullscreen: "Salir", navOrbit: "Órbita", navFly: "Vuelo", navOrbitHint: "Arrastra para orbitar", navFlyHint: "WASD para volar" }}
               navMode="orbit"
@@ -187,12 +187,12 @@ export function SchematicChapter() {
               onLayerYChange={setY}
               hasDocument
               stage={<DemoStage />}
-              inspector={<span className="font-mono text-[11px] text-txt-dim">Clic en un bloque para inspeccionar</span>}
+              inspector={<span className="font-mono text-[0.6875rem] text-txt-dim">Clic en un bloque para inspeccionar</span>}
             />
           </div>
         </Sample>
         <Sample title="Deslizador de capa" code="<AxisSlider axis value max onChange>" col note="Recorta el esquema por eje; se usa suelto o embebido en el marco de arriba.">
-          <div className="w-full max-w-[460px] border border-solid border-line bg-panel">
+          <div className="w-full max-w-[28.75rem] border border-solid border-line bg-panel">
             <AxisSlider axis="Y" value={y} max={47} onChange={setY} />
           </div>
         </Sample>

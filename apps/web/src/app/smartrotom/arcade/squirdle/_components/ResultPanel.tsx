@@ -20,7 +20,7 @@ export function ResultPanel({ message, won, gameOver, onReset }: ResultPanelProp
         <p
           aria-live="polite"
           className={cn(
-            "m-0 inline-flex items-center gap-2.5 font-ar text-[14px] font-semibold",
+            "m-0 inline-flex items-center gap-2.5 font-ar text-[0.875rem] font-semibold",
             won ? "text-ar-lime" : "text-ar-ink",
           )}
         >

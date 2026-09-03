@@ -20,11 +20,11 @@ import { useOfficer } from "../../_hooks/useOfficer"
 function AppTile({ app, action }: { app: SmartRotomApp; action: ReactNode }) {
   return (
     <div className="flex flex-col items-center gap-2 rounded-gt-sm border border-gt-line bg-gt-paper-0 p-3 text-center">
-      <div className="h-[46px] w-[46px] overflow-hidden rounded-[11px] border border-gt-line-strong bg-gt-paper-2">
+      <div className="h-[2.875rem] w-[2.875rem] overflow-hidden rounded-[11px] border border-gt-line-strong bg-gt-paper-2">
         { }
         <img src={staticAsset(ASSET.smartrotom.img, 'apps', `${app.url}.webp`)} alt={app.name} className="h-full w-full object-cover" />
       </div>
-      <div className="text-[12px] font-bold text-gt-ink-900">{app.name}</div>
+      <div className="text-[0.75rem] font-bold text-gt-ink-900">{app.name}</div>
       {action}
     </div>
   )
@@ -80,10 +80,10 @@ function AppsScreen() {
 
       <Card className="mb-4">
         <div className="flex flex-wrap items-center gap-3 p-3.5">
-          <span className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+          <span className="font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
             {t("apps.jugador")}
           </span>
-          <div className="w-[260px]">
+          <div className="w-[16.25rem]">
             {usersLoading ? (
               <Skeleton className="h-9" />
             ) : (
@@ -101,16 +101,16 @@ function AppsScreen() {
       <div className="grid gap-4 lg:grid-cols-2">
         <Card className="overflow-hidden">
           <Bar icon="star" dep="gold">
-            {t("apps.appsAsignadas")} {assigned.length > 0 && <span className="font-gt-mono text-[11px] text-gt-ink-400"> · {assigned.length}</span>}
+            {t("apps.appsAsignadas")} {assigned.length > 0 && <span className="font-gt-mono text-[0.6875rem] text-gt-ink-400"> · {assigned.length}</span>}
           </Bar>
           {appsLoading || playerAppsLoading ? (
             <div className="grid grid-cols-4 gap-2.5 p-3.5">
               {Array.from({ length: 4 }, (_, i) => (
-                <Skeleton key={i} className="h-[92px]" />
+                <Skeleton key={i} className="h-[5.75rem]" />
               ))}
             </div>
           ) : assigned.length ? (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2.5 p-3.5">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-2.5 p-3.5">
               {assigned.map((a) => (
                 <AppTile
                   key={a.id}
@@ -135,11 +135,11 @@ function AppsScreen() {
           {appsLoading || playerAppsLoading ? (
             <div className="grid grid-cols-4 gap-2.5 p-3.5">
               {Array.from({ length: 4 }, (_, i) => (
-                <Skeleton key={i} className="h-[92px]" />
+                <Skeleton key={i} className="h-[5.75rem]" />
               ))}
             </div>
           ) : available.length ? (
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2.5 p-3.5">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-2.5 p-3.5">
               {available.map((a) => (
                 <AppTile
                   key={a.id}

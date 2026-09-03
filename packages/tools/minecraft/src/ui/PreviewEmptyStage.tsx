@@ -19,7 +19,7 @@ export function PreviewEmptyStage({ caption }: { caption: string }) {
           </g>
         </svg>
       </div>
-      <span className="font-mono text-[10px] tracking-[0.1em] uppercase text-txt-dim">{caption}</span>
+      <span className="font-mono text-[0.625rem] tracking-[0.1em] uppercase text-txt-dim">{caption}</span>
     </div>
   )
 }

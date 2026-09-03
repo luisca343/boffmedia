@@ -38,10 +38,10 @@ export function WonderMailChapter() {
         lead={<><code>Select</code> es la primitiva de selección nativa del sistema — hasta ahora cada herramienta llevaba la suya. <code>OptionGroup</code> es el «toggle group» de tarjetas: cuando conviene ver todas las opciones de un vistazo en lugar de un desplegable.</>}
       >
         <Sample title="Select" code="<Select label options value onChange />" col>
-          <div className="w-full max-w-[320px]">
+          <div className="w-full max-w-[20rem]">
             <Select label="Tipo de recompensa" value={sel} options={SEL_OPTS} onChange={setSel} />
           </div>
-          <div className="mt-[14px] w-full max-w-[320px]">
+          <div className="mt-[0.875rem] w-full max-w-[20rem]">
             <Select label="Deshabilitado" value={sel} options={SEL_OPTS} onChange={setSel} disabled hint="La recompensa actual no da objeto" />
           </div>
         </Sample>
@@ -64,17 +64,17 @@ export function WonderMailChapter() {
         lead={<><code>Disclosure</code> pliega los ajustes avanzados para reducir la carga cognitiva. <code>Banner</code> es el aviso de estado a todo el ancho — cuatro tonos semánticos para validación, éxito y error.</>}
       >
         <Sample title="Disclosure" code="<Disclosure title icon sub />" col>
-          <div className="w-full max-w-[520px]">
+          <div className="w-full max-w-[32.5rem]">
             <Disclosure title="Ajustes avanzados" icon="settings" sub="Región y codificación">
               <div className="flex items-center justify-between gap-4 py-1">
-                <span className="font-body text-[13px]/[1.4] font-semibold text-txt">Versión europea (EU)</span>
+                <span className="font-body text-[0.8125rem]/[1.4] font-semibold text-txt">Versión europea (EU)</span>
                 <Toggle on={eu} onChange={setEu} ariaLabel="Versión europea (EU)" />
               </div>
             </Disclosure>
           </div>
         </Sample>
         <Sample title="Banner — tonos" code="<Banner tone />" col>
-          <div className="grid w-full max-w-[560px] gap-[10px]">
+          <div className="grid w-full max-w-[35rem] gap-[0.625rem]">
             <Banner tone="success" title="Wonder Mail generada">El código está listo para copiar.</Banner>
             <Banner tone="warn">El cliente y el objetivo son el mismo Pokémon.</Banner>
             <Banner tone="error" title="Revisa la configuración">La planta supera el tamaño de la mazmorra.</Banner>
@@ -90,7 +90,7 @@ export function WonderMailChapter() {
         lead={<><code>CodeBlock</code> muestra tokens o códigos en mono con copia integrada y una franja de escaneo opcional. Es el corazón del billete de resultado del generador.</>}
       >
         <Sample title="CodeBlock con copia y escaneo" code="<CodeBlock lines tone='accent' scan />" col note="El código del ejemplo es una muestra estática del generador de Wonder Mail.">
-          <div className="w-full max-w-[460px]">
+          <div className="w-full max-w-[28.75rem]">
             <CodeBlock
               label="Código · US / JP"
               tone="accent"

@@ -51,7 +51,7 @@ export function NuevaDenunciaModal({ open, onClose }: { open: boolean; onClose: 
     <Modal open={open} onClose={onClose} title={t("denuncias.new.title")} kicker={t("denuncias.new.kicker")}>
       <div className="space-y-3.5">
         <Select label={t("denuncias.new.category")} value={category} onChange={setCategory} options={CATEGORY_OPTIONS} />
-        <div className="grid grid-cols-[1fr,120px] gap-2.5">
+        <div className="grid grid-cols-[1fr,7.5rem] gap-2.5">
           <Field label={t("denuncias.new.town")} value={town} onChange={setTown} placeholder={t("denuncias.new.townPlaceholder")} />
           <Field label={t("denuncias.new.plotNumber")} value={plotNumber} onChange={setPlotNumber} type="number" mono />
         </div>
@@ -62,7 +62,7 @@ export function NuevaDenunciaModal({ open, onClose }: { open: boolean; onClose: 
           rows={4}
           placeholder={t("denuncias.new.descriptionPlaceholder")}
         />
-        <p className="font-gt-mono text-[10.5px] uppercase tracking-[.1em] text-gt-ink-400">
+        <p className="font-gt-mono text-[0.65625rem] uppercase tracking-[.1em] text-gt-ink-400">
           {t("denuncias.new.registeredBy", { username: officer.username || t("common.you"), rank: officer.rankLabel })}
         </p>
       </div>

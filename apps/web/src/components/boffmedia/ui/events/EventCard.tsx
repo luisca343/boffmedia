@@ -37,8 +37,8 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
         "group relative flex border border-solid border-line [--cut-line:var(--line)] border-l-4 border-l-[var(--ghue)] bg-panel no-underline",
         "transition-[border-color,background,transform] duration-[140ms] hover:-translate-y-[3px] hover:bg-panel-2 hover:border-[color-mix(in_srgb,var(--ghue)_45%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--ghue)_45%,var(--line))]",
         row
-          ? "flex-row items-center gap-5 px-[22px] py-4 cut-bl cut-edge-bl [--cut-e:14px] max-[560px]:flex-wrap"
-          : "flex-col px-5 pb-4 pt-[18px] cut-tag cut-tag-edge [--cut-tag:14px]",
+          ? "flex-row items-center gap-5 px-[1.375rem] py-4 cut-bl cut-edge-bl [--cut-e:14px] max-[560px]:flex-wrap"
+          : "flex-col px-5 pb-4 pt-[1.125rem] cut-tag cut-tag-edge [--cut-tag:14px]",
         status === "completed" && "opacity-70",
       )}
     >
@@ -46,38 +46,38 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
       <Icon
         name={isServer ? "globe" : "trophy"}
         size={110}
-        className="pointer-events-none absolute -bottom-[14px] -right-[14px] z-0 text-[var(--ghue)] opacity-[0.08]"
+        className="pointer-events-none absolute -bottom-[0.875rem] -right-[0.875rem] z-0 text-[var(--ghue)] opacity-[0.08]"
       />
 
       {/* list-only date block */}
       {row && (
-        <div className="flex w-[60px] flex-none flex-col items-center justify-center border-r border-solid border-line pr-[18px] max-[560px]:w-full max-[560px]:flex-row max-[560px]:justify-start max-[560px]:gap-2 max-[560px]:border-b max-[560px]:border-r-0 max-[560px]:pb-2.5 max-[560px]:pr-0">
-          <span className={cn("font-display text-[34px] font-extrabold italic leading-none", status === "completed" ? "text-txt-muted" : "text-[var(--ghue)]")}>
+        <div className="flex w-[3.75rem] flex-none flex-col items-center justify-center border-r border-solid border-line pr-[1.125rem] max-[560px]:w-full max-[560px]:flex-row max-[560px]:justify-start max-[560px]:gap-2 max-[560px]:border-b max-[560px]:border-r-0 max-[560px]:pb-2.5 max-[560px]:pr-0">
+          <span className={cn("font-display text-[2.125rem] font-extrabold italic leading-none", status === "completed" ? "text-txt-muted" : "text-[var(--ghue)]")}>
             {day}
           </span>
-          <span className="mt-[5px] font-mono text-[9px] font-semibold leading-none tracking-[0.12em] text-txt-muted max-[560px]:mt-0">{mon}</span>
+          <span className="mt-[0.3125rem] font-mono text-[0.5625rem] font-semibold leading-none tracking-[0.12em] text-txt-muted max-[560px]:mt-0">{mon}</span>
         </div>
       )}
 
       <div className="relative z-[1] flex min-w-0 flex-1 flex-col">
         <div className="mb-3 flex items-center gap-2.5">
           <EventStatusChip status={status} label={t(`status.${status}`)} />
-          <span className="ml-auto inline-flex items-center gap-1.5 whitespace-nowrap font-mono text-[10px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim">
+          <span className="ml-auto inline-flex items-center gap-1.5 whitespace-nowrap font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim">
             <Icon name={isServer ? "globe" : "trophy"} size={12} className="text-[var(--ghue)]" />
             {t(`type.${isServer ? "server" : "event"}`)}
           </span>
         </div>
 
-        <h3 className="text-[23px]/[1.04] text-txt">{event.title}</h3>
+        <h3 className="text-[1.4375rem]/[1.04] text-txt">{event.title}</h3>
         {event.description && (
-          <p className={cn("mt-2 font-body text-[13.5px]/[1.5] text-txt-muted text-pretty", row ? "line-clamp-1" : "line-clamp-2")}>
+          <p className={cn("mt-2 font-body text-[0.84375rem]/[1.5] text-txt-muted text-pretty", row ? "line-clamp-1" : "line-clamp-2")}>
             {event.description}
           </p>
         )}
 
         <div className="mt-3.5 flex flex-wrap items-center gap-3.5 border-t border-dashed border-line pt-3.5">
-          <span className="inline-flex items-center gap-1.5 font-mono text-[11px]/none font-semibold uppercase tracking-[0.06em] text-txt">
-            <span className="grid h-[22px] w-[22px] flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal cut-seal-edge [--cut-w:1.5px] [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] [--cut:5px]">
+          <span className="inline-flex items-center gap-1.5 font-mono text-[0.6875rem]/none font-semibold uppercase tracking-[0.06em] text-txt">
+            <span className="grid h-[1.375rem] w-[1.375rem] flex-none place-items-center border-[1.5px] border-solid border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_14%,var(--bg))] text-[var(--ghue)] cut-seal cut-seal-edge [--cut-w:1.5px] [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] [--cut:5px]">
               <Icon name="gamepad" size={11} />
             </span>
             {event.gameName || "—"}
@@ -85,7 +85,7 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
           {status === "upcoming" && event.startDate ? (
             <Countdown date={event.startDate} compact />
           ) : (
-            <span className="inline-flex items-center gap-1.5 font-mono text-[11px]/none font-medium uppercase tracking-[0.05em] text-txt-muted">
+            <span className="inline-flex items-center gap-1.5 font-mono text-[0.6875rem]/none font-medium uppercase tracking-[0.05em] text-txt-muted">
               <Icon name="calendar" size={13} className="text-txt-dim" />
               {formatEventDate(event.startDate, intlLocale)}
             </span>
@@ -93,7 +93,7 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
           {/* participant count — the list endpoint supplies it; the detail
               endpoint does not, so still render only when present. */}
           {event.participantCount != null && (
-            <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[11px]/none font-medium uppercase tracking-[0.05em] text-txt-muted">
+            <span className="ml-auto inline-flex items-center gap-1.5 font-mono text-[0.6875rem]/none font-medium uppercase tracking-[0.05em] text-txt-muted">
               <Icon name="users" size={13} className="text-txt-dim" />
               {formatNumber(event.participantCount)}
             </span>
@@ -103,7 +103,7 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
         {/* organizer — NOT in the events model yet → rendered only when supplied
             (the handoff defaults to «Boffmedia»; we defer until the API has it). [deferred] */}
         {event.organizer && (
-          <div className="mt-2.5 border-t border-dashed border-line pt-2.5 text-[10.5px]">
+          <div className="mt-2.5 border-t border-dashed border-line pt-2.5 text-[0.65625rem]">
             <EventOrganizer organizer={event.organizer} />
           </div>
         )}

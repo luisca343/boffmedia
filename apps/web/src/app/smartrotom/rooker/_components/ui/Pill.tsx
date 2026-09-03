@@ -17,8 +17,8 @@ export function Pill({ children, className, title }: PillProps) {
     <span
       title={title}
       className={cn(
-        "inline-flex items-center gap-1 rounded-rk-pill px-[7px] py-[2px]",
-        "text-[10px] font-extrabold uppercase leading-[1.5] tracking-[.04em]",
+        "inline-flex items-center gap-1 rounded-rk-pill px-[0.4375rem] py-[2px]",
+        "text-[0.625rem] font-extrabold uppercase leading-[1.5] tracking-[.04em]",
         className,
       )}
     >

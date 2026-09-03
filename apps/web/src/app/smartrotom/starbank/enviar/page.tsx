@@ -80,17 +80,17 @@ export default function Enviar() {
 
   if (done && recipient && fromAcc) {
     return (
-      <div className="mx-auto mt-14 w-full max-w-[460px] animate-in fade-in animate-duration-300">
+      <div className="mx-auto mt-14 w-full max-w-[28.75rem] animate-in fade-in animate-duration-300">
         <Card className="p-10 text-center">
           <div className="mx-auto mb-5 grid size-20 place-items-center rounded-full bg-sb-pos-soft text-sb-pos">
             <Ico name="check" size={36} />
           </div>
-          <h2 className="m-0 mb-1.5 font-sb-display text-[24px] font-semibold">{t("enviar.transferSent")}</h2>
+          <h2 className="m-0 mb-1.5 font-sb-display text-[1.5rem] font-semibold">{t("enviar.transferSent")}</h2>
           <div className="mb-4 text-sb-fg-muted">
             {t("enviar.transferSentBody", { amount: formatMoney(amount), name: displayName(recipient.name) })}
           </div>
-          <div className="mb-4 font-sb-display text-[48px] font-semibold tabular-nums text-sb-fg">{formatMoney(amount)}</div>
-          <div className="rounded-sb-md bg-sb-surface-2 p-3.5 text-left text-[13px]">
+          <div className="mb-4 font-sb-display text-[3rem] font-semibold tabular-nums text-sb-fg">{formatMoney(amount)}</div>
+          <div className="rounded-sb-md bg-sb-surface-2 p-3.5 text-left text-[0.8125rem]">
             <div className="flex justify-between"><span className="text-sb-fg-muted">{t("enviar.from")}</span><span>{displayName(fromAcc.name)}</span></div>
             <div className="mt-1.5 flex justify-between"><span className="text-sb-fg-muted">{t("enviar.concept")}</span><span>{concept || "—"}</span></div>
             <div className="mt-1.5 flex justify-between"><span className="text-sb-fg-muted">{t("enviar.reference")}</span><span className="font-mono">SR-{Date.now().toString().slice(-8)}</span></div>
@@ -112,7 +112,7 @@ export default function Enviar() {
         <Stepper steps={STEPS} current={step} />
 
         {step === 0 && (
-          <div className="mx-auto flex w-full max-w-[720px] flex-col gap-[18px]">
+          <div className="mx-auto flex w-full max-w-[45rem] flex-col gap-[1.125rem]">
             <div>
               <Label htmlFor="recip">{t("enviar.searchRecipient")}</Label>
               <div className="relative">
@@ -122,18 +122,18 @@ export default function Enviar() {
             </div>
             <div>
               <Label>{t("enviar.myAccounts")}</Label>
-              <p className="-mt-1 mb-2 text-[12px] text-sb-fg-muted">{t("enviar.myAccountsSub")}</p>
-              <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
+              <p className="-mt-1 mb-2 text-[0.75rem] text-sb-fg-muted">{t("enviar.myAccountsSub")}</p>
+              <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(8.75rem,1fr))]">
                 {myTargets.map((c) => <RecipientCard key={c.id} account={c} selected={recipient?.id === c.id} onSelect={setRecipient} />)}
-                {myTargets.length === 0 && <div className="col-span-full py-4 text-center text-[13px] text-sb-fg-muted">{t("enviar.noMatches")}</div>}
+                {myTargets.length === 0 && <div className="col-span-full py-4 text-center text-[0.8125rem] text-sb-fg-muted">{t("enviar.noMatches")}</div>}
               </div>
             </div>
 
             <div>
               <Label>{t("enviar.otherAccounts")}</Label>
-              <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(140px,1fr))]">
+              <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(8.75rem,1fr))]">
                 {otherTargets.slice(0, 12).map((c) => <RecipientCard key={c.id} account={c} selected={recipient?.id === c.id} onSelect={setRecipient} />)}
-                {otherTargets.length === 0 && <div className="col-span-full py-4 text-center text-[13px] text-sb-fg-muted">{q2 ? t("enviar.noMatches") : t("enviar.noOtherAccounts")}</div>}
+                {otherTargets.length === 0 && <div className="col-span-full py-4 text-center text-[0.8125rem] text-sb-fg-muted">{q2 ? t("enviar.noMatches") : t("enviar.noOtherAccounts")}</div>}
               </div>
             </div>
             <div className="mt-2 flex items-center justify-between">
@@ -144,9 +144,9 @@ export default function Enviar() {
         )}
 
         {step === 1 && recipient && (
-          <div className="mx-auto flex w-full max-w-[520px] flex-col gap-5">
+          <div className="mx-auto flex w-full max-w-[32.5rem] flex-col gap-5">
             <div className="flex items-center justify-center gap-2.5 rounded-sb-md bg-sb-surface-2 p-3.5">
-              <span className="text-[13px] text-sb-fg-muted">{t("enviar.sendingTo")}</span>
+              <span className="text-[0.8125rem] text-sb-fg-muted">{t("enviar.sendingTo")}</span>
               <ContactAvatar name={recipient.name} type={recipient.type} image={recipient.image} id={recipient.id} size={28} />
               <strong>{displayName(recipient.name)}</strong>
               <Button variant="ghost" size="sm" onClick={() => setStep(0)}>{t("enviar.change")}</Button>
@@ -160,9 +160,9 @@ export default function Enviar() {
                 value={amountStr}
                 onChange={(e) => setAmountStr(e.target.value.replace(/[^\d.,]/g, ""))}
                 placeholder="0"
-                className="w-full border-0 bg-transparent text-center font-sb-display text-[56px] font-semibold tabular-nums tracking-[-0.03em] text-sb-fg caret-sb-600 outline-none"
+                className="w-full border-0 bg-transparent text-center font-sb-display text-[3.5rem] font-semibold tabular-nums tracking-[-0.03em] text-sb-fg caret-sb-600 outline-none"
               />
-              <div className={cn("text-[13px]", fromAcc && amount > fromAcc.balance ? "text-sb-neg" : "text-sb-fg-muted")}>
+              <div className={cn("text-[0.8125rem]", fromAcc && amount > fromAcc.balance ? "text-sb-neg" : "text-sb-fg-muted")}>
                 {fromAcc && amount > fromAcc.balance
                   ? t("enviar.exceedsBalance", { amount: formatMoney(fromAcc.balance) })
                   : t("enviar.available", { name: fromAcc ? displayName(fromAcc.name) : "—", amount: formatMoney(fromAcc?.balance ?? 0) })}
@@ -171,7 +171,7 @@ export default function Enviar() {
 
             <div className="flex flex-wrap justify-center gap-2">
               {PRESETS.map((v) => (
-                <button key={v} type="button" onClick={() => setAmountStr(v.toLocaleString(locale))} className="rounded-sb-pill border border-sb-border bg-sb-surface px-3.5 py-2 text-[13px] font-medium transition-colors hover:border-sb-300 hover:bg-sb-50 hover:text-sb-700">
+                <button key={v} type="button" onClick={() => setAmountStr(v.toLocaleString(locale))} className="rounded-sb-pill border border-sb-border bg-sb-surface px-3.5 py-2 text-[0.8125rem] font-medium transition-colors hover:border-sb-300 hover:bg-sb-50 hover:text-sb-700">
                   {formatMoney(v)}
                 </button>
               ))}
@@ -182,7 +182,7 @@ export default function Enviar() {
               <Select id="from-acc" value={from} onChange={(e) => setFrom(Number(e.target.value))}>
                 {mine.map((a) => <option key={a.id} value={a.id}>{displayName(a.name)} — {formatMoney(a.balance)}</option>)}
               </Select>
-              {recipient?.id === from && <p className="mt-1.5 text-[12px] font-medium text-sb-neg">{t("enviar.differentAccount")}</p>}
+              {recipient?.id === from && <p className="mt-1.5 text-[0.75rem] font-medium text-sb-neg">{t("enviar.differentAccount")}</p>}
             </div>
 
             <div>
@@ -198,13 +198,13 @@ export default function Enviar() {
         )}
 
         {step === 2 && recipient && fromAcc && (
-          <div className="mx-auto flex w-full max-w-[520px] flex-col gap-[18px]">
+          <div className="mx-auto flex w-full max-w-[32.5rem] flex-col gap-[1.125rem]">
             <div className="text-center">
               <Label className="text-center">{t("enviar.reviewTitle")}</Label>
-              <div className="font-sb-display text-[56px] font-bold tabular-nums tracking-[-0.02em]">{formatMoney(amount)}</div>
+              <div className="font-sb-display text-[3.5rem] font-bold tabular-nums tracking-[-0.02em]">{formatMoney(amount)}</div>
             </div>
 
-            <div className="flex flex-col gap-3 rounded-sb-md bg-sb-surface-2 p-[18px]">
+            <div className="flex flex-col gap-3 rounded-sb-md bg-sb-surface-2 p-[1.125rem]">
               <div className="flex items-center justify-between">
                 <span className="text-sb-fg-muted">{t("enviar.from")}</span>
                 <span className="flex items-center gap-2"><AccountAvatar account={fromAcc} size={24} /><strong>{displayName(fromAcc.name)}</strong></span>
@@ -217,15 +217,15 @@ export default function Enviar() {
               <div className="h-px bg-sb-border" />
               <div className="flex items-center justify-between"><span className="text-sb-fg-muted">{t("enviar.concept")}</span><span>{concept || "—"}</span></div>
               <div className="h-px bg-sb-border" />
-              <div className="flex items-center justify-between"><span className="font-semibold">{t("enviar.totalDebit")}</span><span className="text-[16px] font-bold tabular-nums">{formatMoney(amount)}</span></div>
+              <div className="flex items-center justify-between"><span className="font-semibold">{t("enviar.totalDebit")}</span><span className="text-[1rem] font-bold tabular-nums">{formatMoney(amount)}</span></div>
             </div>
 
             <div className="flex items-center gap-2.5 rounded-sb-md bg-sb-info-soft p-3 text-sb-info">
               <Ico name="shieldOk" size={16} />
-              <span className="text-[12.5px]">{t("enviar.instantProtected", { amount: formatMoney(fromAcc.balance - amount) })}</span>
+              <span className="text-[0.78125rem]">{t("enviar.instantProtected", { amount: formatMoney(fromAcc.balance - amount) })}</span>
             </div>
 
-            {error && <div className="text-[13px] font-medium text-sb-neg">{error}</div>}
+            {error && <div className="text-[0.8125rem] font-medium text-sb-neg">{error}</div>}
 
             <div className="flex items-center justify-between">
               <Button variant="ghost" onClick={() => setStep(1)} disabled={transferMutation.isPending}><Ico name="arrL" size={14} /> {t("common.back")}</Button>
@@ -250,8 +250,8 @@ function RecipientCard({ account: c, selected, onSelect }: { account: SBAccount;
       )}
     >
       <ContactAvatar name={c.name} type={c.type} image={c.image} id={c.id} size={44} />
-      <span className="text-center text-[13px] font-semibold">{displayName(c.name)}</span>
-      <span className="text-[11px] text-sb-fg-muted">{c.type === "MAIN" ? t("accounts.main") : t("accounts.secondary")}</span>
+      <span className="text-center text-[0.8125rem] font-semibold">{displayName(c.name)}</span>
+      <span className="text-[0.6875rem] text-sb-fg-muted">{c.type === "MAIN" ? t("accounts.main") : t("accounts.secondary")}</span>
     </button>
   );
 }

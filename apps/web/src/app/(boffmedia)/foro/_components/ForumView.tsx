@@ -21,10 +21,10 @@ export function ForumView() {
   const go = (href: string) => router.push(href)
 
   return (
-    <main data-ds="boffmedia" className="wrap pb-[90px] pt-[34px]">
+    <main data-ds="boffmedia" className="wrap-wide pb-[5.625rem] pt-[2.125rem]">
       <ToolHeader className="mb-6" title={t("view.title")} sub={t("view.lead")} />
 
-      <div className="grid items-start gap-5 [grid-template-columns:1fr_320px] max-[900px]:grid-cols-1">
+      <div className="grid items-start gap-5 [grid-template-columns:1fr_20rem] max-[900px]:grid-cols-1">
         <div className="min-w-0">
           {isLoading ? (
             <div className="grid min-h-[40vh] place-items-center">

@@ -24,22 +24,22 @@ export function Loadout({
   return (
     <div className="flex flex-col gap-3">
       {/* header strip */}
-      <div className="flex items-center gap-3.5 flex-wrap py-[13px] px-4 bg-panel border border-line border-l-[3px] border-l-[var(--mh)]">
-        <div className="flex items-center gap-[9px]">
+      <div className="flex items-center gap-3.5 flex-wrap py-[0.8125rem] px-4 bg-panel border border-line border-l-[3px] border-l-[var(--mh)]">
+        <div className="flex items-center gap-[0.5625rem]">
           <MhRing pct={pct} label={`${filled}/${total}`} />
           <div className="flex flex-col gap-0.5">
-            <b className="font-display text-[15px] leading-none font-bold uppercase tracking-[0.02em] not-italic">{t("equipment")}</b>
-            <span className="font-mono text-[11px] leading-tight text-txt-muted">{t("build_planner.skill_count", { count: skills })}</span>
+            <b className="font-display text-[0.9375rem] leading-none font-bold uppercase tracking-[0.02em] not-italic">{t("equipment")}</b>
+            <span className="font-mono text-[0.6875rem] leading-tight text-txt-muted">{t("build_planner.skill_count", { count: skills })}</span>
           </div>
         </div>
         <div className="flex gap-4 ml-auto">
           <div className="text-right">
-            <b className="block font-display text-[20px] leading-none italic font-extrabold text-[#ff7a5c]">{attack}</b>
-            <span className="font-mono text-[10px] leading-none uppercase tracking-[0.06em] text-txt-dim">{t("attack")}</span>
+            <b className="block font-display text-[1.25rem] leading-none italic font-extrabold text-[#ff7a5c]">{attack}</b>
+            <span className="font-mono text-[0.625rem] leading-none uppercase tracking-[0.06em] text-txt-dim">{t("attack")}</span>
           </div>
           <div className="text-right">
-            <b className="block font-display text-[20px] leading-none italic font-extrabold text-[var(--info)]">{defense}</b>
-            <span className="font-mono text-[10px] leading-none uppercase tracking-[0.06em] text-txt-dim">{t("defense")}</span>
+            <b className="block font-display text-[1.25rem] leading-none italic font-extrabold text-[var(--info)]">{defense}</b>
+            <span className="font-mono text-[0.625rem] leading-none uppercase tracking-[0.06em] text-txt-dim">{t("defense")}</span>
           </div>
         </div>
       </div>

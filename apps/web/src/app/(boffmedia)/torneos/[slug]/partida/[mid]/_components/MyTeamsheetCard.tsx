@@ -25,14 +25,14 @@ export function MyTeamsheetCard({ mons }: { mons: TnMonApi[] | null }) {
     <section className={TM_CARD}>
       <div className={TM_CARD_HEAD}>
         <h3 className={TM_CARD_H3}>{t("title")}</h3>
-        <span className="font-mono text-[10.5px] uppercase tracking-[0.08em] text-txt-dim">
+        <span className="font-mono text-[0.65625rem] uppercase tracking-[0.08em] text-txt-dim">
           {t("locked")}
         </span>
       </div>
       <div className="p-4">
         <TeamsheetGrid mons={mons} />
       </div>
-      <p className="m-0 flex items-center gap-2 px-4 pb-4 font-body text-[11.5px]/[1.5] text-txt-muted">
+      <p className="m-0 flex items-center gap-2 px-4 pb-4 font-body text-[0.71875rem]/[1.5] text-txt-muted">
         <Icon name="info" size={12} className="flex-none" />
         {t("lockedHint")}
       </p>

@@ -20,9 +20,9 @@ export function VoteRail({
 }) {
   const t = useTranslations("community.vote")
   const total = votes + vote
-  const btn = "grid h-[26px] w-[34px] place-items-center border border-solid bg-panel-2 transition-[color,border-color] duration-[140ms] cut-seal cut-seal-edge [--cut:6px] [--cut-line:var(--line-2)]"
+  const btn = "grid h-[1.625rem] w-[2.125rem] place-items-center border border-solid bg-panel-2 transition-[color,border-color] duration-[140ms] cut-seal cut-seal-edge [--cut:6px] [--cut-line:var(--line-2)]"
   return (
-    <span className={cn("inline-grid justify-items-center gap-[5px]", row && "grid-flow-col items-center")}>
+    <span className={cn("inline-grid justify-items-center gap-[0.3125rem]", row && "grid-flow-col items-center")}>
       <button
         type="button"
         aria-label={t("up")}
@@ -35,7 +35,7 @@ export function VoteRail({
       >
         <Icon name="bolt" size={15} />
       </button>
-      <span className="font-mono text-[16px]/none font-bold text-txt">{total}</span>
+      <span className="font-mono text-[1rem]/none font-bold text-txt">{total}</span>
       <button
         type="button"
         aria-label={t("down")}

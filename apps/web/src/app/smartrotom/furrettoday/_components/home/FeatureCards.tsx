@@ -11,7 +11,7 @@ export function BigFeatureCard({ article }: { article: FtArticle }) {
   const t = useTranslations("furrettoday.featureCards");
   return (
     <Card lift className="flex flex-col overflow-hidden">
-      <div className="border-ft relative h-[320px] shrink-0 border-x-0 border-t-0 border-b-ft-ink">
+      <div className="border-ft relative h-[20rem] shrink-0 border-x-0 border-t-0 border-b-ft-ink">
         <HeroArt
           accent={article.accent}
           src={article.imageUrl}
@@ -32,7 +32,7 @@ export function BigFeatureCard({ article }: { article: FtArticle }) {
       </div>
 
       <div className="flex flex-col gap-3 p-6">
-        <h3 className="font-ft-display relative text-[44px] leading-[0.95]">
+        <h3 className="font-ft-display relative text-[2.75rem] leading-[0.95]">
           <Link
             href={articleHref(article.id)}
             className="after:absolute after:inset-0 after:content-['']"
@@ -84,7 +84,7 @@ export function SmallFeatureCard({
       className={`flex flex-col overflow-hidden ${ACCENT_ON[accent]}`}
       style={{ background: hex }}
     >
-      <div className="ft-halftone border-ft relative h-[130px] shrink-0 border-x-0 border-t-0 border-b-ft-ink">
+      <div className="ft-halftone border-ft relative h-[8.125rem] shrink-0 border-x-0 border-t-0 border-b-ft-ink">
         <div
           aria-hidden="true"
           className="absolute inset-0"
@@ -99,7 +99,7 @@ export function SmallFeatureCard({
       </div>
 
       <div className="flex flex-grow flex-col gap-2.5 p-5">
-        <h3 className="font-ft-display relative text-[28px] leading-[0.95]">
+        <h3 className="font-ft-display relative text-[1.75rem] leading-[0.95]">
           <Link
             href={articleHref(article.id)}
             className="after:absolute after:inset-0 after:content-['']"

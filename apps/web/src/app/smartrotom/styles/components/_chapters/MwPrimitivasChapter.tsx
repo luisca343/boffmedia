@@ -204,10 +204,10 @@ export function MwPrimitivasChapter() {
           code="<PulseDot />"
           note="El punto es decorativo; el número que lo acompaña es el dato accesible."
         >
-          <span className="inline-flex items-center gap-1.5 rounded-mw-sm border border-mw-line-strong bg-black/75 px-2 py-[3px] font-mono text-[11px] font-bold text-white">
+          <span className="inline-flex items-center gap-1.5 rounded-mw-sm border border-mw-line-strong bg-black/75 px-2 py-[3px] font-mono text-[0.6875rem] font-bold text-white">
             <PulseDot /> 12 480
           </span>
-          <span className="inline-flex items-center gap-1.5 text-[13px] text-mw-fg-mute">
+          <span className="inline-flex items-center gap-1.5 text-[0.8125rem] text-mw-fg-mute">
             <PulseDot /> 4 canales que sigues están en directo
           </span>
         </Sample>
@@ -243,7 +243,7 @@ export function MwPrimitivasChapter() {
         >
           <Avatar src={MW_FACES.oak} name="Profesor Oak" size="lg" ring />
           <Avatar name="Sin foto" size="lg" />
-          <span className="inline-flex items-center gap-1 text-[13px] text-mw-fg-mute">
+          <span className="inline-flex items-center gap-1 text-[0.8125rem] text-mw-fg-mute">
             Profesor Oak <Check /> verificado
           </span>
         </Sample>
@@ -251,11 +251,11 @@ export function MwPrimitivasChapter() {
         <Sample app="mw" media="mewtube" title="Check y Toggle" code='size="sm" · "lg" · role="switch"'>
           <Check />
           <Check size="lg" />
-          <label className="inline-flex items-center gap-2 text-[13px] text-mw-fg-mute">
+          <label className="inline-flex items-center gap-2 text-[0.8125rem] text-mw-fg-mute">
             <Toggle checked={autoplay} onChange={setAutoplay} label="Reproducción automática" />
             Reproducción automática
           </label>
-          <label className="inline-flex items-center gap-2 text-[13px] text-mw-fg-mute">
+          <label className="inline-flex items-center gap-2 text-[0.8125rem] text-mw-fg-mute">
             <Toggle checked={notify} onChange={setNotify} label="Avisarme al empezar" />
             Avisarme al empezar
           </label>

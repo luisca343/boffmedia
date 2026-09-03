@@ -139,7 +139,7 @@ const TableHead = React.forwardRef<
   const variant = useTableVariant()
 
   const variantStyles = {
-    default: "text-primary-hover text-[11px] uppercase tracking-wider font-bold",
+    default: "text-primary-hover text-[0.6875rem] uppercase tracking-wider font-bold",
     wingull: "text-white font-semibold text-xs uppercase tracking-wider"
   }
 

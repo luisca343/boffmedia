@@ -60,7 +60,7 @@ export function Ring({ label, value, max, size = 46, tone = "cyan", title }: Rin
         />
       </svg>
       <div className="absolute inset-0 grid place-items-center">
-        <span className="font-ar-display text-[11px] text-ar-ink">{label}</span>
+        <span className="font-ar-display text-[0.6875rem] text-ar-ink">{label}</span>
       </div>
     </div>
   )

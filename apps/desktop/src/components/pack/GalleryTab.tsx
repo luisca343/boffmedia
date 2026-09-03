@@ -167,7 +167,7 @@ export function GalleryTab({
 
   if (loading) {
     return (
-      <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
+      <span className="flex items-center gap-2 py-6 font-mono text-[0.6875rem] text-txt-dim">
         <Spinner size={12} /> {t("reading")}
       </span>
     )
@@ -184,13 +184,13 @@ export function GalleryTab({
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-[11px] text-txt-dim">
+        <span className="font-mono text-[0.6875rem] text-txt-dim">
           {t("galleryCount", { count: items.length })}
         </span>
         {addButton}
       </div>
 
-      <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(200px,1fr))]">
+      <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(12.5rem,1fr))]">
         {items.map((item) => (
           <li key={item}>
             <GalleryThumb

@@ -71,7 +71,7 @@ export function MvDivergence({ result, pokeMap, loading }: MvDivergenceProps) {
 
   return (
     <div className="grid content-start gap-3">
-      <div className="flex flex-wrap items-center gap-[9px] border border-solid border-line bg-panel px-3 py-[9px] font-mono text-[11.5px] leading-[1.5] text-txt-muted">
+      <div className="flex flex-wrap items-center gap-[0.5625rem] border border-solid border-line bg-panel px-3 py-[0.5625rem] font-mono text-[0.71875rem] leading-[1.5] text-txt-muted">
         <Icon name="info" size={13} className="flex-none text-signal" />
         <span>
           {bolded(t("divergence.note", { format: result.ladderFormat, month: result.ladderMonth }))}
@@ -102,7 +102,7 @@ export function MvDivergence({ result, pokeMap, loading }: MvDivergenceProps) {
               <tr key={row.id}>
                 <td className="mono text-txt-dim">{i + 1}</td>
                 <td>
-                  <span className="inline-flex items-center gap-[9px] font-semibold">
+                  <span className="inline-flex items-center gap-[0.5625rem] font-semibold">
                     {p ? (
                       <>
                         <DkSprite src={spriteUrl(p.name)} alt={p.name} size={28} onError={handleSpriteError} />
@@ -143,7 +143,7 @@ function Badge({ tone, children }: { tone: "signal" | "warn"; children: React.Re
       : { color: "var(--warn)", background: "color-mix(in srgb, var(--warn) 12%, transparent)", borderColor: "color-mix(in srgb, var(--warn) 35%, transparent)" }
   return (
     <span
-      className="inline-flex whitespace-nowrap border border-solid px-[7px] py-1 font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.1em] cut cut-edge-slant [--cut:2px]"
+      className="inline-flex whitespace-nowrap border border-solid px-[0.4375rem] py-1 font-mono text-[0.5625rem] font-semibold uppercase leading-none tracking-[0.1em] cut cut-edge-slant [--cut:2px]"
       style={style}
     >
       {children}

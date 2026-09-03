@@ -9,21 +9,21 @@ function Logo() {
   const t = useTranslations("pc")
   return (
     <div className="flex flex-none items-center gap-2.5">
-      <span className="relative flex h-[38px] w-[38px] items-center justify-center rounded-[11px] border border-pc-line-strong bg-gradient-to-br from-[#1f3a63] to-[#0c1830] shadow-[inset_0_0_14px_-4px_rgb(79_155_255_/_.6)]">
+      <span className="relative flex h-[2.375rem] w-[2.375rem] items-center justify-center rounded-[11px] border border-pc-line-strong bg-gradient-to-br from-[#1f3a63] to-[#0c1830] shadow-[inset_0_0_14px_-4px_rgb(79_155_255_/_.6)]">
         <Icon name="boxes" size={20} className="text-pc-accent" />
-        <span className="absolute -right-0.5 -top-0.5 h-[9px] w-[9px] rounded-pc-pill border-2 border-pc-bg-1 bg-pc-green shadow-[0_0_8px_rgb(var(--pc-green))]" />
+        <span className="absolute -right-0.5 -top-0.5 h-[0.5625rem] w-[0.5625rem] rounded-pc-pill border-2 border-pc-bg-1 bg-pc-green shadow-[0_0_8px_rgb(var(--pc-green))]" />
       </span>
       <div className="leading-[1.05]">
-        <div className="font-pc-display text-[16px] font-bold tracking-[.02em]">
+        <div className="font-pc-display text-[1rem] font-bold tracking-[.02em]">
           SmartRotom <span className="text-pc-accent">PC</span>
         </div>
-        <div className="text-[10px] tracking-[.04em] text-pc-fg-subtle">{t("topbar.subtitle")}</div>
+        <div className="text-[0.625rem] tracking-[.04em] text-pc-fg-subtle">{t("topbar.subtitle")}</div>
       </div>
     </div>
   )
 }
 
-const Divider = () => <span className="h-[26px] w-px flex-none bg-pc-line" />
+const Divider = () => <span className="h-[1.625rem] w-px flex-none bg-pc-line" />
 
 export interface TopbarProps {
   onOpenFilters: () => void
@@ -54,7 +54,7 @@ export function Topbar({ onOpenFilters, onOpenLivingDex, onOpenPalette, onOpenHe
         <Icon
           name="search"
           size={17}
-          className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-pc-fg-subtle"
+          className="pointer-events-none absolute left-[0.8125rem] top-1/2 -translate-y-1/2 text-pc-fg-subtle"
         />
         <Input
           ref={searchRef}
@@ -62,7 +62,7 @@ export function Topbar({ onOpenFilters, onOpenLivingDex, onOpenPalette, onOpenHe
           onChange={(e) => setSearch(e.target.value)}
           aria-label={t("topbar.searchAriaLabel")}
           placeholder={t("topbar.searchPlaceholder")}
-          className="h-[42px] rounded-xl pl-10 pr-10 text-sm"
+          className="h-[2.625rem] rounded-xl pl-10 pr-10 text-sm"
         />
         {search ? (
           <Button
@@ -70,18 +70,18 @@ export function Topbar({ onOpenFilters, onOpenLivingDex, onOpenPalette, onOpenHe
             icon
             aria-label={t("topbar.clearSearch")}
             onClick={() => setSearch("")}
-            className="absolute right-1.5 top-1/2 -translate-y-1/2 p-[5px]"
+            className="absolute right-1.5 top-1/2 -translate-y-1/2 p-[0.3125rem]"
           >
             <Icon name="x" size={14} />
           </Button>
         ) : (
-          <span className="absolute right-[11px] top-1/2 -translate-y-1/2">
+          <span className="absolute right-[0.6875rem] top-1/2 -translate-y-1/2">
             <Kbd>/</Kbd>
           </span>
         )}
       </div>
 
-      <div className="flex flex-none items-center gap-[5px]">
+      <div className="flex flex-none items-center gap-[0.3125rem]">
         <Button icon aria-label={t("topbar.filters")} title={t("topbar.filters")} onClick={onOpenFilters}>
           <Icon name="sliders" size={17} />
         </Button>
@@ -106,7 +106,7 @@ export function Topbar({ onOpenFilters, onOpenLivingDex, onOpenPalette, onOpenHe
 
       <Divider />
 
-      <div className="flex flex-none items-center gap-[5px]">
+      <div className="flex flex-none items-center gap-[0.3125rem]">
         <Button icon aria-label={t("topbar.commands")} title={t("topbar.commands")} onClick={onOpenPalette}>
           <Icon name="command" size={17} />
         </Button>

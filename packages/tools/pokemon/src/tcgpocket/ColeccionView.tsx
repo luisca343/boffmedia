@@ -45,14 +45,14 @@ function CGroup({ set, cards, effective, editable, hideMissing, onAdd, onRemove,
   const have = cards.filter((c) => effective(c.id) > 0).length
   const p = cards.length ? Math.round((have / cards.length) * 100) : 0
   return (
-    <div className="mb-[18px]">
+    <div className="mb-[1.125rem]">
       <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open}
-        className="cut-corner cut-corner-edge [--cut-line:var(--line)] hover:[--cut-line:var(--accent-line)] flex w-full items-center gap-[14px] border border-solid border-line bg-panel p-[13px_16px] text-left transition-[background,border-color] hover:border-accent-line hover:bg-panel-2">
-        <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--accent)] flex-none bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{set.id}</span>
-        <span className="font-display text-[17px] font-bold uppercase leading-none tracking-[0.02em] text-txt">{set.name}</span>
-        <span className="font-mono text-[12px] leading-none text-txt-muted">{have}/{cards.length}</span>
-        <span className="hidden max-w-[220px] flex-1 sm:block"><TcgBar pct={p} /></span>
-        <span className="ml-auto font-mono text-[13px] font-bold leading-none text-accent">{p}%</span>
+        className="cut-corner cut-corner-edge [--cut-line:var(--line)] hover:[--cut-line:var(--accent-line)] flex w-full items-center gap-[0.875rem] border border-solid border-line bg-panel p-[13px_16px] text-left transition-[background,border-color] hover:border-accent-line hover:bg-panel-2">
+        <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--accent)] flex-none bg-accent px-[0.4375rem] py-1 font-display text-[0.75rem] font-bold leading-none text-accent-ink">{set.id}</span>
+        <span className="font-display text-[1.0625rem] font-bold uppercase leading-none tracking-[0.02em] text-txt">{set.name}</span>
+        <span className="font-mono text-[0.75rem] leading-none text-txt-muted">{have}/{cards.length}</span>
+        <span className="hidden max-w-[13.75rem] flex-1 sm:block"><TcgBar pct={p} /></span>
+        <span className="ml-auto font-mono text-[0.8125rem] font-bold leading-none text-accent">{p}%</span>
         <Icon name="chevronDown" size={18} className={"text-txt-dim transition-transform " + (open ? "rotate-180" : "")} />
       </button>
       {open && (
@@ -80,13 +80,13 @@ function BestPackPanel({ viewerName }: { viewerName: string | null }) {
 
   return (
     <Panel title={t("app.coleccion.bestPack")} aside={<Icon name="trophy" size={15} className="text-accent" />}>
-      <p className="mb-3 text-[13px] leading-relaxed text-txt-muted">{t("app.coleccion.bestPackHint")}</p>
+      <p className="mb-3 text-[0.8125rem] leading-relaxed text-txt-muted">{t("app.coleccion.bestPackHint")}</p>
       {!rows ? (
         <Button size="sm" variant="pri" icon="sparkles" onClick={run} disabled={loading || !viewerName}>
           {loading ? t("app.coleccion.analyzing") : t("app.coleccion.analyze")}
         </Button>
       ) : error || tableRows.length === 0 ? (
-        <p className="text-[13px] text-txt-dim">{t("app.coleccion.bestPackEmpty")}</p>
+        <p className="text-[0.8125rem] text-txt-dim">{t("app.coleccion.bestPackEmpty")}</p>
       ) : (
         <>
           {best && (
@@ -165,7 +165,7 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
       )}
       {/* No header, by the same rule as CartasView. Whose gallery this is — the
           one thing the tab row cannot say — is carried by the Banner below. */}
-      <p className="mb-5 max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">
+      <p className="mb-5 max-w-[58ch] text-pretty text-[0.9375rem] leading-[1.5] text-txt-muted">
         {t("app.coleccion.summary", { have: totals.have, total: totals.total, pct: totals.pct, dupes: totals.dupes })}
       </p>
 
@@ -178,16 +178,16 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
         </div>
       )}
 
-      <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[1fr_minmax(280px,340px)]">
+      <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[1fr_minmax(17.5rem,21.25rem)]">
         <div>
           <ToolBar>
-            <SearchInput value={q} onChange={setQ} placeholder={t("app.coleccion.searchPlaceholder")} className="min-w-[180px] flex-1" />
-            <Select value={setF} onChange={setSetF} ariaLabel={t("app.filters.expansion")} className="w-auto min-w-[140px]"
+            <SearchInput value={q} onChange={setQ} placeholder={t("app.coleccion.searchPlaceholder")} className="min-w-[11.25rem] flex-1" />
+            <Select value={setF} onChange={setSetF} ariaLabel={t("app.filters.expansion")} className="w-auto min-w-[8.75rem]"
               options={[{ value: "", label: t("app.filters.allSets") }].concat(data.sets.map((s) => ({ value: s.id, label: s.id })))} />
             <ToolBarSpacer />
             <span className="inline-flex items-center gap-2">
               <Toggle on={hideMissing} onChange={setHideMissing} ariaLabel={t("app.coleccion.hideMissing")} />
-              <span className="font-mono text-[12px] uppercase tracking-[0.06em] text-txt-muted">{t("app.coleccion.hideMissing")}</span>
+              <span className="font-mono text-[0.75rem] uppercase tracking-[0.06em] text-txt-muted">{t("app.coleccion.hideMissing")}</span>
             </span>
           </ToolBar>
 
@@ -203,7 +203,7 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
           <BestPackPanel viewerName={viewerName} />
           <Panel title={t("app.panel.recentActivity")} aside={<Icon name="clock" size={15} />}>
             {recent.length === 0 ? (
-              <p className="py-2 text-[13px] text-txt-dim">{t("app.panel.noActivity")}</p>
+              <p className="py-2 text-[0.8125rem] text-txt-dim">{t("app.panel.noActivity")}</p>
             ) : (
               <div className="grid gap-[2px]">
                 {recent.slice(0, 8).map((u) => {
@@ -211,14 +211,14 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
                   const name = card?.name || u.cardName
                   if (!name) return null
                   return (
-                    <div key={u.id} className="flex items-center gap-[10px] border-b border-solid border-line py-[10px] last:border-b-0">
+                    <div key={u.id} className="flex items-center gap-[0.625rem] border-b border-solid border-line py-[0.625rem] last:border-b-0">
                       <TcgTypePip type={card?.types?.[0] || "colorless"} size={18} />
                       <div className="min-w-0">
-                        <div className="truncate text-[14px] leading-tight text-txt">{name}</div>
-                        <div className="font-mono text-[11px] leading-none text-txt-dim">{card ? `${card.setId} · #${padNum(card.localId || card.id)}` : ""}</div>
+                        <div className="truncate text-[0.875rem] leading-tight text-txt">{name}</div>
+                        <div className="font-mono text-[0.6875rem] leading-none text-txt-dim">{card ? `${card.setId} · #${padNum(card.localId || card.id)}` : ""}</div>
                       </div>
-                      <span className={"ml-auto font-mono text-[13px] font-bold " + (u.count > 0 ? "text-ok" : "text-bad")}>{u.count > 0 ? "+" : ""}{u.count}</span>
-                      <span className="min-w-[72px] text-right font-mono text-[11px] leading-none text-txt-dim">{timeAgo(u.at, locale)}</span>
+                      <span className={"ml-auto font-mono text-[0.8125rem] font-bold " + (u.count > 0 ? "text-ok" : "text-bad")}>{u.count > 0 ? "+" : ""}{u.count}</span>
+                      <span className="min-w-[4.5rem] text-right font-mono text-[0.6875rem] leading-none text-txt-dim">{timeAgo(u.at, locale)}</span>
                     </div>
                   )
                 })}
@@ -229,8 +229,8 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
       </div>
 
       {editable && dirtyCount > 0 && (
-        <div className="cut-corner cut-corner-edge [--cut-line:var(--accent-line)] fixed bottom-[22px] left-1/2 z-[120] flex -translate-x-1/2 items-center gap-[14px] border border-solid border-accent-line bg-panel py-[11px] pl-[18px] pr-3 shadow-2xl motion-safe:animate-[bm-toast-in_.24s_both]">
-          <span className="text-[13px] leading-tight text-txt-muted">
+        <div className="cut-corner cut-corner-edge [--cut-line:var(--accent-line)] fixed bottom-[1.375rem] left-1/2 z-[120] flex -translate-x-1/2 items-center gap-[0.875rem] border border-solid border-accent-line bg-panel py-[0.6875rem] pl-[1.125rem] pr-3 shadow-2xl motion-safe:animate-[bm-toast-in_.24s_both]">
+          <span className="text-[0.8125rem] leading-tight text-txt-muted">
             <b className="font-mono text-txt">{dirtyCount}</b> {t("app.coleccion.unsaved", { count: dirtyCount })}
           </span>
           <Button size="sm" variant="ghost" onClick={discard} disabled={saving}>{t("app.coleccion.discard")}</Button>

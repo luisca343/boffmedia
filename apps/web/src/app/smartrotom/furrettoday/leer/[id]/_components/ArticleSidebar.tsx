@@ -87,7 +87,7 @@ function SidebarRelated({
           <Link
             key={a.id}
             href={articleHref(a.id)}
-            className="grid grid-cols-[40px_1fr] items-center gap-2.5 rounded-ft-md p-1.5 hover:bg-ft-ink/5"
+            className="grid grid-cols-[2.5rem_1fr] items-center gap-2.5 rounded-ft-md p-1.5 hover:bg-ft-ink/5"
           >
             <span
               className="ft-stamp shrink-0"
@@ -146,11 +146,11 @@ function SidebarComments({ newsId }: { newsId: number }) {
               <Avatar name={c.username} size={36} />
               <div className="min-w-0 flex-1">
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-ft-ui truncate text-[13px] font-bold">
+                  <span className="font-ft-ui truncate text-[0.8125rem] font-bold">
                     @{c.username}
                   </span>
                   <div className="flex shrink-0 items-center gap-1.5">
-                    <Meta className="text-[11px]">
+                    <Meta className="text-[0.6875rem]">
                       {formatCommentDate(c.createdAt)}
                     </Meta>
                     {canDelete ? (
@@ -211,7 +211,7 @@ export function ArticleSidebar({
   onShare: () => void;
 }) {
   return (
-    <aside className="sticky top-[110px] grid gap-5">
+    <aside className="sticky top-[6.875rem] grid gap-5">
       <ReadingProgress />
       <SidebarShare onShare={onShare} />
       <SidebarRelated article={article} articles={articles} />

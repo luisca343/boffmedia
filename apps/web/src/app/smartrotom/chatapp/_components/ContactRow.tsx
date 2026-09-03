@@ -31,24 +31,24 @@ export function ContactRow({
       onClick={onClick}
       onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onClick())}
       className={cn(
-        "relative flex cursor-pointer items-center gap-[13px] px-[14px] py-[11px] transition-colors duration-[120ms] hover:bg-ca-500/[.08]",
+        "relative flex cursor-pointer items-center gap-[0.8125rem] px-[0.875rem] py-[0.6875rem] transition-colors duration-[120ms] hover:bg-ca-500/[.08]",
         active && "bg-ca-500/[.14]",
       )}
     >
-      <span className="pointer-events-none absolute bottom-0 left-[76px] right-0 h-px bg-ca-800" />
+      <span className="pointer-events-none absolute bottom-0 left-[4.75rem] right-0 h-px bg-ca-800" />
       <Avatar src={chat.image} size={49} presence={isDirect(chat.type) && !isSaved(chat.type) ? chat.presence : undefined} />
 
       <div className="min-w-0 flex-1 py-0.5">
         <div className="flex items-center gap-1.5">
           {isSaved(chat.type) && <Icon name="archive" size={14} className="flex-none text-ca-accent-soft" />}
-          <span className="truncate text-[16px] font-medium text-ca-50">{chat.name}</span>
-          <span className={cn("ml-auto flex-none text-[12px]", unread ? "text-ca-accent-soft" : "text-ca-400")}>
+          <span className="truncate text-[1rem] font-medium text-ca-50">{chat.name}</span>
+          <span className={cn("ml-auto flex-none text-[0.75rem]", unread ? "text-ca-accent-soft" : "text-ca-400")}>
             {timeOf(last?.createdAt)}
           </span>
         </div>
 
         <div className="mt-[3px] flex items-center gap-1.5">
-          <span className={cn("flex min-w-0 flex-1 items-center gap-[5px] text-[14px]", unread ? "text-ca-300" : "text-ca-400")}>
+          <span className={cn("flex min-w-0 flex-1 items-center gap-[0.3125rem] text-[0.875rem]", unread ? "text-ca-300" : "text-ca-400")}>
             {typing ? (
               <span className="flex items-center gap-1.5 text-ca-accent-soft">
                 <Dots sm /> {t("status.typing")}

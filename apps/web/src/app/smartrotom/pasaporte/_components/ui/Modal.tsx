@@ -64,21 +64,21 @@ export function Modal({
       scope={PS_SCOPE}
       scrimClassName="z-[80] flex items-center justify-center p-5 bg-[rgb(3_5_15_/_.78)] backdrop-blur-[4px] animate-ps-fade motion-reduce:animate-none"
       className={cn(
-        "relative max-h-[88vh] w-[min(720px,92vw)] overflow-hidden overflow-y-auto ps-scroll",
+        "relative max-h-[88vh] w-[min(45rem,92vw)] overflow-hidden overflow-y-auto ps-scroll",
         "rounded-2xl border border-ps-gild/18 bg-ps-desk-lo shadow-[0_25px_50px_-12px_rgba(0,0,0,.5)]",
         "animate-ps-sheet-in motion-reduce:animate-none",
         className,
       )}
     >
-      <div className="flex items-center justify-between gap-3 border-b border-ps-gild/18 px-[18px] py-3.5">
-        <h2 className="font-ps-display text-[15px] font-bold tracking-[.06em] text-ps-chrome-fg">{title}</h2>
+      <div className="flex items-center justify-between gap-3 border-b border-ps-gild/18 px-[1.125rem] py-3.5">
+        <h2 className="font-ps-display text-[0.9375rem] font-bold tracking-[.06em] text-ps-chrome-fg">{title}</h2>
         <button
           type="button"
           onClick={onClose}
           aria-label={t("modal.close")}
-          className="grid h-[30px] w-[30px] place-items-center rounded-lg text-ps-chrome-muted transition-colors hover:bg-white/[.06] hover:text-ps-chrome-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-gild"
+          className="grid h-[1.875rem] w-[1.875rem] place-items-center rounded-lg text-ps-chrome-muted transition-colors hover:bg-white/[.06] hover:text-ps-chrome-fg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-gild"
         >
-          <Icon name="x" className="h-[18px] w-[18px]" />
+          <Icon name="x" className="h-[1.125rem] w-[1.125rem]" />
         </button>
       </div>
       {children}

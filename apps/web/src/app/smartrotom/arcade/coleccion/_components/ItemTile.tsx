@@ -39,17 +39,17 @@ export function ItemTile({ item, name, onClick }: ItemTileProps) {
       </div>
 
       <div
-        className="mb-1 font-ar-display text-[8px] uppercase tracking-[0.12em]"
+        className="mb-1 font-ar-display text-[0.5rem] uppercase tracking-[0.12em]"
         style={{ color: skin.fg }}
       >
         {t(skin.nameKey)}
       </div>
-      <div className="line-clamp-2 min-h-[28px] font-ar-mono text-[11px] font-semibold leading-tight text-ar-ink">
+      <div className="line-clamp-2 min-h-[1.75rem] font-ar-mono text-[0.6875rem] font-semibold leading-tight text-ar-ink">
         {name}
       </div>
 
       {count > 1 && (
-        <span className="absolute right-1.5 top-1.5 rounded border border-white/10 bg-black/70 px-1.5 py-0.5 font-ar-display text-[9px] text-ar-amber">
+        <span className="absolute right-1.5 top-1.5 rounded border border-white/10 bg-black/70 px-1.5 py-0.5 font-ar-display text-[0.5625rem] text-ar-amber">
           ×{count}
         </span>
       )}

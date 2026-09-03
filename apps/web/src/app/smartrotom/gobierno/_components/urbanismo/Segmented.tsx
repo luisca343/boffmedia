@@ -22,13 +22,13 @@ export function Segmented<T extends string>({
             type="button"
             onClick={() => onChange(o.value)}
             aria-pressed={active}
-            className={`rounded-[4px] px-[13px] py-[6px] font-gt text-[12px] font-bold tracking-[.02em] transition-colors ${
+            className={`rounded-[4px] px-[0.8125rem] py-[0.375rem] font-gt text-[0.75rem] font-bold tracking-[.02em] transition-colors ${
               active ? "bg-gt-paper-0 text-gt-ink-900 shadow-gt-sm" : "text-gt-ink-500 hover:text-gt-ink-800"
             }`}
           >
             {o.label}
             {o.count != null && (
-              <span className="ml-1.5 font-gt-mono text-[10px] tabular-nums text-gt-ink-400">{o.count}</span>
+              <span className="ml-1.5 font-gt-mono text-[0.625rem] tabular-nums text-gt-ink-400">{o.count}</span>
             )}
           </button>
         )

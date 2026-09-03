@@ -65,22 +65,22 @@ export function LandingPage() {
           className={cn(
             "tv-route relative z-[1]",
             /* central spine, zone-tinted at both ends */
-            "before:absolute before:bottom-0 before:left-1/2 before:top-0 before:z-[1] before:w-[2px] before:-translate-x-1/2 before:content-[''] before:[background:linear-gradient(180deg,rgba(var(--zr),var(--zg),var(--zb),0.95),var(--line-2)_4%,var(--line-2)_97%,rgba(var(--zr),var(--zg),var(--zb),0.95))] max-[820px]:before:left-[18px]",
+            "before:absolute before:bottom-0 before:left-1/2 before:top-0 before:z-[1] before:w-[2px] before:-translate-x-1/2 before:content-[''] before:[background:linear-gradient(180deg,rgba(var(--zr),var(--zg),var(--zb),0.95),var(--line-2)_4%,var(--line-2)_97%,rgba(var(--zr),var(--zg),var(--zb),0.95))] max-[820px]:before:left-[1.125rem]",
             /* route → meta light pool centred on the finish star */
-            "after:pointer-events-none after:absolute after:bottom-0 after:left-1/2 after:z-0 after:h-[420px] after:w-[min(860px,96vw)] after:-translate-x-1/2 after:translate-y-1/2 after:content-[''] after:[background:radial-gradient(50%_50%_at_50%_50%,rgba(var(--zr),var(--zg),var(--zb),0.12),transparent_70%)] [[data-theme=light]_&]:after:opacity-60",
+            "after:pointer-events-none after:absolute after:bottom-0 after:left-1/2 after:z-0 after:h-[26.25rem] after:w-[min(53.75rem,96vw)] after:-translate-x-1/2 after:translate-y-1/2 after:content-[''] after:[background:radial-gradient(50%_50%_at_50%_50%,rgba(var(--zr),var(--zg),var(--zb),0.12),transparent_70%)] [[data-theme=light]_&]:after:opacity-60",
           )}
         >
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute bottom-0 left-1/2 top-0 z-[2] w-[2px] -translate-x-1/2 opacity-50 [background-size:2px_36px] [background:repeating-linear-gradient(180deg,rgba(var(--zr),var(--zg),var(--zb),0)_0_14px,rgba(var(--zr),var(--zg),var(--zb),0.55)_14px_22px)] [mask-image:linear-gradient(180deg,transparent,#000_5%,#000_95%,transparent)] [-webkit-mask-image:linear-gradient(180deg,transparent,#000_5%,#000_95%,transparent)] animate-[tv-flow_1.5s_linear_infinite] [.no-motion_&]:animate-none max-[820px]:left-[18px]"
+            className="pointer-events-none absolute bottom-0 left-1/2 top-0 z-[2] w-[2px] -translate-x-1/2 opacity-50 [background-size:2px_36px] [background:repeating-linear-gradient(180deg,rgba(var(--zr),var(--zg),var(--zb),0)_0_14px,rgba(var(--zr),var(--zg),var(--zb),0.55)_14px_22px)] [mask-image:linear-gradient(180deg,transparent,#000_5%,#000_95%,transparent)] [-webkit-mask-image:linear-gradient(180deg,transparent,#000_5%,#000_95%,transparent)] animate-[tv-flow_1.5s_linear_infinite] [.no-motion_&]:animate-none max-[820px]:left-[1.125rem]"
           />
           <span
             aria-hidden="true"
-            className="absolute left-1/2 top-0 z-[3] w-[2px] -translate-x-1/2 shadow-[0_0_16px_rgba(var(--zr),var(--zg),var(--zb),0.5)] [background:linear-gradient(180deg,rgba(var(--zr),var(--zg),var(--zb),0.15),rgba(var(--zr),var(--zg),var(--zb),1))] [height:var(--pulse)] max-[820px]:left-[18px]"
+            className="absolute left-1/2 top-0 z-[3] w-[2px] -translate-x-1/2 shadow-[0_0_16px_rgba(var(--zr),var(--zg),var(--zb),0.5)] [background:linear-gradient(180deg,rgba(var(--zr),var(--zg),var(--zb),0.15),rgba(var(--zr),var(--zg),var(--zb),1))] [height:var(--pulse)] max-[820px]:left-[1.125rem]"
           />
           <span
             aria-hidden="true"
-            className="absolute left-1/2 z-[4] -translate-x-1/2 -translate-y-1/2 [top:var(--pulse)] before:absolute before:left-1/2 before:top-1/2 before:h-10 before:w-10 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border before:border-solid before:border-[rgba(var(--zr),var(--zg),var(--zb),0.5)] before:content-[''] before:animate-[tv-ping_2.4s_ease-out_infinite] [.no-motion_&]:before:animate-none max-[820px]:left-[18px]"
+            className="absolute left-1/2 z-[4] -translate-x-1/2 -translate-y-1/2 [top:var(--pulse)] before:absolute before:left-1/2 before:top-1/2 before:h-10 before:w-10 before:-translate-x-1/2 before:-translate-y-1/2 before:rounded-full before:border before:border-solid before:border-[rgba(var(--zr),var(--zg),var(--zb),0.5)] before:content-[''] before:animate-[tv-ping_2.4s_ease-out_infinite] [.no-motion_&]:before:animate-none max-[820px]:left-[1.125rem]"
           >
             <i className="block h-3 w-3 rounded-full bg-[rgba(var(--zr),var(--zg),var(--zb),1)] shadow-[0_0_0_5px_rgba(var(--zr),var(--zg),var(--zb),0.16),0_0_22px_4px_rgba(var(--zr),var(--zg),var(--zb),0.8)]" />
           </span>

@@ -38,8 +38,8 @@ export function ArticleFooter({ article }: { article: FtArticle }) {
     <div className="border-ft rounded-ft-lg border-ft-ink bg-ft-yellow-soft p-6 shadow-ft-pop">
       <div className="flex flex-wrap items-center gap-4">
         <FurretMascot size={64} />
-        <div className="min-w-[220px] flex-1">
-          <div className="font-ft-display text-[28px] leading-[0.95]">
+        <div className="min-w-[13.75rem] flex-1">
+          <div className="font-ft-display text-[1.75rem] leading-[0.95]">
             {t("articleFooter.title")}
           </div>
           <p className="mt-1 text-ft-body">

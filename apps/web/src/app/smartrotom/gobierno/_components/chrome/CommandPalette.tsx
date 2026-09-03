@@ -68,7 +68,7 @@ export function CommandPalette() {
           role="dialog"
           aria-modal="true"
           aria-label={t("commandPalette.ariaLabel")}
-          className="gt-edge-gold relative w-full max-w-[540px] animate-gt-pop-scale overflow-hidden rounded-gt border border-gt-line-strong bg-gt-paper-0 shadow-gt-lg motion-reduce:animate-none"
+          className="gt-edge-gold relative w-full max-w-[33.75rem] animate-gt-pop-scale overflow-hidden rounded-gt border border-gt-line-strong bg-gt-paper-0 shadow-gt-lg motion-reduce:animate-none"
         >
           <div className="flex items-center gap-2.5 border-b border-gt-line px-4 py-3">
             <Icon name="search" size={17} className="flex-none text-gt-ink-400" />
@@ -89,16 +89,16 @@ export function CommandPalette() {
               }}
               placeholder={t("commandPalette.searchPlaceholder")}
               aria-label={t("commandPalette.searchPlaceholder")}
-              className="flex-1 bg-transparent text-[14px] text-gt-ink-900 outline-none placeholder:text-gt-ink-400"
+              className="flex-1 bg-transparent text-[0.875rem] text-gt-ink-900 outline-none placeholder:text-gt-ink-400"
             />
-            <span className="rounded border border-gt-line-strong px-1.5 py-px font-gt-mono text-[10px] text-gt-ink-400">
+            <span className="rounded border border-gt-line-strong px-1.5 py-px font-gt-mono text-[0.625rem] text-gt-ink-400">
               ESC
             </span>
           </div>
 
           <div className="gt-scroll max-h-[50vh] overflow-y-auto py-1.5">
             {results.length === 0 ? (
-              <div className="px-4 py-8 text-center text-[13px] text-gt-ink-400">
+              <div className="px-4 py-8 text-center text-[0.8125rem] text-gt-ink-400">
                 {t("commandPalette.noResults", { query: q })}
               </div>
             ) : (
@@ -115,8 +115,8 @@ export function CommandPalette() {
                     }`}
                   >
                     <Icon name={m.icon} size={16} className={`flex-none ${tone.text}`} />
-                    <span className="flex-1 text-[13.5px] font-semibold text-gt-ink-900">{t(m.labelKey)}</span>
-                    <span className="font-gt-mono text-[9.5px] uppercase tracking-[.12em] text-gt-ink-400">
+                    <span className="flex-1 text-[0.84375rem] font-semibold text-gt-ink-900">{t(m.labelKey)}</span>
+                    <span className="font-gt-mono text-[0.59375rem] uppercase tracking-[.12em] text-gt-ink-400">
                       {t(m.groupKey)}
                     </span>
                   </button>

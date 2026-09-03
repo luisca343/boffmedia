@@ -76,10 +76,10 @@ export function ForumCategoryView({ slug }: { slug: string }) {
   }
 
   return (
-    <main data-ds="boffmedia" className="wrap pb-[90px] pt-6">
+    <main data-ds="boffmedia" className="wrap pb-[5.625rem] pt-6">
       <Link
         href="/foro"
-        className="mb-5 inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
+        className="mb-5 inline-flex items-center gap-2 font-mono text-[0.6875rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
       >
         <Icon name="back" size={14} /> {t("cat.breadcrumb")}
       </Link>
@@ -89,11 +89,11 @@ export function ForumCategoryView({ slug }: { slug: string }) {
           <Icon name={category.icon as IconName} size={26} />
         </span>
         <div className="min-w-0">
-          <h1 className="flex items-center gap-2.5 text-[clamp(30px,4vw,44px)]">
+          <h1 className="flex items-center gap-2.5 text-[clamp(1.875rem,4vw,2.75rem)]">
             {category.name}
             {category.locked && <Icon name="lock" size={18} className="text-txt-dim" />}
           </h1>
-          <p className="mt-2 max-w-[64ch] font-body text-[15px]/[1.55] text-txt-muted">{category.description}</p>
+          <p className="mt-2 max-w-[64ch] font-body text-[0.9375rem]/[1.55] text-txt-muted">{category.description}</p>
         </div>
         <div className="ml-auto flex-none self-start">
           {canCreate ? (
@@ -110,7 +110,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
           ) : !loggedIn && !category.locked ? (
             <Link
               href="/entrar"
-              className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-accent-bright"
+              className="inline-flex items-center gap-1.5 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-accent-bright"
             >
               <Icon name="user" size={13} /> {t("cat.loginToPost")}
             </Link>
@@ -121,7 +121,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
       {composing && canCreate && (
         <div className="mb-6">
           {createError && (
-            <p className="mb-2.5 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[12px] font-medium text-bad cut-tag cut-tag-edge [--cut-line:var(--bad)]">
+            <p className="mb-2.5 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[0.75rem] font-medium text-bad cut-tag cut-tag-edge [--cut-line:var(--bad)]">
               {createError}
             </p>
           )}
@@ -138,7 +138,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
         </div>
       )}
 
-      <div className="grid items-start gap-5 [grid-template-columns:1fr_320px] max-[900px]:grid-cols-1">
+      <div className="grid items-start gap-5 [grid-template-columns:1fr_20rem] max-[900px]:grid-cols-1">
         <div className="min-w-0">
           <div className="mb-4 flex flex-wrap items-center gap-3">
             <div className="max-w-full overflow-x-auto">
@@ -152,7 +152,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
                 className="w-max"
               />
             </div>
-            <span className="ml-auto font-mono text-[11px] font-medium uppercase tracking-[0.1em] text-txt-muted">
+            <span className="ml-auto font-mono text-[0.6875rem] font-medium uppercase tracking-[0.1em] text-txt-muted">
               {t("cat.threadCount", { count: total })}
             </span>
           </div>

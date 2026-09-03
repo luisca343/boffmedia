@@ -52,7 +52,7 @@ export function CoverHero({
 
       <div className="ft-wrap-wide relative grid items-center gap-14 px-6 pb-14 pt-4 lg:grid-cols-[1.15fr_1fr]">
         <div className="relative min-w-0">
-          <Pill tone="pink" className="mb-[18px]">
+          <Pill tone="pink" className="mb-[1.125rem]">
             {cover.eyebrow}
           </Pill>
 
@@ -75,7 +75,7 @@ export function CoverHero({
           </h1>
 
           <p
-            className="font-ft-deck mb-6 max-w-[640px] italic text-white/85"
+            className="font-ft-deck mb-6 max-w-[40rem] italic text-white/85"
             style={{ fontSize: "clamp(1.25rem, 2.2vw, 1.75rem)" }}
           >
             {cover.deck}
@@ -96,12 +96,12 @@ export function CoverHero({
           </div>
         </div>
 
-        <div className="relative min-h-[460px] min-w-0 overflow-visible">
-          <div className="border-ft-thick absolute right-[8%] top-[10%] h-[360px] w-[360px] rounded-full border-ft-ink bg-ft-yellow shadow-ft-pop-lg" />
+        <div className="relative min-h-[28.75rem] min-w-0 overflow-visible">
+          <div className="border-ft-thick absolute right-[8%] top-[10%] h-[22.5rem] w-[22.5rem] rounded-full border-ft-ink bg-ft-yellow shadow-ft-pop-lg" />
 
           <div
             aria-hidden="true"
-            className="ft-halftone-mask absolute -right-[4%] top-[32%] h-[220px] w-[460px] opacity-[0.85]"
+            className="ft-halftone-mask absolute -right-[4%] top-[32%] h-[13.75rem] w-[28.75rem] opacity-[0.85]"
             style={{
               backgroundImage: "radial-gradient(#0b0b0f 2px, transparent 2.4px)",
               backgroundSize: "14px 14px",
@@ -120,7 +120,7 @@ export function CoverHero({
 
           <Sticker
             bob
-            className="text-[22px]"
+            className="text-[1.375rem]"
             style={{ position: "absolute", right: 36, top: 36 }}
           >
             {t("new")}
@@ -129,7 +129,7 @@ export function CoverHero({
           <SpeechBubble
             style={{ position: "absolute", right: 12, bottom: "6%", maxWidth: 220 }}
           >
-            <span className="font-ft-display block text-[26px] leading-[0.9] text-ft-ink">
+            <span className="font-ft-display block text-[1.625rem] leading-[0.9] text-ft-ink">
               CA·MI·NAR
             </span>
           </SpeechBubble>
@@ -151,7 +151,7 @@ export function CoverHero({
 
       {contents.length > 0 ? (
         <div className="border-ft relative border-x-0 border-b-0 border-ft-ink bg-white/[0.06]">
-          <div className="ft-wrap-wide grid grid-cols-1 gap-4 px-6 py-[18px] sm:grid-cols-[auto_repeat(4,1fr)] sm:items-center">
+          <div className="ft-wrap-wide grid grid-cols-1 gap-4 px-6 py-[1.125rem] sm:grid-cols-[auto_repeat(4,1fr)] sm:items-center">
             <Eyebrow className="text-ft-yellow">{t("inThisIssue")}</Eyebrow>
             {contents.map((article) => (
               <Link
@@ -159,10 +159,10 @@ export function CoverHero({
                 href={articleHref(article.id)}
                 className="flex min-w-0 items-baseline gap-2 hover:opacity-80"
               >
-                <span className="font-ft-display shrink-0 text-[22px] text-ft-pink">
+                <span className="font-ft-display shrink-0 text-[1.375rem] text-ft-pink">
                   {article.datelineShort}
                 </span>
-                <span className="font-ft-ui truncate text-[13px] font-medium uppercase tracking-[0.04em] text-white/85">
+                <span className="font-ft-ui truncate text-[0.8125rem] font-medium uppercase tracking-[0.04em] text-white/85">
                   {article.title}
                 </span>
               </Link>

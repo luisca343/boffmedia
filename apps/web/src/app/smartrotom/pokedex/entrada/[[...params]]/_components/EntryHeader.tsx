@@ -88,7 +88,7 @@ export function EntryHeader({
             </div>
             <div className="min-w-0">
               <div className="font-pk-mono text-xs text-pk-surface-500 tracking-[0.04em]">N.º {String(pokemon.dex).padStart(4, "0")}</div>
-              <h1 className="font-pk-display font-bold text-[28px] leading-[1.05] tracking-tight text-pk-surface-50 my-0.5 mb-2">
+              <h1 className="font-pk-display font-bold text-[1.75rem] leading-[1.05] tracking-tight text-pk-surface-50 my-0.5 mb-2">
                 {isVisible ? getPokemonNameAndForm(pokemon.name, formName, t) : "???"}
               </h1>
               <div className="flex items-center gap-2.5 flex-wrap">
@@ -115,17 +115,17 @@ export function EntryHeader({
                       className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[7px] text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.05] transition-colors text-xs"
                     >
                       <ChevronLeftIcon className="w-3.5 h-3.5" />
-                      <span className="font-pk-mono text-[11px] text-pk-surface-500">#{String(prev.dex).padStart(3, "0")}</span>
+                      <span className="font-pk-mono text-[0.6875rem] text-pk-surface-500">#{String(prev.dex).padStart(3, "0")}</span>
                     </Link>
                   )}
-                  {prev && next && <span className="w-px h-[18px] bg-white/[0.08]" />}
+                  {prev && next && <span className="w-px h-[1.125rem] bg-white/[0.08]" />}
                   {next && (
                     <Link
                       href={`/smartrotom/pokedex/entrada/${next.dex}`}
                       title={`#${next.dex} ${next.name}`}
                       className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-[7px] text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.05] transition-colors text-xs"
                     >
-                      <span className="font-pk-mono text-[11px] text-pk-surface-500">#{String(next.dex).padStart(3, "0")}</span>
+                      <span className="font-pk-mono text-[0.6875rem] text-pk-surface-500">#{String(next.dex).padStart(3, "0")}</span>
                       <ChevronRightIcon className="w-3.5 h-3.5" />
                     </Link>
                   )}
@@ -142,7 +142,7 @@ export function EntryHeader({
                   key={tab.id}
                   href={`#${tab.id}`}
                   aria-current={isActive ? "location" : undefined}
-                  className={`relative px-3.5 py-2.5 text-[13px] font-medium transition-colors whitespace-nowrap inline-flex items-center gap-[7px] ${
+                  className={`relative px-3.5 py-2.5 text-[0.8125rem] font-medium transition-colors whitespace-nowrap inline-flex items-center gap-[0.4375rem] ${
                     isActive ? "text-pk-primary-300" : "text-pk-surface-400 hover:text-pk-surface-100"
                   }`}
                 >

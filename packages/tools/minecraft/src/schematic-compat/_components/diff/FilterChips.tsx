@@ -14,7 +14,7 @@ export function FilterChips({
   onToggle: (key: SchStatus) => void;
 }) {
   return (
-    <div className="flex flex-wrap gap-[7px]" role="group">
+    <div className="flex flex-wrap gap-[0.4375rem]" role="group">
       {chips.map((c) => {
         const on = active === c.key;
         const dim = active !== null && !on;
@@ -28,14 +28,14 @@ export function FilterChips({
             aria-pressed={on}
             onClick={() => onToggle(c.key)}
             className={cn(
-              "flex items-center gap-[7px] py-[5px] px-2.5 bg-panel border border-solid text-[12px] cursor-pointer",
+              "flex items-center gap-[0.4375rem] py-[0.3125rem] px-2.5 bg-panel border border-solid text-[0.75rem] cursor-pointer",
               "transition-[opacity,border-color,background] duration-[140ms] disabled:opacity-[0.32] disabled:cursor-default",
               on ? cn(tone.bd, tone.soft) : "border-line enabled:hover:border-line-2",
               dim && "opacity-[0.42]",
             )}
           >
-            <span className={cn("w-[7px] h-[7px] shrink-0", tone.dot)} />
-            <span className={cn("font-mono text-[12px] font-bold tabular-nums", tone.fg)}>{c.count}</span>
+            <span className={cn("w-[0.4375rem] h-[0.4375rem] shrink-0", tone.dot)} />
+            <span className={cn("font-mono text-[0.75rem] font-bold tabular-nums", tone.fg)}>{c.count}</span>
             <span className={on ? "text-txt" : "text-txt-dim"}>{c.label}</span>
           </button>
         );

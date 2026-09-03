@@ -71,8 +71,8 @@ export function PreviewShell({
 
   return (
     <div ref={rootRef} className="flex h-full flex-col bg-base-2">
-      <div className="shrink-0 flex items-center gap-1.5 px-3 h-[46px] border-b border-line">
-        <span className="font-mono text-[10.5px] tracking-[0.14em] uppercase text-txt-muted">{labels.title}</span>
+      <div className="shrink-0 flex items-center gap-1.5 px-3 h-[2.875rem] border-b border-line">
+        <span className="font-mono text-[0.65625rem] tracking-[0.14em] uppercase text-txt-muted">{labels.title}</span>
         {headerLead}
         <div className="flex-1" />
         {headerTrail}
@@ -104,7 +104,7 @@ export function PreviewShell({
       </div>
 
       <div
-        className="relative flex-1 min-h-[200px] overflow-hidden"
+        className="relative flex-1 min-h-[12.5rem] overflow-hidden"
         style={{ background: "radial-gradient(120% 120% at 50% 30%, var(--panel) 0%, var(--bg) 80%)" }}
       >
         <div
@@ -124,7 +124,7 @@ export function PreviewShell({
 
       <AxisSlider axis="Y" value={layerY} max={maxLayerY} onChange={onLayerYChange} />
 
-      <div className="shrink-0 border-t border-line py-3 px-3 min-h-[92px]">{inspector}</div>
+      <div className="shrink-0 border-t border-line py-3 px-3 min-h-[5.75rem]">{inspector}</div>
     </div>
   )
 }

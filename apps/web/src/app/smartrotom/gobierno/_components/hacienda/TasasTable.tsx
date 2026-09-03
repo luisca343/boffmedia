@@ -37,8 +37,8 @@ export function TasasTable({ tasas }: { tasas: Tasa[] }) {
             tasas.map((row) => (
               <TR key={row.id}>
                 <TD className="font-semibold text-gt-ink-900">{row.concept}</TD>
-                <TD className="font-gt-mono text-[11.5px] text-gt-ink-500">{row.rate}</TD>
-                <TD className="font-gt-display text-[14px] font-bold tabular-nums text-gt-civic">
+                <TD className="font-gt-mono text-[0.71875rem] text-gt-ink-500">{row.rate}</TD>
+                <TD className="font-gt-display text-[0.875rem] font-bold tabular-nums text-gt-civic">
                   {money(row.collected, intlLocale)} ₽
                 </TD>
                 <TD>{row.active ? <Badge tone="ok">{t("common.activo")}</Badge> : <Badge tone="default">{t("common.inactivo")}</Badge>}</TD>

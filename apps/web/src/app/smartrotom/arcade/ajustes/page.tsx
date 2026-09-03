@@ -13,17 +13,17 @@ export default function AjustesPage() {
 
   return (
     <>
-      <Panel tone="deep" tight className="mb-[18px]">
+      <Panel tone="deep" tight className="mb-[1.125rem]">
         <div className="flex flex-wrap items-center justify-between gap-3.5">
           <div className="flex items-center gap-3.5">
             <Link
               href="/smartrotom/arcade"
-              className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
+              className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
             >
               <Icon.Chevron s={12} dir="left" />
               {t("ajustes.backToArcade")}
             </Link>
-            <h1 className="ar-chrom font-ar-display text-[16px] uppercase leading-none text-ar-ink">
+            <h1 className="ar-chrom font-ar-display text-[1rem] uppercase leading-none text-ar-ink">
               {t("ajustes.title")}
             </h1>
           </div>
@@ -35,7 +35,7 @@ export default function AjustesPage() {
         </div>
       </Panel>
 
-      <div className="grid gap-[18px] lg:grid-cols-2">
+      <div className="grid gap-[1.125rem] lg:grid-cols-2">
         <CabinaSection />
         <CuentaSection />
       </div>

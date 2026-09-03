@@ -199,7 +199,7 @@ export function FtPrimitivasChapter() {
       >
         <Sample title="Esqueleto" code="Skeleton · ft-skel" app="ft">
           <div className="grid gap-3">
-            <Skeleton className="h-[180px] w-full" />
+            <Skeleton className="h-[11.25rem] w-full" />
             <Skeleton className="h-6 w-2/3" />
             <Skeleton className="h-6 w-1/3" />
           </div>

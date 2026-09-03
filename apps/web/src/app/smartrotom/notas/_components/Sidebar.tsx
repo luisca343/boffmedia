@@ -9,7 +9,7 @@ import type { NoteVM, View } from "../_types";
 import type { Theme } from "../_hooks/useNotesTheme";
 
 const NAV_BASE =
-  "group/nav relative flex h-8 cursor-pointer select-none items-center gap-[9px] rounded-nt-sm px-2 text-[13.5px] transition-colors";
+  "group/nav relative flex h-8 cursor-pointer select-none items-center gap-[0.5625rem] rounded-nt-sm px-2 text-[0.84375rem] transition-colors";
 const NAV_IDLE = "text-nt-fg-muted hover:bg-nt-hover hover:text-nt-fg";
 const NAV_ACTIVE = "bg-nt-accent/15 font-[550] text-nt-accent-fg";
 
@@ -107,7 +107,7 @@ export function Sidebar(props: SidebarProps) {
               />
             </span>
           ) : (
-            <span className="w-[14px]" />
+            <span className="w-[0.875rem]" />
           )}
           <Icon
             name={open && kids.length ? "folder-open" : "folder"}
@@ -115,7 +115,7 @@ export function Sidebar(props: SidebarProps) {
             style={{ color: active ? "rgb(var(--nt-accent-fg))" : `rgb(${rgbOf(f.color)})` }}
           />
           <span className="min-w-0 flex-1 truncate">{f.name}</span>
-          <span className="text-[11px] tabular-nums text-nt-fg-subtle">{folderCount(f.id) || ""}</span>
+          <span className="text-[0.6875rem] tabular-nums text-nt-fg-subtle">{folderCount(f.id) || ""}</span>
         </div>
         {open && kids.map((ch) => <FolderNode key={ch.id} f={ch} depth={depth + 1} />)}
       </div>
@@ -124,7 +124,7 @@ export function Sidebar(props: SidebarProps) {
 
   return (
     <aside
-      className={`flex w-[240px] flex-none flex-col border-r border-nt-border bg-nt-bg-2 max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:top-12 max-md:z-[60] max-md:shadow-[0_18px_50px_-12px_rgba(0,0,0,.7)] max-md:transition-transform ${
+      className={`flex w-[15rem] flex-none flex-col border-r border-nt-border bg-nt-bg-2 max-md:fixed max-md:inset-y-0 max-md:left-0 max-md:top-12 max-md:z-[60] max-md:shadow-[0_18px_50px_-12px_rgba(0,0,0,.7)] max-md:transition-transform ${
         props.railOpen ? "max-md:translate-x-0" : "max-md:-translate-x-full"
       }`}
       role="navigation"
@@ -134,14 +134,14 @@ export function Sidebar(props: SidebarProps) {
         <button
           onClick={props.onNew}
           disabled={props.newBusy}
-          className="inline-flex h-9 items-center justify-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[13.5px] font-[550] text-white shadow-[inset_0_1px_0_rgb(255_255_255/.12),0_6px_16px_-8px_rgb(234_88_12/.8)] transition-all hover:brightness-[1.06] active:brightness-95"
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-nt-md bg-gradient-to-b from-nt-500 to-nt-600 px-3.5 text-[0.84375rem] font-[550] text-white shadow-[inset_0_1px_0_rgb(255_255_255/.12),0_6px_16px_-8px_rgb(234_88_12/.8)] transition-all hover:brightness-[1.06] active:brightness-95"
         >
           <Icon name="plus" size={16} /> {t("sidebar.newNote")}
         </button>
         <div className="flex gap-2">
           <button
             onClick={props.onCapture}
-            className="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[13.5px] font-[550] text-nt-fg-muted transition-all hover:bg-nt-hover-strong hover:text-nt-fg"
+            className="inline-flex h-9 flex-1 items-center justify-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-3.5 text-[0.84375rem] font-[550] text-nt-fg-muted transition-all hover:bg-nt-hover-strong hover:text-nt-fg"
           >
             <Icon name="zap" size={15} /> {t("sidebar.capture")}
           </button>
@@ -170,7 +170,7 @@ export function Sidebar(props: SidebarProps) {
               <Icon name={s.icon} size={15} className="opacity-85" />
               <span className="min-w-0 flex-1 truncate">{s.label}</span>
               {s.count != null && (
-                <span className="text-[11px] tabular-nums text-nt-fg-subtle">{s.count || ""}</span>
+                <span className="text-[0.6875rem] tabular-nums text-nt-fg-subtle">{s.count || ""}</span>
               )}
             </div>
           ))}
@@ -178,7 +178,7 @@ export function Sidebar(props: SidebarProps) {
 
         <div className="group mt-3">
           <div className="mb-0.5 flex items-center justify-between px-2 py-1">
-            <span className="font-nt-display text-[10px] font-semibold uppercase tracking-[.12em] text-nt-fg-subtle">
+            <span className="font-nt-display text-[0.625rem] font-semibold uppercase tracking-[.12em] text-nt-fg-subtle">
               {t("sidebar.folders")}
             </span>
             <span
@@ -196,7 +196,7 @@ export function Sidebar(props: SidebarProps) {
 
         <div className="mt-3">
           <div className="mb-0.5 flex items-center justify-between px-2 py-1">
-            <span className="font-nt-display text-[10px] font-semibold uppercase tracking-[.12em] text-nt-fg-subtle">
+            <span className="font-nt-display text-[0.625rem] font-semibold uppercase tracking-[.12em] text-nt-fg-subtle">
               {t("sidebar.tags")}
             </span>
           </div>
@@ -211,7 +211,7 @@ export function Sidebar(props: SidebarProps) {
                 style={{ background: `rgb(${rgbOf(colorKey(t.color))})` }}
               />
               <span className="min-w-0 flex-1 truncate">{t.label}</span>
-              <span className="text-[11px] tabular-nums text-nt-fg-subtle">{counts.byTag[t.id] || ""}</span>
+              <span className="text-[0.6875rem] tabular-nums text-nt-fg-subtle">{counts.byTag[t.id] || ""}</span>
             </div>
           ))}
         </div>

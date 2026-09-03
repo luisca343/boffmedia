@@ -26,14 +26,14 @@ export default function SquirdlePage() {
       {/* Unclipped: the guess autocomplete drops out of the panel, and the panel
           sits at the bottom of the stage — so both would otherwise cut it off. */}
       <GameStage accent="cyan" clip={false}>
-        <div className="grid items-start gap-4 lg:grid-cols-[1fr_260px] lg:gap-5">
-          <Panel tone="deep" clip={false} innerClassName="p-4 md:p-[18px]">
+        <div className="grid items-start gap-4 lg:grid-cols-[1fr_16.25rem] lg:gap-5">
+          <Panel tone="deep" clip={false} innerClassName="p-4 md:p-[1.125rem]">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5">
-              <span className="font-ar-display text-[11px] text-ar-cyan">▸ {t("squirdle.enigma")}</span>
-              <span className="font-ar-mono text-[11px] uppercase text-ar-ink-dim">
+              <span className="font-ar-display text-[0.6875rem] text-ar-cyan">▸ {t("squirdle.enigma")}</span>
+              <span className="font-ar-mono text-[0.6875rem] uppercase text-ar-ink-dim">
                 {t("squirdle.guessTheCreature")}
               </span>
-              <span className="font-ar-display text-[11px] text-ar-magenta-2">
+              <span className="font-ar-display text-[0.6875rem] text-ar-magenta-2">
                 {t("squirdle.attempts", { count: MAX_GUESSES })}
               </span>
             </div>

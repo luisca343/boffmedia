@@ -38,7 +38,7 @@ export function Bar({
       aria-label={label}
       className={cn(
         "overflow-hidden rounded-md bg-ps-ink/[.14]",
-        thin ? "h-[5px]" : "h-2",
+        thin ? "h-[0.3125rem]" : "h-2",
         className,
       )}
     >

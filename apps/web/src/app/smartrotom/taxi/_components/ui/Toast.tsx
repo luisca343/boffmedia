@@ -33,7 +33,7 @@ export function ToastHost() {
 
   return createPortal(
     <ThemedLayer>
-      <div className="fixed left-1/2 top-[74px] z-[80] flex -translate-x-1/2 flex-col items-center gap-2">
+      <div className="fixed left-1/2 top-[4.625rem] z-[80] flex -translate-x-1/2 flex-col items-center gap-2">
         {list.map((t) => {
           const icon = KIND_ICON[t.kind]
           const tone = TONES[t.kind]
@@ -44,13 +44,13 @@ export function ToastHost() {
               className={cn(
                 "flex items-center gap-2.5 rounded-tx-pill py-2.5 pl-3 pr-5",
                 "bg-tx-surface-solid border border-solid shadow-tx-2",
-                "text-[13.5px] font-bold text-tx-txt",
+                "text-[0.84375rem] font-bold text-tx-txt",
                 "animate-tx-toast-in motion-reduce:animate-none",
                 tone.wrap,
               )}
             >
               {tone.badge ? (
-                <span className={cn("grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full", tone.badge)}>
+                <span className={cn("grid h-[1.875rem] w-[1.875rem] shrink-0 place-items-center rounded-full", tone.badge)}>
                   <Icon name={icon} size={18} stroke={2.6} />
                 </span>
               ) : (

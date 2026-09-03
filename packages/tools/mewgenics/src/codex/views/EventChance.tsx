@@ -67,14 +67,14 @@ function StatStepper({ id, label, value, min, max, onChange, tone }: { id: strin
   const clamp = (v: number) => (Number.isFinite(v) ? Math.max(min, Math.min(max, Math.round(v))) : min)
   const step = (d: number) => onChange(clamp(value + d))
 
-  const btn = "grid w-[26px] flex-none place-items-center text-[15px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] transition-colors hover:bg-[color:var(--mwp-paper-3)] disabled:opacity-30 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:bg-[color:var(--mwp-paper-3)]"
+  const btn = "grid w-[1.625rem] flex-none place-items-center text-[0.9375rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] transition-colors hover:bg-[color:var(--mwp-paper-3)] disabled:opacity-30 disabled:hover:bg-transparent focus-visible:outline-none focus-visible:bg-[color:var(--mwp-paper-3)]"
 
   return (
-    <div className="flex w-[104px] flex-none flex-col gap-[5px]">
+    <div className="flex w-[6.5rem] flex-none flex-col gap-[0.3125rem]">
       <label
         htmlFor={id}
         className={cn(
-          "text-[10.5px]/none uppercase tracking-[0.06em] [font-family:var(--mwf-disp)]",
+          "text-[0.65625rem]/none uppercase tracking-[0.06em] [font-family:var(--mwf-disp)]",
           tone === "low" ? "text-[color:var(--mwp-bad)]" : tone === "high" ? "text-[color:var(--mwp-good)]" : "text-[color:var(--mwp-ink-soft)]",
         )}
       >
@@ -82,7 +82,7 @@ function StatStepper({ id, label, value, min, max, onChange, tone }: { id: strin
       </label>
       <div
         className={cn(
-          "flex h-[30px] items-stretch overflow-hidden border-2 border-solid bg-[color:var(--mwp-paper)] [border-radius:6px] focus-within:ring-2 focus-within:ring-[color:var(--mwp-red)]",
+          "flex h-[1.875rem] items-stretch overflow-hidden border-2 border-solid bg-[color:var(--mwp-paper)] [border-radius:6px] focus-within:ring-2 focus-within:ring-[color:var(--mwp-red)]",
           tone === "low" ? "border-[color:var(--mwp-bad)]" : tone === "high" ? "border-[color:var(--mwp-good)]" : "border-[color:var(--mwp-ink)]",
         )}
       >
@@ -98,7 +98,7 @@ function StatStepper({ id, label, value, min, max, onChange, tone }: { id: strin
           onChange={(e) => onChange(clamp(Number(e.target.value)))}
           onBlur={(e) => onChange(clamp(Number(e.target.value)))}
           aria-label={label}
-          className="mew-num w-full min-w-0 flex-1 border-x-2 border-solid border-[color:var(--mwp-ink-line)] bg-transparent text-center font-mono text-[14px]/none font-bold text-[color:var(--mwp-ink)] focus-visible:outline-none"
+          className="mew-num w-full min-w-0 flex-1 border-x-2 border-solid border-[color:var(--mwp-ink-line)] bg-transparent text-center font-mono text-[0.875rem]/none font-bold text-[color:var(--mwp-ink)] focus-visible:outline-none"
         />
         <button type="button" className={btn} onClick={() => step(1)} disabled={value >= max} aria-label={t("event.calc.increase", { stat: label })} tabIndex={-1}>+</button>
       </div>
@@ -161,7 +161,7 @@ export function MewOptionChance({ odds, stats, onChange, idPrefix }: { odds: Mew
         )}
         {(lowest || highest) && (
           <span className={cn(
-            "mb-[7px] inline-flex items-center gap-1 border-[1.5px] border-solid px-2 pb-[3px] pt-[4px] text-[9.5px]/none uppercase tracking-[0.06em] [font-family:var(--mwf-disp)] [border-radius:4px]",
+            "mb-[0.4375rem] inline-flex items-center gap-1 border-[1.5px] border-solid px-2 pb-[3px] pt-[0.25rem] text-[0.59375rem]/none uppercase tracking-[0.06em] [font-family:var(--mwf-disp)] [border-radius:4px]",
             lowest
               ? "border-[color-mix(in_srgb,var(--mwp-bad)_50%,transparent)] text-[color:var(--mwp-bad)]"
               : "border-[color-mix(in_srgb,var(--mwp-good)_50%,transparent)] text-[color:var(--mwp-good)]",
@@ -171,7 +171,7 @@ export function MewOptionChance({ odds, stats, onChange, idPrefix }: { odds: Mew
         )}
       </div>
 
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 font-mono text-[12px]/none font-bold">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 font-mono text-[0.75rem]/none font-bold">
         {tierOnly ? (
           <span className="text-[color:var(--mwp-ink-soft)]">{t("event.calc.tierOnly")}</span>
         ) : (
@@ -183,7 +183,7 @@ export function MewOptionChance({ odds, stats, onChange, idPrefix }: { odds: Mew
       <div
         role="img"
         aria-label={summary}
-        className="flex h-[14px] w-full overflow-hidden border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-3)] [border-radius:5px]"
+        className="flex h-[0.875rem] w-full overflow-hidden border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-3)] [border-radius:5px]"
       >
         {leaves.map((l) => {
           const v = value(l.key)
@@ -192,14 +192,14 @@ export function MewOptionChance({ odds, stats, onChange, idPrefix }: { odds: Mew
         })}
       </div>
 
-      <dl className="m-0 grid gap-x-4 gap-y-px [grid-template-columns:repeat(auto-fit,minmax(132px,1fr))]">
+      <dl className="m-0 grid gap-x-4 gap-y-px [grid-template-columns:repeat(auto-fit,minmax(8.25rem,1fr))]">
         {leaves.map((l) => (
           <div className="flex items-baseline justify-between gap-2 py-[2px]" key={l.key}>
-            <dt className="flex min-w-0 items-center gap-1.5 truncate text-[10.5px]/[1.2] uppercase tracking-[0.05em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">
+            <dt className="flex min-w-0 items-center gap-1.5 truncate text-[0.65625rem]/[1.2] uppercase tracking-[0.05em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">
               <span className={cn("h-2 w-2 flex-none border border-solid border-[color:var(--mwp-ink)]", l.cls)} />
               {t(l.label)}
             </dt>
-            <dd className="m-0 flex-none font-mono text-[12px]/[1.2] font-bold text-[color:var(--mwp-ink)]">{mewPct(value(l.key))}</dd>
+            <dd className="m-0 flex-none font-mono text-[0.75rem]/[1.2] font-bold text-[color:var(--mwp-ink)]">{mewPct(value(l.key))}</dd>
           </div>
         ))}
       </dl>
@@ -216,7 +216,7 @@ export function MewChanceReset({ stats, onChange }: { stats: MewCatStats; onChan
     <button
       type="button"
       onClick={() => onChange(MEW_DEFAULT_STATS)}
-      className="inline-flex items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[5px] text-[11px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-sm)] transition-all hover:-translate-y-px active:translate-y-0.5 active:[box-shadow:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+      className="inline-flex items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-sm)] transition-all hover:-translate-y-px active:translate-y-0.5 active:[box-shadow:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
     >
       {t("event.calc.reset")}
     </button>

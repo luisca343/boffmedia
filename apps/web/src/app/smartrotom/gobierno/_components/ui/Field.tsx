@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl"
 import { Icon, type IconName } from "./Icon"
 
 const BASE =
-  "w-full rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 px-3 py-[9px] text-[13px] font-medium text-gt-ink-900 placeholder:text-gt-ink-400 focus:border-gt-accent focus:outline-none focus:ring-[3px] focus:ring-gt-accent-tint"
+  "w-full rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 px-3 py-[0.5625rem] text-[0.8125rem] font-medium text-gt-ink-900 placeholder:text-gt-ink-400 focus:border-gt-accent focus:outline-none focus:ring-[3px] focus:ring-gt-accent-tint"
 
 export function Field({
   value,
@@ -43,13 +43,13 @@ export function Field({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         aria-label={label ?? placeholder}
-        className={`${BASE} ${icon ? "pl-[33px]" : ""} ${mono ? "font-gt-mono" : "font-gt"} ${className}`}
+        className={`${BASE} ${icon ? "pl-[2.0625rem]" : ""} ${mono ? "font-gt-mono" : "font-gt"} ${className}`}
       />
     </div>
   )
   return label ? (
     <label className="block">
-      <span className="mb-1.5 block font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+      <span className="mb-1.5 block font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
         {label}
       </span>
       {input}
@@ -89,7 +89,7 @@ export function TextArea({
   )
   return label ? (
     <label className="block">
-      <span className="mb-1.5 block font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+      <span className="mb-1.5 block font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
         {label}
       </span>
       {el}
@@ -135,7 +135,7 @@ export function Select({
   )
   return label ? (
     <label className="block">
-      <span className="mb-1.5 block font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+      <span className="mb-1.5 block font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
         {label}
       </span>
       {el}

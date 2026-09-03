@@ -109,14 +109,14 @@ export function TrPanel({
 }) {
   return (
     <section className={cn("min-w-0 border border-solid border-line bg-panel", className)}>
-      <header className="flex flex-wrap items-center gap-[10px] border-b border-solid border-line px-[14px] py-[10px]">
-        <span className="inline-flex items-center gap-[7px] font-display text-[12.5px] font-bold uppercase leading-none tracking-[0.06em]">
+      <header className="flex flex-wrap items-center gap-[0.625rem] border-b border-solid border-line px-[0.875rem] py-[0.625rem]">
+        <span className="inline-flex items-center gap-[0.4375rem] font-display text-[0.78125rem] font-bold uppercase leading-none tracking-[0.06em]">
           {icon && <Icon name={icon} size={13} className="text-accent" />}
           {title}
         </span>
         {right && <span className="ml-auto inline-flex items-center gap-2">{right}</span>}
       </header>
-      <div className="px-[14px] py-[12px]">{children}</div>
+      <div className="px-[0.875rem] py-[0.75rem]">{children}</div>
     </section>
   )
 }
@@ -124,7 +124,7 @@ export function TrPanel({
 // ─── small mono sub-label (tr-sub) ───────────────────────────────────────────────
 export function TrSub({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("mb-2 block font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim", className)}>
+    <span className={cn("mb-2 block font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim", className)}>
       {children}
     </span>
   )
@@ -132,7 +132,7 @@ export function TrSub({ children, className }: { children: React.ReactNode; clas
 
 // ─── empty note line (tr-none) ───────────────────────────────────────────────────
 export function TrNone({ children }: { children: React.ReactNode }) {
-  return <p className="m-0 py-1 font-mono text-[11.5px] leading-[1.5] text-txt-dim">{children}</p>
+  return <p className="m-0 py-1 font-mono text-[0.71875rem] leading-[1.5] text-txt-dim">{children}</p>
 }
 
 // ─── header input styles (underline variant) ─────────────────────────────────────

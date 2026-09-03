@@ -12,17 +12,17 @@ import { CM_NOTE_ICON, CM_NOTE_TONE, type PostBlock } from "./community-util"
 // the separate blog-blocks system and are not rendered here yet.
 export function PostBody({ blocks, className }: { blocks?: PostBlock[]; className?: string }) {
   return (
-    <div className={cn("max-w-[72ch] [&>*+*:not(h3)]:mt-[18px] [&>h3]:mt-[34px]", className)}>
+    <div className={cn("max-w-[72ch] [&>*+*:not(h3)]:mt-[1.125rem] [&>h3]:mt-[2.125rem]", className)}>
       {(blocks || []).map((b, i) => {
         if (b.h)
           return (
-            <h3 key={i} className="font-display text-[26px]/none font-extrabold italic uppercase">
+            <h3 key={i} className="font-display text-[1.625rem]/none font-extrabold italic uppercase">
               {b.h}
             </h3>
           )
         if (b.p)
           return (
-            <p key={i} className="text-pretty font-body text-[17px]/[1.7] text-txt">
+            <p key={i} className="text-pretty font-body text-[1.0625rem]/[1.7] text-txt">
               {b.p}
             </p>
           )
@@ -30,11 +30,11 @@ export function PostBody({ blocks, className }: { blocks?: PostBlock[]; classNam
           return (
             <blockquote
               key={i}
-              className="border-l-4 border-solid border-accent bg-accent-soft px-[22px] py-[18px] font-body text-[19px]/[1.5] font-medium italic text-txt cut-slant-r cut-edge-slant-r [--cut-line:var(--accent)] [--cut:12px]"
+              className="border-l-4 border-solid border-accent bg-accent-soft px-[1.375rem] py-[1.125rem] font-body text-[1.1875rem]/[1.5] font-medium italic text-txt cut-slant-r cut-edge-slant-r [--cut-line:var(--accent)] [--cut:12px]"
             >
               {b.quote}
               {b.cite && (
-                <cite className="mt-3 block font-mono text-[11px]/none font-semibold uppercase not-italic tracking-[0.1em] text-accent">
+                <cite className="mt-3 block font-mono text-[0.6875rem]/none font-semibold uppercase not-italic tracking-[0.1em] text-accent">
                   {b.cite}
                 </cite>
               )}
@@ -42,9 +42,9 @@ export function PostBody({ blocks, className }: { blocks?: PostBlock[]; classNam
           )
         if (b.list)
           return b.ordered ? (
-            <ol key={i} className="grid list-decimal gap-2.5 pl-[26px]">
+            <ol key={i} className="grid list-decimal gap-2.5 pl-[1.625rem]">
               {b.list.map((li, j) => (
-                <li key={j} className="font-body text-[16px]/[1.6] text-txt">
+                <li key={j} className="font-body text-[1rem]/[1.6] text-txt">
                   {li}
                 </li>
               ))}
@@ -54,7 +54,7 @@ export function PostBody({ blocks, className }: { blocks?: PostBlock[]; classNam
               {b.list.map((li, j) => (
                 <li
                   key={j}
-                  className="relative pl-[26px] font-body text-[16px]/[1.6] text-txt before:absolute before:left-1 before:top-[11px] before:h-2 before:w-2 before:bg-accent before:content-[''] before:[clip-path:polygon(50%_0,100%_50%,50%_100%,0_50%)]"
+                  className="relative pl-[1.625rem] font-body text-[1rem]/[1.6] text-txt before:absolute before:left-1 before:top-[0.6875rem] before:h-2 before:w-2 before:bg-accent before:content-[''] before:[clip-path:polygon(50%_0,100%_50%,50%_100%,0_50%)]"
                 >
                   {li}
                 </li>
@@ -65,9 +65,9 @@ export function PostBody({ blocks, className }: { blocks?: PostBlock[]; classNam
           return (
             <pre
               key={i}
-              className="overflow-x-auto border border-solid border-line-2 border-l-4 border-l-accent bg-base-deep px-5 py-[18px] cut-bl cut-edge-bl [--cut-e:12px] [--cut-line:var(--line-2)]"
+              className="overflow-x-auto border border-solid border-line-2 border-l-4 border-l-accent bg-base-deep px-5 py-[1.125rem] cut-bl cut-edge-bl [--cut-e:12px] [--cut-line:var(--line-2)]"
             >
-              <code className="whitespace-pre font-mono text-[13px]/[1.7] font-medium tracking-[0.02em] text-txt">{b.code}</code>
+              <code className="whitespace-pre font-mono text-[0.8125rem]/[1.7] font-medium tracking-[0.02em] text-txt">{b.code}</code>
             </pre>
           )
         if (b.note) {
@@ -76,16 +76,16 @@ export function PostBody({ blocks, className }: { blocks?: PostBlock[]; classNam
             <div
               key={i}
               style={{ "--tone": tone } as React.CSSProperties}
-              className="flex items-start gap-[14px] border border-solid border-line-2 border-l-4 border-l-[color:var(--tone)] bg-[color-mix(in_srgb,var(--tone)_9%,var(--panel))] px-[18px] py-4 cut-slant-r [--cut:12px] cut-edge-slant-r [--cut:12px] [--cut-line:var(--line-2)]"
+              className="flex items-start gap-[0.875rem] border border-solid border-line-2 border-l-4 border-l-[color:var(--tone)] bg-[color-mix(in_srgb,var(--tone)_9%,var(--panel))] px-[1.125rem] py-4 cut-slant-r [--cut:12px] cut-edge-slant-r [--cut:12px] [--cut-line:var(--line-2)]"
             >
               <Icon name={CM_NOTE_ICON[b.tone || "info"] || "info"} size={18} className="mt-px flex-none text-[color:var(--tone)]" />
               <div>
                 {b.title && (
-                  <strong className="mb-1.5 block font-mono text-[12px]/none font-bold uppercase tracking-[0.1em] text-[color:var(--tone)]">
+                  <strong className="mb-1.5 block font-mono text-[0.75rem]/none font-bold uppercase tracking-[0.1em] text-[color:var(--tone)]">
                     {b.title}
                   </strong>
                 )}
-                <p className="font-body text-[15px]/[1.55] text-txt">{b.note}</p>
+                <p className="font-body text-[0.9375rem]/[1.55] text-txt">{b.note}</p>
               </div>
             </div>
           )

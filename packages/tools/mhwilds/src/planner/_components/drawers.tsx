@@ -62,7 +62,7 @@ export function EquipDrawer({
             {current && <Button size="sm" variant="ghost" icon="x" onClick={onRemove}>{t("build_planner.remove")}</Button>}
           </div>
           <div className="flex gap-2 items-center flex-wrap">
-            <Select ariaLabel={t("rarity")} value={rar} onChange={setRar} options={rarOptions} className="min-w-[130px]" />
+            <Select ariaLabel={t("rarity")} value={rar} onChange={setRar} options={rarOptions} className="min-w-[8.125rem]" />
             {isWeaponSlot(slot) && (
               <div className="flex gap-1.5 flex-wrap">
                 <MhTypeChip label={t("build_planner.all")} on={type === "all"} onClick={() => setType("all")} />
@@ -74,11 +74,11 @@ export function EquipDrawer({
       }
     >
       {isLoading ? (
-        <div className="h-[300px] grid place-items-center"><Spinner /></div>
+        <div className="h-[18.75rem] grid place-items-center"><Spinner /></div>
       ) : list.length === 0 ? (
         <Empty icon="search" title={t("build_planner.no_results")} lead={t("build_planner.no_equipment_found")} />
       ) : (
-        <div className="flex flex-col gap-[7px]">
+        <div className="flex flex-col gap-[0.4375rem]">
           {list.map((item) => {
             const active = current?.id === item.id
             const skills = itemSkills(item)
@@ -90,10 +90,10 @@ export function EquipDrawer({
               <MhItem key={item.id} active={active} onPick={() => onPick(item)}>
                 <MhRarity rarity={item.rarity} />
                 <span className="min-w-0">
-                  <span className="block font-body text-[14px] leading-tight truncate font-semibold">{item.name}</span>
-                  {skills.length > 0 && <span className="flex flex-wrap gap-1 mt-[5px]">{skills.map((s) => <MhTag key={s} sk>{s}</MhTag>)}</span>}
+                  <span className="block font-body text-[0.875rem] leading-tight truncate font-semibold">{item.name}</span>
+                  {skills.length > 0 && <span className="flex flex-wrap gap-1 mt-[0.3125rem]">{skills.map((s) => <MhTag key={s} sk>{s}</MhTag>)}</span>}
                 </span>
-                <span className="text-right font-mono text-[12px] leading-[1.4] text-txt-muted flex-none whitespace-nowrap">
+                <span className="text-right font-mono text-[0.75rem] leading-[1.4] text-txt-muted flex-none whitespace-nowrap">
                   {stat}
                   {(item as any).slots?.some((x: number) => x > 0) && <MhSlotPips slots={(item as any).slots} />}
                 </span>
@@ -140,16 +140,16 @@ export function DecoDrawer({
       {list.length === 0 ? (
         <Empty icon="search" title={t("build_planner.no_decorations_found")} lead={t("build_planner.no_decorations_found")} />
       ) : (
-        <div className="flex flex-col gap-[7px]">
+        <div className="flex flex-col gap-[0.4375rem]">
           {list.map((d) => {
             const active = current?.id === d.id
             const skills = d.skills.map((s) => `${s.skill.name} +${s.level}`)
             return (
               <MhItem key={d.id} active={active} onPick={() => onPick(d)}>
-                <span className="w-9 h-9 grid place-items-center flex-none rotate-45 border border-[var(--mh-line)] text-[var(--mh-bright)]"><span className="-rotate-45 font-mono text-[13px] font-bold">{d.slot}</span></span>
+                <span className="w-9 h-9 grid place-items-center flex-none rotate-45 border border-[var(--mh-line)] text-[var(--mh-bright)]"><span className="-rotate-45 font-mono text-[0.8125rem] font-bold">{d.slot}</span></span>
                 <span className="min-w-0">
-                  <span className="block font-body text-[14px] leading-tight truncate font-semibold">{d.name}</span>
-                  <span className="flex flex-wrap gap-1 mt-[5px]">{skills.map((s) => <MhTag key={s} sk>{s}</MhTag>)}</span>
+                  <span className="block font-body text-[0.875rem] leading-tight truncate font-semibold">{d.name}</span>
+                  <span className="flex flex-wrap gap-1 mt-[0.3125rem]">{skills.map((s) => <MhTag key={s} sk>{s}</MhTag>)}</span>
                 </span>
                 <span className="text-right flex-none"><MhRarity rarity={d.rarity} /></span>
               </MhItem>
@@ -189,8 +189,8 @@ export function SavedDrawer({
       ) : (
         <div className="flex flex-col gap-1.5">
           {filtered.map((b) => (
-            <div key={b.key} className="grid grid-cols-[1fr_auto] items-center gap-2 py-[9px] px-[11px] bg-base-2 border border-line">
-              <button type="button" onClick={() => load(b.key)} className="min-w-0 text-left font-body text-[13px] leading-tight font-semibold truncate cursor-pointer bg-transparent border-0 p-0" title={b.name}>{b.name}</button>
+            <div key={b.key} className="grid grid-cols-[1fr_auto] items-center gap-2 py-[0.5625rem] px-[0.6875rem] bg-base-2 border border-line">
+              <button type="button" onClick={() => load(b.key)} className="min-w-0 text-left font-body text-[0.8125rem] leading-tight font-semibold truncate cursor-pointer bg-transparent border-0 p-0" title={b.name}>{b.name}</button>
               <span className="flex gap-1 items-center flex-none">
                 {confirm === b.key ? (
                   <>
@@ -239,13 +239,13 @@ export function IoDrawer({
       <div className="h-px bg-line my-4" />
       <MhLabel>{t("build_planner.import_build")}</MhLabel>
       <textarea
-        className="w-full min-h-[110px] bg-base-2 border border-line text-txt font-mono text-[12px] p-3 resize-y outline-none focus:border-[var(--mh)] placeholder:text-txt-dim"
+        className="w-full min-h-[6.875rem] bg-base-2 border border-line text-txt font-mono text-[0.75rem] p-3 resize-y outline-none focus:border-[var(--mh)] placeholder:text-txt-dim"
         placeholder={t("build_planner.import_placeholder")}
         value={code}
         onChange={(e) => setCode(e.target.value)}
       />
-      {err && <div className="text-bad font-mono text-[12px] leading-tight mt-2">{t("build_planner.error_invalid_file_format")}</div>}
-      {parsed && <div className="text-ok font-mono text-[12px] leading-tight mt-2">✓ «{parsed.name}»</div>}
+      {err && <div className="text-bad font-mono text-[0.75rem] leading-tight mt-2">{t("build_planner.error_invalid_file_format")}</div>}
+      {parsed && <div className="text-ok font-mono text-[0.75rem] leading-tight mt-2">✓ «{parsed.name}»</div>}
       <div className="mt-3.5"><Button size="sm" variant="pri" icon="check" onClick={doImport} disabled={!parsed}>{t("build_planner.import_build")}</Button></div>
     </MhDrawer>
   )

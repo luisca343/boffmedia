@@ -92,11 +92,11 @@ function Ayudas() {
 
       <div
         onContextMenu={open}
-        className="ml-2 flex cursor-context-menu items-center gap-2.5 rounded-nt-md border border-nt-border bg-nt-panel px-3 py-[11px] text-[13.5px] text-nt-fg"
+        className="ml-2 flex cursor-context-menu items-center gap-2.5 rounded-nt-md border border-nt-border bg-nt-panel px-3 py-[0.6875rem] text-[0.84375rem] text-nt-fg"
       >
         <Icon name="file-text" size={15} className="text-nt-fg-subtle" />
         Arquitectura de Notas
-        <span className="ml-2 text-[11px] text-nt-fg-subtle">clic derecho</span>
+        <span className="ml-2 text-[0.6875rem] text-nt-fg-subtle">clic derecho</span>
         <IconButton aria-label="Acciones" onClick={open}>
           <Icon name="more" size={15} />
         </IconButton>
@@ -131,15 +131,15 @@ function Overlays() {
 
       {open && (
         <Overlay onClose={() => setOpen(false)}>
-          <div className={`${MODAL_PANEL} mt-[16vh] w-[540px] max-w-[92vw]`}>
+          <div className={`${MODAL_PANEL} mt-[16vh] w-[33.75rem] max-w-[92vw]`}>
             <div className="flex items-center gap-2.5 border-b border-nt-border px-4 py-3">
               <Icon name="zap" size={16} className="text-nt-accent-fg" />
-              <span className="flex-1 text-[14px] font-[550] text-nt-fg">Captura rápida</span>
+              <span className="flex-1 text-[0.875rem] font-[550] text-nt-fg">Captura rápida</span>
               <Kbd>Esc</Kbd>
             </div>
-            <div className="px-4 py-5 text-[13.5px] leading-[1.6] text-nt-fg-muted">
-              El hijo aporta su propio panel: <code className="font-nt-mono text-[12px] text-nt-accent-fg">MODAL_PANEL</code>{" "}
-              es la cadena de clases del cristal, y <code className="font-nt-mono text-[12px] text-nt-accent-fg">Overlay</code>{" "}
+            <div className="px-4 py-5 text-[0.84375rem] leading-[1.6] text-nt-fg-muted">
+              El hijo aporta su propio panel: <code className="font-nt-mono text-[0.75rem] text-nt-accent-fg">MODAL_PANEL</code>{" "}
+              es la cadena de clases del cristal, y <code className="font-nt-mono text-[0.75rem] text-nt-accent-fg">Overlay</code>{" "}
               sólo pone el velo, el Escape y el cierre por clic fuera.
             </div>
             <div className="flex justify-end gap-2 border-t border-nt-border bg-nt-panel-2 px-4 py-3">
@@ -213,16 +213,16 @@ export function NtPrimitivasChapter() {
         </Sample>
 
         <Sample title="Teclas" code="<Kbd>" app="nt">
-          <span className="flex items-center gap-2 text-[13px] text-nt-fg-muted">
+          <span className="flex items-center gap-2 text-[0.8125rem] text-nt-fg-muted">
             Paleta de comandos <Kbd>⌘</Kbd>
             <Kbd>K</Kbd>
           </span>
-          <span className="flex items-center gap-2 text-[13px] text-nt-fg-muted">
+          <span className="flex items-center gap-2 text-[0.8125rem] text-nt-fg-muted">
             Captura rápida <Kbd>⌘</Kbd>
             <Kbd>⇧</Kbd>
             <Kbd>N</Kbd>
           </span>
-          <span className="flex items-center gap-2 text-[13px] text-nt-fg-muted">
+          <span className="flex items-center gap-2 text-[0.8125rem] text-nt-fg-muted">
             Cerrar <Kbd>Esc</Kbd>
           </span>
         </Sample>

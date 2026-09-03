@@ -85,7 +85,7 @@ export function SorteosView() {
   })
 
   return (
-    <main className="pb-[10px]">
+    <main className="pb-[0.625rem]">
       <ToolHeader
         title={
           <>
@@ -142,7 +142,7 @@ export function SorteosView() {
       />
 
       {/* Grid: Roster + Settings */}
-      <div className="grid gap-[18px] min-[961px]:grid-cols-[minmax(0,1fr)_360px] mt-[18px]">
+      <div className="grid gap-[1.125rem] min-[961px]:grid-cols-[minmax(0,1fr)_22.5rem] mt-[1.125rem]">
         <SorteosRoster
           entrants={entrants}
           weighted={weighted}

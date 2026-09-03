@@ -89,13 +89,13 @@ export default function TrinoPage() {
           <Avatar user={post.author} size={48} />
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <span className="truncate text-[15.5px] font-bold text-rk-fg">{name}</span>
+              <span className="truncate text-[0.96875rem] font-bold text-rk-fg">{name}</span>
               {post.author.isVerified && <Verified />}
             </div>
             {post.author.handle && (
               <Link
                 href={`/smartrotom/rooker/${post.author.handle}`}
-                className="text-[14px] text-rk-fg-subtle hover:underline"
+                className="text-[0.875rem] text-rk-fg-subtle hover:underline"
               >
                 @{post.author.handle}
               </Link>
@@ -103,14 +103,14 @@ export default function TrinoPage() {
           </div>
         </div>
 
-        {post.text && <RichText text={post.text} className="text-[18px]" />}
+        {post.text && <RichText text={post.text} className="text-[1.125rem]" />}
         {attachment && <div className="mt-3">{attachment}</div>}
 
-        <p className="my-3.5 text-[13.5px] text-rk-fg-subtle">{fullTime(post.createdAt)}</p>
+        <p className="my-3.5 text-[0.84375rem] text-rk-fg-subtle">{fullTime(post.createdAt)}</p>
 
         <div className="flex items-center justify-between gap-4 border-y border-rk-line py-2.5">
           <ReactionSummary reactions={post.counts.reactions} />
-          <div className="flex gap-3.5 text-[13px] text-rk-fg-subtle">
+          <div className="flex gap-3.5 text-[0.8125rem] text-rk-fg-subtle">
             <span>
               <b className="text-rk-fg">{fmt(post.counts.retrinos)}</b> {t("post.stats.retrinos")}
             </span>
@@ -162,7 +162,7 @@ export default function TrinoPage() {
           <button
             type="button"
             onClick={() => openReply({ id: post.id, handle: post.author.handle })}
-            className="flex-1 cursor-text text-left text-[16px] text-rk-fg-subtle"
+            className="flex-1 cursor-text text-left text-[1rem] text-rk-fg-subtle"
           >
             {t("post.replyPrompt", { handle: post.author.handle ?? name })}
           </button>

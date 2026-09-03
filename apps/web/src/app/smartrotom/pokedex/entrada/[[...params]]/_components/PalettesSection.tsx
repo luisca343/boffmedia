@@ -22,7 +22,7 @@ export function PalettesSection({ palettes, pokemonIndex, formName }: PalettesSe
   const uniquePalettes = allPalettes.filter((palette, index, self) => index === self.findIndex((p) => p.name === palette.name))
 
   return (
-    <div className="grid grid-cols-[repeat(auto-fill,minmax(120px,1fr))] gap-2.5">
+    <div className="grid grid-cols-[repeat(auto-fill,minmax(7.5rem,1fr))] gap-2.5">
       {uniquePalettes.map((palette, idx) => {
         const isShiny = palette.name === "shiny"
         return (
@@ -34,7 +34,7 @@ export function PalettesSection({ palettes, pokemonIndex, formName }: PalettesSe
                 : "border-white/[0.05] hover:border-pk-primary-400/30 hover:bg-pk-primary-400/[0.03]"
             }`}
           >
-            <span className="absolute top-2 right-2 font-pk-mono text-[9px] tracking-[0.08em] text-pk-surface-500">{palette.name}</span>
+            <span className="absolute top-2 right-2 font-pk-mono text-[0.5625rem] tracking-[0.08em] text-pk-surface-500">{palette.name}</span>
             <PokemonSprite
               width={64}
               height={64}

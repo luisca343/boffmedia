@@ -32,7 +32,7 @@ export default async function LocalizacionPage() {
         }
       />
 
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,1fr))] gap-2.5">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(13.75rem,1fr))] gap-2.5">
         {biomes.map((b) => {
           const m = resolveBiome(b.name)
           return (
@@ -42,11 +42,11 @@ export default async function LocalizacionPage() {
               // separator - %2F gets normalised and redirected - so the route is a
               // catch-all and only the text within each segment is encoded.
               href={`/smartrotom/pokedex/localizacion/${b.name.split("/").map(encodeURIComponent).join("/")}`}
-              className="relative rounded-xl p-[14px_16px] min-h-[116px] flex flex-col gap-2 overflow-hidden border border-transparent transition-transform hover:-translate-y-0.5"
+              className="relative rounded-xl p-[14px_16px] min-h-[7.25rem] flex flex-col gap-2 overflow-hidden border border-transparent transition-transform hover:-translate-y-0.5"
               style={{ background: `linear-gradient(135deg, ${m.color}, color-mix(in oklab, ${m.color} 60%, #000))`, color: m.textLight ? "#fff" : "rgba(0,0,0,.85)" }}
             >
-              <span className="absolute top-0 right-0 w-[100px] h-[100px] bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,.12),transparent_60%)] pointer-events-none" />
-              <span className="self-start w-[26px] h-[26px] bg-black/[0.18] rounded-[7px] grid place-items-center text-base relative" aria-hidden="true">
+              <span className="absolute top-0 right-0 w-[6.25rem] h-[6.25rem] bg-[radial-gradient(circle_at_70%_30%,rgba(255,255,255,.12),transparent_60%)] pointer-events-none" />
+              <span className="self-start w-[1.625rem] h-[1.625rem] bg-black/[0.18] rounded-[7px] grid place-items-center text-base relative" aria-hidden="true">
                 {m.glyph}
               </span>
               <span className="font-pk-display font-bold text-base leading-tight mt-auto relative">{getTranslatedBiomeName(b.name, t)}</span>

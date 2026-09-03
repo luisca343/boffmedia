@@ -92,7 +92,7 @@ export function ParcelasRegister() {
       />
 
       {data && data.total > data.items.length && (
-        <div className="mb-3 font-gt-mono text-[10.5px] text-gt-ink-400">
+        <div className="mb-3 font-gt-mono text-[0.65625rem] text-gt-ink-400">
           {t("urbanismo.mostrando", { shown: data.items.length, total: data.total })}
         </div>
       )}
@@ -109,7 +109,7 @@ export function ParcelasRegister() {
             { value: "subasta", label: t("urbanismo.enSubasta"), count: counts.subasta },
           ]}
         />
-        <div className="w-[190px]">
+        <div className="w-[11.875rem]">
           <Select
             value={town}
             onChange={(v) => {
@@ -123,7 +123,7 @@ export function ParcelasRegister() {
           />
         </div>
         {town !== "all" && townZonas.length > 0 && (
-          <div className="w-[190px]">
+          <div className="w-[11.875rem]">
             <Select
               value={zonaFilter}
               onChange={setZonaFilter}
@@ -168,14 +168,14 @@ export function ParcelasRegister() {
                 return (
                   <TR key={p.regionId}>
                     <TD>
-                      <span className="font-gt-display text-[14px] font-bold text-gt-ink-900">#{p.number}</span>
+                      <span className="font-gt-display text-[0.875rem] font-bold text-gt-ink-900">#{p.number}</span>
                     </TD>
                     <TD>{townName(p.town)}</TD>
                     <TD>
                       {zona && k ? (
                         <span className="flex items-center gap-1.5">
                           <Icon name={k.icon} size={13} style={{ color: TONES[k.tone].css }} />
-                          <span className="text-[12.5px] text-gt-ink-700">{zona.name}</span>
+                          <span className="text-[0.78125rem] text-gt-ink-700">{zona.name}</span>
                         </span>
                       ) : (
                         <span className="text-gt-ink-300">—</span>
@@ -196,7 +196,7 @@ export function ParcelasRegister() {
                       )}
                     </TD>
                     <TD>
-                      <span className="font-gt-mono text-[10.5px] text-gt-ink-400">{p.regionId}</span>
+                      <span className="font-gt-mono text-[0.65625rem] text-gt-ink-400">{p.regionId}</span>
                     </TD>
                     <TD>
                       <Badge tone={st.tone}>{st.label}</Badge>
@@ -209,7 +209,7 @@ export function ParcelasRegister() {
                       ) : !p.owner ? (
                         <Link
                           href={hrefOf("subastas")}
-                          className="inline-flex items-center gap-1.5 rounded-gt-sm px-[11px] py-1.5 text-xs font-bold text-gt-accent hover:underline"
+                          className="inline-flex items-center gap-1.5 rounded-gt-sm px-[0.6875rem] py-1.5 text-xs font-bold text-gt-accent hover:underline"
                         >
                           <Icon name="gavel" size={13} />
                           {t("urbanismo.subastar")}
@@ -294,7 +294,7 @@ function ParcelaEditModal({
       }
     >
       <div className="space-y-3.5">
-        <div className="font-gt-mono text-[10.5px] text-gt-ink-400">{parcela.regionId}</div>
+        <div className="font-gt-mono text-[0.65625rem] text-gt-ink-400">{parcela.regionId}</div>
         <Select label={t("urbanismo.estado")} value={status} onChange={setStatus} options={statusOptions} />
         <Select
           label={t("urbanismo.zona")}

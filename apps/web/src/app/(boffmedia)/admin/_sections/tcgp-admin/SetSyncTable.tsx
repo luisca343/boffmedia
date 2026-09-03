@@ -46,19 +46,19 @@ export function SetSyncTable({
   const t = useTranslations("admin.tcgp")
 
   if (sets.length === 0) {
-    return <p className="py-2 text-[13px] text-txt-muted">{t("noSets")}</p>
+    return <p className="py-2 text-[0.8125rem] text-txt-muted">{t("noSets")}</p>
   }
 
   return (
     <div className="overflow-x-auto">
-      <table className="w-full border-collapse text-[12.5px]">
+      <table className="w-full border-collapse text-[0.78125rem]">
         <thead>
-          <tr className="border-b border-solid border-line text-left font-mono text-[9.5px] uppercase tracking-[0.1em] text-txt-dim">
+          <tr className="border-b border-solid border-line text-left font-mono text-[0.59375rem] uppercase tracking-[0.1em] text-txt-dim">
             <th className="w-8 py-2 pr-2 font-semibold" />
             <th className="py-2 pr-3 font-semibold">{t("colSet")}</th>
-            <th className="w-[168px] py-2 pr-3 font-semibold">{t("colCards")}</th>
-            <th className="w-[168px] py-2 pr-3 font-semibold">{t("colImages")}</th>
-            <th className="w-[132px] py-2 font-semibold">{t("colState")}</th>
+            <th className="w-[10.5rem] py-2 pr-3 font-semibold">{t("colCards")}</th>
+            <th className="w-[10.5rem] py-2 pr-3 font-semibold">{t("colImages")}</th>
+            <th className="w-[8.25rem] py-2 font-semibold">{t("colState")}</th>
           </tr>
         </thead>
         <tbody>
@@ -92,7 +92,7 @@ export function SetSyncTable({
 
                 <td className="py-2 pr-3 align-middle">
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-txt-dim">
+                    <span className="font-mono text-[0.625rem] font-bold uppercase tracking-[0.08em] text-txt-dim">
                       {set.id}
                     </span>
                     <span className="truncate text-txt">{set.name}</span>
@@ -100,7 +100,7 @@ export function SetSyncTable({
                   {run?.message && (
                     <p
                       className={cn(
-                        "m-0 mt-0.5 truncate font-mono text-[10.5px]",
+                        "m-0 mt-0.5 truncate font-mono text-[0.65625rem]",
                         run.state === "error" ? "text-bad" : "text-txt-dim",
                       )}
                       title={run.message}
@@ -111,7 +111,7 @@ export function SetSyncTable({
                   {/* Nothing to download is a finished result; say so, or the
                       row looks like it silently did nothing. */}
                   {!run?.message && run?.unavailable ? (
-                    <p className="m-0 mt-0.5 truncate font-mono text-[10.5px] text-txt-dim">
+                    <p className="m-0 mt-0.5 truncate font-mono text-[0.65625rem] text-txt-dim">
                       {t("noArtworkUpstream", { count: run.unavailable })}
                     </p>
                   ) : null}

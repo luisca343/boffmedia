@@ -90,24 +90,24 @@ export function LivingDex({ onClose }: LivingDexProps) {
       width={920}
       headerExtra={
         <div className="mr-1.5 text-right">
-          <div className="font-pc-mono text-[18px] font-extrabold text-pc-gold">
+          <div className="font-pc-mono text-[1.125rem] font-extrabold text-pc-gold">
             {have}
-            <span className="text-[13px] text-pc-fg-subtle">/{total}</span>
+            <span className="text-[0.8125rem] text-pc-fg-subtle">/{total}</span>
           </div>
-          <div className="text-[10.5px] text-pc-fg-subtle">{t("livingDex.complete", { pct })}</div>
+          <div className="text-[0.65625rem] text-pc-fg-subtle">{t("livingDex.complete", { pct })}</div>
         </div>
       }
       footer={
-        <p className="flex-1 text-[12px] text-pc-fg-muted">
+        <p className="flex-1 text-[0.75rem] text-pc-fg-muted">
           {t("livingDex.missing", { count: total - have })}
         </p>
       }
     >
       {/* `Modal` has no sub-header slot and its body is the scroll container, so the
           filters pin themselves to the top of it. */}
-      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2.5 border-b border-pc-line bg-[var(--pc-panel)] px-[18px] py-3 backdrop-blur-md">
-        <Bar pct={pct} tone="linear-gradient(90deg, rgb(var(--pc-gold)), #ff8a3d)" className="min-w-[160px] flex-1" />
-        <div className="flex flex-wrap gap-[5px]">
+      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-2.5 border-b border-pc-line bg-[var(--pc-panel)] px-[1.125rem] py-3 backdrop-blur-md">
+        <Bar pct={pct} tone="linear-gradient(90deg, rgb(var(--pc-gold)), #ff8a3d)" className="min-w-[10rem] flex-1" />
+        <div className="flex flex-wrap gap-[0.3125rem]">
           <ChipButton active={gen === 0} onClick={() => setGen(0)}>
             {t("livingDex.all")}
           </ChipButton>
@@ -126,7 +126,7 @@ export function LivingDex({ onClose }: LivingDexProps) {
         </ChipButton>
       </div>
 
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(64px,1fr))] gap-2 p-4">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(4rem,1fr))] gap-2 p-4">
         {shown.map((d) => {
           const c = caught.get(d.dex)
           return (
@@ -146,16 +146,16 @@ export function LivingDex({ onClose }: LivingDexProps) {
               {c ? (
                 <Sprite dex={d.dex} palette={c.shiny ? "shiny" : undefined} className="h-[78%] w-[78%]" alt={d.name} />
               ) : (
-                <span className="p-0.5 text-center text-[9px] leading-tight text-pc-fg-subtle/70">{d.name}</span>
+                <span className="p-0.5 text-center text-[0.5625rem] leading-tight text-pc-fg-subtle/70">{d.name}</span>
               )}
-              <span className="absolute inset-x-0 bottom-0.5 text-center font-pc-mono text-[8.5px] text-pc-fg-subtle">
+              <span className="absolute inset-x-0 bottom-0.5 text-center font-pc-mono text-[0.53125rem] text-pc-fg-subtle">
                 #{String(d.dex).padStart(3, "0")}
               </span>
               {c?.shiny && (
                 <Icon name="sparkles" size={11} fill="currentColor" className="absolute right-[3px] top-[3px] text-pc-gold" />
               )}
               {c && c.count > 1 && (
-                <span className="absolute left-[3px] top-[3px] font-pc-mono text-[8.5px] font-extrabold text-pc-cyan">
+                <span className="absolute left-[3px] top-[3px] font-pc-mono text-[0.53125rem] font-extrabold text-pc-cyan">
                   ×{c.count}
                 </span>
               )}

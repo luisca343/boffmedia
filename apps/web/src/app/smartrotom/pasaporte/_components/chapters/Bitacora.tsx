@@ -45,7 +45,7 @@ export function Stamp({ stamp, index }: { stamp: TravelStamp; index: number }) {
         role="img"
         aria-label={`${stamp.place} · ${stamp.sub} · ${date.day} ${date.month} ${date.year}`}
         style={style}
-        className="h-auto w-[122px] overflow-visible mix-blend-multiply"
+        className="h-auto w-[7.625rem] overflow-visible mix-blend-multiply"
       >
         <defs>{rough}</defs>
         <g filter={`url(#${id}-f)`} fill="none" stroke={ink}>
@@ -59,7 +59,7 @@ export function Stamp({ stamp, index }: { stamp: TravelStamp; index: number }) {
           y="30"
           textAnchor="middle"
           fill={ink}
-          className="font-ps-mono text-[13px] font-bold tracking-[.05em]"
+          className="font-ps-mono text-[0.8125rem] font-bold tracking-[.05em]"
         >
           {stamp.place}
         </text>
@@ -68,7 +68,7 @@ export function Stamp({ stamp, index }: { stamp: TravelStamp; index: number }) {
           y="56"
           textAnchor="middle"
           fill={ink}
-          className="ps-num font-ps-mono text-[12.5px] font-bold tracking-[.04em]"
+          className="ps-num font-ps-mono text-[0.78125rem] font-bold tracking-[.04em]"
         >
           {date.day} {date.month} {date.year}
         </text>
@@ -77,7 +77,7 @@ export function Stamp({ stamp, index }: { stamp: TravelStamp; index: number }) {
           y="78"
           textAnchor="middle"
           fill={ink}
-          className="font-ps-mono text-[8px] tracking-[.12em]"
+          className="font-ps-mono text-[0.5rem] tracking-[.12em]"
         >
           {stamp.sub}
         </text>
@@ -94,7 +94,7 @@ export function Stamp({ stamp, index }: { stamp: TravelStamp; index: number }) {
       role="img"
       aria-label={`${stamp.place} · ${stamp.sub} · ${date.numeric}`}
       style={style}
-      className="h-auto w-[116px] overflow-visible mix-blend-multiply"
+      className="h-auto w-[7.25rem] overflow-visible mix-blend-multiply"
     >
       <defs>
         {rough}
@@ -114,12 +114,12 @@ export function Stamp({ stamp, index }: { stamp: TravelStamp; index: number }) {
         </g>
       </g>
 
-      <text fill={ink} className="font-ps-mono text-[9.5px] font-bold tracking-[.04em]">
+      <text fill={ink} className="font-ps-mono text-[0.59375rem] font-bold tracking-[.04em]">
         <textPath href={`#${id}-top`} startOffset="50%" textAnchor="middle">
           {stamp.place}
         </textPath>
       </text>
-      <text fill={ink} className="font-ps-mono text-[6.6px] tracking-[.02em]">
+      <text fill={ink} className="font-ps-mono text-[0.4125rem] tracking-[.02em]">
         <textPath href={`#${id}-bottom`} startOffset="50%" textAnchor="middle">
           {stamp.sub} · {date.numeric}
         </textPath>
@@ -137,7 +137,7 @@ export function Bitacora({ stamps, loading }: { stamps: TravelStamp[]; loading: 
         <PageHead eyebrow={t("bitacora.eyebrow")} title={t("bitacora.title")} />
         <div className="grid grid-cols-3 justify-items-center gap-2">
           {Array.from({ length: 9 }, (_, i) => (
-            <Skeleton key={i} className="h-[96px] w-[118px] rounded-full" />
+            <Skeleton key={i} className="h-[6rem] w-[7.375rem] rounded-full" />
           ))}
         </div>
       </>
@@ -162,7 +162,7 @@ export function Bitacora({ stamps, loading }: { stamps: TravelStamp[]; loading: 
     <>
       <PageHead eyebrow={t("bitacora.eyebrow")} title={t("bitacora.title")} />
 
-      <div className="mb-1 flex flex-wrap items-center gap-3.5 text-[10px] text-ps-ink-soft">
+      <div className="mb-1 flex flex-wrap items-center gap-3.5 text-[0.625rem] text-ps-ink-soft">
         {LEGEND_KINDS.map((kind) => (
           <span key={kind} className="flex items-center gap-1.5">
             <i

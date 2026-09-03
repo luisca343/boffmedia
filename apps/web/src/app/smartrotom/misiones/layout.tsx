@@ -45,7 +45,7 @@ function Tavern({ children }: { children: ReactNode }) {
                 onClick={() => open(null)}
                 className="absolute inset-0 z-40 animate-ms-fade-up bg-[rgba(20,12,6,.5)] backdrop-blur-[2px] motion-reduce:animate-none"
               />
-              <div className="absolute inset-y-0 right-0 z-50 w-full animate-ms-slide-in motion-reduce:animate-none sm:w-[min(760px,72%)]">
+              <div className="absolute inset-y-0 right-0 z-50 w-full animate-ms-slide-in motion-reduce:animate-none sm:w-[min(47.5rem,72%)]">
                 <QuestLetter quest={openQuest} onOpenNpc={setDossier} />
               </div>
             </>

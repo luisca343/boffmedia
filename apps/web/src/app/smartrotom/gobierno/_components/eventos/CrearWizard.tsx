@@ -157,14 +157,14 @@ export function CrearWizard() {
       <div className="gt-edge-gold overflow-hidden rounded-gt border border-gt-line-strong bg-gt-paper-0 shadow-gt-lg">
         <div className="border-b border-gt-line bg-gradient-to-b from-gt-paper-1 to-gt-paper-0 px-5 pb-3.5 pt-4">
           <div className="mb-3.5 flex items-center gap-2.5">
-            <span className="grid h-[30px] w-[30px] flex-none place-items-center rounded-[8px] bg-gt-gold/[.14]">
+            <span className="grid h-[1.875rem] w-[1.875rem] flex-none place-items-center rounded-[8px] bg-gt-gold/[.14]">
               <Icon name="star" size={16} className="text-gt-gold-600" />
             </span>
             <div>
               <div className="font-gt-display text-lg font-bold leading-none text-gt-ink-900">
                 {t("eventos.convocarEvento")}
               </div>
-              <div className="mt-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">
+              <div className="mt-0.5 font-gt-mono text-[0.53125rem] uppercase tracking-[.14em] text-gt-ink-400">
                 {t("eventos.gobiernoOrganizacion")}
               </div>
             </div>
@@ -172,8 +172,8 @@ export function CrearWizard() {
           <StepRail step={step} dep={dep} steps={steps} />
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px]">
-          <div className="gt-scroll min-h-[420px] border-b border-gt-line p-5 lg:border-b-0 lg:border-r">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_21.25rem]">
+          <div className="gt-scroll min-h-[26.25rem] border-b border-gt-line p-5 lg:border-b-0 lg:border-r">
             {step === 0 && <StepTipo type={type} setType={setType} />}
 
             {step === 1 &&
@@ -241,14 +241,14 @@ export function CrearWizard() {
           <div className="gt-scroll bg-gt-paper-2 p-3.5">
             <div className="mb-2.5 flex items-center gap-1.5">
               <Icon name="eye" size={13} className="text-gt-gold-600" />
-              <span className="font-gt-mono text-[8.5px] font-bold uppercase tracking-[.12em] text-gt-ink-500">
+              <span className="font-gt-mono text-[0.53125rem] font-bold uppercase tracking-[.12em] text-gt-ink-500">
                 {t("eventos.previaEnVivo")}
               </span>
             </div>
             {!type ? (
               <div className="grid place-items-center px-4 py-10 text-center">
                 <Icon name="eye" size={26} className="mb-2 text-gt-ink-300" />
-                <div className="max-w-[180px] font-gt-mono text-[11px] leading-relaxed text-gt-ink-400">
+                <div className="max-w-[11.25rem] font-gt-mono text-[0.6875rem] leading-relaxed text-gt-ink-400">
                   {t("eventos.previaHint")}
                 </div>
               </div>
@@ -257,7 +257,7 @@ export function CrearWizard() {
                 <EventoCard ev={draftEv} linkable={false} />
                 {type === "caza" && especies.length > 0 && (
                   <div className="rounded-gt border border-gt-line bg-gt-paper-0 p-3 shadow-gt-sm">
-                    <div className="mb-2 font-gt-mono text-[8px] uppercase tracking-[.12em] text-gt-ink-400">
+                    <div className="mb-2 font-gt-mono text-[0.5rem] uppercase tracking-[.12em] text-gt-ink-400">
                       {t("eventos.especiesPublicadas", { count: especies.length })}
                     </div>
                     <div className="flex flex-wrap gap-1.5">
@@ -279,7 +279,7 @@ export function CrearWizard() {
             {t("eventos.atras")}
           </Button>
           <div className="flex items-center gap-2.5">
-            <span className="hidden font-gt-mono text-[10.5px] text-gt-ink-400 sm:inline">
+            <span className="hidden font-gt-mono text-[0.65625rem] text-gt-ink-400 sm:inline">
               {t("common.stepOf", { step: step + 1, total: STEP_COUNT })}
             </span>
             {step < 3 ? (
@@ -314,7 +314,7 @@ function StepRail({ step, dep, steps }: { step: number; dep: "civic" | "urbanism
           <div key={s} className={`flex items-center gap-2 ${i < steps.length - 1 ? "flex-1" : "flex-none"}`}>
             <div className="flex flex-none items-center gap-2">
               <span
-                className={`grid h-6 w-6 flex-none place-items-center rounded-full font-gt-mono text-[11px] font-bold ${
+                className={`grid h-6 w-6 flex-none place-items-center rounded-full font-gt-mono text-[0.6875rem] font-bold ${
                   on ? `${depClass} text-white` : done ? "bg-gt-ok text-white" : "border border-gt-line-strong text-gt-ink-400"
                 }`}
               >
@@ -325,7 +325,7 @@ function StepRail({ step, dep, steps }: { step: number; dep: "civic" | "urbanism
               </span>
             </div>
             {i < steps.length - 1 && (
-              <div className={`h-[1.5px] min-w-[14px] flex-1 ${done ? "bg-gt-ok" : "bg-gt-line-strong"}`} />
+              <div className={`h-[1.5px] min-w-[0.875rem] flex-1 ${done ? "bg-gt-ok" : "bg-gt-line-strong"}`} />
             )}
           </div>
         )

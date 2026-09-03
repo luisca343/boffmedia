@@ -127,7 +127,7 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
   if (!sp) {
     return (
       <>
-        <DkEmpty icon="search" title={t("editor.emptyTitle")} lead={t("editor.emptyLead")} className="min-h-[280px] content-center">
+        <DkEmpty icon="search" title={t("editor.emptyTitle")} lead={t("editor.emptyLead")} className="min-h-[17.5rem] content-center">
           <Button variant="pri" icon="plus" onClick={() => setPicker({ kind: "species" })}>
             {t("picker.species")}
           </Button>
@@ -189,7 +189,7 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
                   mark disappears the instant you choose, and the validator's
                   objection lives in another pane. */}
               {speciesIllegal && (
-                <b className="cut cut-edge-slant [--cut:3px] mr-1 flex-none border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-[5px] py-[3px] font-mono text-[8.5px]/none font-bold uppercase tracking-[0.08em] text-bad">
+                <b className="cut cut-edge-slant [--cut:3px] mr-1 flex-none border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-[0.3125rem] py-[3px] font-mono text-[0.53125rem]/none font-bold uppercase tracking-[0.08em] text-bad">
                   {t("picker.illegal")}
                 </b>
               )}
@@ -211,7 +211,7 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
               onClick={() => setPicker({ kind: "species" })}
               aria-label={t("set.changeSpecies")}
               className={cn(
-                "cut-seal cut-seal-edge [--cut:12px] [--cut-line:var(--line)] grid h-[112px] w-[112px] flex-none place-items-center border border-solid border-line bg-base-2 transition-[border-color] duration-[140ms] hover:border-accent-line hover:[--cut-line:var(--accent-line)] max-[480px]:self-center",
+                "cut-seal cut-seal-edge [--cut:12px] [--cut-line:var(--line)] grid h-[7rem] w-[7rem] flex-none place-items-center border border-solid border-line bg-base-2 transition-[border-color] duration-[140ms] hover:border-accent-line hover:[--cut-line:var(--accent-line)] max-[480px]:self-center",
                 BSIM_FOCUS_CUT,
                 speciesPop,
               )}
@@ -220,28 +220,28 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
             </button>
             <div className="grid min-w-0 flex-1 content-start gap-3">
               <BxTypeRow types={[...sp.types]} ghost={false} />
-              <div className="grid gap-[5px]">
+              <div className="grid gap-[0.3125rem]">
                 <TbKicker>{t("set.baseStats")}</TbKicker>
                 {STAT_IDS.map((stat) => (
-                  <div key={stat} className="grid grid-cols-[34px_minmax(0,1fr)_34px] items-center gap-2">
-                    <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.06em] text-txt-muted">{labels.statShort(stat)}</span>
+                  <div key={stat} className="grid grid-cols-[2.125rem_minmax(0,1fr)_2.125rem] items-center gap-2">
+                    <span className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.06em] text-txt-muted">{labels.statShort(stat)}</span>
                     <TbStatBar value={base[stat]} />
-                    <span className="text-right font-mono text-[11px]/none font-semibold tabular-nums text-txt">{base[stat]}</span>
+                    <span className="text-right font-mono text-[0.6875rem]/none font-semibold tabular-nums text-txt">{base[stat]}</span>
                   </div>
                 ))}
-                <div className="grid grid-cols-[34px_minmax(0,1fr)_34px] items-center gap-2 pt-px">
-                  <span className="font-mono text-[9px]/none font-semibold uppercase tracking-[0.06em] text-txt-dim">{t("set.total")}</span>
+                <div className="grid grid-cols-[2.125rem_minmax(0,1fr)_2.125rem] items-center gap-2 pt-px">
+                  <span className="font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.06em] text-txt-dim">{t("set.total")}</span>
                   <span />
-                  <span className="text-right font-mono text-[11px]/none font-bold tabular-nums text-accent-bright">{sp.bst}</span>
+                  <span className="text-right font-mono text-[0.6875rem]/none font-bold tabular-nums text-accent-bright">{sp.bst}</span>
                 </div>
               </div>
             </div>
           </div>
 
           {/* ability */}
-          <div ref={abilityRef} className="grid gap-[7px]">
+          <div ref={abilityRef} className="grid gap-[0.4375rem]">
             <TbKicker>{t("set.ability")}</TbKicker>
-            <div className="flex flex-wrap items-center gap-[6px]">
+            <div className="flex flex-wrap items-center gap-[0.375rem]">
               <TbSegChoice options={abilityOptions} value={currentAbility} onChange={(v) => update({ ability: v })} ariaLabel={t("set.ability")} />
               <Button size="sm" variant="ghost" onClick={() => setPicker({ kind: "ability" })}>
                 {t("set.otherAbility")}
@@ -250,14 +250,14 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
           </div>
 
           {/* item */}
-          <div className="grid gap-[7px]">
+          <div className="grid gap-[0.4375rem]">
             <TbKicker>{t("set.item")}</TbKicker>
-            <div className="flex items-center gap-[6px]">
+            <div className="flex items-center gap-[0.375rem]">
               <button ref={itemRef} type="button" onClick={() => setPicker({ kind: "item" })} className={PICKER_TRIGGER} aria-label={`${t("set.item")}: ${itemData?.exists ? itemData.name : t("set.noItem")}`}>
                 <span aria-hidden className="grid h-6 w-6 flex-none place-items-center">
                   {itemStyle ? <span style={itemStyle} className="block" /> : <Icon name="cube" size={15} className="text-txt-dim" />}
                 </span>
-                <span className={cn("min-w-0 flex-1 truncate font-display text-[13px]/none font-bold uppercase tracking-[0.03em]", itemData?.exists ? "text-txt" : "text-txt-dim")}>
+                <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", itemData?.exists ? "text-txt" : "text-txt-dim")}>
                   {itemData?.exists ? itemData.name : set.item || t("set.noItem")}
                 </span>
                 <Icon name="chevronDown" size={14} className="flex-none text-txt-dim" />
@@ -307,15 +307,15 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
             // Champions is played at 50, always. A disabled input would still
             // read as a control the builder is being denied; the number and the
             // one-line reason say it is not a choice anyone has.
-            <div className="grid gap-[7px]">
+            <div className="grid gap-[0.4375rem]">
               <TbKicker>{t("set.level")}</TbKicker>
               <div className="flex items-center gap-2">
-                <span className="inline-flex h-8 items-center font-mono text-[13px]/none font-bold tabular-nums text-txt">{limits.fixedLevel}</span>
-                <span className="font-body text-[12px] leading-[1.35] text-txt-dim">{t("set.levelLocked")}</span>
+                <span className="inline-flex h-8 items-center font-mono text-[0.8125rem]/none font-bold tabular-nums text-txt">{limits.fixedLevel}</span>
+                <span className="font-body text-[0.75rem] leading-[1.35] text-txt-dim">{t("set.levelLocked")}</span>
               </div>
             </div>
           ) : (
-            <label className="grid gap-[7px]">
+            <label className="grid gap-[0.4375rem]">
               <TbKicker>{t("set.level")}</TbKicker>
               <TbNumInput
                 ref={levelRef}
@@ -330,10 +330,10 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
               />
             </label>
           )}
-          <div className="grid gap-[7px]">
+          <div className="grid gap-[0.4375rem]">
             <TbKicker>{t("set.gender")}</TbKicker>
             {sp.gender ? (
-              <span className="inline-flex h-8 items-center font-display text-[12px]/none font-bold uppercase tracking-[0.04em] text-txt-muted">{labels.gender(sp.gender)}</span>
+              <span className="inline-flex h-8 items-center font-display text-[0.75rem]/none font-bold uppercase tracking-[0.04em] text-txt-muted">{labels.gender(sp.gender)}</span>
             ) : (
               <TbSegChoice
                 ariaLabel={t("set.gender")}
@@ -347,14 +347,14 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
               />
             )}
           </div>
-          <div className="grid gap-[7px]">
+          <div className="grid gap-[0.4375rem]">
             <TbKicker>{t("set.shiny")}</TbKicker>
             <Checkbox checked={Boolean(set.shiny)} onChange={(v) => update({ shiny: v })} label={t("set.shiny")} className="h-8" />
           </div>
         </div>
-        <div className="grid gap-[7px]">
+        <div className="grid gap-[0.4375rem]">
           <TbKicker>{t("set.tera")}</TbKicker>
-          <div role="radiogroup" aria-label={t("set.tera")} className="flex flex-wrap gap-[5px]">
+          <div role="radiogroup" aria-label={t("set.tera")} className="flex flex-wrap gap-[0.3125rem]">
             {TYPE_LIST.map((ty) => (
               <TbTypeChip key={ty} type={ty} small label={labels.type(ty)} on={tera === ty} onClick={() => update({ teraType: ty })} />
             ))}
@@ -364,7 +364,7 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
               aria-checked={!tera}
               onClick={() => update({ teraType: "" })}
               className={cn(
-                "cut cut-edge-slant [--cut:3px] inline-flex h-8 items-center border border-solid px-[10px] font-mono text-[9px]/none font-semibold uppercase tracking-[0.08em] transition-[background,color,border-color] duration-[140ms]",
+                "cut cut-edge-slant [--cut:3px] inline-flex h-8 items-center border border-solid px-[0.625rem] font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.08em] transition-[background,color,border-color] duration-[140ms]",
                 !tera ? "border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt" : "border-line [--cut-line:var(--line)] bg-base text-txt-dim hover:text-txt",
                 BSIM_FOCUS_CUT,
               )}

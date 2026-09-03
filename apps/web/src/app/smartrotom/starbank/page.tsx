@@ -83,7 +83,7 @@ export default function Dashboard() {
             <div className="grid size-12 place-items-center rounded-full bg-sb-surface-3 text-sb-fg-subtle">
               <Ico name="cal" size={22} />
             </div>
-            <div className="text-[13px] text-sb-fg-muted">{t("dashboard.noScheduledPayments")}</div>
+            <div className="text-[0.8125rem] text-sb-fg-muted">{t("dashboard.noScheduledPayments")}</div>
           </CardBody>
         </Card>
       </div>
@@ -93,7 +93,7 @@ export default function Dashboard() {
           <SectionHead eyebrow={t("dashboard.recentTransactions")} title={t("dashboard.recentTransactions")} action={<Button variant="ghost" size="sm" href={`${BASE}/transacciones`}>{t("common.viewAll")} <Ico name="arrR" size={14} /></Button>} />
           <CardBody noPad>
             {recent.length === 0 ? (
-              <div className="px-5 py-10 text-center text-[13px] text-sb-fg-muted">{t("dashboard.noTransactions")}</div>
+              <div className="px-5 py-10 text-center text-[0.8125rem] text-sb-fg-muted">{t("dashboard.noTransactions")}</div>
             ) : (
               <div className="flex flex-col">
                 {recent.map((tx, i) => (
@@ -116,10 +116,10 @@ export default function Dashboard() {
               >
                 <AccountAvatar account={acc} size={36} square />
                 <div className="min-w-0 flex-1">
-                  <div className="text-[13.5px] font-semibold">{displayName(acc.name)}</div>
-                  <div className="text-[11.5px] text-sb-fg-muted">{acc.type === "MAIN" ? t("accounts.main") : t("accounts.secondary")}</div>
+                  <div className="text-[0.84375rem] font-semibold">{displayName(acc.name)}</div>
+                  <div className="text-[0.71875rem] text-sb-fg-muted">{acc.type === "MAIN" ? t("accounts.main") : t("accounts.secondary")}</div>
                 </div>
-                <div className="text-[13.5px] font-semibold tabular-nums">{formatMoney(acc.balance)}</div>
+                <div className="text-[0.84375rem] font-semibold tabular-nums">{formatMoney(acc.balance)}</div>
               </button>
             ))}
           </CardBody>
@@ -138,12 +138,12 @@ function QuickAction({ icon, t1, t2, onClick }: { icon: IconName; t1: string; t2
       onClick={onClick}
       className="group flex items-center gap-3 rounded-sb-md border border-sb-border bg-sb-surface p-3.5 text-left transition-all hover:border-sb-300 hover:bg-sb-50 hover:shadow-sb-2"
     >
-      <span className="grid size-[38px] shrink-0 place-items-center rounded-[10px] bg-sb-surface-3 text-sb-700 transition-colors group-hover:bg-sb-100">
+      <span className="grid size-[2.375rem] shrink-0 place-items-center rounded-[10px] bg-sb-surface-3 text-sb-700 transition-colors group-hover:bg-sb-100">
         <Ico name={icon} size={18} />
       </span>
       <div>
-        <div className="text-[13.5px] font-semibold text-sb-fg">{t1}</div>
-        <div className="text-[11.5px] text-sb-fg-muted">{t2}</div>
+        <div className="text-[0.84375rem] font-semibold text-sb-fg">{t1}</div>
+        <div className="text-[0.71875rem] text-sb-fg-muted">{t2}</div>
       </div>
     </button>
   );
@@ -159,9 +159,9 @@ function DashboardSkeleton() {
         </div>
         <Skeleton className="h-9 w-24 rounded-sb-md" />
       </div>
-      <Skeleton className="h-[240px] w-full rounded-sb-xl" />
+      <Skeleton className="h-[15rem] w-full rounded-sb-xl" />
       <div className="grid gap-4 md:grid-cols-3">
-        {[0, 1, 2].map((i) => <Skeleton key={i} className="h-[104px] rounded-sb-lg" />)}
+        {[0, 1, 2].map((i) => <Skeleton key={i} className="h-[6.5rem] rounded-sb-lg" />)}
       </div>
       <div className="grid gap-4 md:grid-cols-12">
         <Skeleton className="h-48 rounded-sb-lg md:col-span-8" />

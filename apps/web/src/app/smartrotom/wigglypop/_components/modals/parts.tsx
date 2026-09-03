@@ -11,14 +11,14 @@ export function MonRow({ mon }: { mon: WpMon }) {
   const t = useTranslations("wigglypop")
   return (
     <div className="flex items-center gap-3 rounded-xl border border-wp-line/24 bg-wp-panel-2 p-3">
-      <SpriteStage mon={mon} dots={false} className="h-[58px] w-[58px] flex-none rounded-[10px]">
+      <SpriteStage mon={mon} dots={false} className="h-[3.625rem] w-[3.625rem] flex-none rounded-[10px]">
         <Sprite mon={mon} className="relative z-[2] h-[76%] w-[76%]" />
       </SpriteStage>
       <div className="flex-1">
-        <div className="flex items-center gap-1.5 font-wp text-[14.5px] font-bold text-wp-fg">
+        <div className="flex items-center gap-1.5 font-wp text-[0.90625rem] font-bold text-wp-fg">
           {mon.shiny && <span className="text-wp-teal">✦</span>}
           {mon.name}
-          <span className="wp-num font-wp text-[12px] text-wp-fg-subtle">{t("common.levelDot", { level: mon.level })}</span>
+          <span className="wp-num font-wp text-[0.75rem] text-wp-fg-subtle">{t("common.levelDot", { level: mon.level })}</span>
         </div>
         <div className="mt-1.5 flex gap-1.5">
           {mon.types.map((ty) => (
@@ -33,7 +33,7 @@ export function MonRow({ mon }: { mon: WpMon }) {
 /** One line of a cost breakdown. */
 export function SumLine({ k, v }: { k: string; v: number }) {
   return (
-    <div className="flex justify-between font-wp text-[13.5px]">
+    <div className="flex justify-between font-wp text-[0.84375rem]">
       <span className="font-semibold text-wp-fg-muted">{k}</span>
       <span className="wp-num font-semibold text-wp-fg">₽{fmt(v)}</span>
     </div>
@@ -63,7 +63,7 @@ export function CostSummary({
       <SumLine k={t("common.protectionFee")} v={fee} />
       <div className="my-0.5 h-px bg-wp-line/24" />
       <div className="flex items-baseline justify-between">
-        <span className="font-wp text-[15px] font-bold text-wp-fg">{t("common.total")}</span>
+        <span className="font-wp text-[0.9375rem] font-bold text-wp-fg">{t("common.total")}</span>
         <Price amount={total} size={20} />
       </div>
     </div>
@@ -92,7 +92,7 @@ export function WalletRow({
           : "border-wp-line/24 bg-wp-panel-2",
       )}
     >
-      <span className="flex items-center gap-2 font-wp text-[13px] font-semibold text-wp-fg-muted">
+      <span className="flex items-center gap-2 font-wp text-[0.8125rem] font-semibold text-wp-fg-muted">
         <Icon name="dollar" size={15} />
         {t("modal.parts.walletLabel")}
       </span>
@@ -125,11 +125,11 @@ export function EscrowSteps({ atomic }: { atomic: boolean }) {
         return (
           <div
             key={s}
-            className="flex items-center gap-2.5 rounded-[10px] border border-wp-line/24 bg-wp-panel-2 px-3 py-2.5 font-wp text-[13px] font-semibold text-wp-fg"
+            className="flex items-center gap-2.5 rounded-[10px] border border-wp-line/24 bg-wp-panel-2 px-3 py-2.5 font-wp text-[0.8125rem] font-semibold text-wp-fg"
           >
             <span
               className={cn(
-                "flex h-[22px] w-[22px] flex-none items-center justify-center rounded-wp-pill border-2 text-[11px] font-extrabold text-white",
+                "flex h-[1.375rem] w-[1.375rem] flex-none items-center justify-center rounded-wp-pill border-2 text-[0.6875rem] font-extrabold text-white",
                 done ? "border-wp-green bg-wp-green" : "border-wp-accent bg-wp-accent",
               )}
             >

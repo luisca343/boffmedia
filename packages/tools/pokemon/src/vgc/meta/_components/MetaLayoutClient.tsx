@@ -239,9 +239,9 @@ function MetaScreen() {
     body = (
       // Split view: the ranking is a sticky, self-scrolling column and the detail
       // rides the page scroll — DkApp does not bound their height.
-      <div className="grid min-h-0 flex-1 items-start grid-cols-[minmax(280px,340px)_minmax(0,1fr)]">
+      <div className="grid min-h-0 flex-1 items-start grid-cols-[minmax(17.5rem,21.25rem)_minmax(0,1fr)]">
         <MvList
-          className="sticky top-[calc(var(--tool-sticky-top,0px)_+_var(--tool-bar-h,58px))] h-[calc(100dvh_-_var(--tool-sticky-top,0px)_-_var(--tool-bar-h,58px))] border-r border-solid border-line"
+          className="sticky top-[calc(var(--tool-sticky-top,0px)_+_var(--tool-bar-h,3.625rem))] h-[calc(100dvh_-_var(--tool-sticky-top,0px)_-_var(--tool-bar-h,3.625rem))] border-r border-solid border-line"
           entries={usageEntries}
           pokeMap={pokeMap}
           selectedId={selectedEntry?.id ?? null}
@@ -299,7 +299,7 @@ function MetaScreen() {
       />
 
       {tab === "stats" && isChampionsFormat && (
-        <div className="flex flex-none items-center gap-2 border-b border-solid border-warn/20 bg-warn/5 px-3 py-2 text-[12px] text-warn">
+        <div className="flex flex-none items-center gap-2 border-b border-solid border-warn/20 bg-warn/5 px-3 py-2 text-[0.75rem] text-warn">
           <Icon name="info" size={14} className="flex-none" />
           {t("tabs.championsNotice")}
         </div>

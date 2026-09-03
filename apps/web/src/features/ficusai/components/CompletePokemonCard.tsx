@@ -251,7 +251,7 @@ const MoveBadges: FC<{ moves: string[]; t: any }> = ({ moves, t }) => (
           </Badge>
         </HoverCardTrigger>
         <HoverCardContent
-          className="bg-layer-3 text-ink w-[400px] border-edge-strong border font-normal"
+          className="bg-layer-3 text-ink w-[25rem] border-edge-strong border font-normal"
           style={{ zIndex: 9999 }}
           side="top"
           align="center"
@@ -326,7 +326,7 @@ export default function PokemonDataCard({ data }: PokemonDataCardProps) {
   }
 
   return (
-    <div className="bg-layer-3/50 rounded-lg p-6 mt-3 border border-edge max-w-4xl w-full sm:w-[420px]">
+    <div className="bg-layer-3/50 rounded-lg p-6 mt-3 border border-edge max-w-4xl w-full sm:w-[26.25rem]">
       <PokemonHeader sprite={spriteInfo?.path} name={pokemonName} types={types} />
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
         {availableTabs.length > 1 && (
@@ -338,7 +338,7 @@ export default function PokemonDataCard({ data }: PokemonDataCardProps) {
             ))}
           </TabsList>
         )}
-        <div className="min-h-[300px]">
+        <div className="min-h-[18.75rem]">
           <TabsContent value="overview">
             <OverviewSection
               stats={stats}

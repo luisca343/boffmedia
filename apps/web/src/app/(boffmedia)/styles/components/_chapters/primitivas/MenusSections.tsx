@@ -64,9 +64,9 @@ export function MenusSections() {
           }
         >
           {({ close }) => (
-            <div className="grid gap-[14px]">
+            <div className="grid gap-[0.875rem]">
               <span className={cn(MONO_LABEL, "text-txt-dim")}>Formato</span>
-              <div className="grid gap-[10px]">
+              <div className="grid gap-[0.625rem]">
                 <Checkbox defaultChecked label="VGC" />
                 <Checkbox label="Singles" />
                 <Checkbox label="Draft" />
@@ -78,9 +78,9 @@ export function MenusSections() {
           )}
         </Popover>
         <Popover align="end" ariaLabel="Detalle de jugador" trigger={<IconButton name="info" label="Detalle" />}>
-          <div className="grid gap-[6px] min-w-[220px]">
-            <b className="font-display text-[15px] not-italic uppercase tracking-[0.02em]">AxelCraft</b>
-            <span className="text-txt-muted text-[13px]">Equipo Volt · 12 480 pts · 3 logros</span>
+          <div className="grid gap-[0.375rem] min-w-[13.75rem]">
+            <b className="font-display text-[0.9375rem] not-italic uppercase tracking-[0.02em]">AxelCraft</b>
+            <span className="text-txt-muted text-[0.8125rem]">Equipo Volt · 12 480 pts · 3 logros</span>
           </div>
         </Popover>
       </Sample>
@@ -175,7 +175,7 @@ export function MenusSections() {
         col
         note={<>El aviso persistente en línea — frente al <code>Toast</code> efímero. Cuatro tonos, icono automático por tono, y ranuras opcionales de <code>actions</code> y cierre.</>}
       >
-        <div className="grid gap-3 w-full max-w-[520px]">
+        <div className="grid gap-3 w-full max-w-[32.5rem]">
           {bannerOpen && (
             <Banner tone="info" title="Regulación H activa" onClose={() => setBannerOpen(false)}>
               Los equipos deben cumplir la lista de la temporada actual.

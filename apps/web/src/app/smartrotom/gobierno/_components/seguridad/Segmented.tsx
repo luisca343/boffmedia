@@ -28,7 +28,7 @@ export function Segmented({
             role="tab"
             aria-selected={on}
             onClick={() => onChange(o.value)}
-            className={`inline-flex items-center gap-2 rounded-gt-sm border px-3 py-[7px] font-gt text-[12.5px] font-semibold transition-colors ${
+            className={`inline-flex items-center gap-2 rounded-gt-sm border px-3 py-[0.4375rem] font-gt text-[0.78125rem] font-semibold transition-colors ${
               on
                 ? `${t.softBg} ${t.softBorder} ${t.text}`
                 : "border-gt-line bg-gt-paper-0 text-gt-ink-500 hover:bg-gt-paper-1 hover:text-gt-ink-800"
@@ -36,7 +36,7 @@ export function Segmented({
           >
             {o.label}
             <span
-              className={`min-w-[18px] rounded-[9px] px-1.5 py-px text-center font-gt-mono text-[10px] font-bold tabular-nums ${
+              className={`min-w-[1.125rem] rounded-[9px] px-1.5 py-px text-center font-gt-mono text-[0.625rem] font-bold tabular-nums ${
                 on ? `${t.solidBg} text-white` : "bg-gt-paper-3 text-gt-ink-500"
               }`}
             >

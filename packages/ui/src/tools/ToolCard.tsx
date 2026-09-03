@@ -60,14 +60,14 @@ export function ToolCard({ tool, variant = "senal", labels, onSelect, className 
           <Icon name={tool.icon} size={20} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-display text-[18px] font-bold uppercase leading-[1.02] tracking-[0.02em]">
+          <span className="block font-display text-[1.125rem] font-bold uppercase leading-[1.02] tracking-[0.02em]">
             {tool.title}
           </span>
           {/* No `block` here: `line-clamp-1` needs `display:-webkit-box`, and a
               display utility beside it silently wins on stylesheet order — the
               row then grows to four lines and every card in the grid stretches
               with it. */}
-          <span className="mt-1 line-clamp-1 text-[13.5px] leading-[1.5] text-txt-muted">{tool.desc}</span>
+          <span className="mt-1 line-clamp-1 text-[0.84375rem] leading-[1.5] text-txt-muted">{tool.desc}</span>
         </span>
         <span className="ml-auto flex flex-none items-center gap-2">
           {badges}
@@ -87,22 +87,22 @@ export function ToolCard({ tool, variant = "senal", labels, onSelect, className 
         <span
           aria-hidden
           className={cn(
-            "absolute left-0 top-0 h-[3px] w-[38px] bg-[var(--ghue)] transition-[width] duration-[320ms] ease-[cubic-bezier(0.2,0.7,0.3,1)]",
+            "absolute left-0 top-0 h-[3px] w-[2.375rem] bg-[var(--ghue)] transition-[width] duration-[320ms] ease-[cubic-bezier(0.2,0.7,0.3,1)]",
             !inert && "group-hover:w-full",
           )}
         />
-        <span className="mb-4 flex items-center gap-[11px]">
+        <span className="mb-4 flex items-center gap-[0.6875rem]">
           <span
             className={cn(
               ICON_BOX,
-              "h-[38px] w-[38px]",
+              "h-[2.375rem] w-[2.375rem]",
               soon && "border-line-2 bg-transparent text-txt-dim [--cut-line:var(--line-2)]",
             )}
           >
             <Icon name={tool.icon} size={20} />
           </span>
           {tool.cat && (
-            <span className="min-w-0 truncate font-mono text-[10px]/[1.3] font-semibold uppercase tracking-[0.12em] text-txt-dim">
+            <span className="min-w-0 truncate font-mono text-[0.625rem]/[1.3] font-semibold uppercase tracking-[0.12em] text-txt-dim">
               {tool.cat}
             </span>
           )}
@@ -115,21 +115,21 @@ export function ToolCard({ tool, variant = "senal", labels, onSelect, className 
         </span>
         <span
           className={cn(
-            "block font-display text-[22px] font-bold uppercase leading-[1.02] tracking-[0.02em]",
+            "block font-display text-[1.375rem] font-bold uppercase leading-[1.02] tracking-[0.02em]",
             soon && "text-txt-muted",
           )}
         >
           {tool.title}
         </span>
-        <span className="mb-0.5 mt-2 block text-pretty text-[13.5px] leading-[1.5] text-txt-muted">{tool.desc}</span>
+        <span className="mb-0.5 mt-2 block text-pretty text-[0.84375rem] leading-[1.5] text-txt-muted">{tool.desc}</span>
       </>
     )
 
   const shell = cn(
     SHELL_BASE,
     variant === "fila"
-      ? cn("flex w-full items-center gap-[15px] px-[18px] py-[15px]", FILA_CLIP)
-      : cn("flex h-full flex-col px-5 pb-[18px] pt-5", SENAL_CLIP),
+      ? cn("flex w-full items-center gap-[0.9375rem] px-[1.125rem] py-[0.9375rem]", FILA_CLIP)
+      : cn("flex h-full flex-col px-5 pb-[1.125rem] pt-5", SENAL_CLIP),
     inert ? "cursor-default" : cn(CARD_HOVER_LINE, SHELL_INTERACTIVE),
     className,
   )

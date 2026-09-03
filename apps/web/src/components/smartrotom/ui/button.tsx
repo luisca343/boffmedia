@@ -32,9 +32,9 @@ const buttonVariants = cva(
           "bg-transparent border-sr-bad [--cut-line:var(--sr-bad)] text-sr-bad hover:bg-sr-bad hover:text-white hover:border-sr-bad",
       },
       size: {
-        default: "[--cut:9px] py-2.5 px-5 text-[13px]",
-        sm: "[--cut:7px] py-2 px-3.5 text-[12px]",
-        lg: "[--cut:11px] py-3.5 px-8 text-[15px]",
+        default: "[--cut:9px] py-2.5 px-5 text-[0.8125rem]",
+        sm: "[--cut:7px] py-2 px-3.5 text-[0.75rem]",
+        lg: "[--cut:11px] py-3.5 px-8 text-[0.9375rem]",
         icon: "[--cut:7px] h-9 w-9",
       },
     },

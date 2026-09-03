@@ -56,14 +56,14 @@ export function EventOrganizer({
           ? "text-txt-muted bg-panel-2 border border-solid border-line-2 [--cut-line:var(--line-2)]"
           : "text-accent bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] border border-solid border-[color-mix(in_srgb,var(--accent)_40%,var(--line-2))] [--cut-line:color-mix(in_srgb,var(--accent)_40%,var(--line-2))]"
     return (
-      <div className={cn("flex items-start gap-[13px]", className)}>
-        {seals("w-[34px] h-[34px] text-[14px]", "-ml-[10px]")}
-        <div className="flex min-w-0 flex-col gap-[7px]">
-          <span className={cn("inline-flex items-center gap-[6px] self-start font-mono text-[9.5px] font-bold uppercase leading-none tracking-[0.13em] px-[9px] py-[5px] cut-tag cut-tag-edge [--cut-tag:4px]", tagCls)}>
+      <div className={cn("flex items-start gap-[0.8125rem]", className)}>
+        {seals("w-[2.125rem] h-[2.125rem] text-[0.875rem]", "-ml-[0.625rem]")}
+        <div className="flex min-w-0 flex-col gap-[0.4375rem]">
+          <span className={cn("inline-flex items-center gap-[0.375rem] self-start font-mono text-[0.59375rem] font-bold uppercase leading-none tracking-[0.13em] px-[0.5625rem] py-[0.3125rem] cut-tag cut-tag-edge [--cut-tag:4px]", tagCls)}>
             <Icon name={m.icon} size={12} />
             {t(m.tagKey)}
           </span>
-          <span className="font-display text-[15px] font-bold uppercase leading-[1.15] tracking-[0.01em] text-txt [&_b]:font-bold">
+          <span className="font-display text-[0.9375rem] font-bold uppercase leading-[1.15] tracking-[0.01em] text-txt [&_b]:font-bold">
             {o.role === "boffmedia" ? (
               <b>Boffmedia</b>
             ) : o.role === "coorg" ? (
@@ -76,7 +76,7 @@ export function EventOrganizer({
               </>
             )}
           </span>
-          <p className="font-body text-[12.5px] leading-[1.5] text-txt-muted text-pretty">{line}</p>
+          <p className="font-body text-[0.78125rem] leading-[1.5] text-txt-muted text-pretty">{line}</p>
         </div>
       </div>
     )
@@ -84,10 +84,10 @@ export function EventOrganizer({
 
   return (
     <span
-      className={cn("inline-flex min-w-0 items-center gap-[9px] font-mono text-[11px] font-semibold leading-none tracking-[0.04em] text-txt-muted", className)}
+      className={cn("inline-flex min-w-0 items-center gap-[0.5625rem] font-mono text-[0.6875rem] font-semibold leading-none tracking-[0.04em] text-txt-muted", className)}
       title={t(m.labelKey)}
     >
-      {seals("w-[22px] h-[22px] text-[10px]", "-ml-[7px]")}
+      {seals("w-[1.375rem] h-[1.375rem] text-[0.625rem]", "-ml-[0.4375rem]")}
       <span className="overflow-hidden text-ellipsis whitespace-nowrap [&_b]:font-bold [&_b]:text-txt">
         {o.role === "boffmedia" ? (
           <>

@@ -18,9 +18,9 @@ export function EmptyState({
   return (
     <div className={cn("grid h-full place-items-center gap-2 text-center text-ps-ink-faint", className)}>
       <div>
-        <Icon name={icon} className="mx-auto h-[42px] w-[42px] opacity-50" />
-        <p className="mt-2 font-ps-ceremony text-[18px] text-ps-ink-soft">{title}</p>
-        {sub && <p className="mt-1 text-[12px] text-ps-ink-faint">{sub}</p>}
+        <Icon name={icon} className="mx-auto h-[2.625rem] w-[2.625rem] opacity-50" />
+        <p className="mt-2 font-ps-ceremony text-[1.125rem] text-ps-ink-soft">{title}</p>
+        {sub && <p className="mt-1 text-[0.75rem] text-ps-ink-faint">{sub}</p>}
       </div>
     </div>
   )

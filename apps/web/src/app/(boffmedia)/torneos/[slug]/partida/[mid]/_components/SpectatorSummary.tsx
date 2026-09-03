@@ -21,10 +21,10 @@ export function SpectatorSummary({
   const done = detail.status === "completed" || detail.status === "bye"
   const line = (c: TnCompetitorApi | null, score: number | null, winner: boolean) => (
     <div className={cn("flex items-center justify-between gap-3 px-4 py-3", winner && "bg-ok-soft")}>
-      <span className={cn("font-display text-[18px] font-bold uppercase", winner ? "text-ok" : "text-txt")}>
+      <span className={cn("font-display text-[1.125rem] font-bold uppercase", winner ? "text-ok" : "text-txt")}>
         {c?.name ?? "—"}
       </span>
-      <span className="font-mono text-[20px] font-bold">{done ? score ?? 0 : "–"}</span>
+      <span className="font-mono text-[1.25rem] font-bold">{done ? score ?? 0 : "–"}</span>
     </div>
   )
   const winId = detail.winner?.id
@@ -34,7 +34,7 @@ export function SpectatorSummary({
         <div className={TM_CARD_HEAD}>
           <h3 className={TM_CARD_H3}>{done ? t("done") : t("playing")}</h3>
           {detail.proposalState === "disputed" && (
-            <span className="inline-flex items-center gap-1.5 border border-solid border-bad px-2 py-1 font-mono text-[10px] font-bold uppercase text-bad">
+            <span className="inline-flex items-center gap-1.5 border border-solid border-bad px-2 py-1 font-mono text-[0.625rem] font-bold uppercase text-bad">
               <Icon name="alert" size={12} />{t("disputed")}
             </span>
           )}

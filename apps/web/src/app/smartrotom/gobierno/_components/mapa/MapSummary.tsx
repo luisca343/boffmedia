@@ -29,16 +29,16 @@ export function MapSummary({
 
   return (
     <div className="animate-gt-pop-scale motion-reduce:animate-none">
-      <div className="mb-1 font-gt-mono text-[10.5px] font-bold uppercase tracking-[.22em] text-gt-dep-urbanismo">
+      <div className="mb-1 font-gt-mono text-[0.65625rem] font-bold uppercase tracking-[.22em] text-gt-dep-urbanismo">
         {t("mapa.resumenCatastral")}
       </div>
-      <h2 className="mb-1 font-gt-display text-[19px] text-gt-ink-900">
+      <h2 className="mb-1 font-gt-display text-[1.1875rem] text-gt-ink-900">
         {t("mapa.municipiosCount", { count: towns.length })}
       </h2>
-      <div className="mb-4 text-[12.5px] leading-relaxed text-gt-ink-500">{t("mapa.instrucciones")}</div>
+      <div className="mb-4 text-[0.78125rem] leading-relaxed text-gt-ink-500">{t("mapa.instrucciones")}</div>
 
       {rows.length === 0 ? (
-        <div className="py-3 text-center text-[12.5px] italic text-gt-ink-400">{t("mapa.sinParcelas")}</div>
+        <div className="py-3 text-center text-[0.78125rem] italic text-gt-ink-400">{t("mapa.sinParcelas")}</div>
       ) : (
         <div className="grid gap-2">
           {rows.map((r) => {
@@ -50,9 +50,9 @@ export function MapSummary({
                 style={{ borderLeft: `3px solid ${color}` }}
               >
                 <div>
-                  <div className="font-gt-display text-[14px] font-bold text-gt-ink-900">{townName(r.t)}</div>
+                  <div className="font-gt-display text-[0.875rem] font-bold text-gt-ink-900">{townName(r.t)}</div>
                   {r.zonasDeTown > 0 && (
-                    <div className="mt-0.5 font-gt-mono text-[10px] text-gt-ink-400">
+                    <div className="mt-0.5 font-gt-mono text-[0.625rem] text-gt-ink-400">
                       {t("mapa.zonasCount", { count: r.zonasDeTown })}
                     </div>
                   )}
@@ -61,7 +61,7 @@ export function MapSummary({
                   <div className="font-gt-display text-base font-bold tabular-nums" style={{ color }}>
                     {r.occ}/{r.total}
                   </div>
-                  <div className="font-gt-mono text-[9px] text-gt-ink-400">{t("urbanismo.ocupadas")}</div>
+                  <div className="font-gt-mono text-[0.5625rem] text-gt-ink-400">{t("urbanismo.ocupadas")}</div>
                 </div>
               </div>
             )
@@ -70,12 +70,12 @@ export function MapSummary({
       )}
 
       <Card className="mt-4 p-3.5">
-        <div className="mb-2.5 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+        <div className="mb-2.5 font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
           {t("mapa.usoSueloZonas")}
         </div>
         <div className="grid grid-cols-2 gap-x-3 gap-y-1.5">
           {Object.entries(ZONA_KINDS).map(([key, k]) => (
-            <div key={key} className="flex items-center gap-[7px] text-[12px] text-gt-ink-700">
+            <div key={key} className="flex items-center gap-[0.4375rem] text-[0.75rem] text-gt-ink-700">
               <Icon name={k.icon} size={14} className={`flex-none ${TONES[k.tone].text}`} />
               {t(k.labelKey)}
             </div>

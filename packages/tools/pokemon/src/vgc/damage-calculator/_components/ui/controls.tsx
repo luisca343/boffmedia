@@ -7,8 +7,8 @@ import { Input as KitInput, Select as KitSelect, type SelectOption, type InputPr
 // labelled field wrapper.
 export function Field({ label, children, className }: { label: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("grid min-w-0 gap-[5px]", className)}>
-      <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{label}</span>
+    <div className={cn("grid min-w-0 gap-[0.3125rem]", className)}>
+      <span className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{label}</span>
       {children}
     </div>
   )
@@ -62,7 +62,7 @@ export function CritToggle({ on, onClick, title }: { on: boolean; onClick: () =>
       title={title}
       onClick={onClick}
       className={cn(
-        "cut-tag cut-tag-edge [--cut-tag:6px] grid h-full min-h-[32px] place-items-center border border-solid font-mono text-[11px]/none font-bold",
+        "cut-tag cut-tag-edge [--cut-tag:6px] grid h-full min-h-[2rem] place-items-center border border-solid font-mono text-[0.6875rem]/none font-bold",
         "transition-[color,border-color,background] duration-[140ms]",
         on ? "border-warn [--cut-line:var(--warn)] bg-warn-soft text-warn" : "border-line-2 [--cut-line:var(--line-2)] bg-base text-txt-dim hover:text-warn",
       )}

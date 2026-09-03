@@ -77,7 +77,7 @@ export default function Transacciones() {
     return (
       <>
         <Skeleton className="h-8 w-48" />
-        <div className="grid gap-4 md:grid-cols-3">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-[104px] rounded-sb-lg" />)}</div>
+        <div className="grid gap-4 md:grid-cols-3">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-[6.5rem] rounded-sb-lg" />)}</div>
         <Skeleton className="h-96 rounded-sb-lg" />
       </>
     );
@@ -108,9 +108,9 @@ export default function Transacciones() {
               {c.label}
             </FChip>
           ))}
-          <div className="relative ml-auto min-w-[200px]">
+          <div className="relative ml-auto min-w-[12.5rem]">
             <Ico name="search" size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-sb-fg-subtle" />
-            <Input className="h-8 pl-8 text-[13px]" placeholder={t("common.search") + "…"} value={q} onChange={(e) => setQ(e.target.value)} />
+            <Input className="h-8 pl-8 text-[0.8125rem]" placeholder={t("common.search") + "…"} value={q} onChange={(e) => setQ(e.target.value)} />
           </div>
         </div>
 
@@ -118,7 +118,7 @@ export default function Transacciones() {
           <table className="w-full border-separate border-spacing-0">
             <thead>
               <tr>
-                <Th className="w-[280px]">{t("transacciones.counterparty")}</Th>
+                <Th className="w-[17.5rem]">{t("transacciones.counterparty")}</Th>
                 <Th>{t("transacciones.concept")}</Th>
                 <Th>{t("transacciones.category")}</Th>
                 <Th align="right"><SortHead id="amount" label={t("transacciones.amount")} /></Th>
@@ -137,13 +137,13 @@ export default function Transacciones() {
                     <tr key={`${tx.date}-${i}`} onClick={() => setOpenTx(tx)} className="cursor-pointer transition-colors hover:bg-sb-surface-2">
                       <Td>
                         <div className="flex items-center gap-2">
-                          <span className="text-[13px] font-semibold">{displayName(tx.displayName)}</span>
+                          <span className="text-[0.8125rem] font-semibold">{displayName(tx.displayName)}</span>
                         </div>
-                        <div className="text-[11px] text-sb-fg-muted">{out ? t("transacciones.exit") : t("transacciones.entry")}</div>
+                        <div className="text-[0.6875rem] text-sb-fg-muted">{out ? t("transacciones.exit") : t("transacciones.entry")}</div>
                       </Td>
                       <Td className="text-sb-fg-2">{tx.reason}</Td>
                       <Td>
-                        <span className={cn("inline-flex h-6 items-center gap-1.5 rounded-sb-pill px-2.5 text-[11.5px] font-semibold", c.soft, c.text)}>
+                        <span className={cn("inline-flex h-6 items-center gap-1.5 rounded-sb-pill px-2.5 text-[0.71875rem] font-semibold", c.soft, c.text)}>
                           <span className={cn("size-1.5 rounded-full", c.dotBg)} />
                           {t(`categories.${c.id}`)}
                         </span>
@@ -154,7 +154,7 @@ export default function Transacciones() {
                       <Td align="right" className="tabular-nums">{formatMoney(balanceAfter(tx, accId))}</Td>
                       <Td align="right" className="text-sb-fg-muted tabular-nums">
                         <div>{fmtDate(tx.date, "short", locale)}</div>
-                        <div className="text-[11px]">{fmtTime(tx.date, locale)}</div>
+                        <div className="text-[0.6875rem]">{fmtTime(tx.date, locale)}</div>
                       </Td>
                     </tr>
                   );
@@ -165,7 +165,7 @@ export default function Transacciones() {
         </div>
 
         <div className="flex items-center justify-between border-t border-sb-border p-4">
-          <div className="text-[13px] text-sb-fg-muted">
+          <div className="text-[0.8125rem] text-sb-fg-muted">
             {t("transacciones.showing", { count: filtered.length })}
           </div>
           <div className="flex gap-2">
@@ -182,13 +182,13 @@ export default function Transacciones() {
 
 function Th({ children, align = "left", className }: { children: React.ReactNode; align?: "left" | "right"; className?: string }) {
   return (
-    <th className={cn("sticky top-0 border-b border-sb-border bg-sb-surface-2 px-4 py-3 text-[11px] font-semibold uppercase tracking-[0.06em] text-sb-fg-muted", align === "right" ? "text-right" : "text-left", className)}>
+    <th className={cn("sticky top-0 border-b border-sb-border bg-sb-surface-2 px-4 py-3 text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-sb-fg-muted", align === "right" ? "text-right" : "text-left", className)}>
       {children}
     </th>
   );
 }
 function Td({ children, align = "left", className }: { children: React.ReactNode; align?: "left" | "right"; className?: string }) {
-  return <td className={cn("border-b border-sb-border px-4 py-3 text-[13px]", align === "right" ? "text-right" : "text-left", className)}>{children}</td>;
+  return <td className={cn("border-b border-sb-border px-4 py-3 text-[0.8125rem]", align === "right" ? "text-right" : "text-left", className)}>{children}</td>;
 }
 function FChip({ children, active, color, onClick }: { children: React.ReactNode; active?: boolean; color?: string; onClick?: () => void }) {
   return (
@@ -197,7 +197,7 @@ function FChip({ children, active, color, onClick }: { children: React.ReactNode
       onClick={onClick}
       style={active && color ? { background: color, borderColor: color, color: "#fff" } : undefined}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-sb-pill border px-2.5 py-1.5 text-[12px] font-medium transition-colors",
+        "inline-flex items-center gap-1.5 rounded-sb-pill border px-2.5 py-1.5 text-[0.75rem] font-medium transition-colors",
         active && !color ? "border-sb-600 bg-sb-600 text-white" : "border-sb-border bg-sb-surface-2 hover:border-sb-border-strong",
       )}
     >

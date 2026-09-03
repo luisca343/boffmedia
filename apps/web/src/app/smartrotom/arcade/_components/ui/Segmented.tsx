@@ -31,7 +31,7 @@ export function Segmented<T extends string>({ options, value, onChange, label }:
             aria-checked={active}
             onClick={() => onChange(o.value)}
             className={cn(
-              "ar-lift rounded-md border px-3 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em]",
+              "ar-lift rounded-md border px-3 py-1.5 font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em]",
               active
                 ? "border-ar-cyan/40 bg-ar-cyan/[.18] text-ar-cyan"
                 : "border-transparent text-ar-ink-dim hover:text-ar-ink",

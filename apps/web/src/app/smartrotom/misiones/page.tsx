@@ -76,7 +76,7 @@ export default function TablonPage() {
       />
 
       <div className="ms-board-frame flex-1">
-        <div className="ms-cork relative flex min-h-[200px] h-full flex-col px-6 pb-14 pt-8">
+        <div className="ms-cork relative flex min-h-[12.5rem] h-full flex-col px-6 pb-14 pt-8">
           <ScatterLayer />
 
           {papers.length === 0 ? (
@@ -86,7 +86,7 @@ export default function TablonPage() {
                 : t("emptyFiltered")}
             </EmptyBoard>
           ) : (
-            <div className="relative z-[2] grid gap-9 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
+            <div className="relative z-[2] grid gap-9 [grid-template-columns:repeat(auto-fill,minmax(17.5rem,1fr))]">
               {papers.map((quest) => (
                 <QuestPaper
                   key={quest.id}

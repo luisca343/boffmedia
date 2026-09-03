@@ -7,7 +7,7 @@ const badgeVariants = cva(
   cn(
     "cut cut-edge-slant [--cut:5px] inline-flex items-center justify-center gap-1",
     "font-display font-bold not-italic uppercase tracking-[0.08em] leading-none",
-    "text-[11px] px-2 py-1 border border-solid transition-colors",
+    "text-[0.6875rem] px-2 py-1 border border-solid transition-colors",
   ),
   {
     variants: {

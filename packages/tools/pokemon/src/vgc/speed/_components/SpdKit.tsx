@@ -26,12 +26,12 @@ export function SpdPanel({
 }) {
   return (
     <section className="min-w-0 border border-solid border-line bg-panel">
-      <header className="flex items-center gap-[8px] border-b border-solid border-line px-[14px] py-[10px]">
+      <header className="flex items-center gap-[0.5rem] border-b border-solid border-line px-[0.875rem] py-[0.625rem]">
         {icon && <Icon name={icon} size={14} className="flex-none text-accent" />}
-        <h3 className="m-0 font-display text-[13px] font-bold uppercase leading-none tracking-[0.06em]">{title}</h3>
+        <h3 className="m-0 font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.06em]">{title}</h3>
         {aside && <span className="ml-auto flex items-center">{aside}</span>}
       </header>
-      <div className={cn("p-[14px]", bodyClassName)}>{children}</div>
+      <div className={cn("p-[0.875rem]", bodyClassName)}>{children}</div>
     </section>
   );
 }
@@ -61,7 +61,7 @@ export function SpdInput({
     // without re-declaring it here.
     <div className={cn("relative inline-flex min-w-0", className)}>
       {icon && (
-        <Icon name={icon} size={15} className="pointer-events-none absolute left-[10px] top-1/2 -translate-y-1/2 text-txt-dim" />
+        <Icon name={icon} size={15} className="pointer-events-none absolute left-[0.625rem] top-1/2 -translate-y-1/2 text-txt-dim" />
       )}
       <Input
         size="sm"
@@ -148,7 +148,7 @@ export function SpdMonSearch({
       {open && results.length > 0 && (
         <div className="absolute z-30 mt-1 w-full border border-solid border-line-2 bg-base shadow-xl">
           {loading ? (
-            <div className="px-3 py-2 font-mono text-[12px] text-txt-dim">{t("loading")}</div>
+            <div className="px-3 py-2 font-mono text-[0.75rem] text-txt-dim">{t("loading")}</div>
           ) : (
             results.map((p) => (
               <button
@@ -162,8 +162,8 @@ export function SpdMonSearch({
                 className="flex w-full items-center gap-2 border-0 bg-transparent px-3 py-2 text-left transition-colors hover:bg-panel-2"
               >
                 <DkSprite src={spriteUrl(p.name)} alt={p.name} size={24} onError={handleSpriteError} />
-                <span className="text-[13px] text-txt">{p.name}</span>
-                <span className="ml-auto font-mono text-[11px] text-txt-dim">{p.baseSpeed}</span>
+                <span className="text-[0.8125rem] text-txt">{p.name}</span>
+                <span className="ml-auto font-mono text-[0.6875rem] text-txt-dim">{p.baseSpeed}</span>
               </button>
             ))
           )}
@@ -188,7 +188,7 @@ export function SpdModifiers({ modifiers, onChange }: { modifiers: Modifiers; on
       onClick={() => toggleFlag(key)}
       title={title}
       className={cn(
-        "border border-solid px-[9px] py-[4px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background,border-color]",
+        "border border-solid px-[0.5625rem] py-[0.25rem] font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background,border-color]",
         modifiers[key] ? onCls : "border-line-2 text-txt-muted hover:text-txt",
       )}
     >
@@ -197,8 +197,8 @@ export function SpdModifiers({ modifiers, onChange }: { modifiers: Modifiers; on
   );
 
   return (
-    <div className="flex flex-wrap items-center gap-2 border border-solid border-line bg-base-2 px-[10px] py-[8px]">
-      <span className="font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">{t("title")}</span>
+    <div className="flex flex-wrap items-center gap-2 border border-solid border-line bg-base-2 px-[0.625rem] py-[0.5rem]">
+      <span className="font-mono text-[0.5625rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">{t("title")}</span>
       <div className="flex items-center gap-1">
         {BOOST_STEPS.map((n) => {
           const on = modifiers.boost === n;
@@ -210,7 +210,7 @@ export function SpdModifiers({ modifiers, onChange }: { modifiers: Modifiers; on
               onClick={() => toggleBoost(n)}
               title={t("boostTitle", { n })}
               className={cn(
-                "border border-solid px-[7px] py-[3px] font-mono text-[10px] font-bold leading-none transition-[color,background,border-color]",
+                "border border-solid px-[0.4375rem] py-[3px] font-mono text-[0.625rem] font-bold leading-none transition-[color,background,border-color]",
                 on
                   ? pos
                     ? "border-ok/50 bg-ok/15 text-ok"

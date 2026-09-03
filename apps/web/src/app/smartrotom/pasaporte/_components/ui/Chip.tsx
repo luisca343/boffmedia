@@ -11,7 +11,7 @@ export function PtsChip({ points, sm = false, className }: { points: number; sm?
     <span
       className={cn(
         "ps-num inline-flex flex-none items-center rounded-full bg-ps-gild/[.18] font-ps-mono font-bold text-ps-gild-lo",
-        sm ? "px-1.5 py-px text-[9.5px]" : "px-[9px] py-[3px] text-[11px]",
+        sm ? "px-1.5 py-px text-[0.59375rem]" : "px-[0.5625rem] py-[3px] text-[0.6875rem]",
         className,
       )}
     >
@@ -39,7 +39,7 @@ export function RarityBadge({
   return (
     <span
       className={cn(
-        "ps-num inline-block rounded-full border border-current px-[7px] py-[2px] font-ps-mono text-[9px] uppercase tracking-[.06em]",
+        "ps-num inline-block rounded-full border border-current px-[0.4375rem] py-[2px] font-ps-mono text-[0.5625rem] uppercase tracking-[.06em]",
         info.className,
         className,
       )}
@@ -55,7 +55,7 @@ export function CircuitTag({ children, className }: { children: ReactNode; class
   return (
     <span
       className={cn(
-        "inline-block rounded-full bg-ps-chapter-deep px-[9px] py-[3px] text-[10px] uppercase tracking-[.16em] text-white",
+        "inline-block rounded-full bg-ps-chapter-deep px-[0.5625rem] py-[3px] text-[0.625rem] uppercase tracking-[.16em] text-white",
         className,
       )}
     >

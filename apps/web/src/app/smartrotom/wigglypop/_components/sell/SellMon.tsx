@@ -117,12 +117,12 @@ export function SellMon() {
   // ── step 2: done ───────────────────────────────────────────────────────────
   if (step === 2 && published && picked) {
     return (
-      <div className="mx-auto mt-10 max-w-[460px] text-center">
+      <div className="mx-auto mt-10 max-w-[28.75rem] text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-wp-pill border border-wp-accent bg-wp-accent/[.13]">
           <Icon name="tag" size={28} className="text-wp-accent" />
         </div>
-        <h2 className="font-wp-display text-[22px] font-semibold text-wp-fg">{t("sell.mon.publishedTitle")}</h2>
-        <p className="mt-2 font-wp text-[13.5px] font-semibold leading-relaxed text-wp-fg-muted">
+        <h2 className="font-wp-display text-[1.375rem] font-semibold text-wp-fg">{t("sell.mon.publishedTitle")}</h2>
+        <p className="mt-2 font-wp text-[0.84375rem] font-semibold leading-relaxed text-wp-fg-muted">
           <b className="text-wp-fg">{picked.name}</b>{" "}
           {t("sell.mon.publishedBody", {
             suffix:
@@ -161,7 +161,7 @@ export function SellMon() {
       )
     if (isLoading) {
       return (
-        <div className="mx-auto max-w-[920px]">
+        <div className="mx-auto max-w-[57.5rem]">
           <div className="grid grid-cols-6 gap-2.5">
             {Array.from({ length: 30 }).map((_, i) => (
               <Skeleton key={i} className="aspect-square rounded-wp-sm" />
@@ -181,9 +181,9 @@ export function SellMon() {
     }
 
     return (
-      <div className="mx-auto max-w-[920px]">
+      <div className="mx-auto max-w-[57.5rem]">
         <div className="mb-4 flex flex-wrap items-center gap-2.5">
-          <span className="mr-1 flex items-center gap-1.5 font-wp text-[13px] font-semibold text-wp-fg-muted">
+          <span className="mr-1 flex items-center gap-1.5 font-wp text-[0.8125rem] font-semibold text-wp-fg-muted">
             <Icon name="shieldCheck" size={15} className="text-wp-green" />
             {t("sell.mon.pcLabel")}
           </span>
@@ -194,7 +194,7 @@ export function SellMon() {
                 type="button"
                 onClick={() => setBoxIdx(i)}
                 className={cn(
-                  "rounded-wp-pill border-wp px-3.5 py-2 font-wp text-[13px] font-extrabold transition-colors",
+                  "rounded-wp-pill border-wp px-3.5 py-2 font-wp text-[0.8125rem] font-extrabold transition-colors",
                   i === boxIdx
                     ? "wp-grad-primary border-transparent text-white"
                     : "border-wp-line/24 bg-white text-wp-fg-muted hover:text-wp-accent-strong",
@@ -220,12 +220,12 @@ export function SellMon() {
   const cheap = price < picked.value
 
   return (
-    <div className="mx-auto grid max-w-[880px] gap-6 md:grid-cols-[300px_1fr]">
+    <div className="mx-auto grid max-w-[55rem] gap-6 md:grid-cols-[18.75rem_1fr]">
       {/* preview */}
       <div>
         <SpriteStage
           mon={picked}
-          className="relative flex-col rounded-wp border-wp border-wp-line/24 p-[18px] text-center"
+          className="relative flex-col rounded-wp border-wp border-wp-line/24 p-[1.125rem] text-center"
         >
           <Sprite mon={picked} className="relative z-[2] h-32 w-[78%]" />
           <div className="relative z-[2]">
@@ -263,7 +263,7 @@ export function SellMon() {
 
       {/* form */}
       <div>
-        <h3 className="mb-3 font-wp text-[15px] font-bold text-wp-fg">{t("sell.mon.formatHeading")}</h3>
+        <h3 className="mb-3 font-wp text-[0.9375rem] font-bold text-wp-fg">{t("sell.mon.formatHeading")}</h3>
         <div className="grid grid-cols-2 gap-2.5">
           {FORMATS.map((k) => (
             <button
@@ -275,7 +275,7 @@ export function SellMon() {
                 format === k ? "border-wp-accent bg-wp-accent/[.13]" : "border-wp-line/24 bg-white",
               )}
             >
-              <div className="flex items-center gap-2 font-wp text-[13.5px] font-bold text-wp-fg">
+              <div className="flex items-center gap-2 font-wp text-[0.84375rem] font-bold text-wp-fg">
                 <Icon
                   name={FORMAT_ICON[k]}
                   size={16}
@@ -283,7 +283,7 @@ export function SellMon() {
                 />
                 {t(FORMAT_LABEL_KEY[k])}
               </div>
-              <div className="mt-1 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+              <div className="mt-1 font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
                 {t(FORMAT_HINT_KEY[k])}
               </div>
             </button>
@@ -293,7 +293,7 @@ export function SellMon() {
         <ValueBox className="mt-4">
           <div className="flex items-center gap-2">
             <Icon name="wand" size={15} className="text-wp-teal" />
-            <span className="font-wp text-[12.5px] font-bold text-wp-fg">{t("common.smartRotomSuggests")}</span>
+            <span className="font-wp text-[0.78125rem] font-bold text-wp-fg">{t("common.smartRotomSuggests")}</span>
             <Price amount={picked.value} size={16} symbolClassName="text-wp-teal-deep" />
             <Button
               className="ml-auto px-2.5 py-1 text-xs"
@@ -306,7 +306,7 @@ export function SellMon() {
 
         {format !== "trade" && (
           <div className="mt-4">
-            <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">
+            <label className="font-wp text-[0.78125rem] font-semibold text-wp-fg-muted">
               {format === "auction" ? t("common.initialBid") : t("common.price")} (₽)
             </label>
             <div className="mt-1.5 flex items-center gap-2.5">
@@ -334,7 +334,7 @@ export function SellMon() {
 
         {format === "auction" && (
           <div className="mt-4">
-            <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">
+            <label className="font-wp text-[0.78125rem] font-semibold text-wp-fg-muted">
               {t("sell.mon.durationLabel")} <b className="text-wp-fg">{t("sell.mon.daysCount", { days })}</b>
             </label>
             <Range
@@ -350,20 +350,20 @@ export function SellMon() {
 
         {format === "trade" && (
           <div className="mt-4">
-            <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">
+            <label className="font-wp text-[0.78125rem] font-semibold text-wp-fg-muted">
               {t("sell.mon.wantsLabel")}
             </label>
             <Textarea
               value={wants}
               onChange={(e) => setWants(e.target.value)}
               placeholder={t("sell.mon.wantsPlaceholder")}
-              className="mt-1.5 min-h-[52px]"
+              className="mt-1.5 min-h-[3.25rem]"
             />
           </div>
         )}
 
         <div className="mt-4">
-          <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">
+          <label className="font-wp text-[0.78125rem] font-semibold text-wp-fg-muted">
             {t("sell.mon.noteLabel")}
           </label>
           <Textarea
@@ -379,7 +379,7 @@ export function SellMon() {
             a marketplace with a scam button — every sale here is escrowed. */}
         <div className="mt-3 flex items-center gap-2 rounded-[11px] border border-wp-green/20 bg-wp-green/[.08] px-3 py-2.5">
           <Icon name="lock" size={15} className="text-wp-green" />
-          <span className="font-wp text-[13px] font-semibold text-wp-fg">
+          <span className="font-wp text-[0.8125rem] font-semibold text-wp-fg">
             {t("sell.mon.escrowActiveNote")}
           </span>
         </div>
@@ -404,10 +404,10 @@ export function SellMon() {
 function MiniSpec({ k, v }: { k: string; v: React.ReactNode }) {
   return (
     <div className="rounded-[14px] border-wp border-wp-line/24 bg-white px-3.5 py-3">
-      <div className="font-wp text-[10.5px] font-black uppercase tracking-[.06em] text-wp-fg-subtle">
+      <div className="font-wp text-[0.65625rem] font-black uppercase tracking-[.06em] text-wp-fg-subtle">
         {k}
       </div>
-      <div className="mt-0.5 font-wp text-[13px] font-extrabold text-wp-fg">{v}</div>
+      <div className="mt-0.5 font-wp text-[0.8125rem] font-extrabold text-wp-fg">{v}</div>
     </div>
   )
 }

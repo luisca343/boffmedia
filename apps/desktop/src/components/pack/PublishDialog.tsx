@@ -95,10 +95,10 @@ export function PublishDialog({
               role="alert"
               className="flex flex-col gap-2 border border-solid border-bad bg-panel-2 p-3"
             >
-              <h3 className="font-display text-[13px] font-bold uppercase tracking-[0.06em] text-bad">
+              <h3 className="font-display text-[0.8125rem] font-bold uppercase tracking-[0.06em] text-bad">
                 {t("invalidTitle")}
               </h3>
-              <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-txt-muted">
+              <ul className="flex list-disc flex-col gap-1 pl-5 text-[0.8125rem] text-txt-muted">
                 {plan.errors.map((error) => (
                   <li key={error}>{error}</li>
                 ))}
@@ -106,7 +106,7 @@ export function PublishDialog({
             </section>
           ) : (
             <>
-              <dl className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(220px,1fr))]">
+              <dl className="grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(13.75rem,1fr))]">
                 <Row label={t("pack")} value={plan.packName} />
                 <Row label={t("version")} value={plan.versionName} />
                 <Row label={t("files")} value={String(plan.fileCount)} />
@@ -136,11 +136,11 @@ export function PublishDialog({
 
               {plan.warnings.length > 0 && (
                 <section className="flex flex-col gap-2 border border-solid border-line bg-panel-2 p-3">
-                  <h3 className="flex items-center gap-2 font-display text-[13px] font-bold uppercase tracking-[0.06em]">
+                  <h3 className="flex items-center gap-2 font-display text-[0.8125rem] font-bold uppercase tracking-[0.06em]">
                     {t("warningsTitle")}
                     <Badge tone="warn">{plan.warnings.length}</Badge>
                   </h3>
-                  <ul className="flex list-disc flex-col gap-1 pl-5 text-[13px] text-txt-muted">
+                  <ul className="flex list-disc flex-col gap-1 pl-5 text-[0.8125rem] text-txt-muted">
                     {plan.warnings.map((warning) => (
                       <li key={warning}>{warning}</li>
                     ))}
@@ -149,7 +149,7 @@ export function PublishDialog({
               )}
 
               {!plan.hasIcon && (
-                <p className="text-[12px] leading-snug text-txt-muted">{t("noIcon")}</p>
+                <p className="text-[0.75rem] leading-snug text-txt-muted">{t("noIcon")}</p>
               )}
             </>
           )}
@@ -182,10 +182,10 @@ export function PublishDialog({
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center gap-3 border border-solid border-line bg-panel px-3 py-2">
-      <dt className="font-display text-[11px] font-bold uppercase tracking-[0.08em] text-txt-muted">
+      <dt className="font-display text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-txt-muted">
         {label}
       </dt>
-      <dd className="ml-auto truncate font-mono text-[12px] text-txt">{value}</dd>
+      <dd className="ml-auto truncate font-mono text-[0.75rem] text-txt">{value}</dd>
     </div>
   )
 }

@@ -127,7 +127,7 @@ export function BotonesChipsSections() {
           col
           note={<>Filtro compacto en mono: exclusivo o <code>multi</code>. Cada opción admite <code>count</code> y un punto de <code>color</code>.</>}
         >
-          <div className="grid gap-4 w-full max-w-[440px]">
+          <div className="grid gap-4 w-full max-w-[27.5rem]">
             <ChipGroup
               label="Formato"
               value={chipG}

@@ -17,7 +17,7 @@ const BASE = "inline-flex items-center gap-1.5 whitespace-nowrap rounded-sb-pill
 
 export function Chip({ tone = "default", lg = false, dot = false, className, children }: { tone?: Tone; lg?: boolean; dot?: boolean; className?: string; children: React.ReactNode }) {
   return (
-    <span className={cn(BASE, lg ? "h-7 text-[12.5px] px-3" : "h-6 text-[11.5px]", TONE[tone], className)}>
+    <span className={cn(BASE, lg ? "h-7 text-[0.78125rem] px-3" : "h-6 text-[0.71875rem]", TONE[tone], className)}>
       {dot ? <span className="size-1.5 rounded-full bg-current" /> : null}
       {children}
     </span>
@@ -27,7 +27,7 @@ export function Chip({ tone = "default", lg = false, dot = false, className, chi
 /** Category chip — the reusable tint-at-10% pattern (table, detail, legends). */
 export function CategoryChip({ category, className }: { category: Category; className?: string }) {
   return (
-    <span className={cn(BASE, "h-6 text-[11.5px] border-transparent", category.soft, category.text, className)}>
+    <span className={cn(BASE, "h-6 text-[0.71875rem] border-transparent", category.soft, category.text, className)}>
       <span className={cn("size-1.5 rounded-full", category.dotBg)} />
       {category.label}
     </span>

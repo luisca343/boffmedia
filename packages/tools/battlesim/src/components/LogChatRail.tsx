@@ -90,7 +90,7 @@ export function LogChatRail({ ticks, chat, tab: tabProp, onTabChange, onClose, c
                   tabIndex={on ? 0 : -1}
                   onClick={() => setTab(key)}
                   onKeyDown={onKey}
-                  className={cn(BSIM_FOCUS, 'flex h-10 flex-1 items-center justify-center gap-2 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] transition-colors duration-[140ms] focus-visible:outline-offset-[-3px]',
+                  className={cn(BSIM_FOCUS, 'flex h-10 flex-1 items-center justify-center gap-2 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.08em] transition-colors duration-[140ms] focus-visible:outline-offset-[-3px]',
                     on ? 'text-txt [box-shadow:inset_0_-2px_0_var(--accent)]' : 'text-txt-dim hover:text-txt-muted')}
                 >
                   {key === 'log' ? t('battle.rail.log') : t('battle.rail.chat')}
@@ -98,7 +98,7 @@ export function LogChatRail({ ticks, chat, tab: tabProp, onTabChange, onClose, c
                     <span className="inline-flex items-center gap-1">
                       <i aria-hidden className="h-2 w-2 bg-accent [clip-path:circle(50%)]" />
                       <span className="sr-only">{t('battle.rail.unread', { count: unread })}</span>
-                      <span aria-hidden className="font-mono text-[9px] font-bold text-accent-bright">{unread}</span>
+                      <span aria-hidden className="font-mono text-[0.5625rem] font-bold text-accent-bright">{unread}</span>
                     </span>
                   )}
                 </button>

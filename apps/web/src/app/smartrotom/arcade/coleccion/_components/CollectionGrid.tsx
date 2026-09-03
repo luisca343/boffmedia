@@ -39,10 +39,10 @@ export function CollectionGrid({
         <div className="mx-auto mb-3.5 grid h-14 w-14 place-items-center rounded-[14px] border border-ar-violet/40 bg-ar-violet/[.12] text-ar-violet-2">
           <Icon.Box s={26} />
         </div>
-        <h3 className="font-ar-display text-[13px] leading-relaxed text-ar-ink">
+        <h3 className="font-ar-display text-[0.8125rem] leading-relaxed text-ar-ink">
           {t("coleccion.grid.emptyTitle")}
         </h3>
-        <p className="mx-auto mt-2 max-w-[380px] font-ar text-[13px] leading-relaxed text-ar-ink-dim">
+        <p className="mx-auto mt-2 max-w-[23.75rem] font-ar text-[0.8125rem] leading-relaxed text-ar-ink-dim">
           {t("coleccion.grid.emptyBody")}
         </p>
         <Link
@@ -61,8 +61,8 @@ export function CollectionGrid({
         <div className="mx-auto mb-3.5 grid h-14 w-14 place-items-center rounded-[14px] border border-ar-cyan/40 bg-ar-cyan/[.12] text-ar-cyan">
           <Icon.Search s={26} />
         </div>
-        <h3 className="font-ar-display text-[13px] leading-relaxed text-ar-ink">{t("coleccion.grid.noMatchTitle")}</h3>
-        <p className="mt-2 font-ar text-[13px] text-ar-ink-dim">
+        <h3 className="font-ar-display text-[0.8125rem] leading-relaxed text-ar-ink">{t("coleccion.grid.noMatchTitle")}</h3>
+        <p className="mt-2 font-ar text-[0.8125rem] text-ar-ink-dim">
           {t("coleccion.grid.noMatchBody")}
         </p>
       </Panel>
@@ -93,7 +93,7 @@ export function CollectionGrid({
           >
             {t("coleccion.grid.prev")}
           </Button>
-          <span className="font-ar-mono text-[11px] tabular-nums text-ar-ink-dim">
+          <span className="font-ar-mono text-[0.6875rem] tabular-nums text-ar-ink-dim">
             {t("coleccion.grid.page", { current: page + 1, total: pageCount })}
           </span>
           <Button

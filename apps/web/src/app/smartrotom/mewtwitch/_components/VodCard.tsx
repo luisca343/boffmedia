@@ -22,7 +22,7 @@ export function VodCard({ v }: { v: VodCardData }) {
           <img src={v.thumb} alt="" loading="lazy" className="h-full w-full object-cover" />
         )}
         {v.duration && (
-          <span className="absolute bottom-2 right-2 rounded-mw-sm bg-black/85 px-1.5 py-[3px] font-mono text-[11px] font-bold text-white">
+          <span className="absolute bottom-2 right-2 rounded-mw-sm bg-black/85 px-1.5 py-[3px] font-mono text-[0.6875rem] font-bold text-white">
             {v.duration}
           </span>
         )}

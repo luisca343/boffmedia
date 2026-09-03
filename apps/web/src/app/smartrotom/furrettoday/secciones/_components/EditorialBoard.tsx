@@ -19,7 +19,7 @@ export function EditorialBoard() {
   if (!board || board.length === 0) return null;
 
   return (
-    <section className="mx-auto max-w-[1400px] px-6 py-12">
+    <section className="mx-auto max-w-[87.5rem] px-6 py-12">
       <div className="mb-6">
         <SectionHeader
           eyebrow={t("eyebrow")}
@@ -35,7 +35,7 @@ export function EditorialBoard() {
           >
             <Avatar name={member.author} size={64} />
             <div className="min-w-0 flex-1">
-              <div className="font-ft-display truncate text-[22px] leading-none">
+              <div className="font-ft-display truncate text-[1.375rem] leading-none">
                 {member.author}
               </div>
               {member.authorRole ? (

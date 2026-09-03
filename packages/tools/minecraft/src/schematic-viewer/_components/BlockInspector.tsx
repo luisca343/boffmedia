@@ -17,7 +17,7 @@ export function BlockInspector() {
 
   if (!selectedBlockId) {
     return (
-      <p className="m-0 text-[12px] leading-[1.5] text-txt-dim">{t("preview.inspectorEmpty")}</p>
+      <p className="m-0 text-[0.75rem] leading-[1.5] text-txt-dim">{t("preview.inspectorEmpty")}</p>
     );
   }
 
@@ -34,20 +34,20 @@ export function BlockInspector() {
         preview={false}
       />
       <div className="min-w-0 flex-1">
-        <div className="mb-2 break-all font-mono text-[12.5px] font-semibold text-txt">
+        <div className="mb-2 break-all font-mono text-[0.78125rem] font-semibold text-txt">
           {selectedBlockId}
         </div>
         {stateEntries.length > 0 && (
           <div className="mb-1.5 grid gap-[3px]">
             {stateEntries.map(([k, v]) => (
-              <div key={k} className="flex justify-between font-mono text-[11px]">
+              <div key={k} className="flex justify-between font-mono text-[0.6875rem]">
                 <span className="text-txt-muted">{k}</span>
                 <span className="text-txt-dim">{v}</span>
               </div>
             ))}
           </div>
         )}
-        <p className="m-0 text-[11.5px] text-txt-dim">
+        <p className="m-0 text-[0.71875rem] text-txt-dim">
           {t("preview.instances", { count: focus.counts.navigable })}
         </p>
         <SelectionLocateControls

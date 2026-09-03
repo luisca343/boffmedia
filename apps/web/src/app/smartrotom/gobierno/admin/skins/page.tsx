@@ -83,7 +83,7 @@ export default function SkinsPage() {
           <Button size="sm" icon="plus" onClick={() => setCreating(true)}>
             {t("skins.nuevaSkin")}
           </Button>
-          <span className="ml-auto font-gt-mono text-[11px] text-gt-ink-400">
+          <span className="ml-auto font-gt-mono text-[0.6875rem] text-gt-ink-400">
             {t("skins.skinsUnicas", { count: skins?.length ?? 0 })}
           </span>
         </div>
@@ -106,8 +106,8 @@ export default function SkinsPage() {
               {(skins ?? []).map((x) => (
                 <TR key={x.id}>
                   <TD>
-                    <div className="font-gt-mono text-[12.5px] font-bold text-gt-ink-900">{x.skin}</div>
-                    <div className="text-[11px] text-gt-ink-400">{(x.npcs ?? []).join(" · ") || "—"}</div>
+                    <div className="font-gt-mono text-[0.78125rem] font-bold text-gt-ink-900">{x.skin}</div>
+                    <div className="text-[0.6875rem] text-gt-ink-400">{(x.npcs ?? []).join(" · ") || "—"}</div>
                   </TD>
                   <TD>
                     <div className="grid place-items-center">
@@ -136,7 +136,7 @@ export default function SkinsPage() {
                       ).map(([k, v]) => (
                         <span key={k} className="flex items-center gap-1">
                           <Icon name={v ? "check" : "x"} size={12} className={v ? "text-gt-ok" : "text-gt-danger"} />
-                          <span className="font-gt-mono text-[10px] text-gt-ink-400">{t(k)}</span>
+                          <span className="font-gt-mono text-[0.625rem] text-gt-ink-400">{t(k)}</span>
                         </span>
                       ))}
                     </div>

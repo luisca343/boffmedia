@@ -52,7 +52,7 @@ function ScraperSourcesPanel() {
       <div className="flex flex-col gap-3">
         <div className="flex flex-wrap gap-2">
           {SCRAPER_SOURCES.map((source) => (
-            <div key={source.name} className="flex items-center gap-2 border border-solid border-line bg-base-2 px-3 py-1.5 text-[12px]">
+            <div key={source.name} className="flex items-center gap-2 border border-solid border-line bg-base-2 px-3 py-1.5 text-[0.75rem]">
               <AvLiveDot className={source.active ? "" : "bg-txt-dim"} />
               <span className="font-medium text-txt">{source.name}</span>
               <span className="text-txt-dim">{t(source.descKey)}</span>
@@ -65,8 +65,8 @@ function ScraperSourcesPanel() {
         {browserConfig && (
           <div className="flex items-center justify-between gap-4 border-t border-solid border-line pt-3">
             <div className="flex flex-col gap-0.5">
-              <span className="text-[13px] font-medium text-txt">{t("tunnel")}</span>
-              <span className="text-[11px] text-txt-dim">{t("tunnelDesc")}</span>
+              <span className="text-[0.8125rem] font-medium text-txt">{t("tunnel")}</span>
+              <span className="text-[0.6875rem] text-txt-dim">{t("tunnelDesc")}</span>
             </div>
             <Toggle
               on={browserConfig.tunnelEnabled}
@@ -110,25 +110,25 @@ function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onTogg
         <div className="flex-1">
           <SearchInput value={search} onChange={setSearch} placeholder={t("filterChapters")} size="sm" />
         </div>
-        <button onClick={onToggleAll} className="whitespace-nowrap font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+        <button onClick={onToggleAll} className="whitespace-nowrap font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
           {allSelected ? t("deselect") : t("selectAllN", { n: chapters.length })}
         </button>
       </div>
 
       <div className="flex items-center gap-2">
-        <span className="shrink-0 font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">{t("range")}</span>
+        <span className="shrink-0 font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">{t("range")}</span>
         <input
           type="number" min={1} max={chapters.length} placeholder="1"
           value={rangeFrom} onChange={(e) => setRangeFrom(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && applyRange()}
-          className="h-7 w-20 border border-solid border-line-2 bg-base-2 px-2 text-center text-[12px] text-txt [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+          className="h-7 w-20 border border-solid border-line-2 bg-base-2 px-2 text-center text-[0.75rem] text-txt [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
         />
         <span className="text-txt-dim">—</span>
         <input
           type="number" min={1} max={chapters.length} placeholder={String(chapters.length)}
           value={rangeTo} onChange={(e) => setRangeTo(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && applyRange()}
-          className="h-7 w-20 border border-solid border-line-2 bg-base-2 px-2 text-center text-[12px] text-txt [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
+          className="h-7 w-20 border border-solid border-line-2 bg-base-2 px-2 text-center text-[0.75rem] text-txt [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none"
         />
         <Button size="sm" icon="check" onClick={applyRange}>{t("select")}</Button>
       </div>
@@ -148,12 +148,12 @@ function ChapterSelector({ chapters, selected, downloadedSlugs, onToggle, onTogg
               }
             >
               <Checkbox checked={isSelected} onChange={() => onToggle(i)} />
-              <span className={"flex-1 truncate text-[12px] " + (isDownloaded ? "text-ok" : "text-txt")}>{ch.title}</span>
+              <span className={"flex-1 truncate text-[0.75rem] " + (isDownloaded ? "text-ok" : "text-txt")}>{ch.title}</span>
               {isDownloaded && <Icon name="database" size={12} className="shrink-0 text-ok" />}
             </div>
           );
         })}
-        {filtered.length === 0 && <p className="py-4 text-center text-[12px] text-txt-dim">{t("noResults")}</p>}
+        {filtered.length === 0 && <p className="py-4 text-center text-[0.75rem] text-txt-dim">{t("noResults")}</p>}
       </div>
     </div>
   );
@@ -179,7 +179,7 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-col gap-1.5">
-        <div className="flex justify-between text-[13px]">
+        <div className="flex justify-between text-[0.8125rem]">
           <span className="font-medium text-txt">
             {progress.done ? t("downloadComplete") : t("downloadingN", { completed: progress.completed, total: progress.total })}
           </span>
@@ -191,7 +191,7 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
         {progress.totalDownloaded > 0 && <AvPill tone="green" icon="check">{t("imagesDlN", { n: progress.totalDownloaded })}</AvPill>}
         {progress.totalFailed > 0 && <AvPill tone="rose" icon="x">{t("failedN", { n: progress.totalFailed })}</AvPill>}
       </div>
-      <button onClick={() => setShowChapters((v) => !v)} className="flex items-center gap-1.5 self-start font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+      <button onClick={() => setShowChapters((v) => !v)} className="flex items-center gap-1.5 self-start font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
         <Icon name={showChapters ? "chevronDown" : "chevronRight"} size={14} />
         {showChapters ? t("hideChaptersN", { n: progress.chapters.length }) : t("showChaptersN", { n: progress.chapters.length })}
       </button>
@@ -200,8 +200,8 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
           {progress.chapters.map((ch) => (
             <div key={ch.chapter} className="flex items-center gap-3 border-b border-solid border-[color-mix(in_srgb,var(--line)_55%,transparent)] px-3 py-2 last:border-b-0">
               <Icon name="check" size={13} className={"shrink-0 " + (ch.failed > 0 ? "text-warn" : "text-ok")} />
-              <span className="flex-1 truncate text-[12px] text-txt">{ch.chapter}</span>
-              <span className="shrink-0 font-mono text-[11px] text-txt-dim">
+              <span className="flex-1 truncate text-[0.75rem] text-txt">{ch.chapter}</span>
+              <span className="shrink-0 font-mono text-[0.6875rem] text-txt-dim">
                 {t("chapterMeta", { dl: ch.downloaded, skip: ch.skipped })}
                 {ch.failed > 0 && <span className="text-bad"> · {t("chapterErr", { n: ch.failed })}</span>}
               </span>
@@ -433,8 +433,8 @@ export default function MangaDownloader() {
         </AvPanel>
 
         {searchResults && (
-          <div className="mb-[18px] flex flex-col gap-2">
-            <p className="text-[13px] text-txt-muted">
+          <div className="mb-[1.125rem] flex flex-col gap-2">
+            <p className="text-[0.8125rem] text-txt-muted">
               {searchResults.length === 0 ? t("noResults") : t("resultsPick", { n: searchResults.length })}
             </p>
             {searchResults.map((r) => <MgResult key={r.url} title={r.title || r.url} sub={r.url} cover={r.cover} onClick={() => handleSelectNovel(r)} />)}
@@ -452,7 +452,7 @@ export default function MangaDownloader() {
           >
             <div className="flex flex-col gap-4">
               {chaptersLoading && (
-                <div className="flex items-center gap-2 py-4 text-[13px] text-txt-muted">
+                <div className="flex items-center gap-2 py-4 text-[0.8125rem] text-txt-muted">
                   <Spinner size={16} className="text-accent" /> {t("loadingChapters")}
                 </div>
               )}
@@ -464,7 +464,7 @@ export default function MangaDownloader() {
 
               {chapters && (
                 <>
-                  <div className="flex flex-wrap items-center gap-2 text-[12px] text-txt-muted">
+                  <div className="flex flex-wrap items-center gap-2 text-[0.75rem] text-txt-muted">
                     <Icon name="book" size={14} />
                     <span>{t("chaptersN", { n: chapters.length })}</span>
                     {downloadedSlugs.size > 0 && <AvPill tone="green">{t("downloadedN", { n: downloadedSlugs.size })}</AvPill>}
@@ -484,7 +484,7 @@ export default function MangaDownloader() {
               )}
 
               {downloading && (
-                <div className="flex items-center gap-2 py-2 text-[13px] text-signal">
+                <div className="flex items-center gap-2 py-2 text-[0.8125rem] text-signal">
                   <Spinner size={16} /> {t("downloadingNote")}
                 </div>
               )}
@@ -501,10 +501,10 @@ export default function MangaDownloader() {
 
       <AvStickyBar open={selectedCount > 0 && !downloading}>
         <div className="min-w-0 flex-1">
-          <p className="text-[14px] font-medium text-txt">{t("selectedN", { count: selectedCount })}</p>
-          <p className="truncate text-[12px] text-txt-muted">{selectedNovel?.title}</p>
+          <p className="text-[0.875rem] font-medium text-txt">{t("selectedN", { count: selectedCount })}</p>
+          <p className="truncate text-[0.75rem] text-txt-muted">{selectedNovel?.title}</p>
         </div>
-        <span className="flex shrink-0 items-center gap-1 font-mono text-[11px] text-txt-dim">
+        <span className="flex shrink-0 items-center gap-1 font-mono text-[0.6875rem] text-txt-dim">
           <Icon name="clock" size={12} />{t("estMin", { n: Math.ceil(selectedCount * 1.5) })}
         </span>
         <Button variant="pri" icon="download" onClick={handleDownload} disabled={downloading}>{t("downloadSelection")}</Button>

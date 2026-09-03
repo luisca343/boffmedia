@@ -125,11 +125,11 @@ export function BuilderDrawer({
       </div>
 
       <header className="flex flex-none items-center gap-3 px-3 pb-2">
-        <h2 className="m-0 text-[17px]/none tracking-[0.02em] text-[color:var(--mwp-cream)] [font-family:var(--mwf-disp)]">
+        <h2 className="m-0 text-[1.0625rem]/none tracking-[0.02em] text-[color:var(--mwp-cream)] [font-family:var(--mwf-disp)]">
           {title}
         </h2>
         {hint && (
-          <span className="truncate text-[10px] text-[color:var(--mwp-cream-dim)]">{hint}</span>
+          <span className="truncate text-[0.625rem] text-[color:var(--mwp-cream-dim)]">{hint}</span>
         )}
         <button
           type="button"
@@ -206,19 +206,19 @@ function EquipmentGrid({
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={t("builder.searchItems")}
-          className="min-w-0 flex-1 border-2 border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] px-2 py-1.5 text-[11px] text-[color:var(--mwp-cream)] [border-radius:var(--wob-sm)] focus:border-[color:var(--mwp-ink)] focus:outline-none"
+          className="min-w-0 flex-1 border-2 border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] px-2 py-1.5 text-[0.6875rem] text-[color:var(--mwp-cream)] [border-radius:var(--wob-sm)] focus:border-[color:var(--mwp-ink)] focus:outline-none"
         />
-        <span className="whitespace-nowrap font-mono text-[10px] text-[color:var(--mwp-cream-dim)]">
+        <span className="whitespace-nowrap font-mono text-[0.625rem] text-[color:var(--mwp-cream-dim)]">
           {shown.length}/{items.length}
         </span>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto border-2 border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] p-2 [border-radius:var(--wob-sm)]">
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(112px,1fr))] gap-2">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(7rem,1fr))] gap-2">
           <button
             type="button"
             onClick={() => onEquip(slot, null)}
-            className={`flex h-[108px] flex-col items-center justify-center gap-1 border-2 border-dashed p-1.5 text-[11px] font-bold transition-all [border-radius:var(--wob-sm)] ${
+            className={`flex h-[6.75rem] flex-col items-center justify-center gap-1 border-2 border-dashed p-1.5 text-[0.6875rem] font-bold transition-all [border-radius:var(--wob-sm)] ${
               current == null
                 ? "border-[color:var(--mwp-red)] bg-[color:var(--mwp-night-2)] text-[color:var(--mwp-cream)]"
                 : "border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)]"
@@ -239,18 +239,18 @@ function EquipmentGrid({
                 type="button"
                 title={String(item.name || item.id)}
                 onClick={() => onEquip(slot, frame)}
-                className={`flex h-[108px] flex-col items-center justify-between gap-1 border-2 border-solid p-1.5 transition-all [border-radius:var(--wob-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] ${
+                className={`flex h-[6.75rem] flex-col items-center justify-between gap-1 border-2 border-solid p-1.5 transition-all [border-radius:var(--wob-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] ${
                   isOn
                     ? "border-[color:var(--mwp-red)] bg-[color:var(--mwp-night-2)] [box-shadow:0_0_0_2px_var(--mwp-red-deep)]"
                     : "border-[color:var(--mwp-nline)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-night-2)]"
                 }`}
               >
                 {art ? (
-                  <img src={art} alt="" loading="lazy" className="h-[62px] w-full object-contain" />
+                  <img src={art} alt="" loading="lazy" className="h-[3.875rem] w-full object-contain" />
                 ) : (
-                  <span className="h-[62px]" />
+                  <span className="h-[3.875rem]" />
                 )}
-                <span className="line-clamp-2 text-center text-[10px]/[1.15] text-[color:var(--mwp-cream)]">
+                <span className="line-clamp-2 text-center text-[0.625rem]/[1.15] text-[color:var(--mwp-cream)]">
                   {String(item.name || item.id)}
                 </span>
               </button>
@@ -287,10 +287,10 @@ function PaletteGrid({
       <div className="flex flex-col gap-3">
         {groups.map((group) => (
           <div key={group.label} className="flex flex-col gap-1.5">
-            <div className="text-[10px] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
+            <div className="text-[0.625rem] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
               {group.label}
             </div>
-            <div className="grid grid-cols-[repeat(auto-fill,minmax(52px,1fr))] gap-1.5">
+            <div className="grid grid-cols-[repeat(auto-fill,minmax(3.25rem,1fr))] gap-1.5">
               {Array.from({ length: group.to - group.from }, (_, i) => i + group.from).map((idx) => (
                 <div key={idx} className="flex flex-col items-center gap-0.5">
                   <PaletteSwatch
@@ -300,7 +300,7 @@ function PaletteGrid({
                     size={40}
                     onClick={() => onChange(idx)}
                   />
-                  <span className="font-mono text-[9px] text-[color:var(--mwp-cream-dim)]">{idx}</span>
+                  <span className="font-mono text-[0.5625rem] text-[color:var(--mwp-cream-dim)]">{idx}</span>
                 </div>
               ))}
             </div>

@@ -12,8 +12,8 @@ function ThemePair({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid w-full grid-cols-1 lg:grid-cols-2">
       {(["light", "dark"] as const).map((t) => (
-        <div key={t} className="ca-app bg-ca-panel p-[22px] font-ca text-ca-50 antialiased" data-theme={t}>
-          <div className="mb-4 font-ca-mono text-[10px] uppercase tracking-[0.16em] text-ca-400">
+        <div key={t} className="ca-app bg-ca-panel p-[1.375rem] font-ca text-ca-50 antialiased" data-theme={t}>
+          <div className="mb-4 font-ca-mono text-[0.625rem] uppercase tracking-[0.16em] text-ca-400">
             {t === "light" ? "Claro" : "Oscuro"}{" "}
             <span className="text-ca-500">data-theme=&quot;{t}&quot;</span>
           </div>
@@ -39,7 +39,7 @@ function AccentRoot({
 }) {
   return (
     <div
-      className="ca-app min-w-[260px] flex-1 rounded-[12px] bg-ca-panel p-4 font-ca text-ca-50 antialiased"
+      className="ca-app min-w-[16.25rem] flex-1 rounded-[12px] bg-ca-panel p-4 font-ca text-ca-50 antialiased"
       data-theme={theme}
       style={{ "--ca-accent": triplet } as CSSProperties}
     >
@@ -149,10 +149,10 @@ export function CaBasesChapter() {
           }
         >
           <ThemePair>
-            <div className="relative h-[150px] w-full overflow-hidden rounded-[12px] bg-ca-wallpaper">
+            <div className="relative h-[9.375rem] w-full overflow-hidden rounded-[12px] bg-ca-wallpaper">
               <div className="ca-doodle pointer-events-none absolute inset-0" />
               <div className="relative flex h-full items-center justify-center">
-                <span className="rounded-ca-md bg-ca-header px-[13px] py-[5px] text-[12.5px] text-ca-300 shadow-[0_1px_1px_rgba(0,0,0,.08)]">
+                <span className="rounded-ca-md bg-ca-header px-[0.8125rem] py-[0.3125rem] text-[0.78125rem] text-ca-300 shadow-[0_1px_1px_rgba(0,0,0,.08)]">
                   Hoy
                 </span>
               </div>
@@ -212,7 +212,7 @@ export function CaBasesChapter() {
                 style={{ background: hex, borderColor: accent === hex ? hex : "transparent", outline: accent === hex ? "2px solid currentColor" : "none", outlineOffset: 2 }}
               />
             ))}
-            <span className="ml-auto font-ca-mono text-[11px] text-ca-400">
+            <span className="ml-auto font-ca-mono text-[0.6875rem] text-ca-400">
               --ca-accent: {triplet}
             </span>
           </div>
@@ -220,14 +220,14 @@ export function CaBasesChapter() {
           <div className="flex w-full flex-wrap gap-4">
             {(["light", "dark"] as const).map((t) => (
               <AccentRoot key={t} theme={t} triplet={triplet}>
-                <div className="mb-3 font-ca-mono text-[10px] uppercase tracking-[0.16em] text-ca-400">
+                <div className="mb-3 font-ca-mono text-[0.625rem] uppercase tracking-[0.16em] text-ca-400">
                   {t === "light" ? "Claro" : "Oscuro"}
                 </div>
                 <div className="mb-3 flex flex-col gap-1.5">
-                  <span className="max-w-[80%] self-start rounded-ca-md bg-ca-bubble-in px-[9px] py-1.5 text-[14.2px] text-ca-bubble-in-text shadow-ca-bubble">
+                  <span className="max-w-[80%] self-start rounded-ca-md bg-ca-bubble-in px-[0.5625rem] py-1.5 text-[0.8875rem] text-ca-bubble-in-text shadow-ca-bubble">
                     ¿Vamos a la raid de las 8?
                   </span>
-                  <span className="max-w-[80%] self-end rounded-ca-md bg-ca-bubble-out px-[9px] py-1.5 text-[14.2px] text-ca-bubble-out-text shadow-ca-bubble">
+                  <span className="max-w-[80%] self-end rounded-ca-md bg-ca-bubble-out px-[0.5625rem] py-1.5 text-[0.8875rem] text-ca-bubble-out-text shadow-ca-bubble">
                     Voy de camino
                   </span>
                 </div>

@@ -10,7 +10,7 @@ type Category = "all" | "unread" | "direct" | "groups" | "favorites";
 
 function SectionHead({ icon, children }: { icon?: IconName; children: ReactNode }) {
   return (
-    <div className="flex items-center gap-1.5 px-4 pb-1.5 pt-3.5 text-[13px] font-semibold text-ca-accent-soft">
+    <div className="flex items-center gap-1.5 px-4 pb-1.5 pt-3.5 text-[0.8125rem] font-semibold text-ca-accent-soft">
       {icon && <Icon name={icon} size={12} />}
       {children}
     </div>
@@ -76,16 +76,16 @@ export function Sidebar({
   );
 
   return (
-    <aside className={cn("flex min-h-0 w-[360px] flex-none flex-col border-r border-ca-800 bg-ca-panel", className)}>
+    <aside className={cn("flex min-h-0 w-[22.5rem] flex-none flex-col border-r border-ca-800 bg-ca-panel", className)}>
       <div className="flex flex-col bg-ca-panel">
-        <div className="flex h-[60px] items-center gap-2.5 bg-ca-header px-4">
-          <div className="flex min-w-0 items-center gap-[11px]">
-            <div className="grid h-[38px] w-[38px] flex-none place-items-center rounded-full bg-ca-accent">
+        <div className="flex h-[3.75rem] items-center gap-2.5 bg-ca-header px-4">
+          <div className="flex min-w-0 items-center gap-[0.6875rem]">
+            <div className="grid h-[2.375rem] w-[2.375rem] flex-none place-items-center rounded-full bg-ca-accent">
               <Icon name="message" size={18} className="text-ca-on-accent" />
             </div>
-            <div className="text-[17px] font-bold leading-[1.1] tracking-[-.01em] text-ca-50">
+            <div className="text-[1.0625rem] font-bold leading-[1.1] tracking-[-.01em] text-ca-50">
               {t("sidebar.title")}
-              <small className="mt-px block text-[11px] font-medium tracking-[.02em] text-ca-400">{t("sidebar.subtitle")}</small>
+              <small className="mt-px block text-[0.6875rem] font-medium tracking-[.02em] text-ca-400">{t("sidebar.subtitle")}</small>
             </div>
           </div>
           <div className="ml-auto flex gap-0.5">
@@ -105,7 +105,7 @@ export function Sidebar({
                 <Icon name="x" size={15} className="text-ca-500" />
               </button>
             ) : (
-              <span className="rounded-[5px] border border-ca-700 px-[5px] py-px font-ca-mono text-[10px] text-ca-500">⌘K</span>
+              <span className="rounded-[5px] border border-ca-700 px-[0.3125rem] py-px font-ca-mono text-[0.625rem] text-ca-500">⌘K</span>
             )
           }
         />
@@ -136,7 +136,7 @@ export function Sidebar({
         {filtered.length === 0 && (
           <div className="px-5 py-12 text-center text-ca-500">
             <Icon name="search" size={30} className="mx-auto opacity-50" />
-            <p className="mt-3 text-[13.5px]">{t("sidebar.noResults")}</p>
+            <p className="mt-3 text-[0.84375rem]">{t("sidebar.noResults")}</p>
           </div>
         )}
       </div>

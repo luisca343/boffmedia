@@ -116,17 +116,25 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
   // beside the console, then the wide one. The wide cap is written out rather
   // than composed from the constant: a class assembled at runtime is a class
   // Tailwind never saw, so it compiles to nothing.
+  //
+  // The cap is respelled at EVERY tier, and that is not redundancy. Tailwind
+  // orders min-width variants ascending, so `BSIM_PAGE_NARROW`'s own
+  // `min-[2240px]:max-w-*` sorts AFTER the `min-[1200px]` override below and
+  // wins — which silently shrank this screen at 2240 while the rail beside it
+  // grew, and squeezed the mode row until `CLASIFICATORIA` truncated to `CL…`.
+  // A `cn()` override of a capped constant only holds while no LATER breakpoint
+  // in the constant touches the same property.
   return (
-    <div className={cn(BSIM_PAGE_NARROW, "grid gap-[14px] min-[1200px]:max-w-[1240px] min-[1200px]:grid-cols-[minmax(0,1fr)_300px] min-[1200px]:items-start")}>
+    <div className={cn(BSIM_PAGE_NARROW, "grid gap-[0.875rem] min-[1200px]:max-w-[77.5rem] min-[1600px]:max-w-[80rem] min-[2240px]:max-w-[90rem] min-[1200px]:grid-cols-[minmax(0,1fr)_18.75rem] min-[1600px]:grid-cols-[minmax(0,1fr)_21.875rem] min-[2240px]:grid-cols-[minmax(0,1fr)_25rem] min-[1200px]:items-start")}>
       {/* ============ GAME CONSOLE ============ */}
-      <section className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] relative grid gap-[15px] border border-solid border-line-2 border-t-[3px] border-t-accent px-[22px] pb-[22px] pt-5 [background:linear-gradient(180deg,var(--panel),var(--bg-2))]">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-[-45%_35%_auto_-12%] h-[320px] [background:radial-gradient(50%_60%_at_30%_0,var(--accent-soft),transparent_70%)]" />
+      <section className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] relative grid gap-[0.9375rem] border border-solid border-line-2 border-t-[3px] border-t-accent px-[1.375rem] pb-[1.375rem] pt-5 [background:linear-gradient(180deg,var(--panel),var(--bg-2))]">
+        <div aria-hidden="true" className="pointer-events-none absolute inset-[-45%_35%_auto_-12%] h-[20rem] [background:radial-gradient(50%_60%_at_30%_0,var(--accent-soft),transparent_70%)]" />
 
-        <header className="relative grid gap-[6px]">
-          <BsimKicker className="inline-flex items-center gap-[7px] text-accent-bright">
+        <header className="relative grid gap-[0.375rem]">
+          <BsimKicker className="inline-flex items-center gap-[0.4375rem] text-accent-bright">
             <Icon name="sword" size={13} />{t("app.lobby.kick")}
           </BsimKicker>
-          <h2 className="m-0 font-display text-[clamp(28px,4.5vw,36px)] font-extrabold italic uppercase leading-[0.95] tracking-[0.02em] text-txt">
+          <h2 className="m-0 font-display text-[clamp(1.75rem,4.5vw,2.25rem)] font-extrabold italic uppercase leading-[0.95] tracking-[0.02em] text-txt">
             {t("app.lobby.title")}
           </h2>
         </header>
@@ -148,7 +156,7 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
 
         {/* format */}
         {showsFormat && (
-          <div className="relative grid gap-[7px]">
+          <div className="relative grid gap-[0.4375rem]">
             <BsimKicker>{t("app.lobby.formatLabel")}</BsimKicker>
             <DkSelect value={format} onChange={setFmt} ariaLabel={t("app.lobby.formatLabel")}
               options={BSIM_FORMATS.map((f) => ({ value: f.value, label: f.label }))} />
@@ -158,10 +166,10 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
         {/* team — only a team format asks for one; a random format builds both
             sides itself and a picker there would be a control that does nothing */}
         {showsTeam && (
-          <div className="relative grid gap-[7px]">
+          <div className="relative grid gap-[0.4375rem]">
             <BsimKicker>{t("hub.team.label")}</BsimKicker>
             {available.length > 0 ? (
-              <div className="grid gap-[7px] min-[520px]:grid-cols-[minmax(0,1fr)_auto] min-[520px]:items-center">
+              <div className="grid gap-[0.4375rem] min-[520px]:grid-cols-[minmax(0,1fr)_auto] min-[520px]:items-center">
                 <DkSelect
                   value={chosen?.clientId ?? ""}
                   onChange={setTeamId}
@@ -176,8 +184,8 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
                 />
               </div>
             ) : (
-              <div className="grid gap-[7px] min-[520px]:grid-cols-[minmax(0,1fr)_auto] min-[520px]:items-center">
-                <p className={cn("m-0 font-mono text-[11px] leading-[1.4]", blocked ? "text-warn" : "text-txt-dim")}>
+              <div className="grid gap-[0.4375rem] min-[520px]:grid-cols-[minmax(0,1fr)_auto] min-[520px]:items-center">
+                <p className={cn("m-0 font-mono text-[0.6875rem] leading-[1.4]", blocked ? "text-warn" : "text-txt-dim")}>
                   {blocked ? t("hub.team.noneTitle") : t("hub.team.sample")}
                 </p>
                 <button
@@ -185,7 +193,7 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
                   onClick={() => go("equipos")}
                   className={cn(
                     "cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line-2)] hover:[--cut-line:var(--accent-line)]",
-                    "inline-flex h-8 flex-none items-center gap-[6px] border border-solid border-line-2 bg-panel px-3 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-muted transition-[color,border-color] duration-[140ms] hover:border-accent-line hover:text-accent-bright",
+                    "inline-flex h-8 flex-none items-center gap-[0.375rem] border border-solid border-line-2 bg-panel px-3 font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.08em] text-txt-muted transition-[color,border-color] duration-[140ms] hover:border-accent-line hover:text-accent-bright",
                     BSIM_FOCUS_CUT,
                   )}
                 >
@@ -208,9 +216,9 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
                   BSIM_FOCUS_CUT,
                 )}>
                 <Icon name={mode === "ia" ? "sword" : "search"} size={22} />
-                <b className="font-display text-[19px] font-extrabold italic uppercase leading-none tracking-[0.05em]">{t(`app.lobby.launch.${mode}`)}</b>
+                <b className="font-display text-[1.1875rem] font-extrabold italic uppercase leading-none tracking-[0.05em]">{t(`app.lobby.launch.${mode}`)}</b>
               </button>
-              <p className="m-0 text-center font-mono text-[11px] leading-[1.4] text-txt-dim">
+              <p className="m-0 text-center font-mono text-[0.6875rem] leading-[1.4] text-txt-dim">
                 {showsTeam && blocked ? t("play.needsTeam") : t(`app.lobby.modes.${mode}.note`)}
               </p>
             </>
@@ -226,7 +234,7 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
       </section>
 
       {/* ============ QUICK ACCESS ============ */}
-      <nav aria-label={t("hub.tiles.aria")} className="grid grid-cols-3 gap-[10px] max-[620px]:grid-cols-1 min-[1200px]:grid-cols-1">
+      <nav aria-label={t("hub.tiles.aria")} className="grid grid-cols-3 gap-[0.625rem] max-[620px]:grid-cols-1 min-[1200px]:grid-cols-1">
         <LobbyTile icon="layers" title={t("app.lobby.tiles.builder")} sub={t("app.lobby.tiles.builderSub")} onClick={() => go("equipos")} />
         <LobbyTile icon="play" title={t("app.lobby.tiles.replays")} sub={t("app.lobby.tiles.replaysSub")} onClick={() => go("repeticiones")} />
         {/* Not an <a href="/clasificacion">: that route exists on the website and
@@ -275,7 +283,7 @@ function ModeCard({
   return (
     <button type="button" role="radio" aria-checked={on} onClick={onSelect}
       className={cn(
-        "cut cut-edge-slant [--cut:8px] grid min-h-[52px] min-w-0 gap-[4px] border border-solid px-3 py-[11px] text-left transition-[background,border-color,color] duration-[140ms]",
+        "cut cut-edge-slant [--cut:8px] grid min-h-[3.25rem] min-w-0 gap-[0.25rem] border border-solid px-3 py-[0.6875rem] text-left transition-[background,border-color,color] duration-[140ms]",
         BSIM_FOCUS_CUT,
         on
           ? "border-accent [--cut-line:var(--accent)] bg-accent-soft text-txt"
@@ -284,16 +292,16 @@ function ModeCard({
       {/* Two rows rather than one: the availability chip and the sub-line were
           competing for the same track, and in a three-across grid the sub lost
           — "Emparejamiento PvP" read as "Emparejamiento…". */}
-      <span className="flex min-w-0 items-center gap-[9px]">
+      <span className="flex min-w-0 items-center gap-[0.5625rem]">
         <Icon name={icon} size={17} className={cn("flex-none", on ? "text-accent-bright" : "text-txt-dim")} />
-        <b className="min-w-0 flex-1 truncate font-display text-[13px] font-bold uppercase leading-none tracking-[0.03em]">{label}</b>
+        <b className="min-w-0 flex-1 truncate font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.03em]">{label}</b>
         {chip && (
           <BsimChip tone={chip.tone} size="xs" dot={false} pulse={chip.tone === "checking"}>
             {chip.label}
           </BsimChip>
         )}
       </span>
-      <small className="min-w-0 truncate pl-[26px] font-mono text-[9px] leading-[1.3] text-txt-dim">{sub}</small>
+      <small className="min-w-0 truncate pl-[1.625rem] font-mono text-[0.5625rem] leading-[1.3] text-txt-dim">{sub}</small>
     </button>
   )
 }
@@ -321,14 +329,14 @@ function GateNotice({
 }) {
   if (availability === "checking") {
     return (
-      <p role="status" className="m-0 py-4 text-center font-mono text-[11px] leading-[1.4] text-txt-dim">{t("hub.gate.checking")}</p>
+      <p role="status" className="m-0 py-4 text-center font-mono text-[0.6875rem] leading-[1.4] text-txt-dim">{t("hub.gate.checking")}</p>
     )
   }
   const offline = availability === "offline"
   return (
-    <div className="cut-tag cut-tag-edge [--cut-tag:10px] grid gap-[10px] border border-solid px-4 py-[14px]"
+    <div className="cut-tag cut-tag-edge [--cut-tag:10px] grid gap-[0.625rem] border border-solid px-4 py-[0.875rem]"
       style={{ borderColor: offline ? "color-mix(in srgb, var(--bad) 40%, transparent)" : "color-mix(in srgb, var(--warn) 40%, transparent)" }}>
-      <p className="m-0 flex items-start gap-[9px] font-body text-[13px] leading-[1.45] text-txt-muted">
+      <p className="m-0 flex items-start gap-[0.5625rem] font-body text-[0.8125rem] leading-[1.45] text-txt-muted">
         <Icon name={offline ? "globe" : "lock"} size={15} className={cn("mt-[2px] flex-none", offline ? "text-bad" : "text-warn")} />
         {offline ? t("hub.gate.offlineReason") : t("hub.gate.signInReason")}
       </p>
@@ -336,7 +344,7 @@ function GateNotice({
         type="button"
         onClick={offline ? onPlayAi : onSignIn}
         className={cn(
-          "cut [--cut:8px] flex h-10 w-full items-center justify-center gap-2 border-0 bg-accent px-4 font-display text-[13px]/none font-bold uppercase tracking-[0.06em] text-accent-ink transition-[background] duration-[140ms] hover:bg-accent-bright",
+          "cut [--cut:8px] flex h-10 w-full items-center justify-center gap-2 border-0 bg-accent px-4 font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.06em] text-accent-ink transition-[background] duration-[140ms] hover:bg-accent-bright",
           BSIM_FOCUS_CUT,
         )}
       >
@@ -362,7 +370,7 @@ function LobbyTile({
       type="button"
       onClick={onClick}
       className={cn(
-        "cut-corner cut-corner-edge hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line)] group grid min-w-0 justify-items-start gap-[5px] border border-solid border-line bg-panel px-4 py-[15px] text-left text-txt-muted transition-[color,border-color,background,transform] duration-[140ms] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt motion-reduce:hover:translate-y-0",
+        "cut-corner cut-corner-edge hover:[--cut-line:var(--accent-line)] [--cut-line:var(--line)] group grid min-w-0 justify-items-start gap-[0.3125rem] border border-solid border-line bg-panel px-4 py-[0.9375rem] text-left text-txt-muted transition-[color,border-color,background,transform] duration-[140ms] hover:-translate-y-[2px] hover:border-accent-line hover:text-txt motion-reduce:hover:translate-y-0",
         BSIM_FOCUS_CUT,
       )}
     >
@@ -371,8 +379,8 @@ function LobbyTile({
         <span className="flex-1" />
         {external && <Icon name="external" size={13} className="text-txt-dim" />}
       </span>
-      <b className="min-w-0 truncate font-display text-[14px] font-bold uppercase leading-none tracking-[0.03em]">{title}</b>
-      <small className="min-w-0 truncate font-mono text-[10px] leading-[1.3] text-txt-dim">{note ?? sub}</small>
+      <b className="min-w-0 truncate font-display text-[0.875rem] font-bold uppercase leading-none tracking-[0.03em]">{title}</b>
+      <small className="min-w-0 truncate font-mono text-[0.625rem] leading-[1.3] text-txt-dim">{note ?? sub}</small>
     </button>
   )
 }

@@ -44,7 +44,7 @@ export default function ReplayControlsButton({
       )}
     >
       {children}
-      {hint && <span className="font-mono text-[9px]/none font-semibold tracking-[0.06em] text-txt-dim">{hint}</span>}
+      {hint && <span className="font-mono text-[0.5625rem]/none font-semibold tracking-[0.06em] text-txt-dim">{hint}</span>}
     </button>
   );
 }

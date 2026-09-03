@@ -67,20 +67,20 @@ export function ActionBtn({
       aria-label={label}
       aria-pressed={active}
       className={cn(
-        "group inline-flex items-center gap-1.5 rounded-rk-pill p-[5px] text-[13px] font-semibold tabular-nums",
+        "group inline-flex items-center gap-1.5 rounded-rk-pill p-[0.3125rem] text-[0.8125rem] font-semibold tabular-nums",
         "transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-rk-accent",
         active ? ACTIVE[tone] : "text-rk-fg-subtle",
         disabled ? "cursor-not-allowed opacity-60" : t.on,
       )}
     >
-      <span className={cn("grid h-[30px] w-[30px] place-items-center rounded-full transition-colors", t.wash)}>
+      <span className={cn("grid h-[1.875rem] w-[1.875rem] place-items-center rounded-full transition-colors", t.wash)}>
         {typeof icon === "string" ? (
           <Icon name={icon as IconName} size={18} fill={active && fillActive} />
         ) : (
           icon
         )}
       </span>
-      {count != null && <span className="min-w-[14px] text-left">{count ? fmt(count) : ""}</span>}
+      {count != null && <span className="min-w-[0.875rem] text-left">{count ? fmt(count) : ""}</span>}
     </button>
   )
 }

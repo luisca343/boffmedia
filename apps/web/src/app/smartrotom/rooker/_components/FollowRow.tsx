@@ -31,12 +31,12 @@ export function FollowRow({
 
       <Link href={`/smartrotom/rooker/${user.handle}`} className="min-w-0 flex-1">
         <div className="flex items-center gap-1">
-          <span className="truncate text-[14px] font-bold text-rk-fg hover:underline">
+          <span className="truncate text-[0.875rem] font-bold text-rk-fg hover:underline">
             {user.displayName || user.username}
           </span>
           {user.isVerified && <Verified size={13} />}
         </div>
-        <div className="truncate text-[13px] text-rk-fg-subtle">@{user.handle}</div>
+        <div className="truncate text-[0.8125rem] text-rk-fg-subtle">@{user.handle}</div>
       </Link>
 
       {uuid && !isMe && (
@@ -44,7 +44,7 @@ export function FollowRow({
           intent={isFollowing ? "following" : "follow"}
           onClick={() => follow.mutate(user.uuid)}
           disabled={follow.isPending}
-          className="flex-none px-4 py-1.5 text-[13px]"
+          className="flex-none px-4 py-1.5 text-[0.8125rem]"
         >
           {isFollowing ? t("common.follow.following") : t("common.follow.follow")}
         </Button>

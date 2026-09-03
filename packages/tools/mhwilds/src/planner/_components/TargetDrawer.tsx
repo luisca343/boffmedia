@@ -29,7 +29,7 @@ export function TargetDrawer({ onPick, onClose }: { onPick: (m: MhMonster) => vo
       tools={<MhSearch value={q} onChange={setQ} placeholder={t("build_planner.search")} />}
     >
       {loading ? (
-        <div className="grid h-[300px] place-items-center">
+        <div className="grid h-[18.75rem] place-items-center">
           <Spinner />
         </div>
       ) : list.length === 0 ? (
@@ -49,7 +49,7 @@ export function TargetDrawer({ onPick, onClose }: { onPick: (m: MhMonster) => vo
                   <Icon name="skull" size={16} className="text-txt-muted" />
                 </span>
                 <span className="grid min-w-0 flex-1 gap-1">
-                  <span className="truncate font-display text-[14px] leading-tight font-bold uppercase not-italic">{m.name}</span>
+                  <span className="truncate font-display text-[0.875rem] leading-tight font-bold uppercase not-italic">{m.name}</span>
                   <span className="inline-flex items-center gap-1.5">
                     {weaks.length ? (
                       weaks.map((w) => (
@@ -61,7 +61,7 @@ export function TargetDrawer({ onPick, onClose }: { onPick: (m: MhMonster) => vo
                         />
                       ))
                     ) : (
-                      <span className="font-mono text-[10px] uppercase text-txt-dim">{t("build_planner.target.no_elem_weak")}</span>
+                      <span className="font-mono text-[0.625rem] uppercase text-txt-dim">{t("build_planner.target.no_elem_weak")}</span>
                     )}
                   </span>
                 </span>

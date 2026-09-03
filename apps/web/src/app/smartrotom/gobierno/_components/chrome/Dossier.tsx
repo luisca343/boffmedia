@@ -48,7 +48,7 @@ export function Dossier() {
           role="dialog"
           aria-modal="true"
           aria-label={t("dossier.ariaDialog")}
-          className="gt-scroll relative flex w-full max-w-[420px] animate-gt-pop flex-col overflow-y-auto border-l border-gt-line-strong bg-gt-paper-0 shadow-gt-lg motion-reduce:animate-none"
+          className="gt-scroll relative flex w-full max-w-[26.25rem] animate-gt-pop flex-col overflow-y-auto border-l border-gt-line-strong bg-gt-paper-0 shadow-gt-lg motion-reduce:animate-none"
         >
           {/* the identity card at the top of every file */}
           <div className="gt-edge-gold sticky top-0 z-10 border-b border-gt-line bg-gradient-to-b from-[#fbf7ec] to-[#f4eedf] px-5 pb-4 pt-5">
@@ -61,7 +61,7 @@ export function Dossier() {
               <Icon name="x" size={17} />
             </button>
 
-            <div className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.22em] text-gt-ink-400">
+            <div className="font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.22em] text-gt-ink-400">
               {t("dossier.kicker")}
             </div>
 
@@ -93,7 +93,7 @@ export function Dossier() {
                     </div>
                   </div>
                 </div>
-                <div className="mt-3 font-gt-mono text-[9.5px] uppercase tracking-[.1em] text-gt-ink-400">
+                <div className="mt-3 font-gt-mono text-[0.59375rem] uppercase tracking-[.1em] text-gt-ink-400">
                   {t("jugadores.uuid")} {citizen.uuid.slice(0, 8)}…
                 </div>
               </>
@@ -105,7 +105,7 @@ export function Dossier() {
               <div className="grid grid-cols-3 gap-2">
                 <Sunken className="px-3 py-2.5 text-center">
                   <div className="font-gt-display text-xl tabular-nums text-gt-ink-900">{citizen.parcelas}</div>
-                  <div className="mt-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
+                  <div className="mt-0.5 font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">
                     {t("dossier.parcelas")}
                   </div>
                 </Sunken>
@@ -113,13 +113,13 @@ export function Dossier() {
                   <div className="font-gt-display text-xl tabular-nums text-gt-ink-900">
                     {citizen.multasPendientes}
                   </div>
-                  <div className="mt-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
+                  <div className="mt-0.5 font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">
                     {t("dossier.multas")}
                   </div>
                 </Sunken>
                 <Sunken className="px-3 py-2.5 text-center">
                   <div className="font-gt-display text-xl tabular-nums text-gt-ink-900">{citizen.towns.length}</div>
-                  <div className="mt-0.5 font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">
+                  <div className="mt-0.5 font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">
                     {t("dossier.ciudades")}
                   </div>
                 </Sunken>
@@ -140,17 +140,17 @@ export function Dossier() {
               {activeBounty && (
                 <DossierSection title={t("dossier.buscaCaptura")} icon="alert">
                   <div className="rounded-gt-sm border border-gt-danger/35 bg-gt-danger-tint px-3 py-2.5">
-                    <div className="text-[13px] font-semibold text-gt-ink-900">{activeBounty.offense}</div>
+                    <div className="text-[0.8125rem] font-semibold text-gt-ink-900">{activeBounty.offense}</div>
                     <div className="mt-1 flex items-center gap-2">
                       <Badge tone={BUSCADO_STATUS[activeBounty.status].tone}>
                         {t(BUSCADO_STATUS[activeBounty.status].labelKey)}
                       </Badge>
-                      <span className="font-gt-mono text-[11px] tabular-nums text-gt-danger">
+                      <span className="font-gt-mono text-[0.6875rem] tabular-nums text-gt-danger">
                         {money(activeBounty.bounty, intlLocale)} ₽
                       </span>
                     </div>
                     {activeBounty.lastSeen && (
-                      <div className="mt-1.5 text-[12px] text-gt-ink-500">
+                      <div className="mt-1.5 text-[0.75rem] text-gt-ink-500">
                         {t("dossier.vistoUltimamente", { location: activeBounty.lastSeen })}
                       </div>
                     )}
@@ -164,13 +164,13 @@ export function Dossier() {
                     {multas.items.map((m) => (
                       <li key={m.id} className="flex items-center justify-between gap-2 border-b border-gt-line-soft pb-1.5 last:border-b-0">
                         <div className="min-w-0">
-                          <div className="truncate text-[12.5px] text-gt-ink-700">{m.reason}</div>
-                          <div className="font-gt-mono text-[9.5px] uppercase tracking-[.1em] text-gt-ink-400">
+                          <div className="truncate text-[0.78125rem] text-gt-ink-700">{m.reason}</div>
+                          <div className="font-gt-mono text-[0.59375rem] uppercase tracking-[.1em] text-gt-ink-400">
                             {m.code} · {fmtDate(m.createdAt, intlLocale)}
                           </div>
                         </div>
                         <div className="flex flex-none items-center gap-2">
-                          <span className="font-gt-mono text-[12px] tabular-nums text-gt-ink-900">
+                          <span className="font-gt-mono text-[0.75rem] tabular-nums text-gt-ink-900">
                             {money(m.amount, intlLocale)} ₽
                           </span>
                           <Badge tone={MULTA_STATUS[m.status].tone}>{t(MULTA_STATUS[m.status].labelKey)}</Badge>
@@ -189,8 +189,8 @@ export function Dossier() {
                     {denuncias.items.map((d) => (
                       <li key={d.id} className="flex items-center justify-between gap-2 border-b border-gt-line-soft pb-1.5 last:border-b-0">
                         <div className="min-w-0">
-                          <div className="truncate text-[12.5px] text-gt-ink-700">{d.description}</div>
-                          <div className="font-gt-mono text-[9.5px] uppercase tracking-[.1em] text-gt-ink-400">
+                          <div className="truncate text-[0.78125rem] text-gt-ink-700">{d.description}</div>
+                          <div className="font-gt-mono text-[0.59375rem] uppercase tracking-[.1em] text-gt-ink-400">
                             {d.code} · {fmtDate(d.createdAt, intlLocale)}
                           </div>
                         </div>
@@ -224,7 +224,7 @@ function DossierSection({
     <section>
       <div className="mb-2 flex items-center gap-2 border-b border-gt-line-strong pb-1.5">
         <Icon name={icon} size={14} className="text-gt-accent" />
-        <h3 className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.16em] text-gt-ink-500">{title}</h3>
+        <h3 className="font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.16em] text-gt-ink-500">{title}</h3>
       </div>
       {children}
     </section>
@@ -232,5 +232,5 @@ function DossierSection({
 }
 
 const EmptyLine = ({ children }: { children: React.ReactNode }) => (
-  <div className="py-1 text-[12.5px] italic text-gt-ink-400">{children}</div>
+  <div className="py-1 text-[0.78125rem] italic text-gt-ink-400">{children}</div>
 )

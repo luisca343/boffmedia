@@ -21,7 +21,7 @@ function FooterAnchor({ link, label }: { link: FooterAnchorTarget; label: string
     </>
   )
   const cls =
-    "group/fl flex items-center justify-between gap-2 py-[5px] font-body text-[14px] font-medium leading-[1.2] text-txt-muted no-underline transition-[color,padding] duration-[140ms] hover:pl-1.5 hover:text-accent"
+    "group/fl flex items-center justify-between gap-2 py-[0.3125rem] font-body text-[0.875rem] font-medium leading-[1.2] text-txt-muted no-underline transition-[color,padding] duration-[140ms] hover:pl-1.5 hover:text-accent"
   if (link.external || link.href) {
     return (
       <a href={link.href} target={link.external ? "_blank" : undefined} rel={link.external ? "noopener noreferrer" : undefined} className={cls}>
@@ -44,7 +44,7 @@ export interface FooterColLink extends FooterAnchorTarget {
 export function FooterCol({ title, links }: { title: string; links: FooterColLink[] }) {
   return (
     <nav aria-label={title}>
-      <h6 className="mb-4 border-b border-line pb-[11px] font-display text-[12px] font-bold uppercase leading-none tracking-[0.16em] text-txt">
+      <h6 className="mb-4 border-b border-line pb-[0.6875rem] font-display text-[0.75rem] font-bold uppercase leading-none tracking-[0.16em] text-txt">
         {title}
       </h6>
       <ul className="grid list-none gap-[3px] p-0">
@@ -67,7 +67,7 @@ export interface FooterSocialItem {
 /** Reusable social row: diagonal-cut boxes that fill with accent and lift on hover. */
 export function FooterSocial({ items }: { items: FooterSocialItem[] }) {
   return (
-    <div className="flex gap-[9px]">
+    <div className="flex gap-[0.5625rem]">
       {items.map((s) => (
         <a
           key={s.label}
@@ -76,7 +76,7 @@ export function FooterSocial({ items }: { items: FooterSocialItem[] }) {
           title={s.label}
           target={s.href.startsWith("http") ? "_blank" : undefined}
           rel={s.href.startsWith("http") ? "noopener noreferrer" : undefined}
-          className="cut cut-edge-slant hover:[--cut-line:var(--accent)] [--cut:7px] grid h-[38px] w-[38px] place-items-center border border-solid border-line bg-panel text-txt-muted transition-[color,background,border-color,transform] duration-[140ms] hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-accent-ink"
+          className="cut cut-edge-slant hover:[--cut-line:var(--accent)] [--cut:7px] grid h-[2.375rem] w-[2.375rem] place-items-center border border-solid border-line bg-panel text-txt-muted transition-[color,background,border-color,transform] duration-[140ms] hover:-translate-y-0.5 hover:border-accent hover:bg-accent hover:text-accent-ink"
         >
           <Icon name={s.icon} size={17} />
         </a>
@@ -96,13 +96,13 @@ export function Footer() {
         className="pointer-events-none absolute inset-0 opacity-50 [background:repeating-linear-gradient(180deg,var(--stripe)_0_1px,transparent_1px_3px)]"
       />
       <div className="wrap relative px-5 min-[640px]:px-10">
-        <div className="grid grid-cols-1 gap-[34px] pb-10 pt-[52px] min-[620px]:grid-cols-2 min-[900px]:grid-cols-[1.5fr_1fr_1fr_1fr] min-[900px]:gap-11">
+        <div className="grid grid-cols-1 gap-[2.125rem] pb-10 pt-[3.25rem] min-[620px]:grid-cols-2 min-[900px]:grid-cols-[1.5fr_1fr_1fr_1fr] min-[900px]:gap-11">
           <div className="max-[899px]:col-span-full">
-            <Link href="/" className="mb-[15px] inline-flex items-center gap-[11px] font-display text-[21px] font-extrabold italic uppercase leading-none text-txt no-underline">
-              <Image src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" width={26} height={26} className="h-[26px] w-[26px] object-contain" />
+            <Link href="/" className="mb-[0.9375rem] inline-flex items-center gap-[0.6875rem] font-display text-[1.3125rem] font-extrabold italic uppercase leading-none text-txt no-underline">
+              <Image src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" width={26} height={26} className="h-[1.625rem] w-[1.625rem] object-contain" />
               <span>Boff<b className="text-accent">media</b></span>
             </Link>
-            <p className="mb-5 max-w-[36ch] font-body text-[14px] leading-[1.65] text-txt-muted">{t("tagline")}</p>
+            <p className="mb-5 max-w-[36ch] font-body text-[0.875rem] leading-[1.65] text-txt-muted">{t("tagline")}</p>
             <FooterSocial items={FOOTER_SOCIAL.map((s) => ({ icon: s.icon, label: t(s.labelKey), href: s.href }))} />
           </div>
 
@@ -118,16 +118,16 @@ export function Footer() {
         {/* Right-aligned: with the clock block below commented out there is no
             `ml-auto` element left for the copyright to sit opposite, so the row
             justifies to the end instead. */}
-        <div className="flex flex-wrap items-center justify-end gap-x-[18px] gap-y-2.5 border-t border-line pb-[22px] pt-[15px] font-mono text-[11px] font-medium leading-none tracking-[0.07em] text-txt-dim">
+        <div className="flex flex-wrap items-center justify-end gap-x-[1.125rem] gap-y-2.5 border-t border-line pb-[1.375rem] pt-[0.9375rem] font-mono text-[0.6875rem] font-medium leading-none tracking-[0.07em] text-txt-dim">
           <span className="text-txt-muted">© 2026 Boffmedia</span>
-          <span className="inline-flex items-center gap-[7px] uppercase">
-            <i aria-hidden="true" className="h-[5px] w-[5px] shrink-0 rotate-45 bg-accent" />
+          <span className="inline-flex items-center gap-[0.4375rem] uppercase">
+            <i aria-hidden="true" className="h-[0.3125rem] w-[0.3125rem] shrink-0 rotate-45 bg-accent" />
             Boffmedia v3.0
           </span>
           {/* 
-          <div className="ml-auto flex items-center gap-[18px] uppercase max-[619px]:ml-0 max-[619px]:w-full">
-            <span className="inline-flex items-center gap-[7px] tabular-nums text-txt-muted">
-              <i aria-hidden="true" className="h-[7px] w-[7px] rounded-full bg-ok animate-[bm-livedot_2s_ease-in-out_infinite] motion-reduce:animate-none" />
+          <div className="ml-auto flex items-center gap-[1.125rem] uppercase max-[619px]:ml-0 max-[619px]:w-full">
+            <span className="inline-flex items-center gap-[0.4375rem] tabular-nums text-txt-muted">
+              <i aria-hidden="true" className="h-[0.4375rem] w-[0.4375rem] rounded-full bg-ok animate-[bm-livedot_2s_ease-in-out_infinite] motion-reduce:animate-none" />
               <Clock />
             </span>
             <span>Madrid · UTC+2</span>

@@ -507,23 +507,23 @@ function ClaimAnonymousDialog({ onResolve }: { onResolve: (accept: boolean) => v
   const t = useVgcT("tracker");
   return (
     <div className="fixed inset-0 z-[90] grid place-items-center bg-black/60 p-4">
-      <div className="grid max-w-[420px] gap-3 border border-solid border-line-2 bg-panel p-5 shadow-[var(--shadow)]">
-        <p className="font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-accent-bright">
+      <div className="grid max-w-[26.25rem] gap-3 border border-solid border-line-2 bg-panel p-5 shadow-[var(--shadow)]">
+        <p className="font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-accent-bright">
           {t("claim.title")}
         </p>
-        <p className="font-body text-[13px] leading-[1.55] text-txt-muted">{t("claim.body")}</p>
+        <p className="font-body text-[0.8125rem] leading-[1.55] text-txt-muted">{t("claim.body")}</p>
         <div className="flex flex-wrap justify-end gap-2 pt-1">
           <button
             type="button"
             onClick={() => onResolve(false)}
-            className="border border-solid border-line-2 bg-base px-3 py-[7px] font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-txt-muted transition-colors hover:text-txt"
+            className="border border-solid border-line-2 bg-base px-3 py-[0.4375rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-txt-muted transition-colors hover:text-txt"
           >
             {t("claim.keepSeparate")}
           </button>
           <button
             type="button"
             onClick={() => onResolve(true)}
-            className="border border-solid border-accent-line bg-accent px-3 py-[7px] font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-white transition-opacity hover:opacity-90"
+            className="border border-solid border-accent-line bg-accent px-3 py-[0.4375rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-white transition-opacity hover:opacity-90"
           >
             {t("claim.import")}
           </button>

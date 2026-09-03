@@ -82,7 +82,7 @@ export function PatrullasSection() {
       {isLoading ? (
         <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-[220px] w-full" />
+            <Skeleton key={i} className="h-[13.75rem] w-full" />
           ))}
         </div>
       ) : isError ? (
@@ -106,21 +106,21 @@ export function PatrullasSection() {
                 style={{ borderTop: `3px solid ${TONES[st.tone].css}` }}
               >
                 <div className="mb-2.5 flex items-center justify-between gap-2">
-                  <span className="font-gt-display text-[17px] font-bold text-gt-ink-900">{p.label}</span>
+                  <span className="font-gt-display text-[1.0625rem] font-bold text-gt-ink-900">{p.label}</span>
                   <Badge tone={st.tone} dot={p.status === "active"}>
                     {t(st.labelKey)}
                   </Badge>
                 </div>
-                <div className="mb-3 font-gt-mono text-[12px] text-gt-ink-500">
+                <div className="mb-3 font-gt-mono text-[0.75rem] text-gt-ink-500">
                   {p.fromTime} – {p.toTime}
                   {p.zone && ` · ${p.zone}`}
                 </div>
-                <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+                <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
                   {t("seguridad.agentesAsignados")}
                 </div>
                 <div className="grid gap-1.5">
                   {p.officers.length === 0 ? (
-                    <span className="text-[12px] italic text-gt-ink-400">{t("seguridad.sinAgentes")}</span>
+                    <span className="text-[0.75rem] italic text-gt-ink-400">{t("seguridad.sinAgentes")}</span>
                   ) : (
                     p.officers.map((o) => (
                       <PlayerLink
@@ -133,7 +133,7 @@ export function PatrullasSection() {
                   )}
                 </div>
                 <div className="mt-3 flex items-center justify-between border-t border-gt-line-soft pt-2.5">
-                  <span className="font-gt-mono text-[11px] text-gt-ink-400">
+                  <span className="font-gt-mono text-[0.6875rem] text-gt-ink-400">
                     {p.incidents != null ? t("seguridad.incidencias", { count: p.incidents }) : ""}
                   </span>
                   {p.status !== "next" && (
@@ -171,11 +171,11 @@ export function PatrullasSection() {
                     className={`flex items-start gap-3 py-2.5 ${i < bitacora.length - 1 ? "border-b border-gt-line-soft" : ""}`}
                   >
                     <span
-                      className={`mt-1 h-[9px] w-[9px] flex-none rounded-full ${TONES[BITACORA_TONE[e.tone] ?? "info"].dot}`}
+                      className={`mt-1 h-[0.5625rem] w-[0.5625rem] flex-none rounded-full ${TONES[BITACORA_TONE[e.tone] ?? "info"].dot}`}
                     />
                     <div className="min-w-0 flex-1">
-                      <div className="text-[13px] text-gt-ink-800">{e.text}</div>
-                      <div className="mt-0.5 font-gt-mono text-[10px] text-gt-ink-400">
+                      <div className="text-[0.8125rem] text-gt-ink-800">{e.text}</div>
+                      <div className="mt-0.5 font-gt-mono text-[0.625rem] text-gt-ink-400">
                         {author?.username ?? "—"} · {fmtDateTime(e.createdAt, intlLocale)}
                       </div>
                     </div>
@@ -191,7 +191,7 @@ export function PatrullasSection() {
             {t("seguridad.traspasoTurno")}
           </Bar>
           <div className="p-4">
-            <p className="mb-2.5 text-[12.5px] leading-relaxed text-gt-ink-500">
+            <p className="mb-2.5 text-[0.78125rem] leading-relaxed text-gt-ink-500">
               {t("seguridad.traspasoDescription")}
             </p>
             <TextArea value={note} onChange={setNote} rows={4} placeholder={t("seguridad.traspasoPlaceholder")} />

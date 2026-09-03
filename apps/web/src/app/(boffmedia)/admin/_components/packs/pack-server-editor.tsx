@@ -49,18 +49,18 @@ export function PackServerEditor({ pack, onSaved }: { pack: AdminPack; onSaved: 
     <section className="border border-solid border-line bg-panel-2 p-3">
       <div className="mb-3 flex items-center gap-2">
         <Icon name="server" size={14} className="text-accent" />
-        <h3 className="font-display text-[12px] font-bold uppercase tracking-[0.08em] text-txt">
+        <h3 className="font-display text-[0.75rem] font-bold uppercase tracking-[0.08em] text-txt">
           {t("serverSection")}
         </h3>
-        <span className="font-mono text-[10px] text-txt-dim">{t("serverSectionLead")}</span>
+        <span className="font-mono text-[0.625rem] text-txt-dim">{t("serverSectionLead")}</span>
       </div>
       <div className="flex flex-wrap items-end gap-3">
-        <div className="min-w-[220px] flex-1">
+        <div className="min-w-[13.75rem] flex-1">
           <Field label={t("serverHost")} hint={t("serverHostHint")}>
             <Input value={host} placeholder="play.example.com" onChange={(e) => setHost(e.target.value)} />
           </Field>
         </div>
-        <div className="w-[120px]">
+        <div className="w-[7.5rem]">
           <Field label={t("serverPort")}>
             <Input
               type="number"

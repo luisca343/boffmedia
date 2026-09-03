@@ -11,7 +11,7 @@ export function TesoreriaStats({ t: data }: { t: Tesoreria }) {
   const { intlLocale } = useFormat()
   const neto = data.ingresosMes - data.gastosMes
   return (
-    <div className="mb-[18px] grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="mb-[1.125rem] grid grid-cols-2 gap-3 sm:grid-cols-4">
       <Stat label={t("tesoreria.stats.balance")} value={`${money(data.balance, intlLocale)} ₽`} tone="hacienda" icon="landmark" />
       <Stat label={t("tesoreria.stats.ingresos")} value={`+${money(data.ingresosMes, intlLocale)} ₽`} tone="ok" icon="trendUp" />
       <Stat label={t("tesoreria.stats.gastos")} value={`−${money(data.gastosMes, intlLocale)} ₽`} tone="urbanismo" icon="trendDown" />

@@ -208,13 +208,13 @@ export function TbTypeChip({
 }) {
   const style = { ["--tyc" as string]: tyColor(type) } as React.CSSProperties;
   const cls = cn(
-    "cut cut-edge-slant [--cut:3px] inline-flex items-center gap-[5px] whitespace-nowrap border border-solid font-mono font-semibold uppercase leading-none tracking-[0.08em] transition-[background,color,border-color] duration-[140ms]",
+    "cut cut-edge-slant [--cut:3px] inline-flex items-center gap-[0.3125rem] whitespace-nowrap border border-solid font-mono font-semibold uppercase leading-none tracking-[0.08em] transition-[background,color,border-color] duration-[140ms]",
     // A chip you can CLICK is a control, and a control is 32px tall whatever
     // its label size: the tera picker and the picker's type filters were 24px
     // targets, which is under every touch guideline there is. A static chip
     // (a coverage table cell) keeps the dense height.
-    onClick ? "h-8 px-[10px]" : small ? "h-6 px-[7px]" : "h-7 px-[9px]",
-    small ? "text-[9px]" : "text-[10px]",
+    onClick ? "h-8 px-[0.625rem]" : small ? "h-6 px-[0.4375rem]" : "h-7 px-[0.5625rem]",
+    small ? "text-[0.5625rem]" : "text-[0.625rem]",
     on
       ? "border-[var(--tyc)] [--cut-line:var(--tyc)] [background:var(--tyc)] text-accent-ink"
       : "border-[color-mix(in_srgb,var(--tyc)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--tyc)_45%,transparent)] [background:color-mix(in_srgb,var(--tyc)_12%,transparent)] text-[var(--tyc)]",
@@ -252,7 +252,7 @@ export function TbMeter({ value, max, className }: { value: number; max: number;
       aria-valuemin={0}
       aria-valuemax={max}
       aria-valuenow={value}
-      className={cn("block h-[6px] w-full overflow-hidden border border-solid border-line bg-base", className)}
+      className={cn("block h-[0.375rem] w-full overflow-hidden border border-solid border-line bg-base", className)}
     >
       <i
         className={cn("block h-full transition-[width,background] duration-[140ms]", over ? "bg-bad" : pct === 100 ? "bg-ok" : "bg-accent")}
@@ -267,7 +267,7 @@ export function TbStatBar({ value, max = 255, className }: { value: number; max?
   const pct = Math.max(2, Math.min(100, (value / max) * 100));
   const tone = value >= 120 ? "bg-ok" : value >= 90 ? "bg-signal" : value >= 60 ? "bg-warn" : "bg-bad";
   return (
-    <span aria-hidden className={cn("block h-[6px] w-full overflow-hidden border border-solid border-line bg-base", className)}>
+    <span aria-hidden className={cn("block h-[0.375rem] w-full overflow-hidden border border-solid border-line bg-base", className)}>
       <i className={cn("block h-full", tone)} style={{ width: `${pct}%` }} />
     </span>
   );
@@ -300,7 +300,7 @@ export function TbSegChoice({
   className?: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={ariaLabel} className={cn("flex flex-wrap gap-[6px]", className)}>
+    <div role="radiogroup" aria-label={ariaLabel} className={cn("flex flex-wrap gap-[0.375rem]", className)}>
       {options.map((o) => {
         const on = o.value === value;
         return (
@@ -311,7 +311,7 @@ export function TbSegChoice({
             aria-checked={on}
             onClick={() => onChange(o.value)}
             className={cn(
-              "cut-tag cut-tag-edge [--cut-tag:7px] inline-flex h-8 min-w-0 max-w-full items-center gap-[7px] border border-solid px-[10px] font-display text-[12px]/none font-bold uppercase tracking-[0.04em] transition-[background,border-color,color] duration-[140ms]",
+              "cut-tag cut-tag-edge [--cut-tag:7px] inline-flex h-8 min-w-0 max-w-full items-center gap-[0.4375rem] border border-solid px-[0.625rem] font-display text-[0.75rem]/none font-bold uppercase tracking-[0.04em] transition-[background,border-color,color] duration-[140ms]",
               on
                 ? "border-accent [--cut-line:var(--accent)] bg-accent text-accent-ink"
                 : "border-line-2 [--cut-line:var(--line-2)] bg-base text-txt-muted hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:text-txt",
@@ -320,7 +320,7 @@ export function TbSegChoice({
           >
             <span className="truncate">{o.label}</span>
             {o.sub && (
-              <small className={cn("font-mono text-[9px] font-semibold tracking-[0.08em]", on ? "opacity-80" : "text-txt-dim")}>
+              <small className={cn("font-mono text-[0.5625rem] font-semibold tracking-[0.08em]", on ? "opacity-80" : "text-txt-dim")}>
                 {o.sub}
               </small>
             )}
@@ -340,7 +340,7 @@ export const TbNumInput = React.forwardRef<HTMLInputElement, InputProps>(functio
       type="number"
       inputMode="numeric"
       size="sm"
-      className={cn("w-[64px] px-2 text-right font-mono text-[13px] tabular-nums", className)}
+      className={cn("w-[4rem] px-2 text-right font-mono text-[0.8125rem] tabular-nums", className)}
       {...props}
     />
   );
@@ -400,11 +400,11 @@ export function TbMoveRow({
         onClick={onClick}
         aria-label={label}
         className={cn(
-          "cut-tag cut-tag-edge [--cut-tag:9px] [--cut-line:var(--line)] flex min-h-[54px] w-full items-center gap-[9px] border border-dashed border-line bg-panel px-[10px] py-2 text-left font-mono text-[10px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim transition-[border-color,color] duration-[140ms] hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:text-txt",
+          "cut-tag cut-tag-edge [--cut-tag:9px] [--cut-line:var(--line)] flex min-h-[3.375rem] w-full items-center gap-[0.5625rem] border border-dashed border-line bg-panel px-[0.625rem] py-2 text-left font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim transition-[border-color,color] duration-[140ms] hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:text-txt",
           BSIM_FOCUS_CUT,
         )}
       >
-        <kbd className="grid h-[18px] min-w-[18px] flex-none place-items-center border border-solid border-line-2 bg-base px-1 font-mono text-[10px] font-semibold not-italic leading-none text-txt-muted">
+        <kbd className="grid h-[1.125rem] min-w-[1.125rem] flex-none place-items-center border border-solid border-line-2 bg-base px-1 font-mono text-[0.625rem] font-semibold not-italic leading-none text-txt-muted">
           {index + 1}
         </kbd>
         <Icon name="plus" size={14} />
@@ -420,29 +420,29 @@ export function TbMoveRow({
         aria-label={`${label}: ${move.name}`}
         style={{ ["--tyc" as string]: tyColor(move.type) } as React.CSSProperties}
         className={cn(
-          "cut-tag cut-tag-edge [--cut-tag:9px] [--cut-line:var(--line)] flex min-h-[54px] w-full min-w-0 items-center gap-[9px] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-panel py-2 pl-[10px] text-left transition-[background,border-color,transform] duration-[140ms] hover:border-[color-mix(in_srgb,var(--tyc)_55%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--tyc)_55%,var(--line))] hover:bg-panel-2",
-          onClear ? "pr-10" : "pr-[10px]",
+          "cut-tag cut-tag-edge [--cut-tag:9px] [--cut-line:var(--line)] flex min-h-[3.375rem] w-full min-w-0 items-center gap-[0.5625rem] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-panel py-2 pl-[0.625rem] text-left transition-[background,border-color,transform] duration-[140ms] hover:border-[color-mix(in_srgb,var(--tyc)_55%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--tyc)_55%,var(--line))] hover:bg-panel-2",
+          onClear ? "pr-10" : "pr-[0.625rem]",
           selected && "border-accent [--cut-line:var(--accent)]",
           BSIM_FOCUS_CUT,
         )}
       >
-        <kbd className="grid h-[18px] min-w-[18px] flex-none place-items-center border border-solid border-line-2 bg-base px-1 font-mono text-[10px] font-semibold not-italic leading-none text-txt-muted">
+        <kbd className="grid h-[1.125rem] min-w-[1.125rem] flex-none place-items-center border border-solid border-line-2 bg-base px-1 font-mono text-[0.625rem] font-semibold not-italic leading-none text-txt-muted">
           {index + 1}
         </kbd>
-        <span className="grid min-w-0 flex-1 gap-[5px]">
-          <span className="truncate font-display text-[13px] font-bold uppercase leading-[1.05] tracking-[0.03em] text-txt">{move.name}</span>
-          <span className="flex flex-wrap items-center gap-[7px]">
+        <span className="grid min-w-0 flex-1 gap-[0.3125rem]">
+          <span className="truncate font-display text-[0.8125rem] font-bold uppercase leading-[1.05] tracking-[0.03em] text-txt">{move.name}</span>
+          <span className="flex flex-wrap items-center gap-[0.4375rem]">
             <BxType type={move.type} small />
             <BxCat cat={move.cat} />
             {illegal && illegalLabel && (
-              <b className="cut cut-edge-slant [--cut:3px] flex-none border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-[5px] py-[3px] font-mono text-[8.5px]/none font-bold uppercase tracking-[0.08em] text-bad">
+              <b className="cut cut-edge-slant [--cut:3px] flex-none border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-[0.3125rem] py-[3px] font-mono text-[0.53125rem]/none font-bold uppercase tracking-[0.08em] text-bad">
                 {illegalLabel}
               </b>
             )}
           </span>
         </span>
         {figures && (
-          <span className="grid flex-none justify-items-end gap-[3px] font-mono text-[9px]/none font-semibold text-txt-dim">
+          <span className="grid flex-none justify-items-end gap-[3px] font-mono text-[0.5625rem]/none font-semibold text-txt-dim">
             <span>{figures.power}</span>
             <span>{figures.accuracy}</span>
             <span>{figures.pp}</span>
@@ -504,23 +504,23 @@ export function TbSlotRow({
   className?: string;
 }) {
   const shape = cn(
-    "cut-tag cut-tag-edge [--cut-tag:9px] relative flex w-full min-w-0 items-center gap-[10px] border border-solid px-[10px] py-2 text-left transition-[border-color,background] duration-[140ms]",
+    "cut-tag cut-tag-edge [--cut-tag:9px] relative flex w-full min-w-0 items-center gap-[0.625rem] border border-solid px-[0.625rem] py-2 text-left transition-[border-color,background] duration-[140ms]",
     selected
       ? "border-accent [--cut-line:var(--accent)] bg-accent-soft"
       : "border-line [--cut-line:var(--line)] bg-panel hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:bg-panel-2",
     BSIM_FOCUS_CUT,
   );
   return (
-    <div className={cn("grid gap-[6px]", className)}>
+    <div className={cn("grid gap-[0.375rem]", className)}>
       {mon ? (
-        <button type="button" onClick={onSelect} aria-pressed={selected} aria-label={ariaLabel} className={cn(shape, "min-h-[58px]")}>
-          {flag && <i aria-hidden className="absolute bottom-[6px] left-0 top-[6px] w-[3px] bg-bad" />}
-          <b className="flex-none font-mono text-[11px]/none font-extrabold text-accent-bright">{order}</b>
+        <button type="button" onClick={onSelect} aria-pressed={selected} aria-label={ariaLabel} className={cn(shape, "min-h-[3.625rem]")}>
+          {flag && <i aria-hidden className="absolute bottom-[0.375rem] left-0 top-[0.375rem] w-[3px] bg-bad" />}
+          <b className="flex-none font-mono text-[0.6875rem]/none font-extrabold text-accent-bright">{order}</b>
           <DkSprite src={speciesSprite(mon.name)} alt="" size={40} onError={handleSpriteError} />
           <span className="grid min-w-0 flex-1 gap-[3px]">
-            <b className="truncate font-display text-[13px]/none font-bold uppercase tracking-[0.03em] text-txt">{mon.name}</b>
+            <b className="truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em] text-txt">{mon.name}</b>
             <BxTypeRow types={mon.types} small />
-            {mon.item && <small className="truncate font-mono text-[10px] leading-[1.2] text-txt-dim">{mon.item}</small>}
+            {mon.item && <small className="truncate font-mono text-[0.625rem] leading-[1.2] text-txt-dim">{mon.item}</small>}
           </span>
         </button>
       ) : (
@@ -531,11 +531,11 @@ export function TbSlotRow({
           aria-label={ariaLabel}
           className={cn(
             shape,
-            "min-h-[58px] justify-center border-dashed font-mono text-[10px]/none font-semibold uppercase tracking-[0.1em]",
+            "min-h-[3.625rem] justify-center border-dashed font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.1em]",
             selected ? "text-txt" : "text-txt-dim hover:text-txt",
           )}
         >
-          <b className="absolute left-[10px] top-1/2 -translate-y-1/2 font-mono text-[11px]/none font-extrabold text-txt-dim">{order}</b>
+          <b className="absolute left-[0.625rem] top-1/2 -translate-y-1/2 font-mono text-[0.6875rem]/none font-extrabold text-txt-dim">{order}</b>
           <Icon name="plus" size={15} />
           <span>{addLabel}</span>
         </button>
@@ -570,7 +570,7 @@ export function TbSlotChip({
       aria-label={ariaLabel}
       className={cn(
         "cut-tag cut-tag-edge [--cut-tag:7px] relative grid min-w-0 place-items-center gap-[2px] border border-solid px-1 transition-[border-color,background] duration-[140ms]",
-        compact ? "h-[54px]" : "h-[64px]",
+        compact ? "h-[3.375rem]" : "h-[4rem]",
         name ? "" : "border-dashed",
         selected
           ? "border-accent [--cut-line:var(--accent)] bg-accent-soft"
@@ -578,15 +578,15 @@ export function TbSlotChip({
         BSIM_FOCUS_CUT,
       )}
     >
-      {flag && <i aria-hidden className="absolute left-1 top-1 h-[6px] w-[6px] bg-bad" />}
-      <b className="absolute right-[5px] top-[3px] font-mono text-[9px]/none font-extrabold text-txt-dim">{order}</b>
+      {flag && <i aria-hidden className="absolute left-1 top-1 h-[0.375rem] w-[0.375rem] bg-bad" />}
+      <b className="absolute right-[0.3125rem] top-[3px] font-mono text-[0.5625rem]/none font-extrabold text-txt-dim">{order}</b>
       {name ? (
         <DkSprite src={speciesSprite(name)} alt="" size={compact ? 32 : 36} onError={handleSpriteError} />
       ) : (
         <Icon name="plus" size={16} className="text-txt-dim" />
       )}
       {!compact && (
-        <span className="w-full truncate text-center font-mono text-[9px]/none font-semibold uppercase tracking-[0.06em] text-txt-muted">
+        <span className="w-full truncate text-center font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.06em] text-txt-muted">
           {name ?? "—"}
         </span>
       )}
@@ -812,7 +812,7 @@ export function TbSpBar({
         // border cannot survive a clip-path — it slices the vertical edges off
         // and leaves the diagonals unstroked — so the stroke is geometry: this
         // element is the line colour, the child insets over it as the track.
-        "cut relative flex h-[26px] w-full cursor-pointer touch-none select-none bg-line [--cut:8px]",
+        "cut relative flex h-[1.625rem] w-full cursor-pointer touch-none select-none bg-line [--cut:8px]",
         BSIM_FOCUS_CUT,
         "transition-[background] duration-[140ms] hover:bg-line-2",
         dragging && "bg-accent-line",
@@ -866,7 +866,7 @@ export function TbSpBar({
             {seg.bump && (
               <i
                 className={cn(
-                  "absolute inset-x-0 bottom-0 h-[4px]",
+                  "absolute inset-x-0 bottom-0 h-[0.25rem]",
                   seg.spent ? "bg-[color-mix(in_srgb,black_50%,var(--accent-bright))]" : "bg-accent",
                 )}
               />

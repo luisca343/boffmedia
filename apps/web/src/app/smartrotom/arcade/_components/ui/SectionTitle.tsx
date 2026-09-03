@@ -26,14 +26,14 @@ export function SectionTitle({ kicker, title, accent = "cyan", right, className 
         {kicker && (
           <div
             className={cn(
-              "mb-2 font-ar-mono text-[11px] font-bold uppercase tracking-[0.18em]",
+              "mb-2 font-ar-mono text-[0.6875rem] font-bold uppercase tracking-[0.18em]",
               ACCENT[accent],
             )}
           >
             {kicker}
           </div>
         )}
-        <h2 className="font-ar-display text-[18px] leading-tight text-ar-ink">{title}</h2>
+        <h2 className="font-ar-display text-[1.125rem] leading-tight text-ar-ink">{title}</h2>
       </div>
       {right}
     </div>

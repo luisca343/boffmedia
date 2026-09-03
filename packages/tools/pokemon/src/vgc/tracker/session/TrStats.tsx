@@ -49,7 +49,7 @@ export function TrStats({ sessionId, session, sessions }: { sessionId: string; s
 
   return (
     <div className="grid gap-3">
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(120px,1fr))] gap-2">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(7.5rem,1fr))] gap-2">
         <DkStat value={played} label={t("kpi.played")} />
         <DkStat value={wr} label={t("kpi.winRate")} tone={r.winRate === null ? "neutral" : r.winRate >= 0.5 ? "pos" : "neg"} />
         <DkStat
@@ -73,7 +73,7 @@ export function TrStats({ sessionId, session, sessions }: { sessionId: string; s
         <TrPanel
           title={t("chart.title")}
           icon="trending"
-          right={<span className="font-mono text-[10.5px] text-txt-muted">{startElo ?? "—"} → {e.current ?? "—"}</span>}
+          right={<span className="font-mono text-[0.65625rem] text-txt-muted">{startElo ?? "—"} → {e.current ?? "—"}</span>}
         >
           <DkTrend
             height={170}
@@ -108,7 +108,7 @@ export function TrStats({ sessionId, session, sessions }: { sessionId: string; s
 
       {session && <RegulationMetaPanel session={session} />}
 
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(420px,100%),1fr))] items-start gap-3">
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(26.25rem,100%),1fr))] items-start gap-3">
         <TrPanel title={t("pairs.title")} icon="users">
           <div className="grid grid-cols-2 gap-4">
             <PairList title={t("pairs.mine")} pairs={stats.myLeadPairs} />
@@ -123,7 +123,7 @@ export function TrStats({ sessionId, session, sessions }: { sessionId: string; s
         </TrPanel>
       </div>
 
-      <TrPanel title={t("matchup.title")} icon="target" right={<span className="font-mono text-[10.5px] text-txt-dim">{t("matchup.hint")}</span>}>
+      <TrPanel title={t("matchup.title")} icon="target" right={<span className="font-mono text-[0.65625rem] text-txt-dim">{t("matchup.hint")}</span>}>
         {stats.opponentPreview.length === 0 ? (
           <TrNone>{t("matchup.empty")}</TrNone>
         ) : (
@@ -131,12 +131,12 @@ export function TrStats({ sessionId, session, sessions }: { sessionId: string; s
             {stats.opponentPreview.slice(0, 12).map((m) => {
               const total = m.wins + m.losses
               return (
-                <div key={m.speciesId} className="flex items-center gap-[10px] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-[5px] last:border-b-0">
-                  <span className="inline-flex w-[160px] flex-none items-center gap-[7px] truncate font-body text-[12px]">
+                <div key={m.speciesId} className="flex items-center gap-[0.625rem] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-[0.3125rem] last:border-b-0">
+                  <span className="inline-flex w-[10rem] flex-none items-center gap-[0.4375rem] truncate font-body text-[0.75rem]">
                     <TrSprite name={m.speciesName} size={24} />
                     <span className="truncate">{m.speciesName}</span>
                   </span>
-                  <span className="w-[42px] flex-none text-right font-mono text-[11px] text-txt-muted">×{m.uses + m.discards}</span>
+                  <span className="w-[2.625rem] flex-none text-right font-mono text-[0.6875rem] text-txt-muted">×{m.uses + m.discards}</span>
                   <span className="min-w-0 flex-1">
                     <DkSplit win={m.wins} loss={m.losses} draw={total > 0 ? 0 : 0} />
                   </span>
@@ -147,8 +147,8 @@ export function TrStats({ sessionId, session, sessions }: { sessionId: string; s
         )}
       </TrPanel>
 
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(420px,100%),1fr))] items-start gap-3">
-        <TrPanel title={t("activity.title")} icon="calendar" right={<span className="font-mono text-[10.5px] text-txt-dim">{t("activity.hint")}</span>}>
+      <div className="grid grid-cols-[repeat(auto-fit,minmax(min(26.25rem,100%),1fr))] items-start gap-3">
+        <TrPanel title={t("activity.title")} icon="calendar" right={<span className="font-mono text-[0.65625rem] text-txt-dim">{t("activity.hint")}</span>}>
           <ActivityHeat stats={stats} />
         </TrPanel>
         <TrPanel title={t("timeOfDay.title")} icon="clock">
@@ -174,15 +174,15 @@ function UsageTable({ items, played, preview }: { items: PokemonUsage[]; played:
         const wr = it.winRate == null ? null : Math.round(it.winRate * 100)
         const pct = played > 0 ? Math.round((it.n / played) * 100) : 0
         return (
-          <div key={it.speciesId} className="flex items-center gap-[9px] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-1 last:border-b-0">
+          <div key={it.speciesId} className="flex items-center gap-[0.5625rem] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-1 last:border-b-0">
             <TrSprite name={it.speciesName} size={26} />
-            <span className="min-w-0 flex-1 truncate font-body text-[12px]">{it.speciesName}</span>
-            <span className="h-[5px] w-[90px] flex-none overflow-hidden border border-solid border-line bg-base" aria-hidden="true">
+            <span className="min-w-0 flex-1 truncate font-body text-[0.75rem]">{it.speciesName}</span>
+            <span className="h-[0.3125rem] w-[5.625rem] flex-none overflow-hidden border border-solid border-line bg-base" aria-hidden="true">
               <i className="block h-full bg-accent opacity-75" style={{ width: `${(it.n / peak) * 100}%` }} />
             </span>
-            <span className="w-[42px] flex-none text-right font-mono text-[11px] text-txt-muted">{pct}%</span>
-            <span className="w-[34px] flex-none text-right font-mono text-[10px] text-txt-dim">×{it.n}</span>
-            <span className={cn("w-[44px] flex-none text-right font-mono text-[11px] font-bold", wr == null ? "text-txt-dim" : wr >= 50 ? "text-ok" : "text-bad")}>
+            <span className="w-[2.625rem] flex-none text-right font-mono text-[0.6875rem] text-txt-muted">{pct}%</span>
+            <span className="w-[2.125rem] flex-none text-right font-mono text-[0.625rem] text-txt-dim">×{it.n}</span>
+            <span className={cn("w-[2.75rem] flex-none text-right font-mono text-[0.6875rem] font-bold", wr == null ? "text-txt-dim" : wr >= 50 ? "text-ok" : "text-bad")}>
               {wr == null ? "—" : `${wr}%`}
             </span>
           </div>
@@ -202,13 +202,13 @@ function PairList({ title, pairs }: { title: string; pairs: LeadPairStats[] }) {
       {pairs.map((p) => {
         const wr = p.winRate == null ? null : Math.round(p.winRate * 100)
         return (
-          <div key={p.key} className="flex items-center gap-[9px] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-1 last:border-b-0">
+          <div key={p.key} className="flex items-center gap-[0.5625rem] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-1 last:border-b-0">
             <span className="inline-flex gap-px">
               <TrSprite name={p.lead1Name} size={24} />
               <TrSprite name={p.lead2Name} size={24} />
             </span>
-            <span className="flex-1 font-mono text-[10.5px] text-txt-dim">×{p.games}</span>
-            <span className={cn("font-mono text-[11px] font-bold", wr == null ? "text-txt-dim" : wr >= 50 ? "text-ok" : "text-bad")}>
+            <span className="flex-1 font-mono text-[0.65625rem] text-txt-dim">×{p.games}</span>
+            <span className={cn("font-mono text-[0.6875rem] font-bold", wr == null ? "text-txt-dim" : wr >= 50 ? "text-ok" : "text-bad")}>
               {wr == null ? "—" : `${wr}%`}
             </span>
           </div>
@@ -224,9 +224,9 @@ function VsRows({ rows, empty }: { rows: { key: string; name: string; w: number;
   return (
     <div className="grid">
       {rows.map((row) => (
-        <div key={row.key} className="flex items-center gap-[10px] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-[5px] last:border-b-0">
-          <span className="w-[130px] flex-none truncate font-body text-[12px]">{row.name}</span>
-          <span className="w-[42px] flex-none text-right font-mono text-[11px] text-txt-muted">
+        <div key={row.key} className="flex items-center gap-[0.625rem] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-[0.3125rem] last:border-b-0">
+          <span className="w-[8.125rem] flex-none truncate font-body text-[0.75rem]">{row.name}</span>
+          <span className="w-[2.625rem] flex-none text-right font-mono text-[0.6875rem] text-txt-muted">
             {row.w}-{row.l}
           </span>
           <span className="min-w-0 flex-1">
@@ -305,14 +305,14 @@ function ComparisonPanel({ sessionId, session, sessions }: { sessionId: string; 
           <button
             type="button"
             onClick={() => setSelected([])}
-            className="font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-accent"
+            className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-accent"
           >
             {t("comparison.clearAll")}
           </button>
         ) : undefined
       }
     >
-      <div className="mb-3 flex flex-wrap gap-[6px]">
+      <div className="mb-3 flex flex-wrap gap-[0.375rem]">
         <LegendChip label={session.label} color="var(--accent)" active locked />
         {others.map((o) => (
           <LegendChip key={o.id} label={o.label} color={colorFor(o.id)} active={selected.includes(o.id)} onClick={() => toggle(o.id)} />
@@ -343,13 +343,13 @@ function LegendChip({
       disabled={locked}
       aria-pressed={active}
       className={cn(
-        "inline-flex items-center gap-[6px] border border-solid px-[9px] py-[5px] font-body text-[11.5px] leading-none transition-[color,border-color,background]",
+        "inline-flex items-center gap-[0.375rem] border border-solid px-[0.5625rem] py-[0.3125rem] font-body text-[0.71875rem] leading-none transition-[color,border-color,background]",
         active ? "border-line-2 bg-panel-2 text-txt" : "border-line bg-base text-txt-muted hover:border-line-2 hover:text-txt",
         locked ? "cursor-default" : "cursor-pointer",
       )}
     >
-      <span className="h-[9px] w-[9px] flex-none" style={{ background: active ? color : "transparent", border: `1.5px solid ${color}` }} />
-      <span className="max-w-[120px] truncate">{label}</span>
+      <span className="h-[0.5625rem] w-[0.5625rem] flex-none" style={{ background: active ? color : "transparent", border: `1.5px solid ${color}` }} />
+      <span className="max-w-[7.5rem] truncate">{label}</span>
     </button>
   )
 }
@@ -368,7 +368,7 @@ function RegulationMetaPanel({ session }: { session: Session }) {
       icon="chart"
       right={
         <>
-          {meta && <span className="font-mono text-[10.5px] text-txt-dim">{t("regulationMeta.matchCount", { n: meta.totalMatches })}</span>}
+          {meta && <span className="font-mono text-[0.65625rem] text-txt-dim">{t("regulationMeta.matchCount", { n: meta.totalMatches })}</span>}
           <DkSeg
             size="sm"
             value={tab}
@@ -419,19 +419,19 @@ function RegUsageBars({
         return (
           <div
             key={it.speciesId}
-            className="flex items-center gap-[9px] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-1 last:border-b-0"
+            className="flex items-center gap-[0.5625rem] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-1 last:border-b-0"
           >
             <TrSprite name={it.speciesName} size={26} />
-            <span className="min-w-0 flex-1 truncate font-body text-[12px]">{it.speciesName}</span>
-            <span className="h-[5px] w-[90px] flex-none overflow-hidden border border-solid border-line bg-base" aria-hidden="true">
+            <span className="min-w-0 flex-1 truncate font-body text-[0.75rem]">{it.speciesName}</span>
+            <span className="h-[0.3125rem] w-[5.625rem] flex-none overflow-hidden border border-solid border-line bg-base" aria-hidden="true">
               <i className="block h-full bg-accent opacity-75" style={{ width: `${(it.n / peak) * 100}%` }} />
             </span>
-            <span className="w-[42px] flex-none text-right font-mono text-[11px] text-txt-muted">{pct}%</span>
+            <span className="w-[2.625rem] flex-none text-right font-mono text-[0.6875rem] text-txt-muted">{pct}%</span>
             {tournamentUsage && (
               <span
                 title={t("regulationMeta.tournamentUsage")}
                 className={cn(
-                  "w-[46px] flex-none text-right font-mono text-[11px] font-semibold",
+                  "w-[2.875rem] flex-none text-right font-mono text-[0.6875rem] font-semibold",
                   tour != null ? "text-accent-bright" : "text-txt-dim",
                 )}
               >

@@ -69,7 +69,7 @@ export function DayTile({
     <div
       className={cn(
         "relative rounded-[10px] border p-2.5 text-center",
-        size === "lg" && "flex min-h-[140px] flex-col justify-between rounded-[14px] p-3.5",
+        size === "lg" && "flex min-h-[8.75rem] flex-col justify-between rounded-[14px] p-3.5",
         isToday
           ? TILE_TONE[tone]
           : state === "claimed"
@@ -89,7 +89,7 @@ export function DayTile({
 
       <div
         className={cn(
-          "mb-2 font-ar-display text-[8px]",
+          "mb-2 font-ar-display text-[0.5rem]",
           isToday ? TEXT_TONE[tone] : "text-ar-ink-muted",
         )}
       >
@@ -99,7 +99,7 @@ export function DayTile({
       <div
         className={cn(
           "mx-auto mb-2 grid place-items-center overflow-hidden rounded-lg border",
-          size === "lg" ? "h-[60px] w-[60px]" : "h-9 w-9",
+          size === "lg" ? "h-[3.75rem] w-[3.75rem]" : "h-9 w-9",
           isToday ? RING_TONE[tone] : "border-white/10",
           TEXT_TONE[tone],
         )}
@@ -109,7 +109,7 @@ export function DayTile({
 
       <div
         className={cn(
-          "truncate font-ar-mono text-[10px]",
+          "truncate font-ar-mono text-[0.625rem]",
           isToday ? "text-ar-ink" : "text-ar-ink-dim",
         )}
         title={view.label}
@@ -118,7 +118,7 @@ export function DayTile({
       </div>
 
       {state === "claimed" && (
-        <div aria-label={t("common.claimed")} className="absolute right-1.5 top-1.5 text-[10px] text-ar-lime">
+        <div aria-label={t("common.claimed")} className="absolute right-1.5 top-1.5 text-[0.625rem] text-ar-lime">
           ✓
         </div>
       )}
@@ -163,11 +163,11 @@ export function StreakRail() {
 
   if (streak.isLoading || banner.isLoading) {
     return (
-      <Panel tone="deep" className="mb-[22px]">
+      <Panel tone="deep" className="mb-[1.375rem]">
         <Skeleton className="mb-3.5 h-10 w-full" />
         <div className="grid grid-cols-7 gap-2.5">
           {Array.from({ length: 7 }, (_, i) => (
-            <Skeleton key={i} className="h-[104px]" />
+            <Skeleton key={i} className="h-[6.5rem]" />
           ))}
         </div>
       </Panel>
@@ -177,10 +177,10 @@ export function StreakRail() {
   if (!rewards.length) return null
 
   return (
-    <Panel tone="deep" className="mb-[22px]">
+    <Panel tone="deep" className="mb-[1.375rem]">
       <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2.5">
         <div>
-          <div className="mb-1.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
+          <div className="mb-1.5 font-ar-display text-[0.5625rem] uppercase tracking-[0.18em] text-ar-cyan">
             {t("streak.weeklyStreak", { current: currentDay, total: streak.data?.totalDays ?? 7 })}
           </div>
           <h3 className="font-ar-display text-sm leading-relaxed text-ar-ink">
@@ -189,7 +189,7 @@ export function StreakRail() {
         </div>
         <div className="flex flex-wrap items-center gap-2.5">
           {resetIn && (
-            <span className="font-ar-mono text-[11px] text-ar-ink-dim">
+            <span className="font-ar-mono text-[0.6875rem] text-ar-ink-dim">
               <span className="text-ar-ink-muted">{t("streak.resetsIn", { time: resetIn })}</span>{" "}
               <b className="text-ar-amber">{resetIn}</b>
             </span>
@@ -197,7 +197,7 @@ export function StreakRail() {
           {claimedToday ? (
             <Link
               href="/smartrotom/arcade/racha"
-              className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-ar-lime/40 bg-ar-lime/[.12] px-3 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-lime"
+              className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-ar-lime/40 bg-ar-lime/[.12] px-3 py-1.5 font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ar-lime"
             >
               <Icon.Shield s={12} /> {t("streak.dayClaimed", { day: currentDay })}
             </Link>
@@ -226,7 +226,7 @@ export function StreakRail() {
       </div>
 
       {claim.isError && (
-        <p role="alert" className="mt-3 font-ar-mono text-[11px] text-ar-danger">
+        <p role="alert" className="mt-3 font-ar-mono text-[0.6875rem] text-ar-danger">
           {t("streak.claimError")}
         </p>
       )}

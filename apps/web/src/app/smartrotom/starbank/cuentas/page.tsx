@@ -50,17 +50,17 @@ export default function Cuentas() {
       </div>
 
       {main && (
-        <div className="relative flex min-h-[170px] flex-col justify-between overflow-hidden rounded-sb-lg p-5 text-white" style={{ background: MAIN_BG }}>
+        <div className="relative flex min-h-[10.625rem] flex-col justify-between overflow-hidden rounded-sb-lg p-5 text-white" style={{ background: MAIN_BG }}>
           <div className="flex flex-wrap items-start justify-between gap-4">
             <div className="flex items-center gap-3.5">
               <AccountAvatar account={main} size={56} square />
               <div>
-                <div className="text-[12px] uppercase tracking-[0.06em] text-[#b6d3ff]">{t("cuentas.mainAccount")}</div>
-                <div className="mt-1 text-[22px] font-semibold">{displayName(main.name)}</div>
+                <div className="text-[0.75rem] uppercase tracking-[0.06em] text-[#b6d3ff]">{t("cuentas.mainAccount")}</div>
+                <div className="mt-1 text-[1.375rem] font-semibold">{displayName(main.name)}</div>
                 <button
                   type="button"
                   onClick={() => select(main.id)}
-                  className="mt-2 inline-flex items-center gap-1.5 rounded-sb-pill border border-white/25 bg-white/15 px-2.5 py-1 text-[11.5px] font-semibold backdrop-blur-[8px] transition-colors hover:bg-white/25"
+                  className="mt-2 inline-flex items-center gap-1.5 rounded-sb-pill border border-white/25 bg-white/15 px-2.5 py-1 text-[0.71875rem] font-semibold backdrop-blur-[8px] transition-colors hover:bg-white/25"
                 >
                   {activeAccount?.id === main.id
                     ? <><span className="size-1.5 rounded-full bg-sb-pos-2" /> {t("cuentas.activeAccount")}</>
@@ -69,8 +69,8 @@ export default function Cuentas() {
               </div>
             </div>
             <div className="text-right">
-              <div className="text-[11px] uppercase tracking-[0.15em] text-[#b6d3ff]">{t("cuentas.balance")}</div>
-              <div className="font-sb-display text-[34px] font-bold tracking-[-0.02em] tabular-nums">{formatMoney(main.balance)}</div>
+              <div className="text-[0.6875rem] uppercase tracking-[0.15em] text-[#b6d3ff]">{t("cuentas.balance")}</div>
+              <div className="font-sb-display text-[2.125rem] font-bold tracking-[-0.02em] tabular-nums">{formatMoney(main.balance)}</div>
               <div className="mt-2.5 flex justify-end gap-2">
                 <Button variant="glass" size="sm" href={`${BASE}/enviar`}><Ico name="send" size={14} /> {t("cuentas.send")}</Button>
                 <Button variant="solid" size="sm" href={`${BASE}/enviar`}><Ico name="arrows" size={14} /> {t("cuentas.move")}</Button>
@@ -83,7 +83,7 @@ export default function Cuentas() {
       <Card flat className="border-0 bg-transparent shadow-none">
         <SectionHead eyebrow={t("cuentas.activeAccounts", { count: secondary.length })} title={t("cuentas.secondaryAccounts")} action={<Button variant="secondary" size="sm" onClick={() => setCreating(true)}><Ico name="plus" size={14} /> {t("cuentas.add")}</Button>} />
         <CardBody noPad>
-          <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(240px,1fr))]">
+          <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(15rem,1fr))]">
             {secondary.map((acc) => {
               const active = activeAccount?.id === acc.id;
               const color = accountColor(acc.id);
@@ -95,12 +95,12 @@ export default function Cuentas() {
                   type="button"
                   onClick={() => select(acc.id)}
                   style={{ borderLeft: `4px solid ${color}` }}
-                  className="flex min-h-[180px] w-full flex-col justify-between rounded-sb-lg border border-sb-border bg-sb-surface p-5 text-left transition-all hover:-translate-y-0.5 hover:border-sb-300 hover:shadow-sb-2"
+                  className="flex min-h-[11.25rem] w-full flex-col justify-between rounded-sb-lg border border-sb-border bg-sb-surface p-5 text-left transition-all hover:-translate-y-0.5 hover:border-sb-300 hover:shadow-sb-2"
                 >
                   <div className="flex items-start justify-between">
                     <AccountAvatar account={acc} size={44} square />
                     <span
-                      className="inline-flex h-6 items-center gap-1.5 rounded-sb-pill px-2.5 text-[11.5px] font-semibold"
+                      className="inline-flex h-6 items-center gap-1.5 rounded-sb-pill px-2.5 text-[0.71875rem] font-semibold"
                       style={{ background: color + "1a", color }}
                     >
                       <span className="size-1.5 rounded-full" style={{ background: color }} />
@@ -108,11 +108,11 @@ export default function Cuentas() {
                     </span>
                   </div>
                   <div>
-                    <div className="text-[16px] font-semibold">{displayName(acc.name)}</div>
-                    <div className="text-[12px] text-sb-fg-muted">{t("cuentas.secondaryAccount")}</div>
+                    <div className="text-[1rem] font-semibold">{displayName(acc.name)}</div>
+                    <div className="text-[0.75rem] text-sb-fg-muted">{t("cuentas.secondaryAccount")}</div>
                   </div>
                   <div className="flex items-center justify-between">
-                    <div className="font-sb-display text-[22px] font-semibold tabular-nums tracking-[-0.01em]">{formatMoney(acc.balance)}</div>
+                    <div className="font-sb-display text-[1.375rem] font-semibold tabular-nums tracking-[-0.01em]">{formatMoney(acc.balance)}</div>
                     <span className="text-sb-fg-muted"><Ico name="arrR" size={16} /></span>
                   </div>
                 </button>
@@ -132,14 +132,14 @@ export default function Cuentas() {
             <button
               type="button"
               onClick={() => setCreating(true)}
-              className="grid min-h-[180px] place-items-center rounded-sb-lg border-2 border-dashed border-sb-border-strong text-sb-fg-muted transition-colors hover:border-sb-300 hover:bg-sb-50 hover:text-sb-700"
+              className="grid min-h-[11.25rem] place-items-center rounded-sb-lg border-2 border-dashed border-sb-border-strong text-sb-fg-muted transition-colors hover:border-sb-300 hover:bg-sb-50 hover:text-sb-700"
             >
               <div className="text-center">
                 <div className="mx-auto mb-2.5 grid size-11 place-items-center rounded-xl bg-sb-surface-3 text-sb-600">
                   <Ico name="plus" size={20} />
                 </div>
                 <div className="font-semibold">{t("cuentas.newSecondary")}</div>
-                <div className="mt-0.5 text-[12px]">{t("cuentas.newSecondarySub")}</div>
+                <div className="mt-0.5 text-[0.75rem]">{t("cuentas.newSecondarySub")}</div>
               </div>
             </button>
           </div>
@@ -198,7 +198,7 @@ function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onCl
 
   return (
     <Sheet width={460} onClose={onClose} eyebrow={t("cuentas.dialog.eyebrow")} title={t("cuentas.dialog.title")}>
-      <div className="flex items-start gap-2.5 rounded-sb-md border border-sb-border bg-sb-info-soft p-3 text-[13px] text-sb-info">
+      <div className="flex items-start gap-2.5 rounded-sb-md border border-sb-border bg-sb-info-soft p-3 text-[0.8125rem] text-sb-info">
         <Ico name="info" size={16} className="mt-0.5 shrink-0" />
         <span>{t("cuentas.dialog.info")}</span>
       </div>
@@ -210,7 +210,7 @@ function CreateAccountDialog({ uuid, onClose, onCreated }: { uuid?: string; onCl
         <Label htmlFor="acc-image">{t("cuentas.dialog.imageLabel")}</Label>
         <ImagePicker value={image} onChange={setImage} />
       </div>
-      {error && <div className="text-[13px] font-medium text-sb-neg">{error}</div>}
+      {error && <div className="text-[0.8125rem] font-medium text-sb-neg">{error}</div>}
       <div className="mt-auto flex justify-end gap-2">
         <Button variant="ghost" onClick={onClose} disabled={createAccount.isPending}>{t("common.cancel")}</Button>
         <Button variant="primary" onClick={submit} disabled={createAccount.isPending || !name.trim()}>{createAccount.isPending ? t("cuentas.dialog.creating") : t("cuentas.dialog.create")}</Button>
@@ -260,7 +260,7 @@ function EditAccountDialog({ account, uuid, onClose, onSaved }: { account: SBAcc
         <Label htmlFor="edit-acc-image">{t("cuentas.dialog.imageLabel")}</Label>
         <ImagePicker value={image} onChange={setImage} currentUrl={account.image || undefined} />
       </div>
-      {error && <div className="text-[13px] font-medium text-sb-neg">{error}</div>}
+      {error && <div className="text-[0.8125rem] font-medium text-sb-neg">{error}</div>}
       <div className="mt-auto flex justify-end gap-2">
         <Button variant="ghost" onClick={onClose} disabled={updateAccount.isPending}>{t("common.cancel")}</Button>
         <Button variant="primary" onClick={submit} disabled={updateAccount.isPending || !dirty || !name.trim()}>{updateAccount.isPending ? t("cuentas.dialog.saving") : t("cuentas.dialog.save")}</Button>

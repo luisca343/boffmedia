@@ -36,15 +36,15 @@ export function FeedbackCell({ fb, children, label }: FeedbackCellProps) {
   return (
     <div
       className={cn(
-        "ar-scanlines flex min-h-[46px] flex-col items-center justify-center gap-0.5 rounded-lg border px-1.5 py-1 text-center",
+        "ar-scanlines flex min-h-[2.875rem] flex-col items-center justify-center gap-0.5 rounded-lg border px-1.5 py-1 text-center",
         FEED_SKIN[fb.state],
       )}
     >
-      <span className="font-ar-display text-[7px] uppercase tracking-[0.1em] text-ar-ink-muted md:hidden">
+      <span className="font-ar-display text-[0.4375rem] uppercase tracking-[0.1em] text-ar-ink-muted md:hidden">
         {label}
       </span>
       <span className="inline-flex items-center gap-1">
-        <span className="font-ar-mono text-[11px] font-bold uppercase leading-tight tabular-nums">
+        <span className="font-ar-mono text-[0.6875rem] font-bold uppercase leading-tight tabular-nums">
           {children}
         </span>
         {fb.dir && <Icon.Chevron s={12} dir={fb.dir} />}

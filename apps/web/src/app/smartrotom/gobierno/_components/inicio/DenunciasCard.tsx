@@ -39,7 +39,7 @@ export function DenunciasCard() {
       {isLoading ? (
         <div className="space-y-2 p-4">
           {Array.from({ length: 4 }, (_, i) => (
-            <Skeleton key={i} className="h-[52px]" />
+            <Skeleton key={i} className="h-[3.25rem]" />
           ))}
         </div>
       ) : recientes.length === 0 ? (
@@ -55,7 +55,7 @@ export function DenunciasCard() {
             return (
               <div
                 key={d.id}
-                className="flex items-center gap-3 border-b border-gt-line-soft px-4 py-[11px] last:border-b-0"
+                className="flex items-center gap-3 border-b border-gt-line-soft px-4 py-[0.6875rem] last:border-b-0"
               >
                 <button
                   type="button"
@@ -66,12 +66,12 @@ export function DenunciasCard() {
                   <Avatar user={d.accused?.username} size={34} />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-gt-mono text-[11px] text-gt-ink-400">{d.code}</span>
-                      <span className="truncate text-[13px] font-bold text-gt-ink-900">
+                      <span className="font-gt-mono text-[0.6875rem] text-gt-ink-400">{d.code}</span>
+                      <span className="truncate text-[0.8125rem] font-bold text-gt-ink-900">
                         {d.accused?.username ?? t("denuncias.sinIdentificar")}
                       </span>
                     </div>
-                    <div className="mt-0.5 truncate text-[12px] text-gt-ink-500">{d.description}</div>
+                    <div className="mt-0.5 truncate text-[0.75rem] text-gt-ink-500">{d.description}</div>
                   </div>
                 </button>
                 {status && <Badge tone={status.tone}>{t(status.labelKey)}</Badge>}

@@ -42,7 +42,7 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
       }
     >
       <div
-        className="mx-auto mb-4 grid h-[132px] w-[132px] place-items-center overflow-hidden rounded-[18px] border-2"
+        className="mx-auto mb-4 grid h-[8.25rem] w-[8.25rem] place-items-center overflow-hidden rounded-[18px] border-2"
         style={{
           background: `radial-gradient(60% 60% at 50% 40%, ${skin.fg}33, transparent 70%)`,
           borderColor: skin.fg,
@@ -53,7 +53,7 @@ export function ItemDetailModal({ item, onClose }: ItemDetailModalProps) {
       </div>
 
       <Panel tone="deep" tight className="mb-3">
-        <dl className="grid grid-cols-2 gap-y-2.5 font-ar-mono text-[11px]">
+        <dl className="grid grid-cols-2 gap-y-2.5 font-ar-mono text-[0.6875rem]">
           <dt className="uppercase tracking-[0.12em] text-ar-ink-muted">{t("coleccion.detail.quantity")}</dt>
           <dd className="text-right tabular-nums text-ar-amber">×{remaining(item)}</dd>
 

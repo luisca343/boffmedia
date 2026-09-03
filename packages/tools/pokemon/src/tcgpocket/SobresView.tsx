@@ -31,13 +31,13 @@ function PackDetail({ set, pack, effective, onBack, onOpenCard }: {
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
       <div className="mb-5"><Button size="sm" variant="ghost" icon="back" onClick={onBack}>{t("app.sobres.title")}</Button></div>
       <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-[auto_1fr]">
-        <div className="mx-auto w-[190px] md:mx-0">
+        <div className="mx-auto w-[11.875rem] md:mx-0">
           <TcgPackTile setId={set.id} name={pack} meta={set.name} hue={typeColor("fire")} onOpen={() => {}} />
         </div>
         <div className="grid gap-5">
           <div>
-            <h2 className="font-display text-[24px] font-bold uppercase leading-none text-txt">{pack}</h2>
-            <p className="mt-1 text-[14px] leading-relaxed text-txt-muted">{set.id} · {set.name} · {t("app.sobres.cardCount", { count: cards.length })}</p>
+            <h2 className="font-display text-[1.5rem] font-bold uppercase leading-none text-txt">{pack}</h2>
+            <p className="mt-1 text-[0.875rem] leading-relaxed text-txt-muted">{set.id} · {set.name} · {t("app.sobres.cardCount", { count: cards.length })}</p>
           </div>
           <Panel title={t("app.sobres.packCards")} aside={<span className="mono-label">{cards.length}</span>}>
             {cards.length === 0 ? (
@@ -66,18 +66,18 @@ export function SobresView({ data, effective, initialSetId, onOpenCard }: Props)
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
       {/* No header, by the same rule as CartasView. */}
-      <p className="mb-5 max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">
+      <p className="mb-5 max-w-[58ch] text-pretty text-[0.9375rem] leading-[1.5] text-txt-muted">
         {t("app.sobres.lead")}
       </p>
 
       {sets.map((s) => (
-        <section key={s.id} className="mb-[26px]">
-          <div className="mb-3 flex items-center gap-[9px]">
-            <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--accent)] bg-accent px-[7px] py-1 font-display text-[12px] font-bold leading-none text-accent-ink">{s.id}</span>
-            <h2 className="font-display text-[18px] font-bold uppercase leading-none tracking-[0.03em] text-txt">{s.name}</h2>
+        <section key={s.id} className="mb-[1.625rem]">
+          <div className="mb-3 flex items-center gap-[0.5625rem]">
+            <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--accent)] bg-accent px-[0.4375rem] py-1 font-display text-[0.75rem] font-bold leading-none text-accent-ink">{s.id}</span>
+            <h2 className="font-display text-[1.125rem] font-bold uppercase leading-none tracking-[0.03em] text-txt">{s.name}</h2>
           </div>
           {s.packs.length === 0 ? (
-            <p className="text-[13px] text-txt-dim">{t("app.sobres.noPacks")}</p>
+            <p className="text-[0.8125rem] text-txt-dim">{t("app.sobres.noPacks")}</p>
           ) : (
             <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
               {s.packs.map((p, i) => (

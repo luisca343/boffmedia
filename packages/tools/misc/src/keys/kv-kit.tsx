@@ -16,7 +16,7 @@ export function KvStatus({ given, label }: { given: boolean; label: string }) {
     <span
       style={clip}
       className={cn("cut cut-edge-slant [--cut:4px]", 
-        "inline-flex items-center gap-[7px] border px-[9px] py-[6px] font-mono text-[9.5px] font-bold uppercase leading-none tracking-[0.1em] " +
+        "inline-flex items-center gap-[0.4375rem] border px-[0.5625rem] py-[0.375rem] font-mono text-[0.59375rem] font-bold uppercase leading-none tracking-[0.1em] " +
         (given
           ? "border-[color-mix(in_srgb,var(--warn)_28%,transparent)] bg-[color-mix(in_srgb,var(--warn)_8%,transparent)] text-txt-dim"
           : "border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft text-ok")
@@ -52,8 +52,8 @@ export function KvVia({ source, sm }: { source: string; sm?: boolean }) {
   return (
     <span
       className={
-        "inline-flex items-center gap-[7px] border font-mono font-semibold uppercase leading-none " +
-        (sm ? "px-[7px] py-[5px] text-[9.5px] tracking-[0.06em]" : "px-[9px] py-[6px] text-[10px] tracking-[0.08em]") +
+        "inline-flex items-center gap-[0.4375rem] border font-mono font-semibold uppercase leading-none " +
+        (sm ? "px-[0.4375rem] py-[0.3125rem] text-[0.59375rem] tracking-[0.06em]" : "px-[0.5625rem] py-[0.375rem] text-[0.625rem] tracking-[0.08em]") +
         " " +
         tone
       }
@@ -102,21 +102,21 @@ export function KvCard({
       <div className="relative aspect-[460/200] border-b border-line">
         <KvArt src={item.imageUrl} name={item.name} />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--panel)_80%,transparent),transparent_45%)]" />
-        <div className="absolute inset-x-[10px] top-[10px] z-[2] flex items-start justify-between gap-2">
+        <div className="absolute inset-x-[0.625rem] top-[0.625rem] z-[2] flex items-start justify-between gap-2">
           <KvStatus given={item.given} label={item.given ? deliveredLabel : availableLabel} />
           <KvVia source={item.source} sm />
         </div>
         {!item.given && item.count > 1 && (
-          <span className="absolute bottom-[10px] right-[10px] z-[2] inline-flex items-center gap-[6px] border border-line-2 bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] px-[8px] py-[5px] font-mono text-[10px] font-bold uppercase leading-none tracking-[0.06em] text-txt backdrop-blur-[4px]">
+          <span className="absolute bottom-[0.625rem] right-[0.625rem] z-[2] inline-flex items-center gap-[0.375rem] border border-line-2 bg-[color-mix(in_srgb,var(--bg)_82%,transparent)] px-[0.5rem] py-[0.3125rem] font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.06em] text-txt backdrop-blur-[4px]">
             <Icon name="layers" size={12} className="text-accent" />
             {item.count}
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-[10px] px-[16px] pb-[16px] pt-[14px]">
-        <span className="min-w-0 truncate font-display text-[19px] font-bold leading-[1.1] text-txt">{item.name}</span>
-        <div className="mt-auto flex items-center gap-[10px] border-t border-dashed border-line pt-[12px]">
-          <span className="font-mono text-[11px] font-bold uppercase leading-none tracking-[0.08em] text-txt-muted">{cta}</span>
+      <div className="flex flex-1 flex-col gap-[0.625rem] px-[1rem] pb-[1rem] pt-[0.875rem]">
+        <span className="min-w-0 truncate font-display text-[1.1875rem] font-bold leading-[1.1] text-txt">{item.name}</span>
+        <div className="mt-auto flex items-center gap-[0.625rem] border-t border-dashed border-line pt-[0.75rem]">
+          <span className="font-mono text-[0.6875rem] font-bold uppercase leading-none tracking-[0.08em] text-txt-muted">{cta}</span>
           <Icon
             name="arrow"
             size={17}
@@ -132,8 +132,8 @@ export function KvCard({
 export function KvInfo({ game, t }: { game: SteamGame; t: KvModalStrings }) {
   const desc = (game.shortDescription || "").trim()
   return (
-    <div className="grid gap-[16px]">
-      {desc && <p className="text-pretty text-[14px] leading-[1.55] text-txt-muted">{desc}</p>}
+    <div className="grid gap-[1rem]">
+      {desc && <p className="text-pretty text-[0.875rem] leading-[1.55] text-txt-muted">{desc}</p>}
       <div className="grid grid-cols-2 gap-px border border-line bg-line max-[600px]:grid-cols-1">
         <SteamFact k={t.developer}>{game.developers?.join(", ") || "—"}</SteamFact>
         <SteamFact k={t.publisher}>{game.publishers?.join(", ") || "—"}</SteamFact>
@@ -141,11 +141,11 @@ export function KvInfo({ game, t }: { game: SteamGame; t: KvModalStrings }) {
         <SteamFact k={t.platforms}>{platformList(game.platforms)}</SteamFact>
       </div>
       {game.genres?.length > 0 && (
-        <div className="grid gap-[8px]">
-          <span className="font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim">{t.genres}</span>
-          <div className="flex flex-wrap gap-[6px]">
+        <div className="grid gap-[0.5rem]">
+          <span className="font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim">{t.genres}</span>
+          <div className="flex flex-wrap gap-[0.375rem]">
             {game.genres.map((g) => (
-              <span key={g} className="border border-line-2 bg-panel-2 px-[8px] py-[5px] font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.05em] text-txt-muted">
+              <span key={g} className="border border-line-2 bg-panel-2 px-[0.5rem] py-[0.3125rem] font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.05em] text-txt-muted">
                 {g}
               </span>
             ))}
@@ -175,19 +175,19 @@ export function KvPrice({ game, t }: { game: SteamGame; t: KvModalStrings }) {
   const hasDiscount = game.discountPercent > 0 && game.normalPrice !== game.currentPrice && !isMissing(game.currentPrice)
   const missing = isMissing(game.currentPrice) && !free
   return (
-    <div className="flex flex-col items-start gap-[10px] border border-line bg-panel-2 p-[22px]">
+    <div className="flex flex-col items-start gap-[0.625rem] border border-line bg-panel-2 p-[1.375rem]">
       {hasDiscount && (
-        <div className="inline-flex items-center gap-[12px]">
-          <span className="border border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft px-[9px] py-[6px] font-display text-[16px] font-extrabold italic leading-none text-ok">
+        <div className="inline-flex items-center gap-[0.75rem]">
+          <span className="border border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft px-[0.5625rem] py-[0.375rem] font-display text-[1rem] font-extrabold italic leading-none text-ok">
             -{game.discountPercent}%
           </span>
-          <span className="font-mono text-[15px] leading-none text-txt-dim line-through">{game.normalPrice}</span>
+          <span className="font-mono text-[0.9375rem] leading-none text-txt-dim line-through">{game.normalPrice}</span>
         </div>
       )}
-      <span className={"font-display text-[44px] font-extrabold italic leading-[0.9] " + (free ? "text-ok" : "text-accent")}>
+      <span className={"font-display text-[2.75rem] font-extrabold italic leading-[0.9] " + (free ? "text-ok" : "text-accent")}>
         {free ? t.free : missing ? "—" : game.currentPrice}
       </span>
-      <span className="font-mono text-[11px] font-medium uppercase leading-none tracking-[0.06em] text-txt-muted">
+      <span className="font-mono text-[0.6875rem] font-medium uppercase leading-none tracking-[0.06em] text-txt-muted">
         {free ? t.freeNote : missing ? t.priceUnknown : hasDiscount ? t.priceNow : t.priceSteam}
       </span>
     </div>
@@ -255,25 +255,25 @@ export function KeyModal({
   const hero = game?.headerImage || item.imageUrl
 
   return (
-    <div className="fixed inset-0 z-[200] grid place-items-center p-[20px]" role="dialog" aria-modal="true" aria-label={item.name}>
+    <div className="fixed inset-0 z-[200] grid place-items-center p-[1.25rem]" role="dialog" aria-modal="true" aria-label={item.name}>
       <button type="button" aria-label={tc("close")} onClick={onClose} className="absolute inset-0 cursor-default border-0 bg-[rgba(0,0,0,0.62)] p-0 backdrop-blur-[3px]" />
       <div
-        className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:18px] relative max-h-[92vh] w-[min(600px,100%)] overflow-y-auto border border-line-2 border-t-[3px] border-t-accent bg-panel animate-[bm-modal-in_var(--t-med,180ms)] motion-reduce:animate-none bm-scroll"
+        className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:18px] relative max-h-[92vh] w-[min(37.5rem,100%)] overflow-y-auto border border-line-2 border-t-[3px] border-t-accent bg-panel animate-[bm-modal-in_var(--t-med,180ms)] motion-reduce:animate-none bm-scroll"
       >
-        <IconButton name="x" label={tc("close")} onClick={onClose} className="absolute right-[14px] top-[14px] z-[3]" />
+        <IconButton name="x" label={tc("close")} onClick={onClose} className="absolute right-[0.875rem] top-[0.875rem] z-[3]" />
         <div className="relative aspect-[460/172] border-b border-line">
           <KvArt src={hero} name={item.name} />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,var(--panel),transparent_55%)]" />
         </div>
-        <div className="grid gap-[14px] px-[22px] pt-[16px]">
-          <div className="flex items-start justify-between gap-[14px]">
+        <div className="grid gap-[0.875rem] px-[1.375rem] pt-[1rem]">
+          <div className="flex items-start justify-between gap-[0.875rem]">
             <div className="min-w-0">
-              <h3 className="font-display text-[26px] font-extrabold not-italic uppercase leading-none tracking-[-0.005em] text-txt">{game?.name || item.name}</h3>
-              <div className="mt-[10px] flex flex-wrap items-center gap-[8px]">
+              <h3 className="font-display text-[1.625rem] font-extrabold not-italic uppercase leading-none tracking-[-0.005em] text-txt">{game?.name || item.name}</h3>
+              <div className="mt-[0.625rem] flex flex-wrap items-center gap-[0.5rem]">
                 <KvStatus given={item.given} label={item.given ? t.delivered : t.available} />
                 <KvVia source={item.source} sm />
                 {!item.given && item.count > 1 && (
-                  <span className="inline-flex items-center gap-[6px] border border-line-2 px-[8px] py-[5px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted">
+                  <span className="inline-flex items-center gap-[0.375rem] border border-line-2 px-[0.5rem] py-[0.3125rem] font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted">
                     <Icon name="layers" size={12} className="text-accent" />
                     {item.count} {t.stock}
                   </span>
@@ -294,11 +294,11 @@ export function KeyModal({
             />
           </div>
         </div>
-        <div className="grid min-h-[200px] gap-[16px] px-[22px] pb-[22px] pt-[16px]">
+        <div className="grid min-h-[12.5rem] gap-[1rem] px-[1.375rem] pb-[1.375rem] pt-[1rem]">
           {loading || !game ? (
-            <div className="grid place-items-center py-[60px] text-txt-dim">
+            <div className="grid place-items-center py-[3.75rem] text-txt-dim">
               <Icon name="refresh" size={28} className="animate-spin" />
-              <span className="mt-3 font-mono text-[11px] uppercase tracking-[0.1em]">{t.loading}</span>
+              <span className="mt-3 font-mono text-[0.6875rem] uppercase tracking-[0.1em]">{t.loading}</span>
             </div>
           ) : (
             <>
@@ -307,7 +307,7 @@ export function KeyModal({
               {tab === "media" && <KvGallery media={game.media} name={game.name} />}
             </>
           )}
-          <div className="mt-[4px] flex flex-wrap gap-[10px] border-t border-line pt-[16px]">
+          <div className="mt-[0.25rem] flex flex-wrap gap-[0.625rem] border-t border-line pt-[1rem]">
             <Button variant="ghost" icon="external" href={`https://store.steampowered.com/app/${item.steamID}`}>
               {t.viewSteam}
             </Button>

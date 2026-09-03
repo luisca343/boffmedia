@@ -7,9 +7,9 @@ import type { SrtWheelSegment } from "./draw-stage"
 
 /** Wheel width per stage size — shared so a preview matches the live draw. */
 export const SRT_WHEEL_SIZES = {
-  default: "max-w-[420px]",
+  default: "max-w-[26.25rem]",
   // `large` IS presentation mode: size off the viewport height (the wheel is square).
-  large: "max-w-[min(78vh,900px)]",
+  large: "max-w-[min(78vh,56.25rem)]",
 } as const
 
 export interface SrtWheelSvgProps {

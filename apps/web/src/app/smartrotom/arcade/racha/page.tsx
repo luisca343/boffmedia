@@ -61,10 +61,10 @@ export default function RachaPage() {
   if (streak.isLoading || banner.isLoading) {
     return (
       <div className="space-y-5">
-        <Skeleton className="h-[220px] rounded-2xl" />
+        <Skeleton className="h-[13.75rem] rounded-2xl" />
         <div className="grid grid-cols-7 gap-3">
           {Array.from({ length: 7 }, (_, i) => (
-            <Skeleton key={i} className="h-[140px] rounded-[14px]" />
+            <Skeleton key={i} className="h-[8.75rem] rounded-[14px]" />
           ))}
         </div>
       </div>
@@ -79,25 +79,25 @@ export default function RachaPage() {
         <div aria-hidden className="ar-horizon opacity-45" />
         <Corners tone="cyan" inset={10} size={14} />
 
-        <div className="relative z-[2] grid items-center gap-6 lg:grid-cols-[1fr_360px]">
+        <div className="relative z-[2] grid items-center gap-6 lg:grid-cols-[1fr_22.5rem]">
           <div>
-            <div className="mb-2.5 font-ar-display text-[10px] uppercase tracking-[0.18em] text-ar-cyan">
+            <div className="mb-2.5 font-ar-display text-[0.625rem] uppercase tracking-[0.18em] text-ar-cyan">
               {t("streak.kicker", {
                 banner: streak.data?.currentBanner ?? banner.data?.name ?? "",
               })}
             </div>
-            <h1 className="ar-chrom font-ar-display text-[26px] leading-tight text-ar-ink">
+            <h1 className="ar-chrom font-ar-display text-[1.625rem] leading-tight text-ar-ink">
               {t.rich("streak.dayHeading", {
                 current: currentDay,
                 total: totalDays,
                 muted: (chunks) => <span className="text-ar-ink-muted">{chunks}</span>,
               })}
             </h1>
-            <p className="mt-3 max-w-[520px] font-ar text-[13px] leading-relaxed text-ar-ink-dim">
+            <p className="mt-3 max-w-[32.5rem] font-ar text-[0.8125rem] leading-relaxed text-ar-ink-dim">
               {t("streak.claimDescription")}
             </p>
 
-            <div className="mt-[18px] flex flex-wrap items-center gap-2.5">
+            <div className="mt-[1.125rem] flex flex-wrap items-center gap-2.5">
               {claimedToday ? (
                 <Tag tone="lime" size="lg">
                   <Icon.Shield s={14} /> {t("streak.dayClaimed", { day: currentDay })}
@@ -132,21 +132,21 @@ export default function RachaPage() {
             </div>
 
             {claim.isError && (
-              <p role="alert" className="mt-3 font-ar-mono text-[11px] text-ar-danger">
+              <p role="alert" className="mt-3 font-ar-mono text-[0.6875rem] text-ar-danger">
                 {t("streak.claimError")}
               </p>
             )}
           </div>
 
           {todayView && (
-            <div className="relative rounded-[14px] border border-ar-cyan/30 bg-black/40 p-[18px]">
-              <div className="mb-2.5 text-center font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
+            <div className="relative rounded-[14px] border border-ar-cyan/30 bg-black/40 p-[1.125rem]">
+              <div className="mb-2.5 text-center font-ar-display text-[0.5625rem] uppercase tracking-[0.18em] text-ar-cyan">
                 {t("streak.rewardReady")}
               </div>
               <div className="mx-auto grid h-24 w-24 place-items-center overflow-hidden rounded-[18px] border border-ar-cyan/40 bg-[radial-gradient(60%_60%_at_50%_40%,rgb(var(--ar-cyan)/.2),transparent_70%)] shadow-[inset_0_0_30px_rgb(var(--ar-cyan)/.3)] motion-reduce:animate-none animate-ar-float">
                 {todayView.art}
               </div>
-              <div className="ar-chrom mt-3 text-center font-ar-display text-[13px] leading-relaxed text-ar-ink">
+              <div className="ar-chrom mt-3 text-center font-ar-display text-[0.8125rem] leading-relaxed text-ar-ink">
                 {todayView.label}
               </div>
             </div>

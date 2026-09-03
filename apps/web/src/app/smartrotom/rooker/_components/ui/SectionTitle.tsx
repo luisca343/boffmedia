@@ -15,7 +15,7 @@ export interface SectionTitleProps {
 export function SectionTitle({ icon, title, action }: SectionTitleProps) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <h2 className="flex items-center gap-2 text-[20px] font-extrabold tracking-[-.01em] text-rk-fg">
+      <h2 className="flex items-center gap-2 text-[1.25rem] font-extrabold tracking-[-.01em] text-rk-fg">
         <Icon name={icon} size={16} className="flex-none text-rk-accent" />
         {title}
       </h2>

@@ -24,7 +24,7 @@ export function Home() {
     return (
       <>
         <ChipRail />
-        <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-5 md:px-10">
+        <div className="mx-auto max-w-[102.5rem] px-4 pb-20 pt-5 md:px-10">
           <StreamSection title={t("home.searchResults", { q })} streams={results} loading={search.isLoading} />
         </div>
       </>
@@ -53,7 +53,7 @@ export function Home() {
           }}
         />
       )}
-      <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-5 md:px-10">
+      <div className="mx-auto max-w-[102.5rem] px-4 pb-20 pt-5 md:px-10">
         <StreamSection eyebrow={t("home.liveEyebrow")} title={t("home.popularLive")} streams={rest} loading={top.isLoading} />
         {top.isError && (
           <p className="py-4 text-center text-sm text-mw-fg-faint">

@@ -36,7 +36,7 @@ export function ParticipantStack({ players, max = 8, size = 38 }: { players: Pla
       {extra > 0 && (
         <span
           className={cn(
-            "-ml-2.5 grid flex-none place-items-center border border-solid border-accent-line [--cut-line:var(--accent-line)] bg-panel-2 font-mono text-[12px]/none font-bold text-accent shadow-[0_0_0_2px_var(--panel)]",
+            "-ml-2.5 grid flex-none place-items-center border border-solid border-accent-line [--cut-line:var(--accent-line)] bg-panel-2 font-mono text-[0.75rem]/none font-bold text-accent shadow-[0_0_0_2px_var(--panel)]",
             CUT_MORE,
           )}
           style={{ width: size, height: size }}
@@ -61,14 +61,14 @@ export function LeaderTable({
   highlight?: number | null
   offset?: number
 }) {
-  const th = "border-b-2 border-solid border-line-2 bg-panel-2 px-4 py-[13px] text-left font-mono text-[10px]/none font-semibold uppercase tracking-[0.13em] text-txt-muted whitespace-nowrap"
-  const td = "border-b border-solid border-line px-4 py-[11px] last:[&]:border-b-0"
+  const th = "border-b-2 border-solid border-line-2 bg-panel-2 px-4 py-[0.8125rem] text-left font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.13em] text-txt-muted whitespace-nowrap"
+  const td = "border-b border-solid border-line px-4 py-[0.6875rem] last:[&]:border-b-0"
   return (
     <div className="overflow-x-auto border border-solid border-line">
-      <table className="w-full min-w-[520px] border-collapse bg-panel">
+      <table className="w-full min-w-[32.5rem] border-collapse bg-panel">
         <thead>
           <tr>
-            <th className={cn(th, "w-[56px]")}>#</th>
+            <th className={cn(th, "w-[3.5rem]")}>#</th>
             <th className={th}>Jugador</th>
             {showGame && <th className={th}>Juego</th>}
             <th className={cn(th, "text-center")}>Logros</th>
@@ -98,27 +98,27 @@ export function LeaderTable({
                 )}
               >
                 <td className={cn(td, "text-center")}>
-                  <span className={cn("inline-grid h-[30px] w-[30px] place-items-center font-display text-[17px]/none font-extrabold italic text-txt-muted", rankCls)}>{rank}</span>
+                  <span className={cn("inline-grid h-[1.875rem] w-[1.875rem] place-items-center font-display text-[1.0625rem]/none font-extrabold italic text-txt-muted", rankCls)}>{rank}</span>
                 </td>
                 <td className={td}>
                   <span className="inline-flex items-center gap-3">
-                    <Avatar accent={rank <= 3} className="h-8 w-8 text-[12px]">{p.avatar}</Avatar>
-                    <b className="font-display text-[16px]/none font-bold uppercase tracking-[0.01em]">{p.nickname}</b>
+                    <Avatar accent={rank <= 3} className="h-8 w-8 text-[0.75rem]">{p.avatar}</Avatar>
+                    <b className="font-display text-[1rem]/none font-bold uppercase tracking-[0.01em]">{p.nickname}</b>
                   </span>
                 </td>
                 {showGame && (
                   <td className={td}>
                     <span
                       style={{ ["--ghue" as string]: evHue(p.hue) }}
-                      className="inline-block border border-solid border-[color:color-mix(in_srgb,var(--ghue)_45%,var(--line))] px-2 py-[5px] font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] text-[color:var(--ghue)]"
+                      className="inline-block border border-solid border-[color:color-mix(in_srgb,var(--ghue)_45%,var(--line))] px-2 py-[0.3125rem] font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.08em] text-[color:var(--ghue)]"
                     >
                       {p.gameShort || "—"}
                     </span>
                   </td>
                 )}
-                <td className={cn(td, "text-center font-mono text-[14px]/none font-medium")}>{p.achievementCount}</td>
-                <td className={cn(td, "text-center font-mono text-[14px]/none font-medium")}>{p.medalCount}</td>
-                <td className={cn(td, "text-right font-mono text-[15px]/none font-semibold")}>{evNum(p.totalPoints)}</td>
+                <td className={cn(td, "text-center font-mono text-[0.875rem]/none font-medium")}>{p.achievementCount}</td>
+                <td className={cn(td, "text-center font-mono text-[0.875rem]/none font-medium")}>{p.medalCount}</td>
+                <td className={cn(td, "text-right font-mono text-[0.9375rem]/none font-semibold")}>{evNum(p.totalPoints)}</td>
               </tr>
             )
           })}
@@ -134,21 +134,21 @@ export function PlayerLine({ player, rank }: { player: PlayerLike; rank: number 
   return (
     <div
       className={cn(
-        "flex items-center gap-[14px] border border-solid bg-panel px-4 py-[11px]",
+        "flex items-center gap-[0.875rem] border border-solid bg-panel px-4 py-[0.6875rem]",
         top ? "border-accent-line bg-[linear-gradient(90deg,var(--accent-soft),transparent_60%)]" : "border-line",
       )}
     >
-      <span className={cn("w-[30px] flex-none font-display text-[22px]/none font-extrabold italic", top ? "text-accent" : "text-txt-muted")}>{String(rank).padStart(2, "0")}</span>
+      <span className={cn("w-[1.875rem] flex-none font-display text-[1.375rem]/none font-extrabold italic", top ? "text-accent" : "text-txt-muted")}>{String(rank).padStart(2, "0")}</span>
       <Avatar accent={top}>{player.avatar}</Avatar>
       <div className="min-w-0 flex-1">
-        <span className="block font-display text-[17px]/[1.1] font-bold uppercase">{player.nickname}</span>
-        <span className="mt-[3px] block font-mono text-[10px]/none font-medium uppercase tracking-[0.06em] text-txt-muted">
+        <span className="block font-display text-[1.0625rem]/[1.1] font-bold uppercase">{player.nickname}</span>
+        <span className="mt-[3px] block font-mono text-[0.625rem]/none font-medium uppercase tracking-[0.06em] text-txt-muted">
           {player.medalCount} medallas · {player.achievementCount} logros
         </span>
       </div>
-      <span className="ml-auto flex-none font-mono text-[15px]/none font-semibold">
+      <span className="ml-auto flex-none font-mono text-[0.9375rem]/none font-semibold">
         {evNum(player.totalPoints)}
-        <small className="ml-1 text-[10px] text-txt-muted">pts</small>
+        <small className="ml-1 text-[0.625rem] text-txt-muted">pts</small>
       </span>
     </div>
   )
@@ -159,7 +159,7 @@ export function Podium({ players }: { players: PlayerLike[] }) {
   const top = players.slice(0, 3)
   const order = [top[1], top[0], top[2]].filter(Boolean) as PlayerLike[]
   return (
-    <div className="mx-auto grid max-w-[760px] grid-cols-3 items-end gap-4 max-[720px]:max-w-[380px] max-[720px]:grid-cols-1">
+    <div className="mx-auto grid max-w-[47.5rem] grid-cols-3 items-end gap-4 max-[720px]:max-w-[23.75rem] max-[720px]:grid-cols-1">
       {order.map((p) => {
         const place = top.indexOf(p) + 1
         const first = place === 1
@@ -168,18 +168,18 @@ export function Podium({ players }: { players: PlayerLike[] }) {
             key={p.userId}
             style={{ ["--ghue" as string]: evHue(p.hue) }}
             className={cn(
-              "relative flex flex-col items-center px-4 pb-[18px] pt-[46px] text-center",
+              "relative flex flex-col items-center px-4 pb-[1.125rem] pt-[2.875rem] text-center",
               "border border-solid bg-panel",
               first
-                ? "border-accent-line [--cut-line:var(--accent-line)] bg-[linear-gradient(to_bottom,var(--accent-soft),var(--panel)_60%)] pt-[54px]"
+                ? "border-accent-line [--cut-line:var(--accent-line)] bg-[linear-gradient(to_bottom,var(--accent-soft),var(--panel)_60%)] pt-[3.375rem]"
                 : "border-line [--cut-line:var(--line)]",
               CUT_POD,
-              "max-[720px]:flex-row max-[720px]:items-center max-[720px]:gap-[14px] max-[720px]:p-4 max-[720px]:text-left",
+              "max-[720px]:flex-row max-[720px]:items-center max-[720px]:gap-[0.875rem] max-[720px]:p-4 max-[720px]:text-left",
             )}
           >
             <span
               className={cn(
-                "absolute left-1/2 top-3 grid h-[34px] w-[34px] -translate-x-1/2 place-items-center font-display text-[18px]/none font-extrabold italic",
+                "absolute left-1/2 top-3 grid h-[2.125rem] w-[2.125rem] -translate-x-1/2 place-items-center font-display text-[1.125rem]/none font-extrabold italic",
                 first ? "bg-accent text-accent-ink [--cut-line:var(--accent)]" : "border border-solid border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt",
                 CUT_PLACE,
                 "max-[720px]:static max-[720px]:translate-x-0",
@@ -190,21 +190,21 @@ export function Podium({ players }: { players: PlayerLike[] }) {
             <Avatar
               accent
               className={cn(
-                "mb-3 max-[720px]:!m-0 max-[720px]:!h-12 max-[720px]:!w-12 max-[720px]:!text-[18px]",
-                first ? "!h-[74px] !w-[74px] !text-[28px]" : "!h-[60px] !w-[60px] !text-[22px]",
+                "mb-3 max-[720px]:!m-0 max-[720px]:!h-12 max-[720px]:!w-12 max-[720px]:!text-[1.125rem]",
+                first ? "!h-[4.625rem] !w-[4.625rem] !text-[1.75rem]" : "!h-[3.75rem] !w-[3.75rem] !text-[1.375rem]",
               )}
             >
               {p.avatar}
             </Avatar>
-            <span className="font-display text-[19px]/[1.05] font-bold uppercase">{p.nickname}</span>
+            <span className="font-display text-[1.1875rem]/[1.05] font-bold uppercase">{p.nickname}</span>
             {p.gameShort && (
-              <span className="mt-1.5 border border-solid border-[color:color-mix(in_srgb,var(--ghue)_45%,var(--line))] px-[7px] py-1 font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-[color:var(--ghue)]">
+              <span className="mt-1.5 border border-solid border-[color:color-mix(in_srgb,var(--ghue)_45%,var(--line))] px-[0.4375rem] py-1 font-mono text-[0.59375rem]/none font-semibold uppercase tracking-[0.1em] text-[color:var(--ghue)]">
                 {p.gameShort}
               </span>
             )}
-            <span className={cn("mt-3 font-display font-extrabold italic text-accent max-[720px]:ml-auto max-[720px]:mt-0", first ? "text-[32px]/none" : "text-[26px]/none")}>
+            <span className={cn("mt-3 font-display font-extrabold italic text-accent max-[720px]:ml-auto max-[720px]:mt-0", first ? "text-[2rem]/none" : "text-[1.625rem]/none")}>
               {evNum(p.totalPoints)}
-              <small className="mt-[5px] block font-mono text-[9px]/none font-medium uppercase not-italic tracking-[0.12em] text-txt-muted [-webkit-text-stroke:0]">pts</small>
+              <small className="mt-[0.3125rem] block font-mono text-[0.5625rem]/none font-medium uppercase not-italic tracking-[0.12em] text-txt-muted [-webkit-text-stroke:0]">pts</small>
             </span>
             <span
               className={cn(

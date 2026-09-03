@@ -96,9 +96,9 @@ export function LiveReportPanel({
     else onChanged()
   }
 
-  const pill = "inline-flex items-center gap-1.5 border border-solid px-[9px] py-[5px] font-mono text-[10px]/none font-bold uppercase tracking-[0.06em]"
-  const gbtn = "flex-1 cursor-pointer border border-solid border-line-2 bg-base px-2 py-[11px] font-body text-[13px]/none font-semibold text-txt-muted transition-colors enabled:hover:border-txt-muted enabled:hover:text-txt disabled:cursor-default"
-  const banner = "m-4 flex items-center gap-[11px] p-[14px] font-body text-[13px]/[1.45] [&>b]:font-bold"
+  const pill = "inline-flex items-center gap-1.5 border border-solid px-[0.5625rem] py-[0.3125rem] font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.06em]"
+  const gbtn = "flex-1 cursor-pointer border border-solid border-line-2 bg-base px-2 py-[0.6875rem] font-body text-[0.8125rem]/none font-semibold text-txt-muted transition-colors enabled:hover:border-txt-muted enabled:hover:text-txt disabled:cursor-default"
+  const banner = "m-4 flex items-center gap-[0.6875rem] p-[0.875rem] font-body text-[0.8125rem]/[1.45] [&>b]:font-bold"
   const locked = phase !== "edit"
 
   return (
@@ -120,9 +120,9 @@ export function LiveReportPanel({
 
       <div className={cn("grid gap-2.5 p-4", locked && "[&_button:not(.on)]:opacity-40")}>
         {Array.from({ length: bestOf }, (_, i) => (
-          <div key={i} className="grid grid-cols-[90px_1fr] items-center gap-4 max-[760px]:grid-cols-[70px_1fr]">
-            <span className="text-right font-mono text-[12px]/none font-bold uppercase tracking-[0.06em] text-txt-muted">{t("gameLabel", { n: i + 1 })}</span>
-            <div className="flex max-w-[300px] gap-2.5">
+          <div key={i} className="grid grid-cols-[5.625rem_1fr] items-center gap-4 max-[760px]:grid-cols-[4.375rem_1fr]">
+            <span className="text-right font-mono text-[0.75rem]/none font-bold uppercase tracking-[0.06em] text-txt-muted">{t("gameLabel", { n: i + 1 })}</span>
+            <div className="flex max-w-[18.75rem] gap-2.5">
               <button type="button" disabled={locked} onClick={() => setGame(i, "W")} className={cn(gbtn, shown[i] === "W" && "on border-ok bg-ok-soft text-ok")}>{t("win")}</button>
               <button type="button" disabled={locked} onClick={() => setGame(i, "L")} className={cn(gbtn, shown[i] === "L" && "on border-bad bg-bad-soft text-bad")}>{t("loss")}</button>
             </div>
@@ -132,7 +132,7 @@ export function LiveReportPanel({
 
       {phase === "edit" && (
         <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line bg-base px-4 py-3.5">
-          <span className={cn("font-body text-[14px]/[1.3]", decisive ? "font-bold text-txt" : "text-txt-dim")}>{decisive ? resultText : t("footerHint")}</span>
+          <span className={cn("font-body text-[0.875rem]/[1.3]", decisive ? "font-bold text-txt" : "text-txt-dim")}>{decisive ? resultText : t("footerHint")}</span>
           <Button variant="pri" size="sm" icon="check" disabled={!decisive || busy} onClick={submit}>{t("submit")}</Button>
         </div>
       )}
@@ -143,7 +143,7 @@ export function LiveReportPanel({
 
       {phase === "incoming" && proposal && (
         <div className="flex flex-wrap items-center justify-between gap-3.5 border-t border-solid border-line bg-base px-4 py-3.5">
-          <span className="font-body text-[14px]/[1.3] font-bold text-txt">
+          <span className="font-body text-[0.875rem]/[1.3] font-bold text-txt">
             {t("incomingScore", { oppName, score: `${gamesToMyScore(proposal.games, false)}-${gamesToMyScore(proposal.games, true)}` })}
           </span>
           <span className="inline-flex gap-2.5">
@@ -219,17 +219,17 @@ function AwaitingFoot({
 
   const fmt = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`
   return (
-    <div className="grid gap-[9px] border-t border-solid border-line bg-base px-4 py-3.5">
+    <div className="grid gap-[0.5625rem] border-t border-solid border-line bg-base px-4 py-3.5">
       <div className="flex flex-wrap items-center justify-between gap-3.5">
-        <span className="font-body text-[14px]/[1.3] font-bold text-txt">{t("awaitingReported", { score: mine })}</span>
-        <span className="inline-flex items-center gap-1.5 font-mono text-[12px]/none text-warn">
+        <span className="font-body text-[0.875rem]/[1.3] font-bold text-txt">{t("awaitingReported", { score: mine })}</span>
+        <span className="inline-flex items-center gap-1.5 font-mono text-[0.75rem]/none text-warn">
           <Icon name="clock" size={12} />{t("awaitingCountdownLabel")} <b className="font-bold">{fmt(left)}</b>
         </span>
       </div>
       <div className="h-1 overflow-hidden bg-line">
         <i className="block h-full bg-warn transition-[width] duration-1000 ease-linear" style={{ width: `${(left / (total.current || 1)) * 100}%` }} />
       </div>
-      <p className="m-0 max-w-[68ch] font-body text-[11.5px]/[1.5] text-txt-muted">
+      <p className="m-0 max-w-[68ch] font-body text-[0.71875rem]/[1.5] text-txt-muted">
         {t("awaitingNote", { oppName })}
       </p>
     </div>

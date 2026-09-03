@@ -207,7 +207,7 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
       {children}
       {drag?.active && drag.items[0] && (
         <div
-          className="pointer-events-none fixed z-[9999] h-[78px] w-[78px] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] scale-105 drop-shadow-[0_12px_14px_rgb(0_0_0_/_.6)]"
+          className="pointer-events-none fixed z-[9999] h-[4.875rem] w-[4.875rem] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] scale-105 drop-shadow-[0_12px_14px_rgb(0_0_0_/_.6)]"
           style={{ left: drag.x, top: drag.y }}
         >
           <Sprite
@@ -217,7 +217,7 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
             className="h-full w-full"
           />
           {drag.multi && drag.items.length > 1 && (
-            <span className="absolute -right-2 -top-2 flex h-[22px] min-w-[22px] items-center justify-center rounded-pc-pill bg-pc-cyan px-1 font-pc-mono text-xs font-extrabold text-[#06222a] shadow-[0_4px_10px_rgb(0_0_0_/_.4)]">
+            <span className="absolute -right-2 -top-2 flex h-[1.375rem] min-w-[1.375rem] items-center justify-center rounded-pc-pill bg-pc-cyan px-1 font-pc-mono text-xs font-extrabold text-[#06222a] shadow-[0_4px_10px_rgb(0_0_0_/_.4)]">
               {drag.items.length}
             </span>
           )}

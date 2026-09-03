@@ -40,23 +40,23 @@ export function LegalDoc({ kicker, title, lead, updated, tocLabel, sections }: L
   }, [sections])
 
   return (
-    <main data-ds="boffmedia" className="wrap pb-[90px] pt-[34px]">
-      <div className="mb-[34px] max-w-[66ch]">
+    <main data-ds="boffmedia" className="wrap pb-[5.625rem] pt-[2.125rem]">
+      <div className="mb-[2.125rem] max-w-[66ch]">
         <span className="mono-label">{kicker}</span>
-        <h1 className="mb-4 mt-3 text-[clamp(46px,5.4vw,66px)]">{title}</h1>
-        <p className="font-body text-[18px]/[1.65] text-txt-muted text-pretty">{lead}</p>
+        <h1 className="mb-4 mt-3 text-[clamp(2.875rem,5.4vw,4.125rem)]">{title}</h1>
+        <p className="font-body text-[1.125rem]/[1.65] text-txt-muted text-pretty">{lead}</p>
         {updated && (
-          <div className="mt-5 inline-flex items-center gap-2 font-mono text-[11px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">
+          <div className="mt-5 inline-flex items-center gap-2 font-mono text-[0.6875rem]/none font-medium uppercase tracking-[0.1em] text-txt-muted">
             <Icon name="clock" size={14} className="text-accent" />
             {updated}
           </div>
         )}
       </div>
 
-      <div className="grid items-start gap-10 [grid-template-columns:236px_1fr] max-[900px]:grid-cols-1 max-[900px]:gap-6">
+      <div className="grid items-start gap-10 [grid-template-columns:14.75rem_1fr] max-[900px]:grid-cols-1 max-[900px]:gap-6">
         {/* sticky TOC */}
-        <aside className="sticky top-[92px] max-[900px]:static">
-          <span className="mb-3.5 block pl-3.5 font-mono text-[10px]/none font-semibold uppercase tracking-[0.16em] text-txt-dim">
+        <aside className="sticky top-[5.75rem] max-[900px]:static">
+          <span className="mb-3.5 block pl-3.5 font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.16em] text-txt-dim">
             {tocLabel ?? t("tocLabel")}
           </span>
           <nav className="grid border-l border-line max-[900px]:auto-cols-max max-[900px]:grid-flow-col max-[900px]:overflow-x-auto max-[900px]:border-l-0 max-[900px]:border-b max-[900px]:border-line">
@@ -67,12 +67,12 @@ export function LegalDoc({ kicker, title, lead, updated, tocLabel, sections }: L
                   key={s.id}
                   href={`#${s.id}`}
                   className={cn(
-                    "-ml-px flex items-baseline gap-2.5 border-l-2 border-transparent px-3.5 py-2.5 font-body text-[13px]/[1.35] no-underline transition-colors duration-[140ms]",
+                    "-ml-px flex items-baseline gap-2.5 border-l-2 border-transparent px-3.5 py-2.5 font-body text-[0.8125rem]/[1.35] no-underline transition-colors duration-[140ms]",
                     "max-[900px]:ml-0 max-[900px]:whitespace-nowrap max-[900px]:border-l-0 max-[900px]:border-b-2",
                     on ? "border-accent text-txt max-[900px]:border-b-accent" : "text-txt-muted hover:text-txt",
                   )}
                 >
-                  <span className={cn("flex-none font-mono text-[10px]/none font-semibold", on ? "text-accent" : "text-txt-dim")}>
+                  <span className={cn("flex-none font-mono text-[0.625rem]/none font-semibold", on ? "text-accent" : "text-txt-dim")}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
                   {s.title}
@@ -90,19 +90,19 @@ export function LegalDoc({ kicker, title, lead, updated, tocLabel, sections }: L
               id={s.id}
               className="mb-10 scroll-mt-[100px] border-b border-line pb-10 last-of-type:mb-0 last-of-type:border-b-0"
             >
-              <div className="mb-[18px] flex items-center gap-4">
-                <span className="grid h-11 w-11 flex-none place-items-center border border-solid border-accent-line bg-accent-soft font-display text-[20px]/none font-extrabold italic text-accent cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:9px]">
+              <div className="mb-[1.125rem] flex items-center gap-4">
+                <span className="grid h-11 w-11 flex-none place-items-center border border-solid border-accent-line bg-accent-soft font-display text-[1.25rem]/none font-extrabold italic text-accent cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:9px]">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <h2 className="text-[clamp(22px,3vw,27px)]/[1.02]">{s.title}</h2>
+                <h2 className="text-[clamp(1.375rem,3vw,1.6875rem)]/[1.02]">{s.title}</h2>
               </div>
               <div className="[&>*+*]:mt-4">
                 {s.body.map((b, j) =>
                   Array.isArray(b) ? (
-                    <ul key={j} className="grid gap-[11px]">
+                    <ul key={j} className="grid gap-[0.6875rem]">
                       {b.map((li, k) => (
-                        <li key={k} className="relative pl-[30px] font-body text-[16px]/[1.6] text-txt text-pretty">
-                          <span className="absolute left-0 top-[3px] grid h-[19px] w-[19px] place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:4px]">
+                        <li key={k} className="relative pl-[1.875rem] font-body text-[1rem]/[1.6] text-txt text-pretty">
+                          <span className="absolute left-0 top-[3px] grid h-[1.1875rem] w-[1.1875rem] place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:4px]">
                             <Icon name="check" size={12} />
                           </span>
                           {li}
@@ -110,7 +110,7 @@ export function LegalDoc({ kicker, title, lead, updated, tocLabel, sections }: L
                       ))}
                     </ul>
                   ) : (
-                    <p key={j} className="font-body text-[17px]/[1.7] text-txt text-pretty">
+                    <p key={j} className="font-body text-[1.0625rem]/[1.7] text-txt text-pretty">
                       {b}
                     </p>
                   ),

@@ -27,7 +27,7 @@ export function Toggle({
         "font-ft-ui inline-flex items-center gap-1.5",
         disabled ? "cursor-not-allowed opacity-55" : "cursor-pointer",
         "rounded-ft-pill border-ft-hair border-ft-ink px-2.5 py-1",
-        "text-[11px] font-bold uppercase tracking-[0.05em]",
+        "text-[0.6875rem] font-bold uppercase tracking-[0.05em]",
         "focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ft-pink",
         checked ? ON[tone] : "bg-white text-ft-ink",
       ].join(" ")}
@@ -35,7 +35,7 @@ export function Toggle({
       <span
         className={[
           "inline-flex h-3 w-3 items-center justify-center rounded-[4px]",
-          "border-ft-hair border-ft-ink text-[10px] font-black leading-none",
+          "border-ft-hair border-ft-ink text-[0.625rem] font-black leading-none",
           checked ? "bg-ft-ink text-ft-yellow" : "bg-transparent text-transparent",
         ].join(" ")}
         aria-hidden="true"

@@ -44,7 +44,7 @@ export function getEvolutionMethod(evolution: Evolution, t: any) {
   return (
     <div className="flex flex-col items-center gap-0.5 text-center">
       {conditions.map((condition, i) => (
-        <div key={`cond-${i}`} className="text-[11px] text-pk-surface-200 leading-tight">
+        <div key={`cond-${i}`} className="text-[0.6875rem] text-pk-surface-200 leading-tight">
           {condition}
         </div>
       ))}

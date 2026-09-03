@@ -21,7 +21,7 @@ export function MiniTag({
   return (
     <span
       onClick={onClick}
-      className="inline-flex items-center gap-1 rounded-full px-[7px] py-px text-[10.5px] font-[550] leading-normal"
+      className="inline-flex items-center gap-1 rounded-full px-[0.4375rem] py-px text-[0.65625rem] font-[550] leading-normal"
       style={{
         background: `rgb(${rgb} / .14)`,
         color: `rgb(${rgb})`,

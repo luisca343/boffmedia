@@ -36,7 +36,7 @@ const ERROR_KEY: Record<string, string> = {
 function GroupHead({ title }: { title: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="font-mono text-[10px] tracking-[0.15em] uppercase text-txt-muted">{title}</span>
+      <span className="font-mono text-[0.625rem] tracking-[0.15em] uppercase text-txt-muted">{title}</span>
       <span className="flex-1 h-px bg-line" />
     </div>
   );
@@ -96,13 +96,13 @@ export function SetupPanel({
   const canAnalyze = engineReady && !!schematic && !!source.registry && !!target.registry && !isAnalyzing && !analyzed;
 
   return (
-    <div className="p-4 pb-[22px] flex flex-col gap-4">
+    <div className="p-4 pb-[1.375rem] flex flex-col gap-4">
       {/* onboarding guide */}
       <Disclosure title={t("guide.title")} icon="info" defaultOpen={false}>
-        <ol className="mt-1 p-0 list-none grid gap-[9px]">
+        <ol className="mt-1 p-0 list-none grid gap-[0.5625rem]">
           {guideSteps.map((tt, i) => (
-            <li key={i} className="flex gap-[9px] items-start text-[12.5px] text-txt-muted leading-[1.4]">
-              <span className="grid place-items-center w-[18px] h-[18px] shrink-0 mt-px font-mono text-[10px] font-semibold bg-accent-soft text-accent-bright border border-solid border-accent-line">
+            <li key={i} className="flex gap-[0.5625rem] items-start text-[0.78125rem] text-txt-muted leading-[1.4]">
+              <span className="grid place-items-center w-[1.125rem] h-[1.125rem] shrink-0 mt-px font-mono text-[0.625rem] font-semibold bg-accent-soft text-accent-bright border border-solid border-accent-line">
                 {i + 1}
               </span>
               <span>{tt}</span>
@@ -194,7 +194,7 @@ export function SetupPanel({
       </Button>
 
       {errorText && (
-        <Banner tone="error" className="text-[12.5px]">
+        <Banner tone="error" className="text-[0.78125rem]">
           {errorText}
         </Banner>
       )}

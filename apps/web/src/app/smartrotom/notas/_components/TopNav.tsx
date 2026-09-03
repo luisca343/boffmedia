@@ -24,20 +24,20 @@ export function TopNav({ activeTitle, onMenu, onSearch, onGraph, onTemplates }: 
       </button>
 
       <div className="flex select-none items-center gap-2.5 pl-1 pr-2">
-        <span className="grid h-[26px] w-[26px] place-items-center rounded-nt-md bg-gradient-to-br from-nt-400 to-nt-600 text-white shadow-[0_0_14px_rgb(var(--nt-accent)/.45)]">
+        <span className="grid h-[1.625rem] w-[1.625rem] place-items-center rounded-nt-md bg-gradient-to-br from-nt-400 to-nt-600 text-white shadow-[0_0_14px_rgb(var(--nt-accent)/.45)]">
           <Icon name="zap" size={15} />
         </span>
-        <span className="font-nt-display text-[14px] font-bold tracking-[.02em] text-nt-fg">
+        <span className="font-nt-display text-[0.875rem] font-bold tracking-[.02em] text-nt-fg">
           Smart<b className="text-nt-accent-fg">Rotom</b>
         </span>
-        <span className="rounded bg-nt-accent/15 px-[5px] py-0.5 font-nt-display text-[8.5px] font-bold tracking-[.1em] text-nt-accent-fg">
+        <span className="rounded bg-nt-accent/15 px-[0.3125rem] py-0.5 font-nt-display text-[0.53125rem] font-bold tracking-[.1em] text-nt-accent-fg">
           NOTAS
         </span>
       </div>
 
-      <span className="mx-1.5 h-[22px] w-px bg-nt-border-2" />
+      <span className="mx-1.5 h-[1.375rem] w-px bg-nt-border-2" />
 
-      <nav className="flex min-w-0 flex-1 items-center gap-1.5 text-[13px] text-nt-fg-muted" aria-label={t("nav.breadcrumb")}>
+      <nav className="flex min-w-0 flex-1 items-center gap-1.5 text-[0.8125rem] text-nt-fg-muted" aria-label={t("nav.breadcrumb")}>
         <span className="whitespace-nowrap max-sm:hidden">SmartRotom</span>
         <span className="text-nt-fg-subtle max-sm:hidden">/</span>
         <span className="whitespace-nowrap">Notas</span>
@@ -51,7 +51,7 @@ export function TopNav({ activeTitle, onMenu, onSearch, onGraph, onTemplates }: 
 
       <button
         onClick={onSearch}
-        className="flex h-8 min-w-0 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-2.5 text-[13px] text-nt-fg-subtle transition-colors hover:border-nt-border-2 hover:text-nt-fg-muted sm:min-w-[200px]"
+        className="flex h-8 min-w-0 items-center gap-2 rounded-nt-md border border-nt-border bg-nt-hover px-2.5 text-[0.8125rem] text-nt-fg-subtle transition-colors hover:border-nt-border-2 hover:text-nt-fg-muted sm:min-w-[12.5rem]"
       >
         <Icon name="search" size={14} />
         <span className="max-sm:hidden">{t("common.search")}…</span>

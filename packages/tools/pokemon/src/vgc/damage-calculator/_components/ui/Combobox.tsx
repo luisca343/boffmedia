@@ -93,13 +93,13 @@ export function Combobox<T>({
       {open && (
         <div
           className={cn(
-            "absolute top-[calc(100%_+_4px)] z-50 max-h-[320px] w-max min-w-full max-w-[300px] overflow-y-auto border border-solid border-line-2 bg-panel shadow-[var(--shadow)]",
+            "absolute top-[calc(100%_+_4px)] z-50 max-h-[20rem] w-max min-w-full max-w-[18.75rem] overflow-y-auto border border-solid border-line-2 bg-panel shadow-[var(--shadow)]",
             alignRight ? "right-0" : "left-0",
           )}
           role="listbox"
         >
           {items.length === 0 && (
-            <div className="px-[14px] py-3 font-mono text-[12px]/[1.4] text-txt-dim">
+            <div className="px-[0.875rem] py-3 font-mono text-[0.75rem]/[1.4] text-txt-dim">
               {emptyLabel ? emptyLabel(q) : `— ${q} —`}
             </div>
           )}
@@ -110,8 +110,8 @@ export function Combobox<T>({
               role="option"
               aria-selected={i === hi}
               className={cn(
-                "flex w-full items-center gap-[10px] px-3 py-2 text-left font-body text-[13px]/[1.2] text-txt",
-                "[&_.tail]:ml-auto [&_.tail]:inline-flex [&_.tail]:items-center [&_.tail]:gap-1 [&_.tail]:font-mono [&_.tail]:text-[11px]/none [&_.tail]:text-txt-muted",
+                "flex w-full items-center gap-[0.625rem] px-3 py-2 text-left font-body text-[0.8125rem]/[1.2] text-txt",
+                "[&_.tail]:ml-auto [&_.tail]:inline-flex [&_.tail]:items-center [&_.tail]:gap-1 [&_.tail]:font-mono [&_.tail]:text-[0.6875rem]/none [&_.tail]:text-txt-muted",
                 i === hi && "bg-accent-soft",
               )}
               onMouseEnter={() => setHi(i)}

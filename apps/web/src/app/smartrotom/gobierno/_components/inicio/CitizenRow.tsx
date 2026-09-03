@@ -18,12 +18,12 @@ export function CitizenRow({
     <button
       type="button"
       onClick={onClick}
-      className="flex w-full items-center gap-2.5 rounded-gt-sm border border-transparent px-2 py-[7px] text-left transition-colors hover:bg-gt-paper-1"
+      className="flex w-full items-center gap-2.5 rounded-gt-sm border border-transparent px-2 py-[0.4375rem] text-left transition-colors hover:bg-gt-paper-1"
     >
       <Avatar user={username} size={30} />
       <div className="min-w-0 flex-1">
-        <div className="truncate text-[12.5px] font-bold text-gt-ink-900">{username}</div>
-        {sub && <div className="truncate font-gt-mono text-[10px] text-gt-ink-400">{sub}</div>}
+        <div className="truncate text-[0.78125rem] font-bold text-gt-ink-900">{username}</div>
+        {sub && <div className="truncate font-gt-mono text-[0.625rem] text-gt-ink-400">{sub}</div>}
       </div>
       {right}
     </button>

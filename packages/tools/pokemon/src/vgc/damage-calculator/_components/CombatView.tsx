@@ -15,7 +15,7 @@ export function CombatView() {
   return (
     <>
       <VersusStrip poke1={poke1} poke2={poke2} field={field} useChampions={useChampions} sel={sel} setSel={setSel} />
-      <div className="grid grid-cols-[minmax(0,1fr)_minmax(240px,300px)_minmax(0,1fr)] items-start gap-4 max-[1280px]:grid-cols-2 max-[920px]:grid-cols-1">
+      <div className="grid grid-cols-[minmax(0,1fr)_minmax(15rem,18.75rem)_minmax(0,1fr)] items-start gap-4 max-[1280px]:grid-cols-2 max-[920px]:grid-cols-1">
         <div>
           <PokemonPanel poke={poke1} side="atk" useChampions={useChampions} onChange={setPoke1} />
         </div>

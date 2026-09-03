@@ -171,9 +171,9 @@ export default function ComponentsShowcase() {
 
   return (
     <main className="wrap">
-      <div className="pt-[34px]">
-      <div className="pt-[34px]">
-        <h1 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(40px,11vw,72px)]/[0.92] mb-[10px] break-words")}>
+      <div className="pt-[2.125rem]">
+      <div className="pt-[2.125rem]">
+        <h1 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(2.5rem,11vw,4.5rem)]/[0.92] mb-[0.625rem] break-words")}>
           Componentes de <em>Boffmedia</em>
         </h1>
         <p className="text-txt-muted max-w-[68ch]">
@@ -182,15 +182,15 @@ export default function ComponentsShowcase() {
         </p>
         <p className={cn(MONO_LABEL, "mt-3 text-txt-dim normal-case tracking-[0.1em]")}>
           {DOMAINS.length} ámbitos · {chapters.length} capítulos · {totalSections} secciones — navega por ámbito o pulsa{" "}
-          <kbd className="border border-solid border-line px-[5px] py-px">/</kbd> para buscar
+          <kbd className="border border-solid border-line px-[0.3125rem] py-px">/</kbd> para buscar
         </p>
       </div>
       </div>
 
-      <div id="sc3-top" className="grid grid-cols-1 lg:grid-cols-[230px_1fr] gap-8 lg:gap-12 items-start pt-10">
+      <div id="sc3-top" className="grid grid-cols-1 lg:grid-cols-[14.375rem_1fr] gap-8 lg:gap-12 items-start pt-10">
         {/* ── index ── */}
-        <aside className="lg:sticky lg:top-[106px] max-h-[48vh] lg:max-h-[calc(100dvh_-_126px)] overflow-hidden flex flex-col">
-          <div className="flex-none flex items-center gap-[9px] border border-solid border-line bg-panel py-[10px] px-3 mb-3 text-txt-dim transition-[border-color] duration-[140ms] focus-within:border-accent focus-within:text-txt-muted">
+        <aside className="lg:sticky lg:top-[6.625rem] max-h-[48vh] lg:max-h-[calc(100dvh_-_7.875rem)] overflow-hidden flex flex-col">
+          <div className="flex-none flex items-center gap-[0.5625rem] border border-solid border-line bg-panel py-[0.625rem] px-3 mb-3 text-txt-dim transition-[border-color] duration-[140ms] focus-within:border-accent focus-within:text-txt-muted">
             <Icon name="search" size={14} />
             <input
               ref={findRef}
@@ -205,14 +205,14 @@ export default function ComponentsShowcase() {
                 }
                 if (e.key === "Enter" && hits && hits[0]) openHit(hits[0])
               }}
-              className="flex-1 min-w-0 bg-transparent border-0 outline-0 text-txt font-mono text-[12px] leading-[1.2] tracking-[0.04em] placeholder:text-txt-dim"
+              className="flex-1 min-w-0 bg-transparent border-0 outline-0 text-txt font-mono text-[0.75rem] leading-[1.2] tracking-[0.04em] placeholder:text-txt-dim"
             />
             {q ? (
-              <button type="button" aria-label="Limpiar búsqueda" onClick={() => setQ("")} className="bg-transparent border-0 cursor-pointer text-txt-muted text-[11px] px-1 py-[2px] hover:text-txt">
+              <button type="button" aria-label="Limpiar búsqueda" onClick={() => setQ("")} className="bg-transparent border-0 cursor-pointer text-txt-muted text-[0.6875rem] px-1 py-[2px] hover:text-txt">
                 ✕
               </button>
             ) : (
-              <kbd className="font-mono text-[10px] leading-none text-txt-dim border border-solid border-line px-[6px] py-[3px]">/</kbd>
+              <kbd className="font-mono text-[0.625rem] leading-none text-txt-dim border border-solid border-line px-[0.375rem] py-[3px]">/</kbd>
             )}
           </div>
 
@@ -220,32 +220,32 @@ export default function ComponentsShowcase() {
             {hits ? (
               hits.length ? (
                 hits.map((h) => (
-                  <a key={h.id} onClick={() => openHit(h)} className={cn(sideLink, "grid gap-[5px] border-line text-txt-muted normal-case tracking-[0.04em] leading-[1.2] hover:text-txt hover:bg-panel")}>
+                  <a key={h.id} onClick={() => openHit(h)} className={cn(sideLink, "grid gap-[0.3125rem] border-line text-txt-muted normal-case tracking-[0.04em] leading-[1.2] hover:text-txt hover:bg-panel")}>
                     {h.label}
-                    <span className="text-[9px] tracking-[0.16em] uppercase text-txt-dim">
+                    <span className="text-[0.5625rem] tracking-[0.16em] uppercase text-txt-dim">
                       {h.dom} · {h.grp}
                     </span>
                   </a>
                 ))
               ) : (
-                <span className="py-3 px-[14px] font-mono text-[11px] leading-[1.6] text-txt-dim">Sin resultados para «{q.trim()}»</span>
+                <span className="py-3 px-[0.875rem] font-mono text-[0.6875rem] leading-[1.6] text-txt-dim">Sin resultados para «{q.trim()}»</span>
               )
             ) : (
               DOMAINS.map((d) => {
                 const dOpen = openDoms.has(d.name)
                 const dCur = d.chapters.some((g) => g.name === grpName)
                 return (
-                  <div key={d.name} className="grid gap-[2px] mt-[14px] first:mt-0">
+                  <div key={d.name} className="grid gap-[2px] mt-[0.875rem] first:mt-0">
                     <button
                       type="button"
                       aria-expanded={dOpen}
                       onClick={() => toggleDom(d.name)}
                       className={cn(
-                        "flex items-center gap-[9px] w-full text-left bg-transparent border-0 cursor-pointer pt-[10px] pr-[14px] pb-2 pl-px font-mono text-[10px] font-bold leading-none tracking-[0.2em] uppercase transition-colors duration-[140ms]",
+                        "flex items-center gap-[0.5625rem] w-full text-left bg-transparent border-0 cursor-pointer pt-[0.625rem] pr-[0.875rem] pb-2 pl-px font-mono text-[0.625rem] font-bold leading-none tracking-[0.2em] uppercase transition-colors duration-[140ms]",
                         dCur ? "text-txt-muted hover:text-txt" : "text-txt-dim hover:text-txt",
                       )}
                     >
-                      <span className={cn("flex-none w-[7px] h-[7px] rotate-45 transition-colors duration-[140ms]", dOpen ? "bg-accent" : "bg-line-2")} />
+                      <span className={cn("flex-none w-[0.4375rem] h-[0.4375rem] rotate-45 transition-colors duration-[140ms]", dOpen ? "bg-accent" : "bg-line-2")} />
                       {d.name}
                       <span className="ml-auto font-medium text-txt-dim tracking-[0.06em]">{d.chapters.length}</span>
                       <span className={cn("flex-none w-0 h-0 border-l-[4px] border-l-current border-y-[3.5px] border-y-transparent opacity-60 transition-transform duration-[140ms]", dOpen && "rotate-90")} />
@@ -260,17 +260,17 @@ export default function ComponentsShowcase() {
                               aria-expanded={open}
                               onClick={() => (open ? jump(g.sections[0].id) : setGrpName(g.name))}
                               className={cn(
-                                "flex items-center gap-[9px] w-full text-left bg-transparent border-0 border-l-[3px] border-solid cursor-pointer py-[10px] px-[14px] font-mono text-[11px] font-bold leading-none tracking-[0.14em] uppercase transition-[color,border-color,background] duration-[140ms]",
+                                "flex items-center gap-[0.5625rem] w-full text-left bg-transparent border-0 border-l-[3px] border-solid cursor-pointer py-[0.625rem] px-[0.875rem] font-mono text-[0.6875rem] font-bold leading-none tracking-[0.14em] uppercase transition-[color,border-color,background] duration-[140ms]",
                                 open ? "text-txt border-l-accent bg-panel" : "text-txt-muted border-l-line hover:text-txt hover:bg-panel",
                               )}
                             >
                               <span className={cn("flex-none w-0 h-0 border-l-[4px] border-l-current border-y-[3.5px] border-y-transparent opacity-60 transition-transform duration-[140ms]", open && "rotate-90")} />
                               {g.name}
-                              <span className="ml-auto font-medium text-[10px] text-txt-dim">{g.sections.length}</span>
+                              <span className="ml-auto font-medium text-[0.625rem] text-txt-dim">{g.sections.length}</span>
                             </button>
                             {open &&
                               g.sections.map((s) => (
-                                <a key={s.id} onClick={() => jump(s.id)} className={cn(sideLink, "pl-[27px]", active === s.id ? "text-txt border-l-accent bg-panel" : "text-txt-muted border-l-line hover:text-txt hover:bg-panel")}>
+                                <a key={s.id} onClick={() => jump(s.id)} className={cn(sideLink, "pl-[1.6875rem]", active === s.id ? "text-txt border-l-accent bg-panel" : "text-txt-muted border-l-line hover:text-txt hover:bg-panel")}>
                                   {s.label}
                                 </a>
                               ))}
@@ -285,25 +285,25 @@ export default function ComponentsShowcase() {
         </aside>
 
         {/* ── main ── */}
-        <div className="min-w-0 pb-[90px]">
+        <div className="min-w-0 pb-[5.625rem]">
           <ActiveView />
 
           <div className="flex flex-wrap items-center justify-between gap-4 border-t border-solid border-line pt-6">
             {gi > 0 ? (
-              <button type="button" onClick={() => setGrpName(chapters[gi - 1].name)} className="grid gap-[7px] text-left bg-panel border border-solid border-line text-txt cursor-pointer py-[14px] px-5 min-w-0 flex-1 sm:flex-none sm:min-w-[190px] transition-[border-color,background] duration-[140ms] hover:border-accent hover:bg-panel-2">
-                <small className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase text-txt-dim">Anterior</small>
-                <b className="font-mono text-[13px] leading-none tracking-[0.1em] uppercase">{chapters[gi - 1].name}</b>
+              <button type="button" onClick={() => setGrpName(chapters[gi - 1].name)} className="grid gap-[0.4375rem] text-left bg-panel border border-solid border-line text-txt cursor-pointer py-[0.875rem] px-5 min-w-0 flex-1 sm:flex-none sm:min-w-[11.875rem] transition-[border-color,background] duration-[140ms] hover:border-accent hover:bg-panel-2">
+                <small className="font-mono text-[0.625rem] leading-none tracking-[0.16em] uppercase text-txt-dim">Anterior</small>
+                <b className="font-mono text-[0.8125rem] leading-none tracking-[0.1em] uppercase">{chapters[gi - 1].name}</b>
               </button>
             ) : (
               <span />
             )}
-            <span className="font-mono text-[11px] leading-none tracking-[0.12em] text-txt-dim">
+            <span className="font-mono text-[0.6875rem] leading-none tracking-[0.12em] text-txt-dim">
               {String(gi + 1).padStart(2, "0")} / {String(chapters.length).padStart(2, "0")}
             </span>
             {gi < chapters.length - 1 ? (
-              <button type="button" onClick={() => setGrpName(chapters[gi + 1].name)} className="grid gap-[7px] text-right bg-panel border border-solid border-line text-txt cursor-pointer py-[14px] px-5 min-w-0 flex-1 sm:flex-none sm:min-w-[190px] transition-[border-color,background] duration-[140ms] hover:border-accent hover:bg-panel-2">
-                <small className="font-mono text-[10px] leading-none tracking-[0.16em] uppercase text-txt-dim text-right">Siguiente</small>
-                <b className="font-mono text-[13px] leading-none tracking-[0.1em] uppercase">{chapters[gi + 1].name}</b>
+              <button type="button" onClick={() => setGrpName(chapters[gi + 1].name)} className="grid gap-[0.4375rem] text-right bg-panel border border-solid border-line text-txt cursor-pointer py-[0.875rem] px-5 min-w-0 flex-1 sm:flex-none sm:min-w-[11.875rem] transition-[border-color,background] duration-[140ms] hover:border-accent hover:bg-panel-2">
+                <small className="font-mono text-[0.625rem] leading-none tracking-[0.16em] uppercase text-txt-dim text-right">Siguiente</small>
+                <b className="font-mono text-[0.8125rem] leading-none tracking-[0.1em] uppercase">{chapters[gi + 1].name}</b>
               </button>
             ) : (
               <span />

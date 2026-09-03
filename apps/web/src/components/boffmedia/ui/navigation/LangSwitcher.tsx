@@ -34,7 +34,7 @@ export function LangSwitcher() {
           disabled={isPending}
           onClick={() => change(l.code)}
           className={cn(
-            "px-1.5 py-[5px] font-mono text-[12px] font-bold leading-none tracking-[0.06em] transition-colors duration-[140ms]",
+            "px-1.5 py-[0.3125rem] font-mono text-[0.75rem] font-bold leading-none tracking-[0.06em] transition-colors duration-[140ms]",
             locale === l.code ? "text-accent" : "text-txt-muted hover:text-txt",
             isPending && "cursor-wait",
           )}

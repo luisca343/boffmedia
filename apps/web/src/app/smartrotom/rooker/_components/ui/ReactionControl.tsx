@@ -100,7 +100,7 @@ export function ReactionControl({ reactions, mine, onReact, disabled = false }: 
           onMouseEnter={open}
           onMouseLeave={close}
           className={cn(
-            "absolute bottom-[calc(100%_+_6px)] left-[-8px] z-40 flex animate-rk-pop gap-0.5 rounded-rk-pill",
+            "absolute bottom-[calc(100%_+_6px)] left-[-0.5rem] z-40 flex animate-rk-pop gap-0.5 rounded-rk-pill",
             "border border-rk-line-strong bg-rk-elevated/95 px-2 py-1.5 shadow-[0_12px_30px_-8px_rgb(0_0_0/.7)]",
             "backdrop-blur-md motion-reduce:animate-none",
           )}

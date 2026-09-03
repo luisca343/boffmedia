@@ -521,13 +521,13 @@ export function ModSelector({
           busyKey={busyKey}
         />
         {progress && (
-          <span className="flex shrink-0 items-center gap-2 font-mono text-[11px] text-txt-dim">
+          <span className="flex shrink-0 items-center gap-2 font-mono text-[0.6875rem] text-txt-dim">
             <Spinner size={12} /> {progress}
           </span>
         )}
       </div>
 
-      <aside className="flex min-h-0 shrink-0 flex-col gap-4 border-solid border-line max-[1200px]:border-t max-[1200px]:pt-4 min-[1201px]:w-[420px] min-[1201px]:border-l min-[1201px]:pl-4 2xl:min-[1201px]:w-[500px]">
+      <aside className="flex min-h-0 shrink-0 flex-col gap-4 border-solid border-line max-[1200px]:border-t max-[1200px]:pt-4 min-[1201px]:w-[26.25rem] min-[1201px]:border-l min-[1201px]:pl-4 2xl:min-[1201px]:w-[31.25rem]">
         <div className="grid shrink-0 gap-3 sm:grid-cols-2 min-[1201px]:grid-cols-1">
           <Field label={t("addByUrl")} hint={t("addByUrlHint")}>
             <div className="flex gap-2">
@@ -579,7 +579,7 @@ export function ModSelector({
         className="min-h-0 flex-1 [grid-template-rows:auto_minmax(0,1fr)]"
       >
         {value.length === 0 ? (
-          <p className="font-body text-[12px] text-txt-dim">{t("noModsSelected")}</p>
+          <p className="font-body text-[0.75rem] text-txt-dim">{t("noModsSelected")}</p>
         ) : (
           <ul className="bm-scroll flex max-h-[45vh] min-h-0 flex-1 flex-col gap-1 overflow-auto pr-1">
             {value.map((mod) => {
@@ -604,10 +604,10 @@ export function ModSelector({
                     </Badge>
                   )}
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate font-display text-[13px] font-bold uppercase tracking-[0.03em]">
+                    <span className="block truncate font-display text-[0.8125rem] font-bold uppercase tracking-[0.03em]">
                       {mod.name}
                     </span>
-                    <span className="block truncate font-mono text-[11px] text-txt-dim">
+                    <span className="block truncate font-mono text-[0.6875rem] text-txt-dim">
                       {mod.fileName}
                       {mod.versionLabel ? ` · ${mod.versionLabel}` : ""} ·{" "}
                       {formatSize(mod.fileSize)}
@@ -615,7 +615,7 @@ export function ModSelector({
                   </span>
                   <button
                     type="button"
-                    className="shrink-0 font-mono text-[11px] text-txt-dim hover:text-bad"
+                    className="shrink-0 font-mono text-[0.6875rem] text-txt-dim hover:text-bad"
                     aria-label={t("remove")}
                     onClick={() => remove(mod.key)}
                   >
@@ -627,10 +627,10 @@ export function ModSelector({
                     <Input
                       value={mod.path}
                       onChange={(e) => setPath(mod.key, e.target.value)}
-                      className="font-mono text-[11px]"
+                      className="font-mono text-[0.6875rem]"
                     />
                     {duplicate && (
-                      <span className="mt-1 block font-body text-[11px] text-bad">
+                      <span className="mt-1 block font-body text-[0.6875rem] text-bad">
                         {t("duplicatePath")}
                       </span>
                     )}
@@ -643,7 +643,7 @@ export function ModSelector({
       </Field>
 
         {value.length > 0 && (
-          <p className="flex shrink-0 items-center gap-2 border-t border-solid border-line pt-3 font-mono text-[11px] text-txt-dim">
+          <p className="flex shrink-0 items-center gap-2 border-t border-solid border-line pt-3 font-mono text-[0.6875rem] text-txt-dim">
             <Icon name="info" size={12} />
             {t("totalSize", {
               size: formatSize(value.reduce((sum, m) => sum + m.fileSize, 0)),

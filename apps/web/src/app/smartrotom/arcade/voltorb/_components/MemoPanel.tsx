@@ -34,7 +34,7 @@ export default function MemoPanel({
   return (
     <Panel tone="void" tight>
       <div className="mb-2.5 flex items-center justify-between gap-2">
-        <span className="font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-magenta-2">
+        <span className="font-ar-display text-[0.5625rem] uppercase tracking-[0.18em] text-ar-magenta-2">
           {t("voltorb.memo.title")}
         </span>
         <button
@@ -42,7 +42,7 @@ export default function MemoPanel({
           onClick={onToggleMemoMode}
           aria-pressed={memoMode}
           className={cn(
-            "ar-lift rounded-md border px-2 py-1 font-ar-mono text-[10px] font-bold uppercase tracking-[0.08em]",
+            "ar-lift rounded-md border px-2 py-1 font-ar-mono text-[0.625rem] font-bold uppercase tracking-[0.08em]",
             memoMode
               ? "border-ar-lime/50 bg-ar-lime/[.14] text-ar-lime"
               : "border-white/10 bg-white/[.04] text-ar-ink-muted",
@@ -62,7 +62,7 @@ export default function MemoPanel({
             aria-pressed={memoMode && selectedMark === mark}
             aria-label={mark === 0 ? t("voltorb.memo.markVoltorb") : t("voltorb.memo.markX", { mark })}
             className={cn(
-              "ar-lift h-[38px] flex-1 rounded-md border font-ar-display text-[13px]",
+              "ar-lift h-[2.375rem] flex-1 rounded-md border font-ar-display text-[0.8125rem]",
               "disabled:pointer-events-none disabled:opacity-45",
               memoMode && selectedMark === mark ? KEY_STATE.active : KEY_STATE.idle,
             )}
@@ -72,7 +72,7 @@ export default function MemoPanel({
         ))}
       </div>
 
-      <p className="mt-2 font-ar-mono text-[10px] leading-relaxed text-ar-ink-muted">
+      <p className="mt-2 font-ar-mono text-[0.625rem] leading-relaxed text-ar-ink-muted">
         {t("voltorb.memo.hint", { bold: "" })}
       </p>
     </Panel>

@@ -26,7 +26,7 @@ export function CtStars({ value = 0, onChange, size = 16, count, ariaLabel }: { 
             {stars(true)}
           </span>
         </span>
-        {count != null && <span className="font-mono text-[11px]/none font-semibold tracking-[0.04em] text-txt-muted">{count}</span>}
+        {count != null && <span className="font-mono text-[0.6875rem]/none font-semibold tracking-[0.04em] text-txt-muted">{count}</span>}
       </span>
     )
   }
@@ -59,7 +59,7 @@ export function CtStatusPill({ status, size = "md", solid = false, showLabel = t
       style={{ "--sc": s.color } as React.CSSProperties}
       className={cn(
         "inline-flex items-center whitespace-nowrap border border-solid font-body font-semibold tracking-[0.02em]",
-        size === "sm" ? "gap-1 px-[7px] py-[3px] text-[10px]" : "gap-[5px] px-[9px] py-1 text-[11px]",
+        size === "sm" ? "gap-1 px-[0.4375rem] py-[3px] text-[0.625rem]" : "gap-[0.3125rem] px-[0.5625rem] py-1 text-[0.6875rem]",
         solid ? "border-[color:var(--sc)] bg-[color:var(--sc)] text-accent-ink [&_svg]:text-accent-ink" : "border-[color-mix(in_oklch,var(--sc)_45%,var(--line))] bg-[color-mix(in_oklch,var(--sc)_14%,transparent)] text-[color:var(--sc)]",
       )}
     >
@@ -88,7 +88,7 @@ export function CtStatusMenu({ gameId, onClose, block }: { gameId: string; onClo
     }
   }, [onClose])
   return (
-    <div ref={ref} role="menu" className={cn("absolute left-0 top-[calc(100%_+_6px)] z-40 flex min-w-[210px] flex-col gap-px border border-solid border-line-2 bg-panel p-[5px] [box-shadow:0_18px_50px_rgba(0,0,0,0.5)]", block && "right-0")}>
+    <div ref={ref} role="menu" className={cn("absolute left-0 top-[calc(100%_+_6px)] z-40 flex min-w-[13.125rem] flex-col gap-px border border-solid border-line-2 bg-panel p-[0.3125rem] [box-shadow:0_18px_50px_rgba(0,0,0,0.5)]", block && "right-0")}>
       {CT_STATUS_ORDER.map((k) => {
         const s = CT_STATUS[k]
         const on = cur === k
@@ -103,9 +103,9 @@ export function CtStatusMenu({ gameId, onClose, block }: { gameId: string; onClo
               CtStore.setStatus(gameId, k)
               onClose?.()
             }}
-            className={cn("flex w-full items-center gap-2.5 border-0 bg-transparent px-2.5 py-[9px] text-left font-body text-[13px]/none font-semibold text-txt transition-[background] duration-[140ms] hover:bg-panel-2", on && "text-[color:var(--sc)]")}
+            className={cn("flex w-full items-center gap-2.5 border-0 bg-transparent px-2.5 py-[0.5625rem] text-left font-body text-[0.8125rem]/none font-semibold text-txt transition-[background] duration-[140ms] hover:bg-panel-2", on && "text-[color:var(--sc)]")}
           >
-            <span className="grid h-[26px] w-[26px] flex-none place-items-center border border-solid border-[color-mix(in_oklch,var(--sc)_40%,var(--line))] bg-[color-mix(in_oklch,var(--sc)_12%,transparent)] text-[color:var(--sc)]">
+            <span className="grid h-[1.625rem] w-[1.625rem] flex-none place-items-center border border-solid border-[color-mix(in_oklch,var(--sc)_40%,var(--line))] bg-[color-mix(in_oklch,var(--sc)_12%,transparent)] text-[color:var(--sc)]">
               <Icon name={s.icon} size={15} className={k === "wishlist" ? "fill-current" : undefined} />
             </span>
             <span className="flex-1">{t(`status.${k}.label`)}</span>
@@ -120,9 +120,9 @@ export function CtStatusMenu({ gameId, onClose, block }: { gameId: string; onClo
             CtStore.setStatus(gameId, cur)
             onClose?.()
           }}
-          className="mt-[3px] flex w-full items-center gap-2.5 border-0 border-t border-solid border-line bg-transparent px-2.5 pb-[9px] pt-[11px] text-left font-body text-[13px]/none font-semibold text-txt-muted transition-[color] duration-[140ms] hover:text-bad"
+          className="mt-[3px] flex w-full items-center gap-2.5 border-0 border-t border-solid border-line bg-transparent px-2.5 pb-[0.5625rem] pt-[0.6875rem] text-left font-body text-[0.8125rem]/none font-semibold text-txt-muted transition-[color] duration-[140ms] hover:text-bad"
         >
-          <span className="grid h-[26px] w-[26px] flex-none place-items-center border border-solid border-line text-txt-dim">
+          <span className="grid h-[1.625rem] w-[1.625rem] flex-none place-items-center border border-solid border-line text-txt-dim">
             <Icon name="x" size={15} />
           </span>
           <span className="flex-1">{t("removeFromLibrary")}</span>
@@ -150,7 +150,7 @@ export function CtLogButton({ gameId, block = false, size = "md" }: { gameId: st
         }}
         className={cn(
           "inline-flex items-center border border-solid font-mono font-semibold uppercase cut cut-edge-slant [--cut:7px] transition-[border-color,background,color] duration-[140ms]",
-          size === "sm" ? "gap-[5px] px-2.5 py-[7px] text-[10px]" : "gap-[7px] px-3 py-[9px] text-[11px] tracking-[0.05em]",
+          size === "sm" ? "gap-[0.3125rem] px-2.5 py-[0.4375rem] text-[0.625rem]" : "gap-[0.4375rem] px-3 py-[0.5625rem] text-[0.6875rem] tracking-[0.05em]",
           block && "w-full justify-center",
           s ? "border-[color-mix(in_oklch,var(--sc)_55%,var(--line))] [--cut-line:color-mix(in_oklch,var(--sc)_55%,var(--line))] bg-[color-mix(in_oklch,var(--sc)_16%,var(--panel-2))] text-[color:var(--sc)]" : "border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt hover:border-accent-line hover:[--cut-line:var(--accent-line)]",
         )}

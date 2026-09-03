@@ -28,7 +28,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
 
   return (
     <Panel tone="void">
-      <div className="mb-3.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-cyan">
+      <div className="mb-3.5 font-ar-display text-[0.5625rem] uppercase tracking-[0.18em] text-ar-cyan">
         {t("loot.probabilities")}
       </div>
 
@@ -39,12 +39,12 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
             <div key={o.rarity}>
               <div className="mb-1 flex items-center justify-between">
                 <span
-                  className="font-ar-display text-[9px] uppercase tracking-[0.12em]"
+                  className="font-ar-display text-[0.5625rem] uppercase tracking-[0.12em]"
                   style={{ color: skin.fg }}
                 >
                   {t(skin.nameKey)}
                 </span>
-                <span className="font-ar-mono text-[11px] tabular-nums text-ar-ink-dim">
+                <span className="font-ar-mono text-[0.6875rem] tabular-nums text-ar-ink-dim">
                   {o.pct.toFixed(1)}%
                 </span>
               </div>
@@ -70,12 +70,12 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
         })}
       </div>
 
-      <div className="mt-[18px] rounded-[10px] border border-white/[.06] bg-black/40 px-3.5 py-3">
-        <div className="font-ar-mono text-[11px] uppercase tracking-[0.12em] text-ar-ink-muted">
+      <div className="mt-[1.125rem] rounded-[10px] border border-white/[.06] bg-black/40 px-3.5 py-3">
+        <div className="font-ar-mono text-[0.6875rem] uppercase tracking-[0.12em] text-ar-ink-muted">
           {t("loot.inInventory")}
         </div>
         <div
-          className={`mt-1.5 font-ar-display text-[16px] leading-relaxed ${owned > 0 ? "text-ar-ink" : "text-ar-ink-muted"}`}
+          className={`mt-1.5 font-ar-display text-[1rem] leading-relaxed ${owned > 0 ? "text-ar-ink" : "text-ar-ink-muted"}`}
         >
           {owned}× {box.name}
         </div>
@@ -113,7 +113,7 @@ export function BoxOddsPanel({ box, owned, opening, onOpen, onShowInfo }: BoxOdd
       </Button>
 
       {empty && (
-        <p role="alert" className="mt-2.5 font-ar-mono text-[11px] text-ar-danger">
+        <p role="alert" className="mt-2.5 font-ar-mono text-[0.6875rem] text-ar-danger">
           {t("loot.noBoxItems")}
         </p>
       )}

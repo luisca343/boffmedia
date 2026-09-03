@@ -49,7 +49,7 @@ export function BuilderSlotRail({
   return (
     <div className="flex min-h-0 flex-col gap-3 pr-0.5 xl:flex-1 xl:overflow-y-auto">
       <RailSection title={t("builder.partsTitle")} count={PART_SLOTS.length}>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(108px,1fr))] gap-1.5">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(6.75rem,1fr))] gap-1.5">
           {PART_SLOTS.map((slot) => (
             <SlotCard
               key={slot}
@@ -64,7 +64,7 @@ export function BuilderSlotRail({
       </RailSection>
 
       <RailSection title={t("builder.equipment")} count={EQUIP_SLOTS.length}>
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(108px,1fr))] gap-1.5">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(6.75rem,1fr))] gap-1.5">
           {EQUIP_SLOTS.map((slot) => {
             const item = equippedItem(equipItems, slot, state.equipment[slot])
             return (
@@ -93,7 +93,7 @@ export function BuilderSlotRail({
           }`}
         >
           <Icon name="paw" size={15} className="flex-none text-[color:var(--mwp-pink)]" />
-          <span className="min-w-0 flex-1 truncate text-[12px] font-bold text-[color:var(--mwp-cream)]">
+          <span className="min-w-0 flex-1 truncate text-[0.75rem] font-bold text-[color:var(--mwp-cream)]">
             {presetName ?? t("builder.presetCustom")}
           </span>
           <Icon name="chevronRight" size={13} className="flex-none text-[color:var(--mwp-cream-dim)]" />
@@ -114,9 +114,9 @@ function RailSection({
 }) {
   return (
     <section className="flex flex-col gap-2 border-2 border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-2)] p-2.5 [border-radius:var(--wob-sm)]">
-      <h2 className="m-0 flex items-baseline gap-1.5 text-[11px] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
+      <h2 className="m-0 flex items-baseline gap-1.5 text-[0.6875rem] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
         {title}
-        {count != null && <span className="font-mono text-[10px] opacity-70">{count}</span>}
+        {count != null && <span className="font-mono text-[0.625rem] opacity-70">{count}</span>}
       </h2>
       {children}
     </section>
@@ -150,7 +150,7 @@ function SlotCard({
       }`}
     >
       <span
-        className={`block h-[46px] w-full rounded-[6px] bg-[color:var(--mwp-night-3)] ${dim ? "opacity-45" : ""}`}
+        className={`block h-[2.875rem] w-full rounded-[6px] bg-[color:var(--mwp-night-3)] ${dim ? "opacity-45" : ""}`}
         style={
           art
             ? {
@@ -162,10 +162,10 @@ function SlotCard({
             : undefined
         }
       />
-      <span className="w-full truncate text-center text-[10px] font-bold uppercase tracking-[0.04em] text-[color:var(--mwp-cream)]">
+      <span className="w-full truncate text-center text-[0.625rem] font-bold uppercase tracking-[0.04em] text-[color:var(--mwp-cream)]">
         {label}
       </span>
-      <span className="w-full truncate text-center font-mono text-[9px] text-[color:var(--mwp-cream-dim)]">
+      <span className="w-full truncate text-center font-mono text-[0.5625rem] text-[color:var(--mwp-cream-dim)]">
         {caption}
       </span>
     </button>

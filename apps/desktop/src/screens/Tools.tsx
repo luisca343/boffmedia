@@ -131,7 +131,7 @@ export function Tools() {
         sub={t("subtitle")}
         actions={
           tools.length > 0 ? (
-            <div className="w-[280px]">
+            <div className="w-[17.5rem]">
               <SearchInput value={query} onChange={setQuery} placeholder={t("search")} size="sm" />
             </div>
           ) : undefined
@@ -242,7 +242,7 @@ export function ToolView() {
       <div
         style={
           {
-            "--tool-vh": `calc(100dvh - 40px - ${SECTION_BAR_H})`,
+            "--tool-vh": `calc(100dvh - 2.5rem - ${SECTION_BAR_H})`,
             "--tool-sticky-top": "0px",
           } as CSSProperties
         }
@@ -270,7 +270,7 @@ export function ToolView() {
               scrollport instead would pad the offline banner and, for a
               `viewport` tool, shrink the box it is supposed to fill exactly. */}
           {tool.gutter ? (
-            <div className="px-[clamp(14px,2vw,32px)] pb-10">
+            <div className="px-[clamp(0.875rem,2vw,2rem)] pb-10">
               <Component />
             </div>
           ) : (

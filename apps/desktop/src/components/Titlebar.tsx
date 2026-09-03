@@ -37,7 +37,7 @@ export function Titlebar() {
   const maximized = useWindowMaximized()
 
   return (
-    <div className="flex h-[40px] min-h-[40px] items-center justify-between bg-base-deep" data-tauri-drag-region>
+    <div className="flex h-[2.5rem] min-h-[2.5rem] items-center justify-between bg-base-deep" data-tauri-drag-region>
       {/* Left: drag region + branding. Tauri only starts a window drag when
           the mousedown TARGET element carries data-tauri-drag-region — the
           attribute does not cascade — so the branding children are made
@@ -59,8 +59,8 @@ export function Titlebar() {
             launcher when Tools became a first-class section. UI STRINGS ONLY —
             the executable, installer and updater feed keep their current
             identity until a dedicated release cycle. */}
-        <span className="pointer-events-none select-none font-display text-[14px]/none font-bold uppercase tracking-[0.06em] text-txt">{t("brandName")}</span>
-        <span className="pointer-events-none select-none font-display text-[14px]/none font-bold uppercase tracking-[0.06em] text-txt-dim">{t("brandSuffix")}</span>
+        <span className="pointer-events-none select-none font-display text-[0.875rem]/none font-bold uppercase tracking-[0.06em] text-txt">{t("brandName")}</span>
+        <span className="pointer-events-none select-none font-display text-[0.875rem]/none font-bold uppercase tracking-[0.06em] text-txt-dim">{t("brandSuffix")}</span>
       </div>
 
       {/* Right: window controls */}

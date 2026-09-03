@@ -171,8 +171,8 @@ function StepRail<S extends string>({
                     : "border-transparent text-txt-muted opacity-50",
               ].join(" ")}
             >
-              <span className="font-mono text-[11px]">{done ? "✓" : i + 1}</span>
-              <span className="font-display text-[11px] font-bold uppercase tracking-[0.08em]">
+              <span className="font-mono text-[0.6875rem]">{done ? "✓" : i + 1}</span>
+              <span className="font-display text-[0.6875rem] font-bold uppercase tracking-[0.08em]">
                 {label(s)}
               </span>
             </button>
@@ -633,7 +633,7 @@ export function VersionEditor({
       bodyClassName="flex min-h-0 flex-1 flex-col"
       aside={
         prefilling ? (
-          <span className="font-mono text-[11px] text-txt-muted">{t("loading")}</span>
+          <span className="font-mono text-[0.6875rem] text-txt-muted">{t("loading")}</span>
         ) : undefined
       }
     >
@@ -665,7 +665,7 @@ export function VersionEditor({
             stepValid={(s) => emuValid[s]}
             label={(s) => t(`emulatorStep.${s}`)}
           />
-          <span className="font-mono text-[11px] text-txt-dim">
+          <span className="font-mono text-[0.6875rem] text-txt-dim">
             {t("stepOf", { n: emuStepIndex + 1, total: EMULATOR_STEPS.length })}
           </span>
         </div>
@@ -734,7 +734,7 @@ export function VersionEditor({
             stepValid={stepValid}
             label={(s) => t(`step.${s}`)}
           />
-          <span className="font-mono text-[11px] text-txt-dim">
+          <span className="font-mono text-[0.6875rem] text-txt-dim">
             {t("stepOf", { n: stepIndex + 1, total: STEPS.length })}
           </span>
         </div>
@@ -751,13 +751,13 @@ export function VersionEditor({
           <div className="flex flex-col gap-5">
             <div className="flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
               <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
-                <span className="font-mono text-[12px] font-bold">01</span>
+                <span className="font-mono text-[0.75rem] font-bold">01</span>
               </span>
               <div className="min-w-0">
-                <p className="font-display text-[15px] font-bold uppercase tracking-[0.04em] text-txt">
+                <p className="font-display text-[0.9375rem] font-bold uppercase tracking-[0.04em] text-txt">
                   {t("metadataLeadTitle")}
                 </p>
-                <p className="mt-1 max-w-[66ch] text-[13px] leading-[1.5] text-txt-dim">
+                <p className="mt-1 max-w-[66ch] text-[0.8125rem] leading-[1.5] text-txt-dim">
                   {t("metadataLead")}
                 </p>
               </div>
@@ -769,10 +769,10 @@ export function VersionEditor({
                   <Icon name="edit" size={15} />
                 </span>
                 <div>
-                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                  <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
                     {t("versionIdentity")}
                   </h3>
-                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                  <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
                     {t("versionIdentityLead")}
                   </p>
                 </div>
@@ -799,10 +799,10 @@ export function VersionEditor({
                   <Icon name="settings" size={15} />
                 </span>
                 <div>
-                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                  <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
                     {t("runtimeSection")}
                   </h3>
-                  <p className="mt-1 text-[12px] leading-[1.45] text-txt-dim">
+                  <p className="mt-1 text-[0.75rem] leading-[1.45] text-txt-dim">
                     {t("runtimeSectionLead")}
                   </p>
                 </div>
@@ -856,10 +856,10 @@ export function VersionEditor({
                   <Icon name="sliders" size={15} />
                 </span>
                 <div>
-                  <h3 className="font-display text-[14px] font-bold uppercase tracking-[0.08em] text-txt">
+                  <h3 className="font-display text-[0.875rem] font-bold uppercase tracking-[0.08em] text-txt">
                     {t("jvmSection")}
                   </h3>
-                  <p className="mt-1 max-w-[80ch] text-[12px] leading-[1.45] text-txt-dim">
+                  <p className="mt-1 max-w-[80ch] text-[0.75rem] leading-[1.45] text-txt-dim">
                     {t("jvmSectionLead")}
                   </p>
                 </div>
@@ -889,7 +889,7 @@ export function VersionEditor({
                   anyway, and finding out at submit time with a path like
                   `version.runtime.jvmArgs.3` is a worse way to learn it. */}
               {rejectedJvmArgs.length > 0 && (
-                <p className="mt-3 text-[12px] leading-[1.45] text-bad" role="alert">
+                <p className="mt-3 text-[0.75rem] leading-[1.45] text-bad" role="alert">
                   {t("jvmArgsRejected", { args: rejectedJvmArgs.join(" ") })}
                 </p>
               )}
@@ -900,10 +900,10 @@ export function VersionEditor({
                 <Icon name="upload" size={15} />
               </span>
               <div className="min-w-0 flex-1">
-                <p className="font-display text-[13px] font-bold uppercase tracking-[0.06em] text-txt">
+                <p className="font-display text-[0.8125rem] font-bold uppercase tracking-[0.06em] text-txt">
                   {t("importSection")}
                 </p>
-                <p className="mt-1 text-[12px] leading-[1.4] text-txt-dim">{t("importSectionLead")}</p>
+                <p className="mt-1 text-[0.75rem] leading-[1.4] text-txt-dim">{t("importSectionLead")}</p>
               </div>
               <Button
                 size="sm"
@@ -915,7 +915,7 @@ export function VersionEditor({
               >
                 {t("importArchive")}
               </Button>
-              {importing && <span className="basis-full font-mono text-[11px] text-txt-muted">{importing}</span>}
+              {importing && <span className="basis-full font-mono text-[0.6875rem] text-txt-muted">{importing}</span>}
               <input
                 ref={archiveRef}
                 type="file"
@@ -932,7 +932,7 @@ export function VersionEditor({
 
         {step === "mods" && (
           <div className="flex min-h-0 flex-1 flex-col gap-2">
-            <p className="shrink-0 font-body text-[12px] text-txt-dim">{t("modsHint")}</p>
+            <p className="shrink-0 font-body text-[0.75rem] text-txt-dim">{t("modsHint")}</p>
             <div className="min-h-0 flex-1">
               <ModSelector
                 value={mods}
@@ -945,11 +945,11 @@ export function VersionEditor({
         )}
 
         {step === "files" && (
-          <div className="grid items-start gap-5 [grid-template-columns:repeat(auto-fit,minmax(420px,1fr))]">
+          <div className="grid items-start gap-5 [grid-template-columns:repeat(auto-fit,minmax(26.25rem,1fr))]">
             <Field label={t("overrides")} hint={t("overridesHint")}>
               <div className="flex flex-col gap-3">
                 <div className="flex flex-wrap items-end gap-3">
-                  <div className="w-[220px]">
+                  <div className="w-[13.75rem]">
                     <Field label={t("prefix")}>
                       <Input
                         value={prefix}
@@ -996,10 +996,10 @@ export function VersionEditor({
                         key={upload.path}
                         className="flex items-center gap-3 border border-solid border-line bg-panel px-3 py-2"
                       >
-                        <span className="truncate font-mono text-[11px] text-txt-muted">
+                        <span className="truncate font-mono text-[0.6875rem] text-txt-muted">
                           {upload.path}
                         </span>
-                        <span className="ml-auto shrink-0 font-mono text-[11px] text-txt-dim">
+                        <span className="ml-auto shrink-0 font-mono text-[0.6875rem] text-txt-dim">
                           {Math.max(1, Math.round(upload.file.size / 1024))} KB
                         </span>
                         <Badge tone={upload.state === "error" ? "bad" : "info"}>
@@ -1007,7 +1007,7 @@ export function VersionEditor({
                         </Badge>
                         <button
                           type="button"
-                          className="shrink-0 font-mono text-[11px] text-txt-dim hover:text-bad"
+                          className="shrink-0 font-mono text-[0.6875rem] text-txt-dim hover:text-bad"
                           onClick={() =>
                             setUploads((current) => current.filter((u) => u.path !== upload.path))
                           }
@@ -1028,7 +1028,7 @@ export function VersionEditor({
             >
               <Textarea
                 rows={5}
-                className="font-mono text-[12px]"
+                className="font-mono text-[0.75rem]"
                 value={extraJson}
                 onChange={(e) => setExtraJson(e.target.value)}
                 placeholder='[{"path":"mods/sodium.jar","sha512":"…","fileSize":123,"source":{"kind":"modrinth","projectId":"AANobbMI","versionId":"…"}}]'
@@ -1041,13 +1041,13 @@ export function VersionEditor({
           <div className="flex flex-col gap-5">
             <div className="flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
               <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
-                <span className="font-mono text-[12px] font-bold">04</span>
+                <span className="font-mono text-[0.75rem] font-bold">04</span>
               </span>
               <div className="min-w-0">
-                <p className="font-display text-[15px] font-bold uppercase tracking-[0.04em] text-txt">
+                <p className="font-display text-[0.9375rem] font-bold uppercase tracking-[0.04em] text-txt">
                   {t("worlds.label")}
                 </p>
-                <p className="mt-1 max-w-[66ch] text-[13px] leading-[1.5] text-txt-dim">
+                <p className="mt-1 max-w-[66ch] text-[0.8125rem] leading-[1.5] text-txt-dim">
                   Optionally include pre-generated Minecraft worlds with this version.
                 </p>
               </div>
@@ -1063,13 +1063,13 @@ export function VersionEditor({
           <div className="flex flex-col gap-5">
             <div className="flex gap-3 border border-solid border-accent-line bg-accent-soft px-4 py-4">
               <span className="grid size-8 shrink-0 place-items-center border border-solid border-accent-line bg-panel text-accent">
-                <span className="font-mono text-[12px] font-bold">05</span>
+                <span className="font-mono text-[0.75rem] font-bold">05</span>
               </span>
               <div className="min-w-0">
-                <p className="font-display text-[15px] font-bold uppercase tracking-[0.04em] text-txt">
+                <p className="font-display text-[0.9375rem] font-bold uppercase tracking-[0.04em] text-txt">
                   {t("optionalEditor.label")}
                 </p>
-                <p className="mt-1 max-w-[66ch] text-[13px] leading-[1.5] text-txt-dim">
+                <p className="mt-1 max-w-[66ch] text-[0.8125rem] leading-[1.5] text-txt-dim">
                   {t("optionalEditor.lead")}
                 </p>
               </div>
@@ -1090,7 +1090,7 @@ export function VersionEditor({
         )}
 
         {step === "review" && (
-          <dl className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
+          <dl className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(18.75rem,1fr))]">
             {[
               [t("versionName"), name],
               [t("minecraft"), minecraft],
@@ -1108,10 +1108,10 @@ export function VersionEditor({
                 key={label}
                 className="flex items-center gap-3 border border-solid border-line bg-panel px-3 py-2"
               >
-                <dt className="font-display text-[11px] font-bold uppercase tracking-[0.08em] text-txt-dim">
+                <dt className="font-display text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-txt-dim">
                   {label}
                 </dt>
-                <dd className="ml-auto truncate font-mono text-[12px] text-txt">{value}</dd>
+                <dd className="ml-auto truncate font-mono text-[0.75rem] text-txt">{value}</dd>
               </div>
             ))}
             <div className="col-span-full">

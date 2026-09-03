@@ -38,7 +38,7 @@ export function ThemePicker({ box, onClose }: ThemePickerProps) {
               }`}
             >
               <span aria-hidden className={`pc-wp pc-wp-dots ${WALLPAPER_CLASS[theme]}`} />
-              <span className="absolute inset-x-0 bottom-1 z-[1] text-center text-[10px] font-semibold text-pc-fg [text-shadow:0_1px_3px_#000]">
+              <span className="absolute inset-x-0 bottom-1 z-[1] text-center text-[0.625rem] font-semibold text-pc-fg [text-shadow:0_1px_3px_#000]">
                 {t(`themes.${theme}`)}
               </span>
             </button>

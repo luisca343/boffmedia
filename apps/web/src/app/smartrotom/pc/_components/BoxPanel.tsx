@@ -62,8 +62,8 @@ export function BoxPanel({ box, contents, secondary = false, onTheme, onShare, o
           onClose={secondary ? closeSecondary : undefined}
         />
 
-        <div className="flex flex-1 items-center justify-center overflow-auto p-[clamp(12px,1.7vw,20px)]">
-          <div className={`w-full ${secondary ? "max-w-[540px]" : "max-w-[660px]"}`}>
+        <div className="flex flex-1 items-center justify-center overflow-auto p-[clamp(0.75rem,1.7vw,1.25rem)]">
+          <div className={`w-full ${secondary ? "max-w-[33.75rem]" : "max-w-[41.25rem]"}`}>
             <BoxGrid cells={cells} onHover={onHover} />
           </div>
         </div>

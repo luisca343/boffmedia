@@ -43,7 +43,7 @@ export function FeatureToggle({
         className,
       )}
     >
-      <div className="flex items-start gap-3.5 p-[15px]">
+      <div className="flex items-start gap-3.5 p-[0.9375rem]">
         <button
           type="button"
           onClick={toggle}
@@ -51,16 +51,16 @@ export function FeatureToggle({
           className="flex min-w-0 flex-1 items-start gap-3.5 text-left focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-[3px]"
         >
           {icon != null && (
-            <span className="grid size-[38px] shrink-0 place-items-center border border-solid border-line-2 bg-panel text-txt">
+            <span className="grid size-[2.375rem] shrink-0 place-items-center border border-solid border-line-2 bg-panel text-txt">
               {icon}
             </span>
           )}
           <span className="min-w-0 flex-1">
-            <span className="block font-display text-[14px] font-bold not-italic uppercase leading-tight tracking-[0.05em] text-txt">
+            <span className="block font-display text-[0.875rem] font-bold not-italic uppercase leading-tight tracking-[0.05em] text-txt">
               {title}
             </span>
             {description != null && (
-              <span className="mt-1 block text-[12.5px] leading-[1.45] text-txt-dim">{description}</span>
+              <span className="mt-1 block text-[0.78125rem] leading-[1.45] text-txt-dim">{description}</span>
             )}
           </span>
         </button>
@@ -82,7 +82,7 @@ export function FeatureToggle({
       </div>
 
       {on && children != null && (
-        <div className="grid gap-3.5 border-t border-solid border-line bg-panel-2 p-[15px]">{children}</div>
+        <div className="grid gap-3.5 border-t border-solid border-line bg-panel-2 p-[0.9375rem]">{children}</div>
       )}
     </div>
   )

@@ -106,12 +106,12 @@ export function OverviewTab({
             label={t("phase")}
             value={`${lp.order}/${phases.length}`}
             icon="layers"
-            foot={<span className="font-mono text-[10px] text-txt-muted">{lp.name}</span>}
+            foot={<span className="font-mono text-[0.625rem] text-txt-muted">{lp.name}</span>}
           />
         )}
       </AvKpis>
 
-      <div className="grid gap-[18px] lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid gap-[1.125rem] lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <AvPanel
           title={ta("title")}
           icon="alert"

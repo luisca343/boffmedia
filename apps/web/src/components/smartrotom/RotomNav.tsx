@@ -122,7 +122,7 @@ export function RotomNav() {
             >
               <div className="flex justify-between items-start gap-2">
                 <div className="flex-grow">
-                  <p className="font-display font-bold not-italic uppercase tracking-[0.04em] text-[11px] leading-tight">
+                  <p className="font-display font-bold not-italic uppercase tracking-[0.04em] text-[0.6875rem] leading-tight">
                     {notif.title}
                   </p>
                   <p className="text-xs mt-1 text-sr-txt-muted normal-case">{notif.body}</p>
@@ -136,7 +136,7 @@ export function RotomNav() {
                   <SmartRotomButton
                     variant="noShadow"
                     size="sm"
-                    className="!py-1 !px-2 text-[11px]"
+                    className="!py-1 !px-2 text-[0.6875rem]"
                     onClick={() => handleMarkRead(notif.id)}
                     aria-label={tNotif("markRead")}
                   >
@@ -153,7 +153,7 @@ export function RotomNav() {
             <SmartRotomButton
               variant="ghost"
               size="sm"
-              className="!py-1 !px-2 text-[11px]"
+              className="!py-1 !px-2 text-[0.6875rem]"
               onClick={handleMarkAllRead}
             >
               <Check size={12} className="mr-1" />

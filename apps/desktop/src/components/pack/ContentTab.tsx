@@ -399,7 +399,7 @@ export function ContentTab({
 
   if (loading) {
     return (
-      <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
+      <span className="flex items-center gap-2 py-6 font-mono text-[0.6875rem] text-txt-dim">
         <Spinner size={12} /> {t("loading")}
       </span>
     );
@@ -521,7 +521,7 @@ export function ContentTab({
       )}
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="min-w-[220px] flex-1">
+        <div className="min-w-[13.75rem] flex-1">
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -606,11 +606,11 @@ export function ContentTab({
         <ul className="flex flex-col">
           {/* A table element would give even columns; these rows need the name
               to absorb all the slack while the actions stay pinned right. */}
-          <li className="flex items-center gap-3 border-b border-solid border-line px-3 py-2 font-display text-[11px] font-bold uppercase tracking-[0.08em] text-txt-dim">
+          <li className="flex items-center gap-3 border-b border-solid border-line px-3 py-2 font-display text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-txt-dim">
             <span className="w-10 shrink-0" />
             <span className="min-w-0 flex-1">Proyecto</span>
-            <span className="hidden w-[200px] shrink-0 md:block">Versión</span>
-            <span className="w-[140px] shrink-0 text-right">Acciones</span>
+            <span className="hidden w-[12.5rem] shrink-0 md:block">Versión</span>
+            <span className="w-[8.75rem] shrink-0 text-right">Acciones</span>
           </li>
           {visible.map((row) => {
             const busy = busyPath === row.path;
@@ -650,7 +650,7 @@ export function ContentTab({
 
                 <span className="flex min-w-0 flex-1 flex-col gap-[2px]">
                   <span className="flex items-center gap-2">
-                    <span className="min-w-0 truncate font-display text-[14px] font-bold uppercase tracking-[0.03em]">
+                    <span className="min-w-0 truncate font-display text-[0.875rem] font-bold uppercase tracking-[0.03em]">
                       {row.name}
                     </span>
                     {/* `new`, matching the browser's Fabric marker: a mod the
@@ -702,7 +702,7 @@ export function ContentTab({
                       )
                     )}
                   </span>
-                  <span className="truncate font-mono text-[12px] text-txt-dim">
+                  <span className="truncate font-mono text-[0.75rem] text-txt-dim">
                     {row.author ? `${row.author} · ` : ""}
                     {KIND_LABEL[row.kind]} · {formatBytes(row.size)}
                   </span>
@@ -711,7 +711,7 @@ export function ContentTab({
                       the delete button, which is the only place it gets asked.
                       Read off the jars, because nothing in the manifest knows. */}
                   {neededBy(row.path).length > 0 && (
-                    <span className="truncate text-[11px] leading-snug text-txt-dim">
+                    <span className="truncate text-[0.6875rem] leading-snug text-txt-dim">
                       {t("neededBy", { names: neededBy(row.path).join(", ") })}
                     </span>
                   )}
@@ -721,7 +721,7 @@ export function ContentTab({
                   {brokenByPath.get(row.path)?.map((b) => (
                     <span
                       key={b.modId}
-                      className="truncate text-[11px] leading-snug text-bad"
+                      className="truncate text-[0.6875rem] leading-snug text-bad"
                     >
                       {b.reason === "disabled"
                         ? t("brokenDisabled", {
@@ -739,12 +739,12 @@ export function ContentTab({
                     is longer than that. `shrink-0` makes the flexible name
                     column give way first — it truncates gracefully, this does
                     not. Capped so a pathological name cannot eat the row. */}
-                <span className="hidden max-w-[440px] shrink-0 flex-col gap-[2px] md:flex">
-                  <span className="whitespace-nowrap font-mono text-[12px] text-txt-muted">
+                <span className="hidden max-w-[27.5rem] shrink-0 flex-col gap-[2px] md:flex">
+                  <span className="whitespace-nowrap font-mono text-[0.75rem] text-txt-muted">
                     {row.fileName}
                   </span>
                   {row.update && (
-                    <span className="whitespace-nowrap font-mono text-[11px] text-accent-bright">
+                    <span className="whitespace-nowrap font-mono text-[0.6875rem] text-accent-bright">
                       → {row.update.label}
                     </span>
                   )}
@@ -755,7 +755,7 @@ export function ContentTab({
                     clickable row, and a delete that also opens Modrinth is
                     not what anyone pressed. */}
                 <span
-                  className="flex w-[140px] shrink-0 items-center justify-end gap-1"
+                  className="flex w-[8.75rem] shrink-0 items-center justify-end gap-1"
                   onClick={(event) => event.stopPropagation()}
                 >
                   {busy ? (

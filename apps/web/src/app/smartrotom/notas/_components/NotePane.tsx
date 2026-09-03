@@ -99,7 +99,7 @@ export function NotePane(props: NotePaneProps) {
               <Icon name="chevron-left" size={18} className="text-nt-fg-muted" />
             </button>
           )}
-          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[12px] text-nt-fg-subtle">
+          <div className="flex min-w-0 flex-1 items-center gap-1.5 overflow-hidden whitespace-nowrap text-[0.75rem] text-nt-fg-subtle">
             <Icon
               name={folder ? "folder" : "file"}
               size={13}
@@ -110,11 +110,11 @@ export function NotePane(props: NotePaneProps) {
             <span className="min-w-0 truncate text-nt-fg-muted">{note.title || t("editor.untitled")}</span>
           </div>
           <div
-            className="inline-flex h-7 items-center gap-1.5 rounded-full border border-nt-border bg-nt-hover px-2.5 text-[12px] text-nt-fg-subtle"
+            className="inline-flex h-7 items-center gap-1.5 rounded-full border border-nt-border bg-nt-hover px-2.5 text-[0.75rem] text-nt-fg-subtle"
             aria-live="polite"
           >
             <span
-              className={`h-[7px] w-[7px] rounded-full ${
+              className={`h-[0.4375rem] w-[0.4375rem] rounded-full ${
                 saveState === "saving" ? "animate-pulse bg-nt-c-warning" : "bg-nt-c-success"
               }`}
             />
@@ -185,13 +185,13 @@ export function NotePane(props: NotePaneProps) {
             />
           ))}
           <button
-            className="inline-flex items-center gap-1 rounded-full border border-dashed border-nt-border-2 px-2 py-0.5 text-[11px] text-nt-fg-subtle hover:border-nt-fg-subtle hover:text-nt-fg-muted"
+            className="inline-flex items-center gap-1 rounded-full border border-dashed border-nt-border-2 px-2 py-0.5 text-[0.6875rem] text-nt-fg-subtle hover:border-nt-fg-subtle hover:text-nt-fg-muted"
             onClick={(e) => props.onAddTag(note, e)}
           >
             <Icon name="plus" size={11} /> {t("editor.addTag")}
           </button>
           <span className="flex-1" />
-          <span className="flex items-center gap-2 text-[11.5px] text-nt-fg-subtle">
+          <span className="flex items-center gap-2 text-[0.71875rem] text-nt-fg-subtle">
             {note.sharedWith.length > 0 && (
               <span className="mr-1 flex">
                 {note.sharedWith.slice(0, 3).map((u) => (

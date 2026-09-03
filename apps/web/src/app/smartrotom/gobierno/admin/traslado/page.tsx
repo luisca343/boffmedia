@@ -62,7 +62,7 @@ export default function TrasladoPage() {
           {t("traslado.orden")}
         </Bar>
         <div className="p-4">
-          <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+          <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
             {t("traslado.jugador")}
           </div>
           <div className="mb-3.5">
@@ -73,7 +73,7 @@ export default function TrasladoPage() {
             )}
           </div>
 
-          <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+          <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
             {t("traslado.destino")}
           </div>
           <div className="mb-3.5">
@@ -84,18 +84,18 @@ export default function TrasladoPage() {
             )}
           </div>
 
-          <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+          <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
             {t("traslado.motivo")}
           </div>
           <div className="mb-3.5">
             <Field value={reason} onChange={setReason} placeholder={t("traslado.motivoPlaceholder")} />
           </div>
 
-          <Sunken className="mb-3.5 px-[13px] py-[11px]">
-            <div className="font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">
+          <Sunken className="mb-3.5 px-[0.8125rem] py-[0.6875rem]">
+            <div className="font-gt-mono text-[0.53125rem] uppercase tracking-[.14em] text-gt-ink-400">
               {t("traslado.aviso")}
             </div>
-            <div className="mt-1 text-[12.5px] leading-normal text-gt-ink-800">{t("traslado.avisoTexto")}</div>
+            <div className="mt-1 text-[0.78125rem] leading-normal text-gt-ink-800">{t("traslado.avisoTexto")}</div>
           </Sunken>
 
           <Button

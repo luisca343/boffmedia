@@ -406,9 +406,11 @@
    DIRECTION TOKENS — Neon (default)
    =========================================================================== */
 :root {
-  --radius-sm: 5px;
-  --radius: 14px;
-  --radius-lg: 22px;
+  /* rem so the corner radius keeps its ratio to the box it rounds once the
+     display scale steps up; a 14px radius on a 19px-root card reads tighter. */
+  --radius-sm: 0.3125rem;
+  --radius: 0.875rem;
+  --radius-lg: 1.375rem;
   --radius-pill: 9999px;
   /* BS/BSX battle primitive padding scale */
   --bsx-pad-sm: 0.45rem 0.55rem;
@@ -444,7 +446,10 @@ html { scroll-behavior: smooth; background: var(--bg); }
    asked for `h-[var(--nav-h)]` (no fallback, so the height collapsed to content)
    while every tool shell offset itself by `var(--nav-h, 66px)`. The two could
    not agree. Anything that sticks below the Navbar reads this token. */
-:root { --nav-h: 66px; }
+/* In rem, not px: it has to grow with the type it wraps when the display scale
+   steps up (@boffmedia/tailwind-config/base.css), or the Navbar stays a 66px
+   1080p band with 19px type crammed into it. */
+:root { --nav-h: 4.125rem; }
 /* apps/web's half of the tool-package layout contract (see ToolManifest.layout
    and MhBar in @boffmedia/tools-mhwilds). A tool package must not do viewport
    math itself — `--nav-h` lives here and nowhere else, so a package reading it
@@ -458,17 +463,18 @@ html { scroll-behavior: smooth; background: var(--bg); }
 :root {
   --tool-vh: calc(100dvh - var(--nav-h));
   --tool-sticky-top: var(--nav-h);
-  /* Height of a tool's sticky bar (`ToolStrip`). It had a `58px` fallback at
-     every call site and no definition anywhere, so the token was decorative and
-     the chassis that reads it could never actually be retuned. It is defined
-     here for the same reason `--nav-h` is: anything that has to line up WITH a
-     tool bar — ToolShell's rail header, mhwilds' roster column — subtracts it
-     rather than repeating the number. */
-  --tool-bar-h: 58px;
 }
+/* `--tool-bar-h` used to be declared here. It moved to
+   @boffmedia/tailwind-config/base.css with the rest of the display scale: it is
+   a rem now, so it grows with the type it has to stay centred around, and
+   apps/desktop needs the same value — which is exactly the drift that put
+   `--nav-h` in one file in the first place. Anything lining up WITH a tool bar
+   still reads `var(--tool-bar-h)` and nothing else. */
 body {
   margin: 0;
-  font: 400 16px/1.55 var(--font-body);
+  /* `1rem`, not `16px`: the hard value ignored both the reader's own browser
+     font size and the display scale on <html>. */
+  font: 400 1rem/1.55 var(--font-body);
   background: var(--bg);
   color: var(--text);
   -webkit-font-smoothing: antialiased;

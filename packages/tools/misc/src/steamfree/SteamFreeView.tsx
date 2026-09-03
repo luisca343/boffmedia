@@ -63,7 +63,7 @@ export function SteamFreeView() {
   const savedValue = currencyFormatter.format(stats.valueCents / 100)
 
   return (
-    <main className="pb-[10px]">
+    <main className="pb-[0.625rem]">
       <ToolHeader
         title={<>{t("titlePre")} <em>{t("titleEm")}</em></>}
         sub={t("sub")}
@@ -76,13 +76,13 @@ export function SteamFreeView() {
         }
       />
 
-      <ToolBar className="mb-[10px]">
-        <SearchInput value={q} onChange={setQ} placeholder={t("searchPlaceholder")} className="min-w-[230px] flex-1" />
+      <ToolBar className="mb-[0.625rem]">
+        <SearchInput value={q} onChange={setQ} placeholder={t("searchPlaceholder")} className="min-w-[14.375rem] flex-1" />
         <Select
           value={sort}
           onChange={(v) => setSort(v as typeof sort)}
           ariaLabel={t("sortLabel")}
-          className="w-auto min-w-[170px]"
+          className="w-auto min-w-[10.625rem]"
           options={[
             { value: "ends", label: t("sortEnds") },
             { value: "value", label: t("sortValue") },
@@ -97,9 +97,9 @@ export function SteamFreeView() {
       </ToolBar>
 
       {/* Steam is the authority here, so say when this snapshot was taken. */}
-      <div className="mb-[22px] flex flex-wrap items-center gap-[10px] font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">
+      <div className="mb-[1.375rem] flex flex-wrap items-center gap-[0.625rem] font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">
         {fetchedAt && (
-          <span className="inline-flex items-center gap-[6px]">
+          <span className="inline-flex items-center gap-[0.375rem]">
             <Icon name="clock" size={12} />
             {t("updated", { time: format.time(new Date(fetchedAt), { hour: "2-digit", minute: "2-digit" }) })}
           </span>
@@ -109,7 +109,7 @@ export function SteamFreeView() {
             href={searchUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center gap-[6px] text-txt-muted underline-offset-4 transition-colors duration-[120ms] hover:text-accent hover:underline"
+            className="inline-flex items-center gap-[0.375rem] text-txt-muted underline-offset-4 transition-colors duration-[120ms] hover:text-accent hover:underline"
           >
             <Icon name="steam" size={12} />
             {t("sourceLink")}
@@ -119,11 +119,11 @@ export function SteamFreeView() {
 
       {/* ── grid ───────────────────────────────────────────────────────────── */}
       {loading ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-[16px]">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-[1rem]">
           {Array.from({ length: 3 }).map((_, i) => (
             <div key={i} className="border border-line bg-panel">
               <Skeleton h={150} className="border-0" />
-              <div className="flex flex-col gap-[10px] p-[16px]">
+              <div className="flex flex-col gap-[0.625rem] p-[1rem]">
                 <Skeleton w="70%" h={18} />
                 <Skeleton w="45%" h={12} />
                 <Skeleton w="35%" h={24} />
@@ -138,7 +138,7 @@ export function SteamFreeView() {
           </Button>
         </Empty>
       ) : list.length ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(320px,1fr))] gap-[16px] max-[600px]:grid-cols-1">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(20rem,1fr))] gap-[1rem] max-[600px]:grid-cols-1">
           {list.map((game) => (
             <SfCard key={game.steamID} game={game} now={now} t={strings} onOpen={open} />
           ))}

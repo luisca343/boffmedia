@@ -99,7 +99,7 @@ export function RomsView() {
               >
                 <div className="flex-1 min-w-0">
                   <h4 className="font-semibold text-txt-primary">{rom.name}</h4>
-                  <div className="flex items-center gap-3 mt-1 text-[12px] text-txt-muted font-mono">
+                  <div className="flex items-center gap-3 mt-1 text-[0.75rem] text-txt-muted font-mono">
                     <span className="uppercase font-bold">{rom.gamePlatform}</span>
                     <span>{truncateSha512(rom.sha512)}</span>
                     <span className="text-line-2">·</span>
@@ -157,7 +157,7 @@ export function RomsView() {
           </>
         }
       >
-        <p className="text-[14px] leading-[1.5] text-txt-muted">
+        <p className="text-[0.875rem] leading-[1.5] text-txt-muted">
           {romToDelete && (
             <>
               {romToDelete.referencedBy > 0 ? (

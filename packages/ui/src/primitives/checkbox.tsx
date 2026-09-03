@@ -29,7 +29,7 @@ export function Checkbox({ checked, defaultChecked, onChange, label, disabled, c
       disabled={disabled}
       onClick={toggle}
       className={cn(
-        "group inline-flex items-center gap-[11px] p-0 border-0 bg-transparent text-left cursor-pointer",
+        "group inline-flex items-center gap-[0.6875rem] p-0 border-0 bg-transparent text-left cursor-pointer",
         "disabled:opacity-40 disabled:cursor-not-allowed",
         "focus-visible:outline-2 focus-visible:outline-accent-line focus-visible:outline-offset-[3px]",
         className,
@@ -54,7 +54,7 @@ export function Checkbox({ checked, defaultChecked, onChange, label, disabled, c
           )}
         />
       </span>
-      {label && <span className="font-body text-[14px] font-medium leading-[1.3] text-txt">{label}</span>}
+      {label && <span className="font-body text-[0.875rem] font-medium leading-[1.3] text-txt">{label}</span>}
     </button>
   )
 }

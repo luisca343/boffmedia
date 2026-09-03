@@ -27,7 +27,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLBut
           "hover:-translate-y-px hover:brightness-110 active:translate-y-px",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ms-gold-2 focus-visible:ring-offset-1 focus-visible:ring-offset-transparent",
           "disabled:pointer-events-none disabled:opacity-50 motion-reduce:transition-none motion-reduce:hover:translate-y-0",
-          sm ? "px-[11px] py-1.5 text-[11px]" : "px-4 py-2.5 text-[13px]",
+          sm ? "px-[0.6875rem] py-1.5 text-[0.6875rem]" : "px-4 py-2.5 text-[0.8125rem]",
           VARIANT[variant],
           className,
         )}
@@ -46,7 +46,7 @@ export const Chip = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLButto
         type={type}
         aria-pressed={active}
         className={cn(
-          "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-[5px] font-ms-uppercase text-[11px] uppercase tracking-[.12em] transition-all duration-150",
+          "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3 py-[0.3125rem] font-ms-uppercase text-[0.6875rem] uppercase tracking-[.12em] transition-all duration-150",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ms-gold-2",
           active
             ? "border-ms-gold-4 bg-gradient-to-b from-ms-gold-2 to-ms-gold-3 text-[#1e120a] shadow-[inset_0_1px_0_rgba(255,255,255,.45),0_0_12px_-3px_rgb(var(--ms-gold-2))]"
@@ -98,7 +98,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSel
     <select
       ref={ref}
       className={cn(
-        "rounded-sm border border-ms-ink-3 bg-ms-paper-2 px-3 py-2.5 font-ms-uppercase text-[11px] uppercase tracking-[.10em] text-ms-ink-1",
+        "rounded-sm border border-ms-ink-3 bg-ms-paper-2 px-3 py-2.5 font-ms-uppercase text-[0.6875rem] uppercase tracking-[.10em] text-ms-ink-1",
         "shadow-[inset_0_2px_4px_rgba(60,40,20,.15)] outline-none focus-visible:ring-2 focus-visible:ring-ms-gold-2",
         className,
       )}

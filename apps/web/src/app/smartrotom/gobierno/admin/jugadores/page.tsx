@@ -83,7 +83,7 @@ export default function JugadoresPage() {
         statusTone="ok"
       />
 
-      <div className={`grid gap-4 ${selUser ? "md:grid-cols-[1fr_330px]" : ""}`}>
+      <div className={`grid gap-4 ${selUser ? "md:grid-cols-[1fr_20.625rem]" : ""}`}>
         <Card className="overflow-hidden">
           <div className="flex flex-wrap items-center gap-3 border-b border-gt-line p-3.5">
             <div className="flex gap-1">
@@ -99,7 +99,7 @@ export default function JugadoresPage() {
                 </Button>
               ))}
             </div>
-            <div className="min-w-[180px] flex-1">
+            <div className="min-w-[11.25rem] flex-1">
               <Field icon="search" value={query} onChange={setQuery} placeholder={t("jugadores.buscarPlaceholder")} />
             </div>
           </div>
@@ -128,10 +128,10 @@ export default function JugadoresPage() {
                     <TD>
                       <div className="flex items-center gap-2.5">
                         <Avatar user={u.username} size={26} />
-                        <span className="font-gt-display text-[13.5px] font-bold text-gt-ink-900">{u.username}</span>
+                        <span className="font-gt-display text-[0.84375rem] font-bold text-gt-ink-900">{u.username}</span>
                       </div>
                     </TD>
-                    <TD className="text-[12px]">{u.world ?? "—"}</TD>
+                    <TD className="text-[0.75rem]">{u.world ?? "—"}</TD>
                     <TD className="font-gt-mono text-xs tabular-nums">{u.energy ?? "—"}</TD>
                     <TD className="font-gt-mono text-xs tabular-nums text-gt-ink-500">{fmtDateTime(u.lastCharge, intlLocale)}</TD>
                     <TD>
@@ -156,7 +156,7 @@ export default function JugadoresPage() {
 
         {selUser && (
           <Card edgeGold className="h-fit overflow-hidden">
-            <div className="flex items-center justify-between gap-2.5 border-b border-gt-line px-4 py-[11px]">
+            <div className="flex items-center justify-between gap-2.5 border-b border-gt-line px-4 py-[0.6875rem]">
               <span className="font-gt-display text-base font-bold text-gt-ink-900">{t("jugadores.ficha")}</span>
               <button
                 type="button"
@@ -175,7 +175,7 @@ export default function JugadoresPage() {
                   <div className="font-gt-display text-lg font-bold text-gt-ink-900">{selUser.username}</div>
                   <div className="mt-1 flex items-center gap-1.5">
                     <span className={`h-2 w-2 rounded-full ${selUser.world ? "bg-gt-ok" : "bg-gt-ink-300"}`} />
-                    <span className="font-gt-mono text-[11px] text-gt-ink-500">
+                    <span className="font-gt-mono text-[0.6875rem] text-gt-ink-500">
                       {selUser.world ?? t("jugadores.desconectado")}
                     </span>
                   </div>
@@ -187,20 +187,20 @@ export default function JugadoresPage() {
                   [t("jugadores.energia"), String(selUser.energy ?? "—")],
                   [t("jugadores.ultActividad"), fmtDateTime(selUser.lastCharge, intlLocale)],
                 ].map(([k, v]) => (
-                  <Sunken key={k} className="px-[11px] py-2">
-                    <div className="font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">{k}</div>
-                    <div className="mt-[3px] font-gt-display text-[15px] font-bold tabular-nums text-gt-ink-900">{v}</div>
+                  <Sunken key={k} className="px-[0.6875rem] py-2">
+                    <div className="font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">{k}</div>
+                    <div className="mt-[3px] font-gt-display text-[0.9375rem] font-bold tabular-nums text-gt-ink-900">{v}</div>
                   </Sunken>
                 ))}
               </div>
 
-              <Sunken className="mb-3.5 px-[11px] py-2">
-                <div className="font-gt-mono text-[8.5px] uppercase tracking-[.12em] text-gt-ink-400">{t("jugadores.uuid")}</div>
-                <div className="mt-[3px] break-all font-gt-mono text-[11.5px] text-gt-ink-700">{selUser.uuid}</div>
+              <Sunken className="mb-3.5 px-[0.6875rem] py-2">
+                <div className="font-gt-mono text-[0.53125rem] uppercase tracking-[.12em] text-gt-ink-400">{t("jugadores.uuid")}</div>
+                <div className="mt-[3px] break-all font-gt-mono text-[0.71875rem] text-gt-ink-700">{selUser.uuid}</div>
               </Sunken>
 
               <div className="mb-3.5">
-                <div className="mb-1.5 font-gt-mono text-[9px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+                <div className="mb-1.5 font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
                   {t("jugadores.nombramientos")}
                 </div>
                 {selOficial && selOficial.roles.length ? (
@@ -224,7 +224,7 @@ export default function JugadoresPage() {
                     })}
                   </div>
                 ) : (
-                  <div className="mb-2 text-[12px] italic text-gt-ink-400">{t("jugadores.sinNombramientos")}</div>
+                  <div className="mb-2 text-[0.75rem] italic text-gt-ink-400">{t("jugadores.sinNombramientos")}</div>
                 )}
 
                 {availableRanks.length > 0 && (

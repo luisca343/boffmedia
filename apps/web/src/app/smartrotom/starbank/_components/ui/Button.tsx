@@ -15,9 +15,9 @@ const VARIANT: Record<Variant, string> = {
 };
 
 const SIZE: Record<Size, string> = {
-  md: "px-3.5 py-[9px] text-[13.5px]",
-  sm: "px-2.5 py-1.5 text-[12.5px]",
-  lg: "px-[18px] py-3 text-[14.5px]",
+  md: "px-3.5 py-[0.5625rem] text-[0.84375rem]",
+  sm: "px-2.5 py-1.5 text-[0.78125rem]",
+  lg: "px-[1.125rem] py-3 text-[0.90625rem]",
   icon: "p-2",
 };
 

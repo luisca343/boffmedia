@@ -34,7 +34,7 @@ export function LogrosView() {
   const totalPoints = React.useMemo(() => list.reduce((n, a) => n + (a.points || 0), 0), [list])
 
   return (
-    <main className="wrap pb-[90px] pt-[34px]">
+    <main className="wrap-wide pb-[5.625rem] pt-[2.125rem]">
       <ToolHeader
         title={t("title")}
         sub={t("lead")}
@@ -46,7 +46,7 @@ export function LogrosView() {
       />
 
       <ToolBar note={t("count", { count: filtered.length })}>
-        <SearchInput value={q} onChange={setQ} placeholder={t("search")} className="max-w-[360px] flex-1 basis-[240px]" />
+        <SearchInput value={q} onChange={setQ} placeholder={t("search")} className="max-w-[22.5rem] flex-1 basis-[15rem]" />
         <div className="max-w-full overflow-x-auto">
           <Seg
             options={FILTERS.map((f) => ({ value: f, label: t(`filter.${f}`) }))}
@@ -70,7 +70,7 @@ export function LogrosView() {
       ) : filtered.length === 0 ? (
         <Empty icon="star" title={t("empty.title")} lead={t("empty.lead")} />
       ) : (
-        <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(420px,1fr))] max-[720px]:grid-cols-1">
+        <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(26.25rem,1fr))] max-[720px]:grid-cols-1">
           {filtered.map((a) => (
             <AchievementItem key={a.id} achievement={a} showEvent />
           ))}

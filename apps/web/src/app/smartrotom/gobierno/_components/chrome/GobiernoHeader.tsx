@@ -21,10 +21,10 @@ export function GobiernoHeader() {
         <div className="flex min-w-0 items-center gap-3">
           <Seal size={48} />
           <div className="min-w-0">
-            <h1 className="whitespace-nowrap font-gt-display text-lg leading-none tracking-[.01em] text-gt-ink-900 md:text-[23px]">
+            <h1 className="whitespace-nowrap font-gt-display text-lg leading-none tracking-[.01em] text-gt-ink-900 md:text-[1.4375rem]">
               {t("header.title")}
             </h1>
-            <div className="mt-[3px] hidden font-gt-mono text-[9.5px] uppercase tracking-[.18em] text-gt-ink-400 sm:block">
+            <div className="mt-[3px] hidden font-gt-mono text-[0.59375rem] uppercase tracking-[.18em] text-gt-ink-400 sm:block">
               {t("header.subtitle")}
             </div>
           </div>
@@ -33,11 +33,11 @@ export function GobiernoHeader() {
         <button
           type="button"
           onClick={() => setCmdOpen(true)}
-          className="hidden min-w-[220px] items-center gap-2.5 rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 px-3.5 py-2 text-gt-ink-400 transition-colors hover:bg-gt-paper-1 lg:flex"
+          className="hidden min-w-[13.75rem] items-center gap-2.5 rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 px-3.5 py-2 text-gt-ink-400 transition-colors hover:bg-gt-paper-1 lg:flex"
         >
           <Icon name="search" size={15} />
-          <span className="flex-1 text-left text-[13px]">{t("header.searchPlaceholder")}</span>
-          <span className="rounded border border-gt-line-strong px-1.5 py-px font-gt-mono text-[10px]">⌘K</span>
+          <span className="flex-1 text-left text-[0.8125rem]">{t("header.searchPlaceholder")}</span>
+          <span className="rounded border border-gt-line-strong px-1.5 py-px font-gt-mono text-[0.625rem]">⌘K</span>
         </button>
 
         <div className="flex items-center gap-3">
@@ -46,11 +46,11 @@ export function GobiernoHeader() {
           <button
             type="button"
             onClick={() => openDossier(uuid)}
-            className="hidden items-center gap-2.5 rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 py-[5px] pl-3 pr-[6px] transition-colors hover:bg-gt-paper-1 md:flex"
+            className="hidden items-center gap-2.5 rounded-gt-sm border border-gt-line-strong bg-gt-paper-0 py-[0.3125rem] pl-3 pr-[0.375rem] transition-colors hover:bg-gt-paper-1 md:flex"
           >
             <div className="text-right">
-              <div className="text-[12.5px] font-bold leading-none text-gt-ink-900">{username}</div>
-              <div className="mt-0.5 font-gt-mono text-[9.5px] text-gt-accent">
+              <div className="text-[0.78125rem] font-bold leading-none text-gt-ink-900">{username}</div>
+              <div className="mt-0.5 font-gt-mono text-[0.59375rem] text-gt-accent">
                 {rankLabel} · {t("poblacion.placa", { badge })}
               </div>
             </div>

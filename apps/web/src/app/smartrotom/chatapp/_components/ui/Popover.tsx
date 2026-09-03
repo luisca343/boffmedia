@@ -38,7 +38,7 @@ export function PopItem({ className, type = "button", children, ...rest }: ItemP
     <button
       type={type}
       className={cn(
-        "flex w-full items-center gap-3 whitespace-nowrap rounded-ca-md px-3 py-[9px] text-left transition-colors duration-[120ms] hover:bg-ca-500/[.12]",
+        "flex w-full items-center gap-3 whitespace-nowrap rounded-ca-md px-3 py-[0.5625rem] text-left transition-colors duration-[120ms] hover:bg-ca-500/[.12]",
         className,
       )}
       {...rest}

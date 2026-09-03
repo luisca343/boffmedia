@@ -45,7 +45,7 @@ export function LeaderboardView() {
   const labels = { points: t("sort.points"), medals: t("sort.medals"), achievements: t("sort.achievements") }
 
   return (
-    <main className="wrap pb-[90px] pt-[34px]">
+    <main className="wrap-wide pb-[5.625rem] pt-[2.125rem]">
       <ToolHeader
         title={t("title")}
         sub={t("lead")}
@@ -53,7 +53,7 @@ export function LeaderboardView() {
       />
 
       <ToolBar note={t("count", { count: total })}>
-        <SearchInput value={q} onChange={setQ} placeholder={t("search")} className="max-w-[360px] flex-1 basis-[240px]" />
+        <SearchInput value={q} onChange={setQ} placeholder={t("search")} className="max-w-[22.5rem] flex-1 basis-[15rem]" />
         <Seg
           options={[
             { value: "points", label: t("sort.points") },
@@ -100,7 +100,7 @@ export function LeaderboardView() {
 
           {pageCount > 1 && (
             <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-              <span className="font-mono text-[11px] font-medium tracking-[0.06em] text-txt-dim">
+              <span className="font-mono text-[0.6875rem] font-medium tracking-[0.06em] text-txt-dim">
                 {t("showing", { from: start + 1, to: Math.min(start + PER_PAGE, total), total })}
               </span>
               <Pagination page={clampedPage} total={pageCount} onChange={setPage} />

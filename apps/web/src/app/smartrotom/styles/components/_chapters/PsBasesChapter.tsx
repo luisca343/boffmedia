@@ -83,11 +83,11 @@ export function PsBasesChapter() {
         >
           <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="flex flex-col gap-2.5 rounded-[6px] border border-ps-gild/18 p-4">
-              <span className="font-ps-mono text-[10px] uppercase tracking-[.2em] text-ps-chrome-subtle">
+              <span className="font-ps-mono text-[0.625rem] uppercase tracking-[.2em] text-ps-chrome-subtle">
                 Escritorio
               </span>
-              <span className="font-ps-ceremony text-[19px] text-ps-chrome-fg">Gobierno de Teras</span>
-              <span className="font-ps text-[12.5px] text-ps-chrome-muted">
+              <span className="font-ps-ceremony text-[1.1875rem] text-ps-chrome-fg">Gobierno de Teras</span>
+              <span className="font-ps text-[0.78125rem] text-ps-chrome-muted">
                 Control de Fronteras · mostrador 04
               </span>
               <div className="mt-1 flex items-center gap-2">
@@ -96,20 +96,20 @@ export function PsBasesChapter() {
                   Inspección
                 </Button>
                 <NavButton aria-label="Página siguiente">
-                  <Icon name="chevR" className="h-[19px] w-[19px]" />
+                  <Icon name="chevR" className="h-[1.1875rem] w-[1.1875rem]" />
                 </NavButton>
               </div>
             </div>
 
             <Leaf accent="info">
-              <span className="font-ps-mono text-[10px] uppercase tracking-[.2em] text-ps-chapter-deep">
+              <span className="font-ps-mono text-[0.625rem] uppercase tracking-[.2em] text-ps-chapter-deep">
                 Papel
               </span>
-              <p className="mt-1 font-ps-ceremony text-[19px] text-ps-ink">Carné Oficial</p>
-              <p className="font-ps text-[12.5px] text-ps-ink-soft">
+              <p className="mt-1 font-ps-ceremony text-[1.1875rem] text-ps-ink">Carné Oficial</p>
+              <p className="font-ps text-[0.78125rem] text-ps-ink-soft">
                 Expedido en Fukitsu · válido cuatro años
               </p>
-              <p className="ps-num mt-2.5 font-ps-mono text-[11px] tracking-[.12em] text-ps-ink-faint">
+              <p className="ps-num mt-2.5 font-ps-mono text-[0.6875rem] tracking-[.12em] text-ps-ink-faint">
                 TRS-7741-K
               </p>
             </Leaf>
@@ -197,10 +197,10 @@ export function PsBasesChapter() {
           note="Sólo versales. Cinzel no tiene minúsculas de verdad y una frase en caja baja se ve rota: si tu texto no va grabado o estampado, no es esta cara."
         >
           <div className="flex flex-col gap-2">
-            <span className="ps-foil font-ps-display text-[26px] font-bold tracking-[.14em]">
+            <span className="ps-foil font-ps-display text-[1.625rem] font-bold tracking-[.14em]">
               PASAPORTE
             </span>
-            <span className="font-ps-display text-[18px] font-extrabold tracking-[.12em] text-ps-gild-hi">
+            <span className="font-ps-display text-[1.125rem] font-extrabold tracking-[.12em] text-ps-gild-hi">
               TEMPORADA VII
             </span>
           </div>
@@ -214,9 +214,9 @@ export function PsBasesChapter() {
           note="La cara de los títulos de capítulo Y de todo VALOR: el nombre del entrenador, la cifra de una placa, el rango. Sobre el papel, siempre `text-ps-ink`."
         >
           <Leaf accent="oxblood">
-            <p className="font-ps-ceremony text-[30px] leading-none text-ps-ink">Identidad</p>
-            <p className="ps-num mt-2 font-ps-ceremony text-[26px] leading-none text-ps-ink">1.284</p>
-            <p className="mt-1 font-ps text-[11px] text-ps-ink-faint">Capturas registradas</p>
+            <p className="font-ps-ceremony text-[1.875rem] leading-none text-ps-ink">Identidad</p>
+            <p className="ps-num mt-2 font-ps-ceremony text-[1.625rem] leading-none text-ps-ink">1.284</p>
+            <p className="mt-1 font-ps text-[0.6875rem] text-ps-ink-faint">Capturas registradas</p>
           </Leaf>
         </Sample>
 
@@ -228,10 +228,10 @@ export function PsBasesChapter() {
           note="El cuerpo y las etiquetas de campo. Es la cara neutra del documento: la que no quiere que la mires."
         >
           <Leaf accent="teal">
-            <p className="font-ps text-[12.5px] font-semibold text-ps-ink-soft">
+            <p className="font-ps text-[0.78125rem] font-semibold text-ps-ink-soft">
               Nombre del titular
             </p>
-            <p className="font-ps text-[12.5px] text-ps-ink-soft">
+            <p className="font-ps text-[0.78125rem] text-ps-ink-soft">
               El cuerpo del documento va en Public Sans, a 12,5px, en tinta suave.
             </p>
           </Leaf>
@@ -245,10 +245,10 @@ export function PsBasesChapter() {
           note="`.ps-num` fija cifras tabulares y NO es negociable: un pasaporte cuyos dígitos cambian de ancho entre dos filas no es un pasaporte. Va en toda cifra, en todo código y en toda fecha."
         >
           <Leaf accent="info">
-            <p className="ps-num font-ps-mono text-[13px] tracking-[.12em] text-ps-ink-soft">
+            <p className="ps-num font-ps-mono text-[0.8125rem] tracking-[.12em] text-ps-ink-soft">
               TRS-7741-K · 14 MAR 2024
             </p>
-            <p className="ps-num font-ps-mono text-[13px] tracking-[.12em] text-ps-ink-soft">
+            <p className="ps-num font-ps-mono text-[0.8125rem] tracking-[.12em] text-ps-ink-soft">
               REG-0912-F · 02 ABR 2024
             </p>
           </Leaf>
@@ -287,10 +287,10 @@ export function PsBasesChapter() {
                 data-ornament={o}
                 className="ps-app grid gap-2 rounded-[6px] border border-ps-gild/18 p-3 [background:none]"
               >
-                <span className="font-ps-mono text-[10px] uppercase tracking-[.18em] text-ps-chrome-subtle">
+                <span className="font-ps-mono text-[0.625rem] uppercase tracking-[.18em] text-ps-chrome-subtle">
                   {o}
                 </span>
-                <div className="ps-paper-surface relative h-[104px] overflow-hidden rounded-[4px] border border-ps-ink/22" />
+                <div className="ps-paper-surface relative h-[6.5rem] overflow-hidden rounded-[4px] border border-ps-ink/22" />
               </div>
             ))}
           </div>
@@ -302,9 +302,9 @@ export function PsBasesChapter() {
           app="ps"
           note="La tela de la tapa, y el bloque de hojas visto de canto. El grosor NO es una sombra: son doce escalones duros de 1px que alternan hoja iluminada (`--ps-leaf`) y sombra entre hojas (`--ps-leaf-shade`), y debajo una losa de 16px con el cartón de la tapa (`--ps-board`). Difumina esos escalones y el libro vuelve a ser una hoja suelta. Los pasos huyen del lomo, así que `-r` y `-l` son espejo."
         >
-          <div className="relative grid h-[150px] w-full place-items-center">
-            <div className="ps-buckram ps-emboss ps-leaves-r relative grid h-[112px] w-[172px] place-items-center overflow-hidden rounded-[4px] bg-gradient-to-br from-ps-navy to-ps-navy-deep">
-              <span className="ps-foil font-ps-display text-[13px] font-bold tracking-[.16em]">
+          <div className="relative grid h-[9.375rem] w-full place-items-center">
+            <div className="ps-buckram ps-emboss ps-leaves-r relative grid h-[7rem] w-[10.75rem] place-items-center overflow-hidden rounded-[4px] bg-gradient-to-br from-ps-navy to-ps-navy-deep">
+              <span className="ps-foil font-ps-display text-[0.8125rem] font-bold tracking-[.16em]">
                 PASAPORTE
               </span>
             </div>
@@ -318,9 +318,9 @@ export function PsBasesChapter() {
           note="El único sitio del documento donde se admite un arcoíris saturado. Un holograma DEBE desentonar sobre el papel — eso es justo lo que lo hace leerse como medida de seguridad y no como adorno. Los tres bucles llevan `ps-loop`, así que `data-motion=off` los aparca."
         >
           <div className="flex flex-wrap items-center gap-5">
-            <span className="ps-holo h-[46px] w-[46px] rounded-lg" />
-            <span className="ps-holo-gold h-[46px] w-[46px] rounded-full" />
-            <span className="ps-holo-ring grid h-[74px] w-[74px] place-items-center rounded-full bg-ps-paper text-center font-ps-mono text-[9px] tracking-[.1em] text-ps-teal-deep">
+            <span className="ps-holo h-[2.875rem] w-[2.875rem] rounded-lg" />
+            <span className="ps-holo-gold h-[2.875rem] w-[2.875rem] rounded-full" />
+            <span className="ps-holo-ring grid h-[4.625rem] w-[4.625rem] place-items-center rounded-full bg-ps-paper text-center font-ps-mono text-[0.5625rem] tracking-[.1em] text-ps-teal-deep">
               SELLO
               <br />
               VÁLIDO
@@ -334,9 +334,9 @@ export function PsBasesChapter() {
           app="ps"
           note="La rejilla teal y la barra de barrido del modo Inspección. En la app son `fixed` y cubren todo el mostrador; aquí van recortadas dentro del espécimen para poder verlas."
         >
-          <div className="relative h-[110px] w-full overflow-hidden rounded-[6px] border border-ps-gild/18 bg-ps-desk-lo">
+          <div className="relative h-[6.875rem] w-full overflow-hidden rounded-[6px] border border-ps-gild/18 bg-ps-desk-lo">
             <span className="ps-grid-glow absolute inset-0" />
-            <span className="ps-beam ps-loop absolute left-0 right-0 h-[60px] animate-ps-scan motion-reduce:animate-none" />
+            <span className="ps-beam ps-loop absolute left-0 right-0 h-[3.75rem] animate-ps-scan motion-reduce:animate-none" />
           </div>
         </Sample>
       </Section>

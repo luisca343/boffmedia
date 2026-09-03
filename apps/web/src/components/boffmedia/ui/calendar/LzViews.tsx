@@ -45,7 +45,7 @@ export function LzCalendarMonth({
     <div className="flex flex-col" role="grid" aria-label={LZ_MONTHS[month] + " " + year}>
       <div className="grid grid-cols-7" role="row">
         {LZ_WD.map((w, i) => (
-          <span key={w} role="columnheader" className={cn("px-3 py-2.5 font-mono text-[10px]/none font-semibold uppercase tracking-[0.14em]", i >= 5 ? "text-[color:color-mix(in_oklab,var(--accent)_60%,var(--dim))]" : "text-txt-dim")}>
+          <span key={w} role="columnheader" className={cn("px-3 py-2.5 font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.14em]", i >= 5 ? "text-[color:color-mix(in_oklab,var(--accent)_60%,var(--dim))]" : "text-txt-dim")}>
             {w}
           </span>
         ))}
@@ -61,7 +61,7 @@ export function LzCalendarMonth({
               role="gridcell"
               onClick={() => n && onSelectDay && onSelectDay(d)}
               className={cn(
-                "flex min-h-[118px] flex-col gap-1.5 border-l border-t border-solid border-line p-2",
+                "flex min-h-[7.375rem] flex-col gap-1.5 border-l border-t border-solid border-line p-2",
                 idx % 7 === 6 && "border-r",
                 idx >= cells.length - 7 && "border-b",
                 !inMonth && "bg-base-2",
@@ -70,9 +70,9 @@ export function LzCalendarMonth({
               )}
             >
               <div className="flex items-center gap-1.5">
-                <span className={cn("font-mono text-[14px]/none font-bold", isToday ? "text-accent" : inMonth ? "text-txt-muted" : "text-txt-dim")}>{d.getDate()}</span>
-                {isToday && <span className="bg-accent px-[5px] py-[3px] font-mono text-[8px]/none font-bold uppercase tracking-[0.1em] text-accent-ink">{t("today")}</span>}
-                {n > 0 && <span className="ml-auto font-mono text-[10px]/none font-bold text-txt-dim">{n}</span>}
+                <span className={cn("font-mono text-[0.875rem]/none font-bold", isToday ? "text-accent" : inMonth ? "text-txt-muted" : "text-txt-dim")}>{d.getDate()}</span>
+                {isToday && <span className="bg-accent px-[0.3125rem] py-[3px] font-mono text-[0.5rem]/none font-bold uppercase tracking-[0.1em] text-accent-ink">{t("today")}</span>}
+                {n > 0 && <span className="ml-auto font-mono text-[0.625rem]/none font-bold text-txt-dim">{n}</span>}
               </div>
               <div className="flex min-h-0 flex-col gap-1">{renderDay && renderDay(d, { inMonth, isToday })}</div>
             </div>
@@ -95,16 +95,16 @@ export function LzDateGroup({ date, items = [], today = new Date(), wished, onWi
   const normal = items.filter((g) => g.hype <= 3)
   return (
     <section id={id} className={cn("scroll-mt-[84px]", past && "opacity-50")}>
-      <div className={cn("mb-[14px] flex items-baseline gap-3 border-b border-solid pb-[9px]", isToday ? "border-accent" : "border-line-2")}>
-        <span className="inline-flex flex-none items-baseline gap-[7px]">
-          <b className={cn("font-display text-[30px]/[0.9] font-extrabold italic tracking-[-0.01em]", isToday ? "text-accent" : "text-txt")}>{date.getDate()}</b>
-          <span className="font-mono text-[12px]/none font-bold uppercase tracking-[0.14em] text-txt-muted">{LZ_MONTHS[date.getMonth()].slice(0, 3)}</span>
+      <div className={cn("mb-[0.875rem] flex items-baseline gap-3 border-b border-solid pb-[0.5625rem]", isToday ? "border-accent" : "border-line-2")}>
+        <span className="inline-flex flex-none items-baseline gap-[0.4375rem]">
+          <b className={cn("font-display text-[1.875rem]/[0.9] font-extrabold italic tracking-[-0.01em]", isToday ? "text-accent" : "text-txt")}>{date.getDate()}</b>
+          <span className="font-mono text-[0.75rem]/none font-bold uppercase tracking-[0.14em] text-txt-muted">{LZ_MONTHS[date.getMonth()].slice(0, 3)}</span>
         </span>
-        <span className="font-mono text-[12px]/none font-semibold capitalize tracking-[0.03em] text-txt-muted">{LZ_WD_LONG[(date.getDay() + 6) % 7]}</span>
-        <span className={cn("font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em]", isToday ? "text-accent" : "text-txt-dim")}>{isToday ? t("today") : lzRelativeDays(days)}</span>
-        {isToday && <span className="bg-accent px-[7px] py-1 font-mono text-[9px]/none font-bold uppercase tracking-[0.12em] text-accent-ink">{t("today")}</span>}
+        <span className="font-mono text-[0.75rem]/none font-semibold capitalize tracking-[0.03em] text-txt-muted">{LZ_WD_LONG[(date.getDay() + 6) % 7]}</span>
+        <span className={cn("font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.08em]", isToday ? "text-accent" : "text-txt-dim")}>{isToday ? t("today") : lzRelativeDays(days)}</span>
+        {isToday && <span className="bg-accent px-[0.4375rem] py-1 font-mono text-[0.5625rem]/none font-bold uppercase tracking-[0.12em] text-accent-ink">{t("today")}</span>}
         <span className="flex-1" />
-        <span className="flex-none font-mono text-[11px]/none font-semibold uppercase tracking-[0.08em] text-txt-dim">
+        <span className="flex-none font-mono text-[0.6875rem]/none font-semibold uppercase tracking-[0.08em] text-txt-dim">
           {items.length} {t("premieres", { count: items.length })}
         </span>
       </div>
@@ -117,7 +117,7 @@ export function LzDateGroup({ date, items = [], today = new Date(), wished, onWi
           </div>
         )}
         {normal.length > 0 && (
-          <div className="grid gap-x-3 gap-y-4 [grid-template-columns:repeat(auto-fill,minmax(158px,1fr))]">
+          <div className="grid gap-x-3 gap-y-4 [grid-template-columns:repeat(auto-fill,minmax(9.875rem,1fr))]">
             {normal.map((g) => (
               <LzPosterCard key={g.id} game={g} onOpen={onOpen} />
             ))}
@@ -137,15 +137,15 @@ export function LzWeekStrip({ days, byDay, today, wished, onOpen }: { days: Date
         const items = byDay[lzKeyOf(d)] || []
         const isToday = lzSameDay(d, today)
         return (
-          <div key={lzKeyOf(d)} className={cn("flex min-h-[340px] flex-col border-l border-solid border-line first:border-l-0", isToday && "bg-accent-soft")}>
+          <div key={lzKeyOf(d)} className={cn("flex min-h-[21.25rem] flex-col border-l border-solid border-line first:border-l-0", isToday && "bg-accent-soft")}>
             <div className={cn("relative flex flex-col items-center gap-[3px] border-b border-solid px-2 py-3", isToday ? "border-accent-line" : "border-line")}>
-              <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{lzWdShort(d)}</span>
-              <span className={cn("font-display text-[24px]/none font-extrabold italic", isToday && "text-accent")}>{d.getDate()}</span>
-              {isToday && <span className="bg-accent px-[5px] py-[2px] font-mono text-[8px]/none font-bold uppercase tracking-[0.1em] text-accent-ink">{t("today")}</span>}
+              <span className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{lzWdShort(d)}</span>
+              <span className={cn("font-display text-[1.5rem]/none font-extrabold italic", isToday && "text-accent")}>{d.getDate()}</span>
+              {isToday && <span className="bg-accent px-[0.3125rem] py-[2px] font-mono text-[0.5rem]/none font-bold uppercase tracking-[0.1em] text-accent-ink">{t("today")}</span>}
             </div>
             <div className="flex flex-1 flex-col gap-1.5 p-2">
               {items.length === 0 ? (
-                <span className="pt-[14px] text-center font-mono text-[12px]/none font-semibold text-txt-dim">—</span>
+                <span className="pt-[0.875rem] text-center font-mono text-[0.75rem]/none font-semibold text-txt-dim">—</span>
               ) : (
                 items.map((g) => (
                   <button
@@ -154,10 +154,10 @@ export function LzWeekStrip({ days, byDay, today, wished, onOpen }: { days: Date
                     onClick={() => onOpen && onOpen(g)}
                     title={g.title}
                     style={{ "--ph": platColor(g) } as React.CSSProperties}
-                    className={cn("relative overflow-hidden border border-solid border-line py-[9px] pl-[14px] pr-2.5 text-left transition-[border-color,transform] duration-[140ms] hover:translate-x-[2px] hover:border-[color:var(--ph)]", g.hype >= 5 ? "bg-[color-mix(in_oklab,var(--accent)_8%,var(--panel-2))]" : "bg-panel-2")}
+                    className={cn("relative overflow-hidden border border-solid border-line py-[0.5625rem] pl-[0.875rem] pr-2.5 text-left transition-[border-color,transform] duration-[140ms] hover:translate-x-[2px] hover:border-[color:var(--ph)]", g.hype >= 5 ? "bg-[color-mix(in_oklab,var(--accent)_8%,var(--panel-2))]" : "bg-panel-2")}
                   >
                     <span className="absolute bottom-0 left-0 top-0 w-1 bg-[color:var(--ph)]" />
-                    <span className="mb-[7px] block text-[12.5px] font-semibold leading-[1.25]">
+                    <span className="mb-[0.4375rem] block text-[0.78125rem] font-semibold leading-[1.25]">
                       {g.title}
                       {wished && wished.has(g.id) && <Icon name="star" size={10} className="ml-[3px] inline-block fill-current align-middle text-warn" />}
                     </span>
@@ -200,10 +200,10 @@ export function LzTimeline({ releases, today, wished, onOpen }: { releases: LzRe
         const isNow = key === todayKey
         return (
           <div key={key} role="listitem" className={cn("flex flex-[0_0_264px] flex-col border-l border-solid border-line first:border-l-0 [scroll-snap-align:start]", isNow && "bg-[color-mix(in_oklab,var(--accent)_5%,transparent)]")}>
-            <div className={cn("sticky top-0 z-[1] flex items-baseline gap-2 border-b border-solid bg-panel px-4 py-[14px]", isNow ? "border-b-2 border-accent" : "border-line")}>
-              <span className={cn("font-display text-[20px]/none font-extrabold italic", isNow && "text-accent")}>{LZ_MONTHS[col.mo].charAt(0).toUpperCase() + LZ_MONTHS[col.mo].slice(1)}</span>
-              <span className="font-mono text-[11px]/none font-semibold text-txt-dim">{col.y}</span>
-              <span className="ml-auto border border-solid border-line bg-base-2 px-[7px] py-1 font-mono text-[11px]/none font-bold text-txt-muted">{col.items.length}</span>
+            <div className={cn("sticky top-0 z-[1] flex items-baseline gap-2 border-b border-solid bg-panel px-4 py-[0.875rem]", isNow ? "border-b-2 border-accent" : "border-line")}>
+              <span className={cn("font-display text-[1.25rem]/none font-extrabold italic", isNow && "text-accent")}>{LZ_MONTHS[col.mo].charAt(0).toUpperCase() + LZ_MONTHS[col.mo].slice(1)}</span>
+              <span className="font-mono text-[0.6875rem]/none font-semibold text-txt-dim">{col.y}</span>
+              <span className="ml-auto border border-solid border-line bg-base-2 px-[0.4375rem] py-1 font-mono text-[0.6875rem]/none font-bold text-txt-muted">{col.items.length}</span>
             </div>
             <div className="flex flex-col gap-2 p-3">
               {col.items.map((g) => {
@@ -217,14 +217,14 @@ export function LzTimeline({ releases, today, wished, onOpen }: { releases: LzRe
                     onClick={() => onOpen && onOpen(g)}
                     title={g.title}
                     style={{ "--ph": platColor(g) } as React.CSSProperties}
-                    className={cn("flex gap-[11px] border border-solid border-line border-l-4 border-l-[color:var(--ph)] px-[11px] py-2.5 text-left transition-[border-color,transform] duration-[140ms] hover:translate-x-[2px] hover:border-line-2 hover:border-l-[color:var(--ph)]", past && "opacity-55", isToday && "[box-shadow:inset_0_0_0_1px_var(--accent-line)]", g.hype >= 5 ? "bg-[color-mix(in_oklab,var(--accent)_8%,var(--panel-2))]" : "bg-panel-2")}
+                    className={cn("flex gap-[0.6875rem] border border-solid border-line border-l-4 border-l-[color:var(--ph)] px-[0.6875rem] py-2.5 text-left transition-[border-color,transform] duration-[140ms] hover:translate-x-[2px] hover:border-line-2 hover:border-l-[color:var(--ph)]", past && "opacity-55", isToday && "[box-shadow:inset_0_0_0_1px_var(--accent-line)]", g.hype >= 5 ? "bg-[color-mix(in_oklab,var(--accent)_8%,var(--panel-2))]" : "bg-panel-2")}
                   >
-                    <span className="flex min-w-[30px] flex-none flex-col items-center font-display text-[19px]/none font-extrabold italic">
+                    <span className="flex min-w-[1.875rem] flex-none flex-col items-center font-display text-[1.1875rem]/none font-extrabold italic">
                       {d.getDate()}
-                      <small className="mt-1 font-mono text-[8px]/none font-semibold uppercase tracking-[0.08em] text-txt-dim">{lzWdShort(d)}</small>
+                      <small className="mt-1 font-mono text-[0.5rem]/none font-semibold uppercase tracking-[0.08em] text-txt-dim">{lzWdShort(d)}</small>
                     </span>
                     <span className="flex min-w-0 flex-col gap-1.5">
-                      <span className="text-[12.5px] font-semibold leading-[1.25]">
+                      <span className="text-[0.78125rem] font-semibold leading-[1.25]">
                         {g.title}
                         {wished && wished.has(g.id) && <Icon name="star" size={10} className="ml-[3px] inline-block fill-current align-middle text-warn" />}
                       </span>

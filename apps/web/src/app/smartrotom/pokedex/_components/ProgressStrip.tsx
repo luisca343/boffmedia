@@ -34,13 +34,13 @@ export function ProgressStrip() {
     <div className="bg-[radial-gradient(700px_200px_at_80%_-50%,rgba(249,115,22,0.12),transparent_60%)] bg-gradient-to-b from-white/[0.03] to-white/[0.015] border border-white/[0.08] rounded-[14px] p-5">
       <div className="flex items-end justify-between gap-6 mb-4">
         <div>
-          <p className="font-pk-mono text-[11px] tracking-[0.12em] uppercase text-pk-surface-500 mb-1.5">
+          <p className="font-pk-mono text-[0.6875rem] tracking-[0.12em] uppercase text-pk-surface-500 mb-1.5">
             {t("progress_title")}
           </p>
-          <div className="font-pk-display font-bold text-[44px] leading-none tracking-tight flex items-baseline gap-2.5 tabular-nums">
+          <div className="font-pk-display font-bold text-[2.75rem] leading-none tracking-tight flex items-baseline gap-2.5 tabular-nums">
             <span className="text-pk-surface-50">{caught}</span>
             <span className="text-pk-surface-600 font-normal">/</span>
-            <span className="text-pk-surface-400 text-[28px]">{total}</span>
+            <span className="text-pk-surface-400 text-[1.75rem]">{total}</span>
             <span className="text-xs font-pk font-medium text-pk-primary-300 bg-pk-primary-400/[0.12] px-2.5 py-1 rounded-full ml-1.5">
               {pct}%
             </span>
@@ -73,7 +73,7 @@ export function ProgressStrip() {
         ))}
       </div>
 
-      <div className="flex gap-[18px] mt-3 flex-wrap">
+      <div className="flex gap-[1.125rem] mt-3 flex-wrap">
         {segments.map((s) => (
           <button
             key={s.id}

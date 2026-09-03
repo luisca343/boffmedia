@@ -121,7 +121,7 @@ export function BuildSlot({
         aria-hidden="true"
       />
       <Icon name={icon} size={30} className="relative text-gt-ink-300" />
-      <span className="absolute inset-x-0 bottom-2 text-center font-gt-mono text-[9px] uppercase tracking-[.08em] text-gt-ink-400">
+      <span className="absolute inset-x-0 bottom-2 text-center font-gt-mono text-[0.5625rem] uppercase tracking-[.08em] text-gt-ink-400">
         [ {label} ]
       </span>
     </div>
@@ -144,7 +144,7 @@ export function Countdown({ iso, label }: { iso: string | null; label?: string }
 
   return (
     <div className="text-right">
-      <div className="font-gt-mono text-[8.5px] uppercase tracking-[.14em] text-gt-ink-400">
+      <div className="font-gt-mono text-[0.53125rem] uppercase tracking-[.14em] text-gt-ink-400">
         {closed ? t("actividad.estado") : (label ?? t("eventos.cierraEn"))}
       </div>
       <div
@@ -181,7 +181,7 @@ export function RankMark({ rank }: { rank: number }) {
     return (
       <span className="inline-flex items-center gap-1 text-gt-gold-600">
         <Icon name="award" size={15} fill="rgb(var(--gt-gold-600))" />
-        <span className="font-gt-mono text-[9px] font-bold uppercase tracking-[.08em]">1º</span>
+        <span className="font-gt-mono text-[0.5625rem] font-bold uppercase tracking-[.08em]">1º</span>
       </span>
     )
   }
@@ -211,7 +211,7 @@ export function BackToEventos() {
   return (
     <Link
       href={`${GOBIERNO_ROOT}/eventos`}
-      className="mb-3 inline-flex items-center gap-1.5 text-[13px] font-semibold text-gt-ink-500 transition-colors hover:text-gt-ink-900"
+      className="mb-3 inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold text-gt-ink-500 transition-colors hover:text-gt-ink-900"
     >
       <Icon name="arrowLeft" size={15} /> {t("nav.eventos")}
     </Link>
@@ -241,25 +241,25 @@ export function EventoCard({ ev, linkable = true }: { ev: Evento; linkable?: boo
           </Badge>
         </div>
         <h3 className="mb-1.5 font-gt-display text-lg leading-tight text-gt-ink-900">{ev.title}</h3>
-        <p className="line-clamp-2 flex-1 text-[12.5px] leading-relaxed text-gt-ink-500">
+        <p className="line-clamp-2 flex-1 text-[0.78125rem] leading-relaxed text-gt-ink-500">
           {isCons ? ev.brief : ev.rules}
         </p>
         <div className="mt-3 flex items-center justify-between gap-3 border-t border-gt-line-soft pt-2.5">
           {isCons ? (
             moment.iso ? (
-              <span className="font-gt-mono text-[10.5px] text-gt-ink-400">
+              <span className="font-gt-mono text-[0.65625rem] text-gt-ink-400">
                 {moment.label} {fmtDateTime(moment.iso)}
               </span>
             ) : (
-              <span className="font-gt-mono text-[10.5px] text-gt-ink-400">{moment.label}</span>
+              <span className="font-gt-mono text-[0.65625rem] text-gt-ink-400">{moment.label}</span>
             )
           ) : (
-            <span className="flex items-center gap-1 font-gt-mono text-[10.5px] text-gt-ink-400">
+            <span className="flex items-center gap-1 font-gt-mono text-[0.65625rem] text-gt-ink-400">
               <Icon name="mapPin" size={11} /> {ev.zone ?? "—"}
             </span>
           )}
           {linkable && (
-            <span className={`flex flex-none items-center gap-1 text-[11.5px] font-bold ${TONES[type.tone].text}`}>
+            <span className={`flex flex-none items-center gap-1 text-[0.71875rem] font-bold ${TONES[type.tone].text}`}>
               {t("eventos.abrir")} <Icon name="arrowRight" size={13} />
             </span>
           )}

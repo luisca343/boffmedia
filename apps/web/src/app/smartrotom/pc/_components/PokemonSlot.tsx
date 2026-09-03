@@ -130,7 +130,7 @@ export const PokemonSlot = memo(function PokemonSlot({
 
           {isMulti && (
             <span className="pointer-events-none absolute inset-0 flex items-start justify-end rounded-[inherit] bg-pc-cyan/[.18] p-1">
-              <span className="flex h-[18px] w-[18px] items-center justify-center rounded-pc-pill bg-pc-cyan text-[#06222a]">
+              <span className="flex h-[1.125rem] w-[1.125rem] items-center justify-center rounded-pc-pill bg-pc-cyan text-[#06222a]">
                 <Icon name="check" size={12} stroke={3} />
               </span>
             </span>

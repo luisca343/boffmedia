@@ -26,7 +26,7 @@ export function Badge({
 
   return (
     <span
-      className={`inline-flex items-center gap-[5px] whitespace-nowrap rounded-[4px] border px-2 py-px font-gt-mono text-[10px] font-bold uppercase leading-[1.7] tracking-[.1em] ${skin} ${className}`}
+      className={`inline-flex items-center gap-[0.3125rem] whitespace-nowrap rounded-[4px] border px-2 py-px font-gt-mono text-[0.625rem] font-bold uppercase leading-[1.7] tracking-[.1em] ${skin} ${className}`}
     >
       {dot && <span className={`h-1.5 w-1.5 rounded-full ${solid ? "bg-white" : t.dot}`} />}
       {icon && <Icon name={icon} size={11} />}

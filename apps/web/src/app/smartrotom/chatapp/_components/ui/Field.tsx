@@ -10,7 +10,7 @@ export const Field = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
     <input
       ref={ref}
       className={cn(
-        "w-full rounded-t-ca-sm border-x-0 border-b-2 border-t-0 border-solid border-ca-accent bg-ca-search-bg px-[13px] py-[11px] text-[14.5px] text-ca-50 outline-none placeholder:text-ca-500",
+        "w-full rounded-t-ca-sm border-x-0 border-b-2 border-t-0 border-solid border-ca-accent bg-ca-search-bg px-[0.8125rem] py-[0.6875rem] text-[0.90625rem] text-ca-50 outline-none placeholder:text-ca-500",
         className,
       )}
       {...rest}

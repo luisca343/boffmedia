@@ -3,8 +3,8 @@ import { cn } from "../cn"
 
 // Shared chassis for text inputs, selects and textareas (.sn-input / .sn-select / .sn-textarea).
 export const INPUT_BASE = cn(
-  "w-full font-body text-[15px] font-normal leading-[1.4] text-txt",
-  "bg-base [[data-theme=light]_&]:bg-panel border border-solid border-line-2 py-[11px] px-[14px]",
+  "w-full font-body text-[0.9375rem] font-normal leading-[1.4] text-txt",
+  "bg-base [[data-theme=light]_&]:bg-panel border border-solid border-line-2 py-[0.6875rem] px-[0.875rem]",
   "cut-tag cut-tag-edge [--cut-line:var(--line-2)]",
   "transition-[border-color,background] duration-[140ms] outline-none",
   "focus:border-accent focus:[--cut-line:var(--accent)] placeholder:text-txt-dim",
@@ -15,7 +15,7 @@ export const INPUT_BASE = cn(
  *  use for `sm`, so a toolbar of mixed controls sits on one line. Declared once
  *  here rather than as `h-8 py-0 …` overrides at every call site — those only
  *  worked by out-arguing INPUT_BASE through tailwind-merge. */
-export const INPUT_SM = "h-8 py-0 px-2.5 text-[12.5px]"
+export const INPUT_SM = "h-8 py-0 px-2.5 text-[0.78125rem]"
 
 export type InputSize = "sm" | "md"
 
@@ -32,5 +32,5 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(function Inp
 export type TextareaProps = React.TextareaHTMLAttributes<HTMLTextAreaElement>
 
 export const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea({ className, ...props }, ref) {
-  return <textarea ref={ref} className={cn(INPUT_BASE, "min-h-[90px] resize-y", className)} {...props} />
+  return <textarea ref={ref} className={cn(INPUT_BASE, "min-h-[5.625rem] resize-y", className)} {...props} />
 })

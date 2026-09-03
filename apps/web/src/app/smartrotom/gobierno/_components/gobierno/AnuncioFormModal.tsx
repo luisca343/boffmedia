@@ -67,7 +67,7 @@ export function AnuncioFormModal({ anuncio, onClose }: { anuncio?: Anuncio | nul
           type="button"
           onClick={() => setPinned((p) => !p)}
           aria-pressed={pinned}
-          className={`flex w-full items-center gap-2.5 rounded-gt-sm border px-3 py-2.5 text-left text-[13px] font-semibold transition-colors ${
+          className={`flex w-full items-center gap-2.5 rounded-gt-sm border px-3 py-2.5 text-left text-[0.8125rem] font-semibold transition-colors ${
             pinned ? "border-gt-gold/40 bg-gt-gold-tint text-gt-gold-600" : "border-gt-line-strong bg-gt-paper-0 text-gt-ink-600"
           }`}
         >

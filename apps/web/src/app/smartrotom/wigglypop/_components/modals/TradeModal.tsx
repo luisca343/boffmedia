@@ -47,7 +47,7 @@ export function TradeModal({ listing: L, onClose }: { listing: WpListing; onClos
   }
 
   return (
-    <Modal onClose={onClose} className="w-[min(600px,94vw)]">
+    <Modal onClose={onClose} className="w-[min(37.5rem,94vw)]">
       <ModalHead
         title={t("common.proposeTrade")}
         sub={
@@ -77,7 +77,7 @@ export function TradeModal({ listing: L, onClose }: { listing: WpListing; onClos
             body={t("modal.trade.emptyPcBody")}
           />
         ) : (
-          <div className="wp-scroll grid max-h-[240px] grid-cols-6 gap-2 overflow-y-auto pr-1">
+          <div className="wp-scroll grid max-h-[15rem] grid-cols-6 gap-2 overflow-y-auto pr-1">
             {mons.map((m) => (
               <Slot
                 key={`${m.box}:${m.index}`}
@@ -91,7 +91,7 @@ export function TradeModal({ listing: L, onClose }: { listing: WpListing; onClos
 
         <Button
           variant="primary"
-          className="mt-4 w-full py-[13px]"
+          className="mt-4 w-full py-[0.8125rem]"
           disabled={!chosen || sending}
           onClick={send}
         >

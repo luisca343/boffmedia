@@ -49,7 +49,7 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
       <Paper
         tilt={-0.5}
         onClick={(event) => event.stopPropagation()}
-        className="ms-scroll relative max-h-[88vh] w-full max-w-[560px] overflow-auto px-[34px] py-[30px]"
+        className="ms-scroll relative max-h-[88vh] w-full max-w-[35rem] overflow-auto px-[2.125rem] py-[1.875rem]"
       >
         <span className="absolute left-3 top-2.5">
           <Thumbtack size={18} />
@@ -73,9 +73,9 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
               </span>
             </div>
           </div>
-          <h1 className="mb-0.5 mt-1.5 font-ms-display text-[32px] text-ms-ink-1">{npc.name}</h1>
+          <h1 className="mb-0.5 mt-1.5 font-ms-display text-[2rem] text-ms-ink-1">{npc.name}</h1>
           {regions.length > 0 && (
-            <div className="inline-flex items-center gap-1 text-[13px] italic text-ms-ink-3">
+            <div className="inline-flex items-center gap-1 text-[0.8125rem] italic text-ms-ink-3">
               <Icon.Pin size={11} /> {regions.join(" · ")}
             </div>
           )}
@@ -86,14 +86,14 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
         <div className="my-4 grid grid-cols-3 gap-2.5">
           {tally.map((entry) => (
             <div key={entry.label} className="border border-ms-ink-1/20 bg-ms-ink-1/[.07] px-1 py-2 text-center">
-              <div className={`font-ms-display text-[22px] leading-none ${entry.className}`}>{entry.value}</div>
+              <div className={`font-ms-display text-[1.375rem] leading-none ${entry.className}`}>{entry.value}</div>
               <Label className="mt-1">{entry.label}</Label>
             </div>
           ))}
         </div>
 
         {dialog?.text && (
-          <p className="mb-[18px] border-l-2 border-ms-ink-3 pl-3 text-sm italic leading-relaxed text-ms-ink-1">
+          <p className="mb-[1.125rem] border-l-2 border-ms-ink-3 pl-3 text-sm italic leading-relaxed text-ms-ink-1">
             “{dialog.text}”
           </p>
         )}
@@ -113,7 +113,7 @@ export function NpcDossier({ npc, onClose }: { npc: NPC; onClose: () => void }) 
                 <WaxSeal status={status} size={26} tilt={-10} />
                 <span className="min-w-0 flex-1">
                   <span className="block font-ms-display text-sm leading-[1.15] text-ms-ink-1">{quest.name}</span>
-                  <span className={`block text-[11px] ${SEAL_TEXT[status]}`}>
+                  <span className={`block text-[0.6875rem] ${SEAL_TEXT[status]}`}>
                     {tStatus(STATUS_LABEL_KEY[status])}
                     {level > 0 && t("level", { level })}
                   </span>

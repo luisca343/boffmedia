@@ -21,7 +21,7 @@ function ResetLink({ onClick }: { onClick: () => void }) {
       type="button"
       onClick={onClick}
       title={t("chrome.resetPanel")}
-      className="inline-flex items-center gap-1.5 border-0 bg-transparent text-txt-dim hover:text-accent-bright font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] cursor-pointer"
+      className="inline-flex items-center gap-1.5 border-0 bg-transparent text-txt-dim hover:text-accent-bright font-mono text-[0.59375rem] font-semibold uppercase tracking-[0.08em] cursor-pointer"
     >
       <Icon name="refresh" size={12} />
       <span>{t("chrome.reset")}</span>
@@ -62,11 +62,11 @@ function CategoryHeader({ catId }: { catId: string }) {
     <div className="flex items-start gap-3 mb-3.5 pb-3 border-b border-solid border-line">
       <Icon name={cat.icon} size={22} className="text-accent mt-0.5 shrink-0" />
       <div className="min-w-0">
-        <h3 className="font-display font-extrabold italic uppercase text-[22px] leading-none tracking-[0.01em]">
+        <h3 className="font-display font-extrabold italic uppercase text-[1.375rem] leading-none tracking-[0.01em]">
           {t(cat.labelKey)}
         </h3>
         {ui.density !== "compact" && (
-          <p className="mt-1 text-txt-muted text-[13.5px] max-w-[70ch]">{t(cat.blurbKey)}</p>
+          <p className="mt-1 text-txt-muted text-[0.84375rem] max-w-[70ch]">{t(cat.blurbKey)}</p>
         )}
       </div>
     </div>
@@ -90,7 +90,7 @@ function SearchResults() {
 
   return (
     <div>
-      <div className="flex items-center gap-2.5 mb-3.5 pb-3 border-b border-solid border-line text-txt-muted text-[14px]">
+      <div className="flex items-center gap-2.5 mb-3.5 pb-3 border-b border-solid border-line text-txt-muted text-[0.875rem]">
         <Icon name="search" size={18} className="text-accent" />
         <span>
           <b className="text-txt">{hits.length}</b> {t("chrome.searchMatches", { count: hits.length })}

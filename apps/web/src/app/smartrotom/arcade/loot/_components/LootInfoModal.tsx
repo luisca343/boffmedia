@@ -63,7 +63,7 @@ export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
       <ol className="mb-5 flex flex-col gap-2.5">
         {(["steps.getBoxes", "steps.chooseBox", "steps.openBox", "steps.itemCollection"] as const).map((key, i) => (
           <li key={key} className="flex items-start gap-2.5">
-            <span className="mt-0.5 grid h-[22px] w-[22px] shrink-0 place-items-center rounded-md border border-ar-cyan/40 bg-ar-cyan/[.12] font-ar-display text-[9px] text-ar-cyan">
+            <span className="mt-0.5 grid h-[1.375rem] w-[1.375rem] shrink-0 place-items-center rounded-md border border-ar-cyan/40 bg-ar-cyan/[.12] font-ar-display text-[0.5625rem] text-ar-cyan">
               {i + 1}
             </span>
             <span className="text-ar-ink-dim">{t(`loot.${key}`)}</span>
@@ -71,7 +71,7 @@ export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
         ))}
       </ol>
 
-      <p className="mb-4 rounded-[10px] border border-white/[.07] bg-black/40 p-3 font-ar-mono text-[11px] leading-relaxed text-ar-ink-muted">
+      <p className="mb-4 rounded-[10px] border border-white/[.07] bg-black/40 p-3 font-ar-mono text-[0.6875rem] leading-relaxed text-ar-ink-muted">
         {t("loot.oddsExplanation")}
       </p>
 
@@ -86,7 +86,7 @@ export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
             >
               <div className="mb-2.5 flex items-center justify-between border-b border-white/[.08] pb-2">
                 <span
-                  className="font-ar-display text-[10px] uppercase tracking-[0.12em]"
+                  className="font-ar-display text-[0.625rem] uppercase tracking-[0.12em]"
                   style={{ color: skin.fg }}
                 >
                   {t(skin.nameKey)}
@@ -104,14 +104,14 @@ export function LootInfoModal({ open, onClose, box }: LootInfoModalProps) {
                   >
                     <span className="flex min-w-0 items-center gap-2">
                       <ItemImage type={row.type} itemId={row.data || row.id} size={22} />
-                      <span className="truncate font-ar text-[12px] text-ar-ink">
+                      <span className="truncate font-ar text-[0.75rem] text-ar-ink">
                         {getItemName(t, row.id, row.type)}
                         {row.amount && row.amount > 1 ? (
                           <span className="ml-1 font-ar-mono text-ar-amber">×{row.amount}</span>
                         ) : null}
                       </span>
                     </span>
-                    <span className="shrink-0 font-ar-mono text-[11px] tabular-nums text-ar-ink-dim">
+                    <span className="shrink-0 font-ar-mono text-[0.6875rem] tabular-nums text-ar-ink-dim">
                       {row.pct.toFixed(2)}%
                     </span>
                   </li>

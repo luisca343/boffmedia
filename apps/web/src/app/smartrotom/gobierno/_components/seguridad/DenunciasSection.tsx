@@ -59,7 +59,7 @@ export function DenunciasSection() {
       {isLoading ? (
         <div className="space-y-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-[86px] w-full" />
+            <Skeleton key={i} className="h-[5.375rem] w-full" />
           ))}
         </div>
       ) : isError ? (
@@ -112,11 +112,11 @@ export function DenunciasSection() {
                   <PlayerLink player={d.accused} size={42} />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="font-gt-mono text-[11px] text-gt-ink-400">{d.code}</span>
+                      <span className="font-gt-mono text-[0.6875rem] text-gt-ink-400">{d.code}</span>
                       <Badge tone="seguridad">{catLabel}</Badge>
                     </div>
-                    <p className="mt-1 max-w-[620px] text-[13px] leading-relaxed text-gt-ink-600">{d.description}</p>
-                    <div className="mt-1.5 font-gt-mono text-[10.5px] text-gt-ink-400">
+                    <p className="mt-1 max-w-[38.75rem] text-[0.8125rem] leading-relaxed text-gt-ink-600">{d.description}</p>
+                    <div className="mt-1.5 font-gt-mono text-[0.65625rem] text-gt-ink-400">
                       {where && `${where} · `}
                       {t("denuncias.denouncedBy", { username: d.reporter.username, date: fmtDateTime(d.createdAt, intlLocale) })}
                     </div>
@@ -131,18 +131,18 @@ export function DenunciasSection() {
                   <div className="border-t border-gt-line-soft px-4 pb-4 pt-3.5">
                     {!actionable && d.resolution ? (
                       <div className="rounded-gt-sm border border-gt-line bg-gt-paper-1 px-3.5 py-3">
-                        <div className="font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+                        <div className="font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
                           {t("denuncias.resolucion")}
                         </div>
-                        <p className="mt-1 text-[13px] text-gt-ink-700">{d.resolution ?? "—"}</p>
+                        <p className="mt-1 text-[0.8125rem] text-gt-ink-700">{d.resolution ?? "—"}</p>
                         {d.resolvedBy && (
-                          <p className="mt-1.5 font-gt-mono text-[10.5px] text-gt-ink-400">
+                          <p className="mt-1.5 font-gt-mono text-[0.65625rem] text-gt-ink-400">
                             {d.resolvedBy.username} · {fmtDateTime(d.resolvedAt, intlLocale)}
                           </p>
                         )}
                       </div>
                     ) : !actionable ? (
-                      <p className="text-[12.5px] italic text-gt-ink-400">{t("denuncias.sinAcciones")}</p>
+                      <p className="text-[0.78125rem] italic text-gt-ink-400">{t("denuncias.sinAcciones")}</p>
                     ) : (
                       <div className="flex flex-wrap items-center gap-2">
                         <Button

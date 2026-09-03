@@ -80,7 +80,7 @@ export function HeroArt({
       {burst ? (
         <svg
           viewBox="0 0 200 200"
-          className="absolute right-4 top-4 h-[110px] w-[110px]"
+          className="absolute right-4 top-4 h-[6.875rem] w-[6.875rem]"
           aria-hidden="true"
         >
           <path

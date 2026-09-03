@@ -70,7 +70,7 @@ export function BuilderStage({
       <div
         ref={boxRef}
         style={{ background: BG_VALUE[bg] }}
-        className="flex min-h-[320px] flex-1 items-center justify-center overflow-auto p-3"
+        className="flex min-h-[20rem] flex-1 items-center justify-center overflow-auto p-3"
       >
         <MewCat
           ref={canvasRef}
@@ -104,7 +104,7 @@ export function BuilderStage({
 
         <div className="ml-auto flex items-center gap-3">
           <div className="flex items-center gap-1">
-            <span className="mr-1 text-[10px] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
+            <span className="mr-1 text-[0.625rem] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
               {t("builder.stageBg")}
             </span>
             {(["paper", "night", "grid"] as const).map((key) => (
@@ -136,7 +136,7 @@ export function BuilderStage({
               type="button"
               onClick={() => setZoom(1)}
               title={t("builder.zoomFit")}
-              className="min-w-[54px] border-2 border-solid border-[color:var(--mwp-nline)] px-2 py-1 text-center font-mono text-[10px] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:text-[color:var(--mwp-cream)]"
+              className="min-w-[3.375rem] border-2 border-solid border-[color:var(--mwp-nline)] px-2 py-1 text-center font-mono text-[0.625rem] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:text-[color:var(--mwp-cream)]"
             >
               {Math.round(zoom * 100)}%
             </button>
@@ -151,7 +151,7 @@ export function BuilderStage({
       </div>
 
       {busy && (
-        <div className="pointer-events-none absolute right-3 top-3 flex items-center gap-2 border-2 border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night)]/85 px-2 py-1 text-[10px] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)]">
+        <div className="pointer-events-none absolute right-3 top-3 flex items-center gap-2 border-2 border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night)]/85 px-2 py-1 text-[0.625rem] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)]">
           <span className="h-3 w-3 animate-spin border-2 border-solid border-[color:var(--mwp-nline)] border-t-[color:var(--mwp-red)] [border-radius:50%] motion-reduce:animate-none" />
           {t("builder.loadingParts")}
         </div>
@@ -200,7 +200,7 @@ function PoseGroup<T extends string>({
 }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="text-[10px] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
+      <span className="text-[0.625rem] font-bold uppercase tracking-[0.06em] text-[color:var(--mwp-cream-dim)]">
         {label}
       </span>
       <div className="flex gap-1">
@@ -210,7 +210,7 @@ function PoseGroup<T extends string>({
             type="button"
             onClick={() => onPick(option)}
             aria-pressed={value === option}
-            className={`px-2 py-1 text-[11px] font-bold [border-radius:var(--wob-sm)] border-2 border-solid transition-all ${
+            className={`px-2 py-1 text-[0.6875rem] font-bold [border-radius:var(--wob-sm)] border-2 border-solid transition-all ${
               value === option
                 ? "border-[color:var(--mwp-red)] bg-[color:var(--mwp-red)] text-[color:var(--mwp-paper)]"
                 : "border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)]"

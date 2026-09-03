@@ -170,7 +170,7 @@ export function BsimPvpView() {
       <div className={cn(BSIM_PAGE_NARROW, 'flex flex-col gap-4 text-txt')}>
       {/* App surface: the rail names the tool, so this view does not repeat it. */}
       <div className="flex items-center justify-between gap-3">
-        <p className="m-0 min-w-0 truncate font-body text-[13px] text-txt-muted">{t('pvp.subtitle')}</p>
+        <p className="m-0 min-w-0 truncate font-body text-[0.8125rem] text-txt-muted">{t('pvp.subtitle')}</p>
         <BsimChip tone={STATUS_TONE[status] ?? 'neutral'} size="md" pulse={status === 'connecting' || status === 'searching'}>{statusLabel}</BsimChip>
       </div>
 
@@ -185,7 +185,7 @@ export function BsimPvpView() {
           title={t('hub.queue.teamRejectedTitle')}
           actions={<Button size="sm" icon="edit" onClick={goToTeams}>{t('hub.queue.editTeam')}</Button>}
         >
-          <ul className="m-0 grid list-disc gap-1 pl-4 font-mono text-[11px] leading-[1.45]">
+          <ul className="m-0 grid list-disc gap-1 pl-4 font-mono text-[0.6875rem] leading-[1.45]">
             {teamProblems.slice(0, 6).map((p) => <li key={p}>{p}</li>)}
           </ul>
         </Banner>
@@ -196,7 +196,7 @@ export function BsimPvpView() {
           <div className="flex flex-col gap-2">
             {pendingChallenges.map((ch) => (
               <div key={ch.from} className="flex items-center justify-between gap-3 border border-solid border-line bg-base px-3 py-2">
-                <span className="min-w-0 truncate text-[13px]"><b className="text-txt">{ch.from}</b> <span className="text-txt-muted">{t('pvp.challengedYou', { format: ch.format })}</span></span>
+                <span className="min-w-0 truncate text-[0.8125rem]"><b className="text-txt">{ch.from}</b> <span className="text-txt-muted">{t('pvp.challengedYou', { format: ch.format })}</span></span>
                 <div className="flex flex-none gap-2">
                   <Button size="sm" variant="pri" onClick={() => void acceptChallenge(ch.from, packedTeam)}>{t('pvp.accept')}</Button>
                   <Button size="sm" variant="danger" onClick={() => void rejectChallenge(ch.from)}>{t('pvp.reject')}</Button>
@@ -217,10 +217,10 @@ export function BsimPvpView() {
               <div className="flex items-center gap-3">
                 <Spinner size={18} />
                 <span className="grid min-w-0 gap-[3px]">
-                  <b role="status" className="font-display text-[14px]/none font-bold uppercase tracking-[0.04em] text-txt">
+                  <b role="status" className="font-display text-[0.875rem]/none font-bold uppercase tracking-[0.04em] text-txt">
                     {queuePosition ? t('hub.queue.position', { n: queuePosition }) : t('hub.queue.positionUnknown')}
                   </b>
-                  <span className="font-mono text-[11px]/none tabular-nums text-txt-dim">
+                  <span className="font-mono text-[0.6875rem]/none tabular-nums text-txt-dim">
                     {t('hub.queue.elapsed', { time: mmss(elapsed) })}
                   </span>
                 </span>
@@ -240,7 +240,7 @@ export function BsimPvpView() {
             </div>
           ) : (
             <div className="grid gap-3">
-              <p className="m-0 font-body text-[13px] leading-[1.45] text-txt-muted">{t('pvp.findMatch.desc')}</p>
+              <p className="m-0 font-body text-[0.8125rem] leading-[1.45] text-txt-muted">{t('pvp.findMatch.desc')}</p>
               <FormatAndTeam
                 format={selectedFormat}
                 onFormat={(v) => { setSelectedFormat(v); setSelectedTeamId(null); }}
@@ -265,7 +265,7 @@ export function BsimPvpView() {
 
         <BsimSection icon="sword" title={t('pvp.challenge.title')}>
           <div className="grid gap-3">
-            <p className="m-0 font-body text-[13px] leading-[1.45] text-txt-muted">{t('pvp.challenge.desc')}</p>
+            <p className="m-0 font-body text-[0.8125rem] leading-[1.45] text-txt-muted">{t('pvp.challenge.desc')}</p>
             <div className="flex gap-2">
               <Input
                 className="min-w-0 flex-1"
@@ -291,8 +291,8 @@ export function BsimPvpView() {
 
       {playerId && (
         <BsimSection icon="user" title={t('pvp.yourId.title')}>
-          <p className="m-0 mb-2 inline-block max-w-full truncate border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[11px] text-txt-muted">{playerId}</p>
-          <p className="m-0 font-body text-[12px] text-txt-dim">{t('pvp.yourId.desc')}</p>
+          <p className="m-0 mb-2 inline-block max-w-full truncate border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[0.6875rem] text-txt-muted">{playerId}</p>
+          <p className="m-0 font-body text-[0.75rem] text-txt-dim">{t('pvp.yourId.desc')}</p>
         </BsimSection>
       )}
       </div>
@@ -306,7 +306,7 @@ type T = (key: string, values?: Record<string, string | number | Date>) => strin
 
 function DisabledReason({ reason, action, onAction }: { reason: string; action: string; onAction: () => void }) {
   return (
-    <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[11px] leading-[1.4] text-warn">
+    <p className="m-0 flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.6875rem] leading-[1.4] text-warn">
       <Icon name="alert" size={12} className="flex-none" />
       {reason}
       <button
@@ -335,14 +335,14 @@ function FormatAndTeam({
 }) {
   const checking = validation.checking || validation.ok === null;
   return (
-    <div className="grid gap-[7px]">
+    <div className="grid gap-[0.4375rem]">
       <BsimKicker>{t('app.lobby.formatLabel')}</BsimKicker>
       <DkSelect value={format} onChange={onFormat} ariaLabel={t('app.lobby.formatLabel')} options={BSIM_FORMATS.map((f) => ({ value: f.value, label: f.label }))} />
       {needsTeam && (
         <>
           <BsimKicker className="mt-1">{t('hub.team.label')}</BsimKicker>
           {teams.length > 0 ? (
-            <div className="grid gap-[7px] min-[420px]:grid-cols-[minmax(0,1fr)_auto] min-[420px]:items-center">
+            <div className="grid gap-[0.4375rem] min-[420px]:grid-cols-[minmax(0,1fr)_auto] min-[420px]:items-center">
               <DkSelect value={teamId ?? ''} onChange={onTeam} ariaLabel={t('hub.team.pickAria')} options={teams.map((tm) => ({ value: tm.clientId, label: tm.name }))} />
               {/* The same pill the lobby and the teambuilder draw — this used
                   to be a verbatim copy of the lobby's markup, one corner size
@@ -361,7 +361,7 @@ function FormatAndTeam({
               onClick={onCreateTeam}
               className={cn(
                 'cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line-2)] hover:[--cut-line:var(--accent-line)]',
-                'inline-flex h-8 items-center justify-center gap-[6px] border border-solid border-line-2 bg-panel px-3 font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted transition-[color,border-color] duration-[140ms] hover:border-accent-line hover:text-accent-bright',
+                'inline-flex h-8 items-center justify-center gap-[0.375rem] border border-solid border-line-2 bg-panel px-3 font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-muted transition-[color,border-color] duration-[140ms] hover:border-accent-line hover:text-accent-bright',
                 BSIM_FOCUS_CUT,
               )}
             >

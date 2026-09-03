@@ -19,7 +19,7 @@ export function InspectOverlay({ show }: { show: boolean }) {
       )}
     >
       <div className="ps-grid-glow absolute inset-0" />
-      <div className="ps-beam ps-loop absolute left-0 right-0 h-[180px] animate-ps-scan motion-reduce:animate-none" />
+      <div className="ps-beam ps-loop absolute left-0 right-0 h-[11.25rem] animate-ps-scan motion-reduce:animate-none" />
     </div>
   )
 }

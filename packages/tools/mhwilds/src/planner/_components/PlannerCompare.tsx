@@ -105,10 +105,10 @@ export function PlannerCompare({
     <div className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="min-w-0">
-          <div className="font-display text-[22px] leading-none italic font-extrabold uppercase text-txt">
+          <div className="font-display text-[1.375rem] leading-none italic font-extrabold uppercase text-txt">
             {t("build_planner.compare.title")}
           </div>
-          <div className="mt-1 font-mono text-[12px] leading-snug text-txt-muted">{t("build_planner.compare.lead")}</div>
+          <div className="mt-1 font-mono text-[0.75rem] leading-snug text-txt-muted">{t("build_planner.compare.lead")}</div>
         </div>
         <span className="flex-1" />
         <Button size="sm" variant="ghost" icon="back" onClick={onBack}>
@@ -132,12 +132,12 @@ export function PlannerCompare({
           </div>
 
           <div className="overflow-x-auto">
-            <div className="grid min-w-[440px] gap-px border border-line bg-line" style={gridStyle}>
+            <div className="grid min-w-[27.5rem] gap-px border border-line bg-line" style={gridStyle}>
               <div className="bg-panel" />
               {cols.map((c) => (
                 <div
                   key={c.key}
-                  className="truncate bg-panel-2 px-3 py-2.5 font-display text-[13px] leading-tight font-bold uppercase tracking-[0.02em] text-txt"
+                  className="truncate bg-panel-2 px-3 py-2.5 font-display text-[0.8125rem] leading-tight font-bold uppercase tracking-[0.02em] text-txt"
                 >
                   {c.name}
                 </div>
@@ -147,7 +147,7 @@ export function PlannerCompare({
                 const bestVal = row.key ? best(row.key, row.low) : null
                 return (
                   <React.Fragment key={row.label}>
-                    <div className="flex items-center bg-panel px-3 py-2.5 font-mono text-[10px] leading-none font-bold uppercase tracking-[0.12em] text-txt-dim">
+                    <div className="flex items-center bg-panel px-3 py-2.5 font-mono text-[0.625rem] leading-none font-bold uppercase tracking-[0.12em] text-txt-dim">
                       {row.label}
                     </div>
                     {cols.map((c) => {
@@ -157,7 +157,7 @@ export function PlannerCompare({
                         <div
                           key={c.key}
                           className={cn(
-                            "bg-panel px-3 py-2.5 font-display text-[15px] leading-none font-bold tabular-nums",
+                            "bg-panel px-3 py-2.5 font-display text-[0.9375rem] leading-none font-bold tabular-nums",
                             isBest ? "text-[var(--mh-bright)]" : "text-txt",
                           )}
                         >
@@ -169,7 +169,7 @@ export function PlannerCompare({
                 )
               })}
 
-              <div className="flex items-center bg-panel px-3 py-2.5 font-mono text-[10px] leading-none font-bold uppercase tracking-[0.12em] text-txt-dim">
+              <div className="flex items-center bg-panel px-3 py-2.5 font-mono text-[0.625rem] leading-none font-bold uppercase tracking-[0.12em] text-txt-dim">
                 {t("build_planner.compare.topSkills")}
               </div>
               {cols.map((c) => (
@@ -181,7 +181,7 @@ export function PlannerCompare({
                       </MhTag>
                     ))
                   ) : (
-                    <span className="font-mono text-[12px] text-txt-dim">—</span>
+                    <span className="font-mono text-[0.75rem] text-txt-dim">—</span>
                   )}
                 </div>
               ))}

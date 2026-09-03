@@ -22,14 +22,14 @@ export const PasswordField = React.forwardRef<HTMLInputElement, PasswordFieldPro
   const [show, setShow] = React.useState(false)
   return (
     <div className="relative">
-      <Input ref={ref} type={show ? "text" : "password"} className={cn("pr-[42px]", className)} {...props} />
+      <Input ref={ref} type={show ? "text" : "password"} className={cn("pr-[2.625rem]", className)} {...props} />
       <button
         type="button"
         aria-pressed={show}
         aria-label={show ? resolvedHideLabel : resolvedShowLabel}
         onClick={() => setShow((v) => !v)}
         className={cn(
-          "absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center w-[26px] h-[26px]",
+          "absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center w-[1.625rem] h-[1.625rem]",
           "text-txt-dim hover:text-accent aria-pressed:text-accent transition-colors",
         )}
       >

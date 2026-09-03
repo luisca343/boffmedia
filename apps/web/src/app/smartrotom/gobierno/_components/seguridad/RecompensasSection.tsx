@@ -27,7 +27,7 @@ export function RecompensasSection() {
   const total = active.reduce((sum, b) => sum + b.bounty, 0)
 
   return (
-    <div className="mx-auto max-w-[1000px]">
+    <div className="mx-auto max-w-[62.5rem]">
       <div className="mb-2 text-center">
         <Badge tone="seguridad" className="mb-3.5">
           {t("recompensas.publicBadge")}
@@ -35,16 +35,16 @@ export function RecompensasSection() {
         <div className="mb-2.5 flex justify-center">
           <Seal size={66} />
         </div>
-        <h1 className="font-gt-display text-[44px] leading-[0.95] text-gt-ink-900">{t("recompensas.title")}</h1>
-        <p className="mx-auto mt-2.5 max-w-[560px] text-[14px] leading-relaxed text-gt-ink-500">
+        <h1 className="font-gt-display text-[2.75rem] leading-[0.95] text-gt-ink-900">{t("recompensas.title")}</h1>
+        <p className="mx-auto mt-2.5 max-w-[35rem] text-[0.875rem] leading-relaxed text-gt-ink-500">
           {t("recompensas.description")}
         </p>
         {active.length > 0 && (
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2.5">
-            <Badge tone="danger" icon="coins" className="px-3.5 py-[7px] text-[13px]">
+            <Badge tone="danger" icon="coins" className="px-3.5 py-[0.4375rem] text-[0.8125rem]">
               {t("recompensas.bolsaTotal", { amount: money(total, intlLocale) })}
             </Badge>
-            <Badge tone="default" icon="users" className="px-3.5 py-[7px] text-[13px]">
+            <Badge tone="default" icon="users" className="px-3.5 py-[0.4375rem] text-[0.8125rem]">
               {t("recompensas.reclamados", { count: active.length })}
             </Badge>
           </div>
@@ -56,7 +56,7 @@ export function RecompensasSection() {
       {isLoading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-[210px] w-full" />
+            <Skeleton key={i} className="h-[13.125rem] w-full" />
           ))}
         </div>
       ) : isError ? (
@@ -85,18 +85,18 @@ export function RecompensasSection() {
                 }`}
               >
                 {i === 0 && (
-                  <div className="flex items-center justify-center gap-1.5 bg-gt-gold py-1 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-white">
+                  <div className="flex items-center justify-center gap-1.5 bg-gt-gold py-1 font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-white">
                     <Icon name="star" size={11} fill="#fff" />
                     {t("recompensas.masBuscado")}
                   </div>
                 )}
                 <div className="p-4">
                   <Avatar user={b.player.username} size={80} />
-                  <div className="mt-2.5 font-gt-display text-[17px] font-bold text-gt-ink-900">{b.player.username}</div>
+                  <div className="mt-2.5 font-gt-display text-[1.0625rem] font-bold text-gt-ink-900">{b.player.username}</div>
                   <div className="mt-1">
                     <Badge tone={sev.tone}>{t(sev.labelKey)}</Badge>
                   </div>
-                  <div className="mt-2.5 font-gt-display text-[25px] font-bold tabular-nums text-gt-danger">
+                  <div className="mt-2.5 font-gt-display text-[1.5625rem] font-bold tabular-nums text-gt-danger">
                     {money(b.bounty, intlLocale)} ₽
                   </div>
                 </div>

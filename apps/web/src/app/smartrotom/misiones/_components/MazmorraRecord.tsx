@@ -23,7 +23,7 @@ export function MazmorraRecord() {
 
   if (isLoading) {
     return (
-      <Paper tilt={0.3} className="px-[22px] py-[18px] text-center">
+      <Paper tilt={0.3} className="px-[1.375rem] py-[1.125rem] text-center">
         <Label className="text-ms-gold-3">{t("title")}</Label>
         <p className="mt-3 font-ms-display text-sm italic text-ms-paper-2">{t("loading")}</p>
       </Paper>
@@ -32,7 +32,7 @@ export function MazmorraRecord() {
 
   if (!run || !stats) {
     return (
-      <Paper tilt={0.3} className="relative px-[22px] py-[18px]">
+      <Paper tilt={0.3} className="relative px-[1.375rem] py-[1.125rem]">
         <Label className="text-ms-gold-3">{t("title")}</Label>
         <EmptyBoard>{t("empty")}</EmptyBoard>
       </Paper>
@@ -47,7 +47,7 @@ export function MazmorraRecord() {
   ]
 
   return (
-    <Paper tilt={0.3} className="relative px-[22px] py-[18px]">
+    <Paper tilt={0.3} className="relative px-[1.375rem] py-[1.125rem]">
       <span className="absolute left-3.5 top-2">
         <Nail size={14} />
       </span>
@@ -67,13 +67,13 @@ export function MazmorraRecord() {
             key={tablet.label}
             className="rounded-sm border border-ms-ink-1/20 bg-ms-ink-1/[.08] px-1.5 py-2.5 text-center"
           >
-            <div className={`font-ms-display text-[22px] leading-none ${tablet.className}`}>{tablet.value}</div>
+            <div className={`font-ms-display text-[1.375rem] leading-none ${tablet.className}`}>{tablet.value}</div>
             <Label className="mt-1">{tablet.label}</Label>
           </div>
         ))}
       </div>
 
-      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2.5 border-t border-dashed border-ms-ink-1/[.28] pt-3 font-ms-uppercase text-[11px] uppercase tracking-[.12em] text-ms-ink-3">
+      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2.5 border-t border-dashed border-ms-ink-1/[.28] pt-3 font-ms-uppercase text-[0.6875rem] uppercase tracking-[.12em] text-ms-ink-3">
         <span>{run.completada ? t("status.completed") : t("status.failed")}</span>
       </div>
     </Paper>

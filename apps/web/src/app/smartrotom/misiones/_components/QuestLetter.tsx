@@ -48,7 +48,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
         <Icon.X size={13} /> {tLetter("close")}
       </Button>
 
-      <div className="absolute left-[18px] top-3.5 z-[11] border border-[#3a2410] bg-gradient-to-b from-[#c2a04c] to-[#6b440f] px-3 py-1 font-ms-uppercase text-[10px] uppercase tracking-[.2em] text-[#1e120a] shadow-[0_2px_3px_rgba(0,0,0,.5)]">
+      <div className="absolute left-[1.125rem] top-3.5 z-[11] border border-[#3a2410] bg-gradient-to-b from-[#c2a04c] to-[#6b440f] px-3 py-1 font-ms-uppercase text-[0.625rem] uppercase tracking-[.2em] text-[#1e120a] shadow-[0_2px_3px_rgba(0,0,0,.5)]">
         {tLetter("badge")}
       </div>
 
@@ -59,13 +59,13 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
       <div className="pointer-events-none absolute bottom-3.5 right-20 z-[11] hidden translate-y-5 lg:block">
         <QuillPen size={140} tilt={28} />
       </div>
-      <div className="pointer-events-none absolute right-3.5 top-[90px] z-[11] hidden lg:block">
+      <div className="pointer-events-none absolute right-3.5 top-[5.625rem] z-[11] hidden lg:block">
         <InkBlot size={48} tilt={-22} color="#2a1810" />
       </div>
 
       {/* The parchment, floating over the desk. */}
       <div
-        className="relative z-[5] m-6 flex-1 overflow-hidden rounded-[2px] shadow-[inset_0_0_80px_rgba(80,50,20,.18),inset_0_0_12px_rgba(80,50,20,.12),0_4px_8px_rgba(0,0,0,.4),0_16px_36px_rgba(0,0,0,.55),0_30px_50px_-10px_rgba(0,0,0,.6)] lg:mb-[86px] lg:ml-11 lg:mr-[60px] lg:mt-11"
+        className="relative z-[5] m-6 flex-1 overflow-hidden rounded-[2px] shadow-[inset_0_0_80px_rgba(80,50,20,.18),inset_0_0_12px_rgba(80,50,20,.12),0_4px_8px_rgba(0,0,0,.4),0_16px_36px_rgba(0,0,0,.55),0_30px_50px_-10px_rgba(0,0,0,.6)] lg:mb-[5.375rem] lg:ml-11 lg:mr-[3.75rem] lg:mt-11"
         style={{
           background:
             "radial-gradient(ellipse at 20% 15%, rgba(120,70,30,.06), transparent 50%)," +
@@ -91,8 +91,8 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
         />
         <FlourishCorners size={56} offset={14} className="text-ms-gold-3/60" />
 
-        <div className="ms-scroll relative z-[1] h-full overflow-auto px-6 pb-8 pt-14 sm:px-12 lg:px-[60px] lg:pt-14">
-          <div className="absolute left-[22px] top-[50px] z-[4] hidden sm:block">
+        <div className="ms-scroll relative z-[1] h-full overflow-auto px-6 pb-8 pt-14 sm:px-12 lg:px-[3.75rem] lg:pt-14">
+          <div className="absolute left-[1.375rem] top-[3.125rem] z-[4] hidden sm:block">
             <div className="relative">
               <NpcPortrait skin={npc?.skin} size={72} ring />
               <span className="absolute -bottom-2.5 -right-2.5">
@@ -113,7 +113,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
 
           <Divider glyph="❦" />
 
-          <div className="mb-[18px] flex flex-wrap items-center justify-center gap-4 text-[13px] italic text-ms-ink-3">
+          <div className="mb-[1.125rem] flex flex-wrap items-center justify-center gap-4 text-[0.8125rem] italic text-ms-ink-3">
             {npc && (
               <span className="inline-flex items-center gap-1">
                 <Icon.Quill size={11} /> {tLetter("from")}{" "}
@@ -143,7 +143,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
           </div>
 
           {objectives.length > 0 && (
-            <div className="mt-[26px] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.18s]">
+            <div className="mt-[1.625rem] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.18s]">
               <div className="mb-3 text-center">
                 <span className="font-ms-display text-lg tracking-[.08em] text-ms-gold-3">{tLetter("objectives")}</span>
               </div>
@@ -158,7 +158,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
                       }`}
                     >
                       <div
-                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border-[1.5px] border-ms-ink-2 font-ms-display text-[13px] font-bold ${
+                        className={`grid h-7 w-7 shrink-0 place-items-center rounded-full border-[1.5px] border-ms-ink-2 font-ms-display text-[0.8125rem] font-bold ${
                           done ? "bg-ms-ink-2 text-ms-paper-1" : "text-ms-ink-2"
                         }`}
                       >
@@ -175,7 +175,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
                         </div>
                         <div className="flex items-center gap-2.5">
                           <Bar value={objective.progress} max={objective.total} className="flex-1" />
-                          <span className="min-w-[38px] text-right font-ms-mono text-[11px] text-ms-ink-2">
+                          <span className="min-w-[2.375rem] text-right font-ms-mono text-[0.6875rem] text-ms-ink-2">
                             {objective.progress}/{objective.total}
                           </span>
                         </div>
@@ -188,11 +188,11 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
           )}
 
           {rewards.length > 0 && (
-            <div className="mt-[26px] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.26s]">
+            <div className="mt-[1.625rem] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.26s]">
               <div className="mb-3 text-center">
                 <span className="font-ms-display text-lg tracking-[.08em] text-ms-gold-3">{tLetter("rewards")}</span>
               </div>
-              <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fit,minmax(170px,1fr))]">
+              <div className="grid gap-2.5 [grid-template-columns:repeat(auto-fit,minmax(10.625rem,1fr))]">
                 {rewards.map((reward) => (
                   <RewardCard key={reward.item} reward={reward} />
                 ))}
@@ -200,7 +200,7 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
             </div>
           )}
 
-          <div className="mt-[30px] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.3s]">
+          <div className="mt-[1.875rem] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.3s]">
             <QuestChain
               quest={quest}
               quests={quests}
@@ -209,17 +209,17 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
           </div>
 
           {dialog?.text && (
-            <div className="mt-[26px] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.34s]">
+            <div className="mt-[1.625rem] animate-ms-fade-up motion-reduce:animate-none [animation-delay:.34s]">
               <Divider glyph="✦" />
-              <div className="relative mt-2.5 border border-ms-ink-1/20 bg-[rgba(255,240,200,.3)] py-3 pl-[70px] pr-3.5">
+              <div className="relative mt-2.5 border border-ms-ink-1/20 bg-[rgba(255,240,200,.3)] py-3 pl-[4.375rem] pr-3.5">
                 <div className="absolute left-2.5 top-2.5">
                   <NpcPortrait skin={npc?.skin} size={48} />
                 </div>
-                <div className="mb-1.5 font-ms-uppercase text-[11px] uppercase tracking-[.14em] text-ms-ink-3">
+                <div className="mb-1.5 font-ms-uppercase text-[0.6875rem] uppercase tracking-[.14em] text-ms-ink-3">
                   {tLetter("wordsOf", { name: npc?.name || t("letter.unknownNpc") })}
                   {dialog.name && ` · ${dialog.name}`}
                 </div>
-                <p className="m-0 border-l-2 border-ms-ink-3 pl-3 text-[15px] italic leading-relaxed text-ms-ink-1">
+                <p className="m-0 border-l-2 border-ms-ink-3 pl-3 text-[0.9375rem] italic leading-relaxed text-ms-ink-1">
                   “{dialog.text}”
                 </p>
               </div>
@@ -233,10 +233,10 @@ export function QuestLetter({ quest, onOpenNpc }: { quest: QuestData; onOpenNpc:
             </p>
           )}
 
-          <div className="mt-[30px] flex animate-ms-fade-up items-center justify-end gap-3.5 motion-reduce:animate-none [animation-delay:.42s]">
+          <div className="mt-[1.875rem] flex animate-ms-fade-up items-center justify-end gap-3.5 motion-reduce:animate-none [animation-delay:.42s]">
             <div className="text-right">
-              <div className="mb-1 text-[13px] italic text-ms-ink-3">{tLetter("signedOff")}</div>
-              <div className="font-ms-display text-[22px] text-ms-ink-1">{npc?.name || tLetter("anonymous")}</div>
+              <div className="mb-1 text-[0.8125rem] italic text-ms-ink-3">{tLetter("signedOff")}</div>
+              <div className="font-ms-display text-[1.375rem] text-ms-ink-1">{npc?.name || tLetter("anonymous")}</div>
             </div>
             <NpcPortrait skin={npc?.skin} size={44} />
           </div>

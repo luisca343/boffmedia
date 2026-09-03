@@ -51,7 +51,7 @@ export function Scan({ className }: { className?: string }) {
         "pointer-events-none absolute inset-0 z-[2] overflow-hidden",
         "[background:repeating-linear-gradient(0deg,rgba(255,255,255,0.028)_0_1px,transparent_1px_3px)]",
         "[[data-theme=light]_&]:[background:repeating-linear-gradient(0deg,rgba(20,23,28,0.03)_0_1px,transparent_1px_3px)]",
-        "after:absolute after:left-0 after:right-0 after:top-[-25%] after:h-[90px] after:content-['']",
+        "after:absolute after:left-0 after:right-0 after:top-[-25%] after:h-[5.625rem] after:content-['']",
         "after:[background:linear-gradient(180deg,transparent,rgba(255,92,10,0.10)_45%,rgba(255,255,255,0.05)_50%,transparent)]",
         "after:animate-[bm-scan_4.6s_cubic-bezier(0.4,0,0.6,1)_infinite]",
         "[.no-motion_&]:after:animate-none [.no-motion_&]:after:opacity-0",
@@ -162,11 +162,11 @@ export function Kinetic({ word, dir = 1, pos = "top" }: { word: string; dir?: nu
   return (
     <div
       aria-hidden="true"
-      className={cn("pointer-events-none absolute left-0 right-0 z-0 select-none", pos === "top" ? "top-[-34px]" : "bottom-[-26px]")}
+      className={cn("pointer-events-none absolute left-0 right-0 z-0 select-none", pos === "top" ? "top-[-2.125rem]" : "bottom-[-1.625rem]")}
     >
       <span
         ref={ref}
-        className="inline-block whitespace-nowrap font-display text-[210px] font-extrabold italic uppercase leading-none text-transparent opacity-60 [-webkit-text-stroke:1px_var(--line)] [will-change:transform] max-[1100px]:text-[130px]"
+        className="inline-block whitespace-nowrap font-display text-[13.125rem] font-extrabold italic uppercase leading-none text-transparent opacity-60 [-webkit-text-stroke:1px_var(--line)] [will-change:transform] max-[1100px]:text-[8.125rem]"
       >
         {word}
       </span>
@@ -359,7 +359,7 @@ export function FxCursor({
         "[&.hot_.r]:after:scale-[1.4] [&.hot_.r]:after:border-accent [&.hot_.r]:after:bg-accent-soft",
       )}
     >
-      <i className="d absolute left-0 top-0 block will-change-transform after:absolute after:left-0 after:top-0 after:-ml-[3.5px] after:-mt-[3.5px] after:h-[7px] after:w-[7px] after:rotate-45 after:bg-accent after:content-['']" />
+      <i className="d absolute left-0 top-0 block will-change-transform after:absolute after:left-0 after:top-0 after:-ml-[0.21875rem] after:-mt-[0.21875rem] after:h-[0.4375rem] after:w-[0.4375rem] after:rotate-45 after:bg-accent after:content-['']" />
       <i className="r absolute left-0 top-0 block will-change-transform after:absolute after:left-0 after:top-0 after:-ml-4 after:-mt-4 after:h-8 after:w-8 after:rotate-45 after:border-[1.5px] after:border-solid after:border-accent-line after:transition-[transform,border-color,background] after:duration-[180ms] after:content-['']" />
     </div>
   )

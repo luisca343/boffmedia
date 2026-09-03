@@ -28,7 +28,7 @@ export default function MochilaPage() {
     <div className="flex min-h-full flex-col">
       <div className="mb-6 mt-2.5 text-center">
         <Label className="text-ms-gold-1">{t("eyebrow")}</Label>
-        <h1 className="mb-1.5 mt-1 font-ms-display text-[38px] text-ms-paper-1 [text-shadow:0_2px_12px_rgba(0,0,0,.6)]">
+        <h1 className="mb-1.5 mt-1 font-ms-display text-[2.375rem] text-ms-paper-1 [text-shadow:0_2px_12px_rgba(0,0,0,.6)]">
           {t("title")}
         </h1>
         <div className="font-ms text-sm italic text-ms-paper-3">
@@ -40,7 +40,7 @@ export default function MochilaPage() {
       </div>
 
       <Label className="mb-2.5 text-ms-gold-1">{t("ownedTitle")}</Label>
-      <div className="mb-[30px] grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-3">
+      <div className="mb-[1.875rem] grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-3">
         {ownedItems.length === 0 ? (
           <p className="col-span-full py-8 text-center font-ms italic text-ms-paper-3">
             {t("ownedEmpty")}
@@ -51,7 +51,7 @@ export default function MochilaPage() {
       </div>
 
       <Label className="mb-2.5 text-ms-paper-3">{t("lockedTitle")}</Label>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-3">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-3">
         {lockedItems.length === 0 ? (
           <p className="col-span-full py-8 text-center font-ms italic text-ms-paper-3">
             {t("lockedEmpty")}

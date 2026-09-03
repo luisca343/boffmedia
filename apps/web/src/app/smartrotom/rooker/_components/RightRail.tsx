@@ -54,9 +54,9 @@ export function RightRail() {
               className="flex items-start justify-between gap-2.5 px-4 py-2.5 transition-colors hover:bg-rk-hover"
             >
               <div className="min-w-0">
-                <div className="text-[12px] text-rk-fg-subtle">{t("common.trendingInNest")}</div>
-                <div className="mt-px truncate text-[15px] font-bold text-rk-fg">#{trend.tag}</div>
-                <div className="text-[12.5px] text-rk-fg-subtle">
+                <div className="text-[0.75rem] text-rk-fg-subtle">{t("common.trendingInNest")}</div>
+                <div className="mt-px truncate text-[0.9375rem] font-bold text-rk-fg">#{trend.tag}</div>
+                <div className="text-[0.78125rem] text-rk-fg-subtle">
                   {t("common.postsCount", { formatted: fmt(trend.posts), count: trend.posts })}
                 </div>
               </div>
@@ -64,7 +64,7 @@ export function RightRail() {
             </Link>
           ))
         ) : (
-          <p className="px-4 pb-4 pt-1 text-[13.5px] leading-relaxed text-rk-fg-subtle">
+          <p className="px-4 pb-4 pt-1 text-[0.84375rem] leading-relaxed text-rk-fg-subtle">
             {t("rightRail.trendsEmpty")}
           </p>
         )}
@@ -77,7 +77,7 @@ export function RightRail() {
 
         {suggestionsLoading ? (
           <div className="flex items-center gap-3 p-4">
-            <Skeleton className="h-[42px] w-[42px] rounded-full" />
+            <Skeleton className="h-[2.625rem] w-[2.625rem] rounded-full" />
             <div className="flex-1 space-y-2">
               <Skeleton className="h-3 w-28" />
               <Skeleton className="h-3 w-20" />
@@ -86,13 +86,13 @@ export function RightRail() {
         ) : suggestions?.length ? (
           suggestions.map((u) => <FollowRow key={u.uuid} user={u} />)
         ) : (
-          <p className="px-4 pb-4 pt-1 text-[13.5px] leading-relaxed text-rk-fg-subtle">
+          <p className="px-4 pb-4 pt-1 text-[0.84375rem] leading-relaxed text-rk-fg-subtle">
             {t("common.followedEveryone")}
           </p>
         )}
       </Box>
 
-      <p className="px-4 pb-4 text-[12px] leading-loose text-rk-fg-subtle">
+      <p className="px-4 pb-4 text-[0.75rem] leading-loose text-rk-fg-subtle">
         {t("rightRail.footer")}
       </p>
     </div>

@@ -101,14 +101,14 @@ export function Field({ label, hint, error, className, children }: FieldProps) {
         // applied, leaving it exposed announces the same words twice.
         <label
           aria-hidden={applied || undefined}
-          className="font-mono text-[11px] font-semibold leading-none uppercase tracking-[0.12em] text-txt-muted"
+          className="font-mono text-[0.6875rem] font-semibold leading-none uppercase tracking-[0.12em] text-txt-muted"
         >
           {label}
         </label>
       )}
       {labelled}
       {described && (
-        <span id={hintId} className={cn("font-body text-[12px] leading-[1.4]", error ? "text-bad" : "text-txt-dim")}>
+        <span id={hintId} className={cn("font-body text-[0.75rem] leading-[1.4]", error ? "text-bad" : "text-txt-dim")}>
           {error || hint}
         </span>
       )}

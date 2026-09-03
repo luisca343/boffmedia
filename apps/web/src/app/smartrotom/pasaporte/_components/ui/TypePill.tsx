@@ -48,7 +48,7 @@ export function TypePill({ type, className }: { type: string; className?: string
     <span
       style={{ background: TYPE_INK[key(type)] ?? UNKNOWN }}
       className={cn(
-        "inline-block rounded-[10px] px-[7px] py-[2px] text-[9px] font-bold uppercase tracking-[.08em] text-white",
+        "inline-block rounded-[10px] px-[0.4375rem] py-[2px] text-[0.5625rem] font-bold uppercase tracking-[.08em] text-white",
         className,
       )}
     >

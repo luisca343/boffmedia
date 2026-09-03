@@ -103,7 +103,7 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
         onFocus={() => query.length >= 2 && setOpen(results.length > 0)}
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         placeholder={placeholder}
-        className="w-full cut-tag cut-tag-edge focus:[--cut-line:var(--accent)] [--cut-line:var(--line-2)] border border-solid border-line-2 bg-base px-3 py-2 font-body text-[13px] text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent"
+        className="w-full cut-tag cut-tag-edge focus:[--cut-line:var(--accent)] [--cut-line:var(--line-2)] border border-solid border-line-2 bg-base px-3 py-2 font-body text-[0.8125rem] text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent"
         autoComplete="off"
         spellCheck={false}
       />
@@ -119,7 +119,7 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
               <button
                 type="button"
                 onMouseDown={(e) => { e.preventDefault(); commit(entry); }}
-                className={`flex w-full items-center gap-2 px-3 py-2 text-left font-body text-[13px] transition-colors ${
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left font-body text-[0.8125rem] transition-colors ${
                   i === highlighted ? 'bg-accent-soft text-accent-bright' : 'text-txt hover:bg-panel-2'
                 }`}
               >
@@ -130,7 +130,7 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
                   onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                 />
                 <span>{entry.name}</span>
-                <span className="ml-auto font-mono text-[11px] text-txt-dim">#{entry.num}</span>
+                <span className="ml-auto font-mono text-[0.6875rem] text-txt-dim">#{entry.num}</span>
               </button>
             </li>
           ))}

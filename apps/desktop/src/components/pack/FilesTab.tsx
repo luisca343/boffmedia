@@ -82,7 +82,7 @@ export function FilesTab({ slug }: { slug: string }) {
       <div className="flex flex-wrap items-center gap-2">
         {/* Breadcrumbs double as the only way back up — there is no ".." row,
             which would sort unpredictably among real folders. */}
-        <nav className="flex min-w-0 flex-1 flex-wrap items-center gap-1 font-mono text-[12px]">
+        <nav className="flex min-w-0 flex-1 flex-wrap items-center gap-1 font-mono text-[0.75rem]">
           <button
             type="button"
             onClick={() => setRel("")}
@@ -121,7 +121,7 @@ export function FilesTab({ slug }: { slug: string }) {
       </div>
 
       {loading ? (
-        <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
+        <span className="flex items-center gap-2 py-6 font-mono text-[0.6875rem] text-txt-dim">
           <Spinner size={12} /> {t("reading")}
         </span>
       ) : entries.length === 0 ? (
@@ -146,29 +146,29 @@ export function FilesTab({ slug }: { slug: string }) {
                 <button
                   type="button"
                   onClick={() => setRel(entry.path)}
-                  className="min-w-0 flex-1 truncate text-left font-mono text-[12px] text-txt hover:text-accent-bright"
+                  className="min-w-0 flex-1 truncate text-left font-mono text-[0.75rem] text-txt hover:text-accent-bright"
                 >
                   {entry.name}
                 </button>
               ) : (
                 <span className="flex min-w-0 flex-1 flex-col gap-[2px]">
-                  <span className="truncate font-mono text-[12px] text-txt-muted">
+                  <span className="truncate font-mono text-[0.75rem] text-txt-muted">
                     {entry.name}
                   </span>
                   {/* The answer to "why is this 7 MB Kotlin jar here, and can I
                       delete it?" — the question the delete button next to it
                       invites and nothing else on this screen answers. */}
                   {dependentsOf(entry.path).length > 0 && (
-                    <span className="truncate font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">
+                    <span className="truncate font-mono text-[0.625rem] uppercase tracking-[0.06em] text-txt-dim">
                       {t("neededBy", { names: dependentsOf(entry.path).join(", ") })}
                     </span>
                   )}
                 </span>
               )}
-              <span className="hidden w-[110px] shrink-0 text-right font-mono text-[11px] text-txt-dim sm:block">
+              <span className="hidden w-[6.875rem] shrink-0 text-right font-mono text-[0.6875rem] text-txt-dim sm:block">
                 {entry.isDir ? "—" : formatBytes(entry.size)}
               </span>
-              <span className="hidden w-[150px] shrink-0 text-right font-mono text-[11px] text-txt-dim md:block">
+              <span className="hidden w-[9.375rem] shrink-0 text-right font-mono text-[0.6875rem] text-txt-dim md:block">
                 {entry.modified ? formatWhen(new Date(entry.modified).toISOString()) : "—"}
               </span>
               <button

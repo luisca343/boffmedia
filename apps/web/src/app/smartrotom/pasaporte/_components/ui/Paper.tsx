@@ -25,7 +25,7 @@ export function Paper({
     <div
       style={style}
       className={cn(
-        "ps-paper-surface relative flex h-full w-full flex-col overflow-hidden px-[34px] py-[30px]",
+        "ps-paper-surface relative flex h-full w-full flex-col overflow-hidden px-[2.125rem] py-[1.875rem]",
         "font-ps text-ps-ink",
         side === "left" ? "ps-gutter-l" : "ps-gutter-r",
         className,

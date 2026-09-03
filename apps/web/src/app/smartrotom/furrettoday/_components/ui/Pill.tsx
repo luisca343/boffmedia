@@ -32,7 +32,7 @@ export function Pill({
     <span
       className={[
         "font-ft-ui inline-flex items-center gap-1.5 whitespace-nowrap",
-        "rounded-ft-pill px-3 pb-[3px] pt-1 text-[11px] font-extrabold uppercase tracking-[0.14em]",
+        "rounded-ft-pill px-3 pb-[3px] pt-1 text-[0.6875rem] font-extrabold uppercase tracking-[0.14em]",
         TONE[tone],
         className ?? "",
       ].join(" ")}

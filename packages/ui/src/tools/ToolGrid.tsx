@@ -20,8 +20,8 @@ export function ToolGrid({ tools, variant = "fila", labels, onSelect, className 
       className={cn(
         "grid grid-cols-1 gap-4",
         variant === "fila"
-          ? "sm:grid-cols-[repeat(auto-fill,minmax(380px,1fr))]"
-          : "sm:grid-cols-[repeat(auto-fill,minmax(320px,1fr))]",
+          ? "sm:grid-cols-[repeat(auto-fill,minmax(23.75rem,1fr))]"
+          : "sm:grid-cols-[repeat(auto-fill,minmax(20rem,1fr))]",
         className,
       )}
     >

@@ -38,18 +38,18 @@ export function PlotPanel({
         </button>
       </div>
 
-      <h2 className="font-gt-display text-[26px] leading-none text-gt-ink-900">
+      <h2 className="font-gt-display text-[1.625rem] leading-none text-gt-ink-900">
         {t("urbanismo.parcela")} #{plot.number}
       </h2>
       <div className="mt-1.5 flex flex-wrap items-center gap-2">
         {center && (
-          <span className="font-gt-mono text-[11px] text-gt-ink-400">
+          <span className="font-gt-mono text-[0.6875rem] text-gt-ink-400">
             X {Math.round(center.x)} · Z {Math.round(center.z)}
           </span>
         )}
         {plot.zona && (
           <span
-            className="inline-flex items-center gap-[5px] rounded-gt-pill border px-2 py-0.5 text-[11px] font-bold"
+            className="inline-flex items-center gap-[0.3125rem] rounded-gt-pill border px-2 py-0.5 text-[0.6875rem] font-bold"
             style={{
               borderColor: `color-mix(in srgb, ${color} 30%, transparent)`,
               background: `color-mix(in srgb, ${color} 9%, transparent)`,
@@ -67,26 +67,26 @@ export function PlotPanel({
         <button
           type="button"
           onClick={() => plot.owner && openDossier(plot.owner.uuid)}
-          className="flex w-full items-center gap-[11px] rounded-gt border border-gt-line bg-gt-paper-0 p-3 text-left shadow-gt-sm transition-colors hover:bg-gt-paper-1"
+          className="flex w-full items-center gap-[0.6875rem] rounded-gt border border-gt-line bg-gt-paper-0 p-3 text-left shadow-gt-sm transition-colors hover:bg-gt-paper-1"
         >
           <Avatar user={plot.owner.username} size={42} />
           <div className="min-w-0 flex-1">
-            <div className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">
+            <div className="font-gt-mono text-[0.5625rem] uppercase tracking-[.12em] text-gt-ink-400">
               {t("urbanismo.propietario")}
             </div>
-            <div className="font-gt-display text-[15px] font-bold text-gt-ink-900">{plot.owner.username}</div>
+            <div className="font-gt-display text-[0.9375rem] font-bold text-gt-ink-900">{plot.owner.username}</div>
           </div>
           <Icon name="arrowRight" size={16} className="flex-none text-gt-ink-300" />
         </button>
       ) : (
         <Sunken className="p-3.5 text-center">
-          <div className="mb-1 font-gt-display text-[15px] text-gt-ink-600">{t("mapa.parcelaVacante")}</div>
-          <div className="font-gt-mono text-[11px] text-gt-ink-400">{t("mapa.sinSubastaAbierta")}</div>
+          <div className="mb-1 font-gt-display text-[0.9375rem] text-gt-ink-600">{t("mapa.parcelaVacante")}</div>
+          <div className="font-gt-mono text-[0.6875rem] text-gt-ink-400">{t("mapa.sinSubastaAbierta")}</div>
         </Sunken>
       )}
 
       <div className="mt-4">
-        <div className="mb-2 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.14em] text-gt-ink-400">
+        <div className="mb-2 font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.14em] text-gt-ink-400">
           {t("mapa.titularidad")}
         </div>
         {isLoading ? (
@@ -96,18 +96,18 @@ export function PlotPanel({
             ))}
           </div>
         ) : !hist || hist.items.length === 0 ? (
-          <div className="text-[12px] italic text-gt-ink-400">{t("mapa.sinCambiosTitularidad")}</div>
+          <div className="text-[0.75rem] italic text-gt-ink-400">{t("mapa.sinCambiosTitularidad")}</div>
         ) : (
           hist.items.map((h) => (
             <div
               key={h.id}
-              className="flex items-center gap-2 border-b border-gt-line-soft py-[7px] text-[12px] last:border-b-0"
+              className="flex items-center gap-2 border-b border-gt-line-soft py-[0.4375rem] text-[0.75rem] last:border-b-0"
             >
               <Icon name="arrowRight" size={13} className="flex-none text-gt-ink-300" />
               <span className="min-w-0 flex-1 truncate text-gt-ink-700">
                 {h.previousOwner?.username ?? t("zonas.municipioLabel")} → <strong>{h.newOwner?.username ?? "—"}</strong>
               </span>
-              <span className="font-gt-mono text-[10px] text-gt-ink-400">{fmtDate(h.changedAt, intlLocale)}</span>
+              <span className="font-gt-mono text-[0.625rem] text-gt-ink-400">{fmtDate(h.changedAt, intlLocale)}</span>
             </div>
           ))
         )}

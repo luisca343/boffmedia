@@ -22,9 +22,9 @@ export interface GameLogoProps {
 
 // --cut-w mirrors the border width so the redrawn chamfer strokes match it.
 const SIZES = {
-  sm: { box: "w-[34px] h-[34px] text-[11px] [--cut:6px] [--cut-w:1.5px]", border: "border-[1.5px]" },
-  md: { box: "w-14 h-14 text-[15px] [--cut:9px] [--cut-w:2px]", border: "border-2" },
-  lg: { box: "w-[104px] h-[104px] text-[17px] [--cut:9px] [--cut-w:2px]", border: "border-2" },
+  sm: { box: "w-[2.125rem] h-[2.125rem] text-[0.6875rem] [--cut:6px] [--cut-w:1.5px]", border: "border-[1.5px]" },
+  md: { box: "w-14 h-14 text-[0.9375rem] [--cut:9px] [--cut-w:2px]", border: "border-2" },
+  lg: { box: "w-[6.5rem] h-[6.5rem] text-[1.0625rem] [--cut:9px] [--cut-w:2px]", border: "border-2" },
 } as const
 
 /** The game seal — its icon (or letter) in the game's hue, with the diagonal cut. */

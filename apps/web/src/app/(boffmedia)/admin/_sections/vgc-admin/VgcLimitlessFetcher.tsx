@@ -182,8 +182,8 @@ export function VgcLimitlessFetcher() {
               tournament: (
                 <div>
                   <p className="text-xs font-medium">{tournament.name ?? tournament.limitlessId}</p>
-                  <p className="text-txt-dim text-[11px] font-mono">{tournament.date ?? "—"} · {tournament.format ?? "—"}</p>
-                  {tournament.errorMessage && <p className="text-bad text-[11px] mt-0.5 truncate max-w-xs">{tournament.errorMessage}</p>}
+                  <p className="text-txt-dim text-[0.6875rem] font-mono">{tournament.date ?? "—"} · {tournament.format ?? "—"}</p>
+                  {tournament.errorMessage && <p className="text-bad text-[0.6875rem] mt-0.5 truncate max-w-xs">{tournament.errorMessage}</p>}
                 </div>
               ),
               status: (

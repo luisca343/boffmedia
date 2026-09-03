@@ -395,7 +395,7 @@ export function PassportBook() {
   if (!uuid) {
     return (
       <main className="relative grid min-h-0 place-items-center px-4">
-        <div className="w-[min(420px,92vw)] rounded-2xl border border-ps-gild/18 bg-ps-desk-lo/60 p-8">
+        <div className="w-[min(26.25rem,92vw)] rounded-2xl border border-ps-gild/18 bg-ps-desk-lo/60 p-8">
           <EmptyState
             icon="idcard"
             title={t("book.emptyTitle")}
@@ -424,7 +424,7 @@ export function PassportBook() {
           which cost it ~25% of its size for a prop nobody reads — so the stage is bare and the
           book takes the whole height it can get. The right padding matches the rail's gutter so
           the spread stays optically centred. */}
-      <main className="relative grid min-h-0 place-items-center py-2 pl-4 pr-4 lg:pl-[92px] lg:pr-[92px]">
+      <main className="relative grid min-h-0 place-items-center py-2 pl-4 pr-4 lg:pl-[5.75rem] lg:pr-[5.75rem]">
         <ChapterRail chapters={rail} active={activeChapter} onFlip={flipTo} />
 
         <div
@@ -434,11 +434,11 @@ export function PassportBook() {
           <div
             aria-hidden="true"
             style={{ left: `${22 + progress * 56}%`, opacity: closed ? 0 : 1, ...ribbonVars(current.accent) }}
-            className="pointer-events-none absolute -top-2.5 z-[25] w-[30px] drop-shadow-[0_6px_6px_rgba(0,0,0,.4)] transition-[left,opacity,background] duration-500 motion-reduce:transition-none"
+            className="pointer-events-none absolute -top-2.5 z-[25] w-[1.875rem] drop-shadow-[0_6px_6px_rgba(0,0,0,.4)] transition-[left,opacity,background] duration-500 motion-reduce:transition-none"
           >
             <div
               style={SILK}
-              className="h-[92px] w-full shadow-[inset_-6px_0_8px_rgba(0,0,0,.25),inset_6px_0_6px_rgba(255,255,255,.18)]"
+              className="h-[5.75rem] w-full shadow-[inset_-6px_0_8px_rgba(0,0,0,.25),inset_6px_0_6px_rgba(255,255,255,.18)]"
             />
           </div>
 

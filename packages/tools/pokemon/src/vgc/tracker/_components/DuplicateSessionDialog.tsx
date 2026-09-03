@@ -45,10 +45,10 @@ export function DuplicateSessionDialog({ source, onConfirm, onClose }: Props) {
           </Field>
         )}
 
-        <div className="grid gap-2 border border-solid border-line bg-base px-3 py-[10px]">
+        <div className="grid gap-2 border border-solid border-line bg-base px-3 py-[0.625rem]">
           <TrSub className="mb-0">{t("duplicate.inherits")}</TrSub>
-          <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-txt-muted">
-            <span className="border border-solid border-line-2 px-[6px] py-px">{source.format}</span>
+          <div className="flex flex-wrap items-center gap-2 font-mono text-[0.6875rem] text-txt-muted">
+            <span className="border border-solid border-line-2 px-[0.375rem] py-px">{source.format}</span>
             <span>{source.regulationId}</span>
             {source.tournamentName && <span className="text-warn">{source.tournamentName}</span>}
           </div>

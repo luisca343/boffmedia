@@ -59,7 +59,7 @@ export default function ConfirmationDialog({
         </>
       }
     >
-      <p className="text-center font-ar text-[13px] leading-relaxed text-ar-ink-dim">
+      <p className="text-center font-ar text-[0.8125rem] leading-relaxed text-ar-ink-dim">
         {t(descriptionKey, descriptionValues)}
       </p>
     </Modal>

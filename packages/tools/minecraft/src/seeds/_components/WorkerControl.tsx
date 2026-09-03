@@ -84,10 +84,10 @@ export function WorkerControl({
   return (
     <div className="grid gap-2 border border-line-2 bg-base p-2.5">
       <div className="flex items-baseline justify-between gap-2">
-        <span className="font-mono text-[10px] uppercase tracking-wide text-txt-dim">
+        <span className="font-mono text-[0.625rem] uppercase tracking-wide text-txt-dim">
           {t("search.workerCount")}
         </span>
-        <span className="font-mono text-[12px] text-txt">
+        <span className="font-mono text-[0.75rem] text-txt">
           {value}
           <span className={saturated ? "text-danger" : "text-txt-dim"}>
             {" · "}
@@ -110,13 +110,13 @@ export function WorkerControl({
         aria-label={t("search.workerCount")}
       />
 
-      <div className="flex justify-between font-mono text-[9px] text-txt-dim">
+      <div className="flex justify-between font-mono text-[0.5625rem] text-txt-dim">
         <span>{DEFAULT_WORKER_COUNT}</span>
         <span>{t("search.recommended", { n: recommended })}</span>
         <span>{max}</span>
       </div>
 
-      <ul className="grid list-none gap-1 p-0 font-mono text-[10px] leading-snug text-txt-dim">
+      <ul className="grid list-none gap-1 p-0 font-mono text-[0.625rem] leading-snug text-txt-dim">
         {/* Only shown once there is something to compare against, so the panel
             never claims a speed-up it has not computed. */}
         {delta !== null && delta !== 0 ? (
@@ -143,11 +143,11 @@ export function WorkerControl({
       </ul>
 
       {overCommitted ? (
-        <p className="border-l-2 border-danger pl-2 text-[10px] leading-snug text-danger">
+        <p className="border-l-2 border-danger pl-2 text-[0.625rem] leading-snug text-danger">
           {t("search.warnOverCommitted", { cores })}
         </p>
       ) : crowded ? (
-        <p className="border-l-2 border-line pl-2 text-[10px] leading-snug text-txt-dim">
+        <p className="border-l-2 border-line pl-2 text-[0.625rem] leading-snug text-txt-dim">
           {t("search.warnCrowded")}
         </p>
       ) : null}

@@ -53,7 +53,7 @@ export function ForgePanel({ weapon }: { weapon: Weapon }) {
       icon="hammer"
       count={mats.length}
       aside={
-        <span className="font-mono text-[11px] leading-none text-txt-muted">
+        <span className="font-mono text-[0.6875rem] leading-none text-txt-muted">
           {t("build_planner.forge.owned", { owned: ownedCount, total: mats.length })}
         </span>
       }
@@ -64,7 +64,7 @@ export function ForgePanel({ weapon }: { weapon: Weapon }) {
           {zenny ? ` · ${zenny.toLocaleString()}z` : ""}
         </MhLabel>
       )}
-      <div className="flex flex-col gap-[5px]">
+      <div className="flex flex-col gap-[0.3125rem]">
         {mats.map((m, i) => {
           const id = String(m.item?.id ?? i)
           return (
@@ -80,7 +80,7 @@ export function ForgePanel({ weapon }: { weapon: Weapon }) {
         })}
       </div>
       {loading && !fullPath && (
-        <div className="mt-2 font-mono text-[10px] uppercase leading-none tracking-[0.08em] text-txt-dim">
+        <div className="mt-2 font-mono text-[0.625rem] uppercase leading-none tracking-[0.08em] text-txt-dim">
           {t("build_planner.forge.loading_path")}
         </div>
       )}

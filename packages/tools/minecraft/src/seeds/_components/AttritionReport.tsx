@@ -34,7 +34,7 @@ export function AttritionReport({ data, t }: AttritionReportProps) {
   return (
     <div className="grid gap-3">
       <div>
-        <h4 className="font-display text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-txt">
+        <h4 className="font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.06em] text-txt">
           {t("search.attritionReport")}
         </h4>
       </div>
@@ -43,12 +43,12 @@ export function AttritionReport({ data, t }: AttritionReportProps) {
         {sorted.map(([constraintType, stats]) => (
           <div
             key={constraintType}
-            className="flex items-center justify-between gap-2 text-[12px] text-txt"
+            className="flex items-center justify-between gap-2 text-[0.75rem] text-txt"
           >
             {/* Constraint type ids render raw, like the vocabulary labels do —
                 they are identifiers, not prose. */}
             <span className="font-mono">{constraintType}</span>
-            <div className="flex items-baseline gap-2 font-mono text-[11px] text-txt-dim">
+            <div className="flex items-baseline gap-2 font-mono text-[0.6875rem] text-txt-dim">
               <span>{stats.count}</span>
               <span>({Math.round(stats.percentage)}%)</span>
             </div>

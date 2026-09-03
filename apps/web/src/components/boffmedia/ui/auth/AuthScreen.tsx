@@ -102,24 +102,24 @@ export function AuthScreen({
     >
       <div aria-hidden className="pointer-events-none absolute inset-0 z-0 opacity-50" style={GRID_BG} />
 
-      <div className="relative z-[1] flex w-full max-w-[440px] flex-col gap-[18px] border border-line-2 border-t-[3px] border-t-accent bg-panel px-[34px] pb-[30px] pt-8 shadow-[0_40px_80px_-34px_rgba(0,0,0,0.75)] cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:16px] max-[480px]:px-5 max-[480px]:pt-[26px] max-[480px]:pb-6">
+      <div className="relative z-[1] flex w-full max-w-[27.5rem] flex-col gap-[1.125rem] border border-line-2 border-t-[3px] border-t-accent bg-panel px-[2.125rem] pb-[1.875rem] pt-8 shadow-[0_40px_80px_-34px_rgba(0,0,0,0.75)] cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:16px] max-[480px]:px-5 max-[480px]:pt-[1.625rem] max-[480px]:pb-6">
         <Link
           href="/"
-          className="flex items-center gap-2.5 font-display text-[20px]/none font-extrabold italic uppercase text-txt no-underline"
+          className="flex items-center gap-2.5 font-display text-[1.25rem]/none font-extrabold italic uppercase text-txt no-underline"
         >
-          <img src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" className="h-[26px] w-[26px] flex-none object-contain" />
+          <img src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" className="h-[1.625rem] w-[1.625rem] flex-none object-contain" />
           BOFF<b className="text-accent">MEDIA</b>
         </Link>
 
         <div className="flex flex-col gap-1.5">
-          <h1 className="text-[30px]/[1.02] tracking-[0.01em] max-[480px]:text-[25px]">
+          <h1 className="text-[1.875rem]/[1.02] tracking-[0.01em] max-[480px]:text-[1.5625rem]">
             {registeredEmail
               ? t("registered.title")
               : isRegister
                 ? t("register.title")
                 : t("login.title")}
           </h1>
-          <p className="font-body text-[14px]/[1.5] not-italic normal-case text-txt-muted">
+          <p className="font-body text-[0.875rem]/[1.5] not-italic normal-case text-txt-muted">
             {registeredEmail
               ? t.rich("registered.subtitle", {
                   address: registeredEmail,
@@ -132,8 +132,8 @@ export function AuthScreen({
         </div>
 
         {registeredEmail ? (
-          <div className="flex flex-col gap-[13px]">
-            <p className="font-body text-[13.5px]/[1.55] not-italic normal-case text-txt-muted">
+          <div className="flex flex-col gap-[0.8125rem]">
+            <p className="font-body text-[0.84375rem]/[1.55] not-italic normal-case text-txt-muted">
               {t("registered.hint")}
             </p>
             <ResendVerificationButton email={registeredEmail} variant="pri" className="w-full" />
@@ -172,12 +172,12 @@ export function AuthScreen({
               onRegistered={onRegistered}
             />
 
-            <p className="mt-0.5 text-center font-body text-[13.5px]/none not-italic normal-case text-txt-muted">
+            <p className="mt-0.5 text-center font-body text-[0.84375rem]/none not-italic normal-case text-txt-muted">
               {isRegister ? t("switch.toLoginQ") : t("switch.toRegisterQ")}
               <button
                 type="button"
                 onClick={() => switchMode(!isRegister)}
-                className="ml-[7px] font-body text-[13.5px] font-bold text-accent hover:text-accent-bright hover:underline"
+                className="ml-[0.4375rem] font-body text-[0.84375rem] font-bold text-accent hover:text-accent-bright hover:underline"
               >
                 {isRegister ? t("switch.toLoginA") : t("switch.toRegisterA")}
               </button>
@@ -188,7 +188,7 @@ export function AuthScreen({
 
       <Link
         href="/"
-        className="relative z-[1] mt-[22px] inline-flex items-center gap-[7px] font-mono text-[11px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
+        className="relative z-[1] mt-[1.375rem] inline-flex items-center gap-[0.4375rem] font-mono text-[0.6875rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim no-underline transition-colors hover:text-txt"
       >
         <Icon name="back" size={14} /> {t("back")}
       </Link>

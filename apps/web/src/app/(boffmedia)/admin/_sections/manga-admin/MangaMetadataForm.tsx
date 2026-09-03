@@ -84,7 +84,7 @@ export default function MangaMetadataForm({ seriesSlug }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("heading")}</p>
+      <p className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("heading")}</p>
 
       <Field label={t("title")}>
         <Input {...field("title")} />

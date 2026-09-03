@@ -50,7 +50,7 @@ export function MvPlayers({ players, loading, teamCache, onFetchTeam }: MvPlayer
   return (
     <div className="grid content-start gap-3">
       <div className="flex flex-wrap items-center gap-3">
-        <DkSearch value={q} onChange={setQ} placeholder={t("standings.search")} className="min-w-[min(280px,100%)]" />
+        <DkSearch value={q} onChange={setQ} placeholder={t("standings.search")} className="min-w-[min(17.5rem,100%)]" />
         <span className="flex-1" />
         <DkChip icon="users">{t("standings.count", { count: rows.length })}</DkChip>
       </div>
@@ -122,7 +122,7 @@ function PlayerRows({
       <tr className="is-click" onClick={onToggle}>
         <td className="mono text-txt-dim">{player.placing}</td>
         <td>
-          <span className="inline-flex items-center gap-[9px] font-semibold">
+          <span className="inline-flex items-center gap-[0.5625rem] font-semibold">
             <Icon
               name="chevron"
               size={13}
@@ -139,21 +139,21 @@ function PlayerRows({
       </tr>
       {expanded && (
         <tr>
-          <td colSpan={4} className="!bg-base-2 !px-4 !py-[14px]">
+          <td colSpan={4} className="!bg-base-2 !px-4 !py-[0.875rem]">
             {loading ? (
-              <div className="flex items-center justify-center gap-2 py-6 font-mono text-[12px] text-txt-dim">
+              <div className="flex items-center justify-center gap-2 py-6 font-mono text-[0.75rem] text-txt-dim">
                 <Icon name="refresh" size={14} className="animate-spin motion-reduce:animate-none" />
                 {loadingLabel}
               </div>
             ) : player.team.length > 0 ? (
               <>
-                <div className="mb-[10px] flex justify-end">
+                <div className="mb-[0.625rem] flex justify-end">
                   <DkCopy text={player.rawText} label={copyLabel} copiedLabel={copiedLabel} />
                 </div>
                 <MvTeamGrid team={player.team} />
               </>
             ) : (
-              <p className="py-4 text-center font-mono text-[12px] text-txt-dim">{emptyLabel}</p>
+              <p className="py-4 text-center font-mono text-[0.75rem] text-txt-dim">{emptyLabel}</p>
             )}
           </td>
         </tr>

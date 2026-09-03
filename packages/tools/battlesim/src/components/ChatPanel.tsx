@@ -63,12 +63,12 @@ export function ChatPanel({ messages, onSend, disabled, placeholder, emptyText, 
       <div ref={scrollRef} role="log" aria-label={t('chat.aria')} onScroll={onScroll}
         className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-2">
         {messages.length === 0 && (
-          <p className="py-4 text-center font-mono text-[11px] text-txt-dim">{emptyText ?? t('chat.empty')}</p>
+          <p className="py-4 text-center font-mono text-[0.6875rem] text-txt-dim">{emptyText ?? t('chat.empty')}</p>
         )}
         {messages.map((msg, i) => (
-          <div key={i} className="break-words font-body text-[12.5px] leading-[1.45] text-txt-muted">
+          <div key={i} className="break-words font-body text-[0.78125rem] leading-[1.45] text-txt-muted">
             {msg.timestamp != null && (
-              <span className="mr-1 font-mono text-[9px] tabular-nums text-txt-dim">{formatTime(msg.timestamp)}</span>
+              <span className="mr-1 font-mono text-[0.5625rem] tabular-nums text-txt-dim">{formatTime(msg.timestamp)}</span>
             )}
             <span className="font-semibold text-accent-bright">{msg.sender}: </span>
             <span className="[&_b]:text-txt" dangerouslySetInnerHTML={{ __html: sanitizeHtml(msg.message) }} />
@@ -83,7 +83,7 @@ export function ChatPanel({ messages, onSend, disabled, placeholder, emptyText, 
             aria-label={label}
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            className={cn('cut-tag cut-tag-edge [--cut-tag:7px] [--cut-line:var(--line)]', BSIM_FOCUS_CUT, 'h-8 min-w-0 flex-1 border border-solid border-line bg-base px-[10px] font-body text-[12.5px] text-txt placeholder:text-txt-dim focus:border-accent-line')}
+            className={cn('cut-tag cut-tag-edge [--cut-tag:7px] [--cut-line:var(--line)]', BSIM_FOCUS_CUT, 'h-8 min-w-0 flex-1 border border-solid border-line bg-base px-[0.625rem] font-body text-[0.78125rem] text-txt placeholder:text-txt-dim focus:border-accent-line')}
           />
           <Button type="submit" size="sm" disabled={!input.trim()}>{t('chat.send')}</Button>
         </form>

@@ -99,7 +99,7 @@ export function LifecycleActions({ config, onChanged }: LifecycleActionsProps) {
           </>
         }
       >
-        <p className="text-[14px] leading-[1.5] text-txt-muted">
+        <p className="text-[0.875rem] leading-[1.5] text-txt-muted">
           {confirming ? t(`${confirming}ConfirmMsg`, { name: config.gameTitle }) : ""}
         </p>
       </Modal>

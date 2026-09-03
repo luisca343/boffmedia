@@ -28,7 +28,7 @@ export function ImageViewer({ data, onClose }: { data: ImageMessageData; onClose
 
   return (
     <Modal bare title="" onClose={onClose} scrimClassName="bg-black/85">
-      <div onClick={(e) => e.stopPropagation()} className="flex w-full max-w-[720px] flex-col gap-3.5">
+      <div onClick={(e) => e.stopPropagation()} className="flex w-full max-w-[45rem] flex-col gap-3.5">
         <div className="relative overflow-hidden rounded-[18px] border border-ca-700 bg-ca-950">
           <img src={data.imageUrl} alt={meta?.caption || ""} className="max-h-[70vh] w-full object-contain" />
           <button onClick={onClose} className="absolute right-2.5 top-2.5 grid h-10 w-10 place-items-center rounded-full bg-black/50 text-white hover:bg-black/70">
@@ -37,7 +37,7 @@ export function ImageViewer({ data, onClose }: { data: ImageMessageData; onClose
           {entities.length > 0 && (
             <div className="absolute left-2.5 top-2.5 flex flex-wrap gap-1.5">
               {entities.map((e, i) => (
-                <span key={i} className="rounded-full border border-ca-online/40 bg-black/60 px-2.5 py-1 font-ca-mono text-[11px] text-ca-online backdrop-blur-sm">
+                <span key={i} className="rounded-full border border-ca-online/40 bg-black/60 px-2.5 py-1 font-ca-mono text-[0.6875rem] text-ca-online backdrop-blur-sm">
                   {e.type === "pokemon" ? (e as PokemonEntity).species : (e as { name: string }).name}
                 </span>
               ))}

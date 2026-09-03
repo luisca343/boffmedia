@@ -34,14 +34,14 @@ export function SorteosSettings({
 
   return (
     <Panel title={t("configTitle")} media={<Icon name="sliders" />} bodyClassName="p-0">
-      <div className="grid gap-[14px] p-[20px]">
+      <div className="grid gap-[0.875rem] p-[1.25rem]">
         {/* Winners */}
-        <div className="flex items-center justify-between gap-[12px]">
+        <div className="flex items-center justify-between gap-[0.75rem]">
           <span className="min-w-0">
-            <b className="block font-display text-[12px] font-bold uppercase tracking-[0.05em] text-txt">
+            <b className="block font-display text-[0.75rem] font-bold uppercase tracking-[0.05em] text-txt">
               {t("cfgWinners")}
             </b>
-            <span className="mt-[4px] block font-mono text-[10px] leading-[1.4] text-txt-dim">
+            <span className="mt-[0.25rem] block font-mono text-[0.625rem] leading-[1.4] text-txt-dim">
               {t("cfgWinnersSub")}
             </span>
           </span>
@@ -58,12 +58,12 @@ export function SorteosSettings({
         </div>
 
         {/* Weighted */}
-        <div className="flex items-center justify-between gap-[12px]">
+        <div className="flex items-center justify-between gap-[0.75rem]">
           <span className="min-w-0">
-            <b className="block font-display text-[12px] font-bold uppercase tracking-[0.05em] text-txt">
+            <b className="block font-display text-[0.75rem] font-bold uppercase tracking-[0.05em] text-txt">
               {t("cfgWeighted")}
             </b>
-            <span className="mt-[4px] block font-mono text-[10px] leading-[1.4] text-txt-dim">
+            <span className="mt-[0.25rem] block font-mono text-[0.625rem] leading-[1.4] text-txt-dim">
               {t("cfgWeightedSub")}
             </span>
           </span>
@@ -71,12 +71,12 @@ export function SorteosSettings({
         </div>
 
         {/* Exclude */}
-        <div className="flex items-center justify-between gap-[12px]">
+        <div className="flex items-center justify-between gap-[0.75rem]">
           <span className="min-w-0">
-            <b className="block font-display text-[12px] font-bold uppercase tracking-[0.05em] text-txt">
+            <b className="block font-display text-[0.75rem] font-bold uppercase tracking-[0.05em] text-txt">
               {t("cfgExclude")}
             </b>
-            <span className="mt-[4px] block font-mono text-[10px] leading-[1.4] text-txt-dim">
+            <span className="mt-[0.25rem] block font-mono text-[0.625rem] leading-[1.4] text-txt-dim">
               {t("cfgExcludeSub")}
             </span>
           </span>
@@ -84,12 +84,12 @@ export function SorteosSettings({
         </div>
 
         {/* Sound */}
-        <div className="flex items-center justify-between gap-[12px]">
+        <div className="flex items-center justify-between gap-[0.75rem]">
           <span className="min-w-0">
-            <b className="block font-display text-[12px] font-bold uppercase tracking-[0.05em] text-txt">
+            <b className="block font-display text-[0.75rem] font-bold uppercase tracking-[0.05em] text-txt">
               {t("cfgSound")}
             </b>
-            <span className="mt-[4px] block font-mono text-[10px] leading-[1.4] text-txt-dim">
+            <span className="mt-[0.25rem] block font-mono text-[0.625rem] leading-[1.4] text-txt-dim">
               {t("cfgSoundSub")}
             </span>
           </span>
@@ -98,12 +98,12 @@ export function SorteosSettings({
       </div>
 
       {/* Keyboard legend */}
-      <div className="hidden [@media(pointer:fine)]:flex flex-col border-t border-line px-[20px] py-[14px] font-mono text-[10px] leading-[1.5] text-txt-dim">
-        <div className="flex items-center gap-[6px]">
+      <div className="hidden [@media(pointer:fine)]:flex flex-col border-t border-line px-[1.25rem] py-[0.875rem] font-mono text-[0.625rem] leading-[1.5] text-txt-dim">
+        <div className="flex items-center gap-[0.375rem]">
           <Kbd>{t("kbdSpace")}</Kbd>
           <span>{t("kbdLegendSpace")}</span>
         </div>
-        <div className="flex items-center gap-[6px] mt-[8px]">
+        <div className="flex items-center gap-[0.375rem] mt-[0.5rem]">
           <Kbd>Esc</Kbd>
           <span>{t("kbdLegendEsc")}</span>
         </div>

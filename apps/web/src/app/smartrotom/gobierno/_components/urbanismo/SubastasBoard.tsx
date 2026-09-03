@@ -98,7 +98,7 @@ export function SubastasBoard() {
             </Card>
           )}
 
-          <div className="mb-3 flex items-center gap-2.5 border-b border-gt-line px-1 pb-[11px]">
+          <div className="mb-3 flex items-center gap-2.5 border-b border-gt-line px-1 pb-[0.6875rem]">
             <Icon name="history" size={16} className="text-gt-dep-urbanismo" />
             <span className="font-gt-display text-base font-bold text-gt-ink-900">{t("subastas.subastasCerradas")}</span>
           </div>
@@ -124,7 +124,7 @@ export function SubastasBoard() {
                     return (
                       <TR key={a.id}>
                         <TD>
-                          <span className="font-gt-mono text-[11px] text-gt-ink-400">{a.code}</span>
+                          <span className="font-gt-mono text-[0.6875rem] text-gt-ink-400">{a.code}</span>
                         </TD>
                         <TD>
                           {townName(a.town)} #{a.number}
@@ -149,7 +149,7 @@ export function SubastasBoard() {
                           </span>
                         </TD>
                         <TD>
-                          <span className="text-[12px] text-gt-ink-500">{a.reason || "—"}</span>
+                          <span className="text-[0.75rem] text-gt-ink-500">{a.reason || "—"}</span>
                         </TD>
                         <TD>
                           <Badge tone={st.tone}>{st.label}</Badge>
@@ -202,7 +202,7 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
           {townName(a.town)} #{a.number}
         </span>
         <span
-          className={`absolute right-2.5 top-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-[3px] font-gt-mono text-[11px] font-bold text-white ${
+          className={`absolute right-2.5 top-2.5 inline-flex items-center gap-1.5 rounded-full px-2.5 py-[3px] font-gt-mono text-[0.6875rem] font-bold text-white ${
             ending || finished ? "bg-gt-danger" : "bg-gt-ink-900"
           }`}
         >
@@ -212,15 +212,15 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
       </div>
       <div className="p-4">
         <div className="mb-1 flex items-center justify-between gap-2">
-          <span className="font-gt-mono text-[11px] text-gt-ink-400">
+          <span className="font-gt-mono text-[0.6875rem] text-gt-ink-400">
             {a.code} · {t("subastas.pujas", { count: a.bids })}
           </span>
-          {a.reason && <span className="max-w-[160px] truncate text-[11px] text-gt-ink-400">{a.reason}</span>}
+          {a.reason && <span className="max-w-[10rem] truncate text-[0.6875rem] text-gt-ink-400">{a.reason}</span>}
         </div>
         <div className="mb-3 flex items-end justify-between gap-2">
           <div>
-            <div className="font-gt-mono text-[9px] uppercase tracking-[.12em] text-gt-ink-400">{t("subastas.pujaActual")}</div>
-            <div className="font-gt-display text-[26px] font-bold tabular-nums text-gt-ink-900">
+            <div className="font-gt-mono text-[0.5625rem] uppercase tracking-[.12em] text-gt-ink-400">{t("subastas.pujaActual")}</div>
+            <div className="font-gt-display text-[1.625rem] font-bold tabular-nums text-gt-ink-900">
               {money(a.currentBid, intlLocale)} ₽
             </div>
           </div>
@@ -231,7 +231,7 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
               className="flex items-center gap-1.5 rounded-gt-sm py-0.5 pr-1 transition-colors hover:bg-gt-paper-1"
             >
               <Avatar user={a.bidder.username} size={26} />
-              <span className="text-[12px] font-semibold text-gt-ink-700">{a.bidder.username}</span>
+              <span className="text-[0.75rem] font-semibold text-gt-ink-700">{a.bidder.username}</span>
             </button>
           ) : (
             <Badge tone="warn">{t("subastas.sinPujas")}</Badge>
@@ -266,7 +266,7 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
         <div className="mt-2.5 border-t border-gt-line-soft pt-2.5">
           {confirmClose ? (
             <div className="flex items-center justify-between gap-2">
-              <span className="text-[11.5px] text-gt-ink-500">{t("subastas.confirmarCierre")}</span>
+              <span className="text-[0.71875rem] text-gt-ink-500">{t("subastas.confirmarCierre")}</span>
               <div className="flex gap-1.5">
                 <Button size="sm" tone="ghost" onClick={() => setConfirmClose(false)}>
                   {t("subastas.no")}
@@ -285,7 +285,7 @@ function SubastaCard({ subasta: a, onOpenOwner }: { subasta: Subasta; onOpenOwne
             <button
               type="button"
               onClick={() => setConfirmClose(true)}
-              className="text-[11.5px] font-semibold text-gt-ink-400 underline-offset-2 hover:text-gt-ink-700 hover:underline"
+              className="text-[0.71875rem] font-semibold text-gt-ink-400 underline-offset-2 hover:text-gt-ink-700 hover:underline"
             >
               {t("subastas.cerrarSubastaAhora")}
             </button>

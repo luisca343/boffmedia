@@ -28,7 +28,7 @@ export const MewSearch = React.forwardRef<HTMLInputElement, MewSearchProps>(
         aria-label={label}
         value={value || ""}
         className={cn(
-          "w-full border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 py-2.5 text-[13px]/[1.5] font-medium text-[color:var(--mwp-ink)] placeholder-[color:var(--mwp-ink-soft)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] transition-[box-shadow,border-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden",
+          "w-full border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 py-2.5 text-[0.8125rem]/[1.5] font-medium text-[color:var(--mwp-ink)] placeholder-[color:var(--mwp-ink-soft)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] transition-[box-shadow,border-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 [&::-webkit-search-cancel-button]:hidden [&::-webkit-search-decoration]:hidden",
           className
         )}
         onChange={(e) => onChange?.(e.target.value)}
@@ -79,7 +79,7 @@ export function MewSelect({
         disabled={disabled}
         aria-label={ariaLabel}
         className={cn(
-          "appearance-none border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 py-2.5 pr-8 text-[13px]/[1.5] font-medium text-[color:var(--mwp-ink)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] transition-[box-shadow,border-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed w-full",
+          "appearance-none border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 py-2.5 pr-8 text-[0.8125rem]/[1.5] font-medium text-[color:var(--mwp-ink)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] transition-[box-shadow,border-color] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 disabled:opacity-50 disabled:cursor-not-allowed w-full",
           className
         )}
       >
@@ -143,7 +143,7 @@ export function MewChips({
 
   return (
     <fieldset className="border-0 p-0 m-0">
-      <legend className="text-[11.5px]/none uppercase tracking-[0.06em] font-bold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)] mb-1.5">
+      <legend className="text-[0.71875rem]/none uppercase tracking-[0.06em] font-bold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)] mb-1.5">
         {label}
       </legend>
       <div ref={containerRef} role="radiogroup" aria-label={label} className="flex flex-wrap gap-1.5">
@@ -157,7 +157,7 @@ export function MewChips({
             onClick={() => onChange(opt.value)}
             onKeyDown={handleKeyDown}
             className={cn(
-              "inline-flex items-center px-3 py-1.5 border-2 border-solid [border-radius:var(--wob-sm)] text-[12px]/none font-bold font-[family:var(--mwf-hand)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]",
+              "inline-flex items-center px-3 py-1.5 border-2 border-solid [border-radius:var(--wob-sm)] text-[0.75rem]/none font-bold font-[family:var(--mwf-hand)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]",
               value === opt.value
                 ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] [transform:rotate(-1deg)]"
                 : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink-soft)] hover:text-[color:var(--mwp-cream)]"
@@ -187,17 +187,17 @@ export function MewEmpty({
       <div className="grid h-16 w-16 place-items-center border-2 border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-paper-2)] text-[color:var(--mwp-ink-soft)] [border-radius:var(--wob-b)]">
         <Icon name={icon as any} size={28} />
       </div>
-      <h3 className="text-center text-[17px]/[1.2] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)]">
+      <h3 className="text-center text-[1.0625rem]/[1.2] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)]">
         {title}
       </h3>
-      <p className="text-center text-[13px]/[1.5] font-medium text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] max-w-xs">
+      <p className="text-center text-[0.8125rem]/[1.5] font-medium text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] max-w-xs">
         {lead}
       </p>
       {action && (
         <button
           type="button"
           onClick={action.onClick}
-          className="mt-2 border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-4 py-2 text-[12px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] transition-all hover:translate-y-[-2px] hover:[box-shadow:0_5px_0_var(--mwp-shadow-sm)] active:translate-y-1 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+          className="mt-2 border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-4 py-2 text-[0.75rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] transition-all hover:translate-y-[-2px] hover:[box-shadow:0_5px_0_var(--mwp-shadow-sm)] active:translate-y-1 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
         >
           {action.label}
         </button>

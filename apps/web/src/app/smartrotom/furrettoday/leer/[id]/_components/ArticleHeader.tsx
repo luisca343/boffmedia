@@ -15,7 +15,7 @@ export function ArticleHeader({ article }: { article: FtArticle }) {
   return (
     <header className="border-ft relative overflow-hidden border-x-0 border-t-0 border-b-ft-ink bg-ft-paper">
       <div className="ft-halftone absolute inset-0 opacity-10" aria-hidden="true" />
-      <div className="relative mx-auto max-w-[880px] px-6 py-12">
+      <div className="relative mx-auto max-w-[55rem] px-6 py-12">
         <div className="mb-4 flex flex-wrap items-center gap-2.5">
           <Pill tone={article.accent}>{article.eyebrow}</Pill>
           <Meta>{longDateOf(article.createdAt, locale)}</Meta>
@@ -24,14 +24,14 @@ export function ArticleHeader({ article }: { article: FtArticle }) {
         </div>
 
         <h1
-          className="font-ft-display mb-4 pb-2 text-[clamp(48px,7.2vw,96px)] leading-[0.96]"
+          className="font-ft-display mb-4 pb-2 text-[clamp(3rem,7.2vw,6rem)] leading-[0.96]"
           style={{ textShadow: `5px 5px 0 ${ACCENT_HEX.pink}` }}
         >
           {article.title}
         </h1>
 
         {article.deck ? (
-          <p className="font-ft-deck max-w-[760px] text-[clamp(20px,2.2vw,26px)] italic text-ft-deck">
+          <p className="font-ft-deck max-w-[47.5rem] text-[clamp(1.25rem,2.2vw,1.625rem)] italic text-ft-deck">
             {article.deck}
           </p>
         ) : null}

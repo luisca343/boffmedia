@@ -26,9 +26,9 @@ export function ChipGroup({ label, value, onChange, options, multi = false, clas
     else onChange(v)
   }
   return (
-    <div className={cn("flex flex-col gap-[5px]", className)}>
+    <div className={cn("flex flex-col gap-[0.3125rem]", className)}>
       {label && (
-        <span className="font-mono text-[9px] font-semibold leading-none uppercase tracking-[0.1em] text-txt-dim">{label}</span>
+        <span className="font-mono text-[0.5625rem] font-semibold leading-none uppercase tracking-[0.1em] text-txt-dim">{label}</span>
       )}
       <div role={multi ? "group" : "radiogroup"} aria-label={typeof label === "string" ? label : undefined} className="flex flex-wrap gap-1">
         {options.map((o) => {
@@ -41,8 +41,8 @@ export function ChipGroup({ label, value, onChange, options, multi = false, clas
               onClick={() => toggle(o.value)}
               style={o.color ? ({ ["--fc" as string]: o.color } as React.CSSProperties) : undefined}
               className={cn(
-                "inline-flex items-center gap-[5px] py-[5px] px-2 border border-solid cursor-pointer",
-                "font-mono text-[11px] font-semibold leading-none tracking-[0.01em] transition-[color,border-color,background] duration-[140ms]",
+                "inline-flex items-center gap-[0.3125rem] py-[0.3125rem] px-2 border border-solid cursor-pointer",
+                "font-mono text-[0.6875rem] font-semibold leading-none tracking-[0.01em] transition-[color,border-color,background] duration-[140ms]",
                 "[--fc:var(--line-2)]",
                 on
                   ? "text-txt border-[var(--fc)] bg-[color-mix(in_srgb,var(--fc)_14%,transparent)]"
@@ -52,7 +52,7 @@ export function ChipGroup({ label, value, onChange, options, multi = false, clas
               {o.color && <span className="w-2 h-2 rounded-full bg-[var(--fc)]" />}
               {o.label}
               {o.count != null && (
-                <span className={cn("font-mono text-[9px] font-semibold leading-none", on ? "text-[var(--fc)]" : "text-txt-dim")}>
+                <span className={cn("font-mono text-[0.5625rem] font-semibold leading-none", on ? "text-[var(--fc)]" : "text-txt-dim")}>
                   {o.count}
                 </span>
               )}

@@ -137,7 +137,7 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
             <div ref={wrapRef} className={wrapClass}>
                 <div className="flex flex-col items-center justify-center gap-3 bg-base-deep" style={{ width: width || '100%', height: height || 240, backgroundImage: `url(${battlesimAssetUrl('fx/bg/hagane.png')})`, backgroundSize: '100% 100%' }}>
                     <Spinner size={44} />
-                    <span className="font-mono text-[12px] text-txt-muted">{t('connection.waitingBattle')}</span>
+                    <span className="font-mono text-[0.75rem] text-txt-muted">{t('connection.waitingBattle')}</span>
                 </div>
             </div>
         );
@@ -152,7 +152,7 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
         );
     }
 
-    const plateWidth = compact ? "w-[min(200px,100%)]" : "w-[min(260px,100%)]";
+    const plateWidth = compact ? "w-[min(12.5rem,100%)]" : "w-[min(16.25rem,100%)]";
     const foePlates = positionsP2.map((position, i) => {
         const mon = toBSXMon(pokemon[position]);
         if (!mon) return null;
@@ -185,7 +185,7 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
                 <BattleScaleProvider width={width || 960}>
                     <div className="pointer-events-none absolute inset-x-0 top-0 z-[120] flex items-start justify-between gap-2 p-1.5 sm:p-2">
                         <div className="flex min-w-0 max-w-[40%] flex-col items-start gap-1">
-                            <div className="pointer-events-auto w-fit border border-solid border-line bg-base/80 px-2 py-1 font-mono text-[11px] font-bold uppercase leading-none tracking-[0.08em] text-txt backdrop-blur-[3px]">
+                            <div className="pointer-events-auto w-fit border border-solid border-line bg-base/80 px-2 py-1 font-mono text-[0.6875rem] font-bold uppercase leading-none tracking-[0.08em] text-txt backdrop-blur-[3px]">
                                 {t('battle.turn', { turn: battle.turn })}
                             </div>
                             <div className="pointer-events-auto max-w-full"><FieldConditions battle={battle} pov={side} max={compact ? 2 : 6} /></div>
@@ -218,12 +218,12 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
 
                     {!liveMode && showPreviewOverlay && overlayFrame(
                         <div className="flex flex-1 items-center justify-center bg-base/80 p-4">
-                            <div className="flex w-full max-w-[420px] flex-col items-center gap-4 border border-solid border-line bg-panel p-5 text-center">
-                                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-txt-dim">{t('battle.intro.title')}</span>
+                            <div className="flex w-full max-w-[26.25rem] flex-col items-center gap-4 border border-solid border-line bg-panel p-5 text-center">
+                                <span className="font-mono text-[0.625rem] font-bold uppercase tracking-[0.14em] text-txt-dim">{t('battle.intro.title')}</span>
                                 <div className="flex w-full items-center justify-between gap-3">
-                                    <b className="min-w-0 flex-1 truncate font-display text-[16px] font-bold uppercase leading-none tracking-[0.04em] text-txt">{getParticipantName(p1.name)}</b>
-                                    <span className={cn(DISPLAY_VOICE, "flex-none text-[28px] text-accent")}>{t('battle.intro.vs')}</span>
-                                    <b className="min-w-0 flex-1 truncate font-display text-[16px] font-bold uppercase leading-none tracking-[0.04em] text-txt">{getParticipantName(p2.name)}</b>
+                                    <b className="min-w-0 flex-1 truncate font-display text-[1rem] font-bold uppercase leading-none tracking-[0.04em] text-txt">{getParticipantName(p1.name)}</b>
+                                    <span className={cn(DISPLAY_VOICE, "flex-none text-[1.75rem] text-accent")}>{t('battle.intro.vs')}</span>
+                                    <b className="min-w-0 flex-1 truncate font-display text-[1rem] font-bold uppercase leading-none tracking-[0.04em] text-txt">{getParticipantName(p2.name)}</b>
                                 </div>
                                 <Button variant="pri" size="lg" icon="play" onClick={() => { setBattleStarted?.(true); setIsPlaying?.(true); }}>{t('battle.intro.play')}</Button>
                             </div>

@@ -29,7 +29,7 @@ export function SmartRotomPanel({
     >
       {title && (
         <header className="flex items-center gap-2 py-3 px-4 border-b border-solid border-sr-line">
-          <h3 className="font-display text-[14px] font-bold not-italic uppercase tracking-[0.06em] leading-none text-sr-txt">
+          <h3 className="font-display text-[0.875rem] font-bold not-italic uppercase tracking-[0.06em] leading-none text-sr-txt">
             {title}
           </h3>
           {aside && <span className="ml-auto flex items-center gap-2">{aside}</span>}

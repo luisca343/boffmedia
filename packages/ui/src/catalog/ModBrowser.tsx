@@ -312,7 +312,7 @@ export function ModBrowser({
 
   if (needsGameVersion && !gameVersion) {
     return (
-      <p className="border border-solid border-line bg-panel px-3 py-4 font-body text-[12px] text-txt-dim">
+      <p className="border border-solid border-line bg-panel px-3 py-4 font-body text-[0.75rem] text-txt-dim">
         {t("needMinecraftLead")}
       </p>
     );
@@ -339,7 +339,7 @@ export function ModBrowser({
             }))}
           />
         )}
-        <div className="min-w-[200px] flex-1">
+        <div className="min-w-[12.5rem] flex-1">
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -347,7 +347,7 @@ export function ModBrowser({
           />
         </div>
         {projectTypes.length > 1 && (
-          <div className="w-[150px]">
+          <div className="w-[9.375rem]">
             <Select
               value={projectType}
               onChange={(v) => setProjectType(v as CatalogProjectType)}
@@ -359,7 +359,7 @@ export function ModBrowser({
             />
           </div>
         )}
-        <div className="w-[150px]">
+        <div className="w-[9.375rem]">
           <Select
             value={sort}
             onChange={(v) => setSort(v as CatalogSort)}
@@ -371,7 +371,7 @@ export function ModBrowser({
             would still render but change nothing, which reads as broken. */}
         {connector && projectType === "mod" && platform === "modrinth" && (
           <label
-            className="flex shrink-0 cursor-pointer items-center gap-[6px] font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim"
+            className="flex shrink-0 cursor-pointer items-center gap-[0.375rem] font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim"
             title={t("connectorHint")}
           >
             <input
@@ -381,7 +381,7 @@ export function ModBrowser({
                 connector.onChange(e.target.checked);
                 setSelected(null);
               }}
-              className="size-[13px] accent-[var(--accent)]"
+              className="size-[0.8125rem] accent-[var(--accent)]"
             />
             {t("connectorToggle")}
           </label>
@@ -394,7 +394,7 @@ export function ModBrowser({
           work. Mods with deep Fabric-internal mixins still fail, and there is no
           catalog field that would let us filter them out for the player. */}
       {connectorOn && (
-        <p className="shrink-0 border border-solid border-line bg-panel px-3 py-2 font-body text-[11px] text-txt-dim">
+        <p className="shrink-0 border border-solid border-line bg-panel px-3 py-2 font-body text-[0.6875rem] text-txt-dim">
           {t("connectorNote")}
         </p>
       )}
@@ -402,8 +402,8 @@ export function ModBrowser({
       {/* The three panes each own their scroll, so the page itself never grows:
           categories · results · the selected project. */}
       <div className="flex min-h-0 flex-1 gap-3">
-        <aside className="hidden w-[180px] shrink-0 flex-col gap-1 md:flex">
-          <span className="shrink-0 font-display text-[11px] font-bold uppercase tracking-[0.08em] text-txt-dim">
+        <aside className="hidden w-[11.25rem] shrink-0 flex-col gap-1 md:flex">
+          <span className="shrink-0 font-display text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-txt-dim">
             {t("categories")}
           </span>
           <ul className="bm-scroll flex min-h-0 flex-1 flex-col overflow-auto">
@@ -412,7 +412,7 @@ export function ModBrowser({
                 type="button"
                 onClick={() => setCategory("")}
                 className={cn(
-                  "w-full px-2 py-[5px] text-left font-body text-[12px]",
+                  "w-full px-2 py-[0.3125rem] text-left font-body text-[0.75rem]",
                   category === ""
                     ? "bg-panel-2 text-acc"
                     : "text-txt-dim hover:text-txt",
@@ -427,7 +427,7 @@ export function ModBrowser({
                   type="button"
                   onClick={() => setCategory(c.id)}
                   className={cn(
-                    "w-full truncate px-2 py-[5px] text-left font-body text-[12px] capitalize",
+                    "w-full truncate px-2 py-[0.3125rem] text-left font-body text-[0.75rem] capitalize",
                     category === c.id
                       ? "bg-panel-2 text-acc"
                       : "text-txt-dim hover:text-txt",
@@ -442,7 +442,7 @@ export function ModBrowser({
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {hits.length === 0 && !loading ? (
-            <p className="border border-solid border-line bg-panel px-3 py-4 font-body text-[12px] text-txt-dim">
+            <p className="border border-solid border-line bg-panel px-3 py-4 font-body text-[0.75rem] text-txt-dim">
               {t("noModResults")}
             </p>
           ) : (
@@ -451,7 +451,7 @@ export function ModBrowser({
                   cards per row instead of two very wide ones. */}
               <ul
                 ref={listRef}
-                className="bm-scroll grid min-h-0 flex-1 auto-rows-min content-start gap-2 overflow-auto pr-1 [grid-template-columns:repeat(auto-fill,minmax(260px,1fr))]"
+                className="bm-scroll grid min-h-0 flex-1 auto-rows-min content-start gap-2 overflow-auto pr-1 [grid-template-columns:repeat(auto-fill,minmax(16.25rem,1fr))]"
               >
                 {hits.map((hit) => {
                   const added = isAdded(hit.platform, hit.projectId);
@@ -474,7 +474,7 @@ export function ModBrowser({
                         <CatalogIcon src={hit.iconUrl} size={40} />
                         <span className="flex min-w-0 flex-1 flex-col gap-[2px]">
                           <span className="flex items-center gap-2">
-                            <span className="min-w-0 flex-1 truncate font-display text-[13px] font-bold uppercase tracking-[0.03em]">
+                            <span className="min-w-0 flex-1 truncate font-display text-[0.8125rem] font-bold uppercase tracking-[0.03em]">
                               {hit.name}
                             </span>
                             {/* `new`, not `info`: the hosts already spend `info`
@@ -492,10 +492,10 @@ export function ModBrowser({
                               </Badge>
                             )}
                           </span>
-                          <span className="line-clamp-1 font-body text-[11px] text-txt-dim">
+                          <span className="line-clamp-1 font-body text-[0.6875rem] text-txt-dim">
                             {toSummaryText(hit.summary)}
                           </span>
-                          <span className="mt-auto flex items-center gap-2 font-mono text-[10px] text-txt-muted">
+                          <span className="mt-auto flex items-center gap-2 font-mono text-[0.625rem] text-txt-muted">
                             <Icon name="download" size={11} />
                             {compactCount(hit.downloads)}
                             {hit.author ? ` · ${hit.author}` : ""}
@@ -646,7 +646,7 @@ function ProjectDetail({
       // The 3rem is NOT a spare-room guess: the overlay is `p-6`, so it is
       // exactly the padding this modal sits inside. Raising the pixel cap is
       // free; shrinking that subtraction overflows the viewport.
-      className="max-w-[1320px] md:h-[min(880px,calc(100dvh-3rem))]"
+      className="max-w-[82.5rem] md:h-[min(55rem,calc(100dvh-3rem))]"
       // On md+ the body must NOT scroll as one — each column owns its own
       // scroll, so the version list stays put while a long description moves.
       // Stacked on narrow, one scroll for the whole thing is the right feel.
@@ -657,14 +657,14 @@ function ProjectDetail({
             a version row is a fixed set of short fields and stops improving
             with more space, whereas prose keeps getting easier to read — so
             the extra width goes here rather than being split evenly. */}
-        <aside className="bm-scroll flex shrink-0 flex-col gap-3 border-b border-solid border-line p-4 md:min-h-0 md:w-[420px] md:overflow-y-auto md:border-b-0 md:border-r lg:w-[520px] xl:w-[600px]">
+        <aside className="bm-scroll flex shrink-0 flex-col gap-3 border-b border-solid border-line p-4 md:min-h-0 md:w-[26.25rem] md:overflow-y-auto md:border-b-0 md:border-r lg:w-[32.5rem] xl:w-[37.5rem]">
           <div className="flex items-start gap-3">
             <CatalogIcon src={hit.iconUrl} size={56} />
             <div className="min-w-0 flex-1">
-              <p className="font-body text-[12px] text-txt-dim">
+              <p className="font-body text-[0.75rem] text-txt-dim">
                 {toSummaryText(hit.summary)}
               </p>
-              <span className="mt-1 flex items-center gap-2 font-mono text-[10px] text-txt-muted">
+              <span className="mt-1 flex items-center gap-2 font-mono text-[0.625rem] text-txt-muted">
                 <Icon name="download" size={11} />
                 {compactCount(hit.downloads)}
                 {hit.author ? ` · ${hit.author}` : ""}
@@ -698,7 +698,7 @@ function ProjectDetail({
           )}
 
           {(project?.categories ?? hit.categories).length > 0 && (
-            <div className="flex flex-wrap gap-x-2 gap-y-1 font-mono text-[10px] capitalize text-txt-muted">
+            <div className="flex flex-wrap gap-x-2 gap-y-1 font-mono text-[0.625rem] capitalize text-txt-muted">
               {(project?.categories ?? hit.categories).slice(0, 8).map((c) => (
                 <span key={c}>{c}</span>
               ))}
@@ -711,7 +711,7 @@ function ProjectDetail({
 
           {project &&
             (project.sourceUrl || project.issuesUrl || project.websiteUrl) && (
-              <div className="mt-auto flex flex-wrap gap-3 pt-2 font-mono text-[11px]">
+              <div className="mt-auto flex flex-wrap gap-3 pt-2 font-mono text-[0.6875rem]">
                 {project.sourceUrl && (
                   <a
                     href={project.sourceUrl}
@@ -748,7 +748,7 @@ function ProjectDetail({
 
         <section className="flex min-h-0 flex-1 flex-col p-4 md:overflow-hidden">
           <div className="mb-2 flex shrink-0 flex-wrap items-center justify-between gap-2">
-            <span className="font-display text-[11px] font-bold uppercase tracking-[0.08em] text-txt-dim">
+            <span className="font-display text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-txt-dim">
               {t("files")}
             </span>
             <Seg
@@ -762,11 +762,11 @@ function ProjectDetail({
           </div>
 
           {loading ? (
-            <span className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
+            <span className="flex items-center gap-2 font-mono text-[0.6875rem] text-txt-dim">
               <Spinner size={12} /> {t("loadingFiles")}
             </span>
           ) : files.length === 0 ? (
-            <p className="font-body text-[12px] text-txt-dim">
+            <p className="font-body text-[0.75rem] text-txt-dim">
               {t("noCompatibleFiles")}
             </p>
           ) : (
@@ -792,7 +792,7 @@ function ProjectDetail({
                     >
                       {t(`releaseType.${file.releaseType}`)}
                     </Badge>
-                    <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-txt-muted">
+                    <span className="min-w-0 flex-1 truncate font-mono text-[0.6875rem] text-txt-muted">
                       {file.fileName}
                     </span>
                     {installedVersion === file.fileId ? (
@@ -826,7 +826,7 @@ function ProjectDetail({
                         {busy ? t("resolving") : t("addMod")}
                       </Button>
                     ) : (
-                      <span className="flex shrink-0 items-center gap-1 font-mono text-[11px] text-bad">
+                      <span className="flex shrink-0 items-center gap-1 font-mono text-[0.6875rem] text-bad">
                         <Icon name="alert" size={12} />
                         {t("notDistributable")}
                       </span>
@@ -835,7 +835,7 @@ function ProjectDetail({
                         filename. With the Add button sharing the first line, one
                         row of seven fields would still wrap at any width this
                         modal can offer. */}
-                    <span className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[10px] text-txt-dim">
+                    <span className="flex w-full flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[0.625rem] text-txt-dim">
                       {file.versionNumber && <span>{file.versionNumber}</span>}
                       <span>
                         {file.gameVersions
@@ -858,7 +858,7 @@ function ProjectDetail({
           )}
 
           {files.some((f) => !f.downloadable) && (
-            <p className="mt-2 shrink-0 font-body text-[12px] text-bad">
+            <p className="mt-2 shrink-0 font-body text-[0.75rem] text-bad">
               {t("notDistributableLead")}
             </p>
           )}

@@ -35,7 +35,7 @@ export function MasBuscadosCard() {
         {isLoading ? (
           <div className="space-y-2 p-2">
             {Array.from({ length: 3 }, (_, i) => (
-              <Skeleton key={i} className="h-[42px]" />
+              <Skeleton key={i} className="h-[2.625rem]" />
             ))}
           </div>
         ) : top.length === 0 ? (

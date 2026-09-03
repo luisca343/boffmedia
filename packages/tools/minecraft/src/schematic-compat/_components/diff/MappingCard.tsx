@@ -72,9 +72,9 @@ export function MappingCard({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5">
               <span className={cn("w-1.5 h-1.5 rounded-full shrink-0", tone.dot)} />
-              <span className="font-mono text-[12px] text-txt truncate">{entry.block.id}</span>
+              <span className="font-mono text-[0.75rem] text-txt truncate">{entry.block.id}</span>
               {isModOnly ? (
-                <span className="shrink-0 py-[1px] px-1.5 font-mono text-[9px] font-bold tracking-[0.08em] uppercase bg-bad-soft text-bad border border-solid border-[color-mix(in_srgb,var(--bad)_35%,transparent)]">
+                <span className="shrink-0 py-[1px] px-1.5 font-mono text-[0.5625rem] font-bold tracking-[0.08em] uppercase bg-bad-soft text-bad border border-solid border-[color-mix(in_srgb,var(--bad)_35%,transparent)]">
                   mod
                 </span>
               ) : null}
@@ -82,7 +82,7 @@ export function MappingCard({
             {/* Reserved even when no effective target, so every card in a windowed row is the same height. */}
             <div
               className={cn(
-                "h-[15px] font-mono text-[11px] pl-[13px] mt-0.5 truncate",
+                "h-[0.9375rem] font-mono text-[0.6875rem] pl-[0.8125rem] mt-0.5 truncate",
                 effective ? (resolution ? "text-accent-bright" : "text-[color:color-mix(in_srgb,var(--ok)_85%,var(--text))]") : "",
               )}
             >
@@ -93,20 +93,20 @@ export function MappingCard({
                 </>
               ) : null}
             </div>
-            <div className="pl-[13px] mt-[3px] text-[11px] text-txt-dim">{t("diff.instances", { count: entry.instanceCount })}</div>
+            <div className="pl-[0.8125rem] mt-[3px] text-[0.6875rem] text-txt-dim">{t("diff.instances", { count: entry.instanceCount })}</div>
             {/* Clamped to one row (+N overflow chip) so state count never grows the card. */}
-            <div className="h-[19px] flex items-center gap-[5px] pl-[13px] mt-[7px] overflow-hidden">
+            <div className="h-[1.1875rem] flex items-center gap-[0.3125rem] pl-[0.8125rem] mt-[0.4375rem] overflow-hidden">
               {visibleStates.map((k) => {
                 const bad = entry.incompatibleStates?.includes(k);
                 return (
-                  <span key={k} className={cn("shrink-0 whitespace-nowrap py-[2px] px-1.5 font-mono text-[10px]", bad ? "bg-bad-soft text-bad" : "bg-panel-2 text-txt-muted")}>
+                  <span key={k} className={cn("shrink-0 whitespace-nowrap py-[2px] px-1.5 font-mono text-[0.625rem]", bad ? "bg-bad-soft text-bad" : "bg-panel-2 text-txt-muted")}>
                     {k}={String(entry.block.states?.[k])}
                   </span>
                 );
               })}
               {hiddenStates > 0 ? (
                 <span
-                  className="shrink-0 whitespace-nowrap py-[2px] px-1.5 font-mono text-[10px] text-txt-dim"
+                  className="shrink-0 whitespace-nowrap py-[2px] px-1.5 font-mono text-[0.625rem] text-txt-dim"
                   title={stateKeys.slice(MAX_VISIBLE_STATES).join(", ")}
                 >
                   +{hiddenStates}
@@ -117,16 +117,16 @@ export function MappingCard({
         </div>
 
         {/* Footer slot always reserved (fixed height) even for non-replaceable "safe" entries. */}
-        <div className="h-8 flex items-center gap-2 pl-[13px]" onClick={(e) => e.stopPropagation()}>
+        <div className="h-8 flex items-center gap-2 pl-[0.8125rem]" onClick={(e) => e.stopPropagation()}>
           {replaceable ? (
             <>
-              <span className="font-mono text-[9.5px] tracking-[0.08em] uppercase text-txt-dim shrink-0">{t("diff.replace")}</span>
+              <span className="font-mono text-[0.59375rem] tracking-[0.08em] uppercase text-txt-dim shrink-0">{t("diff.replace")}</span>
               <ReplaceSelect fluid value={resolution} placeholder={auto || t("diff.choose")} options={options} onChange={(v) => onResolve(entry.block.id, v)} renderThumb={renderThumb} />
               {resolution ? (
                 <button
                   type="button"
                   onClick={() => onResolve(entry.block.id, "")}
-                  className="bg-transparent border-0 text-txt-dim font-mono text-[10px] cursor-pointer underline underline-offset-2 shrink-0 hover:text-txt-muted"
+                  className="bg-transparent border-0 text-txt-dim font-mono text-[0.625rem] cursor-pointer underline underline-offset-2 shrink-0 hover:text-txt-muted"
                 >
                   {auto ? t("diff.auto") : t("diff.clear")}
                 </button>

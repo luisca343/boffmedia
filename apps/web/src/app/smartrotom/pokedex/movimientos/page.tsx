@@ -46,11 +46,11 @@ export default function MovimientosPage() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder={t("movimientos_search_placeholder")}
-          className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] py-2.5 pr-3.5 pl-10 text-[13.5px] text-pk-surface-50 outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)] transition-colors"
+          className="w-full bg-white/[0.03] border border-white/[0.07] rounded-[10px] py-2.5 pr-3.5 pl-10 text-[0.84375rem] text-pk-surface-50 outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:bg-white/[0.05] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.12)] transition-colors"
         />
       </div>
 
-      <div className="grid grid-cols-1 xl:grid-cols-[1fr_380px] gap-[18px] items-start">
+      <div className="grid grid-cols-1 xl:grid-cols-[1fr_23.75rem] gap-[1.125rem] items-start">
         <div className="flex flex-col border border-white/[0.05] rounded-xl overflow-hidden bg-white/[0.012]">
           {isLoading ? (
             <div className="p-8 text-center text-pk-surface-500 text-sm">{t("movimientos_loading")}</div>
@@ -69,19 +69,19 @@ export default function MovimientosPage() {
                   </span>
                   <span className="flex flex-col gap-[3px] min-w-0">
                     <span className="text-sm font-semibold text-pk-surface-50 truncate">{getTranslatedMoveName(m.name, t)}</span>
-                    <span className="text-[11px] text-pk-surface-500 font-pk-mono truncate">{m.name}</span>
+                    <span className="text-[0.6875rem] text-pk-surface-500 font-pk-mono truncate">{m.name}</span>
                   </span>
                   <span className="flex items-center gap-2 justify-end">
-                    <span className="w-[60px] h-1 bg-white/[0.04] rounded-full overflow-hidden">
+                    <span className="w-[3.75rem] h-1 bg-white/[0.04] rounded-full overflow-hidden">
                       <span className="block h-full bg-pk-primary-400 rounded-full" style={{ width: `${(m.count / maxCount) * 100}%` }} />
                     </span>
-                    <span className="font-pk-mono text-xs text-pk-surface-100 tabular-nums font-semibold min-w-[36px] text-right">{m.count}</span>
+                    <span className="font-pk-mono text-xs text-pk-surface-100 tabular-nums font-semibold min-w-[2.25rem] text-right">{m.count}</span>
                   </span>
                 </button>
               )
             })
           ) : (
-            <div className="p-[30px] text-center text-pk-surface-500 text-[13px]">{t("movimientos_no_results")}</div>
+            <div className="p-[1.875rem] text-center text-pk-surface-500 text-[0.8125rem]">{t("movimientos_no_results")}</div>
           )}
         </div>
 

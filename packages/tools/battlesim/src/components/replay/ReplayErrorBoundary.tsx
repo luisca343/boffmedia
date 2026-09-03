@@ -84,7 +84,7 @@ function ReplayErrorFallback({ message, onRetry }: { message?: string; onRetry: 
         }
       />
       {message && (
-        <pre className="cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line)] mx-auto mb-10 max-w-[640px] overflow-auto border border-solid border-line bg-panel p-3 font-mono text-[11px] leading-[1.5] text-txt-dim">
+        <pre className="cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line)] mx-auto mb-10 max-w-[40rem] overflow-auto border border-solid border-line bg-panel p-3 font-mono text-[0.6875rem] leading-[1.5] text-txt-dim">
           {message}
         </pre>
       )}

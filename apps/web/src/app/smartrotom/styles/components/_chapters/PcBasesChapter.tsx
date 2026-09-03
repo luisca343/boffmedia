@@ -77,14 +77,14 @@ export function PcBasesChapter() {
             </div>
             <div>
               <div className={MONO_LABEL}>font-pc · Inter</div>
-              <p className="max-w-prose text-[13.5px] leading-relaxed text-pc-fg-muted">
+              <p className="max-w-prose text-[0.84375rem] leading-relaxed text-pc-fg-muted">
                 Arrastra un Pokémon a otro hueco para intercambiarlo. Suelta sobre una caja del
                 lateral para moverlo allí sin abrirla.
               </p>
             </div>
             <div>
               <div className={MONO_LABEL}>font-pc-mono · JetBrains Mono</div>
-              <div className="flex gap-5 font-pc-mono text-[13px] text-pc-fg">
+              <div className="flex gap-5 font-pc-mono text-[0.8125rem] text-pc-fg">
                 <span>#025</span>
                 <span>Nv 100</span>
                 <span>27/30</span>
@@ -119,7 +119,7 @@ export function PcBasesChapter() {
                   className="absolute left-1.5 top-1.5 h-2 w-2 rounded-pc-pill"
                   style={{ background: THEME_ACCENT[t] }}
                 />
-                <span className="absolute inset-x-0 bottom-1 text-center text-[10px] font-semibold text-pc-fg [text-shadow:0_1px_3px_#000]">
+                <span className="absolute inset-x-0 bottom-1 text-center text-[0.625rem] font-semibold text-pc-fg [text-shadow:0_1px_3px_#000]">
                   {tr(THEME_LABEL_KEY[t])}
                 </span>
               </div>

@@ -41,7 +41,7 @@ export function MvList({ entries, pokeMap, selectedId, onSelect, loading, error,
 
   return (
     <aside className={cn("flex min-h-0 flex-col bg-base", className)} aria-label={t("aria.usageRanking")}>
-      <div className="flex-none border-b border-solid border-line px-3 py-[10px]">
+      <div className="flex-none border-b border-solid border-line px-3 py-[0.625rem]">
         <DkSearch value={q} onChange={setQ} placeholder={t("sidebar.search")} className="w-full" />
       </div>
       <div
@@ -50,10 +50,10 @@ export function MvList({ entries, pokeMap, selectedId, onSelect, loading, error,
         onKeyDown={onKey}
         role="listbox"
         aria-label={t("aria.usageRanking")}
-        className="min-h-0 flex-1 overflow-y-auto p-[6px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent-line max-[980px]:overflow-visible"
+        className="min-h-0 flex-1 overflow-y-auto p-[0.375rem] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent-line max-[980px]:overflow-visible"
       >
         {loading ? (
-          <div className="p-[10px]">
+          <div className="p-[0.625rem]">
             <DkSkelList rows={12} h={46} />
           </div>
         ) : error ? (
@@ -79,20 +79,20 @@ export function MvList({ entries, pokeMap, selectedId, onSelect, loading, error,
                 aria-selected={on}
                 onClick={() => onSelect(e.id)}
                 className={cn(
-                  "flex w-full min-w-0 items-center gap-[10px] border border-solid border-l-[3px] px-[9px] py-[7px] text-left transition-[background,border-color]",
+                  "flex w-full min-w-0 items-center gap-[0.625rem] border border-solid border-l-[3px] px-[0.5625rem] py-[0.4375rem] text-left transition-[background,border-color]",
                   on ? "border-line border-l-accent bg-panel" : "border-transparent border-l-transparent hover:bg-panel",
                 )}
               >
-                <span className={cn("w-[22px] flex-none text-right font-mono text-[10px] font-bold leading-none", on ? "text-accent-bright" : "text-txt-dim")}>
+                <span className={cn("w-[1.375rem] flex-none text-right font-mono text-[0.625rem] font-bold leading-none", on ? "text-accent-bright" : "text-txt-dim")}>
                   {String(rank).padStart(2, "0")}
                 </span>
                 <DkSprite src={spriteUrl(p?.name ?? e.id)} alt={p?.name ?? e.id} size={32} onError={handleSpriteError} />
                 <span className="grid min-w-0 flex-1">
-                  <b className="truncate font-display text-[13px] font-bold uppercase leading-[1.15] tracking-[0.03em]">{p?.name ?? e.id}</b>
-                  <i className="truncate font-mono text-[9.5px] not-italic leading-[1.3] text-txt-dim">{t("list.appearances", { count: fmtCount(e.count) })}</i>
+                  <b className="truncate font-display text-[0.8125rem] font-bold uppercase leading-[1.15] tracking-[0.03em]">{p?.name ?? e.id}</b>
+                  <i className="truncate font-mono text-[0.59375rem] not-italic leading-[1.3] text-txt-dim">{t("list.appearances", { count: fmtCount(e.count) })}</i>
                 </span>
-                <span className="grid w-[58px] flex-none justify-items-end gap-1">
-                  <b className="font-mono text-[12px] font-bold leading-none">{e.usage.toFixed(1)}%</b>
+                <span className="grid w-[3.625rem] flex-none justify-items-end gap-1">
+                  <b className="font-mono text-[0.75rem] font-bold leading-none">{e.usage.toFixed(1)}%</b>
                   <i aria-hidden="true" className="block h-[3px] w-full overflow-hidden border border-solid border-line bg-base-2">
                     <u className="block h-full bg-accent no-underline" style={{ width: `${(e.usage / peak) * 100}%` }} />
                   </i>

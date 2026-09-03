@@ -48,11 +48,11 @@ export function VersionCard({
         className,
       )}
     >
-      <div className="flex items-start gap-3 px-[15px] py-[13px]">
+      <div className="flex items-start gap-3 px-[0.9375rem] py-[0.8125rem]">
         {statusIcon != null && (
           <span
             className={cn(
-              "grid size-[34px] shrink-0 place-items-center border border-solid",
+              "grid size-[2.125rem] shrink-0 place-items-center border border-solid",
               status === "live"
                 ? "border-accent-line bg-accent-soft text-accent"
                 : "border-line-2 bg-panel-2 text-txt-muted",
@@ -63,21 +63,21 @@ export function VersionCard({
         )}
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="font-mono text-[16px] font-bold text-txt">{version}</span>
+            <span className="font-mono text-[1rem] font-bold text-txt">{version}</span>
             {badges}
           </div>
           {meta != null && (
-            <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[11px] text-txt-dim">{meta}</div>
+            <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1.5 font-mono text-[0.6875rem] text-txt-dim">{meta}</div>
           )}
           {notes != null && (
-            <p className="mt-2 text-[12.5px] leading-[1.4] text-txt-muted">{notes}</p>
+            <p className="mt-2 text-[0.78125rem] leading-[1.4] text-txt-muted">{notes}</p>
           )}
         </div>
       </div>
 
       {(date != null || actions != null) && (
-        <div className="flex items-center gap-2 border-t border-solid border-line bg-panel-2 px-[15px] py-2.5">
-          {date != null && <span className="font-mono text-[10.5px] text-txt-dim">{date}</span>}
+        <div className="flex items-center gap-2 border-t border-solid border-line bg-panel-2 px-[0.9375rem] py-2.5">
+          {date != null && <span className="font-mono text-[0.65625rem] text-txt-dim">{date}</span>}
           {actions != null && <span className="ml-auto flex items-center gap-1">{actions}</span>}
         </div>
       )}

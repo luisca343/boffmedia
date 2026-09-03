@@ -68,12 +68,12 @@ export function FlourishCorners({
 export function Divider({ glyph = "❦", className = "text-ms-ink-3" }: { glyph?: string; className?: string }) {
   return (
     <div className={`flex w-full items-center justify-center gap-2.5 font-ms-display opacity-70 ${className}`} aria-hidden>
-      <svg viewBox="0 0 100 12" height="12" className="max-w-[84px] flex-1">
+      <svg viewBox="0 0 100 12" height="12" className="max-w-[5.25rem] flex-1">
         <line x1="0" y1="6" x2="80" y2="6" stroke="currentColor" strokeWidth="0.8" />
         <path d="M 80 6 L 92 2 L 100 6 L 92 10 Z" fill="currentColor" />
       </svg>
       <span className="text-lg leading-none">{glyph}</span>
-      <svg viewBox="0 0 100 12" height="12" className="max-w-[84px] flex-1 -scale-x-100">
+      <svg viewBox="0 0 100 12" height="12" className="max-w-[5.25rem] flex-1 -scale-x-100">
         <line x1="0" y1="6" x2="80" y2="6" stroke="currentColor" strokeWidth="0.8" />
         <path d="M 80 6 L 92 2 L 100 6 L 92 10 Z" fill="currentColor" />
       </svg>

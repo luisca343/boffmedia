@@ -12,7 +12,7 @@ export default async function MoveDetailPage({ params }: { params: Promise<{ id:
   return (
     <ScreenShell>
       <PageHead icon={ZapIcon} eyebrow={t("movedetail_eyebrow")} title={t("movedetail_title")} desc={t("movedetail_desc")} />
-      <div className="max-w-[560px] flex flex-col gap-3.5">
+      <div className="max-w-[35rem] flex flex-col gap-3.5">
         <MoveDetailPane moveKey={moveKey} />
       </div>
     </ScreenShell>

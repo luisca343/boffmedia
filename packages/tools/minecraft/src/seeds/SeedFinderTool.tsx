@@ -550,7 +550,7 @@ export function SeedFinderTool() {
        scroll on its own instead of stretching the whole thing. */
     <div className="flex h-full min-h-0">
         {/* The only scrolling region besides the map itself. */}
-        <aside className="flex w-[380px] shrink-0 flex-col gap-3 overflow-y-auto border-r border-line-2 p-3">
+        <aside className="flex w-[23.75rem] shrink-0 flex-col gap-3 overflow-y-auto border-r border-line-2 p-3">
           {/* One scroll region, two tabs. The map is never unmounted by a tab
               change — switching away from it must not throw away the sampled
               grids, which cost seconds, so the tabs gate the SIDEBAR only. */}
@@ -663,7 +663,7 @@ export function SeedFinderTool() {
                   />
                 ))}
                 {conflictNote ? (
-                  <p className="border-l-2 border-line pl-2 text-[10px] leading-snug text-txt-dim">
+                  <p className="border-l-2 border-line pl-2 text-[0.625rem] leading-snug text-txt-dim">
                     {conflictNote}
                   </p>
                 ) : null}
@@ -705,7 +705,7 @@ export function SeedFinderTool() {
             <Panel
               title={t("filter.title")}
               aside={
-                <span className="font-mono text-[11px] text-txt-dim">
+                <span className="font-mono text-[0.6875rem] text-txt-dim">
                   {t("filter.total", { n: loaded.describe.biomes.distinct })}
                 </span>
               }
@@ -734,7 +734,7 @@ export function SeedFinderTool() {
 
           {/* Small, but never removed: every number this tool prints is still
               unvalidated against a real Minecraft world. */}
-          <p className="mt-auto shrink-0 border-t border-line-2 pt-3 text-[11px] leading-snug text-txt-dim">
+          <p className="mt-auto shrink-0 border-t border-line-2 pt-3 text-[0.6875rem] leading-snug text-txt-dim">
             {t("poc.body")}
           </p>
         </aside>
@@ -782,7 +782,7 @@ export function SeedFinderTool() {
           />
 
           {picked ? (
-            <div className="absolute left-2 top-2 z-[500] flex items-center gap-3 border border-line-2 bg-panel px-3 py-1.5 font-mono text-[12px] shadow-lg">
+            <div className="absolute left-2 top-2 z-[500] flex items-center gap-3 border border-line-2 bg-panel px-3 py-1.5 font-mono text-[0.75rem] shadow-lg">
               <code className="text-txt">{teleportCommand(picked.x, picked.z)}</code>
               <Button size="sm" variant="ghost" onClick={copyTp}>
                 {copied ? t("map.copied") : t("map.copyTp")}
@@ -791,7 +791,7 @@ export function SeedFinderTool() {
           ) : null}
 
           {busy ? (
-            <div className="absolute right-2 top-2 z-[500] border border-line-2 bg-panel px-3 py-1.5 font-mono text-[12px] text-txt-dim shadow-lg">
+            <div className="absolute right-2 top-2 z-[500] border border-line-2 bg-panel px-3 py-1.5 font-mono text-[0.75rem] text-txt-dim shadow-lg">
               {t("stack.building")}
             </div>
           ) : null}

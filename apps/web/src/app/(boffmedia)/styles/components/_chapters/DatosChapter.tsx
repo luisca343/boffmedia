@@ -117,7 +117,7 @@ export function DatosChapter() {
                       {i + 1}
                     </td>
                     <td>
-                      <span className="inline-flex items-center gap-[9px] font-semibold">
+                      <span className="inline-flex items-center gap-[0.5625rem] font-semibold">
                         <DkSprite src={DEMO_SPRITE} alt="" size={28} />
                         {r.name}
                       </span>
@@ -152,7 +152,7 @@ export function DatosChapter() {
 
       <Section id="dkindicadores" kicker="Datos en vivo" title="Indicadores" lead={<>KPI con tono semántico, barra proporcional victoria/derrota, estados en vivo y el «actualizado hace Ns» con refresco manual.</>}>
         <Sample title="KPI" code="<DkStat value label tone>">
-          <div className="grid w-full max-w-[560px] grid-cols-2 gap-2 sm:grid-cols-4">
+          <div className="grid w-full max-w-[35rem] grid-cols-2 gap-2 sm:grid-cols-4">
             <DkStat value="128" label="Jugadas" />
             <DkStat value="61%" label="Win rate" tone="pos" />
             <DkStat value="1608" label="ELO" tone="accent" />
@@ -160,7 +160,7 @@ export function DatosChapter() {
           </div>
         </Sample>
         <Sample title="Split V/D" code="<DkSplit win loss draw>" col>
-          <div className="grid w-[280px] gap-2">
+          <div className="grid w-[17.5rem] gap-2">
             <DkSplit win={14} loss={6} />
             <DkSplit win={5} loss={9} draw={2} />
           </div>
@@ -177,12 +177,12 @@ export function DatosChapter() {
 
       <Section id="dkgraficas" kicker="Datos en vivo" title="Gráficas" lead={<>Línea de progresión con base punteada y puntos por resultado, lista con barras proporcionales y rejilla de intensidad para actividad.</>}>
         <Sample title="Progresión" code="<DkTrend lines baseline dots>" col>
-          <div className="w-full max-w-[560px]">
+          <div className="w-full max-w-[35rem]">
             <DkTrend height={150} baseline={1500} lines={[{ values: ELO, color: "var(--accent)", width: 2, dots: RESULTS }]} />
           </div>
         </Sample>
         <Sample title="Lista con barras" code="<DkBarList items>" col>
-          <div className="w-full max-w-[420px]">
+          <div className="w-full max-w-[26.25rem]">
             <DkBarList
               items={[
                 { name: "Protección", pct: 82.4 },
@@ -194,7 +194,7 @@ export function DatosChapter() {
           </div>
         </Sample>
         <Sample title="Actividad" code="<DkHeat rows cols value>" col>
-          <div className="w-full max-w-[560px]">
+          <div className="w-full max-w-[35rem]">
             <DkHeat rows={["Lun", "Mié", "Vie", "Dom"]} cols={Array.from({ length: 24 }, (_, i) => (i % 6 === 0 ? i + "h" : ""))} max={6} value={(r, c) => ((r * 7 + c * 3) % 11 > 6 ? ((r + c) % 6) + 1 : 0)} />
           </div>
         </Sample>
@@ -219,12 +219,12 @@ export function DatosChapter() {
 
       <Section id="dkestadosvivo" kicker="Datos en vivo" title="Carga, vacío y avisos" lead={<>Skeletons al cambiar de contexto, estado vacío con acción de recuperación y toast para acciones de demo.</>}>
         <Sample title="Skeleton" code="<DkSkelList rows h>" col>
-          <div className="w-full max-w-[420px]">
+          <div className="w-full max-w-[26.25rem]">
             <DkSkelList rows={4} h={38} />
           </div>
         </Sample>
         <Sample title="Vacío" code="<DkEmpty icon title lead>" col>
-          <div className="w-full max-w-[480px]">
+          <div className="w-full max-w-[30rem]">
             <DkEmpty icon="search" title="Sin resultados" lead="Ningún jugador coincide con el filtro actual.">
               <Button size="sm">Limpiar filtros</Button>
             </DkEmpty>

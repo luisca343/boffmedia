@@ -27,7 +27,7 @@ export function AreaChart({ data, height = 240, color = "#2463eb", showAxis = tr
   }, []);
 
   if (!data || data.length < 2) {
-    return <div ref={ref} className="grid place-items-center text-[13px] text-sb-fg-muted" style={{ height }}>Sin datos suficientes</div>;
+    return <div ref={ref} className="grid place-items-center text-[0.8125rem] text-sb-fg-muted" style={{ height }}>Sin datos suficientes</div>;
   }
 
   const padX = showAxis ? 36 : 10;
@@ -89,10 +89,10 @@ export function AreaChart({ data, height = 240, color = "#2463eb", showAxis = tr
       </svg>
       {hover && (
         <div
-          className="pointer-events-none absolute z-[5] -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sb-sm border border-sb-border bg-sb-surface px-2.5 py-2 text-[12px] tabular-nums shadow-sb-2"
+          className="pointer-events-none absolute z-[5] -translate-x-1/2 -translate-y-[130%] whitespace-nowrap rounded-sb-sm border border-sb-border bg-sb-surface px-2.5 py-2 text-[0.75rem] tabular-nums shadow-sb-2"
           style={{ left: hover.x, top: hover.y }}
         >
-          <div className="mb-0.5 text-[11px] text-sb-fg-muted">Hace {hover.d.day} días</div>
+          <div className="mb-0.5 text-[0.6875rem] text-sb-fg-muted">Hace {hover.d.day} días</div>
           <div className="font-bold">{valueFmt(hover.d.balance)}</div>
         </div>
       )}

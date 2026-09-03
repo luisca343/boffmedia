@@ -60,7 +60,7 @@ export function FtQuioscoChapter() {
             <ComicBurst size={110} color="#ff2d87" textColor="#fff" text="NEW!" />
             <SpeechBubble>
               <span className="font-ft-display text-2xl leading-none">CA·MI·NAR</span>
-              <div className="font-ft-deck text-[13px] italic text-ft-deck">
+              <div className="font-ft-deck text-[0.8125rem] italic text-ft-deck">
                 (verbo. ver pág. 12)
               </div>
             </SpeechBubble>

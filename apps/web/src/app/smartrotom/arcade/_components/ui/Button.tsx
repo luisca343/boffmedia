@@ -40,9 +40,9 @@ const VARIANT: Record<ArButtonVariant, string> = {
 }
 
 const SIZE: Record<ArButtonSize, string> = {
-  sm: "px-3 py-1.5 text-[11px]",
-  md: "px-4 py-2.5 text-[12px]",
-  lg: "px-[22px] py-3.5 text-[14px]",
+  sm: "px-3 py-1.5 text-[0.6875rem]",
+  md: "px-4 py-2.5 text-[0.75rem]",
+  lg: "px-[1.375rem] py-3.5 text-[0.875rem]",
 }
 
 export function Button({

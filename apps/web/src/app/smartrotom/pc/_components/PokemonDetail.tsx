@@ -143,10 +143,10 @@ export function PokemonDetail() {
           <Icon name="chevL" size={16} />
         </Button>
         <div className="min-w-0 flex-1 text-center">
-          <div className="truncate font-pc-display text-[11px] uppercase tracking-[.06em] text-pc-fg-subtle">
+          <div className="truncate font-pc-display text-[0.6875rem] uppercase tracking-[.06em] text-pc-fg-subtle">
             {locLabel}
           </div>
-          <div className="font-pc-mono text-[11px] text-pc-fg-subtle">
+          <div className="font-pc-mono text-[0.6875rem] text-pc-fg-subtle">
             {index >= 0 ? index + 1 : "—"} / {neighbours.length}
           </div>
         </div>
@@ -165,12 +165,12 @@ export function PokemonDetail() {
       </header>
 
       <div className="min-h-0 flex-1 overflow-auto">
-        <div className="relative overflow-hidden px-[18px] pb-3.5 pt-[18px] text-center">
+        <div className="relative overflow-hidden px-[1.125rem] pb-3.5 pt-[1.125rem] text-center">
           <span className={`pc-wp pc-wp-dots opacity-50 ${WALLPAPER_CLASS[theme]}`} aria-hidden="true" />
 
           <div className="relative">
             <div
-              className={`mx-auto h-[168px] w-[168px] animate-pc-float motion-reduce:animate-none ${isFainted(p) ? "grayscale" : ""}`}
+              className={`mx-auto h-[10.5rem] w-[10.5rem] animate-pc-float motion-reduce:animate-none ${isFainted(p) ? "grayscale" : ""}`}
             >
               <Sprite
                 dex={p.dex}
@@ -193,12 +193,12 @@ export function PokemonDetail() {
             {isNicknamed(p) && <div className="text-xs text-pc-fg-subtle">{p.species}</div>}
 
             <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-              <span className="font-pc-mono text-[11.5px] text-pc-fg-subtle">
+              <span className="font-pc-mono text-[0.71875rem] text-pc-fg-subtle">
                 #{String(p.dex).padStart(3, "0")}
               </span>
-              <Chip className="text-[11px]">{t("detail.level")} {p.level}</Chip>
+              <Chip className="text-[0.6875rem]">{t("detail.level")} {p.level}</Chip>
               {isLegendary(p) && (
-                <Chip className="border-pc-violet text-[11px] text-pc-violet">
+                <Chip className="border-pc-violet text-[0.6875rem] text-pc-violet">
                   <Icon name="zap" size={11} />
                   {t("filters.statusToggles.legendary")}
                 </Chip>
@@ -215,7 +215,7 @@ export function PokemonDetail() {
           </div>
         </div>
 
-        <div className="flex gap-[7px] px-4 pb-3.5">
+        <div className="flex gap-[0.4375rem] px-4 pb-3.5">
           <Button
             onClick={() => setMark.mutate({ key: mon.key, patch: { favorite: !mark.favorite } })}
             disabled={setMark.isPending}
@@ -235,7 +235,7 @@ export function PokemonDetail() {
           </Button>
         </div>
 
-        <div className="flex flex-col gap-5 px-[18px] pb-6">
+        <div className="flex flex-col gap-5 px-[1.125rem] pb-6">
           <section>
             <SectionTitle icon="sliders">{t("detail.stats")}</SectionTitle>
             <StatBars pokemon={p} />
@@ -280,9 +280,9 @@ export function PokemonDetail() {
 
 function SectionTitle({ icon, children }: { icon: IconName; children: ReactNode }) {
   return (
-    <div className="mb-[11px] flex items-center gap-[7px]">
+    <div className="mb-[0.6875rem] flex items-center gap-[0.4375rem]">
       <Icon name={icon} size={15} className="text-pc-accent" />
-      <span className="font-pc-display text-[12.5px] font-bold uppercase tracking-[.04em] text-pc-fg">
+      <span className="font-pc-display text-[0.78125rem] font-bold uppercase tracking-[.04em] text-pc-fg">
         {children}
       </span>
     </div>

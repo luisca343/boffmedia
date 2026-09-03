@@ -52,8 +52,8 @@ export function SelectedCard({
           : "rounded-tx-xl border border-solid border-tx-accent-soft bg-tx-surface-solid/90 p-4 shadow-tx-2 backdrop-blur-[22px] animate-tx-card-in motion-reduce:animate-none",
       )}
     >
-      <div className="flex items-center gap-[11px]">
-        <span className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-xl bg-tx-accent text-tx-on-accent shadow-[0_0_18px_var(--tx-accent-glow)]">
+      <div className="flex items-center gap-[0.6875rem]">
+        <span className="grid h-[2.625rem] w-[2.625rem] shrink-0 place-items-center rounded-xl bg-tx-accent text-tx-on-accent shadow-[0_0_18px_var(--tx-accent-glow)]">
           <Icon name="pin" size={18} stroke={2.4} />
         </span>
         <div className="min-w-0 flex-1">
@@ -87,7 +87,7 @@ export function SelectedCard({
           type="button"
           onClick={onClose}
           aria-label={t("close")}
-          className="grid h-[34px] w-[34px] place-items-center rounded-[10px] bg-tx-surface text-tx-txt-2 transition-[background,color] duration-150 hover:bg-tx-surface-2 hover:text-tx-txt"
+          className="grid h-[2.125rem] w-[2.125rem] place-items-center rounded-[10px] bg-tx-surface text-tx-txt-2 transition-[background,color] duration-150 hover:bg-tx-surface-2 hover:text-tx-txt"
         >
           <Icon name="x" size={18} />
         </button>
@@ -100,13 +100,13 @@ export function SelectedCard({
       </div>
 
       <div className="mt-3.5 flex flex-col gap-3">
-        <div className="flex items-center justify-between px-0.5 text-[13px] text-tx-txt-2">
+        <div className="flex items-center justify-between px-0.5 text-[0.8125rem] text-tx-txt-2">
           <span>{t("balanceAfter")}</span>
-          <strong className={cn("font-tx-mono text-[15px]", affordable ? "text-tx-txt" : "text-tx-no")}>
+          <strong className={cn("font-tx-mono text-[0.9375rem]", affordable ? "text-tx-txt" : "text-tx-no")}>
             {balance === undefined ? "— ¥" : formatMoney(Math.max(0, after))}
           </strong>
         </div>
-        <div className="flex gap-[9px]">
+        <div className="flex gap-[0.5625rem]">
           <Button variant="ghost" onClick={onRecenter} aria-label={t("centerMap")} title={t("centerMap")}>
             <Icon name="crosshair" size={17} stroke={2} />
           </Button>

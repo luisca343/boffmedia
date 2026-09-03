@@ -62,12 +62,12 @@ export function GraphView({
     <Portal>
       <ThemedLayer>
         <div className="fixed inset-0 z-[90] flex flex-col bg-nt-bg animate-in fade-in">
-          <div className="flex h-[52px] flex-none items-center gap-3 border-b border-nt-border px-[18px]">
+          <div className="flex h-[3.25rem] flex-none items-center gap-3 border-b border-nt-border px-[1.125rem]">
             <Icon name="network" size={18} className="text-nt-accent-fg" />
-            <span className="font-nt-display text-[13px] font-bold uppercase tracking-[.08em] text-nt-fg">
+            <span className="font-nt-display text-[0.8125rem] font-bold uppercase tracking-[.08em] text-nt-fg">
               {t("graph.title")}
             </span>
-            <span className="text-[12px] text-nt-fg-subtle">
+            <span className="text-[0.75rem] text-nt-fg-subtle">
               {nodes.length} {t("graph.notes")} · {edges.length} {t("graph.links")}
             </span>
             <span className="flex-1" />
@@ -119,7 +119,7 @@ export function GraphView({
                     style={{ width: r * 2, height: r * 2 }}
                   />
                   <span
-                    className={`max-w-[120px] rounded-md border px-1.5 py-0.5 text-center text-[11.5px] leading-[1.3] ${
+                    className={`max-w-[7.5rem] rounded-md border px-1.5 py-0.5 text-center text-[0.71875rem] leading-[1.3] ${
                       active
                         ? "border-nt-accent text-nt-fg"
                         : "border-nt-border text-nt-fg-muted"

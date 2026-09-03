@@ -20,7 +20,7 @@ export function PriceChart({ data, height = 78 }: { data: number[]; height?: num
   if (data.length < 2) {
     return (
       <div
-        className="flex items-center justify-center font-wp text-[12px] font-semibold text-wp-fg-subtle"
+        className="flex items-center justify-center font-wp text-[0.75rem] font-semibold text-wp-fg-subtle"
         style={{ height }}
       >
         {t("chart.notEnoughSales")}
@@ -50,7 +50,7 @@ export function PriceChart({ data, height = 78 }: { data: number[]; height?: num
   return (
     <>
       <svg
-        className="block h-[78px] w-full"
+        className="block h-[4.875rem] w-full"
         viewBox={`0 0 ${w} ${height}`}
         preserveAspectRatio="none"
         role="img"
@@ -73,7 +73,7 @@ export function PriceChart({ data, height = 78 }: { data: number[]; height?: num
         />
         <circle cx={pts[pts.length - 1][0]} cy={pts[pts.length - 1][1]} r="3.2" fill={stroke} />
       </svg>
-      <div className="mt-1 flex justify-between font-wp text-[11px] font-semibold text-wp-fg-subtle">
+      <div className="mt-1 flex justify-between font-wp text-[0.6875rem] font-semibold text-wp-fg-subtle">
         <span>{t("chart.min", { min: fmt(min) })}</span>
         <span>{t("chart.max", { max: fmt(max) })}</span>
       </div>

@@ -60,10 +60,10 @@ function useAvatarUrl(user?: AccountUser): string | null {
 }
 
 const ITEM =
-  "flex items-center gap-2.5 px-[15px] py-2.5 font-body text-[14px] font-medium leading-none text-txt-muted no-underline transition-colors duration-[140ms] hover:bg-panel-2 hover:text-txt"
+  "flex items-center gap-2.5 px-[0.9375rem] py-2.5 font-body text-[0.875rem] font-medium leading-none text-txt-muted no-underline transition-colors duration-[140ms] hover:bg-panel-2 hover:text-txt"
 
 const MOBILE_ITEM =
-  "flex items-center gap-2.5 px-1 py-2.5 font-body text-[14px] font-medium leading-none text-txt-muted no-underline transition-colors duration-[140ms] hover:text-txt"
+  "flex items-center gap-2.5 px-1 py-2.5 font-body text-[0.875rem] font-medium leading-none text-txt-muted no-underline transition-colors duration-[140ms] hover:text-txt"
 
 function AccountAvatar({ image, initial, size }: { image?: string | null; initial: string; size: number }) {
   return (
@@ -109,14 +109,14 @@ export function AccountMenu({ user, isAdmin }: { user: AccountUser; isAdmin?: bo
         aria-label={tNav("account")}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex items-center gap-[9px] border border-solid py-1 pl-1 pr-2 cut-tag cut-tag-edge transition-[color,border-color,background] duration-[140ms]",
+          "inline-flex items-center gap-[0.5625rem] border border-solid py-1 pl-1 pr-2 cut-tag cut-tag-edge transition-[color,border-color,background] duration-[140ms]",
           open
             ? "border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt"
             : "border-transparent [--cut-line:transparent] bg-transparent text-txt-muted hover:border-line-2 hover:[--cut-line:var(--line-2)] hover:bg-panel-2 hover:text-txt",
         )}
       >
         <AccountAvatar image={image} initial={initial} size={28} />
-        <span className="max-w-[130px] truncate font-display text-[13px] font-bold leading-none tracking-[0.05em] text-txt">
+        <span className="max-w-[8.125rem] truncate font-display text-[0.8125rem] font-bold leading-none tracking-[0.05em] text-txt">
           {name}
         </span>
         <Icon
@@ -130,16 +130,16 @@ export function AccountMenu({ user, isAdmin }: { user: AccountUser; isAdmin?: bo
         <div
           role="menu"
           aria-label={tNav("account")}
-          className="cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:10px] absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[248px] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
+          className="cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:10px] absolute right-0 top-[calc(100%_+_8px)] z-[70] w-[15.5rem] border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none"
         >
-          <div className="flex items-center gap-3 border-b border-line px-[15px] py-3">
+          <div className="flex items-center gap-3 border-b border-line px-[0.9375rem] py-3">
             <AccountAvatar image={image} initial={initial} size={38} />
             <div className="min-w-0">
-              <b className="block truncate font-display text-[14px] font-bold uppercase leading-tight tracking-[0.03em] text-txt">
+              <b className="block truncate font-display text-[0.875rem] font-bold uppercase leading-tight tracking-[0.03em] text-txt">
                 {name}
               </b>
               {user.email && (
-                <span className="block truncate font-mono text-[11px] leading-none text-txt-muted">{user.email}</span>
+                <span className="block truncate font-mono text-[0.6875rem] leading-none text-txt-muted">{user.email}</span>
               )}
             </div>
           </div>
@@ -174,7 +174,7 @@ export function AccountMenu({ user, isAdmin }: { user: AccountUser; isAdmin?: bo
             type="button"
             role="menuitem"
             onClick={() => signOut({ callbackUrl: "/" })}
-            className="flex w-full items-center gap-2.5 border-t border-line px-[15px] py-2.5 text-left font-body text-[14px] font-medium leading-none text-bad no-underline transition-colors duration-[140ms] hover:bg-panel-2"
+            className="flex w-full items-center gap-2.5 border-t border-line px-[0.9375rem] py-2.5 text-left font-body text-[0.875rem] font-medium leading-none text-bad no-underline transition-colors duration-[140ms] hover:bg-panel-2"
           >
             <Icon name="logout" size={16} className="text-bad" />
             {tNav("logout")}
@@ -230,11 +230,11 @@ export function MobileAccount({ onNavigate }: { onNavigate: () => void }) {
       >
         <AccountAvatar image={image} initial={initial} size={36} />
         <div className="min-w-0">
-          <b className="block truncate font-display text-[15px] font-bold uppercase leading-tight tracking-[0.03em] text-txt">
+          <b className="block truncate font-display text-[0.9375rem] font-bold uppercase leading-tight tracking-[0.03em] text-txt">
             {name}
           </b>
           {user.email && (
-            <span className="block truncate font-mono text-[11px] leading-none text-txt-muted">{user.email}</span>
+            <span className="block truncate font-mono text-[0.6875rem] leading-none text-txt-muted">{user.email}</span>
           )}
         </div>
       </Link>

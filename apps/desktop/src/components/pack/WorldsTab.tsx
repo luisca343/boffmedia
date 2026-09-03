@@ -195,7 +195,7 @@ export function WorldsTab({
 
   if (loading) {
     return (
-      <span className="flex items-center gap-2 py-6 font-mono text-[11px] text-txt-dim">
+      <span className="flex items-center gap-2 py-6 font-mono text-[0.6875rem] text-txt-dim">
         <Spinner size={12} /> {t("reading")}
       </span>
     )
@@ -207,7 +207,7 @@ export function WorldsTab({
       {(isLocal || bundled.length > 0) && (
         <section className="flex flex-col gap-3">
           <div className="flex items-center justify-between gap-2">
-            <span className="font-display text-[13px] font-bold uppercase tracking-[0.06em] text-txt">
+            <span className="font-display text-[0.8125rem] font-bold uppercase tracking-[0.06em] text-txt">
               {tp("bundledWorldsSection")}
             </span>
             {isLocal && (
@@ -218,9 +218,9 @@ export function WorldsTab({
           </div>
 
           {bundled.length === 0 ? (
-            <p className="font-mono text-[11px] text-txt-dim">{tp("bundledWorldsEmptyDetail")}</p>
+            <p className="font-mono text-[0.6875rem] text-txt-dim">{tp("bundledWorldsEmptyDetail")}</p>
           ) : (
-            <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
+            <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(17.5rem,1fr))]">
               {bundled.map((world) => {
                 const installed = installedFolders.has(world.folder.toLowerCase())
                 return (
@@ -233,10 +233,10 @@ export function WorldsTab({
                         <Icon name="cube" size={18} />
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-display text-[14px] font-bold uppercase tracking-[0.03em]">
+                        <p className="truncate font-display text-[0.875rem] font-bold uppercase tracking-[0.03em]">
                           {world.folder}
                         </p>
-                        <p className="truncate font-mono text-[11px] text-txt-dim">
+                        <p className="truncate font-mono text-[0.6875rem] text-txt-dim">
                           {formatBytes(world.sizeBytes)}
                         </p>
                       </div>
@@ -283,7 +283,7 @@ export function WorldsTab({
         ) : (
           <>
             <div className="flex items-center justify-between gap-2">
-              <span className="font-mono text-[11px] text-txt-dim">
+              <span className="font-mono text-[0.6875rem] text-txt-dim">
                 {t("worldCount", { count: worlds.length })} ·{" "}
                 {formatBytes(worlds.reduce((sum, w) => sum + w.sizeBytes, 0))}
               </span>
@@ -292,7 +292,7 @@ export function WorldsTab({
               </Button>
             </div>
 
-            <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]">
+            <ul className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(17.5rem,1fr))]">
               {worlds.map((world) => {
                 const alreadyBundled = bundledFolders.has(world.folder.toLowerCase())
                 return (
@@ -303,10 +303,10 @@ export function WorldsTab({
                     <div className="flex items-start gap-2">
                       <WorldIcon slug={slug} world={world} />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate font-display text-[14px] font-bold uppercase tracking-[0.03em]">
+                        <p className="truncate font-display text-[0.875rem] font-bold uppercase tracking-[0.03em]">
                           {world.name}
                         </p>
-                        <p className="truncate font-mono text-[11px] text-txt-dim">
+                        <p className="truncate font-mono text-[0.6875rem] text-txt-dim">
                           {world.folder}
                         </p>
                       </div>
@@ -318,7 +318,7 @@ export function WorldsTab({
                       {world.version && <Badge tone="ok">{world.version}</Badge>}
                     </div>
 
-                    <p className="font-mono text-[11px] text-txt-dim">
+                    <p className="font-mono text-[0.6875rem] text-txt-dim">
                       {formatBytes(world.sizeBytes)} ·{" "}
                       {world.lastPlayed
                         ? formatWhen(new Date(world.lastPlayed).toISOString())
@@ -328,7 +328,7 @@ export function WorldsTab({
                     <div className="mt-auto flex items-center justify-end gap-2 pt-1">
                       {isLocal &&
                         (alreadyBundled ? (
-                          <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">
+                          <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">
                             {tp("alreadyBundled")}
                           </span>
                         ) : (

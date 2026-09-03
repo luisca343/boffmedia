@@ -39,12 +39,12 @@ export function BoxRail({ onOverview }: BoxRailProps) {
   }, [activeBox])
 
   return (
-    <Panel className="flex w-[232px] flex-none flex-col overflow-hidden">
-      <div className="flex items-center justify-between border-b border-pc-line px-[13px] pb-[9px] pt-3">
+    <Panel className="flex w-[14.5rem] flex-none flex-col overflow-hidden">
+      <div className="flex items-center justify-between border-b border-pc-line px-[0.8125rem] pb-[0.5625rem] pt-3">
         <div className="flex items-center gap-2">
           <Icon name="boxes" size={16} className="text-pc-accent" />
-          <span className="font-pc-display text-[13px] font-bold tracking-[.04em] text-pc-fg">{t("filters.sortFields.box")}</span>
-          <span className="font-pc-mono text-[10.5px] text-pc-fg-subtle">{TOTAL_BOXES}</span>
+          <span className="font-pc-display text-[0.8125rem] font-bold tracking-[.04em] text-pc-fg">{t("filters.sortFields.box")}</span>
+          <span className="font-pc-mono text-[0.65625rem] text-pc-fg-subtle">{TOTAL_BOXES}</span>
         </div>
         {onOverview && (
           <Button variant="ghost" icon onClick={onOverview} aria-label={t("boxOverview.title")}>
@@ -53,7 +53,7 @@ export function BoxRail({ onOverview }: BoxRailProps) {
         )}
       </div>
 
-      <div ref={listRef} className="flex flex-1 flex-col gap-1.5 overflow-y-auto p-[9px]">
+      <div ref={listRef} className="flex flex-1 flex-col gap-1.5 overflow-y-auto p-[0.5625rem]">
         {boxes.map((contents, i) => {
           const count = contents.filter(Boolean).length
           const accent = THEME_ACCENT[boxTheme(boxMeta, i)]
@@ -77,7 +77,7 @@ export function BoxRail({ onOverview }: BoxRailProps) {
               className={`flex items-center gap-2.5 rounded-[11px] border px-2.5 py-2 text-left transition-[background-color,border-color] duration-150 ${tone}`}
             >
               <span
-                className="flex h-[30px] w-[30px] flex-none items-center justify-center rounded-lg font-pc-mono text-[11px] font-extrabold"
+                className="flex h-[1.875rem] w-[1.875rem] flex-none items-center justify-center rounded-lg font-pc-mono text-[0.6875rem] font-extrabold"
                 style={{
                   background: `linear-gradient(160deg, ${accent}33, ${accent}11)`,
                   border: `1px solid ${accent}55`,
@@ -89,7 +89,7 @@ export function BoxRail({ onOverview }: BoxRailProps) {
 
               <span className="min-w-0 flex-1">
                 <span
-                  className={`block truncate text-[12.5px] font-semibold ${active ? "text-pc-fg" : "text-pc-fg-muted"}`}
+                  className={`block truncate text-[0.78125rem] font-semibold ${active ? "text-pc-fg" : "text-pc-fg-muted"}`}
                 >
                   {boxName(boxMeta, i)}
                 </span>
@@ -97,11 +97,11 @@ export function BoxRail({ onOverview }: BoxRailProps) {
                   pct={(count / POKEMON_PER_BOX) * 100}
                   tone={fillTone(count)}
                   height={4}
-                  className="mt-[5px]"
+                  className="mt-[0.3125rem]"
                 />
               </span>
 
-              <span className="flex-none font-pc-mono text-[10.5px] text-pc-fg-subtle">{count}</span>
+              <span className="flex-none font-pc-mono text-[0.65625rem] text-pc-fg-subtle">{count}</span>
             </button>
           )
         })}

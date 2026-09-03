@@ -46,7 +46,7 @@ export function GoalsCard() {
   return (
     <div className="bg-white/[0.025] border border-white/[0.06] rounded-[14px] p-4 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <h3 className="font-pk-display font-semibold text-[15px] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
+        <h3 className="font-pk-display font-semibold text-[0.9375rem] tracking-tight text-pk-surface-50 flex items-center gap-2.5">
           <BookmarkIcon className="w-4 h-4 text-pk-primary-400" />
           {t("goals_title")}
         </h3>
@@ -58,7 +58,7 @@ export function GoalsCard() {
           const pct = (g.value / g.total) * 100
           return (
             <div key={i}>
-              <div className="flex justify-between mb-1.5 text-[12.5px] text-pk-surface-200">
+              <div className="flex justify-between mb-1.5 text-[0.78125rem] text-pk-surface-200">
                 <span>{g.label}</span>
                 <span className="font-pk-mono tabular-nums text-pk-surface-400">
                   <span className="font-semibold" style={{ color: g.color }}>
@@ -67,7 +67,7 @@ export function GoalsCard() {
                   / {g.total}
                 </span>
               </div>
-              <div className="h-[5px] rounded-full bg-white/[0.05] overflow-hidden">
+              <div className="h-[0.3125rem] rounded-full bg-white/[0.05] overflow-hidden">
                 <div
                   className="h-full rounded-full transition-[width] duration-500"
                   style={{ width: `${pct}%`, background: g.color, boxShadow: `0 0 6px ${g.color}55` }}

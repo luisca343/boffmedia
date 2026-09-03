@@ -67,7 +67,7 @@ export function FurnitureView({ rec, onNav }: ViewProps) {
         {siblings.length > 0 && (
           <MewPanel title={t("label.setFamily")} icon="layers" count={siblings.length} span="full">
             <MewSubLabel n={siblings.length}>{mewHuman(setFamily!)}</MewSubLabel>
-            <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(88px,1fr))]">
+            <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(5.5rem,1fr))]">
               {siblings.map((sib) => (
                 <button
                   key={sib.id}
@@ -81,11 +81,11 @@ export function FurnitureView({ rec, onNav }: ViewProps) {
                       <img
                         src={mewFurnitureArt(sib.id)!}
                         alt={sib.name}
-                        className="w-full h-[88px] object-contain p-1.5"
+                        className="w-full h-[5.5rem] object-contain p-1.5"
                       />
                     )}
                   </div>
-                  <div className="mt-1 text-[10.5px] text-[color:var(--mwp-ink)] font-semibold text-center line-clamp-2">
+                  <div className="mt-1 text-[0.65625rem] text-[color:var(--mwp-ink)] font-semibold text-center line-clamp-2">
                     {sib.name}
                   </div>
                 </button>

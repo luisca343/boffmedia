@@ -22,14 +22,14 @@ export function HubChapter() {
               </Sample>
               <Sample title="Con pista" code="<TxSection hint>" col>
                 <TxSection title="Recursos externos" hint={<><Icon name="external" size={12} />Salen del sitio</>}>
-                  <p className="text-txt-muted text-[14px]">Contenido de la sección…</p>
+                  <p className="text-txt-muted text-[0.875rem]">Contenido de la sección…</p>
                 </TxSection>
               </Sample>
             </Section>
 
             <Section id="tarjetas" kicker="Hub de herramientas" title="Tarjeta de herramienta" lead={<>La pieza que puebla el hub y las páginas de juego. Un solo componente (<code>ToolCard</code>) con dos pieles seleccionables por <code>variant</code>: <strong>señal</strong> (rica, vertical, con categoría y flecha) y <strong>fila</strong> (compacta horizontal). El raíl superior y el icono se tiñen con el hue del juego. Estados: normal, popular y «pronto» (deshabilitada).</>}>
               <Sample title="Variante en vivo" code="<ToolCard variant> · <ToolGrid variant>" col note="La misma tarjeta, dos disposiciones. En el hub se elige por juego; la próxima herramienta (Bestiario) usará la piel «señal».">
-                <div className="mb-[18px]">
+                <div className="mb-[1.125rem]">
                   <Seg
                     value={cardVariant}
                     onChange={setCardVariant}
@@ -55,7 +55,7 @@ export function HubChapter() {
 
             <Section id="portadas" kicker="Hub de herramientas" title="Portada de juego" lead={<>La entrada a cada juego en el hub (<code>GameCover</code>): arte de fondo (un <code>image-slot</code>, aquí con placeholder tinteado), sello del juego, contador de herramientas, título, lema y CTA. Variante <code>mini</code> para el layout mixto. El sello del juego (<code>GameLogo</code>) es el átomo reutilizable en su tono.</>}>
               <Sample title="Portadas" code="<GameCover game mini>" col note="Comparten el hue del juego; la variante mini es la tira ancha sin lema.">
-                <div className="grid w-full max-w-[560px] gap-[18px]">
+                <div className="grid w-full max-w-[35rem] gap-[1.125rem]">
                   <GameCover game={{ name: "Pokémon", tagline: "Herramientas competitivas de VGC: cálculo, meta, tracker y más.", slug: "pokemon", hueColor: "hsl(18 90% 55%)", logoLabel: "VGC", toolCount: 6 }} />
                   <GameCover game={{ name: "Monster Hunter", tagline: "Bestiario, armería y planificador para MH Wilds.", slug: "mhwilds", hueColor: "hsl(150 55% 52%)", logoLabel: "MH", toolCount: 5 }} mini />
                 </div>
@@ -85,7 +85,7 @@ export function HubChapter() {
                 <div className="w-full">
                   <VideoHero>
                     <div className="px-8 py-16">
-                      <h3 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(28px,5vw,48px)]")}>Elige tu <em>señal</em></h3>
+                      <h3 className={cn(DISPLAY, DISPLAY_EM, "text-[clamp(1.75rem,5vw,3rem)]")}>Elige tu <em>señal</em></h3>
                     </div>
                   </VideoHero>
                 </div>
@@ -94,11 +94,11 @@ export function HubChapter() {
 
             <Section id="sidenav" kicker="Hub de herramientas" title="Sidebar colapsable" lead={<>El shell de herramientas (<code>ToolShell</code>): carril lateral colapsable y fijable (72px↔264px), cabecera con conmutador de juego y cajón móvil. Se monta en los layouts por juego.</>}>
               <Sample title="Shell en vivo" code="<ToolShell slug='pokemon'>" col note="Vista previa recortada y redimensionable; en la app ocupa toda la altura bajo la barra. Pasa el ratón por el carril para expandirlo.">
-                <div className="w-full h-[520px] resize-y overflow-auto border border-solid border-line">
+                <div className="w-full h-[32.5rem] resize-y overflow-auto border border-solid border-line">
                   <ToolShell slug="pokemon">
                     <div className="p-6">
-                      <h3 className={cn(HEAD4, "text-[22px]")}>Página de herramienta</h3>
-                      <p className="text-txt-muted mt-2 text-[14px]">El contenido de cada herramienta va aquí, con el carril a la izquierda.</p>
+                      <h3 className={cn(HEAD4, "text-[1.375rem]")}>Página de herramienta</h3>
+                      <p className="text-txt-muted mt-2 text-[0.875rem]">El contenido de cada herramienta va aquí, con el carril a la izquierda.</p>
                     </div>
                   </ToolShell>
                 </div>

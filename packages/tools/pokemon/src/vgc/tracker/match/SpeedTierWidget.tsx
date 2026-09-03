@@ -59,15 +59,15 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
 
   return (
     <div className="overflow-hidden border border-solid border-line bg-panel">
-      <div className="flex items-center justify-between border-b border-solid border-line px-3 py-[6px]">
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-muted">{t('speedWidget.label')}</span>
+      <div className="flex items-center justify-between border-b border-solid border-line px-3 py-[0.375rem]">
+        <span className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em] text-txt-muted">{t('speedWidget.label')}</span>
       </div>
 
       {/* Modifiers */}
-      <div className="flex gap-1 border-b border-solid border-line px-3 py-[6px]">
+      <div className="flex gap-1 border-b border-solid border-line px-3 py-[0.375rem]">
         <SpeedFlagChips
           className="flex gap-1"
-          buttonClassName="text-[10px] px-[6px] py-[2px] font-mono border border-solid transition-colors"
+          buttonClassName="text-[0.625rem] px-[0.375rem] py-[2px] font-mono border border-solid transition-colors"
           inactiveClassName="bg-base text-txt-muted hover:text-txt border-line-2"
           chips={[
             { key: 'tailwind', label: tMods('tailwindShort'), title: tMods('tailwind'), active: tailwind, activeClass: 'bg-signal-soft text-signal border-[color-mix(in_srgb,var(--info)_50%,transparent)]' },
@@ -83,8 +83,8 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
       </div>
 
       {/* Opponent speed input */}
-      <div className="border-b border-solid border-line px-3 py-[6px]">
-        <label className="mb-1 block font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-muted">{t('speedWidget.opponentSpeed')}</label>
+      <div className="border-b border-solid border-line px-3 py-[0.375rem]">
+        <label className="mb-1 block font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em] text-txt-muted">{t('speedWidget.opponentSpeed')}</label>
         <input
           type="number"
           min="0"
@@ -92,11 +92,11 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
           value={opponentBaseSpeed}
           onChange={(e) => setOpponentBaseSpeed(e.target.value === '' ? '' : parseInt(e.target.value, 10))}
           placeholder={t('speedWidget.opponentSpeedPlaceholder')}
-          className="w-full border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[12px] text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent"
+          className="w-full border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[0.75rem] text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent"
         />
       </div>
 
-      <div className="border-b border-solid border-line px-3 py-1 font-mono text-[10px] text-txt-dim">{t('speedWidget.presetHint')}</div>
+      <div className="border-b border-solid border-line px-3 py-1 font-mono text-[0.625rem] text-txt-dim">{t('speedWidget.presetHint')}</div>
 
       {/* Rows */}
       {rows.map((row, i) => {
@@ -116,16 +116,16 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
               <div className="absolute inset-y-0 left-0 bg-panel-2" style={{ width: `${barPct}%` }} />
               <img src={spriteUrl(row.name)} alt="" className="relative h-6 w-6 shrink-0 object-contain" onError={handleSpriteError} />
               <div className="relative min-w-0 flex-1">
-                <div className="flex min-w-0 items-center gap-[6px]">
-                  <span className={cn('truncate text-[12px]', nameColor)}>{row.name}</span>
-                  <span className="shrink-0 border border-solid border-line-2 bg-base px-1 py-px font-mono text-[9px] text-txt-muted">
+                <div className="flex min-w-0 items-center gap-[0.375rem]">
+                  <span className={cn('truncate text-[0.75rem]', nameColor)}>{row.name}</span>
+                  <span className="shrink-0 border border-solid border-line-2 bg-base px-1 py-px font-mono text-[0.5625rem] text-txt-muted">
                     {row.evs}/{row.nature === 1.1 ? '+' : 'N'}
                   </span>
                 </div>
               </div>
-              <span className="relative shrink-0 font-mono text-[12px] tabular-nums text-txt-muted">{row.effective}</span>
+              <span className="relative shrink-0 font-mono text-[0.75rem] tabular-nums text-txt-muted">{row.effective}</span>
               {opponentSpeed !== null && (
-                <span className={cn('relative shrink-0 font-mono text-[10px] tabular-nums', comparisonColor)}>
+                <span className={cn('relative shrink-0 font-mono text-[0.625rem] tabular-nums', comparisonColor)}>
                   {comparisonResult === 'faster' ? '+' : comparisonResult === 'tie' ? '=' : ''}
                   {opponentSpeed}
                 </span>
@@ -144,7 +144,7 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
                       setSlotNatures({ ...slotNatures, [row.slotIndex]: preset.nature });
                     }}
                     className={cn(
-                      'border border-solid px-2 py-[2px] font-mono text-[10px] transition-colors',
+                      'border border-solid px-2 py-[2px] font-mono text-[0.625rem] transition-colors',
                       row.evs === preset.evs && row.nature === preset.nature
                         ? 'border-accent-line bg-accent-soft text-accent-bright'
                         : 'border-line-2 bg-panel text-txt-muted hover:text-txt',

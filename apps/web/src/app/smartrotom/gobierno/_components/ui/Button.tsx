@@ -14,10 +14,10 @@ const TONE_CLASS: Record<ButtonTone, string> = {
 }
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
-  sm: "px-[11px] py-1.5 text-xs gap-1.5",
-  md: "px-4 py-[9px] text-[13px] gap-[7px]",
-  lg: "px-[22px] py-3 text-[14.5px] gap-2",
-  icon: "p-2 text-[13px]",
+  sm: "px-[0.6875rem] py-1.5 text-xs gap-1.5",
+  md: "px-4 py-[0.5625rem] text-[0.8125rem] gap-[0.4375rem]",
+  lg: "px-[1.375rem] py-3 text-[0.90625rem] gap-2",
+  icon: "p-2 text-[0.8125rem]",
 }
 
 const ICON_SIZE: Record<ButtonSize, number> = { sm: 14, md: 15, lg: 16, icon: 16 }

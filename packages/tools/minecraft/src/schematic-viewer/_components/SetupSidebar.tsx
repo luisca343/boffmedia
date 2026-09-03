@@ -27,7 +27,7 @@ const ERROR_KEY: Record<string, string> = {
 function GroupHead({ title }: { title: string }) {
   return (
     <div className="flex items-center gap-2.5">
-      <span className="font-mono text-[10px] uppercase tracking-[0.15em] text-txt-muted">
+      <span className="font-mono text-[0.625rem] uppercase tracking-[0.15em] text-txt-muted">
         {title}
       </span>
       <span className="h-px flex-1 bg-line" />
@@ -55,7 +55,7 @@ export function SetupSidebar({
   const errorText = errorCode && ERROR_KEY[errorCode] ? t(ERROR_KEY[errorCode]) : error;
 
   return (
-    <div className="flex flex-col gap-4 p-4 pb-[22px]">
+    <div className="flex flex-col gap-4 p-4 pb-[1.375rem]">
       <div className="flex flex-col gap-2.5">
         <GroupHead title={t("setup.environment")} />
         <EnvironmentPicker
@@ -75,7 +75,7 @@ export function SetupSidebar({
           onPick={onPickSchematic}
         />
         {isLoadingSchematic && (
-          <div className="flex items-center gap-2 font-mono text-[11px] text-txt-dim">
+          <div className="flex items-center gap-2 font-mono text-[0.6875rem] text-txt-dim">
             <Spinner size={13} />
             {t("setup.parsing")}
           </div>
@@ -83,7 +83,7 @@ export function SetupSidebar({
       </div>
 
       {errorText && (
-        <Banner tone="error" className="text-[12.5px]">
+        <Banner tone="error" className="text-[0.78125rem]">
           {errorText}
         </Banner>
       )}

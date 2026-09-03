@@ -29,18 +29,18 @@ export function Indice({
             type="button"
             onClick={() => onFlip(c.page)}
             className={cn(
-              "flex items-center gap-3 rounded-lg px-2 py-[9px] text-left text-ps-ink",
+              "flex items-center gap-3 rounded-lg px-2 py-[0.5625rem] text-left text-ps-ink",
               "transition-colors duration-200 hover:bg-white/40 motion-reduce:transition-none",
               "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-chapter",
             )}
           >
-            <span aria-hidden="true" className={cn("h-[18px] w-1 flex-none rounded-sm", c.tab)} />
-            <span className={cn("ps-num w-[26px] flex-none font-ps-display text-[13px] font-bold", c.deep)}>
+            <span aria-hidden="true" className={cn("h-[1.125rem] w-1 flex-none rounded-sm", c.tab)} />
+            <span className={cn("ps-num w-[1.625rem] flex-none font-ps-display text-[0.8125rem] font-bold", c.deep)}>
               {c.no}
             </span>
-            <span className="flex-none font-ps-ceremony text-[17px]">{c.label}</span>
+            <span className="flex-none font-ps-ceremony text-[1.0625rem]">{c.label}</span>
             <span aria-hidden="true" className="mx-1 mb-1 flex-1 border-b-2 border-dotted border-ps-ink/22" />
-            <span className="ps-num flex-none font-ps-mono text-[12px] text-ps-ink-faint">p.{c.page}</span>
+            <span className="ps-num flex-none font-ps-mono text-[0.75rem] text-ps-ink-faint">p.{c.page}</span>
           </button>
         ))}
       </div>

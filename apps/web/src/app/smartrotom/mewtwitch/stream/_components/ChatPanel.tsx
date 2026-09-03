@@ -26,10 +26,10 @@ export function ChatPanel({ channel, viewers }: { channel: string; viewers?: num
   }
 
   return (
-    <div className="flex h-[540px] flex-col border-t border-mw-line bg-[color-mix(in_srgb,rgb(var(--mw-accent))_6%,rgb(var(--mw-bg)))] lg:h-full lg:border-l lg:border-t-0">
+    <div className="flex h-[33.75rem] flex-col border-t border-mw-line bg-[color-mix(in_srgb,rgb(var(--mw-accent))_6%,rgb(var(--mw-bg)))] lg:h-full lg:border-l lg:border-t-0">
       <div className="flex items-center justify-between border-b border-[color-mix(in_srgb,rgb(var(--mw-accent))_32%,var(--mw-hairline))] bg-[color-mix(in_srgb,rgb(var(--mw-accent))_14%,rgb(var(--mw-bg)))] px-4 py-3.5">
         <strong className="font-mw-display text-sm font-bold tracking-[0.02em]">{t("chat.title")}</strong>
-        <div className="inline-flex items-center gap-2.5 text-[11px] text-mw-fg-mute">
+        <div className="inline-flex items-center gap-2.5 text-[0.6875rem] text-mw-fg-mute">
           {viewers != null && (
             <span className="inline-flex items-center gap-1.5 font-mono">
               <PulseDot /> {compactCount(viewers)} {t("chat.watching")}
@@ -78,7 +78,7 @@ export function ChatPanel({ channel, viewers }: { channel: string; viewers?: num
           <input
             disabled
             placeholder={t("chat.placeholder")}
-            className="flex-1 cursor-not-allowed bg-transparent px-3 py-2 text-[13px] text-mw-fg outline-none placeholder:text-mw-fg-faint"
+            className="flex-1 cursor-not-allowed bg-transparent px-3 py-2 text-[0.8125rem] text-mw-fg outline-none placeholder:text-mw-fg-faint"
           />
           <span className="inline-flex text-mw-fg-mute">
             <I.chat size={16} />
@@ -89,7 +89,7 @@ export function ChatPanel({ channel, viewers }: { channel: string; viewers?: num
         </button>
       </div>
 
-      <div className="inline-flex items-center gap-1.5 px-3.5 pb-3 pt-1.5 font-mono text-[11px] text-mw-fg-faint">
+      <div className="inline-flex items-center gap-1.5 px-3.5 pb-3 pt-1.5 font-mono text-[0.6875rem] text-mw-fg-faint">
         <span>{t("chat.footer")}</span>
         <span>·</span>
         <span>{status === "open" ? t("chat.statusConnected") : status === "connecting" ? t("chat.statusConnecting") : t("chat.statusDisconnected")}</span>

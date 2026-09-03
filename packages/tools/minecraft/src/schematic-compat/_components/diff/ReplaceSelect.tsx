@@ -93,18 +93,18 @@ export function ReplaceSelect({
   }, [open]);
 
   return (
-    <div className={cn("relative", fluid ? "min-w-0 flex-1" : "w-[168px] shrink-0")} ref={trigRef} onClick={(e) => e.stopPropagation()}>
+    <div className={cn("relative", fluid ? "min-w-0 flex-1" : "w-[10.5rem] shrink-0")} ref={trigRef} onClick={(e) => e.stopPropagation()}>
       <button
         type="button"
         aria-expanded={open}
         onClick={toggle}
         className={cn(
-          "w-full h-[30px] flex items-center gap-1.5 px-2 bg-base border border-solid cursor-pointer transition-[border-color] duration-[140ms]",
+          "w-full h-[1.875rem] flex items-center gap-1.5 px-2 bg-base border border-solid cursor-pointer transition-[border-color] duration-[140ms]",
           open ? "border-accent-line" : "border-line hover:border-accent-line",
         )}
       >
         {value ? thumb(value, 18) : null}
-        <span className={cn("flex-1 min-w-0 font-mono text-[11px] text-left truncate", value ? "text-txt" : "text-txt-dim")}>
+        <span className={cn("flex-1 min-w-0 font-mono text-[0.6875rem] text-left truncate", value ? "text-txt" : "text-txt-dim")}>
           {value || placeholder}
         </span>
         <Icon
@@ -117,7 +117,7 @@ export function ReplaceSelect({
 
       {open && pos ? (
         <div
-          className={cn("sch-cmb-pop fixed z-[900] flex flex-col max-h-[420px] overflow-hidden bg-panel border border-line-2", POP_SHADOW)}
+          className={cn("sch-cmb-pop fixed z-[900] flex flex-col max-h-[26.25rem] overflow-hidden bg-panel border border-line-2", POP_SHADOW)}
           style={{ left: pos.left, width: pos.width, top: pos.top, bottom: pos.bottom }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -128,14 +128,14 @@ export function ReplaceSelect({
               value={q}
               onChange={(e) => setQ(e.target.value)}
               placeholder={t("diff.searchPlaceholder")}
-              className="flex-1 min-w-0 bg-transparent border-0 outline-none text-txt font-mono text-[12px] placeholder:text-txt-dim"
+              className="flex-1 min-w-0 bg-transparent border-0 outline-none text-txt font-mono text-[0.75rem] placeholder:text-txt-dim"
             />
           </div>
           <div className="flex-1 min-h-0 overflow-y-auto p-1.5">
             {visible.length === 0 ? (
-              <div className="p-4 text-center text-txt-dim text-[12px]">{t("diff.noResults")}</div>
+              <div className="p-4 text-center text-txt-dim text-[0.75rem]">{t("diff.noResults")}</div>
             ) : (
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(92px,1fr))] gap-1.5">
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(5.75rem,1fr))] gap-1.5">
                 {visible.map((o) => {
                   const name = o.includes(":") ? o.slice(o.indexOf(":") + 1) : o;
                   const sel = o === value;
@@ -150,7 +150,7 @@ export function ReplaceSelect({
                       }}
                       className={cn(
                         "relative flex flex-col items-center gap-1 py-2 px-1 border border-solid cursor-pointer",
-                        "font-mono text-[10px] leading-tight text-center transition-[background,border-color,color] duration-[140ms]",
+                        "font-mono text-[0.625rem] leading-tight text-center transition-[background,border-color,color] duration-[140ms]",
                         sel ? "border-accent-line bg-accent-soft text-accent-bright" : "border-transparent text-txt-muted hover:bg-panel-2 hover:text-txt",
                       )}
                     >
@@ -164,7 +164,7 @@ export function ReplaceSelect({
             )}
           </div>
           {truncatedCount > 0 ? (
-            <div className="shrink-0 p-2 text-center font-mono text-[10.5px] text-txt-dim border-0 border-t border-line">
+            <div className="shrink-0 p-2 text-center font-mono text-[0.65625rem] text-txt-dim border-0 border-t border-line">
               {t("diff.refineSearch", { count: truncatedCount })}
             </div>
           ) : null}
@@ -175,7 +175,7 @@ export function ReplaceSelect({
                 onChange("");
                 setOpen(false);
               }}
-              className="shrink-0 p-2 border-0 border-t border-line bg-transparent text-txt-dim font-mono text-[10.5px] cursor-pointer transition-colors hover:text-bad"
+              className="shrink-0 p-2 border-0 border-t border-line bg-transparent text-txt-dim font-mono text-[0.65625rem] cursor-pointer transition-colors hover:text-bad"
             >
               {t("diff.clearSelection")}
             </button>

@@ -34,7 +34,7 @@ export function Modal({
       scope={FT_SCOPE}
       scrimClassName="z-[80] flex items-center justify-center bg-ft-ink/55 p-6 backdrop-blur-[2px]"
       className={[
-        "border-ft rounded-ft-lg relative w-full max-w-[520px] border-ft-ink bg-white shadow-ft-pop",
+        "border-ft rounded-ft-lg relative w-full max-w-[32.5rem] border-ft-ink bg-white shadow-ft-pop",
         "animate-ft-burst motion-reduce:animate-none",
         className ?? "",
       ].join(" ")}

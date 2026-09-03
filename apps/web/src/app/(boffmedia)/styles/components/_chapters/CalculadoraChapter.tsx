@@ -56,7 +56,7 @@ export function CalculadoraChapter() {
         lead={<>Controles densos para herramientas de datos: búsqueda con teclado, steppers numéricos con límites y píldoras de condición. Reutilizables en cualquier calculadora o planificador.</>}
       >
         <Sample title="Combobox con búsqueda" code="<Combobox>" note="↑/↓ mueve, Enter elige, Esc cierra. <code>getItems(query)</code> devuelve la lista; el render de cada opción es libre.">
-          <div className="w-[260px]">
+          <div className="w-[16.25rem]">
             <Combobox
               value={name}
               placeholder="Buscar Pokémon…"
@@ -79,11 +79,11 @@ export function CalculadoraChapter() {
         </Sample>
         <Sample title="Stepper numérico" code="<NumberStepper min max step>">
           <div className="inline-flex flex-col gap-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-txt-muted">Potencia</span>
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-muted">Potencia</span>
             <NumberStepper value={bp} min={0} max={250} step={5} onChange={setBp} />
           </div>
           <div className="inline-flex flex-col gap-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-txt-muted">Nivel</span>
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-muted">Nivel</span>
             <NumberStepper value={lvl} min={1} max={100} onChange={setLvl} />
           </div>
         </Sample>
@@ -104,12 +104,12 @@ export function CalculadoraChapter() {
         lead={<>El editor completo de un set: naturaleza marcada con ▲/▼, presupuesto de 510 EVs con estado de error, y barra de PS editable con rampa verde → ámbar → rojo.</>}
       >
         <Sample title="Editor de stats" code="<StatEditor poke baseStats onChange>" col note="Sube los EVs por encima de 510 para ver el estado de error del presupuesto.">
-          <div className="w-[min(420px,100%)]">
+          <div className="w-[min(26.25rem,100%)]">
             <StatEditor poke={poke} baseStats={FLUTTER_BASE} onChange={(patch) => setPoke((p) => ({ ...p, ...patch }))} />
           </div>
         </Sample>
         <Sample title="Barra de PS" code="<HpGauge current max>" col>
-          <div className="w-[min(340px,100%)]">
+          <div className="w-[min(21.25rem,100%)]">
             <HpGauge current={hp} max={207} label="PS del defensor" resetLabel="Restaurar" onChange={setHp} onReset={() => setHp(207)} />
           </div>
         </Sample>
@@ -122,7 +122,7 @@ export function CalculadoraChapter() {
         lead={<>El resultado de un cálculo en tres piezas: veredicto de KO, rango numérico sobre escala 0–100 % y texto canónico copiable. Tonos de daño: rojo (OHKO), naranja, ámbar, atenuado.</>}
       >
         <Sample title="Veredicto de KO" code="<KoVerdict text tone>">
-          <div className="flex flex-wrap items-baseline gap-[26px]">
+          <div className="flex flex-wrap items-baseline gap-[1.625rem]">
             <KoVerdict text="OHKO seguro" tone="red" />
             <KoVerdict text="2HKO seguro" tone="orange" />
             <KoVerdict text="Posible 2HKO" tone="amber" />
@@ -130,7 +130,7 @@ export function CalculadoraChapter() {
           </div>
         </Sample>
         <Sample title="Rango de daño" code="<DamageBar minPct maxPct tone>" col>
-          <div className="grid w-full gap-[18px]">
+          <div className="grid w-full gap-[1.125rem]">
             <DamageBar minPct={88.2} maxPct={104.5} tone="red" />
             <DamageBar minPct={41.3} maxPct={48.9} tone="dim" />
           </div>
@@ -160,7 +160,7 @@ export function CalculadoraChapter() {
           <MiniCard name="Incineroar" sub="Banda Brava" />
         </Sample>
         <Sample title="Nota contextual" code="<Callout tone>" col>
-          <div className="grid w-[min(460px,100%)] gap-2.5">
+          <div className="grid w-[min(28.75rem,100%)] gap-2.5">
             <Callout>Los rangos usan las 16 tiradas de daño del motor; el veredicto marca el peor caso.</Callout>
             <Callout tone="warn">Presupuesto de EVs excedido: el total no puede superar 510.</Callout>
           </div>

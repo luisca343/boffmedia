@@ -22,7 +22,7 @@ export const SrtReelCard = React.memo(function SrtReelCard({ name, state, winner
     <div
       className={cn(
         "cut-corner cut-corner-edge [--cut-lg:12px]",
-        "relative mx-[10px] flex h-64 w-[180px] flex-none flex-col items-center justify-center p-4 transition-all duration-[120ms]",
+        "relative mx-[0.625rem] flex h-64 w-[11.25rem] flex-none flex-col items-center justify-center p-4 transition-all duration-[120ms]",
         isWinner
           ? "scale-105 border border-accent-line bg-accent-soft"
           : isCurrent
@@ -80,7 +80,7 @@ export const SrtReelCard = React.memo(function SrtReelCard({ name, state, winner
 
       {/* Winner tag (only on winner) */}
       {isWinner && (
-        <span className="mt-2 animate-[bm-fade_0.3s_ease-out] bg-accent px-[10px] py-[2px] font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-accent-ink motion-reduce:animate-none">
+        <span className="mt-2 animate-[bm-fade_0.3s_ease-out] bg-accent px-[0.625rem] py-[2px] font-mono text-[0.625rem] font-bold uppercase tracking-[0.18em] text-accent-ink motion-reduce:animate-none">
           {winnerLabel}
         </span>
       )}

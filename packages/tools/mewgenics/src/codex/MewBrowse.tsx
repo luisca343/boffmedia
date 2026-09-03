@@ -11,7 +11,7 @@ import { MewSearch, MewSelect, MewChips, MewEmpty } from "./controls"
 import type { MewCodexModel } from "./useMewCodex"
 
 function Kbd({ children }: { children: React.ReactNode }) {
-  return <kbd className="border border-b-[2.5px] border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] px-[5px] py-0.5 font-mono text-[10px]/none text-[color:var(--mwp-cream)] [border-radius:5px]">{children}</kbd>
+  return <kbd className="border border-b-[2.5px] border-solid border-[color:var(--mwp-nline)] bg-[color:var(--mwp-night-3)] px-[0.3125rem] py-0.5 font-mono text-[0.625rem]/none text-[color:var(--mwp-cream)] [border-radius:5px]">{children}</kbd>
 }
 
 /**
@@ -27,8 +27,8 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
 
   const loading =
     catDef.remote && abilitiesLoading ? (
-      <div className="flex items-center justify-center gap-3 py-[60px] text-[color:var(--mwp-cream-dim)]">
-        <span className="h-[22px] w-[22px] animate-spin border-[3px] border-solid border-[color:var(--mwp-nline)] border-t-[color:var(--mwp-red)] [border-radius:50%] motion-reduce:animate-none" />
+      <div className="flex items-center justify-center gap-3 py-[3.75rem] text-[color:var(--mwp-cream-dim)]">
+        <span className="h-[1.375rem] w-[1.375rem] animate-spin border-[3px] border-solid border-[color:var(--mwp-nline)] border-t-[color:var(--mwp-red)] [border-radius:50%] motion-reduce:animate-none" />
         {t("roster.loadingAbilities")}
       </div>
     ) : null
@@ -68,7 +68,7 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
     <div className="px-[var(--mew-gutter)] pb-16 pt-5">
       {/* toolbar: search + sort + view toggle */}
       <div className="flex flex-wrap items-center gap-2.5 mb-4">
-        <div className="min-w-[220px] flex-1 basis-[280px]">
+        <div className="min-w-[13.75rem] flex-1 basis-[17.5rem]">
           <MewSearch
             ref={searchRef}
             value={q}
@@ -84,10 +84,10 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
             onChange={setSort}
             options={CX_SORT[cat].map((s) => ({ value: s.v, label: t(s.label) }))}
             ariaLabel={t("roster.sortLabel")}
-            className="w-[190px] flex-none max-[520px]:flex-1"
+            className="w-[11.875rem] flex-none max-[520px]:flex-1"
           />
         )}
-        <div className="flex flex-none gap-[5px]">
+        <div className="flex flex-none gap-[0.3125rem]">
           {(["grid", "list"] as const).map((vw) => (
             <button
               key={vw}
@@ -96,7 +96,7 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
               aria-pressed={view === vw}
               onClick={() => setView(vw)}
               className={
-                "grid h-[40px] w-[44px] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)] " +
+                "grid h-[2.5rem] w-[2.75rem] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)] " +
                 (view === vw
                   ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]"
                   : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink-soft)]")
@@ -110,7 +110,7 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
 
       {/* category intro */}
       {catDef && (
-        <div className="mb-3 text-[12.5px]/[1.4] font-medium text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-hand)] line-clamp-2">
+        <div className="mb-3 text-[0.78125rem]/[1.4] font-medium text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-hand)] line-clamp-2">
           {t(mewCatKey(cat, "desc"))}
         </div>
       )}
@@ -161,7 +161,7 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
 
       {/* count + shortcut hints */}
       <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-dashed border-[color:var(--mwp-nline)] pb-2.5" aria-live="polite">
-        <div className="text-[11px]/[1.3] tracking-[0.06em] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-disp)]">
+        <div className="text-[0.6875rem]/[1.3] tracking-[0.06em] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-disp)]">
           {t("roster.count", { count: filtered.length, singular: t(mewCatKey(cat, "singular")), label: t(mewCatKey(cat, "label")).toLowerCase() })}
           {filtered.length > CX_CAP ? t("roster.showingCap", { n: CX_CAP }) : ""}
         </div>
@@ -181,7 +181,7 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
           <div
             className={
               view === "grid"
-                ? "mt-4 grid gap-x-3 gap-y-4 [grid-template-columns:repeat(auto-fill,minmax(186px,1fr))] max-[520px]:[grid-template-columns:repeat(auto-fill,minmax(150px,1fr))] [animation:mew-fade-rise_160ms_ease-out]"
+                ? "mt-4 grid gap-x-3 gap-y-4 [grid-template-columns:repeat(auto-fill,minmax(11.625rem,1fr))] max-[520px]:[grid-template-columns:repeat(auto-fill,minmax(9.375rem,1fr))] [animation:mew-fade-rise_160ms_ease-out]"
                 : "mt-4 grid gap-2 grid-cols-1 [animation:mew-fade-rise_160ms_ease-out]"
             }
           >
@@ -200,11 +200,11 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
               <button
                 type="button"
                 onClick={loadMore}
-                className="border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-6 py-2.5 text-[13px]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] transition-all hover:translate-y-[-2px] hover:[box-shadow:0_5px_0_var(--mwp-shadow-sm)] active:translate-y-1 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+                className="border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-6 py-2.5 text-[0.8125rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] transition-all hover:translate-y-[-2px] hover:[box-shadow:0_5px_0_var(--mwp-shadow-sm)] active:translate-y-1 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
               >
                 {t("roster.loadMore")}
               </button>
-              <p className="text-[11px]/[1.4] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-hand)]">
+              <p className="text-[0.6875rem]/[1.4] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-hand)]">
                 {t("roster.loadMoreHint", { remaining: filtered.length - shown.length })}
               </p>
             </div>

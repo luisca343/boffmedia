@@ -16,7 +16,7 @@ function DropItems({ items }: { items: NavItem[] }) {
           href={it.href}
           role="menuitem"
           style={{ animationDelay: `${i * 22}ms` }}
-          className="group/item flex items-center gap-[11px] px-4 py-2 font-body text-[14px] font-medium leading-[1.2] text-txt-muted no-underline transition-colors duration-[140ms] animate-[bm-nd-item_0.16s_both] motion-reduce:animate-none hover:bg-accent-soft hover:text-txt focus-visible:bg-accent-soft focus-visible:text-txt focus-visible:outline-none"
+          className="group/item flex items-center gap-[0.6875rem] px-4 py-2 font-body text-[0.875rem] font-medium leading-[1.2] text-txt-muted no-underline transition-colors duration-[140ms] animate-[bm-nd-item_0.16s_both] motion-reduce:animate-none hover:bg-accent-soft hover:text-txt focus-visible:bg-accent-soft focus-visible:text-txt focus-visible:outline-none"
         >
           <Icon
             name={it.icon || "wrench"}
@@ -39,7 +39,7 @@ function DropSheet({ sec }: { sec: NavSection }) {
   const style = sec.hue != null ? ({ ["--ghue" as string]: String(sec.hue) } as React.CSSProperties) : undefined
   return (
     <div
-      className="max-h-[min(72vh,560px)] w-[252px] overflow-y-auto px-1.5 pb-3.5 pt-2.5"
+      className="max-h-[min(72vh,35rem)] w-[15.75rem] overflow-y-auto px-1.5 pb-3.5 pt-2.5"
       style={style}
     >
       {sec.groups ? (
@@ -50,7 +50,7 @@ function DropSheet({ sec }: { sec: NavSection }) {
                 (gr.href ? (
                   <Link
                     href={gr.href}
-                    className="group/cat flex items-center gap-1.5 px-4 pb-1 pt-2 font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.16em] text-txt-muted no-underline transition-colors duration-[140ms] hover:text-accent"
+                    className="group/cat flex items-center gap-1.5 px-4 pb-1 pt-2 font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.16em] text-txt-muted no-underline transition-colors duration-[140ms] hover:text-accent"
                   >
                     <span className="flex-1">{gr.name}</span>
                     <Icon
@@ -60,7 +60,7 @@ function DropSheet({ sec }: { sec: NavSection }) {
                     />
                   </Link>
                 ) : (
-                  <h5 className="flex items-center gap-1.5 px-4 pb-1 pt-2 font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.16em] text-txt-muted">
+                  <h5 className="flex items-center gap-1.5 px-4 pb-1 pt-2 font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.16em] text-txt-muted">
                     <span className="flex-1">{gr.name}</span>
                   </h5>
                 ))}
@@ -114,7 +114,7 @@ export function NavDropdown({ label, href, active, sections, demoOpen }: NavDrop
           onClick={() => setOpen(false)}
           onKeyDown={(e) => { if (e.key === "ArrowDown") { e.preventDefault(); setOpen(true) } }}
           className={cn(
-            "flex items-center gap-[7px] border-y-[3px] border-transparent font-display text-[16px] font-bold uppercase leading-none tracking-[0.09em] no-underline transition-colors duration-[140ms]",
+            "flex items-center gap-[0.4375rem] border-y-[3px] border-transparent font-display text-[1rem] font-bold uppercase leading-none tracking-[0.09em] no-underline transition-colors duration-[140ms]",
             active || open ? "text-txt" : "text-txt-muted hover:text-txt",
             active && "border-b-accent",
           )}
@@ -134,10 +134,10 @@ export function NavDropdown({ label, href, active, sections, demoOpen }: NavDrop
           aria-label={tNav("menuOf", { label })}
           className={cn(
             "cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:10px] z-[70] flex w-fit border border-solid border-line-2 border-t-accent bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.75)] animate-[bm-nd-pop_0.14s_ease-out] motion-reduce:animate-none",
-            demoOpen ? "relative" : "absolute left-[-18px] top-full",
+            demoOpen ? "relative" : "absolute left-[-1.125rem] top-full",
           )}
         >
-          <div className="flex w-[176px] flex-col gap-0.5 border-r border-line bg-panel-2 py-2.5 px-2" role="none">
+          <div className="flex w-[11rem] flex-col gap-0.5 border-r border-line bg-panel-2 py-2.5 px-2" role="none">
             {sections.map((s, i) => {
               const hueStyle = s.hue != null ? ({ ["--ghue" as string]: String(s.hue) } as React.CSSProperties) : undefined
               return (
@@ -150,7 +150,7 @@ export function NavDropdown({ label, href, active, sections, demoOpen }: NavDrop
                   onFocus={() => setHovSec(i)}
                   onClick={() => setOpen(false)}
                   className={cn(
-                    "group/game flex items-center gap-[9px] px-2.5 py-[9px] font-display text-[13px] font-bold uppercase leading-none tracking-[0.08em] no-underline transition-colors duration-[140ms]",
+                    "group/game flex items-center gap-[0.5625rem] px-2.5 py-[0.5625rem] font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.08em] no-underline transition-colors duration-[140ms]",
                     i === hovSec ? "bg-panel text-txt" : "text-txt-muted",
                   )}
                 >

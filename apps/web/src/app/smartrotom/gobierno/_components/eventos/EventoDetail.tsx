@@ -26,10 +26,10 @@ export function EventoDetail({ id }: { id: string }) {
     return (
       <>
         <BackToEventos />
-        <Skeleton className="h-[200px] w-full" />
+        <Skeleton className="h-[12.5rem] w-full" />
         <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {Array.from({ length: 4 }, (_, i) => (
-            <Skeleton key={i} className="h-[84px] w-full" />
+            <Skeleton key={i} className="h-[5.25rem] w-full" />
           ))}
         </div>
       </>

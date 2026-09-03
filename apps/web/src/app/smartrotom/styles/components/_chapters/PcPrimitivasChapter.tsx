@@ -117,8 +117,8 @@ export function PcPrimitivasChapter() {
             </Select>
             <div className="flex items-center gap-3">
               <Switch checked={on} onChange={setOn} label="Sonido" />
-              <span className="text-[13px] text-pc-fg-muted">Sonido</span>
-              <span className="ml-auto flex items-center gap-1.5 text-[12px] text-pc-fg-subtle">
+              <span className="text-[0.8125rem] text-pc-fg-muted">Sonido</span>
+              <span className="ml-auto flex items-center gap-1.5 text-[0.75rem] text-pc-fg-subtle">
                 Pulsa <Kbd>/</Kbd> para buscar
               </span>
             </div>
@@ -146,17 +146,17 @@ export function PcPrimitivasChapter() {
               ["AtE", 48],
             ].map(([label, v]) => (
               <div key={label as string} className="flex items-center gap-2.5">
-                <span className="w-9 font-pc-mono text-[11px] text-pc-fg-subtle">{label}</span>
-                <span className="w-9 text-right font-pc-mono text-[12.5px] font-bold">{v}</span>
+                <span className="w-9 font-pc-mono text-[0.6875rem] text-pc-fg-subtle">{label}</span>
+                <span className="w-9 text-right font-pc-mono text-[0.78125rem] font-bold">{v}</span>
                 <Bar pct={((v as number) / 200) * 100} tone={statTone(v as number)} className="flex-1" />
               </div>
             ))}
             <div className="mt-1 flex items-center gap-2.5">
-              <span className="w-[72px] text-[12px] text-pc-fg-muted">PS</span>
+              <span className="w-[4.5rem] text-[0.75rem] text-pc-fg-muted">PS</span>
               <Bar pct={38} tone={hpTone(0.38)} height={5} className="flex-1" />
             </div>
             <div className="flex items-center gap-2.5">
-              <span className="w-[72px] text-[12px] text-pc-fg-muted">Pokédex</span>
+              <span className="w-[4.5rem] text-[0.75rem] text-pc-fg-muted">Pokédex</span>
               <Bar
                 pct={62}
                 tone="linear-gradient(90deg, rgb(var(--pc-accent)), rgb(var(--pc-cyan)))"

@@ -59,8 +59,8 @@ export function ExportBarUI({
       <div className="flex-1" />
 
       {exporting ? (
-        <span className="inline-flex items-center gap-2 font-mono text-[11px] text-accent-bright">
-          <span className="w-[13px] h-[13px] rounded-full border-2 border-line-2 border-t-accent animate-spin shrink-0" />
+        <span className="inline-flex items-center gap-2 font-mono text-[0.6875rem] text-accent-bright">
+          <span className="w-[0.8125rem] h-[0.8125rem] rounded-full border-2 border-line-2 border-t-accent animate-spin shrink-0" />
           {t("export.exporting")}
         </span>
       ) : null}
@@ -70,7 +70,7 @@ export function ExportBarUI({
         disabled={exporting}
         onChange={(e) => setFmt(e.target.value)}
         aria-label={t("export.title")}
-        className="h-[34px] min-w-[128px] bg-panel border border-solid border-line px-2 font-mono text-[12px] text-txt-muted cursor-pointer focus:outline-none focus:border-accent-line"
+        className="h-[2.125rem] min-w-[8rem] bg-panel border border-solid border-line px-2 font-mono text-[0.75rem] text-txt-muted cursor-pointer focus:outline-none focus:border-accent-line"
       >
         {formats.map(([lbl, v]) => (
           <option key={v} value={v}>

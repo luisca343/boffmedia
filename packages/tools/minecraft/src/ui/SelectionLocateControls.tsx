@@ -63,7 +63,7 @@ export function SelectionLocateControls({
             <PreviewButton onClick={onPrev} title={labels.prev}>
               <Icon name="back" size={13} />
             </PreviewButton>
-            <span className="px-1 font-mono text-[11px] tabular-nums text-txt-dim">{labels.stepper}</span>
+            <span className="px-1 font-mono text-[0.6875rem] tabular-nums text-txt-dim">{labels.stepper}</span>
             <PreviewButton onClick={onNext} title={labels.next}>
               <Icon name="arrow" size={13} />
             </PreviewButton>
@@ -73,7 +73,7 @@ export function SelectionLocateControls({
           <Icon name="eye" size={13} />
         </PreviewButton>
       </div>
-      {culled && labels.culledNote && <p className="m-0 text-[10.5px] text-txt-dim">{labels.culledNote}</p>}
+      {culled && labels.culledNote && <p className="m-0 text-[0.65625rem] text-txt-dim">{labels.culledNote}</p>}
     </div>
   )
 }

@@ -50,7 +50,7 @@ export function ZonasBrowser() {
       />
 
       {isLoading ? (
-        <div className="grid gap-3.5 md:grid-cols-[258px_1fr]">
+        <div className="grid gap-3.5 md:grid-cols-[16.125rem_1fr]">
           <Skeleton className="h-64" />
           <Skeleton className="h-64" />
         </div>
@@ -63,7 +63,7 @@ export function ZonasBrowser() {
           <Empty icon="layers" title={t("zonas.sinZonas")} sub={t("zonas.sinZonasSub")} />
         </Card>
       ) : (
-        <div className="grid items-start gap-[18px] md:grid-cols-[258px_1fr]">
+        <div className="grid items-start gap-[1.125rem] md:grid-cols-[16.125rem_1fr]">
           <Card className="overflow-hidden md:sticky md:top-0">
             <Bar icon="landmark" dep="urbanismo">
               {t("zonas.municipios")}
@@ -82,23 +82,23 @@ export function ZonasBrowser() {
                     key={tn}
                     type="button"
                     onClick={() => setSelectedTown(tn)}
-                    className={`mb-0.5 block w-full rounded-gt-sm border px-[11px] py-[9px] text-left transition-colors ${
+                    className={`mb-0.5 block w-full rounded-gt-sm border px-[0.6875rem] py-[0.5625rem] text-left transition-colors ${
                       on ? "border-gt-dep-urbanismo/40 bg-gt-dep-urbanismo/10" : "border-transparent hover:bg-gt-paper-1"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span
-                        className={`truncate font-gt-display text-[13.5px] font-bold ${on ? "text-gt-ink-900" : "text-gt-ink-700"}`}
+                        className={`truncate font-gt-display text-[0.84375rem] font-bold ${on ? "text-gt-ink-900" : "text-gt-ink-700"}`}
                       >
                         {townName(tn)}
                       </span>
                       <span
-                        className={`flex-none font-gt-mono text-[10.5px] font-bold tabular-nums ${on ? "text-gt-dep-urbanismo" : "text-gt-ink-400"}`}
+                        className={`flex-none font-gt-mono text-[0.65625rem] font-bold tabular-nums ${on ? "text-gt-dep-urbanismo" : "text-gt-ink-400"}`}
                       >
                         {occ}/{tot}
                       </span>
                     </div>
-                    <div className="mt-0.5 font-gt-mono text-[10px] text-gt-ink-400">
+                    <div className="mt-0.5 font-gt-mono text-[0.625rem] text-gt-ink-400">
                       {t("zonas.sectores", { count: subs.length })}
                     </div>
                   </button>
@@ -120,10 +120,10 @@ export function ZonasBrowser() {
                 const occ = z.ocupadas ?? members.filter((p) => p.owner).length
                 const pct = total ? Math.round((occ / total) * 100) : 0
                 return (
-                  <Card key={z.id} dep={k.tone} className="p-[15px]">
+                  <Card key={z.id} dep={k.tone} className="p-[0.9375rem]">
                     <div className="mb-3 flex items-start gap-2.5">
                       <div
-                        className="grid h-[38px] w-[38px] flex-none place-items-center rounded-[9px] border"
+                        className="grid h-[2.375rem] w-[2.375rem] flex-none place-items-center rounded-[9px] border"
                         style={{
                           background: `color-mix(in srgb, ${TONES[k.tone].css} 14%, rgb(var(--gt-paper-0)))`,
                           borderColor: `color-mix(in srgb, ${TONES[k.tone].css} 28%, transparent)`,
@@ -132,25 +132,25 @@ export function ZonasBrowser() {
                         <Icon name={k.icon} size={19} style={{ color: TONES[k.tone].css }} />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <div className="font-gt-display text-[15.5px] font-bold leading-tight text-gt-ink-900">{z.name}</div>
+                        <div className="font-gt-display text-[0.96875rem] font-bold leading-tight text-gt-ink-900">{z.name}</div>
                         <div className="mt-0.5 flex items-center gap-1.5">
                           <Badge tone={k.tone}>{k.label}</Badge>
-                          <span className="font-gt-mono text-[9.5px] text-gt-ink-300">#{z.id}</span>
+                          <span className="font-gt-mono text-[0.59375rem] text-gt-ink-300">#{z.id}</span>
                         </div>
                       </div>
                       <Button size="sm" tone="plain" onClick={() => setEditing(z)}>
                         {t("zonas.editarZona")}
                       </Button>
                     </div>
-                    <p className="mb-[13px] text-[12px] leading-relaxed text-gt-ink-600">
+                    <p className="mb-[0.8125rem] text-[0.75rem] leading-relaxed text-gt-ink-600">
                       {z.description || k.desc || t("zonas.sinDescripcion")}
                     </p>
                     <div className="mb-3">
                       <div className="mb-1 flex items-center justify-between">
-                        <span className="font-gt-mono text-[8.5px] font-bold uppercase tracking-[.12em] text-gt-ink-400">
+                        <span className="font-gt-mono text-[0.53125rem] font-bold uppercase tracking-[.12em] text-gt-ink-400">
                           {t("zonas.ocupacion")}
                         </span>
-                        <span className="font-gt-mono text-[10.5px] font-bold tabular-nums text-gt-ink-600">
+                        <span className="font-gt-mono text-[0.65625rem] font-bold tabular-nums text-gt-ink-600">
                           {occ}/{total}
                         </span>
                       </div>
@@ -167,7 +167,7 @@ export function ZonasBrowser() {
                             disabled={!p.owner}
                             onClick={() => p.owner && openDossier(p.owner.uuid)}
                             title={p.owner ? p.owner.username : t("urbanismo.vacanteTitle")}
-                            className="inline-flex items-center gap-1 rounded-full border border-gt-line bg-gt-paper-0 px-2 py-0.5 font-gt-mono text-[11px] font-bold text-gt-ink-800 disabled:cursor-default"
+                            className="inline-flex items-center gap-1 rounded-full border border-gt-line bg-gt-paper-0 px-2 py-0.5 font-gt-mono text-[0.6875rem] font-bold text-gt-ink-800 disabled:cursor-default"
                           >
                             <span
                               className="h-1.5 w-1.5 rounded-full"
@@ -178,8 +178,8 @@ export function ZonasBrowser() {
                         ))}
                       </div>
                     )}
-                    <div className="flex items-center justify-between border-t border-gt-line-soft pt-[11px]">
-                      <span className="font-gt-mono text-[10px] text-gt-ink-400">{townName(z.town)}</span>
+                    <div className="flex items-center justify-between border-t border-gt-line-soft pt-[0.6875rem]">
+                      <span className="font-gt-mono text-[0.625rem] text-gt-ink-400">{townName(z.town)}</span>
                     </div>
                   </Card>
                 )

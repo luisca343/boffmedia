@@ -28,7 +28,7 @@ function ReelDemo() {
     setRunning(true)
   }
   return (
-    <div className="grid w-full max-w-[560px] gap-4">
+    <div className="grid w-full max-w-[35rem] gap-4">
       {spin && (
         <>
           {spin.mode === "reel" && (
@@ -106,11 +106,11 @@ export function SorteoRapidoChapter() {
         lead={<>El sorteo rápido (spinner ponderado) se arma con el kit <code>srt-*</code> movido a <code>@/components/boffmedia/ui/giveaways</code>. La fila de participante (<code>SrtEntrantRow</code>) admite renombrar (doble clic), peso y quitar; el paso de peso (<code>SrtNumberStepper</code>) es reutilizable suelto. <em>Nota:</em> el sistema de sorteos con tarjetas/premios/requisitos del handoff no está en el producto — el sorteo local es el spinner. [aplazado]</>}
       >
         <Sample title="Chasis y filas" code="<Panel> · <SrtEntrantRow>" col>
-          <div className="w-full max-w-[520px]">
+          <div className="w-full max-w-[32.5rem]">
             {/* Simplified demo: Panel is from @boffmedia/ui, SrtEntrantRow is from giveaways */}
             <div className="border border-line bg-panel">
-              <div className="border-b border-line px-[20px] py-[15px]">
-                <h3 className="flex items-center gap-[10px] font-display text-[16px] font-bold not-italic uppercase tracking-[0.04em] text-txt">
+              <div className="border-b border-line px-[1.25rem] py-[0.9375rem]">
+                <h3 className="flex items-center gap-[0.625rem] font-display text-[1rem] font-bold not-italic uppercase tracking-[0.04em] text-txt">
                   Participantes
                 </h3>
               </div>
@@ -146,7 +146,7 @@ export function SorteoRapidoChapter() {
         lead={<>El resultado del sorteo: la lista de ganadores con su probabilidad (<code>SrtWinnerList</code>) y la etiqueta de semilla verificable (<code>SrtSeedTag</code>) que permite reproducir el sorteo. La tira girando es la <code>Ruleta del sorteo</code> de arriba.</>}
       >
         <Sample title="Ganadores" code="<SrtWinnerList winners pool weighted>" col>
-          <div className="w-full max-w-[520px]">
+          <div className="w-full max-w-[32.5rem]">
             <SrtWinnerList winners={winners} pool={pool} weighted={weighted} />
           </div>
         </Sample>

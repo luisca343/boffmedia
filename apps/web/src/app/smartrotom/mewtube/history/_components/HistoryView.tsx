@@ -17,7 +17,7 @@ export function HistoryView() {
   const videos = items.map((v) => toVideoCard(v))
 
   return (
-    <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-5 md:px-10">
+    <div className="mx-auto max-w-[102.5rem] px-4 pb-20 pt-5 md:px-10">
       <SectionHeader
         eyebrow={t("history.yourActivity")}
         title={t("history.title")}
@@ -39,7 +39,7 @@ export function HistoryView() {
       {videos.length === 0 ? (
         <p className="py-16 text-center text-sm text-mw-fg-faint">{t("history.empty")}</p>
       ) : (
-        <div className="grid grid-cols-1 gap-[18px] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-[1.125rem] sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {videos.map((v) => (
             <VideoCard key={v.href} v={v} />
           ))}

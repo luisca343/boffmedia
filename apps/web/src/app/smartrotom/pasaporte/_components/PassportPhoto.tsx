@@ -43,7 +43,7 @@ export function PassportPhoto({
           className,
         )}
       >
-        <span className="px-1 text-center font-ps-mono text-[8px] uppercase leading-[1.3] tracking-[.14em] text-ps-ink-faint">
+        <span className="px-1 text-center font-ps-mono text-[0.5rem] uppercase leading-[1.3] tracking-[.14em] text-ps-ink-faint">
           {t.rich("passportPhoto.missing", { br: () => <br /> })}
         </span>
       </div>

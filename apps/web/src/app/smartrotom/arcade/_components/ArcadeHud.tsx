@@ -33,10 +33,10 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
   const totalDays = streak?.totalDays ?? 7
 
   return (
-    <div className="mb-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-ar-violet/[.18] bg-[linear-gradient(180deg,rgb(20_10_52/.85),rgb(8_4_24/.85))] px-[18px] py-3">
+    <div className="mb-4 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-ar-violet/[.18] bg-[linear-gradient(180deg,rgb(20_10_52/.85),rgb(8_4_24/.85))] px-[1.125rem] py-3">
       <div className="flex items-center gap-3.5">
         {loading ? (
-          <Skeleton className="h-[46px] w-[46px] rounded-full" />
+          <Skeleton className="h-[2.875rem] w-[2.875rem] rounded-full" />
         ) : (
           <Ring
             label={currentDay}
@@ -48,13 +48,13 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
         )}
         <div>
           <div className="flex items-baseline gap-2">
-            <span className="font-ar text-[15px] font-bold text-ar-ink">{name}</span>
+            <span className="font-ar text-[0.9375rem] font-bold text-ar-ink">{name}</span>
             {streak?.currentBanner && (
-              <span className="font-ar-mono text-[11px] text-ar-ink-muted">{streak.currentBanner}</span>
+              <span className="font-ar-mono text-[0.6875rem] text-ar-ink-muted">{streak.currentBanner}</span>
             )}
           </div>
           <div className="mt-1.5 flex items-center gap-2">
-            <div className="w-[140px]">
+            <div className="w-[8.75rem]">
               <ProgressBar
                 value={currentDay}
                 max={totalDays}
@@ -63,7 +63,7 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
                 label={t("hud.weeklyStreakProgress")}
               />
             </div>
-            <span className="font-ar-mono text-[10px] tabular-nums text-ar-ink-muted">
+            <span className="font-ar-mono text-[0.625rem] tabular-nums text-ar-ink-muted">
               {t("hud.dayOf", { current: currentDay, total: totalDays })}
             </span>
           </div>
@@ -82,11 +82,11 @@ export function ArcadeHud({ streak, boxesOwned, loading, syncing }: ArcadeHudPro
           </Tag>
         )}
         {resetIn && (
-          <span className="inline-flex items-center gap-1.5 rounded-lg border border-ar-amber/35 bg-black/45 px-2.5 py-1.5 font-ar-mono text-[11px] font-bold tabular-nums text-ar-amber">
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-ar-amber/35 bg-black/45 px-2.5 py-1.5 font-ar-mono text-[0.6875rem] font-bold tabular-nums text-ar-amber">
             {t("hud.resetsIn", { resetIn })}
           </span>
         )}
-        <span className="inline-flex items-center gap-[7px] rounded-lg border border-ar-lime/30 bg-black/35 px-2.5 py-1.5 font-ar-mono text-[11px] text-ar-lime">
+        <span className="inline-flex items-center gap-[0.4375rem] rounded-lg border border-ar-lime/30 bg-black/35 px-2.5 py-1.5 font-ar-mono text-[0.6875rem] text-ar-lime">
           <span
             aria-hidden
             className="h-2 w-2 rounded-full bg-ar-lime shadow-[0_0_8px_rgb(var(--ar-lime))] motion-reduce:animate-none animate-ar-pulse"

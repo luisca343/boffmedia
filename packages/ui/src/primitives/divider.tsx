@@ -13,13 +13,13 @@ export function Divider({ label, className }: DividerProps) {
       role="separator"
       aria-label={typeof label === "string" ? label : undefined}
       className={cn(
-        "flex items-center gap-[14px] text-txt-dim",
+        "flex items-center gap-[0.875rem] text-txt-dim",
         "before:content-[''] before:h-px before:flex-1 before:bg-line",
         "after:content-[''] after:h-px after:flex-1 after:bg-line",
         className,
       )}
     >
-      <span className="font-mono text-[11px] font-semibold leading-none uppercase tracking-[0.1em]">{label}</span>
+      <span className="font-mono text-[0.6875rem] font-semibold leading-none uppercase tracking-[0.1em]">{label}</span>
     </div>
   )
 }

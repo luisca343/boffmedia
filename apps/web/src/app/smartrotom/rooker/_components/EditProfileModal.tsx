@@ -103,81 +103,81 @@ export function EditProfileModal({
         >
           <Icon name="close" size={20} />
         </button>
-        <h2 className="text-[17px] font-extrabold text-rk-fg">{t("editProfile.title")}</h2>
-        <Button intent="accent" onClick={submit} disabled={blocked} className="px-4 py-1.5 text-[13px]">
+        <h2 className="text-[1.0625rem] font-extrabold text-rk-fg">{t("editProfile.title")}</h2>
+        <Button intent="accent" onClick={submit} disabled={blocked} className="px-4 py-1.5 text-[0.8125rem]">
           {update.isPending ? t("editProfile.saving") : t("editProfile.saveButton")}
         </Button>
       </div>
 
       <div className="rk-scroll max-h-[70vh] space-y-4 overflow-y-auto p-4">
         <label className="block">
-          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.handle.label")}</span>
+          <span className="text-[0.8125rem] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.handle.label")}</span>
           <div
             className={cn(
               "mt-1.5 flex items-center rounded-rk-md border bg-rk-card px-3",
               handleValid ? "border-rk-line-strong focus-within:border-rk-accent" : "border-rk-ball",
             )}
           >
-            <span className="text-[15px] text-rk-fg-subtle">@</span>
+            <span className="text-[0.9375rem] text-rk-fg-subtle">@</span>
             <input
               value={handle}
               onChange={(e) => setHandle(e.target.value.toLowerCase())}
               maxLength={32}
-              className="w-full bg-transparent px-1 py-2 text-[15px] text-rk-fg outline-none"
+              className="w-full bg-transparent px-1 py-2 text-[0.9375rem] text-rk-fg outline-none"
             />
           </div>
           {!handleValid && (
-            <p className="mt-1 text-[12.5px] text-rk-ball">
+            <p className="mt-1 text-[0.78125rem] text-rk-ball">
               {t("editProfile.fields.handle.error")}
             </p>
           )}
         </label>
 
         <label className="block">
-          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.displayName.label")}</span>
+          <span className="text-[0.8125rem] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.displayName.label")}</span>
           <input
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
             maxLength={48}
-            className="mt-1.5 w-full rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[15px] text-rk-fg outline-none focus:border-rk-accent"
+            className="mt-1.5 w-full rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[0.9375rem] text-rk-fg outline-none focus:border-rk-accent"
           />
         </label>
 
         <label className="block">
-          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.bio.label")}</span>
+          <span className="text-[0.8125rem] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.bio.label")}</span>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             maxLength={280}
             rows={3}
-            className="mt-1.5 w-full resize-none rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[15px] text-rk-fg outline-none focus:border-rk-accent"
+            className="mt-1.5 w-full resize-none rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[0.9375rem] text-rk-fg outline-none focus:border-rk-accent"
           />
-          <span className="mt-0.5 block text-right text-[12px] tabular-nums text-rk-fg-subtle">
+          <span className="mt-0.5 block text-right text-[0.75rem] tabular-nums text-rk-fg-subtle">
             {bio.length}/280
           </span>
         </label>
 
         <label className="block">
-          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.link.label")}</span>
+          <span className="text-[0.8125rem] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">{t("editProfile.fields.link.label")}</span>
           <input
             value={link}
             onChange={(e) => setLink(e.target.value)}
             maxLength={120}
             placeholder={t("editProfile.fields.link.placeholder")}
-            className="mt-1.5 w-full rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[15px] text-rk-fg outline-none focus:border-rk-accent"
+            className="mt-1.5 w-full rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[0.9375rem] text-rk-fg outline-none focus:border-rk-accent"
           />
         </label>
 
         <div>
-          <span className="text-[13px] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">
+          <span className="text-[0.8125rem] font-bold uppercase tracking-[.04em] text-rk-fg-subtle">
             {t("editProfile.fields.partner.label")}
           </span>
-          <p className="mb-2 mt-0.5 text-[12.5px] text-rk-fg-subtle">
+          <p className="mb-2 mt-0.5 text-[0.78125rem] text-rk-fg-subtle">
             {t("editProfile.fields.partner.hint")}
           </p>
 
           {owned.length ? (
-            <div className="rk-scroll grid max-h-[190px] grid-cols-6 gap-1.5 overflow-y-auto">
+            <div className="rk-scroll grid max-h-[11.875rem] grid-cols-6 gap-1.5 overflow-y-auto">
               {owned.map((e) => (
                 <button
                   key={e.dex}
@@ -197,7 +197,7 @@ export function EditProfileModal({
               ))}
             </div>
           ) : (
-            <p className="rounded-rk-md border border-rk-line bg-rk-card px-3 py-3 text-[13.5px] text-rk-fg-subtle">
+            <p className="rounded-rk-md border border-rk-line bg-rk-card px-3 py-3 text-[0.84375rem] text-rk-fg-subtle">
               {t("editProfile.fields.partner.empty")}
             </p>
           )}

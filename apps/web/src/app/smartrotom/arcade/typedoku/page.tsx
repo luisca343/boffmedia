@@ -24,11 +24,11 @@ export default function TypedokuPage() {
       />
 
       <GameStage accent="cyan">
-        <div className="mx-auto flex max-w-[720px] flex-col gap-4">
-          <Panel tone="deep" innerClassName="p-4 md:p-[18px]">
+        <div className="mx-auto flex max-w-[45rem] flex-col gap-4">
+          <Panel tone="deep" innerClassName="p-4 md:p-[1.125rem]">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5">
-              <span className="font-ar-display text-[11px] text-ar-cyan">▸ {t("typedoku.sudokuOfTypes")}</span>
-              <span className="font-ar-mono text-[11px] uppercase text-ar-ink-dim">
+              <span className="font-ar-display text-[0.6875rem] text-ar-cyan">▸ {t("typedoku.sudokuOfTypes")}</span>
+              <span className="font-ar-mono text-[0.6875rem] uppercase text-ar-ink-dim">
                 {t("typedoku.eachRowColumn")}
               </span>
               <Tag tone={game.isNotesMode ? "magenta" : "ghost"}>
@@ -44,7 +44,7 @@ export default function TypedokuPage() {
 
             {game.isComplete && (
               <div className="mt-4 animate-ar-pop rounded-xl border border-ar-lime/50 bg-ar-lime/[.12] p-4 text-center">
-                <p className="m-0 inline-flex items-center gap-2 font-ar text-[15px] font-semibold text-ar-lime">
+                <p className="m-0 inline-flex items-center gap-2 font-ar text-[0.9375rem] font-semibold text-ar-lime">
                   <Icon.Trophy s={18} />
                   {t("typedoku.congratulations")}
                 </p>
@@ -53,7 +53,7 @@ export default function TypedokuPage() {
           </Panel>
 
           <Panel tone="void" tight>
-            <div className="mb-3 font-ar-display text-[9px] uppercase text-ar-magenta-2">{t("typedoku.types")}</div>
+            <div className="mb-3 font-ar-display text-[0.5625rem] uppercase text-ar-magenta-2">{t("typedoku.types")}</div>
             <TypePad onSelect={game.handleTypeSelect} isNotesMode={game.isNotesMode} />
           </Panel>
 

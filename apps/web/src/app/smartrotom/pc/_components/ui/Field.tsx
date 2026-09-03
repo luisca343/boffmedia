@@ -5,7 +5,7 @@ import { forwardRef, type InputHTMLAttributes, type SelectHTMLAttributes, type T
  * textarea so a level range and a share code look like the same control.
  */
 const WELL =
-  "w-full rounded-[11px] border border-pc-line bg-pc-bg/60 px-[13px] py-[10px] font-pc text-[13.5px] font-medium " +
+  "w-full rounded-[11px] border border-pc-line bg-pc-bg/60 px-[0.8125rem] py-[0.625rem] font-pc text-[0.84375rem] font-medium " +
   "text-pc-fg shadow-[inset_0_1px_0_rgb(255_255_255_/_.03),inset_0_2px_10px_-6px_rgb(0_0_0_/_.7)] " +
   "outline-none transition-[border-color,box-shadow,background-color] " +
   "placeholder:font-medium placeholder:text-pc-fg-subtle hover:border-pc-line-strong " +
@@ -35,7 +35,7 @@ export const Select = forwardRef<HTMLSelectElement, SelectHTMLAttributes<HTMLSel
     return (
       <select
         ref={ref}
-        className={`${WELL} cursor-pointer appearance-none pr-[34px] [&>option]:bg-pc-panel-solid [&>option]:text-pc-fg ${className}`}
+        className={`${WELL} cursor-pointer appearance-none pr-[2.125rem] [&>option]:bg-pc-panel-solid [&>option]:text-pc-fg ${className}`}
         style={{
           backgroundImage: CHEVRON,
           backgroundRepeat: "no-repeat",
@@ -65,14 +65,14 @@ export function Switch({ checked, onChange, label }: SwitchProps) {
       aria-label={label}
       onClick={() => onChange(!checked)}
       className={[
-        "relative h-[22px] w-[38px] flex-none rounded-pc-pill transition-colors focus-visible:outline-none",
+        "relative h-[1.375rem] w-[2.375rem] flex-none rounded-pc-pill transition-colors focus-visible:outline-none",
         checked ? "bg-pc-accent" : "bg-white/[.14]",
       ].join(" ")}
     >
       <span
         className={[
-          "absolute top-0.5 h-[18px] w-[18px] rounded-pc-pill bg-white transition-[left] duration-200",
-          checked ? "left-[18px]" : "left-0.5",
+          "absolute top-0.5 h-[1.125rem] w-[1.125rem] rounded-pc-pill bg-white transition-[left] duration-200",
+          checked ? "left-[1.125rem]" : "left-0.5",
         ].join(" ")}
       />
     </button>
@@ -82,7 +82,7 @@ export function Switch({ checked, onChange, label }: SwitchProps) {
 /** A keycap, for the shortcut hints. */
 export function Kbd({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-pc-line bg-white/5 px-[5px] font-pc-mono text-[11px] font-bold text-pc-fg-subtle">
+    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-pc-line bg-white/5 px-[0.3125rem] font-pc-mono text-[0.6875rem] font-bold text-pc-fg-subtle">
       {children}
     </span>
   )

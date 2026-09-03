@@ -40,7 +40,7 @@ export function DkType({ type, small }: { type: string; small?: boolean }) {
     <span
       className={cn(
         "cut [--cut:3px] inline-flex items-center font-mono font-bold uppercase tracking-[0.08em] text-white",
-        small ? "px-1.5 py-[3px] text-[9px]/none" : "px-2 py-1 text-[10px]/none",
+        small ? "px-1.5 py-[3px] text-[0.5625rem]/none" : "px-2 py-1 text-[0.625rem]/none",
       )}
       style={{ background: typeColor(type), textShadow: "0 1px 2px rgba(0,0,0,0.4)" }}
     >

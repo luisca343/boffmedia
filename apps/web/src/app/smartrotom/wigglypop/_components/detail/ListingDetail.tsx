@@ -73,12 +73,12 @@ export function ListingDetail({ id }: { id: number }) {
 
   return (
     <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-      <div className="flex flex-none items-center gap-3 px-[26px] pt-3">
+      <div className="flex flex-none items-center gap-3 px-[1.625rem] pt-3">
         <Button variant="ghost" onClick={() => router.back()}>
           <Icon name="arrowL" size={16} />
           {t("common.back")}
         </Button>
-        <span className="font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
+        <span className="font-wp text-[0.78125rem] font-semibold text-wp-fg-subtle">
           {t("detail.breadcrumbMarket")} / {t(FORMAT_LABEL_KEY[L.format])} / <span className="text-wp-fg-muted">{mon.name}</span>
         </span>
       </div>
@@ -88,19 +88,19 @@ export function ListingDetail({ id }: { id: number }) {
           {/* ── hero ─────────────────────────────────────────────────────── */}
           <SpriteStage
             mon={mon}
-            className="relative min-h-[320px] flex-col border-b border-wp-line/24 p-8 lg:border-b-0 lg:border-r"
+            className="relative min-h-[20rem] flex-col border-b border-wp-line/24 p-8 lg:border-b-0 lg:border-r"
           >
             <div className={cn("absolute inset-x-0 top-0 z-[3] h-1", RARITY_STRIP[L.rarity])} />
 
-            <div className="absolute left-[18px] top-4 z-[3] flex flex-col gap-2">
+            <div className="absolute left-[1.125rem] top-4 z-[3] flex flex-col gap-2">
               {mon.shiny && (
-                <CornerBadge tone="shiny" className="text-[12px]">
+                <CornerBadge tone="shiny" className="text-[0.75rem]">
                   <Icon name="sparkles" size={13} />
                   {t("common.shinyBadge")}
                 </CornerBadge>
               )}
               {mon.legendary && (
-                <CornerBadge tone="legend" className="text-[12px]">
+                <CornerBadge tone="legend" className="text-[0.75rem]">
                   <Icon name="crown" size={13} filled />
                   {t("common.legendaryBadge")}
                 </CornerBadge>
@@ -118,7 +118,7 @@ export function ListingDetail({ id }: { id: number }) {
               aria-pressed={isWatched}
               className={cn(
                 "disabled:pointer-events-none disabled:opacity-60",
-                "absolute right-[18px] top-4 z-[3] flex h-10 w-10 items-center justify-center rounded-wp-pill border-wp",
+                "absolute right-[1.125rem] top-4 z-[3] flex h-10 w-10 items-center justify-center rounded-wp-pill border-wp",
                 "transition-all duration-150 ease-wp hover:scale-110 motion-reduce:transform-none",
                 isWatched
                   ? "border-wp-accent bg-wp-accent text-white"
@@ -131,7 +131,7 @@ export function ListingDetail({ id }: { id: number }) {
             <Sprite
               mon={mon}
               hero
-              className="relative z-[2] w-[min(320px,70%)] animate-wp-floaty motion-reduce:animate-none"
+              className="relative z-[2] w-[min(20rem,70%)] animate-wp-floaty motion-reduce:animate-none"
             />
 
             <div className="absolute bottom-5 z-[3] flex gap-2">
@@ -143,8 +143,8 @@ export function ListingDetail({ id }: { id: number }) {
           </SpriteStage>
 
           {/* ── specs ────────────────────────────────────────────────────── */}
-          <div className="wp-noscroll overflow-y-auto bg-white/40 px-[30px] pb-10 pt-[26px]">
-            <h1 className="flex items-center gap-2.5 font-wp-display text-[28px] font-semibold text-wp-fg">
+          <div className="wp-noscroll overflow-y-auto bg-white/40 px-[1.875rem] pb-10 pt-[1.625rem]">
+            <h1 className="flex items-center gap-2.5 font-wp-display text-[1.75rem] font-semibold text-wp-fg">
               {mon.shiny && <span className="text-wp-teal">✦</span>}
               {mon.name}
               <GenderIcon gender={mon.gender} />
@@ -155,8 +155,8 @@ export function ListingDetail({ id }: { id: number }) {
         </div>
 
         {/* ── purchase + valuation + history + seller ───────────────────── */}
-        <div className="grid gap-[18px] px-[26px] pb-9 pt-1.5 lg:grid-cols-[1.3fr_1fr]">
-          <Panel className="border-wp border-wp-line/46 bg-white p-[18px] shadow-wp">
+        <div className="grid gap-[1.125rem] px-[1.625rem] pb-9 pt-1.5 lg:grid-cols-[1.3fr_1fr]">
+          <Panel className="border-wp border-wp-line/46 bg-white p-[1.125rem] shadow-wp">
             <PurchasePanel
               listing={L}
               onBuy={() => setSheet("buy")}
@@ -170,7 +170,7 @@ export function ListingDetail({ id }: { id: number }) {
             <ValueBox>
               <div className="mb-2 flex items-center gap-2">
                 <Icon name="wand" size={16} className="text-wp-teal" />
-                <span className="font-wp text-[13px] font-bold text-wp-fg">
+                <span className="font-wp text-[0.8125rem] font-bold text-wp-fg">
                   {t("detail.valuationTitle")}
                 </span>
               </div>
@@ -178,7 +178,7 @@ export function ListingDetail({ id }: { id: number }) {
                 <Price amount={L.value} size={22} symbolClassName="text-wp-teal-deep" />
                 <span
                   className={cn(
-                    "font-wp text-[12.5px] font-bold",
+                    "font-wp text-[0.78125rem] font-bold",
                     valDelta > 0 ? "text-wp-rose" : valDelta < 0 ? "text-wp-green" : "text-wp-fg-muted",
                   )}
                 >
@@ -192,7 +192,7 @@ export function ListingDetail({ id }: { id: number }) {
               {/* Not "IA" — it is a published, deterministic formula over IVs, level,
                   rarity and shininess. Calling a rules engine AI would be a lie the
                   seller then has to live with. */}
-              <p className="mt-2 font-wp text-[11.5px] font-semibold leading-relaxed text-wp-fg-muted">
+              <p className="mt-2 font-wp text-[0.71875rem] font-semibold leading-relaxed text-wp-fg-muted">
                 {t("detail.valuationExplain", {
                   shinyPart: mon.shiny ? t("detail.valuationShinyPart") : "",
                 })}
@@ -200,12 +200,12 @@ export function ListingDetail({ id }: { id: number }) {
             </ValueBox>
 
             <Panel className="p-3.5">
-              <div className="mb-1.5 flex items-center gap-[7px]">
+              <div className="mb-1.5 flex items-center gap-[0.4375rem]">
                 <Icon name="history" size={15} className="text-wp-fg-muted" />
-                <span className="font-wp text-[13px] font-bold text-wp-fg">
+                <span className="font-wp text-[0.8125rem] font-bold text-wp-fg">
                   {t("trust.priceHistory")}
                 </span>
-                <span className="ml-auto font-wp text-[11px] font-semibold text-wp-fg-subtle">
+                <span className="ml-auto font-wp text-[0.6875rem] font-semibold text-wp-fg-subtle">
                   {t("detail.realSalesOf", { species: mon.species })}
                 </span>
               </div>
@@ -219,21 +219,21 @@ export function ListingDetail({ id }: { id: number }) {
               <div className="flex items-center gap-3">
                 <Avatar seller={L.seller} />
                 <div className="min-w-0 flex-1">
-                  <div className="font-wp text-[15px] font-bold text-wp-fg">
+                  <div className="font-wp text-[0.9375rem] font-bold text-wp-fg">
                     {L.seller.username}
                   </div>
-                  <div className="mt-0.5 flex items-center gap-[7px]">
+                  <div className="mt-0.5 flex items-center gap-[0.4375rem]">
                     <Stars value={L.seller.rating} size={12} />
                     {L.seller.rating === null ? (
-                      <span className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+                      <span className="font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
                         {t("detail.newSellerNoRatings")}
                       </span>
                     ) : (
                       <>
-                        <span className="wp-num font-wp text-[12px] text-wp-fg-muted">
+                        <span className="wp-num font-wp text-[0.75rem] text-wp-fg-muted">
                           {L.seller.rating.toFixed(2)}
                         </span>
-                        <span className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+                        <span className="font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
                           · <span className="wp-num">{fmt(L.seller.sales)}</span> {t("detail.salesSuffix")}
                         </span>
                       </>
@@ -259,9 +259,9 @@ export function ListingDetail({ id }: { id: number }) {
 
 function DetailSkeleton() {
   return (
-    <div className="flex-1 p-[26px]">
+    <div className="flex-1 p-[1.625rem]">
       <div className="grid gap-4 lg:grid-cols-[1.05fr_.95fr]">
-        <Skeleton className="h-[420px] rounded-wp" />
+        <Skeleton className="h-[26.25rem] rounded-wp" />
         <div className="flex flex-col gap-3">
           <Skeleton className="h-10 w-2/3 rounded-wp-sm" />
           <Skeleton className="h-24 rounded-wp" />

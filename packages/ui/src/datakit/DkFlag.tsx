@@ -28,7 +28,7 @@ export function DkPin({ on, onClick, size = 14 }: { on?: boolean; onClick?: () =
         onClick?.()
       }}
       className={cn(
-        "inline-grid h-[26px] w-[26px] cursor-pointer place-items-center border-0 bg-transparent transition-[color,transform] duration-[140ms] hover:scale-[1.12] hover:text-warn focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-line",
+        "inline-grid h-[1.625rem] w-[1.625rem] cursor-pointer place-items-center border-0 bg-transparent transition-[color,transform] duration-[140ms] hover:scale-[1.12] hover:text-warn focus-visible:outline focus-visible:outline-2 focus-visible:outline-accent-line",
         on ? "text-warn [&_svg]:fill-warn" : "text-txt-dim",
       )}
     >

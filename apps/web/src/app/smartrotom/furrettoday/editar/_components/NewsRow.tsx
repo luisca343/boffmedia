@@ -51,14 +51,14 @@ export function NewsRow({
       >
         <div className="mb-1.5 flex items-center justify-between gap-2">
           <Pill tone={status.tone}>{t(status.labelKey)}</Pill>
-          <Meta className="text-[11px] text-ft-ink/70">{article.datelineShort}</Meta>
+          <Meta className="text-[0.6875rem] text-ft-ink/70">{article.datelineShort}</Meta>
         </div>
 
         <h4 className="font-ft-display line-clamp-2 text-lg leading-[1.05] text-ft-ink">
           {article.title}
         </h4>
 
-        <Meta className="mt-1 text-[11px] text-ft-ink/70">
+        <Meta className="mt-1 text-[0.6875rem] text-ft-ink/70">
           {article.author ? `${article.author} · ` : ""}
           {article.readTime}
         </Meta>
@@ -85,7 +85,7 @@ export function NewsRow({
             type="button"
             onClick={onRequestDelete}
             aria-label={t("deleteAria", { title: article.title })}
-            className="font-ft-ui ml-auto rounded-ft-pill border border-ft-ink/30 px-2.5 py-1 text-[11px] font-bold text-ft-ink hover:border-ft-ink hover:bg-ft-ink/5"
+            className="font-ft-ui ml-auto rounded-ft-pill border border-ft-ink/30 px-2.5 py-1 text-[0.6875rem] font-bold text-ft-ink hover:border-ft-ink hover:bg-ft-ink/5"
           >
             🗑
           </button>

@@ -137,14 +137,14 @@ function Toolbar({
   return (
     <div className="flex flex-wrap items-center gap-x-3 gap-y-2.5 p-3.5 border border-solid border-line bg-panel">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="min-w-[180px]">
+        <div className="min-w-[11.25rem]">
           <Select
             value={selectedGame}
             onChange={onGame}
             options={[{ value: "", label: t("chrome.selectGame") }, ...FVX_GAMES]}
           />
         </div>
-        <div className="min-w-[170px]">
+        <div className="min-w-[10.625rem]">
           <Select
             value=""
             onChange={onQuickApply}
@@ -157,7 +157,7 @@ function Toolbar({
         <div className="flex items-stretch">
           <Input
             id="rz-seed"
-            className="w-[130px] font-mono text-[12px]"
+            className="w-[8.125rem] font-mono text-[0.75rem]"
             placeholder={t("chrome.seedPlaceholder")}
             value={seed}
             onChange={(e) => onSeed(e.currentTarget.value)}
@@ -173,7 +173,7 @@ function Toolbar({
         </div>
       </div>
 
-      <div id="rz-search-box" className="relative flex-1 min-w-[200px]">
+      <div id="rz-search-box" className="relative flex-1 min-w-[12.5rem]">
         <SearchInput
           value={ui.query}
           onChange={ui.setQuery}
@@ -191,7 +191,7 @@ function Toolbar({
         <Button variant="default" size="sm" icon="sliders" onClick={() => ui.setSummaryOpen(true)}>
           {t("chrome.summary")}
           {count > 0 && (
-            <span className="grid place-items-center min-w-[18px] h-4 px-1 bg-accent text-accent-ink font-mono text-[9.5px] font-bold">
+            <span className="grid place-items-center min-w-[1.125rem] h-4 px-1 bg-accent text-accent-ink font-mono text-[0.59375rem] font-bold">
               {count}
             </span>
           )}
@@ -326,7 +326,7 @@ function EditorShell() {
           above this section, so the toolbar + tab bar pin below them as one
           sticky unit. */}
       <div className="[--rz-chrome-top:calc(var(--nav-h)_+_49px)] md:[--rz-chrome-top:calc(var(--nav-h)_+_55px)]">
-        <div className="sticky top-[var(--rz-chrome-top)] z-40 mb-[18px]">
+        <div className="sticky top-[var(--rz-chrome-top)] z-40 mb-[1.125rem]">
           <Toolbar
             selectedGame={selectedGame}
             onGame={setSelectedGame}
@@ -363,12 +363,12 @@ function EditorShell() {
         }
       >
         <div className="grid gap-3.5">
-          <span className="inline-flex items-center gap-1.5 self-start py-1.5 px-2.5 border border-solid border-accent-line bg-accent-soft text-accent font-mono text-[11px] font-semibold">
+          <span className="inline-flex items-center gap-1.5 self-start py-1.5 px-2.5 border border-solid border-accent-line bg-accent-soft text-accent font-mono text-[0.6875rem] font-semibold">
             <Icon name="check" size={12} />
             {t("chrome.settingsChanged", { count: totalChanged(values) })}
           </span>
           <label className="grid gap-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-txt-muted">
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-muted">
               {t("chrome.presetNameLabel")}
             </span>
             <Input
@@ -378,7 +378,7 @@ function EditorShell() {
             />
           </label>
           <label className="grid gap-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-txt-muted">
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-muted">
               {t("chrome.presetDescLabel")}
             </span>
             <Input
@@ -388,7 +388,7 @@ function EditorShell() {
             />
           </label>
           <label className="grid gap-1.5">
-            <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-txt-muted">
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.1em] text-txt-muted">
               {t("chrome.gameScope")}
             </span>
             <Select

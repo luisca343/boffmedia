@@ -76,7 +76,7 @@ export function BundledWorldsEditor({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-[12px] text-txt-dim">{t("worlds.help")}</p>
+      <p className="text-[0.75rem] text-txt-dim">{t("worlds.help")}</p>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="flex-1">
@@ -88,7 +88,7 @@ export function BundledWorldsEditor({
               disabled={uploading}
             />
             {folderExists && (
-              <p className="mt-1 text-[11px] text-bad">{t("worlds.duplicateFolder")}</p>
+              <p className="mt-1 text-[0.6875rem] text-bad">{t("worlds.duplicateFolder")}</p>
             )}
           </Field>
         </div>
@@ -122,8 +122,8 @@ export function BundledWorldsEditor({
             >
               <Icon name="folder" size={16} className="shrink-0 text-txt-dim" />
               <div className="min-w-0 flex-1">
-                <div className="font-mono text-[12px] font-semibold text-txt">{world.folder}</div>
-                <div className="font-mono text-[11px] text-txt-dim">
+                <div className="font-mono text-[0.75rem] font-semibold text-txt">{world.folder}</div>
+                <div className="font-mono text-[0.6875rem] text-txt-dim">
                   {Math.max(1, Math.round(world.sizeBytes / 1024 / 1024))} MB
                 </div>
               </div>
@@ -141,7 +141,7 @@ export function BundledWorldsEditor({
       )}
 
       {value.length === 0 && (
-        <p className="text-[12px] text-txt-muted">{t("worlds.none")}</p>
+        <p className="text-[0.75rem] text-txt-muted">{t("worlds.none")}</p>
       )}
     </div>
   )

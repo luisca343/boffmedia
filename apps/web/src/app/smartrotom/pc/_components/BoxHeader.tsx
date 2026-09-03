@@ -137,7 +137,7 @@ export function BoxHeader({
       </Button>
 
       <span
-        className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-[9px]"
+        className="flex h-[2.125rem] w-[2.125rem] flex-none items-center justify-center rounded-[9px]"
         style={{
           background: `linear-gradient(160deg, ${accent}44, ${accent}15)`,
           border: `1px solid ${accent}66`,
@@ -171,12 +171,12 @@ export function BoxHeader({
             title={t("common.save")}
             className="flex max-w-full cursor-text items-center gap-2 text-left"
           >
-            <h3 className="truncate font-pc-display text-[17px] font-bold tracking-[.01em] text-pc-fg">
+            <h3 className="truncate font-pc-display text-[1.0625rem] font-bold tracking-[.01em] text-pc-fg">
               {name}
             </h3>
             {secondary && (
               <Chip
-                className="flex-none text-[10px] text-pc-green"
+                className="flex-none text-[0.625rem] text-pc-green"
                 style={{ borderColor: "rgb(var(--pc-green))" }}
               >
                 2ª
@@ -186,18 +186,18 @@ export function BoxHeader({
         )}
 
         <div className="mt-0.5 flex items-center gap-2">
-          <span className="font-pc-mono text-[11.5px] text-pc-fg-subtle">{count}/30</span>
+          <span className="font-pc-mono text-[0.71875rem] text-pc-fg-subtle">{count}/30</span>
           <Bar
             pct={(count / POKEMON_PER_BOX) * 100}
             tone={fillTone(count)}
             height={4}
-            className="w-full max-w-[110px]"
+            className="w-full max-w-[6.875rem]"
           />
         </div>
       </div>
 
       {isRunning && progress && (
-        <span className="flex-none font-pc-mono text-[11px] text-pc-accent">
+        <span className="flex-none font-pc-mono text-[0.6875rem] text-pc-accent">
           {progress.done}/{progress.total}
         </span>
       )}
@@ -220,9 +220,9 @@ export function BoxHeader({
         {menu && (
           <div
             role="menu"
-            className="pc-glass absolute right-0 top-[42px] z-30 w-[210px] animate-pc-slide-up rounded-xl border-pc-line-strong p-[7px] shadow-[0_24px_60px_-20px_rgb(0_0_0_/_.8)] motion-reduce:animate-none"
+            className="pc-glass absolute right-0 top-[2.625rem] z-30 w-[13.125rem] animate-pc-slide-up rounded-xl border-pc-line-strong p-[0.4375rem] shadow-[0_24px_60px_-20px_rgb(0_0_0_/_.8)] motion-reduce:animate-none"
           >
-            <div className="px-2 pb-1.5 pt-1 text-[10px] font-bold uppercase tracking-[.05em] text-pc-fg-subtle">
+            <div className="px-2 pb-1.5 pt-1 text-[0.625rem] font-bold uppercase tracking-[.05em] text-pc-fg-subtle">
               {t("organize.by")}
             </div>
             {ORGANIZE.map(({ mode, icon }) => (

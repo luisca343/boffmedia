@@ -24,9 +24,9 @@ export function CollectorStrip() {
           title={t("title")}
           number="03"
         />
-        <div className="mt-7 flex gap-[18px] overflow-hidden pb-3">
+        <div className="mt-7 flex gap-[1.125rem] overflow-hidden pb-3">
           {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="h-[280px] w-[220px] shrink-0" />
+            <Skeleton key={i} className="h-[17.5rem] w-[13.75rem] shrink-0" />
           ))}
         </div>
       </section>
@@ -43,13 +43,13 @@ export function CollectorStrip() {
         number="03"
         hint={t("hint")}
       />
-      <div className="ft-scroll mt-7 grid grid-flow-col auto-cols-[minmax(220px,1fr)] gap-[18px] overflow-x-auto pb-3">
+      <div className="ft-scroll mt-7 grid grid-flow-col auto-cols-[minmax(220px,1fr)] gap-[1.125rem] overflow-x-auto pb-3">
         {issues.map((iss) => {
           const accent = accentFor(String(iss.issue));
           return (
             <Card key={iss.issue} lift className="overflow-hidden">
               <div
-                className="border-ft relative flex h-[220px] items-center justify-center border-x-0 border-t-0 border-b-ft-ink"
+                className="border-ft relative flex h-[13.75rem] items-center justify-center border-x-0 border-t-0 border-b-ft-ink"
                 style={{
                   background: ACCENT_HEX[accent],
                   backgroundImage: "radial-gradient(#0b0b0f 1.4px, transparent 1.6px)",
@@ -62,8 +62,8 @@ export function CollectorStrip() {
                 </Pill>
               </div>
               <div className="p-3.5">
-                <div className="font-ft-display text-[22px] leading-none">{iss.headline}</div>
-                <div className="font-ft-ui mt-1 text-[13px] font-medium uppercase tracking-[0.04em] text-ft-ink/70">
+                <div className="font-ft-display text-[1.375rem] leading-none">{iss.headline}</div>
+                <div className="font-ft-ui mt-1 text-[0.8125rem] font-medium uppercase tracking-[0.04em] text-ft-ink/70">
                   {t("articles", { count: iss.articles })}
                 </div>
               </div>

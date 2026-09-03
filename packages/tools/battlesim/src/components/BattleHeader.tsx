@@ -45,10 +45,10 @@ interface BattleHeaderProps {
 function MiniScore({ score, foe, right }: { score: BSXScore; foe?: boolean; right?: boolean }) {
   const t = useToolT(BATTLESIM_NS);
   return (
-    <span className={cn('flex items-center gap-[6px]', right && 'flex-row-reverse')} title={score.name}>
-      <b className={cn('grid h-7 w-7 flex-none place-items-center border border-solid font-display text-[11px] font-extrabold leading-none', foe ? 'border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad' : 'border-accent-line bg-accent-soft text-accent-bright')}>{score.av}</b>
+    <span className={cn('flex items-center gap-[0.375rem]', right && 'flex-row-reverse')} title={score.name}>
+      <b className={cn('grid h-7 w-7 flex-none place-items-center border border-solid font-display text-[0.6875rem] font-extrabold leading-none', foe ? 'border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad' : 'border-accent-line bg-accent-soft text-accent-bright')}>{score.av}</b>
       <span className="flex gap-[3px]">
-        {score.team.map((m, i) => <i key={i} aria-hidden className={cn('h-[6px] w-[6px] [clip-path:polygon(50%_0,100%_50%,50%_100%,0_50%)]', m.fnt ? 'bg-line-2' : (m.hp ?? 100) < 35 ? 'bg-warn' : 'bg-ok')} />)}
+        {score.team.map((m, i) => <i key={i} aria-hidden className={cn('h-[0.375rem] w-[0.375rem] [clip-path:polygon(50%_0,100%_50%,50%_100%,0_50%)]', m.fnt ? 'bg-line-2' : (m.hp ?? 100) < 35 ? 'bg-warn' : 'bg-ok')} />)}
       </span>
       <span className="sr-only">{foe ? t('battle.foe') : t('battle.you')} {score.name}: {t('battle.score.alive', { alive: score.alive, total: score.total })}</span>
     </span>
@@ -128,19 +128,19 @@ export function BattleHeader({
   return (
     <header
       aria-label={t('header.aria')}
-      className="flex min-h-[var(--tool-bar-h,58px)] shrink-0 items-center gap-2 border-b border-solid border-line bg-panel px-2 sm:gap-3 sm:px-3"
+      className="flex min-h-[var(--tool-bar-h,3.625rem)] shrink-0 items-center gap-2 border-b border-solid border-line bg-panel px-2 sm:gap-3 sm:px-3"
     >
       <DkBack onClick={onBack} label={t('battle.header.back')} />
       <span
         style={{ ['--tyc']: meta.tone } as CSSProperties}
-        className="cut cut-edge-slant [--cut:3px] flex-none border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--tyc)_45%,transparent)] bg-[color-mix(in_srgb,var(--tyc)_14%,transparent)] px-2 py-1 font-mono text-[10px] font-bold uppercase leading-none tracking-[0.12em] text-[var(--tyc)]"
+        className="cut cut-edge-slant [--cut:3px] flex-none border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--tyc)_45%,transparent)] bg-[color-mix(in_srgb,var(--tyc)_14%,transparent)] px-2 py-1 font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.12em] text-[var(--tyc)]"
       >
         {t(`header.modes.${meta.labelKey}`)}
       </span>
       {desktop && (formatLabel || roomLabel) && (
         <span className="flex min-w-0 items-center gap-2">
-          {formatLabel && <span className="truncate font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{formatLabel}</span>}
-          {roomLabel && <span className="max-w-[14ch] truncate border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[10px] leading-none text-txt-muted" title={roomLabel}>{roomLabel}</span>}
+          {formatLabel && <span className="truncate font-mono text-[0.625rem] uppercase tracking-[0.06em] text-txt-dim">{formatLabel}</span>}
+          {roomLabel && <span className="max-w-[14ch] truncate border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[0.625rem] leading-none text-txt-muted" title={roomLabel}>{roomLabel}</span>}
         </span>
       )}
 
@@ -149,7 +149,7 @@ export function BattleHeader({
       <div className="flex min-w-0 items-center gap-2 sm:gap-3">
         {you && (!desktop ? <MiniScore score={you} /> : <BxScore name={you.name} av={you.av} team={you.team} tag={t('battle.you')} />)}
         {timerYou != null && <BxRing sec={timerYou} max={timerMax} size={mobile ? 30 : 36} label={t('battle.header.timerYou', { sec: timerYou })} />}
-        <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--line-2)] flex-none border border-solid border-line-2 bg-base px-2 py-[6px] font-mono text-[11px] font-bold uppercase leading-none tracking-[0.08em] text-txt" aria-label={t('battle.turn', { turn })}>
+        <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--line-2)] flex-none border border-solid border-line-2 bg-base px-2 py-[0.375rem] font-mono text-[0.6875rem] font-bold uppercase leading-none tracking-[0.08em] text-txt" aria-label={t('battle.turn', { turn })}>
           {mobile ? t('battle.turnShort', { turn }) : t('battle.turn', { turn })}
         </span>
         {timerFoe != null && <BxRing sec={timerFoe} max={timerMax} size={mobile ? 30 : 36} label={t('battle.header.timerFoe', { sec: timerFoe })} />}
@@ -160,7 +160,7 @@ export function BattleHeader({
 
       <div className="flex flex-none items-center gap-1 sm:gap-2">
         {spectatorCount != null && spectatorCount > 0 && !mobile && (
-          <span className="inline-flex items-center gap-1 whitespace-nowrap border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[10px] leading-none text-txt-muted" title={t('battle.header.spectators', { count: spectatorCount })}>
+          <span className="inline-flex items-center gap-1 whitespace-nowrap border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[0.625rem] leading-none text-txt-muted" title={t('battle.header.spectators', { count: spectatorCount })}>
             <Icon name="eye" size={12} />{spectatorCount}
           </span>
         )}
@@ -168,7 +168,7 @@ export function BattleHeader({
           <span className="relative">
             <IconButton name="list" label={t('battle.header.openLog')} variant={railOpen ? 'default' : 'ghost'} size="sm" aria-pressed={railOpen} onClick={onToggleRail} />
             {railUnread > 0 && !railOpen && (
-              <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center bg-accent px-1 font-mono text-[9px] font-bold leading-none text-accent-ink" aria-label={t('battle.rail.unread', { count: railUnread })}>{railUnread}</span>
+              <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center bg-accent px-1 font-mono text-[0.5625rem] font-bold leading-none text-accent-ink" aria-label={t('battle.rail.unread', { count: railUnread })}>{railUnread}</span>
             )}
           </span>
         )}

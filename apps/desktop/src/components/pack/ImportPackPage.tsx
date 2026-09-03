@@ -132,7 +132,7 @@ export function ImportPackPage({
         <Button size="sm" icon="upload" loading={fileBusy} onClick={() => void importFromFile()}>
           {t("fileButton")}
         </Button>
-        <div className="w-full max-w-[440px]">
+        <div className="w-full max-w-[27.5rem]">
           <Field label={t("linkLabel")} hint={t("linkHint")}>
             <div className="flex gap-2">
               <Input
@@ -176,7 +176,7 @@ export function ImportPackPage({
       />
 
       {progress && (
-        <span className="flex shrink-0 items-center gap-2 font-mono text-[11px] text-txt-dim">
+        <span className="flex shrink-0 items-center gap-2 font-mono text-[0.6875rem] text-txt-dim">
           <Spinner size={12} /> {progress}
         </span>
       )}

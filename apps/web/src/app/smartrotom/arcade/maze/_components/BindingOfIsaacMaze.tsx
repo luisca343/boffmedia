@@ -126,11 +126,11 @@ export default function BindingOfIsaacMaze() {
       />
 
       <GameStage accent="violet">
-        <div className="grid items-start gap-4 lg:grid-cols-[1fr_260px] lg:gap-5">
-          <Panel tone="deep" innerClassName="p-4 md:p-[18px]">
+        <div className="grid items-start gap-4 lg:grid-cols-[1fr_16.25rem] lg:gap-5">
+          <Panel tone="deep" innerClassName="p-4 md:p-[1.125rem]">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5">
-              <span className="font-ar-display text-[11px] text-ar-violet-2">▸ {t("maze.dungeon")}</span>
-              <span className="font-ar-mono text-[11px] uppercase text-ar-ink-dim">
+              <span className="font-ar-display text-[0.6875rem] text-ar-violet-2">▸ {t("maze.dungeon")}</span>
+              <span className="font-ar-mono text-[0.6875rem] uppercase text-ar-ink-dim">
                 {t("maze.sizeDepth", { size, depth })}
               </span>
               <Tag tone="magenta">{t("maze.bossTag")}</Tag>
@@ -163,10 +163,10 @@ export default function BindingOfIsaacMaze() {
 
             {showDebug && (
               <div className="mt-4">
-                <div className="mb-2 font-ar-display text-[9px] uppercase text-ar-cyan">
+                <div className="mb-2 font-ar-display text-[0.5625rem] uppercase text-ar-cyan">
                   {t("maze.debugView")}
                 </div>
-                <pre className="ar-scroll m-0 overflow-x-auto rounded-lg border border-white/[.08] bg-black/50 p-3.5 font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
+                <pre className="ar-scroll m-0 overflow-x-auto rounded-lg border border-white/[.08] bg-black/50 p-3.5 font-ar-mono text-[0.6875rem] leading-relaxed text-ar-ink-dim">
                   {maze.map((row) => row.map((room) => room[0].toUpperCase()).join(" ")).join("\n")}
                 </pre>
               </div>
@@ -205,10 +205,10 @@ export default function BindingOfIsaacMaze() {
             </div>
 
             <Panel tone="void" tight>
-              <div className="mb-2.5 font-ar-display text-[9px] uppercase text-ar-magenta-2">
+              <div className="mb-2.5 font-ar-display text-[0.5625rem] uppercase text-ar-magenta-2">
                 {t("maze.bossDistance")}
               </div>
-              <div className="font-ar-mono text-[22px] font-bold tabular-nums text-ar-ink">
+              <div className="font-ar-mono text-[1.375rem] font-bold tabular-nums text-ar-ink">
                 {startToBossDistance ?? "—"}
               </div>
               <ul className="m-0 mt-3 flex list-none flex-col gap-2 p-0">
@@ -217,13 +217,13 @@ export default function BindingOfIsaacMaze() {
                     <span
                       aria-hidden
                       className={cn(
-                        "grid h-[22px] w-[22px] shrink-0 place-items-center rounded-md border",
+                        "grid h-[1.375rem] w-[1.375rem] shrink-0 place-items-center rounded-md border",
                         ROOM_SKIN[room],
                       )}
                     >
                       <RoomIcon room={room} />
                     </span>
-                    <span className="font-ar-mono text-[11px] text-ar-ink-dim">
+                    <span className="font-ar-mono text-[0.6875rem] text-ar-ink-dim">
                       {t(ROOM_LABEL_KEY[room])}
                     </span>
                   </li>

@@ -26,7 +26,7 @@ function MewSetPiece({ item, onNav }: { item: MewRec; onNav: (cat: string, id: s
       style={{ "--h": select.find(item.id)?.rec ? "44" : "230" } as React.CSSProperties}
     >
       <MewTile cat="items" rec={item} size={72} frame="slot" />
-      <span className="text-[12px]/[1.2] font-semibold max-w-[90px] text-[color:var(--mwp-ink)]">{item.name}</span>
+      <span className="text-[0.75rem]/[1.2] font-semibold max-w-[5.625rem] text-[color:var(--mwp-ink)]">{item.name}</span>
       <div className="flex gap-1 flex-wrap justify-center">
         {item.kind && <MewKind kind={item.kind} />}
         {item.rarity && <MewRarity rarity={item.rarity} />}
@@ -53,7 +53,7 @@ export function SetView({ rec, onNav }: ViewProps) {
       <MewSections>
         {members.length > 0 && (
           <MewPanel title={t("panel.setMembers")} icon="layers" count={members.length} span="full">
-            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(100px,1fr))]">
+            <div className="grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(6.25rem,1fr))]">
               {members.map((member) => {
                 const item = select.get("items", member.id)
                 return item ? <MewSetPiece key={member.id} item={item} onNav={onNav} /> : null
@@ -68,7 +68,7 @@ export function SetView({ rec, onNav }: ViewProps) {
         )}
         {passN > 0 && rec.passives && (
           <MewPanel title={t("panel.passivesGranted")} icon="shield" count={passN}>
-            {statModRows.length === 0 && piecesLabel && <div className="text-[13px] font-semibold mb-2">{piecesLabel}</div>}
+            {statModRows.length === 0 && piecesLabel && <div className="text-[0.8125rem] font-semibold mb-2">{piecesLabel}</div>}
             <MewEffects map={rec.passives as Record<string, unknown>} onNav={onNav} />
           </MewPanel>
         )}

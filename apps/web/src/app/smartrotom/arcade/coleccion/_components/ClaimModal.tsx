@@ -54,7 +54,7 @@ function ClaimRow({
     >
       <span
         aria-hidden
-        className="grid h-[18px] w-[18px] shrink-0 place-items-center rounded border-[1.5px] text-[11px] font-black text-[#06031a]"
+        className="grid h-[1.125rem] w-[1.125rem] shrink-0 place-items-center rounded border-[1.5px] text-[0.6875rem] font-black text-[#06031a]"
         style={{
           borderColor: selected ? skin.fg : "rgba(255,255,255,0.2)",
           background: selected ? skin.fg : "transparent",
@@ -74,9 +74,9 @@ function ClaimRow({
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-ar text-[13px] font-semibold text-ar-ink">{name}</span>
+        <span className="block truncate font-ar text-[0.8125rem] font-semibold text-ar-ink">{name}</span>
         <span
-          className="mt-1 block font-ar-display text-[8px] uppercase tracking-[0.12em]"
+          className="mt-1 block font-ar-display text-[0.5rem] uppercase tracking-[0.12em]"
           style={{ color: skin.fg }}
         >
           {t(skin.nameKey)}
@@ -177,12 +177,12 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
           <Tag tone="lime" size="lg">
             <Icon.Shield s={14} /> {t("coleccion.claim.deliveredInGame")}
           </Tag>
-          <p className="rounded-[10px] border border-white/[.07] bg-black/40 p-3 font-ar-mono text-[11px] leading-relaxed text-ar-ink-dim">
+          <p className="rounded-[10px] border border-white/[.07] bg-black/40 p-3 font-ar-mono text-[0.6875rem] leading-relaxed text-ar-ink-dim">
             {t("coleccion.claim.deliveredDescription")}
           </p>
         </div>
       ) : claimable.length === 0 ? (
-        <p className="py-8 text-center font-ar-mono text-[12px] text-ar-ink-muted">
+        <p className="py-8 text-center font-ar-mono text-[0.75rem] text-ar-ink-muted">
           {t("coleccion.claim.noItemsToClaim")}
         </p>
       ) : (
@@ -194,7 +194,7 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
           {!inGame && (
             <p
               role="alert"
-              className="rounded-[10px] border border-ar-amber/35 bg-ar-amber/[.08] p-3 font-ar-mono text-[11px] leading-relaxed text-ar-amber"
+              className="rounded-[10px] border border-ar-amber/35 bg-ar-amber/[.08] p-3 font-ar-mono text-[0.6875rem] leading-relaxed text-ar-amber"
             >
               {t("coleccion.claim.outsideMinecraft")}
             </p>
@@ -203,7 +203,7 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
           {claim.isError && (
             <p
               role="alert"
-              className="rounded-[10px] border border-ar-danger/40 bg-ar-danger/[.08] p-3 font-ar-mono text-[11px] text-ar-danger"
+              className="rounded-[10px] border border-ar-danger/40 bg-ar-danger/[.08] p-3 font-ar-mono text-[0.6875rem] text-ar-danger"
             >
               {userMessageFrom(claim.error, t("coleccion.claim.claimError"))}
             </p>
@@ -211,7 +211,7 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
 
           {pokemon.length > 0 && (
             <section>
-              <h3 className="mb-2 border-b border-white/[.07] pb-1.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-violet-2">
+              <h3 className="mb-2 border-b border-white/[.07] pb-1.5 font-ar-display text-[0.5625rem] uppercase tracking-[0.18em] text-ar-violet-2">
                 {t("coleccion.claim.pokemonSection")}
               </h3>
               <div className="grid gap-2 sm:grid-cols-2">
@@ -230,7 +230,7 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
 
           {regular.length > 0 && (
             <section>
-              <h3 className="mb-2 border-b border-white/[.07] pb-1.5 font-ar-display text-[9px] uppercase tracking-[0.18em] text-ar-amber">
+              <h3 className="mb-2 border-b border-white/[.07] pb-1.5 font-ar-display text-[0.5625rem] uppercase tracking-[0.18em] text-ar-amber">
                 {t("coleccion.claim.minecraftSection")}
               </h3>
               <div className="grid gap-2 sm:grid-cols-2">

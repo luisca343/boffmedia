@@ -28,7 +28,7 @@ export function ComposeInline() {
           <button
             type="button"
             onClick={() => openCompose("text")}
-            className="w-full cursor-text py-2 text-left text-[18px] text-rk-fg-subtle"
+            className="w-full cursor-text py-2 text-left text-[1.125rem] text-rk-fg-subtle"
           >
             {t("compose.inlinePlaceholder", { name: me.displayName || me.username })}
           </button>
@@ -37,7 +37,7 @@ export function ComposeInline() {
               type="button"
               onClick={() => openCompose("media")}
               aria-label={t("compose.attachImageAriaLabel")}
-              className="grid h-[34px] w-[34px] place-items-center rounded-full text-rk-accent transition-colors hover:bg-rk-accent/12"
+              className="grid h-[2.125rem] w-[2.125rem] place-items-center rounded-full text-rk-accent transition-colors hover:bg-rk-accent/12"
             >
               <Icon name="image" size={18} />
             </button>

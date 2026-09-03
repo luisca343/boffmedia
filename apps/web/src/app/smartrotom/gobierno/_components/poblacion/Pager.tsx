@@ -25,7 +25,7 @@ export function Pager({
 
   return (
     <div className="mt-4 flex items-center justify-between gap-3">
-      <span className="font-gt-mono text-[10.5px] uppercase tracking-[.1em] text-gt-ink-400">{summary}</span>
+      <span className="font-gt-mono text-[0.65625rem] uppercase tracking-[.1em] text-gt-ink-400">{summary}</span>
       <div className="flex items-center gap-1.5">
         <Button
           tone="ghost"

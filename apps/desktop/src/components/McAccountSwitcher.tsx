@@ -141,10 +141,10 @@ export function McAccountSwitcher() {
               <li className="flex items-center gap-2 border-b border-line px-3 py-2">
                 <PlayerHead skinUrl={account.skinUrl} username={account.username} size={24} />
                 <div className="min-w-0 flex-1">
-                  <p className="block truncate text-[12px] font-semibold text-txt">
+                  <p className="block truncate text-[0.75rem] font-semibold text-txt">
                     {account.username}
                   </p>
-                  <p className="block truncate font-mono text-[10px] text-txt-dim">{t("title")}</p>
+                  <p className="block truncate font-mono text-[0.625rem] text-txt-dim">{t("title")}</p>
                 </div>
               </li>
 
@@ -163,7 +163,7 @@ export function McAccountSwitcher() {
                     className="flex min-w-0 flex-1 items-center gap-2 text-left disabled:opacity-50"
                   >
                     <PlayerHead skinUrl={entry.skinUrl} username={entry.username} size={24} />
-                    <span className="min-w-0 truncate text-[12px] text-txt">{entry.username}</span>
+                    <span className="min-w-0 truncate text-[0.75rem] text-txt">{entry.username}</span>
                   </button>
                   <button
                     type="button"
@@ -188,7 +188,7 @@ export function McAccountSwitcher() {
                     setOpen(false)
                     void signIn()
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] text-txt-dim hover:bg-panel-2 hover:text-txt disabled:opacity-50"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[0.75rem] text-txt-dim hover:bg-panel-2 hover:text-txt disabled:opacity-50"
                 >
                   <Icon name="plus" size={13} /> {t("addAccount")}
                 </button>
@@ -202,7 +202,7 @@ export function McAccountSwitcher() {
                     setOpen(false)
                     void removeAccount(account.uuid)
                   }}
-                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[12px] text-txt-dim hover:bg-panel-2 hover:text-bad disabled:opacity-50"
+                  className="flex w-full items-center gap-2 px-3 py-2 text-left text-[0.75rem] text-txt-dim hover:bg-panel-2 hover:text-bad disabled:opacity-50"
                 >
                   <Icon name="logout" size={13} /> {t("unlink")}
                 </button>

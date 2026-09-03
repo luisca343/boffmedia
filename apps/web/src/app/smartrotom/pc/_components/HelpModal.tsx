@@ -24,11 +24,11 @@ export function HelpModal({ onClose }: HelpModalProps) {
   const t = useTranslations("pc")
   return (
     <Modal onClose={onClose} title={t("help.title")} icon="keyboard" width={460}>
-      <div className="flex flex-col gap-[7px] p-4">
+      <div className="flex flex-col gap-[0.4375rem] p-4">
         {SHORTCUT_KEYS.map(([k, key]) => (
           <div key={key} className="flex items-center justify-between px-1 py-1.5">
-            <span className="text-[13px] text-pc-fg-muted">{t(key)}</span>
-            <Chip className="font-pc-mono text-[11px]">{k}</Chip>
+            <span className="text-[0.8125rem] text-pc-fg-muted">{t(key)}</span>
+            <Chip className="font-pc-mono text-[0.6875rem]">{k}</Chip>
           </div>
         ))}
       </div>

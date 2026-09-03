@@ -189,16 +189,16 @@ export function Menu({
             onKeyDown={onItemKey}
             style={{ boxShadow: POP_SHADOW, position: "fixed", top: coords.top, bottom: coords.bottom, left: coords.left, right: coords.right }}
             className={cn(
-              "z-[500] min-w-[216px] flex flex-col p-[6px] bg-panel border border-solid border-line-2",
+              "z-[500] min-w-[13.5rem] flex flex-col p-[0.375rem] bg-panel border border-solid border-line-2",
               "cut-tag cut-tag-edge [--cut-tag:9px] [--cut-line:var(--line-2)]",
               "animate-[bm-menu-in_0.12s_ease-out] motion-reduce:animate-none",
             )}
           >
           {items.map((it, i) =>
             it.sep ? (
-              <span key={"s" + i} role="separator" className="h-px my-[5px] mx-1 bg-line" />
+              <span key={"s" + i} role="separator" className="h-px my-[0.3125rem] mx-1 bg-line" />
             ) : it.header ? (
-              <span key={"h" + i} className="pt-2 px-[11px] pb-1 font-mono text-[9.5px] font-bold leading-none uppercase tracking-[0.14em] text-txt-dim">
+              <span key={"h" + i} className="pt-2 px-[0.6875rem] pb-1 font-mono text-[0.59375rem] font-bold leading-none uppercase tracking-[0.14em] text-txt-dim">
                 {it.header}
               </span>
             ) : it.node ? (
@@ -218,8 +218,8 @@ export function Menu({
                 onMouseEnter={() => setActive(i)}
                 onClick={() => choose(it)}
                 className={cn(
-                  "group/mi flex items-center gap-[11px] w-full text-left py-[9px] px-[11px] border-0 bg-transparent cursor-pointer",
-                  "font-body text-[14px] font-medium leading-[1.2] transition-[background,color] duration-[140ms] outline-none",
+                  "group/mi flex items-center gap-[0.6875rem] w-full text-left py-[0.5625rem] px-[0.6875rem] border-0 bg-transparent cursor-pointer",
+                  "font-body text-[0.875rem] font-medium leading-[1.2] transition-[background,color] duration-[140ms] outline-none",
                   "disabled:opacity-40 disabled:cursor-not-allowed",
                   it.danger
                     ? "text-bad hover:bg-bad-soft focus-visible:bg-bad-soft"

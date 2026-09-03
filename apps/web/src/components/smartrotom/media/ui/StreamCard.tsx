@@ -40,7 +40,7 @@ export function StreamCard({ s, className }: { s: StreamCardData; className?: st
         )}
         <div className="absolute inset-0 z-[1] bg-gradient-to-t from-black/65 to-transparent to-50%" />
         <LivePill className="absolute left-2.5 top-2.5 shadow-[0_4px_14px_rgb(var(--mw-accent)/.35)]" />
-        <span className="absolute bottom-2.5 left-2.5 z-[2] inline-flex items-center gap-1.5 rounded-mw-sm border border-mw-line-strong bg-black/75 px-2 py-[3px] font-mono text-[11px] font-bold text-white">
+        <span className="absolute bottom-2.5 left-2.5 z-[2] inline-flex items-center gap-1.5 rounded-mw-sm border border-mw-line-strong bg-black/75 px-2 py-[3px] font-mono text-[0.6875rem] font-bold text-white">
           <PulseDot /> {number(s.viewers)}
         </span>
       </div>

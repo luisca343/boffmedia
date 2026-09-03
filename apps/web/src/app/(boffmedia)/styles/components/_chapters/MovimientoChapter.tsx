@@ -12,15 +12,15 @@ function FxPlayground() {
   const ref = React.useRef<HTMLDivElement>(null)
   useSignalFX(ref, 3)
   return (
-    <div ref={ref} className="flex gap-[22px] items-center flex-wrap w-full p-7 border border-dashed border-line-2">
+    <div ref={ref} className="flex gap-[1.375rem] items-center flex-wrap w-full p-7 border border-dashed border-line-2">
       <div
         data-glare
         data-tilt-fx
-        className={cn("relative w-[250px] max-w-full p-5 bg-panel border border-solid border-line cut-corner cut-corner-edge transition-transform duration-[140ms] will-change-transform", GLARE)}
+        className={cn("relative w-[15.625rem] max-w-full p-5 bg-panel border border-solid border-line cut-corner cut-corner-edge transition-transform duration-[140ms] will-change-transform", GLARE)}
       >
-        <span className="font-mono text-[11px] text-txt-dim">01</span>
-        <h4 className={cn(HEAD4, "text-[18px] mt-2")}>Tarjeta táctil</h4>
-        <p className="mt-1 text-[13px] text-txt-muted">Tilt 3D + glare siguiendo el puntero.</p>
+        <span className="font-mono text-[0.6875rem] text-txt-dim">01</span>
+        <h4 className={cn(HEAD4, "text-[1.125rem] mt-2")}>Tarjeta táctil</h4>
+        <p className="mt-1 text-[0.8125rem] text-txt-muted">Tilt 3D + glare siguiendo el puntero.</p>
       </div>
       <Button variant="pri" iconRight="arrow">
         Botón magnético
@@ -57,7 +57,7 @@ export function MovimientoChapter() {
                 </div>
               </Sample>
               <Sample title="Ticker" code="<Ticker items>" col note={<>La tira de titulares de la barra del shell: desplazamiento continuo con separadores en diamante de acento. Cada <code>◆</code> sale del <code>&lt;em&gt;</code> incrustado.</>}>
-                <div className="flex w-full items-center border border-solid border-line bg-panel px-4 py-[10px] font-mono text-[12px] tracking-[0.04em] text-txt-muted">
+                <div className="flex w-full items-center border border-solid border-line bg-panel px-4 py-[0.625rem] font-mono text-[0.75rem] tracking-[0.04em] text-txt-muted">
                   <Ticker items={["Copa Relámpago · inscripción abierta", "Nueva regulación H disponible", "Sorteo: clave de Steam", "Wingull 2 este sábado"]} />
                 </div>
               </Sample>
@@ -70,7 +70,7 @@ export function MovimientoChapter() {
               lead={<>Rótulo gigante en contorno que se desplaza horizontalmente ligado al scroll — marca de sección en Wingull 2 y Comunidad. <code>dir</code> controla el sentido, <code>pos</code> lo ancla arriba o abajo.</>}
             >
               <Sample title="Palabra cinética" code="<Kinetic word dir pos>" col note={<>Haz scroll para verla moverse. El padre necesita <code>position: relative; overflow: hidden</code>.</>}>
-                <div className="relative h-[190px] w-full overflow-hidden border border-dashed border-line-2">
+                <div className="relative h-[11.875rem] w-full overflow-hidden border border-dashed border-line-2">
                   <Kinetic word="Señal" dir={1} pos="top" />
                 </div>
               </Sample>
@@ -83,14 +83,14 @@ export function MovimientoChapter() {
               lead={<><code>CountUp</code> anima cifras al entrar en pantalla respetando prefijos, sufijos y agrupación («12 480», «412+», «03»). <code>Decode</code> «sintoniza» el texto de los kickers con caracteres de interferencia.</>}
             >
               <Sample title="En vivo" code="<CountUp value> · <Decode text>" col note={<>Pulsa reproducir para volver a lanzarlos.</>}>
-                <div key={fxKey} className="flex flex-wrap items-center gap-[34px]">
-                  <span className={cn(DISPLAY, "text-[54px] leading-none")}>
+                <div key={fxKey} className="flex flex-wrap items-center gap-[2.125rem]">
+                  <span className={cn(DISPLAY, "text-[3.375rem] leading-none")}>
                     <CountUp value="12 480" />
                   </span>
-                  <span className={cn(DISPLAY, "text-[54px] leading-none text-accent")}>
+                  <span className={cn(DISPLAY, "text-[3.375rem] leading-none text-accent")}>
                     <CountUp value="412+" />
                   </span>
-                  <span className="font-mono text-[12px]/none font-semibold uppercase tracking-[0.16em] text-accent">
+                  <span className="font-mono text-[0.75rem]/none font-semibold uppercase tracking-[0.16em] text-accent">
                     <Decode text="Comunidad Pixelmon · En vivo" />
                   </span>
                 </div>

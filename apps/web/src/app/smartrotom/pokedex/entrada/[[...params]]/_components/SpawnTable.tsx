@@ -63,15 +63,15 @@ export function SpawnTable({ spawns }: { spawns: SpawnInfo[] }) {
                 {biomas?.map((b) => b.translated).join(", ") || t("spawn_unknown_biome")}
               </div>
               <div className="flex flex-wrap gap-1.5">
-                <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{method}</span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{t("spawnTable.levelRange", { range: levels })}</span>
-                <span className="inline-flex items-center gap-1 text-[11px] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{times.join(", ")}</span>
+                <span className="inline-flex items-center gap-1 text-[0.6875rem] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{method}</span>
+                <span className="inline-flex items-center gap-1 text-[0.6875rem] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{t("spawnTable.levelRange", { range: levels })}</span>
+                <span className="inline-flex items-center gap-1 text-[0.6875rem] text-pk-surface-300 bg-white/[0.04] px-2 py-0.5 rounded">{times.join(", ")}</span>
               </div>
             </div>
 
             <div className="text-right">
-              <div className="font-pk-mono text-[11px] text-pk-surface-500">{spawn.rarity}%</div>
-              <div className="font-pk-display font-semibold text-[13px] uppercase tracking-wider" style={{ color: meta.fg }}>
+              <div className="font-pk-mono text-[0.6875rem] text-pk-surface-500">{spawn.rarity}%</div>
+              <div className="font-pk-display font-semibold text-[0.8125rem] uppercase tracking-wider" style={{ color: meta.fg }}>
                 {t(meta.labelKey)}
               </div>
             </div>

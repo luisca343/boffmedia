@@ -296,7 +296,7 @@ export default function VoltorbFlipGame() {
           // The arcade has no currency endpoint (deferred/arcade.md).
           <span
             aria-label={t("voltorb.coinsAria", { count: totalCoins })}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-ar-amber/35 bg-black/45 px-2.5 py-1.5 font-ar-mono text-[12px] font-bold tabular-nums text-ar-amber"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-ar-amber/35 bg-black/45 px-2.5 py-1.5 font-ar-mono text-[0.75rem] font-bold tabular-nums text-ar-amber"
           >
             <Icon.Coin s={14} />
             {totalCoins}
@@ -307,16 +307,16 @@ export default function VoltorbFlipGame() {
       <div className="ar-scanlines relative bg-[radial-gradient(80%_60%_at_50%_0%,rgb(var(--ar-magenta)/.18),rgb(var(--ar-void))_60%)] p-3.5 md:p-6">
         <div aria-hidden className="ar-horizon opacity-40" />
 
-        <div className="relative z-[2] grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_260px] lg:gap-5">
-          <Panel tone="deep" innerClassName="p-3 md:p-[18px]">
+        <div className="relative z-[2] grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_16.25rem] lg:gap-5">
+          <Panel tone="deep" innerClassName="p-3 md:p-[1.125rem]">
             <div className="mb-4 flex items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5 pt-1">
-              <span className="font-ar-display text-[10px] text-ar-magenta-2">
+              <span className="font-ar-display text-[0.625rem] text-ar-magenta-2">
                 ▸ {t("voltorb.cardsKicker", { count: flippedMultipliers })}
               </span>
-              <span className="hidden font-ar-mono text-[11px] text-ar-ink-dim md:inline">
+              <span className="hidden font-ar-mono text-[0.6875rem] text-ar-ink-dim md:inline">
                 5×5 · {t("voltorb.difficulty", { level: difficulty })}
               </span>
-              <span className="font-ar-display text-[10px] text-ar-cyan">{t("voltorb.bombs", { count: bombs })}</span>
+              <span className="font-ar-display text-[0.625rem] text-ar-cyan">{t("voltorb.bombs", { count: bombs })}</span>
             </div>
 
             <GameGrid
@@ -328,7 +328,7 @@ export default function VoltorbFlipGame() {
               roundScore={roundScore}
             />
 
-            <div className="mt-[18px] flex flex-wrap justify-center gap-2">
+            <div className="mt-[1.125rem] flex flex-wrap justify-center gap-2">
               <Tag tone="cyan">{t("voltorb.cardsFlipped", { count: flippedMultipliers })}</Tag>
               <Tag tone="amber">{t("voltorb.combo", { score: roundScore })}</Tag>
               <Tag tone="magenta">⚡ {t("voltorb.bombCount", { count: bombs })}</Tag>
@@ -375,7 +375,7 @@ export default function VoltorbFlipGame() {
           </div>
         </div>
 
-        <div className="relative z-[2] mt-4 flex min-h-[100px] items-center justify-center">
+        <div className="relative z-[2] mt-4 flex min-h-[6.25rem] items-center justify-center">
           <Messages
             gameOver={gameOver}
             gameWon={gameWon}

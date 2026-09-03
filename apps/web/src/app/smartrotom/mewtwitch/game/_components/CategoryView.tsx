@@ -14,14 +14,14 @@ export function CategoryView({ id }: { id: string }) {
   const totalViewers = (streams.data ?? []).reduce((a, s) => a + s.viewer_count, 0)
 
   return (
-    <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-6 md:px-10">
+    <div className="mx-auto max-w-[102.5rem] px-4 pb-20 pt-6 md:px-10">
       {g && (
-        <div className="mb-3 grid grid-cols-[100px_1fr] items-center gap-7 border-b border-mw-line pb-7">
-          <img src={twitchThumb(g.box_art_url, 200, 270)} alt="" className="w-[100px] rounded-mw-lg" />
+        <div className="mb-3 grid grid-cols-[6.25rem_1fr] items-center gap-7 border-b border-mw-line pb-7">
+          <img src={twitchThumb(g.box_art_url, 200, 270)} alt="" className="w-[6.25rem] rounded-mw-lg" />
           <div>
-            <div className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-mw-accent">{t("game.category")}</div>
-            <h1 className="my-1.5 font-mw-display text-[clamp(28px,4vw,44px)] font-extrabold tracking-[-0.01em]">{g.name}</h1>
-            <div className="text-[13px] text-mw-fg-mute">
+            <div className="font-mono text-[0.6875rem] font-bold uppercase tracking-[0.16em] text-mw-accent">{t("game.category")}</div>
+            <h1 className="my-1.5 font-mw-display text-[clamp(1.75rem,4vw,2.75rem)] font-extrabold tracking-[-0.01em]">{g.name}</h1>
+            <div className="text-[0.8125rem] text-mw-fg-mute">
               <strong className="text-mw-fg">{compactCount(totalViewers)}</strong> {t("game.viewersSuffix")} · {list.length} {t("game.streamsSuffix")}
             </div>
           </div>

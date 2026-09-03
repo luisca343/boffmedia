@@ -60,31 +60,31 @@ const CATEGORICAL = [
 const SCALE: [string, React.ReactNode][] = [
   [
     "Display / Space Grotesk 600 / 26–28px",
-    <span key="a" className="font-sb-display text-[28px] font-semibold tracking-[-0.02em] text-sb-fg">
+    <span key="a" className="font-sb-display text-[1.75rem] font-semibold tracking-[-0.02em] text-sb-fg">
       Cuenta principal
     </span>,
   ],
   [
     "Cifra / Space Grotesk 600 / 26px · tabular",
-    <span key="b" className="font-sb-display text-[26px] font-semibold tabular-nums tracking-[-0.01em] text-sb-fg">
+    <span key="b" className="font-sb-display text-[1.625rem] font-semibold tabular-nums tracking-[-0.01em] text-sb-fg">
       128.400 ¥
     </span>,
   ],
   [
     "Cuerpo / Inter 400 / 13,5–15px",
-    <span key="c" className="max-w-[52ch] text-[14px] text-sb-fg-2">
+    <span key="c" className="max-w-[52ch] text-[0.875rem] text-sb-fg-2">
       Tu saldo se actualiza en cuanto la transferencia sale del banco de la Liga.
     </span>,
   ],
   [
     "Etiqueta / Inter 600 / 12px · versalitas",
-    <span key="d" className="text-[12px] font-semibold uppercase tracking-[0.02em] text-sb-fg-muted">
+    <span key="d" className="text-[0.75rem] font-semibold uppercase tracking-[0.02em] text-sb-fg-muted">
       Concepto del envío
     </span>,
   ],
   [
     "Sobrelínea / Inter 400 / 11px · tracking",
-    <span key="e" className="text-[11px] uppercase tracking-[0.1em] text-sb-fg-subtle">
+    <span key="e" className="text-[0.6875rem] uppercase tracking-[0.1em] text-sb-fg-subtle">
       Últimos 30 días
     </span>,
   ],
@@ -217,13 +217,13 @@ export function SbBasesChapter() {
         }
       >
         <Sample app="sb" title="Escala" code="Inter · Space Grotesk" col>
-          <div className="grid w-full gap-[18px]">
+          <div className="grid w-full gap-[1.125rem]">
             {SCALE.map(([meta, node]) => (
               <div
                 key={meta}
-                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-sb-border pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[240px_1fr] sm:gap-[22px]"
+                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-sb-border pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[15rem_1fr] sm:gap-[1.375rem]"
               >
-                <span className="font-mono text-[11px] font-medium leading-[1.6] text-sb-fg-subtle">{meta}</span>
+                <span className="font-mono text-[0.6875rem] font-medium leading-[1.6] text-sb-fg-subtle">{meta}</span>
                 {node}
               </div>
             ))}
@@ -250,12 +250,12 @@ export function SbBasesChapter() {
               ] as const
             ).map(([title, numeric, tone]) => (
               <div key={numeric} className="rounded-sb-lg border border-sb-border bg-sb-surface p-4 shadow-sb-1">
-                <div className={cn("mb-3 font-mono text-[10px] font-semibold uppercase tracking-[0.14em]", tone)}>
+                <div className={cn("mb-3 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.14em]", tone)}>
                   {title}
                 </div>
                 <div className="grid gap-2">
                   {LEDGER.map(([label, amount]) => (
-                    <div key={label} className="flex items-center justify-between gap-6 text-[13.5px]">
+                    <div key={label} className="flex items-center justify-between gap-6 text-[0.84375rem]">
                       <span className="truncate text-sb-fg-2">{label}</span>
                       <span className={cn("font-sb-display font-semibold text-sb-fg", numeric)}>{amount}</span>
                     </div>
@@ -277,8 +277,8 @@ export function SbBasesChapter() {
             ).map(([feat, desc, sample]) => (
               <div key={feat} className="rounded-sb-lg border border-sb-border bg-sb-surface p-4 shadow-sb-1">
                 <div className={cn(MONO_LABEL, "mb-2 text-sb-fg-subtle")}>{feat}</div>
-                <div className="font-sb-display text-[20px] font-semibold tabular-nums text-sb-fg">{sample}</div>
-                <div className="mt-1 text-[12px] text-sb-fg-muted">{desc}</div>
+                <div className="font-sb-display text-[1.25rem] font-semibold tabular-nums text-sb-fg">{sample}</div>
+                <div className="mt-1 text-[0.75rem] text-sb-fg-muted">{desc}</div>
               </div>
             ))}
           </div>

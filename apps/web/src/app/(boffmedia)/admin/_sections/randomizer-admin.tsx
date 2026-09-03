@@ -109,7 +109,7 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
           icon="puzzle"
         />
       ) : (
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]">
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18.75rem,1fr))]">
           {filtered.map((preset) => {
             const count = totalChanged(preset.settingsJson as unknown as Record<string, unknown>)
             return (
@@ -118,13 +118,13 @@ function PresetsView({ onLoad }: { onLoad: (preset: RandomizerPreset) => void })
                 className="flex flex-col border border-solid border-line bg-panel transition-colors hover:border-line-2"
               >
                 <div className="p-4 flex-1">
-                  <h4 className="font-display font-extrabold italic uppercase text-[19px] tracking-[0.01em] leading-tight">
+                  <h4 className="font-display font-extrabold italic uppercase text-[1.1875rem] tracking-[0.01em] leading-tight">
                     {preset.name}
                   </h4>
                   {preset.description && (
-                    <p className="mt-2 text-txt-muted text-[13px] leading-[1.45]">{preset.description}</p>
+                    <p className="mt-2 text-txt-muted text-[0.8125rem] leading-[1.45]">{preset.description}</p>
                   )}
-                  <div className="flex items-center gap-1.5 mt-3 font-mono text-[11px] text-txt-dim">
+                  <div className="flex items-center gap-1.5 mt-3 font-mono text-[0.6875rem] text-txt-dim">
                     <Icon name="settings" size={13} />
                     <span>{t("chrome.nSettings", { count })}</span>
                     <span className="text-line-2">·</span>

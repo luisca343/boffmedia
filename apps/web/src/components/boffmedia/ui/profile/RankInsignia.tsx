@@ -16,12 +16,12 @@ export function RankInsignia({ icon, tier, sub, pct, metaLeft, metaRight, classN
       )}
     >
       <div className="flex items-center gap-4">
-        <span className="grid h-[58px] w-[58px] flex-none place-items-center bg-accent text-accent-ink [clip-path:polygon(50%_0,100%_50%,50%_100%,0_50%)]">
+        <span className="grid h-[3.625rem] w-[3.625rem] flex-none place-items-center bg-accent text-accent-ink [clip-path:polygon(50%_0,100%_50%,50%_100%,0_50%)]">
           <Icon name={icon} size={26} />
         </span>
         <div>
-          <div className="font-display text-[26px]/none font-extrabold italic uppercase text-txt">{tier}</div>
-          <div className="mt-1.5 font-mono text-[10px]/none font-medium uppercase tracking-[0.12em] text-txt-muted">
+          <div className="font-display text-[1.625rem]/none font-extrabold italic uppercase text-txt">{tier}</div>
+          <div className="mt-1.5 font-mono text-[0.625rem]/none font-medium uppercase tracking-[0.12em] text-txt-muted">
             {sub}
           </div>
         </div>
@@ -29,7 +29,7 @@ export function RankInsignia({ icon, tier, sub, pct, metaLeft, metaRight, classN
       <div className="mt-5 h-1.5 w-full overflow-hidden bg-line">
         <div className="h-full bg-accent" style={{ width: `${Math.max(0, Math.min(100, pct))}%` }} />
       </div>
-      <div className="mt-[11px] flex justify-between font-mono text-[11px]/none font-medium uppercase tracking-[0.06em] text-txt-muted [&_b]:font-semibold [&_b]:text-txt">
+      <div className="mt-[0.6875rem] flex justify-between font-mono text-[0.6875rem]/none font-medium uppercase tracking-[0.06em] text-txt-muted [&_b]:font-semibold [&_b]:text-txt">
         <span>{metaLeft}</span>
         <span>{metaRight}</span>
       </div>

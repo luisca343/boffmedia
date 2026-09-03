@@ -15,7 +15,7 @@ export function VerifyBadge({ show, className }: { show: boolean; className?: st
     <div
       aria-hidden={!show}
       className={cn(
-        "pointer-events-none fixed right-[26px] top-[76px] z-[61] flex items-center gap-2.5 rounded-lg px-4 py-2.5",
+        "pointer-events-none fixed right-[1.625rem] top-[4.75rem] z-[61] flex items-center gap-2.5 rounded-lg px-4 py-2.5",
         "border border-ps-gild/50 bg-ps-navy-deep/90 backdrop-blur-[8px]",
         "shadow-[0_0_28px_rgba(0,0,0,.5),inset_0_1px_0_rgba(255,255,255,.08)]",
         "transition-all duration-300 motion-reduce:transition-none",
@@ -23,12 +23,12 @@ export function VerifyBadge({ show, className }: { show: boolean; className?: st
         className,
       )}
     >
-      <span className="ps-holo ps-loop grid h-[34px] w-[34px] place-items-center rounded-lg animate-ps-spin motion-reduce:animate-none">
-        <Icon name="shield" className="h-[18px] w-[18px] text-ps-navy-deep" />
+      <span className="ps-holo ps-loop grid h-[2.125rem] w-[2.125rem] place-items-center rounded-lg animate-ps-spin motion-reduce:animate-none">
+        <Icon name="shield" className="h-[1.125rem] w-[1.125rem] text-ps-navy-deep" />
       </span>
       <span className="font-ps-mono">
-        <b className="block text-[13px] font-bold tracking-[.18em] text-ps-gild-hi">{t("verifyBadge.verified")}</b>
-        <span className="text-[10px] tracking-[.08em] text-ps-chrome-subtle">{t("verifyBadge.subtitle")}</span>
+        <b className="block text-[0.8125rem] font-bold tracking-[.18em] text-ps-gild-hi">{t("verifyBadge.verified")}</b>
+        <span className="text-[0.625rem] tracking-[.08em] text-ps-chrome-subtle">{t("verifyBadge.subtitle")}</span>
       </span>
     </div>
   )

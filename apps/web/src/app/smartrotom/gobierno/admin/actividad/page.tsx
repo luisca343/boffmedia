@@ -89,14 +89,14 @@ export default function ActividadPage() {
 
       <Card className="overflow-hidden">
         <div className="flex flex-wrap items-center gap-2.5 border-b border-gt-line p-3">
-          <div className="w-[170px]">
+          <div className="w-[10.625rem]">
             <Select
               value={source}
               onChange={setSource}
               options={[{ value: "all", label: t("actividad.todasFuentes") }, ...sources.map((s) => ({ value: s, label: s }))]}
             />
           </div>
-          <div className="min-w-[160px] flex-1">
+          <div className="min-w-[10rem] flex-1">
             <Field icon="search" value={query} onChange={setQuery} placeholder={t("actividad.buscarPlaceholder")} />
           </div>
           <Button size="sm" tone={live ? "danger" : "ghost"} icon={live ? "minus" : "chevronRight"} onClick={() => setLive((v) => !v)}>
@@ -124,21 +124,21 @@ export default function ActividadPage() {
                 const depInfo = DEPARTMENTS[e.dep as Department]
                 return (
                   <TR key={e.id}>
-                    <TD className="whitespace-nowrap font-gt-mono text-[11px] tabular-nums text-gt-ink-500">
+                    <TD className="whitespace-nowrap font-gt-mono text-[0.6875rem] tabular-nums text-gt-ink-500">
                       {fmtDateTime(e.createdAt, intlLocale)}
                     </TD>
                     <TD>
                       <div className="flex items-center gap-2">
                         <Avatar user={e.actor?.username} size={22} />
-                        <span className="text-[12.5px] font-bold text-gt-ink-900">{e.actor?.username ?? t("actividad.sistema")}</span>
+                        <span className="text-[0.78125rem] font-bold text-gt-ink-900">{e.actor?.username ?? t("actividad.sistema")}</span>
                       </div>
                     </TD>
-                    <TD className="text-[12.5px]">{e.action}</TD>
-                    <TD className="max-w-[220px] truncate text-[12.5px] text-gt-ink-500">{e.target}</TD>
+                    <TD className="text-[0.78125rem]">{e.action}</TD>
+                    <TD className="max-w-[13.75rem] truncate text-[0.78125rem] text-gt-ink-500">{e.target}</TD>
                     <TD>
                       <Badge tone={depInfo?.tone ?? "default"}>{depInfo ? t(depInfo.labelKey) : e.dep}</Badge>
                     </TD>
-                    <TD className="font-gt-mono text-[11px] text-gt-ink-500">{e.source}</TD>
+                    <TD className="font-gt-mono text-[0.6875rem] text-gt-ink-500">{e.source}</TD>
                   </TR>
                 )
               })}

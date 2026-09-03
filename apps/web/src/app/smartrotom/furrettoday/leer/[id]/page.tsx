@@ -48,7 +48,7 @@ export default function ArticlePage({
 
   if (!validId || error || (!isLoading && !article)) {
     return (
-      <div className="mx-auto max-w-[880px] px-6 py-16">
+      <div className="mx-auto max-w-[55rem] px-6 py-16">
         <EmptyState
           title={t("notFoundTitle")}
           message={t("notFoundMessage")}
@@ -61,10 +61,10 @@ export default function ArticlePage({
 
   if (isLoading || !article) {
     return (
-      <div className="mx-auto max-w-[880px] px-6 py-16">
+      <div className="mx-auto max-w-[55rem] px-6 py-16">
         <Skeleton className="h-6 w-40" />
         <Skeleton className="mt-4 h-24 w-full" />
-        <Skeleton className="mt-6 h-[420px] w-full" />
+        <Skeleton className="mt-6 h-[26.25rem] w-full" />
         <div className="mt-8 grid gap-3">
           <Skeleton className="h-5 w-full" />
           <Skeleton className="h-5 w-full" />
@@ -77,7 +77,7 @@ export default function ArticlePage({
   return (
     <div>
       <div className="border-b-ft-hair border-dashed border-b-ft-ink bg-ft-paper-2">
-        <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-6 py-3">
+        <div className="mx-auto flex max-w-[87.5rem] items-center gap-3 px-6 py-3">
           <Button variant="ghost" size="sm" onClick={() => router.push(BASE)}>
             {t("backCover")}
           </Button>
@@ -94,13 +94,13 @@ export default function ArticlePage({
       <ArticleHeader article={article} />
 
       <div className="bg-ft-paper px-6 py-6">
-        <div className="mx-auto max-w-[1400px]">
+        <div className="mx-auto max-w-[87.5rem]">
           <div className="border-ft-thick overflow-hidden rounded-ft-lg border-ft-ink shadow-ft-pop-lg">
             <HeroArt
               accent={article.accent}
               src={article.imageUrl}
               alt={article.title}
-              className="h-[420px] w-full"
+              className="h-[26.25rem] w-full"
             />
           </div>
           <div className="mt-2.5 flex justify-between">
@@ -111,7 +111,7 @@ export default function ArticlePage({
       </div>
 
       <main className="px-6 pb-16 pt-6">
-        <div className="mx-auto grid max-w-[1400px] grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_320px] lg:items-start lg:gap-14">
+        <div className="mx-auto grid max-w-[87.5rem] grid-cols-1 gap-10 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-14">
           <article>
             <div
               className="ft-article ft-dropcap"

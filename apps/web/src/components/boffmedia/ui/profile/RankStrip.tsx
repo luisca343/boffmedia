@@ -14,12 +14,12 @@ export function RankStrip({ rank, stats, className }: RankStripProps) {
   return (
     <div
       className={cn(
-        "grid items-stretch gap-4 [grid-template-columns:348px_1fr] max-[1080px]:grid-cols-1",
+        "grid items-stretch gap-4 [grid-template-columns:21.75rem_1fr] max-[1080px]:grid-cols-1",
         className,
       )}
     >
       <RankInsignia {...rank} />
-      <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(148px,1fr))]">
+      <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(9.25rem,1fr))]">
         {stats.map((s) => (
           <StatTile key={s.label} {...s} />
         ))}

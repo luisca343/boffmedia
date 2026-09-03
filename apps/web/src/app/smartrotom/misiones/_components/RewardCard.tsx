@@ -16,13 +16,13 @@ import { ItemSprite } from "./ui"
 export function RewardCard({ reward }: { reward: IQuestReward }) {
   return (
     <div className="flex items-center gap-3 rounded-sm border border-ms-ink-1/25 bg-[rgba(255,240,200,.45)] p-3">
-      <div className="grid h-[42px] w-[42px] shrink-0 place-items-center rounded-sm border-[1.5px] border-ms-ink-1/30 bg-gradient-to-br from-ms-gold-1 to-ms-gold-2">
+      <div className="grid h-[2.625rem] w-[2.625rem] shrink-0 place-items-center rounded-sm border-[1.5px] border-ms-ink-1/30 bg-gradient-to-br from-ms-gold-1 to-ms-gold-2">
         <ItemSprite name={spriteName(reward.item)} size={30} />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-[13px] font-semibold leading-tight text-ms-ink-1">{itemLabel(reward.item)}</div>
+        <div className="truncate text-[0.8125rem] font-semibold leading-tight text-ms-ink-1">{itemLabel(reward.item)}</div>
         {reward.count > 1 && (
-          <div className="mt-0.5 font-ms-mono text-[11px] text-ms-ink-3">×{reward.count}</div>
+          <div className="mt-0.5 font-ms-mono text-[0.6875rem] text-ms-ink-3">×{reward.count}</div>
         )}
       </div>
     </div>

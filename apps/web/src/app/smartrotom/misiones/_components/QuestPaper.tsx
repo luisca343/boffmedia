@@ -41,7 +41,7 @@ export function QuestPaper({
     <Paper
       tilt={tiltFor(quest.id)}
       className={cn(
-        "ms-pinned flex min-h-[220px] flex-col px-[22px] pb-4 pt-5 text-left",
+        "ms-pinned flex min-h-[13.75rem] flex-col px-[1.375rem] pb-4 pt-5 text-left",
         STATUS_PAPER_FILTER[status],
         selected && "shadow-[inset_0_0_40px_rgba(80,50,20,.18),0_0_0_2px_rgb(var(--ms-gold-2)),0_4px_8px_rgba(0,0,0,.4),0_16px_32px_var(--ms-paper-shadow)]",
       )}
@@ -90,7 +90,7 @@ export function QuestPaper({
         </span>
       </div>
 
-      <h3 className="mb-2 mt-0.5 font-ms-display text-[19px] leading-[1.15] text-ms-ink-1">{quest.name}</h3>
+      <h3 className="mb-2 mt-0.5 font-ms-display text-[1.1875rem] leading-[1.15] text-ms-ink-1">{quest.name}</h3>
 
       <div className="mb-2.5 flex items-center gap-2 text-xs italic text-ms-ink-3">
         <NpcPortrait skin={npc?.skin} size={22} />
@@ -108,11 +108,11 @@ export function QuestPaper({
         )}
       </div>
 
-      <p className="mb-3 line-clamp-2 text-[13px] italic leading-[1.55] text-ms-ink-2">&ldquo;{quest.logText}&rdquo;</p>
+      <p className="mb-3 line-clamp-2 text-[0.8125rem] italic leading-[1.55] text-ms-ink-2">&ldquo;{quest.logText}&rdquo;</p>
 
       {showProgress && (
         <div className="mb-3">
-          <div className="mb-1 flex justify-between font-ms-uppercase text-[10px] uppercase tracking-[.12em] text-ms-ink-3">
+          <div className="mb-1 flex justify-between font-ms-uppercase text-[0.625rem] uppercase tracking-[.12em] text-ms-ink-3">
             <span>
               {t("objectives", { done: progress.done, total: progress.total })}
             </span>

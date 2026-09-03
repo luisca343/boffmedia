@@ -20,8 +20,8 @@ export function PreviewButton({ on, onClick, disabled, title, children }: Previe
       disabled={disabled}
       title={title}
       className={cn(
-        "inline-flex items-center gap-1.5 py-[5px] px-[9px] border border-solid border-transparent bg-transparent",
-        "font-mono text-[11px] cursor-pointer transition-colors duration-[140ms] disabled:opacity-40",
+        "inline-flex items-center gap-1.5 py-[0.3125rem] px-[0.5625rem] border border-solid border-transparent bg-transparent",
+        "font-mono text-[0.6875rem] cursor-pointer transition-colors duration-[140ms] disabled:opacity-40",
         on ? "text-accent-bright bg-accent-soft border-accent-line" : "text-txt-dim hover:text-txt-muted",
       )}
     >
@@ -47,7 +47,7 @@ export function SwitchSegment({ active, disabled, title, onClick, children }: Sw
       onClick={onClick}
       title={title}
       className={cn(
-        "py-1 px-2 font-mono text-[11px] cursor-pointer transition-colors duration-[140ms]",
+        "py-1 px-2 font-mono text-[0.6875rem] cursor-pointer transition-colors duration-[140ms]",
         "disabled:opacity-40 disabled:cursor-not-allowed",
         active ? "bg-accent-soft text-accent-bright" : "text-txt-dim hover:text-txt",
       )}

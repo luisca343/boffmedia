@@ -26,7 +26,7 @@ import {
 const noop = () => {}
 
 /** The map's pieces sit absolutely, so they need a field to sit on. */
-function Field({ children, className = "h-[220px]" }: { children: React.ReactNode; className?: string }) {
+function Field({ children, className = "h-[13.75rem]" }: { children: React.ReactNode; className?: string }) {
   return (
     <div
       className={`relative w-full overflow-hidden rounded-tx-md border border-solid border-tx-line bg-tx-field ${className}`}
@@ -40,7 +40,7 @@ function StopRowDemo() {
   const [selected, setSelected] = React.useState("Puerto Wingull")
   const [favorites, setFavorites] = React.useState<string[]>(["Liga Teras"])
   return (
-    <div className="flex w-full flex-col gap-[9px]">
+    <div className="flex w-full flex-col gap-[0.5625rem]">
       {TX_STOPS.map((stop) => (
         <StopRow
           key={stop.id}
@@ -158,7 +158,7 @@ export function TxViajeChapter() {
         </Sample>
 
         <Sample title="Controles" code="<Compass> · <ZoomControls> · <ScaleChip>" app="tx" padded={false}>
-          <Field className="h-[260px]">
+          <Field className="h-[16.25rem]">
             <Compass />
             <ZoomControls onZoom={noop} />
             <ScaleChip scale={0.09} bottom={16} />
@@ -179,7 +179,7 @@ export function TxViajeChapter() {
         }
       >
         <Sample title="Fila de destino" code="<StopRow>" app="tx" padded={false}>
-          <div className="w-full p-[26px]">
+          <div className="w-full p-[1.625rem]">
             <StopRowDemo />
           </div>
         </Sample>
@@ -196,8 +196,8 @@ export function TxViajeChapter() {
             </>
           }
         >
-          <div className="w-full p-[26px]">
-            <div className="max-w-[380px]">
+          <div className="w-full p-[1.625rem]">
+            <div className="max-w-[23.75rem]">
               <SelectedCard
                 stop={TX_STOPS[1]}
                 balance={9240}
@@ -219,8 +219,8 @@ export function TxViajeChapter() {
           padded={false}
           note="Cuando la tarifa supera el saldo, la acción principal pasa a ser «recargar», no un «viajar» deshabilitado: un botón muerto dice que estás atascado, éste dice por dónde salir."
         >
-          <div className="w-full p-[26px]">
-            <div className="max-w-[380px]">
+          <div className="w-full p-[1.625rem]">
+            <div className="max-w-[23.75rem]">
               <SelectedCard
                 stop={TX_STOPS[2]}
                 balance={1200}

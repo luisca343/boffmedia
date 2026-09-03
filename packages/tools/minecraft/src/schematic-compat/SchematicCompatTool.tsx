@@ -86,7 +86,7 @@ export function SchematicCompatTool() {
               key: "setup",
               label: t("workbench.setupTab"),
               className:
-                "w-[336px] shrink-0 border-r border-line overflow-y-auto overflow-x-hidden bg-base-2 max-[1180px]:w-[320px]",
+                "w-[21rem] shrink-0 border-r border-line overflow-y-auto overflow-x-hidden bg-base-2 max-[1180px]:w-[20rem]",
               tabClassName: "overflow-y-auto overflow-x-hidden bg-base-2",
               node: (
                 <SetupPanel
@@ -108,7 +108,7 @@ export function SchematicCompatTool() {
             {
               key: "diff",
               label: t("workbench.diffTab"),
-              className: "flex-1 min-w-[360px] flex flex-col border-r border-line bg-base",
+              className: "flex-1 min-w-[22.5rem] flex flex-col border-r border-line bg-base",
               tabClassName: "flex flex-col bg-base",
               node: <DiffPanel />,
             },
@@ -118,7 +118,7 @@ export function SchematicCompatTool() {
               // The 3D preview takes a large, window-proportional share (was a fixed
               // 372px) so big schematics are actually legible; capped so it never
               // starves the diff list on ultrawide displays.
-              className: "w-[42%] min-w-[420px] max-w-[900px] shrink-0 flex flex-col bg-base-2 max-[1180px]:min-w-[360px]",
+              className: "w-[42%] min-w-[26.25rem] max-w-[56.25rem] shrink-0 flex flex-col bg-base-2 max-[1180px]:min-w-[22.5rem]",
               tabClassName: "flex flex-col bg-base-2",
               node: <PreviewPanel />,
             },

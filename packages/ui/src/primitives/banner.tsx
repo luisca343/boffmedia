@@ -48,7 +48,7 @@ export function Banner({ tone = "info", title, children, icon, onClose, actions,
     <div
       role={tone === "error" ? "alert" : "status"}
       className={cn(
-        "flex items-start gap-[11px] py-3 px-[14px] border border-solid",
+        "flex items-start gap-[0.6875rem] py-3 px-[0.875rem] border border-solid",
         // `.cut-seal`, not a hand-written polygon: the inline one this replaced
         // was the seal path MINUS its closing `0 var(--cut)` vertex, so instead
         // of chamfering the top-left corner it closed straight from the
@@ -65,8 +65,8 @@ export function Banner({ tone = "info", title, children, icon, onClose, actions,
       <span className={cn("flex-none grid place-items-center mt-px", toneCfg.ico)}>
         <Icon name={icon || toneCfg.def} size={16} />
       </span>
-      <div className="flex-1 min-w-0 flex flex-col gap-[2px] font-body text-[13px] leading-[1.45] text-txt-muted">
-        {title && <b className="font-bold text-[13px] leading-[1.3] text-txt">{title}</b>}
+      <div className="flex-1 min-w-0 flex flex-col gap-[2px] font-body text-[0.8125rem] leading-[1.45] text-txt-muted">
+        {title && <b className="font-bold text-[0.8125rem] leading-[1.3] text-txt">{title}</b>}
         {children && <span>{children}</span>}
       </div>
       {actions}

@@ -27,7 +27,7 @@ export function StatCard({ kicker, value, sub, icon, tone = "cyan" }: StatCardPr
       <div className="mb-2.5 flex items-start justify-between gap-2">
         <div
           className={cn(
-            "font-ar-display text-[8px] uppercase leading-relaxed tracking-[0.12em]",
+            "font-ar-display text-[0.5rem] uppercase leading-relaxed tracking-[0.12em]",
             TONE[tone],
           )}
         >
@@ -35,8 +35,8 @@ export function StatCard({ kicker, value, sub, icon, tone = "cyan" }: StatCardPr
         </div>
         {icon && <span className={TONE[tone]}>{icon}</span>}
       </div>
-      <div className="font-ar-display text-[24px] leading-none text-ar-ink">{value}</div>
-      {sub && <div className="mt-1.5 font-ar-mono text-[11px] text-ar-ink-muted">{sub}</div>}
+      <div className="font-ar-display text-[1.5rem] leading-none text-ar-ink">{value}</div>
+      {sub && <div className="mt-1.5 font-ar-mono text-[0.6875rem] text-ar-ink-muted">{sub}</div>}
     </Panel>
   )
 }

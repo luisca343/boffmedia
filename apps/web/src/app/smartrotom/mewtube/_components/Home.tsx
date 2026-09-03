@@ -23,7 +23,7 @@ export function Home() {
     return (
       <>
         <ChipRail />
-        <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-5 md:px-10">
+        <div className="mx-auto max-w-[102.5rem] px-4 pb-20 pt-5 md:px-10">
           <VideoSection title={t("home.searchResults", { query: q })} videos={results} loading={search.isLoading} />
           {search.isError && (
             <p className="py-12 text-center text-sm text-mw-fg-faint">{t("home.noResults")}</p>
@@ -45,7 +45,7 @@ export function Home() {
     <>
       <ChipRail />
       {featured && <FeaturedHero data={featured} />}
-      <div className="mx-auto max-w-[1640px] px-4 pb-20 pt-5 md:px-10">
+      <div className="mx-auto max-w-[102.5rem] px-4 pb-20 pt-5 md:px-10">
         <VideoSection
           eyebrow={t("home.trending")}
           title={t("home.trendingNow")}

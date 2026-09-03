@@ -28,10 +28,10 @@ export function Sheet({ title, eyebrow, onClose, width = 720, children }: {
         style={{ width: `min(${width}px, 96vw)` }}
         className="flex h-full animate-in flex-col border-l border-sb-border bg-sb-surface slide-in-from-right animate-duration-300"
       >
-        <div className="flex items-center justify-between border-b border-sb-border px-[22px] py-[18px]">
+        <div className="flex items-center justify-between border-b border-sb-border px-[1.375rem] py-[1.125rem]">
           <div>
-            {eyebrow ? <div className="mb-0.5 text-[11px] uppercase tracking-[0.1em] text-sb-fg-subtle">{eyebrow}</div> : null}
-            <h2 className="m-0 font-sb-display text-[20px] font-semibold tracking-[-0.01em] text-sb-fg">{title}</h2>
+            {eyebrow ? <div className="mb-0.5 text-[0.6875rem] uppercase tracking-[0.1em] text-sb-fg-subtle">{eyebrow}</div> : null}
+            <h2 className="m-0 font-sb-display text-[1.25rem] font-semibold tracking-[-0.01em] text-sb-fg">{title}</h2>
           </div>
           <button
             type="button"
@@ -42,7 +42,7 @@ export function Sheet({ title, eyebrow, onClose, width = 720, children }: {
             <Ico name="x" size={16} />
           </button>
         </div>
-        <div className="flex flex-1 flex-col gap-5 overflow-auto px-[22px] py-5">{children}</div>
+        <div className="flex flex-1 flex-col gap-5 overflow-auto px-[1.375rem] py-5">{children}</div>
       </div>
     </div>
   );

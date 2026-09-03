@@ -36,7 +36,7 @@ export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions
   ]
 
   return (
-    <Paper tilt={-0.4} className="relative mb-7 px-[22px] py-[18px]">
+    <Paper tilt={-0.4} className="relative mb-7 px-[1.375rem] py-[1.125rem]">
       <span className="absolute left-3.5 top-2">
         <Nail size={14} />
       </span>
@@ -53,10 +53,10 @@ export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions
               alt=""
               width={72}
               height={72}
-              className="h-[72px] w-[72px] object-cover shadow-[1px_2px_2px_rgba(0,0,0,.45)] ring-[1.5px] ring-inset ring-ms-gold-2"
+              className="h-[4.5rem] w-[4.5rem] object-cover shadow-[1px_2px_2px_rgba(0,0,0,.45)] ring-[1.5px] ring-inset ring-ms-gold-2"
             />
           ) : (
-            <div className="grid h-[72px] w-[72px] place-items-center bg-ms-ink-2/20 font-ms-display text-3xl text-ms-ink-2 ring-[1.5px] ring-inset ring-ms-gold-2">
+            <div className="grid h-[4.5rem] w-[4.5rem] place-items-center bg-ms-ink-2/20 font-ms-display text-3xl text-ms-ink-2 ring-[1.5px] ring-inset ring-ms-gold-2">
               {name.charAt(0).toUpperCase()}
             </div>
           )}
@@ -69,15 +69,15 @@ export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions
 
         <div className="min-w-0 flex-[1_1_240px]">
           <Label className="text-ms-gold-3">{t("adventurerLog")}</Label>
-          <h1 className="my-0.5 font-ms-display text-[28px] leading-tight text-ms-ink-1">{name}</h1>
-          <div className="text-[13px] italic text-ms-ink-3">
+          <h1 className="my-0.5 font-ms-display text-[1.75rem] leading-tight text-ms-ink-1">{name}</h1>
+          <div className="text-[0.8125rem] italic text-ms-ink-3">
             {regions.length > 0
               ? t("questsInKingdoms", { count: regions.length })
               : t("noQuests")}
           </div>
 
           <div className="mt-2.5">
-            <div className="mb-1 flex justify-between font-ms-uppercase text-[10px] uppercase tracking-[.14em] text-ms-ink-3">
+            <div className="mb-1 flex justify-between font-ms-uppercase text-[0.625rem] uppercase tracking-[.14em] text-ms-ink-3">
               <span>{t("completedQuests")}</span>
               <span className="text-ms-gold-3">
                 {completed} / {total}
@@ -93,14 +93,14 @@ export function PlayerHeader({ quests, regions }: { quests: QuestData[]; regions
               key={tablet.label}
               className="rounded-sm border border-ms-ink-1/20 bg-ms-ink-1/[.08] px-1.5 py-2.5 text-center"
             >
-              <div className={`font-ms-display text-[22px] leading-none ${tablet.className}`}>{tablet.value}</div>
+              <div className={`font-ms-display text-[1.375rem] leading-none ${tablet.className}`}>{tablet.value}</div>
               <Label className="mt-1">{tablet.label}</Label>
             </div>
           ))}
         </div>
       </div>
 
-      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2.5 border-t border-dashed border-ms-ink-1/[.28] pt-3 font-ms-uppercase text-[11px] uppercase tracking-[.12em] text-ms-ink-3">
+      <div className="mt-3.5 flex flex-wrap items-center justify-between gap-2.5 border-t border-dashed border-ms-ink-1/[.28] pt-3 font-ms-uppercase text-[0.6875rem] uppercase tracking-[.12em] text-ms-ink-3">
         <span>{t("inn")}</span>
         <span>{t("questsOnBoard", { count: total })}</span>
       </div>

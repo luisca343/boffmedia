@@ -21,9 +21,9 @@ export function Competiciones({
     return (
       <>
         <PageHead eyebrow={t("competiciones.eyebrow")} title={t("competiciones.title")} />
-        <div className="grid grid-cols-4 gap-[18px]">
+        <div className="grid grid-cols-4 gap-[1.125rem]">
           {Array.from({ length: 8 }, (_, i) => (
-            <Skeleton key={i} className="h-[96px] rounded-full" />
+            <Skeleton key={i} className="h-[6rem] rounded-full" />
           ))}
         </div>
       </>
@@ -45,9 +45,9 @@ export function Competiciones({
     <>
       <PageHead eyebrow={t("competiciones.eyebrow")} title={t("competiciones.title")} />
 
-      <p className="mb-3 text-[12px] text-ps-ink-soft">{t("competiciones.intro")}</p>
+      <p className="mb-3 text-[0.75rem] text-ps-ink-soft">{t("competiciones.intro")}</p>
 
-      <div className="grid grid-cols-4 justify-items-center gap-[18px]">
+      <div className="grid grid-cols-4 justify-items-center gap-[1.125rem]">
         {events.map((event) => {
           const earned = isEarned(event)
           return (
@@ -61,13 +61,13 @@ export function Competiciones({
               />
               <span
                 className={cn(
-                  "max-w-[92px] text-[10px] leading-[1.1]",
+                  "max-w-[5.75rem] text-[0.625rem] leading-[1.1]",
                   earned ? "text-ps-ink-soft" : "text-ps-ink-faint",
                 )}
               >
                 {event.name}
               </span>
-              <span className="ps-num font-ps-mono text-[9px] text-ps-ink-faint">
+              <span className="ps-num font-ps-mono text-[0.5625rem] text-ps-ink-faint">
                 {earned ? docDate(event.completedAt, locale) : t("competiciones.locked")}
               </span>
             </div>

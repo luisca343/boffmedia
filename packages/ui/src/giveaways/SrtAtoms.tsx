@@ -21,9 +21,9 @@ export function SrtStatusChip({ status, size }: { status: SrtStatus; size?: "lg"
   return (
     <span
       className={cn(
-        "cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[7px] border border-solid px-2.5 py-1.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.12em]",
+        "cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[0.4375rem] border border-solid px-2.5 py-1.5 font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.12em]",
         STATUS_CLS[key] || "border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt-muted",
-        size === "lg" && "px-[13px] py-2 text-[11px]",
+        size === "lg" && "px-[0.8125rem] py-2 text-[0.6875rem]",
       )}
     >
       {dot && (
@@ -31,7 +31,7 @@ export function SrtStatusChip({ status, size }: { status: SrtStatus; size?: "lg"
           aria-hidden
           className={cn(
             "flex-none rounded-full",
-            key === "active" ? "h-[7px] w-[7px] bg-accent-ink animate-[bm-blink_1.3s_steps(2)_infinite] motion-reduce:animate-none" : "h-1.5 w-1.5 bg-warn animate-[bm-pulse_1s_ease-in-out_infinite] motion-reduce:animate-none",
+            key === "active" ? "h-[0.4375rem] w-[0.4375rem] bg-accent-ink animate-[bm-blink_1.3s_steps(2)_infinite] motion-reduce:animate-none" : "h-1.5 w-1.5 bg-warn animate-[bm-pulse_1s_ease-in-out_infinite] motion-reduce:animate-none",
           )}
         />
       )}
@@ -50,8 +50,8 @@ export function SrtOrganizer({ organizer }: { organizer: SrtOrganizerData }) {
   const t = useGiveawaysT()
   const o = organizer || ({} as SrtOrganizerData)
   return (
-    <span className="inline-flex items-center gap-2 font-mono text-[11px]/none font-semibold tracking-[0.05em] text-txt-muted">
-      <span className={cn("grid h-6 w-6 flex-none place-items-center font-display text-[11px]/none font-bold cut-seal [--cut:5px]", ORG_SEAL[o.kind] || ORG_SEAL.boffmedia)}>{o.avatar || "B"}</span>
+    <span className="inline-flex items-center gap-2 font-mono text-[0.6875rem]/none font-semibold tracking-[0.05em] text-txt-muted">
+      <span className={cn("grid h-6 w-6 flex-none place-items-center font-display text-[0.6875rem]/none font-bold cut-seal [--cut:5px]", ORG_SEAL[o.kind] || ORG_SEAL.boffmedia)}>{o.avatar || "B"}</span>
       {t("by")} <b className="font-bold text-txt">{o.name}</b>
     </span>
   )
@@ -61,7 +61,7 @@ export function SrtSourceTag({ source }: { source: SrtSourceKey }) {
   const t = useGiveawaysT()
   const m = srtSourceMeta(source)
   return (
-    <span className="inline-flex items-center gap-[7px] border border-dashed border-line-2 px-[9px] py-[5px] font-mono text-[10px]/none font-semibold uppercase tracking-[0.09em] text-txt-muted">
+    <span className="inline-flex items-center gap-[0.4375rem] border border-dashed border-line-2 px-[0.5625rem] py-[0.3125rem] font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.09em] text-txt-muted">
       <Icon name={m.icon} size={12} className={source === "twitch" ? "text-[#9146ff]" : "text-[color:var(--info)]"} />
       {t(`source.${source}.label`)}
     </span>
@@ -72,7 +72,7 @@ export function SrtPrizeTag({ type, winners }: { type: SrtPrizeType; winners?: n
   const t = useGiveawaysT()
   const m = srtPrizeMeta(type)
   return (
-    <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center gap-1.5 border border-solid border-accent-line bg-accent-soft px-2 py-[5px] font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.1em] text-accent">
+    <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center gap-1.5 border border-solid border-accent-line bg-accent-soft px-2 py-[0.3125rem] font-mono text-[0.59375rem]/none font-semibold uppercase tracking-[0.1em] text-accent">
       <Icon name={m.icon} size={12} />
       {t(`prize.${type}.label`)}
       {winners && winners > 1 ? ` · ${winners} ${t("winner", { count: winners })}` : ""}
@@ -86,17 +86,17 @@ export function SrtTicketMeter({ tickets, max, odds, label }: { tickets: number;
   return (
     <div className="block">
       <div className="mb-2 flex items-baseline justify-between gap-3">
-        <span className="font-mono text-[10px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{label ?? t("yourTickets")}</span>
-        <span className="font-display text-[22px]/none font-extrabold italic text-accent">
+        <span className="font-mono text-[0.625rem]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{label ?? t("yourTickets")}</span>
+        <span className="font-display text-[1.375rem]/none font-extrabold italic text-accent">
           {tickets}
-          <small className="ml-1 font-mono text-[10px]/none font-medium not-italic tracking-[0.06em] text-txt-muted">/ {max}</small>
+          <small className="ml-1 font-mono text-[0.625rem]/none font-medium not-italic tracking-[0.06em] text-txt-muted">/ {max}</small>
         </span>
       </div>
       <div className="h-2 overflow-hidden border border-solid border-line bg-panel-2">
         <span className="block h-full [background:repeating-linear-gradient(-55deg,var(--accent)_0_8px,var(--accent-bright)_8px_16px)] transition-[width] duration-[420ms]" style={{ width: pct + "%" }} />
       </div>
       {odds != null && (
-        <div className="mt-[7px] font-mono text-[10px]/[1.4] font-medium tracking-[0.04em] text-txt-dim">
+        <div className="mt-[0.4375rem] font-mono text-[0.625rem]/[1.4] font-medium tracking-[0.04em] text-txt-dim">
           {t("estimatedProbability")} <b className="text-txt">{odds < 0.1 ? "<0,1" : odds.toFixed(1)}%</b> · {t("weightedByTickets")}
         </div>
       )}

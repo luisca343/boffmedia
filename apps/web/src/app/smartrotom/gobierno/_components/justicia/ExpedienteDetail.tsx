@@ -30,7 +30,7 @@ export function ExpedienteDetail({ expediente, isLoading }: { expediente: Expedi
   const addEvento = useAddExpedienteEvento()
 
   if (isLoading) {
-    return <Skeleton className="h-full min-h-[320px]" />
+    return <Skeleton className="h-full min-h-[20rem]" />
   }
 
   if (!expediente) {
@@ -59,7 +59,7 @@ export function ExpedienteDetail({ expediente, isLoading }: { expediente: Expedi
               <Avatar user={expediente.subject.username} size={48} />
             </button>
             <div>
-              <div className="font-gt-mono text-[10.5px] text-gt-ink-400">
+              <div className="font-gt-mono text-[0.65625rem] text-gt-ink-400">
                 {expediente.code} · {t("expedientes.instruye", { username: expediente.lead.username })}
               </div>
               <h2 className="font-gt-display text-xl leading-tight text-gt-ink-900">{expediente.title}</h2>
@@ -83,26 +83,26 @@ export function ExpedienteDetail({ expediente, isLoading }: { expediente: Expedi
             const kmTone = TONES[km.tone]
             const last = i === expediente.timeline.length - 1
             return (
-              <div key={e.id} className={`flex items-start gap-3.5 ${last ? "" : "pb-[18px]"}`}>
+              <div key={e.id} className={`flex items-start gap-3.5 ${last ? "" : "pb-[1.125rem]"}`}>
                 <div className="flex flex-none flex-col items-center">
-                  <div className={`grid h-[30px] w-[30px] place-items-center rounded-lg border ${kmTone.softBg} ${kmTone.softBorder}`}>
+                  <div className={`grid h-[1.875rem] w-[1.875rem] place-items-center rounded-lg border ${kmTone.softBg} ${kmTone.softBorder}`}>
                     <Icon name={km.icon} size={15} className={kmTone.text} />
                   </div>
-                  {!last && <div className="mt-1 min-h-[24px] w-px flex-1 bg-gt-line" />}
+                  {!last && <div className="mt-1 min-h-[1.5rem] w-px flex-1 bg-gt-line" />}
                 </div>
                 <div className="flex-1 pt-0.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={`font-gt-mono text-[9.5px] font-bold uppercase tracking-[.1em] ${kmTone.text}`}>
+                    <span className={`font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.1em] ${kmTone.text}`}>
                       {t(km.labelKey)}
                     </span>
                     {e.ref && (
-                      <span className="rounded-[4px] border border-gt-line bg-gt-paper-2 px-[7px] py-px font-gt-mono text-[10px] text-gt-ink-600">
+                      <span className="rounded-[4px] border border-gt-line bg-gt-paper-2 px-[0.4375rem] py-px font-gt-mono text-[0.625rem] text-gt-ink-600">
                         {e.ref}
                       </span>
                     )}
-                    <span className="ml-auto font-gt-mono text-[10px] text-gt-ink-400">{fmtDateTime(e.at, intlLocale)}</span>
+                    <span className="ml-auto font-gt-mono text-[0.625rem] text-gt-ink-400">{fmtDateTime(e.at, intlLocale)}</span>
                   </div>
-                  <p className="mt-1 text-[13px] leading-relaxed text-gt-ink-700">{e.text}</p>
+                  <p className="mt-1 text-[0.8125rem] leading-relaxed text-gt-ink-700">{e.text}</p>
                 </div>
               </div>
             )

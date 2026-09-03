@@ -98,10 +98,10 @@ export function MsPrimitivasChapter() {
           <Nail size={20} />
         </Sample>
         <Sample app="ms" title="Estampa" code="<Stamp />" note="Cae una sola vez, al revelarse la misión — y no cae en absoluto si el sistema pide menos movimiento.">
-          <div className="relative h-[90px] w-[200px]">
+          <div className="relative h-[5.625rem] w-[12.5rem]">
             <Stamp kind="completed">Completada</Stamp>
           </div>
-          <div className="relative h-[90px] w-[200px]">
+          <div className="relative h-[5.625rem] w-[12.5rem]">
             <Stamp kind="failed">Fallida</Stamp>
           </div>
         </Sample>
@@ -166,7 +166,7 @@ export function MsPrimitivasChapter() {
           <Bar value={72} gold />
         </Sample>
         <Sample app="ms" title="Chispas" code="<Sparkles />" note="Sólo sobre lo que está en curso.">
-          <Paper className="relative h-[110px] w-[200px]">
+          <Paper className="relative h-[6.875rem] w-[12.5rem]">
             <Sparkles count={7} />
           </Paper>
         </Sample>
@@ -223,7 +223,7 @@ export function MsPrimitivasChapter() {
                   : undefined
             }
           >
-            <div className="ms-wood w-[200px] p-2" data-tabstyle={style.value}>
+            <div className="ms-wood w-[12.5rem] p-2" data-tabstyle={style.value}>
               <nav className="flex flex-col gap-0.5">
                 {NAV_ITEMS.map((item, i) => {
                   const current = i === 2
@@ -237,7 +237,7 @@ export function MsPrimitivasChapter() {
                     >
                       <span className="text-base opacity-70">{item.glyph}</span>
                       <span className="flex-1">{item.label}</span>
-                      {current && <span className="absolute right-2.5 text-[9px] text-ms-gold-2">▶</span>}
+                      {current && <span className="absolute right-2.5 text-[0.5625rem] text-ms-gold-2">▶</span>}
                     </a>
                   )
                 })}
@@ -268,7 +268,7 @@ export function MsPrimitivasChapter() {
             code={palette.value ? `data-palette="${palette.value}"` : "(por defecto)"}
           >
             <div
-              className="ms-app ms-tavern w-[220px] rounded-sm border border-black/40 p-4 font-ms text-ms-ink-1 antialiased"
+              className="ms-app ms-tavern w-[13.75rem] rounded-sm border border-black/40 p-4 font-ms text-ms-ink-1 antialiased"
               data-palette={palette.value}
             >
               <div className="ms-paper p-3">
@@ -277,7 +277,7 @@ export function MsPrimitivasChapter() {
                 </p>
               </div>
               <div className="mt-3 flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full border border-ms-gold-3 bg-ms-gold-4/30 px-2.5 py-1 font-ms-uppercase text-[10px] uppercase tracking-wider text-ms-gold-1">
+                <span className="inline-flex items-center gap-1 rounded-full border border-ms-gold-3 bg-ms-gold-4/30 px-2.5 py-1 font-ms-uppercase text-[0.625rem] uppercase tracking-wider text-ms-gold-1">
                   ✦ Vigente
                 </span>
               </div>

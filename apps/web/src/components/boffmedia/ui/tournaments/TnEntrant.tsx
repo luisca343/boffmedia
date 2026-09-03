@@ -51,16 +51,16 @@ export function TnEntrant({
   compact?: boolean
 }) {
   const t = useTranslations("torneos.entrant")
-  if (!c) return <span className="inline-flex min-w-0 items-center gap-2 font-mono text-[11px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("bye")}</span>
+  if (!c) return <span className="inline-flex min-w-0 items-center gap-2 font-mono text-[0.6875rem]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("bye")}</span>
   const sd = seed != null ? seed : c.seed
   const nameCls = cn(
-    "max-w-full truncate font-body text-[13.5px]/[1.15] font-semibold transition-colors",
+    "max-w-full truncate font-body text-[0.84375rem]/[1.15] font-semibold transition-colors",
     win ? "text-ok" : lose ? "text-txt-dim" : "text-txt",
     onOpen && "group-hover:text-accent-bright",
   )
   return (
     <span className={cn("inline-flex min-w-0 items-center gap-2", align === "right" && "flex-row-reverse")}>
-      {sd != null && <span className="flex-none border border-solid border-line-2 px-[5px] py-[3px] font-mono text-[10px]/none font-bold text-txt-dim">{sd}</span>}
+      {sd != null && <span className="flex-none border border-solid border-line-2 px-[0.3125rem] py-[3px] font-mono text-[0.625rem]/none font-bold text-txt-dim">{sd}</span>}
       {avatar &&
         (c.kind === "team" ? (
           <TnAvatar c={c} size={compact ? 20 : 24} />
@@ -83,7 +83,7 @@ export function TnEntrant({
                 ? "@" + c.tag
                 : null)
           return subText ? (
-            <span className="max-w-full truncate font-mono text-[9.5px]/[1.2] font-medium text-txt-dim">{subText}</span>
+            <span className="max-w-full truncate font-mono text-[0.59375rem]/[1.2] font-medium text-txt-dim">{subText}</span>
           ) : null
         })()}
       </button>
@@ -94,7 +94,7 @@ export function TnEntrant({
 
 // Match score / live-state. `.tn-score`
 export function TnScore({ status, g1, g2 }: { status: string; g1?: number | null; g2?: number | null }) {
-  if (status === "final") return <span className="whitespace-nowrap font-mono text-[15px]/none font-bold">{g1}<i className="px-0.5 not-italic text-txt-dim">–</i>{g2}</span>
+  if (status === "final") return <span className="whitespace-nowrap font-mono text-[0.9375rem]/none font-bold">{g1}<i className="px-0.5 not-italic text-txt-dim">–</i>{g2}</span>
   return <DkLive status={status} size="sm" />
 }
 
@@ -103,7 +103,7 @@ export function TnFormatBadge({ format, size }: { format: string; size?: "sm" })
   const t = useTranslations("torneos.format")
   const key = TN_FORMAT_LABEL_KEY[format]
   return (
-    <span className={cn("inline-flex items-center border border-solid border-line-2 font-mono font-semibold tracking-[0.02em] text-txt-muted", size === "sm" ? "gap-1 px-1.5 py-1 text-[9.5px]/none" : "gap-1.5 px-2 py-[5px] text-[10.5px]/none")}>
+    <span className={cn("inline-flex items-center border border-solid border-line-2 font-mono font-semibold tracking-[0.02em] text-txt-muted", size === "sm" ? "gap-1 px-1.5 py-1 text-[0.59375rem]/none" : "gap-1.5 px-2 py-[0.3125rem] text-[0.65625rem]/none")}>
       <Icon name={TN_FORMAT_ICON[format] || "trophy"} size={size === "sm" ? 11 : 12} className="text-accent-bright" />
       {key ? t(key) : format}
     </span>

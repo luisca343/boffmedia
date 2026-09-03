@@ -98,7 +98,7 @@ function WheelRun({
           />
 
           {!showLabels && (
-            <p className="mt-2 text-center font-mono text-[11px] text-txt-muted">
+            <p className="mt-2 text-center font-mono text-[0.6875rem] text-txt-muted">
               {t("labelsHidden", { n: segments.length })}
             </p>
           )}

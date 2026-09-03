@@ -10,7 +10,7 @@ const VARIANT: Record<Variant, string> = {
 };
 
 const BASE =
-  "inline-flex select-none items-center justify-center gap-[7px] rounded-[24px] px-[18px] py-2.5 text-[14.5px] font-semibold transition-[background-color,color,filter,transform] duration-[120ms] active:scale-[.97] disabled:pointer-events-none";
+  "inline-flex select-none items-center justify-center gap-[0.4375rem] rounded-[24px] px-[1.125rem] py-2.5 text-[0.90625rem] font-semibold transition-[background-color,color,filter,transform] duration-[120ms] active:scale-[.97] disabled:pointer-events-none";
 
 type Common = { variant?: Variant; className?: string; children?: ReactNode };
 type AsButton = Common & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className" | "children"> & { href?: undefined };

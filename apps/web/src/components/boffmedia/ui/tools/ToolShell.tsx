@@ -44,25 +44,25 @@ function GameSwitch({ slug }: { slug: string }) {
     // line across the shell. So its height is `--tool-bar-h`, not whatever the
     // switcher button plus a `p-3` gutter happened to add up to (74px against
     // the bar's 58 — the step was visible on every tool page).
-    <div ref={ref} className="relative flex h-[var(--tool-bar-h,58px)] items-center px-3">
+    <div ref={ref} className="relative flex h-[var(--tool-bar-h,3.625rem)] items-center px-3">
       <button
         type="button"
         aria-expanded={open}
         aria-haspopup="true"
         title={tShell("switchGame", { game: t(game.nameKey) })}
         onClick={() => setOpen((v) => !v)}
-        // `py-[5px]` (not the old 7) is what lets the 34px seal live inside a
+        // `py-[0.3125rem]` (not the old 7) is what lets the 34px seal live inside a
         // 58px row with air left over on both sides.
-        className="group/sw cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] flex w-full items-center gap-3 whitespace-nowrap border border-solid border-line bg-panel py-[5px] pl-[6px] pr-[10px] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
+        className="group/sw cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] flex w-full items-center gap-3 whitespace-nowrap border border-solid border-line bg-panel py-[0.3125rem] pl-[0.375rem] pr-[0.625rem] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
       >
         <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} bare />
-        <span className="min-w-0 flex-1 text-left font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
+        <span className="min-w-0 flex-1 text-left font-display text-[0.9375rem] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
         <Icon name="chevronDown" size={16} className={cn("flex-none text-txt-muted transition-transform duration-[140ms]", open && "rotate-180")} />
       </button>
       {open && (
         // `top-full` keeps the old 6px gap under the button: the row is now 58px
         // tall around a 46px button, so its bottom edge is 6px above the row's.
-        <div className="absolute left-3 top-full z-[130] min-w-[228px] border border-solid border-line-2 bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.6)] animate-[bm-menu-in_0.16s_ease-out] motion-reduce:animate-none">
+        <div className="absolute left-3 top-full z-[130] min-w-[14.25rem] border border-solid border-line-2 bg-panel shadow-[0_24px_54px_-22px_rgba(0,0,0,0.6)] animate-[bm-menu-in_0.16s_ease-out] motion-reduce:animate-none">
           {HUB_SLUGS.map((s) => {
             const g = getGameEntry(s)
             if (!g) return null
@@ -72,7 +72,7 @@ function GameSwitch({ slug }: { slug: string }) {
                 href={`/${s}`}
                 onClick={() => setOpen(false)}
                 className={cn(
-                  "flex w-full items-center gap-[10px] whitespace-nowrap border-b border-solid border-line px-3 py-[10px] font-mono text-[12px] font-semibold uppercase leading-none tracking-[0.06em] no-underline transition-[background,color] duration-[140ms] last:border-b-0 hover:bg-panel-2 hover:text-txt",
+                  "flex w-full items-center gap-[0.625rem] whitespace-nowrap border-b border-solid border-line px-3 py-[0.625rem] font-mono text-[0.75rem] font-semibold uppercase leading-none tracking-[0.06em] no-underline transition-[background,color] duration-[140ms] last:border-b-0 hover:bg-panel-2 hover:text-txt",
                   s === slug ? "text-accent" : "text-txt-muted",
                 )}
               >
@@ -119,7 +119,11 @@ function SideRail({
       aria-label={tShell("railAria")}
       style={hueStyle(hue)}
       className={cn(
-        "group/rail relative h-full [--ro:264px] [--rw:72px]",
+        // Open / minimised rail widths. Tokens rather than literals because the
+// rail is the one piece of chrome that should get MORE room on a large
+// display, not just taller type — 264px of nav beside 2000px of content
+// is what made the tools read as a 1080p layout stretched sideways.
+        "group/rail relative h-full [--ro:var(--rail-open,16.5rem)] [--rw:var(--rail-min,4.5rem)]",
         "transition-[width] duration-[340ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
         min ? "w-[var(--rw)] hover:w-[var(--ro)] focus-within:w-[var(--ro)] max-lg:w-full" : "w-[var(--ro)]",
       )}
@@ -137,10 +141,10 @@ function SideRail({
           <GameSwitch slug={slug} />
         </div>
 
-        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden py-[10px] pb-4">
+        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden py-[0.625rem] pb-4">
           {groups.map((g) => (
             <div key={g.name} className="mt-1.5 first:mt-0">
-              <div className={cn("whitespace-nowrap px-[26px] pb-[7px] pt-3.5 font-mono text-[10px] font-bold uppercase leading-none tracking-[0.16em] text-txt-dim", labelFade)}>
+              <div className={cn("whitespace-nowrap px-[1.625rem] pb-[0.4375rem] pt-3.5 font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.16em] text-txt-dim", labelFade)}>
                 {g.name}
               </div>
               {g.items.map((it) => {
@@ -167,9 +171,9 @@ function SideRail({
                     <span className={cn("relative grid w-6 flex-none place-items-center transition-colors duration-[140ms]", on ? "text-[var(--ghue)]" : "text-txt-dim group-hover/link:text-txt-muted")}>
                       <Icon name={it.icon} size={18} />
                     </span>
-                    <span className={cn("min-w-0 flex-1 overflow-hidden text-ellipsis font-body text-[14px] leading-[1.1]", labelFade)}>{it.label}</span>
+                    <span className={cn("min-w-0 flex-1 overflow-hidden text-ellipsis font-body text-[0.875rem] leading-[1.1]", labelFade)}>{it.label}</span>
                     {it.isNew && (
-                      <span className={cn("flex-none font-mono text-[9px] font-bold uppercase tracking-[0.1em] text-accent", labelFade)}>{tShell("new")}</span>
+                      <span className={cn("flex-none font-mono text-[0.5625rem] font-bold uppercase tracking-[0.1em] text-accent", labelFade)}>{tShell("new")}</span>
                     )}
                   </Link>
                 )
@@ -189,7 +193,7 @@ function SideRail({
             <span className="grid w-6 flex-none place-items-center">
               <Icon name={pinned ? "collapse" : "chevronRight"} size={18} />
             </span>
-            <span className={cn("min-w-0 flex-1 text-left font-mono text-[11px] uppercase tracking-[0.1em]", labelFade)}>
+            <span className={cn("min-w-0 flex-1 text-left font-mono text-[0.6875rem] uppercase tracking-[0.1em]", labelFade)}>
               {pinned ? tShell("collapse") : tShell("pin")}
             </span>
           </button>
@@ -309,7 +313,7 @@ export function ToolShell({ slug, children }: ToolShellProps) {
     <div data-footer-flush="" className="flex min-h-[calc(100dvh_-_var(--nav-h))] items-stretch">
       <aside
         className={cn(
-          "z-30 flex-none self-start max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-[80] max-lg:h-screen max-lg:w-[288px] max-lg:shadow-[var(--shadow)]",
+          "z-30 flex-none self-start max-lg:fixed max-lg:inset-y-0 max-lg:left-0 max-lg:z-[80] max-lg:h-screen max-lg:w-[18rem] max-lg:shadow-[var(--shadow)]",
           "max-lg:transition-[transform,visibility] max-lg:duration-300",
           "lg:sticky lg:top-[var(--nav-h)] lg:h-[calc(100dvh_-_var(--nav-h))]",
           mobileOpen ? "max-lg:translate-x-0 max-lg:visible" : "max-lg:-translate-x-full max-lg:invisible",
@@ -331,19 +335,19 @@ export function ToolShell({ slug, children }: ToolShellProps) {
           page gives a tool, so the tool's viewport and its sticky offset both
           have to shrink by that bar — or a viewport tool (battlesim) overflows
           the window by exactly one bar and the page scrolls. */}
-      <div className="min-w-0 flex-1 max-lg:[--tool-sticky-top:calc(var(--nav-h)_+_var(--tool-bar-h,58px))] max-lg:[--tool-vh:calc(100dvh_-_var(--nav-h)_-_var(--tool-bar-h,58px))]">
+      <div className="min-w-0 flex-1 max-lg:[--tool-sticky-top:calc(var(--nav-h)_+_var(--tool-bar-h,3.625rem))] max-lg:[--tool-vh:calc(100dvh_-_var(--nav-h)_-_var(--tool-bar-h,3.625rem))]">
         {/* Same rung as the rail header above and as a tool's own bar: one height
             token, so the phone bar does not read as a third, taller band. `min-h`
             rather than `h` because a long breadcrumb is allowed to grow it. */}
-        <div className="sticky top-[var(--nav-h)] z-40 flex min-h-[var(--tool-bar-h,58px)] items-center gap-3 border-b border-solid border-line bg-base-2 px-[22px] py-[6px] lg:hidden">
+        <div className="sticky top-[var(--nav-h)] z-40 flex min-h-[var(--tool-bar-h,3.625rem)] items-center gap-3 border-b border-solid border-line bg-base-2 px-[1.375rem] py-[0.375rem] lg:hidden">
           <button
             type="button"
             onClick={() => setMobileOpen(true)}
             aria-label={tShell("openToolsMenu")}
-            className="cut-tag cut-tag-edge flex flex-none items-center gap-3 border border-solid border-line bg-panel py-[5px] pl-[6px] pr-[10px]"
+            className="cut-tag cut-tag-edge flex flex-none items-center gap-3 border border-solid border-line bg-panel py-[0.3125rem] pl-[0.375rem] pr-[0.625rem]"
           >
             <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} bare />
-            <span className="font-display text-[15px] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
+            <span className="font-display text-[0.9375rem] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
             <Icon name="list" size={18} className="text-txt-muted" />
           </button>
 
@@ -352,17 +356,17 @@ export function ToolShell({ slug, children }: ToolShellProps) {
               carried its own title, wrong now that App surfaces do not. */}
           {activeCrumb && (
             <nav aria-label={tShell("breadcrumb")} className="flex min-w-0 items-center gap-2">
-              <span className="flex-none font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim">
+              <span className="flex-none font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim">
                 {activeCrumb.group}
               </span>
-              <span aria-hidden="true" className="flex-none text-[11px] leading-none text-line-2">/</span>
-              <span className="truncate font-display text-[14px] font-bold uppercase leading-none tracking-[0.04em] text-accent">
+              <span aria-hidden="true" className="flex-none text-[0.6875rem] leading-none text-line-2">/</span>
+              <span className="truncate font-display text-[0.875rem] font-bold uppercase leading-none tracking-[0.04em] text-accent">
                 {activeCrumb.label}
               </span>
             </nav>
           )}
         </div>
-        <div className={cn("min-w-0", !bleed && "[--pad-x:clamp(22px,3.2vw,60px)] [--pad-y:30px] px-[var(--pad-x)] pb-[90px] pt-[var(--pad-y)]")}>
+        <div className={cn("min-w-0", !bleed && "[--pad-x:clamp(22px,3.2vw,60px)] [--pad-y:30px] px-[var(--pad-x)] pb-[5.625rem] pt-[var(--pad-y)]")}>
           {children}
         </div>
       </div>

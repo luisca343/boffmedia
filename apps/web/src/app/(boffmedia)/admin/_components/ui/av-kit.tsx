@@ -22,11 +22,11 @@ export function AvSectionHead({
   actions?: React.ReactNode
 }) {
   return (
-    <div className={cn("mb-5", actions && "flex items-start justify-between gap-[18px] flex-wrap")}>
+    <div className={cn("mb-5", actions && "flex items-start justify-between gap-[1.125rem] flex-wrap")}>
       <div className="min-w-0">
-        <h2 className="text-[clamp(26px,3.4vw,34px)]">{title}</h2>
+        <h2 className="text-[clamp(1.625rem,3.4vw,2.125rem)]">{title}</h2>
         {desc && (
-          <p className="mt-2 text-txt-muted max-w-[74ch] text-[14.5px] leading-[1.5] text-pretty">{desc}</p>
+          <p className="mt-2 text-txt-muted max-w-[74ch] text-[0.90625rem] leading-[1.5] text-pretty">{desc}</p>
         )}
       </div>
       {actions && <div className="flex gap-2 shrink-0 flex-wrap">{actions}</div>}
@@ -46,9 +46,9 @@ export interface AvPanelProps extends Omit<React.HTMLAttributes<HTMLElement>, "t
 
 export function AvPanel({ title, icon, aside, flush, className, bodyClassName, children, ...rest }: AvPanelProps) {
   return (
-    <section className={cn("bg-panel border border-solid border-line mb-[18px]", className)} {...rest}>
+    <section className={cn("bg-panel border border-solid border-line mb-[1.125rem]", className)} {...rest}>
       {title && (
-        <header className="flex items-center gap-[9px] py-3 px-4 border-b border-solid border-line font-mono text-[11px] font-semibold leading-none uppercase tracking-[0.12em] text-txt-muted">
+        <header className="flex items-center gap-[0.5625rem] py-3 px-4 border-b border-solid border-line font-mono text-[0.6875rem] font-semibold leading-none uppercase tracking-[0.12em] text-txt-muted">
           {icon && <Icon name={icon} size={15} className="text-accent shrink-0" />}
           <span>{title}</span>
           {aside && <span className="ml-auto flex items-center gap-2 normal-case tracking-normal">{aside}</span>}
@@ -65,7 +65,7 @@ export function AvKpis({ children, className }: { children: React.ReactNode; cla
   return (
     <div
       className={cn(
-        "grid gap-3 mb-[18px] [grid-template-columns:repeat(auto-fill,minmax(184px,1fr))]",
+        "grid gap-3 mb-[1.125rem] [grid-template-columns:repeat(auto-fill,minmax(11.5rem,1fr))]",
         className,
       )}
     >
@@ -90,21 +90,21 @@ export function AvKpi({
   return (
     <div
       className={cn(
-        "bg-panel border border-solid border-line border-t-[3px] p-[14px_15px] flex flex-col gap-[9px] min-w-0",
+        "bg-panel border border-solid border-line border-t-[3px] p-[14px_15px] flex flex-col gap-[0.5625rem] min-w-0",
         live ? "border-t-accent" : "border-t-line-2",
       )}
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="font-mono text-[9.5px] font-semibold leading-[1.1] uppercase tracking-[0.1em] text-txt-dim">
+        <span className="font-mono text-[0.59375rem] font-semibold leading-[1.1] uppercase tracking-[0.1em] text-txt-dim">
           {label}
         </span>
         {icon && (
-          <span className="grid place-items-center w-[26px] h-[26px] text-accent bg-accent-soft shrink-0">
+          <span className="grid place-items-center w-[1.625rem] h-[1.625rem] text-accent bg-accent-soft shrink-0">
             <Icon name={icon} size={14} />
           </span>
         )}
       </div>
-      <span className="font-display font-extrabold italic text-[30px]/[0.95] tracking-[-0.01em] tabular-nums whitespace-nowrap">
+      <span className="font-display font-extrabold italic text-[1.875rem]/[0.95] tracking-[-0.01em] tabular-nums whitespace-nowrap">
         {value}
       </span>
       {foot && <div className="flex items-center gap-2 flex-wrap mt-auto">{foot}</div>}
@@ -137,7 +137,7 @@ export function AvPill({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-[5px] font-mono text-[9.5px] font-bold leading-none uppercase tracking-[0.08em] py-[5px] px-[9px] whitespace-nowrap border border-solid",
+        "inline-flex items-center gap-[0.3125rem] font-mono text-[0.59375rem] font-bold leading-none uppercase tracking-[0.08em] py-[0.3125rem] px-[0.5625rem] whitespace-nowrap border border-solid",
         PILL_TONES[tone],
         className,
       )}
@@ -172,7 +172,7 @@ export function AvAlert({
   return (
     <div
       className={cn(
-        "flex gap-3 py-[13px] px-4 border border-solid border-line-2 border-l-[3px] bg-panel",
+        "flex gap-3 py-[0.8125rem] px-4 border border-solid border-line-2 border-l-[3px] bg-panel",
         t.bar,
         className,
       )}
@@ -180,9 +180,9 @@ export function AvAlert({
       <Icon name={t.ico} size={17} className={cn("shrink-0 mt-px", t.icon)} />
       <div className="min-w-0">
         {title && (
-          <p className="font-display text-[14px] font-bold leading-[1.2] uppercase tracking-[0.03em]">{title}</p>
+          <p className="font-display text-[0.875rem] font-bold leading-[1.2] uppercase tracking-[0.03em]">{title}</p>
         )}
-        {children && <div className="text-[13px] leading-[1.5] text-txt-muted mt-[3px]">{children}</div>}
+        {children && <div className="text-[0.8125rem] leading-[1.5] text-txt-muted mt-[3px]">{children}</div>}
       </div>
     </div>
   )
@@ -194,7 +194,7 @@ export function AvLiveDot({ className }: { className?: string }) {
   return (
     <span
       className={cn(
-        "inline-block w-[7px] h-[7px] rounded-full bg-ok",
+        "inline-block w-[0.4375rem] h-[0.4375rem] rounded-full bg-ok",
         "animate-[bm-pulse_1.8s_ease-out_infinite] motion-reduce:animate-none",
         className,
       )}
@@ -264,7 +264,7 @@ export function AvViewLink({
 
 export function AvMetrics({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn("grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(92px,1fr))]", className)}>
+    <div className={cn("grid gap-2 [grid-template-columns:repeat(auto-fit,minmax(5.75rem,1fr))]", className)}>
       {children}
     </div>
   )
@@ -280,10 +280,10 @@ export function AvMetric({
   tone?: "accent" | "pos" | "neg"
 }) {
   return (
-    <div className="py-[9px] px-[11px] border border-solid border-line bg-base-2">
+    <div className="py-[0.5625rem] px-[0.6875rem] border border-solid border-line bg-base-2">
       <div
         className={cn(
-          "font-display font-extrabold italic text-[20px] leading-none tabular-nums",
+          "font-display font-extrabold italic text-[1.25rem] leading-none tabular-nums",
           tone === "accent" && "text-accent",
           tone === "pos" && "text-ok",
           tone === "neg" && "text-bad",
@@ -291,7 +291,7 @@ export function AvMetric({
       >
         {value}
       </div>
-      <div className="mt-[3px] font-mono text-[9px] font-medium leading-none uppercase tracking-[0.07em] text-txt-dim">
+      <div className="mt-[3px] font-mono text-[0.5625rem] font-medium leading-none uppercase tracking-[0.07em] text-txt-dim">
         {label}
       </div>
     </div>
@@ -327,13 +327,13 @@ export function AvSwitchRow({
     <div className={cn("flex items-center gap-3 border-b border-dashed border-line py-2.5 last:border-b-0", className)}>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2">
-          <span className={cn("h-[7px] w-[7px] flex-none rounded-full", on ? "bg-ok" : "bg-line-2")} />
-          <span className="font-mono text-[10.5px] font-semibold uppercase tracking-[0.1em] text-txt">{label}</span>
-          <span className={cn("font-mono text-[10px] uppercase tracking-[0.08em]", on ? "text-ok" : "text-txt-dim")}>
+          <span className={cn("h-[0.4375rem] w-[0.4375rem] flex-none rounded-full", on ? "bg-ok" : "bg-line-2")} />
+          <span className="font-mono text-[0.65625rem] font-semibold uppercase tracking-[0.1em] text-txt">{label}</span>
+          <span className={cn("font-mono text-[0.625rem] uppercase tracking-[0.08em]", on ? "text-ok" : "text-txt-dim")}>
             {reading}
           </span>
         </div>
-        {hint && <p className="m-0 mt-0.5 font-body text-[11.5px] leading-[1.4] text-txt-dim">{hint}</p>}
+        {hint && <p className="m-0 mt-0.5 font-body text-[0.71875rem] leading-[1.4] text-txt-dim">{hint}</p>}
       </div>
       {action}
     </div>
@@ -376,7 +376,7 @@ export function AvAttention({
     return (
       <div className={cn("flex items-center gap-3 py-2.5", className)}>
         <Icon name="check" size={15} className="shrink-0 text-ok" />
-        <span className="font-body text-[13px] leading-[1.4] text-txt-muted">{empty}</span>
+        <span className="font-body text-[0.8125rem] leading-[1.4] text-txt-muted">{empty}</span>
       </div>
     )
   }
@@ -387,12 +387,12 @@ export function AvAttention({
         return (
           <li key={it.id} className="flex items-center gap-3 border-b border-dashed border-line py-2.5 last:border-b-0">
             <Icon name={tone.icon} size={15} className={cn("shrink-0", tone.cls)} />
-            <span className="min-w-0 flex-1 font-body text-[13px] leading-[1.4] text-txt">{it.text}</span>
+            <span className="min-w-0 flex-1 font-body text-[0.8125rem] leading-[1.4] text-txt">{it.text}</span>
             {it.action && (
               <button
                 type="button"
                 onClick={it.action.onClick}
-                className="shrink-0 font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-accent transition-opacity hover:opacity-70"
+                className="shrink-0 font-mono text-[0.65625rem] font-semibold uppercase tracking-[0.08em] text-accent transition-opacity hover:opacity-70"
               >
                 {it.action.label}
               </button>
@@ -433,7 +433,7 @@ export function AvProgressBar({
       <div className="flex-1 h-1.5 overflow-hidden border border-solid border-line bg-panel-2">
         <div className={cn("h-full transition-[width] duration-300", toneClass)} style={{ width: `${pct}%` }} />
       </div>
-      {label && <span className="flex-none text-right text-[11px] text-txt-dim tabular-nums font-mono">{label}</span>}
+      {label && <span className="flex-none text-right text-[0.6875rem] text-txt-dim tabular-nums font-mono">{label}</span>}
     </div>
   )
 }
@@ -510,7 +510,7 @@ export function AvJobPanel({
       className={className}
       bodyClassName="flex flex-col gap-4"
     >
-      {desc && <p className="text-[13px] text-txt-muted">{desc}</p>}
+      {desc && <p className="text-[0.8125rem] text-txt-muted">{desc}</p>}
 
       {progress && (
         <AvProgressBar

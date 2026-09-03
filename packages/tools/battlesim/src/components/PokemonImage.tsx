@@ -33,7 +33,7 @@ export function PokemonImage({ id, pokemon, side = 'p2', className, battle }: Po
     return (
         <div className={`relative z-50 flex h-full w-full items-end justify-center ${className ?? ''}`} id={id}>
             {protecting && (
-                <div aria-hidden className={`absolute bottom-8 h-[75px] w-[100px] self-center bg-signal opacity-30 [clip-path:circle(50%)] ${side === 'p1' ? 'z-0' : 'z-50'}`} />
+                <div aria-hidden className={`absolute bottom-8 h-[4.6875rem] w-[6.25rem] self-center bg-signal opacity-30 [clip-path:circle(50%)] ${side === 'p1' ? 'z-0' : 'z-50'}`} />
             )}
             <div aria-hidden style={{
                 position: 'absolute',

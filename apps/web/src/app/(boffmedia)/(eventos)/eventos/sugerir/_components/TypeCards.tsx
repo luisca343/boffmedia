@@ -18,7 +18,7 @@ export function TypeCards({ value, onChange }: TypeCardsProps) {
   const t = useTranslations("sugerir.type")
   return (
     <fieldset>
-      <legend className="mb-3 font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
+      <legend className="mb-3 font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
         {t("label")}
       </legend>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -47,10 +47,10 @@ export function TypeCards({ value, onChange }: TypeCardsProps) {
                 <Icon name={ty.icon} size={20} />
               </span>
               <span className="grid gap-1">
-                <span className="font-display text-[15px] font-bold not-italic uppercase tracking-[0.02em] text-txt">
+                <span className="font-display text-[0.9375rem] font-bold not-italic uppercase tracking-[0.02em] text-txt">
                   {t(`${ty.key}.label`)}
                 </span>
-                <span className="font-body text-[13px]/[1.35] text-txt-muted">{t(`${ty.key}.desc`)}</span>
+                <span className="font-body text-[0.8125rem]/[1.35] text-txt-muted">{t(`${ty.key}.desc`)}</span>
               </span>
             </button>
           )

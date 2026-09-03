@@ -43,7 +43,7 @@ export function TagPicker({
       <div className="fixed inset-0 z-[300]" onMouseDown={onClose}>
         <div
           onMouseDown={(e) => e.stopPropagation()}
-          className="absolute w-[240px] overflow-hidden rounded-nt-md border border-nt-border-2 bg-nt-panel shadow-[0_18px_50px_-12px_rgba(0,0,0,.7)]"
+          className="absolute w-[15rem] overflow-hidden rounded-nt-md border border-nt-border-2 bg-nt-panel shadow-[0_18px_50px_-12px_rgba(0,0,0,.7)]"
           style={{ left: Math.min(x, window.innerWidth - 250), top: Math.min(y, window.innerHeight - 300) }}
         >
           <input
@@ -57,16 +57,16 @@ export function TagPicker({
               }
             }}
             placeholder={t("tagPicker.placeholder")}
-            className="w-full border-b border-nt-border bg-transparent px-3 py-2.5 text-[13px] text-nt-fg outline-none placeholder:text-nt-fg-subtle"
+            className="w-full border-b border-nt-border bg-transparent px-3 py-2.5 text-[0.8125rem] text-nt-fg outline-none placeholder:text-nt-fg-subtle"
           />
-          <div className="nt-scroll max-h-[220px] overflow-auto p-1.5">
+          <div className="nt-scroll max-h-[13.75rem] overflow-auto p-1.5">
             {filtered.map((t) => {
               const on = current.includes(t.id);
               return (
                 <div
                   key={t.id}
                   onClick={() => onToggle(t.id)}
-                  className="flex cursor-pointer items-center gap-2 rounded-nt-sm px-2 py-2 text-[13px] text-nt-fg-muted hover:bg-nt-hover hover:text-nt-fg"
+                  className="flex cursor-pointer items-center gap-2 rounded-nt-sm px-2 py-2 text-[0.8125rem] text-nt-fg-muted hover:bg-nt-hover hover:text-nt-fg"
                 >
                   <span
                     className="h-2 w-2 flex-none rounded-full"
@@ -83,7 +83,7 @@ export function TagPicker({
                   onCreate(q.trim());
                   setQ("");
                 }}
-                className="flex cursor-pointer items-center gap-2 rounded-nt-sm px-2 py-2 text-[13px] text-nt-accent-fg hover:bg-nt-hover"
+                className="flex cursor-pointer items-center gap-2 rounded-nt-sm px-2 py-2 text-[0.8125rem] text-nt-accent-fg hover:bg-nt-hover"
               >
                 <Icon name="plus" size={14} />
                 {t("tagPicker.create", { name: q.trim() })}

@@ -41,20 +41,20 @@ export function TnLeaderboard({ lb, onOpen, pinned, onPin, query }: { lb: TnLb; 
             key={e.author.id}
             style={edge ? { borderLeftColor: edge } : undefined}
             className={cn(
-              "grid grid-cols-[48px_minmax(0,1.4fr)_minmax(80px,2fr)_auto_auto] items-center gap-3 border border-solid border-line border-l-[3px] border-l-line-2 bg-panel px-[14px] py-[9px] max-[720px]:grid-cols-[34px_1fr_auto]",
+              "grid grid-cols-[3rem_minmax(0,1.4fr)_minmax(5rem,2fr)_auto_auto] items-center gap-3 border border-solid border-line border-l-[3px] border-l-line-2 bg-panel px-[0.875rem] py-[0.5625rem] max-[720px]:grid-cols-[2.125rem_1fr_auto]",
               e.rank === 1 && "bg-[color-mix(in_srgb,var(--warn)_6%,var(--panel))]",
               pinned === e.author.id && "!bg-[color-mix(in_srgb,var(--warn)_7%,transparent)]",
             )}
           >
-            <span className={cn("inline-flex items-center gap-1.5 font-mono text-[15px]/none font-extrabold", top ? "text-warn" : "text-txt-muted")}>
+            <span className={cn("inline-flex items-center gap-1.5 font-mono text-[0.9375rem]/none font-extrabold", top ? "text-warn" : "text-txt-muted")}>
               {top && <Icon name="trophy" size={14} />}
               <b>{e.rank}</b>
             </span>
             <span className="flex min-w-0 items-center gap-2.5">
               <TnAvatar c={e.author} size={30} />
               <button type="button" className="group grid min-w-0 gap-0.5 border-0 bg-transparent p-0 text-left enabled:cursor-pointer" onClick={() => onOpen?.(e.author.id)}>
-                <b className="truncate font-body text-[13.5px]/[1.15] font-semibold transition-colors group-hover:text-accent-bright">{e.author.name}</b>
-                <i className="inline-flex items-center gap-1 truncate font-mono text-[9.5px]/[1.2] not-italic text-txt-dim">
+                <b className="truncate font-body text-[0.84375rem]/[1.15] font-semibold transition-colors group-hover:text-accent-bright">{e.author.name}</b>
+                <i className="inline-flex items-center gap-1 truncate font-mono text-[0.59375rem]/[1.2] not-italic text-txt-dim">
                   {e.tag ? e.tag + " · " : ""}
                   <DkFlag flag={e.author.flag} code={e.author.country} name={e.author.countryName} size={11} /> {e.author.countryName}
                 </i>
@@ -63,9 +63,9 @@ export function TnLeaderboard({ lb, onOpen, pinned, onPin, query }: { lb: TnLb; 
             <span className="h-2 overflow-hidden border border-solid border-line-2 bg-base max-[720px]:hidden" aria-hidden="true">
               <i className="block h-full bg-[linear-gradient(90deg,var(--accent),var(--accent-bright))]" style={{ width: Math.max(6, frac * 100) + "%" }} />
             </span>
-            <span className="inline-flex items-baseline gap-[5px] justify-self-end">
-              <b className="font-mono text-[15px]/none font-extrabold text-txt">{e.meta}</b>
-              <span className="font-mono text-[9.5px]/none text-txt-dim">{e.unit}</span>
+            <span className="inline-flex items-baseline gap-[0.3125rem] justify-self-end">
+              <b className="font-mono text-[0.9375rem]/none font-extrabold text-txt">{e.meta}</b>
+              <span className="font-mono text-[0.59375rem]/none text-txt-dim">{e.unit}</span>
               {e.verified ? (
                 <span className="inline-grid place-items-center text-ok" title={t("verified")}><Icon name="check" size={11} /></span>
               ) : (
@@ -76,7 +76,7 @@ export function TnLeaderboard({ lb, onOpen, pinned, onPin, query }: { lb: TnLb; 
           </div>
         )
       })}
-      {rows.length === 0 && <p className="font-mono text-[12px]/[1.5] text-txt-dim">{t("noEntriesFor", { query: query || "" })}</p>}
+      {rows.length === 0 && <p className="font-mono text-[0.75rem]/[1.5] text-txt-dim">{t("noEntriesFor", { query: query || "" })}</p>}
     </div>
   )
 }

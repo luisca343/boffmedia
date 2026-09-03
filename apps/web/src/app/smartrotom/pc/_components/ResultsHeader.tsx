@@ -33,13 +33,13 @@ export function ResultsHeader({
   const t = useTranslations("pc")
   return (
     <div className="flex items-center gap-2.5 border-b border-pc-line bg-gradient-to-r from-pc-violet/10 to-transparent px-3.5 py-2.5">
-      <span className="flex h-[34px] w-[34px] flex-none items-center justify-center rounded-[9px] border border-pc-violet/50 bg-gradient-to-br from-pc-violet/40 to-pc-violet/[.12] text-pc-violet">
+      <span className="flex h-[2.125rem] w-[2.125rem] flex-none items-center justify-center rounded-[9px] border border-pc-violet/50 bg-gradient-to-br from-pc-violet/40 to-pc-violet/[.12] text-pc-violet">
         <Icon name="sliders" size={16} />
       </span>
 
       <div className="min-w-0 flex-1">
         <h3 className="truncate font-pc-display text-base font-bold text-pc-fg">{title}</h3>
-        <p className="font-pc-mono text-[11.5px] text-pc-fg-subtle">
+        <p className="font-pc-mono text-[0.71875rem] text-pc-fg-subtle">
           {count} Pokémon · {t("pagination.page", { current: page, total: pages || 1 })}
         </p>
       </div>

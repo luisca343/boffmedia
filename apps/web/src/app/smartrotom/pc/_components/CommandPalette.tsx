@@ -153,7 +153,7 @@ export function CommandPalette({
         aria-modal="true"
         aria-label={t("commands.title")}
         onClick={(e) => e.stopPropagation()}
-        className="pc-glass w-[560px] max-w-[94vw] animate-pc-slide-up overflow-hidden rounded-pc-lg font-pc text-pc-fg motion-reduce:animate-none"
+        className="pc-glass w-[35rem] max-w-[94vw] animate-pc-slide-up overflow-hidden rounded-pc-lg font-pc text-pc-fg motion-reduce:animate-none"
       >
         <div className="flex items-center gap-2.5 border-b border-pc-line px-4 py-3.5">
           <Icon name="command" size={17} className="text-pc-accent" />
@@ -175,14 +175,14 @@ export function CommandPalette({
             }}
             aria-label={t("topbar.commands")}
             placeholder={t("topbar.commands")}
-            className="flex-1 border-none bg-transparent p-0 text-[15px] text-pc-fg outline-none placeholder:text-pc-fg-subtle"
+            className="flex-1 border-none bg-transparent p-0 text-[0.9375rem] text-pc-fg outline-none placeholder:text-pc-fg-subtle"
           />
-          <Chip className="text-[10px]">ESC</Chip>
+          <Chip className="text-[0.625rem]">ESC</Chip>
         </div>
 
-        <div className="max-h-[360px] overflow-auto p-[7px]">
+        <div className="max-h-[22.5rem] overflow-auto p-[0.4375rem]">
           {filtered.length === 0 && (
-            <p className="p-6 text-center text-[13px] text-pc-fg-subtle">{t("empty.noResults")}</p>
+            <p className="p-6 text-center text-[0.8125rem] text-pc-fg-subtle">{t("empty.noResults")}</p>
           )}
           {filtered.map((c, i) => (
             <button
@@ -190,12 +190,12 @@ export function CommandPalette({
               type="button"
               onClick={() => exec(c)}
               onMouseEnter={() => setSel(i)}
-              className={`flex w-full items-center gap-[11px] rounded-[10px] px-3 py-2.5 text-left focus-visible:outline-none ${
+              className={`flex w-full items-center gap-[0.6875rem] rounded-[10px] px-3 py-2.5 text-left focus-visible:outline-none ${
                 i === sel ? "bg-pc-accent/[.16]" : "bg-transparent"
               }`}
             >
               <Icon name={c.icon} size={15} className={i === sel ? "text-pc-accent" : "text-pc-fg-subtle"} />
-              <span className="flex-1 text-[13.5px]">{c.label}</span>
+              <span className="flex-1 text-[0.84375rem]">{c.label}</span>
               {i === sel && <Icon name="arrowR" size={14} className="text-pc-accent" />}
             </button>
           ))}

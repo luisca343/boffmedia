@@ -44,7 +44,7 @@ export function TeamRow({ mon, index }: TeamRowProps) {
           over ? "border-solid border-pc-green bg-pc-green/[.12]" : "border-pc-line",
         ].join(" ")}
       >
-        <span className="flex h-[22px] w-[22px] items-center justify-center rounded-pc-pill border border-pc-line-strong font-pc-mono text-[11px] text-pc-fg-subtle">
+        <span className="flex h-[1.375rem] w-[1.375rem] items-center justify-center rounded-pc-pill border border-pc-line-strong font-pc-mono text-[0.6875rem] text-pc-fg-subtle">
           {index + 1}
         </span>
         <span className="text-xs text-pc-fg-subtle">{t("team.emptySlot")}</span>
@@ -83,7 +83,7 @@ export function TeamRow({ mon, index }: TeamRowProps) {
         if (!setMark.isPending) setMark.mutate({ key: mon.key, patch: { favorite: !fav } })
       }}
       className={[
-        "flex h-14 flex-none cursor-pointer touch-none items-center gap-[9px] rounded-pc-sm border py-0 pl-1.5 pr-2.5",
+        "flex h-14 flex-none cursor-pointer touch-none items-center gap-[0.5625rem] rounded-pc-sm border py-0 pl-1.5 pr-2.5",
         "bg-gradient-to-b from-[rgb(13_20_36_/_.5)] to-[rgb(9_14_26_/_.65)] transition-colors focus-visible:outline-none",
         over
           ? "border-pc-green shadow-[0_0_0_2px_rgb(var(--pc-green))]"
@@ -118,10 +118,10 @@ export function TeamRow({ mon, index }: TeamRowProps) {
 
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <span className="truncate text-[12.5px] font-bold text-pc-fg">{displayName(p)}</span>
-          <span className="flex-none font-pc-mono text-[10.5px] text-pc-fg-subtle">Nv{p.level}</span>
+          <span className="truncate text-[0.78125rem] font-bold text-pc-fg">{displayName(p)}</span>
+          <span className="flex-none font-pc-mono text-[0.65625rem] text-pc-fg-subtle">Nv{p.level}</span>
         </div>
-        <div className="mt-[3px] flex items-center gap-[5px]">
+        <div className="mt-[3px] flex items-center gap-[0.3125rem]">
           <Bar pct={pct} tone={hpTone(hpPct(p))} height={5} className="flex-1" />
           <ItemDot pokemon={p} />
         </div>

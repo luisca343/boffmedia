@@ -31,9 +31,9 @@ export function Medallas({
     return (
       <>
         <PageHead eyebrow={t("medallas.eyebrow")} title={t("medallas.title")} />
-        <Skeleton className="mb-3 h-[62px]" />
+        <Skeleton className="mb-3 h-[3.875rem]" />
         {Array.from({ length: 2 }, (_, i) => (
-          <Skeleton key={i} className="mb-3 h-[110px]" />
+          <Skeleton key={i} className="mb-3 h-[6.875rem]" />
         ))}
       </>
     )
@@ -56,11 +56,11 @@ export function Medallas({
     <>
       <PageHead eyebrow={t("medallas.eyebrow")} title={t("medallas.title")} />
 
-      <Card className="mb-3 px-3.5 py-[11px]">
-        <div className="mb-[7px] flex items-center justify-between gap-2">
-          <span className="font-ps-ceremony text-[15px]">{t("medallas.badgesEarned")}</span>
-          <span className="ps-num font-ps-mono text-[13px] text-ps-ink-soft">
-            <b className="text-[18px] text-ps-ink">{done}</b>/{gyms.length}
+      <Card className="mb-3 px-3.5 py-[0.6875rem]">
+        <div className="mb-[0.4375rem] flex items-center justify-between gap-2">
+          <span className="font-ps-ceremony text-[0.9375rem]">{t("medallas.badgesEarned")}</span>
+          <span className="ps-num font-ps-mono text-[0.8125rem] text-ps-ink-soft">
+            <b className="text-[1.125rem] text-ps-ink">{done}</b>/{gyms.length}
           </span>
         </div>
         <Bar value={done} max={gyms.length} label={t("medallas.badgesCount", { done, total: gyms.length })} />
@@ -71,7 +71,7 @@ export function Medallas({
       <div className="ps-scroll min-h-0 flex-1 overflow-y-auto pb-7 pr-1">
       {circuits.map((circuit) => (
         <section key={circuit.name} className="mb-3.5">
-          <SectionLabel className="text-[13px]" count={`${circuit.done}/${circuit.badges.length} · ${circuit.pct}%`}>
+          <SectionLabel className="text-[0.8125rem]" count={`${circuit.done}/${circuit.badges.length} · ${circuit.pct}%`}>
             {shortCircuit(circuit.name)}
           </SectionLabel>
           <Bar
@@ -105,7 +105,7 @@ export function Medallas({
                   />
                   <span
                     className={cn(
-                      "max-w-[76px] text-center text-[9.5px] leading-[1.05]",
+                      "max-w-[4.75rem] text-center text-[0.59375rem] leading-[1.05]",
                       earned ? "text-ps-ink-soft" : "text-ps-ink-faint",
                     )}
                   >

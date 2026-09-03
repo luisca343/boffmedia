@@ -72,7 +72,7 @@ export function PostCard({ post, last = false }: PostCardProps) {
       <div className={cn(compact ? "px-3.5 py-2.5" : "px-4 py-3.5")}>
         {post.pinned && (
           <div
-            className="mb-1 flex items-center gap-1.5 text-[12.5px] font-semibold text-rk-fg-subtle"
+            className="mb-1 flex items-center gap-1.5 text-[0.78125rem] font-semibold text-rk-fg-subtle"
             style={{ marginLeft: avatar + 12 }}
           >
             <Icon name="pin" size={13} fill className="text-rk-accent" />
@@ -81,7 +81,7 @@ export function PostCard({ post, last = false }: PostCardProps) {
         )}
         {post.retrinoBy && (
           <div
-            className="mb-1 flex items-center gap-1.5 text-[12.5px] font-semibold text-rk-fg-subtle"
+            className="mb-1 flex items-center gap-1.5 text-[0.78125rem] font-semibold text-rk-fg-subtle"
             style={{ marginLeft: avatar + 12 }}
           >
             <Icon name="retrino" size={13} />{t("post.retrinoedBy", { handle: post.retrinoBy })}
@@ -106,13 +106,13 @@ export function PostCard({ post, last = false }: PostCardProps) {
 
             {post.text && (
               <div className="mt-0.5">
-                <RichText text={post.text} className={compact ? "text-[14px]" : "text-[15px]"} />
+                <RichText text={post.text} className={compact ? "text-[0.875rem]" : "text-[0.9375rem]"} />
               </div>
             )}
 
             {attachment && <div className="mt-2.5">{attachment}</div>}
 
-            <div className="-ml-1.5 mt-2 flex max-w-[440px] items-center justify-between">
+            <div className="-ml-1.5 mt-2 flex max-w-[27.5rem] items-center justify-between">
               <ActionBtn
                 icon="reply"
                 label={t("post.actions.reply")}

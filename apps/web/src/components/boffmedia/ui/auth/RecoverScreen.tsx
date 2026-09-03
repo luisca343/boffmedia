@@ -46,7 +46,7 @@ export function RecoverScreen() {
           <span aria-hidden className="grid h-14 w-14 place-items-center rounded-full bg-accent-soft text-accent">
             <Icon name="mail" size={26} />
           </span>
-          <p className="font-body text-[14px]/[1.55] not-italic normal-case text-txt-muted">
+          <p className="font-body text-[0.875rem]/[1.55] not-italic normal-case text-txt-muted">
             {t("recover.sent")}
           </p>
         </div>
@@ -56,7 +56,7 @@ export function RecoverScreen() {
 
   return (
     <AuthShell title={t("recover.title")} subtitle={t("recover.subtitle")}>
-      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[15px]" noValidate>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.9375rem]" noValidate>
         <Field label={t("fields.email")} error={errors.email?.message}>
           <Input type="email" placeholder={t("fields.emailPh")} autoComplete="email" {...register("email")} />
         </Field>

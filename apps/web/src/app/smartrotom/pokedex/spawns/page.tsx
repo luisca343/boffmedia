@@ -84,7 +84,7 @@ export default function SpawnsPage() {
       />
 
       <div className="flex items-center gap-3 flex-wrap bg-white/[0.02] border border-white/[0.05] rounded-xl p-2.5">
-        <span className="font-pk-mono text-[11px] tracking-[0.1em] uppercase text-pk-surface-400 mr-1">{t("spawns_hide")}</span>
+        <span className="font-pk-mono text-[0.6875rem] tracking-[0.1em] uppercase text-pk-surface-400 mr-1">{t("spawns_hide")}</span>
         <div className="flex gap-1.5">
           <button
             onClick={() => setHideCaught((c) => !c)}
@@ -107,7 +107,7 @@ export default function SpawnsPage() {
             {t("spawns_seen")}
           </button>
         </div>
-        <span className="ml-auto text-[11px] text-pk-surface-500 font-pk-mono">
+        <span className="ml-auto text-[0.6875rem] text-pk-surface-500 font-pk-mono">
           {t("spawns_visible_of")} <b className="text-pk-surface-100">{total}</b> {t("spawns_of")} {spawns.length}
         </span>
       </div>
@@ -121,7 +121,7 @@ export default function SpawnsPage() {
           const meta = RARITY_META[gid]
           return (
             <div key={gid} className="flex flex-col gap-2">
-              <div className="flex items-center gap-2.5 text-[11px] tracking-wider uppercase font-pk-mono font-semibold" style={{ color: meta.fg }}>
+              <div className="flex items-center gap-2.5 text-[0.6875rem] tracking-wider uppercase font-pk-mono font-semibold" style={{ color: meta.fg }}>
                 <span className="flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full" style={{ background: meta.fg, boxShadow: `0 0 6px ${meta.fg}` }} />
                   {t(meta.labelKey)}
@@ -129,7 +129,7 @@ export default function SpawnsPage() {
                 </span>
                 <span className="flex-1 h-px bg-white/[0.06]" />
               </div>
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(96px,1fr))] gap-2">
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(6rem,1fr))] gap-2">
                 {items.map((s, i) => (
                   <SpawnTile
                     key={`${s.dex}-${s.form}-${i}`}

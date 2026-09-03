@@ -58,12 +58,12 @@ export function StopRow({
         <Icon name="pin" size={17} stroke={2.4} />
       </span>
 
-      <span className="flex min-w-0 flex-1 flex-col gap-[5px]">
+      <span className="flex min-w-0 flex-1 flex-col gap-[0.3125rem]">
         <span className="flex items-center gap-2">
-          <span className="truncate text-[14.5px] font-bold text-tx-txt">{stop.id}</span>
+          <span className="truncate text-[0.90625rem] font-bold text-tx-txt">{stop.id}</span>
           {stop.region && <RegionTag>{stop.region}</RegionTag>}
         </span>
-        <span className="flex items-center gap-[11px] text-xs text-tx-txt-2">
+        <span className="flex items-center gap-[0.6875rem] text-xs text-tx-txt-2">
           <span className="inline-flex items-center gap-1">
             <Icon name="walking" size={13} stroke={2} />
             <span className="font-tx-mono">{formatNum(stop.dist)}</span> b
@@ -81,7 +81,7 @@ export function StopRow({
         </span>
       </span>
 
-      <span className="flex shrink-0 flex-col items-end gap-[5px]">
+      <span className="flex shrink-0 flex-col items-end gap-[0.3125rem]">
         <button
           type="button"
           onClick={(e) => {
@@ -95,7 +95,7 @@ export function StopRow({
           }
           aria-pressed={favorite}
           className={cn(
-            "grid h-[26px] w-[26px] place-items-center rounded-lg transition-[color,transform] duration-150 ease-tx",
+            "grid h-[1.625rem] w-[1.625rem] place-items-center rounded-lg transition-[color,transform] duration-150 ease-tx",
             "hover:scale-110 hover:text-tx-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tx-accent",
             favorite ? "text-tx-accent" : "text-tx-txt-3",
           )}
@@ -104,7 +104,7 @@ export function StopRow({
         </button>
         <span
           className={cn(
-            "font-tx-mono text-[14.5px] font-extrabold",
+            "font-tx-mono text-[0.90625rem] font-extrabold",
             affordable ? "text-tx-money" : "text-tx-no",
           )}
         >

@@ -21,15 +21,15 @@ export function Kpi({ label, value, sub, delta, icon = "card", tone = "brand" }:
 }) {
   return (
     <div className="flex flex-col gap-1.5 rounded-sb-lg border border-sb-border bg-sb-surface p-5 shadow-sb-1">
-      <div className="flex items-center justify-between text-[12px] text-sb-fg-muted">
+      <div className="flex items-center justify-between text-[0.75rem] text-sb-fg-muted">
         <span>{label}</span>
         <span className={cn("grid size-8 place-items-center rounded-[10px]", ICON_TONE[tone])}>
           <Ico name={icon} size={16} />
         </span>
       </div>
-      <div className="font-sb-display text-[26px] font-semibold tracking-[-0.01em] tabular-nums">{value}</div>
+      <div className="font-sb-display text-[1.625rem] font-semibold tracking-[-0.01em] tabular-nums">{value}</div>
       {(delta != null || sub) && (
-        <div className="flex items-center gap-1.5 text-[12px] text-sb-fg-muted">
+        <div className="flex items-center gap-1.5 text-[0.75rem] text-sb-fg-muted">
           {delta != null && (
             <span className={cn("font-semibold", delta > 0 ? "text-sb-pos" : "text-sb-neg")}>
               {delta > 0 ? "▲" : "▼"} {Math.abs(delta).toFixed(1)}%

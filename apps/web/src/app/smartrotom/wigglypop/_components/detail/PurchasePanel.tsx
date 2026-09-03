@@ -41,7 +41,7 @@ export function PurchasePanel({
     return (
       <div className="flex flex-wrap items-center gap-3">
         <div className="flex-1">
-          <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+          <div className="font-wp text-[0.6875rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
             {t("common.yourListing")}
           </div>
           <Price amount={L.format === "auction" ? (L.currentBid ?? L.price) : L.price} size={30} />
@@ -61,14 +61,14 @@ export function PurchasePanel({
       <div>
         <div className="mb-3.5 flex items-start justify-between">
           <div>
-            <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+            <div className="font-wp text-[0.6875rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
               {t("purchase.currentBidLabel")} · {t("common.bidsCount", { count: L.bids ?? 0 })}
             </div>
             <Price amount={bid} size={30} />
           </div>
           {L.endsAt && (
             <div className="text-right">
-              <div className="mb-1 font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+              <div className="mb-1 font-wp text-[0.6875rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
                 {t("purchase.endsIn")}
               </div>
               <Countdown endsAt={L.endsAt} />
@@ -76,17 +76,17 @@ export function PurchasePanel({
           )}
         </div>
         <div className="flex gap-2.5">
-          <Button variant="primary" className="flex-1 py-[13px]" onClick={onBid}>
+          <Button variant="primary" className="flex-1 py-[0.8125rem]" onClick={onBid}>
             <Icon name="gavel" size={17} />
             {t("purchase.bidButton", { amount: fmt(next) })}
           </Button>
           {L.buyNow && (
-            <Button className="px-4 py-[13px]" onClick={onBuy}>
+            <Button className="px-4 py-[0.8125rem]" onClick={onBuy}>
               {t("purchase.buyNowButton", { amount: fmt(L.buyNow) })}
             </Button>
           )}
         </div>
-        <div className="mt-2.5 font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+        <div className="mt-2.5 font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
           {t("purchase.minIncrementNote", { step: fmt(L.minIncrement ?? 50) })}
         </div>
       </div>
@@ -96,19 +96,19 @@ export function PurchasePanel({
   if (L.format === "trade") {
     return (
       <div>
-        <div className="mb-2 font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+        <div className="mb-2 font-wp text-[0.6875rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
           {t("purchase.tradeSeeksLabel")}
         </div>
         <div className="mb-3.5 flex flex-wrap gap-2">
           {(L.wants ?? []).map((w) => (
-            <Chip key={w} className="border-wp-teal/30 px-3 py-[7px] text-[13px] text-wp-teal-deep">
+            <Chip key={w} className="border-wp-teal/30 px-3 py-[0.4375rem] text-[0.8125rem] text-wp-teal-deep">
               <Icon name="swap" size={13} />
               {w}
             </Chip>
           ))}
-          {L.tradePlus && <Chip className="px-3 py-[7px] text-[13px]">{t("purchase.tradePlusCompensation")}</Chip>}
+          {L.tradePlus && <Chip className="px-3 py-[0.4375rem] text-[0.8125rem]">{t("purchase.tradePlusCompensation")}</Chip>}
         </div>
-        <Button variant="primary" className="w-full py-[13px]" onClick={onTrade}>
+        <Button variant="primary" className="w-full py-[0.8125rem]" onClick={onTrade}>
           <Icon name="swap" size={17} />
           {t("common.proposeTrade")}
         </Button>
@@ -121,25 +121,25 @@ export function PurchasePanel({
     <div>
       <div className="mb-1 flex items-end gap-3">
         <div>
-          <div className="font-wp text-[11px] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
+          <div className="font-wp text-[0.6875rem] font-bold uppercase tracking-[.06em] text-wp-fg-subtle">
             {t("common.price")}
           </div>
           <Price amount={L.price} size={32} />
         </div>
         {valDelta < 0 && (
-          <span className="mb-1.5 font-wp text-[13px] font-bold text-wp-green">
+          <span className="mb-1.5 font-wp text-[0.8125rem] font-bold text-wp-green">
             {t("purchase.belowValuationPct", { pct: Math.abs(valDelta) })}
           </span>
         )}
       </div>
 
       <div className="mt-3.5 flex gap-2.5">
-        <Button variant="primary" className="flex-1 py-[13px]" onClick={onBuy}>
+        <Button variant="primary" className="flex-1 py-[0.8125rem]" onClick={onBuy}>
           <Icon name="cart" size={17} />
           {t("purchase.buyNowCta")}
         </Button>
         <Button
-          className="px-[15px] py-[13px]"
+          className="px-[0.9375rem] py-[0.8125rem]"
           aria-label={t("common.addToCartAria")}
           onClick={() => {
             addToCart(L)
@@ -150,7 +150,7 @@ export function PurchasePanel({
           <Icon name="plus" size={13} className="-ml-1" />
         </Button>
         {L.format === "offer" && (
-          <Button className="px-4 py-[13px]" onClick={onOffer}>
+          <Button className="px-4 py-[0.8125rem]" onClick={onOffer}>
             <Icon name="handshake" size={16} />
             {t("purchase.offerButton")}
           </Button>
@@ -159,7 +159,7 @@ export function PurchasePanel({
 
       {/* The escrow promise, stated plainly at the point of payment. It is not
           marketing — it is literally what `POST /orders` does with the money. */}
-      <div className="mt-3 flex items-center gap-2 font-wp text-[12px] font-semibold text-wp-fg-muted">
+      <div className="mt-3 flex items-center gap-2 font-wp text-[0.75rem] font-semibold text-wp-fg-muted">
         <Icon name="lock" size={14} className="text-wp-green" />
         {t("purchase.escrowNote")}
       </div>

@@ -1913,16 +1913,33 @@ const config: Config = {
       addComponents({
         // The .cut* geometry moved to @boffmedia/tailwind-config (the `geometry`
         // plugin below) — shared with @boffmedia/ui and SmartRotom chrome alike.
-        // Page gutter — fluid width capped at 1280px with 40px gutters.
+        // Page gutter. Both the cap and the gutter are tokens now
+        // (@boffmedia/tailwind-config/base.css) so they can step on a large
+        // display; the hardcoded 1280px was the single biggest reason the site
+        // read as a 1080p layout centred in a 4K window.
+        //
+        // TWO caps, because the right answer depends on what is inside. Prose
+        // has a readable measure and more pixels cannot improve it, so `.wrap`
+        // stays tight; a card grid genuinely wants the room, so `.wrap-wide`
+        // goes much further. Picking per view is the whole point — a forum
+        // thread at 2100px is worse, not better.
         ".wrap": {
           width: "100%",
-          maxWidth: "1280px",
+          maxWidth: "var(--wrap-max, 1280px)",
           marginInline: "auto",
-          paddingInline: "2.5rem",
+          paddingInline: "var(--wrap-pad, 2.5rem)",
+        },
+        ".wrap-wide": {
+          width: "100%",
+          maxWidth: "var(--wrap-max-wide, 1280px)",
+          marginInline: "auto",
+          paddingInline: "var(--wrap-pad, 2.5rem)",
         },
         // Small uppercase mono label (dim). Color/size overridable by utilities.
         ".mono-label": {
-          font: "600 11px/1 var(--font-mono)",
+          // rem, not 11px: this kicker sits beside type that now rides the display
+          // scale, and a label that stays 11px next to grown type reads as a bug.
+          font: "600 0.6875rem/1 var(--font-mono)",
           letterSpacing: "0.14em",
           textTransform: "uppercase",
           color: "var(--muted)",
@@ -2115,14 +2132,14 @@ const config: Config = {
         ".nt-app .nt-doc.wide": { maxWidth: "980px" },
         '.nt-app .nt-doc[contenteditable="true"]': { caretColor: "rgb(var(--nt-accent))" },
         ".nt-app .nt-doc:focus": { outline: "none" },
-        ".nt-app .nt-doc h1": { fontSize: "32px", lineHeight: "1.18", fontWeight: "700", letterSpacing: "-.02em", margin: "0 0 .5em", color: fg },
-        ".nt-app .nt-doc h2": { fontSize: "21px", lineHeight: "1.3", fontWeight: "650", letterSpacing: "-.01em", margin: "1.7em 0 .5em", color: fg },
-        ".nt-app .nt-doc h3": { fontSize: "17px", fontWeight: "650", margin: "1.4em 0 .4em", color: fg },
-        ".nt-app .nt-doc p": { fontSize: "16px", lineHeight: "1.72", margin: "0 0 1em", color: fg },
-        ".nt-app .nt-doc p.lead": { fontSize: "18px", lineHeight: "1.65", color: "rgb(var(--nt-fg-muted))", marginBottom: "1.4em" },
+        ".nt-app .nt-doc h1": { fontSize: "2rem", lineHeight: "1.18", fontWeight: "700", letterSpacing: "-.02em", margin: "0 0 .5em", color: fg },
+        ".nt-app .nt-doc h2": { fontSize: "1.3125rem", lineHeight: "1.3", fontWeight: "650", letterSpacing: "-.01em", margin: "1.7em 0 .5em", color: fg },
+        ".nt-app .nt-doc h3": { fontSize: "1.0625rem", fontWeight: "650", margin: "1.4em 0 .4em", color: fg },
+        ".nt-app .nt-doc p": { fontSize: "1rem", lineHeight: "1.72", margin: "0 0 1em", color: fg },
+        ".nt-app .nt-doc p.lead": { fontSize: "1.125rem", lineHeight: "1.65", color: "rgb(var(--nt-fg-muted))", marginBottom: "1.4em" },
         ".nt-app .nt-doc strong": { fontWeight: "650", color: fg },
         ".nt-app .nt-doc ul, .nt-app .nt-doc ol": { paddingLeft: "1.4em", margin: "0 0 1.1em" },
-        ".nt-app .nt-doc li": { fontSize: "16px", lineHeight: "1.7", marginBottom: ".35em" },
+        ".nt-app .nt-doc li": { fontSize: "1rem", lineHeight: "1.7", marginBottom: ".35em" },
         ".nt-app .nt-doc ul.todo": { listStyle: "none", paddingLeft: ".2em" },
         ".nt-app .nt-doc ul.todo li": { position: "relative", paddingLeft: "30px", cursor: "pointer" },
         ".nt-app .nt-doc ul.todo li::before": {
@@ -2138,13 +2155,13 @@ const config: Config = {
           borderWidth: "0 2px 2px 0", transform: "rotate(45deg)",
         },
         '.nt-app .nt-doc ul.todo li[data-done="true"]': { color: "rgb(var(--nt-fg-subtle))", textDecoration: "line-through" },
-        ".nt-app .nt-doc blockquote": { margin: "1.3em 0", padding: "4px 0 4px 18px", borderLeft: "3px solid rgb(var(--nt-accent))", color: "rgb(var(--nt-fg-muted))", fontStyle: "italic", fontSize: "16px", lineHeight: "1.65" },
+        ".nt-app .nt-doc blockquote": { margin: "1.3em 0", padding: "4px 0 4px 18px", borderLeft: "3px solid rgb(var(--nt-accent))", color: "rgb(var(--nt-fg-muted))", fontStyle: "italic", fontSize: "1rem", lineHeight: "1.65" },
         ".nt-app .nt-doc code": { fontFamily: "'IBM Plex Mono', ui-monospace, monospace", fontSize: ".86em", background: "var(--nt-hover-strong)", padding: "2px 6px", borderRadius: "5px", color: "rgb(var(--nt-accent-fg))", border: `1px solid ${border}` },
         ".nt-app .nt-doc pre": { background: "rgb(var(--nt-bg))", border: `1px solid ${border}`, borderRadius: "9px", padding: "16px 18px", overflow: "auto", margin: "1.2em 0" },
         ".nt-app .nt-doc pre code": { background: "none", border: "none", padding: "0", color: fg },
-        ".nt-app .nt-doc table": { width: "100%", borderCollapse: "collapse", margin: "1.3em 0", fontSize: "14.5px", border: `1px solid ${border}`, borderRadius: "9px", overflow: "hidden" },
+        ".nt-app .nt-doc table": { width: "100%", borderCollapse: "collapse", margin: "1.3em 0", fontSize: "0.90625rem", border: `1px solid ${border}`, borderRadius: "9px", overflow: "hidden" },
         ".nt-app .nt-doc th, .nt-app .nt-doc td": { textAlign: "left", padding: "9px 14px", borderBottom: `1px solid ${border}` },
-        ".nt-app .nt-doc th": { background: "rgb(var(--nt-panel))", fontWeight: "600", color: "rgb(var(--nt-fg-muted))", fontSize: "12.5px", letterSpacing: ".02em", textTransform: "uppercase" },
+        ".nt-app .nt-doc th": { background: "rgb(var(--nt-panel))", fontWeight: "600", color: "rgb(var(--nt-fg-muted))", fontSize: "0.78125rem", letterSpacing: ".02em", textTransform: "uppercase" },
         ".nt-app .nt-doc td": { borderRight: `1px solid ${border}` },
         ".nt-app .nt-doc tr:last-child td": { borderBottom: "none" },
         ".nt-app .nt-doc td:last-child, .nt-app .nt-doc th:last-child": { borderRight: "none" },
@@ -2160,7 +2177,7 @@ const config: Config = {
         '.nt-app .nt-doc .wikilink::before': { content: '"[["', opacity: ".4", fontSize: ".85em" },
         '.nt-app .nt-doc .wikilink::after': { content: '"]]"', opacity: ".4", fontSize: ".85em" },
         ".nt-app .nt-doc .wikilink:hover": { background: "rgb(var(--nt-accent) / .15)" },
-        ".nt-app .nt-doc.serif p, .nt-app .nt-doc.serif li, .nt-app .nt-doc.serif blockquote": { fontFamily: "Georgia, Cambria, 'Times New Roman', serif", fontSize: "18px" },
+        ".nt-app .nt-doc.serif p, .nt-app .nt-doc.serif li, .nt-app .nt-doc.serif blockquote": { fontFamily: "Georgia, Cambria, 'Times New Roman', serif", fontSize: "1.125rem" },
         ".nt-app .nt-doc.serif h1, .nt-app .nt-doc.serif h2, .nt-app .nt-doc.serif h3": { fontFamily: "Georgia, Cambria, 'Times New Roman', serif" },
         // Thin, theme-aware scrollbar (opt-in on scroll containers).
         ".nt-scroll": { scrollbarWidth: "thin", scrollbarColor: "var(--nt-border-2) transparent" },
@@ -2248,7 +2265,7 @@ const config: Config = {
         ".nt-app .ck.ck-editor__editable.ck-focused:not(.ck-editor__nested-editable)": { border: "none", boxShadow: "none" },
         ".nt-app .ck.ck-editor__top .ck-sticky-panel .ck-toolbar": { border: "none", borderBottom: "1px solid var(--nt-border)", padding: "4px 8px" },
         ".nt-app .ck.ck-toolbar .ck.ck-toolbar__separator": { background: "var(--nt-border-2)" },
-        ".nt-app .nt-mention-item": { fontSize: "13px" },
+        ".nt-app .nt-mention-item": { fontSize: "0.8125rem" },
         ".nt-app .nt-mention-new": { fontStyle: "italic" },
         // CKEditor wraps tables in figure.table; its own `.ck-content .table table`
         // rules outrank the plain `.nt-doc table` look, so the nt table style is

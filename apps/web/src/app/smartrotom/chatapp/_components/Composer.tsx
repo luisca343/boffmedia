@@ -71,10 +71,10 @@ export function Composer({
         <div className="mb-2 flex items-center gap-2.5 rounded-ca-md border-l-4 border-ca-accent bg-ca-search-bg px-3 py-2">
           <Icon name="reply" size={16} className="flex-none text-ca-accent-soft" />
           <div className="min-w-0 flex-1">
-            <div className="text-[12.5px] font-bold text-ca-accent-soft">
+            <div className="text-[0.78125rem] font-bold text-ca-accent-soft">
               {t("composer.replyingTo", { user: reply.uuid === getSmartRotomUser(session).uuid ? t("composer.yourself") : reply.uuid.slice(0, 8) })}
             </div>
-            <div className="truncate text-[13px] text-ca-400">{typeof reply.content === "string" ? reply.content : t("conversation.attached")}</div>
+            <div className="truncate text-[0.8125rem] text-ca-400">{typeof reply.content === "string" ? reply.content : t("conversation.attached")}</div>
           </div>
           <IconButton icon="x" className="h-8 w-8" iconSize={16} onClick={clearReply} title={t("composer.cancelReply")} />
         </div>
@@ -84,15 +84,15 @@ export function Composer({
         <div className="relative flex-none">
           <IconButton icon="paperclip" iconSize={20} active={menu === "attach"} title={t("composer.attach")} onClick={() => setMenu(menu === "attach" ? null : "attach")} />
           {menu === "attach" && (
-            <Popover className="left-0 min-w-[232px]" onMouseLeave={() => setMenu(null)}>
+            <Popover className="left-0 min-w-[14.5rem]" onMouseLeave={() => setMenu(null)}>
               {attach.map((a) => (
                 <PopItem key={a.label} onClick={() => { a.action(); setMenu(null); }}>
                   <span className={cn("grid h-10 w-10 flex-none place-items-center rounded-full", TONE[a.tone])}>
                     <Icon name={a.icon} size={18} />
                   </span>
                   <span>
-                    <span className="block text-[14px] font-medium text-ca-50">{a.label}</span>
-                    <span className="text-[11.5px] text-ca-400">{a.sub}</span>
+                    <span className="block text-[0.875rem] font-medium text-ca-50">{a.label}</span>
+                    <span className="text-[0.71875rem] text-ca-400">{a.sub}</span>
                   </span>
                 </PopItem>
               ))}
@@ -108,33 +108,33 @@ export function Composer({
             placeholder={t("composer.placeholder")}
             onChange={(e) => { setText(e.target.value); grow(e.target); onTyping(); }}
             onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); if (!busy) send(); } }}
-            className="max-h-[120px] min-w-0 flex-1 resize-none bg-transparent px-1 py-[9px] text-[15px] leading-[1.4] text-ca-50 outline-none placeholder:text-ca-500"
+            className="max-h-[7.5rem] min-w-0 flex-1 resize-none bg-transparent px-1 py-[0.5625rem] text-[0.9375rem] leading-[1.4] text-ca-50 outline-none placeholder:text-ca-500"
           />
           <div className="relative flex-none self-end">
-            <IconButton icon="smile" iconSize={20} className="h-[38px] w-[38px]" title={t("composer.emoji")} onClick={() => setMenu(menu === "emoji" ? null : "emoji")} />
+            <IconButton icon="smile" iconSize={20} className="h-[2.375rem] w-[2.375rem]" title={t("composer.emoji")} onClick={() => setMenu(menu === "emoji" ? null : "emoji")} />
             {menu === "emoji" && (
-              <Popover className="right-0 w-[300px]" onMouseLeave={() => setMenu(null)}>
+              <Popover className="right-0 w-[18.75rem]" onMouseLeave={() => setMenu(null)}>
                 <div className="flex gap-1 border-b border-ca-700 px-1 pb-2 pt-0.5">
                   {(["emoji", "sticker"] as const).map((k) => (
                     <button
                       key={k}
                       onClick={() => setTab(k)}
-                      className={cn("rounded-ca-md px-[11px] py-[5px] text-[12.5px] font-semibold", tab === k ? "bg-ca-accent text-ca-on-accent" : "text-ca-300")}
+                      className={cn("rounded-ca-md px-[0.6875rem] py-[0.3125rem] text-[0.78125rem] font-semibold", tab === k ? "bg-ca-accent text-ca-on-accent" : "text-ca-300")}
                     >
                       {t(`composer.tabs.${k}`)}
                     </button>
                   ))}
                 </div>
                 {tab === "emoji" ? (
-                  <div className="ca-scroll grid max-h-[210px] grid-cols-7 gap-0.5 overflow-y-auto p-1.5">
+                  <div className="ca-scroll grid max-h-[13.125rem] grid-cols-7 gap-0.5 overflow-y-auto p-1.5">
                     {EMOJI_SET.map((e) => (
-                      <button key={e} onClick={() => { setText((prev) => prev + e); ta.current?.focus(); }} className="rounded-ca-md p-[5px] text-[21px] hover:bg-ca-700">
+                      <button key={e} onClick={() => { setText((prev) => prev + e); ta.current?.focus(); }} className="rounded-ca-md p-[0.3125rem] text-[1.3125rem] hover:bg-ca-700">
                         {e}
                       </button>
                     ))}
                   </div>
                 ) : (
-                  <div className="ca-scroll grid max-h-[210px] grid-cols-4 gap-1.5 overflow-y-auto p-2">
+                  <div className="ca-scroll grid max-h-[13.125rem] grid-cols-4 gap-1.5 overflow-y-auto p-2">
                     {STICKERS.map((s) => (
                       <button key={s.path} onClick={() => { onSendSticker(s.path); setMenu(null); }} disabled={busy} className="rounded-[10px] bg-ca-900 p-1.5 hover:bg-ca-700 disabled:opacity-60">
                         <img src={s.path} alt={s.name} className="w-full [image-rendering:pixelated]" />
@@ -148,12 +148,12 @@ export function Composer({
         </div>
 
         {text.trim() ? (
-          <button onClick={send} disabled={busy} title={t("composer.send")} className="grid h-[46px] w-[46px] flex-none place-items-center rounded-full bg-ca-accent text-ca-on-accent transition-[transform,filter] hover:brightness-[1.06] active:scale-90 disabled:opacity-60">
+          <button onClick={send} disabled={busy} title={t("composer.send")} className="grid h-[2.875rem] w-[2.875rem] flex-none place-items-center rounded-full bg-ca-accent text-ca-on-accent transition-[transform,filter] hover:brightness-[1.06] active:scale-90 disabled:opacity-60">
             <Icon name="send" size={19} />
           </button>
         ) : (
           // [deferred] voice notes have no API yet — demo-safe placeholder
-          <button title={t("composer.voiceNote")} onClick={() => import("react-toastify").then((m) => m.toast.info(t("composer.voiceNoteSoon")))} className="grid h-[46px] w-[46px] flex-none place-items-center rounded-full bg-ca-accent text-ca-on-accent transition-[transform,filter] hover:brightness-[1.06] active:scale-90">
+          <button title={t("composer.voiceNote")} onClick={() => import("react-toastify").then((m) => m.toast.info(t("composer.voiceNoteSoon")))} className="grid h-[2.875rem] w-[2.875rem] flex-none place-items-center rounded-full bg-ca-accent text-ca-on-accent transition-[transform,filter] hover:brightness-[1.06] active:scale-90">
             <Icon name="mic" size={20} />
           </button>
         )}

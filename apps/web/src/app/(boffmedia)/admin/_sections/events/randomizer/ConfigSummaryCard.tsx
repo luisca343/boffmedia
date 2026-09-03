@@ -67,29 +67,29 @@ export function ConfigSummaryCard({ config, onChanged }: ConfigSummaryCardProps)
       >
         <div className="space-y-4">
           {config.launcherResolvable === true && (
-            <p className="flex items-center gap-1.5 text-[13px] text-ok">
+            <p className="flex items-center gap-1.5 text-[0.8125rem] text-ok">
               <Icon name="check" size={14} className="shrink-0" />
               {t("resolvableOk")}
             </p>
           )}
           {config.launcherResolvable === false && (
-            <p className="flex items-center gap-1.5 text-[13px] text-warn">
+            <p className="flex items-center gap-1.5 text-[0.8125rem] text-warn">
               <Icon name="alert" size={14} className="shrink-0" />
               {t(ISSUE_KEY[config.resolutionIssue ?? ""] ?? "issueNoPack")}
             </p>
           )}
 
-          <dl className="grid gap-x-6 gap-y-3 [grid-template-columns:repeat(auto-fill,minmax(200px,1fr))]">
+          <dl className="grid gap-x-6 gap-y-3 [grid-template-columns:repeat(auto-fill,minmax(12.5rem,1fr))]">
             {facts.map((fact) => (
               <div key={fact.label} className="min-w-0">
-                <dt className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
+                <dt className="font-mono text-[0.59375rem] font-semibold uppercase tracking-[0.1em] text-txt-dim">
                   {fact.label}
                 </dt>
                 <dd
                   className={
                     fact.mono
-                      ? "mt-1 font-mono text-[12px] text-txt-muted truncate"
-                      : "mt-1 text-[13px] truncate"
+                      ? "mt-1 font-mono text-[0.75rem] text-txt-muted truncate"
+                      : "mt-1 text-[0.8125rem] truncate"
                   }
                   title={fact.value}
                 >

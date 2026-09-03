@@ -89,7 +89,7 @@ export function PartidaView({
   if (!detail) {
     return (
       <main className="wrap py-24 text-center">
-        <p className="font-display text-[22px] font-bold uppercase">{t("match.notFound")}</p>
+        <p className="font-display text-[1.375rem] font-bold uppercase">{t("match.notFound")}</p>
         <Button href={`/torneos/${slug}`} size="sm" className="mt-4">
           {t("match.backToTournament")}
         </Button>
@@ -111,13 +111,13 @@ export function PartidaView({
       <div className="mb-4">
         <Link
           href={`/torneos/${slug}`}
-          className="font-mono text-[11px] uppercase tracking-[0.1em] text-txt-dim transition-colors hover:text-accent-bright"
+          className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-txt-dim transition-colors hover:text-accent-bright"
         >
           ← {detail.tournamentName}
         </Link>
       </div>
 
-      <div className="mx-auto grid max-w-[940px] gap-3.5">
+      <div className="mx-auto grid max-w-[58.75rem] gap-3.5">
         <TmRoundHeader
           comp={{ title: detail.tournamentName }}
           roundNo={detail.roundNumber}

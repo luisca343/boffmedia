@@ -35,10 +35,10 @@ export function SearchInput({ value, onChange, placeholder, onSubmit, onCancel, 
       <Icon
         name="search"
         size={sm ? 15 : lg ? 18 : 17}
-        className={cn("absolute top-1/2 -translate-y-1/2 text-txt-dim pointer-events-none", sm ? "left-[11px]" : lg ? "left-4" : "left-[13px]")}
+        className={cn("absolute top-1/2 -translate-y-1/2 text-txt-dim pointer-events-none", sm ? "left-[0.6875rem]" : lg ? "left-4" : "left-[0.8125rem]")}
       />
       <input
-        className={cn(INPUT_BASE, sm ? "h-[38px] pl-9 text-[13px]" : lg ? "h-[50px] pl-[46px] text-[16px]" : "pl-10")}
+        className={cn(INPUT_BASE, sm ? "h-[2.375rem] pl-9 text-[0.8125rem]" : lg ? "h-[3.125rem] pl-[2.875rem] text-[1rem]" : "pl-10")}
         aria-label={ariaLabel ?? resolvedPlaceholder}
         placeholder={resolvedPlaceholder}
         value={value}

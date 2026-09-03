@@ -30,9 +30,9 @@ export function AnuncioFeatured({
 
   return (
     <Card dep="gold" edgeGold className="mb-4 overflow-hidden p-0">
-      <div className="grid grid-cols-1 sm:[grid-template-columns:180px_1fr]">
+      <div className="grid grid-cols-1 sm:[grid-template-columns:11.25rem_1fr]">
         <div
-          className="grid min-h-[150px] place-items-center border-b border-gt-line sm:border-b-0 sm:border-r"
+          className="grid min-h-[9.375rem] place-items-center border-b border-gt-line sm:border-b-0 sm:border-r"
           style={{
             background:
               "repeating-linear-gradient(45deg, rgb(var(--gt-paper-2)) 0 12px, rgb(var(--gt-paper-1)) 12px 24px)",
@@ -48,13 +48,13 @@ export function AnuncioFeatured({
             <Badge tone="default" dot>
               {t("anuncios.fijado")}
             </Badge>
-            <span className="ml-auto flex items-center gap-1 font-gt-mono text-[10.5px] text-gt-ink-400">
+            <span className="ml-auto flex items-center gap-1 font-gt-mono text-[0.65625rem] text-gt-ink-400">
               <Icon name="calendar" size={11} />
               {fmtDateTime(anuncio.publishedAt, intlLocale)}
             </span>
           </div>
           <h2 className="mb-2 font-gt-display text-2xl leading-tight text-gt-ink-900">{anuncio.title}</h2>
-          <p className="max-w-[640px] text-sm leading-relaxed text-gt-ink-600">{anuncio.body}</p>
+          <p className="max-w-[40rem] text-sm leading-relaxed text-gt-ink-600">{anuncio.body}</p>
           <div className="mt-3.5 flex flex-wrap items-center gap-2.5 border-t border-gt-line-soft pt-3">
             <button
               type="button"

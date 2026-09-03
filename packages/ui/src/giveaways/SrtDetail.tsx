@@ -15,7 +15,7 @@ export function SrtPrizeShowcase({ sorteo }: { sorteo: Sorteo }) {
   return (
     <div className="flex flex-col items-start gap-5 sm:flex-row">
       {/* [deferred] <image-slot> prize art — shows the tinted glyph until upload exists */}
-      <div className="relative aspect-square w-full flex-none border border-solid border-line-2 bg-base-2 cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:14px] sm:aspect-square sm:w-[168px] max-sm:aspect-[16/9]">
+      <div className="relative aspect-square w-full flex-none border border-solid border-line-2 bg-base-2 cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:14px] sm:aspect-square sm:w-[10.5rem] max-sm:aspect-[16/9]">
         <span aria-hidden className="absolute inset-0 z-0 grid place-items-center text-accent opacity-[0.28]">
           <Icon name={m.icon} size={70} />
         </span>
@@ -25,17 +25,17 @@ export function SrtPrizeShowcase({ sorteo }: { sorteo: Sorteo }) {
         <div className="mb-3 flex flex-wrap gap-2.5">
           <SrtPrizeTag type={p.type} winners={p.winners} />
         </div>
-        <h4 className="text-[clamp(24px,2.4vw,32px)]/none">{p.name}</h4>
+        <h4 className="text-[clamp(1.5rem,2.4vw,2rem)]/none">{p.name}</h4>
         <div className="mt-3 flex items-baseline gap-2.5">
-          <b className="font-display text-[34px]/none font-extrabold italic text-accent">{srtNum(p.value)} €</b>
-          <span className="font-mono text-[10px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{t("approxValue")}</span>
+          <b className="font-display text-[2.125rem]/none font-extrabold italic text-accent">{srtNum(p.value)} €</b>
+          <span className="font-mono text-[0.625rem]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{t("approxValue")}</span>
         </div>
         <ul className="mt-4 grid list-none gap-2">
           {p.items.map((it, i) => (
-            <li key={i} className="flex items-center gap-2.5 text-[14px] text-txt">
+            <li key={i} className="flex items-center gap-2.5 text-[0.875rem] text-txt">
               <Icon name="check" size={15} className="flex-none text-accent" />
               {it.name}
-              <b className="ml-auto font-mono text-[13px]/none font-bold text-accent">×{it.qty}</b>
+              <b className="ml-auto font-mono text-[0.8125rem]/none font-bold text-accent">×{it.qty}</b>
             </li>
           ))}
         </ul>
@@ -49,12 +49,12 @@ export function SrtReqList({ requirements }: { requirements: SrtRequirement[] })
   return (
     <ul className="grid list-none gap-2.5">
       {requirements.map((r, i) => (
-        <li key={i} className={cn("flex items-center gap-3 border border-solid border-line border-l-[3px] bg-panel-2 px-[14px] py-3", r.met ? "border-l-ok" : "border-l-warn")}>
+        <li key={i} className={cn("flex items-center gap-3 border border-solid border-line border-l-[3px] bg-panel-2 px-[0.875rem] py-3", r.met ? "border-l-ok" : "border-l-warn")}>
           <span className={cn("grid h-8 w-8 flex-none place-items-center border border-solid", r.met ? "border-[color-mix(in_srgb,var(--ok)_40%,var(--line-2))] text-ok" : "border-line-2 text-txt-muted")}>
             <Icon name={r.icon} size={16} />
           </span>
-          <span className="min-w-0 flex-1 text-[14px] text-txt">{r.label}</span>
-          <span className={cn("inline-flex flex-none items-center gap-1.5 font-mono text-[9.5px]/none font-semibold uppercase tracking-[0.08em]", r.met ? "text-ok" : "text-warn")}>
+          <span className="min-w-0 flex-1 text-[0.875rem] text-txt">{r.label}</span>
+          <span className={cn("inline-flex flex-none items-center gap-1.5 font-mono text-[0.59375rem]/none font-semibold uppercase tracking-[0.08em]", r.met ? "text-ok" : "text-warn")}>
             <Icon name={r.met ? "check" : "alert"} size={12} />
             {r.met ? t("requirementMet") : t("requirementPending")}
           </span>
@@ -72,14 +72,14 @@ export function SrtSteps({ steps }: { steps: SrtStep[] }) {
         const last = i === steps.length - 1
         return (
           <div key={i} className={cn("relative flex gap-4", last ? "pb-0" : "pb-5")}>
-            {!last && <span aria-hidden className={cn("absolute bottom-0.5 left-[18px] top-[38px] w-0.5", s.done ? "bg-accent" : "bg-line")} />}
-            <span className={cn("relative z-[1] grid h-[38px] w-[38px] flex-none place-items-center font-display text-[17px]/none font-extrabold italic cut-seal cut-seal-edge [--cut:8px]", s.done ? "border border-solid border-accent [--cut-line:var(--accent)] bg-accent text-accent-ink" : "border border-solid border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt-muted")}>
+            {!last && <span aria-hidden className={cn("absolute bottom-0.5 left-[1.125rem] top-[2.375rem] w-0.5", s.done ? "bg-accent" : "bg-line")} />}
+            <span className={cn("relative z-[1] grid h-[2.375rem] w-[2.375rem] flex-none place-items-center font-display text-[1.0625rem]/none font-extrabold italic cut-seal cut-seal-edge [--cut:8px]", s.done ? "border border-solid border-accent [--cut-line:var(--accent)] bg-accent text-accent-ink" : "border border-solid border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt-muted")}>
               {s.done ? <Icon name="check" size={16} /> : i + 1}
             </span>
             <div className="pt-2">
-              <div className="text-[15px]/[1.4] text-txt">{s.label}</div>
+              <div className="text-[0.9375rem]/[1.4] text-txt">{s.label}</div>
               {s.done && (
-                <span className="mt-[5px] inline-flex items-center gap-1.5 font-mono text-[10px]/none font-semibold uppercase tracking-[0.08em] text-ok">
+                <span className="mt-[0.3125rem] inline-flex items-center gap-1.5 font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.08em] text-ok">
                   <Icon name="check" size={11} />
                   {t("stepDone")}
                 </span>
@@ -98,7 +98,7 @@ export function SrtRules({ rules, seed }: { rules: string[]; seed?: number | nul
     <>
       <ul className="grid list-none gap-3">
         {rules.map((r, i) => (
-          <li key={i} className="flex items-start gap-3 text-[14px]/[1.55] text-txt-muted text-pretty">
+          <li key={i} className="flex items-start gap-3 text-[0.875rem]/[1.55] text-txt-muted text-pretty">
             <span className="mt-px grid h-5 w-5 flex-none place-items-center border border-solid border-accent-line text-accent">
               <Icon name="check" size={12} />
             </span>
@@ -107,10 +107,10 @@ export function SrtRules({ rules, seed }: { rules: string[]; seed?: number | nul
         ))}
       </ul>
       {seed != null && (
-        <div className="mt-4 flex items-center gap-3 border border-solid border-[color-mix(in_srgb,var(--info)_30%,transparent)] bg-[color:var(--info-soft)] px-[15px] py-3">
+        <div className="mt-4 flex items-center gap-3 border border-solid border-[color-mix(in_srgb,var(--info)_30%,transparent)] bg-[color:var(--info-soft)] px-[0.9375rem] py-3">
           <Icon name="lock" size={18} className="flex-none text-[color:var(--info)]" />
-          <span className="text-[13px]/[1.45] text-txt">
-            {t("verifiableLabel")} <code className="font-mono text-[12px]/none font-semibold text-[color:var(--info)]">#{seed}</code>. {t("recomputeNote")}
+          <span className="text-[0.8125rem]/[1.45] text-txt">
+            {t("verifiableLabel")} <code className="font-mono text-[0.75rem]/none font-semibold text-[color:var(--info)]">#{seed}</code>. {t("recomputeNote")}
           </span>
         </div>
       )}

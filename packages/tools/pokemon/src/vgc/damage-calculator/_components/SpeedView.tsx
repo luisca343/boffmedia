@@ -22,7 +22,7 @@ type SpeedT = Translate
 
 function Divider({ label, sub, color }: { label: React.ReactNode; sub?: React.ReactNode; color?: string }) {
   return (
-    <div className="my-1.5 flex items-center gap-3 font-mono text-[11px]/none font-bold uppercase tracking-[0.14em] text-txt-muted" style={color ? { color } : undefined}>
+    <div className="my-1.5 flex items-center gap-3 font-mono text-[0.6875rem]/none font-bold uppercase tracking-[0.14em] text-txt-muted" style={color ? { color } : undefined}>
       <span>
         {label}
         {sub && <span className="font-medium normal-case tracking-normal text-txt-dim"> {sub}</span>}
@@ -34,8 +34,8 @@ function Divider({ label, sub, color }: { label: React.ReactNode; sub?: React.Re
 
 function ModBox({ mods, toggle, label, color, t }: { mods: SpeedMods; toggle: (k: keyof SpeedMods) => void; label: string; color: string; t: SpeedT }) {
   return (
-    <div className="flex flex-wrap items-center gap-2 border border-dashed border-line px-[10px] py-2" role="group" aria-label={label} style={cssVars({ "--cxc": color })}>
-      <span className="flex-none font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em]" style={{ color: "var(--cxc)" }}>{label}</span>
+    <div className="flex flex-wrap items-center gap-2 border border-dashed border-line px-[0.625rem] py-2" role="group" aria-label={label} style={cssVars({ "--cxc": color })}>
+      <span className="flex-none font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.12em]" style={{ color: "var(--cxc)" }}>{label}</span>
       {SPEED_MOD_KEYS.map((m) => (
         <TogglePill key={m.k} on={!!mods[m.k]} label={t(m.i18n)} tone={color} onClick={() => toggle(m.k)} />
       ))}
@@ -61,16 +61,16 @@ function SpeedCard({
       style={color ? cssVars({ "--cxc": color, borderColor: "color-mix(in srgb, var(--cxc) 50%, var(--line))", background: "color-mix(in srgb, var(--cxc) 6%, var(--panel))" }) : undefined}
     >
       <PokemonSprite name={name} size={32} />
-      <span className="max-w-full truncate font-display text-[11px]/[1.15] font-bold uppercase tracking-[0.03em]" title={name}>{name}</span>
+      <span className="max-w-full truncate font-display text-[0.6875rem]/[1.15] font-bold uppercase tracking-[0.03em]" title={name}>{name}</span>
       {big ? (
-        <span className="font-display text-[22px]/none font-extrabold italic" style={{ color }}>{val}</span>
+        <span className="font-display text-[1.375rem]/none font-extrabold italic" style={{ color }}>{val}</span>
       ) : (
-        <span className="flex items-baseline gap-[7px] font-mono text-[12px]/none font-semibold">
+        <span className="flex items-baseline gap-[0.4375rem] font-mono text-[0.75rem]/none font-semibold">
           <b style={{ color: color || "var(--text)" }}>{plus}</b>
-          <i className="text-[10px] not-italic text-txt-dim">{neutral}</i>
+          <i className="text-[0.625rem] not-italic text-txt-dim">{neutral}</i>
         </span>
       )}
-      <span className="font-mono text-[9px]/none font-medium uppercase tracking-[0.08em] text-txt-dim">{baseLabel}</span>
+      <span className="font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.08em] text-txt-dim">{baseLabel}</span>
     </div>
   )
 }
@@ -140,9 +140,9 @@ export function SpeedView() {
   return (
     <div className="grid gap-4">
       {/* Controls */}
-      <div className="grid gap-3 border border-solid border-line bg-panel px-4 py-[14px]">
-        <div className="flex flex-wrap items-center gap-[14px]">
-          <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("level")}</span>
+      <div className="grid gap-3 border border-solid border-line bg-panel px-4 py-[0.875rem]">
+        <div className="flex flex-wrap items-center gap-[0.875rem]">
+          <span className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("level")}</span>
           <Seg
             value={String(level)}
             onChange={(v) => setLevel(Number(v) as 50 | 100)}
@@ -163,16 +163,16 @@ export function SpeedView() {
           )}
           {!showRivals && (
             <Input
-              className="max-w-[240px]"
+              className="max-w-[15rem]"
               value={filter}
               placeholder={t("filterPlaceholder")}
               aria-label={t("filterPlaceholder")}
               onChange={(e) => setFilter(e.target.value)}
             />
           )}
-          {tw && <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-warn">{tv("ui.twHint")}</span>}
+          {tw && <span className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.12em] text-warn">{tv("ui.twHint")}</span>}
         </div>
-        <div className="grid gap-[10px] [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))]">
+        <div className="grid gap-[0.625rem] [grid-template-columns:repeat(auto-fit,minmax(17.5rem,1fr))]">
           <ModBox mods={myMods} toggle={(k) => setMyMods((m) => ({ ...m, [k]: !m[k] }))} label={t("modMyTeam")} color={ATK_COLOR} t={t} />
           <ModBox mods={foeMods} toggle={(k) => setFoeMods((m) => ({ ...m, [k]: !m[k] }))} label={t("modRivals")} color={DEF_COLOR} t={t} />
         </div>
@@ -184,18 +184,18 @@ export function SpeedView() {
             const opps = e.side === "mine" ? foes : mine
             const col = e.side === "mine" ? ATK_COLOR : DEF_COLOR
             return (
-              <div key={`${e.side}-${e.name}-${i}`} className="flex items-center gap-3 border border-l-[3px] border-solid border-line bg-panel px-[14px] py-[9px]" style={cssVars({ "--cxc": col, borderLeftColor: "var(--cxc)" })}>
-                <span className="w-6 flex-none text-right font-mono text-[12px]/none font-bold text-txt-dim">{i + 1}</span>
+              <div key={`${e.side}-${e.name}-${i}`} className="flex items-center gap-3 border border-l-[3px] border-solid border-line bg-panel px-[0.875rem] py-[0.5625rem]" style={cssVars({ "--cxc": col, borderLeftColor: "var(--cxc)" })}>
+                <span className="w-6 flex-none text-right font-mono text-[0.75rem]/none font-bold text-txt-dim">{i + 1}</span>
                 <PokemonSprite name={e.name} size={36} />
                 <div className="min-w-0 flex-1">
-                  <div className="font-display text-[14px]/[1.15] font-bold uppercase tracking-[0.03em]">{e.name}</div>
-                  <div className="flex flex-wrap gap-[10px] font-mono text-[10px]/[1.4] text-txt-dim">
+                  <div className="font-display text-[0.875rem]/[1.15] font-bold uppercase tracking-[0.03em]">{e.name}</div>
+                  <div className="flex flex-wrap gap-[0.625rem] font-mono text-[0.625rem]/[1.4] text-txt-dim">
                     <span>{t("baseSpeed", { speed: e.base })}</span>
                     {e.item !== "None" && <span>{e.item}</span>}
                     <b style={{ color: col }}>{e.side === "mine" ? t("myTeam") : t("rival")}</b>
                   </div>
                   {opps.length > 0 && (
-                    <div className="mt-[5px] flex flex-wrap gap-[5px]">
+                    <div className="mt-[0.3125rem] flex flex-wrap gap-[0.3125rem]">
                       {opps.map((o, j) => {
                         const res = tw ? o.val - e.val : e.val - o.val
                         const c = res > 0 ? "var(--ok)" : res === 0 ? "var(--warn)" : "var(--bad)"
@@ -208,12 +208,12 @@ export function SpeedView() {
                     </div>
                   )}
                 </div>
-                <span className="ml-auto font-display text-[26px]/none font-extrabold italic" style={{ color: col }}>{e.val}</span>
+                <span className="ml-auto font-display text-[1.625rem]/none font-extrabold italic" style={{ color: col }}>{e.val}</span>
               </div>
             )
           })}
           {!merged.length && (
-            <div className="grid place-items-center gap-[10px] border border-dashed border-line-2 px-5 py-14 text-center font-body text-[13px]/[1.5] text-txt-dim">
+            <div className="grid place-items-center gap-[0.625rem] border border-dashed border-line-2 px-5 py-14 text-center font-body text-[0.8125rem]/[1.5] text-txt-dim">
               <Icon name="zap" size={26} />
               <p>{tv("ui.speedEmpty")}</p>
             </div>
@@ -224,7 +224,7 @@ export function SpeedView() {
           {mine.length > 0 && (
             <>
               <Divider label={t("sectionMyTeam")} color="var(--accent)" />
-              <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
+              <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(9.375rem,1fr))]">
                 {mine.map((p) => (
                   <SpeedCard key={p.name} name={p.name} base={p.base} color={ATK_COLOR} big val={p.val} baseLabel={t("baseSpeed", { speed: p.base })} />
                 ))}
@@ -234,7 +234,7 @@ export function SpeedView() {
           {foes.length > 0 && (
             <>
               <Divider label={t("sectionRivals")} color="var(--info)" />
-              <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
+              <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(9.375rem,1fr))]">
                 {foes.map((p) => (
                   <SpeedCard key={p.name} name={p.name} base={p.base} color={DEF_COLOR} big val={p.val} baseLabel={t("baseSpeed", { speed: p.base })} />
                 ))}
@@ -242,7 +242,7 @@ export function SpeedView() {
             </>
           )}
           <Divider label={`${tv("ui.reference")} · ${ref.length}`} sub={tv("ui.referenceSub")} />
-          <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(150px,1fr))]">
+          <div className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(9.375rem,1fr))]">
             {ref.map((p) => {
               const col = teamNames.has(p.name) ? ATK_COLOR : manyNames.has(p.name) ? DEF_COLOR : undefined
               return <SpeedCard key={p.name} name={p.name} base={p.base} color={col} plus={p.plus} neutral={p.neutral} baseLabel={t("baseSpeed", { speed: p.base })} />

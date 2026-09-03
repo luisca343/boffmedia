@@ -29,7 +29,7 @@ export function StatusTabs({
             role="tab"
             aria-selected={active}
             onClick={() => onChange(o.value)}
-            className={`inline-flex items-center gap-1.5 rounded-gt-sm border px-3 py-1.5 font-gt text-[12.5px] font-semibold transition-colors ${
+            className={`inline-flex items-center gap-1.5 rounded-gt-sm border px-3 py-1.5 font-gt text-[0.78125rem] font-semibold transition-colors ${
               active
                 ? `${t.solidBg} ${t.solidBorder} text-white shadow-gt-sm`
                 : "border-gt-line-strong bg-gt-paper-0 text-gt-ink-600 hover:bg-gt-paper-1"
@@ -37,7 +37,7 @@ export function StatusTabs({
           >
             {o.label}
             <span
-              className={`min-w-[18px] rounded-[9px] px-1.5 py-px text-center font-gt-mono text-[10px] font-bold tabular-nums ${
+              className={`min-w-[1.125rem] rounded-[9px] px-1.5 py-px text-center font-gt-mono text-[0.625rem] font-bold tabular-nums ${
                 active ? "bg-white/20 text-white" : "bg-gt-paper-3 text-gt-ink-500"
               }`}
             >

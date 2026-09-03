@@ -66,7 +66,7 @@ export function DestinationsPanel({
       />
 
       {Object.keys(regionCounts).length > 0 && (
-        <div className="tx-rail flex shrink-0 gap-[7px] overflow-x-auto pb-1">
+        <div className="tx-rail flex shrink-0 gap-[0.4375rem] overflow-x-auto pb-1">
           <FilterChip active={region === ALL} count={stops.length} onClick={() => setRegion(ALL)}>
             {t("all")}
           </FilterChip>
@@ -120,7 +120,7 @@ export function DestinationsPanel({
         <span className="text-tx-accent">{sort === "near" ? t("nearest") : t("farthest")}</span>
       </div>
 
-      <div className="flex flex-col gap-[9px]">
+      <div className="flex flex-col gap-[0.5625rem]">
         {list.length === 0 ? (
           <Empty
             message={t("emptyMessage")}

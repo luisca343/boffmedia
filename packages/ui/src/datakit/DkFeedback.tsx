@@ -16,10 +16,10 @@ export function DkEmpty({
   className?: string
 }) {
   return (
-    <div className={cn("grid justify-items-center gap-2 border border-dashed border-line-2 px-5 py-[46px] text-center text-txt-dim", className)}>
+    <div className={cn("grid justify-items-center gap-2 border border-dashed border-line-2 px-5 py-[2.875rem] text-center text-txt-dim", className)}>
       {icon && <Icon name={icon} size={26} className="text-txt-dim" />}
-      <b className="font-display text-[16px] font-bold uppercase leading-[1.1] tracking-[0.04em] text-txt-muted">{title}</b>
-      {lead && <p className="m-0 max-w-[46ch] font-body text-[12.5px] leading-[1.5]">{lead}</p>}
+      <b className="font-display text-[1rem] font-bold uppercase leading-[1.1] tracking-[0.04em] text-txt-muted">{title}</b>
+      {lead && <p className="m-0 max-w-[46ch] font-body text-[0.78125rem] leading-[1.5]">{lead}</p>}
       {children && <div className="mt-1 flex flex-wrap justify-center gap-2">{children}</div>}
     </div>
   )

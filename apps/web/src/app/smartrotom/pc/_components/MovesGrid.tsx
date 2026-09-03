@@ -25,7 +25,7 @@ export function MovesGrid({ moves }: MovesGridProps) {
   }
 
   return (
-    <div className="grid grid-cols-2 gap-[7px]">
+    <div className="grid grid-cols-2 gap-[0.4375rem]">
       {names.map((name, i) => (
         <div
           key={`${name}-${i}`}

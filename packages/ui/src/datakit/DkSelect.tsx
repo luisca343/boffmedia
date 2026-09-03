@@ -31,7 +31,7 @@ export function DkSelect({ value, options, onChange, minWidth, ariaLabel, classN
         onChange={onChange}
         ariaLabel={ariaLabel}
         size="sm"
-        className={cn("max-w-[280px]", className)}
+        className={cn("max-w-[17.5rem]", className)}
       />
     </div>
   )

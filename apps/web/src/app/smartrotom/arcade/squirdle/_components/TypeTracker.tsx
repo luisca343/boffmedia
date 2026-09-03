@@ -24,7 +24,7 @@ export function TypeTracker({ types, statuses, isDoubleType }: TypeTrackerProps)
 
   return (
     <Panel tone="void" tight>
-      <div className="mb-2.5 font-ar-display text-[9px] uppercase text-ar-magenta-2">{t("squirdle.typeTracker.title")}</div>
+      <div className="mb-2.5 font-ar-display text-[0.5625rem] uppercase text-ar-magenta-2">{t("squirdle.typeTracker.title")}</div>
       <ul className="m-0 flex list-none flex-wrap gap-1.5 p-0">
         {types.map((type) => {
           const status = statuses[type] ?? "possible"
@@ -32,8 +32,8 @@ export function TypeTracker({ types, statuses, isDoubleType }: TypeTrackerProps)
             <li key={type}>
               <span
                 className={cn(
-                  "inline-flex items-center rounded-[5px] border px-[7px] py-[3px]",
-                  "font-ar-mono text-[10px] font-bold uppercase tracking-[0.08em]",
+                  "inline-flex items-center rounded-[5px] border px-[0.4375rem] py-[3px]",
+                  "font-ar-mono text-[0.625rem] font-bold uppercase tracking-[0.08em]",
                   STATUS_SKIN[status],
                 )}
               >

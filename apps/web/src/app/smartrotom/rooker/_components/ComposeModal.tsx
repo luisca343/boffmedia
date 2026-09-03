@@ -78,7 +78,7 @@ export function ComposeModal() {
           <Icon name="close" size={20} />
         </button>
         {replyTo?.handle && (
-          <span className="text-[13.5px] text-rk-fg-subtle">
+          <span className="text-[0.84375rem] text-rk-fg-subtle">
             {t("compose.replyingToPrefix")} <span className="text-rk-accent">@{replyTo.handle}</span>
           </span>
         )}
@@ -105,7 +105,7 @@ export function ComposeModal() {
               }}
               rows={3}
               placeholder={replyTo ? t("compose.placeholder.reply") : t("compose.placeholder.new")}
-              className="w-full resize-none bg-transparent text-[19px] leading-snug text-rk-fg outline-none placeholder:text-rk-fg-subtle"
+              className="w-full resize-none bg-transparent text-[1.1875rem] leading-snug text-rk-fg outline-none placeholder:text-rk-fg-subtle"
             />
 
             {showMedia && (
@@ -114,7 +114,7 @@ export function ComposeModal() {
                 onChange={(e) => setMediaUrl(e.target.value)}
                 placeholder={t("compose.mediaPlaceholder")}
                 aria-label={t("compose.mediaAriaLabel")}
-                className="mt-2 w-full rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[14px] text-rk-fg outline-none focus:border-rk-accent"
+                className="mt-2 w-full rounded-rk-md border border-rk-line-strong bg-rk-card px-3 py-2 text-[0.875rem] text-rk-fg outline-none focus:border-rk-accent"
               />
             )}
           </div>
@@ -128,7 +128,7 @@ export function ComposeModal() {
           aria-label={t("compose.attachImageAriaLabel")}
           aria-pressed={showMedia}
           className={cn(
-            "grid h-[34px] w-[34px] place-items-center rounded-full transition-colors hover:bg-rk-accent/12",
+            "grid h-[2.125rem] w-[2.125rem] place-items-center rounded-full transition-colors hover:bg-rk-accent/12",
             showMedia ? "bg-rk-accent/12 text-rk-accent" : "text-rk-accent",
           )}
         >

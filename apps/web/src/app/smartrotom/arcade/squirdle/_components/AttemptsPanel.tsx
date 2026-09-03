@@ -19,7 +19,7 @@ export function AttemptsPanel({ used, remaining }: AttemptsPanelProps) {
   const t = useTranslations("arcade")
   return (
     <Panel tone="cyan" tight>
-      <div className="mb-2.5 font-ar-display text-[9px] uppercase text-ar-cyan">{t("squirdle.attemptsPanel.title")}</div>
+      <div className="mb-2.5 font-ar-display text-[0.5625rem] uppercase text-ar-cyan">{t("squirdle.attemptsPanel.title")}</div>
       <div className="flex gap-1.5">
         {Array.from({ length: MAX_GUESSES }, (_, i) => (
           <span
@@ -31,7 +31,7 @@ export function AttemptsPanel({ used, remaining }: AttemptsPanelProps) {
           />
         ))}
       </div>
-      <p className="m-0 mt-2.5 font-ar-mono text-[11px] text-ar-ink-dim">
+      <p className="m-0 mt-2.5 font-ar-mono text-[0.6875rem] text-ar-ink-dim">
         {t("squirdle.attemptsPanel.remaining", { remaining, total: MAX_GUESSES })}
       </p>
     </Panel>

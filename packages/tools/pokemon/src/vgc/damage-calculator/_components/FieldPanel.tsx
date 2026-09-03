@@ -21,11 +21,11 @@ function FieldSection({ title, divider, children }: { title: string; divider?: b
   return (
     <div
       className={cn(
-        "grid gap-[7px]",
+        "grid gap-[0.4375rem]",
         divider && "border-t border-dashed border-line pt-3 max-[1280px]:border-t-0 max-[1280px]:pt-0",
       )}
     >
-      <span className="font-mono text-[10px]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{title}</span>
+      <span className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.12em] text-txt-dim">{title}</span>
       <PillRow>{children}</PillRow>
     </div>
   )
@@ -54,8 +54,8 @@ export function FieldPanel({ field, setField, setAtkSide, setDefSide }: Props) {
   )
 
   return (
-    <div className="grid content-start gap-[14px] border border-solid border-line bg-panel p-4 max-[1280px]:grid-cols-[repeat(auto-fit,minmax(230px,1fr))]">
-      <div className="flex items-center gap-2 font-display text-[15px]/none font-bold uppercase tracking-[0.05em] max-[1280px]:col-span-full">
+    <div className="grid content-start gap-[0.875rem] border border-solid border-line bg-panel p-4 max-[1280px]:grid-cols-[repeat(auto-fit,minmax(14.375rem,1fr))]">
+      <div className="flex items-center gap-2 font-display text-[0.9375rem]/none font-bold uppercase tracking-[0.05em] max-[1280px]:col-span-full">
         <Icon name="zap" size={16} className="text-accent" />
         {t("title")}
       </div>

@@ -125,11 +125,11 @@ export function DkHeat({ rows, cols, max, value, className }: DkHeatProps) {
       >
         <span />
         {cols.map((c) => (
-          <span key={c} className="text-center font-mono text-[8px] leading-none text-txt-dim">{c}</span>
+          <span key={c} className="text-center font-mono text-[0.5rem] leading-none text-txt-dim">{c}</span>
         ))}
         {rows.map((r, ri) => (
           <React.Fragment key={r}>
-            <span className="pr-[6px] font-mono text-[9px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-dim">{r}</span>
+            <span className="pr-[0.375rem] font-mono text-[0.5625rem] font-semibold uppercase leading-none tracking-[0.06em] text-txt-dim">{r}</span>
             {cols.map((c, ci) => {
               const v = value(ri, ci)
               const intensity = max > 0 ? v / max : 0
@@ -139,7 +139,7 @@ export function DkHeat({ rows, cols, max, value, className }: DkHeatProps) {
                   key={c}
                   title={`${r} · ${c}: ${v}`}
                   style={{ background: bg }}
-                  className="block aspect-square min-w-[10px] border border-solid border-line"
+                  className="block aspect-square min-w-[0.625rem] border border-solid border-line"
                 />
               )
             })}

@@ -171,7 +171,7 @@ export function EntrantsPanel({
       {/* The same numbers the overview shows, so the list and the summary can
           never disagree about who is in. */}
       {showEntry && (
-        <AvMetrics className="mb-[18px] [grid-template-columns:repeat(auto-fit,minmax(110px,1fr))]">
+        <AvMetrics className="mb-[1.125rem] [grid-template-columns:repeat(auto-fit,minmax(6.875rem,1fr))]">
           <AvMetric label={t("participants")} value={fs.registered} />
           <AvMetric label={t("entered")} value={`${fs.entered}/${fs.active}`} tone={fs.active > 0 && fs.entered === fs.active ? "pos" : undefined} />
           <AvMetric label={t("checkIn")} value={fs.checkedIn} />
@@ -205,8 +205,8 @@ export function EntrantsPanel({
                       className="flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors hover:bg-panel-2"
                     >
                       <Avatar size="sm" src={u.profilePicture} alt="">{u.username.slice(0, 1)}</Avatar>
-                      <span className="flex-1 truncate font-body text-[12.5px]">{u.username}</span>
-                      <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-accent">+ {t("add")}</span>
+                      <span className="flex-1 truncate font-body text-[0.78125rem]">{u.username}</span>
+                      <span className="font-mono text-[0.625rem] uppercase tracking-[0.06em] text-accent">+ {t("add")}</span>
                     </button>
                   ))}
                 </div>
@@ -260,7 +260,7 @@ export function EntrantsPanel({
         </div>
 
         {rows.length === 0 ? (
-          <p className="m-0 py-4 text-center font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+          <p className="m-0 py-4 text-center font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
             {t("noEntrants")}
           </p>
         ) : (

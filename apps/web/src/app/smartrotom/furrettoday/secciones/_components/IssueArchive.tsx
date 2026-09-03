@@ -23,7 +23,7 @@ export function IssueArchive() {
   return (
     <section
       id="archivo"
-      className="mx-auto max-w-[1400px] scroll-mt-32 px-6 py-12"
+      className="mx-auto max-w-[87.5rem] scroll-mt-32 px-6 py-12"
     >
       <div className="mb-6">
         <SectionHeader

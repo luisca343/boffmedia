@@ -46,11 +46,11 @@ export function Button({
     <button
       type={type}
       className={cn(
-        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-wp-sm border-wp font-wp text-[13.5px] font-extrabold",
+        "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-wp-sm border-wp font-wp text-[0.84375rem] font-extrabold",
         "transition-[transform,background,border-color,box-shadow,filter] duration-150 ease-wp",
         "hover:-translate-y-px active:translate-y-0 active:scale-[.98] motion-reduce:transform-none",
         "disabled:pointer-events-none disabled:opacity-45",
-        iconOnly ? "p-[9px]" : "px-[15px] py-[9px]",
+        iconOnly ? "p-[0.5625rem]" : "px-[0.9375rem] py-[0.5625rem]",
         VARIANT[variant],
         className,
       )}

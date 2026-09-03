@@ -61,7 +61,7 @@ export function MultasTable({
               const tone = st ? st.tone : ("default" as const)
               return (
                 <TR key={m.id}>
-                  <TD className="font-gt-mono text-[11px] text-gt-ink-400">{m.code}</TD>
+                  <TD className="font-gt-mono text-[0.6875rem] text-gt-ink-400">{m.code}</TD>
                   <TD>
                     <button
                       type="button"
@@ -72,22 +72,22 @@ export function MultasTable({
                       {m.player.username}
                     </button>
                   </TD>
-                  <TD className="max-w-[280px] text-[12.5px]">
+                  <TD className="max-w-[17.5rem] text-[0.78125rem]">
                     {m.reason}
                     {m.denunciaId != null && (
-                      <span className="ml-1.5 font-gt-mono text-[10px] text-gt-ink-400">
+                      <span className="ml-1.5 font-gt-mono text-[0.625rem] text-gt-ink-400">
                         {t("hacienda.denunciaRef", { id: m.denunciaId })}
                       </span>
                     )}
                   </TD>
-                  <TD className="font-gt-display text-[15px] font-bold tabular-nums text-gt-ink-900">
+                  <TD className="font-gt-display text-[0.9375rem] font-bold tabular-nums text-gt-ink-900">
                     {money(m.amount, intlLocale)} ₽
                   </TD>
-                  <TD className="text-[12px] text-gt-ink-500">{m.issuedBy.username}</TD>
+                  <TD className="text-[0.75rem] text-gt-ink-500">{m.issuedBy.username}</TD>
                   <TD>
                     <Badge tone={tone}>{label}</Badge>
                     {m.status === "paid" && m.paidAt && (
-                      <div className="mt-1 font-gt-mono text-[9.5px] text-gt-ink-400">{timeAgo(m.paidAt)}</div>
+                      <div className="mt-1 font-gt-mono text-[0.59375rem] text-gt-ink-400">{timeAgo(m.paidAt)}</div>
                     )}
                   </TD>
                   <TD className="text-right">

@@ -17,7 +17,7 @@ function MewMutationArt({ bodyPart }: { bodyPart?: string }) {
   return (
     <div className="flex items-center justify-center gap-2 p-4 [border-radius:var(--wob-a)] border-2 border-dashed border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)]">
       {glyph && <img src={glyph} alt={label} className="w-6 h-6" />}
-      <span className="text-[12px] font-semibold text-[color:var(--mwp-ink-soft)]">{label}</span>
+      <span className="text-[0.75rem] font-semibold text-[color:var(--mwp-ink-soft)]">{label}</span>
     </div>
   )
 }

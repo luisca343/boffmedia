@@ -40,19 +40,19 @@ export function PassportPanel({
   if (loading) {
     return (
       <div className="tx-scroll flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto p-3.5">
-        <div className="grid shrink-0 grid-cols-2 gap-[9px]">
+        <div className="grid shrink-0 grid-cols-2 gap-[0.5625rem]">
           {[0, 1, 2, 3].map((i) => (
-            <Skeleton key={i} className="h-[104px] rounded-tx-md" />
+            <Skeleton key={i} className="h-[6.5rem] rounded-tx-md" />
           ))}
         </div>
-        <Skeleton className="h-[180px] rounded-tx-md" />
+        <Skeleton className="h-[11.25rem] rounded-tx-md" />
       </div>
     )
   }
 
   return (
     <div className="tx-scroll flex min-h-0 flex-1 flex-col gap-3.5 overflow-y-auto p-3.5">
-      <div className="grid shrink-0 grid-cols-2 gap-[9px]">
+      <div className="grid shrink-0 grid-cols-2 gap-[0.5625rem]">
         <StatBox icon="map" value={stats.visited.length} suffix={` / ${stops.length}`} label={t("visitedDestinations")} />
         <StatBox icon="route" value={stats.trips} label={t("totalTrips")} />
         <StatBox {...blocksTravelled(stats.blocks)} icon="walking" label={t("blocksTravelled")} />
@@ -62,14 +62,14 @@ export function PassportPanel({
       <Eyebrow icon="map" count={`${stats.visited.length}/${stops.length}`}>
         {t("passportStamps")}
       </Eyebrow>
-      <div className="grid shrink-0 grid-cols-3 gap-[9px]">
+      <div className="grid shrink-0 grid-cols-3 gap-[0.5625rem]">
         {stops.map((stop) => {
           const stamped = stats.visited.includes(stop.id)
           return (
             <div
               key={stop.id}
               className={cn(
-                "relative flex aspect-square flex-col items-center justify-center gap-[5px] rounded-tx-md px-1.5 py-2 text-center",
+                "relative flex aspect-square flex-col items-center justify-center gap-[0.3125rem] rounded-tx-md px-1.5 py-2 text-center",
                 "border-[1.5px]",
                 stamped
                   ? "border-solid border-tx-accent-soft bg-tx-accent-soft"
@@ -77,13 +77,13 @@ export function PassportPanel({
               )}
             >
               {stamped && (
-                <span className="absolute right-[5px] top-[5px] text-tx-accent">
+                <span className="absolute right-[0.3125rem] top-[0.3125rem] text-tx-accent">
                   <Icon name="check" size={13} stroke={3} />
                 </span>
               )}
               <span
                 className={cn(
-                  "grid h-[30px] w-[30px] place-items-center rounded-full",
+                  "grid h-[1.875rem] w-[1.875rem] place-items-center rounded-full",
                   stamped ? "bg-tx-accent text-tx-on-accent" : "bg-tx-surface-2 text-tx-txt-3",
                 )}
               >
@@ -91,7 +91,7 @@ export function PassportPanel({
               </span>
               <span
                 className={cn(
-                  "text-[10px] font-bold leading-[1.15]",
+                  "text-[0.625rem] font-bold leading-[1.15]",
                   stamped ? "text-tx-txt" : "text-tx-txt-2",
                 )}
               >
@@ -105,7 +105,7 @@ export function PassportPanel({
       <Eyebrow icon="clock" count={trips.length}>
         {t("travelHistory")}
       </Eyebrow>
-      <div className="flex flex-col gap-[9px]">
+      <div className="flex flex-col gap-[0.5625rem]">
         {trips.length === 0 ? (
           <Empty icon="clock" message={t("emptyHistory")} />
         ) : (
@@ -124,7 +124,7 @@ export function PassportPanel({
                     −{formatMoney(trip.price)}
                   </span>
                 </span>
-                <span className="flex justify-between gap-2 text-[11.5px] text-tx-txt-3">
+                <span className="flex justify-between gap-2 text-[0.71875rem] text-tx-txt-3">
                   <span>{relativeTime(trip.ts)}</span>
                   <span className="font-tx-mono">{formatNum(trip.blocks)} b</span>
                 </span>

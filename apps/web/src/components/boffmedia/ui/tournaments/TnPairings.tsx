@@ -25,7 +25,7 @@ export function TnPairings({ rounds }: { rounds: TnPairingRound[] }) {
 
   const active = valid.find((r) => r.round === sel) ?? valid[valid.length - 1]
   const th =
-    "px-3 py-2 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-txt-dim"
+    "px-3 py-2 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-txt-dim"
   const td = "px-3 py-2 align-middle"
 
   return (
@@ -56,7 +56,7 @@ export function TnPairings({ rounds }: { rounds: TnPairingRound[] }) {
               const botWin = m.winner != null && m.winner === m.bot
               return (
                 <tr key={i} className="border-b border-line last:border-b-0">
-                  <td className={cn(td, "text-center font-mono text-[11px] text-txt-dim")}>{i + 1}</td>
+                  <td className={cn(td, "text-center font-mono text-[0.6875rem] text-txt-dim")}>{i + 1}</td>
                   <td className={cn(td, "text-right")}>
                     <span className="inline-flex justify-end">
                       <TnEntrant c={m.top} align="right" win={topWin} lose={botWin} compact />
@@ -67,7 +67,7 @@ export function TnPairings({ rounds }: { rounds: TnPairingRound[] }) {
                   </td>
                   <td className={td}>
                     {bye ? (
-                      <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-txt-dim">
+                      <span className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-txt-dim">
                         {t("bye")}
                       </span>
                     ) : (
@@ -87,10 +87,10 @@ export function TnPairings({ rounds }: { rounds: TnPairingRound[] }) {
 function ScoreCell({ m, bye }: { m: TnMatch; bye: boolean }) {
   const t = useTranslations("torneos.pairings")
   const tEntrant = useTranslations("torneos.entrant")
-  if (bye) return <span className="font-mono text-[11px] font-bold text-ok">{tEntrant("bye")}</span>
+  if (bye) return <span className="font-mono text-[0.6875rem] font-bold text-ok">{tEntrant("bye")}</span>
   if (m.status === "final") {
     return (
-      <span className="whitespace-nowrap font-mono text-[13px] font-bold tabular-nums">
+      <span className="whitespace-nowrap font-mono text-[0.8125rem] font-bold tabular-nums">
         <span className={m.winner === m.top ? "text-accent-bright" : "text-txt-muted"}>{m.g1 ?? 0}</span>
         <i className="px-0.5 not-italic text-txt-dim">–</i>
         <span className={m.winner === m.bot ? "text-accent-bright" : "text-txt-muted"}>{m.g2 ?? 0}</span>
@@ -98,6 +98,6 @@ function ScoreCell({ m, bye }: { m: TnMatch; bye: boolean }) {
     )
   }
   if (m.status === "playing")
-    return <span className="font-mono text-[9.5px] font-semibold uppercase tracking-[0.08em] text-warn">{t("playing")}</span>
-  return <span className="font-mono text-[11px] text-txt-dim">{t("vs")}</span>
+    return <span className="font-mono text-[0.59375rem] font-semibold uppercase tracking-[0.08em] text-warn">{t("playing")}</span>
+  return <span className="font-mono text-[0.6875rem] text-txt-dim">{t("vs")}</span>
 }

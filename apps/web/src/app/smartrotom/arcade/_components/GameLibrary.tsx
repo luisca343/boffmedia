@@ -30,7 +30,7 @@ export function GameLibrary() {
                   onClick={() => setCategory(c)}
                   aria-pressed={active}
                   className={cn(
-                    "ar-lift rounded-md border px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em]",
+                    "ar-lift rounded-md border px-2.5 py-1.5 font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em]",
                     active
                       ? "border-ar-cyan/50 bg-ar-cyan/[.18] text-ar-cyan"
                       : "border-white/[.08] bg-white/[.04] text-ar-ink-dim hover:text-ar-ink",

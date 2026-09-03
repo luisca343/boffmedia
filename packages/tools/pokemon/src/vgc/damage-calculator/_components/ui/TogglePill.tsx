@@ -6,7 +6,7 @@ import { cssVars } from "./theme"
 
 // wrap row for condition toggles.
 export function PillRow({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-wrap gap-[5px]">{children}</div>
+  return <div className="flex flex-wrap gap-[0.3125rem]">{children}</div>
 }
 
 export interface TogglePillProps {
@@ -28,7 +28,7 @@ export function TogglePill({ on, label, tone, onClick, title }: TogglePillProps)
       onClick={onClick}
       style={tone ? cssVars({ "--tone": tone }) : undefined}
       className={cn(
-        "cut-tag cut-tag-edge [--cut-tag:6px] cursor-pointer border border-solid px-[10px] py-[6px] font-mono text-[10px]/none font-semibold uppercase tracking-[0.06em]",
+        "cut-tag cut-tag-edge [--cut-tag:6px] cursor-pointer border border-solid px-[0.625rem] py-[0.375rem] font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.06em]",
         "transition-[color,border-color,background] duration-[140ms]",
         on
           ? "border-[color-mix(in_srgb,var(--tone,var(--accent))_55%,transparent)] [--cut-line:color-mix(in_srgb,var(--tone,var(--accent))_55%,transparent)] bg-[color-mix(in_srgb,var(--tone,var(--accent))_11%,transparent)] text-[var(--tone,var(--accent))]"

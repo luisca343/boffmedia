@@ -32,8 +32,8 @@ export function TeamPanel() {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-2.5 p-6 text-center">
         <Icon name="wifiOff" size={26} className="text-pc-fg-subtle" />
-        <p className="text-[12.5px] text-pc-fg-muted">{t("team.loadError")}</p>
-        <p className="text-[11.5px] text-pc-fg-subtle">
+        <p className="text-[0.78125rem] text-pc-fg-muted">{t("team.loadError")}</p>
+        <p className="text-[0.71875rem] text-pc-fg-subtle">
           {t("team.loadErrorBody")}
         </p>
       </div>
@@ -41,10 +41,10 @@ export function TeamPanel() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-[7px] overflow-auto p-[11px]">
+    <div className="flex h-full flex-col gap-[0.4375rem] overflow-auto p-[0.6875rem]">
       <div className="flex items-center justify-between px-1 pb-1 pt-0.5">
-        <span className="text-[11.5px] text-pc-fg-subtle">{t("team.inCombat", { count: filled })}</span>
-        <Chip className="text-[10px]">
+        <span className="text-[0.71875rem] text-pc-fg-subtle">{t("team.inCombat", { count: filled })}</span>
+        <Chip className="text-[0.625rem]">
           <Icon name="info" size={11} />
           {t("team.dragHint")}
         </Chip>

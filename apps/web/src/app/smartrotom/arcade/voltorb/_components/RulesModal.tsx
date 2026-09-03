@@ -12,7 +12,7 @@ interface RulesModalProps {
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="mb-5 last:mb-0">
-      <h3 className="mb-2 font-ar-display text-[11px] uppercase tracking-[0.12em] text-ar-amber">
+      <h3 className="mb-2 font-ar-display text-[0.6875rem] uppercase tracking-[0.12em] text-ar-amber">
         {title}
       </h3>
       {children}

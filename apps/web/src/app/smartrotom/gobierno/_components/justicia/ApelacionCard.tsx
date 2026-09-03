@@ -37,27 +37,27 @@ export function ApelacionCard({
           </button>
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className="font-gt-mono text-[11px] text-gt-ink-400">{a.code}</span>
-              <span className="font-gt-display text-[15px] font-bold text-gt-ink-900">{a.player.username}</span>
+              <span className="font-gt-mono text-[0.6875rem] text-gt-ink-400">{a.code}</span>
+              <span className="font-gt-display text-[0.9375rem] font-bold text-gt-ink-900">{a.player.username}</span>
               <Badge>{t("justicia.impugna", { code: a.multa?.code ?? `#${a.multaId}` })}</Badge>
             </div>
-            <div className="mt-1.5 text-[13px] italic leading-relaxed text-gt-ink-700">«{a.grounds}»</div>
+            <div className="mt-1.5 text-[0.8125rem] italic leading-relaxed text-gt-ink-700">«{a.grounds}»</div>
             {a.multa && (
-              <Sunken className="mt-2.5 px-[11px] py-2 text-[12px] text-gt-ink-600">
+              <Sunken className="mt-2.5 px-[0.6875rem] py-2 text-[0.75rem] text-gt-ink-600">
                 <Icon name="gavel" size={12} className="mb-px inline-block text-gt-ink-400" /> {t("justicia.multaOriginal")}{" "}
                 {a.multa.reason} · <strong className="tabular-nums">{money(a.multa.amount, intlLocale)} ₽</strong>
               </Sunken>
             )}
             {a.decision && (
               <div
-                className={`mt-2.5 text-[12.5px] font-semibold ${
+                className={`mt-2.5 text-[0.78125rem] font-semibold ${
                   a.status === "overturned" ? "text-gt-ok" : "text-gt-danger"
                 }`}
               >
                 <Icon name="scale" size={13} className="mb-px inline-block" /> {a.decision}
               </div>
             )}
-            <div className="mt-2 font-gt-mono text-[10.5px] text-gt-ink-400">
+            <div className="mt-2 font-gt-mono text-[0.65625rem] text-gt-ink-400">
               {t("justicia.presentada", { date: fmtDateTime(a.createdAt, intlLocale) })}
               {a.reviewer ? t("justicia.revisa", { username: a.reviewer.username }) : ""}
             </div>

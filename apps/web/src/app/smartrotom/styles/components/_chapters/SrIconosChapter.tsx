@@ -14,7 +14,7 @@ import { MONO_LABEL, Sample, Section } from "../showcase-shared"
 
 function Cell({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-w-[96px] flex-col items-center gap-2 border border-solid border-sr-line bg-sr-panel-2 px-4 py-4">
+    <div className="flex min-w-[6rem] flex-col items-center gap-2 border border-solid border-sr-line bg-sr-panel-2 px-4 py-4">
       <span className="flex h-12 items-center text-sr-txt">{children}</span>
       <span className={cn(MONO_LABEL, "text-center")}>{label}</span>
     </div>
@@ -238,7 +238,7 @@ export function SrIconosChapter() {
             <GoldCoin size={18} />
             <GoldCoin size={28} />
             <GoldCoin size={44} />
-            <span className="inline-flex items-center gap-2 font-mono text-[15px] font-bold">
+            <span className="inline-flex items-center gap-2 font-mono text-[0.9375rem] font-bold">
               <GoldCoin size={18} /> ×2 450
             </span>
           </div>

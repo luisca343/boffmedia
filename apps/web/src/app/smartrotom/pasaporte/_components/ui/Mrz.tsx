@@ -20,7 +20,7 @@ export function Mrz({
     <div
       className={cn(
         "ps-num mt-auto overflow-hidden whitespace-nowrap border-t-2 border-ps-ink/22 px-1 pb-0.5 pt-2",
-        "font-ps-mono text-[clamp(10px,1.5vh,13px)] leading-[1.5] tracking-[.18em] transition-colors duration-300",
+        "font-ps-mono text-[clamp(0.625rem,1.5vh,0.8125rem)] leading-[1.5] tracking-[.18em] transition-colors duration-300",
         inspecting ? "bg-ps-teal/[.08] text-ps-teal-deep" : "bg-ps-ink/[.06] text-ps-ink-soft",
         className,
       )}

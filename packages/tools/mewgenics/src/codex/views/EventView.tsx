@@ -53,10 +53,10 @@ function MewEffectLine({ k, v, onNav, t }: { k: string; v: unknown; onNav: NavFn
   return (
     <li className="flex items-baseline gap-2">
       <Icon name={TONE_ICON[line.tone]} size={10} className={cn("relative top-[2px] flex-none", TONE_CLS[line.tone])} />
-      <span className="min-w-0 text-[12.5px]/[1.45] text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)]">
+      <span className="min-w-0 text-[0.78125rem]/[1.45] text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)]">
         {text ?? <span className="text-[color:var(--mwp-ink-soft)]">{String(line.params.label)}</span>}
         {isCounter && line.refs[0] ? (
-          <span className="ml-1.5 font-mono text-[10.5px] text-[color:var(--mwp-ink-soft)]">{mewCounterShort(line.refs[0])}</span>
+          <span className="ml-1.5 font-mono text-[0.65625rem] text-[color:var(--mwp-ink-soft)]">{mewCounterShort(line.refs[0])}</span>
         ) : line.refs.length ? (
           <span className="ml-1.5 inline-flex flex-wrap gap-1 align-middle">
             {line.refs.slice(0, 4).map((id) => {
@@ -64,11 +64,11 @@ function MewEffectLine({ k, v, onNav, t }: { k: string; v: unknown; onNav: NavFn
               if (cat) return <MewRef key={id} id={id} cat={cat} onNav={onNav} />
               // `injury: str` names the stat the wound drops, not an entity.
               const stat = MEW_STAT_ABBR_KEY[id] ? t(MEW_STAT_ABBR_KEY[id]) : null
-              return <span key={id} className="font-mono text-[11px] font-bold text-[color:var(--mwp-red-deep)]">{stat ?? mewHuman(id)}</span>
+              return <span key={id} className="font-mono text-[0.6875rem] font-bold text-[color:var(--mwp-red-deep)]">{stat ?? mewHuman(id)}</span>
             })}
           </span>
         ) : showRaw || !text ? (
-          <span className="ml-1.5 font-mono text-[11px] text-[color:var(--mwp-ink)]"><MewEffectVal v={v} onNav={onNav} /></span>
+          <span className="ml-1.5 font-mono text-[0.6875rem] text-[color:var(--mwp-ink)]"><MewEffectVal v={v} onNav={onNav} /></span>
         ) : null}
       </span>
     </li>
@@ -87,17 +87,17 @@ function MewReward({ entry, onNav, t, tierPct }: { entry: MewEventReward; onNav:
         <div className="flex flex-wrap items-center gap-1.5">
           {tier && (
             <span className={cn(
-              "inline-flex items-center gap-1 border-[1.5px] border-solid px-[7px] pb-[2px] pt-[3px] text-[9.5px]/none uppercase tracking-[0.07em] [font-family:var(--mwf-disp)] [border-radius:4px]",
+              "inline-flex items-center gap-1 border-[1.5px] border-solid px-[0.4375rem] pb-[2px] pt-[3px] text-[0.59375rem]/none uppercase tracking-[0.07em] [font-family:var(--mwf-disp)] [border-radius:4px]",
               tier === "rare"
                 ? "border-[color:var(--mwp-red)] bg-[color-mix(in_srgb,var(--mwp-red)_12%,transparent)] text-[color:var(--mwp-red-deep)]"
                 : "border-[color:var(--mwp-ink-line)] text-[color:var(--mwp-ink-soft)]",
             )}>
               {tier === "rare" && <Icon name="sparkles" size={9} />}
               {t(tier === "rare" ? "event.tier.rare" : "event.tier.common")}
-              {tierPct?.(tier) && <b className="font-mono text-[10px] tracking-normal">{tierPct(tier)}</b>}
+              {tierPct?.(tier) && <b className="font-mono text-[0.625rem] tracking-normal">{tierPct(tier)}</b>}
             </span>
           )}
-          {weight != null && <span className="font-mono text-[10px]/none text-[color:var(--mwp-ink-soft)]">{t("event.tier.weight")} {weight}</span>}
+          {weight != null && <span className="font-mono text-[0.625rem]/none text-[color:var(--mwp-ink-soft)]">{t("event.tier.weight")} {weight}</span>}
         </div>
       )}
       {prompt ? <MewText muted>{prompt}</MewText> : null}
@@ -119,9 +119,9 @@ function MewOutcome({ outcome, tone, tag, icon, pct, onNav, t, tierPct }: { outc
       : "bg-[color:var(--mwp-paper-2)]"
   return (
     <div className={"flex flex-col gap-2.5 px-4 py-3 " + toneCls}>
-      <span className="otag flex items-center justify-between gap-2 text-[10.5px]/none uppercase tracking-[0.08em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)] [&_svg]:text-current">
+      <span className="otag flex items-center justify-between gap-2 text-[0.65625rem]/none uppercase tracking-[0.08em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)] [&_svg]:text-current">
         <span className="inline-flex items-center gap-1.5"><Icon name={icon} size={12} />{tag}</span>
-        {pct && <span className="font-mono text-[11px] font-bold">{pct}</span>}
+        {pct && <span className="font-mono text-[0.6875rem] font-bold">{pct}</span>}
       </span>
       {outcome.entries.map((e, i) => <MewReward key={i} entry={e} onNav={onNav} t={t} tierPct={tierPct} />)}
     </div>
@@ -152,7 +152,7 @@ export function EventView({ rec, onNav }: ViewProps) {
               {introVariants.map((v, i) => (
                 <div className="flex flex-col gap-1 border-b-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] pb-2.5 last:border-b-0 last:pb-0" key={i}>
                   {v.when && (
-                    <span className="w-fit border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2 pb-[2px] pt-[3px] font-mono text-[10px]/none font-bold text-[color:var(--mwp-ink-soft)] [border-radius:4px]">
+                    <span className="w-fit border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2 pb-[2px] pt-[3px] font-mono text-[0.625rem]/none font-bold text-[color:var(--mwp-ink-soft)] [border-radius:4px]">
                       {t("event.intro.counter")} {v.when}
                     </span>
                   )}
@@ -182,9 +182,9 @@ export function EventView({ rec, onNav }: ViewProps) {
                 // 18/165px radius around a 1300px box, which read as a lopsided
                 // blob, and stacked three nested boxes before any content.
                 <article className="overflow-hidden border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] [border-radius:10px] [box-shadow:0_3px_0_var(--mwp-shadow-md)]" key={o.id}>
-                  <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 bg-[color:var(--mwp-paper-2)] px-4 pb-2 pt-[11px]">
-                    <h3 className="m-0 text-[15px]/none text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)]">{o.label}</h3>
-                    <span className="flex flex-wrap items-center gap-2 text-[11.5px]/none font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">
+                  <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 bg-[color:var(--mwp-paper-2)] px-4 pb-2 pt-[0.6875rem]">
+                    <h3 className="m-0 text-[0.9375rem]/none text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)]">{o.label}</h3>
+                    <span className="flex flex-wrap items-center gap-2 text-[0.71875rem]/none font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">
                       {cost != null && (
                         <span className="inline-flex items-center gap-1 text-[color:var(--mwp-warn)]">
                           <Icon name="gift" size={10} />{t("event.cost", { n: cost, what: mewHuman(o.stat || "") })}
@@ -202,9 +202,9 @@ export function EventView({ rec, onNav }: ViewProps) {
 
                   {reqs.length > 0 && (
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] px-4 py-2">
-                      <span className="text-[10px]/none uppercase tracking-[0.07em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">{t("event.req.title")}</span>
+                      <span className="text-[0.625rem]/none uppercase tracking-[0.07em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-disp)]">{t("event.req.title")}</span>
                       {reqs.map(([k, v]) => (
-                        <span key={k} className="inline-flex items-center gap-1 text-[11px]/[1.3] font-semibold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)]">
+                        <span key={k} className="inline-flex items-center gap-1 text-[0.6875rem]/[1.3] font-semibold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)]">
                           <Icon name="lock" size={9} className="text-[color:var(--mwp-ink-soft)]" />{mewReqText(k, v, t)}
                         </span>
                       ))}
@@ -217,7 +217,7 @@ export function EventView({ rec, onNav }: ViewProps) {
                     </div>
                   )}
 
-                  <div className="grid border-t-2 border-solid border-[color:var(--mwp-ink)] [grid-template-columns:repeat(auto-fit,minmax(280px,1fr))] [&>*+*]:border-l-[1.5px] [&>*+*]:border-dashed [&>*+*]:border-[color:var(--mwp-ink-line)] max-[720px]:[&>*+*]:border-l-0 max-[720px]:[&>*+*]:border-t-[1.5px]">
+                  <div className="grid border-t-2 border-solid border-[color:var(--mwp-ink)] [grid-template-columns:repeat(auto-fit,minmax(17.5rem,1fr))] [&>*+*]:border-l-[1.5px] [&>*+*]:border-dashed [&>*+*]:border-[color:var(--mwp-ink-line)] max-[720px]:[&>*+*]:border-l-0 max-[720px]:[&>*+*]:border-t-[1.5px]">
                     <MewOutcome
                       outcome={o.good} tone="good" tag={t("label.success")} icon="check"
                       pct={odds && odds.roll.kind !== "tier" ? Math.round(odds.chance.success * 100) + "%" : undefined}

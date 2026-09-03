@@ -65,10 +65,10 @@ export function StatChip({ icon, value, label, tone, variant = "chip", className
           className,
         )}
       >
-        <b className={cn("font-display text-[26px] font-extrabold italic leading-none", tone ? TONE_VALUE[tone] : "text-txt")}>
+        <b className={cn("font-display text-[1.625rem] font-extrabold italic leading-none", tone ? TONE_VALUE[tone] : "text-txt")}>
           {value}
         </b>
-        <small className="font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
+        <small className="font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
           {label}
         </small>
       </div>
@@ -78,14 +78,14 @@ export function StatChip({ icon, value, label, tone, variant = "chip", className
     <span
       className={cn(
         "cut cut-edge-slant [--cut:4px]",
-        "inline-flex items-center gap-[9px] border border-solid bg-panel-2 px-3 py-[9px]",
-        "font-mono text-[11px] font-semibold uppercase leading-none tracking-[0.06em]",
+        "inline-flex items-center gap-[0.5625rem] border border-solid bg-panel-2 px-3 py-[0.5625rem]",
+        "font-mono text-[0.6875rem] font-semibold uppercase leading-none tracking-[0.06em]",
         tone ? TONE_BORDER[tone] : "border-line-2 [--cut-line:var(--line-2)] text-txt-muted",
         className,
       )}
     >
       {icon && <Icon name={icon} size={14} className={tone ? TONE_ICON[tone] : "text-txt-muted"} />}
-      <b className={cn("font-display text-[16px] font-extrabold italic leading-none", tone ? TONE_VALUE[tone] : "text-txt")}>
+      <b className={cn("font-display text-[1rem] font-extrabold italic leading-none", tone ? TONE_VALUE[tone] : "text-txt")}>
         {value}
       </b>
       {label}

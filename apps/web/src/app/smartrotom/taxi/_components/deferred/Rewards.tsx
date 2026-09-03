@@ -47,7 +47,7 @@ export function GroupTeleport({
           }
         }}
         className={cn(
-          "mt-3 flex cursor-pointer items-center gap-2.5 rounded-tx-md border border-solid bg-tx-surface px-3 py-[11px]",
+          "mt-3 flex cursor-pointer items-center gap-2.5 rounded-tx-md border border-solid bg-tx-surface px-3 py-[0.6875rem]",
           "transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-tx-accent",
           open ? "border-tx-blue-500" : "border-tx-line",
         )}
@@ -56,11 +56,11 @@ export function GroupTeleport({
           <Icon name="users" size={17} stroke={2.2} />
         </span>
         <div className="min-w-0 flex-1">
-          <b className="text-[13px] font-extrabold text-tx-txt">
+          <b className="text-[0.8125rem] font-extrabold text-tx-txt">
             {t("groupTrip")}{" "}
             {members.length > 0 && t("passengers", { count: members.length + 1 })}
           </b>
-          <span className="block text-[11.5px] text-tx-txt-2">
+          <span className="block text-[0.71875rem] text-tx-txt-2">
             {members.length > 0
               ? t("groupExtra", { amount: formatMoney(groupAdd) })
               : t("bringParty", { count: online })}
@@ -70,7 +70,7 @@ export function GroupTeleport({
       </div>
 
       {open && (
-        <div className="mt-[9px] flex flex-col gap-[7px] animate-tx-card-in motion-reduce:animate-none">
+        <div className="mt-[0.5625rem] flex flex-col gap-[0.4375rem] animate-tx-card-in motion-reduce:animate-none">
           {party.map((member) => {
             const on = members.includes(member.id)
             return (
@@ -92,16 +92,16 @@ export function GroupTeleport({
                   !member.online && "opacity-45",
                 )}
               >
-                <span className="grid h-[30px] w-[30px] shrink-0 place-items-center rounded-full bg-[linear-gradient(140deg,rgb(var(--tx-blue-400)),rgb(var(--tx-blue-700)))] text-[11px] font-extrabold text-white">
+                <span className="grid h-[1.875rem] w-[1.875rem] shrink-0 place-items-center rounded-full bg-[linear-gradient(140deg,rgb(var(--tx-blue-400)),rgb(var(--tx-blue-700)))] text-[0.6875rem] font-extrabold text-white">
                   {member.initials}
                 </span>
-                <span className="flex-1 text-[13px] font-bold text-tx-txt">{member.name}</span>
-                <span className={cn("text-[11px]", member.online ? "text-tx-ok" : "text-tx-txt-3")}>
+                <span className="flex-1 text-[0.8125rem] font-bold text-tx-txt">{member.name}</span>
+                <span className={cn("text-[0.6875rem]", member.online ? "text-tx-ok" : "text-tx-txt-3")}>
                   {member.online ? t("online") : t("offline")}
                 </span>
                 <span
                   className={cn(
-                    "grid h-[22px] w-[22px] shrink-0 place-items-center rounded-[7px] border-[1.5px] border-solid",
+                    "grid h-[1.375rem] w-[1.375rem] shrink-0 place-items-center rounded-[7px] border-[1.5px] border-solid",
                     on ? "border-tx-blue-500 bg-tx-blue-600 text-white" : "border-tx-line-2 text-transparent",
                   )}
                 >
@@ -143,11 +143,11 @@ export function RiderCard({
 
   return (
     <div className="relative overflow-hidden rounded-tx-lg border border-solid border-tx-line-2 bg-[linear-gradient(135deg,#0b1c45,#15306e)] p-4 text-white shadow-tx-1">
-      <span className="pointer-events-none absolute -right-[10%] -top-[40%] h-[200px] w-[200px] rounded-full bg-[radial-gradient(circle,var(--tx-accent-glow),transparent_65%)]" />
+      <span className="pointer-events-none absolute -right-[10%] -top-[40%] h-[12.5rem] w-[12.5rem] rounded-full bg-[radial-gradient(circle,var(--tx-accent-glow),transparent_65%)]" />
       <div className="relative flex items-center justify-between">
         <div className="flex items-center gap-2.5">
           <span
-            className="grid h-[38px] w-[38px] place-items-center rounded-[11px]"
+            className="grid h-[2.375rem] w-[2.375rem] place-items-center rounded-[11px]"
             style={{
               background: `${tier.color}3d`,
               color: tier.color,
@@ -157,29 +157,29 @@ export function RiderCard({
             <Icon name="trophy" size={20} stroke={2.2} />
           </span>
           <div>
-            <div className="font-tx-display text-[15px] font-bold tracking-[0.4px]" style={{ color: tier.color }}>
+            <div className="font-tx-display text-[0.9375rem] font-bold tracking-[0.4px]" style={{ color: tier.color }}>
               {t("member", { tier: tier.name })}
             </div>
-            <div className="text-[11.5px] text-white/60">{t("frequentProgram")}</div>
+            <div className="text-[0.71875rem] text-white/60">{t("frequentProgram")}</div>
           </div>
         </div>
         <div className="text-right">
-          <div className="font-tx-mono text-[26px] font-extrabold leading-none text-tx-accent">
+          <div className="font-tx-mono text-[1.625rem] font-extrabold leading-none text-tx-accent">
             {tier.discount > 0 ? `−${Math.round(tier.discount * 100)}%` : "—"}
           </div>
-          <div className="mt-[3px] text-[10.5px] uppercase tracking-[0.5px] text-white/60">{t("perTrip")}</div>
+          <div className="mt-[3px] text-[0.65625rem] uppercase tracking-[0.5px] text-white/60">{t("perTrip")}</div>
         </div>
       </div>
 
       <div className="relative mt-4">
-        <div className="mb-1.5 flex justify-between text-[11.5px] font-bold text-white/70">
+        <div className="mb-1.5 flex justify-between text-[0.71875rem] font-bold text-white/70">
           <span>{next ? t("tripsToNext", { count: next.min - trips, tier: next.name }) : t("maxLevel")}</span>
           <span className="font-tx-mono">
             {trips}
             {next && ` / ${next.min}`}
           </span>
         </div>
-        <div className="h-[7px] overflow-hidden rounded-[4px] bg-white/15">
+        <div className="h-[0.4375rem] overflow-hidden rounded-[4px] bg-white/15">
           <span
             className="block h-full rounded-[4px] bg-gradient-to-r from-tx-blue-400 to-tx-accent"
             style={{ width: `${pct}%` }}
@@ -188,24 +188,24 @@ export function RiderCard({
       </div>
 
       <div className="relative mt-3.5 flex gap-4">
-        <div className="flex items-center gap-[7px]">
-          <span className="grid h-[30px] w-[30px] place-items-center rounded-[9px] bg-white/10 text-tx-accent">
+        <div className="flex items-center gap-[0.4375rem]">
+          <span className="grid h-[1.875rem] w-[1.875rem] place-items-center rounded-[9px] bg-white/10 text-tx-accent">
             <Icon name="flame" size={15} stroke={2.2} />
           </span>
           <div>
-            <div className="text-[15px] font-extrabold">{t("streakDays", { count: streakDays })}</div>
-            <div className="text-[10.5px] text-white/60">{t("activeStreak")}</div>
+            <div className="text-[0.9375rem] font-extrabold">{t("streakDays", { count: streakDays })}</div>
+            <div className="text-[0.65625rem] text-white/60">{t("activeStreak")}</div>
           </div>
         </div>
-        <div className="flex items-center gap-[7px]">
-          <span className="grid h-[30px] w-[30px] place-items-center rounded-[9px] bg-white/10 text-tx-accent">
+        <div className="flex items-center gap-[0.4375rem]">
+          <span className="grid h-[1.875rem] w-[1.875rem] place-items-center rounded-[9px] bg-white/10 text-tx-accent">
             <Icon name="gift" size={15} stroke={2.2} />
           </span>
           <div>
-            <div className="text-[15px] font-extrabold">
+            <div className="text-[0.9375rem] font-extrabold">
               {trips % freeRideEvery}/{freeRideEvery}
             </div>
-            <div className="text-[10.5px] text-white/60">{t("freeTrip")}</div>
+            <div className="text-[0.65625rem] text-white/60">{t("freeTrip")}</div>
           </div>
         </div>
       </div>
@@ -238,10 +238,10 @@ export function AchievementRow({ achievement }: { achievement: Achievement }) {
         <Icon name={achievement.icon} size={19} stroke={2.2} />
       </span>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-[7px] text-[13.5px] font-extrabold text-tx-txt">
+        <div className="flex items-center gap-[0.4375rem] text-[0.84375rem] font-extrabold text-tx-txt">
           {achievement.name}
           {done && (
-            <span className="rounded-[5px] bg-tx-ok-soft px-1.5 py-0.5 text-[9.5px] font-extrabold uppercase tracking-[0.4px] text-tx-ok">
+            <span className="rounded-[5px] bg-tx-ok-soft px-1.5 py-0.5 text-[0.59375rem] font-extrabold uppercase tracking-[0.4px] text-tx-ok">
               {t("achieved")}
             </span>
           )}
@@ -250,7 +250,7 @@ export function AchievementRow({ achievement }: { achievement: Achievement }) {
         {!done && (
           <div className="mt-2 flex items-center gap-2">
             <ProgressBar pct={pct} className="flex-1" />
-            <span className="shrink-0 font-tx-mono text-[11px] font-bold text-tx-txt-3">
+            <span className="shrink-0 font-tx-mono text-[0.6875rem] font-bold text-tx-txt-3">
               {formatNum(progress)}/{formatNum(goal)}
             </span>
           </div>
@@ -279,23 +279,23 @@ export function TopUpGrid({ packages }: { packages: CoinPackage[] }) {
           className="group relative rounded-tx-md border border-solid border-tx-line bg-tx-surface p-3.5 text-left transition-all duration-150 ease-tx hover:-translate-y-0.5 hover:border-tx-accent hover:bg-tx-surface-2"
         >
           {pkg.tag && (
-            <span className="absolute -top-2 right-2.5 whitespace-nowrap rounded-md bg-tx-accent px-2 py-[3px] text-[9.5px] font-extrabold uppercase tracking-[0.4px] text-tx-on-accent">
+            <span className="absolute -top-2 right-2.5 whitespace-nowrap rounded-md bg-tx-accent px-2 py-[3px] text-[0.59375rem] font-extrabold uppercase tracking-[0.4px] text-tx-on-accent">
               {pkg.tag}
             </span>
           )}
-          <div className="flex items-center gap-1.5 font-tx-mono text-[19px] font-extrabold text-tx-txt">
+          <div className="flex items-center gap-1.5 font-tx-mono text-[1.1875rem] font-extrabold text-tx-txt">
             <Icon name="coins" size={17} stroke={2.2} className="text-tx-accent" />
             {formatNum(pkg.coins)}
           </div>
           <div
             className={cn(
-              "mt-1 text-[11.5px] font-extrabold",
+              "mt-1 text-[0.71875rem] font-extrabold",
               pkg.bonus ? "text-tx-ok" : "font-bold text-tx-txt-3",
             )}
           >
             {pkg.bonus ? t("bonus", { count: formatNum(pkg.bonus) }) : t("noBonus")}
           </div>
-          <div className="mt-[11px] rounded-tx-sm bg-tx-blue-600 py-[9px] text-center text-[13.5px] font-extrabold text-white transition-colors group-hover:bg-tx-blue-500">
+          <div className="mt-[0.6875rem] rounded-tx-sm bg-tx-blue-600 py-[0.5625rem] text-center text-[0.84375rem] font-extrabold text-white transition-colors group-hover:bg-tx-blue-500">
             {pkg.price}
           </div>
         </button>

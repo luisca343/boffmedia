@@ -45,7 +45,7 @@ export function Modal({ title, icon, wide, onClose, foot, children, scrimClassNa
           ? undefined
           : cn(
               "flex max-h-full flex-col overflow-hidden rounded-[14px] border border-ca-800 bg-ca-panel shadow-ca-modal animate-ca-modal-in",
-              wide ? "w-[640px]" : "w-[460px]",
+              wide ? "w-[40rem]" : "w-[28.75rem]",
               "max-w-full",
             )
       }
@@ -55,14 +55,14 @@ export function Modal({ title, icon, wide, onClose, foot, children, scrimClassNa
           children
         ) : (
           <>
-            <div className="flex items-center gap-2.5 bg-ca-header px-[18px] py-4">
-              <div className="flex items-center gap-2 text-[17px] font-semibold text-ca-50">
+            <div className="flex items-center gap-2.5 bg-ca-header px-[1.125rem] py-4">
+              <div className="flex items-center gap-2 text-[1.0625rem] font-semibold text-ca-50">
                 {icon && <Icon name={icon} size={20} className="text-ca-accent-soft" />}
                 {title}
               </div>
               <IconButton icon="x" className="ml-auto" onClick={onClose} title={t("common.close")} />
             </div>
-            <div className="ca-scroll min-h-0 overflow-y-auto px-[18px] py-4">{children}</div>
+            <div className="ca-scroll min-h-0 overflow-y-auto px-[1.125rem] py-4">{children}</div>
             {foot}
           </>
         )}
@@ -73,5 +73,5 @@ export function Modal({ title, icon, wide, onClose, foot, children, scrimClassNa
 
 /** Footer action bar for a Modal (right-aligned). */
 export function ModalFoot({ children }: { children: ReactNode }) {
-  return <div className="flex justify-end gap-2.5 border-t border-ca-800 px-[18px] py-3.5">{children}</div>;
+  return <div className="flex justify-end gap-2.5 border-t border-ca-800 px-[1.125rem] py-3.5">{children}</div>;
 }

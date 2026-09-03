@@ -25,7 +25,7 @@ export function CharRing({ count }: { count: number }) {
   return (
     <div className="inline-flex items-center gap-2">
       {near && (
-        <span className={cn("text-[12px] font-bold tabular-nums", tone)}>{MAX_CHARS - count}</span>
+        <span className={cn("text-[0.75rem] font-bold tabular-nums", tone)}>{MAX_CHARS - count}</span>
       )}
       <svg width="24" height="24" viewBox="0 0 24 24" role="img" aria-label={t("compose.charCountAriaLabel", { count, max: MAX_CHARS })}>
         <circle cx="12" cy="12" r={r} fill="none" strokeWidth="2.4" className="stroke-rk-line-strong" />

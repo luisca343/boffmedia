@@ -38,7 +38,7 @@ export function BoxOverview({ onClose }: { onClose: () => void }) {
   }, [boxes, boxMeta, query])
 
   const search = (
-    <div className="relative w-[200px] flex-none">
+    <div className="relative w-[12.5rem] flex-none">
       <Icon
         name="search"
         size={14}
@@ -49,14 +49,14 @@ export function BoxOverview({ onClose }: { onClose: () => void }) {
         onChange={(e) => setQuery(e.target.value)}
         placeholder={t("topbar.searchPlaceholder")}
         aria-label={t("topbar.searchAriaLabel")}
-        className="h-[38px] py-0 pl-[34px] pr-3 text-[13px]"
+        className="h-[2.375rem] py-0 pl-[2.125rem] pr-3 text-[0.8125rem]"
       />
     </div>
   )
 
   return (
     <Modal onClose={onClose} title={t("boxOverview.title")} icon="boxes" width={980} headerExtra={search}>
-      <div className="grid grid-cols-[repeat(auto-fill,minmax(168px,1fr))] gap-3 p-[18px]">
+      <div className="grid grid-cols-[repeat(auto-fill,minmax(10.5rem,1fr))] gap-3 p-[1.125rem]">
         {visible.map(({ contents, i }) => {
           const count = contents.filter(Boolean).length
           const accent = THEME_ACCENT[boxTheme(boxMeta, i)]
@@ -74,7 +74,7 @@ export function BoxOverview({ onClose }: { onClose: () => void }) {
                 onClose()
               }}
               aria-label={`${boxName(boxMeta, i)}, ${count} de 30`}
-              className={`relative h-[132px] overflow-hidden rounded-[14px] text-left ${
+              className={`relative h-[8.25rem] overflow-hidden rounded-[14px] text-left ${
                 over
                   ? "border-2 border-pc-green"
                   : current
@@ -91,10 +91,10 @@ export function BoxOverview({ onClose }: { onClose: () => void }) {
                 className="absolute inset-0 bg-gradient-to-b from-pc-bg-1/[.55] to-pc-bg/[.82]"
               />
 
-              <span className="relative z-[1] flex h-full flex-col p-[11px]">
-                <span className="flex items-center gap-[7px]">
+              <span className="relative z-[1] flex h-full flex-col p-[0.6875rem]">
+                <span className="flex items-center gap-[0.4375rem]">
                   <span
-                    className="flex h-[22px] w-[22px] flex-none items-center justify-center rounded-md font-pc-mono text-[10px] font-extrabold"
+                    className="flex h-[1.375rem] w-[1.375rem] flex-none items-center justify-center rounded-md font-pc-mono text-[0.625rem] font-extrabold"
                     style={{
                       background: `${accent}33`,
                       border: `1px solid ${accent}66`,
@@ -103,14 +103,14 @@ export function BoxOverview({ onClose }: { onClose: () => void }) {
                   >
                     {i + 1}
                   </span>
-                  <span className="truncate text-[12.5px] font-bold text-pc-fg">
+                  <span className="truncate text-[0.78125rem] font-bold text-pc-fg">
                     {boxName(boxMeta, i)}
                   </span>
                 </span>
 
                 <span className="flex flex-1 items-center gap-0.5">
                   {previews.length === 0 ? (
-                    <span className="text-[11px] text-pc-fg-subtle">{t("boxOverview.empty")}</span>
+                    <span className="text-[0.6875rem] text-pc-fg-subtle">{t("boxOverview.empty")}</span>
                   ) : (
                     previews.map((m) => (
                       <Sprite
@@ -118,7 +118,7 @@ export function BoxOverview({ onClose }: { onClose: () => void }) {
                         dex={m.pokemon.dex}
                         form={m.pokemon.form}
                         palette={m.pokemon.palette}
-                        className="h-[26px] w-[26px] flex-none"
+                        className="h-[1.625rem] w-[1.625rem] flex-none"
                       />
                     ))
                   )}
@@ -126,7 +126,7 @@ export function BoxOverview({ onClose }: { onClose: () => void }) {
 
                 <span className="block">
                   <Bar pct={(count / POKEMON_PER_BOX) * 100} tone={fillTone(count)} height={4} />
-                  <span className="mt-1 block font-pc-mono text-[10px] text-pc-fg-muted">
+                  <span className="mt-1 block font-pc-mono text-[0.625rem] text-pc-fg-muted">
                     {count}/30
                   </span>
                 </span>

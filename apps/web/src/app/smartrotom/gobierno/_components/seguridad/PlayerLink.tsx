@@ -30,7 +30,7 @@ export function PlayerLink({
           className="flex-none rounded-[4px] border border-dashed border-gt-line-strong bg-gt-paper-1"
           style={{ width: size, height: size }}
         />
-        <span className="text-[13px] italic text-gt-ink-400">{t("denuncias.sinIdentificar")}</span>
+        <span className="text-[0.8125rem] italic text-gt-ink-400">{t("denuncias.sinIdentificar")}</span>
       </div>
     )
   }
@@ -49,10 +49,10 @@ export function PlayerLink({
     >
       <Avatar user={player.username} size={size} />
       <span className="min-w-0">
-        <span className="block truncate font-gt-display text-[15px] font-bold text-gt-ink-900 group-hover:underline">
+        <span className="block truncate font-gt-display text-[0.9375rem] font-bold text-gt-ink-900 group-hover:underline">
           {player.username}
         </span>
-        {sub && <span className="block truncate font-gt-mono text-[10.5px] text-gt-ink-400">{sub}</span>}
+        {sub && <span className="block truncate font-gt-mono text-[0.65625rem] text-gt-ink-400">{sub}</span>}
       </span>
     </button>
   )

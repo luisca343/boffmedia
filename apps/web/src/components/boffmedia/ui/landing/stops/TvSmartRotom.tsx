@@ -17,7 +17,7 @@ export function TvSmartRotom() {
       title={t.rich("title", { em: (chunks) => <em>{chunks}</em> })}
       lead={t("lead")}
     >
-      <div className="relative grid justify-items-start gap-[22px] max-[980px]:justify-items-center max-[980px]:text-center">
+      <div className="relative grid justify-items-start gap-[1.375rem] max-[980px]:justify-items-center max-[980px]:text-center">
         <video
           data-tilt-fx
           autoPlay
@@ -26,15 +26,15 @@ export function TvSmartRotom() {
           playsInline
           poster={staticAsset(ASSET.boffmedia.img, 'smartrotom.png')}
           aria-label={t("demoAriaLabel")}
-          className="relative z-[2] aspect-square w-full max-w-[540px] object-cover"
+          className="relative z-[2] aspect-square w-full max-w-[33.75rem] object-cover"
         >
           <source src={staticAsset(ASSET.boffmedia.img, 'rotom_demo3.webm')} type="video/webm" />
         </video>
-        <div className="relative z-[2] flex flex-wrap gap-x-[18px] gap-y-2.5 max-[980px]:justify-center">
+        <div className="relative z-[2] flex flex-wrap gap-x-[1.125rem] gap-y-2.5 max-[980px]:justify-center">
           {featKeys.map((fk) => (
             <span
               key={fk}
-              className="inline-flex items-center gap-[9px] font-body text-[13.5px] font-medium leading-[1.3] text-txt max-[980px]:justify-center"
+              className="inline-flex items-center gap-[0.5625rem] font-body text-[0.84375rem] font-medium leading-[1.3] text-txt max-[980px]:justify-center"
             >
               <i
                 className="h-2 w-2 flex-none rotate-45 bg-[rgba(var(--zr),var(--zg),var(--zb),1)] shadow-[0_0_10px_rgba(var(--zr),var(--zg),var(--zb),0.6)] transition-[background] duration-[260ms] ease-linear"

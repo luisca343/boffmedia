@@ -18,11 +18,11 @@ export default function PuzlePage() {
       <GameTopBar title={t("gameTopBar.titles.puzle")} accent="lime" onHelp={() => setHelp(true)} onReset={game.shuffle} />
 
       <GameStage accent="lime">
-        <div className="mx-auto flex max-w-[560px] flex-col gap-4">
-          <Panel tone="deep" innerClassName="p-4 md:p-[18px]">
+        <div className="mx-auto flex max-w-[35rem] flex-col gap-4">
+          <Panel tone="deep" innerClassName="p-4 md:p-[1.125rem]">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-dashed border-white/10 px-1.5 pb-3.5">
-              <span className="font-ar-display text-[11px] text-ar-lime">▸ {t("puzle.slidingPuzzle")}</span>
-              <span className="font-ar-mono text-[11px] uppercase text-ar-ink-dim">3 × 3</span>
+              <span className="font-ar-display text-[0.6875rem] text-ar-lime">▸ {t("puzle.slidingPuzzle")}</span>
+              <span className="font-ar-mono text-[0.6875rem] uppercase text-ar-ink-dim">3 × 3</span>
               {game.isComplete ? (
                 <Tag tone="lime">{t("puzle.solved")}</Tag>
               ) : (
@@ -38,12 +38,12 @@ export default function PuzlePage() {
                 onMove={game.movePiece}
               />
             ) : (
-              <Skeleton className="mx-auto h-[308px] w-[308px] rounded-[14px]" />
+              <Skeleton className="mx-auto h-[19.25rem] w-[19.25rem] rounded-[14px]" />
             )}
 
             {game.isComplete && (
               <div className="mt-4 animate-ar-pop rounded-xl border border-ar-lime/50 bg-ar-lime/[.12] p-4 text-center">
-                <p className="m-0 inline-flex items-center gap-2 font-ar text-[15px] font-semibold text-ar-lime">
+                <p className="m-0 inline-flex items-center gap-2 font-ar text-[0.9375rem] font-semibold text-ar-lime">
                   <Icon.Trophy s={18} />
                   {t("puzle.completed", { moves: game.moves })}
                 </p>

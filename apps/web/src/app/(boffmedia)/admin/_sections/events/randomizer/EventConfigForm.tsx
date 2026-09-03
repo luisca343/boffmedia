@@ -194,7 +194,7 @@ export function EventConfigForm({ config, eventId, onSaved, onCancel }: EventCon
             )}
           />
           {!loadingPacks && packs.length === 0 && (
-            <div className="flex items-center gap-2 flex-wrap text-[12px] text-txt-dim">
+            <div className="flex items-center gap-2 flex-wrap text-[0.75rem] text-txt-dim">
               <span>{t("noPacks")}</span>
               <a
                 href="/admin?section=packs"
@@ -262,7 +262,7 @@ export function EventConfigForm({ config, eventId, onSaved, onCancel }: EventCon
             )}
           />
           {!loadingRoms && romsForPlatform.length === 0 && (
-            <div className="flex items-center gap-2 flex-wrap text-[12px] text-txt-dim">
+            <div className="flex items-center gap-2 flex-wrap text-[0.75rem] text-txt-dim">
               <span>{t("noRomsForPlatform")}</span>
               <Button
                 type="button"
@@ -297,7 +297,7 @@ export function EventConfigForm({ config, eventId, onSaved, onCancel }: EventCon
               )}
             />
             {!loadingPresets && presets.length === 0 && (
-              <div className="flex items-center gap-2 flex-wrap text-[12px] text-txt-dim">
+              <div className="flex items-center gap-2 flex-wrap text-[0.75rem] text-txt-dim">
                 <span>{t("noPresets")}</span>
                 <a
                   href="/admin?section=randomizer&view=editor"

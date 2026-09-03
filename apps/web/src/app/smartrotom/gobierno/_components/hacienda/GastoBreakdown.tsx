@@ -49,16 +49,16 @@ export function GastoBreakdown({ gastos }: { gastos: Tesoreria["gastos"] }) {
             <div key={i}>
               <div className="mb-1 flex items-start justify-between gap-2">
                 <div className="min-w-0">
-                  <div className="truncate text-[12.5px] text-gt-ink-700">{g.concept}</div>
-                  <div className="font-gt-mono text-[9px] uppercase tracking-[.08em] text-gt-ink-400">
+                  <div className="truncate text-[0.78125rem] text-gt-ink-700">{g.concept}</div>
+                  <div className="font-gt-mono text-[0.5625rem] uppercase tracking-[.08em] text-gt-ink-400">
                     {labelKey ? t(labelKey) : label}
                   </div>
                 </div>
-                <span className="flex-none font-gt-display text-[13px] font-bold tabular-nums text-gt-ink-900">
+                <span className="flex-none font-gt-display text-[0.8125rem] font-bold tabular-nums text-gt-ink-900">
                   {money(g.amount, intlLocale)} ₽
                 </span>
               </div>
-              <div className="h-[7px] overflow-hidden rounded-full bg-gt-paper-2">
+              <div className="h-[0.4375rem] overflow-hidden rounded-full bg-gt-paper-2">
                 <div className={`h-full rounded-full ${tn.solidBg}`} style={{ width: `${pct}%` }} />
               </div>
             </div>

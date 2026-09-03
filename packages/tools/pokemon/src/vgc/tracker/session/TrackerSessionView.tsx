@@ -213,7 +213,7 @@ export function TrackerSessionView({ sessionId }: Props) {
       )}
 
       <DkBody>
-        <div className="grid gap-[14px]">
+        <div className="grid gap-[0.875rem]">
           {isTournament ? (
             <div className="grid grid-cols-3 gap-2">
               <DkStat value={tourStats.seriesWins} label={t("tournament.seriesWins")} tone="pos" />
@@ -245,9 +245,9 @@ export function TrackerSessionView({ sessionId }: Props) {
             ) : seriesList.length === 0 ? (
               <DkEmpty icon="trophy" title={t("empty.noSeriesTitle")} lead={t("tournament.noSeries")} />
             ) : (
-              <div className="grid gap-[7px]">
+              <div className="grid gap-[0.4375rem]">
                 {rounds.length > 1 && (
-                  <div className="mb-[3px] flex flex-wrap gap-[5px]" role="tablist" aria-label={t("tournament.filterByRound")}>
+                  <div className="mb-[3px] flex flex-wrap gap-[0.3125rem]" role="tablist" aria-label={t("tournament.filterByRound")}>
                     <RoundBtn on={roundFilter == null} onClick={() => setRoundFilter(null)}>
                       {t("tournament.allRounds")}
                     </RoundBtn>
@@ -270,7 +270,7 @@ export function TrackerSessionView({ sessionId }: Props) {
           ) : matches.length === 0 ? (
             <DkEmpty icon="sword" title={t("empty.noMatchesTitle")} lead={t("empty.noMatches")} />
           ) : (
-            <div className="grid gap-[7px]">
+            <div className="grid gap-[0.4375rem]">
               {matches.map((m, i) => (
                 <TrMatchRow key={m.id} match={m} number={matches.length - i} sessionId={sessionId} eloDelta={eloDeltas.get(m.id)} />
               ))}
@@ -293,7 +293,7 @@ export function TrackerSessionView({ sessionId }: Props) {
                     setShowPresetPicker(false)
                   }}
                   className={cn(
-                    "flex items-center gap-3 border border-solid px-3 py-[10px] text-left transition-colors",
+                    "flex items-center gap-3 border border-solid px-3 py-[0.625rem] text-left transition-colors",
                     active ? "border-accent-line bg-accent-soft" : "border-line bg-base hover:border-line-2",
                   )}
                 >
@@ -302,8 +302,8 @@ export function TrackerSessionView({ sessionId }: Props) {
                       <TrSprite key={s.slotIndex} name={s.speciesName} size={26} />
                     ))}
                   </span>
-                  <span className="flex-1 truncate font-display text-[13px] font-bold uppercase tracking-[0.03em]">{p.name}</span>
-                  {active && <span className="font-mono text-[10px] text-accent-bright">{t("preset.currentTag")}</span>}
+                  <span className="flex-1 truncate font-display text-[0.8125rem] font-bold uppercase tracking-[0.03em]">{p.name}</span>
+                  {active && <span className="font-mono text-[0.625rem] text-accent-bright">{t("preset.currentTag")}</span>}
                 </button>
               )
             })}
@@ -363,7 +363,7 @@ function RoundBtn({ on, onClick, children }: { on: boolean; onClick: () => void;
     <button
       type="button"
       onClick={onClick}
-      className={cn("cut-tag cut-tag-edge [--cut-tag:6px] ", "border border-solid px-[10px] py-[6px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background,border-color]",
+      className={cn("cut-tag cut-tag-edge [--cut-tag:6px] ", "border border-solid px-[0.625rem] py-[0.375rem] font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.06em] transition-[color,background,border-color]",
         on ? "border-accent bg-accent text-accent-ink" : "border-line-2 bg-base text-txt-muted hover:text-txt",
       )}
     >

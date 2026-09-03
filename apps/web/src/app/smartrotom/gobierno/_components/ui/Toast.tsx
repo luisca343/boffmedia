@@ -43,7 +43,7 @@ export function ToastHost() {
               key={t.id}
               type="button"
               onClick={() => dismissToast(t.id)}
-              className="gt-spine pointer-events-auto flex animate-gt-toast items-center gap-2.5 rounded-gt border border-gt-line-strong bg-gt-paper-0 py-2.5 pl-4 pr-3.5 text-left text-[13px] font-medium text-gt-ink-800 shadow-gt-lg motion-reduce:animate-none"
+              className="gt-spine pointer-events-auto flex animate-gt-toast items-center gap-2.5 rounded-gt border border-gt-line-strong bg-gt-paper-0 py-2.5 pl-4 pr-3.5 text-left text-[0.8125rem] font-medium text-gt-ink-800 shadow-gt-lg motion-reduce:animate-none"
               style={{ ["--gt-dep" as string]: style.css }}
             >
               <Icon name={icon} size={16} className={`flex-none ${style.text}`} />

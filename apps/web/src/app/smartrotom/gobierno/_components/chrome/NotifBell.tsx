@@ -76,14 +76,14 @@ export function NotifBell() {
       >
         <Icon name="bell" size={17} />
         {unread > 0 && (
-          <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-gt-danger px-1 font-gt-mono text-[9px] font-bold tabular-nums text-white">
+          <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center rounded-full bg-gt-danger px-1 font-gt-mono text-[0.5625rem] font-bold tabular-nums text-white">
             {unread}
           </span>
         )}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-[calc(100%_+_8px)] z-50 w-[340px] animate-gt-pop overflow-hidden rounded-gt border border-gt-line-strong bg-gt-paper-0 shadow-gt-lg motion-reduce:animate-none">
+        <div className="absolute right-0 top-[calc(100%_+_8px)] z-50 w-[21.25rem] animate-gt-pop overflow-hidden rounded-gt border border-gt-line-strong bg-gt-paper-0 shadow-gt-lg motion-reduce:animate-none">
           <div className="flex items-center justify-between border-b border-gt-line px-4 py-2.5">
             <span className="font-gt-display text-sm font-bold text-gt-ink-900">{t("campana.titulo")}</span>
             {unread > 0 && (
@@ -91,14 +91,14 @@ export function NotifBell() {
                 type="button"
                 onClick={() => void markAllRead()}
                 disabled={marking}
-                className="disabled:opacity-50 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.12em] text-gt-accent hover:underline"
+                className="disabled:opacity-50 font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.12em] text-gt-accent hover:underline"
               >
                 {t("campana.marcarLeidas")}
               </button>
             )}
           </div>
 
-          <div className="gt-scroll max-h-[340px] overflow-y-auto">
+          <div className="gt-scroll max-h-[21.25rem] overflow-y-auto">
             {items.length === 0 ? (
               <Empty icon="bell" title={t("campana.sinAvisos")} sub={t("campana.sinAvisosSub")} />
             ) : (
@@ -110,9 +110,9 @@ export function NotifBell() {
                     style={{ ["--gt-dep" as string]: tone.css }}
                   >
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[13px] font-semibold text-gt-ink-900">{n.title}</div>
-                      {n.body && <div className="mt-0.5 line-clamp-2 text-[12px] text-gt-ink-500">{n.body}</div>}
-                      <div className="mt-1 font-gt-mono text-[9.5px] uppercase tracking-[.1em] text-gt-ink-400">
+                      <div className="truncate text-[0.8125rem] font-semibold text-gt-ink-900">{n.title}</div>
+                      {n.body && <div className="mt-0.5 line-clamp-2 text-[0.75rem] text-gt-ink-500">{n.body}</div>}
+                      <div className="mt-1 font-gt-mono text-[0.59375rem] uppercase tracking-[.1em] text-gt-ink-400">
                         {timeAgo(n.createdAt)}
                       </div>
                     </div>

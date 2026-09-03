@@ -2,7 +2,7 @@ import type { ComponentProps, ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
 const base =
-  "whitespace-nowrap text-xs px-3 py-[5px] rounded-mw-pill border transition-all duration-150 " +
+  "whitespace-nowrap text-xs px-3 py-[0.3125rem] rounded-mw-pill border transition-all duration-150 " +
   "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-mw-accent " +
   "focus-visible:ring-offset-2 focus-visible:ring-offset-mw-bg"
 

@@ -31,12 +31,12 @@ function SectionHead({
 }) {
   return (
     <div className="flex items-center justify-between mb-3.5">
-      <h2 className="flex items-center gap-2.5 font-pk-display font-bold text-[17px] tracking-tight text-pk-surface-50 m-0">
-        <span className="font-pk-mono text-[10px] tracking-[0.12em] text-pk-surface-500">{num}</span>
+      <h2 className="flex items-center gap-2.5 font-pk-display font-bold text-[1.0625rem] tracking-tight text-pk-surface-50 m-0">
+        <span className="font-pk-mono text-[0.625rem] tracking-[0.12em] text-pk-surface-500">{num}</span>
         {title}
-        {meta && <span className="font-pk-mono text-[11px] text-pk-surface-500 ml-1.5">{meta}</span>}
+        {meta && <span className="font-pk-mono text-[0.6875rem] text-pk-surface-500 ml-1.5">{meta}</span>}
       </h2>
-      {sub && <span className="text-[11px] text-pk-surface-500">{sub}</span>}
+      {sub && <span className="text-[0.6875rem] text-pk-surface-500">{sub}</span>}
       {action}
     </div>
   )
@@ -93,7 +93,7 @@ export default async function EntradaPokedex({ params }: any) {
 
   return (
     <EntryHeader pokemon={pokemon} formName={formName} prev={prev} next={next}>
-      <div className="flex flex-col gap-8 px-7 pt-7 pb-[60px] min-w-0">
+      <div className="flex flex-col gap-8 px-7 pt-7 pb-[3.75rem] min-w-0">
         <section id="info" className="scroll-mt-[130px]">
           <div className="flex flex-col gap-7">
             <EntryHero pokemon={pokemon} formIndex={formIndex} formName={formName} />

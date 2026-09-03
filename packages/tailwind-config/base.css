@@ -24,10 +24,12 @@
   --font-body: "Saira", sans-serif;
   --font-mono: "IBM Plex Mono", monospace;
 
-  /* geometry */
-  --cut: 10px;       /* diagonal corner cut for buttons/chips */
-  --cut-lg: 16px;    /* panels / heroes */
-  --bar: 4px;        /* accent side bar */
+  /* geometry — in rem so the chamfer keeps its ratio to the box it cuts once
+     the display scale steps up (see DISPLAY SCALE below); a 10px cut on a
+     19px-root button reads as a nick rather than as the brand shape. */
+  --cut: 0.625rem;    /* diagonal corner cut for buttons/chips */
+  --cut-lg: 1rem;     /* panels / heroes */
+  --bar: 0.25rem;     /* accent side bar */
 
   /* motion */
   --t-fast: 140ms cubic-bezier(0.2, 0.7, 0.3, 1);
@@ -101,6 +103,85 @@
   --sb-hover: rgba(20, 23, 28, 0.42);
   --sb-drag: var(--accent);
 }
+
+/* ===========================================================================
+   DISPLAY SCALE — the large-screen tier
+   ===========================================================================
+   The problem this solves: the whole product was authored in px literals
+   (10.7k arbitrary `[Npx]` values against 13 rem ones) and stopped responding
+   at `lg`. On a 1440p or 4K panel it therefore rendered as a 1080p interface
+   with the extra pixels handed to the margins — the rail, the bars, the type
+   and the gutters were all exactly the size they are on a laptop.
+
+   The lever is `--ui-scale` on <html>. It is a PERCENTAGE, not a px value, so
+   it multiplies the reader's own default font size instead of overriding it —
+   a person who set 20px in their browser keeps that preference and gets our
+   step on top of it. Everything expressed in rem then rides it: Tailwind's
+   whole spacing scale, its `t-*` type scale, and the px literals that the
+   px->rem pass converted.
+
+   Two steps, keyed off CSS pixel width and DELIBERATELY not devicePixelRatio:
+   a 4K panel driven at 200% OS scaling reports 1920 CSS px and must get the
+   1600 tier, not the 2240 one — the OS setting is the user telling us how big
+   they want things, and overriding it is the bug, not the feature.
+
+     < 1600px   1.00  — byte-identical to what shipped before. A laptop,
+                        1366x768 and every phone are untouched by construction.
+     >= 1600px  1.09  — 1080p-at-100% on a large panel, and 1440p at 125%.
+     >= 2240px  1.19  — 2560x1440 at 100% (109 PPI vs a 24" 1080p's 92, so the
+                        ratio is the physical compensation, not a taste call).
+
+   Widths are two tokens, not one, because the answer differs by content: prose
+   has a readable measure that more pixels cannot improve, while a card grid
+   genuinely wants the room. `.wrap` caps for reading; `.wrap-wide` is for the
+   grid and dashboard views. Both are defined in apps/web's tailwind.config.
+
+   `--tool-pad` is declared HERE for the first time. It was documented as the
+   host shell's to own and then never set by either host, so every call site had
+   silently been running on the `clamp(14px,2vw,32px)` fallback baked into its
+   own `var()` — the token was decorative and could not be retuned at all.
+   =========================================================================== */
+:root {
+  --ui-scale: 100%;
+  /* Page gutter widths, consumed by `.wrap` / `.wrap-wide`. */
+  --wrap-max: 1280px;
+  --wrap-max-wide: 1280px;
+  --wrap-pad: 2.5rem;
+  /* Gutter inside a tool's chrome. Owned by the host, read by @boffmedia/ui. */
+  --tool-pad: clamp(14px, 2vw, 32px);
+  /* Height of a tool's sticky bar (`ToolStrip`). In rem so it rides the scale
+     with the type it has to stay centred around. */
+  --tool-bar-h: 3.625rem;
+  /* ToolShell's side rail: open and minimised widths. */
+  --rail-open: 16.5rem;
+  --rail-min: 4.5rem;
+}
+
+@media (min-width: 1600px) {
+  :root {
+    --ui-scale: 109.375%;
+    --wrap-max: 1460px;
+    --wrap-max-wide: 1680px;
+    --wrap-pad: 3rem;
+    --tool-pad: clamp(20px, 2.2vw, 40px);
+    --rail-open: 17.5rem;
+  }
+}
+
+@media (min-width: 2240px) {
+  :root {
+    --ui-scale: 118.75%;
+    --wrap-max: 1600px;
+    /* `min()` rather than a flat number: on a 21:9 ultrawide 88vw is 3000px,
+       which is not a layout, it is a horizon. */
+    --wrap-max-wide: min(2100px, 88vw);
+    --wrap-pad: 3.5rem;
+    --tool-pad: clamp(28px, 2.4vw, 56px);
+    --rail-open: 18.5rem;
+  }
+}
+
+html { font-size: var(--ui-scale); }
 
 /* ===========================================================================
    SHARED KEYFRAMES — every `animate-[bm-*]` reachable from @boffmedia/ui or a

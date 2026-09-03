@@ -118,11 +118,11 @@ export function VersionCombobox({
       </span>
 
       {open && !disabled && (
-        <ul className="absolute z-50 mt-1 max-h-[260px] w-full overflow-auto border border-solid border-line bg-panel shadow-lg">
+        <ul className="absolute z-50 mt-1 max-h-[16.25rem] w-full overflow-auto border border-solid border-line bg-panel shadow-lg">
           {loading && filtered.length === 0 ? (
-            <li className="px-3 py-2 font-mono text-[11px] text-txt-dim">{t("loading")}</li>
+            <li className="px-3 py-2 font-mono text-[0.6875rem] text-txt-dim">{t("loading")}</li>
           ) : filtered.length === 0 ? (
-            <li className="px-3 py-2 font-mono text-[11px] text-txt-dim">
+            <li className="px-3 py-2 font-mono text-[0.6875rem] text-txt-dim">
               {emptyLabel ?? t("noVersions")}
             </li>
           ) : (
@@ -138,12 +138,12 @@ export function VersionCombobox({
                   }}
                   onMouseEnter={() => setActive(index)}
                   className={cn(
-                    "flex w-full items-center gap-2 px-3 py-[6px] text-left",
+                    "flex w-full items-center gap-2 px-3 py-[0.375rem] text-left",
                     index === active && "bg-panel-2",
                     option.value === value && "text-acc",
                   )}
                 >
-                  <span className="min-w-0 flex-1 truncate font-mono text-[12px]">
+                  <span className="min-w-0 flex-1 truncate font-mono text-[0.75rem]">
                     {option.value}
                   </span>
                   {option.tag && (
@@ -152,7 +152,7 @@ export function VersionCombobox({
                     </Badge>
                   )}
                   {option.meta && (
-                    <span className="shrink-0 font-mono text-[11px] text-txt-dim">
+                    <span className="shrink-0 font-mono text-[0.6875rem] text-txt-dim">
                       {option.meta}
                     </span>
                   )}

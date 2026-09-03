@@ -118,7 +118,7 @@ function BrowseScreen() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-[1400px] px-6 py-14">
+      <div className="mx-auto max-w-[87.5rem] px-6 py-14">
         <Skeleton className="h-14 w-2/3" />
         <div className="mt-8 grid gap-6 md:grid-cols-3">
           <Skeleton className="h-64" />
@@ -140,16 +140,16 @@ function BrowseScreen() {
         totalCount={browsable.length}
       />
 
-      <section className="mx-auto max-w-[1400px] px-6 pb-4 pt-10">
+      <section className="mx-auto max-w-[87.5rem] px-6 pb-4 pt-10">
         <div className="border-ft flex flex-wrap items-end justify-between gap-4 border-x-0 border-t-0 border-b-ft-ink pb-3">
           <div>
             <Eyebrow className="text-ft-pink">{t("resultsEyebrow")}</Eyebrow>
-            <h2 className="font-ft-display mt-1 text-[clamp(36px,5vw,56px)] leading-none">
+            <h2 className="font-ft-display mt-1 text-[clamp(2.25rem,5vw,3.5rem)] leading-none">
               {t("resultsCount", { count: filtered.length, category: catLabel })}
             </h2>
           </div>
           <label className="flex items-center gap-2">
-            <span className="font-ft-ui text-[13px] font-medium uppercase tracking-[0.04em] text-ft-ink/70">
+            <span className="font-ft-ui text-[0.8125rem] font-medium uppercase tracking-[0.04em] text-ft-ink/70">
               {t("sort")}
             </span>
             <Select
@@ -166,7 +166,7 @@ function BrowseScreen() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-[1400px] px-6 pb-8 pt-2">
+      <section className="mx-auto max-w-[87.5rem] px-6 pb-8 pt-2">
         {filtered.length === 0 ? (
           <EmptyState
             title={t("emptyTitle")}
@@ -184,7 +184,7 @@ function BrowseScreen() {
       </section>
 
       {tagCloud.length > 0 ? (
-        <section className="mx-auto max-w-[1400px] px-6 pb-12">
+        <section className="mx-auto max-w-[87.5rem] px-6 pb-12">
           <Eyebrow className="mb-3.5 text-ft-pink">
             {t("tagsEyebrow")}
           </Eyebrow>
@@ -220,7 +220,7 @@ export default function SeccionesPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-[1400px] px-6 py-14">
+        <div className="mx-auto max-w-[87.5rem] px-6 py-14">
           <Skeleton className="h-14 w-2/3" />
         </div>
       }

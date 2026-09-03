@@ -25,7 +25,7 @@ export function FilterTabs<T extends string>({
             type="button"
             onClick={() => onChange(o.value)}
             aria-pressed={active}
-            className={`inline-flex items-center gap-1.5 rounded-gt-sm border px-3 py-1.5 font-gt text-[12.5px] font-semibold transition-colors ${
+            className={`inline-flex items-center gap-1.5 rounded-gt-sm border px-3 py-1.5 font-gt text-[0.78125rem] font-semibold transition-colors ${
               active
                 ? `${t.softBorder} ${t.softBg} ${t.text}`
                 : "border-gt-line-strong bg-gt-paper-0 text-gt-ink-600 hover:bg-gt-paper-1"
@@ -34,7 +34,7 @@ export function FilterTabs<T extends string>({
             {o.label}
             {o.count !== undefined && (
               <span
-                className={`rounded-gt-pill px-1.5 py-px font-gt-mono text-[10px] font-bold tabular-nums ${
+                className={`rounded-gt-pill px-1.5 py-px font-gt-mono text-[0.625rem] font-bold tabular-nums ${
                   active ? `${t.solidBg} text-white` : "bg-gt-paper-3 text-gt-ink-500"
                 }`}
               >

@@ -38,8 +38,8 @@ export function SmartViewsBar() {
   const views = [...SMART_VIEWS, ...savedViews]
 
   return (
-    <div className="flex items-center gap-[7px] overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <span className="flex-none pr-0.5 text-[10.5px] font-bold uppercase tracking-[.05em] text-pc-fg-subtle">
+    <div className="flex items-center gap-[0.4375rem] overflow-x-auto py-0.5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <span className="flex-none pr-0.5 text-[0.65625rem] font-bold uppercase tracking-[.05em] text-pc-fg-subtle">
         {t("views.title")}
       </span>
 
@@ -55,8 +55,8 @@ export function SmartViewsBar() {
             onClick={() => applyView(v)}
             aria-pressed={on}
             className={[
-              "inline-flex flex-none cursor-pointer items-center gap-1.5 rounded-pc-pill border px-[9px] py-1",
-              "font-pc text-[11.5px] font-semibold transition-colors focus-visible:outline-none",
+              "inline-flex flex-none cursor-pointer items-center gap-1.5 rounded-pc-pill border px-[0.5625rem] py-1",
+              "font-pc text-[0.71875rem] font-semibold transition-colors focus-visible:outline-none",
               on
                 ? `${v.tone} border-current bg-white/[.06]`
                 : "border-pc-line-strong bg-pc-panel-2 text-pc-fg-muted hover:text-pc-fg",

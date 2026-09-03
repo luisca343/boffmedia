@@ -67,12 +67,12 @@ export function HubTopbar() {
 
   return (
     <div className="flex items-center gap-4 justify-between">
-      <div className="relative flex-1 max-w-[540px]">
-        <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[17px] h-[17px] text-pk-surface-400 pointer-events-none" />
+      <div className="relative flex-1 max-w-[33.75rem]">
+        <SearchIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-[1.0625rem] h-[1.0625rem] text-pk-surface-400 pointer-events-none" />
         <input
           ref={inputRef}
           type="search"
-          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-[10px] py-[11px] pr-3 pl-[42px] text-sm text-pk-surface-50 font-pk outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:bg-white/[0.06] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.15)] transition-colors"
+          className="w-full bg-white/[0.04] border border-white/[0.08] rounded-[10px] py-[0.6875rem] pr-3 pl-[2.625rem] text-sm text-pk-surface-50 font-pk outline-none placeholder:text-pk-surface-500 focus:border-pk-primary-400/50 focus:bg-white/[0.06] focus:shadow-[0_0_0_3px_rgba(249,115,22,0.15)] transition-colors"
           placeholder={t("topbar_search_placeholder")}
           value={query}
           onChange={(e) => {
@@ -90,12 +90,12 @@ export function HubTopbar() {
         />
         {query.length === 0 && (
           <div className="absolute right-2.5 top-1/2 -translate-y-1/2 flex gap-1 pointer-events-none">
-            <kbd className="font-pk-mono text-[10px] px-1.5 py-0.5 bg-white/[0.06] border border-white/[0.1] border-b-2 rounded text-pk-surface-300">⌘</kbd>
-            <kbd className="font-pk-mono text-[10px] px-1.5 py-0.5 bg-white/[0.06] border border-white/[0.1] border-b-2 rounded text-pk-surface-300">K</kbd>
+            <kbd className="font-pk-mono text-[0.625rem] px-1.5 py-0.5 bg-white/[0.06] border border-white/[0.1] border-b-2 rounded text-pk-surface-300">⌘</kbd>
+            <kbd className="font-pk-mono text-[0.625rem] px-1.5 py-0.5 bg-white/[0.06] border border-white/[0.1] border-b-2 rounded text-pk-surface-300">K</kbd>
           </div>
         )}
         {open && results.length > 0 && (
-          <div id="pk-search-results" className="absolute top-[calc(100%_+_6px)] left-0 right-0 bg-pk-surface-900 border border-white/[0.08] rounded-xl p-1.5 max-h-[380px] overflow-y-auto shadow-pk-elevated z-20 animate-pk-drop-in">
+          <div id="pk-search-results" className="absolute top-[calc(100%_+_6px)] left-0 right-0 bg-pk-surface-900 border border-white/[0.08] rounded-xl p-1.5 max-h-[23.75rem] overflow-y-auto shadow-pk-elevated z-20 animate-pk-drop-in">
             {results.map((p, i) => {
               const spriteUrl = getSpriteUrl({ id: p.dex, form: "base", palette: "none" })
               const status = getPokemonStatus(p.dex, "base")
@@ -121,7 +121,7 @@ export function HubTopbar() {
                     setQuery("")
                   }}
                 >
-                  <span className="font-pk-mono text-[11px] text-pk-surface-500 w-9">
+                  <span className="font-pk-mono text-[0.6875rem] text-pk-surface-500 w-9">
                     #{String(p.dex).padStart(3, "0")}
                   </span>
                   {spriteUrl && (
@@ -137,7 +137,7 @@ export function HubTopbar() {
                 </button>
               )
             })}
-            <div className="flex justify-between px-3.5 py-2 border-t border-white/[0.05] text-[11px] text-pk-surface-500 font-pk-mono">
+            <div className="flex justify-between px-3.5 py-2 border-t border-white/[0.05] text-[0.6875rem] text-pk-surface-500 font-pk-mono">
               <span>↑↓ {t("topbar_navigate")} · ↵ {t("topbar_open")}</span>
               <span>
                 {results.length} {results.length === 1 ? t("topbar_result_one") : t("topbar_result_other")}

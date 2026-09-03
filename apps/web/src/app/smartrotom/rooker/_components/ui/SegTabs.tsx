@@ -40,14 +40,14 @@ export function SegTabs<T extends string>({ tabs, active, onChange, className }:
             aria-selected={on}
             onClick={() => onChange(tab.key)}
             className={cn(
-              "relative flex-1 px-2 py-3.5 text-[14.5px] transition-colors",
+              "relative flex-1 px-2 py-3.5 text-[0.90625rem] transition-colors",
               "focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-rk-accent",
               on ? "font-bold text-rk-fg" : "font-semibold text-rk-fg-subtle hover:bg-rk-hover",
             )}
           >
             {tab.label}
             {on && (
-              <span className="absolute bottom-0 left-1/2 h-1 w-[38px] -translate-x-1/2 rounded-rk-pill bg-rk-accent" />
+              <span className="absolute bottom-0 left-1/2 h-1 w-[2.375rem] -translate-x-1/2 rounded-rk-pill bg-rk-accent" />
             )}
           </button>
         )

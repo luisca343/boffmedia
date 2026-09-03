@@ -49,13 +49,13 @@ function MonCard({ mon }: { mon: PokemonW }) {
   const moves = (mon.moves ?? []).map(moveName).filter((m): m is string => !!m)
 
   return (
-    <Card className="px-[11px] py-[9px]">
-      <div className="flex items-center gap-[9px]">
+    <Card className="px-[0.6875rem] py-[0.5625rem]">
+      <div className="flex items-center gap-[0.5625rem]">
         <Sprite dex={mon.dex} form={mon.form} palette={mon.palette} name={mon.name} size={50} />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <span className="truncate font-ps-ceremony text-[14px]">{mon.name || mon.species}</span>
-            <span className="ps-num flex-none font-ps-mono text-[10px] text-ps-ink-faint">
+            <span className="truncate font-ps-ceremony text-[0.875rem]">{mon.name || mon.species}</span>
+            <span className="ps-num flex-none font-ps-mono text-[0.625rem] text-ps-ink-faint">
               {t("common.level", { level: mon.level })}
             </span>
           </div>
@@ -67,32 +67,32 @@ function MonCard({ mon }: { mon: PokemonW }) {
         </div>
       </div>
 
-      <div className="mt-1.5 flex items-baseline justify-between gap-2 text-[11px]">
+      <div className="mt-1.5 flex items-baseline justify-between gap-2 text-[0.6875rem]">
         <b className="truncate font-semibold">{mon.ability}</b>
         {mon.item && mon.item !== NO_ITEM && (
           <span className="truncate text-ps-ink-soft">{prettyItem(mon.item)}</span>
         )}
       </div>
 
-      <ul className="mt-[5px] grid grid-cols-2 gap-x-2.5 gap-y-[3px]">
+      <ul className="mt-[0.3125rem] grid grid-cols-2 gap-x-2.5 gap-y-[3px]">
         {moves.map((move, i) => (
-          <li key={`${i}-${move}`} className="relative truncate pl-[11px] text-[11px]">
+          <li key={`${i}-${move}`} className="relative truncate pl-[0.6875rem] text-[0.6875rem]">
             <span
               aria-hidden="true"
-              className="absolute left-0 top-[6px] h-[5px] w-[5px] rounded-full bg-ps-chapter"
+              className="absolute left-0 top-[0.375rem] h-[0.3125rem] w-[0.3125rem] rounded-full bg-ps-chapter"
             />
             {move}
           </li>
         ))}
       </ul>
 
-      <div className="mt-[7px] grid grid-cols-6 gap-[3px] text-center">
+      <div className="mt-[0.4375rem] grid grid-cols-6 gap-[3px] text-center">
         {stats.map((value, i) => {
           const statLabel = STAT_KEYS[i] ? t(`equipo.stats.${STAT_KEYS[i]}`) : undefined
           return (
             <div key={STAT_KEYS[i] ?? i}>
-              <div className="text-[9px] uppercase text-ps-ink-faint">{statLabel}</div>
-              <div className="ps-num font-ps-mono text-[12px] font-bold">{value}</div>
+              <div className="text-[0.5625rem] uppercase text-ps-ink-faint">{statLabel}</div>
+              <div className="ps-num font-ps-mono text-[0.75rem] font-bold">{value}</div>
               <Bar value={value} max={peak} thin className="mt-0.5 h-[3px]" label={`${statLabel} ${value}`} />
             </div>
           )
@@ -111,7 +111,7 @@ export function Equipo({ team, loading }: { team?: PokemonW[] | null; loading: b
         <PageHead eyebrow={t("equipo.eyebrow")} title={t("equipo.title")} />
         <div className="grid grid-cols-2 gap-2.5">
           {Array.from({ length: 6 }, (_, i) => (
-            <Skeleton key={i} className="h-[120px]" />
+            <Skeleton key={i} className="h-[7.5rem]" />
           ))}
         </div>
       </>
@@ -132,7 +132,7 @@ export function Equipo({ team, loading }: { team?: PokemonW[] | null; loading: b
   return (
     <>
       <PageHead eyebrow={t("equipo.eyebrowCount", { count: mons.length })} title={t("equipo.title")} />
-      <div className="grid flex-1 grid-cols-2 content-start gap-x-3 gap-y-[9px]">
+      <div className="grid flex-1 grid-cols-2 content-start gap-x-3 gap-y-[0.5625rem]">
         {mons.map((mon, i) => (
           <MonCard key={`${mon.dex}-${mon.name}-${i}`} mon={mon} />
         ))}

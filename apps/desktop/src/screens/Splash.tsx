@@ -17,7 +17,7 @@ export function Splash({ step }: { step: string }) {
       {/* Faint drifting stripe wash — depth without drawing the eye. */}
       <div className="splash-backdrop pointer-events-none absolute inset-0 opacity-60" />
 
-      <div className="relative flex w-full max-w-[360px] flex-col items-center">
+      <div className="relative flex w-full max-w-[22.5rem] flex-col items-center">
         {/* Brand mark: chamfered seal, rotating glow ring, breathing halo, and
             broadcast corner brackets that frame it. */}
         <div className="splash-mark relative grid h-28 w-28 place-items-center [--cut:14px]">
@@ -57,11 +57,11 @@ export function Splash({ step }: { step: string }) {
           </span>
         </div>
 
-        <h1 className="splash-word mt-7 font-display text-[34px]/none font-bold uppercase tracking-[0.14em] text-txt">
+        <h1 className="splash-word mt-7 font-display text-[2.125rem]/none font-bold uppercase tracking-[0.14em] text-txt">
           Boffmedia<span className="text-accent"> App</span>
         </h1>
 
-        <p className="splash-tag mt-1.5 font-display text-[11px] uppercase tracking-[0.42em] text-txt-dim">
+        <p className="splash-tag mt-1.5 font-display text-[0.6875rem] uppercase tracking-[0.42em] text-txt-dim">
           Ficus Labs
         </p>
 

@@ -69,9 +69,9 @@ export function TeamPanel({ label, slots, editable = false, tone = 'var(--accent
   return (
     <div
       style={cssVars({ '--trc': tone, borderTopColor: tone })}
-      className="grid min-w-0 gap-[11px] border border-solid border-line border-t-[3px] bg-panel px-4 py-[14px]"
+      className="grid min-w-0 gap-[0.6875rem] border border-solid border-line border-t-[3px] bg-panel px-4 py-[0.875rem]"
     >
-      <span className="font-mono text-[10px] font-bold uppercase leading-none tracking-[0.14em]" style={{ color: tone }}>
+      <span className="font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.14em]" style={{ color: tone }}>
         {label}
       </span>
 
@@ -149,13 +149,13 @@ function PoolCard({
   if (!slot.speciesId) {
     if (editable && search) {
       return (
-        <div className="flex h-[76px] items-center justify-center overflow-visible border border-dashed border-line-2 p-2">
+        <div className="flex h-[4.75rem] items-center justify-center overflow-visible border border-dashed border-line-2 p-2">
           <PokemonAutocomplete ref={autocompleteRef} search={search} onSelect={onFill} placeholder={t('placeholders.typeName')} onTabNext={onTabNext} />
         </div>
       );
     }
     return (
-      <div className="flex h-[76px] items-center justify-center border border-dashed border-line-2">
+      <div className="flex h-[4.75rem] items-center justify-center border border-dashed border-line-2">
         <span className="select-none text-xl text-txt-dim">?</span>
       </div>
     );
@@ -164,7 +164,7 @@ function PoolCard({
   const isAssigned = slot.role !== 'unknown';
 
   return (
-    <div className="relative h-[76px]">
+    <div className="relative h-[4.75rem]">
       <button
         type="button"
         onClick={isAssigned ? undefined : canAssign ? onAssign : undefined}
@@ -180,12 +180,12 @@ function PoolCard({
         title={isAssigned ? t('tooltips.assignedSlot', { role: slot.role }) : canAssign ? t('tooltips.assignSlot') : t('tooltips.slotsFull')}
       >
         <img src={spriteUrl(slot.speciesName!)} alt={slot.speciesName ?? ''} className="pointer-events-none h-10 w-10 object-contain" onError={handleSpriteError} />
-        <span className="max-w-full truncate px-1 font-body text-[11px] leading-none text-txt">{slot.speciesName}</span>
+        <span className="max-w-full truncate px-1 font-body text-[0.6875rem] leading-none text-txt">{slot.speciesName}</span>
       </button>
 
       {isAssigned && (
         <span
-          className="pointer-events-none absolute right-1 top-1 border border-solid px-1 py-px font-mono text-[9px] font-bold leading-none"
+          className="pointer-events-none absolute right-1 top-1 border border-solid px-1 py-px font-mono text-[0.5625rem] font-bold leading-none"
           style={
             isLead(slot.role)
               ? { color: 'var(--accent-bright)', background: 'var(--accent-soft)', borderColor: 'var(--accent-line)' }
@@ -204,7 +204,7 @@ function PoolCard({
             e.stopPropagation();
             onClear();
           }}
-          className="absolute -right-1.5 -top-1.5 grid h-4 w-4 place-items-center border border-solid border-line-2 bg-panel-2 text-[10px] font-bold leading-none text-txt transition-colors hover:border-bad hover:bg-bad hover:text-white"
+          className="absolute -right-1.5 -top-1.5 grid h-4 w-4 place-items-center border border-solid border-line-2 bg-panel-2 text-[0.625rem] font-bold leading-none text-txt transition-colors hover:border-bad hover:bg-bad hover:text-white"
           title={t('tooltips.removeFromTeam')}
         >
           ×
@@ -232,10 +232,10 @@ function AssignmentZone({
   return (
     <div className="flex flex-col gap-1">
       <div className="flex items-center justify-between px-[2px]">
-        <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: tone }}>
+        <span className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em]" style={{ color: tone }}>
           {label}
         </span>
-        <span className="font-mono text-[10px]" style={{ color: count >= 2 ? tone : 'var(--dim)' }}>
+        <span className="font-mono text-[0.625rem]" style={{ color: count >= 2 ? tone : 'var(--dim)' }}>
           {count}/2
         </span>
       </div>
@@ -245,11 +245,11 @@ function AssignmentZone({
           return slot ? (
             <div
               key={slot.slotIndex}
-              className="relative flex min-h-[56px] flex-1 flex-col items-center justify-center gap-[2px] border border-solid bg-base py-1"
+              className="relative flex min-h-[3.5rem] flex-1 flex-col items-center justify-center gap-[2px] border border-solid bg-base py-1"
               style={{ borderColor: tone }}
             >
               <img src={spriteUrl(slot.speciesName!)} alt={slot.speciesName ?? ''} className="h-8 w-8 object-contain" onError={handleSpriteError} />
-              <span className="max-w-full truncate px-1 font-body text-[9px] leading-none text-txt-muted">{slot.speciesName}</span>
+              <span className="max-w-full truncate px-1 font-body text-[0.5625rem] leading-none text-txt-muted">{slot.speciesName}</span>
               <button
                 type="button"
                 tabIndex={-1}
@@ -261,8 +261,8 @@ function AssignmentZone({
               </button>
             </div>
           ) : (
-            <div key={`empty-${i}`} className="flex min-h-[56px] flex-1 items-center justify-center border border-dashed border-line-2">
-              <span className="text-[10px] text-txt-dim">—</span>
+            <div key={`empty-${i}`} className="flex min-h-[3.5rem] flex-1 items-center justify-center border border-dashed border-line-2">
+              <span className="text-[0.625rem] text-txt-dim">—</span>
             </div>
           );
         })}

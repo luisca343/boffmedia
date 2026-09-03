@@ -122,28 +122,28 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         </div>
 
         {/* My ELO */}
-        <label className="inline-flex items-center gap-[6px] border border-solid border-line-2 bg-panel px-[8px] py-[4px]">
-          <span className="select-none font-mono text-[9px] uppercase tracking-[0.08em] text-txt-muted">{t('indicators.myElo')}</span>
-          <input value={eloAfterInput} onChange={(e) => setEloAfterInput(e.target.value)} onBlur={() => update({ eloAfter: isNaN(parseFloat(eloAfterInput)) ? undefined : parseFloat(eloAfterInput) })} placeholder="—" className={cn(HDR_INPUT, 'w-16 border-0 bg-transparent text-center font-mono text-[15px]')} />
+        <label className="inline-flex items-center gap-[0.375rem] border border-solid border-line-2 bg-panel px-[0.5rem] py-[0.25rem]">
+          <span className="select-none font-mono text-[0.5625rem] uppercase tracking-[0.08em] text-txt-muted">{t('indicators.myElo')}</span>
+          <input value={eloAfterInput} onChange={(e) => setEloAfterInput(e.target.value)} onBlur={() => update({ eloAfter: isNaN(parseFloat(eloAfterInput)) ? undefined : parseFloat(eloAfterInput) })} placeholder="—" className={cn(HDR_INPUT, 'w-16 border-0 bg-transparent text-center font-mono text-[0.9375rem]')} />
         </label>
 
         {/* Rival group */}
-        <div className="inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-[8px] py-[4px]">
-          <input value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT, 'w-24 border-0 bg-transparent text-[13px]')} />
+        <div className="inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-[0.5rem] py-[0.25rem]">
+          <input value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT, 'w-24 border-0 bg-transparent text-[0.8125rem]')} />
           <span className="text-txt-dim">·</span>
-          <input value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT, 'w-20 border-0 bg-transparent text-[12px] text-txt-muted')} />
+          <input value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT, 'w-20 border-0 bg-transparent text-[0.75rem] text-txt-muted')} />
           <span className="text-txt-dim">·</span>
-          <span className="select-none font-mono text-[9px] uppercase tracking-[0.08em] text-txt-muted">{t('indicators.rival')}</span>
-          <input value={opponentEloInput} onChange={(e) => setOpponentEloInput(e.target.value)} onBlur={() => update({ opponentElo: isNaN(parseFloat(opponentEloInput)) ? undefined : parseFloat(opponentEloInput) })} placeholder="—" className={cn(HDR_INPUT, 'w-16 border-0 bg-transparent text-center font-mono text-[15px]')} />
+          <span className="select-none font-mono text-[0.5625rem] uppercase tracking-[0.08em] text-txt-muted">{t('indicators.rival')}</span>
+          <input value={opponentEloInput} onChange={(e) => setOpponentEloInput(e.target.value)} onBlur={() => update({ opponentElo: isNaN(parseFloat(opponentEloInput)) ? undefined : parseFloat(opponentEloInput) })} placeholder="—" className={cn(HDR_INPUT, 'w-16 border-0 bg-transparent text-center font-mono text-[0.9375rem]')} />
         </div>
 
         {/* Finish / saved */}
         {!isCompleted ? (
-          <button type="button" onClick={handleFinish} className="cut cut-edge-slant [--cut-line:var(--accent)] inline-flex items-center gap-[6px] border border-solid border-accent bg-accent px-3 py-[7px] font-display text-[13px] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
+          <button type="button" onClick={handleFinish} className="cut cut-edge-slant [--cut-line:var(--accent)] inline-flex items-center gap-[0.375rem] border border-solid border-accent bg-accent px-3 py-[0.4375rem] font-display text-[0.8125rem] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
             <Icon name="check" size={14} /> {t('buttons.finish')}
           </button>
         ) : (
-          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-ok">
+          <span className="inline-flex items-center gap-1 font-mono text-[0.6875rem] text-ok">
             <Icon name="check" size={13} /> {t('indicators.saved')}
           </span>
         )}
@@ -151,10 +151,10 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         {/* Delete */}
         {confirmDelete ? (
           <div className="inline-flex items-center gap-1">
-            <button type="button" onClick={handleDelete} className="border border-solid border-bad bg-bad px-[10px] py-[6px] font-mono text-[11px] font-semibold uppercase text-white">
+            <button type="button" onClick={handleDelete} className="border border-solid border-bad bg-bad px-[0.625rem] py-[0.375rem] font-mono text-[0.6875rem] font-semibold uppercase text-white">
               {t('buttons.delete')}
             </button>
-            <button type="button" onClick={() => setConfirmDelete(false)} className="border border-solid border-line-2 bg-base px-[10px] py-[6px] font-mono text-[11px] text-txt-muted hover:text-txt">
+            <button type="button" onClick={() => setConfirmDelete(false)} className="border border-solid border-line-2 bg-base px-[0.625rem] py-[0.375rem] font-mono text-[0.6875rem] text-txt-muted hover:text-txt">
               {t('buttons.cancel')}
             </button>
           </div>
@@ -166,7 +166,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
       </DkBar>
 
       <DkBody pad>
-        <div className="grid grid-cols-1 items-start gap-[18px] min-[760px]:grid-cols-2 min-[1100px]:grid-cols-[minmax(280px,360px)_minmax(0,1fr)_minmax(280px,360px)]">
+        <div className="grid grid-cols-1 items-start gap-[1.125rem] min-[760px]:grid-cols-2 min-[1100px]:grid-cols-[minmax(17.5rem,22.5rem)_minmax(0,1fr)_minmax(17.5rem,22.5rem)]">
           <div className="grid gap-3 min-w-0">
             <TeamPanel label={t('labels.myTeam')} slots={match.myTeam.slots} editable={false} tone="var(--accent-bright)" onSlotChange={handleMyTeamChange} />
             <SpeedTierWidget slots={match.myTeam.slots} regulationId={regulationId} />
@@ -180,16 +180,16 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
             <TeamPanel label={t('labels.opponent')} slots={match.opponentTeam.slots} editable tone="var(--info)" search={search} onSlotChange={handleOpponentTeamChange} />
             <SpeedTierWidget slots={match.opponentTeam.slots} regulationId={regulationId} />
 
-            <div className="border border-solid border-line bg-panel px-[14px] py-[12px]">
+            <div className="border border-solid border-line bg-panel px-[0.875rem] py-[0.75rem]">
               <TrSub>{t('outcomeTag.label')}</TrSub>
-              <div className="flex flex-wrap gap-[5px]">
+              <div className="flex flex-wrap gap-[0.3125rem]">
                 {TR_OUTCOME_ORDER.map((tag) => (
                   <OutcomeButton key={tag} tag={tag} active={match.outcomeTag === tag} onClick={() => handleOutcomeTag(tag)} label={t(`outcomeTag.${tag}`)} />
                 ))}
               </div>
             </div>
 
-            <div className="flex items-center justify-between border border-solid border-line bg-panel px-[14px] py-[12px]">
+            <div className="flex items-center justify-between border border-solid border-line bg-panel px-[0.875rem] py-[0.75rem]">
               <TrSub className="mb-0">{t('turnCount.label')}</TrSub>
               <input
                 type="number"
@@ -199,7 +199,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
                 onChange={(e) => setTurnCountInput(e.target.value)}
                 onBlur={() => { const n = parseInt(turnCountInput, 10); update({ turnCount: isNaN(n) || n < 1 ? undefined : n }); }}
                 placeholder="—"
-                className={cn(HDR_INPUT, 'w-16 px-2 py-1 text-center font-mono text-[13px]')}
+                className={cn(HDR_INPUT, 'w-16 px-2 py-1 text-center font-mono text-[0.8125rem]')}
               />
             </div>
           </div>
@@ -217,7 +217,7 @@ function ResultButton({ result, active, onClick, label }: { result: MatchResult;
       onClick={onClick}
       style={active ? cssVars({ background: tone, borderColor: tone }) : undefined}
       className={cn(
-        'border border-solid px-[14px] py-[6px] font-mono text-[13px] font-bold uppercase leading-none transition-all',
+        'border border-solid px-[0.875rem] py-[0.375rem] font-mono text-[0.8125rem] font-bold uppercase leading-none transition-all',
         active ? 'text-white' : 'border-line-2 bg-panel text-txt-muted hover:text-txt',
       )}
     >
@@ -234,7 +234,7 @@ function OutcomeButton({ tag, active, onClick, label }: { tag: OutcomeTag; activ
       onClick={onClick}
       style={active ? cssVars({ color: tone, borderColor: `color-mix(in srgb, ${tone} 55%, transparent)`, background: `color-mix(in srgb, ${tone} 11%, transparent)` }) : undefined}
       className={cn(
-        'border border-solid px-[9px] py-[6px] font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.06em] transition-colors',
+        'border border-solid px-[0.5625rem] py-[0.375rem] font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.06em] transition-colors',
         !active && 'border-line-2 text-txt-dim hover:text-txt',
       )}
     >

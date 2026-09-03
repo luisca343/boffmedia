@@ -13,7 +13,7 @@ export function TravelingOverlay({ stopId, reduceMotion }: { stopId: string; red
   return (
     <Overlay>
       <div className="flex flex-col items-center gap-1.5 p-8 text-center" role="status" aria-live="polite">
-        <div className="relative mb-3.5 grid h-[110px] w-[110px] place-items-center text-tx-accent">
+        <div className="relative mb-3.5 grid h-[6.875rem] w-[6.875rem] place-items-center text-tx-accent">
           <span
             className={cn(
               "absolute inset-0 rounded-full border-2 border-solid border-tx-accent-soft border-t-tx-accent",
@@ -22,7 +22,7 @@ export function TravelingOverlay({ stopId, reduceMotion }: { stopId: string; red
           />
           <span
             className={cn(
-              "absolute inset-[14px] rounded-full border-2 border-solid border-tx-blue-400/20 border-t-tx-blue-400",
+              "absolute inset-[0.875rem] rounded-full border-2 border-solid border-tx-blue-400/20 border-t-tx-blue-400",
               !reduceMotion && "animate-[spin_1.4s_linear_infinite_reverse] motion-reduce:animate-none",
             )}
           />
@@ -32,7 +32,7 @@ export function TravelingOverlay({ stopId, reduceMotion }: { stopId: string; red
         <div className="text-sm text-tx-txt-2">
           {t("preparing", { destination: stopId })}
         </div>
-        <div className="mt-4 h-[5px] w-[220px] overflow-hidden rounded-[3px] bg-tx-surface-2">
+        <div className="mt-4 h-[0.3125rem] w-[13.75rem] overflow-hidden rounded-[3px] bg-tx-surface-2">
           <span
             className={cn(
               "block h-full rounded-[3px] bg-gradient-to-r from-tx-blue-400 to-tx-accent",

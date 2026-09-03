@@ -115,10 +115,10 @@ function PhaseBody({
           </Scroll>
           {view.thirdPlace && (
             <div className="grid gap-1.5">
-              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-txt-dim">
+              <span className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em] text-txt-dim">
                 {t("view.thirdPlace")}
               </span>
-              <div className="max-w-[280px]">
+              <div className="max-w-[17.5rem]">
                 <TnBracketMatch m={A.match(view.thirdPlace)} champion={null} />
               </div>
             </div>
@@ -288,7 +288,7 @@ function SwissStandings({
   t: ReturnType<typeof useTranslations>
 }) {
   const th =
-    "px-2 py-2 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-txt-dim"
+    "px-2 py-2 text-left font-mono text-[0.625rem] font-semibold uppercase tracking-[0.08em] text-txt-dim"
   const td = "px-2 py-2 align-middle"
   const cutLabel =
     advance?.type === "record"
@@ -324,26 +324,26 @@ function SwissStandings({
                   dim && "opacity-40",
                 )}
               >
-                <td className={cn(td, "text-center font-mono text-[12px] text-txt-muted")}>
+                <td className={cn(td, "text-center font-mono text-[0.75rem] text-txt-muted")}>
                   {s.rank}
                 </td>
                 <td className={td}>
                   <TnEntrant c={A.standing(s).c} />
                 </td>
-                <td className={cn(td, "text-center font-mono text-[12px]")}>{s.played}</td>
+                <td className={cn(td, "text-center font-mono text-[0.75rem]")}>{s.played}</td>
                 <td
                   className={cn(
                     td,
-                    "text-center font-mono text-[13px] font-bold",
+                    "text-center font-mono text-[0.8125rem] font-bold",
                     isQ ? "text-accent-bright" : "text-txt-muted",
                   )}
                 >
                   {s.w}-{s.l}
                 </td>
-                <td className={cn(td, "text-center font-mono text-[11px] text-txt-dim")}>
+                <td className={cn(td, "text-center font-mono text-[0.6875rem] text-txt-dim")}>
                   {s.w}-{s.d}-{s.l}
                 </td>
-                <td className={cn(td, "text-right font-mono text-[12px] text-txt-muted")}>
+                <td className={cn(td, "text-right font-mono text-[0.75rem] text-txt-muted")}>
                   {s.pts}
                 </td>
               </tr>
@@ -356,7 +356,7 @@ function SwissStandings({
                   <td colSpan={6} className="p-0">
                     <div className="flex items-center gap-2 bg-accent-line/10 px-2 py-[3px]">
                       <span className="h-px flex-1 bg-accent-line" />
-                      <span className="font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-accent-bright">
+                      <span className="font-mono text-[0.5625rem] font-semibold uppercase tracking-[0.14em] text-accent-bright">
                         {cutLabel}
                       </span>
                       <span className="h-px flex-1 bg-accent-line" />

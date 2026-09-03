@@ -108,15 +108,15 @@ export function AppDownloadView() {
   }
 
   return (
-    <main className="wrap pb-[90px] pt-[34px]" data-ds="boffmedia">
+    <main className="wrap-wide pb-[5.625rem] pt-[2.125rem]" data-ds="boffmedia">
       <div className="mb-7">
         <span className="mono-label">{t("kicker")}</span>
-        <h1 className="mt-2 text-[clamp(46px,6vw,80px)]">{t("title")}</h1>
-        <p className="mt-3 max-w-[64ch] font-body text-[17px]/[1.6] text-txt-muted">{t("lead")}</p>
+        <h1 className="mt-2 text-[clamp(2.875rem,6vw,5rem)]">{t("title")}</h1>
+        <p className="mt-3 max-w-[64ch] font-body text-[1.0625rem]/[1.6] text-txt-muted">{t("lead")}</p>
       </div>
 
       {loading ? (
-        <div className="flex min-h-[280px] items-center justify-center">
+        <div className="flex min-h-[17.5rem] items-center justify-center">
           <Spinner size={32} className="text-accent" />
         </div>
       ) : failed ? (
@@ -129,14 +129,14 @@ export function AppDownloadView() {
         <>
           {primary && (
             <div className="mb-8 flex flex-wrap items-center gap-6 border border-solid border-accent-line border-l-4 border-l-accent bg-[linear-gradient(120deg,var(--accent-soft),var(--panel)_60%)] px-7 py-7">
-              <span className="grid h-[58px] w-[58px] flex-none place-items-center bg-accent text-accent-ink">
+              <span className="grid h-[3.625rem] w-[3.625rem] flex-none place-items-center bg-accent text-accent-ink">
                 <Icon name={PLATFORMS[primary.target]?.icon ?? "download"} size={26} />
               </span>
               <div className="min-w-0 flex-1">
-                <h2 className="text-[24px] not-italic normal-case text-txt">
+                <h2 className="text-[1.5rem] not-italic normal-case text-txt">
                   {t("primaryTitle", { platform: label(primary.target) })}
                 </h2>
-                <p className="mt-1.5 font-mono text-[12px] uppercase tracking-[0.08em] text-txt-dim">
+                <p className="mt-1.5 font-mono text-[0.75rem] uppercase tracking-[0.08em] text-txt-dim">
                   {t("meta", {
                     version: primary.version,
                     size: formatBytes(primary.sizeBytes),
@@ -154,16 +154,16 @@ export function AppDownloadView() {
             {t("smartscreenLead")}
           </Banner>
 
-          <div className="mb-8 grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,1fr)]">
+          <div className="mb-8 grid gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(20rem,1fr)]">
             <Panel title={t("verifyTitle")}>
-              <p className="mb-4 font-body text-[15px]/[1.6] text-txt-muted">{t("verifyLead")}</p>
+              <p className="mb-4 font-body text-[0.9375rem]/[1.6] text-txt-muted">{t("verifyLead")}</p>
               {rows.map((row) => (
                 <div key={row.target} className="mb-5 last:mb-0">
                   <div className="mb-2 flex items-baseline justify-between gap-3">
-                    <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-txt-dim">
+                    <span className="font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-txt-dim">
                       {label(row.target)} · {row.version}
                     </span>
-                    <span className="truncate font-mono text-[11px] text-txt-dim" title={row.artifactName}>
+                    <span className="truncate font-mono text-[0.6875rem] text-txt-dim" title={row.artifactName}>
                       {row.artifactName}
                     </span>
                   </div>
@@ -177,7 +177,7 @@ export function AppDownloadView() {
                   />
                 </div>
               ))}
-              <p className="mt-4 mb-2 font-body text-[15px]/[1.6] text-txt-muted">{t("verifyHow")}</p>
+              <p className="mt-4 mb-2 font-body text-[0.9375rem]/[1.6] text-txt-muted">{t("verifyHow")}</p>
               <CodeBlock
                 label="PowerShell"
                 lines={[`Get-FileHash -Algorithm SHA512 .\\${rows[0]?.artifactName ?? "BoffmediaApp.exe"}`]}
@@ -205,8 +205,8 @@ export function AppDownloadView() {
                           className="flex-none text-txt-dim group-hover:text-accent"
                         />
                         <span className="min-w-0 flex-1">
-                          <span className="block text-[14px] font-bold text-txt">{label(row.target)}</span>
-                          <span className="block font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">
+                          <span className="block text-[0.875rem] font-bold text-txt">{label(row.target)}</span>
+                          <span className="block font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">
                             {row.version} · {formatBytes(row.sizeBytes)}
                           </span>
                         </span>
@@ -222,7 +222,7 @@ export function AppDownloadView() {
                   {["os", "webview", "ram", "account"].map((key) => (
                     <li key={key} className="flex items-start gap-2.5">
                       <Icon name="check" size={15} className="mt-[3px] flex-none text-accent" />
-                      <span className="font-body text-[14px]/[1.5] text-txt-muted">
+                      <span className="font-body text-[0.875rem]/[1.5] text-txt-muted">
                         {t(`requirements.${key}`)}
                       </span>
                     </li>
@@ -234,21 +234,21 @@ export function AppDownloadView() {
 
           {primary?.notes && (
             <Panel title={t("notesTitle", { version: primary.version })} className="mb-8">
-              <p className="whitespace-pre-wrap font-body text-[15px]/[1.6] text-txt-muted">{primary.notes}</p>
+              <p className="whitespace-pre-wrap font-body text-[0.9375rem]/[1.6] text-txt-muted">{primary.notes}</p>
             </Panel>
           )}
 
-          <h2 className="mb-4 text-[26px]">{t("featuresTitle")}</h2>
+          <h2 className="mb-4 text-[1.625rem]">{t("featuresTitle")}</h2>
           <div className="grid grid-cols-3 gap-3 max-[900px]:grid-cols-2 max-[600px]:grid-cols-1">
             {FEATURES.map((feature) => (
               <Panel key={feature.key} className="p-0">
                 <div className="flex items-start gap-3">
                   <Icon name={feature.icon} size={20} className="mt-[2px] flex-none text-accent" />
                   <div className="min-w-0">
-                    <h3 className="text-[16px] not-italic normal-case text-txt">
+                    <h3 className="text-[1rem] not-italic normal-case text-txt">
                       {t(`features.${feature.key}.title`)}
                     </h3>
-                    <p className="mt-1 font-body text-[14px]/[1.5] text-txt-muted">
+                    <p className="mt-1 font-body text-[0.875rem]/[1.5] text-txt-muted">
                       {t(`features.${feature.key}.lead`)}
                     </p>
                   </div>

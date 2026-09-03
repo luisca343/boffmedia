@@ -20,7 +20,7 @@ export function MainContent({ isSidebarCollapsed }: MainContentProps) {
 
       <form>
         <fieldset className="w-auto p-[0.15em_0.3em_0.2em_0.4em] m-[0.15em] border border-solid border-[#c4c4c4] rounded-[4px]">
-          <legend className="block p-0 mb-[22px] text-[1.4em] font-bold leading-[inherit] text-[#1d71b8] border-0">
+          <legend className="block p-0 mb-[1.375rem] text-[1.4em] font-bold leading-[inherit] text-[#1d71b8] border-0">
             Datos de conversión
           </legend>
           

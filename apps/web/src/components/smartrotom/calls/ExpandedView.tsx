@@ -65,7 +65,7 @@ export function ExpandedView({
           title={t("minimize")}
           className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white backdrop-blur-sm transition-colors hover:bg-white/[0.18]"
         >
-          <Minimize2Icon className="h-[18px] w-[18px]" strokeWidth={2} />
+          <Minimize2Icon className="h-[1.125rem] w-[1.125rem]" strokeWidth={2} />
         </button>
         <div className="flex-1" />
         <div className="inline-flex items-center gap-2 rounded-full bg-white/[0.08] px-3 py-1.5 text-xs font-medium text-[#c9d2d6] backdrop-blur-sm">
@@ -97,7 +97,7 @@ export function ExpandedView({
                       className={`relative rounded-full border-2 object-cover shadow-[0_26px_70px_-20px_rgba(0,0,0,.8)] [image-rendering:pixelated] ${ring} ${solo ? "h-40 w-40" : "h-28 w-28"} ${user.status === UserStatus.IDLE ? "opacity-50" : ""}`}
                     />
                   </div>
-                  <span className="max-w-[140px] truncate text-sm text-[#c9d2d6]">
+                  <span className="max-w-[8.75rem] truncate text-sm text-[#c9d2d6]">
                     {user.uuid === currentUserUuid ? t("you") : user.username}
                   </span>
                 </div>
@@ -106,7 +106,7 @@ export function ExpandedView({
           </div>
 
           {solo && (
-            <div className="text-[30px] font-semibold leading-none text-white">
+            <div className="text-[1.875rem] font-semibold leading-none text-white">
               {activeCall.users.find((u) => u.uuid !== currentUserUuid)?.username || t("call")}
             </div>
           )}
@@ -119,13 +119,13 @@ export function ExpandedView({
 
       {/* Control dock */}
       <div className="relative z-10 flex flex-wrap items-start justify-center gap-3.5 px-5 pb-8 pt-4">
-        <DockButton icon={<MicIcon className="h-[22px] w-[22px]" strokeWidth={2} />} label={muted ? t("muted") : t("mute")} on={muted} onClick={() => setMuted((v) => !v)} />
-        <DockButton icon={<VideoIcon className="h-[22px] w-[22px]" strokeWidth={2} />} label={camOff ? t("cameraOff") : t("camera")} on={camOff} onClick={() => setCamOff((v) => !v)} />
-        <DockButton icon={<Volume2Icon className="h-[22px] w-[22px]" strokeWidth={2} />} label={t("speaker")} on={!speaker} onClick={() => setSpeaker((v) => !v)} />
+        <DockButton icon={<MicIcon className="h-[1.375rem] w-[1.375rem]" strokeWidth={2} />} label={muted ? t("muted") : t("mute")} on={muted} onClick={() => setMuted((v) => !v)} />
+        <DockButton icon={<VideoIcon className="h-[1.375rem] w-[1.375rem]" strokeWidth={2} />} label={camOff ? t("cameraOff") : t("camera")} on={camOff} onClick={() => setCamOff((v) => !v)} />
+        <DockButton icon={<Volume2Icon className="h-[1.375rem] w-[1.375rem]" strokeWidth={2} />} label={t("speaker")} on={!speaker} onClick={() => setSpeaker((v) => !v)} />
         {currentUser?.status === UserStatus.RINGING && (
-          <DockButton icon={<PhoneIcon className="h-[22px] w-[22px]" strokeWidth={2} />} label={t("accept")} variant="accept" onClick={onJoinCall} />
+          <DockButton icon={<PhoneIcon className="h-[1.375rem] w-[1.375rem]" strokeWidth={2} />} label={t("accept")} variant="accept" onClick={onJoinCall} />
         )}
-        <DockButton icon={<PhoneIcon className="h-[22px] w-[22px] rotate-[135deg]" strokeWidth={2} />} label={t("hangUp")} variant="end" onClick={onExitCall} />
+        <DockButton icon={<PhoneIcon className="h-[1.375rem] w-[1.375rem] rotate-[135deg]" strokeWidth={2} />} label={t("hangUp")} variant="end" onClick={onExitCall} />
       </div>
     </div>
   )
@@ -158,7 +158,7 @@ function DockButton({
       <button onClick={onClick} title={label} className={`${base} ${cls}`}>
         {icon}
       </button>
-      <span className="whitespace-nowrap text-[11.5px] text-[#aab4bb]">{label}</span>
+      <span className="whitespace-nowrap text-[0.71875rem] text-[#aab4bb]">{label}</span>
     </div>
   )
 }

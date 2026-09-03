@@ -4,7 +4,7 @@ import { Ico } from "./icons";
 
 export function Stepper({ steps, current }: { steps: string[]; current: number }) {
   return (
-    <div className="my-2 mb-[22px] flex items-center gap-3">
+    <div className="my-2 mb-[1.375rem] flex items-center gap-3">
       {steps.map((label, i) => {
         const active = i === current;
         const done = i < current;
@@ -14,13 +14,13 @@ export function Stepper({ steps, current }: { steps: string[]; current: number }
             <div className={cn("flex items-center gap-2.5", active ? "text-sb-fg" : "text-sb-fg-muted")}>
               <span
                 className={cn(
-                  "grid size-7 place-items-center rounded-full text-[13px] font-semibold",
+                  "grid size-7 place-items-center rounded-full text-[0.8125rem] font-semibold",
                   done ? "bg-sb-pos text-white" : active ? "bg-sb-600 text-white" : "bg-sb-surface-3 text-sb-fg-muted",
                 )}
               >
                 {done ? <Ico name="check" size={14} /> : i + 1}
               </span>
-              <span className="text-[13px] font-medium">{label}</span>
+              <span className="text-[0.8125rem] font-medium">{label}</span>
             </div>
           </React.Fragment>
         );

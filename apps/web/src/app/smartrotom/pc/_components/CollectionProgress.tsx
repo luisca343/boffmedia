@@ -62,7 +62,7 @@ export function CollectionProgress({ onOpenLivingDex }: CollectionProgressProps)
         title={t("topbar.livingDex")}
         className="mb-2 flex w-full items-center justify-between rounded-md text-left focus-visible:outline-none"
       >
-        <span className="flex items-center gap-1.5 font-pc text-[11.5px] font-semibold text-pc-fg-muted">
+        <span className="flex items-center gap-1.5 font-pc text-[0.71875rem] font-semibold text-pc-fg-muted">
           <Icon name="book" size={13} className="text-pc-gold" />
           {t("livingDex.title")}
         </span>
@@ -76,18 +76,18 @@ export function CollectionProgress({ onOpenLivingDex }: CollectionProgressProps)
         pct={dexPct}
         tone="linear-gradient(90deg, rgb(var(--pc-accent)), rgb(var(--pc-cyan)))"
         height={7}
-        className="mb-[11px]"
+        className="mb-[0.6875rem]"
       />
 
       <div className="grid grid-cols-4 gap-1.5">
         {tiles.map((t) => (
           <div
             key={t.label}
-            className="rounded-[9px] border border-pc-line bg-white/[.03] px-0.5 py-[7px] text-center"
+            className="rounded-[9px] border border-pc-line bg-white/[.03] px-0.5 py-[0.4375rem] text-center"
           >
             <Icon name={t.icon} size={13} className={`mx-auto ${t.tone}`} />
             <div className="mt-0.5 font-pc-mono text-sm font-extrabold text-pc-fg">{t.value}</div>
-            <div className="text-[9.5px] uppercase tracking-[.04em] text-pc-fg-subtle">{t.label}</div>
+            <div className="text-[0.59375rem] uppercase tracking-[.04em] text-pc-fg-subtle">{t.label}</div>
           </div>
         ))}
       </div>

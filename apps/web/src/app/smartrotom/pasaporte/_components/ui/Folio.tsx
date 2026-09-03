@@ -25,8 +25,8 @@ export function Folio({
     <>
       <span
         className={cn(
-          "ps-num absolute bottom-4 font-ps-mono text-[11px] tracking-[.12em] text-ps-ink-faint",
-          side === "left" ? "left-[30px]" : "right-[30px]",
+          "ps-num absolute bottom-4 font-ps-mono text-[0.6875rem] tracking-[.12em] text-ps-ink-faint",
+          side === "left" ? "left-[1.875rem]" : "right-[1.875rem]",
           className,
         )}
       >
@@ -37,10 +37,10 @@ export function Folio({
           type="button"
           onClick={onIndex}
           className={cn(
-            "absolute bottom-3.5 inline-flex items-center gap-[5px] rounded-sm font-ps text-[11px] tracking-[.04em] text-ps-ink-faint",
+            "absolute bottom-3.5 inline-flex items-center gap-[0.3125rem] rounded-sm font-ps text-[0.6875rem] tracking-[.04em] text-ps-ink-faint",
             "transition-colors hover:text-ps-chapter-deep",
             "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ps-chapter",
-            side === "left" ? "right-[30px]" : "left-[30px]",
+            side === "left" ? "right-[1.875rem]" : "left-[1.875rem]",
           )}
         >
           <Icon name="book" className="h-3.5 w-3.5" />

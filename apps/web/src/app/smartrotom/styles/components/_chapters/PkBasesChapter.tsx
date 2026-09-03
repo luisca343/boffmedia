@@ -98,17 +98,17 @@ export function PkBasesChapter() {
         lead="Tres voces: Orbitron para todo lo que grita (titulares, chips de tipo, cifras), Inter para leer, IBM Plex Mono para lo operativo —números de dex, etiquetas de sección, datos—."
       >
         <Sample title="Escala" code="font-pk-display · font-pk · font-pk-mono" app="pk" col>
-          <div className="grid w-full gap-[18px]">
+          <div className="grid w-full gap-[1.125rem]">
             {[
-              ["Display / Orbitron 700 / 28–40px", <span key="a" className="font-pk-display text-[32px] font-bold tracking-tight text-pk-surface-50">Pokédex Nacional</span>],
-              ["Titular / Orbitron 700 / 20–28px", <span key="b" className="font-pk-display text-[22px] font-bold tracking-tight text-pk-surface-50">Charizard</span>],
-              ["Cuerpo / Inter 400 / 13–15px", <span key="c" className="max-w-[52ch] text-[13.5px] leading-[1.55] text-pk-surface-400">Escupe un fuego tan caliente que funde las rocas. Puede causar incendios forestales sin querer.</span>],
-              ["Dato / Plex Mono 400–500 / 10–13px", <span key="d" className="font-pk-mono text-[12px] uppercase tracking-[0.12em] text-pk-surface-500">Nº 006 · Región Kanto</span>],
+              ["Display / Orbitron 700 / 28–40px", <span key="a" className="font-pk-display text-[2rem] font-bold tracking-tight text-pk-surface-50">Pokédex Nacional</span>],
+              ["Titular / Orbitron 700 / 20–28px", <span key="b" className="font-pk-display text-[1.375rem] font-bold tracking-tight text-pk-surface-50">Charizard</span>],
+              ["Cuerpo / Inter 400 / 13–15px", <span key="c" className="max-w-[52ch] text-[0.84375rem] leading-[1.55] text-pk-surface-400">Escupe un fuego tan caliente que funde las rocas. Puede causar incendios forestales sin querer.</span>],
+              ["Dato / Plex Mono 400–500 / 10–13px", <span key="d" className="font-pk-mono text-[0.75rem] uppercase tracking-[0.12em] text-pk-surface-500">Nº 006 · Región Kanto</span>],
               ["Cifra / Orbitron 700 tabular", <span key="e" className="font-pk-display text-2xl font-bold tabular-nums text-pk-surface-50">534</span>],
             ].map(([meta, node], i) => (
               <div
                 key={i}
-                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-white/[0.06] pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[240px_1fr] sm:gap-[22px]"
+                className="grid grid-cols-1 items-baseline gap-2 border-b border-dashed border-white/[0.06] pb-4 last:border-b-0 last:pb-0 sm:grid-cols-[15rem_1fr] sm:gap-[1.375rem]"
               >
                 <span className={cn(MONO_LABEL, "font-pk-mono text-pk-surface-500")}>{meta as React.ReactNode}</span>
                 {node as React.ReactNode}
@@ -123,9 +123,9 @@ export function PkBasesChapter() {
           app="pk"
           note="El «eyebrow» de la Pokédex: mono, versalita, muy espaciado y en `pk-surface-500`. Aparece en `PageHead`, en las cabeceras de sección y en las fichas."
         >
-          <span className="font-pk-mono text-[10.5px] uppercase tracking-[0.12em] text-pk-surface-500">Base de datos</span>
-          <span className="font-pk-mono text-[10.5px] uppercase tracking-[0.12em] text-pk-surface-500">Movimiento</span>
-          <span className="font-pk-mono text-[10.5px] uppercase tracking-[0.12em] text-pk-primary-300">Apariciones</span>
+          <span className="font-pk-mono text-[0.65625rem] uppercase tracking-[0.12em] text-pk-surface-500">Base de datos</span>
+          <span className="font-pk-mono text-[0.65625rem] uppercase tracking-[0.12em] text-pk-surface-500">Movimiento</span>
+          <span className="font-pk-mono text-[0.65625rem] uppercase tracking-[0.12em] text-pk-primary-300">Apariciones</span>
         </Sample>
       </Section>
     </>

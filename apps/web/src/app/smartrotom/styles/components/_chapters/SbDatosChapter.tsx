@@ -86,14 +86,14 @@ export function SbDatosChapter() {
             <Card>
               <SectionHead title="Saldo" eyebrow="12 semanas" />
               <CardBody>
-                <div className="font-sb-display text-[22px] font-semibold tabular-nums text-sb-fg">128.400 ¥</div>
+                <div className="font-sb-display text-[1.375rem] font-semibold tabular-nums text-sb-fg">128.400 ¥</div>
                 <Sparkline data={SB_SPARK} height={60} />
               </CardBody>
             </Card>
             <Card>
               <SectionHead title="Sin área" eyebrow="showArea = false" />
               <CardBody>
-                <div className="font-sb-display text-[22px] font-semibold tabular-nums text-sb-fg">+ 47 %</div>
+                <div className="font-sb-display text-[1.375rem] font-semibold tabular-nums text-sb-fg">+ 47 %</div>
                 <Sparkline data={SB_SPARK} height={60} color="#047857" showArea={false} strokeWidth={2.5} />
               </CardBody>
             </Card>
@@ -130,7 +130,7 @@ export function SbDatosChapter() {
               <SectionHead title="Ingresos y gastos" eyebrow="Por mes" />
               <CardBody>
                 <BarChart data={SB_BARS} height={220} />
-                <div className="flex items-center gap-4 text-[12px] text-sb-fg-muted">
+                <div className="flex items-center gap-4 text-[0.75rem] text-sb-fg-muted">
                   <span className="inline-flex items-center gap-1.5">
                     <i className="size-2 rounded-full bg-sb-pos-2" /> Ingresos
                   </span>
@@ -259,7 +259,7 @@ export function SbDatosChapter() {
                   </div>
                   <Skeleton className="h-4 w-16" />
                 </div>
-                <Skeleton className="h-[60px] w-full" />
+                <Skeleton className="h-[3.75rem] w-full" />
               </CardBody>
             </Card>
             <Card>
@@ -293,7 +293,7 @@ export function SbDatosChapter() {
 
           {sheetOpen && (
             <Sheet title="Premio torneo Wingull" eyebrow="Ingreso · Hoy" onClose={() => setSheetOpen(false)}>
-              <div className="font-sb-display text-[32px] font-semibold tabular-nums text-sb-pos">+ 12.500 ¥</div>
+              <div className="font-sb-display text-[2rem] font-semibold tabular-nums text-sb-pos">+ 12.500 ¥</div>
               <div className="grid gap-3">
                 {(
                   [
@@ -304,7 +304,7 @@ export function SbDatosChapter() {
                 ).map(([k, v]) => (
                   <div
                     key={k}
-                    className="flex items-center justify-between gap-4 border-b border-sb-border pb-3 text-[13.5px] last:border-b-0"
+                    className="flex items-center justify-between gap-4 border-b border-sb-border pb-3 text-[0.84375rem] last:border-b-0"
                   >
                     <span className="text-sb-fg-muted">{k}</span>
                     <span className="font-semibold tabular-nums text-sb-fg">{v}</span>

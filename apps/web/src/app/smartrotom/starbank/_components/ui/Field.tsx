@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export function Label({ className, children, ...rest }: React.LabelHTMLAttributes<HTMLLabelElement>) {
   return (
-    <label className={cn("mb-1.5 block text-[12px] font-semibold uppercase tracking-[0.02em] text-sb-fg-muted", className)} {...rest}>
+    <label className={cn("mb-1.5 block text-[0.75rem] font-semibold uppercase tracking-[0.02em] text-sb-fg-muted", className)} {...rest}>
       {children}
     </label>
   );

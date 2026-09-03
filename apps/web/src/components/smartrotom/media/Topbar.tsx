@@ -23,7 +23,7 @@ function AppSwitchBtn({ id, active }: { id: MediaAppId; active: boolean }) {
     <Link
       href={MEDIA_THEMES[id].basePath}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-mw-pill px-2.5 py-1.5 text-[13px] font-semibold transition-colors",
+        "inline-flex items-center gap-1.5 rounded-mw-pill px-2.5 py-1.5 text-[0.8125rem] font-semibold transition-colors",
         active ? "text-white" : "text-mw-fg-mute hover:text-mw-fg",
       )}
       style={active ? { background: SWITCH_ON[id] } : undefined}
@@ -54,7 +54,7 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
   }
 
   return (
-    <header className="relative z-30 grid h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b px-4 bg-[color-mix(in_srgb,rgb(var(--mw-accent))_14%,rgb(var(--mw-bg)))] border-[color-mix(in_srgb,rgb(var(--mw-accent))_40%,var(--mw-hairline))] md:grid-cols-[280px_minmax(0,1fr)_280px] md:gap-4 md:px-6">
+    <header className="relative z-30 grid h-16 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b px-4 bg-[color-mix(in_srgb,rgb(var(--mw-accent))_14%,rgb(var(--mw-bg)))] border-[color-mix(in_srgb,rgb(var(--mw-accent))_40%,var(--mw-hairline))] md:grid-cols-[17.5rem_minmax(0,1fr)_17.5rem] md:gap-4 md:px-6">
       {/* left: menu + brand */}
       <div className="flex items-center gap-3">
         <button
@@ -72,13 +72,13 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
           >
             <I.rotom size={20} />
           </span>
-          <span className="inline-flex items-baseline font-mw-display text-[18px] font-extrabold tracking-[0.01em]">
+          <span className="inline-flex items-baseline font-mw-display text-[1.125rem] font-extrabold tracking-[0.01em]">
             <span className="text-mw-fg">Mew</span>
             <span className="bg-[linear-gradient(120deg,rgb(var(--mw-accent)),color-mix(in_srgb,rgb(var(--mw-accent))_40%,#fff))] bg-clip-text text-transparent">
               {theme.id === "mewtube" ? "tube" : "twitch"}
             </span>
           </span>
-          <span className="hidden font-mono text-[10px] uppercase tracking-[0.14em] text-mw-fg-faint sm:inline">
+          <span className="hidden font-mono text-[0.625rem] uppercase tracking-[0.14em] text-mw-fg-faint sm:inline">
             SmartRotom
           </span>
         </Link>
@@ -86,7 +86,7 @@ export function Topbar({ onToggleSidebar }: { onToggleSidebar?: () => void }) {
 
       {/* center: search */}
       <div className="flex min-w-0 justify-center">
-        <form onSubmit={submit} className="flex h-10 w-full max-w-[600px] items-center rounded-mw-pill bg-mw-900 pl-3.5 transition-[border-color,background,box-shadow] border border-[color-mix(in_srgb,rgb(var(--mw-accent))_18%,var(--mw-hairline))] focus-within:bg-mw-bg focus-within:border-[color-mix(in_srgb,rgb(var(--mw-accent))_60%,transparent)] focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,rgb(var(--mw-accent))_12%,transparent)]">
+        <form onSubmit={submit} className="flex h-10 w-full max-w-[37.5rem] items-center rounded-mw-pill bg-mw-900 pl-3.5 transition-[border-color,background,box-shadow] border border-[color-mix(in_srgb,rgb(var(--mw-accent))_18%,var(--mw-hairline))] focus-within:bg-mw-bg focus-within:border-[color-mix(in_srgb,rgb(var(--mw-accent))_60%,transparent)] focus-within:shadow-[0_0_0_4px_color-mix(in_srgb,rgb(var(--mw-accent))_12%,transparent)]">
           <span className="inline-flex text-mw-fg-subtle">
             <I.search size={18} />
           </span>

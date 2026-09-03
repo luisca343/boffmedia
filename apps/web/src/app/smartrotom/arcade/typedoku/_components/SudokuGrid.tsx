@@ -11,7 +11,7 @@ export interface SudokuGridProps {
 /** The 9×9 board, drawn as nine 3×3 boxes so the box borders read without extra rules. */
 export function SudokuGrid({ grid, selectedCell, onCellClick }: SudokuGridProps) {
   return (
-    <div className="mx-auto grid max-w-[560px] grid-cols-3 gap-1.5">
+    <div className="mx-auto grid max-w-[35rem] grid-cols-3 gap-1.5">
       {[0, 1, 2].map((boxRow) => (
         <Fragment key={boxRow}>
           {[0, 1, 2].map((boxCol) => (
@@ -37,7 +37,7 @@ export function SudokuGrid({ grid, selectedCell, onCellClick }: SudokuGridProps)
                         aria-label={`Fila ${row + 1}, columna ${col + 1}${cell?.value ? `: ${cell.value}` : ""}`}
                         className={cn(
                           "flex aspect-square w-full items-center justify-center overflow-hidden rounded-md border",
-                          "font-ar-mono text-[8px] font-bold uppercase leading-none transition-colors sm:text-[9px]",
+                          "font-ar-mono text-[0.5rem] font-bold uppercase leading-none transition-colors sm:text-[0.5625rem]",
                           cell?.value
                             ? TYPE_SKIN[cell.value]
                             : "border-white/[.08] bg-ar-void-2/60 text-ar-ink-muted",

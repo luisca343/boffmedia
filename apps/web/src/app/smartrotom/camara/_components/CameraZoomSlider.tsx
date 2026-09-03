@@ -97,7 +97,7 @@ export function CameraZoomSlider({ onZoomChange }: CameraZoomSliderProps) {
         <Minus className="h-4 w-4" />
       </Button>
 
-      <div className="flex items-center gap-2 min-w-[120px] justify-center">
+      <div className="flex items-center gap-2 min-w-[7.5rem] justify-center">
         {/* Zoom dots indicator */}
         <div className="flex gap-1">
           {ZOOM_LEVELS.map((zoom, idx) => (
@@ -118,7 +118,7 @@ export function CameraZoomSlider({ onZoomChange }: CameraZoomSliderProps) {
         </div>
 
         {/* Zoom level text */}
-        <span className="text-sm font-medium text-white min-w-[32px] text-center">
+        <span className="text-sm font-medium text-white min-w-[2rem] text-center">
           {formatFactor(factor)}
         </span>
       </div>

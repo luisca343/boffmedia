@@ -50,15 +50,15 @@ export function FurretFooter() {
         label={t("furretFooter.marqueeLabel")}
       />
 
-      <div className="mx-auto grid max-w-[1400px] gap-8 px-6 py-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-[87.5rem] gap-8 px-6 py-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <div className="mb-3 flex items-center gap-2.5">
             <FurretMascot size={48} />
-            <span className="font-ft-display text-[28px] text-ft-yellow">
+            <span className="font-ft-display text-[1.75rem] text-ft-yellow">
               FURRET·TODAY
             </span>
           </div>
-          <p className="max-w-[360px] text-white/75">
+          <p className="max-w-[22.5rem] text-white/75">
             {t("furretFooter.tagline")}
           </p>
         </div>
@@ -123,7 +123,7 @@ export function FurretFooter() {
       </div>
 
       <div className="border-t-2 border-dashed border-white/20">
-        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-6 py-5">
+        <div className="mx-auto flex max-w-[87.5rem] flex-wrap items-center justify-between gap-4 px-6 py-5">
           <Meta className="text-white/60">
             {t("furretFooter.copyright", { year: new Date().getFullYear() })}
           </Meta>

@@ -96,13 +96,13 @@ export default function SellerDashboardPage() {
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <div className="flex flex-none flex-wrap items-center gap-3.5 border-b border-wp-line/24 px-[30px] py-[18px]">
-        <div className="min-w-[220px] flex-1">
-          <h1 className="flex items-center gap-2.5 whitespace-nowrap font-wp-display text-[21px] font-semibold text-wp-fg">
+      <div className="flex flex-none flex-wrap items-center gap-3.5 border-b border-wp-line/24 px-[1.875rem] py-[1.125rem]">
+        <div className="min-w-[13.75rem] flex-1">
+          <h1 className="flex items-center gap-2.5 whitespace-nowrap font-wp-display text-[1.3125rem] font-semibold text-wp-fg">
             <Icon name="list" size={20} className="text-wp-accent" />
             {t("anuncios.title")}
           </h1>
-          <p className="mt-0.5 font-wp text-[12.5px] font-semibold text-wp-fg-subtle">
+          <p className="mt-0.5 font-wp text-[0.78125rem] font-semibold text-wp-fg-subtle">
             {t("anuncios.subtitle")}
           </p>
         </div>
@@ -112,7 +112,7 @@ export default function SellerDashboardPage() {
         </Button>
       </div>
 
-      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-5">
+      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[1.875rem] pb-10 pt-5">
         {/* KPIs */}
         <div className="mb-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <Stat k={t("anuncios.statIncome")} v={`₽${fmt(income)}`} icon="dollar" tone="text-wp-green" />
@@ -214,7 +214,7 @@ export default function SellerDashboardPage() {
                             {mon?.shiny && <span className="text-wp-teal">✦ </span>}
                             {L.title}
                           </div>
-                          <div className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+                          <div className="font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
                             {mon ? (
                               <span className="wp-num">
                                 {t("common.levelIvPercent", { level: mon.level, pct: mon.ivPct })}
@@ -228,7 +228,7 @@ export default function SellerDashboardPage() {
                       </div>
                     </TD>
                     <TD>
-                      <Chip className="text-[11px]">
+                      <Chip className="text-[0.6875rem]">
                         <Icon name={FORMAT_ICON[L.format]} size={12} />
                         {t(FORMAT_LABEL_KEY[L.format])}
                       </Chip>
@@ -236,7 +236,7 @@ export default function SellerDashboardPage() {
                     <TD>
                       <span
                         className={cn(
-                          "rounded-wp-pill px-2.5 py-1 font-wp text-[11px] font-extrabold",
+                          "rounded-wp-pill px-2.5 py-1 font-wp text-[0.6875rem] font-extrabold",
                           st.text,
                           st.bg,
                         )}
@@ -296,7 +296,7 @@ export default function SellerDashboardPage() {
                           </Button>
                         )}
                         {L.status === "vendido" && (
-                          <span className="inline-flex items-center gap-1 font-wp text-[11.5px] font-bold text-wp-green">
+                          <span className="inline-flex items-center gap-1 font-wp text-[0.71875rem] font-bold text-wp-green">
                             <Icon name="shieldCheck" size={14} />
                             {t("anuncios.settledLabel")}
                           </span>
@@ -329,11 +329,11 @@ function Stat({
 }) {
   return (
     <Panel className="px-4 py-3.5">
-      <div className="flex items-center gap-[7px] font-wp text-[11px] font-extrabold uppercase tracking-[.05em] text-wp-fg-subtle">
+      <div className="flex items-center gap-[0.4375rem] font-wp text-[0.6875rem] font-extrabold uppercase tracking-[.05em] text-wp-fg-subtle">
         <Icon name={icon} size={14} className={tone} />
         {k}
       </div>
-      <div className={cn("wp-num mt-1 font-wp-display text-[23px] font-semibold", tone ?? "text-wp-fg")}>
+      <div className={cn("wp-num mt-1 font-wp-display text-[1.4375rem] font-semibold", tone ?? "text-wp-fg")}>
         {v}
       </div>
     </Panel>
@@ -365,7 +365,7 @@ function ActionPanel({
         <Icon name={icon} size={17} className={ICON[tone]} />
         <span className="font-wp text-sm font-bold text-wp-fg">{title}</span>
       </div>
-      <p className="mt-1 font-wp text-[12px] font-semibold text-wp-fg-muted">{body}</p>
+      <p className="mt-1 font-wp text-[0.75rem] font-semibold text-wp-fg-muted">{body}</p>
       <div className="mt-3 grid gap-2">{children}</div>
     </div>
   )
@@ -385,14 +385,14 @@ function DeliverRow({
   return (
     <div className="flex items-center gap-3 rounded-xl border border-wp-line/24 bg-white px-3.5 py-2.5">
       <div className="min-w-0 flex-1">
-        <div className="truncate font-wp text-[13.5px] font-bold text-wp-fg">{title}</div>
-        <div className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+        <div className="truncate font-wp text-[0.84375rem] font-bold text-wp-fg">{title}</div>
+        <div className="font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
           {t("anuncios.buyerPaid", { amount: fmt(buyerPaid) })}
         </div>
       </div>
       <Button
         variant="primary"
-        className="px-3.5 py-2 text-[12.5px]"
+        className="px-3.5 py-2 text-[0.78125rem]"
         disabled={mark.isPending}
         onClick={() => mark.mutate(orderId)}
       >
@@ -437,17 +437,17 @@ function OfferRow({
   return (
     <div className="flex items-center gap-3 rounded-xl border border-wp-line/24 bg-white px-3.5 py-2.5">
       <div className="min-w-0 flex-1">
-        <div className="truncate font-wp text-[13.5px] font-bold text-wp-fg">{what}</div>
-        <div className="font-wp text-[11.5px] font-semibold text-wp-fg-subtle">
+        <div className="truncate font-wp text-[0.84375rem] font-bold text-wp-fg">{what}</div>
+        <div className="font-wp text-[0.71875rem] font-semibold text-wp-fg-subtle">
           {t("anuncios.buyerOffers", { buyer: who, amount: fmt(amount) })}
         </div>
       </div>
-      <Button variant="danger" className="px-3 py-2 text-[12.5px]" disabled={busy} onClick={() => respond(false)}>
+      <Button variant="danger" className="px-3 py-2 text-[0.78125rem]" disabled={busy} onClick={() => respond(false)}>
         {t("common.reject")}
       </Button>
       <Button
         variant="primary"
-        className="px-3.5 py-2 text-[12.5px]"
+        className="px-3.5 py-2 text-[0.78125rem]"
         disabled={busy}
         onClick={() => respond(true)}
       >

@@ -123,7 +123,7 @@ function VersionsTab({
       ) : (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-3 border-b border-line pb-3">
-            <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-txt-dim">
+            <span className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-txt-dim">
               {t("tabVersions")}
             </span>
             <Button size="sm" variant="pri" icon="plus" onClick={onNewVersion}>
@@ -301,7 +301,7 @@ function AccessTab({ pack }: { pack: AdminPack }) {
                 className="flex items-center gap-3 px-2 py-1.5 text-left hover:bg-panel disabled:opacity-50"
               >
                 <span className="font-medium text-txt">{u.username}</span>
-                <span className="font-mono text-[11px] text-txt-dim">{u.email}</span>
+                <span className="font-mono text-[0.6875rem] text-txt-dim">{u.email}</span>
                 <Icon name="plus" size={13} className="ml-auto text-accent" />
               </button>
             ))}
@@ -311,7 +311,7 @@ function AccessTab({ pack }: { pack: AdminPack }) {
 
       {/* The exception: a player who has not registered yet. */}
       <details className="border border-solid border-line bg-panel-2 p-3 cut-tag cut-tag-edge">
-        <summary className="cursor-pointer font-mono text-[11px] uppercase tracking-[0.08em] text-txt-dim">
+        <summary className="cursor-pointer font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-dim">
           {t("preGrantTitle")}
         </summary>
         <p className="mt-2 text-xs text-txt-dim">{t("preGrantHint")}</p>
@@ -340,8 +340,8 @@ function AccessTab({ pack }: { pack: AdminPack }) {
                 key={row.uuid}
                 className="flex items-center gap-3 border-b border-line py-2 last:border-0"
               >
-                <span className="font-mono text-[12px] text-txt">{row.uuid}</span>
-                <span className="ml-auto font-mono text-[11px] text-txt-dim">
+                <span className="font-mono text-[0.75rem] text-txt">{row.uuid}</span>
+                <span className="ml-auto font-mono text-[0.6875rem] text-txt-dim">
                   {formatAdminDate(row.grantedAt)}
                 </span>
                 <Button
@@ -362,16 +362,16 @@ function AccessTab({ pack }: { pack: AdminPack }) {
           check, so the grant list alone under-reports who can install this. */}
       {events.length > 0 && (
         <div className="flex flex-col gap-1 border border-solid border-line bg-panel-2 p-3 cut-tag cut-tag-edge">
-          <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">
+          <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">
             {t("derivedFromEvents")}
           </span>
           {events.map((e) => (
             <div key={e.eventId} className="flex items-center gap-3">
               <span className="text-sm text-txt">{e.title}</span>
-              <span className="font-mono text-[11px] text-txt-dim">
+              <span className="font-mono text-[0.6875rem] text-txt-dim">
                 {e.status} · {e.visibility}
               </span>
-              <span className="ml-auto font-mono text-[11px] text-txt">
+              <span className="ml-auto font-mono text-[0.6875rem] text-txt">
                 {t("derivedMembers", { count: e.memberCount })}
               </span>
             </div>
@@ -391,11 +391,11 @@ function AccessTab({ pack }: { pack: AdminPack }) {
               className="flex items-center gap-3 border-b border-line py-2 last:border-0"
             >
               <span className="font-medium text-txt">{row.username}</span>
-              <span className="font-mono text-[11px] text-txt-dim">{row.email}</span>
+              <span className="font-mono text-[0.6875rem] text-txt-dim">{row.email}</span>
               <AvPill tone={row.source === "invite" ? "accent" : "default"}>
                 {t(row.source === "invite" ? "sourceInvite" : "sourceAdmin")}
               </AvPill>
-              <span className="ml-auto font-mono text-[11px] text-txt-dim">
+              <span className="ml-auto font-mono text-[0.6875rem] text-txt-dim">
                 {formatAdminDate(row.grantedAt)}
               </span>
               <Button
@@ -481,7 +481,7 @@ function InvitesTab({ pack }: { pack: AdminPack }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-end gap-3">
-        <div className="w-[160px]">
+        <div className="w-[10rem]">
           <Field label={t("maxUses")}>
             <Input
               type="number"
@@ -505,7 +505,7 @@ function InvitesTab({ pack }: { pack: AdminPack }) {
               key={inv.code}
               className="flex flex-wrap items-center gap-3 border-b border-line py-2 last:border-0"
             >
-              <span className="font-mono text-[13px] font-semibold text-accent-bright">
+              <span className="font-mono text-[0.8125rem] font-semibold text-accent-bright">
                 {inv.code}
               </span>
               {inv.revoked ? (
@@ -515,7 +515,7 @@ function InvitesTab({ pack }: { pack: AdminPack }) {
               ) : (
                 <AvPill tone="ok">{t("active")}</AvPill>
               )}
-              <span className="font-mono text-[11px] text-txt-dim">
+              <span className="font-mono text-[0.6875rem] text-txt-dim">
                 {inv.uses}/{inv.maxUses}
               </span>
               <span className="ml-auto flex items-center gap-2">
@@ -576,11 +576,11 @@ function AuditTab({ pack }: { pack: AdminPack }) {
     <div className="flex flex-col gap-1">
       {rows.map((row) => (
         <div key={row.id} className="flex items-center gap-3 border-b border-line py-2 last:border-0">
-          <span className="font-mono text-[11px] text-txt-dim">
+          <span className="font-mono text-[0.6875rem] text-txt-dim">
             {formatAdminDate(row.at, { time: true })}
           </span>
           <AvPill>{row.action}</AvPill>
-          {row.uuid && <span className="font-mono text-[11px] text-txt-muted">{row.uuid}</span>}
+          {row.uuid && <span className="font-mono text-[0.6875rem] text-txt-muted">{row.uuid}</span>}
         </div>
       ))}
     </div>
@@ -693,11 +693,11 @@ export function PacksAdmin() {
         </div>
       </div>
 
-      <div className="grid min-h-0 flex-1 gap-4 [grid-template-columns:minmax(0,300px)_minmax(0,1fr)] max-[1100px]:grid-cols-1 max-[1100px]:overflow-auto">
+      <div className="grid min-h-0 flex-1 gap-4 [grid-template-columns:minmax(0,18.75rem)_minmax(0,1fr)] max-[1100px]:grid-cols-1 max-[1100px]:overflow-auto">
         <AvPanel
           title={t("packs")}
           icon="cube"
-          className="mb-0 flex min-h-0 flex-col max-[1100px]:h-[320px]"
+          className="mb-0 flex min-h-0 flex-col max-[1100px]:h-[20rem]"
           bodyClassName="flex min-h-0 flex-1 flex-col gap-2"
         >
           {/* Outside the scroller: the filter must stay reachable however far
@@ -782,10 +782,10 @@ export function PacksAdmin() {
           <AvPanel
             title={
               <span className="flex min-w-0 items-center gap-2">
-                <span className="truncate font-display text-[15px] font-bold tracking-[0.05em] text-txt">
+                <span className="truncate font-display text-[0.9375rem] font-bold tracking-[0.05em] text-txt">
                   {pack.name}
                 </span>
-                <span className="truncate font-mono text-[10px] font-normal tracking-normal text-txt-dim">
+                <span className="truncate font-mono text-[0.625rem] font-normal tracking-normal text-txt-dim">
                   {pack.slug}
                 </span>
               </span>
@@ -834,14 +834,14 @@ export function PacksAdmin() {
                </span>
              }
            >
-             <div className="mb-4 grid shrink-0 gap-2 sm:grid-cols-[minmax(0,1fr)_120px_120px]">
+             <div className="mb-4 grid shrink-0 gap-2 sm:grid-cols-[minmax(0,1fr)_7.5rem_7.5rem]">
                <div className="min-w-0 border border-solid border-line bg-panel-2 p-3">
                  <div className="flex flex-wrap items-center gap-2">
                    <AccessPill kind={pack.accessKind} />
-                   <span className="font-mono text-[10px] text-txt-dim">{pack.slug}</span>
+                   <span className="font-mono text-[0.625rem] text-txt-dim">{pack.slug}</span>
                  </div>
                  {pack.summary && (
-                   <p className="mt-2 line-clamp-2 text-[12px] leading-[1.45] text-txt-muted">{pack.summary}</p>
+                   <p className="mt-2 line-clamp-2 text-[0.75rem] leading-[1.45] text-txt-muted">{pack.summary}</p>
                  )}
                </div>
                 <AvMetric value={pack.versionCount} label={t("tabVersions")} tone="accent" />

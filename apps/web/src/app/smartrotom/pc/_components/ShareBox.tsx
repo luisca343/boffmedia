@@ -96,10 +96,10 @@ export function ShareBox({ box, onClose }: ShareBoxProps) {
       tone="text-pc-cyan"
       width={560}
     >
-      <div className="flex flex-col gap-4 p-[18px]">
+      <div className="flex flex-col gap-4 p-[1.125rem]">
         <div className="relative overflow-hidden rounded-[14px] border border-pc-line">
           <span className={`pc-wp pc-wp-dots ${WALLPAPER_CLASS[theme]}`} />
-          <div className="relative z-10 grid grid-cols-10 gap-[5px] p-3.5">
+          <div className="relative z-10 grid grid-cols-10 gap-[0.3125rem] p-3.5">
             {Array.from({ length: POKEMON_PER_BOX }, (_, i) => slots[i] ?? null).map((m, i) => (
               <div
                 key={i}
@@ -120,9 +120,9 @@ export function ShareBox({ box, onClose }: ShareBoxProps) {
         </div>
 
         <div>
-          <div className="mb-2 flex items-center gap-[7px]">
+          <div className="mb-2 flex items-center gap-[0.4375rem]">
             <Icon name="copy" size={14} className="text-pc-accent" />
-            <h3 className="text-[13px] font-bold">{t("share.code")}</h3>
+            <h3 className="text-[0.8125rem] font-bold">{t("share.code")}</h3>
           </div>
           <div className="flex gap-2">
             <Textarea
@@ -139,15 +139,15 @@ export function ShareBox({ box, onClose }: ShareBoxProps) {
               <Icon name="copy" size={15} />
             </Button>
           </div>
-          <p className="mt-1.5 text-[11px] text-pc-fg-subtle">
+          <p className="mt-1.5 text-[0.6875rem] text-pc-fg-subtle">
             {t("share.hint")}
           </p>
         </div>
 
         <div>
-          <div className="mb-2 flex items-center gap-[7px]">
+          <div className="mb-2 flex items-center gap-[0.4375rem]">
             <Icon name="list" size={14} className="text-pc-accent" />
-            <h3 className="text-[13px] font-bold">{t("share.summary")}</h3>
+            <h3 className="text-[0.8125rem] font-bold">{t("share.summary")}</h3>
           </div>
           <div className="flex gap-2">
             <Textarea
@@ -155,7 +155,7 @@ export function ShareBox({ box, onClose }: ShareBoxProps) {
               value={summary}
               aria-label={t("share.summary")}
               onFocus={(e) => e.target.select()}
-              className="h-[120px] flex-1 font-pc-mono"
+              className="h-[7.5rem] flex-1 font-pc-mono"
               style={{ fontSize: 11.5, lineHeight: 1.5, resize: "none" }}
             />
             <Button aria-label={t("share.summary")} onClick={() => copyText(summary, t("share.summaryCopied"), t("share.copyError"))}>

@@ -33,23 +33,23 @@ export function BrowseHero({
         className="ft-halftone-light absolute inset-0 opacity-20"
         aria-hidden="true"
       />
-      <div className="relative mx-auto max-w-[1400px] px-6 py-14">
+      <div className="relative mx-auto max-w-[87.5rem] px-6 py-14">
         <Eyebrow className="text-ft-yellow">{t("eyebrow")}</Eyebrow>
         <h1
-          className="font-ft-display mt-2 mb-3 text-[clamp(56px,9vw,128px)] leading-[0.9]"
+          className="font-ft-display mt-2 mb-3 text-[clamp(3.5rem,9vw,8rem)] leading-[0.9]"
           style={{ textShadow: `6px 6px 0 ${FT_INK}` }}
         >
           {t("titleStart")}{" "}
           <span className="inline-block -rotate-3">{t("titleTilt")}</span>{" "}
           {t("titleEnd")}
         </h1>
-        <p className="font-ft-deck max-w-[720px] text-[22px] italic text-[#fffbe8]">
+        <p className="font-ft-deck max-w-[45rem] text-[1.375rem] italic text-[#fffbe8]">
           {t("description")}
         </p>
 
         <form
           onSubmit={(e) => e.preventDefault()}
-          className="mt-6 flex max-w-[720px] gap-2.5"
+          className="mt-6 flex max-w-[45rem] gap-2.5"
         >
           <Input
             value={query}

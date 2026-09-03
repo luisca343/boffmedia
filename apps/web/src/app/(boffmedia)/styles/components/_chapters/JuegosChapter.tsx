@@ -84,7 +84,7 @@ export function JuegosChapter() {
                 </div>
               </Sample>
               <Sample title="Tira de detalles" code="<MetaChip icon label value>" col note={<>El <code>hue</code> del juego tiñe el glifo; aún no está en la API de eventos. [aplazado]</>}>
-                <div className="grid w-full gap-[10px] [grid-template-columns:repeat(auto-fit,minmax(160px,1fr))]">
+                <div className="grid w-full gap-[0.625rem] [grid-template-columns:repeat(auto-fit,minmax(10rem,1fr))]">
                   <MetaChip icon="clock" label="Inicia" value="16 Jun · 16:00" hue={VGC_HUE} />
                   <MetaChip icon="calendar" label="Finaliza" value="16 Jun · 23:00" hue={VGC_HUE} />
                   <MetaChip icon="trophy" label="Tipo" value="Torneo" hue={VGC_HUE} />
@@ -130,7 +130,7 @@ export function JuegosChapter() {
                 </div>
               </Sample>
               <Sample title="Fila compacta y avatares" code="<PlayerLine> · <ParticipantStack>" col>
-                <div className="grid w-full gap-[10px]">
+                <div className="grid w-full gap-[0.625rem]">
                   <div className="grid gap-2.5">
                     {DEMO_TOP.slice(0, 2).map((p, i) => <PlayerLine key={p.userId} player={p} rank={i + 1} />)}
                   </div>

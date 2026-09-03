@@ -94,12 +94,12 @@ export function AuthorizeAppView() {
   }
 
   return (
-    <main className="wrap pb-[90px] pt-6">
-      <div className="mx-auto max-w-[520px]">
+    <main className="wrap pb-[5.625rem] pt-6">
+      <div className="mx-auto max-w-[32.5rem]">
         <Panel title={t("title")}>
           {!session?.user ? (
             <>
-              <p className="mb-5 font-body text-[15px]/[1.6] text-txt-muted text-pretty">
+              <p className="mb-5 font-body text-[0.9375rem]/[1.6] text-txt-muted text-pretty">
                 {t("loginLead")}
               </p>
               <Button variant="pri" icon="user" href="/entrar" className="w-full">
@@ -109,14 +109,14 @@ export function AuthorizeAppView() {
           ) : phase === "approved" ? (
             <div className="grid gap-3 py-4 text-center">
               <Icon name="check" size={34} className="mx-auto text-ok" />
-              <p className="font-display text-[20px] font-bold uppercase">{t("approvedTitle")}</p>
-              <p className="font-body text-[14px] text-txt-muted">{t("approvedLead")}</p>
+              <p className="font-display text-[1.25rem] font-bold uppercase">{t("approvedTitle")}</p>
+              <p className="font-body text-[0.875rem] text-txt-muted">{t("approvedLead")}</p>
             </div>
           ) : phase === "denied" ? (
             <div className="grid gap-3 py-4 text-center">
               <Icon name="x" size={34} className="mx-auto text-txt-dim" />
-              <p className="font-display text-[20px] font-bold uppercase">{t("deniedTitle")}</p>
-              <p className="font-body text-[14px] text-txt-muted">{t("deniedLead")}</p>
+              <p className="font-display text-[1.25rem] font-bold uppercase">{t("deniedTitle")}</p>
+              <p className="font-body text-[0.875rem] text-txt-muted">{t("deniedLead")}</p>
             </div>
           ) : phase === "already-approved" || phase === "already-denied" ? (
             <div className="grid gap-3 py-4 text-center">
@@ -125,29 +125,29 @@ export function AuthorizeAppView() {
                 size={34}
                 className={phase === "already-approved" ? "mx-auto text-ok" : "mx-auto text-txt-dim"}
               />
-              <p className="font-display text-[20px] font-bold uppercase">
+              <p className="font-display text-[1.25rem] font-bold uppercase">
                 {t(phase === "already-approved" ? "alreadyApprovedTitle" : "alreadyDeniedTitle")}
               </p>
-              <p className="font-body text-[14px] text-txt-muted">
+              <p className="font-body text-[0.875rem] text-txt-muted">
                 {t(phase === "already-approved" ? "alreadyApprovedLead" : "alreadyDeniedLead")}
               </p>
             </div>
           ) : phase === "confirm" && request ? (
             <div className="grid gap-4">
-              <p className="font-body text-[15px]/[1.6] text-txt-muted text-pretty">
+              <p className="font-body text-[0.9375rem]/[1.6] text-txt-muted text-pretty">
                 {t("confirmLead")}
               </p>
               <div className="border border-solid border-line bg-panel-2 p-4 cut-tag cut-tag-edge">
-                <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-txt-dim">
+                <div className="font-mono text-[0.625rem] uppercase tracking-[0.16em] text-txt-dim">
                   {t("client")}
                 </div>
                 <div className="mt-1 font-medium text-txt">
                   {request.clientLabel ?? t("unknownClient")}
                 </div>
-                <div className="mt-3 font-mono text-[10px] uppercase tracking-[0.16em] text-txt-dim">
+                <div className="mt-3 font-mono text-[0.625rem] uppercase tracking-[0.16em] text-txt-dim">
                   {t("codeLabel")}
                 </div>
-                <div className="mt-1 font-display text-[26px]/[1] font-extrabold tracking-[0.12em]">
+                <div className="mt-1 font-display text-[1.625rem]/[1] font-extrabold tracking-[0.12em]">
                   {request.userCode}
                 </div>
               </div>
@@ -165,7 +165,7 @@ export function AuthorizeAppView() {
                   {t("verifyLead")}
                 </Banner>
               ) : (
-                error && <p className="text-bad text-[14px]">{error}</p>
+                error && <p className="text-bad text-[0.875rem]">{error}</p>
               )}
 
               <div className="grid grid-cols-2 gap-3">
@@ -179,7 +179,7 @@ export function AuthorizeAppView() {
             </div>
           ) : (
             <div className="grid gap-4">
-              <p className="font-body text-[15px]/[1.6] text-txt-muted text-pretty">{t("lead")}</p>
+              <p className="font-body text-[0.9375rem]/[1.6] text-txt-muted text-pretty">{t("lead")}</p>
               <Field label={t("codeLabel")} hint={t("codeHint")} error={error ?? undefined}>
                 <Input
                   value={code}

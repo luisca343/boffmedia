@@ -59,11 +59,11 @@ export function SavedDrawer({ onClose }: { onClose: () => void }) {
               onClick={() => load(s.id)}
               title={s.name}
               className={cn(
-                "cut-tag cut-tag-edge [--cut-line:var(--line)] [--cut-tag:8px] flex min-w-0 flex-1 items-center gap-[10px] border border-solid border-line bg-base px-3 py-[10px] text-left",
+                "cut-tag cut-tag-edge [--cut-line:var(--line)] [--cut-tag:8px] flex min-w-0 flex-1 items-center gap-[0.625rem] border border-solid border-line bg-base px-3 py-[0.625rem] text-left",
                 "transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2",
               )}
             >
-              <span className="min-w-0 flex-1 truncate font-display text-[14px]/[1.1] font-bold uppercase tracking-[0.03em]">{s.name}</span>
+              <span className="min-w-0 flex-1 truncate font-display text-[0.875rem]/[1.1] font-bold uppercase tracking-[0.03em]">{s.name}</span>
               <span className="ml-auto flex flex-none gap-0.5">
                 {(s.pokeList || []).slice(0, 6).map((p, i) => (
                   <PokemonSprite key={i} name={p.name} size={24} />
@@ -74,7 +74,7 @@ export function SavedDrawer({ onClose }: { onClose: () => void }) {
               type="button"
               aria-label={`${ts("delete")} ${s.name}`}
               onClick={() => deleteSaved(s.id)}
-              className="grid w-[26px] place-items-center border border-solid border-transparent text-txt-dim hover:border-[color-mix(in_srgb,var(--bad)_40%,transparent)] hover:text-bad"
+              className="grid w-[1.625rem] place-items-center border border-solid border-transparent text-txt-dim hover:border-[color-mix(in_srgb,var(--bad)_40%,transparent)] hover:text-bad"
             >
               <Icon name="trash" size={14} />
             </button>

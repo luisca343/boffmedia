@@ -76,7 +76,7 @@ export function QuickRandomizeModal({
       onClose={() => !running && onClose()}
       size="sm"
       title={t("title")}
-      aside={<span className="font-mono text-[11px] text-txt-muted truncate">{preset.name}</span>}
+      aside={<span className="font-mono text-[0.6875rem] text-txt-muted truncate">{preset.name}</span>}
       footer={
         <>
           <Button variant="ghost" onClick={onClose} disabled={running}>

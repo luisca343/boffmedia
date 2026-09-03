@@ -27,7 +27,7 @@ export function Badge({ tone = "default", children, className }: BadgeProps) {
   return (
     <span
       className={cn(
-        "inline-block font-mono font-bold text-[10px] leading-none uppercase tracking-[0.12em] py-[6px] px-[10px]",
+        "inline-block font-mono font-bold text-[0.625rem] leading-none uppercase tracking-[0.12em] py-[0.375rem] px-[0.625rem]",
         "cut-frame [--cut:4px] [--cut-w:1px]",
         TONES[tone],
         className,

@@ -8,7 +8,7 @@ export default function Page() {
     <div className="font-['Roboto',_sans-serif] text-base text-[#444] bg-white min-h-screen flex flex-col">
       <TopBar />
       <Header />
-      <div className="flex flex-1 pt-[98px]">
+      <div className="flex flex-1 pt-[6.125rem]">
         <Sidebar isSidebarCollapsed={false} />
         <MainContent isSidebarCollapsed={false} />
       </div>

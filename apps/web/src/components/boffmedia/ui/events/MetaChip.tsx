@@ -23,12 +23,12 @@ export function MetaChip({
   return (
     <div
       style={hue ? ({ ["--ghue" as string]: hue } as React.CSSProperties) : undefined}
-      className={cn("flex items-center gap-[11px] border border-solid border-line bg-panel px-[15px] py-[11px]", className)}
+      className={cn("flex items-center gap-[0.6875rem] border border-solid border-line bg-panel px-[0.9375rem] py-[0.6875rem]", className)}
     >
       <Icon name={icon} size={15} className="flex-none text-[color:var(--ghue,var(--accent))]" />
       <div className="flex min-w-0 flex-col gap-1">
-        <span className="font-mono text-[9.5px]/none font-medium uppercase tracking-[0.13em] text-txt-muted">{label}</span>
-        <span className="font-display text-[14px]/none font-bold uppercase tracking-[0.02em]">{value}</span>
+        <span className="font-mono text-[0.59375rem]/none font-medium uppercase tracking-[0.13em] text-txt-muted">{label}</span>
+        <span className="font-display text-[0.875rem]/none font-bold uppercase tracking-[0.02em]">{value}</span>
       </div>
     </div>
   )

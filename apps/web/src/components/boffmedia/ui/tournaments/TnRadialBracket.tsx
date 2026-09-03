@@ -199,8 +199,8 @@ export function TnRadialBracket({ rounds, championId, onOpen, pinned }: { rounds
       : {}
 
   return (
-    <div className={cn("relative grid justify-items-center border border-solid border-line bg-base-2 p-[clamp(16px,3.4%,34px)]")}>
-      <svg viewBox="0 0 1000 1000" role="img" aria-label={t("radialAriaLabel")} className="block h-auto w-full max-w-[min(820px,82vh)]">
+    <div className={cn("relative grid justify-items-center border border-solid border-line bg-base-2 p-[clamp(1rem,3.4%,2.125rem)]")}>
+      <svg viewBox="0 0 1000 1000" role="img" aria-label={t("radialAriaLabel")} className="block h-auto w-full max-w-[min(51.25rem,82vh)]">
         {/* connectors */}
         <g fill="none">
           {L.paths.map((p, i) => {
@@ -280,20 +280,20 @@ export function TnRadialBracket({ rounds, championId, onOpen, pinned }: { rounds
         </g>
       </svg>
       {champ && champ.c ? (
-        <div className="mt-4 inline-flex items-center gap-2.5 border border-solid border-warn bg-panel px-[14px] py-2 shadow-[var(--shadow)]">
-          <span className="inline-flex text-[22px] leading-none">{champ.c.kind === "team" ? "🏆" : champ.c.flag}</span>
+        <div className="mt-4 inline-flex items-center gap-2.5 border border-solid border-warn bg-panel px-[0.875rem] py-2 shadow-[var(--shadow)]">
+          <span className="inline-flex text-[1.375rem] leading-none">{champ.c.kind === "team" ? "🏆" : champ.c.flag}</span>
           <span className="grid gap-px">
-            <i className="font-mono text-[8.5px]/none font-bold uppercase not-italic tracking-[0.16em] text-warn">{t("champion")}</i>
-            <b className="font-display text-[15px]/none font-bold uppercase tracking-[0.02em]">{champ.c.name}</b>
+            <i className="font-mono text-[0.53125rem]/none font-bold uppercase not-italic tracking-[0.16em] text-warn">{t("champion")}</i>
+            <b className="font-display text-[0.9375rem]/none font-bold uppercase tracking-[0.02em]">{champ.c.name}</b>
           </span>
         </div>
       ) : (
-        <div className="mt-4 inline-flex items-baseline gap-3 border border-solid border-line-2 bg-panel px-[14px] py-2 shadow-[var(--shadow)]">
+        <div className="mt-4 inline-flex items-baseline gap-3 border border-solid border-line-2 bg-panel px-[0.875rem] py-2 shadow-[var(--shadow)]">
           <span className="grid gap-px">
-            <i className="font-mono text-[8.5px]/none font-bold uppercase not-italic tracking-[0.16em] text-accent-bright">{t("live")}</i>
-            <b className="font-display text-[15px]/none font-bold uppercase tracking-[0.02em]">{radialRoundName(t, liveRound.matches.length * 2)}</b>
+            <i className="font-mono text-[0.53125rem]/none font-bold uppercase not-italic tracking-[0.16em] text-accent-bright">{t("live")}</i>
+            <b className="font-display text-[0.9375rem]/none font-bold uppercase tracking-[0.02em]">{radialRoundName(t, liveRound.matches.length * 2)}</b>
           </span>
-          <em className="font-mono text-[11px]/none not-italic text-txt-dim">{t("roundsPlayed", { played, total: rounds.length })}</em>
+          <em className="font-mono text-[0.6875rem]/none not-italic text-txt-dim">{t("roundsPlayed", { played, total: rounds.length })}</em>
         </div>
       )}
     </div>

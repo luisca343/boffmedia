@@ -94,7 +94,7 @@ function StripRow({ tone = "base", children }: { tone?: "base" | "sub"; children
         STRIP_GUTTER,
         tone === "sub"
           ? cn("border-t border-solid py-2", STRIP_LINE, STRIP_SUB_BG)
-          : "min-h-[var(--tool-bar-h,58px)] py-[10px]",
+          : "min-h-[var(--tool-bar-h,3.625rem)] py-[0.625rem]",
       )}
     >
       {children}
@@ -200,12 +200,12 @@ export function ToolSeal({
           : undefined
       }
       className={cn(
-        "cut-tag cut-tag-edge [--cut-tag:8px] grid h-[34px] w-[34px] flex-none place-items-center border border-solid",
+        "cut-tag cut-tag-edge [--cut-tag:8px] grid h-[2.125rem] w-[2.125rem] flex-none place-items-center border border-solid",
         !hue &&
           (solid
             ? "[--cut-line:var(--accent)] border-accent bg-accent text-accent-ink"
             : "[--cut-line:var(--accent-line)] border-accent-line bg-accent-soft text-accent"),
-        label && "font-display text-[15px] font-bold tracking-[0.02em]",
+        label && "font-display text-[0.9375rem] font-bold tracking-[0.02em]",
         className,
       )}
     >
@@ -218,9 +218,9 @@ export function ToolSeal({
 export function ToolTitle({ title, sub, className }: { title: React.ReactNode; sub?: React.ReactNode; className?: string }) {
   return (
     <span className={cn("grid min-w-0", className)}>
-      <b className="truncate font-display text-[17px] font-bold uppercase leading-[1.05] tracking-[0.04em]">{title}</b>
+      <b className="truncate font-display text-[1.0625rem] font-bold uppercase leading-[1.05] tracking-[0.04em]">{title}</b>
       {present(sub) && (
-        <i className="truncate font-mono text-[10px] font-medium not-italic uppercase leading-[1.3] tracking-[0.1em] text-txt-dim">
+        <i className="truncate font-mono text-[0.625rem] font-medium not-italic uppercase leading-[1.3] tracking-[0.1em] text-txt-dim">
           {sub}
         </i>
       )}
@@ -276,11 +276,11 @@ export function ToolHeader({
       )}
     >
       <div className="min-w-0">
-        <h1 className={cn(DISPLAY_VOICE, "mb-3 text-[clamp(32px,4vw,52px)]")}>{title}</h1>
-        {present(sub) && <p className="max-w-[58ch] text-pretty text-[15px] leading-[1.5] text-txt-muted">{sub}</p>}
+        <h1 className={cn(DISPLAY_VOICE, "mb-3 text-[clamp(2rem,4vw,3.25rem)]")}>{title}</h1>
+        {present(sub) && <p className="max-w-[58ch] text-pretty text-[0.9375rem] leading-[1.5] text-txt-muted">{sub}</p>}
       </div>
       {(present(meta) || present(actions)) && (
-        <div className="flex flex-wrap items-center gap-[10px]">
+        <div className="flex flex-wrap items-center gap-[0.625rem]">
           {meta}
           {actions}
         </div>
@@ -302,7 +302,11 @@ const present = (node: React.ReactNode) => node !== null && node !== undefined &
  * breakage waiting for the next height change: the bar moves, the scrollport
  * does not, and nothing errors — it just scrolls wrong.
  */
-export const SECTION_BAR_H = "37px"
+// In rem, like every other chassis height, so the bar grows with the type it
+// contains when the display scale steps up. The host subtracts THIS from
+// 100dvh, so a px value here against a rem bar is a scrollport that overflows
+// the window by the difference.
+export const SECTION_BAR_H = "2.3125rem"
 
 /**
  * "Go up one level", on its own.
@@ -391,7 +395,7 @@ export function SectionBar({
       className={cn(
         bordered
           ? // Explicit height, not padding — see `SECTION_BAR_H`.
-            "flex h-[var(--section-bar-h,37px)] shrink-0 items-center gap-3 border-b border-solid border-line px-4"
+            "flex h-[var(--section-bar-h,2.3125rem)] shrink-0 items-center gap-3 border-b border-solid border-line px-4"
           : "mb-4 flex items-center gap-3",
         className,
       )}
@@ -440,8 +444,8 @@ export function ToolBar({ sticky, filters, note, className, children }: ToolBarP
       )}
     >
       <div className="flex flex-wrap items-center gap-3">{children}</div>
-      {present(filters) && <div className="mt-3 flex flex-wrap gap-[7px]">{filters}</div>}
-      {present(note) && <div className="mt-[10px] font-mono text-[12px] leading-none text-txt-dim">{note}</div>}
+      {present(filters) && <div className="mt-3 flex flex-wrap gap-[0.4375rem]">{filters}</div>}
+      {present(note) && <div className="mt-[0.625rem] font-mono text-[0.75rem] leading-none text-txt-dim">{note}</div>}
     </div>
   )
 }

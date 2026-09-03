@@ -119,7 +119,7 @@ export function TcgpApp({
               return (
                 <button key={tab.key} role="tab" aria-selected={on} type="button" onClick={() => nav(tab.key)}
                   className={cn(
-                    "inline-flex flex-none items-center gap-2 border-b-2 border-solid px-[15px] pb-[13px] pt-[11px] font-display text-[14px] font-bold uppercase leading-none tracking-[0.06em] transition-colors",
+                    "inline-flex flex-none items-center gap-2 border-b-2 border-solid px-[0.9375rem] pb-[0.8125rem] pt-[0.6875rem] font-display text-[0.875rem] font-bold uppercase leading-none tracking-[0.06em] transition-colors",
                     on ? "border-accent text-txt" : "border-transparent text-txt-muted hover:text-txt",
                   )}>
                   <Icon name={tab.icon} size={16} className={on ? "text-accent" : "text-txt-dim"} />
@@ -132,7 +132,7 @@ export function TcgpApp({
       >
         <ToolSeal label="TCG" solid />
         <ToolTitle title="TCG Pocket" sub={<span className="max-[560px]:hidden">{t("app.tagline")}</span>} />
-        <div className="ml-auto w-[min(320px,40vw)] max-[720px]:hidden">
+        <div className="ml-auto w-[min(20rem,40vw)] max-[720px]:hidden">
           <SearchInput
             value={search}
             onChange={setSearch}
@@ -145,7 +145,7 @@ export function TcgpApp({
 
       {/* body */}
       <div>
-        <div className="mx-auto w-full max-w-[1400px] p-[clamp(18px,3vw,34px)]">
+        <div className="mx-auto w-full max-w-[87.5rem] p-[clamp(1.125rem,3vw,2.125rem)]">
           {loading ? (
             <div className="grid min-h-[40vh] place-items-center"><Spinner /></div>
           ) : error || !data ? (

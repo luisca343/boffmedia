@@ -36,8 +36,8 @@ export default function ColeccionPage() {
   if (inventory.isLoading || config.isLoading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-[68px] rounded-2xl" />
-        <Skeleton className="h-[120px] rounded-2xl" />
+        <Skeleton className="h-[4.25rem] rounded-2xl" />
+        <Skeleton className="h-[7.5rem] rounded-2xl" />
         <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
           {Array.from({ length: 12 }, (_, i) => (
             <Skeleton key={i} className="aspect-[3/4] rounded-[10px]" />
@@ -50,7 +50,7 @@ export default function ColeccionPage() {
   if (!uuid) {
     return (
       <Panel tone="deep">
-        <p role="alert" className="font-ar-mono text-[12px] text-ar-amber">
+        <p role="alert" className="font-ar-mono text-[0.75rem] text-ar-amber">
           {t("common.loginRequired")}
         </p>
       </Panel>
@@ -60,7 +60,7 @@ export default function ColeccionPage() {
   if (inventory.isError) {
     return (
       <Panel tone="deep">
-        <p role="alert" className="font-ar-mono text-[12px] text-ar-danger">
+        <p role="alert" className="font-ar-mono text-[0.75rem] text-ar-danger">
           {t("common.errorLoading")}
         </p>
         <Button
@@ -83,11 +83,11 @@ export default function ColeccionPage() {
           <div className="flex flex-wrap items-center gap-3.5">
             <Link
               href="/smartrotom/arcade/loot"
-              className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[11px] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
+              className="ar-lift inline-flex items-center gap-1.5 rounded-lg border border-white/10 px-2.5 py-1.5 font-ar text-[0.6875rem] font-semibold uppercase tracking-[0.08em] text-ar-ink-dim hover:text-ar-ink"
             >
               <Icon.Chevron s={12} dir="left" /> {t("coleccion.backToBoxes")}
             </Link>
-            <span className="ar-chrom font-ar-display text-[15px] text-ar-ink">{t("coleccion.title")}</span>
+            <span className="ar-chrom font-ar-display text-[0.9375rem] text-ar-ink">{t("coleccion.title")}</span>
             <Tag tone="cyan" size="md">
               {t("coleccion.itemsCount", { total, unique: items.length })}
             </Tag>

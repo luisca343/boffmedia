@@ -39,14 +39,14 @@ export function ThreadRow({
       role="button"
       tabIndex={0}
       className={cn(
-        "group grid cursor-pointer grid-cols-[44px_1fr_auto] items-center gap-4 border-b border-solid border-line px-5 py-[15px] transition-[background] duration-[140ms] last:border-b-0 hover:bg-panel-2",
-        compact && "px-[18px] py-3",
+        "group grid cursor-pointer grid-cols-[2.75rem_1fr_auto] items-center gap-4 border-b border-solid border-line px-5 py-[0.9375rem] transition-[background] duration-[140ms] last:border-b-0 hover:bg-panel-2",
+        compact && "px-[1.125rem] py-3",
       )}
     >
       <span
         className={cn(
-          "relative grid h-11 w-11 flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] font-display text-[18px]/none font-extrabold italic text-[hsl(var(--chue)_78%_64%)] cut-seal cut-seal-edge [--cut-line:color-mix(in_srgb,hsl(var(--chue)_70%_50%)_40%,var(--line-2))] [--cut:8px]",
-          compact && "h-[38px] w-[38px] text-[15px]",
+          "relative grid h-11 w-11 flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_40%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] font-display text-[1.125rem]/none font-extrabold italic text-[hsl(var(--chue)_78%_64%)] cut-seal cut-seal-edge [--cut-line:color-mix(in_srgb,hsl(var(--chue)_70%_50%)_40%,var(--line-2))] [--cut:8px]",
+          compact && "h-[2.375rem] w-[2.375rem] text-[0.9375rem]",
         )}
       >
         {thread.author?.avatarUrl ? (
@@ -65,13 +65,13 @@ export function ThreadRow({
         )}
       </span>
       <div className="min-w-0">
-        <div className="flex flex-wrap items-center gap-[9px]">
+        <div className="flex flex-wrap items-center gap-[0.5625rem]">
           {thread.pinned && <Icon name="bookmark" size={13} className="text-accent" />}
           {thread.locked && <Icon name="lock" size={13} className="text-txt-dim" />}
-          <h3 className="font-display text-[17px]/[1.2] font-bold uppercase not-italic tracking-[0.01em] group-hover:text-accent-bright">{thread.title}</h3>
+          <h3 className="font-display text-[1.0625rem]/[1.2] font-bold uppercase not-italic tracking-[0.01em] group-hover:text-accent-bright">{thread.title}</h3>
           {thread.solved && <Badge tone="ok">{t("solved")}</Badge>}
         </div>
-        <div className="mt-1.5 flex flex-wrap items-center gap-3 font-mono text-[10px]/none font-medium uppercase tracking-[0.06em] text-txt-muted">
+        <div className="mt-1.5 flex flex-wrap items-center gap-3 font-mono text-[0.625rem]/none font-medium uppercase tracking-[0.06em] text-txt-muted">
           <span>{thread.author ? thread.author.name : t("anonymous")}</span>
           {showCat && thread.catName && (
             <>
@@ -92,14 +92,14 @@ export function ThreadRow({
           )}
         </div>
       </div>
-      <div className={cn("flex flex-none items-center gap-[18px]", compact && "gap-3")}>
+      <div className={cn("flex flex-none items-center gap-[1.125rem]", compact && "gap-3")}>
         <span className="text-center">
-          <b className={cn("block font-mono text-[16px]/none font-bold", hot ? "text-accent" : "text-txt")}>{thread.replies}</b>
-          <span className="mt-1 block font-mono text-[9px]/none font-medium uppercase tracking-[0.08em] text-txt-dim">{t("replies")}</span>
+          <b className={cn("block font-mono text-[1rem]/none font-bold", hot ? "text-accent" : "text-txt")}>{thread.replies}</b>
+          <span className="mt-1 block font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.08em] text-txt-dim">{t("replies")}</span>
         </span>
         <span className="text-center">
-          <b className="block font-mono text-[16px]/none font-bold text-txt">{fmtNum(thread.views)}</b>
-          <span className="mt-1 block font-mono text-[9px]/none font-medium uppercase tracking-[0.08em] text-txt-dim">{t("views")}</span>
+          <b className="block font-mono text-[1rem]/none font-bold text-txt">{fmtNum(thread.views)}</b>
+          <span className="mt-1 block font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.08em] text-txt-dim">{t("views")}</span>
         </span>
       </div>
     </div>
@@ -118,30 +118,30 @@ export function CategoryTile({ cat, onOpen, now }: { cat: ForumCategoryLike; onO
       }}
       role="button"
       tabIndex={0}
-      className="grid cursor-pointer grid-cols-[56px_1fr_auto] items-center gap-[18px] border border-solid border-line border-l-4 border-l-[hsl(var(--chue)_72%_55%)] bg-panel px-[22px] py-[18px] text-left transition-[border-color,background] duration-[140ms] cut-corner cut-corner-edge hover:[--cut-line:var(--accent-line)] hover:border-accent-line hover:border-l-accent hover:bg-panel-2"
+      className="grid cursor-pointer grid-cols-[3.5rem_1fr_auto] items-center gap-[1.125rem] border border-solid border-line border-l-4 border-l-[hsl(var(--chue)_72%_55%)] bg-panel px-[1.375rem] py-[1.125rem] text-left transition-[border-color,background] duration-[140ms] cut-corner cut-corner-edge hover:[--cut-line:var(--accent-line)] hover:border-accent-line hover:border-l-accent hover:bg-panel-2"
     >
       <span className="grid h-14 w-14 flex-none place-items-center border border-solid border-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_42%,var(--line-2))] bg-[color-mix(in_srgb,hsl(var(--chue)_70%_50%)_14%,var(--panel-2))] text-[hsl(var(--chue)_78%_64%)] cut-seal cut-seal-edge [--cut-line:color-mix(in_srgb,hsl(var(--chue)_70%_50%)_42%,var(--line-2))] [--cut:10px]">
         <Icon name={cat.icon} size={24} />
       </span>
       <div>
-        <h3 className="flex items-center gap-2.5 font-display text-[20px]/none font-bold uppercase not-italic">
+        <h3 className="flex items-center gap-2.5 font-display text-[1.25rem]/none font-bold uppercase not-italic">
           {cat.name}
           {cat.locked && <Icon name="lock" size={14} className="text-txt-dim" />}
         </h3>
-        <p className="mt-[7px] text-[14px]/[1.5] text-txt-muted">{cat.description}</p>
+        <p className="mt-[0.4375rem] text-[0.875rem]/[1.5] text-txt-muted">{cat.description}</p>
       </div>
-      <div className="flex flex-none items-center gap-[22px]">
+      <div className="flex flex-none items-center gap-[1.375rem]">
         <span className="text-center">
-          <b className="block font-display text-[24px]/none font-extrabold italic text-txt">{cat.threads}</b>
-          <span className="mt-[5px] block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{t("threads")}</span>
+          <b className="block font-display text-[1.5rem]/none font-extrabold italic text-txt">{cat.threads}</b>
+          <span className="mt-[0.3125rem] block font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{t("threads")}</span>
         </span>
         <span className="text-center">
-          <b className="block font-display text-[24px]/none font-extrabold italic text-txt">{fmtNum(cat.posts)}</b>
-          <span className="mt-[5px] block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{t("posts")}</span>
+          <b className="block font-display text-[1.5rem]/none font-extrabold italic text-txt">{fmtNum(cat.posts)}</b>
+          <span className="mt-[0.3125rem] block font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{t("posts")}</span>
         </span>
         {cat.lastAuthor && cat.lastAt && (
-          <div className="min-w-[150px] border-l border-solid border-line pl-[22px]">
-            <span className="mb-2 block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-dim">{t("lastActivity")}</span>
+          <div className="min-w-[9.375rem] border-l border-solid border-line pl-[1.375rem]">
+            <span className="mb-2 block font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.1em] text-txt-dim">{t("lastActivity")}</span>
             <Byline author={cat.lastAuthor} when={cat.lastAt} size={24} link={false} now={now} />
           </div>
         )}
@@ -175,9 +175,9 @@ export function CmMemberRow({
       }}
       role="button"
       tabIndex={0}
-      className="group flex cursor-pointer items-center gap-3 border-b border-solid border-line px-1 py-[9px] last:border-b-0"
+      className="group flex cursor-pointer items-center gap-3 border-b border-solid border-line px-1 py-[0.5625rem] last:border-b-0"
     >
-      {rank != null && <span className="w-[22px] flex-none font-display text-[16px]/none font-extrabold italic text-accent">{rank}</span>}
+      {rank != null && <span className="w-[1.375rem] flex-none font-display text-[1rem]/none font-extrabold italic text-accent">{rank}</span>}
       <span className="relative flex-none">
         <CmAvatar author={member} size={34} />
         {member.status && (
@@ -185,10 +185,10 @@ export function CmMemberRow({
         )}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block truncate font-display text-[13px]/[1.1] font-bold uppercase not-italic tracking-[0.02em] group-hover:text-accent-bright">{member.name}</span>
-        <span className="mt-[3px] block font-mono text-[9px]/none font-medium uppercase tracking-[0.06em] text-txt-muted">{member.role}</span>
+        <span className="block truncate font-display text-[0.8125rem]/[1.1] font-bold uppercase not-italic tracking-[0.02em] group-hover:text-accent-bright">{member.name}</span>
+        <span className="mt-[3px] block font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.06em] text-txt-muted">{member.role}</span>
       </span>
-      {count != null && <span className="flex-none font-mono text-[13px]/none font-semibold text-accent">{count}</span>}
+      {count != null && <span className="flex-none font-mono text-[0.8125rem]/none font-semibold text-accent">{count}</span>}
     </div>
   )
 }
@@ -196,7 +196,7 @@ export function CmMemberRow({
 function WidgetHead({ icon, title, right }: { icon: "users" | "chart"; title: string; right?: React.ReactNode }) {
   return (
     <div className="mb-1 flex items-center justify-between gap-2.5">
-      <h4 className="flex items-center gap-[9px] font-display text-[14px]/none font-bold uppercase not-italic tracking-[0.03em]">
+      <h4 className="flex items-center gap-[0.5625rem] font-display text-[0.875rem]/none font-bold uppercase not-italic tracking-[0.03em]">
         <Icon name={icon} size={16} className="text-accent" />
         {title}
       </h4>
@@ -209,7 +209,7 @@ export function OnlineList({ members, onOpen, now }: { members: ForumMember[]; o
   const t = useTranslations("common.forum")
   return (
     <Panel>
-      <WidgetHead icon="users" title={t("onlineNow")} right={<span className="font-mono text-[11px] font-medium uppercase tracking-[0.14em] text-ok">{members.length}</span>} />
+      <WidgetHead icon="users" title={t("onlineNow")} right={<span className="font-mono text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-ok">{members.length}</span>} />
       <div className="grid">
         {members.map((m) => (
           <CmMemberRow key={m.handle} member={m} onOpen={onOpen} now={now} />
@@ -232,13 +232,13 @@ export function ForumStats({ stats }: { stats: ForumStatsData }) {
       <WidgetHead icon="chart" title={t("stats")} />
       <div className="grid grid-cols-2 gap-px border border-solid border-line bg-line">
         {cells.map(([val, label]) => (
-          <div key={label} className="bg-panel p-[14px] text-center">
-            <b className="block font-display text-[26px]/none font-extrabold italic text-accent">{val}</b>
-            <span className="mt-1.5 block font-mono text-[9px]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{label}</span>
+          <div key={label} className="bg-panel p-[0.875rem] text-center">
+            <b className="block font-display text-[1.625rem]/none font-extrabold italic text-accent">{val}</b>
+            <span className="mt-1.5 block font-mono text-[0.5625rem]/none font-medium uppercase tracking-[0.1em] text-txt-muted">{label}</span>
           </div>
         ))}
       </div>
-      <p className="mt-[14px] text-center font-mono text-[11px]/[1.4] font-medium uppercase tracking-[0.04em] text-txt-muted">
+      <p className="mt-[0.875rem] text-center font-mono text-[0.6875rem]/[1.4] font-medium uppercase tracking-[0.04em] text-txt-muted">
         {t("newMember")} <b className="text-accent">{stats.newest}</b>
       </p>
     </Panel>

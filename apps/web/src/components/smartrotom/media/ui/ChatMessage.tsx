@@ -24,12 +24,12 @@ export function ChatMessage({ m }: { m: ChatMessageData }) {
   return (
     <div
       className={cn(
-        "my-0.5 -mx-1.5 break-words rounded-md px-1.5 py-1 text-[13px] leading-[1.45] hover:bg-mw-800 animate-mw-fade-in",
+        "my-0.5 -mx-1.5 break-words rounded-md px-1.5 py-1 text-[0.8125rem] leading-[1.45] hover:bg-mw-800 animate-mw-fade-in",
         m.you && "bg-mw-accent/[.14]",
       )}
     >
       {m.mod && (
-        <span className="mr-1 inline-flex items-center rounded-[3px] bg-mw-highlight px-1.5 py-px align-middle text-[9px] font-extrabold tracking-[0.05em] text-black">
+        <span className="mr-1 inline-flex items-center rounded-[3px] bg-mw-highlight px-1.5 py-px align-middle text-[0.5625rem] font-extrabold tracking-[0.05em] text-black">
           MOD
         </span>
       )}

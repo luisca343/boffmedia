@@ -85,7 +85,7 @@ export function GenerateDialog({
             {t("confirmEntryCut", { entered: preview.entered.length, dropped })}
           </AvAlert>
         ) : (
-          <p className="m-0 font-mono text-[11px] text-txt-dim">{t("loadingPreview")}</p>
+          <p className="m-0 font-mono text-[0.6875rem] text-txt-dim">{t("loadingPreview")}</p>
         )}
         {pre && (
           <Field label={t("seeding")}>
@@ -101,7 +101,7 @@ export function GenerateDialog({
           </Field>
         )}
         {pre && (
-          <label className="inline-flex cursor-pointer items-center gap-2 font-mono text-[11px] text-txt-muted">
+          <label className="inline-flex cursor-pointer items-center gap-2 font-mono text-[0.6875rem] text-txt-muted">
             <input type="checkbox" checked={onlyCheckedIn} onChange={(e) => setOnlyCheckedIn(e.target.checked)} />
             {t("onlyCheckedIn")}
           </label>

@@ -38,26 +38,26 @@ export function BattleCard({ data, author }: { data: RookerBattle; author: Rooke
   return (
     <div className={cn("overflow-hidden rounded-rk border bg-gradient-to-b to-rk-card", edge, wash)}>
       <div className="flex items-center justify-between border-b border-rk-line px-3.5 py-2.5">
-        <span className={cn("inline-flex items-center gap-1.5 text-[15px] font-extrabold tracking-[.02em]", tone)}>
+        <span className={cn("inline-flex items-center gap-1.5 text-[0.9375rem] font-extrabold tracking-[.02em]", tone)}>
           <Icon name="sword" size={16} />
           {!decided ? t("card.battle.undecided") : won ? t("card.battle.victory") : t("card.battle.defeat")}
         </span>
-        <span className="text-[11.5px] font-semibold text-rk-fg-muted">{relTime(data.createdAt)}</span>
+        <span className="text-[0.71875rem] font-semibold text-rk-fg-muted">{relTime(data.createdAt)}</span>
       </div>
 
       <div className="flex items-center gap-3 px-4 py-3.5">
         <div className="flex flex-1 flex-col items-center gap-1.5">
           <Avatar user={{ uuid: mine, username: author.username, partnerPokemonId: author.partnerPokemonId }} size={42} />
-          <span className="max-w-full truncate text-[12px] font-bold text-rk-fg">
+          <span className="max-w-full truncate text-[0.75rem] font-bold text-rk-fg">
             {author.displayName || author.username}
           </span>
         </div>
 
-        <span className="text-[13px] font-extrabold uppercase tracking-widest text-rk-fg-subtle">{t("card.battle.vs")}</span>
+        <span className="text-[0.8125rem] font-extrabold uppercase tracking-widest text-rk-fg-subtle">{t("card.battle.vs")}</span>
 
         <div className="flex flex-1 flex-col items-center gap-1.5">
           <Avatar user={{ uuid: theirs, username: rival, partnerPokemonId: null }} size={42} />
-          <span className="max-w-full truncate text-[12px] font-bold text-rk-fg">{rival}</span>
+          <span className="max-w-full truncate text-[0.75rem] font-bold text-rk-fg">{rival}</span>
         </div>
       </div>
 
@@ -66,7 +66,7 @@ export function BattleCard({ data, author }: { data: RookerBattle; author: Rooke
           href={`/smartrotom/liga/camaralucha/ver/${data.replayId}`}
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-rk-pill border bg-rk-fg/5 px-3.5 py-1.5 text-[12.5px] font-bold transition-colors hover:bg-rk-hover",
+            "inline-flex items-center gap-1.5 rounded-rk-pill border bg-rk-fg/5 px-3.5 py-1.5 text-[0.78125rem] font-bold transition-colors hover:bg-rk-hover",
             decided && won ? "border-rk-accent/40 text-rk-accent" : "border-rk-line-strong text-rk-fg",
           )}
         >

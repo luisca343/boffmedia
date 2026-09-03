@@ -21,7 +21,7 @@ export function StatsRow() {
   const semanaActual = tesoreria.data?.series.at(-1)?.ingreso
 
   return (
-    <div className="mb-[18px] grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
+    <div className="mb-[1.125rem] grid grid-cols-[repeat(auto-fit,minmax(9.375rem,1fr))] gap-3">
       <Stat
         label={t("stats.poblacion")}
         value={censo.isLoading ? "—" : (censo.data?.total ?? 0)}

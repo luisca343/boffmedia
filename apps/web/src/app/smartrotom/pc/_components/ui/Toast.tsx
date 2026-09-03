@@ -24,7 +24,7 @@ export function ToastHost() {
       {toasts.map((t) => (
         <div
           key={t.id}
-          className="pc-glass flex animate-pc-pop items-center gap-2.5 rounded-pc-pill border-pc-line-strong py-2.5 pl-[13px] pr-4 font-pc text-[13.5px] font-semibold text-pc-fg shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)] motion-reduce:animate-none"
+          className="pc-glass flex animate-pc-pop items-center gap-2.5 rounded-pc-pill border-pc-line-strong py-2.5 pl-[0.8125rem] pr-4 font-pc text-[0.84375rem] font-semibold text-pc-fg shadow-[0_18px_40px_-18px_rgb(0_0_0_/_.7)] motion-reduce:animate-none"
         >
           <span className={`h-2 w-2 flex-none rounded-pc-pill ${DOT[t.kind]}`} />
           {t.msg}

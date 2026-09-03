@@ -174,7 +174,7 @@ export function DesktopReleasesAdmin() {
         }
       />
 
-      <AvAlert tone="info" title={t("securityTitle")} className="mb-[18px]">
+      <AvAlert tone="info" title={t("securityTitle")} className="mb-[1.125rem]">
         {t("securityLead")}
       </AvAlert>
 
@@ -184,7 +184,7 @@ export function DesktopReleasesAdmin() {
         <AvKpi label={t("kpiDrafts")} value={rows.length - publishedCount} icon="bookmark" />
       </AvKpis>
 
-      <div className="grid gap-4 xl:grid-cols-[minmax(320px,0.75fr)_minmax(0,1.5fr)]">
+      <div className="grid gap-4 xl:grid-cols-[minmax(20rem,0.75fr)_minmax(0,1.5fr)]">
         <AvPanel title={t("uploadTitle")} icon="upload">
           <form className="grid gap-4" onSubmit={(event) => void upload(event)}>
             <Field label={t("version")} hint={t("versionHint")}>
@@ -211,7 +211,7 @@ export function DesktopReleasesAdmin() {
                 accept=".msi,.exe,.zip,.tar.gz,.AppImage.tar.gz,.app.tar.gz"
                 disabled={uploading}
                 onChange={(event) => setArtifact(event.target.files?.[0] ?? null)}
-                className="block w-full cursor-pointer border border-line-2 bg-base px-3 py-2 text-[13px] text-txt file:mr-3 file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:font-mono file:text-[10px] file:font-bold file:uppercase file:text-accent"
+                className="block w-full cursor-pointer border border-line-2 bg-base px-3 py-2 text-[0.8125rem] text-txt file:mr-3 file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:font-mono file:text-[0.625rem] file:font-bold file:uppercase file:text-accent"
               />
             </Field>
 
@@ -221,7 +221,7 @@ export function DesktopReleasesAdmin() {
                 accept=".sig,.txt"
                 disabled={uploading}
                 onChange={(event) => setSignatureFile(event.target.files?.[0] ?? null)}
-                className="block w-full cursor-pointer border border-line-2 bg-base px-3 py-2 text-[13px] text-txt file:mr-3 file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:font-mono file:text-[10px] file:font-bold file:uppercase file:text-accent"
+                className="block w-full cursor-pointer border border-line-2 bg-base px-3 py-2 text-[0.8125rem] text-txt file:mr-3 file:border-0 file:bg-accent-soft file:px-3 file:py-1.5 file:font-mono file:text-[0.625rem] file:font-bold file:uppercase file:text-accent"
               />
             </Field>
 
@@ -230,7 +230,7 @@ export function DesktopReleasesAdmin() {
             </Field>
 
             <div className="flex items-center justify-between gap-3 border-t border-line pt-4">
-              <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">
+              <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">
                 {t("draftNotice")}
               </span>
               <Button type="submit" variant="pri" icon="upload" loading={uploading}>
@@ -246,7 +246,7 @@ export function DesktopReleasesAdmin() {
               {error}
             </AvAlert>
           ) : loading ? (
-            <div className="flex min-h-[240px] items-center justify-center">
+            <div className="flex min-h-[15rem] items-center justify-center">
               <Spinner size={30} className="text-accent" />
             </div>
           ) : rows.length === 0 ? (

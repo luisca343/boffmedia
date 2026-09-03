@@ -67,27 +67,27 @@ export function ManualEnvDialog({
         aria-label={t("manualEnv.title")}
         tabIndex={-1}
         onClick={(e) => e.stopPropagation()}
-        className="w-full max-w-[420px] grid gap-4 p-5 bg-panel border border-line outline-none"
+        className="w-full max-w-[26.25rem] grid gap-4 p-5 bg-panel border border-line outline-none"
       >
         <div className="flex items-start gap-2.5">
           <Icon name="info" size={18} className="shrink-0 mt-px text-accent-bright" />
           <div className="grid gap-1.5">
-            <h2 className="m-0 font-display font-bold text-[15px] text-txt">{t("manualEnv.title")}</h2>
-            <p className="m-0 text-[12.5px] leading-[1.5] text-txt-muted">{t("manualEnv.body")}</p>
-            <p className="m-0 font-mono text-[11px] text-txt-dim">
+            <h2 className="m-0 font-display font-bold text-[0.9375rem] text-txt">{t("manualEnv.title")}</h2>
+            <p className="m-0 text-[0.78125rem] leading-[1.5] text-txt-muted">{t("manualEnv.body")}</p>
+            <p className="m-0 font-mono text-[0.6875rem] text-txt-dim">
               {t("manualEnv.jarsFound", { count: jarCount })}
             </p>
           </div>
         </div>
 
         <label className="grid gap-1">
-          <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-txt-dim">
+          <span className="font-mono text-[0.625rem] tracking-[0.12em] uppercase text-txt-dim">
             {t("manualEnv.version")}
           </span>
           <select
             value={version}
             onChange={(e) => setVersion(e.target.value)}
-            className="w-full p-[9px] bg-base border border-solid border-line-2 font-mono text-[12.5px] text-txt cursor-pointer hover:border-accent-line transition-[border-color] duration-[140ms]"
+            className="w-full p-[0.5625rem] bg-base border border-solid border-line-2 font-mono text-[0.78125rem] text-txt cursor-pointer hover:border-accent-line transition-[border-color] duration-[140ms]"
           >
             {BUNDLED_VERSIONS.map((v) => (
               <option key={v} value={v}>
@@ -98,7 +98,7 @@ export function ManualEnvDialog({
         </label>
 
         <div className="grid gap-1">
-          <span className="font-mono text-[10px] tracking-[0.12em] uppercase text-txt-dim">
+          <span className="font-mono text-[0.625rem] tracking-[0.12em] uppercase text-txt-dim">
             {t("manualEnv.loader")}
           </span>
           <div className="inline-flex gap-0.5 p-0.5 border border-line bg-base">
@@ -109,7 +109,7 @@ export function ManualEnvDialog({
                 aria-pressed={loader === l}
                 onClick={() => setLoader(l)}
                 className={cn(
-                  "flex-1 py-1 px-[7px] font-mono text-[10.5px] cursor-pointer transition-colors duration-[140ms]",
+                  "flex-1 py-1 px-[0.4375rem] font-mono text-[0.65625rem] cursor-pointer transition-colors duration-[140ms]",
                   loader === l
                     ? "bg-panel-2 text-txt shadow-[inset_0_0_0_1px_var(--line-2)]"
                     : "text-txt-dim hover:text-txt-muted",

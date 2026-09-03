@@ -49,7 +49,7 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
           </div>
         </Sample>
         <Sample title="Área de texto" code="<Field> + <Textarea>" col note={<>Entrada multilínea con el mismo chasis; crece en vertical con <code>resize</code>.</>}>
-          <div className="w-full max-w-[440px]">
+          <div className="w-full max-w-[27.5rem]">
             <Field label="Notas del equipo" hint="Visible solo para ti.">
               <Textarea rows={3} placeholder="Anota leads, coberturas, ideas de EV…" />
             </Field>
@@ -58,36 +58,36 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
         <Sample title="Matriz de estados" code="Input / Select / Textarea — todos los estados" col note={<>Los chasis nativos textuales pintan su trazo inferior como capa de fondo (limitación del navegador: los elementos reemplazados no tienen <code>::after</code>). Si necesitas un <code>background-image</code> personalizado (p.ej. degradado, patrón), úsalo a través de <code>--ctl-bg</code> / <code>--ctl-bg-size</code> / <code>--ctl-bg-pos</code> en lugar de <code>background-image</code> directo; un <code>background-image</code> directo sustituye la capa del trazo y el corte queda sin borde.</>}>
           <div className="w-full space-y-6">
             <div className="grid gap-4">
-              <div className="text-[12px] font-mono font-semibold uppercase tracking-[0.1em] text-txt-dim mb-2">Input</div>
+              <div className="text-[0.75rem] font-mono font-semibold uppercase tracking-[0.1em] text-txt-dim mb-2">Input</div>
               <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Defecto (vacío)</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Defecto (vacío)</span>
                   <Input placeholder="Placeholder…" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Con valor</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Con valor</span>
                   <Input defaultValue="Incineroar" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Solo placeholder</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Solo placeholder</span>
                   <Input placeholder="Buscar juego…" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Deshabilitado</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Deshabilitado</span>
                   <Input disabled placeholder="No disponible…" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Compacto (sm)</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Compacto (sm)</span>
                   <Input size="sm" placeholder="Seed…" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Dentro de Field + hint</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Dentro de Field + hint</span>
                   <Field label="Código" hint="Por ejemplo: ROT-2026">
                     <Input placeholder="Código…" />
                   </Field>
                 </div>
                 <div className="sm:col-span-2 lg:col-span-1">
-                  <span className="text-[11px] text-txt-muted block mb-2">Field + error</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Field + error</span>
                   <Field label="Email" error="Ese email ya existe.">
                     <Input defaultValue="user@" placeholder="tu@email…" />
                   </Field>
@@ -95,35 +95,35 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
               </div>
             </div>
             <div className="grid gap-4">
-              <div className="text-[12px] font-mono font-semibold uppercase tracking-[0.1em] text-txt-dim mb-2">Select</div>
+              <div className="text-[0.75rem] font-mono font-semibold uppercase tracking-[0.1em] text-txt-dim mb-2">Select</div>
               <div className="grid gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Defecto</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Defecto</span>
                   <Select value="vgc" onChange={() => {}} ariaLabel="Juego" options={[{ value: "vgc", label: "Pokémon VGC" }, { value: "mc", label: "Minecraft" }]} />
                 </div>
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Deshabilitado</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Deshabilitado</span>
                   <Select disabled value="vgc" onChange={() => {}} ariaLabel="Juego" options={[{ value: "vgc", label: "Pokémon VGC" }]} />
                 </div>
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Compacto (sm)</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Compacto (sm)</span>
                   <Select size="sm" value="es" onChange={() => {}} ariaLabel="País" options={[{ value: "es", label: "ES" }, { value: "fr", label: "FR" }]} />
                 </div>
                 <div className="sm:col-span-2 lg:col-span-1">
-                  <span className="text-[11px] text-txt-muted block mb-2">Field + error</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Field + error</span>
                   <Select label="Regulación" error="Selecciona una regulación válida." value="" onChange={() => {}} options={[{ value: "h", label: "H" }, { value: "g", label: "G" }]} />
                 </div>
               </div>
             </div>
             <div className="grid gap-4">
-              <div className="text-[12px] font-mono font-semibold uppercase tracking-[0.1em] text-txt-dim mb-2">Textarea</div>
+              <div className="text-[0.75rem] font-mono font-semibold uppercase tracking-[0.1em] text-txt-dim mb-2">Textarea</div>
               <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Defecto</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Defecto</span>
                   <Textarea rows={2} placeholder="Escribe una nota…" />
                 </div>
                 <div>
-                  <span className="text-[11px] text-txt-muted block mb-2">Deshabilitado</span>
+                  <span className="text-[0.6875rem] text-txt-muted block mb-2">Deshabilitado</span>
                   <Textarea disabled rows={2} placeholder="No editable…" />
                 </div>
               </div>
@@ -135,7 +135,7 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
           <Toggle on={tglB} onChange={setTglB} label="Modo retransmisión" />
         </Sample>
         <Sample title="Búsqueda" code="<SearchInput value onChange size>" col note={<>Chasis con botón de limpiar cuando hay texto; variante <code>sm</code> para barras densas.</>}>
-          <div className="grid gap-3 w-full max-w-[400px]">
+          <div className="grid gap-3 w-full max-w-[25rem]">
             <SearchInput value={sq} onChange={setSq} placeholder="Buscar jugador, evento…" />
             <SearchInput value={sq} onChange={setSq} size="sm" placeholder="Variante sm" />
           </div>
@@ -146,7 +146,7 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
           col
           note={<>Contenedor plegable para ajustes avanzados y ayuda contextual; oculta el detalle hasta que se necesita. Admite <code>icon</code>, subtítulo y <code>badge</code>.</>}
         >
-          <div className="grid gap-3 w-full max-w-[440px]">
+          <div className="grid gap-3 w-full max-w-[27.5rem]">
             <Disclosure title="Ajustes avanzados" icon="sliders" sub="EVs, IVs y naturaleza" badge="Opcional">
               <div className="grid gap-3 pt-3">
                 <Field label="Naturaleza">
@@ -164,7 +164,7 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
               </div>
             </Disclosure>
             <Disclosure title="Cómo se calcula" icon="info">
-              <p className="pt-3 text-txt-muted text-[13px] leading-[1.6]">
+              <p className="pt-3 text-txt-muted text-[0.8125rem] leading-[1.6]">
                 El rango sale de aplicar la fórmula de daño con los modificadores activos: naturaleza, objeto, campo y clima.
               </p>
             </Disclosure>
@@ -197,7 +197,7 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
             </>
           }
         >
-          <div className="w-full max-w-[440px]">
+          <div className="w-full max-w-[27.5rem]">
             <RadioGroup
               value={rad}
               onChange={setRad}
@@ -211,7 +211,7 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
           </div>
         </Sample>
         <Sample title="Slider" code="<Slider value min max unit onChange>" col note={<>El valor va en mono naranja; aquí alimenta al <code>Progress</code> de abajo.</>}>
-          <div className="grid gap-[18px] w-full max-w-[440px]">
+          <div className="grid gap-[1.125rem] w-full max-w-[27.5rem]">
             <Slider label="Volumen de la señal" value={rng} onChange={setRng} unit="%" />
             <Progress value={rng} />
           </div>
@@ -229,7 +229,7 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
             </>
           }
         >
-          <div className="grid gap-4 w-full max-w-[520px]">
+          <div className="grid gap-4 w-full max-w-[32.5rem]">
             <OptionGroup
               value={opt}
               onChange={(v) => setOpt(v as string)}

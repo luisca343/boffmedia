@@ -44,9 +44,9 @@ export function SignIn() {
 
   return (
     <div className="grid h-full place-items-center px-8 py-10">
-      <div className="w-full max-w-[520px]">
+      <div className="w-full max-w-[32.5rem]">
         <div className="mb-6 text-center">
-          <h1 className={`${DISPLAY_VOICE} text-[34px] text-txt`}>
+          <h1 className={`${DISPLAY_VOICE} text-[2.125rem] text-txt`}>
             {t("title")}
           </h1>
           <p className="mt-3 text-sm text-txt-muted">
@@ -105,7 +105,7 @@ export function SignIn() {
               <Button variant="pri" size="lg" icon="external" onClick={() => void signIn()}>
                 {t("button")}
               </Button>
-              <p className="max-w-[380px] text-center text-xs text-txt-dim">
+              <p className="max-w-[23.75rem] text-center text-xs text-txt-dim">
                 {t("securityNote")}
               </p>
             </div>
@@ -124,7 +124,7 @@ export function SignIn() {
           <Panel title={t("complete")} aside={<Badge tone="warn">{t("waiting")}</Badge>}>
             <ol className="flex flex-col gap-4">
               <li className="flex gap-3">
-                <span className="cut-seal grid h-6 w-6 shrink-0 place-items-center bg-accent text-[12px] font-bold text-accent-ink [--cut:5px]">
+                <span className="cut-seal grid h-6 w-6 shrink-0 place-items-center bg-accent text-[0.75rem] font-bold text-accent-ink [--cut:5px]">
                   1
                 </span>
                 <div className="min-w-0 flex-1">
@@ -132,7 +132,7 @@ export function SignIn() {
                     {t("copyCodeLabel")}
                   </p>
                   {/* Selectable, so it works even if the clipboard is denied. */}
-                  <div className="cut cut-edge-slant [--cut-w:2px] [--cut-line:var(--accent-line)] select-text border-2 border-solid border-accent-line bg-base-deep px-5 py-3 text-center font-display text-[30px]/none font-bold tracking-[0.24em] text-accent-bright">
+                  <div className="cut cut-edge-slant [--cut-w:2px] [--cut-line:var(--accent-line)] select-text border-2 border-solid border-accent-line bg-base-deep px-5 py-3 text-center font-display text-[1.875rem]/none font-bold tracking-[0.24em] text-accent-bright">
                     {deviceCode.userCode}
                   </div>
                   <div className="mt-2 flex justify-center">
@@ -141,7 +141,7 @@ export function SignIn() {
                 </div>
               </li>
               <li className="flex gap-3">
-                <span className="cut-seal grid h-6 w-6 shrink-0 place-items-center bg-accent text-[12px] font-bold text-accent-ink [--cut:5px]">
+                <span className="cut-seal grid h-6 w-6 shrink-0 place-items-center bg-accent text-[0.75rem] font-bold text-accent-ink [--cut:5px]">
                   2
                 </span>
                 <div className="min-w-0 flex-1">
@@ -170,7 +170,7 @@ export function SignIn() {
                     </Button>
                     <CopyButton value={deviceCode.verificationUri} label={t("linkButton")} />
                   </div>
-                  <p className="mt-2 select-text font-mono text-[11px] text-txt-dim">
+                  <p className="mt-2 select-text font-mono text-[0.6875rem] text-txt-dim">
                     {deviceCode.verificationUri}
                   </p>
                 </div>

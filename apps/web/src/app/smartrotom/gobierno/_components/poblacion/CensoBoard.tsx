@@ -62,7 +62,7 @@ export function CensoBoard() {
       />
 
       <div className="mb-4 flex flex-wrap items-center gap-2.5">
-        <div className="w-full max-w-[260px]">
+        <div className="w-full max-w-[16.25rem]">
           <SearchBar value={search} onChange={setSearch} placeholder={t("poblacion.searchPagePlaceholder")} />
         </div>
         <FilterTabs
@@ -79,9 +79,9 @@ export function CensoBoard() {
       </div>
 
       {isLoading ? (
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(248px,1fr))]">
+        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(15.5rem,1fr))]">
           {Array.from({ length: 8 }, (_, i) => (
-            <Skeleton key={i} className="h-[132px]" />
+            <Skeleton key={i} className="h-[8.25rem]" />
           ))}
         </div>
       ) : rows.length === 0 ? (
@@ -92,7 +92,7 @@ export function CensoBoard() {
         />
       ) : (
         <>
-          <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(248px,1fr))]">
+          <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(15.5rem,1fr))]">
             {rows.map((c) => (
               <CiudadanoCard key={c.uuid} citizen={c} />
             ))}

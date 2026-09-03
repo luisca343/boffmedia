@@ -82,15 +82,22 @@ export const BSIM_SEG_FOCUS =
  * only decide how wide the column inside it is allowed to grow.
  */
 /** Single-column screens: lobby, replays, PvP, Showdown, the replay loader. */
-export const BSIM_PAGE_NARROW = "mx-auto w-full max-w-[820px]"
-/** Grid screens: the teams list, the hub's two-column layout above 1200. */
-export const BSIM_PAGE = "mx-auto w-full max-w-[1240px]"
+export const BSIM_PAGE_NARROW = "mx-auto w-full max-w-[51.25rem] min-[2240px]:max-w-[65rem]"
+/**
+ * Grid screens: the teams list, the hub's two-column layout above 1200.
+ *
+ * This one follows `--wrap-max-wide` rather than a flat cap. A grid is exactly
+ * the case where a large display has something to offer — more columns, not a
+ * longer line — and 1240px of team cards centred in a 2560px window was the
+ * clearest single instance of the underscaling complaint.
+ */
+export const BSIM_PAGE = "mx-auto w-full max-w-[var(--wrap-max-wide,77.5rem)]"
 /**
  * Empty / error blocks. `mx-auto` alone is not enough: in a flex COLUMN it
  * makes the box shrink to its content, which is how the replays empty state
  * ended up a 300px dashed sliver next to a 560px one on the teams tab.
  */
-export const BSIM_STATE = "mx-auto w-full max-w-[560px]"
+export const BSIM_STATE = "mx-auto w-full max-w-[35rem]"
 
 /* ── Mono label ──────────────────────────────────────────────────────────── */
 
@@ -103,7 +110,7 @@ export const BSIM_STATE = "mx-auto w-full max-w-[560px]"
  * tracking scale the tool now keeps is: kickers 0.1em · chips 0.08em · data
  * micro-labels 0.06em · display titles 0.03–0.04em.
  */
-export const BSIM_KICKER = "font-mono text-[10px]/none font-semibold uppercase tracking-[0.1em] text-txt-dim"
+export const BSIM_KICKER = "font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.1em] text-txt-dim"
 
 export function BsimKicker({ children, className, id }: { children: React.ReactNode; className?: string; id?: string }) {
   return (
@@ -133,9 +140,9 @@ const CHIP_TONE: Record<BsimChipTone, string> = {
 }
 
 const CHIP_SIZE = {
-  xs: "h-6 gap-[5px] px-[7px] text-[9px]/none",
-  sm: "h-7 gap-[6px] px-[9px] text-[10px]/none",
-  md: "h-8 gap-[6px] px-[9px] text-[10px]/none",
+  xs: "h-6 gap-[0.3125rem] px-[0.4375rem] text-[0.5625rem]/none",
+  sm: "h-7 gap-[0.375rem] px-[0.5625rem] text-[0.625rem]/none",
+  md: "h-8 gap-[0.375rem] px-[0.5625rem] text-[0.625rem]/none",
 } as const
 
 export interface BsimChipProps {
@@ -180,7 +187,7 @@ export function BsimChip({ tone, size = "sm", icon, dot = true, pulse, children,
     <i
       aria-hidden
       className={cn(
-        "h-[6px] w-[6px] flex-none bg-current",
+        "h-[0.375rem] w-[0.375rem] flex-none bg-current",
         pulse && "animate-[bm-pulse_1.2s_ease-in-out_infinite] motion-reduce:animate-none",
       )}
     />
@@ -227,14 +234,14 @@ export interface BsimSectionProps {
 export function BsimSection({ kicker, icon, title, aside, children, className, bodyClassName }: BsimSectionProps) {
   return (
     <section className={cn("border border-solid border-line bg-panel", className)}>
-      <header className="flex items-center gap-[11px] border-b border-solid border-line px-4 py-[13px]">
+      <header className="flex items-center gap-[0.6875rem] border-b border-solid border-line px-4 py-[0.8125rem]">
         {kicker != null && (
-          <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--accent-line)] border border-solid border-accent-line bg-accent-soft px-[7px] py-[5px] font-mono text-[11px]/none font-bold tracking-[0.1em] text-accent">
+          <span className="cut cut-edge-slant [--cut:3px] [--cut-line:var(--accent-line)] border border-solid border-accent-line bg-accent-soft px-[0.4375rem] py-[0.3125rem] font-mono text-[0.6875rem]/none font-bold tracking-[0.1em] text-accent">
             {kicker}
           </span>
         )}
         {icon && <Icon name={icon} size={15} className="shrink-0 text-txt-muted" />}
-        <h3 className="min-w-0 truncate font-display text-[15px]/none font-bold not-italic uppercase tracking-[0.04em] text-txt">{title}</h3>
+        <h3 className="min-w-0 truncate font-display text-[0.9375rem]/none font-bold not-italic uppercase tracking-[0.04em] text-txt">{title}</h3>
         <span className="flex-1" />
         {aside}
       </header>
@@ -501,14 +508,14 @@ export const BsimTab = React.forwardRef<
         onClick={onSelect}
         className={cn(
           BSIM_FOCUS_INSET,
-          "flex h-full min-w-0 items-center gap-[6px] border-0 bg-transparent pl-[10px] font-display text-[11.5px]/none font-bold uppercase tracking-[0.04em] text-inherit",
-          onClose ? "pr-[6px]" : "pr-[10px]",
+          "flex h-full min-w-0 items-center gap-[0.375rem] border-0 bg-transparent pl-[0.625rem] font-display text-[0.71875rem]/none font-bold uppercase tracking-[0.04em] text-inherit",
+          onClose ? "pr-[0.375rem]" : "pr-[0.625rem]",
         )}
       >
         <Icon name={icon} size={12} className="flex-none opacity-80" />
         <span className="max-w-[12ch] truncate">{label}</span>
-        {sub && <span className="max-w-[8ch] truncate font-mono text-[9.5px]/none font-semibold tracking-[0.06em] text-txt-dim">{sub}</span>}
-        {tone && <i aria-hidden className={cn("h-[6px] w-[6px] flex-none [clip-path:circle(50%)]", TAB_DOT[tone])} />}
+        {sub && <span className="max-w-[8ch] truncate font-mono text-[0.59375rem]/none font-semibold tracking-[0.06em] text-txt-dim">{sub}</span>}
+        {tone && <i aria-hidden className={cn("h-[0.375rem] w-[0.375rem] flex-none [clip-path:circle(50%)]", TAB_DOT[tone])} />}
         {stateLabel && <span className="sr-only">{stateLabel}</span>}
       </button>
       {onClose && (

@@ -145,10 +145,10 @@ export function SpecSettingsModal({
         {/* ----------------------------------------------------------- scan */}
         <section className="grid gap-3">
           <div>
-            <h4 className="font-display text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-txt">
+            <h4 className="font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.06em] text-txt">
               {t("spec.scan.title")}
             </h4>
-            <p className="mt-1.5 text-[11px] leading-snug text-txt-dim">{t("spec.scan.lead")}</p>
+            <p className="mt-1.5 text-[0.6875rem] leading-snug text-txt-dim">{t("spec.scan.lead")}</p>
           </div>
 
           <div className="grid grid-cols-3 gap-3">
@@ -184,7 +184,7 @@ export function SpecSettingsModal({
             </Field>
           </div>
 
-          <p className="border border-line-2 bg-base px-2.5 py-2 font-mono text-[11px] text-txt-dim">
+          <p className="border border-line-2 bg-base px-2.5 py-2 font-mono text-[0.6875rem] text-txt-dim">
             {t("spec.scan.cells", { n: cells })}
           </p>
 
@@ -220,7 +220,7 @@ export function SpecSettingsModal({
         {/* ------------------------------------------ engine constants */}
         <section className="grid gap-3 border-t border-line pt-5">
           <div>
-            <h4 className="font-display text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-txt">
+            <h4 className="font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.06em] text-txt">
               {t("spec.settings.engineConstants")}
             </h4>
           </div>
@@ -267,10 +267,10 @@ export function SpecSettingsModal({
         <section className="grid gap-3 border-t border-line pt-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h4 className="font-display text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-txt">
+              <h4 className="font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.06em] text-txt">
                 {t("spec.prefilter.title")}
               </h4>
-              <p className="mt-1.5 text-[11px] leading-snug text-txt-dim">{t("spec.prefilter.lead")}</p>
+              <p className="mt-1.5 text-[0.6875rem] leading-snug text-txt-dim">{t("spec.prefilter.lead")}</p>
             </div>
             {/* A spec may legitimately carry no prefilter — the Teras and
                 island presets do not, because theirs cost more hits than it
@@ -334,7 +334,7 @@ export function SpecSettingsModal({
                   style={{ width: `${Math.round(rejection * 100)}%` }}
                 />
               </div>
-              <p className="font-mono text-[11px] text-txt-dim">
+              <p className="font-mono text-[0.6875rem] text-txt-dim">
                 {t("spec.prefilter.result", {
                   pct: Math.round(rejection * 100),
                   tested: sample.tested,
@@ -348,7 +348,7 @@ export function SpecSettingsModal({
         {/* --------------------------------------------------------- import */}
         <section className="grid gap-3 border-t border-line pt-5">
           <div className="flex items-center justify-between gap-3">
-            <h4 className="font-display text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-txt">
+            <h4 className="font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.06em] text-txt">
               {t("spec.io.title")}
             </h4>
             <Button size="sm" variant="ghost" onClick={exportSpec}>
@@ -362,13 +362,13 @@ export function SpecSettingsModal({
             rows={5}
             spellCheck={false}
             placeholder={t("spec.io.placeholder")}
-            className="font-mono !text-[11px]"
+            className="font-mono !text-[0.6875rem]"
           />
           {importError ? <Banner tone="error">{importError}</Banner> : null}
           {importDropped.length ? (
             <Banner tone="warn">
               {t("spec.io.dropped", { n: importDropped.length })}
-              <span className="mt-1 block font-mono text-[11px]">{importDropped.join(" · ")}</span>
+              <span className="mt-1 block font-mono text-[0.6875rem]">{importDropped.join(" · ")}</span>
             </Banner>
           ) : null}
           <Button size="sm" variant="ghost" onClick={importSpec} disabled={!importText.trim()}>

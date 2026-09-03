@@ -304,7 +304,7 @@ function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "c
           state.kind === "installing" ? (
             <>
               <Progress value={state.progress.fraction * 100} />
-              <p className="mt-1.5 truncate font-mono text-[11px] text-txt-dim">
+              <p className="mt-1.5 truncate font-mono text-[0.6875rem] text-txt-dim">
                 {PHASE_LABEL[state.progress.phase]}
                 {state.progress.currentFile ? ` · ${state.progress.currentFile}` : ""}
               </p>
@@ -315,7 +315,7 @@ function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "c
         badges={
           <>
             <AccessBadge entry={entry} />
-            <span className="font-mono text-[11px] text-txt-dim">
+            <span className="font-mono text-[0.6875rem] text-txt-dim">
               {latest
                 ? // A non-Minecraft pack (emulator, Stardew…) has no `minecraft`
                   // version; its own version name is the one that means something.
@@ -590,7 +590,7 @@ export function Packs() {
           title={t("title")}
           actions={
         <>
-          <div className="w-[280px]">
+          <div className="w-[17.5rem]">
             <SearchInput value={query} onChange={setQuery} placeholder={t("search")} size="sm" />
           </div>
           <Seg
@@ -709,8 +709,8 @@ export function Packs() {
           settings.packLayout === "row"
             ? "flex flex-col gap-2"
             : settings.packLayout === "compact"
-              ? "grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(280px,1fr))]"
-              : "grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(300px,1fr))]"
+              ? "grid gap-3 [grid-template-columns:repeat(auto-fill,minmax(17.5rem,1fr))]"
+              : "grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(18.75rem,1fr))]"
         }
       >
         {shown.map((entry) => (

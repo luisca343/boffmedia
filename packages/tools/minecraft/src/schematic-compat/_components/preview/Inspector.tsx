@@ -58,7 +58,7 @@ export function Inspector() {
 
   const hasStructureSelection = !!selectedStructureIdx && selectedStructureIdx.length > 0;
   if (!selectedBlockId && !hasStructureSelection) {
-    return <p className="text-[12px] text-txt-dim leading-[1.5] m-0">{t("preview.inspectorEmpty")}</p>;
+    return <p className="text-[0.75rem] text-txt-dim leading-[1.5] m-0">{t("preview.inspectorEmpty")}</p>;
   }
   // A structure-only selection (no block) shows just the locate/isolate
   // cluster — its own detail (name/type/tile count) renders in StructuresSection.
@@ -79,9 +79,9 @@ export function Inspector() {
 
   return (
     <>
-      <div className="font-mono text-[12.5px] font-semibold text-txt mb-2 break-all">{selectedBlockId}</div>
+      <div className="font-mono text-[0.78125rem] font-semibold text-txt mb-2 break-all">{selectedBlockId}</div>
       {convertsTo && (
-        <div className="flex items-center gap-1.5 font-mono text-[11px] mb-2 break-all">
+        <div className="flex items-center gap-1.5 font-mono text-[0.6875rem] mb-2 break-all">
           <Icon name="arrow" size={13} className="shrink-0 text-accent-bright" />
           <span className="text-accent-bright">{convertsTo}</span>
         </div>
@@ -89,7 +89,7 @@ export function Inspector() {
       {stateEntries.length > 0 && (
         <div className="grid gap-[3px] mb-1.5">
           {stateEntries.map(([k, v]) => (
-            <div key={k} className="flex justify-between font-mono text-[11px]">
+            <div key={k} className="flex justify-between font-mono text-[0.6875rem]">
               <span className="text-txt-muted">{k}</span>
               <span className="text-txt-dim">{v}</span>
             </div>
@@ -97,7 +97,7 @@ export function Inspector() {
         </div>
       )}
       {diffEntry && (
-        <p className="text-[11.5px] text-txt-dim m-0">
+        <p className="text-[0.71875rem] text-txt-dim m-0">
           {t("diff.instances", { count: diffEntry.instanceCount })} ·{" "}
           <span className="capitalize font-semibold text-txt-muted">{t(STATUS_KEY[diffEntry.status])}</span>
         </p>

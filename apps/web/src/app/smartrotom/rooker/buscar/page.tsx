@@ -55,15 +55,15 @@ function SearchInner() {
                 onClick={() => setQ(trend.tag)}
                 className="block px-4 py-2.5 transition-colors hover:bg-rk-hover"
               >
-                <div className="text-[12px] text-rk-fg-subtle">{t("common.trendingInNest")}</div>
-                <div className="text-[15px] font-bold text-rk-fg">#{trend.tag}</div>
-                <div className="text-[12.5px] text-rk-fg-subtle">
+                <div className="text-[0.75rem] text-rk-fg-subtle">{t("common.trendingInNest")}</div>
+                <div className="text-[0.9375rem] font-bold text-rk-fg">#{trend.tag}</div>
+                <div className="text-[0.78125rem] text-rk-fg-subtle">
                   {t("common.postsCount", { formatted: fmt(trend.posts), count: trend.posts })}
                 </div>
               </Link>
             ))
           ) : (
-            <p className="px-4 pb-5 pt-1 text-[14px] leading-relaxed text-rk-fg-subtle">
+            <p className="px-4 pb-5 pt-1 text-[0.875rem] leading-relaxed text-rk-fg-subtle">
               {t("search.trendsEmpty")}
             </p>
           )}
@@ -74,7 +74,7 @@ function SearchInner() {
           {suggestions?.length ? (
             suggestions.map((u) => <FollowRow key={u.uuid} user={u} />)
           ) : (
-            <p className="px-4 pb-5 pt-1 text-[14px] text-rk-fg-subtle">{t("common.followedEveryone")}</p>
+            <p className="px-4 pb-5 pt-1 text-[0.875rem] text-rk-fg-subtle">{t("common.followedEveryone")}</p>
           )}
         </>
       ) : searching ? (
@@ -104,8 +104,8 @@ function SearchInner() {
                   onClick={() => setQ(tag.tag)}
                   className="block px-4 py-2.5 transition-colors hover:bg-rk-hover"
                 >
-                  <div className="text-[15px] font-bold text-rk-fg">#{tag.tag}</div>
-                  <div className="text-[12.5px] text-rk-fg-subtle">
+                  <div className="text-[0.9375rem] font-bold text-rk-fg">#{tag.tag}</div>
+                  <div className="text-[0.78125rem] text-rk-fg-subtle">
                     {t("common.postsCount", { formatted: fmt(tag.posts), count: tag.posts })}
                   </div>
                 </Link>

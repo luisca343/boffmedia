@@ -39,7 +39,7 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
 
   return (
     <aside
-      className="relative z-[1] hidden h-full flex-col gap-2 overflow-hidden border-r border-white/[0.06] px-3.5 py-[18px] text-[#c8d4ec] md:flex"
+      className="relative z-[1] hidden h-full flex-col gap-2 overflow-hidden border-r border-white/[0.06] px-3.5 py-[1.125rem] text-[#c8d4ec] md:flex"
       style={{ background: SIDE_BG }}
     >
       {/* Brand */}
@@ -53,9 +53,9 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
           </svg>
           <span className="pointer-events-none absolute inset-1.5 rounded-md" style={{ background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,.7), rgba(255,255,255,0) 55%)" }} />
         </div>
-        <div className="font-sb-display text-[18px] font-bold tracking-[-0.02em] text-white">
+        <div className="font-sb-display text-[1.125rem] font-bold tracking-[-0.02em] text-white">
           {t("sidebar.title")}
-          <small className="block text-[10px] font-medium uppercase tracking-[0.14em] text-[#9bb3da]">{t("sidebar.subtitle")}</small>
+          <small className="block text-[0.625rem] font-medium uppercase tracking-[0.14em] text-[#9bb3da]">{t("sidebar.subtitle")}</small>
         </div>
       </div>
 
@@ -71,8 +71,8 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
           <AccountAvatar account={account ?? undefined} size={36} square />
         </span>
         <div className="flex min-w-0 flex-1 flex-col">
-          <span className="truncate text-[13px] font-semibold text-white">{account ? displayName(account.name) : "—"}</span>
-          <span className="text-[12px] tabular-nums text-[#9bb3da]">{formatMoney(account?.balance ?? 0)}</span>
+          <span className="truncate text-[0.8125rem] font-semibold text-white">{account ? displayName(account.name) : "—"}</span>
+          <span className="text-[0.75rem] tabular-nums text-[#9bb3da]">{formatMoney(account?.balance ?? 0)}</span>
         </div>
         <button
           type="button"
@@ -87,7 +87,7 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
       {/* Nav */}
       {NAV.map((g) => (
         <div key={g.groupKey}>
-          <div className="px-3 pb-1.5 pt-3.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#6e84ab]">{t(g.groupKey)}</div>
+          <div className="px-3 pb-1.5 pt-3.5 text-[0.625rem] font-semibold uppercase tracking-[0.14em] text-[#6e84ab]">{t(g.groupKey)}</div>
           <div className="flex flex-col gap-0.5">
             {g.items.map((item) => {
               const active = currentPage === item.seg;
@@ -97,7 +97,7 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
                   href={item.href}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative flex items-center gap-3 rounded-[10px] px-3 py-[9px] text-[13.5px] font-medium transition-colors",
+                    "relative flex items-center gap-3 rounded-[10px] px-3 py-[0.5625rem] text-[0.84375rem] font-medium transition-colors",
                     active ? "text-white" : "text-[#b2c0dc] hover:bg-white/[0.06] hover:text-white",
                   )}
                   style={active ? { background: "linear-gradient(90deg, rgba(59,130,246,.22), rgba(59,130,246,.06))" } : undefined}
@@ -113,7 +113,7 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
       ))}
 
       {/* Foot */}
-      <div className="mt-auto flex items-center gap-2 border-t border-white/[0.07] pt-3 text-[12px] text-[#8597b6]">
+      <div className="mt-auto flex items-center gap-2 border-t border-white/[0.07] pt-3 text-[0.75rem] text-[#8597b6]">
         <span className="size-1.5 rounded-full bg-sb-pos-2 shadow-[0_0_0_3px_rgba(5,150,105,.25)]" aria-hidden />
         {t("sidebar.systemStatus")}
       </div>

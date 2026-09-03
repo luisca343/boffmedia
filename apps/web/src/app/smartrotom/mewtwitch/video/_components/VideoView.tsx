@@ -17,7 +17,7 @@ export function VideoView({ id }: { id: string }) {
   if (!v) return <div className="p-6 text-sm text-mw-fg-faint">{t("video.notFound")}</div>
 
   return (
-    <div className="mx-auto max-w-[1100px] px-4 pb-20 pt-6 md:px-10">
+    <div className="mx-auto max-w-[68.75rem] px-4 pb-20 pt-6 md:px-10">
       <div className="relative aspect-video w-full overflow-hidden rounded-mw-2xl border border-mw-line bg-black">
         {host && (
           <iframe
@@ -29,7 +29,7 @@ export function VideoView({ id }: { id: string }) {
         )}
       </div>
       <h1 className="mb-2 mt-4 font-mw-display text-2xl font-extrabold leading-[1.25]">{v.title}</h1>
-      <div className="flex flex-wrap items-center gap-2 text-[13px] text-mw-fg-mute">
+      <div className="flex flex-wrap items-center gap-2 text-[0.8125rem] text-mw-fg-mute">
         <span className="font-semibold text-mw-fg">{v.user_name}</span>
         <span>·</span>
         <span>{compactCount(v.view_count)} {t("video.views")}</span>

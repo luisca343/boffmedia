@@ -89,7 +89,7 @@ export function TxPrimitivasChapter() {
         }
       >
         <Sample title="Variantes" code="<Button variant>" app="tx" col>
-          <div className="flex gap-[9px]">
+          <div className="flex gap-[0.5625rem]">
             <Button variant="ghost" aria-label="Centrar en el mapa">
               <Icon name="crosshair" size={17} stroke={2} />
             </Button>
@@ -98,7 +98,7 @@ export function TxPrimitivasChapter() {
               Viajar · 2.956 ¥
             </Button>
           </div>
-          <div className="flex gap-[9px]">
+          <div className="flex gap-[0.5625rem]">
             <Button variant="quiet" className="flex-[0_0_38%]">
               Cancelar
             </Button>
@@ -157,7 +157,7 @@ export function TxPrimitivasChapter() {
           <Pill as="button" tone="money">
             <Icon name="coins" size={14} stroke={2.2} />
             9.240 ¥
-            <span className="ml-px grid h-[17px] w-[17px] place-items-center rounded-full bg-tx-accent text-tx-on-accent">
+            <span className="ml-px grid h-[1.0625rem] w-[1.0625rem] place-items-center rounded-full bg-tx-accent text-tx-on-accent">
               <Icon name="plus" size={11} stroke={3} />
             </span>
           </Pill>
@@ -210,8 +210,8 @@ export function TxPrimitivasChapter() {
           <Empty message="Ningún destino coincide con tu búsqueda." action="Ver todos" onAction={() => {}} />
         </Sample>
         <Sample title="Esqueleto" code="<Skeleton>" app="tx" col>
-          <Skeleton className="h-[38px] w-[120px] rounded-tx-pill" />
-          <Skeleton className="h-[104px] rounded-tx-md" />
+          <Skeleton className="h-[2.375rem] w-[7.5rem] rounded-tx-pill" />
+          <Skeleton className="h-[6.5rem] rounded-tx-md" />
         </Sample>
         <Sample
           title="Avisos"

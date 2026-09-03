@@ -199,7 +199,7 @@ export function ReplaysView() {
           onChange={setQ}
           placeholder={t("replays.search")}
           ariaLabel={t("replays.search")}
-          className="min-w-[180px] flex-1"
+          className="min-w-[11.25rem] flex-1"
         />
         <DkSeg
           value={scope}
@@ -253,7 +253,7 @@ export function ReplaysView() {
 
       {rows !== null && !error && filtered.length > 0 && (
         <>
-          <ul className="grid list-none gap-[7px] p-0">
+          <ul className="grid list-none gap-[0.4375rem] p-0">
             {shown.map((r) => (
               <ReplayRowItem
                 key={`${r.local ? "l" : "r"}:${r.id}`}
@@ -273,7 +273,7 @@ export function ReplaysView() {
               <Button size="sm" icon="chevronDown" onClick={() => setVisible((v) => v + PAGE)}>
                 {t("hub.replays.loadMore")}
               </Button>
-              <span className="font-mono text-[10px]/none tabular-nums text-txt-dim">
+              <span className="font-mono text-[0.625rem]/none tabular-nums text-txt-dim">
                 {t("hub.replays.shown", { shown: shown.length, total: filtered.length })}
               </span>
             </div>
@@ -322,17 +322,17 @@ function ReplayRowItem({
         type="button"
         onClick={onOpen}
         className={cn(
-          "cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-tag:10px] group flex w-full items-center gap-3 border border-solid border-line bg-panel py-3 pl-4 pr-[52px] text-left transition-[border-color,background,transform] duration-[140ms] hover:-translate-y-px hover:border-accent-line hover:bg-panel-2 motion-reduce:hover:translate-y-0",
+          "cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-tag:10px] group flex w-full items-center gap-3 border border-solid border-line bg-panel py-3 pl-4 pr-[3.25rem] text-left transition-[border-color,background,transform] duration-[140ms] hover:-translate-y-px hover:border-accent-line hover:bg-panel-2 motion-reduce:hover:translate-y-0",
           BSIM_FOCUS_CUT,
         )}
       >
-        <span className="grid min-w-0 flex-1 gap-[4px]">
-          <span className="flex min-w-0 items-center gap-2 font-display text-[14px] font-bold uppercase leading-none tracking-[0.03em]">
+        <span className="grid min-w-0 flex-1 gap-[0.25rem]">
+          <span className="flex min-w-0 items-center gap-2 font-display text-[0.875rem] font-bold uppercase leading-none tracking-[0.03em]">
             <b className={cn("min-w-0 truncate", p1Won ? "text-accent-bright" : "text-txt")}>{r.side1}</b>
-            <span className="flex-none font-mono text-[10px] font-semibold uppercase text-txt-dim">{t("header.vs")}</span>
+            <span className="flex-none font-mono text-[0.625rem] font-semibold uppercase text-txt-dim">{t("header.vs")}</span>
             <b className={cn("min-w-0 truncate", p2Won ? "text-accent-bright" : "text-txt")}>{r.side2}</b>
           </span>
-          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[10px]/none text-txt-dim">
+          <span className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.625rem]/none text-txt-dim">
             {/* Icon AND word: "local" vs "account" was carried by the border
                 colour alone before, which is no signal at all for a third of
                 readers. */}
@@ -352,7 +352,7 @@ function ReplayRowItem({
         <Icon name="play" size={14} className="flex-none text-txt-dim transition-colors duration-[140ms] group-hover:text-accent-bright" />
       </button>
 
-      <span className="absolute right-[10px] top-1/2 -translate-y-1/2">
+      <span className="absolute right-[0.625rem] top-1/2 -translate-y-1/2">
         <Menu
           size="sm"
           variant="ghost"

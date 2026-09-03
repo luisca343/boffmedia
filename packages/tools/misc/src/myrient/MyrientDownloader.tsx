@@ -39,7 +39,7 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1.5">
-        <div className="flex justify-between text-[13px]">
+        <div className="flex justify-between text-[0.8125rem]">
           <span className="font-medium text-txt">
             {summary ? t("downloadComplete") : t("downloadingN", { completed, total })}
           </span>
@@ -49,14 +49,14 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
           <div className={"h-full transition-[width] duration-300 ease-out " + (summary ? "bg-ok" : "bg-accent")} style={{ width: `${pct}%` }} />
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.06em]">
+      <div className="flex flex-wrap gap-2 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em]">
         {counts.downloaded > 0 && <span className="border border-transparent bg-ok-soft px-2 py-1 text-ok">{t("countDownloaded", { n: counts.downloaded })}</span>}
         {counts.skipped > 0 && <span className="border border-transparent bg-warn-soft px-2 py-1 text-warn">{t("countSkipped", { n: counts.skipped })}</span>}
         {counts.failed > 0 && <span className="border border-transparent bg-bad-soft px-2 py-1 text-bad">{t("countFailed", { n: counts.failed })}</span>}
         {counts.downloading > 0 && <span className="border border-transparent bg-accent-soft px-2 py-1 text-signal">{t("countDownloading", { n: counts.downloading })}</span>}
         {summary && <span className="inline-flex items-center gap-1 border border-line-2 bg-base-2 px-2 py-1 text-txt-muted"><Icon name="database" size={11} />{summary.totalDownloadedSize}</span>}
       </div>
-      <button onClick={() => setShowFiles((v) => !v)} className="flex items-center gap-1.5 self-start font-mono text-[11px] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+      <button onClick={() => setShowFiles((v) => !v)} className="flex items-center gap-1.5 self-start font-mono text-[0.6875rem] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
         <Icon name={showFiles ? "chevronDown" : "chevronRight"} size={14} />
         {showFiles ? t("hideFilesN", { n: files.length }) : t("showFilesN", { n: files.length })}
       </button>
@@ -65,9 +65,9 @@ function DownloadProgressPanel({ progress }: { progress: ProgressState }) {
           {files.map((f) => (
             <div key={f.filename} className="flex items-center gap-2 border-b border-[color-mix(in_srgb,var(--line)_55%,transparent)] px-3 py-2 last:border-b-0">
               <MyStatusIcon status={f.status} />
-              <span className="min-w-0 flex-1 truncate text-[12px] text-txt" title={f.filename}>{f.filename}</span>
-              {f.size && <span className="shrink-0 font-mono text-[11px] text-txt-dim">{f.size}</span>}
-              {f.error && <span className="max-w-[140px] shrink-0 truncate text-[11px] text-bad" title={f.error}>{f.error}</span>}
+              <span className="min-w-0 flex-1 truncate text-[0.75rem] text-txt" title={f.filename}>{f.filename}</span>
+              {f.size && <span className="shrink-0 font-mono text-[0.6875rem] text-txt-dim">{f.size}</span>}
+              {f.error && <span className="max-w-[8.75rem] shrink-0 truncate text-[0.6875rem] text-bad" title={f.error}>{f.error}</span>}
             </div>
           ))}
         </div>
@@ -327,9 +327,9 @@ export function MyrientDownloader() {
       />
 
       {/* search bar */}
-      <form className="mb-[14px] flex flex-wrap items-center gap-[12px]" onSubmit={(e) => { e.preventDefault(); if (!isSearchDisabled) handleSearch(); }}>
-        <div className="relative min-w-[220px] max-w-[460px] flex-1">
-          <Icon name="search" size={16} className="pointer-events-none absolute left-[13px] top-1/2 -translate-y-1/2 text-txt-dim" />
+      <form className="mb-[0.875rem] flex flex-wrap items-center gap-[0.75rem]" onSubmit={(e) => { e.preventDefault(); if (!isSearchDisabled) handleSearch(); }}>
+        <div className="relative min-w-[13.75rem] max-w-[28.75rem] flex-1">
+          <Icon name="search" size={16} className="pointer-events-none absolute left-[0.8125rem] top-1/2 -translate-y-1/2 text-txt-dim" />
           <Input
             className="pl-10"
             placeholder={selectedConsole ? t("filterPlaceholder") : t("searchPlaceholder")}
@@ -343,24 +343,24 @@ export function MyrientDownloader() {
       </form>
 
       {/* console filter */}
-      <div className="mb-[14px] flex flex-col gap-[10px]">
-        <div className="flex items-center gap-[8px]">
-          <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("consoleLabel")}</span>
+      <div className="mb-[0.875rem] flex flex-col gap-[0.625rem]">
+        <div className="flex items-center gap-[0.5rem]">
+          <span className="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.12em] text-txt-dim">{t("consoleLabel")}</span>
           {selectedConsole ? (
-            <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center border border-accent-line bg-accent-soft px-[8px] py-[4px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
+            <span className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center border border-accent-line bg-accent-soft px-[0.5rem] py-[0.25rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-accent">
               {CONSOLES[selectedConsole]?.shortLabel ?? selectedConsole}
             </span>
           ) : (
-            <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{t("searchAllHint")}</span>
+            <span className="font-mono text-[0.625rem] uppercase tracking-[0.06em] text-txt-dim">{t("searchAllHint")}</span>
           )}
         </div>
-        <div className="flex flex-col gap-[8px]">
+        <div className="flex flex-col gap-[0.5rem]">
           {CONSOLE_GROUPS.map(({ mfr, entries }) => (
-            <div key={mfr} className="flex items-start gap-[10px]">
-              <span className="mt-[8px] w-[64px] flex-none text-right font-mono text-[10px] font-semibold uppercase tracking-[0.1em]" style={{ color: MFR_DOT[mfr as Manufacturer] }}>
+            <div key={mfr} className="flex items-start gap-[0.625rem]">
+              <span className="mt-[0.5rem] w-[4rem] flex-none text-right font-mono text-[0.625rem] font-semibold uppercase tracking-[0.1em]" style={{ color: MFR_DOT[mfr as Manufacturer] }}>
                 {mfr}
               </span>
-              <div className="flex flex-wrap gap-[6px]">
+              <div className="flex flex-wrap gap-[0.375rem]">
                 {entries.map(([key, info]) => (
                   <ConsoleChip key={key} label={info.shortLabel} dot={MFR_DOT[mfr as Manufacturer]} on={selectedConsole === key} onClick={() => handleConsoleSelect(key)} />
                 ))}
@@ -371,17 +371,17 @@ export function MyrientDownloader() {
       </div>
 
       {/* region filter */}
-      <div className="mb-[20px]">
+      <div className="mb-[1.25rem]">
         <Disclosure title={t("regionLabel")} icon="filter" sub={regions.length ? regions.join(" · ") : t("regionOptional")}>
-          <div className="flex flex-col gap-[12px]">
-            <div className="flex flex-wrap gap-[6px]">
+          <div className="flex flex-col gap-[0.75rem]">
+            <div className="flex flex-wrap gap-[0.375rem]">
               {COMMON_REGIONS.map((r) => (
                 <RegionChip key={r} label={r} on={regions.includes(r)} onClick={() => toggleRegion(r)} />
               ))}
             </div>
-            <div className="flex gap-[8px]">
+            <div className="flex gap-[0.5rem]">
               <Input
-                className="max-w-[260px]"
+                className="max-w-[16.25rem]"
                 value={customRegion}
                 onChange={(e) => setCustomRegion(e.target.value)}
                 onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addCustomRegion(); } }}
@@ -390,12 +390,12 @@ export function MyrientDownloader() {
               <Button size="sm" icon="plus" onClick={addCustomRegion} disabled={!customRegion.trim()}>{t("addRegion")}</Button>
             </div>
             {regions.length > 0 && (
-              <div className="flex flex-wrap items-center gap-[6px]">
-                <span className="font-mono text-[10px] uppercase tracking-[0.08em] text-txt-dim">{t("activeRegions")}</span>
+              <div className="flex flex-wrap items-center gap-[0.375rem]">
+                <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">{t("activeRegions")}</span>
                 {regions.map((r) => (
-                  <span key={r} className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center gap-[6px] border border-accent-line bg-accent-soft py-[4px] pl-[8px] pr-[5px] font-mono text-[10px] font-semibold uppercase tracking-[0.06em] text-accent">
+                  <span key={r} className="cut cut-edge-slant [--cut-line:var(--accent-line)] [--cut:4px] inline-flex items-center gap-[0.375rem] border border-accent-line bg-accent-soft py-[0.25rem] pl-[0.5rem] pr-[0.3125rem] font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] text-accent">
                     {r}
-                    <button type="button" aria-label={t("removeRegion", { r })} onClick={() => removeRegion(r)} className="grid h-[16px] w-[16px] place-items-center text-accent/70 transition-opacity hover:text-accent">
+                    <button type="button" aria-label={t("removeRegion", { r })} onClick={() => removeRegion(r)} className="grid h-[1rem] w-[1rem] place-items-center text-accent/70 transition-opacity hover:text-accent">
                       <Icon name="x" size={11} />
                     </button>
                   </span>
@@ -406,11 +406,11 @@ export function MyrientDownloader() {
         </Disclosure>
       </div>
 
-      {error && <div className="mb-[16px]"><Banner tone="error" title={t("errorTitle")}>{error}</Banner></div>}
+      {error && <div className="mb-[1rem]"><Banner tone="error" title={t("errorTitle")}>{error}</Banner></div>}
 
       {/* single-console catalog */}
       {singleCatalog && (
-        <div className="mb-[18px] border border-line bg-panel p-4">
+        <div className="mb-[1.125rem] border border-line bg-panel p-4">
           <GameCatalogTable
             files={singleCatalog.files}
             selected={selected}
@@ -425,7 +425,7 @@ export function MyrientDownloader() {
 
       {/* multi-console results */}
       {multiCatalog && (
-        <div className="mb-[18px] flex flex-col gap-3">
+        <div className="mb-[1.125rem] flex flex-col gap-3">
           {multiCatalog.totalCount === 0 ? (
             <Empty icon="database" title={t("emptyTitle")} lead={multiCatalog.query ? t("emptySearch", { q: multiCatalog.query }) : t("emptyLead")} />
           ) : (
@@ -451,8 +451,8 @@ export function MyrientDownloader() {
 
       {/* progress */}
       {progress && (
-        <div className="mb-[18px] border border-line bg-panel p-4">
-          <p className="mb-3 font-mono text-[11px] font-semibold uppercase tracking-[0.12em] text-txt-muted">{t("progressTitle")}</p>
+        <div className="mb-[1.125rem] border border-line bg-panel p-4">
+          <p className="mb-3 font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.12em] text-txt-muted">{t("progressTitle")}</p>
           <DownloadProgressPanel progress={progress} />
         </div>
       )}
@@ -460,29 +460,29 @@ export function MyrientDownloader() {
       {/* sticky bar */}
       {showStickyBar && (
         <div className="fixed inset-x-0 bottom-0 z-50 border-t border-solid border-line-2 bg-[color-mix(in_srgb,var(--panel)_96%,transparent)] backdrop-blur">
-          <div className="mx-auto flex max-w-[1280px] flex-wrap items-center gap-4 px-10 py-3">
+          <div className="mx-auto flex max-w-[80rem] flex-wrap items-center gap-4 px-10 py-3">
             <div className="min-w-0 flex-1">
               {singleCatalog ? (
                 <>
-                  <p className="text-[14px] font-medium text-txt">{t("selectedN", { n: selected.size })}</p>
-                  <p className="truncate font-mono text-[11px] text-txt-muted">
+                  <p className="text-[0.875rem] font-medium text-txt">{t("selectedN", { n: selected.size })}</p>
+                  <p className="truncate font-mono text-[0.6875rem] text-txt-muted">
                     {CONSOLES[selectedConsole!]?.label}{regions.length > 0 && ` · ${regions.join(", ")}`}
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="text-[14px] font-medium text-txt">{t("selectedN", { n: totalMultiSelected })}</p>
-                  <p className="truncate font-mono text-[11px] text-txt-muted">
+                  <p className="text-[0.875rem] font-medium text-txt">{t("selectedN", { n: totalMultiSelected })}</p>
+                  <p className="truncate font-mono text-[0.6875rem] text-txt-muted">
                     {t("consolesN", { n: multiConsoleCount })}{regions.length > 0 && ` · ${regions.join(", ")}`}
                   </p>
                 </>
               )}
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{t("concurrency")}</span>
+              <span className="font-mono text-[0.625rem] uppercase tracking-[0.06em] text-txt-dim">{t("concurrency")}</span>
               <Select value={concurrency} options={["1", "2", "3", "4", "5"]} onChange={setConcurrency} />
             </div>
-            {downloadError && <p className="max-w-xs truncate text-[11px] text-bad">{downloadError}</p>}
+            {downloadError && <p className="max-w-xs truncate text-[0.6875rem] text-bad">{downloadError}</p>}
             <Button variant="pri" icon="download" onClick={singleCatalog ? handleSingleDownload : triggerMultiDownload} disabled={downloading}>
               {t("downloadSelection")}
             </Button>

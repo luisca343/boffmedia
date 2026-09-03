@@ -60,7 +60,7 @@ export function ReleaseRow({
               title={hashFull}
               aria-label={copyLabel}
               className={cn(
-                "inline-flex items-center gap-1.5 font-mono text-[10px] text-txt-dim",
+                "inline-flex items-center gap-1.5 font-mono text-[0.625rem] text-txt-dim",
                 "transition-colors duration-[140ms] hover:text-accent",
               )}
             >

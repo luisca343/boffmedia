@@ -23,7 +23,7 @@ export function QuickActionsCard() {
           <Link
             key={a.slug}
             href={hrefOf(a.slug)}
-            className={`flex items-center gap-[9px] px-[14px] py-[13px] text-[12.5px] font-semibold text-gt-ink-700 transition-colors hover:bg-gt-paper-1 ${
+            className={`flex items-center gap-[0.5625rem] px-[0.875rem] py-[0.8125rem] text-[0.78125rem] font-semibold text-gt-ink-700 transition-colors hover:bg-gt-paper-1 ${
               i % 2 === 0 ? "border-r border-gt-line-soft" : ""
             } ${i < 2 ? "border-b border-gt-line-soft" : ""}`}
           >

@@ -65,7 +65,7 @@ export function ItemDot({ pokemon }: { pokemon: ExtendedPokemonW }) {
   return (
     <span
       title={prettyItem(pokemon.item)}
-      className="flex h-[7px] w-[7px] rounded-pc-pill bg-pc-amber shadow-[0_0_0_2px_rgb(7_11_22_/_.6)]"
+      className="flex h-[0.4375rem] w-[0.4375rem] rounded-pc-pill bg-pc-amber shadow-[0_0_0_2px_rgb(7_11_22_/_.6)]"
     />
   )
 }

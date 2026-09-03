@@ -177,26 +177,26 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
         <DkBack onClick={handleBack} label={t('nav.backToSession')} />
         <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
           <span className="inline-flex items-center gap-1">
-            <span className="font-mono text-[11px] text-txt-muted">{t('workspace.roundPrefix')}</span>
-            <input value={roundInput} onChange={(e) => setRoundInput(e.target.value)} onBlur={() => { const n = parseInt(roundInput, 10); update({ roundNumber: isNaN(n) ? undefined : n }); }} placeholder="—" className={cn(HDR_INPUT_UNDERLINE, 'w-8 text-center font-mono text-[13px]')} />
+            <span className="font-mono text-[0.6875rem] text-txt-muted">{t('workspace.roundPrefix')}</span>
+            <input value={roundInput} onChange={(e) => setRoundInput(e.target.value)} onBlur={() => { const n = parseInt(roundInput, 10); update({ roundNumber: isNaN(n) ? undefined : n }); }} placeholder="—" className={cn(HDR_INPUT_UNDERLINE, 'w-8 text-center font-mono text-[0.8125rem]')} />
           </span>
           <span className="text-txt-dim">·</span>
-          <input value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT_UNDERLINE, 'min-w-0 max-w-[160px] flex-1 py-[2px] text-[13px]')} />
+          <input value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT_UNDERLINE, 'min-w-0 max-w-[10rem] flex-1 py-[2px] text-[0.8125rem]')} />
           <span className="text-txt-dim">·</span>
-          <input value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT_UNDERLINE, 'min-w-0 max-w-[120px] flex-1 py-[2px] text-[12px] text-txt-muted')} />
+          <input value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT_UNDERLINE, 'min-w-0 max-w-[7.5rem] flex-1 py-[2px] text-[0.75rem] text-txt-muted')} />
         </div>
         <DkSpacer />
-        <span className="inline-flex items-center gap-[6px]">
-          <span className={cn('font-mono text-[24px] font-bold tabular-nums leading-none', wins > losses ? 'text-ok' : wins < losses ? 'text-bad' : 'text-txt')}>{wins}</span>
-          <span className="text-[14px] text-txt-dim">–</span>
-          <span className={cn('font-mono text-[24px] font-bold tabular-nums leading-none', losses > wins ? 'text-bad' : losses < wins ? 'text-ok' : 'text-txt')}>{losses}</span>
+        <span className="inline-flex items-center gap-[0.375rem]">
+          <span className={cn('font-mono text-[1.5rem] font-bold tabular-nums leading-none', wins > losses ? 'text-ok' : wins < losses ? 'text-bad' : 'text-txt')}>{wins}</span>
+          <span className="text-[0.875rem] text-txt-dim">–</span>
+          <span className={cn('font-mono text-[1.5rem] font-bold tabular-nums leading-none', losses > wins ? 'text-bad' : losses < wins ? 'text-ok' : 'text-txt')}>{losses}</span>
         </span>
         {!isCompleted ? (
-          <button type="button" onClick={handleFinishSeries} className="cut cut-edge-slant [--cut-line:var(--accent)] inline-flex items-center gap-[6px] border border-solid border-accent bg-accent px-3 py-[7px] font-display text-[13px] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
+          <button type="button" onClick={handleFinishSeries} className="cut cut-edge-slant [--cut-line:var(--accent)] inline-flex items-center gap-[0.375rem] border border-solid border-accent bg-accent px-3 py-[0.4375rem] font-display text-[0.8125rem] font-bold uppercase tracking-[0.06em] text-accent-ink transition-colors hover:bg-accent-bright">
             <Icon name="check" size={14} /> {t('buttons.finish')}
           </button>
         ) : (
-          <span className="inline-flex items-center gap-1 font-mono text-[11px] text-ok">
+          <span className="inline-flex items-center gap-1 font-mono text-[0.6875rem] text-ok">
             <Icon name="check" size={13} /> {t('indicators.saved')}
           </span>
         )}
@@ -216,14 +216,14 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                 type="button"
                 onClick={() => unlocked && setActiveGame(n)}
                 disabled={!unlocked}
-                className={cn('cut-tag cut-tag-edge [--cut-tag:6px] ', 'inline-flex flex-none items-center gap-[6px] border border-solid px-[10px] py-[7px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.08em] transition-[color,background,border-color]',
+                className={cn('cut-tag cut-tag-edge [--cut-tag:6px] ', 'inline-flex flex-none items-center gap-[0.375rem] border border-solid px-[0.625rem] py-[0.4375rem] font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.08em] transition-[color,background,border-color]',
                   active ? 'border-accent bg-accent text-accent-ink' : !unlocked ? 'cursor-not-allowed border-line bg-base text-txt-dim' : 'border-line bg-base text-txt-muted hover:text-txt',
                 )}
               >
                 {!unlocked ? <Icon name="lock" size={11} /> : done ? <Icon name="check" size={11} className={active ? '' : 'text-ok'} /> : null}
                 {t('workspace.game', { n })}
                 {game?.result && (
-                  <span className={cn('font-mono text-[10px]', active ? '' : game.result === 'win' ? 'text-ok' : game.result === 'loss' ? 'text-bad' : 'text-warn')}>
+                  <span className={cn('font-mono text-[0.625rem]', active ? '' : game.result === 'win' ? 'text-ok' : game.result === 'loss' ? 'text-bad' : 'text-warn')}>
                     {t(`result.${game.result}Short`)}
                   </span>
                 )}
@@ -231,7 +231,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
             );
           })}
           {currentGame && !currentGame.completedAt && series.seriesResult === undefined && (
-            <button type="button" onClick={() => handleFinishGame(activeGame)} className="ml-auto inline-flex flex-none items-center gap-1 border border-solid border-line-2 bg-base px-[10px] py-[6px] font-mono text-[10px] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
+            <button type="button" onClick={() => handleFinishGame(activeGame)} className="ml-auto inline-flex flex-none items-center gap-1 border border-solid border-line-2 bg-base px-[0.625rem] py-[0.375rem] font-mono text-[0.625rem] uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt">
               <Icon name="check" size={11} /> {t('workspace.endGame', { n: activeGame })}
             </button>
           )}
@@ -240,7 +240,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
 
       <DkBody pad>
         {currentGame ? (
-          <div className="grid grid-cols-1 items-start gap-[18px] min-[760px]:grid-cols-2 min-[1100px]:grid-cols-[minmax(280px,360px)_minmax(0,1fr)_minmax(280px,360px)]">
+          <div className="grid grid-cols-1 items-start gap-[1.125rem] min-[760px]:grid-cols-2 min-[1100px]:grid-cols-[minmax(17.5rem,22.5rem)_minmax(0,1fr)_minmax(17.5rem,22.5rem)]">
             <div className="grid min-w-0 gap-3">
               <TeamPanel label={t('labels.myTeam')} slots={currentGame.mySlots} editable={false} tone="var(--accent-bright)" onSlotChange={(slots) => handleMySlots(activeGame, slots)} />
               <SpeedTierWidget slots={currentGame.mySlots} regulationId={regulationId} />
@@ -262,7 +262,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
               <TeamPanel label={t('labels.opponent')} slots={currentGame.opponentSlots} editable tone="var(--info)" search={search} onSlotChange={(slots) => handleOpponentSlots(activeGame, slots)} />
               <SpeedTierWidget slots={currentGame.opponentSlots} regulationId={regulationId} />
 
-              <div className="border border-solid border-line bg-panel px-[14px] py-[12px]">
+              <div className="border border-solid border-line bg-panel px-[0.875rem] py-[0.75rem]">
                 <TrSub>{t('workspace.game', { n: activeGame })}</TrSub>
                 <div className="flex gap-2">
                   {(['win', 'loss', 'draw'] as MatchResult[]).map((r) => (
@@ -271,9 +271,9 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                 </div>
               </div>
 
-              <div className="border border-solid border-line bg-panel px-[14px] py-[12px]">
+              <div className="border border-solid border-line bg-panel px-[0.875rem] py-[0.75rem]">
                 <TrSub>{t('outcomeTag.label')}</TrSub>
-                <div className="mb-3 flex flex-wrap gap-[5px]">
+                <div className="mb-3 flex flex-wrap gap-[0.3125rem]">
                   {TR_OUTCOME_ORDER.map((tag) => (
                     <OutcomeButton key={tag} tag={tag} active={currentGame.outcomeTag === tag} onClick={() => handleGameOutcomeTag(activeGame, tag)} label={t(`outcomeTag.${tag}`)} />
                   ))}
@@ -287,7 +287,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
                     value={currentGame.turnCount ?? ''}
                     onChange={(e) => handleGameTurnCount(activeGame, e.target.value)}
                     placeholder="—"
-                    className="w-16 border border-solid border-line-2 bg-base px-2 py-1 text-center font-mono text-[13px] text-txt outline-none focus:border-accent"
+                    className="w-16 border border-solid border-line-2 bg-base px-2 py-1 text-center font-mono text-[0.8125rem] text-txt outline-none focus:border-accent"
                   />
                 </div>
               </div>
@@ -295,7 +295,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
             </div>
           </div>
         ) : (
-          <div className="grid place-items-center py-16 font-mono text-[13px] text-txt-muted">{t('workspace.noGameData')}</div>
+          <div className="grid place-items-center py-16 font-mono text-[0.8125rem] text-txt-muted">{t('workspace.noGameData')}</div>
         )}
       </DkBody>
     </DkApp>
@@ -309,7 +309,7 @@ function GameResultButton({ result, active, onClick, label }: { result: MatchRes
       type="button"
       onClick={onClick}
       style={active ? cssVars({ background: tone, borderColor: tone }) : undefined}
-      className={cn('flex-1 border border-solid py-[6px] font-mono text-[12px] font-bold uppercase leading-none transition-all', active ? 'text-white' : 'border-line-2 bg-base text-txt-muted hover:text-txt')}
+      className={cn('flex-1 border border-solid py-[0.375rem] font-mono text-[0.75rem] font-bold uppercase leading-none transition-all', active ? 'text-white' : 'border-line-2 bg-base text-txt-muted hover:text-txt')}
     >
       {label}
     </button>
@@ -323,7 +323,7 @@ function OutcomeButton({ tag, active, onClick, label }: { tag: OutcomeTag; activ
       type="button"
       onClick={onClick}
       style={active ? cssVars({ color: tone, borderColor: `color-mix(in srgb, ${tone} 55%, transparent)`, background: `color-mix(in srgb, ${tone} 11%, transparent)` }) : undefined}
-      className={cn('border border-solid px-[9px] py-[6px] font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.06em] transition-colors', !active && 'border-line-2 text-txt-dim hover:text-txt')}
+      className={cn('border border-solid px-[0.5625rem] py-[0.375rem] font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.06em] transition-colors', !active && 'border-line-2 text-txt-dim hover:text-txt')}
     >
       {label}
     </button>
@@ -345,7 +345,7 @@ function PreviousGameRecap({ games, upToGame, side }: { games: SeriesGame[]; upT
         const resTone = g.result === 'win' ? 'text-ok' : g.result === 'loss' ? 'text-bad' : 'text-warn';
         return (
           <div key={g.gameNumber} className="flex items-center gap-2">
-            <span className={cn('w-9 shrink-0 font-mono text-[10px] font-bold uppercase', resTone)}>
+            <span className={cn('w-9 shrink-0 font-mono text-[0.625rem] font-bold uppercase', resTone)}>
               {g.result ? t(`result.${g.result}Short`) : '—'} {t('workspace.gameAbbr', { n: g.gameNumber })}
             </span>
             <div className="flex items-center gap-[2px]">
@@ -355,7 +355,7 @@ function PreviousGameRecap({ games, upToGame, side }: { games: SeriesGame[]; upT
             </div>
             {backs.length > 0 && (
               <>
-                <span className="text-[10px] text-txt-dim">/</span>
+                <span className="text-[0.625rem] text-txt-dim">/</span>
                 <div className="flex items-center gap-[2px]">
                   {backs.map((s) => (
                     <img key={s.slotIndex} src={spriteUrl(s.speciesName!)} alt={s.speciesName ?? ''} className="h-6 w-6 object-contain opacity-60" onError={handleSpriteError} />

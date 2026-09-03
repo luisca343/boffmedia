@@ -15,20 +15,20 @@ function hasNewline(children: React.ReactNode): boolean {
 
 const components: Components = {
   h1: ({ node, ...props }) => (
-    <h3 className="mb-3 mt-6 font-display text-[22px]/[1.15] font-bold uppercase not-italic tracking-[0.01em] text-txt first:mt-0" {...props} />
+    <h3 className="mb-3 mt-6 font-display text-[1.375rem]/[1.15] font-bold uppercase not-italic tracking-[0.01em] text-txt first:mt-0" {...props} />
   ),
   h2: ({ node, ...props }) => (
-    <h3 className="mb-3 mt-6 font-display text-[19px]/[1.15] font-bold uppercase not-italic tracking-[0.01em] text-txt first:mt-0" {...props} />
+    <h3 className="mb-3 mt-6 font-display text-[1.1875rem]/[1.15] font-bold uppercase not-italic tracking-[0.01em] text-txt first:mt-0" {...props} />
   ),
   h3: ({ node, ...props }) => (
-    <h4 className="mb-2.5 mt-5 font-display text-[16px]/[1.2] font-bold uppercase not-italic tracking-[0.02em] text-txt first:mt-0" {...props} />
+    <h4 className="mb-2.5 mt-5 font-display text-[1rem]/[1.2] font-bold uppercase not-italic tracking-[0.02em] text-txt first:mt-0" {...props} />
   ),
-  p: ({ node, ...props }) => <p className="my-3 font-body text-[15px]/[1.65] text-txt-muted first:mt-0 last:mb-0" {...props} />,
+  p: ({ node, ...props }) => <p className="my-3 font-body text-[0.9375rem]/[1.65] text-txt-muted first:mt-0 last:mb-0" {...props} />,
   ul: ({ node, ...props }) => (
-    <ul className="my-3 grid gap-1.5 pl-5 font-body text-[15px]/[1.6] text-txt-muted marker:text-accent [list-style:disc]" {...props} />
+    <ul className="my-3 grid gap-1.5 pl-5 font-body text-[0.9375rem]/[1.6] text-txt-muted marker:text-accent [list-style:disc]" {...props} />
   ),
   ol: ({ node, ...props }) => (
-    <ol className="my-3 grid gap-1.5 pl-5 font-body text-[15px]/[1.6] text-txt-muted marker:font-mono marker:font-semibold marker:text-accent [list-style:decimal]" {...props} />
+    <ol className="my-3 grid gap-1.5 pl-5 font-body text-[0.9375rem]/[1.6] text-txt-muted marker:font-mono marker:font-semibold marker:text-accent [list-style:decimal]" {...props} />
   ),
   li: ({ node, ...props }) => <li className="pl-1" {...props} />,
   a: ({ node, href, ...props }) => (
@@ -41,11 +41,11 @@ const components: Components = {
     />
   ),
   blockquote: ({ node, ...props }) => (
-    <blockquote className="my-4 border-l-2 border-solid border-accent bg-panel-2 py-1 pl-4 font-body text-[15px]/[1.6] italic text-txt-muted" {...props} />
+    <blockquote className="my-4 border-l-2 border-solid border-accent bg-panel-2 py-1 pl-4 font-body text-[0.9375rem]/[1.6] italic text-txt-muted" {...props} />
   ),
   pre: ({ node, ...props }) => (
     <pre
-      className="my-4 overflow-x-auto border border-solid border-line bg-panel-2 p-4 font-mono text-[13px]/[1.6] text-txt cut-corner cut-corner-edge"
+      className="my-4 overflow-x-auto border border-solid border-line bg-panel-2 p-4 font-mono text-[0.8125rem]/[1.6] text-txt cut-corner cut-corner-edge"
       {...props}
     />
   ),

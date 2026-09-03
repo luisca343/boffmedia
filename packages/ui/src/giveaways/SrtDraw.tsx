@@ -66,7 +66,7 @@ export function SrtDrawReel({ sorteo, spinning, revealed, onLand }: { sorteo: So
 
   return (
     <div className="relative">
-      <div ref={viewportRef} className="relative h-[84px] overflow-hidden border border-solid border-line-2 bg-base-2">
+      <div ref={viewportRef} className="relative h-[5.25rem] overflow-hidden border border-solid border-line-2 bg-base-2">
         <span aria-hidden className="absolute -bottom-1 -top-1 left-1/2 z-[3] w-[3px] -translate-x-1/2 bg-txt [box-shadow:0_0_0_1px_var(--bg)]">
           <span className="absolute -top-2 left-1/2 -translate-x-1/2 border-[7px] border-solid border-transparent border-t-accent" />
           <span className="absolute -bottom-2 left-1/2 -translate-x-1/2 border-[7px] border-solid border-transparent border-b-accent" />
@@ -82,14 +82,14 @@ export function SrtDrawReel({ sorteo, spinning, revealed, onLand }: { sorteo: So
                 className="relative flex flex-none flex-col items-center justify-center gap-1 overflow-hidden border-r border-solid border-[rgba(0,0,0,0.35)]"
                 style={{ width: c.w, background: color, boxShadow: isWin ? "inset 0 0 0 3px var(--text)" : undefined }}
               >
-                <Avatar className="h-[30px] w-[30px] text-[12px]">{c.p.avatar}</Avatar>
-                <span className="whitespace-nowrap font-mono text-[9px]/none font-semibold uppercase tracking-[0.04em] text-accent-ink opacity-[0.85]">{c.p.name}</span>
+                <Avatar className="h-[1.875rem] w-[1.875rem] text-[0.75rem]">{c.p.avatar}</Avatar>
+                <span className="whitespace-nowrap font-mono text-[0.5625rem]/none font-semibold uppercase tracking-[0.04em] text-accent-ink opacity-[0.85]">{c.p.name}</span>
               </div>
             )
           })}
         </div>
       </div>
-      <div className="mt-3 flex flex-wrap items-center gap-2 font-mono text-[10px]/none font-medium tracking-[0.05em] text-txt-muted">
+      <div className="mt-3 flex flex-wrap items-center gap-2 font-mono text-[0.625rem]/none font-medium tracking-[0.05em] text-txt-muted">
         <Icon name="info" size={13} />
         {t("reelExplainer")}
       </div>
@@ -104,20 +104,20 @@ export function SrtWinnerCard({ sorteo, onReplay }: { sorteo: Sorteo; onReplay?:
   const total = srtTotalTickets(sorteo)
   const odds = total ? (w.tickets / total) * 100 : 0
   return (
-    <div className="relative border border-solid border-accent-line border-t-[3px] border-t-accent bg-panel px-[26px] pb-[30px] pt-[34px] text-center cut-corner cut-corner-edge [--cut-line:var(--accent-line)] [--cut-lg:16px]">
+    <div className="relative border border-solid border-accent-line border-t-[3px] border-t-accent bg-panel px-[1.625rem] pb-[1.875rem] pt-[2.125rem] text-center cut-corner cut-corner-edge [--cut-line:var(--accent-line)] [--cut-lg:16px]">
       <span aria-hidden className="pointer-events-none absolute inset-0 z-0 [background:radial-gradient(80%_70%_at_50%_0,var(--accent-soft),transparent_60%)]" />
-      <span className="relative z-[1] inline-flex items-center gap-[7px] border border-solid border-accent-line px-[11px] py-1.5 font-mono text-[10px]/none font-bold uppercase tracking-[0.14em] text-accent">
+      <span className="relative z-[1] inline-flex items-center gap-[0.4375rem] border border-solid border-accent-line px-[0.6875rem] py-1.5 font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.14em] text-accent">
         <Icon name="sparkles" size={12} />
         {t("status.announced.label")}
       </span>
-      <div className="relative z-[1] mx-auto mb-[14px] mt-[18px] grid h-[76px] w-[76px] place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:14px]">
+      <div className="relative z-[1] mx-auto mb-[0.875rem] mt-[1.125rem] grid h-[4.75rem] w-[4.75rem] place-items-center border border-solid border-accent-line bg-accent-soft text-accent cut-seal cut-seal-edge [--cut-line:var(--accent-line)] [--cut:14px]">
         <Icon name="trophy" size={40} />
       </div>
       <div className="relative z-[1] inline-flex items-center gap-3">
-        <Avatar accent className="h-11 w-11 text-[17px]">{w.avatar}</Avatar>
-        <b className="font-display text-[34px]/none font-extrabold italic text-txt">{w.name}</b>
+        <Avatar accent className="h-11 w-11 text-[1.0625rem]">{w.avatar}</Avatar>
+        <b className="font-display text-[2.125rem]/none font-extrabold italic text-txt">{w.name}</b>
       </div>
-      <p className="relative z-[1] mt-3 text-[14px] text-txt-muted">
+      <p className="relative z-[1] mt-3 text-[0.875rem] text-txt-muted">
         {/* Plain `t`, not a rich translation. The web original passed a `b`
             chunk handler, but neither locale's `wonWith` contains a tag for it
             to wrap — the handler never fired. Keeping it would have forced a

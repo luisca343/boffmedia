@@ -31,7 +31,7 @@ export function TnBracketMatch({
       type="button"
       disabled={!p || !onOpen}
       className={cn(
-        "flex w-full min-w-0 items-center gap-2 border-0 bg-transparent px-[10px] py-2 text-left font-body text-[12.5px]/[1.2] font-semibold text-txt transition-[background] duration-[140ms] enabled:cursor-pointer enabled:hover:bg-panel-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent-line disabled:cursor-default",
+        "flex w-full min-w-0 items-center gap-2 border-0 bg-transparent px-[0.625rem] py-2 text-left font-body text-[0.78125rem]/[1.2] font-semibold text-txt transition-[background] duration-[140ms] enabled:cursor-pointer enabled:hover:bg-panel-2 focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-accent-line disabled:cursor-default",
         isWin && "text-ok",
         m.winner && !isWin && p && "text-txt-dim",
         hot(p) && "bg-[color-mix(in_srgb,var(--accent)_8%,transparent)]",
@@ -39,7 +39,7 @@ export function TnBracketMatch({
       )}
       onClick={() => p && onOpen && onOpen(p.id)}
     >
-      <span className="flex-none border border-solid border-line-2 px-1 py-0.5 font-mono text-[9px]/none font-bold text-txt-dim">{seed != null ? seed : "—"}</span>
+      <span className="flex-none border border-solid border-line-2 px-1 py-0.5 font-mono text-[0.5625rem]/none font-bold text-txt-dim">{seed != null ? seed : "—"}</span>
       {p ? (
         <>
           {p.kind === "team" ? <TnAvatar c={p} size={17} /> : <DkFlag flag={p.flag} code={p.country} name={p.countryName} size={13} />}
@@ -48,7 +48,7 @@ export function TnBracketMatch({
       ) : (
         <span className="min-w-0 flex-1 truncate italic text-txt-dim">{t("tbd")}</span>
       )}
-      <span className="flex-none font-mono text-[12px]/none font-bold">{m.status === "final" ? g : ""}</span>
+      <span className="flex-none font-mono text-[0.75rem]/none font-bold">{m.status === "final" ? g : ""}</span>
     </button>
   )
   const gA = Math.max(m.g1 || 0, m.g2 || 0)
@@ -65,11 +65,11 @@ export function TnBracketMatch({
       )}
     >
       {seat(m.top, m.winner === m.top, gTop, m.topSeed)}
-      <div className="flex min-h-[4px] items-center justify-center border-y border-dashed border-line py-0.5">
+      <div className="flex min-h-[0.25rem] items-center justify-center border-y border-dashed border-line py-0.5">
         {m.status !== "final" && m.top && m.bot ? (
           <DkLive status={m.status} size="sm" />
         ) : reset ? (
-          <span className="p-0.5 font-mono text-[8px]/none font-bold uppercase tracking-[0.1em] text-accent-bright">reset</span>
+          <span className="p-0.5 font-mono text-[0.5rem]/none font-bold uppercase tracking-[0.1em] text-accent-bright">reset</span>
         ) : null}
       </div>
       {seat(m.bot, m.winner === m.bot, gBot, m.botSeed)}
@@ -88,7 +88,7 @@ export interface TnDoubleData {
 export function TnDoubleBracket({ d, onOpen, hi }: { d: TnDoubleData; onOpen?: (id: string) => void; hi?: Set<string> | null }) {
   const t = useTranslations("torneos.bracket")
   const lane = "overflow-x-auto border border-solid border-line px-4 pb-4 pt-3"
-  const head = "mb-3 flex items-center gap-2 font-mono text-[10px]/none font-bold uppercase tracking-[0.14em]"
+  const head = "mb-3 flex items-center gap-2 font-mono text-[0.625rem]/none font-bold uppercase tracking-[0.14em]"
   return (
     <div className="grid gap-4">
       <div className={cn(lane, "bg-base-2")}>
@@ -111,10 +111,10 @@ export function TnDoubleBracket({ d, onOpen, hi }: { d: TnDoubleData; onOpen?: (
             <Icon name="star" size={13} />
             {t("grandFinalTitle")}
           </div>
-          <div className="max-w-[320px]">
+          <div className="max-w-[20rem]">
             <TnBracketMatch m={d.grandFinal} onOpen={onOpen} champion={d.champion} hi={hi} reset={d.grandFinal.reset} />
           </div>
-          {d.grandFinal.reset && <p className="mt-2 font-mono text-[10.5px]/[1.4] font-medium text-txt-dim">{t("resetNote")}</p>}
+          {d.grandFinal.reset && <p className="mt-2 font-mono text-[0.65625rem]/[1.4] font-medium text-txt-dim">{t("resetNote")}</p>}
         </div>
       )}
     </div>

@@ -109,8 +109,8 @@ export function BxType({ type, ghost = false, small = false }: { type: string; g
   const L = useBxLabels()
   return (
     <span style={{ ...tyc(tyColor(type)) }}
-      className={cn("cut cut-edge-slant [--cut:3px]", "inline-flex items-center gap-[5px] font-mono font-semibold uppercase leading-none tracking-[0.06em]",
-        small ? "gap-1 px-[5px] py-[3px] text-[8.5px]" : "px-[7px] py-1 text-[10px]",
+      className={cn("cut cut-edge-slant [--cut:3px]", "inline-flex items-center gap-[0.3125rem] font-mono font-semibold uppercase leading-none tracking-[0.06em]",
+        small ? "gap-1 px-[0.3125rem] py-[3px] text-[0.53125rem]" : "px-[0.4375rem] py-1 text-[0.625rem]",
         ghost
           ? "border border-solid border-[color-mix(in_srgb,var(--tyc)_40%,transparent)] text-[var(--tyc)] [background:color-mix(in_srgb,var(--tyc)_13%,transparent)]"
           : "text-accent-ink [background:var(--tyc)]")}>
@@ -130,8 +130,8 @@ const CAT_MARK: Record<string, string> = {
 export function BxCat({ cat }: { cat: string }) {
   const L = useBxLabels()
   return (
-    <span className="inline-flex items-center gap-1 font-mono text-[8.5px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-muted">
-      <i aria-hidden className={cn("h-[7px] w-[7px] flex-none", CAT_MARK[cat] || CAT_MARK.status)} />{L.cat(cat)}
+    <span className="inline-flex items-center gap-1 font-mono text-[0.53125rem] font-semibold uppercase leading-none tracking-[0.08em] text-txt-muted">
+      <i aria-hidden className={cn("h-[0.4375rem] w-[0.4375rem] flex-none", CAT_MARK[cat] || CAT_MARK.status)} />{L.cat(cat)}
     </span>
   )
 }
@@ -146,7 +146,7 @@ export function BxStatus({ status, long = false }: { status?: string | null; lon
   if (!status) return null
   return (
     <span title={L.statusLong(status)} aria-label={L.statusLong(status)}
-      className={cn("cut [--cut:2px] ", "flex-none px-[5px] py-[3px] font-mono text-[8.5px] font-bold leading-none tracking-[0.08em]", STATUS_BG[status] || "bg-warn text-accent-ink")}>
+      className={cn("cut [--cut:2px] ", "flex-none px-[0.3125rem] py-[3px] font-mono text-[0.53125rem] font-bold leading-none tracking-[0.08em]", STATUS_BG[status] || "bg-warn text-accent-ink")}>
       {long ? L.statusLong(status) : L.status(status)}
     </span>
   )
@@ -155,7 +155,7 @@ export function BxStatus({ status, long = false }: { status?: string | null; lon
 export function BxBoost({ stat, value }: { stat: string; value: number }) {
   const L = useBxLabels()
   return (
-    <span className={cn("flex-none border border-solid px-[5px] py-[3px] font-mono text-[9px] font-bold leading-none tracking-[0.04em]",
+    <span className={cn("flex-none border border-solid px-[0.3125rem] py-[3px] font-mono text-[0.5625rem] font-bold leading-none tracking-[0.04em]",
       value > 0 ? "border-[color-mix(in_srgb,var(--ok)_45%,transparent)] bg-ok-soft text-ok" : "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad")}>
       {(value > 0 ? "+" : "") + value} {L.boost(stat)}
     </span>
@@ -199,7 +199,7 @@ export function BxHp({ pct, ghost = null, trail = true }: { pct: number; ghost?:
     // line colour, an inner one inset and re-clipped — written out here because
     // the bars inside must be clipped to the inner shape too, and `.cut-frame`
     // paints its fill from a pseudo-element that children cannot live inside.
-    <div className="cut relative h-[17px] w-full bg-line-2 [--cut:7px]">
+    <div className="cut relative h-[1.0625rem] w-full bg-line-2 [--cut:7px]">
       <div
         className="cut absolute overflow-hidden bg-[linear-gradient(180deg,var(--base)_0%,var(--panel-2)_100%)] [--cut:6px]"
         // Horizontal inset is wider than vertical on purpose: a 1px diagonal is
@@ -236,7 +236,7 @@ export function BxHp({ pct, ghost = null, trail = true }: { pct: number; ghost?:
 
         {/* Gloss: a bright band over the top third of the FILL only, which is
             what makes it read as a lit surface rather than a coloured box. */}
-        <i aria-hidden className="absolute inset-x-0 top-0 z-[2] h-[6px] bg-[linear-gradient(180deg,color-mix(in_srgb,white_38%,transparent)_0%,transparent_100%)] transition-[width] duration-[300ms] ease-out motion-reduce:transition-none" style={{ width: p + "%" }} />
+        <i aria-hidden className="absolute inset-x-0 top-0 z-[2] h-[0.375rem] bg-[linear-gradient(180deg,color-mix(in_srgb,white_38%,transparent)_0%,transparent_100%)] transition-[width] duration-[300ms] ease-out motion-reduce:transition-none" style={{ width: p + "%" }} />
 
         {/* Leading edge: a slanted highlight where the fill ends, so the eye
             catches the value changing even on a small plate. */}
@@ -280,8 +280,8 @@ export function BxPlate({ mon, slotTag, foe = false, ghost = null, active = fals
       onClick={clickable ? (targetable ? onClick : onDetails) : undefined}
       aria-label={clickable ? (targetable ? targetLabel ?? mon.name : detailsLabel ?? mon.name) : undefined}
       style={{ ...tyc(tyColor(mon.tera && mon.teraType ? mon.teraType : mon.types[0])) }}
-      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,10px)] [--cut-line:var(--line)]", "relative flex w-full min-w-0 items-center gap-[9px] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] px-[10px] py-[7px] pl-2 text-left text-txt backdrop-blur-[4px] transition-[border-color,background,transform] duration-[140ms]",
-        compact ? "gap-[7px] px-2 py-[5px]" : "",
+      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,0.625rem)] [--cut-line:var(--line)]", "relative flex w-full min-w-0 items-center gap-[0.5625rem] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-[color-mix(in_srgb,var(--panel)_88%,transparent)] px-[0.625rem] py-[0.4375rem] pl-2 text-left text-txt backdrop-blur-[4px] transition-[border-color,background,transform] duration-[140ms]",
+        compact ? "gap-[0.4375rem] px-2 py-[0.3125rem]" : "",
         mon.fnt && "opacity-55 saturate-[0.2]",
         active && "border-accent-line [--cut-line:var(--accent-line)]",
         (ghost || aimed) && "border-[color-mix(in_srgb,var(--warn)_55%,transparent)] [--cut-line:color-mix(in_srgb,var(--warn)_55%,transparent)]",
@@ -293,17 +293,17 @@ export function BxPlate({ mon, slotTag, foe = false, ghost = null, active = fals
       )}>
       <span className="relative flex-none">
         <BxSprite mon={mon} size={compact ? 30 : 40} />
-        {mon.fnt && <b className="absolute inset-0 grid place-items-center font-display text-[12px] font-extrabold leading-none tracking-[0.06em] text-bad">{t("battle.end.ko")}</b>}
+        {mon.fnt && <b className="absolute inset-0 grid place-items-center font-display text-[0.75rem] font-extrabold leading-none tracking-[0.06em] text-bad">{t("battle.end.ko")}</b>}
       </span>
-      <span className="grid min-w-0 flex-1 gap-[5px]">
-        <span className="flex min-w-0 items-center gap-[6px]">
-          {slotTag && <b className={cn("flex-none border border-solid px-[5px] py-[2px] font-mono text-[8px] font-bold not-italic leading-none tracking-[0.1em]", foe ? "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad" : "border-accent-line bg-accent-soft text-accent-bright")}>{slotTag}</b>}
+      <span className="grid min-w-0 flex-1 gap-[0.3125rem]">
+        <span className="flex min-w-0 items-center gap-[0.375rem]">
+          {slotTag && <b className={cn("flex-none border border-solid px-[0.3125rem] py-[2px] font-mono text-[0.5rem] font-bold not-italic leading-none tracking-[0.1em]", foe ? "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad" : "border-accent-line bg-accent-soft text-accent-bright")}>{slotTag}</b>}
           {mon.tera && mon.teraType && <BxTera type={mon.teraType} size=".78em" />}
           {/* The name carries the plate voice too — it is the half of the
               Champions nameplate the eye actually reads as "that game". */}
-          <span className={cn("min-w-0 flex-1 truncate leading-none", compact ? "text-[12.5px]" : "text-[14.5px]")} style={BX_PLATE_VOICE}>{mon.name}</span>
+          <span className={cn("min-w-0 flex-1 truncate leading-none", compact ? "text-[0.78125rem]" : "text-[0.90625rem]")} style={BX_PLATE_VOICE}>{mon.name}</span>
           <span aria-label={hpAriaLabel(t, mon, pct, showExact)} className="ml-auto inline-flex flex-none items-baseline gap-[3px] leading-none" style={{ ...BX_PLATE_VOICE, color: mon.fnt ? "var(--muted)" : hpTone(pct) }}>
-            {!mon.fnt && band !== "ok" && <i aria-hidden className="self-center not-italic text-[10px]">▼</i>}
+            {!mon.fnt && band !== "ok" && <i aria-hidden className="self-center not-italic text-[0.625rem]">▼</i>}
             {/* Current big, maximum small — the number that changes is the one
                 worth reading at a glance, and it is how Champions sets it. */}
             <b style={{ fontSize: compact ? "15px" : "19px" }}>{mon.fnt ? t("battle.end.ko") : showExact ? mon.hpCur : pct}</b>
@@ -314,16 +314,16 @@ export function BxPlate({ mon, slotTag, foe = false, ghost = null, active = fals
         </span>
         <BxHp pct={pct} ghost={ghost} />
         {ghost ? (
-          <span className="flex min-h-[16px] items-center gap-[6px] font-mono text-[11px] font-bold leading-none text-warn">
+          <span className="flex min-h-[1rem] items-center gap-[0.375rem] font-mono text-[0.6875rem] font-bold leading-none text-warn">
             <Icon name="target" size={11} /><b>−{ghost.min}–{ghost.max}%</b>
-            {ghost.ko && <i className={cn("px-[5px] py-[3px] font-mono text-[9px] font-bold not-italic uppercase leading-none tracking-[0.06em] text-accent-ink", ghost.ko.cls === "sure" ? "bg-bad" : "bg-warn")}>{ghost.ko.t}</i>}
+            {ghost.ko && <i className={cn("px-[0.3125rem] py-[3px] font-mono text-[0.5625rem] font-bold not-italic uppercase leading-none tracking-[0.06em] text-accent-ink", ghost.ko.cls === "sure" ? "bg-bad" : "bg-warn")}>{ghost.ko.t}</i>}
           </span>
         ) : (
-          <span className="flex min-h-[16px] flex-wrap items-center gap-[5px]">
-            {!mon.fnt && band === "critical" && <b className="bg-bad px-[5px] py-[3px] font-mono text-[8.5px] font-bold uppercase leading-none tracking-[0.08em] text-accent-ink">{t("battle.hp.critical")}</b>}
+          <span className="flex min-h-[1rem] flex-wrap items-center gap-[0.3125rem]">
+            {!mon.fnt && band === "critical" && <b className="bg-bad px-[0.3125rem] py-[3px] font-mono text-[0.53125rem] font-bold uppercase leading-none tracking-[0.08em] text-accent-ink">{t("battle.hp.critical")}</b>}
             <BxTypeRow types={types} small />
             <BxStatus status={mon.status} />
-            {mon.protect && <i className="border border-dashed border-[color-mix(in_srgb,var(--info)_50%,transparent)] px-1 py-[2px] font-mono text-[8.5px] font-bold not-italic leading-none tracking-[0.1em] text-signal">{t("battle.labels.protect")}</i>}
+            {mon.protect && <i className="border border-dashed border-[color-mix(in_srgb,var(--info)_50%,transparent)] px-1 py-[2px] font-mono text-[0.53125rem] font-bold not-italic leading-none tracking-[0.1em] text-signal">{t("battle.labels.protect")}</i>}
             {boosts.map(([s, v]) => <BxBoost key={s} stat={s} value={v} />)}
           </span>
         )}
@@ -349,29 +349,29 @@ export function BxKey({ move, hotkey, target = null, selected = false, disabled 
     <button type="button" disabled={off} onClick={off ? undefined : onClick} title={why} aria-pressed={selected || undefined}
       onMouseEnter={onHover} onMouseLeave={onLeave} onFocus={onHover} onBlur={onLeave}
       style={{ ...tyc(tyColor(move.type)) }}
-      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,10px)] [--cut-line:var(--line)]", BSIM_FOCUS_CUT, FOCUS_RING, "relative flex min-h-[52px] w-full min-w-0 items-center gap-[9px] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-panel px-[10px] py-2 text-left text-txt transition-[background,border-color,transform] duration-[140ms]",
+      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,0.625rem)] [--cut-line:var(--line)]", BSIM_FOCUS_CUT, FOCUS_RING, "relative flex min-h-[3.25rem] w-full min-w-0 items-center gap-[0.5625rem] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-panel px-[0.625rem] py-2 text-left text-txt transition-[background,border-color,transform] duration-[140ms]",
         "hover:-translate-y-px hover:border-[color-mix(in_srgb,var(--tyc)_55%,var(--line))] hover:bg-panel-2 motion-reduce:hover:translate-y-0 active:translate-y-px motion-reduce:active:translate-y-0",
         selected && "border-accent [--cut-line:var(--accent)] bg-accent-soft",
         off && "cursor-not-allowed opacity-50 hover:translate-y-0 hover:border-line hover:bg-panel",
       )}>
       {hotkey != null && <BxKbd>{hotkey}</BxKbd>}
-      <span className="grid min-w-0 flex-1 gap-[5px]">
-        <span className="flex items-center gap-[6px] font-display text-[13px] font-bold uppercase leading-[1.05] tracking-[0.03em]">
+      <span className="grid min-w-0 flex-1 gap-[0.3125rem]">
+        <span className="flex items-center gap-[0.375rem] font-display text-[0.8125rem] font-bold uppercase leading-[1.05] tracking-[0.03em]">
           <span className="min-w-0 truncate">{move.name}</span>
-          {tera && <b className="flex-none border border-solid border-[color-mix(in_srgb,var(--accent)_50%,transparent)] px-[3px] py-px font-mono text-[7.5px] not-italic tracking-[0.08em] text-accent-bright">TERA</b>}
+          {tera && <b className="flex-none border border-solid border-[color-mix(in_srgb,var(--accent)_50%,transparent)] px-[3px] py-px font-mono text-[0.46875rem] not-italic tracking-[0.08em] text-accent-bright">TERA</b>}
         </span>
-        <span className="flex flex-wrap items-center gap-[7px]">
+        <span className="flex flex-wrap items-center gap-[0.4375rem]">
           <BxType type={move.type} small /><BxCat cat={move.cat} />
-          {move.spread && <i className="border border-dashed border-line-2 px-1 py-[2px] font-mono text-[8.5px] font-semibold not-italic leading-none tracking-[0.08em] text-txt-dim">{move.spread === "all" ? t("bx.spreadAllTag") : t("bx.spreadTag")}</i>}
-          {(move.prio ?? 0) > 0 && <i className="border border-dashed border-[color-mix(in_srgb,var(--ok)_45%,transparent)] px-1 py-[2px] font-mono text-[8.5px] font-semibold not-italic leading-none tracking-[0.08em] text-ok">+{move.prio}</i>}
-          {why && <i className="border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-1 py-[2px] font-mono text-[8.5px] font-bold not-italic uppercase leading-none tracking-[0.08em] text-bad">{why}</i>}
+          {move.spread && <i className="border border-dashed border-line-2 px-1 py-[2px] font-mono text-[0.53125rem] font-semibold not-italic leading-none tracking-[0.08em] text-txt-dim">{move.spread === "all" ? t("bx.spreadAllTag") : t("bx.spreadTag")}</i>}
+          {(move.prio ?? 0) > 0 && <i className="border border-dashed border-[color-mix(in_srgb,var(--ok)_45%,transparent)] px-1 py-[2px] font-mono text-[0.53125rem] font-semibold not-italic leading-none tracking-[0.08em] text-ok">+{move.prio}</i>}
+          {why && <i className="border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-1 py-[2px] font-mono text-[0.53125rem] font-bold not-italic uppercase leading-none tracking-[0.08em] text-bad">{why}</i>}
         </span>
       </span>
       <span className="grid flex-none justify-items-end gap-1">
-        {eff && <b className={cn("px-[5px] py-[3px] font-mono text-[8.5px] font-bold uppercase leading-none tracking-[0.06em]",
+        {eff && <b className={cn("px-[0.3125rem] py-[3px] font-mono text-[0.53125rem] font-bold uppercase leading-none tracking-[0.06em]",
           eff.cls === "super" ? "bg-ok text-accent-ink" : eff.cls === "immune" ? "bg-txt-dim text-accent-ink" : "border border-solid border-line-2 bg-panel-2 text-txt-muted")}>{L.eff(eff.key)}</b>}
-        <span className="inline-flex items-center gap-[5px] font-mono text-[9.5px] font-semibold leading-none text-txt-dim">
-          <i className="h-1 w-[30px] overflow-hidden border border-solid border-line bg-base"><b className="block h-full bg-accent" style={{ width: (move.pp / Math.max(1, move.maxpp)) * 100 + "%" }} /></i>
+        <span className="inline-flex items-center gap-[0.3125rem] font-mono text-[0.59375rem] font-semibold leading-none text-txt-dim">
+          <i className="h-1 w-[1.875rem] overflow-hidden border border-solid border-line bg-base"><b className="block h-full bg-accent" style={{ width: (move.pp / Math.max(1, move.maxpp)) * 100 + "%" }} /></i>
           {move.pp}/{move.maxpp}
         </span>
       </span>
@@ -389,20 +389,20 @@ export function BxBench({ mon, hotkey, disabled = false, reserved = false, reaso
   const why = reason ?? (mon.fnt ? t("battle.dock.fainted") : undefined)
   return (
     <button type="button" disabled={off} onClick={onClick} title={why} aria-pressed={reserved || undefined}
-      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,10px)] [--cut-line:var(--line)]", BSIM_FOCUS_CUT, FOCUS_RING, PRESS, "flex min-h-[52px] w-full min-w-0 items-center gap-[9px] border border-solid border-line bg-panel px-[10px] py-[7px] text-left text-txt transition-[background,border-color,transform] duration-[140ms]",
+      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,0.625rem)] [--cut-line:var(--line)]", BSIM_FOCUS_CUT, FOCUS_RING, PRESS, "flex min-h-[3.25rem] w-full min-w-0 items-center gap-[0.5625rem] border border-solid border-line bg-panel px-[0.625rem] py-[0.4375rem] text-left text-txt transition-[background,border-color,transform] duration-[140ms]",
         "hover:border-accent-line hover:bg-panel-2 disabled:cursor-not-allowed disabled:hover:border-line disabled:hover:bg-panel",
         mon.fnt && "opacity-45 saturate-[0.2]", off && !mon.fnt && "opacity-60",
         reserved && "border-accent-line [--cut-line:var(--accent-line)] bg-accent-soft")}>
       {hotkey != null && <BxKbd>{hotkey}</BxKbd>}
       <BxSprite mon={mon} size={34} />
       <span className="grid min-w-0 flex-1 gap-1">
-        <span className="flex min-w-0 items-center gap-[6px] font-display text-[12.5px] font-bold uppercase leading-none tracking-[0.03em]">
+        <span className="flex min-w-0 items-center gap-[0.375rem] font-display text-[0.78125rem] font-bold uppercase leading-none tracking-[0.03em]">
           <span className="min-w-0 truncate">{mon.name}</span><BxStatus status={mon.status} />
-          {reserved && <i className="flex-none font-mono text-[8px] font-bold not-italic leading-none tracking-[0.1em] text-accent-bright">{t("bx.chosen")}</i>}
-          {why && !mon.fnt && <i className="flex-none border border-solid border-line-2 px-1 py-[2px] font-mono text-[8px] font-semibold not-italic uppercase leading-none tracking-[0.08em] text-txt-dim">{why}</i>}
+          {reserved && <i className="flex-none font-mono text-[0.5rem] font-bold not-italic leading-none tracking-[0.1em] text-accent-bright">{t("bx.chosen")}</i>}
+          {why && !mon.fnt && <i className="flex-none border border-solid border-line-2 px-1 py-[2px] font-mono text-[0.5rem] font-semibold not-italic uppercase leading-none tracking-[0.08em] text-txt-dim">{why}</i>}
         </span>
         <span className="flex items-center gap-2">
-          <span className="h-[8px] min-w-0 flex-1 overflow-hidden border border-solid border-line-2 bg-[linear-gradient(180deg,var(--panel-2)_0%,var(--panel)_100%)]"><i className="block h-full transition-[width] duration-[300ms] ease-out motion-reduce:transition-none" style={{ width: pct + "%", background: `linear-gradient(180deg, color-mix(in srgb, ${hpTone(pct)} 110%, white 15%) 0%, ${hpTone(pct)} 70%, color-mix(in srgb, ${hpTone(pct)} 85%, black 10%) 100%)` }} /></span>
+          <span className="h-[0.5rem] min-w-0 flex-1 overflow-hidden border border-solid border-line-2 bg-[linear-gradient(180deg,var(--panel-2)_0%,var(--panel)_100%)]"><i className="block h-full transition-[width] duration-[300ms] ease-out motion-reduce:transition-none" style={{ width: pct + "%", background: `linear-gradient(180deg, color-mix(in srgb, ${hpTone(pct)} 110%, white 15%) 0%, ${hpTone(pct)} 70%, color-mix(in srgb, ${hpTone(pct)} 85%, black 10%) 100%)` }} /></span>
           <span aria-label={hpAriaLabel(t, mon, pct, true)} className="flex-none leading-none" style={{ ...BX_PLATE_VOICE, color: mon.fnt ? "var(--muted)" : hpTone(pct), fontSize: "11px" }}>{mon.fnt ? t("battle.end.ko") : mon.hpCur != null && mon.hpMax != null ? `${mon.hpCur}/${mon.hpMax}` : pct + "%"}</span>
         </span>
         <BxTypeRow types={mon.types} small />
@@ -412,7 +412,7 @@ export function BxBench({ mon, hotkey, disabled = false, reserved = false, reaso
 }
 
 /* ── Mechanic buttons (tera + the others share one shape) ────────────────── */
-const MECH_BTN = cn("cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px]", BSIM_FOCUS_CUT, FOCUS_RING, PRESS, "inline-flex h-8 items-center gap-2 border border-solid border-line-2 bg-panel px-3 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-[border-color,color,background] duration-[140ms]",
+const MECH_BTN = cn("cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px]", BSIM_FOCUS_CUT, FOCUS_RING, PRESS, "inline-flex h-8 items-center gap-2 border border-solid border-line-2 bg-panel px-3 font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted transition-[border-color,color,background] duration-[140ms]",
   "hover:border-[color-mix(in_srgb,var(--tyc)_60%,transparent)] hover:text-txt disabled:cursor-not-allowed disabled:opacity-45")
 const MECH_ARMED = "border-[var(--tyc)] [--cut-line:var(--tyc)] text-txt [background:color-mix(in_srgb,var(--tyc)_14%,var(--panel))]"
 
@@ -462,7 +462,7 @@ export function BxRing({ sec, max = 45, size = 50, label }: { sec: number; max?:
           strokeDasharray={c} strokeDashoffset={c * (1 - frac)} transform={`rotate(-90 ${size / 2} ${size / 2})`}
           className="motion-reduce:[transition:none]" style={{ transition: "stroke-dashoffset 1s linear, stroke .3s" }} />
       </svg>
-      <b aria-hidden className={cn("font-mono font-bold leading-none", size < 40 ? "text-[11px]" : "text-[13px]", low && "animate-[bm-blink_1s_steps(2)_infinite] text-bad motion-reduce:animate-none")}>{sec}</b>
+      <b aria-hidden className={cn("font-mono font-bold leading-none", size < 40 ? "text-[0.6875rem]" : "text-[0.8125rem]", low && "animate-[bm-blink_1s_steps(2)_infinite] text-bad motion-reduce:animate-none")}>{sec}</b>
       <span className="sr-only" aria-live="polite">{announce}</span>
     </span>
   )
@@ -473,29 +473,29 @@ export function BxTick({ ev }: { ev: BxTickEv }) {
   const t = useToolT(BATTLESIM_NS)
   if (ev.turn != null) {
     return (
-      <div className="flex items-center gap-[10px] pb-1 pt-[10px]">
-        <span className="flex-none font-mono text-[11px] font-extrabold leading-none tracking-[0.14em] text-accent-bright">T{ev.turn}</span>
+      <div className="flex items-center gap-[0.625rem] pb-1 pt-[0.625rem]">
+        <span className="flex-none font-mono text-[0.6875rem] font-extrabold leading-none tracking-[0.14em] text-accent-bright">T{ev.turn}</span>
         <i className="h-px flex-1 bg-[linear-gradient(90deg,var(--accent-line),transparent)]" />
       </div>
     )
   }
   if (ev.kind === "sys") {
     return (
-      <div className="border-l-2 border-solid border-line-2 py-[5px] pl-[10px] pr-2">
-        <span className="font-body text-[12.5px] italic leading-[1.45] text-txt-dim" dangerouslySetInnerHTML={{ __html: sanitizeHtml(ev.txt || "") }} />
+      <div className="border-l-2 border-solid border-line-2 py-[0.3125rem] pl-[0.625rem] pr-2">
+        <span className="font-body text-[0.78125rem] italic leading-[1.45] text-txt-dim" dangerouslySetInnerHTML={{ __html: sanitizeHtml(ev.txt || "") }} />
       </div>
     )
   }
   const c = ev.type ? tyColor(ev.type) : ev.kind === "boost" ? "var(--ok)" : "var(--accent)"
   return (
-    <div style={tyc(c)} className={cn("relative flex min-w-0 items-baseline gap-2 border-l-2 border-solid border-l-[var(--tyc)] bg-[color-mix(in_srgb,var(--panel)_70%,transparent)] py-[5px] pl-[10px] pr-2",
+    <div style={tyc(c)} className={cn("relative flex min-w-0 items-baseline gap-2 border-l-2 border-solid border-l-[var(--tyc)] bg-[color-mix(in_srgb,var(--panel)_70%,transparent)] py-[0.3125rem] pl-[0.625rem] pr-2",
       ev.who === "foe" && "border-l-[color-mix(in_srgb,var(--tyc)_70%,var(--bad))]", ev.crit && "bg-[color-mix(in_srgb,var(--warn)_8%,var(--panel))]")}>
-      <span className="min-w-0 font-body text-[12.5px] leading-[1.45] text-txt-muted [&_b]:font-semibold [&_b]:text-txt" dangerouslySetInnerHTML={{ __html: sanitizeHtml(ev.txt || "") }} />
+      <span className="min-w-0 font-body text-[0.78125rem] leading-[1.45] text-txt-muted [&_b]:font-semibold [&_b]:text-txt" dangerouslySetInnerHTML={{ __html: sanitizeHtml(ev.txt || "") }} />
       {(ev.dmg || ev.eff) && (
         <span className="ml-auto inline-flex flex-none gap-1">
-          {ev.dmg && <b className="bg-bad-soft px-1 py-[3px] font-mono text-[10px] font-bold leading-none text-bad">{ev.dmg}</b>}
-          {ev.eff === "super" && <b className="font-mono text-[8.5px] font-bold leading-[1.2] tracking-[0.06em] text-ok">{t("bx.effective")}</b>}
-          {ev.eff === "weak" && <b className="font-mono text-[8.5px] font-semibold leading-[1.2] text-txt-dim">{t("bx.resisted")}</b>}
+          {ev.dmg && <b className="bg-bad-soft px-1 py-[3px] font-mono text-[0.625rem] font-bold leading-none text-bad">{ev.dmg}</b>}
+          {ev.eff === "super" && <b className="font-mono text-[0.53125rem] font-bold leading-[1.2] tracking-[0.06em] text-ok">{t("bx.effective")}</b>}
+          {ev.eff === "weak" && <b className="font-mono text-[0.53125rem] font-semibold leading-[1.2] text-txt-dim">{t("bx.resisted")}</b>}
         </span>
       )}
     </div>
@@ -587,7 +587,7 @@ export function BxLog({ log, className, filters = true, limit = VISIBLE_TICK_LIM
             ]} />
           {groups.length > 1 && (
             <button type="button" onClick={collapsePrevious} title={t("log.collapsePrevious")}
-              className={cn(BSIM_FOCUS, "ml-auto h-8 border border-solid border-line-2 bg-panel px-2 font-mono text-[10px] uppercase leading-none tracking-[0.06em] text-txt-dim transition-colors duration-[140ms] hover:text-txt")}>
+              className={cn(BSIM_FOCUS, "ml-auto h-8 border border-solid border-line-2 bg-panel px-2 font-mono text-[0.625rem] uppercase leading-none tracking-[0.06em] text-txt-dim transition-colors duration-[140ms] hover:text-txt")}>
               {t("log.collapsePrevious")}
             </button>
           )}
@@ -595,7 +595,7 @@ export function BxLog({ log, className, filters = true, limit = VISIBLE_TICK_LIM
       )}
       {log.length > limit && !showAll && (
         <button type="button" onClick={() => setShowAll(true)}
-          className={cn(BSIM_FOCUS, "w-full shrink-0 border-b border-solid border-line bg-base py-[6px] font-mono text-[10.5px] text-txt-muted transition-colors duration-[140ms] hover:text-txt")}>
+          className={cn(BSIM_FOCUS, "w-full shrink-0 border-b border-solid border-line bg-base py-[0.375rem] font-mono text-[0.65625rem] text-txt-muted transition-colors duration-[140ms] hover:text-txt")}>
           {t("log.showAll", { count: log.length })}
         </button>
       )}
@@ -609,7 +609,7 @@ export function BxLog({ log, className, filters = true, limit = VISIBLE_TICK_LIM
               {group.turn > 0 && (
                 <button type="button" onClick={() => toggleTurn(group.turn)} aria-expanded={!isCollapsed}
                   aria-label={isCollapsed ? t("battle.log.expand", { turn: group.turn }) : t("battle.log.collapse", { turn: group.turn })}
-                  className={cn(BSIM_FOCUS, "sticky top-0 z-[1] flex min-h-8 w-full items-center gap-[10px] bg-panel pb-[3px] pt-[7px] text-left font-mono text-[11px] font-extrabold leading-none tracking-[0.14em] focus-visible:outline-offset-[-3px]", isActive ? "text-txt" : "text-accent-bright")}>
+                  className={cn(BSIM_FOCUS, "sticky top-0 z-[1] flex min-h-8 w-full items-center gap-[0.625rem] bg-panel pb-[3px] pt-[0.4375rem] text-left font-mono text-[0.6875rem] font-extrabold leading-none tracking-[0.14em] focus-visible:outline-offset-[-3px]", isActive ? "text-txt" : "text-accent-bright")}>
                   <span aria-hidden>{isCollapsed ? "▸" : "▾"}</span>
                   <span>T{group.turn}</span>
                   {isCollapsed && <span className="font-normal text-txt-dim">{t("log.events", { count: group.events.length })}</span>}
@@ -620,7 +620,7 @@ export function BxLog({ log, className, filters = true, limit = VISIBLE_TICK_LIM
             </div>
           )
         })}
-        {groups.length === 0 && <p className="py-4 text-center font-mono text-[11px] text-txt-dim">{t("log.empty")}</p>}
+        {groups.length === 0 && <p className="py-4 text-center font-mono text-[0.6875rem] text-txt-dim">{t("log.empty")}</p>}
       </div>
       <span className="sr-only" aria-live="polite" aria-label={t("battle.log.latest")}>{latestText}</span>
     </div>
@@ -639,15 +639,15 @@ export function BxScore({ name, handle, rating, av, team = [], right = false, ta
   const isFoe = foe ?? right
   const alive = team.filter((m) => !m.fnt).length
   return (
-    <div className={cn("flex min-w-0 items-center gap-[10px]", right && "flex-row-reverse text-right", compact && "gap-2")}>
+    <div className={cn("flex min-w-0 items-center gap-[0.625rem]", right && "flex-row-reverse text-right", compact && "gap-2")}>
       <span
-        className={cn("cut-tag cut-tag-edge [--cut-tag:8px] ", "grid flex-none place-items-center border border-solid font-display font-extrabold leading-none tracking-[0.04em]", compact ? "h-8 w-8 text-[12px]" : "h-9 w-9 text-[13px]",
+        className={cn("cut-tag cut-tag-edge [--cut-tag:8px] ", "grid flex-none place-items-center border border-solid font-display font-extrabold leading-none tracking-[0.04em]", compact ? "h-8 w-8 text-[0.75rem]" : "h-9 w-9 text-[0.8125rem]",
           isFoe ? "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad" : "border-accent-line [--cut-line:var(--accent-line)] bg-accent-soft text-accent-bright")}>{av}</span>
       <span className="grid min-w-0 gap-[2px]">
-        <b className={cn("flex min-w-0 items-center gap-[6px] font-display font-bold uppercase leading-none tracking-[0.04em]", compact ? "text-[12.5px]" : "text-[14.5px]", right && "flex-row-reverse")}>
-          <span className="min-w-0 truncate">{name}</span>{tag && <i className={cn("flex-none px-[5px] py-[2px] font-mono text-[8px] font-bold not-italic uppercase leading-none tracking-[0.12em]", isFoe ? "bg-bad text-accent-ink" : "bg-accent text-accent-ink")}>{tag}</i>}
+        <b className={cn("flex min-w-0 items-center gap-[0.375rem] font-display font-bold uppercase leading-none tracking-[0.04em]", compact ? "text-[0.78125rem]" : "text-[0.90625rem]", right && "flex-row-reverse")}>
+          <span className="min-w-0 truncate">{name}</span>{tag && <i className={cn("flex-none px-[0.3125rem] py-[2px] font-mono text-[0.5rem] font-bold not-italic uppercase leading-none tracking-[0.12em]", isFoe ? "bg-bad text-accent-ink" : "bg-accent text-accent-ink")}>{tag}</i>}
         </b>
-        {!compact && (handle || rating != null) && <small className="truncate font-mono text-[10px] font-medium leading-[1.2] tracking-[0.04em] text-txt-dim">{handle ? handle + (rating != null ? " · " : "") : ""}{rating}</small>}
+        {!compact && (handle || rating != null) && <small className="truncate font-mono text-[0.625rem] font-medium leading-[1.2] tracking-[0.04em] text-txt-dim">{handle ? handle + (rating != null ? " · " : "") : ""}{rating}</small>}
       </span>
       {team.length > 0 && (
         <span className={cn("flex flex-none gap-1", right ? "ml-0 mr-1" : "ml-1")} title={t("battle.score.alive", { alive, total: team.length })}>
@@ -665,22 +665,22 @@ export function BxOrder({ slots }: { slots: OrderSlot[] }) {
   const order = speedOrder(slots)
   if (!order.length) return null
   return (
-    <div className="flex min-w-0 flex-wrap items-center gap-[10px] py-[7px]">
-      <span className="inline-flex flex-none items-center gap-[5px] font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
+    <div className="flex min-w-0 flex-wrap items-center gap-[0.625rem] py-[0.4375rem]">
+      <span className="inline-flex flex-none items-center gap-[0.3125rem] font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-dim">
         <Icon name="trending" size={12} />{t("bx.orderProjected")}
       </span>
-      <span className="flex min-w-0 flex-wrap gap-[6px]">
+      <span className="flex min-w-0 flex-wrap gap-[0.375rem]">
         {order.map((s, i) => (
           <span key={s.side + s.idx}
-            className={cn("cut cut-edge-slant [--cut:4px] ", "inline-flex items-center gap-[6px] border border-solid bg-panel py-[3px] pl-1 pr-2", s.side === "foe" ? "border-[color-mix(in_srgb,var(--bad)_30%,var(--line))]" : "border-line")}>
-            <b className={cn("font-mono text-[9.5px] font-extrabold leading-none", s.side === "foe" ? "text-bad" : "text-accent-bright")}>{i + 1}</b>
+            className={cn("cut cut-edge-slant [--cut:4px] ", "inline-flex items-center gap-[0.375rem] border border-solid bg-panel py-[3px] pl-1 pr-2", s.side === "foe" ? "border-[color-mix(in_srgb,var(--bad)_30%,var(--line))]" : "border-line")}>
+            <b className={cn("font-mono text-[0.59375rem] font-extrabold leading-none", s.side === "foe" ? "text-bad" : "text-accent-bright")}>{i + 1}</b>
             <BxSprite mon={s.mon} size={22} />
-            <span className="whitespace-nowrap font-body text-[10.5px] font-semibold leading-none text-txt-muted">{s.mon.name}</span>
-            <span className="font-mono text-[9.5px] font-semibold leading-none text-txt-dim">{s.spe}</span>
+            <span className="whitespace-nowrap font-body text-[0.65625rem] font-semibold leading-none text-txt-muted">{s.mon.name}</span>
+            <span className="font-mono text-[0.59375rem] font-semibold leading-none text-txt-dim">{s.spe}</span>
           </span>
         ))}
       </span>
-      <span className="ml-auto flex-none font-mono text-[9.5px] leading-none text-txt-dim">{t("bx.priorityNote")}</span>
+      <span className="ml-auto flex-none font-mono text-[0.59375rem] leading-none text-txt-dim">{t("bx.priorityNote")}</span>
     </div>
   )
 }
@@ -690,10 +690,10 @@ export function BxField({ icon = "sun", name, turns, tone, side }: { icon?: Para
   const t = useToolT(BATTLESIM_NS)
   return (
     <span style={tone ? tyc(tone) : undefined} title={side ? `${side === "foe" ? t("battle.foe") : t("battle.you")} · ${name}` : name}
-      className="inline-flex max-w-full items-center gap-[5px] whitespace-nowrap border border-solid border-[color-mix(in_srgb,var(--tyc,var(--line-2))_45%,transparent)] bg-[color-mix(in_srgb,var(--tyc,var(--panel))_10%,var(--panel))] px-2 py-1 font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.06em] text-[var(--tyc,var(--muted))]">
+      className="inline-flex max-w-full items-center gap-[0.3125rem] whitespace-nowrap border border-solid border-[color-mix(in_srgb,var(--tyc,var(--line-2))_45%,transparent)] bg-[color-mix(in_srgb,var(--tyc,var(--panel))_10%,var(--panel))] px-2 py-1 font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.06em] text-[var(--tyc,var(--muted))]">
       {side && <i aria-hidden className="not-italic">{side === "foe" ? "▲" : "▼"}</i>}
       {side && <span className="sr-only">{side === "foe" ? t("battle.foe") : t("battle.you")}</span>}
-      <Icon name={icon} size={13} /><span className="truncate">{name}</span>{turns != null && <b className="font-mono text-[9px] font-bold leading-none opacity-75">{turns}</b>}
+      <Icon name={icon} size={13} /><span className="truncate">{name}</span>{turns != null && <b className="font-mono text-[0.5625rem] font-bold leading-none opacity-75">{turns}</b>}
     </span>
   )
 }
@@ -711,25 +711,25 @@ export function BxSpark({ data, w = 220, h = 40 }: { data: number[]; w?: number;
         <path d={`${path} L${w},${h} L0,${h} Z`} fill="var(--accent-soft)" stroke="none" />
         <path d={path} fill="none" stroke="var(--accent)" strokeWidth="2" />
       </svg>
-      <b className="flex-none font-mono text-[13px] font-bold leading-none" style={{ color: last >= 50 ? "var(--ok)" : "var(--bad)" }}>{last}%</b>
+      <b className="flex-none font-mono text-[0.8125rem] font-bold leading-none" style={{ color: last >= 50 ? "var(--ok)" : "var(--bad)" }}>{last}%</b>
     </span>
   )
 }
 
 /* ── Keyboard hint chip ──────────────────────────────────────────────────── */
 export function BxKbd({ children }: { children: React.ReactNode }) {
-  return <kbd className="grid h-[18px] min-w-[18px] flex-none place-items-center border border-solid border-line-2 bg-base px-1 font-mono text-[10px] font-semibold not-italic leading-none text-txt-muted">{children}</kbd>
+  return <kbd className="grid h-[1.125rem] min-w-[1.125rem] flex-none place-items-center border border-solid border-line-2 bg-base px-1 font-mono text-[0.625rem] font-semibold not-italic leading-none text-txt-muted">{children}</kbd>
 }
 export function BxKbdHint({ k, label }: { k: React.ReactNode; label: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-[5px] font-mono text-[9.5px] font-medium leading-none tracking-[0.04em] text-txt-dim">
+    <span className="inline-flex items-center gap-[0.3125rem] font-mono text-[0.59375rem] font-medium leading-none tracking-[0.04em] text-txt-dim">
       <BxKbd>{k}</BxKbd>{label}
     </span>
   )
 }
 
 /* ── Plan chip (queued order) ────────────────────────────────────────────── */
-const SLOTTAG = "flex-none border border-solid border-accent-line bg-accent-soft px-[5px] py-[3px] font-mono text-[9px] font-bold not-italic leading-none tracking-[0.08em] text-accent-bright"
+const SLOTTAG = "flex-none border border-solid border-accent-line bg-accent-soft px-[0.3125rem] py-[3px] font-mono text-[0.5625rem] font-bold not-italic leading-none tracking-[0.08em] text-accent-bright"
 export type BxPlanAction =
   | { kind: "move"; move: { name: string; type?: string }; target?: { spread?: string } | null; targetName?: string; tera?: boolean; mech?: string }
   | { kind: "switch"; toName: string }
@@ -748,9 +748,9 @@ export function BxPlan({ tag, action, onClear, hint, active = false, onSelect, s
   const bodyProps = onSelect ? { type: "button" as const, onClick: onSelect, "aria-label": selectLabel, "aria-current": active ? ("step" as const) : undefined } : {}
   if (!action) {
     return (
-      <div className={cn("cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px] inline-flex min-h-8 min-w-0 items-center gap-[7px] border border-dashed border-line-2 bg-panel px-[9px]", active && "border-accent-line [--cut-line:var(--accent-line)] bg-accent-soft")}>
+      <div className={cn("cut cut-edge-slant [--cut-line:var(--line-2)] [--cut:4px] inline-flex min-h-8 min-w-0 items-center gap-[0.4375rem] border border-dashed border-line-2 bg-panel px-[0.5625rem]", active && "border-accent-line [--cut-line:var(--accent-line)] bg-accent-soft")}>
         <b className={SLOTTAG}>{tag}</b>
-        <Body {...bodyProps} className={cn("min-w-0 truncate border-0 bg-transparent py-[11px] pl-0 pr-0 text-left font-mono text-[10px] font-medium leading-none tracking-[0.04em]", active ? "text-accent-bright" : "text-txt-dim", onSelect && cn(BSIM_FOCUS, "focus-visible:outline-offset-[-1px]"))}>{hint || t("bx.noOrder")}</Body>
+        <Body {...bodyProps} className={cn("min-w-0 truncate border-0 bg-transparent py-[0.6875rem] pl-0 pr-0 text-left font-mono text-[0.625rem] font-medium leading-none tracking-[0.04em]", active ? "text-accent-bright" : "text-txt-dim", onSelect && cn(BSIM_FOCUS, "focus-visible:outline-offset-[-1px]"))}>{hint || t("bx.noOrder")}</Body>
       </div>
     )
   }
@@ -758,11 +758,11 @@ export function BxPlan({ tag, action, onClear, hint, active = false, onSelect, s
   const tgt = !isMove ? null : action.target && action.target.spread ? (action.target.spread === "all" ? t("bx.targetAll") : t("bx.targetBoth")) : action.targetName || ""
   return (
     <div style={{ ...tyc(isMove ? tyColor(action.move.type) : "var(--accent)") }}
-      className={cn("cut cut-edge-slant [--cut:4px] inline-flex min-h-8 min-w-0 items-center gap-[7px] border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,var(--line))] [--cut-line:color-mix(in_srgb,var(--tyc)_45%,var(--line))] bg-panel px-[9px]", active && "bg-accent-soft")}>
+      className={cn("cut cut-edge-slant [--cut:4px] inline-flex min-h-8 min-w-0 items-center gap-[0.4375rem] border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,var(--line))] [--cut-line:color-mix(in_srgb,var(--tyc)_45%,var(--line))] bg-panel px-[0.5625rem]", active && "bg-accent-soft")}>
       <b className={SLOTTAG}>{tag}</b>
-      <Body {...bodyProps} className={cn("min-w-0 truncate border-0 bg-transparent py-[8px] pl-0 pr-0 text-left font-body text-[11.5px] leading-[1.2] text-txt-muted [&_b]:font-semibold [&_b]:text-txt", onSelect && cn(BSIM_FOCUS, "focus-visible:outline-offset-[-1px]"))}>
+      <Body {...bodyProps} className={cn("min-w-0 truncate border-0 bg-transparent py-[0.5rem] pl-0 pr-0 text-left font-body text-[0.71875rem] leading-[1.2] text-txt-muted [&_b]:font-semibold [&_b]:text-txt", onSelect && cn(BSIM_FOCUS, "focus-visible:outline-offset-[-1px]"))}>
         {isMove ? (
-          <>{(action.tera || action.mech) && <i className="mr-1 border border-solid border-[color-mix(in_srgb,var(--accent)_50%,transparent)] px-[3px] py-px font-mono text-[7.5px] not-italic uppercase tracking-[0.08em] text-accent-bright">{action.mech ?? "TERA"}</i>}<b>{action.move.name}</b>{tgt ? " → " + tgt : ""}</>
+          <>{(action.tera || action.mech) && <i className="mr-1 border border-solid border-[color-mix(in_srgb,var(--accent)_50%,transparent)] px-[3px] py-px font-mono text-[0.46875rem] not-italic uppercase tracking-[0.08em] text-accent-bright">{action.mech ?? "TERA"}</i>}<b>{action.move.name}</b>{tgt ? " → " + tgt : ""}</>
         ) : action.kind === "switch" ? (
           <>{t("bx.switchTo", { name: action.toName })}</>
         ) : (
@@ -789,10 +789,10 @@ export function BxUnknownSlot({ small = false }: { small?: boolean }) {
   const t = useToolT(BATTLESIM_NS)
   return (
     <span aria-label={t("battle.mon.unrevealed")}
-      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,10px)] [--cut-line:var(--line)]", "flex w-full min-w-0 items-center border border-dashed border-line bg-panel text-left opacity-60",
-        small ? "gap-[7px] px-2 py-[6px]" : "gap-[10px] px-[10px] py-2")}>
-      <span aria-hidden className={cn("grid flex-none place-items-center border border-solid border-line-2 bg-base font-mono font-bold leading-none text-txt-dim", small ? "h-7 w-7 text-[12px]" : "h-10 w-10 text-[15px]")}>?</span>
-      <span className={cn("min-w-0 flex-1 truncate font-mono font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim", small ? "text-[10px]" : "text-[10.5px]")}>{t("battle.mon.unrevealed")}</span>
+      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,0.625rem)] [--cut-line:var(--line)]", "flex w-full min-w-0 items-center border border-dashed border-line bg-panel text-left opacity-60",
+        small ? "gap-[0.4375rem] px-2 py-[0.375rem]" : "gap-[0.625rem] px-[0.625rem] py-2")}>
+      <span aria-hidden className={cn("grid flex-none place-items-center border border-solid border-line-2 bg-base font-mono font-bold leading-none text-txt-dim", small ? "h-7 w-7 text-[0.75rem]" : "h-10 w-10 text-[0.9375rem]")}>?</span>
+      <span className={cn("min-w-0 flex-1 truncate font-mono font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim", small ? "text-[0.625rem]" : "text-[0.65625rem]")}>{t("battle.mon.unrevealed")}</span>
     </span>
   )
 }
@@ -812,23 +812,23 @@ export function BxSlot({ mon, order, selected = false, dim = false, onClick, asi
   if (!mon) {
     return (
       <button type="button" onClick={onClick} disabled={disabled}
-        className={cn("cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-tag:var(--cut,10px)] [--cut-line:var(--line)]", BSIM_FOCUS_CUT, FOCUS_RING, PRESS, "flex min-h-[58px] w-full items-center justify-center gap-2 border border-dashed border-line bg-panel px-[10px] py-2 font-mono text-[10.5px] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim transition-[border-color,color] duration-[140ms] hover:border-accent-line hover:text-txt")}>
+        className={cn("cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] [--cut-tag:var(--cut,0.625rem)] [--cut-line:var(--line)]", BSIM_FOCUS_CUT, FOCUS_RING, PRESS, "flex min-h-[3.625rem] w-full items-center justify-center gap-2 border border-dashed border-line bg-panel px-[0.625rem] py-2 font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim transition-[border-color,color] duration-[140ms] hover:border-accent-line hover:text-txt")}>
         <Icon name="plus" size={16} /><span>{t("bx.add")}</span>
       </button>
     )
   }
   return (
     <Tag type={onClick ? "button" : undefined} onClick={onClick} disabled={onClick ? disabled : undefined} aria-pressed={onClick ? selected : undefined} aria-label={label}
-      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,10px)] [--cut-line:var(--line)] ", "flex w-full min-w-0 items-center border border-solid border-line bg-panel text-left text-txt transition-[border-color,background] duration-[140ms]",
-        small ? "gap-[7px] px-2 py-[6px]" : "gap-[10px] px-[10px] py-2",
+      className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,0.625rem)] [--cut-line:var(--line)] ", "flex w-full min-w-0 items-center border border-solid border-line bg-panel text-left text-txt transition-[border-color,background] duration-[140ms]",
+        small ? "gap-[0.4375rem] px-2 py-[0.375rem]" : "gap-[0.625rem] px-[0.625rem] py-2",
         onClick && cn(BSIM_FOCUS_CUT, FOCUS_RING, PRESS, "hover:border-accent-line hover:[--cut-line:var(--accent-line)] hover:bg-panel-2 disabled:cursor-not-allowed disabled:hover:border-line disabled:hover:bg-panel"),
         selected && "border-accent [--cut-line:var(--accent)] bg-accent-soft", dim && "opacity-55 saturate-[0.3]")}>
-      {order != null && <b className={cn("grid flex-none place-items-center bg-accent font-mono font-extrabold leading-none text-accent-ink", small ? "h-4 min-w-4 px-1 text-[9px]" : "h-5 min-w-5 px-1 text-[11px]")}>{order}</b>}
+      {order != null && <b className={cn("grid flex-none place-items-center bg-accent font-mono font-extrabold leading-none text-accent-ink", small ? "h-4 min-w-4 px-1 text-[0.5625rem]" : "h-5 min-w-5 px-1 text-[0.6875rem]")}>{order}</b>}
       <BxSprite mon={mon as BxMon} size={small ? 28 : 40} />
       <span className="grid min-w-0 flex-1 gap-[3px]">
-        <b className={cn("truncate font-display font-bold uppercase leading-none tracking-[0.03em]", small ? "text-[11.5px]" : "text-[13px]")}>{mon.name}</b>
+        <b className={cn("truncate font-display font-bold uppercase leading-none tracking-[0.03em]", small ? "text-[0.71875rem]" : "text-[0.8125rem]")}>{mon.name}</b>
         {!small && <BxTypeRow types={mon.types} small />}
-        {!small && mon.item && <small className="font-mono text-[9.5px] leading-[1.2] text-txt-dim">{mon.item}</small>}
+        {!small && mon.item && <small className="font-mono text-[0.59375rem] leading-[1.2] text-txt-dim">{mon.item}</small>}
       </span>
       {aside}
     </Tag>

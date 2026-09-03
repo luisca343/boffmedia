@@ -58,18 +58,18 @@ export function NewsletterModal({
           <FurretMascot size={84} className="-mb-2" />
 
           {sent ? (
-            <div className="border-ft rounded-ft mt-2 border-ft-ink bg-white p-[18px]">
-              <div className="font-ft-display text-[28px]">{t("successTitle")}</div>
+            <div className="border-ft rounded-ft mt-2 border-ft-ink bg-white p-[1.125rem]">
+              <div className="font-ft-display text-[1.75rem]">{t("successTitle")}</div>
               <p className="font-ft mt-1 text-ft-body">
                 {t("successMessage")}
               </p>
             </div>
           ) : (
             <>
-              <h3 className="font-ft-display mb-1.5 mt-1 text-[42px] leading-[0.95]">
+              <h3 className="font-ft-display mb-1.5 mt-1 text-[2.625rem] leading-[0.95]">
                 {t("title")}
               </h3>
-              <p className="font-ft mb-[18px] text-ft-body">
+              <p className="font-ft mb-[1.125rem] text-ft-body">
                 {t("description")}
               </p>
               <form onSubmit={handleSubmit} className="flex gap-2.5">

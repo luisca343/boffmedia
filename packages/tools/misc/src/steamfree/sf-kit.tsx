@@ -67,8 +67,8 @@ export function SfCountdown({
     return (
       <span
         className={cn(
-          "cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[7px] border border-line-2 bg-panel-2 font-mono font-semibold uppercase leading-none text-txt-muted",
-          lg ? "px-[12px] py-[9px] text-[11px] tracking-[0.06em]" : "px-[9px] py-[6px] text-[9.5px] tracking-[0.08em]",
+          "cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[0.4375rem] border border-line-2 bg-panel-2 font-mono font-semibold uppercase leading-none text-txt-muted",
+          lg ? "px-[0.75rem] py-[0.5625rem] text-[0.6875rem] tracking-[0.06em]" : "px-[0.5625rem] py-[0.375rem] text-[0.59375rem] tracking-[0.08em]",
         )}
       >
         <Icon name="clock" size={lg ? 14 : 11} />
@@ -87,8 +87,8 @@ export function SfCountdown({
     <span
       title={t.deadline}
       className={cn(
-        "cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[7px] border font-mono font-bold uppercase leading-none",
-        lg ? "px-[12px] py-[9px] text-[13px] tracking-[0.04em]" : "px-[9px] py-[6px] text-[10px] tracking-[0.06em]",
+        "cut cut-edge-slant [--cut:4px] inline-flex items-center gap-[0.4375rem] border font-mono font-bold uppercase leading-none",
+        lg ? "px-[0.75rem] py-[0.5625rem] text-[0.8125rem] tracking-[0.04em]" : "px-[0.5625rem] py-[0.375rem] text-[0.625rem] tracking-[0.06em]",
         tone,
       )}
     >
@@ -106,14 +106,14 @@ export function SfCountdown({
 
 export function SfReview({ game, t }: { game: SteamFreeGame; t: SfStrings }) {
   if (game.reviewPercentPositive == null || !game.reviewCount) {
-    return <span className="font-mono text-[10px] uppercase tracking-[0.06em] text-txt-dim">{t.noReviews}</span>
+    return <span className="font-mono text-[0.625rem] uppercase tracking-[0.06em] text-txt-dim">{t.noReviews}</span>
   }
   const pct = game.reviewPercentPositive
   const tone = pct >= 70 ? "text-ok" : pct >= 40 ? "text-warn" : "text-bad"
   return (
-    <span className="inline-flex flex-wrap items-center gap-[7px] font-mono text-[10px] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted">
+    <span className="inline-flex flex-wrap items-center gap-[0.4375rem] font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.06em] text-txt-muted">
       <Icon name="star" size={12} className={tone} />
-      <b className={"font-display text-[13px] font-extrabold italic leading-none " + tone}>{pct}%</b>
+      <b className={"font-display text-[0.8125rem] font-extrabold italic leading-none " + tone}>{pct}%</b>
       {game.reviewLabel || t.reviews}
       <span className="text-txt-dim">({game.reviewCount.toLocaleString()})</span>
     </span>
@@ -151,31 +151,31 @@ export function SfCard({
       >
         <SteamArt src={game.headerImage || game.capsuleImage} name={game.name} />
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,color-mix(in_srgb,var(--panel)_82%,transparent),transparent_48%)]" />
-        <span className="absolute left-[10px] top-[10px] z-[2] inline-flex items-center border border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft px-[9px] py-[6px] font-display text-[15px] font-extrabold italic leading-none text-ok">
+        <span className="absolute left-[0.625rem] top-[0.625rem] z-[2] inline-flex items-center border border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft px-[0.5625rem] py-[0.375rem] font-display text-[0.9375rem] font-extrabold italic leading-none text-ok">
           -100%
         </span>
-        <span className="absolute right-[10px] top-[10px] z-[2]">
+        <span className="absolute right-[0.625rem] top-[0.625rem] z-[2]">
           <SfCountdown endsUnix={game.freeToKeepEnds} now={now} t={t} />
         </span>
       </button>
 
-      <div className="flex flex-1 flex-col gap-[11px] px-[16px] pb-[16px] pt-[14px]">
-        <div className="flex items-start justify-between gap-[10px]">
-          <h3 className="min-w-0 truncate font-display text-[19px] font-bold leading-[1.1] text-txt">{game.name}</h3>
+      <div className="flex flex-1 flex-col gap-[0.6875rem] px-[1rem] pb-[1rem] pt-[0.875rem]">
+        <div className="flex items-start justify-between gap-[0.625rem]">
+          <h3 className="min-w-0 truncate font-display text-[1.1875rem] font-bold leading-[1.1] text-txt">{game.name}</h3>
           <Badge tone={game.isFreeToKeep ? "ok" : "warn"}>{game.isFreeToKeep ? t.keep : t.weekend}</Badge>
         </div>
 
         <SfReview game={game} t={t} />
 
         {hasPrice && (
-          <div className="flex flex-wrap items-baseline gap-[10px]">
-            <span className="font-display text-[26px] font-extrabold italic leading-none text-ok">{game.currentPrice}</span>
-            <span className="font-mono text-[13px] leading-none text-txt-dim line-through">{game.normalPrice}</span>
-            <span className="ml-auto font-mono text-[9.5px] uppercase leading-none tracking-[0.08em] text-txt-dim">{t.saves}</span>
+          <div className="flex flex-wrap items-baseline gap-[0.625rem]">
+            <span className="font-display text-[1.625rem] font-extrabold italic leading-none text-ok">{game.currentPrice}</span>
+            <span className="font-mono text-[0.8125rem] leading-none text-txt-dim line-through">{game.normalPrice}</span>
+            <span className="ml-auto font-mono text-[0.59375rem] uppercase leading-none tracking-[0.08em] text-txt-dim">{t.saves}</span>
           </div>
         )}
 
-        <div className="mt-auto flex flex-wrap gap-[8px] border-t border-dashed border-line pt-[12px]">
+        <div className="mt-auto flex flex-wrap gap-[0.5rem] border-t border-dashed border-line pt-[0.75rem]">
           <Button variant="pri" size="sm" icon="steam" href={game.storeUrl} className="flex-1">
             {t.claim}
           </Button>
@@ -227,43 +227,43 @@ export function SfModal({
   const genres = detail?.genres ?? []
 
   return (
-    <div className="fixed inset-0 z-[200] grid place-items-center p-[20px]" role="dialog" aria-modal="true" aria-label={game.name}>
+    <div className="fixed inset-0 z-[200] grid place-items-center p-[1.25rem]" role="dialog" aria-modal="true" aria-label={game.name}>
       <button
         type="button"
         aria-label={t.close}
         onClick={onClose}
         className="absolute inset-0 cursor-default border-0 bg-[rgba(0,0,0,0.62)] p-0 backdrop-blur-[3px]"
       />
-      <div className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:18px] bm-scroll relative max-h-[92vh] w-[min(620px,100%)] animate-[bm-modal-in_var(--t-med,180ms)] overflow-y-auto border border-line-2 border-t-[3px] border-t-accent bg-panel motion-reduce:animate-none">
-        <IconButton name="x" label={t.close} onClick={onClose} className="absolute right-[14px] top-[14px] z-[3]" />
+      <div className="cut-corner cut-corner-edge [--cut-line:var(--line-2)] [--cut-lg:18px] bm-scroll relative max-h-[92vh] w-[min(38.75rem,100%)] animate-[bm-modal-in_var(--t-med,180ms)] overflow-y-auto border border-line-2 border-t-[3px] border-t-accent bg-panel motion-reduce:animate-none">
+        <IconButton name="x" label={t.close} onClick={onClose} className="absolute right-[0.875rem] top-[0.875rem] z-[3]" />
 
         <div className="relative aspect-[460/172] border-b border-line">
           <SteamArt src={detail?.headerImage || game.headerImage} name={game.name} />
           <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_top,var(--panel),transparent_55%)]" />
         </div>
 
-        <div className="grid gap-[14px] px-[22px] pt-[16px]">
+        <div className="grid gap-[0.875rem] px-[1.375rem] pt-[1rem]">
           <div className="min-w-0">
-            <h3 className="font-display text-[26px] font-extrabold not-italic uppercase leading-none tracking-[-0.005em] text-txt">
+            <h3 className="font-display text-[1.625rem] font-extrabold not-italic uppercase leading-none tracking-[-0.005em] text-txt">
               {game.name}
             </h3>
-            <div className="mt-[10px] flex flex-wrap items-center gap-[8px]">
+            <div className="mt-[0.625rem] flex flex-wrap items-center gap-[0.5rem]">
               <SfCountdown endsUnix={game.freeToKeepEnds} now={now} t={t} size="lg" />
               <Badge tone={game.isFreeToKeep ? "ok" : "warn"}>{game.isFreeToKeep ? t.keep : t.weekend}</Badge>
             </div>
-            <p className="mt-[10px] font-mono text-[10.5px] leading-[1.5] text-txt-dim">
+            <p className="mt-[0.625rem] font-mono text-[0.65625rem] leading-[1.5] text-txt-dim">
               {game.isFreeToKeep ? t.keepNote : t.weekendNote}
             </p>
           </div>
 
           {game.originalPriceCents > 0 && (
-            <div className="flex items-center gap-[14px] border border-line bg-panel-2 px-[18px] py-[14px]">
-              <span className="font-display text-[36px] font-extrabold italic leading-none text-ok">{game.currentPrice}</span>
-              <div className="flex flex-col gap-[4px]">
-                <span className="font-mono text-[13px] leading-none text-txt-dim line-through">{game.normalPrice}</span>
-                <span className="font-mono text-[9.5px] uppercase leading-none tracking-[0.08em] text-txt-muted">{t.saves}</span>
+            <div className="flex items-center gap-[0.875rem] border border-line bg-panel-2 px-[1.125rem] py-[0.875rem]">
+              <span className="font-display text-[2.25rem] font-extrabold italic leading-none text-ok">{game.currentPrice}</span>
+              <div className="flex flex-col gap-[0.25rem]">
+                <span className="font-mono text-[0.8125rem] leading-none text-txt-dim line-through">{game.normalPrice}</span>
+                <span className="font-mono text-[0.59375rem] uppercase leading-none tracking-[0.08em] text-txt-muted">{t.saves}</span>
               </div>
-              <span className="ml-auto border border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft px-[10px] py-[7px] font-display text-[17px] font-extrabold italic leading-none text-ok">
+              <span className="ml-auto border border-[color-mix(in_srgb,var(--ok)_40%,transparent)] bg-ok-soft px-[0.625rem] py-[0.4375rem] font-display text-[1.0625rem] font-extrabold italic leading-none text-ok">
                 -100%
               </span>
             </div>
@@ -280,10 +280,10 @@ export function SfModal({
           />
         </div>
 
-        <div className="grid min-h-[200px] gap-[16px] px-[22px] pb-[22px] pt-[16px]">
+        <div className="grid min-h-[12.5rem] gap-[1rem] px-[1.375rem] pb-[1.375rem] pt-[1rem]">
           {tab === "info" ? (
-            <div className="grid gap-[16px]">
-              {desc && <p className="text-pretty text-[14px] leading-[1.55] text-txt-muted">{desc}</p>}
+            <div className="grid gap-[1rem]">
+              {desc && <p className="text-pretty text-[0.875rem] leading-[1.55] text-txt-muted">{desc}</p>}
               <div className="grid grid-cols-2 gap-px border border-line bg-line max-[600px]:grid-cols-1">
                 <SteamFact k={t.developer}>{game.developers.join(", ") || "—"}</SteamFact>
                 <SteamFact k={t.publisher}>{game.publishers.join(", ") || "—"}</SteamFact>
@@ -292,15 +292,15 @@ export function SfModal({
               </div>
               <SfReview game={game} t={t} />
               {genres.length > 0 && (
-                <div className="grid gap-[8px]">
-                  <span className="font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim">
+                <div className="grid gap-[0.5rem]">
+                  <span className="font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.1em] text-txt-dim">
                     {t.genres}
                   </span>
-                  <div className="flex flex-wrap gap-[6px]">
+                  <div className="flex flex-wrap gap-[0.375rem]">
                     {genres.map((g) => (
                       <span
                         key={g}
-                        className="border border-line-2 bg-panel-2 px-[8px] py-[5px] font-mono text-[9.5px] font-semibold uppercase leading-none tracking-[0.05em] text-txt-muted"
+                        className="border border-line-2 bg-panel-2 px-[0.5rem] py-[0.3125rem] font-mono text-[0.59375rem] font-semibold uppercase leading-none tracking-[0.05em] text-txt-muted"
                       >
                         {g}
                       </span>
@@ -315,15 +315,15 @@ export function SfModal({
               )}
             </div>
           ) : loading || !detail ? (
-            <div className="grid place-items-center py-[60px] text-txt-dim">
+            <div className="grid place-items-center py-[3.75rem] text-txt-dim">
               <Icon name="refresh" size={28} className="animate-spin" />
-              <span className="mt-3 font-mono text-[11px] uppercase tracking-[0.1em]">{t.detailLoading}</span>
+              <span className="mt-3 font-mono text-[0.6875rem] uppercase tracking-[0.1em]">{t.detailLoading}</span>
             </div>
           ) : (
             <SteamGallery media={detail.media} name={detail.name} thumbLabel={t.mediaN} />
           )}
 
-          <div className="mt-[4px] flex flex-wrap gap-[10px] border-t border-line pt-[16px]">
+          <div className="mt-[0.25rem] flex flex-wrap gap-[0.625rem] border-t border-line pt-[1rem]">
             <Button variant="pri" icon="steam" href={game.storeUrl} className="flex-1">
               {t.claim}
             </Button>

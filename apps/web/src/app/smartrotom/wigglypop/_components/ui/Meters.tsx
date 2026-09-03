@@ -74,7 +74,7 @@ export function IVMeter({ ivs, className }: { ivs: number[]; className?: string 
 /** One stat's bar on the detail page. */
 export function StatBar({ statKey, value, max }: { statKey: string; value: number; max: number }) {
   return (
-    <div className="h-[9px] overflow-hidden rounded-wp-pill bg-wp-fg/[.08]">
+    <div className="h-[0.5625rem] overflow-hidden rounded-wp-pill bg-wp-fg/[.08]">
       <i
         className="block h-full rounded-wp-pill"
         style={{
@@ -105,7 +105,7 @@ export function Countdown({ endsAt, className }: { endsAt: string; className?: s
   return (
     <span
       className={cn(
-        "wp-num inline-flex items-center gap-1 font-wp text-[12.5px] font-black",
+        "wp-num inline-flex items-center gap-1 font-wp text-[0.78125rem] font-black",
         now.over ? "text-wp-fg-subtle" : now.urgent ? "text-wp-rose" : "text-wp-amber",
         className,
       )}

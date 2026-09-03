@@ -10,7 +10,7 @@ export function SubscribeStrip({ onOpen }: { onOpen: () => void }) {
         className="flex flex-wrap items-center justify-between gap-6 px-8 py-7"
         style={{ background: "rgb(var(--ft-yellow))" }}
       >
-        <div className="flex items-center gap-[18px]">
+        <div className="flex items-center gap-[1.125rem]">
           <ComicBurst size={86} color="rgb(var(--ft-pink))" textColor="white" text="NEW!" />
           <div>
             <Eyebrow>{t("eyebrow")}</Eyebrow>

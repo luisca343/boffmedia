@@ -71,9 +71,9 @@ function ThreadCard({
         <Label className={SEAL_TEXT[status]}>{t(STATUS_LABEL_KEY[status])}</Label>
         {level ? <Label>{t("questChain.level", { level })}</Label> : null}
       </div>
-      <h3 className="mb-1.5 font-ms-display text-[15px] leading-tight text-ms-ink-1">{quest.name}</h3>
+      <h3 className="mb-1.5 font-ms-display text-[0.9375rem] leading-tight text-ms-ink-1">{quest.name}</h3>
       <div className="mt-auto flex items-center justify-between gap-2">
-        <div className="flex min-w-0 items-center gap-1.5 font-ms text-[11px] italic text-ms-ink-3">
+        <div className="flex min-w-0 items-center gap-1.5 font-ms text-[0.6875rem] italic text-ms-ink-3">
           {npc && <NpcPortrait skin={npc.skin} size={20} />}
           <span className="overflow-hidden text-ellipsis whitespace-nowrap">{npc?.name ?? "—"}</span>
         </div>
@@ -130,7 +130,7 @@ export function ThreadWall() {
             {chains.map((line, row) => (
               <div key={`thread-${row}`}>
                 <div
-                  className="absolute font-ms-uppercase text-[10px] uppercase tracking-[.18em] text-ms-gold-1/80"
+                  className="absolute font-ms-uppercase text-[0.625rem] uppercase tracking-[.18em] text-ms-gold-1/80"
                   style={{ left: PAD, top: cyTop(row) - 26 }}
                 >
                   {t("thread", {
@@ -159,7 +159,7 @@ export function ThreadWall() {
             <span className="font-ms-display text-lg">{t("looseEnds")}</span>
             <div className="h-px flex-1 bg-gradient-to-r from-ms-gold-3 to-transparent opacity-50" />
           </div>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(230px,1fr))] gap-5">
+          <div className="grid grid-cols-[repeat(auto-fill,minmax(14.375rem,1fr))] gap-5">
             {loose.map((quest) => (
               <ThreadCard key={quest.id} quest={quest} npc={npcForQuest(npcs, quest)} onSelect={() => open(quest)} style={{ height: NODE_H }} />
             ))}

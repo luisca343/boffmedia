@@ -428,7 +428,7 @@ export function Settings() {
                 <li key={section.id}>
                   <button
                     onClick={() => handleSectionClick(section.id)}
-                    className={`w-full text-left font-mono text-[11px] uppercase tracking-[0.1em] border-l-2 pl-3 py-1 transition-colors ${
+                    className={`w-full text-left font-mono text-[0.6875rem] uppercase tracking-[0.1em] border-l-2 pl-3 py-1 transition-colors ${
                       activeSection === section.id
                         ? "border-accent text-accent"
                         : "border-transparent text-txt-muted hover:text-txt"
@@ -443,7 +443,7 @@ export function Settings() {
         </nav>
 
         {/* Main content column */}
-        <div className="flex-1 flex flex-col gap-10 max-w-[760px]">
+        <div className="flex-1 flex flex-col gap-10 max-w-[47.5rem]">
         <Section
           id="settings-appearance"
           sectionRef={(el) => {
@@ -549,7 +549,7 @@ export function Settings() {
                   onChange={(memoryMib) => patchSettings({ memoryMib })}
                 />
               </div>
-              <div className="w-[116px] shrink-0">
+              <div className="w-[7.25rem] shrink-0">
                 <Input
                   type="number"
                   min={2048}
@@ -626,7 +626,7 @@ export function Settings() {
                 {jvmVerdicts
                   .filter((v) => !v.ok)
                   .map((v) => (
-                    <li key={v.arg} className="text-[11px] text-bad">
+                    <li key={v.arg} className="text-[0.6875rem] text-bad">
                       {t("jvm.rejected", { arg: v.arg, reason: v.reason ?? "" })}
                     </li>
                   ))}
@@ -676,7 +676,7 @@ export function Settings() {
                   }
                   label={t("install.backupBeforeUpdate")}
                 />
-                <p className="pl-[52px] text-[11px] text-txt-dim">
+                <p className="pl-[3.25rem] text-[0.6875rem] text-txt-dim">
                   {t("install.backupBeforeUpdateHint")}
                 </p>
               </div>
@@ -719,12 +719,12 @@ export function Settings() {
                           {status?.path ? (
                             <>
                               <p
-                                className="truncate font-mono text-[11px] text-txt-muted"
+                                className="truncate font-mono text-[0.6875rem] text-txt-muted"
                                 title={status.path}
                               >
                                 {elidePath(status.path)}
                               </p>
-                              <p className="truncate text-[11px] text-txt-dim">
+                              <p className="truncate text-[0.6875rem] text-txt-dim">
                                 {status.method}
                               </p>
                             </>
@@ -780,12 +780,12 @@ export function Settings() {
                           {status?.path ? (
                             <>
                               <p
-                                className="truncate font-mono text-[11px] text-txt-muted"
+                                className="truncate font-mono text-[0.6875rem] text-txt-muted"
                                 title={status.path}
                               >
                                 {elidePath(status.path)}
                               </p>
-                              <p className="truncate text-[11px] text-txt-dim">
+                              <p className="truncate text-[0.6875rem] text-txt-dim">
                                 {status.method}
                               </p>
                             </>
@@ -890,7 +890,7 @@ export function Settings() {
               </a>
             </div>
 
-            <p className="mt-4 text-[11px] text-txt-dim italic">
+            <p className="mt-4 text-[0.6875rem] text-txt-dim italic">
               {t("emulators.packPagePrimary")}
             </p>
           </Panel>
@@ -933,7 +933,7 @@ export function Settings() {
                               </Badge>
                             )}
                           </p>
-                          <p className="truncate font-mono text-[10px] text-txt-dim">
+                          <p className="truncate font-mono text-[0.625rem] text-txt-dim">
                             #{entry.id}
                           </p>
                         </div>
@@ -1061,7 +1061,7 @@ export function Settings() {
                         </Badge>
                       )}
                     </p>
-                    <p className="truncate font-mono text-[10px] text-txt-dim">
+                    <p className="truncate font-mono text-[0.625rem] text-txt-dim">
                       {entry.uuid}
                     </p>
                   </div>
@@ -1150,7 +1150,7 @@ export function Settings() {
                       <p className="truncate text-sm font-medium">
                         {packLabel(pack.tool)}
                       </p>
-                      <p className="font-mono text-[11px] text-txt-dim">
+                      <p className="font-mono text-[0.6875rem] text-txt-dim">
                         {t("storage.version", { version: pack.version })}
                         {" · "}
                         {formatBytes(pack.bytes)}
@@ -1182,12 +1182,12 @@ export function Settings() {
                         <p className="truncate text-sm font-medium">
                           {packLabel(progress.tool)}
                         </p>
-                        <span className="text-[11px] text-txt-dim">
+                        <span className="text-[0.6875rem] text-txt-dim">
                           {t(`storage.phase.${progress.phase}`)}
                         </span>
                       </div>
                       <Progress value={pct} aria-label={t("storage.downloading")} />
-                      <div className="mt-1 flex items-center justify-between text-[11px] text-txt-dim">
+                      <div className="mt-1 flex items-center justify-between text-[0.6875rem] text-txt-dim">
                         <span>
                           {t("storage.progressOf", {
                             downloaded: formatBytes(downloaded),
@@ -1221,7 +1221,7 @@ export function Settings() {
                 {t("storage.cacheClear")}
               </Button>
             </div>
-            <p className="mt-2 text-[11px] text-txt-dim">
+            <p className="mt-2 text-[0.6875rem] text-txt-dim">
               {t("storage.cacheHint")}
             </p>
           </Panel>
@@ -1329,11 +1329,11 @@ function Section({
       className="flex flex-col gap-3 scroll-mt-6"
     >
       <header className="flex flex-col gap-[2px] border-b border-solid border-line pb-2">
-        <h2 className="font-display text-[15px] font-bold uppercase tracking-[0.06em] text-txt">
+        <h2 className="font-display text-[0.9375rem] font-bold uppercase tracking-[0.06em] text-txt">
           {title}
         </h2>
         {lead && (
-          <p className="text-[12px] leading-snug text-txt-muted">{lead}</p>
+          <p className="text-[0.75rem] leading-snug text-txt-muted">{lead}</p>
         )}
       </header>
       <div className="flex flex-col gap-4">{children}</div>

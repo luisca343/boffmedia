@@ -29,9 +29,9 @@ export function BattleTeamsPanel() {
 
   if (isLoading) {
     return (
-      <div className="flex h-full flex-col gap-3 p-[11px]">
+      <div className="flex h-full flex-col gap-3 p-[0.6875rem]">
         {[0, 1].map((i) => (
-          <Skeleton key={i} className="h-[104px] w-full" />
+          <Skeleton key={i} className="h-[6.5rem] w-full" />
         ))}
       </div>
     )
@@ -49,21 +49,21 @@ export function BattleTeamsPanel() {
   }
 
   return (
-    <div className="flex h-full flex-col gap-3 overflow-auto p-[11px]">
+    <div className="flex h-full flex-col gap-3 overflow-auto p-[0.6875rem]">
       {teams.map((team) => {
         const slots = Array.from({ length: PARTY_SIZE }, (_, i) => team.pokemon?.[i] ?? null)
         const n = slots.filter(Boolean).length
         return (
           <div key={team.id} className="pc-glass rounded-[12px] bg-white/[.02] p-2.5">
-            <div className="mb-[9px] flex items-center gap-[7px]">
+            <div className="mb-[0.5625rem] flex items-center gap-[0.4375rem]">
               <Icon name="sword" size={14} className="text-pc-accent" />
-              <span className="min-w-0 flex-1 truncate text-[12.5px] font-bold text-pc-fg">{team.name}</span>
+              <span className="min-w-0 flex-1 truncate text-[0.78125rem] font-bold text-pc-fg">{team.name}</span>
               {team.isActive && (
-                <span className="flex-none rounded-pc-pill bg-pc-green/[.16] px-1.5 py-px font-pc-mono text-[9.5px] font-bold uppercase text-pc-green">
+                <span className="flex-none rounded-pc-pill bg-pc-green/[.16] px-1.5 py-px font-pc-mono text-[0.59375rem] font-bold uppercase text-pc-green">
                   activo
                 </span>
               )}
-              <span className="flex-none font-pc-mono text-[10.5px] text-pc-fg-subtle">{n}/6</span>
+              <span className="flex-none font-pc-mono text-[0.65625rem] text-pc-fg-subtle">{n}/6</span>
             </div>
             <div className="grid grid-cols-6 gap-1.5">
               {slots.map((p, i) => (
@@ -73,7 +73,7 @@ export function BattleTeamsPanel() {
           </div>
         )
       })}
-      <p className="p-1 text-center text-[11px] text-pc-fg-subtle">
+      <p className="p-1 text-center text-[0.6875rem] text-pc-fg-subtle">
         {t("team.readOnly")}
       </p>
     </div>

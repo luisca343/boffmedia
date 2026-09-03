@@ -197,14 +197,14 @@ export function SearchPanel({
         title={t("search.title")}
         aside={
           running ? (
-            <span className="font-mono text-[10px] uppercase tracking-wide text-accent">
+            <span className="font-mono text-[0.625rem] uppercase tracking-wide text-accent">
               {t("search.workers", { n: workers })}
             </span>
           ) : null
         }
       >
         <div className="grid gap-3">
-          <p className="text-[11px] leading-snug text-txt-dim">{t("search.lead")}</p>
+          <p className="text-[0.6875rem] leading-snug text-txt-dim">{t("search.lead")}</p>
 
           <Seg
             className="w-full"
@@ -228,7 +228,7 @@ export function SearchPanel({
           />
 
           {estimate !== null ? (
-            <p className="border border-line-2 bg-base px-2.5 py-2 font-mono text-[11px] text-txt-dim">
+            <p className="border border-line-2 bg-base px-2.5 py-2 font-mono text-[0.6875rem] text-txt-dim">
               {running
                 ? t("search.remaining", { time: formatDuration(estimate, t) })
                 : t("search.estimate", { time: formatDuration(estimate, t) })}
@@ -249,7 +249,7 @@ export function SearchPanel({
                   style={{ width: `${total ? Math.round((checked / total) * 100) : 0}%` }}
                 />
               </div>
-              <p className="font-mono text-[10px] leading-relaxed text-txt-dim">
+              <p className="font-mono text-[0.625rem] leading-relaxed text-txt-dim">
                 {t("search.checked", { checked, total })}
                 <br />
                 {t("search.evaluated", { n: evaluated })} · {t("search.elapsed", { time: formatDuration(elapsedMs, t) })}
@@ -258,17 +258,17 @@ export function SearchPanel({
           ) : null}
 
           {poolShort ? (
-            <p className="font-mono text-[10px] leading-snug text-txt-dim">
+            <p className="font-mono text-[0.625rem] leading-snug text-txt-dim">
               {t("search.poolShort", { got: grantedPool, asked: chosen })}
             </p>
           ) : null}
 
           {progress.error ? (
-            <p className="font-mono text-[10px] leading-snug text-danger">{progress.error}</p>
+            <p className="font-mono text-[0.625rem] leading-snug text-danger">{progress.error}</p>
           ) : null}
 
           {/* D1, said out loud rather than implied by a capped dropdown. */}
-          <p className="border-t border-line-2 pt-2.5 text-[10px] leading-snug text-txt-dim">
+          <p className="border-t border-line-2 pt-2.5 text-[0.625rem] leading-snug text-txt-dim">
             {t("search.ceiling")}
           </p>
         </div>
@@ -278,7 +278,7 @@ export function SearchPanel({
         title={t("search.results")}
         aside={
           <>
-            <span className="font-mono text-[11px] text-txt-dim">
+            <span className="font-mono text-[0.6875rem] text-txt-dim">
               {hits.length}
               {dropped > 0 ? ` (+${dropped})` : ""}
             </span>
@@ -326,11 +326,11 @@ export function SearchPanel({
       >
         {importedRun ? (
           <div className="mb-2.5 grid gap-1 border border-line-2 bg-base px-2.5 py-2">
-            <p className="font-mono text-[10px] leading-snug text-txt-dim">
+            <p className="font-mono text-[0.625rem] leading-snug text-txt-dim">
               {t("run.imported", { date: formatStamp(importedRun.exportedAt) })}
             </p>
             {importedRun.packMismatch.length ? (
-              <p className="font-mono text-[10px] leading-snug text-danger">
+              <p className="font-mono text-[0.625rem] leading-snug text-danger">
                 {t("run.packMismatch", { packs: importedRun.packMismatch.join(", ") })}
               </p>
             ) : null}
@@ -338,7 +338,7 @@ export function SearchPanel({
         ) : null}
 
         {importError ? (
-          <p className="mb-2.5 font-mono text-[10px] leading-snug text-danger">
+          <p className="mb-2.5 font-mono text-[0.625rem] leading-snug text-danger">
             {t("run.openFailed", { message: importError })}
           </p>
         ) : null}
@@ -347,7 +347,7 @@ export function SearchPanel({
             with scores reads as a verified result and nothing here has been
             opened in Minecraft. The per-hit row carries the /tp checklist that
             turns this into something checkable. */}
-        <p className="mb-2.5 border-l-2 border-line pl-2 text-[11px] leading-snug text-txt-dim">
+        <p className="mb-2.5 border-l-2 border-line pl-2 text-[0.6875rem] leading-snug text-txt-dim">
           {t("search.unverified")}
         </p>
 
@@ -364,13 +364,13 @@ export function SearchPanel({
               />
             ))}
             {dropped > 0 ? (
-              <p className="pt-1 text-[10px] leading-snug text-txt-dim">
+              <p className="pt-1 text-[0.625rem] leading-snug text-txt-dim">
                 {t("search.dropped", { n: dropped, kept: MAX_HITS })}
               </p>
             ) : null}
           </div>
         ) : (
-          <p className="text-[11px] leading-snug text-txt-dim">
+          <p className="text-[0.6875rem] leading-snug text-txt-dim">
             {running ? t("search.searching") : t("search.noResults")}
           </p>
         )}

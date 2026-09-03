@@ -50,13 +50,13 @@ export function Navbar() {
     <nav className="sticky top-0 z-50 flex h-[var(--nav-h)] items-center gap-4 border-b border-line bg-base px-5 transition-[background,border-color] duration-[260ms] min-[640px]:px-10 min-[1120px]:gap-7">
       <Link
         href="/"
-        className="mr-0 flex shrink-0 items-center gap-[11px] font-display text-[22px] font-extrabold italic uppercase leading-none text-txt no-underline min-[1120px]:mr-[14px]"
+        className="mr-0 flex shrink-0 items-center gap-[0.6875rem] font-display text-[1.375rem] font-extrabold italic uppercase leading-none text-txt no-underline min-[1120px]:mr-[0.875rem]"
       >
-        <Image src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" width={27} height={27} className="h-[27px] w-[27px] object-contain" />
+        <Image src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" width={27} height={27} className="h-[1.6875rem] w-[1.6875rem] object-contain" />
         <span>Boff<b className="text-accent">media</b></span>
       </Link>
 
-      <div className="hidden h-full items-stretch gap-[26px] min-[1120px]:flex">
+      <div className="hidden h-full items-stretch gap-[1.625rem] min-[1120px]:flex">
         {PRIMARY_NAV.map((n) => {
           const on = n.route === "/" ? pathname === "/" : seg === n.route
           if (n.menu) {
@@ -75,7 +75,7 @@ export function Navbar() {
               key={n.route}
               href={n.route}
               className={cn(
-                "flex items-center border-y-[3px] border-transparent font-display text-[16px] font-bold uppercase leading-none tracking-[0.09em] no-underline transition-colors duration-[140ms]",
+                "flex items-center border-y-[3px] border-transparent font-display text-[1rem] font-bold uppercase leading-none tracking-[0.09em] no-underline transition-colors duration-[140ms]",
                 on ? "border-b-accent text-txt" : "text-txt-muted hover:text-txt",
               )}
             >
@@ -89,7 +89,7 @@ export function Navbar() {
         <div className="hidden items-center gap-2.5 min-[1120px]:flex">
           <IconButton name="search" label={tNav("search")} />
           <LangSwitcher />
-          <span aria-hidden="true" className="h-[22px] w-px shrink-0 bg-line-2" />
+          <span aria-hidden="true" className="h-[1.375rem] w-px shrink-0 bg-line-2" />
           <NotifBell />
         </div>
         <IconButton name={theme === "dark" ? "sun" : "moon"} label={tNav("theme")} onClick={toggle} />

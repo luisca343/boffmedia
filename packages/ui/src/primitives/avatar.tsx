@@ -18,9 +18,9 @@ export interface AvatarProps {
 }
 
 const SIZE: Record<AvatarSize, string> = {
-  sm: "h-6 w-6 text-[10px] [--cut:5px]",
-  md: "h-9 w-9 text-[13px]",
-  lg: "h-16 w-16 text-[22px]",
+  sm: "h-6 w-6 text-[0.625rem] [--cut:5px]",
+  md: "h-9 w-9 text-[0.8125rem]",
+  lg: "h-16 w-16 text-[1.375rem]",
 }
 
 export function Avatar({ children, src, alt = "", size = "md", accent, className }: AvatarProps) {
@@ -57,7 +57,7 @@ export function AvatarGroup({ items, max = 5, size = "md" }: AvatarGroupProps) {
   const shown = items.slice(0, max)
   const extra = items.length - shown.length
   return (
-    <span className="inline-flex [&>*]:-ml-[9px] [&>*:first-child]:ml-0">
+    <span className="inline-flex [&>*]:-ml-[0.5625rem] [&>*:first-child]:ml-0">
       {shown.map((it, i) => {
         const o = typeof it === "string" ? { label: it } : it
         return (
@@ -67,7 +67,7 @@ export function AvatarGroup({ items, max = 5, size = "md" }: AvatarGroupProps) {
         )
       })}
       {extra > 0 && (
-        <Avatar size={size} className="bg-panel font-mono font-semibold text-[11px] text-txt-muted">
+        <Avatar size={size} className="bg-panel font-mono font-semibold text-[0.6875rem] text-txt-muted">
           +{extra}
         </Avatar>
       )}

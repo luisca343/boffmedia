@@ -96,12 +96,12 @@ function CellComponent({ cell, onClick, rowIndex, colIndex }: CellProps) {
           {cell.marks.length > 0 ? (
             <span className="relative grid grid-cols-2 gap-0.5 rounded-md bg-black/40 p-1">
               {MARKS.map((mark) => (
-                <span key={mark} className="grid h-[18px] w-[18px] place-items-center">
+                <span key={mark} className="grid h-[1.125rem] w-[1.125rem] place-items-center">
                   {cell.marks.includes(mark) &&
                     (mark === 0 ? (
                       <span
                         aria-hidden
-                        className="ar-glow-magenta text-[13px] leading-none text-ar-magenta-2"
+                        className="ar-glow-magenta text-[0.8125rem] leading-none text-ar-magenta-2"
                       >
                         ⚡
                       </span>
@@ -109,7 +109,7 @@ function CellComponent({ cell, onClick, rowIndex, colIndex }: CellProps) {
                       <span
                         aria-hidden
                         className={cn(
-                          "font-ar-mono text-[11px] font-bold leading-none",
+                          "font-ar-mono text-[0.6875rem] font-bold leading-none",
                           MARK_TONE[mark],
                         )}
                       >
@@ -120,7 +120,7 @@ function CellComponent({ cell, onClick, rowIndex, colIndex }: CellProps) {
               ))}
             </span>
           ) : (
-            <span aria-hidden className="relative font-ar-display text-[10px] text-ar-ink-muted">
+            <span aria-hidden className="relative font-ar-display text-[0.625rem] text-ar-ink-muted">
               ?
             </span>
           )}
@@ -136,7 +136,7 @@ function CellComponent({ cell, onClick, rowIndex, colIndex }: CellProps) {
           {cell.value === 0 ? (
             <VoltorbImage size="lg" glow />
           ) : (
-            <span aria-hidden className="font-ar-display text-[18px] sm:text-[22px]">
+            <span aria-hidden className="font-ar-display text-[1.125rem] sm:text-[1.375rem]">
               {cell.value}
             </span>
           )}

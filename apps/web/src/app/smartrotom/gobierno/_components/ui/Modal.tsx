@@ -45,11 +45,11 @@ export function Modal({
         <div className="flex items-start justify-between gap-4 border-b border-gt-line px-5 pb-3.5 pt-4">
           <div className="min-w-0">
             {kicker && (
-              <div className="mb-1 font-gt-mono text-[9.5px] font-bold uppercase tracking-[.18em] text-gt-ink-400">
+              <div className="mb-1 font-gt-mono text-[0.59375rem] font-bold uppercase tracking-[.18em] text-gt-ink-400">
                 {kicker}
               </div>
             )}
-            <h2 className="font-gt-display text-[19px] leading-tight text-gt-ink-900">{title}</h2>
+            <h2 className="font-gt-display text-[1.1875rem] leading-tight text-gt-ink-900">{title}</h2>
           </div>
           <button
             type="button"

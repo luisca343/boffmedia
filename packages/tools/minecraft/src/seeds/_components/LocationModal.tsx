@@ -60,14 +60,14 @@ export interface LocationModalProps {
 function Step({ n, title, hint }: { n: number; title: string; hint?: string }) {
   return (
     <div className="flex items-baseline gap-2.5">
-      <span className="grid h-5 w-5 shrink-0 place-items-center bg-accent font-mono text-[10px] font-bold text-accent-ink">
+      <span className="grid h-5 w-5 shrink-0 place-items-center bg-accent font-mono text-[0.625rem] font-bold text-accent-ink">
         {n}
       </span>
       <div>
-        <h4 className="font-display text-[13px] font-bold uppercase leading-none tracking-[0.06em] text-txt">
+        <h4 className="font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.06em] text-txt">
           {title}
         </h4>
-        {hint ? <p className="mt-1 text-[11px] leading-snug text-txt-dim">{hint}</p> : null}
+        {hint ? <p className="mt-1 text-[0.6875rem] leading-snug text-txt-dim">{hint}</p> : null}
       </div>
     </div>
   );
@@ -109,7 +109,7 @@ export function LocationModal({
       aside={
         result ? (
           <span
-            className={`font-mono text-[10px] uppercase tracking-wide ${
+            className={`font-mono text-[0.625rem] uppercase tracking-wide ${
               result.pass ? "text-ok" : "text-danger"
             }`}
           >
@@ -165,10 +165,10 @@ export function LocationModal({
                     : "border-line-2 bg-base hover:border-line"
                 }`}
               >
-                <span className="font-display text-[12px] font-bold uppercase tracking-[0.04em] text-txt">
+                <span className="font-display text-[0.75rem] font-bold uppercase tracking-[0.04em] text-txt">
                   {hard ? t("spec.field.hard") : t("spec.field.soft")}
                 </span>
-                <span className="text-[10px] leading-snug text-txt-dim">
+                <span className="text-[0.625rem] leading-snug text-txt-dim">
                   {hard ? t("spec.field.hardHint") : t("spec.field.softHint")}
                 </span>
               </button>
@@ -206,10 +206,10 @@ export function LocationModal({
                     : "border-line-2 bg-base hover:border-line"
                 }`}
               >
-                <span className="font-display text-[12px] font-bold uppercase tracking-[0.04em] text-txt">
+                <span className="font-display text-[0.75rem] font-bold uppercase tracking-[0.04em] text-txt">
                   {mode === "at" ? t("spec.field.modeAt") : t("spec.field.modeDiscover")}
                 </span>
-                <span className="text-[10px] leading-snug text-txt-dim">
+                <span className="text-[0.625rem] leading-snug text-txt-dim">
                   {mode === "at" ? t("spec.field.modeAtHint") : t("spec.field.modeDiscoverHint")}
                 </span>
               </button>
@@ -341,13 +341,13 @@ export function LocationModal({
           )}
 
           {offLattice ? (
-            <p className="border border-line-2 bg-base px-2.5 py-2 text-[11px] leading-snug text-txt-dim">
+            <p className="border border-line-2 bg-base px-2.5 py-2 text-[0.6875rem] leading-snug text-txt-dim">
               {t("spec.field.offLattice", { n: latticeDrift(lattice) })}
             </p>
           ) : null}
 
           {result ? (
-            <p className="border border-line-2 bg-base px-2.5 py-2 font-mono text-[11px] text-txt-dim">
+            <p className="border border-line-2 bg-base px-2.5 py-2 font-mono text-[0.6875rem] text-txt-dim">
               {t("spec.verdict.site", { x: result.x, z: result.z, n: result.candidatesTried })}
             </p>
           ) : null}
@@ -358,7 +358,7 @@ export function LocationModal({
           <div className="flex items-start justify-between gap-3">
             <Step n={2} title={t("spec.step.conditions")} hint={t("spec.step.conditionsHint")} />
             {total ? (
-              <span className="shrink-0 font-mono text-[10px] uppercase tracking-wide text-txt-dim">
+              <span className="shrink-0 font-mono text-[0.625rem] uppercase tracking-wide text-txt-dim">
                 {result ? t("spec.step.conditionsMet", { passed, total }) : t("spec.step.conditionsCount", { total })}
               </span>
             ) : null}
@@ -389,7 +389,7 @@ export function LocationModal({
               ))}
             </ul>
           ) : (
-            <p className="border border-dashed border-line-2 p-4 text-center text-[12px] text-txt-dim">
+            <p className="border border-dashed border-line-2 p-4 text-center text-[0.75rem] text-txt-dim">
               {t("spec.step.noConditions")}
             </p>
           )}
@@ -401,7 +401,7 @@ export function LocationModal({
                names have to be read. */
             <div className="grid gap-3 border border-accent bg-panel p-3">
               <div className="flex items-center justify-between">
-                <h5 className="font-display text-[12px] font-bold uppercase tracking-[0.06em] text-txt">
+                <h5 className="font-display text-[0.75rem] font-bold uppercase tracking-[0.06em] text-txt">
                   {t("spec.action.addConstraint")}
                 </h5>
                 <button
@@ -416,7 +416,7 @@ export function LocationModal({
               <div className="grid grid-cols-2 gap-3">
                 {CONSTRAINTS_BY_GROUP.map(({ group, items }) => (
                   <div key={group} className="grid content-start gap-1.5">
-                    <span className="font-mono text-[10px] uppercase tracking-wide text-accent">
+                    <span className="font-mono text-[0.625rem] uppercase tracking-wide text-accent">
                       {t(`spec.group.${group}`)}
                     </span>
                     {items.map((c) => (
@@ -427,7 +427,7 @@ export function LocationModal({
                           patch({ constraints: [...location.constraints, defaultConstraint(c.type)] });
                           setAdding(false);
                         }}
-                        className="border border-line-2 bg-base px-2 py-1.5 text-left text-[12px] text-txt transition-colors hover:border-accent"
+                        className="border border-line-2 bg-base px-2 py-1.5 text-left text-[0.75rem] text-txt transition-colors hover:border-accent"
                       >
                         {t(`spec.constraint.${c.label}`)}
                       </button>

@@ -23,7 +23,7 @@ export function PublicPackView({ pack }: { pack: PublicPack }) {
   const t = useTranslations("app.packPage")
 
   return (
-    <main className="mx-auto flex max-w-[900px] flex-col gap-8 px-5 py-12">
+    <main className="mx-auto flex max-w-[56.25rem] flex-col gap-8 px-5 py-12">
       <header className="flex flex-wrap items-start gap-5">
         {pack.iconUrl && (
           <Image
@@ -36,14 +36,14 @@ export function PublicPackView({ pack }: { pack: PublicPack }) {
           />
         )}
         <div className="min-w-0 flex-1">
-          <h1 className="font-display text-[32px]/none font-bold uppercase tracking-[0.05em] text-txt">
+          <h1 className="font-display text-[2rem]/none font-bold uppercase tracking-[0.05em] text-txt">
             {pack.name}
           </h1>
-          <p className="mt-2 font-mono text-[12px] uppercase tracking-[0.08em] text-txt-dim">
+          <p className="mt-2 font-mono text-[0.75rem] uppercase tracking-[0.08em] text-txt-dim">
             {pack.slug}
           </p>
           {pack.summary && (
-            <p className="mt-3 max-w-[60ch] text-[15px] leading-[1.5] text-txt-muted">
+            <p className="mt-3 max-w-[60ch] text-[0.9375rem] leading-[1.5] text-txt-muted">
               {pack.summary}
             </p>
           )}
@@ -70,7 +70,7 @@ export function PublicPackView({ pack }: { pack: PublicPack }) {
       {/* The call to action, and the reason the page exists: a link you hand
           someone alongside the download. */}
       <section className="flex flex-wrap items-center gap-3 border border-solid border-accent-line bg-accent-soft px-5 py-4">
-        <p className="min-w-0 flex-1 text-[14px] leading-[1.5] text-txt">{t("installLead")}</p>
+        <p className="min-w-0 flex-1 text-[0.875rem] leading-[1.5] text-txt">{t("installLead")}</p>
         {/* `Button` routes an internal href through the host Link registered
             with `configureUi`, so this stays a real client-side navigation
             without the page importing next/link itself. */}
@@ -81,10 +81,10 @@ export function PublicPackView({ pack }: { pack: PublicPack }) {
 
       {pack.description && (
         <section className="flex flex-col gap-2">
-          <h2 className="font-display text-[16px] font-bold uppercase tracking-[0.05em]">
+          <h2 className="font-display text-[1rem] font-bold uppercase tracking-[0.05em]">
             {t("about")}
           </h2>
-          <p className="whitespace-pre-wrap text-[14px] leading-[1.6] text-txt-muted">
+          <p className="whitespace-pre-wrap text-[0.875rem] leading-[1.6] text-txt-muted">
             {pack.description}
           </p>
         </section>
@@ -93,10 +93,10 @@ export function PublicPackView({ pack }: { pack: PublicPack }) {
       {pack.optionalGroups.length > 0 && (
         <section className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">
-            <h2 className="font-display text-[16px] font-bold uppercase tracking-[0.05em]">
+            <h2 className="font-display text-[1rem] font-bold uppercase tracking-[0.05em]">
               {t("optionalTitle")}
             </h2>
-            <p className="max-w-[60ch] text-[13px] leading-[1.5] text-txt-muted">
+            <p className="max-w-[60ch] text-[0.8125rem] leading-[1.5] text-txt-muted">
               {t("optionalLead")}
             </p>
           </div>
@@ -109,10 +109,10 @@ export function PublicPackView({ pack }: { pack: PublicPack }) {
 
       {pack.gallery.length > 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="font-display text-[16px] font-bold uppercase tracking-[0.05em]">
+          <h2 className="font-display text-[1rem] font-bold uppercase tracking-[0.05em]">
             {t("gallery")}
           </h2>
-          <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(260px,1fr))]">
+          <div className="grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(16.25rem,1fr))]">
             {pack.gallery.map((image) => (
               <Image
                 key={image.url}

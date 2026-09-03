@@ -54,34 +54,34 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
 
   return (
     <div className="flex min-w-0 flex-1 flex-col">
-      <div className="flex-none px-[30px] pt-3.5">
+      <div className="flex-none px-[1.875rem] pt-3.5">
         <Button variant="ghost" onClick={() => router.back()}>
           <Icon name="arrowL" size={16} />
           {t("common.back")}
         </Button>
       </div>
 
-      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[30px] pb-10 pt-3.5">
+      <div className="wp-scroll min-h-0 flex-1 overflow-y-auto px-[1.875rem] pb-10 pt-3.5">
         {isLoading || !seller ? (
           <Skeleton className="h-32 rounded-wp-lg" />
         ) : (
           <>
             <Panel className="flex flex-wrap items-center gap-5 rounded-wp-lg p-6">
               <Avatar seller={seller} size={76} />
-              <div className="min-w-[200px] flex-1">
-                <h1 className="font-wp-display text-[26px] font-semibold text-wp-fg">
+              <div className="min-w-[12.5rem] flex-1">
+                <h1 className="font-wp-display text-[1.625rem] font-semibold text-wp-fg">
                   {seller.username}
                 </h1>
                 <div className="mt-1.5 flex items-center gap-2">
                   <Stars value={seller.rating} size={15} />
                   {seller.rating === null ? (
-                    <span className="font-wp text-[13px] font-semibold text-wp-fg-subtle">
+                    <span className="font-wp text-[0.8125rem] font-semibold text-wp-fg-subtle">
                       {t("vendedor.newSellerNoRatings")}
                     </span>
                   ) : (
                     <>
                       <span className="wp-num font-wp text-wp-fg">{seller.rating.toFixed(2)}</span>
-                      <span className="font-wp text-[13px] font-semibold text-wp-fg-subtle">
+                      <span className="font-wp text-[0.8125rem] font-semibold text-wp-fg-subtle">
                         · <span className="wp-num">{fmt(seller.reviews)}</span> {t("vendedor.reviewsSuffix")}
                       </span>
                     </>
@@ -103,7 +103,7 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
             {listings.length === 0 ? (
               <EmptyState icon="tag" title={t("vendedor.noActiveListings")} />
             ) : (
-              <div className="grid grid-cols-[repeat(auto-fill,minmax(190px,1fr))] gap-3.5">
+              <div className="grid grid-cols-[repeat(auto-fill,minmax(11.875rem,1fr))] gap-3.5">
                 {listings.map((L) => (
                   <ListingCard
                     key={L.id}
@@ -131,7 +131,7 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
                 {reviews.map((r: any) => (
                   <Panel key={r.id} className="p-4">
                     <div className="mb-2 flex items-center gap-2">
-                      <span className="font-wp text-[13px] font-bold text-wp-fg">
+                      <span className="font-wp text-[0.8125rem] font-bold text-wp-fg">
                         {r.reviewer?.username ?? t("common.defaultUsername")}
                       </span>
                       <span className="ml-auto">
@@ -139,11 +139,11 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
                       </span>
                     </div>
                     {r.body && (
-                      <p className="font-wp text-[13px] font-semibold leading-relaxed text-wp-fg-muted">
+                      <p className="font-wp text-[0.8125rem] font-semibold leading-relaxed text-wp-fg-muted">
                         {r.body}
                       </p>
                     )}
-                    <div className="mt-2 font-wp text-[11px] font-semibold text-wp-fg-subtle">
+                    <div className="mt-2 font-wp text-[0.6875rem] font-semibold text-wp-fg-subtle">
                       {timeAgo(r.createdAt)}
                     </div>
                   </Panel>
@@ -160,11 +160,11 @@ export default function SellerPage({ params }: { params: Promise<{ uuid: string 
 function Stat({ k, v, icon }: { k: string; v: string; icon: "star" | "cart" | "users" }) {
   return (
     <Panel className="px-4 py-3.5">
-      <div className="flex items-center gap-[7px] font-wp text-[11.5px] font-bold uppercase tracking-[.05em] text-wp-fg-subtle">
+      <div className="flex items-center gap-[0.4375rem] font-wp text-[0.71875rem] font-bold uppercase tracking-[.05em] text-wp-fg-subtle">
         <Icon name={icon} size={14} />
         {k}
       </div>
-      <div className="wp-num mt-1 font-wp-display text-[22px] font-semibold text-wp-fg">{v}</div>
+      <div className="wp-num mt-1 font-wp-display text-[1.375rem] font-semibold text-wp-fg">{v}</div>
     </Panel>
   )
 }

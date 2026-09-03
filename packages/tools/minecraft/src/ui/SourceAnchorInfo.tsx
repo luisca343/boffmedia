@@ -67,7 +67,7 @@ export function SourceAnchorInfo({
   return (
     <div className={`grid gap-1 border border-line bg-panel py-1.5 px-2 ${className ?? ""}`}>
       <div className="flex items-center gap-1.5">
-        <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-txt-muted">
+        <span className="font-mono text-[0.625rem] tracking-[0.14em] uppercase text-txt-muted">
           {labels.title}
         </span>
         <div className="flex-1" />
@@ -88,14 +88,14 @@ export function SourceAnchorInfo({
         )}
       </div>
       {origin && (
-        <div className="flex items-baseline gap-2 font-mono text-[11px]">
-          <span className="text-[10px] text-txt-muted">{labels.origin}</span>
+        <div className="flex items-baseline gap-2 font-mono text-[0.6875rem]">
+          <span className="text-[0.625rem] text-txt-muted">{labels.origin}</span>
           <span className="tabular-nums text-txt-dim">{coords(origin)}</span>
         </div>
       )}
       {playerPos && (
-        <div className="flex items-baseline gap-2 font-mono text-[11px]">
-          <span className="text-[10px] text-txt-muted">{labels.playerStand}</span>
+        <div className="flex items-baseline gap-2 font-mono text-[0.6875rem]">
+          <span className="text-[0.625rem] text-txt-muted">{labels.playerStand}</span>
           <span className="tabular-nums text-txt-dim">{coords(playerPos)}</span>
         </div>
       )}

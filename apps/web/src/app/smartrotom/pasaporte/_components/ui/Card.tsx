@@ -12,7 +12,7 @@ export function Card({ children, className }: { children?: ReactNode; className?
   return (
     <div
       className={cn(
-        "rounded-[10px] border border-ps-ink/22 bg-gradient-to-b from-white/50 to-white/[.16] px-[15px] py-[13px]",
+        "rounded-[10px] border border-ps-ink/22 bg-gradient-to-b from-white/50 to-white/[.16] px-[0.9375rem] py-[0.8125rem]",
         "shadow-[inset_0_1px_0_rgba(255,255,255,.6),0_2px_6px_rgba(80,60,30,.08)]",
         className,
       )}
@@ -38,12 +38,12 @@ export function Stat({
 }) {
   return (
     <Card className={className}>
-      <div className="flex items-center gap-2 text-[12.5px] font-semibold text-ps-ink-soft">
-        <Icon name={icon} className="h-[17px] w-[17px] text-ps-chapter-deep" />
+      <div className="flex items-center gap-2 text-[0.78125rem] font-semibold text-ps-ink-soft">
+        <Icon name={icon} className="h-[1.0625rem] w-[1.0625rem] text-ps-chapter-deep" />
         <span>{label}</span>
       </div>
-      <div className="ps-num mt-1 font-ps-ceremony text-[clamp(20px,2.9vh,30px)] leading-none text-ps-ink">{value}</div>
-      {sub && <div className="mt-[3px] text-[11px] text-ps-ink-faint">{sub}</div>}
+      <div className="ps-num mt-1 font-ps-ceremony text-[clamp(1.25rem,2.9vh,1.875rem)] leading-none text-ps-ink">{value}</div>
+      {sub && <div className="mt-[3px] text-[0.6875rem] text-ps-ink-faint">{sub}</div>}
     </Card>
   )
 }

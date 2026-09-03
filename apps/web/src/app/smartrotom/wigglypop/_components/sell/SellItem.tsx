@@ -97,12 +97,12 @@ export function SellItem() {
 
   if (published && picked) {
     return (
-      <div className="mx-auto mt-10 max-w-[460px] text-center">
+      <div className="mx-auto mt-10 max-w-[28.75rem] text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-wp-pill border border-wp-accent bg-wp-accent/[.13]">
           <Icon name="tag" size={28} className="text-wp-accent" />
         </div>
-        <h2 className="font-wp-display text-[22px] font-semibold text-wp-fg">{t("sell.item.publishedTitle")}</h2>
-        <p className="mt-2 font-wp text-[13.5px] font-semibold leading-relaxed text-wp-fg-muted">
+        <h2 className="font-wp-display text-[1.375rem] font-semibold text-wp-fg">{t("sell.item.publishedTitle")}</h2>
+        <p className="mt-2 font-wp text-[0.84375rem] font-semibold leading-relaxed text-wp-fg-muted">
           <b className="text-wp-fg">
             {qty}× {picked.name}
           </b>{" "}
@@ -127,9 +127,9 @@ export function SellItem() {
 
   if (!picked) {
     return (
-      <div className="mx-auto max-w-[920px]">
+      <div className="mx-auto max-w-[57.5rem]">
         <div className="mb-4 flex items-center gap-2.5">
-          <span className="flex items-center gap-1.5 font-wp text-[13px] font-semibold text-wp-fg-muted">
+          <span className="flex items-center gap-1.5 font-wp text-[0.8125rem] font-semibold text-wp-fg-muted">
             <Icon name="package" size={15} className="text-wp-accent" />
             {t("sell.item.catalogLabel")}
           </span>
@@ -138,14 +138,14 @@ export function SellItem() {
             onChange={(e) => setSearch(e.target.value)}
             placeholder={t("sell.item.searchPlaceholder")}
             aria-label={t("sell.item.searchAria")}
-            className="ml-auto max-w-[260px]"
+            className="ml-auto max-w-[16.25rem]"
           />
         </div>
 
         {/* Said once, at the top, rather than apologised for later. */}
         <div className="mb-4 flex items-start gap-2 rounded-[11px] border border-wp-amber/25 bg-wp-amber/[.08] px-3 py-2.5">
           <Icon name="info" size={15} className="mt-px flex-none text-wp-amber" />
-          <span className="font-wp text-[12.5px] font-semibold leading-relaxed text-wp-fg-muted">
+          <span className="font-wp text-[0.78125rem] font-semibold leading-relaxed text-wp-fg-muted">
             {t("sell.item.disclaimer")}
           </span>
         </div>
@@ -153,7 +153,7 @@ export function SellItem() {
         {isLoading ? (
           <div className="grid grid-cols-3 gap-3 xl:grid-cols-4">
             {Array.from({ length: 8 }).map((_, i) => (
-              <Skeleton key={i} className="h-[120px] rounded-wp" />
+              <Skeleton key={i} className="h-[7.5rem] rounded-wp" />
             ))}
           </div>
         ) : results.length === 0 ? (
@@ -171,12 +171,12 @@ export function SellItem() {
                   "hover:-translate-y-1 hover:border-wp-accent hover:shadow-wp-card-hover",
                 )}
               >
-                <div className="font-wp text-[13.5px] font-bold leading-tight text-wp-fg">
+                <div className="font-wp text-[0.84375rem] font-bold leading-tight text-wp-fg">
                   {it.name}
                 </div>
                 <div className="mt-auto flex items-center justify-between pt-3">
-                  <Chip className="text-[10px]">{it.category}</Chip>
-                  <span className="wp-num font-wp text-[11.5px] font-bold text-wp-teal">
+                  <Chip className="text-[0.625rem]">{it.category}</Chip>
+                  <span className="wp-num font-wp text-[0.71875rem] font-bold text-wp-teal">
                     ~₽{fmt(it.refPrice)}
                   </span>
                 </div>
@@ -191,7 +191,7 @@ export function SellItem() {
   const total = price * qty
 
   return (
-    <div className="mx-auto max-w-[560px]">
+    <div className="mx-auto max-w-[35rem]">
       <div className="rounded-wp border-wp border-wp-line/24 bg-white p-5">
         <div className="flex items-start justify-between">
           <div>
@@ -205,7 +205,7 @@ export function SellItem() {
         </div>
 
         <div className="mt-5">
-          <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">{t("sell.item.qtyLabel")}</label>
+          <label className="font-wp text-[0.78125rem] font-semibold text-wp-fg-muted">{t("sell.item.qtyLabel")}</label>
           <div className="mt-1.5 flex items-center gap-2.5">
             <Button
               iconOnly
@@ -232,9 +232,9 @@ export function SellItem() {
         <ValueBox className="mt-4">
           <div className="flex items-center gap-2">
             <Icon name="wand" size={15} className="text-wp-teal" />
-            <span className="font-wp text-[12.5px] font-bold text-wp-fg">{t("sell.item.refPriceLabel")}</span>
+            <span className="font-wp text-[0.78125rem] font-bold text-wp-fg">{t("sell.item.refPriceLabel")}</span>
             <Price amount={picked.refPrice} size={16} symbolClassName="text-wp-teal-deep" />
-            <span className="font-wp text-[11px] font-semibold text-wp-fg-subtle">{t("sell.item.perUnitSuffix")}</span>
+            <span className="font-wp text-[0.6875rem] font-semibold text-wp-fg-subtle">{t("sell.item.perUnitSuffix")}</span>
             <Button className="ml-auto px-2.5 py-1 text-xs" onClick={() => setPrice(picked.refPrice)}>
               {t("common.useSuggested")}
             </Button>
@@ -242,7 +242,7 @@ export function SellItem() {
         </ValueBox>
 
         <div className="mt-4">
-          <label className="font-wp text-[12.5px] font-semibold text-wp-fg-muted">
+          <label className="font-wp text-[0.78125rem] font-semibold text-wp-fg-muted">
             {t("sell.item.unitPriceLabel")}
           </label>
           <div className="mt-1.5">
@@ -255,7 +255,7 @@ export function SellItem() {
         </div>
 
         <div className="mt-4 flex items-center justify-between rounded-wp border border-wp-line/24 bg-wp-panel-2 px-4 py-3">
-          <span className="font-wp text-[13px] font-semibold text-wp-fg-muted">
+          <span className="font-wp text-[0.8125rem] font-semibold text-wp-fg-muted">
             {t("sell.item.incomeIfSold", { qty, price: fmt(price) })}
           </span>
           <Price amount={total} size={19} />

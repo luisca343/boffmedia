@@ -97,23 +97,23 @@ export function BattleConnectionState({
 
   return (
     <div data-ds="boffmedia" className="flex min-h-[60vh] flex-col items-center justify-center gap-4 px-4 text-txt">
-      <section className={cn(BSIM_STATE, 'cut-corner cut-corner-edge [--cut-line:var(--line)] grid justify-items-center gap-[14px] border border-solid border-line bg-panel px-5 py-8 text-center')}>
-        <BsimKicker className={cn('inline-flex items-center gap-[7px]', face.tone)}>
+      <section className={cn(BSIM_STATE, 'cut-corner cut-corner-edge [--cut-line:var(--line)] grid justify-items-center gap-[0.875rem] border border-solid border-line bg-panel px-5 py-8 text-center')}>
+        <BsimKicker className={cn('inline-flex items-center gap-[0.4375rem]', face.tone)}>
           <Icon name={face.icon} size={12} />
           {t(face.key)}
         </BsimKicker>
 
         <Spinner size={26} />
 
-        <p role="status" className="m-0 font-display text-[15px]/[1.3] font-bold not-italic uppercase tracking-[0.03em] text-txt">
+        <p role="status" className="m-0 font-display text-[0.9375rem]/[1.3] font-bold not-italic uppercase tracking-[0.03em] text-txt">
           {message}
         </p>
 
-        {detail && <p className="m-0 font-mono text-[11px] leading-[1.45] text-warn">{detail}</p>}
+        {detail && <p className="m-0 font-mono text-[0.6875rem] leading-[1.45] text-warn">{detail}</p>}
 
         {/* Twenty seconds in, silence stops being reassuring. */}
         {slow && (
-          <p className="m-0 font-body text-[12.5px] leading-[1.45] text-txt-muted">{t('hub.conn.slow')}</p>
+          <p className="m-0 font-body text-[0.78125rem] leading-[1.45] text-txt-muted">{t('hub.conn.slow')}</p>
         )}
 
         {children}

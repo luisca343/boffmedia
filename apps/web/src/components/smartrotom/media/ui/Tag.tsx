@@ -3,7 +3,7 @@ import type { ComponentProps, ReactNode } from "react"
 import { cn } from "@/lib/utils"
 
 const base =
-  "inline-flex items-center text-[11px] font-semibold px-2 py-[3px] rounded-mw-pill no-underline " +
+  "inline-flex items-center text-[0.6875rem] font-semibold px-2 py-[3px] rounded-mw-pill no-underline " +
   "text-mw-accent bg-mw-accent/[.14] border border-mw-accent/25"
 
 const interactive =

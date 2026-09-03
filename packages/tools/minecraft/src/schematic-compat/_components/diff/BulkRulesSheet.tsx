@@ -36,12 +36,12 @@ export function BulkRulesSheet({
   return (
     <div className="fixed inset-0 z-[950] flex justify-end bg-scrim" onClick={onClose}>
       <aside
-        className={cn("relative w-[min(440px,100%)] h-full flex flex-col bg-panel border-l-2 border-accent", POP_SHADOW, "animate-[bm-drawer-in_0.24s_cubic-bezier(0.16,1,0.3,1)] motion-reduce:animate-none")}
+        className={cn("relative w-[min(27.5rem,100%)] h-full flex flex-col bg-panel border-l-2 border-accent", POP_SHADOW, "animate-[bm-drawer-in_0.24s_cubic-bezier(0.16,1,0.3,1)] motion-reduce:animate-none")}
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-label={t("diff.bulkRulesTitle")}
       >
-        <header className="relative py-[18px] px-[18px] border-b border-line">
+        <header className="relative py-[1.125rem] px-[1.125rem] border-b border-line">
           <button
             type="button"
             onClick={onClose}
@@ -50,25 +50,25 @@ export function BulkRulesSheet({
           >
             <Icon name="x" size={16} />
           </button>
-          <span className="font-mono text-[10px] tracking-[0.14em] uppercase text-accent-bright">{t("diff.bulkRules")}</span>
-          <h3 className="font-display italic font-extrabold text-[24px] my-[5px] text-txt not-italic">{t("diff.bulkRulesTitle")}</h3>
-          <p className="text-[13px] text-txt-muted m-0 max-w-[40ch]">{t("diff.bulkRulesDesc")}</p>
+          <span className="font-mono text-[0.625rem] tracking-[0.14em] uppercase text-accent-bright">{t("diff.bulkRules")}</span>
+          <h3 className="font-display italic font-extrabold text-[1.5rem] my-[0.3125rem] text-txt not-italic">{t("diff.bulkRulesTitle")}</h3>
+          <p className="text-[0.8125rem] text-txt-muted m-0 max-w-[40ch]">{t("diff.bulkRulesDesc")}</p>
         </header>
 
-        <div className="flex-1 min-h-0 overflow-y-auto py-3.5 px-[18px] flex flex-col gap-2.5">
+        <div className="flex-1 min-h-0 overflow-y-auto py-3.5 px-[1.125rem] flex flex-col gap-2.5">
           {groups.map((g) => {
             const a = actions[g.namespace] || "skip";
             const would = a === "air" ? g.entries.length : a === "remap" ? g.remap : 0;
             return (
-              <div key={g.namespace} className="border border-line bg-base-2 p-[11px]">
-                <div className="flex items-center justify-between gap-2 mb-[9px]">
+              <div key={g.namespace} className="border border-line bg-base-2 p-[0.6875rem]">
+                <div className="flex items-center justify-between gap-2 mb-[0.5625rem]">
                   <span className="flex items-center gap-2">
                     <AssetThumb id={g.namespace + ":block"} size={20} />
-                    <span className="font-mono text-[13px] font-semibold text-txt">{g.namespace}</span>
-                    <span className="font-mono text-[10px] py-px px-1.5 bg-panel-2 text-txt-muted">{g.entries.length}</span>
+                    <span className="font-mono text-[0.8125rem] font-semibold text-txt">{g.namespace}</span>
+                    <span className="font-mono text-[0.625rem] py-px px-1.5 bg-panel-2 text-txt-muted">{g.entries.length}</span>
                   </span>
                   {a !== "skip" && would > 0 ? (
-                    <span className="inline-flex items-center gap-1 font-mono text-[10.5px] text-ok">
+                    <span className="inline-flex items-center gap-1 font-mono text-[0.65625rem] text-ok">
                       <Icon name="check" size={11} />
                       {t("diff.bulkWouldResolve", { count: would })}
                     </span>
@@ -84,7 +84,7 @@ export function BulkRulesSheet({
                         disabled={disabled}
                         onClick={() => set(g.namespace, k)}
                         className={cn(
-                          "py-[7px] px-1 font-mono text-[11px] border border-solid cursor-pointer transition-[color,border-color,background] duration-[140ms]",
+                          "py-[0.4375rem] px-1 font-mono text-[0.6875rem] border border-solid cursor-pointer transition-[color,border-color,background] duration-[140ms]",
                           "disabled:opacity-40 disabled:cursor-not-allowed",
                           a === k ? "border-accent bg-accent-soft text-accent-bright" : "border-line text-txt-muted enabled:hover:border-line-2 enabled:hover:text-txt",
                         )}
@@ -100,7 +100,7 @@ export function BulkRulesSheet({
           })}
         </div>
 
-        <footer className="shrink-0 flex items-center justify-end gap-2.5 py-3 px-[18px] border-t border-line">
+        <footer className="shrink-0 flex items-center justify-end gap-2.5 py-3 px-[1.125rem] border-t border-line">
           <Button variant="ghost" size="sm" onClick={onClose}>
             {t("diff.bulkCancel")}
           </Button>

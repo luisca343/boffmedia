@@ -30,7 +30,7 @@ export function DkLive({ status = "live", label, size = "md" }: { status?: strin
     <span
       className={cn(
         "inline-flex items-center gap-1.5 whitespace-nowrap border border-solid font-mono font-bold uppercase tracking-[0.14em] cut cut-edge-slant [--cut:3px]",
-        size === "sm" ? "px-1.5 py-1 text-[8px]/none" : "px-2 py-[5px] text-[9px]/none",
+        size === "sm" ? "px-1.5 py-1 text-[0.5rem]/none" : "px-2 py-[0.3125rem] text-[0.5625rem]/none",
         DK_LIVE_TONE[kind],
       )}
     >
@@ -59,7 +59,7 @@ export function DkUpdated({ updatedAt, live = false, onRefresh }: { updatedAt: n
     return () => clearInterval(id)
   }, [live])
   return (
-    <span className="inline-flex items-center gap-[7px] whitespace-nowrap font-mono text-[10px]/none font-medium tracking-[0.06em] text-txt-dim">
+    <span className="inline-flex items-center gap-[0.4375rem] whitespace-nowrap font-mono text-[0.625rem]/none font-medium tracking-[0.06em] text-txt-dim">
       {live && <Icon name="refresh" size={13} className="animate-[bm-spin_2.6s_linear_infinite] text-ok motion-reduce:animate-none" />}
       <span suppressHydrationWarning>{dkRelTime(updatedAt, t)}</span>
       {onRefresh && (

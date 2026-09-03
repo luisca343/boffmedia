@@ -65,20 +65,20 @@ export function MewgenicsChapter() {
         }
       >
         <Sample title={`CxCard · rejilla`} code={`<CxCard cat rec view="grid" />`} note="Tarjeta del listado. La activa recibe un halo del hue de su dato.">
-          <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,156px)]">
+          <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,9.75rem)]">
             <CxCard cat="items" rec={ITEM} view="grid" onOpen={() => {}} />
             <CxCard cat="items" rec={ITEM2} view="grid" onOpen={() => {}} />
             <CxCard cat="characters" rec={CHAR} view="grid" active onOpen={() => {}} />
           </div>
         </Sample>
         <Sample title={`CxCard · lista`} code={`<CxCard cat rec view="list" />`} col>
-          <div className="grid w-full max-w-[400px] gap-2">
+          <div className="grid w-full max-w-[25rem] gap-2">
             <CxCard cat="items" rec={ITEM} view="list" onOpen={() => {}} />
             <CxCard cat="characters" rec={CHAR} view="list" onOpen={() => {}} />
           </div>
         </Sample>
         <Sample title="Panel con cinta y nota" code="<MewPanel> · <MewNote>" col note="Cada panel es una hoja pegada con cinta y cabecera de trazo discontinuo. La nota al margen va en cursiva con borde discontinuo.">
-          <div className="w-full max-w-[480px] pt-3">
+          <div className="w-full max-w-[30rem] pt-3">
             <MewPanel title="Datos" icon="database" count={3}>
               <DataList
                 rows={[
@@ -104,13 +104,13 @@ export function MewgenicsChapter() {
         }
       >
         <Sample title="SearchInput" code="<SearchInput value onChange size />" col note="Envuelve un &lt;input&gt; nativo; el botón de limpiar aparece solo con texto.">
-          <div className="grid w-full max-w-[420px] gap-3">
+          <div className="grid w-full max-w-[26.25rem] gap-3">
             <SearchInput value={q} onChange={setQ} placeholder="Buscar objeto…" />
             <SearchInput value={q} onChange={setQ} placeholder="Compacto…" size="sm" />
           </div>
         </Sample>
         <Sample title="DataList" code="<DataList rows />" col>
-          <div className="w-full max-w-[460px] pt-3">
+          <div className="w-full max-w-[28.75rem] pt-3">
             <MewPanel title="Ficha" icon="database">
               <DataList
                 rows={[
@@ -124,7 +124,7 @@ export function MewgenicsChapter() {
           </div>
         </Sample>
         <Sample title="ChipGroup" code="<ChipGroup label value onChange options multi />" col note="Radio (una opción) o <code>multi</code> (varias); cada opción admite <code>count</code> y <code>color</code>.">
-          <div className="grid w-full max-w-[460px] gap-3.5">
+          <div className="grid w-full max-w-[28.75rem] gap-3.5">
             <ChipGroup label="Tipo" value={kind} onChange={(v) => setKind(v as string)} options={[{ value: "weapon", label: "Arma", count: 258 }, { value: "head", label: "Cabeza", count: 210 }, { value: "face", label: "Cara", count: 199 }, { value: "neck", label: "Cuello", count: 191 }]} />
             <ChipGroup
               label="Rareza (multi)"
@@ -169,7 +169,7 @@ export function MewgenicsChapter() {
           <MewKind kind="trinket" />
         </Sample>
         <Sample title="Texto con tokens" code="<MewText> · [img:x] · {ph}" col note="Tokens <code>[img:...]</code> como píldoras rojas de rotulador, saltos de línea y marcadores de acumulación.">
-          <div className="w-full max-w-[480px] pt-3">
+          <div className="w-full max-w-[30rem] pt-3">
             <MewPanel title="Descripción" icon="book">
               <MewText>{TEXT}</MewText>
             </MewPanel>
@@ -184,14 +184,14 @@ export function MewgenicsChapter() {
         lead={<>El renderizador genérico <code>&lt;MewEffects&gt;</code> convierte cualquier mapa de pasivas en filas legibles. <code>&lt;MewStats&gt;</code> dibuja las estadísticas felinas como barras de cera con contorno entintado y línea base en 5.</>}
       >
         <Sample title="MewEffects" code="<MewEffects map onNav />" col note="Valores: número (+N en rojo), id de entidad, lista o subobjeto.">
-          <div className="w-full max-w-[480px] pt-3">
+          <div className="w-full max-w-[30rem] pt-3">
             <MewPanel title="Pasivas que otorga" icon="shield" count={4}>
               <MewEffects map={EFFECTS} />
             </MewPanel>
           </div>
         </Sample>
         <Sample title="MewStats" code="<MewStats stats />" col note="Verde por encima de la línea base, ámbar por debajo, rojo en la media.">
-          <div className="w-full max-w-[380px] pt-3">
+          <div className="w-full max-w-[23.75rem] pt-3">
             <MewPanel title="Estadísticas" icon="chart">
               <MewStats stats={STATS} />
             </MewPanel>
@@ -223,14 +223,14 @@ export function MewgenicsChapter() {
           </div>
         </Sample>
         <Sample title="MewPopCard · contenido de la ficha" code="<MewPopCard cat rec />" col note="El cuerpo se adapta a la categoría: habilidad (coste · alcance · daño · efectos), pasiva (clase · rangos · efecto base) y estado (regla).">
-          <div className="flex flex-wrap gap-[22px] pt-1.5">
-            <div className="w-[300px]">
+          <div className="flex flex-wrap gap-[1.375rem] pt-1.5">
+            <div className="w-[18.75rem]">
               <MewPopCard cat="abilities" rec={ABILITY} />
             </div>
-            <div className="w-[300px]">
+            <div className="w-[18.75rem]">
               <MewPopCard cat="passives" rec={PASSIVE} />
             </div>
-            <div className="w-[300px]">
+            <div className="w-[18.75rem]">
               <MewPopCard cat="keywords" rec={KEYWORD} />
             </div>
           </div>
@@ -249,11 +249,11 @@ export function MewgenicsChapter() {
           </div>
         </Sample>
         <Sample title="MewPopCard · objeto y conjunto" code={`<MewPopCard cat="items"|"sets" />`} col>
-          <div className="flex flex-wrap gap-[22px] pt-1.5">
-            <div className="w-[300px]">
+          <div className="flex flex-wrap gap-[1.375rem] pt-1.5">
+            <div className="w-[18.75rem]">
               <MewPopCard cat="items" rec={ITEM_D} />
             </div>
-            <div className="w-[300px]">
+            <div className="w-[18.75rem]">
               <MewPopCard cat="sets" rec={SET} />
             </div>
           </div>

@@ -87,12 +87,12 @@ export function TrustBadges({
   }
 
   return (
-    <div className={cn("flex flex-wrap gap-[7px]", className)}>
+    <div className={cn("flex flex-wrap gap-[0.4375rem]", className)}>
       {badges.map((b) => (
         <span
           key={b.label}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-wp-pill border-wp px-[11px] py-[7px] font-wp text-[12px] font-extrabold",
+            "inline-flex items-center gap-1.5 rounded-wp-pill border-wp px-[0.6875rem] py-[0.4375rem] font-wp text-[0.75rem] font-extrabold",
             b.amber
               ? "border-wp-amber/30 bg-wp-amber/[.10] text-wp-amber"
               : b.pink
