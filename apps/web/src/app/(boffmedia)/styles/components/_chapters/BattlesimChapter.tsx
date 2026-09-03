@@ -24,6 +24,8 @@ import {
   BxTeraBtn,
   BxTick,
   BxType,
+  BsimTab,
+  TbSpBar,
 } from "@boffmedia/tools-battlesim"
 import { tyColor, TYPE_ES } from "@boffmedia/tools-battlesim"
 import { DEX, STAT_ES, bxMon, finalStat } from "./battlesim-demo"
@@ -66,6 +68,97 @@ function RingDemo() {
 function TeraDemo() {
   const [armed, setArmed] = React.useState(false)
   return <BxTeraBtn type="Steel" armed={armed} hotkey="T" onToggle={() => setArmed((v) => !v)} />
+}
+
+/**
+ * The real `TbSpBar`, not a mock of it.
+ *
+ * The budget is SHARED across the three rows on purpose. Spending in one
+ * visibly puts the others' remaining pills out of reach, and that interaction
+ * between rows is the part of the design a static screenshot cannot show — it
+ * is also the reason the bar bothers to distinguish "not taken" from "not
+ * takeable" at all.
+ */
+function TabDemo() {
+  const [sel, setSel] = React.useState("replay")
+  const [open, setOpen] = React.useState(["replay", "pvp"])
+  return (
+    <div className="flex w-[min(520px,100%)] flex-wrap items-center gap-1 border border-solid border-line bg-base-2 p-2">
+      <BsimTab icon="home" label="Lobby" selected={sel === "home"} onSelect={() => setSel("home")} />
+      <BsimTab icon="layers" label="Equipos" selected={sel === "teams"} onSelect={() => setSel("teams")} />
+      {open.includes("replay") && (
+        <BsimTab
+          icon="play"
+          label="Repetición"
+          sub="98CB4F…"
+          tone="dim"
+          stateLabel="terminada"
+          selected={sel === "replay"}
+          onSelect={() => setSel("replay")}
+          onClose={() => setOpen((o) => o.filter((k) => k !== "replay"))}
+          closeLabel="Cerrar Repetición"
+        />
+      )}
+      {open.includes("pvp") && (
+        <BsimTab
+          icon="sword"
+          label="PvP"
+          sub="Kaito"
+          tone="ok"
+          stateLabel="en curso"
+          selected={sel === "pvp"}
+          onSelect={() => setSel("pvp")}
+          onClose={() => setOpen((o) => o.filter((k) => k !== "pvp"))}
+          closeLabel="Cerrar PvP"
+        />
+      )}
+      {open.length < 2 && (
+        <button
+          type="button"
+          onClick={() => setOpen(["replay", "pvp"])}
+          className="h-8 border border-dashed border-line px-3 font-mono text-[10px]/none uppercase tracking-[0.08em] text-txt-dim hover:text-txt"
+        >
+          restaurar
+        </button>
+      )}
+    </div>
+  )
+}
+
+const SP_FORMAT = "gen9championsvgc2026regma"
+const SP_TOTAL = 66
+
+function SpBarDemo() {
+  const [sp, setSp] = React.useState<Record<string, number>>({ atk: 20, spe: 12, spa: 4 })
+  const spent = Object.values(sp).reduce((a, b) => a + b, 0)
+  // Adamant boosts Atq, so only that row has bumps (at 10, 20 and 30). Vel and
+  // AtE are there to show the contrast: with no boost there is nothing to mark.
+  const rows: [string, string, number][] = [["atk", "Atq", 130], ["spe", "Vel", 102], ["spa", "AtE", 80]]
+  return (
+    <div className="grid w-[min(440px,100%)] gap-[10px]">
+      {rows.map(([key, label, base]) => (
+        <div key={key} className="grid grid-cols-[34px_1fr_34px] items-center gap-[10px]">
+          <span className="font-mono text-[9px]/none font-semibold uppercase tracking-[0.06em] text-accent-bright">{label}</span>
+          <TbSpBar
+            stat={key}
+            currentSp={sp[key]}
+            remainingBudget={SP_TOTAL - spent}
+            nature="Adamant"
+            base={base}
+            format={SP_FORMAT}
+            onChange={(v) => setSp((prev) => ({ ...prev, [key]: v }))}
+            ariaLabel={`SP ${label}`}
+            valueText={(n) => `${n} de 32 SP en ${label}`}
+            bumpHint={(n) => `${n} saltos de +2`}
+          />
+          <span className="text-right font-mono text-[12px]/none font-bold text-txt">{sp[key]}</span>
+        </div>
+      ))}
+      <p className="m-0 font-mono text-[10px]/none text-txt-dim">
+        {spent} / {SP_TOTAL} SP · {SP_TOTAL - spent} restantes
+      </p>
+    </div>
+  )
 }
 
 const TERA_TYPES = ["Fire", "Water", "Steel", "Fairy", "Dragon", "Ghost"]
@@ -314,6 +407,50 @@ export function BattlesimChapter() {
               </div>
             ))}
           </div>
+        </Sample>
+        <Sample
+          title="Pestaña de sala"
+          code="<BsimTab icon label sub tone onClose>"
+          col
+          note={
+            <>
+              Una sola pieza: chasis, etiqueta y cierre. Antes eran <b>dos</b> cajas con borde propio pegadas con <code>-ml-px</code>, así que
+              una pestaña cerrable se leía como una pestaña con un botón enganchado al lado — y el estado seleccionado solo encendía la mitad
+              izquierda, justo cuando más importaba. Ahora el chasis lleva el borde, el chaflán, el fondo y el hover, y las dos zonas de
+              pulsación van transparentes dentro.
+              <br />
+              Siguen siendo <b>dos botones</b>, y eso no es negociable: un botón dentro de otro es HTML inválido e inalcanzable por teclado.
+              Son hermanos, el cierre conserva su propio tabulador y su propio nombre accesible, y cada uno lleva anillo de foco{" "}
+              <i>interior</i> — un contorno normal lo recortaría el chaflán. Sin <code>onClose</code> la pestaña no se puede cerrar, que es
+              como se declaran las tres secciones fijas.
+            </>
+          }
+        >
+          <TabDemo />
+        </Sample>
+
+        <Sample
+          title="Reparto de SP (Champions)"
+          code="<TbSpBar stat currentSp nature base>"
+          col
+          note={
+            <>
+              Los formatos Champions no gastan EVs sino Puntos de Estadística: 32 por característica, 66 en total, en pasos de 1. Cada
+              píldora es un punto y las píldoras <b>son</b> el control — clic, arrastre y teclado (flechas, Inicio/Fin, RePág/AvPág).
+              <br />
+              El contraste principal se gasta en tres estados: <b>tomado</b> (degradado de acento con su propio borde), <b>libre</b> (zócalo
+              perfilado en <code>--line-2</code>) y <b>fuera de presupuesto</b> (zócalo apagado, perfilado en <code>--line</code>). El
+              presupuesto es común a las tres filas, así que al gastar en una las píldoras libres de las otras pasan a estar fuera de alcance.
+              <br />
+              Encima de eso, y solo como nota al pie, la franja inferior marca un <b>salto</b>: con naturaleza potenciada (×110/100 truncado a
+              16 bits) ese punto sube +2 en vez de +1, y conviene pararse justo ahí. Por eso Atq (Adamant) lleva marcas en el 10, el 20 y el 30
+              mientras que Vel y AtE no llevan ninguna. La franja se ve igual esté el punto tomado o no, porque describe el paso y no el reparto.
+              Los puntos que <i>no</i> suben nada (naturaleza reducida) no se marcan: bastan dos marcas distintas en una píldora de 8 px para
+              que la barra deje de leerse, y eso ya lo dice la columna del valor final al no moverse.
+            </>
+          }
+        >
+          <SpBarDemo />
         </Sample>
         <Sample title="Celdas de cobertura" code=".bx-covcell" col note="Del panel de análisis: mejor eficacia ofensiva del equipo contra cada tipo defensor.">
           <div className="grid w-[min(440px,100%)] grid-cols-[repeat(auto-fill,minmax(88px,1fr))] gap-1">

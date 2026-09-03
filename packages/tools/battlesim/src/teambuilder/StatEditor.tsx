@@ -31,7 +31,7 @@ import { DkSelect } from "@boffmedia/ui/datakit";
 
 import { useToolT } from "../i18n";
 import { STAT_IDS, TB_NS, canonicalNature, type StatId, type TbLabels } from "./labels";
-import { TbKicker, TbMeter, TbNumInput } from "./tb-kit";
+import { TbKicker, TbMeter, TbNumInput, TbSpBar } from "./tb-kit";
 
 type StatsTable = Record<StatId, number>;
 
@@ -140,15 +140,32 @@ export function StatEditor({
                 {plus && <span aria-label="+">▲</span>}
                 {minus && <span aria-label="−">▼</span>}
               </span>
-              <Slider
-                value={ev}
-                min={0}
-                max={limits.perStat}
-                step={limits.step}
-                onChange={(v) => setEv(stat, v)}
-                ariaLabel={pointsAria(stat)}
-                className="[&>output]:hidden"
-              />
+              {/* EV formats use the slider; SP formats use the segmented bar. */}
+              {sp ? (
+                <TbSpBar
+                  stat={stat}
+                  currentSp={ev}
+                  perStat={limits.perStat}
+                  remainingBudget={remaining}
+                  nature={nature}
+                  base={base?.[stat] ?? 0}
+                  format={format}
+                  onChange={(v) => setEv(stat, v)}
+                  ariaLabel={pointsAria(stat)}
+                  valueText={(n) => t("set.spBarSegmentAria", { current: n, max: limits.perStat, stat: labels.stat(stat) })}
+                  bumpHint={(n) => t("set.spBarBumpLabel", { n })}
+                />
+              ) : (
+                <Slider
+                  value={ev}
+                  min={0}
+                  max={limits.perStat}
+                  step={limits.step}
+                  onChange={(v) => setEv(stat, v)}
+                  ariaLabel={pointsAria(stat)}
+                  className="[&>output]:hidden"
+                />
+              )}
               <TbNumInput
                 min={0}
                 max={limits.perStat}

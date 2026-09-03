@@ -108,8 +108,21 @@ async function errorMessage(response: Response, fallback: string): Promise<strin
   return fallback;
 }
 
+/**
+ * How a host hands the browser API the player's session token.
+ *
+ * A function, resolved per request, rather than a string captured at wiring
+ * time: `createWebToolHost` runs at import time — before any session provider
+ * exists — and the token is refreshed underneath us, so a value read once
+ * would be empty on the first call and stale on every later one.
+ *
+ * Returning empty/null means "no session right now", which is a normal state
+ * (a signed-out player) and not an error.
+ */
+export type ToolTokenSource = () => string | null | undefined | Promise<string | null | undefined>;
+
 /** Direct `fetch` against the public API — what the web tools do today. */
-export function createWebApi(baseUrl: string): ToolApi {
+export function createWebApi(baseUrl: string, token?: ToolTokenSource): ToolApi {
   // Shared by `request` and `stream` so the two cannot drift on how a path
   // becomes a URL — the relative-base trap below is subtle enough that a second
   // copy of it would eventually be a second bug.
@@ -129,16 +142,55 @@ export function createWebApi(baseUrl: string): ToolApi {
     return url;
   };
 
+  /**
+   * Content type plus, when there is one, the session bearer.
+   *
+   * WHY THIS EXISTS AT ALL: the website session is a NextAuth Bearer JWT and
+   * nothing attaches it for us — there is no cookie on the API origin (see the
+   * `credentials` note below). Without this, every `auth: "required"` tool
+   * call left the browser anonymous and came back 401, which is exactly what a
+   * teambuilder sync did.
+   *
+   * A `required` call with no token fails BEFORE the request with status 0 —
+   * deliberately not 401. The outbox treats a 4xx as permanent and drops the
+   * queued row; a session that is merely still loading must not destroy the
+   * player's queued writes, so this has to read as "try again", not "refused".
+   */
+  const headersFor = async (init?: ToolApiRequest): Promise<Record<string, string> | undefined> => {
+    const headers: Record<string, string> = {};
+    if (init?.body !== undefined) headers["content-type"] = "application/json";
+
+    let bearer = "";
+    if (token) {
+      try {
+        bearer = (await token()) ?? "";
+      } catch {
+        // A token source that throws is a session we do not have.
+        bearer = "";
+      }
+    }
+
+    if (bearer) headers.authorization = `Bearer ${bearer}`;
+    else if (init?.auth === "required") {
+      throw new ToolApiError("This action needs a Boffmedia session.", {
+        needsSignin: true,
+      });
+    }
+
+    return Object.keys(headers).length > 0 ? headers : undefined;
+  };
+
   return {
     async request<T>(path: string, init?: ToolApiRequest): Promise<T> {
       const method = init?.method ?? "GET";
       const url = urlFor(path, init?.query);
+      const headers = await headersFor(init);
 
       let response: Response;
       try {
         response = await fetch(url, {
           method,
-          headers: init?.body === undefined ? undefined : { "content-type": "application/json" },
+          headers,
           body: init?.body === undefined ? undefined : JSON.stringify(init.body),
           signal: init?.signal,
           // NOT `credentials: "include"`. The API is a different origin and its
@@ -176,12 +228,13 @@ export function createWebApi(baseUrl: string): ToolApi {
     async stream<T>(path: string, init: ToolStreamRequest<T>): Promise<void> {
       const method = init.method ?? "POST";
       const url = urlFor(path, init.query);
+      const headers = await headersFor(init);
 
       let response: Response;
       try {
         response = await fetch(url, {
           method,
-          headers: init.body === undefined ? undefined : { "content-type": "application/json" },
+          headers,
           body: init.body === undefined ? undefined : JSON.stringify(init.body),
           signal: init.signal,
           // A progress stream that is served from cache is a progress stream
@@ -305,9 +358,15 @@ export function createWebApiUrl(baseUrl: string) {
 export function createWebToolHost(options?: {
   apiBaseUrl?: string;
   session?: ToolSession;
+  /**
+   * The session bearer for `auth` calls. Omitted, every request goes out
+   * anonymous — fine for a host with no accounts, wrong for one that has them:
+   * `auth: "required"` then fails at the door instead of silently 401ing.
+   */
+  token?: ToolTokenSource;
 }): ToolHost {
   const apiBaseUrl = options?.apiBaseUrl ?? "/api";
-  const api = createWebApi(apiBaseUrl);
+  const api = createWebApi(apiBaseUrl, options?.token);
   const fallback = createToolSession({ signIn: () => {} });
   fallback.publish({ status: "anonymous" });
   return {

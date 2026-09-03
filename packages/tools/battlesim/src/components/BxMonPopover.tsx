@@ -3,7 +3,7 @@
 import { Modal } from '@boffmedia/ui';
 import { Dex } from '@pkmn/dex';
 import { useToolT, BATTLESIM_NS } from '../i18n';
-import { BxSprite, BxTypeRow, BxType, BxStatus, BxBoost, BxTera, BxHp, useBxLabels } from './bx-kit';
+import { BxSprite, BxTypeRow, BxType, BxStatus, BxBoost, BxTera, BxHp, useBxLabels, BX_PLATE_VOICE, hpAriaLabel } from './bx-kit';
 import { hpTone } from '../lib/bx-helpers';
 import type { BSXMon } from '../engine/toBSXMon';
 
@@ -48,9 +48,9 @@ export function BxMonPopover({ mon, foe = false, open, onClose }: { mon: BSXMon 
         </div>
 
         <div className="grid gap-[6px]">
-          <div className="flex items-center justify-between font-mono text-[10px] uppercase leading-none tracking-[0.1em] text-txt-dim">
-            <span>{t('battle.mon.hp')}</span>
-            <b className="text-[13px] tracking-normal" style={{ color: mon.fnt ? 'var(--muted)' : hpTone(pct) }}>{mon.fnt ? t('battle.end.ko') : showExact ? `${mon.hpCur}/${mon.hpMax} · ${pct}%` : `${pct}%`}</b>
+          <div className="flex items-center justify-between">
+            <span className="font-mono text-[10px] uppercase leading-none tracking-[0.1em] text-txt-dim">{t('battle.mon.hp')}</span>
+            <b aria-label={hpAriaLabel(t, mon, pct, showExact)} className="text-[14px] leading-none" style={{ ...BX_PLATE_VOICE, color: mon.fnt ? 'var(--muted)' : hpTone(pct) }}>{mon.fnt ? t('battle.end.ko') : showExact ? `${mon.hpCur}/${mon.hpMax} · ${pct}%` : `${pct}%`}</b>
           </div>
           <BxHp pct={pct} trail={false} />
         </div>

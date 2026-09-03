@@ -226,11 +226,15 @@ export async function mergeTeamsFromServer(): Promise<number> {
 
   let remote: ServerTeam[];
   try {
-    const response = await toolApi().request<{ data?: { items?: ServerTeam[] } }>(
+    // NOT `data.items`: unlike the paginated replay list, this endpoint returns
+    // the teams as a BARE ARRAY under the envelope's `data`. Reading `.items`
+    // here made every merge silently see zero teams — a sync that reported
+    // success and applied nothing.
+    const response = await toolApi().request<{ data?: ServerTeam[] }>(
       "/battlesimulator/teams",
       { auth: "required" },
     );
-    remote = response?.data?.items ?? [];
+    remote = Array.isArray(response?.data) ? response.data : [];
   } catch {
     return 0;
   }

@@ -13,9 +13,8 @@
 
 import * as React from "react"
 import { cn, Icon, type IconName } from "@boffmedia/ui"
-import { DkApp, DkBack, DkBar, DkBody, DkTitle, DkEmpty, DkSkelList } from "@boffmedia/ui/datakit"
+import { DkApp, DkBody, DkEmpty, DkSkelList } from "@boffmedia/ui/datakit"
 import { useToolT, BATTLESIM_NS } from "../i18n"
-import { useBsimBackOrHub } from "../nav"
 
 /* ── Focus ───────────────────────────────────────────────────────────────── */
 
@@ -38,6 +37,22 @@ export const BSIM_FOCUS =
  */
 export const BSIM_FOCUS_CUT =
   "outline-none focus-visible:[--cut-w:3px] focus-visible:[--cut-line:var(--accent)]"
+
+/**
+ * The focus ring for a hit area INSIDE a clipped chassis it does not own.
+ *
+ * `BSIM_FOCUS_CUT` widens the shape's own edge stroke, which is the right
+ * answer when the focusable element IS the shape. It is the wrong answer for
+ * one of several controls sharing a chassis — there is one stroke and two
+ * buttons, so lighting it cannot say which has focus. `BSIM_FOCUS` is wrong
+ * too: its outline is offset outward, so it would be drawn outside a box the
+ * element does not own and then clipped by the chamfer.
+ *
+ * An inset ring is drawn inside the element's own border box, so the clip never
+ * reaches it and it marks the half that actually has focus.
+ */
+export const BSIM_FOCUS_INSET =
+  "outline-none focus-visible:[box-shadow:inset_0_0_0_2px_var(--accent)]"
 
 /**
  * The focus ring for a `DkSeg` tab strip, reached through its `className`.
@@ -343,19 +358,16 @@ export function BsimErrorState({ code, title, lead, icon, actions, className }: 
 /**
  * The Suspense fallback for every lazy screen.
  *
- * `fallback={null}` blanked the whole viewport while the ~8 MB battle chunk
- * downloaded — the tool looked like it had crashed. Keeping the bar means the
- * chrome never moves, so the swap reads as loading rather than as a navigation
- * to nowhere.
+ * The tab bar at the top of the tool never unmounts — a screen loads while it
+ * stays in place — so the chrome remains stable and the swap reads as loading
+ * rather than as a navigation to nowhere. This removes the redundant fallback
+ * bar that used to exist on every screen.
  */
 export function BsimScreenSkeleton() {
   const t = useToolT(BATTLESIM_NS)
   return (
     <div className="contents">
       <DkApp>
-        <DkBar>
-          <DkTitle icon="sword" label="Battlesim" sub={t("app.tagline")} />
-        </DkBar>
         <DkBody>
           <p role="status" className="sr-only">
             {t("errors.loading")}
@@ -372,36 +384,148 @@ export function BsimScreenSkeleton() {
 /**
  * The tool chrome for a screen that is NOT the hub and not a live battle.
  *
- * The PvP lobby and the replay viewer used to render bare into the host page:
- * no title, and — the part that matters — no way back. On the website you could
- * still use the browser's Back; in the launcher there is no browser, so those
- * screens were one-way doors. `useBsimBackOrHub` is the seam's answer on both
- * hosts: pop the in-tool stack, or land on the hub when there is none.
+ * The PvP lobby and the replay viewer used to render bare into the host page
+ * with no way back — on the website you could still use the browser's Back; in
+ * the launcher there is no browser, so those screens were one-way doors. The
+ * global tab bar at the top now provides pinned navigation to the hub sections
+ * (Lobby · Equipos · Repeticiones), which are always reachable from any screen.
  *
  * A battle screen deliberately does NOT use this — `BattleShell` owns its own
  * chrome, because a battle needs the header to carry timers and a forfeit.
  */
 export function BsimScreenShell({
-  sub,
   children,
   bodyClassName,
 }: {
-  /** Overrides the tool tagline in the bar. */
-  sub?: React.ReactNode
   children?: React.ReactNode
   bodyClassName?: string
 }) {
-  const t = useToolT(BATTLESIM_NS)
-  const back = useBsimBackOrHub()
   return (
     <div className="contents">
       <DkApp>
-        <DkBar>
-          <DkBack onClick={back} label={t("connection.backToLobby")} />
-          <DkTitle icon="sword" label="Battlesim" sub={sub ?? t("app.tagline")} />
-        </DkBar>
         <DkBody className={bodyClassName}>{children}</DkBody>
       </DkApp>
     </div>
   )
 }
+
+/* ── Tab ─────────────────────────────────────────────────────────────────── */
+
+/** The status dot's tone. Structurally `BsimRoomTone`, restated so the kit
+ *  keeps no dependency on the rooms registry. */
+export type BsimTabTone = "ok" | "warn" | "bad" | "dim"
+
+const TAB_DOT: Record<BsimTabTone, string> = {
+  ok: "bg-ok",
+  warn: "bg-warn",
+  bad: "bg-bad",
+  dim: "bg-line-2",
+}
+
+/**
+ * ONE tab — chassis, label and close, in a single object.
+ *
+ * It used to be two: the tab was a bordered `cut-tag` and the close button was
+ * a SECOND bordered `cut-tag` pulled back over it with `-ml-px`. Two strokes,
+ * two backgrounds and two chamfers touching at a seam, which is what made a
+ * closable tab read as a tab with a separate button stuck to its side rather
+ * than as one control. Worse, the seam did not move with the state: the tab
+ * half lit up on selection and the close half did not, so the pair drifted
+ * further apart exactly when the tab mattered most.
+ *
+ * Now the CHASSIS owns the whole visual — one border, one chamfer, one
+ * background, one hover — and the two hit areas inside it are transparent and
+ * borderless. Selection styles the chassis, so both halves light together.
+ *
+ * STILL TWO BUTTONS, THOUGH, and that part is not negotiable: a button inside a
+ * button is invalid HTML and unreachable by keyboard, so "combine them" can only
+ * mean one chassis, never one element. They stay siblings, the close keeps its
+ * own tab stop and its own accessible name, and each gets an INSET focus ring —
+ * an outline would be clipped away by the chassis' chamfer, and an offset one
+ * would draw outside a box it no longer owns.
+ *
+ * `ref` goes to the tab button rather than the chassis: the tablist drives
+ * roving focus by calling `.focus()` on it.
+ */
+export const BsimTab = React.forwardRef<
+  HTMLButtonElement,
+  {
+    icon: IconName
+    label: string
+    /** Secondary line — a room id, a format. Truncated hard. */
+    sub?: string | null
+    /** Status dot. Omit for a tab that has no live state. */
+    tone?: BsimTabTone | null
+    /** Word behind the dot, for screen readers. The dot is redundant colour. */
+    stateLabel?: string
+    selected?: boolean
+    /** Roving tabindex: 0 for the one tab in the tab order, -1 for the rest. */
+    tabIndex?: number
+    id?: string
+    ariaControls?: string
+    onSelect?: () => void
+    onFocus?: () => void
+    onKeyDown?: (e: React.KeyboardEvent<HTMLButtonElement>) => void
+    /** Omit entirely for a tab that cannot be closed (the pinned sections). */
+    onClose?: () => void
+    /** Accessible name for the close control. Required whenever `onClose` is. */
+    closeLabel?: string
+    className?: string
+  }
+>(function BsimTab(
+  { icon, label, sub, tone, stateLabel, selected = false, tabIndex, id, ariaControls, onSelect, onFocus, onKeyDown, onClose, closeLabel, className },
+  ref,
+) {
+  return (
+    <span
+      role="presentation"
+      className={cn(
+        "cut-tag cut-tag-edge [--cut-tag:8px]",
+        "flex h-8 flex-none items-center overflow-hidden border border-solid transition-[background,border-color,color] duration-[140ms]",
+        selected
+          ? "border-line-2 [--cut-line:var(--line-2)] bg-panel text-txt [box-shadow:inset_0_2px_0_var(--accent)]"
+          : "border-line [--cut-line:var(--line)] bg-base text-txt-muted hover:bg-panel-2 hover:text-txt",
+        className,
+      )}
+    >
+      <button
+        type="button"
+        role="tab"
+        id={id}
+        aria-selected={selected}
+        aria-controls={ariaControls}
+        tabIndex={tabIndex}
+        ref={ref}
+        onFocus={onFocus}
+        onKeyDown={onKeyDown}
+        onClick={onSelect}
+        className={cn(
+          BSIM_FOCUS_INSET,
+          "flex h-full min-w-0 items-center gap-[6px] border-0 bg-transparent pl-[10px] font-display text-[11.5px]/none font-bold uppercase tracking-[0.04em] text-inherit",
+          onClose ? "pr-[6px]" : "pr-[10px]",
+        )}
+      >
+        <Icon name={icon} size={12} className="flex-none opacity-80" />
+        <span className="max-w-[12ch] truncate">{label}</span>
+        {sub && <span className="max-w-[8ch] truncate font-mono text-[9.5px]/none font-semibold tracking-[0.06em] text-txt-dim">{sub}</span>}
+        {tone && <i aria-hidden className={cn("h-[6px] w-[6px] flex-none [clip-path:circle(50%)]", TAB_DOT[tone])} />}
+        {stateLabel && <span className="sr-only">{stateLabel}</span>}
+      </button>
+      {onClose && (
+        <button
+          type="button"
+          tabIndex={tabIndex}
+          onFocus={onFocus}
+          onClick={onClose}
+          aria-label={closeLabel}
+          className={cn(
+            BSIM_FOCUS_INSET,
+            "grid h-full w-7 flex-none place-items-center border-0 bg-transparent pr-[2px] text-txt-dim transition-colors duration-[140ms] hover:text-bad",
+          )}
+        >
+          <Icon name="x" size={11} />
+        </button>
+      )}
+    </span>
+  )
+})

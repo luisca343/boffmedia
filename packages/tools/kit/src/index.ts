@@ -63,3 +63,4 @@ export {
   webOpenUrl,
   webSaveFile,
 } from "./web";
+export type { ToolTokenSource } from "./web";

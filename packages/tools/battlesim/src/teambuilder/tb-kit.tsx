@@ -13,6 +13,7 @@
 import * as React from "react";
 import { Dex } from "@pkmn/dex";
 import { Icons } from "@pkmn/img";
+import { calcStat } from "@boffmedia/battle-core";
 import { cn, Icon, Input, type InputProps } from "@boffmedia/ui";
 import { DkSprite } from "@boffmedia/ui/datakit";
 import { spriteUrl, handleSpriteError } from "@boffmedia/tools-pokemon";
@@ -636,5 +637,243 @@ export function TbIconAction({
     >
       <Icon name={name} size={14} className={cn(flip && "rotate-180")} />
     </button>
+  );
+}
+
+
+/* ── SP bar (Champions Stat Points allocator) ────────────────────────────── */
+
+/** One segment's state: three allocation states, plus the bump flag. */
+export interface TbSpSegment {
+  /** This point is taken. */
+  spent: boolean;
+  /** Not taken, and the remaining budget can still reach it. */
+  affordable: boolean;
+  /** Not taken, and beyond what the remaining budget can reach. */
+  unreachable: boolean;
+  /** Taking this point raises the final stat by +2 instead of +1. */
+  bump: boolean;
+}
+
+/**
+ * The Champions Stat Points allocator: one segment per point, and the segments
+ * ARE the control.
+ *
+ * SEGMENT i IS THE STEP FROM SP i TO SP i+1. Taking it costs a point, so the
+ * value the bar carries runs 0…perStat — 33 states for 32 segments — while the
+ * segments are indexed 0…perStat-1. Conflating the two is how the control ends
+ * up unable to reach 32 at all.
+ *
+ * TAKEN vs NOT TAKEN OWNS THE CONTRAST; BUMPS ARE A FOOTNOTE ON TOP OF IT.
+ * That ordering is the design, and it took several passes to get right — every
+ * version where the bump treatment competed with the fill made the bar harder
+ * to read, because the question the control exists for is how many points you
+ * have spent.
+ *
+ * A bump is a step worth +2 instead of +1: Champions multiplies a
+ * nature-boosted stat by 110/100 with a 16-bit truncation, so roughly every
+ * tenth point lands one extra. It is marked because it is the whole reason a
+ * Champions spread is not linear — you stop ON a bump, not next to it.
+ *
+ * ONE NATURE TREATMENT, NOT TWO. The mirror case (a lowered stat's ×90/100
+ * swallowing some points entirely) is deliberately NOT marked. Two different
+ * nature marks on an ~8px sliver read as clutter, and the wasted-point case is
+ * already visible where it counts: the final-stat column beside the bar does
+ * not move when you buy one.
+ *
+ * SEMANTICS: the container is the slider — one focus stop, arrows, Home/End,
+ * PageUp/PageDown — and the segments are decoration. They are deliberately not
+ * buttons. Thirty-two tab stops per stat and six stats to a Pokémon is not
+ * navigable, and a `role="slider"` may not contain focusable children anyway.
+ *
+ * Words arrive as props; this file stays presentational like the rest of the kit.
+ */
+export function TbSpBar({
+  stat,
+  currentSp,
+  perStat = 32,
+  remainingBudget,
+  nature,
+  base,
+  format,
+  onChange,
+  ariaLabel,
+  valueText,
+  bumpHint,
+}: {
+  stat: string;
+  currentSp: number;
+  perStat?: number;
+  /** Points left in the pool. Negative when the spread is over budget. */
+  remainingBudget: number;
+  nature: string;
+  /** The species' base stat, or 0 when the slot has no species yet. */
+  base: number;
+  format: string;
+  onChange: (nextSp: number) => void;
+  ariaLabel: string;
+  /** Spoken value for the current allocation. */
+  valueText: (sp: number) => string;
+  /** Spoken gloss for how many bumps this stat has. Omitted when it has none. */
+  bumpHint: (n: number) => string;
+}) {
+  const trackRef = React.useRef<HTMLDivElement>(null);
+  const [dragging, setDragging] = React.useState(false);
+
+  const segments = React.useMemo<TbSpSegment[]>(() => {
+    // Segment `i` costs a point to take, so the last one the budget can reach
+    // is `currentSp + remainingBudget - 1`. Off by one here reads as one more
+    // point than the pool holds — and "how much may I still put into this
+    // stat" is exactly the question the bar is answering.
+    const lastAffordable = currentSp + remainingBudget - 1;
+    return Array.from({ length: perStat }, (_, i) => ({
+      spent: i < currentSp,
+      affordable: i >= currentSp && i <= lastAffordable,
+      unreachable: i > lastAffordable,
+      // Computed, never a table of positions, so the marks move when the
+      // nature does. 31 IVs and level 50 are fixed in Champions and `calcStat`
+      // ignores both for an "sp" format; passing them keeps the call honest.
+      bump:
+        base > 0 &&
+        calcStat(format, stat as never, base, 31, i + 1, 50, nature) -
+          calcStat(format, stat as never, base, 31, i, 50, nature) >=
+          2,
+    }));
+  }, [currentSp, remainingBudget, perStat, base, format, stat, nature]);
+
+  const bumpCount = React.useMemo(() => segments.filter((s) => s.bump).length, [segments]);
+
+  /** Pointer x → the SP value that fills the segment under the cursor. */
+  const valueAt = (clientX: number): number => {
+    const el = trackRef.current;
+    if (!el) return currentSp;
+    const rect = el.getBoundingClientRect();
+    if (rect.width <= 0) return currentSp;
+    return Math.max(0, Math.min(perStat, Math.ceil(((clientX - rect.left) / rect.width) * perStat)));
+  };
+
+  const commit = (next: number) => {
+    if (next !== currentSp) onChange(next);
+  };
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    const next = valueAt(e.clientX);
+    // Clicking the point that is already the last one taken gives it back.
+    // Without this there is no way to reach 0 with the pointer.
+    commit(next === currentSp ? next - 1 : next);
+    setDragging(true);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (dragging) commit(valueAt(e.clientX));
+  };
+
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    setDragging(false);
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const jump = (to: number) => {
+      e.preventDefault();
+      commit(Math.max(0, Math.min(perStat, to)));
+    };
+    switch (e.key) {
+      case "ArrowLeft":
+      case "ArrowDown": return jump(currentSp - 1);
+      case "ArrowRight":
+      case "ArrowUp": return jump(currentSp + 1);
+      case "Home": return jump(0);
+      case "End": return jump(perStat);
+      case "PageDown": return jump(currentSp - 5);
+      case "PageUp": return jump(currentSp + 5);
+      default: return;
+    }
+  };
+
+  return (
+    <div
+      ref={trackRef}
+      role="slider"
+      aria-label={ariaLabel}
+      aria-valuemin={0}
+      aria-valuemax={perStat}
+      aria-valuenow={currentSp}
+      aria-valuetext={bumpCount > 0 ? `${valueText(currentSp)}. ${bumpHint(bumpCount)}` : valueText(currentSp)}
+      tabIndex={0}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
+      onKeyDown={handleKeyDown}
+      className={cn(
+        // The slab-and-inset parallelogram the rest of the tool uses. A CSS
+        // border cannot survive a clip-path — it slices the vertical edges off
+        // and leaves the diagonals unstroked — so the stroke is geometry: this
+        // element is the line colour, the child insets over it as the track.
+        "cut relative flex h-[26px] w-full cursor-pointer touch-none select-none bg-line [--cut:8px]",
+        BSIM_FOCUS_CUT,
+        "transition-[background] duration-[140ms] hover:bg-line-2",
+        dragging && "bg-accent-line",
+      )}
+    >
+      <div className="cut absolute inset-[1px_2px] flex gap-[2px] overflow-hidden bg-base px-[2px] [--cut:7px]">
+        {segments.map((seg, i) => (
+          <span
+            key={i}
+            aria-hidden
+            className={cn(
+              // Each point is a slanted sliver, parallel to the bar's own
+              // edges: the house shape and the Champions read in one move.
+              "relative min-w-0 flex-1 -skew-x-[17deg] transition-[background,box-shadow,opacity] duration-[120ms]",
+
+              /* TAKEN vs NOT TAKEN is the whole vocabulary, so it gets the
+               * whole contrast: a lit gradient against an outlined socket.
+               *
+               * Every untaken point is OUTLINED rather than flat. A socket you
+               * can see is the difference between reading "32 points, 12 taken"
+               * at a glance and seeing an orange smear that trails off into the
+               * background — and the outline costs nothing, because there is no
+               * longer anything else competing for the pill's edge.
+               */
+              seg.spent
+                ? "bg-[linear-gradient(180deg,color-mix(in_srgb,white_30%,var(--accent-bright))_0%,var(--accent-bright)_58%,color-mix(in_srgb,black_14%,var(--accent-bright))_100%)] [box-shadow:inset_0_0_0_1px_color-mix(in_srgb,black_28%,var(--accent-bright))]"
+                : seg.unreachable
+                  ? // Out of budget: still a visible socket, just clearly a
+                    // closed one. Dimming it to nothing lost the count.
+                    "bg-panel opacity-60 [box-shadow:inset_0_0_0_1px_var(--line)]"
+                  : "bg-panel-2 [box-shadow:inset_0_0_0_1px_var(--line-2)]",
+            )}
+          >
+            {/*
+             * The bump mark: a stripe along the FOOT of the pill.
+             *
+             * At the foot rather than around it or across the top, because it
+             * has to annotate without competing — the pill's fill is already
+             * saying the thing the bar is for, and every version that wrapped
+             * or capped the pill fought that. A footer reads as a marginal
+             * note, and it reads the same taken or not, which is the property a
+             * bump needs: it describes the STEP, not the current spread.
+             *
+             * Accent family in both states, never a foreign hue. Three were
+             * tried on this ~8px sliver and all three failed — `--bad` was mud
+             * against `--accent` (two reds a few degrees apart) and backwards
+             * besides, near-white read as glare, `--ok` green looked like a
+             * rendering bug. So: solid accent on a dark pill, and the same
+             * orange struck down toward black on a lit one.
+             */}
+            {seg.bump && (
+              <i
+                className={cn(
+                  "absolute inset-x-0 bottom-0 h-[4px]",
+                  seg.spent ? "bg-[color-mix(in_srgb,black_50%,var(--accent-bright))]" : "bg-accent",
+                )}
+              />
+            )}
+          </span>
+        ))}
+      </div>
+    </div>
   );
 }

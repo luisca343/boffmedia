@@ -6,6 +6,7 @@ import { configureUi } from "@boffmedia/ui"
 
 import { env } from "@/config/env.public"
 import { staticAssetUrl } from "@/lib/assets"
+import { sessionToken } from "@/services/http/core"
 
 // Runs at import time, once per module graph. Next builds the server and the
 // client bundles separately, so this module has to be reachable from BOTH —
@@ -59,6 +60,15 @@ if (typeof window !== "undefined") {
   // "/api" default, a relative base `new URL()` rejects outright, so every
   // tool request through the `api` capability threw before it was sent.
   configureToolHost(
-    createWebToolHost({ apiBaseUrl: env.NEXT_PUBLIC_API, session: toolSessionStore.session }),
+    createWebToolHost({
+      apiBaseUrl: env.NEXT_PUBLIC_API,
+      session: toolSessionStore.session,
+      // The API is a different origin with no cookie of ours on it, so the
+      // NextAuth access token has to travel as a Bearer header — the same one
+      // every `services/http` call sends. Read per request rather than once:
+      // this runs at import time, long before a session exists, and the token
+      // is refreshed underneath us.
+      token: sessionToken,
+    }),
   )
 }

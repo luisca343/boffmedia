@@ -21,6 +21,47 @@ import {
 const tyc = (v: string) => ({ ["--tyc"]: v }) as React.CSSProperties
 
 /**
+ * Champions-style HUD nameplate voice: Saira italic (not Saira Condensed,
+ * which ships normal styles only with no italic file). The oblique effect
+ * comes from real italic + a condensed width via the wdth axis.
+ *
+ * CRITICAL: font-variation-settings overrides font-weight, so always set
+ * both axes together in the same declaration. Tailwind's arbitrary values
+ * with commas/quotes (e.g. `[font-variation-settings:'wdth'_75,'wght'_800]`)
+ * are fragile — define as a named constant (CSS class or inline style).
+ */
+export const BX_PLATE_VOICE: React.CSSProperties = {
+  fontFamily: "Saira, sans-serif",
+  fontStyle: "italic",
+  fontVariationSettings: '"wdth" 75, "wght" 800',
+  letterSpacing: "-0.01em",
+  textTransform: "uppercase",
+  // HP counts down digit by digit; proportional figures make the readout
+  // shuffle sideways on every tick.
+  fontVariantNumeric: "tabular-nums",
+}
+
+/**
+ * The HP readout's accessible name.
+ *
+ * The visible text is `19/155`, which a screen reader pronounces as "19 slash
+ * 155" — so the number is spelled out in words instead. In the reader's own
+ * language: this is a Spanish-first product and an English aria-label here is a
+ * regression, not a stopgap.
+ */
+export function hpAriaLabel(
+  t: (key: string, values?: Record<string, string | number | Date>) => string,
+  mon: { fnt?: boolean; hpCur?: number | null; hpMax?: number | null },
+  pct: number,
+  exact: boolean,
+): string {
+  if (mon.fnt) return t("battle.labels.statusLong.fnt")
+  return exact && mon.hpCur != null && mon.hpMax != null
+    ? t("battle.hp.ariaExact", { cur: mon.hpCur, max: mon.hpMax })
+    : t("battle.hp.ariaPct", { pct })
+}
+
+/**
  * The second half of the focus ring for a CUT shape.
  *
  * `BSIM_FOCUS_CUT` widens the chamfer stroke, which is the design system's
@@ -146,13 +187,68 @@ export function BxHp({ pct, ghost = null, trail = true }: { pct: number; ghost?:
     return () => clearTimeout(id)
   }, [p, trailPct])
   return (
-    <div className="relative h-[7px] overflow-hidden border border-solid border-line-2 bg-base">
-      <i className="absolute bottom-0 top-0 z-[2] w-px bg-[color-mix(in_srgb,var(--line-2)_80%,transparent)]" style={{ left: "50%" }} />
-      <i className="absolute bottom-0 top-0 z-[2] w-px bg-[color-mix(in_srgb,var(--line-2)_80%,transparent)]" style={{ left: "25%" }} />
-      {trail && <i className={cn("absolute inset-0 right-auto bg-[color-mix(in_srgb,var(--bad)_55%,var(--panel-2))]", !snap && "transition-[width] duration-[600ms] ease-out motion-reduce:transition-none")} style={{ width: trailPct + "%" }} />}
-      <i className="absolute inset-0 right-auto transition-[width] duration-[300ms] ease-out motion-reduce:transition-none" style={{ width: p + "%", background: hpTone(p) }} />
-      {ghost && gMax > gMin && <i className="absolute bottom-0 top-0 z-[2] bg-[repeating-linear-gradient(45deg,color-mix(in_srgb,var(--warn)_55%,transparent)_0_4px,transparent_4px_8px)]" style={{ left: p - gMax + "%", width: gMax - gMin + "%" }} />}
-      {ghost && gMin > 0 && <i className="absolute bottom-0 top-0 z-[3] bg-[color-mix(in_srgb,var(--bad)_75%,transparent)]" style={{ left: Math.max(0, p - gMin) + "%", width: Math.min(gMin, p) + "%" }} />}
+    // The SHAPE is the redesign. A slanted bar is what Champions draws and it
+    // is also what this design system already speaks — `.cut` is literally a
+    // parallelogram — so the modern read and the house style are the same move
+    // rather than a compromise between them.
+    //
+    // A CSS `border` cannot survive a `clip-path`: the clip slices the vertical
+    // borders off and leaves the diagonals unstroked, so an outlined shape
+    // collapses into two loose horizontal rules. The stroke has to be geometry.
+    // This is the nesting `.cut-frame` performs — an outer slab painted in the
+    // line colour, an inner one inset and re-clipped — written out here because
+    // the bars inside must be clipped to the inner shape too, and `.cut-frame`
+    // paints its fill from a pseudo-element that children cannot live inside.
+    <div className="cut relative h-[17px] w-full bg-line-2 [--cut:7px]">
+      <div
+        className="cut absolute overflow-hidden bg-[linear-gradient(180deg,var(--base)_0%,var(--panel-2)_100%)] [--cut:6px]"
+        // Horizontal inset is wider than vertical on purpose: a 1px diagonal is
+        // antialiased across ~1.4px and reads thinner than the 1px rules above
+        // and below it, so an even inset makes the slanted edges look weaker
+        // than the flat ones. Same reasoning as the design system's --cut-ix.
+        style={{ inset: "1px 2px" }}
+      >
+        {/* Quarter marks, slanted to sit parallel with the bar's own edges. */}
+        {[25, 50, 75].map((at) => (
+          <i key={at} aria-hidden className="absolute bottom-0 top-0 z-[2] w-px -skew-x-[22deg] bg-[color-mix(in_srgb,var(--line-2)_70%,transparent)]" style={{ left: at + "%" }} />
+        ))}
+
+        {/* Delayed damage trail (see above) — behind everything but the track. */}
+        {trail && <i className={cn("absolute inset-0 right-auto bg-[color-mix(in_srgb,var(--bad)_45%,var(--panel-2))]", !snap && "transition-[width] duration-[600ms] ease-out motion-reduce:transition-none")} style={{ width: trailPct + "%" }} />}
+
+        {/* The live fill. */}
+        <i
+          className="absolute inset-0 right-auto z-[1] bg-[linear-gradient(180deg,var(--hp-top)_0%,var(--hp-main)_55%,var(--hp-bottom)_100%)] transition-[width] duration-[300ms] ease-out motion-reduce:transition-none"
+          style={{
+            width: p + "%",
+            // `color-mix()` percentages are `<percentage [0,100]>`. A value over
+            // 100 does not merely clamp — it fails to parse, and because these
+            // are CUSTOM properties the failure is invisible until use: the var
+            // holds the bad token happily, then the gradient that reads it goes
+            // invalid at computed-value time and the background resolves to
+            // nothing. A "110%" here left the bar with no fill at all, which no
+            // type-check or lint can see. Mix the tint INTO the tone.
+            "--hp-main": hpTone(p),
+            "--hp-top": "color-mix(in srgb, white 30%, var(--hp-main))",
+            "--hp-bottom": "color-mix(in srgb, black 18%, var(--hp-main))",
+          } as React.CSSProperties}
+        />
+
+        {/* Gloss: a bright band over the top third of the FILL only, which is
+            what makes it read as a lit surface rather than a coloured box. */}
+        <i aria-hidden className="absolute inset-x-0 top-0 z-[2] h-[6px] bg-[linear-gradient(180deg,color-mix(in_srgb,white_38%,transparent)_0%,transparent_100%)] transition-[width] duration-[300ms] ease-out motion-reduce:transition-none" style={{ width: p + "%" }} />
+
+        {/* Leading edge: a slanted highlight where the fill ends, so the eye
+            catches the value changing even on a small plate. */}
+        {p > 0 && p < 100 && (
+          <i aria-hidden className="absolute bottom-0 top-0 z-[3] -ml-[2px] w-[3px] -skew-x-[22deg] bg-[color-mix(in_srgb,white_70%,var(--hp-edge))] transition-[left] duration-[300ms] ease-out motion-reduce:transition-none" style={{ left: p + "%", "--hp-edge": hpTone(p) } as React.CSSProperties} />
+        )}
+
+        {/* Ghost damage preview: hatched band (the predicted range). */}
+        {ghost && gMax > gMin && <i className="absolute bottom-0 top-0 z-[4] bg-[repeating-linear-gradient(45deg,color-mix(in_srgb,var(--warn)_65%,transparent)_0_4px,transparent_4px_8px)]" style={{ left: p - gMax + "%", width: gMax - gMin + "%" }} />}
+        {/* Ghost damage preview: solid band (damage taken in every roll). */}
+        {ghost && gMin > 0 && <i className="absolute bottom-0 top-0 z-[5] bg-[color-mix(in_srgb,var(--bad)_75%,transparent)]" style={{ left: Math.max(0, p - gMin) + "%", width: Math.min(gMin, p) + "%" }} />}
+      </div>
     </div>
   )
 }
@@ -178,7 +274,6 @@ export function BxPlate({ mon, slotTag, foe = false, ghost = null, active = fals
   const types = mon.tera && mon.teraType ? [mon.teraType] : mon.types
   const clickable = targetable || !!onDetails
   const Tag = (clickable ? "button" : "div") as "button"
-  const readout = mon.fnt ? t("battle.end.ko") : showExact ? `${mon.hpCur}/${mon.hpMax}` : pct + "%"
   return (
     <Tag
       type={clickable ? "button" : undefined}
@@ -204,10 +299,17 @@ export function BxPlate({ mon, slotTag, foe = false, ghost = null, active = fals
         <span className="flex min-w-0 items-center gap-[6px]">
           {slotTag && <b className={cn("flex-none border border-solid px-[5px] py-[2px] font-mono text-[8px] font-bold not-italic leading-none tracking-[0.1em]", foe ? "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad" : "border-accent-line bg-accent-soft text-accent-bright")}>{slotTag}</b>}
           {mon.tera && mon.teraType && <BxTera type={mon.teraType} size=".78em" />}
-          <span className={cn("min-w-0 flex-1 truncate font-display font-bold uppercase leading-none tracking-[0.03em]", compact ? "text-[12px]" : "text-[13.5px]")}>{mon.name}</span>
-          <span className="ml-auto inline-flex flex-none items-center gap-1 font-mono text-[14px] font-bold leading-none" style={{ color: mon.fnt ? "var(--muted)" : hpTone(pct) }}>
-            {!mon.fnt && band !== "ok" && <i aria-hidden className="not-italic text-[10px]">▼</i>}
-            {readout}
+          {/* The name carries the plate voice too — it is the half of the
+              Champions nameplate the eye actually reads as "that game". */}
+          <span className={cn("min-w-0 flex-1 truncate leading-none", compact ? "text-[12.5px]" : "text-[14.5px]")} style={BX_PLATE_VOICE}>{mon.name}</span>
+          <span aria-label={hpAriaLabel(t, mon, pct, showExact)} className="ml-auto inline-flex flex-none items-baseline gap-[3px] leading-none" style={{ ...BX_PLATE_VOICE, color: mon.fnt ? "var(--muted)" : hpTone(pct) }}>
+            {!mon.fnt && band !== "ok" && <i aria-hidden className="self-center not-italic text-[10px]">▼</i>}
+            {/* Current big, maximum small — the number that changes is the one
+                worth reading at a glance, and it is how Champions sets it. */}
+            <b style={{ fontSize: compact ? "15px" : "19px" }}>{mon.fnt ? t("battle.end.ko") : showExact ? mon.hpCur : pct}</b>
+            {!mon.fnt && (
+              <span className="opacity-70" style={{ fontSize: compact ? "10px" : "12px" }}>{showExact ? `/${mon.hpMax}` : "%"}</span>
+            )}
           </span>
         </span>
         <BxHp pct={pct} ghost={ghost} />
@@ -300,8 +402,8 @@ export function BxBench({ mon, hotkey, disabled = false, reserved = false, reaso
           {why && !mon.fnt && <i className="flex-none border border-solid border-line-2 px-1 py-[2px] font-mono text-[8px] font-semibold not-italic uppercase leading-none tracking-[0.08em] text-txt-dim">{why}</i>}
         </span>
         <span className="flex items-center gap-2">
-          <span className="h-[5px] min-w-0 flex-1 overflow-hidden border border-solid border-line bg-base"><i className="block h-full transition-[width] motion-reduce:transition-none" style={{ width: pct + "%", background: hpTone(pct) }} /></span>
-          <span className="flex-none font-mono text-[10px] font-bold leading-none" style={{ color: mon.fnt ? "var(--muted)" : hpTone(pct) }}>{mon.fnt ? t("battle.end.ko") : mon.hpCur != null && mon.hpMax != null ? `${mon.hpCur}/${mon.hpMax}` : pct + "%"}</span>
+          <span className="h-[8px] min-w-0 flex-1 overflow-hidden border border-solid border-line-2 bg-[linear-gradient(180deg,var(--panel-2)_0%,var(--panel)_100%)]"><i className="block h-full transition-[width] duration-[300ms] ease-out motion-reduce:transition-none" style={{ width: pct + "%", background: `linear-gradient(180deg, color-mix(in srgb, ${hpTone(pct)} 110%, white 15%) 0%, ${hpTone(pct)} 70%, color-mix(in srgb, ${hpTone(pct)} 85%, black 10%) 100%)` }} /></span>
+          <span aria-label={hpAriaLabel(t, mon, pct, true)} className="flex-none leading-none" style={{ ...BX_PLATE_VOICE, color: mon.fnt ? "var(--muted)" : hpTone(pct), fontSize: "11px" }}>{mon.fnt ? t("battle.end.ko") : mon.hpCur != null && mon.hpMax != null ? `${mon.hpCur}/${mon.hpMax}` : pct + "%"}</span>
         </span>
         <BxTypeRow types={mon.types} small />
       </span>

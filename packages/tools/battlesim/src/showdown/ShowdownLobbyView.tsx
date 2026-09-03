@@ -61,7 +61,7 @@ export function BsimShowdownView() {
     // The bar is the shell's, not this screen's: rendered bare, the Showdown
     // lobby had no title, no seal and — on the launcher, where there is no
     // browser Back — no way out of it at all.
-    <BsimScreenShell sub={t('showdown.title')}>
+    <BsimScreenShell>
       <div className={cn(BSIM_PAGE_NARROW, 'flex flex-col gap-4 text-txt')}>
       <div className="flex items-center justify-between gap-3">
         <p className="m-0 min-w-0 truncate font-body text-[13px] text-txt-muted">{t('showdown.subtitle')}</p>

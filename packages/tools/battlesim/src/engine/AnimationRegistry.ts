@@ -2,6 +2,7 @@ import { Battle } from "@pkmn/client";
 import { ArgType, BattleArgsKWArgsTypes } from "@pkmn/protocol";
 import { Scene } from "./Scene";
 import { getEventHandler, noAnimEvents, getDefaultTimeout } from "./eventHandlers";
+import type { BattleAudioState } from "./BattleAudio";
 
 export interface AnimationContext {
   scene: Scene;
@@ -12,6 +13,7 @@ export interface AnimationContext {
   pov: 0 | 1;
   acceleration: number;
   skipAnims: boolean;
+  audioState?: BattleAudioState;
 }
 
 export class AnimationRegistry {

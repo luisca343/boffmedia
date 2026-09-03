@@ -19,6 +19,12 @@
  * its own tab stop rather than a click target buried inside the tab. Delete
  * closes the focused room, as a browser does.
  *
+ * WHAT A TAB LOOKS LIKE IS NOT HERE. `BsimTab` in `bsim-kit` owns the chassis,
+ * the label and the close affordance as one object; this file owns which tabs
+ * exist, which is on, and what the keyboard does. The split is why the close
+ * control could be folded into the tab's own frame without this file changing:
+ * it never knew there were two boxes.
+ *
  * WHAT THE TABS POINT AT. Nothing here holds screen state: a pinned tab is
  * `nav.replace("hub", { tab })` and a room tab is `activateRoom`, which is a
  * `nav.replace` to that room's own address. The bar renders the address; it
@@ -32,7 +38,7 @@ import { useToolT, BATTLESIM_NS } from "../i18n"
 import { useBsimNav, type BsimScreen } from "../nav"
 import { useBsimRooms, type BsimRoom, type BsimRoomTone } from "../rooms/RoomsProvider"
 import type { BsimView } from "../lib/bsim-data"
-import { BSIM_FOCUS_CUT } from "./bsim-kit"
+import { BSIM_FOCUS_CUT, BsimTab } from "./bsim-kit"
 
 /* ── Geometry ────────────────────────────────────────────────────────────── */
 
@@ -44,20 +50,6 @@ import { BSIM_FOCUS_CUT } from "./bsim-kit"
  * how the battle ends up one bar taller than its viewport.
  */
 export const BSIM_TAB_BAR_H = "40px"
-
-/** 32px tall inside a 40px bar: the contract's minimum hit target, exactly. */
-const TAB_BOX =
-  "flex h-8 flex-none items-center gap-[6px] border border-solid px-[10px] font-display text-[11.5px]/none font-bold uppercase tracking-[0.04em] transition-[background,border-color,color] duration-[140ms]"
-
-const TAB_ON = "border-line-2 [--cut-line:var(--line-2)] bg-panel text-txt [box-shadow:inset_0_2px_0_var(--accent)]"
-const TAB_OFF = "border-line [--cut-line:var(--line)] bg-base text-txt-muted hover:bg-panel-2 hover:text-txt"
-
-const DOT: Record<BsimRoomTone, string> = {
-  ok: "bg-ok",
-  warn: "bg-warn",
-  bad: "bg-bad",
-  dim: "bg-line-2",
-}
 
 /* ── The pinned three ────────────────────────────────────────────────────── */
 
@@ -222,56 +214,30 @@ export function BsimTabBar() {
             const open = entry.kind === "room" ? entry : null
             return (
               <span key={entry.key} role="presentation" className="flex flex-none items-center">
-                <button
-                  type="button"
-                  role="tab"
+                <BsimTab
                   id={`bsim-tab-${entry.key}`}
-                  aria-selected={on}
-                  aria-controls={`bsim-panel-${entry.key}`}
-                  tabIndex={roving ? 0 : -1}
+                  ariaControls={`bsim-panel-${entry.key}`}
                   ref={(node) => {
                     if (node) tabRefs.current.set(entry.key, node)
                     else tabRefs.current.delete(entry.key)
                   }}
+                  icon={entry.icon}
+                  label={entry.label}
+                  selected={on}
+                  tabIndex={roving ? 0 : -1}
                   onFocus={() => setFocusKey(entry.key)}
                   onKeyDown={(event) => onKeyDown(event, index, entry)}
-                  onClick={() => activate(entry)}
-                  className={cn(
-                    "cut-tag cut-tag-edge [--cut-tag:8px]",
-                    BSIM_FOCUS_CUT,
-                    TAB_BOX,
-                    on ? TAB_ON : TAB_OFF,
-                    open && "pr-[6px]",
-                  )}
-                >
-                  <Icon name={entry.icon} size={12} className="flex-none opacity-80" />
-                  <span className="max-w-[12ch] truncate">{entry.label}</span>
-                  {open && (
-                    <>
-                      {open.sub && <span className="max-w-[8ch] truncate font-mono text-[9.5px]/none font-semibold tracking-[0.06em] text-txt-dim">{open.sub}</span>}
-                      {/* The dot is redundant colour: the state is also a word,
-                          read out beside it. */}
-                      <i aria-hidden className={cn("h-[6px] w-[6px] flex-none [clip-path:circle(50%)]", DOT[open.tone])} />
-                      <span className="sr-only">{open.state}</span>
-                    </>
-                  )}
-                </button>
-                {open && (
-                  <button
-                    type="button"
-                    tabIndex={roving ? 0 : -1}
-                    onFocus={() => setFocusKey(entry.key)}
-                    onClick={() => requestClose(open.room.id)}
-                    aria-label={t("tabs.close", { label: entry.label })}
-                    className={cn(
-                      "cut-tag cut-tag-edge [--cut-tag:6px] [--cut-line:var(--line)]",
-                      BSIM_FOCUS_CUT,
-                      "-ml-px grid h-8 w-8 flex-none place-items-center border border-solid border-line bg-base text-txt-dim transition-[background,color] duration-[140ms] hover:bg-bad-soft hover:text-bad",
-                    )}
-                  >
-                    <Icon name="x" size={11} />
-                  </button>
-                )}
+                  onSelect={() => activate(entry)}
+                  // Only a room can be closed; the pinned three never can, and
+                  // passing no `onClose` is what says so.
+                  sub={open?.sub}
+                  tone={open?.tone}
+                  // The dot is redundant colour: the state is also a word, read
+                  // out beside it.
+                  stateLabel={open?.state}
+                  onClose={open ? () => requestClose(open.room.id) : undefined}
+                  closeLabel={open ? t("tabs.close", { label: entry.label }) : undefined}
+                />
               </span>
             )
           })}

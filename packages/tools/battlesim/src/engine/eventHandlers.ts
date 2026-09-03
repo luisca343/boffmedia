@@ -7,6 +7,7 @@ import {
 } from "./battleActions";
 import { getRelativeIdent } from "./replayUtils";
 import { fxLabels } from "./fxLabels";
+import { playCry } from "./BattleAudio";
 
 export interface EventHandler {
   getPayload?(args: ArgType, kwArgs: BattleArgsKWArgsTypes, battle: Battle): any;
@@ -28,7 +29,17 @@ export const eventHandlers: Record<string, EventHandler> = {
   'switch': {
     beforeStateChange: async (ctx) => {
       const pokemonIdent = getRelativeIdent(ctx.args[1] as PokemonIdent, ctx.pov);
-      await switchAction(ctx.scene, pokemonIdent, ctx.args[2] as PokemonDetails, ctx.args[3] as PokemonHPStatus);
+      const details = ctx.args[2] as PokemonDetails;
+      await switchAction(ctx.scene, pokemonIdent, details, ctx.args[3] as PokemonHPStatus);
+
+      // Play cry on switch-in if audio is available
+      if (ctx.audioState) {
+        // Extract species id from details string (format: "species[, details...]")
+        const speciesId = (details as string).split(',')[0].trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (speciesId) {
+          await playCry(speciesId, ctx.audioState);
+        }
+      }
     },
     afterStateChange: async (ctx) => {
       if (ctx.skipAnims) return 100;
@@ -41,6 +52,15 @@ export const eventHandlers: Record<string, EventHandler> = {
   'faint': {
     beforeStateChange: async (ctx) => {
       await faintAction(ctx.battle, ctx.scene, getRelativeIdent(ctx.args[1] as PokemonIdent, ctx.pov));
+
+      // Play cry on faint if audio is available
+      if (ctx.audioState) {
+        const pokemonIdent = ctx.args[1] as PokemonIdent;
+        const pokemon = ctx.battle.getPokemon(pokemonIdent);
+        if (pokemon?.species?.id) {
+          await playCry(pokemon.species.id, ctx.audioState);
+        }
+      }
     },
     afterStateChange: async (ctx) => {
       return 600 / ctx.acceleration;

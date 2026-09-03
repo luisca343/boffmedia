@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { toolApi } from '@boffmedia/tool-kit';
-import { Button } from '@boffmedia/ui';
 import { DkSkelList } from '@boffmedia/ui/datakit';
 
 import { useToolT, BATTLESIM_NS } from '../i18n';
@@ -10,7 +9,7 @@ import { Game } from '../components/replay/Game';
 import { BsimErrorState, BsimScreenShell } from '../components/bsim-kit';
 import { getReplay } from '../storage';
 import type { ReplayData } from '../engine/types';
-import { useBsimNav, useBsimBackOrHub } from '../nav';
+import { useBsimNav } from '../nav';
 
 /**
  * One replay, from wherever it actually lives.
@@ -33,7 +32,6 @@ export function BsimReplayDetailView() {
   // has no router to supply one, and `params: Promise<...>` is a Next App
   // Router signature this package must not depend on.
   const nav = useBsimNav();
-  const back = useBsimBackOrHub();
   const id = nav.params.id ?? '';
   const source = nav.params.source ?? '';
   const t = useToolT(BATTLESIM_NS);
@@ -121,7 +119,7 @@ export function BsimReplayDetailView() {
 
   if (loading) {
     return (
-      <BsimScreenShell sub={t('app.tabs.repeticiones')}>
+      <BsimScreenShell>
         <div className="flex flex-col gap-3">
           <p role="status" className="sr-only">{t('hub.replays.loading')}</p>
           <DkSkelList rows={1} h={340} />
@@ -133,19 +131,14 @@ export function BsimReplayDetailView() {
 
   if (errorCode) {
     return (
-      <BsimScreenShell sub={t('app.tabs.repeticiones')}>
-        <BsimErrorState
-          code={errorCode}
-          actions={<Button variant="pri" icon="back" onClick={back}>{t('hub.replays.back')}</Button>}
-        />
+      <BsimScreenShell>
+        <BsimErrorState code={errorCode} />
       </BsimScreenShell>
     );
   }
 
   return (
-    <BsimScreenShell
-      sub={replayData ? `${replayData.side1} ${t('header.vs')} ${replayData.side2}` : t('app.tabs.repeticiones')}
-    >
+    <BsimScreenShell>
       <Game replayData={replayData} />
     </BsimScreenShell>
   );

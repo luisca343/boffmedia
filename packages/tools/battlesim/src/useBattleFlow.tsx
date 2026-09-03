@@ -7,6 +7,8 @@ import { Scene } from "./engine/Scene";
 import { BattleEventProcessor, ProcessedBattleEvent } from "./engine/BattleEventProcessor";
 import { BattleStateBuilder } from "./engine/BattleStateBuilder";
 import { getReplaySpeed } from "./engine/replaySpeed";
+import type { BattleAudioState } from "./engine/BattleAudio";
+import { useBattleAudioState } from "./lib/BattleAudioProvider";
 
 export interface UseBattleFlowOptions {
   liveMode?: boolean;
@@ -41,9 +43,20 @@ export function useBattleFlow(
   const isWaitingForChoice = options?.isWaitingForChoice ?? false;
   const setIsWaitingForChoice = options?.setIsWaitingForChoice;
 
+  // Try to get audio state; use undefined if not available (e.g., in embedded replays)
+  let audioState: BattleAudioState | undefined;
+  try {
+    audioState = useBattleAudioState();
+  } catch {
+    // Audio provider not mounted; proceed without audio
+  }
+
   const processorRef = useRef<BattleEventProcessor | null>(null);
   if (scene && (!processorRef.current || processorRef.current.context.scene !== scene || processorRef.current.context.battle !== battle)) {
-    processorRef.current = new BattleEventProcessor({ scene, battle, pov });
+    processorRef.current = new BattleEventProcessor({ scene, battle, pov, audioState });
+  } else if (processorRef.current && audioState !== processorRef.current.context.audioState) {
+    // Update audio state if it changes
+    processorRef.current.context.audioState = audioState;
   }
 
   const battleLines = useMemo(() => battleLog ? battleLog.split('\n').filter(l => l.trim()) : [], [battleLog]);

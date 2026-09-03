@@ -1,16 +1,12 @@
 "use client"
 
 import * as React from "react"
-import { DkApp, DkBar, DkBody, DkTitle, DkBack } from "@boffmedia/ui/datakit"
+import { DkApp, DkBody } from "@boffmedia/ui/datakit"
 import { LobbyView } from "./LobbyView"
 import { ReplaysView } from "./ReplaysView"
 import { TeamsView } from "../teambuilder/TeamsView"
 import { BSIM_TABS, type BsimView } from "../lib/bsim-data"
-import { useBsimNav, useBsimBackOrHub } from "../nav"
-import { useToolT, BATTLESIM_NS } from "../i18n"
-
-/** The bar's sub-line names the section the pinned tab selected. */
-const SECTION_KEY: Record<BsimView, "home" | "teams" | "replays"> = { lobby: "home", equipos: "teams", repeticiones: "replays" }
+import { useBsimNav } from "../nav"
 
 /** The tab lives in the address (`?tab=…`), so an unknown value falls back. */
 function readTab(raw: string | undefined): BsimView {
@@ -29,9 +25,7 @@ function readTab(raw: string | undefined): BsimView {
  * instead of two.
  */
 export function BsimApp() {
-  const t = useToolT(BATTLESIM_NS)
   const nav = useBsimNav()
-  const backOrHub = useBsimBackOrHub()
 
   // Not component state. A tab is a place — it should survive a reload, be
   // linkable, and be undone by Back — and the teambuilder hangs a `team` param
@@ -48,11 +42,6 @@ export function BsimApp() {
   return (
     <div className="contents">
     <DkApp>
-      <DkBar>
-        <DkBack onClick={backOrHub} label={t("connection.backToLobby")} />
-        <DkTitle icon="sword" label="Battlesim" sub={t(`tabs.${SECTION_KEY[view]}`)} />
-      </DkBar>
-
       <DkBody>
         {view === "lobby" && <LobbyView go={setView} />}
         {view === "equipos" && <TeamsView />}

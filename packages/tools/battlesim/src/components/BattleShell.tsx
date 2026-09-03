@@ -28,9 +28,33 @@ interface BattleShellProps {
 /**
  * The viewport-true battle frame. It fills the host's box (`--tool-vh`)
  * exactly and hides its own overflow: the only scrollers below are the log
- * pane and, on small screens, the dock. The canvas box is `flex-1` and the
- * dock keeps its natural height, so when the two cannot both fit it is the
- * canvas that gives way — the controls are never below the fold.
+ * pane and the dock.
+ *
+ * THE STAGE'S SIZE IS A FUNCTION OF THE SHELL ALONE — never of what the dock
+ * happens to be showing. That is the whole rule, and both halves of it matter:
+ *
+ *  - `flex-none` + `aspect-[16/9]`: the height follows the WIDTH, so opening
+ *    the move picker, arming tera or switching to the bench cannot move it.
+ *    The stage used to be `shrink-[999]` so the dock could always win the
+ *    space it needed — controls were never below the fold, but the field
+ *    jumped every time the dock changed rows, which is the thing that made it
+ *    uncomfortable to play. The trade is deliberate and this way round now.
+ *  - `max-height`: a percentage of this column, which is the shell minus the
+ *    header. Without it a short, wide window gives 16:9 a height taller than
+ *    the shell, and since the frame hides its overflow the dock would be
+ *    pushed out of the box entirely — unreachable controls, which is strictly
+ *    worse than the resizing it replaced. The cap letterboxes instead, and
+ *    `BattleCanvas` is asked to `fit="contain"`, so it centres in whatever box
+ *    it is given. A percentage rather than `--tool-vh` because the shell is
+ *    `100dvh` in fullscreen and the two must not disagree there.
+ *
+ * The dock then takes the REMAINDER (`flex-1`) and scrolls inside itself. Not
+ * a fixed pixel height: the split is proportional, so the dock cannot be
+ * squeezed to nothing on a short window, and a tall desktop spends the space
+ * on visible move keys instead of leaving it blank under a 120px band.
+ *
+ * Mobile keeps its own bargain — the stage caps at roughly a third so the dock
+ * is the primary surface — but it is stable for the same reason as the others.
  */
 export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(function BattleShell(
   { header, canvas, dock, rail, railOpen = false, mobileTabs, overlay, children, layout, fullscreen, className },
@@ -54,25 +78,22 @@ export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(function
 
         <div className="relative flex min-h-0 min-w-0 flex-1">
           <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
-            {/* Stage box: measured by the canvas. Mobile keeps a 16:9 header
-                capped at roughly a third of the tool box so the dock stays
-                the primary surface. */}
+            {/* Stage box: measured by the canvas. 16:9 off the width, capped
+                off this column's height — both inputs the dock cannot touch,
+                which is what keeps it still. See the rule above the component. */}
             <div
               className={cn(
-                "relative isolate flex min-w-0 items-center justify-center overflow-hidden bg-base-deep",
-                // Natural 16:9 height, shrinking only when the dock needs the room
-                // — never growing past it, or a portrait tablet letterboxes the
-                // field between two black bands.
-                mobile ? "aspect-[16/9] w-full flex-none" : "aspect-[16/9] min-h-[160px] w-full shrink-[999]",
+                "relative isolate flex aspect-[16/9] w-full flex-none min-w-0 items-center justify-center overflow-hidden bg-base-deep",
+                mobile ? "max-h-[34%]" : "max-h-[62%]",
               )}
-              style={mobile ? { maxHeight: "calc(var(--tool-vh, 100dvh) * 0.34)" } : undefined}
             >
               {canvas}
             </div>
 
-            <div className={cn("relative flex min-h-0 min-w-0 flex-col", mobile ? "flex-1" : "min-h-[120px] shrink")}>
+            {/* Dock: whatever the stage left, scrolling inside itself. */}
+            <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
               {dock && (
-                <div className={cn("min-h-0 min-w-0 overflow-y-auto border-t border-solid border-line bg-panel", mobile ? "flex-1" : "shrink")}>
+                <div className="min-h-0 min-w-0 flex-1 overflow-y-auto border-t border-solid border-line bg-panel">
                   {dock}
                 </div>
               )}

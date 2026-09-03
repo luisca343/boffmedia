@@ -17,6 +17,9 @@ import { toBSXMon } from '../engine/toBSXMon';
 import { getParticipantName } from '../engine/replayUtils';
 import type { BattleSessionState } from '../engine/BattleSession';
 import type { TargetingState, EndAction } from '../lib/battle-types';
+import { BattleAudioProvider, useBattleAudioState, useBattleAudioControls } from '../lib/BattleAudioProvider';
+import { useRoomVisible } from '../lib/room-visibility';
+import { playMusic, selectTrackForBattle, stopMusic } from '../engine/BattleAudio';
 
 export interface LiveBattleProps {
   state: BattleSessionState;
@@ -46,6 +49,42 @@ type MobileTab = 'actions' | RailTab;
  * dock + rail + preview/end overlays + forfeit/leave guards. PlayView, the
  * PvP room and the Showdown room differ only in where their choices go.
  */
+/**
+ * Plays music when battle starts; stops on battle end.
+ *
+ * Wrapped in a safe boundary so lack of audio provider doesn't break the battle.
+ */
+function MusicController({ roomId, battleActive }: { roomId?: string; battleActive: boolean }) {
+  const audioState = useBattleAudioState();
+  const { owner } = useBattleAudioControls();
+  const visible = useRoomVisible();
+
+  // The state is read at the moment the track starts, not depended on: volume
+  // and mute reach the playing element through `setMusicVolume` instead, so
+  // nudging the slider does not re-run this effect.
+  const stateRef = useRef(audioState);
+  stateRef.current = audioState;
+
+  const unlocked = audioState.autoplayUnlocked;
+
+  useEffect(() => {
+    // Only the room on screen plays. The others stay mounted (hidden rooms keep
+    // their layout) and would otherwise all start a track over each other.
+    const shouldPlay = battleActive && !!roomId && unlocked && visible;
+    if (shouldPlay) {
+      void playMusic(selectTrackForBattle(roomId), stateRef.current, owner);
+    } else {
+      // Not an `if (!battleActive)` inside the cleanup: a cleanup closes over
+      // the render that created it, so when the battle ended the stale `true`
+      // was read and the music played on past the end screen.
+      stopMusic(owner);
+    }
+    return () => stopMusic(owner);
+  }, [battleActive, roomId, unlocked, visible, owner]);
+
+  return null;
+}
+
 export function LiveBattle({ state, pov, mode, formatLabel, roomLabel, onChoice, onUndo, onForfeit, onBack, initScene, chat, spectator = false, spectatorCount, endActions, banner }: LiveBattleProps) {
   const t = useToolT(BATTLESIM_NS);
   const shellNode = useRef<HTMLDivElement | null>(null);
@@ -174,10 +213,13 @@ export function LiveBattle({ state, pov, mode, formatLabel, roomLabel, onChoice,
   ) : undefined;
 
   return (
-    <BattleShell ref={setShell} layout={layout} fullscreen={isFullscreen} header={header} canvas={canvas} dock={dock}
-      rail={rail} railOpen={layout === 'tablet' ? railOpen : mobileTab !== 'actions'} mobileTabs={mobileTabs} overlay={overlay}>
-      <ConfirmDialog open={confirmForfeit} tone="error" title={t('connection.forfeitTitle')} body={t('connection.forfeitConfirm')} confirmLabel={t('connection.forfeitCta')}
-        onConfirm={() => { setConfirmForfeit(false); onForfeit?.(); }} onClose={() => setConfirmForfeit(false)} />
-    </BattleShell>
+    <BattleAudioProvider roomId={roomLabel}>
+      <MusicController roomId={roomLabel} battleActive={!finished} />
+      <BattleShell ref={setShell} layout={layout} fullscreen={isFullscreen} header={header} canvas={canvas} dock={dock}
+        rail={rail} railOpen={layout === 'tablet' ? railOpen : mobileTab !== 'actions'} mobileTabs={mobileTabs} overlay={overlay}>
+        <ConfirmDialog open={confirmForfeit} tone="error" title={t('connection.forfeitTitle')} body={t('connection.forfeitConfirm')} confirmLabel={t('connection.forfeitCta')}
+          onConfirm={() => { setConfirmForfeit(false); onForfeit?.(); }} onClose={() => setConfirmForfeit(false)} />
+      </BattleShell>
+    </BattleAudioProvider>
   );
 }

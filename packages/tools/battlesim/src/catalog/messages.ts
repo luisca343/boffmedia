@@ -32,6 +32,10 @@ export const messages = {
           "calcDesc": "Calculadora de daño",
           "resume": "Combate PvP en curso — reanudar"
         },
+        "audio": {
+          "mute": "Silenciar audio",
+          "unmute": "Activar audio"
+        },
         "header": {
           "lobby": "Lobby",
           "forfeit": "Rendirse",
@@ -359,7 +363,9 @@ export const messages = {
             "pp": "PP",
             "evAria": "EVs de {stat}",
             "spAria": "SP de {stat}",
-            "ivAria": "IVs de {stat}"
+            "ivAria": "IVs de {stat}",
+            "spBarSegmentAria": "{current} de {max} SP en {stat}",
+            "spBarBumpLabel": "{n} saltos de +2"
           },
           "picker": {
             "species": "Elegir Pokémon",
@@ -642,7 +648,9 @@ export const messages = {
           },
           "hp": {
             "critical": "CRÍTICO",
-            "low": "Bajo"
+            "low": "Bajo",
+            "ariaExact": "{cur} de {max} PS",
+            "ariaPct": "{pct}% de PS"
           },
           "dock": {
             "aria": "Acciones de combate",
@@ -1166,6 +1174,10 @@ export const messages = {
           "calcDesc": "Damage calculator",
           "resume": "PvP battle in progress — resume"
         },
+        "audio": {
+          "mute": "Mute audio",
+          "unmute": "Unmute audio"
+        },
         "header": {
           "lobby": "Lobby",
           "forfeit": "Forfeit",
@@ -1493,7 +1505,9 @@ export const messages = {
             "pp": "PP",
             "evAria": "{stat} EVs",
             "spAria": "{stat} SP",
-            "ivAria": "{stat} IVs"
+            "ivAria": "{stat} IVs",
+            "spBarSegmentAria": "{current} of {max} SP in {stat}",
+            "spBarBumpLabel": "{n} +2 bumps"
           },
           "picker": {
             "species": "Choose a Pokémon",
@@ -1776,7 +1790,9 @@ export const messages = {
           },
           "hp": {
             "critical": "CRITICAL",
-            "low": "Low"
+            "low": "Low",
+            "ariaExact": "{cur} of {max} HP",
+            "ariaPct": "{pct}% HP"
           },
           "dock": {
             "aria": "Battle actions",

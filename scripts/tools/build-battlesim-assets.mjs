@@ -107,6 +107,7 @@ async function walk(root, base = root) {
 function categorise(rel) {
   if (rel.startsWith("sprites/trainers/")) return "sprites/trainers";
   if (rel.startsWith("sprites/")) return "sprites/pokemon";
+  if (rel.startsWith("audio/music/")) return "audio/music";
   if (rel.startsWith("audio/cries/")) return "audio/cries";
   if (rel.startsWith("fx/bg/")) return "fx/bg";
   if (rel.startsWith("fx/")) return "fx";
@@ -199,9 +200,9 @@ async function main() {
     counts: Object.fromEntries(ordered.map(([cat, acc]) => [cat, acc.files])),
     sources: [
       {
-        what: "Static Pokemon sprites (gen5 front/back, shiny), trainer avatars, cries",
+        what: "Static Pokemon sprites (gen5 front/back, shiny), trainer avatars, cries, and battle music",
         from: PS_ORIGIN,
-        paths: MIRROR_SETS.map((s) => s.local),
+        paths: [...MIRROR_SETS.map((s) => s.local), "audio/music"],
         note:
           "Mirrored from Pokemon Showdown, which hosts community fan art for many of these. " +
           "Not Boffmedia's work; mirrored so replays and AI battles render offline. Animated " +
@@ -210,7 +211,7 @@ async function main() {
       {
         what: "Battle effect art, backgrounds and UI bits",
         from: "boffmedia (hand-authored)",
-        paths: ["fx", "img", "audio"],
+        paths: ["fx", "img"],
       },
     ],
     excluded: EXCLUDE,

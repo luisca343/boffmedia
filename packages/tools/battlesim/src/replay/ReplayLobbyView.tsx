@@ -9,7 +9,7 @@ import { useToolT, BATTLESIM_NS } from '../i18n';
 export function BsimReplayView() {
   const t = useToolT(BATTLESIM_NS);
   return (
-    <BsimScreenShell sub={t('app.tabs.repeticiones')}>
+    <BsimScreenShell>
       <Game />
     </BsimScreenShell>
   );

@@ -4,6 +4,7 @@ import { LogFormatter } from "@pkmn/view";
 import { Scene } from "./Scene";
 import { getEventPayload, EventPayload } from "./eventPayload";
 import { AnimationRegistry, AnimationContext } from "./AnimationRegistry";
+import type { BattleAudioState } from "./BattleAudio";
 
 export interface ProcessedBattleEvent {
   type: string;
@@ -17,6 +18,7 @@ export interface BattleEventProcessorContext {
   scene: Scene;
   battle: Battle;
   pov: 0 | 1;
+  audioState?: BattleAudioState;
 }
 
 export class BattleEventProcessor {
@@ -57,7 +59,7 @@ export class BattleEventProcessor {
     kwArgs: BattleArgsKWArgsTypes,
     data: any
   ): AnimationContext | null {
-    const { scene, battle, pov } = this.context;
+    const { scene, battle, pov, audioState } = this.context;
     return {
       scene,
       battle,
@@ -67,6 +69,7 @@ export class BattleEventProcessor {
       pov,
       acceleration: scene.acceleration,
       skipAnims: scene.acceleration >= 3,
+      audioState,
     };
   }
 }

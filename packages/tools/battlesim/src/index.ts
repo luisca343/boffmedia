@@ -29,6 +29,13 @@ export { BsimReplayView } from "./replay/ReplayLobbyView";
 export { BsimReplayDetailView } from "./replay/ReplayDetailView";
 export { TeamsView } from "./teambuilder/TeamsView";
 
+// Teambuilder kit pieces the styleguide documents live. Exported so
+// `styles/components` renders the REAL control rather than a mock of it — the
+// EV sample beside it is hand-rolled markup, and hand-rolled samples are how a
+// styleguide ends up describing a component that no longer looks like that.
+export { TbSpBar } from "./teambuilder/tb-kit";
+export type { TbSpSegment } from "./teambuilder/tb-kit";
+
 // D5 host opt-in.
 export { setShowdownProxyEnabled, isShowdownProxyEnabled } from "./config";
 
@@ -36,6 +43,8 @@ export { setShowdownProxyEnabled, isShowdownProxyEnabled } from "./config";
 export { RoomsProvider, useBsimRooms, useBsimRoomsMaybe, shortRoomId, roomKeyFor, formatLabelFor } from "./rooms/RoomsProvider";
 export type { BsimRoom, BsimRoomKind, BsimRoomTone, BsimRoomsApi } from "./rooms/RoomsProvider";
 export { BsimTabBar, BSIM_TAB_BAR_H, bsimPinKeyFor } from "./components/BsimTabBar";
+export { BsimTab } from "./components/bsim-kit";
+export type { BsimTabTone } from "./components/bsim-kit";
 
 // Navigation
 export { useBsimNav, BsimNavProvider, useHashBsimNav, useBsimBackOrHub, matchBsimRoute } from "./nav";

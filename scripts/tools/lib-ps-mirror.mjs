@@ -24,6 +24,29 @@ export const MIRROR_SETS = [
   { remote: "audio/cries", local: "audio/cries", ext: ".mp3" },
 ];
 
+/** Battle music tracks from Pokémon Showdown. Hardcoded list to avoid duplicating cries. */
+export const MUSIC_TRACKS = [
+  'bw-rival',
+  'bw-subway-trainer',
+  'bw-trainer',
+  'bw2-homika-dogars',
+  'bw2-kanto-gym-leader',
+  'bw2-rival',
+  'colosseum-miror-b',
+  'dpp-rival',
+  'dpp-trainer',
+  'hgss-johto-trainer',
+  'hgss-kanto-trainer',
+  'oras-rival',
+  'oras-trainer',
+  'sm-rival',
+  'sm-trainer',
+  'spl-elite4',
+  'xd-miror-b',
+  'xy-rival',
+  'xy-trainer',
+];
+
 const CONCURRENCY = 12;
 const RETRIES = 3;
 
@@ -138,5 +161,48 @@ export async function mirrorPsAssets(root, { log = () => {} } = {}) {
     });
     log(`${set.remote}: done — ${fetched} fetched, ${missing.length} missing, ${(totalBytes / 1e6).toFixed(1)} MB on disk`);
   }
+
+  // Mirror battle music tracks separately (hardcoded list to avoid duplication with cries)
+  const musicDir = join(root, 'audio/music');
+  await mkdir(musicDir, { recursive: true });
+  const musicPresent = await localNames(musicDir);
+  const musicTodo = MUSIC_TRACKS.filter((name) => !musicPresent.has(`${name}.mp3`));
+
+  log(`audio/music: ${MUSIC_TRACKS.length} expected, ${MUSIC_TRACKS.length - musicTodo.length} cached, ${musicTodo.length} to fetch`);
+
+  let musicFetched = 0;
+  let musicBytes = 0;
+  const musicMissing = [];
+  await pool(musicTodo, async (trackName) => {
+    const fileName = `${trackName}.mp3`;
+    const res = await fetchWithRetry(`${PS_ORIGIN}/audio/${encodeURIComponent(fileName)}`);
+    if (!res.ok) {
+      musicMissing.push(fileName);
+      return;
+    }
+    const buf = Buffer.from(await res.arrayBuffer());
+    await writeFile(join(musicDir, fileName), buf);
+    musicFetched++;
+    musicBytes += buf.length;
+  });
+
+  // Size the whole music directory
+  let totalMusicBytes = 0;
+  for (const name of await localNames(musicDir)) {
+    totalMusicBytes += (await stat(join(musicDir, name))).size;
+  }
+
+  report.push({
+    remote: 'audio (music)',
+    local: 'audio/music',
+    total: MUSIC_TRACKS.length,
+    fetched: musicFetched,
+    skipped: MUSIC_TRACKS.length - musicTodo.length,
+    missing: musicMissing,
+    bytes: totalMusicBytes,
+    fetchedBytes: musicBytes,
+  });
+  log(`audio/music: done — ${musicFetched} fetched, ${musicMissing.length} missing, ${(totalMusicBytes / 1e6).toFixed(1)} MB on disk`);
+
   return report;
 }

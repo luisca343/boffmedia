@@ -127,7 +127,7 @@ export function BsimPvpView() {
   // until the doomed connect timed out into `connect_failed`.
   if (!online) {
     return (
-      <BsimScreenShell sub={t('pvp.title')}>
+      <BsimScreenShell>
         <BsimErrorState
           code="offline"
           actions={
@@ -144,7 +144,7 @@ export function BsimPvpView() {
   const fatal = status === 'error' && !!error ? parseBsimError(error) : null;
   if (fatal && (fatal.code === 'signin_required' || fatal.code === 'connect_failed')) {
     return (
-      <BsimScreenShell sub={t('pvp.title')}>
+      <BsimScreenShell>
         <BsimErrorState
           code={error ?? undefined}
           actions={
@@ -166,7 +166,7 @@ export function BsimPvpView() {
   }
 
   return (
-    <BsimScreenShell sub={t('pvp.title')}>
+    <BsimScreenShell>
       <div className={cn(BSIM_PAGE_NARROW, 'flex flex-col gap-4 text-txt')}>
       {/* App surface: the rail names the tool, so this view does not repeat it. */}
       <div className="flex items-center justify-between gap-3">

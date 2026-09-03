@@ -1,12 +1,14 @@
 'use client';
 
 import type { CSSProperties } from 'react';
+import { useState, useCallback } from 'react';
 import { Icon, IconButton, Button, cn } from '@boffmedia/ui';
 import { DkBack } from '@boffmedia/ui/datakit';
 import { useToolT, BATTLESIM_NS } from '../i18n';
 import { BxRing, BxScore } from './bx-kit';
 import type { BSXScore } from '../useBSXLayout';
 import type { BattleLayoutKind } from '../lib/battle-layout';
+import { useBattleAudioState, useBattleAudioControls } from '../lib/BattleAudioProvider';
 
 /** `labelKey` is a key id under `battlesim.header.modes` — never copy. */
 const MODE_META: Record<string, { labelKey: string; tone: string }> = {
@@ -54,6 +56,40 @@ function MiniScore({ score, foe, right }: { score: BSXScore; foe?: boolean; righ
 }
 
 /**
+ * Audio control button in the battle header.
+ *
+ * Toggles mute and acts as the autoplay unlock trigger (requires user gesture).
+ * Shows a speaker icon when unmuted, a muted speaker icon when muted.
+ */
+function AudioControlButton() {
+  const t = useToolT(BATTLESIM_NS);
+  const audioState = useBattleAudioState();
+  const { setMuted, unlockAutoplay } = useBattleAudioControls();
+
+  const handleClick = useCallback(async () => {
+    // Unlock autoplay on any click (required by browser)
+    if (!audioState.autoplayUnlocked) {
+      await unlockAutoplay();
+    }
+    // Toggle mute
+    setMuted(!audioState.muted);
+  }, [audioState.muted, audioState.autoplayUnlocked, setMuted, unlockAutoplay]);
+
+  const iconName = audioState.muted ? 'mute' : 'volume';
+  const label = audioState.muted ? t('audio.unmute') : t('audio.mute');
+
+  return (
+    <IconButton
+      name={iconName}
+      label={label}
+      variant="ghost"
+      size="sm"
+      onClick={handleClick}
+    />
+  );
+}
+
+/**
  * The one 58px bar over the battle: back, mode kicker, format/room, the VS
  * score plates with per-side timers around the turn counter, then the
  * rail/fullscreen/forfeit controls.
@@ -64,6 +100,22 @@ function MiniScore({ score, foe, right }: { score: BSXScore; foe?: boolean; righ
  * that control now, above every screen; stacking the two would have put one
  * tab bar directly on top of another.
  */
+/**
+ * Safely renders the audio control button if the context is available.
+ *
+ * Some battle contexts don't have audio (replays in modals, embedded players),
+ * so this wrapper prevents errors when the provider isn't mounted.
+ */
+function SafeAudioControl() {
+  try {
+    useBattleAudioState();
+    return <AudioControlButton />;
+  } catch {
+    // Context not available; skip audio control
+    return null;
+  }
+}
+
 export function BattleHeader({
   mode, onBack, roomLabel, formatLabel, you, foe, turn, timerYou, timerFoe, timerMax = 60,
   spectatorCount, layout, onToggleRail, railOpen, railUnread = 0, isFullscreen, onToggleFullscreen, showForfeit, onForfeit,
@@ -120,6 +172,7 @@ export function BattleHeader({
             )}
           </span>
         )}
+        <SafeAudioControl />
         {onToggleFullscreen && (
           <IconButton name={isFullscreen ? 'exitFullscreen' : 'fullscreen'} label={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')} variant="ghost" size="sm" onClick={onToggleFullscreen} />
         )}
