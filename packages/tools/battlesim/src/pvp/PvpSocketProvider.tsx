@@ -126,7 +126,6 @@ export function PvpSocketProvider({ children }: { children: React.ReactNode }) {
         setStatus("error")
         setError("signin_required")
         setConnection("lost")
-        pendingRef.current = null
         return null
       }
 
@@ -140,7 +139,6 @@ export function PvpSocketProvider({ children }: { children: React.ReactNode }) {
         setStatus("error")
         setError("connect_failed")
         setConnection("lost")
-        pendingRef.current = null
         return null
       }
 
@@ -190,11 +188,20 @@ export function PvpSocketProvider({ children }: { children: React.ReactNode }) {
       setSocket(next)
       setConnection(next.connected ? "connected" : "reconnecting")
       if (next.connected) setStatus("connected")
-      pendingRef.current = null
       return next
     })()
 
+    // Cleared through `finally`, NOT from inside the body. An async function
+    // runs synchronously up to its first `await`, and the anonymous branch
+    // above returns before there is one — so a `pendingRef.current = null`
+    // written in the body ran BEFORE the assignment below and was immediately
+    // overwritten by the settled promise. `connect()` then returned that
+    // resolved-null promise for the rest of the page's life, so a visitor who
+    // signed in without reloading could never open a socket again.
     pendingRef.current = opening
+    void opening.finally(() => {
+      if (pendingRef.current === opening) pendingRef.current = null
+    })
     return opening
   }, [])
 

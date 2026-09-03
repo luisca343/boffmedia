@@ -146,22 +146,52 @@ export class ShowdownGateway
     entry.showdownWs.send(payload);
   }
 
+  /**
+   * Log the player's OWN Pokémon Showdown identity in, registered or not.
+   *
+   * `password` is optional, and that is the whole of the guest support:
+   * `Actions.login` posts to `/api/login` when it has one and to
+   * `/api/getassertion` when it does not, which is exactly how the official
+   * client claims an unregistered name. Both come back through `onResponse` as
+   * the same `|/trn NAME,0,ASSERTION` command, so nothing downstream changes.
+   *
+   * The credential is relayed and never kept: it is read off this payload,
+   * posted to PS, and dropped. It is not stored, not echoed back to the client
+   * and — see below — not logged, not even the username.
+   */
   @SubscribeMessage('login')
   async handleLogin(
     client: Socket,
-    payload: { username: string; password: string; challstr: string },
+    payload: { username?: string; password?: string; challstr?: string },
   ): Promise<void> {
-    const { username, password, challstr } = payload;
+    const username = typeof payload?.username === 'string' ? payload.username.trim() : '';
+    const password = typeof payload?.password === 'string' ? payload.password : '';
+    const challstr = typeof payload?.challstr === 'string' ? payload.challstr : '';
+
+    // Validated here rather than trusted: this payload crosses the wire, and
+    // `username` goes into a form-encoded POST to PS. 18 is Showdown's own
+    // limit; a longer one is rejected there anyway, with a worse message.
+    if (!username || username.length > 18) {
+      client.emit('loginError', 'invalid_username');
+      return;
+    }
+    if (!challstr) {
+      client.emit('loginError', 'no_challstr');
+      return;
+    }
+
     try {
       const action = Actions.login({
         username,
-        password,
+        // Omitted, not empty: `Actions.login` branches on the property being
+        // present, and this is what selects the unregistered-name path.
+        ...(password ? { password } : {}),
         challstr,
       });
       // Username, the PS response body and the /trn assertion were all logged
       // at info level here. The assertion is a bearer credential for that PS
       // account; the username identifies the player. Only the outcome is logged.
-      this.logger.log('PS login attempt');
+      this.logger.log(`PS login attempt (${password ? 'registered' : 'guest'})`);
       const response = await axios({
         url: action.url,
         method: action.method,

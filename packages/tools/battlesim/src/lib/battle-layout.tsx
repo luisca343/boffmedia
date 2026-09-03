@@ -82,6 +82,53 @@ export function useElementSize<T extends HTMLElement>(ref: React.RefObject<T | n
   return size
 }
 
+/**
+ * `useElementSize` for an element that may mount LATER than its measurer, and
+ * whose real answer can legitimately be zero.
+ *
+ * Both differences are load-bearing, and both are why this is a second hook
+ * rather than a flag on the first one:
+ *
+ *  - IT TAKES A NODE IN STATE, NOT A REF. A ref object is stable for the life
+ *    of the component, so an effect keyed on it runs exactly once — on the
+ *    render where `ref.current` may still be `null`, and it never re-runs when
+ *    the element finally appears. `null` then stays `null` forever. The action
+ *    dock's band is exactly that element: it exists only while there is a dock
+ *    to put in it, so a spectator promoted to a player, or a battle that
+ *    reaches `active`, mounts it after the shell. Passing the node through
+ *    `useState` (a callback ref) makes it a real dependency.
+ *  - A ZERO IS KEPT, NOT DISCARDED. `useElementSize` refuses zeros because it
+ *    feeds the engine's module-level canvas width, where a zero from any room
+ *    would flatten every open battle's sprites. Nothing downstream of THIS
+ *    hook is shared: it publishes `--bx-dock-h`, which lifts the ally HP
+ *    plates clear of the band. "No band" is a true and useful answer there —
+ *    a sticky last-positive height would strand the plates in mid-air above a
+ *    band that is no longer on screen.
+ */
+export function useNodeSize(node: HTMLElement | null): ElementSize {
+  const [size, setSize] = React.useState<ElementSize>({ width: 0, height: 0 })
+  React.useLayoutEffect(() => {
+    if (!node) {
+      setSize((prev) => (prev.width === 0 && prev.height === 0 ? prev : { width: 0, height: 0 }))
+      return
+    }
+    const read = () => {
+      const r = node.getBoundingClientRect()
+      const next = { width: Math.round(r.width), height: Math.round(r.height) }
+      setSize((prev) => (prev.width === next.width && prev.height === next.height ? prev : next))
+    }
+    read()
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", read)
+      return () => window.removeEventListener("resize", read)
+    }
+    const ro = new ResizeObserver(read)
+    ro.observe(node)
+    return () => ro.disconnect()
+  }, [node])
+  return size
+}
+
 /** The layout kind of the element `ref` points at. */
 export function useMeasuredLayout<T extends HTMLElement>(ref: React.RefObject<T | null>): BattleLayoutKind {
   const { width } = useElementSize(ref)

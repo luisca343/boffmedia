@@ -1,8 +1,8 @@
 "use client"
 
-import { forwardRef, type ReactNode } from "react"
+import { forwardRef, useState, type CSSProperties, type ReactNode } from "react"
 import { cn } from "@boffmedia/ui"
-import { BattleLayoutProvider, type BattleLayoutKind } from "../lib/battle-layout"
+import { BattleLayoutProvider, useNodeSize, type BattleLayoutKind } from "../lib/battle-layout"
 
 interface BattleShellProps {
   /** The one bar: back, mode, tabs, score plates, timers, fullscreen, forfeit. */
@@ -31,30 +31,50 @@ interface BattleShellProps {
  * pane and the dock.
  *
  * THE STAGE'S SIZE IS A FUNCTION OF THE SHELL ALONE — never of what the dock
- * happens to be showing. That is the whole rule, and both halves of it matter:
+ * happens to be showing. That is the one rule both stances below obey, and it
+ * is what stopped the board jumping every time the dock changed rows.
  *
- *  - `flex-none` + `aspect-[16/9]`: the height follows the WIDTH, so opening
- *    the move picker, arming tera or switching to the bench cannot move it.
- *    The stage used to be `shrink-[999]` so the dock could always win the
- *    space it needed — controls were never below the fold, but the field
- *    jumped every time the dock changed rows, which is the thing that made it
- *    uncomfortable to play. The trade is deliberate and this way round now.
- *  - `max-height`: a percentage of this column, which is the shell minus the
- *    header. Without it a short, wide window gives 16:9 a height taller than
- *    the shell, and since the frame hides its overflow the dock would be
- *    pushed out of the box entirely — unreachable controls, which is strictly
- *    worse than the resizing it replaced. The cap letterboxes instead, and
- *    `BattleCanvas` is asked to `fit="contain"`, so it centres in whatever box
- *    it is given. A percentage rather than `--tool-vh` because the shell is
- *    `100dvh` in fullscreen and the two must not disagree there.
+ * ── Pointer / desktop & tablet: OVERLAY ──────────────────────────────────
+ * The stage IS the body, and the dock floats over its lower edge in a
+ * translucent band.
  *
- * The dock then takes the REMAINDER (`flex-1`) and scrolls inside itself. Not
- * a fixed pixel height: the split is proportional, so the dock cannot be
- * squeezed to nothing on a short window, and a tall desktop spends the space
- * on visible move keys instead of leaving it blank under a 120px band.
+ * The stack this replaced gave the stage the full column WIDTH but capped its
+ * HEIGHT at 62% of the column, and the canvas fits `contain` — so height won,
+ * and the field shrank to 16:9 of that height. On a 1834x843 window the field
+ * came out 825x464 inside a 1494px column: 334px of dead black down each side,
+ * over half the column's width spent on nothing. The field cannot be widened
+ * to fill it — the background art is stretched `100% 100%` and every sprite is
+ * placed in 960-unit space, so the field is 16:9 or it is distorted. The only
+ * way to spend that width is to stop capping the height, which means the dock
+ * can no longer sit under the field. It sits ON it. Same window, overlay:
+ * 1330x748, +160% field area.
  *
- * Mobile keeps its own bargain — the stage caps at roughly a third so the dock
- * is the primary surface — but it is stable for the same reason as the others.
+ * Two rules keep the band from swallowing what it covers — the failure that
+ * sank the first attempt at this:
+ *
+ *  - `max-h-[max(25%,9.5rem)]`: a QUARTER of the body, so the band covers the
+ *    field's floor and not its inhabitants, with a 152px floor under the
+ *    percentage so a short window gets a usable band rather than a scrolling
+ *    slit. `max()` rather than a JS stance switch: there is no first frame to
+ *    guess wrong, and no second measurement to disagree with the first.
+ *    The bench and team list get 48% instead (`data-bx-tall`, set by the dock)
+ *    — two rows of six cards do not fit a quarter, and unlike the move row
+ *    they are a place you opened on purpose and close again.
+ *  - The band is only as tall as its CONTENT, and `BxDock` renders a one-line
+ *    strip whenever you have no choice to make. So the quarter is spent only
+ *    while you are actually choosing; between turns the field is whole.
+ *
+ * `--bx-dock-h` publishes the band's measured height to the stage, and
+ * `BattleCanvas` lifts the ally HP plates by it — they sit at the field's
+ * bottom edge, which is precisely where the band is. Absolutely positioned, so
+ * the band's height never feeds back into the stage box that sizes the field.
+ *
+ * ── Mobile: STACK ────────────────────────────────────────────────────────
+ * Unchanged, and deliberately not overlaid. The dock is the primary surface
+ * there — a quarter of a phone's height cannot hold it, and a band covering
+ * the rest would leave neither readable. The stage keeps its `aspect-[16/9]`
+ * off the WIDTH (stable for the same reason: the dock cannot touch it) capped
+ * at roughly a third, and the dock takes the remainder and scrolls.
  */
 export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(function BattleShell(
   { header, canvas, dock, rail, railOpen = false, mobileTabs, overlay, children, layout, fullscreen, className },
@@ -63,6 +83,10 @@ export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(function
   const mobile = layout === "mobile"
   const tablet = layout === "tablet"
   const desktop = layout === "desktop"
+  // The band floats over the field everywhere except mobile (see the rule above).
+  const overlayDock = !mobile
+  const [bandNode, setBandNode] = useState<HTMLDivElement | null>(null)
+  const band = useNodeSize(bandNode)
   return (
     <BattleLayoutProvider value={layout}>
       <div
@@ -77,38 +101,82 @@ export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(function
         {header}
 
         <div className="relative flex min-h-0 min-w-0 flex-1">
-          <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
-            {/* Stage box: measured by the canvas. 16:9 off the width, capped
-                off this column's height — both inputs the dock cannot touch,
-                which is what keeps it still. See the rule above the component. */}
-            <div
-              className={cn(
-                "relative isolate flex aspect-[16/9] w-full flex-none min-w-0 items-center justify-center overflow-hidden bg-base-deep",
-                mobile ? "max-h-[34%]" : "max-h-[62%]",
-              )}
-            >
-              {canvas}
-            </div>
+          {/* THE RAIL ABSORBS THE SLACK — the field never leaves any.
+              A 16:9 field in a body that is not 16:9 leaves a sliver over on
+              one axis, and on a wide desktop window that sliver was ~100px of
+              blurred dressing down each side of the board. So the column is
+              sized as the FIELD's box (`aspect-[16/9]` off the full body
+              height, which is what `contain` was going to pick anyway) and the
+              rail is `flex-1` with a floor rather than a fixed width: it takes
+              exactly what is left, whatever that is, and the log — cramped at
+              21.25rem — gets the room instead of the gutters.
+              `max-w` is the narrow case: when the rail would drop below its
+              floor the column clamps, the field goes back to letterboxing
+              inside it, and the dressing covers that. Only when there IS a
+              persistent rail to absorb it — tablet's is a drawer over the
+              field, so there the column stays full-width. */}
+          <div
+            className={cn(
+              "relative flex min-h-0 min-w-0 flex-col",
+              desktop && rail
+                ? "aspect-[16/9] h-full w-auto flex-none max-w-[calc(100%-21.25rem)]"
+                : "flex-1",
+            )}
+          >
+            {overlayDock ? (
+              /* Stage box: the whole column, measured by the canvas. The band
+                 below is absolutely positioned, so nothing the dock shows can
+                 change this box — see the rule above the component. */
+              <div
+                className="relative isolate flex min-h-0 min-w-0 flex-1 items-center justify-center overflow-hidden bg-base-deep"
+                style={{ ["--bx-dock-h" as string]: `${band.height}px` } as CSSProperties}
+              >
+                {canvas}
 
-            {/* Dock: whatever the stage left, scrolling inside itself. */}
-            <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
-              {dock && (
-                <div className="min-h-0 min-w-0 flex-1 overflow-y-auto border-t border-solid border-line bg-panel">
-                  {dock}
+                {/* Action band, floating over the field's lower edge. Capped at
+                    a quarter of the stage (152px floor) and only as tall as the
+                    dock's own content, which collapses to a strip off-turn.
+                    `empty:hidden` keeps the chrome off screen between battles,
+                    when `BxDock` renders nothing at all. */}
+                {dock && (
+                  <div
+                    ref={setBandNode}
+                    className="absolute inset-x-0 bottom-0 z-20 max-h-[max(25%,9.5rem)] min-w-0 overflow-y-auto overscroll-contain border-t border-solid border-line-2 bg-panel/85 backdrop-blur-[8px] empty:hidden has-[[data-bx-tall]]:max-h-[max(48%,16rem)]"
+                  >
+                    {dock}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                {/* Stage box: measured by the canvas. 16:9 off the width, capped
+                    off this column's height — both inputs the dock cannot touch,
+                    which is what keeps it still. */}
+                <div className="relative isolate flex aspect-[16/9] w-full flex-none min-w-0 items-center justify-center overflow-hidden bg-base-deep max-h-[34%]">
+                  {canvas}
                 </div>
-              )}
-              {mobile && rail && railOpen && (
-                <div className="absolute inset-0 z-20 flex min-h-0 flex-col border-t border-solid border-line bg-panel animate-[bm-drawer-in_200ms_ease_both] motion-reduce:animate-none">
-                  {rail}
+
+                {/* Dock: whatever the stage left, scrolling inside itself. */}
+                <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+                  {dock && (
+                    <div className="min-h-0 min-w-0 flex-1 overflow-y-auto border-t border-solid border-line bg-panel">
+                      {dock}
+                    </div>
+                  )}
+                  {rail && railOpen && (
+                    <div className="absolute inset-0 z-20 flex min-h-0 flex-col border-t border-solid border-line bg-panel animate-[bm-drawer-in_200ms_ease_both] motion-reduce:animate-none">
+                      {rail}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
+              </>
+            )}
 
             {mobile && mobileTabs}
           </div>
 
           {desktop && rail && (
-            <aside className="flex w-[21.25rem] min-w-0 shrink-0 flex-col border-l border-solid border-line bg-panel">
+            <aside className="flex min-h-0 min-w-[21.25rem] flex-1 flex-col border-l border-solid border-line bg-panel">
               {rail}
             </aside>
           )}

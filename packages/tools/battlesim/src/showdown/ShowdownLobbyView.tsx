@@ -1,13 +1,16 @@
 'use client';
 
 import { useToolT, BATTLESIM_NS } from '../i18n';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useBsimNav } from '../nav';
 import { useShowdownBattle } from '../useShowdownBattle';
 import { ChatPanel } from '../components/ChatPanel';
 import { Button, Input, Select, Banner, toast } from '@boffmedia/ui';
+import { DkSeg } from '@boffmedia/ui/datakit';
 import { cn } from '../lib/cn';
-import { bsimErrorText, BsimChip, BsimScreenShell, BsimSection, BSIM_PAGE_NARROW, type BsimChipTone } from '../components/bsim-kit';
+import { getPref, setPref } from '../storage';
+import { BSIM_SHOWDOWN_USER_KEY } from '../lib/bsim-data';
+import { bsimErrorText, BsimChip, BsimScreenShell, BsimSection, BSIM_PAGE_NARROW, BSIM_SEG_FOCUS, type BsimChipTone } from '../components/bsim-kit';
 
 const STATUS_TONE: Record<string, BsimChipTone> = {
   active: 'ok', authenticated: 'signal', error: 'bad',
@@ -16,8 +19,14 @@ const STATUS_TONE: Record<string, BsimChipTone> = {
 export function BsimShowdownView() {
   const t = useToolT(BATTLESIM_NS);
   const nav = useBsimNav();
-  const [loginUser, setLoginUser] = useState('Boffmedia');
-  const [loginPass, setLoginPass] = useState('boffmedia');
+  // EMPTY, and no auto-submit below. These used to be seeded with a shared
+  // Boffmedia Showdown account and an effect fired it the instant `challstr`
+  // arrived, so every visitor played as the same PS user: one ladder rating,
+  // one battle history, and a name in chat that was never theirs. The player
+  // brings their own identity now - registered, or an unregistered name.
+  const [loginUser, setLoginUser] = useState('');
+  const [loginPass, setLoginPass] = useState('');
+  const [loginMode, setLoginMode] = useState<'account' | 'guest'>('account');
   const [challengeTarget, setChallengeTarget] = useState('');
   const [selectedFormat, setSelectedFormat] = useState('gen9randombattle');
 
@@ -31,11 +40,62 @@ export function BsimShowdownView() {
     }, [nav]),
   });
 
+  // The NAME comes back, the password never does. Restoring the name is the
+  // whole convenience here; a saved password would be a credential for someone
+  // else's service sitting in this tool's storage, which is not ours to keep.
+  // Skipped once the field has been touched, so a slow read cannot land on top
+  // of what someone is typing.
+  const userTouched = useRef(false);
   useEffect(() => {
-    if (status === 'authenticating' && challstr && loginUser && loginPass) login(loginUser, loginPass);
-  }, [status, challstr, loginUser, loginPass, login]);
+    let live = true;
+    void getPref<string>(BSIM_SHOWDOWN_USER_KEY)
+      .then((saved) => {
+        if (!live || userTouched.current || !saved) return;
+        setLoginUser(saved);
+      })
+      .catch(() => { /* first run, or storage unavailable */ });
+    return () => { live = false; };
+  }, []);
 
-  const handleLogin = () => { if (loginUser && loginPass) login(loginUser, loginPass); };
+  // Declared BEFORE the login derivations that read them: `const` has a
+  // temporal dead zone, so leaving these further down (where they used to sit,
+  // next to the label they fed) makes `canSubmit` a ReferenceError at render.
+  const isConnected = status !== 'idle' && status !== 'error';
+  const isLoggedIn = status === 'authenticated' && !!username && !username.startsWith('Guest');
+
+  const guest = loginMode === 'guest';
+  const canSubmit = !!loginUser.trim() && (guest || !!loginPass) && isConnected && !!challstr;
+
+  // The control feeds `/search`, so it must only offer what PS will accept a
+  // search for — a challenge-only format like Custom Game is in the list but
+  // laddering it is refused. Falls back to the whole list rather than an empty
+  // control, so a server whose flags we read wrong still leaves a usable
+  // screen.
+  const formatOptions = useMemo(() => {
+    const searchable = formats.filter((f) => f.searchable);
+    return searchable.length > 0 ? searchable : formats;
+  }, [formats]);
+
+  // `selectedFormat` starts as the format ID `gen9randombattle`, while the
+  // options carry PS's display names (`[Gen 9] Random Battle`) — so nothing
+  // matched and the select rendered with no selection until it was touched.
+  // Settles after one pass: once the value is in the list this does nothing.
+  useEffect(() => {
+    if (formatOptions.length === 0) return;
+    if (formatOptions.some((f) => f.name === selectedFormat)) return;
+    setSelectedFormat(formatOptions[0].name);
+  }, [formatOptions, selectedFormat]);
+
+  const handleLogin = () => {
+    if (!canSubmit) return;
+    const name = loginUser.trim();
+    void setPref(BSIM_SHOWDOWN_USER_KEY, name).catch(() => { /* non-fatal */ });
+    // `undefined`, not '': the relay branches on the property being PRESENT to
+    // choose Showdown's unregistered-name path.
+    login(name, guest ? undefined : loginPass);
+    // Held no longer than the emit needs it.
+    setLoginPass('');
+  };
   // The relay gives no acknowledgement, so the send used to be silent: the
   // field kept its text and nothing on screen changed. A toast is the honest
   // report of what we know — that it left.
@@ -47,8 +107,6 @@ export function BsimShowdownView() {
     setChallengeTarget('');
   };
 
-  const isConnected = status !== 'idle' && status !== 'error';
-  const isLoggedIn = status === 'authenticated' && !!username && !username.startsWith('Guest');
 
   let statusLabel = t('showdown.status.disconnected');
   if (status === 'active') statusLabel = t('showdown.status.inBattle');
@@ -95,10 +153,56 @@ export function BsimShowdownView() {
 
       {!isLoggedIn && (
         <BsimSection icon="user" title={t('showdown.login.title')}>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Input className="flex-1" placeholder={t('showdown.login.username')} value={loginUser} onChange={(e) => setLoginUser(e.target.value)} disabled={!isConnected || !challstr} />
-            <Input className="flex-1" type="password" placeholder={t('showdown.login.password')} value={loginPass} onChange={(e) => setLoginPass(e.target.value)} disabled={!isConnected || !challstr} onKeyDown={(e) => e.key === 'Enter' && handleLogin()} />
-            <Button variant="pri" onClick={handleLogin} disabled={!isConnected || !challstr || !loginUser || !loginPass}>{t('showdown.login.button')}</Button>
+          <div className="flex flex-col gap-3">
+            <DkSeg
+              value={loginMode}
+              onChange={(v) => setLoginMode(v as 'account' | 'guest')}
+              ariaLabel={t('showdown.login.modeLabel')}
+              options={[
+                { value: 'account', label: t('showdown.login.modeAccount') },
+                { value: 'guest', label: t('showdown.login.modeGuest') },
+              ]}
+              // self-start: DkSeg is inline-flex, which a flex COLUMN stretches
+              // to full width - a two-option toggle spanning the panel reads as a
+              // pair of buttons, not as one control with a choice in it.
+              className={cn(BSIM_SEG_FOCUS, "self-start")}
+            />
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Input
+                className="flex-1"
+                autoComplete="username"
+                placeholder={guest ? t('showdown.login.guestName') : t('showdown.login.username')}
+                value={loginUser}
+                onChange={(e) => { userTouched.current = true; setLoginUser(e.target.value); }}
+                onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                disabled={!isConnected || !challstr}
+              />
+              {/* An unregistered name has no password by definition, so the
+                  field is ABSENT rather than disabled - nothing to wonder about. */}
+              {!guest && (
+                <Input
+                  className="flex-1"
+                  type="password"
+                  autoComplete="current-password"
+                  placeholder={t('showdown.login.password')}
+                  value={loginPass}
+                  onChange={(e) => setLoginPass(e.target.value)}
+                  disabled={!isConnected || !challstr}
+                  onKeyDown={(e) => e.key === 'Enter' && handleLogin()}
+                />
+              )}
+              <Button variant="pri" onClick={handleLogin} disabled={!canSubmit}>
+                {guest ? t('showdown.login.guestButton') : t('showdown.login.button')}
+              </Button>
+            </div>
+
+            {/* Whose credential this is and where it goes. Asking for a password
+                for ANOTHER service without saying so is the part that would be
+                wrong, not the asking. */}
+            <p className="m-0 font-mono text-[0.6875rem] leading-[1.5] text-txt-dim">
+              {guest ? t('showdown.login.guestNotice') : t('showdown.login.notice')}
+            </p>
           </div>
           {!isConnected && <p className="mt-2 font-mono text-[0.6875rem] text-txt-dim">{t('showdown.login.connecting')}</p>}
           {isConnected && !challstr && <p className="mt-2 font-mono text-[0.6875rem] text-txt-dim">{t('showdown.login.waitingChallstr')}</p>}
@@ -118,18 +222,18 @@ export function BsimShowdownView() {
                   format we had not been told about — a control offering one
                   option that might not exist on the server. The list arrives
                   moments after login; until it does, say so. */}
-              {formats.length > 0 ? (
+              {formatOptions.length > 0 ? (
                 <Select
                   className="mb-3"
                   value={selectedFormat}
                   onChange={setSelectedFormat}
                   ariaLabel={t('showdown.battle.title')}
-                  options={formats.map((f) => ({ value: f.name, label: `${f.section ? `${f.section} — ` : ''}${f.name}` }))}
+                  options={formatOptions.map((f) => ({ value: f.name, label: `${f.section ? `${f.section} — ` : ''}${f.name}` }))}
                 />
               ) : (
                 <p role="status" className="mb-3 font-mono text-[0.6875rem] text-txt-dim">{t('hub.showdown.formatsLoading')}</p>
               )}
-              <Button variant="pri" className="w-full" disabled={formats.length === 0} onClick={() => findBattle(selectedFormat)}>{t('showdown.battle.button')}</Button>
+              <Button variant="pri" className="w-full" disabled={formatOptions.length === 0} onClick={() => findBattle(selectedFormat)}>{t('showdown.battle.button')}</Button>
             </BsimSection>
 
             <BsimSection icon="target" title={t('showdown.challenge.title')}>

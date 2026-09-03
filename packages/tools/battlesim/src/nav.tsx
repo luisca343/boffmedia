@@ -229,7 +229,14 @@ export function useHashBsimNav(screen: BsimScreen, params: Record<string, string
         setHash("");
       },
       push: (next, nextParams) => {
-        const url = nextParams ? resolveRoute(next, nextParams) : window.location.pathname + window.location.search;
+        // ALWAYS resolved, unlike `replace` above. A push is "go to this
+        // screen", so borrowing replace's "no params = stay where you are"
+        // rule made `nav.push("showdown")` — the lobby's Showdown launch, the
+        // one call site in the package that passes no params — navigate to the
+        // address it was already on. The button did nothing, while typing the
+        // same URL worked. `useMemoryNav.push` never had the bug, so the
+        // launcher's Showdown tile worked and the website's did not.
+        const url = resolveRoute(next, nextParams);
         if (navigate) {
           navigate(url);
         } else {

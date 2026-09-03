@@ -11,6 +11,7 @@ import { Hazard } from "./Hazard";
 import BattleEndScreen from "./BattleEndScreen";
 import { BxPlate, useBxLabels } from "./bx-kit";
 import { BxMonPopover } from "./BxMonPopover";
+import { BxMonHoverCard, type HoverAnchor } from "./BxMonHoverCard";
 import { toBSXMon, type BSXMon } from "../engine/toBSXMon";
 import { FieldConditions, resolveCondLabel } from "./FieldConditions";
 import { battlesimAssetUrl } from '../asset';
@@ -126,11 +127,41 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
 
     const [details, setDetails] = useState<{ mon: BSXMon; foe: boolean } | null>(null);
 
+    // Hover card. Keyed by POSITION, not by mon: the same slot is hovered
+    // across a switch, and holding the object would show the card of a
+    // Pokémon that has already left the field.
+    const [hover, setHover] = useState<{ position: string; box: HoverAnchor } | null>(null);
+    const onSpriteHover = useCallback((position: string, box: HoverAnchor | null) => {
+        // A leave from a slot that is no longer the hovered one is stale —
+        // pointer enter on the next sprite arrives before the previous one's
+        // leave, and honouring it would close the card that just opened.
+        setHover((cur) => (box ? { position, box } : cur?.position === position ? null : cur));
+    }, []);
+    // Targeting owns the field while it is on: the plates are buttons then and
+    // a card over them is in the way. Same for the two full-cover overlays.
+    const hoverBlocked = !!targeting || showPreviewOverlay || battleComplete;
+
     const overlayFrame = (children: React.ReactNode) => (
         <div className="absolute inset-0 z-40 flex flex-col overflow-hidden">{children}</div>
     );
 
     const wrapClass = fit === 'contain' ? "relative flex h-full w-full items-center justify-center" : "relative w-full";
+
+    // How far the ally HP plates must rise to clear the action band.
+    //
+    // The band is fixed to the bottom of the STAGE and the field is centred
+    // inside it, so the two edges only coincide when the field is the taller
+    // of the two — which is the usual case (a box wider than 16:9 makes height
+    // the binding constraint, and the field then spans the stage exactly).
+    // When the box is NARROWER than 16:9 the field is width-bound and centres
+    // with `slack` px of stage above and below it, and the band eats that
+    // before it reaches the field at all. Subtracting it stops the plates from
+    // floating that far above a band they were already clear of.
+    //
+    // `--bx-dock-h` is only defined by the overlay stance, so on mobile and in
+    // the replay player this resolves to 0px and the plates sit where they did.
+    const slack = fit === 'contain' && box.height > height ? Math.round((box.height - height) / 2) : 0;
+    const allyLift = `max(0px, calc(var(--bx-dock-h, 0px) - ${slack}px))`;
 
     if (liveMode && liveStatus === 'connecting') {
         return (
@@ -180,6 +211,21 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
 
     return (
         <div ref={wrapRef} className={wrapClass}>
+            {/* Gutter dressing. The field is 16:9 and the stage rarely is, so a
+                sliver of stage is always left over on one axis. Left bare it is
+                `--bg-deep`, i.e. pure black, and reads as a hole punched either
+                side of the board.
+                A blurred, BRIGHTENED copy of the field art instead — brightened,
+                not scrimmed: any darkening layer over pure black lands back on
+                black, which is the thing being fixed. `scale-110` hides the
+                blur's soft edge; `-z-10` puts it behind the field but still in
+                front of the stage's own background. */}
+            {fit === 'contain' && width > 0 && (
+                <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+                    <div className="absolute inset-0 scale-110"
+                        style={{ backgroundImage: `url(${battlesimAssetUrl('fx/bg/hagane.png')})`, backgroundSize: 'cover', backgroundPosition: 'center', filter: 'blur(28px) brightness(1.15) saturate(0.85)' }} />
+                </div>
+            )}
             <div id="game" ref={gameRefCallback} className="relative select-none overflow-hidden bg-base-deep"
                 style={{ width: width || undefined, height: height || undefined, backgroundImage: `url(${battlesimAssetUrl('fx/bg/hagane.png')})`, backgroundSize: `100% 100%` }}>
                 <BattleScaleProvider width={width || 960}>
@@ -193,7 +239,8 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
                         <div className="flex min-w-0 max-w-[60%] flex-row-reverse flex-wrap items-start justify-start gap-1">{foePlates}</div>
                     </div>
 
-                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[120] flex items-end gap-2 p-1.5 sm:p-2">
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[120] flex items-end gap-2 px-1.5 pt-1.5 sm:px-2 sm:pt-2"
+                         style={{ paddingBottom: `calc(0.5rem + ${allyLift})`, transition: 'padding-bottom 180ms ease' }}>
                         <div className="flex min-w-0 max-w-[60%] flex-wrap items-end gap-1">{allyPlates}</div>
                     </div>
 
@@ -201,13 +248,19 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
                     <Avatar side={p2} pov={side} />
 
                     {positionsP1.map((position) => pokemon[position] && (
-                        <PokemonElement key={position} battle={battle} pokemon={pokemon[position]} side={battle.p1} position={position} />
+                        <PokemonElement key={position} battle={battle} pokemon={pokemon[position]} side={battle.p1} position={position} onHover={onSpriteHover} />
                     ))}
                     {Object.entries(battle.p1.sideConditions).map((entry) => <Hazard key={entry[0]} hazard={entry as any} side="p1" />)}
                     {positionsP2.map((position) => pokemon[position] && (
-                        <PokemonElement key={position} battle={battle} pokemon={pokemon[position]} side={battle.p2} position={position} />
+                        <PokemonElement key={position} battle={battle} pokemon={pokemon[position]} side={battle.p2} position={position} onHover={onSpriteHover} />
                     ))}
                     {Object.entries(battle.p2.sideConditions).map((entry) => <Hazard key={entry[0]} hazard={entry as any} side="p2" />)}
+
+                    {hover && !hoverBlocked && (() => {
+                        const mon = toBSXMon(pokemon[hover.position]);
+                        if (!mon) return null;
+                        return <BxMonHoverCard mon={mon} foe={hover.position.startsWith('p2')} anchor={hover.box} field={{ width, height }} compact={compact} />;
+                    })()}
 
                     <div id="overlay" className="pointer-events-none absolute inset-0">
                         {battle.field.pseudoWeather['trickroom'] && (

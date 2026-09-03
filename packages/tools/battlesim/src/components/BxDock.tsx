@@ -10,7 +10,7 @@ import { useRoomVisible } from '../lib/room-visibility';
 import type { BSXLayout, BSXSlot } from '../useBSXLayout';
 import type { BSXKeyMove } from '../engine/toBSXMon';
 import type { TargetOption, TargetingState } from '../lib/battle-types';
-import type { BattleLayoutKind } from '../lib/battle-layout';
+import { useNodeSize, type BattleLayoutKind } from '../lib/battle-layout';
 
 export type ActiveMechanic = 'terastallize' | 'mega' | 'dynamax' | 'zmove' | null;
 
@@ -265,6 +265,19 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
     enabled: roomVisible && status === 'active' && isWaiting && !spectator,
   });
 
+  // The grids follow the DOCK's width, not the viewport's.
+  //
+  // These were `min-[480px]:` / `min-[720px]:`, and a Tailwind arbitrary
+  // variant compiles to a VIEWPORT media query — but the dock is never the
+  // viewport in any host. It is a band inside the battle shell, which itself
+  // sits in a launcher pane, or beside the web sidebar, or next to the log
+  // rail. On an 1834px window the query answered "wide" and the band laid two
+  // ~700px move keys across a space that comfortably fits four, doubling the
+  // band's height to hold four moves that should occupy one row. That height
+  // is now field the band no longer has to cover.
+  const [dockNode, setDockNode] = useState<HTMLElement | null>(null);
+  const dockW = useNodeSize(dockNode).width;
+
   if (status !== 'active') return null;
 
   const slotTag = (s: BSXSlot) => (slots.length > 1 ? String.fromCharCode(65 + s.idx) : t('battle.you'));
@@ -274,12 +287,71 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
     { id: 'team', label: t('battle.dock.team'), enabled: canAct && bsx.requestType === 'team' },
   ];
   const showSeg = segments.find((s) => s.id === seg && s.enabled) ? seg : (segments.find((s) => s.enabled)?.id ?? seg);
-  const moveCols = mobile ? 'grid-cols-1' : 'grid-cols-1 min-[480px]:grid-cols-2';
-  const benchCols = mobile ? 'grid-cols-2' : 'grid-cols-2 min-[720px]:grid-cols-3';
+  // Four across from 840px, because that is where a move key still clears the
+  // ~205px it needs for a truncating name over one unwrapped badge row — and
+  // because a SECOND row of keys costs 52px out of a band capped at a quarter
+  // of the field, which on a 1280x800 window was the difference between the
+  // whole dock fitting and the tera button falling below a scroll.
+  const moveCols = mobile ? 'grid-cols-1'
+    : dockW >= 840 ? 'grid-cols-4' : dockW >= 620 ? 'grid-cols-3' : dockW >= 420 ? 'grid-cols-2' : 'grid-cols-1';
+  // A bench card carries a sprite, a name, an HP bar, a readout and a type row
+  // — it needs ~200px, not the ~150 a move key gets away with. Six across a
+  // 1178px band left each one 186px, and the bar came out a stub.
+  const benchCols = mobile ? 'grid-cols-2'
+    : dockW >= 1250 ? 'grid-cols-6' : dockW >= 1050 ? 'grid-cols-5' : dockW >= 840 ? 'grid-cols-4' : dockW >= 620 ? 'grid-cols-3' : 'grid-cols-2';
+  // The legend is ~300px of hints, and it was gated on `md:` — the viewport
+  // again, not the band. It is the first thing to drop when the header row
+  // would otherwise wrap, and the keys it describes work either way.
+  const showLegend = !mobile && dockW >= 1300;
+
+  const waitLabel = sent ? `${t('battle.dock.sent')} ${t('battle.dock.waiting')}` : t('battle.dock.waiting');
+  const undoBtn = sent && onUndo && !bsx.noCancel
+    ? <Button variant="ghost" size="sm" icon="back" title={t('battle.dock.undoHint')} onClick={() => { onUndo(); setSent(false); }}>{t('battle.dock.undo')}</Button>
+    : null;
+
+  // OFF-TURN: a one-line strip, not the full dock.
+  //
+  // The dock floats OVER the field on every pointer layout now, so its height
+  // is field you cannot see. Between turns there is nothing here to act on —
+  // the segment tabs are all disabled, the hotkey legend describes keys that
+  // do nothing, and the move grid is gone anyway — so rendering the full
+  // chrome would cover a quarter of the board to say "waiting". What is worth
+  // the strip is what you chose and the means to take it back.
+  if (!canAct) {
+    return (
+      <section ref={setDockNode} aria-label={t('battle.dock.aria')} className="flex min-h-11 flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2">
+        {slots.filter((s) => s.needsOrder && orders[s.idx]).map((s) => (
+          <BxPlan key={s.idx} tag={slotTag(s)} action={orderToPlan(orders[s.idx] ?? null, t)}
+            onClear={sent && onUndo && !bsx.noCancel ? () => clearSlot(s.idx) : undefined} />
+        ))}
+        <span role="status" className="inline-flex items-center gap-2 font-mono text-[0.65625rem] uppercase tracking-[0.08em] text-txt-dim">
+          <i aria-hidden className="h-2 w-2 bg-warn [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" />
+          {spectator ? t('battle.dock.spectating') : waitLabel}
+        </span>
+        {undoBtn}
+        {timer != null && <span className="ml-auto"><BxRing sec={timer} max={timerMax} size={28} /></span>}
+      </section>
+    );
+  }
 
   return (
-    <section aria-label={t('battle.dock.aria')} className="flex flex-col gap-2 p-2 sm:gap-[0.625rem] sm:p-3">
-      {/* Persistent header: segments + timer + hotkey legend */}
+    <section ref={setDockNode} aria-label={t('battle.dock.aria')}
+      // The bench and the team list are two rows of six cards, not one row of
+      // four keys, and they do not fit the quarter of the field the band
+      // normally allows. They are also a place you went ON PURPOSE and leave
+      // again — unlike the move row, which is simply where every turn happens
+      // — so the band is allowed to grow for them. `BattleShell` reads this.
+      data-bx-tall={showSeg === 'switch' || showSeg === 'team' ? '' : undefined}
+      // Tighter vertically than horizontally: every pixel of height here is a
+      // pixel of field the band covers, and the band was overrunning its cap by
+      // a hair on a 1280x800 window. Side padding is free by comparison.
+      className="flex flex-col gap-2 px-2 py-[0.375rem] sm:gap-2 sm:px-3 sm:py-2">
+      {/* ONE header row: segments · orders · mechanics · legend · timer.
+          These were three stacked rows, which cost ~90px of a band that is
+          capped at a quarter of the field — enough that the move keys' own
+          bottom edge and the tera button fell below the fold and had to be
+          scrolled to. In a band this wide they all fit side by side with room
+          to spare, and the height they were spending is field again. */}
       <div className="flex flex-wrap items-center gap-2">
         <div role="tablist" aria-label={t('battle.dock.aria')} className="cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line-2)] inline-flex border border-solid border-line-2 bg-base">
           {segments.map((s) => {
@@ -293,9 +365,29 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
             );
           })}
         </div>
+        {slots.map((s) => (
+          <BxPlan key={s.idx} tag={slotTag(s)} action={orderToPlan(orders[s.idx] ?? null, t)} active={s.idx === cursor && s.needsOrder}
+            hint={s.needsOrder ? (s.mon ? t('battle.dock.orderFor', { name: s.mon.name }) : undefined) : t('battle.dock.pass')}
+            onClear={s.needsOrder && orders[s.idx] ? () => clearSlot(s.idx) : undefined}
+            onSelect={s.needsOrder ? () => { setCursor(s.idx); setPending(null); onTargeting(null); } : undefined}
+            selectLabel={s.mon ? t('battle.dock.orderFor', { name: s.mon.name }) : undefined} />
+        ))}
+
+        {showSeg === 'moves' && slot && (slot.canTera || slot.canMega || slot.canDyna || slot.canZ) && (
+          <span className="inline-flex flex-wrap items-center gap-2">
+            {slot.canTera && slot.teraType && <BxTeraBtn type={slot.teraType} armed={mech === 'terastallize'} used={mechUsedInBattle || mechTaken} onToggle={() => setMech((c) => (c === 'terastallize' ? null : 'terastallize'))} hotkey="T" />}
+            {(['mega', 'dynamax', 'zmove'] as const).map((m) => {
+              const can = m === 'mega' ? slot.canMega : m === 'dynamax' ? slot.canDyna : slot.canZ;
+              if (!can) return null;
+              const meta = MECH_META[m];
+              return <BxMechBtn key={m} glyph={meta.glyph} tone={meta.tone} hotkey={meta.hotkey} label={t(`battle.dock.mech.${m}`)} hint={t(`battle.dock.mech.${m}Hint`)} armed={mech === m} used={mechTaken} onToggle={() => setMech((c) => (c === m ? null : m))} />;
+            })}
+          </span>
+        )}
+
         {timer != null && <BxRing sec={timer} max={timerMax} size={32} />}
-        {!mobile && (
-          <span className="ml-auto hidden flex-wrap items-center gap-3 md:flex">
+        {showLegend && (
+          <span className="ml-auto flex flex-wrap items-center gap-3">
             <BxKbdHint k="1–4" label={t('battle.dock.legend.moves')} />
             <BxKbdHint k="5–9" label={t('battle.dock.legend.bench')} />
             {slot?.canTera && <BxKbdHint k="T" label={t('battle.dock.legend.tera')} />}
@@ -307,36 +399,18 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
         )}
       </div>
 
-      {/* Order strip */}
-      {slots.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2">
-          {slots.map((s) => (
-            <BxPlan key={s.idx} tag={slotTag(s)} action={orderToPlan(orders[s.idx] ?? null, t)} active={!sent && s.idx === cursor && s.needsOrder}
-              hint={s.needsOrder ? (s.mon ? t('battle.dock.orderFor', { name: s.mon.name }) : undefined) : t('battle.dock.pass')}
-              onClear={s.needsOrder && orders[s.idx] && (!sent || (onUndo && !bsx.noCancel)) ? () => clearSlot(s.idx) : undefined}
-              onSelect={s.needsOrder && !sent ? () => { setCursor(s.idx); setPending(null); onTargeting(null); } : undefined}
-              selectLabel={s.mon ? t('battle.dock.orderFor', { name: s.mon.name }) : undefined} />
-          ))}
-          {(sent || !isWaiting) && (
-            <span role="status" className="ml-auto inline-flex items-center gap-2 font-mono text-[0.65625rem] uppercase tracking-[0.08em] text-txt-dim">
-              <i aria-hidden className="h-2 w-2 bg-warn [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" />
-              {sent ? t('battle.dock.sent') : ''} {t('battle.dock.waiting')}
-              {sent && onUndo && !bsx.noCancel && <Button variant="ghost" size="sm" icon="back" title={t('battle.dock.undoHint')} onClick={() => { onUndo(); setSent(false); }}>{t('battle.dock.undo')}</Button>}
-            </span>
-          )}
-        </div>
-      )}
-      {slots.length === 0 && !isWaiting && (
-        <span role="status" className="inline-flex items-center gap-2 font-mono text-[0.65625rem] uppercase tracking-[0.08em] text-txt-dim">
-          <i aria-hidden className="h-2 w-2 bg-warn [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" />{t('battle.dock.waiting')}
-        </span>
-      )}
+      {/* The order chips moved into the header row above; "waiting", "sent",
+          "spectating" and undo live in the off-turn strip, and by definition
+          none of those can be true here. */}
 
-      {spectator && <p className="m-0 font-mono text-[0.6875rem] text-txt-dim">{t('battle.dock.spectating')}</p>}
-
-      {/* Target mode */}
+      {/* Target mode. One row, and it REPLACES the move grid below rather than
+          stacking on it: once a move is picked the keys are no longer
+          actionable, and the two together were 300px of content in a band that
+          allows 166 — the picker's own buttons scrolled out of reach, which is
+          the one thing this band must never do. The hint is the row's title
+          rather than a line of its own for the same reason. */}
       {pending && (
-        <div role="status" className="flex flex-wrap items-center gap-2 border border-solid border-warn bg-warn-soft p-2">
+        <div role="status" title={t('battle.dock.chooseTargetHint')} className="flex flex-wrap items-center gap-2 border border-solid border-warn bg-warn-soft px-2 py-[0.375rem]">
           <b className="font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.04em] text-txt">{t('battle.dock.chooseTarget')}</b>
           <span className="font-mono text-[0.625rem] text-txt-muted">{pending.name}</span>
           <span className="flex flex-wrap gap-1">
@@ -345,7 +419,7 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
             ))}
           </span>
           <Button size="sm" variant="ghost" onClick={escape}>{t('battle.dock.legend.esc')}</Button>
-          <span className="w-full font-mono text-[0.625rem] text-txt-dim">{t('battle.dock.chooseTargetHint')}</span>
+          <span className="sr-only">{t('battle.dock.chooseTargetHint')}</span>
         </div>
       )}
 
@@ -356,29 +430,20 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
       )}
 
       {/* Body */}
-      {canAct && showSeg === 'moves' && slot && (
+      {canAct && showSeg === 'moves' && slot && !pending && (
         <div className="flex flex-col gap-2">
           {slot.trapped && <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-warn">{t('battle.dock.trapped')}</span>}
+          {/* No `selected` state on the keys: the target picker REPLACES this
+              grid, so a move that is mid-targeting is never on screen beside
+              it to be marked. */}
           <div className={cn('grid gap-2', moveCols)}>
             {activeMoves.map((move: BSXKeyMove, i) => (
               <BxKey key={(move.id ?? move.name) + i} move={move} hotkey={i + 1} tera={mech === 'terastallize'} target={bsx.bsxFoe}
-                selected={!!pending && pending.move === i + 1}
                 onClick={() => chooseMove(i)}
                 onHover={onAim && move.cat !== 'status' ? () => onAim(true) : undefined}
                 onLeave={onAim ? () => onAim(false) : undefined} />
             ))}
           </div>
-          {(slot.canTera || slot.canMega || slot.canDyna || slot.canZ) && (
-            <div className="flex flex-wrap gap-2">
-              {slot.canTera && slot.teraType && <BxTeraBtn type={slot.teraType} armed={mech === 'terastallize'} used={mechUsedInBattle || mechTaken} onToggle={() => setMech((c) => (c === 'terastallize' ? null : 'terastallize'))} hotkey="T" />}
-              {(['mega', 'dynamax', 'zmove'] as const).map((m) => {
-                const can = m === 'mega' ? slot.canMega : m === 'dynamax' ? slot.canDyna : slot.canZ;
-                if (!can) return null;
-                const meta = MECH_META[m];
-                return <BxMechBtn key={m} glyph={meta.glyph} tone={meta.tone} hotkey={meta.hotkey} label={t(`battle.dock.mech.${m}`)} hint={t(`battle.dock.mech.${m}Hint`)} armed={mech === m} used={mechTaken} onToggle={() => setMech((c) => (c === m ? null : m))} />;
-              })}
-            </div>
-          )}
         </div>
       )}
 

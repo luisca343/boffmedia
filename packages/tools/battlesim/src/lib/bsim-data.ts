@@ -57,3 +57,12 @@ export function isTeamFormat(id: string): boolean {
 }
 
 export const BSIM_FORMAT_KEY = "bsim_format"
+
+/**
+ * The player's Pokemon Showdown NAME, remembered between visits.
+ *
+ * The name only, and never the password: a PS password is a credential
+ * for someone else's service, and keeping one in this tool's storage is
+ * not a convenience we get to decide to offer.
+ */
+export const BSIM_SHOWDOWN_USER_KEY = "bsim_showdown_user"

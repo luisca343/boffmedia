@@ -25,7 +25,13 @@ const MODE_SCREEN: Record<BsimMode, BsimScreen> = {
 const MODE_NEEDS: Record<BsimMode, { online: boolean; account: boolean }> = {
   ia: { online: false, account: false },
   pvp: { online: true, account: true },
-  showdown: { online: true, account: false },
+  // `account: true` because the RELAY requires one. It reads as a Showdown
+  // login, so it looked like it needed no Boffmedia account — but §5.1.5 put
+  // the `/showdown` namespace behind the same ws-ticket `/battle` is behind
+  // (it opens a real upstream PS connection per client, and an open one made
+  // this API a public proxy). The tile advertised "EN LÍNEA", let a signed-out
+  // player straight through, and the screen answered with a bare error.
+  showdown: { online: true, account: true },
 }
 
 type Availability = "ok" | "offline" | "signin" | "checking"

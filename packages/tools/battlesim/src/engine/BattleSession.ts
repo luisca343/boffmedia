@@ -22,6 +22,8 @@ export interface SessionCallbacks {
 export interface BattleSessionState {
   roomId: string;
   battle: Battle;
+  /** Increments on every visible change. See `BattleSession.revision`. */
+  revision: number;
   scene: Scene | null;
   status: LiveBattleStatus;
   currentRequest: Protocol.Request | null;
@@ -52,6 +54,36 @@ export class BattleSession {
   timerState: TimerState | null = null;
   battleComplete = false;
 
+  /**
+   * Whether the SERVER paces this battle.
+   *
+   * A local simulator computes the whole battle as fast as it can, so the
+   * viewer has to be the brake: `waiting` stops the queue at each decision
+   * point, and only the viewer's own choice releases it. A live battle is the
+   * opposite — nothing arrives until both players have chosen, so there is
+   * nothing to hold back, and holding back is actively wrong: it makes the
+   * viewer's own choice the ONLY thing that can advance the display. Play the
+   * same battle in the official client and Boffmedia freezes; let the timer
+   * pick for you and it freezes; have the opponent forfeit while you are
+   * deciding and you never see the end screen. The request still waits for the
+   * queue to drain before it prompts (see `pendingRequest`) — it just no longer
+   * dams the incoming stream behind it.
+   */
+  livePaced = false;
+
+  /**
+   * Bumped on every visible change, and it EXISTS TO BE A CHANGED PROP.
+   *
+   * `BattleCanvas` is `memo`'d, and every prop it takes is identity-stable for
+   * the whole battle — `battle` most of all, because a @pkmn/client Battle is
+   * mutated in place and never replaced. So the shallow comparison saw nothing
+   * change and the canvas simply stopped re-rendering: HP bars moved only when
+   * some unrelated prop happened to change, a switch showed up a turn late, and
+   * the opening sprites took until the first interaction to appear. The parent
+   * was re-rendering correctly the whole time; `memo` was throwing it away.
+   */
+  revision = 0;
+
   private processor: BattleEventProcessor | null = null;
   private lineBuffer: string[] = [];
   private pendingBuffer: string[] = [];
@@ -68,6 +100,17 @@ export class BattleSession {
     this.callbacks = callbacks;
   }
 
+  /**
+   * The viewer's own player name, for battles where the side is not handed to
+   * us. See `BattleEventProcessorContext.viewerName`.
+   */
+  private viewerName: string | null = null;
+
+  setViewerName(name: string | null): void {
+    this.viewerName = name;
+    this.processor?.setViewerName(name);
+  }
+
   initScene(gameElement: HTMLElement, pov: 0 | 1 = 0): void {
     // Always re-create scene if gameElement changed (tab switch unmounts/remounts canvas)
     if (!this.scene || this.scene.gameElement !== gameElement) {
@@ -76,10 +119,27 @@ export class BattleSession {
         scene: this.scene,
         battle: this.battle,
         pov,
+        viewerName: this.viewerName,
       });
+      // Resolves the side immediately when the battle already carries the
+      // `|player|` lines — the case when a room screen adopts a battle the
+      // lobby had been following.
+      if (this.viewerName) this.processor.setViewerName(this.viewerName);
       // Flush any lines that arrived before scene was ready
       this.flushBuffer();
+      return;
     }
+    // Same element, new pov. This used to fall through and do NOTHING, which
+    // is how the animation side got frozen at whatever was known when the
+    // canvas first mounted — usually 0, because the `|player|` lines had not
+    // been processed yet. React re-laid the field out from the corrected pov;
+    // the animations stayed on the stale one, so a p2 player watched their own
+    // attacks play from the opponent's side.
+    //
+    // Ignored when a `viewerName` is set: the protocol is then the authority
+    // and an argument from a caller that re-renders with a stale value (the
+    // Showdown room's default of 0) must not undo it.
+    if (!this.viewerName) this.processor?.setPov(pov);
   }
 
   addLine(line: string): void {
@@ -107,11 +167,12 @@ export class BattleSession {
     if (this.processing || this.lineBuffer.length > 0) {
       this.pendingRequest = request;
     } else {
-      this.waiting = true;
+      // `waiting` only where the viewer is the brake. See `livePaced`.
+      this.waiting = !this.livePaced;
       this.isWaitingForChoice = true;
       this.currentRequest = request;
       this.callbacks.onRequest(request);
-      this.callbacks.onUpdate();
+      this.notify();
     }
   }
 
@@ -143,17 +204,17 @@ export class BattleSession {
       this.battleComplete = true;
       this.hasWinEvent = false;
       this.pendingRequest = null; // Don't prompt for choice after battle ends
-      this.callbacks.onUpdate();
+      this.notify();
     }
 
     if (this.pendingRequest && !this.waiting && !this.battleComplete) {
       const req = this.pendingRequest;
       this.pendingRequest = null;
-      this.waiting = true;
+      this.waiting = !this.livePaced;
       this.isWaitingForChoice = true;
       this.currentRequest = req;
       this.callbacks.onRequest(req);
-      this.callbacks.onUpdate();
+      this.notify();
     }
   }
 
@@ -177,7 +238,7 @@ export class BattleSession {
     try {
       event = await this.processor.processLine(line);
     } catch (e) {
-      this.callbacks.onUpdate();
+      this.notify();
       return;
     }
 
@@ -196,7 +257,7 @@ export class BattleSession {
       const timeout = await this.processor.runAnimation(event);
       await new Promise<void>(resolve => setTimeout(resolve, timeout));
       this.callbacks.onBattleEnd(event.args[1] as string);
-      this.callbacks.onUpdate();
+      this.notify();
       return;
     }
 
@@ -204,7 +265,7 @@ export class BattleSession {
     const timeout = await this.processor.runAnimation(event);
     await new Promise<void>(resolve => setTimeout(resolve, timeout));
 
-    this.callbacks.onUpdate();
+    this.notify();
   }
 
   resumeAfterChoice(): void {
@@ -242,6 +303,12 @@ export class BattleSession {
     this.pendingBuffer = [];
   }
 
+  /** The one place a visible change is announced. See `revision`. */
+  private notify(): void {
+    this.revision++;
+    this.callbacks.onUpdate();
+  }
+
   getState(): BattleSessionState {
     return {
       roomId: this.roomId,
@@ -251,6 +318,7 @@ export class BattleSession {
       currentRequest: this.currentRequest,
       isWaitingForChoice: this.isWaitingForChoice,
       htmlLog: this.htmlLog,
+      revision: this.revision,
       messageBar: this.messageBar,
       winner: this.winner,
       replay: this.replay,

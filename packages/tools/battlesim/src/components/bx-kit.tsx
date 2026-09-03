@@ -396,15 +396,26 @@ export function BxBench({ mon, hotkey, disabled = false, reserved = false, reaso
       {hotkey != null && <BxKbd>{hotkey}</BxKbd>}
       <BxSprite mon={mon} size={34} />
       <span className="grid min-w-0 flex-1 gap-1">
+        {/* THE HP READOUT SITS ON THE NAME ROW, NOT BESIDE THE BAR.
+            These cards go six across a dock band, which leaves each one about
+            90px of text column — and a bar sharing that row with "260/260" got
+            roughly 45px of it, too short to read a fill against and too short
+            to tell 100% from 60%. The number is a fixed width and the bar is
+            the elastic part, so the number moves up to the row that already
+            truncates and the bar takes the full width underneath. */}
         <span className="flex min-w-0 items-center gap-[0.375rem] font-display text-[0.78125rem] font-bold uppercase leading-none tracking-[0.03em]">
           <span className="min-w-0 truncate">{mon.name}</span><BxStatus status={mon.status} />
           {reserved && <i className="flex-none font-mono text-[0.5rem] font-bold not-italic leading-none tracking-[0.1em] text-accent-bright">{t("bx.chosen")}</i>}
           {why && !mon.fnt && <i className="flex-none border border-solid border-line-2 px-1 py-[2px] font-mono text-[0.5rem] font-semibold not-italic uppercase leading-none tracking-[0.08em] text-txt-dim">{why}</i>}
+          <span aria-label={hpAriaLabel(t, mon, pct, true)} className="ml-auto flex-none leading-none" style={{ ...BX_PLATE_VOICE, color: mon.fnt ? "var(--muted)" : hpTone(pct), fontSize: "11px" }}>{mon.fnt ? t("battle.end.ko") : mon.hpCur != null && mon.hpMax != null ? `${mon.hpCur}/${mon.hpMax}` : pct + "%"}</span>
         </span>
-        <span className="flex items-center gap-2">
-          <span className="h-[0.5rem] min-w-0 flex-1 overflow-hidden border border-solid border-line-2 bg-[linear-gradient(180deg,var(--panel-2)_0%,var(--panel)_100%)]"><i className="block h-full transition-[width] duration-[300ms] ease-out motion-reduce:transition-none" style={{ width: pct + "%", background: `linear-gradient(180deg, color-mix(in srgb, ${hpTone(pct)} 110%, white 15%) 0%, ${hpTone(pct)} 70%, color-mix(in srgb, ${hpTone(pct)} 85%, black 10%) 100%)` }} /></span>
-          <span aria-label={hpAriaLabel(t, mon, pct, true)} className="flex-none leading-none" style={{ ...BX_PLATE_VOICE, color: mon.fnt ? "var(--muted)" : hpTone(pct), fontSize: "11px" }}>{mon.fnt ? t("battle.end.ko") : mon.hpCur != null && mon.hpMax != null ? `${mon.hpCur}/${mon.hpMax}` : pct + "%"}</span>
-        </span>
+        {/* `BxHp`, not a bar of its own. The hand-rolled one here carried the
+            same `color-mix(… 110%, …)` that BxHp documents above: a percentage
+            over 100 does not clamp, it fails to parse, and the whole
+            `background` shorthand goes with it — so every bench bar rendered as
+            an empty outline no matter the HP, at full health included. One bar
+            implementation means that fix cannot be missed twice. */}
+        <BxHp pct={pct} trail={false} />
         <BxTypeRow types={mon.types} small />
       </span>
     </button>

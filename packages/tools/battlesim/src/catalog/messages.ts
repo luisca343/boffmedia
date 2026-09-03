@@ -525,7 +525,14 @@ export const messages = {
             "password": "Contraseña",
             "button": "Entrar",
             "connecting": "Conectando al servidor de Showdown…",
-            "waitingChallstr": "Esperando la cadena de reto…"
+            "waitingChallstr": "Esperando la cadena de reto…",
+            "modeLabel": "Cómo quieres entrar",
+            "modeAccount": "Con mi cuenta",
+            "modeGuest": "Sin cuenta",
+            "guestName": "Nombre para el combate",
+            "guestButton": "Jugar sin cuenta",
+            "notice": "Tu usuario y contraseña son los de Pokémon Showdown, no los de Boffmedia. Se envían a Showdown para iniciar sesión y no se guardan aquí; solo recordamos el nombre.",
+            "guestNotice": "Juegas con un nombre sin registrar en Pokémon Showdown: no hace falta contraseña, pero el nombre no queda reservado y no puntúa en la clasificación."
           },
           "lobbyChat": "Chat del lobby",
           "battle": {
@@ -1667,7 +1674,14 @@ export const messages = {
             "password": "Password",
             "button": "Log in",
             "connecting": "Connecting to Showdown server…",
-            "waitingChallstr": "Waiting for challenge string…"
+            "waitingChallstr": "Waiting for challenge string…",
+            "modeLabel": "How you want to log in",
+            "modeAccount": "With my account",
+            "modeGuest": "No account",
+            "guestName": "Name for the battle",
+            "guestButton": "Play without an account",
+            "notice": "This username and password are your Pokémon Showdown ones, not your Boffmedia ones. They are sent to Showdown to log you in and are not stored here; only the name is remembered.",
+            "guestNotice": "You will play under an unregistered Pokémon Showdown name: no password needed, but the name is not reserved for you and does not count towards the ladder."
           },
           "lobbyChat": "Lobby chat",
           "battle": {

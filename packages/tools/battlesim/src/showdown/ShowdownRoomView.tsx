@@ -34,17 +34,28 @@ export function BsimShowdownRoomView() {
   const p1Name = state?.battle?.p1?.name?.trim();
   const p2Name = state?.battle?.p2?.name?.trim();
   const pov: 0 | 1 = p1Name === myName ? 0 : p2Name === myName ? 1 : 0;
-  const povRef = useRef<0 | 1>(0);
-  if (p1Name || p2Name) povRef.current = pov;
+  // The canvas element, kept from the ref callback.
+  //
+  // NOT `document.getElementById('game')`, which is what this used to do: the
+  // tool keeps several battle rooms mounted as LAYERS at once and every one of
+  // them renders an element with that id, so the global lookup could hand this
+  // room another room's canvas and rebind the session's scene to it.
+  const gameElRef = useRef<HTMLElement | null>(null);
 
-  const handleInitScene = useCallback((el: HTMLElement) => { initScene(el, povRef.current); }, [initScene]);
+  const handleInitScene = useCallback((el: HTMLElement) => {
+    gameElRef.current = el;
+    initScene(el);
+  }, [initScene]);
 
+  // The canvas usually mounts BEFORE the session exists, and `initScene` is a
+  // silent no-op until it does — so without this the scene was never built for
+  // a session adopted after the first paint, and the field stayed empty.
+  // No pov is passed: the engine resolves the side from the `|player|` lines
+  // against the viewer's own name, which is the only source that cannot be
+  // late (see `BattleEventProcessorContext.viewerName`).
   useEffect(() => {
-    if (session && (p1Name || p2Name)) {
-      const gameEl = document.getElementById('game');
-      if (gameEl) initScene(gameEl, povRef.current);
-    }
-  }, [p1Name, p2Name, session, initScene, pov]);
+    if (session && gameElRef.current) initScene(gameElRef.current);
+  }, [session, initScene]);
 
   useEffect(() => {
     if (state?.battleComplete && !savedReplayId && !savingReplay) {

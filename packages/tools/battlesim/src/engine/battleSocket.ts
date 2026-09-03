@@ -51,7 +51,12 @@ export async function fetchBattleTicket(): Promise<string> {
  */
 export async function openBattleSocket(namespace: SocketNamespace): Promise<Socket> {
   const ticket = await fetchBattleTicket();
-  const origin = getToolHost().apiUrl("");
+  // `apiUrl(path)` joins with a slash, so `apiUrl("")` hands back the base with
+  // a TRAILING one — and socket.io reads the pathname of the url it is given as
+  // the NAMESPACE. `https://api…es/` + `/battle` is `//battle`, which is not a
+  // namespace the server registered, so every connection was refused with
+  // "Invalid namespace" on both `/battle` and `/showdown`. Strip it.
+  const origin = getToolHost().apiUrl("").replace(/\/+$/, "");
 
   const socket = io(`${origin}${namespace}`, {
     auth: { ticket },
