@@ -56,8 +56,16 @@ jobs:
           echo "SECRET=${{ secrets.SECRET }}" >> .env.production.local
           echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env.production.local
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env.production.local
+          # Twitch: the browser only ever needs the client id (mewtwitch calls the
+          # Helix API with a Client-Id header). The secret is server-only — the
+          # OAuth link flow in app/api/twitch/* reads env.TWITCH_CLIENT_SECRET.
+          # It was previously written as NEXT_PUBLIC_TWITCH_CLIENT_SECRET, which
+          # nothing read (so the link flow was inert) and which Next would inline
+          # into the browser bundle the moment anything did. The GitHub secret
+          # still carries the old name; rename and rotate it when convenient.
           echo "NEXT_PUBLIC_TWITCH_CLIENT_ID=${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_ID }}" >> .env.production.local
-          echo "NEXT_PUBLIC_TWITCH_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_SECRET }}" >> .env.production.local
+          echo "TWITCH_CLIENT_ID=${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_ID }}" >> .env.production.local
+          echo "TWITCH_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_SECRET }}" >> .env.production.local
           echo "NEXT_PUBLIC_TERAS_API=${{ secrets.NEXT_PUBLIC_TERAS_API }}" >> .env.production.local
 
       - name: Build and push Docker image
