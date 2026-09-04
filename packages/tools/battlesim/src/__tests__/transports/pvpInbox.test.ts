@@ -66,6 +66,8 @@ function wire(socket: FakeSocket) {
   socket.on('spectateJoined', (d: any) => inbox.handleResumed(d, 'spectateJoined'));
   socket.on('chatMessage', (d: any) => inbox.handleChat(d));
   socket.on('timerUpdate', (d: any) => inbox.handleTimer(d));
+  socket.on('opponentDisconnected', (d: any) => inbox.handleOpponentDisconnected(d));
+  socket.on('opponentReconnected', (d: any) => inbox.handleOpponentReconnected(d));
   socket.on('error', (d: any) => inbox.handleError(d ?? {}));
   socket.on('battleCreated', (d: any) => {
     if (!d?.roomId) return;
@@ -370,6 +372,75 @@ describe('PvpInbox — a rejected choice', () => {
     expect(spy.requests).toHaveLength(0);
     expect(warn).toHaveBeenCalled();
     warn.mockRestore();
+  });
+});
+
+describe('PvpInbox — opponent disconnect grace period', () => {
+  it('stores opponent disconnect state with expiry time', () => {
+    const socket = fakeSocket();
+    const inbox = wire(socket);
+    const now = Date.now();
+    const expiresAt = now + 30000;
+
+    socket.fire('opponentDisconnected', {
+      roomId: 'room-1',
+      graceDurationMs: 30000,
+      expiresAt,
+    });
+
+    const room = inbox.peek('room-1')!;
+    expect(room.opponentDisconnect).toEqual({
+      graceDurationMs: 30000,
+      expiresAt,
+    });
+  });
+
+  it('clears opponent disconnect state on opponentReconnected', () => {
+    const socket = fakeSocket();
+    const inbox = wire(socket);
+    const now = Date.now();
+
+    socket.fire('opponentDisconnected', {
+      roomId: 'room-1',
+      graceDurationMs: 30000,
+      expiresAt: now + 30000,
+    });
+    expect(inbox.peek('room-1')!.opponentDisconnect).not.toBeNull();
+
+    socket.fire('opponentReconnected', { roomId: 'room-1' });
+    expect(inbox.peek('room-1')!.opponentDisconnect).toBeNull();
+  });
+
+  it('clears opponent disconnect state on battleEnd', () => {
+    const socket = fakeSocket();
+    const inbox = wire(socket);
+    const now = Date.now();
+
+    socket.fire('opponentDisconnected', {
+      roomId: 'room-1',
+      graceDurationMs: 30000,
+      expiresAt: now + 30000,
+    });
+    expect(inbox.peek('room-1')!.opponentDisconnect).not.toBeNull();
+
+    socket.fire('battleEnd', { roomId: 'room-1' });
+    expect(inbox.peek('room-1')!.opponentDisconnect).toBeNull();
+    expect(inbox.peek('room-1')!.status).toBe('finished');
+  });
+
+  it('ignores malformed opponent disconnect frames', () => {
+    const socket = fakeSocket();
+    const inbox = wire(socket);
+
+    socket.fire('opponentDisconnected', { graceDurationMs: 30000 });
+    expect(inbox.peek('room-1')).toBeNull();
+
+    socket.fire('opponentDisconnected', {
+      roomId: 'room-1',
+      graceDurationMs: 'not a number',
+      expiresAt: 'not a number',
+    });
+    expect(inbox.peek('room-1')!.opponentDisconnect).toBeNull();
   });
 });
 

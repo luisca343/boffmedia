@@ -649,6 +649,11 @@ export const messages = {
           "retry": "Reintentar"
         },
         "battle": {
+          "opponent": {
+            "disconnected": "Rival desconectado",
+            "reconnecting": "El rival se está reconectando…",
+            "countdownExpired": "El rival no volvió a tiempo"
+          },
           "you": "TÚ",
           "foe": "RIVAL",
           "turn": "Turno {turn}",
@@ -1849,6 +1854,11 @@ export const messages = {
           "retry": "Try Again"
         },
         "battle": {
+          "opponent": {
+            "disconnected": "Opponent disconnected",
+            "reconnecting": "Opponent is reconnecting…",
+            "countdownExpired": "The opponent did not return in time"
+          },
           "you": "YOU",
           "foe": "FOE",
           "turn": "Turn {turn}",

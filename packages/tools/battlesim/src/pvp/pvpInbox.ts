@@ -71,6 +71,11 @@ export interface PvpTimerState {
   activeSide: PvpSide | null;
 }
 
+export interface PvpOpponentDisconnectState {
+  graceDurationMs: number;
+  expiresAt: number;
+}
+
 export interface PvpRoomInbox {
   roomId: string;
   /**
@@ -106,6 +111,7 @@ export interface PvpRoomInbox {
   pendingResync: { lines: string[]; seq: number } | null;
   chat: PvpChatEntry[];
   timer: PvpTimerState | null;
+  opponentDisconnect: PvpOpponentDisconnectState | null;
 }
 
 export interface PvpProtocolFrame {
@@ -167,6 +173,7 @@ export function createRoomInbox(roomId: string): PvpRoomInbox {
     pendingResync: null,
     chat: [],
     timer: null,
+    opponentDisconnect: null,
   };
 }
 
@@ -341,6 +348,7 @@ export class PvpInbox {
     room.status = 'finished';
     room.winner = frame.winner ?? null;
     room.replayId = typeof frame.replayId === 'number' ? frame.replayId : null;
+    room.opponentDisconnect = null;
     // ONLY the bookkeeping. `battleComplete`, `hasWinEvent` and the end screen
     // belong to `BattleSession`, which reaches them when the `|win|` line has
     // been through the queue like every other line (M3). Setting them here
@@ -371,6 +379,22 @@ export class PvpInbox {
     const room = this.room(frame.roomId);
     room.timer = { p1: frame.p1, p2: frame.p2, activeSide: frame.activeSide ?? null };
     if (room.session) room.session.timerState = room.timer;
+    this.changed(frame.roomId);
+  }
+
+  handleOpponentDisconnected(frame: { roomId?: string; graceDurationMs?: number; expiresAt?: number }): void {
+    if (!frame?.roomId) return;
+    const room = this.room(frame.roomId);
+    if (typeof frame.graceDurationMs === 'number' && typeof frame.expiresAt === 'number') {
+      room.opponentDisconnect = { graceDurationMs: frame.graceDurationMs, expiresAt: frame.expiresAt };
+    }
+    this.changed(frame.roomId);
+  }
+
+  handleOpponentReconnected(frame: { roomId?: string }): void {
+    if (!frame?.roomId) return;
+    const room = this.room(frame.roomId);
+    room.opponentDisconnect = null;
     this.changed(frame.roomId);
   }
 

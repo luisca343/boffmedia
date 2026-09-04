@@ -25,6 +25,7 @@ import { BSIM_FORMATS } from '../lib/bsim-data';
 import { toId } from '../lib/bx-helpers';
 import type { EndAction } from '../lib/battle-types';
 import { usePvpActions, usePvpTransport } from './PvpSocketProvider';
+import { useOpponentDisconnectCountdown } from "./useOpponentDisconnectCountdown"
 
 export function BsimPvpRoomView() {
   // The address comes from the nav seam, not from a route prop: the
@@ -195,11 +196,14 @@ export function BsimPvpRoomView() {
     { id: 'lobby', label: t('battle.end.backToLobby'), variant: 'ghost', onClick: () => nav.replace('pvp', {}) },
   ];
 
+  const disconnectCountdown = useOpponentDisconnectCountdown(room?.opponentDisconnect ?? null)
   const notice = room?.resyncing
     ? t('battle.header.resyncing')
     : connection === 'reconnecting'
       ? t('battle.header.connecting')
-      : null;
+      : disconnectCountdown !== null
+        ? `${t('battle.opponent.disconnected')} (${disconnectCountdown}s)`
+        : null;
 
   return (
     <LiveBattle

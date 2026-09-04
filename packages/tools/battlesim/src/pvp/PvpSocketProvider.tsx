@@ -236,6 +236,8 @@ export function PvpSocketProvider({ children }: { children: React.ReactNode }) {
     const onSpectateJoined = (data: any) => inbox.handleResumed(data, "spectateJoined")
     const onChat = (data: any) => inbox.handleChat(data)
     const onTimer = (data: any) => inbox.handleTimer(data)
+    const onOpponentDisconnected = (data: any) => inbox.handleOpponentDisconnected(data)
+    const onOpponentReconnected = (data: any) => inbox.handleOpponentReconnected(data)
     const onError = (data: any) => inbox.handleError(data ?? {})
     const onBattleCreated = (data: any) => {
       if (!data?.roomId) return
@@ -257,6 +259,8 @@ export function PvpSocketProvider({ children }: { children: React.ReactNode }) {
     next.on("spectateJoined", onSpectateJoined)
     next.on("chatMessage", onChat)
     next.on("timerUpdate", onTimer)
+    next.on("opponentDisconnected", onOpponentDisconnected)
+    next.on("opponentReconnected", onOpponentReconnected)
     next.on("error", onError)
     next.on("battleCreated", onBattleCreated)
     next.on("connect", onReconnected)
@@ -270,6 +274,8 @@ export function PvpSocketProvider({ children }: { children: React.ReactNode }) {
       next.off("spectateJoined", onSpectateJoined)
       next.off("chatMessage", onChat)
       next.off("timerUpdate", onTimer)
+      next.off("opponentDisconnected", onOpponentDisconnected)
+      next.off("opponentReconnected", onOpponentReconnected)
       next.off("error", onError)
       next.off("battleCreated", onBattleCreated)
       next.off("connect", onReconnected)
