@@ -14,6 +14,10 @@ import { useTranslations } from "next-intl"
 import type { Mon, SlotLoc } from "../_types/pc.types"
 import { Sprite, toast } from "../_components/ui"
 import { locId, parseLocId, usePcUi } from "../_stores/pcUiStore"
+import { startsDrag } from "../_utils/dragUtils"
+
+// Re-export types for use in tests and utilities
+export type { SlotLoc }
 
 /**
  * Pointer-based drag and drop, replacing the app's `@dnd-kit` setup.
@@ -108,13 +112,14 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
 
   // The handlers are held in a ref so they can be added and removed by identity
   // across renders without re-binding the window on every pointer move.
-  const handlers = useRef<{ move: (e: PointerEvent) => void; up: () => void }>(null)
+  const handlers = useRef<{ move: (e: PointerEvent) => void; up: () => void; cancel: () => void }>(null)
 
   const finish = useCallback(() => {
     const s = state.current
     if (handlers.current) {
       window.removeEventListener("pointermove", handlers.current.move)
       window.removeEventListener("pointerup", handlers.current.up)
+      window.removeEventListener("pointercancel", handlers.current.cancel)
     }
     state.current = null
     setDrag(null)
@@ -148,9 +153,19 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
     onDropSingle(from, to)
   }, [monAt, onDropMany, onDropSingle, setMultiMode, t, validate])
 
+  const abort = useCallback(() => {
+    if (handlers.current) {
+      window.removeEventListener("pointermove", handlers.current.move)
+      window.removeEventListener("pointerup", handlers.current.up)
+      window.removeEventListener("pointercancel", handlers.current.cancel)
+    }
+    state.current = null
+    setDrag(null)
+  }, [])
+
   const beginDrag = useCallback(
     (e: ReactPointerEvent, mon: Mon) => {
-      if (e.button !== 0) return
+      if (!startsDrag(e.button)) return
 
       // Dragging any member of a multi-selection drags the whole selection.
       const isSelectionDrag = multiMode && selected.has(locId(mon.loc)) && selected.size > 1
@@ -185,12 +200,14 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
         setDrag({ ...s })
       }
       const onUp = () => finish()
+      const onCancel = () => abort()
 
-      handlers.current = { move: onMove, up: onUp }
+      handlers.current = { move: onMove, up: onUp, cancel: onCancel }
       window.addEventListener("pointermove", onMove)
       window.addEventListener("pointerup", onUp)
+      window.addEventListener("pointercancel", onCancel)
     },
-    [finish, monAt, multiMode, selected],
+    [finish, abort, monAt, multiMode, selected],
   )
 
   useEffect(
@@ -198,6 +215,7 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
       if (!handlers.current) return
       window.removeEventListener("pointermove", handlers.current.move)
       window.removeEventListener("pointerup", handlers.current.up)
+      window.removeEventListener("pointercancel", handlers.current.cancel)
     },
     [],
   )

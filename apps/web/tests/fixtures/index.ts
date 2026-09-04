@@ -18,6 +18,7 @@ import { PasaportePage } from "../pages/smartrotom/pasaporte.page"
 import { NotificationsPage } from "../pages/smartrotom/notifications.page"
 import { AdminNotificationsPage } from "../pages/smartrotom/admin-notifications.page"
 import { AdminJugadoresPage } from "../pages/smartrotom/admin-jugadores.page"
+import { PCPage } from "../pages/smartrotom/pc.page"
 
 type Pages = {
   landingPage: LandingPage
@@ -39,6 +40,7 @@ type Pages = {
   notificationsPage: NotificationsPage
   adminNotificationsPage: AdminNotificationsPage
   adminJugadoresPage: AdminJugadoresPage
+  pcPage: PCPage
 }
 
 export const test = base.extend<Pages>({
@@ -61,6 +63,7 @@ export const test = base.extend<Pages>({
   notificationsPage: async ({ page }, use) => { await use(new NotificationsPage(page)) },
   adminNotificationsPage: async ({ page }, use) => { await use(new AdminNotificationsPage(page)) },
   adminJugadoresPage: async ({ page }, use) => { await use(new AdminJugadoresPage(page)) },
+  pcPage: async ({ page }, use) => { await use(new PCPage(page)) },
 })
 
 export { expect }
