@@ -46,6 +46,13 @@ interface BattleHeaderProps {
    */
   onToggleLog?: () => void;
   logHidden?: boolean;
+  /**
+   * The in-battle damage calculator. Sits BEFORE the log controls and is offered
+   * in every layout, unlike them: hiding the log is a fullscreen-only trade for
+   * field width, while the calculator is a thing you go and open.
+   */
+  onToggleCalc?: () => void;
+  calcOpen?: boolean;
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
   showForfeit?: boolean;
@@ -161,6 +168,7 @@ function NamesToggle() {
 export function BattleHeader({
   mode, onBack, roomLabel, formatLabel, you, foe, turn, timerYou, timerFoe, timerMax = 60,
   spectatorCount, layout, onToggleRail, railOpen, railUnread = 0, onToggleLog, logHidden = false,
+  onToggleCalc, calcOpen = false,
   isFullscreen, onToggleFullscreen, showForfeit, onForfeit,
 }: BattleHeaderProps) {
   const t = useToolT(BATTLESIM_NS);
@@ -206,6 +214,16 @@ export function BattleHeader({
           <span className="inline-flex items-center gap-1 whitespace-nowrap border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[0.625rem] leading-none text-txt-muted" title={t('battle.header.spectators', { count: spectatorCount })}>
             <Icon name="eye" size={12} />{spectatorCount}
           </span>
+        )}
+        {onToggleCalc && (
+          <IconButton
+            name="calc"
+            label={calcOpen ? t('calc.close') : t('calc.open')}
+            variant={calcOpen ? 'default' : 'ghost'}
+            size="sm"
+            aria-pressed={calcOpen}
+            onClick={onToggleCalc}
+          />
         )}
         {onToggleRail && layout === 'tablet' && (
           <span className="relative">

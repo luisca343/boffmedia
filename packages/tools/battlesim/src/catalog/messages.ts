@@ -21,6 +21,59 @@ export const messages = {
           "mute": "Silenciar audio",
           "unmute": "Activar audio"
         },
+        "calc": {
+          "aria": "Calculadora de daño del combate",
+          "title": "Calculadora",
+          "open": "Abrir la calculadora de daño",
+          "close": "Cerrar la calculadora",
+          "turn": "Turno {turn}",
+          "reset": "Restablecer",
+          "readOnly": "Nada de lo que toques aquí afecta al combate.",
+          "empty": "Todavía no hay nada en el campo.",
+          "attacker": "Atacante",
+          "defender": "Defensor",
+          "field": "Campo",
+          "swap": "Invertir los papeles",
+          "bench": "banquillo",
+          "details": "Ajustes",
+          "power": "Potencia",
+          "crit": "Crítico",
+          "noMove": "Sin movimiento",
+          "statusMove": "Movimiento de estado: no hace daño.",
+          "variablePower": "Potencia variable: escríbela tú.",
+          "none": "Ninguno",
+          "level": "Nivel",
+          "item": "Objeto",
+          "ability": "Habilidad",
+          "status": "Estado",
+          "tera": "Teratipo",
+          "nature": "Naturaleza",
+          "boosts": "Cambios de stat",
+          "evs": "EVs",
+          "ivs": "IVs",
+          "weather": "Clima",
+          "terrain": "Campo",
+          "attackerSide": "Lado del atacante",
+          "defenderSide": "Lado del defensor",
+          "helpingHand": "Refuerzo",
+          "spread": {
+            "known": "Reparto real",
+            "unknown": "Reparto estimado"
+          },
+          "unknown": {
+            "title": "Reparto desconocido",
+            "body": "Del rival no se conocen EVs, IVs ni naturaleza, así que el daño se da como rango: desde 0 EVs con naturaleza neutra hasta 252 EVs con naturaleza favorable."
+          },
+          "hint": {
+            "foeMoves": "Del rival solo se listan los movimientos que ya ha usado."
+          },
+          "ko": {
+            "none": "Sin KO",
+            "ohko": "OHKO",
+            "nhko": "{hits}HKO",
+            "range": "{min}HKO–{max}HKO"
+          }
+        },
         "header": {
           "lobby": "Lobby",
           "forfeit": "Rendirse",
@@ -1167,6 +1220,59 @@ export const messages = {
         "audio": {
           "mute": "Mute audio",
           "unmute": "Unmute audio"
+        },
+        "calc": {
+          "aria": "In-battle damage calculator",
+          "title": "Calculator",
+          "open": "Open the damage calculator",
+          "close": "Close the calculator",
+          "turn": "Turn {turn}",
+          "reset": "Reset",
+          "readOnly": "Nothing you touch here affects the battle.",
+          "empty": "Nothing on the field yet.",
+          "attacker": "Attacker",
+          "defender": "Defender",
+          "field": "Field",
+          "swap": "Swap roles",
+          "bench": "bench",
+          "details": "Settings",
+          "power": "Power",
+          "crit": "Crit",
+          "noMove": "No move",
+          "statusMove": "Status move: it deals no damage.",
+          "variablePower": "Variable power: type it in yourself.",
+          "none": "None",
+          "level": "Level",
+          "item": "Item",
+          "ability": "Ability",
+          "status": "Status",
+          "tera": "Tera type",
+          "nature": "Nature",
+          "boosts": "Stat stages",
+          "evs": "EVs",
+          "ivs": "IVs",
+          "weather": "Weather",
+          "terrain": "Terrain",
+          "attackerSide": "Attacker's side",
+          "defenderSide": "Defender's side",
+          "helpingHand": "Helping Hand",
+          "spread": {
+            "known": "Real spread",
+            "unknown": "Estimated spread"
+          },
+          "unknown": {
+            "title": "Unknown spread",
+            "body": "The opponent's EVs, IVs and nature are not knowable, so damage is shown as a range: from 0 EVs with a neutral nature up to 252 EVs with a boosting one."
+          },
+          "hint": {
+            "foeMoves": "Only the moves the opponent has already used are listed."
+          },
+          "ko": {
+            "none": "No KO",
+            "ohko": "OHKO",
+            "nhko": "{hits}HKO",
+            "range": "{min}HKO–{max}HKO"
+          }
         },
         "header": {
           "lobby": "Lobby",

@@ -33,6 +33,22 @@ function toSmogonEvs(
   }
 }
 
+/**
+ * Status display name -> the id @smogon/calc actually tests for.
+ *
+ * IT FAILS SILENTLY WITHOUT THIS. `Pokemon#hasStatus` is a plain
+ * `includes(this.status)` against `'brn' | 'par' | ...`, so the panel's
+ * `"Burned"` never matched and a burned physical attacker calculated at FULL
+ * damage — verified: Knock Off from a 252+ Incineroar reads 61-73 with
+ * `"Burned"` and 30-36 with `"brn"`. No throw, no warning, just the wrong
+ * number. Ids pass through untouched, which is what battlesim's in-battle
+ * panel sends (a live battle speaks ids).
+ */
+const STATUS_ID: Record<string, string> = {
+  Burned: 'brn', Paralyzed: 'par', Poisoned: 'psn',
+  'Badly Poisoned': 'tox', Frozen: 'frz', Asleep: 'slp',
+}
+
 function toSmogonPokemon(
   p: CalcPokemon,
   role: 'atk' | 'def',
@@ -52,7 +68,7 @@ function toSmogonPokemon(
     nature: p.nature as State.Pokemon['nature'],
     ability: p.ability as State.Pokemon['ability'],
     item: p.item !== 'None' ? (p.item as State.Pokemon['item']) : undefined,
-    status: p.status !== 'Healthy' ? (p.status as State.Pokemon['status']) : undefined,
+    status: p.status !== 'Healthy' ? ((STATUS_ID[p.status] ?? p.status) as State.Pokemon['status']) : undefined,
     teraType: p.teraType !== 'None' ? (p.teraType as State.Pokemon['teraType']) : undefined,
     evs: evs as State.Pokemon['evs'],
     ivs: p.ivs as State.Pokemon['ivs'],

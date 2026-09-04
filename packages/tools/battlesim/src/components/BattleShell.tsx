@@ -17,6 +17,16 @@ interface BattleShellProps {
   railOpen?: boolean
   /** Mobile bottom tab bar (Acciones · Registro · Chat). */
   mobileTabs?: ReactNode
+  /**
+   * The damage panel: a drawer over the body's right edge, in every layout.
+   *
+   * Deliberately NOT a second column beside the rail. The field is 16:9 and the
+   * shell sizes it off the body, so a panel taking width would resize the board
+   * mid-turn — the one thing this component exists to prevent — and in desktop
+   * fullscreen the rail is hidden entirely, which a panel docked to it would
+   * vanish with. Floating leaves the log toggle alone.
+   */
+  panel?: ReactNode
   /** Preview / end screen — covers the whole body below the bar. */
   overlay?: ReactNode
   /** Portalled dialogs and other zero-size children. */
@@ -78,7 +88,7 @@ interface BattleShellProps {
  * at roughly a third, and the dock takes the remainder and scrolls.
  */
 export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(function BattleShell(
-  { header, canvas, dock, rail, railOpen = false, mobileTabs, overlay, children, layout, fullscreen, className },
+  { header, canvas, dock, rail, railOpen = false, mobileTabs, panel, overlay, children, layout, fullscreen, className },
   ref,
 ) {
   // A battle is played at the window's left edge: the dock's first move button
@@ -194,6 +204,8 @@ export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(function
               {rail}
             </aside>
           )}
+
+          {panel}
 
           {overlay && <div className="absolute inset-0 z-30 flex min-h-0 flex-col overflow-hidden">{overlay}</div>}
         </div>

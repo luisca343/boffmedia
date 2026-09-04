@@ -2,43 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { VgcService } from '../../service'
+import { NATURES } from '../_lib/natures'
 
-// ─── Natures — static Gen 3+ game mechanics constants ──────────────────────────
-// These 25 natures have never changed since Gen 3 and are fully format-agnostic.
-
-export interface NatureData {
-  name: string
-  plus: string | null
-  minus: string | null
-}
-
-export const NATURES: NatureData[] = [
-  { name: 'Adamant', plus: 'atk',  minus: 'spa' },
-  { name: 'Bashful', plus: null,   minus: null  },
-  { name: 'Bold',    plus: 'def',  minus: 'atk' },
-  { name: 'Brave',   plus: 'atk',  minus: 'spe' },
-  { name: 'Calm',    plus: 'spd',  minus: 'atk' },
-  { name: 'Careful', plus: 'spd',  minus: 'spa' },
-  { name: 'Docile',  plus: null,   minus: null  },
-  { name: 'Gentle',  plus: 'spd',  minus: 'def' },
-  { name: 'Hardy',   plus: null,   minus: null  },
-  { name: 'Hasty',   plus: 'spe',  minus: 'def' },
-  { name: 'Impish',  plus: 'def',  minus: 'spa' },
-  { name: 'Jolly',   plus: 'spe',  minus: 'spa' },
-  { name: 'Lax',     plus: 'def',  minus: 'spd' },
-  { name: 'Lonely',  plus: 'atk',  minus: 'def' },
-  { name: 'Mild',    plus: 'spa',  minus: 'def' },
-  { name: 'Modest',  plus: 'spa',  minus: 'atk' },
-  { name: 'Naive',   plus: 'spe',  minus: 'spd' },
-  { name: 'Naughty', plus: 'atk',  minus: 'spd' },
-  { name: 'Quiet',   plus: 'spa',  minus: 'spe' },
-  { name: 'Quirky',  plus: null,   minus: null  },
-  { name: 'Rash',    plus: 'spa',  minus: 'spd' },
-  { name: 'Relaxed', plus: 'def',  minus: 'spe' },
-  { name: 'Sassy',   plus: 'spd',  minus: 'spe' },
-  { name: 'Serious', plus: null,   minus: null  },
-  { name: 'Timid',   plus: 'spe',  minus: 'atk' },
-]
+// ─── Natures ─────────────────────────────────────────────────────────────
+// The table moved to `../_lib/natures`, which is pure: the spread solver needs
+// it and must not pull React and `VgcService` in behind it. Re-exported here so
+// every existing import of `NATURES` from this hook keeps working.
+export { NATURES, natureEffect, probeNature } from '../_lib/natures'
+export type { NatureData, NatureEffect } from '../_lib/natures'
 
 // ─── Move / item / ability data from server ────────────────────────────────────
 

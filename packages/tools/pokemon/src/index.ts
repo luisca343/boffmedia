@@ -55,3 +55,42 @@ export * from "./vgc/damage-calculator/_components/ui";
 export { MvType } from "./vgc/meta/_components/MvBits";
 export { defaultPokemon } from "./vgc/damage-calculator/_store/slices/calcSlice";
 export type { CalcPokemon } from "./vgc/damage-calculator/_types/calculator";
+
+// The damage engine itself, as opposed to the screen around it.
+//
+// `smogonAdapter` is the only module in this package that knows how a
+// `CalcPokemon` becomes a @smogon/calc `Pokemon`, and it is pure: no React, no
+// store, no host. Battlesim's in-battle panel calls it with a spread it
+// extracted from the live field, which is why it is exported rather than
+// copied — a second implementation of "how do we ask @smogon/calc" is exactly
+// how the two surfaces would start disagreeing about the same damage roll.
+export { calcDamage, calcAllMoves, getKOVerdict, getDamageColorClass } from "./vgc/damage-calculator/_lib/smogonAdapter";
+export { DEFAULT_FIELD } from "./vgc/damage-calculator/_store/slices/calcSlice";
+export type {
+  CalcField,
+  CalcMove,
+  DamageResult,
+  MoveSlots,
+  SideConditions,
+  StatKey,
+  StatValues,
+  BoostKey,
+  StatBoosts,
+  Weather,
+  Terrain,
+  GameFormat,
+} from "./vgc/damage-calculator/_types/calculator";
+
+// The 25 natures. Static Gen-3+ mechanics, and the one table that decides which
+// stat a nature raises — battlesim's in-battle panel solves a live spread
+// against it, so a second copy would be a second answer to "is Adamant +atk".
+export { NATURES, natureEffect, probeNature } from "./vgc/damage-calculator/_lib/natures";
+export type { NatureData, NatureEffect } from "./vgc/damage-calculator/_lib/natures";
+
+// Spreads. `solveSpread` inverts the stat formula from the final stats a live
+// battle publishes; `minSpread`/`maxSpread` are the admitted guesses for the
+// side of the field nobody can see. See the header of `_lib/spread.ts` — the
+// distinction between the two is the difference between a useful in-battle
+// number and a confidently wrong one.
+export { solveSpread, spreadStats, minSpread, maxSpread } from "./vgc/damage-calculator/_lib/spread";
+export type { KnownStats, SolvedSpread, SpreadGuess } from "./vgc/damage-calculator/_lib/spread";

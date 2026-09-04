@@ -11,6 +11,8 @@ import { BxDock } from './BxDock';
 import { BattlePreview } from './BattlePreview';
 import { BattleEndScreen } from './BattleEndScreen';
 import { LogChatRail, useUnreadChat, type RailChat, type RailTab } from './LogChatRail';
+import { DamageCalcPanel } from './DamageCalcPanel';
+import { snapshotBattle } from '../calc/fromBattle';
 import { BSIM_FOCUS } from './bsim-kit';
 import { useBSXLayout } from '../useBSXLayout';
 import { useMeasuredLayout } from '../lib/battle-layout';
@@ -116,6 +118,13 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
    * without touching this flag (see `railHidden`).
    */
   const [logHidden, setLogHidden] = useState(false);
+  /**
+   * The damage panel. Independent of `logHidden` on purpose: the log toggle is
+   * a fullscreen-only trade of the rail for field width, and a calculator that
+   * shared that switch would be unreachable in exactly the mode people play
+   * their real games in.
+   */
+  const [calcOpen, setCalcOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('actions');
   const [confirmForfeit, setConfirmForfeit] = useState(false);
   /** The departure the guard below is holding, or null. See `useToolNavGuard`. */
@@ -190,6 +199,7 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
       spectatorCount={spectatorCount} layout={layout}
       onToggleRail={() => setRailOpen((v) => !v)} railOpen={railOpen} railUnread={unread}
       onToggleLog={isFullscreen ? () => setLogHidden((v) => !v) : undefined} logHidden={logHidden}
+      onToggleCalc={() => setCalcOpen((v) => !v)} calcOpen={calcOpen}
       isFullscreen={isFullscreen} onToggleFullscreen={toggleFullscreen}
       showForfeit={live && !!onForfeit} onForfeit={() => setConfirmForfeit(true)}
     />
@@ -239,6 +249,22 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
     </div>
   );
 
+  /**
+   * The calculator's view of the board. Rebuilt on `state.revision` — the same
+   * counter the canvas commits on — so the panel follows the battle turn by
+   * turn, and only while it is open: `snapshotBattle` solves a spread per
+   * Pokémon, which is wasted work for the 99% of battles nobody opens it in.
+   *
+   * READ-ONLY. `snapshotBattle` copies everything it reads and freezes the
+   * result; nothing below can write back into `state.battle`, the session or
+   * the ledger. Keep it that way — see the header of `calc/fromBattle.ts`.
+   */
+  const calcSnapshot = useMemo(
+    () => (calcOpen ? snapshotBattle(state.battle, pov, { request: state.currentRequest }) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [calcOpen, state.battle, state.revision, state.currentRequest, pov],
+  );
+
   const overlay = previewOpen ? (
     <BattlePreview
       team={bsx.bsxBench} foeTeam={foeTeam} foeUnknown={foeUnknown} picks={bsx.maxTeamSize} leads={bsx.activeCount}
@@ -254,7 +280,9 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
     <BattleAudioProvider roomId={roomLabel}>
       <MusicController roomId={roomLabel} battleActive={!finished} />
       <BattleShell ref={setShell} layout={layout} fullscreen={isFullscreen} header={header} canvas={canvas} dock={dock}
-        rail={railHidden ? undefined : rail} railOpen={layout === 'tablet' ? railOpen : mobileTab !== 'actions'} mobileTabs={mobileTabs} overlay={overlay}>
+        rail={railHidden ? undefined : rail} railOpen={layout === 'tablet' ? railOpen : mobileTab !== 'actions'} mobileTabs={mobileTabs}
+        panel={calcSnapshot ? <DamageCalcPanel snapshot={calcSnapshot} onClose={() => setCalcOpen(false)} /> : undefined}
+        overlay={overlay}>
         <ConfirmDialog open={confirmLeave !== null} tone="warning" title={t('connection.leaveTitle')} body={t('connection.leaveConfirm')} confirmLabel={t('connection.leaveCta')}
           onConfirm={() => { const go = confirmLeave; setConfirmLeave(null); go?.(); }} onClose={() => setConfirmLeave(null)} />
         <ConfirmDialog open={confirmForfeit} tone="error" title={t('connection.forfeitTitle')} body={t('connection.forfeitConfirm')} confirmLabel={t('connection.forfeitCta')}
