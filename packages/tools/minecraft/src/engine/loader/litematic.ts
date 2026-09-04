@@ -149,6 +149,15 @@ function loadRegion(name: string, comp: NbtCompound): RegionPlacement {
   const volume = absX * absY * absZ;
 
   const longs = asLongArray(comp.BlockStates, `Regions.${name}.BlockStates`);
+
+  // Bounds check per-region before allocation to prevent DoS via huge dimensions.
+  if (volume > MAX_VOLUME) {
+    throw new Error(
+      `Litematic region "${name}" volume (${absX}×${absY}×${absZ} = ${volume.toLocaleString()} blocks) ` +
+        `exceeds the ${MAX_VOLUME.toLocaleString()}-block limit per region.`
+    );
+  }
+
   const blockData = decodeBlockStates(longs, palette.length, volume);
 
   // Litematica min corner: end = pos + (size >= 0 ? size - 1 : size + 1);

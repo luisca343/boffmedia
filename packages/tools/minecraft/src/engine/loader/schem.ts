@@ -20,6 +20,14 @@ import { parseBlockState } from "../normalizer";
 import type { SchematicStructure, UnifiedBlock, TileEntity } from "../types";
 
 /**
+ * Guard against malicious or corrupted schematics declaring absurdly large
+ * dimensions that would cause excessive memory allocation before validation.
+ * Max int32 cubed could overflow to billions of blocks; we cap at 50M which
+ * is ~200 MB as Int32Array (consistent with Litematica loader).
+ */
+const MAX_VOLUME = 50_000_000;
+
+/**
  * Width/Height/Length are NBT `short` in the Sponge spec but interpreted unsigned
  * (WorldEdit/FAWE), so a dimension in 32768–65535 round-trips through a signed
  * short as a negative value. Recover the unsigned 16-bit magnitude. A foreign
@@ -107,6 +115,16 @@ export function loadSchem(root: NbtCompound, fileName: string): SchematicStructu
     "BlockData"
   );
   const expected = width * height * length;
+
+  // Bounds check before allocation to prevent DoS via huge dimensions.
+  if (expected > MAX_VOLUME) {
+    throw new Error(
+      `Schematic volume (${width}×${height}×${length} = ${expected.toLocaleString()} blocks) ` +
+        `exceeds the ${MAX_VOLUME.toLocaleString()}-block limit. ` +
+        `Export a smaller sub-region from your world editor first.`
+    );
+  }
+
   const blockData = decodeVarintArray(blockDataRaw, expected);
 
   const tileEntities = readTileEntities(root, blockContainer);

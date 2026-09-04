@@ -17,8 +17,13 @@
     "react": ">=19",
     "react-dom": ">=19"
   },
+  "scripts": {
+    "test": "vitest run",
+    "type-check": "tsc --noEmit"
+  },
   "devDependencies": {
     "@types/react": "19.2.7",
-    "@types/react-dom": "19.2.3"
+    "@types/react-dom": "19.2.3",
+    "vitest": "^4.1.10"
   }
 }
