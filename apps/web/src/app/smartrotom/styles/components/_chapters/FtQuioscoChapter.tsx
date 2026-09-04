@@ -151,6 +151,8 @@ export function FtQuioscoChapter() {
         >
           <div
             className="ft-article ft-dropcap max-w-[62ch]"
+            // Not sanitized on purpose: `BODY` is the module-scope literal above,
+            // written by us. No editor, no API, no user input — nothing to filter.
             dangerouslySetInnerHTML={{ __html: BODY }}
           />
         </Sample>

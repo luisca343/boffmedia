@@ -4,6 +4,8 @@ import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
+import { sanitizeRichText } from "@/lib/sanitizeHtml";
+
 import {
   Button,
   Divider,
@@ -29,6 +31,19 @@ const BASE = "/smartrotom/furrettoday";
  */
 function stripLeadingHeading(html: string): string {
   return html.replace(/^\s*<h1(?:\s[^>]*)?>[\s\S]*?<\/h1>/i, "");
+}
+
+/**
+ * Articles are CKEditor documents written by newsroom staff, and that editor
+ * hands them `sourceEditing` + `htmlEmbed` — the body is arbitrary HTML, not
+ * markup this app generated. The API sanitizes on write, but rows created
+ * before that gate landed are still in the table, so the reader sanitizes too.
+ * Order matters: strip the duplicate `<h1>` first, because the sanitizer
+ * normalises the tag (attribute order, quoting) and the anchored regex above
+ * would then miss it.
+ */
+function articleHtml(html: string): string {
+  return sanitizeRichText(stripLeadingHeading(html));
 }
 
 export default function ArticlePage({
@@ -116,7 +131,7 @@ export default function ArticlePage({
             <div
               className="ft-article ft-dropcap"
               dangerouslySetInnerHTML={{
-                __html: stripLeadingHeading(article.content),
+                __html: articleHtml(article.content),
               }}
             />
             <Divider className="my-8" />

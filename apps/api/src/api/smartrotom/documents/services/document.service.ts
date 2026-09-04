@@ -11,6 +11,7 @@ import {
   DocumentDetails,
   NotePreview,
 } from '../repositories/documents.repository';
+import { sanitizeRichText } from '@/common/html/sanitize-rich-text';
 
 export interface CreateDocumentRequest {
   title: string;
@@ -107,7 +108,10 @@ export class DocumentService {
 
     const result = await this.documentsRepository.createDocument({
       title: title.trim(),
-      content: content.trim(),
+      // Notes are CKEditor documents too — same allowlist, same reason as
+      // `news.service.ts`. Both note editors and the version restore path
+      // reach the database through here, so this is the one choke point.
+      content: sanitizeRichText(content).trim(),
       type,
       public: isPublic ?? false,
     });
@@ -130,7 +134,7 @@ export class DocumentService {
     }
 
     if (updateDocumentRequest.content !== undefined) {
-      updateData.content = updateDocumentRequest.content.trim();
+      updateData.content = sanitizeRichText(updateDocumentRequest.content).trim();
     }
 
     if (updateDocumentRequest.type !== undefined) {

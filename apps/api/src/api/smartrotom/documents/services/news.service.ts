@@ -7,6 +7,7 @@ import {
   NewsIssueRow,
 } from '../repositories/interfaces/news.repository.interface';
 import { NewsDetails } from '../repositories/documents.repository';
+import { sanitizeRichText } from '@/common/html/sanitize-rich-text';
 
 export interface CreateNewsRequest {
   title: string;
@@ -99,7 +100,11 @@ export class NewsService {
     const result = await this.newsRepository.createNews({
       ...createNewsRequest,
       title: title.trim(),
-      content: (content ?? '').trim(),
+      // CKEditor ships SourceEditing and HtmlEmbed to the newsroom, so `content`
+      // is attacker-controlled markup, not just formatted text. Sanitized here
+      // rather than in the controller because `saveDocument`-style callers and
+      // the version restore path all funnel through the services.
+      content: sanitizeRichText(content).trim(),
     });
 
     return this.getNewsById(result.insertId);
@@ -131,7 +136,12 @@ export class NewsService {
     Object.keys(updateNewsRequest).forEach((key) => {
       const value = updateNewsRequest[key as keyof UpdateNewsRequest];
       if (value !== undefined) {
-        if (typeof value === 'string') {
+        if (key === 'content' && typeof value === 'string') {
+          // The generic string branch below only trims. `content` is the one
+          // field that carries editor HTML, so it needs the allowlist too —
+          // an update would otherwise be a way around the create-path gate.
+          updateData[key] = sanitizeRichText(value).trim();
+        } else if (typeof value === 'string') {
           updateData[key] = value.trim();
         } else {
           updateData[key] = value;

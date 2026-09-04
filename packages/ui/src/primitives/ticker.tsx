@@ -13,6 +13,11 @@ export function Ticker({ items }: TickerProps) {
           <span
             key={i}
             className="mr-11"
+            // Not sanitized on purpose: `items` is a fixed headline list the host
+            // passes in (i18n values in `TopBar`), never user input. The HTML is
+            // the point — an `<em>` inside a value is how a headline styles a word.
+            // If a caller ever feeds this from the database, sanitize at that
+            // caller: this package must stay host-agnostic and dependency-free.
             dangerouslySetInnerHTML={{ __html: t + " <em>◆</em>" }}
           />
         ))}
