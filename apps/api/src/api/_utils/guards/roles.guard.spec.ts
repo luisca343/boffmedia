@@ -8,9 +8,9 @@ import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { fakeExecutionContext } from '@/_testing/nest-context';
 
 const contextFor = (
-  user,
-  handler,
-  cls,
+  user: { roles?: string[] } | undefined,
+  handler: unknown,
+  cls: unknown,
 ) =>
   // handler/cls are the real ones on purpose: Reflector keys the @Roles
   // metadata on that exact pair, so a stand-in would resolve to no roles.
