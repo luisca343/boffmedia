@@ -2,11 +2,14 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { ActorContext, assertActsAsSelf } from '@api/_utils/auth/actor';
 import { Logger } from 'nestjs-pino';
 import { PeopleRepository } from '../_shared/people.repository';
 import { AuditoriaService } from '../_shared/auditoria.service';
+import { GobiernoSocketsService } from '../_shared/gobierno-sockets.service';
 import { TreasuryService } from '../_shared/treasury.service';
 import { TransactionType } from '../../starbank/enums/transaction-type.enum';
 import { toPersonRef } from '../_shared/entities/person-ref.entity';
@@ -65,6 +68,8 @@ export class HaciendaService {
     private readonly peopleRepository: PeopleRepository,
     private readonly auditoriaService: AuditoriaService,
     private readonly treasuryService: TreasuryService,
+    @Inject(forwardRef(() => GobiernoSocketsService))
+    private readonly gobiernoSocketsService: GobiernoSocketsService,
   ) {}
 
   // ==================== MULTAS ====================
@@ -140,6 +145,8 @@ export class HaciendaService {
       target: `multa ${m.code} (${m.amount})`,
       dep: 'hacienda',
     });
+    // Emit socket event so gobierno staff UIs refresh without F5
+    this.gobiernoSocketsService.emit({ type: 'multa:created', multaId: m.id });
     return this.getMulta(m.id);
   }
 
@@ -227,6 +234,8 @@ export class HaciendaService {
       target: `multa ${existing.code}`,
       dep: 'hacienda',
     });
+    // Emit socket event so gobierno staff UIs refresh without F5
+    this.gobiernoSocketsService.emit({ type: 'multa:status_changed', multaId: id });
     return this.getMulta(id);
   }
 
@@ -254,6 +263,8 @@ export class HaciendaService {
       target: `multa ${existing.code}${dto.reason ? ` (${dto.reason})` : ''}`,
       dep: 'hacienda',
     });
+    // Emit socket event so gobierno staff UIs refresh without F5
+    this.gobiernoSocketsService.emit({ type: 'multa:status_changed', multaId: id });
     return this.getMulta(id);
   }
 

@@ -2,11 +2,14 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  Inject,
+  forwardRef,
 } from '@nestjs/common';
 import { ActorContext, assertActsAsSelf } from '@api/_utils/auth/actor';
 import { Logger } from 'nestjs-pino';
 import { PeopleRepository } from '../_shared/people.repository';
 import { AuditoriaService } from '../_shared/auditoria.service';
+import { GobiernoSocketsService } from '../_shared/gobierno-sockets.service';
 import { TreasuryService } from '../_shared/treasury.service';
 import { TransactionType } from '../../starbank/enums/transaction-type.enum';
 import { toPersonRef } from '../_shared/entities/person-ref.entity';
@@ -40,6 +43,8 @@ export class JusticiaService {
     private readonly peopleRepository: PeopleRepository,
     private readonly auditoriaService: AuditoriaService,
     private readonly treasuryService: TreasuryService,
+    @Inject(forwardRef(() => GobiernoSocketsService))
+    private readonly gobiernoSocketsService: GobiernoSocketsService,
   ) {}
 
   // ==================== EXPEDIENTES ====================
@@ -114,6 +119,8 @@ export class JusticiaService {
       target: `expediente ${e.code}`,
       dep: 'justicia',
     });
+    // Emit socket event so gobierno staff UIs refresh without F5
+    this.gobiernoSocketsService.emit({ type: 'expediente:created', expedienteId: e.id });
     return this.getExpediente(e.id);
   }
 

@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { WingullFacadeService } from '../../wingull/wingull.facade.service';
+import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 import { PeopleRepository } from '../_shared/people.repository';
 import { AuditoriaService } from '../_shared/auditoria.service';
 import { toPersonRef } from '../_shared/entities/person-ref.entity';
@@ -28,6 +29,7 @@ export class AdministracionService {
     private readonly logger: Logger,
     private readonly administracionRepository: AdministracionRepository,
     private readonly wingullFacadeService: WingullFacadeService,
+    private readonly notificationsService: NotificationsService,
     private readonly peopleRepository: PeopleRepository,
     private readonly auditoriaService: AuditoriaService,
   ) {}
@@ -134,6 +136,16 @@ export class AdministracionService {
       `[${dto.speaker}] ${dto.text}`,
     );
     await this.administracionRepository.recordMegafonia(dto);
+
+    // Reaches the bell. `create` with no userId is the existing broadcast path —
+    // it fans out a row per user, so an announcement survives for players who
+    // were not online to see the in-game chat line.
+    await this.notificationsService.create({
+      type: 'system',
+      title: `[${dto.speaker}]`,
+      body: dto.text,
+    });
+
     await this.auditoriaService.log({
       actorUuid: dto.byUuid,
       action: 'send',

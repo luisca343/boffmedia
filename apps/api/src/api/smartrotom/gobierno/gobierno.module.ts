@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
+import { SocketsModule } from '@api/_utils/sockets/sockets.module';
+import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
 import {
   STARBANK_ACCOUNT_REPOSITORY_TOKEN,
   STARBANK_TRANSACTION_REPOSITORY_TOKEN,
@@ -17,6 +19,7 @@ import { CountersRepository } from './_shared/counters.repository';
 import { CountersService } from './_shared/counters.service';
 import { StarbankHouseAccountService } from '../starbank/services/starbank-house-account.service';
 import { TreasuryService } from './_shared/treasury.service';
+import { GobiernoSocketsService } from './_shared/gobierno-sockets.service';
 
 // Urbanismo
 import { UrbanismoRepository } from './urbanismo/urbanismo.repository';
@@ -59,7 +62,7 @@ import { AdministracionService } from './administracion/administracion.service';
 import { AdministracionController } from './administracion/administracion.controller';
 
 @Module({
-  imports: [DrizzleModule, WingullModule],
+  imports: [DrizzleModule, WingullModule, SocketsModule, NotificationsModule],
   controllers: [
     UrbanismoController,
     SeguridadController,
@@ -92,6 +95,7 @@ import { AdministracionController } from './administracion/administracion.contro
     CountersService,
     StarbankHouseAccountService,
     TreasuryService,
+    GobiernoSocketsService,
 
     UrbanismoRepository,
     UrbanismoService,

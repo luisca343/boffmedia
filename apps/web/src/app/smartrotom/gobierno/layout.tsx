@@ -10,6 +10,7 @@ import { CommandPalette } from "./_components/chrome/CommandPalette"
 import { Dossier } from "./_components/chrome/Dossier"
 import { ToastHost } from "./_components/ui"
 import { useOfficer } from "./_hooks/useOfficer"
+import { useGobiernoSockets } from "./_hooks/useGobiernoSockets"
 import { useGobiernoPrefs } from "./_stores/useGobiernoPrefs"
 
 /**
@@ -25,6 +26,9 @@ export default function GobiernoLayout({ children }: { children: ReactNode }) {
   const { status, canOpen } = useOfficer()
   const accent = useGobiernoPrefs((s) => s.accent)
   const density = useGobiernoPrefs((s) => s.density)
+
+  // Listen to gobierno realtime updates
+  useGobiernoSockets()
 
   useEffect(() => {
     if (status !== "loading" && !canOpen) router.replace("/smartrotom")
