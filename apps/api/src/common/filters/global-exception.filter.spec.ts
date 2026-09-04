@@ -1,5 +1,13 @@
 import { ArgumentsHost, BadRequestException } from '@nestjs/common';
 import { GlobalExceptionFilter } from './global-exception.filter';
+import {
+  DomainError,
+  ValidationError,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+  ForbiddenError,
+} from '../errors/domain-error';
 import { fakeArgumentsHost } from '@/_testing/nest-context';
 
 /**
@@ -77,4 +85,67 @@ describe('GlobalExceptionFilter', () => {
     expect(() => filter.catch(err, host)).not.toThrow();
     expect(status).toHaveBeenCalledWith(500);
   });
+
+  describe('domain errors', () => {
+    it('maps each kind to its status and keeps the catalogued code', () => {
+      const cases: Array<[DomainError, number, string]> = [
+        [new ValidationError('ACTOR_NOT_SELF', 'bad input'), 400, 'BAD_REQUEST'],
+        [
+          new UnauthorizedError('AUTH_INVALID_CREDENTIALS', 'no'),
+          401,
+          'UNAUTHORIZED',
+        ],
+        [new ForbiddenError('ACTOR_NOT_SELF', 'nope'), 403, 'FORBIDDEN'],
+        [new NotFoundError('ACTOR_NOT_SELF', 'gone'), 404, 'NOT_FOUND'],
+        [new ConflictError('ACTOR_NOT_SELF', 'taken'), 409, 'CONFLICT'],
+      ];
+
+      for (const [err, expectedStatus, expectedLabel] of cases) {
+        status.mockClear();
+        json.mockClear();
+        filter.catch(err, host);
+        expect(status).toHaveBeenCalledWith(expectedStatus);
+        expect(json).toHaveBeenCalledWith(
+          expect.objectContaining({
+            statusCode: expectedStatus,
+            error: expectedLabel,
+            code: err.code,
+          }),
+        );
+      }
+    });
+
+    // The regression this guards: domain errors first shipped with their own
+    // @Catch filter, whose body had no `error`, `timestamp` or `path`. Migrating
+    // a service from HttpException to DomainError therefore dropped three fields
+    // from its responses, and no test noticed.
+    it('returns the same body shape as every other error', () => {
+      filter.catch(new BadRequestException('nope'), host);
+      const httpBody = json.mock.calls[0][0] as Record<string, unknown>;
+
+      json.mockClear();
+      status.mockClear();
+      filter.catch(new ValidationError('ACTOR_NOT_SELF', 'nope'), host);
+      const domainBody = json.mock.calls[0][0] as Record<string, unknown>;
+
+      expect(Object.keys(domainBody).sort()).toEqual(
+        Object.keys(httpBody).sort(),
+      );
+      expect(domainBody['path']).toBe(httpBody['path']);
+      expect(typeof domainBody['timestamp']).toBe('string');
+    });
+
+    it('falls back to the catalogued Spanish text as the user message', () => {
+      const err = new ConflictError('ACTOR_NOT_SELF', 'internal detail');
+      filter.catch(err, host);
+      expect(json).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: 'internal detail',
+          userMessage: err.userMessage(),
+        }),
+      );
+    });
+
+  });
+
 });

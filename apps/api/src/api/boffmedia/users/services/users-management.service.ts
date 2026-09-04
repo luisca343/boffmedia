@@ -1,11 +1,4 @@
-import {
-  HttpException,
-  Injectable,
-  BadRequestException,
-  ConflictException,
-  NotFoundException,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { PasswordService } from '@api/auth/password.service';
 import {
@@ -18,6 +11,14 @@ import { UpdateUserDto } from '../dto/update-user.dto';
 import { Logger } from 'nestjs-pino';
 import { DEFAULT_PROFILE_PICTURE } from '../users.constants';
 import { throwIfDatabaseUnavailable } from '@api/_utils/database-availability';
+import {
+  DomainError,
+  ValidationError,
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+} from '@/common/errors/domain-error';
+import { ApiErrorCode } from '@/common/errors/error-codes.generated';
 
 export interface UserCreationResult {
   user: BoffMediaUserSafe;
@@ -107,7 +108,8 @@ export class BoffMediaUsersManagementService {
     // Validate input
     const validation = this.validateUserData(userData);
     if (!validation.isValid) {
-      throw new BadRequestException(
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
         `Invalid user data: ${validation.errors.join(', ')}`,
       );
     }
@@ -136,7 +138,8 @@ export class BoffMediaUsersManagementService {
         ) {
           conflicts.push('uuid');
         }
-        throw new ConflictException(
+        throw new ConflictError(
+          ApiErrorCode.ACTOR_NOT_SELF,
           `User already exists with: ${conflicts.join(', ')}`,
         );
       }
@@ -169,17 +172,11 @@ export class BoffMediaUsersManagementService {
 
       return newUser;
     } catch (error: any) {
-      if (
-        error instanceof BadRequestException ||
-        error instanceof ConflictException
-      ) {
+      if (error instanceof ValidationError || error instanceof ConflictError) {
         throw error;
       }
       this.logger.error('Failed to create user:', error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`User creation failed: ${error.message}`);
+      throw error;
     }
   }
 
@@ -203,10 +200,8 @@ export class BoffMediaUsersManagementService {
       return { user: newUser, isNew: true };
     } catch (error: any) {
       this.logger.error('Error in findOrCreateUser:', error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to find or create user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -217,90 +212,93 @@ export class BoffMediaUsersManagementService {
       return await this.usersRepository.findAllUsers();
     } catch (error: any) {
       this.logger.error('Failed to get all users:', error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve users: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
   async getUserById(id: number): Promise<BoffMediaUserSafe | null> {
     if (!id || id <= 0) {
-      throw new BadRequestException('Valid ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid ID is required',
+      );
     }
 
     try {
       return await this.usersRepository.findUserById(id);
     } catch (error: any) {
       this.logger.error(`Failed to get user by ID ${id}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
   async getUserByUsername(username: string): Promise<BoffMediaUserSafe | null> {
     if (!username || username.trim() === '') {
-      throw new BadRequestException('Username is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Username is required',
+      );
     }
 
     try {
       return await this.usersRepository.findUserByUsername(username);
     } catch (error: any) {
       this.logger.error(`Failed to get user by username ${username}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
   async getUserByEmail(email: string): Promise<BoffMediaUserSafe | null> {
     if (!email || email.trim() === '') {
-      throw new BadRequestException('Email is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Email is required',
+      );
     }
 
     try {
       return await this.usersRepository.findUserByEmail(email);
     } catch (error: any) {
       this.logger.error(`Failed to get user by email ${email}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
   async getUserByUuid(uuid: string): Promise<BoffMediaUserSafe | null> {
     if (!uuid || uuid.trim() === '') {
-      throw new BadRequestException('UUID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'UUID is required',
+      );
     }
 
     try {
       return await this.usersRepository.findUserByUuid(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to get user by UUID ${uuid}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
   async getUserByGoogleId(googleId: string): Promise<BoffMediaUserSafe | null> {
     if (!googleId || googleId.trim() === '') {
-      throw new BadRequestException('Google ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Google ID is required',
+      );
     }
 
     try {
       return await this.usersRepository.findUserByGoogleId(googleId);
     } catch (error: any) {
       this.logger.error(`Failed to get user by Google ID ${googleId}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -308,7 +306,10 @@ export class BoffMediaUsersManagementService {
     discordId: string,
   ): Promise<BoffMediaUserSafe | null> {
     if (!discordId || discordId.trim() === '') {
-      throw new BadRequestException('Discord ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Discord ID is required',
+      );
     }
 
     try {
@@ -318,26 +319,25 @@ export class BoffMediaUsersManagementService {
         `Failed to get user by Discord ID ${discordId}:`,
         error,
       );
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
   async getUserByTwitchId(twitchId: string): Promise<BoffMediaUserSafe | null> {
     if (!twitchId || twitchId.trim() === '') {
-      throw new BadRequestException('Twitch ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Twitch ID is required',
+      );
     }
 
     try {
       return await this.usersRepository.findUserByTwitchId(twitchId);
     } catch (error: any) {
       this.logger.error(`Failed to get user by Twitch ID ${twitchId}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -346,7 +346,10 @@ export class BoffMediaUsersManagementService {
     username: string,
   ): Promise<FullUserData | null> {
     if (!username || username.trim() === '') {
-      throw new BadRequestException('Username is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Username is required',
+      );
     }
 
     try {
@@ -358,10 +361,8 @@ export class BoffMediaUsersManagementService {
         `Failed to get full user by username ${username}:`,
         error,
       );
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve full user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -369,7 +370,10 @@ export class BoffMediaUsersManagementService {
     username: string,
   ): Promise<FullUserDataSafe | null> {
     if (!username || username.trim() === '') {
-      throw new BadRequestException('Username is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Username is required',
+      );
     }
 
     try {
@@ -379,42 +383,42 @@ export class BoffMediaUsersManagementService {
         `Failed to get full user by username ${username}:`,
         error,
       );
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve full user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
   async getFullUserByEmail(email: string): Promise<FullUserDataSafe | null> {
     if (!email || email.trim() === '') {
-      throw new BadRequestException('Email is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Email is required',
+      );
     }
 
     try {
       return await this.usersRepository.findFullUserByEmail(email);
     } catch (error: any) {
       this.logger.error(`Failed to get full user by email ${email}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve full user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
   async getFullUserByUuid(uuid: string): Promise<FullUserDataSafe | null> {
     if (!uuid || uuid.trim() === '') {
-      throw new BadRequestException('UUID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'UUID is required',
+      );
     }
 
     try {
       return await this.usersRepository.findFullUserByUuid(uuid);
     } catch (error: any) {
       this.logger.error(`Failed to get full user by UUID ${uuid}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to retrieve full user: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -425,16 +429,25 @@ export class BoffMediaUsersManagementService {
     updateData: UpdateUserDto,
   ): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
-      throw new BadRequestException('Valid ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid ID is required',
+      );
     }
 
     // Validate update data
     if (updateData.username && !this.isValidUsername(updateData.username)) {
-      throw new BadRequestException('Invalid username format');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Invalid username format',
+      );
     }
 
     if (updateData.email && !this.isValidEmail(updateData.email)) {
-      throw new BadRequestException('Invalid email format');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Invalid email format',
+      );
     }
 
     try {
@@ -445,10 +458,8 @@ export class BoffMediaUsersManagementService {
       return await this.usersRepository.updateUser(id, updateData);
     } catch (error: any) {
       this.logger.error(`Failed to update user ${id}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`User update failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -463,19 +474,26 @@ export class BoffMediaUsersManagementService {
     newPassword: string,
   ): Promise<{ success: boolean }> {
     if (!id || id <= 0) {
-      throw new BadRequestException('Valid ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid ID is required',
+      );
     }
 
     const user = await this.usersRepository.findUserById(id);
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundError(
+        ApiErrorCode.ACTOR_NOT_SELF,
+        'User not found',
+      );
     }
 
     const full = await this.usersRepository.findFullUserByUsernameWithPassword(
       user.username,
     );
     if (!full?.boffmedia_users.password) {
-      throw new BadRequestException(
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
         'This account has no password (linked via an OAuth provider)',
       );
     }
@@ -485,12 +503,16 @@ export class BoffMediaUsersManagementService {
       full.boffmedia_users.password,
     );
     if (!currentValid) {
-      throw new UnauthorizedException('Current password is incorrect');
+      throw new UnauthorizedError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Current password is incorrect',
+      );
     }
 
     const validation = this.passwordService.validatePassword(newPassword);
     if (!validation.isValid) {
-      throw new BadRequestException(
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
         `Password validation failed: ${validation.errors.join(', ')}`,
       );
     }
@@ -511,16 +533,23 @@ export class BoffMediaUsersManagementService {
    */
   async linkSteam(id: number, steamId: string): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
-      throw new BadRequestException('Valid ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid ID is required',
+      );
     }
     if (!steamId || !/^\d{17}$/.test(steamId)) {
-      throw new BadRequestException('A valid SteamID64 is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'A valid SteamID64 is required',
+      );
     }
 
     // Refuse to steal a SteamID already linked to a different account.
     const owner = await this.usersRepository.findUserBySteamId(steamId);
     if (owner && owner.id !== id) {
-      throw new ConflictException(
+      throw new ConflictError(
+        ApiErrorCode.ACTOR_NOT_SELF,
         'This Steam account is already linked to another user',
       );
     }
@@ -531,10 +560,8 @@ export class BoffMediaUsersManagementService {
       } as UpdateUserDto);
     } catch (error: any) {
       this.logger.error(`Failed to link Steam for user ${id}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Steam link failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -545,16 +572,23 @@ export class BoffMediaUsersManagementService {
    */
   async linkDiscord(id: number, discordId: string): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
-      throw new BadRequestException('Valid ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid ID is required',
+      );
     }
     if (!discordId || !/^\d{5,32}$/.test(discordId)) {
-      throw new BadRequestException('A valid Discord ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'A valid Discord ID is required',
+      );
     }
 
     // Refuse to steal a Discord account already linked to someone else.
     const owner = await this.usersRepository.findUserByDiscordId(discordId);
     if (owner && owner.id !== id) {
-      throw new ConflictException(
+      throw new ConflictError(
+        ApiErrorCode.ACTOR_NOT_SELF,
         'This Discord account is already linked to another user',
       );
     }
@@ -565,10 +599,8 @@ export class BoffMediaUsersManagementService {
       } as UpdateUserDto);
     } catch (error: any) {
       this.logger.error(`Failed to link Discord for user ${id}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Discord link failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -579,16 +611,23 @@ export class BoffMediaUsersManagementService {
    */
   async linkGoogle(id: number, googleId: string): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
-      throw new BadRequestException('Valid ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid ID is required',
+      );
     }
     if (!googleId || googleId.trim() === '' || googleId.length > 255) {
-      throw new BadRequestException('A valid Google ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'A valid Google ID is required',
+      );
     }
 
     // Refuse to steal a Google account already linked to someone else.
     const owner = await this.usersRepository.findUserByGoogleId(googleId);
     if (owner && owner.id !== id) {
-      throw new ConflictException(
+      throw new ConflictError(
+        ApiErrorCode.ACTOR_NOT_SELF,
         'This Google account is already linked to another user',
       );
     }
@@ -599,10 +638,8 @@ export class BoffMediaUsersManagementService {
       } as UpdateUserDto);
     } catch (error: any) {
       this.logger.error(`Failed to link Google for user ${id}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Google link failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -613,16 +650,23 @@ export class BoffMediaUsersManagementService {
    */
   async linkTwitch(id: number, twitchId: string): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
-      throw new BadRequestException('Valid ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid ID is required',
+      );
     }
     if (!twitchId || !/^\d{1,20}$/.test(twitchId)) {
-      throw new BadRequestException('A valid Twitch ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'A valid Twitch ID is required',
+      );
     }
 
     // Refuse to steal a Twitch account already linked to someone else.
     const owner = await this.usersRepository.findUserByTwitchId(twitchId);
     if (owner && owner.id !== id) {
-      throw new ConflictException(
+      throw new ConflictError(
+        ApiErrorCode.ACTOR_NOT_SELF,
         'This Twitch account is already linked to another user',
       );
     }
@@ -633,10 +677,8 @@ export class BoffMediaUsersManagementService {
       } as UpdateUserDto);
     } catch (error: any) {
       this.logger.error(`Failed to link Twitch for user ${id}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Twitch link failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -649,7 +691,10 @@ export class BoffMediaUsersManagementService {
     provider: 'google' | 'discord' | 'twitch' | 'steam',
   ): Promise<BoffMediaUserSafe> {
     if (!id || id <= 0) {
-      throw new BadRequestException('Valid ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid ID is required',
+      );
     }
 
     const column = {
@@ -665,7 +710,10 @@ export class BoffMediaUsersManagementService {
       | undefined;
 
     if (!column) {
-      throw new BadRequestException(`Unsupported provider: ${provider}`);
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        `Unsupported provider: ${provider}`,
+      );
     }
 
     try {
@@ -674,10 +722,8 @@ export class BoffMediaUsersManagementService {
       } as UpdateUserDto);
     } catch (error: any) {
       this.logger.error(`Failed to unlink ${provider} for user ${id}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Provider unlink failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -685,7 +731,10 @@ export class BoffMediaUsersManagementService {
 
   async deleteUser(id: number): Promise<{ success: boolean; message: string }> {
     if (!id || id <= 0) {
-      throw new BadRequestException('Valid ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid ID is required',
+      );
     }
 
     try {
@@ -713,7 +762,10 @@ export class BoffMediaUsersManagementService {
     password: string,
   ): Promise<SessionUser | null> {
     if (!username || !password) {
-      throw new BadRequestException('Username and password are required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Username and password are required',
+      );
     }
 
     try {
@@ -808,10 +860,8 @@ export class BoffMediaUsersManagementService {
       return this.createSessionUser(fullUser, roles);
     } catch (error: any) {
       this.logger.error('Failed to create user from Google:', error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Google authentication failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -880,10 +930,8 @@ export class BoffMediaUsersManagementService {
       return this.createSessionUser(fullUser, roles);
     } catch (error: any) {
       this.logger.error('Failed to create user from Discord:', error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Discord authentication failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -952,10 +1000,8 @@ export class BoffMediaUsersManagementService {
       return this.createSessionUser(fullUser, roles);
     } catch (error: any) {
       this.logger.error('Failed to create user from Twitch:', error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Twitch authentication failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -975,10 +1021,8 @@ export class BoffMediaUsersManagementService {
       return await this.createUser(userData);
     } catch (error: any) {
       this.logger.error('Failed to create Minecraft user:', error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Minecraft user creation failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -1001,7 +1045,10 @@ export class BoffMediaUsersManagementService {
         linkData.password,
       );
       if (!sessionUser) {
-        throw new BadRequestException('Invalid credentials');
+        throw new ValidationError(
+          ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+          'Invalid credentials',
+        );
       }
 
       // Find the user and update with Minecraft UUID
@@ -1016,10 +1063,8 @@ export class BoffMediaUsersManagementService {
       });
     } catch (error: any) {
       this.logger.error('Failed to link Minecraft account:', error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Minecraft account linking failed: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 
@@ -1027,17 +1072,18 @@ export class BoffMediaUsersManagementService {
 
   async getUserRoles(userId: number): Promise<string[]> {
     if (!userId || userId <= 0) {
-      throw new BadRequestException('Valid user ID is required');
+      throw new ValidationError(
+        ApiErrorCode.AUTH_INVALID_CREDENTIALS,
+        'Valid user ID is required',
+      );
     }
 
     try {
       return await this.usersRepository.getUserRoles(userId);
     } catch (error: any) {
       this.logger.error(`Failed to get user roles for ${userId}:`, error);
-      // A typed HTTP error (404/403/409…) has to reach the client as itself;
-      // wrapping it in a bare Error turned all of them into 500s.
-      if (error instanceof HttpException) throw error;
-      throw new Error(`Failed to get user roles: ${error.message}`);
+      if (error instanceof DomainError) throw error;
+      throw error;
     }
   }
 

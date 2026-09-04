@@ -8,6 +8,7 @@ import {
 import { Request, Response } from 'express';
 import { Logger } from 'nestjs-pino';
 import { captureApiException } from '../observability/sentry';
+import { DomainError } from '../errors/domain-error';
 
 interface ErrorResponse {
   statusCode: number;
@@ -36,6 +37,22 @@ params: ...` and which carries no
  * 500 Internal Server Error instead of 409 Conflict.
  */
 const MAX_CAUSE_DEPTH = 5;
+
+/**
+ * `error` is the coarse, stable label every error body has carried since before
+ * domain errors existed. Domain errors are handled HERE rather than in a filter
+ * of their own: a second @Catch(DomainError) filter produced a second, shorter
+ * body shape (no `error`, no `timestamp`, no `path`), so migrating a service
+ * from HttpException to DomainError silently changed its response. One filter,
+ * one contract.
+ */
+const DOMAIN_ERROR_LABELS: Record<number, string> = {
+  400: 'BAD_REQUEST',
+  401: 'UNAUTHORIZED',
+  403: 'FORBIDDEN',
+  404: 'NOT_FOUND',
+  409: 'CONFLICT',
+};
 
 function isDuplicateEntryError(err: unknown): boolean {
   let current = err;
@@ -136,6 +153,18 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   ): ErrorResponse {
     const timestamp = new Date().toISOString();
     const path = request.url;
+
+    if (exception instanceof DomainError) {
+      return {
+        statusCode: exception.statusCode,
+        error: DOMAIN_ERROR_LABELS[exception.statusCode] ?? 'DOMAIN_ERROR',
+        message: exception.message,
+        userMessage: exception.userMessage(),
+        code: exception.code,
+        timestamp,
+        path,
+      };
+    }
 
     if (isDuplicateEntryError(exception)) {
       return {
