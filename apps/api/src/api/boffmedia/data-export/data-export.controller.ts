@@ -27,6 +27,7 @@ import type { DataExport } from '@/_db/schema/BoffMediaDataExports';
 
 import { DataExportService } from './data-export.service';
 import { DataExportStatusEntity } from './entities/data-export-status.entity';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 /**
  * "Download everything you hold on me" (GDPR art. 15 / 20).
@@ -42,6 +43,8 @@ import { DataExportStatusEntity } from './entities/data-export-status.entity';
 @ApiTags('BoffMedia | Data export')
 @ApiBearerAuth('JWT')
 @UseGuards(JwtAuthGuard, FullSessionGuard)
+// A GDPR export is an account-level action: website sign-in only.
+@Clients(CLIENT.WEB)
 @Controller('users/me/data-export')
 export class DataExportController {
   constructor(private readonly service: DataExportService) {}

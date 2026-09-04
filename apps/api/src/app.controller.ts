@@ -10,6 +10,7 @@ import { AppService } from './app.service';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { SkipEnvelope } from './common/decorators/skip-envelope.decorator';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 /**
  * Auth here is per route and must stay that way. JwtAuthGuard resolves
@@ -124,6 +125,7 @@ export class AppController {
    */
   @Public()
   @UseGuards(DesktopOrUserAuthGuard, RolesGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   @Get('steamkeys')

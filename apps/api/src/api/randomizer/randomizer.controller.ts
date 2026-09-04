@@ -46,10 +46,13 @@ import {
   CreateRomDto,
   RomResponseDto,
 } from './dto/randomizer.dto';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 // Admin panel for randomizer configs, assignments, and presets.
 // All routes require JWT + BOFF_ADMIN role.
 @ApiTags('Randomizer | Admin')
+// Randomizer administration is web-only.
+@Clients(CLIENT.WEB)
 @Controller('randomizer/admin')
 @UseGuards(JwtAuthGuard, FullSessionGuard, RolesGuard)
 @Roles(USER_ROLES.BOFF_ADMIN)

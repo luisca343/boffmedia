@@ -5,6 +5,10 @@
       "es": "No puedes actuar en nombre de otro jugador.",
       "where": "api/_utils/auth/actor.ts"
     },
+    "AUTH_CLIENT_NOT_ALLOWED": {
+      "es": "Esta acción no está disponible desde esta aplicación.",
+      "where": "api/_utils/guards/clients.guard.ts"
+    },
     "AUTH_EMAIL_NOT_VERIFIED": {
       "es": "Verifica tu correo antes de continuar. Te hemos enviado un enlace al registrarte.",
       "where": "api/packs/desktop-device.service.ts"

@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { ClientsGuard } from '@api/_utils/guards/clients.guard';
 import { GlobalThrottlerGuard } from '@api/_utils/guards/global-throttler.guard';
 import { RetentionModule } from '@api/retention/retention.module';
 import { ResponseInterceptor } from './api/_utils/interceptors/response.interceptor';
@@ -194,6 +195,13 @@ import { publicPath } from '@/config/paths';
     {
       provide: APP_GUARD,
       useClass: JwtAuthGuard,
+    },
+    // Which CLIENT may call which route (`@Clients()`). After JwtAuthGuard so a
+    // bad credential still answers 401 from the usual place — this one only
+    // turns away a valid token held by the wrong client, which is a 403.
+    {
+      provide: APP_GUARD,
+      useClass: ClientsGuard,
     },
     // Registered AFTER JwtAuthGuard on purpose: APP_GUARDs run in registration
     // order, and this one keys on `req.user`, which the guard above populates.

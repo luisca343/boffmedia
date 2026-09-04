@@ -47,6 +47,7 @@ import {
 } from './entities/packs.entity';
 import { DesktopDeviceService } from './desktop-device.service';
 import { env } from '@/config/env';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 // The launcher's entire surface. Identity is a BOFFMEDIA account, established
 // by the device-authorization flow below — packs, events, entitlement and
@@ -57,6 +58,10 @@ import { env } from '@/config/env';
 // the global JwtAuthGuard (a launcher token is not a website session), and the
 // DesktopAuthGuard below does the real authentication itself.
 @ApiTags('Packs | Launcher')
+// The launcher API: only the desktop app holds a session that reaches it.
+// The three unauthenticated routes below (device grant, poll, public pack page)
+// carry no token at all, so the client check never fires on them.
+@Clients(CLIENT.DESKTOP)
 @Controller('packs/launcher')
 export class LauncherController {
   constructor(

@@ -35,6 +35,7 @@ import { BattlesimTicketDto } from './dto/ws-ticket-response.dto';
 import { BattlesimReplayDto } from './dto/replay-response.dto';
 import { BattlesimTeamDto } from './dto/team-response.dto';
 import { BattlesimPageDto } from './dto/paginated-response.dto';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 /**
  * Battlesim endpoints: replay and team storage for local and PvP battles.
@@ -57,6 +58,7 @@ export class BattlesimController {
    */
   @Post('ws-ticket')
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @Throttle({ default: { limit: 10, ttl: 60000 } })
   @ApiBearerAuth('JWT')
   @ApiOperation({
@@ -88,6 +90,7 @@ export class BattlesimController {
    */
   @Get('replays')
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: "List caller's replays",
@@ -131,6 +134,7 @@ export class BattlesimController {
    */
   @Put('replays/:clientId')
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiBearerAuth('JWT')
@@ -224,6 +228,7 @@ export class BattlesimController {
    */
   @Get('teams')
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: "List caller's teams",
@@ -245,6 +250,7 @@ export class BattlesimController {
    */
   @Put('teams/:clientId')
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @HttpCode(HttpStatus.OK)
   @Throttle({ default: { limit: 30, ttl: 60000 } })
   @ApiBearerAuth('JWT')
@@ -295,6 +301,7 @@ export class BattlesimController {
    */
   @Delete('teams/:clientId')
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiParam({

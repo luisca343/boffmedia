@@ -63,12 +63,16 @@ import {
   PackVersionEntity,
   ResolvedFileEntity,
 } from './entities/packs.entity';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 // The dashboard's surface: pack authoring lives in the web app, not the
 // launcher. Every route is admin-only and carries its own
 // @UseGuards(JwtAuthGuard, RolesGuard); there is no class-level @Public() here,
 // which is what keeps the guards effective.
 @ApiTags('Packs | Admin')
+// Pack authoring lives in the web dashboard (packs/desktop is the app's narrow
+// publishing subset).
+@Clients(CLIENT.WEB)
 @Controller('packs/admin')
 @UseGuards(JwtAuthGuard, FullSessionGuard, RolesGuard)
 @Roles(USER_ROLES.BOFF_ADMIN)

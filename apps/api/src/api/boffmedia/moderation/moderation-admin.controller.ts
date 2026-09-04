@@ -33,6 +33,7 @@ import {
   ModerationItemDetailEntity,
   ModerationQueuePageEntity,
 } from './entities/moderation.entity';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 /**
  * The report queue.
@@ -44,6 +45,9 @@ import {
  * than the problem it solves.
  */
 @ApiTags('BoffMedia | Moderation Admin')
+// Moderation decisions are taken in the web dashboard. FullSessionGuard already
+// refuses an ingame token; this states the same rule as a declaration.
+@Clients(CLIENT.WEB)
 @Controller('moderation/admin')
 @UseGuards(JwtAuthGuard, FullSessionGuard, RolesGuard)
 @Roles(USER_ROLES.BOFF_ADMIN)

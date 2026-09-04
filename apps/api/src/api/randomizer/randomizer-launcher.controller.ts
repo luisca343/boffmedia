@@ -26,6 +26,7 @@ import { RandomizerPackLinkRepository } from '@api/_repositories/randomizer/pack
 import { AssignmentClaimedDto } from './dto/randomizer.dto';
 import { RandomizerRepository } from './repositories/randomizer.repository';
 import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 // Launcher endpoints for randomizer claim and ROM patching.
 // Each route is @Public() (per-route, never on the class — a class-level
@@ -34,6 +35,8 @@ import { RANDOMIZER_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces
 // @Public the global website guard 401s every launcher call before this guard
 // runs, which silently kills all randomizer minting.
 @ApiTags('Randomizer | Launcher')
+// Randomizer release metadata the app fetches. Desktop sessions only.
+@Clients(CLIENT.DESKTOP)
 @Controller('randomizer/launcher')
 @UseGuards(DesktopAuthGuard)
 @ApiBearerAuth('Launcher')

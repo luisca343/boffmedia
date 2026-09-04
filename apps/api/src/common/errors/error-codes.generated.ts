@@ -5,6 +5,7 @@
 /** Stable, machine-readable codes for errors that surface to a user. */
 export const ApiErrorCode = {
   ACTOR_NOT_SELF: 'ACTOR_NOT_SELF',
+  AUTH_CLIENT_NOT_ALLOWED: 'AUTH_CLIENT_NOT_ALLOWED',
   AUTH_EMAIL_NOT_VERIFIED: 'AUTH_EMAIL_NOT_VERIFIED',
   AUTH_INVALID_CREDENTIALS: 'AUTH_INVALID_CREDENTIALS',
   AUTH_REFRESH_INVALID: 'AUTH_REFRESH_INVALID',
@@ -74,6 +75,8 @@ export type ApiErrorCode = (typeof ApiErrorCode)[keyof typeof ApiErrorCode];
 /** Spanish fallback text shipped as `userMessage` alongside each code. */
 export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   ACTOR_NOT_SELF: 'No puedes actuar en nombre de otro jugador.',
+  AUTH_CLIENT_NOT_ALLOWED:
+    'Esta acción no está disponible desde esta aplicación.',
   AUTH_EMAIL_NOT_VERIFIED:
     'Verifica tu correo antes de continuar. Te hemos enviado un enlace al registrarte.',
   AUTH_INVALID_CREDENTIALS: 'Usuario o contraseña incorrectos.',

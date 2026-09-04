@@ -23,6 +23,7 @@ import { DesktopDeviceService } from './desktop-device.service';
 import { PacksAuthService } from './packs-auth.service';
 import { DeviceRequestEntity } from './entities/packs.entity';
 import { DeviceDecisionDto, DeviceLookupDto } from './dto/packs.dto';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 /**
  * The website half of the launcher's device-authorization flow. The player is
@@ -34,6 +35,10 @@ import { DeviceDecisionDto, DeviceLookupDto } from './dto/packs.dto';
  * session for the account.
  */
 @ApiTags('Desktop | Authorization')
+// The path says desktop, the CALLER is the website: these are the routes the
+// /app/autorizar page uses to approve or deny an app device code. The app itself
+// polls packs/launcher/auth/device/poll instead.
+@Clients(CLIENT.WEB)
 @Controller('desktop/auth')
 @UseGuards(JwtAuthGuard)
 @ApiBearerAuth('JWT')

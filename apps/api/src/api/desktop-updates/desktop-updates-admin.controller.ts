@@ -30,12 +30,15 @@ import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { DesktopUpdatesService } from './desktop-updates.service';
 import { PublishReleaseQueryDto } from './dto/desktop-updates.dto';
 import { DesktopReleaseEntity } from './entities/desktop-updates.entity';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 /**
  * Publicación de versiones del launcher. Igual que PacksController: sin
  * @Public() de clase, guards por clase efectivos, solo BOFF_ADMIN.
  */
 @ApiTags('Desktop | Admin')
+// Publishing a desktop release is done FROM the website, never from the app.
+@Clients(CLIENT.WEB)
 @Controller('desktop/admin/releases')
 @UseGuards(JwtAuthGuard, FullSessionGuard, RolesGuard)
 @Roles(USER_ROLES.BOFF_ADMIN)

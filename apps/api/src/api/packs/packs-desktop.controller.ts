@@ -42,6 +42,7 @@ import {
 } from '../boffmedia/util/upload/safe-path';
 import { PacksDownloadsService } from './packs-downloads.service';
 import { PacksService } from './packs.service';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 /**
  * Desktop image storage for pack uploads (icons and gallery images).
@@ -97,6 +98,9 @@ function desktopImageStorage() {
  * `app` is what a user calls the product.
  */
 @ApiTags('Packs | Desktop')
+// Pack publishing from inside the app — desktop sessions only (DesktopAdminGuard
+// additionally requires the account to be a Boffmedia admin).
+@Clients(CLIENT.DESKTOP)
 @Controller('packs/desktop')
 @Public()
 @UseGuards(DesktopAdminGuard)

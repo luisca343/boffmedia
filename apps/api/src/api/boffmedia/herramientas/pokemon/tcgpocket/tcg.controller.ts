@@ -40,6 +40,7 @@ import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { TcgSyncRequestDto, TcgSyncStatus } from './dto/tcg-sync.dto';
 import { DesktopOrUserAuthGuard } from '@api/packs/guards/desktop-or-user-auth.guard';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 @ApiTags('BoffMedia 🛠 | Pokemon TCG Pocket')
 @Public()
@@ -595,6 +596,7 @@ export class TcgController {
   }
 
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @Post('users/cards')
   @ApiOperation({ summary: 'Add card to user collection' })
   @ApiResponse({
@@ -619,6 +621,7 @@ export class TcgController {
   }
 
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @Put('users/:userId/cards/:cardId')
   @ApiOperation({
     summary: 'Set user card quantity (upsert)',
@@ -652,6 +655,7 @@ export class TcgController {
   }
 
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @Delete('users/:userId/cards/:cardId')
   @ApiOperation({ summary: 'Remove card from user collection' })
   @ApiParam({ name: 'userId', description: 'User ID', example: 'user123' })
@@ -674,6 +678,7 @@ export class TcgController {
   }
 
   @UseGuards(DesktopOrUserAuthGuard)
+  @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @Get('users/:userId/cards/history')
   @ApiOperation({ summary: 'Get user card history' })
   @ApiParam({ name: 'userId', description: 'User ID (ignored, uses authenticated user)', example: 'user123' })
