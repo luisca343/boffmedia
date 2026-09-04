@@ -31,11 +31,36 @@ const COND_ICON: Record<string, IconName> = {
   trickroom: 'clock', magicroom: 'cube', wonderroom: 'cube', gravity: 'target',
 };
 
+/**
+ * `field.weatherState.id` / `field.terrainState.id` -> the catalog's id.
+ *
+ * The catalog is keyed by the MOVE that sets the condition (`raindance`,
+ * `electricterrain`), which is what a protocol line names. @pkmn/client's
+ * `field` does not: it holds the CONDITION's own id (`rain`, `electric`), so
+ * every weather and terrain chip fell through `resolveCondLabel` and printed
+ * the raw id with no tone and the fallback icon — "RAIN" instead of "Lluvia".
+ * Additive, because the same resolver is fed protocol ids by `fxLabels`
+ * (BattleCanvas): both spellings must answer.
+ */
+const STATE_ALIAS: Record<string, string> = {
+  sun: 'sunnyday', harshsunshine: 'desolateland',
+  rain: 'raindance', heavyrain: 'primordialsea',
+  sand: 'sandstorm', strongwinds: 'deltastream',
+  electric: 'electricterrain', grassy: 'grassyterrain',
+  misty: 'mistyterrain', psychic: 'psychicterrain',
+};
+
+/** The catalog id for a raw field id, whichever spelling it arrived in. */
+export function condId(rawId: string): string {
+  const id = toId(rawId);
+  return STATE_ALIAS[id] ?? id;
+}
+
 type Translate = (key: string, values?: Record<string, string | number>) => string;
 
 /** Label for a weather/terrain/room/side id, or `null` when the catalog has none. */
 export function resolveCondLabel(t: Translate, rawId: string): string | null {
-  const id = toId(rawId);
+  const id = condId(rawId);
   if (COND_IDS.has(id)) return t(`field.cond.${id}`);
   if (SIDE_IDS.has(id)) return t(`battle.side.${id}`);
   return null;
@@ -57,13 +82,16 @@ export function buildFieldChips(battle: Battle, pov: 0 | 1, t: Translate): Field
 
   const pushState = (st: { id?: string; minDuration?: number; maxDuration?: number } | undefined) => {
     if (!st?.id) return;
-    chips.push({ key: st.id, label: resolveCondLabel(t, st.id) ?? st.id, turns: turnsOf(st), tone: COND_TONE[st.id], icon: COND_ICON[st.id] ?? 'sparkles' });
+    // Tone and icon are looked up under the SAME normalised id as the label,
+    // or a chip the catalog can name still draws grey with the fallback icon.
+    const id = condId(st.id);
+    chips.push({ key: st.id, label: resolveCondLabel(t, st.id) ?? st.id, turns: turnsOf(st), tone: COND_TONE[id], icon: COND_ICON[id] ?? 'sparkles' });
   };
 
   pushState(battle.field.weatherState as any);
   pushState(battle.field.terrainState as any);
   for (const [id, pw] of Object.entries(battle.field.pseudoWeather)) {
-    chips.push({ key: id, label: resolveCondLabel(t, id) ?? id, turns: turnsOf(pw as any), tone: COND_TONE[id] ?? 'var(--info)', icon: COND_ICON[id] ?? 'cube' });
+    chips.push({ key: id, label: resolveCondLabel(t, id) ?? id, turns: turnsOf(pw as any), tone: COND_TONE[condId(id)] ?? 'var(--info)', icon: COND_ICON[condId(id)] ?? 'cube' });
   }
 
   const allySide = pov === 0 ? battle.p1 : battle.p2;

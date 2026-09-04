@@ -5,28 +5,29 @@ import {
   isRandomFormat,
   unpackTeam,
   type BattleEndResult,
+  type ChoiceResult,
   type TimerConfig,
   type TimerState,
 } from '@boffmedia/battle-core';
-import { Protocol } from '@pkmn/protocol';
 
 /**
  * One PvP battle.
  *
- * Two things changed here in M2, and both are the point of the milestone:
+ * THE ROOM IS THE TRANSCRIPT. Every viewer — p1, p2, a spectator — has its own
+ * ordered view of the battle coming out of the simulator, and this class keeps
+ * each of those views as an array whose INDEX IS THE SEQUENCE NUMBER. That one
+ * property is what makes `resume` and `spectate` idempotent: a socket that
+ * comes back at any moment is handed the whole array plus the seq of its last
+ * entry, replays it, and is by construction in the same state as a socket that
+ * never left. It is also why there is no longer a private `request` event —
+ * `|request|` lines live in the view log like every other line, so a resync
+ * re-prompts for free instead of depending on a separately-stored "last
+ * request" that the old code forgot to re-send on spectate.
  *
- * 1. THE SIMULATOR IS NOW SHARED. The battle plumbing this file used to own is
- *    `@boffmedia/battle-core`'s `BattleEngine`, consumed here as compiled CJS
- *    and by the browser as ESM. One implementation means a PvP battle and a
- *    local AI battle cannot diverge in their rules, their protocol or their
- *    replay format — which they would have, slowly, as two copies.
- *
- * 2. AI MODE IS GONE (D3). The server used to run a `RandomPlayerAI` on p2 so a
- *    single player could battle over a socket. That is now done in a Web Worker
- *    in the player's own page: it works offline, it costs the server nothing,
- *    and it removes the only reason an unauthenticated socket ever needed to
- *    create a room. What is left here is PvP, which is exactly the case that
- *    genuinely needs a server.
+ * The simulator itself is `@boffmedia/battle-core`'s `BattleEngine`, consumed
+ * here as compiled CJS and by the browser as ESM. One implementation means a
+ * PvP battle and a local AI battle cannot diverge in their rules, their
+ * protocol or their replay format.
  *
  * A side is a Boffmedia account, never a display name. `rotom_replays` stored
  * names in `side1`/`side2`, so two players called the same thing were the same
@@ -34,6 +35,15 @@ import { Protocol } from '@pkmn/protocol';
  */
 
 export type BattleRoomStatus = 'waiting' | 'active' | 'finished';
+
+/** The three fan-out audiences. Also the socket.io room suffixes. */
+export type RoomViewer = 'p1' | 'p2' | 'spec';
+
+export const ROOM_VIEWERS: readonly RoomViewer[] = [
+  'p1',
+  'p2',
+  'spec',
+] as const;
 
 /** Who is playing a side. */
 export interface RoomPlayer {
@@ -43,11 +53,21 @@ export interface RoomPlayer {
   team?: string;
 }
 
+/** What a resuming or spectating socket needs to be caught up. */
+export interface ViewSnapshot {
+  /** Every line this viewer has been sent, index === seq. */
+  replay: string[];
+  /** Seq of the last line in `replay`, or -1 when nothing has been sent. */
+  seq: number;
+}
+
 export interface BattleRoomCallbacks {
-  onProtocol: (line: string) => void;
-  onRequestP1: (request: Protocol.Request) => void;
-  onRequestP2: (request: Protocol.Request) => void;
-  onBattleEnd: (result: BattleEndResult) => void;
+  /** One call per line, per viewer, in that viewer's order. `seq` is its index. */
+  onLine: (viewer: RoomViewer, seq: number, line: string) => void;
+  onBattleEnd: (
+    result: BattleEndResult,
+    seqs: Record<RoomViewer, number>,
+  ) => void;
   onError: (error: string) => void;
   onTimerUpdate?: (state: TimerState) => void;
 }
@@ -57,18 +77,18 @@ export class BattleRoom {
   readonly format: string;
   readonly p1: RoomPlayer;
   readonly p2: RoomPlayer;
+  /** When the room was made, for the reaper's `waiting` sweep. */
+  readonly createdAt = Date.now();
   /** When the battle ended, for the reaper. */
   finishedAt: number | null = null;
 
   private engine: BattleEngine;
   private state: BattleRoomStatus = 'waiting';
-  private lastRequest: { p1: Protocol.Request | null; p2: Protocol.Request | null } = {
-    p1: null,
-    p2: null,
-  };
-  /** Every protocol line so far. A spectator joining at turn 20 replays this
-   *  to catch up, which is why it cannot wait for the battle to end. */
-  private replayLines: string[] = [];
+
+  /** Per-viewer transcript. Index is the sequence number, by construction. */
+  private viewLog: Record<RoomViewer, string[]> = { p1: [], p2: [], spec: [] };
+  /** Next seq to hand out per viewer. Ahead of `viewLog` only for `battleEnd`. */
+  private nextSeq: Record<RoomViewer, number> = { p1: 0, p2: 0, spec: 0 };
 
   constructor(
     id: string,
@@ -87,22 +107,23 @@ export class BattleRoom {
     this.engine = new BattleEngine(
       id,
       {
-        onProtocol: (line) => {
-          this.replayLines.push(line);
-          this.callbacks.onProtocol(line);
-        },
-        onRequestP1: (request) => {
-          this.lastRequest.p1 = request;
-          this.callbacks.onRequestP1(request);
-        },
-        onRequestP2: (request) => {
-          this.lastRequest.p2 = request;
-          this.callbacks.onRequestP2(request);
+        onLine: (viewer, line) => {
+          const key: RoomViewer = viewer === 'spectator' ? 'spec' : viewer;
+          const seq = this.nextSeq[key]++;
+          this.viewLog[key].push(line);
+          this.callbacks.onLine(key, seq, line);
         },
         onBattleEnd: (result) => {
           this.state = 'finished';
           this.finishedAt = Date.now();
-          this.callbacks.onBattleEnd(result);
+          // The ending gets a seq of its own on every stream, so a client can
+          // order it against the protocol lines it has already applied.
+          const seqs = {
+            p1: this.nextSeq.p1++,
+            p2: this.nextSeq.p2++,
+            spec: this.nextSeq.spec++,
+          } as Record<RoomViewer, number>;
+          this.callbacks.onBattleEnd(result, seqs);
         },
         onError: (message) => {
           // Detail to the log, never to the socket: an engine message names
@@ -110,7 +131,8 @@ export class BattleRoom {
           this.logger?.error(`[battle ${this.id}] ${message}`);
           this.callbacks.onError('battle_error');
         },
-        onTimerUpdate: (timerState) => this.callbacks.onTimerUpdate?.(timerState),
+        onTimerUpdate: (timerState) =>
+          this.callbacks.onTimerUpdate?.(timerState),
       },
       'pvp',
       timerConfig,
@@ -129,23 +151,49 @@ export class BattleRoom {
 
     await this.engine.create(
       this.format,
-      { name: this.p1.name, team: this.p1.team ? (unpackTeam(this.p1.team) ?? undefined) : undefined },
-      { name: this.p2.name, team: this.p2.team ? (unpackTeam(this.p2.team) ?? undefined) : undefined },
+      {
+        name: this.p1.name,
+        team: this.p1.team
+          ? (unpackTeam(this.p1.team) ?? undefined)
+          : undefined,
+      },
+      {
+        name: this.p2.name,
+        team: this.p2.team
+          ? (unpackTeam(this.p2.team) ?? undefined)
+          : undefined,
+      },
     );
-    this.state = 'active';
+    if (this.state === 'waiting') this.state = 'active';
   }
 
-  /** `side` is resolved from the socket's identity by the gateway, never sent. */
-  async choose(side: 'p1' | 'p2', choice: string): Promise<void> {
-    if (this.state !== 'active') return;
-    await this.engine.playerChoice(choice, side);
+  /**
+   * `side` is resolved from the socket's identity by the gateway, never sent.
+   * `rqid` is the client's claim about WHICH request it is answering; the
+   * engine rejects it if that is not the request it last delivered.
+   */
+  async choose(
+    side: 'p1' | 'p2',
+    choice: string,
+    rqid?: number | null,
+  ): Promise<ChoiceResult> {
+    if (this.state !== 'active') return { ok: false, code: 'battle_over' };
+    return this.engine.makeChoice(side, choice, rqid);
   }
 
-  async undo(side: 'p1' | 'p2'): Promise<void> {
-    if (this.state !== 'active') return;
-    await this.engine.undoChoice(side);
+  async undo(side: 'p1' | 'p2'): Promise<ChoiceResult> {
+    if (this.state !== 'active') return { ok: false, code: 'battle_over' };
+    return this.engine.undoChoice(side);
   }
 
+  /**
+   * Concede.
+   *
+   * A room that was created and never started (the format threw, the process
+   * was mid-`start`) has no streams at all, and this used to walk straight into
+   * them and throw out of the gateway's handler. The engine guards it now; the
+   * `finished` check here is only to keep a second forfeit quiet.
+   */
   async forfeit(side: 'p1' | 'p2'): Promise<void> {
     if (this.state === 'finished') return;
     await this.engine.forfeit(side);
@@ -158,6 +206,11 @@ export class BattleRoom {
     return null;
   }
 
+  /** The viewer an account gets: their own side, or the spectator view. */
+  viewerOf(userId: number): RoomViewer {
+    return this.sideOf(userId) ?? 'spec';
+  }
+
   playerFor(side: 'p1' | 'p2'): RoomPlayer {
     return side === 'p1' ? this.p1 : this.p2;
   }
@@ -166,12 +219,24 @@ export class BattleRoom {
     return this.state;
   }
 
-  /** The log so far — what a joining spectator or a resuming player replays. */
-  get replay(): string {
-    return this.replayLines.join(String.fromCharCode(10));
+  /**
+   * The catch-up snapshot for one viewer.
+   *
+   * A player's own view already CONTAINS their last `|request|` line, in the
+   * position the simulator emitted it, so replaying this re-prompts them
+   * without any separate request plumbing.
+   */
+  snapshot(viewer: RoomViewer): ViewSnapshot {
+    const replay = [...this.viewLog[viewer]];
+    return { replay, seq: replay.length - 1 };
   }
 
-  currentRequest(side: 'p1' | 'p2'): Protocol.Request | null {
-    return this.lastRequest[side];
+  /** The omniscient log — what gets persisted as the replay. */
+  get replay(): string {
+    return this.engine.replayLog;
+  }
+
+  currentRequestLine(side: 'p1' | 'p2'): string | null {
+    return this.engine.currentRequestLine(side);
   }
 }

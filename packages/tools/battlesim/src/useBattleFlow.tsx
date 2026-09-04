@@ -43,13 +43,10 @@ export function useBattleFlow(
   const isWaitingForChoice = options?.isWaitingForChoice ?? false;
   const setIsWaitingForChoice = options?.setIsWaitingForChoice;
 
-  // Try to get audio state; use undefined if not available (e.g., in embedded replays)
-  let audioState: BattleAudioState | undefined;
-  try {
-    audioState = useBattleAudioState();
-  } catch {
-    // Audio provider not mounted; proceed without audio
-  }
+  // `useBattleAudioState` reads a context WITH a default, so it cannot throw —
+  // the try/catch that used to wrap it was dead, and wrapping a hook in one is
+  // a conditional-hook trap waiting for the day the context loses its default.
+  const audioState: BattleAudioState | undefined = useBattleAudioState();
 
   const processorRef = useRef<BattleEventProcessor | null>(null);
   if (scene && (!processorRef.current || processorRef.current.context.scene !== scene || processorRef.current.context.battle !== battle)) {
@@ -58,6 +55,19 @@ export function useBattleFlow(
     // Update audio state if it changes
     processorRef.current.context.audioState = audioState;
   }
+
+  /**
+   * Which playback run an in-flight `playAction` belongs to.
+   *
+   * The LIVE path had a `cancelled` flag and the replay path had nothing (H7):
+   * a seek left the previous line's animation mid-`await`, and when it landed
+   * it wrote its html into the log and advanced `currentAction` past the turn
+   * the user had just jumped to — so scrubbing produced a battle that played
+   * two places at once. Every seek and every reset bumps this; an awaited step
+   * that comes back to a different generation drops what it was carrying.
+   */
+  const generationRef = useRef(0);
+  const bumpGeneration = useCallback(() => { generationRef.current += 1; }, []);
 
   const battleLines = useMemo(() => battleLog ? battleLog.split('\n').filter(l => l.trim()) : [], [battleLog]);
 
@@ -136,6 +146,10 @@ export function useBattleFlow(
         setIsWaitingForChoice?.(true);
         liveCallbacksRef.current.onRequest?.(request);
       } catch (e) {
+        // A malformed request must not park the queue on a prompt that will
+        // never come: skip it and keep going, loudly.
+        console.warn('[battlesim] malformed |request| JSON in replay flow', line, e);
+        bumpLiveIndex();
       }
       return;
     }
@@ -152,6 +166,7 @@ export function useBattleFlow(
       try {
         event = await processor.processLine(line);
       } catch (e) {
+        console.warn('[battlesim] processLine failed', line, e);
         if (!cancelled) liveProcessingRef.current = false;
         if (!cancelled) bumpLiveIndex();
         return;
@@ -228,6 +243,8 @@ export function useBattleFlow(
   }, [currentAction, isPlaying, liveMode]);
 
   const handleTurnChange = () => {
+    // Anything still awaiting an animation belongs to the turn we are leaving.
+    bumpGeneration();
     let changeTurn = newTurn;
     if(changeTurn < 0) changeTurn = 0;
     if(changeTurn > lastTurn + 1) changeTurn = lastTurn + 1;
@@ -250,6 +267,7 @@ export function useBattleFlow(
   };
 
   const resetBattle = (currBattle: Battle, turn: number) => {
+    bumpGeneration();
     // Create a completely new battle instance
     const freshBattle = new Battle(new Generations(Dex as any) as any);
     
@@ -325,12 +343,26 @@ export function useBattleFlow(
     const processor = processorRef.current;
     if (!processor) return;
 
+    const generation = generationRef.current;
+    const stale = () => generationRef.current !== generation;
+
+    // The speed control has to reach the ANIMATIONS, not only the sleep between
+    // them: dividing the sleep alone left every switch, every hit and every
+    // faint running at real time, so "4x" was a replay that paused less between
+    // identically-slow moves. `setAcceleration(8)` skips them outright, which is
+    // what the top speed is supposed to mean.
+    const speed = getReplaySpeed();
+    processor.context.scene.setAcceleration(speed);
+
     try {
       const event = await processor.processLine(line);
+      if (stale()) return;
       updateBattleLog(event.html, battle, event.type);
 
       const timeout = await processor.runAnimation(event);
-      await new Promise<void>(resolve => setTimeout(resolve, timeout / getReplaySpeed()));
+      if (stale()) return;
+      await new Promise<void>(resolve => setTimeout(resolve, timeout / speed));
+      if (stale()) return;
 
       if (!liveMode) {
         if (event.type === 'win' || event.type === 'tie') {
@@ -345,6 +377,8 @@ export function useBattleFlow(
         }
       }
     } catch (error) {
+      console.warn('[battlesim] replay step failed', line, error);
+      if (!stale() && !liveMode) setCurrentAction(currentAction + 1);
     }
   }
 
@@ -362,6 +396,8 @@ export function useBattleFlow(
   return {
     handleTurnChange,
     playAction,
+    /** Invalidate anything in flight (a seek from outside this hook). */
+    bumpGeneration,
     updateBattleState,
     resetBattle,
     // Live mode additions

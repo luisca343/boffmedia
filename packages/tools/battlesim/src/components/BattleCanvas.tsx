@@ -1,13 +1,15 @@
 "use client"
 import { Battle, Pokemon } from "@pkmn/client";
 import { PokemonIdent } from "@pkmn/protocol";
-import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } from "react";
+import { forwardRef, memo, useCallback, useEffect, useImperativeHandle, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Button, Spinner, Skeleton, DISPLAY_VOICE } from "@boffmedia/ui";
 import { useToolT, BATTLESIM_NS } from '../i18n';
 import { positionsP1, positionsP2, ASPECT_RATIO } from "../engine/viewUtils";
 import { PokemonElement } from "./PokemonElement";
 import { Avatar } from "./Avatar";
 import { Hazard } from "./Hazard";
+import { FieldLayer } from "./FieldLayer";
+import { SideScreens } from "./SideScreens";
 import BattleEndScreen from "./BattleEndScreen";
 import { BxPlate, useBxLabels } from "./bx-kit";
 import { BxMonPopover } from "./BxMonPopover";
@@ -17,9 +19,25 @@ import { FieldConditions, resolveCondLabel } from "./FieldConditions";
 import { battlesimAssetUrl } from '../asset';
 import { BattleScaleProvider, useElementSize } from "../lib/battle-layout";
 import { setFxLabels } from "../engine/fxLabels";
+import { spriteIdentityKey, useSpriteSource } from "../sprites";
+import type { TurnLedger } from "../engine/TurnLedger";
 import { getParticipantName } from "../engine/replayUtils";
 import { cn } from "../lib/cn";
 import type { TargetingState } from "../lib/battle-types";
+
+/**
+ * What the canvas needs from the session, structurally rather than by class.
+ *
+ * `BattleSession` satisfies it as-is; stating it this way keeps the canvas
+ * renderable (and testable) with nothing but a Battle, and keeps the engine out
+ * of the component's type surface.
+ */
+export interface CanvasSession {
+    /** The commit handshake. See the layout effect below. */
+    onCommitted?: (revision: number) => void;
+    /** What happened this turn, per Pokémon — read by the HP plates. */
+    ledger?: TurnLedger;
+}
 
 export type BattleCanvasRefProps = {
   bounceAll: () => void;
@@ -39,11 +57,13 @@ interface BattleCanvasProps {
     /**
      * Bumped by the session on every visible change.
      *
-     * Load-bearing despite being unread: this component is `memo`'d and every
+     * Load-bearing twice over. First, this component is `memo`'d and every
      * other prop keeps its identity for the whole battle (`battle` is mutated
      * in place, never replaced), so without a value that actually changes the
      * shallow compare skips every re-render and the field freezes between
-     * turns. See `BattleSession.revision`.
+     * turns. Second, it is the token of the commit handshake: the layout effect
+     * below reports it back so the engine knows the state it just applied is on
+     * screen. See `BattleSession.revision` / `awaitCommit`.
      */
     revision?: number;
     initScene?: (gameElement: HTMLElement) => void;
@@ -62,6 +82,13 @@ interface BattleCanvasProps {
     targeting?: TargetingState | null;
     /** Compact plates (defaults to canvas width < 640). */
     compact?: boolean;
+    /**
+     * The session driving this battle, for the two things only it can answer:
+     * the commit handshake and the turn ledger. Optional — the replay player
+     * renders without one, and the engine's `awaitCommit` has its own 64 ms
+     * fallback for exactly that case.
+     */
+    session?: CanvasSession | null;
 }
 
 /**
@@ -73,6 +100,7 @@ interface BattleCanvasProps {
 export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasProps>(function BattleCanvas({
     battle, pov, showPreviewOverlay = false, setBattleStarted, setIsPlaying, battleLog, initScene,
     liveMode = false, liveStatus, battleComplete = false, aimedFoe = false, fit = 'width', targeting = null, compact: compactProp,
+    session = null, revision = 0,
 }, ref) {
     const t = useToolT(BATTLESIM_NS);
     const L = useBxLabels();
@@ -88,6 +116,20 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
     const side: 0 | 1 = pov === 1 ? 1 : 0;
 
     useImperativeHandle(ref, () => ({ bounceAll: () => {}, animateMove: () => {} }), []);
+
+    // THE COMMIT HANDSHAKE. The engine applies a line, bumps `revision`, then
+    // waits here before animating: a switch's summon addresses an `<img>` that
+    // does not exist until React has mounted it, and a move animation aimed at
+    // last turn's sprite writes styles onto a Pokemon that has already left.
+    //
+    // A layout effect rather than an effect, and on `[revision]` rather than on
+    // every render: layout effects run inside the commit, before the browser
+    // paints, so the engine is released at the first moment the DOM is real —
+    // one frame earlier than `useEffect` would, which is the difference between
+    // the ball opening on the new sprite and opening on nothing.
+    useLayoutEffect(() => {
+        session?.onCommitted?.(revision);
+    }, [session, revision]);
 
     // The engine's popup words, from the catalog, for this locale.
     useEffect(() => {
@@ -111,21 +153,91 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
         p2a: p2.active[0], p2b: p2.active[1], p2c: p2.active[2], p2d: p2.active[3], p2e: p2.active[4],
     } as { [key: string]: Pokemon };
 
-    // Hit flash: a plate whose HP dropped since the last render flashes for
-    // half a second. Kept in a ref so the timer survives the many renders an
-    // animation produces.
-    const prevHp = useRef<Record<string, number>>({});
+    const spriteSource = useSpriteSource();
+
+    /**
+     * The React key of a slot's sprite element.
+     *
+     * Folds in everything that must produce a NEW <img> rather than a patched
+     * one: the slot, the mon (`searchid` = ident + details, stable per mon and
+     * forme), and the sprite's own identity (species as rendered, shiny, gender,
+     * side, source). Patching an animated GIF's `src` in place leaves the old
+     * frames on screen until the new file decodes, which is what made a switch
+     * show the outgoing Pokemon for a beat; a remount cannot do that.
+     *
+     * `speciesForme` covers `-transform` too: the client has already rewritten
+     * it to the target by the time this runs.
+     */
+    const identityOf = (position: string, mon: Pokemon): string => {
+        const spriteSide: 'p1' | 'p2' = position.startsWith('p2') ? 'p2' : 'p1';
+        const searchid = (mon as any).searchid || (mon as any).originalIdent || mon.ident || '';
+        return position + ':' + searchid + ':' + spriteIdentityKey({
+            speciesForme: mon.speciesForme, shiny: mon.shiny, gender: mon.gender as any,
+            side: spriteSide, source: spriteSource, transformedInto: null,
+        });
+    };
+
+    /**
+     * Which slots are about to be SUMMONED, and therefore must mount invisible.
+     *
+     * Only an ident change qualifies. `switch` / `drag` / `replace` are the
+     * three events whose `postApply` commits and then plays the summon (see
+     * `eventHandlers.switchHandler`), and all three change the slot's ident —
+     * including the opening leads, which arrive as `|switch|` onto an empty
+     * slot and are summoned like any other, so hiding those is right too.
+     * `detailschange` / `-formechange` / `-transform` also remount the node (the
+     * key folds in `speciesForme`) but their handler only commits and waits, so
+     * a sprite hidden for one of those would never be faded back in — a Mega
+     * Evolution would simply vanish.
+     *
+     * Recorded in a layout effect, not during render: a render may run twice for
+     * one commit, and the answer has to be the same both times.
+     */
+    const lastIdent = useRef<Record<string, string>>({});
+    const summonPending: Record<string, boolean> = {};
+    for (const position of [...positionsP1, ...positionsP2]) {
+        const mon = pokemon[position];
+        const ident = mon ? String((mon as any).originalIdent || mon.ident || '') : '';
+        summonPending[position] = !!ident && lastIdent.current[position] !== ident;
+    }
+    useLayoutEffect(() => {
+        for (const position of [...positionsP1, ...positionsP2]) {
+            const mon = pokemon[position];
+            const ident = mon ? String((mon as any).originalIdent || mon.ident || '') : '';
+            if (ident) lastIdent.current[position] = ident;
+            else delete lastIdent.current[position];
+        }
+    });
+
+    /** What happened this turn, per Pokemon — the HP plates draw the delta. */
+    const ledger = session?.ledger;
+
+    // Hit flash: a plate whose Pokemon lost HP since the last render flashes
+    // for half a second. Kept in a ref so the timer survives the many renders
+    // an animation produces.
+    //
+    // KEYED BY POKEMON, NOT BY SLOT. Keying the previous HP by slot meant a
+    // switch compared two different Pokemon: send a full-HP mon in after a
+    // damaged one and the plate flashed a hit nobody took. (The old
+    // `speciesForme` guard caught the common case and missed every switch
+    // between two of the same species, and every Ditto.) The map is keyed by
+    // `originalIdent`, which carries the side prefix and survives forme
+    // changes, so a mon coming back in is compared against ITS own last HP —
+    // which is also why entry hazards correctly flash the incoming plate.
+    // Nothing is pruned: a battle holds at most twelve of these.
+    const prevHp = useRef<Map<string, number>>(new Map());
     const [hits, setHits] = useState<Record<string, true>>({});
     const hitTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
     useEffect(() => {
         const fresh: Record<string, true> = {};
         let changed = false;
         for (const [pos, mon] of Object.entries(pokemon)) {
-            if (!mon) { delete prevHp.current[pos]; continue; }
-            const prev = prevHp.current[pos];
-            if (prev != null && mon.hp < prev && mon.speciesForme === prevHp.current[pos + ':s'] as any) { fresh[pos] = true; changed = true; }
-            prevHp.current[pos] = mon.hp;
-            (prevHp.current as any)[pos + ':s'] = mon.speciesForme;
+            if (!mon) continue;
+            const key = String((mon as any).originalIdent || mon.ident || '');
+            if (!key) continue;
+            const prev = prevHp.current.get(key);
+            if (prev != null && mon.hp < prev) { fresh[pos] = true; changed = true; }
+            prevHp.current.set(key, mon.hp);
         }
         if (changed) {
             setHits((h) => ({ ...h, ...fresh }));
@@ -151,10 +263,6 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
     // a card over them is in the way. Same for the two full-cover overlays.
     const hoverBlocked = !!targeting || showPreviewOverlay || battleComplete;
 
-    const overlayFrame = (children: React.ReactNode) => (
-        <div className="absolute inset-0 z-40 flex flex-col overflow-hidden">{children}</div>
-    );
-
     const wrapClass = fit === 'contain' ? "relative flex h-full w-full items-center justify-center" : "relative w-full";
 
     // How far the ally HP plates must rise to clear the action band.
@@ -172,6 +280,25 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
     // the replay player this resolves to 0px and the plates sit where they did.
     const slack = fit === 'contain' && box.height > height ? Math.round((box.height - height) / 2) : 0;
     const allyLift = `max(0px, calc(var(--bx-dock-h, 0px) - ${slack}px))`;
+
+    /**
+     * The replay player's own overlays — the intro card and the end screen.
+     *
+     * They stop at the action band, exactly where the ally plates do, and for
+     * the same reason: the band floats over the field's lower edge, and an
+     * overlay drawn to the field's real bottom would cover it. It does not only
+     * LOOK covered — the overlay outranks the band in the stage's stacking
+     * order, so every button on the transport (play, scrub, speed) was eating
+     * its clicks with nothing on screen to explain why.
+     *
+     * `allyLift` is 0 wherever there is no band (mobile, `fit="width"`), so
+     * this is `inset-0` again there.
+     */
+    // `z-[130]`, above the HUD plates' `z-[120]`: these two cover the field, and
+    // at z-40 the plates and the turn chip floated on top of the end screen.
+    const overlayFrame = (children: React.ReactNode) => (
+        <div className="absolute inset-x-0 top-0 z-[130] flex flex-col overflow-hidden" style={{ bottom: allyLift }}>{children}</div>
+    );
 
     if (liveMode && liveStatus === 'connecting') {
         return (
@@ -201,6 +328,7 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
         return (
             <div key={position} className={cn("pointer-events-auto min-w-0", plateWidth)}>
                 <BxPlate mon={mon} foe compact={compact} slotTag={t('battle.foe')} aimed={aimedFoe && !mon.fnt && !targeting} hit={!!hits[position]}
+                    ledger={ledger?.get(pokemon[position])}
                     targetable={!!opt} targetLabel={opt?.label} onClick={opt ? () => targeting?.onPick(opt.code) : undefined}
                     onDetails={opt ? undefined : () => setDetails({ mon, foe: true })} detailsLabel={t('battle.mon.details', { name: mon.name })} />
             </div>
@@ -213,6 +341,7 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
         return (
             <div key={position} className={cn("pointer-events-auto min-w-0", plateWidth)}>
                 <BxPlate mon={mon} compact={compact} slotTag={t('battle.you')} active={!targeting} hit={!!hits[position]}
+                    ledger={ledger?.get(pokemon[position])}
                     targetable={!!opt} targetLabel={opt?.label} onClick={opt ? () => targeting?.onPick(opt.code) : undefined}
                     onDetails={opt ? undefined : () => setDetails({ mon, foe: false })} detailsLabel={t('battle.mon.details', { name: mon.name })} />
             </div>
@@ -257,14 +386,30 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
                     <Avatar side={p1} pov={side} />
                     <Avatar side={p2} pov={side} />
 
+                    {/* Weather / terrain / rooms, between the background art and
+                        everything standing on it. Derived from `battle.field` on
+                        every revision — see `FieldLayer`. */}
+                    <FieldLayer battle={battle} />
+
                     {positionsP1.map((position) => pokemon[position] && (
-                        <PokemonElement key={position} battle={battle} pokemon={pokemon[position]} side={battle.p1} position={position} onHover={onSpriteHover} />
+                        <PokemonElement key={identityOf(position, pokemon[position])} battle={battle} pokemon={pokemon[position]}
+                            position={position} mountHidden={summonPending[position]} onHover={onSpriteHover} />
                     ))}
-                    {Object.entries(battle.p1.sideConditions).map((entry) => <Hazard key={entry[0]} hazard={entry as any} side="p1" />)}
+                    {/* POV-SWAPPED. `p1`/`p2` here are the locals from the top of
+                        this component, not `battle.p1`/`battle.p2`: hazards laid
+                        on the VIEWER must be drawn on the viewer's half of the
+                        field, and on pov 1 the viewer is `battle.p2`. Using the
+                        raw sides put every spike on the wrong side for player
+                        two — while the chip row beside them, which does swap,
+                        said the opposite. */}
+                    {Object.entries(p1.sideConditions).map((entry) => <Hazard key={entry[0]} hazard={entry as any} side="p1" />)}
+                    <SideScreens conditions={p1.sideConditions} side="ally" />
                     {positionsP2.map((position) => pokemon[position] && (
-                        <PokemonElement key={position} battle={battle} pokemon={pokemon[position]} side={battle.p2} position={position} onHover={onSpriteHover} />
+                        <PokemonElement key={identityOf(position, pokemon[position])} battle={battle} pokemon={pokemon[position]}
+                            position={position} mountHidden={summonPending[position]} onHover={onSpriteHover} />
                     ))}
-                    {Object.entries(battle.p2.sideConditions).map((entry) => <Hazard key={entry[0]} hazard={entry as any} side="p2" />)}
+                    {Object.entries(p2.sideConditions).map((entry) => <Hazard key={entry[0]} hazard={entry as any} side="p2" />)}
+                    <SideScreens conditions={p2.sideConditions} side="foe" />
 
                     {hover && !hoverBlocked && (() => {
                         const mon = toBSXMon(pokemon[hover.position]);
@@ -273,9 +418,12 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
                     })()}
 
                     <div id="overlay" className="pointer-events-none absolute inset-0">
-                        {battle.field.pseudoWeather['trickroom'] && (
-                            <div className="absolute inset-0 z-[5] opacity-60" style={{ backgroundImage: `url(${battlesimAssetUrl('fx/trickroom.png')})`, backgroundSize: '100% 100%' }} />
-                        )}
+                        {/* Trick Room used to be drawn here from `fx/trickroom.png`,
+                            a file that is not in the pack — so the one pseudo
+                            weather with art shipped as a broken image. The real
+                            asset is `fx/weather-trickroom.png`, and it belongs to
+                            `FieldLayer` now along with the other rooms, the
+                            weather and the terrain. */}
                         <div className="absolute inset-0 z-[1]" style={{ backgroundImage: `url(${battlesimAssetUrl('fx/bg/hagane_overlay.png')})`, backgroundSize: '100% 100%' }} />
                     </div>
 

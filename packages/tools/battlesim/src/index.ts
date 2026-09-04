@@ -56,7 +56,18 @@ export { useToolT, useToolRichT, useLocale, BATTLESIM_NS } from "./i18n";
 
 // Asset & sprite resolution
 export { battlesimAssetUrl } from "./asset";
-export { spriteUrl, avatarUrl, cryUrl, terasFormeUrl, useSpriteSource, handleSpriteError } from "./sprites";
+export {
+  spriteUrl,
+  avatarUrl,
+  cryUrl,
+  cryCandidates,
+  battleSpriteUrl,
+  spriteIdentityKey,
+  terasFormeUrl,
+  useSpriteSource,
+  handleSpriteError,
+} from "./sprites";
+export type { SpriteSource, SpriteOptions, BattleSpriteInput } from "./sprites";
 
 // Storage
 export {

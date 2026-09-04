@@ -5,11 +5,37 @@ type BSXMon = {
   id: string; name: string; types: string[]; hp: number; fnt?: boolean; tera?: boolean;
   teraType?: string; status?: string | null; boosts?: Record<string, number>;
   stats: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number };
-  moves?: any[]; sleepT?: number; protect?: boolean;
+  moves?: any[]; sleepT?: number;
+  /**
+   * `protect` was the ONLY volatile the HUD carried — one boolean standing in
+   * for a table that also holds substitute, leech seed, confusion, taunt,
+   * encore and the perish counter, every one of which changes what a player
+   * should do this turn. {@link volatiles} carries the ids; this stays because
+   * call sites read it, and it is derived from that list rather than sampled
+   * separately, so the two can never disagree.
+   */
+  protect?: boolean;
+  /** Volatile ids as the client holds them: `protect`, `substitute`, `confusion`, `perish2`… */
+  volatiles?: string[];
   /** Exact HP when the source knows it (own side). Foes only expose a percent. */
   hpCur?: number; hpMax?: number;
+  /**
+   * `${originalIdent}|${details}` — stable across a turn, different the moment
+   * the slot holds a different Pokémon (or the same one in a new forme).
+   *
+   * The HP bar keys its per-mon memory on this. Keyed on the PERCENT instead,
+   * a switch read as "the same bar losing 90 HP" and animated a catch-up for a
+   * hit that never happened.
+   */
+  searchid?: string;
+  /** `M` | `F` | `N` — the plate draws the glyph, never the letter. */
+  gender?: string;
   /** Request-side extras. */
   active?: boolean; item?: string; ability?: string; level?: number; moveIds?: string[];
+  /** How the CURRENT item was acquired/revealed (`knocked off`, `frisked`…). */
+  itemEffect?: string;
+  /** The item the mon no longer holds, and why it went (`consumed`, `knocked off`…). */
+  lastItem?: string; lastItemEffect?: string;
   /** The `poke` slot name when it differs from the species (nicknames). */
   species?: string;
 };
@@ -39,16 +65,78 @@ export function hpPercent(cur: number, max: number): number {
   return Math.max(1, Math.min(100, Math.ceil((cur / max) * 100)));
 }
 
+const BASE_STATS_FALLBACK = { hp: 100, atk: 100, def: 100, spa: 100, spd: 100, spe: 100 };
+
+/**
+ * `Pokemon#species` is `this.side.battle.gen.species.get(this.speciesForme)`,
+ * typed as a `Specie` but able to return undefined — the battle's generation
+ * view does not carry every forme that can appear in its own protocol. A
+ * `|detailschange|p1a: Charizard|Charizard-Mega-X, L50, M` in a gen-9 battle
+ * (Illusion, or a format that permits it) resolves to nothing, and the `types`
+ * getter's last branch reads `.types` off that nothing and THROWS — from
+ * inside a React render, which took the entire canvas down rather than
+ * blanking one type badge.
+ *
+ * The unrestricted `Dex` knows every forme, so it answers where the gen view
+ * cannot; a forme neither knows yields an empty list. A missing badge is a
+ * cosmetic loss. An exception here is the whole battle.
+ */
+function speciesOf(pokemon: Pokemon) {
+  const known = pokemon.species as Pokemon['species'] | undefined;
+  if (known) return { types: [...known.types] as string[], baseStats: known.baseStats };
+  const forme = pokemon.speciesForme || pokemon.baseSpeciesForme || pokemon.name;
+  const dexed = Dex.species.get(forme);
+  return dexed?.exists
+    ? { types: [...dexed.types] as string[], baseStats: dexed.baseStats }
+    : { types: [] as string[], baseStats: null };
+}
+
+/**
+ * The item id, with the `item:` prefix @pkmn/sim's condition ids carry stripped.
+ *
+ * `|-status|p2a: Heracross|brn|[from] item: Flame Orb` makes @pkmn/client look
+ * the effect up with `battle.get('conditions', 'item: Flame Orb')`, and the
+ * @pkmn/sim Dex this package feeds it answers with `kind: 'Item'` and
+ * `id: 'item:flameorb'` — prefix included. The client then assigns that id
+ * straight onto `pokemon.item`, so every HUD lookup got `Dex.items.get(...)`'s
+ * miss stub and the plate printed the raw id: "itemflameorb" instead of
+ * "Flame Orb". Normalised here rather than at each of the four display sites,
+ * and only when stripping actually resolves, so a genuine id that happens to
+ * begin with "item" is left alone.
+ */
+function itemIdOf(raw?: string | null): string | undefined {
+  if (!raw) return undefined;
+  if (Dex.items.get(raw)?.exists) return raw;
+  const stripped = raw.replace(/^item:\s*/i, "");
+  return stripped !== raw && Dex.items.get(stripped)?.exists ? stripped : raw;
+}
+
+/**
+ * The `types` getter's OTHER two branches are sound — tera and `typechange`
+ * never touch the species — so they are reproduced rather than discarded: a
+ * Terastallized Pokémon whose forme the gen view has lost still shows its tera
+ * type, which is the type that matters.
+ */
+function typesOf(pokemon: Pokemon, fallback: string[]): string[] {
+  if (pokemon.terastallized && pokemon.terastallized !== 'Stellar') return [pokemon.terastallized as string];
+  const changed = (pokemon.volatiles as any)?.typechange?.apparentType;
+  if (typeof changed === 'string' && changed) return changed.split('/');
+  return fallback;
+}
+
 export function toBSXMon(pokemon: Pokemon | null): BSXMon | null {
   if (!pokemon) return null;
-  const species = pokemon.species;
-  const stats = species?.baseStats || { hp: 100, atk: 100, def: 100, spa: 100, spd: 100, spe: 100 };
+  const species = speciesOf(pokemon);
+  const stats = species.baseStats || BASE_STATS_FALLBACK;
   const knownMax = pokemon.maxhp > 0 ? pokemon.maxhp : 100;
+  const volatiles = Object.keys(pokemon.volatiles || {});
   return {
     id: pokemon.speciesForme?.toLowerCase() || pokemon.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
     name: pokemon.name,
     species: pokemon.speciesForme,
-    types: [...pokemon.types] as string[],
+    searchid: pokemon.searchid || pokemon.originalIdent || undefined,
+    gender: pokemon.gender || undefined,
+    types: typesOf(pokemon, species.types),
     hp: hpPercent(pokemon.hp, knownMax),
     hpCur: pokemon.hp,
     hpMax: knownMax,
@@ -61,8 +149,12 @@ export function toBSXMon(pokemon: Pokemon | null): BSXMon | null {
       hp: stats.hp, atk: stats.atk, def: stats.def,
       spa: stats.spa, spd: stats.spd, spe: stats.spe,
     },
-    protect: !!pokemon.volatiles?.protect,
-    item: pokemon.item || undefined,
+    volatiles,
+    protect: volatiles.includes('protect'),
+    item: itemIdOf(pokemon.item),
+    itemEffect: pokemon.itemEffect || undefined,
+    lastItem: itemIdOf(pokemon.lastItem),
+    lastItemEffect: pokemon.lastItemEffect || undefined,
     ability: pokemon.ability || undefined,
     level: pokemon.level,
     moveIds: (pokemon.moveSlots || []).map((m) => String(m.id)),
@@ -111,6 +203,8 @@ export function requestPokemonToBSXMon(
   const detailParts = (poke.details || "").split(",").map((s) => s.trim());
   const speciesName = detailParts[0] || nickname;
   const levelPart = detailParts.find((p) => /^L\d+$/.test(p));
+  // `Garchomp, L50, M` — the gender letter is a bare part, never prefixed.
+  const genderPart = detailParts.find((p) => p === 'M' || p === 'F');
   const species = Dex.species.get(speciesName);
   const stats = species?.exists
     ? { hp: species.baseStats.hp, atk: species.baseStats.atk, def: species.baseStats.def, spa: species.baseStats.spa, spd: species.baseStats.spd, spe: species.baseStats.spe }
@@ -126,6 +220,12 @@ export function requestPokemonToBSXMon(
     id: speciesName.toLowerCase().replace(/[^a-z0-9]/g, ''),
     name: nickname,
     species: speciesName,
+    // The client builds `searchid` the same way; a request-side mon and the
+    // field-side one for the same Pokémon must produce the SAME key or the
+    // bench bar and the plate bar would each think the other switched.
+    searchid: poke.ident && poke.details ? `${poke.ident}|${poke.details}` : undefined,
+    gender: genderPart,
+    volatiles: [],
     types: species?.exists ? [...species.types] : ["Normal"],
     hp: Math.max(0, Math.min(100, hpPct)),
     hpCur,
@@ -134,7 +234,7 @@ export function requestPokemonToBSXMon(
     status,
     stats,
     active: !!poke.active,
-    item: poke.item || undefined,
+    item: itemIdOf(poke.item),
     ability: poke.ability || poke.baseAbility || undefined,
     level: levelPart ? parseInt(levelPart.slice(1)) : 100,
     moveIds: poke.moves,

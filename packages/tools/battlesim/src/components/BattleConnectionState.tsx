@@ -7,7 +7,7 @@ import { useToolT, BATTLESIM_NS } from '../i18n';
 import { BsimErrorState, BsimKicker, BSIM_STATE } from './bsim-kit';
 import { useBsimNavMaybe } from '../nav';
 
-type ConnectionKind = 'loading' | 'connecting' | 'reconnecting' | 'queue' | 'error';
+type ConnectionKind = 'loading' | 'connecting' | 'reconnecting' | 'resyncing' | 'queue' | 'error';
 
 interface BattleConnectionStateProps {
   kind: ConnectionKind;
@@ -34,6 +34,10 @@ const KIND: Record<Exclude<ConnectionKind, 'error'>, { icon: IconName; key: stri
   loading: { icon: 'clock', key: 'hub.conn.loading', tone: 'text-txt-dim' },
   connecting: { icon: 'link', key: 'hub.conn.connecting', tone: 'text-signal' },
   reconnecting: { icon: 'refresh', key: 'hub.conn.reconnecting', tone: 'text-warn' },
+  // Distinct from `reconnecting`: the socket is up and we are waiting for the
+  // server's copy of the battle. "Reconnecting" over a working connection is a
+  // lie the player can see through when the chat keeps arriving.
+  resyncing: { icon: 'refresh', key: 'hub.conn.resyncing', tone: 'text-signal' },
   queue: { icon: 'users', key: 'hub.conn.queue', tone: 'text-accent-bright' },
 };
 

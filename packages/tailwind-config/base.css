@@ -218,9 +218,14 @@ html { font-size: var(--ui-scale); }
 @keyframes bm-bob { 0%, 100% { translate: 0 0; } 50% { translate: 0 -9px; } }
 @keyframes bm-srt-conf { 0% { opacity: 0; transform: translateY(-10px) rotate(0deg); } 10% { opacity: 1; } 80% { opacity: 0.85; } 100% { opacity: 0; transform: translateY(560px) rotate(540deg); } }
 
-/* battlesim «Bx» HUD — plate hit flash + low-timer blink */
+/* battlesim «Bx» HUD — plate hit flash + low-timer blink + HP delta labels */
 @keyframes bm-hitflash { 0%, 100% { background: color-mix(in srgb, var(--panel) 88%, transparent); } 40% { background: color-mix(in srgb, var(--bad) 22%, var(--panel)); } }
 @keyframes bm-blink { 50% { opacity: 0.35; } }
+/* An ENTRANCE, not a lifetime: the "−37%" labels under an HP bar rise into
+   place and then stay, because what removes them is the next `|turn|` clearing
+   the ledger entry, never a timer. `both` so the from-state applies during the
+   stagger delay rather than flashing the label at full opacity first. */
+@keyframes bm-hprise { from { opacity: 0; transform: translateY(5px); } }
 
 /* ---------------------------------------------------------------------------
    REDUCED MOTION. apps/web's globals.css deliberately collapses TRANSITIONS
@@ -252,4 +257,5 @@ html { font-size: var(--ui-scale); }
   @keyframes bm-srt-conf { from, to { animation-timing-function: linear; } }
   @keyframes bm-hitflash { from, to { animation-timing-function: linear; } }
   @keyframes bm-blink { from, to { animation-timing-function: linear; } }
+  @keyframes bm-hprise { from, to { animation-timing-function: linear; } }
 }

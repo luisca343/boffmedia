@@ -31,6 +31,12 @@
   },
   "devDependencies": {
     "@types/react": "19.2.7",
-    "@types/react-dom": "19.2.3"
+    "@types/react-dom": "19.2.3",
+    "happy-dom": "15.11.7",
+    "vitest": "^4.1.10"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "type-check": "tsc --noEmit"
   }
 }

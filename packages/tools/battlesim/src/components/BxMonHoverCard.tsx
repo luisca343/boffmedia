@@ -2,8 +2,8 @@
 
 import { Dex } from '@pkmn/dex';
 import { useToolT, BATTLESIM_NS } from '../i18n';
-import { BxSprite, BxTypeRow, BxType, BxStatus, BxBoost, BxHp, BxTera, useBxLabels, BX_PLATE_VOICE, hpAriaLabel } from './bx-kit';
-import { hpTone } from '../lib/bx-helpers';
+import { BxSprite, BxTypeRow, BxType, BxStatus, BxBoost, BxHp, BxTera, BxVolatiles, useBxLabels, BX_PLATE_VOICE, hpAriaLabel } from './bx-kit';
+import { hpTone, shownVolatiles, perishCount, GENDER_GLYPH } from '../lib/bx-helpers';
 import { cn } from '../lib/cn';
 import type { BSXMon } from '../engine/toBSXMon';
 
@@ -43,6 +43,8 @@ export function BxMonHoverCard({ mon, foe = false, anchor, field, compact = fals
   const pct = mon.fnt ? 0 : mon.hp;
   const showExact = !foe && mon.hpCur != null && mon.hpMax != null;
   const boosts = Object.entries((mon.boosts || {}) as Record<string, number>).filter(([, v]) => v);
+  const volatiles = shownVolatiles(mon.volatiles ?? (mon.protect ? ['protect'] : []));
+  const perish = perishCount(mon.volatiles);
   const abilityName = mon.ability ? (Dex.abilities.get(mon.ability)?.name ?? mon.ability) : null;
   const itemName = mon.item ? (Dex.items.get(mon.item)?.name ?? mon.item) : null;
   const moves = (mon.moveIds || []).map((id) => {
@@ -77,6 +79,7 @@ export function BxMonHoverCard({ mon, foe = false, anchor, field, compact = fals
           <span className="flex min-w-0 items-center gap-[0.3125rem]">
             {mon.tera && mon.teraType && <BxTera type={mon.teraType} size="0.85em" />}
             <b className="min-w-0 truncate font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.03em] text-txt">{mon.name}</b>
+            {GENDER_GLYPH[mon.gender ?? ''] && <i aria-hidden title={mon.gender} className={cn('flex-none not-italic leading-none', mon.gender === 'F' ? 'text-[#f95587]' : 'text-[#6390f0]')}>{GENDER_GLYPH[mon.gender ?? '']}</i>}
             {mon.level != null && <span className="flex-none font-mono text-[0.5625rem] leading-none text-txt-dim">{t('battle.mon.level', { level: mon.level })}</span>}
           </span>
           <span className="flex flex-wrap items-center gap-1">
@@ -93,10 +96,15 @@ export function BxMonHoverCard({ mon, foe = false, anchor, field, compact = fals
             {mon.fnt ? t('battle.end.ko') : showExact ? `${mon.hpCur}/${mon.hpMax}` : `${pct}%`}
           </b>
         </div>
-        <BxHp pct={pct} trail={false} />
+        <BxHp pct={pct} monKey={mon.searchid ?? mon.id} ko={!!mon.fnt} />
       </div>
 
-      {boosts.length > 0 && <div className="flex flex-wrap gap-1">{boosts.map(([s, v]) => <BxBoost key={s} stat={s} value={v} />)}</div>}
+      {(boosts.length > 0 || volatiles.length > 0 || perish != null) && (
+        <div className="flex flex-wrap gap-1">
+          <BxVolatiles ids={volatiles} perish={perish} />
+          {boosts.map(([s, v]) => <BxBoost key={s} stat={s} value={v} />)}
+        </div>
+      )}
 
       <div className="grid grid-cols-2 gap-x-2 gap-y-[0.25rem]">
         {([['battle.mon.ability', abilityName], ['battle.mon.item', itemName]] as const).map(([key, value]) => (

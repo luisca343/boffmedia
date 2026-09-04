@@ -10,11 +10,14 @@ import { cn } from "@boffmedia/ui"
 import { Icon } from "@boffmedia/ui"
 import { DkSprite, DkSeg } from "@boffmedia/ui/datakit"
 import { spriteUrl, handleSpriteError } from "@boffmedia/tools-pokemon"
+import { Dex } from "@pkmn/dex"
 import { useToolT, BATTLESIM_NS } from "../i18n"
 import { sanitizeHtml } from "../engine/sanitizeHtml"
+import type { LedgerEntry } from "../engine/TurnLedger"
 import { BSIM_FOCUS, BSIM_FOCUS_CUT } from "./bsim-kit"
 import {
   tyColor, tyLabel, TYPE_ES, hpTone, hpBand, effTag, effMult, speedOrder,
+  hpSegments, shownVolatiles, perishCount, volatileTone, STATUS_DOT, GENDER_GLYPH,
   type BxMon, type BxMove, type BxTickEv, type BxTeamHP, type OrderSlot, type EffKey,
 } from "../lib/bx-helpers"
 
@@ -141,13 +144,121 @@ export const STATUS_BG: Record<string, string> = {
   psn: "bg-[#a33ea1] text-white", tox: "bg-[#a33ea1] text-white",
   slp: "bg-txt-dim text-base", frz: "bg-[#74c6c2] text-accent-ink", fnt: "bg-line-2 text-txt",
 }
+/**
+ * The status pill, beside the NAME — not in the chip row under the bar.
+ *
+ * A burn and a paralysis change what the next turn is worth more than any
+ * type badge does, and in the chip row they sat fourth in a wrapping line
+ * that a long species name could push onto a second row entirely. Beside the
+ * name they are always in the same place, always visible, and the colour
+ * block makes them findable without reading: the three letters are the
+ * identification, the block is the alarm.
+ */
 export function BxStatus({ status, long = false }: { status?: string | null; long?: boolean }) {
   const L = useBxLabels()
   if (!status) return null
   return (
     <span title={L.statusLong(status)} aria-label={L.statusLong(status)}
-      className={cn("cut [--cut:2px] ", "flex-none px-[0.3125rem] py-[3px] font-mono text-[0.53125rem] font-bold leading-none tracking-[0.08em]", STATUS_BG[status] || "bg-warn text-accent-ink")}>
+      className={cn("cut [--cut:2px] ", "inline-flex flex-none items-center gap-[3px] px-[0.3125rem] py-[3px] font-mono text-[0.53125rem] font-bold not-italic leading-none tracking-[0.08em]", STATUS_BG[status] || "bg-warn text-accent-ink")}>
+      {/* Icon-free by design: a burn glyph and a poison glyph are two small
+          silhouettes at this size, while two flat colour blocks are told
+          apart in peripheral vision. */}
+      <i aria-hidden className="h-[0.375rem] w-[0.375rem] flex-none border border-solid border-[color-mix(in_srgb,black_35%,transparent)]" style={{ background: STATUS_DOT[status] || "var(--warn)" }} />
       {long ? L.statusLong(status) : L.status(status)}
+    </span>
+  )
+}
+
+/* ── Volatiles ───────────────────────────────────────────────────────────── */
+/**
+ * Substitute, leech seed, confusion, taunt, encore, perish count, protect.
+ *
+ * `BSXMon.protect` used to be the whole of this — one boolean for a table
+ * that decides whether your attack even connects. Rendered as chips rather
+ * than as a sentence because they are read at a glance mid-turn and because
+ * they wrap: a mon under three of them is exactly the mon whose plate must
+ * still fit.
+ */
+export function BxVolatiles({ ids, perish = null }: { ids: string[]; perish?: number | null }) {
+  const t = useToolT(BATTLESIM_NS)
+  if (!ids.length && perish == null) return null
+  const chip = "flex-none border border-dashed border-[color-mix(in_srgb,var(--tyc)_55%,transparent)] px-1 py-[2px] font-mono text-[0.53125rem] font-bold not-italic uppercase leading-none tracking-[0.06em] text-[var(--tyc)]"
+  return (
+    <>
+      {ids.map((id) => (
+        <i key={id} style={tyc(volatileTone(id))} className={chip}
+          title={id === "protect" ? t("battle.labels.protect") : t(`battle.labels.volatile.${id}`)}>
+          {id === "protect" ? t("battle.labels.protect") : t(`battle.labels.volatile.${id}`)}
+        </i>
+      ))}
+      {perish != null && (
+        <i style={tyc("var(--bad)")} className={chip} title={t("battle.labels.volatile.perish", { n: perish })}>
+          {t("battle.labels.volatile.perish", { n: perish })}
+        </i>
+      )}
+    </>
+  )
+}
+
+/* ── Item / ability / tera meta line ─────────────────────────────────────── */
+/** `lastItemEffect`/`itemEffect` → the one word the line prints beside the item. */
+function itemStateKey(effect?: string): "lost" | "used" | "swapped" | null {
+  switch (effect) {
+    case "knocked off": case "stolen": case "incinerated": case "flung": case "popped": case "held up":
+      return "lost"
+    case "eaten": case "consumed": case "harvested":
+      return "used"
+    case "tricked": case "bestowed":
+      return "swapped"
+    default:
+      return null
+  }
+}
+
+/**
+ * The compact meta line: item, ability, tera. One row, fixed shape.
+ *
+ * An item that has LEFT is information — a Choice Scarf that got knocked off
+ * changes the speed maths for the rest of the game — so `lastItem` is drawn
+ * struck through with the reason rather than simply vanishing, which is what
+ * the plate did before and what left a player believing the scarf was still
+ * on. Ability appears only once the battle has revealed it: a blank is honest
+ * and an em dash is not a guess either, so the row simply shortens.
+ */
+export function BxMeta({ mon, compact = false }: { mon: BxMon; compact?: boolean }) {
+  const t = useToolT(BATTLESIM_NS)
+  const L = useBxLabels()
+  const held = mon.item ? (Dex.items.get(mon.item)?.name ?? mon.item) : null
+  const gone = !held && mon.lastItem ? (Dex.items.get(mon.lastItem)?.name ?? mon.lastItem) : null
+  const goneKey = itemStateKey(mon.lastItemEffect) ?? (gone ? "lost" : null)
+  const heldKey = itemStateKey(mon.itemEffect)
+  const ability = mon.ability ? (Dex.abilities.get(mon.ability)?.name ?? mon.ability) : null
+  if (!held && !gone && !ability && !(mon.tera && mon.teraType)) return null
+  const size = compact ? "text-[0.53125rem]" : "text-[0.5625rem]"
+  return (
+    <span className={cn("flex min-w-0 items-center gap-[0.375rem] font-mono font-medium not-italic leading-none tracking-[0.04em] text-txt-dim", size)}>
+      {held && (
+        <span className="inline-flex min-w-0 items-center gap-[0.25rem]" title={t("battle.mon.item") + ": " + held}>
+          <i aria-hidden className="h-[0.3125rem] w-[0.3125rem] flex-none rotate-45 bg-txt-dim" />
+          <span className="min-w-0 truncate text-txt-muted">{held}</span>
+          {heldKey && <b className="flex-none text-warn">{t(`battle.mon.itemState.${heldKey}`)}</b>}
+        </span>
+      )}
+      {gone && (
+        <span className="inline-flex min-w-0 items-center gap-[0.25rem]" title={t("battle.mon.item") + ": " + gone}>
+          <i aria-hidden className="h-[0.3125rem] w-[0.3125rem] flex-none rotate-45 bg-line-2" />
+          <s className="min-w-0 truncate decoration-bad/70">{gone}</s>
+          {goneKey && <b className="flex-none text-bad">{t(`battle.mon.itemState.${goneKey}`)}</b>}
+        </span>
+      )}
+      {ability && (
+        <span className="min-w-0 truncate" title={t("battle.mon.ability") + ": " + ability}>{ability}</span>
+      )}
+      {mon.tera && mon.teraType && (
+        <span className="ml-auto inline-flex flex-none items-center gap-[0.25rem] uppercase" style={tyc(tyColor(mon.teraType))}>
+          <BxTera type={mon.teraType} size="0.85em" /><b className="text-[var(--tyc)]">{L.type(mon.teraType)}</b>
+        </span>
+      )}
     </span>
   )
 }
@@ -169,23 +280,41 @@ export function BxTera({ type, size = "1em" }: { type: string; size?: string }) 
     className="flex-none leading-none [color:var(--tyc)] [text-shadow:0_0_8px_color-mix(in_srgb,var(--tyc)_65%,transparent)]">◆</span>
 }
 
-/* ── HP bar (with ghost damage preview + delayed damage trail) ───────────── */
-export function BxHp({ pct, ghost = null, trail = true }: { pct: number; ghost?: { min: number; max: number } | null; trail?: boolean }) {
-  const p = Math.max(0, Math.min(100, pct))
+/* ── HP bar (ledger segments + ghost damage preview) ─────────────────────── */
+/**
+ * Three layers over one track: what you have, what this turn took, what this
+ * turn gave back.
+ *
+ * THE TRAIL IS GONE ON PURPOSE. It was a second bar that remembered the
+ * component's own previous percentage and caught up 500 ms later, which meant
+ * (a) a mon switching into the slot inherited its predecessor's number and
+ * animated a 90-point "hit" that never happened — the memory was keyed on the
+ * percentage, not on WHICH POKÉMON — and (b) how much damage the bar claimed
+ * depended on when React re-rendered, so a two-hit move and a hit-plus-
+ * residual were indistinguishable and a fast turn could swallow one of them
+ * entirely. `TurnLedger` already records every damage and heal event with
+ * absolute numbers, keyed by identity, so the band is READ rather than
+ * inferred: it appears the instant the event lands and stays until the next
+ * `|turn|` snapshot re-baselines the entry. No timer decides anything here.
+ *
+ * `monKey` is the second half of that fix: the bar remounts on an identity
+ * change, so the fill's width transition never plays across two different
+ * Pokémon.
+ */
+export function BxHp({ pct, ghost = null, ledger = null, monKey, ko = false }: {
+  pct: number
+  ghost?: { min: number; max: number } | null
+  /** This turn's record for the mon this bar belongs to. */
+  ledger?: LedgerEntry | null
+  /** `searchid`-style identity. Changing it remounts the bar with no animation. */
+  monKey?: string
+  /** Fainted: the track goes flat and desaturated rather than merely empty. */
+  ko?: boolean
+}) {
+  const seg = hpSegments(pct, ledger)
+  const p = seg.pct
   const gMax = ghost ? Math.min(p, ghost.max) : 0
   const gMin = ghost ? Math.min(p, ghost.min) : 0
-  // The trail is a second bar behind the live one that catches up after
-  // 500 ms, so a hit reads as "what you had → what you have" instead of a
-  // jump. Heals snap the trail up immediately: a trail ahead of the bar
-  // would read as damage that never happened.
-  const [trailPct, setTrailPct] = React.useState(p)
-  const [snap, setSnap] = React.useState(false)
-  React.useEffect(() => {
-    if (p >= trailPct) { setSnap(true); setTrailPct(p); return }
-    setSnap(false)
-    const id = setTimeout(() => setTrailPct(p), 500)
-    return () => clearTimeout(id)
-  }, [p, trailPct])
   return (
     // The SHAPE is the redesign. A slanted bar is what Champions draws and it
     // is also what this design system already speaks — `.cut` is literally a
@@ -199,7 +328,7 @@ export function BxHp({ pct, ghost = null, trail = true }: { pct: number; ghost?:
     // line colour, an inner one inset and re-clipped — written out here because
     // the bars inside must be clipped to the inner shape too, and `.cut-frame`
     // paints its fill from a pseudo-element that children cannot live inside.
-    <div className="cut relative h-[1.0625rem] w-full bg-line-2 [--cut:7px]">
+    <div key={monKey} data-bx-hp className={cn("cut relative h-[1.0625rem] w-full [--cut:7px]", ko ? "bg-[color-mix(in_srgb,var(--line-2)_60%,transparent)] saturate-[0.25]" : "bg-line-2")}>
       <div
         className="cut absolute overflow-hidden bg-[linear-gradient(180deg,var(--base)_0%,var(--panel-2)_100%)] [--cut:6px]"
         // Horizontal inset is wider than vertical on purpose: a 1px diagonal is
@@ -213,8 +342,28 @@ export function BxHp({ pct, ghost = null, trail = true }: { pct: number; ghost?:
           <i key={at} aria-hidden className="absolute bottom-0 top-0 z-[2] w-px -skew-x-[22deg] bg-[color-mix(in_srgb,var(--line-2)_70%,transparent)]" style={{ left: at + "%" }} />
         ))}
 
-        {/* Delayed damage trail (see above) — behind everything but the track. */}
-        {trail && <i className={cn("absolute inset-0 right-auto bg-[color-mix(in_srgb,var(--bad)_45%,var(--panel-2))]", !snap && "transition-[width] duration-[600ms] ease-out motion-reduce:transition-none")} style={{ width: trailPct + "%" }} />}
+        {/* LOST THIS TURN — from where the bar stands now up to where it stood
+            when the turn began. Hatched AND desaturated-red rather than solid:
+            solid red beside the live fill reads as a second, larger health
+            bar, and the hatch says "this is gone" in a way a flat colour at
+            this size cannot. It fades to transparent towards its right edge so
+            the band points back at the fill instead of ending in a hard wall.
+            Cumulative by construction — a four-hit move draws ONE band. */}
+        {seg.lostPct > 0 && (
+          <i data-bx-hp-lost aria-hidden
+            className="absolute bottom-0 top-0 z-[1] bg-[repeating-linear-gradient(115deg,color-mix(in_srgb,var(--bad)_58%,transparent)_0_3px,color-mix(in_srgb,var(--bad)_18%,transparent)_3px_7px)] [mask-image:linear-gradient(90deg,black_0%,black_58%,color-mix(in_srgb,black_35%,transparent)_100%)]"
+            style={{ left: p + "%", width: seg.lostPct + "%" }} />
+        )}
+
+        {/* GAINED THIS TURN — soft green from where the turn began up to the
+            live edge, i.e. the part of the fill that was not there a moment
+            ago. Sits UNDER the fill's z-index and is tinted rather than
+            hatched: a heal is good news and should not read as damage. */}
+        {seg.gainedPct > 0 && (
+          <i data-bx-hp-gained aria-hidden
+            className="absolute bottom-0 top-0 z-[1] bg-[color-mix(in_srgb,var(--ok)_55%,transparent)] [mask-image:linear-gradient(90deg,color-mix(in_srgb,black_30%,transparent)_0%,black_100%)]"
+            style={{ left: seg.startPct + "%", width: seg.gainedPct + "%" }} />
+        )}
 
         {/* The live fill. */}
         <i
@@ -253,10 +402,56 @@ export function BxHp({ pct, ghost = null, trail = true }: { pct: number; ghost?:
   )
 }
 
+/**
+ * The per-event damage/heal labels and the multi-hit count, for the row
+ * directly under the bar.
+ *
+ * Every label is keyed by its INDEX IN `ledger.events`, so what is on screen
+ * is a function of the ledger and nothing else — no timer schedules them, no
+ * timer removes them. They rise into place on mount (a CSS animation, which
+ * cannot change what is rendered) and then stay until the next `|turn|`
+ * clears the entry, which is the same moment the coloured band goes.
+ *
+ * Separate from {@link BxHp} because the bar is clipped to a chamfer and
+ * these must not be: a label drawn inside it would be sliced by the same
+ * `clip-path` that gives the bar its shape.
+ */
+export function BxHpDeltas({ ledger, compact = false }: { ledger?: LedgerEntry | null; compact?: boolean }) {
+  const t = useToolT(BATTLESIM_NS)
+  const seg = hpSegments(ledger?.maxhp ? (ledger.hp / ledger.maxhp) * 100 : 0, ledger)
+  if (!seg.deltas.length && seg.hits < 2) return null
+  return (
+    <>
+      {seg.hits > 1 && (
+        <b title={t("battle.hp.hits", { n: seg.hits })}
+          className="flex-none border border-solid border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft px-[0.25rem] py-[2px] font-mono text-[0.53125rem] font-bold not-italic leading-none tracking-[0.04em] text-bad">
+          ×{seg.hits}
+        </b>
+      )}
+      {seg.deltas.map((d) => (
+        <b key={d.i} style={{ animationDelay: `${Math.min(d.i, 6) * 70}ms` }}
+          className={cn("flex-none animate-[bm-hprise_260ms_ease-out_both] font-mono font-bold not-italic leading-none tracking-[0.02em] motion-reduce:animate-none [font-variant-numeric:tabular-nums]",
+            compact ? "text-[0.53125rem]" : "text-[0.59375rem]",
+            d.kind === "damage" ? "text-bad" : "text-ok")}>
+          {d.kind === "damage" ? "−" : "+"}{d.pct}%
+        </b>
+      ))}
+    </>
+  )
+}
+
 /* ── Field plate (combatant HUD) ─────────────────────────────────────────── */
 export type BxGhost = { min: number; max: number; ko?: { t: string; cls: "sure" | "maybe" } | null } | null
-export function BxPlate({ mon, slotTag, foe = false, ghost = null, active = false, targetable = false, aimed = false, hit = false, onClick, compact = false, exact, targetLabel, onDetails, detailsLabel }: {
+export function BxPlate({ mon, slotTag, foe = false, ghost = null, ledger = null, active = false, targetable = false, aimed = false, hit = false, onClick, compact = false, exact, targetLabel, onDetails, detailsLabel }: {
   mon: BxMon | null; slotTag?: string; foe?: boolean; ghost?: BxGhost; active?: boolean; targetable?: boolean; aimed?: boolean; hit?: boolean; onClick?: () => void; compact?: boolean
+  /**
+   * This turn's ledger entry for `mon` — `session.ledger?.get(pokemon)`.
+   *
+   * Optional, and the plate is correct without it (it simply draws no "this
+   * turn" bands). It is not optional for a live battle: it is the ONLY source
+   * for what the turn took, and the bar will not guess in its absence.
+   */
+  ledger?: LedgerEntry | null
   /** Show `cur/max` instead of a percent. Defaults to "own side and known". */
   exact?: boolean
   /** Accessible name while targetable. */
@@ -274,6 +469,28 @@ export function BxPlate({ mon, slotTag, foe = false, ghost = null, active = fals
   const types = mon.tera && mon.teraType ? [mon.teraType] : mon.types
   const clickable = targetable || !!onDetails
   const Tag = (clickable ? "button" : "div") as "button"
+  // Identity, not slot: the plate component is keyed by POSITION on the field,
+  // so the same instance survives a switch. Everything with memory below hangs
+  // off this instead.
+  const monKey = mon.searchid ?? mon.id
+  const gender = GENDER_GLYPH[mon.gender ?? ""]
+  const volatiles = shownVolatiles(mon.volatiles ?? (mon.protect ? ["protect"] : []))
+  const perish = perishCount(mon.volatiles)
+  // The readout, in one place: the numerals row uses it when there is room for
+  // one, and the name row uses it in `compact`, where there is not.
+  const readout = (
+    <span aria-label={hpAriaLabel(t, mon, pct, showExact)}
+      className={cn("inline-flex flex-none items-baseline justify-end gap-[3px] leading-none", showExact ? "min-w-[7ch]" : "min-w-[4.5ch]")}
+      style={{ ...BX_PLATE_VOICE, color: mon.fnt ? "var(--muted)" : hpTone(pct) }}>
+      {!mon.fnt && band !== "ok" && <i aria-hidden className="self-center not-italic text-[0.625rem]">▼</i>}
+      {/* Current big, maximum small — the number that changes is the one
+          worth reading at a glance, and it is how Champions sets it. */}
+      <b style={{ fontSize: compact ? "15px" : "21px" }}>{mon.fnt ? t("battle.end.ko") : showExact ? mon.hpCur : pct}</b>
+      {!mon.fnt && (
+        <span className="opacity-70" style={{ fontSize: compact ? "10px" : "12px" }}>{showExact ? `/${mon.hpMax}` : "%"}</span>
+      )}
+    </span>
+  )
   return (
     <Tag
       type={clickable ? "button" : undefined}
@@ -295,38 +512,74 @@ export function BxPlate({ mon, slotTag, foe = false, ghost = null, active = fals
         <BxSprite mon={mon} size={compact ? 30 : 40} />
         {mon.fnt && <b className="absolute inset-0 grid place-items-center font-display text-[0.75rem] font-extrabold leading-none tracking-[0.06em] text-bad">{t("battle.end.ko")}</b>}
       </span>
+      {/* The reading order is the reference's: WHO, then the bar, then the
+          number, then everything else. The status pill rides the name row
+          rather than the chip row so it is never pushed to a second line by a
+          long species name — it is the fact that changes the turn.
+
+          `compact` folds the numerals back onto the name row. That plate is an
+          overlay on the field itself, where every row of height is board a
+          player cannot see, and the number is legible there because it is the
+          only thing competing with the name. */}
       <span className="grid min-w-0 flex-1 gap-[0.3125rem]">
         <span className="flex min-w-0 items-center gap-[0.375rem]">
           {slotTag && <b className={cn("flex-none border border-solid px-[0.3125rem] py-[2px] font-mono text-[0.5rem] font-bold not-italic leading-none tracking-[0.1em]", foe ? "border-[color-mix(in_srgb,var(--bad)_45%,transparent)] bg-bad-soft text-bad" : "border-accent-line bg-accent-soft text-accent-bright")}>{slotTag}</b>}
           {mon.tera && mon.teraType && <BxTera type={mon.teraType} size=".78em" />}
           {/* The name carries the plate voice too — it is the half of the
               Champions nameplate the eye actually reads as "that game". */}
-          <span className={cn("min-w-0 flex-1 truncate leading-none", compact ? "text-[0.78125rem]" : "text-[0.90625rem]")} style={BX_PLATE_VOICE}>{mon.name}</span>
-          <span aria-label={hpAriaLabel(t, mon, pct, showExact)} className="ml-auto inline-flex flex-none items-baseline gap-[3px] leading-none" style={{ ...BX_PLATE_VOICE, color: mon.fnt ? "var(--muted)" : hpTone(pct) }}>
-            {!mon.fnt && band !== "ok" && <i aria-hidden className="self-center not-italic text-[0.625rem]">▼</i>}
-            {/* Current big, maximum small — the number that changes is the one
-                worth reading at a glance, and it is how Champions sets it. */}
-            <b style={{ fontSize: compact ? "15px" : "19px" }}>{mon.fnt ? t("battle.end.ko") : showExact ? mon.hpCur : pct}</b>
-            {!mon.fnt && (
-              <span className="opacity-70" style={{ fontSize: compact ? "10px" : "12px" }}>{showExact ? `/${mon.hpMax}` : "%"}</span>
-            )}
+          <span className={cn("min-w-0 truncate leading-none", compact ? "text-[0.78125rem]" : "text-[0.90625rem]")} style={BX_PLATE_VOICE}>{mon.name}</span>
+          {gender && <i aria-hidden title={mon.gender} className={cn("flex-none not-italic leading-none", compact ? "text-[0.65625rem]" : "text-[0.71875rem]", mon.gender === "F" ? "text-[#f95587]" : "text-[#6390f0]")}>{gender}</i>}
+          {!compact && mon.level != null && (
+            <span className="flex-none font-mono text-[0.5625rem] font-semibold not-italic leading-none tracking-[0.04em] text-txt-dim [font-variant-numeric:tabular-nums]">{t("battle.mon.level", { level: mon.level })}</span>
+          )}
+          <span className="ml-auto flex flex-none items-center gap-[0.375rem]">
+            <BxStatus status={mon.status} />
+            {compact && readout}
           </span>
         </span>
-        <BxHp pct={pct} ghost={ghost} />
-        {ghost ? (
+
+        <BxHp pct={pct} ghost={ghost} ledger={ledger} monKey={monKey} ko={!!mon.fnt} />
+
+        {/* Numerals row. The deltas sit on the LEFT of it because they are read
+            against the bar above them, and the running total sits on the right
+            where it has never moved. Fixed minimum widths in `ch` on both ends:
+            during a fast turn the numbers change every frame and a row that
+            re-measured itself would make the whole plate twitch. */}
+        {!compact && (
+          <span className="flex min-h-[1.375rem] min-w-0 items-center gap-[0.3125rem]">
+            {ghost ? (
+              <span className="flex min-w-0 items-center gap-[0.375rem] font-mono text-[0.6875rem] font-bold leading-none text-warn">
+                <Icon name="target" size={11} /><b>−{ghost.min}–{ghost.max}%</b>
+                {ghost.ko && <i className={cn("px-[0.3125rem] py-[3px] font-mono text-[0.5625rem] font-bold not-italic uppercase leading-none tracking-[0.06em] text-accent-ink", ghost.ko.cls === "sure" ? "bg-bad" : "bg-warn")}>{ghost.ko.t}</i>}
+              </span>
+            ) : (
+              <BxHpDeltas ledger={ledger} />
+            )}
+            {!mon.fnt && band === "critical" && (
+              <b className="flex-none bg-bad px-[0.3125rem] py-[3px] font-mono text-[0.53125rem] font-bold uppercase leading-none tracking-[0.08em] text-accent-ink">{t("battle.hp.critical")}</b>
+            )}
+            <span className="ml-auto">{readout}</span>
+          </span>
+        )}
+
+        {compact && ghost && (
           <span className="flex min-h-[1rem] items-center gap-[0.375rem] font-mono text-[0.6875rem] font-bold leading-none text-warn">
             <Icon name="target" size={11} /><b>−{ghost.min}–{ghost.max}%</b>
             {ghost.ko && <i className={cn("px-[0.3125rem] py-[3px] font-mono text-[0.5625rem] font-bold not-italic uppercase leading-none tracking-[0.06em] text-accent-ink", ghost.ko.cls === "sure" ? "bg-bad" : "bg-warn")}>{ghost.ko.t}</i>}
           </span>
-        ) : (
+        )}
+
+        {!ghost && (
           <span className="flex min-h-[1rem] flex-wrap items-center gap-[0.3125rem]">
-            {!mon.fnt && band === "critical" && <b className="bg-bad px-[0.3125rem] py-[3px] font-mono text-[0.53125rem] font-bold uppercase leading-none tracking-[0.08em] text-accent-ink">{t("battle.hp.critical")}</b>}
+            {compact && <BxHpDeltas ledger={ledger} compact />}
+            {compact && !mon.fnt && band === "critical" && <b className="bg-bad px-[0.3125rem] py-[3px] font-mono text-[0.53125rem] font-bold uppercase leading-none tracking-[0.08em] text-accent-ink">{t("battle.hp.critical")}</b>}
             <BxTypeRow types={types} small />
-            <BxStatus status={mon.status} />
-            {mon.protect && <i className="border border-dashed border-[color-mix(in_srgb,var(--info)_50%,transparent)] px-1 py-[2px] font-mono text-[0.53125rem] font-bold not-italic leading-none tracking-[0.1em] text-signal">{t("battle.labels.protect")}</i>}
+            <BxVolatiles ids={volatiles} perish={perish} />
             {boosts.map(([s, v]) => <BxBoost key={s} stat={s} value={v} />)}
           </span>
         )}
+
+        {!compact && !ghost && <BxMeta mon={mon} />}
       </span>
     </Tag>
   )
@@ -391,10 +644,19 @@ export function BxBench({ mon, hotkey, disabled = false, reserved = false, reaso
     <button type="button" disabled={off} onClick={onClick} title={why} aria-pressed={reserved || undefined}
       className={cn("cut-tag cut-tag-edge [--cut-tag:var(--cut,0.625rem)] [--cut-line:var(--line)]", BSIM_FOCUS_CUT, FOCUS_RING, PRESS, "flex min-h-[3.25rem] w-full min-w-0 items-center gap-[0.5625rem] border border-solid border-line bg-panel px-[0.625rem] py-[0.4375rem] text-left text-txt transition-[background,border-color,transform] duration-[140ms]",
         "hover:border-accent-line hover:bg-panel-2 disabled:cursor-not-allowed disabled:hover:border-line disabled:hover:bg-panel",
-        mon.fnt && "opacity-45 saturate-[0.2]", off && !mon.fnt && "opacity-60",
+        // KO and "currently on the field" are the two states a player scans
+        // this row for, and neither was legible: a fainted card was merely
+        // dimmer than a disabled one, and the active mon looked like any other
+        // card you happen not to be allowed to pick.
+        mon.fnt && "border-[color-mix(in_srgb,var(--bad)_40%,var(--line))] [--cut-line:color-mix(in_srgb,var(--bad)_40%,var(--line))] opacity-55 saturate-[0.2]",
+        off && !mon.fnt && "opacity-60",
+        mon.active && !mon.fnt && "border-accent [--cut-line:var(--accent)] [box-shadow:inset_0_0_0_1px_color-mix(in_srgb,var(--accent)_45%,transparent)]",
         reserved && "border-accent-line [--cut-line:var(--accent-line)] bg-accent-soft")}>
       {hotkey != null && <BxKbd>{hotkey}</BxKbd>}
-      <BxSprite mon={mon} size={34} />
+      <span className="relative flex-none">
+        <BxSprite mon={mon} size={34} />
+        {mon.fnt && <b className="absolute inset-0 grid place-items-center font-display text-[0.6875rem] font-extrabold leading-none tracking-[0.06em] text-bad">{t("battle.end.ko")}</b>}
+      </span>
       <span className="grid min-w-0 flex-1 gap-1">
         {/* THE HP READOUT SITS ON THE NAME ROW, NOT BESIDE THE BAR.
             These cards go six across a dock band, which leaves each one about
@@ -415,7 +677,7 @@ export function BxBench({ mon, hotkey, disabled = false, reserved = false, reaso
             `background` shorthand goes with it — so every bench bar rendered as
             an empty outline no matter the HP, at full health included. One bar
             implementation means that fix cannot be missed twice. */}
-        <BxHp pct={pct} trail={false} />
+        <BxHp pct={pct} monKey={mon.searchid ?? mon.id} ko={!!mon.fnt} />
         <BxTypeRow types={mon.types} small />
       </span>
     </button>

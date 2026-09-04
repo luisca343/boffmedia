@@ -24,7 +24,17 @@ export type { BsimFormat, BsimFormatKind, BsimStatSystem, BsimStatLimits, BsimSt
 
 // Engine
 export { BattleEngine } from './engine/BattleEngine.js';
-export type { BattleEngineMode, PlayerSpec, BattleEndResult, BattleEngineCallbacks } from './engine/BattleEngine.js';
+export type {
+  BattleEngineMode,
+  BattleEngineOptions,
+  BattleViewer,
+  BattleSide,
+  PlayerSpec,
+  BattleEndResult,
+  BattleEngineCallbacks,
+  ChoiceErrorCode,
+  ChoiceResult,
+} from './engine/BattleEngine.js';
 
 export { TimerManager } from './engine/TimerManager.js';
 export type { TimerConfig, TimerState, TimerManagerCallbacks } from './engine/TimerManager.js';

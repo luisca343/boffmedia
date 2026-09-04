@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { Protocol } from '@pkmn/protocol';
 import { Socket } from 'socket.io-client';
 import { ShowdownBaseSession, ChatMessage } from './engine/ShowdownBaseSession';
-import { toolApi } from '@boffmedia/tool-kit';
+import { toolApi, toolSession } from '@boffmedia/tool-kit';
 import { openBattleSocket, attachListeners } from './engine/battleSocket';
 
 export interface ChallengeRequest {
@@ -65,6 +65,32 @@ const showdownLines = new Map<string, string[]>();
 let showdownUsername: string | null = null;
 
 /**
+ * Every battle room PS has told us we are in, so a reconnect can re-enter them.
+ *
+ * A room is not recoverable from anything else: the relay's upstream connection
+ * is new after a real drop, PS does not re-join anything by itself, and the
+ * battle simply stops arriving. `/join <roomid>` answers with `|init|battle`
+ * plus the full log, which is why the frame handler treats that as a resync.
+ */
+const knownBattleRooms = new Set<string>();
+
+/**
+ * The credentials for a re-login, held ONLY in memory.
+ *
+ * Never written to storage, never logged, and dropped when the last screen lets
+ * go of the relay. They exist because a fresh upstream connection means a fresh
+ * `|challstr|`, and PS will not let an un-`/trn`'d connection into a battle
+ * room — so without this a reconnect leaves the player a spectator of their own
+ * battle, or out of it entirely.
+ */
+let heldCredentials: { username: string; password?: string } | null = null;
+/** Whether the relay has ever completed an upstream connection this page load. */
+let relayHasConnected = false;
+/** Set when a NEW upstream connection replaced a previous one. */
+let pendingRelogin = false;
+let pendingRejoin = false;
+
+/**
  * ONE relay socket for the whole tool, for the same reason the sessions above
  * are shared — and this is the half the migration lost.
  *
@@ -86,6 +112,22 @@ let relaySocket: Socket | null = null;
 let relayPending: Promise<Socket> | null = null;
 let relayRefs = 0;
 
+/**
+ * How long the relay may stay on "connecting" before it has to say why not.
+ *
+ * Getting to a usable relay is two hops — this socket to the API, then the
+ * API's upstream socket to Pokemon Showdown — and NEITHER was reported. The
+ * hook attached its handlers and then waited: no `connect_error` listener, no
+ * clock, and `'connecting'` was a status the type declared and nothing ever
+ * set. A refused ticket, a websocket a proxy would not upgrade, or a PS server
+ * that would not answer all produced the same thing on screen — a lobby whose
+ * login form stayed disabled, or a room sitting on the waiting spinner, with
+ * no error and nothing to retry.
+ *
+ * Covers both hops because the player cannot act until both are up.
+ */
+const RELAY_CONNECT_DEADLINE_MS = 20_000;
+
 async function acquireRelaySocket(): Promise<Socket> {
   if (!relaySocket && !relayPending) {
     // The relay requires a Boffmedia session now (§5.1.5): it opens a real
@@ -99,7 +141,26 @@ async function acquireRelaySocket(): Promise<Socket> {
         // Two screens awaiting this same open would both attach before
         // `connected` fires, so "the first caller" is not a safe test — owning
         // it here is.
-        socket.on('connected', () => { socket.emit('connectToShowdown'); });
+        socket.on('connected', (data?: { resumed?: boolean }) => {
+          if (data?.resumed) {
+            // The API kept its upstream PS socket alive across our blip and has
+            // just replayed the cached `|challstr|` and everything buffered
+            // since. Asking for `connectToShowdown` here would TEAR DOWN that
+            // upstream connection and open an anonymous second one — which is
+            // how a reconnect used to leave the player watching a battle they
+            // could no longer send a move to (H5).
+            return;
+          }
+          if (relayHasConnected) {
+            // A genuinely new upstream connection after a previous one: PS has
+            // forgotten the login and every room we were in. Both are re-done
+            // on the way back through `|challstr|` and `|updateuser|`.
+            pendingRelogin = true;
+            pendingRejoin = true;
+          }
+          relayHasConnected = true;
+          socket.emit('connectToShowdown');
+        });
         relaySocket = socket;
         relayPending = null;
         return socket;
@@ -140,6 +201,13 @@ function releaseRelaySocket(): void {
   relaySocket?.close();
   relaySocket = null;
   relayPending = null;
+  relayHasConnected = false;
+  pendingRelogin = false;
+  pendingRejoin = false;
+  // The user left the tool: this is the teardown a transport blip is NOT.
+  // Credentials go first, and nothing about the previous account survives.
+  heldCredentials = null;
+  resetShowdownState();
 }
 
 function getGlobalSessions(): Map<string, ShowdownBaseSession> {
@@ -158,10 +226,17 @@ function setGlobalUsername(name: string | null) {
   showdownUsername = name;
 }
 
-/** Clears everything the relay accumulated. Called on disconnect. */
+/**
+ * Clears everything the relay accumulated.
+ *
+ * Called when the LAST screen lets go of the relay — not on a `disconnect`,
+ * which is usually a blip the upstream connection outlives. Throwing the
+ * sessions away there blanked a live battle that was about to be recovered.
+ */
 export function resetShowdownState(): void {
   showdownSessions.clear();
   showdownLines.clear();
+  knownBattleRooms.clear();
   showdownUsername = null;
 }
 
@@ -175,6 +250,15 @@ export function useShowdownBattle(
   options?: UseShowdownBattleOptions,
 ) {
   const autoCreateSession = options?.autoCreateSession ?? true;
+  /**
+   * ONE spelling of the room id, everywhere.
+   *
+   * Incoming frames are keyed by PS's own normalisation; the id this hook is
+   * given came through an address bar and may carry case or an escape. Three
+   * places compared the two raw (L4), so a room could be owned under one key,
+   * looked up under another, and silently double-processed.
+   */
+  const normalizedRoomId = roomId ? toRoomid(roomId) : undefined;
   const onBattleFoundRef = useRef(options?.onBattleFound);
   onBattleFoundRef.current = options?.onBattleFound;
 
@@ -190,6 +274,19 @@ export function useShowdownBattle(
   // acquires, and the second overwrites `detachRef` so the FIRST set of
   // listeners is never removed — every relay message then handled twice.
   const connectingRef = useRef(false);
+  /**
+   * Whether this mount has gone away.
+   *
+   * `connect` is async and the acquire can outlive the screen that asked for
+   * it: the unmount cleanup ran while `releaseRef` was still null, so the
+   * refcount was never given back and the relay socket stayed open with
+   * nothing owning it — and the resolved socket then had a dead mount's
+   * listeners attached to it, permanently. Reset on every mount so StrictMode's
+   * double-invoke is not mistaken for a real teardown.
+   */
+  const goneRef = useRef(false);
+  /** Fires if neither hop of the relay comes up. See `RELAY_CONNECT_DEADLINE_MS`. */
+  const deadlineRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const sessionRef = useRef<ShowdownBaseSession | null>(null);
   const challstrRef = useRef<string>('');
   const joinedRoomsRef = useRef<Set<string>>(new Set());
@@ -197,6 +294,14 @@ export function useShowdownBattle(
 
   const [status, setStatusState] = useState<ShowdownStatus>('idle');
   const setStatus = useCallback((s: ShowdownStatus) => {
+    // Anything that is not `connecting` is an ANSWER — the relay came up, the
+    // login was refused, PS dropped us — so the deadline has done its job and
+    // must not fire over the top of it. Clearing here rather than at each of
+    // the dozen call sites is what makes that true for all of them.
+    if (s !== 'connecting' && deadlineRef.current !== null) {
+      clearTimeout(deadlineRef.current);
+      deadlineRef.current = null;
+    }
     statusRef.current = s;
     setStatusState(s);
   }, []);
@@ -254,6 +359,67 @@ export function useShowdownBattle(
 
     const lines = messageData.split('\n');
 
+    /**
+     * `|init|battle` is PS handing over the room's WHOLE log.
+     *
+     * It arrives on the first join and again on every `/join` after a
+     * reconnect, and everything after it in the frame is that log. Feeding it
+     * line by line was H4/H5: on a re-join it was applied on top of a battle
+     * that had already seen most of it, so HP, boosts and the log doubled. One
+     * `resync` instead — the only "catch me up" that is safe to receive twice.
+     */
+    if (isRoomFrame) {
+      const initIndex = lines.findIndex((line) => {
+        const head = Protocol.parseLine(line) as any;
+        return head && head[0] === 'init' && head[1] === 'battle';
+      });
+      if (initIndex >= 0) {
+        const log = lines.slice(initIndex).filter((line) => line.trim());
+        joinedRoomsRef.current.add(roomid);
+        knownBattleRooms.add(roomid);
+
+        const globalSessions = getGlobalSessions();
+        let sess = globalSessions.get(roomid);
+        if (!sess) {
+          const relay = socketRef.current ?? relaySocket;
+          if (!relay) {
+            console.warn('[battlesim] |init|battle with no relay socket', roomid);
+            return;
+          }
+          sess = new ShowdownBaseSession(
+            roomid,
+            { onUpdate: triggerUpdate, onRequest: () => triggerUpdate(), onBattleEnd: () => triggerUpdate() },
+            relay,
+          );
+          sess.setViewerName(getGlobalUsername());
+          globalSessions.set(roomid, sess);
+        }
+        getGlobalLines().set(roomid, [...log]);
+        sess.status = 'active';
+
+        if (sess.scene) {
+          sess.resync(log);
+        } else {
+          // No canvas yet, so the session is still BUFFERING and has no
+          // processor: `resync` would replay onto one that does not exist and
+          // drop every line. Feed only what is not already in the buffer.
+          for (const line of log.slice(sess.psLines.length)) sess.addLine(line);
+        }
+        for (const line of log) {
+          if (line.startsWith('|c|') || line.startsWith('|c:|')) sess.handleChatLine(line);
+        }
+
+        if (autoCreateSession && (roomid === normalizedRoomId || !normalizedRoomId)) {
+          sessionRef.current = sess;
+          setSession(sess);
+          setStatus('active');
+        }
+        onBattleFoundRef.current?.(roomid);
+        triggerUpdate();
+        return;
+      }
+    }
+
     for (const line of lines) {
       if (!line.trim()) continue;
 
@@ -261,10 +427,6 @@ export function useShowdownBattle(
       if (!parsed) continue;
 
       const msgType = parsed[0];
-      // Skip noisy message types
-      const noisy = ['join', 'leave', 'c', 'c:'];
-      if (!noisy.includes(msgType)) {
-      }
 
       // Store all battle lines globally for replay
       if (roomid !== 'lobby' && roomid !== 'global') {
@@ -277,6 +439,21 @@ export function useShowdownBattle(
         case 'challstr': {
           challstrRef.current = parsed[1];
           setChallstr(parsed[1]);
+          // A NEW upstream connection replaced a previous one, so PS has
+          // forgotten who we are. The credentials are still in memory (see
+          // `heldCredentials`) and this is the first moment a login can be
+          // sent, because a login needs the challstr of the connection it is
+          // for. The flag is module-level, so however many screens see this
+          // frame, exactly one login goes out.
+          if (pendingRelogin && heldCredentials && socketRef.current?.connected) {
+            pendingRelogin = false;
+            socketRef.current.emit('login', {
+              username: heldCredentials.username,
+              ...(heldCredentials.password ? { password: heldCredentials.password } : {}),
+              challstr: parsed[1],
+            });
+            setStatus('authenticating');
+          }
           break;
         }
 
@@ -292,6 +469,17 @@ export function useShowdownBattle(
             // sees those, so an ungated emit would join once per open screen.
             if (lobbyIsMine && socketRef.current?.connected) {
               socketRef.current.emit('sendToShowdown', '|/join lobby');
+            }
+            // Back in after a reconnect: PS puts nobody back in a battle room
+            // by itself, and the battle simply stops arriving. `/join` answers
+            // with `|init|battle` and the full log, which the frame handler
+            // above takes as a resync. Module-level flag, so one join per room
+            // however many screens are watching.
+            if (pendingRejoin && socketRef.current?.connected) {
+              pendingRejoin = false;
+              for (const known of knownBattleRooms) {
+                socketRef.current.emit('sendToShowdown', `|/join ${known}`);
+              }
             }
           } else {
             setUsername(newName || null);
@@ -395,39 +583,9 @@ export function useShowdownBattle(
         }
 
         case 'init': {
-          if (parsed[1] === 'battle') {
-            joinedRoomsRef.current.add(roomid);
-            // Store session globally so battle page can pick it up
-            const globalSessions = getGlobalSessions();
-            if (autoCreateSession && (roomid === roomId || !roomId)) {
-              let session = globalSessions.get(roomid);
-              if (!session || session.roomId !== roomid) {
-                session = new ShowdownBaseSession(
-                  roomid,
-                  { onUpdate: triggerUpdate, onRequest: () => triggerUpdate(), onBattleEnd: () => triggerUpdate() },
-                  socketRef.current!,
-                );
-                session.setViewerName(getGlobalUsername());
-                globalSessions.set(roomid, session);
-              }
-              sessionRef.current = session;
-              setSession(session);
-              setStatus('active');
-            } else if (!autoCreateSession) {
-              // Lobby: create session globally but don't set it locally
-              if (!globalSessions.has(roomid)) {
-                const session = new ShowdownBaseSession(
-                  roomid,
-                  { onUpdate: triggerUpdate, onRequest: () => triggerUpdate(), onBattleEnd: () => triggerUpdate() },
-                  socketRef.current!,
-                );
-                session.setViewerName(getGlobalUsername());
-                globalSessions.set(roomid, session);
-              }
-            }
-            // Always notify about found battles (for lobby navigation)
-            onBattleFoundRef.current?.(roomid);
-          }
+          // `|init|battle` never reaches here: a frame carrying one is taken
+          // whole, above, as the room's log. What is left is `|init|chat` and
+          // friends, which carry no battle state.
           break;
         }
 
@@ -442,19 +600,20 @@ export function useShowdownBattle(
         }
 
         case 'request': {
-          // Route to local session or global session
+          // ONE delivery, and one only (H3).
+          //
+          // This used to ALSO stash the parsed request on the session so a
+          // canvas remount could replay it — which meant the same request was
+          // handled twice, and the second one flipped the session into
+          // `waiting` behind a turn that had already been answered. The line
+          // goes into the queue like every other line; `handleRequest` dedupes
+          // on rqid, so a request PS re-sends (a `/undo`, a re-join, a resync)
+          // still prompts exactly once.
           const reqSession = sessionRef.current?.roomId === roomid
             ? sessionRef.current
             : getGlobalSessions().get(roomid);
-          if (reqSession) {
-            // Store request for transfer to battle page
-            try {
-              const request = JSON.parse(parsed[1]) as Protocol.Request;
-              (reqSession as any).pendingShowdownRequest = request;
-            } catch {}
-            // Add as a line — processLine handles request via the buffer
-            reqSession.addLine(line);
-          }
+          if (reqSession) reqSession.addLine(line);
+          else console.warn('[battlesim] |request| for an unknown room', roomid);
           break;
         }
 
@@ -470,14 +629,14 @@ export function useShowdownBattle(
         }
 
         case 'spectator': {
-          if (roomid === roomId) {
+          if (roomid === normalizedRoomId) {
             setSpectatorCount((prev) => prev + 1);
           }
           break;
         }
 
         case 'spectatorleave': {
-          if (roomid === roomId) {
+          if (roomid === normalizedRoomId) {
             setSpectatorCount((prev) => Math.max(0, prev - 1));
           }
           break;
@@ -531,28 +690,71 @@ export function useShowdownBattle(
           const defaultSession = sessionRef.current?.roomId === roomid
             ? sessionRef.current
             : getGlobalSessions().get(roomid);
-          if (defaultSession) {
-            defaultSession.addLine(line);
-          }
+          if (!defaultSession) break;
+          // Only a `|`-prefixed protocol line is battle state. Anything else in
+          // a battle room is a relay artefact or a PS message the parser did
+          // not recognise, and `addLine`ing it put a line the formatter cannot
+          // read into the log (L2). Say what was dropped rather than dropping
+          // it silently.
+          if (line.startsWith('|')) defaultSession.addLine(line);
+          else console.warn('[battlesim] unrecognised frame in battle room', roomid, line.slice(0, 80));
           break;
         }
       }
     }
-  }, [roomId, triggerUpdate]);
+  }, [normalizedRoomId, autoCreateSession, triggerUpdate, setStatus]);
 
   const connect = useCallback(async () => {
     if (socketRef.current || connectingRef.current) return;
     connectingRef.current = true;
-    let socket: Socket;
+
+    // SAID OUT LOUD, at last. `'connecting'` was in the status union and no
+    // code path ever assigned it, so the whole open — ticket, socket, upstream
+    // PS connection — happened under `'idle'`: the lobby reported
+    // "disconnected" and disabled its own login form, and the room rendered
+    // the generic "waiting for the battle" spinner.
+    setError(null);
+    setStatus('connecting');
+
+    // Asked before the ticket request, exactly as the PvP provider does: the
+    // ws-ticket route is `auth: "required"`, so a signed-out visitor was
+    // sending a request that could only come back 401 — and every failure of
+    // the acquire, network ones included, was then reported as
+    // `signin_required`. Only an EXPLICIT "anonymous" is a no; "loading" is not.
+    let anonymous = false;
     try {
-      socket = await acquireRelaySocket();
+      anonymous = toolSession().status() === 'anonymous';
     } catch {
+      // No host configured (tests, a styleguide). Let the request decide.
+      anonymous = false;
+    }
+    if (anonymous) {
       connectingRef.current = false;
       setError('signin_required');
       setStatus('error');
       return;
     }
+
+    let socket: Socket;
+    try {
+      socket = await acquireRelaySocket();
+    } catch (e) {
+      connectingRef.current = false;
+      // We know there IS a session by here, so this is the API or the network.
+      console.warn('[battlesim] could not open the Showdown relay', e);
+      setError('connect_failed');
+      setStatus('error');
+      return;
+    }
     connectingRef.current = false;
+
+    // The screen left while the ticket was in flight. Hand the reference back
+    // rather than leaking it, and attach nothing: this mount is gone.
+    if (goneRef.current) {
+      releaseRelaySocket();
+      return;
+    }
+
     // Read BEFORE the listeners go on: a screen that finds the relay already
     // connected has missed everything that got it there.
     const joinedLive = socket.connected;
@@ -560,6 +762,18 @@ export function useShowdownBattle(
     releaseRef.current = releaseRelaySocket;
 
     detachRef.current = attachListeners(socket, [
+      // socket.io keeps retrying by default (`reconnectionAttempts` is
+      // Infinity), so `socket.active` stays true and this is a progress
+      // report, not a verdict — the verdict is the deadline below. Only a
+      // socket that has given up is fatal on its own.
+      ['connect_error', (err: Error) => {
+        if (socket.active) {
+          console.warn('[battlesim] showdown relay connect error, retrying', err?.message ?? err);
+          return;
+        }
+        setError('connect_failed');
+        setStatus('error');
+      }],
       ['showdownConnected', () => { if (statusRef.current !== 'authenticated' && statusRef.current !== 'active') { setStatus('authenticating'); } }],
       ['showdownMessage', (data: string) => { handleShowdownMessage(data); }],
       ['showdownDisconnected', () => { if (statusRef.current !== 'reconnecting') { setError('Disconnected from Showdown server'); } }],
@@ -576,7 +790,15 @@ export function useShowdownBattle(
       // `|nametaken|` and a failed login both arrive here; the form has to come
       // back so the player can try again rather than sitting on "connecting".
       ['loginError', (msg: string) => { setError(msg); setStatus('idle'); }],
-      ['disconnect', () => { if (statusRef.current !== 'reconnecting') { setStatus('idle'); resetShowdownState(); } }],
+      // NOT `resetShowdownState()` (H5). A `disconnect` is usually a blip the
+      // relay's upstream PS connection outlives (60s), and every room on screen
+      // is about to be recovered by a `/join` + `|init|battle` resync. Deleting
+      // the sessions here blanked a live battle a second before it came back.
+      ['disconnect', () => {
+        if (statusRef.current === 'reconnecting') return;
+        console.warn('[battlesim] showdown relay disconnected');
+        setStatus(getGlobalSessions().size > 0 ? 'reconnecting' : 'idle');
+      }],
     ]);
 
     // Such a screen would sit on 'idle' — which the room renders as
@@ -591,12 +813,33 @@ export function useShowdownBattle(
         setStatus('authenticating');
       }
     }
+
+    // Both hops on one clock. Cleared by `setStatus` the moment anything else
+    // is reported, so this only ever fires on a relay that said nothing at all.
+    if (statusRef.current === 'connecting') {
+      deadlineRef.current = setTimeout(() => {
+        deadlineRef.current = null;
+        if (goneRef.current || statusRef.current !== 'connecting') return;
+        console.warn('[battlesim] showdown relay never came up');
+        setError('connect_failed');
+        setStatus('error');
+      }, RELAY_CONNECT_DEADLINE_MS);
+    }
   }, [handleShowdownMessage, setStatus]);
 
   // The socket is SHARED (see `acquireRelaySocket`), so a screen leaving lets
   // go of its reference rather than closing it out from under the other one.
   useEffect(() => {
+    // Reset on every mount, not just declared once: StrictMode runs this
+    // cleanup and then mounts again on the same fiber, so a flag left true
+    // would make the second mount's acquire throw its socket away.
+    goneRef.current = false;
     return () => {
+      goneRef.current = true;
+      if (deadlineRef.current !== null) {
+        clearTimeout(deadlineRef.current);
+        deadlineRef.current = null;
+      }
       detachRef.current?.();
       detachRef.current = null;
       releaseRef.current?.();
@@ -627,6 +870,11 @@ export function useShowdownBattle(
       return;
     }
     setStatus('authenticating');
+    // Held for a re-login after a reconnect and for nothing else: in memory,
+    // for this page load, never written to storage and never logged. A fresh
+    // upstream connection means a fresh challstr, and PS will not let an
+    // un-`/trn`'d connection back into a battle room.
+    heldCredentials = { username: user, ...(password ? { password } : {}) };
     socketRef.current.emit('login', {
       username: user,
       ...(password ? { password } : {}),
@@ -730,11 +978,11 @@ export function useShowdownBattle(
   // Claimed BEFORE the socket is opened, so no frame can arrive unowned.
   useEffect(() => {
     const self = selfRef.current;
-    if (autoCreateSession && roomId) {
+    if (autoCreateSession && normalizedRoomId) {
       // Normalised the same way the incoming frames are, so a room id that
       // reached this screen through a URL cannot claim a key no frame matches
       // and silently leave the room unowned (and therefore double-processed).
-      const key = toRoomid(roomId);
+      const key = normalizedRoomId;
       // Last mount wins: a room reopened after a reload is the live one.
       roomOwners.set(key, self);
       return () => {
@@ -748,74 +996,85 @@ export function useShowdownBattle(
       };
     }
     return undefined;
-  }, [autoCreateSession, roomId]);
+  }, [autoCreateSession, normalizedRoomId]);
+
+  /**
+   * Drop this screen's hold on the relay and ask for it again.
+   *
+   * `connect` alone cannot be the retry: it returns early while `socketRef` is
+   * set, and after the deadline fires the socket IS set — attached, and going
+   * nowhere. Letting go first is what makes the button do something, and it is
+   * also what closes the relay (and so the API's upstream PS connection) when
+   * this was the last screen holding it.
+   */
+  const reconnect = useCallback(() => {
+    detachRef.current?.();
+    detachRef.current = null;
+    releaseRef.current?.();
+    releaseRef.current = null;
+    socketRef.current = null;
+    connectingRef.current = false;
+    setError(null);
+    setStatus('idle');
+    void connect();
+  }, [connect, setStatus]);
 
   // Auto-connect on mount
   useEffect(() => {
     connect();
   }, [connect]);
 
-  // Pick up existing global session for this room (created by lobby hook)
+  /**
+   * Adopt the session the lobby already built for this room.
+   *
+   * WHAT THIS REPLACES. The old version constructed a SECOND session and
+   * replayed the stored lines onto its battle with `battle.add` — bypassing the
+   * processor entirely, so no scene, no formatter (hence "Player 1" instead of
+   * the trainers' names) and no ledger — and then aliased its `psLines` to the
+   * module-level array, so the two grew together and the saved replay carried
+   * every line twice (H4).
+   *
+   * Adopting is the whole fix. The lobby's session already holds everything
+   * that has arrived, buffered behind the scene it has not got yet; pointing
+   * its callbacks at this mount is all that is needed, and `initScene` below
+   * drains the buffer through the ordinary pipeline. Anything it somehow missed
+   * is recovered by the `/join` -> `|init|battle` path, which resyncs.
+   *
+   * Deliberately NOT a `resync` here: without a scene there is no processor, so
+   * a resync would clear the buffer and replay into nothing.
+   */
   useEffect(() => {
-    if (autoCreateSession && roomId) {
-      const globalSessions = getGlobalSessions();
-      const globalLines = getGlobalLines();
-      const existing = globalSessions.get(roomId);
-      const lines = globalLines.get(roomId) || [];
-      // NOT `socketRef.current`: this effect runs on the same mount as the one
-      // that calls `connect()`, and `connect` is async — so the ref is still
-      // null here, and the session was being built around it. Every choice the
-      // room then submitted threw on `null.emit`. The relay is a module
-      // singleton the lobby has already opened by the time this branch can be
-      // taken (it needs the lobby's session and lines to exist at all).
-      const relay = socketRef.current ?? relaySocket;
-      if (existing && lines.length > 0 && relay) {
-        // Create a fresh session
-        const newSession = new ShowdownBaseSession(
-          roomId,
-          { onUpdate: triggerUpdate, onRequest: () => triggerUpdate(), onBattleEnd: () => triggerUpdate() },
-          relay,
-        );
-        newSession.setViewerName(getGlobalUsername());
-        newSession.status = 'active';
-        // Replay lines directly on the battle object to populate state
-        for (const line of lines) {
-          const { args, kwArgs } = Protocol.parseBattleLine(line);
-          if (args[0] === 'request') continue; // Skip request lines
-          try {
-            newSession.battle.add(args, kwArgs);
-          } catch {}
-        }
-        // Also store the raw lines for the session's buffer (for scene init)
-        (newSession as any).psLines = lines;
-        // Transfer chat messages and request
-        newSession.chatMessages = existing.chatMessages;
-        const pendingRequest = (existing as any).pendingShowdownRequest;
-        if (pendingRequest) {
-          (newSession as any).pendingShowdownRequest = pendingRequest;
-        }
-        // Replace in global store
-        globalSessions.set(roomId, newSession);
-        sessionRef.current = newSession;
-        setSession(newSession);
-        setStatus('active');
-        joinedRoomsRef.current.add(roomId);
-      }
-    }
-  }, []);
+    if (!autoCreateSession || !normalizedRoomId) return;
+    const existing = getGlobalSessions().get(normalizedRoomId);
+    if (!existing || sessionRef.current === existing) return;
+
+    existing.callbacks = {
+      ...existing.callbacks,
+      onUpdate: triggerUpdate,
+      onRequest: () => triggerUpdate(),
+      onBattleEnd: () => triggerUpdate(),
+    };
+    existing.setViewerName(getGlobalUsername());
+    existing.status = 'active';
+    sessionRef.current = existing;
+    setSession(existing);
+    setStatus('active');
+    joinedRoomsRef.current.add(normalizedRoomId);
+    knownBattleRooms.add(normalizedRoomId);
+  }, [autoCreateSession, normalizedRoomId, triggerUpdate, setStatus]);
 
   // Auto-join room if provided and authenticated
   useEffect(() => {
     if (
       autoCreateSession &&
-      roomId &&
+      normalizedRoomId &&
       status === 'authenticated' &&
-      !joinedRoomsRef.current.has(roomId) &&
+      !joinedRoomsRef.current.has(normalizedRoomId) &&
       !sessionRef.current
     ) {
-      joinBattle(roomId);
+      joinBattle(normalizedRoomId);
     }
-  }, [roomId, status, joinBattle, autoCreateSession]);
+  }, [normalizedRoomId, status, joinBattle, autoCreateSession]);
 
   const saveShowdownReplay = useCallback(async (): Promise<number | null> => {
     const sess = sessionRef.current;
@@ -898,6 +1157,7 @@ export function useShowdownBattle(
     reconnectInfo,
     challstr,
     connect,
+    reconnect,
     login,
     joinBattle,
     findBattle,

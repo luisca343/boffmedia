@@ -32,7 +32,7 @@ export function BsimShowdownView() {
 
   const {
     status, username, lobbyChat, challenges, formats, onlineUsers, error, reconnectInfo, challstr,
-    login, findBattle, acceptChallenge, rejectChallenge, sendRaw,
+    login, findBattle, acceptChallenge, rejectChallenge, sendRaw, reconnect,
   } = useShowdownBattle(undefined, {
     autoCreateSession: false,
     onBattleFound: useCallback((roomid: string) => {
@@ -128,7 +128,19 @@ export function BsimShowdownView() {
 
       {/* `{error}` used to be printed raw: the relay's codes reached the
           user as `signin_required`. */}
-      {error && <Banner tone="error">{bsimErrorText(error, t)}</Banner>}
+      {error && (
+        <Banner tone="error">
+          <span className="flex flex-wrap items-center gap-2">
+            {bsimErrorText(error, t)}
+            {/* A relay that could not be reached is retryable, and until now
+                the only way to retry was to reload the tool. A refused login
+                is not: the answer to that is the form below. */}
+            {status === 'error' && (
+              <Button size="sm" variant="pri" icon="refresh" onClick={reconnect}>{t('connection.tryAgain')}</Button>
+            )}
+          </span>
+        </Banner>
+      )}
       {reconnectInfo && (
         <Banner tone="warn" icon="refresh">
           {t('connection.reconnecting', { attempt: reconnectInfo.attempt, max: reconnectInfo.maxAttempts })}

@@ -29,15 +29,24 @@ export function subscribeCanvasWidth(fn: (width: number) => void): () => void {
 export const positionsP1 = ["p1a", "p1b", "p1c", "p1d", "p1e"];
 export const positionsP2 = ["p2a", "p2b", "p2c", "p2d", "p2e"];
 
-type Position = {
+export type Position = {
     top: number;
     left: number;
     x?: number;
     y?: number;
 };
 
-export function getOffset(battle: Battle, position: string, scaleMulti:number = 1) {
-    const gameType = battle.gameType.toString().trim().toLowerCase() || 'singles';
+/**
+ * The slot's box on the field, or `null` when the gametype has no authored
+ * position for it.
+ *
+ * It used to answer `{ top: 2000, left: 0 }` — a coordinate 2000px below a
+ * 540px field — so a typo'd slot code or an unsupported gametype did not fail,
+ * it silently parked the sprite (and every popup aimed at it) off-screen.
+ * Callers bail on `null` instead.
+ */
+export function getOffset(battle: Battle | null | undefined, position: string, scaleMulti: number = 1): Position | null {
+    const gameType = String(battle?.gameType ?? 'singles').trim().toLowerCase() || 'singles';
     const img = getImageSize(scaleMulti);
 
     const positions: { [key: string]: { [key: string]: Position } } = {
@@ -79,7 +88,7 @@ export function getOffset(battle: Battle, position: string, scaleMulti:number = 
             p2e: { top: 115 * scaleMulti - img / 2, left: 500 * scaleMulti + img / 2 },
         }
     };
-    return positions[gameType]?.[position] || { top: 2000, left: 0, x: 0, y: 0 };
+    return positions[gameType]?.[position] ?? null;
 }
 
 /** Sprite box (175 field units) at a scale; defaults to the live canvas scale. */

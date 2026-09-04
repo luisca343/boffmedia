@@ -12,6 +12,13 @@
  * turn synchronously, and doing that on the main thread drops frames in the
  * middle of the animation the player is watching.
  *
+ * WHAT IT FORWARDS IS THE P1 VIEW, not the omniscient log. The engine hands
+ * this worker one ordered stream per viewer; the human is p1, so p1's stream is
+ * the one that goes to the page. That stream already has `|split|` resolved the
+ * way Showdown resolves it (exact HP for the player's own Pokémon, percentages
+ * for the bot's) and carries `|request|` lines inline, in order — which is why
+ * there is no separate `request` message any more.
+ *
  * `@boffmedia/battle-core` is imported as its COMPILED ESM build. Never point a
  * bundler at that package's `src/` — apps/api consumes the CJS half of the same
  * build, and aliasing one host to source is how the two drift apart.
@@ -28,7 +35,13 @@ import type { BattleWorkerEvent, BattleWorkerRequest } from "./worker-protocol";
 // those formats starts. Idempotent, so calling it at worker boot is free.
 registerBattleMods();
 
-const engines = new Map<string, BattleEngine>();
+interface Room {
+  engine: BattleEngine;
+  /** Next `protocol.seq`, monotonic from 0. Mirrors the PvP gateway. */
+  seq: number;
+}
+
+const rooms = new Map<string, Room>();
 
 const post = (event: BattleWorkerEvent) => {
   (self as unknown as Worker).postMessage(event);
@@ -36,22 +49,34 @@ const post = (event: BattleWorkerEvent) => {
 
 function start(message: Extract<BattleWorkerRequest, { type: "start" }>) {
   const { roomId, format } = message;
-  if (engines.has(roomId)) return;
+  if (rooms.has(roomId)) return;
+
+  const room: Room = { engine: undefined as unknown as BattleEngine, seq: 0 };
 
   const engine = new BattleEngine(
     roomId,
     {
-      onProtocol: (line) => post({ type: "protocol", roomId, line }),
-      onRequestP1: (request) => post({ type: "request", roomId, request }),
+      onLine: (viewer, line) => {
+        // The bot's own view and the spectator view exist, but nobody in this
+        // page is allowed to see them: forwarding either is what would put the
+        // opponent's exact HP on screen.
+        if (viewer !== "p1") return;
+        post({ type: "protocol", roomId, seq: room.seq++, line });
+      },
       onBattleEnd: (result) => {
+        // Fired only after `|win|` has been delivered on every stream, so the
+        // page has already applied the real ending. Nothing here synthesises a
+        // second one — this message carries the log and the teams for the
+        // replay record, not the terminal protocol line.
         post({
           type: "battleEnd",
           roomId,
+          seq: room.seq++,
           winner: result.winner,
           log: result.log,
           teams: result.teams,
         });
-        engines.delete(roomId);
+        rooms.delete(roomId);
       },
       onError: (message_) => post({ type: "error", roomId, message: message_ }),
     },
@@ -60,7 +85,8 @@ function start(message: Extract<BattleWorkerRequest, { type: "start" }>) {
     "ai",
   );
 
-  engines.set(roomId, engine);
+  room.engine = engine;
+  rooms.set(roomId, room);
 
   const p1Team = message.p1Team ? unpackTeam(message.p1Team) ?? undefined : undefined;
   const p2Team = message.p2Team ? unpackTeam(message.p2Team) ?? undefined : undefined;
@@ -73,7 +99,7 @@ function start(message: Extract<BattleWorkerRequest, { type: "start" }>) {
     )
     .then(() => post({ type: "battleCreated", roomId, format }))
     .catch((error: unknown) => {
-      engines.delete(roomId);
+      rooms.delete(roomId);
       post({
         type: "error",
         roomId,
@@ -84,25 +110,43 @@ function start(message: Extract<BattleWorkerRequest, { type: "start" }>) {
 
 self.onmessage = (event: MessageEvent<BattleWorkerRequest>) => {
   const message = event.data;
-  const engine = message.type === "start" ? undefined : engines.get(message.roomId);
+  const room = message.type === "start" ? undefined : rooms.get(message.roomId);
 
   switch (message.type) {
     case "start":
       start(message);
       return;
     case "choice":
-      void engine?.playerChoice(message.choice, "p1");
+      void room?.engine.makeChoice("p1", message.choice, message.rqid).then((result) => {
+        if (!result.ok) {
+          post({
+            type: "error",
+            roomId: message.roomId,
+            code: result.code,
+            message: `Choice refused: ${result.code}`,
+          });
+        }
+      });
       return;
     case "undo":
-      void engine?.undoChoice("p1");
+      void room?.engine.undoChoice("p1").then((result) => {
+        if (!result.ok) {
+          post({
+            type: "error",
+            roomId: message.roomId,
+            code: result.code,
+            message: `Undo refused: ${result.code}`,
+          });
+        }
+      });
       return;
     case "forfeit":
-      void engine?.forfeit("p1");
+      void room?.engine.forfeit("p1");
       return;
     case "stop":
       // No forfeit event wanted here — the room is being thrown away (tab
       // closed, screen unmounted), and nobody is left to be told who won.
-      engines.delete(message.roomId);
+      rooms.delete(message.roomId);
       return;
   }
 };

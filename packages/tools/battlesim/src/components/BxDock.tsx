@@ -304,7 +304,25 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
   // would otherwise wrap, and the keys it describes work either way.
   const showLegend = !mobile && dockW >= 1300;
 
-  const waitLabel = sent ? `${t('battle.dock.sent')} ${t('battle.dock.waiting')}` : t('battle.dock.waiting');
+  // THREE off-turn states, not one.
+  //
+  // "Esperando al rival" was printed for all of them, including the stretch
+  // after both players have chosen while the engine plays the turn out — which
+  // is most of the time you spend looking at this strip, and during which the
+  // opponent is not being waited on at all. `isWaiting` false with nothing
+  // sent by us is the queue draining: the dock is disabled because the turn is
+  // still resolving, and saying so is the difference between "the game is
+  // working" and "the other player is slow".
+  //
+  // This is a LABEL, not a gate: the dock is already incapable of offering a
+  // move before the queue drains (BattleSession promotes a request only once
+  // `lineBuffer` is empty), and a rejected choice comes back as a fresh
+  // request, which re-enables the strip through the reset effect above with no
+  // special handling for `error { code: 'stale_choice' }`.
+  const resolving = !isWaiting && !sent && !spectator && status === 'active';
+  const waitLabel = sent
+    ? `${t('battle.dock.sent')} ${t('battle.dock.waiting')}`
+    : resolving ? t('battle.dock.resolving') : t('battle.dock.waiting');
   const undoBtn = sent && onUndo && !bsx.noCancel
     ? <Button variant="ghost" size="sm" icon="back" title={t('battle.dock.undoHint')} onClick={() => { onUndo(); setSent(false); }}>{t('battle.dock.undo')}</Button>
     : null;
@@ -324,8 +342,8 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
           <BxPlan key={s.idx} tag={slotTag(s)} action={orderToPlan(orders[s.idx] ?? null, t)}
             onClear={sent && onUndo && !bsx.noCancel ? () => clearSlot(s.idx) : undefined} />
         ))}
-        <span role="status" className="inline-flex items-center gap-2 font-mono text-[0.65625rem] uppercase tracking-[0.08em] text-txt-dim">
-          <i aria-hidden className="h-2 w-2 bg-warn [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" />
+        <span role="status" className={cn('inline-flex items-center gap-2 font-mono text-[0.65625rem] uppercase tracking-[0.08em]', resolving ? 'text-txt-muted' : 'text-txt-dim')}>
+          <i aria-hidden className={cn('h-2 w-2 [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none', resolving ? 'bg-accent' : 'bg-warn')} />
           {spectator ? t('battle.dock.spectating') : waitLabel}
         </span>
         {undoBtn}

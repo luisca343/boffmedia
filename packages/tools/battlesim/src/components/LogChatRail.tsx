@@ -26,6 +26,8 @@ interface LogChatRailProps {
   onClose?: () => void;
   className?: string;
   limit?: number;
+  /** Replay integration: highlights and scrolls to this turn group. */
+  activeTurn?: number;
 }
 
 /**
@@ -49,7 +51,7 @@ export function useUnreadChat(chat: RailChat | undefined, visible: boolean): num
  * The battle side rail: Log | Chat as a real tablist (roving tabindex, arrow
  * keys, panels), unread dot on chat. Without chat, the log alone.
  */
-export function LogChatRail({ ticks, chat, tab: tabProp, onTabChange, onClose, className, limit }: LogChatRailProps) {
+export function LogChatRail({ ticks, chat, tab: tabProp, onTabChange, onClose, className, limit, activeTurn }: LogChatRailProps) {
   const t = useToolT(BATTLESIM_NS);
   const [tabState, setTabState] = useState<RailTab>('log');
   const tab = tabProp ?? tabState;
@@ -116,7 +118,7 @@ export function LogChatRail({ ticks, chat, tab: tabProp, onTabChange, onClose, c
 
       <div role={showTabs ? 'tabpanel' : undefined} id={`${baseId}-panel-log`} aria-labelledby={showTabs ? `${baseId}-tab-log` : undefined} hidden={tab !== 'log'}
         className={cn('min-h-0 flex-1 flex-col', tab === 'log' ? 'flex' : 'hidden')}>
-        <BxLog log={ticks} limit={limit} className="min-h-0 flex-1" />
+        <BxLog log={ticks} limit={limit} activeTurn={activeTurn} className="min-h-0 flex-1" />
       </div>
       {chat && (
         <div role="tabpanel" id={`${baseId}-panel-chat`} aria-labelledby={`${baseId}-tab-chat`} hidden={tab !== 'chat'}

@@ -67,6 +67,32 @@ export class MatchmakingService {
     return null;
   }
 
+  /**
+   * Puts a player back at the FRONT of their queue WITHOUT trying to match.
+   *
+   * Exists for exactly one caller: the gateway rejecting a match it had already
+   * pulled both players out of the queue for (a create rate limit). Re-adding
+   * them with `joinQueue` would match the same two people against each other
+   * again on the second call and hit the same limit — an unbounded
+   * create/reject loop. They were at the head of the queue before the match, so
+   * that is where they go back.
+   */
+  requeue(player: QueuedPlayer): void {
+    this.removeFromQueue(player.playerId);
+    this.clearQueueTimeout(player.playerId);
+
+    const queue = this.queues.get(player.format) ?? [];
+    queue.unshift(player);
+    this.queues.set(player.format, queue);
+
+    const timeout = setTimeout(() => {
+      this.removeFromQueue(player.playerId);
+      this.queueTimeouts.delete(player.playerId);
+    }, this.QUEUE_TIMEOUT_MS);
+    timeout.unref?.();
+    this.queueTimeouts.set(player.playerId, timeout);
+  }
+
   /** Accepts the account id in either shape; the gateway holds a number. */
   leaveQueue(playerId: string | number): boolean {
     const id = String(playerId);
@@ -81,7 +107,8 @@ export class MatchmakingService {
 
   getAllQueueSizes(): Record<string, number> {
     const sizes: Record<string, number> = {};
-    for (const [format, queue] of this.queues.entries()) sizes[format] = queue.length;
+    for (const [format, queue] of this.queues.entries())
+      sizes[format] = queue.length;
     return sizes;
   }
 

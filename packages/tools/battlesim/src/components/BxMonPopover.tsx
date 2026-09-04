@@ -3,8 +3,8 @@
 import { Modal } from '@boffmedia/ui';
 import { Dex } from '@pkmn/dex';
 import { useToolT, BATTLESIM_NS } from '../i18n';
-import { BxSprite, BxTypeRow, BxType, BxStatus, BxBoost, BxTera, BxHp, useBxLabels, BX_PLATE_VOICE, hpAriaLabel } from './bx-kit';
-import { hpTone } from '../lib/bx-helpers';
+import { BxSprite, BxTypeRow, BxType, BxStatus, BxBoost, BxTera, BxHp, BxVolatiles, useBxLabels, BX_PLATE_VOICE, hpAriaLabel } from './bx-kit';
+import { hpTone, shownVolatiles, perishCount, GENDER_GLYPH } from '../lib/bx-helpers';
 import type { BSXMon } from '../engine/toBSXMon';
 
 const STAT_KEYS = ['hp', 'atk', 'def', 'spa', 'spd', 'spe'] as const;
@@ -20,6 +20,8 @@ export function BxMonPopover({ mon, foe = false, open, onClose }: { mon: BSXMon 
   if (!mon) return null;
   const pct = mon.fnt ? 0 : mon.hp;
   const boosts = Object.entries((mon.boosts || {}) as Record<string, number>).filter(([, v]) => v);
+  const volatiles = shownVolatiles(mon.volatiles ?? (mon.protect ? ['protect'] : []));
+  const perish = perishCount(mon.volatiles);
   const moves = (mon.moveIds || []).map((id) => {
     const m = Dex.moves.get(id);
     return m?.exists ? { id, name: m.name, type: m.type } : { id, name: id, type: 'Normal' };
@@ -38,6 +40,7 @@ export function BxMonPopover({ mon, foe = false, open, onClose }: { mon: BSXMon 
             <div className="flex min-w-0 items-center gap-2">
               {mon.tera && mon.teraType && <BxTera type={mon.teraType} size="1em" />}
               <b className="min-w-0 truncate font-display text-[1rem] font-bold uppercase leading-none tracking-[0.03em] text-txt">{mon.name}</b>
+              {GENDER_GLYPH[mon.gender ?? ''] && <i aria-hidden title={mon.gender} className={mon.gender === 'F' ? 'flex-none not-italic leading-none text-[#f95587]' : 'flex-none not-italic leading-none text-[#6390f0]'}>{GENDER_GLYPH[mon.gender ?? '']}</i>}
               {mon.level != null && <span className="font-mono text-[0.625rem] leading-none text-txt-dim">{t('battle.mon.level', { level: mon.level })}</span>}
             </div>
             <div className="flex flex-wrap items-center gap-1">
@@ -52,13 +55,16 @@ export function BxMonPopover({ mon, foe = false, open, onClose }: { mon: BSXMon 
             <span className="font-mono text-[0.625rem] uppercase leading-none tracking-[0.1em] text-txt-dim">{t('battle.mon.hp')}</span>
             <b aria-label={hpAriaLabel(t, mon, pct, showExact)} className="text-[0.875rem] leading-none" style={{ ...BX_PLATE_VOICE, color: mon.fnt ? 'var(--muted)' : hpTone(pct) }}>{mon.fnt ? t('battle.end.ko') : showExact ? `${mon.hpCur}/${mon.hpMax} · ${pct}%` : `${pct}%`}</b>
           </div>
-          <BxHp pct={pct} trail={false} />
+          <BxHp pct={pct} monKey={mon.searchid ?? mon.id} ko={!!mon.fnt} />
         </div>
 
-        {boosts.length > 0 && (
+        {(boosts.length > 0 || volatiles.length > 0 || perish != null) && (
           <div className="grid gap-[0.375rem]">
             <span className="font-mono text-[0.625rem] uppercase leading-none tracking-[0.1em] text-txt-dim">{t('battle.mon.boosts')}</span>
-            <div className="flex flex-wrap gap-1">{boosts.map(([s, v]) => <BxBoost key={s} stat={s} value={v} />)}</div>
+            <div className="flex flex-wrap gap-1">
+              <BxVolatiles ids={volatiles} perish={perish} />
+              {boosts.map(([s, v]) => <BxBoost key={s} stat={s} value={v} />)}
+            </div>
           </div>
         )}
 

@@ -137,9 +137,9 @@ export function BsimReplayDetailView() {
     );
   }
 
-  return (
-    <BsimScreenShell>
-      <Game replayData={replayData} />
-    </BsimScreenShell>
-  );
+  // NO `BsimScreenShell` around the player itself. It wears the battle shell
+  // now — `h-[var(--tool-vh)]`, its own bar, its own rail — and a padded page
+  // body around that is exactly what made the replay a postage stamp with a
+  // scrollbar. The loading and error states above still get the page chrome.
+  return <Game replayData={replayData} />;
 }

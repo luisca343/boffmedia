@@ -8,10 +8,25 @@ export interface ChatMessage {
   timestamp: number;
 }
 
+/**
+ * A battle relayed from Pokémon Showdown.
+ *
+ * Two things differ from the base session and nothing else does: choices go out
+ * as PS commands on the relay socket rather than as `makeChoice` events, and the
+ * raw frames are kept so a replay can be saved from what actually arrived.
+ */
 export class ShowdownBaseSession extends BattleSession {
   chatMessages: ChatMessage[] = [];
+  /**
+   * Every battle line this session has been given, in order.
+   *
+   * Appended in exactly ONE place — the `addLine` override below — and never
+   * aliased to the module-level `showdownLines` map. It used to be assigned
+   * that array by reference when a room screen adopted a session from the
+   * lobby, so the two grew together and `saveShowdownReplay` wrote a log with
+   * every line twice (H4).
+   */
   psLines: string[] = [];
-  pendingShowdownRequest: Protocol.Request | null = null;
   private showdownSocket: Socket;
 
   constructor(roomId: string, callbacks: SessionCallbacks, showdownSocket: Socket) {
@@ -27,24 +42,38 @@ export class ShowdownBaseSession extends BattleSession {
     super.addLine(line);
   }
 
-  override initScene(gameElement: HTMLElement, pov: 0 | 1 = 0): void {
-    super.initScene(gameElement, pov);
-    // Process pending request after scene is ready
-    if (this.pendingShowdownRequest) {
-      this.handleRequest(this.pendingShowdownRequest);
-      this.pendingShowdownRequest = null;
-    }
+  /**
+   * Rebuild from a full log, and keep `psLines` in step with it.
+   *
+   * `resync` bypasses `addLine` by design (it replays onto a fresh Battle with
+   * animations skipped), so the raw-line record has to be replaced here or a
+   * replay saved after a re-join would be missing everything before it.
+   */
+  override resync(lines: string[], opts?: { seq?: number }): void {
+    this.psLines = [...lines];
+    super.resync(lines, opts);
   }
 
   private lastRequest: Protocol.Request | null = null;
 
+  /**
+   * `/choose <choice>|<rqid>`.
+   *
+   * The rqid is PS's own protection against a choice arriving for a turn that
+   * has already resolved, and it was simply not being sent (H2): a click that
+   * landed a moment after the timer picked for you was accepted as this turn's
+   * move. `currentRequest` is read BEFORE `resumeAfterChoice` clears it.
+   */
   override makeChoice(choice: string, _socket: Socket): void {
     if (this.status === 'finished') return;
 
-    const psChoice = choice.startsWith('/choose ') ? choice : `/choose ${choice}`;
+    const request = this.currentRequest;
+    const rqid = (request as any)?.rqid;
+    const body = choice.startsWith('/choose ') ? choice.slice('/choose '.length) : choice;
+    const psChoice = typeof rqid === 'number' ? `/choose ${body}|${rqid}` : `/choose ${body}`;
     this.showdownSocket.emit('sendToShowdown', `${this.roomId}|${psChoice}`);
 
-    this.lastRequest = this.currentRequest;
+    this.lastRequest = request;
     this.isWaitingForChoice = false;
     this.currentRequest = null;
     this.resumeAfterChoice();
@@ -54,6 +83,8 @@ export class ShowdownBaseSession extends BattleSession {
   undoChoice(): boolean {
     if (this.status === 'finished' || !this.lastRequest) return false;
     this.showdownSocket.emit('sendToShowdown', `${this.roomId}|/undo`);
+    // Dedupes on rqid, so re-offering the request we just answered cannot
+    // produce a second prompt if PS also re-sends it.
     this.handleRequest(this.lastRequest);
     this.lastRequest = null;
     return true;

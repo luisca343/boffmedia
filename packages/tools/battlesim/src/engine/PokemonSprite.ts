@@ -1,40 +1,77 @@
 import { PokemonIdent } from "@pkmn/protocol";
 import { getOffset, getScaleMultiplier } from "./viewUtils";
 import { AnimationData, ScenePos } from "./types";
-import { Scene } from "./Scene";
+import { Scene, SceneToken } from "./Scene";
+
+/** PS transition names → the CSS easing that reads closest to them. */
+export const TRANSITION_EASING: Record<string, string> = {
+  linear: 'linear',
+  accel: 'cubic-bezier(0.55, 0, 1, 0.45)',
+  decel: 'cubic-bezier(0, 0.55, 0.45, 1)',
+  swing: 'ease-in-out',
+  ballistic: 'cubic-bezier(0.3, 0, 0.1, 1)',
+  ballisticUnder: 'cubic-bezier(0.6, 0, 0.9, 0.4)',
+  ballistic2: 'cubic-bezier(0.6, 0, 0.9, 0.4)',
+  ballistic2Back: 'cubic-bezier(0.1, 0.9, 0.4, 1)',
+  ballistic2Under: 'cubic-bezier(0.1, 0.9, 0.4, 1)',
+  ghost: 'ease-out',
+};
+
+export function easingFor(transition?: string): string {
+  return (transition && TRANSITION_EASING[transition]) || 'linear';
+}
+
+export interface PokemonSpriteOptions {
+  /**
+   * Snap the element back to its slot and clear transform/opacity first.
+   *
+   * True for move animations, which are authored from a known origin. FALSE
+   * for the summon, whose whole point is to start at scale 0.1 / opacity 0 —
+   * the constructor's unconditional reset is what made the incoming Pokemon
+   * pop in at full size before growing.
+   */
+  reset?: boolean;
+}
 
 /**
- * Manages a Pokémon sprite in battle
+ * A transient handle on one slot's element for the duration of one animation.
+ *
+ * It captures the scene generation and the slot generation at construction: if
+ * the Pokemon it addresses is recalled, faints, transforms, or the whole scene
+ * is torn down, every remaining queued transition and every pending `.then`
+ * becomes a no-op instead of writing styles onto whatever took its place.
  */
 export class PokemonSprite {
   scene: Scene;
   position: PokemonIdent;
   element: HTMLElement | null;
-  
+  readonly token: SceneToken;
+
   startingOffsetLeft: number = 0;
   startingOffsetTop: number = 0;
-  
+
   animationQueue: AnimationData[] = [];
   animCounter: number = 0;
-  
+
   sp: any;
   isMissedPokemon: boolean = false;
-  
-  constructor(scene: Scene, position: PokemonIdent) {
+
+  constructor(scene: Scene, position: PokemonIdent, options: PokemonSpriteOptions = {}) {
     this.scene = scene;
-    this.position = position;
-  
-    const element = scene.getPokemonElement(position);
+    this.position = (String(position).split(':')[0]) as PokemonIdent;
+    this.token = scene.token(this.position);
+
+    const element = scene.getPokemonElement(this.position);
     this.element = element;
-    
-    if (!element) return;
-    
+
     this.startingOffsetLeft = this.x();
     this.startingOffsetTop = this.y();
-    
-    // Initialize element styles
-    element.style.left = `${getOffset(this.scene.battle, position, getScaleMultiplier()).left}px`;
-    element.style.top = `${getOffset(this.scene.battle, position, getScaleMultiplier()).top}px`;
+
+    if (!element) return;
+    if (options.reset === false) return;
+
+    element.style.left = `${this.startingOffsetLeft}px`;
+    element.style.top = `${this.startingOffsetTop}px`;
     element.style.right = 'auto';
     element.style.bottom = 'auto';
     element.style.position = 'absolute';
@@ -42,100 +79,82 @@ export class PokemonSprite {
     element.style.opacity = '1';
     element.style.transform = 'none';
   }
-  
+
+  /** This sprite's Pokemon is gone, or the scene is. */
+  get stale(): boolean {
+    return this.scene.isStale(this.token);
+  }
+
   /**
-   * Creates a delay in animation
+   * A queued pause. It used to call `scene.wait` and throw the promise away,
+   * which made all 274 uses of it no-ops — every "wait for the attacker to
+   * arrive before flinching" beat in the move table fired immediately.
    */
   delay(time: number): this {
-    this.scene.wait(time);
-    return this;
+    return this.anim({ time }, 'linear');
   }
-  
-  /**
-   * Plays next animation in queue
-   */
+
   playNextAnim(): void {
     if (this.animationQueue.length === 0) return;
-    
     const animData = this.animationQueue[0];
-    const {animType, transition, type, callback} = animData;
+    const { transition, type, callback } = animData;
     this.performAnimation(transition, type, callback, animData);
   }
-  
-  /**
-   * Adds animation to queue
-   */
+
   anim(transition: ScenePos, type?: string, callback?: () => void): this {
+    if (this.stale) return this;
     this.animCounter++;
-    
-    const animation: AnimationData = { 
-      animType: 'sprite', 
-      transition, 
-      type, 
-      callback 
+
+    const animation: AnimationData = {
+      animType: 'sprite',
+      transition,
+      type,
+      callback,
     };
-    
+
     this.animationQueue.push(animation);
-    
+
     // Start animation if it's the only one in queue
     if (this.animCounter === 1) {
       this.playNextAnim();
     }
-    
+
     return this;
   }
 
-  /**
-   * Performs a single animation
-   */
   performAnimation(transition: ScenePos, type?: string, callback?: () => void, animData?: AnimationData): void {
-    const animationTime = transition.time === undefined ? 500 : transition.time;
-    
-    const prom = new Promise<void>(resolve => setTimeout(() => {
-      resolve();
-    }, animationTime));
-    
-    this.scene.currentAnimations.push(prom);
-  
+    if (this.stale) return;
+    const authored = transition.time === undefined ? 500 : transition.time;
+    const animationTime = this.scene.animTime(authored);
+
+    const prom = this.scene.wait(animationTime);
+    this.scene.track(prom);
+
     const element = this.scene.getPokemonElement(this.position);
-    if (!element) {
-      return;
+    if (element) {
+      element.style.transition = `all ${animationTime}ms ${easingFor(type)}`;
+      element.style.position = 'absolute';
+
+      if (transition.x !== undefined) element.style.left = `${transition.x}px`;
+      if (transition.y !== undefined) element.style.top = `${transition.y}px`;
+      if (transition.opacity !== undefined) element.style.opacity = `${transition.opacity}`;
+      // Only written when asked for: a bare `{ time }` step is a PAUSE, and
+      // resetting the transform on it undid the scale the previous step set.
+      if (transition.scale !== undefined) element.style.transform = `scale(${transition.scale})`;
+      if (transition.z !== undefined) element.style.zIndex = `${transition.z}`;
+
+      // Force reflow to ensure transition applies
+      void element.offsetHeight;
     }
 
-    // Apply transition styles
-    element.style.transition = `all ${animationTime}ms`;
-    element.style.position = 'absolute';
-  
-    if (transition.x !== undefined) {
-      element.style.left = `${transition.x}px`;
-    }
-    if (transition.y !== undefined) {
-      element.style.top = `${transition.y}px`;
-    }
-    if (transition.opacity !== undefined) {
-      element.style.opacity = `${transition.opacity}`;
-    }
-    if (transition.scale !== undefined) {
-      element.style.transform = `scale(${transition.scale})`;
-    } else {
-      element.style.transform = 'none';
-    }
-
-    // Force reflow to ensure transition applies
-    element.offsetHeight;
-
-    // Handle animation completion
     prom.then(() => {
-      if (callback) {
-        callback();
-      }
-      
+      if (this.stale) return;
+      if (callback) callback();
+
       const idx = animData ? this.animationQueue.indexOf(animData) : 0;
       if (idx >= 0) this.animationQueue.splice(idx, 1);
-      const animIdx = this.scene.currentAnimations.indexOf(prom);
-      if (animIdx >= 0) this.scene.currentAnimations.splice(animIdx, 1);
       this.animCounter--;
-      
+
       if (this.animationQueue.length > 0) {
         this.playNextAnim();
       } else {
@@ -144,60 +163,45 @@ export class PokemonSprite {
     });
   }
 
-  /**
-   * Resets sprite to original position
-   */
+  /** Back to the slot's authored box. No-op once this sprite is stale. */
   resetPosition(): void {
+    this.animationQueue = [];
+    this.animCounter = 0;
+    if (this.stale) return;
     const element = this.scene.getPokemonElement(this.position);
     if (!element) return;
-    
-    element.style.top = `${getOffset(this.scene.battle, this.position, getScaleMultiplier()).top}px`;
-    element.style.left = `${getOffset(this.scene.battle, this.position, getScaleMultiplier()).left}px`;
-    this.animationQueue = [];
+    const offset = getOffset(this.scene.battle, this.position, getScaleMultiplier());
+    if (!offset) return;
+    element.style.transition = 'none';
+    element.style.top = `${offset.top}px`;
+    element.style.left = `${offset.left}px`;
+    element.style.transform = 'none';
+    element.style.opacity = '1';
   }
 
-  /**
-   * Clears element styling
-   */
   async clearElement(): Promise<void> {
-    if (!this.element) return;
+    if (this.stale || !this.element) return;
     this.element.style.transition = 'none';
     this.element.style.transform = 'none';
     this.element.style.opacity = '1';
-    this.element.style.borderColor = 'white';
   }
-  
-  /**
-   * Gets the X position
-   */
+
   x(): number {
-    return getOffset(this.scene.battle, this.position, getScaleMultiplier()).left;
+    return getOffset(this.scene.battle, this.position, getScaleMultiplier())?.left ?? this.startingOffsetLeft;
   }
-  
-  /**
-   * Gets the Y position
-   */
+
   y(): number {
-    return getOffset(this.scene.battle, this.position, getScaleMultiplier()).top;
+    return getOffset(this.scene.battle, this.position, getScaleMultiplier())?.top ?? this.startingOffsetTop;
   }
-  
-  /**
-   * Gets the Z index
-   */
+
   z(): number {
     return this.element?.style.zIndex ? parseInt(this.element.style.zIndex) : 1;
   }
-  
-  /**
-   * Calculates position behind this sprite
-   */
+
   behind(amount: number): number {
     return this.z() - amount > 0 ? this.z() - amount : 0;
   }
-  
-  /**
-   * Calculates position to the left of this sprite
-   */
+
   leftof(offset: number): number {
     return this.x() - offset;
   }

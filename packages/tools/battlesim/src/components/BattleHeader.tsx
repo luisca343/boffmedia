@@ -20,7 +20,8 @@ const MODE_META: Record<string, { labelKey: string; tone: string }> = {
 
 interface BattleHeaderProps {
   mode: 'ai' | 'pvp' | 'showdown' | 'replay';
-  onBack: () => void;
+  /** Omitted by the embedded replay player, which has no tool to go back to. */
+  onBack?: () => void;
   roomLabel?: string;
   formatLabel?: string;
   you?: BSXScore | null;
@@ -130,7 +131,7 @@ export function BattleHeader({
       aria-label={t('header.aria')}
       className="flex min-h-[var(--tool-bar-h,3.625rem)] shrink-0 items-center gap-2 border-b border-solid border-line bg-panel px-2 sm:gap-3 sm:px-3"
     >
-      <DkBack onClick={onBack} label={t('battle.header.back')} />
+      {onBack && <DkBack onClick={onBack} label={t('battle.header.back')} />}
       <span
         style={{ ['--tyc']: meta.tone } as CSSProperties}
         className="cut cut-edge-slant [--cut:3px] flex-none border border-solid border-[color-mix(in_srgb,var(--tyc)_45%,transparent)] [--cut-line:color-mix(in_srgb,var(--tyc)_45%,transparent)] bg-[color-mix(in_srgb,var(--tyc)_14%,transparent)] px-2 py-1 font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.12em] text-[var(--tyc)]"

@@ -21,8 +21,10 @@ export default function VerPage({ params }: { params: { id: string } }) {
     return <div>{t("loading")}</div>;
   }
 
+  // `--tool-vh`: the player is a viewport-true frame (see `BattleShell`), and
+  // this page is not a tool host, so it has to say how tall its box is.
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col" style={{ ["--tool-vh" as string]: "min(90dvh, 52rem)" }}>
       <Game replayData={replay} />
     </div>
   );

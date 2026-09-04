@@ -2,15 +2,14 @@
 
 import { Game } from '../components/replay/Game';
 import { BsimScreenShell } from '../components/bsim-kit';
-import { useToolT, BATTLESIM_NS } from '../i18n';
 
-/** The paste-a-replay screen. Wrapped in the tool chrome so it has a way back:
- *  it used to render bare, which on the launcher means a one-way door. */
+/**
+ * The paste-a-replay screen.
+ *
+ * The page chrome is on the LOADER only. Once a replay is pasted the player
+ * takes the whole frame — the same bar/field/dock/rail shell a live battle
+ * wears — and a padded page body around it would shrink the field back down.
+ */
 export function BsimReplayView() {
-  const t = useToolT(BATTLESIM_NS);
-  return (
-    <BsimScreenShell>
-      <Game />
-    </BsimScreenShell>
-  );
+  return <Game shell={BsimScreenShell} />;
 }

@@ -648,7 +648,8 @@ export const messages = {
             "lost": "Perdido",
             "tie": "Empate",
             "live": "En curso",
-            "connecting": "Conectando"
+            "connecting": "Conectando",
+            "resyncing": "Sincronizando el combate…"
           },
           "score": {
             "alive": "{alive} de {total} en pie"
@@ -657,7 +658,10 @@ export const messages = {
             "critical": "CRÍTICO",
             "low": "Bajo",
             "ariaExact": "{cur} de {max} PS",
-            "ariaPct": "{pct}% de PS"
+            "ariaPct": "{pct}% de PS",
+            "hits": "{n} impactos este turno",
+            "lostTurn": "−{pct}% este turno",
+            "gainedTurn": "+{pct}% este turno"
           },
           "dock": {
             "aria": "Acciones de combate",
@@ -672,6 +676,7 @@ export const messages = {
             "targetAlly": "Aliado",
             "targetSelf": "Uno mismo",
             "waiting": "Esperando al rival…",
+            "resolving": "Resolviendo el turno…",
             "sent": "Órdenes enviadas",
             "undo": "Deshacer",
             "undoHint": "Cancela la orden enviada (antes de que se resuelva el turno)",
@@ -758,6 +763,22 @@ export const messages = {
           },
           "labels": {
             "protect": "PROT",
+            "volatile": {
+              "substitute": "SUST",
+              "confusion": "CONF",
+              "leechseed": "DRENA",
+              "taunt": "MOFA",
+              "encore": "OTRA VEZ",
+              "disable": "ANULA",
+              "yawn": "BOSTEZO",
+              "attract": "ATRAER",
+              "curse": "MALDIC",
+              "torment": "TORMENTO",
+              "healblock": "ANTICURA",
+              "embargo": "EMBARGO",
+              "destinybond": "DESTINO",
+              "perish": "MORTAL {n}"
+            },
             "cat": {
               "phys": "Físico",
               "spec": "Especial",
@@ -997,6 +1018,11 @@ export const messages = {
             "hp": "PS",
             "unknown": "—",
             "unrevealed": "Sin revelar",
+            "itemState": {
+              "lost": "perdido",
+              "used": "usado",
+              "swapped": "cambiado"
+            },
             "close": "Cerrar"
           },
           "play": {
@@ -1110,6 +1136,7 @@ export const messages = {
             "loading": "Cargando",
             "connecting": "Conectando",
             "reconnecting": "Reconectando",
+            "resyncing": "Sincronizando",
             "queue": "En cola",
             "slow": "Esto tarda más de lo normal.",
             "retry": "Reintentar"
@@ -1797,7 +1824,8 @@ export const messages = {
             "lost": "Lost",
             "tie": "Tie",
             "live": "Live",
-            "connecting": "Connecting"
+            "connecting": "Connecting",
+            "resyncing": "Syncing the battle…"
           },
           "score": {
             "alive": "{alive} of {total} standing"
@@ -1806,7 +1834,10 @@ export const messages = {
             "critical": "CRITICAL",
             "low": "Low",
             "ariaExact": "{cur} of {max} HP",
-            "ariaPct": "{pct}% HP"
+            "ariaPct": "{pct}% HP",
+            "hits": "{n} hits this turn",
+            "lostTurn": "−{pct}% this turn",
+            "gainedTurn": "+{pct}% this turn"
           },
           "dock": {
             "aria": "Battle actions",
@@ -1821,6 +1852,7 @@ export const messages = {
             "targetAlly": "Ally",
             "targetSelf": "Self",
             "waiting": "Waiting for the opponent…",
+            "resolving": "Resolving the turn…",
             "sent": "Orders sent",
             "undo": "Undo",
             "undoHint": "Cancel the order you sent (before the turn resolves)",
@@ -1907,6 +1939,22 @@ export const messages = {
           },
           "labels": {
             "protect": "PROT",
+            "volatile": {
+              "substitute": "SUB",
+              "confusion": "CONF",
+              "leechseed": "SEED",
+              "taunt": "TAUNT",
+              "encore": "ENCORE",
+              "disable": "DISABLE",
+              "yawn": "YAWN",
+              "attract": "ATTRACT",
+              "curse": "CURSE",
+              "torment": "TORMENT",
+              "healblock": "HEAL BLK",
+              "embargo": "EMBARGO",
+              "destinybond": "D.BOND",
+              "perish": "PERISH {n}"
+            },
             "cat": {
               "phys": "Physical",
               "spec": "Special",
@@ -2146,6 +2194,11 @@ export const messages = {
             "hp": "HP",
             "unknown": "—",
             "unrevealed": "Unrevealed",
+            "itemState": {
+              "lost": "lost",
+              "used": "used",
+              "swapped": "swapped"
+            },
             "close": "Close"
           },
           "play": {
@@ -2259,6 +2312,7 @@ export const messages = {
             "loading": "Loading",
             "connecting": "Connecting",
             "reconnecting": "Reconnecting",
+            "resyncing": "Syncing",
             "queue": "In queue",
             "slow": "This is taking longer than usual.",
             "retry": "Try again"

@@ -8,34 +8,50 @@ import {
 import { Server, Socket } from 'socket.io';
 import { Logger } from 'nestjs-pino';
 import { randomUUID } from 'node:crypto';
-import { isKnownFormat, validateTeam, unpackTeam } from '@boffmedia/battle-core';
+import {
+  isKnownFormat,
+  validateTeam,
+  unpackTeam,
+} from '@boffmedia/battle-core';
 
 import { env } from '@/config/env';
 import { allowedOrigins } from '@/config/cors-origins';
-import { BattleRoom, type RoomPlayer } from './battle.room';
+import {
+  BattleRoom,
+  ROOM_VIEWERS,
+  type RoomPlayer,
+  type RoomViewer,
+} from './battle.room';
 import { MatchmakingService } from './matchmaking.service';
-import { BattleTicketService, type BattlePrincipal } from '../battle-ticket.service';
+import {
+  BattleTicketService,
+  type BattlePrincipal,
+} from '../battle-ticket.service';
 import { BattlesimRepository } from '../battlesim.repository';
 
 /**
  * PvP battles over a websocket.
  *
- * WHAT THIS FIXES. The gateway had no authentication at all. `JwtAuthGuard` is
- * global but returns true for a non-HTTP context, so it never applied here;
- * identity was the `clientId` string the client sent in `register`, which meant
- * anyone could claim to be anyone, take over another player's room through
- * `reconnect`, and read their battle. `cors: true` bypassed the origin
- * allowlist on top of that.
+ * AUTHENTICATION. A socket presents a 60-second ticket minted over the
+ * authenticated HTTP path (`POST battlesimulator/ws-ticket`), `io.use` verifies
+ * it once at connection time, and `socket.data`'s `battleUser` is the ONLY
+ * identity any handler reads. No handler takes an id from its payload.
  *
- * Now: a socket presents a 60-second ticket minted over the authenticated HTTP
- * path (`POST battlesimulator/ws-ticket`), `io.use` verifies it once at
- * connection time, and `socket.data.user` is the ONLY identity any handler
- * reads. No handler takes an id from its payload.
+ * FAN-OUT IS PER VIEWER. There are three socket.io rooms per battle —
+ * `${roomId}:p1`, `${roomId}:p2`, `${roomId}:spec` — because the three
+ * audiences are not allowed to see the same bytes: `|split|` lines carry exact
+ * HP only to the side that owns the Pokémon, and `|request|` lines name a
+ * player's whole team. Broadcasting one omniscient stream to everybody and
+ * unicasting requests on the side, which is what this used to do, leaked the
+ * first and raced the second: `protocol` went through the adapter and `request`
+ * went straight down a socket, so a client could be handed the prompt for a
+ * turn whose protocol lines had not arrived yet.
  *
- * Fan-out is through real socket.io rooms rather than a hand-rolled loop over a
- * Map, which is also what makes spectating work: a spectator joins the room and
- * receives live protocol like everyone else, instead of the one-shot snapshot
- * they used to get and then never an update again.
+ * SEQUENCE NUMBERS. Every `protocol` and `battleEnd` carries a `seq` that is
+ * monotonic from 0 WITHIN ONE VIEWER. That is what makes `resume`/`spectate`
+ * idempotent — the snapshot's `seq` is the index of its last line, so a client
+ * can rejoin at any point, at any number of times, and know exactly which live
+ * frames it has already applied.
  */
 
 /** Per-account limits. Generous for a person, hostile to a script. */
@@ -44,6 +60,8 @@ const CREATE_WINDOW_MS = 60_000;
 const MAX_CREATES_PER_WINDOW = 10;
 /** How long a finished room sticks around so both players can read the result. */
 const ROOM_TTL_AFTER_END_MS = 5 * 60_000;
+/** A room that never reached `active` is a failed start; it is not a battle. */
+const WAITING_ROOM_TTL_MS = 2 * 60_000;
 const REAPER_INTERVAL_MS = 60_000;
 /** A disconnected player may come back to a live battle for this long. */
 const RECONNECT_GRACE_MS = 30_000;
@@ -62,7 +80,10 @@ declare module 'socket.io' {
   // NOT `cors: true`. socket.io does its own CORS, so the wildcard here
   // bypassed `app.enableCors()` entirely and left the namespace open to any
   // origin on the internet.
-  cors: { origin: allowedOrigins(env.NODE_ENV === 'production'), credentials: false },
+  cors: {
+    origin: allowedOrigins(env.NODE_ENV === 'production'),
+    credentials: false,
+  },
 })
 export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server;
@@ -78,7 +99,13 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /** "challengerId:targetId" -> the offer. Reaped with the rooms. */
   private pendingChallenges = new Map<
     string,
-    { from: BattlePrincipal; to: BattlePrincipal; format: string; team?: string; at: number }
+    {
+      from: BattlePrincipal;
+      to: BattlePrincipal;
+      format: string;
+      team?: string;
+      at: number;
+    }
   >();
   /** userId -> their live sockets. One account can have two tabs open. */
   private connections = new Map<number, Set<Socket>>();
@@ -95,7 +122,8 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // The whole authentication story, in one place: a connection either proves
     // who it is here or never reaches a handler.
     server.use((socket: Socket, next: (err?: Error) => void) => {
-      const ticket = (socket.handshake.auth as { ticket?: unknown } | undefined)?.ticket;
+      const ticket = (socket.handshake.auth as { ticket?: unknown } | undefined)
+        ?.ticket;
       if (typeof ticket !== 'string' || !ticket) {
         next(new Error('unauthorized'));
         return;
@@ -143,7 +171,7 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
     if (!held?.size) return;
 
     // A dropped connection is not a forfeit yet: reconnects are common and a
-    // battle should survive a tunnel. If they do not `resume` in time, every
+    // battle should survive a tunnel. If they do not come back in time, every
     // live room they hold is conceded so the opponent is not stuck.
     const existing = this.graceTimers.get(user.userId);
     if (existing) clearTimeout(existing);
@@ -202,14 +230,26 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
     });
 
     if (!match) {
-      client.emit('queueJoined', { format, position: this.matchmaking.getQueueSize(format) });
+      client.emit('queueJoined', {
+        format,
+        position: this.matchmaking.getQueueSize(format),
+      });
       return;
     }
 
     await this.createRoom(
-      { userId: Number(match.player1.playerId), name: match.player1.name ?? 'Player', team: match.player1.team },
-      { userId: Number(match.player2.playerId), name: match.player2.name ?? 'Player', team: match.player2.team },
+      {
+        userId: Number(match.player1.playerId),
+        name: match.player1.name ?? 'Player',
+        team: match.player1.team,
+      },
+      {
+        userId: Number(match.player2.playerId),
+        name: match.player2.name ?? 'Player',
+        team: match.player2.team,
+      },
       match.format,
+      'queue',
     );
   }
 
@@ -243,7 +283,9 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    const targetName = String(payload?.targetName ?? '').trim().slice(0, 32);
+    const targetName = String(payload?.targetName ?? '')
+      .trim()
+      .slice(0, 32);
     const target = this.findConnectedByName(targetName);
     if (!target || target.userId === user.userId) {
       // Same answer for "not online", "no such account" and "yourself": none of
@@ -267,7 +309,10 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       at: Date.now(),
     });
 
-    this.emitToUser(target.userId, 'challengeReceived', { from: user.name, format });
+    this.emitToUser(target.userId, 'challengeReceived', {
+      from: user.name,
+      format,
+    });
     client.emit('challengeSent', { to: target.name, format });
   }
 
@@ -300,9 +345,14 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
     this.matchmaking.leaveQueue(user.userId);
 
     await this.createRoom(
-      { userId: challenger.userId, name: challenger.name, team: challenge.team },
+      {
+        userId: challenger.userId,
+        name: challenger.name,
+        team: challenge.team,
+      },
       { userId: user.userId, name: user.name, team },
       challenge.format,
+      'challenge',
     );
   }
 
@@ -310,49 +360,80 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   handleRejectChallenge(client: Socket, payload: { fromName?: unknown }): void {
     const user = client.battleUser;
     if (!user) return;
-    const challenger = this.findConnectedByName(String(payload?.fromName ?? '').trim());
+    const challenger = this.findConnectedByName(
+      String(payload?.fromName ?? '').trim(),
+    );
     if (!challenger) return;
     const key = `${challenger.userId}:${user.userId}`;
     if (this.pendingChallenges.delete(key)) {
-      this.emitToUser(challenger.userId, 'challengeRejected', { by: user.name });
+      this.emitToUser(challenger.userId, 'challengeRejected', {
+        by: user.name,
+      });
     }
   }
 
   // ── in-battle ─────────────────────────────────────────────────────────────
 
+  /**
+   * Answer the current request.
+   *
+   * `rqid` identifies WHICH request is being answered. Without it a duplicate
+   * click, or a choice sent just before a reconnect and re-sent just after,
+   * moved a Pokémon on a turn the player had never seen. The engine compares it
+   * against the request it last put on that side's stream and refuses anything
+   * else; the client is told which, so it can re-prompt from its own log.
+   */
   @SubscribeMessage('makeChoice')
   async handleMakeChoice(
     client: Socket,
-    payload: { roomId?: unknown; choice?: unknown },
+    payload: { roomId?: unknown; choice?: unknown; rqid?: unknown },
   ): Promise<void> {
     const ctx = this.contextFor(client, payload?.roomId);
     if (!ctx) return;
-    const choice = typeof payload?.choice === 'string' ? payload.choice.slice(0, 120) : '';
+    const choice =
+      typeof payload?.choice === 'string' ? payload.choice.slice(0, 120) : '';
     if (!choice) return;
-    await ctx.room.choose(ctx.side, choice);
+    const rqid = typeof payload?.rqid === 'number' ? payload.rqid : null;
+    const result = await ctx.room.choose(ctx.side, choice, rqid);
+    if (!result.ok)
+      client.emit('error', { roomId: ctx.room.id, code: result.code });
   }
 
   @SubscribeMessage('undoChoice')
-  async handleUndoChoice(client: Socket, payload: { roomId?: unknown }): Promise<void> {
+  async handleUndoChoice(
+    client: Socket,
+    payload: { roomId?: unknown },
+  ): Promise<void> {
     const ctx = this.contextFor(client, payload?.roomId);
     if (!ctx) return;
-    await ctx.room.undo(ctx.side);
+    const result = await ctx.room.undo(ctx.side);
+    if (!result.ok)
+      client.emit('error', { roomId: ctx.room.id, code: result.code });
   }
 
   @SubscribeMessage('forfeit')
-  async handleForfeit(client: Socket, payload: { roomId?: unknown }): Promise<void> {
+  async handleForfeit(
+    client: Socket,
+    payload: { roomId?: unknown },
+  ): Promise<void> {
     const ctx = this.contextFor(client, payload?.roomId);
     if (!ctx) return;
     await ctx.room.forfeit(ctx.side);
   }
 
   @SubscribeMessage('chatMessage')
-  handleChat(client: Socket, payload: { roomId?: unknown; message?: unknown }): void {
+  handleChat(
+    client: Socket,
+    payload: { roomId?: unknown; message?: unknown },
+  ): void {
     const ctx = this.contextFor(client, payload?.roomId);
     if (!ctx) return;
-    const text = String(payload?.message ?? '').trim().slice(0, 300);
+    const text = String(payload?.message ?? '')
+      .trim()
+      .slice(0, 300);
     if (!text) return;
     // `sender` is the authenticated name, not anything the client supplied.
+    // Chat goes to the BASE room: it is the one thing all three views share.
     this.server.to(ctx.room.id).emit('chatMessage', {
       roomId: ctx.room.id,
       sender: ctx.user.name,
@@ -364,8 +445,10 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   /**
    * Rejoin a battle after a reconnect.
    *
-   * Replaces `reconnect{playerId, roomId}`, which took over whatever account
-   * the payload named. This one only ever resumes the socket's OWN side.
+   * Idempotent and callable at any time: the answer is the caller's OWN view
+   * log plus the seq of its last line. That log already contains their last
+   * `|request|` line, so replaying it re-prompts them — which is why the
+   * separate `request` unicast this used to end with is gone.
    */
   @SubscribeMessage('resume')
   handleResume(client: Socket, payload: { roomId?: unknown }): void {
@@ -379,49 +462,74 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    const timer = this.graceTimers.get(user.userId);
-    if (timer) {
-      clearTimeout(timer);
-      this.graceTimers.delete(user.userId);
-    }
+    this.clearGrace(user.userId);
+    this.joinView(client, roomId, side);
 
-    void client.join(roomId);
+    const snapshot = room.snapshot(side);
     client.emit('resumed', {
       roomId,
       side,
       status: room.status,
-      replay: room.replay,
+      replay: snapshot.replay,
+      seq: snapshot.seq,
+      format: room.format,
     });
-    const pending = room.currentRequest(side);
-    if (pending) client.emit('request', { roomId, request: pending });
   }
 
   /**
-   * Watch a battle you are not in.
+   * Watch a battle.
    *
-   * Joins the socket.io room, so from here on the spectator receives the same
-   * live `protocol` stream as the players. Previously this returned one
-   * snapshot and then nothing, which looked like a frozen battle.
+   * A player who lands here instead of `resume` — a fresh socket that only has
+   * a room id — is given their OWN side's view, not the spectator one, and
+   * their disconnect grace is cleared exactly as `resume` would. Handing a
+   * player the spectator stream would silently downgrade them to percentage HP
+   * and never re-prompt them.
    */
   @SubscribeMessage('spectate')
   handleSpectate(client: Socket, payload: { roomId?: unknown }): void {
-    if (!client.battleUser) return;
+    const user = client.battleUser;
+    if (!user) return;
     const roomId = typeof payload?.roomId === 'string' ? payload.roomId : '';
     const room = this.rooms.get(roomId);
     if (!room) {
       client.emit('error', { code: 'battle_not_found' });
       return;
     }
-    void client.join(roomId);
+
+    const side = room.sideOf(user.userId);
+    const viewer: RoomViewer = side ?? 'spec';
+    if (side) this.clearGrace(user.userId);
+    this.joinView(client, roomId, viewer);
+
+    const snapshot = room.snapshot(viewer);
     client.emit('spectateJoined', {
       roomId,
+      side,
       status: room.status,
-      replay: room.replay,
+      replay: snapshot.replay,
+      seq: snapshot.seq,
       format: room.format,
     });
   }
 
   // ── internals ─────────────────────────────────────────────────────────────
+
+  /** Puts a socket in the base room (chat, timer) and in exactly one view. */
+  private joinView(client: Socket, roomId: string, viewer: RoomViewer): void {
+    void client.join(roomId);
+    for (const other of ROOM_VIEWERS) {
+      if (other !== viewer) void client.leave(`${roomId}:${other}`);
+    }
+    void client.join(`${roomId}:${viewer}`);
+  }
+
+  private clearGrace(userId: number): void {
+    const timer = this.graceTimers.get(userId);
+    if (timer) {
+      clearTimeout(timer);
+      this.graceTimers.delete(userId);
+    }
+  }
 
   /** Resolves the socket's room and side, or emits and returns null. */
   private contextFor(
@@ -456,7 +564,9 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   private rateLimited(userId: number): boolean {
     const now = Date.now();
-    const recent = (this.createLog.get(userId) ?? []).filter((t) => now - t < CREATE_WINDOW_MS);
+    const recent = (this.createLog.get(userId) ?? []).filter(
+      (t) => now - t < CREATE_WINDOW_MS,
+    );
     if (recent.length >= MAX_CREATES_PER_WINDOW) {
       this.createLog.set(userId, recent);
       return true;
@@ -466,8 +576,39 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return false;
   }
 
-  private async createRoom(p1: RoomPlayer, p2: RoomPlayer, format: string): Promise<void> {
-    if (this.rateLimited(p1.userId) || this.rateLimited(p2.userId)) return;
+  private async createRoom(
+    p1: RoomPlayer,
+    p2: RoomPlayer,
+    format: string,
+    origin: 'queue' | 'challenge',
+  ): Promise<void> {
+    // BOTH predicates, always. `||` short-circuited, so when p1 was over the
+    // limit p2's create was never even counted — and then the whole thing
+    // returned in silence, which is the part players actually noticed: two
+    // people matched, both were pulled out of the queue, and neither ever got a
+    // battle or an error.
+    const p1Limited = this.rateLimited(p1.userId);
+    const p2Limited = this.rateLimited(p2.userId);
+    if (p1Limited || p2Limited) {
+      this.emitToUser(p1.userId, 'error', { code: 'rate_limited' });
+      this.emitToUser(p2.userId, 'error', { code: 'rate_limited' });
+      if (origin === 'queue') {
+        // Straight back into the queue, WITHOUT re-matching: matching them
+        // against each other again here would be an infinite create/reject
+        // loop, since the limit that just rejected them is still in force.
+        for (const player of [p1, p2]) {
+          this.matchmaking.requeue({
+            playerId: String(player.userId),
+            socketId: this.socketsOf(player.userId)[0]?.id ?? '',
+            format,
+            joinedAt: Date.now(),
+            team: player.team,
+            name: player.name,
+          });
+        }
+      }
+      return;
+    }
 
     const roomId = randomUUID();
     const room = new BattleRoom(
@@ -476,17 +617,19 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       p1,
       p2,
       {
-        onProtocol: (line) => this.server.to(roomId).emit('protocol', { roomId, line }),
-        // A request is private to one side — it names that player's whole team
-        // — so it goes to their socket, never to the room.
-        onRequestP1: (request) => this.emitToUser(p1.userId, 'request', { roomId, request }),
-        onRequestP2: (request) => this.emitToUser(p2.userId, 'request', { roomId, request }),
-        onTimerUpdate: (state) => this.server.to(roomId).emit('timerUpdate', { roomId, ...state }),
-        onError: (code) => this.server.to(roomId).emit('error', { roomId, code }),
-        onBattleEnd: (result) => {
-          void this.persistReplay(room, result.winner, result.log);
-          this.server.to(roomId).emit('battleEnd', { roomId, winner: result.winner });
-          this.release(roomId);
+        onLine: (viewer, seq, line) =>
+          this.server
+            .to(`${roomId}:${viewer}`)
+            .emit('protocol', { roomId, seq, line }),
+        onTimerUpdate: (state) =>
+          this.server.to(roomId).emit('timerUpdate', { roomId, ...state }),
+        onError: (code) =>
+          this.server.to(roomId).emit('error', { roomId, code }),
+        onBattleEnd: (result, seqs) => {
+          // The replay id is part of the ending, not a later surprise: the
+          // client's "watch replay" button reads it off this payload, and the
+          // old `{roomId, winner}` never carried one, so the button was dead.
+          void this.finishRoom(room, result.winner, result.log, seqs);
         },
       },
       this.logger,
@@ -500,7 +643,8 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       [p1.userId, 'p1'],
       [p2.userId, 'p2'],
     ] as const) {
-      for (const socket of this.socketsOf(userId)) void socket.join(roomId);
+      for (const socket of this.socketsOf(userId))
+        this.joinView(socket, roomId, side);
       this.emitToUser(userId, 'battleCreated', { roomId, format, side });
     }
 
@@ -510,10 +654,36 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       this.logger.error(
         `[battle ${roomId}] failed to start: ${error instanceof Error ? error.message : 'unknown'}`,
       );
-      this.server.to(roomId).emit('error', { roomId, code: 'battle_start_failed' });
+      this.server
+        .to(roomId)
+        .emit('error', { roomId, code: 'battle_start_failed' });
       this.rooms.delete(roomId);
       this.release(roomId);
     }
+  }
+
+  /**
+   * Persists the replay, THEN tells everyone the battle is over.
+   *
+   * A PvP battle is stored once per account, so the id a player is handed is
+   * the row THEY own; a spectator owns neither and gets null.
+   */
+  private async finishRoom(
+    room: BattleRoom,
+    winner: string,
+    log: string,
+    seqs: Record<RoomViewer, number>,
+  ): Promise<void> {
+    const replayIds = await this.persistReplay(room, winner, log);
+    for (const viewer of ROOM_VIEWERS) {
+      this.server.to(`${room.id}:${viewer}`).emit('battleEnd', {
+        roomId: room.id,
+        seq: seqs[viewer],
+        winner,
+        replayId: viewer === 'spec' ? null : (replayIds?.[viewer] ?? null),
+      });
+    }
+    this.release(room.id);
   }
 
   /** Every connected socket belonging to an account. */
@@ -527,7 +697,8 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const wanted = name.toLowerCase();
     for (const sockets of this.connections.values()) {
       for (const socket of sockets) {
-        if (socket.battleUser?.name.toLowerCase() === wanted) return socket.battleUser;
+        if (socket.battleUser?.name.toLowerCase() === wanted)
+          return socket.battleUser;
       }
     }
     return null;
@@ -552,15 +723,20 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   /**
-   * Persists the finished battle for BOTH accounts.
+   * Persists the finished battle for BOTH accounts and returns its id.
    *
    * The old path wrote display names into `rotom_replays.side1/side2` and never
    * called `createUserReplay`, so a PvP battle produced a row nobody owned and
    * neither player could find.
    */
-  private async persistReplay(room: BattleRoom, winner: string, log: string): Promise<void> {
+  private async persistReplay(
+    room: BattleRoom,
+    winner: string,
+    log: string,
+  ): Promise<{ p1: string; p2: string } | null> {
+    if (!log) return null;
     try {
-      await this.repo.recordPvpReplay({
+      return await this.repo.recordPvpReplay({
         format: room.format,
         p1: room.p1,
         p2: room.p2,
@@ -569,10 +745,12 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
         playedAt: Date.now(),
       });
     } catch (error) {
-      // A lost replay must not take the battle's ending down with it.
+      // A lost replay must not take the battle's ending down with it — the
+      // clients get `replayId: null` and a battle that still ends.
       this.logger.error(
         `[battle ${room.id}] replay not saved: ${error instanceof Error ? error.message : 'unknown'}`,
       );
+      return null;
     }
   }
 
@@ -583,10 +761,26 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       if (room.finishedAt && now - room.finishedAt > ROOM_TTL_AFTER_END_MS) {
         this.rooms.delete(roomId);
         this.release(roomId);
+        continue;
+      }
+      // A room that never left `waiting` is a start that failed somewhere the
+      // catch could not see it. It held a side for both players against
+      // MAX_ROOMS_PER_USER forever, so three of them locked an account out of
+      // PvP entirely.
+      if (
+        room.status === 'waiting' &&
+        now - room.createdAt > WAITING_ROOM_TTL_MS
+      ) {
+        this.server
+          .to(roomId)
+          .emit('error', { roomId, code: 'battle_start_failed' });
+        this.rooms.delete(roomId);
+        this.release(roomId);
       }
     }
     for (const [key, challenge] of this.pendingChallenges) {
-      if (now - challenge.at > CHALLENGE_TTL_MS) this.pendingChallenges.delete(key);
+      if (now - challenge.at > CHALLENGE_TTL_MS)
+        this.pendingChallenges.delete(key);
     }
     for (const [userId, stamps] of this.createLog) {
       const recent = stamps.filter((t) => now - t < CREATE_WINDOW_MS);

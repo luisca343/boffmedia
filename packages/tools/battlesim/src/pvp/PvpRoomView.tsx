@@ -1,8 +1,20 @@
 'use client';
 
+/**
+ * One PvP battle, on the stream the provider is already receiving.
+ *
+ * This screen used to be the socket's subscriber: it attached `protocol`,
+ * `request`, `battleEnd`, `timerUpdate` and `spectateJoined` handlers in an
+ * effect whose dependencies included the provider's context value, and emitted
+ * `spectate` every time that effect re-ran. Three bugs lived in that one effect
+ * (C1-C3): the opening request arrived before the listener existed, the replay
+ * was `addLine`d onto an already-populated battle, and a transport flicker
+ * re-joined the room. Ownership now sits in `PvpSocketProvider` / `PvpInbox`;
+ * what is left here is "adopt a session, render it, send choices".
+ */
+
 import { useToolT, BATTLESIM_NS } from '../i18n';
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { Protocol } from '@pkmn/protocol';
+import { useState, useRef, useEffect, useCallback, useSyncExternalStore } from 'react';
 import { BattleSession } from '../engine/BattleSession';
 import { BattleConnectionState } from '../components/BattleConnectionState';
 import type { ChatPanelMessage } from '../components/ChatPanel';
@@ -12,7 +24,7 @@ import { LiveBattle } from '../components/LiveBattle';
 import { BSIM_FORMATS } from '../lib/bsim-data';
 import { toId } from '../lib/bx-helpers';
 import type { EndAction } from '../lib/battle-types';
-import { usePvpSocket } from './PvpSocketProvider';
+import { usePvpActions, usePvpTransport } from './PvpSocketProvider';
 
 export function BsimPvpRoomView() {
   // The address comes from the nav seam, not from a route prop: the
@@ -23,31 +35,46 @@ export function BsimPvpRoomView() {
   const roomid = nav.params.roomId ?? "";
   const decodedRoomId = decodeURIComponent(roomid);
   const t = useToolT(BATTLESIM_NS);
-  // The socket belongs to the provider above the screen switch, not to this
-  // mount: the lobby opened it, and navigating here must not have closed it.
-  // `connection` / `opponentConnected` are what the shell shows mid-battle.
-  // `pvp` also carries `connection` and `opponentConnected` for the shell to
-  // show mid-battle — see PvpSocketProvider for what each value means.
-  const pvp = usePvpSocket();
-  const { socket, connection, getRoomSession, setRoomSession, getRoomSide, connect: connectPvp } = pvp;
+
+  // Two hooks, deliberately: the ACTIONS never change identity (so the join
+  // effect below keys on the socket and the room id and nothing else), while
+  // the transport half re-renders the screen when the connection state moves.
+  const actions = usePvpActions();
+  const { socket, connection, connect: connectPvp } = usePvpTransport();
+  const { getRoomSession, setRoomSession, getRoomSide, getRoom, attachSession, joinRoom, subscribeRoom } = actions;
 
   // A deep link straight into a room (a reload, a restored address) arrives with
   // no socket at all, because nothing opened one. Ask for it here too.
   useEffect(() => { void connectPvp(); }, [connectPvp]);
 
   const [session, setSession] = useState<BattleSession | null>(null);
-  const [side, setSide] = useState<'p1' | 'p2'>('p1');
-  const [chatMessages, setChatMessages] = useState<ChatPanelMessage[]>([]);
   const [, forceUpdate] = useState(0);
   const sceneInitialized = useRef(false);
 
   const triggerUpdate = useCallback(() => { forceUpdate((n) => n + 1); }, []);
 
+  // The inbox is the room's record; this is how a change to it reaches React.
+  const subscribeToRoom = useCallback(
+    (listener: () => void) => subscribeRoom(decodedRoomId, listener),
+    [subscribeRoom, decodedRoomId],
+  );
+  // The inbox mutates its record in place, so `revision` is what changes.
+  useSyncExternalStore(
+    subscribeToRoom,
+    () => getRoom(decodedRoomId)?.revision ?? 0,
+    () => 0,
+  );
+  const room = getRoom(decodedRoomId);
+
+  /**
+   * Adopt (or create) the session, then enter the room's stream.
+   *
+   * `[socket, decodedRoomId]` and nothing else. This used to list five context
+   * getters that were rebuilt on every transport status change, so a reconnect
+   * banner appearing was enough to re-emit `spectate` and re-apply the replay.
+   */
   useEffect(() => {
     if (!socket) return;
-
-    const storedSide = getRoomSide(decodedRoomId);
-    if (storedSide) setSide(storedSide);
 
     let sess = getRoomSession(decodedRoomId);
     if (!sess) {
@@ -63,72 +90,45 @@ export function BsimPvpRoomView() {
       sess.status = 'active';
       setRoomSession(decodedRoomId, sess);
     } else {
-      sess.callbacks = { onUpdate: triggerUpdate, onRequest: () => triggerUpdate(), onBattleEnd: () => triggerUpdate() };
+      sess.callbacks = { ...sess.callbacks, onUpdate: triggerUpdate, onRequest: () => triggerUpdate(), onBattleEnd: () => triggerUpdate() };
     }
     setSession(sess);
 
-    const handleProtocol = (data: { roomId: string; line: string }) => {
-      if (data.roomId === decodedRoomId) { sess.addLine(data.line); triggerUpdate(); }
-    };
-    const handleRequest = (data: { roomId: string; request: Protocol.Request }) => {
-      if (data.roomId === decodedRoomId) { sess.handleRequest(data.request); triggerUpdate(); }
-    };
-    const handleBattleEnd = (data: { roomId: string; winner: string; replay: string; replayId?: number }) => {
-      if (data.roomId === decodedRoomId) {
-        sess.winner = data.winner; sess.replay = data.replay; sess.replayId = data.replayId ?? null;
-        sess.status = 'finished'; sess.battleComplete = true; sess.isWaitingForChoice = false; sess.currentRequest = null;
-        (sess.battle as any).winner = data.winner; triggerUpdate();
-      }
-    };
-    const handleTimerUpdate = (data: { roomId: string; p1: any; p2: any; activeSide: any }) => {
-      if (data.roomId === decodedRoomId) { sess.timerState = { p1: data.p1, p2: data.p2, activeSide: data.activeSide }; triggerUpdate(); }
-    };
-    const handleChatMessage = (data: { roomId: string; sender: string; message: string; timestamp: number }) => {
-      if (data.roomId === decodedRoomId) setChatMessages((prev) => [...prev, { sender: data.sender, message: data.message, timestamp: data.timestamp }]);
-    };
-    const handleSpectateJoined = (data: { roomId: string; replay: string; status: string; currentRequest?: Protocol.Request | null }) => {
-      if (data.roomId === decodedRoomId && data.replay) {
-        for (const line of data.replay.split('\n')) if (line.trim()) sess.addLine(line);
-        if (data.currentRequest) sess.handleRequest(data.currentRequest);
-        triggerUpdate();
-      }
-    };
+    // Everything buffered for this room — the opening `|player|`/`|request|`
+    // lines most of all — is delivered by this call, in order, through
+    // `acceptFrame`. `onGap` is wired by the inbox, not here.
+    attachSession(decodedRoomId, sess);
+    // The stored side is a HINT for the first paint only; `resumed.side` /
+    // `spectateJoined.side` is what actually reaches `setViewerSide` (H6).
+    joinRoom(decodedRoomId, getRoomSide(decodedRoomId));
+  }, [socket, decodedRoomId, triggerUpdate, getRoomSession, setRoomSession, getRoomSide, attachSession, joinRoom]);
 
-    socket.on('chatMessage', handleChatMessage);
-    socket.on('protocol', handleProtocol);
-    socket.on('request', handleRequest);
-    socket.on('battleEnd', handleBattleEnd);
-    socket.on('timerUpdate', handleTimerUpdate);
-    socket.on('spectateJoined', handleSpectateJoined);
-    socket.emit('spectate', { roomId: decodedRoomId });
-
-    return () => {
-      socket.off('chatMessage', handleChatMessage);
-      socket.off('protocol', handleProtocol);
-      socket.off('request', handleRequest);
-      socket.off('battleEnd', handleBattleEnd);
-      socket.off('timerUpdate', handleTimerUpdate);
-      socket.off('spectateJoined', handleSpectateJoined);
-    };
-  }, [socket, decodedRoomId, triggerUpdate, getRoomSession, setRoomSession, getRoomSide]);
+  // The server's word, falling back to the stored hint until it speaks.
+  const side = room?.side ?? getRoomSide(decodedRoomId) ?? 'p1';
+  const pov: 0 | 1 = side === 'p2' ? 1 : 0;
 
   const handleInitScene = useCallback((el: HTMLElement) => {
     if (session && !sceneInitialized.current) {
-      session.initScene(el, side === 'p1' ? 0 : 1);
+      session.initScene(el, pov);
       sceneInitialized.current = true;
       triggerUpdate();
     }
-  }, [session, side, triggerUpdate]);
+  }, [session, pov, triggerUpdate]);
 
+  /**
+   * The choice, with the rqid of the request it answers.
+   *
+   * Through the session rather than a bare `socket.emit`: the rqid lives on the
+   * request the session is currently prompting for, and a choice without one is
+   * accepted by the server for whatever turn it happens to be on (H2). A
+   * rejected choice comes back as `error { code: 'stale_choice' }` and the
+   * inbox re-prompts.
+   */
   const handleMakeChoice = useCallback((choice: string) => {
-    if (socket && session) {
-      socket.emit('makeChoice', { roomId: decodedRoomId, choice });
-      session.isWaitingForChoice = false;
-      session.currentRequest = null;
-      session.resumeAfterChoice();
-      triggerUpdate();
-    }
-  }, [socket, session, decodedRoomId, triggerUpdate]);
+    if (!socket || !session) return;
+    session.makeChoice(choice, socket);
+    triggerUpdate();
+  }, [socket, session, triggerUpdate]);
 
   const handleUndo = useCallback(() => {
     socket?.emit('undoChoice', { roomId: decodedRoomId });
@@ -143,14 +143,17 @@ export function BsimPvpRoomView() {
   }, [socket, decodedRoomId]);
 
   const state = session?.getState();
-  const pov: 0 | 1 = side === 'p1' ? 0 : 1;
+  const chatMessages: ChatPanelMessage[] = room?.chat ?? [];
 
   if (!session || !state) {
-    // Two different waits wearing one face before: no socket yet (connecting)
-    // and a socket with no protocol yet (joining the room).
+    // Three different waits wearing one face before: no socket yet
+    // (connecting), a socket with no protocol yet (joining the room), and
+    // waiting on the server's copy of a battle we have lost frames from
+    // (resyncing) — which is NOT "reconnecting", because the connection is up
+    // and the chat is still arriving.
     return (
       <BattleConnectionState
-        kind={socket ? 'loading' : 'connecting'}
+        kind={!socket ? 'connecting' : room?.resyncing ? 'resyncing' : 'loading'}
         message={socket ? t('connection.loadingBattle') : t('connection.connectingServer')}
       >
         <Button variant="ghost" onClick={backOrHub}>{t('connection.backToLobby')}</Button>
@@ -180,17 +183,28 @@ export function BsimPvpRoomView() {
 
   // The lobby pre-selects `format`; the room only knows the tier line, so it
   // is mapped back to a format id when one matches.
-  const tier = String((state.battle as any).tier ?? '');
+  const tier = String((state.battle as any).tier ?? room?.format ?? '');
   const format = BSIM_FORMATS.find((f) => f.label === tier || f.value === toId(tier))?.value;
+  // The replay button reads `replayId` — the row the gateway wrote for THIS
+  // player — and is offered only when there is one. It used to read a `replay`
+  // field the server has never sent, so the button was permanently dead (M2).
+  const replayId = state.replayId ?? room?.replayId ?? null;
   const endActions: EndAction[] = [
     { id: 'rematch', label: t('battle.end.rematch'), variant: 'pri', icon: 'sword', onClick: () => nav.push('pvp', format ? { format } : {}) },
-    ...(state.replayId ? [{ id: 'replay', label: t('battle.end.watchReplay'), variant: 'default' as const, icon: 'play' as const, onClick: () => nav.push('replayDetail', { id: String(state.replayId) }) }] : []),
+    ...(replayId ? [{ id: 'replay', label: t('battle.end.watchReplay'), variant: 'default' as const, icon: 'play' as const, onClick: () => nav.push('replayDetail', { id: String(replayId) }) }] : []),
     { id: 'lobby', label: t('battle.end.backToLobby'), variant: 'ghost', onClick: () => nav.replace('pvp', {}) },
   ];
+
+  const notice = room?.resyncing
+    ? t('battle.header.resyncing')
+    : connection === 'reconnecting'
+      ? t('battle.header.connecting')
+      : null;
 
   return (
     <LiveBattle
       state={state}
+      session={session}
       pov={pov}
       mode="pvp"
       roomLabel={decodedRoomId.slice(0, 8)}
@@ -202,9 +216,9 @@ export function BsimPvpRoomView() {
       initScene={handleInitScene}
       chat={{ messages: chatMessages, onSend: handleSendChat, disabled: state.status !== 'active' }}
       endActions={endActions}
-      banner={connection === 'reconnecting' ? (
+      banner={notice ? (
         <p role="status" className="m-0 flex items-center gap-2 border-b border-solid border-warn bg-warn-soft px-3 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt">
-          <i aria-hidden className="h-2 w-2 bg-warn [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" />{t('battle.header.connecting')}
+          <i aria-hidden className="h-2 w-2 bg-warn [clip-path:circle(50%)] animate-[bm-pulse_1.4s_ease-in-out_infinite] motion-reduce:animate-none" />{notice}
         </p>
       ) : undefined}
     />

@@ -8,7 +8,7 @@ import { useToolOnline, useToolSession } from '@boffmedia/tool-kit';
 import { useToolT, BATTLESIM_NS } from '../i18n';
 import { useBsimNav } from '../nav';
 import { usePvPMatchmaking } from '../usePvPMatchmaking';
-import { usePvpSocket } from './PvpSocketProvider';
+import { usePvpActions } from './PvpSocketProvider';
 import { BattleSession } from '../engine/BattleSession';
 import { BSIM_FORMATS, isTeamFormat } from '../lib/bsim-data';
 import { useTeams } from '../teambuilder/useTeams';
@@ -31,7 +31,9 @@ const mmss = (ms: number) => {
 export function BsimPvpView() {
   const t = useToolT(BATTLESIM_NS);
   const nav = useBsimNav();
-  const pvp = usePvpSocket();
+  // Actions only: this screen never reads the transport status directly, and a
+  // stable identity keeps the battle-handoff effect below off the re-render path.
+  const pvp = usePvpActions();
   const session = useToolSession();
   const online = useToolOnline();
   const {
@@ -112,6 +114,12 @@ export function BsimPvpView() {
       // Handed to the room screen through the provider. This used to travel on
       // `window.__pvp_sessions`, which nothing owned and nothing cleaned up.
       pvp.setRoomSession(activeRoomId, session);
+      // Adopted HERE, not when the room screen mounts: the gateway starts the
+      // battle the moment it answers `battleCreated`, so the opening lines —
+      // `|player|`, `|poke|`, and the first `|request|` — are already arriving
+      // while this screen is still the one on top. They are held by the inbox
+      // and delivered in order by this call (C3).
+      pvp.attachSession(activeRoomId, session);
       setActiveSession(session, activeRoomId);
       nav.push('pvpRoom', { roomId: activeRoomId });
     }

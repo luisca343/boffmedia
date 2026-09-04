@@ -16,7 +16,7 @@
  * is the worst way for a bug to behave.
  */
 
-import { cryUrl } from '../sprites';
+import { cryCandidates } from '../sprites';
 import { battlesimAssetUrl } from '../asset';
 
 export interface AudioVolume {
@@ -148,37 +148,53 @@ async function resumeContext(): Promise<void> {
  * in over and over in one battle — re-fetching and re-decoding a file we
  * already hold is pure waste on a path that runs mid-animation. In-flight
  * promises are cached too, so two simultaneous switch-ins of the same species
- * (doubles) decode once. `null` is cached for a miss: a Pokémon with no cry
- * must not retry the 404 on every switch.
+ * (doubles) decode once.
+ *
+ * A `null` result IS cached, but only when it is a real miss — a 404 (no file
+ * at that url) or a decode failure (a corrupt/unsupported file): a Pokémon
+ * with no cry recording must not retry that 404 on every switch. A transient
+ * failure — the fetch timing out, or a network error — is deliberately NOT
+ * cached: the file may well exist, and permanently remembering "miss" for a
+ * blip would make one dropped packet mid-battle silence that Pokémon's cry
+ * for the rest of the session.
  */
+const CRY_FETCH_TIMEOUT_MS = 4000;
 const bufferCache = new Map<string, Promise<AudioBuffer | null>>();
 
 function loadBuffer(url: string, ctx: AudioContext): Promise<AudioBuffer | null> {
   const hit = bufferCache.get(url);
   if (hit) return hit;
+
   const p = (async () => {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), CRY_FETCH_TIMEOUT_MS);
+    let res: Response;
     try {
-      const res = await fetch(url);
-      if (!res.ok) return null;
+      res = await fetch(url, { signal: controller.signal });
+    } catch {
+      // Aborted (timeout) or a network error — transient. Do not remember
+      // this as a miss; let the next call try again.
+      bufferCache.delete(url);
+      return null;
+    } finally {
+      clearTimeout(timer);
+    }
+
+    if (!res.ok) return null; // real 404 — a durable miss.
+
+    try {
       return await ctx.decodeAudioData(await res.arrayBuffer());
     } catch {
-      return null;
+      return null; // corrupt/unsupported file — also a durable miss.
     }
   })();
+
   bufferCache.set(url, p);
   return p;
 }
 
-/** Plays a cached one-shot on a channel. Silent, never throwing, on any failure. */
-export async function playAudio(url: string, channel: keyof AudioVolume, state: BattleAudioState): Promise<void> {
-  if (!unlocked || state.muted) return;
-  const ctx = getAudioContext();
-  if (!ctx) return;
-  if (ctx.state === 'suspended') await resumeContext();
-  if (ctx.state !== 'running') return;
-
-  const buffer = await loadBuffer(url, ctx);
-  if (!buffer) return;
+/** Builds the graph for one decoded buffer and starts it. Never throws. */
+function playDecodedBuffer(buffer: AudioBuffer, channel: keyof AudioVolume, state: BattleAudioState, ctx: AudioContext): void {
   try {
     const source = ctx.createBufferSource();
     source.buffer = buffer;
@@ -196,9 +212,78 @@ export async function playAudio(url: string, channel: keyof AudioVolume, state: 
   }
 }
 
-/** A Pokémon's cry, by species id. Many species have none — that is not an error. */
-export async function playCry(id: string, state: BattleAudioState): Promise<void> {
-  return playAudio(cryUrl(id), 'cry', state);
+/** Plays a cached one-shot on a channel. Silent, never throwing, on any failure. */
+export async function playAudio(url: string, channel: keyof AudioVolume, state: BattleAudioState): Promise<void> {
+  if (!unlocked || state.muted) return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') await resumeContext();
+  if (ctx.state !== 'running') return;
+
+  const buffer = await loadBuffer(url, ctx);
+  if (!buffer) return;
+  playDecodedBuffer(buffer, channel, state, ctx);
+}
+
+/**
+ * A Pokémon's cry, by species (forme included). Many species/formes have none
+ * — that is not an error, it just falls through to the base cry or to silence.
+ *
+ * MUST NEVER throw or reject, and is never awaited by its callers on the hot
+ * path (a switch-in should not stall on network) — the `Promise<void>` return
+ * exists for callers that DO want to know playback was attempted (tests,
+ * `preloadCries`), not as a contract callers must honor.
+ */
+export async function playCry(speciesId: string, state: BattleAudioState): Promise<void> {
+  try {
+    if (!unlocked || state.muted) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    if (ctx.state === 'suspended') await resumeContext();
+    if (ctx.state !== 'running') return;
+
+    for (const url of cryCandidates(speciesId)) {
+      const buffer = await loadBuffer(url, ctx);
+      if (buffer) {
+        playDecodedBuffer(buffer, 'cry', state, ctx);
+        return;
+      }
+    }
+  } catch {
+    /* never surface a rejection to the caller */
+  }
+}
+
+/**
+ * Warms the cry cache for a set of species — call once per side at battle
+ * start so the first switch-in's cry is already decoded instead of racing a
+ * fetch against the switch animation. Bounded to 4 concurrent decodes so a
+ * six-mon team doesn't open six requests at once; fire-and-forget, so a slow
+ * or failing preload never blocks or is awaited by the caller.
+ */
+export function preloadCries(speciesIds: string[]): void {
+  if (typeof window === 'undefined') return;
+  const ctx = getAudioContext();
+  if (!ctx) return;
+
+  const queue = Array.from(new Set(speciesIds));
+  let next = 0;
+  const worker = async () => {
+    for (;;) {
+      const i = next++;
+      if (i >= queue.length) return;
+      for (const url of cryCandidates(queue[i])) {
+        const buffer = await loadBuffer(url, ctx);
+        if (buffer) break; // primed the one this species will actually play
+      }
+    }
+  };
+
+  const CONCURRENCY = 4;
+  const workers = Array.from({ length: Math.min(CONCURRENCY, queue.length) }, () => worker());
+  void Promise.all(workers).catch(() => {
+    /* preloading is an optimisation; a failure here is not a battle error */
+  });
 }
 
 /**

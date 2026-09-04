@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useToolSession } from '@boffmedia/tool-kit';
 
 import { attachListeners, waitForConnect } from './engine/battleSocket';
-import { usePvpSocket } from './pvp/PvpSocketProvider';
+import { usePvpActions, usePvpTransport } from './pvp/PvpSocketProvider';
 import type { BattleSession } from './engine/BattleSession';
 
 export type MatchmakingStatus =
@@ -44,8 +44,10 @@ export interface PvpNotice {
  * id, which is precisely what used to make the identity forgeable.
  */
 export function usePvPMatchmaking() {
-  const pvp = usePvpSocket();
-  const { socket, connect: openSocket, error: socketError } = pvp;
+  const { socket, connect: openSocket, error: socketError } = usePvpTransport();
+  // Stable: the side is recorded through the provider so `PvpInbox` and the
+  // room screen read the SAME value, rather than each keeping its own guess.
+  const { setRoomSide } = usePvpActions();
 
   const [status, setStatus] = useState<MatchmakingStatus>('idle');
   const [error, setError] = useState<string | null>(null);
@@ -103,6 +105,9 @@ export function usePvPMatchmaking() {
     return attachListeners(socket, [
       ['connect', () => { setStatus((s) => (s === 'searching' || s === 'inBattle' ? s : 'connected')); setError(null); }],
       ['battleCreated', (data: { roomId: string; format: string; side?: 'p1' | 'p2' }) => {
+        // The server states the side; the store is only a hint for the first
+        // paint after a reload (H6).
+        if (data.side === 'p1' || data.side === 'p2') setRoomSide(data.roomId, data.side);
         setActiveSide(data.side ?? 'p1');
         setActiveRoomId(data.roomId);
         setQueuePosition(null);
@@ -131,12 +136,17 @@ export function usePvPMatchmaking() {
         setQueueStartedAt(null);
         setQueuePosition(null);
       }],
-      ['resumed', (data: { roomId: string; side: 'p1' | 'p2' }) => { setActiveSide(data.side); setActiveRoomId(data.roomId); setStatus('inBattle'); }],
+      ['resumed', (data: { roomId: string; side: 'p1' | 'p2' }) => {
+        if (data.side === 'p1' || data.side === 'p2') setRoomSide(data.roomId, data.side);
+        setActiveSide(data.side);
+        setActiveRoomId(data.roomId);
+        setStatus('inBattle');
+      }],
       // The server sends a CODE, never an internal message.
       ['error', (data: { code?: string }) => { setError(data?.code ?? 'unknown'); setTimeout(() => setError(null), 6000); }],
       ['disconnect', () => { setStatus((s) => (s === 'inBattle' ? s : 'idle')); }],
     ]);
-  }, [socket, push]);
+  }, [socket, push, setRoomSide]);
 
   const joinQueue = useCallback(async (format: string, team?: string) => {
     setTeamProblems([]);
@@ -184,10 +194,16 @@ export function usePvPMatchmaking() {
     setPendingChallenges((prev) => prev.filter((c) => c.from !== fromName));
   }, [connect]);
 
-  const makeChoice = useCallback((roomId: string, choice: string) => {
-    socket?.emit('makeChoice', { roomId, choice });
-  }, [socket]);
-
+  /**
+   * Forfeit from the LOBBY (a stale room the player wants rid of).
+   *
+   * There is deliberately no `makeChoice` here any more: a choice has to carry
+   * the `rqid` of the request it answers, that rqid lives on the session, and
+   * the session belongs to the room screen — so `session.makeChoice(choice,
+   * socket)` is the only correct way to send one (H2). A second, rqid-less
+   * path on this hook was an invitation to submit a choice the server would
+   * accept for whichever turn it happened to be on.
+   */
   const forfeit = useCallback((roomId: string) => {
     socket?.emit('forfeit', { roomId });
   }, [socket]);
@@ -211,7 +227,6 @@ export function usePvPMatchmaking() {
     challengePlayer,
     acceptChallenge,
     rejectChallenge,
-    makeChoice,
     forfeit,
     setActiveSession,
   };

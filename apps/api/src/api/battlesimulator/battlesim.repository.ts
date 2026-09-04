@@ -42,7 +42,10 @@ export class BattlesimRepository {
    * If a row with the same (user_id, client_id) exists, it is updated.
    * Otherwise a new row is created with a server-generated uuid.
    */
-  async upsertReplay(userId: number, replay: ReplayInput): Promise<BattlesimReplay> {
+  async upsertReplay(
+    userId: number,
+    replay: ReplayInput,
+  ): Promise<BattlesimReplay> {
     const id = randomUUID();
     await this.db
       .insert(battlesimReplays)
@@ -82,7 +85,10 @@ export class BattlesimRepository {
       .select()
       .from(battlesimReplays)
       .where(
-        and(eq(battlesimReplays.userId, userId), eq(battlesimReplays.clientId, replay.clientId)),
+        and(
+          eq(battlesimReplays.userId, userId),
+          eq(battlesimReplays.clientId, replay.clientId),
+        ),
       )
       .limit(1);
 
@@ -123,7 +129,9 @@ export class BattlesimRepository {
 
     const hasMore = rows.length > limit;
     const items = rows.slice(0, limit);
-    const nextCursor = hasMore ? String(items[items.length - 1].playedAt) : null;
+    const nextCursor = hasMore
+      ? String(items[items.length - 1].playedAt)
+      : null;
 
     return { items, cursor: nextCursor };
   }
@@ -136,7 +144,9 @@ export class BattlesimRepository {
     const [row] = await this.db
       .select()
       .from(battlesimReplays)
-      .where(and(eq(battlesimReplays.id, id), isNull(battlesimReplays.deletedAt)))
+      .where(
+        and(eq(battlesimReplays.id, id), isNull(battlesimReplays.deletedAt)),
+      )
       .limit(1);
 
     return row ?? null;
@@ -174,7 +184,12 @@ export class BattlesimRepository {
     const [row] = await this.db
       .select()
       .from(battlesimTeams)
-      .where(and(eq(battlesimTeams.userId, userId), eq(battlesimTeams.clientId, team.clientId)))
+      .where(
+        and(
+          eq(battlesimTeams.userId, userId),
+          eq(battlesimTeams.clientId, team.clientId),
+        ),
+      )
       .limit(1);
 
     return row!;
@@ -187,7 +202,12 @@ export class BattlesimRepository {
     return this.db
       .select()
       .from(battlesimTeams)
-      .where(and(eq(battlesimTeams.userId, userId), isNull(battlesimTeams.deletedAt)))
+      .where(
+        and(
+          eq(battlesimTeams.userId, userId),
+          isNull(battlesimTeams.deletedAt),
+        ),
+      )
       .orderBy(desc(battlesimTeams.updatedAt));
   }
 
@@ -243,7 +263,10 @@ export class BattlesimRepository {
     winner: string;
     log: string;
     playedAt: number;
-  }): Promise<void> {
+    // Returns ONE id per player: a PvP battle is stored twice, once owned by
+    // each account, and `battleEnd` has to hand each player the row THEY can
+    // open. Returning nothing is why the gateway had no replay id to send.
+  }): Promise<{ p1: string; p2: string }> {
     const replayId1 = randomUUID();
     const replayId2 = randomUUID();
 
@@ -280,5 +303,7 @@ export class BattlesimRepository {
       playedAt: data.playedAt,
       deletedAt: null,
     });
+
+    return { p1: replayId1, p2: replayId2 };
   }
 }

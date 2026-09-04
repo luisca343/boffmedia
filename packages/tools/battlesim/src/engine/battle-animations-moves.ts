@@ -11,52 +11,74 @@
 
 import { PokemonSprite } from './PokemonSprite';
 import { Scene} from './Scene'
-import { getImageSize, getScaleMultiplier } from './viewUtils';
 
 export const BattleOtherAnims: {[k: string]: {anim: (scene: Scene, args: PokemonSprite[], data?: any) => void, prepareAnim?: (scene: Scene, args: PokemonSprite[], data?: any) => void}} = {
-	faint:{
+	faint: {
+		anim(scene, [attacker]) {
+			// A KO is a shrink and a fade. No ball: nothing is being recalled.
+			attacker.anim({
+				opacity: 0,
+				scale: 0.4,
+				time: 500,
+			}, 'accel');
+		},
+	},
+	recall: {
+		// The OUTGOING Pokemon shrinks into its ball while the ball flies back to
+		// its trainer. Runs before `battle.add`, while the slot still holds it.
 		anim(scene, [attacker], data) {
 			attacker.anim({
 				opacity: 0,
-				scale: 0.5,
-				time: 600,
-			}, 'linear');
-			scene.showEffect('pokeball', {
-				opacity: 0,
-				x: attacker.x() + getImageSize() / 2,
-				y: attacker.y() + getImageSize(),
-				scale: 0.7,
-				time: 0 / scene.acceleration,
-			}, {
-				opacity: 0,
-				x: data.startingPosition.left * getScaleMultiplier(),
-				y: data.startingPosition.top * getScaleMultiplier(),
-				time: 500 / scene.acceleration,
-			}, 'ballistic2', '', '');
-		},
-	},
-	switch: {
-		anim(scene, [attacker, defender], data) {
-			// Start small and grow
-			attacker.anim({
-				opacity: 0,
 				scale: 0.1,
-				time: 500, // Start immediately
-			}, 'linear');
-	
+				time: 400,
+			}, 'accel');
 			scene.showEffect('pokeball', {
-				opacity: 0,
-				x: data.startingPosition.left * getScaleMultiplier(),
-				y: data.startingPosition.top * getScaleMultiplier(),
-				scale: 0.7,
-				time: 500 / scene.acceleration,
-			}, {
 				opacity: 0,
 				x: attacker.x(),
 				y: attacker.y(),
-				time: 1000 / scene.acceleration,
-			}, 'ballistic2', '', '');
-		}
+				scale: 0.7,
+				time: 0,
+			}, {
+				opacity: 1,
+				x: data.trainerPosition.left,
+				y: data.trainerPosition.top,
+				scale: 0.5,
+				time: 420,
+			}, 'ballistic2', 'fade');
+		},
+	},
+	summon: {
+		// The ball flies out to the slot, then the Pokemon grows out of it. The
+		// ball used to animate from opacity 0 to opacity 0 — invisible for the
+		// whole flight — and the sprite popped in at full size.
+		anim(scene, [attacker], data) {
+			scene.showEffect('pokeball', {
+				opacity: 0,
+				x: data.trainerPosition.left,
+				y: data.trainerPosition.top,
+				scale: 0.5,
+				time: 0,
+			}, {
+				opacity: 1,
+				x: attacker.x(),
+				y: attacker.y(),
+				scale: 0.7,
+				time: 400,
+			}, 'ballistic2', 'fade');
+			attacker.delay(400);
+			attacker.anim({
+				opacity: 1,
+				scale: 1,
+				time: 400,
+			}, 'decel');
+		},
+	},
+	switch: {
+		// Kept as an alias: `playEffect('switch', ...)` is still a valid entry
+		// point, and it must mean the same thing as the summon half.
+		anim(scene, args, data) {
+			BattleOtherAnims.summon.anim(scene, args, data);
+		},
 	},
 	hitmark: {
 		anim(scene, [attacker]) {

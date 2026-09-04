@@ -26,7 +26,11 @@ export function ReplayModal({
   const t = useTranslations("pasaporte")
   return (
     <Modal title={t("replayModal.title", { name: achievement.name })} onClose={onClose}>
-      <div className="bg-ps-desk-lo p-3">
+      {/* `--tool-vh` is the box a tool is given, and the player is that box
+          exactly (bar · field · transport · log rail). Inside a tool page the
+          host sets it; here there is no host, so the sheet states it — without
+          this the shell would fall back to a full `100dvh` inside the modal. */}
+      <div className="bg-ps-desk-lo p-3" style={{ ["--tool-vh" as string]: "min(80dvh, 44rem)" }}>
         <Game battleName={achievement.id} />
       </div>
     </Modal>

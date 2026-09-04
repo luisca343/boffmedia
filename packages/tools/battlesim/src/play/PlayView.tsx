@@ -232,7 +232,7 @@ function PlayInner() {
 
   return (
     <LiveBattle
-      state={state} pov={0} mode="ai" formatLabel={formatLabel} roomLabel={shortRoomId(roomId)}
+      state={state} session={session} pov={0} mode="ai" formatLabel={formatLabel} roomLabel={shortRoomId(roomId)}
       onChoice={(choice) => makeChoice(roomId, choice)}
       onForfeit={() => forfeit(roomId)}
       onBack={backOrHub}

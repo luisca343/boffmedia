@@ -2,23 +2,24 @@ import { useEffect, useState } from 'react';
 import { Battle } from "@pkmn/client";
 import { Generations } from '@pkmn/data';
 import { Dex } from '@pkmn/sim';
-import { create } from 'zustand';
 import { Protocol } from '@pkmn/protocol';
 import { Scene } from './engine/Scene';
 import { ReplayData } from './engine/types';
 import { countActions } from './engine/replayUtils';
 import { battlesimAssetUrl } from './asset';
 
-// Battle Store Types and Implementation
-interface BattleStore {
-    battle: Battle;
-    setBattle: (battle: Battle) => void;
-}
-
-const useBattleStore = create<BattleStore>((set) => ({
-    battle: new Battle(new Generations(Dex as any) as any),
-    setBattle: (battle: Battle) => set({ battle }),
-}));
+/**
+ * PER MOUNT, not per module.
+ *
+ * This was a module-level zustand store holding ONE `Battle` (M1). The tool
+ * keeps several replay rooms mounted at once as layers, so every one of them
+ * read and wrote the same battle: opening a second replay reset the first,
+ * seeking in one moved the other, and the two `Scene`s ended up bound to the
+ * same object. A `useState` initialiser gives each mount its own, which is the
+ * only thing the store was ever used for — there was no cross-component
+ * subscriber to justify the global.
+ */
+const newBattle = () => new Battle(new Generations(Dex as any) as any);
 
 interface GameState {
     // Core state
@@ -57,9 +58,8 @@ interface GameState {
 }
 
 export function useGameState(replayData?: ReplayData) {
-    // Battle state from store
-    const battle = useBattleStore((state) => state.battle);
-    const setBattle = useBattleStore((state) => state.setBattle);
+    // This mount's battle. See `newBattle`.
+    const [battle, setBattle] = useState<Battle>(newBattle);
     
     // Core state
     const [battleLog, setBattleLog] = useState<string | null>(null);
@@ -76,7 +76,10 @@ export function useGameState(replayData?: ReplayData) {
     const [settingTurn, setSettingTurn] = useState(false);
     const [lastTurn, setLastTurn] = useState<number>(0);
     const [simulatedAttack, setSimulatedAttack] = useState<string>('contactattack');
-    const [logVisible, setLogVisible] = useState(false);
+    // The log rail is OPEN by default: the replay player wears the same shell
+    // as a live battle now (bar · field · dock · rail), and that shell reserves
+    // the rail's column whether or not anything is in it.
+    const [logVisible, setLogVisible] = useState(true);
     const [pov, setPov] = useState<0 | 1>(0);
     
     // Initialize battle data

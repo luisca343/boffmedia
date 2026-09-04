@@ -5,7 +5,7 @@ import { ConfirmDialog, useFullscreen, cn } from '@boffmedia/ui';
 import { useToolT, BATTLESIM_NS } from '../i18n';
 import { BattleShell } from './BattleShell';
 import { BattleHeader } from './BattleHeader';
-import { BattleCanvas } from './BattleCanvas';
+import { BattleCanvas, type CanvasSession } from './BattleCanvas';
 import { BxDock } from './BxDock';
 import { BattlePreview } from './BattlePreview';
 import { BattleEndScreen } from './BattleEndScreen';
@@ -23,6 +23,13 @@ import { playMusic, selectTrackForBattle, stopMusic } from '../engine/BattleAudi
 
 export interface LiveBattleProps {
   state: BattleSessionState;
+  /**
+   * The session behind `state`, for the canvas's commit handshake (see
+   * `BattleCanvas`'s layout effect on `[revision]`). Optional: without it the
+   * engine falls back to its own 64 ms timer, which works but animates a frame
+   * ahead of the DOM on a slow commit. Room views should pass their session.
+   */
+  session?: CanvasSession | null;
   pov: 0 | 1;
   mode: 'ai' | 'pvp' | 'showdown';
   formatLabel?: string;
@@ -85,7 +92,7 @@ function MusicController({ roomId, battleActive }: { roomId?: string; battleActi
   return null;
 }
 
-export function LiveBattle({ state, pov, mode, formatLabel, roomLabel, onChoice, onUndo, onForfeit, onBack, initScene, chat, spectator = false, spectatorCount, endActions, banner }: LiveBattleProps) {
+export function LiveBattle({ state, session = null, pov, mode, formatLabel, roomLabel, onChoice, onUndo, onForfeit, onBack, initScene, chat, spectator = false, spectatorCount, endActions, banner }: LiveBattleProps) {
   const t = useToolT(BATTLESIM_NS);
   const shellNode = useRef<HTMLDivElement | null>(null);
   const { ref: fsRef, isFullscreen, toggle: toggleFullscreen } = useFullscreen<HTMLDivElement>();
@@ -93,6 +100,10 @@ export function LiveBattle({ state, pov, mode, formatLabel, roomLabel, onChoice,
   const layout = useMeasuredLayout(shellNode);
 
   const bsx = useBSXLayout(state, pov);
+  // The ledger is on `state` whether or not a room view passed its session, so
+  // the HP plates get their per-turn deltas either way; the commit handshake
+  // needs the real session and degrades to the engine's own timer without one.
+  const canvasSession = useMemo<CanvasSession>(() => session ?? { ledger: state.ledger }, [session, state.ledger]);
   const [targeting, setTargeting] = useState<TargetingState | null>(null);
   const [aiming, setAiming] = useState(false);
   const [railOpen, setRailOpen] = useState(false);
@@ -161,6 +172,7 @@ export function LiveBattle({ state, pov, mode, formatLabel, roomLabel, onChoice,
   const canvas = (
     <BattleCanvas
       battle={state.battle} revision={state.revision} pov={pov} liveMode liveStatus={state.status} battleComplete={finished}
+      session={canvasSession}
       initScene={initScene} fit="contain" targeting={targeting} aimedFoe={aiming} compact={layout === 'mobile'}
     />
   );

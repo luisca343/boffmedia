@@ -28,15 +28,21 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { Protocol } from "@pkmn/protocol";
 
 import { BattleSession } from "../engine/BattleSession";
 import { keepReplay } from "../sync";
+import { applyWorkerEvent } from "./workerInbox";
 import type { BattleWorkerEvent, BattleWorkerRequest } from "./worker-protocol";
 
-/** What `BattleSession` needs of a transport: nothing but `emit`. */
+/**
+ * What `BattleSession` needs of a transport: nothing but `emit`.
+ *
+ * `rqid` rides along because the session puts it there — the worker refuses a
+ * choice that does not answer the request it last delivered, which is what
+ * stops a double-click spending two turns.
+ */
 interface SessionTransport {
-  emit(event: string, payload: { roomId: string; choice?: string }): void;
+  emit(event: string, payload: { roomId: string; choice?: string; rqid?: number | null }): void;
 }
 
 const newRoomId = () =>
@@ -67,53 +73,30 @@ export function useLocalBattleEngine() {
       const session = sessionsRef.current.get(message.roomId);
       if (!session) return;
 
-      switch (message.type) {
-        case "protocol":
-          session.addLine(message.line);
-          break;
-        case "request":
-          session.handleRequest(message.request as Protocol.Request);
-          break;
-        case "battleEnd": {
-          session.addLine(`|win|${message.winner}`);
-          // The session does not move its own status — the transport owns that,
-          // as the socket manager did. Without this the screen sits on
-          // "connecting" forever with a battle running behind it.
-          session.winner = message.winner;
-          session.replay = message.log;
-          session.status = "finished";
-          session.isWaitingForChoice = false;
-          session.currentRequest = null;
+      // The routing lives in `workerInbox` so it can be tested without a Web
+      // Worker, a bundler that can resolve one, or a React renderer.
+      applyWorkerEvent(session, message, {
+        onEnd: (end) => {
           // D7: stored locally first, always — a battle with no account and no
-          // network still leaves a replay. `keepReplay` queues the upload through
-          // the outbox only when a session exists.
+          // network still leaves a replay. `keepReplay` queues the upload
+          // through the outbox only when a session exists.
           void keepReplay({
-            id: message.roomId,
-            format: formatsRef.current.get(message.roomId) ?? "",
+            id: end.roomId,
+            format: formatsRef.current.get(end.roomId) ?? "",
             p1: "Player",
             p2: "Bot",
-            winner: message.winner,
-            log: message.log,
-            teams: message.teams as never,
+            winner: end.winner,
+            log: end.log,
+            teams: end.teams as never,
             playedAt: Date.now(),
             source: "local",
-          }).catch(() => {
+          }).catch((e) => {
             // Storage is a convenience here, not the battle itself.
+            console.warn("[battlesim] could not store the local replay", e);
           });
-          rerender();
-          break;
-        }
-        case "error":
-          session.error = message.message;
-          session.status = "error";
-          rerender();
-          break;
-        case "battleCreated":
-          session.status = "active";
-          rerender();
-          break;
-      }
-      rerender();
+        },
+        onChange: rerender,
+      });
     };
 
     workerRef.current = worker;
@@ -137,7 +120,7 @@ export function useLocalBattleEngine() {
   const transport = useRef<SessionTransport>({ emit: () => {} });
   transport.current.emit = (event, payload) => {
     if (event === "makeChoice" && payload.choice !== undefined) {
-      send({ type: "choice", roomId: payload.roomId, choice: payload.choice });
+      send({ type: "choice", roomId: payload.roomId, choice: payload.choice, rqid: payload.rqid ?? null });
     } else if (event === "forfeit") {
       send({ type: "forfeit", roomId: payload.roomId });
     } else if (event === "undoChoice") {
@@ -154,6 +137,15 @@ export function useLocalBattleEngine() {
         onBattleEnd: () => rerender(),
       });
       session.status = "connecting";
+      // The player is ALWAYS p1 in a local battle — the worker only ever sends
+      // the p1 view — so the side is stated outright rather than guessed from a
+      // `pov` argument at canvas-mount time.
+      session.setViewerSide("p1");
+      session.callbacks.onGap = (lastSeq, seq) => {
+        // Nothing to ask: the worker has no resync verb and the frames it posts
+        // cannot be lost in transit. A gap here means a bug, so say so.
+        console.warn(`[battlesim] worker gap in ${roomId}: had ${lastSeq}, got ${seq}`);
+      };
       sessionsRef.current.set(roomId, session);
       formatsRef.current.set(roomId, format);
       send({ type: "start", roomId, format, ...teams });
@@ -201,6 +193,8 @@ export function useLocalBattleEngine() {
     [rerender, send],
   );
 
+  // pov 0 is the argument's default; `setViewerSide('p1')` at creation already
+  // outranks it, so a remount cannot flip the field.
   const initScene = useCallback((roomId: string, element: HTMLElement) => {
     sessionsRef.current.get(roomId)?.initScene(element, 0);
   }, []);

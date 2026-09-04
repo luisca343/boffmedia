@@ -31,12 +31,34 @@ interface TicketResponse {
   ticket?: string;
 }
 
+/**
+ * How long a ticket request may take before we call it a failed connection.
+ *
+ * `toolApi().request` has no deadline of its own, so a request that never
+ * settles — a captive portal, a dead tunnel, a proxy holding the socket open —
+ * left `openBattleSocket` permanently pending and every screen that awaited it
+ * sitting on "connecting" with nothing to retry. A hang is a failure; it just
+ * takes a clock to say so.
+ */
+const TICKET_TIMEOUT_MS = 10_000;
+
 /** Asks the API for a socket ticket. Requires a session on either host. */
 export async function fetchBattleTicket(): Promise<string> {
-  const response = await toolApi().request<TicketResponse>("/battlesimulator/ws-ticket", {
-    method: "POST",
-    auth: "required",
-  });
+  // Constructed by hand rather than with `AbortSignal.timeout`, which the
+  // package cannot assume: this runs in a browser, in the launcher's webview
+  // and under jsdom in the tests.
+  const abort = new AbortController();
+  const timer = setTimeout(() => abort.abort(), TICKET_TIMEOUT_MS);
+  let response: TicketResponse | undefined;
+  try {
+    response = await toolApi().request<TicketResponse>("/battlesimulator/ws-ticket", {
+      method: "POST",
+      auth: "required",
+      signal: abort.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
   // The controller is enveloped ({success, statusCode, data}); `toolApi` hands
   // back the raw body, so the ticket is one level in. The bare form is accepted
   // too so this does not break if the route is ever marked @SkipEnvelope.
@@ -58,26 +80,46 @@ export async function openBattleSocket(namespace: SocketNamespace): Promise<Sock
   // "Invalid namespace" on both `/battle` and `/showdown`. Strip it.
   const origin = getToolHost().apiUrl("").replace(/\/+$/, "");
 
+  // Spent by the `auth` callback on the FIRST attempt; every attempt after it
+  // mints its own. A ticket lasts 60 seconds and a reconnect can easily outlive
+  // one, so reusing this would refuse every retry for the same stale reason.
+  let firstTicket: string | null = ticket;
+
   const socket = io(`${origin}${namespace}`, {
-    auth: { ticket },
+    // The FUNCTION form, and that is the whole point: socket.io calls it and
+    // waits for the callback before each connection attempt, reconnects
+    // included. The previous code refreshed the ticket from `reconnect_attempt`
+    // with a floating promise — which fires alongside the attempt, not before
+    // it, so every retry went out carrying the ticket that had just been
+    // refused and the fresh one only landed in time for the attempt after.
+    auth: (cb: (data: object) => void) => {
+      if (firstTicket) {
+        const spend = firstTicket;
+        firstTicket = null;
+        cb({ ticket: spend });
+        return;
+      }
+      void fetchBattleTicket()
+        .then((fresh) => cb({ ticket: fresh }))
+        // Offline, or the session is gone. An EMPTY ticket rather than no
+        // callback at all: not calling back leaves the attempt pending
+        // forever, which is the hang this whole file is trying not to have.
+        // The server refuses it immediately and socket.io schedules the next
+        // attempt, by which time the network may be back.
+        .catch(() => cb({ ticket: "" }));
+    },
     // websocket first, polling as the fallback: a corporate proxy or a
     // reverse proxy that does not forward `Upgrade` will refuse the former,
     // and silently degrading beats a battle that never starts.
+    //
+    // `tryAllTransports` is what makes that sentence TRUE. Engine.IO defaults
+    // it to false, so listing two transports websocket-first bought no
+    // fallback at all: a refused upgrade failed the connection outright and
+    // the reconnection loop then retried websocket, forever, on a network
+    // where it could never work — the client's half of "hung on connecting".
     transports: ["websocket", "polling"],
-    // Reconnection is on, but the ticket has to be refreshed for each attempt
-    // or every one of them is refused for the same reason.
+    tryAllTransports: true,
     reconnection: true,
-  });
-
-  socket.io.on("reconnect_attempt", () => {
-    void fetchBattleTicket()
-      .then((fresh) => {
-        socket.auth = { ticket: fresh };
-      })
-      .catch(() => {
-        // Offline, or the session is gone. The attempt still fires and is
-        // refused; the UI reports a disconnected socket, which is honest.
-      });
   });
 
   return socket;
