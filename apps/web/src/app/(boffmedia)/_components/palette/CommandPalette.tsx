@@ -162,14 +162,14 @@ function CommandPaletteContent({
         >
           {filteredEntries.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-txt-muted">
-              {t("palette.noResults")}
+              {tNav("palette.noResults")}
             </div>
           ) : (
             filteredEntries.map((entry, idx) => {
               const categoryLabel = {
-                route: t("palette.category.route"),
-                tool: t("palette.category.tool"),
-                admin: t("palette.category.admin"),
+                route: tNav("palette.category.route"),
+                tool: tNav("palette.category.tool"),
+                admin: tNav("palette.category.admin"),
               }[entry.category]
 
               return (
@@ -203,7 +203,7 @@ function CommandPaletteContent({
         </div>
 
         <div className="border-t border-line px-4 py-2 text-xs text-txt-muted">
-          {t("palette.hint")}
+          {tNav("palette.hint")}
         </div>
       </div>
     </div>

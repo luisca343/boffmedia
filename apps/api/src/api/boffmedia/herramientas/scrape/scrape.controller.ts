@@ -215,7 +215,7 @@ export class ScrapeController {
   // ==================== DOWNLOADS ====================
 
   @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @Post('myrient/download')
@@ -249,7 +249,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Throttle({ default: { ttl: 60_000, limit: 2 } })
   @Post('myrient/download-all')
@@ -275,7 +275,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Post('myrient/download-selected/stream')
@@ -342,7 +342,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Patch('manga/browser')
   @ApiOperation({ summary: 'Enable or disable the remote browser tunnel' })
@@ -403,7 +403,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Post('manga/download/novel/stream')
@@ -437,7 +437,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Post('myrient/download-selected')
@@ -510,7 +510,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Throttle({ default: { ttl: 60_000, limit: 20 } })
   @Post('manga/convert-chapter')
@@ -538,7 +538,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Post('manga/patch-metadata')
   @ApiOperation({
@@ -565,7 +565,7 @@ export class ScrapeController {
   // Guarded to match its PATCH sibling: same admin resource, so a public read
   // of the cron schedule and series status was an unintended asymmetry.
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Get('manga/config')
   @ApiOperation({
@@ -577,7 +577,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Patch('manga/config')
   @ApiOperation({
@@ -589,7 +589,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Patch('manga/series/:slug/status')
   @ApiOperation({ summary: 'Update the status of a tracked manga series' })
@@ -603,7 +603,7 @@ export class ScrapeController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Throttle({ default: { ttl: 60_000, limit: 2 } })
   @Post('manga/cron/run')

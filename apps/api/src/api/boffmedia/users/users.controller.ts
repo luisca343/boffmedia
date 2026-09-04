@@ -63,6 +63,18 @@ import { UserValidationResponseEntity } from './entities/user-validation-respons
 import { BatchUsersDto } from './dto/batch-users.dto';
 import { Logger } from 'nestjs-pino';
 
+/**
+ * User account and role administration — requires BOFF_ADMIN only (superuser access).
+ *
+ * Rationale: This controller manages user accounts and role assignments.
+ * Granting content or release sub-roles access to this endpoint would allow
+ * privilege escalation (e.g., granting themselves higher roles). Only the
+ * superuser role (BOFF_ADMIN) should ever control account creation, deletion,
+ * and role management.
+ *
+ * The audit log requires BOFF_ADMIN_CONTENT, but users/admin operations are
+ * too sensitive for delegation to sub-roles.
+ */
 @ApiTags('BoffMedia | Users')
 @Controller('users')
 export class BoffMediaUsersController {
@@ -208,6 +220,9 @@ export class BoffMediaUsersController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
+  // SUPERUSER_ONLY_REASON: account and role administration. A content or release
+  // sub-role must never be able to edit accounts or grant roles - that is the whole
+  // point of the W8 split (least privilege), not an oversight.
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get all BoffMedia users' })
@@ -254,6 +269,9 @@ export class BoffMediaUsersController {
 
   @Get('statistics')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  // SUPERUSER_ONLY_REASON: account and role administration. A content or release
+  // sub-role must never be able to edit accounts or grant roles - that is the whole
+  // point of the W8 split (least privilege), not an oversight.
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get user statistics with integrations' })
@@ -331,6 +349,9 @@ export class BoffMediaUsersController {
 
   @Get('username/:username')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  // SUPERUSER_ONLY_REASON: account and role administration. A content or release
+  // sub-role must never be able to edit accounts or grant roles - that is the whole
+  // point of the W8 split (least privilege), not an oversight.
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get user by username' })
@@ -358,6 +379,9 @@ export class BoffMediaUsersController {
 
   @Get('username/:username/full')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  // SUPERUSER_ONLY_REASON: account and role administration. A content or release
+  // sub-role must never be able to edit accounts or grant roles - that is the whole
+  // point of the W8 split (least privilege), not an oversight.
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   @ApiOperation({
@@ -388,6 +412,9 @@ export class BoffMediaUsersController {
 
   @Get('email/:email')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  // SUPERUSER_ONLY_REASON: account and role administration. A content or release
+  // sub-role must never be able to edit accounts or grant roles - that is the whole
+  // point of the W8 split (least privilege), not an oversight.
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get user by email' })
@@ -667,6 +694,9 @@ export class BoffMediaUsersController {
 
   @Post('batch')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  // SUPERUSER_ONLY_REASON: account and role administration. A content or release
+  // sub-role must never be able to edit accounts or grant roles - that is the whole
+  // point of the W8 split (least privilege), not an oversight.
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Get multiple users with integrations by IDs' })

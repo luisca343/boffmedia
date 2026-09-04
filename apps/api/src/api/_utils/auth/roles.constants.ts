@@ -4,6 +4,10 @@
 // `nest start`. Keep the two files in step by hand.
 export const USER_ROLES = {
   BOFF_ADMIN: 'BOFF_ADMIN',
+  // Boffmedia admin sub-roles (can also hold BOFF_ADMIN for backward compatibility).
+  // These allow fine-grained access within the admin console.
+  BOFF_ADMIN_CONTENT: 'BOFF_ADMIN_CONTENT', // Events, tournaments, games, achievements, moderation, content
+  BOFF_ADMIN_RELEASE: 'BOFF_ADMIN_RELEASE', // Desktop builds, pack releases
   ROTOM_ADMIN: 'ROTOM_ADMIN',
   ROTOM_FURRET: 'ROTOM_FURRET',
   // Opens /smartrotom/gobierno. The three GOB_* ranks are titles, not extra access —
@@ -25,15 +29,24 @@ export const GOBIERNO_RANKS = [
 
 /**
  * The roles that make an account an administrative one, and therefore the roles
- * that MUST carry a second factor (see `auth/two-factor`). Both of them reach
- * destructive surfaces: BOFF_ADMIN publishes packs and desktop releases,
- * ROTOM_ADMIN runs the in-game economy and player administration.
+ * that MUST carry a second factor (see `auth/two-factor`).
+ *
+ * Includes:
+ * - BOFF_ADMIN: full admin (publishes packs/desktop releases, moderates content, manages events)
+ * - BOFF_ADMIN_RELEASE: can publish desktop releases to all users (critical access)
+ * - BOFF_ADMIN_CONTENT: can moderate content and manage events (reaches all users)
+ * - ROTOM_ADMIN: runs the in-game economy and player administration
+ *
+ * Sub-roles (BOFF_ADMIN_*) require 2FA to prevent privilege escalation and ensure
+ * accountability for high-impact changes (especially releases that reach every player).
  *
  * The GOB_* ranks are deliberately absent: they are titles inside the
  * SmartRotom fiction, not access to the platform.
  */
 export const ADMIN_ROLES: readonly UserRole[] = [
   USER_ROLES.BOFF_ADMIN,
+  USER_ROLES.BOFF_ADMIN_CONTENT,
+  USER_ROLES.BOFF_ADMIN_RELEASE,
   USER_ROLES.ROTOM_ADMIN,
 ];
 

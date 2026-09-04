@@ -22,6 +22,7 @@ import { VgcMetaPanel } from "../_sections/vgc-admin/VgcMetaPanel"
 import MangaDownloader from "../_sections/manga-admin/MangaDownloader"
 import MangaLibrary from "../_sections/manga-admin/MangaLibrary"
 import MangaConfig from "../_sections/manga-admin/MangaConfig"
+import { AuditAdmin } from "../_sections/audit-admin"
 import UnauthorizedPage from "@/components/boffmedia/ui/layout/Unauthorized"
 
 const NAV_META: { labelKey: string; items: { id: string; labelKey: string; icon: IconName }[] }[] = [
@@ -46,7 +47,10 @@ const NAV_META: { labelKey: string; items: { id: string; labelKey: string; icon:
   },
   {
     labelKey: "account",
-    items: [{ id: "security", labelKey: "security", icon: "shield" }],
+    items: [
+      { id: "security", labelKey: "security", icon: "shield" },
+      { id: "audit", labelKey: "audit", icon: "clipboard-list" },
+    ],
   },
   {
     labelKey: "tools",
@@ -76,10 +80,22 @@ function AdminContent() {
   const rawSection = searchParams.get("section")
   const section = VALID_SECTIONS.includes(rawSection ?? "") ? (rawSection as string) : "games"
 
-  const nav: AvNavGroup[] = NAV_META.map((g) => ({
-    label: t(g.labelKey),
-    items: g.items.map((i) => ({ id: i.id, label: t(i.labelKey), icon: i.icon })),
-  }))
+  // Filter nav items based on user roles
+  // Audit requires BOFF_ADMIN_CONTENT (content admin sub-role) or BOFF_ADMIN (superuser)
+  const userHasAuditAccess = session?.user.roles?.some(r =>
+    r === USER_ROLES.BOFF_ADMIN || r === USER_ROLES.BOFF_ADMIN_CONTENT
+  ) ?? false
+
+  const nav: AvNavGroup[] = NAV_META.map((g) => {
+    let items = g.items.map((i) => ({ id: i.id, label: t(i.labelKey), icon: i.icon }))
+
+    // Filter out audit if user doesn't have permission
+    if (g.labelKey === "account" && !userHasAuditAccess) {
+      items = items.filter(i => i.id !== "audit")
+    }
+
+    return { label: t(g.labelKey), items }
+  })
 
   const navigate = (id: string) => {
     const params = new URLSearchParams(searchParams.toString())
@@ -116,6 +132,7 @@ function AdminContent() {
       {section === "manga-config"      && <MangaConfig />}
       {section === "moderation"        && <ModerationAdmin />}
       {section === "security"          && <SecurityAdmin />}
+      {section === "audit"             && <AuditAdmin />}
     </AvShell>
   )
 }

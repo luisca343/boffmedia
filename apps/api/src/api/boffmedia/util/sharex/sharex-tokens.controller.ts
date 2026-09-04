@@ -25,12 +25,21 @@ import {
 type AuthedRequest = { user: { userId: number; roles?: string[] } };
 
 /**
- * Deliberately a separate controller from `SharexController`.
+ * ShareX admin token management — requires BOFF_ADMIN only (superuser access).
  *
+ * Deliberately a separate controller from `SharexController`.
  * That one carries a class-level `@Public()` — which would turn a route-level
  * `@UseGuards(JwtAuthGuard)` here into a silent no-op, because the global guard
  * short-circuits on the class flag before authenticating. Keeping the admin
  * routes on their own un-public controller means the guards actually run.
+ *
+ * Token management is superuser-only because:
+ * - ShareX tokens grant upload capabilities to the screenshot service
+ * - Exposing token management to content/release sub-roles would bypass
+ *   the normal image upload/moderation pipeline
+ * - Tokens represent system capability, not content authority
+ *
+ * SUPERUSER_ONLY_REASON: system capability, not content authority (see above).
  */
 @ApiTags('BoffMedia 🛠 | ShareX')
 @Controller('sharex/tokens')

@@ -29,6 +29,7 @@
       "randomizer": "Randomizer",
       "account": "Account",
       "security": "Security",
+      "audit": "Audit",
       "moderation": "Moderation"
     },
     "crud": {
@@ -1232,6 +1233,23 @@
       "banDays": "Days",
       "banDaysHint": "How long the posting restriction lasts.",
       "banPermanent": "No end date"
+    },
+    "audit": {
+      "title": "Audit",
+      "desc": "Log of changes made by administrators.",
+      "logs": "Audit logs",
+      "loadFailed": "Failed to load audit logs.",
+      "emptyTitle": "No records",
+      "emptyLead": "No changes recorded in the selected period.",
+      "colAction": "Action",
+      "colSubject": "Subject",
+      "colActor": "Performed by",
+      "colTime": "Date and time",
+      "colMetadata": "Details",
+      "filterSubjectType": "Type",
+      "noActor": "System",
+      "pagination": "{from}–{to} of {total}",
+      "loadMore": "Load more"
     }
   },
   "tournaments": {

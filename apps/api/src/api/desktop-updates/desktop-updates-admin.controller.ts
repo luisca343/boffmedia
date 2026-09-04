@@ -42,7 +42,7 @@ import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 @Clients(CLIENT.WEB)
 @Controller('desktop/admin/releases')
 @UseGuards(JwtAuthGuard, FullSessionGuard, RolesGuard)
-@Roles(USER_ROLES.BOFF_ADMIN)
+@Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_RELEASE)
 @ApiBearerAuth('JWT')
 export class DesktopUpdatesAdminController {
   constructor(private readonly updates: DesktopUpdatesService) {}

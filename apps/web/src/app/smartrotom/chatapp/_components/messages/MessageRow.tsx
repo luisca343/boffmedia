@@ -135,7 +135,7 @@ function WaypointInner({ content, out, time }: { content: string; out: boolean; 
       </div>
       <div className="flex gap-2 px-3 pb-3">
         <MiniButton onClick={copy}><Icon name="copy" size={14} /> {t("message.copy")}</MiniButton>
-        <MiniButton accent onClick={() => void add()} disabled={adding || !inMinecraft} className="disabled:opacity-60" title={!inMinecraft ? t("chatapp.waypointNotAvailable") : undefined}><Icon name="plus" size={14} /> {t("message.addWaypoint")}</MiniButton>
+        <MiniButton accent onClick={() => void add()} disabled={adding || !inMinecraft} className="disabled:opacity-60" title={!inMinecraft ? t("message.waypointNotAvailable") : undefined}><Icon name="plus" size={14} /> {t("message.addWaypoint")}</MiniButton>
       </div>
       <div className="px-[0.8125rem] pb-2 text-[0.65625rem] text-ca-500" style={{ textAlign: out ? "right" : "left" }}>{time}</div>
     </CardShell>

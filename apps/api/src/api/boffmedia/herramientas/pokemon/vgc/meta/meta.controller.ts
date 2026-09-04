@@ -83,7 +83,7 @@ export class VgcMetaController {
 
   @Post('smogon/fetch')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({
     summary:
       '[Admin] Fetch stats.txt + moveset.txt from Smogon and store normalised rows',
@@ -104,7 +104,7 @@ export class VgcMetaController {
 
   @Delete('smogon/snapshot')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({
     summary: '[Admin] Delete a Smogon snapshot and its Pokémon rows',
   })
@@ -212,7 +212,7 @@ export class VgcMetaController {
 
   @Post('champions/fetch-pastes')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({
     summary: '[Admin] Batch-fetch pastes for all teams in a regulation',
   })
@@ -231,7 +231,7 @@ export class VgcMetaController {
 
   @Post('champions/refresh')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({
     summary: 'Re-fetch VGCPastes CSV and refresh Champions data',
   })
@@ -348,7 +348,7 @@ export class VgcMetaController {
 
   @Post('limitless/tournament')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({ summary: '[Admin] Import a Limitless tournament by URL' })
   @ApiResponse({
     status: 201,
@@ -412,7 +412,7 @@ export class VgcMetaController {
 
   @Get('regulations/all')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({
     summary:
       '[Admin] List every regulation, including soft-disabled ones. ' +
@@ -431,7 +431,7 @@ export class VgcMetaController {
 
   @Post('regulations')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({ summary: '[Admin] Create or update a Champions regulation' })
   @ApiResponse({
     status: 201,

@@ -97,7 +97,7 @@ export class MangaController {
   // leaving RolesGuard with no principal to check.
   @RequireSession()
   @UseGuards(JwtAuthGuard, RolesGuard, UserThrottlerGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @ApiBearerAuth('JWT')
   @Post('download/stream')

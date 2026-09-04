@@ -34,7 +34,7 @@ export class InvitesController {
   // ==================== INVITE OPERATIONS ====================
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Post()
   @ApiOperation({ summary: 'Create a new invite' })
@@ -68,7 +68,7 @@ export class InvitesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Get()
   @ApiOperation({ summary: 'Get all invites (admin only)' })
@@ -89,7 +89,7 @@ export class InvitesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Get('statistics')
   @ApiOperation({ summary: 'Get invite statistics (admin only)' })
@@ -252,7 +252,7 @@ export class InvitesController {
   // ==================== INVITE MANAGEMENT ====================
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Delete(':id')
   @ApiOperation({ summary: 'Soft delete invite by ID' })
@@ -274,7 +274,7 @@ export class InvitesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Delete(':id/permanent')
   @ApiOperation({ summary: 'Permanently delete invite by ID' })
@@ -298,7 +298,7 @@ export class InvitesController {
   // ==================== USER INVITE OPERATIONS ====================
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Get('user/:uuid')
   @ApiOperation({ summary: 'Get invites by user UUID (admin only)' })
@@ -320,7 +320,7 @@ export class InvitesController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Get('username/:username')
   @ApiOperation({ summary: 'Get invites by username (admin only)' })

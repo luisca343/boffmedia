@@ -88,7 +88,7 @@ export class NotificationsController {
 
   @Post()
   @UseGuards(RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({
     summary:
       'Create a notification for a user, or broadcast to all (admin only)',

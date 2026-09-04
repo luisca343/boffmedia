@@ -288,7 +288,7 @@ export class TournamentsController {
   // ── admin management ─────────────────────────────────────────────────────────
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a tournament (draft).' })
   @ApiResponse({ status: HttpStatus.CREATED, type: TournamentDetail })
@@ -298,7 +298,7 @@ export class TournamentsController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update tournament meta.' })
   update(
@@ -310,7 +310,7 @@ export class TournamentsController {
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Soft-delete a tournament.' })
   remove(@Param('id', ParseIntPipe) id: number): Promise<{ success: boolean }> {
@@ -319,7 +319,7 @@ export class TournamentsController {
 
   @Post(':id/participants')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Add an entrant.' })
   addParticipant(
@@ -331,7 +331,7 @@ export class TournamentsController {
 
   @Patch(':id/participants/:pid')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update an entrant (seed/score/status/group).' })
   updateParticipant(
@@ -344,7 +344,7 @@ export class TournamentsController {
 
   @Delete(':id/participants/:pid')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Remove an entrant.' })
   removeParticipant(
@@ -356,7 +356,7 @@ export class TournamentsController {
 
   @Get(':id/entries/preview')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary:
@@ -368,7 +368,7 @@ export class TournamentsController {
 
   @Post(':id/entries/resolve')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary:
@@ -380,7 +380,7 @@ export class TournamentsController {
 
   @Post(':id/participants/:pid/readmit')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary:
@@ -395,7 +395,7 @@ export class TournamentsController {
 
   @Post(':id/generate')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary:
@@ -411,7 +411,7 @@ export class TournamentsController {
 
   @Post(':id/matches/:mid/report')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Report a match result (advances the bracket).' })
   @ApiResponse({ status: HttpStatus.CREATED, type: TournamentDetail })
@@ -426,7 +426,7 @@ export class TournamentsController {
 
   @Post(':id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Change tournament status (lifecycle).' })
   setStatus(
@@ -438,7 +438,7 @@ export class TournamentsController {
 
   @Post(':id/matches/schedule')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Set/clear the scheduled time of matches (bulk).' })
   schedule(
@@ -451,7 +451,7 @@ export class TournamentsController {
   // ── phases (admin) ─────────────────────────────────────────────────────────
   @Post(':id/phases')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary:
@@ -467,7 +467,7 @@ export class TournamentsController {
 
   @Patch(':id/phases/:pid')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Edit a pending phase.' })
   updatePhase(
@@ -480,7 +480,7 @@ export class TournamentsController {
 
   @Delete(':id/phases/:pid')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Remove a pending phase (renumbers order).' })
   removePhase(
@@ -492,7 +492,7 @@ export class TournamentsController {
 
   @Post(':id/advance')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary:

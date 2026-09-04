@@ -29,6 +29,7 @@
       "randomizer": "Randomizer",
       "account": "Cuenta",
       "security": "Seguridad",
+      "audit": "Auditoría",
       "moderation": "Moderación"
     },
     "crud": {
@@ -1232,6 +1233,23 @@
       "banDays": "Días",
       "banDaysHint": "Cuánto dura la restricción para publicar.",
       "banPermanent": "Sin fecha de fin"
+    },
+    "audit": {
+      "title": "Auditoría",
+      "desc": "Registro de cambios realizados por administradores.",
+      "logs": "Registros de auditoría",
+      "loadFailed": "No se ha podido cargar los registros de auditoría.",
+      "emptyTitle": "Sin registros",
+      "emptyLead": "No hay cambios registrados en el período seleccionado.",
+      "colAction": "Acción",
+      "colSubject": "Sujeto",
+      "colActor": "Realizado por",
+      "colTime": "Fecha y hora",
+      "colMetadata": "Detalles",
+      "filterSubjectType": "Tipo",
+      "noActor": "Sistema",
+      "pagination": "{from}–{to} de {total}",
+      "loadMore": "Cargar más"
     }
   },
   "tournaments": {

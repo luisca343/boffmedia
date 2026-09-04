@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { AuditService } from './audit.service';
 import { AuditRepository } from './boffmedia/audit.repository';
+import { AuditController } from '@api/boffmedia/audit/audit.controller';
 
 /**
  * Audit is cross-cutting, so it is provided once and globally.
@@ -23,5 +24,6 @@ import { AuditRepository } from './boffmedia/audit.repository';
   imports: [DrizzleModule],
   providers: [AuditService, AuditRepository],
   exports: [AuditService, AuditRepository],
+  controllers: [AuditController],
 })
 export class AuditModule {}

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, and, isNull } from 'drizzle-orm';
+import { eq, and, isNull, gte, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { boffMediaUploads, BoffMediaUpload } from '@/_db/schema/BoffMediaUploads';
 
@@ -95,5 +95,31 @@ export class UploadsRepository {
       throw new Error(`Upload not found: ${id}`);
     }
     return result[0];
+  }
+
+  /**
+   * Calculate total bytes uploaded by a user in the current UTC day (A17: daily quota tracking).
+   * Returns the sum of all non-deleted uploads with createdAt in today's date range.
+   */
+  async getDailyUploadSizeBytes(ownerUserId: number): Promise<number> {
+    // Calculate today's start and end in UTC
+    const now = new Date();
+    const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
+    const dayEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
+
+    const result = await this.db
+      .select({
+        totalSize: sql<number>`COALESCE(SUM(${boffMediaUploads.size}), 0)`,
+      })
+      .from(boffMediaUploads)
+      .where(
+        and(
+          eq(boffMediaUploads.ownerUserId, ownerUserId),
+          isNull(boffMediaUploads.deletedAt),
+          gte(boffMediaUploads.createdAt, dayStart),
+        ),
+      );
+
+    return result.length > 0 ? (result[0].totalSize || 0) : 0;
   }
 }

@@ -55,7 +55,7 @@ import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 @Clients(CLIENT.WEB)
 @Controller('randomizer/admin')
 @UseGuards(JwtAuthGuard, FullSessionGuard, RolesGuard)
-@Roles(USER_ROLES.BOFF_ADMIN)
+@Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_RELEASE)
 @ApiBearerAuth('JWT')
 export class RandomizerController {
   constructor(

@@ -10,13 +10,14 @@ import {
 } from '@nestjs/common';
 import { createHash, randomUUID } from 'crypto';
 import { createReadStream, createWriteStream } from 'fs';
-import { mkdir, rename, rm, stat } from 'fs/promises';
+import { mkdir, rename, rm, stat, statfs } from 'fs/promises';
 import { dirname, join } from 'path';
 import type { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import { firstValueFrom } from 'rxjs';
 import { env } from '@/config/env';
 import { laboonPath } from '@/config/paths';
+import { UploadsRepository } from '@api/_repositories/boffmedia/uploads.repository';
 
 // Every CurseForge byte is proxied. The key stays here because an
 // embedded key is an extracted key, and an abused key is a revoked key, which
@@ -43,8 +44,13 @@ export interface ProxiedDownload {
 @Injectable()
 export class PacksDownloadsService {
   private readonly logger = new Logger(PacksDownloadsService.name);
+  private readonly dailyQuotaBytes = env.UPLOAD_DAILY_QUOTA_MB * 1024 * 1024;
+  private readonly minFreeSpaceBytes = env.UPLOAD_MIN_FREE_SPACE_MB * 1024 * 1024;
 
-  constructor(private readonly http: HttpService) {}
+  constructor(
+    private readonly http: HttpService,
+    private readonly uploadsRepository: UploadsRepository,
+  ) {}
 
   private get curseforgeKey(): string {
     if (!env.CURSEFORGE_API_KEY) {
@@ -224,8 +230,40 @@ export class PacksDownloadsService {
    * Writes to a temp file and renames: a half-written blob under its final
    * (correct-looking) name would be served forever and fail verification on
    * every machine.
+   *
+   * Optionally checks per-user daily quota (A17) if userId is provided.
    */
-  async storeBlob(source: Readable): Promise<{ sha512: string; size: number }> {
+  async storeBlob(source: Readable, userId?: number): Promise<{ sha512: string; size: number }> {
+    // Check free disk space before starting (A17: prevent disk exhaustion)
+    if (this.minFreeSpaceBytes > 0) {
+      const stats = await statfs(blobDir()).catch(() => null);
+      if (!stats) {
+        throw new ServiceUnavailableException({
+          message: 'Cannot determine available disk space',
+          userMessage: 'El servidor no puede verificar el espacio disponible. Inténtalo de nuevo.',
+        });
+      }
+      const freeBytes = stats.bavail * stats.bsize;
+      if (freeBytes < this.minFreeSpaceBytes) {
+        throw new ServiceUnavailableException({
+          message: `insufficient free disk space (${freeBytes} < ${this.minFreeSpaceBytes})`,
+          userMessage: 'El servidor no tiene suficiente espacio en disco. Avisa a un administrador.',
+        });
+      }
+    }
+
+    // Check per-user daily quota (A17: prevent individual users from exhausting storage)
+    if (userId && this.dailyQuotaBytes > 0) {
+      const dailyUsed = await this.uploadsRepository.getDailyUploadSizeBytes(userId);
+      const remaining = this.dailyQuotaBytes - dailyUsed;
+      if (remaining <= 0) {
+        throw new PayloadTooLargeException({
+          message: `user ${userId} has exceeded daily quota (${dailyUsed} >= ${this.dailyQuotaBytes})`,
+          userMessage: 'Has alcanzado el límite de subidas diarias. Inténtalo mañana.',
+        });
+      }
+    }
+
     const dir = blobDir();
     await mkdir(join(dir, 'tmp'), { recursive: true });
     const temp = join(dir, 'tmp', `${randomUUID()}.part`);

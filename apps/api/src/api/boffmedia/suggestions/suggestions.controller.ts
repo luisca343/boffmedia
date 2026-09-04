@@ -45,7 +45,7 @@ export class SuggestionsController {
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({ summary: 'List all event suggestions (admin)' })
   @ApiResponse({ status: 200, type: [SuggestionEntity] })
   list() {
@@ -54,7 +54,7 @@ export class SuggestionsController {
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiOperation({ summary: 'Approve / reject an event suggestion (admin)' })
   @ApiResponse({ status: 200, type: SuggestionEntity })
   review(

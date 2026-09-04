@@ -230,6 +230,27 @@ export const env = z
      * the "without undue delay" of GDPR art. 17. Set to 0 to disable erasure.
      */
     RETENTION_DELETED_USER_DAYS: z.coerce.number().default(30),
+
+    // Upload limits (A16: image dimension cap, A17: per-user daily quota)
+    // Maximum image width and height in pixels. Prevents decompression bombs.
+    // 8000×8000 is a safe limit for sharp processing on standard hardware.
+    MAX_IMAGE_WIDTH: z.coerce.number().default(8000),
+    MAX_IMAGE_HEIGHT: z.coerce.number().default(8000),
+    // Per-user daily blob upload quota in MB (A17). 0 = unlimited.
+    // Default 5GB/day per user for pack blob uploads (very generous for legitimate use).
+    UPLOAD_DAILY_QUOTA_MB: z.coerce.number().default(5120),
+    // Minimum free disk space required before accepting blob uploads in MB.
+    // Rejects uploads when free space drops below this threshold.
+    // Default 10GB to keep some breathing room on shared storage.
+    UPLOAD_MIN_FREE_SPACE_MB: z.coerce.number().default(10240),
+
+    // A14: Resend webhook secret for signature verification. HMAC-SHA256(body, secret).
+    // Unset = webhooks cannot be verified and will be rejected as hostile.
+    RESEND_WEBHOOK_SECRET: z.string().optional(),
+
+    // A19: Per-user daily token budget for FicusAI (LLM usage). In tokens.
+    // Default 100k tokens/day per user. 0 = unlimited.
+    FICUSAI_DAILY_TOKEN_BUDGET: z.coerce.number().default(100000),
   })
   .superRefine((cfg, ctx) => {
     // In production a missing/localhost WEB_URL would silently ship localhost

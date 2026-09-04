@@ -1,4 +1,6 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable, BadRequestException, PayloadTooLargeException } from '@nestjs/common';
+import sharp from 'sharp';
+import { env } from '@/config/env';
 import { AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
 import {
   FileUploadService,
@@ -20,6 +22,8 @@ export class ImageUploadService {
     '.webp',
   ];
   private readonly defaultMaxSizeInBytes = 5 * 1024 * 1024; // 5MB
+  private readonly maxImageWidth = env.MAX_IMAGE_WIDTH;
+  private readonly maxImageHeight = env.MAX_IMAGE_HEIGHT;
 
   constructor(private readonly fileUploadService: FileUploadService) {}
 
@@ -58,8 +62,46 @@ export class ImageUploadService {
       );
     }
 
+    // Validate image dimensions before processing (A16: prevent decompression bombs)
+    await this.validateImageDimensions(file);
+
     // Upload the image
     return this.fileUploadService.uploadFile({ file, ...uploadRequest });
+  }
+
+  /** Validate image dimensions by reading metadata only (fast, safe against bombs).
+   *  Sharp.metadata() reads only the image header, never the full file.
+   *  This check happens BEFORE any decode, so a malicious header fails here. */
+  private async validateImageDimensions(file: Express.Multer.File): Promise<void> {
+    if (!file.buffer && !file.path) {
+      return; // Cannot validate without data
+    }
+
+    try {
+      const metadata = await sharp(file.buffer || file.path).metadata();
+      if (!metadata.width || !metadata.height) {
+        throw new BadRequestException('Cannot determine image dimensions');
+      }
+
+      if (metadata.width > this.maxImageWidth || metadata.height > this.maxImageHeight) {
+        throw new PayloadTooLargeException({
+          message: `Image dimensions exceed ${this.maxImageWidth}×${this.maxImageHeight}px limit`,
+          userMessage: `La imagen es demasiado grande (máx. ${this.maxImageWidth}×${this.maxImageHeight}px).`,
+        });
+      }
+    } catch (error: unknown) {
+      if (error instanceof PayloadTooLargeException) {
+        throw error;
+      }
+      // Re-throw validation errors but catch parsing errors
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      throw new BadRequestException({
+        message: `Failed to validate image dimensions: ${error instanceof Error ? error.message : String(error)}`,
+        userMessage: 'La imagen no es válida o está corrupta.',
+      });
+    }
   }
 
   async deleteImage(

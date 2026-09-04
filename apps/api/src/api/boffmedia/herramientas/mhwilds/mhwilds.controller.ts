@@ -332,7 +332,7 @@ export class MhwildsController {
   // ==================== CACHE MANAGEMENT OPERATIONS ====================
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Delete('cache')
   @ApiOperation({ summary: 'Clear cache' })
@@ -370,7 +370,7 @@ export class MhwildsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Post('cache/warmup')
   @ApiOperation({ summary: 'Warmup cache for a locale' })
@@ -397,7 +397,7 @@ export class MhwildsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Post('cache/validate')
   @ApiOperation({ summary: 'Validate cache for a locale' })
@@ -424,7 +424,7 @@ export class MhwildsController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Post('cache/optimize')
   @ApiOperation({ summary: 'Optimize cache storage' })

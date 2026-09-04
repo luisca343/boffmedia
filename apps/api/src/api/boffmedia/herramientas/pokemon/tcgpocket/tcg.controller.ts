@@ -480,7 +480,7 @@ export class TcgController {
 
   @RequireSession()
   @UseGuards(RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @Get('admin/sync/status')
   @ApiOperation({
     summary: 'Compare the stored catalogue against the remote one',
@@ -508,7 +508,7 @@ export class TcgController {
 
   @RequireSession()
   @UseGuards(RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @Post('admin/sync/stream')
   // A stream is a 200, not a 201: nothing is created at this URL.
   @HttpCode(HttpStatus.OK)

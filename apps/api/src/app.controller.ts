@@ -13,10 +13,18 @@ import { SkipEnvelope } from './common/decorators/skip-envelope.decorator';
 import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 /**
+ * Root system operations: health diagnostics, logging control, etc.
+ * These require BOFF_ADMIN only (superuser access) — not delegated to sub-roles.
+ *
  * Auth here is per route and must stay that way. JwtAuthGuard resolves
  * IS_PUBLIC_KEY from the handler first and the controller class second and
  * takes the first defined value, so a class-level @Public() would neuter
  * @UseGuards on every guarded route below.
+ *
+ * Each guarded route in this controller requires BOFF_ADMIN because:
+ * - Health/admin (detailed diagnostics) is sensitive (aids reconnaissance)
+ * - Logging toggles are disk-fill vectors if left open to sub-roles
+ * - These operations affect the whole system, not just content
  */
 @ApiTags('Boffmedia')
 @Controller()
@@ -75,6 +83,7 @@ export class AppController {
    */
   @Get('health/admin')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  // SUPERUSER_ONLY_REASON: system operations, not content or releases.
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   async getHealthAdmin() {
@@ -98,6 +107,7 @@ export class AppController {
    */
   @Get('togglelogging')
   @UseGuards(JwtAuthGuard, RolesGuard)
+  // SUPERUSER_ONLY_REASON: system operations, not content or releases.
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   toggleLogging() {
@@ -126,6 +136,7 @@ export class AppController {
   @Public()
   @UseGuards(DesktopOrUserAuthGuard, RolesGuard)
   @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
+  // SUPERUSER_ONLY_REASON: system operations, not content or releases.
   @Roles(USER_ROLES.BOFF_ADMIN)
   @ApiBearerAuth('JWT')
   @Get('steamkeys')

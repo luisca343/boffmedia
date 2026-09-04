@@ -1,5 +1,9 @@
 export const USER_ROLES = {
   BOFF_ADMIN: 'BOFF_ADMIN',
+  // Boffmedia admin sub-roles (can also hold BOFF_ADMIN for backward compatibility).
+  // These allow fine-grained access within the admin console.
+  BOFF_ADMIN_CONTENT: 'BOFF_ADMIN_CONTENT', // Events, tournaments, games, achievements, moderation, content
+  BOFF_ADMIN_RELEASE: 'BOFF_ADMIN_RELEASE', // Desktop builds, pack releases
   ROTOM_ADMIN: 'ROTOM_ADMIN',
   ROTOM_FURRET: 'ROTOM_FURRET',
   // Opens /smartrotom/gobierno. The three GOB_* ranks below are titles, not extra access —

@@ -4,10 +4,12 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   boffMediaAudit,
   AuditSubject,
+  BoffMediaAuditRow,
 } from '@/_db/schema/BoffMediaEvents';
 import { packAudit } from '@/_db/schema/Packs';
 import { randomizerAudit } from '@/_db/schema/Randomizer';
 import { gobiernoAuditoria } from '@/_db/schema/SmartRotomGobierno';
+import { desc, eq, and } from 'drizzle-orm';
 
 /**
  * Unified audit service with a common vocabulary across all audit domains.
@@ -134,5 +136,63 @@ export class AuditService {
         }`,
       );
     }
+  }
+
+  /**
+   * Get paginated audit logs with optional filtering.
+   */
+  async getLogs(opts: {
+    limit?: number;
+    offset?: number;
+    subjectType?: string;
+    subjectId?: number;
+  }): Promise<{ data: BoffMediaAuditRow[]; total: number }> {
+    const { limit = 50, offset = 0, subjectType, subjectId } = opts;
+
+    const conditions = [];
+    if (subjectType) {
+      conditions.push(eq(boffMediaAudit.subjectType, subjectType as AuditSubject));
+    }
+    if (subjectId !== undefined) {
+      conditions.push(eq(boffMediaAudit.subjectId, subjectId));
+    }
+
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const [data, countResult] = await Promise.all([
+      this.db
+        .select()
+        .from(boffMediaAudit)
+        .where(whereClause)
+        .orderBy(desc(boffMediaAudit.at))
+        .limit(limit)
+        .offset(offset),
+      this.db
+        .select({ count: boffMediaAudit.id })
+        .from(boffMediaAudit)
+        .where(whereClause),
+    ]);
+
+    const total = countResult.length;
+    return { data, total };
+  }
+
+  /**
+   * Get all audit logs for a specific subject.
+   */
+  async getSubjectLogs(
+    subjectType: string,
+    subjectId: number,
+  ): Promise<BoffMediaAuditRow[]> {
+    return this.db
+      .select()
+      .from(boffMediaAudit)
+      .where(
+        and(
+          eq(boffMediaAudit.subjectType, subjectType as AuditSubject),
+          eq(boffMediaAudit.subjectId, subjectId),
+        ),
+      )
+      .orderBy(desc(boffMediaAudit.at));
   }
 }

@@ -212,7 +212,10 @@ export class PacksDesktopController {
   @ApiConsumes('application/octet-stream')
   @ApiResponse({ status: HttpStatus.CREATED, type: BlobUploadEntity })
   async uploadBlob(@Req() req: Request): Promise<BlobUploadEntity> {
-    return this.downloads.storeBlob(req);
+    const desktopReq = req as DesktopRequest;
+    const userId = this.actorId(desktopReq);
+    // Pass userId for per-user daily quota check (A17)
+    return this.downloads.storeBlob(req, userId ?? undefined);
   }
 
   // ── Icon and gallery images (D2) ─────────────────────────────────────────

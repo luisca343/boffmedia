@@ -50,7 +50,7 @@ export class TwitchController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Post('check-now')
   @ApiOperation({ summary: 'Trigger immediate stream check' })
@@ -88,7 +88,7 @@ export class TwitchController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Post('monitor/user/:username')
   @ApiOperation({ summary: 'Add user to monitoring list' })
@@ -102,7 +102,7 @@ export class TwitchController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Delete('monitor/user/:username')
   @ApiOperation({ summary: 'Remove user from monitoring list' })
@@ -116,7 +116,7 @@ export class TwitchController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Post('notifications/target')
   @ApiOperation({ summary: 'Add notification target' })
@@ -130,7 +130,7 @@ export class TwitchController {
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
   @Delete('notifications/target/:type')
   @ApiOperation({ summary: 'Remove notification target' })

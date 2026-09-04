@@ -280,7 +280,7 @@ export class ForumController {
 
   @Patch('threads/:id/pin')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Pin or unpin a thread (admin only)' })
   @ApiResponse({
@@ -297,7 +297,7 @@ export class ForumController {
 
   @Patch('threads/:id/lock')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Lock or unlock a thread (admin only)' })
   @ApiResponse({

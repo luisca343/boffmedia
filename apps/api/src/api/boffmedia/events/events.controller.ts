@@ -129,7 +129,7 @@ export class EventsController {
 
   @Post('/event')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a new event' })
   @ApiResponse({
@@ -143,7 +143,7 @@ export class EventsController {
 
   @Patch('/event/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update event' })
   @ApiResponse({
@@ -160,7 +160,7 @@ export class EventsController {
 
   @Post('/event/:id/status')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Set the event lifecycle status',
@@ -187,7 +187,7 @@ export class EventsController {
 
   @Post('/event/:id/invites')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create an invitation code for a private event' })
   @ApiResponse({ status: HttpStatus.CREATED, type: EventInviteEntity })
@@ -201,7 +201,7 @@ export class EventsController {
 
   @Get('/event/:id/invites')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'List invitation codes for an event' })
   @ApiResponse({ status: HttpStatus.OK, type: [EventInviteEntity] })
@@ -213,7 +213,7 @@ export class EventsController {
 
   @Delete('/invites/:code')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Revoke an invitation code' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Invite revoked.' })
@@ -248,7 +248,7 @@ export class EventsController {
 
   @Delete('/event/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Delete event' })
   @ApiResponse({
@@ -287,7 +287,7 @@ export class EventsController {
 
   @Post('/games')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a new game' })
   @ApiResponse({
@@ -301,7 +301,7 @@ export class EventsController {
 
   @Patch('/games/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update game' })
   @ApiResponse({
@@ -318,7 +318,7 @@ export class EventsController {
 
   @Delete('/games/:id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Delete game' })
   @ApiResponse({
@@ -375,7 +375,7 @@ export class EventsController {
 
   @Post(':eventId/achievements')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a new achievement for an event' })
   @ApiResponse({
@@ -395,7 +395,7 @@ export class EventsController {
 
   @Patch(':eventId/achievements/:achievementId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update achievement' })
   @ApiResponse({
@@ -554,7 +554,7 @@ export class EventsController {
 
   @Post(':eventId/teams')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a new team for an event' })
   @ApiResponse({
@@ -571,7 +571,7 @@ export class EventsController {
 
   @Patch(':eventId/teams/:teamId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update team' })
   @ApiResponse({
@@ -670,7 +670,7 @@ export class EventsController {
 
   @Delete(':eventId/participants/:participantId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: 'Remove a participant from an event (admin)',
@@ -687,7 +687,7 @@ export class EventsController {
 
   @Patch(':eventId/participants/:participantId')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Set a participant status (admin)' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Status updated.' })
@@ -730,7 +730,7 @@ export class EventsController {
   // ==================== PROGRESS MANAGEMENT ====================
   @Put(':eventId/progress')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(USER_ROLES.BOFF_ADMIN)
+  @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Update progress for an achievement' })
   @ApiResponse({
