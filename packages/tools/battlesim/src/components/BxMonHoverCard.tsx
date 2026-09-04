@@ -45,11 +45,11 @@ export function BxMonHoverCard({ mon, foe = false, anchor, field, compact = fals
   const boosts = Object.entries((mon.boosts || {}) as Record<string, number>).filter(([, v]) => v);
   const volatiles = shownVolatiles(mon.volatiles ?? (mon.protect ? ['protect'] : []));
   const perish = perishCount(mon.volatiles);
-  const abilityName = mon.ability ? (Dex.abilities.get(mon.ability)?.name ?? mon.ability) : null;
-  const itemName = mon.item ? (Dex.items.get(mon.item)?.name ?? mon.item) : null;
+  const abilityName = mon.ability ? L.ability(mon.ability) : null;
+  const itemName = mon.item ? L.item(mon.item) : null;
   const moves = (mon.moveIds || []).map((id) => {
     const m = Dex.moves.get(id);
-    return m?.exists ? { id, name: m.name, type: m.type } : { id, name: id, type: 'Normal' };
+    return m?.exists ? { id, name: L.move(m.name), type: m.type } : { id, name: id, type: 'Normal' };
   });
 
   // Placed against the sprite, then clamped inside the field — a card that

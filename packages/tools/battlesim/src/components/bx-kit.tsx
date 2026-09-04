@@ -12,6 +12,7 @@ import { DkSprite, DkSeg } from "@boffmedia/ui/datakit"
 import { spriteUrl, handleSpriteError } from "@boffmedia/tools-pokemon"
 import { Dex } from "@pkmn/dex"
 import { useToolT, BATTLESIM_NS } from "../i18n"
+import { usePkmnLabels } from "../lib/pkmn-label"
 import { sanitizeHtml } from "../engine/sanitizeHtml"
 import type { LedgerEntry } from "../engine/TurnLedger"
 import { BSIM_FOCUS, BSIM_FOCUS_CUT } from "./bsim-kit"
@@ -82,6 +83,11 @@ const PRESS = "active:translate-y-px motion-reduce:active:translate-y-0"
 /* ── Catalog resolvers ───────────────────────────────────────────────────── */
 export interface BxLabels {
   type: (t: string) => string
+  /** Move / ability / item, in the player's chosen NAME language — which is not
+   *  necessarily the interface's. Takes an id or an English name. */
+  move: (m: string | null | undefined) => string
+  ability: (a: string | null | undefined) => string
+  item: (i: string | null | undefined) => string
   cat: (c: string) => string
   status: (s: string) => string
   statusLong: (s: string) => string
@@ -92,15 +98,19 @@ export interface BxLabels {
 /** Domain words (types, categories, statuses, stat names) resolved from the catalog. */
 export function useBxLabels(): BxLabels {
   const t = useToolT(BATTLESIM_NS)
+  const pkmn = usePkmnLabels()
   return React.useMemo<BxLabels>(() => ({
     type: (ty) => (ty in TYPE_ES ? t(`battle.types.${ty}`) : tyLabel(ty)),
+    move: pkmn.move,
+    ability: pkmn.ability,
+    item: pkmn.item,
     cat: (c) => (c === "phys" || c === "spec" || c === "status" ? t(`battle.labels.cat.${c}`) : c),
     status: (s) => (["brn", "par", "psn", "tox", "slp", "frz", "fnt"].includes(s) ? t(`battle.labels.status.${s}`) : s.toUpperCase()),
     statusLong: (s) => (["brn", "par", "psn", "tox", "slp", "frz", "fnt"].includes(s) ? t(`battle.labels.statusLong.${s}`) : s),
     boost: (b) => (["atk", "def", "spa", "spd", "spe", "accuracy", "evasion"].includes(b) ? t(`battle.labels.boost.${b}`) : b),
     eff: (k) => t(`battle.labels.eff.${k}`),
     stat: (s) => (["hp", "atk", "def", "spa", "spd", "spe"].includes(s) ? t(`battle.labels.stat.${s}`) : s),
-  }), [t])
+  }), [t, pkmn])
 }
 
 export function BxSprite({ mon, size = 40 }: { mon: BxMon; size?: number }) {
@@ -228,11 +238,11 @@ function itemStateKey(effect?: string): "lost" | "used" | "swapped" | null {
 export function BxMeta({ mon, compact = false }: { mon: BxMon; compact?: boolean }) {
   const t = useToolT(BATTLESIM_NS)
   const L = useBxLabels()
-  const held = mon.item ? (Dex.items.get(mon.item)?.name ?? mon.item) : null
-  const gone = !held && mon.lastItem ? (Dex.items.get(mon.lastItem)?.name ?? mon.lastItem) : null
+  const held = mon.item ? L.item(mon.item) : null
+  const gone = !held && mon.lastItem ? L.item(mon.lastItem) : null
   const goneKey = itemStateKey(mon.lastItemEffect) ?? (gone ? "lost" : null)
   const heldKey = itemStateKey(mon.itemEffect)
-  const ability = mon.ability ? (Dex.abilities.get(mon.ability)?.name ?? mon.ability) : null
+  const ability = mon.ability ? L.ability(mon.ability) : null
   if (!held && !gone && !ability && !(mon.tera && mon.teraType)) return null
   const size = compact ? "text-[0.53125rem]" : "text-[0.5625rem]"
   return (
@@ -610,7 +620,7 @@ export function BxKey({ move, hotkey, target = null, selected = false, disabled 
       {hotkey != null && <BxKbd>{hotkey}</BxKbd>}
       <span className="grid min-w-0 flex-1 gap-[0.3125rem]">
         <span className="flex items-center gap-[0.375rem] font-display text-[0.8125rem] font-bold uppercase leading-[1.05] tracking-[0.03em]">
-          <span className="min-w-0 truncate">{move.name}</span>
+          <span className="min-w-0 truncate">{L.move(move.name)}</span>
           {tera && <b className="flex-none border border-solid border-[color-mix(in_srgb,var(--accent)_50%,transparent)] px-[3px] py-px font-mono text-[0.46875rem] not-italic tracking-[0.08em] text-accent-bright">TERA</b>}
         </span>
         <span className="flex flex-wrap items-center gap-[0.4375rem]">
@@ -818,6 +828,8 @@ export function BxLog({ log, className, filters = true, limit = VISIBLE_TICK_LIM
   const t = useToolT(BATTLESIM_NS)
   const ref = React.useRef<HTMLDivElement>(null)
   const pinned = React.useRef(true)
+  /** Mirrors `pinned` for rendering — the ref alone cannot show a button. */
+  const [following, setFollowing] = React.useState(true)
   const [showAll, setShowAll] = React.useState(false)
   const [filter, setFilter] = React.useState<BxLogFilter>("all")
   const [collapsed, setCollapsed] = React.useState<Set<number>>(() => new Set())
@@ -829,10 +841,31 @@ export function BxLog({ log, className, filters = true, limit = VISIBLE_TICK_LIM
   }, [log, showAll, limit, filter])
   const latestTurn = groups.length > 0 ? groups[groups.length - 1].turn : 0
 
-  React.useEffect(() => {
+  const stickToBottom = React.useCallback(() => {
     const el = ref.current
     if (el && pinned.current && activeTurn == null) el.scrollTop = el.scrollHeight
-  }, [log.length, activeTurn, filter])
+  }, [activeTurn])
+
+  React.useEffect(stickToBottom, [stickToBottom, log.length, filter, showAll, collapsed])
+
+  /**
+   * The log also follows the latest line when the CONTENT grows without the
+   * event count changing — and it does, constantly. A turn header sticks and
+   * unsticks, a group collapses, a sprite in a line finishes loading, the rail
+   * itself is resized by the field beside it: each of those changes
+   * `scrollHeight` after the effect above has already run, which left the pane
+   * a few lines short of the end and looking stuck. Watching the box is the
+   * only way to catch all of them; the effect stays because it is what runs on
+   * the FIRST paint, before an observer has fired.
+   */
+  React.useEffect(() => {
+    const el = ref.current
+    if (!el || typeof ResizeObserver === "undefined") return
+    const observer = new ResizeObserver(stickToBottom)
+    observer.observe(el)
+    for (const child of Array.from(el.children)) observer.observe(child)
+    return () => observer.disconnect()
+  }, [stickToBottom, log.length])
   React.useEffect(() => {
     if (activeTurn != null && ref.current) {
       const el = ref.current.querySelector<HTMLElement>(`[data-turn="${activeTurn}"]`)
@@ -841,7 +874,22 @@ export function BxLog({ log, className, filters = true, limit = VISIBLE_TICK_LIM
   }, [activeTurn])
   const onScroll = () => {
     const el = ref.current
-    if (el) pinned.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40
+    if (!el) return
+    // 40px of slack: a pane one line short of the end is still "at the end" as
+    // far as the reader is concerned, and a sub-pixel scrollHeight would
+    // otherwise unpin a log nobody touched.
+    const atEnd = el.scrollHeight - el.scrollTop - el.clientHeight < 40
+    pinned.current = atEnd
+    setFollowing(atEnd)
+  }
+
+  /** Back to the end, and following again. */
+  const jumpToLatest = () => {
+    const el = ref.current
+    if (!el) return
+    pinned.current = true
+    setFollowing(true)
+    el.scrollTop = el.scrollHeight
   }
   const toggleTurn = (turn: number) => setCollapsed((prev) => { const n = new Set(prev); if (n.has(turn)) n.delete(turn); else n.add(turn); return n })
   const collapsePrevious = () => setCollapsed(new Set(groups.filter((g) => g.turn !== latestTurn).map((g) => g.turn)))
@@ -895,6 +943,20 @@ export function BxLog({ log, className, filters = true, limit = VISIBLE_TICK_LIM
         })}
         {groups.length === 0 && <p className="py-4 text-center font-mono text-[0.6875rem] text-txt-dim">{t("log.empty")}</p>}
       </div>
+
+      {/* Scrolling up to re-read something stops the pane following the battle,
+          which is right — and used to be a one-way door, because nothing said
+          how to resume short of dragging back to the exact bottom. */}
+      {!following && activeTurn == null && groups.length > 0 && (
+        // A band at the foot of the pane, not a floating pill: the same shape
+        // as the "show all" control at its head, and a shape that cannot end up
+        // over a line the reader is in the middle of.
+        <button type="button" onClick={jumpToLatest}
+          className={cn(BSIM_FOCUS, "flex h-7 w-full shrink-0 items-center justify-center gap-[0.375rem] border-t border-solid border-accent-line bg-accent-soft font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.08em] text-accent-bright transition-colors duration-[140ms] hover:bg-accent hover:text-accent-ink")}>
+          <Icon name="chevronDown" size={13} />
+          {t("log.jumpLatest")}
+        </button>
+      )}
       <span className="sr-only" aria-live="polite" aria-label={t("battle.log.latest")}>{latestText}</span>
     </div>
   )
@@ -1017,6 +1079,7 @@ export function BxPlan({ tag, action, onClear, hint, active = false, onSelect, s
   selectLabel?: string
 }) {
   const t = useToolT(BATTLESIM_NS)
+  const L = useBxLabels()
   const Body = (onSelect ? "button" : "span") as "button"
   const bodyProps = onSelect ? { type: "button" as const, onClick: onSelect, "aria-label": selectLabel, "aria-current": active ? ("step" as const) : undefined } : {}
   if (!action) {
@@ -1035,7 +1098,7 @@ export function BxPlan({ tag, action, onClear, hint, active = false, onSelect, s
       <b className={SLOTTAG}>{tag}</b>
       <Body {...bodyProps} className={cn("min-w-0 truncate border-0 bg-transparent py-[0.5rem] pl-0 pr-0 text-left font-body text-[0.71875rem] leading-[1.2] text-txt-muted [&_b]:font-semibold [&_b]:text-txt", onSelect && cn(BSIM_FOCUS, "focus-visible:outline-offset-[-1px]"))}>
         {isMove ? (
-          <>{(action.tera || action.mech) && <i className="mr-1 border border-solid border-[color-mix(in_srgb,var(--accent)_50%,transparent)] px-[3px] py-px font-mono text-[0.46875rem] not-italic uppercase tracking-[0.08em] text-accent-bright">{action.mech ?? "TERA"}</i>}<b>{action.move.name}</b>{tgt ? " → " + tgt : ""}</>
+          <>{(action.tera || action.mech) && <i className="mr-1 border border-solid border-[color-mix(in_srgb,var(--accent)_50%,transparent)] px-[3px] py-px font-mono text-[0.46875rem] not-italic uppercase tracking-[0.08em] text-accent-bright">{action.mech ?? "TERA"}</i>}<b>{L.move(action.move.name)}</b>{tgt ? " → " + tgt : ""}</>
         ) : action.kind === "switch" ? (
           <>{t("bx.switchTo", { name: action.toName })}</>
         ) : (
@@ -1081,6 +1144,7 @@ export function BxSlot({ mon, order, selected = false, dim = false, onClick, asi
   label?: string
 }) {
   const t = useToolT(BATTLESIM_NS)
+  const L = useBxLabels()
   const Tag = (onClick ? "button" : "div") as "button"
   if (!mon) {
     return (
@@ -1101,7 +1165,7 @@ export function BxSlot({ mon, order, selected = false, dim = false, onClick, asi
       <span className="grid min-w-0 flex-1 gap-[3px]">
         <b className={cn("truncate font-display font-bold uppercase leading-none tracking-[0.03em]", small ? "text-[0.71875rem]" : "text-[0.8125rem]")}>{mon.name}</b>
         {!small && <BxTypeRow types={mon.types} small />}
-        {!small && mon.item && <small className="font-mono text-[0.59375rem] leading-[1.2] text-txt-dim">{mon.item}</small>}
+        {!small && mon.item && <small className="font-mono text-[0.59375rem] leading-[1.2] text-txt-dim">{L.item(mon.item)}</small>}
       </span>
       {aside}
     </Tag>

@@ -1,7 +1,8 @@
 import type { PresetSlot } from './types';
+import { toID } from '@boffmedia/pokemon-identity';
 
 function toSpeciesId(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return toID(name);
 }
 
 export function parseShowdownPaste(paste: string): PresetSlot[] {

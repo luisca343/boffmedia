@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toID } from '@boffmedia/pokemon-identity';
 import { VgcService } from '../../service';
 import type { SpeciesEntry } from '../types';
 
@@ -16,7 +17,7 @@ async function loadSpecies(regulationId: string): Promise<SpeciesEntry[]> {
       .then((res) => {
         const data = res?.data ?? [];
         _cache[regulationId] = data.map((p) => ({
-          id: p.name.toLowerCase().replace(/[^a-z0-9]/g, ''),
+          id: toID(p.name),
           name: p.name,
           num: p.num,
         }));
@@ -46,7 +47,7 @@ export function usePokemonSearch(regulationId: string) {
   const search = useCallback(
     (query: string): SpeciesEntry[] => {
       if (!query || query.length < 2) return [];
-      const q = query.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const q = toID(query);
       return species
         .filter((s) => s.id.startsWith(q) || s.name.toLowerCase().startsWith(query.toLowerCase()))
         .slice(0, 8);

@@ -24,12 +24,12 @@ export function BxMonPopover({ mon, foe = false, open, onClose }: { mon: BSXMon 
   const perish = perishCount(mon.volatiles);
   const moves = (mon.moveIds || []).map((id) => {
     const m = Dex.moves.get(id);
-    return m?.exists ? { id, name: m.name, type: m.type } : { id, name: id, type: 'Normal' };
+    return m?.exists ? { id, name: L.move(m.name), type: m.type } : { id, name: id, type: 'Normal' };
   });
   const showExact = !foe && mon.hpCur != null && mon.hpMax != null;
   const max = Math.max(...STAT_KEYS.map((k) => mon.stats[k]), 1);
-  const abilityName = mon.ability ? (Dex.abilities.get(mon.ability)?.name ?? mon.ability) : null;
-  const itemName = mon.item ? (Dex.items.get(mon.item)?.name ?? mon.item) : null;
+  const abilityName = mon.ability ? L.ability(mon.ability) : null;
+  const itemName = mon.item ? L.item(mon.item) : null;
 
   return (
     <Modal open={open} onClose={onClose} size="sm" title={t('battle.mon.details', { name: mon.name })}>

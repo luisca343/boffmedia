@@ -21,9 +21,7 @@
         "form_astraldusk": "Astral Crepuscular",
         "form_astralshorn": "Esquilado Astral",
         "form_lowkey": "Grave",
-
         "palette_shiny2": "Terashiny",
-
         "form": "{pokemon} {form}",
         "form_mega": "Mega",
         "form_terasmega": "de Teras Mega",
@@ -80,10 +78,9 @@
         "form_gibbous": "Gibosa",
         "form_rain": "Lluvioso",
         "form_creator": "Creador",
-
-        "form_attack":"Ataque",
-        "form_defense":"Defensa",
-        "form_speed":"Velocidad",
+        "form_attack": "Ataque",
+        "form_defense": "Defensa",
+        "form_speed": "Velocidad",
         "form_sus": "Sus",
         "form_sirdoofusiii": "Sir Doofus III",
         "form_plant": "Planta",
@@ -228,8 +225,6 @@
         "form_three": "Tres",
         "form_two": "Dos",
         "form_chasanova": "Casanova",
-
-
         "palette_none": "Base",
         "palette_shiny": "Shiny",
         "palette_pink": "Rosa",
@@ -243,9 +238,7 @@
         "palette_alter": "Alter",
         "palette_ashen": "Ceniza",
         "palette_zombie": "Zombi",
-
         "form_battle_bond": "Vínculo",
-        
         "form_archipelago": "Archipiélago",
         "palette_archipelago": "Archipiélago",
         "palette_archipelago_shiny": "Archipiélago Variocolor",
@@ -306,7 +299,6 @@
         "form_tundra": "Tundra",
         "palette_tundra": "Tundra",
         "palette_tundra_shiny": "Tundra Variocolor",
-
         "palette_red": "Rojo",
         "palette_orange": "Naranja",
         "palette_yellow": "Amarillo",
@@ -315,15 +307,12 @@
         "palette_green": "Verde",
         "palette_indigo": "Índigo",
         "palette_violet": "Violeta",
-
         "palette_phony": "Falsificado",
         "palette_authentic": "Genuino",
-
         "palette_main_circular": "Principal Circular",
         "palette_secondary_circular": "Secundario Circular",
         "palette_dark": "Oscuro",
         "palette_witch": "Bruja",
-        
         "unknown_description": "Descripción no disponible.",
         "pixelmon_abomasnow": "Abomasnow",
         "pixelmon_abomasnow_description": "Aparece con las flores de nieve y se retira cuando se les caen los pétalos. No se sabe adónde va.",
@@ -2329,7 +2318,7 @@
         "pixelmon_floragato": "Floragato",
         "pixelmon_floragato_description": "Maneja diestramente la vid oculta bajo su largo pelaje y propina latigazos al enemigo con el capullo endurecido de la punta.",
         "pixelmon_meowscarada": "Meowscarada",
-        "pixelmon_meowscarada_description": "Se sirve de la luz que reflejan los tricomas de su manto de hojas para camuflar la vid y crear la ilusión óptica de que la flor flota en el aire.",  
+        "pixelmon_meowscarada_description": "Se sirve de la luz que reflejan los tricomas de su manto de hojas para camuflar la vid y crear la ilusión óptica de que la flor flota en el aire.",
         "pixelmon_crocalor": "Crocalor",
         "pixelmon_crocalor_description": "La mezcla de energía ígnea con el exceso de su propia fuerza vital ha tomado la forma de una bola de fuego de aspecto oval sobre su cabeza.",
         "pixelmon_skeledirge": "Skeledirge",
@@ -2356,9 +2345,7 @@
         "pixelmon_wiglett_description": "Puede percibir el olor de los Veluza a 20m de distancia, lo que le permite ocultarse bajo la arena a tiempo.",
         "pixelmon_wugtrio": "Wugtrio",
         "pixelmon_wugtrio_description": "Es de temperamento agresivo, aunque no lo parezca. Envuelve a sus presas con sus largos cuerpos y las arrastra a su nido.",
-      
         "pixelmon_unimplemented_description": "Este Pokémon todavía no está implementado en pixelmon_",
-              
         "pixelmon_dipplin": "Dipplin",
         "pixelmon_dipplin_description": "Ha evolucionado gracias a una manzana especial que solo se cultiva en cierta zona_ Este Pokémon está formado por dos individuos.",
         "pixelmon_poltchageist": "Poltchageist",
@@ -2373,8 +2360,6 @@
         "pixelmon_fezandipiti_description": "",
         "pixelmon_ogerpon": "Ogerpon",
         "pixelmon_ogerpon_description": "",
-
-
         "pixelmon_ironflight": "Iron Flight",
         "pixelmon_ironflight_description": "",
         "pixelmon_brutalking": "Brutal King",
@@ -2452,6 +2437,22 @@
         "pixelmon_nimbeon": "Nimbeon",
         "pixelmon_nimbeon_description": "",
         "pixelmon_sandeon": "Sandeon",
-        "pixelmon_sandeon_description": ""
+        "pixelmon_sandeon_description": "",
+        "pixelmon_archaludon": "Archaludon",
+        "pixelmon_archaludon_description": "Absorbe electricidad estática de su entorno. Los rayos que lanza cuando se pone a cuatro patas son tremendamente poderosos.",
+        "pixelmon_gougingfire": "Gouging Fire",
+        "pixelmon_gougingfire_description": "Hay muy pocos informes de avistamientos de esta criatura. Un breve vídeo la muestra desbocada y lanzando columnas de fuego.",
+        "pixelmon_hydrapple": "Hydrapple",
+        "pixelmon_hydrapple_description": "Siete sierpientes viven dentro de una manzana hecha de sirope. La sierpiente del centro es la comandante.",
+        "pixelmon_ironboulder": "Iron Boulder",
+        "pixelmon_ironboulder_description": "Se asemeja a un Pokémon descrito en una revista dudosa como un Terrakion que había sido modificado por una organización malvada.",
+        "pixelmon_ironcrown": "Ferropalmas",
+        "pixelmon_ironcrown_description": "Se asemeja a un objeto misterioso presentado en una revista paranormal como un arma de última generación con forma de Cobalion.",
+        "pixelmon_pecharunt": "Pecharunt",
+        "pixelmon_pecharunt_description": "Alimenta a otros con mochi tóxico que saca a relucir deseos y capacidades. Quienes comen el mochi caen bajo el control de Pecharunt, encadenados a su voluntad.",
+        "pixelmon_ragingbolt": "Raging Bolt",
+        "pixelmon_ragingbolt_description": "Se dice que incinera todo a su alrededor con rayos lanzados desde su pelaje. Se sabe muy poco sobre esta criatura.",
+        "pixelmon_terapagos": "Terapagos",
+        "pixelmon_terapagos_description": "Terapagos se protege usando su poder para transformar energía en cristales duros. Este Pokémon es la fuente del fenómeno Teracristal."
     }
 }

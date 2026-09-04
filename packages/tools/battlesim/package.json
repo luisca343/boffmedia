@@ -13,6 +13,8 @@
   "dependencies": {
     "@boffmedia/asset-paths": "workspace:*",
     "@boffmedia/battle-core": "workspace:*",
+    "@boffmedia/pokemon-identity": "workspace:*",
+    "@boffmedia/pkmn-names": "workspace:*",
     "@boffmedia/tool-kit": "workspace:*",
     "@boffmedia/tools-pokemon": "workspace:*",
     "@boffmedia/ui": "workspace:*",

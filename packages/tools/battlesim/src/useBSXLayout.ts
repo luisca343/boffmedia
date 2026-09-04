@@ -3,6 +3,7 @@ import { Battle } from "@pkmn/client";
 import type { BattleRequest } from "./engine/types";
 import type { BSXMon, BSXKeyMove, BSXTickEv, TeamMemberHP } from "./engine/toBSXMon";
 import { toBSXMon, toBSXKeyMoves, requestPokemonToBSXMon, toBSXTicks, toTeamHP, makeLogTranslator } from "./engine/toBSXMon";
+import { usePkmnLabels } from "./lib/pkmn-label";
 import { useToolT, BATTLESIM_NS } from "./i18n";
 
 type TimerState = {
@@ -102,9 +103,11 @@ const activesFor = (gameType: string) =>
  */
 export function useBSXLayout(state: BattleState | null, pov: 0 | 1 = 0): BSXLayout {
   const t = useToolT(BATTLESIM_NS);
+  const { names } = usePkmnLabels();
   // The engine's log comes out of @pkmn/view in English whatever the UI locale
-  // is; this re-renders the templates we know from the catalog.
-  const translateLog = useMemo(() => makeLogTranslator(t), [t]);
+  // is; this re-renders the templates we know from the catalog, and puts the
+  // move, ability and item names through the player's chosen name language.
+  const translateLog = useMemo(() => makeLogTranslator(t, names), [t, names]);
   return useMemo(() => {
     if (!state) return EMPTY;
 

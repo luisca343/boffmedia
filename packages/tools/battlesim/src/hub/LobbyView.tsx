@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import { Icon, cn, type IconName } from "@boffmedia/ui"
 import { DkSelect } from "@boffmedia/ui/datakit"
 import { openUrl, siteUrl, useToolOnline, useToolSession } from "@boffmedia/tool-kit"
+import { usePkmnNameMode, type PkmnNameMode } from "@boffmedia/pkmn-names"
 
 import { useBsimNav, type BsimScreen } from "../nav"
 import { isShowdownProxyEnabled } from "../config"
@@ -240,6 +241,7 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
       </section>
 
       {/* ============ QUICK ACCESS ============ */}
+      <div className="grid content-start gap-[0.625rem]">
       <nav aria-label={t("hub.tiles.aria")} className="grid grid-cols-3 gap-[0.625rem] max-[620px]:grid-cols-1 min-[1200px]:grid-cols-1">
         <LobbyTile icon="layers" title={t("app.lobby.tiles.builder")} sub={t("app.lobby.tiles.builderSub")} onClick={() => go("equipos")} />
         <LobbyTile icon="play" title={t("app.lobby.tiles.replays")} sub={t("app.lobby.tiles.replaysSub")} onClick={() => go("repeticiones")} />
@@ -256,7 +258,41 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
           onClick={() => void openUrl(siteUrl("/clasificacion"))}
         />
       </nav>
+
+      <NamesLanguage t={t} />
+      </div>
     </div>
+  )
+}
+
+/**
+ * Which language MOVE, ABILITY AND ITEM names are shown in — a separate question
+ * from which language the site is in, and separate on purpose.
+ *
+ * Competitive Pokémon is played in English everywhere else the player goes:
+ * Showdown, damage calculators, every team paste they are handed, every guide
+ * they read. So someone can reasonably want this tool in Spanish and its names
+ * in English, and `auto` — follow the site — is only the DEFAULT, not the rule.
+ * It sits in the hub because it is the tool's front door and the setting reaches
+ * every screen behind it, the teambuilder included.
+ */
+function NamesLanguage({ t }: { t: T }) {
+  const [mode, setMode] = usePkmnNameMode()
+  return (
+    <section className="cut-tag cut-tag-edge [--cut-tag:10px] grid gap-[0.4375rem] border border-solid border-line bg-panel px-4 py-[0.875rem]">
+      <BsimKicker>{t("app.lobby.names.label")}</BsimKicker>
+      <DkSelect
+        value={mode}
+        onChange={(value) => setMode(value as PkmnNameMode)}
+        ariaLabel={t("app.lobby.names.label")}
+        options={[
+          { value: "auto", label: t("app.lobby.names.auto") },
+          { value: "es", label: t("app.lobby.names.es") },
+          { value: "en", label: t("app.lobby.names.en") },
+        ]}
+      />
+      <small className="font-mono text-[0.5625rem] leading-[1.4] text-txt-dim">{t("app.lobby.names.hint")}</small>
+    </section>
   )
 }
 

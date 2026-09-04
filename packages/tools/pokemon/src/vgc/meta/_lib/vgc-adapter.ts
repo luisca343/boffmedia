@@ -1,5 +1,6 @@
 import type { PokemonUsageDetail, LimitlessPlayerEntry, LimitlessPlayerTeam, DivergenceResult as ApiDivergenceResult, SpeciesTeamEntry } from "../../service"
 import type { PokeData, UsageEntry, PlayerEntry, TeamSlot, DivergenceResult } from "./meta-types"
+import { toID } from "@boffmedia/pokemon-identity"
 
 const SPECIES_DEX: Record<string, number> = {
   incineroar: 727, "flutter-mane": 987, fluttermane: 987, urshifu: 892,
@@ -27,9 +28,9 @@ const SPECIES_DEX: Record<string, number> = {
 }
 
 function getDex(speciesId: string, speciesName: string): number {
-  const key = speciesId.toLowerCase().replace(/[^a-z0-9]/g, "")
+  const key = toID(speciesId)
   if (SPECIES_DEX[key]) return SPECIES_DEX[key]
-  const nameKey = speciesName.toLowerCase().replace(/[^a-z0-9]/g, "")
+  const nameKey = toID(speciesName)
   if (SPECIES_DEX[nameKey]) return SPECIES_DEX[nameKey]
   return 0
 }

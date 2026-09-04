@@ -28,9 +28,11 @@ import { cn, Icon, Input, Modal, Spinner } from "@boffmedia/ui";
 import { BSIM_FOCUS, BSIM_FOCUS_CUT } from "../components/bsim-kit";
 import { BxType, BxTypeRow, BxCat } from "../components/bx-kit";
 import { useToolT } from "../i18n";
+import { usePkmnLabels } from "../lib/pkmn-label";
 import { TB_NS, TYPE_LIST, toId, useTbLabels } from "./labels";
 import { itemIconStyle, speciesSprite, TbTypeChip } from "./tb-kit";
 import { handleSpriteError } from "@boffmedia/tools-pokemon";
+import { useAllSpecies } from "./useTeamValidation";
 
 export type PickerKind = "species" | "move" | "item" | "ability";
 
@@ -57,9 +59,18 @@ export interface PickerProps {
 
 interface Row {
   id: string;
+  /**
+   * The ENGLISH name, always. It is what goes into the set, into a paste and
+   * into `itemIconStyle`/`speciesSprite`, none of which have ever heard of
+   * Spanish. What the row SHOWS is `label`.
+   */
   name: string;
+  /** What to print: the name in the player's chosen language, or `name`. */
+  label?: string;
   /** Lower-cased search key. */
   key: string;
+  /** Search key for `label`, when it differs — so both languages find the row. */
+  altKey?: string;
   types?: string[];
   cat?: string;
   num?: number;
@@ -136,6 +147,7 @@ const OVERSCAN = 6;
 export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSpecies, loading, preferredIds, excludeIds }: PickerProps) {
   const t = useToolT(TB_NS);
   const labels = useTbLabels();
+  const allSpecies = useAllSpecies();
   const [query, setQuery] = React.useState("");
   const [typeFilter, setTypeFilter] = React.useState("");
   const [catFilter, setCatFilter] = React.useState("");
@@ -170,7 +182,34 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
     return () => ro?.disconnect();
   }, [open]);
 
-  const source = React.useMemo(() => (open ? loadSource(kind) : []), [open, kind]);
+  const pkmn = usePkmnLabels();
+
+  const source = React.useMemo(() => {
+    if (!open) return [];
+    const rows: Row[] =
+      kind === "species"
+        ? // Convert species picker data from worker to Row format
+          allSpecies.species.map((s) => ({
+            id: s.id,
+            name: s.name,
+            key: toId(s.name),
+            types: s.types,
+            num: s.bst,
+          }))
+        : loadSource(kind);
+    // Species are not translated — Spanish uses the English names — so that
+    // list is handed back as it is rather than copied to change nothing.
+    if (kind === "species" || pkmn.names.locale === "en") return rows;
+    const localize = pkmn.names[kind];
+    return rows
+      .map((row) => {
+        const label = localize(row.name);
+        return label === row.name ? row : { ...row, label, altKey: toId(label) };
+      })
+      // Alphabetical in the language being read: a Spanish list sorted by the
+      // English names looks unsorted, which is worse than either order.
+      .sort((a, b) => (a.label ?? a.name).localeCompare(b.label ?? b.name, "es"));
+  }, [open, kind, allSpecies.species, pkmn]);
   const exclude = React.useMemo(() => new Set((excludeIds ?? []).filter(Boolean)), [excludeIds]);
 
   const { entries, options, total } = React.useMemo(() => {
@@ -178,12 +217,16 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
     const filtered = source.filter((r) => {
       if (exclude.has(r.id) && r.id !== value) return false;
       if (typeFilter && !(r.types ?? []).includes(typeFilter)) return false;
-      if (catFilter && r.cat !== catFilter) return false;
-      return !q || r.key.includes(q);
+      if (catFilter && "cat" in r && r.cat !== catFilter) return false;
+      // Both languages, whichever one is on screen: years of typing
+      // "flamethrower" do not end because the labels turned Spanish, and a
+      // player told "usa Lanzallamas" must find it while reading English.
+      return !q || r.key.includes(q) || !!r.altKey?.includes(q);
     });
     // Prefix matches first, then the rest — typing "garg" should put Garganacl
     // above anything that merely contains the letters.
-    if (q) filtered.sort((a, b) => Number(b.key.startsWith(q)) - Number(a.key.startsWith(q)));
+    const prefix = (r: Row) => Number(r.key.startsWith(q) || !!r.altKey?.startsWith(q));
+    if (q) filtered.sort((a, b) => prefix(b) - prefix(a));
 
     const out: Entry[] = [];
     let optionIndex = 0;
@@ -378,10 +421,10 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
         onScroll={(e) => setScrollTop(e.currentTarget.scrollTop)}
         className="relative h-[min(56dvh,28.75rem)] overflow-y-auto overscroll-contain"
       >
-        {loading ? (
+        {loading || (kind === "species" && allSpecies.loading) ? (
           <p aria-live="polite" className="m-0 flex items-center justify-center gap-2 px-4 py-10 font-body text-[0.8125rem] text-txt-dim">
             <Spinner size={14} />
-            {t("picker.loadingMoves")}
+            {kind === "species" ? t("picker.loadingSpecies") : t("picker.loadingMoves")}
           </p>
         ) : entries.length === 0 ? (
           <p className="m-0 px-4 py-10 text-center font-body text-[0.8125rem] text-txt-dim">{t("picker.noResults")}</p>
@@ -463,7 +506,7 @@ function RowBody({ kind, row, illegal }: { kind: PickerKind; row: Row; illegal?:
     return (
       <>
         <img src={speciesSprite(row.name)} alt="" width={36} height={36} loading="lazy" onError={handleSpriteError} className={cn("h-9 w-9 flex-none object-contain", illegal && "opacity-60 saturate-[0.4]")} />
-        <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", illegal ? "text-txt-muted" : "text-txt")}>{row.name}</span>
+        <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", illegal ? "text-txt-muted" : "text-txt")}>{row.label ?? row.name}</span>
         {illegal && <IllegalTag />}
         <BxTypeRow types={row.types ?? []} small />
         <span className="w-[3.5rem] flex-none text-right font-mono text-[0.625rem]/none text-txt-dim">
@@ -475,7 +518,7 @@ function RowBody({ kind, row, illegal }: { kind: PickerKind; row: Row; illegal?:
   if (kind === "move") {
     return (
       <>
-        <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", illegal ? "text-txt-muted" : "text-txt")}>{row.name}</span>
+        <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", illegal ? "text-txt-muted" : "text-txt")}>{row.label ?? row.name}</span>
         {illegal && <IllegalTag />}
         <span className="hidden min-[560px]:inline-flex">{row.cat && <BxCat cat={CAT_KEY[row.cat] ?? "status"} />}</span>
         <BxType type={row.types?.[0] ?? "Normal"} small />
@@ -493,7 +536,7 @@ function RowBody({ kind, row, illegal }: { kind: PickerKind; row: Row; illegal?:
           {style ? <span style={style} className="block" /> : <i className="h-2 w-2 bg-line-2" />}
         </span>
         <span className="grid min-w-0 flex-1 gap-[3px]">
-          <span className="truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em] text-txt">{row.name}</span>
+          <span className="truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em] text-txt">{row.label ?? row.name}</span>
           {row.sub && <span className="truncate font-body text-[0.6875rem]/none text-txt-dim">{row.sub}</span>}
         </span>
       </>
@@ -501,7 +544,7 @@ function RowBody({ kind, row, illegal }: { kind: PickerKind; row: Row; illegal?:
   }
   return (
     <span className="grid min-w-0 flex-1 gap-[3px]">
-      <span className="truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em] text-txt">{row.name}</span>
+      <span className="truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em] text-txt">{row.label ?? row.name}</span>
       {row.sub && <span className="truncate font-body text-[0.6875rem]/none text-txt-dim">{row.sub}</span>}
     </span>
   );

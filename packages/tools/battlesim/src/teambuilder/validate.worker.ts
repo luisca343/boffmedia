@@ -24,7 +24,8 @@
 // @pkmn reaches for Node's `global`; without this the worker dies on first use.
 import "../lib/node-globals";
 
-import { legalMovesFor, legalSpeciesFor, registerBattleMods, unpackTeam, validateTeam } from "@boffmedia/battle-core";
+import { allAvailableSpecies, legalMovesFor, legalSpeciesFor, registerBattleMods, unpackTeam, validateTeam } from "@boffmedia/battle-core";
+import type { SpeciesPickerData } from "@boffmedia/battle-core";
 
 registerBattleMods();
 
@@ -49,7 +50,12 @@ export interface SpeciesRequest {
   format: string;
 }
 
-export type BsimWorkerRequest = ValidateRequest | MovesRequest | SpeciesRequest;
+export interface AllSpeciesRequest {
+  kind: "all-species";
+  token: number;
+}
+
+export type BsimWorkerRequest = ValidateRequest | MovesRequest | SpeciesRequest | AllSpeciesRequest;
 
 export interface ValidateResponse {
   kind: "validate";
@@ -74,7 +80,15 @@ export interface SpeciesResponse {
   known: boolean;
 }
 
-export type BsimWorkerResponse = ValidateResponse | MovesResponse | SpeciesResponse;
+export interface AllSpeciesResponse {
+  kind: "all-species";
+  token: number;
+  species: SpeciesPickerData[];
+  /** Always true for all-species; included for protocol consistency. */
+  known: boolean;
+}
+
+export type BsimWorkerResponse = ValidateResponse | MovesResponse | SpeciesResponse | AllSpeciesResponse;
 
 const post = (message: BsimWorkerResponse) => (self as unknown as Worker).postMessage(message);
 
@@ -133,9 +147,20 @@ function handleSpecies(request: SpeciesRequest) {
   }
 }
 
+function handleAllSpecies(request: AllSpeciesRequest) {
+  const { token } = request;
+  try {
+    const result = allAvailableSpecies();
+    post({ kind: "all-species", token, species: result.species, known: result.known });
+  } catch {
+    post({ kind: "all-species", token, species: [], known: false });
+  }
+}
+
 self.onmessage = (event: MessageEvent<BsimWorkerRequest>) => {
   const request = event.data;
   if (request.kind === "moves") handleMoves(request);
   else if (request.kind === "species") handleSpecies(request);
+  else if (request.kind === "all-species") handleAllSpecies(request);
   else handleValidate(request);
 };

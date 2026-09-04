@@ -1,5 +1,6 @@
 import { Pokemon } from "@pkmn/client";
 import { Dex } from "@pkmn/dex";
+import type { PkmnNameKind, PkmnNameTable } from "@boffmedia/pkmn-names";
 
 type BSXMon = {
   id: string; name: string; types: string[]; hp: number; fnt?: boolean; tera?: boolean;
@@ -286,8 +287,11 @@ interface LogRule {
  * English, which is what the hundreds of per-move and per-ability templates
  * outside this list do regardless.
  *
- * Species, move, ability and item names are never translated — they are the
- * same proper nouns every other surface of the tool shows.
+ * Species names are never translated: Spanish uses the English ones. Move,
+ * ability and item names ARE, when the player asked for that — but not by these
+ * rules. Each capture named `move`, `ability` or `item` is passed through the
+ * name table in one place below, so a rule added later is translated without
+ * anyone remembering to do it.
  */
 const LOG_RULES: LogRule[] = [
   // Framing.
@@ -296,8 +300,8 @@ const LOG_RULES: LogRule[] = [
   { re: /^Tie between (.+) and (.+)!$/, key: "tie", vals: (m) => ({ a: m[1], b: m[2] }) },
 
   // Switches.
-  { re: /^Go! (<strong>.+<\/strong>)!$/, key: "switchInOwn", vals: (m) => ({ name: m[1] }) },
-  { re: /^(.+?) sent out (<strong>.+<\/strong>)!$/, key: "switchIn", vals: (m) => ({ trainer: m[1], name: m[2] }) },
+  { re: /^Go! (<strong>.+<\/strong>(?: \([^)]+\))?)!$/, key: "switchInOwn", vals: (m) => ({ name: m[1] }) },
+  { re: /^(.+?) sent out (<strong>.+<\/strong>(?: \([^)]+\))?)!$/, key: "switchIn", vals: (m) => ({ trainer: m[1], name: m[2] }) },
   { re: /^(.+), come back!$/, key: "switchOutOwn" },
   { re: /^(.+?) withdrew (.+)!$/, key: "switchOut", vals: (m, p) => ({ trainer: m[1], name: p(m[2]) }) },
   { re: /^(.+) was dragged out!$/, key: "drag" },
@@ -443,7 +447,25 @@ const LOG_RULES: LogRule[] = [
  * A factory rather than a hook so the pure log pipeline in this module stays
  * free of React; `useBSXLayout` memoises it per translator.
  */
-export function makeLogTranslator(t: LogT): (html: string) => string {
+/** Captures whose contents are a Pokémon proper noun, and which kind. */
+const NAMED_VALS = { move: "move", ability: "ability", item: "item" } as const;
+
+/**
+ * The log's names arrive wrapped in the formatter's own markup
+ * (`<strong>Flamethrower</strong>`), so the tags are peeled off to get a key the
+ * table can be looked up by and put back around the answer. A name with no
+ * Spanish entry compares equal and the original string is returned untouched,
+ * markup and all.
+ */
+function localizeInMarkup(raw: string, kind: PkmnNameKind, names: PkmnNameTable): string {
+  const text = stripTags(raw).trim();
+  if (!text) return raw;
+  const localized = names[kind](text);
+  if (localized === text) return raw;
+  return raw.includes("<") ? raw.replace(text, localized) : localized;
+}
+
+export function makeLogTranslator(t: LogT, names?: PkmnNameTable): (html: string) => string {
   const poke = (raw: string): string => {
     const s = raw.trim();
     const opp = s.match(/^the opposing (.+)$/i);
@@ -463,6 +485,12 @@ export function makeLogTranslator(t: LogT): (html: string) => string {
       const m = body.match(rule.re);
       if (!m) continue;
       const vals = rule.vals ? rule.vals(m, poke, stat) : { name: poke(m[1]) };
+      if (names) {
+        for (const [key, kind] of Object.entries(NAMED_VALS)) {
+          const value = vals[key];
+          if (typeof value === "string") vals[key] = localizeInMarkup(value, kind, names);
+        }
+      }
       return t(`battle.logTx.${rule.key}`, vals);
     }
     return seg;

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { VgcService, type VgcPokemon } from '../../service'
+import { toID as toIdImpl } from '@boffmedia/pokemon-identity';
 
 export type { VgcPokemon }
 
@@ -30,7 +31,7 @@ async function loadLegalPokemon(regulationId: string): Promise<VgcPokemon[]> {
 
 /** Normalize a Pokémon name the same way as the tracker's `toId` — lowercase alphanumeric. */
 export function toId(s: string): string {
-  return s.toLowerCase().replace(/[^a-z0-9]/g, '')
+  return toIdImpl(s)
 }
 
 /**

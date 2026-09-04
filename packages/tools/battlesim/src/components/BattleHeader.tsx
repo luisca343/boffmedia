@@ -4,8 +4,10 @@ import type { CSSProperties } from 'react';
 import { useState, useCallback } from 'react';
 import { Icon, IconButton, Button, cn } from '@boffmedia/ui';
 import { DkBack } from '@boffmedia/ui/datakit';
+import { usePkmnNameLocale, usePkmnNameMode } from '@boffmedia/pkmn-names';
 import { useToolT, BATTLESIM_NS } from '../i18n';
 import { BxRing, BxScore } from './bx-kit';
+import { BSIM_FOCUS } from './bsim-kit';
 import type { BSXScore } from '../useBSXLayout';
 import type { BattleLayoutKind } from '../lib/battle-layout';
 import { useBattleAudioState, useBattleAudioControls } from '../lib/BattleAudioProvider';
@@ -117,6 +119,38 @@ function SafeAudioControl() {
   }
 }
 
+/**
+ * Flip the language of MOVE, ABILITY AND ITEM names without leaving the battle.
+ *
+ * The full three-way setting (auto · es · en) lives in the hub, but mid-battle
+ * the only thing anyone wants is the flip itself — you are reading a move you
+ * do not recognise and you want the other name for it, now, without walking out
+ * of the room to a settings panel. So this shows the language currently in
+ * effect and switches to the other one, which also pins the choice: an explicit
+ * pick outranks `auto`, exactly as picking one in the hub does.
+ */
+function NamesToggle() {
+  const t = useToolT(BATTLESIM_NS);
+  const locale = usePkmnNameLocale();
+  const [, setMode] = usePkmnNameMode();
+  const other = locale === 'es' ? 'en' : 'es';
+  return (
+    <button
+      type="button"
+      onClick={() => setMode(other)}
+      aria-label={t('app.lobby.names.label')}
+      title={`${t('app.lobby.names.label')}: ${t(`app.lobby.names.${locale}`)}`}
+      className={cn(
+        BSIM_FOCUS,
+        'flex h-8 flex-none items-center gap-[0.3125rem] border border-solid border-line-2 bg-base px-2 font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.08em] text-txt-muted transition-colors duration-[140ms] hover:border-accent-line hover:text-txt',
+      )}
+    >
+      <Icon name="globe" size={13} />
+      {locale.toUpperCase()}
+    </button>
+  );
+}
+
 export function BattleHeader({
   mode, onBack, roomLabel, formatLabel, you, foe, turn, timerYou, timerFoe, timerMax = 60,
   spectatorCount, layout, onToggleRail, railOpen, railUnread = 0, isFullscreen, onToggleFullscreen, showForfeit, onForfeit,
@@ -173,6 +207,7 @@ export function BattleHeader({
             )}
           </span>
         )}
+        <NamesToggle />
         <SafeAudioControl />
         {onToggleFullscreen && (
           <IconButton name={isFullscreen ? 'exitFullscreen' : 'fullscreen'} label={isFullscreen ? t('header.exitFullscreen') : t('header.fullscreen')} variant="ghost" size="sm" onClick={onToggleFullscreen} />

@@ -15,6 +15,7 @@ import { ReplayData } from "../../engine/types";
 import { countActions, getParticipantName } from "../../engine/replayUtils";
 import { ReplayErrorBoundary } from "./ReplayErrorBoundary";
 import { toBSXTicks, makeLogTranslator, toTeamHP } from "../../engine/toBSXMon";
+import { usePkmnLabels } from "../../lib/pkmn-label";
 import { REPLAY_TICK_LIMIT } from "../bx-kit";
 import { setReplaySpeed } from "../../engine/replaySpeed";
 import { useToolT, BATTLESIM_NS } from '../../i18n';
@@ -129,6 +130,8 @@ export function Game({replayData, shell: Shell}: {
     return () => setReplaySpeed(1);
   }, [speed]);
 
+  const pkmn = usePkmnLabels();
+
   const { battle, setBattle, battleLog, currentAction, scene, htmlLog, isPlaying, messageBar,
     turnInput, newTurn, settingTurn, lastTurn, simulatedAttack, logVisible, pov, setBattleLog,
     setCurrentAction, setScene, setHtmlLog: setLog, setIsPlaying, setMessageBar, setTurnInput,
@@ -169,7 +172,7 @@ export function Game({replayData, shell: Shell}: {
     await moveAction(battle, scene, 'p1a' as PokemonIdent, simulatedAttack, 'p2a' as PokemonIdent);
   }
 
-  const translateLog = useMemo(() => makeLogTranslator(t), [t]);
+  const translateLog = useMemo(() => makeLogTranslator(t, pkmn.names), [t, pkmn.names]);
   const bsxTicks = useMemo(() => toBSXTicks(htmlLog, translateLog), [htmlLog, translateLog]);
 
   // Timeline markers: one per turn for KOs and switches.

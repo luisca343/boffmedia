@@ -2,6 +2,7 @@
 
 import { forwardRef, useState, type CSSProperties, type ReactNode } from "react"
 import { cn } from "@boffmedia/ui"
+import { useToolChromeLock } from "@boffmedia/tool-kit"
 import { BattleLayoutProvider, useNodeSize, type BattleLayoutKind } from "../lib/battle-layout"
 
 interface BattleShellProps {
@@ -80,6 +81,14 @@ export const BattleShell = forwardRef<HTMLDivElement, BattleShellProps>(function
   { header, canvas, dock, rail, railOpen = false, mobileTabs, overlay, children, layout, fullscreen, className },
   ref,
 ) {
+  // A battle is played at the window's left edge: the dock's first move button
+  // and the ally half of the field both sit within a few pixels of it, and the
+  // web shell's minimised tool rail opens on hover from exactly there. So the
+  // shell holds the host's chrome for as long as it is on screen — see
+  // `useToolChromeLock`. Every battle surface wears this shell (live, PvP,
+  // Showdown, replay), which is why the lock is taken here and nowhere else.
+  useToolChromeLock()
+
   const mobile = layout === "mobile"
   const tablet = layout === "tablet"
   const desktop = layout === "desktop"

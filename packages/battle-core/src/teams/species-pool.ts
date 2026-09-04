@@ -53,6 +53,53 @@ const EXISTENCE_TAG: Record<string, string> = {
   Custom: 'custom',
 };
 
+/**
+ * Metadata for a species available in the picker.
+ * Includes enough data for the teambuilder picker's display and search.
+ */
+export interface SpeciesPickerData {
+  id: string;
+  name: string;
+  types: string[];
+  bst: number;
+  /** For sorting: the official Pokédex number, or high number for modded. */
+  num: number;
+}
+
+/**
+ * All species available in the modded dex, including Champions Megas and Teras.
+ * Used by the teambuilder picker to show all available species before filtering
+ * by format legality. This is a hint for the UI, never an authority.
+ */
+export interface AllSpecies {
+  /** All available species with picker metadata. */
+  species: SpeciesPickerData[];
+  /** Always true; included for protocol consistency with legalSpeciesFor. */
+  known: boolean;
+}
+
+export function allAvailableSpecies(): AllSpecies {
+  registerBattleMods();
+
+  try {
+    const out: SpeciesPickerData[] = [];
+    for (const species of Dex.species.all()) {
+      if (!species.exists || species.num <= 0 || species.battleOnly) continue;
+      out.push({
+        id: species.id,
+        name: species.name,
+        types: [...species.types],
+        bst: species.bst || 0,
+        num: species.num || 999,
+      });
+    }
+    out.sort((a, b) => a.num - b.num || a.name.localeCompare(b.name));
+    return { species: out, known: true };
+  } catch {
+    return { species: [], known: false };
+  }
+}
+
 export function legalSpeciesFor(formatId: string): LegalSpecies {
   registerBattleMods();
 

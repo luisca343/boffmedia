@@ -52,7 +52,7 @@ export const messages = {
           "Arrest client (Magnemite)": "Arrestar cliente (Magnemite)",
           "Arrest client (Magnezone)": "Arrestar cliente (Magnezone)",
           "Jirachi": "Jirachi",
-          "Special Floor (broken)": "Piso especial (roto)",
+          "Special Floor (broken)": "Planta especial (rota)",
           "Unlock seven treasures dungeon (broken)": "Desbloquear la mazmorra de los siete tesoros (roto)"
         },
         "rewardTypes": {
@@ -65,13 +65,13 @@ export const messages = {
           "CLIENT_JOINS": "??? (Cliente se une)"
         },
         "QUEST_TYPE": "Tipo de misión",
-        "QUEST_CONFIGURATION": "Configuración de Misión",
-        "LOCATION_SETTINGS": "Configuración de Ubicación",
+        "QUEST_CONFIGURATION": "Configuración de misión",
+        "LOCATION_SETTINGS": "Configuración de ubicación",
         "POKEMON_SETTINGS": "Configuración de Pokémon",
-        "REWARD_SETTINGS": "Configuración de Recompensas",
-        "EUROPEAN_VERSION": "Versión Europea",
+        "REWARD_SETTINGS": "Configuración de recompensas",
+        "EUROPEAN_VERSION": "Versión europea",
         "USE_EUROPEAN_FORMAT": "Usar formato europeo",
-        "ADDITIONAL_SETTINGS": "Configuración Adicional",
+        "ADDITIONAL_SETTINGS": "Configuración adicional",
         "GENERATE_WONDER_MAIL": "Generar Correo Secreto",
         "WONDERMAIL_TITLE": "Generador de",
         "WONDERMAIL_SUBTITLE": "Correos Secretos",
@@ -80,27 +80,27 @@ export const messages = {
         "WONDER_MAIL_CREATOR_DESCRIPTION": "Crea correos secretos personalizados para Pokémon Mundo Misterioso: Exploradores del Cielo. Configura misiones, ubicaciones, Pokémon y recompensas.",
         "EUROPEAN_VERSION_TOOLTIP": "Habilita el formato de correo europeo",
         "COPY_TO_CLIPBOARD": "Copiar al portapapeles",
-        "COPIED_SUCCESS": "¡Copiado exitosamente!",
+        "COPIED_SUCCESS": "¡Copiado correctamente!",
         "WONDER_MAIL_RESULT": "Resultado del Correo Secreto",
         "WONDER_MAIL_INSTRUCTIONS": "Haz clic en el botón de copiar para copiar el correo secreto a tu portapapeles",
         "REQUIRED_FIELD": "Campo obligatorio",
         "OPTIONAL_FIELD": "Campo opcional",
         "DISABLED_FIELD": "Campo deshabilitado",
-        "MAX_FLOOR": "Piso máximo",
-        "GENERATE_SUCCESS": "¡Correo secreto generado exitosamente!",
+        "MAX_FLOOR": "Planta máxima",
+        "GENERATE_SUCCESS": "¡Correo secreto generado correctamente!",
         "FORM_VALIDATION": {
-          "QUEST_TYPE_REQUIRED": "Debe seleccionar un tipo de misión",
-          "DUNGEON_REQUIRED": "Debe seleccionar una mazmorra",
-          "FLOOR_REQUIRED": "Debe especificar un piso válido",
-          "FLOOR_OUT_OF_RANGE": "El piso debe estar entre 1 y {max}",
-          "POKEMON_REQUIRED": "Debe seleccionar un Pokémon",
-          "REWARD_TYPE_REQUIRED": "Debe seleccionar un tipo de recompensa"
+          "QUEST_TYPE_REQUIRED": "Selecciona un tipo de misión",
+          "DUNGEON_REQUIRED": "Selecciona una mazmorra",
+          "FLOOR_REQUIRED": "Indica una planta válida",
+          "FLOOR_OUT_OF_RANGE": "La planta debe estar entre 1 y {max}",
+          "POKEMON_REQUIRED": "Selecciona un Pokémon",
+          "REWARD_TYPE_REQUIRED": "Selecciona un tipo de recompensa"
         },
         "HELP_TEXT": {
           "QUEST_TYPE": "Selecciona el tipo de misión que quieres crear",
           "QUEST_SUBTYPE": "Algunos tipos de misión tienen variaciones especiales",
           "DUNGEON": "Elige la mazmorra donde tendrá lugar la misión",
-          "FLOOR": "Especifica en qué piso de la mazmorra ocurrirá la misión",
+          "FLOOR": "Indica en qué planta de la mazmorra ocurrirá la misión",
           "CLIENT_POKEMON": "El Pokémon que solicita ayuda",
           "TARGET_POKEMON": "El Pokémon que debe ser rescatado o encontrado",
           "REWARD_TYPE": "Qué tipo de recompensa recibirás al completar la misión",
@@ -117,7 +117,7 @@ export const messages = {
         },
         "selectPokemon": "Selecciona un Pokémon",
         "app": {
-          "title": "Generador de Wonder Mail",
+          "title": "Generador de Correos Secretos",
           "region": "Región",
           "regionIntl": "US / JP",
           "regionEU": "EU",
@@ -135,13 +135,13 @@ export const messages = {
           "advancedSub": "Región y codificación",
           "euTitle": "Versión europea (EU)",
           "euSub": "Cambia la codificación regional del código. Mantén US / JP para la versión americana o japonesa.",
-          "mailLabel": "Wonder Mail S",
+          "mailLabel": "Correo Secreto S",
           "codeLabel": "Código",
           "emptyTitle": "Sin código todavía",
-          "emptyText": "Configura la misión y pulsa Generar código para obtener tu Wonder Mail.",
+          "emptyText": "Configura la misión y pulsa Generar código para obtener tu Correo Secreto.",
           "loadingTitle": "Generando…",
           "loadingText": "Codificando parámetros de la misión.",
-          "readyHint": "Introdúcelo en el buzón Wonder Mail dentro del juego.",
+          "readyHint": "Introdúcelo en el buzón de Correos Secretos dentro del juego.",
           "summaryHead": "Resumen de la misión",
           "sumMission": "Misión",
           "sumDungeon": "Mazmorra",
@@ -169,7 +169,7 @@ export const messages = {
           }
         },
         "DUNGEON": "Mazmorra",
-        "FLOOR": "Piso",
+        "FLOOR": "Planta",
         "QUEST_SUBTYPE": "Subtipo de misión",
         "CLIENT_POKEMON": "Pokémon cliente",
         "CLIENT_IS_TARGET": "El cliente es el objetivo",
@@ -234,13 +234,13 @@ export const messages = {
           "52": "Mar Milagro",
           "53": "Mar Milagro",
           "54": "Cueva Regia",
-          "55": "Camara Regice",
+          "55": "Cámara Regice",
           "56": "Cueva Regia",
-          "57": "Camara Regirock",
+          "57": "Cámara Regirock",
           "58": "Cueva Regia",
-          "59": "Camara Registeel",
+          "59": "Cámara Registeel",
           "60": "Cueva Regia",
-          "61": "Camara Regigigas",
+          "61": "Cámara Regigigas",
           "62": "Monte Tribulaciones",
           "63": "La Pesadilla",
           "64": "Grieta Espacial",
@@ -351,7 +351,7 @@ export const messages = {
           "174": "Cueva Estrella",
           "175": "Armaldo's Shelter",
           "176": "Manantial Luminoso",
-          "177": "Terma",
+          "177": "Termas",
           "178": "Dojo Normal/Volador",
           "179": "Dojo Fuego/Siniestro",
           "180": "Dojo Roca/Agua",
@@ -374,18 +374,18 @@ export const messages = {
           "245": "Aldea Tesoro",
           "246": "Aldea Tesoro",
           "254": "Cueva Cascada",
-          "255": "Secret Waterfall",
-          "256": "Quicksand Desert",
-          "259": "Beach Cave"
+          "255": "Cascada Secreta",
+          "256": "Desierto Tremedal",
+          "259": "Cueva Bajamar"
         },
         "manifest": {
-          "name": "Generador de Wonder Mail",
+          "name": "Generador de Correos Secretos",
           "category": "Generador",
           "description": "Crea correos secretos y misiones para Pokémon Mundo Misterioso: Exploradores del Cielo."
         }
       },
       "tcgpocket": {
-        "loading": "Cargando...",
+        "loading": "Cargando…",
         "geneticapex": "Genes Formidables",
         "promo-a": "Promo A",
         "mythicalisland": "Isla Singular",
@@ -403,9 +403,9 @@ export const messages = {
         },
         "item": {
           "xp": "XP",
-          "packhourglass": "Reloj de Arena de Sobres",
-          "wonderhourglass": "Reloj de Arena mágico",
-          "shopticket": "Cupón de Tienda",
+          "packhourglass": "Reloj de arena de sobres",
+          "wonderhourglass": "Reloj de arena mágico",
+          "shopticket": "Cupón de tienda",
           "shinedust": "Polvo Iris"
         },
         "mewQuest": "Mew Inmersivo",
@@ -418,18 +418,18 @@ export const messages = {
         },
         "quickSearch": {
           "title": "Consulta rápida",
-          "description": "Ingresa un nombre de usuario para ver su galería de cartas",
+          "description": "Introduce un nombre de usuario para ver su galería de cartas",
           "placeholder": "Nombre de usuario",
           "searchButton": "Buscar"
         },
         "viewGallery": {
-          "title": "Ver Galería",
+          "title": "Ver galería",
           "description": "Explora tu colección de cartas"
         },
         "cardsList": {
-          "title": "Lista de Cartas",
+          "title": "Lista de cartas",
           "description": "Navega por todas las cartas disponibles",
-          "pageTitle": "Todas las Cartas",
+          "pageTitle": "Todas las cartas",
           "noResults": "No se encontraron cartas que coincidan con la búsqueda."
         },
         "battles": {
@@ -443,36 +443,36 @@ export const messages = {
           "grass": "Planta",
           "fire": "Fuego",
           "water": "Agua",
-          "lightning": "Eléctrico",
+          "lightning": "Rayo",
           "psychic": "Psíquico",
           "fighting": "Lucha",
           "darkness": "Oscuridad",
           "metal": "Metal",
           "dragon": "Dragón",
-          "colorless": "Incoloro"
+          "colorless": "Incolora"
         },
         "cardDetail": {
-          "loading": "Cargando...",
+          "loading": "Cargando…",
           "number": "Número",
           "expansion": "Expansión",
           "rarity": "Rareza",
           "type": "Tipo",
           "hp": "PS",
           "weakness": "Debilidad",
-          "retreatCost": "Coste de Retirada"
+          "retreatCost": "Coste de retirada"
         },
         "gallery": {
           "notFound": {
             "title": "Galería no encontrada",
             "description": "Esta galería no existe o todavía no tiene cartas."
           },
-          "recentCards": "Cartas Recientes",
+          "recentCards": "Cartas recientes",
           "noCards": "No se encontraron cartas.",
-          "saveChanges": "Guardar Cambios",
-          "unknownCard": "Carta Desconocida",
+          "saveChanges": "Guardar cambios",
+          "unknownCard": "Carta desconocida",
           "errors": {
             "recentUpdates": "No se pudieron obtener las actualizaciones recientes. Inténtalo de nuevo más tarde.",
-            "bestPack": "No se pudo obtener el mejor pack. Por favor, intenta de nuevo."
+            "bestPack": "No se pudo calcular el mejor sobre. Inténtalo de nuevo."
           },
           "header": {
             "title": "Galería de {username}",
@@ -483,12 +483,12 @@ export const messages = {
             "showAmounts": "Mostrar cantidades",
             "selectEvent": "Seleccionar evento",
             "allCards": "Todas las cartas",
-            "bestPack": "Recomendar Mejor Sobre"
+            "bestPack": "Recomendar mejor sobre"
           },
           "recentUpdates": {
-            "title": "Actualizaciones Recientes",
+            "title": "Actualizaciones recientes",
             "noUpdates": "No hay actualizaciones recientes",
-            "loadMore": "Cargar Más"
+            "loadMore": "Cargar más"
           }
         },
         "filter": {
@@ -497,14 +497,14 @@ export const messages = {
           "allExpansions": "Todas las expansiones"
         },
         "bestPack": {
-          "dialogTitle": "Probabilidades de Nuevas Cartas por Pack",
+          "dialogTitle": "Probabilidades de carta nueva por sobre",
           "bestPackGeneral": "El mejor sobre para obtener nuevas cartas es: {packName}",
           "bestPackEvent": "El mejor sobre para obtener nuevas cartas de '{eventName}' es: {packName}",
           "missingCardsCount": "Cartas faltantes: {missing} de {total}",
           "missingCardsList": "Lista de cartas faltantes:",
           "availableIn": "Disponible en:",
           "table": {
-            "packName": "Nombre del Sobre",
+            "packName": "Nombre del sobre",
             "card": "Carta {number}",
             "total": "Total"
           }
@@ -657,7 +657,7 @@ export const messages = {
       },
       "vgc": {
         "calc": {
-          "title": "Calculadora de Daño",
+          "title": "Calculadora de daño",
           "subtitle": "Calcula el daño con condiciones de campo VGC completas",
           "share": "Compartir",
           "shareCopied": "¡Copiado!",
@@ -678,12 +678,12 @@ export const messages = {
             "add": "Añadir",
             "myTeam": "Mi equipo",
             "threats": "Amenazas",
-            "matrixHint": "Toca un Pokémon para editar su set",
+            "matrixHint": "Pulsa un Pokémon para editar su set",
             "matrixCorner": "Atacante ↓ · Defensor →",
             "matrixEmpty": "Añade Pokémon a ambos lados para ver la matriz de daño.",
             "saveNote": "Guarda el equipo actual para reutilizarlo en la matriz o entre sesiones.",
             "editPrefix": "Editar",
-            "twHint": "Tiempo Raro: el más lento actúa primero",
+            "twHint": "Espacio Raro: el más lento actúa primero",
             "reference": "Referencia",
             "referenceSub": "(máx / neutra, 31 IV)",
             "speedEmpty": "Añade Pokémon a tu equipo y a rivales para comparar velocidades.",
@@ -693,7 +693,7 @@ export const messages = {
           "panel": {
             "attacker": "Pokémon 1 — Atacante",
             "defender": "Pokémon 2 — Defensor",
-            "searchPlaceholder": "Buscar Pokémon...",
+            "searchPlaceholder": "Buscar Pokémon…",
             "nature": "Naturaleza",
             "ability": "Habilidad",
             "item": "Objeto",
@@ -736,7 +736,7 @@ export const messages = {
             "statAtk": "Atq",
             "statDef": "Def",
             "statSpa": "AtE",
-            "statSpd": "DefE",
+            "statSpd": "DfE",
             "statSpe": "Vel",
             "colStat": "Stat",
             "colBase": "Base",
@@ -750,9 +750,9 @@ export const messages = {
             "overBudget": "presupuesto excedido",
             "hpLabel": "PS",
             "hpReset": "Reiniciar",
-            "movePlaceholder": "Movimiento {n}...",
+            "movePlaceholder": "Movimiento {n}…",
             "loadingMoves": "Cargando movimientos…",
-            "basePower": "Poder Base",
+            "basePower": "Poder base",
             "categoryPhysical": "Fís",
             "categorySpecial": "Esp",
             "categoryStatus": "Est"
@@ -765,15 +765,15 @@ export const messages = {
             "weather": "Clima",
             "terrain": "Terreno",
             "conditions": "Condiciones",
-            "attackerSide": "Lado Atacante",
-            "defenderSide": "Lado Defensor",
+            "attackerSide": "Lado atacante",
+            "defenderSide": "Lado defensor",
             "weathers": {
               "Sun": "Sol",
               "Rain": "Lluvia",
-              "Sand": "Arena",
+              "Sand": "Tormenta de arena",
               "Snow": "Nieve",
-              "Harsh Sunshine": "Sol Abrasador",
-              "Heavy Rain": "Lluvia Torrencial"
+              "Harsh Sunshine": "Sol abrasador",
+              "Heavy Rain": "Diluvio"
             },
             "terrains": {
               "Electric": "Eléctrico",
@@ -784,40 +784,40 @@ export const messages = {
             "pill": {
               "Trick Room": "Espacio Raro",
               "Gravity": "Gravedad",
-              "Magic Room": "Sala Mágica",
-              "Wonder Room": "Sala Extraña",
-              "Stealth Rock": "Roca",
+              "Magic Room": "Zona Mágica",
+              "Wonder Room": "Zona Extraña",
+              "Stealth Rock": "Trampa Rocas",
               "Reflect": "Reflejo",
-              "Light Screen": "Pantalla Luz",
+              "Light Screen": "Pantalla de Luz",
               "Aurora Veil": "Velo Aurora",
               "Tailwind": "Viento Afín",
-              "Helping Hand": "Ayuda",
+              "Helping Hand": "Refuerzo",
               "Spikes": "Púas"
             }
           },
           "matrix": {
-            "teamLabel": "Tu Equipo",
+            "teamLabel": "Tu equipo",
             "manyLabel": "Amenazas",
             "addPokemon": "+ Añadir Pokémon",
             "emptyTeam": "No hay Pokémon en tu equipo aún",
             "emptyMany": "No hay amenazas añadidas aún",
-            "searchPlaceholder": "Buscar Pokémon...",
-            "atkDefCorner": "ATK ↓ / DEF →"
+            "searchPlaceholder": "Buscar Pokémon…",
+            "atkDefCorner": "Atacante ↓ / Defensor →"
           },
           "saved": {
-            "title": "Equipos Guardados",
+            "title": "Equipos guardados",
             "empty": "No hay equipos guardados aún",
-            "saveTeam": "+ Guardar Equipo",
-            "saveThreats": "+ Guardar Rivales",
-            "namePlaceholder": "Nombre para este equipo...",
+            "saveTeam": "+ Guardar equipo",
+            "saveThreats": "+ Guardar rivales",
+            "namePlaceholder": "Nombre para este equipo…",
             "saveButton": "Guardar",
             "cancel": "Cancelar",
             "importButton": "Importar",
-            "importTitle": "Importar a Biblioteca",
-            "importPlaceholder": "Pega un equipo en formato Showdown...",
-            "importNamePlaceholder": "Nombre para esta entrada...",
-            "importSave": "Guardar en Biblioteca",
-            "importLoading": "Cargando datos...",
+            "importTitle": "Importar a biblioteca",
+            "importPlaceholder": "Pega un equipo en formato Showdown…",
+            "importNamePlaceholder": "Nombre para esta entrada…",
+            "importSave": "Guardar en biblioteca",
+            "importLoading": "Cargando datos…",
             "importError": "No se encontraron Pokémon válidos.",
             "importNameRequired": "Escribe un nombre para esta entrada.",
             "noTeam": "No hay Pokémon en el equipo",
@@ -860,18 +860,18 @@ export const messages = {
             "tiesWith": "= Empate con",
             "slowerThan": "▼ Más lento que",
             "baseSpeed": "base {speed}",
-            "myTeam": "Mi Equipo",
+            "myTeam": "Mi equipo",
             "rival": "Rival",
             "level": "Nivel",
             "vsRivals": "vs Rivales",
             "allPokemon": "Todos los Pokémon",
-            "filterPlaceholder": "Filtrar referencia...",
-            "modMyTeam": "Mi Equipo",
+            "filterPlaceholder": "Filtrar referencia…",
+            "modMyTeam": "Mi equipo",
             "modRivals": "Rivales",
             "emptyState": "Añade Pokémon a ambos equipos para comparar velocidades",
             "noFilterMatch": "Ningún Pokémon coincide con tu filtro",
-            "comparisonTitle": "Comparación de velocidad — Mi Equipo vs Rivales (objetos aplicados por Pokémon)",
-            "sectionMyTeam": "Mi Equipo",
+            "comparisonTitle": "Comparación de velocidad — mi equipo vs. rivales (objetos aplicados por Pokémon)",
+            "sectionMyTeam": "Mi equipo",
             "sectionRivals": "Rivales",
             "referenceTitle": "Referencia — arriba: +Vel 252 EVs / abajo: neutral · {count} Pokémon{format}{filter}",
             "formatSuffix": " (formato)",
@@ -886,7 +886,7 @@ export const messages = {
             "quadX": "4×",
             "nve": "NVE",
             "se": "SE",
-            "weak": "Debil",
+            "weak": "Débil",
             "res": "Res",
             "addPokemon": "Añade Pokémon a tu equipo",
             "addPokemonHint": "Cambia a las pestañas 1v1 o matriz para configurar tu equipo, luego vuelve aquí.",
@@ -898,17 +898,17 @@ export const messages = {
             "offensiveCoverage": "⚔ Cobertura ofensiva",
             "rivalsVulnerabilities": "🛡 Vulnerabilidades de rivales",
             "defensiveProfile": "🛡 Perfil defensivo",
-            "rivalsThreatsTitle": "⚔ Amenazas de Rivales",
-            "offensiveCoverageTitle": "⚔ Cobertura Ofensiva",
-            "rivalsWeaknessesTitle": "🛡 Debilidades de Rivales",
-            "defensiveCoverageTitle": "🛡 Cobertura Defensiva",
+            "rivalsThreatsTitle": "⚔ Amenazas de rivales",
+            "offensiveCoverageTitle": "⚔ Cobertura ofensiva",
+            "rivalsWeaknessesTitle": "🛡 Debilidades de rivales",
+            "defensiveCoverageTitle": "🛡 Cobertura defensiva",
             "stabByDefenderType": "Amenazas STAB de rivales por tipo defensor",
             "stabVsDefenderType": "Cobertura STAB de tu equipo vs cada tipo defensor",
             "rivalsBestThreaten": "Rivales amenazan más:",
             "bestCovered": "Mejor cubierto:",
             "rivalsResistMost": "Rivales resisten más:",
             "mostResistedBy": "Más resistido por:",
-            "insights": "Insights",
+            "insights": "Conclusiones",
             "canHit": "Puede golpear",
             "typesSe": "tipos SE",
             "notVeryEffective": "poco efectivo",
@@ -917,7 +917,7 @@ export const messages = {
             "resists": "resiste",
             "insightWeak": "débil",
             "membersCount": "({count} miembros)",
-            "myTeamToggle": "⚔ Mi Equipo",
+            "myTeamToggle": "⚔ Mi equipo",
             "rivalsToggle": "🛡 Rivales"
           },
           "matrixExtras": {
@@ -932,10 +932,10 @@ export const messages = {
             "trickRoom": "Espacio Raro",
             "gravity": "Gravedad",
             "atkTailwind": "Atq VA",
-            "atkHelpingHand": "Atq Ayuda",
+            "atkHelpingHand": "Atq Refuerzo",
             "defTailwind": "Def VA",
             "defReflect": "Def Reflejo",
-            "defLightScreen": "Def Pantalla Luz"
+            "defLightScreen": "Def Pantalla de Luz"
           },
           "moveStripCard": {
             "level": "Nv. {level}"
@@ -948,12 +948,12 @@ export const messages = {
           "modifiers": {
             "title": "Modificadores",
             "clear": "Limpiar modificadores",
-            "boostTitle": "Etapa de Velocidad {n}",
-            "tailwind": "Viento Afín (×2 Velocidad)",
+            "boostTitle": "Etapa de velocidad {n}",
+            "tailwind": "Viento Afín (×2 velocidad)",
             "tailwindShort": "V. Afín",
-            "scarf": "Pañuelo Elegido (×1.5 Velocidad)",
+            "scarf": "Pañuelo Elegido (×1.5 velocidad)",
             "scarfShort": "Pañuelo",
-            "paralysis": "Parálisis (×0.5 Velocidad)",
+            "paralysis": "Parálisis (×0.5 velocidad)",
             "paralysisShort": "Parál."
           },
           "tabs": {
@@ -963,16 +963,16 @@ export const messages = {
           "clearInput": "Limpiar"
         },
         "speedTiers": {
-          "title": "Niveles de Velocidad",
-          "subtitle": "Estadísticas de velocidad a nivel 50 para Pokémon legales — ordenados por velocidad base",
-          "search": "Filtrar Pokémon...",
-          "highlightPlaceholder": "Resaltar velocidad...",
-          "showingTier": "Mostrando tier de velocidad {speed}",
+          "title": "Niveles de velocidad",
+          "subtitle": "Velocidad a nivel 50 de los Pokémon legales, ordenados por velocidad base",
+          "search": "Filtrar Pokémon…",
+          "highlightPlaceholder": "Resaltar velocidad…",
+          "showingTier": "Mostrando el nivel de velocidad {speed}",
           "pokemonCount": "{count} Pokémon",
-          "loading": "Cargando niveles de velocidad...",
-          "error": "Error al cargar los niveles de velocidad. Asegúrate de que la API está en ejecución.",
+          "loading": "Cargando niveles de velocidad…",
+          "error": "No se pudieron cargar los niveles de velocidad. Comprueba que la API esté activa.",
           "empty": "No se encontraron Pokémon.",
-          "footer": "N = Naturaleza neutral · + = Naturaleza +Velocidad · todos los cálculos a nivel 50 · 31 IVs",
+          "footer": "N = naturaleza neutra · + = naturaleza +Velocidad · todos los cálculos a nivel 50 · 31 IVs",
           "legend": {
             "restricted": "Restringido",
             "mythical": "Mítico",
@@ -980,9 +980,9 @@ export const messages = {
           },
           "badge": {
             "restricted": "Restringido",
-            "restrictedTitle": "Legendario Restringido",
+            "restrictedTitle": "Legendario restringido",
             "mythical": "Mítico",
-            "mythicalTitle": "Pokémon Mítico"
+            "mythicalTitle": "Pokémon mítico"
           },
           "columns": {
             "number": "#",
@@ -990,33 +990,22 @@ export const messages = {
             "base": "Base",
             "baseTitle": "Estadística de velocidad base",
             "minNeutral": "0/N",
-            "minNeutralTitle": "0 PEs, Naturaleza neutral",
+            "minNeutralTitle": "0 EVs, naturaleza neutra",
             "minPlus": "0/+",
-            "minPlusTitle": "0 PEs, Naturaleza +Velocidad",
+            "minPlusTitle": "0 EVs, naturaleza +Velocidad",
             "maxNeutral": "252/N",
-            "maxNeutralTitle": "252 PEs, Naturaleza neutral",
+            "maxNeutralTitle": "252 EVs, naturaleza neutra",
             "maxPlus": "252/+",
-            "maxPlusTitle": "252 PEs, Naturaleza +Velocidad",
-            "scarf": "Scarf",
-            "scarfTitle": "252 PEs, Pañuelo Elegido",
-            "scarfPlus": "Scarf+",
-            "scarfPlusTitle": "252 PEs, +Velocidad, Pañuelo Elegido",
+            "maxPlusTitle": "252 EVs, naturaleza +Velocidad",
+            "scarf": "Pañuelo",
+            "scarfTitle": "252 EVs, Pañuelo Elegido",
+            "scarfPlus": "Pañuelo+",
+            "scarfPlusTitle": "252 EVs, +Velocidad, Pañuelo Elegido",
             "noScarf": "No puede llevar Pañuelo Elegido",
             "types": "Tipos"
           },
-          "modifiers": {
-            "title": "Modificadores",
-            "clear": "Limpiar modificadores",
-            "boostTitle": "Etapa de Velocidad {n}",
-            "tailwind": "Viento Afín (×2 Velocidad)",
-            "tailwindShort": "V. Afín",
-            "scarf": "Pañuelo Elegido (×1.5 Velocidad)",
-            "scarfShort": "Pañuelo",
-            "paralysis": "Parálisis (×0.5 Velocidad)",
-            "paralysisShort": "Parál."
-          },
           "team": {
-            "title": "Mi Equipo",
+            "title": "Mi equipo",
             "add": "Añadir al equipo",
             "remove": "Quitar del equipo",
             "full": "El equipo está lleno (6 Pokémon)",
@@ -1030,13 +1019,13 @@ export const messages = {
             "column": "vs Equipo"
           },
           "reference": {
-            "title": "Tu Referencia",
-            "searchPlaceholder": "Elige un Pokémon...",
+            "title": "Tu referencia",
+            "searchPlaceholder": "Elige un Pokémon…",
             "customMode": "Personalizado",
             "pokemonMode": "Pokémon",
             "clearRef": "Limpiar",
-            "effectiveSpeed": "Velocidad Efectiva",
-            "evLabel": "PE / Naturaleza",
+            "effectiveSpeed": "Velocidad efectiva",
+            "evLabel": "EVs / naturaleza",
             "noRef": "Elige un Pokémon para ver tu posición en la tabla de velocidad"
           },
           "zones": {
@@ -1046,39 +1035,39 @@ export const messages = {
             "tieCount": "{count} empate"
           },
           "expanded": {
-            "breakdown": "Desglose de Velocidad",
+            "breakdown": "Desglose de velocidad",
             "vsRef": "vs tú ({speed})",
-            "sendToMatchup": "Comparar en Matchup",
+            "sendToMatchup": "Comparar en el comparador",
             "noRef": "Establece una referencia para comparar velocidades"
           }
         },
         "speedComparison": {
-          "title": "Comparación de Velocidad",
+          "title": "Comparación de velocidad",
           "subtitle": "Compara la velocidad de tu equipo contra cualquier rival",
           "opponentTitle": "Rival",
-          "opponentSearch": "Buscar Pokémon...",
-          "opponentManual": "O ingresa la velocidad directamente",
-          "opponentSpeedPlaceholder": "Stat de velocidad...",
+          "opponentSearch": "Buscar Pokémon…",
+          "opponentManual": "O introduce la velocidad directamente",
+          "opponentSpeedPlaceholder": "Velocidad…",
           "opponentModifiers": "Modificadores del rival",
           "effectiveSpeed": "Velocidad efectiva",
-          "myTeamTitle": "Mi Equipo",
+          "myTeamTitle": "Mi equipo",
           "myTeamModifiers": "Condiciones del equipo",
           "teamMemberName": "Nombre (opcional)",
-          "teamMemberSpeed": "Stat de velocidad",
+          "teamMemberSpeed": "Velocidad",
           "addMember": "Añadir casilla",
           "removeMember": "Quitar",
           "clearTeam": "Limpiar todo",
           "faster": "Más rápido",
           "slower": "Más lento",
           "tie": "Empate",
-          "noOpponent": "Ingresa la velocidad del rival para comparar",
-          "invalidSpeed": "Ingresa un stat de velocidad válido",
+          "noOpponent": "Introduce la velocidad del rival para comparar",
+          "invalidSpeed": "Introduce una velocidad válida",
           "referenceSpeed": "Velocidades de referencia",
-          "loading": "Cargando datos de Pokémon...",
+          "loading": "Cargando datos de Pokémon…",
           "empty": "No se encontraron Pokémon"
         },
         "tracker": {
-          "title": "VGC Tracker",
+          "title": "Tracker VGC",
           "subtitle": "Registra tus combates clasificados",
           "buttons": {
             "presets": "Presets ({count})",
@@ -1109,7 +1098,7 @@ export const messages = {
           "labels": {
             "sessionLabel": "Etiqueta de sesión",
             "presetName": "Nombre del preset",
-            "regulation": "Regulación",
+            "regulation": "Reglamento",
             "format": "Formato",
             "startingElo": "ELO inicial",
             "teamPreset": "Preset de equipo",
@@ -1123,7 +1112,7 @@ export const messages = {
             "limitlessTournament": "Vincular torneo de Limitless",
             "optional": "opcional",
             "noTournamentLink": "Ninguno",
-            "noImportedTournaments": "No hay torneos importados para esta regulación"
+            "noImportedTournaments": "No hay torneos importados para este reglamento"
           },
           "placeholders": {
             "rivalName": "Nombre del rival…",
@@ -1204,7 +1193,7 @@ export const messages = {
             "exportAll": "Exportar todo",
             "importFile": "Importar archivo",
             "importHint": "Combina datos, omite duplicados",
-            "importSuccess": "{sessions} sesiones · {matches} partidas importadas",
+            "importSuccess": "{sessions} sesiones · {matches} combates importados",
             "importError": "Archivo inválido o corrupto"
           },
           "preset": {
@@ -1238,7 +1227,7 @@ export const messages = {
           },
           "outcomeTag": {
             "label": "Resultado",
-            "skill": "Skill",
+            "skill": "Habilidad",
             "misplay": "Error",
             "luck": "Suerte",
             "disconnect": "Desconexión"
@@ -1248,11 +1237,11 @@ export const messages = {
           },
           "archetype": {
             "label": "Arquetipo",
-            "placeholder": "ej. Lluvia, HO, ER..."
+            "placeholder": "ej. Lluvia, HO, ER…"
           },
           "sessionNotes": {
             "label": "Notas de sesión",
-            "placeholder": "Notas sobre esta sesión..."
+            "placeholder": "Notas sobre esta sesión…"
           },
           "workspace": {
             "roundPrefix": "R",
@@ -1270,9 +1259,6 @@ export const messages = {
             "seriesTab": "Notas de serie",
             "noGameNotes": "Sin notas de partida aún",
             "noSeriesNotes": "Sin notas de serie aún",
-            "phaseLive": "en vivo",
-            "phasePost": "post",
-            "phaseSeries": "serie",
             "addSeriesPlaceholder": "Añadir nota de serie… (Enter)"
           },
           "speedWidget": {
@@ -1282,8 +1268,8 @@ export const messages = {
             "summary": "{count} mons · {min}-{max}",
             "trickroom": "ER ↕",
             "opponentSpeed": "Velocidad Base Rival",
-            "opponentSpeedPlaceholder": "Ingresa la velocidad base del rival...",
-            "presetHint": "Haz click en una fila para cambiar el preset de EV"
+            "opponentSpeedPlaceholder": "Introduce la velocidad base del rival…",
+            "presetHint": "Haz clic en una fila para cambiar el preset de EVs"
           },
           "zones": {
             "leads": "Inicios",
@@ -1291,26 +1277,26 @@ export const messages = {
           },
           "sessionStats": {
             "tabs": {
-              "matches": "Partidas",
+              "matches": "Combates",
               "stats": "Estadísticas",
               "aria": "Vista de sesión"
             },
             "kpi": {
-              "played": "Jugadas",
-              "winRate": "Win Rate",
+              "played": "Combates",
+              "winRate": "Win rate",
               "streak": "Racha",
               "streakWin": "{count}V seguidas",
               "streakLoss": "{count}D seguidas",
               "eloNow": "ELO actual",
               "eloBest": "Máximo",
               "eloWorst": "Mínimo",
-              "avgDelta": "±ELO/partida",
+              "avgDelta": "±ELO/combate",
               "bestStreak": "Mejor racha"
             },
             "chart": {
               "title": "Evolución del ELO",
               "start": "Inicio",
-              "noData": "Sin partidas completadas aún"
+              "noData": "Sin combates completados aún"
             },
             "table": {
               "pokemon": "Pokémon",
@@ -1320,36 +1306,20 @@ export const messages = {
               "record": "V/D/E",
               "winRate": "WR",
               "tournamentUsage": "Torneo %",
-              "noData": "Sin datos de partidas completadas.",
+              "noData": "Sin datos de combates completados.",
               "tabs": {
                 "myTeam": "Mi equipo",
-                "preview": "Preview rival",
+                "preview": "Vista previa rival",
                 "leads": "Leads rivales",
                 "backs": "Backs rivales"
               },
               "title": "Uso de Pokémon",
               "empty": "Sin datos suficientes."
             },
-            "leadPairs": {
-              "title": "Parejas de leads",
-              "my": "Mis leads",
-              "opp": "Leads rivales",
-              "pair": "Pareja",
-              "minGames": "≥{n} partidas",
-              "noData": "Sin datos de leads aún.",
-              "noDataThreshold": "Sin parejas con {n}+ partidas. Prueba a quitar el filtro."
-            },
-            "timeSlots": {
-              "title": "Hora del día",
-              "morning": "Mañana (6–11h)",
-              "afternoon": "Tarde (12–20h)",
-              "evening": "Noche (21–23h)",
-              "night": "Madrugada (0–6h)"
-            },
             "regulationMeta": {
-              "title": "Meta de la regulación",
-              "matchCount": "{n} partidas",
-              "noData": "Sin datos de rivales en esta regulación aún.",
+              "title": "Meta del reglamento",
+              "matchCount": "{n} combates",
+              "noData": "Sin datos de rivales en este reglamento aún.",
               "tournamentUsage": "Uso en torneo"
             },
             "comparison": {
@@ -1357,30 +1327,8 @@ export const messages = {
               "clearAll": "Limpiar todo",
               "hint": "Selecciona sesiones arriba para superponer sus gráficas de ELO."
             },
-            "heatmap": {
-              "title": "Mapa de actividad",
-              "days": {
-                "sun": "Dom",
-                "mon": "Lun",
-                "tue": "Mar",
-                "wed": "Mié",
-                "thu": "Jue",
-                "fri": "Vie",
-                "sat": "Sáb"
-              }
-            },
-            "matchupMatrix": {
-              "title": "Win rates por pareja",
-              "pair": "Pareja",
-              "minGames": "≥{n} partidas",
-              "noData": "Sin parejas con suficientes partidas aún."
-            },
-            "archetypeBreakdown": {
-              "title": "vs Arquetipo",
-              "archetype": "Arquetipo"
-            },
             "pairs": {
-              "title": "Parejas de lead",
+              "title": "Parejas de leads",
               "mine": "Mías",
               "rivals": "Rivales",
               "empty": "Sin datos."
@@ -1437,7 +1385,7 @@ export const messages = {
             "backToSession": "Volver a la sesión"
           },
           "sessionSub": {
-            "record": "{played} partidas · {wins}-{losses}"
+            "record": "{played} combates · {wins}-{losses}"
           },
           "roles": {
             "lead1": "Lead 1",
@@ -1452,12 +1400,12 @@ export const messages = {
             "series": "serie"
           },
           "sync": {
-            "conflict": "Conflicto de sync",
+            "conflict": "Conflicto de sincronización",
             "conflictHint": "Otra pestaña o dispositivo tiene datos más recientes.",
             "refreshFromCloud": "Actualizar desde la nube",
             "synced": "Sincronizado",
             "syncing": "Sincronizando",
-            "error": "Error de sync",
+            "error": "Error de sincronización",
             "rejected": "El servidor rechazó un cambio: {detail}",
             "refreshed": "Tracker actualizado desde la nube",
             "conflictBody": "Otro dispositivo tiene datos más recientes. Actualiza desde la nube para continuar.",
@@ -1471,13 +1419,13 @@ export const messages = {
           }
         },
         "meta": {
-          "title": "Análisis de Meta",
-          "subtitle": "Uso en el Ladder y composición de equipos, según Smogon Stats",
+          "title": "Análisis de meta",
+          "subtitle": "Uso en el ladder y composición de equipos, según Smogon Stats",
           "formats": {
             "gen9vgc2026regi": "VGC 2026 Reg I",
             "gen9vgc2026regh": "VGC 2026 Reg H",
-            "gen9vgc2025regg": "VGC 2026 Reg G",
-            "gen9vgc2025regf": "VGC 2026 Reg F"
+            "gen9vgc2025regg": "VGC 2025 Reg G",
+            "gen9vgc2025regf": "VGC 2025 Reg F"
           },
           "pickers": {
             "format": "Formato",
@@ -1485,12 +1433,12 @@ export const messages = {
             "monthPlaceholder": "Último",
             "cutoff": "ELO mín.",
             "load": "Aplicar",
-            "regulation": "Regulación",
+            "regulation": "Reglamento",
             "tournament": "Torneo"
           },
           "options": "Opciones",
           "sidebar": {
-            "search": "Buscar Pokémon...",
+            "search": "Buscar Pokémon…",
             "noResults": "Sin resultados"
           },
           "table": {
@@ -1500,20 +1448,20 @@ export const messages = {
             "item": "Objeto",
             "move": "Movimiento",
             "tera": "Tera",
-            "loading": "Cargando datos de meta...",
+            "loading": "Cargando datos de meta…",
             "empty": "Sin datos para este formato y mes.",
             "error": "Error al cargar la meta. Comprueba que la API esté activa."
           },
           "detail": {
-            "baseStats": "Estadísticas Base",
+            "baseStats": "Estadísticas base",
             "abilities": "Habilidades",
             "items": "Objetos",
             "moves": "Movimientos",
             "teraTypes": "Teratipos",
             "teammates": "Compañeros",
-            "spreads": "Distribuciones de EVs",
+            "spreads": "Repartos de EVs",
             "close": "Cerrar",
-            "loading": "Cargando detalles...",
+            "loading": "Cargando detalles…",
             "backToList": "Volver",
             "notFound": "Sin datos disponibles para este Pokémon.",
             "battles": "{count} combates",
@@ -1529,7 +1477,7 @@ export const messages = {
             "appearances": "Apariciones",
             "topN": "top {n}",
             "noData": "—",
-            "abilitiesTeras": "Habilidades y Teratipos",
+            "abilitiesTeras": "Habilidades y teratipos",
             "clickToJump": "clic para saltar",
             "teamsWith": "Equipos con {name}",
             "tournamentResults": "resultados de torneo",
@@ -1543,7 +1491,7 @@ export const messages = {
             "col": {
               "rank": "#",
               "player": "Jugador",
-              "record": "Registro",
+              "record": "Balance",
               "team": "Equipo"
             },
             "teamLoading": "Cargando…",
@@ -1557,7 +1505,7 @@ export const messages = {
           "divergence": {
             "loading": "Cargando datos de divergencia…",
             "empty": "Sin datos de divergencia. Importa un torneo primero.",
-            "selectTournament": "Selecciona una regulación y torneo para ver la divergencia.",
+            "selectTournament": "Selecciona un reglamento y un torneo para ver la divergencia.",
             "rowCount": "{count} Pokémon",
             "allElo": "Todos los ELO",
             "col": {
@@ -1568,13 +1516,13 @@ export const messages = {
               "badge": "Insignia"
             },
             "badges": {
-              "ladderTrap": "Trampa de Ladder",
-              "ladderTrapTitle": "Muy usado en el Ladder y poco en torneos — puede estar sobrevalorado en top cut",
+              "ladderTrap": "Trampa de ladder",
+              "ladderTrapTitle": "Muy usado en el ladder y poco en torneos: puede estar sobrevalorado en top cut",
               "tournamentStaple": "Pilar de torneo",
-              "tournamentStapleTitle": "Poco usado en el Ladder y mucho en torneos — infravalorado en el Ladder"
+              "tournamentStapleTitle": "Poco usado en el ladder y mucho en torneos: infravalorado en el ladder"
             },
             "emptyTitle": "Sin datos de divergencia",
-            "note": "Compara el uso en el <b>Ladder</b> ({format} · {month} · 1630+ ELO) con el uso en <b>torneos</b>. Δ positivo = más usado en torneo."
+            "note": "Compara el uso en el <b>ladder</b> ({format} · {month} · 1630+ ELO) con el uso en <b>torneos</b>. Δ positivo = más usado en torneo."
           },
           "refresh": "Actualizar",
           "footer": "Datos de Smogon Stats · Actualización mensual · Corte de ELO por defecto: 1760",
@@ -1604,7 +1552,7 @@ export const messages = {
             "tournamentView": "Vista de torneo",
             "usageRanking": "Ranking de uso",
             "standings": "Clasificación del torneo",
-            "divergence": "Divergencia Ladder–torneos"
+            "divergence": "Divergencia ladder–torneos"
           },
           "list": {
             "appearances": "{count} apariciones"
@@ -1617,7 +1565,7 @@ export const messages = {
           "sub": {
             "combined": "Combinado · {count} torneos",
             "tourWithPlayers": "{name} · {count} jug.",
-            "formatNote": "Regulación actual. Permite dos Pokémon restringidos por equipo."
+            "formatNote": "Reglamento actual. Permite dos Pokémon restringidos por equipo."
           },
           "adapter": {
             "teamFallback": "Equipo",
@@ -1631,13 +1579,13 @@ export const messages = {
             "category": "Competitivo"
           },
           "speed": {
-            "name": "Tiers de velocidad",
+            "name": "Niveles de velocidad",
             "description": "Compara velocidades del formato y sus modificadores.",
             "category": "Competitivo"
           },
           "meta": {
             "name": "Análisis de meta",
-            "description": "Uso, equipos y divergencias por regulación y torneo.",
+            "description": "Uso, equipos y divergencias por reglamento y torneo.",
             "category": "Competitivo"
           },
           "tracker": {
@@ -2634,17 +2582,6 @@ export const messages = {
             "noScarf": "Cannot hold Choice Scarf",
             "types": "Types"
           },
-          "modifiers": {
-            "title": "Modifiers",
-            "clear": "Clear all modifiers",
-            "boostTitle": "Speed stage {n}",
-            "tailwind": "Tailwind (×2 Speed)",
-            "tailwindShort": "Tailwind",
-            "scarf": "Choice Scarf (×1.5 Speed)",
-            "scarfShort": "Scarf",
-            "paralysis": "Paralysis (×0.5 Speed)",
-            "paralysisShort": "Para"
-          },
           "team": {
             "title": "My Team",
             "add": "Add to team",
@@ -2900,9 +2837,6 @@ export const messages = {
             "seriesTab": "Series notes",
             "noGameNotes": "No game notes yet",
             "noSeriesNotes": "No series notes yet",
-            "phaseLive": "live",
-            "phasePost": "post",
-            "phaseSeries": "series",
             "addSeriesPlaceholder": "Add series note… (Enter)"
           },
           "speedWidget": {
@@ -2960,22 +2894,6 @@ export const messages = {
               "title": "Pokémon usage",
               "empty": "Not enough data."
             },
-            "leadPairs": {
-              "title": "Lead pairs",
-              "my": "My leads",
-              "opp": "Opponent leads",
-              "pair": "Pair",
-              "minGames": "≥{n} games",
-              "noData": "No lead data recorded yet.",
-              "noDataThreshold": "No pairs with {n}+ games. Try removing the filter."
-            },
-            "timeSlots": {
-              "title": "Time of day",
-              "morning": "Morning (6–11h)",
-              "afternoon": "Afternoon (12–20h)",
-              "evening": "Evening (21–23h)",
-              "night": "Night (0–6h)"
-            },
             "regulationMeta": {
               "title": "Regulation meta",
               "matchCount": "{n} matches",
@@ -2986,28 +2904,6 @@ export const messages = {
               "title": "Compare sessions",
               "clearAll": "Clear all",
               "hint": "Select sessions above to overlay their ELO charts."
-            },
-            "heatmap": {
-              "title": "Activity heatmap",
-              "days": {
-                "sun": "Sun",
-                "mon": "Mon",
-                "tue": "Tue",
-                "wed": "Wed",
-                "thu": "Thu",
-                "fri": "Fri",
-                "sat": "Sat"
-              }
-            },
-            "matchupMatrix": {
-              "title": "Pair win rates",
-              "pair": "Pair",
-              "minGames": "≥{n} games",
-              "noData": "No pairs with enough games yet."
-            },
-            "archetypeBreakdown": {
-              "title": "vs Archetype",
-              "archetype": "Archetype"
             },
             "pairs": {
               "title": "Lead pairs",
@@ -3106,8 +3002,8 @@ export const messages = {
           "formats": {
             "gen9vgc2026regi": "VGC 2026 Reg I",
             "gen9vgc2026regh": "VGC 2026 Reg H",
-            "gen9vgc2025regg": "VGC 2026 Reg G",
-            "gen9vgc2025regf": "VGC 2026 Reg F"
+            "gen9vgc2025regg": "VGC 2025 Reg G",
+            "gen9vgc2025regf": "VGC 2025 Reg F"
           },
           "pickers": {
             "format": "Format",

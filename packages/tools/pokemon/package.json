@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@boffmedia/asset-paths": "workspace:*",
+    "@boffmedia/pokemon-identity": "workspace:*",
     "@boffmedia/shared": "workspace:*",
     "@boffmedia/tool-kit": "workspace:*",
     "@boffmedia/ui": "workspace:*",

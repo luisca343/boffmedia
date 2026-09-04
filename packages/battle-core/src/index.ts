@@ -46,8 +46,8 @@ export { validateTeam } from './teams/validate.js';
 export type { ValidationResult } from './teams/validate.js';
 export { legalMovesFor } from './teams/learnset.js';
 export type { LegalMoves } from './teams/learnset.js';
-export { legalSpeciesFor } from './teams/species-pool.js';
-export type { LegalSpecies } from './teams/species-pool.js';
+export { allAvailableSpecies, legalSpeciesFor } from './teams/species-pool.js';
+export type { AllSpecies, LegalSpecies, SpeciesPickerData } from './teams/species-pool.js';
 
 // Replay
 export type { ReplayRecord, TeamRecord } from './replay/types.js';

@@ -178,6 +178,36 @@ export function RoomsProvider({ children }: { children: React.ReactNode }) {
   const navId = nav.params.id
   const navSource = nav.params.source
 
+  /**
+   * Tabs for battles that outlived this provider.
+   *
+   * The engine survives a remount now (see `localEngine`), but the tab list is
+   * ordinary React state and does not — so without this, coming back from a
+   * refresh, a hot reload or a recovered error left every running battle alive
+   * and unreachable, with only the one named in the address getting a tab back.
+   * The sessions ARE the truth here: a tab is drawn for each, once, on mount.
+   */
+  React.useEffect(() => {
+    const running = Array.from(local.sessions.keys())
+    if (running.length === 0) return
+    setRooms((prev) => {
+      const missing = running
+        .filter((id) => !prev.some((r) => r.id === id))
+        .map<BsimRoom>((id) => ({
+          id,
+          kind: "ai",
+          label: formatLabelFor(local.getFormat(id)) ?? "",
+          sub: shortRoomId(id),
+          tone: "ok",
+          screen: "play",
+          params: { roomId: id },
+        }))
+      return missing.length ? [...missing, ...prev] : prev
+    })
+    // Mount only: after this, rooms are opened and closed through the API.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   /** An address that names a room opens it. This is the deep-link half. */
   React.useEffect(() => {
     const room = roomFromNav(navScreen, { roomId: navRoomId, id: navId, source: navSource } as Record<string, string>)

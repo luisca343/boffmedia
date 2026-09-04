@@ -3,12 +3,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Button, cn, toast } from '@boffmedia/ui';
 import { useToolT, BATTLESIM_NS } from '../i18n';
-import { BxKey, BxBench, BxPlan, BxTeraBtn, BxMechBtn, BxKbdHint, BxRing, type BxPlanAction } from './bx-kit';
+import { BxKey, BxBench, BxPlan, BxTeraBtn, BxMechBtn, BxKbdHint, BxRing, useBxLabels, type BxPlanAction } from './bx-kit';
 import { BSIM_FOCUS } from './bsim-kit';
+import { BxMonPopover } from './BxMonPopover';
 import { useBattleHotkeys } from '../useBattleHotkeys';
 import { useRoomVisible } from '../lib/room-visibility';
 import type { BSXLayout, BSXSlot } from '../useBSXLayout';
-import type { BSXKeyMove } from '../engine/toBSXMon';
+import type { BSXKeyMove, BSXMon } from '../engine/toBSXMon';
 import type { TargetOption, TargetingState } from '../lib/battle-types';
 import { useNodeSize, type BattleLayoutKind } from '../lib/battle-layout';
 
@@ -83,6 +84,7 @@ const orderToChoice = (o: Order | null): string => {
  */
 export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, timer, timerMax = 60, onTargeting, onAim, spectator = false, layout }: BxDockProps) {
   const t = useToolT(BATTLESIM_NS);
+  const L = useBxLabels();
   const roomVisible = useRoomVisible();
   const mobile = layout === 'mobile';
   const doubles = bsx.activeCount > 1;
@@ -92,6 +94,8 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
   const setOrders = useCallback((next: (Order | null)[]) => { ordersRef.current = next; setOrdersState(next); }, []);
   const [cursor, setCursor] = useState(0);
   const [seg, setSeg] = useState<Segment>('moves');
+  /** Which of your six the team panel is showing in full. */
+  const [teamDetail, setTeamDetail] = useState<BSXMon | null>(null);
   const [mech, setMech] = useState<ActiveMechanic>(null);
   const [pending, setPending] = useState<PendingTarget | null>(null);
   const [sent, setSent] = useState(false);
@@ -284,7 +288,13 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
   const segments: Array<{ id: Segment; label: string; enabled: boolean }> = [
     { id: 'moves', label: t('battle.dock.moves'), enabled: inMoves },
     { id: 'switch', label: t('battle.dock.switch'), enabled: canSwitch },
-    { id: 'team', label: t('battle.dock.team'), enabled: canAct && bsx.requestType === 'team' },
+    // ALWAYS available, unlike the other two. Moves and switches are choices,
+    // and a choice you cannot make is a disabled tab; this one only tells you
+    // what you have, which is worth knowing precisely when you cannot act. It
+    // used to be gated on `requestType === 'team'` — team preview — which is
+    // drawn as a full-screen overlay over this very band, so the tab could not
+    // be reached in the one state that enabled it.
+    { id: 'team', label: t('battle.dock.team'), enabled: bsx.bsxBench.length > 0 },
   ];
   const showSeg = segments.find((s) => s.id === seg && s.enabled) ? seg : (segments.find((s) => s.enabled)?.id ?? seg);
   // Four across from 840px, because that is where a move key still clears the
@@ -430,7 +440,7 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
       {pending && (
         <div role="status" title={t('battle.dock.chooseTargetHint')} className="flex flex-wrap items-center gap-2 border border-solid border-warn bg-warn-soft px-2 py-[0.375rem]">
           <b className="font-display text-[0.8125rem] font-bold uppercase leading-none tracking-[0.04em] text-txt">{t('battle.dock.chooseTarget')}</b>
-          <span className="font-mono text-[0.625rem] text-txt-muted">{pending.name}</span>
+          <span className="font-mono text-[0.625rem] text-txt-muted">{L.move(pending.name)}</span>
           <span className="flex flex-wrap gap-1">
             {pending.options.map((o) => (
               <Button key={o.code} size="sm" variant={o.side === 'foe' ? 'danger' : 'default'} onClick={() => pending && (onTargetingPick(o.code))}>{o.label}</Button>
@@ -483,9 +493,25 @@ export function BxDock({ bsx, status, isWaiting, htmlLog, onChoice, onUndo, time
         </div>
       )}
 
-      {canAct && showSeg === 'team' && (
-        <p className="m-0 font-body text-[0.78125rem] text-txt-muted">{t('battle.preview.leadSingles')}</p>
+      {showSeg === 'team' && (
+        <div className="flex flex-col gap-2">
+          <span className="font-mono text-[0.65625rem] font-semibold uppercase leading-none tracking-[0.12em] text-txt-muted">
+            {t('battle.dock.teamHint')}
+          </span>
+          {/* The same cards the switch panel uses, and deliberately so: this is
+              the same six Pokémon, read rather than chosen. They are never
+              disabled here — a fainted or already-active mon is exactly what
+              you opened this to check — and a click opens the full detail
+              instead of spending your turn. */}
+          <div className={cn('grid gap-2', benchCols)}>
+            {bsx.bsxBench.map((mon, i) => (
+              <BxBench key={mon.id + i} mon={mon} onClick={() => setTeamDetail(mon)} />
+            ))}
+          </div>
+        </div>
       )}
+
+      <BxMonPopover mon={teamDetail} open={!!teamDetail} onClose={() => setTeamDetail(null)} />
     </section>
   );
 

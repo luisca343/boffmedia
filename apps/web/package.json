@@ -20,6 +20,7 @@
   "dependencies": {
     "@boffmedia/asset-paths": "workspace:*",
     "@boffmedia/pack-schema": "workspace:*",
+    "@boffmedia/pokemon-identity": "workspace:*",
     "@boffmedia/shared": "workspace:*",
     "@boffmedia/tool-kit": "workspace:*",
     "@boffmedia/tools-battlesim": "workspace:*",

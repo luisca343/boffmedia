@@ -19,7 +19,7 @@ import { DkSprite } from "@boffmedia/ui/datakit";
 import { spriteUrl, handleSpriteError } from "@boffmedia/tools-pokemon";
 
 import { BSIM_FOCUS, BSIM_FOCUS_CUT, BsimChip, BsimKicker, type BsimChipTone } from "../components/bsim-kit";
-import { BxTypeRow, BxType, BxCat } from "../components/bx-kit";
+import { BxTypeRow, BxType, BxCat, useBxLabels } from "../components/bx-kit";
 import { tyColor } from "../lib/bx-helpers";
 import type { TbSyncState } from "./useTeamDraft";
 
@@ -393,6 +393,8 @@ export function TbMoveRow({
   illegalLabel?: string;
 }) {
   const pop = usePop(popKey);
+  // `move.name` is the English name the set stores; only what is PRINTED moves.
+  const L = useBxLabels();
   if (!move) {
     return (
       <button
@@ -417,7 +419,7 @@ export function TbMoveRow({
       <button
         type="button"
         onClick={onClick}
-        aria-label={`${label}: ${move.name}`}
+        aria-label={`${label}: ${L.move(move.name)}`}
         style={{ ["--tyc" as string]: tyColor(move.type) } as React.CSSProperties}
         className={cn(
           "cut-tag cut-tag-edge [--cut-tag:9px] [--cut-line:var(--line)] flex min-h-[3.375rem] w-full min-w-0 items-center gap-[0.5625rem] border border-solid border-line border-l-[3px] border-l-[var(--tyc)] bg-panel py-2 pl-[0.625rem] text-left transition-[background,border-color,transform] duration-[140ms] hover:border-[color-mix(in_srgb,var(--tyc)_55%,var(--line))] hover:[--cut-line:color-mix(in_srgb,var(--tyc)_55%,var(--line))] hover:bg-panel-2",
@@ -430,7 +432,7 @@ export function TbMoveRow({
           {index + 1}
         </kbd>
         <span className="grid min-w-0 flex-1 gap-[0.3125rem]">
-          <span className="truncate font-display text-[0.8125rem] font-bold uppercase leading-[1.05] tracking-[0.03em] text-txt">{move.name}</span>
+          <span className="truncate font-display text-[0.8125rem] font-bold uppercase leading-[1.05] tracking-[0.03em] text-txt">{L.move(move.name)}</span>
           <span className="flex flex-wrap items-center gap-[0.4375rem]">
             <BxType type={move.type} small />
             <BxCat cat={move.cat} />
@@ -503,6 +505,7 @@ export function TbSlotRow({
   flag?: boolean;
   className?: string;
 }) {
+  const L = useBxLabels();
   const shape = cn(
     "cut-tag cut-tag-edge [--cut-tag:9px] relative flex w-full min-w-0 items-center gap-[0.625rem] border border-solid px-[0.625rem] py-2 text-left transition-[border-color,background] duration-[140ms]",
     selected
@@ -520,7 +523,7 @@ export function TbSlotRow({
           <span className="grid min-w-0 flex-1 gap-[3px]">
             <b className="truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em] text-txt">{mon.name}</b>
             <BxTypeRow types={mon.types} small />
-            {mon.item && <small className="truncate font-mono text-[0.625rem] leading-[1.2] text-txt-dim">{mon.item}</small>}
+            {mon.item && <small className="truncate font-mono text-[0.625rem] leading-[1.2] text-txt-dim">{L.item(mon.item)}</small>}
           </span>
         </button>
       ) : (

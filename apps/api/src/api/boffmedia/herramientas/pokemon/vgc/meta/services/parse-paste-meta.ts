@@ -1,7 +1,8 @@
 ﻿import { VgcMetaSlot, StatSpread } from '@/_db/schema/Vgc';
+import { toID } from '@boffmedia/pokemon-identity';
 
 function toSpeciesId(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]/g, '');
+  return toID(name);
 }
 
 function parseSpread(line: string): StatSpread | undefined {

@@ -17,21 +17,6 @@ export const messages = {
   "es": {
     "tools": {
       "battlesim": {
-        "landing": {
-          "title": "Simulador de Combates",
-          "subtitle": "Mira repeticiones, juega contra la IA o combate en Pokémon Showdown",
-          "play": "Jugar",
-          "playDesc": "Combate contra un oponente IA",
-          "pvp": "PvP",
-          "pvpDesc": "Combate contra otros jugadores en nuestro servidor",
-          "showdown": "Showdown Online",
-          "showdownDesc": "Juega en el servidor oficial de Pokémon Showdown",
-          "replays": "Repeticiones",
-          "replaysDesc": "Mira repeticiones de combates guardados",
-          "calc": "Calculadora",
-          "calcDesc": "Calculadora de daño",
-          "resume": "Combate PvP en curso — reanudar"
-        },
         "audio": {
           "mute": "Silenciar audio",
           "unmute": "Activar audio"
@@ -65,24 +50,10 @@ export const messages = {
           "reconnecting": "Reconectando (intento {attempt}/{max})…",
           "forfeitConfirm": "¿Seguro que quieres rendirte?",
           "forfeitTitle": "Rendirse",
-          "forfeitCta": "Rendirse"
-        },
-        "dock": {
-          "waitingOpponent": "Esperando al rival…",
-          "teamPreview": "Vista previa del equipo — se enviará el orden por defecto",
-          "confirmTeam": "Confirmar equipo",
-          "switch": "Cambiar",
-          "forcedSwitch": "Cambio forzado",
-          "trapped": " (atrapado)",
-          "undo": "Deshacer",
-          "undoHint": "Cancela la elección enviada (antes de que se resuelva el turno)",
-          "aria": "Acciones de combate",
-          "mechanics": {
-            "terastallize": "Teracristalización",
-            "mega": "Mega Evolución",
-            "dynamax": "Dynamax",
-            "zmove": "Movimiento Z"
-          }
+          "forfeitCta": "Rendirse",
+          "leaveTitle": "Combate en curso",
+          "leaveConfirm": "Si sales del simulador se perderá el combate que estás jugando.",
+          "leaveCta": "Salir igualmente"
         },
         "log": {
           "label": "Registro de combate",
@@ -93,6 +64,7 @@ export const messages = {
           "filterDamage": "Daño",
           "filterSwitches": "Cambios",
           "filterField": "Campo",
+          "jumpLatest": "Ir al último",
           "collapsePrevious": "− Anteriores",
           "hidden": "Registro oculto — actívalo con el botón del ojo",
           "tab": "Registro"
@@ -126,8 +98,8 @@ export const messages = {
           "saveReplay": "Guardar repetición"
         },
         "play": {
-          "title": "Simulador de Combates",
-          "subtitle": "Juega un combate Pokémon contra un oponente IA",
+          "title": "Simulador de combates",
+          "subtitle": "Juega un combate Pokémon contra la IA",
           "start": "Empezar combate",
           "newTab": "+ Nuevo",
           "won": "Ganado",
@@ -151,9 +123,16 @@ export const messages = {
             "kick": "Simulador de combates · VGC",
             "title": "A la batalla",
             "modeLabel": "Modo de juego",
+            "names": {
+              "label": "Idioma de los nombres",
+              "auto": "Automático (como la web)",
+              "es": "Español",
+              "en": "English",
+              "hint": "Movimientos, habilidades y objetos. El resto de la interfaz sigue el idioma de la web."
+            },
             "formatLabel": "Formato",
             "launch": {
-              "ia": "Batallar",
+              "ia": "Combatir",
               "pvp": "Buscar combate",
               "showdown": "Buscar combate"
             },
@@ -179,7 +158,7 @@ export const messages = {
               "builderSub": "Crea y edita equipos",
               "replays": "Repeticiones",
               "replaysSub": "Revive tus combates",
-              "ladder": "Escalera",
+              "ladder": "Ladder",
               "ladderSub": "Clasificación global"
             }
           },
@@ -227,7 +206,6 @@ export const messages = {
           "filterAll": "Todos",
           "otherFormats": "Otros",
           "formatLabel": "Formato",
-          "nameLabel": "Nombre",
           "new": "Nuevo equipo",
           "import": "Importar",
           "export": "Exportar",
@@ -345,7 +323,7 @@ export const messages = {
             "nature": "Naturaleza",
             "evs": "EVs",
             "sp": "SP",
-            "spName": "Puntos de Estadística",
+            "spName": "Puntos de estadística",
             "ivs": "IVs",
             "advanced": "Avanzado",
             "budget": "Presupuesto",
@@ -380,6 +358,7 @@ export const messages = {
             "recents": "Recientes",
             "noResults": "Sin resultados",
             "illegal": "Ilegal",
+            "loadingSpecies": "Cargando Pokémon disponibles…",
             "loadingMoves": "Cargando movimientos legales…",
             "allTypes": "Todos",
             "typeFilter": "Filtrar por tipo",
@@ -465,12 +444,6 @@ export const messages = {
             "careful": "Cauta",
             "quirky": "Rara"
           }
-        },
-        "replay": {
-          "invalidId": "ID de repetición no válido",
-          "notFound": "Repetición no encontrada",
-          "loadFailed": "No se pudo cargar la repetición",
-          "pasteManually": "Pegar repetición manualmente"
         },
         "pvp": {
           "title": "Combate PvP",
@@ -600,7 +573,7 @@ export const messages = {
             "desolateland": "Sol abrasador",
             "raindance": "Lluvia",
             "primordialsea": "Diluvio",
-            "sandstorm": "Tormenta arena",
+            "sandstorm": "Tormenta de arena",
             "hail": "Granizo",
             "snow": "Nieve",
             "deltastream": "Turbulencias",
@@ -616,9 +589,6 @@ export const messages = {
         },
         "avatar": {
           "alt": "avatar"
-        },
-        "sprite": {
-          "altFallback": "Pokémon"
         },
         "replayError": {
           "title": "Error en la repetición",
@@ -689,6 +659,7 @@ export const messages = {
             "reserved": "Elegido",
             "noBench": "No quedan Pokémon en el banquillo",
             "forcedSwitch": "Elige quién entra",
+            "teamHint": "Tu equipo — toca un Pokémon para ver sus detalles",
             "forcedSwitchFor": "Elige quién entra por {name}",
             "rejected": "El servidor rechazó la orden. Elige de nuevo.",
             "spectating": "Estás viendo el combate como espectador",
@@ -706,7 +677,7 @@ export const messages = {
               "mega": "Mega",
               "dynamax": "Dynamax",
               "zmove": "Movimiento Z",
-              "megaHint": "Mega Evolucionar este turno",
+              "megaHint": "Megaevolucionar este turno",
               "dynamaxHint": "Dynamax durante 3 turnos",
               "zmoveHint": "Usar Movimiento Z (una vez por combate)",
               "armed": "{name} armado: pulsa un movimiento"
@@ -750,10 +721,10 @@ export const messages = {
           "fx": {
             "crit": "¡CRÍTICO!",
             "miss": "¡Falló!",
-            "super": "¡Muy eficaz!",
+            "super": "¡Supereficaz!",
             "resisted": "Poco eficaz…",
             "immune": "No afecta",
-            "tera": "¡Teracristal {type}!",
+            "tera": "¡Tera {type}!",
             "mega": "¡Megaevolución!",
             "primal": "¡Regresión primigenia!",
             "burst": "¡Ultraexplosión!",
@@ -822,8 +793,8 @@ export const messages = {
               "hp": "PS",
               "atk": "Ataque",
               "def": "Defensa",
-              "spa": "At. Esp.",
-              "spd": "Def. Esp.",
+              "spa": "Ataque Esp.",
+              "spd": "Defensa Esp.",
               "spe": "Velocidad",
               "accuracy": "Precisión",
               "evasion": "Evasión"
@@ -861,7 +832,7 @@ export const messages = {
             "tailwind": "Viento Afín",
             "safeguard": "Velo Sagrado",
             "mist": "Neblina",
-            "luckychant": "Conjuro"
+            "luckychant": "Conjuro Fortuna"
           },
           "logTx": {
             "opposing": "{name} rival",
@@ -1042,12 +1013,11 @@ export const messages = {
         "bx": {
           "spreadAllTag": "ÁREA · TODOS",
           "spreadTag": "ÁREA",
-          "teraUsedTitle": "Teracristal ya usado en este combate",
+          "teraUsedTitle": "Tera ya usado en este combate",
           "teraArmTitle": "Teracristalizar este turno",
-          "effective": "¡EFICAZ!",
-          "resisted": "resistido",
+          "effective": "¡SUPEREFICAZ!",
+          "resisted": "poco eficaz",
           "logAria": "Registro del combate",
-          "teamStatusAria": "Estado del equipo",
           "priorityNote": "La prioridad puede alterarlo",
           "noOrder": "Sin orden",
           "clearOrderAria": "Borrar orden",
@@ -1183,7 +1153,7 @@ export const messages = {
           }
         },
         "manifest": {
-          "title": "Simulador de Combates",
+          "title": "Simulador de combates",
           "description": "Juega contra la IA, combate a otros jugadores o conecta a Pokémon Showdown",
           "category": "Herramientas"
         }
@@ -1193,21 +1163,6 @@ export const messages = {
   "en": {
     "tools": {
       "battlesim": {
-        "landing": {
-          "title": "Battle Simulator",
-          "subtitle": "Watch replays, play against AI, or battle on Pokémon Showdown",
-          "play": "Play",
-          "playDesc": "Battle against an AI opponent",
-          "pvp": "PvP",
-          "pvpDesc": "Battle other players on our server",
-          "showdown": "Showdown Online",
-          "showdownDesc": "Play on the official Pokémon Showdown server",
-          "replays": "Replays",
-          "replaysDesc": "Watch saved battle replays",
-          "calc": "Calculator",
-          "calcDesc": "Damage calculator",
-          "resume": "PvP battle in progress — resume"
-        },
         "audio": {
           "mute": "Mute audio",
           "unmute": "Unmute audio"
@@ -1241,24 +1196,10 @@ export const messages = {
           "reconnecting": "Reconnecting (attempt {attempt}/{max})…",
           "forfeitConfirm": "Are you sure you want to forfeit?",
           "forfeitTitle": "Forfeit the match",
-          "forfeitCta": "Forfeit"
-        },
-        "dock": {
-          "waitingOpponent": "Waiting for opponent…",
-          "teamPreview": "Team Preview — sending default order",
-          "confirmTeam": "Confirm Team",
-          "switch": "Switch",
-          "forcedSwitch": "Forced Switch",
-          "trapped": " (trapped)",
-          "undo": "Undo",
-          "undoHint": "Cancel the submitted choice (before the turn resolves)",
-          "aria": "Battle actions",
-          "mechanics": {
-            "terastallize": "Terastallize",
-            "mega": "Mega Evolution",
-            "dynamax": "Dynamax",
-            "zmove": "Z-Move"
-          }
+          "forfeitCta": "Forfeit",
+          "leaveTitle": "Battle in progress",
+          "leaveConfirm": "Leaving the simulator will lose the battle you are playing.",
+          "leaveCta": "Leave anyway"
         },
         "log": {
           "label": "Battle log",
@@ -1269,6 +1210,7 @@ export const messages = {
           "filterDamage": "Damage",
           "filterSwitches": "Switches",
           "filterField": "Field",
+          "jumpLatest": "Jump to latest",
           "collapsePrevious": "− Previous",
           "hidden": "Log hidden — toggle with the eye button",
           "tab": "Log"
@@ -1327,6 +1269,13 @@ export const messages = {
             "kick": "Battle simulator · VGC",
             "title": "To battle",
             "modeLabel": "Game mode",
+            "names": {
+              "label": "Language of names",
+              "auto": "Automatic (match the site)",
+              "es": "Español",
+              "en": "English",
+              "hint": "Moves, abilities and items. The rest of the interface follows the site language."
+            },
             "formatLabel": "Format",
             "launch": {
               "ia": "Battle",
@@ -1403,7 +1352,6 @@ export const messages = {
           "filterAll": "All",
           "otherFormats": "Other",
           "formatLabel": "Format",
-          "nameLabel": "Name",
           "new": "New team",
           "import": "Import",
           "export": "Export",
@@ -1556,6 +1504,7 @@ export const messages = {
             "recents": "Recent",
             "noResults": "No results",
             "illegal": "Illegal",
+            "loadingSpecies": "Loading available Pokémon…",
             "loadingMoves": "Loading legal moves…",
             "allTypes": "All",
             "typeFilter": "Filter by type",
@@ -1641,12 +1590,6 @@ export const messages = {
             "careful": "Careful",
             "quirky": "Quirky"
           }
-        },
-        "replay": {
-          "invalidId": "Invalid replay ID",
-          "notFound": "Replay not found",
-          "loadFailed": "Failed to load replay",
-          "pasteManually": "Paste replay manually"
         },
         "pvp": {
           "title": "PvP Battle",
@@ -1793,9 +1736,6 @@ export const messages = {
         "avatar": {
           "alt": "avatar"
         },
-        "sprite": {
-          "altFallback": "Pokemon"
-        },
         "replayError": {
           "title": "Replay Error",
           "message": "Something went wrong loading the replay.",
@@ -1865,6 +1805,7 @@ export const messages = {
             "reserved": "Chosen",
             "noBench": "No Pokémon left on the bench",
             "forcedSwitch": "Choose who comes in",
+            "teamHint": "Your team — tap a Pokémon for its details",
             "forcedSwitchFor": "Choose who replaces {name}",
             "rejected": "The server rejected that order. Choose again.",
             "spectating": "You are watching this battle as a spectator",
@@ -2223,7 +2164,6 @@ export const messages = {
           "effective": "SUPER EFFECTIVE!",
           "resisted": "resisted",
           "logAria": "Battle log",
-          "teamStatusAria": "Team status",
           "priorityNote": "Priority can change this",
           "noOrder": "No order",
           "clearOrderAria": "Clear order",

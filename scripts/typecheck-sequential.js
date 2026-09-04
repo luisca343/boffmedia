@@ -20,6 +20,8 @@ const PACKAGES = [
   'packages/pack-schema',
   'packages/battle-core',
   'packages/asset-paths',
+  'packages/pokemon-identity',
+  'packages/pkmn-names',
   'packages/tools/kit',
   'packages/tools/minecraft',
   'packages/tools/mhwilds',

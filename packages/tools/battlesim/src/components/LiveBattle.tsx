@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ConfirmDialog, useFullscreen, cn } from '@boffmedia/ui';
+import { useToolNavGuard } from '@boffmedia/tool-kit';
 import { useToolT, BATTLESIM_NS } from '../i18n';
 import { BattleShell } from './BattleShell';
 import { BattleHeader } from './BattleHeader';
@@ -109,9 +110,24 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
   const [railOpen, setRailOpen] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('actions');
   const [confirmForfeit, setConfirmForfeit] = useState(false);
+  /** The departure the guard below is holding, or null. See `useToolNavGuard`. */
+  const [confirmLeave, setConfirmLeave] = useState<(() => void) | null>(null);
 
   const finished = state.battleComplete || state.status === 'finished';
   const live = state.status === 'active' && !finished && !spectator;
+
+  /**
+   * Leaving the TOOL mid-battle is asked about; moving around inside it is not.
+   *
+   * The distinction is not politeness, it is what actually happens: battlesim is
+   * mounted by its route group's layout and keeps its rooms in tabs, so going to
+   * the hub or the teambuilder leaves the battle running and asking would be
+   * noise. A link out of the tool unmounts the layout — the worker, the session
+   * and the turn you were halfway through go with it — and that is worth one
+   * question. `live` is the same flag the dock uses: a finished battle and a
+   * spectator's view have nothing to lose, so neither of them asks.
+   */
+  useToolNavGuard(live ? (_intent, proceed) => setConfirmLeave(() => proceed) : null);
   const chatVisible = layout === 'desktop' ? true : layout === 'tablet' ? railOpen : mobileTab === 'chat';
   const unread = useUnreadChat(chat, chatVisible && (layout === 'desktop' ? true : true));
 
@@ -229,6 +245,8 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
       <MusicController roomId={roomLabel} battleActive={!finished} />
       <BattleShell ref={setShell} layout={layout} fullscreen={isFullscreen} header={header} canvas={canvas} dock={dock}
         rail={rail} railOpen={layout === 'tablet' ? railOpen : mobileTab !== 'actions'} mobileTabs={mobileTabs} overlay={overlay}>
+        <ConfirmDialog open={confirmLeave !== null} tone="warning" title={t('connection.leaveTitle')} body={t('connection.leaveConfirm')} confirmLabel={t('connection.leaveCta')}
+          onConfirm={() => { const go = confirmLeave; setConfirmLeave(null); go?.(); }} onClose={() => setConfirmLeave(null)} />
         <ConfirmDialog open={confirmForfeit} tone="error" title={t('connection.forfeitTitle')} body={t('connection.forfeitConfirm')} confirmLabel={t('connection.forfeitCta')}
           onConfirm={() => { setConfirmForfeit(false); onForfeit?.(); }} onClose={() => setConfirmForfeit(false)} />
       </BattleShell>

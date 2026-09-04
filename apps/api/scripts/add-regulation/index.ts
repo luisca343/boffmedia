@@ -49,6 +49,12 @@ const MOD_DIR = path.resolve(
 const PROVENANCE_FILE = path.join(MOD_DIR, '.source.json');
 const REGISTRY_FILE = path.join(MOD_DIR, 'registry.generated.ts');
 const CACHE_DIR = path.join(os.tmpdir(), 'boffmedia-showdown-src');
+// Display base for the paths this script prints. All three uses are
+// `relativeImport(VGC_DIR, …)` inside a console.log, so this only affects how
+// generated-file paths are shown — never where anything is written. Running via
+// `pnpm --filter api add-regulation` puts cwd at apps/api, which is the most
+// useful thing to print paths relative to.
+const VGC_DIR = process.cwd();
 
 /**
  * Seeds the tracked set on the very first run, before .source.json exists.

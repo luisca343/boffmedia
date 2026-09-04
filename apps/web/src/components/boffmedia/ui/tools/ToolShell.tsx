@@ -7,10 +7,12 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@boffmedia/ui"
 import { useDismiss } from "@boffmedia/ui/hooks/use-dismiss"
+import { useToolChromeLocked } from "@boffmedia/tool-kit"
 import { getGameEntry, toolsVisibleTo, type GameEntry } from "@/data/games"
 import { useViewerRoles } from "@/services/useBoffSession"
 import { hubConfig } from "@/data/hub"
 import { HUB_SLUGS, hueColorOf, hueStyle } from "./tools-data"
+import { activeToolBase, useToolLinkGuard } from "./useToolLinkGuard"
 import { GameLogo } from "./GameLogo"
 import { ArtImage } from "./ArtImage"
 
@@ -97,6 +99,7 @@ function SideRail({
   onNavigate,
   pinned,
   onTogglePin,
+  hoverOpen,
 }: {
   slug: string
   groups: SideGroup[]
@@ -104,6 +107,8 @@ function SideRail({
   onNavigate?: () => void
   pinned: boolean
   onTogglePin: () => void
+  /** False while an immersive tool holds the chrome — see `ToolShell` below. */
+  hoverOpen: boolean
 }) {
   const tShell = useTranslations("toolsUi.shell")
   const hub = hubConfig[slug]
@@ -111,7 +116,10 @@ function SideRail({
   const min = !pinned
 
   const labelFade = min
-    ? "opacity-0 transition-opacity duration-200 group-hover/rail:opacity-100 group-focus-within/rail:opacity-100"
+    ? cn(
+        "opacity-0 transition-opacity duration-200 group-focus-within/rail:opacity-100",
+        hoverOpen && "group-hover/rail:opacity-100",
+      )
     : "opacity-100"
 
   return (
@@ -125,7 +133,8 @@ function SideRail({
 // is what made the tools read as a 1080p layout stretched sideways.
         "group/rail relative h-full [--ro:var(--rail-open,16.5rem)] [--rw:var(--rail-min,4.5rem)]",
         "transition-[width] duration-[340ms] ease-[cubic-bezier(0.22,1,0.36,1)]",
-        min ? "w-[var(--rw)] hover:w-[var(--ro)] focus-within:w-[var(--ro)] max-lg:w-full" : "w-[var(--ro)]",
+        min ? "w-[var(--rw)] focus-within:w-[var(--ro)] max-lg:w-full" : "w-[var(--ro)]",
+        min && hoverOpen && "hover:w-[var(--ro)]",
       )}
     >
       <div
@@ -133,8 +142,11 @@ function SideRail({
           "absolute inset-y-0 left-0 z-[30] flex flex-col overflow-hidden border-r border-solid border-line bg-[color-mix(in_srgb,var(--panel)_55%,var(--bg))]",
           "transition-[width,box-shadow] duration-[340ms] ease-[cubic-bezier(0.22,1,0.36,1)] max-lg:!w-full",
           min
-            ? "w-[var(--rw)] group-hover/rail:z-[60] group-hover/rail:w-[var(--ro)] group-hover/rail:shadow-[28px_0_80px_-34px_rgba(0,0,0,0.8)] group-focus-within/rail:z-[60] group-focus-within/rail:w-[var(--ro)]"
+            ? "w-[var(--rw)] group-focus-within/rail:z-[60] group-focus-within/rail:w-[var(--ro)]"
             : "w-[var(--ro)]",
+          min &&
+            hoverOpen &&
+            "group-hover/rail:z-[60] group-hover/rail:w-[var(--ro)] group-hover/rail:shadow-[28px_0_80px_-34px_rgba(0,0,0,0.8)]",
         )}
       >
         <div className="flex-none border-b border-solid border-line">
@@ -249,6 +261,16 @@ export function ToolShell({ slug, children }: ToolShellProps) {
   const roles = useViewerRoles()
   const [mobileOpen, setMobileOpen] = React.useState(false)
   const [pinned, setPinned] = React.useState(false)
+  /**
+   * A tool is asking for the chrome to stay still (battlesim, while a battle or
+   * a replay is on screen). The minimised rail then stops opening on HOVER
+   * only: reaching for a move button at the window's left edge is not a request
+   * for the navigation, and having 264px of it slide over the board mid-turn is
+   * the kind of interruption you cannot aim your way out of. Everything
+   * deliberate still works — the pin, the phone's menu button, and tabbing into
+   * the rail, which is a keyboard user actually asking for it.
+   */
+  const chromeLocked = useToolChromeLocked()
 
   React.useEffect(() => {
     try {
@@ -297,6 +319,15 @@ export function ToolShell({ slug, children }: ToolShellProps) {
 
   const bleed = React.useMemo(() => isBleedRoute(game, pathname), [game, pathname])
 
+  /**
+   * Let the mounted tool be asked before a link out of it throws away what the
+   * user is in the middle of — a battle in progress, today. Inert unless the
+   * tool registered a guard, and scoped to ITS routes: everything under the
+   * tool's own href keeps the tool mounted, so only a link past that boundary
+   * is a departure worth a dialog.
+   */
+  useToolLinkGuard(React.useMemo(() => activeToolBase(game, pathname), [game, pathname]))
+
   /** Group + tool for the current route, for the mobile breadcrumb. Derived from
    *  the same `groups` the rail renders, so the two can never disagree. */
   const activeCrumb = React.useMemo(() => {
@@ -325,6 +356,7 @@ export function ToolShell({ slug, children }: ToolShellProps) {
           activeHref={pathname}
           pinned={pinned}
           onTogglePin={togglePin}
+          hoverOpen={!chromeLocked}
           onNavigate={() => setMobileOpen(false)}
         />
       </aside>

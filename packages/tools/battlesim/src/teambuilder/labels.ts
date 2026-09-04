@@ -12,6 +12,7 @@
 
 import { useMemo } from "react";
 import { Dex } from "@pkmn/dex";
+import { toID } from "@boffmedia/pokemon-identity";
 
 import { useToolT, BATTLESIM_NS } from "../i18n";
 
@@ -29,8 +30,8 @@ export const TYPE_LIST = [
 const KNOWN_TYPES = new Set<string>([...TYPE_LIST, "Stellar"]);
 const KNOWN_CATS = new Set(["Physical", "Special", "Status"]);
 
-/** Showdown's id: lower-case alphanumerics only. */
-export const toId = (s: string | undefined | null) => (s ?? "").toLowerCase().replace(/[^a-z0-9]/g, "");
+/** Showdown's id: lower-case alphanumerics only. Re-exported from @boffmedia/pokemon-identity. */
+export const toId = toID;
 
 export interface TbLabels {
   stat(id: string): string;

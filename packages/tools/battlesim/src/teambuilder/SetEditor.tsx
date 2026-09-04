@@ -24,7 +24,7 @@ import { DkEmpty } from "@boffmedia/ui/datakit";
 import { handleSpriteError } from "@boffmedia/tools-pokemon";
 
 import { BsimSection, BSIM_FOCUS_CUT } from "../components/bsim-kit";
-import { BxTypeRow } from "../components/bx-kit";
+import { BxTypeRow, useBxLabels } from "../components/bx-kit";
 import { useToolT } from "../i18n";
 import { STAT_IDS, TB_NS, TYPE_LIST, canonicalGender, canonicalNature, canonicalType, toId, useTbLabels, type StatId } from "./labels";
 import { Picker, PICKER_TRIGGER, type PickerKind } from "./Picker";
@@ -49,6 +49,7 @@ export interface SetEditorProps {
 
 export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }: SetEditorProps) {
   const t = useToolT(TB_NS);
+  const L = useBxLabels();
   const labels = useTbLabels();
   const set = withSetDefaults(rawSet);
   const speciesData = set.species ? Dex.species.get(set.species) : null;
@@ -148,10 +149,12 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
   /* ── Derived ───────────────────────────────────────────────────────────── */
   const abilityOptions = (() => {
     const entries = Object.entries(sp.abilities).filter(([, name]) => Boolean(name)) as [string, string][];
-    const opts = entries.map(([slot, name]) => ({ value: name, label: name, sub: slot === "H" ? t("set.hidden") : undefined }));
+    // `value` is the English name the set is written with; `label` is what the
+    // player reads. The two are allowed to differ and must not be confused.
+    const opts = entries.map(([slot, name]) => ({ value: name, label: L.ability(name), sub: slot === "H" ? t("set.hidden") : undefined }));
     if (set.ability && !opts.some((o) => toId(o.value) === toId(set.ability))) {
       const a = Dex.abilities.get(set.ability);
-      opts.push({ value: set.ability, label: a.exists ? a.name : set.ability, sub: undefined });
+      opts.push({ value: set.ability, label: a.exists ? L.ability(a.name) : set.ability, sub: undefined });
     }
     return opts;
   })();
@@ -253,12 +256,12 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
           <div className="grid gap-[0.4375rem]">
             <TbKicker>{t("set.item")}</TbKicker>
             <div className="flex items-center gap-[0.375rem]">
-              <button ref={itemRef} type="button" onClick={() => setPicker({ kind: "item" })} className={PICKER_TRIGGER} aria-label={`${t("set.item")}: ${itemData?.exists ? itemData.name : t("set.noItem")}`}>
+              <button ref={itemRef} type="button" onClick={() => setPicker({ kind: "item" })} className={PICKER_TRIGGER} aria-label={`${t("set.item")}: ${itemData?.exists ? L.item(itemData.name) : t("set.noItem")}`}>
                 <span aria-hidden className="grid h-6 w-6 flex-none place-items-center">
                   {itemStyle ? <span style={itemStyle} className="block" /> : <Icon name="cube" size={15} className="text-txt-dim" />}
                 </span>
                 <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", itemData?.exists ? "text-txt" : "text-txt-dim")}>
-                  {itemData?.exists ? itemData.name : set.item || t("set.noItem")}
+                  {itemData?.exists ? L.item(itemData.name) : set.item || t("set.noItem")}
                 </span>
                 <Icon name="chevronDown" size={14} className="flex-none text-txt-dim" />
               </button>

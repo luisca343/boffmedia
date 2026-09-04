@@ -33,10 +33,10 @@ const STAT_ES: Record<string, string> = { atk: "Atq", def: "Def", spa: "AtE", sp
 let labels: FxLabels = {
   crit: "¡CRÍTICO!",
   miss: "¡Falló!",
-  super: "¡Muy eficaz!",
+  super: "¡Supereficaz!",
   resisted: "Poco eficaz…",
   immune: "No afecta",
-  tera: (type) => `¡Teracristal ${type}!`,
+  tera: (type) => `¡Tera ${type}!`,
   mega: "¡Megaevolución!",
   primal: "¡Regresión primigenia!",
   burst: "¡Ultraexplosión!",

@@ -26,6 +26,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { BsimWorkerRequest, BsimWorkerResponse } from "./validate.worker";
+import type { SpeciesPickerData } from "@boffmedia/battle-core";
 
 const DEBOUNCE_MS = 300;
 const CACHE_MAX = 200;
@@ -41,9 +42,11 @@ export interface TeamValidation {
 type Answer = { ok: boolean; problems: string[] };
 type MovesAnswer = { moves: Set<string>; known: boolean };
 type SpeciesAnswer = { species: Set<string>; known: boolean };
+type AllSpeciesAnswer = { species: SpeciesPickerData[]; known: boolean };
 type Listener = (answer: Answer) => void;
 type MovesListener = (answer: MovesAnswer) => void;
 type SpeciesListener = (answer: SpeciesAnswer) => void;
+type AllSpeciesListener = (answer: AllSpeciesAnswer) => void;
 
 const IDLE: TeamValidation = { ok: null, problems: [], checking: false };
 const NO_MOVES: MovesAnswer = { moves: new Set<string>(), known: false };
@@ -61,8 +64,13 @@ const movesListeners = new Map<string, Set<MovesListener>>();
 const speciesCache = new Map<string, SpeciesAnswer>();
 const speciesListeners = new Map<string, Set<SpeciesListener>>();
 
+// The all-species list is global and never changes within a session, so this
+// cache is a single entry that survives the whole session.
+const allSpeciesCache = new Map<"all-species", AllSpeciesAnswer>();
+const allSpeciesListeners = new Set<AllSpeciesListener>();
+
 /** token → which cache the reply belongs to, and under which key. */
-const inflight = new Map<number, { kind: "validate" | "moves" | "species"; key: string }>();
+const inflight = new Map<number, { kind: "validate" | "moves" | "species" | "all-species"; key: string }>();
 let worker: Worker | null = null;
 let token = 0;
 let idleTimer: ReturnType<typeof setTimeout> | null = null;
@@ -104,6 +112,10 @@ function ensureWorker(): Worker | null {
       const answer: MovesAnswer = { moves: new Set(reply.moves), known: reply.known };
       remember(movesCache, pending.key, answer);
       movesListeners.get(pending.key)?.forEach((fn) => fn(answer));
+    } else if (reply.kind === "all-species") {
+      const answer: AllSpeciesAnswer = { species: reply.species, known: reply.known };
+      allSpeciesCache.set("all-species", answer);
+      allSpeciesListeners.forEach((fn) => fn(answer));
     } else {
       const answer: Answer = { ok: reply.ok, problems: reply.problems };
       remember(cache, pending.key, answer);
@@ -348,6 +360,56 @@ export function useLegalSpecies(format: string): LegalSpeciesPool {
     setState({ species: new Set<string>(), known: false, loading: true });
     return subscribeSpecies(format, format, (answer) => setState({ ...answer, loading: false }));
   }, [format]);
+
+  return state;
+}
+
+export interface AllSpeciesPool {
+  /** All available species with picker metadata (including modded). Meaningless when `known` is false. */
+  species: SpeciesPickerData[];
+  /** Always true; included for protocol consistency. */
+  known: boolean;
+  loading: boolean;
+}
+
+const EMPTY_ALL_SPECIES: AllSpeciesPool = { species: [], known: false, loading: false };
+
+/**
+ * All available species (including Champions Megas and Teras), answered by the
+ * pooled worker. The species list is global and constant within a session.
+ *
+ * This is used by the teambuilder picker to populate its species list with all
+ * available options, which are then filtered by format legality via
+ * `useLegalSpecies`. `known: false` means the worker failed; show the
+ * unfiltered list rather than an empty picker.
+ */
+export function useAllSpecies(): AllSpeciesPool {
+  const [state, setState] = useState<AllSpeciesPool>(() => {
+    const hit = allSpeciesCache.get("all-species");
+    return hit ? { ...hit, loading: false } : { species: [], known: false, loading: true };
+  });
+
+  useEffect(() => {
+    const hit = allSpeciesCache.get("all-species");
+    if (hit) {
+      setState({ ...hit, loading: false });
+      return;
+    }
+
+    setState({ species: [], known: false, loading: true });
+
+    const listener: AllSpeciesListener = (answer) => setState({ ...answer, loading: false });
+    allSpeciesListeners.add(listener);
+
+    const asked = [...inflight.values()].some((p) => p.kind === "all-species");
+    if (!asked) {
+      send({ kind: "all-species" }, "all-species");
+    }
+
+    return () => {
+      allSpeciesListeners.delete(listener);
+    };
+  }, []);
 
   return state;
 }
