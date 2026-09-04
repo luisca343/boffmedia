@@ -1,0 +1,64 @@
+{
+  "formatVersion": 1,
+  "pack": {
+    "id": "pk_2",
+    "slug": "boff-emerald",
+    "name": "Boff Emerald",
+    "gameType": "emulator",
+    "access": {
+      "kind": "public"
+    }
+  },
+  "version": {
+    "id": "v_1",
+    "name": "1.0",
+    "createdAt": "2026-07-30T12:00:00Z",
+    "files": [
+      {
+        "path": "roms/emerald.gba",
+        "sha512": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "fileSize": 1234,
+        "env": {
+          "client": "required",
+          "server": "unsupported"
+        },
+        "source": {
+          "kind": "user-provided",
+          "hint": "Pokémon Emerald (USA, Rev 1)"
+        }
+      },
+      {
+        "path": "patches/hack.bps",
+        "sha512": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "fileSize": 1234,
+        "env": {
+          "client": "required",
+          "server": "required"
+        },
+        "source": {
+          "kind": "override",
+          "blobSha512": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      },
+      {
+        "path": "roms/hack.gba",
+        "sha512": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "fileSize": 1234,
+        "env": {
+          "client": "required",
+          "server": "unsupported"
+        },
+        "source": {
+          "kind": "patched",
+          "base": "roms/emerald.gba",
+          "patch": "patches/ghost.bps",
+          "format": "bps"
+        }
+      }
+    ],
+    "emulator": {
+      "kind": "mgba",
+      "rom": "roms/hack.gba"
+    }
+  }
+}

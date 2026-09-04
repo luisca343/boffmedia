@@ -1394,3 +1394,100 @@ mod tests {
         assert!(parse_manifest(&optional_manifest(&["mods/iris.jar"], groups)).is_ok());
     }
 }
+
+/// The Rust half of the cross-language parity harness. Its twin is
+/// `src/parity.test.ts` in packages/pack-schema, and the two read the SAME
+/// fixture directory off disk.
+///
+/// WHY IT EXISTS. Everything above this line is a rule written twice: zod owns
+/// it, `emit-schema.mjs` drops it (JSON Schema cannot carry a refinement), and
+/// this file re-implements it by hand. CLAUDE.md mandates that mirror and,
+/// until this module existed, nothing checked it — so a rule tightened on one
+/// side left the launcher installing a pack the dashboard refuses to publish,
+/// silently, in the one direction that matters to a player.
+///
+/// The verdict compared is a boolean: accepted or rejected. The two sides have
+/// honestly different error taxonomies — zod collects every issue with a path,
+/// `ManifestError` is one variant and stops at the first — and demanding those
+/// match would invent a contract neither owes the other. What they owe each
+/// other is agreeing on which manifests install.
+///
+/// The tests in `mod tests` above are NOT redundant with this: they pin the
+/// exact `ManifestError` a violation produces, which is what the installer's
+/// messages are built on. This module pins only the verdict, across languages.
+#[cfg(test)]
+mod parity {
+    use super::*;
+    use std::path::{Path, PathBuf};
+
+    /// Floors, not exact counts: adding a fixture must not require touching two
+    /// languages, but a directory that silently stops being found must fail
+    /// rather than pass with zero cases. Kept in step with `MIN_ACCEPT` /
+    /// `MIN_REJECT` in packages/pack-schema/src/parity.test.ts.
+    const MIN_ACCEPT: usize = 8;
+    const MIN_REJECT: usize = 48;
+
+    /// `CARGO_MANIFEST_DIR` is apps/desktop/src-tauri, so three levels up is the
+    /// repo root. Resolved at runtime rather than `include_str!`-ed so a fixture
+    /// added on the TypeScript side is picked up here with no Rust edit at all.
+    fn fixture_dir(verdict: &str) -> PathBuf {
+        Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../packages/pack-schema/src/__fixtures__/parity")
+            .join(verdict)
+    }
+
+    /// (name, contents), sorted, so a failure names the rule it broke.
+    fn fixtures(verdict: &str) -> Vec<(String, String)> {
+        let dir = fixture_dir(verdict);
+        let entries = std::fs::read_dir(&dir)
+            .unwrap_or_else(|e| panic!("parity fixtures missing at {}: {e}", dir.display()));
+        let mut out: Vec<(String, String)> = entries
+            .map(|e| e.expect("readable dir entry").path())
+            .filter(|p| p.extension().is_some_and(|x| x == "json"))
+            .map(|p| {
+                let name = p.file_stem().unwrap().to_string_lossy().into_owned();
+                let raw = std::fs::read_to_string(&p)
+                    .unwrap_or_else(|e| panic!("unreadable fixture {}: {e}", p.display()));
+                (name, raw)
+            })
+            .collect();
+        out.sort();
+        out
+    }
+
+    #[test]
+    fn accepts_every_manifest_the_zod_schema_accepts() {
+        let cases = fixtures("accept");
+        assert!(
+            cases.len() >= MIN_ACCEPT,
+            "expected at least {MIN_ACCEPT} accept fixtures, found {}",
+            cases.len()
+        );
+        for (name, raw) in cases {
+            if let Err(err) = parse_manifest(&raw) {
+                panic!(
+                    "parity drift on accept/{name}.json: zod accepts this manifest, \
+                     parse_manifest rejected it with {err}"
+                );
+            }
+        }
+    }
+
+    #[test]
+    fn rejects_every_manifest_the_zod_schema_rejects() {
+        let cases = fixtures("reject");
+        assert!(
+            cases.len() >= MIN_REJECT,
+            "expected at least {MIN_REJECT} reject fixtures, found {}",
+            cases.len()
+        );
+        for (name, raw) in cases {
+            if parse_manifest(&raw).is_ok() {
+                panic!(
+                    "parity drift on reject/{name}.json: zod rejects this manifest, \
+                     parse_manifest accepted it — the rule it violates is not mirrored here"
+                );
+            }
+        }
+    }
+}

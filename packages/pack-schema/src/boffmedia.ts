@@ -741,7 +741,13 @@ export const PackManifest = z
           message: `\`dependencies\` is minecraft-only (gameType is "${gameType}")`,
         })
       }
-      if (v.worlds !== undefined) {
+      // Emptiness, not presence — and the difference is not cosmetic. `worlds`
+      // reaches Rust as a plain `Vec` (the JSON Schema carries no way to say
+      // "absent"), so `undefined` and `[]` are the SAME value there and no
+      // hand-written mirror could ever tell them apart. A `!== undefined` test
+      // here would therefore reject a manifest the launcher installs happily.
+      // See __fixtures__/parity/accept/non-minecraft-empty-worlds.json.
+      if (v.worlds !== undefined && v.worlds.length > 0) {
         ctx.addIssue({
           code: "custom",
           path: ["version", "worlds"],

@@ -1,0 +1,87 @@
+{
+  "formatVersion": 1,
+  "pack": {
+    "id": "pk_1",
+    "slug": "boff-smp",
+    "name": "Boff SMP",
+    "access": {
+      "kind": "public"
+    }
+  },
+  "version": {
+    "id": "v_1",
+    "name": "1.4.2",
+    "createdAt": "2026-07-30T12:00:00Z",
+    "dependencies": {
+      "minecraft": "1.21.4",
+      "fabric-loader": "0.16.9"
+    },
+    "files": [
+      {
+        "path": "mods/sodium.jar",
+        "sha512": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "fileSize": 1234,
+        "env": {
+          "client": "required",
+          "server": "required"
+        },
+        "source": {
+          "kind": "modrinth",
+          "projectId": "AANobbMI",
+          "versionId": "xyz"
+        }
+      },
+      {
+        "path": "mods/iris.jar",
+        "sha512": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "fileSize": 1234,
+        "env": {
+          "client": "optional",
+          "server": "unsupported"
+        },
+        "source": {
+          "kind": "url",
+          "url": "https://example.com/f.jar"
+        }
+      },
+      {
+        "path": "mods/ferrite.jar",
+        "sha512": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+        "fileSize": 1234,
+        "env": {
+          "client": "optional",
+          "server": "unsupported"
+        },
+        "source": {
+          "kind": "url",
+          "url": "https://example.com/f.jar"
+        }
+      }
+    ],
+    "optionalGroups": [
+      {
+        "id": "shaders",
+        "name": "shaders",
+        "select": "atMostOne",
+        "features": [
+          {
+            "id": "iris",
+            "name": "iris",
+            "paths": [
+              "mods/iris.jar"
+            ],
+            "default": true
+          },
+          {
+            "id": "ferrite",
+            "name": "ferrite",
+            "paths": [
+              "mods/ferrite.jar"
+            ],
+            "default": true
+          }
+        ]
+      }
+    ]
+  }
+}

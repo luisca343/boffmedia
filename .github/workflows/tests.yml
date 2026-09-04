@@ -67,6 +67,12 @@ jobs:
       - name: battle-core
         run: pnpm --filter @boffmedia/battle-core test
 
+      # Half of the pack-manifest parity harness: this step runs the shared
+      # fixtures through zod, the `cargo test` job below runs the SAME files
+      # through `parse_manifest`. Neither half is meaningful alone — a rule that
+      # exists on one side only shows up as a fixture one job rejects and the
+      # other accepts. Both jobs are required checks for that reason; dropping
+      # either silently restores the drift this was built to catch.
       - name: pack-schema
         run: pnpm --filter @boffmedia/pack-schema test
 
@@ -90,6 +96,11 @@ jobs:
   # emits a rerun-if-changed for frontendDist when the directory exists — so
   # `cargo test` compiles from a bare checkout with no Node in the picture.
   # Verified against a checkout with apps/desktop/dist absent.
+  #
+  # This job is also the Rust half of the pack-manifest parity harness (see the
+  # pack-schema step above). `pack::parity` reads the fixture JSON straight off
+  # the checkout at packages/pack-schema/src/__fixtures__/parity — committed
+  # files, no Node and no build needed to get at them.
   cargo:
     name: Unit tests (cargo)
     runs-on: windows-latest

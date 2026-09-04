@@ -1,0 +1,33 @@
+{
+  "formatVersion": 1,
+  "pack": {
+    "id": "pk_4",
+    "slug": "boff-stardew",
+    "name": "Boff Stardew",
+    "gameType": "stardew",
+    "access": {
+      "kind": "public"
+    }
+  },
+  "version": {
+    "id": "v_1",
+    "name": "1.0",
+    "createdAt": "2026-07-30T12:00:00Z",
+    "files": [
+      {
+        "path": "Mods/SMAPI.zip",
+        "sha512": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "fileSize": 1234,
+        "env": {
+          "client": "required",
+          "server": "required"
+        },
+        "source": {
+          "kind": "override",
+          "blobSha512": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        }
+      }
+    ],
+    "stardew": {}
+  }
+}
