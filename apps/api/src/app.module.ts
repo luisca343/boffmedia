@@ -23,6 +23,7 @@ import { SmartRotomAppsModule } from '@api/smartrotom/apps/apps.module';
 import { SmartRotomUsersModule } from '@api/smartrotom/users/users.module';
 import { InvitesModule } from './api/wingull/invites/invites.module';
 import { BoffMediaUsersModule } from '@api/boffmedia/users/users.module';
+import { DataExportModule } from '@api/boffmedia/data-export/data-export.module';
 import { PokemonModule } from '@api/smartrotom/pokemon/pokemon.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { StarbankModule } from '@api/smartrotom/starbank/starbank.module';
@@ -120,6 +121,7 @@ import { publicPath } from '@/config/paths';
     SmartRotomAppsModule,
     SmartRotomUsersModule,
     BoffMediaUsersModule,
+    DataExportModule,
     InvitesModule,
     PokemonModule,
     StarbankModule,

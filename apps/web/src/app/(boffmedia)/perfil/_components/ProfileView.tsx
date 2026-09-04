@@ -32,6 +32,7 @@ import { useUserActivity, useUserTrophies } from "@/hooks/profile/useProfileStat
 import { ResendVerificationButton } from "@/components/boffmedia/ui/auth"
 import { useProfileEditor } from "./useProfileEditor"
 import { LinkedAccountsPanel } from "./LinkedAccountsPanel"
+import { DataExportPanel } from "./DataExportPanel"
 import { ProfileTournamentsTab } from "./ProfileTournamentsTab"
 
 // achievement category → a safe local IconName (mirrors ui/events/AchievementItem)
@@ -359,6 +360,11 @@ export function ProfileView({
                   <Empty icon="clock" title={t("activity.emptyTitle")} lead={t("activity.emptyBody")} />
                 )}
               </Panel>
+
+              {/* Below the linked accounts, because it is the same kind of
+                  thing: what the site holds about you and what you can do about
+                  it. */}
+              <DataExportPanel />
             </div>
           </div>
         </>

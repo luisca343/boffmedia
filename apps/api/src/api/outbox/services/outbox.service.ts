@@ -10,6 +10,10 @@ import { WigglypopCustodyService } from '@api/smartrotom/wigglypop/services/wigg
 import { WigglypopOrdersRepository } from '@api/smartrotom/wigglypop/repositories/wigglypop-orders.repository';
 import { WigglypopSagaService } from '@api/smartrotom/wigglypop/services/wigglypop-saga.service';
 import { MailService } from '@api/mail/mail.service';
+import {
+  DataExportService,
+  DATA_EXPORT_TOPIC,
+} from '@api/boffmedia/data-export/data-export.service';
 
 type Handler = (payload: Record<string, unknown>) => Promise<void>;
 
@@ -41,6 +45,7 @@ export class OutboxService {
     @Optional() private readonly ordersRepo?: WigglypopOrdersRepository,
     @Optional() private readonly saga?: WigglypopSagaService,
     @Optional() private readonly mail?: MailService,
+    @Optional() private readonly dataExport?: DataExportService,
   ) {
     // Handlers are registered by topic. Topics are explicit to keep the
     // mapping clear and avoid plugin-framework complexity.
@@ -76,6 +81,11 @@ export class OutboxService {
     );
     this.register('mail:send-password-reset', (payload) =>
       this.handleMailPasswordReset(payload),
+    );
+    // GDPR art. 15/20. Async because the build reads ~90 tables: doing it inside
+    // the POST is a request the proxy cuts and the user retries.
+    this.register(DATA_EXPORT_TOPIC, (payload) =>
+      this.handleDataExportBuild(payload),
     );
   }
 
@@ -193,6 +203,16 @@ export class OutboxService {
         });
         break;
     }
+  }
+
+  private async handleDataExportBuild(payload: Record<string, unknown>): Promise<void> {
+    if (!this.dataExport) {
+      throw new Error('DataExportService not wired into OutboxModule');
+    }
+    const { exportId, userId } = payload as { exportId: number; userId: number };
+    // `build` stamps the row `failed` before rethrowing, so the user sees the
+    // outcome immediately while the outbox still retries with backoff.
+    await this.dataExport.build(exportId, userId);
   }
 
   private async handleWigglypopSettle(payload: Record<string, unknown>): Promise<void> {

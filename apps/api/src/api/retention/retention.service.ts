@@ -3,6 +3,8 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
 import { RetentionRepository } from './repositories/retention.repository';
+import { UserErasureService } from './user-erasure.service';
+import { DataExportService } from '@api/boffmedia/data-export/data-export.service';
 
 /**
  * Daily housekeeping: purges data beyond its retention window.
@@ -14,12 +16,23 @@ import { RetentionRepository } from './repositories/retention.repository';
  * fetch, so nothing depends on this having run. The queries live in
  * `RetentionRepository`; a service never talks to Drizzle directly. Failure
  * must never crash the scheduler tick.
+ *
+ * One exception to "nothing depends on this having run": the erasure step below
+ * hard-deletes accounts, which nothing else in the codebase will ever do. If
+ * this tick stops firing, soft-deleted accounts accumulate silently — the exact
+ * state A18 describes.
+ *
+ * Assumes a SINGLE API instance (owner decision Q9, 2026-09-04). No distributed
+ * lock, deliberately: two schedulers would claim the same due rows and the loser
+ * would fail on rows the winner already deleted.
  */
 @Injectable()
 export class RetentionService {
   constructor(
     private readonly logger: Logger,
     private readonly repo: RetentionRepository,
+    private readonly erasure: UserErasureService,
+    private readonly dataExport: DataExportService,
   ) {}
 
   @Cron(CronExpression.EVERY_DAY_AT_3AM)
@@ -86,6 +99,19 @@ export class RetentionService {
         );
         if (deleted > 0) summary.push(`note_versions: -${deleted}`);
       }
+
+      // GDPR export archives: a full copy of one person's data sitting on disk,
+      // so the window is short and the file is unlinked before the row forgets
+      // its name.
+      const purgedExports = await this.dataExport.purgeExpired(now);
+      if (purgedExports > 0) summary.push(`data_exports: -${purgedExports}`);
+
+      // A18 — soft-deleted accounts were kept forever. Last in the sweep on
+      // purpose: it is the only step that hard-deletes rows other steps still
+      // reference, so it runs against a tree the rest of the pass has already
+      // trimmed.
+      const erased = await this.erasure.sweep(now);
+      if (erased > 0) summary.push(`deleted_users: -${erased}`);
 
       if (summary.length > 0) {
         (this.logger as any).info(`Retention sweep: ${summary.join(', ')}`);

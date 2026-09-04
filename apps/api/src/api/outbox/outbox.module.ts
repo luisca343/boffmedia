@@ -6,6 +6,7 @@ import { NotificationsModule } from '@api/boffmedia/notifications/notifications.
 import { TournamentsModule } from '@api/boffmedia/tournaments/tournaments.module';
 import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
 import { MailModule } from '@api/mail/mail.module';
+import { DataExportModule } from '@api/boffmedia/data-export/data-export.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { MailModule } from '@api/mail/mail.module';
     forwardRef(() => TournamentsModule),
     forwardRef(() => WigglypopModule),
     MailModule,
+    forwardRef(() => DataExportModule),
   ],
   providers: [OutboxService, OutboxRepository],
   exports: [OutboxService, OutboxRepository],

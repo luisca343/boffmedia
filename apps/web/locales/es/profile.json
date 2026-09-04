@@ -156,6 +156,25 @@
     "emailUnverified": {
       "title": "Correo sin verificar",
       "lead": "Verifica tu correo para poder autorizar la app y recuperar tu cuenta si pierdes la contraseña."
+    },
+    "dataExport": {
+      "title": "Tus datos",
+      "lead": "Puedes pedir una copia de todo lo que guardamos sobre tu cuenta. La preparamos en segundo plano y te la damos en un único archivo JSON.",
+      "scope": "Incluye solo lo que es tuyo. Los mensajes que escribió otra persona, aunque estén en tu conversación o bajo tu hilo, son datos suyos y no aparecen en el archivo.",
+      "request": "Pedir mis datos",
+      "requestAgain": "Pedirlos de nuevo",
+      "queued": "Estamos preparando tus datos. Te avisaremos aquí cuando estén listos.",
+      "preparingTitle": "Preparando tu copia",
+      "preparingBody": "Esto puede tardar unos minutos. Puedes cerrar la página: seguirá preparándose.",
+      "readyTitle": "Tu copia está lista",
+      "readyBody": "Podrás descargarla hasta el {date}. Después se borrará del servidor.",
+      "download": "Descargar",
+      "downloadFailed": "No hemos podido descargar el archivo. Vuelve a intentarlo.",
+      "expiredTitle": "La copia ha caducado",
+      "expiredBody": "El archivo se ha borrado del servidor. Puedes volver a pedirlo cuando quieras.",
+      "failedTitle": "Algo ha fallado",
+      "failedBody": "No hemos podido preparar tu copia. Vuelve a pedirla; si sigue fallando, escríbenos.",
+      "failed": "No hemos podido pedir tus datos."
     }
   }
 }

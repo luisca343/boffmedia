@@ -156,6 +156,25 @@
     "emailUnverified": {
       "title": "Email not verified",
       "lead": "Verify your email so you can authorize the app and recover your account if you lose your password."
+    },
+    "dataExport": {
+      "title": "Your data",
+      "lead": "You can ask for a copy of everything we hold about your account. We prepare it in the background and hand it back as a single JSON file.",
+      "scope": "It contains only what is yours. Messages someone else wrote — even inside your conversation or under your thread — are their data and are not in the file.",
+      "request": "Request my data",
+      "requestAgain": "Request it again",
+      "queued": "We are preparing your data. We will tell you here when it is ready.",
+      "preparingTitle": "Preparing your copy",
+      "preparingBody": "This can take a few minutes. You can close the page — it will keep going.",
+      "readyTitle": "Your copy is ready",
+      "readyBody": "You can download it until {date}. After that it is deleted from the server.",
+      "download": "Download",
+      "downloadFailed": "We could not download the file. Please try again.",
+      "expiredTitle": "This copy has expired",
+      "expiredBody": "The file has been deleted from the server. You can request a new one whenever you like.",
+      "failedTitle": "Something went wrong",
+      "failedBody": "We could not prepare your copy. Request it again; if it keeps failing, get in touch.",
+      "failed": "We could not request your data."
     }
   }
 }

@@ -55,3 +55,21 @@ export function uploadsPath(...segments: string[]): string {
     ...segments,
   );
 }
+
+/**
+ * Absolute path inside the GDPR data-export store (`DATA_EXPORT_ROOT`, else
+ * `<cwd>/var/exports`).
+ *
+ * Separate from {@link uploadsPath} on purpose, and the separation is the whole
+ * point: `var/uploads` is mounted at `/uploads` by `express.static`, so anything
+ * written there is readable by anyone who can guess the name. An export archive
+ * is every row the system holds about one person in a single file — it is only
+ * ever handed back by an authenticated route that re-checks ownership, and it
+ * must never be reachable by URL.
+ */
+export function dataExportPath(...segments: string[]): string {
+  return join(
+    env.DATA_EXPORT_ROOT ?? join(process.cwd(), 'var', 'exports'),
+    ...segments,
+  );
+}
