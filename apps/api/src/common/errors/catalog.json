@@ -97,6 +97,10 @@
       "es": "No tienes acceso a este grupo.",
       "where": "smartrotom/chatapp/services/group.service.ts"
     },
+    "CHAT_MEMBERSHIP_FIXED": {
+      "es": "La lista de miembros de este chat no se puede modificar.",
+      "where": "smartrotom/chatapp/services/group.service.ts"
+    },
     "CHAT_MESSAGE_NOT_DELETABLE": {
       "es": "No puedes eliminar este mensaje.",
       "where": "smartrotom/chatapp/services/message.service.ts"
@@ -105,10 +109,6 @@
       "es": "No puedes editar este mensaje.",
       "where": "smartrotom/chatapp/services/message.service.ts"
     },
-    "CHAT_MEMBERSHIP_FIXED": {
-      "es": "La lista de miembros de este chat no se puede modificar.",
-      "where": "smartrotom/chatapp/services/group.service.ts"
-    },
     "CHAT_NOT_FOUND": {
       "es": "No se encontró el chat.",
       "where": "smartrotom/chatapp"
@@ -116,6 +116,66 @@
     "CHAT_NOT_MEMBER": {
       "es": "No formas parte de este chat.",
       "where": "smartrotom/chatapp"
+    },
+    "DATA_EXPORT_EXPIRED": {
+      "es": "Esta copia de tus datos ha caducado y se ha borrado. Puedes volver a pedirla.",
+      "where": "api/boffmedia/data-export/data-export.service.ts"
+    },
+    "DATA_EXPORT_NOT_READY": {
+      "es": "Todavía estamos preparando tus datos. Te avisaremos cuando puedas descargarlos.",
+      "where": "api/boffmedia/data-export/data-export.service.ts"
+    },
+    "DATA_EXPORT_TOO_SOON": {
+      "es": "Ya has pedido tus datos hace poco. Espera un poco antes de volver a pedirlos.",
+      "where": "api/boffmedia/data-export/data-export.service.ts"
+    },
+    "EVENT_DELETE_BLOCKED_BY_TOURNAMENT": {
+      "es": "No se puede eliminar este evento: tiene un torneo anexo. Elimina o desvincula el torneo primero.",
+      "where": "boffmedia/events/services/events.service.ts"
+    },
+    "EVENT_LIFECYCLE_FORWARD_ONLY": {
+      "es": "El ciclo de vida del evento solo avanza. Marca «reabrir» si de verdad quieres retrocederlo.",
+      "where": "boffmedia/events/services/events.service.ts"
+    },
+    "EVENT_REOPEN_BLOCKED_BY_RANDOMIZER": {
+      "es": "No se puede reabrir: el evento tiene un randomizer que ya no es borrador. Ciérralo o elimínalo antes.",
+      "where": "boffmedia/events/services/events.service.ts"
+    },
+    "MATCH_AMENDMENT_CONFLICT": {
+      "es": "La partida fue corregida por otro administrador. Vuelve a cargarla antes de corregirla de nuevo.",
+      "where": "boffmedia/tournaments/services/matches.service.ts"
+    },
+    "MATCH_SETTLED_CONCURRENTLY": {
+      "es": "La partida se resolvió mientras enviabas el resultado. Vuelve a cargarla antes de corregirla.",
+      "where": "boffmedia/tournaments/services/matches.service.ts"
+    },
+    "MODERATION_AUTHOR_UNKNOWN": {
+      "es": "No hemos podido identificar a quien publicó este contenido.",
+      "where": "boffmedia/moderation/moderation.service.ts"
+    },
+    "MODERATION_CONTENT_BANNED": {
+      "es": "No puedes publicar contenido mientras dure tu sanción.",
+      "where": "boffmedia/moderation/moderation.service.ts"
+    },
+    "MODERATION_CONTENT_NOT_FOUND": {
+      "es": "Este contenido ya no existe.",
+      "where": "boffmedia/moderation/moderation.service.ts"
+    },
+    "MODERATION_CONTENT_TYPE_UNKNOWN": {
+      "es": "Este tipo de contenido no se puede reportar.",
+      "where": "boffmedia/moderation/moderation.service.ts"
+    },
+    "MODERATION_NOT_HIDDEN": {
+      "es": "Este contenido no lo ocultó el equipo de moderación.",
+      "where": "boffmedia/moderation/moderation.service.ts"
+    },
+    "MODERATION_REPORT_NOT_FOUND": {
+      "es": "No hay ningún reporte abierto sobre este contenido.",
+      "where": "boffmedia/moderation/moderation.service.ts"
+    },
+    "MODERATION_SELF_REPORT": {
+      "es": "No puedes reportar tu propio contenido.",
+      "where": "boffmedia/moderation/moderation.service.ts"
     },
     "SERVICE_DATABASE_UNAVAILABLE": {
       "es": "El servicio no está disponible ahora mismo. Vuelve a intentarlo en unos minutos.",
@@ -149,36 +209,12 @@
       "es": "El check-in no está abierto.",
       "where": "boffmedia/tournaments/services/registration.service.ts"
     },
-    "TOURNAMENT_TEAMSHEET_LOCKED": {
-      "es": "Las listas de equipo están bloqueadas: el torneo ya ha empezado.",
-      "where": "boffmedia/tournaments/services/match-report.service.ts"
-    },
-    "EVENT_LIFECYCLE_FORWARD_ONLY": {
-      "es": "El ciclo de vida del evento solo avanza. Marca «reabrir» si de verdad quieres retrocederlo.",
-      "where": "boffmedia/events/services/events.service.ts"
-    },
-    "EVENT_REOPEN_BLOCKED_BY_RANDOMIZER": {
-      "es": "No se puede reabrir: el evento tiene un randomizer que ya no es borrador. Ciérralo o elimínalo antes.",
-      "where": "boffmedia/events/services/events.service.ts"
+    "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": {
+      "es": "Este torneo pertenece a un evento: únete al evento antes de inscribirte.",
+      "where": "boffmedia/tournaments/services/registration.service.ts"
     },
     "TOURNAMENT_PARTICIPANT_IN_BRACKET": {
       "es": "Ese participante ya está en el cuadro. Cambia su estado a retirado o descalificado en vez de borrarlo.",
-      "where": "boffmedia/tournaments/services/registration.service.ts"
-    },
-    "MATCH_SETTLED_CONCURRENTLY": {
-      "es": "La partida se resolvió mientras enviabas el resultado. Vuelve a cargarla antes de corregirla.",
-      "where": "boffmedia/tournaments/services/matches.service.ts"
-    },
-    "MATCH_AMENDMENT_CONFLICT": {
-      "es": "La partida fue corregida por otro administrador. Vuelve a cargarla antes de corregirla de nuevo.",
-      "where": "boffmedia/tournaments/services/matches.service.ts"
-    },
-    "TOURNAMENT_TEAMSHEET_REQUIRED": {
-      "es": "Envía tu lista de equipo antes de hacer check-in.",
-      "where": "boffmedia/tournaments/services/registration.service.ts"
-    },
-    "TOURNAMENT_EVENT_MEMBERSHIP_REQUIRED": {
-      "es": "Este torneo pertenece a un evento: únete al evento antes de inscribirte.",
       "where": "boffmedia/tournaments/services/registration.service.ts"
     },
     "TOURNAMENT_PROPOSAL_ALREADY_EXISTS": {
@@ -197,13 +233,17 @@
       "es": "La propuesta ya se resolvió mientras enviabas la disputa.",
       "where": "boffmedia/tournaments/services/match-report.service.ts"
     },
-    "EVENT_DELETE_BLOCKED_BY_TOURNAMENT": {
-      "es": "No se puede eliminar este evento: tiene un torneo anexo. Elimina o desvincula el torneo primero.",
-      "where": "boffmedia/events/services/events.service.ts"
-    },
     "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": {
       "es": "No se puede cambiar un torneo cuyo evento padre ya ha finalizado.",
       "where": "boffmedia/tournaments/services/tournaments.service.ts"
+    },
+    "TOURNAMENT_TEAMSHEET_LOCKED": {
+      "es": "Las listas de equipo están bloqueadas: el torneo ya ha empezado.",
+      "where": "boffmedia/tournaments/services/match-report.service.ts"
+    },
+    "TOURNAMENT_TEAMSHEET_REQUIRED": {
+      "es": "Envía tu lista de equipo antes de hacer check-in.",
+      "where": "boffmedia/tournaments/services/registration.service.ts"
     }
   }
 }

@@ -33,11 +33,21 @@ export const ApiErrorCode = {
   CHAT_MESSAGE_NOT_EDITABLE: 'CHAT_MESSAGE_NOT_EDITABLE',
   CHAT_NOT_FOUND: 'CHAT_NOT_FOUND',
   CHAT_NOT_MEMBER: 'CHAT_NOT_MEMBER',
+  DATA_EXPORT_EXPIRED: 'DATA_EXPORT_EXPIRED',
+  DATA_EXPORT_NOT_READY: 'DATA_EXPORT_NOT_READY',
+  DATA_EXPORT_TOO_SOON: 'DATA_EXPORT_TOO_SOON',
   EVENT_DELETE_BLOCKED_BY_TOURNAMENT: 'EVENT_DELETE_BLOCKED_BY_TOURNAMENT',
   EVENT_LIFECYCLE_FORWARD_ONLY: 'EVENT_LIFECYCLE_FORWARD_ONLY',
   EVENT_REOPEN_BLOCKED_BY_RANDOMIZER: 'EVENT_REOPEN_BLOCKED_BY_RANDOMIZER',
   MATCH_AMENDMENT_CONFLICT: 'MATCH_AMENDMENT_CONFLICT',
   MATCH_SETTLED_CONCURRENTLY: 'MATCH_SETTLED_CONCURRENTLY',
+  MODERATION_AUTHOR_UNKNOWN: 'MODERATION_AUTHOR_UNKNOWN',
+  MODERATION_CONTENT_BANNED: 'MODERATION_CONTENT_BANNED',
+  MODERATION_CONTENT_NOT_FOUND: 'MODERATION_CONTENT_NOT_FOUND',
+  MODERATION_CONTENT_TYPE_UNKNOWN: 'MODERATION_CONTENT_TYPE_UNKNOWN',
+  MODERATION_NOT_HIDDEN: 'MODERATION_NOT_HIDDEN',
+  MODERATION_REPORT_NOT_FOUND: 'MODERATION_REPORT_NOT_FOUND',
+  MODERATION_SELF_REPORT: 'MODERATION_SELF_REPORT',
   SERVICE_DATABASE_UNAVAILABLE: 'SERVICE_DATABASE_UNAVAILABLE',
   TAXI_INSUFFICIENT_FUNDS: 'TAXI_INSUFFICIENT_FUNDS',
   TAXI_IN_DUNGEON_RUN: 'TAXI_IN_DUNGEON_RUN',
@@ -102,6 +112,12 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   CHAT_MESSAGE_NOT_EDITABLE: 'No puedes editar este mensaje.',
   CHAT_NOT_FOUND: 'No se encontró el chat.',
   CHAT_NOT_MEMBER: 'No formas parte de este chat.',
+  DATA_EXPORT_EXPIRED:
+    'Esta copia de tus datos ha caducado y se ha borrado. Puedes volver a pedirla.',
+  DATA_EXPORT_NOT_READY:
+    'Todavía estamos preparando tus datos. Te avisaremos cuando puedas descargarlos.',
+  DATA_EXPORT_TOO_SOON:
+    'Ya has pedido tus datos hace poco. Espera un poco antes de volver a pedirlos.',
   EVENT_DELETE_BLOCKED_BY_TOURNAMENT:
     'No se puede eliminar este evento: tiene un torneo anexo. Elimina o desvincula el torneo primero.',
   EVENT_LIFECYCLE_FORWARD_ONLY:
@@ -112,6 +128,17 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
     'La partida fue corregida por otro administrador. Vuelve a cargarla antes de corregirla de nuevo.',
   MATCH_SETTLED_CONCURRENTLY:
     'La partida se resolvió mientras enviabas el resultado. Vuelve a cargarla antes de corregirla.',
+  MODERATION_AUTHOR_UNKNOWN:
+    'No hemos podido identificar a quien publicó este contenido.',
+  MODERATION_CONTENT_BANNED:
+    'No puedes publicar contenido mientras dure tu sanción.',
+  MODERATION_CONTENT_NOT_FOUND: 'Este contenido ya no existe.',
+  MODERATION_CONTENT_TYPE_UNKNOWN:
+    'Este tipo de contenido no se puede reportar.',
+  MODERATION_NOT_HIDDEN: 'Este contenido no lo ocultó el equipo de moderación.',
+  MODERATION_REPORT_NOT_FOUND:
+    'No hay ningún reporte abierto sobre este contenido.',
+  MODERATION_SELF_REPORT: 'No puedes reportar tu propio contenido.',
   SERVICE_DATABASE_UNAVAILABLE:
     'El servicio no está disponible ahora mismo. Vuelve a intentarlo en unos minutos.',
   TAXI_INSUFFICIENT_FUNDS: 'No tienes saldo suficiente para este viaje.',
