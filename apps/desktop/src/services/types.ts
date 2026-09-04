@@ -254,6 +254,11 @@ export type Settings = {
    *  allowlist refuses stays visible in the field instead of vanishing as
    *  the player types it. Never contains `-Xmx` — that is `memoryMib`. */
   jvmArgs: string[]
+  /** Whether the app may send crash reports. OPT-IN: false unless the player
+   *  turned it on, and `#[serde(default)]` on the Rust side means an existing
+   *  settings.json - written before this option existed - loads as false too.
+   *  Nothing is sent while it is false; see services/crashReports.ts. */
+  crashReports: boolean
 }
 
 /** The offered zoom steps. A closed set rather than a free number so every value

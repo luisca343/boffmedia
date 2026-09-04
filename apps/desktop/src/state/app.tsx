@@ -3,6 +3,7 @@ import * as React from "react";
 import { toast } from "@boffmedia/ui";
 
 import { setLocale, translate } from "../i18n";
+import { setCrashReporting } from "../services/crashReports";
 import {
   setToolBackendReachable,
   setToolSessionAccount,
@@ -1680,6 +1681,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         // Before the reveal, so the first frame the player sees is already at
         // their scale rather than snapping a moment later.
         void applyUiScale(settings.uiScale ?? 1);
+        // The opt-in gate. Until this runs the flag is false, so anything that
+        // crashes before settings load is dropped rather than sent - which is
+        // the right way round for a consent switch.
+        setCrashReporting(settings.crashReports === true);
       })
       .catch(() => {
         /* defaults are a working launcher; a read failure is not fatal */
@@ -1700,6 +1705,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // Applied immediately, not on the debounced save: the picker has to show
       // its effect as it is used, and zoom is free to set.
       if (patch.uiScale !== undefined) void applyUiScale(patch.uiScale);
+      // Applied immediately for the same reason as the zoom, and one more:
+      // switching reporting OFF has to stop it now, not after the 300 ms save
+      // debounce. A consent toggle that lags is a consent toggle that lies.
+      if (patch.crashReports !== undefined) setCrashReporting(patch.crashReports);
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(() => {
         void settingsSet(next).catch((err: { message?: string }) => {

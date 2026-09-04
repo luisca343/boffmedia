@@ -199,6 +199,9 @@ export const MOCK_SETTINGS: Settings = {
   // Non-empty in the browser mock so `dev:renderer` exercises the inherit path
   // and the flag chips actually render without a desktop build.
   jvmArgs: ["-XX:+UseG1GC"],
+  // Off, like the real default: browser mode must not be the one place where
+  // reporting looks enabled.
+  crashReports: false,
 }
 
 /** Browser-mode library. The desktop equivalent is `loadPackEntries`, which

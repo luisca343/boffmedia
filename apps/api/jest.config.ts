@@ -28,6 +28,9 @@ module.exports = {
     collectCoverageFrom: [
       'src/**/*.ts',
       '!src/**/*.spec.ts',
+      // Test-only helpers. Shipped under src/ so specs can reach them through
+      // the '@/' alias, but they are scaffolding, not code under test.
+      '!src/_testing/**',
       '!src/**/*.e2e-spec.ts',
       '!src/main.ts',
       '!src/**/*.entity.ts',
