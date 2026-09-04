@@ -21,6 +21,7 @@ import "@boffmedia/tailwind-config/base.css"
 
 import { useEffect } from "react"
 import { AlertTriangle, RefreshCw, Home } from "lucide-react"
+import { reportBoundaryError } from "@/lib/sentry"
 
 interface GlobalErrorProps {
   error: Error & { digest?: string }
@@ -30,6 +31,11 @@ interface GlobalErrorProps {
 export default function GlobalError({ error, reset }: GlobalErrorProps) {
   useEffect(() => {
     console.error(error)
+    // Safe to call from here despite the no-providers rule above: `reportBoundaryError`
+    // reads one build-inlined env var and touches no context. A crash caught by
+    // THIS boundary is the most severe kind the app has — a root provider threw
+    // — so it is the one that must never be silently dropped.
+    reportBoundaryError(error, { boundary: "global-error", digest: error.digest })
   }, [error])
 
   return (

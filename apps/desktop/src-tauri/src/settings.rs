@@ -86,6 +86,15 @@ pub struct Settings {
     /// `#[serde(default)]` so a settings.json without the key loads unchanged.
     #[serde(default)]
     pub jvm_args: Vec<String>,
+    /// Whether the app may send crash reports. OPT-IN, so `#[serde(default)]`
+    /// (false) is load-bearing twice over: a settings.json written before this
+    /// option existed must load as OFF, and so must a hand-edited file that
+    /// drops the key. Consent is never inferred from a missing field.
+    ///
+    /// Read by `crash_reports::set_enabled` at startup and on every save; the
+    /// renderer keeps its own copy of the same flag.
+    #[serde(default)]
+    pub crash_reports: bool,
 }
 
 /// 1.0. Deliberately not "whatever the OS DPI suggests": Tauri already applies
@@ -137,6 +146,9 @@ impl Default for Settings {
             // Empty, not a curated GC preset: a default the player never chose
             // is a default nobody can debug when the game behaves oddly.
             jvm_args: Vec::new(),
+            // Off. The only defensible default for something that sends data
+            // off the player's machine.
+            crash_reports: false,
         }
     }
 }
@@ -284,6 +296,9 @@ pub fn settings_get(app: tauri::AppHandle) -> Settings {
 #[tauri::command]
 pub fn settings_set(app: tauri::AppHandle, settings: Settings) -> Result<Settings, InstallFailure> {
     save(&app, &settings)?;
+    // Applied on the save rather than only at the next start: a consent toggle
+    // that takes effect on relaunch is a consent toggle that lies.
+    crate::crash_reports::set_enabled(settings.crash_reports);
     Ok(settings)
 }
 
@@ -359,6 +374,8 @@ mod tests {
         // Automatic sizing must default OFF for an existing player: silently
         // re-sizing a heap they tuned is a change they cannot explain.
         assert!(!s.memory_auto);
+        // And consent is never inherited from a file that predates the option.
+        assert!(!s.crash_reports);
     }
 
     #[test]
@@ -385,6 +402,7 @@ mod tests {
             "memoryAuto",
             "packLayout",
             "backupBeforeUpdate",
+            "crashReports",
         ] {
             assert!(raw.contains(key), "missing {key} in {raw}");
         }

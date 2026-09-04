@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/primitives/button";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import Link from "next/link";
 import { FloatingBackground } from "./_components/layout/FloatingBackground";
+import { reportBoundaryError } from "@/lib/sentry";
 
 interface ErrorPageProps {
   error: Error & { digest?: string };
@@ -17,6 +18,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
 
   useEffect(() => {
     console.error(error);
+    reportBoundaryError(error, { boundary: "boffmedia", digest: error.digest });
   }, [error]);
 
   return (

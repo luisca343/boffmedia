@@ -12,6 +12,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import {
+  initSentry,
+  captureApiException,
+  flushSentry,
+} from './common/observability/sentry';
 import { ApiResponseEntity } from './common/entities/api-response.entity';
 import { Logger } from 'nestjs-pino';
 import { publicPath, uploadsPath } from '@/config/paths';
@@ -58,7 +63,14 @@ function installProcessGuards(): void {
         err: { message: error?.message, stack: error?.stack },
       }),
     );
-    process.exit(1);
+    captureApiException(error, { mechanism: 'uncaughtException' });
+    // The ONLY place a flush is warranted: the process is about to leave, and
+    // an event still in Sentry's buffer dies with it — which is exactly the
+    // class of crash we most want to see. `flushSentry` resolves immediately
+    // when Sentry is off, and the timer below is the backstop for a flush that
+    // never settles, so the exit path is unchanged on a box with no DSN.
+    setTimeout(() => process.exit(1), 2500).unref();
+    void flushSentry(2000).then(() => process.exit(1));
   });
 
   process.on('unhandledRejection', (reason: unknown) => {
@@ -71,10 +83,14 @@ function installProcessGuards(): void {
         err: { message: error?.message ?? String(reason), stack: error?.stack },
       }),
     );
+    captureApiException(reason, { mechanism: 'unhandledRejection' });
   });
 }
 
 async function bootstrap() {
+  // Before the guards, so a throw inside them is still reported, and before
+  // NestFactory, so a failure to build the module graph is too.
+  initSentry();
   installProcessGuards();
 
   const app = await NestFactory.create(AppModule, { bufferLogs: true });

@@ -1368,6 +1368,25 @@ export function Settings() {
               </span>
             </div>
           </Panel>
+
+          {/* Crash reports (audit X5). OPT-IN, and the copy has to say what is
+            sent and what is not before the switch is worth anything: a toggle
+            labelled only "send diagnostics" asks for consent to something the
+            player cannot picture. Placed under App rather than in its own
+            section on purpose - it is a property of the app, and a section of
+            one switch would read as more important than the update check. */}
+          <Panel title={t("crashReports.title")}>
+            <Toggle
+              on={settings.crashReports === true}
+              onChange={(crashReports) => patchSettings({ crashReports })}
+              label={t("crashReports.toggle")}
+            />
+            <p className="mt-2 text-xs text-txt-dim">{t("crashReports.sent")}</p>
+            <p className="mt-1 text-xs text-txt-dim">
+              {t("crashReports.notSent")}
+            </p>
+            <p className="mt-2 text-xs text-txt-dim">{t("crashReports.hint")}</p>
+          </Panel>
         </Section>
         </div>
       </div>

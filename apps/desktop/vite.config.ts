@@ -1,10 +1,16 @@
 import react from "@vitejs/plugin-react"
+import { createRequire } from "node:module"
 import { resolve } from "node:path"
 import { defineConfig } from "vite"
 
 import { isBundledAsset } from "./src/bundled-assets.generated"
 
 const host = process.env.TAURI_DEV_HOST
+
+// Release tag for the opt-in crash reports (audit X5). Injected from
+// package.json rather than read from an env var, so a build cannot ship events
+// tagged "dev" because whoever ran it forgot to export something.
+const APP_VERSION = createRequire(import.meta.url)("./package.json").version
 
 /**
  * Where `dev:renderer` borrows the shared asset tree from.
@@ -41,6 +47,12 @@ export default defineConfig({
   // them with Vite's banner.
   clearScreen: false,
   envPrefix: ["VITE_", "TAURI_ENV_"],
+  // Substituted, not declared in .env: it is derived, and there is nothing for
+  // anyone to configure. `VITE_SENTRY_DSN` stays a real env var — see
+  // src/services/crashReports.ts for why an absent one means "never load".
+  define: {
+    "import.meta.env.VITE_APP_VERSION": JSON.stringify(APP_VERSION),
+  },
   server: {
     // 5273 rather than Vite's default 5173: the web app and the launcher get
     // run at the same time and must not fight over a port.

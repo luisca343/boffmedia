@@ -128,6 +128,13 @@ const es = {
       backupBeforeUpdate: "Hacer copia antes de actualizar",
       backupBeforeUpdateHint: "Guarda automáticamente una copia de los mundos y la configuración antes de descargar una nueva versión de un pack.",
     },
+    crashReports: {
+      title: "Informes de errores",
+      toggle: "Enviar informes de errores automáticamente",
+      sent: "Se envía: el mensaje de error, en qué parte de la app ocurrió, la versión de la app y tu sistema operativo (Windows, macOS o Linux).",
+      notSent: "No se envía: tu correo, tu cuenta de Minecraft ni su UUID, tus contraseñas, el nombre de tu usuario de Windows ni las rutas de tus carpetas, y nada de lo que escribas en la app.",
+      hint: "Está desactivado salvo que lo actives tú. Puedes desactivarlo cuando quieras y deja de enviarse al instante.",
+    },
     updates: {
       title: "Actualizaciones",
       installed: "Versión instalada",
@@ -1491,6 +1498,13 @@ const en = {
       keepLogs: "Keep the log between sessions",
       backupBeforeUpdate: "Backup before updating",
       backupBeforeUpdateHint: "Automatically saves a backup of worlds and config before downloading a new version of a pack.",
+    },
+    crashReports: {
+      title: "Crash reports",
+      toggle: "Send crash reports automatically",
+      sent: "What is sent: the error message, which part of the app it happened in, the app version, and your operating system (Windows, macOS or Linux).",
+      notSent: "What is not sent: your email, your Minecraft account or its UUID, your passwords, your Windows user name or any folder paths, and nothing you type into the app.",
+      hint: "Off unless you turn it on. You can turn it off at any time and sending stops immediately.",
     },
     updates: {
       title: "Updates",

@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { Request, Response } from 'express';
 import { Logger } from 'nestjs-pino';
+import { captureApiException } from '../observability/sentry';
 
 interface ErrorResponse {
   statusCode: number;
@@ -82,6 +83,10 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         },
         'Unhandled exception outside an HTTP context',
       );
+      // No status code to reason about out here, so nothing is "expected":
+      // every throw that reaches this branch is a defect in a Discord listener
+      // or another external context and is worth reporting.
+      captureApiException(exception, { mechanism: contextType || 'unknown' });
       return true;
     }
 
@@ -103,6 +108,23 @@ export class GlobalExceptionFilter implements ExceptionFilter {
         },
         'Unhandled exception',
       );
+
+      // The one rule that keeps this signal usable: a catalogued error is an
+      // ANSWER, not a fault. Every code in common/errors/catalog.json is a 4xx
+      // the API meant to return — "insufficient funds", "code already used" —
+      // and those are excluded by the >= 500 check above. The extra `body.code`
+      // guard is for the day someone catalogues a 5xx anyway: the catalog's own
+      // contract says internal errors get no code, so a 500 that carries one was
+      // deliberately shaped for a user and is not news. Uncatalogued 500s — the
+      // ones that reach here as `INTERNAL_SERVER_ERROR` — are the whole point.
+      if (!body.code) {
+        captureApiException(exception, {
+          mechanism: 'http',
+          path: request.url,
+          method: request.method,
+          statusCode: body.statusCode,
+        });
+      }
     }
 
     response.status(body.statusCode).json(body);

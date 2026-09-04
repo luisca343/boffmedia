@@ -1,8 +1,15 @@
+import { createRequire } from 'node:module';
 import withBundleAnalyzer from '@next/bundle-analyzer';
 import createNextIntlPlugin from 'next-intl/plugin';
 import nextra from 'nextra'
 
 const withNextIntl = createNextIntlPlugin();
+
+// Release tag for Sentry (audit X5). Read here rather than in the app because
+// package.json is not something a browser bundle should be pulling in, and
+// `process.env.npm_package_version` is only set when the process was started by
+// a package manager script — which a container entrypoint is not.
+const pkgVersion = createRequire(import.meta.url)('./package.json').version;
 
 const bundleAnalyzer = withBundleAnalyzer({
     enabled: process.env.ANALYZE === 'true',
@@ -83,6 +90,14 @@ const nextConfig = {
             { source: '/boffmedia/img/:path*', headers: oneHour },
             { source: '/blog/:path*', headers: oneHour },
         ];
+    },
+
+    // Only NEXT_PUBLIC_SENTRY_RELEASE — the DSN and environment come from the
+    // real environment. An explicit value (a commit sha from CI) wins; the
+    // fallback keeps events tagged with something on a plain `next build`.
+    env: {
+        NEXT_PUBLIC_SENTRY_RELEASE:
+            process.env.NEXT_PUBLIC_SENTRY_RELEASE || `web@${pkgVersion}`,
     },
 
     // Production optimizations

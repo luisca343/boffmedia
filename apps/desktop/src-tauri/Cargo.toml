@@ -94,6 +94,17 @@ open = "5"
 # Windows/macOS/Linux, and a target table here would make `updates.rs` fail to
 # compile for a mobile target that will never be built anyway.
 tauri-plugin-updater = "2"
+# Crash reporting (audit X5). OPT-IN and inert without a build-time DSN - see
+# src/crash_reports.rs for the three gates. `default-features = false` drops
+# `debug-images`, whose findshlibs dependency buys symbolication we cannot use
+# without uploading debug files anyway; `transport` reuses the reqwest+native-tls
+# stack this crate already links rather than pulling in a second one.
+sentry = { version = "0.49", default-features = false, features = [
+    "backtrace",
+    "contexts",
+    "panic",
+    "transport",
+] }
 # A second launch must never start a second game-managing process: two instances
 # would race on the same instance dir, the same marker file and the same
 # credential entry. This one focuses the window that is already open instead.

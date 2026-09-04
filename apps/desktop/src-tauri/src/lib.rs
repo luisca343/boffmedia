@@ -22,6 +22,7 @@ pub mod auth;
 pub mod backups;
 pub mod browse;
 pub mod catalog;
+pub mod crash_reports;
 pub mod datadir;
 pub mod dialogs;
 pub mod emulators;
@@ -106,6 +107,10 @@ pub fn run() {
             // happen on a write, so a cache left over the cap by a session that
             // then wrote nothing would stay over it forever.
             tool_assets::sweep_on_startup(&handle);
+            // The opt-in gate (crash_reports.rs). Until this line runs the flag
+            // is false, so anything that fails before settings load is dropped
+            // rather than sent - the right way round for a consent switch.
+            crash_reports::set_enabled(settings::load(&handle).crash_reports);
             Ok(())
         })
         .manage(updates::UpdateState::default())

@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
+import { reportBoundaryError } from "@/lib/sentry"
 
 /**
  * In-app crash fallback (audit P5). A per-app `error.tsx` keeps the app's
@@ -25,7 +26,11 @@ export function AppErrorFallback({
   // Error boundaries swallow the exception; without this the crash is invisible in the console.
   useEffect(() => {
     console.error(error)
-  }, [error])
+    reportBoundaryError(error, {
+      boundary: `smartrotom/${appName}`,
+      digest: (error as Error & { digest?: string }).digest,
+    })
+  }, [error, appName])
 
   return (
     <div className="flex min-h-[60vh] w-full flex-col items-center justify-center gap-3 px-6 text-center text-current">

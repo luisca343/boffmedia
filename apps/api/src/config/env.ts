@@ -23,6 +23,20 @@ export const env = z
     // is the bind-mount path in both dev and the container; set it only when the
     // tree lives somewhere else on disk.
     PUBLIC_ROOT: z.string().optional(),
+    // Filesystem root of the GDPR data-export archives. Unset = <cwd>/var/exports.
+    // Deliberately NOT under UPLOADS_ROOT: that tree is served statically at
+    // /uploads, and an export is the single most concentrated pile of one
+    // person's data the system can produce. It is only ever read back through an
+    // authenticated route.
+    DATA_EXPORT_ROOT: z.string().optional(),
+    // How long a built export stays downloadable. It is a full copy of one
+    // person's data sitting on disk, so it is short-lived by design; the user
+    // can always ask again.
+    DATA_EXPORT_TTL_DAYS: z.coerce.number().default(7),
+    // Minimum gap between two export requests from the same account. Building
+    // one reads ~50 tables, so this is the rate limit that matters — the HTTP
+    // throttler only stops a burst, not one request an hour forever.
+    DATA_EXPORT_COOLDOWN_HOURS: z.coerce.number().default(24),
 
     // Database (MySQL)
     DB_HOST: z.string(),
@@ -113,6 +127,22 @@ export const env = z
     // Third-party APIs
     GEMINI_API_KEY: z.string().optional(),
 
+    // Error tracking (Sentry SaaS). Optional exactly like TERAS_API_TOKEN and
+    // SECRET_ENCRYPTION_KEY above, and for a stronger reason: unset means the
+    // SDK is never even require()d, so dev, CI and the test suite carry no
+    // Sentry at all and print nothing about it. See common/observability/sentry.ts.
+    SENTRY_DSN: z.string().optional(),
+    // Overrides the environment tag; defaults to NODE_ENV. Set it when several
+    // deploys share a NODE_ENV ('staging' and 'production' are both 'production').
+    SENTRY_ENVIRONMENT: z.string().optional(),
+    // Release tag for correlating events with a build. Unset = `api@<the version
+    // in apps/api/package.json>`, which is enough to tell two deploys apart only
+    // if that version is bumped; set this to the commit sha in CI if it is not.
+    SENTRY_RELEASE: z.string().optional(),
+    // Performance tracing, off by default: the API already reports latency
+    // through Prometheus, and a span per request is the expensive half of Sentry.
+    SENTRY_TRACES_SAMPLE_RATE: z.coerce.number().min(0).max(1).default(0),
+
     // Launcher pack distribution. The CurseForge key never
     // reaches the launcher: since 16 July 2026 edge.forgecdn.net 401s without an
     // `x-api-key` header, and an embedded key is an extracted key, so every CF
@@ -173,6 +203,18 @@ export const env = z
     RETENTION_EVENT_INVITES_GRACE_DAYS: z.coerce.number().default(30), // expired + grace
     RETENTION_NOTE_VERSIONS_KEEP: z.coerce.number().default(20), // most recent N per note
     RETENTION_OUTBOX_DAYS: z.coerce.number().default(30), // DELIVERED rows only; failed ones are kept
+    /**
+     * How long a SOFT-DELETED account (`boffmedia_users.deleted_at`) is kept
+     * before the daily sweep hard-deletes it and everything hanging off it.
+     *
+     * 30 days because that is the window the deletion itself promises: the row
+     * is already scrubbed of every PII field the moment the user asks, so this
+     * is not "we keep your data for a month" — it is how long the tombstone and
+     * the pseudonymous rows that reference it survive, which is the standard
+     * grace period for an accidental or coerced deletion and comfortably inside
+     * the "without undue delay" of GDPR art. 17. Set to 0 to disable erasure.
+     */
+    RETENTION_DELETED_USER_DAYS: z.coerce.number().default(30),
   })
   .superRefine((cfg, ctx) => {
     // In production a missing/localhost WEB_URL would silently ship localhost
