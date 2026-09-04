@@ -223,6 +223,7 @@ export function Game({replayData, shell: Shell}: {
       mode="replay" onBack={goBack} turn={battle.turn} layout={layout}
       you={scoreYou} foe={scoreFoe}
       onToggleRail={() => setRailOpen((v) => !v)} railOpen={railOpen}
+      onToggleLog={isFullscreen ? () => setLogVisible(!logVisible) : undefined} logHidden={!logVisible}
       isFullscreen={isFullscreen} onToggleFullscreen={toggleFullscreen}
     />
   );
@@ -306,7 +307,9 @@ export function Game({replayData, shell: Shell}: {
   );
 
   // The eye button in the transport still hides the log — it just hides the
-  // RAIL now, and the shell hands the field the column it frees.
+  // RAIL now, and the shell hands the field the column it frees. The header
+  // carries the same switch in fullscreen, where the transport band is the one
+  // thing a viewer is not looking at.
   const rail = logVisible ? (
     <LogChatRail
       ticks={bsxTicks}

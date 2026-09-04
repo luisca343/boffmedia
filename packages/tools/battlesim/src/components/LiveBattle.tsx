@@ -108,6 +108,14 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
   const [targeting, setTargeting] = useState<TargetingState | null>(null);
   const [aiming, setAiming] = useState(false);
   const [railOpen, setRailOpen] = useState(false);
+  /**
+   * Desktop fullscreen only: the rail is the one thing between the field and
+   * the whole screen. Windowed, the rail is what the shell hands the slack a
+   * 16:9 field cannot use, so hiding it there buys the field nothing and the
+   * toggle is not offered — leaving fullscreen therefore restores the rail
+   * without touching this flag (see `railHidden`).
+   */
+  const [logHidden, setLogHidden] = useState(false);
   const [mobileTab, setMobileTab] = useState<MobileTab>('actions');
   const [confirmForfeit, setConfirmForfeit] = useState(false);
   /** The departure the guard below is holding, or null. See `useToolNavGuard`. */
@@ -128,7 +136,8 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
    * spectator's view have nothing to lose, so neither of them asks.
    */
   useToolNavGuard(live ? (_intent, proceed) => setConfirmLeave(() => proceed) : null);
-  const chatVisible = layout === 'desktop' ? true : layout === 'tablet' ? railOpen : mobileTab === 'chat';
+  const railHidden = isFullscreen && layout === 'desktop' && logHidden;
+  const chatVisible = layout === 'desktop' ? !railHidden : layout === 'tablet' ? railOpen : mobileTab === 'chat';
   const unread = useUnreadChat(chat, chatVisible && (layout === 'desktop' ? true : true));
 
   // A live battle still cannot survive the DOCUMENT going away — it is a worker
@@ -180,6 +189,7 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
       timerYou={timers ? bsx.bsxTimerYou : undefined} timerFoe={timers ? bsx.bsxTimerFoe : undefined}
       spectatorCount={spectatorCount} layout={layout}
       onToggleRail={() => setRailOpen((v) => !v)} railOpen={railOpen} railUnread={unread}
+      onToggleLog={isFullscreen ? () => setLogHidden((v) => !v) : undefined} logHidden={logHidden}
       isFullscreen={isFullscreen} onToggleFullscreen={toggleFullscreen}
       showForfeit={live && !!onForfeit} onForfeit={() => setConfirmForfeit(true)}
     />
@@ -244,7 +254,7 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
     <BattleAudioProvider roomId={roomLabel}>
       <MusicController roomId={roomLabel} battleActive={!finished} />
       <BattleShell ref={setShell} layout={layout} fullscreen={isFullscreen} header={header} canvas={canvas} dock={dock}
-        rail={rail} railOpen={layout === 'tablet' ? railOpen : mobileTab !== 'actions'} mobileTabs={mobileTabs} overlay={overlay}>
+        rail={railHidden ? undefined : rail} railOpen={layout === 'tablet' ? railOpen : mobileTab !== 'actions'} mobileTabs={mobileTabs} overlay={overlay}>
         <ConfirmDialog open={confirmLeave !== null} tone="warning" title={t('connection.leaveTitle')} body={t('connection.leaveConfirm')} confirmLabel={t('connection.leaveCta')}
           onConfirm={() => { const go = confirmLeave; setConfirmLeave(null); go?.(); }} onClose={() => setConfirmLeave(null)} />
         <ConfirmDialog open={confirmForfeit} tone="error" title={t('connection.forfeitTitle')} body={t('connection.forfeitConfirm')} confirmLabel={t('connection.forfeitCta')}

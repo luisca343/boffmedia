@@ -39,6 +39,13 @@ interface BattleHeaderProps {
   onToggleRail?: () => void;
   railOpen?: boolean;
   railUnread?: number;
+  /**
+   * Desktop fullscreen: collapse the log rail so the field takes the screen.
+   * Passed only where hiding the rail actually buys the field something — the
+   * tablet and mobile rails already float over it, so they get `onToggleRail`.
+   */
+  onToggleLog?: () => void;
+  logHidden?: boolean;
   isFullscreen?: boolean;
   onToggleFullscreen?: () => void;
   showForfeit?: boolean;
@@ -153,7 +160,8 @@ function NamesToggle() {
 
 export function BattleHeader({
   mode, onBack, roomLabel, formatLabel, you, foe, turn, timerYou, timerFoe, timerMax = 60,
-  spectatorCount, layout, onToggleRail, railOpen, railUnread = 0, isFullscreen, onToggleFullscreen, showForfeit, onForfeit,
+  spectatorCount, layout, onToggleRail, railOpen, railUnread = 0, onToggleLog, logHidden = false,
+  isFullscreen, onToggleFullscreen, showForfeit, onForfeit,
 }: BattleHeaderProps) {
   const t = useToolT(BATTLESIM_NS);
   const meta = MODE_META[mode];
@@ -203,6 +211,21 @@ export function BattleHeader({
           <span className="relative">
             <IconButton name="list" label={t('battle.header.openLog')} variant={railOpen ? 'default' : 'ghost'} size="sm" aria-pressed={railOpen} onClick={onToggleRail} />
             {railUnread > 0 && !railOpen && (
+              <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center bg-accent px-1 font-mono text-[0.5625rem] font-bold leading-none text-accent-ink" aria-label={t('battle.rail.unread', { count: railUnread })}>{railUnread}</span>
+            )}
+          </span>
+        )}
+        {onToggleLog && desktop && (
+          <span className="relative">
+            <IconButton
+              name="list"
+              label={logHidden ? t('battle.header.openLog') : t('battle.header.hideLog')}
+              variant={logHidden ? 'ghost' : 'default'}
+              size="sm"
+              aria-pressed={!logHidden}
+              onClick={onToggleLog}
+            />
+            {railUnread > 0 && logHidden && (
               <span className="absolute -right-1 -top-1 grid h-4 min-w-4 place-items-center bg-accent px-1 font-mono text-[0.5625rem] font-bold leading-none text-accent-ink" aria-label={t('battle.rail.unread', { count: railUnread })}>{railUnread}</span>
             )}
           </span>
