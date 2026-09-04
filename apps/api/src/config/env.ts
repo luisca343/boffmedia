@@ -102,7 +102,22 @@ export const env = z
     WIGGLYPOP_SAGA_STALE_MINUTES: z.coerce.number().default(120),
 
     // Discord / StreamElements
-    DISCORD_KEY: z.string(),
+    // The bot boots IN-PROCESS with the HTTP server (Necord + discord.js, see
+    // discord/_main/discord.module.ts), so both of these are the switch that
+    // keeps a chat outage from being an API outage.
+    //
+    // Optional exactly like TERAS_API_TOKEN above: with no token the whole
+    // Discord subtree — the gateway client and all 19 command providers — is
+    // never registered, and the API serves HTTP and websockets as usual. A
+    // missing token degrades; it does not crash.
+    DISCORD_KEY: z.string().optional(),
+    // Explicit kill switch, independent of the token, for the case where the
+    // bot IS the thing misbehaving and you want it off without hunting down the
+    // secret. Same enum/transform idiom as WIGGLYPOP_ATOMIC_CUSTODY above.
+    DISCORD_BOT_ENABLED: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((v) => v === 'true'),
     STREAMELEMENTS_KEY: z.string().optional(),
     // Discord webhook for tournament announcements. TOURNAMENTS_* takes
     // precedence; both optional — announcements are silently disabled if unset.

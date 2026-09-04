@@ -1,11 +1,9 @@
-import { Global, Module } from '@nestjs/common';
-import { env } from '@/config/env';
+import { Global, Module, Provider } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 import { DiscordController } from './discord.controller';
 import { DiscordService } from './discord.service';
 import { ConfigModule } from '@nestjs/config';
 import { CommandsModule } from '../_commands/commands.module';
-import { NecordModule } from 'necord';
-import { IntentsBitField } from 'discord.js';
 import { PingCommand } from '../commands/global/ping';
 import { FraseCommand } from '../commands/global/frases/frase';
 import { FrasesCommand } from '../commands/global/frases/frases';
@@ -29,52 +27,61 @@ import { MetaMatchupCommand } from '../commands/global/meta/meta-matchup.command
 import { MetaSpeedCommand } from '../commands/global/meta/meta-speed.command';
 import { MetaThreatsCommand } from '../commands/global/meta/meta-threats.command';
 import { MetaDamageCommand } from '../commands/global/meta/meta-damage.command';
+import { DiscordBoundaryInterceptor } from './discord-boundary.interceptor';
+import { DiscordHealthListener } from './discord-health.listener';
+import { discordGatewayImports, isDiscordBotEnabled } from './discord.config';
+
+/**
+ * Everything that only makes sense with a live gateway client. Gated behind the
+ * kill switch as one block: with the bot off there is no `Client` for Necord's
+ * explorer to bind these to, so registering them would only instantiate 19
+ * providers (and their VGC/DB dependencies) to answer nothing.
+ */
+const GATEWAY_PROVIDERS: Provider[] = [
+  PingCommand,
+  FraseCommand,
+  FrasesCommand,
+  NuevaFraseCommand,
+  JoinCommand,
+  SetVozCommand,
+  SetVozAutocompleteInterceptor,
+  MessageListener,
+  DiscordHealthListener,
+  // VGC meta — shared utilities
+  MetaCacheService,
+  MetaRegulationAutocompleteInterceptor,
+  MetaVgcAutocompleteInterceptor,
+  // VGC meta — commands
+  MetaPokemonCommand,
+  MetaTopCommand,
+  MetaTeammatesCommand,
+  MetaRegulationsCommand,
+  MetaCoreCommand,
+  MetaExplainCommand,
+  MetaAnalyzeCommand,
+  MetaMatchupCommand,
+  MetaSpeedCommand,
+  MetaThreatsCommand,
+  MetaDamageCommand,
+];
 
 @Global()
 @Module({
   imports: [
     ConfigModule,
     VgcMetaModule,
-    NecordModule.forRoot({
-      token: env.DISCORD_KEY,
-      intents: [
-        IntentsBitField.Flags.Guilds,
-        IntentsBitField.Flags.GuildMembers,
-        IntentsBitField.Flags.GuildMessages,
-        IntentsBitField.Flags.MessageContent,
-        IntentsBitField.Flags.GuildPresences,
-        IntentsBitField.Flags.GuildVoiceStates,
-      ],
-    }),
+    // Empty when the bot is switched off or has no token — see discord.config.ts.
+    ...discordGatewayImports(),
     CommandsModule,
   ],
   controllers: [DiscordController],
   providers: [
     DiscordService,
-    PingCommand,
-    FraseCommand,
-    FrasesCommand,
-    NuevaFraseCommand,
-    JoinCommand,
-    SetVozCommand,
-    SetVozAutocompleteInterceptor,
-    MessageListener,
-    // VGC meta — shared utilities
-    MetaCacheService,
-    MetaRegulationAutocompleteInterceptor,
-    MetaVgcAutocompleteInterceptor,
-    // VGC meta — commands
-    MetaPokemonCommand,
-    MetaTopCommand,
-    MetaTeammatesCommand,
-    MetaRegulationsCommand,
-    MetaCoreCommand,
-    MetaExplainCommand,
-    MetaAnalyzeCommand,
-    MetaMatchupCommand,
-    MetaSpeedCommand,
-    MetaThreatsCommand,
-    MetaDamageCommand,
+    // Declared here rather than in AppModule so the Discord failure boundary
+    // stays inside discord/. An APP_INTERCEPTOR is global wherever it is
+    // registered, and this one no-ops outside a Necord context.
+    { provide: APP_INTERCEPTOR, useClass: DiscordBoundaryInterceptor },
+    ...(isDiscordBotEnabled() ? GATEWAY_PROVIDERS : []),
   ],
 })
 export class DiscordModule {}
