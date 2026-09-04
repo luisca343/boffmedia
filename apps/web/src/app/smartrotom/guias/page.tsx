@@ -1,6 +1,13 @@
 import { getTranslations } from "next-intl/server";
+import { redirect } from "next/navigation";
+import { isAppHidden } from "../_config/hidden-apps";
 
 export default async function Guias() {
+  // Hidden indefinitely — this stub app was never completed.
+  if (isAppHidden("guias")) {
+    redirect("/smartrotom");
+  }
+
   const t = await getTranslations("guias.page");
 
   return (

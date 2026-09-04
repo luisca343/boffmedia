@@ -12,6 +12,9 @@ export const env = z
     NEXT_PUBLIC_ROTOM_API_URL: z.string().default(''),
     NEXT_PUBLIC_MC_WORLD: z.string(),
     NEXT_PUBLIC_TWITCH_CLIENT_ID: z.string().default(''),
+    // Un-hide SmartRotom stub apps for local/staff testing (comma-separated).
+    // Hiding is the default and lives in app/smartrotom/_config/hidden-apps.ts.
+    NEXT_PUBLIC_UNHIDE_APPS: z.string().default(''),
 
     // Auth (NextAuth) — server-side only, never exposed to browser bundles
     NEXTAUTH_SECRET: z.string(),

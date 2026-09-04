@@ -67,7 +67,7 @@ Real-time in-game chat application. Enables player-to-player and group messaging
 
 ### Cinder ⭐ New
 **Route:** `/smartrotom/cinder`  
-**Status:** Stub — route exists, renders a heading only  
+**Status:** Stub, and now unreachable — hidden by default since 2026-09-04 (`_config/hidden-apps.ts`, reason `archived`). Nothing was deleted.  
 Breeding tool app inspired by "Tinder"-style swipe mechanics. Helps players find compatible Pokémon for breeding by matching IVs, natures, egg groups, and other criteria.
 
 **UX flow:**
@@ -107,7 +107,7 @@ News and daily events feed, themed around Furret. Shows server news, event annou
 
 ### Guías ⭐ New
 **Route:** `/smartrotom/guias`  
-**Status:** Stub — route exists, renders a heading only  
+**Status:** Stub, and now unreachable — hidden by default since 2026-09-04 (`_config/hidden-apps.ts`, reason `archived`). Nothing was deleted.  
 Tutorial and guide library for players. Hosts written guides, tips, and how-to articles covering server mechanics, Pixelmon gameplay, and SmartRotom features.
 
 **Planned sub-sections:**
@@ -129,7 +129,7 @@ Tutorial and guide library for players. Hosts written guides, tips, and how-to a
 
 ### Karts ⭐ New
 **Route:** `/smartrotom/karts`  
-**Status:** Stub on the web, but the API is live  
+**Status:** Stub on the web, but the API is live. Hidden by default since 2026-09-04 (`_config/hidden-apps.ts`, reason `pending-build` — scheduled, unlike the archived stubs).  
 The backend already serves `POST /smartrotom/karts/carrera`, `GET /ranking` and `GET /stats/:uuid`; the page renders nothing but a heading. The frontend is what is missing here, not the data.
 
 Racing companion app. Displays available kart races, circuits, personal best times, leaderboards, and upcoming race events on the server.
@@ -347,7 +347,7 @@ Wallapop/marketplace-style trading app. Allows players to list Pokémon and item
 
 ### Equipo (Team Builder) ⭐ New
 **Route:** `/smartrotom/equipo`  
-**Status:** Stub — route exists, renders a heading only  
+**Status:** Stub, and now unreachable — hidden by default since 2026-09-04 (`_config/hidden-apps.ts`, reason `archived`). Nothing was deleted.  
 Team composition tool. PC already has a team slot builder for Pokémon you own — Equipo extends beyond that: build hypothetical teams with any Pokémon (owned or not), run scenarios for Liga/Torneos prep, and analyze coverage without being limited to your box.
 
 **Rationale for standalone over PC sub-route:** PC is box management (what you have). Equipo is theory-crafting (what you want to build). The workflows and audience overlap but the depth warrants its own space — and it can deep-link *from* PC ("analyze this team in Equipo") without being buried inside it.
@@ -380,7 +380,13 @@ Team composition tool. PC already has a team slot builder for Pokémon you own �
 
 ## Cross-App Connections
 
-The apps form a connected ecosystem. These are the intentional deep-links and data flows between apps:
+The apps form a connected ecosystem. These are the intentional deep-links and data flows between apps.
+
+> **These rows are the design intent, not an inventory of what exists.** Any row naming Cinder,
+> Equipo, Guías or Karts describes a link that was never built — those four are stubs and are now
+> hidden. A 2026-09 audit read this table as a description of shipped behaviour and reported a
+> non-existent cross-link from PC/Pokédex to Equipo; check the Status line of both apps before
+> trusting a row here.
 
 | From | To | Connection |
 |------|-----|------------|
