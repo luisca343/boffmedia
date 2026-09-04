@@ -3,7 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Button, Empty, SearchInput, Seg, Spinner, ToolBar, ToolHeader } from "@boffmedia/ui"
-import { useGetEvents } from "@/hooks/events/useGetEvents"
+import { useEventsPaged } from "@/hooks/events/useGetEvents"
 import { EventCard, eventStatus, type EventLike, type EventStatus } from "@/components/boffmedia/ui/events"
 
 const FILTERS = ["all", "active", "upcoming", "completed"] as const
@@ -12,7 +12,11 @@ const ORDER: Record<EventStatus, number> = { active: 0, upcoming: 1, completed: 
 
 export function EventsView() {
   const t = useTranslations("events")
-  const { events, error, isLoading, refetch } = useGetEvents()
+  // Paged, not the whole table: this list is the hot one and used to render
+  // every event the server owned on first paint (audit W3). Search and the
+  // status filter still run over what is LOADED — "load more" is what reaches
+  // the rest, which is why the count note reads off `sorted`.
+  const { events, error, isLoading, refetch, hasMore, isLoadingMore, loadMore } = useEventsPaged()
   const [q, setQ] = React.useState("")
   const [filter, setFilter] = React.useState<Filter>("all")
 
@@ -64,11 +68,20 @@ export function EventsView() {
       ) : sorted.length === 0 ? (
         <Empty icon="calendar" title={t("empty.title")} lead={t("empty.lead")} />
       ) : (
-        <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(21.25rem,1fr))] max-[720px]:grid-cols-1">
-          {sorted.map((e) => (
-            <EventCard key={e.id} event={e} />
-          ))}
-        </div>
+        <>
+          <div className="grid gap-4 [grid-template-columns:repeat(auto-fill,minmax(21.25rem,1fr))] max-[720px]:grid-cols-1">
+            {sorted.map((e) => (
+              <EventCard key={e.id} event={e} />
+            ))}
+          </div>
+          {hasMore && (
+            <div className="mt-6 grid place-items-center">
+              <Button icon="plus" loading={isLoadingMore} onClick={loadMore}>
+                {t("loadMore")}
+              </Button>
+            </div>
+          )}
+        </>
       )}
     </main>
   )

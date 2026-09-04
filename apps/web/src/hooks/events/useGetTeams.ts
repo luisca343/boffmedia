@@ -1,15 +1,21 @@
-import { useRotomRequest } from "@/hooks/useRotomRequest"
+"use client"
+
+import { useQuery } from "@tanstack/react-query"
+import { orThrow } from "@/services/boffAPI"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
+import { queryErrorText } from "@/lib/query/errorText"
+import { eventKeys } from "./keys"
 
 export function useGetTeams() {
-  const { data, error, isLoading, refetch, setData } = useRotomRequest(EventsService.getTeams)
+  const { data, error, isLoading, refetch } = useQuery({
+    queryKey: eventKeys.teams(),
+    queryFn: () => orThrow(EventsService.getTeams()),
+  })
 
   return {
     teams: data,
-    error,
+    error: queryErrorText(error),
     isLoading,
     refetch,
-    seTeams: setData,
   }
 }
-

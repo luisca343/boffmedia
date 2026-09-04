@@ -15,11 +15,15 @@ import { useBoffSession } from "@/services/useBoffSession"
 import { EventsService } from "@/services/api/boffmedia/eventsService"
 import { RandomlockeSection } from "./RandomlockeSection"
 
+/** Rows the side panel shows. The endpoint has no pagination (see the hook), so
+ *  this bounds the render, not the response. */
+const LEADERBOARD_PREVIEW = 10
+
 export function EventDetailView({ id }: { id: number }) {
   const t = useTranslations("events")
   const { event, isLoading } = useGetEvent(id)
   const { achievements } = useGetEventAchievements(id)
-  const { leaderboard } = useGetLeaderboard(id)
+  const { leaderboard } = useGetLeaderboard(id, LEADERBOARD_PREVIEW)
   const { isParticipating, status: memberStatus, activeCount, refetch: refetchParts } = useCurrentParticipant(id)
   const { session } = useBoffSession()
   const [joining, setJoining] = React.useState(false)
@@ -184,7 +188,7 @@ export function EventDetailView({ id }: { id: number }) {
               <p className="p-5 font-body text-[0.8125rem] text-txt-dim">{t("detail.leaderEmpty")}</p>
             ) : (
               <div className="grid">
-                {board.slice(0, 10).map((p, i) => (
+                {board.map((p, i) => (
                   <div
                     key={(p as { participantId?: number }).participantId ?? i}
                     className={cn(

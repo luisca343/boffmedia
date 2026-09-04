@@ -4,6 +4,7 @@
     "title": "Events",
     "lead": "Community tournaments, challenges and seasons. Take part, earn achievements and climb the ranking.",
     "search": "Search event…",
+    "loadMore": "Load more",
     "count": "{count, plural, =0 {No events} one {# event} other {# events}}",
     "filter": {
       "all": "All",
