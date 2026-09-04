@@ -114,6 +114,11 @@ export const authOptions: NextAuthOptions = {
             password: credentials.password,
           });
 
+          // Throttled: return a specific error code the form can recognize
+          if (envelope.statusCode === 429) {
+            throw new Error("AUTH_THROTTLED");
+          }
+
           // `null` from authorize() means exactly one thing to NextAuth: these
           // credentials are wrong. The API answers 503 when it could not reach
           // the database and therefore never checked them — collapsing that into

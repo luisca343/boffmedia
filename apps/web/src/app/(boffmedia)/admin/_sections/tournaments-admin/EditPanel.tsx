@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { Field, Input, Select, Button, toast } from "@boffmedia/ui"
 import { AvPanel } from "../../_components/ui/av-kit"
 import { ImageUploadField } from "@/components/shared/media/ImageUploadField"
+import { naiveToUtc, utcToNaive } from "@/lib/timezone-utils"
 import {
   TournamentsService,
   type TnTeamsheetVisibility,
@@ -29,12 +30,8 @@ export function EditPanel({
   onChange: () => void
 }) {
   const t = useTranslations("tournaments")
-  const toLocal = (iso: string | null) => {
-    if (!iso) return ""
-    const d = new Date(iso)
-    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
-    return d.toISOString().slice(0, 16)
-  }
+  // Convert UTC timestamps to naive Madrid wall-clock time for editing.
+  // This ensures the form shows times as they should appear in Madrid timezone.
   const [name, setName] = useState(detail.name)
   const [description, setDescription] = useState(detail.description ?? "")
   const [rules, setRules] = useState(detail.rules ?? "")
@@ -45,14 +42,17 @@ export function EditPanel({
   const [maxParticipants, setMaxParticipants] = useState<number | "">(detail.maxParticipants ?? "")
   const [teamsheetRequired, setTeamsheetRequired] = useState(detail.teamsheetRequired)
   const [teamsheetVisibility, setTeamsheetVisibility] = useState<TnTeamsheetVisibility>(detail.teamsheetVisibility)
-  const [entryDeadline, setEntryDeadline] = useState(toLocal(detail.entryDeadline))
-  const [startDate, setStartDate] = useState(toLocal(detail.startDate))
-  const [endDate, setEndDate] = useState(toLocal(detail.endDate))
+  const [entryDeadline, setEntryDeadline] = useState(utcToNaive(detail.entryDeadline) || "")
+  const [startDate, setStartDate] = useState(utcToNaive(detail.startDate) || "")
+  const [endDate, setEndDate] = useState(utcToNaive(detail.endDate) || "")
   const [busy, setBusy] = useState(false)
 
   const save = async () => {
     if (!name.trim()) return toast.error(t("nameRequired"))
     setBusy(true)
+    // Convert naive wall-clock inputs (from datetime-local) to UTC.
+    // Admins enter times in Europe/Madrid timezone; we must convert to UTC
+    // before sending to the API to ensure correct storage regardless of server TZ.
     const r = await TournamentsService.update(detail.id, {
       name: name.trim(),
       description: description.trim() || null,
@@ -64,9 +64,9 @@ export function EditPanel({
       maxParticipants: maxParticipants === "" ? null : maxParticipants,
       teamsheetRequired,
       teamsheetVisibility,
-      entryDeadline: entryDeadline ? new Date(entryDeadline).toISOString() : null,
-      startDate: startDate ? new Date(startDate).toISOString() : null,
-      endDate: endDate ? new Date(endDate).toISOString() : null,
+      entryDeadline: naiveToUtc(entryDeadline || null),
+      startDate: naiveToUtc(startDate || null),
+      endDate: naiveToUtc(endDate || null),
     })
     setBusy(false)
     if (r.error) toast.error(r.error)

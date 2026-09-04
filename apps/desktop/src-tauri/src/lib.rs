@@ -82,6 +82,14 @@ pub fn run() {
                 let _ = window.show();
                 let _ = window.unminimize();
                 let _ = window.set_focus();
+
+                // NOTE: argv is available here but not currently used. Deep-link support
+                // (boffmedia://pack/ID) is not yet implemented: it would require
+                // (1) OS protocol registration in the bundle config (tauri.conf.json),
+                // (2) UI affordance to generate/share the links on the web pack page
+                // (apps/web/src/app/(boffmedia)/app/packs/[slug]/_components/PublicPackView.tsx),
+                // and (3) listener in the renderer to dispatch navigation. This handler
+                // is left as groundwork for when the full feature is built. See audit D10.
             }
         }))
         // The endpoint list from tauri.conf.json is only the default; every

@@ -182,7 +182,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
         </div>
 
         <aside className="grid gap-5 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
-          <OnlineList members={online.map(toMemberLike)} onOpen={go} now={now} />
+          <OnlineList members={(online as any[]).map(toMemberLike)} onOpen={go} now={now} />
           {stats && <ForumStats stats={stats} />}
         </aside>
       </div>

@@ -113,6 +113,20 @@
       "when": 1788530006000,
       "tag": "0015_desktop_telemetry",
       "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "5",
+      "when": 1788530007000,
+      "tag": "0016_retention_lease",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1788530008000,
+      "tag": "0017_wigglypop_session_guard",
+      "breakpoints": true
     }
   ]
 }

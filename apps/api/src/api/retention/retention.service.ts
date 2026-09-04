@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Logger } from 'nestjs-pino';
+import { Counter } from 'prom-client';
 import { env } from '@/config/env';
 import { RetentionRepository } from './repositories/retention.repository';
 import { UserErasureService } from './user-erasure.service';
@@ -22,10 +23,24 @@ import { DataExportService } from '@api/boffmedia/data-export/data-export.servic
  * this tick stops firing, soft-deleted accounts accumulate silently — the exact
  * state A18 describes.
  *
- * Assumes a SINGLE API instance (owner decision Q9, 2026-09-04). No distributed
- * lock, deliberately: two schedulers would claim the same due rows and the loser
- * would fail on rows the winner already deleted.
+ * A8 — Distributed lease (database row): the sweep claims a lease to prevent
+ * concurrent runs on multi-instance deployments. The lease expires after 90 minutes
+ * (if the process crashes), allowing the next instance to claim it. Release is
+ * guaranteed on all paths via try/finally, and sweep failures surface in metrics
+ * rather than being swallowed. Unlike MySQL advisory locks (which are per-connection
+ * and break with connection pooling), leases are connection-independent.
+ *
+ * Previously assumed a SINGLE API instance (owner decision Q9, 2026-09-04).
+ * The lease is cheap insurance even for single-instance deployments, and
+ * batched deletes + visible failures are worth doing unconditionally.
  */
+
+const sweepErrorsTotal = new Counter({
+  name: 'retention_sweep_errors_total',
+  help: 'Retention sweep failures by error type',
+  labelNames: ['error_type'],
+});
+
 @Injectable()
 export class RetentionService {
   constructor(
@@ -39,8 +54,20 @@ export class RetentionService {
   async sweep(): Promise<void> {
     const now = new Date();
     const summary: string[] = [];
+    const lockName = 'boffmedia_retention_sweep';
+    let leaseToken: string | null = null;
 
     try {
+      // A8 — Claim a distributed lease (database row) so concurrent instances
+      // cannot run the sweep simultaneously. Returns a lease token if successful,
+      // null if another instance owns the lease. The lease expires after 90 minutes;
+      // if the process crashes, the next instance can claim it.
+      leaseToken = await this.repo.claimLease(lockName, 90);
+      if (!leaseToken) {
+        // Another instance owns the lease; silently return.
+        // This is expected and not an error — the other instance has the work.
+        return;
+      }
       // Notifications: read only, older than window
       if (env.RETENTION_NOTIFICATIONS_DAYS > 0) {
         const cutoff = new Date(
@@ -118,7 +145,66 @@ export class RetentionService {
       }
     } catch (error: any) {
       // Housekeeping — a failure must never crash the scheduler tick.
-      this.logger.error(`Retention sweep failed: ${error?.message}`);
+      // A8 — Categorize the error for metrics visibility.
+      const errorType = this.categorizeError(error);
+      sweepErrorsTotal.inc({ error_type: errorType });
+      this.logger.error(`Retention sweep failed [${errorType}]: ${error?.message}`);
+    } finally {
+      // A8 — ALWAYS release the lease, even if the sweep threw. A leaked lease
+      // (row stays in the table) is worse than no lease, because the next sweep
+      // waits 90 minutes before retrying. The lease expires automatically via
+      // expiry time, but we should release it immediately if we own it.
+      // If release fails, log it but don't rethrow.
+      if (leaseToken) {
+        try {
+          await this.repo.releaseLease(lockName, leaseToken);
+        } catch (releaseError: any) {
+          this.logger.error(
+            `Retention sweep lease release failed: ${releaseError?.message}`,
+          );
+        }
+      }
     }
+  }
+
+  /**
+   * Categorize errors for metrics. This tells us whether sweep failures
+   * are transient (database timeout) or systematic (missing table, schema change).
+   */
+  private categorizeError(error: any): string {
+    const message = (error?.message ?? '').toLowerCase();
+    const code = error?.code ?? '';
+
+    // Connection failures: network-level issues
+    if (
+      message.includes('econnrefused') ||
+      message.includes('connection lost') ||
+      message.includes('connection reset') ||
+      code === 'PROTOCOL_CONNECTION_LOST'
+    ) {
+      return 'connection_lost';
+    }
+    // Timeouts: query or lock acquisition took too long
+    if (
+      message.includes('timeout') ||
+      message.includes('lock wait timeout') ||
+      code === 'PROTOCOL_SEQUENCE_TIMEOUT'
+    ) {
+      return 'timeout';
+    }
+    // Schema mismatches: table or column doesn't exist
+    if (
+      message.includes('no such table') ||
+      message.includes('bad field error') ||
+      code === 'ER_NO_SUCH_TABLE' ||
+      code === 'ER_BAD_FIELD_ERROR'
+    ) {
+      return 'schema_mismatch';
+    }
+    // Deadlocks: transaction conflict
+    if (message.includes('deadlock') || code === 'ER_LOCK_DEADLOCK') {
+      return 'deadlock';
+    }
+    return 'unknown';
   }
 }

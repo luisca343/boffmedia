@@ -24,7 +24,8 @@
     "card": {
       "starts": "Empieza {date}",
       "ends": "Hasta {date}",
-      "game": "Juego"
+      "game": "Juego",
+      "timezone": "Hora de España"
     },
     "countdown": {
       "days": "días",

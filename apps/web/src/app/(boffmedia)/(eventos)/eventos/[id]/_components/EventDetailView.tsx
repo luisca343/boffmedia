@@ -121,10 +121,11 @@ export function EventDetailView({ id }: { id: number }) {
           <Panel title={t("detail.about")}>
             <p className="font-body text-[0.9375rem]/[1.6] text-txt-muted text-pretty">{event.description || "—"}</p>
             <div className="mt-4 flex flex-wrap gap-x-6 gap-y-3">
-              <span className="inline-flex items-center gap-2 font-mono text-[0.75rem]/none uppercase tracking-[0.06em] text-txt-muted">
+              <span className="inline-flex items-center gap-2 font-mono text-[0.75rem]/none uppercase tracking-[0.06em] text-txt-muted" title={t("card.timezone")}>
                 <Icon name="calendar" size={14} className="text-accent" />
                 {formatEventDate(event.startDate) || "—"}
                 {event.endDate ? ` — ${formatEventDate(event.endDate)}` : ""}
+                {event.startDate ? ` • ${t("card.timezone")}` : ""}
               </span>
               <span className="inline-flex items-center gap-2 font-mono text-[0.75rem]/none uppercase tracking-[0.06em] text-txt-muted">
                 <Icon name="users" size={14} className="text-accent" />

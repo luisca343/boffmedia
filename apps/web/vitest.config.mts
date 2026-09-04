@@ -21,5 +21,19 @@ export default defineConfig({
     // @boffmedia/ui is included explicitly: its tests moved out of src/ with
     // the package and would otherwise be silently collected by nothing.
     include: ["src/**/*.test.ts", "../../packages/ui/src/**/*.test.ts"],
+    // `config/env` validates NEXT_PUBLIC_* with zod AT IMPORT TIME, so any test
+    // that reaches the service layer dies with a ZodError before a single
+    // assertion runs — and vitest reports that as a FILE failure while still
+    // printing "N tests passed", which reads like success. It has already
+    // silently disabled two suites in this backlog (the W14 command palette and
+    // W5's session integration tests). Supplying placeholder values here is the
+    // fix for the whole class; individual tests that care about a specific value
+    // still override it themselves.
+    // The three without a zod default are the ones that throw.
+    env: {
+      NEXT_PUBLIC_API: "http://localhost:34301",
+      NEXT_PUBLIC_SOCKET_URL: "http://localhost:34301",
+      NEXT_PUBLIC_MC_WORLD: "test",
+    },
   },
 })

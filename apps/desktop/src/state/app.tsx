@@ -115,6 +115,10 @@ type State = {
   boffDeviceCode: BoffDeviceCode | null;
   boffSigningIn: boolean;
   boffError: string | null;
+  /** Elapsed seconds since device code was issued; null when not signing in. */
+  boffElapsedSeconds: number | null;
+  /** Whether the device code has expired. */
+  boffCodeExpired: boolean;
   /** The MINECRAFT account, when one is signed in. Needed to launch Minecraft
    *  and nothing else — an emulator pack never asks for it. */
   account: Account | null;
@@ -213,6 +217,8 @@ type Action =
       code?: string;
     }
   | { type: "boff/cancel"; message?: string }
+  | { type: "boff/expired" }
+  | { type: "boff/elapsed"; seconds: number }
   | { type: "boff/signout" }
   | { type: "boot/step"; step: string }
   | { type: "boot/done"; part: "auth" | "settings" | "packs" }
@@ -276,6 +282,8 @@ function reducer(s: State, a: Action): State {
         boffDeviceCode: null,
         boffError: null,
         boffRestoreError: null,
+        boffElapsedSeconds: null,
+        boffCodeExpired: false,
       };
     case "boff/switched":
       // A different Boffmedia account: its entitlements differ, so the library
@@ -291,6 +299,8 @@ function reducer(s: State, a: Action): State {
         boffDeviceCode: null,
         boffError: null,
         boffRestoreError: null,
+        boffElapsedSeconds: null,
+        boffCodeExpired: false,
         restoreError: null,
         offline: false,
         packs: [],
@@ -335,6 +345,19 @@ function reducer(s: State, a: Action): State {
         boffSigningIn: false,
         boffDeviceCode: null,
         boffError: a.message ?? null,
+        boffElapsedSeconds: null,
+        boffCodeExpired: false,
+      };
+    case "boff/expired":
+      return {
+        ...s,
+        boffCodeExpired: true,
+        boffSigningIn: false,
+      };
+    case "boff/elapsed":
+      return {
+        ...s,
+        boffElapsedSeconds: a.seconds,
       };
     case "boff/signout":
       // Signing out of Boffmedia empties the library too: every managed pack in
@@ -563,6 +586,8 @@ const initial: State = {
   boffDeviceCode: null,
   boffSigningIn: false,
   boffError: null,
+  boffElapsedSeconds: null,
+  boffCodeExpired: false,
   account: null,
   deviceCode: null,
   signingIn: false,
@@ -826,15 +851,26 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       const code = await boffDeviceStart();
       dispatch({ type: "boff/code", code });
 
-      const intervalMs = Math.max(2, code.intervalSeconds) * 1000;
+      const initialIntervalMs = Math.max(2, code.intervalSeconds) * 1000;
       const deadline = Date.now() + code.expiresIn * 1000;
+      const startTime = Date.now();
+      let currentIntervalMs = initialIntervalMs;
+      const MAX_BACKOFF_MS = 30_000; // Cap exponential backoff at 30 seconds
+      let pollCount = 0;
+
       for (;;) {
         if (boffCancelled.current) return;
-        if (Date.now() > deadline) {
-          surfaceFailure("El código ha caducado.");
+        const now = Date.now();
+        const elapsedMs = now - startTime;
+        const elapsedSeconds = Math.floor(elapsedMs / 1000);
+        dispatch({ type: "boff/elapsed", seconds: elapsedSeconds });
+
+        if (now > deadline) {
+          // Code expired server-side; show the expired state instead of just an error
+          dispatch({ type: "boff/expired" });
           return;
         }
-        await sleep(intervalMs);
+        await sleep(currentIntervalMs);
         if (boffCancelled.current) return;
 
         const poll = await boffDevicePoll();
@@ -859,8 +895,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         if (poll.status === "expired") {
-          surfaceFailure("El código ha caducado.");
+          // Server says code is expired; show the expired state
+          dispatch({ type: "boff/expired" });
           return;
+        }
+
+        // Exponential backoff: double the interval each poll, cap at MAX_BACKOFF_MS
+        pollCount += 1;
+        if (pollCount > 0) {
+          currentIntervalMs = Math.min(
+            initialIntervalMs * Math.pow(1.5, pollCount - 1),
+            MAX_BACKOFF_MS
+          );
         }
       }
     } catch (err) {

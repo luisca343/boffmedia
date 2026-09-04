@@ -105,6 +105,10 @@ describe('WigglypopCustodyService', () => {
     // A sold or cancelled listing must give the mon back (S9): the custody lock
     // is released on every path that takes the listing off the shelf.
     releaseCustodyByListing: jest.fn(),
+    // S12: Session tracking for divergence detection
+    recordSession: jest.fn(),
+    getActiveSessions: jest.fn(),
+    countActiveSessions: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -121,6 +125,14 @@ describe('WigglypopCustodyService', () => {
     outbox.enqueue.mockResolvedValue(1);
     listingsRepository.findManyByIds.mockResolvedValue([makeListing()]);
     listingsRepository.findById.mockResolvedValue(makeListing());
+    // S12: Default to single session (no divergence)
+    listingsRepository.recordSession.mockResolvedValue({
+      uuid: BUYER,
+      sessionId: 'test-session',
+      createdAt: new Date(),
+    });
+    listingsRepository.getActiveSessions.mockResolvedValue(['test-session']);
+    listingsRepository.countActiveSessions.mockResolvedValue(1);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -549,6 +561,86 @@ describe('WigglypopCustodyService', () => {
       expect(wingull.takePokemon).not.toHaveBeenCalled();
       expect(escrow.hold).not.toHaveBeenCalled();
       expect(escrow.release).not.toHaveBeenCalled();
+    });
+  });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  describe('S12: Concurrent session divergence detection (logging only)', () => {
+    let logger: any;
+
+    beforeEach(async () => {
+      const module: TestingModule = await Test.createTestingModule({
+        providers: [
+          WigglypopCustodyService,
+          {
+            provide: Logger,
+            useValue: {
+              log: jest.fn(),
+              warn: jest.fn(),
+              error: jest.fn(),
+            },
+          },
+          { provide: WigglypopEscrowService, useValue: escrow },
+          { provide: WingullFacadeService, useValue: wingull },
+          { provide: WigglypopOrdersRepository, useValue: ordersRepository },
+          { provide: WigglypopListingsRepository, useValue: listingsRepository },
+          { provide: OutboxRepository, useValue: outbox },
+        ],
+      }).compile();
+
+      service = module.get(WigglypopCustodyService);
+      logger = module.get(Logger);
+    });
+
+    it('logs a divergence warning when multiple sessions act on custody for the same UUID', async () => {
+      // Simulate two concurrent sessions acting on the buyer's UUID
+      listingsRepository.getActiveSessions.mockResolvedValue([
+        'session-1',
+        'session-2',
+      ]);
+
+      await service.settleNewOrder(makeOrder());
+
+      // Verify divergence warning was logged
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining(
+          'Wigglypop S12 divergence detected: UUID ' + BUYER,
+        ),
+      );
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('2 concurrent sessions'),
+      );
+      expect(logger.warn).toHaveBeenCalledWith(
+        expect.stringContaining('Operation: settleNewOrder'),
+      );
+    });
+
+    it('does not log when only one session is active (normal case)', async () => {
+      listingsRepository.getActiveSessions.mockResolvedValue(['session-1']);
+
+      await service.settleNewOrder(makeOrder());
+
+      // Warn should not be called for single session
+      expect(logger.warn).not.toHaveBeenCalledWith(
+        expect.stringContaining('S12 divergence detected'),
+      );
+    });
+
+    it('continues operation if divergence check fails (non-blocking)', async () => {
+      // Divergence check throws an error
+      listingsRepository.getActiveSessions.mockRejectedValue(
+        new Error('database error'),
+      );
+
+      // Should not throw, should proceed with order settlement
+      await service.settleNewOrder(makeOrder());
+
+      // The order should still be settled
+      expect(escrow.hold).toHaveBeenCalled();
+      // Error should be logged but not re-thrown
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining('S12: divergence check failed'),
+      );
     });
   });
 });

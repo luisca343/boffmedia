@@ -442,3 +442,24 @@ export const wigglypopMonCustody = mysqlTable(
 );
 
 export type WigglypopMonCustody = typeof wigglypopMonCustody.$inferSelect;
+
+// ─── Session Guard (S12) ────────────────────────────────────────────────────
+
+// Tracks active game sessions per UUID to detect concurrent custody operations.
+// Used for logging divergence warnings only (enforcement is out of scope).
+export const wigglypopSessions = mysqlTable(
+  'rotom_wigglypop_sessions',
+  {
+    uuid: playerUuid('uuid').notNull(),
+    sessionId: varchar('session_id', { length: 64 }).notNull(),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (t) => ({
+    uuidCreatedIdx: index('wp_sessions_uuid_created_idx').on(
+      t.uuid,
+      t.createdAt,
+    ),
+  }),
+);
+
+export type WigglypopSession = typeof wigglypopSessions.$inferSelect;

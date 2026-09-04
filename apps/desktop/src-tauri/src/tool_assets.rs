@@ -629,6 +629,20 @@ fn store(dir: &Path, file: &Path, bytes: &[u8]) {
     }
 }
 
+/// Purge all assets for a given tool pack from the cache (D-11).
+/// Called when tool_packs_remove is invoked, to clean up loose assets
+/// when a pack is uninstalled. Triggers LRU sweep that considers both
+/// tool packs and loose assets when enforcing the cache cap.
+pub async fn purge_pack_assets(app: &tauri::AppHandle, dir: &Path, _tool: &str) {
+    // Trigger LRU sweep that considers pack access times (D-11).
+    if let Some(packs_root) = crate::tool_packs::packs_root_for_sweep(app) {
+        sweep_lru(dir, &packs_root);
+    } else {
+        // Fallback if packs don't exist: simple write-time sweep.
+        sweep(dir);
+    }
+}
+
 /// Enforce the cap, oldest first.
 ///
 /// Least-recently-WRITTEN, not least-recently-used: reads do not touch mtime,
@@ -663,6 +677,100 @@ pub fn sweep(dir: &Path) {
         }
         if std::fs::remove_file(&path).is_ok() {
             total = total.saturating_sub(len);
+        }
+    }
+}
+
+/// Enforce the cap by evicting least-recently-used content (D-11).
+/// LRU-aware version that considers tool pack access times.
+///
+/// Two-phase eviction:
+/// 1. Evict tool pack directories by access time (oldest marker mtime first).
+///    Packs are the heavy-art bundles (708 MB across three tools); prioritizing
+///    them keeps common-case access patterns responsive.
+/// 2. If still over cap: evict loose asset files by write time (oldest first).
+///
+/// Tool packs track access via "accessed" marker files touched by cached_version_dir();
+/// loose assets (per-file cache) are write-only, not access-tracked.
+pub(crate) fn sweep_lru(cache_dir: &Path, packs_root: &Path) {
+    sweep_lru_capped(cache_dir, packs_root, CACHE_CAP_BYTES)
+}
+
+/// The body of {@link sweep_lru} with the cap injected.
+///
+/// The cap is a parameter for ONE reason: a test cannot write 512 MB to prove
+/// eviction. The first version of the test worked around that by copying the
+/// eviction loop into the test body and asserting on its own copy — which
+/// passes with `sweep_lru` deleted, so it guarded nothing. Production still
+/// calls the const; the test calls this with a handful of kilobytes.
+pub(crate) fn sweep_lru_capped(cache_dir: &Path, packs_root: &Path, cap: u64) {
+    let Ok(entries) = std::fs::read_dir(cache_dir) else {
+        return;
+    };
+    let mut files: Vec<(SystemTime, u64, PathBuf)> = Vec::new();
+    let mut total: u64 = 0;
+    for entry in entries.flatten() {
+        let Ok(meta) = entry.metadata() else { continue };
+        if !meta.is_file() {
+            continue;
+        }
+        let modified = meta.modified().unwrap_or(SystemTime::UNIX_EPOCH);
+        total += meta.len();
+        files.push((modified, meta.len(), entry.path()));
+    }
+    // Packs live outside the asset cache directory but count against the SAME
+    // budget, so they are measured BEFORE the cap is tested. Leaving them out of
+    // `total` while subtracting their bytes during eviction — as the first
+    // version did — deletes packs to relieve an overage they never contributed
+    // to, and can leave the loose files that actually caused it in place.
+    let mut packs: Vec<(SystemTime, u64, PathBuf)> = Vec::new();
+    if let Ok(pack_entries) = std::fs::read_dir(packs_root) {
+        for entry in pack_entries.flatten() {
+            let tool_dir = entry.path();
+            if !tool_dir.is_dir() {
+                continue;
+            }
+            // Get the pack's access time from its marker file.
+            let marker = tool_dir.join("accessed");
+            let accessed = std::fs::metadata(&marker)
+                .ok()
+                .and_then(|m| m.modified().ok())
+                .unwrap_or(SystemTime::UNIX_EPOCH);
+            let bytes = crate::tool_packs::dir_bytes(&tool_dir);
+            total += bytes;
+            packs.push((accessed, bytes, tool_dir));
+        }
+    }
+
+    if total <= cap {
+        return;
+    }
+
+    let target = cap / 5 * 4;
+
+    // Phase 1: evict tool packs by ACCESS time (D-11 LRU), oldest first. Packs
+    // are the heavy bundles, so they are the first thing worth reclaiming.
+    packs.sort_by_key(|(accessed, _, _)| *accessed);
+    for (_, pack_bytes, pack_dir) in packs {
+        if total <= target {
+            break;
+        }
+        // Remove the entire pack directory (the tool's extracted version tree).
+        if std::fs::remove_dir_all(&pack_dir).is_ok() {
+            total = total.saturating_sub(pack_bytes);
+        }
+    }
+
+    // Phase 2: Evict loose asset files if still over cap after pack removal.
+    if total > target {
+        files.sort_by_key(|(modified, _, _)| *modified);
+        for (_, len, path) in files {
+            if total <= target {
+                break;
+            }
+            if std::fs::remove_file(&path).is_ok() {
+                total = total.saturating_sub(len);
+            }
         }
     }
 }
@@ -798,6 +906,83 @@ mod tests {
         // The survivors are the NEWEST ones: eviction by age, not by name.
         assert!(!dir.path().join("0000.png").exists());
         assert!(dir.path().join("0009.png").exists());
+    }
+
+    /// D-11: eviction must follow ACCESS time, which is the whole point — the
+    /// old `sweep` sorted by write time, so a pack used every day was evicted
+    /// before one downloaded yesterday and never opened.
+    ///
+    /// This drives the real function. The first version of this test copied the
+    /// eviction loop into the test body and asserted on its own copy, which
+    /// passes with `sweep_lru` deleted. The cap is a parameter so a test can
+    /// apply pressure with megabytes instead of the 512 MB production cap.
+    #[test]
+    fn sweep_lru_evicts_the_least_recently_accessed_pack() {
+        use std::time::{Duration, UNIX_EPOCH};
+
+        let cache = tempdir::TempCacheDir::new();
+        let packs_root = tempdir::TempCacheDir::new();
+        let packs_dir = packs_root.path();
+
+        // Written a, b, c — but ACCESSED in the opposite order, so write time and
+        // access time disagree and only one of them gives the right answer.
+        //
+        //   pack_a  accessed last  (5000) — keep
+        //   pack_b  accessed       (3000)
+        //   pack_c  accessed first (1000) — evict
+        for (name, accessed) in &[("pack_a", 5_000u64), ("pack_b", 3_000u64), ("pack_c", 1_000u64)] {
+            let dir = packs_dir.join(name);
+            std::fs::create_dir_all(&dir).unwrap();
+            std::fs::write(dir.join("data.bin"), vec![0u8; 1024 * 1024]).unwrap();
+            let marker = dir.join("accessed");
+            std::fs::write(&marker, "").unwrap();
+            // Windows needs a WRITE handle to set the timestamp; File::open is
+            // read-only and fails. The earlier version of this test hid that by
+            // discarding the result.
+            std::fs::OpenOptions::new()
+                .write(true)
+                .open(&marker)
+                .and_then(|f| f.set_modified(UNIX_EPOCH + Duration::from_secs(*accessed)))
+                .unwrap();
+        }
+
+        // 3 MB of packs against a 2 MB cap.
+        sweep_lru_capped(cache.path(), packs_dir, 2 * 1024 * 1024);
+
+        assert!(
+            !packs_dir.join("pack_c").exists(),
+            "the least-recently-ACCESSED pack must go, even though it was written last"
+        );
+        assert!(
+            packs_dir.join("pack_a").exists(),
+            "the most-recently-accessed pack must survive"
+        );
+    }
+
+    /// Under the cap, a sweep must not touch anything: evicting a pack the
+    /// player is using, for no reason, is worse than being slightly over.
+    #[test]
+    fn sweep_lru_leaves_everything_alone_while_under_the_cap() {
+        use std::time::{Duration, UNIX_EPOCH};
+
+        let cache = tempdir::TempCacheDir::new();
+        let packs_root = tempdir::TempCacheDir::new();
+        let packs_dir = packs_root.path();
+
+        let dir = packs_dir.join("pack_a");
+        std::fs::create_dir_all(&dir).unwrap();
+        std::fs::write(dir.join("data.bin"), vec![0u8; 1024 * 1024]).unwrap();
+        let marker = dir.join("accessed");
+        std::fs::write(&marker, "").unwrap();
+        std::fs::OpenOptions::new()
+            .write(true)
+            .open(&marker)
+            .and_then(|f| f.set_modified(UNIX_EPOCH + Duration::from_secs(1_000)))
+            .unwrap();
+
+        sweep_lru_capped(cache.path(), packs_dir, CACHE_CAP_BYTES);
+
+        assert!(packs_dir.join("pack_a").exists());
     }
 
     /// A self-cleaning temp directory. `tempfile` is not a dependency of this

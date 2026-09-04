@@ -78,6 +78,15 @@ export class WigglypopCustodyService {
    * returns the order in its settled state.
    */
   async settleNewOrder(order: OrderWithLines): Promise<OrderWithLines> {
+    // S12: Record session and detect concurrent operations
+    const buyerSession = this.generateSessionId();
+    await this.listingsRepository.recordSession(order.buyerUuid, buyerSession);
+    await this.checkAndLogDivergence(
+      order.buyerUuid,
+      buyerSession,
+      `settleNewOrder:${order.code}`,
+    );
+
     return this.isAtomic()
       ? this.settleAtomic(order)
       : this.settleManual(order);
@@ -675,6 +684,48 @@ export class WigglypopCustodyService {
       }
       // CUSTODY LOCK: Release locks on all mons when the order is cancelled.
       await this.listingsRepository.releaseCustodyByListing(line.listingId);
+    }
+  }
+
+  // ─── Session Guard (S12) ────────────────────────────────────────────────────
+
+  /**
+   * Generates a unique session ID for tracking concurrent operations.
+   * Simple implementation: timestamp + random suffix.
+   */
+  private generateSessionId(): string {
+    return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
+  }
+
+  /**
+   * Checks if multiple sessions are acting on custody for the same UUID
+   * and logs a divergence warning if so.
+   *
+   * Logging only, not enforcement (enforcement out of scope per requirements).
+   */
+  private async checkAndLogDivergence(
+    uuid: string,
+    currentSessionId: string,
+    operation: string,
+  ): Promise<void> {
+    try {
+      const activeSessions = await this.listingsRepository.getActiveSessions(
+        uuid,
+      );
+
+      if (activeSessions.length > 1) {
+        this.logger.warn(
+          `Wigglypop S12 divergence detected: UUID ${uuid} has ${activeSessions.length} concurrent sessions acting on custody. ` +
+            `Current session: ${currentSessionId}, all sessions: [${activeSessions.join(', ')}]. ` +
+            `Operation: ${operation}.`,
+        );
+      }
+    } catch (error: any) {
+      // Divergence detection failures must not block custody operations.
+      // Log the error but continue.
+      this.logger.error(
+        `Wigglypop S12: divergence check failed for UUID ${uuid}: ${error?.message}`,
+      );
     }
   }
 }

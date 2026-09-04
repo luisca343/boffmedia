@@ -35,6 +35,12 @@ function CopyButton({ value, label }: { value: string; label: string }) {
   )
 }
 
+function formatTime(seconds: number): string {
+  const mins = Math.floor(seconds / 60)
+  const secs = seconds % 60
+  return `${mins}:${secs.toString().padStart(2, "0")}`
+}
+
 export function BoffSignIn() {
   const {
     boffSignIn,
@@ -43,6 +49,8 @@ export function BoffSignIn() {
     boffDeviceCode,
     boffError,
     boffRestoreError,
+    boffElapsedSeconds,
+    boffCodeExpired,
     goBoffOffline,
   } = useApp()
   const t = useT("boffSignin")
@@ -123,7 +131,7 @@ export function BoffSignIn() {
           </Panel>
         )}
 
-        {boffSigningIn && boffDeviceCode && (
+        {boffSigningIn && boffDeviceCode && !boffCodeExpired && (
           <Panel title={t("complete")} aside={<Badge tone="warn">{t("waiting")}</Badge>}>
             <ol className="flex flex-col gap-4">
               <li className="flex gap-3">
@@ -169,9 +177,28 @@ export function BoffSignIn() {
             <div className="mt-5 flex items-center justify-between gap-3 border-t border-line pt-4">
               <span className="flex items-center gap-2 text-xs text-txt-dim">
                 <Spinner size={12} /> {t("confirmWaiting")}
+                {boffElapsedSeconds !== null && (
+                  <span className="ml-2">
+                    {t("elapsedTime", {
+                      elapsed: formatTime(boffElapsedSeconds),
+                      total: formatTime(boffDeviceCode.expiresIn),
+                    })}
+                  </span>
+                )}
               </span>
               <Button size="sm" variant="ghost" onClick={cancelBoffSignIn}>
                 {t("cancelButton")}
+              </Button>
+            </div>
+          </Panel>
+        )}
+
+        {boffCodeExpired && (
+          <Panel title={t("expiredTitle")} className="mb-4">
+            <div className="flex flex-col items-center gap-4 py-4">
+              <p className="text-center text-sm text-txt">{t("failedTitle")}</p>
+              <Button variant="pri" size="lg" icon="refresh" onClick={() => void boffSignIn()}>
+                {t("restartButton")}
               </Button>
             </div>
           </Panel>

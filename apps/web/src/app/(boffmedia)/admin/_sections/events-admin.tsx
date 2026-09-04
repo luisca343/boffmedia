@@ -12,6 +12,7 @@ import { orThrow } from "@/services/http/core"
 import { RandomizerService } from "@/services/api/boffmedia/randomizerService"
 import { EventForm } from "./forms/EventForm"
 import { EventAdminPanel } from "./events/EventAdminPanel"
+import { naiveToUtc } from "@/lib/timezone-utils"
 import type { Event as EventType } from "@boffmedia/shared"
 import type { RandomizerConfig } from "@/services/api/boffmedia/randomizer.types"
 
@@ -116,6 +117,9 @@ export function EventsAdmin() {
           const { gameId, packId, ...rest } = data
           // orThrow: the http helpers return an envelope instead of throwing, so
           // without it a 400 was reported to the admin as "created OK".
+          // CRITICAL: Convert naive wall-clock input (from datetime-local) to UTC.
+          // The admin enters times in Europe/Madrid timezone. We must convert to UTC
+          // before sending to the API to ensure correct storage regardless of server TZ.
           await orThrow(EventsService.createEvent({
             ...rest,
             gameId,
@@ -124,17 +128,19 @@ export function EventsAdmin() {
             icon: data.icon || "",
             banner: data.banner || "",
             // Empty datetime inputs mean "undated", not "invalid" — send null.
-            startDate: data.startDate || null,
-            endDate: data.endDate || data.startDate || null,
+            // Convert naive Madrid times to UTC.
+            startDate: naiveToUtc(data.startDate || null),
+            endDate: naiveToUtc(data.endDate || data.startDate || null),
           }))
         }}
         onUpdate={async (id, data: any) => {
           const { packId, ...rest } = data
+          // Convert naive Madrid times to UTC (see onCreate for explanation).
           await orThrow(EventsService.updateEvent(Number(id), {
             ...rest,
             packId: packId || null,
-            startDate: data.startDate || null,
-            endDate: data.endDate || null,
+            startDate: naiveToUtc(data.startDate || null),
+            endDate: naiveToUtc(data.endDate || null),
           }))
         }}
         onDelete={async (id) => {

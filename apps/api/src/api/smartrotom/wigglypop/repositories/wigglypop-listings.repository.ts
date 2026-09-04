@@ -5,6 +5,7 @@ import {
   asc,
   desc,
   eq,
+  gte,
   inArray,
   isNotNull,
   like,
@@ -22,10 +23,12 @@ import {
   wigglypopOffers,
   wigglypopOrderLines,
   wigglypopWatchlist,
+  wigglypopSessions,
   WigglypopCatalogItem,
   WigglypopListing,
   WigglypopListingItem,
   WigglypopListingMon,
+  WigglypopSession,
 } from '@/_db/schema/SmartRotomWigglypop';
 import { rotomUsers } from '@/_db/schema/SmartRotom';
 import { ListListingsQueryDto } from '../dto/wigglypop.dto';
@@ -552,5 +555,75 @@ export class WigglypopListingsRepository {
     await this.db
       .delete(wigglypopMonCustody)
       .where(eq(wigglypopMonCustody.listingId, listingId));
+  }
+
+  // ─── Session Guard (S12) ────────────────────────────────────────────────────
+
+  /**
+   * Records an active game session for a UUID. Used to detect concurrent custody operations.
+   * Returns the session record.
+   */
+  async recordSession(
+    uuid: string,
+    sessionId: string,
+  ): Promise<WigglypopSession> {
+    const [result] = await this.db
+      .insert(wigglypopSessions)
+      .values({
+        uuid,
+        sessionId,
+      })
+      .$returningId();
+
+    const row = await this.db
+      .select()
+      .from(wigglypopSessions)
+      .where(
+        and(
+          eq(wigglypopSessions.uuid, uuid),
+          eq(wigglypopSessions.sessionId, sessionId),
+        ),
+      )
+      .limit(1);
+
+    return row[0]!;
+  }
+
+  /**
+   * Counts distinct active sessions for a UUID (created in the last 30 minutes).
+   * Used to detect concurrent custody operations for the same player.
+   */
+  async countActiveSessions(uuid: string): Promise<number> {
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const rows = await this.db
+      .select({
+        count: sql<number>`count(distinct ${wigglypopSessions.sessionId})`,
+      })
+      .from(wigglypopSessions)
+      .where(
+        and(
+          eq(wigglypopSessions.uuid, uuid),
+          gte(wigglypopSessions.createdAt, thirtyMinutesAgo),
+        ),
+      );
+    return Number(rows[0]?.count ?? 0);
+  }
+
+  /**
+   * Gets all distinct active session IDs for a UUID (created in the last 30 minutes).
+   * Used in divergence logging to report which sessions are concurrent.
+   */
+  async getActiveSessions(uuid: string): Promise<string[]> {
+    const thirtyMinutesAgo = new Date(Date.now() - 30 * 60 * 1000);
+    const rows = await this.db
+      .selectDistinct({ sessionId: wigglypopSessions.sessionId })
+      .from(wigglypopSessions)
+      .where(
+        and(
+          eq(wigglypopSessions.uuid, uuid),
+          gte(wigglypopSessions.createdAt, thirtyMinutesAgo),
+        ),
+      );
+    return rows.map((r) => r.sessionId);
   }
 }

@@ -1,9 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQueryClient } from "@tanstack/react-query"
 import type { ApiResponse } from "@/services/boffAPI"
 import { forumKeys } from "./keys"
+import { useSessionMutation } from "@/lib/hooks/useSessionMutation"
 
 // Pulls a human-readable message out of a failed ApiResponse envelope. The
 // NestJS validation filter can send `message` as a string[], so the runtime
@@ -17,7 +18,7 @@ export function apiErrorMessage(res: ApiResponse<unknown>, fallback: string): st
 }
 
 /**
- * The forum write scaffold, now on TanStack `useMutation`. The public shape is
+ * The forum write scaffold, now on TanStack `useSessionMutation`. The public shape is
  * unchanged — `{ run, isSubmitting, error, setError }`, with `run` resolving to
  * the data or `null` — because ten call sites render `error` as a string and
  * disable their button on `isSubmitting`.
@@ -35,6 +36,9 @@ export function apiErrorMessage(res: ApiResponse<unknown>, fallback: string): st
  *
  * `error` stays a string rather than the mutation's Error object: the fallbacks
  * are per-action Spanish copy owned by the calling hook.
+ *
+ * 401s are handled centrally: if session is expired, the dialog appears and
+ * user can re-authenticate. Pending 2FA 401s are silently ignored.
  */
 export function useForumMutation<TArgs extends unknown[], TData>(
   fn: (...args: TArgs) => Promise<ApiResponse<TData>>,
@@ -44,7 +48,7 @@ export function useForumMutation<TArgs extends unknown[], TData>(
   const [error, setError] = React.useState<string | null>(null)
   const inFlight = React.useRef(false)
 
-  const { mutateAsync, isPending } = useMutation({
+  const { mutateAsync, isPending } = useSessionMutation({
     mutationFn: async (args: TArgs) => {
       const res = await fn(...args)
       if (!res.success) throw new Error(apiErrorMessage(res, fallbackError))

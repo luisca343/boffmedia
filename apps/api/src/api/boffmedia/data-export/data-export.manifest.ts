@@ -115,6 +115,7 @@ import {
   wigglypopListingMons,
   wigglypopListings,
   wigglypopMonCustody,
+  wigglypopSessions,
   wigglypopOffers,
   wigglypopOrderLines,
   wigglypopOrders,
@@ -916,6 +917,14 @@ export const EXPORTED_TABLES: readonly ExportedTable[] = [
       'Pokémon of yours that are locked because they are currently listed.',
   },
   {
+    table: 'rotom_wigglypop_sessions',
+    section: 'economy',
+    drizzle: wigglypopSessions,
+    ownedBy: [{ column: wigglypopSessions.uuid, key: 'mcUuid' }],
+    meaning:
+      'When your game client touched the marketplace, used to spot two sessions acting at once.',
+  },
+  {
     table: 'rotom_wigglypop_listing_items',
     section: 'economy',
     drizzle: wigglypopListingItems,
@@ -1142,6 +1151,14 @@ export const EXPORTED_TABLES: readonly ExportedTable[] = [
 ];
 
 export const EXCLUDED_TABLES: readonly ExcludedTable[] = [
+  // Scheduler machinery. One row per named job holding an owner id and an
+  // expiry so two API instances cannot run the nightly sweep at once. It has no
+  // user column at all — there is nothing here to attribute to a person.
+  {
+    table: 'retention_lease',
+    reason:
+      'A single row of cron bookkeeping (job name, random owner id, expiry). Carries no user reference of any kind.',
+  },
   // Opt-in desktop telemetry. This is the one table whose exclusion protects
   // the user rather than the system: rows are keyed ONLY by a random
   // per-installation id that is deliberately not tied to an account, so there

@@ -90,6 +90,14 @@
       "serverPack": "Pack de servidor",
       "clientPack": "Pack de cliente"
     },
+    "connection": {
+      "reconnecting": "Reconectando…",
+      "offline": "Conexión perdida",
+      "failed": "Conexión fallida",
+      "retrying": "Reintentando en {seconds}s",
+      "tryReconnect": "Intentar reconectar",
+      "working": "Estamos trabajando en ello"
+    },
     "construction": {
       "title": "Página en construcción",
       "message": "Estamos trabajando en esta sección. ¡Vuelve pronto para ver las novedades!",

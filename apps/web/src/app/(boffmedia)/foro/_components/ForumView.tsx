@@ -34,7 +34,7 @@ export function ForumView() {
             <Empty icon="list" title={t("view.emptyTitle")} lead={t("view.emptyLead")} />
           ) : (
             <div className="grid gap-3">
-              {categories.map((c) => (
+              {(categories as any[]).map((c: any) => (
                 <CategoryTile key={c.id} cat={toCategoryLike(c)} onOpen={go} now={now} />
               ))}
             </div>
@@ -42,7 +42,7 @@ export function ForumView() {
         </div>
 
         <aside className="grid gap-5 max-[900px]:grid-cols-2 max-[560px]:grid-cols-1">
-          <OnlineList members={online.map(toMemberLike)} onOpen={go} now={now} />
+          <OnlineList members={(online as any[]).map(toMemberLike)} onOpen={go} now={now} />
           {stats && <ForumStats stats={stats} />}
         </aside>
       </div>

@@ -1,21 +1,18 @@
 "use client"
 
 import { useSocketAuth } from "@/services/useSocketAuth"
-import { type ReactNode, useEffect } from "react"
+import { type ReactNode } from "react"
+import { BoffmediaConnectionBanner } from "@/app/_components/BoffmediaConnectionBanner"
 
 export function SocketProvider({ children }: { children: ReactNode }) {
   // Initialize socket connection and auth listeners
   const socket = useSocketAuth()
 
-  useEffect(() => {
-    return () => {
-      console.log("SocketProvider unmounted")
-    }
-  }, [])
-
-  useEffect(() => {
-  }, [socket])
-
-  return <>{children}</>
+  return (
+    <>
+      <BoffmediaConnectionBanner />
+      {children}
+    </>
+  )
 }
 

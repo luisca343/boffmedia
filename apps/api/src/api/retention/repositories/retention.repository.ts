@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, desc, eq, isNotNull, isNull, lt, lte, sql } from 'drizzle-orm';
@@ -12,6 +13,7 @@ import { randomizerAudit } from '@/_db/schema/Randomizer';
 import { gobiernoAuditoria } from '@/_db/schema/SmartRotomGobierno';
 import { rotomNoteVersions, rotomDocuments } from '@/_db/schema/SmartRotomDocuments';
 import { boffMediaOutbox } from '@/_db/schema/BoffMediaOutbox';
+import { retentionLease } from '@/_db/schema/Retention';
 
 /**
  * The delete side of the daily retention sweep (see `RetentionService`).
@@ -32,6 +34,76 @@ export class RetentionRepository {
   constructor(
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
+
+  /**
+   * A8 — Claim a distributed lease for the retention sweep via a database row.
+   * Returns a lease token if successful, null if another instance owns the lease.
+   *
+   * The lease row is claimed with a conditional UPDATE that succeeds only if:
+   *   - No row exists (first claim ever)
+   *   - The existing row's expiry is in the past (previous owner crashed or abandoned it)
+   *
+   * If another instance owns a live lease, the UPDATE affects 0 rows and we return null.
+   *
+   * The lease lasts 90 minutes; if the process crashes, the row stays in the
+   * table but expires, allowing the next instance to claim it after a delay.
+   * The service should call releaseLease() to release it immediately when done.
+   */
+  async claimLease(lockName: string, durationMinutes: number = 90): Promise<string | null> {
+    const ownerId = randomUUID();
+    const expiresAt = new Date(Date.now() + durationMinutes * 60 * 1000);
+
+    // Attempt to INSERT or UPDATE: use INSERT ... ON DUPLICATE KEY UPDATE
+    // to either create the row (if it doesn't exist) or claim it (if expired).
+    const [result] = await this.db.execute<any>(
+      sql`
+        INSERT INTO ${retentionLease}
+        (lock_name, owner_id, expires_at)
+        VALUES (${lockName}, ${ownerId}, ${expiresAt})
+        ON DUPLICATE KEY UPDATE
+          owner_id = CASE
+            WHEN expires_at < NOW() THEN ${ownerId}
+            ELSE owner_id
+          END,
+          expires_at = CASE
+            WHEN expires_at < NOW() THEN ${expiresAt}
+            ELSE expires_at
+          END;
+      `,
+    );
+
+    // After the INSERT/UPDATE, query to check if we own the lease.
+    // If expires_at is in the future and owner_id is ours, we own it.
+    const [lease] = await this.db
+      .select()
+      .from(retentionLease)
+      .where(
+        and(
+          eq(retentionLease.lockName, lockName),
+          eq(retentionLease.ownerId, ownerId),
+          sql`${retentionLease.expiresAt} > NOW()`,
+        ),
+      );
+
+    return lease ? ownerId : null;
+  }
+
+  /**
+   * A8 — Release a distributed lease by deleting the row.
+   * This should only be called by the instance that owns the lease (has the token).
+   *
+   * If the lease was already released or claimed by another instance,
+   * the DELETE affects 0 rows but does not error. The service should handle
+   * this gracefully (it is not an error to release when already released).
+   */
+  async releaseLease(lockName: string, ownerId: string): Promise<void> {
+    await this.db.delete(retentionLease).where(
+      and(
+        eq(retentionLease.lockName, lockName),
+        eq(retentionLease.ownerId, ownerId),
+      ),
+    );
+  }
 
   /**
    * Delete read notifications older than the retention window.

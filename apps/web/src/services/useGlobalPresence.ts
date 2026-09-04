@@ -57,9 +57,19 @@ export function useGlobalPresence() {
     socket.on("presence:list", handlePresenceList);
     socket.on("presence:update", handlePresenceUpdate);
 
+    // A reconnect has a hole behind it: whatever was emitted while the tab was
+    // offline is gone. The server sends a fresh presence:list after the client's
+    // smartrotom:connection (which is emitted on every connect by useSocketStore),
+    // so the list will auto-refresh. This listener documents that assumption.
+    const handleReconnect = () => {
+      // Fresh list will arrive after smartrotom:connection
+    };
+    socket.on("connect", handleReconnect);
+
     return () => {
       socket.off("presence:list", handlePresenceList);
       socket.off("presence:update", handlePresenceUpdate);
+      socket.off("connect", handleReconnect);
     };
   }, [socket, handlePresenceList, handlePresenceUpdate]);
 

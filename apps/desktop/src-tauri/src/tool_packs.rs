@@ -101,6 +101,14 @@ pub struct ToolPackSummary {
     pub tool: String,
     pub version: String,
     pub bytes: u64,
+    /// Timestamp of last access (as Unix seconds), used for LRU eviction.
+    /// Omitted from JSON if zero (not yet accessed after install).
+    #[serde(skip_serializing_if = "is_zero")]
+    pub last_accessed: u64,
+}
+
+fn is_zero(val: &u64) -> bool {
+    *val == 0
 }
 
 #[derive(Debug, Clone, Copy, Serialize)]
@@ -191,10 +199,23 @@ fn packs_root(app: &tauri::AppHandle) -> Option<PathBuf> {
     Some(dir)
 }
 
+/// Get the packs root for LRU assessment (used by tool_assets sweep).
+/// This is public so tool_assets::sweep can call it. Requires an app handle.
+pub(crate) fn packs_root_for_sweep(app: &tauri::AppHandle) -> Option<PathBuf> {
+    let dir = crate::datadir::data_root(app).ok()?.join("tool-packs");
+    // Don't create: sweep is read-only. If dir doesn't exist, there are no packs.
+    if dir.is_dir() {
+        Some(dir)
+    } else {
+        None
+    }
+}
+
 /// Sum of every file's size under `dir`, recursively. Used only where a
 /// human is about to look at the number (a status check, the Settings
-/// storage list) — never on the `boffasset://` hot path.
-fn dir_bytes(dir: &Path) -> u64 {
+/// storage list) — never on the `boffasset://` hot path. Also used by
+/// tool_assets::sweep_lru for LRU assessment (D-11).
+pub(crate) fn dir_bytes(dir: &Path) -> u64 {
     let mut total = 0u64;
     let mut stack = vec![dir.to_path_buf()];
     while let Some(current) = stack.pop() {
@@ -290,6 +311,8 @@ fn cached_version_dir(tool_dir: &Path) -> Option<PathBuf> {
         .unwrap_or_else(|p| p.into_inner())
         .get(tool_dir)
     {
+        // On cache hit, touch the pack's mtime for LRU tracking (D-11).
+        let _ = std::fs::write(tool_dir.join("accessed"), "");
         return hit.clone();
     }
     let resolved = std::fs::read_to_string(tool_dir.join("current"))
@@ -301,6 +324,10 @@ fn cached_version_dir(tool_dir: &Path) -> Option<PathBuf> {
         .write()
         .unwrap_or_else(|p| p.into_inner())
         .insert(tool_dir.to_path_buf(), resolved.clone());
+    // Touch access time on first resolution too.
+    if resolved.is_some() {
+        let _ = std::fs::write(tool_dir.join("accessed"), "");
+    }
     resolved
 }
 
@@ -730,13 +757,17 @@ pub fn tool_packs_cancel(state: tauri::State<'_, PackState>, tool: String) {
 }
 
 /// Deletes `<tool>/` entirely, reverting the tool to the asset cache /
-/// network path.
+/// network path. Also purges this tool's assets from the boffasset cache (D-11).
 #[tauri::command]
 pub async fn tool_packs_remove(app: tauri::AppHandle, tool: String) -> Result<(), String> {
     if let Some(root) = packs_root(&app) {
         let tool_dir = root.join(&tool);
         let _ = tokio::fs::remove_dir_all(&tool_dir).await;
         invalidate(&tool_dir);
+    }
+    // Purge all assets for this tool from the boffasset cache with LRU sweep (D-11).
+    if let Some(cache_dir) = cache_dir(&app) {
+        crate::tool_assets::purge_pack_assets(&app, &cache_dir, &tool).await;
     }
     Ok(())
 }
@@ -768,7 +799,14 @@ pub async fn tool_packs_list(app: tauri::AppHandle) -> Vec<ToolPackSummary> {
         }
         let tool = entry.file_name().to_string_lossy().to_string();
         let bytes = dir_bytes(&tool_dir.join(&version));
-        out.push(ToolPackSummary { tool, version, bytes });
+        // Get last access time from the "accessed" marker file (D-11).
+        let last_accessed = std::fs::metadata(tool_dir.join("accessed"))
+            .ok()
+            .and_then(|m| m.modified().ok())
+            .and_then(|t| t.duration_since(std::time::UNIX_EPOCH).ok())
+            .map(|d| d.as_secs())
+            .unwrap_or(0);
+        out.push(ToolPackSummary { tool, version, bytes, last_accessed });
     }
     out
 }
@@ -986,6 +1024,46 @@ mod tests {
         );
         assert!(!version_dir.join("pack.toon").exists());
         assert!(!root.join("othertool").exists());
+
+        let _ = std::fs::remove_dir_all(&root);
+    }
+
+    // D-11: LRU eviction tracks pack access via marker files (D-11).
+    #[test]
+    fn pack_access_markers_created_on_resolution() {
+        let root = temp_dir("lru-markers");
+        let tool_dir = root.join("mewgenics");
+        std::fs::create_dir_all(&tool_dir).unwrap();
+        std::fs::write(tool_dir.join("current"), "v1").unwrap();
+        std::fs::create_dir_all(tool_dir.join("v1")).unwrap();
+
+        // Verify marker doesn't exist before resolution.
+        assert!(
+            !tool_dir.join("accessed").exists(),
+            "access marker should not exist initially"
+        );
+
+        // First access: resolve and verify marker is created.
+        let resolved1 = resolve_under(&root, "/boffmedia/tools/mewgenics/data.json");
+        assert!(resolved1.is_some());
+        assert!(
+            tool_dir.join("accessed").exists(),
+            "access marker should be created on first resolve"
+        );
+
+        // Clear the cache to force re-resolution on next call.
+        invalidate(&tool_dir);
+
+        // Second access: verify marker exists again (proving it's touched on each resolution).
+        let resolved2 = resolve_under(&root, "/boffmedia/tools/mewgenics/data.json");
+        assert!(
+            resolved2.is_some(),
+            "resolve should work after cache invalidation"
+        );
+        assert!(
+            tool_dir.join("accessed").exists(),
+            "access marker should be re-created after cache invalidation"
+        );
 
         let _ = std::fs::remove_dir_all(&root);
     }

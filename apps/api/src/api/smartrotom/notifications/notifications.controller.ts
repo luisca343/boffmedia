@@ -64,6 +64,21 @@ export class NotificationsController {
     ) as unknown as NotificationsInboxDto;
   }
 
+  @Get('unread-count')
+  @ApiOperation({ summary: 'Get unread notification count for a user (S10)' })
+  @ApiQuery({ name: 'uuid', description: 'User UUID' })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'Unread notification count',
+    schema: { type: 'object', properties: { count: { type: 'number' } } },
+  })
+  async getUnreadCount(
+    @Query('uuid') uuid: string,
+  ): Promise<{ count: number }> {
+    const count = await this.notificationsService.getUnreadCount(uuid);
+    return { count };
+  }
+
   @RequireSession()
   @Patch(':id/read')
   @ApiOperation({ summary: 'Mark a single notification as read' })

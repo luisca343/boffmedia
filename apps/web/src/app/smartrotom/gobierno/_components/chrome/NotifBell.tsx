@@ -33,6 +33,17 @@ export function NotifBell() {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
 
+  // S10: Hydrate unread count from server on mount
+  const { data: unreadCountData } = useQuery({
+    queryKey: ["gob", "notifs-unread", uuid],
+    queryFn: () =>
+      rotomGETOrThrow<{ count: number }>(
+        `/notifications/unread-count?uuid=${encodeURIComponent(uuid)}`
+      ),
+    enabled: !!uuid,
+    staleTime: 30_000,
+  })
+
   const { data } = useQuery({
     queryKey: ["gob", "notifs", uuid],
     queryFn: () =>
@@ -42,8 +53,10 @@ export function NotifBell() {
   })
 
   // `isRead` arrives as 0 | 1, not a boolean — it is a tinyint column.
+  // Use server-hydrated count as initial value, fall back to computed count from items
   const items = data?.items ?? []
-  const unread = items.filter((n) => !n.isRead).length
+  const computedUnread = items.filter((n) => !n.isRead).length
+  const unread = unreadCountData?.count ?? computedUnread
 
   useEffect(() => {
     if (!open) return
@@ -60,6 +73,8 @@ export function NotifBell() {
       // Invalidating unconditionally would clear the badge on a write the server rejected,
       // so the refetch only follows a confirmed success.
       await rotomPATCHOrThrow("/notifications/read-all", { uuid })
+      // S10: Invalidate both unread count and inbox queries
+      qc.invalidateQueries({ queryKey: ["gob", "notifs-unread", uuid] })
       qc.invalidateQueries({ queryKey: ["gob", "notifs", uuid] })
     } catch (e) {
       toast.error(userMessageFrom(e, t("campana.markError")))

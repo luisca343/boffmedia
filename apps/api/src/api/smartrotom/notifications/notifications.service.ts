@@ -61,4 +61,10 @@ export class NotificationsService {
   async markAllRead(userUuid: string): Promise<void> {
     return this.repo.markAllRead(userUuid);
   }
+
+  // ─── S10: Unread count ──────────────────────────────────────────────────────
+
+  async getUnreadCount(userUuid: string): Promise<number> {
+    return this.repo.getUnreadCount(userUuid);
+  }
 }

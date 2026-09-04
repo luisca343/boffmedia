@@ -87,7 +87,9 @@ export function EventCard({ event, layout }: { event: EventLike; layout?: "grid"
           ) : (
             <span className="inline-flex items-center gap-1.5 font-mono text-[0.6875rem]/none font-medium uppercase tracking-[0.05em] text-txt-muted">
               <Icon name="calendar" size={13} className="text-txt-dim" />
-              {formatEventDate(event.startDate, intlLocale)}
+              <span title={t("card.timezone")}>
+                {formatEventDate(event.startDate, intlLocale)} {event.startDate ? "• " + t("card.timezone") : ""}
+              </span>
             </span>
           )}
           {/* participant count — the list endpoint supplies it; the detail

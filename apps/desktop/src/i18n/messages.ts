@@ -346,6 +346,9 @@ const es = {
     restoreOfflineTitle: "Sin conexión",
     playOffline: "Jugar sin conexión",
     playOfflineHint: "Abre tu biblioteca con los packs ya instalados. Necesitarás conexión para instalar o actualizar.",
+    elapsedTime: "{elapsed} de {total}",
+    expiredTitle: "El código ha caducado",
+    restartButton: "Pedir un código nuevo",
   },
 
   signin: {
@@ -1739,6 +1742,9 @@ const en = {
     restoreOfflineTitle: "No connection",
     playOffline: "Play offline",
     playOfflineHint: "Opens your library with the packs already installed. You will need a connection to install or update.",
+    elapsedTime: "{elapsed} of {total}",
+    expiredTitle: "Code expired",
+    restartButton: "Request a new code",
   },
 
   signin: {
