@@ -118,6 +118,7 @@ async fn install_payload(
         Phase::Overrides,
         reporter,
         &skip_paths,
+        None,
     )
     .await?;
 

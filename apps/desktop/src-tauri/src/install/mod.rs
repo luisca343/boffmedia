@@ -2069,6 +2069,7 @@ pub async fn instance_install_files(
             &plan.pack_id,
             None,
             file,
+            None,
         )
         .await
         {

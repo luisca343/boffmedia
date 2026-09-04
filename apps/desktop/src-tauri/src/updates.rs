@@ -102,6 +102,41 @@ pub async fn updates_check(app: tauri::AppHandle) -> Result<Option<UpdateInfo>, 
     Ok(Some(info))
 }
 
+/// Where a retained build for `version` is kept.
+pub fn backup_path(backup_dir: &std::path::Path, version: &str) -> std::path::PathBuf {
+    // The version is a filename component, so anything that could climb out of
+    // the directory is flattened rather than trusted.
+    let safe: String = version
+        .chars()
+        .map(|c| if c.is_ascii_alphanumeric() || c == '.' || c == '-' { c } else { '_' })
+        .collect();
+    backup_dir.join(format!("{safe}{}", std::env::consts::EXE_SUFFIX))
+}
+
+/// Copy the running binary aside before an update overwrites it.
+///
+/// Groundwork for D3 only: nothing reverts to this copy yet, and doing so
+/// automatically needs a first-launch health signal that cannot be exercised
+/// without a real Windows update cycle (see docs/desktop-update-rollback-plan.md).
+/// Retaining the build is the half that is safe to land now — without it there is
+/// nothing to revert TO, so a rollback path could never be added after the fact
+/// for a release already in the wild.
+///
+/// Copy, never rename: on Windows the running image is locked, and a failure
+/// here must not block the update. The caller logs and carries on.
+pub fn retain_current_build(
+    current_exe: &std::path::Path,
+    backup_dir: &std::path::Path,
+    version: &str,
+) -> Result<std::path::PathBuf, String> {
+    std::fs::create_dir_all(backup_dir)
+        .map_err(|e| format!("no se pudo crear el directorio de respaldo: {e}"))?;
+    let dest = backup_path(backup_dir, version);
+    std::fs::copy(current_exe, &dest)
+        .map_err(|e| format!("no se pudo respaldar la versión actual: {e}"))?;
+    Ok(dest)
+}
+
 /// Download, verify the minisign signature, install, and restart into the new
 /// build. Does not return on success: `app.restart()` replaces the process.
 #[tauri::command]
@@ -124,6 +159,21 @@ pub async fn updates_install(app: tauri::AppHandle) -> Result<(), String> {
             .map_err(|e| format!("No se pudo comprobar si hay actualizaciones: {e}"))?
             .ok_or_else(|| "Ya tienes la última versión.".to_string())?,
     };
+
+    // Keep the build we are about to replace. Best-effort by design: a failure
+    // to back up is not a reason to refuse an update the user asked for, and the
+    // rollback that would consume it is not built yet.
+    match (std::env::current_exe(), app.path().app_data_dir()) {
+        (Ok(exe), Ok(data_dir)) => {
+            let dir = data_dir.join("desktop").join("backup");
+            match retain_current_build(&exe, &dir, app.package_info().version.to_string().as_str())
+            {
+                Ok(path) => eprintln!("[updates] versión anterior respaldada en {}", path.display()),
+                Err(e) => eprintln!("[updates] no se pudo respaldar la versión anterior: {e}"),
+            }
+        }
+        _ => eprintln!("[updates] no se localizó el ejecutable actual; no se respaldó nada"),
+    }
 
     let mut downloaded: u64 = 0;
     update
@@ -162,5 +212,33 @@ mod tests {
         // The whole point: `{{target}}` on its own resolves to "windows", and
         // the feed is keyed on "windows-x86_64".
         assert!(url.contains("{{target}}-{{arch}}"));
+    }
+    #[test]
+    fn a_retained_build_is_copied_not_moved() {
+        let dir = std::env::temp_dir().join(format!("boff-upd-{}", std::process::id()));
+        let _ = std::fs::remove_dir_all(&dir);
+        std::fs::create_dir_all(&dir).unwrap();
+        let exe = dir.join("current.bin");
+        std::fs::write(&exe, b"old build").unwrap();
+
+        let backups = dir.join("backup");
+        let dest = retain_current_build(&exe, &backups, "1.2.3").unwrap();
+
+        // The running image stays put — on Windows it is locked, and a move
+        // would take the app out from under itself.
+        assert!(exe.is_file());
+        assert_eq!(std::fs::read(&dest).unwrap(), b"old build");
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn a_version_cannot_climb_out_of_the_backup_directory() {
+        let dir = std::path::Path::new("/backups");
+        let escaped = backup_path(dir, "../../evil");
+        // Dots survive because real versions contain them; separators do not,
+        // which is what actually keeps the result a single name inside `dir`.
+        assert_eq!(escaped.parent().unwrap(), dir);
+        assert_eq!(escaped.components().count(), dir.components().count() + 1);
     }
 }

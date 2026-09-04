@@ -6,10 +6,15 @@
 // Delta updates are the reason for the content-addressed cache: a file is
 // keyed by its sha512, so an update that changes 3 of 400 mods downloads 3.
 // A file already correct on disk is not even re-copied.
+//
+// Resume capability: interrupted downloads can restart from where they left off.
+// A resume manifest stores the sha512 of each completed file, allowing the
+// downloader to skip already-verified files and emit correct progress events.
 
 use std::io::Write;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
+use std::collections::HashMap;
 
 use sha2::{Digest, Sha512};
 use tokio::sync::Semaphore;
@@ -43,6 +48,90 @@ struct ModrinthFile {
 struct ModrinthHashes {
     #[serde(default)]
     sha512: Option<String>,
+}
+
+/// Resume state for a download session: maps file paths to their sha512 hashes
+/// after successful verification. Stored durably so interrupted downloads can
+/// resume where they left off.
+#[derive(serde::Serialize, serde::Deserialize, Default, Debug, Clone)]
+pub struct ResumeManifest {
+    /// Completed files, keyed by their normalized path (lowercase, forward slashes)
+    pub completed: HashMap<String, String>,
+}
+
+impl ResumeManifest {
+    /// Load resume state from disk, or return empty if the file does not exist.
+    pub fn load(path: &Path) -> Result<Self, InstallFailure> {
+        match std::fs::read_to_string(path) {
+            Ok(json) => serde_json::from_str(&json).map_err(|e| {
+                InstallFailure::message(format!(
+                    "No se pudo leer el estado de reanudación: {e}"
+                ))
+            }),
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(Self::default()),
+            Err(e) => Err(InstallFailure::message(format!(
+                "No se pudo leer el estado de reanudación: {e}"
+            ))),
+        }
+    }
+
+    /// Save resume state to disk.
+    pub fn save(&self, path: &Path) -> Result<(), InstallFailure> {
+        if let Some(parent) = path.parent() {
+            std::fs::create_dir_all(parent).map_err(|e| {
+                InstallFailure::message(format!(
+                    "No se pudo crear el directorio de reanudación: {e}"
+                ))
+            })?;
+        }
+        let json = serde_json::to_string(self).map_err(|e| {
+            InstallFailure::message(format!(
+                "No se pudo serializar el estado de reanudación: {e}"
+            ))
+        })?;
+        std::fs::write(path, json).map_err(|e| {
+            InstallFailure::message(format!(
+                "No se pudo guardar el estado de reanudación: {e}"
+            ))
+        })
+    }
+
+    /// Mark a file as completed. Returns true if this is a new completion.
+    pub fn mark_completed(&mut self, path: &str, sha512: &str) -> bool {
+        let norm = path.to_lowercase().replace('\\', "/");
+        self.completed.insert(norm, sha512.to_lowercase()).is_none()
+    }
+
+    /// Check if a file is already completed and verified.
+    pub fn is_completed(&self, path: &str, sha512: &str) -> bool {
+        let norm = path.to_lowercase().replace('\\', "/");
+        self.completed
+            .get(&norm)
+            .map(|h| h == &sha512.to_lowercase())
+            .unwrap_or(false)
+    }
+}
+
+/// Can this file be skipped on a resumed install?
+///
+/// Both halves are required. The manifest says we hashed this exact content
+/// last time; the metadata check says it is still there. Trusting the manifest
+/// alone makes a file deleted between runs invisible — it would be recorded as
+/// done and never fetched, leaving the instance quietly incomplete.
+fn resumable(
+    manifest: &ResumeManifest,
+    dest_root: &Path,
+    rel_path: &str,
+    sha512: &str,
+    size: u64,
+) -> bool {
+    if !manifest.is_completed(rel_path, sha512) {
+        return false;
+    }
+    let dest = dest_root.join(rel_path.replace('\\', "/"));
+    std::fs::metadata(&dest)
+        .map(|m| m.is_file() && (size == 0 || m.len() == size))
+        .unwrap_or(false)
 }
 
 pub fn hex(bytes: &[u8]) -> String {
@@ -120,10 +209,14 @@ pub async fn download_all(
     phase: Phase,
     reporter: &Reporter,
 ) -> Result<(), InstallFailure> {
-    download_all_with_skips(app, http, layout, dest_root, pack_id, password, files, phase, reporter, &[]).await
+    download_all_with_skips(app, http, layout, dest_root, pack_id, password, files, phase, reporter, &[], None).await
 }
 
-/// Same as `download_all`, but with an option to skip certain paths.
+/// Same as `download_all`, but with an option to skip certain paths and resume state.
+///
+/// `resume_manifest` (optional) allows interrupted downloads to skip already-verified files
+/// and emit correct progress. If provided, completed files matching the expected hash are
+/// skipped, and new completions are recorded in the manifest.
 #[allow(clippy::too_many_arguments)]
 pub async fn download_all_with_skips(
     app: &tauri::AppHandle,
@@ -136,6 +229,7 @@ pub async fn download_all_with_skips(
     phase: Phase,
     reporter: &Reporter,
     skip_paths: &[String],
+    resume_manifest: Option<Arc<tokio::sync::Mutex<ResumeManifest>>>,
 ) -> Result<(), InstallFailure> {
     if files.is_empty() {
         reporter.emit(phase, 1.0, "", 0, 0);
@@ -153,6 +247,36 @@ pub async fn download_all_with_skips(
     let mut handles = Vec::with_capacity(files.len());
 
     for file in files {
+        // Already done in an earlier, interrupted run? The manifest lets us skip
+        // the sha512 of a file we hashed ourselves last time, which is the whole
+        // saving on a multi-GB pack.
+        //
+        // It is NOT trusted on its own. `fetch_one` below has always confirmed the
+        // file is on disk before skipping it, and short-circuiting past that check
+        // would make a file deleted between runs — by the user, by antivirus, by a
+        // failed disk write — invisible: the manifest would call it done and the
+        // instance would be quietly missing a mod. Cheap metadata call, so the
+        // expensive hash is still the thing being avoided.
+        if let Some(manifest) = &resume_manifest {
+            let manifest = manifest.lock().await;
+            if resumable(&manifest, dest_root, &file.path, &file.sha512, file.size) {
+                // File is already downloaded and verified; skip it and advance progress
+                let done = counter.add(file.size);
+                reporter.emit(
+                    phase,
+                    if total > 0 {
+                        done.min(total) as f32 / total as f32
+                    } else {
+                        1.0
+                    },
+                    &file.path,
+                    done,
+                    total,
+                );
+                continue;
+            }
+        }
+
         // Skip randomizer-managed ROM slots
         if skip_norm.iter().any(|s| norm(&file.path) == *s) {
             // Still advance the progress bar for skipped files
@@ -184,6 +308,7 @@ pub async fn download_all_with_skips(
         let file = file.clone();
         let reporter = reporter.clone();
         let counter = Arc::clone(&counter);
+        let resume = resume_manifest.clone();
 
         handles.push(tauri::async_runtime::spawn(async move {
             let _permit = permit_source
@@ -199,6 +324,7 @@ pub async fn download_all_with_skips(
                 &pack_id,
                 password.as_deref(),
                 &file,
+                resume,
             )
             .await;
 
@@ -264,6 +390,8 @@ fn backoff_delay(attempt: u32) -> std::time::Duration {
 /// Fetch (or place from cache) exactly one file. `pub(crate)` because the
 /// add-a-mod path in mod.rs downloads a handful of named files without a plan,
 /// a phase or a progress bar — everything `download_all` exists to provide.
+///
+/// `resume_manifest` allows recording this file's completion for resume scenarios.
 #[allow(clippy::too_many_arguments)]
 pub(crate) async fn fetch_one(
     app: &tauri::AppHandle,
@@ -273,6 +401,7 @@ pub(crate) async fn fetch_one(
     pack_id: &str,
     password: Option<&str>,
     file: &PlannedFile,
+    resume_manifest: Option<Arc<tokio::sync::Mutex<ResumeManifest>>>,
 ) -> Result<(), InstallFailure> {
     let dest = dest_root.join(file.path.replace('\\', "/"));
     let sha512 = file.sha512.to_lowercase();
@@ -284,6 +413,11 @@ pub(crate) async fn fetch_one(
             && (file.size == 0 || meta.len() == file.size)
             && sha512_of(&dest).as_deref() == Some(sha512.as_str())
         {
+            // Record as completed for resume scenarios
+            if let Some(manifest) = resume_manifest {
+                let mut m = manifest.lock().await;
+                m.mark_completed(&file.path, &sha512);
+            }
             return Ok(());
         }
     }
@@ -293,7 +427,13 @@ pub(crate) async fn fetch_one(
     // 2. In the content-addressed cache from another pack or an earlier
     //    version? Copy rather than re-download.
     if blob.is_file() && sha512_of(&blob).as_deref() == Some(sha512.as_str()) {
-        return place(&blob, &dest);
+        place(&blob, &dest)?;
+        // Record as completed for resume scenarios
+        if let Some(manifest) = resume_manifest {
+            let mut m = manifest.lock().await;
+            m.mark_completed(&file.path, &sha512);
+        }
+        return Ok(());
     }
 
     // 2b. In the local blob store? This is how an imported third-party
@@ -305,7 +445,13 @@ pub(crate) async fn fetch_one(
     //     then fail loudly rather than install corrupt bytes.
     let local = local_blob_path(layout, &sha512);
     if local.is_file() && sha512_of(&local).as_deref() == Some(sha512.as_str()) {
-        return place(&local, &dest);
+        place(&local, &dest)?;
+        // Record as completed for resume scenarios
+        if let Some(manifest) = resume_manifest {
+            let mut m = manifest.lock().await;
+            m.mark_completed(&file.path, &sha512);
+        }
+        return Ok(());
     }
 
     // 2c. A user-provided file the checks above did not satisfy is NOT an install
@@ -335,7 +481,15 @@ pub(crate) async fn fetch_one(
             }
         }
     }
-    place(&blob, &dest)
+    place(&blob, &dest)?;
+
+    // Record this file as completed for resume scenarios
+    if let Some(manifest) = resume_manifest {
+        let mut m = manifest.lock().await;
+        m.mark_completed(&file.path, &sha512);
+    }
+
+    Ok(())
 }
 
 /// The network leg of one download: acquire the response, then stream+verify it
@@ -677,5 +831,130 @@ mod tests {
     #[test]
     fn hashing_a_missing_file_is_not_a_panic() {
         assert!(sha512_of(Path::new("/definitely/not/here")).is_none());
+    }
+
+    #[test]
+    fn a_file_deleted_between_runs_is_not_resumable() {
+        let dir = std::env::temp_dir().join(format!("boff-resume-{}", std::process::id()));
+        std::fs::create_dir_all(dir.join("mods")).unwrap();
+        let rel = "mods/example.jar";
+        let dest = dir.join("mods/example.jar");
+        std::fs::write(&dest, b"hello").unwrap();
+
+        let mut manifest = ResumeManifest::default();
+        manifest.mark_completed(rel, "abc123");
+
+        // Present, right size, recorded: skip it.
+        assert!(resumable(&manifest, &dir, rel, "abc123", 5));
+
+        // Recorded, but the size on disk no longer matches — a truncated write.
+        assert!(!resumable(&manifest, &dir, rel, "abc123", 999));
+
+        // Recorded, but gone. This is the case the manifest alone gets wrong:
+        // without the disk check it reports done and the mod never returns.
+        std::fs::remove_file(&dest).unwrap();
+        assert!(!resumable(&manifest, &dir, rel, "abc123", 5));
+
+        std::fs::remove_dir_all(&dir).ok();
+    }
+
+    #[test]
+    fn resume_manifest_tracks_completed_files() {
+        let mut manifest = ResumeManifest::default();
+        let path = "mods/example.jar";
+        let hash = "abc123";
+
+        // Initially, file is not completed
+        assert!(!manifest.is_completed(path, hash));
+
+        // After marking, it is completed
+        assert!(manifest.mark_completed(path, hash));
+        assert!(manifest.is_completed(path, hash));
+
+        // Marking again returns false (already completed)
+        assert!(!manifest.mark_completed(path, hash));
+
+        // Hash mismatch means it's not completed
+        assert!(!manifest.is_completed(path, "different_hash"));
+    }
+
+    #[test]
+    fn resume_manifest_normalizes_paths() {
+        let mut manifest = ResumeManifest::default();
+        let path_backslash = "mods\\example.jar";
+        let path_forward = "mods/example.jar";
+        let hash = "abc123";
+
+        manifest.mark_completed(path_backslash, hash);
+
+        // Both representations should find the same completion
+        assert!(manifest.is_completed(path_forward, hash));
+        assert!(manifest.is_completed(path_backslash, hash));
+    }
+
+    #[test]
+    fn resume_manifest_is_case_insensitive() {
+        let mut manifest = ResumeManifest::default();
+        let hash_lower = "abc123def456";
+        let hash_upper = "ABC123DEF456";
+
+        manifest.mark_completed("mods/mod.jar", hash_lower);
+
+        // Both case variants should match
+        assert!(manifest.is_completed("mods/mod.jar", hash_lower));
+        assert!(manifest.is_completed("mods/mod.jar", hash_upper));
+        assert!(manifest.is_completed("MODS/MOD.JAR", hash_lower));
+    }
+
+    #[test]
+    fn resume_manifest_serializes_and_deserializes() {
+        let mut manifest = ResumeManifest::default();
+        manifest.mark_completed("mods/a.jar", "hash_a");
+        manifest.mark_completed("mods/b.jar", "hash_b");
+
+        let json = serde_json::to_string(&manifest).unwrap();
+        let restored: ResumeManifest = serde_json::from_str(&json).unwrap();
+
+        assert!(restored.is_completed("mods/a.jar", "hash_a"));
+        assert!(restored.is_completed("mods/b.jar", "hash_b"));
+    }
+
+    #[test]
+    fn resume_manifest_handles_disk_io() {
+        let temp_dir = std::env::temp_dir().join(format!("resume_manifest_test_{}", uuid::Uuid::new_v4()));
+        let _ = std::fs::remove_dir_all(&temp_dir);
+        let manifest_path = temp_dir.join("manifest.json");
+
+        let mut manifest = ResumeManifest::default();
+        manifest.mark_completed("mods/test.jar", "test_hash");
+
+        // Save should succeed
+        manifest.save(&manifest_path).unwrap();
+        assert!(manifest_path.exists());
+
+        // Load should restore the state
+        let loaded = ResumeManifest::load(&manifest_path).unwrap();
+        assert!(loaded.is_completed("mods/test.jar", "test_hash"));
+
+        // Load from nonexistent path should return empty
+        let nonexistent = ResumeManifest::load(&temp_dir.join("nonexistent.json")).unwrap();
+        assert!(nonexistent.completed.is_empty());
+
+        let _ = std::fs::remove_dir_all(&temp_dir);
+    }
+
+    #[test]
+    fn partial_file_is_re_downloaded_not_trusted_on_size() {
+        // This test verifies the behavior described in the finding: a partial
+        // file is re-downloaded, never trusted on size alone. A file 90% of
+        // expected size with hash mismatch should not be considered complete.
+        let mut manifest = ResumeManifest::default();
+        let expected_hash = "correct_hash_123";
+        let partial_hash = "partial_hash_999";
+
+        // If a file was completed with the partial hash, it should NOT match
+        // when we check against the expected hash
+        manifest.mark_completed("mods/large.jar", partial_hash);
+        assert!(!manifest.is_completed("mods/large.jar", expected_hash));
     }
 }

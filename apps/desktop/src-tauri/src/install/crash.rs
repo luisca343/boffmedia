@@ -319,6 +319,38 @@ const RULES: &[Rule] = &[
         explanation: "El cargador no ha podido leer uno de los archivos de la carpeta de mods.",
         action: "Repara la instalación desde la ficha del pack.",
     },
+    // ── Installer-related errors (Forge/NeoForge) ──────────────────────────
+    Rule {
+        id: "processor-failed",
+        kind: CrashKind::LoaderMismatch,
+        all: &["processor failed", "forge"],
+        title: "El instalador de Forge falló",
+        explanation:
+            "El procesador del instalador de Forge/NeoForge no pudo completarse. Suele ocurrir \
+             por una versión de Java incompatible o por corrupción en la instalación.",
+        action: "En Ajustes, borra la ruta de Java para que se instale la correcta, luego \
+                 repara la instalación.",
+    },
+    Rule {
+        id: "java-not-found-installer",
+        kind: CrashKind::WrongJava,
+        all: &["could not find java executable"],
+        title: "No se encontró Java para el instalador",
+        explanation:
+            "El instalador de Forge/NeoForge no pudo localizar una instalación de Java válida.",
+        action: "En Ajustes, borra la ruta de Java e intenta de nuevo. El lanzador instalará \
+                 la versión correcta automáticamente.",
+    },
+    Rule {
+        id: "installer-out-of-memory",
+        kind: CrashKind::OutOfMemory,
+        all: &["outofmemory", "installer"],
+        title: "El instalador se quedó sin memoria",
+        explanation:
+            "La memoria disponible fue insuficiente durante la instalación de Forge/NeoForge.",
+        action: "Cierra otras aplicaciones y reintenta. Si persiste, aumenta la RAM o \
+                 libera espacio en disco.",
+    },
 ];
 
 /// Classify a crash from the tail of the game log. `exit_code` is accepted so a
@@ -457,6 +489,18 @@ mod tests {
             CrashKind::CorruptModJar,
             "[main/ERROR]: Failed to read mods/create-1.20.1.jar\n\
              java.util.zip.ZipException: zip END header not found",
+        ),
+        (
+            "forge processor failed",
+            CrashKind::LoaderMismatch,
+            "[STDERR] Error running: installer processor failed\n\
+             net.minecraftforge.installer.ServerInstallTask processor failed",
+        ),
+        (
+            "installer java not found",
+            CrashKind::WrongJava,
+            "[STDERR] Error: Could not find java executable\n\
+             Installation cannot proceed without Java",
         ),
     ];
 
