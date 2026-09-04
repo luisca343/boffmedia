@@ -655,14 +655,20 @@ export function PackDetail() {
       icon: "plus",
       onSelect: () => void doDuplicate(),
     },
+    // Both carry a running label AND a lock, like the server ZIP below: the
+    // export opens a native save dialog from Rust, and a second invocation
+    // while the first is open puts up a second modal dialog over it — two
+    // destinations for one export, with the losing one's zip half-written.
     {
       label: exporting ? t("exportingMenu") : t("exportMenu"),
       icon: "upload",
+      disabled: exporting,
       onSelect: () => void doExport(false),
     },
     {
       label: exportingServer ? t("exportingServerMenu") : t("exportServerMenu"),
       icon: "upload",
+      disabled: exportingServer,
       onSelect: () => void doExport(true),
     },
     {

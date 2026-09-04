@@ -86,6 +86,10 @@ const es = {
         "Se calcula por pack, con su número de mods y la RAM del equipo, sin pasar nunca del 60 % de la memoria física. Un pack concreto puede fijar el suyo desde su ficha.",
       manualHint:
         "{size} para la JVM. Asignar más memoria de la que tiene el equipo no hace que el juego falle: hace que el sistema empiece a usar el disco y se quede colgado. Deja al menos 2 GB al sistema.",
+      // El recorte ya existía; lo nuevo es decirlo. Reescribir 64000 a 16384
+      // por debajo del cursor se lee como que el campo se come lo escrito.
+      clamped:
+        "{typed} MiB queda fuera del rango admitido (2048–16384). Se ha aplicado {applied} MiB.",
     },
     java: {
       title: "Java",
@@ -107,6 +111,13 @@ const es = {
       memoryNote:
         "La memoria se ajusta arriba: un -Xmx aquí no tendría efecto, porque el valor resuelto se añade el último.",
       rejected: "{arg}: {reason}",
+      previewLabel: "Así se lanzará",
+      // Se corta antes del classpath a propósito: eso sale del manifiesto del
+      // pack que arranque, así que escribirlo aquí sería inventarlo.
+      previewNote:
+        "Solo la parte de la JVM, y solo con los parámetros aceptados: los rechazados de arriba no aparecen porque no se van a pasar. El -Xmx va el último para ganar a la versión del pack. Detrás van el classpath y los argumentos de Minecraft, que dependen del pack.",
+      previewManagedJava: "<java gestionado>",
+      previewAutoHeap: "-Xmx<automático>",
     },
     install: {
       title: "Instalación",
@@ -367,6 +378,14 @@ const es = {
     signOutAll: "Cerrar todas las sesiones",
     switching: "Cambiando…",
     switchLabel: "Cambiar de cuenta",
+    // Por qué el switcher está bloqueado. Se dice en dos sitios a la vez —
+    // junto a los controles apagados y en el toast del intento — porque un
+    // botón gris sin explicación se lee como que la app está rota.
+    busyTitle: "Espera a que termine",
+    busyInstalling:
+      "Hay una instalación en curso. Cambiar de cuenta o cerrar sesión ahora la dejaría a medias: el token que está usando la descarga es el mismo que se sustituiría.",
+    busyPlaying:
+      "Hay una partida abierta. Cambiar de cuenta o cerrar sesión ahora cortaría su sesión. Cierra el juego primero.",
   },
 
   // El chip de MINECRAFT del rail. Namespace propio y no `accountSwitcher`:
@@ -1431,6 +1450,10 @@ const en = {
         "Sized per pack from its mod count and this machine's RAM, never above 60% of physical memory. Any pack can pin its own from its page.",
       manualHint:
         "{size} for the JVM. Allocating more memory than the machine has does not crash the game: it makes the system start paging to disk and hang. Leave at least 2 GB for the system.",
+      // The clamp is old; saying so is not. Rewriting 64000 to 16384 under the
+      // cursor reads as the field eating what was typed.
+      clamped:
+        "{typed} MiB is outside the accepted range (2048–16384). {applied} MiB was applied instead.",
     },
     java: {
       title: "Java",
@@ -1452,6 +1475,13 @@ const en = {
       memoryNote:
         "Memory is set above: an -Xmx here would have no effect, because the resolved value is appended last.",
       rejected: "{arg}: {reason}",
+      previewLabel: "How it will launch",
+      // Stops before the classpath on purpose: that comes from the manifest of
+      // whichever pack launches, so writing it here would be a guess.
+      previewNote:
+        "The JVM part only, and only the accepted arguments: the rejected ones above are absent because they will not be passed. -Xmx goes last so it beats the pack's own version metadata. The classpath and Minecraft's arguments follow, and depend on the pack.",
+      previewManagedJava: "<managed java>",
+      previewAutoHeap: "-Xmx<automatic>",
     },
     install: {
       title: "Installation",
@@ -1702,6 +1732,14 @@ const en = {
     signOutAll: "Sign out all sessions",
     switching: "Switching…",
     switchLabel: "Switch account",
+    // Why the switcher is locked. Said in two places at once — beside the
+    // disabled controls and in the toast the attempt raises — because a greyed
+    // out button with no reason reads as the app being broken.
+    busyTitle: "Wait for this to finish",
+    busyInstalling:
+      "An install is running. Switching account or signing out now would leave it half-written: the token the download is using is the one that would be replaced.",
+    busyPlaying:
+      "A game is running. Switching account or signing out now would cut its session. Close the game first.",
   },
 
   // The MINECRAFT chip in the rail. Its own namespace rather than

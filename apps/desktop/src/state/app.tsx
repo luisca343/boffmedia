@@ -58,6 +58,7 @@ import {
   stopGame,
   type ScannedInstallState,
 } from "../runtime";
+import { sessionBusyReason, type SessionBusyReason } from "./sessionGuard";
 import type {
   Account,
   DeviceCode,
@@ -575,6 +576,10 @@ type Ctx = State & {
    *  is what those operations authenticate with, and swapping it mid-flight
    *  re-authenticates their remaining requests as somebody else (C1). */
   sessionBusy: boolean;
+  /** Why, when {@link sessionBusy}. The UI shows this beside the disabled
+   *  controls: a control that is greyed out with no explanation reads as the
+   *  app being broken, which is what the silent refusal used to look like. */
+  sessionBusyReason: SessionBusyReason | null;
   selected: PackEntry | null;
   /** Authorize this launcher against a Boffmedia account (device flow). Also the
    *  "add account" action — it keys tokens by account id, so a fresh device flow
@@ -693,13 +698,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   offlineRef.current = state.offline;
   // An install or a live game holds the process-global session token. Switching
   // account under them re-authenticates their remaining requests as somebody
-  // else (C1), so the switcher disables itself and the callbacks refuse.
-  const sessionBusy =
-    state.game.kind === "running" ||
-    state.game.kind === "preparing" ||
-    state.packs.some((p) => p.state?.kind === "installing");
-  const sessionBusyRef = React.useRef(sessionBusy);
-  sessionBusyRef.current = sessionBusy;
+  // else (C1), so the switcher disables itself and the callbacks refuse. The
+  // rule itself lives in `sessionGuard.ts` — pure, and the single copy every
+  // account action and every disabled control reads.
+  const busyReason = sessionBusyReason(state.game, state.packs);
+  const sessionBusy = busyReason !== null;
+  const busyReasonRef = React.useRef(busyReason);
+  busyReasonRef.current = busyReason;
   const settingsRef = React.useRef<Settings>(state.settings);
   settingsRef.current = state.settings;
   const saveTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -707,6 +712,28 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const log = React.useCallback((line: Omit<LogLine, "ts">) => {
     dispatch({ type: "log", line: { ...line, ts: Date.now() } });
   }, []);
+
+  /** Every account action funnels its refusal through here. Returns true when
+   *  the caller must abort.
+   *
+   *  The bare `return` these guards used to be WAS the defect: the controls are
+   *  disabled while busy, so a player who found another route to the action
+   *  (the rail flyout, a keyboard activation, a stale render) got a click that
+   *  did nothing at all and no reason for it. Saying why costs one toast. */
+  const refuseWhileBusy = React.useCallback(() => {
+    const reason = busyReasonRef.current;
+    if (!reason) return false;
+    const key = reason === "installing" ? "busyInstalling" : "busyPlaying";
+    toast.warn(translate("accountSwitcher", key), {
+      title: translate("accountSwitcher", "busyTitle"),
+    });
+    log({
+      level: "warn",
+      source: "app",
+      text: translate("accountSwitcher", key),
+    });
+    return true;
+  }, [log]);
 
   /** Re-read what is on disk for one pack. Cheap, and the only way the UI
    *  learns that an install left the pack outdated or broken. */
@@ -740,8 +767,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   const boffSignIn = React.useCallback(async () => {
     if (boffFlowActive.current) return;
-    boffFlowActive.current = true;
     const adding = boffAccountRef.current != null;
+    // ADDING an account is a switch on completion — the new device flow becomes
+    // the active principal — so it belongs in the same refused window. A first
+    // sign-in is not: there is no token to replace, and refusing it would trap
+    // a signed-out player behind a local pack's install.
+    if (adding && refuseWhileBusy()) return;
+    boffFlowActive.current = true;
     const surfaceFailure = (message: string) => {
       dispatch({ type: "boff/cancel", message });
       if (adding) toast.error(message);
@@ -797,7 +829,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     } finally {
       boffFlowActive.current = false;
     }
-  }, [log]);
+  }, [log, refuseWhileBusy]);
 
   const cancelBoffSignIn = React.useCallback(() => {
     boffCancelled.current = true;
@@ -824,7 +856,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const boffSignOutFn = React.useCallback(async () => {
     // The backing token is mid-use while an install runs or a game is live;
     // Rust refuses the sign-out, but disabling it here is the real guard.
-    if (sessionBusyRef.current) return;
+    if (refuseWhileBusy()) return;
     setSwitchingBoffAccount(true);
     try {
       const next = await boffSignOut();
@@ -856,16 +888,12 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setSwitchingBoffAccount(false);
       reloadBoffAccounts();
     }
-  }, [log, reloadBoffAccounts]);
+  }, [log, refuseWhileBusy, reloadBoffAccounts]);
 
   const switchBoffAccount = React.useCallback(
     async (id: number) => {
-      if (
-        id === state.boffAccount?.id ||
-        switchingBoffAccount ||
-        sessionBusyRef.current
-      )
-        return;
+      if (id === state.boffAccount?.id || switchingBoffAccount) return;
+      if (refuseWhileBusy()) return;
       setSwitchingBoffAccount(true);
       try {
         const account = await boffSwitch(id);
@@ -888,7 +916,13 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setSwitchingBoffAccount(false);
       }
     },
-    [state.boffAccount?.id, switchingBoffAccount, log, reloadBoffAccounts],
+    [
+      state.boffAccount?.id,
+      switchingBoffAccount,
+      log,
+      refuseWhileBusy,
+      reloadBoffAccounts,
+    ],
   );
 
   // Re-read the roster whenever the active Boffmedia account changes: covers the
@@ -1731,6 +1765,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const switchAccount = React.useCallback(
     async (uuid: string) => {
       if (uuid === activeUuid || switchingAccount) return;
+      // Same window as the Boffmedia switch: `auth_switch` swaps the MSA
+      // session a launch authenticates with, and the running game's is the one
+      // it would swap out from under.
+      if (refuseWhileBusy()) return;
       setSwitchingAccount(true);
       try {
         const account = await authSwitch(uuid);
@@ -1755,11 +1793,14 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         setSwitchingAccount(false);
       }
     },
-    [activeUuid, log, reloadAccounts, switchingAccount],
+    [activeUuid, log, refuseWhileBusy, reloadAccounts, switchingAccount],
   );
 
   const removeAccount = React.useCallback(
     async (uuid: string) => {
+      // Removing the ACTIVE account promotes another one, which is a switch by
+      // another name — so it is refused in the same window.
+      if (refuseWhileBusy()) return;
       setSwitchingAccount(true);
       try {
         const next = await authRemove(uuid);
@@ -1782,7 +1823,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         reloadAccounts();
       }
     },
-    [log, reloadAccounts],
+    [log, refuseWhileBusy, reloadAccounts],
   );
 
   // Re-check the BOFFMEDIA session against `/me` — the launcher JWT is what the
@@ -1871,6 +1912,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     goOffline,
     goBoffOffline,
     sessionBusy,
+    sessionBusyReason: busyReason,
     selected:
       state.packs.find((p) => p.pack.id === state.selectedPackId) ?? null,
     boffSignIn,
@@ -1882,6 +1924,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     signIn,
     cancelSignIn: () => dispatch({ type: "signin/cancel" }),
     signOut: () => {
+      // The worst of the account actions to run mid-install, and the one that
+      // had no guard: auth_logout forgets the launcher session outright
+      // (api.forget_session), so the download's remaining requests do not get a
+      // different token, they get NO token.
+      if (refuseWhileBusy()) return;
       // "Leave this machine clean": auth_logout forgets every Minecraft account
       // AND the launcher session (api.forget_session), so the renderer drops the
       // Boffmedia principal too and lands back on BoffSignIn.

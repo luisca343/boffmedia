@@ -89,12 +89,20 @@ export function AccountSwitcher() {
     boffSignOut,
     boffSigningIn,
     sessionBusy,
+    sessionBusyReason,
   } = useApp()
   // Switching, signing out and adding all swap or drop the process-global
   // session token; an install or a live game authenticates with it, so the
   // whole surface is disabled while `sessionBusy`. A device flow already in
   // flight (`boffSigningIn`) likewise blocks starting another (M2/C1).
   const locked = switchingBoffAccount || sessionBusy || boffSigningIn
+  // Only the sessionBusy lock gets a written reason: the other two are
+  // momentary (a spinner is already showing) whereas this one lasts as long as
+  // a multi-gigabyte download and is the one a player would otherwise read as
+  // the menu being dead.
+  const busyNotice = sessionBusyReason
+    ? t(sessionBusyReason === "installing" ? "busyInstalling" : "busyPlaying")
+    : null
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -206,6 +214,23 @@ export function AccountSwitcher() {
                   </p>
                 </div>
               </li>
+
+              {/* The reason every entry below is disabled. Above them, not
+                  below: it has to be read BEFORE the dead buttons are clicked
+                  for it to save the click. */}
+              {busyNotice && (
+                <li
+                  className="border-b border-line bg-warn-soft px-3 py-2"
+                  role="status"
+                >
+                  <p className="text-[0.6875rem] font-semibold text-txt">
+                    {t("busyTitle")}
+                  </p>
+                  <p className="mt-0.5 text-[0.625rem] leading-snug text-txt-dim">
+                    {busyNotice}
+                  </p>
+                </li>
+              )}
 
               {/* Other signed-in Boffmedia accounts */}
               {others.map((entry) => (

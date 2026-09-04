@@ -1,6 +1,8 @@
 import {
   Badge,
+  Banner,
   Button,
+  CodeBlock,
   DataList,
   Divider,
   Field,
@@ -17,7 +19,7 @@ import {
 } from "@boffmedia/ui";
 import { listTools } from "@boffmedia/tool-kit";
 import type { ReactNode } from "react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { BoffAvatar } from "../components/AccountSwitcher";
 import { PlayerHead } from "../components/PlayerHead";
@@ -74,6 +76,7 @@ export function Settings() {
     signIn,
     signingIn,
     sessionBusy,
+    sessionBusyReason,
     signOut,
     switchingAccount,
     switchBoffAccount,
@@ -88,6 +91,9 @@ export function Settings() {
   // rather than a dotted key: a `common.`-prefixed key handed to `t` resolves to
   // `settings.common.…`, misses, and renders the raw dotted string to the user.
   const tCommon = useT("common");
+  // The account-busy copy is shared with the rail switcher, so it lives in that
+  // namespace rather than being duplicated under `settings.account`.
+  const tAccount = useT("accountSwitcher");
   // Unbound, for the tool-package `tools.*` keys a pack's `dataPack.labelKey`
   // or `titleKey` points into — the same root every tool catalog is flattened
   // onto (see `i18n/index.tsx`).
@@ -107,15 +113,57 @@ export function Settings() {
   const [jvmDraft, setJvmDraft] = useState(settings.jvmArgs.join(" "));
   const [jvmVerdicts, setJvmVerdicts] = useState<JvmArgVerdict[]>([]);
   // Judged as typed, by Rust — the renderer holds no second copy of the grammar.
+  //
+  // Debounced rather than per-keystroke: every check is an IPC round trip, and
+  // a half-typed "-XX:+Use" is a rejection the player is already in the middle
+  // of fixing. 250 ms is long enough that a flag is only judged once it stops
+  // changing, short enough that it still lands before the field is left — which
+  // is what makes the verdicts, and the preview built from them, correct on
+  // blur without a second check wired to the blur handler.
   useEffect(() => {
     let live = true;
-    void jvmArgsCheck(splitArgs(jvmDraft)).then((v) => {
-      if (live) setJvmVerdicts(v);
-    });
+    const timer = setTimeout(() => {
+      void jvmArgsCheck(splitArgs(jvmDraft)).then((v) => {
+        if (live) setJvmVerdicts(v);
+      });
+    }, 250);
     return () => {
       live = false;
+      clearTimeout(timer);
     };
   }, [jvmDraft]);
+  /** Set when the number field's value had to be pulled back into range on
+   *  blur. The clamp itself is old; announcing it is not. Silently rewriting
+   *  "64000" to "16384" under the cursor reads as the field eating the input,
+   *  and the player has no way to learn the ceiling exists. */
+  const [memoryClamped, setMemoryClamped] = useState<number | null>(null);
+
+  /** The JVM half of the command a launch would actually run, assembled in the
+   *  order `install/game.rs` assembles it: the JVM, then the accepted tuning
+   *  flags, then the resolved `-Xmx` LAST — which is exactly why an `-Xmx`
+   *  typed into the field above is rejected rather than honoured, and the
+   *  preview is where that stops being an abstract rule.
+   *
+   *  Deliberately stops before the classpath and the game arguments: those come
+   *  from the version manifest of whichever pack is launching, so writing them
+   *  here would be a guess. The trailing ellipsis says so.
+   *
+   *  Under `memoryAuto` the heap is sized per pack from its mod count, so there
+   *  is no one number to show and the placeholder says which. */
+  const jvmPreview = useMemo(() => {
+    const java = settings.javaPath?.trim() || t("jvm.previewManagedJava");
+    const kept = jvmVerdicts.filter((v) => v.ok).map((v) => v.arg);
+    const xmx = settings.memoryAuto
+      ? t("jvm.previewAutoHeap")
+      : `-Xmx${settings.memoryMib}M`;
+    return [java, ...kept, xmx, "…"].join(" ");
+  }, [
+    settings.javaPath,
+    settings.memoryAuto,
+    settings.memoryMib,
+    jvmVerdicts,
+    t,
+  ]);
 
   // Section navigation state and tracking
   const [activeSection, setActiveSection] = useState("settings-appearance");
@@ -561,9 +609,15 @@ export function Settings() {
                   onChange={(e) => setMemoryDraft(e.target.value)}
                   onBlur={() => {
                     const parsed = Number(memoryDraft);
-                    const next = Number.isFinite(parsed)
-                      ? Math.min(16384, Math.max(2048, Math.round(parsed)))
+                    const valid = Number.isFinite(parsed) && memoryDraft !== "";
+                    const rounded = valid
+                      ? Math.round(parsed)
                       : settings.memoryMib;
+                    const next = Math.min(16384, Math.max(2048, rounded));
+                    // Only a value the player actually typed counts as clamped;
+                    // an empty or unparseable field falls back to the stored
+                    // one, which is not a range problem.
+                    setMemoryClamped(valid && rounded !== next ? rounded : null);
                     setMemoryDraft(String(next));
                     if (next !== settings.memoryMib)
                       patchSettings({ memoryMib: next });
@@ -571,6 +625,14 @@ export function Settings() {
                 />
               </div>
             </div>
+            {memoryClamped !== null && (
+              <p className="mt-2 text-[0.6875rem] text-warn" role="alert">
+                {t("performance.clamped", {
+                  typed: memoryClamped,
+                  applied: settings.memoryMib,
+                })}
+              </p>
+            )}
             <p className="mt-2 text-xs text-txt-dim">
               {settings.memoryAuto
                 ? t("performance.autoHint")
@@ -632,6 +694,19 @@ export function Settings() {
                   ))}
               </ul>
             )}
+            {/* The whole point of the preview: it is built from the SAME
+              verdicts shown above, so a refused flag is visibly absent from the
+              line that will actually run. That is the difference between "we
+              told you it was rejected" and "here is what you get instead".
+              Nothing here judges anything — the ok/not-ok call is entirely
+              `jvm_args_check`'s. */}
+            <CodeBlock
+              className="mt-3"
+              label={t("jvm.previewLabel")}
+              lines={[jvmPreview]}
+              copyText={jvmPreview}
+            />
+            <p className="mt-2 text-xs text-txt-dim">{t("jvm.previewNote")}</p>
             <p className="mt-2 text-xs text-txt-dim">{t("jvm.memoryNote")}</p>
           </Panel>
 
@@ -905,6 +980,26 @@ export function Settings() {
           lead={t("sections.account.lead")}
         >
           <Panel>
+            {/* Every control in this panel — both rosters, add, sign out —
+                swaps or drops the process-global session token, so all of them
+                go dead together while an install or a game holds it. One notice
+                at the top of the panel, not one per button: it is one reason,
+                and repeating it six times would be noise. */}
+            {sessionBusyReason && (
+              <Banner
+                tone="warn"
+                icon="alert"
+                title={tAccount("busyTitle")}
+                className="mb-4"
+              >
+                {tAccount(
+                  sessionBusyReason === "installing"
+                    ? "busyInstalling"
+                    : "busyPlaying",
+                )}
+              </Banner>
+            )}
+
             {/* Boffmedia account roster */}
             <div className="mb-4">
               <p className="mb-3 text-sm font-medium">
@@ -1109,10 +1204,15 @@ export function Settings() {
               >
                 {t("account.addMinecraft")}
               </Button>
+              {/* The only account control that used to stay live while an
+                install ran — and the most destructive one to press then:
+                auth_logout forgets the launcher session too, so the download's
+                remaining requests get no token at all. */}
               <Button
                 size="sm"
                 variant="ghost"
                 icon="logout"
+                disabled={sessionBusy}
                 onClick={() => signOut()}
               >
                 {t("account.signOutEverywhere")}
