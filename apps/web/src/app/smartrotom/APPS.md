@@ -23,6 +23,41 @@ Señalización (ex carteles/OGT Explorer), Skins NPC, Apps de jugador, Rendimien
 (ex logs). The `rotom_apps` row that used to link a home-screen tile to `/smartrotom/admin`
 still needs a manual DB update — see the migration notes for this change.
 
+### Gobierno — Urbanismo subsection
+**Routes:** `/smartrotom/gobierno/zonas` · `/smartrotom/gobierno/parcelas`  
+**Status:** Active — staff management tools  
+The Gobierno (Government of Teras) app contains an Urbanismo (Urban Planning) section where
+government staff manage in-game land and property data. Two core tools:
+
+**Zonas** (`/smartrotom/gobierno/zonas`): Land-use directory showing municipios (towns) and
+their sectors (zonas). Staff create new zonas with `POST /smartrotom/gobierno/urbanismo/zonas`,
+update zona metadata with `PATCH /smartrotom/gobierno/urbanismo/zonas/:id`, and view occupancy
+derived from the parcelas list. Each zona tracks occupancy (number of owned plots) and total
+parcela count. A separate "zonas reguladas" overlay (Spawn/Mercado/PvP/Evento) has no database
+backing and is not rendered. **Q12 (open):** Whether staff can also manage zonas via in-game
+commands is unknown — the web UI is the only documented path to observe.
+
+**Parcelas** (`/smartrotom/gobierno/parcelas`): WorldGuard plot registry (the catastro). Staff
+view all tracked plots, filter by town/zona/status, and update status via `PATCH
+/smartrotom/gobierno/urbanismo/parcelas/:regionId` (the WorldGuard region id, not a numeric row id). A plot's status field records: `ocupada`
+(owned), `vacante` (for sale), `embargada` (seized), `subasta` (at auction). Plots with no
+gobierno metadata yet (`id === null`) arrive with status `sin_registrar` and cannot be PATCHed
+until registered through another path. The register implements filtering by town, zona, and
+status, and renders a table of all parcelas with owner, coordinates, and editable status.
+
+**API Controllers:**
+- `smartrotom/gobierno/urbanismo` controller (POST/GET/PATCH zonas; POST/GET/PATCH/DELETE
+  parcelas; auction management with PlaceBidDto; bidding and closure)
+- Service layer: `UrbanismoService` handles CRUD, validation, and Socket.io event broadcasts
+  to watching clients
+- Database: Drizzle tables `gobiernoZonas`, `gobiernoParcelas`, `gobiernoSubastas` in
+  `apps/api/src/_db/schema/SmartRotomGobierno.ts` (which also holds denuncias, multas,
+  patrullas, bitacora and tasas for the other Gobierno sections)
+
+**Capabilities:** Both tools are web UI only — staff manage plots and land from this admin
+dashboard. The tools require authentication and the `GOBIERNO` role (+ `ROTOM_ADMIN` for
+administrative functions). No offline support.
+
 ---
 
 ### Arcade

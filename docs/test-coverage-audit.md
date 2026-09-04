@@ -1,5 +1,8 @@
 # API Test Coverage Audit
 
+**Status**: Superseded by the 2026-09 product audit backlog, which lives as a published artifact rather than a file in this repo (ask the owner for the link). Do not act on items below without re-verifying them first: BOTH rows in "Known production bugs" were already fixed and were still recorded as open here.  
+**Last verified**: 2026-09-05. No updates made since 2026-05-18; see "Known production bugs" section below.
+
 > **Purpose**: Track test coverage across all 37 NestJS controllers. Used to plan and record integration test work.  
 > **Pattern**: Integration tests use Supertest + ValidationPipe + GlobalExceptionFilter — see existing examples in `auth.controller.integration.spec.ts`, `events.controller.integration.spec.ts`, `apps.controller.integration.spec.ts`, `starbank.controller.integration.spec.ts`.  
 > **Legend**: `[x]` done · `[ ]` pending · `[~]` partial · `[-]` not applicable (no logic to test)  
@@ -736,7 +739,7 @@ Empty controller — all endpoints commented out. Skip until implemented.
 
 ## Known production bugs discovered during testing
 
-| Controller | Endpoint | Bug |
-|---|---|---|
-| `battlesimulator/battle` | `GET /` | `getPokemonTeam()` is a plain function that calls `this.logger.log()` — `this` is `undefined`, throws `TypeError` at runtime. |
-| `smartrotom/_main` | `POST /karts/carrera` | `ResultadoCarreraDto` has no `class-validator` decorators; `forbidNonWhitelisted: true` rejects all non-empty bodies. Fields are silently dropped. |
+| Controller | Endpoint | Bug | Status |
+|---|---|---|---|
+| `battlesimulator/battle` | `GET /` | `getPokemonTeam()` is a plain function that calls `this.logger.log()` — `this` is `undefined`, throws `TypeError` at runtime. | **Fixed.** Verified 2026-09-05: `getPokemonTeam` has zero matches in `apps/api/src`. The M1 battlesim port replaced that path. |
+| `smartrotom/_main` | `POST /karts/carrera` | `ResultadoCarreraDto` has no `class-validator` decorators; `forbidNonWhitelisted: true` rejects all non-empty bodies. Fields are silently dropped. | **Fixed.** Verified 2026-09-05: `ResultadoCarreraDto` has zero matches in `apps/api/src`. `POST karts/carrera` now takes `SaveRaceDto` (`smartrotom/karts/dto/save-race.dto.ts`), which carries 18 class-validator decorators including `@ValidateNested` over the participants array — so `forbidNonWhitelisted` no longer rejects the body. |

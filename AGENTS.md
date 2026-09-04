@@ -218,3 +218,100 @@ Non-component files (types.ts, config.ts, .svg, .css) must not live inside `_com
 - **Discord bot** lives inside the NestJS app (`src/discord/`), not as a separate service.
 - **Desktop app naming**: `app` (what a user calls the download), `desktop` (which client, in code that distinguishes web/desktop/in-game), `launcher` (the launching function specifically) are three deliberately distinct words — see CLAUDE.md's "apps/desktop (Tauri v2)" section for the full rule and why collapsing them makes names less accurate.
 - **`@boffmedia/ui` is host-agnostic**: no `next/*`, no `next-intl`, no `@/` imports — it ships to both `apps/web` and `apps/desktop`. Each host wires it up via `configureUi()`.
+
+---
+
+## Tool Registration Checklist
+
+When a domain package's first tool is ready, it must be registered in the desktop hub. Follow these steps to ensure the tool works in both the web and desktop app. All claims below have been verified against actual code (tool-host.ts, typecheck-sequential.js, manifest entries, CSS tokens, layout declarations).
+
+### 1. Tool Manifest & Registration
+
+- [ ] Tool has a **manifest entry** in its domain package (`packages/tools/<domain>/src/tools.ts`):
+  ```ts
+  { 
+    id, domain, titleKey, descriptionKey, icon, 
+    component: lazy(...), 
+    layout: "document" | "viewport",
+    requiredCapabilities: [list actual ones used]
+  }
+  ```
+- [ ] Manifest is exported from the package's `/tools.ts` export (the manifests list, not the barrel)
+- [ ] Tool is **registered** in `apps/desktop/src/tool-host.ts` → `registerTools([...])` array (import manifests only, not the barrel)
+
+### 2. i18n & Catalogs
+
+- [ ] Tool has **package-owned es/en message catalogs** under `packages/tools/<domain>/src/locales/`
+- [ ] Catalog keys follow the naming scheme (e.g., `tools.schematicCompat.*`, `tools.mhwilds.*.skillTree.*`)
+- [ ] Keys use **ICU plurals and select syntax** (not just `{name}` substitution) — `@boffmedia/ui` rules apply
+- [ ] Desktop host (`apps/desktop/src/i18n/messages.ts`) includes the new catalog via merge
+- [ ] Both locales have identical key sets (audit before shipping)
+
+### 3. Capabilities
+
+Verify the tool uses only capabilities present in `configureToolHost()`:
+
+- [ ] **`api`** — if tool calls `apps/api`, make sure `requiredCapabilities` includes it
+- [ ] **`saveFile`** — if tool exports files, verify it uses the capability (not direct blob download)
+- [ ] **`storage`** — if tool persists state, verify it uses `data.db(namespace)` or `data.outbox(namespace)`
+- [ ] No `next/*`, no `next-intl`, no `@tauri-apps/*` imports in the package itself
+
+### 4. Layout Contract — Critical
+
+**Wrong layout is silent and total failure.** A `"document"` tool in a clipped box cannot scroll at all.
+
+- [ ] Tool **declares `layout` in the manifest**: `"document"` (grows with content, page scroll) or `"viewport"` (fills a bounded box, tool scrolls its own panes)
+- [ ] Tool uses **exactly two host-provided CSS tokens** with working fallbacks:
+  - `--tool-vh`: height of the box the host gives the tool (e.g., `calc(100dvh - 77px)` in desktop, `calc(100dvh - var(--nav-h))` on web)
+  - `--tool-sticky-top`: sticky offset from top of that box (e.g., `0px` in desktop; `var(--nav-h)` on web)
+- [ ] **No viewport math in the package** — no `calc(100dvh - var(--nav-h))`, no hardcoded heights. Packages never read `--nav-h`.
+- [ ] No `--nav-h` references — that variable exists only in `apps/web/globals.css`
+
+### 5. Assets & Data Packs
+
+- [ ] If tool includes **bundled assets** (JSON, images, fonts):
+  - Asset paths are **root-relative** (e.g., `/tools/<domain>/data/...`)
+  - `packages/tools/<domain>/public/` holds them
+  - `scripts/sync-tool-assets.mjs` is run to generate the asset manifest used by the launcher
+- [ ] If tool has large data packs:
+  - Packs are **fetched on first use**, not bundled in startup
+  - Launcher's `boffasset://` scheme fetches and caches them
+
+### 6. Type-Check & Bundling
+
+- [ ] **Package is added to `PACKAGES` in `scripts/typecheck-sequential.js`** — *This is mandatory. A missing entry makes `pnpm type-check` report green for code it never read.*
+- [ ] `pnpm type-check` passes across all packages (sequential to avoid memory spikes)
+- [ ] `pnpm build:desktop` produces a valid renderer bundle:
+  - Package workers split correctly (if any) — Vite's default `worker.format: "iife"` cannot do code-splitting; dynamic imports in workers require `worker: { format: "es" }`
+  - Lazy-loaded deps do NOT appear in the startup chunk
+  - Import `@boffmedia/tools-<domain>/tools` (manifests + lazy refs only), NOT the barrel — the barrel eagerly re-exports components and UI kit, which drags heavy dependencies into the startup chunk
+  - Measure startup time before and after (should not regress by >10% without heavy deps like three.js)
+
+### 7. Testing & Verification
+
+- [ ] Tool works in **`dev:renderer` mode** (browser, mocked capabilities)
+- [ ] Tool works in **desktop Tauri dev build** with all required capabilities
+- [ ] Tool is **reachable pre-auth** and **offline** (if it does not require `api`)
+- [ ] If tool uses `api`:
+  - Anonymous calls (no session) work for public endpoints
+  - Authenticated calls attach the player's session when one exists
+  - A 401 does NOT sign the player out unexpectedly
+
+### 8. Web Counterpart (if extracted from web)
+
+- [ ] Web imports the tool from the package (not local `_components`)
+- [ ] Web routing wraps stateful tools in host-router adapters (e.g., `VgcNavProvider`)
+- [ ] Web regression pass: tool visually and functionally identical to before extraction
+- [ ] Web Tailwind config includes `packages/tools/<domain>` in `content` globs
+
+### 9. Code Review
+
+- [ ] Tool package has **no unused variables** (lint rule is `error` with `_` prefix ignore pattern)
+- [ ] No dead code, no commented-out imports
+- [ ] Manifest lazy-loads the component (do NOT eagerly re-export it from the barrel)
+
+### 10. Launch & Communication
+
+- [ ] Tool is listed in the **tool inventory** in `docs/boffmedia-desktop-app-plan.md` §2 (update the table)
+- [ ] Owner is notified of the tool's availability in the desktop app
+- [ ] Tool is **visible in both web and desktop hubs** (registry-driven rendering)

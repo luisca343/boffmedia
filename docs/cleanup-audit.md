@@ -1,5 +1,9 @@
 # Boffmedia Monorepo — Cleanup Audit
 
+**Status**: Partially superseded by 2026-09 product audit backlog. Sections 1-3, 6 remain accurate.  
+Sections 4-5 remain pending; see status below.  
+**Last verified**: 2026-09-05 against current codebase.
+
 > Generated 2026-05-17. All items are pre-existing technical debt, not introduced by the agent branch.
 > Last updated: 2026-05-17 — Sections 1, 2, 3, 6 completed.
 
@@ -226,7 +230,13 @@ Also removed during audit:
 ## 4. Console.log → structured logger
 
 **Scale**: ~1,044 statements (API ~900, Web ~140)
-**Status**: `[ ]` Pending — planned for a future sprint.
+**Status**: `[~]` API half effectively done; web half pending.  
+**Last verified**: 2026-09-05 by counting, not by assumption. The API is at **17**
+console statements, not the ~900 recorded above — the NestJS `Logger` migration in
+the plan below has in fact happened. The web app is at **143** against a recorded
+~140, i.e. genuinely untouched. So the remaining work is `apps/web` only, and the
+"~1,044 statements" headline is stale by two orders of magnitude on the API side.
+Recount before quoting this section; do not re-derive the number from the 2026-05 text.
 
 ### Plan
 
@@ -274,6 +284,9 @@ These are not actively blocking anything but create repository bloat.
 
 - [ ] Investigate moving large data files (pokedex.ts) to JSON and loading at runtime
 - [ ] Investigate splitting `battle-animations-moves.ts` into smaller chunks with dynamic import
+
+**Status**: `[ ]` Pending — low priority.  
+**Last verified**: 2026-09-05. Files remain in repo. Work remains out of scope.
 
 ---
 
