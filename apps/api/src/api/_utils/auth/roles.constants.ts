@@ -22,3 +22,21 @@ export const GOBIERNO_RANKS = [
   { role: USER_ROLES.GOB_INSPECTOR, label: 'Inspector', prefix: 'I' },
   { role: USER_ROLES.GOB_AGENTE, label: 'Agente', prefix: 'G' },
 ] as const;
+
+/**
+ * The roles that make an account an administrative one, and therefore the roles
+ * that MUST carry a second factor (see `auth/two-factor`). Both of them reach
+ * destructive surfaces: BOFF_ADMIN publishes packs and desktop releases,
+ * ROTOM_ADMIN runs the in-game economy and player administration.
+ *
+ * The GOB_* ranks are deliberately absent: they are titles inside the
+ * SmartRotom fiction, not access to the platform.
+ */
+export const ADMIN_ROLES: readonly UserRole[] = [
+  USER_ROLES.BOFF_ADMIN,
+  USER_ROLES.ROTOM_ADMIN,
+];
+
+/** True when the account holds a role that requires two-factor authentication. */
+export const holdsAdminRole = (roles: readonly string[] | undefined): boolean =>
+  Boolean(roles?.some((r) => ADMIN_ROLES.includes(r as UserRole)));

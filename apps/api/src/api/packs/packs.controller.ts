@@ -16,6 +16,7 @@ import {
 import {
   ApiBearerAuth,
   ApiConsumes,
+  ApiHeader,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -24,6 +25,7 @@ import type { Request } from 'express';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { FullSessionGuard } from '@api/_utils/guards/full-session.guard';
+import { STEP_UP_HEADER, StepUpGuard } from '@api/_utils/guards/step-up.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { PacksDownloadsService } from './packs-downloads.service';
@@ -344,6 +346,16 @@ export class PacksController {
   }
 
   @Post(':id/versions/:versionId/publish')
+  // Publishing is the moment a pack version starts being installed on other
+  // people's machines. An admin session alone is a credential that has been
+  // sitting in a browser for hours; a step-up says someone is at the keyboard.
+  @UseGuards(StepUpGuard)
+  @ApiHeader({
+    name: STEP_UP_HEADER,
+    description:
+      'Token de confirmación reciente de doble factor (POST /auth/2fa/step-up).',
+    required: true,
+  })
   @ApiOperation({
     summary: 'Publicar una versión',
     description:

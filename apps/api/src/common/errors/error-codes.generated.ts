@@ -7,6 +7,15 @@ export const ApiErrorCode = {
   ACTOR_NOT_SELF: 'ACTOR_NOT_SELF',
   AUTH_EMAIL_NOT_VERIFIED: 'AUTH_EMAIL_NOT_VERIFIED',
   AUTH_INVALID_CREDENTIALS: 'AUTH_INVALID_CREDENTIALS',
+  AUTH_REFRESH_INVALID: 'AUTH_REFRESH_INVALID',
+  AUTH_REFRESH_REUSE_DETECTED: 'AUTH_REFRESH_REUSE_DETECTED',
+  AUTH_STEP_UP_REQUIRED: 'AUTH_STEP_UP_REQUIRED',
+  AUTH_TWO_FACTOR_ALREADY_ENROLLED: 'AUTH_TWO_FACTOR_ALREADY_ENROLLED',
+  AUTH_TWO_FACTOR_ENROLMENT_REQUIRED: 'AUTH_TWO_FACTOR_ENROLMENT_REQUIRED',
+  AUTH_TWO_FACTOR_INVALID_CODE: 'AUTH_TWO_FACTOR_INVALID_CODE',
+  AUTH_TWO_FACTOR_NOT_ENROLLED: 'AUTH_TWO_FACTOR_NOT_ENROLLED',
+  AUTH_TWO_FACTOR_REQUIRED: 'AUTH_TWO_FACTOR_REQUIRED',
+  AUTH_TWO_FACTOR_UNAVAILABLE: 'AUTH_TWO_FACTOR_UNAVAILABLE',
   BANK_ACCOUNT_NOT_OWNED: 'BANK_ACCOUNT_NOT_OWNED',
   BANK_AMOUNT_NOT_POSITIVE: 'BANK_AMOUNT_NOT_POSITIVE',
   BANK_BALANCE_ADJUST_FAILED: 'BANK_BALANCE_ADJUST_FAILED',
@@ -58,6 +67,22 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   AUTH_EMAIL_NOT_VERIFIED:
     'Verifica tu correo antes de continuar. Te hemos enviado un enlace al registrarte.',
   AUTH_INVALID_CREDENTIALS: 'Usuario o contraseña incorrectos.',
+  AUTH_REFRESH_INVALID: 'Tu sesión ha caducado. Vuelve a iniciar sesión.',
+  AUTH_REFRESH_REUSE_DETECTED:
+    'Tu sesión se ha cerrado por seguridad: se ha reutilizado un token ya canjeado. Vuelve a iniciar sesión.',
+  AUTH_STEP_UP_REQUIRED:
+    'Confirma esta acción con tu código de verificación en dos pasos.',
+  AUTH_TWO_FACTOR_ALREADY_ENROLLED:
+    'Esta cuenta ya tiene la verificación en dos pasos activada.',
+  AUTH_TWO_FACTOR_ENROLMENT_REQUIRED:
+    'Tu cuenta de administración necesita verificación en dos pasos antes de continuar.',
+  AUTH_TWO_FACTOR_INVALID_CODE: 'El código no es válido o ya ha caducado.',
+  AUTH_TWO_FACTOR_NOT_ENROLLED:
+    'Esta cuenta todavía no tiene la verificación en dos pasos activada.',
+  AUTH_TWO_FACTOR_REQUIRED:
+    'Introduce el código de verificación de tu aplicación de autenticación.',
+  AUTH_TWO_FACTOR_UNAVAILABLE:
+    'La verificación en dos pasos no está disponible en este servidor. Avisa a un administrador.',
   BANK_ACCOUNT_NOT_OWNED:
     'No puedes transferir desde una cuenta que no es tuya.',
   BANK_AMOUNT_NOT_POSITIVE: 'El importe debe ser mayor que cero.',

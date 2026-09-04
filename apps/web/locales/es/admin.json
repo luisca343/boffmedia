@@ -26,7 +26,9 @@
       "app": "App",
       "packs": "Packs",
       "releases": "Releases",
-      "randomizer": "Randomizer"
+      "randomizer": "Randomizer",
+      "account": "Cuenta",
+      "security": "Seguridad"
     },
     "crud": {
       "count": "{count} {plural}",
@@ -1110,6 +1112,28 @@
       "confirmPublishLead": "¿Publicar la versión {version} para que aparezca en el feed de actualización?",
       "confirmUnpublish": "Despublicar release",
       "confirmUnpublishLead": "¿Despublicar la versión {version}? Se ocultará del feed de actualización."
+    },
+    "twoFactor": {
+      "sectionTitle": "Seguridad de la cuenta",
+      "sectionDesc": "Verificación en dos pasos y códigos de recuperación de tu propia cuenta de administración.",
+      "kpiRequired": "Obligatoria",
+      "kpiEnrolled": "Activada",
+      "kpiBackupCodes": "Códigos sin usar",
+      "yes": "Sí",
+      "no": "No",
+      "notEnrolledWarning": "Esta cuenta necesita verificación en dos pasos. Se te pedirá activarla la próxima vez que inicies sesión.",
+      "lowBackupCodes": "Te quedan muy pocos códigos de recuperación. Genera un juego nuevo.",
+      "regenerateTitle": "Códigos de recuperación",
+      "regenerateLead": "Generar un juego nuevo invalida todos los anteriores. Necesitas un código de tu aplicación de autenticación para hacerlo.",
+      "regenerateSubmit": "Generar códigos nuevos",
+      "codesRegenerated": "Códigos regenerados",
+      "codesLead": "Son de un solo uso y solo se muestran ahora.",
+      "codeLabel": "Código de 6 dígitos",
+      "invalidCode": "El código no es válido o ya ha caducado.",
+      "stepUpTitle": "Confirma esta acción",
+      "stepUpLead": "Publicar cambia lo que se ejecuta en el equipo de otras personas. Introduce el código de tu aplicación de autenticación para confirmar que eres tú quien está al teclado ahora mismo.",
+      "confirm": "Confirmar",
+      "cancel": "Cancelar"
     }
   },
   "tournaments": {

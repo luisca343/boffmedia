@@ -4,7 +4,9 @@ import {
   apiAuthedAutoGET,
   apiAuthedAutoPATCH,
   apiAuthedAutoPOST,
+  apiAuthedAutoPOSTWithHeaders,
 } from '@/services/boffAPI';
+import { STEP_UP_HEADER } from '@/services/api/boffmedia/stepUp';
 
 // The launcher's pack registry, admin half. The launcher itself
 // talks to /packs/launcher/* with its own session; nothing here is reachable
@@ -317,11 +319,20 @@ export class PacksService {
   }
 
   /** Publishing also makes this the pack's latest version — one step, so the
-   *  two can never disagree. */
-  static publishVersion(packId: string, versionId: string) {
-    return apiAuthedAutoPOST<void>(
+   *  two can never disagree.
+   *
+   *  `stepUpToken` is a fresh two-factor confirmation: this is the moment the
+   *  version starts installing itself on other people's machines, and an admin
+   *  session that has been sitting in a browser for hours is not enough. */
+  static publishVersion(
+    packId: string,
+    versionId: string,
+    stepUpToken: string,
+  ) {
+    return apiAuthedAutoPOSTWithHeaders<void>(
       `/packs/admin/${packId}/versions/${versionId}/publish`,
       {},
+      { [STEP_UP_HEADER]: stepUpToken },
     );
   }
 

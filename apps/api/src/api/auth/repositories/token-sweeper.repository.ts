@@ -5,6 +5,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   boffMediaEmailVerifications,
   boffMediaPasswordResetTokens,
+  boffMediaRefreshTokens,
 } from '@/_db/schema/BoffMediaAuth';
 import { desktopDeviceCodes } from '@/_db/schema/DesktopAuth';
 
@@ -60,5 +61,20 @@ export class TokenSweeperRepository {
           ),
         ),
       );
+  }
+
+  /**
+   * Drop refresh-token ledger rows once their token can no longer be presented.
+   *
+   * Strictly on `expires_at`, never on `rotated_at`: a SPENT row is exactly what
+   * reuse detection needs to still be there when the stolen copy shows up, so
+   * deleting rotated rows early would turn a detected theft back into a silent
+   * one. Once the JWT itself is expired the verify step rejects it first and the
+   * row has no job left.
+   */
+  async deleteExpiredRefreshTokens(now: Date): Promise<void> {
+    await this.db
+      .delete(boffMediaRefreshTokens)
+      .where(lt(boffMediaRefreshTokens.expiresAt, now));
   }
 }

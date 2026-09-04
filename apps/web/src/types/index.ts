@@ -27,6 +27,18 @@ export interface BoffUser { //extends DefaultUser {
   accessToken?: string
   /** NestJS-signed refresh token — used to silently renew accessToken */
   refreshToken?: string
+  /**
+   * True while an ADMIN sign-in is waiting on its second factor. The session
+   * exists but carries no `accessToken`, so it can reach nothing; `TwoFactorGate`
+   * routes the browser to /entrar/2fa until it is cleared.
+   */
+  twoFactorPending?: boolean
+  /** false = the account has no second factor yet and must enrol before it can
+   *  finish signing in. Admin 2FA is mandatory, so this is a step, not an offer. */
+  twoFactorEnrolled?: boolean
+  /** The API's short-lived `typ:'mfa'` token. Authenticates /auth/2fa/challenge/*
+   *  and nothing else — it is not a session and grants no account powers. */
+  challengeToken?: string
 }
 
 declare module "next-auth" {

@@ -9,9 +9,10 @@ const DEVICE_CODE_GRACE_MS = 60 * 60 * 1000;
 
 /**
  * Deletes single-use credentials — password-reset tokens, email verifications,
- * desktop device codes — once they can no longer be used. The rows are *hashes*
- * of live credentials, so keeping them past expiry is storage no one needs and
- * an audit surface no one wants.
+ * desktop device codes, spent refresh-token jtis — once they can no longer be
+ * used. The rows are *hashes* (or, for refresh tokens, bare ids) of live
+ * credentials, so keeping them past expiry is storage no one needs and an audit
+ * surface no one wants.
  *
  * Housekeeping only: every read path re-checks expiry and single-use, so nothing
  * depends on this having run. The queries live in `TokenSweeperRepository`; a
@@ -33,6 +34,7 @@ export class TokenSweeperService {
       await this.repo.deleteStaleDeviceCodes(
         new Date(now.getTime() - DEVICE_CODE_GRACE_MS),
       );
+      await this.repo.deleteExpiredRefreshTokens(now);
     } catch (error: any) {
       // Housekeeping — a failure must never crash the scheduler tick.
       this.logger.error(`Token sweep failed: ${error?.message}`);

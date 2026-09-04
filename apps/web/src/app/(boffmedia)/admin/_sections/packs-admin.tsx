@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { Badge, Button, ConfirmDialog, Empty, Field, Icon, Input, PackListItem, Spinner, Tabs, toast, VersionRow } from "@boffmedia/ui"
 import { AvKpi, AvKpis, AvMetric, AvPanel, AvPill, AvSectionHead, AvViewLink, formatAdminDate } from "../_components/ui/av-kit"
+import { useStepUp } from "../_components/hooks/useStepUp"
 import { PackForm } from "../_components/packs/pack-form"
 import { PackServerEditor } from "../_components/packs/pack-server-editor"
 import { VersionEditor } from "../_components/packs/version-editor"
@@ -70,6 +71,7 @@ function VersionsTab({
   reloadToken: number
 }) {
   const t = useTranslations("admin.packs")
+  const { requestStepUp, stepUpDialog } = useStepUp()
   const [rows, setRows] = useState<PackVersionRow[] | null>(null)
   const [publishing, setPublishing] = useState<string | null>(null)
   const [confirmDelete, setConfirmDelete] = useState<PackVersionRow | null>(null)
@@ -95,9 +97,13 @@ function VersionsTab({
   }
 
   const publish = async (versionId: string) => {
+    // Publishing is the moment this version starts installing itself on other
+    // people's machines — the API demands a fresh two-factor confirmation.
+    const stepUpToken = await requestStepUp()
+    if (!stepUpToken) return
     setPublishing(versionId)
     try {
-      const res = await PacksService.publishVersion(pack.id, versionId)
+      const res = await PacksService.publishVersion(pack.id, versionId, stepUpToken)
       if (!res.success) {
         toast({ tone: "bad", title: t("publishFailed"), msg: res.userMessage })
         return
@@ -114,6 +120,7 @@ function VersionsTab({
 
   return (
     <>
+      {stepUpDialog}
       {rows.length === 0 ? (
         <Empty icon="layers" title={t("noVersions")} lead={t("noVersionsLead")}>
           <Button size="sm" variant="pri" icon="plus" onClick={onNewVersion}>

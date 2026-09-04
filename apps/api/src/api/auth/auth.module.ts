@@ -23,6 +23,12 @@ import { MailModule } from '@api/mail/mail.module';
 import { OutboxModule } from '@api/outbox/outbox.module';
 import { TokenSweeperService } from './token-sweeper.service';
 import { TokenSweeperRepository } from './repositories/token-sweeper.repository';
+import { RefreshTokensRepository } from './repositories/refresh-tokens.repository';
+import { TwoFactorController } from './two-factor/two-factor.controller';
+import { TwoFactorService } from './two-factor/two-factor.service';
+import { TwoFactorRepository } from './two-factor/two-factor.repository';
+import { MfaChallengeGuard } from './two-factor/mfa-challenge.guard';
+import { StepUpGuard } from '@api/_utils/guards/step-up.guard';
 
 @Module({
   imports: [
@@ -43,7 +49,7 @@ import { TokenSweeperRepository } from './repositories/token-sweeper.repository'
       signOptions: { expiresIn: '1h' },
     }),
   ],
-  controllers: [AuthController, MinecraftController],
+  controllers: [AuthController, MinecraftController, TwoFactorController],
   providers: [
     GoogleStrategy,
     JwtStrategy,
@@ -56,12 +62,21 @@ import { TokenSweeperRepository } from './repositories/token-sweeper.repository'
     MinecraftHandshakeService,
     TokenSweeperService,
     TokenSweeperRepository,
+    RefreshTokensRepository,
+    TwoFactorService,
+    TwoFactorRepository,
+    MfaChallengeGuard,
+    // Exported so the two publishing modules can put it on their routes without
+    // each registering a second JwtService against the same secret.
+    StepUpGuard,
   ],
   exports: [
     AuthService,
     JwtModule,
     EmailVerificationService,
     MinecraftHandshakeService,
+    TwoFactorService,
+    StepUpGuard,
   ],
 })
 export class AuthModule {}

@@ -10,6 +10,7 @@ import {
   type DesktopTarget,
 } from "@/services/api/boffmedia/desktopReleasesService"
 import { AvAlert, AvKpi, AvKpis, AvPanel, AvPill, AvSectionHead, formatAdminDate } from "../_components/ui/av-kit"
+import { useStepUp } from "../_components/hooks/useStepUp"
 
 const VERSION_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/
 
@@ -39,6 +40,9 @@ function formatBytes(bytes: number): string {
 
 export function DesktopReleasesAdmin() {
   const t = useTranslations("admin.releases")
+  // Uploading and publishing both change what runs on someone else's machine,
+  // so both ask for a fresh code rather than riding the admin session alone.
+  const { requestStepUp, stepUpDialog } = useStepUp()
   const [rows, setRows] = useState<DesktopReleaseEntity[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -94,10 +98,14 @@ export function DesktopReleasesAdmin() {
         return
       }
 
+      const stepUpToken = await requestStepUp()
+      if (!stepUpToken) return
+
       const response = await DesktopReleasesService.upload(
         { version: cleanVersion, target, notes },
         artifact,
         signature,
+        stepUpToken,
       )
       if (!response.success || !response.data) {
         toast({ tone: "bad", title: t("uploadFailed"), msg: response.userMessage ?? t("tryAgain") })
@@ -122,9 +130,12 @@ export function DesktopReleasesAdmin() {
     if (!confirmPublish) return
     setBusyId(confirmPublish.id)
     try {
+      const stepUpToken = await requestStepUp()
+      if (!stepUpToken) return
+
       const response = confirmPublish.published
-        ? await DesktopReleasesService.unpublish(confirmPublish.id)
-        : await DesktopReleasesService.publish(confirmPublish.id)
+        ? await DesktopReleasesService.unpublish(confirmPublish.id, stepUpToken)
+        : await DesktopReleasesService.publish(confirmPublish.id, stepUpToken)
       if (!response.success) {
         toast({
           tone: "bad",
@@ -164,6 +175,7 @@ export function DesktopReleasesAdmin() {
 
   return (
     <div>
+      {stepUpDialog}
       <AvSectionHead
         title={t("title")}
         desc={t("desc")}

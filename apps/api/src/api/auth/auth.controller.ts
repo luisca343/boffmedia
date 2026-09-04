@@ -14,6 +14,7 @@ import {
   ApiOperation,
   ApiResponse,
   ApiBearerAuth,
+  ApiExtraModels,
 } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { AuthThrottlerGuard } from '@api/_utils/guards/auth-throttler.guard';
@@ -38,9 +39,14 @@ import { ResendVerificationDto } from './dto/resend-verification.dto';
 import {
   AuthLoginResponseEntity,
   AuthRefreshResponseEntity,
+  AuthTwoFactorChallengeEntity,
 } from './entities/auth-response.entity';
 
 @ApiTags('BoffMedia | Authentication')
+// Login and the three OAuth callbacks answer with EITHER a session or a
+// two-factor challenge — an admin account never gets the former without the
+// latter. Registered here so the challenge shape reaches the generated client.
+@ApiExtraModels(AuthTwoFactorChallengeEntity)
 @Public()
 @Controller('auth')
 export class AuthController {
@@ -62,7 +68,8 @@ export class AuthController {
   @ApiOperation({ summary: 'Login user' })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'User logged in successfully.',
+    description:
+      'User logged in successfully — OR, for an account holding an admin role, an AuthTwoFactorChallengeEntity carrying no tokens at all. Check for `two_factor` before reading `access_token`.',
     type: AuthLoginResponseEntity,
   })
   @ApiResponse({

@@ -13,6 +13,42 @@
       "es": "Usuario o contraseña incorrectos.",
       "where": "api/auth/auth.controller.ts"
     },
+    "AUTH_REFRESH_INVALID": {
+      "es": "Tu sesión ha caducado. Vuelve a iniciar sesión.",
+      "where": "api/auth/auth.service.ts"
+    },
+    "AUTH_REFRESH_REUSE_DETECTED": {
+      "es": "Tu sesión se ha cerrado por seguridad: se ha reutilizado un token ya canjeado. Vuelve a iniciar sesión.",
+      "where": "api/auth/auth.service.ts"
+    },
+    "AUTH_STEP_UP_REQUIRED": {
+      "es": "Confirma esta acción con tu código de verificación en dos pasos.",
+      "where": "api/_utils/guards/step-up.guard.ts"
+    },
+    "AUTH_TWO_FACTOR_ALREADY_ENROLLED": {
+      "es": "Esta cuenta ya tiene la verificación en dos pasos activada.",
+      "where": "api/auth/two-factor/two-factor.service.ts"
+    },
+    "AUTH_TWO_FACTOR_ENROLMENT_REQUIRED": {
+      "es": "Tu cuenta de administración necesita verificación en dos pasos antes de continuar.",
+      "where": "api/auth/two-factor/two-factor.service.ts"
+    },
+    "AUTH_TWO_FACTOR_INVALID_CODE": {
+      "es": "El código no es válido o ya ha caducado.",
+      "where": "api/auth/two-factor/two-factor.service.ts"
+    },
+    "AUTH_TWO_FACTOR_NOT_ENROLLED": {
+      "es": "Esta cuenta todavía no tiene la verificación en dos pasos activada.",
+      "where": "api/auth/two-factor/two-factor.service.ts"
+    },
+    "AUTH_TWO_FACTOR_REQUIRED": {
+      "es": "Introduce el código de verificación de tu aplicación de autenticación.",
+      "where": "api/auth/two-factor/two-factor.service.ts"
+    },
+    "AUTH_TWO_FACTOR_UNAVAILABLE": {
+      "es": "La verificación en dos pasos no está disponible en este servidor. Avisa a un administrador.",
+      "where": "api/auth/two-factor/two-factor.service.ts"
+    },
     "BANK_ACCOUNT_NOT_OWNED": {
       "es": "No puedes transferir desde una cuenta que no es tuya.",
       "where": "smartrotom/starbank"

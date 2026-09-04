@@ -14,6 +14,7 @@ import { AchievementsAdmin } from "../_sections/achievements-admin"
 import { TournamentsAdmin } from "../_sections/tournaments-admin"
 import { PacksAdmin } from "../_sections/packs-admin"
 import { DesktopReleasesAdmin } from "../_sections/desktop-releases-admin"
+import { SecurityAdmin } from "../_sections/security-admin"
 import { RandomizerAdmin } from "../_sections/randomizer-admin"
 import { TcgpSync } from "../_sections/tcgp-admin/TcgpSync"
 import { VgcMetaPanel } from "../_sections/vgc-admin/VgcMetaPanel"
@@ -40,6 +41,10 @@ const NAV_META: { labelKey: string; items: { id: string; labelKey: string; icon:
       { id: "releases", labelKey: "releases", icon: "upload" },
       { id: "randomizer", labelKey: "randomizer", icon: "sparkles" },
     ],
+  },
+  {
+    labelKey: "account",
+    items: [{ id: "security", labelKey: "security", icon: "shield" }],
   },
   {
     labelKey: "tools",
@@ -107,6 +112,7 @@ function AdminContent() {
       {section === "manga-downloader"  && <MangaDownloader />}
       {section === "manga-library"     && <MangaLibrary />}
       {section === "manga-config"      && <MangaConfig />}
+      {section === "security"          && <SecurityAdmin />}
     </AvShell>
   )
 }

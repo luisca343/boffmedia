@@ -24,6 +24,7 @@ import type { Request } from 'express';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { FullSessionGuard } from '@api/_utils/guards/full-session.guard';
+import { STEP_UP_HEADER, StepUpGuard } from '@api/_utils/guards/step-up.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { DesktopUpdatesService } from './desktop-updates.service';
@@ -54,6 +55,13 @@ export class DesktopUpdatesAdminController {
   }
 
   @Post()
+  @UseGuards(StepUpGuard)
+  @ApiHeader({
+    name: STEP_UP_HEADER,
+    description:
+      'Token de confirmación reciente de doble factor (POST /auth/2fa/step-up). Publicar cambia lo que se ejecuta en la máquina de otra persona, así que la sesión de admin por sí sola no basta.',
+    required: true,
+  })
   @ApiOperation({
     summary: 'Subir el bundle de una versión',
     description:
@@ -91,6 +99,13 @@ export class DesktopUpdatesAdminController {
   }
 
   @Post(':id/publish')
+  @UseGuards(StepUpGuard)
+  @ApiHeader({
+    name: STEP_UP_HEADER,
+    description:
+      'Token de confirmación reciente de doble factor (POST /auth/2fa/step-up). Publicar cambia lo que se ejecuta en la máquina de otra persona, así que la sesión de admin por sí sola no basta.',
+    required: true,
+  })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Publicar una release',
@@ -105,6 +120,13 @@ export class DesktopUpdatesAdminController {
   }
 
   @Post(':id/unpublish')
+  @UseGuards(StepUpGuard)
+  @ApiHeader({
+    name: STEP_UP_HEADER,
+    description:
+      'Token de confirmación reciente de doble factor (POST /auth/2fa/step-up). Publicar cambia lo que se ejecuta en la máquina de otra persona, así que la sesión de admin por sí sola no basta.',
+    required: true,
+  })
   @HttpCode(HttpStatus.OK)
   @ApiOperation({
     summary: 'Despublicar una release',

@@ -11,6 +11,11 @@ import type { UserRole } from "@boffmedia/shared/roles";
 import { AuthError, AUTH_ERROR_CODES, handleAuthError } from '@/utils/auth-errors';
 import { CookiesOptions } from "next-auth";
 import type { AuthLoginResponseEntity, AuthRefreshResponseEntity } from "@boffmedia/shared";
+import {
+  PENDING_TWO_FACTOR_USER_ID,
+  type LoginOrChallenge,
+  type TwoFactorSessionUpdate,
+} from "@/features/twoFactorSession";
 
 // Discord OAuth only activates when both credentials are configured — keeps the
 // provider (and the /entrar button) inert until the app secrets are set.
@@ -65,6 +70,16 @@ const sessionCookie = {
       },
 } as Partial<CookiesOptions>;
 
+/**
+ * Refresh failures that mean "this session is over", as opposed to "try again".
+ * Anything else (a 5xx, a timeout) leaves the stored pair alone.
+ */
+const TERMINAL_REFRESH_CODES: string[] = [
+  ApiErrorCode.AUTH_REFRESH_REUSE_DETECTED,
+  ApiErrorCode.AUTH_REFRESH_INVALID,
+  ApiErrorCode.AUTH_TWO_FACTOR_ENROLMENT_REQUIRED,
+];
+
 export const authOptions: NextAuthOptions = {
   // `/entrar` is the ONLY login entry point. These two used to point at
   // `/auth/signin` and `/auth/error`, neither of which is a route — so every
@@ -94,7 +109,7 @@ export const authOptions: NextAuthOptions = {
             return null;
           }
 
-          const envelope = await boffPOST<AuthLoginResponseEntity | { error: string }>(`/auth/login`, {
+          const envelope = await boffPOST<LoginOrChallenge | { error: string }>(`/auth/login`, {
             username: credentials.username,
             password: credentials.password,
           });
@@ -110,7 +125,24 @@ export const authOptions: NextAuthOptions = {
 
           const response = envelope.data;
 
-          if (response && !('error' in response)) {
+          // An admin account answers with a CHALLENGE instead of a session: the
+          // password checked out, the second factor has not. The session created
+          // here deliberately carries no accessToken, so it can reach nothing —
+          // TwoFactorGate sends the browser to /entrar/2fa to finish.
+          if (response && 'two_factor' in response && response.two_factor?.required) {
+            return {
+              id: PENDING_TWO_FACTOR_USER_ID,
+              username: credentials.username,
+              name: credentials.username,
+              email: "",
+              roles: [],
+              twoFactorPending: true,
+              twoFactorEnrolled: response.two_factor.enrolled,
+              challengeToken: response.two_factor.challenge_token,
+            };
+          }
+
+          if (response && !('error' in response) && 'user' in response) {
             const { user } = response;
             return {
               ...user,
@@ -235,7 +267,7 @@ export const authOptions: NextAuthOptions = {
           // GoogleProfile is next-auth's real typed shape for this provider's profile;
           // `image` is kept as a defensive fallback in case the shape ever drifts.
           const googleProfile = profile as (GoogleProfile & { image?: string }) | undefined;
-          const response = await boffPOST<AuthLoginResponseEntity>('/auth/google/callback', {
+          const response = await boffPOST<LoginOrChallenge>('/auth/google/callback', {
             email: profile?.email,
             name: profile?.name,
             picture: googleProfile?.picture ?? googleProfile?.image,
@@ -247,6 +279,21 @@ export const authOptions: NextAuthOptions = {
           }
 
           const responseData = response.data;
+
+          // Same gate as the credentials path: reaching an admin account through
+          // Google/Discord/Twitch is the same door, so it needs the same second
+          // factor. Nothing here is a usable session until /entrar/2fa finishes.
+          if ('two_factor' in responseData) {
+            user.id = PENDING_TWO_FACTOR_USER_ID;
+            user.roles = [];
+            user.accessToken = undefined;
+            user.refreshToken = undefined;
+            user.twoFactorPending = true;
+            user.twoFactorEnrolled = responseData.two_factor.enrolled;
+            user.challengeToken = responseData.two_factor.challenge_token;
+            return true;
+          }
+
           user.id = String(responseData.user.id);
           user.roles = responseData.user.roles as UserRole[];
           user.smartRotomUser = responseData.user.smartRotomUser ?? undefined;
@@ -270,7 +317,7 @@ export const authOptions: NextAuthOptions = {
                 }?size=256`
               : undefined;
 
-          const response = await boffPOST<AuthLoginResponseEntity>('/auth/discord/callback', {
+          const response = await boffPOST<LoginOrChallenge>('/auth/discord/callback', {
             discordId: p?.id,
             email: p?.email,
             name: p?.global_name ?? p?.username,
@@ -282,6 +329,21 @@ export const authOptions: NextAuthOptions = {
           }
 
           const responseData = response.data;
+
+          // Same gate as the credentials path: reaching an admin account through
+          // Google/Discord/Twitch is the same door, so it needs the same second
+          // factor. Nothing here is a usable session until /entrar/2fa finishes.
+          if ('two_factor' in responseData) {
+            user.id = PENDING_TWO_FACTOR_USER_ID;
+            user.roles = [];
+            user.accessToken = undefined;
+            user.refreshToken = undefined;
+            user.twoFactorPending = true;
+            user.twoFactorEnrolled = responseData.two_factor.enrolled;
+            user.challengeToken = responseData.two_factor.challenge_token;
+            return true;
+          }
+
           user.id = String(responseData.user.id);
           user.roles = responseData.user.roles as UserRole[];
           user.smartRotomUser = responseData.user.smartRotomUser ?? undefined;
@@ -298,7 +360,7 @@ export const authOptions: NextAuthOptions = {
       if (account?.provider === 'twitch') {
         try {
           const p = profile as TwitchProfile | undefined;
-          const response = await boffPOST<AuthLoginResponseEntity>('/auth/twitch/callback', {
+          const response = await boffPOST<LoginOrChallenge>('/auth/twitch/callback', {
             twitchId: p?.sub,
             email: p?.email,
             name: p?.preferred_username,
@@ -310,6 +372,21 @@ export const authOptions: NextAuthOptions = {
           }
 
           const responseData = response.data;
+
+          // Same gate as the credentials path: reaching an admin account through
+          // Google/Discord/Twitch is the same door, so it needs the same second
+          // factor. Nothing here is a usable session until /entrar/2fa finishes.
+          if ('two_factor' in responseData) {
+            user.id = PENDING_TWO_FACTOR_USER_ID;
+            user.roles = [];
+            user.accessToken = undefined;
+            user.refreshToken = undefined;
+            user.twoFactorPending = true;
+            user.twoFactorEnrolled = responseData.two_factor.enrolled;
+            user.challengeToken = responseData.two_factor.challenge_token;
+            return true;
+          }
+
           user.id = String(responseData.user.id);
           user.roles = responseData.user.roles as UserRole[];
           user.smartRotomUser = responseData.user.smartRotomUser ?? undefined;
@@ -324,7 +401,7 @@ export const authOptions: NextAuthOptions = {
       }
       return true;
     },
-    async jwt({ token, user, account, trigger }) {
+    async jwt({ token, user, account, trigger, session }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
@@ -334,7 +411,30 @@ export const authOptions: NextAuthOptions = {
         token.image = user.profilePicture ?? user.image ?? null;
         token.accessToken = user.accessToken;
         token.refreshToken = user.refreshToken;
+        token.twoFactorPending = user.twoFactorPending;
+        token.twoFactorEnrolled = user.twoFactorEnrolled;
+        token.challengeToken = user.challengeToken;
         token.lastUpdated = Date.now();
+      }
+
+      // The second factor landed: /entrar/2fa calls `update({ twoFactor })` with
+      // the session the API just minted, and it REPLACES the pending stub here.
+      // Nothing else may write accessToken — the page never has a way to forge
+      // one, it only relays what /auth/2fa/challenge/* returned.
+      const promotion = (session as TwoFactorSessionUpdate | undefined)?.twoFactor;
+      if (trigger === 'update' && promotion) {
+        token.id = String(promotion.user.id);
+        token.name = promotion.user.username;
+        token.email = promotion.user.email;
+        token.roles = promotion.user.roles as UserRole[];
+        token.smartRotomUser = promotion.user.smartRotomUser ?? undefined;
+        token.accessToken = promotion.access_token;
+        token.refreshToken = promotion.refresh_token;
+        token.twoFactorPending = false;
+        token.twoFactorEnrolled = true;
+        token.challengeToken = undefined;
+        token.lastUpdated = Date.now();
+        return token;
       }
 
       // Only refresh when explicitly requested or token is approaching expiry (55 min).
@@ -344,7 +444,9 @@ export const authOptions: NextAuthOptions = {
         !token.lastUpdated ||
         (Date.now() - (token.lastUpdated as number) > 55 * 60 * 1000);
 
-      if (shouldRefresh && token.id && token.refreshToken) {
+      // A pending sign-in has no refresh token to spend, and calling /auth/refresh
+      // with the previous session's one would quietly resurrect it.
+      if (shouldRefresh && !token.twoFactorPending && token.id && token.refreshToken) {
         try {
           const response = await boffPOST<AuthRefreshResponseEntity>('/auth/refresh', {
             refresh_token: token.refreshToken,
@@ -363,8 +465,19 @@ export const authOptions: NextAuthOptions = {
             token.accessToken = userData.access_token ?? token.accessToken;
             token.refreshToken = userData.refresh_token ?? token.refreshToken;
             token.lastUpdated = Date.now();
+          } else if (TERMINAL_REFRESH_CODES.includes(response?.code ?? '')) {
+            // The API said this refresh token is dead, not that it was busy:
+            // reuse was detected on the family, the jti is unknown, or the
+            // account now needs a second factor it has not enrolled. Keeping the
+            // pair would leave the browser signed in on an access token nothing
+            // will ever renew — and, after a detected theft, that is exactly the
+            // session that must stop working.
+            token.accessToken = undefined;
+            token.refreshToken = undefined;
           }
         } catch (error) {
+          // A NETWORK failure is not a revocation: keep the tokens and retry on
+          // the next request rather than signing the user out over a blip.
           console.error('Error refreshing token:', error);
         }
       }
@@ -385,6 +498,9 @@ export const authOptions: NextAuthOptions = {
         } | undefined,
         image: token.image as string | null | undefined,
         accessToken: token.accessToken as string | undefined,
+        twoFactorPending: token.twoFactorPending as boolean | undefined,
+        twoFactorEnrolled: token.twoFactorEnrolled as boolean | undefined,
+        challengeToken: token.challengeToken as string | undefined,
       } as BoffUser;
       return session;
     },

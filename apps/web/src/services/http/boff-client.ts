@@ -44,6 +44,31 @@ export async function apiAuthedAutoPOST<T>(url: string, data: any): Promise<ApiR
   return authedRequest<T>("POST", `${getApiUrl()}${url}`, await sessionToken(), data);
 }
 
+/**
+ * Same as `apiAuthedAutoPOST` but lets the caller add request headers.
+ *
+ * It exists for `X-Step-Up-Token`: publishing a release or a pack version needs
+ * a fresh two-factor confirmation alongside the session Bearer, and a header is
+ * the only place to put it that also works for the raw octet-stream upload.
+ */
+export async function apiAuthedAutoPOSTWithHeaders<T>(
+  url: string,
+  data: any,
+  extraHeaders: Record<string, string>,
+): Promise<ApiResponse<T>> {
+  const res = await fetch(`${getApiUrl()}${url}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...extraHeaders,
+      Authorization: `Bearer ${await sessionToken()}`,
+    },
+    body: JSON.stringify(data ?? {}),
+  });
+  if (!res.ok) return parseErrorEnvelope<T>(res);
+  return (await res.json()) as ApiResponse<T>;
+}
+
 export async function apiAuthedAutoPATCH<T>(url: string, data: any): Promise<ApiResponse<T>> {
   return authedRequest<T>("PATCH", `${getApiUrl()}${url}`, await sessionToken(), data);
 }

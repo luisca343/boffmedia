@@ -37,6 +37,18 @@ export const env = z
 
     // Auth
     JWT_SECRET: z.string().min(32),
+    // AES-256-GCM key (64 hex characters) for the few secrets that must be
+    // stored recoverably rather than hashed — today only the TOTP shared
+    // secrets behind admin 2FA. See `_utils/crypto/secret-box.ts`.
+    //
+    // Optional so dev and the test suite boot without it, exactly like
+    // TERAS_API_TOKEN: when it is unset, enrolling a second factor FAILS rather
+    // than falling back to storing the secret in the clear, so an admin account
+    // on a box without the key simply cannot finish enrolment.
+    SECRET_ENCRYPTION_KEY: z
+      .string()
+      .regex(/^[0-9a-fA-F]{64}$/, 'must be 64 hex characters')
+      .optional(),
     GOOGLE_CLIENT_ID: z.string(),
     GOOGLE_CLIENT_SECRET: z.string(),
     GOOGLE_CALLBACK_URL: z.string().optional(),

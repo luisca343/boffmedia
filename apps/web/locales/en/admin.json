@@ -26,7 +26,9 @@
       "app": "App",
       "packs": "Packs",
       "releases": "Releases",
-      "randomizer": "Randomizer"
+      "randomizer": "Randomizer",
+      "account": "Account",
+      "security": "Security"
     },
     "crud": {
       "count": "{count} {plural}",
@@ -1110,6 +1112,28 @@
       "confirmPublishLead": "Publish version {version} so it appears in the update feed?",
       "confirmUnpublish": "Unpublish release",
       "confirmUnpublishLead": "Unpublish version {version}? It will be hidden from the update feed."
+    },
+    "twoFactor": {
+      "sectionTitle": "Account security",
+      "sectionDesc": "Two-factor verification and backup codes for your own admin account.",
+      "kpiRequired": "Required",
+      "kpiEnrolled": "Enabled",
+      "kpiBackupCodes": "Unused codes",
+      "yes": "Yes",
+      "no": "No",
+      "notEnrolledWarning": "This account needs two-factor verification. You will be asked to set it up the next time you sign in.",
+      "lowBackupCodes": "You have very few backup codes left. Generate a new set.",
+      "regenerateTitle": "Backup codes",
+      "regenerateLead": "Generating a new set invalidates every previous code. You need a code from your authenticator app to do it.",
+      "regenerateSubmit": "Generate new codes",
+      "codesRegenerated": "Codes regenerated",
+      "codesLead": "Each one works once and they are shown only now.",
+      "codeLabel": "6-digit code",
+      "invalidCode": "That code is not valid, or it has expired.",
+      "stepUpTitle": "Confirm this action",
+      "stepUpLead": "Publishing changes what runs on other people's machines. Enter the code from your authenticator app to confirm it is you at the keyboard right now.",
+      "confirm": "Confirm",
+      "cancel": "Cancel"
     }
   },
   "tournaments": {

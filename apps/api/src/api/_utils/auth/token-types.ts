@@ -22,6 +22,19 @@ export const TOKEN_TYPE = {
    * so a hijacked one cannot take the account over.
    */
   INGAME: 'ingame',
+  /**
+   * Two-factor challenge. Minted by `/auth/login` (and the OAuth callbacks) for
+   * an account that holds an admin role, INSTEAD of a session: it says "this
+   * password/OAuth identity checked out" and nothing else.
+   *
+   * It authenticates only the `/auth/2fa/*` routes, so it is deliberately NOT
+   * in WEBSITE_TOKEN_TYPES — the whole point is that holding it grants none of
+   * the account's powers until the second factor lands. Short-lived (10 min).
+   *
+   * The same `typ` also carries the STEP-UP token minted by `/auth/2fa/step-up`,
+   * distinguished by an `su: true` claim; StepUpGuard checks both.
+   */
+  MFA: 'mfa',
 } as const;
 
 export type TokenType = (typeof TOKEN_TYPE)[keyof typeof TOKEN_TYPE];

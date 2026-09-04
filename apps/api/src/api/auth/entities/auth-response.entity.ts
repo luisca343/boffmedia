@@ -111,3 +111,31 @@ export class AuthRefreshResponseEntity {
   @ApiProperty({ type: AuthRefreshUserEntity })
   user: AuthRefreshUserEntity;
 }
+
+/**
+ * What `/auth/login` (and the OAuth callbacks) answer with INSTEAD of a session
+ * when the account holds an admin role. No tokens, because the sign-in is not
+ * finished — the client takes `challenge_token` to `/auth/2fa/challenge/*`.
+ */
+export class AuthTwoFactorChallengeDetailEntity {
+  @ApiProperty({ example: true })
+  required: true;
+
+  @ApiProperty({
+    example: true,
+    description:
+      'false = the account has no second factor yet and must be walked through enrolment before it can sign in. Admin 2FA is mandatory, so this is a step, not an offer.',
+  })
+  enrolled: boolean;
+
+  @ApiProperty({
+    description:
+      "Short-lived typ:'mfa' token. Authenticates the /auth/2fa/challenge/* routes and nothing else.",
+  })
+  challenge_token: string;
+}
+
+export class AuthTwoFactorChallengeEntity {
+  @ApiProperty({ type: AuthTwoFactorChallengeDetailEntity })
+  two_factor: AuthTwoFactorChallengeDetailEntity;
+}

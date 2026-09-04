@@ -43,6 +43,13 @@
       "when": 1788363027375,
       "tag": "0005_battlesim_replays_teams",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1788521195797,
+      "tag": "0006_auth_hardening_2fa_refresh_rotation",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,7 @@ import { SessionProvider } from "next-auth/react"
 import { UserSocketListener } from "../providers/UserSocketListener"
 import { SocketProvider } from "@/providers/SocketProvider"
 import { ToolSessionBridge } from "@/lib/ToolSessionBridge"
+import { TwoFactorGate } from "@/features/TwoFactorGate"
 
 export function GlobalProviders({ children }: { children: React.ReactNode }) {
     return (
@@ -11,6 +12,9 @@ export function GlobalProviders({ children }: { children: React.ReactNode }) {
             {/* Publishes the session into @boffmedia/tool-kit's host. Here
                 because it needs SessionProvider above it; renders nothing. */}
             <ToolSessionBridge />
+            {/* Keeps a half-finished admin sign-in on /entrar/2fa. Renders
+                nothing; needs SessionProvider above it. */}
+            <TwoFactorGate />
             {children}
         </SocketProvider>
     </SessionProvider>
