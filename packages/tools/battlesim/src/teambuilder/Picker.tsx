@@ -29,6 +29,7 @@ import { BSIM_FOCUS, BSIM_FOCUS_CUT } from "../components/bsim-kit";
 import { BxType, BxTypeRow, BxCat } from "../components/bx-kit";
 import { useToolT } from "../i18n";
 import { usePkmnLabels } from "../lib/pkmn-label";
+import { useFocusTrap } from "../lib/useFocusTrap";
 import { TB_NS, TYPE_LIST, toId, useTbLabels } from "./labels";
 import { itemIconStyle, speciesSprite, TbTypeChip } from "./tb-kit";
 import { handleSpriteError } from "@boffmedia/tools-pokemon";
@@ -156,7 +157,11 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
   const [viewH, setViewH] = React.useState(400);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const listRef = React.useRef<HTMLDivElement>(null);
+  const modalRef = React.useRef<HTMLDivElement>(null);
   const listId = React.useId();
+
+  // Focus trap: traps Tab key within modal and restores focus on close
+  useFocusTrap(modalRef, inputRef);
 
   // Fresh every time it opens; the Modal keeps focus for itself on mount, so
   // the field is focused a tick later.
@@ -339,8 +344,9 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
   const placeholder = t(`picker.search${kind[0].toUpperCase()}${kind.slice(1)}` as "picker.searchMove");
 
   return (
-    <Modal open={open} onClose={onClose} title={t(`picker.${kind}`)} size="lg" bodyClassName="p-0 overflow-hidden flex flex-col">
-      <div className="grid gap-[0.625rem] border-b border-solid border-line px-4 pb-3 pt-[0.875rem]">
+    <div ref={open ? modalRef : null}>
+      <Modal open={open} onClose={onClose} title={t(`picker.${kind}`)} size="lg" bodyClassName="p-0 overflow-hidden flex flex-col">
+        <div className="grid gap-[0.625rem] border-b border-solid border-line px-4 pb-3 pt-[0.875rem]">
         <div className="relative">
           <Icon name="search" size={15} className="pointer-events-none absolute left-[0.6875rem] top-1/2 -translate-y-1/2 text-txt-dim" />
           <Input
@@ -481,6 +487,7 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
         <span className="hidden min-[560px]:inline">{t("picker.hint")}</span>
       </div>
     </Modal>
+    </div>
   );
 }
 

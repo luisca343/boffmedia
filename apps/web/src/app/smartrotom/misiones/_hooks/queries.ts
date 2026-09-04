@@ -49,6 +49,9 @@ export function useQuestSystem() {
       : t("outsideGame")
     : null
 
+  // Show staleness warning when outside the game and data might be outdated
+  const isStale = !isMinecraft() && (query.data || query.isLoading)
+
   return {
     quests,
     npcs,
@@ -56,6 +59,7 @@ export function useQuestSystem() {
     regions,
     isLoading: query.isLoading,
     error,
+    isStale,
     refetch: query.refetch,
   }
 }

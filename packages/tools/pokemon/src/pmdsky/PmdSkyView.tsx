@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { encodePmdSkyUrl } from "./_lib/pmdSkyUrlSerializer"
 import {
   Button,
   Select,
@@ -20,7 +21,16 @@ import { getFloors } from "./DungeonData"
 import { useWmV3 } from "./useWmV3"
 import { WmSection, WmStars, WmPokePicker, WmTicket, WmCombo } from "./wm-kit"
 
-export function PmdSkyView() {
+export interface PmdSkyViewProps {
+  /**
+   * Optional: web host provides URL state sync.
+   * Omit this on desktop (launcher) where there is no URL.
+   */
+  onCopyShareLink?: (encoded: string) => void
+  onHydrateFromUrl?: (callback: (formState: any) => void) => void
+}
+
+export function PmdSkyView({ onCopyShareLink, onHydrateFromUrl }: PmdSkyViewProps = {}) {
   // The package catalog merges both source files under one namespace (field
   // labels plus `questTypes.*` / `rewardTypes.*` beside `dungeons.*`), so one
   // bound translator serves all of them. A root translator here would make
@@ -39,7 +49,28 @@ export function PmdSkyView() {
     generate, randomize, reset,
   } = ctx
 
+  // Hydrate from URL if provided by host
+  React.useEffect(() => {
+    if (onHydrateFromUrl) {
+      onHydrateFromUrl(({ questType, specialQuestType, dungeon, floor, clientPokemon, targetPokemon, rewardType, targetItem, rewardItem, europeanVersion }) => {
+        // Apply decoded state to store
+        if (questType !== undefined) setQuestType(questType)
+        if (specialQuestType) setSubQuest(String(specialQuestType))
+        if (dungeon !== undefined) setDungeon(dungeon)
+        if (floor !== undefined) setFloor(String(floor))
+        if (clientPokemon !== undefined) setClient(clientPokemon)
+        if (targetPokemon !== undefined) setTarget(targetPokemon)
+        if (rewardType !== undefined) setRewardType(String(rewardType))
+        if (targetItem !== undefined) setTargetItem(String(targetItem))
+        if (rewardItem !== undefined) setRewardItem(String(rewardItem))
+        if (europeanVersion !== undefined) setEuropean(europeanVersion)
+      })
+    }
+  }, [onHydrateFromUrl, setQuestType, setSubQuest, setDungeon, setFloor, setClient, setTarget, setRewardType, setTargetItem, setRewardItem, setEuropean])
+
   const [shared, setShared] = React.useState(false)
+  const [linkCopied, setLinkCopied] = React.useState(false)
+
   const share = () => {
     const text = summary.map((r) => `${r.k}: ${r.v}`).join(" · ") + (ctx.codeText ? `  —  ${ctx.codeText.replace(/\n/g, " ")}` : "")
     try {
@@ -50,6 +81,27 @@ export function PmdSkyView() {
     setShared(true)
     setTimeout(() => setShared(false), 1600)
   }
+
+  const copyShareLink = React.useCallback(() => {
+    if (!onCopyShareLink) return
+    const encoded = encodePmdSkyUrl({
+      questType: form.questType,
+      specialQuestType: form.specialQuestType || undefined,
+      dungeon: form.dungeon,
+      floor: form.floor,
+      clientPokemon: form.clientPokemon,
+      targetPokemon: form.targetPokemon,
+      rewardType: form.rewardType,
+      targetItem: form.targetItem,
+      rewardItem: form.rewardItem,
+      europeanVersion: form.europeanVersion,
+    })
+    if (encoded) {
+      onCopyShareLink(encoded)
+      setLinkCopied(true)
+      setTimeout(() => setLinkCopied(false), 1600)
+    }
+  }, [form, onCopyShareLink])
   // Through the host capability rather than an anchor click: the launcher
   // webview cannot start a download, and this way the desktop gets its native
   // save dialog for free.
@@ -298,10 +350,15 @@ export function PmdSkyView() {
                   {status === "ready" ? tApp("regenerate") : status === "loading" ? tApp("generating") : tApp("generate")}
                 </Button>
                 {status === "ready" && (
-                  <div className="grid grid-cols-2 gap-[0.625rem]">
+                  <div className={`grid gap-[0.625rem]`} style={{ gridTemplateColumns: onCopyShareLink ? 'repeat(3, 1fr)' : 'repeat(2, 1fr)' }}>
                     <Button size="sm" icon={shared ? "check" : "link"} onClick={share} className="justify-center">
                       {shared ? tApp("copied") : tApp("share")}
                     </Button>
+                    {onCopyShareLink && (
+                      <Button size="sm" icon={linkCopied ? "check" : "link"} onClick={copyShareLink} className="justify-center">
+                        {linkCopied ? tApp("copied") : "URL"}
+                      </Button>
+                    )}
                     <Button size="sm" icon="download" onClick={exportTxt} className="justify-center">
                       {tApp("export")}
                     </Button>

@@ -1,8 +1,10 @@
 "use client"
 import { useEffect, useState } from "react"
+import { OutdatedDataWarning } from "@/components/smartrotom/behavior/OutdatedDataWarning";
 import { useTranslations } from "next-intl"
-import { CompassIcon } from "lucide-react"
+import { CompassIcon, AlertCircle } from "lucide-react"
 import { getSpawns } from "@/services/mcef/mcefApi"
+import { useIsMinecraft } from "@/components/smartrotom/behavior/useIsMinecraft"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { PokedexStatus } from "../dexUtils"
 import { ScreenShell } from "../_components/ScreenShell"
@@ -24,6 +26,7 @@ function classifyRarity(percentage: number): string {
 
 export default function SpawnsPage() {
   const t = useTranslations("pokedex")
+  const inMinecraft = useIsMinecraft()
   const [spawns, setSpawns] = useState<PossibleSpawn[]>([])
   const [tick, setTick] = useState(30)
   const [hideCaught, setHideCaught] = useState(false)
@@ -39,6 +42,7 @@ export default function SpawnsPage() {
         setSpawns(res)
       } catch (e) {
         console.error("Error fetching spawns:", e)
+        setSpawns([])
       }
     }
     fetchSpawns()
@@ -76,11 +80,18 @@ export default function SpawnsPage() {
         meta={
           <>
             <MetaStat label={t("spawns_visible")} value={total} />
-            <span className="inline-flex items-center justify-end gap-1.5 font-pk-mono text-pk-secondary-400">
-              <span className="w-1.5 h-1.5 rounded-full bg-pk-secondary-400 shadow-[0_0_6px_#22d3ee] animate-pulse" />⟳ {tick}s
-            </span>
+            {inMinecraft && (
+              <span className="inline-flex items-center justify-end gap-1.5 font-pk-mono text-pk-secondary-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-pk-secondary-400 shadow-[0_0_6px_#22d3ee] animate-pulse" />⟳ {tick}s
+              </span>
+            )}
           </>
         }
+      />
+
+      <OutdatedDataWarning
+        message={t("spawns_outdated")}
+        description={t("spawns_outdatedDesc")}
       />
 
       <div className="flex items-center gap-3 flex-wrap bg-white/[0.02] border border-white/[0.05] rounded-xl p-2.5">

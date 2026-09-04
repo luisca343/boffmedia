@@ -146,7 +146,7 @@ export async function loadPackEntries(
           (packs) => ({ packs, error: null as string | null, code: null as string | null }),
           (err: { message?: string; code?: string }) => ({
             packs: [] as WirePack[],
-            error: err?.message ?? "No se pudo contactar con el servidor de packs.",
+            error: err?.message ?? "Could not reach the pack server.",
             code: err?.code ?? null,
           }),
         ),

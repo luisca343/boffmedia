@@ -15,6 +15,7 @@
 //   * the Microsoft refresh token — auth::store, never leaves the credential store.
 
 use serde::{Deserialize, Serialize};
+use std::error::Error;
 use tokio::sync::Mutex;
 
 use crate::auth::{store, AuthFailure};
@@ -409,6 +410,41 @@ struct RedeemResult {
 
 // ── Errors ─────────────────────────────────────────────────────────────────
 
+/// Detailed diagnostic error codes for network and server failures. Sent as the
+/// `code` field in the serialized error so the renderer can map each to a
+/// localized diagnostic message and help the player solve the problem.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ErrorCode {
+    /// DNS resolution failed — the hostname does not resolve.
+    DnsFailed,
+    /// TCP connection was refused — the server port is not listening.
+    ConnectionRefused,
+    /// TCP connection timed out — server is not responding to connection attempts.
+    ConnectionTimeout,
+    /// HTTP protocol error — response could not be decoded (malformed, invalid UTF-8).
+    HttpProtocolError,
+    /// Server returned 5xx error — server-side failure.
+    Server5xxError,
+    /// Authentication/credential problem (4xx auth errors).
+    AuthFailed,
+    /// OS credential store error — keychain locked, Secret Service broken, etc.
+    StoreError,
+}
+
+impl ErrorCode {
+    fn as_str(&self) -> &'static str {
+        match self {
+            ErrorCode::DnsFailed => "dns_failed",
+            ErrorCode::ConnectionRefused => "connection_refused",
+            ErrorCode::ConnectionTimeout => "connection_timeout",
+            ErrorCode::HttpProtocolError => "http_protocol_error",
+            ErrorCode::Server5xxError => "server_5xx_error",
+            ErrorCode::AuthFailed => "auth_failed",
+            ErrorCode::StoreError => "store_error",
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum ApiError {
     /// No Minecraft session, or the server rejected the one we proved.
@@ -420,13 +456,14 @@ pub enum ApiError {
     /// connect timeout. Distinct from `Message` so the renderer can say
     /// "cannot reach the server" instead of inventing a reason — from here we
     /// genuinely cannot tell whether the fault is ours or their network, and
-    /// the UI is honest about that.
-    Unreachable(String),
+    /// the UI is honest about that. Carries a diagnostic code for granular
+    /// error messages.
+    Unreachable { message: String, code: Option<ErrorCode> },
     /// The API answered, and answered 5xx. This one IS definitively server-side
     /// and the player can be told so plainly: nothing about their machine,
     /// their session or their install is wrong, and retrying later is the whole
     /// of the advice.
-    ServerDown(String),
+    ServerDown { message: String, code: ErrorCode },
     /// The OS credential store itself failed (locked keychain, broken Secret
     /// Service). Kept apart from `Message` because the renderer must not offer
     /// "play offline" for it — the stored token cannot be read either.
@@ -439,17 +476,44 @@ impl From<reqwest::Error> for ApiError {
         // or the API is down) and must never read as "you were kicked out".
         // A body that fails to DECODE is a different animal — the server did
         // answer — so it stays a plain message rather than claiming the host
-        // is unreachable.
+        // is unreachable. Translation happens in the renderer via i18n codes.
         if err.is_decode() {
-            return ApiError::Message(format!("Respuesta inesperada del servidor: {err}"));
+            return ApiError::Message(err.to_string());
         }
-        if err.is_timeout() {
-            return ApiError::Unreachable(
-                "El servidor no respondió a tiempo. Puede estar caído o tu conexión ser inestable."
-                    .into(),
-            );
+
+        // Map detailed network errors to diagnostic codes.
+        let code = if err.is_timeout() {
+            Some(ErrorCode::ConnectionTimeout)
+        } else if err.is_connect() {
+            // A connection failure could be DNS, refused, or timeout. Try to
+            // narrow it down by looking at the source. If we can't tell, we'll
+            // say "connection refused" as the most common case (the port exists
+            // but is not listening).
+            if let Some(source) = err.source() {
+                let msg = source.to_string();
+                if msg.to_lowercase().contains("nodename nor servname provided")
+                    || msg.to_lowercase().contains("name or service not known")
+                    || msg.to_lowercase().contains("no such host")
+                {
+                    Some(ErrorCode::DnsFailed)
+                } else if msg.to_lowercase().contains("connection refused") {
+                    Some(ErrorCode::ConnectionRefused)
+                } else if msg.to_lowercase().contains("timed out") {
+                    Some(ErrorCode::ConnectionTimeout)
+                } else {
+                    Some(ErrorCode::ConnectionRefused)
+                }
+            } else {
+                Some(ErrorCode::ConnectionRefused)
+            }
+        } else {
+            None
+        };
+
+        ApiError::Unreachable {
+            message: err.to_string(),
+            code,
         }
-        ApiError::Unreachable(format!("No se pudo contactar con el servidor: {err}"))
     }
 }
 
@@ -464,9 +528,11 @@ pub const CONTROL_TIMEOUT: std::time::Duration = std::time::Duration::from_secs(
 /// is what made "the API is down" look like "your library failed to load".
 pub(crate) async fn response_error(res: reqwest::Response, fallback: &str) -> ApiError {
     if res.status().is_server_error() {
-        let status = res.status().as_u16();
         let message = error_message(res, fallback).await;
-        return ApiError::ServerDown(format!("{message} (error {status} del servidor)"));
+        return ApiError::ServerDown {
+            message,
+            code: ErrorCode::Server5xxError,
+        };
     }
     ApiError::Message(error_message(res, fallback).await)
 }
@@ -480,12 +546,16 @@ impl From<ApiError> for AuthFailure {
             },
             ApiError::Denied(message)
             | ApiError::Message(message)
-            | ApiError::Unreachable(message)
-            | ApiError::ServerDown(message)
             | ApiError::Store(message) => AuthFailure {
                 message,
                 needs_signin: false,
             },
+            ApiError::Unreachable { message, .. } | ApiError::ServerDown { message, .. } => {
+                AuthFailure {
+                    message,
+                    needs_signin: false,
+                }
+            }
         }
     }
 }
@@ -503,10 +573,17 @@ impl serde::Serialize for ApiError {
             ApiError::NeedsSignin(m) => (m.as_str(), true, None),
             ApiError::Denied(m) => (m.as_str(), false, None),
             ApiError::Message(m) => (m.as_str(), false, None),
-            // The renderer switches on these two to pick between "we cannot
-            // reach the server" and "the server is down" — see `serverStatus`.
-            ApiError::Unreachable(m) => (m.as_str(), false, Some("server_unreachable")),
-            ApiError::ServerDown(m) => (m.as_str(), false, Some("server_down")),
+            // Unreachable now carries an optional diagnostic code. The renderer
+            // can use code-based fallbacks to "server_unreachable" for backwards compat.
+            ApiError::Unreachable { message: m, code } => {
+                let code_str = code.map(|c| c.as_str()).or(Some("server_unreachable"));
+                (m.as_str(), false, code_str)
+            }
+            // ServerDown always has a code now (Server5xxError), but we send
+            // "server_down" for backwards compat with older renderers.
+            ApiError::ServerDown { message: m, code: _ } => {
+                (m.as_str(), false, Some("server_down"))
+            }
             ApiError::Store(m) => (m.as_str(), false, Some("store_error")),
         };
         Wire {
@@ -562,7 +639,7 @@ pub async fn boff_device_start(
 
     if !res.status().is_success() {
         return Err(ApiError::Message(
-            error_message(res, "El servidor de packs no está disponible.").await,
+            error_message(res, "Could not reach the pack server.").await,
         ));
     }
 
@@ -579,7 +656,7 @@ pub async fn boff_device_poll(
     api: tauri::State<'_, ApiState>,
 ) -> Result<DevicePollView, ApiError> {
     let device_code = api.pending.lock().await.clone().ok_or_else(|| {
-        ApiError::Message("No hay ninguna autorización en curso.".into())
+        ApiError::Message("No authorization in progress.".into())
     })?;
 
     let res = api
@@ -591,7 +668,7 @@ pub async fn boff_device_poll(
 
     if !res.status().is_success() {
         return Err(ApiError::Message(
-            error_message(res, "No se pudo comprobar la autorización.").await,
+            error_message(res, "Could not check authorization status.").await,
         ));
     }
 
@@ -602,7 +679,7 @@ pub async fn boff_device_poll(
         let _op = api.session_op.lock().await;
 
         let token = body.data.token.clone().ok_or_else(|| {
-            ApiError::Message("El servidor aprobó la sesión sin devolverla.".into())
+            ApiError::Message("Server approved session but did not return token.".into())
         })?;
 
         // Which account this token belongs to — the poll usually says, but fall
@@ -785,8 +862,7 @@ pub async fn boff_accounts(app: tauri::AppHandle) -> Result<Vec<BoffAccountEntry
 async fn ensure_idle(manager: &crate::install::InstallManager) -> Result<(), ApiError> {
     if manager.is_busy().await {
         return Err(ApiError::Message(
-            "No puedes cambiar de cuenta mientras hay una instalación en curso o un juego \
-             abierto."
+            "Cannot switch accounts while an installation is in progress or a game is running."
                 .into(),
         ));
     }
@@ -809,7 +885,7 @@ async fn switch_inner(
         remove_boff(&mut roster, id);
         let _ = save_boff_roster(app, &roster);
         return Err(ApiError::NeedsSignin(
-            "Esa cuenta ya no tiene sesión guardada. Vuelve a añadirla.".into(),
+            "That account no longer has a saved session. Please re-authorize it.".into(),
         ));
     };
 
@@ -914,7 +990,7 @@ pub async fn boff_offline(
     let _op = api.session_op.lock().await;
     let roster = load_boff_roster(&app);
     let no_account = || {
-        ApiError::NeedsSignin("No hay ninguna cuenta de Boffmedia guardada en este equipo.".into())
+        ApiError::NeedsSignin("No Boffmedia account found on this machine.".into())
     };
     let active = roster.active.ok_or_else(no_account)?;
     let entry = roster
@@ -988,11 +1064,11 @@ async fn boff_me(api: &ApiState) -> Result<BoffAccount, ApiError> {
     .await?;
 
     if res.status() == reqwest::StatusCode::UNAUTHORIZED {
-        return Err(ApiError::NeedsSignin("Tu sesión ha caducado.".into()));
+        return Err(ApiError::NeedsSignin("Your session has expired.".into()));
     }
     if !res.status().is_success() {
         return Err(ApiError::Message(
-            error_message(res, "No se pudo leer tu cuenta.").await,
+            error_message(res, "Could not read your account information.").await,
         ));
     }
     let body: Envelope<BoffAccount> = res.json().await?;
@@ -1011,11 +1087,11 @@ async fn boff_me_with(api: &ApiState, token: &str) -> Result<BoffAccount, ApiErr
         .await?;
 
     if res.status() == reqwest::StatusCode::UNAUTHORIZED {
-        return Err(ApiError::NeedsSignin("Tu sesión ha caducado.".into()));
+        return Err(ApiError::NeedsSignin("Your session has expired.".into()));
     }
     if !res.status().is_success() {
         return Err(ApiError::Message(
-            error_message(res, "No se pudo leer tu cuenta.").await,
+            error_message(res, "Could not read your account information.").await,
         ));
     }
     let body: Envelope<BoffAccount> = res.json().await?;
@@ -1040,7 +1116,7 @@ async fn current_token(api: &ApiState) -> Result<String, ApiError> {
             Ok(token)
         }
         Ok(None) => Err(ApiError::NeedsSignin(
-            "Autoriza esta app con tu cuenta de Boffmedia para ver tus packs.".into(),
+            "Please authorize this app with your Boffmedia account to see your packs.".into(),
         )),
         Err(e) => Err(ApiError::Store(e.to_string())),
     }
@@ -1290,7 +1366,7 @@ pub async fn packs_list(
     .await
     {
         Ok(res) => res,
-        Err(err @ (ApiError::Message(_) | ApiError::Unreachable(_))) => {
+        Err(err @ (ApiError::Message(_) | ApiError::Unreachable { .. })) => {
             if let Some(id) = account_id {
                 if let Some(cached) = read_json_cache::<Vec<LauncherPack>>(packs_cache_path(&app, id)) {
                     return Ok(cached);
@@ -1302,13 +1378,13 @@ pub async fn packs_list(
     };
 
     if !res.status().is_success() {
-        let err = response_error(res, "No se pudo cargar la lista de packs.").await;
+        let err = response_error(res, "Could not load pack list.").await;
         // A 5xx is the registry being broken, not this player's entitlements
         // changing — the last-good list is still the truth about what they own,
         // so it is served exactly as it is for an unreachable host. A 4xx is
         // NOT: that is the server deciding about this account, and the cache
         // must not outlive it.
-        if matches!(err, ApiError::ServerDown(_)) {
+        if matches!(err, ApiError::ServerDown { .. }) {
             if let Some(id) = account_id {
                 if let Some(cached) = read_json_cache::<Vec<LauncherPack>>(packs_cache_path(&app, id)) {
                     return Ok(cached);
@@ -1351,7 +1427,7 @@ pub async fn pack_manifest(
         // installed with, so an already-installed pack stays LAUNCHABLE
         // offline. Only for transport failures — a revoked entitlement or a
         // dead session must never be papered over by a cache.
-        Err(err @ (ApiError::Message(_) | ApiError::Unreachable(_))) => {
+        Err(err @ (ApiError::Message(_) | ApiError::Unreachable { .. })) => {
             if let Some(cached) =
                 read_json_cache::<serde_json::Value>(manifest_cache_path(&app, &pack_id))
             {
@@ -1364,12 +1440,12 @@ pub async fn pack_manifest(
 
     let status = res.status();
     if !status.is_success() {
-        let message = error_message(res, "No se pudo obtener el manifiesto.").await;
+        let message = error_message(res, "Could not fetch the pack manifest.").await;
         return Err(if status == reqwest::StatusCode::FORBIDDEN {
             ApiError::Denied(message)
         } else if status == reqwest::StatusCode::CONFLICT {
             ApiError::Message(
-                "Este pack necesita una versión más reciente de la app. Por favor, actualiza la app desde el sitio oficial.".to_string()
+                "This pack requires a newer version of the app. Please update from the official website.".to_string()
             )
         } else {
             ApiError::Message(message)
@@ -1382,9 +1458,9 @@ pub async fn pack_manifest(
     // fails here is a server bug, and failing at the boundary is the only place
     // it is debuggable.
     let raw = serde_json::to_string(&body.data)
-        .map_err(|e| ApiError::Message(format!("Manifiesto ilegible: {e}")))?;
+        .map_err(|e| ApiError::Message(format!("Unreadable manifest: {e}")))?;
     crate::pack::parse_manifest(&raw)
-        .map_err(|e| ApiError::Message(format!("El manifiesto del pack no es válido: {e}")))?;
+        .map_err(|e| ApiError::Message(format!("Invalid pack manifest: {e}")))?;
 
     // Last-good manifest, for the offline fallback above.
     write_json_cache(manifest_cache_path(&app, &pack_id), &body.data);
@@ -1489,22 +1565,22 @@ pub async fn fetch_pack_file(
         // Entitlement revoked between listing and download. A hard failure,
         // but not one that signing in again fixes.
         reqwest::StatusCode::FORBIDDEN => ApiError::Denied(
-            error_message(res, "Ya no tienes acceso a este pack.").await,
+            error_message(res, "You no longer have access to this pack.").await,
         ),
         // Our CurseForge key is missing or was rejected: a server-side problem
         // the player can do nothing about except retry later.
         reqwest::StatusCode::SERVICE_UNAVAILABLE => ApiError::Message(
             error_message(
                 res,
-                "El servidor no puede descargar de CurseForge ahora mismo. Inténtalo más tarde.",
+                "The server cannot download from CurseForge right now. Try again later.",
             )
             .await,
         ),
         reqwest::StatusCode::BAD_GATEWAY => ApiError::Message(
-            error_message(res, "CurseForge no responde. Inténtalo más tarde.").await,
+            error_message(res, "CurseForge is not responding. Try again later.").await,
         ),
         other => ApiError::Message(
-            error_message(res, &format!("La descarga falló ({other})."))
+            error_message(res, &format!("Download failed ({other})."))
                 .await,
         ),
     })
@@ -1513,13 +1589,13 @@ pub async fn fetch_pack_file(
 fn missing_fallback(file: &PackFile) -> String {
     match file {
         PackFile::Curseforge { .. } => {
-            "El servidor no encuentra este archivo de CurseForge para esta versión del pack."
+            "The server cannot find this CurseForge file for this pack version."
                 .to_string()
         }
         // Distinguishable on purpose: this is overwhelmingly "nobody ran the
         // admin blob upload for this version yet", not a network fault.
         PackFile::Override { sha512 } => format!(
-            "El servidor no tiene el archivo de configuración {}… de este pack. Falta subirlo.",
+            "The server does not have the configuration file {}… for this pack. It needs to be uploaded.",
             &sha512[..8.min(sha512.len())]
         ),
     }
@@ -1541,7 +1617,7 @@ pub async fn invite_redeem(
 
     if !res.status().is_success() {
         return Err(ApiError::Message(
-            error_message(res, "No se pudo canjear el código.").await,
+            error_message(res, "Could not redeem the code.").await,
         ));
     }
     let body: Envelope<RedeemResult> = res.json().await?;

@@ -2,8 +2,9 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { openPC } from "@/services/mcef/mcefApi";
+import { InGameOnly } from "@/components/smartrotom/behavior/InGameOnly";
 
-export default function PC() {
+function PCContent() {
   const [salir, setSalir] = useState(false);
   const router = useRouter();
 
@@ -28,5 +29,13 @@ export default function PC() {
     <div className="pantalla pantallaPrincipal">
       {/* No need for Navigate component */}
     </div>
+  );
+}
+
+export default function PC() {
+  return (
+    <InGameOnly messageKey="minecraft.onlyInGame">
+      <PCContent />
+    </InGameOnly>
   );
 }

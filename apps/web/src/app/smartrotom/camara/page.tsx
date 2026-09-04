@@ -7,12 +7,13 @@ import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { toast } from "react-toastify"
 import { useAudio } from "@/hooks/useAudio"
 import { useCameraGalleryStore } from "@/stores/cameraGalleryStore"
+import { InGameOnly } from "@/components/smartrotom/behavior/InGameOnly"
 import { CameraControls } from "./_components/CameraControls"
 import { CameraBottomControls } from "./_components/CameraBottomControls"
 import { GalleryView } from "./_components/GalleryView"
 import { ScreenshotPreviewDialog } from "./_components/ScreenshotPreviewDialog"
 
-export default function CameraApp() {
+function CameraAppContent() {
   const t = useTranslations("camara")
   const [includeUI, setIncludeUI] = useState(false)
   const [isCapturing, setIsCapturing] = useState(false)
@@ -149,5 +150,13 @@ export default function CameraApp() {
         onCapture={handleCapture}
       />
     </div>
+  )
+}
+
+export default function CameraApp() {
+  return (
+    <InGameOnly messageKey="minecraft.onlyInGame">
+      <CameraAppContent />
+    </InGameOnly>
   )
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { getTranslations } from "next-intl/server"
-import { PmdSkyView } from "@boffmedia/tools-pokemon"
+import { Suspense } from "react"
+import { PmdSkyRouted } from "./_components/PmdSkyRouted"
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("pageMeta.herramientas")
@@ -8,5 +9,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function PmdPage() {
-  return <PmdSkyView />
+  return (
+    <Suspense>
+      <PmdSkyRouted />
+    </Suspense>
+  )
 }

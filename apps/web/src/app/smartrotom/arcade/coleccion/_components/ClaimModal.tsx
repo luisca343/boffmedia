@@ -162,7 +162,8 @@ export function ClaimModal({ open, onClose, items }: ClaimModalProps) {
               size="md"
               icon={<Icon.Sparkle s={14} />}
               onClick={() => void submit()}
-              disabled={picked.length === 0 || claim.isPending}
+              disabled={picked.length === 0 || claim.isPending || !inGame}
+              title={!inGame ? t("coleccion.claim.outsideMinecraft") : undefined}
             >
               {claim.isPending
                 ? t("coleccion.claim.claiming")

@@ -119,6 +119,11 @@
         "0": "Vincula tu cuenta de BoffMedia en la configuración",
         "1": "Cierra sesión y vuelve a iniciarla"
       }
+    },
+    "minecraft": {
+      "needsGame": "Esto requiere Minecraft",
+      "onlyInGame": "Esta función solo funciona dentro del juego. Abre SmartRotom en tu cliente de Minecraft.",
+      "openInGame": "Ejecuta Minecraft y abre el menú de mods para acceder a esta app."
     }
   }
 }

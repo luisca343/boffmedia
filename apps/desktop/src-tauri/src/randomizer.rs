@@ -65,11 +65,11 @@ fn randomizer_error_from_api(err: api::ApiError) -> RandomizerError {
         // Split out from the generic network failure so this screen can say
         // whether the fault is reaching the server at all or the server itself
         // answering 5xx — the two need different advice.
-        api::ApiError::Unreachable(m) => RandomizerError {
+        api::ApiError::Unreachable { message: m, .. } => RandomizerError {
             code: "server_unreachable".to_string(),
             message: m,
         },
-        api::ApiError::ServerDown(m) => RandomizerError {
+        api::ApiError::ServerDown { message: m, .. } => RandomizerError {
             code: "server_down".to_string(),
             message: m,
         },

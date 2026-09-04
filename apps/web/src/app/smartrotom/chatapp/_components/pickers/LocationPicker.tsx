@@ -1,7 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
+import { OutdatedDataWarning } from "@/components/smartrotom/behavior/OutdatedDataWarning";
 import { useTranslations } from "next-intl";
+import { AlertCircle } from "lucide-react";
 import { getMcUserData, getWaypoints, type Waypoint } from "@/services/mcef/mcefApi";
+import { useIsMinecraft } from "@/components/smartrotom/behavior/useIsMinecraft";
 import { Icon, Modal } from "../ui";
 
 type WP = { name: string; x: number; y: number; z: number; dimension?: string; color?: string };
@@ -16,6 +19,7 @@ export function WaypointPicker({
   onWaypointSelect: (wp: WP) => void;
 }) {
   const t = useTranslations("chatapp");
+  const inMinecraft = useIsMinecraft();
   const [waypoints, setWaypoints] = useState<Waypoint[]>([]);
   const [current, setCurrent] = useState<{ x: number; y: number; z: number } | null>(null);
   const [loading, setLoading] = useState(false);
@@ -50,6 +54,11 @@ export function WaypointPicker({
 
   return (
     <Modal title={t("locationPicker.title")} icon="mappin" onClose={close}>
+      <OutdatedDataWarning
+        className="mb-3"
+        message={t("locationPicker.outdated")}
+        description={t("locationPicker.outdatedDesc")}
+      />
       {loading ? (
         <div className="py-10 text-center text-[0.84375rem] text-ca-500">{t("locationPicker.loading")}</div>
       ) : (

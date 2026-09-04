@@ -13,8 +13,9 @@ import { MinaService } from "@/services/api/smartrotom/minaService";
 import { darCaja, darCajaLegacy, getMcUserData } from "@/services/mcef/mcefApi";
 import { ItemImage } from "@/lib/ItemImage";
 import { UnclaimedItem } from "@boffmedia/shared";
+import { InGameOnly } from "@/components/smartrotom/behavior/InGameOnly";
 
-export default function Reclamar() {
+function ReclamarContent() {
   const t = useTranslations("mina");
   const uuid = useRotomUuid();
   const { unclaimed, setUnclaimed, boxes, isLoading } = useGetUnclaimed(uuid!);
@@ -117,7 +118,7 @@ export default function Reclamar() {
               <div className="flex space-x-2">
                 {groupedRewards[type].map((reward, index) => (
                   <div key={index} className="relative group flex space-x-2">
-                      <ItemImage 
+                      <ItemImage
                         key={index}
                         type="mina"
                         itemId={reward.itemId}
@@ -141,5 +142,13 @@ export default function Reclamar() {
         </div>
       </div>
     </MenuWrapper>
+  );
+}
+
+export default function Reclamar() {
+  return (
+    <InGameOnly messageKey="minecraft.onlyInGame">
+      <ReclamarContent />
+    </InGameOnly>
   );
 }

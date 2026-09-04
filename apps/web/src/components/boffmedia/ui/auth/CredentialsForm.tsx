@@ -13,6 +13,7 @@ import { UsersService } from "@/services/api/boffmedia/usersService"
 import { AuthService } from "@/services/api/boffmedia/authService"
 import { PasswordRequirements } from "./PasswordRequirements"
 import { isPasswordValid } from "./passwordPolicy"
+import { useAuthThrottle } from "@/app/(boffmedia)/(auth)/_components/useAuthThrottle"
 
 interface CredentialsFormProps {
   isRegister: boolean
@@ -34,6 +35,7 @@ type Values = {
 export function CredentialsForm({ isRegister, redirect, onRegistered }: CredentialsFormProps) {
   const t = useTranslations("auth")
   const router = useRouter()
+  const throttle = useAuthThrottle()
 
   const schema = React.useMemo(() => {
     const base = z.object({
@@ -95,18 +97,31 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
       password: values.password,
     })
     if (res?.error) {
-      // NextAuth passes an authorize() throw through as the error string. If a
-      // future version collapses it to CredentialsSignin instead, this falls
-      // back to the credentials message — i.e. exactly today's behaviour.
-      const unreachable = res.error.includes(ApiErrorCode.SERVICE_DATABASE_UNAVAILABLE)
-      toast.error(t(unreachable ? "errors.serviceUnavailable" : "errors.signIn"))
+      // NextAuth passes an authorize() throw through as the error string.
+      if (res.error.includes("AUTH_THROTTLED")) {
+        throttle.handleThrottle({} as any, 30)
+        toast.error(throttle.message)
+      } else {
+        const unreachable = res.error.includes(ApiErrorCode.SERVICE_DATABASE_UNAVAILABLE)
+        toast.error(t(unreachable ? "errors.serviceUnavailable" : "errors.signIn"))
+      }
     } else router.replace(redirect)
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.9375rem]" noValidate>
+      {throttle.isThrottled && !isRegister && (
+        <div className="rounded bg-warning-soft px-3 py-2 text-[0.875rem] text-warning">
+          {throttle.message}
+        </div>
+      )}
       <Field label={t("fields.username")} error={errors.username?.message}>
-        <Input placeholder={t("fields.usernamePh")} autoComplete="username" {...register("username")} />
+        <Input
+          placeholder={t("fields.usernamePh")}
+          autoComplete="username"
+          disabled={throttle.isThrottled && !isRegister}
+          {...register("username")}
+        />
       </Field>
 
       {isRegister && (
@@ -120,6 +135,7 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
           autoComplete={isRegister ? "new-password" : "current-password"}
           showLabel={t("fields.show")}
           hideLabel={t("fields.hide")}
+          disabled={throttle.isThrottled && !isRegister}
           {...register("password")}
         />
       </Field>
@@ -149,8 +165,14 @@ export function CredentialsForm({ isRegister, redirect, onRegistered }: Credenti
         </div>
       )}
 
-      <Button type="submit" variant="pri" loading={isSubmitting} className="mt-0.5 w-full">
-        {isRegister ? t("submit.register") : t("submit.login")}
+      <Button
+        type="submit"
+        variant="pri"
+        loading={isSubmitting}
+        disabled={throttle.isThrottled && !isRegister}
+        className="mt-0.5 w-full"
+      >
+        {throttle.isThrottled && !isRegister ? throttle.buttonLabel : isRegister ? t("submit.register") : t("submit.login")}
       </Button>
     </form>
   )

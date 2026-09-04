@@ -531,9 +531,9 @@ fn api_message(err: crate::api::ApiError) -> String {
         crate::api::ApiError::NeedsSignin(m)
         | crate::api::ApiError::Denied(m)
         | crate::api::ApiError::Message(m)
-        | crate::api::ApiError::Unreachable(m)
-        | crate::api::ApiError::ServerDown(m)
         | crate::api::ApiError::Store(m) => m,
+        crate::api::ApiError::Unreachable { message: m, .. }
+        | crate::api::ApiError::ServerDown { message: m, .. } => m,
     }
 }
 

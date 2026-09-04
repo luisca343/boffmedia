@@ -169,7 +169,9 @@
       "title": "Share location",
       "loading": "Loading waypoints…",
       "currentLocation": "Current location",
-      "noWaypoints": "No saved waypoints."
+      "noWaypoints": "No saved waypoints.",
+      "outdated": "Not in-game",
+      "outdatedDesc": "Waypoints and position data update only in-game."
     },
     "conversation": {
       "summaryTitle": "SmartRotom summary",
@@ -193,6 +195,7 @@
       "imageSaveError": "Error saving image",
       "waypointAdded": "Waypoint \"{name}\" added",
       "waypointError": "Error adding waypoint",
+      "waypointNotAvailable": "Waypoints can only be added in-game",
       "openingNote": "Opening note…",
       "scanned": "SCANNED",
       "scanDetails": "Scan details · {count}",

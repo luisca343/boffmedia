@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
+import { OutdatedDataWarning } from "@/components/smartrotom/behavior/OutdatedDataWarning"
 import { BoardError, BoardLoading } from "./_components/BoardStatus"
 import { BoardFilters, RegionStrip, type SortKey } from "./_components/BoardFilters"
 import { PlayerHeader } from "./_components/PlayerHeader"
@@ -18,7 +19,7 @@ import { regionOf } from "./_utils/regions"
 /** El Tablón — the board itself. Thin: it filters, then hangs papers. */
 export default function TablonPage() {
   const t = useTranslations("misiones.board")
-  const { quests, npcs, regions, isLoading, error, open, openQuest, trackedQuest } = useBoard()
+  const { quests, npcs, regions, isLoading, error, open, openQuest, trackedQuest, isStale } = useBoard()
 
   const [search, setSearch] = useState("")
   const [status, setStatus] = useState<SealStatus | "ALL">("ALL")
@@ -51,6 +52,12 @@ export default function TablonPage() {
   return (
     <div className="flex min-h-full flex-col">
       <PlayerHeader quests={quests} regions={regions} />
+
+      {isStale && (
+        <div className="mx-6 mt-4 mb-4">
+          <OutdatedDataWarning messageKey="minecraft.outdated" descriptionKey="minecraft.outdatedDesc" />
+        </div>
+      )}
 
       {trackedQuest && (
         <div className="my-8">

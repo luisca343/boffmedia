@@ -169,7 +169,9 @@
       "title": "Compartir ubicación",
       "loading": "Cargando waypoints…",
       "currentLocation": "Ubicación actual",
-      "noWaypoints": "No hay waypoints guardados."
+      "noWaypoints": "No hay waypoints guardados.",
+      "outdated": "No en el juego",
+      "outdatedDesc": "Los puntos de ruta y datos de posición se actualizan solo en el juego."
     },
     "conversation": {
       "summaryTitle": "Resumen de SmartRotom",
@@ -193,6 +195,7 @@
       "imageSaveError": "Error al guardar la imagen",
       "waypointAdded": "Waypoint \"{name}\" añadido",
       "waypointError": "Error al añadir waypoint",
+      "waypointNotAvailable": "Los waypoints solo se pueden añadir en el juego",
       "openingNote": "Abriendo nota…",
       "scanned": "ESCANEADO",
       "scanDetails": "Detalles del escaneo · {count}",

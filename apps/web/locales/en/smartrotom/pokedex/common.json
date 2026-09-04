@@ -306,6 +306,8 @@
     "spawns_seen": "Seen",
     "spawns_title": "Spawns",
     "spawns_visible": "Visible",
+    "spawns_outdated": "Not in-game",
+    "spawns_outdatedDesc": "Spawn data updates only in-game. The data shown here may be outdated.",
     "spawnscard_active": "Active",
     "spawnscard_all": "All",
     "spawnscard_rares": "Rare",

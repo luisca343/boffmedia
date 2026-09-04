@@ -822,6 +822,25 @@ const es = {
     serverUnreachableShort: "Tus packs instalados y las herramientas siguen funcionando.",
     retryButton: "Reintentar",
     running: "En ejecución",
+    // Diagnostic error messages for each error code (D4)
+    dnsFailed: "No se pudo resolver el nombre del servidor. Comprueba tu conexión de internet.",
+    connectionRefused: "El servidor rechazó la conexión. Es posible que no esté disponible.",
+    connectionTimeout: "El servidor no respondió a tiempo. Puede estar caído o tu conexión ser inestable.",
+    httpProtocolError: "Respuesta inesperada del servidor. Intenta de nuevo más tarde.",
+    server5xxError: "El servidor tiene un error interno. Intenta de nuevo más tarde.",
+    authFailed: "Problema con la autenticación. Comprueba tu sesión e intenta de nuevo.",
+    storeError: "No se pudo acceder al almacén de credenciales del sistema. Comprueba que no esté bloqueado.",
+    // Diagnostic action titles (D4)
+    diagnosticDNS: "Error de DNS",
+    diagnosticRefused: "Conexión rechazada",
+    diagnosticTimeout: "Tiempo de espera agotado",
+    diagnosticProtocol: "Error de protocolo",
+    diagnosticServerError: "Error del servidor",
+    diagnosticAuth: "Problema de autenticación",
+    diagnosticStore: "Error del almacén de credenciales",
+    diagnosticButton: "Diagnosticar",
+    diagnosticLogs: "Ver registro",
+    diagnosticFolder: "Abrir carpeta",
   },
 
   crash: {
@@ -2196,6 +2215,25 @@ const en = {
     serverUnreachableShort: "Your installed packs and the tools keep working.",
     retryButton: "Retry",
     running: "Running",
+    // Diagnostic error messages for each error code (D4)
+    dnsFailed: "Could not resolve the server name. Check your internet connection.",
+    connectionRefused: "The server refused the connection. It may not be available.",
+    connectionTimeout: "The server did not respond in time. It may be down or your connection may be unstable.",
+    httpProtocolError: "Unexpected response from the server. Try again later.",
+    server5xxError: "The server has an internal error. Try again later.",
+    authFailed: "Authentication problem. Check your session and try again.",
+    storeError: "Could not access the system credential store. Check that it is not locked.",
+    // Diagnostic action titles (D4)
+    diagnosticDNS: "DNS Error",
+    diagnosticRefused: "Connection Refused",
+    diagnosticTimeout: "Timeout",
+    diagnosticProtocol: "Protocol Error",
+    diagnosticServerError: "Server Error",
+    diagnosticAuth: "Authentication Problem",
+    diagnosticStore: "Credential Store Error",
+    diagnosticButton: "Diagnose",
+    diagnosticLogs: "View Log",
+    diagnosticFolder: "Open Folder",
   },
 
   crash: {

@@ -2,6 +2,7 @@ import { Banner, Button } from "@boffmedia/ui"
 
 import { useT } from "../i18n"
 import { useApp } from "../state/app"
+import { mapErrorCodeToI18nKey, getDiagnosticTitle } from "../utils/errorCodeToMessage"
 import { AppRail } from "./nav/AppRail"
 
 // The backend is not answering. Announced ONCE, where the loss is actually
@@ -12,7 +13,7 @@ import { AppRail } from "./nav/AppRail"
 //   * Closable, and the dismissal sticks for the whole outage (see
 //     `backendNoticeDismissed`). Without a close button, or reappearing on the
 //     next navigation, it reads as the app shouting rather than informing.
-//   * One line. The long explanation moved to the rail indicator's tooltip.
+//   * Shows diagnostic detail from error codes (DNS vs refused vs timeout vs 5xx).
 //
 // Nothing is hidden by closing it: `BackendIndicator` in the rail stays for as
 // long as the outage does, as one icon instead of a paragraph.
@@ -23,28 +24,50 @@ import { AppRail } from "./nav/AppRail"
 //                 guess — so the copy names both.
 function ServerNotice() {
   const t = useT("shell")
-  const { backendStatus, backendNoticeDismissed, retryBackend, dismissBackendNotice, packsLoading, section } =
+  const { backendStatus, backendErrorCode, backendNoticeDismissed, retryBackend, dismissBackendNotice, packsLoading, section, go } =
     useApp()
 
   if (section !== "play") return null
   if (backendNoticeDismissed) return null
   if (backendStatus !== "down" && backendStatus !== "unreachable") return null
-  const isDown = backendStatus === "down"
+
+  // Get diagnostic title from error code (DNS, refused, timeout, 5xx, auth, store)
+  const diagnosticTitle = getDiagnosticTitle(backendErrorCode, t)
+  // Get diagnostic message from error code
+  const messageKey = mapErrorCodeToI18nKey(backendErrorCode)
+  const diagnosticMessage = t(messageKey)
 
   return (
     <Banner
       tone="warn"
       icon="alert"
-      title={isDown ? t("serverDownTitle") : t("serverUnreachableTitle")}
+      title={diagnosticTitle}
       className="m-4 mb-0"
       onClose={dismissBackendNotice}
       actions={
-        <Button size="sm" variant="ghost" icon="refresh" disabled={packsLoading} onClick={retryBackend}>
-          {t("retryButton")}
-        </Button>
+        <div className="flex gap-2">
+          <Button size="sm" variant="ghost" icon="refresh" disabled={packsLoading} onClick={retryBackend}>
+            {t("retryButton")}
+          </Button>
+          {/* Both of these carried no onClick when first written, which is the
+              exact defect D4 describes — an action the user can press that does
+              nothing. Logs navigates to the screen that already exists; the
+              "open data folder" action was REMOVED rather than left inert,
+              because the app exposes no command for its own data directory
+              (instance_reveal is pack-scoped). Add it back with the Rust
+              command, not before. */}
+          <Button
+            size="sm"
+            variant="ghost"
+            icon="list"
+            onClick={() => go("logs")}
+          >
+            {t("diagnosticLogs")}
+          </Button>
+        </div>
       }
     >
-      {isDown ? t("serverDownShort") : t("serverUnreachableShort")}
+      {diagnosticMessage}
     </Banner>
   )
 }

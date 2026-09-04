@@ -3,17 +3,19 @@
 import * as React from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { Button, Field, Input } from "@boffmedia/ui"
+import { Button, Field, Input, toast } from "@boffmedia/ui"
 import { AuthService } from "@/services/api/boffmedia/authService"
 import { AuthShell } from "./AuthShell"
 import { ResendVerificationButton } from "./ResendVerificationButton"
+import { useAuthThrottle } from "@/app/(boffmedia)/(auth)/_components/useAuthThrottle"
 
-type Status = "verifying" | "ok" | "err" | "missing"
+type Status = "verifying" | "ok" | "err" | "missing" | "throttled"
 
 export function VerifyEmailScreen() {
   const t = useTranslations("auth")
   const router = useRouter()
   const token = useSearchParams().get("token") ?? ""
+  const throttle = useAuthThrottle()
   const [status, setStatus] = React.useState<Status>(token ? "verifying" : "missing")
   const [email, setEmail] = React.useState("")
   const [sent, setSent] = React.useState(false)
@@ -25,7 +27,15 @@ export function VerifyEmailScreen() {
     if (!token || ran.current) return
     ran.current = true
     AuthService.verifyEmail(token)
-      .then((res) => setStatus(res.success ? "ok" : "err"))
+      .then((res) => {
+        if (res.statusCode === 429) {
+          throttle.handleThrottle(res)
+          setStatus("throttled")
+          toast.error(throttle.message)
+        } else {
+          setStatus(res.success ? "ok" : "err")
+        }
+      })
       .catch(() => setStatus("err"))
   }, [token])
 
@@ -36,13 +46,16 @@ export function VerifyEmailScreen() {
         ? { text: t("verify.success"), tone: "text-success" }
         : status === "missing"
           ? { text: t("verify.missingToken"), tone: "text-danger" }
-          : { text: t("verify.error"), tone: "text-danger" }
+          : status === "throttled"
+            ? { text: throttle.message, tone: "text-warning" }
+            : { text: t("verify.error"), tone: "text-danger" }
 
   // The link expires in 24h, so "invalid or expired" is the state most people
   // actually land in — offering a fresh one here is the difference between a
   // dead end and one more click. The address is asked for rather than read from
   // the session: a stale link is just as likely to be opened signed out.
-  const canResend = status === "err" || status === "missing"
+  // Throttled is also a chance to resend (user should wait the countdown).
+  const canResend = status === "err" || status === "missing" || status === "throttled"
 
   return (
     <AuthShell title={t("verify.title")}>

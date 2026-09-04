@@ -12,6 +12,7 @@ import { AuthService } from "@/services/api/boffmedia/authService"
 import { AuthShell } from "./AuthShell"
 import { PasswordRequirements } from "./PasswordRequirements"
 import { isPasswordValid } from "./passwordPolicy"
+import { useAuthThrottle } from "@/app/(boffmedia)/(auth)/_components/useAuthThrottle"
 
 type Values = { password: string; confirmPassword: string }
 
@@ -19,6 +20,7 @@ export function ResetScreen() {
   const t = useTranslations("auth")
   const router = useRouter()
   const token = useSearchParams().get("token") ?? ""
+  const throttle = useAuthThrottle()
   const [done, setDone] = React.useState(false)
 
   const schema = React.useMemo(
@@ -50,6 +52,11 @@ export function ResetScreen() {
   async function onSubmit(values: Values) {
     try {
       const res = await AuthService.resetPassword(token, values.password)
+      if (res.statusCode === 429) {
+        throttle.handleThrottle(res)
+        toast.error(throttle.message)
+        return
+      }
       if (res.success) {
         // Auto-sign-in with the just-set credentials; fall back to the manual
         // "go to login" state if that doesn't take.
@@ -100,11 +107,17 @@ export function ResetScreen() {
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-[0.9375rem]" noValidate>
+          {throttle.isThrottled && (
+            <div className="rounded bg-warning-soft px-3 py-2 text-[0.875rem] text-warning">
+              {throttle.message}
+            </div>
+          )}
           <Field label={t("reset.password")} error={errors.password?.message}>
             <PasswordField
               autoComplete="new-password"
               showLabel={t("fields.show")}
               hideLabel={t("fields.hide")}
+              disabled={throttle.isThrottled}
               {...register("password")}
             />
           </Field>
@@ -116,12 +129,19 @@ export function ResetScreen() {
               autoComplete="new-password"
               showLabel={t("fields.show")}
               hideLabel={t("fields.hide")}
+              disabled={throttle.isThrottled}
               {...register("confirmPassword")}
             />
           </Field>
 
-          <Button type="submit" variant="pri" loading={isSubmitting} className="mt-0.5 w-full">
-            {t("reset.submit")}
+          <Button
+            type="submit"
+            variant="pri"
+            loading={isSubmitting}
+            disabled={throttle.isThrottled}
+            className="mt-0.5 w-full"
+          >
+            {throttle.isThrottled ? throttle.buttonLabel : t("reset.submit")}
           </Button>
         </form>
       )}

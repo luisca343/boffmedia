@@ -326,7 +326,7 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
         if (!mon) return null;
         const opt = targeting?.options.find((o) => o.side === 'foe' && o.slot === i);
         return (
-            <div key={position} className={cn("pointer-events-auto min-w-0", plateWidth)}>
+            <div key={position} className={cn("pointer-events-auto min-w-0", plateWidth)} role="region" aria-label={`${t('battle.foe')} ${mon.name} ${mon.hpCur ?? mon.hp}/${mon.hpMax ?? mon.hp} HP`}>
                 <BxPlate mon={mon} foe compact={compact} slotTag={t('battle.foe')} aimed={aimedFoe && !mon.fnt && !targeting} hit={!!hits[position]}
                     ledger={ledger?.get(pokemon[position])}
                     targetable={!!opt} targetLabel={opt?.label} onClick={opt ? () => targeting?.onPick(opt.code) : undefined}
@@ -339,7 +339,7 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
         if (!mon) return null;
         const opt = targeting?.options.find((o) => o.side === 'ally' && o.slot === i);
         return (
-            <div key={position} className={cn("pointer-events-auto min-w-0", plateWidth)}>
+            <div key={position} className={cn("pointer-events-auto min-w-0", plateWidth)} role="region" aria-label={`${t('battle.you')} ${mon.name} ${mon.hpCur ?? mon.hp}/${mon.hpMax ?? mon.hp} HP`}>
                 <BxPlate mon={mon} compact={compact} slotTag={t('battle.you')} active={!targeting} hit={!!hits[position]}
                     ledger={ledger?.get(pokemon[position])}
                     targetable={!!opt} targetLabel={opt?.label} onClick={opt ? () => targeting?.onPick(opt.code) : undefined}
@@ -445,7 +445,14 @@ export const BattleCanvas = memo(forwardRef<BattleCanvasRefProps, BattleCanvasPr
                     )}
                 </BattleScaleProvider>
             </div>
-            <span className="sr-only" aria-live="polite">{battle.turn > 0 ? t('battle.turnAnnounce', { turn: battle.turn }) : ''}</span>
+            <span className="sr-only" aria-live="polite" aria-atomic="true">
+              {battle.turn > 0 ? t('battle.turn', { turn: battle.turn }) : ''}
+            </span>
+            <span className="sr-only" aria-live="assertive" aria-atomic="true">
+              {p1.active[0]?.name && p2.active[0]?.name ?
+                `${p1.active[0].name} vs ${p2.active[0].name}` :
+                ''}
+            </span>
             <BxMonPopover mon={details?.mon ?? null} foe={details?.foe} open={!!details} onClose={() => setDetails(null)} />
         </div>
     );

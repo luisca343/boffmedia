@@ -178,6 +178,10 @@ type State = {
   backendStatus: BackendStatus;
   /** The transport detail behind a non-ok {@link backendStatus}, for the log. */
   backendDetail: string | null;
+  /** Diagnostic error code for the current backend status (e.g., "dns_failed",
+   *  "connection_refused", "server_5xx_error"). Used by the UI to display
+   *  localized diagnostic messages. Null when status is unknown or ok. */
+  backendErrorCode: string | null;
   /** The player closed the outage banner. Sticky for the WHOLE outage, not just
    *  the render — a banner that reopens on the next navigation or the next
    *  30-second poll is not dismissible, it is nagging. Re-armed only when the
@@ -248,7 +252,7 @@ type Action =
   | { type: "logs/clear" }
   | { type: "settings"; settings: Settings }
   | { type: "system/select"; system: SystemId | "All" }
-  | { type: "backend/status"; status: BackendStatus; detail?: string | null }
+  | { type: "backend/status"; status: BackendStatus; detail?: string | null; code?: string | null }
   | { type: "backend/dismiss" }
   | UpdateQueueAction;
 
@@ -533,6 +537,7 @@ function reducer(s: State, a: Action): State {
         ...s,
         backendStatus: a.status,
         backendDetail: a.detail ?? null,
+        backendErrorCode: a.code ?? null,
         // Recovery re-arms the banner; a `checking` tick in the middle of an
         // outage must NOT, or every poll would resurrect what was dismissed.
         backendNoticeDismissed:
@@ -582,6 +587,7 @@ const initial: State = {
   selectedSystem: "All",
   backendStatus: "unknown",
   backendDetail: null,
+  backendErrorCode: null,
   backendNoticeDismissed: false,
   updateQueue: initialUpdateQueueState,
 };
@@ -1385,6 +1391,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             type: "backend/status",
             status: serverFault,
             detail: registryError,
+            code: registryErrorCode,
           });
         } else if (!registryError && boffAccountId) {
           // Only when a request actually went out. A signed-out load asks the
@@ -1406,6 +1413,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             type: "backend/status",
             status: serverFault,
             detail: err?.message ?? null,
+            code: err?.code,
           });
         }
         dispatch({

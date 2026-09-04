@@ -9,6 +9,7 @@
 // Tool entry points. Hosts with their own routing (web) import these directly;
 // registry-driven hosts (the launcher Tools hub) go through `pokemonTools`.
 export { PmdSkyView } from "./pmdsky/PmdSkyView";
+export type { PmdSkyViewProps } from "./pmdsky/PmdSkyView";
 export { TcgpApp } from "./tcgpocket/TcgpApp";
 export type { TcgpAppProps, TcgpView } from "./tcgpocket/TcgpApp";
 export { DamageCalculatorView } from "./vgc/damage-calculator/_components/DamageCalculatorView";
@@ -21,6 +22,11 @@ export { TrackerApp } from "./vgc/tracker/TrackerApp";
 // router, which is what the desktop app does. See `vgc/routing`.
 export { VgcNavProvider, VgcRoot, VgcLink, useVgcNav, matchParams, VGC_BASE } from "./vgc/routing";
 export type { VgcNav, VgcParams } from "./vgc/routing";
+
+// PMD Sky URL state encoder/decoder. Used by web routing layer (PmdSkyRouted)
+// to preserve form state in URL for sharing and back-button support.
+export { encodePmdSkyUrl, decodePmdSkyUrl } from "./pmdsky/_lib/pmdSkyUrlSerializer";
+export type { UrlState as PmdSkyUrlState } from "./pmdsky/_lib/pmdSkyUrlSerializer";
 
 // Registry manifests (D6).
 export {

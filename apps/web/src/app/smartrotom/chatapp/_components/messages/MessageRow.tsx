@@ -4,6 +4,7 @@ import { toast } from "react-toastify";
 import { useTranslations } from "next-intl";
 import { cn } from "@/lib/utils";
 import { addWaypoint } from "@/services/mcef/mcefApi";
+import { useIsMinecraft } from "@/components/smartrotom/behavior/useIsMinecraft";
 import { useGuardedSubmit } from "@/components/smartrotom/behavior/useGuardedSubmit";
 import { Icon, MiniButton, Popover } from "../ui";
 import { ImageBubble } from "./ImageBubble";
@@ -106,6 +107,7 @@ function CardShell({ out, children }: { out: boolean; children: ReactNode }) {
 
 function WaypointInner({ content, out, time }: { content: string; out: boolean; time: string }) {
   const t = useTranslations("chatapp");
+  const inMinecraft = useIsMinecraft();
   const w = parseWaypoint(content);
   const color = w?.color || "#f97316";
   // The hook must run before the `!w` bail-out, so the body re-checks instead.
@@ -133,7 +135,7 @@ function WaypointInner({ content, out, time }: { content: string; out: boolean; 
       </div>
       <div className="flex gap-2 px-3 pb-3">
         <MiniButton onClick={copy}><Icon name="copy" size={14} /> {t("message.copy")}</MiniButton>
-        <MiniButton accent onClick={() => void add()} disabled={adding} className="disabled:opacity-60"><Icon name="plus" size={14} /> {t("message.addWaypoint")}</MiniButton>
+        <MiniButton accent onClick={() => void add()} disabled={adding || !inMinecraft} className="disabled:opacity-60" title={!inMinecraft ? t("chatapp.waypointNotAvailable") : undefined}><Icon name="plus" size={14} /> {t("message.addWaypoint")}</MiniButton>
       </div>
       <div className="px-[0.8125rem] pb-2 text-[0.65625rem] text-ca-500" style={{ textAlign: out ? "right" : "left" }}>{time}</div>
     </CardShell>

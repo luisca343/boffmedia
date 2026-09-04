@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { useBoffSession } from "@/services/useBoffSession"
 import { useApiError } from "@/hooks/useApiError"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
+import { OutdatedDataWarning } from "@/components/smartrotom/behavior/OutdatedDataWarning"
 import { MapCanvas } from "./_components/map/MapCanvas"
 import { DestinationsPanel } from "./_components/DestinationsPanel"
 import { PassportPanel } from "./_components/PassportPanel"
@@ -62,6 +63,7 @@ export default function TaxiPage() {
   const [recenterSignal, setRecenterSignal] = useState(0)
 
   const player = positionQuery.data ?? { x: 0, z: 0 }
+  const positionIsStale = positionQuery.isStale ?? false
   const balance = balanceQuery.data
   const transactions = useMemo(() => ledgerQuery.data?.transactions ?? [], [ledgerQuery.data])
 
@@ -191,6 +193,12 @@ export default function TaxiPage() {
           if (!wide) setSheetFull(true)
         }}
       />
+
+      {positionIsStale && (
+        <div className="px-4 py-2">
+          <OutdatedDataWarning messageKey="minecraft.outdated" descriptionKey="minecraft.outdatedDesc" />
+        </div>
+      )}
 
       <div className={`relative flex min-h-0 flex-1 overflow-hidden ${wide ? "flex-row" : "flex-col"}`}>
         <div className="relative min-h-0 min-w-0 flex-1">

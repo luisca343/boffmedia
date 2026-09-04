@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import type { Region, StarBankAccount, StarBankTransaction, TaxiStop } from "@boffmedia/shared"
 import { rotomAuthedPOSTOrThrow, rotomGETOrThrow, wingullGETOrThrow } from "@/services/boffAPI"
 import { getMcUserData } from "@/services/mcef/mcefApi"
+import { isMinecraft } from "@/services/mcef/mcefHelper"
 import { POSITION_REFRESH_INTERVAL } from "../_utils/constants"
 import type { Position, TaxiConfig, TripResult } from "../_types"
 
@@ -114,7 +115,7 @@ export function useRegions() {
  */
 export function usePlayerPosition() {
   const t = useTranslations("taxi.errors")
-  return useQuery<Position>({
+  const query = useQuery<Position>({
     queryKey: taxiKeys.position,
     queryFn: async () => {
       const res = await getMcUserData()
@@ -125,6 +126,14 @@ export function usePlayerPosition() {
     placeholderData: { x: 0, z: 0 },
     retry: false,
   })
+
+  // Show staleness warning when outside the game and using placeholder data
+  const isStale = !isMinecraft() && (query.data || query.isLoading)
+
+  return {
+    ...query,
+    isStale,
+  }
 }
 
 export function useBalance(uuid?: string) {
