@@ -25,7 +25,7 @@ setup("authenticate", async ({ page }) => {
     await dialog.accept()
   })
 
-  await page.goto("/auth")
+  await page.goto("/entrar")
   // Located by form-field name, not placeholder text: AuthForm's placeholders and
   // its submit label are translated (t('fields.usernamePh'), t('submit.login')),
   // so any English locator here breaks the moment the default locale is not en.
@@ -40,7 +40,7 @@ setup("authenticate", async ({ page }) => {
     throw new Error(`Auth setup: login rejected — "${loginError}". Check TEST_USERNAME / TEST_PASSWORD in .env.development.local`)
   }
 
-  await page.waitForURL((url) => !url.pathname.startsWith("/auth"), { timeout: 20_000, waitUntil: "commit" })
+  await page.waitForURL((url) => !url.pathname.startsWith("/entrar"), { timeout: 20_000, waitUntil: "commit" })
 
   // Leaving /auth is NOT proof of a session. next-auth answers the credentials
   // callback 200 and redirects even when the browser then refuses to store the

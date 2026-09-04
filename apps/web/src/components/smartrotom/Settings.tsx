@@ -3,7 +3,7 @@ import { isMinecraft } from "@/services/mcef/mcefHelper";
 import { env } from "@/config/env.public";
 import { useBoffSession } from "@/services/useBoffSession";
 import { signIn, signOut } from "next-auth/react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { SmartRotomButton } from "@/components/smartrotom/ui";
 import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone, Sun } from "lucide-react";
@@ -37,13 +37,45 @@ export function SettingsPage() {
   const mode = useRotomMode();
   const t = useTranslations("smartrotom");
 
+  // Development only. A bearer token on the system clipboard is readable by the
+  // next page that asks for a paste, and this panel is reachable in-game through
+  // MCEF and in a normal browser — including on a stream, since MewTwitch users
+  // broadcast this app.
+  const canCopyToken = process.env.NODE_ENV !== "production";
+
   const copyToken = () => {
-    if (session?.user?.accessToken) {
+    if (canCopyToken && session?.user?.accessToken) {
       navigator.clipboard.writeText(session.user.accessToken);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
   };
+
+  /**
+   * The session with its credentials masked.
+   *
+   * The panel used to render `JSON.stringify(session)` verbatim, which put a live
+   * bearer token in plain text on a screen a player can be sharing. The shape stays
+   * identical so the panel remains useful for "am I signed in, as whom, with which
+   * roles" — only the values that grant access are replaced.
+   */
+  const redactedSession = useMemo(() => {
+    if (!session) return session;
+    const SECRET_KEYS = /^(accessToken|refreshToken|token|idToken|challengeToken)$/;
+    const mask = (value: unknown): unknown => {
+      if (Array.isArray(value)) return value.map(mask);
+      if (value && typeof value === "object") {
+        return Object.fromEntries(
+          Object.entries(value as Record<string, unknown>).map(([k, v]) => [
+            k,
+            SECRET_KEYS.test(k) && typeof v === "string" ? `[redacted, ${v.length} chars]` : mask(v),
+          ]),
+        );
+      }
+      return value;
+    };
+    return mask(session);
+  }, [session]);
 
   return (
     <div className="space-y-5">
@@ -133,7 +165,7 @@ export function SettingsPage() {
                 </div>
                 <span className="text-[0.625rem] text-sr-txt-muted font-mono">session.json</span>
               </div>
-              {session?.user?.accessToken && (
+              {canCopyToken && session?.user?.accessToken && (
                 <SmartRotomButton
                   onClick={copyToken}
                   variant={copied ? "default" : "neutral"}
@@ -157,7 +189,7 @@ export function SettingsPage() {
             {/* JSON content */}
             <div className="p-3 max-h-40 overflow-auto scrollbar-thin">
               <pre className="text-[0.6875rem] leading-relaxed text-sr-txt font-mono whitespace-pre-wrap break-all">
-                {JSON.stringify(session, null, 2)}
+                {JSON.stringify(redactedSession, null, 2)}
               </pre>
             </div>
           </div>

@@ -42,7 +42,7 @@ setup("authenticate as admin", async ({ page }) => {
     await dialog.accept()
   })
 
-  await page.goto("/auth")
+  await page.goto("/entrar")
   // Located by form-field name, not placeholder text: AuthForm's placeholders and
   // its submit label are translated (t('fields.usernamePh'), t('submit.login')),
   // so any English locator here breaks the moment the default locale is not en.
@@ -55,7 +55,7 @@ setup("authenticate as admin", async ({ page }) => {
     throw new Error(`Admin auth setup: login rejected — "${loginError}". Check TEST_ADMIN_USERNAME / TEST_ADMIN_PASSWORD.`)
   }
 
-  await page.waitForURL((url) => !url.pathname.startsWith("/auth"), { timeout: 20_000, waitUntil: "commit" })
+  await page.waitForURL((url) => !url.pathname.startsWith("/entrar"), { timeout: 20_000, waitUntil: "commit" })
   }
 
   // The role check below runs against whichever path was taken, so a cookie
@@ -64,8 +64,28 @@ setup("authenticate as admin", async ({ page }) => {
 
   const session = await page.evaluate(async () => {
     const res = await fetch("/api/auth/session")
-    return (await res.json()) as { user?: { roles?: string[]; username?: string } } | null
+    return (await res.json()) as {
+      user?: { roles?: string[]; username?: string; twoFactorPending?: boolean }
+    } | null
   })
+
+  // Admin accounts now answer sign-in with a TOTP challenge instead of a session
+  // (W17), and a PENDING session deliberately carries no accessToken and roles: [].
+  // Checked before the role assertion below, which would otherwise report "holds
+  // neither ROTOM_ADMIN nor BOFF_ADMIN (roles: [])" and send the operator off to
+  // grant a role the account already has.
+  if (session?.user?.twoFactorPending) {
+    throw new Error(
+      `The account "${username}" signed in but is waiting on its second factor, so this ` +
+        "setup cannot mint an admin storage state.\n" +
+        "Admin 2FA is mandatory and there is no way to opt out — the harness needs the " +
+        "account's TOTP secret to compute a code, which it has no way to obtain today.\n" +
+
+        "Until that is wired, chromium:admin cannot run unattended. Do NOT disable the " +
+        "requirement to make this pass: it exists so one phished password cannot publish " +
+        "a desktop release.",
+    )
+  }
 
   // The app's own gate is `isRotomAdmin() || isBoffAdmin()` (useOfficer), so accept
   // either — but nothing weaker.
