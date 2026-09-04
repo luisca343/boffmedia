@@ -6,6 +6,7 @@ import {
   IsString,
   IsUUID,
   Matches,
+  Max,
   MaxLength,
   Min,
 } from 'class-validator';
@@ -30,11 +31,12 @@ export class FeedQueryDto {
   @IsIn(['parati', 'siguiendo'])
   tab?: 'parati' | 'siguiendo' = 'parati';
 
-  @ApiPropertyOptional({ default: 20 })
+  @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number = 20;
 
   @ApiPropertyOptional({ default: 0 })
@@ -186,11 +188,12 @@ export class ProfilePostsQueryDto {
   @IsUUID()
   uuid?: string;
 
-  @ApiPropertyOptional({ default: 20 })
+  @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number = 20;
 
   @ApiPropertyOptional({ default: 0 })
@@ -202,11 +205,12 @@ export class ProfilePostsQueryDto {
 }
 
 export class TrendsQueryDto {
-  @ApiPropertyOptional({ default: 10 })
+  @ApiPropertyOptional({ default: 10, minimum: 1, maximum: 100 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number = 10;
 }
 
@@ -218,11 +222,12 @@ export class SuggestionsQueryDto {
   @IsUUID()
   uuid?: string;
 
-  @ApiPropertyOptional({ default: 5 })
+  @ApiPropertyOptional({ default: 5, minimum: 1, maximum: 100 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number = 5;
 }
 
@@ -243,11 +248,12 @@ export class InboxQueryDto {
   @IsUUID()
   uuid: string;
 
-  @ApiPropertyOptional({ default: 20 })
+  @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number = 20;
 
   @ApiPropertyOptional({ default: 0 })
@@ -263,11 +269,12 @@ export class BookmarksQueryDto {
   @IsUUID()
   uuid: string;
 
-  @ApiPropertyOptional({ default: 20 })
+  @ApiPropertyOptional({ default: 20, minimum: 1, maximum: 100 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number = 20;
 
   @ApiPropertyOptional({ default: 0 })

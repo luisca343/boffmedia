@@ -1,17 +1,20 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, Min } from 'class-validator';
+import { IsInt, IsOptional, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class BattlesimListQueryDto {
   @ApiProperty({
     description: 'Maximum number of items to return',
     example: 20,
+    minimum: 1,
+    maximum: 100,
     required: false,
   })
   @IsOptional()
   @Type(() => Number)
-  @IsNumber()
+  @IsInt()
   @Min(1)
+  @Max(100)
   limit?: number = 20;
 
   @ApiProperty({

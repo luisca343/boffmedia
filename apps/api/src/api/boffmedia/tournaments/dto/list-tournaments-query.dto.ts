@@ -30,18 +30,18 @@ export class ListTournamentsQueryDto {
   @IsString()
   q?: string;
 
-  @ApiPropertyOptional({ minimum: 1, maximum: 100 })
+  @ApiPropertyOptional({ minimum: 1, maximum: 100, default: 20 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(1)
   @Max(100)
-  limit?: number;
+  limit?: number = 20;
 
-  @ApiPropertyOptional({ minimum: 0 })
+  @ApiPropertyOptional({ minimum: 0, default: 0 })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(0)
-  offset?: number;
+  offset?: number = 0;
 }

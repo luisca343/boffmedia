@@ -33,6 +33,7 @@ export class ListEventsQueryDto {
   @ApiPropertyOptional({
     minimum: 1,
     maximum: 100,
+    default: 20,
     description: 'Max events to return (pagination)',
   })
   @IsOptional()
@@ -40,15 +41,16 @@ export class ListEventsQueryDto {
   @IsInt()
   @Min(1)
   @Max(100)
-  limit?: number;
+  limit?: number = 20;
 
   @ApiPropertyOptional({
     minimum: 0,
+    default: 0,
     description: 'Number of events to skip (pagination)',
   })
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   @Min(0)
-  offset?: number;
+  offset?: number = 0;
 }

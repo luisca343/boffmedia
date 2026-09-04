@@ -1,6 +1,7 @@
 import { BaseDto } from '@api/_utils/dto/base.dto';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsOptional, MaxLength } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsInt, Min, Max, MaxLength } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class NotificationResponseDto {
   @ApiProperty({ description: 'Notification ID', example: 1 })
@@ -66,18 +67,28 @@ export class GetInboxQueryDto {
   @ApiProperty({
     description: 'Max results to return',
     example: 20,
+    minimum: 1,
+    maximum: 100,
     required: false,
   })
   @IsOptional()
-  limit?: number;
+  @Type(() => Number)
+  @IsInt()
+  @Min(1)
+  @Max(100)
+  limit?: number = 20;
 
   @ApiProperty({
     description: 'Pagination offset',
     example: 0,
+    minimum: 0,
     required: false,
   })
   @IsOptional()
-  offset?: number;
+  @Type(() => Number)
+  @IsInt()
+  @Min(0)
+  offset?: number = 0;
 }
 
 export class MarkReadBodyDto extends BaseDto {
