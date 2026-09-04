@@ -28,7 +28,8 @@
       "releases": "Releases",
       "randomizer": "Randomizer",
       "account": "Account",
-      "security": "Security"
+      "security": "Security",
+      "moderation": "Moderation"
     },
     "crud": {
       "count": "{count} {plural}",
@@ -1134,6 +1135,86 @@
       "stepUpLead": "Publishing changes what runs on other people's machines. Enter the code from your authenticator app to confirm it is you at the keyboard right now.",
       "confirm": "Confirm",
       "cancel": "Cancel"
+    },
+    "moderation": {
+      "title": "Moderation",
+      "desc": "Content the community reported. It publishes instantly; this is where it gets reviewed after.",
+      "loadFailed": "Could not load the report queue.",
+      "actionFailed": "Could not apply the action.",
+      "reasonRequired": "Write a reason before continuing.",
+      "queueTitle": "Report queue",
+      "kpiItems": "Items",
+      "kpiReports": "Reports",
+      "kpiRepeat": "Repeat offenders",
+      "filterStatus": "Status",
+      "filterSort": "Sort",
+      "filterType": "Type",
+      "status": {
+        "open": "Open",
+        "actioned": "Actioned",
+        "dismissed": "Dismissed"
+      },
+      "sort": {
+        "reports": "Most reported",
+        "oldest": "Oldest",
+        "newest": "Newest"
+      },
+      "type": {
+        "all": "Everything",
+        "forum_thread": "Forum thread",
+        "forum_post": "Forum post",
+        "rooker_post": "Trino",
+        "user_profile": "Profile"
+      },
+      "reason": {
+        "spam": "Spam",
+        "harassment": "Harassment",
+        "hate": "Hate",
+        "sexual": "Sexual content",
+        "illegal": "Illegal content",
+        "off_topic": "Off topic",
+        "other": "Other"
+      },
+      "emptyTitle": "Nothing pending",
+      "emptyLead": "No reported content is waiting for review.",
+      "reportsCount": "{count} reports",
+      "hiddenFlag": "Hidden",
+      "goneFlag": "Gone",
+      "bannedFlag": "Sanctioned",
+      "ageDays": "{count} d",
+      "noExcerpt": "(no text)",
+      "unknownAuthor": "Unknown author",
+      "authorTotal": "{count} reports in total",
+      "authorActioned": "{count} actioned",
+      "authorSanctions": "{count} sanctions",
+      "reasons": "Reasons",
+      "dismiss": "Dismiss",
+      "hide": "Hide",
+      "unhide": "Restore",
+      "sanction": "Sanction",
+      "prev": "Previous",
+      "next": "Next",
+      "pageOf": "{from}–{to} of {total}",
+      "cancel": "Cancel",
+      "working": "Applying…",
+      "confirmAction": "Confirm",
+      "confirm": {
+        "dismiss": "Dismiss the reports",
+        "hide": "Hide the content",
+        "unhide": "Restore the content",
+        "sanction": "Sanction the author"
+      },
+      "done": {
+        "dismiss": "Reports dismissed",
+        "hide": "Content hidden",
+        "unhide": "Content restored",
+        "sanction": "Sanction applied"
+      },
+      "reasonLabel": "Reason",
+      "reasonHint": "It goes into the audit trail. Write it for whoever reads it in six months.",
+      "banDays": "Days",
+      "banDaysHint": "How long the posting restriction lasts.",
+      "banPermanent": "No end date"
     }
   },
   "tournaments": {

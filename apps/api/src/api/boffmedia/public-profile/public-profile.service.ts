@@ -26,7 +26,9 @@ export class PublicProfileService {
       name: user.name,
       avatarUrl: user.avatarUrl ?? null,
       coverUrl: user.coverUrl ?? null,
-      bio: user.bio ?? null,
+      // A hidden bio reads as no bio. The account, the avatar and the trophies
+      // are untouched: moderation took down one piece of text, not a person.
+      bio: user.bioHidden ? null : (user.bio ?? null),
       roles,
       memberSince: user.memberSince ? user.memberSince.toISOString() : null,
     };

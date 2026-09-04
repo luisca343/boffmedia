@@ -41,6 +41,9 @@
     "TOURNAMENT_PROPOSAL_INVALIDATED": "The proposal is no longer valid due to a match amendment.",
     "TOURNAMENT_PROPOSAL_SETTLED_CONCURRENTLY": "The proposal was settled while you were disputing it.",
     "EVENT_DELETE_BLOCKED_BY_TOURNAMENT": "Cannot delete this event — it has an attached tournament. Delete or detach the tournament first.",
-    "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": "That tournament belongs to an event that is already completed, so it cannot be reopened."
+    "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": "That tournament belongs to an event that is already completed, so it cannot be reopened.",
+    "DATA_EXPORT_TOO_SOON": "You asked for your data recently. Please wait a little before asking again.",
+    "DATA_EXPORT_NOT_READY": "We are still preparing your data. We will let you know when you can download it.",
+    "DATA_EXPORT_EXPIRED": "This copy of your data has expired and been deleted. You can request a new one."
   }
 }

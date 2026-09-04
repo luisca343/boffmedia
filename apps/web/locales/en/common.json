@@ -743,6 +743,30 @@
       "zoom": "Zoom",
       "cancel": "Cancel",
       "apply": "Apply"
+    },
+    "moderation": {
+      "report": "Report",
+      "dialogTitle": "Report content",
+      "dialogLead": "Tell us what is wrong. The team will review it; whoever posted it is never told who reported it.",
+      "reasonLabel": "Reason",
+      "detailLabel": "Details (optional)",
+      "detailHint": "500 characters max.",
+      "cancel": "Cancel",
+      "send": "Send",
+      "sending": "Sending…",
+      "failed": "Could not send the report.",
+      "receivedTitle": "Report received",
+      "updatedTitle": "Report updated",
+      "receivedBody": "Thanks. We will review it and let you know once we have.",
+      "reason": {
+        "spam": "Spam or advertising",
+        "harassment": "Harassment or abuse",
+        "hate": "Hate or discrimination",
+        "sexual": "Sexual content",
+        "illegal": "Illegal content",
+        "off_topic": "Off topic",
+        "other": "Something else"
+      }
     }
   }
 }

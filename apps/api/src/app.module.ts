@@ -54,6 +54,7 @@ import { ForumModule } from '@api/boffmedia/forum/forum.module';
 import { TournamentsModule } from '@api/boffmedia/tournaments/tournaments.module';
 import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
 import { SuggestionsModule } from '@api/boffmedia/suggestions/suggestions.module';
+import { ModerationModule } from '@api/boffmedia/moderation/moderation.module';
 import { CommunityModule } from '@api/boffmedia/community/community.module';
 import { PublicProfileModule } from '@api/boffmedia/public-profile/public-profile.module';
 import { UploadModule } from './api/boffmedia/util/upload/upload.module';
@@ -151,6 +152,7 @@ import { publicPath } from '@/config/paths';
     TournamentsModule,
     NotificationsModule,
     SuggestionsModule,
+    ModerationModule,
     CommunityModule,
     PublicProfileModule,
     UploadModule,

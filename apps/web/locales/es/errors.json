@@ -41,6 +41,9 @@
     "TOURNAMENT_PROPOSAL_INVALIDATED": "La propuesta quedó invalidada por un cambio en la partida.",
     "TOURNAMENT_PROPOSAL_SETTLED_CONCURRENTLY": "La propuesta ya se resolvió mientras enviabas la disputa.",
     "EVENT_DELETE_BLOCKED_BY_TOURNAMENT": "No se puede eliminar este evento: tiene un torneo anexo. Elimina o desvincula el torneo primero.",
-    "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": "No se puede cambiar un torneo cuyo evento padre ya ha finalizado."
+    "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": "No se puede cambiar un torneo cuyo evento padre ya ha finalizado.",
+    "DATA_EXPORT_TOO_SOON": "Ya has pedido tus datos hace poco. Espera un poco antes de volver a pedirlos.",
+    "DATA_EXPORT_NOT_READY": "Todavía estamos preparando tus datos. Te avisaremos cuando puedas descargarlos.",
+    "DATA_EXPORT_EXPIRED": "Esta copia de tus datos ha caducado y se ha borrado. Puedes volver a pedirla."
   }
 }

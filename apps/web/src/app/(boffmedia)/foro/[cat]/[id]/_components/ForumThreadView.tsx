@@ -17,6 +17,7 @@ import { useCreatePost } from "@/hooks/forum/useCreatePost"
 import { useEditPost } from "@/hooks/forum/useEditPost"
 import { useDeletePost } from "@/hooks/forum/useDeletePost"
 import { useBoffSession } from "@/services/useBoffSession"
+import { ReportButton } from "@/components/shared/moderation/ReportButton"
 import { toAuthor } from "../../../_lib/adapters"
 
 const PAGE = 20
@@ -87,6 +88,11 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
   // session user id (string) matched against the numeric forum author id.
   const canSolve = loggedIn && (currentUserId === String(thread.author.id) || admin)
   const canModifyPost = (authorId: number) => loggedIn && (currentUserId === String(authorId) || admin)
+  // Reporting is offered on everything a signed-in reader did not write. Not
+  // gated on `!admin`: an admin browsing the forum is a reader like any other,
+  // and a report from them still belongs in the queue with a reason attached
+  // rather than as a silent takedown.
+  const canReport = (authorId: number) => loggedIn && currentUserId !== String(authorId)
 
   const handleVote = () => {
     if (!loggedIn) {
@@ -222,6 +228,10 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
               <span>{hasVoted ? t("voted") : t("vote")}</span>
             </button>
 
+            {canReport(thread.author.id) && (
+              <ReportButton contentType="forum_thread" contentId={thread.id} />
+            )}
+
             {admin && (
               <>
                 <Button size="sm" icon="bookmark" onClick={handleTogglePin} loading={pinning}>
@@ -250,7 +260,8 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
               const editable = canModifyPost(post.author.id)
               const showSolveMark = canSolve && !post.isOp && !post.isSolution
               const showUnsolve = canSolve && post.isSolution
-              const showFooter = !isEditing && (editable || showSolveMark || showUnsolve)
+              const reportable = canReport(post.author.id)
+              const showFooter = !isEditing && (editable || showSolveMark || showUnsolve || reportable)
 
               return (
                 <article
@@ -297,6 +308,9 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
                         <Button size="sm" icon="x" onClick={handleUnsolve} loading={solving}>
                           {t("unmarkSolution")}
                         </Button>
+                      )}
+                      {reportable && (
+                        <ReportButton contentType="forum_post" contentId={post.id} />
                       )}
                       {editable && (
                         <span className="ml-auto flex items-center gap-2">

@@ -3,6 +3,7 @@ import { ResponseModule } from '@api/_utils/response/response.module';
 import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { NotificationsModule } from '@api/boffmedia/notifications/notifications.module';
+import { ModerationModule } from '@api/boffmedia/moderation/moderation.module';
 import { ForumController } from './forum.controller';
 
 // Repositories
@@ -41,6 +42,13 @@ import { ForumFacadeService } from './forum.facade.service';
   ],
   controllers: [ForumController],
   exports: [ForumFacadeService],
-  imports: [ResponseModule, LoggerModule, DrizzleModule, NotificationsModule],
+  imports: [
+    ResponseModule,
+    LoggerModule,
+    DrizzleModule,
+    NotificationsModule,
+    // For `ContentBanGuard` on the two write routes.
+    ModerationModule,
+  ],
 })
 export class ForumModule {}

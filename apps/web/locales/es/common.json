@@ -743,6 +743,30 @@
       "zoom": "Zoom",
       "cancel": "Cancelar",
       "apply": "Aplicar"
+    },
+    "moderation": {
+      "report": "Reportar",
+      "dialogTitle": "Reportar contenido",
+      "dialogLead": "Cuéntanos qué pasa. Lo revisará el equipo; no se avisa a quien lo publicó de quién lo ha reportado.",
+      "reasonLabel": "Motivo",
+      "detailLabel": "Detalles (opcional)",
+      "detailHint": "Máximo 500 caracteres.",
+      "cancel": "Cancelar",
+      "send": "Enviar",
+      "sending": "Enviando…",
+      "failed": "No se ha podido enviar el reporte.",
+      "receivedTitle": "Reporte recibido",
+      "updatedTitle": "Reporte actualizado",
+      "receivedBody": "Gracias. Lo revisaremos y te avisaremos cuando lo hayamos hecho.",
+      "reason": {
+        "spam": "Spam o publicidad",
+        "harassment": "Acoso o insultos",
+        "hate": "Odio o discriminación",
+        "sexual": "Contenido sexual",
+        "illegal": "Contenido ilegal",
+        "off_topic": "Fuera de lugar",
+        "other": "Otro motivo"
+      }
     }
   }
 }

@@ -507,6 +507,13 @@ export const AUDIT_SUBJECT = {
   TOURNAMENT: 'tournament',
   PARTICIPANT: 'participant',
   MATCH: 'match',
+  // Appended last, and it has to stay last: MySQL stores an ENUM by ordinal
+  // position, so inserting a value in the middle silently remaps every existing
+  // row. `report` is a dismissal (the subject is the report itself), `content`
+  // is a hide or unhide, and `user` is what was done to an author.
+  REPORT: 'report',
+  CONTENT: 'content',
+  USER: 'user',
 } as const;
 
 export type AuditSubject = (typeof AUDIT_SUBJECT)[keyof typeof AUDIT_SUBJECT];
@@ -520,6 +527,9 @@ export const boffMediaAudit = mysqlTable(
       AUDIT_SUBJECT.TOURNAMENT,
       AUDIT_SUBJECT.PARTICIPANT,
       AUDIT_SUBJECT.MATCH,
+      AUDIT_SUBJECT.REPORT,
+      AUDIT_SUBJECT.CONTENT,
+      AUDIT_SUBJECT.USER,
     ]).notNull(),
     subjectId: int('subject_id').notNull(),
     /** Dotted action, e.g. `event.status`, `event.reopen`, `match.amend`. */

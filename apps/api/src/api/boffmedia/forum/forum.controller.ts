@@ -24,6 +24,7 @@ import { OptionalAuth } from '@api/_utils/decorators/optional-auth.decorator';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { UserThrottlerGuard } from '@api/_utils/guards/user-throttler.guard';
+import { ContentBanGuard } from '@api/boffmedia/moderation/content-ban.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { SuccessResponse } from '@api/_utils/entities/common-response.entity';
@@ -156,8 +157,11 @@ export class ForumController {
 
   // ==================== WRITE ====================
 
+  // `ContentBanGuard` after `JwtAuthGuard`: it reads the account the JWT
+  // resolved. It is what makes a moderation sanction cost the author anything —
+  // without it a content ban is a row nobody reads.
   @Post('threads')
-  @UseGuards(JwtAuthGuard, UserThrottlerGuard)
+  @UseGuards(JwtAuthGuard, ContentBanGuard, UserThrottlerGuard)
   @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Create a thread (with its original post)' })
@@ -174,7 +178,7 @@ export class ForumController {
   }
 
   @Post('threads/:id/posts')
-  @UseGuards(JwtAuthGuard, UserThrottlerGuard)
+  @UseGuards(JwtAuthGuard, ContentBanGuard, UserThrottlerGuard)
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @ApiBearerAuth('JWT')
   @ApiOperation({ summary: 'Reply to a thread' })

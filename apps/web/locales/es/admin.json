@@ -28,7 +28,8 @@
       "releases": "Releases",
       "randomizer": "Randomizer",
       "account": "Cuenta",
-      "security": "Seguridad"
+      "security": "Seguridad",
+      "moderation": "Moderación"
     },
     "crud": {
       "count": "{count} {plural}",
@@ -1134,6 +1135,86 @@
       "stepUpLead": "Publicar cambia lo que se ejecuta en el equipo de otras personas. Introduce el código de tu aplicación de autenticación para confirmar que eres tú quien está al teclado ahora mismo.",
       "confirm": "Confirmar",
       "cancel": "Cancelar"
+    },
+    "moderation": {
+      "title": "Moderación",
+      "desc": "Contenido reportado por la comunidad. Se publica al instante; aquí se revisa después.",
+      "loadFailed": "No se ha podido cargar la cola de reportes.",
+      "actionFailed": "No se ha podido aplicar la acción.",
+      "reasonRequired": "Escribe un motivo antes de continuar.",
+      "queueTitle": "Cola de reportes",
+      "kpiItems": "Elementos",
+      "kpiReports": "Reportes",
+      "kpiRepeat": "Reincidentes",
+      "filterStatus": "Estado",
+      "filterSort": "Orden",
+      "filterType": "Tipo",
+      "status": {
+        "open": "Abiertos",
+        "actioned": "Con acción",
+        "dismissed": "Descartados"
+      },
+      "sort": {
+        "reports": "Más reportado",
+        "oldest": "Más antiguo",
+        "newest": "Más reciente"
+      },
+      "type": {
+        "all": "Todo",
+        "forum_thread": "Hilo del foro",
+        "forum_post": "Mensaje del foro",
+        "rooker_post": "Trino",
+        "user_profile": "Perfil"
+      },
+      "reason": {
+        "spam": "Spam",
+        "harassment": "Acoso",
+        "hate": "Odio",
+        "sexual": "Contenido sexual",
+        "illegal": "Contenido ilegal",
+        "off_topic": "Fuera de lugar",
+        "other": "Otro"
+      },
+      "emptyTitle": "Nada pendiente",
+      "emptyLead": "No hay contenido reportado esperando revisión.",
+      "reportsCount": "{count} reportes",
+      "hiddenFlag": "Oculto",
+      "goneFlag": "Ya no existe",
+      "bannedFlag": "Sancionado",
+      "ageDays": "{count} d",
+      "noExcerpt": "(sin texto)",
+      "unknownAuthor": "Autor desconocido",
+      "authorTotal": "{count} reportes en total",
+      "authorActioned": "{count} con acción",
+      "authorSanctions": "{count} sanciones",
+      "reasons": "Motivos",
+      "dismiss": "Descartar",
+      "hide": "Ocultar",
+      "unhide": "Restaurar",
+      "sanction": "Sancionar",
+      "prev": "Anterior",
+      "next": "Siguiente",
+      "pageOf": "{from}–{to} de {total}",
+      "cancel": "Cancelar",
+      "working": "Aplicando…",
+      "confirmAction": "Confirmar",
+      "confirm": {
+        "dismiss": "Descartar los reportes",
+        "hide": "Ocultar el contenido",
+        "unhide": "Restaurar el contenido",
+        "sanction": "Sancionar al autor"
+      },
+      "done": {
+        "dismiss": "Reportes descartados",
+        "hide": "Contenido oculto",
+        "unhide": "Contenido restaurado",
+        "sanction": "Sanción aplicada"
+      },
+      "reasonLabel": "Motivo",
+      "reasonHint": "Queda registrado en la auditoría. Escríbelo para quien lo lea dentro de seis meses.",
+      "banDays": "Días",
+      "banDaysHint": "Cuánto dura la restricción para publicar.",
+      "banPermanent": "Sin fecha de fin"
     }
   },
   "tournaments": {

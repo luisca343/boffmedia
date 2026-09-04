@@ -41,6 +41,7 @@ import {
   TrainerStats,
   TrendItem,
 } from './types/rooker.types';
+import { notHidden } from '@api/boffmedia/moderation/content-registry';
 
 const TRENDS_WINDOW_DAYS = 7;
 
@@ -56,7 +57,7 @@ export class RookerRepository {
     const rows = await this.db
       .select()
       .from(rookerPosts)
-      .where(eq(rookerPosts.id, id))
+      .where(and(eq(rookerPosts.id, id), notHidden(rookerPosts.id)))
       .limit(1);
     return rows[0] ?? null;
   }
@@ -106,7 +107,7 @@ export class RookerRepository {
     const [r] = await this.db
       .select({ c: sql<number>`count(*)` })
       .from(rookerPosts)
-      .where(isNull(rookerPosts.parentId));
+      .where(and(isNull(rookerPosts.parentId), notHidden(rookerPosts.id)));
     return Number(r?.c ?? 0);
   }
 
@@ -244,10 +245,16 @@ export class RookerRepository {
 
     const ids = [...new Set(rows.map((r) => r.postId))];
 
+    // The one place a moderator hide has to bite. Rooker has no hide column of
+    // its own, so the decision lives in `boffmedia_content_moderation` and this
+    // filter is what applies it — and because EVERY feed (para ti, siguiendo,
+    // replies, an author's page, bookmarks, search) funnels its ids through
+    // this single hydration pass, filtering here covers all of them at once
+    // instead of eight `where` clauses that can drift apart.
     const posts = await this.db
       .select()
       .from(rookerPosts)
-      .where(inArray(rookerPosts.id, ids));
+      .where(and(inArray(rookerPosts.id, ids), notHidden(rookerPosts.id)));
 
     if (posts.length === 0) return [];
 
