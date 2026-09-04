@@ -19,6 +19,7 @@
  */
 
 import axios from 'axios';
+import { assertUrlAllowed } from '@api/_utils/http/safe-fetch';
 import { createWriteStream } from 'fs';
 import { rename, unlink } from 'fs/promises';
 import { Transform } from 'stream';
@@ -74,9 +75,25 @@ export type StreamOpener = (
 
 const USER_AGENT = 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)';
 
+/**
+ * Hosts a bulk download may open.
+ *
+ * The catalogue entries arrive in the REQUEST BODY, `link` included, so the URL
+ * opened here is attacker-chosen even though the route is admin-only. The
+ * single-file path in myrient.service has always gone through the allowlist;
+ * the three bulk paths did not, which is the SSRF this closes.
+ */
+const ALLOWED_DOWNLOAD_HOSTS = ['myrient.erista.me'];
+
 /** The real opener: an axios GET in stream mode, wired to the same signal so a
  *  cancel lands even while we are still waiting for response headers. */
 export const openHttpStream: StreamOpener = async (url, signal) => {
+  // Scheme, allowlist and resolved-IP checks, shared with safeFetchStream. This
+  // opener cannot BE safeFetchStream — that helper owns the whole read, and the
+  // point of this module is its own idle watchdog and `.part` handling over a
+  // multi-GiB body — but it must not be less careful about what it opens.
+  await assertUrlAllowed(url, { allowedHosts: ALLOWED_DOWNLOAD_HOSTS });
+
   const response = await axios.get<NodeJS.ReadableStream>(url, {
     responseType: 'stream',
     headers: { 'User-Agent': USER_AGENT },
@@ -84,6 +101,11 @@ export const openHttpStream: StreamOpener = async (url, signal) => {
     // stream means "time to headers" and does nothing once bytes start. The
     // idle watchdog below is what actually guards the body.
     timeout: 0,
+    // A redirect is the allowlist's back door: it is followed without any of
+    // the checks above. safeFetchStream refuses them for the same reason, and
+    // the single-file download has run that way against Myrient all along, so
+    // this costs nothing real.
+    maxRedirects: 0,
     signal,
   });
   return response.data;

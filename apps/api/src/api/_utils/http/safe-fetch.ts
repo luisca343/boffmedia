@@ -144,6 +144,68 @@ function isPublicIp(ip: string): boolean {
  * });
  * ```
  */
+/**
+ * Scheme, hostname-allowlist and resolved-IP checks — everything that decides
+ * whether a URL may be opened at all, with no opinion about how it is then
+ * read.
+ *
+ * Extracted so a caller that must do its own transport can still be safe.
+ * The Myrient bulk downloader is exactly that case: it streams multi-GiB ROMs
+ * through its own idle watchdog and partial-file handling, so it cannot go
+ * through `safeFetchStream`, and before this it opened `entry.link` — a URL
+ * taken STRAIGHT FROM THE REQUEST BODY — with a bare `axios.get`. Admin-only,
+ * but a server-side request forgery all the same, and invisible next to the
+ * single-file path two hundred lines above that had used the allowlist all
+ * along.
+ */
+export async function assertUrlAllowed(
+  url: string,
+  config: Pick<SafeFetchConfig, 'allowedHosts' | 'allowHttp'>,
+): Promise<void> {
+  const urlObj = new URL(url);
+
+  // 1. Scheme check
+  if (!['http:', 'https:'].includes(urlObj.protocol)) {
+    throw new SafeFetchError(`Scheme must be http or https; got ${urlObj.protocol}`, url);
+  }
+
+  if (!config.allowHttp && urlObj.protocol !== 'https:') {
+    throw new SafeFetchError('Only HTTPS is allowed', url);
+  }
+
+  // 2. Hostname allowlist
+  const hostname = urlObj.hostname;
+  const allowed = config.allowedHosts.map((h) => h.toLowerCase()).includes(hostname.toLowerCase());
+  if (!allowed) {
+    throw new SafeFetchError(
+      `Hostname not in allowlist: ${hostname}. Allowed: ${config.allowedHosts.join(', ')}`,
+      url,
+    );
+  }
+
+  // 3. DNS resolution and IP range check. The allowlist alone is not enough:
+  // a name on it can still resolve into the private range (DNS rebinding, or
+  // simply a host that moved).
+  let resolvedIps: string[] = [];
+  try {
+    resolvedIps = await dns.resolve4(hostname);
+  } catch {
+    try {
+      resolvedIps = await dns.resolve6(hostname);
+    } catch {
+      throw new SafeFetchError(`Failed to resolve hostname: ${hostname}`, url);
+    }
+  }
+
+  const hasPublicIp = resolvedIps.some((ip) => isPublicIp(ip));
+  if (!hasPublicIp) {
+    throw new SafeFetchError(
+      `All resolved IPs are private or loopback: ${resolvedIps.join(', ')}`,
+      url,
+    );
+  }
+}
+
 export async function safeFetch(
   url: string,
   config: SafeFetchConfig,
@@ -248,46 +310,7 @@ export async function safeFetchStream(
   config: SafeFetchConfig,
 ) {
   try {
-    const urlObj = new URL(url);
-
-    // 1. Scheme check
-    if (!['http:', 'https:'].includes(urlObj.protocol)) {
-      throw new SafeFetchError(`Scheme must be http or https; got ${urlObj.protocol}`, url);
-    }
-
-    if (!config.allowHttp && urlObj.protocol !== 'https:') {
-      throw new SafeFetchError('Only HTTPS is allowed', url);
-    }
-
-    // 2. Hostname allowlist
-    const hostname = urlObj.hostname;
-    const allowed = config.allowedHosts.map((h) => h.toLowerCase()).includes(hostname.toLowerCase());
-    if (!allowed) {
-      throw new SafeFetchError(
-        `Hostname not in allowlist: ${hostname}. Allowed: ${config.allowedHosts.join(', ')}`,
-        url,
-      );
-    }
-
-    // 3. DNS resolution and IP range check
-    let resolvedIps: string[] = [];
-    try {
-      resolvedIps = await dns.resolve4(hostname);
-    } catch {
-      try {
-        resolvedIps = await dns.resolve6(hostname);
-      } catch {
-        throw new SafeFetchError(`Failed to resolve hostname: ${hostname}`, url);
-      }
-    }
-
-    const hasPublicIp = resolvedIps.some((ip) => isPublicIp(ip));
-    if (!hasPublicIp) {
-      throw new SafeFetchError(
-        `All resolved IPs are private or loopback: ${resolvedIps.join(', ')}`,
-        url,
-      );
-    }
+    await assertUrlAllowed(url, config);
 
     // 4. Stream request with constraints
     const timeout = config.timeout ?? 30_000;

@@ -15,7 +15,7 @@ import { tmpdir } from 'os';
 import * as path from 'path';
 import { Readable } from 'stream';
 
-import { downloadToFile } from './streamed-download';
+import { downloadToFile, openHttpStream } from './streamed-download';
 
 /** A source we drive by hand: nothing arrives until the test pushes it. */
 function manualSource(): Readable {
@@ -253,5 +253,38 @@ describe('downloadToFile', () => {
 
     // Cumulative, not per-chunk: the caller wants "how far did it get".
     expect(seen).toEqual([2, 5]);
+  });
+});
+
+describe('openHttpStream — SSRF guard', () => {
+  // `entry.link` reaches this opener straight from the request body, so these
+  // are the checks standing between an admin route and an arbitrary outbound
+  // GET from inside the network. Every case below reached the socket before.
+  const never = new AbortController().signal;
+
+  it('refuses a host that is not Myrient', async () => {
+    await expect(
+      openHttpStream('https://evil.example.com/rom.zip', never),
+    ).rejects.toThrow(/not in allowlist/i);
+  });
+
+  it('refuses the cloud metadata endpoint', async () => {
+    // The canonical SSRF target: link-local, no DNS, credentials behind it.
+    await expect(
+      openHttpStream('http://169.254.169.254/latest/meta-data/', never),
+    ).rejects.toThrow(/not in allowlist|Only HTTPS/i);
+  });
+
+  it('refuses a non-http scheme', async () => {
+    await expect(
+      openHttpStream('file:///etc/passwd', never),
+    ).rejects.toThrow(/Scheme must be http or https/i);
+  });
+
+  it('refuses plain http even on the allowed host', async () => {
+    // Downgrade is how you get a MITM to choose the bytes we write to disk.
+    await expect(
+      openHttpStream('http://myrient.erista.me/rom.zip', never),
+    ).rejects.toThrow(/Only HTTPS/i);
   });
 });
