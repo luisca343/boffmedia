@@ -4,10 +4,12 @@ import {
   IsNotEmpty,
   IsNumber,
   IsEnum,
+  IsIn,
   IsOptional,
   MaxLength,
 } from 'class-validator';
 import { BATTLESIM_REPLAY_SOURCES } from '@/_db/schema/Battlesim';
+import { BSIM_FORMAT_IDS } from '../_utils/formats';
 
 export class BattlesimReplayUploadDto {
   @ApiProperty({
@@ -20,12 +22,17 @@ export class BattlesimReplayUploadDto {
   clientId: string;
 
   @ApiProperty({
-    description: 'Battle format (e.g., gen9randomdoublesbattle)',
+    description:
+      'Battle format. Must be a registered id from battle-core BSIM_FORMATS.',
     example: 'gen9randombattle',
   })
   @IsString()
   @IsNotEmpty()
   @MaxLength(64)
+  // Only `local` and `pvp` replays reach this endpoint, and both are produced by
+  // our own engine — so the format can only ever be one this list already knows.
+  // Pasted Showdown transcripts go to /smartrotom/replay/create, not here.
+  @IsIn(BSIM_FORMAT_IDS)
   format: string;
 
   @ApiProperty({

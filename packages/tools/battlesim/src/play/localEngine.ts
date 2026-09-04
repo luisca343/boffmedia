@@ -136,12 +136,24 @@ class LocalBattleEngineStore {
       // Worker, a bundler that can resolve one, or a React renderer.
       applyWorkerEvent(session, message, {
         onEnd: (end) => {
+          const format = this.formats.get(end.roomId);
+          if (!format) {
+            // Unreachable: `formats` and `sessions` are written and deleted
+            // together, and this callback already returned above when the
+            // session was missing. It is checked anyway because the fallback
+            // used to be `?? ""`, and the API now rejects an unregistered
+            // format outright (@IsIn over BSIM_FORMATS) — so an empty string
+            // would queue an outbox row that can never be accepted, retried
+            // forever. Dropping an impossible replay beats poisoning the queue.
+            console.warn(`[battlesim] no format for ${end.roomId}; replay not stored`);
+            return;
+          }
           // D7: stored locally first, always — a battle with no account and no
           // network still leaves a replay. `keepReplay` queues the upload
           // through the outbox only when a session exists.
           void keepReplay({
             id: end.roomId,
-            format: this.formats.get(end.roomId) ?? "",
+            format,
             p1: "Player",
             p2: "Bot",
             winner: end.winner,

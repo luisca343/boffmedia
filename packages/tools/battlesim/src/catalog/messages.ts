@@ -560,7 +560,7 @@ export const messages = {
             "load": "Cargar repetición",
             "hint": "Copia y pega el texto completo de la repetición de Pokémon Showdown.",
             "errorEmpty": "Pega un texto de repetición válido.",
-            "errorFormat": "Formato de repetición no válido. Se espera texto de Showdown con líneas |player| y |turn|.",
+            "errorFormat": "Formato de repetición no válido. Se espera texto de Showdown con líneas |player|, |start y |turn|.",
             "errorUnknown": "Ha ocurrido un error desconocido.",
             "side1": "Jugador 1",
             "side2": "Jugador 2"
@@ -1707,7 +1707,7 @@ export const messages = {
             "load": "Load replay",
             "hint": "Copy and paste the complete replay text from Pokémon Showdown.",
             "errorEmpty": "Please paste a valid replay text.",
-            "errorFormat": "Invalid replay format. Expected Showdown replay text with |player| and |turn| lines.",
+            "errorFormat": "Invalid replay format. Expected Showdown replay text with |player|, |start and |turn| lines.",
             "errorUnknown": "An unknown error occurred.",
             "side1": "Player 1",
             "side2": "Player 2"

@@ -39,3 +39,37 @@ export function getParticipantName(name: string): string {
 export function countActions(battleLog: string | null): number {
   return battleLog ? battleLog.split('\n').length : 0;
 }
+
+/**
+ * Why a pasted transcript cannot be played, or `null` when it can.
+ *
+ * `"markers"` is deliberately the only structural verdict: this is a cheap
+ * smell test in front of the loader, NOT a protocol parser. `BattleStateBuilder`
+ * feeds every line to `@pkmn/client`, which throws on the first line it cannot
+ * make sense of — and a throw there lands in the player, past the point where
+ * the paste box can still say anything useful.
+ */
+export type ReplayTranscriptProblem = 'empty' | 'markers';
+
+/**
+ * The three markers the replay player cannot do without.
+ *
+ * `|player|` names the sides the shell renders, `|start` is where
+ * `buildSetupState()` stops feeding setup lines, and `|turn|` is what the turn
+ * index is built from — a transcript with no `|turn|` line has no timeline to
+ * scrub and `lastTurn` resolves to nothing.
+ *
+ * NOTE THE MISSING TRAILING PIPE ON `|start`: the protocol line is a bare
+ * `|start`, so a check for `'|start|'` matches nothing at all — the loader's
+ * first version had exactly that and the marker was silently never enforced.
+ */
+export function validateReplayTranscript(text: string): ReplayTranscriptProblem | null {
+  const trimmed = text.trim();
+  if (!trimmed) return 'empty';
+
+  const hasPlayer = trimmed.includes('|player|');
+  const hasStart = /^\|start\b/m.test(trimmed);
+  const hasTurn = trimmed.includes('|turn|');
+
+  return hasPlayer && hasStart && hasTurn ? null : 'markers';
+}

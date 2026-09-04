@@ -12,7 +12,7 @@ import { BattleHeader } from "../BattleHeader";
 import { LogChatRail, type RailTab } from "../LogChatRail";
 import { moveAction, } from "../../engine/battleActions";
 import { ReplayData } from "../../engine/types";
-import { countActions, getParticipantName } from "../../engine/replayUtils";
+import { countActions, getParticipantName, validateReplayTranscript } from "../../engine/replayUtils";
 import { ReplayErrorBoundary } from "./ReplayErrorBoundary";
 import { toBSXTicks, makeLogTranslator, toTeamHP } from "../../engine/toBSXMon";
 import { usePkmnLabels } from "../../lib/pkmn-label";
@@ -33,13 +33,16 @@ function ReplayLoader({ onReplayLoad }: { onReplayLoad: (data: ReplayData) => vo
   const [replayText, setReplayText] = useState("");
   const [error, setError] = useState("");
 
+  // The paste box is the ONLY gate in front of `Game`: from here the text goes
+  // straight into `BattleStateBuilder`, which hands every line to @pkmn/client
+  // and throws on the first one it cannot parse — inside the player, where the
+  // user gets an error boundary instead of a sentence telling them what to fix.
   const handleLoadReplay = () => {
     try {
-      if (!replayText.trim()) throw new Error(t('replays.loader.errorEmpty'));
       const text = replayText.trim();
-      const hasPlayer = text.includes('|player|');
-      const hasTurn = text.includes('|turn|') || text.includes('|start|');
-      if (!hasPlayer || !hasTurn) throw new Error(t('replays.loader.errorFormat'));
+      const problem = validateReplayTranscript(text);
+      if (problem === 'empty') throw new Error(t('replays.loader.errorEmpty'));
+      if (problem) throw new Error(t('replays.loader.errorFormat'));
       onReplayLoad({
         side1: t('replays.loader.side1'), side2: t('replays.loader.side2'), team1: "", team2: "",
         replay: text, winner: 0, createdAt: new Date().toISOString()

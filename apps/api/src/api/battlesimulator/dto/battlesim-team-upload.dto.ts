@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, MaxLength, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsIn, MaxLength, IsNumber, IsOptional } from 'class-validator';
+import { BSIM_FORMAT_IDS } from '../_utils/formats';
 
 export class BattlesimTeamUploadDto {
   @ApiProperty({
@@ -21,12 +22,16 @@ export class BattlesimTeamUploadDto {
   name: string;
 
   @ApiProperty({
-    description: 'Battle format (e.g., gen9vgc2025regulationc)',
-    example: 'gen9vgc2025regulationc',
+    description:
+      'Battle format. Must be a registered id from battle-core BSIM_FORMATS.',
+    example: 'gen9vgc2025regi',
   })
   @IsString()
   @IsNotEmpty()
   @MaxLength(64)
+  // A team is only ever useful in a format the simulator can start; storing one
+  // under an unknown id just defers the failure to the day it is loaded.
+  @IsIn(BSIM_FORMAT_IDS)
   format: string;
 
   @ApiProperty({
