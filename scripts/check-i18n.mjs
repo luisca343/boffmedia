@@ -138,7 +138,20 @@ for (const rel of files) {
     let other;
     try {
       other = leaves(JSON.parse(readFileSync(join(ROOT, locale, rel), "utf8")));
-    } catch {
+    } catch (err) {
+      // Tell an ABSENT file apart from an UNPARSEABLE one. Collapsing both into
+      // "missing entirely" is how a real defect got the wrong name: en/admin.json
+      // had typographic quotes as its JSON delimiters, and this branch reported a
+      // 2160-key file that exists on disk as having no English at all — then went
+      // on to raise cascading false key-resolution violations against it.
+      // check-locale-json.mjs runs first and gives the line and column; this only
+      // has to avoid lying about which of the two problems it is.
+      if (err instanceof SyntaxError) {
+        violations.push(
+          `${locale}/${rel}  is not valid JSON (${err.message}) — see check-locale-json.mjs for the line`,
+        );
+        continue;
+      }
       gaps.push(`${locale}/${rel}  missing entirely (${base.size} keys have no ${locale})`);
       missing += base.size;
       continue;
