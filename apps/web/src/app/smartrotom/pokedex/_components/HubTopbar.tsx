@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { SearchIcon, ZapIcon, FilterIcon, SettingsIcon } from "lucide-react"
+import { SearchIcon, ZapIcon, FilterIcon, SettingsIcon, RefreshCwIcon } from "lucide-react"
 import { TypeChip, StatusPill } from "./ui"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { usePokedexData } from "@/hooks/usePokedexData"
@@ -19,7 +19,7 @@ export function HubTopbar() {
   const [open, setOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
   const { allPokemon, fetchAllPokemon } = usePokemonStore()
-  const { getPokemonStatus } = usePokedexData()
+  const { getPokemonStatus, refetch, isLoading } = usePokedexData()
 
   useEffect(() => {
     if (allPokemon.length === 0) fetchAllPokemon()
@@ -147,6 +147,19 @@ export function HubTopbar() {
         )}
       </div>
       <div className="flex gap-2">
+        {/* The dex cache lives minutes, not seconds (see POKEDEX_TTL_MS) — this is the
+            manual escape hatch for someone who wants fresher data right now, since there
+            is no server push to invalidate it for them. */}
+        <button
+          type="button"
+          onClick={() => refetch()}
+          disabled={isLoading}
+          aria-label={t("topbar_refresh_aria")}
+          title={t("topbar_refresh_aria")}
+          className="w-9 h-9 bg-white/[0.04] border border-white/[0.08] rounded-[9px] grid place-items-center text-pk-surface-300 hover:text-pk-surface-50 hover:bg-white/[0.07] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <RefreshCwIcon className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
+        </button>
         {[ZapIcon, FilterIcon, SettingsIcon].map((Icon, i) => (
           <button
             key={i}

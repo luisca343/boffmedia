@@ -213,6 +213,7 @@
     "spawns_no_pokemon": "No Pokémon appearing right now.",
     "topbar_search_placeholder": "Search Pokémon, move, ability…",
     "topbar_search_aria": "Search Pokémon, move, ability",
+    "topbar_refresh_aria": "Refresh Pokédex data",
     "topbar_result_one": "# result",
     "topbar_result_other": "# results",
     "spawnscard_updates_in": "Updates in {tick}s",

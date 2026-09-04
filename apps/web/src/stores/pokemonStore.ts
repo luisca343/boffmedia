@@ -25,7 +25,13 @@ const pendingFetches = new Map<string, Promise<PokedexData | void>>()
 
 // The app can stay open for hours in MCEF, so the snapshot must expire — the dex changes
 // server-side and an unbounded cache shows a caught Pokémon as a silhouette forever.
-const POKEDEX_TTL_MS = 30_000
+// There is no server push for captures (the mod never emits a socket event on catch —
+// only checked in via horus), so this can't be "just long enough to cover the gap between
+// pushes". 10 minutes balances staleness against hammering the API every mount; the
+// `registro/[[...params]]` route already calls `invalidatePokedex()` right after the mod's
+// own capture-reveal flow, and `usePokedexData().refetch()` is the escape hatch for anyone
+// who needs fresher data sooner (wired into the pokedex topbar's refresh button).
+const POKEDEX_TTL_MS = 10 * 60 * 1000
 
 export const usePokemonStore = create<PokemonState>((set, get) => ({
   console: "PokemonStore initialized",
