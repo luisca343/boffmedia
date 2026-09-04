@@ -25,14 +25,24 @@ export type TypeName =
   | 'Steel'
   | 'Fairy';
 
-/** Effectiveness multipliers: 0 (immune), 0.5 (resists), 2 (super-effective). */
-export type TypeEffectiveness = 0 | 0.5 | 1 | 2;
+/**
+ * A single chart entry: 0 (immune), 0.5 (resists), 2 (super-effective).
+ * Neutral matchups are not stored, so 1 never appears in the chart itself.
+ */
+export type TypeMatchup = 0 | 0.5 | 2;
+
+/**
+ * A stacked multiplier over a defender's type(s). Dual types multiply, so the
+ * quad cases (0.25 and 4) are reachable and are NOT collapsed to neutral —
+ * consumers count quad-weaknesses and double-resistances off these values.
+ */
+export type TypeEffectiveness = 0 | 0.25 | 0.5 | 1 | 2 | 4;
 
 /**
  * Type effectiveness chart. Maps attacking type → defending type → multiplier.
  * Only non-neutral entries are stored; unlisted combinations are 1×.
  */
-export const TYPE_EFF: Record<TypeName, Record<string, TypeEffectiveness>> = {
+export const TYPE_EFF: Record<TypeName, Record<string, TypeMatchup>> = {
   Normal: { Ghost: 0, Rock: 0.5, Steel: 0.5 },
   Fire: { Fire: 0.5, Water: 0.5, Rock: 0.5, Dragon: 0.5, Grass: 2, Ice: 2, Bug: 2, Steel: 2 },
   Water: { Water: 0.5, Grass: 0.5, Dragon: 0.5, Fire: 2, Ground: 2, Rock: 2 },
@@ -138,11 +148,12 @@ export function effectiveness(
     const val = TYPE_EFF[atkType as TypeName]?.[dt] ?? 1;
     mult *= val;
   }
-  // Clamp to valid effectiveness values
-  if (mult === 0) return 0;
-  if (mult === 0.5) return 0.5;
-  if (mult === 2) return 2;
-  return 1;
+  // The product is returned as-is. This function used to clamp anything that
+  // was not exactly 0, 0.5 or 2 down to 1, which silently erased every quad
+  // weakness and double resistance — the two cases a coverage grid exists to
+  // show. Defined for a defender with one or two types, which is every real
+  // Pokémon; a third type could only arise from bad data.
+  return mult as TypeEffectiveness;
 }
 
 /**

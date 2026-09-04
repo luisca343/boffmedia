@@ -12,10 +12,16 @@ export default [
   {
     rules: {
       'no-restricted-imports': ['error', {
-        patterns: [{
-          group: ['@/components/boffmedia/primitives/*'],
-          message: 'Import boffmedia v3 primitives from the barrel `@/components/boffmedia/primitives` (BOFFMEDIA_V3.md §1), not by deep path.',
-        }],
+        patterns: [
+          {
+            group: ['@/components/boffmedia/primitives/*'],
+            message: 'Import boffmedia v3 primitives from the barrel `@/components/boffmedia/primitives` (BOFFMEDIA_V3.md §1), not by deep path.',
+          },
+          {
+            group: ['@/components/ui/primitives', '@/components/ui/primitives/*'],
+            message: 'The legacy shadcn layer is deprecated. Use @boffmedia/ui (packages/ui) instead. See CLAUDE.md.',
+          },
+        ],
       }],
       '@next/next/no-img-element': 'off',
       'react-hooks/exhaustive-deps': 'off',
@@ -57,5 +63,45 @@ export default [
     // The one module allowed to turn a prefix into a URL.
     files: ['src/lib/assets.ts'],
     rules: { 'no-restricted-syntax': 'off' },
+  },
+  {
+    // RATCHET: exempt the primitives layer itself so internal cross-imports stay legal.
+    // Entries in this block must not be added to; they can only be removed as files migrate
+    // to @boffmedia/ui.
+    files: ['src/components/ui/primitives/**'],
+    rules: { 'no-restricted-imports': 'off' },
+  },
+  {
+    // RATCHET: exempt existing consumers of the legacy layer. Entries in this list may only
+    // be REMOVED as files migrate to @boffmedia/ui, never added. New files must use
+    // @boffmedia/ui (packages/ui).
+    files: [
+      'src/app/(boffmedia)/error.tsx',
+      'src/app/(clones)/ciclosimitacion/dbunit/_components/Content.tsx',
+      'src/app/(clones)/ciclosimitacion/page.tsx',
+      'src/app/not-found.tsx',
+      'src/app/smartrotom/bidkea/page.tsx',
+      'src/app/smartrotom/camara/_components/CameraBottomControls.tsx',
+      'src/app/smartrotom/camara/_components/CameraControls.tsx',
+      'src/app/smartrotom/camara/_components/CameraZoomSlider.tsx',
+      'src/app/smartrotom/camara/_components/GalleryView.tsx',
+      'src/app/smartrotom/camara/_components/ScreenshotPreviewDialog.tsx',
+      'src/app/smartrotom/mina/drops/page.tsx',
+      'src/app/smartrotom/mina/jugar/page.tsx',
+      'src/app/wingull/_components/MovingSection.tsx',
+      'src/app/wingull/invitacion/\\[id\\]/_components/InvitacionForm.tsx',
+      'src/app/wingull/invitacion/\\[id\\]/_components/InvitacionNoEncontrada.tsx',
+      'src/app/wingull/invitacion/\\[id\\]/_components/InvitacionUsada.tsx',
+      'src/app/wingull/page.tsx',
+      'src/app/wingull/pueblos/_components/PueblosView.tsx',
+      'src/components/boffmedia/ui/navigation/NotificationPreferences.tsx',
+      'src/features/ficusai/components/BiomeListCard.tsx',
+      'src/features/ficusai/components/ChatInput.tsx',
+      'src/features/ficusai/components/CompletePokemonCard.tsx',
+      'src/features/ficusai/components/MessageBubble.tsx',
+      'src/features/ficusai/components/MoveData.tsx',
+      'src/features/ficusai/components/MoveEffect.tsx',
+    ],
+    rules: { 'no-restricted-imports': 'off' },
   },
 ]

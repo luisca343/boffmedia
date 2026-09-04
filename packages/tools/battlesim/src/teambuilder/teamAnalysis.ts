@@ -11,6 +11,7 @@
 
 import { Dex } from "@pkmn/dex";
 import type { PokemonSet } from "@pkmn/sim";
+import { effectiveness } from "@boffmedia/pokemon-identity";
 
 import { TYPE_LIST } from "./labels";
 
@@ -23,9 +24,6 @@ export interface CoverageRow {
   weakSlots: number[];
 }
 
-/** `damageTaken` codes: 0 neutral · 1 weak (×2) · 2 resist (×½) · 3 immune. */
-const CODE_MULT = [1, 2, 0.5, 0];
-
 export function analyseTeam(sets: PokemonSet[]): { rows: CoverageRow[]; members: number } {
   const members = sets
     .map((set, slot) => ({ slot, species: set.species ? Dex.species.get(set.species) : null }))
@@ -34,12 +32,7 @@ export function analyseTeam(sets: PokemonSet[]): { rows: CoverageRow[]; members:
   const rows = TYPE_LIST.map((attack) => {
     const row: CoverageRow = { type: attack, weak: 0, resist: 0, immune: 0, weakSlots: [] };
     for (const { slot, species } of members) {
-      let mult = 1;
-      for (const def of species.types) {
-        const table = Dex.types.get(def);
-        if (!table.exists) continue;
-        mult *= CODE_MULT[table.damageTaken[attack] ?? 0] ?? 1;
-      }
+      const mult = effectiveness(attack, species.types);
       if (mult === 0) row.immune += 1;
       else if (mult > 1) {
         row.weak += 1;

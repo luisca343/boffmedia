@@ -1,13 +1,10 @@
-import { Injectable, HttpException, HttpStatus, Inject } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, gt, and, sql } from 'drizzle-orm';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import {
-  desktopTelemetryEvents,
   type DesktopTelemetryEventCode,
   type DesktopTelemetryEventName,
 } from '@/_db/schema/DesktopTelemetry';
 import { DesktopTelemetryEventDto } from './dto/desktop-telemetry.dto';
+import { DesktopTelemetryRepository } from './repositories/desktop-telemetry.repository';
 
 /**
  * Desktop telemetry service: opt-in, PII-scrubbed event collection.
@@ -24,8 +21,7 @@ export class DesktopTelemetryService {
   private readonly MAX_EVENTS_PER_HOUR = 100;
 
   constructor(
-    @Inject(DRIZZLE)
-    private readonly db: MySql2Database<Record<string, never>>,
+    private readonly repository: DesktopTelemetryRepository,
   ) {}
 
   /**
@@ -60,24 +56,14 @@ export class DesktopTelemetryService {
     }
 
     // Check rate limit: max MAX_EVENTS_PER_HOUR events per install_id per hour.
-    // We use sql.raw() for DATE_SUB which Drizzle doesn't have built-in.
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
 
-    // COUNT, not the rows. This endpoint is public and unauthenticated by
-    // nature, so selecting every matching row to measure its length would make
-    // flooding it cheaper for the attacker and more expensive for us with each
-    // event they send — the rate limiter would become the amplifier.
-    const [recent] = await this.db
-      .select({ count: sql<number>`count(*)` })
-      .from(desktopTelemetryEvents)
-      .where(
-        and(
-          eq(desktopTelemetryEvents.installId, dto.installId),
-          gt(desktopTelemetryEvents.createdAt, oneHourAgo),
-        ),
-      );
+    const recentCount = await this.repository.countEventsSince(
+      dto.installId,
+      oneHourAgo,
+    );
 
-    if (Number(recent?.count ?? 0) >= this.MAX_EVENTS_PER_HOUR) {
+    if (recentCount >= this.MAX_EVENTS_PER_HOUR) {
       throw new HttpException(
         'Rate limit exceeded: too many events from this installation',
         HttpStatus.TOO_MANY_REQUESTS,
@@ -85,10 +71,10 @@ export class DesktopTelemetryService {
     }
 
     // Insert the event.
-    await this.db.insert(desktopTelemetryEvents).values({
+    await this.repository.insertEvent({
       installId: dto.installId,
       eventName: dto.eventName as DesktopTelemetryEventName,
-      code: dto.code,
+      code: dto.code as DesktopTelemetryEventCode,
     });
   }
 

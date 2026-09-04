@@ -1,31 +1,29 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { HttpException, HttpStatus } from '@nestjs/common';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import { DesktopTelemetryService } from './desktop-telemetry.service';
 import { DesktopTelemetryEventDto } from './dto/desktop-telemetry.dto';
-import { desktopTelemetryEvents } from '@/_db/schema/DesktopTelemetry';
+import { DesktopTelemetryRepository } from './repositories/desktop-telemetry.repository';
 
 describe('DesktopTelemetryService', () => {
   let service: DesktopTelemetryService;
-  let db: MySql2Database<Record<string, never>>;
+  let repository: jest.Mocked<
+    Pick<DesktopTelemetryRepository, 'countEventsSince' | 'insertEvent'>
+  >;
 
   beforeEach(async () => {
+    repository = {
+      countEventsSince: jest.fn().mockResolvedValue(0),
+      insertEvent: jest.fn().mockResolvedValue(undefined),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         DesktopTelemetryService,
-        {
-          provide: DRIZZLE,
-          useValue: {
-            select: jest.fn(),
-            insert: jest.fn(),
-          },
-        },
+        { provide: DesktopTelemetryRepository, useValue: repository },
       ],
     }).compile();
 
     service = module.get<DesktopTelemetryService>(DesktopTelemetryService);
-    db = module.get<MySql2Database<Record<string, never>>>(DRIZZLE);
   });
 
   describe('ingestEvent', () => {
@@ -38,22 +36,13 @@ describe('DesktopTelemetryService', () => {
         code: 'success',
       };
 
-      const selectMock = jest.fn().mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue([{ count: 0 }]),
-        }),
-      });
-
-      const insertMock = jest.fn().mockReturnValue({
-        values: jest.fn().mockResolvedValue(undefined),
-      });
-
-      (db.select as jest.Mock).mockImplementation(selectMock);
-      (db.insert as jest.Mock).mockImplementation(insertMock);
-
       await service.ingestEvent(dto);
 
-      expect(insertMock).toHaveBeenCalledWith(desktopTelemetryEvents);
+      expect(repository.insertEvent).toHaveBeenCalledWith({
+        installId: validUuid,
+        eventName: 'install-done',
+        code: 'success',
+      });
     });
 
     it('should accept a valid crash-code:missing-dependency event', async () => {
@@ -63,22 +52,9 @@ describe('DesktopTelemetryService', () => {
         code: 'missing-dependency',
       };
 
-      const selectMock = jest.fn().mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue([{ count: 0 }]),
-        }),
-      });
-
-      const insertMock = jest.fn().mockReturnValue({
-        values: jest.fn().mockResolvedValue(undefined),
-      });
-
-      (db.select as jest.Mock).mockImplementation(selectMock);
-      (db.insert as jest.Mock).mockImplementation(insertMock);
-
       await service.ingestEvent(dto);
 
-      expect(insertMock).toHaveBeenCalled();
+      expect(repository.insertEvent).toHaveBeenCalled();
     });
 
     it('should accept a valid tool-open:vgc event', async () => {
@@ -88,22 +64,28 @@ describe('DesktopTelemetryService', () => {
         code: 'vgc',
       };
 
-      const selectMock = jest.fn().mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue([{ count: 0 }]),
-        }),
-      });
-
-      const insertMock = jest.fn().mockReturnValue({
-        values: jest.fn().mockResolvedValue(undefined),
-      });
-
-      (db.select as jest.Mock).mockImplementation(selectMock);
-      (db.insert as jest.Mock).mockImplementation(insertMock);
-
       await service.ingestEvent(dto);
 
-      expect(insertMock).toHaveBeenCalled();
+      expect(repository.insertEvent).toHaveBeenCalled();
+    });
+
+    it('should count only events inside the trailing hour', async () => {
+      const dto: DesktopTelemetryEventDto = {
+        installId: validUuid,
+        eventName: 'launch',
+        code: 'launch',
+      };
+
+      const before = Date.now();
+      await service.ingestEvent(dto);
+
+      expect(repository.countEventsSince).toHaveBeenCalledTimes(1);
+      const [installId, since] = repository.countEventsSince.mock.calls[0];
+      expect(installId).toBe(validUuid);
+      // The window is one hour back from now, not an all-time count.
+      const windowMs = before - since.getTime();
+      expect(windowMs).toBeGreaterThanOrEqual(60 * 60 * 1000);
+      expect(windowMs).toBeLessThan(60 * 60 * 1000 + 5000);
     });
 
     it('should reject invalid UUID', async () => {
@@ -116,6 +98,9 @@ describe('DesktopTelemetryService', () => {
       await expect(service.ingestEvent(dto)).rejects.toThrow(HttpException);
       const error = await service.ingestEvent(dto).catch((e) => e);
       expect(error.getStatus()).toBe(HttpStatus.BAD_REQUEST);
+      // Rejected before it ever reaches the database.
+      expect(repository.countEventsSince).not.toHaveBeenCalled();
+      expect(repository.insertEvent).not.toHaveBeenCalled();
     });
 
     it('should reject mismatched code for event type', async () => {
@@ -125,17 +110,10 @@ describe('DesktopTelemetryService', () => {
         code: 'missing-dependency', // wrong: missing-dependency is for crash-code
       };
 
-      const selectMock = jest.fn().mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue([{ count: 0 }]),
-        }),
-      });
-
-      (db.select as jest.Mock).mockImplementation(selectMock);
-
       await expect(service.ingestEvent(dto)).rejects.toThrow(HttpException);
       const error = await service.ingestEvent(dto).catch((e) => e);
       expect(error.getStatus()).toBe(HttpStatus.BAD_REQUEST);
+      expect(repository.insertEvent).not.toHaveBeenCalled();
     });
 
     it('should reject when rate limit exceeded (100 events in 1 hour)', async () => {
@@ -145,19 +123,12 @@ describe('DesktopTelemetryService', () => {
         code: 'success',
       };
 
-      // The service asks the database for a COUNT rather than the rows, so the
-      // mock resolves to a single count row — the shape drizzle really returns.
-      const selectMock = jest.fn().mockReturnValue({
-        from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue([{ count: 100 }]),
-        }),
-      });
-
-      (db.select as jest.Mock).mockImplementation(selectMock);
+      repository.countEventsSince.mockResolvedValue(100);
 
       await expect(service.ingestEvent(dto)).rejects.toThrow(HttpException);
       const error = await service.ingestEvent(dto).catch((e) => e);
       expect(error.getStatus()).toBe(HttpStatus.TOO_MANY_REQUESTS);
+      expect(repository.insertEvent).not.toHaveBeenCalled();
     });
   });
 });
