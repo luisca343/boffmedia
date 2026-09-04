@@ -5,6 +5,8 @@ import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/user
 import { PasswordService } from './password.service';
 import { MailService } from '@api/mail/mail.service';
 import { PasswordResetTokensRepository } from './repositories/password-reset-tokens.repository';
+import { AuditService } from '@api/_repositories/audit.service';
+import { AUDIT_SUBJECT } from '@/_db/schema/BoffMediaEvents';
 
 const TOKEN_TTL_MS = 60 * 60 * 1000; // 1 hour
 
@@ -16,6 +18,7 @@ export class PasswordResetService {
     private readonly passwordService: PasswordService,
     private readonly mail: MailService,
     private readonly logger: Logger,
+    private readonly audit: AuditService,
   ) {}
 
   private hash(token: string): string {
@@ -86,6 +89,18 @@ export class PasswordResetService {
     // Invalidate all outstanding web sessions: password reset signs the user out everywhere.
     await this.usersRepository.bumpSessionVersion(row.userId);
     await this.tokens.markUsed(row.id);
+    // `actor` is the account itself: a reset is completed by whoever holds the
+    // emailed token, and no authenticated principal exists on this route. The
+    // distinction from `user.password_change` is the point — a reset means the
+    // token was used, which is what an account-takeover review looks for.
+    await this.audit.record({
+      domain: 'boffmedia',
+      subjectType: AUDIT_SUBJECT.USER,
+      subjectId: row.userId,
+      action: 'user.password_reset',
+      actor: row.userId,
+      metadata: { sessionsRevoked: true, via: 'reset-token' },
+    });
 
     const user = await this.usersRepository.findUserById(row.userId);
     return { success: true, username: user?.username ?? '' };

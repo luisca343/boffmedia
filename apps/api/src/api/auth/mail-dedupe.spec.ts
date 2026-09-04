@@ -7,6 +7,7 @@ import { EmailVerificationsRepository } from './repositories/email-verifications
 import { PasswordResetService } from './password-reset.service';
 import { PasswordResetTokensRepository } from './repositories/password-reset-tokens.repository';
 import { PasswordService } from './password.service';
+import { AuditService } from '@api/_repositories/audit.service';
 
 /**
  * `outbox_dedupe_uq` is UNIQUE over every row whatever its status, so a mail
@@ -68,6 +69,7 @@ describe('transactional mail dedupe keys', () => {
       const module = await Test.createTestingModule({
         providers: [
           PasswordResetService,
+          { provide: AuditService, useValue: { record: jest.fn() } },
           { provide: PasswordResetTokensRepository, useValue: tokens },
           {
             provide: BoffMediaUsersRepository,

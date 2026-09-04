@@ -19,6 +19,8 @@ import {
   UnauthorizedError,
 } from '@/common/errors/domain-error';
 import { ApiErrorCode } from '@/common/errors/error-codes.generated';
+import { AuditService } from '@api/_repositories/audit.service';
+import { AUDIT_SUBJECT } from '@/_db/schema/BoffMediaEvents';
 
 export interface UserCreationResult {
   user: BoffMediaUserSafe;
@@ -100,6 +102,7 @@ export class BoffMediaUsersManagementService {
 
     private readonly usersRepository: BoffMediaUsersRepository,
     private readonly passwordService: PasswordService,
+    private readonly audit: AuditService,
   ) {}
 
   // ==================== USER CREATION ====================
@@ -521,6 +524,18 @@ export class BoffMediaUsersManagementService {
     await this.usersRepository.updateUser(id, { password: hashed });
     // Invalidate all outstanding web sessions: password change signs the user out everywhere.
     await this.usersRepository.bumpSessionVersion(id);
+    // Audited here rather than in `bumpSessionVersion`: the repository knows a
+    // counter moved, not why. Password change, password reset and an explicit
+    // sign-out-everywhere all bump it, and telling them apart afterwards is the
+    // entire point of the row. Never throws — see AuditService.
+    await this.audit.record({
+      domain: 'boffmedia',
+      subjectType: AUDIT_SUBJECT.USER,
+      subjectId: id,
+      action: 'user.password_change',
+      actor: id,
+      metadata: { sessionsRevoked: true },
+    });
     return { success: true };
   }
 

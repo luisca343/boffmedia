@@ -84,6 +84,23 @@ jobs:
       - name: tools-battlesim
         run: pnpm --filter @boffmedia/tools-battlesim test
 
+      # The four packages whose suites landed with the tool-coverage pass. They
+      # are listed one step per package for the same reason as the rest, and
+      # they are listed AT ALL because a suite absent from this file is a suite
+      # that only ever runs on the machine that wrote it. scripts/check-ci-coverage.mjs
+      # now fails the lint chain if a test-bearing package goes missing here.
+      - name: tool-kit
+        run: pnpm --filter @boffmedia/tool-kit test
+
+      - name: tools-pokemon
+        run: pnpm --filter @boffmedia/tools-pokemon test
+
+      - name: tools-misc
+        run: pnpm --filter @boffmedia/tools-misc test
+
+      - name: tools-mhwilds
+        run: pnpm --filter @boffmedia/tools-mhwilds test
+
       - name: desktop (renderer)
         run: pnpm --filter desktop test
 

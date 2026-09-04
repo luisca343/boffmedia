@@ -256,6 +256,8 @@ export function BackupsTab({ slug, packName }: { slug: string; packName: string 
           </ul>
         )}
         <Divider label={tis("costDivider")} className="my-4" />
+        {/* xss-ok: an i18n value from the desktop catalogue, not user content.
+            The HTML is the point — the warning bolds the disk-cost figure. */}
         <p className="text-xs text-txt-dim" dangerouslySetInnerHTML={{ __html: tis("costWarning") }} />
       </Panel>
     </div>

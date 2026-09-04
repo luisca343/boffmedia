@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MySql2Database, drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
+import { instrumentPool } from '@/_utils/metrics/db-metrics';
 
 export const DRIZZLE = Symbol('DRIZZLE');
 
@@ -38,6 +39,20 @@ export const DRIZZLE = Symbol('DRIZZLE');
           // pool can replace the socket.
           enableKeepAlive: true,
           keepAliveInitialDelay: 10_000,
+        });
+
+        // Wrapped before drizzle ever sees it, so every query drizzle issues —
+        // and every raw one a repository issues against the same pool — lands
+        // in the histogram. A7: the HTTP metrics could show a slow route but
+        // never say which query made it slow.
+        //
+        // The threshold is configurable because "slow" is deployment-specific:
+        // 200ms is alarming on a local socket and unremarkable across a region.
+        instrumentPool(pool, {
+          slowQueryMs: parseInt(
+            configService.get<string>('SLOW_QUERY_MS') ?? '500',
+            10,
+          ),
         });
 
         return drizzle(pool) as MySql2Database;

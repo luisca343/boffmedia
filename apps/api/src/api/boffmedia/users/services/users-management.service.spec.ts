@@ -3,6 +3,7 @@ import { Logger } from 'nestjs-pino';
 import { BoffMediaUsersManagementService } from './users-management.service';
 import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
 import { PasswordService } from '@api/auth/password.service';
+import { AuditService } from '@api/_repositories/audit.service';
 
 const mockRepo = {
   checkMultipleFieldsExist: jest.fn(),
@@ -53,6 +54,10 @@ const mockFullUser = {
 describe('BoffMediaUsersManagementService', () => {
   let service: BoffMediaUsersManagementService;
 
+  // The service records `user.password_change`; AuditService never throws by
+  // contract, so a bare jest.fn() is a faithful stand-in.
+  const mockAudit = { record: jest.fn() };
+
   beforeEach(async () => {
     jest.clearAllMocks();
     const module: TestingModule = await Test.createTestingModule({
@@ -61,6 +66,7 @@ describe('BoffMediaUsersManagementService', () => {
         { provide: Logger, useValue: mockLogger },
         { provide: BoffMediaUsersRepository, useValue: mockRepo },
         { provide: PasswordService, useValue: mockPasswordService },
+        { provide: AuditService, useValue: mockAudit },
       ],
     }).compile();
 
@@ -318,6 +324,50 @@ describe('BoffMediaUsersManagementService', () => {
         expect.objectContaining({ password: '$hashed$' }),
       );
       expect(mockRepo.bumpSessionVersion).toHaveBeenCalledWith(1);
+    });
+
+    it('writes a user.password_change audit row naming the account', async () => {
+      mockRepo.findUserById.mockResolvedValue(mockUser);
+      mockRepo.findFullUserByUsernameWithPassword.mockResolvedValue(
+        mockFullUser,
+      );
+      mockPasswordService.verifyPassword.mockResolvedValue(true);
+      mockPasswordService.validatePassword.mockReturnValue({
+        isValid: true,
+        errors: [],
+        strength: 'strong',
+      });
+      mockRepo.updateUser.mockResolvedValue(mockUser);
+      mockRepo.bumpSessionVersion.mockResolvedValue(undefined);
+
+      await service.changePassword(1, 'OldPass1!', 'NewPass1!');
+
+      // The action string is asserted literally: it is what an incident review
+      // greps for, so renaming it is a breaking change, not a refactor.
+      expect(mockAudit.record).toHaveBeenCalledWith(
+        expect.objectContaining({
+          domain: 'boffmedia',
+          subjectType: 'user',
+          subjectId: 1,
+          action: 'user.password_change',
+          actor: 1,
+        }),
+      );
+    });
+
+    it('records no audit row when the current password is wrong', async () => {
+      mockRepo.findUserById.mockResolvedValue(mockUser);
+      mockRepo.findFullUserByUsernameWithPassword.mockResolvedValue(
+        mockFullUser,
+      );
+      mockPasswordService.verifyPassword.mockResolvedValue(false);
+
+      await expect(
+        service.changePassword(1, 'WrongPass1!', 'NewPass1!'),
+      ).rejects.toThrow();
+
+      // A failed attempt must not look like a successful change in the trail.
+      expect(mockAudit.record).not.toHaveBeenCalled();
     });
 
     it('rejects invalid new password without bumping session version', async () => {

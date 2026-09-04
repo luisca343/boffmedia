@@ -3,6 +3,7 @@ import { LoggerModule } from '@api/_utils/logger/logger.module';
 import { ResponseModule } from '@api/_utils/response/response.module';
 
 import { MyrientScrapeService } from './services/myrient.service';
+import { ScrapeHealthService } from './services/scrape-health.service';
 import { MangaBrowserService } from './services/manga/manga-browser.service';
 import { MangaScraperRegistry } from './services/manga/manga-registry.service';
 import { MangaLibraryService } from './services/manga/manga-library.service';
@@ -18,6 +19,8 @@ import { ScrapeController } from './scrape.controller';
   imports: [LoggerModule, ResponseModule],
   controllers: [ScrapeController],
   providers: [
+    // Shared by every scraper in this module; must be constructed before them.
+    ScrapeHealthService,
     MyrientScrapeService,
     // Manga config (no dependencies — must come first)
     MangaConfigService,
@@ -31,6 +34,6 @@ import { ScrapeController } from './scrape.controller';
     MangaCronService,
     ScrapeFacadeService,
   ],
-  exports: [ScrapeFacadeService],
+  exports: [ScrapeFacadeService, ScrapeHealthService],
 })
 export class ScrapeModule {}

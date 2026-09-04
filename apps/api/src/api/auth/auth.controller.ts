@@ -8,6 +8,8 @@ import {
   Req,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { AuditService } from '@api/_repositories/audit.service';
+import { AUDIT_SUBJECT } from '@/_db/schema/BoffMediaEvents';
 import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import {
   ApiTags,
@@ -55,6 +57,7 @@ export class AuthController {
     private readonly passwordResetService: PasswordResetService,
     private readonly emailVerificationService: EmailVerificationService,
     private readonly usersRepository: BoffMediaUsersRepository,
+    private readonly audit: AuditService,
   ) {}
 
   @Post('login')
@@ -218,6 +221,14 @@ export class AuthController {
   })
   async signoutEverywhere(@CurrentUser() user: AuthPrincipal) {
     await this.usersRepository.bumpSessionVersion(user.userId);
+    await this.audit.record({
+      domain: 'boffmedia',
+      subjectType: AUDIT_SUBJECT.USER,
+      subjectId: user.userId,
+      action: 'user.sessions_revoked',
+      actor: user.userId,
+      metadata: { reason: 'signout-everywhere' },
+    });
     return { success: true };
   }
 }

@@ -12,6 +12,7 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
 import { Reflector } from '@nestjs/core';
 import { BoffMediaUsersRepository } from '@api/boffmedia/users/repositories/users.repository';
+import { AuditService } from '@api/_repositories/audit.service';
 
 const mockLogger = {
   log: jest.fn(),
@@ -67,6 +68,9 @@ describe('AuthController — integration (ValidationPipe + GlobalExceptionFilter
           provide: BoffMediaUsersRepository,
           useValue: mockUsersRepository,
         },
+        // Same reasoning: the route records `user.sessions_revoked` alongside
+        // the bump, and AuditService is contractually silent on failure.
+        { provide: AuditService, useValue: { record: jest.fn() } },
         ResponseInterceptor,
         Reflector,
       ],

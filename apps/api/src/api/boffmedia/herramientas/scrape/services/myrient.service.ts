@@ -1,4 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import { ScrapeHealthService } from './scrape-health.service';
 import * as cheerio from 'cheerio';
 import { access, mkdir, readdir, stat } from 'fs/promises';
 import * as path from 'path';
@@ -184,6 +189,8 @@ async function runWithConcurrency<T>(
 @Injectable()
 export class MyrientScrapeService {
   private readonly logger = new Logger(MyrientScrapeService.name);
+
+  constructor(private readonly health: ScrapeHealthService) {}
 
   /**
    * Returns the files already downloaded locally for a given console,
@@ -432,6 +439,31 @@ export class MyrientScrapeService {
 
       entries.push({ name, link, size });
     });
+
+    // Drift check. The candidate count MUST NOT reuse the row selector above,
+    // or it would agree with it by construction and could never disagree: it
+    // counts file-looking anchors anywhere in the document, which survives any
+    // change to the table structure that the row-scoped pass depends on.
+    const candidates = $('a[href]')
+      .toArray()
+      .filter((el) => {
+        const href = $(el).attr('href') ?? '';
+        if (!href || href.endsWith('/') || href === '../' || href === './') {
+          return false;
+        }
+        // A file, not a nav link: something after the last dot in the last path
+        // segment, and not an anchor or query-only href.
+        const leaf = href.split('/').pop() ?? '';
+        return !href.startsWith('#') && !href.startsWith('?') && /[^.]\.[A-Za-z0-9]{2,5}$/.test(leaf);
+      }).length;
+
+    if (this.health.record({ source: 'myrient', url, extracted: entries.length, candidates })) {
+      // Answering "no games" here would be a lie the user cannot see through.
+      throw new ServiceUnavailableException(
+        'The Myrient catalogue could not be read: the source page structure has changed. ' +
+          'This is a scraper problem, not an empty directory.',
+      );
+    }
 
     return entries;
   }

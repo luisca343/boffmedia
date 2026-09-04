@@ -169,8 +169,8 @@ export function TwoFactorScreen() {
       <AuthShell title={t("enrolTitle")} subtitle={t("enrolLead")}>
         {enrolment ? (
           <>
-            {/* The QR arrives from the API as an SVG string so no client needs a
-                QR encoder. It is server-generated markup, never user content. */}
+            {/* xss-ok: the QR arrives from the API as an SVG string so no client
+                needs a QR encoder. Server-generated markup, never user content. */}
             <div
               className="mx-auto w-[12rem] bg-white p-2"
               dangerouslySetInnerHTML={{ __html: enrolment.qr_svg }}
