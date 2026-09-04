@@ -299,12 +299,28 @@ export class ScrapeController {
     res.setHeader('Connection', 'keep-alive');
     res.flushHeaders();
 
-    for await (const chunk of this.scrapeFacadeService.streamDownloadSelected(
-      dto,
-    )) {
-      res.write(chunk);
+    // The user's Cancel is an aborted fetch, which arrives here as nothing more
+    // than a closed socket — so THIS is where a cancel becomes real. Without it
+    // the browser stopped listening and the server carried on pulling gigabytes
+    // for nobody, which is why "cancel" used to only hide the UI.
+    const aborter = new AbortController();
+    const onClose = () => aborter.abort();
+    res.on('close', onClose);
+
+    try {
+      for await (const chunk of this.scrapeFacadeService.streamDownloadSelected(
+        dto,
+        aborter.signal,
+      )) {
+        // A disconnected client makes every further write a no-op at best and
+        // an EPIPE at worst; stop rather than keep formatting frames for it.
+        if (res.writableEnded || aborter.signal.aborted) break;
+        res.write(chunk);
+      }
+    } finally {
+      res.off('close', onClose);
+      if (!res.writableEnded) res.end();
     }
-    res.end();
   }
 
   // ==================== MANGA ====================

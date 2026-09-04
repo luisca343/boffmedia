@@ -32,6 +32,7 @@ import {
   toolOutbox,
   useToolOnline,
   useToolSession,
+  useToolSync,
 } from "@boffmedia/tool-kit"
 
 import { TCGP_NS, useLocale, useToolT } from "../i18n"
@@ -46,6 +47,26 @@ const COLLECTION = "collection"
 /** Documents are keyed by whose collection they are, so signing in as someone
  *  else on a shared machine cannot show the previous player's cards. */
 const OWN = "own"
+
+/**
+ * What the last reconcile silently changed under the player.
+ *
+ * The merge rule below is last-writer-wins with the SERVER as the writer: a
+ * card with no pending local write takes the server's number, full stop. That
+ * rule is fine — it is what "another device edited this" has to mean without a
+ * per-card version, and inventing a merge would be worse. What was not fine is
+ * that it happened with no trace: a count edited on this device before signing
+ * in, or on a second device, was simply replaced and nothing said so. This is
+ * the receipt.
+ */
+export interface CollectionOverride {
+  /** How many cards took the server's value over a different local one. */
+  count: number
+  /** Up to a handful of card ids, for a UI that wants to name them. */
+  cardIds: string[]
+  /** When the server's copy won, so "which side won and when" is answerable. */
+  at: number
+}
 
 export interface RecentUpdate {
   id: string | number
@@ -90,6 +111,18 @@ export function useCollection({ username, byId }: UseCollectionOpts) {
   const [recent, setRecent] = useState<RecentUpdate[]>([])
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [override, setOverride] = useState<CollectionOverride | null>(null)
+
+  // The queue's own state, with a bounded retry behind it. Before this the tool
+  // could only report a COUNT: a player looking at "3 changes not synced" had
+  // no way to tell whether they were on their way, waiting for a network, being
+  // retried, or dead — and nothing was retrying them anyway except the next
+  // `online` event.
+  const sync = useToolSync(NS)
+  // Destructured because `save` below needs it: the view object is memoised but
+  // still changes whenever the status does, and listing it as a dependency
+  // would hand every consumer of `save` a new identity on every sync tick.
+  const { clearRejection } = sync
 
   // ── local first ───────────────────────────────────────────────────────────
   // Render what is on disk before anything is asked of the network, so the
@@ -134,10 +167,28 @@ export function useCollection({ username, byId }: UseCollectionOpts) {
         if (local[cardId] !== undefined) merged[cardId] = local[cardId]
         else delete merged[cardId]
       }
+
+      // Everything the server just won. Only cards this device actually HELD a
+      // different number for — an absent local value is a first sync, not a
+      // conflict, and reporting those would cry wolf on every fresh install.
+      const lost = Object.keys(local).filter(
+        (cardId) => !queued.has(cardId) && local[cardId] !== merged[cardId],
+      )
+      setOverride(
+        lost.length > 0
+          ? { count: lost.length, cardIds: lost.slice(0, 5), at: Date.now() }
+          : null,
+      )
+
       void toolDb(NS).put(COLLECTION, docId, merged)
       return merged
     })
   }, [target, docId])
+
+  /** The player has read the notice. It is dismissible rather than a toast
+   *  because the data is already gone — it has to survive long enough to be
+   *  seen, and a toast on a background refresh would not. */
+  const dismissOverride = useCallback(() => setOverride(null), [])
 
   useEffect(() => {
     if (!authReady || !target || !online) return
@@ -234,7 +285,12 @@ export function useCollection({ username, byId }: UseCollectionOpts) {
             // to produce is now a lie. Said plainly rather than swallowed.
             toast.error(t("app.coleccion.syncRejected", { detail: rejection.message }))
           }
-          if (result.rejected.length) await mergeServer().catch(() => {})
+          if (result.rejected.length) {
+            await mergeServer().catch(() => {})
+            // Reconciled, so the status must stop reporting a refusal it has
+            // already dealt with.
+            clearRejection()
+          }
         }
       }
 
@@ -271,6 +327,7 @@ export function useCollection({ username, byId }: UseCollectionOpts) {
     online,
     byId,
     mergeServer,
+    clearRejection,
     t,
   ])
 
@@ -288,5 +345,8 @@ export function useCollection({ username, byId }: UseCollectionOpts) {
     editable,
     authReady,
     loggedIn: !!sessionUserId,
+    sync,
+    override,
+    dismissOverride,
   }
 }

@@ -62,8 +62,23 @@ export {
 } from "./nav-guard";
 export type { ToolNavGuardFn, ToolNavIntent } from "./nav-guard";
 
-export { useToolOnline, useToolPending, useToolSession } from "./hooks";
-export type { ToolSessionView } from "./hooks";
+export { useToolOnline, useToolPending, useToolSession, useToolSync } from "./hooks";
+export type { ToolSessionView, ToolSyncView } from "./hooks";
+
+export {
+  SYNC_RETRY,
+  createRetryScheduler,
+  deriveSyncStatus,
+  retryDelayMs,
+} from "./sync-policy";
+export type {
+  DeriveSyncStatusInput,
+  RetryScheduler,
+  RetrySchedulerOptions,
+  SyncRetryPolicy,
+  ToolSyncState,
+  ToolSyncStatus,
+} from "./sync-policy";
 
 export { getTool, isToolVisibleTo, listTools, registerTools } from "./registry";
 export type { ToolDomain, ToolLayout, ToolManifest } from "./registry";

@@ -132,10 +132,13 @@ export class ScrapeFacadeService {
     }
   }
 
+  /** `signal` is the HTTP client's disconnect — see the controller. Passed
+   *  through untouched so a cancel reaches the sockets doing the downloading. */
   streamDownloadSelected(
     dto: DownloadSelectedGamesDto,
+    signal?: AbortSignal,
   ): AsyncGenerator<string> {
-    return this.myrientScrapeService.streamDownloadSelected(dto);
+    return this.myrientScrapeService.streamDownloadSelected(dto, signal);
   }
 
   // ==================== MANGA SCRAPER ====================

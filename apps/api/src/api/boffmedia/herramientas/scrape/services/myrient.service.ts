@@ -1,18 +1,21 @@
 import { Injectable, Logger } from '@nestjs/common';
-import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { createWriteStream } from 'fs';
 import { access, mkdir, readdir, stat } from 'fs/promises';
 import * as path from 'path';
-import { pipeline } from 'stream/promises';
 import { laboonPath } from '@/config/paths';
 import { safeFetch, safeFetchStream } from '@api/_utils/http/safe-fetch';
+import {
+  DEFAULT_IDLE_TIMEOUT_MS,
+  downloadToFile,
+  type StreamedDownloadOutcome,
+} from './streamed-download';
 import { GameFileEntry } from '../entities/game-file.entity';
 import { EuropeAggregateResult } from '../entities/europe-aggregate.entity';
 import { DownloadResult } from '../entities/download-result.entity';
 import {
   BulkDownloadResult,
   FileDownloadEntry,
+  FileDownloadStatus,
 } from '../entities/bulk-download-result.entity';
 import {
   LocalGameEntry,
@@ -82,6 +85,79 @@ async function fileExists(filePath: string): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+/** How often the SSE stream reports that an in-flight transfer is (or is not)
+ *  still receiving bytes. Short enough that a stall is visible long before the
+ *  90s watchdog fires, long enough not to be its own traffic. */
+const TICK_INTERVAL_MS = 3_000;
+
+/**
+ * A frame buffer between the download job and the SSE generator.
+ *
+ * The generator used to BE the job, which meant it could not emit anything
+ * while awaiting a batch — and a batch is where all the time goes. Splitting
+ * them lets the job push heartbeats from inside a transfer while the generator
+ * does nothing but drain.
+ */
+class FrameQueue {
+  private readonly items: string[] = [];
+  private waiter: (() => void) | null = null;
+  private closed = false;
+
+  push(frame: Record<string, unknown>): void {
+    if (this.closed) return;
+    this.items.push(`data: ${JSON.stringify(frame)}
+
+`);
+    this.wake();
+  }
+
+  close(): void {
+    this.closed = true;
+    this.wake();
+  }
+
+  private wake(): void {
+    const waiter = this.waiter;
+    this.waiter = null;
+    waiter?.();
+  }
+
+  async *drain(): AsyncGenerator<string> {
+    for (;;) {
+      // Drain everything buffered before sleeping: a `close()` that lands with
+      // frames still queued must not lose them.
+      while (this.items.length) yield this.items.shift() as string;
+      if (this.closed) return;
+      await new Promise<void>((resolve) => {
+        this.waiter = resolve;
+      });
+    }
+  }
+}
+
+/**
+ * Counts one batch's outcomes.
+ *
+ * Shared rather than inlined twice because the two bulk routes drifting on how
+ * they count is exactly the class of bug that makes a summary lie.
+ */
+function tally(results: FileDownloadEntry[]) {
+  const count = (status: FileDownloadStatus) =>
+    results.filter((r) => r.status === status).length;
+  return {
+    downloaded: count('downloaded'),
+    skipped: count('skipped'),
+    failed: count('failed'),
+    stalled: count('stalled'),
+    cancelled: count('cancelled'),
+    // Skipped files count toward the on-disk total: they ARE on disk. A stalled
+    // or cancelled one contributes nothing — its partial bytes were deleted.
+    totalDownloadedSizeBytes: results
+      .filter((r) => r.status === 'downloaded' || r.status === 'skipped')
+      .reduce((sum, r) => sum + (r.sizeBytes ?? 0), 0),
+  };
 }
 
 /**
@@ -371,7 +447,7 @@ export class MyrientScrapeService {
    * @param url  Full URL to the zip/cia/3ds file to download (must be from Myrient).
    * @returns    Metadata about the saved file.
    */
-  async downloadGame(url: string): Promise<DownloadResult> {
+  async downloadGame(url: string, signal?: AbortSignal): Promise<DownloadResult> {
     const townPath = laboonPath('juegos', 'myrient', '3DS');
     await mkdir(townPath, { recursive: true });
 
@@ -380,21 +456,40 @@ export class MyrientScrapeService {
     const filePath = path.join(townPath, filename);
 
     // Fetch using safe-fetch to enforce SSRF protection: HTTPS-only, host allowlist,
-    // and IP range validation. For streaming downloads, callers are responsible for
-    // piping to a stream that enforces the byte limit.
-    const response = await safeFetchStream(url, {
-      allowedHosts: ['myrient.erista.me'],
-      timeout: 0, // no timeout – files can be several GiB
-      maxBytes: 50_000_000_000, // 50 GB limit for game files
-      axiosConfig: {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)',
-        },
+    // and IP range validation. `timeout: 0` there is NOT "no timeout": axios'
+    // timeout is a time-to-HEADERS budget and does nothing once a multi-GiB body
+    // starts flowing. The guard that matters is the IDLE timeout inside
+    // `downloadToFile`, which also keeps a dead transfer from leaving a
+    // truncated file behind under the final name.
+    const result = await downloadToFile({
+      url,
+      filePath,
+      signal,
+      open: async (target, streamSignal) => {
+        const response = await safeFetchStream(target, {
+          allowedHosts: ['myrient.erista.me'],
+          timeout: 0, // no header timeout – a busy mirror can be slow to start
+          maxBytes: 50_000_000_000, // 50 GB limit for game files
+          axiosConfig: {
+            headers: {
+              'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)',
+            },
+            signal: streamSignal,
+          },
+        });
+        return response.data;
       },
     });
 
-    const writeStream = createWriteStream(filePath);
-    await pipeline(response.data, writeStream);
+    if (result.outcome !== 'downloaded') {
+      // This single-file route answers with a DownloadResult that has no status
+      // field, so the only way to tell the three failures apart downstream is to
+      // throw — with the outcome word in the message, deliberately.
+      throw new Error(
+        `Download ${result.outcome}: ${result.error ?? filename} ` +
+          `(${formatBytes(result.receivedBytes)} received)`,
+      );
+    }
 
     const { size: sizeBytes } = await stat(filePath);
 
@@ -405,6 +500,78 @@ export class MyrientScrapeService {
       sizeBytes,
       size: formatBytes(sizeBytes),
     };
+  }
+
+  /**
+   * The one place a catalogue entry becomes a file on disk.
+   *
+   * All three bulk paths (blocking-all, blocking-selected, SSE-selected) funnel
+   * through here so the idle timeout, the cancel and the partial-file cleanup
+   * cannot drift apart between them — three copy-pasted `axios.get` + `pipeline`
+   * blocks is how all three came to have no timeout at all.
+   */
+  private async fetchOne(
+    entry: GameFileEntry,
+    saveDir: string,
+    prefix: string,
+    options: {
+      signal?: AbortSignal;
+      onProgress?: (receivedBytes: number) => void;
+    } = {},
+  ): Promise<FileDownloadEntry> {
+    const filename = decodeURIComponent(
+      entry.link.split('/').pop() ?? entry.name,
+    );
+    const filePath = path.join(saveDir, filename);
+
+    // Trusting "it is on disk, therefore it is complete" is only safe now that a
+    // failed transfer can no longer leave a truncated file under the final name.
+    // Before `.part`, a stall wrote a broken ROM that every later run skipped.
+    if (await fileExists(filePath)) {
+      const { size: sizeBytes } = await stat(filePath);
+      this.logger.log(`${prefix} SKIP (already exists) ${filename}`);
+      return {
+        filename,
+        status: 'skipped',
+        size: formatBytes(sizeBytes),
+        sizeBytes,
+      };
+    }
+
+    // A file the batch never reached because the caller gave up is `cancelled`,
+    // not `failed`: nothing went wrong with it.
+    if (options.signal?.aborted) return { filename, status: 'cancelled' };
+
+    this.logger.log(
+      `${prefix} Downloading ${filename} (${entry.size || 'unknown size'}) — ${entry.link}`,
+    );
+
+    const result = await downloadToFile({
+      url: entry.link,
+      filePath,
+      signal: options.signal,
+      idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
+      onProgress: options.onProgress,
+    });
+
+    if (result.outcome === 'downloaded') {
+      const { size: sizeBytes } = await stat(filePath);
+      this.logger.log(`${prefix} OK ${filename} → ${formatBytes(sizeBytes)}`);
+      return {
+        filename,
+        status: 'downloaded',
+        size: formatBytes(sizeBytes),
+        sizeBytes,
+      };
+    }
+
+    const status: Exclude<StreamedDownloadOutcome, 'downloaded'> = result.outcome;
+    this.logger.error(
+      `${prefix} ${status.toUpperCase()} ${filename}: ${result.error ?? '—'} ` +
+        `(${formatBytes(result.receivedBytes)} received, partial file discarded) — ` +
+        `URL: ${entry.link}`,
+    );
+    return { filename, status, error: result.error };
   }
 
   /**
@@ -421,6 +588,7 @@ export class MyrientScrapeService {
    */
   async downloadAllGames(
     dto: DownloadAllGamesDto,
+    signal?: AbortSignal,
   ): Promise<BulkDownloadResult> {
     const catalog = CONSOLE_CATALOG[dto.console];
     const regions = dto.regions ?? [];
@@ -444,79 +612,26 @@ export class MyrientScrapeService {
 
     // 4. Build one download task per matched entry
     const tasks = matched.map(
-      (entry, i) => async (): Promise<FileDownloadEntry> => {
-        const filename = decodeURIComponent(
-          entry.link.split('/').pop() ?? entry.name,
-        );
-        const filePath = path.join(saveDir, filename);
-        const prefix = `[${catalog.label}] [${i + 1}/${matched.length}]`;
-
-        // Skip if already on disk
-        if (await fileExists(filePath)) {
-          const { size: sizeBytes } = await stat(filePath);
-          this.logger.log(`${prefix} SKIP (already exists) ${filename}`);
-          return {
-            filename,
-            status: 'skipped',
-            size: formatBytes(sizeBytes),
-            sizeBytes,
-          };
-        }
-
-        this.logger.log(
-          `${prefix} Downloading ${filename} (${entry.size || 'unknown size'}) — ${entry.link}`,
-        );
-        try {
-          const response = await axios.get<NodeJS.ReadableStream>(entry.link, {
-            responseType: 'stream',
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)',
-            },
-            timeout: 0,
-          });
-
-          const writeStream = createWriteStream(filePath);
-          await pipeline(response.data, writeStream);
-
-          const { size: sizeBytes } = await stat(filePath);
-          this.logger.log(
-            `${prefix} OK ${filename} → ${formatBytes(sizeBytes)}`,
-          );
-          return {
-            filename,
-            status: 'downloaded',
-            size: formatBytes(sizeBytes),
-            sizeBytes,
-          };
-        } catch (err: unknown) {
-          const errMsg = err instanceof Error ? err.message : String(err);
-          this.logger.error(
-            `${prefix} FAILED ${filename}: ${errMsg} — URL: ${entry.link}`,
-          );
-          return {
-            filename,
-            status: 'failed',
-            error: errMsg,
-          };
-        }
-      },
+      (entry, i) => (): Promise<FileDownloadEntry> =>
+        this.fetchOne(
+          entry,
+          saveDir,
+          `[${catalog.label}] [${i + 1}/${matched.length}]`,
+          { signal },
+        ),
     );
 
     // 5. Run with concurrency control
     const results = await runWithConcurrency(tasks, concurrency);
 
     // 6. Aggregate stats
-    const downloaded = results.filter((r) => r.status === 'downloaded').length;
-    const skipped = results.filter((r) => r.status === 'skipped').length;
-    const failed = results.filter((r) => r.status === 'failed').length;
-    const totalDownloadedSizeBytes = results
-      .filter((r) => r.status === 'downloaded' || r.status === 'skipped')
-      .reduce((sum, r) => sum + (r.sizeBytes ?? 0), 0);
+    const stats = tally(results);
 
     this.logger.log(
       `[${catalog.label}] Bulk download complete — ` +
-        `${downloaded} downloaded, ${skipped} skipped, ${failed} failed. ` +
-        `Total on-disk: ${formatBytes(totalDownloadedSizeBytes)}`,
+        `${stats.downloaded} downloaded, ${stats.skipped} skipped, ` +
+        `${stats.failed} failed, ${stats.stalled} stalled, ${stats.cancelled} cancelled. ` +
+        `Total on-disk: ${formatBytes(stats.totalDownloadedSizeBytes)}`,
     );
 
     return {
@@ -524,11 +639,8 @@ export class MyrientScrapeService {
       consoleLabel: catalog.label,
       regions,
       totalMatched: matched.length,
-      downloaded,
-      skipped,
-      failed,
-      totalDownloadedSize: formatBytes(totalDownloadedSizeBytes),
-      totalDownloadedSizeBytes,
+      ...stats,
+      totalDownloadedSize: formatBytes(stats.totalDownloadedSizeBytes),
       files: results,
     };
   }
@@ -538,15 +650,25 @@ export class MyrientScrapeService {
    *
    * Emits:
    *   { type: 'start',    total }
+   *   { type: 'active',   index, total, filename }            -- transfer began
+   *   { type: 'tick',     filename, receivedBytes, idleMs }   -- still alive (or not)
    *   { type: 'progress', index, total, filename, status, size?, sizeBytes?, error? }
-   *   { type: 'done',     downloaded, skipped, failed,
-   *                       totalDownloadedSize, totalDownloadedSizeBytes, console, consoleLabel }
+   *   { type: 'done',     downloaded, skipped, failed, stalled, cancelled, ... }
    *
-   * Files are processed in batches of `concurrency`. Each batch runs in parallel;
-   * results are yielded in submission order once the batch settles.
+   * The `active` and `tick` frames are why this is no longer a generator that
+   * simply awaits each batch. A batch of two multi-GiB files used to emit
+   * NOTHING for however long it ran, so a dead connection and a healthy one
+   * looked identical from the browser: a bar that had not moved. `tick` carries
+   * the byte count and the time since the last byte, so the UI can say "stalled"
+   * before the watchdog gives up, and `done` reports `cancelled` honestly when
+   * the caller hung up.
+   *
+   * `signal` is the client's disconnect. Without it, closing the tab left the
+   * server fetching gigabytes for a browser that would never read them.
    */
   async *streamDownloadSelected(
     dto: DownloadSelectedGamesDto,
+    signal?: AbortSignal,
   ): AsyncGenerator<string> {
     const catalog = CONSOLE_CATALOG[dto.console];
     const concurrency = Math.min(Math.max(dto.concurrency ?? 2, 1), 5);
@@ -559,107 +681,136 @@ export class MyrientScrapeService {
     const saveDir = laboonPath('juegos', 'Roms', catalog.localFolder);
     await mkdir(saveDir, { recursive: true });
 
-    yield `data: ${JSON.stringify({ type: 'start', total: selected.length })}\n\n`;
+    const frames = new FrameQueue();
+    frames.push({ type: 'start', total: selected.length });
 
-    let downloaded = 0,
-      skipped = 0,
-      failed = 0,
-      totalDownloadedSizeBytes = 0;
-    let globalIndex = 0;
+    // Live byte counters for whatever is in flight, so the ticker can report
+    // both progress and its absence. Cleared when a file settles.
+    const inFlight = new Map<
+      string,
+      { receivedBytes: number; lastByteAt: number }
+    >();
 
-    const downloadOne = async (
-      entry: GameFileEntry,
-      i: number,
-    ): Promise<FileDownloadEntry> => {
-      const filename = decodeURIComponent(
-        entry.link.split('/').pop() ?? entry.name,
-      );
-      const filePath = path.join(saveDir, filename);
-      const prefix = `[${catalog.label}] [${i + 1}/${selected.length}]`;
-
-      if (await fileExists(filePath)) {
-        const { size: sizeBytes } = await stat(filePath);
-        this.logger.log(`${prefix} SKIP ${filename}`);
-        return {
+    const ticker = setInterval(() => {
+      const now = Date.now();
+      for (const [filename, state] of inFlight) {
+        frames.push({
+          type: 'tick',
           filename,
-          status: 'skipped',
-          size: formatBytes(sizeBytes),
-          sizeBytes,
-        };
-      }
-
-      this.logger.log(`${prefix} Downloading ${filename} — ${entry.link}`);
-      try {
-        const response = await axios.get<NodeJS.ReadableStream>(entry.link, {
-          responseType: 'stream',
-          headers: {
-            'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)',
-          },
-          timeout: 0,
+          receivedBytes: state.receivedBytes,
+          idleMs: now - state.lastByteAt,
+          idleTimeoutMs: DEFAULT_IDLE_TIMEOUT_MS,
         });
-        const writeStream = createWriteStream(filePath);
-        await pipeline(response.data, writeStream);
-        const { size: sizeBytes } = await stat(filePath);
-        this.logger.log(`${prefix} OK ${filename} → ${formatBytes(sizeBytes)}`);
-        return {
-          filename,
-          status: 'downloaded',
-          size: formatBytes(sizeBytes),
-          sizeBytes,
-        };
-      } catch (err: unknown) {
-        const errMsg = err instanceof Error ? err.message : String(err);
-        this.logger.error(`${prefix} FAILED ${filename}: ${errMsg}`);
-        return {
-          filename,
-          status: 'failed',
-          error: errMsg,
-        };
       }
-    };
+    }, TICK_INTERVAL_MS);
+    ticker.unref?.();
 
-    // Process in batches of `concurrency`, yield each result in order after the batch settles
-    for (
-      let batchStart = 0;
-      batchStart < selected.length;
-      batchStart += concurrency
-    ) {
-      const batch = selected.slice(batchStart, batchStart + concurrency);
-      const batchResults = await Promise.all(
-        batch.map((entry, j) => downloadOne(entry, batchStart + j)),
-      );
+    // The job runs alongside the drain rather than inside it: a generator that
+    // awaits a whole batch before yielding cannot emit heartbeats DURING that
+    // batch, which was the original defect.
+    const job = (async () => {
+      let globalIndex = 0;
+      const settled: FileDownloadEntry[] = [];
 
-      for (const entry of batchResults) {
-        globalIndex++;
-        if (entry.status === 'downloaded') {
-          downloaded++;
-          totalDownloadedSizeBytes += entry.sizeBytes ?? 0;
-        } else if (entry.status === 'skipped') {
-          skipped++;
-          totalDownloadedSizeBytes += entry.sizeBytes ?? 0;
-        } else {
-          failed++;
+      for (
+        let batchStart = 0;
+        batchStart < selected.length;
+        batchStart += concurrency
+      ) {
+        const batch = selected.slice(batchStart, batchStart + concurrency);
+        const batchResults = await Promise.all(
+          batch.map((entry, j) => {
+            const index = batchStart + j;
+            const filename = decodeURIComponent(
+              entry.link.split('/').pop() ?? entry.name,
+            );
+            frames.push({
+              type: 'active',
+              index: index + 1,
+              total: selected.length,
+              filename,
+            });
+            inFlight.set(filename, {
+              receivedBytes: 0,
+              lastByteAt: Date.now(),
+            });
+            return this.fetchOne(
+              entry,
+              saveDir,
+              `[${catalog.label}] [${index + 1}/${selected.length}]`,
+              {
+                signal,
+                onProgress: (receivedBytes) => {
+                  const state = inFlight.get(filename);
+                  if (state) {
+                    state.receivedBytes = receivedBytes;
+                    state.lastByteAt = Date.now();
+                  }
+                },
+              },
+            ).finally(() => inFlight.delete(filename));
+          }),
+        );
+
+        for (const entry of batchResults) {
+          globalIndex++;
+          settled.push(entry);
+          frames.push({
+            type: 'progress',
+            index: globalIndex,
+            total: selected.length,
+            ...entry,
+          });
         }
 
-        yield `data: ${JSON.stringify({
-          type: 'progress',
-          index: globalIndex,
-          total: selected.length,
-          ...entry,
-        })}\n\n`;
+        // Stop starting NEW batches once the caller has gone. Files already in
+        // flight were aborted by the same signal inside `fetchOne`.
+        if (signal?.aborted) break;
       }
-    }
 
-    yield `data: ${JSON.stringify({
-      type: 'done',
-      console: dto.console,
-      consoleLabel: catalog.label,
-      downloaded,
-      skipped,
-      failed,
-      totalDownloadedSize: formatBytes(totalDownloadedSizeBytes),
-      totalDownloadedSizeBytes,
-    })}\n\n`;
+      // Anything the loop never reached is reported, not silently dropped — a
+      // summary that counts fewer files than were requested is a summary the
+      // user cannot reconcile with what they selected.
+      for (let i = settled.length; i < selected.length; i++) {
+        settled.push({
+          filename: decodeURIComponent(
+            selected[i].link.split('/').pop() ?? selected[i].name,
+          ),
+          status: 'cancelled',
+        });
+      }
+
+      const stats = tally(settled);
+      frames.push({
+        type: 'done',
+        console: dto.console,
+        consoleLabel: catalog.label,
+        ...stats,
+        totalDownloadedSize: formatBytes(stats.totalDownloadedSizeBytes),
+        aborted: signal?.aborted === true,
+      });
+    })();
+
+    try {
+      // A failure inside the job must still close the stream rather than hang
+      // the drain forever waiting for a frame that will never arrive.
+      void job
+        .catch((err: unknown) => {
+          this.logger.error(
+            `[${catalog.label}] Stream-download aborted: ` +
+              `${err instanceof Error ? err.message : String(err)}`,
+          );
+        })
+        // `.catch` first, then `.close`: closing off a still-rejected promise
+        // would turn a logged failure into an unhandled rejection that kills
+        // the process.
+        .finally(() => frames.close());
+
+      for await (const frame of frames.drain()) yield frame;
+    } finally {
+      clearInterval(ticker);
+      frames.close();
+    }
   }
 
   /**
@@ -675,6 +826,7 @@ export class MyrientScrapeService {
    */
   async downloadSelectedGames(
     dto: DownloadSelectedGamesDto,
+    signal?: AbortSignal,
   ): Promise<BulkDownloadResult> {
     const catalog = CONSOLE_CATALOG[dto.console];
     const concurrency = Math.min(Math.max(dto.concurrency ?? 2, 1), 5);
@@ -690,79 +842,26 @@ export class MyrientScrapeService {
 
     // Build one download task per selected entry
     const tasks = selected.map(
-      (entry, i) => async (): Promise<FileDownloadEntry> => {
-        const filename = decodeURIComponent(
-          entry.link.split('/').pop() ?? entry.name,
-        );
-        const filePath = path.join(saveDir, filename);
-        const prefix = `[${catalog.label}] [${i + 1}/${selected.length}]`;
-
-        // Skip if already on disk
-        if (await fileExists(filePath)) {
-          const { size: sizeBytes } = await stat(filePath);
-          this.logger.log(`${prefix} SKIP (already exists) ${filename}`);
-          return {
-            filename,
-            status: 'skipped',
-            size: formatBytes(sizeBytes),
-            sizeBytes,
-          };
-        }
-
-        this.logger.log(
-          `${prefix} Downloading ${filename} (${entry.size || 'unknown size'}) — ${entry.link}`,
-        );
-        try {
-          const response = await axios.get<NodeJS.ReadableStream>(entry.link, {
-            responseType: 'stream',
-            headers: {
-              'User-Agent': 'Mozilla/5.0 (compatible; FicusLabs-Scraper/1.0)',
-            },
-            timeout: 0,
-          });
-
-          const writeStream = createWriteStream(filePath);
-          await pipeline(response.data, writeStream);
-
-          const { size: sizeBytes } = await stat(filePath);
-          this.logger.log(
-            `${prefix} OK ${filename} → ${formatBytes(sizeBytes)}`,
-          );
-          return {
-            filename,
-            status: 'downloaded',
-            size: formatBytes(sizeBytes),
-            sizeBytes,
-          };
-        } catch (err: unknown) {
-          const errMsg = err instanceof Error ? err.message : String(err);
-          this.logger.error(
-            `${prefix} FAILED ${filename}: ${errMsg} — URL: ${entry.link}`,
-          );
-          return {
-            filename,
-            status: 'failed',
-            error: errMsg,
-          };
-        }
-      },
+      (entry, i) => (): Promise<FileDownloadEntry> =>
+        this.fetchOne(
+          entry,
+          saveDir,
+          `[${catalog.label}] [${i + 1}/${selected.length}]`,
+          { signal },
+        ),
     );
 
     // Run with concurrency control
     const results = await runWithConcurrency(tasks, concurrency);
 
     // Aggregate stats
-    const downloaded = results.filter((r) => r.status === 'downloaded').length;
-    const skipped = results.filter((r) => r.status === 'skipped').length;
-    const failed = results.filter((r) => r.status === 'failed').length;
-    const totalDownloadedSizeBytes = results
-      .filter((r) => r.status === 'downloaded' || r.status === 'skipped')
-      .reduce((sum, r) => sum + (r.sizeBytes ?? 0), 0);
+    const stats = tally(results);
 
     this.logger.log(
       `[${catalog.label}] Selected download complete — ` +
-        `${downloaded} downloaded, ${skipped} skipped, ${failed} failed. ` +
-        `Total on-disk: ${formatBytes(totalDownloadedSizeBytes)}`,
+        `${stats.downloaded} downloaded, ${stats.skipped} skipped, ` +
+        `${stats.failed} failed, ${stats.stalled} stalled, ${stats.cancelled} cancelled. ` +
+        `Total on-disk: ${formatBytes(stats.totalDownloadedSizeBytes)}`,
     );
 
     return {
@@ -770,11 +869,8 @@ export class MyrientScrapeService {
       consoleLabel: catalog.label,
       regions: [],
       totalMatched: selected.length,
-      downloaded,
-      skipped,
-      failed,
-      totalDownloadedSize: formatBytes(totalDownloadedSizeBytes),
-      totalDownloadedSizeBytes,
+      ...stats,
+      totalDownloadedSize: formatBytes(stats.totalDownloadedSizeBytes),
       files: results,
     };
   }

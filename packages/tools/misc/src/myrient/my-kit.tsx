@@ -125,6 +125,11 @@ const STATUS: Record<FileDownloadStatus, { icon: Parameters<typeof Icon>[0]["nam
   downloaded: { icon: "check", cls: "text-ok" },
   skipped: { icon: "swap", cls: "text-warn" },
   failed: { icon: "x", cls: "text-bad" },
+  // Warn, not bad: a stall is a dead mirror the user can simply try again,
+  // which is a different message from an error they have to read.
+  stalled: { icon: "alert", cls: "text-warn" },
+  // Dim, not red: nothing went wrong, the user asked for this.
+  cancelled: { icon: "minus", cls: "text-txt-dim" },
 }
 
 export function MyStatusIcon({ status }: { status: FileDownloadStatus }) {

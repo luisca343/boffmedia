@@ -3,7 +3,9 @@
 import { useMemo, useState } from "react"
 
 import { Button, Panel, SearchInput, Select, Toggle, Banner, Empty, Icon, ToolBar, ToolBarSpacer } from "@boffmedia/ui"
-import { useToolPending, useToolSession } from "@boffmedia/tool-kit"
+import { useToolSession } from "@boffmedia/tool-kit"
+import type { ToolSyncState, ToolSyncView } from "@boffmedia/tool-kit"
+import type { CollectionOverride } from "./useCollection"
 import type { TcgCard } from "./service"
 import type { TcgpData } from "./useTcgpCards"
 import { useBestPack } from "./useBestPack"
@@ -22,6 +24,73 @@ interface Collection {
   editable: boolean
   loggedIn: boolean
   recent: { id: string | number; cardId: string; count: number; at: string; cardName?: string }[]
+  sync: ToolSyncView
+  override: CollectionOverride | null
+  dismissOverride: () => void
+}
+
+/* ── sync status ───────────────────────────────────────────────────────────── */
+
+/** Tone and icon per state. Deliberately explicit rather than derived: `stuck`
+ *  and `rejected` are the only two that get a bad tone, because they are the
+ *  only two where the screen is showing something the server does not have and
+ *  will not get without the player doing something. */
+const SYNC_LOOK: Record<ToolSyncState, { tone: "ok" | "warn" | "bad" | "muted"; icon: "check" | "refresh" | "clock" | "alert" | "database" }> = {
+  "local-only": { tone: "muted", icon: "database" },
+  synced: { tone: "ok", icon: "check" },
+  syncing: { tone: "muted", icon: "refresh" },
+  queued: { tone: "warn", icon: "clock" },
+  retrying: { tone: "warn", icon: "refresh" },
+  stuck: { tone: "bad", icon: "alert" },
+  rejected: { tone: "bad", icon: "alert" },
+}
+
+const SYNC_TONE: Record<"ok" | "warn" | "bad" | "muted", string> = {
+  ok: "border-transparent bg-ok-soft text-ok",
+  warn: "border-transparent bg-warn-soft text-warn",
+  bad: "border-transparent bg-bad-soft text-bad",
+  muted: "border-line-2 bg-base-2 text-txt-muted",
+}
+
+/**
+ * What the queue is doing, in one line the player can act on.
+ *
+ * The old UI had a single warn banner that appeared when `pending > 0` and said
+ * nothing otherwise — so "synced" was indistinguishable from "not signed in"
+ * and from "eight failed attempts and giving up". Every state now has a word,
+ * and the one dead end (`stuck`) carries the way out.
+ */
+function SyncStatus({ sync, labels, retryLabel }: {
+  sync: ToolSyncView
+  labels: Record<ToolSyncState, string>
+  retryLabel: string
+}) {
+  const look = SYNC_LOOK[sync.state]
+  const dead = sync.state === "stuck" || sync.state === "rejected"
+  return (
+    <div className="mb-5 flex flex-wrap items-center gap-2">
+      <span className={"inline-flex items-center gap-1.5 border px-2 py-1 font-mono text-[0.625rem] font-semibold uppercase tracking-[0.06em] " + SYNC_TONE[look.tone]}>
+        <Icon
+          name={look.icon}
+          size={11}
+          className={sync.state === "syncing" ? "animate-spin motion-reduce:animate-none" : undefined}
+        />
+        {labels[sync.state]}
+      </span>
+      {/* The detail is the server's own error text — useful, but never the
+          whole message, because it is an HTTP string and not a sentence. */}
+      {dead && (sync.rejection?.message || sync.lastError) && (
+        <span className="max-w-[26rem] truncate text-[0.6875rem] text-txt-muted" title={sync.rejection?.message ?? sync.lastError ?? ""}>
+          {sync.rejection?.message ?? sync.lastError}
+        </span>
+      )}
+      {/* `stuck` means the timer has stopped, so without this the player has no
+          way back at all. */}
+      {sync.state === "stuck" && (
+        <Button size="sm" icon="refresh" onClick={() => void sync.retryNow()}>{retryLabel}</Button>
+      )}
+    </div>
+  )
 }
 
 interface Props {
@@ -109,8 +178,17 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
   const t = useToolT(TCGP_NS)
   const locale = useLocale()
   const { user, signIn } = useToolSession()
-  const pending = useToolPending("pokemon.tcgpocket")
-  const { owned, effective, setChange, dirtyCount, discard, save, saving, editable, loggedIn, recent } = collection
+  const { owned, effective, setChange, dirtyCount, discard, save, saving, editable, loggedIn, recent, sync, override, dismissOverride } = collection
+
+  const syncLabels: Record<ToolSyncState, string> = {
+    "local-only": t("app.coleccion.syncLocalOnly"),
+    synced: t("app.coleccion.syncSynced"),
+    syncing: t("app.coleccion.syncSyncing"),
+    queued: t("app.coleccion.syncQueued", { count: sync.pending }),
+    retrying: t("app.coleccion.syncRetrying", { count: sync.pending, attempts: sync.attempts }),
+    stuck: t("app.coleccion.syncStuck", { count: sync.pending }),
+    rejected: t("app.coleccion.syncRejectedShort"),
+  }
 
   const [q, setQ] = useState("")
   const [setF, setSetF] = useState("")
@@ -156,11 +234,29 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
           {t("app.coleccion.localLead")}
         </Banner>
       )}
-      {/* What has not reached the server yet. Only worth saying when there IS a
-          server to reach — signed out, nothing is owed to anyone. */}
-      {loggedIn && pending > 0 && (
-        <Banner tone="warn" icon="refresh" className="mb-5">
-          {t("app.coleccion.pendingSync", { count: pending })}
+      {/* What the queue is doing. Only worth saying when there IS a server to
+          reach — signed out, nothing is owed to anyone, and a gallery is
+          someone else's collection that this device never writes to. */}
+      {loggedIn && !username && (
+        <SyncStatus sync={sync} labels={syncLabels} retryLabel={t("app.coleccion.syncRetry")} />
+      )}
+      {/* The merge rule, said out loud. Last-writer-wins with the server as the
+          writer is a defensible rule; doing it silently was the actual defect,
+          because a player whose count changed under them had no way to know it
+          was not a bug in the counter. */}
+      {override && (
+        <Banner
+          tone="warn"
+          icon="database"
+          title={t("app.coleccion.overrideTitle")}
+          className="mb-5"
+          actions={
+            <Button size="sm" variant="ghost" onClick={dismissOverride}>
+              {t("app.coleccion.overrideDismiss")}
+            </Button>
+          }
+        >
+          {t("app.coleccion.overrideLead", { count: override.count, at: new Date(override.at) })}
         </Banner>
       )}
       {/* No header, by the same rule as CartasView. Whose gallery this is — the

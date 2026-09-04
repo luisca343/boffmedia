@@ -17,10 +17,17 @@
  * consumers nothing new.
  */
 
-import { useCallback, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 
 import { getToolHost, hasToolHost } from "./host";
 import type { ToolSessionStatus, ToolSessionUser } from "./session";
+import {
+  createRetryScheduler,
+  deriveSyncStatus,
+  type RetryScheduler,
+  type SyncRetryPolicy,
+  type ToolSyncStatus,
+} from "./sync-policy";
 
 /**
  * Whether the host can reach the network right now, re-rendering on change.
@@ -144,3 +151,108 @@ function sessionUser(): ToolSessionUser | null {
 function nullUser(): ToolSessionUser | null {
   return null;
 }
+
+/* ── sync status ───────────────────────────────────────────────────────────── */
+
+/** What a tool sees before a host exists (SSR, a test, a styleguide): nothing
+ *  is owed, because nothing has been written. Identity-stable, because
+ *  `useState` initialisers and `Object.is` comparisons both care. */
+const IDLE_SYNC: ToolSyncStatus = {
+  state: "synced",
+  pending: 0,
+  attempts: 0,
+  lastError: null,
+  retryInMs: null,
+  rejection: null,
+};
+
+export interface ToolSyncView extends ToolSyncStatus {
+  /** Try the queue again right now, past the attempt cap. This is the way out
+   *  of `stuck`, so any UI that can show that state must offer this. */
+  retryNow(): Promise<void>;
+  /** The tool has reconciled with the server after a rejection. */
+  clearRejection(): void;
+}
+
+/**
+ * The queue's state, with a bounded retry policy actually running behind it.
+ *
+ * Distinct from {@link useToolPending}, which reports a NUMBER and nothing
+ * else: a count cannot tell a player whether their writes are on their way,
+ * waiting for a network, being retried, or dead. This can, and — because it
+ * owns a scheduler — it is also what makes a failed write get tried again at
+ * all, rather than waiting for the next `online` event that may never come.
+ *
+ * Opt-in per tool. A tool that does not call this keeps exactly its old
+ * behaviour.
+ */
+export function useToolSync(
+  namespace: string,
+  options: { policy?: SyncRetryPolicy } = {},
+): ToolSyncView {
+  const online = useToolOnline();
+  const { signedIn } = useToolSession();
+  const [status, setStatus] = useState<ToolSyncStatus>(IDLE_SYNC);
+  const scheduler = useRef<RetryScheduler | null>(null);
+
+  // Read through refs inside the scheduler rather than captured values: it can
+  // sit on a timer for two minutes, and a connectivity or session change in
+  // that window must be seen by the attempt when it fires, not by the closure
+  // that armed it.
+  const live = useRef({ online, signedIn });
+  live.current = { online, signedIn };
+
+  // Read through a ref and kept OUT of the effect's deps. A caller writing the
+  // natural `useToolSync(ns, { policy: { ... } })` passes a fresh object every
+  // render; as a dependency that would tear down and rebuild the scheduler on
+  // every render, which is an unbounded flush loop wearing a policy's clothes.
+  const policy = useRef(options.policy);
+  policy.current = options.policy;
+
+  useEffect(() => {
+    if (!hasToolHost()) return;
+    const instance = createRetryScheduler({
+      outbox: getToolHost().data.outbox(namespace),
+      isOnline: () => live.current.online,
+      isSignedIn: () => live.current.signedIn,
+      policy: policy.current,
+    });
+    scheduler.current = instance;
+    const unsubscribeStatus = instance.subscribe(setStatus);
+    // The outbox announces its own writes; without this the status only moved
+    // when the scheduler happened to wake up.
+    const unsubscribeQueue = getToolHost()
+      .data.outbox(namespace)
+      .subscribe(() => instance.poke());
+    return () => {
+      unsubscribeQueue();
+      unsubscribeStatus();
+      instance.stop();
+      scheduler.current = null;
+    };
+  }, [namespace]);
+
+  // Connectivity and session changes are decisions, not just re-renders: coming
+  // back online should try the queue now rather than at the end of a backoff
+  // that was armed while there was no network.
+  useEffect(() => {
+    scheduler.current?.poke();
+  }, [online, signedIn]);
+
+  const retryNow = useCallback(async () => {
+    await scheduler.current?.retryNow();
+  }, []);
+  const clearRejection = useCallback(() => {
+    scheduler.current?.clearRejection();
+  }, []);
+
+  // Memoised, and load-bearing rather than an optimisation: a fresh object per
+  // render makes this hook unusable in any dependency array, and a tool that
+  // lists it in one gets an unbounded render loop rather than a warning.
+  return useMemo(
+    () => ({ ...status, retryNow, clearRejection }),
+    [status, retryNow, clearRejection],
+  );
+}
+
+export { deriveSyncStatus };

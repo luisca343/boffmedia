@@ -1,12 +1,27 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export type FileDownloadStatus = 'downloaded' | 'skipped' | 'failed';
+/**
+ * How one file ended.
+ *
+ * `stalled` and `cancelled` are separate from `failed` on purpose: a stall is
+ * a dead connection the user can retry, a cancel is something the user did,
+ * and a failure is an error they have to read. Collapsing the three is exactly
+ * what left the old UI showing progress that never advanced.
+ */
+export type FileDownloadStatus =
+  | 'downloaded'
+  | 'skipped'
+  | 'failed'
+  | 'stalled'
+  | 'cancelled';
 
 export class FileDownloadEntry {
   @ApiProperty({ example: 'Super Mario 3D Land (Europe).zip' })
   filename: string;
 
-  @ApiProperty({ enum: ['downloaded', 'skipped', 'failed'] })
+  @ApiProperty({
+    enum: ['downloaded', 'skipped', 'failed', 'stalled', 'cancelled'],
+  })
   status: FileDownloadStatus;
 
   @ApiProperty({ example: '1.19 GiB', required: false })
@@ -43,6 +58,19 @@ export class BulkDownloadResult {
 
   @ApiProperty({ example: 2 })
   failed: number;
+
+  @ApiProperty({
+    example: 1,
+    description:
+      'Files abandoned because the connection stopped sending bytes. Their partial data was deleted.',
+  })
+  stalled: number;
+
+  @ApiProperty({
+    example: 0,
+    description: 'Files not attempted or aborted because the caller cancelled.',
+  })
+  cancelled: number;
 
   @ApiProperty({ example: '274.58 GiB' })
   totalDownloadedSize: string;

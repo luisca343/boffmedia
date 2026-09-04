@@ -98,12 +98,22 @@ export interface CatalogResult {
   files: GameFileEntry[];
 }
 
+/**
+ * How one file ended.
+ *
+ * `pending` and `downloading` are the CLIENT's own two states — the server only
+ * ever reports terminal ones. `stalled` and `cancelled` are separate from
+ * `failed` because they are three different sentences to a user: the mirror
+ * went quiet, you stopped it, or something actually broke.
+ */
 export type FileDownloadStatus =
   | "pending"
   | "downloading"
   | "downloaded"
   | "skipped"
-  | "failed";
+  | "failed"
+  | "stalled"
+  | "cancelled";
 
 export interface FileDownloadEntry {
   filename: string;
@@ -113,19 +123,62 @@ export interface FileDownloadEntry {
   error?: string;
 }
 
-/** The frames `download-selected/stream` emits, in order: one `start`, many
- *  `progress`, one `done`. */
+/** The frames `download-selected/stream` emits: one `start`, then `active` /
+ *  `tick` / `progress` interleaved as files run, then one `done`. */
 export type SseStartEvent = { type: "start"; total: number };
+
+/** A transfer has BEGUN. Sent up front so the panel can name the file that is
+ *  actually running instead of leaving every row on "pending" for an hour. */
+export type SseActiveEvent = {
+  type: "active";
+  index: number;
+  total: number;
+  filename: string;
+};
+
+/**
+ * A heartbeat for a running transfer.
+ *
+ * `idleMs` — time since the last byte — is the payload that matters: it is what
+ * lets the UI say "this has gone quiet" while it is still happening, rather
+ * than showing a bar that silently never moves. `idleTimeoutMs` is the server's
+ * own budget, so the client does not have to hardcode a matching guess.
+ */
+export type SseTickEvent = {
+  type: "tick";
+  filename: string;
+  receivedBytes: number;
+  idleMs: number;
+  idleTimeoutMs: number;
+};
+
 export type SseProgressEvent = {
   type: "progress";
   index: number;
   total: number;
 } & FileDownloadEntry;
-export type SseDoneEvent = { type: "done" } & Omit<
-  BulkDownloadResult,
-  "files" | "regions" | "totalMatched"
->;
-export type SseEvent = SseStartEvent | SseProgressEvent | SseDoneEvent;
+
+/**
+ * `stalled`, `cancelled` and `aborted` are declared here rather than read off
+ * `BulkDownloadResult` because `@boffmedia/shared` is regenerated from the live
+ * API's OpenAPI document; until that regeneration runs, the shared type does
+ * not carry them yet. Intersecting locally keeps this honest either way.
+ */
+export type SseDoneEvent = {
+  type: "done";
+  stalled: number;
+  cancelled: number;
+  /** True when the run ended because the caller hung up, not because it
+   *  finished. Without it a cancelled run reads as a completed one. */
+  aborted?: boolean;
+} & Omit<BulkDownloadResult, "files" | "regions" | "totalMatched">;
+
+export type SseEvent =
+  | SseStartEvent
+  | SseActiveEvent
+  | SseTickEvent
+  | SseProgressEvent
+  | SseDoneEvent;
 
 /** `regions` is omitted rather than sent empty — the API treats an absent
  *  parameter as "no filter" and an empty one as "match nothing". */

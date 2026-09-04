@@ -616,7 +616,17 @@ export const messages = {
             "localTitle": "Tu colección, en este dispositivo",
             "localLead": "Puedes usarla sin cuenta. Inicia sesión con Boffmedia para sincronizarla y verla desde cualquier sitio.",
             "localSignIn": "Iniciar sesión",
-            "pendingSync": "{count, plural, one {# cambio sin sincronizar} other {# cambios sin sincronizar}}"
+            "pendingSync": "{count, plural, one {# cambio sin sincronizar} other {# cambios sin sincronizar}}",
+            "syncLocalOnly": "Solo en este dispositivo",
+            "syncSynced": "Sincronizado",
+            "syncSyncing": "Sincronizando…",
+            "syncQueued": "{count, plural, one {# cambio en cola} other {# cambios en cola}}",
+            "syncRetrying": "Reintentando ({attempts}) · {count, plural, one {# cambio} other {# cambios}}",
+            "syncStuck": "{count, plural, one {# cambio sin guardar en el servidor} other {# cambios sin guardar en el servidor}}",
+            "syncRejectedShort": "El servidor rechazó un cambio",
+            "syncRetry": "Reintentar",
+            "overrideTitle": "Ha ganado la copia del servidor",
+            "overrideLead": "{count, plural, one {# carta tenía} other {# cartas tenían}} un número distinto en este dispositivo y {count, plural, one {se ha actualizado} other {se han actualizado}} con el valor del servidor ({at, time, short}). Los cambios que aún estaban en cola se han respetado."
           },
           "sobres": {
             "title": "Sobres",
@@ -2194,7 +2204,17 @@ export const messages = {
             "localTitle": "Your collection, on this device",
             "localLead": "You can use it with no account. Sign in with Boffmedia to sync it and see it anywhere.",
             "localSignIn": "Sign in",
-            "pendingSync": "{count, plural, one {# change not synced} other {# changes not synced}}"
+            "pendingSync": "{count, plural, one {# change not synced} other {# changes not synced}}",
+            "syncLocalOnly": "This device only",
+            "syncSynced": "Synced",
+            "syncSyncing": "Syncing…",
+            "syncQueued": "{count, plural, one {# change queued} other {# changes queued}}",
+            "syncRetrying": "Retrying ({attempts}) · {count, plural, one {# change} other {# changes}}",
+            "syncStuck": "{count, plural, one {# change not saved to the server} other {# changes not saved to the server}}",
+            "syncRejectedShort": "The server refused a change",
+            "syncRetry": "Try again",
+            "overrideTitle": "The server's copy won",
+            "overrideLead": "{count, plural, one {# card had} other {# cards had}} a different number on this device and {count, plural, one {was} other {were}} updated with the server's value ({at, time, short}). Changes still queued were kept."
           },
           "sobres": {
             "title": "Packs",
