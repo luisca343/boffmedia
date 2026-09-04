@@ -176,6 +176,19 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const existing = this.graceTimers.get(user.userId);
     if (existing) clearTimeout(existing);
 
+    // Emit disconnect signal to opponent so they see grace countdown
+    for (const roomId of held) {
+      const room = this.rooms.get(roomId);
+      const side = room?.sideOf(user.userId);
+      if (room && side && room.status === 'active') {
+        const otherSide = side === 'p1' ? 'p2' : 'p1';
+        this.server.to(`${roomId}:${otherSide}`).emit('opponentDisconnected', {
+          graceDurationMs: RECONNECT_GRACE_MS,
+          expiresAt: Date.now() + RECONNECT_GRACE_MS,
+        });
+      }
+    }
+
     const timer = setTimeout(() => {
       this.graceTimers.delete(user.userId);
       for (const roomId of [...(this.userRooms.get(user.userId) ?? [])]) {
@@ -462,8 +475,15 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
+    const wasInGrace = this.graceTimers.has(user.userId);
     this.clearGrace(user.userId);
     this.joinView(client, roomId, side);
+
+    // If this player was disconnected, notify opponent they have reconnected
+    if (wasInGrace) {
+      const otherSide = side === 'p1' ? 'p2' : 'p1';
+      this.server.to(`${roomId}:${otherSide}`).emit('opponentReconnected');
+    }
 
     const snapshot = room.snapshot(side);
     client.emit('resumed', {
@@ -498,8 +518,15 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     const side = room.sideOf(user.userId);
     const viewer: RoomViewer = side ?? 'spec';
+    const wasInGrace = side && this.graceTimers.has(user.userId);
     if (side) this.clearGrace(user.userId);
     this.joinView(client, roomId, viewer);
+
+    // If this player was disconnected and is coming back, notify opponent
+    if (wasInGrace) {
+      const otherSide = side === 'p1' ? 'p2' : 'p1';
+      this.server.to(`${roomId}:${otherSide}`).emit('opponentReconnected');
+    }
 
     const snapshot = room.snapshot(viewer);
     client.emit('spectateJoined', {
@@ -633,6 +660,12 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
         },
       },
       this.logger,
+      // Timer config for competitive PvP battles: 60s per turn, 5 min total
+      {
+        enabled: true,
+        turnMs: 60_000,
+        totalMs: 300_000,
+      },
     );
 
     this.rooms.set(roomId, room);

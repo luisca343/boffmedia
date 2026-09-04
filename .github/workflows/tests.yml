@@ -122,6 +122,42 @@ jobs:
         working-directory: apps/desktop/src-tauri
         run: cargo test
 
+  # Integration tests: MySQL with Testcontainers.
+  # These run against a REAL database (not fakes), so they verify behaviors
+  # fakes cannot model: unique-key collisions, FK constraints, migrations,
+  # and soft-delete with PII scrubbing.
+  #
+  # BLOCKING, deliberately. The suite decides at load time whether a Docker
+  # endpoint exists and reports itself skipped when there is none, so a runner
+  # without Docker is already a pass — `continue-on-error` here would only hide
+  # a genuine failure, which is the entire thing this job exists to catch.
+  #
+  # No docker-in-docker service either: ubuntu-latest ships a working daemon and
+  # testcontainers talks to it directly.
+  integration:
+    name: Integration tests (MySQL + Testcontainers)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: API integration tests (MySQL)
+        run: pnpm --filter api test:integration
+
   # NON-BLOCKING, and it has to be: every suite here needs a running site plus
   # real accounts. The `chromium` project hits public pages, `chromium:auth`
   # logs in as a player, and `chromium:admin` FAILS BY DESIGN unless its account

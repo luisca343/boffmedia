@@ -524,3 +524,100 @@ describe('BattleGateway — the ending', () => {
     for (const end of ends) expect((end as any).payload.replayId).toBeNull();
   });
 });
+
+describe('BattleGateway — disconnect/reconnect signals', () => {
+  const ROOM = 'room-dc';
+  let gateway: BattleGateway;
+  let alice: any;
+  let bob: any;
+  let server: any;
+
+  beforeEach(() => {
+    alice = mockSocket({ userId: 1, name: 'Alice' });
+    bob = mockSocket({ userId: 2, name: 'Bob' });
+    server = mockServer([alice, bob]);
+    gateway = makeGateway({}, server);
+    (gateway as any).rooms.set(ROOM, fakeRoom(ROOM, { sides: { 1: 'p1', 2: 'p2' } }));
+    (gateway as any).hold(1, ROOM);
+    (gateway as any).hold(2, ROOM);
+    gateway.handleConnection(alice);
+    gateway.handleConnection(bob);
+    server.__sent = [];
+  });
+
+  it('emits opponentDisconnected to the other player when one disconnects', () => {
+    jest.useFakeTimers();
+    gateway.handleDisconnect(alice);
+
+    const disconnected = server.__to(`${ROOM}:p2`).find(
+      (s: any) => s.event === 'opponentDisconnected',
+    );
+    expect(disconnected).toBeDefined();
+    expect(disconnected!.payload).toMatchObject({
+      graceDurationMs: 30_000,
+      expiresAt: expect.any(Number),
+    });
+    jest.useRealTimers();
+  });
+
+  it('emits opponentReconnected when a player resumes after disconnect', () => {
+    jest.useFakeTimers();
+    // Disconnect Alice
+    gateway.handleDisconnect(alice);
+    server.__sent = [];
+
+    // Resume Alice
+    gateway.handleResume(alice, { roomId: ROOM });
+
+    const reconnected = server.__to(`${ROOM}:p2`).find(
+      (s: any) => s.event === 'opponentReconnected',
+    );
+    expect(reconnected).toBeDefined();
+    jest.useRealTimers();
+  });
+
+  it('emits opponentReconnected when a player spectates after disconnect', () => {
+    jest.useFakeTimers();
+    // Disconnect Alice
+    gateway.handleDisconnect(alice);
+    server.__sent = [];
+
+    // Spectate Alice (she still owns p1 side)
+    gateway.handleSpectate(alice, { roomId: ROOM });
+
+    const reconnected = server.__to(`${ROOM}:p2`).find(
+      (s: any) => s.event === 'opponentReconnected',
+    );
+    expect(reconnected).toBeDefined();
+    jest.useRealTimers();
+  });
+
+  it('does not emit opponentReconnected if the player was not in grace', () => {
+    gateway.handleResume(alice, { roomId: ROOM });
+    server.__sent = [];
+
+    gateway.handleResume(alice, { roomId: ROOM });
+
+    const reconnected = server.__to(`${ROOM}:p2`).find(
+      (s: any) => s.event === 'opponentReconnected',
+    );
+    expect(reconnected).toBeUndefined();
+  });
+
+  it('does not emit disconnect/reconnect when a non-player disconnects', () => {
+    const spec = mockSocket({ userId: 999, name: 'Spectator' });
+    server = mockServer([alice, bob, spec]);
+    gateway = makeGateway({}, server);
+    (gateway as any).rooms.set(ROOM, fakeRoom(ROOM, { sides: { 1: 'p1', 2: 'p2' } }));
+    (gateway as any).hold(1, ROOM);
+    (gateway as any).hold(2, ROOM);
+    gateway.handleConnection(alice);
+    gateway.handleConnection(bob);
+    gateway.handleConnection(spec);
+    server.__sent = [];
+
+    gateway.handleDisconnect(spec);
+
+    expect(server.__sent).toEqual([]);
+  });
+});

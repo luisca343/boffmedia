@@ -1,3 +1,4 @@
+import type { TimerState } from '@boffmedia/battle-core';
 import {
   BattleRoom,
   type BattleRoomCallbacks,
@@ -185,4 +186,93 @@ describe('BattleRoom — the transcript', () => {
     // The persisted log is the omniscient one, not any viewer's.
     expect(room.replay.length).toBeGreaterThan(0);
   });
+});
+
+describe('BattleRoom — timer', () => {
+  // B6: TimerManager was rewritten and then never wired, so the clock existed
+  // and did nothing. These use a deliberately short config so expiry is
+  // observable; the point of both is that a timer which emits nothing and
+  // never fires must FAIL here, which is what the audit's version of the
+  // feature would have done.
+  const timed = { enabled: true, turnMs: 2_000, totalMs: 4_000 };
+
+  const wait = (ms: number) =>
+    new Promise((resolve) => setTimeout(resolve, ms));
+
+  it('ticks once a battle with an enabled timer is under way', async () => {
+    const h = harness();
+    const updates: TimerState[] = [];
+    const room = new BattleRoom(
+      'timer-ticks',
+      'gen9randombattle',
+      P1,
+      P2,
+      { ...h.callbacks, onTimerUpdate: (state) => updates.push(state) },
+      undefined,
+      timed,
+    );
+    await room.start();
+    await wait(1_500);
+
+    expect(updates.length).toBeGreaterThan(0);
+    expect(updates[0]).toMatchObject({
+      p1: {
+        turnRemaining: expect.any(Number),
+        totalRemaining: expect.any(Number),
+      },
+      p2: {
+        turnRemaining: expect.any(Number),
+        totalRemaining: expect.any(Number),
+      },
+    });
+
+    await room.forfeit('p1');
+    await settle();
+  }, 15_000);
+
+  it('ends the battle through the normal forfeit path when a clock runs out', async () => {
+    const h = harness();
+    const room = new BattleRoom(
+      'timer-expiry',
+      'gen9randombattle',
+      P1,
+      P2,
+      h.callbacks,
+      undefined,
+      timed,
+    );
+    await room.start();
+
+    // Neither side ever chooses. The turn clock is the only thing that can end
+    // this, and it must end it the same way a manual forfeit does — one
+    // onBattleEnd carrying a winner, not a bespoke timeout result.
+    await wait(5_000);
+
+    expect(h.ends).toHaveLength(1);
+    // `winner` is the player's NAME, the same field a manual forfeit fills.
+    expect([P1.name, P2.name]).toContain(h.ends[0].winner);
+    expect(room.status).not.toBe('active');
+    expect(h.errors).toEqual([]);
+  }, 20_000);
+
+  it('leaves a room without a timer config untimed', async () => {
+    const h = harness();
+    const updates: TimerState[] = [];
+    const room = new BattleRoom(
+      'timer-off',
+      'gen9randombattle',
+      P1,
+      P2,
+      { ...h.callbacks, onTimerUpdate: (state) => updates.push(state) },
+    );
+    await room.start();
+    await wait(1_500);
+
+    expect(updates).toEqual([]);
+    expect(room.status).toBe('active');
+    expect(h.ends).toEqual([]);
+
+    await room.forfeit('p1');
+    await settle();
+  }, 15_000);
 });

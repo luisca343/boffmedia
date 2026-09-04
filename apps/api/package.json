@@ -25,6 +25,7 @@
     "test:watch": "cross-env NODE_OPTIONS=--max-old-space-size=4096 jest --watch --maxWorkers=1",
     "test:cov": "cross-env NODE_OPTIONS=--max-old-space-size=4096 jest --coverage --runInBand",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
+    "test:integration": "cross-env NODE_OPTIONS=--max-old-space-size=4096 jest --config ./jest.config.integration.ts --runInBand",
     "test:e2e": "cross-env NODE_OPTIONS=--max-old-space-size=2048 jest --config ./test/jest-e2e.json --maxWorkers=1",
     "seed:system": "node ../../node_modules/ts-node/dist/bin.js -r tsconfig-paths/register src/seed/system.ts",
     "seed:dev": "node ../../node_modules/ts-node/dist/bin.js -r tsconfig-paths/register src/seed/dev.ts",
@@ -152,7 +153,9 @@
     "ts-jest": "^29.4.1",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
+    "testcontainers": "^10.8.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.2"
   }
 }
+

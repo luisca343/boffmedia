@@ -15,6 +15,8 @@ module.exports = {
     modulePathIgnorePatterns: ['src/typings'],
     testPathIgnorePatterns: [
       '/node_modules./',
+      // Real-MySQL suite; it needs Docker and runs via jest.config.integration.ts.
+      '\.db\.spec\.ts$',
       '<rootDir>/(coverage|dist|lib|tmp)./',
       '<rootDir>/src/api/smartrotom/arcade/arcade.controller.integration.spec.ts',
       '<rootDir>/src/api/smartrotom/arcade/arcade.facade.service.spec.ts',
