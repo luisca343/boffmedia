@@ -79,6 +79,10 @@ describe('DesktopDeviceService', () => {
     packsRepo = {
       audit: jest.fn().mockResolvedValue(undefined),
       getDesktopTokenVersion: jest.fn().mockResolvedValue(4),
+      // `poll` resolves roles on the spot so an admin does not sign in and find
+      // the admin-only tools missing until the next `me`. Leaving it off the
+      // fake killed every poll test with `rolesOf is not a function`.
+      rolesOf: jest.fn().mockResolvedValue([]),
     } as unknown as jest.Mocked<PacksRepository>;
 
     service = new DesktopDeviceService(repo, auth, users, packsRepo);
@@ -220,6 +224,10 @@ describe('DesktopDeviceService', () => {
           username: 'TrainerAsh',
           mcUuid: UUID,
           avatarUrl: 'https://cdn.discordapp.com/avatars/1/a.png',
+          // Shipped with the approval rather than left to the next `me`: the
+          // app hides admin-only tools from a role-less account, so an admin
+          // would sign in to a tool-less UI until they restarted.
+          roles: [],
         },
       });
     });

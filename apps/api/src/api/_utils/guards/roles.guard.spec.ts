@@ -5,17 +5,16 @@ import { FullSessionGuard } from './full-session.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { ROLES_METADATA_KEY } from '@api/_utils/decorators/roles.decorator';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { fakeExecutionContext } from '@/_testing/nest-context';
 
 const contextFor = (
   user: unknown,
   handler: () => void,
   cls: new () => unknown,
 ): ExecutionContext =>
-  ({
-    getHandler: () => handler,
-    getClass: () => cls,
-    switchToHttp: () => ({ getRequest: () => ({ user }) }),
-  }) as unknown as ExecutionContext;
+  // handler/cls are the real ones on purpose: Reflector keys the @Roles
+  // metadata on that exact pair, so a stand-in would resolve to no roles.
+  fakeExecutionContext({ request: { user }, handler, cls });
 
 describe('RolesGuard', () => {
   const guard = new RolesGuard(new Reflector());
@@ -83,10 +82,7 @@ describe('RolesGuard', () => {
 
 describe('FullSessionGuard', () => {
   const guard = new FullSessionGuard();
-  const ctx = (user: unknown) =>
-    ({
-      switchToHttp: () => ({ getRequest: () => ({ user }) }),
-    }) as unknown as ExecutionContext;
+  const ctx = (user: unknown) => fakeExecutionContext({ request: { user } });
 
   it('admits a website session', () => {
     expect(guard.canActivate(ctx({ tokenType: 'access' }))).toBe(true);

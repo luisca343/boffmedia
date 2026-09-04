@@ -1,5 +1,6 @@
 import { ArgumentsHost, BadRequestException } from '@nestjs/common';
 import { GlobalExceptionFilter } from './global-exception.filter';
+import { fakeArgumentsHost } from '@/_testing/nest-context';
 
 /**
  * The shape drizzle actually throws: its own Error whose message is only the
@@ -35,12 +36,10 @@ describe('GlobalExceptionFilter', () => {
     } as never);
     json = jest.fn();
     status = jest.fn().mockReturnValue({ json });
-    host = {
-      switchToHttp: () => ({
-        getResponse: () => ({ status }),
-        getRequest: () => ({ url: '/auth/resend-verification', method: 'POST' }),
-      }),
-    } as never;
+    host = fakeArgumentsHost({
+      request: { url: '/auth/resend-verification', method: 'POST' },
+      response: { status },
+    });
   });
 
   describe('unique-key collisions', () => {

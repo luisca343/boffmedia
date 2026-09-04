@@ -3,16 +3,14 @@ import { JwtService } from '@nestjs/jwt';
 import { ApiErrorCode } from '@/common/errors/user-error';
 import { TOKEN_TYPE } from '@api/_utils/auth/token-types';
 import { STEP_UP_HEADER, StepUpGuard } from './step-up.guard';
+import { fakeExecutionContext } from '@/_testing/nest-context';
 
 const SECRET = 'test-secret-that-is-long-enough-32chars';
 
 const contextFor = (
   headers: Record<string, string>,
   user?: { userId: number },
-): ExecutionContext =>
-  ({
-    switchToHttp: () => ({ getRequest: () => ({ headers, user }) }),
-  }) as unknown as ExecutionContext;
+): ExecutionContext => fakeExecutionContext({ request: { headers, user } });
 
 describe('StepUpGuard', () => {
   const jwt = new JwtService({ secret: SECRET });

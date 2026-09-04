@@ -1,20 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
 import { loadSchematicFile } from "../../../../engine/loader";
 import type { TileEntity } from "../../../../engine/types";
 import { convertLittleTilesForExport } from "./littletiles-writer";
-
-const ROOT = "/home/luisca/Programacion/Ficus Labs/boffmedia";
-
-function fixture(name: string): File {
-  const b = readFileSync(`${ROOT}/docs/schem/${name}`);
-  const bytes = new Uint8Array(b);
-  return {
-    name,
-    arrayBuffer: async () =>
-      bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
-  } as unknown as File;
-}
+import { hasSchemFixtures, schemFixture as fixture } from "./schem-fixtures";
 
 /** faceCache nibbles in CreativeCore Facing order. */
 function faces(cache: number): Record<string, number> {
@@ -34,7 +22,9 @@ function tilesAt(converted: { tileEntities: TileEntity[] }, x: number, y: number
 
 // LittleFaceState ordinals: 1..3 inside (un/partially/fully covered),
 // 4..6 outside (un/partially/fully covered).
-describe("LittleTiles exported face caches", () => {
+// Skipped, not failed, where docs/schem/ is absent (a fresh clone, CI): the
+// fixtures are gitignored game exports. See schem-fixtures.ts.
+describe.skipIf(!hasSchemFixtures)("LittleTiles exported face caches", () => {
   it("stamps mod-equivalent face states on the LA_PUERTA corner cell", async () => {
     const legacy = await loadSchematicFile(fixture("LA_PUERTA.schematic"));
     const converted = await convertLittleTilesForExport(legacy);

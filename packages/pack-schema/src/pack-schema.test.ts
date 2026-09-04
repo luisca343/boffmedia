@@ -15,6 +15,24 @@ import {
 
 const sha512 = "a".repeat(128)
 
+/**
+ * The refusal's issue messages, joined.
+ *
+ * `ZodError.message` is `JSON.stringify(issues, null, 2)`, so every double
+ * quote a `.superRefine` writes reaches the matcher escaped as `\"` — and a
+ * plain `toThrow(/… "any" group/)` stops matching without the rule having
+ * changed at all. Only the three assertions that quote a `select` value need
+ * this; the quote-free regexes elsewhere match the blob either way.
+ */
+function refusal(parse: () => unknown): string {
+  try {
+    parse()
+  } catch (e) {
+    return (e as z.ZodError).issues.map((i) => i.message).join("\n")
+  }
+  throw new Error("expected PackManifest.parse to reject this manifest, but it accepted it")
+}
+
 // Typed as the schema's *input* so tests can mutate fields to invalid values
 // without TS narrowing the fixture to one exact shape.
 const manifest = (): z.input<typeof PackManifest> => ({
@@ -421,7 +439,7 @@ describe("optional content", () => {
   it("rejects a feature path whose file is not env.client optional", () => {
     const m = withOptional()
     m.version.optionalGroups![0].features[0].paths = ["mods/sodium.jar"]
-    expect(() => PackManifest.parse(m)).toThrow(/must be env\.client "optional"/)
+    expect(refusal(() => PackManifest.parse(m))).toMatch(/must be env\.client "optional"/)
   })
 
   // ---- rule 3 ----
@@ -489,7 +507,9 @@ describe("optional content", () => {
       select: "one" as const,
       features: [{ id: "bsl", name: "BSL", paths: ["shaderpacks/bsl.zip"], default: true }],
     })
-    expect(() => PackManifest.parse(m)).toThrow(/only target a feature in an "any" group/)
+    expect(refusal(() => PackManifest.parse(m))).toMatch(
+      /only target a feature in an "any" group/,
+    )
   })
 
   it("rejects a self-requirement", () => {
@@ -557,7 +577,7 @@ describe("optional content", () => {
       kind: "shaderpack" as const,
       file: "shaderpacks/bsl.zip",
     }
-    expect(() => PackManifest.parse(m)).toThrow(/"one" or "atMostOne" group/)
+    expect(refusal(() => PackManifest.parse(m))).toMatch(/"one" or "atMostOne" group/)
   })
 
   it("accepts a shaderpack activation in a `one` group", () => {

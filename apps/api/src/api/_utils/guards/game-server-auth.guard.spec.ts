@@ -1,4 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common';
+import { fakeExecutionContext } from '@/_testing/nest-context';
 
 const mockEnv: {
   TERAS_API_TOKEN?: string;
@@ -17,12 +18,7 @@ const { GameServerAuthGuard } =
   require('./game-server-auth.guard') as typeof import('./game-server-auth.guard');
 /* eslint-enable @typescript-eslint/no-require-imports */
 
-const ctxFor = (req: any) =>
-  ({
-    switchToHttp: () => ({ getRequest: () => req }),
-    getHandler: () => undefined,
-    getClass: () => undefined,
-  }) as any;
+const ctxFor = (req: any) => fakeExecutionContext({ request: req }) as any;
 
 describe('GameServerAuthGuard', () => {
   let guard: InstanceType<typeof GameServerAuthGuard>;

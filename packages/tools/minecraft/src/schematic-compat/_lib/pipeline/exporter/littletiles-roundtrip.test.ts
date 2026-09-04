@@ -1,11 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
 import { loadSchematicFile } from "../../../../engine/loader";
 import type { LittleTilesGroup, SchematicStructure } from "../../../../engine/types";
 import { convertLittleTilesForExport } from "./littletiles-writer";
 import { writeSchem } from "./schem-writer";
-
-const ROOT = "/home/luisca/Programacion/Ficus Labs/boffmedia";
+import { hasSchemFixtures, schemFixture as fixture } from "./schem-fixtures";
 
 function fileFrom(bytes: Uint8Array, name: string): File {
   return {
@@ -13,11 +11,6 @@ function fileFrom(bytes: Uint8Array, name: string): File {
     arrayBuffer: async () =>
       bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
   } as unknown as File;
-}
-
-function fixture(name: string): File {
-  const b = readFileSync(`${ROOT}/docs/schem/${name}`);
-  return fileFrom(new Uint8Array(b), name);
 }
 
 /** Comparable shape: material id → sorted box + slope-corner coordinate lists. */
@@ -39,7 +32,9 @@ async function reload(structure: SchematicStructure, name: string) {
   return loadSchematicFile(fileFrom(writeSchem(structure, 2), name));
 }
 
-describe("LittleTiles 1.12 → modern roundtrip", () => {
+// Skipped, not failed, where docs/schem/ is absent (a fresh clone, CI): the
+// fixtures are gitignored game exports. See schem-fixtures.ts.
+describe.skipIf(!hasSchemFixtures)("LittleTiles 1.12 → modern roundtrip", () => {
   it("converts the 1.12 fixture and the modern parser reads back identical boxes", async () => {
     const legacy = await loadSchematicFile(fixture("PRUEBA_LITTLE.schematic"));
     expect(legacy.littleTiles).toBeDefined();

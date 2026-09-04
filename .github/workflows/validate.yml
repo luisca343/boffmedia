@@ -9,6 +9,11 @@ name: Validate
 # `pnpm lint` is not eslint — it chains six check-* scripts that encode rules
 # invisible in the component code (layering, i18n parity, design-system
 # crossing, schema drift, error codes). Run it as the script, never bare eslint.
+#
+# Keep this workflow lean. Both deploys reuse it through `workflow_call`, so
+# every job added here goes in front of every release. The vitest suites,
+# `cargo test` and Playwright gate the PR instead, in tests.yml — which is also
+# where the reasoning for that split is written down.
 
 on:
   workflow_call:

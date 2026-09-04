@@ -1,14 +1,11 @@
-import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { DesktopAuthGuard, DesktopRequest } from './desktop-auth.guard';
 import { PacksAuthService } from '../packs-auth.service';
 import { PacksRepository } from '../packs.repository';
+import { fakeExecutionContext } from '@/_testing/nest-context';
 
 const ctx = (headers: Record<string, string>) =>
-  ({
-    switchToHttp: () => ({
-      getRequest: () => ({ headers }) as unknown as DesktopRequest,
-    }),
-  }) as unknown as ExecutionContext;
+  fakeExecutionContext({ request: { headers } });
 
 const principal = (over: Record<string, unknown> = {}) => ({
   userId: 7,
@@ -44,9 +41,7 @@ describe('DesktopAuthGuard', () => {
     const req = {
       headers: { authorization: 'Bearer tok' },
     } as unknown as DesktopRequest;
-    const context = {
-      switchToHttp: () => ({ getRequest: () => req }),
-    } as unknown as ExecutionContext;
+    const context = fakeExecutionContext({ request: req });
 
     await expect(guard.canActivate(context)).resolves.toBe(true);
     expect(req.desktopClient).toEqual(principal());

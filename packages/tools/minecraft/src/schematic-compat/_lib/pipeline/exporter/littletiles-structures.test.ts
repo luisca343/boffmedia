@@ -1,11 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { readFileSync } from "node:fs";
 import { loadSchematicFile } from "../../../../engine/loader";
 import type { SchematicStructure, TileEntity } from "../../../../engine/types";
 import { convertLittleTilesForExport } from "./littletiles-writer";
 import { writeSchem } from "./schem-writer";
-
-const ROOT = "/home/luisca/Programacion/Ficus Labs/boffmedia";
+import { hasSchemFixtures, schemFixture as fixture } from "./schem-fixtures";
 
 function fileFrom(bytes: Uint8Array, name: string): File {
   return {
@@ -13,11 +11,6 @@ function fileFrom(bytes: Uint8Array, name: string): File {
     arrayBuffer: async () =>
       bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength),
   } as unknown as File;
-}
-
-function fixture(name: string): File {
-  const b = readFileSync(`${ROOT}/docs/schem/${name}`);
-  return fileFrom(new Uint8Array(b), name);
 }
 
 type Pos = { x: number; y: number; z: number };
@@ -73,7 +66,9 @@ function warningsOf(s: SchematicStructure): string[] {
   return (s.metadata.littleTilesStructureWarnings as string[] | undefined) ?? [];
 }
 
-describe("LittleTiles 1.12 structure conversion", () => {
+// Skipped, not failed, where docs/schem/ is absent (a fresh clone, CI): the
+// fixtures are gitignored game exports. See schem-fixtures.ts.
+describe.skipIf(!hasSchemFixtures)("LittleTiles 1.12 structure conversion", () => {
   it("converts chair, ladder and axis door to modern children entries", async () => {
     const tes = [
       legacyTE({ x: 0, y: 1, z: 0 }, [

@@ -4,16 +4,15 @@ import { firstValueFrom, of } from 'rxjs';
 
 import { ResponseInterceptor } from './response.interceptor';
 import { METRICS_PATH } from '@/_utils/metrics/metrics.constants';
+import { fakeExecutionContext } from '@/_testing/nest-context';
 
 function contextFor(path: string): ExecutionContext {
-  return {
-    switchToHttp: () => ({
-      getRequest: () => ({ path, body: {}, params: {}, query: {} }),
-      getResponse: () => ({ statusCode: 200, headersSent: false }),
-    }),
-    getHandler: () => function handler() {},
-    getClass: () => class {},
-  } as unknown as ExecutionContext;
+  return fakeExecutionContext({
+    request: { path, body: {}, params: {}, query: {} },
+    response: { statusCode: 200, headersSent: false },
+    handler: function handler() {},
+    cls: class {},
+  });
 }
 
 const handlerReturning = (data: unknown): CallHandler => ({

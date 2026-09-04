@@ -1,4 +1,5 @@
 import { UnauthorizedException } from '@nestjs/common';
+import { fakeExecutionContext } from '@/_testing/nest-context';
 
 // Mutable mock of the validated env the guard reads.
 const mockEnv: {
@@ -18,12 +19,7 @@ const { GameOrUserAuthGuard } =
   require('./game-or-user-auth.guard') as typeof import('./game-or-user-auth.guard');
 /* eslint-enable @typescript-eslint/no-require-imports */
 
-const ctxFor = (req: any) =>
-  ({
-    switchToHttp: () => ({ getRequest: () => req }),
-    getHandler: () => undefined,
-    getClass: () => undefined,
-  }) as any;
+const ctxFor = (req: any) => fakeExecutionContext({ request: req }) as any;
 
 describe('GameOrUserAuthGuard', () => {
   let guard: InstanceType<typeof GameOrUserAuthGuard>;

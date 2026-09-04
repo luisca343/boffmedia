@@ -2,8 +2,9 @@
   "name": "boffmedia",
   "private": true,
   "packageManager": "pnpm@10.24.0",
+  "//engines": "node >=22.12, not >=22: require(esm) landed in 22.12. Below it, jsdom's html-encoding-sniffer (ESM-only @exodus/bytes) throws ERR_REQUIRE_ESM and the tools-minecraft DOM tests cannot start at all.",
   "engines": {
-    "node": ">=22",
+    "node": ">=22.12",
     "pnpm": ">=10"
   },
   "scripts": {

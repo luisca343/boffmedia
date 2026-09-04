@@ -8,7 +8,7 @@ import { GlobalExceptionFilter } from '@/common/filters/global-exception.filter'
 import { Logger } from 'nestjs-pino';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
-import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { DesktopOrUserAuthGuard } from '@api/packs/guards/desktop-or-user-auth.guard';
 
 const mockLogger = {
   log: jest.fn(),
@@ -38,12 +38,17 @@ describe('AppController — integration (smoke tests)', () => {
       ],
     })
       // Guards are stubbed: this suite is about validation and error
-      // shape, not about who may call the route.
+      // shape, not about who may call the route. Every guard AppController
+      // names in a @UseGuards must appear here — an un-overridden one is a real
+      // provider Nest then tries to construct, and the whole suite fails to
+      // compile on its unresolvable dependencies (that is how the stale
+      // GameOrUserAuthGuard entry, replaced on the tools route by
+      // DesktopOrUserAuthGuard, took the file down).
       .overrideGuard(JwtAuthGuard)
       .useValue({ canActivate: () => true })
       .overrideGuard(RolesGuard)
       .useValue({ canActivate: () => true })
-      .overrideGuard(GameOrUserAuthGuard)
+      .overrideGuard(DesktopOrUserAuthGuard)
       .useValue({ canActivate: () => true })
       .compile();
 

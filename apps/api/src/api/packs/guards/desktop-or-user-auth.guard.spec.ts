@@ -1,5 +1,6 @@
-import { ExecutionContext, UnauthorizedException } from '@nestjs/common';
+import { UnauthorizedException } from '@nestjs/common';
 import { DesktopOrUserAuthGuard } from './desktop-or-user-auth.guard';
+import { fakeExecutionContext } from '@/_testing/nest-context';
 
 /**
  * The point of this guard is that a desktop session is NOT a website session:
@@ -9,21 +10,23 @@ import { DesktopOrUserAuthGuard } from './desktop-or-user-auth.guard';
  */
 describe('DesktopOrUserAuthGuard', () => {
   const desktopAuth = { verifySession: jest.fn() };
-  const packsRepo = { getDesktopTokenVersion: jest.fn() };
+  const packsRepo = {
+    getDesktopTokenVersion: jest.fn(),
+    // The guard resolves the account's roles from the database for an app
+    // session (see the long comment on `canActivate`). Leaving it off the fake
+    // killed every desktop-path test with `rolesOf is not a function`.
+    rolesOf: jest.fn(),
+  };
 
   let guard: DesktopOrUserAuthGuard;
   let req: any;
 
-  const context = () =>
-    ({
-      switchToHttp: () => ({ getRequest: () => req }),
-      getHandler: () => undefined,
-      getClass: () => undefined,
-      getType: () => 'http',
-    }) as unknown as ExecutionContext;
+  const context = () => fakeExecutionContext({ request: req });
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // clearAllMocks wipes implementations too, so the default lives here.
+    packsRepo.rolesOf.mockResolvedValue([]);
     req = { headers: {} };
     guard = new DesktopOrUserAuthGuard(
       desktopAuth as any,
@@ -128,7 +131,13 @@ describe('DesktopOrUserAuthGuard', () => {
       expect(req.user).toBeUndefined();
     });
 
-    it('grants no roles to an app session', async () => {
+    // This case used to assert the opposite ("an app session is an identity,
+    // not a set of powers", roles always `[]`). The guard reversed that stance
+    // deliberately: it made one whole class of route impossible — reachable
+    // from both surfaces AND role-gated. The desktop token still carries no
+    // roles of its own; they come from the database, for the same human who
+    // already holds them on the website.
+    it('resolves the account roles from the database for an app session', async () => {
       withBearer('desktop-token');
       desktopAuth.verifySession.mockReturnValue({
         userId: 1,
@@ -137,12 +146,12 @@ describe('DesktopOrUserAuthGuard', () => {
         tokenVersion: 0,
       });
       packsRepo.getDesktopTokenVersion.mockResolvedValue(0);
+      packsRepo.rolesOf.mockResolvedValue(['BOFF_ADMIN']);
 
       await guard.canActivate(context());
 
-      // An app session is an identity, not a set of powers: RolesGuard must not
-      // be satisfiable by one.
-      expect(req.user.roles).toEqual([]);
+      expect(packsRepo.rolesOf).toHaveBeenCalledWith(1);
+      expect(req.user.roles).toEqual(['BOFF_ADMIN']);
     });
   });
 });
