@@ -18,6 +18,7 @@ import {
   wigglypopListingItems,
   wigglypopListingMons,
   wigglypopListings,
+  wigglypopMonCustody,
   wigglypopOffers,
   wigglypopOrderLines,
   wigglypopWatchlist,
@@ -492,5 +493,64 @@ export class WigglypopListingsRepository {
       .where(inArray(rotomUsers.uuid, uuids));
     for (const r of rows) names.set(r.uuid, r.username ?? null);
     return names;
+  }
+
+  // ─── Custody locks ──────────────────────────────────────────────────────────
+
+  /**
+   * Checks if a Pokémon (identified by seller + key) is already locked by another listing.
+   * Returns the listing ID that holds the lock, or null if the mon is unlocked.
+   */
+  async findCustodyLock(
+    sellerUuid: string,
+    pokemonKey: string,
+  ): Promise<number | null> {
+    const rows = await this.db
+      .select({ listingId: wigglypopMonCustody.listingId })
+      .from(wigglypopMonCustody)
+      .where(
+        and(
+          eq(wigglypopMonCustody.sellerUuid, sellerUuid),
+          eq(wigglypopMonCustody.pokemonKey, pokemonKey),
+        ),
+      );
+    return rows[0]?.listingId ?? null;
+  }
+
+  /**
+   * Locks a Pokémon (seller + key) to the given listing. Throws if already locked.
+   * The unique constraint on (seller_uuid, pokemon_key) enforces that only one
+   * listing can hold the lock.
+   */
+  async lockMon(
+    sellerUuid: string,
+    pokemonKey: string,
+    listingId: number,
+  ): Promise<void> {
+    try {
+      await this.db.insert(wigglypopMonCustody).values({
+        sellerUuid,
+        pokemonKey,
+        listingId,
+      });
+    } catch (error: any) {
+      // MySQL error 1062 = duplicate key (unique constraint violation)
+      if (error?.code === 'ER_DUP_ENTRY') {
+        throw new Error(
+          'This Pokémon is already listed',
+        );
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Releases the custody lock for all mons in a listing.
+   * Called when a listing is cancelled or completed.
+   */
+  async releaseCustodyByListing(listingId: number): Promise<void> {
+    await this.db
+      .delete(wigglypopMonCustody)
+      .where(eq(wigglypopMonCustody.listingId, listingId));
   }
 }

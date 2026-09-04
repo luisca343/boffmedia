@@ -29,6 +29,7 @@ interface TeamInput {
   name: string;
   format: string;
   packed: string;
+  tags?: string[] | null;
   clientUpdatedAt?: number | null;
   deletedAt?: number | null;
 }
@@ -157,6 +158,7 @@ export class BattlesimRepository {
    */
   async upsertTeam(userId: number, team: TeamInput): Promise<BattlesimTeam> {
     const id = randomUUID();
+    const tagsJson = team.tags ? JSON.stringify(team.tags) : '[]';
     await this.db
       .insert(battlesimTeams)
       .values({
@@ -166,6 +168,7 @@ export class BattlesimRepository {
         name: team.name,
         format: team.format,
         packed: team.packed,
+        tags: tagsJson,
         clientUpdatedAt: team.clientUpdatedAt ?? null,
         deletedAt: team.deletedAt ?? null,
       })
@@ -174,6 +177,7 @@ export class BattlesimRepository {
           name: sql`VALUES(name)`,
           format: sql`VALUES(format)`,
           packed: sql`VALUES(packed)`,
+          tags: sql`VALUES(tags)`,
           updatedAt: sql`NOW()`,
           clientUpdatedAt: sql`VALUES(client_updated_at)`,
           deletedAt: sql`VALUES(deleted_at)`,
@@ -247,6 +251,20 @@ export class BattlesimRepository {
           eq(battlesimTeams.clientId, clientId),
         ),
       );
+  }
+
+  /**
+   * Parse tags from JSON string stored in the database.
+   * Returns an empty array if parsing fails or the input is empty.
+   */
+  parseTags(tagsJson: string): string[] {
+    if (!tagsJson) return [];
+    try {
+      const parsed = JSON.parse(tagsJson);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
   }
 
   /**

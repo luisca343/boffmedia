@@ -36,6 +36,7 @@ use crate::install::paths::Layout;
 use crate::install::resolve::{fetch_for, loader_of, Fetch, LoaderKind, PlannedFile};
 use crate::install::InstallFailure;
 use crate::pack::PackManifest;
+use crate::pack::PackManifestVersionFilesItem;
 use crate::pack::PackManifestVersionFilesItemEnvServer as EnvServer;
 
 /// Emitted once per bundled file so the UI can show a real bar: a server pack
@@ -119,6 +120,22 @@ fn properties_value(value: &str) -> String {
         .filter(|c| c.is_ascii_graphic() || *c == ' ')
         .map(|c| if c == '\\' { '/' } else { c })
         .take(120)
+        .collect()
+}
+
+/// The files a dedicated server can actually use. `unsupported` means the mod
+/// cannot load headless at all - shipping a shader pack to a server is the
+/// exact chore this feature exists to remove.
+///
+/// Extracted so the test can exercise THIS function instead of re-writing the
+/// predicate: a test that copies the filter keeps passing after the filter is
+/// deleted from the export path, which is no guard at all.
+fn server_usable_files(
+    files: &[PackManifestVersionFilesItem],
+) -> Vec<&PackManifestVersionFilesItem> {
+    files
+        .iter()
+        .filter(|f| f.env.server != EnvServer::Unsupported)
         .collect()
 }
 
@@ -208,12 +225,7 @@ pub async fn export_server_zip(
     // Only the files a dedicated server can actually use. `unsupported` means
     // the mod cannot load headless at all — shipping a shader pack to a server
     // is the exact chore this feature exists to remove.
-    let wanted: Vec<_> = manifest
-        .version
-        .files
-        .iter()
-        .filter(|f| f.env.server != EnvServer::Unsupported)
-        .collect();
+    let wanted = server_usable_files(&manifest.version.files);
     let total = wanted.len();
 
     for (index, f) in wanted.iter().enumerate() {
@@ -874,5 +886,68 @@ mod tests {
             ..gen(Some("forge"), Some("47.2.0"))
         };
         assert!(g.readme().contains("mods/rom.gba"));
+    }
+
+    #[test]
+    fn server_export_filters_client_only_files() {
+        use crate::pack::{PackManifestVersionFilesItem, PackManifestVersionFilesItemEnvServer};
+
+        // Create a manifest with three files:
+        // 1. A required-on-server file (e.g., a mod)
+        // 2. A client-only file (env.server == "unsupported", e.g., Sodium)
+        // 3. An optional-on-server file
+        let files = vec![
+            PackManifestVersionFilesItem {
+                path: "mods/required-mod.jar".try_into().unwrap(),
+                sha512: "a".repeat(128).try_into().unwrap(),
+                file_size: 1000,
+                env: crate::pack::PackManifestVersionFilesItemEnv {
+                    client: crate::pack::PackManifestVersionFilesItemEnvClient::Required,
+                    server: PackManifestVersionFilesItemEnvServer::Required,
+                },
+                source: crate::pack::PackManifestVersionFilesItemSource::Url {
+                    url: "https://example.com/required.jar".parse().unwrap(),
+                },
+                loader: None,
+            },
+            PackManifestVersionFilesItem {
+                path: "mods/sodium.jar".try_into().unwrap(),
+                sha512: "b".repeat(128).try_into().unwrap(),
+                file_size: 2000,
+                env: crate::pack::PackManifestVersionFilesItemEnv {
+                    client: crate::pack::PackManifestVersionFilesItemEnvClient::Required,
+                    server: PackManifestVersionFilesItemEnvServer::Unsupported,
+                },
+                source: crate::pack::PackManifestVersionFilesItemSource::Url {
+                    url: "https://example.com/sodium.jar".parse().unwrap(),
+                },
+                loader: None,
+            },
+            PackManifestVersionFilesItem {
+                path: "mods/optional-mod.jar".try_into().unwrap(),
+                sha512: "c".repeat(128).try_into().unwrap(),
+                file_size: 3000,
+                env: crate::pack::PackManifestVersionFilesItemEnv {
+                    client: crate::pack::PackManifestVersionFilesItemEnvClient::Optional,
+                    server: PackManifestVersionFilesItemEnvServer::Optional,
+                },
+                source: crate::pack::PackManifestVersionFilesItemSource::Url {
+                    url: "https://example.com/optional.jar".parse().unwrap(),
+                },
+                loader: None,
+            },
+        ];
+
+        // The export path's own filter, not a copy of it.
+        let wanted = super::server_usable_files(&files);
+
+        // Should exclude Sodium (client-only) but keep required and optional
+        assert_eq!(wanted.len(), 2, "client-only file (Sodium) must be excluded");
+        assert_eq!(wanted[0].path.to_string(), "mods/required-mod.jar");
+        assert_eq!(wanted[1].path.to_string(), "mods/optional-mod.jar");
+        assert!(
+            !wanted.iter().any(|f| f.path.to_string().contains("sodium")),
+            "Sodium (env.server=unsupported) must not be in server pack"
+        );
     }
 }

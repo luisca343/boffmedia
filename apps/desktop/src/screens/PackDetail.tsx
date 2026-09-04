@@ -1272,6 +1272,14 @@ export function PackDetail() {
                   },
                 ]}
               />
+              {latest?.changelog && (
+                <>
+                  <Divider label={t("info.changelogLabel")} className="my-4" />
+                  <p className="whitespace-pre-wrap text-[0.75rem] leading-[1.45] text-txt-muted">
+                    {latest.changelog}
+                  </p>
+                </>
+              )}
             </Panel>
 
             <Panel title={t("info.accessTitle")}>

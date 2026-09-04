@@ -268,4 +268,60 @@ describe('MatchesService (settlement claim)', () => {
 
     expect(notify.notifyMatchReady).toHaveBeenCalledTimes(1);
   });
+
+  it('records admin dispute resolution (resolvedByUserId + resolvedAt)', async () => {
+    const disputedMatch = {
+      ...baseMatch,
+      status: 'live',
+      proposalState: 'disputed',
+      proposedByParticipantId: 10,
+      proposedTopScore: 2,
+      proposedBotScore: 1,
+    };
+
+    await service.settle(
+      disputedMatch,
+      {
+        winnerId: 10,
+        loserId: 20,
+        topScore: 2,
+        botScore: 1,
+        status: 'completed',
+      },
+      {
+        actorUserId: 999, // admin user id
+      },
+    );
+
+    expect(repo.claimSettlement).toHaveBeenCalledWith(
+      7,
+      expect.objectContaining({
+        resolvedByUserId: 999,
+        resolvedAt: expect.any(Date),
+      }),
+      expect.anything(),
+    );
+  });
+
+  it('does not record dispute resolution when actorUserId is undefined', async () => {
+    const disputedMatch = {
+      ...baseMatch,
+      status: 'live',
+      proposalState: 'disputed',
+    };
+
+    await service.settle(disputedMatch, {
+      winnerId: 10,
+      loserId: 20,
+      topScore: 1,
+      botScore: 0,
+      status: 'completed',
+    });
+
+    // When actorUserId is undefined, resolvedByUserId should not be set
+    const call = repo.claimSettlement.mock.calls[0];
+    const settlement = call[1];
+    expect(settlement.resolvedByUserId).toBeUndefined();
+    expect(settlement.resolvedAt).toBeUndefined();
+  });
 });

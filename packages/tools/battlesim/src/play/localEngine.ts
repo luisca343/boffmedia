@@ -180,7 +180,11 @@ class LocalBattleEngineStore {
 
   /* ── Battles ──────────────────────────────────────────────────────────── */
 
-  createBattle(format = "gen9randombattle", teams?: { p1Team?: string; p2Team?: string }): string {
+  createBattle(
+    format = "gen9randombattle",
+    teams?: { p1Team?: string; p2Team?: string },
+    aiOptions?: { aiDifficulty?: "easy" | "medium" | "hard"; aiSeed?: number | null },
+  ): string {
     const roomId = newRoomId();
     const session = new BattleSession(roomId, {
       onUpdate: () => this.emit(),
@@ -199,7 +203,14 @@ class LocalBattleEngineStore {
     };
     this.sessions.set(roomId, session);
     this.formats.set(roomId, format);
-    this.send({ type: "start", roomId, format, ...teams });
+    this.send({
+      type: "start",
+      roomId,
+      format,
+      ...teams,
+      aiDifficulty: aiOptions?.aiDifficulty,
+      aiSeed: aiOptions?.aiSeed,
+    });
     this.emit();
     return roomId;
   }
@@ -233,6 +244,21 @@ class LocalBattleEngineStore {
   /** The format a room was started with — the rematch and the tab label read it. */
   getFormat(roomId: string): string | undefined {
     return this.formats.get(roomId);
+  }
+
+  /** The AI seed for a room, if this is an AI battle. */
+  getAISeed(roomId: string): number | null | undefined {
+    const session = this.sessions.get(roomId);
+    if (!session) return undefined;
+    // The engine is stored in the session; access its public fields
+    return (session as any).engine?.aiSeed;
+  }
+
+  /** The AI difficulty tier for a room, if this is an AI battle. */
+  getAIDifficulty(roomId: string): 'easy' | 'medium' | 'hard' | undefined {
+    const session = this.sessions.get(roomId);
+    if (!session) return undefined;
+    return (session as any).engine?.aiDifficulty;
   }
 
   makeChoice(roomId: string, choice: string): void {

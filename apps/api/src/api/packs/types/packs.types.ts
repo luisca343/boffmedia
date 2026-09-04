@@ -43,6 +43,10 @@ export interface LauncherPackView {
     optionalFeatureCount: number;
     /** Present for emulator packs — the library sidebar's system mapping. */
     emulatorKind?: 'mgba' | 'melonds' | null;
+    /** What changed in this version, as the pack author wrote it. Nullable:
+     *  most versions never had one, and a missing changelog is silence, not an
+     *  error. */
+    changelog: string | null;
     createdAt: string;
   } | null;
 }
@@ -76,6 +80,9 @@ export interface PublicPackView {
     loader: PackLoader | null;
     loaderVersion: string | null;
     fileCount: number;
+    /** What changed in this version, as the pack author wrote it. Null for the
+     *  versions published before authors could say. */
+    changelog: string | null;
     createdAt: string;
   } | null;
   /** The optional-content model, exactly as `@boffmedia/ui`'s OptionalChooser

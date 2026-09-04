@@ -57,6 +57,10 @@ interface BattleHeaderProps {
   onToggleFullscreen?: () => void;
   showForfeit?: boolean;
   onForfeit?: () => void;
+  /** AI seed for local battles (shown for reproducibility). */
+  aiSeed?: number | null;
+  /** AI difficulty tier for local battles. */
+  aiDifficulty?: 'easy' | 'medium' | 'hard';
 }
 
 function MiniScore({ score, foe, right }: { score: BSXScore; foe?: boolean; right?: boolean }) {
@@ -169,7 +173,7 @@ export function BattleHeader({
   mode, onBack, roomLabel, formatLabel, you, foe, turn, timerYou, timerFoe, timerMax = 60,
   spectatorCount, layout, onToggleRail, railOpen, railUnread = 0, onToggleLog, logHidden = false,
   onToggleCalc, calcOpen = false,
-  isFullscreen, onToggleFullscreen, showForfeit, onForfeit,
+  isFullscreen, onToggleFullscreen, showForfeit, onForfeit, aiSeed, aiDifficulty,
 }: BattleHeaderProps) {
   const t = useToolT(BATTLESIM_NS);
   const meta = MODE_META[mode];
@@ -213,6 +217,16 @@ export function BattleHeader({
         {spectatorCount != null && spectatorCount > 0 && !mobile && (
           <span className="inline-flex items-center gap-1 whitespace-nowrap border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[0.625rem] leading-none text-txt-muted" title={t('battle.header.spectators', { count: spectatorCount })}>
             <Icon name="eye" size={12} />{spectatorCount}
+          </span>
+        )}
+        {mode === 'ai' && aiSeed != null && !mobile && (
+          <span className="inline-flex items-center gap-1 whitespace-nowrap border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[0.625rem] leading-none text-txt-muted" title={t('battle.header.aiSeed', { seed: aiSeed })}>
+            {t('battle.header.aiSeed', { seed: aiSeed })}
+          </span>
+        )}
+        {mode === 'ai' && aiDifficulty && !mobile && (
+          <span className="inline-flex items-center gap-1 whitespace-nowrap border border-solid border-line-2 bg-base px-2 py-1 font-mono text-[0.625rem] leading-none text-txt-muted" title={t('battle.header.aiDifficultyLabel', { difficulty: t(`battle.play.difficulty${aiDifficulty[0].toUpperCase()}${aiDifficulty.slice(1)}`) })}>
+            {t('battle.header.aiDifficultyLabel', { difficulty: t(`battle.play.difficulty${aiDifficulty[0].toUpperCase()}${aiDifficulty.slice(1)}`) })}
           </span>
         )}
         {onToggleCalc && (

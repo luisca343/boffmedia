@@ -160,6 +160,15 @@
       "clear": "Clear",
       "noNotifications": "No notifications",
       "delete": "Delete",
+      "palette": {
+        "noResults": "No results found",
+        "hint": "↑ ↓ to navigate • ⏎ to select • Esc to close",
+        "category": {
+          "route": "Route",
+          "tool": "Tool",
+          "admin": "Admin"
+        }
+      },
       "sections": {
         "competition": "Competition",
         "participate": "Take part",

@@ -98,6 +98,20 @@ export class DesktopReleasesRepository {
       .where(eq(desktopReleases.id, id));
   }
 
+  async setRolloutPercent(id: number, rolloutPercent: number): Promise<void> {
+    await this.db
+      .update(desktopReleases)
+      .set({ rolloutPercent })
+      .where(eq(desktopReleases.id, id));
+  }
+
+  async setPaused(id: number, paused: boolean): Promise<void> {
+    await this.db
+      .update(desktopReleases)
+      .set({ paused })
+      .where(eq(desktopReleases.id, id));
+  }
+
   async remove(id: number): Promise<void> {
     await this.db.delete(desktopReleases).where(eq(desktopReleases.id, id));
   }

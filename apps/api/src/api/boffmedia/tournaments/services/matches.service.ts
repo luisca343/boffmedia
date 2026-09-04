@@ -119,7 +119,7 @@ export class MatchesService {
         {
           amend: alreadyResolved,
           expectedVersion: alreadyResolved ? dto.amendVersion : undefined,
-          actorUserId: alreadyResolved ? actorUserId : undefined,
+          actorUserId,
           previousResult: alreadyResolved
             ? {
                 winnerId: match.winnerParticipantId,
@@ -183,7 +183,7 @@ export class MatchesService {
       {
         amend: alreadyResolved,
         expectedVersion: alreadyResolved ? dto.amendVersion : undefined,
-        actorUserId: alreadyResolved ? actorUserId : undefined,
+        actorUserId,
         previousResult: alreadyResolved
           ? {
               winnerId: match.winnerParticipantId,
@@ -286,6 +286,11 @@ export class MatchesService {
     actorUserId?: number | null,
     previousResult?: { winnerId: number | null; topScore: number | null; botScore: number | null },
   ): Promise<boolean> {
+    const now = new Date();
+    // When an admin resolves a disputed match, record who and when.
+    const isDisputeResolution =
+      match.proposalState === 'disputed' && actorUserId !== undefined;
+
     const claimed = await repo.claimSettlement(
       match.id,
       {
@@ -293,7 +298,7 @@ export class MatchesService {
         botScore: s.botScore,
         winnerParticipantId: s.winnerId,
         status: s.status,
-        reportedAt: new Date(),
+        reportedAt: now,
         // Increment version on every settlement: both normal claims and amends.
         version: match.version + 1,
         // Any settlement (rival confirm, admin report/amend, forfeit, bye)
@@ -305,6 +310,11 @@ export class MatchesService {
         proposedAt: null,
         proposalExpiresAt: null,
         proposalState: null,
+        // Record admin dispute resolution
+        ...(isDisputeResolution && {
+          resolvedByUserId: actorUserId,
+          resolvedAt: now,
+        }),
       },
       {
         allowResolved: amend,

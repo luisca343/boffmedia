@@ -1,0 +1,13 @@
+{
+  "notifications": {
+    "preferences": "Preferencias de Notificaciones",
+    "preferences_description": "Elige qué notificaciones deseas recibir y gestiona tus suscripciones de correo.",
+    "type_event": "Notificaciones de Eventos",
+    "type_achievement": "Notificaciones de Logros",
+    "type_tournament": "Notificaciones de Torneos",
+    "type_system": "Notificaciones del Sistema",
+    "type_forum": "Notificaciones del Foro",
+    "mute_this_type": "Silenciar este tipo de notificación",
+    "muted": "Este tipo de notificación está silenciado"
+  }
+}

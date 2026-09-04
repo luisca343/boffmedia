@@ -19,6 +19,11 @@ import {
   UpdaterFeedEntity,
 } from './entities/desktop-updates.entity';
 
+export interface ClientIdentifier {
+  /** A stable identifier for the client (device id, installation id, or machine UUID). */
+  deviceId: string;
+}
+
 /** Tauri's platform key is `{os}-{arch}`: windows-x86_64, darwin-aarch64,
  *  linux-x86_64… Anything else is a client typo, and this value becomes a path
  *  segment, so it is validated before it ever reaches the filesystem. */
@@ -46,15 +51,21 @@ export class DesktopUpdatesService {
    * caller is already on the newest published build — the plugin treats an
    * empty 204 as "no update", which is cheaper and less error-prone than
    * returning a payload it has to reject.
+   *
+   * Honors staged rollout: a release at N% is offered only to a deterministic,
+   * stable subset of clients (bucketed by hashing the device ID). A paused
+   * release is never offered, even if published.
    */
   async feed(
     target: string,
     currentVersion: string,
     baseUrl: string,
+    clientId?: ClientIdentifier,
   ): Promise<UpdaterFeedEntity | null> {
     const platform = this.assertTarget(target);
+    const releases = await this.releases.listPublishedForTarget(platform);
     const newest = this.newest(
-      await this.releases.listPublishedForTarget(platform),
+      releases.filter((r) => !r.paused && this.isClientInRollout(r, clientId)),
     );
     if (!newest) return null;
     if (compareVersions(newest.version, stripV(currentVersion)) <= 0)
@@ -71,6 +82,47 @@ export class DesktopUpdatesService {
         },
       },
     };
+  }
+
+  /**
+   * Deterministically assign a client to a rollout bucket based on their device ID.
+   * Returns true if the client is in the rollout percentage for this release.
+   *
+   * The bucket assignment is stable: the same device ID will always get the same
+   * answer across repeated calls, and the population splits evenly across buckets
+   * at the specified percentage.
+   */
+  private isClientInRollout(
+    release: DesktopRelease,
+    clientId?: ClientIdentifier,
+  ): boolean {
+    // No client identifier means we can't determine rollout; conservative default
+    // is to include it (assume it's a new install or dev client that should get
+    // the release). For production, the desktop app should always send device_id.
+    if (!clientId) return true;
+
+    // If rollout is at 100%, everyone gets it.
+    if (release.rolloutPercent >= 100) return true;
+
+    // If rollout is at 0%, no one gets it.
+    if (release.rolloutPercent <= 0) return false;
+
+    // Hash the device ID to a stable 0-99 bucket.
+    const bucket = this.getClientBucket(clientId.deviceId);
+    return bucket < release.rolloutPercent;
+  }
+
+  /**
+   * Hash a device ID to a stable bucket (0-99). Uses CRC32-style hashing for
+   * determinism across clients and requests.
+   */
+  private getClientBucket(deviceId: string): number {
+    // Use a simple hash based on the device ID to map it to 0-99.
+    // This ensures the same device always gets the same bucket.
+    const hash = createHash('sha256').update(deviceId).digest();
+    // Take the first 4 bytes and convert to a number in the range 0-99.
+    const value = hash.readUInt32BE(0);
+    return Math.abs(value % 100);
   }
 
   /** Newest *published* build for a target, by semver, not by insert order. */
@@ -260,6 +312,29 @@ export class DesktopUpdatesService {
     });
   }
 
+  async setRolloutPercent(
+    id: number,
+    rolloutPercent: number,
+  ): Promise<DesktopReleaseEntity> {
+    const row = await this.releases.findById(id);
+    if (!row) throw new NotFoundException('Release no encontrada');
+    if (rolloutPercent < 0 || rolloutPercent > 100) {
+      throw new BadRequestException({
+        message: 'rolloutPercent must be between 0 and 100',
+        userMessage: 'El porcentaje de despliegue debe estar entre 0 y 100.',
+      });
+    }
+    await this.releases.setRolloutPercent(id, rolloutPercent);
+    return toEntity({ ...row, rolloutPercent });
+  }
+
+  async setPaused(id: number, paused: boolean): Promise<DesktopReleaseEntity> {
+    const row = await this.releases.findById(id);
+    if (!row) throw new NotFoundException('Release no encontrada');
+    await this.releases.setPaused(id, paused);
+    return toEntity({ ...row, paused });
+  }
+
   async remove(id: number): Promise<void> {
     const row = await this.releases.findById(id);
     if (!row) throw new NotFoundException('Release no encontrada');
@@ -303,6 +378,8 @@ function toEntity(row: DesktopRelease): DesktopReleaseEntity {
     sizeBytes: row.sizeBytes,
     published: row.published,
     publishedAt: row.publishedAt ? row.publishedAt.toISOString() : null,
+    rolloutPercent: row.rolloutPercent,
+    paused: row.paused,
     createdAt: row.createdAt.toISOString(),
   };
 }

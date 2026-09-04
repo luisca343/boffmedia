@@ -660,6 +660,8 @@ export class WigglypopCustodyService {
         order.id,
         line.lineTotal,
       );
+      // CUSTODY LOCK: Release locks on all mons when the listing is completed.
+      await this.listingsRepository.releaseCustodyByListing(line.listingId);
     }
   }
 
@@ -671,6 +673,8 @@ export class WigglypopCustodyService {
       if (listing && listing.status === 'reservado') {
         await this.listingsRepository.setStatus(line.listingId, 'activo');
       }
+      // CUSTODY LOCK: Release locks on all mons when the order is cancelled.
+      await this.listingsRepository.releaseCustodyByListing(line.listingId);
     }
   }
 }

@@ -19,7 +19,10 @@ import {
   boffMediaContentReports,
   boffMediaModerationSanctions,
 } from '@/_db/schema/BoffMediaModeration';
-import { boffMediaNotifications } from '@/_db/schema/BoffMediaNotifications';
+import {
+  boffMediaNotifications,
+  boffMediaNotificationPreferences,
+} from '@/_db/schema/BoffMediaNotifications';
 import {
   boffMediaTournamentMatchMessages,
   boffMediaTournamentParticipants,
@@ -111,6 +114,7 @@ import {
   wigglypopListingItems,
   wigglypopListingMons,
   wigglypopListings,
+  wigglypopMonCustody,
   wigglypopOffers,
   wigglypopOrderLines,
   wigglypopOrders,
@@ -252,6 +256,15 @@ export const EXPORTED_TABLES: readonly ExportedTable[] = [
     drizzle: boffMediaNotifications,
     ownedBy: [{ column: boffMediaNotifications.userId, key: 'accountId' }],
     meaning: 'Site notifications addressed to you, and whether you read them.',
+  },
+  {
+    table: 'boffmedia_notification_preferences',
+    section: 'account',
+    drizzle: boffMediaNotificationPreferences,
+    ownedBy: [
+      { column: boffMediaNotificationPreferences.userId, key: 'accountId' },
+    ],
+    meaning: 'Which kinds of notification you chose to mute.',
   },
   {
     table: 'boffmedia_uploads',
@@ -895,6 +908,14 @@ export const EXPORTED_TABLES: readonly ExportedTable[] = [
     meaning: 'Things you listed for sale or trade.',
   },
   {
+    table: 'rotom_wigglypop_mon_custody',
+    section: 'economy',
+    drizzle: wigglypopMonCustody,
+    ownedBy: [{ column: wigglypopMonCustody.sellerUuid, key: 'mcUuid' }],
+    meaning:
+      'Pokémon of yours that are locked because they are currently listed.',
+  },
+  {
     table: 'rotom_wigglypop_listing_items',
     section: 'economy',
     drizzle: wigglypopListingItems,
@@ -1121,6 +1142,18 @@ export const EXPORTED_TABLES: readonly ExportedTable[] = [
 ];
 
 export const EXCLUDED_TABLES: readonly ExcludedTable[] = [
+  // Opt-in desktop telemetry. This is the one table whose exclusion protects
+  // the user rather than the system: rows are keyed ONLY by a random
+  // per-installation id that is deliberately not tied to an account, so there
+  // is no column to match a person against. Adding one to satisfy an export
+  // would create exactly the account-linked trail the opt-in promises not to
+  // keep. A user who wants the events gone deletes the app's data directory,
+  // which retires the id.
+  {
+    table: 'desktop_telemetry_events',
+    reason:
+      'Anonymous, opt-in app events keyed by a random install id with no account link. Nothing here can be attributed to a person, so nothing here is personal data to export.',
+  },
   // Credentials. Every one of these is a hash or an encrypted secret that still
   // opens the account. None carries a fact about the person that is not already
   // in `boffmedia_users`, and putting a working second factor into a

@@ -116,6 +116,12 @@ export const battlesimTeams = mysqlTable(
     format: varchar('format', { length: 64 }).notNull(),
     /** Showdown packed-team format — the sim's own wire shape. */
     packed: text('packed').notNull(),
+    /**
+     * User-defined tags for organizing teams (JSON array).
+     * Example: '["competitive", "doubles"]'
+     * Stored as JSON to support flexible tagging without a join table.
+     */
+    tags: text('tags').default('[]').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
     /**

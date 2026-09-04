@@ -36,6 +36,9 @@ export type {
   ChoiceResult,
 } from './engine/BattleEngine.js';
 
+export { createAIPlayer, normalizeSeed } from './engine/AIPlayer.js';
+export type { AIDifficulty } from './engine/AIPlayer.js';
+
 export { TimerManager } from './engine/TimerManager.js';
 export type { TimerConfig, TimerState, TimerManagerCallbacks } from './engine/TimerManager.js';
 

@@ -585,6 +585,10 @@ export const boffMediaTournamentMatches = mysqlTable(
       PROPOSAL_STATE.DISPUTED,
     ]),
     judgeRequestedAt: timestamp('judge_requested_at'),
+    // Dispute resolution: admin who resolved a disputed match (when proposalState
+    // transitions from 'disputed' to null). Null if auto-verified or never disputed.
+    resolvedByUserId: int('resolved_by_user_id'),
+    resolvedAt: timestamp('resolved_at'),
     // Optimistic concurrency control: incremented on every settlement/amend.
     // Admin amends use this to ensure the match hasn't changed since they last
     // loaded it; a conflict (409) tells them to reload the match.
@@ -664,6 +668,13 @@ export const boffMediaTournamentMatches = mysqlTable(
       columns: [t.loserNextMatchId],
       foreignColumns: [t.id],
       name: 'tm_lnext_fk',
+    })
+      .onDelete('set null')
+      .onUpdate('cascade'),
+    resolvedByFk: foreignKey({
+      columns: [t.resolvedByUserId],
+      foreignColumns: [boffMediaUsers.id],
+      name: 'tm_resolved_by_fk',
     })
       .onDelete('set null')
       .onUpdate('cascade'),

@@ -19,15 +19,20 @@
  * doing so is what leaked the opponent's exact HP.
  */
 
-import { BattleStreams, RandomPlayerAI, Teams } from '@pkmn/sim';
+import { BattleStreams, Teams } from '@pkmn/sim';
 import { Generations } from '@pkmn/data';
 import { Battle } from '@pkmn/client';
 import { Protocol } from '@pkmn/protocol';
-import { Dex, PokemonSet } from '@pkmn/sim';
+import { Dex, PokemonSet, type PRNGSeed } from '@pkmn/sim';
 
 import { getFormat, isKnownFormat, isRandomFormat } from '../formats.js';
 import { getRandomTeam } from '../teams/random.js';
 import { TimerManager, TimerConfig, TimerState } from './TimerManager.js';
+import {
+  createAIPlayer,
+  formatSeedForPRNG,
+  type AIDifficulty,
+} from './AIPlayer.js';
 
 export type BattleEngineMode = 'ai' | 'pvp';
 
@@ -108,10 +113,14 @@ const newSideState = (): SideState => ({
 export class BattleEngine {
   readonly id: string;
   readonly mode: BattleEngineMode;
+  /** AI difficulty tier, if this is an AI battle. */
+  readonly aiDifficulty: AIDifficulty | null = null;
+  /** The seed used for the AI PRNG, if seeded. Enables reproducible battles. */
+  readonly aiSeed: number | null = null;
 
   private streams!: ReturnType<typeof BattleStreams.getPlayerStreams>;
   private battle!: Battle;
-  private p2AI: RandomPlayerAI | null = null;
+  private p2AI: any = null;
   private replayLines: string[] = [];
   private sides: Record<BattleSide, SideState> = { p1: newSideState(), p2: newSideState() };
   private callbacks: BattleEngineCallbacks;
@@ -163,7 +172,12 @@ export class BattleEngine {
     );
   }
 
-  async create(format: string = 'gen9randombattle', p1Spec?: PlayerSpec, p2Spec?: PlayerSpec): Promise<void> {
+  async create(
+    format: string = 'gen9randombattle',
+    p1Spec?: PlayerSpec,
+    p2Spec?: PlayerSpec,
+    options?: { aiDifficulty?: AIDifficulty; aiSeed?: any },
+  ): Promise<void> {
     // Validate format before creating anything
     if (!isKnownFormat(format)) {
       throw new Error(`Unknown format: ${format}`);
@@ -194,11 +208,26 @@ export class BattleEngine {
       // p2 ONLY. `ai` means "a human plays p1 against a bot", not "watch two
       // bots play". The AI OWNS the p2 stream — we must not read it as well, or
       // the two consumers race for the same chunks.
-      this.p2AI = new RandomPlayerAI(this.streams.p2);
+      const difficulty = options?.aiDifficulty ?? 'medium';
+      const seed = options?.aiSeed ?? null;
+
+      // Store for later inspection (replays, debugging)
+      (this as any).aiDifficulty = difficulty;
+      (this as any).aiSeed = seed;
+
+      this.p2AI = createAIPlayer(this.streams.p2, difficulty, seed);
       void this.p2AI.start();
     }
 
-    const spec = { formatid: format };
+    // The AI's seed alone does NOT make a battle reproducible: damage rolls,
+    // crits, accuracy and speed ties come from the BATTLE's own PRNG, which is
+    // unseeded unless `>start` carries a seed. Seeding only the bot and calling
+    // the result deterministic is how a "seeded" battle still diverges run to
+    // run — so the same seed drives both.
+    const battleSeed = formatSeedForPRNG(options?.aiSeed ?? null);
+    const spec = battleSeed
+      ? { formatid: format, seed: battleSeed }
+      : { formatid: format };
     const p1 = { name: p1Spec?.name ?? 'Player', team: Teams.pack(team1) };
     const p2 = { name: p2Spec?.name ?? 'Bot', team: Teams.pack(team2) };
 

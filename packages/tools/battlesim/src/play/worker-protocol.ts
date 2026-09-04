@@ -16,6 +16,9 @@
  * ordinary `protocol` line. Same change as the `/battle` gateway, same reason.
  */
 
+/** Difficulty tier for AI opponent. Affects move/switch selection strategy. */
+export type AIDifficulty = 'easy' | 'medium' | 'hard';
+
 /** Main thread -> worker. */
 export type BattleWorkerRequest =
   | {
@@ -28,6 +31,10 @@ export type BattleWorkerRequest =
       p2Team?: string;
       p1Name?: string;
       p2Name?: string;
+      /** AI difficulty tier. Defaults to 'medium'. Only used when p2 is AI. */
+      aiDifficulty?: AIDifficulty;
+      /** PRNG seed for deterministic AI decisions. Can be number, null (unseeded), or PRNGSeed format. */
+      aiSeed?: number | null;
     }
   | {
       type: "choice";

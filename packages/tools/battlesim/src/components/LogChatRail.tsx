@@ -14,6 +14,7 @@ export interface RailChat {
   messages: ChatPanelMessage[];
   onSend?: (message: string) => void;
   disabled?: boolean;
+  opponentName?: string;
 }
 
 interface LogChatRailProps {
@@ -124,7 +125,7 @@ export function LogChatRail({ ticks, chat, tab: tabProp, onTabChange, onClose, c
         <div role="tabpanel" id={`${baseId}-panel-chat`} aria-labelledby={`${baseId}-tab-chat`} hidden={tab !== 'chat'}
           className={cn('min-h-0 flex-1 flex-col', tab === 'chat' ? 'flex' : 'hidden')}>
           <ChatPanel messages={chat.messages} onSend={chat.onSend} disabled={chat.disabled}
-            placeholder={t('chat.battlePlaceholder')} emptyText={t('chat.battleEmpty')} />
+            placeholder={t('chat.battlePlaceholder')} emptyText={t('chat.battleEmpty')} opponentName={chat.opponentName} />
         </div>
       )}
     </div>

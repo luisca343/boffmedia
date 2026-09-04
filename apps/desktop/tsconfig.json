@@ -11,7 +11,7 @@
     "esModuleInterop": true,
     "isolatedModules": true,
     "resolveJsonModule": true,
-    "types": ["vite/client"],
+    "types": ["vite/client", "vitest/globals"],
     "paths": {
       "@/*": ["./src/*"],
       "@boffmedia/tool-kit": ["../../packages/tools/kit/src"],

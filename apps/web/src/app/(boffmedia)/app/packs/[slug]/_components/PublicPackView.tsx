@@ -90,6 +90,17 @@ export function PublicPackView({ pack }: { pack: PublicPack }) {
         </section>
       )}
 
+      {pack.version?.changelog && (
+        <section className="flex flex-col gap-2">
+          <h2 className="font-display text-[1rem] font-bold uppercase tracking-[0.05em]">
+            {t("changelog")}
+          </h2>
+          <p className="whitespace-pre-wrap text-[0.875rem] leading-[1.6] text-txt-muted">
+            {pack.version.changelog}
+          </p>
+        </section>
+      )}
+
       {pack.optionalGroups.length > 0 && (
         <section className="flex flex-col gap-3">
           <div className="flex flex-col gap-1">

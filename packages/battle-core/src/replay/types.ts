@@ -38,4 +38,8 @@ export interface TeamRecord {
   updatedAt: number;
   /** Soft-delete marker. */
   deletedAt?: number;
+  /** User-defined tags for organizing and filtering teams. */
+  tags?: string[];
+  /** Client clock timestamp (epoch ms) for detecting merge conflicts. */
+  clientUpdatedAt?: number | null;
 }

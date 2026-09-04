@@ -1,4 +1,19 @@
-import type { DesktopReleaseEntity } from "@boffmedia/shared"
+import type { DesktopReleaseEntity as GeneratedDesktopRelease } from "@boffmedia/shared"
+
+/** The generated entity plus the staged-rollout fields (X17).
+ *
+ *  `packages/shared/src` is regenerated from the running API's OpenAPI document
+ *  and must never be hand-edited, so until someone runs `pnpm generate:shared`
+ *  against an API carrying this release, the two new columns are declared here —
+ *  the same stopgap `PackVersionRow` uses for its emulator fields. Delete this
+ *  wrapper once the generated model has them. */
+export type DesktopReleaseEntity = GeneratedDesktopRelease & {
+  /** 0-100. What share of clients this release is offered to. */
+  rolloutPercent: number
+  /** A hold: the release stays published and keeps its artifact, but no client
+   *  is offered it. */
+  paused: boolean
+}
 
 import {
   apiAuthedAutoBinaryPOST,
@@ -61,6 +76,30 @@ export class DesktopReleasesService {
   static unpublish(id: number, stepUpToken: string) {
     return apiAuthedAutoPOSTWithHeaders<DesktopReleaseEntity>(
       `/desktop/admin/releases/${id}/unpublish`,
+      {},
+      { [STEP_UP_HEADER]: stepUpToken },
+    )
+  }
+
+  static setRollout(id: number, percent: number, stepUpToken: string) {
+    return apiAuthedAutoPOSTWithHeaders<DesktopReleaseEntity>(
+      `/desktop/admin/releases/${id}/rollout?percent=${percent}`,
+      {},
+      { [STEP_UP_HEADER]: stepUpToken },
+    )
+  }
+
+  static pause(id: number, stepUpToken: string) {
+    return apiAuthedAutoPOSTWithHeaders<DesktopReleaseEntity>(
+      `/desktop/admin/releases/${id}/pause`,
+      {},
+      { [STEP_UP_HEADER]: stepUpToken },
+    )
+  }
+
+  static resume(id: number, stepUpToken: string) {
+    return apiAuthedAutoPOSTWithHeaders<DesktopReleaseEntity>(
+      `/desktop/admin/releases/${id}/resume`,
       {},
       { [STEP_UP_HEADER]: stepUpToken },
     )

@@ -33,7 +33,7 @@ const newClientId = () =>
     ? crypto.randomUUID()
     : `team-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-export type TeamPatch = Partial<Pick<TeamRecord, "name" | "format" | "packed">>;
+export type TeamPatch = Partial<Pick<TeamRecord, "name" | "format" | "packed" | "tags">>;
 
 export interface UseTeams {
   teams: TeamRecord[];

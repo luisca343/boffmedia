@@ -50,6 +50,10 @@ export interface LiveBattleProps {
   endActions: EndAction[];
   /** Connection notices etc., shown above the dock. */
   banner?: ReactNode;
+  /** AI seed for local battles (shown for reproducibility). */
+  aiSeed?: number | null;
+  /** AI difficulty tier for local battles. */
+  aiDifficulty?: 'easy' | 'medium' | 'hard';
 }
 
 type MobileTab = 'actions' | RailTab;
@@ -95,7 +99,7 @@ function MusicController({ roomId, battleActive }: { roomId?: string; battleActi
   return null;
 }
 
-export function LiveBattle({ state, session = null, pov, mode, formatLabel, roomLabel, onChoice, onUndo, onForfeit, onBack, initScene, chat, spectator = false, spectatorCount, endActions, banner }: LiveBattleProps) {
+export function LiveBattle({ state, session = null, pov, mode, formatLabel, roomLabel, onChoice, onUndo, onForfeit, onBack, initScene, chat, spectator = false, spectatorCount, endActions, banner, aiSeed, aiDifficulty }: LiveBattleProps) {
   const t = useToolT(BATTLESIM_NS);
   const shellNode = useRef<HTMLDivElement | null>(null);
   const { ref: fsRef, isFullscreen, toggle: toggleFullscreen } = useFullscreen<HTMLDivElement>();
@@ -202,6 +206,7 @@ export function LiveBattle({ state, session = null, pov, mode, formatLabel, room
       onToggleCalc={() => setCalcOpen((v) => !v)} calcOpen={calcOpen}
       isFullscreen={isFullscreen} onToggleFullscreen={toggleFullscreen}
       showForfeit={live && !!onForfeit} onForfeit={() => setConfirmForfeit(true)}
+      aiSeed={aiSeed} aiDifficulty={aiDifficulty}
     />
   );
 

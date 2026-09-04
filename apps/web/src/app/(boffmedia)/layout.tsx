@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { env } from "@/config/env";
 import { GlobalProviders } from "../GlobalProviders";
 import { BackToTop } from "@/components/ui/BackToTop";
+import { CommandPaletteProvider } from "./_components/palette/CommandPalette";
 
 import '../globals.css'
 import { Navbar } from "@/components/boffmedia/ui/navigation/Navbar";
@@ -20,20 +21,22 @@ export default async function RootLayout({
 }>) {
   return (
     <GlobalProviders>
-      {/* v3 base heading styles (tailwind.config.ts) are scoped here for the
-          whole group now that every route is v3. `display:contents` keeps the
-          body flex layout intact while the descendant selectors still match. */}
-      <div data-ds="boffmedia" className="contents">
-        <ToastStack />
-        <Navbar />
-        <section className="no-scrollbar flex-1 min-h-0 bg-base">
-            <section className="flex-1 min-h-0 [&>*]:min-h-[calc(100vh_-_22rem)]">
-              {children}
-            </section>
-            <Footer />
-        </section>
-        <BackToTop />
-      </div>
+      <CommandPaletteProvider>
+        {/* v3 base heading styles (tailwind.config.ts) are scoped here for the
+            whole group now that every route is v3. `display:contents` keeps the
+            body flex layout intact while the descendant selectors still match. */}
+        <div data-ds="boffmedia" className="contents">
+          <ToastStack />
+          <Navbar />
+          <section className="no-scrollbar flex-1 min-h-0 bg-base">
+              <section className="flex-1 min-h-0 [&>*]:min-h-[calc(100vh_-_22rem)]">
+                {children}
+              </section>
+              <Footer />
+          </section>
+          <BackToTop />
+        </div>
+      </CommandPaletteProvider>
     </GlobalProviders>
   );
 }

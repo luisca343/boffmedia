@@ -28,6 +28,14 @@ export class SocketsGateway
   server: Server;
   users: Map<string, { uuid: string; socketId: string }> = new Map();
 
+  /** Every live socket a uuid currently holds, which is NOT the same question
+   *  as `users` answers. `users` keeps ONE socket per uuid so a targeted emit
+   *  has somewhere to go; presence has to outlive any single tab. Keying
+   *  presence on `users` alone meant a player with two tabs went offline the
+   *  moment they closed the newer one, while still connected in the other —
+   *  invisible until S8 put that list on screen. */
+  private socketsOf: Map<string, Set<string>> = new Map();
+
   constructor(
     private readonly logger: Logger,
 
@@ -50,6 +58,14 @@ export class SocketsGateway
       uuid,
       status: this.presence.get(uuid),
     });
+  }
+
+  private sendPresenceList(client: Socket): void {
+    const onlineList = Array.from(this.users.keys()).map((uuid) => ({
+      uuid,
+      status: this.presence.get(uuid),
+    }));
+    client.emit('presence:list', onlineList);
   }
 
   handleConnection(client: Socket) {
@@ -89,8 +105,15 @@ export class SocketsGateway
     }
 
     this.users.set(uuid, { uuid, socketId: client.id });
+    const sockets = this.socketsOf.get(uuid) ?? new Set<string>();
+    sockets.add(client.id);
+    this.socketsOf.set(uuid, sockets);
     this.presence.setOnline(uuid, !!smartRotomUser?.inGame);
     this.broadcastPresence(uuid);
+
+    // Send full online list to the connecting client
+    this.sendPresenceList(client);
+
     this.logger.log(`Updated connection for user ${uuid}`);
     this.logger.log('Current users:', this.users.size);
 
@@ -100,15 +123,24 @@ export class SocketsGateway
   handleDisconnect(client: Socket) {
     this.logger.log(`Client with ID ${client.id} disconnected`);
 
-    // Find and remove the disconnected user
-    for (const [uuid, user] of this.users.entries()) {
-      if (user.socketId === client.id) {
+    // A uuid goes offline when its LAST socket goes, not when the one that
+    // happened to be in `users` goes: two tabs are one player.
+    for (const [uuid, sockets] of this.socketsOf.entries()) {
+      if (!sockets.delete(client.id)) continue;
+
+      if (sockets.size === 0) {
+        this.socketsOf.delete(uuid);
         this.users.delete(uuid);
         this.presence.setOffline(uuid);
         this.broadcastPresence(uuid);
         this.logger.log(`Removed user ${uuid} from connections`);
-        break;
+      } else if (this.users.get(uuid)?.socketId === client.id) {
+        // Still connected elsewhere: repoint the targeted-emit socket at a
+        // surviving tab instead of leaving `users` pointing at a dead one.
+        const [survivor] = sockets;
+        this.users.set(uuid, { uuid, socketId: survivor });
       }
+      break;
     }
 
     this.logger.log('Current users:', this.users.size);

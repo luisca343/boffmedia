@@ -174,6 +174,11 @@ export class PackVersionEntity {
   emulatorKind?: 'mgba' | 'melonds' | null;
   @ApiProperty() published!: boolean;
   @ApiPropertyOptional({ nullable: true }) notes!: string | null;
+  @ApiPropertyOptional({
+    nullable: true,
+    description: 'What changed in this version, for players.',
+  })
+  changelog!: string | null;
   @ApiProperty() createdAt!: string;
 }
 

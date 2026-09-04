@@ -62,6 +62,8 @@ pub enum ManifestError {
     ForbiddenForNonMinecraft,
     #[error("`runtime` is minecraft-only — there is no JVM to configure")]
     RuntimeNotMinecraft,
+    #[error("runtime.memoryMib must be between 512 and 65536 MiB (got {0})")]
+    RuntimeMemoryOutOfBounds(u32),
     #[error("runtime.jvmArgs rejected: {0} ({1})")]
     RuntimeJvmArg(String, &'static str),
     #[error("initialFiles cannot contain user-provided sources")]
@@ -157,6 +159,16 @@ fn validate_runtime(manifest: &PackManifest) -> Result<(), ManifestError> {
     if !is_minecraft {
         return Err(ManifestError::RuntimeNotMinecraft);
     }
+
+    // Bounds check on memory: the schema enforces 512..=65536, mirror it here.
+    // The schema validation runs first in zod, so this is defensive — a rule
+    // that tightens or loosens must stay synchronized.
+    if let Some(mib) = runtime.memory_mib {
+        if mib < 512 || mib > 65536 {
+            return Err(ManifestError::RuntimeMemoryOutOfBounds(mib as u32));
+        }
+    }
+
     for arg in &runtime.jvm_args {
         if let Err((arg, why)) = crate::install::jvm_args::judge(arg.as_str()) {
             return Err(ManifestError::RuntimeJvmArg(arg, why.reason()));
@@ -770,6 +782,36 @@ mod tests {
         let m = manifest_with_runtime(r#"{"memoryMib":4096}"#, Some("emulator"));
         let err = parse_manifest(&m).unwrap_err();
         assert!(matches!(err, ManifestError::RuntimeNotMinecraft), "{err:?}");
+    }
+
+    #[test]
+    fn rejects_memory_too_small() {
+        let m = manifest_with_runtime(r#"{"memoryMib":256}"#, None);
+        match parse_manifest(&m).unwrap_err() {
+            ManifestError::RuntimeMemoryOutOfBounds(mib) => assert_eq!(mib, 256),
+            other => panic!("expected RuntimeMemoryOutOfBounds, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn rejects_memory_too_large() {
+        let m = manifest_with_runtime(r#"{"memoryMib":100000}"#, None);
+        match parse_manifest(&m).unwrap_err() {
+            ManifestError::RuntimeMemoryOutOfBounds(mib) => assert_eq!(mib, 100000),
+            other => panic!("expected RuntimeMemoryOutOfBounds, got {other:?}"),
+        }
+    }
+
+    #[test]
+    fn accepts_memory_at_bounds() {
+        let m = manifest_with_runtime(r#"{"memoryMib":512}"#, None);
+        assert!(parse_manifest(&m).is_ok());
+
+        let m = manifest_with_runtime(r#"{"memoryMib":65536}"#, None);
+        assert!(parse_manifest(&m).is_ok());
+
+        let m = manifest_with_runtime(r#"{"memoryMib":4096}"#, None);
+        assert!(parse_manifest(&m).is_ok());
     }
 
     #[test]

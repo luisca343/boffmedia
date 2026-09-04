@@ -64,6 +64,55 @@
       "when": 1788524000000,
       "tag": "0008_moderation_reports",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "5",
+      "when": 1788530000000,
+      "tag": "0009_pack_version_changelog",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "5",
+      "when": 1788530001000,
+      "tag": "0010_desktop_release_rollout",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "5",
+      "when": 1788530002000,
+      "tag": "0011_notification_preferences",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "5",
+      "when": 1788530003000,
+      "tag": "0012_battlesim_team_tags",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "5",
+      "when": 1788530004000,
+      "tag": "0013_tournament_disputes",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "5",
+      "when": 1788530005000,
+      "tag": "0014_wigglypop_listing_custody",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "5",
+      "when": 1788530006000,
+      "tag": "0015_desktop_telemetry",
+      "breakpoints": true
     }
   ]
 }

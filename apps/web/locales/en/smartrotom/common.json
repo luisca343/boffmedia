@@ -94,6 +94,11 @@
     "languageSwitcher": {
       "label": "Language:"
     },
+    "presence": {
+      "online": "Online",
+      "ingame": "In-game",
+      "offline": "Offline"
+    },
     "notLinked": {
       "smartrotomMessage": "SmartRotom user not linked. Access Minecraft before using the web.",
       "smartrotomCauses": {

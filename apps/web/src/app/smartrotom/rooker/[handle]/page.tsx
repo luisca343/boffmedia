@@ -5,6 +5,8 @@ import { useParams } from "next/navigation"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { usePokemonStore } from "@/stores/pokemonStore"
+import { PresenceBadge } from "@/components/smartrotom/PresenceBadge"
+import { useGlobalPresence } from "@/services/useGlobalPresence"
 import {
   Avatar,
   Button,
@@ -55,6 +57,7 @@ export default function ProfilePage() {
   const allPokemon = usePokemonStore((s) => s.allPokemon)
   const follow = useFollow()
   const [editing, setEditing] = useState(false)
+  const { getStatus } = useGlobalPresence()
 
   const partnerName = useMemo(
     () => allPokemon.find((p) => p.dex === profile?.partnerPokemonId)?.name,
@@ -150,6 +153,7 @@ export default function ProfilePage() {
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-[1.3125rem] font-extrabold text-rk-fg">{name}</span>
             {profile.isVerified && <Verified size={17} />}
+            {profile.uuid && <PresenceBadge status={getStatus(profile.uuid)} />}
           </div>
           <div className="text-[0.90625rem] text-rk-fg-subtle">@{profile.handle}</div>
 

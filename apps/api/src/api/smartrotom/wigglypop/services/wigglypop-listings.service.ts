@@ -353,6 +353,18 @@ export class WigglypopListingsService {
     const mons = verified.map((v) => this.snapshotMon(v));
     const items = itemInputs.length ? await this.snapshotItems(itemInputs) : [];
 
+    // CUSTODY LOCK: Before creating the listing, check if any mon is already locked.
+    // This is the single guarded transition that prevents double-listing.
+    for (const mon of mons) {
+      const existingLock = await this.listingsRepository.findCustodyLock(
+        dto.sellerUuid,
+        mon.pokemonKey,
+      );
+      if (existingLock !== null) {
+        throw new BadRequestException('This Pokémon is already listed');
+      }
+    }
+
     // The listing's tasación is the sum of what is inside it — the asking price is whatever
     // the seller chose, and the two are shown side by side.
     const value =
@@ -388,6 +400,23 @@ export class WigglypopListingsService {
       mons as any,
       items as any,
     );
+
+    // CUSTODY LOCK: Now that the listing exists, lock each mon to prevent concurrent
+    // modifications. If locking fails (mon was just listed by another request), we
+    // cascade-delete the listing we just created via the FK.
+    try {
+      for (const mon of mons) {
+        await this.listingsRepository.lockMon(
+          dto.sellerUuid,
+          mon.pokemonKey,
+          listing.id,
+        );
+      }
+    } catch (error: any) {
+      // If locking fails, cascade delete the listing we just created.
+      await this.listingsRepository.delete(listing.id);
+      throw new BadRequestException(error?.message ?? 'Could not lock the Pokémon');
+    }
 
     return this.toEntity(listing);
   }
@@ -443,6 +472,9 @@ export class WigglypopListingsService {
         'A sold listing cannot be deleted — it is part of an order',
       );
     }
+
+    // CUSTODY LOCK: Release locks on all mons in this listing when it is cancelled.
+    await this.listingsRepository.releaseCustodyByListing(id);
 
     await this.listingsRepository.delete(id);
     return { success: true };

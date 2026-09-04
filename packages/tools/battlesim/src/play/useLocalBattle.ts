@@ -47,7 +47,7 @@ export function useLocalBattleEngine() {
   useEffect(() => localBattles.subscribe(() => forceUpdate((n) => n + 1)), []);
 
   const createBattle = useCallback(
-    (format?: string, teams?: { p1Team?: string; p2Team?: string }) => localBattles.createBattle(format, teams),
+    (format?: string, teams?: { p1Team?: string; p2Team?: string }, aiOptions?: { aiDifficulty?: 'easy' | 'medium' | 'hard'; aiSeed?: number | null }) => localBattles.createBattle(format, teams, aiOptions),
     [],
   );
   const closeBattle = useCallback((roomId: string) => localBattles.closeBattle(roomId), []);
@@ -59,6 +59,8 @@ export function useLocalBattleEngine() {
     (roomId: string, element: HTMLElement) => localBattles.initScene(roomId, element),
     [],
   );
+  const getAISeed = useCallback((roomId: string) => localBattles.getAISeed(roomId), []);
+  const getAIDifficulty = useCallback((roomId: string) => localBattles.getAIDifficulty(roomId), []);
 
   return {
     sessions: localBattles.sessions,
@@ -71,6 +73,8 @@ export function useLocalBattleEngine() {
     makeChoice,
     forfeit,
     initScene,
+    getAISeed,
+    getAIDifficulty,
   };
 }
 

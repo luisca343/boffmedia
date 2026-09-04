@@ -525,6 +525,20 @@ export async function copyText(text: string): Promise<boolean> {
   }
 }
 
+/** Get the stable per-installation ID for telemetry and rollouts.
+ *  Returns a random UUID persisted locally. */
+export async function getInstallId(): Promise<string> {
+  if (!isDesktop()) {
+    // Return a mock UUID for browser mode
+    return "00000000-0000-0000-0000-000000000000";
+  }
+  try {
+    return await invoke<string>("get_install_id");
+  } catch (err) {
+    throw asFailure(err);
+  }
+}
+
 // ── Pack registry ──────────────────────────────────────────────────────────
 // The HTTP lives in Rust: minting a pack session needs the Minecraft access
 // token for Mojang's join handshake, and that token never crosses this
@@ -544,6 +558,10 @@ export type WirePackVersion = {
    *  cached listing written before this field existed must still parse — the
    *  Rust side has the matching `#[serde(default)]` for the same reason. */
   optionalFeatureCount?: number;
+  /** What changed in this version. Optional for the same reason as
+   *  `optionalFeatureCount`: a cached listing written before the field existed
+   *  must still parse. */
+  changelog?: string | null;
   createdAt: string;
 };
 

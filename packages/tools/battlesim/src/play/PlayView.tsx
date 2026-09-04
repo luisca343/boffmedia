@@ -73,6 +73,7 @@ function PlayInner() {
 
   const { teams } = useTeams();
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState<'easy' | 'medium' | 'hard'>('medium');
   const { available: myTeams, needsTeam, blocked, teamsFor } = useBattleTeams(selectedFormat, teams);
 
   // `?team=<clientId>` preselects that team (the hub's team picker links here).
@@ -92,8 +93,8 @@ function PlayInner() {
    * room has no tab and no address, and is therefore unreachable the moment
    * anything else is on screen.
    */
-  const start = useCallback((format: string, teamId: string | null) => {
-    const id = createBattle(format, teamsFor(teamId));
+  const start = useCallback((format: string, teamId: string | null, difficulty?: 'easy' | 'medium' | 'hard') => {
+    const id = createBattle(format, teamsFor(teamId), { aiDifficulty: difficulty ?? 'medium' });
     openRoom({
       id,
       kind: 'ai',
@@ -109,7 +110,7 @@ function PlayInner() {
 
   const handleCreateBattle = () => {
     if (blocked) return;
-    start(selectedFormat, selectedTeamId);
+    start(selectedFormat, selectedTeamId, selectedDifficulty);
   };
 
   /**
@@ -184,6 +185,18 @@ function PlayInner() {
                     )}
                   </div>
                 )}
+                <Select
+                  label={t('battle.play.difficulty')}
+                  value={selectedDifficulty}
+                  onChange={(v) => setSelectedDifficulty(v as 'easy' | 'medium' | 'hard')}
+                  ariaLabel={t('battle.play.difficulty')}
+                  options={[
+                    { value: 'easy', label: t('battle.play.difficultyEasy') },
+                    { value: 'medium', label: t('battle.play.difficultyMedium') },
+                    { value: 'hard', label: t('battle.play.difficultyHard') },
+                  ]}
+                  hint={t('battle.play.difficultyHint')}
+                />
                 <div className="flex flex-wrap items-center gap-2 border-t border-solid border-line pt-4">
                   <Button variant="pri" size="lg" icon="sword" onClick={handleCreateBattle} disabled={blocked}>{t('battle.play.start')}</Button>
                   <Button variant="ghost" onClick={backOrHub}>{t('battle.play.back')}</Button>
@@ -238,6 +251,8 @@ function PlayInner() {
       onBack={backOrHub}
       initScene={(el) => initScene(roomId, el)}
       endActions={endActions}
+      aiSeed={local.getAISeed(roomId)}
+      aiDifficulty={local.getAIDifficulty(roomId)}
     />
   );
 }

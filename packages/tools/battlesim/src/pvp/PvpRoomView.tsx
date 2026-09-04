@@ -205,6 +205,9 @@ export function BsimPvpRoomView() {
         ? `${t('battle.opponent.disconnected')} (${disconnectCountdown}s)`
         : null;
 
+  const foe = pov === 0 ? state.battle.p2 : state.battle.p1;
+  const foeName = foe.name && foe.name !== 'Unknown' ? foe.name : t('battle.foe');
+
   return (
     <LiveBattle
       state={state}
@@ -218,7 +221,7 @@ export function BsimPvpRoomView() {
       onForfeit={handleForfeit}
       onBack={backOrHub}
       initScene={handleInitScene}
-      chat={{ messages: chatMessages, onSend: handleSendChat, disabled: state.status !== 'active' }}
+      chat={{ messages: chatMessages, onSend: handleSendChat, disabled: state.status !== 'active', opponentName: foeName }}
       endActions={endActions}
       banner={notice ? (
         <p role="status" className="m-0 flex items-center gap-2 border-b border-solid border-warn bg-warn-soft px-3 py-2 font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt">

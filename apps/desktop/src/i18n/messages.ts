@@ -135,6 +135,13 @@ const es = {
       notSent: "No se envía: tu correo, tu cuenta de Minecraft ni su UUID, tus contraseñas, el nombre de tu usuario de Windows ni las rutas de tus carpetas, y nada de lo que escribas en la app.",
       hint: "Está desactivado salvo que lo actives tú. Puedes desactivarlo cuando quieras y deja de enviarse al instante.",
     },
+    telemetry: {
+      title: "Telemetría",
+      toggle: "Enviar datos de telemetría anónimos",
+      sent: "Se envía: si una instalación se completó bien o falló, cuándo se abrió el juego, qué herramientas se utilizaron, y tipos de errores si ocurren (sin el mensaje de error).",
+      notSent: "No se envía: tu correo, tu cuenta de Minecraft ni su UUID, tus contraseñas, el nombre de tu usuario de Windows ni las rutas de tus carpetas. Cada instalación recibe un ID anónimo único que se borra si limpias los datos de la app.",
+      hint: "Está desactivado salvo que lo actives tú. Puedes desactivarlo cuando quieras y deja de enviarse al instante. Ningún dato se envía si está desactivado.",
+    },
     updates: {
       title: "Actualizaciones",
       installed: "Versión instalada",
@@ -647,6 +654,11 @@ const es = {
       compact: "Compacta",
       row: "Lista",
     },
+    updateAll: "Actualizar todo",
+    updateAllQueued: "{count} por actualizar",
+    updateAllUpdating: "Actualizando {count}/{total}",
+    updateAllStop: "Detener",
+    moreInfo: "Más información",
   },
 
   packDetail: {
@@ -709,6 +721,7 @@ const es = {
       granted: "Concedido",
       integrityLabel: "integridad",
       integrityDescription: "Cada archivo se verifica por SHA-512 antes de escribirse. Un archivo que no coincide se vuelve a descargar; si vuelve a fallar, la instalación se marca como dañada en lugar de lanzarse.",
+      changelogLabel: "Novedades",
     },
     editLocalMenu: "Editar pack",
     duplicateLocalMenu: "Duplicar pack",
@@ -1506,6 +1519,13 @@ const en = {
       notSent: "What is not sent: your email, your Minecraft account or its UUID, your passwords, your Windows user name or any folder paths, and nothing you type into the app.",
       hint: "Off unless you turn it on. You can turn it off at any time and sending stops immediately.",
     },
+    telemetry: {
+      title: "Telemetry",
+      toggle: "Send anonymous telemetry data",
+      sent: "What is sent: whether pack installations succeed or fail, when the game is launched, which tools are used, and error types if they occur (not the error message).",
+      notSent: "What is not sent: your email, your Minecraft account or its UUID, your passwords, your Windows user name or folder paths. Each installation gets a unique anonymous ID that is deleted if you clear the app's data.",
+      hint: "Off unless you turn it on. You can turn it off at any time and sending stops immediately. No data is sent when off.",
+    },
     updates: {
       title: "Updates",
       installed: "Installed version",
@@ -2008,6 +2028,11 @@ const en = {
       compact: "Compact",
       row: "List",
     },
+    updateAll: "Update all",
+    updateAllQueued: "{count} to update",
+    updateAllUpdating: "Updating {count}/{total}",
+    updateAllStop: "Stop",
+    moreInfo: "More info",
   },
 
   packDetail: {
@@ -2070,6 +2095,7 @@ const en = {
       granted: "Granted",
       integrityLabel: "integrity",
       integrityDescription: "Every file is verified by SHA-512 before writing. A file that doesn't match is re-downloaded; if it fails again, the installation is marked as damaged instead of launching.",
+      changelogLabel: "What's new",
     },
     editLocalMenu: "Edit pack",
     duplicateLocalMenu: "Duplicate pack",

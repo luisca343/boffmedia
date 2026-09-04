@@ -241,7 +241,10 @@ export class BattlesimController {
   })
   async listTeams(@CurrentUser() user: AuthPrincipal): Promise<BattlesimTeamDto[]> {
     const teams = await this.repo.listTeams(user.userId);
-    return teams as BattlesimTeamDto[];
+    return teams.map((team) => ({
+      ...team,
+      tags: this.repo.parseTags(team.tags),
+    } as BattlesimTeamDto));
   }
 
   /**
@@ -287,11 +290,15 @@ export class BattlesimController {
       name: dto.name,
       format: dto.format,
       packed: dto.packed,
+      tags: dto.tags ?? [],
       clientUpdatedAt: dto.clientUpdatedAt,
       deletedAt: dto.deletedAt,
     });
 
-    return team as BattlesimTeamDto;
+    return {
+      ...team,
+      tags: this.repo.parseTags(team.tags),
+    } as BattlesimTeamDto;
   }
 
   /**

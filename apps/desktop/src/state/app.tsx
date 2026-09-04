@@ -5,6 +5,13 @@ import { toast } from "@boffmedia/ui";
 import { setLocale, translate } from "../i18n";
 import { setCrashReporting } from "../services/crashReports";
 import {
+  emitInstallComplete,
+  emitGameCrash,
+  emitGameLaunch,
+  emitToolOpen,
+  crashKindToTelemetryCode,
+} from "../services/telemetry-integration";
+import {
   setToolBackendReachable,
   setToolSessionAccount,
   setToolSignIn,
@@ -40,6 +47,7 @@ import {
   authSwitch,
   installPack,
   applyUiScale,
+  getInstallId,
   instanceModGraph,
   instanceScan,
   isDesktop,
@@ -60,6 +68,12 @@ import {
   type ScannedInstallState,
 } from "../runtime";
 import { sessionBusyReason, type SessionBusyReason } from "./sessionGuard";
+import {
+  updateQueueReducer,
+  initialUpdateQueueState,
+  type UpdateQueueState,
+  type UpdateQueueAction,
+} from "./updateQueue";
 import type {
   Account,
   DeviceCode,
@@ -169,6 +183,8 @@ type State = {
    *  30-second poll is not dismissible, it is nagging. Re-armed only when the
    *  backend comes back, so the NEXT outage is announced once more. */
   backendNoticeDismissed: boolean;
+  /** Batch update queue for multiple packs. */
+  updateQueue: UpdateQueueState;
 };
 
 /** `unreachable` — nothing answered, and we cannot tell whose network is at
@@ -233,7 +249,8 @@ type Action =
   | { type: "settings"; settings: Settings }
   | { type: "system/select"; system: SystemId | "All" }
   | { type: "backend/status"; status: BackendStatus; detail?: string | null }
-  | { type: "backend/dismiss" };
+  | { type: "backend/dismiss" }
+  | UpdateQueueAction;
 
 function reducer(s: State, a: Action): State {
   switch (a.type) {
@@ -523,6 +540,14 @@ function reducer(s: State, a: Action): State {
       };
     case "backend/dismiss":
       return { ...s, backendNoticeDismissed: true };
+    // Queue actions are delegated to the queue reducer
+    case "queue/enqueue":
+    case "queue/start":
+    case "queue/done":
+    case "queue/error":
+    case "queue/stop":
+    case "queue/clear":
+      return { ...s, updateQueue: updateQueueReducer(s.updateQueue, a as UpdateQueueAction) };
     default:
       return s;
   }
@@ -558,6 +583,7 @@ const initial: State = {
   backendStatus: "unknown",
   backendDetail: null,
   backendNoticeDismissed: false,
+  updateQueue: initialUpdateQueueState,
 };
 
 type Ctx = State & {
@@ -648,6 +674,12 @@ type Ctx = State & {
   stop: () => void;
   clearLogs: () => void;
   patchSettings: (patch: Partial<Settings>) => void;
+  /** The current batch update queue state. */
+  updateQueue: UpdateQueueState;
+  /** Queue multiple packs for sequential update. Only the current install runs at a time. */
+  queueUpdates: (packIds: string[]) => Promise<void>;
+  /** Stop the queue and prevent further updates. */
+  stopUpdateQueue: () => void;
 };
 
 const AppContext = React.createContext<Ctx | null>(null);
@@ -697,6 +729,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // than a dependency so the callbacks do not re-create when the flag flips.
   const offlineRef = React.useRef(state.offline);
   offlineRef.current = state.offline;
+  // Track update queue state for callbacks that must not re-create
+  const updateQueueRef = React.useRef(state.updateQueue);
+  updateQueueRef.current = state.updateQueue;
   // An install or a live game holds the process-global session token. Switching
   // account under them re-authenticates their remaining requests as somebody
   // else (C1), so the switcher disables itself and the callbacks refuse. The
@@ -1411,9 +1446,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           totalBytes: e.totalBytes,
         }),
       ),
-      onInstallDone(() =>
-        log({ level: "info", source: "app", text: "Instalación completada" }),
-      ),
+      onInstallDone(() => {
+        log({ level: "info", source: "app", text: "Instalación completada" });
+        // Advance the queue if there are more packs to update
+        if (updateQueueRef.current.current !== null) {
+          dispatch({ type: "queue/done" });
+        }
+        // Emit telemetry: install completed successfully (fire and forget)
+        void (async () => {
+          try {
+            const installId = await getInstallId();
+            await emitInstallComplete(state.settings, installId, true);
+          } catch {
+            // Silently ignore telemetry errors; they must never affect the user's action
+          }
+        })();
+      }),
       onGameLog((line) => dispatch({ type: "log", line })),
       onGameState((game) => {
         // A killed process exits non-zero, so the Rust watcher reports the
@@ -1432,6 +1480,16 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             source: "app",
             text: `El juego se cerró con el código ${game.exitCode}.`,
           });
+          // Emit telemetry: game crashed (fire and forget)
+          void (async () => {
+            try {
+              const installId = await getInstallId();
+              const crashKind = game.diagnosis?.kind || "unclassified";
+              await emitGameCrash(state.settings, installId, crashKind as string);
+            } catch {
+              // Silently ignore telemetry errors
+            }
+          })();
         }
       }),
     ];
@@ -1439,6 +1497,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       for (const off of offs) off();
     };
   }, [log]);
+
+  // Emit telemetry when a tool is opened (view changes to "tool" with a toolId)
+  React.useEffect(() => {
+    if (state.view === "tool" && state.selectedToolId) {
+      void (async () => {
+        try {
+          const installId = await getInstallId();
+          await emitToolOpen(state.settings, installId, state.selectedToolId!);
+        } catch {
+          // Silently ignore telemetry errors
+        }
+      })();
+    }
+  }, [state.view, state.selectedToolId, state.settings]);
 
   // The manifest is fetched here rather than in Rust because the password
   // path is a UI decision; install_pack re-validates whatever it gets.
@@ -1519,6 +1591,17 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
           state: { kind: "broken", reason: message },
         });
         log({ level: "error", source: "app", text: message });
+        // The failure half of install-done. Without it telemetry only ever sees
+        // successes, and an "install success rate" computed from that is 100%
+        // by construction — the exact blindness D16 exists to remove.
+        void (async () => {
+          try {
+            const installId = await getInstallId();
+            await emitInstallComplete(state.settings, installId, false);
+          } catch {
+            // Telemetry must never affect the user's install.
+          }
+        })();
       } finally {
         busy.current.delete(packId);
       }
@@ -1650,6 +1733,15 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         runningPackId.current = packId;
         dispatch({ type: "pack/played", packId, at: new Date().toISOString() });
         void refreshInstallState(packId);
+        // Emit telemetry: game launched (fire and forget)
+        void (async () => {
+          try {
+            const installId = await getInstallId();
+            await emitGameLaunch(state.settings, installId);
+          } catch {
+            // Silently ignore telemetry errors
+          }
+        })();
       } catch (err) {
         const errObj = err as { message?: string; code?: string };
         let message = errObj.message ?? "No se pudo iniciar el juego.";
@@ -1750,6 +1842,46 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         runningPackId.current = null;
       });
   }, [log]);
+
+  // Re-entrancy guard for the update queue: prevent multiple concurrent queueUpdates calls
+  const startingQueue = React.useRef(false);
+
+  const queueUpdates = React.useCallback(
+    async (packIds: string[]) => {
+      // Prevent re-entrancy: reject if another queueUpdates call is already running
+      if (startingQueue.current) return;
+
+      startingQueue.current = true;
+      try {
+        // Enqueue the packs
+        dispatch({ type: "queue/enqueue", packIds });
+
+        // If nothing is currently being installed, start the first pack
+        if (updateQueueRef.current.current === null) {
+          const packId = updateQueueRef.current.queued[0];
+          if (packId) {
+            dispatch({ type: "queue/start", packId });
+            // install() will be called by the effect below
+          }
+        }
+      } finally {
+        startingQueue.current = false;
+      }
+    },
+    [],
+  );
+
+  const stopUpdateQueue = React.useCallback(() => {
+    dispatch({ type: "queue/stop" });
+  }, []);
+
+  // When the queue current pack changes, install it
+  React.useEffect(() => {
+    if (updateQueueRef.current.current !== null && !busy.current.has(updateQueueRef.current.current)) {
+      const packId = updateQueueRef.current.current;
+      void install(packId);
+    }
+  }, [state.updateQueue.current, install]);
 
   // ── Account switching ───────────────────────────────────────────────────
   //
@@ -1969,6 +2101,9 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     stop,
     clearLogs: () => dispatch({ type: "logs/clear" }),
     patchSettings,
+    updateQueue: state.updateQueue,
+    queueUpdates,
+    stopUpdateQueue,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

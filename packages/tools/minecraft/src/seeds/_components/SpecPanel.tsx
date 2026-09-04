@@ -18,7 +18,7 @@
  * no — so the caveat has to arrive before the answer, not after it.
  */
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Banner, Button, Field, Panel, Select, Spinner } from "@boffmedia/ui";
 
 import type { Translate } from "@boffmedia/ui/i18n";
@@ -57,6 +57,12 @@ export interface SpecPanelProps {
   packIds: readonly string[];
   onFocusSite?: (x: number, z: number) => void;
   onTestPrefilter: () => Promise<PrefilterSample | null>;
+  /** Generate a share link for the current spec. */
+  onGenerateShareLink?: (spec: UiSpec) => void;
+  /** The encoded spec ready to share (for copy-to-clipboard). */
+  encodedSpec?: string | null;
+  /** Error from share link generation, if any. */
+  shareError?: string | null;
   t: Translate;
 }
 
@@ -71,12 +77,16 @@ export function SpecPanel({
   packIds,
   onFocusSite,
   onTestPrefilter,
+  onGenerateShareLink,
+  encodedSpec,
+  shareError,
   t,
 }: SpecPanelProps) {
   // The open location is tracked by id, not by index: an edit that removes an
   // earlier card would otherwise slide a different location under the modal.
   const [openId, setOpenId] = useState<string | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [shareLinkCopied, setShareLinkCopied] = useState(false);
 
   const biomeOptions = useMemo(() => [...COMMON_TAGS, ...biomeIds], [biomeIds]);
   const names = useMemo(() => spec.locations.map((l) => l.name).filter(Boolean), [spec.locations]);
@@ -98,6 +108,29 @@ export function SpecPanel({
     // closed would add a row that means nothing and explains nothing.
     setOpenId(next.id);
   }, [spec, onChange]);
+
+  const handleCopyShareLink = useCallback(() => {
+    if (onGenerateShareLink) {
+      onGenerateShareLink(spec);
+    }
+  }, [spec, onGenerateShareLink]);
+
+  // Copy the encoded spec to clipboard when it's ready
+  useEffect(() => {
+    if (encodedSpec && !shareLinkCopied) {
+      const url = typeof window !== "undefined"
+        ? new URL(window.location.href)
+        : null;
+      if (url) {
+        url.searchParams.set("spec", encodedSpec);
+        void navigator.clipboard.writeText(url.toString());
+        setShareLinkCopied(true);
+        // Reset after 2 seconds
+        const timer = setTimeout(() => setShareLinkCopied(false), 2000);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [encodedSpec, shareLinkCopied]);
 
   return (
     <>
@@ -153,6 +186,8 @@ export function SpecPanel({
             ))}
           </div>
 
+          {shareError ? <Banner tone="warn">{shareError}</Banner> : null}
+
           <div className="grid grid-cols-2 gap-2">
             <Button size="sm" variant="ghost" onClick={addLocation}>
               {t("spec.action.addLocation")}
@@ -161,6 +196,16 @@ export function SpecPanel({
               {t("spec.settings.open")}
             </Button>
           </div>
+
+          <Button
+            size="sm"
+            variant="pri"
+            onClick={handleCopyShareLink}
+            disabled={!onGenerateShareLink}
+            className="w-full"
+          >
+            {shareLinkCopied ? t("spec.action.shareLinkCopied") : t("spec.action.copyShareLink")}
+          </Button>
         </div>
       </Panel>
 

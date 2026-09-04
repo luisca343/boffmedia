@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Controller,
   Delete,
   Get,
@@ -141,6 +142,73 @@ export class DesktopUpdatesAdminController {
     @Param('id', ParseIntPipe) id: number,
   ): Promise<DesktopReleaseEntity> {
     return this.updates.setPublished(id, false);
+  }
+
+  @Post(':id/rollout')
+  @UseGuards(StepUpGuard)
+  @ApiHeader({
+    name: STEP_UP_HEADER,
+    description:
+      'Token de confirmación reciente de doble factor (POST /auth/2fa/step-up).',
+    required: true,
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Actualizar el porcentaje de despliegue',
+    description:
+      'Define qué porcentaje de clientes (0-100) reciben esta versión. Los clientes se asignan a grupos determinísticamente por su device ID.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: DesktopReleaseEntity })
+  async setRollout(
+    @Param('id', ParseIntPipe) id: number,
+    @Query('percent') percent: string,
+  ): Promise<DesktopReleaseEntity> {
+    const rolloutPercent = Number.parseInt(percent, 10);
+    if (Number.isNaN(rolloutPercent)) {
+      throw new BadRequestException('percent must be a valid integer');
+    }
+    return this.updates.setRolloutPercent(id, rolloutPercent);
+  }
+
+  @Post(':id/pause')
+  @UseGuards(StepUpGuard)
+  @ApiHeader({
+    name: STEP_UP_HEADER,
+    description:
+      'Token de confirmación reciente de doble factor (POST /auth/2fa/step-up).',
+    required: true,
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Pausar una release',
+    description:
+      'Pausa la distribución incluso si está publicada. Útil para pausas de emergencia sin despublicar.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: DesktopReleaseEntity })
+  async pause(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<DesktopReleaseEntity> {
+    return this.updates.setPaused(id, true);
+  }
+
+  @Post(':id/resume')
+  @UseGuards(StepUpGuard)
+  @ApiHeader({
+    name: STEP_UP_HEADER,
+    description:
+      'Token de confirmación reciente de doble factor (POST /auth/2fa/step-up).',
+    required: true,
+  })
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({
+    summary: 'Reanudar una release pausada',
+    description: 'Reanuda la distribución de una release previamente pausada.',
+  })
+  @ApiResponse({ status: HttpStatus.OK, type: DesktopReleaseEntity })
+  async resume(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<DesktopReleaseEntity> {
+    return this.updates.setPaused(id, false);
   }
 
   @Delete(':id')

@@ -343,6 +343,12 @@ pub struct LauncherVersion {
     /// can map the pack to its system without a manifest fetch.
     #[serde(default)]
     pub emulator_kind: Option<String>,
+    /// What changed in this version. `default` for the same reason as the
+    /// fields above: a listing served by an older API, or one cached before
+    /// this field existed, must still deserialise — a library that fails to
+    /// load is far worse than a card with no changelog.
+    #[serde(default)]
+    pub changelog: Option<String>,
     pub created_at: String,
 }
 

@@ -67,6 +67,9 @@ const REAPER_INTERVAL_MS = 60_000;
 const RECONNECT_GRACE_MS = 30_000;
 /** An unanswered challenge stops being answerable. */
 const CHALLENGE_TTL_MS = 2 * 60_000;
+/** Chat rate limit: max messages per player per battle. */
+const CHAT_RATE_LIMIT = 1; // 1 message per second per player per room
+const CHAT_RATE_WINDOW_MS = 1000;
 
 declare module 'socket.io' {
   interface Socket {
@@ -109,6 +112,8 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   >();
   /** userId -> their live sockets. One account can have two tabs open. */
   private connections = new Map<number, Set<Socket>>();
+  /** "${userId}:${roomId}" -> timestamps of recent chat messages for rate limiting. */
+  private chatRateLimit = new Map<string, number[]>();
   private reaper: NodeJS.Timeout | null = null;
 
   constructor(
@@ -441,6 +446,19 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ): void {
     const ctx = this.contextFor(client, payload?.roomId);
     if (!ctx) return;
+
+    // Rate limit: CHAT_RATE_LIMIT messages per CHAT_RATE_WINDOW_MS per player per room.
+    const rateLimitKey = `${ctx.user.userId}:${ctx.room.id}`;
+    const now = Date.now();
+    let timestamps = this.chatRateLimit.get(rateLimitKey) ?? [];
+    timestamps = timestamps.filter((ts) => now - ts < CHAT_RATE_WINDOW_MS);
+    if (timestamps.length >= CHAT_RATE_LIMIT) {
+      // Silently drop: spam is not an error the client should retry.
+      return;
+    }
+    timestamps.push(now);
+    this.chatRateLimit.set(rateLimitKey, timestamps);
+
     const text = String(payload?.message ?? '')
       .trim()
       .slice(0, 300);
@@ -819,6 +837,12 @@ export class BattleGateway implements OnGatewayConnection, OnGatewayDisconnect {
       const recent = stamps.filter((t) => now - t < CREATE_WINDOW_MS);
       if (recent.length) this.createLog.set(userId, recent);
       else this.createLog.delete(userId);
+    }
+    // Clean up stale rate limit entries.
+    for (const [key, stamps] of this.chatRateLimit) {
+      const recent = stamps.filter((t) => now - t < CHAT_RATE_WINDOW_MS);
+      if (recent.length) this.chatRateLimit.set(key, recent);
+      else this.chatRateLimit.delete(key);
     }
   }
 }

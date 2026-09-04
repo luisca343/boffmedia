@@ -28,6 +28,7 @@ pub mod dialogs;
 pub mod emulators;
 pub mod icons;
 pub mod install;
+pub mod install_id;
 pub mod local_packs;
 pub mod meta;
 pub mod mrpack;

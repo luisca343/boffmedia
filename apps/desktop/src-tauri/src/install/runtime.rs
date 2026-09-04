@@ -828,6 +828,76 @@ mod tests {
         assert_eq!(dropped.len(), 1);
     }
 
+    // ── D18 three-level precedence: user > manifest > global ──────────────
+
+    #[test]
+    fn the_three_level_precedence_for_memory_is_user_override_wins() {
+        let global = settings(2048, None, false);
+        let manifest_hint = 8192_u32;
+        let user_override = 4096_u32;
+
+        // User choice wins over manifest hint wins over global.
+        let over = RuntimeOverride {
+            memory: MemoryChoice::Fixed { mib: user_override },
+            ..Default::default()
+        };
+        let resolved = resolve(&global, &over, 50, 16384);
+        assert_eq!(resolved.heap_mib, user_override);
+        assert_eq!(resolved.memory_source, RuntimeSource::Override);
+
+        // Manifest hint wins when user has not chosen.
+        let (seeded, _) = seed_from_pack(&PackRuntime { memory_mib: Some(manifest_hint), jvm_args: vec![] });
+        let resolved = resolve(&global, &seeded, 50, 16384);
+        assert_eq!(resolved.heap_mib, manifest_hint);
+        assert_eq!(resolved.memory_source, RuntimeSource::Override);
+
+        // Global wins when neither user nor manifest provides a value.
+        let no_override = RuntimeOverride::default();
+        let resolved = resolve(&global, &no_override, 50, 16384);
+        assert_eq!(resolved.heap_mib, 2048);
+        assert_eq!(resolved.memory_source, RuntimeSource::Global);
+    }
+
+    #[test]
+    fn the_three_level_precedence_for_jvm_args_is_user_override_wins() {
+        let mut global = settings(6144, None, false);
+        global.jvm_args = vec!["-XX:+UseSerialGC".into()];
+        let manifest_hint = vec!["-XX:+UseG1GC".into(), "-Xms2G".into()];
+
+        // User choice wins over manifest hint wins over global.
+        let user_override = vec!["-XX:+UseShenandoahGC".into()];
+        let over = RuntimeOverride {
+            jvm: JvmChoice::Custom { args: user_override.clone() },
+            ..Default::default()
+        };
+        let resolved = resolve(&global, &over, 50, 16384);
+        assert_eq!(resolved.jvm_args, user_override);
+        assert_eq!(resolved.jvm_source, RuntimeSource::Override);
+
+        // Manifest hint wins when user has not chosen.
+        let (seeded, _) = seed_from_pack(&PackRuntime { memory_mib: None, jvm_args: manifest_hint.clone() });
+        let resolved = resolve(&global, &seeded, 50, 16384);
+        assert_eq!(resolved.jvm_args, manifest_hint);
+        assert_eq!(resolved.jvm_source, RuntimeSource::Override);
+
+        // Global wins when neither user nor manifest provides a value.
+        let no_override = RuntimeOverride::default();
+        let resolved = resolve(&global, &no_override, 50, 16384);
+        assert_eq!(resolved.jvm_args, vec!["-XX:+UseSerialGC".to_string()]);
+        assert_eq!(resolved.jvm_source, RuntimeSource::Global);
+    }
+
+    #[test]
+    fn manifest_hint_is_clamped_like_user_override() {
+        // The manifest can specify a value outside the acceptable range,
+        // but the clamping applied to user overrides is also applied here,
+        // so the installer stays safe and the clamping is logged.
+        let (seeded, _) = seed_from_pack(&PackRuntime { memory_mib: Some(100_000), jvm_args: vec![] });
+        let resolved = resolve(&Settings::default(), &seeded, 50, 16384);
+        // Clamped to max: 65536.
+        assert_eq!(resolved.heap_mib, 65536);
+    }
+
     // ── mod counting ───────────────────────────────────────────────────────
 
     #[test]

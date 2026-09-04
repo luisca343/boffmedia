@@ -114,5 +114,19 @@ export class DesktopReleaseEntity {
     | string
     | null;
 
+  @ApiProperty({
+    description:
+      'Porcentaje de clientes (0-100) que reciben esta versión. Los clientes se asignan a grupos determinísticamente por su device ID.',
+    example: 100,
+  })
+  rolloutPercent!: number;
+
+  @ApiProperty({
+    description:
+      'Pausa la distribución incluso si está publicada. Útil para pausas de emergencia sin despublicar.',
+    example: false,
+  })
+  paused!: boolean;
+
   @ApiProperty() createdAt!: string;
 }

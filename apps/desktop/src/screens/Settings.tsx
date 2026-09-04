@@ -1387,6 +1387,19 @@ export function Settings() {
             </p>
             <p className="mt-2 text-xs text-txt-dim">{t("crashReports.hint")}</p>
           </Panel>
+
+          <Panel title={t("telemetry.title")}>
+            <Toggle
+              on={settings.telemetry === true}
+              onChange={(telemetry) => patchSettings({ telemetry })}
+              label={t("telemetry.toggle")}
+            />
+            <p className="mt-2 text-xs text-txt-dim">{t("telemetry.sent")}</p>
+            <p className="mt-1 text-xs text-txt-dim">
+              {t("telemetry.notSent")}
+            </p>
+            <p className="mt-2 text-xs text-txt-dim">{t("telemetry.hint")}</p>
+          </Panel>
         </Section>
         </div>
       </div>

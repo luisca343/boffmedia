@@ -156,6 +156,7 @@ export class OutboxService {
       link?: string;
       dedupeKey?: string;
     };
+    // The notifications service now checks preferences internally
     await this.notifications.create(
       { userId, type: type as any, title, body, link },
       dedupeKey,

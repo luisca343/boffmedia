@@ -53,6 +53,10 @@ describe('WigglypopListingsService', () => {
     findCatalogEntries: jest.fn(),
     listCatalog: jest.fn(),
     findSalePricesByDex: jest.fn(),
+    findCustodyLock: jest.fn(),
+    lockMon: jest.fn(),
+    releaseCustodyByListing: jest.fn(),
+    delete: jest.fn(),
   };
   const tradingRepository = {};
   const ordersRepository = {};
@@ -63,6 +67,10 @@ describe('WigglypopListingsService', () => {
     wingull.getPC.mockResolvedValue(PC);
     listingsRepository.findSellerUsername.mockResolvedValue('Luisca');
     listingsRepository.findCatalogEntries.mockResolvedValue([]);
+    listingsRepository.findCustodyLock.mockResolvedValue(null); // No lock by default
+    listingsRepository.lockMon.mockResolvedValue(undefined); // Lock succeeds by default
+    listingsRepository.releaseCustodyByListing.mockResolvedValue(undefined);
+    listingsRepository.delete.mockResolvedValue(true);
     listingsRepository.create.mockImplementation(async (listing) => ({
       id: 1,
       ...listing,
@@ -344,6 +352,156 @@ describe('WigglypopListingsService', () => {
     it('returns [] when nobody has ever sold one', async () => {
       listingsRepository.findSalePricesByDex.mockResolvedValue([]);
       expect(await service.priceHistory(445)).toEqual([]);
+    });
+  });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  describe('custody locks (S9 audit finding)', () => {
+    it('rejects a double-listing attempt with "This Pokémon is already listed"', async () => {
+      // First listing succeeds
+      listingsRepository.findCustodyLock.mockResolvedValue(null);
+      await service.create({
+        sellerUuid: SELLER,
+        kind: 'mon',
+        format: 'fixed',
+        price: 15000,
+        mon: { pokemonKey: LIVE_KEY, sourceBox: 2, sourceIndex: 7 },
+      } as any);
+
+      // Second listing attempt finds the lock
+      listingsRepository.findCustodyLock.mockResolvedValue(1);
+      await expect(
+        service.create({
+          sellerUuid: SELLER,
+          kind: 'mon',
+          format: 'fixed',
+          price: 15000,
+          mon: { pokemonKey: LIVE_KEY, sourceBox: 2, sourceIndex: 7 },
+        } as any),
+      ).rejects.toThrow('This Pokémon is already listed');
+
+      // Listing creation is never called
+      expect(listingsRepository.create).toHaveBeenCalledTimes(1);
+    });
+
+    it('locks the mon immediately after creating the listing', async () => {
+      listingsRepository.findCustodyLock.mockResolvedValue(null);
+      await service.create({
+        sellerUuid: SELLER,
+        kind: 'mon',
+        format: 'fixed',
+        price: 15000,
+        mon: { pokemonKey: LIVE_KEY, sourceBox: 2, sourceIndex: 7 },
+      } as any);
+
+      // lockMon must be called with seller, key, and listing ID
+      expect(listingsRepository.lockMon).toHaveBeenCalledWith(SELLER, LIVE_KEY, 1);
+    });
+
+    it('cascades delete the listing if locking fails — preventing a lingering unlocked listing', async () => {
+      listingsRepository.findCustodyLock.mockResolvedValue(null);
+      // Lock fails (e.g., unique constraint violation from concurrent request)
+      listingsRepository.lockMon.mockRejectedValueOnce(
+        new Error('This Pokémon is already listed'),
+      );
+
+      await expect(
+        service.create({
+          sellerUuid: SELLER,
+          kind: 'mon',
+          format: 'fixed',
+          price: 15000,
+          mon: { pokemonKey: LIVE_KEY, sourceBox: 2, sourceIndex: 7 },
+        } as any),
+      ).rejects.toThrow('This Pokémon is already listed');
+
+      // The created but unlocked listing is deleted
+      expect(listingsRepository.delete).toHaveBeenCalledWith(1);
+    });
+
+    it('releases custody locks when a listing is cancelled', async () => {
+      // Set up a listing
+      listingsRepository.findById.mockResolvedValue({
+        id: 1,
+        sellerUuid: SELLER,
+        status: 'activo',
+      });
+
+      await service.remove(1, SELLER);
+
+      // releaseCustodyByListing must be called before delete
+      expect(listingsRepository.releaseCustodyByListing).toHaveBeenCalledWith(1);
+      expect(listingsRepository.delete).toHaveBeenCalledWith(1);
+    });
+
+    it('prevents double-listing rejection for a different seller — seller B can list the same mon as seller A', async () => {
+      const sellerA = 'seller-a';
+      const sellerB = 'seller-b';
+
+      // Seller A lists the mon
+      listingsRepository.findCustodyLock.mockResolvedValue(null);
+      await service.create({
+        sellerUuid: sellerA,
+        kind: 'mon',
+        format: 'fixed',
+        price: 15000,
+        mon: { pokemonKey: LIVE_KEY, sourceBox: 2, sourceIndex: 7 },
+      } as any);
+
+      // Seller B can list the same mon (same key) because the lock is keyed to (seller, key)
+      listingsRepository.findCustodyLock.mockResolvedValue(null);
+      await service.create({
+        sellerUuid: sellerB,
+        kind: 'mon',
+        format: 'fixed',
+        price: 16000,
+        mon: { pokemonKey: LIVE_KEY, sourceBox: 2, sourceIndex: 7 },
+      } as any);
+
+      // Both succeeded
+      expect(listingsRepository.create).toHaveBeenCalledTimes(2);
+      // findCustodyLock called twice, once per seller
+      expect(listingsRepository.findCustodyLock).toHaveBeenCalledWith(
+        sellerA,
+        LIVE_KEY,
+      );
+      expect(listingsRepository.findCustodyLock).toHaveBeenCalledWith(
+        sellerB,
+        LIVE_KEY,
+      );
+    });
+
+    it('allows a seller to list a different mon if the original is released', async () => {
+      // First mon is listed
+      listingsRepository.findCustodyLock.mockResolvedValue(null);
+      await service.create({
+        sellerUuid: SELLER,
+        kind: 'mon',
+        format: 'fixed',
+        price: 15000,
+        mon: { pokemonKey: LIVE_KEY, sourceBox: 2, sourceIndex: 7 },
+      } as any);
+
+      // Cancel the listing (releases custody)
+      listingsRepository.findById.mockResolvedValue({
+        id: 1,
+        sellerUuid: SELLER,
+        status: 'activo',
+      });
+      await service.remove(1, SELLER);
+
+      // Now a second mon with the same key can be listed again after the lock is released
+      listingsRepository.findCustodyLock.mockResolvedValue(null);
+      await service.create({
+        sellerUuid: SELLER,
+        kind: 'mon',
+        format: 'fixed',
+        price: 15000,
+        mon: { pokemonKey: LIVE_KEY, sourceBox: 2, sourceIndex: 7 },
+      } as any);
+
+      // Both succeeded
+      expect(listingsRepository.create).toHaveBeenCalledTimes(2);
     });
   });
 });

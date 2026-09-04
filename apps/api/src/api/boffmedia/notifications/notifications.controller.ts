@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Put,
   Query,
   Req,
   UseGuards,
@@ -24,18 +25,27 @@ import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { NotificationsService } from './notifications.service';
+import { NotificationPreferencesService } from './services/notification-preferences.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
+import { UpdatePreferencesDto } from './dto/update-preferences.dto';
 import {
   NotificationEntity,
   UnreadCountEntity,
 } from './entities/notification.entity';
+import {
+  PreferenceEntity,
+  PreferencesListEntity,
+} from './entities/preference.entity';
 
 @ApiTags('BoffMedia | Notifications')
 @ApiBearerAuth('JWT')
 @Controller('notifications')
 @UseGuards(JwtAuthGuard)
 export class NotificationsController {
-  constructor(private readonly service: NotificationsService) {}
+  constructor(
+    private readonly service: NotificationsService,
+    private readonly preferencesService: NotificationPreferencesService,
+  ) {}
 
   @Get()
   @ApiOperation({ summary: "List the current user's notifications" })
@@ -85,5 +95,26 @@ export class NotificationsController {
   })
   create(@Body() dto: CreateNotificationDto) {
     return this.service.create(dto);
+  }
+
+  @Get('preferences')
+  @ApiOperation({ summary: "Get the current user's notification preferences" })
+  @ApiResponse({ status: 200, type: PreferencesListEntity })
+  async getPreferences(@Req() req: any) {
+    const preferences = await this.preferencesService.listForUser(req.user.userId);
+    return { preferences };
+  }
+
+  @Put('preferences/:type')
+  @ApiOperation({ summary: 'Update a notification type preference' })
+  @ApiResponse({ status: 200, type: PreferenceEntity })
+  async updatePreference(
+    @Req() req: any,
+    @Param('type') type: string,
+    @Body() dto: UpdatePreferencesDto,
+  ) {
+    return this.preferencesService.updatePreference(req.user.userId, type, {
+      isMuted: dto.isMuted,
+    });
   }
 }

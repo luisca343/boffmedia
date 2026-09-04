@@ -7,6 +7,7 @@ import {
   text,
   timestamp,
   varchar,
+  boolean,
 } from 'drizzle-orm/mysql-core';
 import { boffMediaUsers } from './BoffMedia';
 
@@ -61,3 +62,42 @@ export const boffMediaNotifications = mysqlTable(
 );
 
 export type Notification = typeof boffMediaNotifications.$inferSelect;
+
+/**
+ * Per-user, per-notification-type preferences.
+ * Defaults to "everything on" when no row exists, so existing users are unaffected.
+ * One row per (user, type) pair; a missing row means no mute/opt-out.
+ *
+ * Note: An email opt-out field was deliberately not shipped because no notification email
+ * path exists yet. If adding one, include the column WITH the email sender, not separately.
+ */
+export const boffMediaNotificationPreferences = mysqlTable(
+  'boffmedia_notification_preferences',
+  {
+    id: int('id').primaryKey().autoincrement(),
+    userId: int('user_id')
+      .notNull()
+      .references(() => boffMediaUsers.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    type: mysqlEnum('type', [
+      NOTIFICATION_TYPE.EVENT,
+      NOTIFICATION_TYPE.ACHIEVEMENT,
+      NOTIFICATION_TYPE.TOURNAMENT,
+      NOTIFICATION_TYPE.SYSTEM,
+      NOTIFICATION_TYPE.FORUM,
+    ])
+      .notNull(),
+    isMuted: boolean('is_muted').notNull().default(false),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
+  },
+  (t) => ({
+    userTypeUq: uniqueIndex('bnp_user_type_uq').on(t.userId, t.type),
+    userIdx: index('bnp_user_idx').on(t.userId),
+  }),
+);
+
+export type NotificationPreference = typeof boffMediaNotificationPreferences.$inferSelect;
+export type NewNotificationPreference = Omit<NotificationPreference, 'id' | 'createdAt' | 'updatedAt'>;

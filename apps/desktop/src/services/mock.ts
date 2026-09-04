@@ -45,6 +45,7 @@ function version(
     loaderVersion: "21.4.30",
     emulatorKind: emulatorKind ?? null,
     fileCount,
+    changelog: null,
   }
 }
 
@@ -116,6 +117,7 @@ const PACKS: {
     latest: {
       id: "v_emu_1",
       name: "1.0.0",
+      changelog: null,
       createdAt: "2026-07-01T00:00:00Z",
       minecraft: null,
       loader: null,
@@ -139,6 +141,7 @@ const PACKS: {
     latest: {
       id: "v_zom_1",
       name: "1.0.0",
+      changelog: null,
       createdAt: "2026-07-01T00:00:00Z",
       minecraft: null,
       loader: null,
@@ -161,6 +164,7 @@ const PACKS: {
     latest: {
       id: "v_std_1",
       name: "1.0.0",
+      changelog: null,
       createdAt: "2026-07-01T00:00:00Z",
       minecraft: null,
       loader: null,
@@ -202,6 +206,8 @@ export const MOCK_SETTINGS: Settings = {
   // Off, like the real default: browser mode must not be the one place where
   // reporting looks enabled.
   crashReports: false,
+  // Off, like the real default: telemetry is opt-in.
+  telemetry: false,
 }
 
 /** Browser-mode library. The desktop equivalent is `loadPackEntries`, which
@@ -264,6 +270,7 @@ export function mockPackEntries(): PackEntry[] {
         loader: null,
         loaderVersion: null,
         fileCount: manifest.version.files.length,
+        changelog: null,
         createdAt: manifest.version.createdAt,
       },
       state: { kind: "not-installed" as const },

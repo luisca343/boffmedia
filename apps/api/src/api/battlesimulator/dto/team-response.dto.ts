@@ -17,6 +17,13 @@ export class BattlesimTeamDto {
   packed: string;
 
   @ApiProperty({
+    description: 'User-defined tags for organizing teams',
+    isArray: true,
+    type: String,
+  })
+  tags: string[];
+
+  @ApiProperty({
     description: "Client's last update timestamp (epoch ms)",
     nullable: true,
   })

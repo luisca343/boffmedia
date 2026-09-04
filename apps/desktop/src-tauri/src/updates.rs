@@ -58,8 +58,17 @@ fn updater(app: &tauri::AppHandle) -> Result<tauri_plugin_updater::Updater, Stri
     let url = endpoint()
         .parse()
         .map_err(|e| format!("Endpoint de actualización inválido: {e}"))?;
+
+    // Get the stable per-installation ID for rollout bucketing. This is an opaque
+    // random UUID, NOT tied to user identity or hardware. It is used by the API
+    // solely to bucket this installation into a deterministic subset of clients
+    // for staged rollouts; it is never logged or tracked as telemetry.
+    let install_id = crate::install_id::get_or_create(app)?;
+
     app.updater_builder()
         .endpoints(vec![url])
+        .map_err(|e| e.to_string())?
+        .header("x-boff-install-id", &install_id)
         .map_err(|e| e.to_string())?
         .build()
         .map_err(|e| e.to_string())

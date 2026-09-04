@@ -132,7 +132,9 @@ export const messages = {
           "unread": "{count} mensajes sin leer",
           "lobbyPlaceholder": "Escribe un mensaje…",
           "lobbyEmpty": "Aún no hay mensajes. El chat aparecerá aquí al conectar con el lobby.",
-          "aria": "Chat"
+          "aria": "Chat",
+          "mute": "Silenciar a {name}",
+          "unmute": "Activar a {name}"
         },
         "end": {
           "victory": "¡VICTORIA!",
@@ -333,7 +335,17 @@ export const messages = {
             "error": "No se pudo sincronizar",
             "errorHint": "El servidor rechazó este equipo. Sigue guardado en este dispositivo; vuelve a intentarlo.",
             "localOnly": "Solo local · Inicia sesión",
-            "localOnlyHint": "Este equipo se guarda solo en este dispositivo. Inicia sesión para tenerlo en todos."
+            "localOnlyHint": "Este equipo se guarda solo en este dispositivo. Inicia sesión para tenerlo en todos.",
+            "localNewer": "Este equipo se editó más recientemente en otro dispositivo. Sincroniza para ver la versión actual."
+          },
+          "tags": {
+            "title": "Etiquetas",
+            "add": "Añadir etiqueta",
+            "addAria": "Añadir una nueva etiqueta al equipo",
+            "placeholder": "Nueva etiqueta…",
+            "filterByTag": "Filtrar por etiqueta",
+            "filterAll": "Todas",
+            "empty": "Sin etiquetas"
           },
           "editor": {
             "nameAria": "Nombre del equipo",
@@ -678,7 +690,9 @@ export const messages = {
             "tie": "Empate",
             "live": "En curso",
             "connecting": "Conectando",
-            "resyncing": "Sincronizando el combate…"
+            "resyncing": "Sincronizando el combate…",
+            "aiSeed": "Semilla {seed}",
+            "aiDifficultyLabel": "Dificultad de la IA: {difficulty}"
           },
           "score": {
             "alive": "{alive} de {total} en pie"
@@ -1060,6 +1074,11 @@ export const messages = {
             "setupLead": "Elige un formato y, si hace falta, un equipo. La IA usará otro de tus equipos o uno de ejemplo.",
             "format": "Formato",
             "team": "Tu equipo",
+            "difficulty": "Dificultad de la IA",
+            "difficultyEasy": "Fácil",
+            "difficultyMedium": "Normal",
+            "difficultyHard": "Difícil",
+            "difficultyHint": "Controla la agresividad y precisión de la IA.",
             "start": "Empezar",
             "sample": "Equipo de ejemplo",
             "sampleHint": "Sin equipos propios en este formato: se usará uno de ejemplo.",
@@ -1337,7 +1356,9 @@ export const messages = {
           "unread": "{count} unread messages",
           "lobbyPlaceholder": "Type a message…",
           "lobbyEmpty": "No messages yet. Chat appears here once connected to the lobby.",
-          "aria": "Chat"
+          "aria": "Chat",
+          "mute": "Mute {name}",
+          "unmute": "Unmute {name}"
         },
         "end": {
           "victory": "VICTORY!",
@@ -1538,7 +1559,17 @@ export const messages = {
             "error": "Couldn't sync",
             "errorHint": "The server refused this team. It is still saved on this device; try again.",
             "localOnly": "Local only · Sign in",
-            "localOnlyHint": "This team is saved on this device only. Sign in to have it on all of them."
+            "localOnlyHint": "This team is saved on this device only. Sign in to have it on all of them.",
+            "localNewer": "This team was edited more recently on another device. Sync to see the current version."
+          },
+          "tags": {
+            "title": "Tags",
+            "add": "Add tag",
+            "addAria": "Add a new tag to this team",
+            "placeholder": "New tag…",
+            "filterByTag": "Filter by tag",
+            "filterAll": "All",
+            "empty": "No tags"
           },
           "editor": {
             "nameAria": "Team name",
@@ -1883,7 +1914,9 @@ export const messages = {
             "tie": "Tie",
             "live": "Live",
             "connecting": "Connecting",
-            "resyncing": "Syncing the battle…"
+            "resyncing": "Syncing the battle…",
+            "aiSeed": "Seed {seed}",
+            "aiDifficultyLabel": "AI difficulty: {difficulty}"
           },
           "score": {
             "alive": "{alive} of {total} standing"
@@ -2265,6 +2298,11 @@ export const messages = {
             "setupLead": "Pick a format and, if it needs one, a team. The AI plays another of your teams or a sample.",
             "format": "Format",
             "team": "Your team",
+            "difficulty": "AI difficulty",
+            "difficultyEasy": "Easy",
+            "difficultyMedium": "Normal",
+            "difficultyHard": "Hard",
+            "difficultyHint": "Controls the AI's aggression and precision.",
             "start": "Start",
             "sample": "Sample team",
             "sampleHint": "No teams of yours for this format: a sample will be used.",

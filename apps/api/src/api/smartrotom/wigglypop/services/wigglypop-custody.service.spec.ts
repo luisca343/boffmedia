@@ -102,6 +102,9 @@ describe('WigglypopCustodyService', () => {
     findById: jest.fn(),
     markSold: jest.fn(),
     setStatus: jest.fn(),
+    // A sold or cancelled listing must give the mon back (S9): the custody lock
+    // is released on every path that takes the listing off the shelf.
+    releaseCustodyByListing: jest.fn(),
   };
 
   beforeEach(async () => {

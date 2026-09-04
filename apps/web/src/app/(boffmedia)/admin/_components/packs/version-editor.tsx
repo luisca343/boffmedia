@@ -208,6 +208,7 @@ export function VersionEditor({
   const [loader, setLoader] = useState("")
   const [loaderVersion, setLoaderVersion] = useState("")
   const [notes, setNotes] = useState("")
+  const [changelog, setChangelog] = useState("")
   const [prefix, setPrefix] = useState("config")
   const [uploads, setUploads] = useState<Upload[]>([])
   const [mods, setMods] = useState<SelectedMod[]>([])
@@ -289,6 +290,7 @@ export function VersionEditor({
       // build we just restored is wiped and replaced by "recommended".
       lastPair.current = `${version.loader ?? ""}:${version.minecraft ?? ""}`
       setNotes(version.notes ?? "")
+      setChangelog(version.changelog ?? "")
       setMods(toSelected(version.files))
       // Restored for an edit AND a clone: the groups are the most laborious
       // part of a version to author, and a clone that dropped them would
@@ -549,6 +551,7 @@ export function VersionEditor({
         loader?: PackLoader
         loaderVersion?: string
         notes?: string
+        changelog?: string
         files: unknown[]
         worlds?: BundledWorld[]
         emulator?: { kind: EmulatorKind; rom: string; args?: string[] }
@@ -582,6 +585,7 @@ export function VersionEditor({
         payload.loader = (loader || undefined) as PackLoader | undefined
         payload.loaderVersion = loader ? loaderVersion.trim() : undefined
         payload.notes = notes.trim() || undefined
+        payload.changelog = changelog.trim() || undefined
       }
 
       // Emulator-specific fields
@@ -788,6 +792,17 @@ export function VersionEditor({
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     placeholder={t("notesPlaceholder")}
+                  />
+                </Field>
+              </div>
+
+              <div className="mt-4 grid gap-4">
+                <Field label={t("changelog")} hint={t("changelogHint")}>
+                  <Textarea
+                    rows={4}
+                    value={changelog}
+                    onChange={(e) => setChangelog(e.target.value)}
+                    placeholder={t("changelogPlaceholder")}
                   />
                 </Field>
               </div>
@@ -1103,6 +1118,7 @@ export function VersionEditor({
                 String(optionalGroups.reduce((n, g) => n + g.features.length, 0)),
               ],
               [t("notes"), notes || "—"],
+              [t("changelog"), changelog || "—"],
             ].map(([label, value]) => (
               <div
                 key={label}

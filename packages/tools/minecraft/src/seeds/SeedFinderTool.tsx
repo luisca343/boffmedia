@@ -52,6 +52,7 @@ import {
   runBundleCsv,
 } from "./_lib/runBundle";
 import { useSeedsEngine } from "./_hooks/useSeedsEngine";
+import { useSpecShareLink } from "./_hooks/useSpecShareLink";
 import { SeedMap, type HoverInfo } from "./_components/SeedMap";
 import { MapHud } from "./_components/MapHud";
 import { BiomeFilter } from "./_components/BiomeFilter";
@@ -194,6 +195,9 @@ export function SeedFinderTool() {
   const [workerTarget, setWorkerTarget] = useState(0);
   const [survivorRate, setSurvivorRate] = useState<number | null>(null);
 
+  // Share link management: generate URLs and import from query params
+  const shareLink = useSpecShareLink();
+
   const styler = useMemo(() => (loaded ? createBiomeStyler(loaded.packColors) : null), [loaded]);
   const parsedSeed = useMemo(() => parseSeed(seed), [seed]);
 
@@ -219,6 +223,17 @@ export function SeedFinderTool() {
     setWorkerTarget(searchPoolTarget());
     setHydrated(true);
   }, []);
+
+  /**
+   * Import a spec from a share link if present in the URL.
+   * This runs after the view state is read but before the first render.
+   */
+  useEffect(() => {
+    if (shareLink.importedSpec) {
+      setSpec(shareLink.importedSpec);
+      setTab("search");
+    }
+  }, [shareLink.importedSpec]);
 
   /**
    * Load the stack, bind the seed, find spawn. Runs on mount and whenever the
@@ -565,6 +580,14 @@ export function SeedFinderTool() {
           />
 
           {error ? <Banner tone="error">{error}</Banner> : null}
+          {shareLink.importError ? (
+            <Banner tone="warn">
+              {t("spec.importError", { defaultValue: "Failed to import spec from share link: " + shareLink.importError })}
+              <Button size="sm" variant="ghost" onClick={shareLink.clearImportError} className="mt-1">
+                {t("spec.action.dismiss", { defaultValue: "Dismiss" })}
+              </Button>
+            </Banner>
+          ) : null}
 
           {tab === "search" ? (
             <SpecPanel
@@ -578,6 +601,9 @@ export function SeedFinderTool() {
               packIds={packIds}
               onFocusSite={showSite}
               onTestPrefilter={testPrefilter}
+              onGenerateShareLink={shareLink.generateShareLink}
+              encodedSpec={shareLink.encodedSpec}
+              shareError={shareLink.encodeError}
               t={t}
             />
           ) : null}

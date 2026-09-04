@@ -44,6 +44,7 @@ function toVersion(pack: WirePack): PackVersionSummary | null {
     emulatorKind: v.emulatorKind ?? null,
     fileCount: v.fileCount,
     optionalFeatureCount: v.optionalFeatureCount ?? 0,
+    changelog: v.changelog ?? null,
     createdAt: v.createdAt,
   }
 }
@@ -75,6 +76,9 @@ function toLocalEntry(manifest: PackManifest): PackEntry {
       minecraft: (manifest.version.dependencies ?? {}).minecraft ?? null,
       loader: loaderEntry?.[0] ?? null,
       loaderVersion: loaderEntry?.[1] ?? null,
+      // A local pack IS its manifest; there is no registry version history
+      // for it to describe, so it never carries a changelog.
+      changelog: null,
       emulatorKind: null,
       fileCount: manifest.version.files.length,
       optionalFeatureCount: (

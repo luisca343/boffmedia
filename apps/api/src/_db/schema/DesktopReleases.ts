@@ -51,6 +51,13 @@ export const desktopReleases = mysqlTable(
     /** boffmedia user id of the admin who uploaded it. No FK: the release must
      *  outlive the account, exactly like pack_audit. */
     uploadedBy: int('uploaded_by'),
+    /** Staged rollout: percentage (0-100) of clients to offer this release to.
+     *  Clients are assigned to buckets deterministically by hashing their device id.
+     *  Default 100 (all clients). */
+    rolloutPercent: int('rollout_percent').notNull().default(100),
+    /** Pause the rollout: when true, the release is not offered in the update feed
+     *  even if published. Useful for emergency holds without unpublishing. */
+    paused: boolean('paused').notNull().default(false),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
   },

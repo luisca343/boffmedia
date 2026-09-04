@@ -141,6 +141,7 @@ export async function queueTeamUpload(record: TeamRecord): Promise<boolean> {
           name: record.name,
           format: record.format,
           packed: record.packed,
+          tags: record.tags ?? [],
           clientUpdatedAt: record.updatedAt,
         },
     // Keyed on the team, not the operation: a save followed by a delete
@@ -210,6 +211,7 @@ interface ServerTeam {
   name: string;
   format: string;
   packed: string;
+  tags?: string[];
   clientUpdatedAt: number | null;
   deletedAt: number | null;
 }
@@ -253,7 +255,9 @@ export async function mergeTeamsFromServer(): Promise<number> {
       name: row.name,
       format: row.format,
       packed: row.packed,
+      tags: row.tags ?? [],
       updatedAt: row.clientUpdatedAt ?? Date.now(),
+      clientUpdatedAt: row.clientUpdatedAt,
       ...(row.deletedAt ? { deletedAt: row.deletedAt } : {}),
     });
     applied++;

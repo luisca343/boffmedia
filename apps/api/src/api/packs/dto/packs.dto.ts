@@ -232,6 +232,14 @@ export class CreatePackVersionDto {
   @IsString()
   notes?: string;
 
+  @ApiPropertyOptional({
+    description:
+      'Changelog: what changed in this version, for players. Shown on pack detail pages.',
+  })
+  @IsOptional()
+  @IsString()
+  changelog?: string;
+
   @ApiProperty({
     description:
       'PackFile[] — validado con @boffmedia/pack-schema, el mismo esquema del que la app genera sus tipos de Rust',

@@ -128,6 +128,9 @@ export const packVersions = mysqlTable(
     /** Draft versions are invisible to launchers — publishing is a deliberate act. */
     published: boolean('published').notNull().default(false),
     notes: text('notes'),
+    /** Changelog for this version — what changed for players. Displayed on pack
+     *  detail pages to inform users of version-specific changes before install. */
+    changelog: text('changelog'),
     // The Boffmedia admin who cut this version. Was char(36) — a Minecraft UUID
     // shape — and never written by anything, so every row said "nobody".
     createdBy: int('created_by'),

@@ -96,6 +96,10 @@ function start(message: Extract<BattleWorkerRequest, { type: "start" }>) {
       format,
       { name: message.p1Name ?? "Player", team: p1Team },
       { name: message.p2Name ?? "Bot", team: p2Team },
+      {
+        aiDifficulty: message.aiDifficulty,
+        aiSeed: message.aiSeed ?? null,
+      },
     )
     .then(() => post({ type: "battleCreated", roomId, format }))
     .catch((error: unknown) => {

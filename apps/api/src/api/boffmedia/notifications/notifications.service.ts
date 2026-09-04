@@ -1,14 +1,19 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { NotificationEntity } from './entities/notification.entity';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import {
   NotificationRow,
   NotificationsRepository,
 } from './repositories/notifications.repository';
+import { NotificationPreferencesService } from './services/notification-preferences.service';
 
 @Injectable()
 export class NotificationsService {
-  constructor(private readonly repo: NotificationsRepository) {}
+  constructor(
+    private readonly repo: NotificationsRepository,
+    @Optional()
+    private readonly preferencesService?: NotificationPreferencesService,
+  ) {}
 
   private toEntity(row: NotificationRow): NotificationEntity {
     return {
@@ -65,6 +70,9 @@ export class NotificationsService {
    * Create a notification for one user, or broadcast to every user when
    * `userId` is omitted. Reusable by other services (event/achievement
    * producers) — not just the admin endpoint.
+   *
+   * Respects user notification preferences: if a type is muted, the
+   * notification is skipped.
    */
   async create(
     dto: CreateNotificationDto,
@@ -78,6 +86,17 @@ export class NotificationsService {
     };
 
     if (dto.userId != null) {
+      // Check preferences: if muted, skip creation
+      if (this.preferencesService) {
+        const shouldDeliver = await this.preferencesService.shouldDeliver(
+          dto.userId,
+          dto.type,
+        );
+        if (!shouldDeliver) {
+          return { created: 0 };
+        }
+      }
+
       const row = { ...base, userId: dto.userId, dedupeKey: dedupeKey ?? null };
       if (dedupeKey) {
         // Idempotent: a retried producer (a re-run advance, a redelivered job)
@@ -92,6 +111,27 @@ export class NotificationsService {
 
     const userIds = await this.repo.findAllUserIds();
     if (userIds.length === 0) return { created: 0 };
+
+    // For broadcast, filter out users who have this type muted
+    if (this.preferencesService) {
+      const deliveryMap = await Promise.all(
+        userIds.map(async (uid) => ({
+          userId: uid,
+          shouldDeliver: await this.preferencesService!.shouldDeliver(
+            uid,
+            dto.type,
+          ),
+        })),
+      );
+      const activeUserIds = deliveryMap
+        .filter((d) => d.shouldDeliver)
+        .map((d) => d.userId);
+
+      if (activeUserIds.length === 0) return { created: 0 };
+
+      await this.repo.insertBroadcast(activeUserIds, base);
+      return { created: activeUserIds.length };
+    }
 
     await this.repo.insertBroadcast(userIds, base);
     return { created: userIds.length };

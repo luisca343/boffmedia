@@ -53,7 +53,19 @@ export class DesktopUpdatesController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<UpdaterFeedEntity | undefined> {
-    const feed = await this.updates.feed(target, currentVersion, baseUrl(req));
+    // Extract install ID from request header (sent by the Tauri updater plugin).
+    // Used for staged rollout bucketing: clients are hashed into 0-99 buckets
+    // based on their installation ID. Absent ID (older clients) defaults to
+    // included (true), so old clients always receive updates.
+    const installId = (req.headers['x-boff-install-id'] as string | undefined)?.trim();
+    const clientId = installId ? { deviceId: installId } : undefined;
+
+    const feed = await this.updates.feed(
+      target,
+      currentVersion,
+      baseUrl(req),
+      clientId,
+    );
     if (!feed) {
       res.status(HttpStatus.NO_CONTENT);
       return undefined;
@@ -95,7 +107,11 @@ export class DesktopUpdatesController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<UpdaterFeedEntity | undefined> {
-    const feed = await this.updates.feed(target, '0.0.0', baseUrl(req));
+    // Same rollout bucketing as the versioned feed (see feed() above).
+    const installId = (req.headers['x-boff-install-id'] as string | undefined)?.trim();
+    const clientId = installId ? { deviceId: installId } : undefined;
+
+    const feed = await this.updates.feed(target, '0.0.0', baseUrl(req), clientId);
     if (!feed) {
       res.status(HttpStatus.NO_CONTENT);
       return undefined;

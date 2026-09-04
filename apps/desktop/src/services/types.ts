@@ -52,6 +52,8 @@ export type PackVersionSummary = {
   /** How many things the player can switch on or off. Zero for a pack that
    *  installs everything it has, which is most of them. */
   optionalFeatureCount?: number
+  /** What changed in this version, shown on pack detail pages. */
+  changelog: string | null
   createdAt: string
 }
 
@@ -259,6 +261,12 @@ export type Settings = {
    *  settings.json - written before this option existed - loads as false too.
    *  Nothing is sent while it is false; see services/crashReports.ts. */
   crashReports: boolean
+  /** Whether the app may send anonymous telemetry (install/launch/crash rates,
+   *  tool usage). OPT-IN: false by default. `#[serde(default)]` means existing
+   *  settings.json loads as false. Nothing is sent while false; see
+   *  services/telemetry.ts. Telemetry is PII-scrubbed: install_id is random,
+   *  all fields enumerated, no usernames/emails/UUIDs/paths. */
+  telemetry: boolean
 }
 
 /** The offered zoom steps. A closed set rather than a free number so every value

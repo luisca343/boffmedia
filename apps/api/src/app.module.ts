@@ -79,6 +79,7 @@ import { WigglypopModule } from '@api/smartrotom/wigglypop/wigglypop.module';
 import { TaxiModule } from '@api/smartrotom/taxi/taxi.module';
 import { PacksModule } from './api/packs/packs.module';
 import { DesktopUpdatesModule } from './api/desktop-updates/desktop-updates.module';
+import { DesktopTelemetryModule } from './api/desktop-telemetry/desktop-telemetry.module';
 import { RandomizerModule } from '@api/randomizer/randomizer.module';
 import { publicPath } from '@/config/paths';
 
@@ -176,6 +177,7 @@ import { publicPath } from '@/config/paths';
     TaxiModule,
     PacksModule,
     DesktopUpdatesModule,
+    DesktopTelemetryModule,
     RandomizerModule,
   ],
   controllers: [AppController],

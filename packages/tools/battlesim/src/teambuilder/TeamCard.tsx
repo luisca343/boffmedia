@@ -17,6 +17,7 @@ import { useToolT } from "../i18n";
 import { TB_NS } from "./labels";
 import { TbSpriteThumb, TbValidityChip, type TbValidity } from "./tb-kit";
 import { useTeamValidation } from "./useTeamValidation";
+import { SyncIndicator } from "./SyncIndicator";
 
 export interface TeamCardProps {
   team: TeamRecord;
@@ -27,14 +28,18 @@ export interface TeamCardProps {
   onRename: (name: string) => void;
   onExport: () => void;
   onDelete: () => void;
+  onAddTag: (tag: string) => void;
+  onRemoveTag: (tag: string) => void;
 }
 
-export function TeamCard({ team, formatLabel, onPlay, onEdit, onDuplicate, onRename, onExport, onDelete }: TeamCardProps) {
+export function TeamCard({ team, formatLabel, onPlay, onEdit, onDuplicate, onRename, onExport, onDelete, onAddTag, onRemoveTag }: TeamCardProps) {
   const t = useToolT(TB_NS);
   const ref = React.useRef<HTMLElement>(null);
   const [visible, setVisible] = React.useState(false);
   const [renaming, setRenaming] = React.useState(false);
   const [draft, setDraft] = React.useState(team.name);
+  const [addingTag, setAddingTag] = React.useState(false);
+  const [tagDraft, setTagDraft] = React.useState("");
 
   React.useEffect(() => {
     const el = ref.current;
@@ -78,6 +83,15 @@ export function TeamCard({ team, formatLabel, onPlay, onEdit, onDuplicate, onRen
     else setDraft(team.name);
   };
 
+  const commitTag = () => {
+    const next = tagDraft.trim().toLowerCase();
+    setAddingTag(false);
+    if (next && !(team.tags ?? []).includes(next)) {
+      onAddTag(next);
+    }
+    setTagDraft("");
+  };
+
   return (
     <article
       ref={ref}
@@ -109,6 +123,7 @@ export function TeamCard({ team, formatLabel, onPlay, onEdit, onDuplicate, onRen
           <h3 className="m-0 min-w-0 flex-1 truncate font-display text-[1rem]/none font-bold not-italic uppercase tracking-[0.03em] text-txt">{team.name}</h3>
         )}
         <DkChip className="flex-none">{formatLabel}</DkChip>
+        <SyncIndicator clientUpdatedAt={team.clientUpdatedAt ?? null} serverUpdatedAt={team.updatedAt} />
       </header>
 
       {/* The six squares were the card's only statement of WHO is on the team,
@@ -123,6 +138,61 @@ export function TeamCard({ team, formatLabel, onPlay, onEdit, onDuplicate, onRen
         {Array.from({ length: 6 }, (_, i) => (
           <TbSpriteThumb key={i} name={species[i]} size={44} />
         ))}
+      </div>
+
+      {/* Tags section */}
+      <div className="border-t border-solid border-line px-3 py-2">
+        {(team.tags ?? []).length > 0 && (
+          <div className="mb-2 flex flex-wrap gap-1">
+            {(team.tags ?? []).map((tag) => (
+              <div
+                key={tag}
+                className="inline-flex items-center gap-1 rounded-sm bg-accent-bg px-2 py-1 text-[0.75rem] font-medium text-accent"
+              >
+                {tag}
+                <button
+                  onClick={() => onRemoveTag(tag)}
+                  className="ml-1 flex h-4 w-4 items-center justify-center rounded hover:bg-accent hover:text-accent-bg"
+                  aria-label={t("editor.removeSlot")}
+                  type="button"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+        {addingTag ? (
+          <Input
+            size="sm"
+            autoFocus
+            value={tagDraft}
+            placeholder={t("tags.placeholder")}
+            onChange={(e) => setTagDraft(e.target.value)}
+            onBlur={commitTag}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                commitTag();
+              } else if (e.key === "Escape") {
+                e.preventDefault();
+                setAddingTag(false);
+                setTagDraft("");
+              }
+            }}
+            className="w-full"
+          />
+        ) : (
+          <Button
+            size="sm"
+            variant="ghost"
+            icon="plus"
+            onClick={() => setAddingTag(true)}
+            className="w-full"
+          >
+            {t("tags.add")}
+          </Button>
+        )}
       </div>
 
       <footer className="mt-auto flex flex-wrap items-center gap-2 border-t border-solid border-line px-3 py-[0.625rem]">

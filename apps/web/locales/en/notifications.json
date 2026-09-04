@@ -1,0 +1,13 @@
+{
+  "notifications": {
+    "preferences": "Notification Preferences",
+    "preferences_description": "Choose which notifications you want to receive and manage email subscriptions.",
+    "type_event": "Event Notifications",
+    "type_achievement": "Achievement Notifications",
+    "type_tournament": "Tournament Notifications",
+    "type_system": "System Notifications",
+    "type_forum": "Forum Notifications",
+    "mute_this_type": "Mute this notification type",
+    "muted": "This notification type is muted"
+  }
+}

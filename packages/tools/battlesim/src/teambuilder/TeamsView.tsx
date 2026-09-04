@@ -38,6 +38,7 @@ export function TeamsView() {
 
   const [query, setQuery] = React.useState("");
   const [filter, setFilter] = React.useState(ALL);
+  const [tagFilter, setTagFilter] = React.useState(ALL);
   const [importOpen, setImportOpen] = React.useState(false);
   const [importFormat, setImportFormat] = React.useState(BSIM_TEAM_FORMATS[0]?.value ?? "gen9ou");
   const [pendingDelete, setPendingDelete] = React.useState<TeamRecord | null>(null);
@@ -51,11 +52,26 @@ export function TeamsView() {
 
   /* ── Grouping ──────────────────────────────────────────────────────────── */
   const known = React.useMemo(() => new Set(BSIM_TEAM_FORMATS.map((f) => f.value)), []);
+
+  // Collect all available tags from teams.
+  const availableTags = React.useMemo(() => {
+    const tags = new Set<string>();
+    for (const team of teams.teams) {
+      if (team.tags) {
+        for (const tag of team.tags) {
+          tags.add(tag);
+        }
+      }
+    }
+    return Array.from(tags).sort();
+  }, [teams.teams]);
+
   const groups = React.useMemo(() => {
     const q = query.trim().toLowerCase();
     const byFormat = new Map<string, TeamRecord[]>();
     for (const team of teams.teams) {
       if (q && !team.name.toLowerCase().includes(q)) continue;
+      if (tagFilter !== ALL && !(team.tags ?? []).includes(tagFilter)) continue;
       const key = known.has(team.format) ? team.format : OTHER;
       if (filter !== ALL && key !== filter) continue;
       const list = byFormat.get(key) ?? [];
@@ -70,7 +86,7 @@ export function TeamsView() {
     const other = byFormat.get(OTHER);
     if (other?.length) ordered.push({ key: OTHER, label: t("otherFormats"), teams: other });
     return ordered;
-  }, [teams.teams, query, filter, known, t]);
+  }, [teams.teams, query, filter, tagFilter, known, t]);
 
   const filterOptions = React.useMemo(() => {
     const present = new Set(teams.teams.map((tm) => (known.has(tm.format) ? tm.format : OTHER)));
@@ -80,9 +96,21 @@ export function TeamsView() {
     return opts;
   }, [teams.teams, known, t]);
 
+  const tagFilterOptions = React.useMemo(() => {
+    const opts = [{ value: ALL, label: t("tags.filterAll") }];
+    for (const tag of availableTags) {
+      opts.push({ value: tag, label: tag });
+    }
+    return opts;
+  }, [availableTags, t]);
+
   React.useEffect(() => {
     if (filter !== ALL && !filterOptions.some((o) => o.value === filter)) setFilter(ALL);
   }, [filter, filterOptions]);
+
+  React.useEffect(() => {
+    if (tagFilter !== ALL && !availableTags.includes(tagFilter)) setTagFilter(ALL);
+  }, [tagFilter, availableTags]);
 
   /* ── Actions ───────────────────────────────────────────────────────────── */
   const create = async () => {
@@ -128,6 +156,21 @@ export function TeamsView() {
     } finally {
       setDeleting(false);
     }
+  };
+
+  const addTag = async (team: TeamRecord, tag: string) => {
+    const trimmed = tag.trim().toLowerCase();
+    if (!trimmed) return;
+    const current = team.tags ?? [];
+    if (!current.includes(trimmed)) {
+      await teams.update(team.clientId, { tags: [...current, trimmed] });
+    }
+  };
+
+  const removeTag = async (team: TeamRecord, tag: string) => {
+    const current = team.tags ?? [];
+    const updated = current.filter((t) => t !== tag);
+    await teams.update(team.clientId, { tags: updated });
   };
 
   /* ── Editor route ──────────────────────────────────────────────────────── */
@@ -230,6 +273,13 @@ export function TeamsView() {
         ) : (
           <DkSeg value={filter} onChange={setFilter} options={filterOptions} ariaLabel={t("filterAria")} className={BSIM_SEG_FOCUS} />
         )}
+        {availableTags.length > 0 && (
+          narrow || tagFilterOptions.length > 5 ? (
+            <DkSelect value={tagFilter} onChange={setTagFilter} options={tagFilterOptions} ariaLabel={t("tags.filterByTag")} />
+          ) : (
+            <DkSeg value={tagFilter} onChange={setTagFilter} options={tagFilterOptions} ariaLabel={t("tags.filterByTag")} className={BSIM_SEG_FOCUS} />
+          )
+        )}
         <Button size="sm" icon="upload" onClick={() => setImportOpen(true)}>
           {t("import")}
         </Button>
@@ -264,6 +314,8 @@ export function TeamsView() {
                   onRename={(name) => void teams.update(team.clientId, { name })}
                   onExport={() => void exportTeam(team)}
                   onDelete={() => setPendingDelete(team)}
+                  onAddTag={(tag) => void addTag(team, tag)}
+                  onRemoveTag={(tag) => void removeTag(team, tag)}
                 />
               ))}
             </div>

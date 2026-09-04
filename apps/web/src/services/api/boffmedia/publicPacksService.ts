@@ -25,6 +25,7 @@ export type PublicPack = {
     loader: string | null;
     loaderVersion: string | null;
     fileCount: number;
+    changelog: string | null;
     createdAt: string;
   } | null;
   optionalGroups: import("@boffmedia/ui").OptionalGroup[];

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsIn, MaxLength, IsNumber, IsOptional } from 'class-validator';
+import { IsString, IsNotEmpty, IsIn, MaxLength, IsNumber, IsOptional, IsArray } from 'class-validator';
 import { BSIM_FORMAT_IDS } from '../_utils/formats';
 
 export class BattlesimTeamUploadDto {
@@ -41,6 +41,16 @@ export class BattlesimTeamUploadDto {
   @IsString()
   @IsNotEmpty()
   packed: string;
+
+  @ApiProperty({
+    description: 'User-defined tags for organizing teams',
+    example: ['competitive', 'doubles'],
+    required: false,
+    isArray: true,
+  })
+  @IsArray()
+  @IsOptional()
+  tags?: string[];
 
   @ApiProperty({
     description:

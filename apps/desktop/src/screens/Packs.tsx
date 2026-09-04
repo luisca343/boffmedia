@@ -32,6 +32,7 @@ import {
   localPackDuplicate,
   localPackSave,
   serverStatus,
+  openUrl,
 } from "../runtime"
 import { ImportPackPage } from "../components/pack/ImportPackPage"
 import { DeleteLocalPackModal, UninstallPackModal } from "../components/pack/PackDeleteDialogs"
@@ -191,6 +192,11 @@ function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "c
     icon: "folder",
     onSelect: () => void instanceReveal(pack.slug, ""),
   }
+  const moreInfoAction: MenuItem = {
+    label: t("moreInfo"),
+    icon: "external",
+    onSelect: () => void openUrl(`/app/packs/${pack.slug}`),
+  }
   const menuItems: MenuItem[] = isLocal
     ? [
         { label: tp("editLocalMenu"), icon: "edit", onSelect: () => go("pack", pack.id, { edit: true }) },
@@ -220,7 +226,9 @@ function LibraryCard({ entry, layout }: { entry: PackEntry; layout?: "card" | "c
         },
       ]
     : [
+        moreInfoAction,
         openFolder,
+        { sep: true },
         {
           label: t("uninstallMenu"),
           icon: "trash",
@@ -536,6 +544,10 @@ export function Packs() {
     boffSignIn,
     backendStatus,
     boffRestoreError,
+    updateQueue,
+    queueUpdates,
+    stopUpdateQueue,
+    offline,
   } = useApp()
 
   // A session that DIED is not the same as never having had one. With no
@@ -546,6 +558,13 @@ export function Packs() {
   const [query, setQuery] = useState("")
   const [creating, setCreating] = useState(false)
   const [importing, setImporting] = useState(false)
+
+  // Find all outdated packs that can be updated
+  const outdatedPacks = useMemo(() => {
+    return packs.filter(
+      (p) => p.state.kind === "outdated" && p.latest && p.origin === "managed",
+    )
+  }, [packs])
 
   const shown = useMemo(() => {
     let result = packs
@@ -612,6 +631,26 @@ export function Packs() {
             const module = getModule(gameType)
             return (
               <>
+                {outdatedPacks.length > 0 && (
+                  <Button
+                    size="sm"
+                    icon="download"
+                    variant={updateQueue.current ? "default" : "pri"}
+                    loading={!!updateQueue.current}
+                    disabled={offline}
+                    title={offline ? t("installOfflineTitle") : undefined}
+                    onClick={() => void queueUpdates(outdatedPacks.map((p) => p.pack.id))}
+                  >
+                    {updateQueue.current
+                      ? t("updateAllUpdating", {
+                          count: updateQueue.current ? 1 : 0,
+                          total: (updateQueue.queued.length || 0) + (updateQueue.current ? 1 : 0),
+                        })
+                      : updateQueue.queued.length > 0
+                        ? t("updateAllQueued", { count: updateQueue.queued.length })
+                        : t("updateAll")}
+                  </Button>
+                )}
                 {module.canImport && (
                   <Button size="sm" icon="upload" onClick={() => setImporting(true)}>
                     {t("importButton")}

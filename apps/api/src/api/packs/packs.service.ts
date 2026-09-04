@@ -168,6 +168,7 @@ export class PacksService {
                     version.optionalGroups,
                   ),
                   emulatorKind: this.emulatorKind(version.emulator),
+                  changelog: version.changelog,
                   createdAt: version.createdAt.toISOString(),
                 }
               : null,
@@ -230,6 +231,7 @@ export class PacksService {
             loader: published.loader,
             loaderVersion: published.loaderVersion,
             fileCount: published.files.length,
+            changelog: published.changelog,
             createdAt: published.createdAt.toISOString(),
           }
         : null,
@@ -839,6 +841,7 @@ export class PacksService {
       optionalGroups: pv.optionalGroups ?? null,
       runtime: pv.runtime ?? null,
       notes: dto.notes ?? null,
+      changelog: dto.changelog ?? null,
     });
     await this.repo.audit(AUDIT.VERSION_UPDATED, packId, null, {
       actorId,
@@ -957,6 +960,7 @@ export class PacksService {
       optionalGroups: pv.optionalGroups ?? null,
       runtime: pv.runtime ?? null,
       notes: dto.notes ?? null,
+      changelog: dto.changelog ?? null,
       published: false,
       createdBy: actorId,
     });

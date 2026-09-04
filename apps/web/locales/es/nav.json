@@ -160,6 +160,15 @@
       "clear": "Limpiar",
       "noNotifications": "Sin notificaciones",
       "delete": "Eliminar",
+      "palette": {
+        "noResults": "Sin resultados",
+        "hint": "↑ ↓ navegar • ⏎ seleccionar • Esc cerrar",
+        "category": {
+          "route": "Ruta",
+          "tool": "Herramienta",
+          "admin": "Admin"
+        }
+      },
       "sections": {
         "competition": "Competición",
         "participate": "Participa",

@@ -410,3 +410,35 @@ export const wigglypopReviews = mysqlTable(
 );
 
 export type WigglypopReview = typeof wigglypopReviews.$inferSelect;
+
+// ─── Custody Locks ───────────────────────────────────────────────────────────
+
+// When a Pokémon is listed, it is locked by its pokemonKey to prevent concurrent
+// double-listings and concurrent modifications. The lock is released only when the
+// listing is cancelled or completed. Only one listing may hold a lock on the same
+// (sellerUuid, pokemonKey) pair at a time.
+export const wigglypopMonCustody = mysqlTable(
+  'rotom_wigglypop_mon_custody',
+  {
+    sellerUuid: playerUuid('seller_uuid').notNull(),
+    pokemonKey: pokemonKey().notNull(),
+    listingId: int('listing_id')
+      .notNull()
+      .references(() => wigglypopListings.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade',
+      }),
+    createdAt: timestamp('created_at').notNull().defaultNow(),
+  },
+  (t) => ({
+    // Unique constraint ensures only one listing can lock a given (seller, mon) pair.
+    custodyUq: uniqueIndex('wp_custody_seller_mon_uq').on(
+      t.sellerUuid,
+      t.pokemonKey,
+    ),
+    listingIdx: index('wp_custody_listing_idx').on(t.listingId),
+    sellerIdx: index('wp_custody_seller_idx').on(t.sellerUuid),
+  }),
+);
+
+export type WigglypopMonCustody = typeof wigglypopMonCustody.$inferSelect;

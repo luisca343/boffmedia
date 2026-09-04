@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react"
 import { useTranslations } from "next-intl"
 import { Button, ConfirmDialog, Empty, Field, Icon, Input, ReleaseRow, Select, Spinner, Textarea, toast } from "@boffmedia/ui"
-import type { DesktopReleaseEntity } from "@boffmedia/shared"
+import type { DesktopReleaseEntity } from "@/services/api/boffmedia/desktopReleasesService"
 
 import {
   DesktopReleasesService,
@@ -54,6 +54,9 @@ export function DesktopReleasesAdmin() {
   const [uploading, setUploading] = useState(false)
   const [busyId, setBusyId] = useState<number | null>(null)
   const [confirmPublish, setConfirmPublish] = useState<DesktopReleaseEntity | null>(null)
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [editingRollout, setEditingRollout] = useState<string>("")
+  const [rolloutLoading, setRolloutLoading] = useState(false)
 
   const reload = useCallback(async () => {
     setLoading(true)
@@ -171,6 +174,74 @@ export function DesktopReleasesAdmin() {
     }
   }
 
+  const handleTogglePause = async (release: DesktopReleaseEntity) => {
+    setBusyId(release.id)
+    try {
+      const stepUpToken = await requestStepUp()
+      if (!stepUpToken) {
+        setBusyId(null)
+        return
+      }
+
+      const response = release.paused
+        ? await DesktopReleasesService.resume(release.id, stepUpToken)
+        : await DesktopReleasesService.pause(release.id, stepUpToken)
+      if (!response.success) {
+        toast({
+          tone: "bad",
+          title: release.paused ? t("resumeFailed") : t("pauseFailed"),
+          msg: response.userMessage ?? t("tryAgain"),
+        })
+        return
+      }
+      toast({ tone: "ok", title: release.paused ? t("resumed") : t("paused") })
+      await reload()
+    } catch {
+      toast({
+        tone: "bad",
+        title: release.paused ? t("resumeFailed") : t("pauseFailed"),
+        msg: t("tryAgain"),
+      })
+    } finally {
+      setBusyId(null)
+    }
+  }
+
+  const handleRolloutChange = async (release: DesktopReleaseEntity) => {
+    const percent = Number.parseInt(editingRollout, 10)
+    if (Number.isNaN(percent) || percent < 0 || percent > 100) {
+      toast({ tone: "bad", title: t("rolloutFailed"), msg: t("rolloutInvalid") })
+      return
+    }
+
+    setRolloutLoading(true)
+    try {
+      const stepUpToken = await requestStepUp()
+      if (!stepUpToken) {
+        setRolloutLoading(false)
+        return
+      }
+
+      const response = await DesktopReleasesService.setRollout(release.id, percent, stepUpToken)
+      if (!response.success) {
+        toast({
+          tone: "bad",
+          title: t("rolloutFailed"),
+          msg: response.userMessage ?? t("tryAgain"),
+        })
+        return
+      }
+      toast({ tone: "ok", title: t("rolloutUpdated") })
+      setExpandedId(null)
+      setEditingRollout("")
+      await reload()
+    } catch {
+      toast({ tone: "bad", title: t("rolloutFailed"), msg: t("tryAgain") })
+    } finally {
+      setRolloutLoading(false)
+    }
+  }
+
   const publishedCount = rows.filter((release) => release.published).length
 
   return (
@@ -267,24 +338,75 @@ export function DesktopReleasesAdmin() {
             <div className="flex flex-col gap-2">
               {rows.map((release) => {
                 const publishedAt = asText(release.publishedAt)
+                const isExpanded = expandedId === release.id
                 return (
-                  <ReleaseRow
-                    key={release.id}
-                    published={release.published}
-                    version={release.version}
-                    target={release.target}
-                    meta={<>{release.artifactName} · {formatBytes(release.sizeBytes)}</>}
-                    hashShort={`${release.artifactSha512.slice(0, 12)}…`}
-                    hashFull={release.artifactSha512}
-                    onCopyHash={() => void copyHash(release.artifactSha512)}
-                    copyLabel={t("copyHash")}
-                    date={publishedAt ? formatAdminDate(publishedAt) : undefined}
-                    actions={
-                      <Button size="sm" variant={release.published ? "ghost" : "pri"} icon={release.published ? "x" : "check"} loading={busyId === release.id} onClick={() => void togglePublished(release)}>
-                        {release.published ? t("unpublish") : t("publish")}
-                      </Button>
-                    }
-                  />
+                  <div key={release.id}>
+                    <ReleaseRow
+                      published={release.published}
+                      version={release.version}
+                      target={release.target}
+                      meta={<>{release.artifactName} · {formatBytes(release.sizeBytes)}</>}
+                      hashShort={`${release.artifactSha512.slice(0, 12)}…`}
+                      hashFull={release.artifactSha512}
+                      onCopyHash={() => void copyHash(release.artifactSha512)}
+                      copyLabel={t("copyHash")}
+                      date={publishedAt ? formatAdminDate(publishedAt) : undefined}
+                      actions={
+                        <div className="flex gap-2">
+                          <Button size="sm" variant="ghost" icon={isExpanded ? "collapse" : "chevronDown"} onClick={() => setExpandedId(isExpanded ? null : release.id)}>
+                            {t("details")}
+                          </Button>
+                          <Button size="sm" variant={release.published ? "ghost" : "pri"} icon={release.published ? "x" : "check"} loading={busyId === release.id} onClick={() => void togglePublished(release)}>
+                            {release.published ? t("unpublish") : t("publish")}
+                          </Button>
+                        </div>
+                      }
+                    />
+                    {isExpanded && (
+                      <div className="border-t border-line px-4 py-4 space-y-4">
+                        <div>
+                          <label className="block text-sm font-medium text-txt-dim mb-2">
+                            {t("rolloutPercent")}
+                          </label>
+                          <div className="flex gap-2">
+                            <Input
+                              type="number"
+                              min="0"
+                              max="100"
+                              value={editingRollout || release.rolloutPercent}
+                              onChange={(event) => setEditingRollout(event.target.value)}
+                              disabled={rolloutLoading}
+                              className="flex-1"
+                            />
+                            <Button
+                              size="sm"
+                              variant="pri"
+                              onClick={() => void handleRolloutChange(release)}
+                              loading={rolloutLoading}
+                            >
+                              {t("apply")}
+                            </Button>
+                          </div>
+                          <p className="text-xs text-txt-dim mt-1">{t("rolloutHint")}</p>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <Button
+                            size="sm"
+                            variant={release.paused ? "pri" : "ghost"}
+                            icon={release.paused ? "play" : "pause"}
+                            loading={busyId === release.id}
+                            onClick={() => void handleTogglePause(release)}
+                          >
+                            {release.paused ? t("resume") : t("pause")}
+                          </Button>
+                          {release.paused && (
+                            <span className="text-xs text-warn font-medium">{t("pausedWarning")}</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 )
               })}
             </div>

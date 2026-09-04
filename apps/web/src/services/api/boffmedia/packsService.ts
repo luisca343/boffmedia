@@ -78,6 +78,9 @@ export interface PackVersionRow {
   worldCount: number;
   published: boolean;
   notes: string | null;
+  /** Player-facing "what changed", shown on the pack page and in the app.
+   *  Awaiting reconciliation via pnpm generate:shared, like the field below. */
+  changelog: string | null;
   // Emulator pack fields — awaiting reconciliation via pnpm generate:shared
   emulatorKind?: 'mgba' | 'melonds';
   createdAt: string;
