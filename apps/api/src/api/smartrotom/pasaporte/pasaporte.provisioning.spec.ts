@@ -55,7 +55,10 @@ describe('PasaporteService.getProfile — provisioning is owner-only', () => {
     repo = moduleRef.get(PasaporteRepository);
 
     repo.findUser.mockResolvedValue({ uuid: OWNER, world: 'Teras' } as never);
-    repo.achievementTotals.mockResolvedValue({ completed: 0, total: 0 } as never);
+    repo.achievementTotals.mockResolvedValue({
+      completed: 0,
+      total: 0,
+    } as never);
     repo.firstActivityAt.mockResolvedValue(null as never);
     repo.trainerIdOwner.mockResolvedValue(null as never);
   });
