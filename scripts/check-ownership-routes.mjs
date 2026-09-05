@@ -38,6 +38,30 @@ const USER_OWNING_CONTROLLERS = [
   'smartrotom/users',
 ];
 
+/**
+ * WHAT THIS GATE CANNOT SEE, established by sweeping for each class 2026-09-05
+ * rather than assumed. Recorded here because the boundary is the useful part:
+ * a green run means "no unjustified owner-keyed PATH param", not "no IDOR".
+ *
+ *   1. An owner id arriving in the request BODY. `POST /x { uuid }` is invisible
+ *      here -- only path params are read. Swept: every POST/PUT/PATCH/DELETE
+ *      taking a uuid in the body was checked for caller identity, and every hit
+ *      was a false positive (the handler reads `@Req() req.user`). No defect.
+ *
+ *   2. A per-user resource addressed by its OWN id rather than the owner's.
+ *      `:account` is in the list below precisely because it was that -- and it
+ *      was a live IDOR on StarBank transaction history. Swept the generalisation
+ *      (routes with any id-shaped param whose handler establishes no caller):
+ *      the hits are public reference data, or carry service-layer enforcement
+ *      their docblocks describe. No further defect.
+ *
+ *   3. Whether the service actually honours the caller it is handed. This reads
+ *      decorators; `starbank.ownership.spec.ts` is the half that asserts
+ *      behaviour, and pairing the two is the point.
+ *
+ * When a new owner-keyed param appears, add it below. The list only catches the
+ * keys somebody thought of, which is how :account went unnoticed.
+ */
 const USER_PARAM_PATTERNS = [
   ':userId',
   ':uuid',
