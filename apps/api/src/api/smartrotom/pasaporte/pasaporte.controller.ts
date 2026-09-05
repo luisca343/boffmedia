@@ -15,6 +15,11 @@ import {
 export class PasaporteController {
   constructor(private readonly pasaporteService: PasaporteService) {}
 
+  // ownership-review: the trainer carne is public by design - it is the card other
+  // players look at. What needs a decision is the SIDE EFFECT: this route
+  // provisions the passport on first read, so an anonymous GET performs a write
+  // for an arbitrary uuid. AWAITING OWNER DECISION: provision on an authenticated
+  // read only, or keep it. See scripts/check-ownership-routes.mjs REVIEW_ALLOWLIST.
   @Get('profile/:uuid')
   @ApiOperation({
     summary:
@@ -32,6 +37,8 @@ export class PasaporteController {
     ) as unknown as Promise<PasaporteProfileEntity>;
   }
 
+  // ownership-ok: public by design - it reports each achievement's global rarity %,
+  // so it is built around cross-player aggregation.
   @Get('logros/:uuid')
   @ApiOperation({
     summary:
@@ -48,6 +55,8 @@ export class PasaporteController {
     >;
   }
 
+  // ownership-ok: public by design - derived entirely from replays, which are
+  // themselves public.
   @Get('season/:uuid')
   @ApiOperation({
     summary:

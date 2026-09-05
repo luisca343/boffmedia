@@ -187,6 +187,9 @@ export class RookerController {
     ) as unknown as Promise<RookerProfileEntity | null>;
   }
 
+  // ownership-ok: public by design - require-session.decorator.ts states the model:
+  // Rooker's timeline is readable by anyone, while posting, following and deleting
+  // are not.
   @Get('profile/:handle')
   @ApiOperation({
     summary:
@@ -204,6 +207,8 @@ export class RookerController {
     ) as unknown as Promise<RookerProfileEntity>;
   }
 
+  // ownership-ok: public by design - same social-timeline model. The viewer/uuid
+  // query param is a like-state hint, not an authorization input.
   @Get('profile/:handle/posts')
   @ApiOperation({ summary: "A user's trinos, filtered by tab." })
   @ApiParam({ name: 'handle', example: 'luisca' })

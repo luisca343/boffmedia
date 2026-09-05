@@ -120,7 +120,10 @@ export class JusticiaService {
       dep: 'justicia',
     });
     // Emit socket event so gobierno staff UIs refresh without F5
-    this.gobiernoSocketsService.emit({ type: 'expediente:created', expedienteId: e.id });
+    this.gobiernoSocketsService.emit({
+      type: 'expediente:created',
+      expedienteId: e.id,
+    });
     return this.getExpediente(e.id);
   }
 

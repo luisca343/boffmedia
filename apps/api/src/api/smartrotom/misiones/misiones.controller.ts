@@ -237,6 +237,7 @@ export class MisionesController {
 
   // ==================== VALIDATION ENDPOINTS ====================
 
+  // ownership-ok: public by design - returns a bare existence boolean, no fields.
   @Get('validate/user/:uuid')
   @ApiOperation({ summary: 'Validate if user exists in quest system' })
   @ApiResponse({

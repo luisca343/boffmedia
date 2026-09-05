@@ -85,6 +85,7 @@ export class ChatappController {
     return await this.chatappFacadeService.createChat(createChatRequest);
   }
 
+  // ownership-ok: handler is getChats(@CurrentMcUuid() uuid); the path param is never bound.
   @Get('chats/:uuid')
   @ApiOperation({ summary: 'Get chats for a player' })
   @ApiResponse({
@@ -157,7 +158,11 @@ export class ChatappController {
     }
     const limit = limitStr ? parseInt(limitStr, 10) : undefined;
     const before = beforeStr ? parseInt(beforeStr, 10) : undefined;
-    return await this.chatappFacadeService.getMessages(chatIdNum, limit, before);
+    return await this.chatappFacadeService.getMessages(
+      chatIdNum,
+      limit,
+      before,
+    );
   }
 
   @Post('messages/:chatId')
@@ -399,6 +404,7 @@ export class ChatappController {
     );
   }
 
+  // ownership-ok: group.service.ts:139-141 requires the requester be a member.
   @Delete('group/:groupId/member/:uuid')
   @ApiOperation({ summary: 'Remove a member from a group' })
   @ApiResponse({

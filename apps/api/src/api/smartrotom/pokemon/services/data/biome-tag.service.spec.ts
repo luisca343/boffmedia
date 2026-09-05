@@ -105,9 +105,9 @@ describe('BiomeTagService', () => {
     );
 
     it('expands a 9.4.0 tag reference', () => {
-      expect(
-        service.resolveBiomeReference('#pixelmon:spawning/mesas'),
-      ).toEqual(['minecraft:badlands']);
+      expect(service.resolveBiomeReference('#pixelmon:spawning/mesas')).toEqual(
+        ['minecraft:badlands'],
+      );
     });
 
     it('expands a 1.16.5 bare category name, spaces and all', () => {

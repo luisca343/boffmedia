@@ -440,6 +440,8 @@ export class PokemonController {
 
   // ==================== IMAGE OPERATIONS ====================
 
+  // ownership-ok: returns an IMAGE. The uuid only resolves palette and hide flags
+  // for the render; no player data is in the payload.
   @Get('image/:pokemonId/:formName/:paletteName/:uuid')
   @ApiOperation({ summary: 'Get Pokémon image' })
   @ApiResponse({
@@ -600,6 +602,8 @@ export class PokemonController {
     });
   }
 
+  // ownership-ok: public by design - Pokedex progress is shown on other players'
+  // public profiles (rooker profile/:handle returns derived dex and battle stats).
   @Get('dex/stats/:uuid')
   @ApiOperation({ summary: 'Get Pokédex statistics for user' })
   @ApiResponse({
@@ -618,6 +622,7 @@ export class PokemonController {
     return await this.pokemonFacadeService.getPokedexStatistics(uuid);
   }
 
+  // ownership-ok: public by design - same public-profile surface as dex/stats.
   @Get('dex/detailed/:uuid')
   @ApiOperation({ summary: 'Get detailed Pokédex status for user' })
   @ApiResponse({
@@ -636,6 +641,7 @@ export class PokemonController {
     return await this.pokemonFacadeService.getDetailedPokedexStatus(uuid);
   }
 
+  // ownership-ok: public by design - same public-profile surface as dex/stats.
   @Get('dex/registries/:uuid')
   @ApiOperation({ summary: 'Get Pokédex registries for user' })
   @ApiResponse({

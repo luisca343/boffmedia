@@ -70,6 +70,8 @@ export class KartsController {
     return await this.kartsService.getRanking(circuito, modo, limit);
   }
 
+  // ownership-ok: public by design - the same numbers the public kart ranking
+  // already publishes for every player.
   @Get('stats/:uuid')
   @Public()
   @ApiOperation({ summary: 'Kart stats for one player' })

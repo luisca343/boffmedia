@@ -89,8 +89,8 @@ describe('desktopAvatarUrl', () => {
 describe('the url handed to the launcher', () => {
   it('is absolute, since a relative one cannot be fetched off our origin', () => {
     // A bare path here is the bug this whole file exists to prevent.
-    expect(
-      desktopAvatarUrl('/uploads/profiles/42.png', new Date()),
-    ).toMatch(/^https?:\/\//);
+    expect(desktopAvatarUrl('/uploads/profiles/42.png', new Date())).toMatch(
+      /^https?:\/\//,
+    );
   });
 });

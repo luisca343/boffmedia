@@ -125,7 +125,10 @@ export class HaciendaService {
     return this.toMultaEntity(m, names);
   }
 
-  async createMulta(dto: CreateMultaDto, actor?: ActorContext): Promise<GobiernoMultaEntity> {
+  async createMulta(
+    dto: CreateMultaDto,
+    actor?: ActorContext,
+  ): Promise<GobiernoMultaEntity> {
     // Authorization: an officer can only issue a fine as themselves. ROTOM_ADMIN can
     // issue on behalf of any officer (authorization is enforced at the controller
     // guard level; here we just confirm for non-admin users).
@@ -235,7 +238,10 @@ export class HaciendaService {
       dep: 'hacienda',
     });
     // Emit socket event so gobierno staff UIs refresh without F5
-    this.gobiernoSocketsService.emit({ type: 'multa:status_changed', multaId: id });
+    this.gobiernoSocketsService.emit({
+      type: 'multa:status_changed',
+      multaId: id,
+    });
     return this.getMulta(id);
   }
 
@@ -264,7 +270,10 @@ export class HaciendaService {
       dep: 'hacienda',
     });
     // Emit socket event so gobierno staff UIs refresh without F5
-    this.gobiernoSocketsService.emit({ type: 'multa:status_changed', multaId: id });
+    this.gobiernoSocketsService.emit({
+      type: 'multa:status_changed',
+      multaId: id,
+    });
     return this.getMulta(id);
   }
 

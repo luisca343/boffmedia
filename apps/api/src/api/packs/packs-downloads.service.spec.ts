@@ -1,9 +1,12 @@
 import { createHash } from 'crypto';
-import { mkdtemp, rm, statfs } from 'fs/promises';
+import { mkdtemp, rm } from 'fs/promises';
 import { tmpdir } from 'os';
 import { join } from 'path';
 import { Readable } from 'stream';
-import { ServiceUnavailableException, PayloadTooLargeException } from '@nestjs/common';
+import {
+  ServiceUnavailableException,
+  PayloadTooLargeException,
+} from '@nestjs/common';
 
 import { env } from '@/config/env';
 import { PacksDownloadsService } from './packs-downloads.service';
@@ -42,6 +45,7 @@ describe('PacksDownloadsService — override blobs', () => {
     service = new PacksDownloadsService({} as never, mockUploadsRepository);
 
     // Setup default mock for statfs (plenty of space)
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Access mocked fs/promises for testing
     const mockStatfs = require('fs/promises').statfs as jest.Mock;
     mockStatfs.mockResolvedValue({
       bavail: 100 * 1024 * 1024,
@@ -90,6 +94,7 @@ describe('PacksDownloadsService — A17 behavioral tests', () => {
     (env as { PACK_BLOB_DIR?: string }).PACK_BLOB_DIR = dir;
 
     // Get reference to mocked statfs
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Access mocked fs/promises for testing
     mockStatfs = require('fs/promises').statfs as jest.Mock;
   });
 
@@ -121,14 +126,18 @@ describe('PacksDownloadsService — A17 behavioral tests', () => {
       const dailyQuotaBytes = dailyQuotaMB * 1024 * 1024;
 
       // User has used exactly the full quota
-      mockUploadsRepository.getDailyUploadSizeBytes.mockResolvedValue(dailyQuotaBytes);
+      mockUploadsRepository.getDailyUploadSizeBytes.mockResolvedValue(
+        dailyQuotaBytes,
+      );
 
       const bytes = Buffer.from('test');
       await expect(
         service.storeBlob(Readable.from([bytes]), 1),
       ).rejects.toThrow(PayloadTooLargeException);
 
-      expect(mockUploadsRepository.getDailyUploadSizeBytes).toHaveBeenCalledWith(1);
+      expect(
+        mockUploadsRepository.getDailyUploadSizeBytes,
+      ).toHaveBeenCalledWith(1);
     });
 
     it('allows upload when daily total is under quota', async () => {
@@ -145,7 +154,9 @@ describe('PacksDownloadsService — A17 behavioral tests', () => {
 
       expect(result).toHaveProperty('sha512');
       expect(result.size).toBe(bytes.length);
-      expect(mockUploadsRepository.getDailyUploadSizeBytes).toHaveBeenCalledWith(1);
+      expect(
+        mockUploadsRepository.getDailyUploadSizeBytes,
+      ).toHaveBeenCalledWith(1);
     });
   });
 
@@ -163,7 +174,9 @@ describe('PacksDownloadsService — A17 behavioral tests', () => {
       ).rejects.toThrow(ServiceUnavailableException);
 
       // Should not query quota if free-space check fails first
-      expect(mockUploadsRepository.getDailyUploadSizeBytes).not.toHaveBeenCalled();
+      expect(
+        mockUploadsRepository.getDailyUploadSizeBytes,
+      ).not.toHaveBeenCalled();
     });
 
     it('rejects when free-space probe throws (deliberate: no silent bypass)', async () => {
@@ -177,7 +190,9 @@ describe('PacksDownloadsService — A17 behavioral tests', () => {
 
       // CRITICAL: Disk probe failure must reject, not silently proceed
       // This is a deliberate design decision: a broken disk probe takes uploads down
-      expect(mockUploadsRepository.getDailyUploadSizeBytes).not.toHaveBeenCalled();
+      expect(
+        mockUploadsRepository.getDailyUploadSizeBytes,
+      ).not.toHaveBeenCalled();
     });
   });
 });

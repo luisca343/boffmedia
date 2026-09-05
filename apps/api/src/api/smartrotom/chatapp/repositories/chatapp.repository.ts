@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, asc, desc, and, sql } from 'drizzle-orm';
+import { eq, desc, and, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   rotomChats,
@@ -220,7 +220,7 @@ export class ChatappRepository {
     // in descending order for efficiency, then reverse in JS to match the ascending contract.
     // Hard limit: 100 messages per page.
     const actualLimit = Math.min(Math.max(1, limit), 100);
-    let query = this.db
+    const query = this.db
       .select({
         id: rotomChatMessages.id,
         content: rotomChatMessages.content,
@@ -231,7 +231,10 @@ export class ChatappRepository {
       .from(rotomChatMessages)
       .where(
         before
-          ? and(eq(rotomChatMessages.chatId, chatId), sql`${rotomChatMessages.id} < ${before}`)
+          ? and(
+              eq(rotomChatMessages.chatId, chatId),
+              sql`${rotomChatMessages.id} < ${before}`,
+            )
           : eq(rotomChatMessages.chatId, chatId),
       )
       .orderBy(desc(rotomChatMessages.id))
@@ -239,7 +242,7 @@ export class ChatappRepository {
 
     const results = await query;
     // Reverse to match ascending order (caller expects newest messages last).
-    return (results.reverse() as unknown as ChatMessage[]);
+    return results.reverse() as unknown as ChatMessage[];
   }
 
   async createMessage(messageData: {

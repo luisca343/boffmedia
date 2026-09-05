@@ -1,4 +1,7 @@
-import { DungeonBestRun, DungeonPlayerStats } from '../../entities/dungeon-player-stats.entity';
+import {
+  DungeonBestRun,
+  DungeonPlayerStats,
+} from '../../entities/dungeon-player-stats.entity';
 import { DungeonRankingEntry } from '../../entities/dungeon-ranking-entry.entity';
 
 export interface DungeonRunRow {

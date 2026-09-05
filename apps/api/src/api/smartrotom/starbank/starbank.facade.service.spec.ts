@@ -1,3 +1,4 @@
+import { ForbiddenException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { StarbankFacadeService } from './starbank.facade.service';
 import { StarbankAccountService } from './services/starbank-account.service';
@@ -389,13 +390,23 @@ describe('StarbankFacadeService', () => {
     });
   });
 
+  /**
+   * These two read a per-ACCOUNT history by numeric id, so they carry an
+   * ownership check the per-uuid reads do not need. The caller uuid is the
+   * third argument, and the account must be one of theirs.
+   */
   describe('getTransactions', () => {
+    const OWNER = 'test-uuid-1234';
+    const ownsAccountOne = () =>
+      accountService.getUserAccounts.mockResolvedValue([{ id: 1 }] as any);
+
     it('should return transactions with default limit', async () => {
+      ownsAccountOne();
       transactionService.getAccountTransactions.mockResolvedValue([
         mockTransaction,
       ] as any);
 
-      const result = await service.getTransactions(1);
+      const result = await service.getTransactions(1, 50, OWNER);
 
       expect(transactionService.getAccountTransactions).toHaveBeenCalledWith(
         1,
@@ -405,14 +416,32 @@ describe('StarbankFacadeService', () => {
     });
 
     it('should pass custom limit', async () => {
+      ownsAccountOne();
       transactionService.getAccountTransactions.mockResolvedValue([]);
 
-      await service.getTransactions(1, 10);
+      await service.getTransactions(1, 10, OWNER);
 
       expect(transactionService.getAccountTransactions).toHaveBeenCalledWith(
         1,
         10,
       );
+    });
+
+    it('refuses an account the caller does not own', async () => {
+      accountService.getUserAccounts.mockResolvedValue([{ id: 99 }] as any);
+
+      await expect(service.getTransactions(1, 50, OWNER)).rejects.toThrow(
+        ForbiddenException,
+      );
+      // The read must not happen at all, not merely be discarded afterwards.
+      expect(transactionService.getAccountTransactions).not.toHaveBeenCalled();
+    });
+
+    it('refuses when no caller is supplied', async () => {
+      await expect(service.getTransactions(1, 50)).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(transactionService.getAccountTransactions).not.toHaveBeenCalled();
     });
   });
 
@@ -433,12 +462,23 @@ describe('StarbankFacadeService', () => {
   });
 
   describe('getTransfers', () => {
+    it('refuses an account the caller does not own', async () => {
+      accountService.getUserAccounts.mockResolvedValue([{ id: 99 }] as any);
+
+      await expect(service.getTransfers(1, 'test-uuid-1234')).rejects.toThrow(
+        ForbiddenException,
+      );
+      expect(transactionService.getAccountTransfers).not.toHaveBeenCalled();
+    });
+
     it('should return last 10 transfers for account', async () => {
       transactionService.getAccountTransfers.mockResolvedValue([
         mockTransaction,
       ] as any);
 
-      const result = await service.getTransfers(1);
+      accountService.getUserAccounts.mockResolvedValue([{ id: 1 }] as any);
+
+      const result = await service.getTransfers(1, 'test-uuid-1234');
 
       expect(transactionService.getAccountTransfers).toHaveBeenCalledWith(
         1,

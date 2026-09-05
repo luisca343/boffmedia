@@ -7,8 +7,6 @@ import { SaveDungeonRunResponse } from './entities/save-dungeon-run-response.ent
 import { IDungeonsRepository } from './repositories/interfaces/dungeons.repository.interface';
 
 const MAX_RANKING_LIMIT = 100;
-/** Deep enough that a named player almost always has a rank to show. */
-const RANK_LOOKUP_DEPTH = 1000;
 
 @Injectable()
 export class DungeonsService {

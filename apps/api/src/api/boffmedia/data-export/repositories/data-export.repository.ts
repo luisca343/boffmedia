@@ -63,56 +63,64 @@ export class DataExportRepository {
 
     const mcUuid = user.uuid;
 
-    const [participants, sharex, documents, bankAccounts, orders, listings, mine, chats] =
-      await Promise.all([
-        this.db
-          .select({ id: boffMediaParticipants.id })
-          .from(boffMediaParticipants)
-          .where(eq(boffMediaParticipants.userId, userId)),
-        this.db
-          .select({ id: sharexTokens.id })
-          .from(sharexTokens)
-          .where(eq(sharexTokens.createdBy, userId)),
-        // The uuid-keyed sets stay empty when there is no linked Minecraft
-        // identity, which makes every SmartRotom clause drop out rather than
-        // matching on NULL.
-        mcUuid
-          ? this.db
-              .select({ id: rotomUserDocuments.documentId })
-              .from(rotomUserDocuments)
-              .where(eq(rotomUserDocuments.uuid, mcUuid))
-          : Promise.resolve([] as { id: number }[]),
-        mcUuid
-          ? this.db
-              .select({ id: starBankUserAccounts.accountId })
-              .from(starBankUserAccounts)
-              .where(eq(starBankUserAccounts.uuid, mcUuid))
-          : Promise.resolve([] as { id: number }[]),
-        mcUuid
-          ? this.db
-              .select({ id: wigglypopOrders.id })
-              .from(wigglypopOrders)
-              .where(eq(wigglypopOrders.buyerUuid, mcUuid))
-          : Promise.resolve([] as { id: number }[]),
-        mcUuid
-          ? this.db
-              .select({ id: wigglypopListings.id })
-              .from(wigglypopListings)
-              .where(eq(wigglypopListings.sellerUuid, mcUuid))
-          : Promise.resolve([] as { id: number }[]),
-        mcUuid
-          ? this.db
-              .select({ id: mineGames.id })
-              .from(mineGames)
-              .where(eq(mineGames.uuid, mcUuid))
-          : Promise.resolve([] as { id: number }[]),
-        mcUuid
-          ? this.db
-              .select({ id: rotomChatMembers.chatId })
-              .from(rotomChatMembers)
-              .where(eq(rotomChatMembers.uuid, mcUuid))
-          : Promise.resolve([] as { id: number }[]),
-      ]);
+    const [
+      participants,
+      sharex,
+      documents,
+      bankAccounts,
+      orders,
+      listings,
+      mine,
+      chats,
+    ] = await Promise.all([
+      this.db
+        .select({ id: boffMediaParticipants.id })
+        .from(boffMediaParticipants)
+        .where(eq(boffMediaParticipants.userId, userId)),
+      this.db
+        .select({ id: sharexTokens.id })
+        .from(sharexTokens)
+        .where(eq(sharexTokens.createdBy, userId)),
+      // The uuid-keyed sets stay empty when there is no linked Minecraft
+      // identity, which makes every SmartRotom clause drop out rather than
+      // matching on NULL.
+      mcUuid
+        ? this.db
+            .select({ id: rotomUserDocuments.documentId })
+            .from(rotomUserDocuments)
+            .where(eq(rotomUserDocuments.uuid, mcUuid))
+        : Promise.resolve([] as { id: number }[]),
+      mcUuid
+        ? this.db
+            .select({ id: starBankUserAccounts.accountId })
+            .from(starBankUserAccounts)
+            .where(eq(starBankUserAccounts.uuid, mcUuid))
+        : Promise.resolve([] as { id: number }[]),
+      mcUuid
+        ? this.db
+            .select({ id: wigglypopOrders.id })
+            .from(wigglypopOrders)
+            .where(eq(wigglypopOrders.buyerUuid, mcUuid))
+        : Promise.resolve([] as { id: number }[]),
+      mcUuid
+        ? this.db
+            .select({ id: wigglypopListings.id })
+            .from(wigglypopListings)
+            .where(eq(wigglypopListings.sellerUuid, mcUuid))
+        : Promise.resolve([] as { id: number }[]),
+      mcUuid
+        ? this.db
+            .select({ id: mineGames.id })
+            .from(mineGames)
+            .where(eq(mineGames.uuid, mcUuid))
+        : Promise.resolve([] as { id: number }[]),
+      mcUuid
+        ? this.db
+            .select({ id: rotomChatMembers.chatId })
+            .from(rotomChatMembers)
+            .where(eq(rotomChatMembers.uuid, mcUuid))
+        : Promise.resolve([] as { id: number }[]),
+    ]);
 
     const ids = (rows: { id: number }[]) => rows.map((r) => r.id);
 

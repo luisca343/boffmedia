@@ -65,6 +65,7 @@ export class DungeonsController {
     return await this.dungeonsService.getRanking(limit);
   }
 
+  // ownership-ok: public by design — sits next to the public ranking with the same numbers.
   @Get('stats/:uuid')
   @Public()
   @ApiOperation({ summary: 'Dungeon stats and rank for one player' })

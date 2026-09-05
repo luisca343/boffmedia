@@ -160,7 +160,11 @@ export class DungeonsRepository implements IDungeonsRepository {
    * stage depth, then speed. NULL times sort last (below all completed times).
    * Ties: two players with identical stats get adjacent ranks (no rank skipping).
    */
-  async findPlayerStatsWithRank(uuid: string): Promise<(DungeonRankingEntry & { mejorPartida: DungeonBestRun | null }) | null> {
+  async findPlayerStatsWithRank(
+    uuid: string,
+  ): Promise<
+    (DungeonRankingEntry & { mejorPartida: DungeonBestRun | null }) | null
+  > {
     // Compute the player's aggregated stats
     const statsRows = await this.db
       .select({
@@ -199,7 +203,9 @@ export class DungeonsRepository implements IDungeonsRepository {
     // times available (asc NULL), then speed (asc).
     const rankRows = await this.db
       .select({
-        rank: sql<number>`CAST(1 + COUNT(DISTINCT ranked_players.uuid) AS UNSIGNED)`.as('rank'),
+        rank: sql<number>`CAST(1 + COUNT(DISTINCT ranked_players.uuid) AS UNSIGNED)`.as(
+          'rank',
+        ),
       })
       .from(
         this.db

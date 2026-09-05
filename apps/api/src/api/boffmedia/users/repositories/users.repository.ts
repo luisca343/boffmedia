@@ -745,7 +745,10 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         .limit(1);
       return rows.length > 0 ? rows[0].v : null;
     } catch (error: any) {
-      this.logger.error(`Failed to get session version for user ${userId}:`, error);
+      this.logger.error(
+        `Failed to get session version for user ${userId}:`,
+        error,
+      );
       if (error instanceof HttpException) throw error;
       throw new Error(`Failed to get session version: ${error.message}`);
     }
@@ -765,7 +768,10 @@ export class BoffMediaUsersRepository implements IBoffMediaUsersRepository {
         })
         .where(eq(boffMediaUsers.id, userId));
     } catch (error: any) {
-      this.logger.error(`Failed to bump session version for user ${userId}:`, error);
+      this.logger.error(
+        `Failed to bump session version for user ${userId}:`,
+        error,
+      );
       if (error instanceof HttpException) throw error;
       throw new Error(`Failed to bump session version: ${error.message}`);
     }

@@ -311,6 +311,11 @@ export class EventosController {
     return this.eventosService.registerCaptura(id, dto, resolveActor(req));
   }
 
+  // ownership-review: reads a named rival's registered capture in a caza evento,
+  // while the sibling :id/capturas deliberately withholds rows during a live hunt.
+  // AWAITING OWNER DECISION: is a capture private until the event closes? If yes
+  // this defeats the blind hunt. See scripts/check-ownership-routes.mjs
+  // REVIEW_ALLOWLIST.
   @Get(':id/captura/:uuid')
   @Public()
   @ApiOperation({

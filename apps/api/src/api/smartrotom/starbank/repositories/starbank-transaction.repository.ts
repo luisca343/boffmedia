@@ -161,13 +161,13 @@ export class StarbankTransactionRepository implements IStarbankTransactionReposi
           .select({ id: starBankTransactions.id })
           .from(starBankTransactions)
           .where(
-          and(
-            eq(starBankTransactions.idempotencyKey, idempotencyKey),
-            // Scoped to the paying account: a bare key match would return a
-            // different user's transaction and drop this transfer entirely.
-            eq(starBankTransactions.fromAccountId, fromId),
-          ),
-        )
+            and(
+              eq(starBankTransactions.idempotencyKey, idempotencyKey),
+              // Scoped to the paying account: a bare key match would return a
+              // different user's transaction and drop this transfer entirely.
+              eq(starBankTransactions.fromAccountId, fromId),
+            ),
+          )
           .limit(1);
         if (existing.length > 0) {
           return { success: true, transactionId: existing[0].id };

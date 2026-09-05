@@ -2,10 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 
-import {
-  EXPORTED_TABLES,
-  type ExportSubject,
-} from '../data-export.manifest';
+import { EXPORTED_TABLES, type ExportSubject } from '../data-export.manifest';
 import { DataExportRepository } from './data-export.repository';
 
 /**

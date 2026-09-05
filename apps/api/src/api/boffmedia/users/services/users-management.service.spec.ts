@@ -318,7 +318,9 @@ describe('BoffMediaUsersManagementService', () => {
       const result = await service.changePassword(1, 'OldPass1!', 'NewPass1!');
 
       expect(result.success).toBe(true);
-      expect(mockPasswordService.hashPassword).toHaveBeenCalledWith('NewPass1!');
+      expect(mockPasswordService.hashPassword).toHaveBeenCalledWith(
+        'NewPass1!',
+      );
       expect(mockRepo.updateUser).toHaveBeenCalledWith(
         1,
         expect.objectContaining({ password: '$hashed$' }),

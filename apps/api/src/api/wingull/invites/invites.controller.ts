@@ -300,6 +300,8 @@ export class InvitesController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.BOFF_ADMIN, USER_ROLES.BOFF_ADMIN_CONTENT)
   @RequireSession()
+  // ownership-ok: role-gated - @Roles(BOFF_ADMIN, BOFF_ADMIN_CONTENT) with
+  // @RequireSession().
   @Get('user/:uuid')
   @ApiOperation({ summary: 'Get invites by user UUID (admin only)' })
   @ApiResponse({

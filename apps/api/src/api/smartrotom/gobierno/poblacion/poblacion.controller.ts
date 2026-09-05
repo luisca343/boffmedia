@@ -52,6 +52,8 @@ export class PoblacionController {
     return this.poblacionService.listCenso(query);
   }
 
+  // ownership-ok: public by design - the civic dossier any player can open from
+  // any name in the app.
   @Get('censo/:uuid')
   @Public()
   @ApiOperation({
@@ -76,6 +78,9 @@ export class PoblacionController {
     return this.poblacionService.listOficiales();
   }
 
+  // ownership-ok: role-gated, not owner-gated - @Roles(GOB_ALCALDE, ROTOM_ADMIN).
+  // Granting yourself a role is exactly what this must prevent, so ownership would
+  // be the wrong check.
   @Post('oficiales/:uuid/roles')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.GOB_ALCALDE, USER_ROLES.ROTOM_ADMIN)
@@ -91,6 +96,7 @@ export class PoblacionController {
     return this.poblacionService.grantRole(uuid, dto);
   }
 
+  // ownership-ok: same @Roles(GOB_ALCALDE, ROTOM_ADMIN) gate as the grant above.
   @Delete('oficiales/:uuid/roles/:role')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.GOB_ALCALDE, USER_ROLES.ROTOM_ADMIN)

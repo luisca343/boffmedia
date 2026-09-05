@@ -17,6 +17,8 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 import { GameServerAuthGuard } from '@api/_utils/guards/game-server-auth.guard';
 import { resolveActor, assertActsAsSelf } from '@api/_utils/auth/actor';
@@ -47,9 +49,9 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Logger } from 'nestjs-pino';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { ACCOUNT_IMAGE_UPLOAD, saveAccountImage } from './account-image';
+import { Roles } from '@api/_utils/decorators/roles.decorator';
 
 @ApiTags('SmartRotom | Starbank')
-@Public()
 @Controller('smartrotom/starbank')
 export class StarbankController {
   constructor(
@@ -59,9 +61,10 @@ export class StarbankController {
 
   // ==================== ACCOUNT OPERATIONS ====================
 
+  @Roles(USER_ROLES.ROTOM_ADMIN)
   @Get('accounts')
   @ApiOperation({
-    summary: 'Get all accounts',
+    summary: 'Get all accounts (admin only)',
     description: 'Retrieve a list of all StarBank accounts in the system',
   })
   @ApiResponse({
@@ -77,6 +80,13 @@ export class StarbankController {
     return await this.starbankFacadeService.getAllAccounts();
   }
 
+  // @Public() is REQUIRED here and is not a loosening. The class-level
+  // @Public() that used to blanket this controller is gone (it made every
+  // balance and transaction readable by anyone), but the guard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a
+  // JWT. The global JwtAuthGuard runs before route guards, so without this
+  // it rejects the mod with 401 and GameOrUserAuthGuard never runs.
+  @Public()
   @Post('accounts')
   @UseGuards(GameOrUserAuthGuard)
   @ApiOperation({
@@ -248,6 +258,8 @@ export class StarbankController {
     );
   }
 
+  // ownership-ok: the path uuid is discarded; the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get('accounts/:uuid')
   @ApiOperation({
     summary: 'Get accounts for a user',
@@ -274,11 +286,14 @@ export class StarbankController {
     description: 'Failed to retrieve accounts.',
   })
   async getUserAccounts(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<StarBankAccount[]> {
     return await this.starbankFacadeService.getAccounts(uuid);
   }
 
+  // ownership-ok: the path uuid is discarded; the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get('balance/:uuid')
   @ApiOperation({
     summary: 'Get balance for a user',
@@ -314,13 +329,21 @@ export class StarbankController {
     description: 'Failed to retrieve balance.',
   })
   async getUserBalance(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<{ balance: number }> {
     return await this.starbankFacadeService.getBalance(uuid);
   }
 
   // ==================== TRANSACTION OPERATIONS ====================
 
+  // @Public() is REQUIRED here and is not a loosening. The class-level
+  // @Public() that used to blanket this controller is gone (it made every
+  // balance and transaction readable by anyone), but the guard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a
+  // JWT. The global JwtAuthGuard runs before route guards, so without this
+  // it rejects the mod with 401 and GameOrUserAuthGuard never runs.
+  @Public()
   @Post('transfer')
   @UseGuards(GameOrUserAuthGuard)
   @ApiOperation({
@@ -362,6 +385,13 @@ export class StarbankController {
     );
   }
 
+  // @Public() is REQUIRED here and is not a loosening. The class-level
+  // @Public() that used to blanket this controller is gone (it made every
+  // balance and transaction readable by anyone), but the guard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a
+  // JWT. The global JwtAuthGuard runs before route guards, so without this
+  // it rejects the mod with 401 and GameOrUserAuthGuard never runs.
+  @Public()
   @Post('transfer/from-main')
   @UseGuards(GameOrUserAuthGuard)
   @ApiOperation({
@@ -399,6 +429,13 @@ export class StarbankController {
     );
   }
 
+  // @Public() is REQUIRED here and is not a loosening. The class-level
+  // @Public() that used to blanket this controller is gone (it made every
+  // balance and transaction readable by anyone), but the guard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a
+  // JWT. The global JwtAuthGuard runs before route guards, so without this
+  // it rejects the mod with 401 and GameServerAuthGuard never runs.
+  @Public()
   @Post('shop')
   @UseGuards(GameServerAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -407,7 +444,7 @@ export class StarbankController {
     description:
       'Process a purchase or sale transaction with an NPC shop. Mints/moves ' +
       "money on the mod's behalf, so it is server-only: requires the mod's " +
-      "Bearer token. Never user-reachable — it carries no ownership check.",
+      'Bearer token. Never user-reachable — it carries no ownership check.',
   })
   @ApiBody({ type: CreateShopTransactionDto })
   @ApiResponse({
@@ -428,6 +465,13 @@ export class StarbankController {
     return await this.starbankFacadeService.shop(shopDto);
   }
 
+  // @Public() is REQUIRED here and is not a loosening. The class-level
+  // @Public() that used to blanket this controller is gone (it made every
+  // balance and transaction readable by anyone), but the guard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a
+  // JWT. The global JwtAuthGuard runs before route guards, so without this
+  // it rejects the mod with 401 and GameServerAuthGuard never runs.
+  @Public()
   @Post('trainerdefeat')
   @UseGuards(GameServerAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -459,6 +503,13 @@ export class StarbankController {
     );
   }
 
+  // @Public() is REQUIRED here and is not a loosening. The class-level
+  // @Public() that used to blanket this controller is gone (it made every
+  // balance and transaction readable by anyone), but the guard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a
+  // JWT. The global JwtAuthGuard runs before route guards, so without this
+  // it rejects the mod with 401 and GameServerAuthGuard never runs.
+  @Public()
   @Post('set-balance')
   @UseGuards(GameServerAuthGuard)
   @HttpCode(HttpStatus.OK)
@@ -498,6 +549,10 @@ export class StarbankController {
 
   // ==================== TRANSACTION HISTORY ====================
 
+  // ownership-ok: the account id is checked against the caller's own accounts
+  // in StarbankFacadeService.assertOwnsAccount(). A numeric id is trivially
+  // enumerable, so this read is owner-scoped even though the path carries no uuid.
+  @RequireSession()
   @Get('transactions/:account')
   @ApiOperation({
     summary: 'Get transaction history for an account',
@@ -531,11 +586,18 @@ export class StarbankController {
   })
   async getAccountTransactions(
     @Param('account') account: number,
+    @CurrentMcUuid() callerUuid: string,
     @Query('limit') limit: number = 50,
   ): Promise<StarBankTransaction[]> {
-    return await this.starbankFacadeService.getTransactions(account, limit);
+    return await this.starbankFacadeService.getTransactions(
+      account,
+      limit,
+      callerUuid,
+    );
   }
 
+  // ownership-ok: the path uuid is discarded; the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get('transactions/user/:uuid')
   @ApiOperation({
     summary: 'Get transaction history for a user',
@@ -570,12 +632,17 @@ export class StarbankController {
     description: 'Failed to retrieve transaction history.',
   })
   async getUserTransactions(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
     @Query('limit') limit: number = 50,
   ): Promise<StarBankTransaction[]> {
     return await this.starbankFacadeService.getTransactionsByUUID(uuid, limit);
   }
 
+  // ownership-ok: the account id is checked against the caller's own accounts
+  // in StarbankFacadeService.assertOwnsAccount(). A numeric id is trivially
+  // enumerable, so this read is owner-scoped even though the path carries no uuid.
+  @RequireSession()
   @Get('transfers/:account')
   @ApiOperation({
     summary: 'Get transfer history for an account',
@@ -602,10 +669,13 @@ export class StarbankController {
   })
   async getAccountTransfers(
     @Param('account') account: number,
+    @CurrentMcUuid() callerUuid: string,
   ): Promise<StarBankTransaction[]> {
-    return await this.starbankFacadeService.getTransfers(account);
+    return await this.starbankFacadeService.getTransfers(account, callerUuid);
   }
 
+  // ownership-ok: the path uuid is discarded; the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get('transfers/user/:uuid')
   @ApiOperation({
     summary: 'Get transfer history for a user',
@@ -633,7 +703,8 @@ export class StarbankController {
     description: 'Failed to retrieve transfer history.',
   })
   async getUserTransfers(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<StarBankTransaction[]> {
     return await this.starbankFacadeService.getTransfersByUUID(uuid);
   }

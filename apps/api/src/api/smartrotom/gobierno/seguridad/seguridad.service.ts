@@ -122,7 +122,10 @@ export class SeguridadService {
       dep: 'seguridad',
     });
     // Emit socket event so gobierno staff UIs refresh without F5
-    this.gobiernoSocketsService.emit({ type: 'denuncia:created', denunciaId: d.id });
+    this.gobiernoSocketsService.emit({
+      type: 'denuncia:created',
+      denunciaId: d.id,
+    });
     return this.getDenuncia(d.id);
   }
 
@@ -173,7 +176,10 @@ export class SeguridadService {
       dep: 'seguridad',
     });
     // Emit socket event so gobierno staff UIs refresh without F5
-    this.gobiernoSocketsService.emit({ type: 'denuncia:resolved', denunciaId: id });
+    this.gobiernoSocketsService.emit({
+      type: 'denuncia:resolved',
+      denunciaId: id,
+    });
     return this.getDenuncia(id);
   }
 

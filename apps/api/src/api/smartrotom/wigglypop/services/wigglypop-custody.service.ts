@@ -709,9 +709,8 @@ export class WigglypopCustodyService {
     operation: string,
   ): Promise<void> {
     try {
-      const activeSessions = await this.listingsRepository.getActiveSessions(
-        uuid,
-      );
+      const activeSessions =
+        await this.listingsRepository.getActiveSessions(uuid);
 
       if (activeSessions.length > 1) {
         this.logger.warn(

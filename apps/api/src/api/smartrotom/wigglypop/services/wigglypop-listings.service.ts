@@ -415,7 +415,9 @@ export class WigglypopListingsService {
     } catch (error: any) {
       // If locking fails, cascade delete the listing we just created.
       await this.listingsRepository.delete(listing.id);
-      throw new BadRequestException(error?.message ?? 'Could not lock the Pokémon');
+      throw new BadRequestException(
+        error?.message ?? 'Could not lock the Pokémon',
+      );
     }
 
     return this.toEntity(listing);

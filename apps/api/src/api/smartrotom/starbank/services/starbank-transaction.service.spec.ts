@@ -64,7 +64,9 @@ describe('StarbankTransactionService', () => {
       checkAccountExists: jest.fn(),
     };
 
-    houseAccounts = { resolveAccountId: jest.fn().mockResolvedValue(SYSTEM_ID) };
+    houseAccounts = {
+      resolveAccountId: jest.fn().mockResolvedValue(SYSTEM_ID),
+    };
 
     transactionRepository = {
       create: jest.fn(),

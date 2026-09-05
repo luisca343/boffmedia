@@ -79,6 +79,7 @@ export class ArcadeController {
     return await this.arcadeFacadeService.getRewardsBanner();
   }
 
+  // ownership-ok: public by design — catalogue reads stay open (see class comment).
   @Get('streak/:uuid')
   @ApiOperation({ summary: "Get user's arcade streak status" })
   @ApiParam({
@@ -111,6 +112,7 @@ export class ArcadeController {
     return this.arcadeFacadeService.claimDailyReward(uuid);
   }
 
+  // ownership-ok: public by design — catalogue reads stay open (see class comment).
   @Get('streak/:uuid/stats')
   @ApiOperation({ summary: 'Get detailed streak statistics' })
   @ApiParam({
@@ -144,6 +146,7 @@ export class ArcadeController {
 
   // ==================== INVENTORY ENDPOINTS ====================
 
+  // ownership-ok: the path uuid is discarded; the service is called with @CurrentMcUuid().
   @RequireSession()
   @Get('inventory/:uuid')
   @ApiOperation({ summary: 'Get player inventory items' })
@@ -185,6 +188,8 @@ export class ArcadeController {
     return this.arcadeFacadeService.getUserInventory(uuid);
   }
 
+  // ownership-ok: the path uuid is discarded; the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get('inventory/:uuid/stats')
   @ApiOperation({ summary: 'Get inventory statistics' })
   @ApiParam({
@@ -196,7 +201,10 @@ export class ArcadeController {
     status: HttpStatus.OK,
     description: 'Inventory statistics retrieved successfully.',
   })
-  async getInventoryStats(@Param('uuid') uuid: string): Promise<{
+  async getInventoryStats(
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<{
     totalItems: number;
     itemsByType: Record<string, number>;
     itemsByRarity: Record<string, number>;
@@ -204,6 +212,7 @@ export class ArcadeController {
     return this.arcadeFacadeService.getInventoryStats(uuid);
   }
   @ApiExtraModels(RarityRange)
+  // ownership-ok: the path uuid is discarded; the service is called with @CurrentMcUuid().
   @RequireSession()
   @Get('inventory/:uuid/item/:itemId')
   @ApiOperation({ summary: 'Get specific inventory item' })
@@ -273,6 +282,8 @@ export class ArcadeController {
   }
 
   @RequireSession()
+  // ownership-ok: the path uuid is discarded; the service is called with
+  // @CurrentMcUuid(), so a player only ever marks their OWN item used.
   @Post('inventory/:uuid/item/:itemId/use')
   @ApiOperation({ summary: 'Mark inventory item as used' })
   @ApiParam({
@@ -362,6 +373,8 @@ export class ArcadeController {
     return this.arcadeFacadeService.claimMultipleItems(uuid, items);
   }*/
 
+  // ownership-ok: the path uuid is discarded; the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get('user/:uuid/complete-data')
   @ApiOperation({ summary: 'Get complete user arcade data' })
   @ApiParam({
@@ -373,7 +386,10 @@ export class ArcadeController {
     status: HttpStatus.OK,
     description: 'Complete user data retrieved successfully.',
   })
-  async getCompleteUserData(@Param('uuid') uuid: string): Promise<{
+  async getCompleteUserData(
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
+  ): Promise<{
     streak: ArcadeStreak;
     inventory: ArcadeInventoryResponse;
     inventoryStats: {

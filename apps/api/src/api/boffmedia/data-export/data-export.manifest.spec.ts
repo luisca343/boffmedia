@@ -4,10 +4,7 @@ import { join } from 'node:path';
 import { getTableColumns, is } from 'drizzle-orm';
 import { getTableConfig, MySqlTable } from 'drizzle-orm/mysql-core';
 
-import {
-  EXCLUDED_TABLES,
-  EXPORTED_TABLES,
-} from './data-export.manifest';
+import { EXCLUDED_TABLES, EXPORTED_TABLES } from './data-export.manifest';
 
 /**
  * The ratchet behind the GDPR export.
@@ -36,7 +33,7 @@ function collectSchemaTables(): string[] {
   const names: string[] = [];
 
   for (const file of files) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Load schema files dynamically to auto-discover tables
     const mod = require(join(SCHEMA_DIR, file)) as Record<string, unknown>;
     for (const exported of Object.values(mod)) {
       if (!is(exported, MySqlTable)) continue;
@@ -148,7 +145,7 @@ describe('data export manifest', () => {
     expect(mute).toEqual([]);
   });
 
-  describe("the other-people rule, pinned where it is easiest to lose", () => {
+  describe('the other-people rule, pinned where it is easiest to lose', () => {
     const spec = (table: string) =>
       EXPORTED_TABLES.find((t) => t.table === table);
 
@@ -174,7 +171,7 @@ describe('data export manifest', () => {
       ).toBe(false);
     });
 
-    it("strips the counterparty from every row that has one", () => {
+    it('strips the counterparty from every row that has one', () => {
       const cases: ReadonlyArray<[table: string, column: string]> = [
         ['boffmedia_forum_threads', 'lastPostUserId'],
         ['tools_battlesim_replays', 'opponentUserId'],

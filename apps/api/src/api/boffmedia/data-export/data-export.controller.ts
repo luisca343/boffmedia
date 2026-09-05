@@ -72,9 +72,13 @@ export class DataExportController {
     return row ? present(row) : null;
   }
 
+  // ownership-ok: service.open(user.userId, id) scopes to the caller's userId.
   @Get(':id/download')
   @ApiOperation({ summary: 'Download a prepared export' })
-  @ApiResponse({ status: 200, description: 'The archive, as a JSON attachment' })
+  @ApiResponse({
+    status: 200,
+    description: 'The archive, as a JSON attachment',
+  })
   @ApiResponse({ status: 403, description: 'Not your export' })
   async download(
     @CurrentUser() user: AuthPrincipal,

@@ -11,7 +11,6 @@
 
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from 'nestjs-pino';
-import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq } from 'drizzle-orm';
 import {
   describeIntegration,
@@ -376,17 +375,14 @@ describeIntegration('BoffMediaUsersRepository (Integration)', () => {
         fail('Should have thrown');
       } catch (err: any) {
         // Verify the error chain contains ER_DUP_ENTRY
-        let found = false;
         let current = err;
         for (let depth = 0; depth < 5; depth++) {
           if (!current) break;
           if (current.code === 'ER_DUP_ENTRY') {
-            found = true;
             break;
           }
           if (typeof current.message === 'string') {
             if (current.message.includes('Duplicate entry')) {
-              found = true;
               break;
             }
           }

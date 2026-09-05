@@ -485,10 +485,7 @@ export class BoffMediaUsersManagementService {
 
     const user = await this.usersRepository.findUserById(id);
     if (!user) {
-      throw new NotFoundError(
-        ApiErrorCode.ACTOR_NOT_SELF,
-        'User not found',
-      );
+      throw new NotFoundError(ApiErrorCode.ACTOR_NOT_SELF, 'User not found');
     }
 
     const full = await this.usersRepository.findFullUserByUsernameWithPassword(

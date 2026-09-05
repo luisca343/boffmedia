@@ -391,8 +391,22 @@ describe('WigglypopCustodyService', () => {
         makeListing({
           kind: 'bundle',
           mons: [
-            { id: 1, listingId: 101, pokemonKey: 'a', sourceBox: 1, sourceIndex: 1, dex: 1 },
-            { id: 2, listingId: 101, pokemonKey: 'b', sourceBox: 1, sourceIndex: 2, dex: 2 },
+            {
+              id: 1,
+              listingId: 101,
+              pokemonKey: 'a',
+              sourceBox: 1,
+              sourceIndex: 1,
+              dex: 1,
+            },
+            {
+              id: 2,
+              listingId: 101,
+              pokemonKey: 'b',
+              sourceBox: 1,
+              sourceIndex: 2,
+              dex: 2,
+            },
           ],
         }),
       ]);
@@ -583,7 +597,10 @@ describe('WigglypopCustodyService', () => {
           { provide: WigglypopEscrowService, useValue: escrow },
           { provide: WingullFacadeService, useValue: wingull },
           { provide: WigglypopOrdersRepository, useValue: ordersRepository },
-          { provide: WigglypopListingsRepository, useValue: listingsRepository },
+          {
+            provide: WigglypopListingsRepository,
+            useValue: listingsRepository,
+          },
           { provide: OutboxRepository, useValue: outbox },
         ],
       }).compile();

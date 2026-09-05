@@ -13,6 +13,8 @@ import {
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import {
   ApiTags,
@@ -98,6 +100,9 @@ export class UsersController {
     ) as unknown as RotomUser;
   }
 
+  // ownership-ok: session required, and open to any signed-in player on purpose -
+  // ChatApp's group picker legitimately lists other players. The entity carries no
+  // email or secret.
   @Get(':id')
   @ApiOperation({ summary: 'Get a user by ID' })
   @ApiResponse({
@@ -115,6 +120,7 @@ export class UsersController {
     return this.usersFacadeService.getUserById(id) as unknown as RotomUser;
   }
 
+  // ownership-ok: same record as GET :id, looked up by uuid. Same reasoning.
   @Get('uuid/:uuid')
   @ApiOperation({ summary: 'Get a user by UUID' })
   @ApiResponse({
@@ -138,6 +144,8 @@ export class UsersController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
+  // ownership-ok: role-gated - @Roles(ROTOM_ADMIN). Not reachable by an ordinary
+  // player at all.
   @Patch(':id')
   @ApiOperation({ summary: 'Update a user by ID' })
   @ApiResponse({
@@ -165,6 +173,7 @@ export class UsersController {
     ) as unknown as RotomUser;
   }
 
+  // ownership-ok: role-gated - @Roles(ROTOM_ADMIN).
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(USER_ROLES.ROTOM_ADMIN)
@@ -251,6 +260,8 @@ export class UsersController {
 
   // ==================== USER WITH ACCOUNTS ====================
 
+  // ownership-ok: the path uuid is discarded; the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get(':uuid/accounts')
   @ApiOperation({ summary: 'Get user with their accounts' })
   @ApiResponse({
@@ -261,7 +272,8 @@ export class UsersController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'User not found.' })
   @ApiParam({ name: 'uuid', description: 'User UUID' })
   async getUserWithAccounts(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<UserWithAccounts> {
     const result = await this.usersFacadeService.getUserWithAccounts(uuid);
     if (!result) {
@@ -336,6 +348,7 @@ export class UsersController {
 
   // ==================== VALIDATION ====================
 
+  // ownership-ok: returns a bare existence boolean, no fields.
   @Get('validate/:uuid')
   @ApiOperation({ summary: 'Validate if user exists' })
   @ApiResponse({

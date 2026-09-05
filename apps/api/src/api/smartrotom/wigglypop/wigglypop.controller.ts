@@ -24,6 +24,8 @@ import {
 import { Request } from 'express';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
+import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 import { resolveActor } from '@api/_utils/auth/actor';
 import { WigglypopFacadeService } from './wigglypop.facade.service';
 import {
@@ -59,13 +61,22 @@ import {
 } from './entities/wigglypop.entity';
 
 @ApiTags('SmartRotom | Wigglypop')
-@Public()
+// NO class-level @Public(). It used to be here, and it made the whole
+// marketplace anonymous: a player's watchlist (their buying intent), their
+// complete order book with prices and counterparties, and the pending bids on
+// their listings were all readable by anyone who knew a uuid — and a rival
+// bidder could read the competing bids before placing their own. JwtAuthGuard's
+// own docblock warns against exactly this shape: mark the public routes
+// individually, because a class-level @Public() also silently disables every
+// route-level guard beneath it.
 @Controller('smartrotom/wigglypop')
 export class WigglypopController {
   constructor(private readonly wigglypop: WigglypopFacadeService) {}
 
   // ==================== LISTINGS ====================
 
+  // ownership-ok: public by design - the marketplace listing board.
+  @Public()
   @Get('listings')
   @ApiOperation({
     summary: 'Browse the market',
@@ -80,6 +91,8 @@ export class WigglypopController {
     return this.wigglypop.listListings(query);
   }
 
+  // ownership-ok: public by design - one listing on the public board.
+  @Public()
   @Get('listings/:id')
   @ApiOperation({ summary: 'Get one listing (and count the view)' })
   @ApiParam({ name: 'id', type: Number })
@@ -90,6 +103,11 @@ export class WigglypopController {
     return this.wigglypop.getListing(id);
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('listings')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -108,6 +126,11 @@ export class WigglypopController {
     return this.wigglypop.createListing(dto, resolveActor(req));
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Patch('listings/:id')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -123,6 +146,11 @@ export class WigglypopController {
     return this.wigglypop.updateListing(id, dto, resolveActor(req));
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Delete('listings/:id')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -138,6 +166,8 @@ export class WigglypopController {
     return this.wigglypop.deleteListing(id, dto.actorUuid, resolveActor(req));
   }
 
+  // ownership-ok: public by design - the bid history on a public listing.
+  @Public()
   @Get('listings/:id/bids')
   @ApiOperation({ summary: 'Bid history for an auction, highest first' })
   @ApiParam({ name: 'id', type: Number })
@@ -150,6 +180,8 @@ export class WigglypopController {
 
   // ==================== MARKET DATA ====================
 
+  // ownership-ok: public by design - the item reference catalog.
+  @Public()
   @Get('item-catalog')
   @ApiOperation({
     summary: 'The item catalogue that backs the sell flow’s item picker',
@@ -163,6 +195,8 @@ export class WigglypopController {
     return this.wigglypop.listItemCatalog();
   }
 
+  // ownership-ok: public by design - aggregate market prices per species.
+  @Public()
   @Get('price-history/:dex')
   @ApiOperation({
     summary: 'What players have actually paid for a species, oldest first',
@@ -178,6 +212,11 @@ export class WigglypopController {
     return this.wigglypop.priceHistory(dex);
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('valuate')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -192,6 +231,8 @@ export class WigglypopController {
     return this.wigglypop.valuate(dto);
   }
 
+  // ownership-ok: public by design - a seller's PUBLIC reputation page - rating, sales count, reviews.
+  @Public()
   @Get('sellers/:uuid')
   @ApiOperation({
     summary: 'A seller’s public reputation',
@@ -207,16 +248,25 @@ export class WigglypopController {
 
   // ==================== WATCHLIST ====================
 
+  // ownership-ok: the path uuid is discarded; the service is called with
+  // @CurrentMcUuid(), so a player only ever reads their own - a watchlist is the player's own buying intent.
+  @RequireSession()
   @Get('watchlist/:uuid')
   @ApiOperation({ summary: 'The listings a player is watching' })
   @ApiParam({ name: 'uuid', type: String })
   @ApiResponse({ status: HttpStatus.OK, type: WigglypopWatchlistEntity })
   async getWatchlist(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<WigglypopWatchlistEntity> {
     return this.wigglypop.getWatchlist(uuid);
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Put('watchlist')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -232,6 +282,11 @@ export class WigglypopController {
 
   // ==================== ORDERS ====================
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('orders')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -260,6 +315,9 @@ export class WigglypopController {
     return this.wigglypop.createOrder(dto, resolveActor(req), idempotencyKey);
   }
 
+  // ownership-ok: the path uuid is discarded; the service is called with
+  // @CurrentMcUuid(), so a player only ever reads their own - an order book carries prices and counterparties.
+  @RequireSession()
   @Get('orders/user/:uuid')
   @ApiOperation({
     summary:
@@ -268,11 +326,17 @@ export class WigglypopController {
   @ApiParam({ name: 'uuid', type: String })
   @ApiResponse({ status: HttpStatus.OK, type: [WigglypopOrderEntity] })
   async getUserOrders(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<WigglypopOrderEntity[]> {
     return this.wigglypop.getUserOrders(uuid);
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('orders/:id/transferred')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -291,6 +355,11 @@ export class WigglypopController {
     return this.wigglypop.markTransferred(id, dto.actorUuid, resolveActor(req));
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('orders/:id/confirm')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -309,6 +378,11 @@ export class WigglypopController {
     return this.wigglypop.confirmOrder(id, dto.actorUuid, resolveActor(req));
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('orders/:id/cancel')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -326,6 +400,11 @@ export class WigglypopController {
 
   // ==================== BIDS ====================
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('bids')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -345,6 +424,11 @@ export class WigglypopController {
 
   // ==================== OFFERS ====================
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('offers')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -358,16 +442,25 @@ export class WigglypopController {
     return this.wigglypop.createOffer(dto, resolveActor(req));
   }
 
+  // ownership-ok: the path uuid is discarded; the service is called with
+  // @CurrentMcUuid(), so a player only ever reads their own - pending bids must not be readable by a rival bidder.
+  @RequireSession()
   @Get('offers/seller/:uuid')
   @ApiOperation({ summary: 'Offers waiting on a seller' })
   @ApiParam({ name: 'uuid', type: String })
   @ApiResponse({ status: HttpStatus.OK, type: [WigglypopOfferEntity] })
   async getSellerOffers(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<WigglypopOfferEntity[]> {
     return this.wigglypop.getSellerOffers(uuid);
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('offers/:id/accept')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -388,6 +481,11 @@ export class WigglypopController {
     return this.wigglypop.acceptOffer(id, dto.actorUuid, resolveActor(req));
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('offers/:id/reject')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -405,6 +503,11 @@ export class WigglypopController {
 
   // ==================== TRADES ====================
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('trades')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -422,16 +525,25 @@ export class WigglypopController {
     return this.wigglypop.createTrade(dto, resolveActor(req));
   }
 
+  // ownership-ok: the path uuid is discarded; the service is called with
+  // @CurrentMcUuid(), so a player only ever reads their own - a trade proposal names the proposer and the offered Pokemon.
+  @RequireSession()
   @Get('trades/seller/:uuid')
   @ApiOperation({ summary: 'Trade proposals waiting on a seller' })
   @ApiParam({ name: 'uuid', type: String })
   @ApiResponse({ status: HttpStatus.OK, type: [WigglypopTradeOfferEntity] })
   async getSellerTrades(
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<WigglypopTradeOfferEntity[]> {
     return this.wigglypop.getSellerTrades(uuid);
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('trades/:id/accept')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -452,6 +564,11 @@ export class WigglypopController {
     return this.wigglypop.acceptTrade(id, dto.actorUuid, resolveActor(req));
   }
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('trades/:id/reject')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()
@@ -469,6 +586,11 @@ export class WigglypopController {
 
   // ==================== REVIEWS ====================
 
+  // @Public() is REQUIRED, and is not a loosening: GameOrUserAuthGuard below
+  // authenticates the Minecraft mod's OPAQUE server token, which is not a JWT.
+  // The global JwtAuthGuard runs before route guards and would reject the mod
+  // with 401 before this guard ever ran.
+  @Public()
   @Post('reviews')
   @UseGuards(GameOrUserAuthGuard)
   @ApiBearerAuth()

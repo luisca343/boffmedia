@@ -73,6 +73,8 @@ export class LigaController {
     return await this.ligaFacadeService.getRecentReplays(q.limit ?? 10);
   }
 
+  // ownership-ok: public by design - a replay is a two-party game-world fact, and
+  // the sibling replays/history/:player1/:player2 route is public by construction.
   @Get('replays/player/:uuid')
   @ApiOperation({ summary: 'Get replays for a specific player' })
   @ApiResponse({
@@ -101,6 +103,7 @@ export class LigaController {
 
   // ==================== STATISTICS ENDPOINTS ====================
 
+  // ownership-ok: public by design - the leaderboard publishes the same figures.
   @Get('stats/player/:uuid')
   @ApiOperation({ summary: 'Get statistics for a player' })
   @ApiResponse({
@@ -127,6 +130,8 @@ export class LigaController {
     return await this.ligaFacadeService.getLeaderboard(q.limit ?? 20);
   }
 
+  // ownership-ok: public by design - a rank is meaningless unless everyone's is
+  // readable.
   @Get('ranking/:uuid')
   @ApiOperation({ summary: 'Get ranking for a specific player' })
   @ApiResponse({

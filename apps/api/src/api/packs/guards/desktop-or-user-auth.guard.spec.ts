@@ -28,10 +28,7 @@ describe('DesktopOrUserAuthGuard', () => {
     // clearAllMocks wipes implementations too, so the default lives here.
     packsRepo.rolesOf.mockResolvedValue([]);
     req = { headers: {} };
-    guard = new DesktopOrUserAuthGuard(
-      desktopAuth as any,
-      packsRepo as any,
-    );
+    guard = new DesktopOrUserAuthGuard(desktopAuth as any, packsRepo as any);
   });
 
   const withBearer = (token: string) => {
@@ -48,10 +45,7 @@ describe('DesktopOrUserAuthGuard', () => {
   it('lets a website session through without touching the desktop path', async () => {
     withBearer('website-token');
     jest
-      .spyOn(
-        Object.getPrototypeOf(Object.getPrototypeOf(guard)),
-        'canActivate',
-      )
+      .spyOn(Object.getPrototypeOf(Object.getPrototypeOf(guard)), 'canActivate')
       .mockResolvedValue(true);
 
     await expect(guard.canActivate(context())).resolves.toBe(true);
@@ -119,7 +113,7 @@ describe('DesktopOrUserAuthGuard', () => {
       );
     });
 
-    it("re-throws the website error when the token is not a desktop session either", async () => {
+    it('re-throws the website error when the token is not a desktop session either', async () => {
       withBearer('garbage');
       desktopAuth.verifySession.mockImplementation(() => {
         throw new UnauthorizedException('Token de tipo incorrecto');

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
-import { eq, asc, desc, and, inArray, ne, isNull, sql } from 'drizzle-orm';
+import { eq, desc, and, inArray, ne, isNull, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   rotomChatMessages,
@@ -43,7 +43,7 @@ export class ChatMessageRepository {
     // in descending order for efficiency, then reverse in JS to match the ascending contract.
     // Hard limit: 100 messages per page.
     const actualLimit = Math.min(Math.max(1, limit), 100);
-    let query = this.db
+    const query = this.db
       .select({
         id: rotomChatMessages.id,
         content: rotomChatMessages.content,
@@ -54,7 +54,10 @@ export class ChatMessageRepository {
       .from(rotomChatMessages)
       .where(
         before
-          ? and(eq(rotomChatMessages.chatId, chatId), sql`${rotomChatMessages.id} < ${before}`)
+          ? and(
+              eq(rotomChatMessages.chatId, chatId),
+              sql`${rotomChatMessages.id} < ${before}`,
+            )
           : eq(rotomChatMessages.chatId, chatId),
       )
       .orderBy(desc(rotomChatMessages.id))

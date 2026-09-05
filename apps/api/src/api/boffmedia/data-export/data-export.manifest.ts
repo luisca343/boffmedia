@@ -1015,7 +1015,8 @@ export const EXPORTED_TABLES: readonly ExportedTable[] = [
     drizzle: gobiernoMultas,
     ownedBy: [{ column: gobiernoMultas.playerUuid, key: 'mcUuid' }],
     redact: ['issuedByUuid'],
-    meaning: 'Fines issued to you. The officer who issued each one is not named.',
+    meaning:
+      'Fines issued to you. The officer who issued each one is not named.',
   },
   {
     table: 'rotom_gobierno_apelaciones',

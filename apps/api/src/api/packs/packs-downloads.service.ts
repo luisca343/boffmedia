@@ -45,7 +45,8 @@ export interface ProxiedDownload {
 export class PacksDownloadsService {
   private readonly logger = new Logger(PacksDownloadsService.name);
   private readonly dailyQuotaBytes = env.UPLOAD_DAILY_QUOTA_MB * 1024 * 1024;
-  private readonly minFreeSpaceBytes = env.UPLOAD_MIN_FREE_SPACE_MB * 1024 * 1024;
+  private readonly minFreeSpaceBytes =
+    env.UPLOAD_MIN_FREE_SPACE_MB * 1024 * 1024;
 
   constructor(
     private readonly http: HttpService,
@@ -233,33 +234,40 @@ export class PacksDownloadsService {
    *
    * Optionally checks per-user daily quota (A17) if userId is provided.
    */
-  async storeBlob(source: Readable, userId?: number): Promise<{ sha512: string; size: number }> {
+  async storeBlob(
+    source: Readable,
+    userId?: number,
+  ): Promise<{ sha512: string; size: number }> {
     // Check free disk space before starting (A17: prevent disk exhaustion)
     if (this.minFreeSpaceBytes > 0) {
       const stats = await statfs(blobDir()).catch(() => null);
       if (!stats) {
         throw new ServiceUnavailableException({
           message: 'Cannot determine available disk space',
-          userMessage: 'El servidor no puede verificar el espacio disponible. Inténtalo de nuevo.',
+          userMessage:
+            'El servidor no puede verificar el espacio disponible. Inténtalo de nuevo.',
         });
       }
       const freeBytes = stats.bavail * stats.bsize;
       if (freeBytes < this.minFreeSpaceBytes) {
         throw new ServiceUnavailableException({
           message: `insufficient free disk space (${freeBytes} < ${this.minFreeSpaceBytes})`,
-          userMessage: 'El servidor no tiene suficiente espacio en disco. Avisa a un administrador.',
+          userMessage:
+            'El servidor no tiene suficiente espacio en disco. Avisa a un administrador.',
         });
       }
     }
 
     // Check per-user daily quota (A17: prevent individual users from exhausting storage)
     if (userId && this.dailyQuotaBytes > 0) {
-      const dailyUsed = await this.uploadsRepository.getDailyUploadSizeBytes(userId);
+      const dailyUsed =
+        await this.uploadsRepository.getDailyUploadSizeBytes(userId);
       const remaining = this.dailyQuotaBytes - dailyUsed;
       if (remaining <= 0) {
         throw new PayloadTooLargeException({
           message: `user ${userId} has exceeded daily quota (${dailyUsed} >= ${this.dailyQuotaBytes})`,
-          userMessage: 'Has alcanzado el límite de subidas diarias. Inténtalo mañana.',
+          userMessage:
+            'Has alcanzado el límite de subidas diarias. Inténtalo mañana.',
         });
       }
     }

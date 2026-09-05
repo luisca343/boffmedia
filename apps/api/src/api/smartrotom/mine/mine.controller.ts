@@ -38,6 +38,11 @@ export class MineController {
 
   // ==================== ENERGY ENDPOINTS ====================
 
+  // ownership-review: per-player state under a class-level @Public(), whose comment
+  // claims only 'leaderboards and reward tables' are public. Reads another player's
+  // energy meter. AWAITING OWNER DECISION: is this meant to be visible like the
+  // ranking, or was it left open only because the mutation routes were the ones
+  // being fixed? See scripts/check-ownership-routes.mjs REVIEW_ALLOWLIST.
   @Get('energy/:uuid')
   @ApiOperation({ summary: 'Get energy status for a player' })
   @ApiResponse({
@@ -130,6 +135,9 @@ export class MineController {
 
   // ==================== PLAYER ENDPOINTS ====================
 
+  // ownership-review: reads another player's full mining haul history (items,
+  // values, dates). Not leaderboard data. AWAITING OWNER DECISION - see
+  // energy/:uuid above.
   @Get('history/:uuid')
   @ApiOperation({ summary: 'Get game history for a player' })
   @ApiExtraModels(PlayerHistory)
@@ -193,6 +201,8 @@ export class MineController {
     return await this.mineFacadeService.getPlayerRanking();
   }
 
+  // ownership-ok: public by design - GET ranking already publishes rank and total
+  // value for every player.
   @Get('rank/:uuid')
   @ApiOperation({ summary: 'Get specific player rank' })
   @ApiResponse({
@@ -219,6 +229,9 @@ export class MineController {
     return rank;
   }
 
+  // ownership-review: reads another player's pending unclaimed rewards. Read-only -
+  // POST claim is @RequireSession() + @CurrentMcUuid(), so nothing can be stolen,
+  // only observed. AWAITING OWNER DECISION - see energy/:uuid above.
   @Get('unclaimed/:uuid')
   @ApiOperation({ summary: 'Get unclaimed rewards for a player' })
   @ApiResponse({
@@ -252,6 +265,7 @@ export class MineController {
     return await this.mineFacadeService.claimRewards({ ...body, uuid });
   }
 
+  // ownership-ok: public by design - the same totals as the public ranking.
   @Get('stats/:uuid')
   @ApiOperation({ summary: 'Get player statistics' })
   @ApiResponse({
@@ -270,6 +284,7 @@ export class MineController {
 
   // ==================== VALIDATION ENDPOINTS ====================
 
+  // ownership-ok: public by design - returns a bare existence boolean, no fields.
   @Get('validate/player/:uuid')
   @ApiOperation({ summary: 'Validate if player exists' })
   @ApiResponse({

@@ -171,10 +171,17 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
       // The suite runs as a signed-in caller, so `resolveActor` carries their
       // mcUuid — which is what the ownership check downstream needs. It is
       // `undefined` only on a route reachable with no credential at all.
-      expect(mockFacade.transfer).toHaveBeenCalledWith(1, 2, 100, 'payment', {
-        mcUuid: TEST_MC_UUID,
-        serverAuthed: false,
-      }, undefined);
+      expect(mockFacade.transfer).toHaveBeenCalledWith(
+        1,
+        2,
+        100,
+        'payment',
+        {
+          mcUuid: TEST_MC_UUID,
+          serverAuthed: false,
+        },
+        undefined,
+      );
     });
   });
 
@@ -422,7 +429,10 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getTransactions).toHaveBeenCalledWith(1, 50);
+      // The caller's uuid is the third argument: these per-ACCOUNT reads take a
+      // numeric id, so the facade has to look up who owns it. A handler that
+      // forgets to thread it returns another player's history.
+      expect(mockFacade.getTransactions).toHaveBeenCalledWith(1, 50, TEST_MC_UUID);
     });
 
     it('passes custom limit query param to facade', async () => {
@@ -433,7 +443,7 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getTransactions).toHaveBeenCalledWith(1, 10);
+      expect(mockFacade.getTransactions).toHaveBeenCalledWith(1, 10, TEST_MC_UUID);
     });
   });
 
@@ -467,7 +477,7 @@ describe('StarbankController — integration (ValidationPipe + GlobalExceptionFi
       );
 
       expect(res.status).toBe(200);
-      expect(mockFacade.getTransfers).toHaveBeenCalledWith(5);
+      expect(mockFacade.getTransfers).toHaveBeenCalledWith(5, TEST_MC_UUID);
     });
   });
 

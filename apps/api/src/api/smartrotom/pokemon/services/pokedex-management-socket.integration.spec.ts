@@ -70,9 +70,7 @@ describe('PokedexManagementService - Socket Integration', () => {
       ],
     }).compile();
 
-    service = module.get<PokedexManagementService>(
-      PokedexManagementService,
-    );
+    service = module.get<PokedexManagementService>(PokedexManagementService);
     socketsService = module.get<PokedexSocketsService>(PokedexSocketsService);
   });
 
@@ -177,8 +175,8 @@ describe('PokedexManagementService - Socket Integration', () => {
       expect(result.success).toBe(true);
 
       // Verify socket emit was NOT called
-      const socketEmit =
-        socketsService['socketGateway'].emitToUuid as jest.Mock;
+      const socketEmit = socketsService['socketGateway']
+        .emitToUuid as jest.Mock;
       expect(socketEmit).not.toHaveBeenCalled();
     });
   });
@@ -204,8 +202,8 @@ describe('PokedexManagementService - Socket Integration', () => {
       expect(result.success).toBe(true);
 
       // Verify socket emit was called for dex update
-      const socketEmit =
-        socketsService['socketGateway'].emitToUuid as jest.Mock;
+      const socketEmit = socketsService['socketGateway']
+        .emitToUuid as jest.Mock;
       expect(socketEmit).toHaveBeenCalledWith(
         uuid,
         'pokedex:updated',
@@ -230,8 +228,8 @@ describe('PokedexManagementService - Socket Integration', () => {
       expect(result.success).toBe(true);
 
       // Verify socket emit was NOT called (no changes)
-      const socketEmit =
-        socketsService['socketGateway'].emitToUuid as jest.Mock;
+      const socketEmit = socketsService['socketGateway']
+        .emitToUuid as jest.Mock;
       expect(socketEmit).not.toHaveBeenCalled();
     });
 

@@ -414,6 +414,10 @@ export class PacksController {
     return { success: true };
   }
 
+  // ownership-ok: admin-gated, not owner-gated, and deliberately so - any release
+  // admin may administer any pack. The class carries @UseGuards(JwtAuthGuard,
+  // FullSessionGuard, RolesGuard) + @Roles(BOFF_ADMIN, BOFF_ADMIN_RELEASE); the
+  // caller's identity is recorded as the audit actor.
   @Delete(':id/access/user/:userId')
   @ApiOperation({
     summary: 'Revocar el acceso de una cuenta',
@@ -448,6 +452,7 @@ export class PacksController {
     return { success: true };
   }
 
+  // ownership-ok: same class-level admin gate as the route above.
   @Delete(':id/access/legacy/:uuid')
   @ApiOperation({ summary: 'Revocar una pre-concesión a un UUID' })
   async revoke(

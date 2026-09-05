@@ -539,9 +539,7 @@ export class WigglypopListingsRepository {
     } catch (error: any) {
       // MySQL error 1062 = duplicate key (unique constraint violation)
       if (error?.code === 'ER_DUP_ENTRY') {
-        throw new Error(
-          'This Pokémon is already listed',
-        );
+        throw new Error('This Pokémon is already listed');
       }
       throw error;
     }
@@ -567,7 +565,7 @@ export class WigglypopListingsRepository {
     uuid: string,
     sessionId: string,
   ): Promise<WigglypopSession> {
-    const [result] = await this.db
+    await this.db
       .insert(wigglypopSessions)
       .values({
         uuid,

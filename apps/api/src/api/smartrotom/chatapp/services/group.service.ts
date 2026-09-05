@@ -179,11 +179,10 @@ export class GroupService {
     groupId: number,
     requestingUserUuid: string,
   ): Promise<void> {
-    const requestingUserInChat =
-      await this.chatMemberRepository.findUserInChat(
-        groupId,
-        requestingUserUuid,
-      );
+    const requestingUserInChat = await this.chatMemberRepository.findUserInChat(
+      groupId,
+      requestingUserUuid,
+    );
     if (!requestingUserInChat) {
       throw new ForbiddenException({
         message: 'User does not have permission to manage this group',

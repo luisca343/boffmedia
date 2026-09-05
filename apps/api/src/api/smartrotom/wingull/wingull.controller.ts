@@ -428,6 +428,8 @@ export class WingullController {
     return await this.wingullFacadeService.updateNPCs(data);
   }
 
+  // ownership-ok: public by design - plot ownership is already published wholesale:
+  // GET /wingull/plots returns ownerUuid for every plot.
   @Get('owned-regions/:uuid')
   @ApiOperation({ summary: 'Fetch the regions a player owns, by UUID' })
   @ApiResponse({

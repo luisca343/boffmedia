@@ -1,6 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from 'nestjs-pino';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { WigglypopOrdersService } from './wigglypop-orders.service';
 import {
   WigglypopOrdersRepository,
@@ -239,8 +238,6 @@ describe('WigglypopOrdersService', () => {
       expect(result1).toEqual(result2);
       // Outbox enqueued twice with the same dedupeKey
       expect(custody.settleNewOrder).toHaveBeenCalledTimes(2);
-
-
     });
 
     it('should not create duplicate orders on replay (repository level idempotency)', async () => {

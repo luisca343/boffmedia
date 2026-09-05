@@ -819,6 +819,9 @@ export class EventsController {
   // ==================== USER PROFILE ====================
 
   @OptionalAuth()
+  // ownership-ok: public by design - the trophy case is rendered on /u/[handle].
+  // Private-event rows are filtered per-viewer in profile.service.ts using the
+  // caller's own userId, so a viewer sees only what they are entitled to.
   @Get('users/:userId/trophies')
   @Public()
   @ApiOperation({ summary: "Get a user's trophy case (earned + locked)" })
@@ -843,6 +846,8 @@ export class EventsController {
   }
 
   @OptionalAuth()
+  // ownership-ok: public by design - same public profile page as the trophies
+  // route above, with the same per-viewer filter on private-event titles.
   @Get('users/:userId/activity')
   @Public()
   @ApiOperation({ summary: "Get a user's activity timeline" })

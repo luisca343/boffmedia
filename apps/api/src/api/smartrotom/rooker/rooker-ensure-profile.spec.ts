@@ -33,7 +33,10 @@ describe('RookerService.ensureProfile()', () => {
       providers: [
         RookerService,
         { provide: RookerRepository, useValue: repo },
-        { provide: NotificationsService, useValue: { createNotification: jest.fn() } },
+        {
+          provide: NotificationsService,
+          useValue: { createNotification: jest.fn() },
+        },
         { provide: PokemonDataManagementService, useValue: {} },
       ],
     }).compile();
@@ -72,7 +75,9 @@ describe('RookerService.ensureProfile()', () => {
   it('takes the next candidate when it loses a race on the unique index', async () => {
     // Both players cleared the pre-check, then the insert lost.
     repo.insertProfile
-      .mockRejectedValueOnce(Object.assign(new Error('dup'), { code: 'ER_DUP_ENTRY' }))
+      .mockRejectedValueOnce(
+        Object.assign(new Error('dup'), { code: 'ER_DUP_ENTRY' }),
+      )
       .mockResolvedValueOnce(undefined);
 
     await expect(service.ensureProfile(UUID, 'Ash!')).resolves.toBe('ash_2');

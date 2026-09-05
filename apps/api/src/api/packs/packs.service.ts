@@ -286,7 +286,11 @@ export class PacksService {
     // Minecraft-only (the zod superRefine rejects it elsewhere — an emulator
     // pack has no JVM), and omitted when empty so a manifest that recommends
     // nothing stays byte-identical to the shape launchers already install from.
-    if (gameType === 'minecraft' && v.runtime && Object.keys(v.runtime).length > 0)
+    if (
+      gameType === 'minecraft' &&
+      v.runtime &&
+      Object.keys(v.runtime).length > 0
+    )
       out.runtime = v.runtime;
     return out;
   }

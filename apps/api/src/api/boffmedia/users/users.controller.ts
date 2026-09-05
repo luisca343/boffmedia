@@ -729,7 +729,12 @@ export class BoffMediaUsersController {
 
   // ==================== VALIDATION ====================
 
+  @Throttle({ default: { ttl: 60_000, limit: 5 } })
   @Public()
+  // ownership-ok: public by design - the signup availability check. It returns a
+  // bare boolean and no user data. It is an account-existence oracle, which is why
+  // it is throttled: unthrottled it confirmed whether any given email has an
+  // account, at unlimited rate, to anyone.
   @Get('validate/:type/:identifier')
   @ApiOperation({ summary: 'Validate if user exists by different identifiers' })
   @ApiParam({

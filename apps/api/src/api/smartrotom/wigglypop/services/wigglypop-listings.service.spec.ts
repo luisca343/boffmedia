@@ -395,7 +395,11 @@ describe('WigglypopListingsService', () => {
       } as any);
 
       // lockMon must be called with seller, key, and listing ID
-      expect(listingsRepository.lockMon).toHaveBeenCalledWith(SELLER, LIVE_KEY, 1);
+      expect(listingsRepository.lockMon).toHaveBeenCalledWith(
+        SELLER,
+        LIVE_KEY,
+        1,
+      );
     });
 
     it('cascades delete the listing if locking fails — preventing a lingering unlocked listing', async () => {
@@ -430,7 +434,9 @@ describe('WigglypopListingsService', () => {
       await service.remove(1, SELLER);
 
       // releaseCustodyByListing must be called before delete
-      expect(listingsRepository.releaseCustodyByListing).toHaveBeenCalledWith(1);
+      expect(listingsRepository.releaseCustodyByListing).toHaveBeenCalledWith(
+        1,
+      );
       expect(listingsRepository.delete).toHaveBeenCalledWith(1);
     });
 

@@ -1,4 +1,4 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
 import { StarbankAccountService } from './services/starbank-account.service';
 import { StarbankTransactionService } from './services/starbank-transaction.service';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
@@ -285,10 +285,44 @@ export class StarbankFacadeService {
 
   // ==================== TRANSACTION HISTORY ====================
 
+  /**
+   * The caller must own the account they are asking about.
+   *
+   * These two per-ACCOUNT reads take a numeric id, not a uuid, so the ownership
+   * question cannot be answered by scoping the query the way the per-uuid
+   * routes do -- somebody has to look up who the account belongs to. The check
+   * lives HERE rather than in the controller so a second caller cannot reach
+   * the history without it.
+   *
+   * Until this existed the two routes were reachable by any signed-in player
+   * with any account id, and before the class-level `@Public()` came off this
+   * controller they were reachable with no credential at all: a numeric id is
+   * the easiest thing in the world to enumerate, and what came back was another
+   * player's transaction history.
+   */
+  private async assertOwnsAccount(
+    accountId: number,
+    callerUuid: string,
+  ): Promise<void> {
+    const owned = await this.accountService.getUserAccounts(callerUuid);
+    if (!owned.some((a) => a.id === accountId)) {
+      throw new ForbiddenException('That account does not belong to you.');
+    }
+  }
+
   async getTransactions(
     account: number,
     limit: number = 50,
+    callerUuid?: string,
   ): Promise<StarBankTransaction[]> {
+    // Optional in the signature, required in practice: the parameter is new and
+    // making it mandatory would be a compile error in every existing caller,
+    // which is the change most likely to be "fixed" by passing undefined. A
+    // missing caller is refused instead.
+    if (!callerUuid) {
+      throw new ForbiddenException('A session is required to read an account.');
+    }
+    await this.assertOwnsAccount(account, callerUuid);
     return await this.transactionService.getAccountTransactions(account, limit);
   }
 
@@ -299,7 +333,14 @@ export class StarbankFacadeService {
     return await this.transactionService.getUserTransactions(uuid, limit);
   }
 
-  async getTransfers(account: number): Promise<StarBankTransaction[]> {
+  async getTransfers(
+    account: number,
+    callerUuid?: string,
+  ): Promise<StarBankTransaction[]> {
+    if (!callerUuid) {
+      throw new ForbiddenException('A session is required to read an account.');
+    }
+    await this.assertOwnsAccount(account, callerUuid);
     return await this.transactionService.getAccountTransfers(account, 10);
   }
 

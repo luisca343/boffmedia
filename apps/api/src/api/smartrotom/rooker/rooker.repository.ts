@@ -682,9 +682,7 @@ export class RookerRepository {
     handle: string,
     displayName: string | null,
   ): Promise<void> {
-    await this.db
-      .insert(rookerProfiles)
-      .values({ uuid, handle, displayName });
+    await this.db.insert(rookerProfiles).values({ uuid, handle, displayName });
   }
 
   async upsertProfile(
