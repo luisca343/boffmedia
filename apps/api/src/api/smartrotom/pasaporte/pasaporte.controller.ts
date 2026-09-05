@@ -1,6 +1,8 @@
 import { Controller, Get, HttpStatus, Param } from '@nestjs/common';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { OptionalAuth } from '@api/_utils/decorators/optional-auth.decorator';
+import { CurrentMcUuidOptional } from '@api/_utils/decorators/current-user.decorator';
 import { PasaporteService } from './pasaporte.service';
 import { TrainerParamsDto } from './dto/pasaporte.dto';
 import {
@@ -15,15 +17,17 @@ import {
 export class PasaporteController {
   constructor(private readonly pasaporteService: PasaporteService) {}
 
-  // ownership-review: the trainer carne is public by design - it is the card other
-  // players look at. What needs a decision is the SIDE EFFECT: this route
-  // provisions the passport on first read, so an anonymous GET performs a write
-  // for an arbitrary uuid. AWAITING OWNER DECISION: provision on an authenticated
-  // read only, or keep it. See scripts/check-ownership-routes.mjs REVIEW_ALLOWLIST.
+  // ownership-ok: OWNER DECISION 2026-09-05 -- the carne stays readable by anyone
+  // (it is the card other players look at), but PROVISIONING is owner-only. This
+  // is the only place a passport row is written, and it froze the region and
+  // memberSince at whoever read first; a stranger could therefore decide a
+  // player's region. @OptionalAuth() rather than @Public() so an anonymous reader
+  // still gets through while a signed-in one is identified.
+  @OptionalAuth()
   @Get('profile/:uuid')
   @ApiOperation({
     summary:
-      'The carné. Provisions the passport on first read (deterministic trainer id, region from the world). ' +
+      'The carné. Readable by anyone; created only on the OWNER’s first read (deterministic trainer id, region from the world). ' +
       'rank / title / completionPct are derived from achievements on every read — never stored.',
   })
   @ApiParam({ name: 'uuid', description: "The trainer's UUID" })
@@ -31,9 +35,11 @@ export class PasaporteController {
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'No such trainer' })
   async getProfile(
     @Param() params: TrainerParamsDto,
+    @CurrentMcUuidOptional() callerUuid?: string,
   ): Promise<PasaporteProfileEntity> {
     return this.pasaporteService.getProfile(
       params.uuid,
+      callerUuid,
     ) as unknown as Promise<PasaporteProfileEntity>;
   }
 

@@ -28,11 +28,6 @@ const OPT_OUT = /ownership-ok:/i;
  */
 const REVIEW_MARKER = /ownership-review:/i;
 const REVIEW_ALLOWLIST = new Set([
-  'smartrotom/gobierno/eventos/eventos.controller.ts::GET :id/captura/:uuid',
-  'smartrotom/mine/mine.controller.ts::GET energy/:uuid',
-  'smartrotom/mine/mine.controller.ts::GET history/:uuid',
-  'smartrotom/mine/mine.controller.ts::GET unclaimed/:uuid',
-  'smartrotom/pasaporte/pasaporte.controller.ts::GET profile/:uuid',
 ]);
 const BACKSLASH = String.fromCharCode(92);
 

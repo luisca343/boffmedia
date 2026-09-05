@@ -35,14 +35,12 @@ import { RequireSession } from '@api/_utils/decorators/require-session.decorator
 @Controller('smartrotom/mine')
 export class MineController {
   constructor(private readonly mineFacadeService: MineFacadeService) {}
-
-  // ==================== ENERGY ENDPOINTS ====================
-
-  // ownership-review: per-player state under a class-level @Public(), whose comment
-  // claims only 'leaderboards and reward tables' are public. Reads another player's
-  // energy meter. AWAITING OWNER DECISION: is this meant to be visible like the
-  // ranking, or was it left open only because the mutation routes were the ones
-  // being fixed? See scripts/check-ownership-routes.mjs REVIEW_ALLOWLIST.
+  // ownership-ok: OWNER DECISION 2026-09-05 -- a player's energy, haul history and
+  // pending unclaimed rewards are NOT visible to other players. The class-level
+  // @Public() on this controller covers the leaderboards and reward tables its own
+  // comment names; these three are per-player state and were never in that set.
+  // The path uuid is discarded and the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get('energy/:uuid')
   @ApiOperation({ summary: 'Get energy status for a player' })
   @ApiResponse({
@@ -55,7 +53,10 @@ export class MineController {
     description: 'Player not found.',
   })
   @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  async getEnergy(@Param('uuid') uuid: string) {
+  async getEnergy(
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
+  ) {
     return await this.mineFacadeService.getPlayerEnergy(uuid);
   }
 
@@ -132,12 +133,12 @@ export class MineController {
   async getRewardDropRates() {
     return await this.mineFacadeService.getRewardDropRates();
   }
-
-  // ==================== PLAYER ENDPOINTS ====================
-
-  // ownership-review: reads another player's full mining haul history (items,
-  // values, dates). Not leaderboard data. AWAITING OWNER DECISION - see
-  // energy/:uuid above.
+  // ownership-ok: OWNER DECISION 2026-09-05 -- a player's energy, haul history and
+  // pending unclaimed rewards are NOT visible to other players. The class-level
+  // @Public() on this controller covers the leaderboards and reward tables its own
+  // comment names; these three are per-player state and were never in that set.
+  // The path uuid is discarded and the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get('history/:uuid')
   @ApiOperation({ summary: 'Get game history for a player' })
   @ApiExtraModels(PlayerHistory)
@@ -186,7 +187,10 @@ export class MineController {
     description: 'Player not found.',
   })
   @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  async getHistory(@Param('uuid') uuid: string) {
+  async getHistory(
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
+  ) {
     return await this.mineFacadeService.getPlayerHistory(uuid);
   }
 
@@ -228,10 +232,12 @@ export class MineController {
     }
     return rank;
   }
-
-  // ownership-review: reads another player's pending unclaimed rewards. Read-only -
-  // POST claim is @RequireSession() + @CurrentMcUuid(), so nothing can be stolen,
-  // only observed. AWAITING OWNER DECISION - see energy/:uuid above.
+  // ownership-ok: OWNER DECISION 2026-09-05 -- a player's energy, haul history and
+  // pending unclaimed rewards are NOT visible to other players. The class-level
+  // @Public() on this controller covers the leaderboards and reward tables its own
+  // comment names; these three are per-player state and were never in that set.
+  // The path uuid is discarded and the service is called with @CurrentMcUuid().
+  @RequireSession()
   @Get('unclaimed/:uuid')
   @ApiOperation({ summary: 'Get unclaimed rewards for a player' })
   @ApiResponse({
@@ -244,7 +250,10 @@ export class MineController {
     description: 'Player not found.',
   })
   @ApiParam({ name: 'uuid', description: 'Player UUID' })
-  async getUnclaimed(@Param('uuid') uuid: string) {
+  async getUnclaimed(
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
+  ) {
     return await this.mineFacadeService.getUnclaimedRewards(uuid);
   }
 

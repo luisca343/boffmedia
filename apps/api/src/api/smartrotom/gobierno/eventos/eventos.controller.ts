@@ -21,6 +21,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
+import { CurrentMcUuid } from '@api/_utils/decorators/current-user.decorator';
 import { Request } from 'express';
 import { GameOrUserAuthGuard } from '@api/_utils/guards/game-or-user-auth.guard';
 import { resolveActor } from '@api/_utils/auth/actor';
@@ -311,22 +312,23 @@ export class EventosController {
     return this.eventosService.registerCaptura(id, dto, resolveActor(req));
   }
 
-  // ownership-review: reads a named rival's registered capture in a caza evento,
-  // while the sibling :id/capturas deliberately withholds rows during a live hunt.
-  // AWAITING OWNER DECISION: is a capture private until the event closes? If yes
-  // this defeats the blind hunt. See scripts/check-ownership-routes.mjs
-  // REVIEW_ALLOWLIST.
+  // ownership-ok: OWNER DECISION 2026-09-05 -- a capture is PRIVATE until the hunt
+  // closes, so this returns only the CALLER's own. The route summary always said
+  // "own" and the sibling :id/capturas already withholds rows while the event is
+  // live; nothing enforced it here, so any player could read a named rival's entry
+  // by uuid and the blind hunt was blind in one direction only. The path uuid is
+  // discarded and the service is called with @CurrentMcUuid().
   @Get(':id/captura/:uuid')
-  @Public()
   @ApiOperation({
-    summary: "Get a single player's own capture (safe while the hunt is blind)",
+    summary: "Get the caller's own capture. Private while the hunt is live.",
   })
   @ApiParam({ name: 'id', type: Number })
   @ApiParam({ name: 'uuid', type: String })
   @ApiResponse({ status: HttpStatus.OK, type: GobiernoEventoCapturaEntity })
   async getOwnCaptura(
     @Param('id', ParseIntPipe) id: number,
-    @Param('uuid') uuid: string,
+    @Param('uuid') _pathUuid: string,
+    @CurrentMcUuid() uuid: string,
   ): Promise<GobiernoEventoCapturaEntity | null> {
     return this.eventosService.getOwnCaptura(id, uuid);
   }

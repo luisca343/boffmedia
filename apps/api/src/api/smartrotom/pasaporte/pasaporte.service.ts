@@ -59,11 +59,39 @@ export class PasaporteService {
   // The passport provisions itself on first read: a trainer who never opened the app
   // still has to be addressable by uuid, exactly like Rooker hands every rotom_user a
   // handle. Nothing here is a score, so creating it costs nothing.
-  async getProfile(uuid: string): Promise<ProfileView> {
+  /**
+   * The carne. Readable by anyone; PROVISIONED only by its owner.
+   *
+   * OWNER DECISION 2026-09-05. Reading a passport that does not exist yet used to
+   * CREATE it, from an anonymous request, and this is still the only place a
+   * passport row is ever written. Two fields are decided at that moment and then
+   * frozen: the region, taken from whatever world the player happens to be in,
+   * and `memberSince`. So a stranger opening a player's carne before the player
+   * ever did would freeze that player's region on the stranger's timing.
+   *
+   * It was never a data-exposure hole -- `findUser` refuses a uuid that is not a
+   * real player, and the trainer id is derived from the uuid, so the row a
+   * stranger triggered is the row the owner would have got. It is a correctness
+   * one, and it contradicted what this file already believes: `memberSince` is
+   * elaborately derived below precisely because "the passport row is created the
+   * first time the trainer opens the app".
+   *
+   * `callerUuid` is undefined for an anonymous reader (the route is
+   * `@OptionalAuth()`, not `@Public()`, so a signed-in caller is identified while
+   * an anonymous one still gets through). A non-owner reading a passport that
+   * does not exist gets a 404 rather than silently minting one.
+   */
+  async getProfile(uuid: string, callerUuid?: string): Promise<ProfileView> {
     const user = await this.repo.findUser(uuid);
     if (!user) throw new NotFoundException(`Trainer ${uuid} not found`);
 
     let profile = await this.repo.findProfile(uuid);
+
+    if (!profile && callerUuid !== uuid) {
+      throw new NotFoundException(
+        `Trainer ${uuid} has no passport yet. It is created the first time they open it themselves.`,
+      );
+    }
 
     if (!profile) {
       const world = user.world?.trim();
