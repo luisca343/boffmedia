@@ -32,13 +32,23 @@
  *   server's version of any row this device has no pending write for.
  * * **Signed out is not an error.** With no account there is no queue at all —
  *   local writes still happen (that is `useVgcDb`), so the tracker is fully
- *   usable, it just has nowhere to sync to. The status says `offline`.
+ *   usable, it just has nowhere to sync to. The status says `local-only`
+ *   (it said `offline`, the same word this file also used for a dropped
+ *   network — see the note on `SyncStatus` below).
  */
 
 import React, { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { toast } from "@boffmedia/ui";
-import { toolOutbox, toolStorage, useToolOnline, useToolSession } from "@boffmedia/tool-kit";
+import {
+  SYNC_RETRY,
+  retryDelayMs,
+  toolOutbox,
+  toolStorage,
+  useToolOnline,
+  useToolSession,
+  type ToolSyncState,
+} from "@boffmedia/tool-kit";
 
 import {
   claimAnonymousData,
@@ -60,13 +70,40 @@ import { useVgcT } from "../../i18n";
 import type { Match, Series, Session, TeamPreset } from "../types";
 
 export type { SyncTable };
-export type SyncStatus = "idle" | "syncing" | "error" | "offline" | "conflict";
+
+/**
+ * T5. The tracker speaks the kit's vocabulary now, not its own.
+ *
+ * It used to declare `"idle" | "syncing" | "error" | "offline" | "conflict"`,
+ * which overlapped the kit's seven words without matching them, and two of the
+ * five were actively misleading:
+ *
+ *   `idle`    meant SYNCED. A word for "nothing is happening" was doing duty
+ *             for "everything is saved", which are not the same claim.
+ *   `offline` meant BOTH "signed out" and "no network" -- one word for a
+ *             permanent, chosen condition and a temporary, involuntary one.
+ *             They are `local-only` and `queued` here, and separating them is
+ *             the only behavioural change in this migration.
+ *
+ * `conflict` went the other way: it is the one state the kit could not express
+ * and now can, because collapsing it into `rejected` would tell a player to
+ * discard work when the correct action is to pull.
+ */
+export type SyncStatus = ToolSyncState;
 
 type SyncEntity = Session | Match | Series | TeamPreset;
 
-/** How long to wait before retrying after the server failed us. */
-const RETRY_BASE_MS = 5_000;
-const RETRY_MAX_MS = 120_000;
+/**
+ * The retry schedule comes from the kit now.
+ *
+ * These were `RETRY_BASE_MS = 5_000` and `RETRY_MAX_MS = 120_000` -- the same
+ * numbers as `SYNC_RETRY`, written out a second time, with one difference that
+ * was not a stylistic one: there was NO CAP. `failures.current` counted up
+ * forever and the tracker retried a dead server every two minutes for as long
+ * as the tab stayed open, with the badge saying "sync error" the whole time and
+ * never saying it had given up. `SYNC_RETRY.maxAttempts` gives it a terminal
+ * state, which is what `stuck` is for.
+ */
 
 interface TrackerSyncContextValue {
   /** Call after every write. Pass null for data to trigger a DELETE on the server. */
@@ -84,7 +121,8 @@ interface TrackerSyncContextValue {
 
 export const TrackerSyncContext = createContext<TrackerSyncContextValue>({
   pushChange: () => {},
-  syncStatus: "offline",
+  // No provider means no session, which is exactly local-only.
+  syncStatus: "local-only",
   conflictMessage: null,
   refreshNow: async () => false,
   lastSyncAt: 0,
@@ -126,7 +164,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
   // account the previous player's sessions and then uploaded them.
   setTrackerOwner(owner);
 
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>("offline");
+  const [syncStatus, setSyncStatus] = useState<SyncStatus>("local-only");
   const [conflictMessage, setConflictMessage] = useState<string | null>(null);
   const [lastSyncAt, setLastSyncAt] = useState(0);
   const [pendingCount, setPendingCount] = useState(0);
@@ -163,7 +201,10 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
     // is rendering from the local store, and the badge hides itself. Flushing
     // anyway would paint a red "sync error" over a tracker that is working.
     if (!onlineRef.current) {
-      setSyncStatus("offline");
+      // `queued`, not `local-only`: the player IS signed in and the writes are
+      // owed to the server. The old vocabulary said "offline" for this and for
+      // being signed out, so the badge could not tell them apart.
+      setSyncStatus("queued");
       return;
     }
     setSyncStatus("syncing");
@@ -174,7 +215,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
       // The queue itself failed — a broken IndexedDB, a dead IPC bridge. There
       // is nothing to report per-op and nothing to retry right now, but the
       // badge must not sit on "syncing" forever pretending work is in flight.
-      setSyncStatus("error");
+      setSyncStatus("retrying");
       return;
     }
     await refreshPending().catch(() => {});
@@ -194,14 +235,16 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
       (r) => !(r.status === 404 && r.path.includes("?clientDeletedAt=")),
     );
     if (real.length) {
-      setSyncStatus("error");
+      setSyncStatus("retrying");
       toast.error(tr("sync.rejected", { detail: real[0].message }));
       return;
     }
 
     // `stopped` covers two very different things — the connection went away
     // mid-run, or the server is failing. Only the second deserves red.
-    setSyncStatus(result.stopped ? (onlineRef.current ? "error" : "offline") : "idle");
+    setSyncStatus(
+      result.stopped ? (onlineRef.current ? "retrying" : "queued") : "synced",
+    );
   }, [refreshPending]);
 
   const flush = useCallback(async () => {
@@ -314,7 +357,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
       toast.success(tRef.current("sync.refreshed"));
       return true;
     } catch {
-      setSyncStatus("error");
+      setSyncStatus("retrying");
       return false;
     }
   }, [pullAndMerge, flush]);
@@ -324,7 +367,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
   useEffect(() => {
     if (status === "loading") return;
     if (!signedIn) {
-      setSyncStatus("offline");
+      setSyncStatus("local-only");
       setConflictMessage(null);
       setPendingCount(0);
       // The owner changed, so every hook reading the store has stale rows.
@@ -335,7 +378,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
     if (!online) {
       // Not an error: the queue is intact and the screen is rendering from the
       // local store, which is complete.
-      setSyncStatus("offline");
+      setSyncStatus("queued");
       return;
     }
 
@@ -350,7 +393,7 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
         await flush();
       })
       .catch(() => {
-        if (!cancelled) setSyncStatus("error");
+        if (!cancelled) setSyncStatus("retrying");
       });
 
     return () => { cancelled = true; };
@@ -366,15 +409,26 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
   const failures = useRef(0);
   useEffect(() => {
     // Only a SUCCESS clears the count. Resetting on anything that is not
-    // "error" looks right and is not: a retry passes through "syncing" on its
-    // way back to "error", so the counter was cleared every round and the
-    // backoff never grew past its first step.
-    if (syncStatus === "idle") {
+    // "retrying" looks right and is not: a retry passes through "syncing" on
+    // its way back, so the counter was cleared every round and the backoff
+    // never grew past its first step.
+    if (syncStatus === "synced") {
       failures.current = 0;
       return;
     }
-    if (syncStatus !== "error" || !signedIn || !online) return;
-    const delay = Math.min(RETRY_MAX_MS, RETRY_BASE_MS * 2 ** failures.current);
+    if (syncStatus !== "retrying" || !signedIn || !online) return;
+
+    // The cap this loop never had. Without it `failures` counted up forever and
+    // the tracker hammered a dead server every two minutes for as long as the
+    // tab was open, showing "sync error" and never admitting it had stopped
+    // making progress. `stuck` says so, and SyncStatusBadge offers the refresh
+    // that is the way out of it.
+    if (failures.current >= SYNC_RETRY.maxAttempts) {
+      setSyncStatus("stuck");
+      return;
+    }
+
+    const delay = retryDelayMs(failures.current + 1);
     failures.current += 1;
     const timer = setTimeout(() => { void flush(); }, delay);
     return () => clearTimeout(timer);
@@ -445,8 +499,11 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
         await flush();
       })().catch(() => {
         // Queueing failed, so this write is owed to the server and nothing is
-        // tracking it. Said on the badge rather than left to the console.
-        setSyncStatus("error");
+        // tracking it. `stuck`, not `retrying`: the op never reached the outbox,
+        // so the retry loop -- which walks the QUEUE -- has nothing to pick up
+        // and no amount of waiting will send it. Saying "retrying" here would be
+        // a spinner over a write that is never going anywhere.
+        setSyncStatus("stuck");
       });
     },
     [flush],

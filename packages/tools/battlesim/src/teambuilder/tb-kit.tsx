@@ -115,11 +115,20 @@ export function TbValidityChip({
 /* ── Sync chip ───────────────────────────────────────────────────────────── */
 
 const SYNC_TONE: Record<TbSyncState, BsimChipTone> = {
-  saved: "neutral",
-  syncing: "checking",
   synced: "ok",
-  pending: "warn",
-  error: "bad",
+  syncing: "checking",
+  queued: "warn",
+  // The teambuilder cannot currently REACH these three: it flushes one team at
+  // a time and reads the result, so it never sees the queue's own retry ladder
+  // and has nothing to merge. They are listed because the map is exhaustive
+  // over the shared vocabulary (T5) -- which is what turned this file's rename
+  // into a compile error rather than a silent fall-through -- and because a
+  // tone that only appears when something is wrong should be decided calmly,
+  // not in the commit that first makes it reachable.
+  retrying: "warn",
+  stuck: "bad",
+  conflict: "warn",
+  rejected: "bad",
   "local-only": "neutral",
 };
 
@@ -128,11 +137,13 @@ const SYNC_TONE: Record<TbSyncState, BsimChipTone> = {
  * glyph for "still working"; every settled state gets a real icon instead.
  */
 const SYNC_ICON: Record<TbSyncState, "check" | "clock" | "alert" | "database" | undefined> = {
-  saved: "check",
-  syncing: undefined,
   synced: "check",
-  pending: "clock",
-  error: "alert",
+  syncing: undefined,
+  queued: "clock",
+  retrying: "clock",
+  stuck: "alert",
+  conflict: "alert",
+  rejected: "alert",
   "local-only": "database",
 };
 

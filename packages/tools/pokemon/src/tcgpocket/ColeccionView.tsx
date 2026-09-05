@@ -43,6 +43,13 @@ const SYNC_LOOK: Record<ToolSyncState, { tone: "ok" | "warn" | "bad" | "muted"; 
   retrying: { tone: "warn", icon: "refresh" },
   stuck: { tone: "bad", icon: "alert" },
   rejected: { tone: "bad", icon: "alert" },
+  // The collection cannot currently REACH this -- `useCollection` never sets
+  // the conflict flag, because a card count is last-write-wins and there is
+  // nothing to conflict over. It is here because the map is exhaustive over the
+  // shared vocabulary (T5), which is the property that made adding `conflict`
+  // to the kit a compile error here rather than a silent fall-through. If the
+  // collection ever gains a merge, this is already the honest look for it.
+  conflict: { tone: "warn", icon: "alert" },
 }
 
 const SYNC_TONE: Record<"ok" | "warn" | "bad" | "muted", string> = {
@@ -188,6 +195,7 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
     retrying: t("app.coleccion.syncRetrying", { count: sync.pending, attempts: sync.attempts }),
     stuck: t("app.coleccion.syncStuck", { count: sync.pending }),
     rejected: t("app.coleccion.syncRejectedShort"),
+    conflict: t("app.coleccion.syncConflict"),
   }
 
   const [q, setQ] = useState("")

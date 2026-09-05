@@ -158,23 +158,36 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
     return flagged.has(i) ? `${base} · ${t("hasProblem")}` : base;
   };
 
-  // The chip says one of exactly six things, and each of them is something the
-  // store or the outbox reported — see `TbSyncState`. The hint spells out what
-  // it means for the player's data, because "Pendiente" on its own does not.
+  // Every state named once, and each of them is something the store or the
+  // outbox reported — see `TbSyncState`, which is the kit's shared vocabulary
+  // since T5. The hint spells out what it means for the player's data, because
+  // "Pendiente" on its own does not.
+  //
+  // `synced` reads two ways, and the difference is `serverConfirmed`: without a
+  // receipt from a flush this session it says "Saved" (it is on this device),
+  // and with one it says "Synced" (it is on this device AND in the account).
+  // These were two separate states until T5, which over-claimed in the other
+  // direction — a team safely on the server showed "Saved" after every reload,
+  // because nothing had confirmed it in THAT session.
+  const syncedKey = draft.serverConfirmed ? "synced" : "saved";
   const syncWord = {
-    saved: t("sync.saved"),
+    synced: t(`sync.${syncedKey}`),
     syncing: t("sync.syncing"),
-    synced: t("sync.synced"),
-    pending: t("sync.pending"),
-    error: t("sync.error"),
+    queued: t("sync.pending"),
+    retrying: t("sync.pending"),
+    stuck: t("sync.error"),
+    conflict: t("sync.conflict"),
+    rejected: t("sync.error"),
     "local-only": t("sync.localOnly"),
   }[draft.syncState];
   const syncHint = {
-    saved: t("sync.savedHint"),
+    synced: t(`sync.${syncedKey}Hint`),
     syncing: t("sync.syncingHint"),
-    synced: t("sync.syncedHint"),
-    pending: t("sync.pendingHint"),
-    error: t("sync.errorHint"),
+    queued: t("sync.pendingHint"),
+    retrying: t("sync.pendingHint"),
+    stuck: t("sync.errorHint"),
+    conflict: t("sync.conflictHint"),
+    rejected: t("sync.errorHint"),
     "local-only": t("sync.localOnlyHint"),
   }[draft.syncState];
 

@@ -175,6 +175,50 @@ describe("deriveSyncStatus", () => {
     expect(status.state).toBe("rejected");
     expect(status.rejection).toBe(rejection);
   });
+
+  // T5. `conflict` is the one member unification had to ADD rather than rename,
+  // and it earns its place by prescribing a different action: `rejected` means
+  // discard or reconcile a write the server will never take, `conflict` means
+  // pull, because the write is fine and merely behind.
+  it("reports a conflict even while a flush is in flight", () => {
+    const status = deriveSyncStatus({
+      ...base,
+      flushing: true,
+      conflict: true,
+      pending: [entry()],
+    });
+    expect(status.state).toBe("conflict");
+    // Nothing to count down to: the queue is not what needs to happen next.
+    expect(status.retryInMs).toBeNull();
+    // The pending work is still reported, because it did not go anywhere.
+    expect(status.pending).toBe(1);
+  });
+
+  it("keeps a refusal above a conflict, because it is the more damaging of the two", () => {
+    const rejection: ToolOutboxRejection = {
+      opId: "op-2",
+      path: "/y",
+      status: 422,
+      message: "nope",
+    };
+    expect(
+      deriveSyncStatus({ ...base, conflict: true, rejection }).state,
+    ).toBe("rejected");
+  });
+
+  it("does not let a conflict hide behind an empty queue", () => {
+    // `synced` is checked before the queue states, so a conflict arriving with
+    // nothing pending -- which is the usual case, since a pull is what clears
+    // it -- must still outrank it. Ordering this one wrong is invisible: the
+    // tracker would simply show a tick.
+    expect(deriveSyncStatus({ ...base, conflict: true }).state).toBe("conflict");
+  });
+
+  it("says local-only, not conflict, for a signed-out player", () => {
+    expect(
+      deriveSyncStatus({ ...base, signedIn: false, conflict: true }).state,
+    ).toBe("local-only");
+  });
 });
 
 describe("createRetryScheduler", () => {

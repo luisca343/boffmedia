@@ -16,7 +16,12 @@
  * an "add one" op deduped this way would silently lose writes.
  */
 
-import { toolApi, toolSession, type ToolFlushResult } from "@boffmedia/tool-kit";
+import {
+  toolApi,
+  toolSession,
+  type ToolFlushResult,
+  type ToolSyncState,
+} from "@boffmedia/tool-kit";
 import type { ReplayRecord, TeamRecord } from "@boffmedia/battle-core";
 
 import { battlesimOutbox, listTeams, saveReplay, saveTeam } from "./storage";
@@ -100,10 +105,25 @@ export async function fetchServerReplays(limit = 50): Promise<ServerReplay[] | n
  * The editor puts this on screen, so every value has to be something the
  * outbox actually told us. `"synced"` is only returned when this team's row
  * left the queue through a request that came back OK; anything still queued is
- * `"queued"`/`"offline"`, and a row the server refused for good is
- * `"rejected"` (it is gone from the queue and was never applied).
+ * `"queued"`, and a row the server refused for good is `"rejected"` (it is
+ * gone from the queue and was never applied).
+ *
+ * T5. Derived from the kit's vocabulary rather than written out again, so
+ * renaming a member there is a compile error here instead of a silent drift.
+ *
+ * `"offline"` was the fifth member and is gone. It reported that the network
+ * was not there -- a CAUSE, not an outcome. The outcome is identical to
+ * `"queued"`: the row is in the outbox either way, and the kit's own rule is
+ * that offline work is `queued` and never `retrying`, precisely because there
+ * is no attempt to count down to. Two words for one state is how a vocabulary
+ * drifts, and the VGC tracker had the mirror image of the same fault -- it used
+ * `offline` for SIGNED OUT, which this file has always called `local-only`. One
+ * word, two meanings, in two files meant to agree with each other.
  */
-export type TeamSyncResult = "synced" | "queued" | "offline" | "rejected" | "local-only";
+export type TeamSyncResult = Extract<
+  ToolSyncState,
+  "synced" | "queued" | "rejected" | "local-only"
+>;
 
 const teamPath = (clientId: string) => `/battlesimulator/teams/${encodeURIComponent(clientId)}`;
 
@@ -168,7 +188,8 @@ export async function flushTeamUploads(clientId: string): Promise<TeamSyncResult
   try {
     result = await outbox.flush();
   } catch {
-    return "offline";
+    // The flush threw, so nothing left the queue: still owed, still `queued`.
+    return "queued";
   }
 
   if (result.rejected.some((r) => r.path === teamPath(clientId))) return "rejected";
@@ -178,9 +199,9 @@ export async function flushTeamUploads(clientId: string): Promise<TeamSyncResult
     stillQueued = (await outbox.pending()).some((op) => op.dedupeKey === teamDedupeKey(clientId));
   } catch {
     // The queue could not be read back, so "it went" is not something we know.
-    return result.stopped ? "offline" : "queued";
+    return "queued";
   }
-  if (stillQueued) return result.stopped ? "offline" : "queued";
+  if (stillQueued) return "queued";
   return "synced";
 }
 

@@ -334,6 +334,8 @@ export const messages = {
             "pendingHint": "Guardado aquí. Falta subirlo a tu cuenta: se enviará al salir del editor o al pulsar Sincronizar.",
             "error": "No se pudo sincronizar",
             "errorHint": "El servidor rechazó este equipo. Sigue guardado en este dispositivo; vuelve a intentarlo.",
+            "conflict": "Otro dispositivo va por delante",
+            "conflictHint": "Otro dispositivo tiene una versión más reciente de este equipo. Vuelve a abrirlo para traerla.",
             "localOnly": "Solo local · Inicia sesión",
             "localOnlyHint": "Este equipo se guarda solo en este dispositivo. Inicia sesión para tenerlo en todos.",
             "localNewer": "Este equipo se editó más recientemente en otro dispositivo. Sincroniza para ver la versión actual."
@@ -1558,6 +1560,8 @@ export const messages = {
             "pendingHint": "Saved here. Still to reach your account: it is sent when you leave the editor or press Sync.",
             "error": "Couldn't sync",
             "errorHint": "The server refused this team. It is still saved on this device; try again.",
+            "conflict": "Another device is ahead",
+            "conflictHint": "Another device has a newer version of this team. Reopen it to pull that version in.",
             "localOnly": "Local only · Sign in",
             "localOnlyHint": "This team is saved on this device only. Sign in to have it on all of them.",
             "localNewer": "This team was edited more recently on another device. Sync to see the current version."

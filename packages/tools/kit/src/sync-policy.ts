@@ -71,11 +71,26 @@ export function retryDelayMs(
 }
 
 /**
- * What the player is told.
+ * What the player is told. ONE vocabulary for every offline tool (T5).
  *
- * `stuck` is the state that did not exist before and is the reason this file
- * does: a queue that has run out of attempts, is NOT going to move on its own,
- * and says so instead of showing a spinner forever.
+ * `stuck` is the state that did not exist before this file: a queue that has
+ * run out of attempts, is NOT going to move on its own, and says so instead of
+ * showing a spinner forever.
+ *
+ * `conflict` arrived with T5, from the VGC tracker, and it is the one state the
+ * other consumers could not express. It is NOT a variety of `rejected`, and the
+ * difference is what the player has to do about it:
+ *
+ *   rejected — the screen shows something the server does not have and never
+ *              will. The local write is a lie until the tool reconciles.
+ *   conflict — the screen shows something OLDER than the server has. Nothing is
+ *              wrong with the local write; another tab or device simply moved
+ *              first, and the answer is to pull rather than to re-send.
+ *
+ * Collapsing the two would have told a player to discard work when the correct
+ * action was to refresh. Three vocabularies were unified here and this is the
+ * only member that had to be ADDED rather than renamed -- the rest of the
+ * differences were the same ideas under different words.
  */
 export type ToolSyncState =
   | "local-only"
@@ -84,7 +99,8 @@ export type ToolSyncState =
   | "queued"
   | "retrying"
   | "stuck"
-  | "rejected";
+  | "rejected"
+  | "conflict";
 
 export interface ToolSyncStatus {
   state: ToolSyncState;
@@ -112,6 +128,10 @@ export interface DeriveSyncStatusInput {
   /** Set once a flush reports a permanent refusal; cleared when the tool has
    *  reconciled. */
   rejection?: ToolOutboxRejection | null;
+  /** Another tab or device holds newer data (a 409, typically). Distinct from
+   *  `rejection`: the local write is fine, it is merely behind. Cleared when
+   *  the tool pulls. */
+  conflict?: boolean;
   /** Epoch ms of the next scheduled attempt, from the scheduler. */
   nextAttemptAt?: number | null;
   now?: number;
@@ -123,9 +143,11 @@ export interface DeriveSyncStatusInput {
  *
  * Order is the design. A rejection outranks everything because it is the only
  * state where the screen is showing something the server does not have and
- * never will; "signed out" outranks the queue because a signed-out player is
- * not waiting for anything; and `stuck` outranks `retrying` so a dead queue can
- * never present itself as a live one.
+ * never will; "signed out" outranks the queue -- and the conflict flag -- because
+ * a signed-out player is not waiting for anything; a conflict outranks `synced`
+ * because it usually arrives with an empty queue and the alternative is showing
+ * a tick over a stale screen; and `stuck` outranks `retrying` so a dead queue
+ * can never present itself as a live one.
  */
 export function deriveSyncStatus(input: DeriveSyncStatusInput): ToolSyncStatus {
   const {
@@ -134,6 +156,7 @@ export function deriveSyncStatus(input: DeriveSyncStatusInput): ToolSyncStatus {
     flushing,
     pending,
     rejection = null,
+    conflict = false,
     nextAttemptAt = null,
     now = Date.now(),
     policy = SYNC_RETRY,
@@ -146,8 +169,16 @@ export function deriveSyncStatus(input: DeriveSyncStatusInput): ToolSyncStatus {
 
   if (rejection) return { ...base, state: "rejected", retryInMs: null };
   // Signed out is not a sync problem. Local-only work is the documented,
-  // supported way to use these tools, so it must never wear a warning colour.
+  // supported way to use these tools, so it must never wear a warning colour --
+  // and that applies to a conflict flag left over from a previous session,
+  // which is why `local-only` is checked FIRST. (Written the other way round to
+  // begin with, on the reasoning that a conflict can only be learned while
+  // signed in; true, and irrelevant, because the flag outlives the session.)
   if (!signedIn) return { ...base, state: "local-only", retryInMs: null };
+  // Above `synced`, not below it. A conflict is normally learned by a pull and
+  // arrives with an EMPTY queue, so ordering these the other way would show a
+  // tick to a player whose screen is stale -- invisible, and exactly wrong.
+  if (conflict) return { ...base, state: "conflict", retryInMs: null };
   if (pending.length === 0) return { ...base, state: "synced", retryInMs: null };
   if (flushing) return { ...base, state: "syncing", retryInMs: null };
 

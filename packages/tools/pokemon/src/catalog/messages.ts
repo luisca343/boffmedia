@@ -624,6 +624,7 @@ export const messages = {
             "syncRetrying": "Reintentando ({attempts}) · {count, plural, one {# cambio} other {# cambios}}",
             "syncStuck": "{count, plural, one {# cambio sin guardar en el servidor} other {# cambios sin guardar en el servidor}}",
             "syncRejectedShort": "El servidor rechazó un cambio",
+            "syncConflict": "Otro dispositivo tiene datos más recientes",
             "syncRetry": "Reintentar",
             "overrideTitle": "Ha ganado la copia del servidor",
             "overrideLead": "{count, plural, one {# carta tenía} other {# cartas tenían}} un número distinto en este dispositivo y {count, plural, one {se ha actualizado} other {se han actualizado}} con el valor del servidor ({at, time, short}). Los cambios que aún estaban en cola se han respetado."
@@ -1416,6 +1417,8 @@ export const messages = {
             "synced": "Sincronizado",
             "syncing": "Sincronizando",
             "error": "Error de sincronización",
+            "stuck": "Sin guardar en el servidor",
+            "retry": "Reintentar",
             "rejected": "El servidor rechazó un cambio: {detail}",
             "refreshed": "Tracker actualizado desde la nube",
             "conflictBody": "Otro dispositivo tiene datos más recientes. Actualiza desde la nube para continuar.",
@@ -2212,6 +2215,7 @@ export const messages = {
             "syncRetrying": "Retrying ({attempts}) · {count, plural, one {# change} other {# changes}}",
             "syncStuck": "{count, plural, one {# change not saved to the server} other {# changes not saved to the server}}",
             "syncRejectedShort": "The server refused a change",
+            "syncConflict": "Another device has newer data",
             "syncRetry": "Try again",
             "overrideTitle": "The server's copy won",
             "overrideLead": "{count, plural, one {# card had} other {# cards had}} a different number on this device and {count, plural, one {was} other {were}} updated with the server's value ({at, time, short}). Changes still queued were kept."
@@ -3004,6 +3008,8 @@ export const messages = {
             "synced": "Synced",
             "syncing": "Syncing",
             "error": "Sync error",
+            "stuck": "Not saved to the server",
+            "retry": "Try again",
             "rejected": "The server rejected a change: {detail}",
             "refreshed": "Tracker refreshed from the cloud",
             "conflictBody": "Another device has newer data. Refresh from the cloud to continue.",
