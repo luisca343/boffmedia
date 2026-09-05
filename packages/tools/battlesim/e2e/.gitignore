@@ -1,0 +1,9 @@
+node_modules/
+host/node_modules/
+# Vite's cacheDir for the e2e host. It holds a pre-bundled react-dom, which is
+# both large and full of dangerouslySetInnerHTML call sites that are not ours.
+host/.vite/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

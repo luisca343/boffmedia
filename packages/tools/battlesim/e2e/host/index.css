@@ -1,0 +1,37 @@
+/* The design system, for real.
+ *
+ * Without this the host rendered every component with its Tailwind classes
+ * INERT — the markup was correct and the geometry was nonsense, so the battle
+ * field measured 1600x0 and any assertion about layout was measuring the
+ * absence of a stylesheet rather than the app. A suite that cannot see the
+ * layout cannot catch the class of bug BsimRoot's own header warns about (a
+ * zero-height field hands the sprite engine a zero scale).
+ *
+ * Order matters, and it is the same order apps/desktop/src/index.css uses:
+ * tokens and faces before Tailwind's layers, so utilities referencing
+ * var(--accent) resolve.
+ *
+ * RELATIVE paths, not the `@boffmedia/tailwind-config/...` specifier the
+ * launcher uses: that package is not a dependency of @boffmedia/tools-battlesim,
+ * so pnpm never links it here and postcss resolves the bare name against this
+ * package root and fails.
+ */
+@import "../../../../tailwind-config/base.css";
+@import "../../../../tailwind-config/fonts.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+}
