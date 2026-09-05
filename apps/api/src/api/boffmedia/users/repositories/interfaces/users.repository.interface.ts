@@ -6,9 +6,21 @@ import { CreateUserDto } from '../../dto/create-user.dto';
 // the forum presence marker — lastSeenAt is read directly by the forum, never
 // surfaced through the general user reads — or the internal revocation counters,
 // which the user selects never fetch).
+//
+// A14's bounce columns are omitted for the same reason: `userSelectWithoutPassword`
+// does not fetch them, and the one consumer that cares (mail.service, deciding
+// whether to send at all) selects `emailBounced` on its own. Adding them here
+// instead would put a deliverability flag on every user read, including the ones
+// behind public profiles, to serve a single caller.
 export type BoffMediaUserSafe = Omit<
   BoffMediaUser,
-  'password' | 'deletedAt' | 'lastSeenAt' | 'desktopTokenVersion' | 'sessionVersion'
+  | 'password'
+  | 'deletedAt'
+  | 'lastSeenAt'
+  | 'desktopTokenVersion'
+  | 'sessionVersion'
+  | 'emailBounced'
+  | 'emailBouncedAt'
 >;
 
 // Complex query result types. Keeps `password` (for credential checks) but not
@@ -17,7 +29,12 @@ export type BoffMediaUserSafe = Omit<
 export interface FullUserData {
   boffmedia_users: Omit<
     BoffMediaUser,
-    'deletedAt' | 'lastSeenAt' | 'desktopTokenVersion' | 'sessionVersion'
+    | 'deletedAt'
+    | 'lastSeenAt'
+    | 'desktopTokenVersion'
+    | 'sessionVersion'
+    | 'emailBounced'
+    | 'emailBouncedAt'
   >;
   rotom_users: RotomUser | null;
 }

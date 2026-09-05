@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common';
+import { ValidationError } from '@/common/errors/domain-error';
 import { MessageService } from './services/messages.service';
 import { AIService } from './services/ai-service';
 import { PokemonDataService } from './services/pokemon-data.service';
+import { UsageBudgetService } from './services/usage-budget.service';
 import { FicusMessageContentDto } from './dto/ficus-message-content.dto';
 import { SendMessageDto } from './dto/send-message.dto';
 import { GetMessagesDto } from './dto/get-messages.dto';
@@ -23,6 +25,7 @@ export class FicusAIFacadeService {
     private readonly messageService: MessageService,
     private readonly aiService: AIService,
     private readonly pokemonDataService: PokemonDataService,
+    private readonly budgetService: UsageBudgetService,
   ) {}
 
   // ==================== MESSAGE MANAGEMENT ====================
@@ -52,6 +55,20 @@ export class FicusAIFacadeService {
   ): Promise<FicusMessageContentDto> {
     const { uuid, mensaje } = sendMessageDto;
 
+    // Check daily token budget (estimate ~100 tokens per message)
+    const withinBudget = await this.budgetService.checkAndLogUsage(uuid, 100);
+    if (!withinBudget) {
+      // A domain error, not a Nest exception: GlobalExceptionFilter maps it to
+      // the same body every other error uses, and check-domain-errors.mjs
+      // ratchets on services importing HTTP exceptions (A5).
+      const dailyBudget = this.budgetService.getDailyBudget();
+      const usedToday = await this.budgetService.getTodayUsage(uuid);
+      throw new ValidationError(
+        'FICUSAI_DAILY_BUDGET_SPENT',
+        `Daily token budget exceeded: ${usedToday}/${dailyBudget}`,
+      );
+    }
+
     // Store user message if it's from user
     if (mensaje.sender === MessageSender.USER) {
       await this.messageService.storeMessage(uuid, mensaje);
@@ -59,6 +76,10 @@ export class FicusAIFacadeService {
 
     // Get AI response
     const aiResponse = await this.generateAIResponse(uuid, mensaje);
+
+    // Log actual token usage (will be improved with real token counts from API)
+    // For now, estimate ~150 tokens output per response
+    await this.budgetService.logUsage(uuid, 100, 150);
 
     // Store and return the AI response
     await this.messageService.storeMessage(uuid, aiResponse);

@@ -7,7 +7,9 @@ import { FicusAIFacadeService } from './ficusai.facade.service';
 import { MessageService } from './services/messages.service';
 import { AIService } from './services/ai-service';
 import { PokemonDataService } from './services/pokemon-data.service';
+import { UsageBudgetService } from './services/usage-budget.service';
 import { FicusAIRepository } from './repositories/ficusai.repository';
+import { FicusAiUsageRepository } from './repositories/ficusai-usage.repository';
 import { FICUSAI_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 @Module({
@@ -25,6 +27,8 @@ import { FICUSAI_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/re
     MessageService,
     AIService,
     PokemonDataService,
+    UsageBudgetService,
+    FicusAiUsageRepository,
 
     // Repository
     {
@@ -37,6 +41,7 @@ import { FICUSAI_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/re
     MessageService,
     AIService,
     PokemonDataService,
+    UsageBudgetService,
   ],
 })
 export class FicusAIModule {}

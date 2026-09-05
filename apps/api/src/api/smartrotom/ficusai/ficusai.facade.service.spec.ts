@@ -3,6 +3,7 @@ import { Logger } from 'nestjs-pino';
 import { FicusAIFacadeService } from './ficusai.facade.service';
 import { MessageService } from './services/messages.service';
 import { AIService } from './services/ai-service';
+import { UsageBudgetService } from './services/usage-budget.service';
 import { PokemonDataService } from './services/pokemon-data.service';
 import { MessageSender } from './enums/message-sender.enum';
 import { MessagePartType } from './dto/message-part.dto';
@@ -44,6 +45,12 @@ const userMessage = {
 
 describe('FicusAIFacadeService', () => {
   let service: FicusAIFacadeService;
+  const mockUsageBudget = {
+    checkAndLogUsage: jest.fn().mockResolvedValue(true),
+    logUsage: jest.fn().mockResolvedValue(undefined),
+    getTodayUsage: jest.fn().mockResolvedValue(0),
+    getDailyBudget: jest.fn().mockReturnValue(100_000),
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -56,6 +63,10 @@ describe('FicusAIFacadeService', () => {
         { provide: MessageService, useValue: mockMessageService },
         { provide: AIService, useValue: mockAiService },
         { provide: PokemonDataService, useValue: mockPokemonDataService },
+        // A19: the facade now checks a per-user daily token budget before it
+        // calls the model. Faked here so this suite keeps testing delegation;
+        // the budget arithmetic is covered by its own service spec.
+        { provide: UsageBudgetService, useValue: mockUsageBudget },
       ],
     }).compile();
 

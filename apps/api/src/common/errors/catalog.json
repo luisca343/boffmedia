@@ -145,6 +145,10 @@
       "es": "No se puede reabrir: el evento tiene un randomizer que ya no es borrador. Ciérralo o elimínalo antes.",
       "where": "boffmedia/events/services/events.service.ts"
     },
+    "FICUSAI_DAILY_BUDGET_SPENT": {
+      "es": "Has agotado tu presupuesto diario de FicusAI. Vuelve a intentarlo mañana.",
+      "where": "api/smartrotom/ficusai/ficusai.facade.service.ts"
+    },
     "MATCH_AMENDMENT_CONFLICT": {
       "es": "La partida fue corregida por otro administrador. Vuelve a cargarla antes de corregirla de nuevo.",
       "where": "boffmedia/tournaments/services/matches.service.ts"

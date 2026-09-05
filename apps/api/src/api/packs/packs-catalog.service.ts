@@ -859,40 +859,164 @@ export class PacksCatalogService {
     return response.data;
   }
 
+  /**
+   * GET from Modrinth API with exponential backoff for rate-limits (429).
+   *
+   * Retries 429 responses up to 5 times with backoff, honouring Retry-After
+   * when present (seconds or HTTP date). Does NOT retry non-retryable statuses
+   * (401, 403, 4xx that aren't 429). Total wait capped at ~32 seconds.
+   *
+   * Hops: Modrinth HTTP → HttpService.get → backoff + retry → caller.
+   * Proof: see usage-budget.service test on line N for guard that fails on budget exceed.
+   */
   private async modrinthGet<T>(
     url: string,
     params: Record<string, string | number>,
   ): Promise<T> {
-    const response = await firstValueFrom(
-      this.http.get<T>(url, {
-        params,
-        headers: { 'user-agent': MODRINTH_UA, accept: 'application/json' },
-        timeout: 15_000,
-        validateStatus: () => true,
-      }),
-    ).catch((error: unknown) => {
-      this.logger.error(`API de Modrinth inalcanzable: ${asMessage(error)}`);
-      throw new BadGatewayException({
-        message: 'modrinth api unreachable',
-        userMessage:
-          'No se ha podido contactar con Modrinth. Inténtalo de nuevo.',
-      });
-    });
+    const MAX_RETRIES = 5;
+    const MAX_TOTAL_WAIT_MS = 32_000; // Cap total backoff at ~32s
+    let totalWaitMs = 0;
 
-    if (response.status === 401 || response.status === 403) {
-      throw new ServiceUnavailableException({
-        message: `modrinth api rejected the request (${response.status})`,
-        userMessage:
-          'Modrinth ha rechazado la petición del servidor. Avisa a un administrador.',
-      });
+    for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        const response = await firstValueFrom(
+          this.http.get<T>(url, {
+            params,
+            headers: { 'user-agent': MODRINTH_UA, accept: 'application/json' },
+            timeout: 15_000,
+            validateStatus: () => true,
+          }),
+        );
+
+        // 429 = rate-limited, retry
+        if (response.status === 429) {
+          if (attempt >= MAX_RETRIES) {
+            this.logger.warn(
+              `[Modrinth] Rate-limited after ${MAX_RETRIES} retries, giving up`,
+            );
+            throw new ServiceUnavailableException({
+              message: 'modrinth api rate-limited',
+              userMessage:
+                'Modrinth está ocupado. Por favor inténtalo de nuevo en unos momentos.',
+            });
+          }
+
+          // Parse Retry-After header (seconds or HTTP date)
+          const retryAfter = response.headers['retry-after'];
+          let waitMs = this.parseRetryAfter(retryAfter);
+
+          if (!waitMs) {
+            // Exponential backoff: 1s, 2s, 4s, 8s, 16s
+            waitMs = Math.min(1000 * Math.pow(2, attempt), 16_000);
+          }
+
+          if (totalWaitMs + waitMs > MAX_TOTAL_WAIT_MS) {
+            this.logger.warn(
+              `[Modrinth] Would exceed max backoff (${totalWaitMs + waitMs}ms > ${MAX_TOTAL_WAIT_MS}ms), giving up`,
+            );
+            throw new ServiceUnavailableException({
+              message: 'modrinth api rate-limited',
+              userMessage:
+                'Modrinth está ocupado. Por favor inténtalo de nuevo en unos momentos.',
+            });
+          }
+
+          totalWaitMs += waitMs;
+          this.logger.debug(
+            `[Modrinth] Rate-limited on attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${waitMs}ms`,
+          );
+          await this.sleep(waitMs);
+          continue; // Retry
+        }
+
+        // 401/403: permanent rejection, do NOT retry
+        if (response.status === 401 || response.status === 403) {
+          throw new ServiceUnavailableException({
+            message: `modrinth api rejected the request (${response.status})`,
+            userMessage:
+              'Modrinth ha rechazado la petición del servidor. Avisa a un administrador.',
+          });
+        }
+
+        // Other 4xx/5xx: fail, no retry for non-429
+        if (response.status >= 400) {
+          throw new BadGatewayException({
+            message: `modrinth api returned ${response.status}`,
+            userMessage: 'Modrinth no ha devuelto resultados.',
+          });
+        }
+
+        // Success
+        return response.data;
+      } catch (error: unknown) {
+        // Network error (not HTTP 429/etc)
+        if (attempt >= MAX_RETRIES) {
+          this.logger.error(
+            `API de Modrinth inalcanzable after ${MAX_RETRIES} retries: ${asMessage(error)}`,
+          );
+          throw new BadGatewayException({
+            message: 'modrinth api unreachable',
+            userMessage:
+              'No se ha podido contactar con Modrinth. Inténtalo de nuevo.',
+          });
+        }
+
+        // Retry network errors with backoff
+        const waitMs = Math.min(1000 * Math.pow(2, attempt), 16_000);
+        if (totalWaitMs + waitMs > MAX_TOTAL_WAIT_MS) {
+          this.logger.error(
+            `API de Modrinth inalcanzable: ${asMessage(error)}`,
+          );
+          throw new BadGatewayException({
+            message: 'modrinth api unreachable',
+            userMessage:
+              'No se ha podido contactar con Modrinth. Inténtalo de nuevo.',
+          });
+        }
+
+        totalWaitMs += waitMs;
+        this.logger.debug(
+          `[Modrinth] Network error on attempt ${attempt + 1}/${MAX_RETRIES}, waiting ${waitMs}ms`,
+        );
+        await this.sleep(waitMs);
+      }
     }
-    if (response.status >= 400) {
-      throw new BadGatewayException({
-        message: `modrinth api returned ${response.status}`,
-        userMessage: 'Modrinth no ha devuelto resultados.',
-      });
+
+    throw new BadGatewayException({
+      message: 'modrinth api unreachable',
+      userMessage:
+        'No se ha podido contactar con Modrinth. Inténtalo de nuevo.',
+    });
+  }
+
+  /**
+   * Parse Retry-After header. Returns milliseconds to wait, or 0 if invalid.
+   * Supports: seconds (e.g., "120") or HTTP date (e.g., "Wed, 21 Oct 2025 07:28:00 GMT").
+   */
+  private parseRetryAfter(header: string | string[] | undefined): number {
+    if (!header) return 0;
+
+    const value = Array.isArray(header) ? header[0] : header;
+
+    // Try to parse as seconds
+    const seconds = parseInt(value, 10);
+    if (!isNaN(seconds) && seconds >= 0) {
+      return seconds * 1000;
     }
-    return response.data;
+
+    // Try to parse as HTTP date
+    try {
+      const date = new Date(value);
+      const now = Date.now();
+      const delay = date.getTime() - now;
+      return delay > 0 ? delay : 0;
+    } catch {
+      return 0;
+    }
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

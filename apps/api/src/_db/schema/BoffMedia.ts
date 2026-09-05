@@ -64,6 +64,12 @@ export const boffMediaUsers = mysqlTable('boffmedia_users', {
   // GDPR soft-delete: set (with PII scrubbed) instead of hard-deleting. All
   // reads/login exclude rows where this is non-null.
   deletedAt: timestamp('deleted_at', { mode: 'date' }),
+  // Hard bounce or complaint flag. Resend webhooks mark this true when the
+  // email bounces or is reported as spam. Transactional emails (password reset,
+  // verification) are skipped for bounced addresses to prevent amplification.
+  emailBounced: boolean('email_bounced').notNull().default(false),
+  // Timestamp when the bounce/complaint was recorded.
+  emailBouncedAt: timestamp('email_bounced_at', { mode: 'date' }),
 });
 
 export type BoffMediaUser = typeof boffMediaUsers.$inferSelect;

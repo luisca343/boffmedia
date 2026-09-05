@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { env } from '@/config/env';
+import { MailRecipientRepository } from './repositories/mail-recipient.repository';
 import {
   MAIL_TEMPLATES,
   DEFAULT_MAIL_LOCALE,
@@ -22,7 +23,10 @@ export interface SendMailInput {
  */
 @Injectable()
 export class MailService {
-  constructor(private readonly logger: Logger) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly recipients: MailRecipientRepository,
+  ) {}
 
   private readonly from = env.MAIL_FROM;
   private readonly apiKey = env.RESEND_API_KEY;
@@ -35,6 +39,23 @@ export class MailService {
       );
       this.logger.debug(`[MailService] Body (text): ${input.text ?? ''}`);
       return;
+    }
+
+    // Check if the address is marked as bounced. Skip sending to prevent
+    // amplification attacks targeting bounced mailboxes.
+    try {
+      if (await this.recipients.isBounced(input.to)) {
+        this.logger.warn(
+          `[MailService] Skipping email to bounced address: ${input.to.slice(0, 3)}...`,
+        );
+        return;
+      }
+    } catch (error) {
+      this.logger.error(
+        `[MailService] Failed to check bounce status for ${input.to}`,
+        error as Error,
+      );
+      // Continue anyway — a database error should not block email
     }
 
     try {

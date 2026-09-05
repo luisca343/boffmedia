@@ -93,7 +93,17 @@ async function bootstrap() {
   initSentry();
   installProcessGuards();
 
-  const app = await NestFactory.create(AppModule, { bufferLogs: true });
+  const app = await NestFactory.create(AppModule, {
+    bufferLogs: true,
+    // Keeps the exact bytes of the request body available as `req.rawBody`.
+    // Required by the Resend webhook (A14): an HMAC signature is computed over
+    // what the sender transmitted, and re-serialising the PARSED body with
+    // JSON.stringify does not reproduce those bytes — key escaping, number
+    // formatting and whitespace all differ — so verification would fail on
+    // every real delivery while passing any test that signs the same
+    // re-serialisation.
+    rawBody: true,
+  });
   app.useLogger(app.get(Logger));
 
   const isProduction = env.NODE_ENV === 'production';

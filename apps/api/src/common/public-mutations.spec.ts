@@ -43,6 +43,15 @@ const ALLOWED_ANONYMOUS_MUTATIONS: Record<string, string> = {
   'api/boffmedia/util/sharex/sharex.controller.ts#post':
     'authenticates in-handler via a ShareX upload token',
 
+  // A provider webhook cannot hold a Boffmedia session: Resend is the caller.
+  // It authenticates in-handler by HMAC over the raw body against
+  // RESEND_WEBHOOK_SECRET, in constant time, and REFUSES the request when the
+  // secret is unset rather than skipping the check — marking an address as
+  // bounced stops its password-reset mail, so a fail-open here would let anyone
+  // lock an account out of every recovery path.
+  'api/webhooks/resend-webhook.controller.ts#handleWebhook':
+    'authenticates in-handler via a Resend HMAC signature',
+
   // In-game reads implemented as POST so the player uuid travels in the body
   // rather than the URL. They return public player statistics, and the
   // Minecraft plugin is the only caller. They mutate nothing despite the verb.

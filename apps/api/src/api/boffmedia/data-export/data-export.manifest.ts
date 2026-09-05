@@ -31,7 +31,7 @@ import {
 import { boffMediaUploads } from '@/_db/schema/BoffMediaUploads';
 import { desktopDeviceCodes } from '@/_db/schema/DesktopAuth';
 import { discordQuotes, discordUsers } from '@/_db/schema/Discord';
-import { ficusAiMessages } from '@/_db/schema/FicusAI';
+import { ficusAiMessages, ficusAiUsage } from '@/_db/schema/FicusAI';
 import {
   packAcl,
   packAudit,
@@ -778,6 +778,14 @@ export const EXPORTED_TABLES: readonly ExportedTable[] = [
     drizzle: ficusAiMessages,
     ownedBy: [{ column: ficusAiMessages.uuid, key: 'mcUuid' }],
     meaning: 'Your conversations with the FicusAI assistant.',
+  },
+  {
+    table: 'rotom_ficusai_usage',
+    section: 'social',
+    drizzle: ficusAiUsage,
+    ownedBy: [{ column: ficusAiUsage.uuid, key: 'mcUuid' }],
+    meaning:
+      'How many FicusAI tokens you used each day, which is what the daily budget is counted against.',
   },
   {
     table: 'rotom_news_comments',

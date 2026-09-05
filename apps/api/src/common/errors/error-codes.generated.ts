@@ -40,6 +40,7 @@ export const ApiErrorCode = {
   EVENT_DELETE_BLOCKED_BY_TOURNAMENT: 'EVENT_DELETE_BLOCKED_BY_TOURNAMENT',
   EVENT_LIFECYCLE_FORWARD_ONLY: 'EVENT_LIFECYCLE_FORWARD_ONLY',
   EVENT_REOPEN_BLOCKED_BY_RANDOMIZER: 'EVENT_REOPEN_BLOCKED_BY_RANDOMIZER',
+  FICUSAI_DAILY_BUDGET_SPENT: 'FICUSAI_DAILY_BUDGET_SPENT',
   MATCH_AMENDMENT_CONFLICT: 'MATCH_AMENDMENT_CONFLICT',
   MATCH_SETTLED_CONCURRENTLY: 'MATCH_SETTLED_CONCURRENTLY',
   MODERATION_AUTHOR_UNKNOWN: 'MODERATION_AUTHOR_UNKNOWN',
@@ -127,6 +128,8 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
     'El ciclo de vida del evento solo avanza. Marca «reabrir» si de verdad quieres retrocederlo.',
   EVENT_REOPEN_BLOCKED_BY_RANDOMIZER:
     'No se puede reabrir: el evento tiene un randomizer que ya no es borrador. Ciérralo o elimínalo antes.',
+  FICUSAI_DAILY_BUDGET_SPENT:
+    'Has agotado tu presupuesto diario de FicusAI. Vuelve a intentarlo mañana.',
   MATCH_AMENDMENT_CONFLICT:
     'La partida fue corregida por otro administrador. Vuelve a cargarla antes de corregirla de nuevo.',
   MATCH_SETTLED_CONCURRENTLY:
