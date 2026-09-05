@@ -31,7 +31,7 @@ on:
           - dev
           - prod
       notes:
-        description: "Release notes shown in the update banner"
+        description: "Release notes for the update banner. Blank = use this version's CHANGELOG.md section."
         required: false
         default: ""
         type: string
@@ -80,6 +80,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      # X9. Both checks are BEFORE the build on purpose: the Windows Tauri build
+      # is ~20 minutes, and a release with no notes or a drifted version number
+      # should fail in ten seconds, not at the upload step.
       - name: Verify the tag matches tauri.conf.json
         shell: bash
         run: |
@@ -88,6 +91,15 @@ jobs:
             echo "::error::tauri.conf.json version ($conf_version) != requested (${{ github.event.inputs.version }}). Bump it first (RELEASING §4.1)."
             exit 1
           fi
+          # ...and that package.json and Cargo.toml agree with it. The check
+          # above only ever compared ONE of the three files to the input, so
+          # a Cargo.toml left behind shipped a binary reporting a version the
+          # feed has never heard of.
+          node scripts/release-notes.mjs --check-versions
+
+      - name: Verify this version has release notes
+        shell: bash
+        run: node scripts/release-notes.mjs --check "${{ github.event.inputs.version }}"
 
       - name: Build + sign (Tauri)
         env:
@@ -109,6 +121,14 @@ jobs:
           PUBLISH: ${{ github.event.inputs.publish }}
         run: |
           set -euo pipefail
+          # Blank notes fall back to CHANGELOG.md, which is the point of X9: the
+          # text users see in the update banner comes from a file that was
+          # reviewed in a pull request, not from whatever was typed into the
+          # dispatch form at release time.
+          if [ -z "$NOTES" ]; then
+            NOTES=$(node scripts/release-notes.mjs --notes "$VERSION")
+            echo "Notes taken from CHANGELOG.md (${#NOTES} chars)."
+          fi
           bundle="apps/desktop/src-tauri/target/release/bundle/nsis"
           # productName is "Boffmedia App", so NSIS emits "Boffmedia App_<ver>_x64-setup.exe"
           # (with a space). Glob on the stable suffix instead of the product name, so a
