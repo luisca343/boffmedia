@@ -17,6 +17,42 @@ if (fs.existsSync(envFile)) {
   }
 }
 
+/**
+ * WHERE THE SUITE POINTS, and why the default is local.
+ *
+ * This used to read `process.env.BASE_URL ?? "https://ficuslab.es"` in two
+ * places, and the two combined into a trap. `webServer` starts `pnpm dev` and
+ * then waits for `url` to answer -- and with BASE_URL unset, `url` was
+ * PRODUCTION, which answers immediately. So the readiness probe passed whether
+ * or not the local server had started, and the whole suite ran against
+ * production. Not only reads: `chromium:auth` signs in as TEST_USERNAME first,
+ * and the PC specs drag real Pokemon between real boxes.
+ *
+ * Two rules follow, and they are the fix:
+ *
+ *   1. The default is LOCAL. Pointing a suite that mutates data at a deployed
+ *      environment must be a deliberate act -- `BASE_URL=... npx playwright
+ *      test` -- never what you get by forgetting to set a variable.
+ *   2. A webServer starts ONLY when the target is local. Against a deployed
+ *      environment there is nothing to start, and a readiness probe aimed at
+ *      the remote host cannot tell you anything about a local process.
+ *
+ * The banner prints the target on every run, because "which environment did
+ * that green tick describe" is not a question a report should leave open.
+ */
+const LOCAL_TARGET = "http://localhost:3000"
+const TARGET = process.env.BASE_URL ?? LOCAL_TARGET
+// Anchored, and the host must END at a port, a path or the string's end --
+// `https://localhost.evil.com` contains "localhost" and is not local.
+const IS_LOCAL = /^https?:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(\/|$)/.test(TARGET)
+
+console.log(
+  `[playwright] target ${TARGET} ` +
+    (IS_LOCAL
+      ? "(local -- starting `pnpm dev`)"
+      : "(REMOTE -- no server is started, and the authenticated specs will sign in and WRITE there)"),
+)
+
 export default defineConfig({
   testDir: "./tests",
   timeout: 30_000,
@@ -27,7 +63,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: [["html", { open: "never" }]],
   use: {
-    baseURL: process.env.BASE_URL ?? "https://ficuslab.es",
+    baseURL: TARGET,
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
@@ -78,14 +114,18 @@ export default defineConfig({
       testMatch: /.*\.admin\.spec\.ts/,
     },
   ],
-  webServer: {
-    command: "pnpm dev",
-    url: process.env.BASE_URL ?? "https://ficuslab.es",
-    timeout: 120_000,
-    reuseExistingServer: !process.env.CI,
-    env: {
-      ...process.env,
-      NEXT_PUBLIC_API: process.env.NEXT_PUBLIC_API ?? "http://127.0.0.1:3333",
-    },
-  },
+  // Undefined against a remote target: there is no local process to wait for,
+  // and probing the remote host reports "ready" instantly while proving nothing.
+  webServer: IS_LOCAL
+    ? {
+        command: "pnpm dev",
+        url: TARGET,
+        timeout: 120_000,
+        reuseExistingServer: !process.env.CI,
+        env: {
+          ...process.env,
+          NEXT_PUBLIC_API: process.env.NEXT_PUBLIC_API ?? "http://127.0.0.1:3333",
+        },
+      }
+    : undefined,
 })

@@ -1,221 +1,179 @@
 import { test, expect } from "../../fixtures"
 
 /**
- * PC (Storage) drag and drop tests for SmartRotom.
+ * PC (Storage) pointer drag and drop.
  *
- * These tests require an authenticated session with TEST_USERNAME / TEST_PASSWORD
- * environment variables set. The PC app requires a real account with Pokemon data.
+ * THIS FILE USED TO BE UNABLE TO FAIL, and it is worth recording how, because the
+ * shape recurs. Every uncertainty was a bare `test.skip()` — not on /pc, zero
+ * slots, no visible slot, fewer than two slots — so an account with an empty PC,
+ * a session that never carried, or a page that 500'd all produced the same green
+ * tick as a working drag. On top of that the ghost locator (`[class*='drag-ghost']`)
+ * matched a class that has never existed in this app, and the assertions were
+ * tautologies: `if (ghostVisible) expect(ghost).toBeVisible()` cannot fail, and
+ * `expect(ghostVisible).toBe(false)` passes trivially when the locator matches
+ * nothing — which is exactly what the pointercancel test, the one guarding the
+ * bug this suite was written for (d675e5d81), was doing.
  *
- * Touch fallback: These tests work with pointer events, which cover mouse, touch,
- * and pen input. The PC now handles all three uniformly via the pointer event API.
+ * The rule now, borrowed from admin.setup.ts: SKIP ONLY ON ABSENT CREDENTIALS.
+ * That is the one condition CI legitimately hits, it is announced, and it is
+ * outside the app's control. Everything else — bounced to sign-in, an empty PC,
+ * a missing ghost — is a FAILURE with a message saying what to fix. A test
+ * environment that is not set up should say so loudly; it must never mimic a pass.
+ *
+ * Requires TEST_USERNAME / TEST_PASSWORD pointing at an account whose PC holds at
+ * least two Pokemon. Nothing here mutates storage: every drag is released over
+ * empty space or aborted, so no drop is ever committed.
  */
 
-test.describe("SmartRotom PC — pointer-based drag and drop (touch-enabled)", () => {
+const HAVE_CREDENTIALS = !!process.env.TEST_USERNAME && !!process.env.TEST_PASSWORD
+
+test.describe("SmartRotom PC — pointer drag and drop", () => {
+  test.skip(
+    !HAVE_CREDENTIALS,
+    "TEST_USERNAME / TEST_PASSWORD are unset, so no player session can be minted. " +
+      "This is the ONLY condition under which this suite skips.",
+  )
+
   test.beforeEach(async ({ pcPage, page }) => {
-    // Try to navigate to PC. If auth fails, skip gracefully.
-    // The storage state is loaded from .auth/user.json if available.
-    try {
-      await pcPage.goto()
-      // Verify we actually loaded a PC page, not redirected to auth
-      const url = page.url()
-      if (!url.includes("/pc")) {
-        test.skip()
-      }
-    } catch {
-      // Navigation or page load failed
-      test.skip()
-    }
+    await pcPage.goto()
+
+    // Being bounced to sign-in means the storage state did not carry a session.
+    // Skipping here is what let the whole suite pass while running anonymously.
+    await expect(
+      page,
+      "Expected /smartrotom/pc, got bounced — the saved session did not carry. " +
+        "Check tests/auth.setup.ts and that TEST_USERNAME is a real account.",
+    ).toHaveURL(/\/smartrotom\/pc/)
+
+    await expect(
+      pcPage.occupiedSlots.first(),
+      "The PC rendered no occupied slot. Either the page failed to load its boxes, " +
+        "or TEST_USERNAME's PC is empty — these tests need an account holding at " +
+        "least two Pokemon. Seed it rather than letting this suite skip.",
+    ).toBeVisible({ timeout: 15_000 })
   })
 
-  test("PC page loads at /smartrotom/pc", { tag: "@smoke" }, async ({ page }) => {
-    await expect(page).toHaveURL(/\/smartrotom\/pc/)
-  })
-
-  test("page title is visible when PC loads", async ({ pcPage }) => {
+  test("PC page loads at /smartrotom/pc", { tag: "@smoke" }, async ({ pcPage }) => {
     await expect(pcPage.title).toBeVisible()
   })
 
-  test(
-    "drag ghost appears and follows pointer during drag",
-    { tag: "@touch" },
-    async ({ pcPage, page }) => {
-      const slots = await pcPage.pokemonSlots.count()
+  test("the ghost appears past the threshold and follows the pointer", { tag: "@touch" }, async ({
+    pcPage,
+    page,
+  }) => {
+    const slot = pcPage.occupiedSlots.first()
 
-      // Skip if no Pokemon in PC (empty storage)
-      if (slots === 0) {
-        test.skip()
-      }
+    // Below DRAG_THRESHOLD_PX (7) this is a click, not a drag: no ghost.
+    const box = await slot.boundingBox()
+    expect(box, "the first occupied slot has no bounding box").not.toBeNull()
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+    await page.mouse.down()
+    await page.mouse.move(box!.x + box!.width / 2 + 3, box!.y + box!.height / 2 + 3)
+    await expect(
+      pcPage.dragGhost,
+      "a 4px move is under the 7px threshold and must not start a drag",
+    ).toHaveCount(0)
 
-      // Find first non-empty slot by checking for any visible content
-      let sourceSlot = null
-      for (let i = 0; i < Math.min(10, slots); i++) {
-        const slot = pcPage.pokemonSlots.nth(i)
-        const isVisible = await slot.isVisible()
-        if (isVisible) {
-          sourceSlot = slot
-          break
-        }
-      }
+    // Past it, the ghost exists...
+    await page.mouse.move(box!.x + box!.width / 2 + 60, box!.y + box!.height / 2 + 60, { steps: 8 })
+    await expect(pcPage.dragGhost).toBeVisible()
+    const first = await pcPage.ghostPosition()
+    expect(first).not.toBeNull()
 
-      if (!sourceSlot) {
-        test.skip()
-      }
+    // ...and tracks the pointer. Asserting only that it is visible would pass
+    // against a ghost pinned at 0,0, which is the interesting way for this to break.
+    await page.mouse.move(box!.x + box!.width / 2 + 200, box!.y + box!.height / 2 + 140, { steps: 8 })
+    const second = await pcPage.ghostPosition()
+    expect(second).not.toBeNull()
+    expect(
+      Math.hypot(second!.x - first!.x, second!.y - first!.y),
+      "the ghost did not move with the pointer",
+    ).toBeGreaterThan(50)
 
-      // sourceSlot is now guaranteed to be not null (type assertion needed for TS)
-      // Start drag: pointer down
-      await sourceSlot!.dispatchEvent("pointerdown", {
-        button: 0,
-        isPrimary: true,
-        pointerId: 1,
-      })
+    // Release over the slot it came from: validate() sees an unchanged position,
+    // so nothing is written even if a drop is registered.
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2, { steps: 4 })
+    await page.mouse.up()
+    await expect(pcPage.dragGhost).toHaveCount(0)
+  })
 
-      // Move pointer beyond drag threshold (7px)
-      await page.mouse.move(100, 100)
-      await sourceSlot!.dispatchEvent("pointermove", {
-        clientX: 100,
-        clientY: 100,
-      })
+  test("pointercancel aborts the drag", { tag: "@touch" }, async ({ pcPage, page }) => {
+    const slot = pcPage.occupiedSlots.first()
+    await pcPage.startDragFrom(slot)
 
-      // Ghost may appear (depends on implementation details)
-      // At minimum, no error should occur during drag
-      const dragGhost = pcPage.dragGhost
-      // If ghost is visible, it should have contents
-      const ghostVisible = await dragGhost.isVisible().catch(() => false)
-      if (ghostVisible) {
-        await expect(dragGhost).toBeVisible()
-      }
+    // Proving the drag STARTED is the half the old test skipped, and without it
+    // "the ghost is gone" is true of a gesture that never began — so the test
+    // passed with the pointercancel handler deleted, which is the bug it guards.
+    await expect(pcPage.dragGhost, "the drag never started, so the abort proves nothing").toBeVisible()
 
-      // End drag
-      await sourceSlot!.dispatchEvent("pointerup")
+    // The browser revokes a pointer to scroll or zoom and no pointerup follows.
+    // DragProvider listens on window, so dispatching anywhere reaches it.
+    await page.evaluate(() => {
+      window.dispatchEvent(new PointerEvent("pointercancel", { bubbles: true }))
+    })
 
-      // Ghost should disappear
-      if (ghostVisible) {
-        // Give it time to fade
-        await page.waitForTimeout(100)
-        const stillVisible = await dragGhost.isVisible().catch(() => false)
-        expect(stillVisible).toBe(false)
-      }
-    },
-  )
+    await expect(pcPage.dragGhost, "a cancelled gesture left the ghost on screen").toHaveCount(0)
 
-  test(
-    "drag can be cancelled mid-gesture (pointercancel)",
-    { tag: "@touch" },
-    async ({ pcPage, page }) => {
-      const slots = await pcPage.pokemonSlots.count()
-      if (slots === 0) {
-        test.skip()
-      }
+    // An abort is not a drop: releasing afterwards must not commit anything.
+    await page.mouse.up()
+    await expect(pcPage.dragGhost).toHaveCount(0)
+  })
 
-      let sourceSlot = null
-      for (let i = 0; i < Math.min(10, slots); i++) {
-        const slot = pcPage.pokemonSlots.nth(i)
-        const isVisible = await slot.isVisible()
-        if (isVisible) {
-          sourceSlot = slot
-          break
-        }
-      }
+  test("a secondary button does not start a drag", { tag: "@touch" }, async ({ pcPage, page }) => {
+    const slot = pcPage.occupiedSlots.first()
+    const box = await slot.boundingBox()
+    expect(box).not.toBeNull()
 
-      if (!sourceSlot) {
-        test.skip()
-      }
+    // The old version pressed the right button and never moved, so no drag could
+    // have started whatever the guard did. The move past the threshold is what
+    // makes this a test of startsDrag() rather than of arithmetic.
+    await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2)
+    await page.mouse.down({ button: "right" })
+    await page.mouse.move(box!.x + box!.width / 2 + 80, box!.y + box!.height / 2 + 80, { steps: 8 })
 
-      // sourceSlot is now guaranteed to be not null (type assertion needed for TS)
-      // Start drag
-      await sourceSlot!.dispatchEvent("pointerdown", {
-        button: 0,
-        isPrimary: true,
-      })
-
-      // Move past threshold
-      await page.mouse.move(100, 100)
-
-      // Cancel the gesture (simulates browser interruption, e.g., context menu)
-      // This should abort the drag without completing a drop
-      await sourceSlot!.dispatchEvent("pointercancel")
-
-      // No error should occur, and the drag should be aborted
-      const ghostVisible = await pcPage.dragGhost.isVisible().catch(() => false)
-      expect(ghostVisible).toBe(false)
-    },
-  )
-
-  test(
-    "non-primary pointer events are ignored",
-    { tag: "@touch" },
-    async ({ pcPage }) => {
-      const slots = await pcPage.pokemonSlots.count()
-      if (slots === 0) {
-        test.skip()
-      }
-
-      const slot = pcPage.pokemonSlots.first()
-
-      // Right-click (button 2) should not start a drag
-      await slot.dispatchEvent("pointerdown", {
-        button: 2, // secondary button
-        isPrimary: false,
-      })
-
-      // Drag ghost should not appear
-      const ghostVisible = await pcPage.dragGhost.isVisible().catch(() => false)
-      expect(ghostVisible).toBe(false)
-    },
-  )
+    await expect(pcPage.dragGhost, "a right-button press started a drag").toHaveCount(0)
+    await page.mouse.up({ button: "right" })
+  })
 })
 
 test.describe("SmartRotom PC — multi-select drag", () => {
+  test.skip(!HAVE_CREDENTIALS, "TEST_USERNAME / TEST_PASSWORD are unset.")
+
   test.beforeEach(async ({ pcPage, page }) => {
-    try {
-      await pcPage.goto()
-      const url = page.url()
-      if (!url.includes("/pc")) {
-        test.skip()
-      }
-    } catch {
-      test.skip()
-    }
+    await pcPage.goto()
+    await expect(page).toHaveURL(/\/smartrotom\/pc/)
+    await expect(
+      pcPage.occupiedSlots.nth(1),
+      "these tests need TEST_USERNAME's PC to hold at least two Pokemon.",
+    ).toBeVisible({ timeout: 15_000 })
   })
 
-  test(
-    "multi-select mode drag shows item count",
-    { tag: "@touch" },
-    async ({ pcPage, page }) => {
-      const slots = await pcPage.pokemonSlots.count()
-      if (slots < 2) {
-        test.skip()
-      }
+  test("dragging a selection carries its count", { tag: "@touch" }, async ({ pcPage, page }) => {
+    // Multi-select is a real mode, not an optional nicety: without it the
+    // selection is empty and the badge can never render, so a missing button is
+    // a failure rather than a reason to proceed and assert nothing.
+    await expect(
+      pcPage.multiSelectButton,
+      "no multi-select control on the PC — the badge below cannot be reached without it",
+    ).toBeVisible()
+    await pcPage.multiSelectButton.click()
 
-      // Enable multi-select (usually Ctrl/Cmd+M or via button)
-      // This is app-specific; adjust based on actual PC UI
-      const multiButton = pcPage.multiSelectButton
-      const buttonVisible = await multiButton.isVisible().catch(() => false)
-      if (buttonVisible) {
-        await multiButton.click()
-      }
+    await pcPage.occupiedSlots.nth(0).click()
+    await pcPage.occupiedSlots.nth(1).click()
 
-      // Select at least 2 Pokemon
-      const slot1 = pcPage.pokemonSlots.nth(0)
-      const slot2 = pcPage.pokemonSlots.nth(1)
+    await pcPage.startDragFrom(pcPage.occupiedSlots.nth(0))
 
-      await slot1.click({ modifiers: ["Control"] })
-      await slot2.click({ modifiers: ["Control"] })
+    await expect(pcPage.dragGhost).toBeVisible()
+    await expect(
+      pcPage.dragCount,
+      "a multi-drag showed no count badge, so the selection was not carried",
+    ).toHaveText("2")
 
-      // Drag from first slot
-      // The ghost should show a count badge when multiple items are dragged
-      // This verifies the multi-drag code path works end-to-end
-      await slot1.dispatchEvent("pointerdown", {
-        button: 0,
-        isPrimary: true,
-      })
-
-      await page.mouse.move(100, 100)
-
-      // Check for count badge (implementation detail, may need adjustment)
-      const ghostVisible = await pcPage.dragGhost.isVisible().catch(() => false)
-      // Any state is acceptable — the test verifies the gesture completes without error
-      expect(typeof ghostVisible).toBe("boolean")
-    },
-  )
+    // Abort rather than drop: a committed multi-move would rearrange the account.
+    await page.evaluate(() => {
+      window.dispatchEvent(new PointerEvent("pointercancel", { bubbles: true }))
+    })
+    await page.mouse.up()
+    await expect(pcPage.dragGhost).toHaveCount(0)
+  })
 })

@@ -260,8 +260,14 @@ jobs:
   #
   # To make this blocking, set these repository secrets and delete the
   # `continue-on-error` line below:
-  #   BASE_URL              — the deployed environment to test (playwright.config.ts
-  #                           otherwise defaults to https://ficuslab.es)
+  #   BASE_URL              — the deployed environment to test. REQUIRED for this
+  #                           job to mean anything: playwright.config.ts defaults
+  #                           to http://localhost:3000 and starts `pnpm dev`, so
+  #                           with BASE_URL unset this suite tests a local server,
+  #                           not a deployment. It used to default to production,
+  #                           which made the readiness probe pass instantly and
+  #                           ran the whole suite — sign-in and PC drags included —
+  #                           against live data.
   #   NEXT_PUBLIC_API       — the API that environment talks to
   #   NEXT_PUBLIC_MC_WORLD  — the Minecraft world the SmartRotom specs assert against
   #   TEST_USERNAME / TEST_PASSWORD              — an ordinary player account

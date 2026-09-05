@@ -225,6 +225,14 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
       {children}
       {drag?.active && drag.items[0] && (
         <div
+          // The ghost's only stable identity. Its classes are all Tailwind
+          // utilities that other elements share -- the e2e page object used to
+          // locate it as `[class*='drag-ghost']`, a class that has never existed
+          // here, falling back to the first `drop-shadow` on the page. So every
+          // "the ghost is gone" assertion passed against an element that was
+          // never the ghost, including the one guarding the pointercancel abort.
+          // Rendered only while `drag.active`, so its presence IS the state.
+          data-pc-drag-ghost=""
           className="pointer-events-none fixed z-[9999] h-[4.875rem] w-[4.875rem] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] scale-105 drop-shadow-[0_12px_14px_rgb(0_0_0_/_.6)]"
           style={{ left: drag.x, top: drag.y }}
         >
@@ -235,7 +243,9 @@ export function DragProvider({ children, monAt, onDropSingle, onDropMany, valida
             className="h-full w-full"
           />
           {drag.multi && drag.items.length > 1 && (
-            <span className="absolute -right-2 -top-2 flex h-[1.375rem] min-w-[1.375rem] items-center justify-center rounded-pc-pill bg-pc-cyan px-1 font-pc-mono text-xs font-extrabold text-[#06222a] shadow-[0_4px_10px_rgb(0_0_0_/_.4)]">
+            <span
+              data-pc-drag-count={drag.items.length}
+              className="absolute -right-2 -top-2 flex h-[1.375rem] min-w-[1.375rem] items-center justify-center rounded-pc-pill bg-pc-cyan px-1 font-pc-mono text-xs font-extrabold text-[#06222a] shadow-[0_4px_10px_rgb(0_0_0_/_.4)]">
               {drag.items.length}
             </span>
           )}
