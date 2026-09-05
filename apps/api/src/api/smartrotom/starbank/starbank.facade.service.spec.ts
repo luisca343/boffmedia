@@ -1,4 +1,18 @@
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenError } from '@/common/errors/domain-error';
+
+/**
+ * A5: services throw DOMAIN errors, not Nest HTTP exceptions -- the global
+ * filter is what turns one into a response. Asserting the class alone would
+ * still pass if the error carried a 500, so `expectForbidden` also asserts the
+ * status the filter will read off it. That is the part a user feels.
+ */
+async function expectForbidden(p: Promise<unknown>): Promise<void> {
+  await expect(p).rejects.toBeInstanceOf(ForbiddenError);
+  await p.catch((e) => {
+    expect((e as ForbiddenError).statusCode).toBe(403);
+    expect((e as ForbiddenError).code).toBe('BANK_ACCOUNT_NOT_YOURS');
+  });
+}
 import { Test, TestingModule } from '@nestjs/testing';
 import { StarbankFacadeService } from './starbank.facade.service';
 import { StarbankAccountService } from './services/starbank-account.service';
@@ -430,17 +444,13 @@ describe('StarbankFacadeService', () => {
     it('refuses an account the caller does not own', async () => {
       accountService.getUserAccounts.mockResolvedValue([{ id: 99 }] as any);
 
-      await expect(service.getTransactions(1, 50, OWNER)).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expectForbidden(service.getTransactions(1, 50, OWNER));
       // The read must not happen at all, not merely be discarded afterwards.
       expect(transactionService.getAccountTransactions).not.toHaveBeenCalled();
     });
 
     it('refuses when no caller is supplied', async () => {
-      await expect(service.getTransactions(1, 50)).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expectForbidden(service.getTransactions(1, 50));
       expect(transactionService.getAccountTransactions).not.toHaveBeenCalled();
     });
   });
@@ -465,9 +475,7 @@ describe('StarbankFacadeService', () => {
     it('refuses an account the caller does not own', async () => {
       accountService.getUserAccounts.mockResolvedValue([{ id: 99 }] as any);
 
-      await expect(service.getTransfers(1, 'test-uuid-1234')).rejects.toThrow(
-        ForbiddenException,
-      );
+      await expectForbidden(service.getTransfers(1, 'test-uuid-1234'));
       expect(transactionService.getAccountTransfers).not.toHaveBeenCalled();
     });
 

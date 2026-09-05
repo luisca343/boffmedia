@@ -1,4 +1,6 @@
-import { ForbiddenException, HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
+import { ForbiddenError } from '@/common/errors/domain-error';
+import { ApiErrorCode } from '@/common/errors/error-codes.generated';
 import { StarbankAccountService } from './services/starbank-account.service';
 import { StarbankTransactionService } from './services/starbank-transaction.service';
 import { WingullFacadeService } from '../wingull/wingull.facade.service';
@@ -306,7 +308,10 @@ export class StarbankFacadeService {
   ): Promise<void> {
     const owned = await this.accountService.getUserAccounts(callerUuid);
     if (!owned.some((a) => a.id === accountId)) {
-      throw new ForbiddenException('That account does not belong to you.');
+      throw new ForbiddenError(
+        ApiErrorCode.BANK_ACCOUNT_NOT_YOURS,
+        'That account does not belong to you.',
+      );
     }
   }
 
@@ -320,7 +325,10 @@ export class StarbankFacadeService {
     // which is the change most likely to be "fixed" by passing undefined. A
     // missing caller is refused instead.
     if (!callerUuid) {
-      throw new ForbiddenException('A session is required to read an account.');
+      throw new ForbiddenError(
+        ApiErrorCode.BANK_ACCOUNT_NOT_YOURS,
+        'A session is required to read an account.',
+      );
     }
     await this.assertOwnsAccount(account, callerUuid);
     return await this.transactionService.getAccountTransactions(account, limit);
@@ -338,7 +346,10 @@ export class StarbankFacadeService {
     callerUuid?: string,
   ): Promise<StarBankTransaction[]> {
     if (!callerUuid) {
-      throw new ForbiddenException('A session is required to read an account.');
+      throw new ForbiddenError(
+        ApiErrorCode.BANK_ACCOUNT_NOT_YOURS,
+        'A session is required to read an account.',
+      );
     }
     await this.assertOwnsAccount(account, callerUuid);
     return await this.transactionService.getAccountTransfers(account, 10);

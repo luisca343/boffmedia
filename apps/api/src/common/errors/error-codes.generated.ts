@@ -18,6 +18,7 @@ export const ApiErrorCode = {
   AUTH_TWO_FACTOR_REQUIRED: 'AUTH_TWO_FACTOR_REQUIRED',
   AUTH_TWO_FACTOR_UNAVAILABLE: 'AUTH_TWO_FACTOR_UNAVAILABLE',
   BANK_ACCOUNT_NOT_OWNED: 'BANK_ACCOUNT_NOT_OWNED',
+  BANK_ACCOUNT_NOT_YOURS: 'BANK_ACCOUNT_NOT_YOURS',
   BANK_AMOUNT_NOT_POSITIVE: 'BANK_AMOUNT_NOT_POSITIVE',
   BANK_BALANCE_ADJUST_FAILED: 'BANK_BALANCE_ADJUST_FAILED',
   BANK_INSUFFICIENT_FUNDS: 'BANK_INSUFFICIENT_FUNDS',
@@ -99,6 +100,7 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
     'La verificación en dos pasos no está disponible en este servidor. Avisa a un administrador.',
   BANK_ACCOUNT_NOT_OWNED:
     'No puedes transferir desde una cuenta que no es tuya.',
+  BANK_ACCOUNT_NOT_YOURS: 'Esa cuenta no es tuya.',
   BANK_AMOUNT_NOT_POSITIVE: 'El importe debe ser mayor que cero.',
   BANK_BALANCE_ADJUST_FAILED: 'No se pudo ajustar el saldo.',
   BANK_INSUFFICIENT_FUNDS: 'Saldo insuficiente.',

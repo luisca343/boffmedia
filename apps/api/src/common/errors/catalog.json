@@ -97,6 +97,10 @@
       "es": "No hay nadie más en el chat para llamar.",
       "where": "smartrotom/chatapp/services/call.service.ts"
     },
+    "BANK_ACCOUNT_NOT_YOURS": {
+      "es": "Esa cuenta no es tuya.",
+      "where": "smartrotom/starbank/starbank.facade.service.ts"
+    },
     "CHAT_GROUP_NO_ACCESS": {
       "es": "No tienes acceso a este grupo.",
       "where": "smartrotom/chatapp/services/group.service.ts"
