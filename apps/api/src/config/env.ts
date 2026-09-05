@@ -190,6 +190,21 @@ export const envSchema = z
     // derive it from the incoming request (x-forwarded-proto/host), which is
     // right in dev and behind a well-configured proxy, wrong behind a bad one.
     DESKTOP_UPDATE_BASE_URL: z.string().optional(),
+    // D15. The ed25519 PRIVATE key that signs pack manifests, base64 PKCS#8
+    // DER. Generate one with `node scripts/generate-pack-signing-key.mjs`.
+    //
+    // Optional, and the launcher does not verify yet -- that ORDER is the whole
+    // design. A client that requires a signature ahead of a server that
+    // produces one bricks every install in the field, so the server signs for a
+    // full release cycle before any launcher checks. Unset means the signed
+    // endpoint answers 503; it never serves an unsigned body from a signed
+    // route, because a client that later trusts that route would accept it.
+    //
+    // Asymmetric on purpose: the public half is served at
+    // GET /packs/launcher/manifest-key and it does not matter who reads it. A
+    // symmetric secret compiled into a downloadable binary -- the second of
+    // four reverted attempts at D15 -- defends against nobody.
+    PACK_SIGNING_PRIVATE_KEY: z.string().optional(),
 
     // Browser / manga scraper
     CHROME_PATH: z.string().optional(),

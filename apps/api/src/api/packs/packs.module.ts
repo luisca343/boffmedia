@@ -20,6 +20,7 @@ import { PacksController } from './packs.controller';
 import { PacksDesktopController } from './packs-desktop.controller';
 import { PacksRepository } from './packs.repository';
 import { PacksService } from './packs.service';
+import { ManifestSigningService } from './services/manifest-signing.service';
 import { AuditService } from '@api/_repositories/audit.service';
 
 @Module({
@@ -52,6 +53,9 @@ import { AuditService } from '@api/_repositories/audit.service';
 
     PacksRepository,
     PacksService,
+    // D15. Reads PACK_SIGNING_PRIVATE_KEY once at construction; inert without
+    // it, and the signed route 503s rather than serving an unsigned body.
+    ManifestSigningService,
     PacksAuthService,
     DesktopDeviceRepository,
     DesktopDeviceService,

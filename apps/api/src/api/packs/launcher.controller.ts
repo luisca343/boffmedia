@@ -12,6 +12,7 @@ import {
   Query,
   Req,
   Res,
+  ServiceUnavailableException,
   StreamableFile,
   UseGuards,
 } from '@nestjs/common';
@@ -46,6 +47,8 @@ import {
   DesktopSessionUserEntity,
 } from './entities/packs.entity';
 import { DesktopDeviceService } from './desktop-device.service';
+import { ManifestSigningService } from './services/manifest-signing.service';
+import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 import { env } from '@/config/env';
 import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
@@ -68,6 +71,7 @@ export class LauncherController {
     private readonly device: DesktopDeviceService,
     private readonly packs: PacksService,
     private readonly downloads: PacksDownloadsService,
+    private readonly signing: ManifestSigningService,
   ) {}
 
   // Throttled by IP: these are unauthenticated and each one writes a row.
@@ -210,6 +214,105 @@ export class LauncherController {
       query.password ?? null,
       this.capabilitiesFrom(gameTypes),
     );
+  }
+
+  /**
+   * The ed25519 public key that verifies a signed manifest. D15.
+   *
+   * Deliberately unauthenticated and deliberately boring: a verification key is
+   * public by construction, and a launcher that cannot reach it before it has a
+   * session would be unable to verify its first install.
+   */
+  @Get('manifest-key')
+  @Public()
+  @ApiOperation({
+    summary: 'La clave pública que verifica un manifiesto firmado',
+    description:
+      'ed25519, SPKI DER en base64. 503 mientras PACK_SIGNING_PRIVATE_KEY no esté configurada.',
+  })
+  manifestKey(): { alg: 'ed25519'; publicKey: string } {
+    const publicKey = this.signing.publicKey();
+    if (!publicKey) {
+      throw new ServiceUnavailableException(
+        'La firma de manifiestos no está configurada en este servidor.',
+      );
+    }
+    return { alg: 'ed25519', publicKey };
+  }
+
+  /**
+   * The manifest as SIGNED BYTES. D15.
+   *
+   * A SEPARATE ROUTE, not a header bolted onto `packs/:id/manifest`, and that is
+   * the design rather than an accident. Two reasons:
+   *
+   *  1. The existing route goes through `ResponseInterceptor`, which wraps it as
+   *     `{ success, statusCode, data }`. A client verifying a signature over
+   *     "the manifest" would have to pull `data` back out of a parsed envelope
+   *     and re-serialise it — and `serde_json` and `JSON.stringify` disagree on
+   *     key order and escaping, so the bytes would differ and every signature
+   *     would fail. Silently, at install time, on a user's machine. That is the
+   *     mistake that killed the third attempt at D15.
+   *  2. The launcher in the field keeps working, untouched, for a full release
+   *     cycle. Nothing verifies yet. A client that REQUIRED a signature before
+   *     the server produced one is the mistake that killed the first attempt.
+   *
+   * So this sends the manifest as a raw JSON body with no envelope, and signs
+   * exactly those bytes. `X-Boff-Manifest-Signature` covers the response body
+   * verbatim: a client must verify what it RECEIVED, before parsing, never what
+   * it parsed.
+   */
+  @Get('packs/:id/manifest.signed')
+  @Public()
+  @UseGuards(DesktopAuthGuard)
+  @SkipEnvelope()
+  @ApiBearerAuth('JWT')
+  @ApiOperation({
+    summary: 'El manifiesto firmado, sin envoltorio',
+    description:
+      'Cuerpo JSON crudo (sin `{success,statusCode,data}`) más la cabecera X-Boff-Manifest-Signature (ed25519, base64) sobre esos bytes exactos. 503 si el servidor no tiene clave: nunca devuelve un cuerpo sin firmar desde esta ruta.',
+  })
+  async signedManifest(
+    @Param('id') id: string,
+    @Query() query: ManifestQueryDto,
+    @Req() req: DesktopRequest,
+    @Res() res: Response,
+    @Headers('x-boff-game-types') gameTypes?: string,
+  ): Promise<void> {
+    if (!this.signing.enabled) {
+      // 503 rather than falling back to an unsigned body. A launcher that
+      // trusts this route would otherwise accept an unsigned manifest, which is
+      // worse than having no signature at all.
+      throw new ServiceUnavailableException(
+        'La firma de manifiestos no está configurada en este servidor.',
+      );
+    }
+
+    const manifest = await this.packs.manifestFor(
+      this.principalOf(req),
+      id,
+      query.password ?? null,
+      this.capabilitiesFrom(gameTypes),
+    );
+
+    // Serialise ONCE. The bytes that get signed and the bytes that get sent are
+    // the same Buffer, so there is no second serialisation to disagree with the
+    // first — which is the entire failure mode this route exists to avoid.
+    const body = Buffer.from(JSON.stringify(manifest), 'utf8');
+    const signature = this.signing.sign(body);
+    if (!signature) {
+      throw new ServiceUnavailableException(
+        'La firma de manifiestos no está configurada en este servidor.',
+      );
+    }
+
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('X-Boff-Manifest-Signature', signature);
+    res.setHeader('X-Boff-Manifest-Signature-Alg', 'ed25519');
+    // No compression, no transform: anything that rewrites these bytes on the
+    // way out breaks the signature for a client that verifies the raw body.
+    res.setHeader('Cache-Control', 'no-transform, private, max-age=0');
+    res.end(body);
   }
 
   // ── Downloads (an install is blocked without these) ──────────────────────
