@@ -120,6 +120,31 @@ export class SocketsGateway
     return client.emit('smartrotom:connection', { ...smartRotomUser, uuid });
   }
 
+  /**
+   * Emit to EVERY socket one uuid currently holds, and to nobody else.
+   *
+   * Use this instead of `server.emit` for anything addressed to one player.
+   * `server.emit` reaches every connected socket, which turns a per-player
+   * signal into two problems at once: every other client acts on it (an
+   * invalidation broadcast makes N clients refetch for one player's change),
+   * and the payload is delivered to people it was never about.
+   *
+   * It walks `socketsOf`, not `users`, because a player with two tabs holds
+   * two sockets and `users` keeps only one of them — the same distinction
+   * N12 was about.
+   *
+   * Returns the number of sockets written to, so a caller can tell "delivered"
+   * from "that player is not connected" rather than assuming.
+   */
+  emitToUuid(uuid: string, event: string, payload: unknown): number {
+    const sockets = this.socketsOf.get(uuid);
+    if (!sockets?.size) return 0;
+    for (const socketId of sockets) {
+      this.server.to(socketId).emit(event, payload);
+    }
+    return sockets.size;
+  }
+
   handleDisconnect(client: Socket) {
     this.logger.log(`Client with ID ${client.id} disconnected`);
 

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { Logger } from 'nestjs-pino';
 import { PokedexManagementService } from './pokedex-management.service';
+import { PokedexSocketsService } from './pokedex-sockets.service';
 import { PokemonDataManagementService } from './pokemon-data-management.service';
 import { POKEMON_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
@@ -26,6 +27,10 @@ const mockLogger = { log: jest.fn(), warn: jest.fn(), error: jest.fn() };
 
 describe('PokedexManagementService', () => {
   let service: PokedexManagementService;
+  const mockPokedexSockets = {
+    emitCapture: jest.fn(),
+    emitDexUpdate: jest.fn(),
+  };
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -36,6 +41,10 @@ describe('PokedexManagementService', () => {
         { provide: Logger, useValue: mockLogger },
         { provide: POKEMON_REPOSITORY_TOKEN, useValue: mockRepo },
         { provide: PokemonDataManagementService, useValue: mockDataManagement },
+        // S1: registerPokemon/bulkUpdateDex now tell the owner's clients to
+        // refetch. Faked here so this suite keeps testing the write logic;
+        // the emission itself is covered by pokedex-sockets.service.spec.
+        { provide: PokedexSocketsService, useValue: mockPokedexSockets },
       ],
     }).compile();
 

@@ -1,4 +1,4 @@
-import { HttpException, Injectable, Inject } from '@nestjs/common';
+import { HttpException, Injectable, Inject, forwardRef } from '@nestjs/common';
 import {
   PokedexRegistryData,
   PokedexStatistics,
@@ -7,6 +7,7 @@ import {
   BulkUpdateResult,
 } from '../repositories/pokemon.repository';
 import { PokemonDataManagementService } from './pokemon-data-management.service';
+import { PokedexSocketsService } from './pokedex-sockets.service';
 import { POKEMON_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import { IPokemonRepository } from '../repositories/interfaces/pokemon.repository.interface';
 import { Logger } from 'nestjs-pino';
@@ -28,6 +29,8 @@ export class PokedexManagementService {
     @Inject(POKEMON_REPOSITORY_TOKEN)
     private readonly pokemonRepository: IPokemonRepository,
     private readonly pokemonDataService: PokemonDataManagementService,
+    @Inject(forwardRef(() => PokedexSocketsService))
+    private readonly pokedexSocketsService: PokedexSocketsService,
   ) {}
 
   async registerPokemon(
@@ -67,6 +70,10 @@ export class PokedexManagementService {
         if (result.success) {
           // Clear cache for this user
           delete this.dexCache[uuid];
+          // Emit socket event if this is a capture (status === 1)
+          if (status === 1) {
+            this.pokedexSocketsService.emitCapture(uuid, pokemonId, formId);
+          }
           return {
             success: true,
             message: 'Pokemon registered successfully',
@@ -91,6 +98,8 @@ export class PokedexManagementService {
         if (updateResult.success) {
           // Clear cache for this user
           delete this.dexCache[uuid];
+          // Emit socket event for this new catch
+          this.pokedexSocketsService.emitCapture(uuid, pokemonId, formId);
           return {
             success: true,
             message: 'Pokemon status updated to caught',
@@ -218,6 +227,16 @@ export class PokedexManagementService {
       delete this.dexCache[uuid];
 
       this.logger.log('POKEDEX UPDATE COMPLETED', results);
+
+      // Emit socket event if any changes were made
+      if (
+        results.inserted.seen > 0 ||
+        results.inserted.caught > 0 ||
+        results.updated > 0
+      ) {
+        this.pokedexSocketsService.emitDexUpdate(uuid);
+      }
+
       return {
         success: true,
         message: 'Pokedex updated successfully',

@@ -3,8 +3,11 @@ import { usePokemonStore } from "@/stores/pokemonStore"
 import type { PokedexData } from "@/types/pokedex"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { PokedexStatus } from "@/app/smartrotom/pokedex/dexUtils"
+import { usePokedexSockets } from "@/app/smartrotom/pokedex/_hooks/usePokedexSockets"
 
 export function usePokedexData() {
+  // Subscribe to Pokédex socket events so captures invalidate the cache
+  usePokedexSockets()
   const uuid = useRotomUuid()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)

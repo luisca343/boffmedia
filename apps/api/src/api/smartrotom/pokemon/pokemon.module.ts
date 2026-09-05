@@ -22,6 +22,7 @@ import { PokemonShowdownService } from './services/pokemon-showdown.service';
 import { PokemonDataManagementService } from './services/pokemon-data-management.service';
 import { PokedexManagementService } from './services/pokedex-management.service';
 import { PokemonIntegrationService } from './services/pokemon-integration.service';
+import { PokedexSocketsService } from './services/pokedex-sockets.service';
 
 // Import facade service
 import { PokemonFacadeService } from './pokemon.facade.service';
@@ -63,6 +64,7 @@ const logger = pino({ name: 'util' });
     // Domain services
     PokemonDataManagementService,
     PokedexManagementService,
+    PokedexSocketsService,
     PokemonIntegrationService, // This needs WingullFacadeService
 
     // Facade service
