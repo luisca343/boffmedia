@@ -49,7 +49,7 @@ const NAV_META: { labelKey: string; items: { id: string; labelKey: string; icon:
     labelKey: "account",
     items: [
       { id: "security", labelKey: "security", icon: "shield" },
-      { id: "audit", labelKey: "audit", icon: "clipboard-list" },
+      { id: "audit", labelKey: "audit", icon: "list" },
     ],
   },
   {

@@ -4,11 +4,30 @@ import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Icon, Spinner, Empty } from "@boffmedia/ui"
 import { AvSectionHead, formatAdminDate } from "../_components/ui/av-kit"
-import { boffPOST } from "@/services/boffAPI"
-import type { BoffMediaAuditRow } from "@boffmedia/shared"
+import { apiAuthedAutoGET } from "@/services/boffAPI"
+
+/**
+ * The wire shape of one `boffmedia_audit` row.
+ *
+ * Declared here rather than imported: the API's own `BoffMediaAuditRow` is a
+ * Drizzle `$inferSelect` over the table, so it is a database type, not a
+ * contract — and it is not exported from `@boffmedia/shared` at all. The first
+ * version of this file imported it from there anyway and did not compile.
+ */
+interface AuditRow {
+  id: number
+  subjectType: string
+  subjectId: number
+  /** Dotted action, e.g. `event.status`, `match.amend`. */
+  action: string
+  /** null for system jobs, which act with no Boffmedia account. */
+  actorUserId: number | null
+  meta: Record<string, unknown> | null
+  at: string
+}
 
 interface AuditLogsResponse {
-  data: BoffMediaAuditRow[]
+  data: AuditRow[]
   total: number
 }
 
@@ -24,7 +43,7 @@ const SUBJECT_TYPES = {
 
 export function AuditAdmin() {
   const t = useTranslations("admin.audit")
-  const [logs, setLogs] = useState<BoffMediaAuditRow[]>([])
+  const [logs, setLogs] = useState<AuditRow[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<{ subjectType?: string }>({})
@@ -40,10 +59,12 @@ export function AuditAdmin() {
         offset: String(offset),
         ...(filter.subjectType && { subjectType: filter.subjectType }),
       })
-      const response = await boffPOST<AuditLogsResponse>(
-        `/boffmedia/audit/logs?${params}`
+      // GET, not POST: the controller declares `@Get('logs')`. The first
+      // version posted to it, so the viewer could never have loaded a row.
+      const response = await apiAuthedAutoGET<AuditLogsResponse>(
+        `/boffmedia/audit/logs?${params}`,
       )
-      setLogs(response.data)
+      setLogs(response.data?.data ?? [])
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err))
     } finally {
@@ -71,7 +92,7 @@ export function AuditAdmin() {
       <div>
         <AvSectionHead title={t("title")} desc={t("desc")} />
         <Empty
-          icon="alert-circle"
+          icon="alert"
           title={t("loadFailed")}
           lead={error}
         />
