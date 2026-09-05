@@ -89,6 +89,18 @@ export default defineConfig({
       // compiled CJS, the same constraint that keeps @boffmedia/pack-schema
       // dual-built. Resolving it per-host here changes nothing for the API.
       "@boffmedia/asset-paths": resolve(__dirname, "../../packages/asset-paths/src"),
+      // Same shape, same reason, and it surfaced the moment asset-paths was
+      // fixed -- which is exactly what the battlesim e2e host's config warns
+      // about: these appear ONE PACKAGE AT A TIME, because Rollup stops at the
+      // first bad import. @boffmedia/pokemon-identity is CJS-only for the same
+      // constraint (apps/api consumes it as compiled CJS in
+      // parse-paste-meta.ts), and the damage calculator started importing
+      // `toID` from it, so `dist/cjs/index.js` is what Rollup was reading.
+      //
+      // The failure is loud here but silent in a dev server: the page goes
+      // blank with `does not provide an export named 'X'` and no React error,
+      // because it happens at module evaluation before anything renders.
+      "@boffmedia/pokemon-identity": resolve(__dirname, "../../packages/pokemon-identity/src"),
     },
   },
   // The schematic tools spawn `new Worker(new URL(...), { type: "module" })`,
