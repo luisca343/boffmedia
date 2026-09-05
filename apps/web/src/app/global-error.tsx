@@ -87,6 +87,13 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 Reintentar / Retry
               </button>
 
+              {/* A plain <a>, deliberately, and not next/link: this boundary
+                  replaces the root layout when the app has already failed, and
+                  a router crash is one of the things it catches. <Link> would
+                  make the last screen a user can still reach depend on the
+                  subsystem that may be the reason they are seeing it. A full
+                  document navigation always works. */}
+              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
               <a
                 href="/"
                 className="roboto-medium inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium h-10 px-4 py-2 border border-line bg-transparent text-txt hover:bg-panel-2/40 shadow-sm hover:shadow-md transition-colors duration-200"

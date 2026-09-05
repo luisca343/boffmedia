@@ -38,6 +38,15 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
   const [voteState, setVoteState] = React.useState<{ voted: boolean; votes: number } | null>(null)
   const [editingId, setEditingId] = React.useState<number | null>(null)
   const [replyKey, setReplyKey] = React.useState(0)
+  // Holds the post awaiting confirmation, so the dialog knows what it is about
+  // to delete and no row has to keep state of its own.
+  //
+  // Declared HERE, with the other hooks, and not beside its handlers further
+  // down: two early returns for the loading and not-found states sit between
+  // the two points, so a render that took either branch skipped this hook and
+  // React saw a different hook order on the next render. It is the kind of
+  // fault that shows up as unrelated state appearing in the wrong place.
+  const [pendingDelete, setPendingDelete] = React.useState<number | null>(null)
 
   const { session, status, isBoffAdmin } = useBoffSession()
   const loggedIn = status === "authenticated"
@@ -158,9 +167,6 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
     })
   }
 
-  // Holds the post awaiting confirmation, so the dialog knows what it is about
-  // to delete and no row has to keep state of its own.
-  const [pendingDelete, setPendingDelete] = React.useState<number | null>(null)
   const handleDelete = (postId: number) => setPendingDelete(postId)
   const confirmDelete = () => {
     const postId = pendingDelete
