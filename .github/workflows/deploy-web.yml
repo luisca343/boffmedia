@@ -53,7 +53,13 @@ jobs:
           echo "NEXT_PUBLIC_SOCKET_URL=${{ secrets.NEXT_PUBLIC_SOCKET_URL }}" >> .env.production.local
           echo "NEXT_PUBLIC_MC_WORLD=${{ secrets.NEXT_PUBLIC_MC_WORLD }}" >> .env.production.local
           echo "NEXT_PUBLIC_URL=${{ secrets.NEXT_PUBLIC_URL }}" >> .env.production.local
-          echo "SECRET=${{ secrets.SECRET }}" >> .env.production.local
+          # NOT `SECRET`. That name was NextAuth v3's; this app is on v4, whose
+          # secret is NEXTAUTH_SECRET — and `authOptions.secret` reads
+          # `env.NEXTAUTH_SECRET` explicitly, so nothing has consulted a bare
+          # SECRET since the migration. It was still being written here, which
+          # made the production env look like it had two secrets and one of them
+          # unused. Removed by scripts/check-env-example.mjs, which flagged it as
+          # a name the deploy writes and no code reads.
           echo "NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }}" >> .env.production.local
           echo "NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }}" >> .env.production.local
           # Twitch: the browser only ever needs the client id (mewtwitch calls the
@@ -66,7 +72,15 @@ jobs:
           echo "NEXT_PUBLIC_TWITCH_CLIENT_ID=${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_ID }}" >> .env.production.local
           echo "TWITCH_CLIENT_ID=${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_ID }}" >> .env.production.local
           echo "TWITCH_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_TWITCH_CLIENT_SECRET }}" >> .env.production.local
-          echo "NEXT_PUBLIC_TERAS_API=${{ secrets.NEXT_PUBLIC_TERAS_API }}" >> .env.production.local
+          # Which database the admin console says it is about to mutate. Unset
+          # falls back to NODE_ENV, which cannot tell staging from production —
+          # so staging labels itself PROD. See admin/_components/ui/av-shell.tsx.
+          echo "NEXT_PUBLIC_ENV=${{ secrets.NEXT_PUBLIC_ENV || 'production' }}" >> .env.production.local
+          # NEXT_PUBLIC_TERAS_API was written here and read by nothing, in any
+          # app or package — a dead name inlined into every browser bundle. Same
+          # class as the NEXT_PUBLIC_TWITCH_CLIENT_SECRET above, found the same
+          # way, by scripts/check-env-example.mjs. The Minecraft-side token the
+          # name suggests is TERAS_API_TOKEN and it lives API-side only.
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v6
