@@ -1,0 +1,285 @@
+# Grafana unified-alerting rules for Boffmedia, as provisioning rather than as a
+# table in a runbook.
+#
+# X11. The runbook has carried these four alerts under a "(TODO)" heading since
+# May, next to a note that SMTP is working and the contact point is tested. The
+# gap was never the thresholds — it was that a table in Markdown cannot be
+# applied. This file can: drop it in Grafana's provisioning directory and the
+# rules exist, identically, on every server that reads it.
+#
+# INSTALL
+#   1. Find the Prometheus datasource UID:
+#        curl -s -u admin:PASSWORD http://localhost:3000/api/datasources \
+#          | jq -r '.[] | select(.type=="prometheus") | .uid'
+#   2. Substitute it — the placeholder below is deliberately not a valid UID, so
+#      a file installed unedited fails loudly instead of evaluating against
+#      nothing:
+#        sed -i "s/PROMETHEUS_DS_UID/<the uid>/g" alerts-boffmedia.yaml
+#   3. Copy and reload:
+#        docker cp alerts-boffmedia.yaml grafana:/etc/grafana/provisioning/alerting/
+#        docker restart grafana
+#   4. Verify in Grafana → Alerting → Alert rules that all four appear under the
+#      "Boffmedia" folder and are in state Normal (not Error / NoData).
+#
+# CONTACT POINT: these carry no `notification_settings`, so they follow the
+# default notification policy. Point that at the tested email contact
+# (luisca343@gmail.com) under Alerting → Notification policies, or add a
+# `notification_settings.receiver` per rule.
+#
+# A NOTE ON `noDataState`. "API container down" uses NoData → Alerting, because
+# for that rule the absence of data IS the incident. The other three use
+# NoData → OK: a deploy restart briefly produces no samples, and three pages
+# every time the API rolls is how a team learns to ignore the alerts.
+#
+# Every `expr` here is checked by scripts/check-metrics-parity.mjs against the
+# metric names the API actually registers, so a rule cannot go on watching a
+# metric that has been renamed away.
+apiVersion: 1
+
+groups:
+  - orgId: 1
+    name: boffmedia-api
+    folder: Boffmedia
+    interval: 1m
+    rules:
+      # ── 1. API error rate high ────────────────────────────────────────
+      - uid: boff-api-error-rate
+        title: API error rate high
+        condition: C
+        for: 5m
+        annotations:
+          summary: More than 1% of API responses are 5xx over the last 5 minutes.
+          runbook_url: docs/runbooks/runbook-prometheus-grafana.md
+          description: >-
+            Check the "Top 5 Erroring Routes" panel on the Boffmedia — Application
+            Overview dashboard to see whether this is one route or all of them.
+        labels:
+          severity: critical
+          service: boffmedia-api
+        noDataState: OK
+        execErrState: Error
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: PROMETHEUS_DS_UID
+            model:
+              refId: A
+              instant: true
+              # Guarded with `or vector(0)`: with no traffic at all both sides
+              # are 0 and the division is NaN, which Grafana reports as
+              # execErrState rather than as "no errors".
+              expr: >-
+                (sum(rate(http_requests_total{status_code=~"5.."}[5m]))
+                 / clamp_min(sum(rate(http_requests_total[5m])), 0.001))
+                or vector(0)
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0.01]
+
+      # ── 2. API container down ─────────────────────────────────────────
+      - uid: boff-api-down
+        title: API container down
+        condition: C
+        for: 2m
+        annotations:
+          summary: Prometheus cannot scrape boffmedia-api.
+          description: >-
+            Either the container is not running or /metrics stopped answering.
+            `docker ps | grep boffmedia-server`, then
+            `curl http://172.17.0.1:34301/metrics | head`.
+        labels:
+          severity: critical
+          service: boffmedia-api
+        # The one rule where missing data is the incident, not a deploy blip.
+        noDataState: Alerting
+        execErrState: Alerting
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: PROMETHEUS_DS_UID
+            model:
+              refId: A
+              instant: true
+              expr: up{job="boffmedia-api"}
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: lt
+                    params: [1]
+
+      # ── 3. DB connections high ────────────────────────────────────────
+      - uid: boff-db-connections
+        title: DB connections above 80% of max
+        condition: C
+        for: 5m
+        annotations:
+          summary: MySQL is using more than 80% of max_connections.
+          description: >-
+            Usually a leak or a slow query holding connections open. Check
+            "MySQL Queries/s" and the API's db_slow_queries_total before raising
+            max_connections — the limit is rarely the actual problem.
+        labels:
+          severity: warning
+          service: mariadb
+        noDataState: OK
+        execErrState: Error
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 600
+              to: 0
+            datasourceUid: PROMETHEUS_DS_UID
+            model:
+              refId: A
+              instant: true
+              expr: >-
+                mysql_global_status_threads_connected
+                / mysql_global_variables_max_connections
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0.8]
+
+      # ── 4. Backup missed ──────────────────────────────────────────────
+      - uid: boff-backup-missed
+        title: Backup missed
+        condition: C
+        for: 10m
+        annotations:
+          summary: The last successful database backup is more than 25 hours old.
+          runbook_url: docs/runbooks/runbook-db-backups.md
+          description: >-
+            25h, not 24h, so an ordinary few-minutes drift in the nightly job's
+            start time does not page anyone.
+        labels:
+          severity: warning
+          service: mariadb
+        noDataState: Alerting
+        execErrState: Error
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 3600
+              to: 0
+            datasourceUid: PROMETHEUS_DS_UID
+            model:
+              refId: A
+              instant: true
+              # Same path the dashboard's "Last Backup Age" panel reads. Needs
+              # node_exporter's --collector.filestat plus a textfile/filestat
+              # path pointing at the backup script's success marker; without it
+              # this is NoData, which is why noDataState is Alerting here.
+              expr: >-
+                time() -
+                node_filestat_modification_time{path="/opt/backups/.last-backup-success"}
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [90000]
+
+  # The API's own instrumentation, which the original four predate: db-metrics.ts
+  # times every query through the mysql2 pool, and retention.service.ts counts
+  # failed nightly sweeps. Both were shipped and then watched by nothing.
+  - orgId: 1
+    name: boffmedia-api-internal
+    folder: Boffmedia
+    interval: 1m
+    rules:
+      - uid: boff-db-slow-queries
+        title: Slow queries rising
+        condition: C
+        for: 10m
+        annotations:
+          summary: The API is logging more than one slow query per second.
+          description: >-
+            db_slow_queries_total is labelled by operation only — the SQL itself
+            is in the API's warn-level log lines, which is where to look next.
+        labels:
+          severity: warning
+          service: boffmedia-api
+        noDataState: OK
+        execErrState: Error
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 900
+              to: 0
+            datasourceUid: PROMETHEUS_DS_UID
+            model:
+              refId: A
+              instant: true
+              expr: sum(rate(db_slow_queries_total[5m]))
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [1]
+
+      - uid: boff-retention-sweep-failing
+        title: Nightly retention sweep failing
+        condition: C
+        for: 5m
+        annotations:
+          summary: The 03:00 retention sweep threw.
+          description: >-
+            This job is what enforces the GDPR deletion window
+            (RETENTION_DELETED_USER_DAYS). A sweep that fails silently means
+            accounts a user asked to erase are still on disk.
+        labels:
+          severity: warning
+          service: boffmedia-api
+        noDataState: OK
+        execErrState: Error
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 86400
+              to: 0
+            datasourceUid: PROMETHEUS_DS_UID
+            model:
+              refId: A
+              instant: true
+              expr: increase(retention_sweep_errors_total[24h])
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              refId: C
+              type: threshold
+              expression: A
+              conditions:
+                - evaluator:
+                    type: gt
+                    params: [0]

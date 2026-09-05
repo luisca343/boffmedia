@@ -1,7 +1,9 @@
 # Runbook: Prometheus + Grafana — Application Monitoring
 
-> **Status**: Partially active — MariaDB metrics live, API metrics pending deploy  
-> **Last updated**: 2026-05-17  
+> **Status**: Active. MariaDB and API metrics live; six alert rules provisionable from
+> `docs/grafana/alerts-boffmedia.yaml`; dashboard and rules kept honest by
+> `scripts/check-metrics-parity.mjs` in the lint chain.  
+> **Last updated**: 2026-09-05 (was 2026-05-17)  
 > **BookStack target**: Infrastructure → DevOps → Runbooks → Prometheus & Grafana
 
 ---
@@ -190,6 +192,10 @@ Verify from off-box: `curl --max-time 5 http://<server-ip>:34301/metrics` → re
 | Last Backup Age | `node_filestat_modification_time` | Live after node_exporter configured |
 | Top 5 Slowest Routes | table, p95 per route | Live after API deploy |
 | Top 5 Erroring Routes | table, error rate per route | Live after API deploy |
+| DB Query p95 by Operation | `db_query_duration_ms_bucket` | Live (added 2026-09-05) |
+| Slow Queries/s by Operation | `db_slow_queries_total` | Live (added 2026-09-05) |
+| DB Query Errors/s | `db_query_errors_total` | Live (added 2026-09-05) |
+| Retention Sweep Errors (24h) | `retention_sweep_errors_total` | Live (added 2026-09-05) |
 | MySQL Queries/s | `mysql_global_status_queries` | Live now |
 | InnoDB Buffer Pool Hit % | innodb read ratio | Live now |
 
@@ -206,20 +212,58 @@ curl -s -X POST \
 
 ---
 
-## Grafana alerts (TODO)
+## Grafana alerts
 
 > **SMTP working as of 2026-05-18.** Contact point (luisca343@gmail.com) tested and delivering.  
-> Fix applied: all `[smtp]` lines in `/docker/config/grafana/grafana.ini` were commented out with `;` — uncommented the required fields and restarted Grafana.  
-> **Next: create the 4 alert rules below.**
+> Fix applied: all `[smtp]` lines in `/docker/config/grafana/grafana.ini` were commented out with `;` — uncommented the required fields and restarted Grafana.
 
-| Alert | Condition | Threshold |
-|---|---|---|
-| API error rate high | 5xx rate > 1% for 5m | `rate(http_requests_total{status_code=~"5.."}[5m]) / rate(http_requests_total[5m]) > 0.01` |
-| API container down | Prometheus scrape failing | `up{job="boffmedia-api"} == 0` for 2m |
-| DB connections high | > 80% of max | `mysql_global_status_threads_connected / mysql_global_variables_max_connections > 0.8` for 5m |
-| Backup missed | Last backup > 25h ago | `(time() - node_filestat_modification_time{...}) > 90000` |
+**The rules are now code, not a table.** They live in
+[`docs/grafana/alerts-boffmedia.yaml`](../grafana/alerts-boffmedia.yaml) as a
+Grafana provisioning file, because a table in Markdown cannot be applied and
+this one sat under a "TODO" heading for three and a half months. Installing it
+is four commands, written at the top of that file.
 
-Configure in Grafana → Alerting → Alert rules. Requires a contact point (email) set up first under Alerting → Contact points.
+Six rules in two groups:
+
+| Group | Alert | Condition | For |
+|---|---|---|---|
+| `boffmedia-api` | API error rate high | 5xx share of requests > 1% | 5m |
+| `boffmedia-api` | API container down | `up{job="boffmedia-api"} < 1` | 2m |
+| `boffmedia-api` | DB connections above 80% of max | threads_connected / max_connections > 0.8 | 5m |
+| `boffmedia-api` | Backup missed | success marker older than 25h | 10m |
+| `boffmedia-api-internal` | Slow queries rising | `sum(rate(db_slow_queries_total[5m])) > 1` | 10m |
+| `boffmedia-api-internal` | Nightly retention sweep failing | `increase(retention_sweep_errors_total[24h]) > 0` | 5m |
+
+The second group did not exist in the original four: `db-metrics.ts` and
+`retention.service.ts` registered four metrics after this runbook was written,
+and nothing — no panel, no rule — ever read any of them.
+
+**Two things that were wrong in the original four and are worth knowing:**
+
+- The error-rate expression divides two rates. With no traffic at all both sides
+  are zero, the division is NaN, and Grafana reports that as an *execution
+  error*, not as "no errors". The shipped rule clamps the denominator.
+- `noDataState` is not uniform, deliberately. "API container down" treats missing
+  data as the incident (`Alerting`); the rest treat it as `OK`, because a deploy
+  restart briefly produces no samples and three pages per deploy is how a team
+  learns to ignore its alerts.
+
+### The parity check
+
+`node scripts/check-metrics-parity.mjs` (part of `pnpm lint`) reads the metric
+names out of the dashboard JSON and this alert file and compares them to the
+`new Histogram/Counter/Gauge` registrations in the API, both directions:
+
+- a name referenced by a panel or a rule that the API does not register and no
+  exporter provides — **fails**, because PromQL returns an empty series for an
+  unknown metric and an empty series draws as a flat zero, which is
+  indistinguishable from a healthy system;
+- a metric the API registers that nothing reads — **fails**, which is the state
+  the four DB metrics were in.
+
+Negative-tested by mistyping a panel expression, by renaming a metric in the
+API, and by replacing the datasource placeholder with a real UID; all three go
+red.
 
 ---
 
