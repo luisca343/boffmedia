@@ -45,6 +45,7 @@ function version(
     loaderVersion: "21.4.30",
     emulatorKind: emulatorKind ?? null,
     fileCount,
+    optionalFeatureCount: 0,
     changelog: null,
   }
 }
@@ -208,6 +209,9 @@ export const MOCK_SETTINGS: Settings = {
   crashReports: false,
   // Off, like the real default: telemetry is opt-in.
   telemetry: false,
+  // Emulator paths and ROM directories: empty in the browser mock (no settings UI for these yet)
+  emulatorPaths: {},
+  romDirs: [],
 }
 
 /** Browser-mode library. The desktop equivalent is `loadPackEntries`, which

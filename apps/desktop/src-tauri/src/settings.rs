@@ -95,6 +95,15 @@ pub struct Settings {
     /// renderer keeps its own copy of the same flag.
     #[serde(default)]
     pub crash_reports: bool,
+    /// Whether the app may send anonymous telemetry (install/launch/crash rates,
+    /// tool usage). OPT-IN, so `#[serde(default)]` (false) means an existing
+    /// settings.json written before this field existed loads as OFF. Consent is
+    /// never inferred from a missing field.
+    ///
+    /// Read by `telemetry::set_enabled` at startup; the renderer keeps its own
+    /// copy of the same flag.
+    #[serde(default)]
+    pub telemetry: bool,
 }
 
 /// 1.0. Deliberately not "whatever the OS DPI suggests": Tauri already applies
@@ -149,6 +158,8 @@ impl Default for Settings {
             // Off. The only defensible default for something that sends data
             // off the player's machine.
             crash_reports: false,
+            // Off. The only defensible default for telemetry.
+            telemetry: false,
         }
     }
 }

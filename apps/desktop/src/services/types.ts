@@ -267,6 +267,11 @@ export type Settings = {
    *  services/telemetry.ts. Telemetry is PII-scrubbed: install_id is random,
    *  all fields enumerated, no usernames/emails/UUIDs/paths. */
   telemetry: boolean
+  /** Per-emulator-kind exe path overrides. Persisted in settings but not edited
+   *  through the UI (uses separate emulator settings dialogs). */
+  emulatorPaths: Record<string, string>
+  /** The player's ROM-library root directories for the auto-scan. */
+  romDirs: string[]
 }
 
 /** The offered zoom steps. A closed set rather than a free number so every value

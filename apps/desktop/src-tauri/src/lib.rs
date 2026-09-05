@@ -45,6 +45,7 @@ pub mod tool_packs;
 pub mod worlds;
 pub mod status;
 pub mod updates;
+pub mod shape_parity;
 
 use serde::Serialize;
 
