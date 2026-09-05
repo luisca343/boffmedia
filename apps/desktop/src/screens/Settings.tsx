@@ -39,6 +39,8 @@ import {
   toolPacksRemove,
   assetCacheBytes,
   assetCacheClear,
+  updatesRollback,
+  updatesRollbackTarget,
   onPackProgress,
   onPackDone,
   onPackError,
@@ -86,6 +88,18 @@ export function Settings() {
     boffSigningIn,
   } = useApp();
   const { phase, update, error } = useUpdates();
+
+  // D3. Asked once on mount: the retained build does not appear or vanish while
+  // this screen is open, and polling for it would be noise. `null` hides the
+  // whole affordance, which is the right answer on a fresh install, in browser
+  // mode, and after a user has cleared %APPDATA%.
+  const [rollbackTarget, setRollbackTarget] = useState<string | null>(null);
+  const [rollingBack, setRollingBack] = useState(false);
+  const [rollbackError, setRollbackError] = useState<string | null>(null);
+  useEffect(() => {
+    void updatesRollbackTarget().then(setRollbackTarget);
+  }, []);
+
   const t = useT("settings");
   // `t` is namespaced to `settings`, so a shared string needs its own translator
   // rather than a dotted key: a `common.`-prefixed key handed to `t` resolves to
@@ -1367,6 +1381,37 @@ export function Settings() {
                       : t("updates.idleHint")}
               </span>
             </div>
+
+            {/* D3, the manual half. The automatic revert only fires when a
+                build fails to START -- an update that launches fine and is
+                broken in some way the launcher cannot detect never trips the
+                boot counter, because every launch reports itself healthy. This
+                is the way out of that, and it is only rendered when there is
+                actually a retained build to go back to. */}
+            {rollbackTarget && (
+              <div className="mt-4 flex items-center gap-3 border-t border-line pt-4">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  icon="refresh"
+                  disabled={rollingBack}
+                  onClick={() => {
+                    setRollbackError(null);
+                    setRollingBack(true);
+                    // Does not resolve on success: the process is replaced.
+                    void updatesRollback().catch((e) => {
+                      setRollbackError(String(e));
+                      setRollingBack(false);
+                    });
+                  }}
+                >
+                  {t("updates.rollback", { version: rollbackTarget })}
+                </Button>
+                <span className="text-xs text-txt-dim">
+                  {rollbackError ?? t("updates.rollbackHint")}
+                </span>
+              </div>
+            )}
           </Panel>
 
           {/* Crash reports (audit X5). OPT-IN, and the copy has to say what is

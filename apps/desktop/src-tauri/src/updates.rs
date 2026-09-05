@@ -169,15 +169,31 @@ pub async fn updates_install(app: tauri::AppHandle) -> Result<(), String> {
             .ok_or_else(|| "Ya tienes la última versión.".to_string())?,
     };
 
-    // Keep the build we are about to replace. Best-effort by design: a failure
-    // to back up is not a reason to refuse an update the user asked for, and the
-    // rollback that would consume it is not built yet.
-    match (std::env::current_exe(), app.path().app_data_dir()) {
-        (Ok(exe), Ok(data_dir)) => {
-            let dir = data_dir.join("desktop").join("backup");
-            match retain_current_build(&exe, &dir, app.package_info().version.to_string().as_str())
-            {
-                Ok(path) => eprintln!("[updates] versión anterior respaldada en {}", path.display()),
+    // Keep the build we are about to replace, and put the incoming one on
+    // trial. Best-effort by design: a failure to back up is not a reason to
+    // refuse an update the user asked for -- it only means D3's automatic
+    // revert has nothing to revert TO, and `decide()` returns GiveUp rather
+    // than doing something rash.
+    //
+    // `datadir::data_root`, NOT `app.path().app_data_dir()`. This was the only
+    // call to the latter in the whole crate: it resolves to
+    // `%APPDATA%\es.boffmedia.app` while settings, install_id and instances all
+    // live in `%APPDATA%\Boffmedia`. The backup was being written to a tree
+    // nothing else knows about.
+    let running = app.package_info().version.to_string();
+    match (std::env::current_exe(), crate::datadir::data_root(&app)) {
+        (Ok(exe), Ok(root)) => {
+            let dir = crate::update_health::backup_dir(&root);
+            match retain_current_build(&exe, &dir, &running) {
+                Ok(path) => {
+                    eprintln!("[updates] versión anterior respaldada en {}", path.display());
+                    // Only arm the trial once there IS a build to go back to.
+                    // Arming without a backup would count two failed launches
+                    // and then find nothing, which is noise, not safety.
+                    if let Err(e) = crate::update_health::arm(&root, &update.version, &running) {
+                        eprintln!("[updates] no se pudo registrar la actualización en curso: {e}");
+                    }
+                }
                 Err(e) => eprintln!("[updates] no se pudo respaldar la versión anterior: {e}"),
             }
         }
@@ -203,6 +219,64 @@ pub async fn updates_install(app: tauri::AppHandle) -> Result<(), String> {
         .map_err(|e| format!("No se pudo instalar la actualización: {e}"))?;
 
     app.restart();
+}
+
+/// The renderer mounted, so this build starts. Ends any trial D3 opened.
+///
+/// Called from the renderer rather than from `setup` for the reason the whole
+/// feature exists: `setup` completing proves the Rust side came up, and the
+/// failure being guarded against is a build whose WINDOW never appears. Only
+/// the renderer can report that it did.
+#[tauri::command]
+pub fn updates_mark_healthy(app: tauri::AppHandle) -> Result<(), String> {
+    let root = crate::datadir::data_root(&app)?;
+    crate::update_health::mark_healthy(&root, &app.package_info().version.to_string())
+}
+
+/// Go back to the retained build now, at the user's request.
+///
+/// The manual counterpart to the automatic path, and the only one a person can
+/// exercise deliberately: an update that starts but is broken in some way the
+/// launcher cannot detect is exactly the case the boot counter will never fire
+/// on, because every launch reaches `mark_healthy`.
+#[tauri::command]
+pub fn updates_rollback(app: tauri::AppHandle) -> Result<(), String> {
+    if PORTABLE {
+        return Err(
+            "Esta es la versión portable: descarga el .zip anterior desde la web.".to_string(),
+        );
+    }
+    let root = crate::datadir::data_root(&app)?;
+    let state = crate::update_health::load(&root);
+    let running = app.package_info().version.to_string();
+    let target = state
+        .last_good
+        .filter(|v| *v != running)
+        .ok_or_else(|| "No hay una versión anterior guardada a la que volver.".to_string())?;
+
+    let exe = std::env::current_exe()
+        .map_err(|e| format!("No se localizó el ejecutable actual: {e}"))?;
+    crate::update_health::revert_to(&root, &exe, &target)?;
+    // Restart HERE rather than handing the renderer a "now relaunch" job, for
+    // the same reason `updates_install` does: the swap has already happened, so
+    // the process is running an image that no longer matches the file on disk.
+    // Leaving that window open, and depending on the UI to close it, is how a
+    // half-applied update survives.
+    app.restart();
+}
+
+/// What the Settings screen needs to offer a rollback: the version it would go
+/// back to, or `None` when there is nothing retained.
+#[tauri::command]
+pub fn updates_rollback_target(app: tauri::AppHandle) -> Result<Option<String>, String> {
+    let root = crate::datadir::data_root(&app)?;
+    let running = app.package_info().version.to_string();
+    // The retained FILE has to exist, not merely be named in the state. A user
+    // who cleared %APPDATA% would otherwise be offered a rollback that fails.
+    Ok(crate::update_health::load(&root)
+        .last_good
+        .filter(|v| *v != running)
+        .filter(|v| backup_path(&crate::update_health::backup_dir(&root), v).is_file()))
 }
 
 #[cfg(test)]

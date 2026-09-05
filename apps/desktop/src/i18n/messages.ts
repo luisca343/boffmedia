@@ -151,6 +151,9 @@ const es = {
       checkingHint: "Comprobando con el servidor…",
       availableHint: "Disponible la {version}. Actualiza desde el aviso de arriba.",
       idleHint: "La app lo comprueba solo al arrancar.",
+      rollback: "Volver a la {version}",
+      rollbackHint:
+        "Restaura la versión anterior guardada y reinicia. Tus packs, cuentas y ajustes no se tocan.",
     },
     language: {
       title: "Idioma",
@@ -1557,6 +1560,9 @@ const en = {
       checkingHint: "Checking with the server…",
       availableHint: "Version {version} is available. Update from the banner above.",
       idleHint: "The app checks on its own at startup.",
+      rollback: "Go back to {version}",
+      rollbackHint:
+        "Restores the previous build and restarts. Your packs, accounts and settings are untouched.",
     },
     language: {
       title: "Language",

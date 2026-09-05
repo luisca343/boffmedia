@@ -1565,6 +1565,48 @@ export async function updatesInstall(): Promise<void> {
 export const onUpdateProgress = (fn: (e: UpdateProgressEvent) => void) =>
   subscribe<UpdateProgressEvent>(EVENT_UPDATE_PROGRESS, fn);
 
+/**
+ * D3. "This build starts" — the signal that ends an update's trial.
+ *
+ * It has to come from the RENDERER. Rust's `setup` completing only proves the
+ * Rust side came up, and the failure the trial guards against is a build whose
+ * window never appears. Calling this is what stops the boot counter reaching
+ * two and reverting a perfectly good update, so it is not optional decoration:
+ * without it, every successful update is undone on its third launch.
+ *
+ * Failures are swallowed. A build that cannot write its own health file is not
+ * a build that should refuse to run, and the worst case is a spurious revert to
+ * a version that also worked.
+ */
+export async function updatesMarkHealthy(): Promise<void> {
+  if (!isDesktop()) return;
+  try {
+    await invoke("updates_mark_healthy");
+  } catch {
+    /* see above */
+  }
+}
+
+/** The version a rollback would return to, or null when nothing is retained. */
+export async function updatesRollbackTarget(): Promise<string | null> {
+  if (!isDesktop()) return null;
+  try {
+    return await invoke<string | null>("updates_rollback_target");
+  } catch {
+    return null;
+  }
+}
+
+/** Put the retained build back and relaunch into it.
+ *
+ *  Never resolves on success — the process is replaced, exactly like
+ *  `updatesInstall`. Throws a plain string message on failure. */
+export async function updatesRollback(): Promise<void> {
+  if (!isDesktop())
+    throw "Volver a una versión anterior solo funciona en la aplicación de escritorio.";
+  await invoke("updates_rollback");
+}
+
 // ── Settings ───────────────────────────────────────────────────────────────
 
 export async function settingsGet(): Promise<Settings> {

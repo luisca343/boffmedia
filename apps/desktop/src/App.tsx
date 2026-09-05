@@ -1,3 +1,5 @@
+import { useEffect } from "react"
+
 import { ToastStack } from "@boffmedia/ui"
 
 import { Shell } from "./components/Shell"
@@ -11,6 +13,7 @@ import { Tools, ToolView } from "./screens/Tools"
 import { BoffSignIn } from "./screens/BoffSignIn"
 import { SignIn } from "./screens/SignIn"
 import { Splash } from "./screens/Splash"
+import { updatesMarkHealthy } from "./runtime"
 import { AppProvider, useApp } from "./state/app"
 
 // No router library: six screens behind one union, and Tauri serves from a
@@ -69,6 +72,23 @@ function BootAwareUpdateBanner() {
   return booting ? null : <UpdateBanner />
 }
 
+/**
+ * D3. Tell Rust the window came up.
+ *
+ * Mounted once at the root and rendering nothing. Deliberately NOT inside
+ * `BootAwareUpdateBanner` or any screen: this must fire whatever the app does
+ * next -- signed out, offline, boot failed, splash stuck -- because the only
+ * claim it makes is that the renderer executed, which is exactly the claim the
+ * boot counter needs. Tying it to a successful sign-in would revert a good
+ * build for an expired session.
+ */
+function ReportHealthyLaunch() {
+  useEffect(() => {
+    void updatesMarkHealthy()
+  }, [])
+  return null
+}
+
 export function App() {
   return (
     <AppProvider>
@@ -80,6 +100,7 @@ export function App() {
         {/* Above the router on purpose: an update is worth showing on the
             sign-in screen too, and the check never blocks it. Suppressed only
             during boot, where it would push the splash off-centre. */}
+        <ReportHealthyLaunch />
         <BootAwareUpdateBanner />
         <div className="min-h-0 flex-1">
           <Router />

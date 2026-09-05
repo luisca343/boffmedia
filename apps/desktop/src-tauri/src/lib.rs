@@ -44,6 +44,7 @@ pub mod tool_db;
 pub mod tool_packs;
 pub mod worlds;
 pub mod status;
+pub mod update_health;
 pub mod updates;
 pub mod shape_parity;
 
@@ -109,6 +110,38 @@ pub fn run() {
             // away any `<instance>/.minecraft` level.
             let handle = app.handle().clone();
             datadir::migrate(&handle);
+            // D3. Before anything else that could fail: count this launch, and
+            // if the build on trial has now failed twice, put the previous one
+            // back and restart into it. This has to run FIRST -- the failure it
+            // guards against is a build that dies during startup, so anything
+            // ahead of it is code that might never be reached.
+            if let Ok(root) = datadir::data_root(&handle) {
+                if let Ok(exe) = std::env::current_exe() {
+                    // Left locked by a previous revert; deletable now.
+                    update_health::sweep_displaced(&exe);
+                    let running = handle.package_info().version.to_string();
+                    match update_health::record_boot(&root, &running) {
+                        update_health::Verdict::Revert { to } => {
+                            match update_health::revert_to(&root, &exe, &to) {
+                                Ok(()) => {
+                                    eprintln!(
+                                        "[updates] {running} no arrancó dos veces; se restauró {to}"
+                                    );
+                                    handle.restart();
+                                }
+                                Err(e) => eprintln!("[updates] no se pudo restaurar {to}: {e}"),
+                            }
+                        }
+                        update_health::Verdict::Trying(n) => {
+                            eprintln!("[updates] arranque {n} de {running} tras actualizar");
+                        }
+                        update_health::Verdict::GiveUp => eprintln!(
+                            "[updates] {running} no arranca y no hay copia anterior utilizable"
+                        ),
+                        update_health::Verdict::Nothing => {}
+                    }
+                }
+            }
             // Icons need no setup here: icon_cache returns data: URLs, so
             // there is no asset-protocol scope to align with the custom data
             // root (an alignment that silently broke twice — see icons.rs).
@@ -216,6 +249,9 @@ pub fn run() {
             settings::plays_get,
             settings::playtime_get,
             updates::updates_check,
+            updates::updates_mark_healthy,
+            updates::updates_rollback,
+            updates::updates_rollback_target,
             updates::updates_install,
             status::server_status,
             local_packs::local_packs_list,
