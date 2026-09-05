@@ -183,7 +183,9 @@ export class TrackerRepository {
     return this.db
       .select()
       .from(vgcMatches)
-      .where(and(eq(vgcMatches.sessionId, sessionId), isNull(vgcMatches.deletedAt)))
+      .where(
+        and(eq(vgcMatches.sessionId, sessionId), isNull(vgcMatches.deletedAt)),
+      )
       .orderBy(desc(vgcMatches.createdAt));
   }
 
@@ -240,7 +242,9 @@ export class TrackerRepository {
     return this.db
       .select()
       .from(vgcSeries)
-      .where(and(eq(vgcSeries.sessionId, sessionId), isNull(vgcSeries.deletedAt)))
+      .where(
+        and(eq(vgcSeries.sessionId, sessionId), isNull(vgcSeries.deletedAt)),
+      )
       .orderBy(desc(vgcSeries.createdAt));
   }
 
@@ -313,11 +317,23 @@ export class TrackerRepository {
       presets: string[];
     };
   }> {
-    const live = <T extends typeof vgcSessions | typeof vgcMatches | typeof vgcSeries | typeof vgcTeamPresets>(
+    const live = <
+      T extends
+        | typeof vgcSessions
+        | typeof vgcMatches
+        | typeof vgcSeries
+        | typeof vgcTeamPresets,
+    >(
       table: T,
     ) => and(eq(table.userId, userId), isNull(table.deletedAt));
 
-    const tombstones = <T extends typeof vgcSessions | typeof vgcMatches | typeof vgcSeries | typeof vgcTeamPresets>(
+    const tombstones = <
+      T extends
+        | typeof vgcSessions
+        | typeof vgcMatches
+        | typeof vgcSeries
+        | typeof vgcTeamPresets,
+    >(
       table: T,
     ) =>
       this.db

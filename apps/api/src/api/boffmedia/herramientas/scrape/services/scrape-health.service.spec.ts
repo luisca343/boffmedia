@@ -21,7 +21,12 @@ describe('ScrapeHealthService', () => {
   });
 
   const parse = (extracted: number, candidates: number) =>
-    health.record({ source: 'myrient', url: 'https://x/dir/', extracted, candidates });
+    health.record({
+      source: 'myrient',
+      url: 'https://x/dir/',
+      extracted,
+      candidates,
+    });
 
   it('reports drift when the page has rows and the selectors found none', () => {
     expect(parse(0, 42)).toBe(true);
@@ -65,8 +70,15 @@ describe('ScrapeHealthService', () => {
 
   it('tracks sources independently', () => {
     health.record({ source: 'myrient', url: 'u', extracted: 0, candidates: 3 });
-    health.record({ source: 'novelcool', url: 'u', extracted: 10, candidates: 10 });
-    const byName = Object.fromEntries(health.snapshot().map((s) => [s.source, s]));
+    health.record({
+      source: 'novelcool',
+      url: 'u',
+      extracted: 10,
+      candidates: 10,
+    });
+    const byName = Object.fromEntries(
+      health.snapshot().map((s) => [s.source, s]),
+    );
     expect(byName.myrient.drifting).toBe(true);
     expect(byName.novelcool.drifting).toBe(false);
   });

@@ -34,7 +34,13 @@ import { LigaModule } from '@api/smartrotom/liga/liga.module';
     LigaModule,
   ],
   controllers: [BattlesimController],
-  providers: [BattleGateway, MatchmakingService, ShowdownGateway, BattlesimRepository, BattleTicketService],
+  providers: [
+    BattleGateway,
+    MatchmakingService,
+    ShowdownGateway,
+    BattlesimRepository,
+    BattleTicketService,
+  ],
   exports: [MatchmakingService],
 })
 export class BattleModule {}

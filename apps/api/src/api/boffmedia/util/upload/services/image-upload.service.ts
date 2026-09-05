@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, PayloadTooLargeException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  PayloadTooLargeException,
+} from '@nestjs/common';
 import sharp from 'sharp';
 import { env } from '@/config/env';
 import { AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
@@ -72,7 +76,9 @@ export class ImageUploadService {
   /** Validate image dimensions by reading metadata only (fast, safe against bombs).
    *  Sharp.metadata() reads only the image header, never the full file.
    *  This check happens BEFORE any decode, so a malicious header fails here. */
-  private async validateImageDimensions(file: Express.Multer.File): Promise<void> {
+  private async validateImageDimensions(
+    file: Express.Multer.File,
+  ): Promise<void> {
     if (!file.buffer && !file.path) {
       return; // Cannot validate without data
     }
@@ -83,7 +89,10 @@ export class ImageUploadService {
         throw new BadRequestException('Cannot determine image dimensions');
       }
 
-      if (metadata.width > this.maxImageWidth || metadata.height > this.maxImageHeight) {
+      if (
+        metadata.width > this.maxImageWidth ||
+        metadata.height > this.maxImageHeight
+      ) {
         throw new PayloadTooLargeException({
           message: `Image dimensions exceed ${this.maxImageWidth}×${this.maxImageHeight}px limit`,
           userMessage: `La imagen es demasiado grande (máx. ${this.maxImageWidth}×${this.maxImageHeight}px).`,

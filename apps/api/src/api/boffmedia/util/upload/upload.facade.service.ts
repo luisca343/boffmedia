@@ -42,7 +42,11 @@ export class UploadFacadeService {
     actor: AuthPrincipal,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const result = await this.imageUploadService.deleteImage(path, filename, actor);
+      const result = await this.imageUploadService.deleteImage(
+        path,
+        filename,
+        actor,
+      );
       return {
         success: result.success,
         message: result.success
@@ -96,7 +100,11 @@ export class UploadFacadeService {
     actor: AuthPrincipal,
   ): Promise<{ success: boolean; message: string }> {
     try {
-      const result = await this.fileUploadService.deleteFile(path, filename, actor);
+      const result = await this.fileUploadService.deleteFile(
+        path,
+        filename,
+        actor,
+      );
       return {
         success: result.success,
         message: result.success

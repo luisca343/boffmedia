@@ -79,9 +79,8 @@ export class DiscordHealthListener {
     // not re-login by itself. HTTP and websockets are unaffected, but the bot
     // is gone until the process restarts, so this one is worth waking someone.
     this.logger.error('Discord session invalidated — the bot is offline');
-    captureApiException(
-      new Error('Discord session invalidated'),
-      { mechanism: 'discord.invalidated' },
-    );
+    captureApiException(new Error('Discord session invalidated'), {
+      mechanism: 'discord.invalidated',
+    });
   }
 }

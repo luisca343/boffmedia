@@ -39,7 +39,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     // `sv` as 0 so the backward-compatibility window closes automatically as old
     // tokens expire (in 15 minutes for access tokens, 7 days for refresh tokens).
     const embeddedVersion = payload.sv ?? 0;
-    const currentVersion = await this.usersRepository.getSessionVersion(payload.sub);
+    const currentVersion = await this.usersRepository.getSessionVersion(
+      payload.sub,
+    );
     if (currentVersion === null || currentVersion !== embeddedVersion) {
       throw new UnauthorizedException();
     }

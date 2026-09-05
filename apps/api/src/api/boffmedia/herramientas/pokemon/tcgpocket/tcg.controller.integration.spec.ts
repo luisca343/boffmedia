@@ -484,7 +484,10 @@ describe('TcgController — integration (ValidationPipe + GlobalExceptionFilter)
 
   describe('GET /tools/ptcgp/admin/sync/status', () => {
     it('returns 200 and passes the series through', async () => {
-      mockFacade.getSyncStatus.mockResolvedValue({ seriesId: 'tcgp', sets: [] });
+      mockFacade.getSyncStatus.mockResolvedValue({
+        seriesId: 'tcgp',
+        sets: [],
+      });
 
       const res = await request(app.getHttpServer()).get(
         '/tools/ptcgp/admin/sync/status?seriesId=tcgp',

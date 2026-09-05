@@ -193,9 +193,7 @@ export class TeamsRepository {
     } catch (error) {
       // Map 1062 (Duplicate entry) to the domain error
       if (this.isDuplicateEntry(error)) {
-        throw new Error(
-          'Participant is already in a team for this event',
-        );
+        throw new Error('Participant is already in a team for this event');
       }
       throw error;
     }

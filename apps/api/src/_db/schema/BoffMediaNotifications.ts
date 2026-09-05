@@ -87,8 +87,7 @@ export const boffMediaNotificationPreferences = mysqlTable(
       NOTIFICATION_TYPE.TOURNAMENT,
       NOTIFICATION_TYPE.SYSTEM,
       NOTIFICATION_TYPE.FORUM,
-    ])
-      .notNull(),
+    ]).notNull(),
     isMuted: boolean('is_muted').notNull().default(false),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
@@ -99,5 +98,9 @@ export const boffMediaNotificationPreferences = mysqlTable(
   }),
 );
 
-export type NotificationPreference = typeof boffMediaNotificationPreferences.$inferSelect;
-export type NewNotificationPreference = Omit<NotificationPreference, 'id' | 'createdAt' | 'updatedAt'>;
+export type NotificationPreference =
+  typeof boffMediaNotificationPreferences.$inferSelect;
+export type NewNotificationPreference = Omit<
+  NotificationPreference,
+  'id' | 'createdAt' | 'updatedAt'
+>;

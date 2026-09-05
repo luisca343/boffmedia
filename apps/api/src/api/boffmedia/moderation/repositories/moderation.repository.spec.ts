@@ -61,10 +61,7 @@ describe('ModerationRepository — what it hands Drizzle', () => {
     updatedSet = undefined;
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        ModerationRepository,
-        { provide: DRIZZLE, useValue: db },
-      ],
+      providers: [ModerationRepository, { provide: DRIZZLE, useValue: db }],
     }).compile();
 
     repository = module.get(ModerationRepository);

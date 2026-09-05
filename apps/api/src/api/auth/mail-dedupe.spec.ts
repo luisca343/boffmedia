@@ -28,7 +28,9 @@ describe('transactional mail dedupe keys', () => {
     let verifications: { replaceActiveToken: jest.Mock };
 
     beforeEach(async () => {
-      verifications = { replaceActiveToken: jest.fn().mockResolvedValue(undefined) };
+      verifications = {
+        replaceActiveToken: jest.fn().mockResolvedValue(undefined),
+      };
       const module = await Test.createTestingModule({
         providers: [
           EmailVerificationService,
@@ -52,7 +54,8 @@ describe('transactional mail dedupe keys', () => {
     it('keys the mail on the token hash it stores, not on the address', async () => {
       await service.issue(7, 'player@example.com');
 
-      const [, , tokenHash, , mail] = verifications.replaceActiveToken.mock.calls[0];
+      const [, , tokenHash, , mail] =
+        verifications.replaceActiveToken.mock.calls[0];
       expect(mail.dedupeKey).toBe(`verify:7:${tokenHash}`);
       // The address must not appear: that is precisely what made the key
       // constant across calls.
@@ -74,9 +77,11 @@ describe('transactional mail dedupe keys', () => {
           {
             provide: BoffMediaUsersRepository,
             useValue: {
-              findUserByEmail: jest
-                .fn()
-                .mockResolvedValue({ id: 3, email: 'player@example.com', locale: 'es' }),
+              findUserByEmail: jest.fn().mockResolvedValue({
+                id: 3,
+                email: 'player@example.com',
+                locale: 'es',
+              }),
             },
           },
           { provide: PasswordService, useValue: {} },

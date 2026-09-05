@@ -1,6 +1,5 @@
 import {
   Injectable,
-  Inject,
   ConflictException,
   ForbiddenException,
   InternalServerErrorException,
@@ -441,7 +440,10 @@ export class EventsFacadeService {
     await this.assertTeamEventVisible(team.eventId, includePrivate, userId);
 
     // Get raw team members data with pagination
-    const rawMembers = await this.teamsService.getTeamMembers(teamId, pagination);
+    const rawMembers = await this.teamsService.getTeamMembers(
+      teamId,
+      pagination,
+    );
 
     // Transform to match TeamMember entity
     return rawMembers.map((member) => ({
@@ -810,11 +812,10 @@ export class EventsFacadeService {
     }
 
     // Get raw participants data with pagination
-    const rawParticipants =
-      await this.participantsService.getEventParticipants(
-        eventId,
-        pagination,
-      );
+    const rawParticipants = await this.participantsService.getEventParticipants(
+      eventId,
+      pagination,
+    );
 
     // Transform to match Participant entity. `comment` is admin-only: old rows
     // stored the literal invite code in it, so echoing it publicly leaked live

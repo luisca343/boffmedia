@@ -276,9 +276,9 @@ describe('openHttpStream — SSRF guard', () => {
   });
 
   it('refuses a non-http scheme', async () => {
-    await expect(
-      openHttpStream('file:///etc/passwd', never),
-    ).rejects.toThrow(/Scheme must be http or https/i);
+    await expect(openHttpStream('file:///etc/passwd', never)).rejects.toThrow(
+      /Scheme must be http or https/i,
+    );
   });
 
   it('refuses plain http even on the allowed host', async () => {

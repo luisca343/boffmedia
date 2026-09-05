@@ -21,16 +21,16 @@ export class EmailVerificationsRepository {
     private readonly outbox: OutboxRepository,
   ) {}
 
-/**
- * Why the outbox enqueue lives in here rather than in the service.
- *
- * The token write and the mail enqueue have to share one transaction: a
- * rolled-back token must not leave a queued email promising a link that will
- * never work. Keeping that transaction in the repository is what lets the
- * service stay free of both drizzle and the transaction handle — the
- * alternative, handing a `tx` back to the caller, moves the atomicity guarantee
- * into whichever service remembers to honour it.
- */
+  /**
+   * Why the outbox enqueue lives in here rather than in the service.
+   *
+   * The token write and the mail enqueue have to share one transaction: a
+   * rolled-back token must not leave a queued email promising a link that will
+   * never work. Keeping that transaction in the repository is what lets the
+   * service stay free of both drizzle and the transaction handle — the
+   * alternative, handing a `tx` back to the caller, moves the atomicity guarantee
+   * into whichever service remembers to honour it.
+   */
   async replaceActiveToken(
     userId: number,
     email: string,
@@ -55,12 +55,7 @@ export class EmailVerificationsRepository {
         expiresAt,
       });
 
-      await this.outbox.enqueueTx(
-        tx,
-        mail.topic,
-        mail.payload,
-        mail.dedupeKey,
-      );
+      await this.outbox.enqueueTx(tx, mail.topic, mail.payload, mail.dedupeKey);
     });
   }
 

@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsIn, MaxLength, IsNumber, IsOptional, IsArray } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsIn,
+  MaxLength,
+  IsNumber,
+  IsOptional,
+  IsArray,
+} from 'class-validator';
 import { BSIM_FORMAT_IDS } from '../_utils/formats';
 
 export class BattlesimTeamUploadDto {

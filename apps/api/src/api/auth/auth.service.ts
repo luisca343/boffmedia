@@ -132,7 +132,9 @@ export class AuthService {
    * Deliberately bypasses the gate in `login()` — re-running it here would ask
    * for the code that was just given.
    */
-  async issueSessionForVerifiedUser(userId: number): Promise<AuthSessionResult> {
+  async issueSessionForVerifiedUser(
+    userId: number,
+  ): Promise<AuthSessionResult> {
     const withIntegrations = await this.usersService.getUserWithIntegrations(
       String(userId),
       'id',
@@ -169,7 +171,8 @@ export class AuthService {
     // account ownership.
     let sessionVersion: number | undefined;
     if (!isIngame) {
-      sessionVersion = (await this.usersRepository.getSessionVersion(user.id)) ?? 0;
+      sessionVersion =
+        (await this.usersRepository.getSessionVersion(user.id)) ?? 0;
     }
 
     const payload = {
@@ -346,7 +349,11 @@ export class AuthService {
       // back through /auth/login, which walks them into enrolment. Ingame
       // sessions are exempt for the same reason as in login(): they carry no
       // roles at all.
-      if (!scope && holdsAdminRole(roles) && !(await this.twoFactor.isEnrolled(user.id))) {
+      if (
+        !scope &&
+        holdsAdminRole(roles) &&
+        !(await this.twoFactor.isEnrolled(user.id))
+      ) {
         throw new UnauthorizedException(
           userError(
             ApiErrorCode.AUTH_TWO_FACTOR_ENROLMENT_REQUIRED,
@@ -360,7 +367,8 @@ export class AuthService {
       // identity, not account ownership.
       let sessionVersion: number | undefined;
       if (!scope) {
-        sessionVersion = (await this.usersRepository.getSessionVersion(user.id)) ?? 0;
+        sessionVersion =
+          (await this.usersRepository.getSessionVersion(user.id)) ?? 0;
       }
 
       const newPayload = {
@@ -433,7 +441,10 @@ export class AuthService {
     if (!payload.jti) {
       if (ALLOW_PRE_ROTATION_REFRESH) return undefined;
       throw new UnauthorizedException(
-        userError(ApiErrorCode.AUTH_REFRESH_INVALID, 'refresh token has no jti'),
+        userError(
+          ApiErrorCode.AUTH_REFRESH_INVALID,
+          'refresh token has no jti',
+        ),
       );
     }
 

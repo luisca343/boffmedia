@@ -89,7 +89,11 @@ describe('GlobalExceptionFilter', () => {
   describe('domain errors', () => {
     it('maps each kind to its status and keeps the catalogued code', () => {
       const cases: Array<[DomainError, number, string]> = [
-        [new ValidationError('ACTOR_NOT_SELF', 'bad input'), 400, 'BAD_REQUEST'],
+        [
+          new ValidationError('ACTOR_NOT_SELF', 'bad input'),
+          400,
+          'BAD_REQUEST',
+        ],
         [
           new UnauthorizedError('AUTH_INVALID_CREDENTIALS', 'no'),
           401,
@@ -145,7 +149,5 @@ describe('GlobalExceptionFilter', () => {
         }),
       );
     });
-
   });
-
 });

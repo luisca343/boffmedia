@@ -95,7 +95,7 @@ export function instrumentPool(pool: Pool, opts: InstrumentOptions): Pool {
         typeof first === 'string'
           ? first
           : typeof (first as { sql?: unknown })?.sql === 'string'
-            ? ((first as { sql: string }).sql)
+            ? (first as { sql: string }).sql
             : '';
       const operation = operationOf(sql);
       const start = process.hrtime.bigint();
@@ -125,7 +125,10 @@ export function instrumentPool(pool: Pool, opts: InstrumentOptions): Pool {
       // promise API is used in this codebase, but the callback path must still
       // not be broken by instrumentation, so it is passed through untimed
       // rather than wrapped incorrectly.
-      if (result instanceof Promise || typeof (result as { then?: unknown })?.then === 'function') {
+      if (
+        result instanceof Promise ||
+        typeof (result as { then?: unknown })?.then === 'function'
+      ) {
         return (result as Promise<unknown>).then(
           (value) => {
             finish(false);

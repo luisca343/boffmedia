@@ -379,8 +379,7 @@ export class TcgSyncService {
 
         // Its parent row could not be created, so its cards cannot be stored.
         if (!set.inDb) {
-          const message =
-            setRowError ?? `Set ${set.id} is not in the database`;
+          const message = setRowError ?? `Set ${set.id} is not in the database`;
           const counts = { ...zero(), failed: 1 };
           add(stageCounts, counts);
           failures.push({ stage: 'cards', scope: set.id, message });
@@ -508,7 +507,9 @@ export class TcgSyncService {
         const set = targetSets[i];
 
         try {
-          const cards = await this.tcgRepository.getCardImageStateForSet(set.id);
+          const cards = await this.tcgRepository.getCardImageStateForSet(
+            set.id,
+          );
           // Only cards with NO artwork at all. A card that already has one locale
           // is done: chasing the other one would re-request assets that tcgdex
           // does not have, every single run. `force` re-fetches everything.

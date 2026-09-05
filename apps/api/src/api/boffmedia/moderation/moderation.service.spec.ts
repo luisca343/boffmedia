@@ -413,7 +413,9 @@ describe('ModerationService', () => {
       // The stored HTML is sanitised on write, but re-rendering it inside the
       // one session that can ban people is not a risk worth carrying for a
       // table cell.
-      expect(excerptOf(['<a href="#">Compra</a>  <b>ya</b>'])).toBe('Compra ya');
+      expect(excerptOf(['<a href="#">Compra</a>  <b>ya</b>'])).toBe(
+        'Compra ya',
+      );
     });
 
     it('joins a surface’s columns and drops the empty ones', () => {
@@ -427,9 +429,7 @@ describe('ModerationService', () => {
 
   describe('the queue', () => {
     it('defaults to open reports, worst first', async () => {
-      const listQueue = jest
-        .fn()
-        .mockResolvedValue({ rows: [], total: 0 });
+      const listQueue = jest.fn().mockResolvedValue({ rows: [], total: 0 });
       (repo as { listQueue?: unknown }).listQueue = listQueue;
 
       await service.queue({});

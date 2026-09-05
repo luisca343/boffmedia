@@ -3,7 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class UpdatePreferencesDto {
   @ApiProperty({
-    description: 'Notification type (event, achievement, tournament, system, forum)',
+    description:
+      'Notification type (event, achievement, tournament, system, forum)',
   })
   @IsString()
   type: string;

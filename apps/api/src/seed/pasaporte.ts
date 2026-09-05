@@ -23,7 +23,10 @@ export const SEASON_DAYS = 90;
 // Game-design data: what an achievement is WORTH, by category. The columns default to
 // (10, 'bronce'), so the backfill only touches rows still sitting at that default —
 // re-running this never overwrites a value someone tuned by hand.
-export const CATEGORY_WEIGHTS: Record<string, { tier: string; points: number }> = {
+export const CATEGORY_WEIGHTS: Record<
+  string,
+  { tier: string; points: number }
+> = {
   Gimnasios: { tier: 'plata', points: 25 },
   Ligas: { tier: 'oro', points: 50 },
   'Frente Batalla': { tier: 'platino', points: 100 },

@@ -258,13 +258,10 @@ describe('BattleRoom — timer', () => {
   it('leaves a room without a timer config untimed', async () => {
     const h = harness();
     const updates: TimerState[] = [];
-    const room = new BattleRoom(
-      'timer-off',
-      'gen9randombattle',
-      P1,
-      P2,
-      { ...h.callbacks, onTimerUpdate: (state) => updates.push(state) },
-    );
+    const room = new BattleRoom('timer-off', 'gen9randombattle', P1, P2, {
+      ...h.callbacks,
+      onTimerUpdate: (state) => updates.push(state),
+    });
     await room.start();
     await wait(1_500);
 

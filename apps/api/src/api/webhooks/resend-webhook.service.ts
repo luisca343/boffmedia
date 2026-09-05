@@ -21,9 +21,7 @@ import { EmailBounceRepository } from './repositories/email-bounce.repository';
 export class ResendWebhookService {
   private readonly logger = new Logger(ResendWebhookService.name);
 
-  constructor(
-    private readonly bounces: EmailBounceRepository,
-  ) {}
+  constructor(private readonly bounces: EmailBounceRepository) {}
 
   /**
    * Verify Resend webhook signature.
@@ -60,7 +58,9 @@ export class ResendWebhookService {
     }
     if (!signature) return 'invalid';
 
-    const expected = createHmac('sha256', secret).update(rawBody).digest('base64');
+    const expected = createHmac('sha256', secret)
+      .update(rawBody)
+      .digest('base64');
 
     // Constant time, length-checked first because timingSafeEqual throws on a
     // length mismatch. `!==` on an HMAC leaks how far the comparison got.

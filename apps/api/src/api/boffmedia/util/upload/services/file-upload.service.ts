@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { promises as fs } from 'fs';
 import { join } from 'path';
 import { UploadRepository } from '@repositories/boffmedia/upload.repository';
@@ -151,17 +155,24 @@ export class FileUploadService {
 
     // Check ownership: the actor must own the file or be a BoffMedia admin.
     // Files with no row are legacy (pre-dating this table) and admin-only.
-    const upload = await this.uploadsRepository.findByLocation(sanitizedPath, safeName);
+    const upload = await this.uploadsRepository.findByLocation(
+      sanitizedPath,
+      safeName,
+    );
     const isAdmin = actor.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
 
     if (!upload) {
       // Legacy file — admin-only
       if (!isAdmin) {
-        throw new ForbiddenException('Cannot delete legacy file: admin access required');
+        throw new ForbiddenException(
+          'Cannot delete legacy file: admin access required',
+        );
       }
     } else if (upload.ownerUserId !== actor.userId && !isAdmin) {
       // Non-legacy file — owner or admin only
-      throw new ForbiddenException('You do not have permission to delete this file');
+      throw new ForbiddenException(
+        'You do not have permission to delete this file',
+      );
     }
 
     await this.uploadRepository.deleteFile(filePath);
@@ -194,17 +205,24 @@ export class FileUploadService {
 
     // Check ownership: the actor must own the file or be a BoffMedia admin.
     // Files with no row are legacy (pre-dating this table) and admin-only.
-    const upload = await this.uploadsRepository.findByLocation(sanitizedPath, safeName);
+    const upload = await this.uploadsRepository.findByLocation(
+      sanitizedPath,
+      safeName,
+    );
     const isAdmin = actor.roles?.includes(USER_ROLES.BOFF_ADMIN) ?? false;
 
     if (!upload) {
       // Legacy file — admin-only
       if (!isAdmin) {
-        throw new ForbiddenException('Cannot access legacy file: admin access required');
+        throw new ForbiddenException(
+          'Cannot access legacy file: admin access required',
+        );
       }
     } else if (upload.ownerUserId !== actor.userId && !isAdmin) {
       // Non-legacy file — owner or admin only
-      throw new ForbiddenException('You do not have permission to access this file');
+      throw new ForbiddenException(
+        'You do not have permission to access this file',
+      );
     }
 
     const fileInfo = await this.uploadRepository.getFileInfo(filePath);

@@ -32,7 +32,10 @@ import { Injectable } from '@nestjs/common';
  */
 @Injectable()
 export class LeaderboardCacheService {
-  private readonly store = new Map<string, { value: unknown; expiresAt: number }>();
+  private readonly store = new Map<
+    string,
+    { value: unknown; expiresAt: number }
+  >();
 
   /**
    * Short by design. Explicit invalidation on a progress write is what keeps a

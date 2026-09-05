@@ -38,7 +38,9 @@ describe('UserErasureService', () => {
       erase: jest.fn().mockResolvedValue(moved),
     } as unknown as jest.Mocked<UserErasureRepository>;
 
-    audit = { record: jest.fn().mockResolvedValue(undefined) } as unknown as jest.Mocked<AuditService>;
+    audit = {
+      record: jest.fn().mockResolvedValue(undefined),
+    } as unknown as jest.Mocked<AuditService>;
     dataExport = {
       purgeForUser: jest.fn().mockResolvedValue(0),
     } as unknown as jest.Mocked<DataExportService>;

@@ -47,10 +47,7 @@ const makeFile = (
   return file as Express.Multer.File;
 };
 
-const makeActor = (
-  userId = 1,
-  roles: string[] = [],
-): AuthPrincipal => ({
+const makeActor = (userId = 1, roles: string[] = []): AuthPrincipal => ({
   userId,
   username: `user${userId}`,
   roles,
@@ -162,9 +159,9 @@ describe('FileUploadService', () => {
 
     it('throws when no actor is provided', async () => {
       const file = makeFile();
-      await expect(service.uploadFile({ file, actor: null as any })).rejects.toThrow(
-        'Actor is required',
-      );
+      await expect(
+        service.uploadFile({ file, actor: null as any }),
+      ).rejects.toThrow('Actor is required');
     });
 
     // Filename validation is no longer a repository method the caller may skip
@@ -231,10 +228,7 @@ describe('FileUploadService', () => {
 
         expect(result.filename).toBe('photo.png');
         expect(mockRepo.saveFile).not.toHaveBeenCalled();
-        expect(write).toHaveBeenCalledWith(
-          join(dir, 'photo.png'),
-          file.buffer,
-        );
+        expect(write).toHaveBeenCalledWith(join(dir, 'photo.png'), file.buffer);
         expect(mockUploadsRepo.registerUpload).toHaveBeenCalledWith(
           1,
           '',
@@ -259,9 +253,9 @@ describe('FileUploadService', () => {
         new Error('Duplicate location'),
       );
 
-      await expect(
-        service.uploadFile({ file, actor }),
-      ).rejects.toThrow('Duplicate location');
+      await expect(service.uploadFile({ file, actor })).rejects.toThrow(
+        'Duplicate location',
+      );
 
       expect(mockRepo.deleteFile).toHaveBeenCalledWith('/uploads/photo.png');
     });
@@ -454,9 +448,9 @@ describe('FileUploadService', () => {
         deletedAt: null,
       });
 
-      await expect(
-        service.getFileInfo('', 'photo.png', actor),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.getFileInfo('', 'photo.png', actor)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('rejects non-admin who tries to access legacy file', async () => {
@@ -464,9 +458,9 @@ describe('FileUploadService', () => {
       mockRepo.fileExists.mockResolvedValue(true);
       mockUploadsRepo.findByLocation.mockResolvedValue(null); // Legacy file
 
-      await expect(
-        service.getFileInfo('', 'photo.png', actor),
-      ).rejects.toThrow(ForbiddenException);
+      await expect(service.getFileInfo('', 'photo.png', actor)).rejects.toThrow(
+        ForbiddenException,
+      );
     });
 
     it('allows admin to access non-owned file', async () => {

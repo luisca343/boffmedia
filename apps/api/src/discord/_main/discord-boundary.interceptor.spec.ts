@@ -7,7 +7,7 @@ import { fakeExecutionContext } from '@/_testing/nest-context';
 jest.mock('@/common/observability/sentry', () => ({
   captureApiException: jest.fn(),
 }));
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- Dynamic require after jest.mock setup
 const { captureApiException } = require('@/common/observability/sentry') as {
   captureApiException: jest.Mock;
 };

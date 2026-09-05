@@ -28,7 +28,10 @@ import { mkdir, open, unlink } from 'fs/promises';
 import { UploadFacadeService } from './upload.facade.service';
 import { UploadImageDto, UploadFileDto, DeleteFileDto } from './dto/upload.dto';
 import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
-import { CurrentUser, AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
+import {
+  CurrentUser,
+  AuthPrincipal,
+} from '@api/_utils/decorators/current-user.decorator';
 import {
   ALLOWED_FILE_EXTENSIONS,
   ALLOWED_IMAGE_EXTENSIONS,

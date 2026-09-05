@@ -26,7 +26,7 @@ import { DesktopOrUserAuthGuard } from '@api/packs/guards/desktop-or-user-auth.g
 import { CurrentUser } from '@api/_utils/decorators/current-user.decorator';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import type { AuthPrincipal } from '@api/_utils/decorators/current-user.decorator';
-import { BattleTicketService, BATTLE_TICKET_TTL_SECONDS } from './battle-ticket.service';
+import { BattleTicketService } from './battle-ticket.service';
 import { BattlesimRepository } from './battlesim.repository';
 import { BattlesimReplayUploadDto } from './dto/battlesim-replay-upload.dto';
 import { BattlesimTeamUploadDto } from './dto/battlesim-team-upload.dto';
@@ -209,7 +209,8 @@ export class BattlesimController {
   })
   @ApiOperation({
     summary: 'Fetch a replay by id',
-    description: 'Public endpoint for share links. Returns 404 if not found or deleted.',
+    description:
+      'Public endpoint for share links. Returns 404 if not found or deleted.',
   })
   @ApiResponse({
     status: 200,
@@ -264,7 +265,9 @@ export class BattlesimController {
   })
   @ApiResponse({ status: 400, description: 'Malformed replay id' })
   @ApiResponse({ status: 404, description: 'Replay not found' })
-  async getLeagueReplay(@Param('id') id: string): Promise<BattlesimLeagueReplayDto> {
+  async getLeagueReplay(
+    @Param('id') id: string,
+  ): Promise<BattlesimLeagueReplayDto> {
     // Rejected here rather than coerced: `parseInt("12abc")` is 12, which would
     // quietly serve a different replay than the one the link asked for.
     if (!/^\d+$/.test(id)) {
@@ -302,12 +305,17 @@ export class BattlesimController {
     description: 'Teams fetched',
     type: [BattlesimTeamDto],
   })
-  async listTeams(@CurrentUser() user: AuthPrincipal): Promise<BattlesimTeamDto[]> {
+  async listTeams(
+    @CurrentUser() user: AuthPrincipal,
+  ): Promise<BattlesimTeamDto[]> {
     const teams = await this.repo.listTeams(user.userId);
-    return teams.map((team) => ({
-      ...team,
-      tags: this.repo.parseTags(team.tags),
-    } as BattlesimTeamDto));
+    return teams.map(
+      (team) =>
+        ({
+          ...team,
+          tags: this.repo.parseTags(team.tags),
+        }) as BattlesimTeamDto,
+    );
   }
 
   /**

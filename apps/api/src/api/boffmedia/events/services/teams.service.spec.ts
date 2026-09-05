@@ -255,7 +255,9 @@ describe('TeamsService', () => {
     it('throws when participant is already in a team for this event', async () => {
       // The unique constraint on (event_id, participant_id) causes addMember to
       // throw when a participant is already in a team for this event.
-      const error = new Error('Participant is already in a team for this event');
+      const error = new Error(
+        'Participant is already in a team for this event',
+      );
       mockTeamsRepo.addMember.mockRejectedValueOnce(error);
 
       await expect(service.joinTeam(10, 1, 1)).rejects.toThrow(

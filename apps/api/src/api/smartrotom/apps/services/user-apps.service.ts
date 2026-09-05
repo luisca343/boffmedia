@@ -117,7 +117,9 @@ export class UserAppsService {
     // written straight through from the client.
     const existingApps = await this.userAppsRepository.findByPlayerUuid(uuid);
     const existingAppIds = new Set(existingApps.map((app) => app.appId));
-    const validOrder = order.filter((app) => existingAppIds.has(Number(app.id)));
+    const validOrder = order.filter((app) =>
+      existingAppIds.has(Number(app.id)),
+    );
 
     const claimed = new Set<number>();
     for (const app of validOrder) {

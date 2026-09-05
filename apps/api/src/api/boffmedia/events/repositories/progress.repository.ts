@@ -146,9 +146,7 @@ export class ProgressRepository {
     return result[0];
   }
 
-  async findAllProgress(
-    participantId: number,
-  ): Promise<ParticipantProgress[]> {
+  async findAllProgress(participantId: number): Promise<ParticipantProgress[]> {
     return this.db
       .select()
       .from(boffMediaParticipantProgress)

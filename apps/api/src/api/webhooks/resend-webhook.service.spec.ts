@@ -58,9 +58,9 @@ describe('ResendWebhookService', () => {
       // The controller hands it req.rawBody. If only strings worked, every real
       // delivery would fail while every test here passed.
       const body = '{"test":"data"}';
-      expect(service.verifySignature(Buffer.from(body, 'utf8'), sign(body))).toBe(
-        'ok',
-      );
+      expect(
+        service.verifySignature(Buffer.from(body, 'utf8'), sign(body)),
+      ).toBe('ok');
     });
 
     it('rejects a malformed signature', () => {

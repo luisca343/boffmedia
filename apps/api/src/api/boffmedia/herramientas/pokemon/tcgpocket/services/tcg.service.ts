@@ -389,9 +389,15 @@ export class TcgService {
         // insert, or a typo'd id becomes a row nothing can render.
         const cardExists = await this.tcgRepository.checkIfCardExists(cardId);
         if (!cardExists) {
-          throw new BadRequestException(`Card with ID ${cardId} does not exist`);
+          throw new BadRequestException(
+            `Card with ID ${cardId} does not exist`,
+          );
         }
-        await this.tcgRepository.addUserCard(userId, cardId, updateDto.quantity);
+        await this.tcgRepository.addUserCard(
+          userId,
+          cardId,
+          updateDto.quantity,
+        );
       }
 
       // Add to history if there was a change

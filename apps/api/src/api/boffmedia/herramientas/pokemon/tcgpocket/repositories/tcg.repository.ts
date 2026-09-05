@@ -121,7 +121,9 @@ export class TcgRepository implements ITcgRepository {
 
       const newSets = sets.filter((s) => !existingIds.has(s.id));
       if (newSets.length > 0) {
-        await this.db.insert(tcgSets).values(newSets.map((x) => this.toSetRow(x)));
+        await this.db
+          .insert(tcgSets)
+          .values(newSets.map((x) => this.toSetRow(x)));
       }
     } catch (error: any) {
       this.logger.error('[TcgRepository] Error inserting sets:', error);
@@ -537,7 +539,11 @@ export class TcgRepository implements ITcgRepository {
 
   /** Ids + current artwork paths for one set, for the images stage. */
   async getCardImageStateForSet(setId: string): Promise<
-    Array<{ id: string; imageLocalEn: string | null; imageLocalEs: string | null }>
+    Array<{
+      id: string;
+      imageLocalEn: string | null;
+      imageLocalEs: string | null;
+    }>
   > {
     try {
       return await this.db

@@ -78,8 +78,7 @@ export class AuditService {
             subjectType: opts.subjectType,
             subjectId: opts.subjectId,
             action: opts.action,
-            actorUserId:
-              typeof opts.actor === 'number' ? opts.actor : null,
+            actorUserId: typeof opts.actor === 'number' ? opts.actor : null,
             meta: opts.metadata ?? null,
             // Timestamp defaults to CURRENT_TIMESTAMP() via schema default
           });
@@ -100,8 +99,7 @@ export class AuditService {
             configId: opts.configId ?? null,
             assignmentId: opts.assignmentId ?? null,
             action: opts.action,
-            actor:
-              typeof opts.actor === 'string' ? opts.actor : null,
+            actor: typeof opts.actor === 'string' ? opts.actor : null,
             meta: opts.metadata ?? null,
           });
           break;
@@ -125,9 +123,7 @@ export class AuditService {
           break;
 
         default:
-          throw new Error(
-            `Unknown audit domain: ${(opts as any).domain}`,
-          );
+          throw new Error(`Unknown audit domain: ${(opts as any).domain}`);
       }
     } catch (error) {
       this.logger.error(
@@ -151,7 +147,9 @@ export class AuditService {
 
     const conditions = [];
     if (subjectType) {
-      conditions.push(eq(boffMediaAudit.subjectType, subjectType as AuditSubject));
+      conditions.push(
+        eq(boffMediaAudit.subjectType, subjectType as AuditSubject),
+      );
     }
     if (subjectId !== undefined) {
       conditions.push(eq(boffMediaAudit.subjectId, subjectId));

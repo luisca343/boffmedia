@@ -117,9 +117,9 @@ describe('UploadFacadeService', () => {
         new Error('not found'),
       );
 
-      await expect(
-        service.deleteImage('', 'photo.jpg', actor),
-      ).rejects.toThrow('Failed to delete image');
+      await expect(service.deleteImage('', 'photo.jpg', actor)).rejects.toThrow(
+        'Failed to delete image',
+      );
     });
   });
 

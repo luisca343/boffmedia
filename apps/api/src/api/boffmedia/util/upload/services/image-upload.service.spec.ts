@@ -140,7 +140,9 @@ describe('ImageUploadService', () => {
       const actor = makeActor();
       mockFileUploadService.deleteFile.mockResolvedValue({ success: true });
 
-      await expect(service.deleteImage('', 'photo.jpg', actor)).resolves.toEqual({
+      await expect(
+        service.deleteImage('', 'photo.jpg', actor),
+      ).resolves.toEqual({
         success: true,
       });
       expect(mockFileUploadService.deleteFile).toHaveBeenCalledWith(
@@ -208,9 +210,7 @@ describe('ImageUploadService', () => {
 
       const file = makeFile('wide.png');
 
-      const error = await service
-        .uploadImage({ file, actor })
-        .catch((e) => e);
+      const error = await service.uploadImage({ file, actor }).catch((e) => e);
 
       expect(error).toBeInstanceOf(PayloadTooLargeException);
       expect(error.message).toContain('Image dimensions exceed');
@@ -233,9 +233,7 @@ describe('ImageUploadService', () => {
 
       const file = makeFile('tall.png');
 
-      const error = await service
-        .uploadImage({ file, actor })
-        .catch((e) => e);
+      const error = await service.uploadImage({ file, actor }).catch((e) => e);
 
       expect(error).toBeInstanceOf(PayloadTooLargeException);
       expect(error.message).toContain('Image dimensions exceed');
@@ -286,9 +284,7 @@ describe('ImageUploadService', () => {
 
       const file = makeFile('nodim.png');
 
-      const error = await service
-        .uploadImage({ file, actor })
-        .catch((e) => e);
+      const error = await service.uploadImage({ file, actor }).catch((e) => e);
 
       expect(error).toBeInstanceOf(BadRequestException);
       expect(error.message).toContain('Cannot determine image dimensions');

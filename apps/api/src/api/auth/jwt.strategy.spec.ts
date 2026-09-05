@@ -12,7 +12,6 @@ jest.mock('@/config/env', () => ({
 
 describe('JwtStrategy', () => {
   let strategy: JwtStrategy;
-  let usersService: jest.Mocked<BoffMediaUsersFacadeService>;
   let usersRepository: jest.Mocked<
     Pick<BoffMediaUsersRepository, 'getSessionVersion'>
   >;
@@ -35,7 +34,6 @@ describe('JwtStrategy', () => {
     }).compile();
 
     strategy = module.get<JwtStrategy>(JwtStrategy);
-    usersService = module.get(BoffMediaUsersFacadeService);
     usersRepository = module.get(BoffMediaUsersRepository);
   });
 

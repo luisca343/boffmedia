@@ -154,7 +154,10 @@ export class TeamsService {
     try {
       await this.teamsRepository.addMember(memberData);
     } catch (error) {
-      if (error instanceof Error && error.message.includes('already in a team')) {
+      if (
+        error instanceof Error &&
+        error.message.includes('already in a team')
+      ) {
         throw new ConflictException(
           'Participant is already in a team for this event',
         );

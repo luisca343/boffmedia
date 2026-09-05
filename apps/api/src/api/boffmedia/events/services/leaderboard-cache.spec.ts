@@ -24,8 +24,12 @@ describe('LeaderboardsService — caching (A10)', () => {
   beforeEach(() => {
     cache = new LeaderboardCacheService();
     repo = {
-      findGlobalTotals: jest.fn().mockResolvedValue([{ participantId: 1, totalPoints: 10 }]),
-      findEventTotals: jest.fn().mockResolvedValue([{ participantId: 2, totalPoints: 5 }]),
+      findGlobalTotals: jest
+        .fn()
+        .mockResolvedValue([{ participantId: 1, totalPoints: 10 }]),
+      findEventTotals: jest
+        .fn()
+        .mockResolvedValue([{ participantId: 2, totalPoints: 5 }]),
       findTeamTotals: jest.fn().mockResolvedValue([{ teamId: 7, score: 3 }]),
     };
     service = new LeaderboardsService(
@@ -77,13 +81,19 @@ describe('LeaderboardsService — caching (A10)', () => {
 
   it('serves the NEW rows after invalidation, not just a new query', async () => {
     await service.getGlobalLeaderboard();
-    repo.findGlobalTotals.mockResolvedValue([{ participantId: 9, totalPoints: 99 }]);
+    repo.findGlobalTotals.mockResolvedValue([
+      { participantId: 9, totalPoints: 99 },
+    ]);
 
     // Still cached: the stale board is what a caller gets until invalidation.
-    expect((await service.getGlobalLeaderboard())[0]).toMatchObject({ participantId: 1 });
+    expect((await service.getGlobalLeaderboard())[0]).toMatchObject({
+      participantId: 1,
+    });
 
     cache.invalidateAll();
-    expect((await service.getGlobalLeaderboard())[0]).toMatchObject({ participantId: 9 });
+    expect((await service.getGlobalLeaderboard())[0]).toMatchObject({
+      participantId: 9,
+    });
   });
 
   it('does not cache a failure', async () => {

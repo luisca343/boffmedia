@@ -98,8 +98,11 @@ function anonymousMutations(): string[] {
     // are written in, and survives multi-line decorator arguments.
     const signatures = [...body.matchAll(SIGNATURE)];
     signatures.forEach((match, index) => {
-      const from = index === 0 ? 0 : (signatures[index - 1].index ?? 0) +
-        signatures[index - 1][0].length;
+      const from =
+        index === 0
+          ? 0
+          : (signatures[index - 1].index ?? 0) +
+            signatures[index - 1][0].length;
       const region = body.slice(from, match.index);
       if (!VERB.test(region)) return;
       if (classGuarded) return;

@@ -44,7 +44,10 @@ describe('BattleModule — every injected dependency is reachable', () => {
 
   it('resolves every BattlesimController constructor parameter', () => {
     const deps =
-      (Reflect.getMetadata('design:paramtypes', BattlesimController) as unknown[]) ?? [];
+      (Reflect.getMetadata(
+        'design:paramtypes',
+        BattlesimController,
+      ) as unknown[]) ?? [];
 
     // A walk that finds nothing makes every assertion below vacuously true —
     // the A15/N21 failure mode. Assert the reflection actually read something.
@@ -52,6 +55,7 @@ describe('BattleModule — every injected dependency is reachable', () => {
     expect(deps).toContain(
       // The dependency B14 introduced, named explicitly so this test fails
       // loudly if the constructor is reordered or the param is dropped.
+      // eslint-disable-next-line @typescript-eslint/no-require-imports -- Dynamic require for reflection testing
       require('@api/smartrotom/liga/services/replay.service').ReplayService,
     );
 
@@ -72,7 +76,12 @@ describe('BattleModule — every injected dependency is reachable', () => {
   it('fails if LigaModule stops exporting the service, not just if the import goes', () => {
     // The import alone is not enough — a provider that a module does not
     // EXPORT is still unreachable from the importer.
-    const { ReplayService } = require('@api/smartrotom/liga/services/replay.service');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Dynamic require for reflection testing
+    const {
+      ReplayService,
+      // eslint-disable-next-line @typescript-eslint/no-require-imports -- Dynamic require for reflection testing
+    } = require('@api/smartrotom/liga/services/replay.service');
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Dynamic require for reflection testing
     const { LigaModule } = require('@api/smartrotom/liga/liga.module');
 
     expect(importsOf(BattleModule)).toContain(LigaModule);

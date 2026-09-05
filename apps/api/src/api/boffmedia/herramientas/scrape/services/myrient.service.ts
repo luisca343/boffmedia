@@ -454,10 +454,21 @@ export class MyrientScrapeService {
         // A file, not a nav link: something after the last dot in the last path
         // segment, and not an anchor or query-only href.
         const leaf = href.split('/').pop() ?? '';
-        return !href.startsWith('#') && !href.startsWith('?') && /[^.]\.[A-Za-z0-9]{2,5}$/.test(leaf);
+        return (
+          !href.startsWith('#') &&
+          !href.startsWith('?') &&
+          /[^.]\.[A-Za-z0-9]{2,5}$/.test(leaf)
+        );
       }).length;
 
-    if (this.health.record({ source: 'myrient', url, extracted: entries.length, candidates })) {
+    if (
+      this.health.record({
+        source: 'myrient',
+        url,
+        extracted: entries.length,
+        candidates,
+      })
+    ) {
       // Answering "no games" here would be a lie the user cannot see through.
       throw new ServiceUnavailableException(
         'The Myrient catalogue could not be read: the source page structure has changed. ' +
@@ -479,7 +490,10 @@ export class MyrientScrapeService {
    * @param url  Full URL to the zip/cia/3ds file to download (must be from Myrient).
    * @returns    Metadata about the saved file.
    */
-  async downloadGame(url: string, signal?: AbortSignal): Promise<DownloadResult> {
+  async downloadGame(
+    url: string,
+    signal?: AbortSignal,
+  ): Promise<DownloadResult> {
     const townPath = laboonPath('juegos', 'myrient', '3DS');
     await mkdir(townPath, { recursive: true });
 
@@ -597,7 +611,8 @@ export class MyrientScrapeService {
       };
     }
 
-    const status: Exclude<StreamedDownloadOutcome, 'downloaded'> = result.outcome;
+    const status: Exclude<StreamedDownloadOutcome, 'downloaded'> =
+      result.outcome;
     this.logger.error(
       `${prefix} ${status.toUpperCase()} ${filename}: ${result.error ?? '—'} ` +
         `(${formatBytes(result.receivedBytes)} received, partial file discarded) — ` +

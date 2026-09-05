@@ -7,11 +7,6 @@ import { MessageSender } from '../enums/message-sender.enum';
 import { Logger } from 'nestjs-pino';
 import { UsageBudgetService } from './usage-budget.service';
 
-interface TokenCounts {
-  inputTokens: number;
-  outputTokens: number;
-}
-
 @Injectable()
 export class AIService {
   constructor(

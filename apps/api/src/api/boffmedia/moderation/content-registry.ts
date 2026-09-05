@@ -139,9 +139,7 @@ const BY_TYPE = new Map<string, ContentSurface>(
 );
 
 /** The registered surface for a `content_type`, or `undefined` if unknown. */
-export function findSurface(
-  contentType: string,
-): ContentSurface | undefined {
+export function findSurface(contentType: string): ContentSurface | undefined {
   return BY_TYPE.get(contentType);
 }
 

@@ -11,10 +11,7 @@ import pino from 'pino';
 
 // The same derivation the runtime uses when a player is created — one definition, so a
 // backfilled handle and a freshly minted one can never disagree.
-import {
-  baseHandle,
-  dedupeHandle,
-} from '../api/smartrotom/rooker/handle';
+import { baseHandle, dedupeHandle } from '../api/smartrotom/rooker/handle';
 
 const logger = pino({ name: 'rooker-seed' });
 

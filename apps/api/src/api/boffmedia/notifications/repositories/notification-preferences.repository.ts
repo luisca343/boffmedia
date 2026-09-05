@@ -4,8 +4,6 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   boffMediaNotificationPreferences,
   NotificationPreference,
-  NewNotificationPreference,
-  NOTIFICATION_TYPE,
 } from '@/_db/schema/BoffMediaNotifications';
 import { eq, and } from 'drizzle-orm';
 
@@ -54,7 +52,7 @@ export class NotificationPreferencesRepository {
     isMuted: boolean,
   ): Promise<NotificationPreference> {
     // Drizzle's onDuplicateKeyUpdate for MySQL
-    const result = await this.db
+    await this.db
       .insert(boffMediaNotificationPreferences)
       .values({
         userId,
@@ -72,7 +70,9 @@ export class NotificationPreferencesRepository {
       (pref) =>
         pref ||
         Promise.reject(
-          new Error(`Failed to upsert preference for user ${userId}, type ${type}`),
+          new Error(
+            `Failed to upsert preference for user ${userId}, type ${type}`,
+          ),
         ),
     );
   }

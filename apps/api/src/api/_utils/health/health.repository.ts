@@ -11,9 +11,7 @@ import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
  */
 @Injectable()
 export class HealthRepository {
-  constructor(
-    @Inject(DRIZZLE) private readonly db: MySql2Database,
-  ) {}
+  constructor(@Inject(DRIZZLE) private readonly db: MySql2Database) {}
 
   /**
    * Round-trips the cheapest possible statement. Throws whatever the driver

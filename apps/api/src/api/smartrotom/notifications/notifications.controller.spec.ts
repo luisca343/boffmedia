@@ -7,7 +7,6 @@ const TEST_UUID = 'test-user-uuid';
 
 describe('NotificationsController', () => {
   let controller: NotificationsController;
-  let service: NotificationsService;
 
   const mockNotification = {
     id: 1,
@@ -40,7 +39,6 @@ describe('NotificationsController', () => {
     }).compile();
 
     controller = module.get(NotificationsController);
-    service = module.get(NotificationsService);
 
     jest.clearAllMocks();
   });
@@ -128,9 +126,7 @@ describe('NotificationsController', () => {
 
       await controller.markAllRead({ uuid: TEST_UUID } as any, TEST_UUID);
 
-      expect(notificationsService.markAllRead).toHaveBeenCalledWith(
-        TEST_UUID,
-      );
+      expect(notificationsService.markAllRead).toHaveBeenCalledWith(TEST_UUID);
     });
   });
 

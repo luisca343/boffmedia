@@ -94,7 +94,11 @@ describe('UserAppsService', () => {
       expect(userAppsRepository.findUserApp).toHaveBeenCalledWith(uuid, appId);
       // Slot 0, not 1. `order` is the 0-based grid cell, so starting the scan at
       // 1 left the first app a player was ever given in the SECOND slot.
-      expect(userAppsRepository.addUserApp).toHaveBeenCalledWith(uuid, appId, 0);
+      expect(userAppsRepository.addUserApp).toHaveBeenCalledWith(
+        uuid,
+        appId,
+        0,
+      );
     });
 
     it('fills the lowest FREE cell, not the next one up', async () => {
@@ -108,7 +112,11 @@ describe('UserAppsService', () => {
 
       await service.addAppToPlayer(uuid, appId);
 
-      expect(userAppsRepository.addUserApp).toHaveBeenCalledWith(uuid, appId, 1);
+      expect(userAppsRepository.addUserApp).toHaveBeenCalledWith(
+        uuid,
+        appId,
+        1,
+      );
     });
 
     it('throws ConflictException when every grid cell is taken', async () => {

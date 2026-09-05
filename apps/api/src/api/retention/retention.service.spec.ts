@@ -86,7 +86,10 @@ describe('RetentionService', () => {
     it('claims a lease at the start of the sweep', async () => {
       await service.sweep();
 
-      expect(repo.claimLease).toHaveBeenCalledWith('boffmedia_retention_sweep', 90);
+      expect(repo.claimLease).toHaveBeenCalledWith(
+        'boffmedia_retention_sweep',
+        90,
+      );
     });
 
     it('skips the sweep if another instance owns the lease', async () => {
@@ -140,7 +143,9 @@ describe('RetentionService', () => {
     });
 
     it('logs an error if lease release itself fails', async () => {
-      repo.deleteOldReadNotifications.mockRejectedValueOnce(new Error('timeout'));
+      repo.deleteOldReadNotifications.mockRejectedValueOnce(
+        new Error('timeout'),
+      );
       repo.releaseLease.mockRejectedValueOnce(new Error('connection lost'));
 
       await service.sweep();
@@ -152,7 +157,9 @@ describe('RetentionService', () => {
 
     it('never skips lease release via try/catch rethrow', async () => {
       // Even if the error handler rethrows, the finally must run.
-      repo.deleteOldReadNotifications.mockRejectedValueOnce(new Error('any error'));
+      repo.deleteOldReadNotifications.mockRejectedValueOnce(
+        new Error('any error'),
+      );
 
       // The service catches errors, so it doesn't rethrow.
       await service.sweep();
@@ -236,7 +243,9 @@ describe('RetentionService', () => {
     });
 
     it('catches sweep failures and logs them with error type', async () => {
-      repo.deleteOldReadNotifications.mockRejectedValueOnce(new Error('connection lost'));
+      repo.deleteOldReadNotifications.mockRejectedValueOnce(
+        new Error('connection lost'),
+      );
 
       await service.sweep();
 
@@ -266,7 +275,9 @@ describe('RetentionService', () => {
 
       await service.sweep();
 
-      expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('[timeout]'));
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining('[timeout]'),
+      );
     });
 
     it('categorizes schema mismatch errors', async () => {
@@ -292,15 +303,21 @@ describe('RetentionService', () => {
 
       await service.sweep();
 
-      expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('[deadlock]'));
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining('[deadlock]'),
+      );
     });
 
     it('defaults unknown errors to "unknown" category', async () => {
-      repo.deleteOldReadNotifications.mockRejectedValueOnce(new Error('some weird error'));
+      repo.deleteOldReadNotifications.mockRejectedValueOnce(
+        new Error('some weird error'),
+      );
 
       await service.sweep();
 
-      expect(logger.error).toHaveBeenCalledWith(expect.stringContaining('[unknown]'));
+      expect(logger.error).toHaveBeenCalledWith(
+        expect.stringContaining('[unknown]'),
+      );
     });
   });
 
@@ -316,7 +333,8 @@ describe('RetentionService', () => {
 
       await service.sweep();
 
-      const auditCallOrder = repo.deleteBoffMediaAuditOld.mock.invocationCallOrder[0];
+      const auditCallOrder =
+        repo.deleteBoffMediaAuditOld.mock.invocationCallOrder[0];
       const erasureCallOrder = erasure.sweep.mock.invocationCallOrder[0];
 
       expect(erasureCallOrder).toBeGreaterThan(auditCallOrder);

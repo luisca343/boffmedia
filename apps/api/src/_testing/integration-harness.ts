@@ -5,9 +5,6 @@ import { createPool, Pool } from 'mysql2/promise';
 import {
   startTestDatabase,
   stopTestDatabase,
-  getTestDatabaseConfig,
-  getDatabaseUrl,
-  isDockerAvailable,
   TestDatabaseConfig,
 } from './testcontainers-setup';
 

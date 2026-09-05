@@ -59,7 +59,7 @@ function collectForeignKeys(): Fk[] {
   const fks: Fk[] = [];
 
   for (const file of files) {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Load schema files dynamically to auto-discover tables
     const mod = require(join(SCHEMA_DIR, file)) as Record<string, unknown>;
 
     for (const exported of Object.values(mod)) {

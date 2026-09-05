@@ -57,7 +57,9 @@ export class DesktopUpdatesController {
     // Used for staged rollout bucketing: clients are hashed into 0-99 buckets
     // based on their installation ID. Absent ID (older clients) defaults to
     // included (true), so old clients always receive updates.
-    const installId = (req.headers['x-boff-install-id'] as string | undefined)?.trim();
+    const installId = (
+      req.headers['x-boff-install-id'] as string | undefined
+    )?.trim();
     const clientId = installId ? { deviceId: installId } : undefined;
 
     const feed = await this.updates.feed(
@@ -108,10 +110,17 @@ export class DesktopUpdatesController {
     @Res({ passthrough: true }) res: Response,
   ): Promise<UpdaterFeedEntity | undefined> {
     // Same rollout bucketing as the versioned feed (see feed() above).
-    const installId = (req.headers['x-boff-install-id'] as string | undefined)?.trim();
+    const installId = (
+      req.headers['x-boff-install-id'] as string | undefined
+    )?.trim();
     const clientId = installId ? { deviceId: installId } : undefined;
 
-    const feed = await this.updates.feed(target, '0.0.0', baseUrl(req), clientId);
+    const feed = await this.updates.feed(
+      target,
+      '0.0.0',
+      baseUrl(req),
+      clientId,
+    );
     if (!feed) {
       res.status(HttpStatus.NO_CONTENT);
       return undefined;

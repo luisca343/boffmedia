@@ -5,7 +5,6 @@ import {
   HttpStatus,
   UnauthorizedException,
   UseGuards,
-  Req,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { AuditService } from '@api/_repositories/audit.service';
@@ -210,7 +209,9 @@ export class AuthController {
   @UseGuards(JwtAuthGuard, AuthThrottlerGuard)
   @ApiBearerAuth('JWT')
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
-  @ApiOperation({ summary: 'Sign out from all devices (invalidate all sessions)' })
+  @ApiOperation({
+    summary: 'Sign out from all devices (invalidate all sessions)',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'Signed out from all devices.',

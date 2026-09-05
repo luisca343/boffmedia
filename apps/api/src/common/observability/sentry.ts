@@ -42,7 +42,7 @@ function resolveRelease(): string {
   try {
     // Resolves to apps/api/package.json from both src/common/observability (jest,
     // ts-node) and dist/common/observability (production) — the depth is the same.
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Dynamic load to resolve from correct directory in jest vs production
     const pkg = require('../../../package.json') as { version?: string };
     return `api@${pkg.version ?? '0.0.0'}`;
   } catch {
@@ -60,7 +60,7 @@ export function initSentry(): boolean {
 
   let mod: SentryLike;
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Lazy load Sentry only when DSN is configured
     mod = require('@sentry/node') as SentryLike;
   } catch {
     // A DSN was configured but the package is missing — that is a deployment
@@ -107,7 +107,9 @@ export function captureApiException(
       tags: {
         mechanism: context.mechanism,
         ...(context.method ? { method: context.method } : {}),
-        ...(context.statusCode ? { status_code: String(context.statusCode) } : {}),
+        ...(context.statusCode
+          ? { status_code: String(context.statusCode) }
+          : {}),
       },
       // The path is a route template's worth of information but can carry ids;
       // it goes through the same scrubber as everything else via beforeSend.

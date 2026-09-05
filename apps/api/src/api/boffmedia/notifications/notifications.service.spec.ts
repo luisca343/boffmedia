@@ -55,7 +55,10 @@ describe('NotificationsService', () => {
 
       const result = await service.create(dto);
 
-      expect(preferencesService.shouldDeliver).toHaveBeenCalledWith(1, NOTIFICATION_TYPE.EVENT);
+      expect(preferencesService.shouldDeliver).toHaveBeenCalledWith(
+        1,
+        NOTIFICATION_TYPE.EVENT,
+      );
       expect(repo.insert).toHaveBeenCalled();
       expect(result).toEqual({ created: 1 });
     });
@@ -71,7 +74,10 @@ describe('NotificationsService', () => {
 
       const result = await service.create(dto);
 
-      expect(preferencesService.shouldDeliver).toHaveBeenCalledWith(1, NOTIFICATION_TYPE.EVENT);
+      expect(preferencesService.shouldDeliver).toHaveBeenCalledWith(
+        1,
+        NOTIFICATION_TYPE.EVENT,
+      );
       expect(repo.insert).not.toHaveBeenCalled();
       expect(result).toEqual({ created: 0 });
     });
@@ -85,8 +91,9 @@ describe('NotificationsService', () => {
       };
 
       jest.spyOn(repo, 'findAllUserIds').mockResolvedValue([1, 2, 3]);
-      jest.spyOn(preferencesService, 'shouldDeliver')
-        .mockResolvedValueOnce(true)  // user 1
+      jest
+        .spyOn(preferencesService, 'shouldDeliver')
+        .mockResolvedValueOnce(true) // user 1
         .mockResolvedValueOnce(false) // user 2 (muted)
         .mockResolvedValueOnce(true); // user 3
 
@@ -112,7 +119,8 @@ describe('NotificationsService', () => {
       };
 
       jest.spyOn(repo, 'findAllUserIds').mockResolvedValue([1, 2]);
-      jest.spyOn(preferencesService, 'shouldDeliver')
+      jest
+        .spyOn(preferencesService, 'shouldDeliver')
         .mockResolvedValueOnce(false)
         .mockResolvedValueOnce(false);
 

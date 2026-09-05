@@ -20,9 +20,11 @@ export class ContentBanGuard implements CanActivate {
   constructor(private readonly moderation: ModerationService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
-    const req = context.switchToHttp().getRequest<
-      Request & { user?: { userId?: number; mcUuid?: string | null } }
-    >();
+    const req = context
+      .switchToHttp()
+      .getRequest<
+        Request & { user?: { userId?: number; mcUuid?: string | null } }
+      >();
     const userId = req.user?.userId;
     const uuid = req.user?.mcUuid;
     if (userId == null && !uuid) return true;

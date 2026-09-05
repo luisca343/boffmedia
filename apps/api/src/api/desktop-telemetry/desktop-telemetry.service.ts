@@ -20,9 +20,7 @@ import { DesktopTelemetryRepository } from './repositories/desktop-telemetry.rep
 export class DesktopTelemetryService {
   private readonly MAX_EVENTS_PER_HOUR = 100;
 
-  constructor(
-    private readonly repository: DesktopTelemetryRepository,
-  ) {}
+  constructor(private readonly repository: DesktopTelemetryRepository) {}
 
   /**
    * Ingest a telemetry event. Validates the payload, enforces rate-limiting,
@@ -48,7 +46,12 @@ export class DesktopTelemetryService {
     // Validate event-specific code. (The DTO already validates enum membership,
     // but we add semantic validation here: certain codes only make sense with
     // certain event names.)
-    if (!this.isValidCodeForEvent(dto.eventName, dto.code as DesktopTelemetryEventCode)) {
+    if (
+      !this.isValidCodeForEvent(
+        dto.eventName,
+        dto.code as DesktopTelemetryEventCode,
+      )
+    ) {
       throw new HttpException(
         `Invalid code "${dto.code}" for event type "${dto.eventName}"`,
         HttpStatus.BAD_REQUEST,

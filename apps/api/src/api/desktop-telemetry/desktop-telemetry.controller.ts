@@ -1,15 +1,5 @@
-import {
-  Controller,
-  Post,
-  Body,
-  HttpStatus,
-  HttpCode,
-} from '@nestjs/common';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-} from '@nestjs/swagger';
+import { Controller, Post, Body, HttpStatus, HttpCode } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { SkipEnvelope } from '@/common/decorators/skip-envelope.decorator';
 import { DesktopTelemetryService } from './desktop-telemetry.service';
@@ -65,7 +55,8 @@ export class DesktopTelemetryController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: 'Evento malformado (UUID inválido, campo faltante, tipo no enumerado)',
+    description:
+      'Evento malformado (UUID inválido, campo faltante, tipo no enumerado)',
   })
   @ApiResponse({
     status: HttpStatus.TOO_MANY_REQUESTS,

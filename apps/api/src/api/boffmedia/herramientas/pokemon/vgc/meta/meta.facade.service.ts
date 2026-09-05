@@ -5,7 +5,10 @@
   NotFoundException,
 } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
-import { initChampionsMod, listChampionsFormatIds } from '@boffmedia/battle-core';
+import {
+  initChampionsMod,
+  listChampionsFormatIds,
+} from '@boffmedia/battle-core';
 import { FetchSmogonDto } from './dto/fetch-smogon.dto';
 import { SmogonService } from './services/smogon.service';
 import { VgcPastesService } from './services/vgcpastes.service';

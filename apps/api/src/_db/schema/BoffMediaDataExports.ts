@@ -73,7 +73,10 @@ export const boffMediaDataExports = mysqlTable(
   (t) => ({
     // The cooldown check and the status poll both read "this user's most recent
     // request", which is exactly this index.
-    userRequestedIdx: index('bde_user_requested_idx').on(t.userId, t.requestedAt),
+    userRequestedIdx: index('bde_user_requested_idx').on(
+      t.userId,
+      t.requestedAt,
+    ),
     statusIdx: index('bde_status_idx').on(t.status),
   }),
 );

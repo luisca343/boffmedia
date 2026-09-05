@@ -58,8 +58,12 @@ describe('TcgImageService', () => {
       expect(fs.mkdir).toHaveBeenCalled();
       expect(axios.get).toHaveBeenCalledTimes(2);
       expect(fs.writeFile).toHaveBeenCalledTimes(2);
-      expect(sets[0].logo_local).toBe('/boffmedia/tools/tcg/sets/sv1/logo.webp');
-      expect(sets[0].symbol_local).toBe('/boffmedia/tools/tcg/sets/sv1/symbol.webp');
+      expect(sets[0].logo_local).toBe(
+        '/boffmedia/tools/tcg/sets/sv1/logo.webp',
+      );
+      expect(sets[0].symbol_local).toBe(
+        '/boffmedia/tools/tcg/sets/sv1/symbol.webp',
+      );
     });
 
     it('sets logo_local to null when logo download fails', async () => {

@@ -56,7 +56,9 @@ describe('instrumentPool', () => {
     await q('SELECT 1');
     await q('INSERT INTO t VALUES (1)');
 
-    const metric = await register.getSingleMetric('db_query_duration_ms')!.get();
+    const metric = await register
+      .getSingleMetric('db_query_duration_ms')!
+      .get();
     const counts = new Map(
       metric.values
         .filter((v) => nameOf(v) === 'db_query_duration_ms_count')
@@ -77,7 +79,9 @@ describe('instrumentPool', () => {
       'SELECT SLEEP(1)',
     );
 
-    const metric = await register.getSingleMetric('db_slow_queries_total')!.get();
+    const metric = await register
+      .getSingleMetric('db_slow_queries_total')!
+      .get();
     const select = metric.values.find((v) => v.labels.operation === 'select');
     expect(select?.value).toBe(1);
   });
@@ -89,7 +93,9 @@ describe('instrumentPool', () => {
       'SET NAMES utf8mb4',
     );
 
-    const metric = await register.getSingleMetric('db_query_duration_ms')!.get();
+    const metric = await register
+      .getSingleMetric('db_query_duration_ms')!
+      .get();
     const other = metric.values.find(
       (v) =>
         nameOf(v) === 'db_query_duration_ms_count' &&

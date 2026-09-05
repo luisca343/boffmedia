@@ -3,7 +3,8 @@ import { ApiProperty } from '@nestjs/swagger';
 export class TwoFactorEnrolmentEntity {
   @ApiProperty({
     example: 'JBSWY3DPEHPK3PXP',
-    description: 'Base32 shared secret, for typing in when the QR cannot be scanned',
+    description:
+      'Base32 shared secret, for typing in when the QR cannot be scanned',
   })
   secret: string;
 
@@ -32,7 +33,9 @@ export class TwoFactorBackupCodesEntity {
 }
 
 export class TwoFactorStatusEntity {
-  @ApiProperty({ description: 'Whether this account holds a role that requires 2FA' })
+  @ApiProperty({
+    description: 'Whether this account holds a role that requires 2FA',
+  })
   required: boolean;
 
   @ApiProperty({ description: 'Whether a confirmed second factor exists' })

@@ -280,7 +280,11 @@ describe('AuthService', () => {
     });
 
     it('includes the session version (sv) claim in refreshed website session tokens', async () => {
-      jwtService.verify.mockReturnValue({ sub: 1, username: 'TrainerAsh', typ: 'refresh' });
+      jwtService.verify.mockReturnValue({
+        sub: 1,
+        username: 'TrainerAsh',
+        typ: 'refresh',
+      });
       usersService.getUserWithIntegrations.mockResolvedValue(
         mockUserWithIntegrations as any,
       );

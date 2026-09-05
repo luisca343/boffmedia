@@ -49,10 +49,7 @@ export const Clients = (...clients: Client[]) =>
  * behaviour while declaring nothing, and "web only" would have silently broken
  * every SmartRotom route the Rotom phone calls.
  */
-export const DEFAULT_CLIENTS: readonly Client[] = [
-  CLIENT.WEB,
-  CLIENT.INGAME,
-];
+export const DEFAULT_CLIENTS: readonly Client[] = [CLIENT.WEB, CLIENT.INGAME];
 
 /**
  * Maps a token's `typ` claim onto the client that holds it.
@@ -74,5 +71,6 @@ export const CLIENT_BY_TOKEN_TYPE: Readonly<Record<string, Client>> = {
 };
 
 /** Narrow a raw `typ` claim to the client that holds it, if any. */
-export const clientOfTokenType = (typ: TokenType | string): Client | undefined =>
-  CLIENT_BY_TOKEN_TYPE[typ];
+export const clientOfTokenType = (
+  typ: TokenType | string,
+): Client | undefined => CLIENT_BY_TOKEN_TYPE[typ];

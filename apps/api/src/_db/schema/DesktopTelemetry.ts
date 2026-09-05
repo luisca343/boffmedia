@@ -64,4 +64,5 @@ export const desktopTelemetryEvents = mysqlTable(
 );
 
 export type DesktopTelemetryEvent = typeof desktopTelemetryEvents.$inferSelect;
-export type NewDesktopTelemetryEvent = typeof desktopTelemetryEvents.$inferInsert;
+export type NewDesktopTelemetryEvent =
+  typeof desktopTelemetryEvents.$inferInsert;

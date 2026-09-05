@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { promises as dns } from 'dns';
-import * as net from 'net';
 
 /**
  * Configuration for safe HTTP fetching.
@@ -52,7 +51,10 @@ export interface SafeFetchConfig {
  * Error raised when a URL fails safe-fetch validation.
  */
 export class SafeFetchError extends Error {
-  constructor(message: string, public readonly url: string) {
+  constructor(
+    message: string,
+    public readonly url: string,
+  ) {
     super(message);
     this.name = 'SafeFetchError';
   }
@@ -166,7 +168,10 @@ export async function assertUrlAllowed(
 
   // 1. Scheme check
   if (!['http:', 'https:'].includes(urlObj.protocol)) {
-    throw new SafeFetchError(`Scheme must be http or https; got ${urlObj.protocol}`, url);
+    throw new SafeFetchError(
+      `Scheme must be http or https; got ${urlObj.protocol}`,
+      url,
+    );
   }
 
   if (!config.allowHttp && urlObj.protocol !== 'https:') {
@@ -175,7 +180,9 @@ export async function assertUrlAllowed(
 
   // 2. Hostname allowlist
   const hostname = urlObj.hostname;
-  const allowed = config.allowedHosts.map((h) => h.toLowerCase()).includes(hostname.toLowerCase());
+  const allowed = config.allowedHosts
+    .map((h) => h.toLowerCase())
+    .includes(hostname.toLowerCase());
   if (!allowed) {
     throw new SafeFetchError(
       `Hostname not in allowlist: ${hostname}. Allowed: ${config.allowedHosts.join(', ')}`,
@@ -215,7 +222,10 @@ export async function safeFetch(
 
     // 1. Scheme check: only HTTP(S), and respect allowHttp flag
     if (!['http:', 'https:'].includes(urlObj.protocol)) {
-      throw new SafeFetchError(`Scheme must be http or https; got ${urlObj.protocol}`, url);
+      throw new SafeFetchError(
+        `Scheme must be http or https; got ${urlObj.protocol}`,
+        url,
+      );
     }
 
     if (!config.allowHttp && urlObj.protocol !== 'https:') {
@@ -224,7 +234,9 @@ export async function safeFetch(
 
     // 2. Hostname allowlist check (exact match, case-insensitive)
     const hostname = urlObj.hostname;
-    const allowed = config.allowedHosts.map((h) => h.toLowerCase()).includes(hostname.toLowerCase());
+    const allowed = config.allowedHosts
+      .map((h) => h.toLowerCase())
+      .includes(hostname.toLowerCase());
     if (!allowed) {
       throw new SafeFetchError(
         `Hostname not in allowlist: ${hostname}. Allowed: ${config.allowedHosts.join(', ')}`,
@@ -243,7 +255,10 @@ export async function safeFetch(
       try {
         resolvedIps = await dns.resolve6(hostname);
       } catch {
-        throw new SafeFetchError(`Failed to resolve hostname: ${hostname}`, url);
+        throw new SafeFetchError(
+          `Failed to resolve hostname: ${hostname}`,
+          url,
+        );
       }
     }
 
@@ -305,10 +320,7 @@ export async function safeFetch(
  * response.data.pipe(writeStream);
  * ```
  */
-export async function safeFetchStream(
-  url: string,
-  config: SafeFetchConfig,
-) {
+export async function safeFetchStream(url: string, config: SafeFetchConfig) {
   try {
     await assertUrlAllowed(url, config);
 

@@ -71,10 +71,7 @@ export function resetSecretBoxKeyCache(): void {
 export function sealSecret(plaintext: string): string {
   const iv = randomBytes(IV_BYTES);
   const cipher = createCipheriv('aes-256-gcm', key(), iv);
-  const ct = Buffer.concat([
-    cipher.update(plaintext, 'utf8'),
-    cipher.final(),
-  ]);
+  const ct = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
   return [
     VERSION,
     iv.toString('base64url'),

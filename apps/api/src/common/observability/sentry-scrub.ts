@@ -34,7 +34,8 @@ export const REDACTED = '[redacted]';
  * Keys whose VALUE is dropped whole, whatever it looks like. Substring match,
  * case-insensitive, so `X-Refresh-Token`, `userEmail` and `db_password` all hit.
  */
-const SENSITIVE_KEY = /authorization|cookie|token|secret|password|passwd|api[-_]?key|jwt|session|credential|dsn|email|correo|uuid|ip[-_]?address|remote[-_]?addr/i;
+const SENSITIVE_KEY =
+  /authorization|cookie|token|secret|password|passwd|api[-_]?key|jwt|session|credential|dsn|email|correo|uuid|ip[-_]?address|remote[-_]?addr/i;
 
 /**
  * The only request headers worth keeping. An allowlist rather than a denylist:
@@ -79,14 +80,19 @@ const MAX_DEPTH = 8;
 const MAX_STRING = 20000;
 
 function scrubString(value: string): string {
-  let out = value.length > MAX_STRING ? value.slice(0, MAX_STRING) + '…' : value;
+  let out =
+    value.length > MAX_STRING ? value.slice(0, MAX_STRING) + '…' : value;
   for (const pattern of VALUE_PATTERNS) {
     out = out.replace(pattern, REDACTED);
   }
   return out;
 }
 
-function scrubValue(value: unknown, depth: number, seen: WeakSet<object>): unknown {
+function scrubValue(
+  value: unknown,
+  depth: number,
+  seen: WeakSet<object>,
+): unknown {
   if (typeof value === 'string') return scrubString(value);
   if (value === null || typeof value !== 'object') return value;
   if (depth >= MAX_DEPTH) return REDACTED;
@@ -111,7 +117,9 @@ function scrubValue(value: unknown, depth: number, seen: WeakSet<object>): unkno
  * or `null` to drop the event entirely — callers must forward `null` to Sentry
  * unchanged, that is how the SDK is told not to send.
  */
-export function scrubSentryEvent<T extends ScrubbableEvent>(event: T): T | null {
+export function scrubSentryEvent<T extends ScrubbableEvent>(
+  event: T,
+): T | null {
   if (!event || typeof event !== 'object') return null;
 
   // Request bodies never go: they carry passwords on /auth/login, team
@@ -139,7 +147,8 @@ export function scrubSentryEvent<T extends ScrubbableEvent>(event: T): T | null 
   if (event.user) {
     const id = event.user['id'];
     const numericId =
-      typeof id === 'number' || (typeof id === 'string' && /^\d{1,12}$/.test(id))
+      typeof id === 'number' ||
+      (typeof id === 'string' && /^\d{1,12}$/.test(id))
         ? id
         : undefined;
     event.user = numericId === undefined ? {} : { id: numericId };

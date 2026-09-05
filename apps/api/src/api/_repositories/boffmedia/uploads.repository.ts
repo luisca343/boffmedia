@@ -2,7 +2,10 @@ import { Injectable, Inject } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { eq, and, isNull, gte, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import { boffMediaUploads, BoffMediaUpload } from '@/_db/schema/BoffMediaUploads';
+import {
+  boffMediaUploads,
+  BoffMediaUpload,
+} from '@/_db/schema/BoffMediaUploads';
 
 /**
  * Track which Boffmedia user uploaded which file. Files written before this table
@@ -53,7 +56,10 @@ export class UploadsRepository {
    * Returns `null` when the file exists on disk but has no row (legacy file
    * pre-dating this table), so the service can apply the legacy policy: admin-only.
    */
-  async findByLocation(subdir: string, filename: string): Promise<BoffMediaUpload | null> {
+  async findByLocation(
+    subdir: string,
+    filename: string,
+  ): Promise<BoffMediaUpload | null> {
     const result = await this.db
       .select()
       .from(boffMediaUploads)
@@ -104,8 +110,17 @@ export class UploadsRepository {
   async getDailyUploadSizeBytes(ownerUserId: number): Promise<number> {
     // Calculate today's start and end in UTC
     const now = new Date();
-    const dayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 0, 0, 0, 0));
-    const dayEnd = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 23, 59, 59, 999));
+    const dayStart = new Date(
+      Date.UTC(
+        now.getUTCFullYear(),
+        now.getUTCMonth(),
+        now.getUTCDate(),
+        0,
+        0,
+        0,
+        0,
+      ),
+    );
 
     const result = await this.db
       .select({
@@ -120,6 +135,6 @@ export class UploadsRepository {
         ),
       );
 
-    return result.length > 0 ? (result[0].totalSize || 0) : 0;
+    return result.length > 0 ? result[0].totalSize || 0 : 0;
   }
 }

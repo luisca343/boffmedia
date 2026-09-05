@@ -28,6 +28,7 @@ export interface TestDatabaseConfig {
 export async function isDockerAvailable(): Promise<boolean> {
   try {
     // testcontainers checks this internally, so we can use it too
+    // eslint-disable-next-line @typescript-eslint/no-require-imports -- Lazy load to gracefully handle missing docker-modem
     const Docker = require('docker-modem');
     const modem = new Docker();
     await new Promise<void>((resolve, reject) => {

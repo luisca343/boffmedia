@@ -14,9 +14,7 @@ export interface PreferenceViewDto {
 
 @Injectable()
 export class NotificationPreferencesService {
-  constructor(
-    private readonly repo: NotificationPreferencesRepository,
-  ) {}
+  constructor(private readonly repo: NotificationPreferencesRepository) {}
 
   /**
    * Get all preferences for the current user, filling in defaults for types with no rows.

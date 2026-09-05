@@ -69,12 +69,17 @@ export const battlesimReplays = mysqlTable(
     log: mediumtext('log').notNull(),
     /** Team snapshots as JSON, for the preview screen. */
     teams: text('teams'),
-    source: mysqlEnum('source', BATTLESIM_REPLAY_SOURCES).notNull().default('local'),
+    source: mysqlEnum('source', BATTLESIM_REPLAY_SOURCES)
+      .notNull()
+      .default('local'),
     /** The other account in a PvP battle, so it is listed for both players. */
-    opponentUserId: int('opponent_user_id').references(() => boffMediaUsers.id, {
-      onDelete: 'set null',
-      onUpdate: 'cascade',
-    }),
+    opponentUserId: int('opponent_user_id').references(
+      () => boffMediaUsers.id,
+      {
+        onDelete: 'set null',
+        onUpdate: 'cascade',
+      },
+    ),
     /**
      * When the battle was PLAYED, on the client's clock (epoch ms).
      *
@@ -90,9 +95,16 @@ export const battlesimReplays = mysqlTable(
     deletedAt: bigint('deleted_at', { mode: 'number' }),
   },
   (t) => ({
-    ownerUq: uniqueIndex('bsim_replays_owner_client_uq').on(t.userId, t.clientId),
+    ownerUq: uniqueIndex('bsim_replays_owner_client_uq').on(
+      t.userId,
+      t.clientId,
+    ),
     // The listing is always "mine, newest first, excluding tombstones".
-    ownerPlayedIdx: index('bsim_replays_owner_played_idx').on(t.userId, t.deletedAt, t.playedAt),
+    ownerPlayedIdx: index('bsim_replays_owner_played_idx').on(
+      t.userId,
+      t.deletedAt,
+      t.playedAt,
+    ),
     opponentIdx: index('bsim_replays_opponent_idx').on(t.opponentUserId),
   }),
 );

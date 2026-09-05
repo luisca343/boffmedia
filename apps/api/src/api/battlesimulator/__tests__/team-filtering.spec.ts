@@ -21,7 +21,9 @@ interface Team {
 function filterByTag(teams: Team[], tag: string): Team[] {
   if (!tag.trim()) return teams;
   const normalized = tag.toLowerCase();
-  return teams.filter((t) => t.tags.some((ta) => ta.toLowerCase() === normalized));
+  return teams.filter((t) =>
+    t.tags.some((ta) => ta.toLowerCase() === normalized),
+  );
 }
 
 /**
@@ -176,7 +178,10 @@ describe('Team Filtering', () => {
 
     it('should apply both tag and name filters', () => {
       // Competitive tag only
-      expect(filterTeams(teams, 'competitive', '')).toEqual([teams[0], teams[2]]);
+      expect(filterTeams(teams, 'competitive', '')).toEqual([
+        teams[0],
+        teams[2],
+      ]);
       // VGC tag + "Trick" name
       expect(filterTeams(teams, 'vgc', 'Trick')).toEqual([teams[2]]);
       // Casual tag + "Comp" name

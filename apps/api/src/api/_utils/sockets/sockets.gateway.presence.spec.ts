@@ -18,7 +18,6 @@ import { Logger } from 'nestjs-pino';
 describe('SocketsGateway - Presence', () => {
   let gateway: SocketsGateway;
   let presenceService: PresenceService;
-  let jwtService: JwtService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -49,7 +48,6 @@ describe('SocketsGateway - Presence', () => {
 
     gateway = module.get<SocketsGateway>(SocketsGateway);
     presenceService = module.get<PresenceService>(PresenceService);
-    jwtService = module.get<JwtService>(JwtService);
   });
 
   describe('sendPresenceList', () => {
@@ -67,9 +65,7 @@ describe('SocketsGateway - Presence', () => {
       };
 
       // Call the private method through gateway instance
-      const sendPresenceList = (
-        gateway as any
-      ).sendPresenceList.bind(gateway);
+      const sendPresenceList = (gateway as any).sendPresenceList.bind(gateway);
       sendPresenceList(mockSocket);
 
       // Should emit presence:list with all online users
@@ -87,9 +83,7 @@ describe('SocketsGateway - Presence', () => {
         emit: jest.fn(),
       };
 
-      const sendPresenceList = (
-        gateway as any
-      ).sendPresenceList.bind(gateway);
+      const sendPresenceList = (gateway as any).sendPresenceList.bind(gateway);
       sendPresenceList(mockSocket);
 
       expect(mockSocket.emit).toHaveBeenCalledWith('presence:list', []);
@@ -108,9 +102,7 @@ describe('SocketsGateway - Presence', () => {
         emit: jest.fn(),
       };
 
-      const sendPresenceList = (
-        gateway as any
-      ).sendPresenceList.bind(gateway);
+      const sendPresenceList = (gateway as any).sendPresenceList.bind(gateway);
       sendPresenceList(mockSocket);
 
       // All users in users map should be in the list
@@ -142,7 +134,10 @@ describe('SocketsGateway - Presence', () => {
 
   beforeEach(() => {
     // handleSmartRotomConnection and handleDisconnect both broadcast.
-    (gateway as any).server = { emit: jest.fn(), sockets: { sockets: new Map() } };
+    (gateway as any).server = {
+      emit: jest.fn(),
+      sockets: { sockets: new Map() },
+    };
   });
 
   describe('multi-tab user handling', () => {

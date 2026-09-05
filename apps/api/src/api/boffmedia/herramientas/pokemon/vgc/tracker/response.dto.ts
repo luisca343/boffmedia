@@ -76,7 +76,6 @@ export class TeamPresetDto {
       'detection compares — never `updatedAt`, which is the server clock.',
   })
   clientUpdatedAt?: number;
-
 }
 
 export class MatchSlotDto {
@@ -163,7 +162,6 @@ export class SessionDto {
       'detection compares — never `updatedAt`, which is the server clock.',
   })
   clientUpdatedAt?: number;
-
 }
 
 export class MatchDto {
@@ -220,7 +218,6 @@ export class MatchDto {
       'detection compares — never `updatedAt`, which is the server clock.',
   })
   clientUpdatedAt?: number;
-
 }
 
 export class SeriesGameDto {
@@ -297,7 +294,6 @@ export class SeriesDto {
       'detection compares — never `updatedAt`, which is the server clock.',
   })
   clientUpdatedAt?: number;
-
 }
 
 /** Ids the account has deleted, per table. See `TrackerSyncDataDto.deleted`. */

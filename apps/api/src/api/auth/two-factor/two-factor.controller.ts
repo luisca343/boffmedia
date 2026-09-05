@@ -30,7 +30,10 @@ import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import { JwtAuthGuard } from '../jwt-auth.guard';
 import { AuthService, type AuthSessionResult } from '../auth.service';
 import { AuthLoginResponseEntity } from '../entities/auth-response.entity';
-import { MfaChallengeGuard, type MfaChallengeRequest } from './mfa-challenge.guard';
+import {
+  MfaChallengeGuard,
+  type MfaChallengeRequest,
+} from './mfa-challenge.guard';
 import { MfaChallengeThrottlerGuard } from './mfa-challenge-throttler.guard';
 import { TwoFactorService } from './two-factor.service';
 import { TwoFactorConfirmDto, TwoFactorVerifyDto } from './dto/two-factor.dto';
@@ -117,7 +120,9 @@ export class TwoFactorController {
   @Throttle({ default: { ttl: 60_000, limit: 10 } })
   @HttpCode(HttpStatus.OK)
   @ApiBearerAuth('JWT')
-  @ApiOperation({ summary: 'Completar el inicio de sesión con el segundo factor' })
+  @ApiOperation({
+    summary: 'Completar el inicio de sesión con el segundo factor',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: AuthLoginResponseEntity })
   async verify(
     @Req() req: MfaChallengeRequest,
@@ -134,7 +139,9 @@ export class TwoFactorController {
   @Get('status')
   @UseGuards(JwtAuthGuard, FullSessionGuard)
   @ApiBearerAuth('JWT')
-  @ApiOperation({ summary: 'Estado de la verificación en dos pasos de mi cuenta' })
+  @ApiOperation({
+    summary: 'Estado de la verificación en dos pasos de mi cuenta',
+  })
   @ApiResponse({ status: HttpStatus.OK, type: TwoFactorStatusEntity })
   async status(
     @CurrentUser() user: AuthPrincipal,

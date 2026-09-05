@@ -44,5 +44,7 @@ export const DEV_ONLY_ORIGINS = [
 
 /** The list that applies for the current environment. */
 export function allowedOrigins(isProduction: boolean): string[] {
-  return isProduction ? [...PUBLIC_ORIGINS] : [...PUBLIC_ORIGINS, ...DEV_ONLY_ORIGINS];
+  return isProduction
+    ? [...PUBLIC_ORIGINS]
+    : [...PUBLIC_ORIGINS, ...DEV_ONLY_ORIGINS];
 }

@@ -101,7 +101,11 @@ export class NotificationsRepository {
       .insert(boffMediaNotifications)
       .values(row)
       .onDuplicateKeyUpdate({
-        set: { title: row.title, body: row.body ?? null, link: row.link ?? null },
+        set: {
+          title: row.title,
+          body: row.body ?? null,
+          link: row.link ?? null,
+        },
       });
   }
 

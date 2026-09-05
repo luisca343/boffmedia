@@ -284,7 +284,11 @@ export class MatchesService {
     notifications: TournamentMatch[],
     expectedVersion?: number,
     actorUserId?: number | null,
-    previousResult?: { winnerId: number | null; topScore: number | null; botScore: number | null },
+    previousResult?: {
+      winnerId: number | null;
+      topScore: number | null;
+      botScore: number | null;
+    },
   ): Promise<boolean> {
     const now = new Date();
     // When an admin resolves a disputed match, record who and when.
@@ -325,20 +329,14 @@ export class MatchesService {
 
     // Write an audit row for amends, recording what changed.
     if (amend && actorUserId !== undefined) {
-      await this.audit.record(
-        'match',
-        match.id,
-        'amend',
-        actorUserId,
-        {
-          previous: previousResult,
-          new: {
-            winnerId: s.winnerId,
-            topScore: s.topScore,
-            botScore: s.botScore,
-          },
+      await this.audit.record('match', match.id, 'amend', actorUserId, {
+        previous: previousResult,
+        new: {
+          winnerId: s.winnerId,
+          topScore: s.topScore,
+          botScore: s.botScore,
         },
-      );
+      });
     }
 
     if (s.winnerId == null) return true; // draw (league/group/swiss) — nothing to advance

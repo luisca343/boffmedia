@@ -3,7 +3,6 @@ import {
   Get,
   Query,
   UseGuards,
-  Req,
   BadRequestException,
   ParseIntPipe,
   Param,

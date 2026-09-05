@@ -43,7 +43,12 @@ export const boffMediaOutbox = mysqlTable(
     dedupeKey: varchar('dedupe_key', { length: 255 }),
     attemptCount: int('attempt_count').notNull().default(0),
     nextAttemptAt: timestamp('next_attempt_at').notNull().defaultNow(),
-    status: mysqlEnum('status', ['pending', 'processing', 'delivered', 'failed'])
+    status: mysqlEnum('status', [
+      'pending',
+      'processing',
+      'delivered',
+      'failed',
+    ])
       .notNull()
       .default('pending'),
     /**
@@ -63,7 +68,10 @@ export const boffMediaOutbox = mysqlTable(
   (t) => ({
     topicIdx: index('outbox_topic_idx').on(t.topic),
     statusIdx: index('outbox_status_idx').on(t.status),
-    nextAttemptIdx: index('outbox_next_attempt_idx').on(t.nextAttemptAt, t.status),
+    nextAttemptIdx: index('outbox_next_attempt_idx').on(
+      t.nextAttemptAt,
+      t.status,
+    ),
     // uniqueIndex, not index: the whole dedupe contract above depends on the
     // database refusing a second row with the same key. MySQL permits unlimited
     // NULLs in a UNIQUE index, so an unkeyed row is still never deduplicated.

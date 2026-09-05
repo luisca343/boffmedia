@@ -1,6 +1,5 @@
 import { Logger } from 'nestjs-pino';
 import { RandomizerRepository } from './randomizer.repository';
-import { AuditService } from '@api/_repositories/audit.service';
 
 /**
  * `getPublishedEmulatorRom` is the gate every randomizer config passes through:

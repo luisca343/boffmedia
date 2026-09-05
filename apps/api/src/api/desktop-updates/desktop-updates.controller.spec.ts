@@ -1,17 +1,16 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { HttpStatus } from '@nestjs/common';
 import { DesktopUpdatesController } from './desktop-updates.controller';
 import { DesktopUpdatesService } from './desktop-updates.service';
 import { DesktopReleasesRepository } from './repositories/desktop-releases.repository';
 import { DesktopRelease } from '@/_db/schema/DesktopReleases';
-import { UpdaterFeedEntity } from './entities/desktop-updates.entity';
 
 describe('DesktopUpdatesController', () => {
   let controller: DesktopUpdatesController;
-  let service: DesktopUpdatesService;
   let repository: DesktopReleasesRepository;
 
-  const mockRelease = (overrides?: Partial<DesktopRelease>): DesktopRelease => ({
+  const mockRelease = (
+    overrides?: Partial<DesktopRelease>,
+  ): DesktopRelease => ({
     id: 1,
     version: '2.0.0',
     target: 'windows-x86_64',
@@ -45,8 +44,9 @@ describe('DesktopUpdatesController', () => {
     }).compile();
 
     controller = module.get<DesktopUpdatesController>(DesktopUpdatesController);
-    service = module.get<DesktopUpdatesService>(DesktopUpdatesService);
-    repository = module.get<DesktopReleasesRepository>(DesktopReleasesRepository);
+    repository = module.get<DesktopReleasesRepository>(
+      DesktopReleasesRepository,
+    );
   });
 
   describe('feed with rollout bucketing', () => {
@@ -68,12 +68,7 @@ describe('DesktopUpdatesController', () => {
 
       const res = { status: jest.fn().mockReturnThis() } as any;
 
-      const result = await controller.feed(
-        'windows-x86_64',
-        '1.0.0',
-        req,
-        res,
-      );
+      const result = await controller.feed('windows-x86_64', '1.0.0', req, res);
 
       // Verify the result was computed with the install ID
       expect(result).toBeDefined();
@@ -130,12 +125,7 @@ describe('DesktopUpdatesController', () => {
 
       const res = { status: jest.fn().mockReturnThis() } as any;
 
-      const result = await controller.feed(
-        'windows-x86_64',
-        '1.0.0',
-        req,
-        res,
-      );
+      const result = await controller.feed('windows-x86_64', '1.0.0', req, res);
 
       // Without install ID, the service defaults to including (true).
       // So even at 50% rollout, a request without the header should get the release.
@@ -161,12 +151,7 @@ describe('DesktopUpdatesController', () => {
 
       const res = { status: jest.fn().mockReturnThis() } as any;
 
-      const result = await controller.feed(
-        'windows-x86_64',
-        '1.0.0',
-        req,
-        res,
-      );
+      const result = await controller.feed('windows-x86_64', '1.0.0', req, res);
 
       // Should trim and process the install ID normally
       expect(result?.version).toBe('2.0.0');

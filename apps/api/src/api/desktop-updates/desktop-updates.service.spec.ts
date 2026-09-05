@@ -7,7 +7,9 @@ describe('DesktopUpdatesService', () => {
   let service: DesktopUpdatesService;
   let repository: DesktopReleasesRepository;
 
-  const mockRelease = (overrides?: Partial<DesktopRelease>): DesktopRelease => ({
+  const mockRelease = (
+    overrides?: Partial<DesktopRelease>,
+  ): DesktopRelease => ({
     id: 1,
     version: '1.0.0',
     target: 'windows-x86_64',
@@ -43,7 +45,9 @@ describe('DesktopUpdatesService', () => {
     }).compile();
 
     service = module.get<DesktopUpdatesService>(DesktopUpdatesService);
-    repository = module.get<DesktopReleasesRepository>(DesktopReleasesRepository);
+    repository = module.get<DesktopReleasesRepository>(
+      DesktopReleasesRepository,
+    );
   });
 
   describe('feed with rollout and paused', () => {

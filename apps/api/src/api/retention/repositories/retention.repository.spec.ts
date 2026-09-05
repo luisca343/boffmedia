@@ -48,7 +48,9 @@ describe('RetentionRepository — Distributed Lease', () => {
       mockDb.execute.mockResolvedValueOnce([{ affectedRows: 1 }]);
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue([{ lockName: 'test', ownerId: 'some-uuid' }]),
+          where: jest
+            .fn()
+            .mockResolvedValue([{ lockName: 'test', ownerId: 'some-uuid' }]),
         }),
       });
 
@@ -78,7 +80,9 @@ describe('RetentionRepository — Distributed Lease', () => {
       mockDb.execute.mockResolvedValueOnce([{ affectedRows: 1 }]);
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          where: jest.fn().mockResolvedValue([{ lockName: 'test', ownerId: 'id' }]),
+          where: jest
+            .fn()
+            .mockResolvedValue([{ lockName: 'test', ownerId: 'id' }]),
         }),
       });
 
@@ -130,18 +134,18 @@ describe('RetentionRepository — Distributed Lease', () => {
       let selectCallCount = 0;
       mockDb.select.mockReturnValue({
         from: jest.fn().mockReturnValue({
-          where: jest
-            .fn()
-            .mockImplementation(() => {
-              selectCallCount++;
-              if (selectCallCount === 1) {
-                // First claimant's SELECT
-                return Promise.resolve([{ lockName: 'test', ownerId: 'first-uuid' }]);
-              } else {
-                // Second claimant's SELECT finds empty because ownerId doesn't match
-                return Promise.resolve([]);
-              }
-            }),
+          where: jest.fn().mockImplementation(() => {
+            selectCallCount++;
+            if (selectCallCount === 1) {
+              // First claimant's SELECT
+              return Promise.resolve([
+                { lockName: 'test', ownerId: 'first-uuid' },
+              ]);
+            } else {
+              // Second claimant's SELECT finds empty because ownerId doesn't match
+              return Promise.resolve([]);
+            }
+          }),
         }),
       });
 

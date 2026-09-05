@@ -36,7 +36,10 @@ export class AuthorSummaryEntity {
   })
   actionedReports!: number;
 
-  @ApiProperty({ example: 7, description: 'Reports against this author, ever.' })
+  @ApiProperty({
+    example: 7,
+    description: 'Reports against this author, ever.',
+  })
   totalReports!: number;
 
   @ApiProperty({ example: 0, description: 'Sanctions on record.' })

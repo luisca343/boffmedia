@@ -768,7 +768,12 @@ export class StandingsService {
     cmap: Map<number, Competitor>,
     profile: TournamentPhase['tiebreakProfile'] = 'points',
   ): Standing[] {
-    return this.cachedComputeStandings(tournamentId, participantIds, matches, profile).map((s) => ({
+    return this.cachedComputeStandings(
+      tournamentId,
+      participantIds,
+      matches,
+      profile,
+    ).map((s) => ({
       rank: s.rank,
       c: cmap.get(s.participantId)!,
       played: s.played,

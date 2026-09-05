@@ -3,11 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MySql2Database } from 'drizzle-orm/mysql2';
 import { and, eq, inArray, lt, sql } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import {
-  boffMediaOutbox,
-  type OutboxInsert,
-  type Outbox,
-} from '@/_db/schema/BoffMediaOutbox';
+import { boffMediaOutbox, type Outbox } from '@/_db/schema/BoffMediaOutbox';
 
 @Injectable()
 export class OutboxRepository {
@@ -39,14 +35,12 @@ export class OutboxRepository {
     payload: Record<string, unknown>,
     dedupeKey?: string,
   ): Promise<number> {
-    const [result] = await tx
-      .insert(boffMediaOutbox)
-      .values({
-        topic,
-        payload,
-        dedupeKey: dedupeKey ?? null,
-        status: 'pending',
-      });
+    const [result] = await tx.insert(boffMediaOutbox).values({
+      topic,
+      payload,
+      dedupeKey: dedupeKey ?? null,
+      status: 'pending',
+    });
     return result.insertId;
   }
 
@@ -60,14 +54,12 @@ export class OutboxRepository {
     payload: Record<string, unknown>,
     dedupeKey?: string,
   ): Promise<number> {
-    const [result] = await this.db
-      .insert(boffMediaOutbox)
-      .values({
-        topic,
-        payload,
-        dedupeKey: dedupeKey ?? null,
-        status: 'pending',
-      });
+    const [result] = await this.db.insert(boffMediaOutbox).values({
+      topic,
+      payload,
+      dedupeKey: dedupeKey ?? null,
+      status: 'pending',
+    });
     return result.insertId;
   }
 

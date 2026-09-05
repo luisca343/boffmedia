@@ -14,9 +14,9 @@ function urlWith(
   try {
     let url: string | null = null;
     jest.isolateModules(() => {
-      url = (
-        require('./asset-url') as typeof import('./asset-url')
-      ).absoluteAssetUrl(path);
+      // eslint-disable-next-line @typescript-eslint/no-require-imports -- Require inside isolateModules for test isolation
+      const mod = require('./asset-url') as typeof import('./asset-url');
+      url = mod.absoluteAssetUrl(path);
     });
     return url;
   } finally {
@@ -66,7 +66,10 @@ describe('absoluteAssetUrl', () => {
       'http://api.example.test/uploads/profiles/42.png',
     );
     expect(
-      urlWith({ PUBLIC_DIR: 'http://api.example.test/public///' }, '/boffmedia/a.png'),
+      urlWith(
+        { PUBLIC_DIR: 'http://api.example.test/public///' },
+        '/boffmedia/a.png',
+      ),
     ).toBe('http://api.example.test/public/boffmedia/a.png');
   });
 
@@ -98,7 +101,10 @@ describe('absoluteAssetUrl', () => {
     // The caller must treat this as "no url" — better a monogram than one
     // guaranteed to 404.
     expect(
-      urlWith({ PUBLIC_DIR: '/public', WEB_URL: '/also-a-path' }, '/uploads/a.png'),
+      urlWith(
+        { PUBLIC_DIR: '/public', WEB_URL: '/also-a-path' },
+        '/uploads/a.png',
+      ),
     ).toBeNull();
   });
 });

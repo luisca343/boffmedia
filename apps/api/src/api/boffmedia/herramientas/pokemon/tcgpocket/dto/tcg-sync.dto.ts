@@ -99,7 +99,9 @@ export class TcgSyncStatus {
   @ApiProperty() seriesId: string;
   @ApiProperty({ description: 'Remote catalogue was reachable' })
   remoteAvailable: boolean;
-  @ApiPropertyOptional({ description: 'Why the remote check failed, if it did' })
+  @ApiPropertyOptional({
+    description: 'Why the remote check failed, if it did',
+  })
   remoteError?: string | null;
   @ApiProperty() setsRemote: number;
   @ApiProperty() setsInDb: number;

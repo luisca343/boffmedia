@@ -562,7 +562,9 @@ export class TcgController {
                 stage: 'series',
                 scope: dto.seriesId || 'tcgp',
                 // First line only: a driver error carries the whole statement.
-                message: String(error?.message ?? error).split('\n')[0].slice(0, 240),
+                message: String(error?.message ?? error)
+                  .split('\n')[0]
+                  .slice(0, 240),
               },
             ],
           })}\n\n`,
@@ -681,7 +683,11 @@ export class TcgController {
   @Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
   @Get('users/:userId/cards/history')
   @ApiOperation({ summary: 'Get user card history' })
-  @ApiParam({ name: 'userId', description: 'User ID (ignored, uses authenticated user)', example: 'user123' })
+  @ApiParam({
+    name: 'userId',
+    description: 'User ID (ignored, uses authenticated user)',
+    example: 'user123',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
     description: 'User card history retrieved successfully.',

@@ -76,9 +76,9 @@ describe('StepUpGuard', () => {
   });
 
   it('refuses a token signed with a different secret', () => {
-    const forged = new JwtService({ secret: 'another-secret-of-at-least-32-chars!!' }).sign(
-      { sub: 1, typ: TOKEN_TYPE.MFA, su: true },
-    );
+    const forged = new JwtService({
+      secret: 'another-secret-of-at-least-32-chars!!',
+    }).sign({ sub: 1, typ: TOKEN_TYPE.MFA, su: true });
     const ctx = contextFor({ [STEP_UP_HEADER]: forged }, { userId: 1 });
 
     expect(() => guard.canActivate(ctx)).toThrow(ForbiddenException);

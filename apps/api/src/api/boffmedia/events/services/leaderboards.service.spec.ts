@@ -52,7 +52,10 @@ describe('LeaderboardsService', () => {
         // A10. A REAL cache, fresh per test: these specs assert the repository
         // was called with particular arguments, and a shared instance would
         // let one test's cached board answer the next test's read.
-        { provide: LeaderboardCacheService, useValue: new LeaderboardCacheService() },
+        {
+          provide: LeaderboardCacheService,
+          useValue: new LeaderboardCacheService(),
+        },
       ],
     }).compile();
     service = module.get<LeaderboardsService>(LeaderboardsService);

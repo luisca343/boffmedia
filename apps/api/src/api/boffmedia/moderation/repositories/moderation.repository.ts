@@ -202,11 +202,7 @@ export class ModerationRepository {
   async listReportsForContent(
     contentType: string,
     contentId: string,
-  ): Promise<
-    Array<
-      ContentReport & { reporterUsername: string | null }
-    >
-  > {
+  ): Promise<Array<ContentReport & { reporterUsername: string | null }>> {
     const rows = await this.db
       .select({
         report: boffMediaContentReports,
@@ -225,7 +221,10 @@ export class ModerationRepository {
       )
       .orderBy(desc(boffMediaContentReports.createdAt));
 
-    return rows.map((r) => ({ ...r.report, reporterUsername: r.reporterUsername }));
+    return rows.map((r) => ({
+      ...r.report,
+      reporterUsername: r.reporterUsername,
+    }));
   }
 
   /** Everyone who reported this item and is still waiting to hear back. */
@@ -346,9 +345,7 @@ export class ModerationRepository {
   async findModeration(
     contentType: string,
     contentId: string,
-  ): Promise<
-    typeof boffMediaContentModeration.$inferSelect | undefined
-  > {
+  ): Promise<typeof boffMediaContentModeration.$inferSelect | undefined> {
     const [row] = await this.db
       .select()
       .from(boffMediaContentModeration)
@@ -533,9 +530,10 @@ export class ModerationRepository {
    * "Live" is `revoked_at IS NULL AND (expires_at IS NULL OR expires_at > now)`
    * — the NULL expiry is the indefinite ban, so it must not be read as expired.
    */
-  async findActiveContentBan(
-    subject: { userId?: number | null; uuid?: string | null },
-  ): Promise<ModerationSanction | undefined> {
+  async findActiveContentBan(subject: {
+    userId?: number | null;
+    uuid?: string | null;
+  }): Promise<ModerationSanction | undefined> {
     const identity: SQL[] = [];
     if (subject.userId != null) {
       identity.push(

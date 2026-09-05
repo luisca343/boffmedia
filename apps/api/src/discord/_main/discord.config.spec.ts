@@ -23,7 +23,9 @@ describe('isDiscordBotEnabled', () => {
   });
 
   it('is off when no token was configured — degrade, do not crash', () => {
-    expect(isDiscordBotEnabled(withEnv({ DISCORD_KEY: undefined }))).toBe(false);
+    expect(isDiscordBotEnabled(withEnv({ DISCORD_KEY: undefined }))).toBe(
+      false,
+    );
     expect(isDiscordBotEnabled(withEnv({ DISCORD_KEY: '' }))).toBe(false);
   });
 });

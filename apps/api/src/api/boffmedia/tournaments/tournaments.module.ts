@@ -23,11 +23,7 @@ import { TournamentAnnouncerService } from './services/tournament-announcer.serv
   // forwardRef on OutboxModule: it forwardRefs this module back, and a direct
   // import here means whichever of the two is reached first sees `undefined` in
   // the other's imports array.
-  imports: [
-    DrizzleModule,
-    NotificationsModule,
-    forwardRef(() => OutboxModule),
-  ],
+  imports: [DrizzleModule, NotificationsModule, forwardRef(() => OutboxModule)],
   controllers: [TournamentsController],
   providers: [
     TournamentsRepository,

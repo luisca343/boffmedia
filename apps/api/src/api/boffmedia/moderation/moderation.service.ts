@@ -8,10 +8,7 @@ import {
 import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import { AuditRepository } from '@api/_repositories/boffmedia/audit.repository';
 import { AUDIT_SUBJECT } from '@/_db/schema/BoffMediaEvents';
-import {
-  REPORT_STATUS,
-  SANCTION_KIND,
-} from '@/_db/schema/BoffMediaModeration';
+import { REPORT_STATUS, SANCTION_KIND } from '@/_db/schema/BoffMediaModeration';
 import { NotificationsService } from '../notifications/notifications.service';
 import { ContentSurface, findSurface } from './content-registry';
 import {
@@ -71,7 +68,10 @@ export class ModerationService {
 
     // Not a moral rule, a queue-hygiene one: self-reports are how people test
     // the button, and every one of them costs an admin a look.
-    if (content.authorUserId != null && content.authorUserId === reporterUserId) {
+    if (
+      content.authorUserId != null &&
+      content.authorUserId === reporterUserId
+    ) {
       throw new BadRequestException(
         userError(
           ApiErrorCode.MODERATION_SELF_REPORT,
@@ -356,7 +356,8 @@ export class ModerationService {
     // The author comes from the content while it still exists, and from the
     // report's snapshot once it does not — sanctioning has to stay possible
     // after the post is gone, which is often exactly when it is decided.
-    const subjectUserId = content?.authorUserId ?? reports[0]?.authorUserId ?? null;
+    const subjectUserId =
+      content?.authorUserId ?? reports[0]?.authorUserId ?? null;
     const subjectUuid = content?.authorUuid ?? reports[0]?.authorUuid ?? null;
     if (subjectUserId == null && !subjectUuid) {
       throw new NotFoundException(
@@ -493,14 +494,15 @@ export class ModerationService {
     if (groups.length === 0) return [];
 
     const hidden = await this.repo.findHiddenKeys(
-      groups.map((g) => ({ contentType: g.contentType, contentId: g.contentId })),
+      groups.map((g) => ({
+        contentType: g.contentType,
+        contentId: g.contentId,
+      })),
     );
 
     const userIds = [
       ...new Set(
-        groups
-          .map((g) => g.authorUserId)
-          .filter((v): v is number => v != null),
+        groups.map((g) => g.authorUserId).filter((v): v is number => v != null),
       ),
     ];
     const uuids = [
@@ -518,7 +520,9 @@ export class ModerationService {
       const surface = findSurface(group.contentType);
       const id = surface?.parseId(group.contentId) ?? null;
       const content =
-        surface && id !== null ? await this.repo.loadContent(surface, id) : null;
+        surface && id !== null
+          ? await this.repo.loadContent(surface, id)
+          : null;
 
       const key = authorKey(group.authorUserId, group.authorUuid);
       const tally = key ? tallies.get(key) : undefined;

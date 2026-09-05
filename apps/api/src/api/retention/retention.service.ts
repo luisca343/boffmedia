@@ -71,7 +71,8 @@ export class RetentionService {
       // Notifications: read only, older than window
       if (env.RETENTION_NOTIFICATIONS_DAYS > 0) {
         const cutoff = new Date(
-          now.getTime() - env.RETENTION_NOTIFICATIONS_DAYS * 24 * 60 * 60 * 1000,
+          now.getTime() -
+            env.RETENTION_NOTIFICATIONS_DAYS * 24 * 60 * 60 * 1000,
         );
         const deleted = await this.repo.deleteOldReadNotifications(cutoff);
         if (deleted > 0) summary.push(`notifications: -${deleted}`);
@@ -95,7 +96,9 @@ export class RetentionService {
       // Gobierno audits: separate window
       if (env.RETENTION_GOBIERNO_AUDIT_MONTHS > 0) {
         const cutoff = new Date(now);
-        cutoff.setMonth(cutoff.getMonth() - env.RETENTION_GOBIERNO_AUDIT_MONTHS);
+        cutoff.setMonth(
+          cutoff.getMonth() - env.RETENTION_GOBIERNO_AUDIT_MONTHS,
+        );
         const deleted = await this.repo.deleteGobiernoAuditoriaOld(cutoff);
         if (deleted > 0) summary.push(`gobierno_auditoria: -${deleted}`);
       }
@@ -113,7 +116,8 @@ export class RetentionService {
       // Event invites: expired past grace period
       if (env.RETENTION_EVENT_INVITES_GRACE_DAYS > 0) {
         const cutoff = new Date(
-          now.getTime() - env.RETENTION_EVENT_INVITES_GRACE_DAYS * 24 * 60 * 60 * 1000,
+          now.getTime() -
+            env.RETENTION_EVENT_INVITES_GRACE_DAYS * 24 * 60 * 60 * 1000,
         );
         const deleted = await this.repo.deleteExpiredEventInvites(cutoff);
         if (deleted > 0) summary.push(`event_invites: -${deleted}`);
@@ -148,7 +152,9 @@ export class RetentionService {
       // A8 — Categorize the error for metrics visibility.
       const errorType = this.categorizeError(error);
       sweepErrorsTotal.inc({ error_type: errorType });
-      this.logger.error(`Retention sweep failed [${errorType}]: ${error?.message}`);
+      this.logger.error(
+        `Retention sweep failed [${errorType}]: ${error?.message}`,
+      );
     } finally {
       // A8 — ALWAYS release the lease, even if the sweep threw. A leaked lease
       // (row stays in the table) is worse than no lease, because the next sweep

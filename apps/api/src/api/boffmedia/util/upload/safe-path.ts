@@ -55,25 +55,27 @@ export const ALLOWED_FILE_EXTENSIONS = new Set([
 ]);
 
 /** Magic-byte prefixes, so a `.png` that is really a script is refused. */
-const IMAGE_MAGIC: ReadonlyArray<{ ext: string; test: (b: Buffer) => boolean }> =
-  [
-    { ext: '.jpg', test: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
-    {
-      ext: '.png',
-      test: (b) =>
-        b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47,
-    },
-    {
-      ext: '.gif',
-      test: (b) => b.subarray(0, 3).toString('latin1') === 'GIF',
-    },
-    {
-      ext: '.webp',
-      test: (b) =>
-        b.subarray(0, 4).toString('latin1') === 'RIFF' &&
-        b.subarray(8, 12).toString('latin1') === 'WEBP',
-    },
-  ];
+const IMAGE_MAGIC: ReadonlyArray<{
+  ext: string;
+  test: (b: Buffer) => boolean;
+}> = [
+  { ext: '.jpg', test: (b) => b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff },
+  {
+    ext: '.png',
+    test: (b) =>
+      b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47,
+  },
+  {
+    ext: '.gif',
+    test: (b) => b.subarray(0, 3).toString('latin1') === 'GIF',
+  },
+  {
+    ext: '.webp',
+    test: (b) =>
+      b.subarray(0, 4).toString('latin1') === 'RIFF' &&
+      b.subarray(8, 12).toString('latin1') === 'WEBP',
+  },
+];
 
 /** Multipart fields arrive as `string | string[]`; take the first value. */
 function first(raw: unknown): string | undefined {

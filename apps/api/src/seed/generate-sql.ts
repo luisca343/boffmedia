@@ -165,7 +165,10 @@ function mineRewards(): string {
   );
 
   return (
-    header(`Mine drop table (${REWARDS.length} rewards)`, 'seed/mine-rewards.ts') +
+    header(
+      `Mine drop table (${REWARDS.length} rewards)`,
+      'seed/mine-rewards.ts',
+    ) +
     '\n-- Never DELETE from this table: game history FKs to it ON DELETE CASCADE.\n\n' +
     rows.join('\n\n') +
     '\n'
@@ -193,7 +196,10 @@ function pasaporte(): string {
     );
 
   return (
-    header('Pasaporte: active cycle + achievement weights', 'seed/pasaporte.ts') +
+    header(
+      'Pasaporte: active cycle + achievement weights',
+      'seed/pasaporte.ts',
+    ) +
     '\n-- ── The active cycle ───────────────────────────────────────────────────────\n' +
     '-- Guarded on "is any season active", not on the number: a cycle already running is\n' +
     '-- left alone rather than replaced.\n\n' +
@@ -413,7 +419,10 @@ function build(): Map<string, string> {
       '-- 00-admin section first — bcrypt cannot be computed in SQL, so the password hash',
       '-- has to be pasted in. Leaving the placeholder inserts no administrator, by design.',
       '',
-      ...FILES.map((f) => `-- ═══ ${f.name} ${'═'.repeat(Math.max(0, 60 - f.name.length))}\n\n${out.get(f.name)!}`),
+      ...FILES.map(
+        (f) =>
+          `-- ═══ ${f.name} ${'═'.repeat(Math.max(0, 60 - f.name.length))}\n\n${out.get(f.name)!}`,
+      ),
     ].join('\n'),
   );
 

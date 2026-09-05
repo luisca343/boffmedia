@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { LoggingUtil } from './_utils/LoggingUtils';
 
@@ -47,8 +47,7 @@ export class AppService {
    */
   async getHealth(): Promise<{ status: 'ok' | 'degraded' }> {
     const dbHealth = await this.checkDatabaseConnection();
-    const status =
-      dbHealth.status === 'error' ? 'degraded' : ('ok' as const);
+    const status = dbHealth.status === 'error' ? 'degraded' : ('ok' as const);
     return { status };
   }
 

@@ -18,7 +18,10 @@ jest.mock('@/config/env', () => ({
 
 import { TwoFactorService, hashBackupCode } from './two-factor.service';
 import { TwoFactorRepository } from './two-factor.repository';
-import { openSecret, resetSecretBoxKeyCache } from '@api/_utils/crypto/secret-box';
+import {
+  openSecret,
+  resetSecretBoxKeyCache,
+} from '@api/_utils/crypto/secret-box';
 
 describe('TwoFactorService', () => {
   let service: TwoFactorService;
@@ -275,7 +278,7 @@ describe('TwoFactorService', () => {
  *  the database actually holds. */
 function sealFor(secret: string): string {
   // Imported lazily so the env mock above is in place first.
-
+  // eslint-disable-next-line @typescript-eslint/no-require-imports -- Lazy load after env mock is set up
   const { sealSecret } = require('@api/_utils/crypto/secret-box');
   return sealSecret(secret);
 }

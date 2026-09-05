@@ -153,9 +153,7 @@ describe('TcgSyncService', () => {
         { id: 'A2-002' },
       ]);
 
-      await collect(
-        service.run({ seriesId: 'tcgp', sets: true, cards: true }),
-      );
+      await collect(service.run({ seriesId: 'tcgp', sets: true, cards: true }));
 
       expect(mockImageService.downloadSetImages).not.toHaveBeenCalled();
       expect(mockImageService.downloadCardImage).not.toHaveBeenCalled();
@@ -168,7 +166,9 @@ describe('TcgSyncService', () => {
     it('skips sets that are already complete, and re-walks them under force', async () => {
       mockFetchService.fetchAndMergeCardsForSet.mockResolvedValue([]);
 
-      const events = await collect(service.run({ seriesId: 'tcgp', cards: true }));
+      const events = await collect(
+        service.run({ seriesId: 'tcgp', cards: true }),
+      );
       const skipped = events.filter(
         (e: any) => e.type === 'set' && e.state === 'skipped',
       );
@@ -183,7 +183,9 @@ describe('TcgSyncService', () => {
       mockFetchService.fetchAndMergeCardsForSet.mockResolvedValue([]);
       mockRepository.upsertCards.mockResolvedValue({ inserted: 0, updated: 3 });
 
-      await collect(service.run({ seriesId: 'tcgp', cards: true, force: true }));
+      await collect(
+        service.run({ seriesId: 'tcgp', cards: true, force: true }),
+      );
       expect(mockFetchService.fetchAndMergeCardsForSet).toHaveBeenCalled();
     });
 
@@ -207,11 +209,17 @@ describe('TcgSyncService', () => {
         },
       );
 
-      const events = await collect(service.run({ seriesId: 'tcgp', cards: true }));
+      const events = await collect(
+        service.run({ seriesId: 'tcgp', cards: true }),
+      );
 
       const setEvents = events.filter((e: any) => e.type === 'set') as any[];
-      expect(setEvents.find((e) => e.setId === 'A1' && e.state === 'error')).toBeDefined();
-      expect(setEvents.find((e) => e.setId === 'A2' && e.state === 'done')).toBeDefined();
+      expect(
+        setEvents.find((e) => e.setId === 'A1' && e.state === 'error'),
+      ).toBeDefined();
+      expect(
+        setEvents.find((e) => e.setId === 'A2' && e.state === 'done'),
+      ).toBeDefined();
 
       const done = events[events.length - 1] as any;
       expect(done.type).toBe('done');
@@ -251,9 +259,7 @@ describe('TcgSyncService', () => {
       mockRepository.getSyncStatsBySeries.mockResolvedValue([]);
       mockFetchService.fetchAndMergeCardsForSet.mockResolvedValue([]);
 
-      await collect(
-        service.run({ seriesId: 'tcgp', sets: true, cards: true }),
-      );
+      await collect(service.run({ seriesId: 'tcgp', sets: true, cards: true }));
 
       // Once for resolveTargetSets, once for the sets stage — not a third time.
       expect(
@@ -270,21 +276,30 @@ describe('TcgSyncService', () => {
       mockFetchService.fetchAndMergeCardsForSet.mockResolvedValue([]);
       mockRepository.upsertSets.mockRejectedValue(new Error('sets table down'));
 
-      const events = await collect(service.run({ seriesId: 'tcgp', cards: true }));
+      const events = await collect(
+        service.run({ seriesId: 'tcgp', cards: true }),
+      );
       const setEvents = events.filter((e: any) => e.type === 'set') as any[];
 
       // A2 is remote-only and could not be created; A1 is already stored.
       expect(
         setEvents.find((e) => e.setId === 'A2' && e.state === 'error')?.message,
       ).toContain('sets table down');
-      expect(setEvents.find((e) => e.setId === 'A1' && e.state === 'done')).toBeDefined();
+      expect(
+        setEvents.find((e) => e.setId === 'A1' && e.state === 'done'),
+      ).toBeDefined();
     });
 
     it('creates the series row before the first set is written', async () => {
       // Nothing imported yet: sets cannot be inserted until the series exists.
       mockRepository.checkIfSeriesExists.mockResolvedValue(false);
       mockFetchService.fetchAndMergeSeries.mockResolvedValue([
-        { id: 'tcgp', name_en: 'TCG Pocket', name_es: 'TCG Pocket', logo: null },
+        {
+          id: 'tcgp',
+          name_en: 'TCG Pocket',
+          name_es: 'TCG Pocket',
+          logo: null,
+        },
       ]);
 
       await collect(service.run({ seriesId: 'tcgp', sets: true }));
@@ -311,7 +326,9 @@ describe('TcgSyncService', () => {
         ),
       );
 
-      const events = await collect(service.run({ seriesId: 'tcgp', cards: true }));
+      const events = await collect(
+        service.run({ seriesId: 'tcgp', cards: true }),
+      );
       const done = events[events.length - 1] as any;
 
       expect(done.failures[0].message.length).toBeLessThanOrEqual(240);
@@ -459,7 +476,9 @@ describe('TcgSyncService', () => {
       expect(done.type).toBe('done');
       expect(done.cancelled).toBe(true);
       // Two sets were in scope; the second one never starts.
-      expect(mockFetchService.fetchAndMergeCardsForSet).toHaveBeenCalledTimes(1);
+      expect(mockFetchService.fetchAndMergeCardsForSet).toHaveBeenCalledTimes(
+        1,
+      );
     });
   });
 });

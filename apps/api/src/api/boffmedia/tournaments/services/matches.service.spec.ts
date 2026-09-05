@@ -200,24 +200,18 @@ describe('MatchesService (settlement claim)', () => {
       },
     );
 
-    expect(audit.record).toHaveBeenCalledWith(
-      'match',
-      7,
-      'amend',
-      456,
-      {
-        previous: {
-          winnerId: 10,
-          topScore: 1,
-          botScore: 0,
-        },
-        new: {
-          winnerId: 20,
-          topScore: 0,
-          botScore: 1,
-        },
+    expect(audit.record).toHaveBeenCalledWith('match', 7, 'amend', 456, {
+      previous: {
+        winnerId: 10,
+        topScore: 1,
+        botScore: 0,
       },
-    );
+      new: {
+        winnerId: 20,
+        topScore: 0,
+        botScore: 1,
+      },
+    });
   });
 
   it('report surfaces a lost race instead of reporting success', async () => {

@@ -43,9 +43,9 @@ export class StepUpGuard implements CanActivate {
   constructor(private readonly jwt: JwtService) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const req = context.switchToHttp().getRequest<
-      Request & { user?: { userId?: number } }
-    >();
+    const req = context
+      .switchToHttp()
+      .getRequest<Request & { user?: { userId?: number } }>();
     const raw = req.headers[STEP_UP_HEADER];
     const token = Array.isArray(raw) ? raw[0] : raw;
 

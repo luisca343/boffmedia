@@ -134,7 +134,9 @@ export class DocumentService {
     }
 
     if (updateDocumentRequest.content !== undefined) {
-      updateData.content = sanitizeRichText(updateDocumentRequest.content).trim();
+      updateData.content = sanitizeRichText(
+        updateDocumentRequest.content,
+      ).trim();
     }
 
     if (updateDocumentRequest.type !== undefined) {

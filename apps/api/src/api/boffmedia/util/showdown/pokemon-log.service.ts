@@ -27,7 +27,8 @@ export class PokemonLogService {
     let errors = 0;
 
     try {
-      const keyFile = env.POKEMON_LOG_SERVICE_KEY_FILE || 'boffmedia-b6e4f721c326.json';
+      const keyFile =
+        env.POKEMON_LOG_SERVICE_KEY_FILE || 'boffmedia-b6e4f721c326.json';
       const auth = new google.auth.GoogleAuth({
         keyFile,
         scopes: ['https://www.googleapis.com/auth/spreadsheets'],
@@ -140,7 +141,10 @@ export class PokemonLogService {
     }
   }
 
-  parseShowdownLog(logData: string, localPlayerName: string = 'Luisca343'): ParsedLog | null {
+  parseShowdownLog(
+    logData: string,
+    localPlayerName: string = 'Luisca343',
+  ): ParsedLog | null {
     const lines = logData.split('\n');
     let rivalPlayer = '';
     let rivalPlayerName = '';

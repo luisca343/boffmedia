@@ -71,7 +71,10 @@ export const ficusAiUsage = mysqlTable(
   },
   (t) => ({
     // Unique constraint on (uuid, date) for upsert operations
-    uniqueUserDateIdx: uniqueIndex('ficusai_usage_user_date_idx').on(t.uuid, t.date),
+    uniqueUserDateIdx: uniqueIndex('ficusai_usage_user_date_idx').on(
+      t.uuid,
+      t.date,
+    ),
   }),
 );
 

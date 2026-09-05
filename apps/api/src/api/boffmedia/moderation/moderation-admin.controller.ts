@@ -151,7 +151,9 @@ export class ModerationAdminController {
     description: 'Fresh two-factor confirmation token',
     required: true,
   })
-  @ApiOperation({ summary: 'Warn or content-ban the author of reported content' })
+  @ApiOperation({
+    summary: 'Warn or content-ban the author of reported content',
+  })
   @ApiResponse({ status: HttpStatus.CREATED })
   async sanction(
     @Body() dto: CreateSanctionDto,

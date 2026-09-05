@@ -101,7 +101,9 @@ export class NotificationsController {
   @ApiOperation({ summary: "Get the current user's notification preferences" })
   @ApiResponse({ status: 200, type: PreferencesListEntity })
   async getPreferences(@Req() req: any) {
-    const preferences = await this.preferencesService.listForUser(req.user.userId);
+    const preferences = await this.preferencesService.listForUser(
+      req.user.userId,
+    );
     return { preferences };
   }
 

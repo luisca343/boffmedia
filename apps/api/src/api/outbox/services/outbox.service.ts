@@ -1,4 +1,4 @@
-import { Inject, Injectable, Optional } from '@nestjs/common';
+import { Injectable, Optional } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { Logger } from 'nestjs-pino';
 import { OutboxRepository } from '../repositories/outbox.repository';
@@ -144,7 +144,9 @@ export class OutboxService {
 
   // ─── Handlers ────────────────────────────────────────────────────────────
 
-  private async handleNotificationCreate(payload: Record<string, unknown>): Promise<void> {
+  private async handleNotificationCreate(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.notifications) {
       throw new Error('NotificationsService not wired into OutboxModule');
     }
@@ -163,7 +165,9 @@ export class OutboxService {
     );
   }
 
-  private async handleTournamentAnnounce(payload: Record<string, unknown>): Promise<void> {
+  private async handleTournamentAnnounce(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.announcer || !this.tournamentsRepo) {
       throw new Error('TournamentAnnouncerService not wired into OutboxModule');
     }
@@ -180,9 +184,10 @@ export class OutboxService {
 
     switch (eventType) {
       case 'champion':
-        if (!participantId) throw new Error('participantId required for champion');
+        if (!participantId)
+          throw new Error('participantId required for champion');
         await this.announcer.post({
-          title: `🏆 ${await this.tournamentsRepo.findParticipant(participantId).then(p => p?.name ?? 'Campeón')} gana ${tournament.name}`,
+          title: `🏆 ${await this.tournamentsRepo.findParticipant(participantId).then((p) => p?.name ?? 'Campeón')} gana ${tournament.name}`,
           url: `${process.env.NEXTAUTH_URL ?? 'https://ficuslab.es'}/torneos/${tournament.slug}`,
           color: 0xeab308,
         });
@@ -206,17 +211,24 @@ export class OutboxService {
     }
   }
 
-  private async handleDataExportBuild(payload: Record<string, unknown>): Promise<void> {
+  private async handleDataExportBuild(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.dataExport) {
       throw new Error('DataExportService not wired into OutboxModule');
     }
-    const { exportId, userId } = payload as { exportId: number; userId: number };
+    const { exportId, userId } = payload as {
+      exportId: number;
+      userId: number;
+    };
     // `build` stamps the row `failed` before rethrowing, so the user sees the
     // outcome immediately while the outbox still retries with backoff.
     await this.dataExport.build(exportId, userId);
   }
 
-  private async handleWigglypopSettle(payload: Record<string, unknown>): Promise<void> {
+  private async handleWigglypopSettle(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.custody || !this.ordersRepo) {
       throw new Error('WigglypopCustodyService not wired into OutboxModule');
     }
@@ -228,7 +240,9 @@ export class OutboxService {
     await this.custody.settleNewOrder(order);
   }
 
-  private async handleWigglypopConfirm(payload: Record<string, unknown>): Promise<void> {
+  private async handleWigglypopConfirm(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.custody || !this.ordersRepo) {
       throw new Error('WigglypopCustodyService not wired into OutboxModule');
     }
@@ -240,7 +254,9 @@ export class OutboxService {
     await this.custody.confirmOrder(order);
   }
 
-  private async handleWigglypopCancel(payload: Record<string, unknown>): Promise<void> {
+  private async handleWigglypopCancel(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.custody || !this.ordersRepo) {
       throw new Error('WigglypopCustodyService not wired into OutboxModule');
     }
@@ -257,7 +273,9 @@ export class OutboxService {
    * while the order is still owed something, and that throw is what keeps the
    * outbox row pending so the dispatcher tries again with backoff.
    */
-  private async handleWigglypopDeliver(payload: Record<string, unknown>): Promise<void> {
+  private async handleWigglypopDeliver(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.saga) {
       throw new Error('WigglypopSagaService not wired into OutboxModule');
     }
@@ -265,7 +283,9 @@ export class OutboxService {
     await this.saga.deliverOrder(orderId);
   }
 
-  private async handleMailVerification(payload: Record<string, unknown>): Promise<void> {
+  private async handleMailVerification(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.mail) {
       throw new Error('MailService not wired into OutboxModule');
     }
@@ -277,7 +297,9 @@ export class OutboxService {
     await this.mail.sendEmailVerification(to, token, locale);
   }
 
-  private async handleMailPasswordReset(payload: Record<string, unknown>): Promise<void> {
+  private async handleMailPasswordReset(
+    payload: Record<string, unknown>,
+  ): Promise<void> {
     if (!this.mail) {
       throw new Error('MailService not wired into OutboxModule');
     }

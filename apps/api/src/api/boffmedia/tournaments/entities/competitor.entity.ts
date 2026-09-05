@@ -78,7 +78,7 @@ export class Competitor {
     nullable: true,
     enum: ['teamsheet', 'check-in'],
     description:
-      "What this registration is still missing before it counts as an entry — who is about to be dropped, and why. Admin-only: null for everyone else. A player reads their own through `viewerEntryGaps`.",
+      'What this registration is still missing before it counts as an entry — who is about to be dropped, and why. Admin-only: null for everyone else. A player reads their own through `viewerEntryGaps`.',
   })
   entryGaps: string[] | null;
 }

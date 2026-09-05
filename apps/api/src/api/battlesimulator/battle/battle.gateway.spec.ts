@@ -537,7 +537,10 @@ describe('BattleGateway — disconnect/reconnect signals', () => {
     bob = mockSocket({ userId: 2, name: 'Bob' });
     server = mockServer([alice, bob]);
     gateway = makeGateway({}, server);
-    (gateway as any).rooms.set(ROOM, fakeRoom(ROOM, { sides: { 1: 'p1', 2: 'p2' } }));
+    (gateway as any).rooms.set(
+      ROOM,
+      fakeRoom(ROOM, { sides: { 1: 'p1', 2: 'p2' } }),
+    );
     (gateway as any).hold(1, ROOM);
     (gateway as any).hold(2, ROOM);
     gateway.handleConnection(alice);
@@ -549,9 +552,9 @@ describe('BattleGateway — disconnect/reconnect signals', () => {
     jest.useFakeTimers();
     gateway.handleDisconnect(alice);
 
-    const disconnected = server.__to(`${ROOM}:p2`).find(
-      (s: any) => s.event === 'opponentDisconnected',
-    );
+    const disconnected = server
+      .__to(`${ROOM}:p2`)
+      .find((s: any) => s.event === 'opponentDisconnected');
     expect(disconnected).toBeDefined();
     expect(disconnected!.payload).toMatchObject({
       graceDurationMs: 30_000,
@@ -569,9 +572,9 @@ describe('BattleGateway — disconnect/reconnect signals', () => {
     // Resume Alice
     gateway.handleResume(alice, { roomId: ROOM });
 
-    const reconnected = server.__to(`${ROOM}:p2`).find(
-      (s: any) => s.event === 'opponentReconnected',
-    );
+    const reconnected = server
+      .__to(`${ROOM}:p2`)
+      .find((s: any) => s.event === 'opponentReconnected');
     expect(reconnected).toBeDefined();
     jest.useRealTimers();
   });
@@ -585,9 +588,9 @@ describe('BattleGateway — disconnect/reconnect signals', () => {
     // Spectate Alice (she still owns p1 side)
     gateway.handleSpectate(alice, { roomId: ROOM });
 
-    const reconnected = server.__to(`${ROOM}:p2`).find(
-      (s: any) => s.event === 'opponentReconnected',
-    );
+    const reconnected = server
+      .__to(`${ROOM}:p2`)
+      .find((s: any) => s.event === 'opponentReconnected');
     expect(reconnected).toBeDefined();
     jest.useRealTimers();
   });
@@ -598,9 +601,9 @@ describe('BattleGateway — disconnect/reconnect signals', () => {
 
     gateway.handleResume(alice, { roomId: ROOM });
 
-    const reconnected = server.__to(`${ROOM}:p2`).find(
-      (s: any) => s.event === 'opponentReconnected',
-    );
+    const reconnected = server
+      .__to(`${ROOM}:p2`)
+      .find((s: any) => s.event === 'opponentReconnected');
     expect(reconnected).toBeUndefined();
   });
 
@@ -608,7 +611,10 @@ describe('BattleGateway — disconnect/reconnect signals', () => {
     const spec = mockSocket({ userId: 999, name: 'Spectator' });
     server = mockServer([alice, bob, spec]);
     gateway = makeGateway({}, server);
-    (gateway as any).rooms.set(ROOM, fakeRoom(ROOM, { sides: { 1: 'p1', 2: 'p2' } }));
+    (gateway as any).rooms.set(
+      ROOM,
+      fakeRoom(ROOM, { sides: { 1: 'p1', 2: 'p2' } }),
+    );
     (gateway as any).hold(1, ROOM);
     (gateway as any).hold(2, ROOM);
     gateway.handleConnection(alice);
