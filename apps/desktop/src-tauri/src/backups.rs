@@ -218,7 +218,7 @@ pub fn backup_before_update(
     let label = format!("Antes de actualizar a {}", version_id);
 
     let dir = backups_dir(layout, slug);
-    if let Err(_) = std::fs::create_dir_all(&dir) {
+    if std::fs::create_dir_all(&dir).is_err() {
         return false;
     }
 

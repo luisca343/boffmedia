@@ -19,6 +19,12 @@ use crate::pack::PackManifestVersionInitialFilesItemSource as Source;
 /// Seed the version's `initialFiles` into the instance, first-install-only.
 /// Game-agnostic: takes the instance/layout/pack-id directly so both the
 /// Minecraft and emulator install paths can call it.
+//
+// Eight parameters, one over clippy's limit, and they stay separate on purpose:
+// bundling them into a struct would mean the Minecraft and emulator callers
+// each build a context object whose only reader is this function. The
+// game-agnostic signature IS the design — see the doc comment above.
+#[allow(clippy::too_many_arguments)]
 pub async fn seed_initial_files(
     app: &tauri::AppHandle,
     instance: &InstancePaths,

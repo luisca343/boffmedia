@@ -297,6 +297,11 @@ mod tests {
         assert_eq!(apply(PatchFormat::Bps, &source, &patch).unwrap(), target);
     }
 
+    // `(n - 1) << 2 | command` is the BPS action encoding, written out rather
+    // than folded. clippy calls `| 0` and `3 - 1` no-ops, and arithmetically it
+    // is right — but the whole point of these literals is to show which command
+    // number each action carries, and a bare `24` shows nothing.
+    #[allow(clippy::identity_op)]
     #[test]
     fn bps_source_read_reuses_the_base() {
         // TargetRead the first 3 bytes, then SourceRead the remaining tail

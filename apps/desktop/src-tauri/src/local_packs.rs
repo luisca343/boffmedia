@@ -309,7 +309,7 @@ pub async fn local_pack_duplicate(
     let label = {
         let trimmed = name.trim();
         if trimmed.is_empty() {
-            format!("{} (copia)", manifest.pack.name.to_string())
+            format!("{} (copia)", *manifest.pack.name)
         } else {
             trimmed.to_string()
         }
@@ -534,7 +534,7 @@ async fn export_mrpack_impl(
 
     let dialog = app.dialog().clone();
     let suffix = if server_only { "-server" } else { "" };
-    let file_name = format!("{}{suffix}.mrpack", manifest.pack.slug.to_string());
+    let file_name = format!("{}{suffix}.mrpack", *manifest.pack.slug);
     let chosen = tauri::async_runtime::spawn_blocking(move || {
         dialog
             .file()
@@ -628,7 +628,7 @@ async fn export_mrpack_impl(
             // that already ships every mod jar it needs.
             continue;
         }
-        let local = crate::install::files::local_blob_path(&layout, &world.sha512.as_str());
+        let local = crate::install::files::local_blob_path(&layout, world.sha512.as_str());
         let world_zip_bytes = if local.is_file() {
             std::fs::read(&local).ok()
         } else {
@@ -697,7 +697,7 @@ async fn export_mrpack_impl(
     if let Ok(icon_file) = icon_path(&dir) {
         if let Ok(icon_bytes) = std::fs::read(&icon_file) {
             if let Some(filename) = icon_file.file_name().and_then(|n| n.to_str()) {
-                let _ = zip.start_file(&format!("boffmedia/{}", filename), options);
+                let _ = zip.start_file(format!("boffmedia/{}", filename), options);
                 let _ = zip.write_all(&icon_bytes);
             }
         }
@@ -712,7 +712,7 @@ async fn export_mrpack_impl(
                     if metadata.is_file() {
                         if let Some(filename) = entry.file_name().to_str() {
                             if let Ok(bytes) = std::fs::read(entry.path()) {
-                                let _ = zip.start_file(&format!("boffmedia/gallery/{}", filename), options);
+                                let _ = zip.start_file(format!("boffmedia/gallery/{}", filename), options);
                                 let _ = zip.write_all(&bytes);
                             }
                         }
@@ -950,7 +950,7 @@ pub async fn import_mrpack_bytes(
     if renamed {
         let renamed_name = format!(
             "{} ({})",
-            manifest.pack.name.to_string(),
+            *manifest.pack.name,
             final_slug.rsplit('-').next().unwrap_or("2")
         );
         manifest.pack.name = renamed_name
@@ -1530,7 +1530,7 @@ fn extract_mrpack_metadata<R: std::io::Read + std::io::Seek>(
     for (name, is_dir) in &entries {
         if name.starts_with("boffmedia/icon.") && !is_dir {
             if let Ok(mut entry) = archive.by_name(name) {
-                let filename = name.split('/').last().unwrap_or("icon.png");
+                let filename = name.split('/').next_back().unwrap_or("icon.png");
                 let dest = pack_dir.join(filename);
                 let mut buf = Vec::new();
                 let _ = std::io::Read::read_to_end(&mut entry, &mut buf);
@@ -1544,7 +1544,7 @@ fn extract_mrpack_metadata<R: std::io::Read + std::io::Seek>(
     for (name, is_dir) in &entries {
         if name.starts_with("boffmedia/gallery/") && !is_dir {
             if let Ok(mut entry) = archive.by_name(name) {
-                let filename = name.split('/').last().unwrap_or("image.png");
+                let filename = name.split('/').next_back().unwrap_or("image.png");
                 let _ = std::fs::create_dir_all(&gallery_dir);
                 let mut buf = Vec::new();
                 let _ = std::io::Read::read_to_end(&mut entry, &mut buf);

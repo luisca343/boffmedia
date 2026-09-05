@@ -223,7 +223,7 @@ fn write_resource_packs(minecraft: &Path, desired: &Desired) -> std::io::Result<
 
 /// `resourcePacks:["vanilla","file/x.zip"]` — a JSON array on one line.
 fn parse_entries(line: &str) -> Option<Vec<String>> {
-    let value = line.trim_end_matches(['\r', '\n']).splitn(2, ':').nth(1)?;
+    let value = line.trim_end_matches(['\r', '\n']).split_once(':')?.1;
     serde_json::from_str::<Vec<String>>(value.trim()).ok()
 }
 

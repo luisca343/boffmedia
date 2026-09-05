@@ -342,9 +342,7 @@ mod tests {
     fn a_long_token_survives_a_round_trip_through_the_real_store() {
         let key = "msa-refresh-token:test-chunking";
         // The shape of a real MSA refresh token: long, and ASCII.
-        let token: String = std::iter::repeat("M.C107_BAY.0.U.-Cl0abcdefghij")
-            .take(120)
-            .collect();
+        let token: String = "M.C107_BAY.0.U.-Cl0abcdefghij".repeat(120);
         assert!(token.encode_utf16().count() * 2 > 2560, "must exceed the cap");
 
         write_secret(key, &token).expect("a long secret must be storable");

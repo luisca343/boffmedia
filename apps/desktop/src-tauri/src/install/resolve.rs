@@ -276,7 +276,7 @@ fn plan_minecraft(manifest: &PackManifest) -> Result<PlannedMinecraft, InstallFa
             // No port → hand Minecraft the bare host so its own SRV lookup finds
             // the real one (a host behind an SRV record declares no port).
             Some(match server.port {
-                Some(port) => format!("{}:{}", server.host.to_string(), port),
+                Some(port) => format!("{}:{}", *server.host, port),
                 None => server.host.to_string(),
             })
         } else {

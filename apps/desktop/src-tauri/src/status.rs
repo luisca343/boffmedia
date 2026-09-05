@@ -220,10 +220,8 @@ mod tests {
             // read_varint is async (it reads off a TcpStream); this exercises
             // the same byte layout it decodes, via the sync loop it mirrors.
             let mut result: i32 = 0;
-            let mut i = 0;
-            for &byte in &buf {
+            for (i, &byte) in buf.iter().enumerate() {
                 result |= ((byte & 0x7F) as i32) << (7 * i);
-                i += 1;
                 if byte & 0x80 == 0 {
                     break;
                 }

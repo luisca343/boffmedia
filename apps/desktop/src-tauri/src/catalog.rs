@@ -180,9 +180,11 @@ fn http() -> &'static reqwest::Client {
 
 /// Only the tag lists are cached: they change a few times a year, while search
 /// results must not be stale behind a player who just typed a new query.
-fn category_cache() -> &'static Mutex<HashMap<String, (Instant, Vec<CatalogCategory>)>> {
-    static CACHE: OnceLock<Mutex<HashMap<String, (Instant, Vec<CatalogCategory>)>>> =
-        OnceLock::new();
+/// Keyed by game id; the value is (fetched-at, the tag list).
+type CategoryCache = Mutex<HashMap<String, (Instant, Vec<CatalogCategory>)>>;
+
+fn category_cache() -> &'static CategoryCache {
+    static CACHE: OnceLock<CategoryCache> = OnceLock::new();
     CACHE.get_or_init(|| Mutex::new(HashMap::new()))
 }
 

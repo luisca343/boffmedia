@@ -809,7 +809,7 @@ async fn install_payload(
     // is not a candidate. Without this the dropped jar stays forever, which is
     // how a removed-but-still-loaded mod crashes a pack that "updated fine".
     let previous = read_marker(&prepared.instance);
-    let mut marker = build_marker(prepared, &wanted, &manifest);
+    let mut marker = build_marker(prepared, &wanted, manifest);
     // A pin survives a re-verify of the SAME version (every launch does one)
     // and is cleared by an install of a different one — which is only ever an
     // explicit "Actualizar" click.
@@ -2566,9 +2566,11 @@ fn is_extra_candidate(path: &str) -> bool {
 /// scan, and the answer almost never changes: a file's identity is fixed by its
 /// (len, mtime) pair. Process-lifetime cache, so the first open pays and the
 /// rest are free; a rebuilt jar changes mtime and is re-hashed.
-static EXTRA_HASH_CACHE: std::sync::Mutex<
-    Option<std::collections::HashMap<(std::path::PathBuf, u64, i64), String>>,
-> = std::sync::Mutex::new(None);
+/// (path, len, mtime) -> sha512. A file's identity is fixed by that triple.
+type ExtraHashCache = std::collections::HashMap<(std::path::PathBuf, u64, i64), String>;
+
+static EXTRA_HASH_CACHE: std::sync::Mutex<Option<ExtraHashCache>> =
+    std::sync::Mutex::new(None);
 
 fn cached_sha512(path: &std::path::Path, len: u64, mtime: i64) -> Option<String> {
     let key = (path.to_path_buf(), len, mtime);

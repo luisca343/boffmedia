@@ -557,7 +557,7 @@ mod tests {
             jar("mods/controlify.jar", &["controlify"], &[], &["yet_another_config_lib_v3"]),
             jar("mods/yet_another_config_lib_v3.jar", &["yet_another_config_lib_v3"], &[], &[]),
         ];
-        let (edges, unresolved, broken) = resolve(&jars);
+        let (edges, unresolved, _broken) = resolve(&jars);
         assert!(unresolved.is_empty());
         let edge = edges.iter().find(|e| e.from == "mods/better-clouds.jar").unwrap();
         assert_eq!(edge.to, "mods/yet_another_config_lib_v3.jar");
@@ -572,7 +572,7 @@ mod tests {
             &["lambdynlights_runtime"],
             &["lambdynlights_runtime"],
         )];
-        let (edges, unresolved, broken) = resolve(&jars);
+        let (edges, unresolved, _broken) = resolve(&jars);
         // Self-satisfied, so no edge worth drawing — but emphatically not unresolved.
         assert!(edges.is_empty());
         assert!(unresolved.is_empty());
@@ -585,7 +585,7 @@ mod tests {
             jar("mods/fzzy_config-0.7.6.jar", &["fzzy_config"], &["kotlinforforge"], &[]),
             jar("mods/kotlinforforge-5.12.0-all.jar", &[], &[], &[]),
         ];
-        let (edges, unresolved, broken) = resolve(&jars);
+        let (edges, unresolved, _broken) = resolve(&jars);
         assert!(unresolved.is_empty(), "{unresolved:?}");
         assert_eq!(edges[0].to, "mods/kotlinforforge-5.12.0-all.jar");
     }
@@ -593,7 +593,7 @@ mod tests {
     #[test]
     fn a_genuinely_missing_dependency_is_still_reported() {
         let jars = vec![jar("mods/a.jar", &["a"], &["nowhere"], &[])];
-        let (edges, unresolved, broken) = resolve(&jars);
+        let (edges, unresolved, _broken) = resolve(&jars);
         assert!(edges.is_empty());
         assert_eq!(unresolved[0].mod_id, "nowhere");
     }

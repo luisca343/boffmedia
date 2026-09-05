@@ -43,9 +43,10 @@ pub enum RuntimeSource {
 
 /// Per-pack heap choice. `Inherit` is the default so an instance written by the
 /// previous build — which has no runtime file at all — behaves exactly as it did.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, Default)]
 #[serde(tag = "mode", rename_all = "camelCase")]
 pub enum MemoryChoice {
+    #[default]
     Inherit,
     Auto,
     #[serde(rename_all = "camelCase")]
@@ -54,31 +55,20 @@ pub enum MemoryChoice {
     },
 }
 
-impl Default for MemoryChoice {
-    fn default() -> Self {
-        MemoryChoice::Inherit
-    }
-}
-
 /// Per-pack Java choice. `Auto` is NOT the same as `Inherit`: it means "ignore
 /// the global path for this pack and let the launcher install the right JVM", so
 /// a global Java 8 path kept for one legacy pack does not stop every other pack
 /// starting.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(tag = "mode", rename_all = "camelCase")]
 pub enum JavaChoice {
+    #[default]
     Inherit,
     Auto,
     #[serde(rename_all = "camelCase")]
     Custom {
         path: String,
     },
-}
-
-impl Default for JavaChoice {
-    fn default() -> Self {
-        JavaChoice::Inherit
-    }
 }
 
 /// Per-pack JVM tuning flags. Only TWO states, not three, and that asymmetry is
@@ -90,9 +80,10 @@ impl Default for JavaChoice {
 /// `-Xmx` never appears here. The resolved heap is appended last by
 /// `game::install` so it beats the version metadata, so an `-Xmx` in this list
 /// would be silently overridden; `jvm_args::judge` rejects it for that reason.
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(tag = "mode", rename_all = "camelCase")]
 pub enum JvmChoice {
+    #[default]
     Inherit,
     #[serde(rename_all = "camelCase")]
     Custom {
@@ -100,11 +91,7 @@ pub enum JvmChoice {
     },
 }
 
-impl Default for JvmChoice {
-    fn default() -> Self {
-        JvmChoice::Inherit
-    }
-}
+
 
 /// The per-instance file. Every field `#[serde(default)]`: a file written by a
 /// future build with more fields, or by this one with fewer, must still parse —
