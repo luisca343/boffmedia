@@ -7,3 +7,7 @@ host/.vite/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+# The B15 cold-start measurement, rewritten on every run. It is a same-machine
+# trend line, not a committed baseline -- committing it would produce a diff on
+# every run and invite someone to "fix" a number by editing the file.
+/worker-cold-start.json
