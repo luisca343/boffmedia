@@ -94,7 +94,33 @@ describe('DataExportService', () => {
       expect(outbox.enqueue).not.toHaveBeenCalled();
     });
 
+    /**
+     * The clock is FROZEN for these two, and it has to be.
+     *
+     * Both assert on a ONE-MILLISECOND margin either side of the cooldown, and
+     * the service reads `Date.now()` itself — so any delay between building the
+     * fixture date and the service reading the clock moves the boundary. In
+     * isolation the gap is microseconds and both pass; inside the full
+     * `--runInBand` suite (250 s, one worker, GC pauses) the millisecond
+     * elapses and "one millisecond inside the window" becomes one millisecond
+     * outside it. That is why this file passed alone and failed in the suite,
+     * which is the worst way for a deploy gate to fail: it looks like whatever
+     * changed most recently.
+     *
+     * Widening the margin would only make it rarer. Freezing the clock removes
+     * the race, and the boundary stays exact — which is the property the two
+     * tests exist to pin.
+     */
     describe('the cooldown boundary', () => {
+      beforeEach(() => {
+        jest.useFakeTimers({ doNotFake: ['nextTick', 'setImmediate'] });
+        jest.setSystemTime(new Date('2026-09-05T12:00:00.000Z'));
+      });
+
+      afterEach(() => {
+        jest.useRealTimers();
+      });
+
       it('refuses one millisecond inside the window', async () => {
         repo.findLatestForUser.mockResolvedValue(
           row({ requestedAt: new Date(Date.now() - (24 * HOUR_MS - 1)) }),
