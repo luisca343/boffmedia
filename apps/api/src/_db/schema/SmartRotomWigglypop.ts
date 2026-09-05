@@ -422,12 +422,7 @@ export const wigglypopMonCustody = mysqlTable(
   {
     sellerUuid: playerUuid('seller_uuid').notNull(),
     pokemonKey: pokemonKey().notNull(),
-    listingId: int('listing_id')
-      .notNull()
-      .references(() => wigglypopListings.id, {
-        onDelete: 'cascade',
-        onUpdate: 'cascade',
-      }),
+    listingId: int('listing_id').notNull(),
     createdAt: timestamp('created_at').notNull().defaultNow(),
   },
   (t) => ({
@@ -438,6 +433,18 @@ export const wigglypopMonCustody = mysqlTable(
     ),
     listingIdx: index('wp_custody_listing_idx').on(t.listingId),
     sellerIdx: index('wp_custody_seller_idx').on(t.sellerUuid),
+    // Named explicitly, like every other FK in this file. An inline .references()
+    // here made drizzle generate
+    // `rotom_wigglypop_mon_custody_listing_id_rotom_wigglypop_listings_id_fk` --
+    // 69 chars, past MySQL's 64-char identifier limit -- so migration 0014 aborted
+    // with ER_TOO_LONG_IDENT and could never have run on any database.
+    listingFk: foreignKey({
+      name: 'wp_custody_listing_fk',
+      columns: [t.listingId],
+      foreignColumns: [wigglypopListings.id],
+    })
+      .onDelete('cascade')
+      .onUpdate('cascade'),
   }),
 );
 

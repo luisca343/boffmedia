@@ -127,6 +127,27 @@
       "when": 1788530008000,
       "tag": "0017_wigglypop_session_guard",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1788530009000,
+      "tag": "0018_boffmedia_admin_subroles",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "5",
+      "when": 1788530010000,
+      "tag": "0019_ficusai_usage_tracking",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "5",
+      "when": 1788530011000,
+      "tag": "0020_mail_bounce_handling",
+      "breakpoints": true
     }
   ]
 }

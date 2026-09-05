@@ -18,4 +18,4 @@ CREATE TABLE `rotom_wigglypop_mon_custody` (
 	INDEX `wp_custody_seller_idx` (`seller_uuid`)
 );
 --> statement-breakpoint
-ALTER TABLE `rotom_wigglypop_mon_custody` ADD CONSTRAINT `rotom_wigglypop_mon_custody_listing_id_rotom_wigglypop_listings_id_fk` FOREIGN KEY (`listing_id`) REFERENCES `rotom_wigglypop_listings`(`id`) ON DELETE cascade ON UPDATE cascade;
+ALTER TABLE `rotom_wigglypop_mon_custody` ADD CONSTRAINT `wp_custody_listing_fk` FOREIGN KEY (`listing_id`) REFERENCES `rotom_wigglypop_listings`(`id`) ON DELETE cascade ON UPDATE cascade;

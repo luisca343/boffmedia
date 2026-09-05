@@ -11,6 +11,7 @@ INSERT INTO `boffmedia_roles` (`name`) VALUES
   ('BOFF_ADMIN_CONTENT'),
   ('BOFF_ADMIN_RELEASE')
 ON DUPLICATE KEY UPDATE `name` = VALUES(`name`);
+--> statement-breakpoint
 
 -- Assign all sub-roles to existing BOFF_ADMIN users for backward compatibility
 -- Get the BOFF_ADMIN role ID, then the new sub-role IDs, and join users to each sub-role
