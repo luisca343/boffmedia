@@ -19,7 +19,7 @@
     "generate:shared": "pnpm --filter api generate:shared && node scripts/generate-error-codes.mjs",
     "generate:error-codes": "node scripts/generate-error-codes.mjs",
     "check:error-codes": "node scripts/generate-error-codes.mjs --check",
-    "check:seed-sql": "pnpm --filter api check:seed-sql",
+    "check:seed-sql": "node scripts/check-ownership-routes.mjs && pnpm --filter api check:seed-sql",
     "lint": "node scripts/lint-sequential.js && node scripts/check-v3-conventions.mjs && node scripts/check-layering.mjs && node scripts/check-domain-errors.mjs && node scripts/check-locale-json.mjs && node scripts/check-i18n.mjs && node scripts/check-fonts.mjs && node scripts/check-tool-chassis.mjs && node scripts/check-ci-coverage.mjs && node scripts/check-html-sinks.mjs && pnpm --filter @boffmedia/pack-schema check:schema && node scripts/generate-error-codes.mjs --check && node scripts/tools/pokemon-identity-report.mjs --check && node scripts/tools/build-pokedex-locales.mjs --check && pnpm --filter api check:seed-sql",
     "lint:parallel": "pnpm -r lint",
     "check:v3": "node scripts/check-v3-conventions.mjs",
