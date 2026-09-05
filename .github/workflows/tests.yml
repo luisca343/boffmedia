@@ -139,6 +139,23 @@ jobs:
         working-directory: apps/desktop/src-tauri
         run: cargo test
 
+      # X12. desktop-release.yml is manual and Windows-only, so before this a
+      # Rust mistake surfaced at release time, twenty minutes into a build. The
+      # `cargo test` step above already covers "does it compile"; this covers
+      # the rest. `--all-targets` so the test modules are linted too — that is
+      # where half the findings were.
+      #
+      # `-D warnings` is the point: a clippy run that only prints is a clippy
+      # run nobody reads. The 17 findings this started with are fixed at the
+      # source, except two that are deliberate and carry a scoped
+      # `#[allow(...)]` with a comment saying why (an 8-argument game-agnostic
+      # signature, and BPS action encoding written out as `(n - 1) << 2 | cmd`
+      # so the command number stays legible). Never widen those to a crate-level
+      # allow.
+      - name: cargo clippy
+        working-directory: apps/desktop/src-tauri
+        run: cargo clippy --all-targets -- -D warnings
+
   # Integration tests: MySQL with Testcontainers.
   # These run against a REAL database (not fakes), so they verify behaviors
   # fakes cannot model: unique-key collisions, FK constraints, migrations,
@@ -174,6 +191,65 @@ jobs:
 
       - name: API integration tests (MySQL)
         run: pnpm --filter api test:integration
+
+  # B7. The battle simulator, driven in a real browser against a real bundle.
+  #
+  # BLOCKING, unlike the Playwright job below, and the difference is the whole
+  # reason this is a separate job: that one needs a deployed site and real
+  # accounts, while this one needs nothing. The suite drives a LOCAL AI battle,
+  # which runs the engine in a Web Worker inside the page — no relay, no API, no
+  # network, no secrets. So it can be required, and it is.
+  #
+  # What it buys: before this, "bundling, worker and Next integration
+  # regressions are invisible" was literally true — the package had 259 unit
+  # tests and nothing that ran it as a program. A lazy chunk that fails to
+  # resolve, a worker that cannot boot, a CJS-only workspace dependency that
+  # explodes at module evaluation (which is exactly what building this found)
+  # are all silent to vitest and fatal to a player.
+  #
+  # Playwright's `webServer` starts the Vite host itself; there is no separate
+  # server step to keep in sync.
+  battlesim-e2e:
+    name: E2E (battlesim, local AI path)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run the battlesim e2e suite
+        run: pnpm --filter @boffmedia/tools-battlesim e2e
+
+      - name: Upload the HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: battlesim-e2e-report
+          path: packages/tools/battlesim/e2e/playwright-report
+          retention-days: 7
+          if-no-files-found: ignore
 
   # NON-BLOCKING, and it has to be: every suite here needs a running site plus
   # real accounts. The `chromium` project hits public pages, `chromium:auth`

@@ -18,7 +18,21 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const ROOTS = ['apps/web/src', 'apps/desktop/src', 'packages'];
-const SKIP = new Set(['node_modules', '.next', 'dist', 'build', '.turbo', 'coverage']);
+// Build output and tool caches, never source. `.vite` earns its place the
+// hard way: a Vite cacheDir holds a pre-bundled copy of react-dom, which
+// contains ~100 real dangerouslySetInnerHTML call sites, and scanning it
+// turned this gate red on generated code nobody wrote or ships.
+const SKIP = new Set([
+  'node_modules',
+  '.next',
+  'dist',
+  'build',
+  '.turbo',
+  'coverage',
+  '.vite',
+  'playwright-report',
+  'test-results',
+]);
 
 // Function names that count as sanitizing. Both are allowlist-based sanitizers
 // reviewed as part of the rich-text gate; see the header of each.

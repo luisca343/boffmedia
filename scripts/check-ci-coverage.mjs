@@ -54,25 +54,47 @@ for (const dir of packageDirs()) {
     continue;
   }
   const scripts = pkg.scripts ?? {};
-  if (!scripts.test && !scripts['test:unit']) continue;
+  // Two INDEPENDENT requirements, not one list.
+  //
+  //  - the unit suite: `test` OR `test:unit`, whichever the package defines.
+  //    Either satisfies it. apps/web has both, and that is not an oversight —
+  //    its `test` script is Playwright and its `test:unit` is vitest, which is
+  //    why tests.yml runs the latter by name.
+  //  - the `e2e` suite, checked SEPARATELY. The battlesim harness drives a real
+  //    browser against a real bundle, and under the old rule — which looked
+  //    only at `test`/`test:unit` — it could have been written, forgotten, and
+  //    never run once by CI. That is exactly the hole this file exists to close
+  //    for `test`; leaving a second door open would have been the joke telling
+  //    itself.
+  const unitScripts = ['test', 'test:unit'].filter((name) => scripts[name]);
+  const requirements = [];
+  if (unitScripts.length > 0) requirements.push(unitScripts);
+  if (scripts.e2e) requirements.push(['e2e']);
+  if (requirements.length === 0) continue;
   if (!pkg.name || GATED_ELSEWHERE.has(pkg.name)) continue;
+
   // Trailing boundary matters: `--filter web` must not be satisfied by
-  // `--filter web-something` — require whitespace or end-of-string after it.
+  // `--filter web-something`. The script NAME is matched too, so a package
+  // wired in for `test` does not silently vouch for its `e2e` suite as well.
   const needle = `--filter ${pkg.name}`;
-  const hit = ci.split(needle).slice(1).some((rest) => rest === '' || /^[\s]/.test(rest));
-  if (!hit) {
-    missing.push(pkg.name);
+  const after = ci.split(needle).slice(1);
+  for (const alternatives of requirements) {
+    const hit = alternatives.some((suite) =>
+      after.some((rest) => new RegExp(`^\\s+${suite}(\\s|$)`).test(rest)),
+    );
+    if (!hit) missing.push({ name: pkg.name, suite: alternatives[0] });
   }
 }
 
 if (missing.length > 0) {
-  console.error('These packages have a test script that no CI workflow runs:\n');
-  for (const name of missing) console.error(`  ${name}`);
+  console.error('These package suites are not run by any CI workflow:\n');
+  for (const m of missing) console.error(`  ${m.name}  (${m.suite})`);
   console.error(
     '\nAdd a step to .github/workflows/tests.yml:\n' +
-      `\n      - name: ${missing[0].replace(/^@boffmedia\//, '')}\n        run: pnpm --filter ${missing[0]} test\n`,
+      `\n      - name: ${missing[0].name.replace(/^@boffmedia\//, '')}\n` +
+      `        run: pnpm --filter ${missing[0].name} ${missing[0].suite}\n`,
   );
   process.exit(1);
 }
 
-console.log(`check-ci-coverage: every test-bearing package is wired to CI.`);
+console.log(`check-ci-coverage: every test-bearing package suite is wired to CI.`);

@@ -221,9 +221,6 @@ importers:
       nestjs-pino:
         specifier: ^4.6.1
         version: 4.6.1(@nestjs/common@11.1.17(class-transformer@0.5.1)(class-validator@0.14.4)(reflect-metadata@0.2.2)(rxjs@7.8.2))(pino-http@11.0.0)(pino@10.3.1)(rxjs@7.8.2)
-      openai:
-        specifier: ^5.12.2
-        version: 5.23.2(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@4.4.3)
       otplib:
         specifier: ^12.0.1
         version: 12.0.1
@@ -525,7 +522,7 @@ importers:
         version: 1.1.1(emoji-mart@5.6.0)(react@19.2.3)
       '@hookform/resolvers':
         specifier: 3.9.0
-        version: 3.9.0(react-hook-form@7.72.0(react@19.2.3))(zod@3.25.76)
+        version: 3.9.0(react-hook-form@7.72.0(react@19.2.3))(zod@4.4.3)
       '@next/bundle-analyzer':
         specifier: 16.0.7
         version: 16.0.7(bufferutil@4.1.0)(utf-8-validate@5.0.10)
@@ -749,7 +746,7 @@ importers:
         specifier: ^3.0.1
         version: 3.4.1
       socket.io-client:
-        specifier: ^4.7.4
+        specifier: ^4.8.1
         version: 4.8.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
       tailwind-merge:
         specifier: ^2.5.2
@@ -767,8 +764,8 @@ importers:
         specifier: ^1.0.35
         version: 1.0.35
       zod:
-        specifier: ^3.22.4
-        version: 3.25.76
+        specifier: ^4.4.3
+        version: 4.4.3
       zustand:
         specifier: ^4.5.0
         version: 4.5.7(@types/react@19.2.7)(react@19.2.3)
@@ -971,21 +968,30 @@ importers:
         specifier: 19.2.3
         version: 19.2.3(react@19.2.3)
       socket.io-client:
-        specifier: ^4.7.4
+        specifier: ^4.8.1
         version: 4.8.3(bufferutil@4.1.0)(utf-8-validate@5.0.10)
     devDependencies:
+      '@playwright/test':
+        specifier: ^1.48.0
+        version: 1.58.2
       '@types/react':
         specifier: 19.2.7
         version: 19.2.7
       '@types/react-dom':
         specifier: 19.2.3
         version: 19.2.3(@types/react@19.2.7)
+      '@vitejs/plugin-react':
+        specifier: ^4.2.4
+        version: 4.7.0(vite@5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1))
       happy-dom:
         specifier: 15.11.7
         version: 15.11.7
+      vite:
+        specifier: ^5.0.8
+        version: 5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1)
       vitest:
         specifier: ^4.1.10
-        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@24.12.0)(happy-dom@15.11.7)(jsdom@29.1.0(@noble/hashes@1.8.0))(vite@8.0.10(@types/node@24.12.0)(esbuild@0.27.4)(jiti@1.21.7)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))
+        version: 4.1.10(@opentelemetry/api@1.9.1)(@types/node@24.12.0)(happy-dom@15.11.7)(jsdom@29.1.0(@noble/hashes@1.8.0))(vite@5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1))
 
   packages/tools/kit:
     dependencies:
@@ -9452,18 +9458,6 @@ packages:
   oniguruma-to-es@4.3.5:
     resolution: {integrity: sha512-Zjygswjpsewa0NLTsiizVuMQZbp0MDyM6lIt66OxsF21npUDlzpHi1Mgb/qhQdkb+dWFTzJmFbEWdvZgRho8eQ==}
 
-  openai@5.23.2:
-    resolution: {integrity: sha512-MQBzmTulj+MM5O8SKEk/gL8a7s5mktS9zUtAkU257WjvobGc9nKcBuVwjyEEcb9SI8a8Y2G/mzn3vm9n1Jlleg==}
-    hasBin: true
-    peerDependencies:
-      ws: ^8.18.0
-      zod: ^3.23.8
-    peerDependenciesMeta:
-      ws:
-        optional: true
-      zod:
-        optional: true
-
   openapi-typescript-codegen@0.29.0:
     resolution: {integrity: sha512-/wC42PkD0LGjDTEULa/XiWQbv4E9NwLjwLjsaJ/62yOsoYhwvmBR31kPttn1DzQ2OlGe5stACcF/EIkZk43M6w==}
     hasBin: true
@@ -11405,6 +11399,37 @@ packages:
     peerDependencies:
       vite: '*'
 
+  vite@5.4.21:
+    resolution: {integrity: sha512-o5a9xKjbtuhY6Bi5S3+HvbRERmouabWbyUcpXXUA1u+GNUKoROi9byOJ8M0nHbHYHkYICiMlqxkg1KkYmm25Sw==}
+    engines: {node: ^18.0.0 || >=20.0.0}
+    hasBin: true
+    peerDependencies:
+      '@types/node': ^18.0.0 || >=20.0.0
+      less: '*'
+      lightningcss: ^1.21.0
+      sass: '*'
+      sass-embedded: '*'
+      stylus: '*'
+      sugarss: '*'
+      terser: ^5.4.0
+    peerDependenciesMeta:
+      '@types/node':
+        optional: true
+      less:
+        optional: true
+      lightningcss:
+        optional: true
+      sass:
+        optional: true
+      sass-embedded:
+        optional: true
+      stylus:
+        optional: true
+      sugarss:
+        optional: true
+      terser:
+        optional: true
+
   vite@6.4.3:
     resolution: {integrity: sha512-NTKlcQjlAK7MlQoyb6LgaqHc8sso/pVyUJYWMws3jg21uTJw/LddqIFPcPqP6PzpgbIcZyKI85sFE4HBrQDA8A==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
@@ -11841,12 +11866,6 @@ packages:
 
   zod@3.24.1:
     resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
-
-  zod@3.25.76:
-    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
-
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
 
   zod@4.4.3:
     resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
@@ -13377,10 +13396,10 @@ snapshots:
       hono: 4.12.18
     optional: true
 
-  '@hookform/resolvers@3.9.0(react-hook-form@7.72.0(react@19.2.3))(zod@3.25.76)':
+  '@hookform/resolvers@3.9.0(react-hook-form@7.72.0(react@19.2.3))(zod@4.4.3)':
     dependencies:
       react-hook-form: 7.72.0(react@19.2.3)
-      zod: 3.25.76
+      zod: 4.4.3
 
   '@humanfs/core@0.19.1': {}
 
@@ -16572,6 +16591,18 @@ snapshots:
       '@use-gesture/core': 10.3.1
       react: 19.2.3
 
+  '@vitejs/plugin-react@4.7.0(vite@5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1))':
+    dependencies:
+      '@babel/core': 7.29.0
+      '@babel/plugin-transform-react-jsx-self': 7.29.7(@babel/core@7.29.0)
+      '@babel/plugin-transform-react-jsx-source': 7.29.7(@babel/core@7.29.0)
+      '@rolldown/pluginutils': 1.0.0-beta.27
+      '@types/babel__core': 7.20.5
+      react-refresh: 0.17.0
+      vite: 5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1)
+    transitivePeerDependencies:
+      - supports-color
+
   '@vitejs/plugin-react@4.7.0(vite@6.4.3(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))':
     dependencies:
       '@babel/core': 7.29.0
@@ -16592,6 +16623,14 @@ snapshots:
       '@vitest/utils': 4.1.10
       chai: 6.2.2
       tinyrainbow: 3.1.0
+
+  '@vitest/mocker@4.1.10(vite@5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1))':
+    dependencies:
+      '@vitest/spy': 4.1.10
+      estree-walker: 3.0.3
+      magic-string: 0.30.21
+    optionalDependencies:
+      vite: 5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1)
 
   '@vitest/mocker@4.1.10(vite@6.4.3(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3))':
     dependencies:
@@ -21558,7 +21597,7 @@ snapshots:
       unist-util-visit: 5.1.0
       unist-util-visit-children: 3.0.0
       yaml: 2.8.3
-      zod: 4.3.6
+      zod: 4.4.3
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -21712,11 +21751,6 @@ snapshots:
       oniguruma-parser: 0.12.1
       regex: 6.1.0
       regex-recursion: 6.0.2
-
-  openai@5.23.2(ws@8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10))(zod@4.4.3):
-    optionalDependencies:
-      ws: 8.20.0(bufferutil@4.1.0)(utf-8-validate@5.0.10)
-      zod: 4.4.3
 
   openapi-typescript-codegen@0.29.0:
     dependencies:
@@ -24148,6 +24182,17 @@ snapshots:
       - supports-color
       - typescript
 
+  vite@5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1):
+    dependencies:
+      esbuild: 0.27.4
+      postcss: 8.5.12
+      rollup: 4.62.3
+    optionalDependencies:
+      '@types/node': 24.12.0
+      fsevents: 2.3.3
+      lightningcss: 1.32.0
+      terser: 5.46.1
+
   vite@6.4.3(@types/node@24.12.0)(jiti@1.21.7)(lightningcss@1.32.0)(terser@5.46.1)(tsx@4.21.0)(yaml@2.8.3):
     dependencies:
       esbuild: 0.25.12
@@ -24222,6 +24267,36 @@ snapshots:
     optionalDependencies:
       '@opentelemetry/api': 1.9.1
       '@types/node': 20.19.37
+      happy-dom: 15.11.7
+      jsdom: 29.1.0(@noble/hashes@1.8.0)
+    transitivePeerDependencies:
+      - msw
+
+  vitest@4.1.10(@opentelemetry/api@1.9.1)(@types/node@24.12.0)(happy-dom@15.11.7)(jsdom@29.1.0(@noble/hashes@1.8.0))(vite@5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1)):
+    dependencies:
+      '@vitest/expect': 4.1.10
+      '@vitest/mocker': 4.1.10(vite@5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1))
+      '@vitest/pretty-format': 4.1.10
+      '@vitest/runner': 4.1.10
+      '@vitest/snapshot': 4.1.10
+      '@vitest/spy': 4.1.10
+      '@vitest/utils': 4.1.10
+      es-module-lexer: 2.0.0
+      expect-type: 1.4.0
+      magic-string: 0.30.21
+      obug: 2.1.3
+      pathe: 2.0.3
+      picomatch: 4.0.4
+      std-env: 4.2.0
+      tinybench: 2.9.0
+      tinyexec: 1.0.4
+      tinyglobby: 0.2.16
+      tinyrainbow: 3.1.0
+      vite: 5.4.21(@types/node@24.12.0)(lightningcss@1.32.0)(terser@5.46.1)
+      why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.1
+      '@types/node': 24.12.0
       happy-dom: 15.11.7
       jsdom: 29.1.0(@noble/hashes@1.8.0)
     transitivePeerDependencies:
@@ -24649,10 +24724,6 @@ snapshots:
       zod: 4.4.3
 
   zod@3.24.1: {}
-
-  zod@3.25.76: {}
-
-  zod@4.3.6: {}
 
   zod@4.4.3: {}
 
