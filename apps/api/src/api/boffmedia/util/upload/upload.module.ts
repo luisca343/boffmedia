@@ -22,6 +22,14 @@ import { UploadController } from './upload.controller';
 
     UploadFacadeService,
   ],
-  exports: [UploadFacadeService, FileUploadService, ImageUploadService],
+  exports: [
+    UploadFacadeService,
+    FileUploadService,
+    ImageUploadService,
+    // The daily-upload quota ledger. PacksDownloadsService reads it so the app's
+    // blob uploads bill against the SAME per-user counter as the web /upload
+    // routes — a second ledger would let one surface spend the other's budget.
+    UploadsRepository,
+  ],
 })
 export class UploadModule {}
