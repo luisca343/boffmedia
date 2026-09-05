@@ -1,6 +1,13 @@
 import { z } from 'zod';
 
-export const env = z
+/**
+ * The schema, exported separately from the parsed value so it can be exercised
+ * against a synthetic environment. `env` below is the real parse of
+ * `process.env`, which happens ONCE at import time — that is the fail-fast this
+ * file exists for, and it is why every consumer imports the value rather than
+ * calling `parseEnv` themselves.
+ */
+export const envSchema = z
   .object({
     // App
     NODE_ENV: z.string().default('development'),
@@ -266,5 +273,90 @@ export const env = z
         });
       }
     }
-  })
-  .parse(process.env);
+  });
+
+/** What `parseEnv` throws. Carries the formatted report as its message. */
+export class EnvValidationError extends Error {
+  constructor(
+    message: string,
+    /** One entry per offending variable, in schema order. */
+    readonly problems: { key: string; message: string }[],
+  ) {
+    super(message);
+    this.name = 'EnvValidationError';
+  }
+}
+
+/**
+ * Render a ZodError over `process.env` as something an operator can act on.
+ *
+ * A raw ZodError is a JSON dump of `issues` with a `path` array per entry, and
+ * at boot it arrives wrapped in a Nest stack trace. The variable name — the
+ * only part anyone needs — is the hardest thing in it to find. This flattens
+ * each issue to `KEY — message`, keeps them ALL (zod collects every issue, so a
+ * fresh deploy learns about all twelve missing variables in one restart instead
+ * of one per attempt), and names the file that lists every key with its default.
+ *
+ * `source` is read back rather than trusting the issue: in zod 4 a missing key
+ * and a malformed one are both `invalid_type`, and the only field that told
+ * them apart (`received`) is absent exactly in the missing case. Asking the
+ * environment whether the key is there is the check that cannot rot.
+ */
+function formatIssues(
+  error: z.ZodError,
+  source: NodeJS.ProcessEnv,
+): { message: string; problems: { key: string; message: string }[] } {
+  const problems = error.issues.map((issue) => {
+    const key = issue.path.length ? issue.path.join('.') : '(root)';
+    const missing = source[key] === undefined || source[key] === '';
+    const message = missing ? 'is required but is not set' : issue.message;
+    return { key, message };
+  });
+
+  const count = problems.length;
+  const lines = [
+    'Invalid environment: the API cannot start.',
+    '',
+    ...problems.map((p) => `  ${p.key} — ${p.message}`),
+    '',
+    `${count} problem${count === 1 ? '' : 's'}. Every key, its default and how to`,
+    'generate the secrets: apps/api/.env.example',
+  ];
+
+  return { message: lines.join('\n'), problems };
+}
+
+/**
+ * Validate an environment. Pure: it throws, it does not print and it does not
+ * exit, so a spec can drive it with a synthetic `process.env`. The
+ * printing-and-exiting half is below.
+ */
+export function parseEnv(source: NodeJS.ProcessEnv): z.infer<typeof envSchema> {
+  const result = envSchema.safeParse(source);
+  if (result.success) return result.data;
+  const { message, problems } = formatIssues(result.error, source);
+  throw new EnvValidationError(message, problems);
+}
+
+/**
+ * The boot path. A bad environment is not an exception to be handled — nothing
+ * downstream can do anything useful with a missing JWT_SECRET — so this prints
+ * the report and stops the process, rather than letting a ZodError surface
+ * through Nest's bootstrap as a stack trace whose useful half is a `path`
+ * array. `process.exitCode` plus a rethrow would leave this module
+ * half-evaluated for the 72 files that import it; exiting here is the honest
+ * end.
+ */
+function loadEnv(): z.infer<typeof envSchema> {
+  try {
+    return parseEnv(process.env);
+  } catch (error) {
+    if (!(error instanceof EnvValidationError)) throw error;
+    // console, not the Nest logger: this runs before the app — and therefore
+    // the logger — exists.
+    console.error('\n' + error.message + '\n');
+    process.exit(1);
+  }
+}
+
+export const env = loadEnv();
