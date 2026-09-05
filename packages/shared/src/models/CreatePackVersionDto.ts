@@ -9,6 +9,10 @@ export type CreatePackVersionDto = {
     loaderVersion?: string;
     notes?: string;
     /**
+     * Changelog: what changed in this version, for players. Shown on pack detail pages.
+     */
+    changelog?: string;
+    /**
      * PackFile[] — validado con @boffmedia/pack-schema, el mismo esquema del que la app genera sus tipos de Rust
      */
     files: Array<Record<string, any>>;

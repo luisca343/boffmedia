@@ -21,6 +21,23 @@ export class ReplayService {
     return replay;
   }
 
+  /**
+   * The same read, reporting absence as `null` instead of a thrown `Error`.
+   *
+   * `getReplayById` above signals "no such replay" by throwing a bare `Error`,
+   * which `GlobalExceptionFilter` can only render as a 500 — and a caller that
+   * wants a 404 would have to tell the two apart by matching on the message,
+   * which breaks the moment the string is reworded or translated.
+   *
+   * Added for the battlesim replay route (audit B14), which owns the HTTP
+   * semantics for league-sourced replays. `getReplayById` is left exactly as it
+   * was so Liga's own controller keeps its current behaviour.
+   */
+  async findReplayById(id: number): Promise<LeagueReplay | null> {
+    if (!Number.isInteger(id) || id <= 0) return null;
+    return (await this.ligaRepository.findReplayById(id)) ?? null;
+  }
+
   async getRecentReplays(limit: number = 10): Promise<LeagueReplay[]> {
     if (limit <= 0 || limit > 100) {
       throw new Error('Limit must be between 1 and 100');

@@ -22,7 +22,8 @@
       "threadCount": "{count, plural, one {{count} thread} other {{count} threads}}",
       "emptyTitle": "No threads",
       "emptyLead": "There are no threads in this board yet.",
-      "loadMore": "Load more"
+      "loadMore": "Load more",
+      "loadingMore": "Loading…"
     },
     "thread": {
       "breadcrumb": "Forum",
@@ -52,6 +53,7 @@
       "confirmDelete": "Delete this message? This action cannot be undone.",
       "confirmDeleteTitle": "Delete post",
       "loadMore": "Load more",
+      "loadingMore": "Loading…",
       "closedNotice": "This thread is closed",
       "replyTitle": "Reply",
       "replySubmit": "Reply",

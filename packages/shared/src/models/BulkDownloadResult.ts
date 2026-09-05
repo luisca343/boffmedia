@@ -14,6 +14,14 @@ export type BulkDownloadResult = {
      */
     skipped: number;
     failed: number;
+    /**
+     * Files abandoned because the connection stopped sending bytes. Their partial data was deleted.
+     */
+    stalled: number;
+    /**
+     * Files not attempted or aborted because the caller cancelled.
+     */
+    cancelled: number;
     totalDownloadedSize: string;
     totalDownloadedSizeBytes: number;
     files: Array<FileDownloadEntry>;

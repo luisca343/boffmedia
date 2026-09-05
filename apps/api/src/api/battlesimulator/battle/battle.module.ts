@@ -9,6 +9,7 @@ import { BattleTicketService } from '../battle-ticket.service';
 import { PacksModule } from '@api/packs/packs.module';
 import { DrizzleModule } from '@api/_utils/drizzle/drizzle.module';
 import { AuthModule } from '@api/auth/auth.module';
+import { LigaModule } from '@api/smartrotom/liga/liga.module';
 
 @Module({
   // PacksModule supplies PacksAuthService + PacksRepository, which
@@ -26,6 +27,11 @@ import { AuthModule } from '@api/auth/auth.module';
     // Registering a second JwtModule here would put two JwtService providers in
     // scope for the same secret — see the same note in packs.module.ts.
     AuthModule,
+    // ReplayService, injected by BattlesimController for the league-replay
+    // route (audit B14). LigaModule already exports it. Without this import the
+    // app type-checks and then fails to BOOT on an unresolvable dependency —
+    // the N19/A6 trap, which no gate in this repo can see.
+    LigaModule,
   ],
   controllers: [BattlesimController],
   providers: [BattleGateway, MatchmakingService, ShowdownGateway, BattlesimRepository, BattleTicketService],

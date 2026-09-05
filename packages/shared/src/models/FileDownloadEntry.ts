@@ -14,6 +14,8 @@ export namespace FileDownloadEntry {
         DOWNLOADED = 'downloaded',
         SKIPPED = 'skipped',
         FAILED = 'failed',
+        STALLED = 'stalled',
+        CANCELLED = 'cancelled',
     }
 }
 

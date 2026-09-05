@@ -86,8 +86,13 @@ export function BsimReplayDetailView() {
       };
     }
 
+    // Audit B14: served by the battle simulator's own module, not by
+    // SmartRotom's Liga controller. The row is still league data — the API
+    // delegates to Liga's ReplayService — but a battlesim screen no longer
+    // reaches into a SmartRotom route to read it. Unlike the Liga endpoint,
+    // this one answers 404 for a missing replay instead of 500.
     toolApi()
-      .request<{ data?: Record<string, string> }>(`/smartrotom/liga/replay/${id}`)
+      .request<{ data?: Record<string, string> }>(`/battlesimulator/replays/liga/${id}`)
       .then((res) => {
         if (!alive) return;
         const r = res?.data;

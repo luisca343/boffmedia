@@ -7,6 +7,7 @@ import { ParticipantProgress } from '@/_db/schema/BoffMediaEvents';
 import { AchievementsService } from './achievements.service';
 import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 import { ProgressRepository } from '../repositories/progress.repository';
+import { LeaderboardCacheService } from './leaderboard-cache.service';
 
 @Injectable()
 export class ProgressService {
@@ -14,6 +15,8 @@ export class ProgressService {
     private readonly progressRepository: ProgressRepository,
     private readonly achievementsService: AchievementsService,
     private readonly notificationsService: NotificationsService,
+    // A10: a progress write is what makes a cached leaderboard wrong.
+    private readonly leaderboardCache: LeaderboardCacheService,
   ) {}
 
   /**
@@ -24,15 +27,28 @@ export class ProgressService {
   async transaction<T>(
     fn: (service: ProgressService) => Promise<T>,
   ): Promise<T> {
-    return this.progressRepository.runInTransaction((txRepository) =>
-      fn(
-        new ProgressService(
-          txRepository,
-          this.achievementsService,
-          this.notificationsService,
+    const result = await this.progressRepository.runInTransaction(
+      (txRepository) =>
+        fn(
+          new ProgressService(
+            txRepository,
+            this.achievementsService,
+            this.notificationsService,
+            // Threaded through, or the transactional copy would have no cache
+            // and every write that goes through a transaction — which is the
+            // normal path from the facade — would invalidate nothing.
+            this.leaderboardCache,
+          ),
         ),
-      ),
     );
+
+    // AFTER the commit, not inside it. `updateProgress` also invalidates, but
+    // that call happens while the transaction is still open: a concurrent read
+    // in that window would recompute from pre-commit data and repopulate the
+    // cache with rows the commit is about to change. Clearing again here closes
+    // that window. Clearing twice costs nothing.
+    this.leaderboardCache.invalidateAll();
+    return result;
   }
 
   async updateProgress(
@@ -93,7 +109,12 @@ export class ProgressService {
       await this.notifyAchievementUnlocked(participantId, achievement);
     }
 
-    // 5. Return updated progress
+    // 5. Any cached leaderboard is now wrong: this participant's points moved,
+    //    which changes their event board, the global board, and — when a team
+    //    score was recomputed above — that event's team board (A10).
+    this.leaderboardCache.invalidateAll();
+
+    // 6. Return updated progress
     return this.progressRepository.findProgress(participantId, achievementId);
   }
 

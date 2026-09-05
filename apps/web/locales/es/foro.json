@@ -22,7 +22,8 @@
       "threadCount": "{count, plural, one {{count} hilo} other {{count} hilos}}",
       "emptyTitle": "Sin hilos",
       "emptyLead": "Aún no hay hilos en este tablón.",
-      "loadMore": "Cargar más"
+      "loadMore": "Cargar más",
+      "loadingMore": "Cargando…"
     },
     "thread": {
       "breadcrumb": "Foro",
@@ -52,6 +53,7 @@
       "confirmDelete": "¿Eliminar este mensaje? Esta acción no se puede deshacer.",
       "confirmDeleteTitle": "Eliminar mensaje",
       "loadMore": "Cargar más",
+      "loadingMore": "Cargando…",
       "closedNotice": "Este hilo está cerrado",
       "replyTitle": "Responder",
       "replySubmit": "Responder",

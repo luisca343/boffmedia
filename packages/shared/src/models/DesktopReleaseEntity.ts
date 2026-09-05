@@ -18,6 +18,14 @@ export type DesktopReleaseEntity = {
      */
     published: boolean;
     publishedAt?: string | null;
+    /**
+     * Porcentaje de clientes (0-100) que reciben esta versión. Los clientes se asignan a grupos determinísticamente por su device ID.
+     */
+    rolloutPercent: number;
+    /**
+     * Pausa la distribución incluso si está publicada. Útil para pausas de emergencia sin despublicar.
+     */
+    paused: boolean;
     createdAt: string;
 };
 

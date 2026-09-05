@@ -4,6 +4,7 @@ import {
   LeaderboardsRepository,
   RecentAchievementRow,
 } from '../repositories/leaderboards.repository';
+import { LeaderboardCacheService } from './leaderboard-cache.service';
 
 interface TeamLeaderboardEntry {
   teamId: number;
@@ -25,7 +26,12 @@ interface ParticipantRanking {
 
 @Injectable()
 export class LeaderboardsService {
-  constructor(private readonly repo: LeaderboardsRepository) {}
+  constructor(
+    private readonly repo: LeaderboardsRepository,
+    // A10. Caches board DATA only; the caller's visibility check runs before
+    // this service is reached and is never cached. See the class docblock.
+    private readonly cache: LeaderboardCacheService,
+  ) {}
 
   /**
    * Get global leaderboard across all events.
@@ -35,26 +41,35 @@ export class LeaderboardsService {
    * zero-score rows.
    */
   async getGlobalLeaderboard(): Promise<LeaderboardEntry[]> {
-    return this.addRankingToResults(await this.repo.findGlobalTotals());
+    // The most expensive of the three: no event filter, so it aggregates the
+    // whole progress table, and it is the one the public /clasificacion page
+    // hits.
+    return this.cache.through('global', async () =>
+      this.addRankingToResults(await this.repo.findGlobalTotals()),
+    );
   }
 
   /**
    * Get leaderboard for a specific event
    */
   async getEventLeaderboard(eventId: number): Promise<LeaderboardEntry[]> {
-    return this.addRankingToResults(await this.repo.findEventTotals(eventId));
+    return this.cache.through(`event:${eventId}`, async () =>
+      this.addRankingToResults(await this.repo.findEventTotals(eventId)),
+    );
   }
 
   /**
    * Get team leaderboard for a specific event
    */
   async getTeamLeaderboard(eventId: number): Promise<TeamLeaderboardEntry[]> {
-    const results = await this.repo.findTeamTotals(eventId);
+    return this.cache.through(`teams:${eventId}`, async () => {
+      const results = await this.repo.findTeamTotals(eventId);
 
-    return results.map((result, index) => ({
-      ...result,
-      rank: index + 1,
-    })) as unknown as TeamLeaderboardEntry[];
+      return results.map((result, index) => ({
+        ...result,
+        rank: index + 1,
+      })) as unknown as TeamLeaderboardEntry[];
+    });
   }
 
   /**

@@ -12,6 +12,7 @@ import {
   UseGuards,
   ParseIntPipe,
   HttpStatus,
+  Header,
 } from '@nestjs/common';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { PaginationQueryDto } from '@api/_utils/dto/pagination.dto';
@@ -749,6 +750,11 @@ export class EventsController {
   // ==================== LEADERBOARD MANAGEMENT ====================
   @Public()
   @Get('/leaderboards')
+  // A10. Public and identical for every caller, so a shared cache may hold it.
+  // 30s matches the server-side TTL; `stale-while-revalidate` lets a CDN or
+  // browser serve the old board for another 30s while it refetches, which is
+  // the right trade for a scoreboard.
+  @Header('Cache-Control', 'public, max-age=30, stale-while-revalidate=30')
   @ApiOperation({ summary: 'Get all leaderboards' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -762,6 +768,11 @@ export class EventsController {
   @OptionalAuth()
   @Get(':eventId/leaderboard')
   @Public()
+  // `private`, NOT `public`: this route answers 404 for an event the caller
+  // may not see, so the response depends on who is asking. A shared cache
+  // holding one admin's 200 would serve it to anonymous callers — the exact
+  // leak the server-side cache avoids by never caching the visibility check.
+  @Header('Cache-Control', 'private, max-age=30')
   @ApiOperation({ summary: 'Get event leaderboard' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -784,6 +795,8 @@ export class EventsController {
   @OptionalAuth()
   @Get(':eventId/teams/leaderboard')
   @Public()
+  // `private` for the same reason as the event board above.
+  @Header('Cache-Control', 'private, max-age=30')
   @ApiOperation({ summary: 'Get team leaderboard for event' })
   @ApiResponse({
     status: HttpStatus.OK,

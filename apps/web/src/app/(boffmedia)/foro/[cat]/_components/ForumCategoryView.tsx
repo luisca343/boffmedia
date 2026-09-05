@@ -15,8 +15,6 @@ import type { ThreadSort } from "@/services/api/boffmedia/forumService"
 import { useBoffSession } from "@/services/useBoffSession"
 import { toMemberLike, toThreadLike } from "../../_lib/adapters"
 
-const PAGE = 20
-
 export function ForumCategoryView({ slug }: { slug: string }) {
   const t = useTranslations("foro")
   const router = useRouter()
@@ -28,7 +26,6 @@ export function ForumCategoryView({ slug }: { slug: string }) {
   ]
   const [now] = React.useState(() => new Date())
   const [sort, setSort] = React.useState<ThreadSort>("recent")
-  const [limit, setLimit] = React.useState(PAGE)
   const [composing, setComposing] = React.useState(false)
 
   const { status, isBoffAdmin } = useBoffSession()
@@ -36,7 +33,15 @@ export function ForumCategoryView({ slug }: { slug: string }) {
   const admin = isBoffAdmin()
 
   const { category, isLoading: catLoading, error: catError } = useForumCategory(slug)
-  const { threadList, isLoading: threadsLoading } = useForumThreads(slug, { sort, limit })
+  const {
+    threads: items,
+    total,
+    isLoading: threadsLoading,
+    error: threadsError,
+    hasMore: hasMoreThreads,
+    isLoadingMore: loadingMoreThreads,
+    loadMore: loadMoreThreads,
+  } = useForumThreads(slug, { sort })
   const { stats } = useForumStats()
   const { online } = useForumOnline()
   const { createThread, isSubmitting: creating, error: createError, setError: setCreateError } = useCreateThread()
@@ -62,9 +67,6 @@ export function ForumCategoryView({ slug }: { slug: string }) {
       </main>
     )
   }
-
-  const items = threadList?.items ?? []
-  const total = threadList?.total ?? 0
 
   // A logged-in member may open a new thread unless the board is locked; admins
   // can post to a locked board too. Anonymous visitors get a login nudge.
@@ -145,10 +147,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
               <Seg
                 options={SORTS}
                 value={sort}
-                onChange={(v) => {
-                  setSort(v as ThreadSort)
-                  setLimit(PAGE)
-                }}
+                onChange={(v) => setSort(v as ThreadSort)}
                 className="w-max"
               />
             </div>
@@ -157,7 +156,7 @@ export function ForumCategoryView({ slug }: { slug: string }) {
             </span>
           </div>
 
-          {threadsLoading && !threadList ? (
+          {threadsLoading && items.length === 0 ? (
             <div className="grid min-h-[30vh] place-items-center">
               <Spinner />
             </div>
@@ -170,10 +169,15 @@ export function ForumCategoryView({ slug }: { slug: string }) {
                   <ThreadRow key={t.id} thread={toThreadLike(t)} onOpen={go} showCat={false} now={now} />
                 ))}
               </div>
-              {items.length < total && (
+              {threadsError && (
+                <p className="mt-4 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[0.75rem] font-medium text-bad cut-tag cut-tag-edge [--cut-line:var(--bad)]">
+                  {threadsError}
+                </p>
+              )}
+              {hasMoreThreads && (
                 <div className="mt-4 flex justify-center">
-                  <Button icon="chevronDown" onClick={() => setLimit((l) => l + PAGE)}>
-                    {t("cat.loadMore")}
+                  <Button icon="chevronDown" onClick={loadMoreThreads} disabled={loadingMoreThreads}>
+                    {loadingMoreThreads ? t("cat.loadingMore") : t("cat.loadMore")}
                   </Button>
                 </div>
               )}

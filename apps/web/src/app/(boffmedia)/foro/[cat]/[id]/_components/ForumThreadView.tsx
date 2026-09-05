@@ -20,8 +20,6 @@ import { useBoffSession } from "@/services/useBoffSession"
 import { ReportButton } from "@/components/shared/moderation/ReportButton"
 import { toAuthor } from "../../../_lib/adapters"
 
-const PAGE = 20
-
 function ErrorNote({ children }: { children: React.ReactNode }) {
   return (
     <p className="mb-2.5 border border-solid border-bad bg-bad-soft py-2.5 px-3.5 font-mono text-[0.75rem] font-medium text-bad cut-tag cut-tag-edge [--cut-line:var(--bad)]">
@@ -34,7 +32,6 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
   const t = useTranslations("foro.thread")
   const router = useRouter()
   const [now] = React.useState(() => new Date())
-  const [limit, setLimit] = React.useState(PAGE)
 
   // Vote is server-response-driven: null until the caller toggles, then it holds
   // the { voted, votes } the API returns (there is no separate hasVoted read).
@@ -48,7 +45,16 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
   const currentUserId = session?.user?.id
 
   const { thread, isLoading: threadLoading, error: threadError, refetch: refetchThread } = useForumThread(threadId)
-  const { postList, isLoading: postsLoading, refetch: refetchPosts } = useForumThreadPosts(threadId, { limit })
+  const {
+    posts: items,
+    total,
+    isLoading: postsLoading,
+    error: postsError,
+    refetch: refetchPosts,
+    hasMore: hasMorePosts,
+    isLoadingMore: loadingMorePosts,
+    loadMore: loadMorePosts,
+  } = useForumThreadPosts(threadId)
 
   const { voteThread, isSubmitting: voting } = useVoteThread()
   const { setPinned, isSubmitting: pinning } = useSetPinned()
@@ -78,8 +84,6 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
     )
   }
 
-  const items = postList?.items ?? []
-  const total = postList?.total ?? 0
 
   const displayVotes = voteState?.votes ?? thread.votes
   const hasVoted = voteState?.voted ?? false
@@ -246,7 +250,7 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
         </div>
       </header>
 
-      {postsLoading && !postList ? (
+      {postsLoading && items.length === 0 ? (
         <div className="grid min-h-[30vh] place-items-center">
           <Spinner />
         </div>
@@ -341,10 +345,12 @@ export function ForumThreadView({ threadId, cat }: { threadId: number; cat: stri
             })}
           </div>
 
-          {items.length < total && (
+          {postsError && <ErrorNote>{postsError}</ErrorNote>}
+
+          {hasMorePosts && (
             <div className="mt-5 flex justify-center">
-              <Button icon="chevronDown" onClick={() => setLimit((l) => l + PAGE)}>
-                {t("loadMore")}
+              <Button icon="chevronDown" onClick={loadMorePosts} disabled={loadingMorePosts}>
+                {loadingMorePosts ? t("loadingMore") : t("loadMore")}
               </Button>
             </div>
           )}

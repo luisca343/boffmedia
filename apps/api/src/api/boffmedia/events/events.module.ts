@@ -32,6 +32,7 @@ import { EventInvitesService } from './services/event-invites.service';
 import { TeamsService } from './services/teams.service';
 import { ProgressService } from './services/progress.service';
 import { LeaderboardsService } from './services/leaderboards.service';
+import { LeaderboardCacheService } from './services/leaderboard-cache.service';
 import { ProfileService } from './services/profile.service';
 
 // Import facade service
@@ -65,6 +66,11 @@ import { EventsFacadeService } from './events.facade.service';
     TeamsService,
     ProgressService,
     LeaderboardsService,
+    // A10. Both LeaderboardsService (reads) and ProgressService (invalidation
+    // on write) inject it, so it must be a provider of THIS module — the
+    // instance has to be shared or the write clears a different cache than the
+    // read populated.
+    LeaderboardCacheService,
     ProfileService,
 
     // Facade service

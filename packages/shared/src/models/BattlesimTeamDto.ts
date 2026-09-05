@@ -24,6 +24,10 @@ export type BattlesimTeamDto = {
      */
     packed: string;
     /**
+     * User-defined tags for organizing teams
+     */
+    tags: Array<string>;
+    /**
      * Client's last update timestamp (epoch ms)
      */
     clientUpdatedAt: Record<string, any> | null;

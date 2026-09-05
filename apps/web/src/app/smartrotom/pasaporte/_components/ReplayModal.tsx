@@ -2,10 +2,45 @@
 
 // DESK. The sheet is chrome — it is the officer's screen, not a page of the book.
 
+import dynamic from "next/dynamic"
 import { useTranslations } from "next-intl"
 import type { UserAchievement } from "@boffmedia/shared"
-import { Game } from "@boffmedia/tools-battlesim"
 import { Modal } from "./ui"
+
+/**
+ * Loaded on demand, and that is the whole point (audit S11).
+ *
+ * MEASURED: a static `import { Game } from "@boffmedia/tools-battlesim"` put
+ * the battle engine and the full `@pkmn` dex — a 7.4 MB chunk plus a 1.8 MB
+ * one — into this route's INITIAL client bundle. /smartrotom/pasaporte came to
+ * ~11.9 MB of client JS against a ~1.15 MB median across the 125 SmartRotom
+ * routes, roughly ten times its neighbours, and it was one of only two routes
+ * anywhere near that size.
+ *
+ * Rendering the modal conditionally (`{replay && <ReplayModal/>}`) did nothing
+ * about it: a conditional RENDER still requires a static IMPORT, so every
+ * visitor to the passport downloaded a battle simulator whether or not they
+ * ever opened a replay — and most never do, since it is behind a click on a
+ * single badge.
+ *
+ * `ssr: false` because the player is a client-only surface (it owns a worker
+ * and canvas state); there is nothing meaningful to render on the server.
+ */
+const Game = dynamic(
+  () => import("@boffmedia/tools-battlesim").then((m) => m.Game),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="grid h-[min(80dvh,44rem)] place-items-center"
+        role="status"
+        aria-live="polite"
+      >
+        <span className="h-8 w-8 animate-spin rounded-full border-2 border-current border-t-transparent opacity-60" />
+      </div>
+    ),
+  },
+)
 
 /**
  * The battle the badge was won with.

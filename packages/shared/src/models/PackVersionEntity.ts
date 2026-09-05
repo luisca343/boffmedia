@@ -14,6 +14,10 @@ export type PackVersionEntity = {
     emulatorKind?: PackVersionEntity.emulatorKind | null;
     published: boolean;
     notes?: Record<string, any> | null;
+    /**
+     * What changed in this version, for players.
+     */
+    changelog?: Record<string, any> | null;
     createdAt: string;
 };
 export namespace PackVersionEntity {

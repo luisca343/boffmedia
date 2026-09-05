@@ -38,8 +38,29 @@ function FileRow({ consoleKey, filename, size, downloadLabel }: { consoleKey: st
 }
 
 /* ── console result group (collapsible) ───────────────────────────────────── */
+
+/**
+ * Rows rendered per expanded console before "show more" (audit T8).
+ *
+ * MEASURED: nothing bounds this list at any layer. `myrient.service.ts` returns
+ * `files: filtered` with no cap, and a single console directory in the Myrient
+ * archive holds thousands of ROMs — so expanding one group could mount several
+ * thousand `FileRow`s at once, and every re-render walks all of them.
+ *
+ * The window is what the TCG card grid already does (`CartasView`, PAGE = 60):
+ * a slice plus a "show more", rather than a virtualizer. It costs no dependency
+ * and no measurement of row heights, and the finding's own advice is to
+ * virtualize only where a list is genuinely huge — which cannot be established
+ * for a scraped directory whose size is not known until it is fetched.
+ */
+const FILES_PAGE = 100
+
 export function ConsoleGroup({ result, filesLabel, downloadLabel, defaultOpen = true }: { result: SearchConsoleResult; filesLabel: (n: number) => string; downloadLabel: string; defaultOpen?: boolean }) {
   const [open, setOpen] = React.useState(defaultOpen)
+  const [shown, setShown] = React.useState(FILES_PAGE)
+  // A new search reuses this component for a different console; without this the
+  // previous group's expanded window would carry over to the new results.
+  React.useEffect(() => { setShown(FILES_PAGE) }, [result.consoleKey, result.count])
   const mfr = CONSOLES[result.consoleKey]?.manufacturer
   const color = mfr ? MFR_DOT[mfr] : "var(--muted)"
   return (
@@ -56,9 +77,19 @@ export function ConsoleGroup({ result, filesLabel, downloadLabel, defaultOpen = 
       </button>
       {open && (
         <div>
-          {result.files.map((f) => (
+          {result.files.slice(0, shown).map((f) => (
             <FileRow key={f.filename} consoleKey={result.consoleKey} filename={f.filename} size={f.size} downloadLabel={downloadLabel} />
           ))}
+          {result.files.length > shown && (
+            <button
+              type="button"
+              onClick={() => setShown((n) => n + FILES_PAGE)}
+              className="flex w-full items-center justify-center gap-[0.5rem] border-t border-[color-mix(in_srgb,var(--line)_60%,transparent)] bg-panel-2 px-[1rem] py-[0.625rem] font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.06em] text-txt-muted transition-colors hover:text-txt"
+            >
+              <Icon name="chevronDown" size={14} />
+              {filesLabel(result.files.length - shown)}
+            </button>
+          )}
         </div>
       )}
     </div>

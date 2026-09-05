@@ -33,6 +33,8 @@ import { BattlesimTeamUploadDto } from './dto/battlesim-team-upload.dto';
 import { BattlesimListQueryDto } from './dto/list-query.dto';
 import { BattlesimTicketDto } from './dto/ws-ticket-response.dto';
 import { BattlesimReplayDto } from './dto/replay-response.dto';
+import { BattlesimLeagueReplayDto } from './dto/league-replay-response.dto';
+import { ReplayService as LeagueReplayService } from '@api/smartrotom/liga/services/replay.service';
 import { BattlesimTeamDto } from './dto/team-response.dto';
 import { BattlesimPageDto } from './dto/paginated-response.dto';
 import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
@@ -50,6 +52,10 @@ export class BattlesimController {
   constructor(
     private readonly ticketService: BattleTicketService,
     private readonly repo: BattlesimRepository,
+    // League replays are Liga's data, but the battle simulator owns the route
+    // that serves them to its own viewer (audit B14). BattleModule must import
+    // LigaModule for this to resolve — it compiles either way and fails at boot.
+    private readonly leagueReplays: LeagueReplayService,
   ) {}
 
   /**
@@ -220,6 +226,63 @@ export class BattlesimController {
       throw new NotFoundException('Replay not found');
     }
     return replay as BattlesimReplayDto;
+  }
+
+  /**
+   * GET /battlesimulator/replays/liga/:id
+   * Fetch a league-sourced replay by its integer id. Public (share links).
+   *
+   * Audit B14. The battlesim replay viewer used to call
+   * `/smartrotom/liga/replay/:id` directly, so a battle-simulator screen
+   * depended on a SmartRotom module. The row is still Liga's — this delegates
+   * to `ReplayService` rather than reaching into its tables — but the HTTP
+   * surface the simulator reads now belongs to the simulator.
+   *
+   * Three segments, so this cannot collide with the two-segment
+   * `replays/:id` above regardless of declaration order.
+   *
+   * Liga's own route answers a non-numeric id with a 500, because its service
+   * signals absence by throwing a bare `Error`. This one uses the non-throwing
+   * `findReplayById` and answers 400 or 404, which is what a share link that
+   * has been mistyped or has expired should say.
+   */
+  @Get('replays/liga/:id')
+  @Public()
+  @ApiParam({
+    name: 'id',
+    description: 'League replay id (positive integer)',
+  })
+  @ApiOperation({
+    summary: 'Fetch a league-sourced replay by id',
+    description:
+      'Public endpoint for share links into the battlesim replay viewer. Returns 404 if no such league replay exists.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Replay found',
+    type: BattlesimLeagueReplayDto,
+  })
+  @ApiResponse({ status: 400, description: 'Malformed replay id' })
+  @ApiResponse({ status: 404, description: 'Replay not found' })
+  async getLeagueReplay(@Param('id') id: string): Promise<BattlesimLeagueReplayDto> {
+    // Rejected here rather than coerced: `parseInt("12abc")` is 12, which would
+    // quietly serve a different replay than the one the link asked for.
+    if (!/^\d+$/.test(id)) {
+      throw new BadRequestException('Replay id must be a positive integer');
+    }
+    const replay = await this.leagueReplays.findReplayById(Number(id));
+    if (!replay) {
+      throw new NotFoundException('Replay not found');
+    }
+    return {
+      id: replay.id,
+      side1: replay.side1,
+      side2: replay.side2,
+      team1: replay.team1,
+      team2: replay.team2,
+      replay: replay.replay,
+      createdAt: replay.createdAt,
+    };
   }
 
   /**

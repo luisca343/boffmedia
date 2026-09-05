@@ -8,7 +8,7 @@ export type BattlesimReplayUploadDto = {
      */
     clientId: string;
     /**
-     * Battle format (e.g., gen9randomdoublesbattle)
+     * Battle format. Must be a registered id from battle-core BSIM_FORMATS.
      */
     format: string;
     /**

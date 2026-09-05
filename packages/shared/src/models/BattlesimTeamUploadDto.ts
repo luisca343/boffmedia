@@ -12,13 +12,17 @@ export type BattlesimTeamUploadDto = {
      */
     name: string;
     /**
-     * Battle format (e.g., gen9vgc2025regulationc)
+     * Battle format. Must be a registered id from battle-core BSIM_FORMATS.
      */
     format: string;
     /**
      * Team in Showdown packed format
      */
     packed: string;
+    /**
+     * User-defined tags for organizing teams
+     */
+    tags?: Array<any[]>;
     /**
      * Client's last update timestamp (epoch ms) for merge conflict resolution
      */

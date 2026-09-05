@@ -3,6 +3,7 @@ import { ProgressService } from './progress.service';
 import { AchievementsService } from './achievements.service';
 import { NotificationsService } from '@api/boffmedia/notifications/notifications.service';
 import { ProgressRepository } from '../repositories/progress.repository';
+import { LeaderboardCacheService } from './leaderboard-cache.service';
 
 const mockProgress = {
   participantId: 1,
@@ -38,6 +39,9 @@ describe('ProgressService', () => {
   };
   const mockAchievementsService = { getAchievementById: jest.fn() };
   const notifications = { create: jest.fn() };
+  // A10. A REAL cache, not a mock: the assertion below is that a write leaves
+  // the cache empty, which a jest.fn() would satisfy without clearing anything.
+  let leaderboardCache: LeaderboardCacheService;
 
   beforeEach(async () => {
     jest.clearAllMocks();
@@ -46,6 +50,7 @@ describe('ProgressService', () => {
     repo.isCompleted.mockResolvedValue(false);
     repo.findProgress.mockResolvedValue(mockProgress);
     repo.findParticipantUserId.mockResolvedValue(42);
+    leaderboardCache = new LeaderboardCacheService();
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -53,6 +58,7 @@ describe('ProgressService', () => {
         { provide: ProgressRepository, useValue: repo },
         { provide: AchievementsService, useValue: mockAchievementsService },
         { provide: NotificationsService, useValue: notifications },
+        { provide: LeaderboardCacheService, useValue: leaderboardCache },
       ],
     }).compile();
 
@@ -61,6 +67,59 @@ describe('ProgressService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  // ─── A10: a write must make cached leaderboards stale ────────────────────────
+
+  describe('leaderboard cache invalidation (A10)', () => {
+    beforeEach(() => {
+      mockAchievementsService.getAchievementById.mockResolvedValue(
+        mockAchievement,
+      );
+    });
+
+    /** Put something in the cache the way the read path does. */
+    const seed = async () => {
+      await leaderboardCache.through('global', async () => ['stale board']);
+      expect(leaderboardCache.size).toBe(1);
+    };
+
+    it('clears cached boards after a progress write', async () => {
+      await seed();
+
+      await service.updateProgress(1, 2, 3);
+
+      // Not "invalidateAll was called" — the cache is really empty, so the next
+      // read recomputes. A spy would pass even if the method did nothing.
+      expect(leaderboardCache.size).toBe(0);
+    });
+
+    it('clears them after a TRANSACTIONAL write too, which is the normal path', async () => {
+      // The facade wraps updateProgress in `transaction()`, which builds a
+      // SECOND ProgressService around the tx repository. If the cache is not
+      // threaded into that copy, every real write invalidates nothing.
+      repo.runInTransaction.mockImplementation((fn: any) => fn(repo));
+      await seed();
+
+      await service.transaction((tx) => tx.updateProgress(1, 2, 3));
+
+      expect(leaderboardCache.size).toBe(0);
+    });
+
+    it('clears AFTER the transaction commits, not only inside it', async () => {
+      // A read racing between the inner invalidation and COMMIT would
+      // repopulate the cache from pre-commit rows. Simulated here by refilling
+      // the cache from inside the transaction, after the write.
+      repo.runInTransaction.mockImplementation(async (fn: any) => {
+        const out = await fn(repo);
+        await leaderboardCache.through('global', async () => ['racer']);
+        return out;
+      });
+
+      await service.transaction((tx) => tx.updateProgress(1, 2, 3));
+
+      expect(leaderboardCache.size).toBe(0);
+    });
   });
 
   // ─── updateProgress ───────────────────────────────────────────────────────────

@@ -117,6 +117,21 @@ export function useBattleFlow(
     return map;
   }, [battleLines]);
 
+  /**
+   * The state builder, kept ACROSS seeks (audit B11).
+   *
+   * It used to be constructed inside `handleTurnChange`, so a new one existed
+   * for every turn change. That is what made the builder's incremental cursor
+   * impossible: a fresh instance has nothing to continue from, and every seek
+   * re-fed the log from line 0. Memoised on `battleLines` so loading a
+   * different replay starts a new builder rather than continuing the old one's
+   * position into an unrelated log.
+   */
+  const builderRef = useMemo(
+    () => ({ current: new BattleStateBuilder(battleLines, turnIndexMap) }),
+    [battleLines, turnIndexMap],
+  );
+
   const clearActions = ['switch', 'move', 'turn'];
 
   // ─── LIVE MODE: useEffect-driven one-line-per-render cycle ───
@@ -249,7 +264,7 @@ export function useBattleFlow(
     if(changeTurn < 0) changeTurn = 0;
     if(changeTurn > lastTurn + 1) changeTurn = lastTurn + 1;
 
-    const builder = new BattleStateBuilder(battleLines, turnIndexMap);
+    const builder = builderRef.current;
 
     if(changeTurn === 0) {
       const result = builder.buildSetupState();

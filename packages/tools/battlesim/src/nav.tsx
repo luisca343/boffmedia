@@ -22,10 +22,16 @@ export type BsimScreen = "hub" | "play" | "pvp" | "pvpRoom" | "showdown" | "show
  *
  * THE TOKENS ARE THE PACKAGE'S PARAM NAMES, not the web's folder names. The
  * canonical vocabulary is `roomId` and `id` (plus the query-only `tab`, `team`,
- * `source`, `format`); apps/web keeps its `[roomid]` / `[name]` folders and
- * aliases them to those names in BsimRouted when it READS the address. Writing
- * goes the other way and must use the canonical names, or `[roomid]` survives
- * into the URL verbatim — which is exactly the bug this spelling fixes.
+ * `source`, `format`). Writing must use those canonical names, or a host's
+ * folder spelling survives into the URL verbatim — which is the bug this
+ * spelling fixes.
+ *
+ * The folder names cannot affect reading: `BsimRouted` matches the raw
+ * pathname against THIS table, so a Next segment name is never consulted. That
+ * makes a mismatched folder pure misdirection for whoever reads the tree next,
+ * which is why `replay/[name]` was renamed to `replay/[id]` (audit B14) — the
+ * value it carried was always an id. `battle/[roomid]` still differs from the
+ * canonical `roomId` in case only, and is harmless for the same reason.
  */
 export const BSIM_ROUTES: Record<BsimScreen, string> = {
   hub: "/pokemon/battlesim",
