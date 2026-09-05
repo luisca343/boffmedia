@@ -4,6 +4,7 @@ import { CommandsService } from '@/discord/_commands/commands.service';
 import { formatDate } from '@/_utils/stringUtils';
 import { EmbedBuilder } from 'discord.js';
 import { FraseDto } from './_dto/frase.dto';
+import { DISCORD_GUILDS } from '../../../_main/discord.config';
 
 @Injectable()
 export class FraseCommand {
@@ -12,7 +13,7 @@ export class FraseCommand {
   @SlashCommand({
     name: 'frase',
     description: 'Mostrar las frase',
-    guilds: ['516237304101339156'],
+    guilds: DISCORD_GUILDS,
   })
   public async onFrase(
     @Context() [interaction]: SlashCommandContext,

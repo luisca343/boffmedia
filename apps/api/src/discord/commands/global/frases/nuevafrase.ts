@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Context, SlashCommand, SlashCommandContext, Options } from 'necord';
 import { CommandsService } from '@/discord/_commands/commands.service';
 import { NuevaFraseDto } from './_dto/nuevafrase.dto';
+import { DISCORD_GUILDS } from '../../../_main/discord.config';
 
 @Injectable()
 export class NuevaFraseCommand {
@@ -10,7 +11,7 @@ export class NuevaFraseCommand {
   @SlashCommand({
     name: 'nuevafrase',
     description: 'Añadir una nueva frase',
-    guilds: ['516237304101339156'],
+    guilds: DISCORD_GUILDS,
   })
   public async onNuevaFrase(
     @Context() [interaction]: SlashCommandContext,

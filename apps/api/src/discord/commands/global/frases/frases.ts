@@ -20,6 +20,7 @@ import {
 } from 'discord.js';
 import { FrasesDto } from './_dto/frases.dto';
 import { Logger } from 'nestjs-pino';
+import { DISCORD_GUILDS } from '../../../_main/discord.config';
 
 @Injectable()
 export class FrasesCommand {
@@ -31,7 +32,7 @@ export class FrasesCommand {
   @SlashCommand({
     name: 'frases',
     description: 'Mostrar las frases',
-    guilds: ['516237304101339156'],
+    guilds: DISCORD_GUILDS,
   })
   public async onFrases(
     @Context() [interaction]: SlashCommandContext,

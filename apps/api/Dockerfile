@@ -203,5 +203,12 @@ ENV NODE_OPTIONS="--max-old-space-size=4096"
 HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
   CMD node -e "require('http').get('http://localhost:34301/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) }).on('error', () => process.exit(1))"
 
+# The API. The Discord bot ships in this SAME image and is started with a
+# different command -- `docker run --entrypoint node <image> dist/discord-main.js`
+# (A1, see scripts/deploy/deploy.sh's `discord` branch). There is no second
+# Dockerfile and no second build: everything under src/ is compiled, so
+# dist/discord-main.js is already here, and the ffmpeg installed above for
+# @discordjs/voice is the dependency that would have made a slimmer second image
+# pointless anyway.
 CMD ["node", "dist/main.js"]
 

@@ -10,6 +10,7 @@ import { User } from 'discord.js';
 import { and, eq, sql, desc } from 'drizzle-orm';
 import { getVoiceName } from '../_util/audio';
 import { Logger } from 'nestjs-pino';
+import { env } from '@/config/env';
 
 @Injectable()
 export class CommandsService {
@@ -17,7 +18,7 @@ export class CommandsService {
     private readonly logger: Logger,
     private db: MySQL2Service,
   ) {}
-  private testServerGUID = '516237304101339156';
+  private testServerGUID = env.DISCORD_GUILD_ID;
 
   async getFrases(
     guildID: string,

@@ -70,3 +70,19 @@ jobs:
           ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/deploy_key root@${{ secrets.DEPLOY_HOST }} \
             "/opt/scripts/deploy.sh api ${{ github.run_number }}"
+
+      # A1. The Discord bot, same image, `dist/discord-main.js` instead of
+      # `dist/main.js`. AFTER the api step, and the order is load-bearing: the
+      # api container has to come up with DISCORD_BOT_ENABLED=false first, or
+      # for the length of this step two gateway clients hold the same token and
+      # Discord hands each interaction to one of them at random -- commands that
+      # intermittently work, a much worse symptom than an outage.
+      #
+      # `continue-on-error` while the split is being adopted: the bot failing to
+      # restart must not fail an API deploy that has already succeeded, and the
+      # api container still carries the bot on any host whose env file has not
+      # been switched over yet.
+      - name: Deploy the Discord bot
+        continue-on-error: true
+        run: |
+          ssh -i ~/.ssh/deploy_key root@${{ secrets.DEPLOY_HOST }}             "/opt/scripts/deploy.sh discord ${{ github.run_number }}"

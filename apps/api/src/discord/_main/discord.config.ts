@@ -11,6 +11,20 @@ export type DiscordEnv = Pick<
 >;
 
 /**
+ * The guild slash commands are registered to.
+ *
+ * Read once, here, so the seven `guilds: ['5162…']` literals that used to be
+ * spread across the command files cannot drift apart -- and so a staging
+ * deployment can point its bot somewhere that is not the production server,
+ * which a compiled-in id made impossible.
+ *
+ * Evaluated at module load, like every other `env` read in this file. That is
+ * fine and deliberate: `config/env.ts` has already validated and defaulted the
+ * value before any of this is imported.
+ */
+export const DISCORD_GUILDS: string[] = [env.DISCORD_GUILD_ID];
+
+/**
  * The kill switch. Running the API with no Discord bot is a SUPPORTED
  * configuration, not a degraded one: a box that never got a token, a
  * staging deploy that must not answer in the production guild, or an incident

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
 import { Logger } from 'nestjs-pino';
+import { DISCORD_GUILDS } from '../../_main/discord.config';
 
 @Injectable()
 export class PingCommand {
@@ -9,7 +10,7 @@ export class PingCommand {
   @SlashCommand({
     name: 'ping',
     description: 'Replies with Pong!',
-    guilds: ['516237304101339156'],
+    guilds: DISCORD_GUILDS,
   })
   public async onPing(@Context() [interaction]: SlashCommandContext) {
     this.logger.log('[DEBUG] PingCommand executed');

@@ -1,6 +1,5 @@
 import { Global, Module, Provider } from '@nestjs/common';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { DiscordController } from './discord.controller';
 import { DiscordService } from './discord.service';
 import { ConfigModule } from '@nestjs/config';
 import { CommandsModule } from '../_commands/commands.module';
@@ -74,7 +73,10 @@ const GATEWAY_PROVIDERS: Provider[] = [
     ...discordGatewayImports(),
     CommandsModule,
   ],
-  controllers: [DiscordController],
+  // No controllers. `DiscordController` used to sit here with every route
+  // commented out — a class that existed only to be registered. A1 removed it:
+  // the bot process has no HTTP surface at all, so a controller in this module
+  // could not be served from there anyway.
   providers: [
     DiscordService,
     // Declared here rather than in AppModule so the Discord failure boundary

@@ -4,6 +4,7 @@ import { setVoice } from '@/discord/_util/audio';
 import { CommandsService } from '@/discord/_commands/commands.service';
 import { SetVozDto } from './setVoz.dto';
 import { SetVozAutocompleteInterceptor } from './setVoz.interceptor';
+import { DISCORD_GUILDS } from '../../../_main/discord.config';
 
 @Injectable()
 export class SetVozCommand {
@@ -13,7 +14,7 @@ export class SetVozCommand {
   @SlashCommand({
     name: 'setvoz',
     description: 'Cambiar la voz del bot',
-    guilds: ['516237304101339156'],
+    guilds: DISCORD_GUILDS,
   })
   public async onSetVoz(
     @Context() [interaction]: SlashCommandContext,

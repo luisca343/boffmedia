@@ -1,4 +1,9 @@
-import { createPrivateKey, createPublicKey, sign, type KeyObject } from 'node:crypto';
+import {
+  createPrivateKey,
+  createPublicKey,
+  sign,
+  type KeyObject,
+} from 'node:crypto';
 import { Injectable, Logger } from '@nestjs/common';
 
 import { env } from '@/config/env';
@@ -69,7 +74,10 @@ export class ManifestSigningService {
         );
       }
       this.privateKey = key;
-      this.publicKeyDer = createPublicKey(key).export({ format: 'der', type: 'spki' });
+      this.publicKeyDer = createPublicKey(key).export({
+        format: 'der',
+        type: 'spki',
+      });
       this.logger.log('Pack manifest signing is ON (ed25519).');
     } catch (e) {
       // Refusing to boot would take the whole API down over an optional

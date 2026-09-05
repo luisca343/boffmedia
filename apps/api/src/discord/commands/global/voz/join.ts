@@ -2,13 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { Context, SlashCommand, SlashCommandContext } from 'necord';
 import { joinVoiceChannel } from '@discordjs/voice';
 import { GuildMember, VoiceChannel } from 'discord.js';
+import { DISCORD_GUILDS } from '../../../_main/discord.config';
 
 @Injectable()
 export class JoinCommand {
   @SlashCommand({
     name: 'join',
     description: 'Join a voice channel',
-    guilds: ['516237304101339156'],
+    guilds: DISCORD_GUILDS,
   })
   public async onJoin(@Context() [interaction]: SlashCommandContext) {
     let channel = interaction.options.getChannel('channel') as VoiceChannel;

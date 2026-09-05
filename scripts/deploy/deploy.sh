@@ -22,8 +22,8 @@
 #
 set -euo pipefail
 
-SERVICE="${1:?usage: deploy.sh <api|web> <tag>}"
-TAG="${2:?usage: deploy.sh <api|web> <tag>}"
+SERVICE="${1:?usage: deploy.sh <api|web|discord> <tag>}"
+TAG="${2:?usage: deploy.sh <api|web|discord> <tag>}"
 
 # ─── WEB BINDS CONFIRMED (docker inspect boffmedia-web, 2026-09-02) ─────────
 # ─── API BINDS UNCONFIRMED — see the comment above the /srv/boffmedia/public
@@ -62,11 +62,55 @@ case "$SERVICE" in
       --restart unless-stopped
     )
     ;;
+  # A1. The Discord bot, from the SAME IMAGE as the API with a different
+  # entrypoint. Not a second build: the image already carries ffmpeg for
+  # @discordjs/voice, and `nest build` emits dist/discord-main.js beside
+  # dist/main.js because both live under src/.
+  #
+  # Deploy ORDER matters, once. The api container must be redeployed with
+  # DISCORD_BOT_ENABLED=false in /etc/boffmedia/api.env BEFORE this one starts,
+  # or two gateway clients answer the same slash command with the same token —
+  # Discord does not refuse that, it just delivers each interaction to one of
+  # them, so the symptom is commands that intermittently work.
+  #
+  # No -p: the bot has no HTTP surface. It is an application CONTEXT, not a
+  # server, so there is nothing to bind and nothing to health-check — the
+  # image's HEALTHCHECK curls localhost:34301, which this process does not
+  # serve, so it is disabled here and wait_for_health falls back to "is it
+  # still running" (the `none` branch below).
+  discord)
+    NAME="boffmedia-discord"
+    IMAGE="luisca343/boffmedia-server2"
+    RUN_FLAGS=(
+      --entrypoint node
+      --health-cmd=NONE
+      --env-file /etc/boffmedia/api.env
+      # Same env file as the API on purpose: the bot imports @/config/env, which
+      # validates the WHOLE schema at import time (A12), so it needs the DB and
+      # JWT names even though it only uses some of them. Splitting the file
+      # would mean two places to add a variable and one of them forgotten.
+      -e DISCORD_BOT_ENABLED=true
+      --restart unless-stopped
+    )
+    RUN_ARGS=(dist/discord-main.js)
+    ;;
   *)
-    echo "unknown service '$SERVICE' (expected api or web)" >&2
+    echo "unknown service '$SERVICE' (expected api, web or discord)" >&2
     exit 2
     ;;
 esac
+
+# Only the discord branch passes a command; the others use the image's CMD.
+#
+# Written as an `if`, not `[ ... ] && RUN_ARGS=()`. Under `set -e` that compound
+# EXITS when the test is false -- which is exactly the discord case, the one
+# branch that sets it -- so the deploy would abort before starting anything,
+# with no output. `${RUN_ARGS+x}` also has to be the test rather than
+# `${RUN_ARGS[0]}`, because `set -u` makes reading an element of an unset array
+# an error in bash 4.
+if [ -z "${RUN_ARGS+x}" ]; then
+  RUN_ARGS=()
+fi
 # ─────────────────────────────────────────────────────────────────────────────
 
 HEALTH_TIMEOUT="${HEALTH_TIMEOUT:-240}"
@@ -77,7 +121,11 @@ PREVIOUS_IMAGE="$(docker inspect --format '{{.Config.Image}}' "$NAME" 2>/dev/nul
 start_container() {
   local image="$1"
   docker rm -f "$NAME" >/dev/null 2>&1 || true
-  docker run -d --name "$NAME" "${RUN_FLAGS[@]}" "$image" >/dev/null
+  # `"${RUN_ARGS[@]+...}"` rather than a bare `"${RUN_ARGS[@]}"`: expanding an
+  # EMPTY array is an unbound-variable error under `set -u` in bash 4, which is
+  # what api and web would hit on every deploy. bash 5 permits it; the server's
+  # version is not something this script should depend on.
+  docker run -d --name "$NAME" "${RUN_FLAGS[@]}" "$image"     "${RUN_ARGS[@]+"${RUN_ARGS[@]}"}" >/dev/null
 }
 
 # Resolves to healthy/unhealthy for an image that declares a HEALTHCHECK, and to

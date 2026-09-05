@@ -12,80 +12,11 @@ import { ValidationPipe } from '@nestjs/common';
 import { apiReference } from '@scalar/nestjs-api-reference';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
-import {
-  initSentry,
-  captureApiException,
-  flushSentry,
-} from './common/observability/sentry';
+import { initSentry } from './common/observability/sentry';
 import { ApiResponseEntity } from './common/entities/api-response.entity';
 import { Logger } from 'nestjs-pino';
 import { publicPath, uploadsPath } from '@/config/paths';
-
-/**
- * Socket failures that say nothing about this process's health: the peer went
- * away. They arrive as an 'error' event on whichever client emitted them, and
- * an EventEmitter with no listener for 'error' is fatal to Node — so a public
- * WebSocket dropping an idle connection could take the whole API down, taking
- * every unrelated route with it.
- */
-const RECOVERABLE_SOCKET_CODES = new Set([
-  'ECONNRESET',
-  'EPIPE',
-  'ETIMEDOUT',
-  'ECONNREFUSED',
-  'EHOSTUNREACH',
-  'ENETUNREACH',
-  'EAI_AGAIN',
-]);
-
-function installProcessGuards(): void {
-  process.on('uncaughtException', (error: NodeJS.ErrnoException) => {
-    if (error?.code && RECOVERABLE_SOCKET_CODES.has(error.code)) {
-      // Deliberately kept alive: a dropped peer connection is not a reason to
-      // stop serving requests that have nothing to do with it.
-      console.error(
-        JSON.stringify({
-          level: 50,
-          service: 'boffmedia-api',
-          msg: `Recovered from an unhandled socket error (${error.code})`,
-          err: { message: error.message, stack: error.stack },
-        }),
-      );
-      return;
-    }
-    // Anything else is a real defect, and continuing from an unknown state is
-    // worse than restarting: let the process die so the supervisor replaces it.
-    console.error(
-      JSON.stringify({
-        level: 60,
-        service: 'boffmedia-api',
-        msg: 'Fatal uncaught exception — exiting',
-        err: { message: error?.message, stack: error?.stack },
-      }),
-    );
-    captureApiException(error, { mechanism: 'uncaughtException' });
-    // The ONLY place a flush is warranted: the process is about to leave, and
-    // an event still in Sentry's buffer dies with it — which is exactly the
-    // class of crash we most want to see. `flushSentry` resolves immediately
-    // when Sentry is off, and the timer below is the backstop for a flush that
-    // never settles, so the exit path is unchanged on a box with no DSN.
-    setTimeout(() => process.exit(1), 2500).unref();
-    void flushSentry(2000).then(() => process.exit(1));
-  });
-
-  process.on('unhandledRejection', (reason: unknown) => {
-    const error = reason as NodeJS.ErrnoException;
-    console.error(
-      JSON.stringify({
-        level: 50,
-        service: 'boffmedia-api',
-        msg: 'Unhandled promise rejection',
-        err: { message: error?.message ?? String(reason), stack: error?.stack },
-      }),
-    );
-    captureApiException(reason, { mechanism: 'unhandledRejection' });
-  });
-}
+import { installProcessGuards } from './common/process-guards';
 
 async function bootstrap() {
   // Before the guards, so a throw inside them is still reported, and before

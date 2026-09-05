@@ -109,15 +109,32 @@ export const envSchema = z
     WIGGLYPOP_SAGA_STALE_MINUTES: z.coerce.number().default(120),
 
     // Discord / StreamElements
-    // The bot boots IN-PROCESS with the HTTP server (Necord + discord.js, see
-    // discord/_main/discord.module.ts), so both of these are the switch that
-    // keeps a chat outage from being an API outage.
+    //
+    // The bot can run in EITHER of two shapes and the switch below is what
+    // chooses (A1):
+    //
+    //   - its own process, `dist/discord-main.js` from the same image, with the
+    //     API container setting DISCORD_BOT_ENABLED=false. This is the intended
+    //     production shape: a bot restart no longer restarts the API, an API
+    //     deploy no longer drops the gateway session, and @discordjs/voice stops
+    //     sharing a heap with a Playwright browser.
+    //   - in-process with the HTTP server, which is what it did before A1 and
+    //     what a deployment that has not been split yet still does. Nothing
+    //     forbids it.
     //
     // Optional exactly like TERAS_API_TOKEN above: with no token the whole
     // Discord subtree — the gateway client and all 19 command providers — is
     // never registered, and the API serves HTTP and websockets as usual. A
-    // missing token degrades; it does not crash.
+    // missing token degrades; it does not crash. (The dedicated bot process is
+    // the one place that treats it as fatal, because there it means the
+    // container has nothing to do.)
     DISCORD_KEY: z.string().optional(),
+    // The guild every slash command is registered to. It was the literal
+    // '516237304101339156' in seven source files -- a per-deployment fact
+    // compiled into the code, so a staging bot could only ever answer in the
+    // production guild. Defaulted rather than required so nothing breaks for a
+    // deployment that has not set it.
+    DISCORD_GUILD_ID: z.string().default('516237304101339156'),
     // Explicit kill switch, independent of the token, for the case where the
     // bot IS the thing misbehaving and you want it off without hunting down the
     // secret. Same enum/transform idiom as WIGGLYPOP_ATOMIC_CUSTODY above.

@@ -13,14 +13,20 @@ import { ManifestSigningService } from './manifest-signing.service';
  *   - a missing key silently behaving as if it were present (fail-open)
  */
 
-jest.mock('@/config/env', () => ({ env: {} as Record<string, string | undefined> }));
+jest.mock('@/config/env', () => ({
+  env: {} as Record<string, string | undefined>,
+}));
 // eslint-disable-next-line @typescript-eslint/no-require-imports
-const { env } = require('@/config/env') as { env: Record<string, string | undefined> };
+const { env } = require('@/config/env') as {
+  env: Record<string, string | undefined>;
+};
 
 function freshKeypair(): { priv: string; pub: string } {
   const { publicKey, privateKey } = generateKeyPairSync('ed25519');
   return {
-    priv: privateKey.export({ format: 'der', type: 'pkcs8' }).toString('base64'),
+    priv: privateKey
+      .export({ format: 'der', type: 'pkcs8' })
+      .toString('base64'),
     pub: publicKey.export({ format: 'der', type: 'spki' }).toString('base64'),
   };
 }
@@ -57,7 +63,9 @@ describe('ManifestSigningService', () => {
     // what makes that true by construction, and this proves it.
     expect(svc.publicKey()).toBe(pub);
 
-    const body = Buffer.from(JSON.stringify({ formatVersion: 1, pack: { id: 'x' } }));
+    const body = Buffer.from(
+      JSON.stringify({ formatVersion: 1, pack: { id: 'x' } }),
+    );
     const sig = svc.sign(body)!;
     expect(verifyWith(pub, body, sig)).toBe(true);
   });
@@ -67,7 +75,9 @@ describe('ManifestSigningService', () => {
     const { priv, pub } = freshKeypair();
     const svc = serviceWith(priv);
 
-    const body = Buffer.from(JSON.stringify({ pack: { id: 'legit' }, version: '1.0.0' }));
+    const body = Buffer.from(
+      JSON.stringify({ pack: { id: 'legit' }, version: '1.0.0' }),
+    );
     const sig = svc.sign(body)!;
 
     const tampered = Buffer.from(body.toString().replace('1.0.0', '9.9.9'));
@@ -98,7 +108,9 @@ describe('ManifestSigningService', () => {
 
     // Same object, different key order -- what a client rebuilds after parsing.
     const rebuilt = Buffer.from('{"b":2,"a":1}');
-    expect(JSON.stringify(JSON.parse(sent.toString()))).not.toBe(rebuilt.toString());
+    expect(JSON.stringify(JSON.parse(sent.toString()))).not.toBe(
+      rebuilt.toString(),
+    );
     expect(verifyWith(pub, rebuilt, sig)).toBe(false);
   });
 
@@ -125,7 +137,9 @@ describe('ManifestSigningService', () => {
     // the explicit algorithm check stops it being used here, where every
     // verifier expects ed25519.
     const { privateKey } = generateKeyPairSync('rsa', { modulusLength: 2048 });
-    const der = privateKey.export({ format: 'der', type: 'pkcs8' }).toString('base64');
+    const der = privateKey
+      .export({ format: 'der', type: 'pkcs8' })
+      .toString('base64');
     const svc = serviceWith(der);
     expect(svc.enabled).toBe(false);
   });
