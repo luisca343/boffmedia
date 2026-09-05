@@ -37,8 +37,11 @@ const BACKUP_CODE_LENGTH = 10;
 /** Crockford-ish: no I, L, O or U — the characters people mistranscribe. */
 const BACKUP_ALPHABET = '23456789ABCDEFGHJKMNPQRSTVWXYZ';
 
-/** What the authenticator app shows above the code. */
-const TOTP_ISSUER = 'Boffmedia';
+/** What the authenticator app shows above the code. Cased like the brand
+ *  everywhere else — `BoffMedia`, matching the document title in the web root
+ *  layout and the MAIL_FROM display name. Changing it rewrites the otpauth URI,
+ *  so it is only free to touch while nothing is enrolled. */
+const TOTP_ISSUER = 'BoffMedia';
 
 export interface EnrolmentStart {
   /** Base32 shared secret, for the "cannot scan the QR" path. */

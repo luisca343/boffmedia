@@ -78,7 +78,10 @@ describe('TwoFactorService', () => {
       const result = await service.startEnrolment(1, 'TrainerAsh');
 
       expect(result.otpauth_url).toMatch(/^otpauth:\/\/totp\//);
-      expect(result.otpauth_url).toContain('Boffmedia');
+      // Case matters: this is the brand name the authenticator app prints above
+      // the code, and toContain is case-sensitive, so this assertion is what
+      // catches a casing drift in TOTP_ISSUER.
+      expect(result.otpauth_url).toContain('BoffMedia');
       expect(result.qr_svg).toContain('<svg');
 
       const [, sealed] = repo.putPendingSecret.mock.calls[0];
