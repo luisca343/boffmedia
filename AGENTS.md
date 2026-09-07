@@ -315,3 +315,75 @@ Verify the tool uses only capabilities present in `configureToolHost()`:
 - [ ] Tool is listed in the **tool inventory** in `docs/boffmedia-desktop-app-plan.md` §2 (update the table)
 - [ ] Owner is notified of the tool's availability in the desktop app
 - [ ] Tool is **visible in both web and desktop hubs** (registry-driven rendering)
+
+<!-- mimir:policy BEGIN (managed by `mimir wire`; do not edit inside) -->
+## mimir — persistent memory (recall before deciding, record after)
+
+`mimir` is a durable, searchable log of decisions, bugfixes, patterns and preferences for this
+project, plus a global store shared across every project. It survives context windows and sessions.
+
+| Need | Command |
+| --- | --- |
+| what is already known here | `mimir context` |
+| recall prior work on a topic | `mimir search "<terms>"` |
+| record something worth keeping | `mimir save "<title>" -t <type> --what "…" --why "…"` |
+| read one entry in full | `mimir show <id>` |
+| mark an entry replaced by a newer one | `mimir supersede <old-id> --by <new-id>` |
+| what happened recently | `mimir timeline` |
+
+`<type>` is one of `decision`, `bugfix`, `pattern`, `preference`, `session`. Add `--topic <key>` to
+group related entries, and `--global` for something true of every project (tooling, house style).
+
+**Recall first.** Before designing anything non-trivial, debugging something that feels familiar, or
+re-deriving a constraint, run `mimir search` on the topic. A recorded decision stands unless you
+have a reason to overturn it — and if you overturn it, `mimir save` the replacement and
+`mimir supersede` the old entry so recall stops surfacing it.
+
+**Record as you go, not at the end.** After a non-obvious choice, a fixed bug, or a discovered
+gotcha, save it with the *why*, not just the *what*. One fact per entry, titled so a future
+`mimir search` finds it.
+<!-- mimir:policy END -->
+
+## Janus CLI tools (Codex)
+
+Mimir and Horus are available as local command-line tools, not MCP servers. Use their managed
+guidance below when deciding when and how to invoke them.
+
+- On Windows PowerShell, use `mimir.cmd` and `horus.cmd` explicitly. The extensionless commands
+  can resolve to `.ps1` launchers that are blocked by the local execution policy.
+- Do not invoke the Claude-only `hook` commands from Codex sessions.
+
+<!-- horus:policy BEGIN (managed by `horus wire`; do not edit inside) -->
+## horus — code graph (query it before searching text)
+
+`horus` keeps a symbol/edge index of this repo in `.horus/graph.db`. **Locate code by querying the
+graph; use text search only for what the graph cannot answer** — comments, config, strings, docs,
+and other non-code text.
+
+| Need | Command |
+| --- | --- |
+| (re)build the index | `horus build` |
+| top-down overview: apps, cross-app edges, hotspots, modules | `horus architecture` |
+| find a symbol by name / FQN / doc words | `horus search <name or phrase>` |
+| restrict a search to one app/package | `horus search <term> --app <api\|web\|…>` |
+| symbols + callers + callees + blast radius (signatures) | `horus explore <symbol>` |
+| full source of one symbol, on demand | `horus show <symbol>` |
+| who calls this (incl. cross-app http/ipc callers) | `horus callers <symbol>` |
+| what this calls | `horus callees <symbol>` |
+| everything a change would touch (+ tests covering it) | `horus impact <symbol>` |
+| symbols your working diff touches + blast radius | `horus diff` |
+| index health + unresolved-edge causes | `horus status` |
+| visualize the graph in the browser | `horus view` |
+
+**Order of operations:** `horus architecture` when the repo is unfamiliar → `horus search`/`explore`
+to locate (search also matches doc-comment words, so a phrase like "retry logic" works) →
+`horus show` or a targeted `grep` on the file it named to read the exact lines → *never* a broad
+`grep`/`rg`/`find` over the repo as the first move.
+
+In a monorepo, edges cross app boundaries: a web client call site links to the NestJS route it hits
+(`http`) and a Tauri `invoke()` links to its Rust command (`ipc`). So `horus impact` on a server
+handler already lists the client code that depends on it — check it before changing a route or a
+shared endpoint. Entries marked `?` are unproven candidates (over-approximation is deliberate;
+`--strict` hides them). If a command reports the graph is missing or stale, run `horus build`
+(incremental, seconds) and retry — do not fall back to grepping the whole repo.
+<!-- horus:policy END -->

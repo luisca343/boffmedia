@@ -1,6 +1,7 @@
 import react from "@vitejs/plugin-react"
 import { createRequire } from "node:module"
-import { resolve } from "node:path"
+import { existsSync, statSync } from "node:fs"
+import { resolve, sep } from "node:path"
 import { defineConfig } from "vite"
 
 import { isBundledAsset } from "./src/bundled-assets.generated"
@@ -25,6 +26,35 @@ const APP_VERSION = createRequire(import.meta.url)("./package.json").version
  * ever objecting to.
  */
 const ASSET_UPSTREAM = process.env.VITE_WEB_BASE_URL || "https://boffmedia.es"
+const WEB_PUBLIC_DIR = resolve(__dirname, "../web/public")
+
+/**
+ * In browser-only renderer development the Rust asset scheme does not exist.
+ * Prefer an asset already extracted into the web app's disposable public tree,
+ * then let the proxy fetch a missing one from the configured upstream.  This
+ * keeps the Mewgenics dataset and its cat-builder SVGs available locally
+ * without copying their 419 MB tree into this app or its production bundle.
+ */
+function localWebAsset(url: string): string | null {
+  const [rawPath] = url.split("?", 1)
+  if (!rawPath?.startsWith("/")) return null
+
+  let pathname: string
+  try {
+    pathname = decodeURIComponent(rawPath)
+  } catch {
+    return null
+  }
+
+  const file = resolve(WEB_PUBLIC_DIR, `.${pathname}`)
+  if (!file.startsWith(`${WEB_PUBLIC_DIR}${sep}`)) return null
+
+  try {
+    return existsSync(file) && statSync(file).isFile() ? file : null
+  } catch {
+    return null
+  }
+}
 
 const assetProxy = {
   target: ASSET_UPSTREAM,
@@ -34,8 +64,20 @@ const assetProxy = {
   // dev mode fail in exactly the case the bundling exists to survive. The test
   // is the same generated one the runtime router uses (`bundled-assets`), so
   // dev and the built app cannot disagree about what this app ships.
-  bypass: (req: { url?: string }) =>
-    isBundledAsset((req.url ?? "").split("?")[0]) ? req.url : null,
+  bypass: (req: { url?: string }) => {
+    const url = req.url ?? ""
+    const pathname = url.split("?", 1)[0]
+    if (isBundledAsset(pathname)) return url
+
+    const local = localWebAsset(url)
+    if (!local) return null
+
+    // Vite's own /@fs handler is registered after its proxy middleware. A
+    // string result from `bypass` hands this request on to that handler, where
+    // it gets normal static-file MIME and range handling.
+    const query = url.slice(pathname.length)
+    return `${encodeURI(`/@fs/${local.replace(/\\/g, "/")}`)}${query}`
+  },
 }
 
 export default defineConfig({

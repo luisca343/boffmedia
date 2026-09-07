@@ -21,7 +21,7 @@ import { fileURLToPath } from "node:url"
 
 const PROFILES = {
   dev: {
-    apiUrl: "https://api.ficuslab.es",
+    apiUrl: "http://localhost:34301",
     config: ["--config", "src-tauri/tauri.dev.conf.json"],
   },
   // No overrides: tauri.conf.json and api.rs already carry production.
