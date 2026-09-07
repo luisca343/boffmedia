@@ -75,3 +75,33 @@ export interface LimitlessPlayer {
   drop: number | null;
   hasTeam: boolean;
 }
+
+export interface MetaOverviewCorePokemon {
+  speciesId: string;
+  speciesName: string;
+}
+
+export interface MetaOverviewCore {
+  size: number;
+  pokemon: MetaOverviewCorePokemon[];
+  teamCount: number;
+  usagePercent: number;
+}
+
+export interface MetaOverviewTeam {
+  id: string;
+  tournamentId: number;
+  tournamentName: string | null;
+  tournamentDate: string | null;
+  playerName: string;
+  placing: number;
+  record: string;
+  slots: import('@/_db/schema/Vgc').VgcMetaSlot[];
+  rawText: string;
+}
+
+export interface MetaOverview {
+  totalTeams: number;
+  cores: MetaOverviewCore[];
+  recentTeams: MetaOverviewTeam[];
+}

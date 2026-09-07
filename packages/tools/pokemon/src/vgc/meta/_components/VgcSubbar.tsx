@@ -1,17 +1,11 @@
 "use client"
 
 import { useVgcT } from "../../i18n";
-import { Icon } from "@boffmedia/ui"
-import { DkSub, DkSubNote, DkSeg, DkChip } from "@boffmedia/ui/datakit"
+import { DkSub, DkSubNote, DkSeg } from "@boffmedia/ui/datakit"
 import { fmtCount } from "../_lib/meta-types"
 
 interface VgcSubbarProps {
-  tab: string
   view: string
-  formatLabel?: string
-  formatNote?: string
-  cutoffLabel?: string
-  month?: string
   curTourName?: string
   curTourPlayers?: number
   curTourIsCombined?: boolean
@@ -20,12 +14,7 @@ interface VgcSubbarProps {
 }
 
 export function VgcSubbar({
-  tab,
   view,
-  formatLabel,
-  formatNote,
-  cutoffLabel,
-  month,
   curTourName,
   curTourPlayers,
   curTourIsCombined,
@@ -33,20 +22,6 @@ export function VgcSubbar({
   onViewChange,
 }: VgcSubbarProps) {
   const t = useVgcT("meta")
-
-  if (tab === "stats") {
-    return (
-      <DkSub>
-        <DkChip icon="shield" tone="var(--accent-bright)">{formatLabel}</DkChip>
-        {formatNote && <span className="min-w-0 truncate font-mono text-[0.6875rem] leading-[1.4] text-txt-muted">{formatNote}</span>}
-        <DkSubNote>
-          <Icon name="info" size={12} />
-          {cutoffLabel}
-          {month ? ` · ${month}` : ""}
-        </DkSubNote>
-      </DkSub>
-    )
-  }
 
   return (
     <DkSub>

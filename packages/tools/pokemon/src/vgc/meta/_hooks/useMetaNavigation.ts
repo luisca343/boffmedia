@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import { useVgcNav } from "../../routing";
 import {
   ChampionsRegulation,
@@ -11,7 +11,6 @@ import {
 
 const BASE_PATH      = "/pokemon/vgc/meta";
 export const DEFAULT_CUTOFF = 1760;
-const DESKTOP_MEDIA_QUERY = "(min-width: 980px)";
 
 export interface MetaUrlState {
   tab:          string;
@@ -98,7 +97,6 @@ interface UseMetaNavigationOpts {
   snapshots:   SmogonSnapshot[];
   regulations: ChampionsRegulation[];
   tournaments: LimitlessTournament[];
-  entries:     PokemonUsageDetail[];
   entriesMap:  Map<string, PokemonUsageDetail>;
 }
 
@@ -110,13 +108,11 @@ export function useMetaNavigation({
   snapshots,
   regulations,
   tournaments,
-  entries,
   entriesMap,
 }: UseMetaNavigationOpts): UseMetaNavigationResult {
   const router = useVgcNav();
   const { query: searchParams } = useVgcNav();
   const { params: rawParams } = useVgcNav();
-  const [isDesktop, setIsDesktop] = useState(false);
 
   const speciesId    = rawParams?.speciesId as string | undefined;
   const tab          = searchParams.get("tab")          ?? "stats";
@@ -126,18 +122,6 @@ export function useMetaNavigation({
   const regulation   = searchParams.get("regulation")   ?? "";
   const tournamentId = searchParams.get("tournamentId") ?? "";
   const view         = searchParams.get("view")         ?? "aggregate";
-
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(DESKTOP_MEDIA_QUERY);
-    const updateViewport = () => setIsDesktop(mediaQuery.matches);
-
-    updateViewport();
-    mediaQuery.addEventListener("change", updateViewport);
-
-    return () => {
-      mediaQuery.removeEventListener("change", updateViewport);
-    };
-  }, []);
 
   // Auto-navigate when Stats tab has no format: default to latest regulation (Champions), fall back to first Smogon snapshot
   useEffect(() => {
@@ -191,14 +175,6 @@ export function useMetaNavigation({
       router.replace(buildUrl({ speciesId, tab, format, month, cutoff, regulation, tournamentId: String(tournaments[0].id), view }));
     }
   }, [tournaments, tab, searchParams, speciesId, format, month, cutoff, regulation, view, router]);
-
-  // Auto-navigate to first Pokémon when list loads and no selection
-  useEffect(() => {
-    if (!isDesktop) return;
-    if (!speciesId && entries.length > 0 && view === "aggregate") {
-      router.replace(buildUrl({ speciesId: entries[0].speciesId, tab, format, month, cutoff, regulation, tournamentId, view }));
-    }
-  }, [isDesktop, entries, speciesId, view, router, tab, format, month, cutoff, regulation, tournamentId]);  
 
   const detail = useMemo(
     () => (speciesId ? (entriesMap.get(speciesId) ?? null) : null),

@@ -2,9 +2,9 @@
 
 import { useVgcT } from "../../i18n";
 import { cn } from "@boffmedia/ui/cn"
-import { DkBack, DkBarList, DkSprite, DkEmpty, DkSkel } from "@boffmedia/ui/datakit"
+import { DkBack, DkSprite, DkEmpty, DkSkel } from "@boffmedia/ui/datakit"
 import { spriteUrl, handleSpriteError } from "../../tracker-core/types"
-import { fmtCount, type PokeData, type UsageEntry, type TeamEntry } from "../_lib/meta-types"
+import { type PokeData, type UsageEntry, type TeamEntry } from "../_lib/meta-types"
 import { MvType, MvSpread, MvBaseStats, MvCard } from "./MvBits"
 import { MvTeamRow } from "./MvTeams"
 
@@ -58,7 +58,7 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
         <header className="mb-4 flex flex-wrap items-center gap-[0.875rem]">
           {onBack && <DkBack onClick={onBack} label={t("detail.backToList")} />}
           <span className="grid h-[4.625rem] w-[4.625rem] flex-none place-items-center border border-solid border-line-2 bg-panel cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:12px]">
-            <DkSprite src={spriteUrl(detail.name)} alt={detail.name} size={62} onError={handleSpriteError} />
+            <DkSprite src={spriteUrl(detail.name)} alt={detail.name} size={72} onError={handleSpriteError} />
           </span>
           <div className="min-w-0">
             <h2 className="m-0 mb-[0.4375rem] font-display text-[2.125rem] font-extrabold uppercase italic leading-none tracking-[0.01em] max-[720px]:text-[1.6875rem]">{detail.name}</h2>
@@ -71,7 +71,6 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
           <div className="ml-auto flex flex-wrap gap-2 max-[980px]:ml-0 max-[980px]:w-full">
             <Kpi value={`#${rank}`} label={t("detail.rank")} />
             <Kpi value={`${entry.usage.toFixed(2)}%`} label={t("detail.usage")} />
-            <Kpi value={fmtCount(entry.count)} label={t("detail.appearances")} />
           </div>
         </header>
 
@@ -81,15 +80,15 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
           </MvCard>
 
           <MvCard title={t("detail.moves")} aside={t("detail.topN", { n: 10 })}>
-            <DkBarList items={detail.moves.map((m) => ({ name: m.name, pct: m.pct }))} max={10} empty={t("detail.noData")} />
+            <MvMetricList items={detail.moves.map((m) => ({ name: m.name, pct: m.pct }))} max={10} empty={t("detail.noData")} />
           </MvCard>
 
           <MvCard title={t("detail.items")} aside={t("detail.topN", { n: 8 })}>
-            <DkBarList items={detail.items.map((m) => ({ name: m.name, pct: m.pct }))} max={8} empty={t("detail.noData")} />
+            <MvMetricList items={detail.items.map((m) => ({ name: m.name, pct: m.pct }))} max={8} empty={t("detail.noData")} />
           </MvCard>
 
           <MvCard title={t("detail.abilitiesTeras")}>
-            <DkBarList items={detail.abilities.map((m) => ({ name: m.name, pct: m.pct }))} max={4} empty={t("detail.noData")} />
+            <MvMetricList items={detail.abilities.map((m) => ({ name: m.name, pct: m.pct }))} max={4} empty={t("detail.noData")} />
             {tera.length > 0 && (
               <div className="flex flex-wrap gap-[0.375rem] border-t border-dashed border-line pt-[0.5625rem]">
                 {tera.map((x) => (
@@ -103,7 +102,7 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
           </MvCard>
 
           <MvCard title={t("detail.teammates")} aside={t("detail.clickToJump")}>
-            <DkBarList
+            <MvMetricList
               items={detail.mates
                 .filter((m) => pokeMap[m.id])
                 .map((m) => {
@@ -111,7 +110,7 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
                   return {
                     name: mp.name,
                     pct: m.pct,
-                    lead: <DkSprite src={spriteUrl(mp.name)} alt={mp.name} size={26} onError={handleSpriteError} />,
+                    lead: <DkSprite src={spriteUrl(mp.name)} alt={mp.name} size={32} onError={handleSpriteError} />,
                     onClick: () => onSelect(m.id),
                   }
                 })}
@@ -146,7 +145,7 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
               ))}
             </div>
           ) : (
-            <p className="py-2 font-mono text-[0.75rem] leading-[1.5] text-txt-dim">{t("detail.noTeams")}</p>
+            <p className="py-2 font-mono text-[0.8125rem] leading-[1.5] text-txt-dim">{t("detail.noTeams")}</p>
           )}
         </MvCard>
       </div>
@@ -156,9 +155,48 @@ export function MvDetail({ detail, entry, rank, pokeMap, onSelect, onBack, loadi
 
 function Kpi({ value, label }: { value: React.ReactNode; label: string }) {
   return (
-    <span className="grid min-w-[4.625rem] justify-items-center gap-[3px] border border-solid border-line bg-panel px-[0.875rem] py-[0.5625rem] max-[980px]:flex-1">
+    <span className="grid min-w-[4.875rem] justify-items-center gap-[3px] border border-solid border-line bg-panel px-[0.875rem] py-[0.5625rem] max-[980px]:flex-1">
       <b className="font-display text-[1.1875rem] font-extrabold italic leading-none">{value}</b>
       <i className="font-mono text-[0.53125rem] font-semibold not-italic uppercase leading-none tracking-[0.12em] text-txt-dim">{label}</i>
     </span>
+  )
+}
+
+interface MvMetricItem {
+  name: React.ReactNode
+  pct: number
+  lead?: React.ReactNode
+  onClick?: () => void
+}
+
+/** Ranked meta values keep the percentage, but use a calmer number-only row. */
+function MvMetricList({ items, max, empty }: { items: MvMetricItem[]; max?: number; empty?: React.ReactNode }) {
+  const shown = max == null ? items : items.slice(0, max)
+  if (shown.length === 0) {
+    return <p className="py-2 font-mono text-[0.75rem] leading-[1.5] text-txt-dim">{empty ?? "—"}</p>
+  }
+
+  return (
+    <div className="grid">
+      {shown.map((item, index) => {
+        const row = (
+          <>
+            {item.lead}
+            <span className="min-w-0 flex-1 truncate font-body text-[0.75rem] leading-[1.3] text-txt transition-colors">{item.name}</span>
+            <span className="w-[3.75rem] flex-none text-right font-mono text-[0.6875rem] font-semibold leading-none text-txt-muted">
+              {item.pct.toFixed(1)}%
+            </span>
+          </>
+        )
+        const base = "flex w-full min-w-0 items-center gap-[0.6875rem] border-b border-dashed border-[color-mix(in_srgb,var(--line)_65%,transparent)] py-[0.4375rem] last:border-b-0"
+        return item.onClick ? (
+          <button key={index} type="button" onClick={item.onClick} className={cn(base, "cursor-pointer border-x-0 border-t-0 bg-transparent text-left [&:hover_span]:text-accent-bright")}>
+            {row}
+          </button>
+        ) : (
+          <div key={index} className={base}>{row}</div>
+        )
+      })}
+    </div>
   )
 }

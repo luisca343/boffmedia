@@ -21,7 +21,7 @@ export function MvSpread({ nature, ev }: { nature: string; ev: number[] }) {
           </span>
         )}
       </span>
-      <span className="font-mono text-[0.6875rem] leading-[1.3] text-txt-muted">
+          <span className="font-mono text-[0.6875rem] leading-[1.3] text-txt-muted">
         {parts.map((p, i) => (
           <span key={p.k}>
             {i > 0 && <i className="not-italic text-txt-dim"> / </i>}

@@ -122,7 +122,7 @@ function PlayerRows({
       <tr className="is-click" onClick={onToggle}>
         <td className="mono text-txt-dim">{player.placing}</td>
         <td>
-          <span className="inline-flex items-center gap-[0.5625rem] font-semibold">
+          <span className="inline-flex items-center gap-[0.5625rem] font-body text-[0.75rem] font-semibold">
             <Icon
               name="chevron"
               size={13}
@@ -134,7 +134,7 @@ function PlayerRows({
         </td>
         <td className="mono">{player.record}</td>
         <td>
-          <DkTeam slots={player.team.slice(0, 6).map((s) => ({ name: s.name, src: spriteUrl(s.name), onError: handleSpriteError }))} />
+          <DkTeam size={32} slots={player.team.slice(0, 6).map((s) => ({ name: s.name, src: spriteUrl(s.name), onError: handleSpriteError }))} />
         </td>
       </tr>
       {expanded && (

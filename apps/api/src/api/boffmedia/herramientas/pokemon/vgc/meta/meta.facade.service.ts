@@ -198,6 +198,10 @@ export class VgcMetaFacadeService {
     return this.limitlessService.getCombinedUsageEntries(regulationId);
   }
 
+  async getLimitlessMetaOverview(regulationId: string) {
+    return this.limitlessService.getMetaOverview(regulationId);
+  }
+
   async getLimitlessTournamentStatus(id: number) {
     return this.limitlessService.getJobStatus(id);
   }

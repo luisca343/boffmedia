@@ -7,6 +7,7 @@ import {
   PokemonUsageDetail,
   PokemonUsageEntry,
   LimitlessPlayer,
+  MetaOverview,
 } from '../entities/pokemon-usage.entity';
 import { VgcMetaSlot } from '@/_db/schema/Vgc';
 import { LIMITLESS_API_BASE } from '../config/smogon.config';
@@ -195,6 +196,23 @@ function aggregateSlots(
       spreads: [],
     } satisfies PokemonUsageDetail;
   });
+}
+
+function combinations<T>(values: T[], size: number): T[][] {
+  const result: T[][] = [];
+
+  function visit(start: number, picked: T[]) {
+    if (picked.length === size) {
+      result.push(picked);
+      return;
+    }
+    for (let i = start; i <= values.length - (size - picked.length); i++) {
+      visit(i + 1, [...picked, values[i]]);
+    }
+  }
+
+  visit(0, []);
+  return result;
 }
 
 // ─── Service ─────────────────────────────────────────────────────────────────
@@ -455,6 +473,134 @@ export class LimitlessService {
       topMove: row.topMove,
       topTeraType: row.topTeraType,
     }));
+  }
+
+  async getMetaOverview(regulationId: string): Promise<MetaOverview> {
+    const tournaments = (
+      await this.limitlessRepository.findTournamentsByRegulation(regulationId)
+    )
+      .filter((t) => t.status === 'done')
+      .sort((a, b) => {
+        const left = a.date ?? a.fetchedAt.toISOString();
+        const right = b.date ?? b.fetchedAt.toISOString();
+        return right.localeCompare(left) || b.id - a.id;
+      });
+
+    if (tournaments.length === 0) {
+      return { totalTeams: 0, cores: [], recentTeams: [] };
+    }
+
+    const teams: Array<{
+      tournamentId: number;
+      tournamentName: string | null;
+      tournamentDate: string | null;
+      playerSlug: string;
+      playerName: string | null;
+      placing: number | null;
+      record: string | null;
+      slots: VgcMetaSlot[];
+      rawText: string;
+    }> = [];
+
+    for (const tournament of tournaments) {
+      const rows = await this.limitlessRepository.findTeamsWithPastes(
+        tournament.id,
+      );
+      for (const row of rows) {
+        if (!row.parsedSlots) continue;
+        const slots = JSON.parse(row.parsedSlots) as VgcMetaSlot[];
+        if (slots.length === 0) continue;
+        teams.push({
+          tournamentId: tournament.id,
+          tournamentName: tournament.name,
+          tournamentDate: tournament.date,
+          playerSlug: row.playerSlug,
+          playerName: row.playerName,
+          placing: row.placing,
+          record: row.record,
+          slots,
+          rawText: row.rawText ?? '',
+        });
+      }
+    }
+
+    type CoreCount = {
+      count: number;
+      pokemon: MetaOverview['cores'][number]['pokemon'];
+    };
+    const coreCounts = new Map<number, Map<string, CoreCount>>();
+    for (const team of teams) {
+      const pokemon = [
+        ...new Map(team.slots.map((slot) => [slot.speciesId, slot])).values(),
+      ].sort((a, b) => a.speciesId.localeCompare(b.speciesId));
+      for (const size of [2, 3, 4]) {
+        const sizeCounts: Map<string, CoreCount> =
+          coreCounts.get(size) ?? new Map<string, CoreCount>();
+        for (const core of combinations(pokemon, size)) {
+          const key = core.map((slot) => slot.speciesId).join('|');
+          const existing = sizeCounts.get(key);
+          sizeCounts.set(key, {
+            count: (existing?.count ?? 0) + 1,
+            pokemon: core.map((slot) => ({
+              speciesId: slot.speciesId,
+              speciesName: slot.speciesName,
+            })),
+          });
+        }
+        coreCounts.set(size, sizeCounts);
+      }
+    }
+
+    const cores = [2, 3, 4].flatMap((size) => {
+      const sizeCounts: Map<string, CoreCount> =
+        coreCounts.get(size) ?? new Map<string, CoreCount>();
+      return [...sizeCounts.values()]
+        .sort(
+          (a, b) =>
+            b.count - a.count ||
+            a.pokemon
+              .map((p) => p.speciesId)
+              .join('|')
+              .localeCompare(b.pokemon.map((p) => p.speciesId).join('|')),
+        )
+        .slice(0, 5)
+        .map((core) => ({
+          size,
+          pokemon: core.pokemon,
+          teamCount: core.count,
+          usagePercent:
+            teams.length > 0 ? (core.count / teams.length) * 100 : 0,
+        }));
+    });
+
+    const perTournament = new Map<number, number>();
+    const recentTeams = [...teams]
+      .sort((a, b) => {
+        const date = (b.tournamentDate ?? '').localeCompare(
+          a.tournamentDate ?? '',
+        );
+        return date || (a.placing ?? 9999) - (b.placing ?? 9999);
+      })
+      .filter((team) => {
+        const count = perTournament.get(team.tournamentId) ?? 0;
+        if (count >= 3) return false;
+        perTournament.set(team.tournamentId, count + 1);
+        return true;
+      })
+      .slice(0, 10)
+      .map((team) => ({
+        id: `${team.tournamentId}:${team.playerSlug}`,
+        tournamentId: team.tournamentId,
+        tournamentName: team.tournamentName,
+        tournamentDate: team.tournamentDate,
+        playerName: team.playerName ?? team.playerSlug,
+        placing: team.placing ?? 0,
+        record: team.record ?? '',
+        slots: team.slots,
+        rawText: team.rawText,
+      }));
+
+    return { totalTeams: teams.length, cores, recentTeams };
   }
 
   async getPlayerList(tournamentId: number): Promise<LimitlessPlayer[]> {

@@ -8,9 +8,9 @@
  * keys inside each `t("…")` are unchanged.
  */
 
-import type { Translate } from "@boffmedia/ui/i18n";
+import type { RichTranslate, Translate } from "@boffmedia/ui/i18n";
 
-import { useToolT } from "../i18n";
+import { useToolRichT, useToolT } from "../i18n";
 
 /** This tool family's root namespace. Four registry entries share it. */
 export const VGC_NS = "tools.vgc";
@@ -18,4 +18,9 @@ export const VGC_NS = "tools.vgc";
 /** A translator bound to `tools.vgc.<section>`. */
 export function useVgcT(section: string): Translate {
   return useToolT(`${VGC_NS}.${section}`);
+}
+
+/** A rich translator bound to `tools.vgc.<section>`. */
+export function useVgcRichT(section: string): RichTranslate {
+  return useToolRichT(`${VGC_NS}.${section}`);
 }

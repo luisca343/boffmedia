@@ -73,6 +73,19 @@ export interface TeamEntry {
   rawText: string
 }
 
+export interface OverviewCore {
+  size: number
+  pokemon: { speciesId: string; speciesName: string }[]
+  teamCount: number
+  usagePercent: number
+}
+
+export interface OverviewTeam extends TeamEntry {
+  tournamentName: string | null
+  tournamentDate: string | null
+  placing: number
+}
+
 export interface PlayerEntry {
   slug: string
   placing: number

@@ -15,6 +15,7 @@ import { useLimitlessTournaments } from "../_hooks/useLimitlessTournaments";
 import { useLimitlessUsage } from "../_hooks/useLimitlessUsage";
 import { useLimitlessPlayers } from "../_hooks/useLimitlessPlayers";
 import { useDivergence } from "../_hooks/useDivergence";
+import { useMetaOverview } from "../_hooks/useMetaOverview";
 import { useMetaNavigation, DEFAULT_CUTOFF } from "../_hooks/useMetaNavigation";
 import { useSpeciesTeams } from "../_hooks/useSpeciesTeams";
 import { VgcToolbar } from "./VgcToolbar";
@@ -23,6 +24,7 @@ import { MvList } from "./MvList";
 import { MvDetail } from "./MvDetail";
 import { MvPlayers } from "./MvPlayers";
 import { MvDivergence } from "./MvDivergence";
+import { MvOverview } from "./MvOverview";
 import { FORMAT_LABELS } from "../constants";
 import { toUsageEntry, toPokeData, toPlayerEntry, toDivergenceResult, toTeamEntry, toTeamSlot } from "../_lib/vgc-adapter";
 import type { PokeData, TeamSlot } from "../_lib/meta-types";
@@ -123,7 +125,15 @@ function MetaScreen() {
 
   // ── Navigation hook — buildUrl, auto-navigation effects, all handlers ──────
   const { speciesId, view, handleSelect, handleTabChange, handleFormatChange, handleOptionsApply, handleRegulationChange, handleTournamentChange, handleViewChange, handleBack } =
-    useMetaNavigation({ snapshots, regulations, tournaments, entries, entriesMap });
+    useMetaNavigation({ snapshots, regulations, tournaments, entriesMap });
+
+  const overviewRegulationId = tab === "stats"
+    ? (isChampionsFormat ? format : teamsRegulationId)
+    : undefined;
+  const { overview, loading: overviewLoading, error: overviewError } = useMetaOverview(
+    overviewRegulationId,
+    tab === "stats" && !speciesId,
+  );
 
   // ── Paste-derived data for preview formats ────────────────────────────────
   const { detail: pasteDetail } = useChampionsPasteDetail(
@@ -144,7 +154,7 @@ function MetaScreen() {
   }, [entries]);
 
   const selectedEntry = useMemo(() => {
-    if (!speciesId) return usageEntries[0] ?? null;
+    if (!speciesId) return null;
     return usageEntries.find((e) => e.id === speciesId) ?? null;
   }, [usageEntries, speciesId]);
 
@@ -189,17 +199,30 @@ function MetaScreen() {
     [speciesTeams, t],
   );
 
+  const adaptedOverviewTeams = useMemo(
+    () => (overview?.recentTeams ?? []).map((team) => ({
+      slug: team.id,
+      name: team.playerName,
+      record: team.record,
+      team: team.slots.map((slot) => toTeamSlot(slot, t("adapter.teraNone"))),
+      rawText: team.rawText,
+      tournamentName: team.tournamentName,
+      tournamentDate: team.tournamentDate,
+      placing: team.placing,
+    })),
+    [overview, t],
+  );
+
   // ── Toolbar / subbar derived data ──────────────────────────────────────────
   const totalBattles = ladderEntries.reduce((a, e) => a + e.rawCount, 0);
   const totalTeams   = tournamentEntries.reduce((a, e) => a + e.rawCount, 0);
   const curTour = tournamentId && tournamentId !== "combined"
-    ? tournaments.find((t2) => String(t2.id) === String(tournamentId))
+    ? tournaments.find((tour) => String(tour.id) === String(tournamentId))
     : undefined;
-  const fmt = snapshots.find((s) => s.formatId === resolvedSmogonFormat);
-  const cutoffLabel = cutoff === 0 ? t("cutoff.all") : `${cutoff}+ ELO`;
 
   // ── Body ───────────────────────────────────────────────────────────────────
   const isSplit = tab === "stats" || view === "aggregate";
+  const showOverview = tab === "stats" && !speciesId;
 
   let body: React.ReactNode;
   if (!isSplit && view === "players") {
@@ -215,7 +238,19 @@ function MetaScreen() {
       </DkBody>
     );
   } else if (narrow) {
-    body = speciesId && selectedPokeData ? (
+    body = showOverview ? (
+      <MvOverview
+        entries={usageEntries}
+        pokeMap={pokeMap}
+        onSelect={handleSelect}
+        cores={overview?.cores ?? []}
+        recentTeams={adaptedOverviewTeams}
+        totalTeams={overview?.totalTeams ?? 0}
+        loading={loading}
+        overviewLoading={overviewLoading}
+        overviewError={overviewError}
+      />
+    ) : speciesId && selectedPokeData ? (
       <div className="flex min-h-0 flex-1 flex-col max-[980px]:overflow-visible">
         <MvDetail
           className="flex-1"
@@ -249,16 +284,30 @@ function MetaScreen() {
           loading={loading}
           error={error}
         />
-        <MvDetail
-          detail={selectedPokeData}
-          entry={selectedEntry}
-          rank={selectedRank}
-          pokeMap={pokeMap}
-          onSelect={handleSelect}
-          loading={loading}
-          teams={adaptedTeams}
-          teamsLoading={teamsLoading}
-        />
+        {showOverview ? (
+          <MvOverview
+            entries={usageEntries}
+            pokeMap={pokeMap}
+            onSelect={handleSelect}
+            cores={overview?.cores ?? []}
+            recentTeams={adaptedOverviewTeams}
+            totalTeams={overview?.totalTeams ?? 0}
+            loading={loading}
+            overviewLoading={overviewLoading}
+            overviewError={overviewError}
+          />
+        ) : (
+          <MvDetail
+            detail={selectedPokeData}
+            entry={selectedEntry}
+            rank={selectedRank}
+            pokeMap={pokeMap}
+            onSelect={handleSelect}
+            loading={loading}
+            teams={adaptedTeams}
+            teamsLoading={teamsLoading}
+          />
+        )}
       </div>
     );
   }
@@ -284,19 +333,16 @@ function MetaScreen() {
         onRegulationChange={handleRegulationChange}
         onTournamentChange={handleTournamentChange}
       />
-      <VgcSubbar
-        tab={tab}
-        view={view}
-        formatLabel={selectedRegulation?.name ?? fmt?.formatId ?? format}
-        formatNote={selectedRegulation?.name ? t("sub.formatNote") : undefined}
-        cutoffLabel={cutoffLabel}
-        month={month}
-        curTourName={curTour?.name ?? undefined}
-        curTourPlayers={curTour?.playerCount ?? undefined}
-        curTourIsCombined={tournamentId === "combined" || !tournamentId}
-        combinedCount={tournaments.length}
-        onViewChange={handleViewChange}
-      />
+      {tab === "tournament" && (
+        <VgcSubbar
+          view={view}
+          curTourName={curTour?.name ?? undefined}
+          curTourPlayers={curTour?.playerCount ?? undefined}
+          curTourIsCombined={tournamentId === "combined" || !tournamentId}
+          combinedCount={tournaments.length}
+          onViewChange={handleViewChange}
+        />
+      )}
 
       {tab === "stats" && isChampionsFormat && (
         <div className="flex flex-none items-center gap-2 border-b border-solid border-warn/20 bg-warn/5 px-3 py-2 text-[0.75rem] text-warn">

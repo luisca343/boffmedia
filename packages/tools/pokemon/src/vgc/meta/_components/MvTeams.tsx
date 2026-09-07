@@ -13,8 +13,8 @@ export function MvTeamGrid({ team }: { team: TeamSlot[] }) {
   return (
     <div className="grid grid-cols-[repeat(auto-fill,minmax(13.125rem,1fr))] gap-[0.625rem]">
       {team.map((s, i) => (
-        <div key={`${s.name}-${i}`} className="flex min-w-0 items-start gap-[0.625rem] border border-solid border-line bg-panel px-[0.625rem] py-[0.5625rem]">
-          <DkSprite src={spriteUrl(s.name)} alt={s.name} size={46} onError={handleSpriteError} />
+        <div key={`${s.name}-${i}`} className="flex min-w-0 items-start gap-[0.75rem] border border-solid border-line bg-panel px-[0.75rem] py-[0.625rem]">
+          <DkSprite src={spriteUrl(s.name)} alt={s.name} size={52} onError={handleSpriteError} />
           <div className="grid min-w-0 gap-[2px]">
             <b className="font-display text-[0.78125rem] font-bold uppercase leading-[1.15] tracking-[0.03em]">{s.name}</b>
             {s.item && <span className="font-mono text-[0.625rem] leading-[1.3] text-txt-muted">{s.item}</span>}
@@ -53,6 +53,7 @@ export function MvTeamRow({ team }: { team: TeamEntry }) {
         )}
         <DkTeam
           className="ml-auto"
+          size={32}
           slots={team.team.slice(0, 6).map((s) => ({ name: s.name, src: spriteUrl(s.name), onError: handleSpriteError }))}
         />
         <Icon name="chevron" size={14} className="flex-none text-txt-dim transition-transform" style={{ transform: open ? "rotate(180deg)" : "none" }} />

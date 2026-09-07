@@ -1487,7 +1487,6 @@ export const messages = {
             "rentalCode": "Código de alquiler",
             "rank": "Puesto",
             "usage": "Uso",
-            "appearances": "Apariciones",
             "topN": "top {n}",
             "noData": "—",
             "abilitiesTeras": "Habilidades y teratipos",
@@ -1497,6 +1496,25 @@ export const messages = {
             "noTeams": "Sin equipos registrados para esta especie.",
             "emptyTitle": "Elige un Pokémon",
             "emptyLead": "Selecciona una especie del ranking para ver su detalle competitivo: movimientos, objetos, repartos y equipos."
+          },
+          "overview": {
+            "kicker": "Panorama del formato",
+            "title": "Meta del formato",
+            "lead": "Explora los picks más jugados, los núcleos que más se repiten y los equipos destacados de los torneos recientes.",
+            "teamCount": "{count} equipos analizados",
+            "noTournamentData": "Sin datos de torneos",
+            "topPokemon": "Top 20 Pokémon",
+            "topN": "los {n} primeros",
+            "cores2": "Núcleos de 2",
+            "cores3": "Núcleos de 3",
+            "cores4": "Núcleos de 4",
+            "coreAside": "más frecuentes",
+            "teams": "equipos",
+            "noCores": "No hay núcleos registrados.",
+            "coresNeedTeams": "Los núcleos aparecen cuando hay equipos de torneo importados.",
+            "recentTeams": "Equipos destacados recientes",
+            "recentTeamsAside": "mejores resultados por torneo",
+            "noTeams": "No hay equipos de torneo registrados."
           },
           "standings": {
             "loading": "Cargando resultados…",
@@ -1567,9 +1585,6 @@ export const messages = {
             "standings": "Clasificación del torneo",
             "divergence": "Divergencia ladder–torneos"
           },
-          "list": {
-            "appearances": "{count} apariciones"
-          },
           "empty": {
             "noMatch": "Ningún Pokémon coincide con «{q}».",
             "noPlayer": "Ningún jugador coincide con «{q}».",
@@ -1577,8 +1592,7 @@ export const messages = {
           },
           "sub": {
             "combined": "Combinado · {count} torneos",
-            "tourWithPlayers": "{name} · {count} jug.",
-            "formatNote": "Reglamento actual. Permite dos Pokémon restringidos por equipo."
+            "tourWithPlayers": "{name} · {count} jug."
           },
           "adapter": {
             "teamFallback": "Equipo",
@@ -3078,7 +3092,6 @@ export const messages = {
             "rentalCode": "Rental Code",
             "rank": "Rank",
             "usage": "Usage",
-            "appearances": "Appearances",
             "topN": "top {n}",
             "noData": "—",
             "abilitiesTeras": "Abilities & Tera Types",
@@ -3088,6 +3101,25 @@ export const messages = {
             "noTeams": "No teams recorded for this species.",
             "emptyTitle": "Pick a Pokémon",
             "emptyLead": "Select a species from the ranking to see its competitive breakdown: moves, items, spreads and teams."
+          },
+          "overview": {
+            "kicker": "Format overview",
+            "title": "Format meta",
+            "lead": "Explore the most-played picks, the cores that appear together most often, and standout teams from recent tournaments.",
+            "teamCount": "{count} teams analyzed",
+            "noTournamentData": "No tournament data",
+            "topPokemon": "Top 20 Pokémon",
+            "topN": "top {n}",
+            "cores2": "2-Pokémon cores",
+            "cores3": "3-Pokémon cores",
+            "cores4": "4-Pokémon cores",
+            "coreAside": "most common",
+            "teams": "teams",
+            "noCores": "No cores recorded.",
+            "coresNeedTeams": "Cores appear once tournament teams have been imported.",
+            "recentTeams": "Recent standout teams",
+            "recentTeamsAside": "best results by tournament",
+            "noTeams": "No tournament teams recorded."
           },
           "standings": {
             "loading": "Loading standings…",
@@ -3158,9 +3190,6 @@ export const messages = {
             "standings": "Tournament standings",
             "divergence": "Ladder–tournament divergence"
           },
-          "list": {
-            "appearances": "{count} appearances"
-          },
           "empty": {
             "noMatch": "No Pokémon matches “{q}”.",
             "noPlayer": "No player matches “{q}”.",
@@ -3168,8 +3197,7 @@ export const messages = {
           },
           "sub": {
             "combined": "Combined · {count} tournaments",
-            "tourWithPlayers": "{name} · {count} players",
-            "formatNote": "Current regulation. Allows two restricted Pokémon per team."
+            "tourWithPlayers": "{name} · {count} players"
           },
           "adapter": {
             "teamFallback": "Team",

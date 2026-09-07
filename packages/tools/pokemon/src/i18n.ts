@@ -14,7 +14,14 @@
  */
 
 import { useMemo } from "react";
-import { useRootT, useUiLocale, type Translate } from "@boffmedia/ui/i18n";
+import {
+  useRootRichT,
+  useRootT,
+  useUiLocale,
+  type RichTranslate,
+  type RichValues,
+  type Translate,
+} from "@boffmedia/ui/i18n";
 
 export function useToolT(namespace: string): Translate {
   // `useRootT`, not `useT`: the latter is bound to `common.primitives`, which
@@ -29,6 +36,17 @@ export function useToolT(namespace: string): Translate {
   return useMemo(
     () =>
       (key: string, values?: Record<string, string | number | Date>) =>
+        t(`${namespace}.${key}`, values),
+    [t, namespace],
+  );
+}
+
+/** Rich counterpart for the few messages that carry emphasis tags. */
+export function useToolRichT(namespace: string): RichTranslate {
+  const t = useRootRichT();
+  return useMemo(
+    () =>
+      (key: string, values?: RichValues) =>
         t(`${namespace}.${key}`, values),
     [t, namespace],
   );

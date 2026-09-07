@@ -23,6 +23,7 @@ import type {
   LimitlessPlayerDto,
   LimitlessPlayerTeamDto,
   LimitlessTournamentDto,
+  MetaOverviewDto,
   PokemonUsageDetailDto,
   PokemonUsageEntryDto,
   SmogonSnapshotDto,
@@ -132,6 +133,12 @@ export class VgcMetaService {
     );
   }
 
+  static getLimitlessMetaOverview(regulationId: string) {
+    return request<MetaOverview>(
+      `/tools/vgc/meta/limitless/overview?regulationId=${encodeURIComponent(regulationId)}`,
+    );
+  }
+
   static getLimitlessPlayers(tournamentId: number) {
     return request<LimitlessPlayerEntry[]>(`/tools/vgc/meta/limitless/${tournamentId}/players`);
   }
@@ -171,6 +178,7 @@ export type LimitlessTournament = LimitlessTournamentDto;
 export type LimitlessPlayerEntry = LimitlessPlayerDto;
 export type LimitlessMetaSlot = VgcMetaSlotDto;
 export type LimitlessPlayerTeam = LimitlessPlayerTeamDto;
+export type MetaOverview = MetaOverviewDto;
 export type LimitlessImportJobStatus = ImportJobStatusDto;
 export type SpeedTierEntry = SpeedTierEntryDto;
 export type VgcPokemon = VgcPokemonDto;

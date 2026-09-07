@@ -329,6 +329,68 @@ export class LimitlessPlayerTeamDto {
   slots!: VgcMetaSlotDto[];
 }
 
+export class MetaOverviewCorePokemonDto {
+  @ApiProperty()
+  speciesId!: string;
+
+  @ApiProperty()
+  speciesName!: string;
+}
+
+export class MetaOverviewCoreDto {
+  @ApiProperty({ description: 'Number of Pokemon in this core.' })
+  size!: number;
+
+  @ApiProperty({ type: MetaOverviewCorePokemonDto, isArray: true })
+  pokemon!: MetaOverviewCorePokemonDto[];
+
+  @ApiProperty()
+  teamCount!: number;
+
+  @ApiProperty()
+  usagePercent!: number;
+}
+
+export class MetaOverviewTeamDto {
+  @ApiProperty()
+  id!: string;
+
+  @ApiProperty()
+  tournamentId!: number;
+
+  @ApiProperty({ type: String, nullable: true })
+  tournamentName!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  tournamentDate!: string | null;
+
+  @ApiProperty()
+  playerName!: string;
+
+  @ApiProperty()
+  placing!: number;
+
+  @ApiProperty()
+  record!: string;
+
+  @ApiProperty({ type: VgcMetaSlotDto, isArray: true })
+  slots!: VgcMetaSlotDto[];
+
+  @ApiProperty()
+  rawText!: string;
+}
+
+export class MetaOverviewDto {
+  @ApiProperty()
+  totalTeams!: number;
+
+  @ApiProperty({ type: MetaOverviewCoreDto, isArray: true })
+  cores!: MetaOverviewCoreDto[];
+
+  @ApiProperty({ type: MetaOverviewTeamDto, isArray: true })
+  recentTeams!: MetaOverviewTeamDto[];
+}
+
 export class DivergenceRowDto {
   @ApiProperty()
   speciesId!: string;

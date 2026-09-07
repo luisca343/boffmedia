@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { useVgcT } from "../../i18n";
+import { useVgcRichT, useVgcT } from "../../i18n";
 import { Icon } from "@boffmedia/ui"
 import { DkTable, DkSprite, DkEmpty, DkSkelList } from "@boffmedia/ui/datakit"
 import { spriteUrl, handleSpriteError } from "../../tracker-core/types"
@@ -13,29 +13,9 @@ interface MvDivergenceProps {
   loading?: boolean
 }
 
-/**
- * Render the `<b>…</b>` spans in one translated sentence.
- *
- * The web original used next-intl's `t.rich`. The host-agnostic translator is
- * deliberately ONE function — a second method would have to exist in both hosts
- * — and the alternative, splitting the sentence into three keys, hands
- * translators fragments they cannot reorder. So the markup stays in the message
- * and is parsed here, for the single sentence in this package that needs it.
- */
-function bolded(text: string): React.ReactNode[] {
-  return text.split(/<b>|<\/b>/).map((chunk, i) =>
-    i % 2 === 1 ? (
-      <b key={i} className="text-txt">
-        {chunk}
-      </b>
-    ) : (
-      chunk
-    ),
-  )
-}
-
 export function MvDivergence({ result, pokeMap, loading }: MvDivergenceProps) {
   const t = useVgcT("meta")
+  const tRich = useVgcRichT("meta")
   const [sortKey, setSortKey] = useState("delta")
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc")
 
@@ -74,7 +54,11 @@ export function MvDivergence({ result, pokeMap, loading }: MvDivergenceProps) {
       <div className="flex flex-wrap items-center gap-[0.5625rem] border border-solid border-line bg-panel px-3 py-[0.5625rem] font-mono text-[0.71875rem] leading-[1.5] text-txt-muted">
         <Icon name="info" size={13} className="flex-none text-signal" />
         <span>
-          {bolded(t("divergence.note", { format: result.ladderFormat, month: result.ladderMonth }))}
+          {tRich("divergence.note", {
+            format: result.ladderFormat,
+            month: result.ladderMonth,
+            b: (chunks) => <b className="text-txt">{chunks}</b>,
+          })}
         </span>
         <span className="ml-auto text-txt-dim">{t("divergence.rowCount", { count: result.rowCount })}</span>
       </div>
@@ -105,8 +89,8 @@ export function MvDivergence({ result, pokeMap, loading }: MvDivergenceProps) {
                   <span className="inline-flex items-center gap-[0.5625rem] font-semibold">
                     {p ? (
                       <>
-                        <DkSprite src={spriteUrl(p.name)} alt={p.name} size={28} onError={handleSpriteError} />
-                        {p.name}
+                        <DkSprite src={spriteUrl(p.name)} alt={p.name} size={34} onError={handleSpriteError} />
+                        <span className="text-[0.75rem]">{p.name}</span>
                       </>
                     ) : (
                       row.id

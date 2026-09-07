@@ -134,7 +134,11 @@ export class LimitlessRepository {
 
   async findTeamsWithPastes(
     tournamentId: number,
-  ): Promise<Array<VgcLimitlessTeam & { parsedSlots: string | null }>> {
+  ): Promise<
+    Array<
+      VgcLimitlessTeam & { parsedSlots: string | null; rawText: string | null }
+    >
+  > {
     const rows = await this.db
       .select({
         id: vgcLimitlessTeams.id,
@@ -146,11 +150,14 @@ export class LimitlessRepository {
         pasteId: vgcLimitlessTeams.pasteId,
         fetchedAt: vgcLimitlessTeams.fetchedAt,
         parsedSlots: vgcPokepastes.parsedSlots,
+        rawText: vgcPokepastes.rawText,
       })
       .from(vgcLimitlessTeams)
       .leftJoin(vgcPokepastes, eq(vgcLimitlessTeams.pasteId, vgcPokepastes.id))
       .where(eq(vgcLimitlessTeams.tournamentId, tournamentId));
-    return rows as Array<VgcLimitlessTeam & { parsedSlots: string | null }>;
+    return rows as Array<
+      VgcLimitlessTeam & { parsedSlots: string | null; rawText: string | null }
+    >;
   }
 
   async findTeamWithPaste(

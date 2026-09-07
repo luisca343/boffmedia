@@ -32,6 +32,7 @@ import {
   CountResultDto,
   DivergenceResultDto,
   LimitlessPlayerTeamDto,
+  MetaOverviewDto,
   PersonalMetaComparisonDto,
   PokemonUsageDetailDto,
   PokemonUsageEntryDto,
@@ -305,6 +306,20 @@ export class VgcMetaController {
   })
   getLimitlessCombinedUsageList(@Query('regulationId') regulationId: string) {
     return this.facade.getLimitlessCombinedUsageList(regulationId);
+  }
+
+  @Public()
+  @Get('limitless/overview')
+  @ApiOperation({
+    summary: 'Get common cores and recent teams for a regulation',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Meta overview returned.',
+    type: MetaOverviewDto,
+  })
+  getLimitlessMetaOverview(@Query('regulationId') regulationId: string) {
+    return this.facade.getLimitlessMetaOverview(regulationId);
   }
 
   @Public()
