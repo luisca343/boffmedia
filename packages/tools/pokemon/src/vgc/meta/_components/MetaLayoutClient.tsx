@@ -172,7 +172,7 @@ function MetaScreen() {
       ...base,
       abilities: pasteDetail.abilities.length > 0 ? pasteDetail.abilities.map((a) => ({ name: a.name, pct: a.percent })) : base.abilities,
       items:     pasteDetail.items.length     > 0 ? pasteDetail.items.map((a) => ({ name: a.name, pct: a.percent }))     : base.items,
-      moves:     pasteDetail.moves.length     > 0 ? pasteDetail.moves.map((a) => ({ name: a.name, pct: a.percent }))     : base.moves,
+      moves:     pasteDetail.moves.length     > 0 ? pasteDetail.moves.map((a) => ({ name: a.name, pct: a.percent, type: a.type }))     : base.moves,
       tera:      pasteDetail.teraTypes.length > 0 ? pasteDetail.teraTypes.map((a) => ({ name: a.name, pct: a.percent })) : base.tera,
       spreads:   pasteDetail.spreads.length   > 0 ? pasteDetail.spreads.map((s) => ({ nature: s.nature, ev: s.spread.split("/").map(Number), pct: s.percent })) : base.spreads,
     };

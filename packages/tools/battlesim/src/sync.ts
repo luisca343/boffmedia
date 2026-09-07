@@ -24,7 +24,7 @@ import {
 } from "@boffmedia/tool-kit";
 import type { ReplayRecord, TeamRecord } from "@boffmedia/battle-core";
 
-import { battlesimOutbox, listTeams, saveReplay, saveTeam } from "./storage";
+import { battlesimOutbox, getTeamMeta, listTeams, saveReplay, saveTeam, saveTeamMeta } from "./storage";
 
 /** Whether an account is attached right now. */
 function signedIn(): boolean {
@@ -151,19 +151,25 @@ export async function storeTeam(record: TeamRecord): Promise<void> {
 export async function queueTeamUpload(record: TeamRecord): Promise<boolean> {
   if (!signedIn()) return false;
 
+  const meta = await getTeamMeta(record.clientId);
+
   await battlesimOutbox().enqueue({
-    method: record.deletedAt ? "DELETE" : "PUT",
+    // Deletes are PUT tombstones too. A bare DELETE has no client timestamp,
+    // so another device can legitimately resurrect an older copy.
+    method: "PUT",
     path: teamPath(record.clientId),
-    body: record.deletedAt
-      ? undefined
-      : {
-          clientId: record.clientId,
-          name: record.name,
-          format: record.format,
-          packed: record.packed,
-          tags: record.tags ?? [],
-          clientUpdatedAt: record.updatedAt,
-        },
+    body: {
+      clientId: record.clientId,
+      name: record.name,
+      format: record.format,
+      packed: record.packed,
+      tags: record.tags ?? [],
+      favorite: meta?.favorite ?? false,
+      pinned: meta?.pinned ?? false,
+      notes: meta?.notes ?? null,
+      clientUpdatedAt: record.updatedAt,
+      deletedAt: record.deletedAt ?? null,
+    },
     // Keyed on the team, not the operation: a save followed by a delete
     // collapses to the delete, which is the correct final state.
     dedupeKey: teamDedupeKey(record.clientId),
@@ -233,6 +239,9 @@ interface ServerTeam {
   format: string;
   packed: string;
   tags?: string[];
+  favorite?: boolean;
+  pinned?: boolean;
+  notes?: string | null;
   clientUpdatedAt: number | null;
   deletedAt: number | null;
 }
@@ -262,13 +271,13 @@ export async function mergeTeamsFromServer(): Promise<number> {
     return 0;
   }
 
-  const local = new Map((await listTeams()).map((t) => [t.clientId, t]));
+  const local = new Map((await listTeams(true)).map((t) => [t.clientId, t]));
   let applied = 0;
 
   for (const row of remote) {
     const mine = local.get(row.clientId);
-    const theirStamp = row.deletedAt ?? row.clientUpdatedAt ?? 0;
-    const myStamp = mine?.deletedAt ?? mine?.updatedAt ?? -1;
+    const theirStamp = Math.max(row.deletedAt ?? 0, row.clientUpdatedAt ?? 0);
+    const myStamp = mine ? Math.max(mine.deletedAt ?? 0, mine.updatedAt) : -1;
     if (mine && myStamp >= theirStamp) continue;
 
     await saveTeam({
@@ -280,6 +289,12 @@ export async function mergeTeamsFromServer(): Promise<number> {
       updatedAt: row.clientUpdatedAt ?? Date.now(),
       clientUpdatedAt: row.clientUpdatedAt,
       ...(row.deletedAt ? { deletedAt: row.deletedAt } : {}),
+    });
+    await saveTeamMeta({
+      clientId: row.clientId,
+      ...(row.favorite === undefined ? {} : { favorite: row.favorite }),
+      ...(row.pinned === undefined ? {} : { pinned: row.pinned }),
+      ...(row.notes === undefined ? {} : { notes: row.notes ?? undefined }),
     });
     applied++;
   }

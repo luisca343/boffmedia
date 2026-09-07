@@ -23,6 +23,15 @@ export class BattlesimTeamDto {
   })
   tags: string[];
 
+  @ApiProperty({ description: 'Whether the team is in the account favorites' })
+  favorite: boolean;
+
+  @ApiProperty({ description: 'Whether the team is pinned in the library' })
+  pinned: boolean;
+
+  @ApiProperty({ description: 'Private strategy notes for this team', nullable: true, type: String })
+  notes: string | null;
+
   @ApiProperty({
     description: "Client's last update timestamp (epoch ms)",
     nullable: true,

@@ -120,7 +120,7 @@ function PlayerRows({
   return (
     <>
       <tr className="is-click" onClick={onToggle}>
-        <td className="mono text-txt-dim">{player.placing}</td>
+        <td className="mono text-txt-dim">{player.placing != null && player.placing > 0 ? player.placing : "-"}</td>
         <td>
           <span className="inline-flex items-center gap-[0.5625rem] font-body text-[0.75rem] font-semibold">
             <Icon

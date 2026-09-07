@@ -5,7 +5,7 @@
 export type LimitlessPlayerDto = {
     playerSlug: string;
     playerName: string;
-    placing: number;
+    placing: number | null;
     record: string;
     drop?: number | null;
     hasTeam: boolean;

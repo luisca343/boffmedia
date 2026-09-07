@@ -48,9 +48,9 @@ export function toPokeData(d: PokemonUsageDetail): PokeData {
     base: d.baseStats,
     abilities: d.abilities.map((a) => ({ name: a.name, pct: a.percent })),
     items: d.items.map((i) => ({ name: i.name, pct: i.percent })),
-    moves: d.moves.map((m) => ({ name: m.name, pct: m.percent })),
+    moves: d.moves.map((m) => ({ name: m.name, pct: m.percent, type: m.type })),
     tera: d.teraTypes.map((t) => ({ name: t.name, pct: t.percent })),
-    mates: d.teammates.map((t) => ({ id: t.name, pct: t.percent })),
+    mates: d.teammates.map((t) => ({ id: toID(t.name), pct: t.percent })),
     spreads: d.spreads.map((s) => ({
       nature: s.nature,
       ev: s.spread.split("/").map(Number),
@@ -62,7 +62,7 @@ export function toPokeData(d: PokemonUsageDetail): PokeData {
 // `teraNoneLabel`/`teamFallback` are Spanish defaults (matches on-screen copy today);
 // callers with access to `t()` should pass `t("meta.adapter.teraNone")` / `t("meta.adapter.teamFallback")`.
 export function toTeamSlot(
-  slot: { speciesName: string; item?: string; tera?: string; moves: string[] },
+  slot: { speciesName: string; item?: string; ability?: string; tera?: string; moves: string[]; moveTypes?: Array<string | null> | null; nature?: string; spread?: { hp: number; atk: number; def: number; spa: number; spd: number; spe: number } },
   teraNoneLabel = "Nada",
 ): TeamSlot {
   return {
@@ -70,7 +70,11 @@ export function toTeamSlot(
     name: slot.speciesName,
     tera: slot.tera || teraNoneLabel,
     item: slot.item || "",
+    ability: slot.ability || "",
+    nature: slot.nature || "",
+    ev: slot.spread ? [slot.spread.hp, slot.spread.atk, slot.spread.def, slot.spread.spa, slot.spread.spd, slot.spread.spe] : undefined,
     moves: slot.moves,
+    moveTypes: slot.moveTypes ?? undefined,
   }
 }
 
@@ -82,6 +86,10 @@ export function toTeamEntry(
   slug: string
   name: string
   record: string
+  source: SpeciesTeamEntry["source"]
+  rank: string | null
+  tournamentName: string | null
+  tournamentDate: string | null
   team: TeamSlot[]
   rawText: string
 } {
@@ -89,6 +97,10 @@ export function toTeamEntry(
     slug: `${entry.playerId}-${entry.source}`,
     name: entry.rank || entry.playerName || teamFallback,
     record: entry.record || "—",
+    source: entry.source,
+    rank: entry.rank,
+    tournamentName: entry.tournamentName,
+    tournamentDate: entry.tournamentDate,
     team: entry.slots.map((s) => toTeamSlot(s, teraNoneLabel)),
     rawText: entry.rawText,
   }
@@ -105,15 +117,7 @@ export function toPlayerEntry(
     placing: player.placing,
     name: player.playerName,
     record: player.record || "—",
-    team: team
-      ? team.slots.map((s) => ({
-          dex: getDex(s.speciesName, s.speciesName),
-          name: s.speciesName,
-          tera: s.tera || teraNoneLabel,
-          item: s.item || "",
-          moves: s.moves,
-        }))
-      : [],
+    team: team ? team.slots.map((s) => toTeamSlot(s, teraNoneLabel)) : [],
     rawText: team?.rawText || "",
   }
 }
@@ -122,6 +126,7 @@ export function toDivergenceResult(result: ApiDivergenceResult): DivergenceResul
   return {
     rows: result.rows.map((r) => ({
       id: r.speciesId,
+      name: r.speciesName,
       ladder: r.ladderPercent,
       tournament: r.tournamentPercent,
       delta: r.deltaPercent,

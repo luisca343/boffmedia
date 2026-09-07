@@ -51,6 +51,7 @@ type Availability = "ok" | "offline" | "signin" | "checking"
 export function LobbyView({ go }: { go: (view: BsimView) => void }) {
   const t = useToolT(BATTLESIM_NS)
   const nav = useBsimNav()
+  const openTeamBuilder = () => void openUrl(siteUrl("/pokemon/teambuilder"))
   const online = useToolOnline()
   const session = useToolSession()
 
@@ -197,7 +198,7 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
                 </p>
                 <button
                   type="button"
-                  onClick={() => go("equipos")}
+                  onClick={openTeamBuilder}
                   className={cn(
                     "cut-tag cut-tag-edge [--cut-tag:8px] [--cut-line:var(--line-2)] hover:[--cut-line:var(--accent-line)]",
                     "inline-flex h-8 flex-none items-center gap-[0.375rem] border border-solid border-line-2 bg-panel px-3 font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.08em] text-txt-muted transition-[color,border-color] duration-[140ms] hover:border-accent-line hover:text-accent-bright",
@@ -243,7 +244,7 @@ export function LobbyView({ go }: { go: (view: BsimView) => void }) {
       {/* ============ QUICK ACCESS ============ */}
       <div className="grid content-start gap-[0.625rem]">
       <nav aria-label={t("hub.tiles.aria")} className="grid grid-cols-3 gap-[0.625rem] max-[620px]:grid-cols-1 min-[1200px]:grid-cols-1">
-        <LobbyTile icon="layers" title={t("app.lobby.tiles.builder")} sub={t("app.lobby.tiles.builderSub")} onClick={() => go("equipos")} />
+        <LobbyTile icon="layers" title={t("app.lobby.tiles.builder")} sub={t("app.lobby.tiles.builderSub")} onClick={openTeamBuilder} />
         <LobbyTile icon="play" title={t("app.lobby.tiles.replays")} sub={t("app.lobby.tiles.replaysSub")} onClick={() => go("repeticiones")} />
         {/* Not an <a href="/clasificacion">: that route exists on the website and
             nowhere in the launcher, where following it would navigate the whole

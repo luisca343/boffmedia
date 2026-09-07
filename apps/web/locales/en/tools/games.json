@@ -6,7 +6,8 @@
         "vgc": "VGC",
         "tcgpocket": "TCG Pocket",
         "others": "Others",
-        "battlesim": "Battlesim"
+        "battlesim": "Battlesim",
+        "teambuilder": "Team Builder"
       },
       "tools": {
         "meta": "Meta Analysis",
@@ -19,7 +20,8 @@
         "skyGenerator": "Wonder Mail Generator",
         "pokedex": "Pokédex",
         "damageCalc": "Damage Calculator",
-        "battlesim": "Battlesim"
+        "battlesim": "Battlesim",
+        "teambuilder": "Team Builder"
       }
     },
     "mhwilds": {

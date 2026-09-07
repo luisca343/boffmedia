@@ -1162,6 +1162,9 @@ importers:
       '@boffmedia/asset-paths':
         specifier: workspace:*
         version: link:../../asset-paths
+      '@boffmedia/battle-core':
+        specifier: workspace:*
+        version: link:../../battle-core
       '@boffmedia/pokemon-identity':
         specifier: workspace:*
         version: link:../../pokemon-identity
@@ -1174,6 +1177,12 @@ importers:
       '@boffmedia/ui':
         specifier: workspace:*
         version: link:../../ui
+      '@pkmn/dex':
+        specifier: ^0.9.38
+        version: 0.9.38
+      '@pkmn/img':
+        specifier: ^0.2.40
+        version: 0.2.41
       '@smogon/calc':
         specifier: ^0.11.0
         version: 0.11.0

@@ -15,12 +15,15 @@
 
 import { toolDb, toolOutbox, toolStorage } from "@boffmedia/tool-kit";
 import type { ReplayRecord, TeamRecord } from "@boffmedia/battle-core";
+import { TEAM_BUILDER_STORE, TEAM_COLLECTION } from "@boffmedia/tools-pokemon/teambuilder/storage";
+import type { TeamMeta } from "./teambuilder/library-types";
 
 /** The tool id, which is what the kit keys a store on. */
-export const BATTLESIM_STORE = "pokemon.battlesim";
+export const BATTLESIM_STORE = TEAM_BUILDER_STORE;
 
 export const COLLECTION = {
-  teams: "teams",
+  teams: TEAM_COLLECTION,
+  teamMeta: "team-meta",
   replays: "replays",
 } as const;
 
@@ -56,11 +59,11 @@ export async function removeReplay(id: string): Promise<void> {
 
 // ── teams ───────────────────────────────────────────────────────────────────
 
-export async function listTeams(): Promise<TeamRecord[]> {
+export async function listTeams(includeDeleted = false): Promise<TeamRecord[]> {
   const docs = await battlesimDb().list<TeamRecord>(COLLECTION.teams);
   // Tombstones stay on disk so a delete can be told to the server later; they
   // are not something the UI should ever show.
-  return docs.map((d) => d.value).filter((t) => !t.deletedAt);
+  return docs.map((d) => d.value).filter((t) => includeDeleted || !t.deletedAt);
 }
 
 /**
@@ -77,6 +80,20 @@ export async function getTeam(clientId: string): Promise<TeamRecord | null> {
 export async function saveTeam(record: TeamRecord): Promise<void> {
   await battlesimDb().put(COLLECTION.teams, record.clientId, record);
 }
+
+export async function listTeamMeta(): Promise<TeamMeta[]> {
+  const docs = await battlesimDb().list<TeamMeta>(COLLECTION.teamMeta);
+  return docs.map((d) => d.value);
+}
+
+export async function getTeamMeta(clientId: string): Promise<TeamMeta | null> {
+  return battlesimDb().get<TeamMeta>(COLLECTION.teamMeta, clientId);
+}
+
+export async function saveTeamMeta(meta: TeamMeta): Promise<void> {
+  await battlesimDb().put(COLLECTION.teamMeta, meta.clientId, meta);
+}
+
 
 // ── preferences ─────────────────────────────────────────────────────────────
 //

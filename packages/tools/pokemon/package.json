@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "@boffmedia/asset-paths": "workspace:*",
+    "@boffmedia/battle-core": "workspace:*",
     "@boffmedia/pokemon-identity": "workspace:*",
     "@boffmedia/shared": "workspace:*",
     "@boffmedia/tool-kit": "workspace:*",
     "@boffmedia/ui": "workspace:*",
+    "@pkmn/dex": "^0.9.38",
+    "@pkmn/img": "^0.2.40",
     "@smogon/calc": "^0.11.0",
     "lz-string": "^1.5.0",
     "zustand": "^4.5.0"

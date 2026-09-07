@@ -32,6 +32,8 @@ export interface VgcMetaSlot {
   item?: string;
   ability?: string;
   moves: string[];
+  /** Canonical move types, aligned with `moves`; added at response time. */
+  moveTypes?: Array<string | null>;
   nature?: string;
   /** SP (Champions) or EV (standard) spread parsed from the EVs: line */
   spread?: StatSpread;

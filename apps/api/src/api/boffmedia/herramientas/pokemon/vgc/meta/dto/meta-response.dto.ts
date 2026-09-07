@@ -8,6 +8,11 @@ export class UsageStatDto {
   percent!: number;
 }
 
+export class MoveUsageDto extends UsageStatDto {
+  @ApiProperty({ type: String, nullable: true })
+  type!: string | null;
+}
+
 export class BaseStatsDto {
   @ApiProperty()
   hp!: number;
@@ -98,8 +103,8 @@ export class PokemonUsageDetailDto extends PokemonUsageEntryDto {
   @ApiProperty({ type: UsageStatDto, isArray: true })
   items!: UsageStatDto[];
 
-  @ApiProperty({ type: UsageStatDto, isArray: true })
-  moves!: UsageStatDto[];
+  @ApiProperty({ type: MoveUsageDto, isArray: true })
+  moves!: MoveUsageDto[];
 
   @ApiProperty({ type: UsageStatDto, isArray: true })
   teraTypes!: UsageStatDto[];
@@ -153,6 +158,9 @@ export class VgcMetaSlotDto {
   @ApiProperty({ type: String, isArray: true })
   moves!: string[];
 
+  @ApiPropertyOptional({ type: String, isArray: true, nullable: true })
+  moveTypes?: Array<string | null>;
+
   @ApiPropertyOptional()
   nature?: string;
 
@@ -178,6 +186,12 @@ export class SpeciesTeamEntryDto {
 
   @ApiProperty({ type: String, nullable: true })
   rank!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  tournamentName!: string | null;
+
+  @ApiProperty({ type: String, nullable: true })
+  tournamentDate!: string | null;
 
   @ApiProperty({ type: VgcMetaSlotDto, isArray: true })
   slots!: VgcMetaSlotDto[];
@@ -316,8 +330,8 @@ export class LimitlessPlayerTeamDto {
   @ApiProperty()
   playerName!: string;
 
-  @ApiProperty()
-  placing!: number;
+  @ApiProperty({ type: Number, nullable: true })
+  placing!: number | null;
 
   @ApiProperty()
   record!: string;

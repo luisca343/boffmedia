@@ -278,6 +278,32 @@ export const messages = {
           "noMatch": "Ningún equipo coincide con la búsqueda.",
           "noMatchLead": "Prueba con otro nombre o quita el filtro de formato.",
           "clearFilters": "Quitar filtros",
+          "sort": {
+            "label": "Ordenar",
+            "updated": "Última edición",
+            "name": "Nombre",
+            "format": "Formato"
+          },
+          "view": {
+            "grid": "Vista de tarjetas",
+            "list": "Vista de lista"
+          },
+          "library": {
+            "title": "Biblioteca",
+            "all": "Todos los equipos",
+            "favorites": "Favoritos",
+            "pinned": "Fijados"
+          },
+          "meta": {
+            "favorite": "Añadir a favoritos",
+            "unfavorite": "Quitar de favoritos",
+            "pin": "Fijar equipo",
+            "unpin": "Desfijar equipo",
+            "notes": "Notas de estrategia",
+            "notesPh": "Plan de juego, leads y apuntes…",
+            "teamProgress": "{filled} de {total} Pokémon",
+            "shortcuts": "Atajos: N nuevo · / buscar · 1–6 cambiar de hueco"
+          },
           "playDisabled": "Añade al menos un Pokémon para poder jugar con este equipo.",
           "hasProblem": "con problemas",
           "slotsAria": "Pokémon del equipo: {list}",
@@ -347,7 +373,8 @@ export const messages = {
             "placeholder": "Nueva etiqueta…",
             "filterByTag": "Filtrar por etiqueta",
             "filterAll": "Todas",
-            "empty": "Sin etiquetas"
+            "empty": "Sin etiquetas",
+            "remove": "Quitar etiqueta {tag}"
           },
           "editor": {
             "nameAria": "Nombre del equipo",
@@ -1504,6 +1531,32 @@ export const messages = {
           "noMatch": "No team matches your search.",
           "noMatchLead": "Try another name, or clear the format filter.",
           "clearFilters": "Clear filters",
+          "sort": {
+            "label": "Sort",
+            "updated": "Recently edited",
+            "name": "Name",
+            "format": "Format"
+          },
+          "view": {
+            "grid": "Card view",
+            "list": "List view"
+          },
+          "library": {
+            "title": "Library",
+            "all": "All teams",
+            "favorites": "Favorites",
+            "pinned": "Pinned"
+          },
+          "meta": {
+            "favorite": "Add to favorites",
+            "unfavorite": "Remove from favorites",
+            "pin": "Pin team",
+            "unpin": "Unpin team",
+            "notes": "Strategy notes",
+            "notesPh": "Game plan, leads and reminders…",
+            "teamProgress": "{filled} of {total} Pokémon",
+            "shortcuts": "Shortcuts: N new · / search · 1–6 switch slot"
+          },
           "playDisabled": "Add at least one Pokémon before you can play with this team.",
           "hasProblem": "has problems",
           "slotsAria": "Team Pokémon: {list}",
@@ -1573,7 +1626,8 @@ export const messages = {
             "placeholder": "New tag…",
             "filterByTag": "Filter by tag",
             "filterAll": "All",
-            "empty": "No tags"
+            "empty": "No tags",
+            "remove": "Remove tag {tag}"
           },
           "editor": {
             "nameAria": "Team name",

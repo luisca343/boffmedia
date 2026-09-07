@@ -244,6 +244,8 @@ export class LimitlessRepository {
       playerName: string | null;
       placing: number | null;
       record: string | null;
+      tournamentName: string | null;
+      tournamentDate: string | null;
       parsedSlots: string;
       rawText: string;
     }>
@@ -254,6 +256,8 @@ export class LimitlessRepository {
         playerName: vgcLimitlessTeams.playerName,
         placing: vgcLimitlessTeams.placing,
         record: vgcLimitlessTeams.record,
+        tournamentName: vgcLimitlessTournaments.name,
+        tournamentDate: vgcLimitlessTournaments.date,
         parsedSlots: vgcPokepastes.parsedSlots,
         rawText: vgcPokepastes.rawText,
       })
@@ -274,6 +278,8 @@ export class LimitlessRepository {
       playerName: string | null;
       placing: number | null;
       record: string | null;
+      tournamentName: string | null;
+      tournamentDate: string | null;
       parsedSlots: string;
       rawText: string;
     }>;

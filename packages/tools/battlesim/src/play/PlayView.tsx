@@ -18,6 +18,7 @@
 
 import { Suspense, useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { Button, Select, cn } from '@boffmedia/ui';
+import { openUrl, siteUrl } from '@boffmedia/tool-kit';
 import { DkBack, DkTitle, DkSprite } from '@boffmedia/ui/datakit';
 import { unpackTeam } from '@boffmedia/battle-core';
 import { spriteUrl, handleSpriteError } from '@boffmedia/tools-pokemon';
@@ -175,12 +176,12 @@ function PlayInner() {
                     ) : blocked ? (
                       <div className="flex flex-wrap items-center gap-3 border border-solid border-warn bg-warn-soft p-3">
                         <span className="font-body text-[0.78125rem] text-txt">{t('battle.play.noTeams')}</span>
-                        <Button size="sm" variant="ghost" icon="layers" onClick={() => nav.replace('hub', { tab: 'equipos' })}>{t('battle.play.createTeam')}</Button>
+                        <Button size="sm" variant="ghost" icon="layers" onClick={() => void openUrl(siteUrl('/pokemon/teambuilder'))}>{t('battle.play.createTeam')}</Button>
                       </div>
                     ) : (
                       <div className="flex flex-wrap items-center gap-3 border border-solid border-line bg-base p-3">
                         <span className="font-body text-[0.78125rem] text-txt-muted">{t('battle.play.sampleHint')}</span>
-                        <Button size="sm" variant="ghost" icon="layers" onClick={() => nav.replace('hub', { tab: 'equipos' })}>{t('battle.play.createTeam')}</Button>
+                        <Button size="sm" variant="ghost" icon="layers" onClick={() => void openUrl(siteUrl('/pokemon/teambuilder'))}>{t('battle.play.createTeam')}</Button>
                       </div>
                     )}
                   </div>

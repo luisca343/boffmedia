@@ -391,6 +391,8 @@ export type { MoveCount } from './models/MoveCount';
 export type { MoveEffect } from './models/MoveEffect';
 export type { MovePokemonDto } from './models/MovePokemonDto';
 export type { MoveTargetingInfo } from './models/MoveTargetingInfo';
+export type { MoveUsageDto } from './models/MoveUsageDto';
+export type { MoveUsageEntryDto } from './models/MoveUsageEntryDto';
 export type { News } from './models/News';
 export type { NewsComment } from './models/NewsComment';
 export type { NewsIssue } from './models/NewsIssue';

@@ -81,20 +81,15 @@ export function MvDivergence({ result, pokeMap, loading }: MvDivergenceProps) {
         <tbody>
           {sorted.map((row, i) => {
             const p = pokeMap[row.id]
+            const displayName = p?.name ?? row.name ?? row.id
             const pos = row.delta > 0
             return (
               <tr key={row.id}>
                 <td className="mono text-txt-dim">{i + 1}</td>
                 <td>
                   <span className="inline-flex items-center gap-[0.5625rem] font-semibold">
-                    {p ? (
-                      <>
-                        <DkSprite src={spriteUrl(p.name)} alt={p.name} size={34} onError={handleSpriteError} />
-                        <span className="text-[0.75rem]">{p.name}</span>
-                      </>
-                    ) : (
-                      row.id
-                    )}
+                    <DkSprite src={spriteUrl(displayName)} alt={displayName} size={34} onError={handleSpriteError} />
+                    <span className="text-[0.75rem]">{displayName}</span>
                   </span>
                 </td>
                 <td className="mono text-right text-txt-muted">{row.ladder.toFixed(1)}%</td>

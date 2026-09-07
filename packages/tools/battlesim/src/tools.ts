@@ -36,6 +36,21 @@ export const battlesimTool: ToolManifest = {
   component: lazy(() => import("./BsimRoot").then((m) => ({ default: m.default }))),
 };
 
+/** The same editor is also exposed as a first-class tool outside Battlesim. */
+export const teamBuilderTool: ToolManifest = {
+  id: "pokemon.teambuilder",
+  domain: "pokemon",
+  titleKey: `${BATTLESIM_NS}.app.lobby.tiles.builder`,
+  descriptionKey: `${BATTLESIM_NS}.app.lobby.tiles.builderSub`,
+  categoryKey: `${BATTLESIM_NS}.manifest.category`,
+  icon: "layers",
+  route: "/pokemon/teambuilder",
+  requiredCapabilities: ["storage"],
+  layout: "document",
+  gutter: false,
+  component: lazy(() => import("./teambuilder/TeamBuilderApp").then((m) => ({ default: m.TeamBuilderApp }))),
+};
+
 /**
  * The manifests for a host, given what that host can offer.
  *
@@ -46,7 +61,7 @@ export const battlesimTool: ToolManifest = {
  */
 export function battlesimToolsFor({ showdownProxy }: { showdownProxy: boolean }): ToolManifest[] {
   setShowdownProxyEnabled(showdownProxy);
-  return [battlesimTool];
+  return [battlesimTool, teamBuilderTool];
 }
 
 /** Registry-driven hosts (the launcher) import this. Showdown stays off. */

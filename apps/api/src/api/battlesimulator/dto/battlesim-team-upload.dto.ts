@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsOptional,
   IsArray,
+  IsBoolean,
 } from 'class-validator';
 import { BSIM_FORMAT_IDS } from '../_utils/formats';
 
@@ -47,7 +48,6 @@ export class BattlesimTeamUploadDto {
     example: 'Pikachu|...|move1|move2|move3|move4',
   })
   @IsString()
-  @IsNotEmpty()
   packed: string;
 
   @ApiProperty({
@@ -59,6 +59,21 @@ export class BattlesimTeamUploadDto {
   @IsArray()
   @IsOptional()
   tags?: string[];
+
+  @ApiProperty({ description: 'Whether the team is in the account favorites', required: false })
+  @IsBoolean()
+  @IsOptional()
+  favorite?: boolean;
+
+  @ApiProperty({ description: 'Whether the team is pinned in the library', required: false })
+  @IsBoolean()
+  @IsOptional()
+  pinned?: boolean;
+
+  @ApiProperty({ description: 'Private strategy notes for this team', required: false, nullable: true, type: String })
+  @IsString()
+  @IsOptional()
+  notes?: string | null;
 
   @ApiProperty({
     description:

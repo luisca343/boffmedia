@@ -8,6 +8,11 @@ export class UsageEntryDto {
   percent: number;
 }
 
+export class MoveUsageEntryDto extends UsageEntryDto {
+  @ApiProperty({ type: String, nullable: true })
+  type!: string | null;
+}
+
 export class SpreadEntryDto {
   @ApiProperty({ example: 'Jolly' })
   nature: string;
@@ -38,8 +43,8 @@ export class ChampionsPasteDetailDto {
   @ApiProperty({ type: [UsageEntryDto] })
   items: UsageEntryDto[];
 
-  @ApiProperty({ type: [UsageEntryDto] })
-  moves: UsageEntryDto[];
+  @ApiProperty({ type: [MoveUsageEntryDto] })
+  moves: MoveUsageEntryDto[];
 
   @ApiProperty({ type: [UsageEntryDto] })
   teraTypes: UsageEntryDto[];

@@ -4,7 +4,6 @@ import * as React from "react"
 import { DkApp, DkBody } from "@boffmedia/ui/datakit"
 import { LobbyView } from "./LobbyView"
 import { ReplaysView } from "./ReplaysView"
-import { TeamsView } from "../teambuilder/TeamsView"
 import { BSIM_TABS, type BsimView } from "../lib/bsim-data"
 import { useBsimNav } from "../nav"
 
@@ -33,7 +32,7 @@ export function BsimApp() {
   //
   // `teams` / `teamEdit` are the same section reached under another screen
   // name; without this line a `nav.push("teams")` landed on the lobby.
-  const view: BsimView = nav.screen === "teams" || nav.screen === "teamEdit" ? "equipos" : readTab(nav.params.tab)
+  const view: BsimView = readTab(nav.params.tab)
   const setView = React.useCallback(
     (next: BsimView) => nav.replace("hub", { ...nav.params, tab: next }),
     [nav],
@@ -44,7 +43,6 @@ export function BsimApp() {
     <DkApp>
       <DkBody>
         {view === "lobby" && <LobbyView go={setView} />}
-        {view === "equipos" && <TeamsView />}
         {view === "repeticiones" && <ReplaysView />}
       </DkBody>
     </DkApp>

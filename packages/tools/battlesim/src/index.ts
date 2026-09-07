@@ -28,6 +28,7 @@ export { BsimShowdownRoomView } from "./showdown/ShowdownRoomView";
 export { BsimReplayView } from "./replay/ReplayLobbyView";
 export { BsimReplayDetailView } from "./replay/ReplayDetailView";
 export { TeamsView } from "./teambuilder/TeamsView";
+export { TeamBuilderApp } from "./teambuilder/TeamBuilderApp";
 
 // Teambuilder kit pieces the styleguide documents live. Exported so
 // `styles/components` renders the REAL control rather than a mock of it — the

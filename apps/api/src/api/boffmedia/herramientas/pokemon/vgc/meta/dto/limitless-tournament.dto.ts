@@ -20,7 +20,7 @@ export class LimitlessTournamentDto {
 export class LimitlessPlayerDto {
   @ApiProperty() playerSlug: string;
   @ApiProperty() playerName: string;
-  @ApiProperty() placing: number;
+  @ApiProperty({ type: Number, nullable: true }) placing: number | null;
   @ApiProperty() record: string;
   @ApiPropertyOptional({ type: Number, nullable: true }) drop?: number | null;
   @ApiProperty() hasTeam: boolean;

@@ -11,12 +11,12 @@
  */
 
 import * as React from "react";
-import { Dex } from "@pkmn/dex";
-import { Icons } from "@pkmn/img";
 import { calcStat } from "@boffmedia/battle-core";
 import { cn, Icon, Input, type InputProps } from "@boffmedia/ui";
 import { DkSprite } from "@boffmedia/ui/datakit";
-import { spriteUrl, handleSpriteError } from "@boffmedia/tools-pokemon";
+import { itemIconStyle, spriteUrl, handleSpriteError } from "@boffmedia/tools-pokemon";
+
+export { itemIconStyle } from "@boffmedia/tools-pokemon";
 
 import { BSIM_FOCUS, BSIM_FOCUS_CUT, BsimChip, BsimKicker, type BsimChipTone } from "../components/bsim-kit";
 import { BxTypeRow, BxType, BxCat, useBxLabels } from "../components/bx-kit";
@@ -31,18 +31,6 @@ export const speciesSprite = (name: string) => spriteUrl(name);
  * The item icon out of Showdown's sprite sheet, as inline style. `null` when
  * the dex does not know the item, so the caller falls back to text.
  */
-export function itemIconStyle(name: string | undefined): React.CSSProperties | null {
-  if (!name) return null;
-  const item = Dex.items.get(name);
-  if (!item.exists) return null;
-  try {
-    const icon = Icons.getItem(item.name);
-    return icon?.css ? (icon.css as React.CSSProperties) : null;
-  } catch {
-    return null;
-  }
-}
-
 /**
  * The "pop" a chip does when its value lands: scale 0.96 → 1 over 140 ms.
  * A transition rather than a keyframe so it needs nothing from the host's CSS;
@@ -98,15 +86,17 @@ export function TbValidityChip({
   onClick,
   className,
   title,
+  size = "sm",
 }: {
   state: TbValidity;
   children: React.ReactNode;
   onClick?: () => void;
   className?: string;
   title?: string;
+  size?: "xs" | "sm" | "md";
 }) {
   return (
-    <BsimChip tone={VALIDITY_TONE[state]} pulse={state === "checking"} onClick={onClick} title={title} className={className}>
+    <BsimChip tone={VALIDITY_TONE[state]} size={size} pulse={state === "checking"} onClick={onClick} title={title} className={className}>
       {children}
     </BsimChip>
   );

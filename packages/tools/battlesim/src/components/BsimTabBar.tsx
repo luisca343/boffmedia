@@ -59,9 +59,8 @@ export const BSIM_TAB_BAR_H = "40px"
  * `tab` is the value that already lived in the address as `?tab=…`, so nothing
  * about the hub's own routing changes — only where the control is drawn.
  */
-const PINS: { tab: BsimView; icon: IconName; key: "home" | "teams" | "replays" }[] = [
+const PINS: { tab: BsimView; icon: IconName; key: "home" | "replays" }[] = [
   { tab: "lobby", icon: "home", key: "home" },
-  { tab: "equipos", icon: "layers", key: "teams" },
   { tab: "repeticiones", icon: "play", key: "replays" },
 ]
 
@@ -73,7 +72,7 @@ const PINS: { tab: BsimView; icon: IconName; key: "home" | "teams" | "replays" }
  * mapping is two ways for the pair of ids to stop matching.
  */
 export function bsimPinKeyFor(screen: BsimScreen, params: Record<string, string>): string | null {
-  if (screen === "teams" || screen === "teamEdit") return "pin:equipos"
+  if (screen === "teams" || screen === "teamEdit") return null
   if (screen === "hub") return `pin:${PINS.find((p) => p.tab === params.tab)?.tab ?? "lobby"}`
   return null
 }

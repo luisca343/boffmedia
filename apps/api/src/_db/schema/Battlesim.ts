@@ -1,5 +1,6 @@
 import {
   bigint,
+  boolean,
   index,
   int,
   mediumtext,
@@ -134,6 +135,9 @@ export const battlesimTeams = mysqlTable(
      * Stored as JSON to support flexible tagging without a join table.
      */
     tags: text('tags').default('[]').notNull(),
+    favorite: boolean('favorite').notNull().default(false),
+    pinned: boolean('pinned').notNull().default(false),
+    notes: text('notes'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
     /**

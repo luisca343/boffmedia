@@ -13,7 +13,11 @@ import {
 } from '../config/smogon.config';
 import { VgcMetaSlot, StatSpread } from '@/_db/schema/Vgc';
 import { PokepasteService } from './pokepaste.service';
-import { getDexForFormat, resolveSpeciesId } from '../utils/dex-resolver';
+import {
+  getDexForFormat,
+  resolveMoveType,
+  resolveSpeciesId,
+} from '../utils/dex-resolver';
 
 /**
  * Full RFC-4180 CSV parser. Handles quoted fields that contain commas,
@@ -310,6 +314,8 @@ export class VgcPastesService {
     regulationId: string,
     speciesId: string,
   ): Promise<ChampionsPasteDetail> {
+    const regulation = await this.regulationsRepository.findById(regulationId);
+    const dexForFormat = getDexForFormat(regulation?.formatId ?? undefined);
     const rows =
       await this.vgcPastesRepository.findParsedSlotsByRegulation(regulationId);
     if (rows.length === 0) {
@@ -370,7 +376,10 @@ export class VgcPastesService {
       pasteCount: matchCount,
       abilities: toEntries(abilityCounts),
       items: toEntries(itemCounts),
-      moves: toEntries(moveCounts),
+      moves: toEntries(moveCounts).map((move) => ({
+        ...move,
+        type: resolveMoveType(move.name, dexForFormat),
+      })),
       teraTypes: [], // Not used in Champions format
       spreads: [...spreadCounts.entries()]
         .sort((a, b) => b[1] - a[1])

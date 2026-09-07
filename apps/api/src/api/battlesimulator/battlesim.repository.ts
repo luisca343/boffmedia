@@ -30,6 +30,9 @@ interface TeamInput {
   format: string;
   packed: string;
   tags?: string[] | null;
+  favorite?: boolean | null;
+  pinned?: boolean | null;
+  notes?: string | null;
   clientUpdatedAt?: number | null;
   deletedAt?: number | null;
 }
@@ -169,6 +172,9 @@ export class BattlesimRepository {
         format: team.format,
         packed: team.packed,
         tags: tagsJson,
+        favorite: team.favorite ?? false,
+        pinned: team.pinned ?? false,
+        notes: team.notes ?? null,
         clientUpdatedAt: team.clientUpdatedAt ?? null,
         deletedAt: team.deletedAt ?? null,
       })
@@ -178,6 +184,9 @@ export class BattlesimRepository {
           format: sql`VALUES(format)`,
           packed: sql`VALUES(packed)`,
           tags: sql`VALUES(tags)`,
+          favorite: sql`VALUES(favorite)`,
+          pinned: sql`VALUES(pinned)`,
+          notes: sql`VALUES(notes)`,
           updatedAt: sql`NOW()`,
           clientUpdatedAt: sql`VALUES(client_updated_at)`,
           deletedAt: sql`VALUES(deleted_at)`,
@@ -206,12 +215,7 @@ export class BattlesimRepository {
     return this.db
       .select()
       .from(battlesimTeams)
-      .where(
-        and(
-          eq(battlesimTeams.userId, userId),
-          isNull(battlesimTeams.deletedAt),
-        ),
-      )
+      .where(eq(battlesimTeams.userId, userId))
       .orderBy(desc(battlesimTeams.updatedAt));
   }
 
@@ -252,6 +256,7 @@ export class BattlesimRepository {
         ),
       );
   }
+
 
   /**
    * Parse tags from JSON string stored in the database.

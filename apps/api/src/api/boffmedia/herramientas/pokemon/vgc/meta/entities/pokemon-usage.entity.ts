@@ -23,7 +23,7 @@ export interface PokemonUsageDetail extends PokemonUsageEntry {
   };
   abilities: Array<{ name: string; percent: number }>;
   items: Array<{ name: string; percent: number }>;
-  moves: Array<{ name: string; percent: number }>;
+  moves: Array<{ name: string; percent: number; type?: string | null }>;
   teraTypes: Array<{ name: string; percent: number }>;
   teammates: Array<{ name: string; percent: number }>;
   spreads: Array<{ nature: string; spread: string; percent: number }>;
@@ -39,7 +39,7 @@ export interface ChampionsPasteDetail {
   pasteCount: number;
   abilities: Array<{ name: string; percent: number }>;
   items: Array<{ name: string; percent: number }>;
-  moves: Array<{ name: string; percent: number }>;
+  moves: Array<{ name: string; percent: number; type?: string | null }>;
   teraTypes: Array<{ name: string; percent: number }>;
   spreads: Array<{ nature: string; spread: string; percent: number }>;
 }
@@ -61,6 +61,8 @@ export interface SpeciesTeamEntry {
   /** Display string for placement/rank: Limitless "7-2-0" or VGCPastes rank */
   record: string | null;
   rank: string | null;
+  tournamentName: string | null;
+  tournamentDate: string | null;
   slots: import('@/_db/schema/Vgc').VgcMetaSlot[];
   rawText: string;
   replicaCode: string | null;
@@ -70,7 +72,7 @@ export interface SpeciesTeamEntry {
 export interface LimitlessPlayer {
   playerSlug: string;
   playerName: string;
-  placing: number;
+  placing: number | null;
   record: string;
   drop: number | null;
   hasTeam: boolean;

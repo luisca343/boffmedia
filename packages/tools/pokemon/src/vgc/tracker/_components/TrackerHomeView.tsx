@@ -16,7 +16,7 @@ import {
   DkTitle,
 } from "@boffmedia/ui/datakit"
 import { Button, Icon } from "@boffmedia/ui"
-import { useSessions, usePresets } from "../../tracker-core/hooks/useVgcDb"
+import { useSessions, usePresets, useBuilderPresets } from "../../tracker-core/hooks/useVgcDb"
 import type { Session } from "../../tracker-core/types"
 import { TrSessionRow } from "../_components/TrSessionRow"
 import { careerFromSummaries, useSessionSummaries } from "../_components/useSessionSummaries"
@@ -40,6 +40,8 @@ export function TrackerHomeView() {
     refresh: refreshSessions,
   } = useSessions()
   const { presets, save: savePreset, remove: removePreset } = usePresets()
+  const { presets: builderPresets } = useBuilderPresets()
+  const selectablePresets = useMemo(() => [...presets, ...builderPresets], [presets, builderPresets])
 
   const allSessions = useMemo(() => [...sessions, ...archivedSessions], [sessions, archivedSessions])
   const summaries = useSessionSummaries(allSessions)
@@ -70,7 +72,7 @@ export function TrackerHomeView() {
   const active = sessions.filter(match)
   const archived = archivedSessions.filter(match)
 
-  const presetOf = (s: Session) => presets.find((p) => p.id === s.activePresetId)
+  const presetOf = (s: Session) => selectablePresets.find((p) => p.id === s.activePresetId)
 
   const handleCreateSession = async (data: Omit<Session, "id" | "startedAt">) => {
     await createSession({ id: crypto.randomUUID(), startedAt: Date.now(), ...data })
@@ -188,7 +190,7 @@ export function TrackerHomeView() {
       </DkBody>
 
       {showNewSession && (
-        <NewSessionDialog presets={presets} onConfirm={handleCreateSession} onClose={() => setShowNewSession(false)} />
+        <NewSessionDialog presets={selectablePresets} onConfirm={handleCreateSession} onClose={() => setShowNewSession(false)} />
       )}
       {showPresets && (
         <PresetManager presets={presets} onSave={savePreset} onDelete={removePreset} onClose={() => setShowPresets(false)} />

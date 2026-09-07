@@ -53,9 +53,6 @@ export function MvOverview({
       <div className="px-[var(--dk-pad)] pb-12 pt-[1.125rem]">
         <header className="mb-5 flex flex-wrap items-end justify-between gap-3 border-b border-solid border-line pb-4">
           <div>
-            <p className="mb-1 font-mono text-[0.625rem] font-bold uppercase tracking-[0.16em] text-accent">
-              {t("overview.kicker")}
-            </p>
             <h2 className="m-0 font-display text-[2rem] font-extrabold uppercase italic leading-none tracking-[0.01em] max-[720px]:text-[1.625rem]">
               {t("overview.title")}
             </h2>

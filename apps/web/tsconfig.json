@@ -64,6 +64,9 @@
       "@boffmedia/tools-pokemon/*": [
         "../../packages/tools/pokemon/src/*"
       ],
+      "@boffmedia/battle-core": [
+        "../../packages/battle-core/dist/cjs/index"
+      ],
       "@boffmedia/ui": [
         "../../packages/ui/src"
       ],

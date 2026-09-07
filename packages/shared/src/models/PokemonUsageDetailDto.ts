@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 import type { BaseStatsDto } from './BaseStatsDto';
+import type { MoveUsageDto } from './MoveUsageDto';
 import type { SpreadUsageDto } from './SpreadUsageDto';
 import type { UsageStatDto } from './UsageStatDto';
 export type PokemonUsageDetailDto = {
@@ -18,7 +19,7 @@ export type PokemonUsageDetailDto = {
     baseStats: BaseStatsDto;
     abilities: Array<UsageStatDto>;
     items: Array<UsageStatDto>;
-    moves: Array<UsageStatDto>;
+    moves: Array<MoveUsageDto>;
     teraTypes: Array<UsageStatDto>;
     teammates: Array<UsageStatDto>;
     spreads: Array<SpreadUsageDto>;

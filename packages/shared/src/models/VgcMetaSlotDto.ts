@@ -11,6 +11,7 @@ export type VgcMetaSlotDto = {
     item?: string;
     ability?: string;
     moves: Array<string>;
+    moveTypes?: Array<string> | null;
     nature?: string;
     spread?: StatSpreadDto;
     tera?: string;

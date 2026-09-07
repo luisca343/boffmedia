@@ -290,7 +290,8 @@ export class BattlesimController {
 
   /**
    * GET /battlesimulator/teams
-   * List caller's teams, excluding tombstones.
+   * List caller's teams, including tombstones so offline deletes propagate to
+   * other devices during merge. The client filters them from the UI.
    */
   @Get('teams')
   @UseGuards(DesktopOrUserAuthGuard)
@@ -298,7 +299,7 @@ export class BattlesimController {
   @ApiBearerAuth('JWT')
   @ApiOperation({
     summary: "List caller's teams",
-    description: 'All teams, excluding deleted ones.',
+    description: 'All teams, including tombstones for synchronization.',
   })
   @ApiResponse({
     status: 200,
@@ -362,6 +363,9 @@ export class BattlesimController {
       format: dto.format,
       packed: dto.packed,
       tags: dto.tags ?? [],
+      favorite: dto.favorite ?? false,
+      pinned: dto.pinned ?? false,
+      notes: dto.notes ?? null,
       clientUpdatedAt: dto.clientUpdatedAt,
       deletedAt: dto.deletedAt,
     });
@@ -371,6 +375,7 @@ export class BattlesimController {
       tags: this.repo.parseTags(team.tags),
     } as BattlesimTeamDto;
   }
+
 
   /**
    * DELETE /battlesimulator/teams/:clientId

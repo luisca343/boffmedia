@@ -28,6 +28,18 @@ export type BattlesimTeamDto = {
      */
     tags: Array<string>;
     /**
+     * Whether the team is in the account favorites
+     */
+    favorite: boolean;
+    /**
+     * Whether the team is pinned in the library
+     */
+    pinned: boolean;
+    /**
+     * Private strategy notes for this team
+     */
+    notes: string | null;
+    /**
      * Client's last update timestamp (epoch ms)
      */
     clientUpdatedAt: Record<string, any> | null;

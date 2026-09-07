@@ -67,7 +67,6 @@ const BsimShowdownView = React.lazy(() => import("./showdown/ShowdownLobbyView")
 const BsimShowdownRoomView = React.lazy(() => import("./showdown/ShowdownRoomView").then((m) => ({ default: m.BsimShowdownRoomView })));
 const BsimReplayView = React.lazy(() => import("./replay/ReplayLobbyView").then((m) => ({ default: m.BsimReplayView })));
 const BsimReplayDetailView = React.lazy(() => import("./replay/ReplayDetailView").then((m) => ({ default: m.BsimReplayDetailView })));
-const BsimTeamsView = React.lazy(() => import("./teambuilder/TeamsView").then((m) => ({ default: m.TeamsView })));
 
 /** One screen, by name. Both the base layer and every room layer go through it. */
 function Screen({ screen }: { screen: BsimScreen }) {
@@ -88,10 +87,6 @@ function Screen({ screen }: { screen: BsimScreen }) {
       return <BsimReplayView />;
     case "replayDetail":
       return <BsimReplayDetailView />;
-    // M3: teambuilder screens
-    case "teams":
-    case "teamEdit":
-      return <BsimTeamsView />;
     case "hub":
     default:
       return <BsimApp />;

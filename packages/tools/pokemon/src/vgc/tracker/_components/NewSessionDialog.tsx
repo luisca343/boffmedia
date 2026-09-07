@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useVgcT } from "../../i18n";
 import { Modal, Field, Input, Select, Button, Icon } from "@boffmedia/ui"
 import { DkSeg } from "@boffmedia/ui/datakit"
@@ -25,10 +25,18 @@ export function NewSessionDialog({ presets, onConfirm, onClose }: Props) {
   const [regulations, setRegulations] = useState<ChampionsRegulation[]>([])
   const [limitlessTournaments, setLimitlessTournaments] = useState<LimitlessTournament[]>([])
   const [limitlessTournamentId, setLimitlessTournamentId] = useState<number | undefined>(undefined)
+  const initializedPreset = useRef(false)
 
   useEffect(() => {
     setFormat(sessionType === "tournament" ? "BO3" : "BO1")
   }, [sessionType])
+
+  useEffect(() => {
+    if (!initializedPreset.current && presets[0]) {
+      setActivePresetId(presets[0].id)
+      initializedPreset.current = true
+    }
+  }, [presets])
 
   useEffect(() => {
     VgcService.getChampionsRegulations().then((res) => {

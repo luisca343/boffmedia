@@ -6,7 +6,7 @@ import type { VgcMetaSlotDto } from './VgcMetaSlotDto';
 export type LimitlessPlayerTeamDto = {
     playerSlug: string;
     playerName: string;
-    placing: number;
+    placing: number | null;
     record: string;
     rawText: string;
     slots: Array<VgcMetaSlotDto>;

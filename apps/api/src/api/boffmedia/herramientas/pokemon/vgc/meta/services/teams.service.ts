@@ -4,6 +4,7 @@ import { LimitlessRepository } from '../repositories/limitless.repository';
 import { PastesRepository } from '../repositories/pastes.repository';
 import { SpeciesTeamEntry } from '../entities/pokemon-usage.entity';
 import { VgcMetaSlot } from '@/_db/schema/Vgc';
+import { getDexForFormat, withMoveTypes } from '../utils/dex-resolver';
 
 const TEAMS_LIMIT = 30;
 
@@ -34,9 +35,13 @@ export class TeamsService {
     ]);
 
     const results: SpeciesTeamEntry[] = [];
+    const dexForFormat = getDexForFormat(formatId);
 
     for (const team of vgcPastesTeams) {
-      const slots = JSON.parse(team.parsedSlots) as VgcMetaSlot[];
+      const slots = withMoveTypes(
+        JSON.parse(team.parsedSlots) as VgcMetaSlot[],
+        dexForFormat,
+      );
       if (!slots.some((s) => s.speciesId === speciesId)) continue;
       results.push({
         source: 'vgcpastes',
@@ -44,6 +49,8 @@ export class TeamsService {
         playerName: team.playerName,
         record: null,
         rank: team.rank,
+        tournamentName: team.tournament,
+        tournamentDate: team.dateShared,
         slots,
         rawText: team.rawText,
         replicaCode: team.replicaCode ?? null,
@@ -51,7 +58,10 @@ export class TeamsService {
     }
 
     for (const team of limitlessTeams) {
-      const slots = JSON.parse(team.parsedSlots) as VgcMetaSlot[];
+      const slots = withMoveTypes(
+        JSON.parse(team.parsedSlots) as VgcMetaSlot[],
+        dexForFormat,
+      );
       if (!slots.some((s) => s.speciesId === speciesId)) continue;
       results.push({
         source: 'limitless',
@@ -59,6 +69,8 @@ export class TeamsService {
         playerName: team.playerName,
         record: team.record,
         rank: team.placing != null ? String(team.placing) : null,
+        tournamentName: team.tournamentName,
+        tournamentDate: team.tournamentDate,
         slots,
         rawText: team.rawText,
         replicaCode: null,
@@ -80,7 +92,10 @@ export class TeamsService {
 
     for (const paste of rawPastes) {
       if (linkedPasteIds.has(paste.id)) continue;
-      const slots = JSON.parse(paste.parsedSlots) as VgcMetaSlot[];
+      const slots = withMoveTypes(
+        JSON.parse(paste.parsedSlots) as VgcMetaSlot[],
+        dexForFormat,
+      );
       if (!slots.some((s) => s.speciesId === speciesId)) continue;
       results.push({
         source: 'paste',
@@ -88,6 +103,8 @@ export class TeamsService {
         playerName: paste.author ?? null,
         record: null,
         rank: null,
+        tournamentName: null,
+        tournamentDate: null,
         slots,
         rawText: paste.rawText,
         replicaCode: paste.replicaCode ?? null,

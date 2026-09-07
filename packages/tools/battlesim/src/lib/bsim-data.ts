@@ -1,13 +1,12 @@
 import type { IconName } from "@boffmedia/ui"
 import { BSIM_FORMATS as CORE_FORMATS, formatsFor } from "@boffmedia/battle-core"
 
-export type BsimView = "lobby" | "equipos" | "repeticiones"
+export type BsimView = "lobby" | "repeticiones"
 export type BsimMode = "ia" | "pvp" | "showdown"
 
 /** In-app nav tabs shown in the tool bar. */
 export const BSIM_TABS: { key: BsimView; icon: IconName }[] = [
   { key: "lobby", icon: "sword" },
-  { key: "equipos", icon: "layers" },
   { key: "repeticiones", icon: "play" },
 ]
 

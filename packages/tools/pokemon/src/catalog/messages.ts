@@ -1467,6 +1467,14 @@ export const messages = {
           },
           "detail": {
             "baseStats": "Estadísticas base",
+            "stats": {
+              "hp": "PS",
+              "atk": "Atq",
+              "def": "Def",
+              "spa": "AtE",
+              "spd": "DfE",
+              "spe": "Vel"
+            },
             "abilities": "Habilidades",
             "items": "Objetos",
             "moves": "Movimientos",
@@ -1490,6 +1498,14 @@ export const messages = {
             "topN": "top {n}",
             "noData": "—",
             "abilitiesTeras": "Habilidades y teratipos",
+            "team": {
+              "ability": "Habilidad",
+              "item": "Objeto",
+              "moves": "Movimientos",
+              "spread": "Reparto",
+              "neutral": "Neutra",
+              "top": "Top"
+            },
             "clickToJump": "clic para saltar",
             "teamsWith": "Equipos con {name}",
             "tournamentResults": "resultados de torneo",
@@ -1498,7 +1514,6 @@ export const messages = {
             "emptyLead": "Selecciona una especie del ranking para ver su detalle competitivo: movimientos, objetos, repartos y equipos."
           },
           "overview": {
-            "kicker": "Panorama del formato",
             "title": "Meta del formato",
             "lead": "Explora los picks más jugados, los núcleos que más se repiten y los equipos destacados de los torneos recientes.",
             "teamCount": "{count} equipos analizados",
@@ -3072,6 +3087,14 @@ export const messages = {
           },
           "detail": {
             "baseStats": "Base Stats",
+            "stats": {
+              "hp": "HP",
+              "atk": "Atk",
+              "def": "Def",
+              "spa": "SpA",
+              "spd": "SpD",
+              "spe": "Spe"
+            },
             "abilities": "Abilities",
             "items": "Items",
             "moves": "Moves",
@@ -3095,6 +3118,14 @@ export const messages = {
             "topN": "top {n}",
             "noData": "—",
             "abilitiesTeras": "Abilities & Tera Types",
+            "team": {
+              "ability": "Ability",
+              "item": "Item",
+              "moves": "Moves",
+              "spread": "Spread",
+              "neutral": "Neutral",
+              "top": "Top"
+            },
             "clickToJump": "click to jump",
             "teamsWith": "Teams with {name}",
             "tournamentResults": "tournament results",
@@ -3103,7 +3134,6 @@ export const messages = {
             "emptyLead": "Select a species from the ranking to see its competitive breakdown: moves, items, spreads and teams."
           },
           "overview": {
-            "kicker": "Format overview",
             "title": "Format meta",
             "lead": "Explore the most-played picks, the cores that appear together most often, and standout teams from recent tournaments.",
             "teamCount": "{count} teams analyzed",

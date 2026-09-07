@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Banner, Button, Icon, Input, Spinner, cn, toast } from '@boffmedia/ui';
 import { DkSelect } from '@boffmedia/ui/datakit';
-import { useToolOnline, useToolSession } from '@boffmedia/tool-kit';
+import { openUrl, siteUrl, useToolOnline, useToolSession } from '@boffmedia/tool-kit';
 
 import { useToolT, BATTLESIM_NS } from '../i18n';
 import { useBsimNav } from '../nav';
@@ -129,7 +129,7 @@ export function BsimPvpView() {
   const KNOWN_STATUS = ['connecting', 'connected', 'idle', 'searching', 'inBattle', 'error'];
   const statusLabel = t(`pvp.status.${KNOWN_STATUS.includes(status) ? status : 'disconnected'}`);
 
-  const goToTeams = useCallback(() => nav.replace('hub', { tab: 'equipos' }), [nav]);
+  const goToTeams = useCallback(() => void openUrl(siteUrl('/pokemon/teambuilder')), []);
   const playAi = useCallback(() => nav.replace('play', { format: selectedFormat }), [nav, selectedFormat]);
 
   // A fatal transport state is the whole screen, not a red string above the

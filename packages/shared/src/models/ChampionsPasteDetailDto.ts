@@ -2,6 +2,7 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { MoveUsageEntryDto } from './MoveUsageEntryDto';
 import type { SpreadEntryDto } from './SpreadEntryDto';
 import type { UsageEntryDto } from './UsageEntryDto';
 export type ChampionsPasteDetailDto = {
@@ -13,7 +14,7 @@ export type ChampionsPasteDetailDto = {
     pasteCount: number;
     abilities: Array<UsageEntryDto>;
     items: Array<UsageEntryDto>;
-    moves: Array<UsageEntryDto>;
+    moves: Array<MoveUsageEntryDto>;
     teraTypes: Array<UsageEntryDto>;
     spreads: Array<SpreadEntryDto>;
 };

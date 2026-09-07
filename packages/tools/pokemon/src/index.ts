@@ -44,6 +44,12 @@ export {
 export { PMDSKY_NS, TCGP_NS, useToolT } from "./i18n";
 export { VGC_NS, useVgcT } from "./vgc/i18n";
 
+// Shared teambuilder surfaces. The builder remains visually owned by its
+// working implementation in tools-battlesim, while its canonical item lookup
+// and team shelf are available to VGC and other Pokémon tools.
+export { itemIconStyle } from "./teambuilder/item-icon";
+export { listBuilderTeams, getBuilderTeam, TEAM_BUILDER_STORE, TEAM_COLLECTION } from "./teambuilder/storage";
+
 // Two VGC utilities that outlived the port's boundary: Battlesim's sprite
 // helpers and Torneos' Showdown-paste parser are web-only tools that were
 // reaching into the tracker's internals through `@/features/vgc-tracker`. That

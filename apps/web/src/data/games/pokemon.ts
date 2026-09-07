@@ -47,6 +47,14 @@ export const pokemon: GameEntry = {
       ],
     },
     {
+      key: "teambuilder",
+      nameKey: "games.pokemon.categories.teambuilder",
+      href: "/pokemon/teambuilder",
+      tools: [
+        { key: "teambuilder", nameKey: "games.pokemon.tools.teambuilder", href: "/pokemon/teambuilder", sidebarIcon: "layers", bleed: true },
+      ],
+    },
+    {
       key: "tcgpocket",
       nameKey: "games.pokemon.categories.tcgpocket",
       href: "/pokemon/tcgpocket",

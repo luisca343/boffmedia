@@ -11,7 +11,12 @@ import {
 } from '../entities/pokemon-usage.entity';
 import { VgcMetaSlot } from '@/_db/schema/Vgc';
 import { LIMITLESS_API_BASE } from '../config/smogon.config';
-import { getDexForFormat, resolveSpeciesId } from '../utils/dex-resolver';
+import {
+  getDexForFormat,
+  resolveMoveType,
+  resolveSpeciesId,
+  withMoveTypes,
+} from '../utils/dex-resolver';
 
 // ─── Limitless API types ─────────────────────────────────────────────────────
 
@@ -190,7 +195,10 @@ function aggregateSlots(
       baseStats,
       abilities: toList(abilityCounts.get(speciesId), count),
       items: toList(itemCounts.get(speciesId), count),
-      moves: toList(moveCounts.get(speciesId), count),
+      moves: toList(moveCounts.get(speciesId), count).map((move) => ({
+        ...move,
+        type: resolveMoveType(move.name, dexForFormat),
+      })),
       teraTypes: toList(teraCounts.get(speciesId), count),
       teammates,
       spreads: [],
@@ -452,7 +460,9 @@ export class LimitlessService {
       const teams = await this.limitlessRepository.findTeamsWithPastes(t.id);
       for (const team of teams) {
         if (team.parsedSlots)
-          allSlots.push(JSON.parse(team.parsedSlots) as VgcMetaSlot[]);
+          allSlots.push(
+            withMoveTypes(JSON.parse(team.parsedSlots) as VgcMetaSlot[], dexForFormat),
+          );
       }
     }
     return aggregateSlots(allSlots, dexForFormat);
@@ -476,6 +486,8 @@ export class LimitlessService {
   }
 
   async getMetaOverview(regulationId: string): Promise<MetaOverview> {
+    const regulation = await this.regulationsRepository.findById(regulationId);
+    const dexForFormat = getDexForFormat(regulation?.formatId ?? undefined);
     const tournaments = (
       await this.limitlessRepository.findTournamentsByRegulation(regulationId)
     )
@@ -508,7 +520,10 @@ export class LimitlessService {
       );
       for (const row of rows) {
         if (!row.parsedSlots) continue;
-        const slots = JSON.parse(row.parsedSlots) as VgcMetaSlot[];
+        const slots = withMoveTypes(
+          JSON.parse(row.parsedSlots) as VgcMetaSlot[],
+          dexForFormat,
+        );
         if (slots.length === 0) continue;
         teams.push({
           tournamentId: tournament.id,
@@ -611,7 +626,7 @@ export class LimitlessService {
       .map((t) => ({
         playerSlug: t.playerSlug,
         playerName: t.playerName ?? t.playerSlug,
-        placing: t.placing ?? 0,
+        placing: t.placing ?? null,
         record: t.record ?? '',
         drop: null,
         hasTeam: !!t.pasteId,
@@ -628,14 +643,21 @@ export class LimitlessService {
         `Player "${playerSlug}" not found in tournament ${tournamentId}`,
       );
     }
+    const tournament = await this.limitlessRepository.findTournamentById(tournamentId);
+    const regulation = tournament?.regulationId
+      ? await this.regulationsRepository.findById(tournament.regulationId)
+      : null;
+    const dexForFormat = getDexForFormat(
+      regulation?.formatId ?? tournament?.format ?? undefined,
+    );
     return {
       playerSlug: row.playerSlug,
       playerName: row.playerName ?? row.playerSlug,
-      placing: row.placing ?? 0,
+      placing: row.placing ?? null,
       record: row.record ?? '',
       rawText: row.rawText ?? '',
       slots: row.parsedSlots
-        ? (JSON.parse(row.parsedSlots) as VgcMetaSlot[])
+        ? withMoveTypes(JSON.parse(row.parsedSlots) as VgcMetaSlot[], dexForFormat)
         : [],
     };
   }

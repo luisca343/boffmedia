@@ -9,6 +9,8 @@ export type SpeciesTeamEntryDto = {
     playerName: string | null;
     record: string | null;
     rank: string | null;
+    tournamentName: string | null;
+    tournamentDate: string | null;
     slots: Array<VgcMetaSlotDto>;
     rawText: string;
     replicaCode: string | null;

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { vgcDb } from '../db';
 import type { Match, PresetVersion, Series, Session, TeamPreset } from '../types';
 import { useTrackerSync } from '../context/TrackerSyncContext';
+import { getBuilderPreset, listBuilderPresets } from '../builder-teams';
 
 // ─── Sessions ────────────────────────────────────────────────────────────────
 
@@ -181,6 +182,27 @@ export function usePresets() {
   return { presets, loading, save, remove, refresh };
 }
 
+/**
+ * The teambuilder is the canonical team editor. These rows are deliberately
+ * read-only here: the tracker may select them for a session, while rename,
+ * delete and validation remain in the teambuilder itself.
+ */
+export function useBuilderPresets() {
+  const [presets, setPresets] = useState<TeamPreset[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    const rows = await listBuilderPresets().catch(() => []);
+    rows.sort((a, b) => b.updatedAt - a.updatedAt);
+    setPresets(rows);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => { refresh(); }, [refresh]);
+
+  return { presets, loading, refresh };
+}
+
 // ─── Series ──────────────────────────────────────────────────────────────────
 
 export function useSeries(sessionId: string) {
@@ -241,7 +263,13 @@ export function usePreset(presetId: string | null) {
 
   useEffect(() => {
     if (!presetId) { setPreset(null); return; }
-    vgcDb.presets.get(presetId).then((p) => setPreset(p ?? null));
+    vgcDb.presets.get(presetId).then(async (p) => {
+      if (p) {
+        setPreset(p);
+        return;
+      }
+      setPreset(await getBuilderPreset(presetId));
+    });
   }, [presetId, lastSyncAt]);
 
   return preset;

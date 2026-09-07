@@ -2,13 +2,13 @@
 // Colours are canonical Pokémon values; type keys are Spanish (the API returns
 // localized type names), matching the DkType hexes.
 
-export const STAT_META: Record<string, { label: string; color: string }> = {
-  hp:  { label: "PS",  color: "#ff5959" },
-  atk: { label: "Atq", color: "#f5ac78" },
-  def: { label: "Def", color: "#fae078" },
-  spa: { label: "AtE", color: "#9db7f5" },
-  spd: { label: "DfE", color: "#a7db8d" },
-  spe: { label: "Vel", color: "#fa92b2" },
+export const STAT_META: Record<string, { color: string }> = {
+  hp:  { color: "#ff5959" },
+  atk: { color: "#f5ac78" },
+  def: { color: "#fae078" },
+  spa: { color: "#9db7f5" },
+  spd: { color: "#a7db8d" },
+  spe: { color: "#fa92b2" },
 }
 
 export const STAT_ORDER = ["hp", "atk", "def", "spa", "spd", "spe"] as const
@@ -45,7 +45,7 @@ export interface PokeData {
   base: Record<string, number>
   abilities: { name: string; pct: number }[]
   items: { name: string; pct: number }[]
-  moves: { name: string; pct: number }[]
+  moves: { name: string; pct: number; type?: string | null }[]
   tera: { name: string; pct: number }[]
   mates: { id: string; pct: number }[]
   spreads: { nature: string; ev: number[]; pct: number }[]
@@ -62,13 +62,21 @@ export interface TeamSlot {
   name: string
   tera: string
   item: string
+  ability?: string
+  nature?: string
+  ev?: number[]
   moves: string[]
+  moveTypes?: Array<string | null>
 }
 
 export interface TeamEntry {
   slug: string
   name: string
   record: string
+  source?: "vgcpastes" | "limitless" | "paste"
+  rank?: string | null
+  tournamentName: string | null
+  tournamentDate: string | null
   team: TeamSlot[]
   rawText: string
 }
@@ -88,7 +96,7 @@ export interface OverviewTeam extends TeamEntry {
 
 export interface PlayerEntry {
   slug: string
-  placing: number
+  placing: number | null
   name: string
   record: string
   team: TeamSlot[]
@@ -97,6 +105,7 @@ export interface PlayerEntry {
 
 export interface DivergenceRow {
   id: string
+  name: string
   ladder: number
   tournament: number
   delta: number

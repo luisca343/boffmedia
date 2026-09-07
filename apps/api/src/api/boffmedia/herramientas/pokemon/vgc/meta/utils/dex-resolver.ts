@@ -1,5 +1,6 @@
 import { Dex } from '@pkmn/sim';
 import { initChampionsMod } from '@boffmedia/battle-core';
+import { VgcMetaSlot } from '@/_db/schema/Vgc';
 
 /**
  * Returns a format-aware Dex instance for the given formatId.
@@ -16,6 +17,23 @@ export function getDexForFormat(formatId?: string): typeof Dex {
   if (!formatId) return Dex;
   const format = Dex.formats.get(formatId);
   return format.exists ? Dex.forFormat(format) : Dex;
+}
+
+/** Returns a canonical move type, or null when a source contains an unknown move. */
+export function resolveMoveType(name: string, dex: typeof Dex): string | null {
+  const move = dex.moves.get(name);
+  return move.exists ? move.type : null;
+}
+
+/** Adds response-only move metadata without changing the stored paste JSON. */
+export function withMoveTypes(
+  slots: VgcMetaSlot[],
+  dex: typeof Dex,
+): VgcMetaSlot[] {
+  return slots.map((slot) => ({
+    ...slot,
+    moveTypes: slot.moves.map((move) => resolveMoveType(move, dex)),
+  }));
 }
 
 /**

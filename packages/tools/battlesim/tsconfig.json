@@ -13,6 +13,9 @@
     "resolveJsonModule": true,
     "paths": {
       "@boffmedia/asset-paths": ["../../asset-paths/src/index.ts"],
+      "@boffmedia/battle-core": ["../../battle-core/src/index.ts"],
+      "@boffmedia/tools-pokemon": ["../pokemon/src/index.ts"],
+      "@boffmedia/tools-pokemon/*": ["../pokemon/src/*"],
       "@boffmedia/tool-kit": ["../kit/src/index.ts"],
       "@boffmedia/ui": ["../../ui/src/index.ts"],
       "@boffmedia/ui/*": ["../../ui/src/*"]

@@ -19,7 +19,7 @@ import {
 } from "@boffmedia/ui/datakit"
 import { DkSeg } from "@boffmedia/ui/datakit"
 import { Button, Modal, Field, Input, Spinner } from "@boffmedia/ui"
-import { useMatches, usePresets, useSeries, useSessions, usePreset } from "../../tracker-core/hooks/useVgcDb"
+import { useMatches, usePresets, useBuilderPresets, useSeries, useSessions, usePreset } from "../../tracker-core/hooks/useVgcDb"
 import { emptySlots, slotsForGame, slotsFromPreset } from "../../tracker-core/types"
 import { parseMatchCsv } from "../../tracker-core/utils/importCsv"
 import { vgcDb } from "../../tracker-core/db"
@@ -45,9 +45,17 @@ export function TrackerSessionView({ sessionId }: Props) {
   const { seriesList, loading: seriesLoading, create: createSeries } = useSeries(sessionId)
   const { pushChange } = useTrackerSync()
   const { presets } = usePresets()
+  const { presets: builderPresets } = useBuilderPresets()
+  const selectablePresets = useMemo(() => [...presets, ...builderPresets], [presets, builderPresets])
+  const builderPresetIds = useMemo(() => new Set(builderPresets.map((p) => p.id)), [builderPresets])
   const preset = usePreset(session?.activePresetId ?? null)
   const isTournament = session?.type === "tournament"
-  const sessionPresets = presets.filter((p) => p.regulationId === session?.regulationId)
+  // Builder teams carry Showdown's format id, while tracker presets carry the
+  // API regulation id. Keep builder teams available for every session; the
+  // editor is the source of truth for their exact format and legality.
+  const sessionPresets = selectablePresets.filter(
+    (p) => p.regulationId === session?.regulationId || builderPresetIds.has(p.id),
+  )
 
   const [tab, setTab] = useState<"matches" | "stats">("matches")
   const [showPresetPicker, setShowPresetPicker] = useState(false)

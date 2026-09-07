@@ -25,24 +25,26 @@ import { useCallback, useEffect, useState } from "react";
 import { exportPaste, importPaste, packTeam, unpackTeam, type TeamRecord } from "@boffmedia/battle-core";
 import { useToolSession } from "@boffmedia/tool-kit";
 
-import { getTeam, listTeams } from "../storage";
+import { getTeam, getTeamMeta, listTeamMeta, listTeams, saveTeamMeta } from "../storage";
 import { keepTeam, mergeTeamsFromServer, storeTeam, uploadTeam, type TeamSyncResult } from "../sync";
+import type { LibraryTeam, TeamMeta } from "./library-types";
 
 const newClientId = () =>
   typeof crypto !== "undefined" && "randomUUID" in crypto
     ? crypto.randomUUID()
     : `team-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
-export type TeamPatch = Partial<Pick<TeamRecord, "name" | "format" | "packed" | "tags">>;
+export type TeamPatch = Partial<Pick<TeamRecord, "name" | "format" | "packed" | "tags">> & Partial<Omit<TeamMeta, "clientId">>;
+type LocalTeamPatch = Pick<TeamRecord, "name" | "format" | "packed">;
 
 export interface UseTeams {
-  teams: TeamRecord[];
+  teams: LibraryTeam[];
   loading: boolean;
   create(name: string, format: string, packed?: string): Promise<TeamRecord>;
   /** Tier 1 + tier 2: a deliberate list action, uploaded at once. */
   update(clientId: string, patch: TeamPatch): Promise<void>;
   /** TIER 1 ONLY — the editor's autosave. Local write, no upload, no network. */
-  updateLocal(clientId: string, patch: TeamPatch): Promise<void>;
+  updateLocal(clientId: string, patch: LocalTeamPatch): Promise<void>;
   /** TIER 2 ONLY — queue the stored state of one team and send it now. */
   syncTeam(clientId: string): Promise<TeamSyncResult>;
   /** Tombstones the team and returns what was removed, so a caller can offer Undo. */
@@ -58,13 +60,14 @@ export interface UseTeams {
 }
 
 export function useTeams(): UseTeams {
-  const [teams, setTeams] = useState<TeamRecord[]>([]);
+  const [teams, setTeams] = useState<LibraryTeam[]>([]);
   const [loading, setLoading] = useState(true);
   const session = useToolSession();
 
   const refresh = useCallback(async () => {
-    const rows = await listTeams().catch(() => []);
-    setTeams(rows.slice().sort((a, b) => b.updatedAt - a.updatedAt));
+    const [rows, metadata] = await Promise.all([listTeams().catch(() => []), listTeamMeta().catch(() => [])]);
+    const byId = new Map(metadata.map((meta) => [meta.clientId, meta]));
+    setTeams(rows.slice().map((team) => ({ ...team, ...(byId.get(team.clientId) ?? { clientId: team.clientId }) })).sort((a, b) => b.updatedAt - a.updatedAt));
     setLoading(false);
   }, []);
 
@@ -79,8 +82,8 @@ export function useTeams(): UseTeams {
     if (!session.signedIn) return;
     let alive = true;
     void mergeTeamsFromServer()
-      .then((applied) => {
-        if (alive && applied > 0) void refresh();
+      .then((teamsApplied) => {
+        if (alive && teamsApplied > 0) void refresh();
       })
       .catch(() => {
         // Offline or the endpoint is down; the local set is still correct.
@@ -117,7 +120,12 @@ export function useTeams(): UseTeams {
     async (clientId: string, patch: TeamPatch) => {
       const current = await getTeam(clientId);
       if (!current) return;
-      await persist({ ...current, ...patch, updatedAt: Date.now() });
+      const { favorite, pinned, notes, ...teamPatch } = patch;
+      if (favorite !== undefined || pinned !== undefined || notes !== undefined) {
+        const existing = (await getTeamMeta(clientId)) ?? { clientId };
+        await saveTeamMeta({ ...existing, ...(favorite === undefined ? {} : { favorite }), ...(pinned === undefined ? {} : { pinned }), ...(notes === undefined ? {} : { notes }) });
+      }
+      await persist({ ...current, ...teamPatch, updatedAt: Date.now() });
     },
     [persist],
   );
@@ -128,7 +136,7 @@ export function useTeams(): UseTeams {
   // Sincronizar). The list is refreshed so a card behind the editor is never
   // showing a team the store no longer holds.
   const updateLocal = useCallback(
-    async (clientId: string, patch: TeamPatch) => {
+    async (clientId: string, patch: LocalTeamPatch) => {
       const current = await getTeam(clientId);
       if (!current) return;
       await storeTeam({ ...current, ...patch, updatedAt: Date.now() });
@@ -178,6 +186,8 @@ export function useTeams(): UseTeams {
         updatedAt: Date.now(),
         deletedAt: undefined,
       };
+      const meta = await getTeamMeta(clientId);
+      if (meta) await saveTeamMeta({ ...meta, clientId: copy.clientId });
       await persist(copy);
       return copy;
     },

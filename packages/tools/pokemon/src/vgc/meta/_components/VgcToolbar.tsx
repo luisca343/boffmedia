@@ -120,7 +120,7 @@ export function VgcToolbar({
 
   return (
     <DkBar>
-      <DkTitle icon="trending" label={t("barTitle")} sub={tab === "stats" ? t("barSub.ladder") : t("barSub.tournament")} />
+      <DkTitle label={t("barTitle")} sub={tab === "stats" ? t("barSub.ladder") : t("barSub.tournament")} />
       <DkDivider />
       <DkSeg
         value={tab}

@@ -21,7 +21,7 @@
 
 import * as React from "react";
 import { exportPaste, type TeamRecord } from "@boffmedia/battle-core";
-import { Banner, Button, Disclosure, DISPLAY_VOICE, Icon, Input, Menu, cn, toast } from "@boffmedia/ui";
+import { Banner, Button, Disclosure, DISPLAY_VOICE, Icon, IconButton, Input, Menu, Textarea, cn, toast } from "@boffmedia/ui";
 import { DkBack, DkSelect, useDkNarrow } from "@boffmedia/ui/datakit";
 
 import { BsimSection, BSIM_FOCUS } from "../components/bsim-kit";
@@ -37,14 +37,18 @@ import { analyseTeam } from "./teamAnalysis";
 import { TbIconAction, TbKicker, TbSlotChip, TbSlotRow, TbSyncChip, TbTypeChip, TbValidityChip, type TbSlotMon, type TbValidity } from "./tb-kit";
 import { useTeamDraft } from "./useTeamDraft";
 import { useTeamValidation } from "./useTeamValidation";
+import type { LibraryTeam } from "./library-types";
+import type { TeamPatch } from "./useTeams";
 import { Dex } from "@pkmn/dex";
 
 export interface TeamEditorProps {
-  team: TeamRecord;
+  team: LibraryTeam;
   /** TIER 1 — the local write. Called on every debounced change. */
   onSaveLocal: (patch: Pick<TeamRecord, "name" | "format" | "packed">) => Promise<void>;
   /** TIER 2 — queue this team for the account and flush, reporting what happened. */
   onSync: () => Promise<TeamSyncResult>;
+  onMetaChange: (patch: Pick<TeamPatch, "favorite" | "pinned" | "notes">) => Promise<void>;
+  onTagsChange: (tags: string[]) => Promise<void>;
   onBackToList: () => void;
 }
 
@@ -53,7 +57,7 @@ const clampSlot = (raw: string | undefined) => {
   return Number.isNaN(n) ? 0 : Math.max(0, Math.min(5, n));
 };
 
-export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEditorProps) {
+export function TeamEditor({ team, onSaveLocal, onSync, onMetaChange, onTagsChange, onBackToList }: TeamEditorProps) {
   const t = useToolT(TB_NS);
   const labels = useTbLabels();
   const nav = useBsimNav();
@@ -75,6 +79,28 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
   const [importOpen, setImportOpen] = React.useState(false);
   const [renaming, setRenaming] = React.useState(false);
   const [nameDraft, setNameDraft] = React.useState(draft.name);
+  const [notesDraft, setNotesDraft] = React.useState(team.notes ?? "");
+  const [tagDraft, setTagDraft] = React.useState("");
+
+  React.useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || target?.isContentEditable || ["INPUT", "TEXTAREA", "SELECT"].includes(target?.tagName ?? "")) return;
+      const number = Number(event.key);
+      if (number >= 1 && number <= 6) {
+        event.preventDefault();
+        selectSlot(number - 1);
+      } else if (event.key === "ArrowUp" && slot > 0) {
+        event.preventDefault();
+        selectSlot(slot - 1);
+      } else if (event.key === "ArrowDown" && slot < 5) {
+        event.preventDefault();
+        selectSlot(slot + 1);
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [nav, slot]);
 
   const formatOptions = React.useMemo(() => {
     const opts = BSIM_TEAM_FORMATS.map((f) => ({ value: f.value, label: f.label }));
@@ -114,6 +140,13 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
     setRenaming(false);
   };
 
+  const addTag = async () => {
+    const next = tagDraft.trim().toLowerCase();
+    if (!next || (team.tags ?? []).includes(next)) return;
+    await onTagsChange([...(team.tags ?? []), next]);
+    setTagDraft("");
+  };
+
   /* ── Derived ───────────────────────────────────────────────────────────── */
   const problems = React.useMemo(
     () =>
@@ -135,6 +168,8 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
         : validityState === "ok"
           ? t("validity.ok")
           : t("validity.problems", { count: validation.problems.length });
+
+  const filledSlots = draft.sets.filter((set) => !isEmptySet(set)).length;
 
   const monOf = (i: number): TbSlotMon | null => {
     const s = draft.sets[i];
@@ -397,6 +432,8 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
         <DkBack onClick={leave} label={t("backToList")} />
         <div className="flex min-w-0 flex-1 basis-[13.75rem] items-center gap-2">
           {nameBlock}
+          <IconButton size="sm" name="star" variant={team.favorite ? "pri" : "ghost"} label={t(team.favorite ? "meta.unfavorite" : "meta.favorite")} onClick={() => void onMetaChange({ favorite: !team.favorite })} className={team.favorite ? "text-accent" : undefined} />
+          <IconButton size="sm" name="bookmark" variant={team.pinned ? "pri" : "ghost"} label={t(team.pinned ? "meta.unpin" : "meta.pin")} onClick={() => void onMetaChange({ pinned: !team.pinned })} className={team.pinned ? "text-signal" : undefined} />
           <TbSyncChip state={draft.syncState} title={syncHint}>
             {syncWord}
           </TbSyncChip>
@@ -457,6 +494,39 @@ export function TeamEditor({ team, onSaveLocal, onSync, onBackToList }: TeamEdit
           {t("remote.changed")}
         </Banner>
       )}
+
+      <section className="grid gap-2 border border-solid border-line bg-panel p-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <TbKicker>{t("meta.notes")}</TbKicker>
+          <span className="font-mono text-[0.625rem] text-txt-dim">{t("meta.teamProgress", { filled: filledSlots, total: 6 })}</span>
+        </div>
+        <Textarea
+          value={notesDraft}
+          aria-label={t("meta.notes")}
+          placeholder={t("meta.notesPh")}
+          onChange={(event) => setNotesDraft(event.target.value)}
+          onBlur={() => void onMetaChange({ notes: notesDraft.trim() || undefined })}
+          className="min-h-[4.5rem]"
+        />
+        <div className="flex flex-wrap items-center gap-1">
+          {(team.tags ?? []).map((tag) => (
+            <span key={tag} className="inline-flex items-center gap-1 rounded-sm bg-accent-bg px-2 py-1 text-[0.75rem] font-medium text-accent">
+              {tag}
+              <button type="button" className="flex h-4 w-4 items-center justify-center rounded hover:bg-accent hover:text-accent-bg" aria-label={t("tags.remove", { tag })} onClick={() => void onTagsChange((team.tags ?? []).filter((item) => item !== tag))}>×</button>
+            </span>
+          ))}
+          <Input
+            size="sm"
+            value={tagDraft}
+            placeholder={t("tags.placeholder")}
+            aria-label={t("tags.addAria")}
+            onChange={(event) => setTagDraft(event.target.value)}
+            onKeyDown={(event) => { if (event.key === "Enter") { event.preventDefault(); void addTag(); } }}
+            className="max-w-[13rem]"
+          />
+          <Button size="sm" variant="ghost" icon="plus" onClick={() => void addTag()}>{t("tags.add")}</Button>
+        </div>
+      </section>
 
       {strip ? (
         <>
