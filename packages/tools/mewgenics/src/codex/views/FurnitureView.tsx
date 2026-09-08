@@ -2,11 +2,11 @@
 
 import * as React from "react"
 import { useToolT, MEWGENICS_NS } from "../../i18n"
-import { MewPanel, MewNote, MewTile } from "../../MewAtoms"
-import { MEW_STATMOD, mewHuman, mewStatModLabel } from "../../mew-util"
+import { MewPanel, MewNote } from "../../MewAtoms"
+import { mewHuman, mewStatModLabel } from "../../mew-util"
 import { mewFurnitureArt } from "../../mew-art"
-import { select, MewData } from "../../mew-store"
-import { MewDesc, MewDetail, MewFactGrid, MewHero, MewHeroMedia, MewSections, MewSubLabel, num, rows, type ViewProps } from "./scaffold"
+import { MewData } from "../../mew-store"
+import { MewDesc, MewDetail, MewFactGrid, MewHero, MewSections, MewSubLabel, type ViewProps } from "./scaffold"
 
 export function FurnitureView({ rec, onNav }: ViewProps) {
   const t = useToolT(MEWGENICS_NS)
@@ -36,20 +36,18 @@ export function FurnitureView({ rec, onNav }: ViewProps) {
     return all.filter((f) => f.id !== rec.id && (f.set === setFamily || f.id?.startsWith(setFamily + "_")))
   }, [setFamily, rec.id])
 
-  const furnitureArt = React.useMemo(() => mewFurnitureArt(rec.id), [rec.id])
-
   return (
-    <MewDetail id={rec.id}>
-      <MewHero cat="furniture" rec={rec} media={furnitureArt ? <MewHeroMedia src={furnitureArt} alt={rec.name} max={200} /> : undefined} />
+    <MewDetail id={rec.id} layout="showcase">
+      <MewHero cat="furniture" rec={rec} />
       <MewDesc>{rec.desc}</MewDesc>
       <MewSections>
         {statRows.length > 0 && (
-          <MewPanel title={t("panel.stats")} icon="home">
+          <MewPanel title={t("panel.stats")} icon="home" className="mew-panel--compact">
             <MewFactGrid rows={statRows} />
           </MewPanel>
         )}
         {flagNotes.length > 0 && (
-          <MewPanel title={t("label.properties")} icon="bookmark">
+          <MewPanel title={t("label.properties")} icon="bookmark" className="mew-panel--compact">
             <div className="space-y-1">
               {flagNotes.map((n) => (
                 <div key={n} className="text-[color:var(--mwp-ink)] text-sm">
@@ -60,7 +58,7 @@ export function FurnitureView({ rec, onNav }: ViewProps) {
           </MewPanel>
         )}
         {statRows.length === 0 && flagNotes.length === 0 && (
-          <MewPanel>
+          <MewPanel className="mew-panel--compact">
             <MewNote>{t("label.noData")}</MewNote>
           </MewPanel>
         )}

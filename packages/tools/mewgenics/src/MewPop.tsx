@@ -5,8 +5,8 @@ import { useToolT, MEWGENICS_NS } from "./i18n"
 import { cn, Icon, type IconName } from "@boffmedia/ui"
 import { MewTag } from "./mew-kit"
 import { mewCursor } from "./mew-art"
-import { MewRarity, MewStats, MewText, MewTile } from "./MewAtoms"
-import { MEW, MEW_KIND_LABEL, mewBodyPartLabel, mewCatKey, mewClip, mewFactionLabel, mewHueFor, mewHuman, mewRarityAccent, mewStatModLabel, type MewRec } from "./mew-util"
+import { MewKindIcon, MewRarity, MewStats, MewText, MewTile } from "./MewAtoms"
+import { MEW, MEW_KIND_LABEL, mewBodyPartLabel, mewCatKey, mewClip, mewFactionLabel, mewHueFor, mewHuman, mewRarityAccent, mewStatModLabel, mewTileFrame, type MewRec } from "./mew-util"
 import { MewRecordMeta } from "./codex/MewRecordMeta"
 
 // Mewgenics roster card (CxCard) + the hover popover card. Prefix cx- / mew-pop-.
@@ -42,10 +42,10 @@ export function CxCard({ cat, rec, active, onOpen, view, cursorEnabled, playSoun
       )}
     >
       {view === "list" ? (
-        <MewTile cat={cat} rec={rec} size={40} frame="slot" />
+        <MewTile cat={cat} rec={rec} size={40} frame={mewTileFrame(cat)} />
       ) : (
         <span className="flex items-start justify-center">
-          <MewTile cat={cat} rec={rec} size={66} frame="slot" />
+          <MewTile cat={cat} rec={rec} size={66} frame={mewTileFrame(cat)} />
         </span>
       )}
       {view === "list" ? (
@@ -84,9 +84,9 @@ function mewEffectNames(map?: Record<string, unknown>, max = 4): string | null {
   return keys.slice(0, max).map((k) => mewHuman(k)).join(" · ") + (keys.length > max ? " +" + (keys.length - max) : "")
 }
 
-function PopFlag({ icon, tone, children }: { icon?: IconName; tone?: string; children: React.ReactNode }) {
+function PopFlag({ icon, iconNode, tone, children }: { icon?: IconName; iconNode?: React.ReactNode; tone?: string; children: React.ReactNode }) {
   const tagTone = tone === "good" || tone === "warn" || tone === "bad" ? tone : tone === "rar" ? "hue" : "neutral"
-  return <MewTag icon={icon} tone={tagTone}>{children}</MewTag>
+  return <MewTag icon={icon} tone={tagTone}>{iconNode}{children}</MewTag>
 }
 
 type FactRow = { label: string; value: React.ReactNode; mono?: boolean }
@@ -157,11 +157,12 @@ function MewPopBody({ cat, rec, t }: { cat: string; rec: MewRec; t: (k: string, 
   }
   if (cat === "items") {
     const passN = rec.passives ? Object.keys(rec.passives).length : 0
-    const kindLabel = MEW_KIND_LABEL[rec.kind || ""] ? t(`data.kind.${rec.kind}`) : mewHuman(rec.kind)
+    const kind = String(rec.kind || "").toLowerCase()
+    const kindLabel = MEW_KIND_LABEL[kind] ? t(`data.kind.${kind}`) : mewHuman(rec.kind)
     return (
       <>
         <div className="flex flex-wrap gap-[0.3125rem]">
-          <PopFlag icon="bookmark">{kindLabel}</PopFlag>
+          <PopFlag iconNode={<MewKindIcon kind={kind} consumable={rec.consumable} />}>{kindLabel}</PopFlag>
           <MewRarity rarity={rec.rarity} cursed={rec.cursed} />
         </div>
         {mewClip(rec.desc, 130) ? <MewText muted>{mewClip(rec.desc, 130)}</MewText> : null}
@@ -299,7 +300,7 @@ export function MewPopCard({ cat, rec }: { cat: string; rec: MewRec }) {
     >
       <span aria-hidden className="mew-pop-card__tape pointer-events-none absolute -top-[0.5625rem] left-[1.375rem] h-[1.0625rem] w-[3.625rem] border-l border-r border-dashed border-[var(--mwp-tape-light-bright)] [transform:rotate(-4deg)]" />
       <header className="mew-pop-card__header">
-        <MewTile cat={cat} rec={rec} size={40} glyph={isSet ? "layers" : undefined} />
+        <MewTile cat={cat} rec={rec} size={40} frame={mewTileFrame(cat)} glyph={isSet ? "layers" : undefined} />
         <div className="flex min-w-0 flex-col gap-[3px]">
           <span className="mew-pop-card__category text-[0.625rem]/none uppercase tracking-[0.1em] [font-family:var(--mwf-disp)]">{mewCatLabel(cat, t)}</span>
           <span className="mew-pop-card__title truncate text-[1rem]/none [font-family:var(--mwf-disp)]">{rec.name}</span>

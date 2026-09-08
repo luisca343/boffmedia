@@ -49,6 +49,11 @@ export const MEW_CATS: MewCat[] = [
   { key: "statuses", file: null, icon: "flame", hue: 50 },
 ]
 
+/** Inventory frames suit actual item/character art; other categories stay bare. */
+export type MewTileFrame = "blob" | "slot" | "none"
+export const mewTileFrame = (cat: string): MewTileFrame =>
+  cat === "items" || cat === "characters" ? "slot" : "none"
+
 /** Message key for a category's chrome: `cat.<key>.label|singular|desc`. */
 export const mewCatKey = (cat: string, leaf: "label" | "singular" | "desc") =>
   `cat.${cat}.${leaf}`
@@ -221,6 +226,22 @@ export function mewStatusColor(rec: MewRec): string | null {
 }
 
 export const MEW_KIND_LABEL: Record<string, string> = { weapon: "Arma", head: "Cabeza", face: "Cara", neck: "Cuello", trinket: "Abalorio", modifier: "Modificador", armor: "Armadura" }
+
+/** Native Mewgenics silhouettes used by the inventory's equipment slots. */
+export const MEW_KIND_ICON_SRC: Record<string, string> = {
+  weapon: new URL("./assets/item-slots/weapon.svg", import.meta.url).toString(),
+  head: new URL("./assets/item-slots/head.svg", import.meta.url).toString(),
+  face: new URL("./assets/item-slots/face.svg", import.meta.url).toString(),
+  neck: new URL("./assets/item-slots/neck.svg", import.meta.url).toString(),
+  trinket: new URL("./assets/item-slots/trinket.svg", import.meta.url).toString(),
+  consumable: new URL("./assets/item-slots/consumable.svg", import.meta.url).toString(),
+  modifier: new URL("./assets/item-slots/modifier.svg", import.meta.url).toString(),
+}
+
+export function mewKindIconSrc(kind?: string, consumable = false): string | undefined {
+  const normalizedKind = String(kind || "").toLowerCase()
+  return MEW_KIND_ICON_SRC[normalizedKind === "trinket" && consumable ? "consumable" : normalizedKind]
+}
 
 const MEW_TOKEN_LABEL: Record<string, string> = {
   shield: "Escudo", divineshield: "Escudo divino", str: "FUE", dex: "DES", con: "CON", int: "INT",

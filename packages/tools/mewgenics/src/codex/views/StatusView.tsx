@@ -27,7 +27,7 @@ export function StatusView({ rec, onNav }: ViewProps) {
   const hasBody = hasDesc || !!(effects && Object.keys(effects).length) || !!(passives && Object.keys(passives).length) || statModRows.length > 0
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="glossary">
       <MewHero
         cat="statuses"
         rec={rec}

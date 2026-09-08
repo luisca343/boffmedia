@@ -383,8 +383,8 @@ export const messages = {
             "desc": "Pasivas de clase y trastornos, con sus rangos."
           },
           "keywords": {
-            "label": "Estados",
-            "singular": "estado",
+            "label": "Palabras clave",
+            "singular": "palabra clave",
             "desc": "Efectos de estado y palabras clave con sus reglas."
           },
           "events": {
@@ -1038,8 +1038,8 @@ export const messages = {
             "desc": "Class passives and disorders, with their ranks."
           },
           "keywords": {
-            "label": "Statuses",
-            "singular": "status",
+            "label": "Keywords",
+            "singular": "keyword",
             "desc": "Status effects and keywords with their rules."
           },
           "events": {

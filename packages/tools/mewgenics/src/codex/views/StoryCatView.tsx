@@ -50,7 +50,7 @@ export function StoryCatView({ rec }: ViewProps) {
   )
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="showcase">
       <MewHero
         cat="story_cats"
         rec={rec}

@@ -85,7 +85,7 @@ export function ClassView({ rec, onNav }: ViewProps) {
   const classCharacters = React.useMemo(() => select.classToCharacters(rec.id), [rec.id])
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="collection">
       <MewHero
         cat="classes"
         rec={rec}

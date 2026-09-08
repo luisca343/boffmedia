@@ -5,7 +5,7 @@ import { lockScrollport } from "../../scrollport"
 import { useToolT, MEWGENICS_NS } from "../../i18n"
 import { cn, DataList, Icon, type DataListProps } from "@boffmedia/ui"
 import { MewText, MewTile } from "../../MewAtoms"
-import { MEW, type MewRec } from "../../mew-util"
+import { MEW, mewTileFrame, type MewRec } from "../../mew-util"
 import { mewArtSrc, mewUiSrc, mewFurnitureArt, mewTokenSrc, mewClassBg } from "../../mew-art"
 import { select } from "../../mew-store"
 import type { NavFn } from "../MewRefs"
@@ -17,6 +17,14 @@ export { MewTag } from "../../mew-kit"
 
 /** Every detail view receives the selected record + the codex navigator. */
 export type ViewProps = { rec: MewRec; onNav: NavFn }
+
+/**
+ * Detail pages do not all carry the same kind of information. The layout name
+ * lets the shared shell tune its measure without making individual views
+ * rebuild the hero/content frame.
+ */
+export type MewDetailLayout = "mechanic" | "entity" | "showcase" | "glossary" | "collection" | "atlas" | "narrative"
+export type MewSectionFlow = "balanced" | "prose"
 
 export type Row = { label: string; value: React.ReactNode; mono?: boolean }
 /** Filter falsy conditional rows down to real `Row`s (for `cond && {…}` lists). */
@@ -36,7 +44,7 @@ export function MewFacts({ rows: r, className }: DataListProps) {
 }
 
 /**
- * The two-column fiche grid: a sticky hero rail (column 1) beside the content
+ * The two-column fiche grid: a hero rail (column 1) beside the content
  * (column 2).
  *
  * INVARIANT — never give a direct child `grid-column: 1/-1`. MewHero is placed
@@ -47,14 +55,11 @@ export function MewFacts({ rows: r, className }: DataListProps) {
  * slot; wide panels use MewPanel's `span="full"`, which spans the *inner*
  * MewSections grid, not this one.
  */
-export function MewDetail({ children, id }: { children: React.ReactNode; id?: string }) {
+export function MewDetail({ children, id, layout = "mechanic" }: { children: React.ReactNode; id?: string; layout?: MewDetailLayout }) {
   return (
-    <>
-      <div className="mew-detail">
-        {children}
-      </div>
-      {id && <MewIdCopyLine id={id} />}
-    </>
+    <div className="mew-detail" data-layout={layout} data-record-id={id}>
+      {children}
+    </div>
   )
 }
 
@@ -86,11 +91,16 @@ const MEW_AREA_ART: Record<string, string> = {
 export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: { cat: string; rec: MewRec; badges?: React.ReactNode; title?: string; sub?: React.ReactNode; tip?: string; backdrop?: string | null; media?: React.ReactNode }) {
   const [showLightbox, setShowLightbox] = React.useState(false)
   const [artError, setArtError] = React.useState(false)
+  const [copiedId, setCopiedId] = React.useState(false)
   const closeButtonRef = React.useRef<HTMLButtonElement>(null)
   const triggerRef = React.useRef<HTMLButtonElement>(null)
   const t = useToolT(MEWGENICS_NS)
 
   const hue = MEW.catBy[cat] ? MEW.catBy[cat].hue : 230
+  // Item and character art benefits from its inventory/bestiary tile. Other
+  // categories already provide a meaningful glyph or illustration, so the
+  // extra blob/slot wrapper only adds visual noise around the hero mark.
+  const heroFrame = mewTileFrame(cat)
   const tape = "pointer-events-none absolute -top-[0.6875rem] h-[1.375rem] w-[4.75rem] border-l border-r border-dashed border-[color:var(--mwp-tape-light)] bg-[color:var(--mwp-tape)]"
 
   // Per-category art resolution for hero tiles
@@ -131,6 +141,13 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: 
 
   const backdropSrc = backdrop ?? (cat === "classes" ? mewClassBg(rec.id) : null)
 
+  const copyId = React.useCallback(() => {
+    navigator.clipboard.writeText(rec.id).then(() => {
+      setCopiedId(true)
+      setTimeout(() => setCopiedId(false), 1600)
+    }).catch(() => { /* clipboard access can be unavailable in the launcher */ })
+  }, [rec.id])
+
   const handleEscape = React.useCallback((e: KeyboardEvent) => {
     if (e.key === "Escape" && showLightbox) {
       setShowLightbox(false)
@@ -162,7 +179,6 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: 
       <header
         style={{
           "--h": hue,
-          top: "var(--mew-hero-top)",
           ...(bgSrc || backdropSrc ? {
             // Paper scrim over the area/class art so ink text stays readable.
             backgroundImage: bgSrc
@@ -177,22 +193,24 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: 
             backgroundBlendMode: "normal, normal",
           } : {})
         } as React.CSSProperties}
-        className="mew-detail__hero sticky z-[2] mt-1.5 flex flex-col items-center gap-[0.8125rem] self-start [border-radius:var(--wob-a)] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-5 pb-[1.375rem] pt-7 text-center text-[color:var(--mwp-ink)] [box-shadow:0_6px_0_var(--mwp-shadow-lg)] mew-paper"
+        className="mew-detail__hero mt-1.5 self-start [border-radius:var(--wob-a)] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-5 pb-[1.375rem] pt-7 text-[color:var(--mwp-ink)] [box-shadow:0_6px_0_var(--mwp-shadow-lg)] mew-paper"
       >
-        {canOpenLightbox ? (
-          <button
-            ref={triggerRef}
-            type="button"
-            onClick={() => setShowLightbox(true)}
-            className="cursor-pointer border-0 bg-transparent p-0 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 [border-radius:var(--wob-a)]"
-            aria-label={t("common.openLightbox")}
-          >
-            <MewTile cat={cat} rec={rec} size={112} frame="slot" art={artSrc} />
-          </button>
-        ) : (
-          <MewTile cat={cat} rec={rec} size={112} frame="slot" art={artSrc} />
-        )}
-        <div className="flex min-w-0 flex-col items-center gap-[0.5625rem]">
+        <div className="mew-detail__hero-mark">
+          {canOpenLightbox ? (
+            <button
+              ref={triggerRef}
+              type="button"
+              onClick={() => setShowLightbox(true)}
+              className="cursor-pointer border-0 bg-transparent p-0 hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 [border-radius:var(--wob-a)]"
+              aria-label={t("common.openLightbox")}
+            >
+              <MewTile cat={cat} rec={rec} size={112} frame={heroFrame} art={artSrc} />
+            </button>
+          ) : (
+            <MewTile cat={cat} rec={rec} size={112} frame={heroFrame} art={artSrc} />
+          )}
+        </div>
+        <div className="mew-detail__hero-copy flex min-w-0 flex-col items-center gap-[0.5625rem]">
           {/* Name plate: the game's tooltips put the name in its own outlined
               box on the paper, so the title gets a plate, not a ribbon. */}
           <div className="inline-block max-w-full border-2 border-solid border-[color:var(--mwp-ink)] bg-[color-mix(in_srgb,var(--mwp-paper)_42%,white)] px-4 pb-[0.5625rem] pt-[0.6875rem] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-md)] [transform:rotate(-0.6deg)]">
@@ -206,17 +224,23 @@ export function MewHero({ cat, rec, badges, title, sub, tip, backdrop, media }: 
           ) : null}
           <div className="mew-quick-facts" aria-label={t("label.quickFacts")}>
             {badges || <MewRecordMeta cat={cat} rec={rec} />}
-            <span className="mew-quick-facts__id" title={rec.id}>
-              <Icon name="code" size={11} aria-hidden />
-              {t("label.id")}: {rec.id}
-            </span>
+            <button
+              type="button"
+              className="mew-quick-facts__id"
+              title={copiedId ? t("common.copied") : t("common.copy")}
+              aria-label={`${t("common.copy")} ${t("label.id")}: ${rec.id}`}
+              onClick={copyId}
+            >
+              <Icon name={copiedId ? "check" : "code"} size={11} aria-hidden />
+              <span>{t("label.id")}: {rec.id}</span>
+            </button>
           </div>
         </div>
         {/* Large per-category art (portrait, furniture render, event subject).
             It lives INSIDE the hero, never as a `grid-column:1/-1` sibling —
             see MewDetail for why a full-width sibling opens a dead 9-row gap. */}
         {media ? (
-          <div className="mt-1 flex w-full justify-center border-t-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] pt-[0.9375rem]">
+          <div className="mew-detail__hero-media mt-1 flex w-full justify-center border-t-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] pt-[0.9375rem]">
             {media}
           </div>
         ) : null}
@@ -332,32 +356,8 @@ export function MewDesc({ children }: { children?: string }) {
 export function MewFlags({ children }: { children: React.ReactNode }) {
   return <div className="mew-detail__content m-0 flex flex-wrap gap-2">{children}</div>
 }
-export function MewSections({ children }: { children: React.ReactNode }) {
-  return <div className="mew-detail__content mew-detail__sections">{children}</div>
-}
-
-export function MewIdCopyLine({ id }: { id: string }) {
-  const t = useToolT(MEWGENICS_NS)
-  const [copied, setCopied] = React.useState(false)
-  const handleCopy = React.useCallback(() => {
-    navigator.clipboard.writeText(id).then(() => {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
-    })
-  }, [id])
-  return (
-    <div className="mt-3 border-t border-dashed border-[color:var(--mwp-ink-line)] pt-2 flex items-center gap-2">
-      <span className="text-[0.6875rem] font-mono text-[color:var(--mwp-ink-soft)]">{t("label.id")}: <span className="text-[color:var(--mwp-red-deep)] font-bold">{id}</span></span>
-      <button
-        type="button"
-        onClick={handleCopy}
-        className="ml-auto text-[0.625rem] px-2 py-1 border border-solid border-[color:var(--mwp-ink-line)] hover:border-[color:var(--mwp-ink)] rounded text-[color:var(--mwp-ink-soft)] hover:text-[color:var(--mwp-ink)] transition-colors"
-        title={t("label.id")}
-      >
-        {copied ? t("common.copied") : t("common.copy")}
-      </button>
-    </div>
-  )
+export function MewSections({ children, flow = "balanced" }: { children: React.ReactNode; flow?: MewSectionFlow }) {
+  return <div className="mew-detail__content mew-detail__sections" data-flow={flow}>{children}</div>
 }
 export function MewSubLabel({ children, n }: { children: React.ReactNode; n?: number }) {
   return (

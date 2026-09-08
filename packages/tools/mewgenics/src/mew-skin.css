@@ -9,10 +9,6 @@
  * `apps/desktop/src/index.css`) and neither one defines a `--mwp-*` token of
  * its own.
  *
- * `--mew-hero-top` is the one line that touches the host: it is built from
- * `--tool-sticky-top`, which each host sets to whatever overlays the top of the
- * tool's scrollport — the navbar on the web, nothing (0px) in the launcher.
- * That is the layout contract, and it is why no height is spelled out here.
  */
 
 /* ===========================================================================
@@ -178,12 +174,6 @@
   --mwp-grain-wash: 93%;
   --mwp-accent: #2fb3a8;
   --mwp-tab-shift: 13px;
-  /* Breathing room between the sticky chrome and the fiche hero beneath it. */
-  --mew-hero-gap: 14px;
-  /* Where the sticky hero parks: below the host's tool bar plus the codex's own
-     measured chrome. Both are read as tokens — nothing here stands in for the
-     bar's height, so it cannot drift when the bar changes. */
-  --mew-hero-top: calc(var(--tool-sticky-top, 0px) + var(--mew-chrome-h, 0px) + var(--mew-hero-gap));
 }
 
 /* Blends the grain into whatever paper colour the element already carries, so
@@ -418,6 +408,7 @@
 }
 
 .mew-tile--native { color: var(--mew-tile-ink); }
+.mew-tile--bare { color: var(--mew-tile-ink); }
 .mew-tile--framed { border-color: var(--mew-tile-border); color: var(--mew-tile-ink); }
 .mew-tile--slot {
   background-color: var(--mwp-paper-2);
@@ -807,6 +798,13 @@
   color: var(--mwp-ink-soft);
 }
 
+.mew-kind-icon {
+  width: 1rem;
+  height: 0.875rem;
+  flex: none;
+  object-fit: contain;
+}
+
 .mew-tag--good > svg { color: var(--mwp-good); }
 .mew-tag--warn > svg { color: var(--mwp-warn); }
 .mew-tag--bad > svg { color: var(--mwp-bad); }
@@ -864,12 +862,17 @@
 
 .mew-panel {
   position: relative;
+  align-self: start;
+  min-width: 0;
   border: 2px solid var(--mwp-ink);
   border-radius: var(--wob-b);
   background: var(--mwp-paper);
   color: var(--mwp-ink);
   box-shadow: 0 5px 0 var(--mwp-shadow-lg);
 }
+
+/* A one- or two-value panel should read like a card, not a banner. */
+.mew-panel--compact { width: min(100%, 32rem); }
 
 .mew-panel__header {
   position: relative;
@@ -886,6 +889,15 @@
   background: var(--mwp-paper);
   padding: 0.8125rem 1rem 0.5625rem;
   box-shadow: 0 -2px 0 var(--mwp-shadow-lg);
+}
+
+.mew-panel__header--with-aside {
+  width: calc(100% - var(--mwp-tab-shift) - 1rem);
+}
+
+.mew-panel__aside {
+  min-width: 0;
+  margin-left: auto;
 }
 
 .mew-panel__header h2 {
@@ -974,32 +986,84 @@
   line-height: 1;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: pointer;
+  transition: border-color 120ms ease, background-color 120ms ease, color 120ms ease;
 }
 
 .mew-quick-facts__id > svg { flex: none; color: var(--mwp-red); }
+.mew-quick-facts__id:hover {
+  border-color: var(--mwp-ink);
+  background: var(--mwp-paper-3);
+  color: var(--mwp-ink);
+}
+.mew-quick-facts__id:focus-visible {
+  outline: 2px solid var(--mwp-red);
+  outline-offset: 2px;
+}
 
 .mew-detail {
+  --mew-detail-max: 82rem;
+  --mew-detail-rail: clamp(16.5rem, 19vw, 18.5rem);
   display: grid;
-  grid-template-columns: minmax(17.5rem, 21.25rem) minmax(0, 1fr);
+  grid-template-columns: var(--mew-detail-rail) minmax(0, 1fr);
   align-items: start;
-  gap: 1.125rem 1.625rem;
+  gap: 1rem clamp(1.25rem, 2vw, 2rem);
+  width: min(100%, var(--mew-detail-max));
+  margin-inline: auto;
   padding-top: 1.625rem;
   padding-bottom: 5.25rem;
 }
 
+.mew-detail[data-layout="entity"] {
+  --mew-detail-max: 88rem;
+  --mew-detail-rail: clamp(18rem, 21vw, 21rem);
+}
+
+.mew-detail[data-layout="showcase"] {
+  --mew-detail-max: 60rem;
+  --mew-detail-rail: clamp(18rem, 22vw, 21rem);
+}
+
+.mew-detail[data-layout="glossary"] {
+  --mew-detail-max: 60rem;
+  --mew-detail-rail: clamp(16.5rem, 19vw, 18rem);
+}
+
+.mew-detail[data-layout="collection"] { --mew-detail-max: 92rem; }
+.mew-detail[data-layout="atlas"] { --mew-detail-max: 94rem; }
+.mew-detail[data-layout="narrative"] {
+  --mew-detail-max: 88rem;
+  --mew-detail-rail: clamp(17rem, 19vw, 19rem);
+}
+
 .mew-detail__hero {
+  position: static;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8125rem;
+  text-align: center;
   grid-column: 1;
   grid-row: 1 / span 9;
 }
 
 .mew-detail__content { grid-column: 2; min-width: 0; }
+.mew-detail__map {
+  grid-column: 2;
+  min-width: 0;
+  max-width: 100%;
+}
 .mew-detail__sections {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(18.75rem, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: start;
-  gap: 1.25rem 1.125rem;
-  margin-top: 0.375rem;
+  gap: 1.375rem 1.125rem;
+  margin-top: 0.5rem;
 }
+
+.mew-detail__sections[data-flow="prose"] { grid-template-columns: minmax(0, 1fr); }
+.mew-detail[data-layout="showcase"] .mew-detail__sections,
+.mew-detail[data-layout="glossary"] .mew-detail__sections { grid-template-columns: minmax(0, 1fr); }
 
 .mew-detail__sections > .mew-panel--wide { grid-column: span 2; }
 .mew-detail__sections > .mew-panel--full { grid-column: 1 / -1; }
@@ -1016,7 +1080,7 @@
 .mew-button.mew-topbar__button--random { transform: rotate(1deg); }
 .mew-button.mew-topbar__button--random:hover { transform: rotate(-2deg) translateY(-1px); }
 
-@media (max-width: 1240px) {
+@media (max-width: 980px) {
   .mew-detail {
     display: flex;
     flex-direction: column;
@@ -1027,15 +1091,58 @@
 
   .mew-detail__hero,
   .mew-detail__content { width: 100%; }
-  .mew-detail__hero { order: 0; }
+  .mew-detail__hero {
+    order: 0;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    justify-items: start;
+    text-align: left;
+  }
+  .mew-detail__hero-copy { align-items: flex-start; }
+  .mew-detail__hero-copy > div:first-child { transform: none; }
+  .mew-detail__hero .mew-quick-facts { justify-content: flex-start; }
+  .mew-detail__hero-media {
+    grid-column: 3;
+    grid-row: 1;
+    align-self: stretch;
+    width: auto;
+    max-width: 17rem;
+    margin-top: 0;
+    border-top: 0;
+    border-left: 1.5px dashed var(--mwp-ink-line);
+    padding-top: 0;
+    padding-left: 1rem;
+  }
   .mew-detail__content { order: 1; }
+  .mew-detail__map {
+    order: 1;
+    width: auto;
+    align-self: stretch;
+  }
   .mew-detail__sections { margin-top: 0; }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 720px) {
   .mew-detail__sections { grid-template-columns: minmax(0, 1fr); }
   .mew-detail__sections > .mew-panel--wide,
   .mew-detail__sections > .mew-panel--full { grid-column: 1; }
+  .mew-detail__hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .mew-detail__hero-copy { align-items: center; }
+  .mew-detail__hero .mew-quick-facts { justify-content: center; }
+  .mew-detail__hero-media {
+    width: 100%;
+    max-width: none;
+    margin-top: 0.25rem;
+    border-top: 1.5px dashed var(--mwp-ink-line);
+    border-left: 0;
+    padding-top: 0.9375rem;
+    padding-left: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -137,7 +137,7 @@ export function EventView({ rec, onNav }: ViewProps) {
   const introVariants = Array.isArray(rec.introVariants) ? (rec.introVariants as { prompt: string; when?: string }[]) : []
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="narrative">
       <MewHero
         cat="events"
         rec={rec}
@@ -145,7 +145,7 @@ export function EventView({ rec, onNav }: ViewProps) {
         media={subjectPortrait ? <MewHeroMedia src={subjectPortrait} alt={rec.subject || rec.name} max={240} /> : undefined}
       />
       {introVariants.length === 0 && <MewDesc>{rec.prompt}</MewDesc>}
-      <MewSections>
+      <MewSections flow="prose">
         {introVariants.length > 0 && (
           <MewPanel title={t("event.intro.title")} icon="book" count={introVariants.length} span="full">
             <div className="flex flex-col gap-2.5">

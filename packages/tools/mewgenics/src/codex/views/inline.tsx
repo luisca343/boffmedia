@@ -4,7 +4,7 @@ import { Icon, type IconName } from "@boffmedia/ui"
 import { useToolT, MEWGENICS_NS } from "../../i18n"
 import { MewKind, MewRarity, MewText, MewTile } from "../../MewAtoms"
 import { select } from "../../mew-store"
-import { mewClip, mewHuman } from "../../mew-util"
+import { mewClip, mewHuman, mewTileFrame } from "../../mew-util"
 import { MewRef, type NavFn } from "../MewRefs"
 import { getTargetMode, abilityRange } from "./ability-format"
 
@@ -27,7 +27,7 @@ function InlineShell({ cat, id, rec, badges, facts, desc, onNav }: { cat: string
   return (
     <div className="border-t border-dashed border-[color:var(--mwp-ink-line)] pt-3 first:border-t-0 first:pt-0">
       <button type="button" onClick={() => onNav(cat, id)} className="group flex w-full items-center gap-2.5 text-left">
-        <MewTile cat={cat} rec={rec as never} size={42} />
+        <MewTile cat={cat} rec={rec as never} size={42} frame={mewTileFrame(cat)} />
         <span className="flex min-w-0 flex-1 flex-col gap-1">
           <span className="flex flex-wrap items-center gap-1.5">
             <span className="text-[0.875rem]/[1.15] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] group-hover:text-[color:var(--mwp-red-deep)]">{rec.name}</span>
@@ -89,7 +89,7 @@ export function MewItemInline({ id, onNav }: { id: string; onNav: NavFn }) {
   const passNames = it.passives ? Object.keys(it.passives).map((k) => (select.effect(k)?.rec.name ?? mewHuman(k))) : []
   const badges = (
     <>
-      {it.kind && <MewKind kind={it.kind} />}
+      {it.kind && <MewKind kind={it.kind} consumable={it.consumable} />}
       <MewRarity rarity={it.rarity} cursed={it.cursed} />
     </>
   )

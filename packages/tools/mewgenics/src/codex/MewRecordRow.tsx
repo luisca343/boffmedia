@@ -4,7 +4,7 @@ import * as React from "react"
 import { Icon } from "@boffmedia/ui"
 import { useToolT, MEWGENICS_NS } from "../i18n"
 import { MewTile } from "../MewAtoms"
-import { mewClip, mewHueFor, mewRarityAccent, type MewRec } from "../mew-util"
+import { mewClip, mewHueFor, mewRarityAccent, mewTileFrame, type MewRec } from "../mew-util"
 import { MewRecordMeta } from "./MewRecordMeta"
 
 export type MewListDensity = "compact" | "comfortable"
@@ -41,7 +41,7 @@ export function MewRecordRow({
       className="mew-reference-row mew-paper"
     >
       <span className="mew-reference-row__art" aria-hidden>
-        <MewTile cat={cat} rec={rec} size={density === "compact" ? 40 : 48} frame="slot" />
+        <MewTile cat={cat} rec={rec} size={density === "compact" ? 40 : 48} frame={mewTileFrame(cat)} />
       </span>
       <span className="mew-reference-row__main">
         <span className="mew-reference-row__title-line">

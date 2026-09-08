@@ -4,7 +4,7 @@ import * as React from "react"
 import { useToolT, MEWGENICS_NS } from "./i18n"
 import { cn } from '@boffmedia/ui'
 import { Icon, type IconName } from "@boffmedia/ui"
-import { MEW, MEW_KIND_LABEL, MEW_TOKEN_ICON, mewClassColor, mewFactionLabel, mewHueFor, mewHuman, mewIsRawKey, mewMonogram, mewParseText, mewRarityAccent, mewRarityLabel, mewStatNameLabel, mewStatusColor, mewTokenLabelI18n, type MewRec } from "./mew-util"
+import { MEW, MEW_KIND_LABEL, MEW_TOKEN_ICON, mewClassColor, mewFactionLabel, mewHueFor, mewHuman, mewIsRawKey, mewKindIconSrc, mewMonogram, mewParseText, mewRarityAccent, mewRarityLabel, mewStatNameLabel, mewStatusColor, mewTokenLabelI18n, type MewRec } from "./mew-util"
 import { mewArtSrc, mewTokenSrc, mewUiSrc, mewCursor, mewFurnitureArt } from "./mew-art"
 import { select } from "./mew-store"
 
@@ -48,7 +48,7 @@ export function MewText({ children, muted, className }: { children?: React.React
   )
 }
 
-export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artProp }: { cat: string; rec: MewRec; size?: number; glyph?: IconName; frame?: "blob" | "slot"; art?: string | null }) {
+export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artProp }: { cat: string; rec: MewRec; size?: number; glyph?: IconName; frame?: "blob" | "slot" | "none"; art?: string | null }) {
   const hue = mewHueFor(cat, rec)
   const rarityAccent = cat === "items" ? mewRarityAccent(rec.rarity, rec.cursed) : undefined
   // Classes and statuses ship ONE flat white glyph each (or one per kind), so
@@ -92,6 +92,7 @@ export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artPr
   // second Codex blob/slot around them; the generic frame remains useful for
   // categories whose art is a glyph or a fallback monogram.
   const slotSrc = frame === "slot" ? mewUiSrc("slots", "InventoryGridBGBox") : null
+  const bareTile = frame === "none"
   const nativeItemArt = cat === "items" && !!art
   const rarityFrame = nativeItemArt ? mewRarityAssetSrc(rec.rarity, rec.cursed) : undefined
   return (
@@ -101,8 +102,10 @@ export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artPr
       className={cn(
         nativeItemArt
           ? "mew-tile mew-tile--native relative grid flex-none place-items-center overflow-visible border-0 bg-transparent p-0 [border-radius:0]"
+          : bareTile
+          ? "mew-tile mew-tile--bare relative grid flex-none place-items-center overflow-visible border-0 bg-transparent p-0 [border-radius:0]"
           : "mew-tile mew-tile--framed relative grid flex-none place-items-center overflow-hidden border-2 border-solid",
-        !nativeItemArt && (slotSrc
+        !nativeItemArt && !bareTile && (slotSrc
           ? "mew-tile--slot"
           : "mew-tile--blob"),
       )}>
@@ -221,12 +224,18 @@ export function MewFaction({ faction }: { faction: string }) {
   )
 }
 
-export function MewKind({ kind }: { kind: string }) {
+export function MewKindIcon({ kind, consumable, className }: { kind: string; consumable?: boolean; className?: string }) {
+  const src = mewKindIconSrc(kind, consumable)
+  return src ? <img src={src} alt="" aria-hidden className={cn("mew-kind-icon", className)} /> : null
+}
+
+export function MewKind({ kind, consumable }: { kind: string; consumable?: boolean }) {
   const t = useToolT(MEWGENICS_NS)
-  const kindLabel = MEW_KIND_LABEL[kind] ? t(`data.kind.${kind}`) : mewHuman(kind)
+  const normalizedKind = kind.toLowerCase()
+  const kindLabel = MEW_KIND_LABEL[normalizedKind] ? t(`data.kind.${normalizedKind}`) : mewHuman(kind)
   return (
     <span className="mew-tag">
-      <Icon name="bookmark" size={11} className="text-[color:var(--mwp-ink-soft)]" />
+      <MewKindIcon kind={normalizedKind} consumable={consumable} />
       {kindLabel}
     </span>
   )
@@ -319,7 +328,7 @@ export function MewPanel({ title, icon, count, aside, children, className, span 
   return (
     <section className={cn("mew-panel mew-paper", spanClass, className)}>
       {hasHeader && (
-        <div className="mew-panel__header mew-paper">
+        <div className={cn("mew-panel__header mew-paper", aside != null && "mew-panel__header--with-aside")}>
           {icon && (
             <span className="mew-panel__icon">
               <Icon name={icon} size={14} />
@@ -327,7 +336,7 @@ export function MewPanel({ title, icon, count, aside, children, className, span 
           )}
           {title && <h2>{title}</h2>}
           {count != null && <span className="mew-panel__count">{count}</span>}
-          {aside && <span className="flex-1">{aside}</span>}
+          {aside && <span className="mew-panel__aside">{aside}</span>}
         </div>
       )}
       <div className={cn("mew-panel__body", !hasHeader && "mew-panel__body--bare")}>{children}</div>
@@ -419,7 +428,7 @@ export function MewMapBand({ src, alt, onOpenLightbox }: { src: string; alt: str
   return (
     // Sits in the content column, not 1/-1: the fiche hero spans 9 grid rows,
     // so a full-width child gets pushed below it and off the first screen.
-    <div className="mb-3 [grid-column:2] max-[1240px]:[grid-column:auto]">
+    <div className="mew-detail__map mb-3">
       <div className="relative w-full">
         <div
           ref={containerRef}

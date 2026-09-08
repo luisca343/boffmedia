@@ -22,7 +22,7 @@ export function KeywordView({ rec, onNav }: ViewProps) {
   const { list: appliedBy, more: appliedByMore } = mewTruncate(appliedByAll, 12)
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="glossary">
       <MewHero cat="keywords" rec={rec} badges={<MewFlag icon="flame" tone="warn">{t("label.statusBadge")}</MewFlag>} />
       <MewSections>
         {blocks.length ? (
@@ -35,7 +35,7 @@ export function KeywordView({ rec, onNav }: ViewProps) {
           </MewPanel>
         )}
         {appliedBy.length > 0 && (
-          <MewPanel title={t("panel.usedBy")} icon="bolt" span="full">
+          <MewPanel title={t("panel.usedBy")} icon="bolt">
             <div className="flex flex-wrap gap-1.5">
               <MewRefList ids={appliedBy.map((a) => a.id)} cat="abilities" icon="bolt" onNav={onNav} />
               {appliedByMore > 0 && <MewMoreTag n={appliedByMore} />}

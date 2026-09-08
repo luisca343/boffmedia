@@ -56,7 +56,7 @@ export function MapView({ rec, onNav }: ViewProps) {
 
   return (
     <>
-      <MewDetail id={rec.id}>
+      <MewDetail id={rec.id} layout="atlas">
         {mapArt?.graphic && (
           <MewMapBand
             src={mapArt.graphic}

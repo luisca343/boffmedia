@@ -20,7 +20,7 @@ export function CharacterView({ rec, onNav }: ViewProps) {
   const portraitSrc = React.useMemo(() => mewPortraitSrc(rec.id), [rec.id])
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="entity">
       <MewHero
         cat="characters"
         rec={rec}

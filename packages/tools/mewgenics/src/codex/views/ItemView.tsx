@@ -39,14 +39,24 @@ export function ItemView({ rec, onNav }: ViewProps) {
   const passN = rec.passives ? Object.keys(rec.passives).length : 0
 
   return (
-    <MewDetail id={rec.id}>
-      <MewHero cat="items" rec={rec} badges={<>{rec.kind && <MewKind kind={rec.kind} />}<MewRarity rarity={rec.rarity} cursed={rec.cursed} /></>} />
+    <MewDetail id={rec.id} layout="mechanic">
+      <MewHero cat="items" rec={rec} badges={<>{rec.kind && <MewKind kind={rec.kind} consumable={rec.consumable} />}<MewRarity rarity={rec.rarity} cursed={rec.cursed} /></>} />
       <MewDesc>{rec.desc}</MewDesc>
       {flags.length > 0 && <MewFlags>{flags}</MewFlags>}
       <MewSections>
         {statRows.length > 0 && (
           <MewPanel title={t("panel.mods")} icon="sliders"><MewFacts rows={statRows} /></MewPanel>
         )}
+        <MewPanel title={t("panel.data")} icon="database">
+          <MewFacts
+            rows={rows([
+              { label: t("label.type"), value: rec.kind ? <MewKind kind={rec.kind} consumable={rec.consumable} /> : "—" },
+              { label: t("label.rarity"), value: rec.rarity || rec.cursed ? <MewRarity rarity={rec.rarity} cursed={rec.cursed} /> : "—" },
+              rec.shield != null && { label: t("label.shield"), value: rec.shield },
+              rec.durability != null && { label: t("label.durability"), value: rec.durability },
+            ])}
+          />
+        </MewPanel>
         {passN > 0 && (
           <MewPanel title={t("panel.passivesGranted")} icon="shield" count={passN}>
             <MewEffects map={rec.passives} onNav={onNav} />
@@ -61,7 +71,7 @@ export function ItemView({ rec, onNav }: ViewProps) {
           </MewPanel>
         )}
         {(poolRecs.length > 0 || shopRecs.length > 0) && (
-          <MewPanel title={t("panel.whereToGet")} icon="map" span="full">
+          <MewPanel title={t("panel.whereToGet")} icon="map">
             <div className="flex flex-col gap-3.5 text-[0.8125rem]">
               <p className="m-0 text-[0.71875rem]/[1.4] italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)]">{t("source.hint")}</p>
               {poolRecs.length > 0 && (
@@ -106,18 +116,8 @@ export function ItemView({ rec, onNav }: ViewProps) {
             </div>
           </MewPanel>
         )}
-        <MewPanel title={t("panel.data")} icon="database">
-          <MewFacts
-            rows={rows([
-              { label: t("label.type"), value: rec.kind ? <MewKind kind={rec.kind} /> : "—" },
-              { label: t("label.rarity"), value: rec.rarity || rec.cursed ? <MewRarity rarity={rec.rarity} cursed={rec.cursed} /> : "—" },
-              rec.shield != null && { label: t("label.shield"), value: rec.shield },
-              rec.durability != null && { label: t("label.durability"), value: rec.durability },
-            ])}
-          />
-        </MewPanel>
         {sets.length > 0 && (
-          <MewPanel title={t("panel.sets")} icon="layers" count={sets.length} span="full">
+          <MewPanel title={t("panel.sets")} icon="layers" count={sets.length}>
             <div className="flex flex-col gap-4">
               {sets.map((s) => {
                 const set = select.set(s)
@@ -162,7 +162,7 @@ export function ItemView({ rec, onNav }: ViewProps) {
           </MewPanel>
         )}
         {users.length > 0 && (
-          <MewPanel title={t("panel.carriers")} icon="paw" count={usersAll.length} span="full">
+          <MewPanel title={t("panel.carriers")} icon="paw" count={usersAll.length}>
             <div className="flex flex-wrap gap-1.5">
               <MewRefList ids={users.map((u) => u.id)} cat="characters" icon="paw" onNav={onNav} />
               {usersMore > 0 && <MewMoreTag n={usersMore} />}

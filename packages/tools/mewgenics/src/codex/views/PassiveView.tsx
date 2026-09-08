@@ -16,7 +16,7 @@ export function PassiveView({ rec, onNav }: ViewProps) {
   const { list: grantedBy, more: grantedByMore } = mewTruncate(grantedByData.recs, 12)
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="mechanic">
       <MewHero cat="passives" rec={rec} badges={rec.cls ? <MewRef id={rec.cls} cat="classes" icon="star" onNav={onNav} label={mewHuman(rec.cls)} /> : undefined} />
       <MewDesc>{rec.desc}</MewDesc>
       <MewSections>
@@ -39,7 +39,7 @@ export function PassiveView({ rec, onNav }: ViewProps) {
           </MewPanel>
         )}
         {grantedBy.length > 0 && (
-          <MewPanel title={t("panel.passivesGranted")} icon="shield" span="full">
+          <MewPanel title={t("panel.passivesGranted")} icon="shield">
             <MewSubLabel>{mewHuman(grantedByData.kind)}</MewSubLabel>
             <div className="flex flex-wrap gap-1.5">
               <MewRefList ids={grantedBy.map((a) => a.id)} cat={grantedByData.kind as any} icon="shield" onNav={onNav} />

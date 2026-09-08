@@ -27,7 +27,7 @@ export function AbilityView({ rec, onNav }: ViewProps) {
   const effN = dmg.effects ? Object.keys(dmg.effects).length : 0
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="mechanic">
       <MewHero
         cat="abilities"
         rec={rec}
@@ -99,7 +99,7 @@ export function AbilityView({ rec, onNav }: ViewProps) {
           </MewPanel>
         )}
         {(usedByChars.length > 0 || usedByClasses.length > 0) && (
-          <MewPanel title={t("panel.usedBy")} icon="paw" span="full">
+          <MewPanel title={t("panel.usedBy")} icon="paw">
             {usedByClasses.length > 0 && (
               <>
                 <MewSubLabel>{t("label.classes")}</MewSubLabel>

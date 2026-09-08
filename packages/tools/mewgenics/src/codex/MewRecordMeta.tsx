@@ -22,7 +22,7 @@ export function MewRecordMeta({ cat, rec }: { cat: string; rec: MewRec }) {
   if (cat === "items") {
     return (
       <>
-        {rec.kind && <MewKind kind={rec.kind} />}
+        {rec.kind && <MewKind kind={rec.kind} consumable={rec.consumable} />}
         <MewRarity rarity={rec.rarity} cursed={rec.cursed} />
       </>
     )

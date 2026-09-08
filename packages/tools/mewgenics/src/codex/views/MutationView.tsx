@@ -40,7 +40,7 @@ export function MutationView({ rec, onNav }: ViewProps) {
   }, [rec.name, rec.body_part, rec.num, t])
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="glossary">
       <MewHero cat="mutations" rec={rec} title={displayName} />
       <MewDesc>{rec.desc}</MewDesc>
       <MewSections>

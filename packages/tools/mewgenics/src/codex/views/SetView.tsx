@@ -28,7 +28,7 @@ function MewSetPiece({ item, onNav }: { item: MewRec; onNav: (cat: string, id: s
       <MewTile cat="items" rec={item} size={72} frame="slot" />
       <span className="text-[0.75rem]/[1.2] font-semibold max-w-[5.625rem] text-[color:var(--mwp-ink)]">{item.name}</span>
       <div className="flex gap-1 flex-wrap justify-center">
-        {item.kind && <MewKind kind={item.kind} />}
+        {item.kind && <MewKind kind={item.kind} consumable={item.consumable} />}
         <MewRarity rarity={item.rarity} cursed={item.cursed} />
       </div>
     </button>
@@ -47,7 +47,7 @@ export function SetView({ rec, onNav }: ViewProps) {
   const piecesLabel = rec.pieces_required != null ? t("pop.setPieces", { n: rec.pieces_required }) : null
 
   return (
-    <MewDetail id={rec.id}>
+    <MewDetail id={rec.id} layout="collection">
       <MewHero cat="sets" rec={rec} />
       <MewDesc>{rec.desc}</MewDesc>
       <MewSections>
