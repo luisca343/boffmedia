@@ -61,7 +61,9 @@ export class MhWildsService {
   }
 
   static getCharms(locale?: string): Promise<ApiResponse<Charm[]>> {
-    return get<Charm[]>("/tools/mhwilds/charms", { locale });
+    // The raw charms endpoint returns grouped charm tables. The planner needs
+    // the flattened, named ranks (name, description, rarity and skills).
+    return get<Charm[]>("/tools/mhwilds/charms/ranks", { locale });
   }
 
   static getDecorations(locale?: string): Promise<ApiResponse<Decoration[]>> {

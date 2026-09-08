@@ -1,4 +1,87 @@
 import { ArmorPiece, EquipmentType, Weapon } from "../../types";
+import { assetUrl, hasToolHost } from "@boffmedia/tool-kit";
+
+const MHWILDS_ICON_PATH = "/boffmedia/img/games/mhwilds";
+
+function mhWildsAsset(fileName: string): string {
+  const rooted = `${MHWILDS_ICON_PATH}/${fileName}`;
+  return hasToolHost() ? assetUrl(rooted) : rooted;
+}
+
+function clampIconIndex(value: number | undefined, max: number): number {
+  return Math.max(1, Math.min(max, value || 1));
+}
+
+export const getDecorationImagePath = (slot?: number): string =>
+  mhWildsAsset(`decoration-${clampIconIndex(slot, 3)}.png`);
+
+export type DecorationSlotKind = "weapon" | "armor";
+
+export const getDecorationSlotImagePath = (
+  slot?: number,
+  kind: DecorationSlotKind = "armor",
+): string => mhWildsAsset(`decoration-slot-${kind}-${clampIconIndex(slot, 3)}.png`);
+
+// Wilds decoration colors belong to the decoration icon family, not to the
+// decoration rarity. The API exposes the game's color name and color id; keep
+// both as inputs so a stale/localized payload can still resolve by id.
+const DECORATION_COLOR_BY_ID: Record<number, string> = {
+  1: "white",
+  2: "gray",
+  3: "rose",
+  4: "pink",
+  5: "red",
+  6: "vermilion",
+  7: "orange",
+  8: "brown",
+  9: "ivory",
+  10: "yellow",
+  11: "lemon",
+  12: "sage-green",
+  13: "moss-green",
+  14: "green",
+  15: "emerald",
+  16: "sky",
+  17: "blue",
+  18: "ultramarine",
+  19: "blue-purple",
+  20: "purple",
+  21: "dark-purple",
+};
+
+const DECORATION_COLOR_FILTERS: Record<string, string> = {
+  white: "grayscale(1) brightness(1.35)",
+  gray: "grayscale(1) brightness(0.72)",
+  rose: "grayscale(1) sepia(1) hue-rotate(300deg) saturate(4)",
+  pink: "grayscale(1) sepia(1) hue-rotate(320deg) saturate(5)",
+  red: "grayscale(1) sepia(1) hue-rotate(345deg) saturate(6)",
+  vermilion: "grayscale(1) sepia(1) hue-rotate(5deg) saturate(6)",
+  orange: "grayscale(1) sepia(1) hue-rotate(20deg) saturate(6)",
+  brown: "grayscale(1) sepia(1) hue-rotate(35deg) saturate(3.5)",
+  ivory: "grayscale(1) sepia(0.65) hue-rotate(45deg) saturate(2.2) brightness(1.15)",
+  yellow: "grayscale(1) sepia(1) hue-rotate(55deg) saturate(6)",
+  lemon: "grayscale(1) sepia(1) hue-rotate(68deg) saturate(5)",
+  "sage-green": "grayscale(1) sepia(1) hue-rotate(82deg) saturate(4)",
+  "moss-green": "grayscale(1) sepia(1) hue-rotate(102deg) saturate(4)",
+  green: "grayscale(1) sepia(1) hue-rotate(122deg) saturate(5)",
+  emerald: "grayscale(1) sepia(1) hue-rotate(145deg) saturate(5)",
+  sky: "grayscale(1) sepia(1) hue-rotate(175deg) saturate(5)",
+  blue: "grayscale(1) sepia(1) hue-rotate(198deg) saturate(5)",
+  ultramarine: "grayscale(1) sepia(1) hue-rotate(220deg) saturate(6)",
+  "blue-purple": "grayscale(1) sepia(1) hue-rotate(242deg) saturate(5)",
+  purple: "grayscale(1) sepia(1) hue-rotate(265deg) saturate(5)",
+  "dark-purple": "grayscale(1) sepia(1) hue-rotate(285deg) saturate(5)",
+};
+
+export const getDecorationColorFilterStyle = (color?: string, colorId?: number): string => {
+  const normalized = color?.trim().toLowerCase();
+  const resolved = (normalized && DECORATION_COLOR_FILTERS[normalized] ? normalized : undefined)
+    || (colorId != null ? DECORATION_COLOR_BY_ID[colorId] : undefined);
+  return resolved ? DECORATION_COLOR_FILTERS[resolved] || "" : "";
+};
+
+export const getCharmImagePath = (rarity?: number): string =>
+  mhWildsAsset(`talisman-${clampIconIndex(rarity, 8)}.png`);
 
 export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
   const typeNames: Record<EquipmentType, string> = {
@@ -204,6 +287,7 @@ export const getWeaponTypeIcon = (weaponType: string): string => {
     'great-sword': 'great-sword',
     'long-sword': 'long-sword',
     'sword-shield': 'sword-shield',
+    'sword-and-shield': 'sword-shield',
     'dual-blades': 'dual-blades',
     'hammer': 'hammer',
     'hunting-horn': 'hunting-horn',
@@ -220,7 +304,7 @@ export const getWeaponTypeIcon = (weaponType: string): string => {
 
 
   // Default to a generic weapon icon if not found
-  return `/boffmedia/tools/mhwilds/${iconMap[normalizedType] || 'great-sword'}.webp`;
+  return mhWildsAsset(`${iconMap[normalizedType] || 'great-sword'}.webp`);
 };
 
 export const getArmorImagePath = (armorType: EquipmentType): string => {
@@ -236,5 +320,5 @@ export const getArmorImagePath = (armorType: EquipmentType): string => {
   };
 
   // Return the path to the image
-  return `/boffmedia/tools/mhwilds/${imageMap[armorType] || 'helmet'}.webp`;
+  return mhWildsAsset(`${imageMap[armorType] || 'helmet'}.webp`);
 };

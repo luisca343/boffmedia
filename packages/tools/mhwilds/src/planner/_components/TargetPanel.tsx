@@ -6,7 +6,7 @@ import { Button, Icon } from "@boffmedia/ui"
 import { MhMonster, Weapon } from "../../types"
 import { MhPanel, MhLabel } from "../../ui/mh-kit"
 import { elementColor, weaponAttack } from "../../ui/mh-helpers"
-import { getAllWeaponElements } from "./equipment-utils"
+import { getAllWeaponElements, getRarityFilterStyle, getWeaponTypeIcon } from "./equipment-utils"
 
 export function TargetPanel({
   target,
@@ -123,7 +123,16 @@ export function TargetPanel({
           {suggestions.map(({ w, el, level }) => (
             <div key={w.id} className="flex items-center gap-2.5 border border-line bg-base-2 px-2.5 py-2">
               <span className="grid h-7 w-7 flex-none place-items-center border border-line bg-panel">
-                <Icon name="sword" size={14} className="text-txt-muted" />
+                <img
+                  src={getWeaponTypeIcon(w.kind || w.type || "great-sword")}
+                  alt=""
+                  aria-hidden="true"
+                  width={24}
+                  height={24}
+                  draggable={false}
+                  className="h-6 w-6 object-contain"
+                  style={{ filter: getRarityFilterStyle(w.rarity) }}
+                />
               </span>
               <span className="grid min-w-0 flex-1 gap-0.5">
                 <span className="truncate font-display text-[0.8125rem] leading-tight font-bold uppercase not-italic">{w.name}</span>

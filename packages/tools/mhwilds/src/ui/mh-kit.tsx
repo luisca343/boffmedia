@@ -148,6 +148,7 @@ export function MhRarity({ rarity, long }: { rarity?: number; long?: boolean }) 
   )
 }
 
+
 // ── element / status chip ─────────────────────────────────────────────────────
 export function MhElement({ type, value, hidden, label }: { type: string; value: number; hidden?: boolean; label: string }) {
   const t = useToolT("tools.mhwilds.ui")
@@ -261,17 +262,41 @@ export function MhCatLegend({ labels }: { labels: Record<string, string> }) {
 
 // ── equipment slot (loadout) ─────────────────────────────────────────────────
 export function MhSlot({
-  icon, kind, name, rarity, filled, active, onOpen,
-}: { icon: IconName; kind: string; name: string; rarity?: number; filled: boolean; active: boolean; onOpen: () => void }) {
+  icon, imageSrc, imageAlt, imageFilter, kind, name, rarity, filled, active, onOpen,
+}: {
+  icon: IconName
+  imageSrc?: string
+  imageAlt?: string
+  imageFilter?: string
+  kind: string
+  name: string
+  rarity?: number
+  filled: boolean
+  active: boolean
+  onOpen: () => void
+}) {
   return (
     <button
       type="button"
       onClick={onOpen}
-      className={`group relative grid grid-cols-[2.75rem_1fr_auto] items-center gap-3 w-full text-left py-[0.6875rem] px-[0.8125rem] bg-panel border cursor-pointer transition-colors hover:bg-panel-2 ${active ? "border-[var(--mh)] shadow-[0_0_0_1px_var(--mh)]" : "border-line hover:border-line-2"}`}
+      className={`group relative grid min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-3 w-full text-left py-[0.6875rem] px-[0.8125rem] bg-panel border cursor-pointer transition-colors hover:bg-panel-2 ${active ? "border-[var(--mh)] shadow-[0_0_0_1px_var(--mh)]" : "border-line hover:border-line-2"}`}
     >
       <span className={`absolute left-0 top-0 bottom-0 w-[3px] bg-[var(--mh)] transition-opacity ${filled ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
       <span className={`w-11 h-11 grid place-items-center flex-none border ${filled ? "text-[var(--mh-bright)] border-[var(--mh-line)] bg-[var(--mh-soft)]" : "text-txt-dim border-line bg-panel-2"}`}>
-        <Icon name={icon} size={20} />
+        {imageSrc ? (
+          <img
+            src={imageSrc}
+            alt={imageAlt || ""}
+            aria-hidden={!imageAlt}
+            width={40}
+            height={40}
+            draggable={false}
+            className={`h-10 w-10 object-contain ${filled ? "" : "opacity-30"}`}
+            style={imageFilter ? { filter: imageFilter } : undefined}
+          />
+        ) : (
+          <Icon name={icon} size={20} />
+        )}
       </span>
       <span className="min-w-0 flex flex-col gap-0.5">
         <span className="font-mono text-[0.625rem] leading-none uppercase tracking-[0.08em] text-txt-dim">{kind}</span>
@@ -287,39 +312,73 @@ export function MhSlot({
 
 // ── decoration socket ────────────────────────────────────────────────────────
 export function MhDecoSocket({
-  size, decoName, decoSlot, onOpen, onClear,
-}: { size: number; decoName?: string | null; decoSlot?: number; onOpen: () => void; onClear?: () => void }) {
+  size, decoName, decoSlot, slotImageSrc, decoImageSrc, decoImageFilter, onOpen, onClear,
+}: { size: number; decoName?: string | null; decoSlot?: number; slotImageSrc: string; decoImageSrc?: string; decoImageFilter?: string; onOpen: () => void; onClear?: () => void }) {
   const t = useToolT("tools.mhwilds.ui")
   const filled = !!decoName
+  const partial = filled && decoSlot != null && decoSlot < size
   return (
-    <div className={`grid grid-cols-[1.375rem_1fr_auto] items-center gap-[0.5625rem] w-full py-[0.4375rem] px-2.5 bg-base-2 border border-line border-l-2 transition-colors hover:bg-panel ${filled ? "border-l-[var(--mh)]" : "border-l-line-2 hover:border-l-[var(--mh)]"}`}>
-      <button type="button" onClick={onOpen} aria-label={t("slotLevel", { size })} className="w-[1.375rem] h-[1.375rem] grid place-items-center flex-none font-mono text-[0.6875rem] leading-none font-bold text-[var(--mh-bright)] border border-[var(--mh-line)] rotate-45">
-        <span className="-rotate-45">{filled ? decoSlot : size}</span>
+    <div className={`grid grid-cols-[1.375rem_1fr_auto] items-center gap-[0.5625rem] w-full py-[0.4375rem] px-2.5 bg-base-2 border border-line border-l-2 transition-colors hover:bg-panel ${partial ? "border-l-warn" : filled ? "border-l-[var(--mh)]" : "border-l-line-2 hover:border-l-[var(--mh)]"}`}>
+      <button type="button" onClick={onOpen} aria-label={t("slotLevel", { size })} className="w-[1.375rem] h-[1.375rem] grid place-items-center flex-none font-mono text-[0.6875rem] leading-none font-bold text-[var(--mh-bright)]">
+        {filled && decoImageSrc ? (
+          <img
+            src={decoImageSrc}
+            alt=""
+            aria-hidden="true"
+            width={20}
+            height={20}
+            draggable={false}
+            className="block h-5 w-5 object-contain"
+            style={decoImageFilter ? { filter: decoImageFilter } : undefined}
+          />
+        ) : (
+          <img
+            src={slotImageSrc}
+            alt=""
+            aria-hidden="true"
+            width={22}
+            height={22}
+            draggable={false}
+            className="block h-[1.375rem] w-[1.375rem] object-contain"
+          />
+        )}
       </button>
       <button type="button" onClick={onOpen} className="min-w-0 flex-1 text-left bg-transparent border-0 p-0 cursor-pointer">
         <span className={`block font-body text-[0.75rem] leading-tight truncate ${filled ? "text-txt" : "text-txt-dim italic"}`}>
           {filled ? decoName : t("emptySlot", { size })}
         </span>
       </button>
-      {filled && onClear && (
-        <button type="button" onClick={onClear} aria-label={t("removeJewel")} className="text-txt-dim grid place-items-center hover:text-bad">
-          <Icon name="x" size={13} />
-        </button>
+      {filled && (
+        <span className="flex items-center gap-1.5">
+          {partial && <span className="font-mono text-[0.5625rem] leading-none font-bold text-warn">{decoSlot}/{size}</span>}
+          {onClear && (
+            <button type="button" onClick={onClear} aria-label={t("removeJewel")} className="text-txt-dim grid place-items-center hover:text-bad">
+              <Icon name="x" size={13} />
+            </button>
+          )}
+        </span>
       )}
     </div>
   )
 }
 
 // slot pips (weapon/armor decoration slots)
-export function MhSlotPips({ slots }: { slots?: number[] }) {
+export function MhSlotPips({ slots, imagePath }: { slots?: number[]; imagePath?: (slot: number) => string }) {
   const active = (slots || []).filter((s) => s > 0)
-  if (!active.length) return null
+  if (!active.length || !imagePath) return null
   return (
-    <span className="inline-flex gap-[3px] mt-1">
+    <span className="flex items-center justify-end gap-1">
       {active.map((s, i) => (
-        <span key={i} className="w-3.5 h-3.5 inline-grid place-items-center font-mono text-[0.5rem] leading-none font-bold text-[var(--mh-bright)] border border-[var(--mh-line)] rotate-45">
-          <span className="-rotate-45">{s}</span>
-        </span>
+        <img
+          key={i}
+          src={imagePath(s)}
+          alt=""
+          aria-hidden="true"
+          width={22}
+          height={22}
+          draggable={false}
+          className="h-[1.375rem] w-[1.375rem] object-contain"
+        />
       ))}
     </span>
   )
@@ -360,8 +419,8 @@ export interface MhEquipItemData {
   slots?: number[]
 }
 export function MhEquipItem({
-  item, kind, active, onPick,
-}: { item: MhEquipItemData; kind: "weapon" | "armor" | "charm"; active?: boolean; onPick: () => void }) {
+  item, kind, active, onPick, slotImagePath,
+}: { item: MhEquipItemData; kind: "weapon" | "armor" | "charm"; active?: boolean; onPick: () => void; slotImagePath?: (slot: number) => string }) {
   const t = useToolT("tools.mhwilds.ui")
   const skills = (item.skills || []).map((s) => `${s.name} ${s.level}`)
   const stat =
@@ -387,9 +446,9 @@ export function MhEquipItem({
           </span>
         )}
       </span>
-      <span className="flex-none whitespace-nowrap text-right font-mono text-[0.75rem] leading-[1.4] font-semibold text-txt-muted">
-        {stat}
-        {item.slots && item.slots.some((x) => x > 0) && <MhSlotPips slots={item.slots} />}
+      <span className="flex min-w-[5rem] flex-none flex-col items-end gap-1 whitespace-nowrap text-right font-mono text-[0.75rem] leading-[1.4] font-semibold text-txt-muted">
+        <span>{stat}</span>
+        {item.slots && item.slots.some((x) => x > 0) && <MhSlotPips slots={item.slots} imagePath={slotImagePath} />}
       </span>
     </button>
   )

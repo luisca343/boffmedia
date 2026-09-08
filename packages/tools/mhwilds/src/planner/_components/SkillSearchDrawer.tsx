@@ -5,6 +5,7 @@ import { useToolT } from "../../i18n"
 import { Empty, Icon } from "@boffmedia/ui"
 import { ArmorPiece, Charm, Decoration, EquipmentType } from "../../types"
 import { MhDrawer, MhSearch, MhTag } from "../../ui/mh-kit"
+import { getArmorImagePath, getCharmImagePath, getDecorationColorFilterStyle, getDecorationImagePath, getRarityFilterStyle } from "./equipment-utils"
 
 export type SkillSource =
   | { kind: "armor"; slot: EquipmentType; item: ArmorPiece; level: number }
@@ -91,7 +92,29 @@ export function SkillSearchDrawer({
               .map((src, i) => (
                 <div key={i} className="flex items-center gap-2.5 border border-line bg-base-2 px-2.5 py-2">
                   <span className="grid h-7 w-7 flex-none place-items-center border border-line bg-panel">
-                    <Icon name={src.kind === "armor" ? "shield" : "sparkles"} size={13} className="text-txt-muted" />
+                    {src.kind === "armor" ? (
+                      <img
+                        src={getArmorImagePath(src.slot)}
+                        alt=""
+                        aria-hidden="true"
+                        width={24}
+                        height={24}
+                        draggable={false}
+                        className="h-6 w-6 object-contain"
+                        style={{ filter: getRarityFilterStyle(src.item.rarity) }}
+                      />
+                    ) : (
+                      <img
+                        src={src.kind === "charm" ? getCharmImagePath(src.item.rarity) : getDecorationImagePath(src.decoSlot)}
+                        alt=""
+                        aria-hidden="true"
+                        width={24}
+                        height={24}
+                        draggable={false}
+                        className="h-6 w-6 object-contain"
+                        style={src.kind === "charm" ? undefined : { filter: getDecorationColorFilterStyle(src.item.icon?.color, src.item.icon?.colorId) }}
+                      />
+                    )}
                   </span>
                   <span className="grid min-w-0 flex-1 gap-0.5">
                     <span className="truncate font-display text-[0.8125rem] leading-tight font-bold uppercase not-italic">{src.item.name}</span>

@@ -8,6 +8,7 @@ import {
   MhDrawer, MhItem, MhRarity, MhTag, MhSlotPips, MhTypeChip, MhSearch, MhLabel,
 } from "../../ui/mh-kit"
 import { WEAPON_TYPES, weaponAttack } from "../../ui/mh-helpers"
+import { getArmorImagePath, getCharmImagePath, getDecorationColorFilterStyle, getDecorationImagePath, getDecorationSlotImagePath, getRarityFilterStyle, getWeaponTypeIcon } from "./equipment-utils"
 import { getSavedBuilds, loadBuildFromLocalStorage, deleteBuildFromLocalStorage } from "../_utils/buildUtils"
 
 type Item = Weapon | ArmorPiece | Charm
@@ -40,7 +41,11 @@ export function EquipDrawer({
   const list = useMemo(() => {
     let out = [...items]
     const term = q.trim().toLowerCase()
-    if (term) out = out.filter((i) => i.name.toLowerCase().includes(term) || itemSkills(i).some((s) => s.toLowerCase().includes(term)))
+    if (term) out = out.filter((i) => {
+      const name = String(i.name || "").toLowerCase()
+      const description = String((i as Charm).description || "").toLowerCase()
+      return name.includes(term) || description.includes(term) || itemSkills(i).some((s) => s.toLowerCase().includes(term))
+    })
     if (rar !== "all") out = out.filter((i) => i.rarity === +rar)
     if (isWeaponSlot(slot) && type !== "all") out = out.filter((i) => (i as Weapon).kind === type)
     return out.sort((a, b) => a.rarity - b.rarity)
@@ -51,7 +56,8 @@ export function EquipDrawer({
 
   return (
     <MhDrawer
-      iconName={isWeaponSlot(slot) ? "sword" : slot === "charm" ? "sparkles" : "shield"}
+      icon={slot === "charm" ? <img src={getCharmImagePath()} alt="" aria-hidden="true" width={18} height={18} className="h-[18px] w-[18px] object-contain" /> : undefined}
+      iconName={isWeaponSlot(slot) ? "sword" : slot === "charm" ? undefined : "shield"}
       title={`${t("build_planner.select")} ${label.toLowerCase()}`}
       sub={t("build_planner.optionsCount", { count: list.length })}
       onClose={onClose}
@@ -86,16 +92,41 @@ export function EquipDrawer({
               ? <><b className="text-txt">{t("attack")} {weaponAttack(item as Weapon)}</b><br />{(item as Weapon).affinity >= 0 ? "+" : ""}{(item as Weapon).affinity}%</>
               : slot === "charm" ? <b className="text-txt">{t("rarity")} {item.rarity}</b>
               : <b className="text-txt">{t("def")} {(item as ArmorPiece).defense?.base}</b>
+            const imageSrc = isWeaponSlot(slot)
+              ? getWeaponTypeIcon((item as Weapon).kind || (item as Weapon).type || "great-sword")
+              : slot === "charm" ? getCharmImagePath(item.rarity) : getArmorImagePath(slot)
+            const imageFilter = slot === "charm" ? undefined : getRarityFilterStyle(item.rarity)
+            const description = slot === "charm" ? String((item as Charm).description || "") : ""
             return (
               <MhItem key={item.id} active={active} onPick={() => onPick(item)}>
-                <MhRarity rarity={item.rarity} />
+                <span className="inline-flex items-center gap-2 flex-none">
+                  <MhRarity rarity={item.rarity} />
+                  {imageSrc ? (
+                    <img
+                      src={imageSrc}
+                      alt=""
+                      aria-hidden="true"
+                      width={32}
+                      height={32}
+                      draggable={false}
+                      className="h-8 w-8 object-contain"
+                      style={imageFilter ? { filter: imageFilter } : undefined}
+                    />
+                  ) : null}
+                </span>
                 <span className="min-w-0">
                   <span className="block font-body text-[0.875rem] leading-tight truncate font-semibold">{item.name}</span>
                   {skills.length > 0 && <span className="flex flex-wrap gap-1 mt-[0.3125rem]">{skills.map((s) => <MhTag key={s} sk>{s}</MhTag>)}</span>}
+                  {description && <span className="mt-[0.3125rem] block truncate font-body text-[0.6875rem] leading-tight italic text-txt-muted">{description}</span>}
                 </span>
-                <span className="text-right font-mono text-[0.75rem] leading-[1.4] text-txt-muted flex-none whitespace-nowrap">
-                  {stat}
-                  {(item as any).slots?.some((x: number) => x > 0) && <MhSlotPips slots={(item as any).slots} />}
+                <span className="flex min-w-[5rem] flex-none flex-col items-end gap-1 text-right font-mono text-[0.75rem] leading-[1.4] text-txt-muted whitespace-nowrap">
+                  <span>{stat}</span>
+                  {(item as any).slots?.some((x: number) => x > 0) && (
+                    <MhSlotPips
+                      slots={(item as any).slots}
+                      imagePath={(level) => getDecorationSlotImagePath(level, isWeaponSlot(slot) ? "weapon" : "armor")}
+                    />
+                  )}
                 </span>
               </MhItem>
             )
@@ -126,7 +157,7 @@ export function DecoDrawer({
 
   return (
     <MhDrawer
-      iconName="puzzle"
+      icon={<img src={getDecorationSlotImagePath(size, isWeaponSlot(slot) ? "weapon" : "armor")} alt="" aria-hidden="true" width={20} height={20} className="h-5 w-5 object-contain" />}
       title={t("build_planner.deco_level", { size })}
       sub={t("build_planner.compatibleCount", { count: list.length })}
       onClose={onClose}
@@ -146,7 +177,18 @@ export function DecoDrawer({
             const skills = d.skills.map((s) => `${s.skill.name} +${s.level}`)
             return (
               <MhItem key={d.id} active={active} onPick={() => onPick(d)}>
-                <span className="w-9 h-9 grid place-items-center flex-none rotate-45 border border-[var(--mh-line)] text-[var(--mh-bright)]"><span className="-rotate-45 font-mono text-[0.8125rem] font-bold">{d.slot}</span></span>
+                <span className="w-9 h-9 grid place-items-center flex-none border border-[var(--mh-line)] bg-panel">
+                  <img
+                    src={getDecorationImagePath(d.slot)}
+                    alt=""
+                    aria-hidden="true"
+                    width={30}
+                    height={30}
+                    draggable={false}
+                    className="h-[30px] w-[30px] object-contain"
+                    style={{ filter: getDecorationColorFilterStyle(d.icon?.color, d.icon?.colorId) }}
+                  />
+                </span>
                 <span className="min-w-0">
                   <span className="block font-body text-[0.875rem] leading-tight truncate font-semibold">{d.name}</span>
                   <span className="flex flex-wrap gap-1 mt-[0.3125rem]">{skills.map((s) => <MhTag key={s} sk>{s}</MhTag>)}</span>

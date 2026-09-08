@@ -89,6 +89,11 @@ export interface DecorationSkill {
   id: number | string;
 }
 
+export interface DecorationIcon {
+  color?: string;
+  colorId?: number;
+}
+
 export interface Decoration {
   id: number | string;
   gameId?: number;
@@ -98,6 +103,7 @@ export interface Decoration {
   rarity: number;
   kind?: string;
   skills: DecorationSkill[];
+  icon?: DecorationIcon;
   value?: number;
 }
 
@@ -261,7 +267,7 @@ export interface CharmSkill {
   description: string;
   id: number;
 
-  name?: null;
+  name?: string | null;
 }
 
 export interface CharmMaterial {
