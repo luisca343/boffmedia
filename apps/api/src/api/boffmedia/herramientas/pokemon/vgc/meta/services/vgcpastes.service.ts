@@ -70,6 +70,151 @@ function parseCsv(raw: string): string[][] {
   return rows;
 }
 
+function normalizeHeader(value: string): string {
+  return value.trim().replace(/\s+/g, ' ').toLowerCase();
+}
+
+function findHeaderIndex(
+  headers: string[],
+  ...expectedNames: string[]
+): number {
+  const normalizedHeaders = headers.map(normalizeHeader);
+  const normalizedNames = expectedNames.map(normalizeHeader);
+  return normalizedHeaders.findIndex((header) =>
+    normalizedNames.includes(header),
+  );
+}
+
+function readCell(cols: string[], index: number): string | null {
+  if (index < 0) return null;
+  const value = cols[index]?.trim();
+  return value || null;
+}
+
+export interface VgcPastesCsvRow {
+  teamId: string;
+  /** Present only in the featured-teams sheet; deliberately not persisted. */
+  category: string | null;
+  teamDescription: string | null;
+  playerName: string | null;
+  pasteUrl: string | null;
+  hasEvs: string | null;
+  replicaStatus: string | null;
+  dateShared: string | null;
+  tournament: string | null;
+  rank: string | null;
+  sourceUrl: string | null;
+  owner: string | null;
+  species: string[];
+  items: string[];
+}
+
+/**
+ * Parses either the regular VGCPastes sheet or the featured-teams sheet.
+ *
+ * The featured sheet inserts Category near the start and calls Replica Status
+ * Rental Status. All other positions are therefore resolved from header names
+ * (or the numbered Pokemon-slot groups), rather than fixed column offsets.
+ */
+export function parseVgcPastesCsv(raw: string): VgcPastesCsvRow[] {
+  const rows = parseCsv(raw);
+  const headerRowIdx = rows.findIndex((cols) => {
+    const normalized = cols.map(normalizeHeader);
+    return (
+      normalized.includes('team id') &&
+      normalized.some((header) => header.includes('pokemon text for copypasta'))
+    );
+  });
+  if (headerRowIdx === -1) {
+    throw new NotFoundException(
+      'Could not find column-header row (needs "Team ID" + "Pokemon Text for Copypasta") in VGCPastes CSV',
+    );
+  }
+
+  const headers = rows[headerRowIdx];
+  const idxTeamId = findHeaderIndex(headers, 'Team ID');
+  const idxTeamDescription = findHeaderIndex(headers, 'Team Description');
+  const idxFullName = findHeaderIndex(headers, 'Full Name');
+  const idxPokepaste = findHeaderIndex(headers, 'Pokepaste');
+  const idxHasEvs = findHeaderIndex(headers, 'EVs');
+  const idxReplicaStatus = findHeaderIndex(
+    headers,
+    'Replica Status',
+    'Rental Status',
+  );
+  const idxCategory = findHeaderIndex(headers, 'Category');
+  const idxDate = findHeaderIndex(headers, 'Date Shared');
+  const idxTournament = findHeaderIndex(headers, 'Tournament / Event');
+  const idxRank = findHeaderIndex(headers, 'Rank');
+  const idxSourceUrl = findHeaderIndex(headers, 'Link to Source');
+  const idxOwner = findHeaderIndex(headers, 'Owner');
+  const idxPokeText = headers.findIndex((header) =>
+    normalizeHeader(header).includes('pokemon text for copypasta'),
+  );
+
+  const requiredColumns = [
+    ['Team ID', idxTeamId],
+    ['Team Description', idxTeamDescription],
+    ['Full Name', idxFullName],
+    ['Pokepaste', idxPokepaste],
+    ['EVs', idxHasEvs],
+    ['Date Shared', idxDate],
+    ['Tournament / Event', idxTournament],
+    ['Rank', idxRank],
+    ['Link to Source', idxSourceUrl],
+    ['Owner', idxOwner],
+    ['Pokemon Text for Copypasta', idxPokeText],
+  ];
+  const missingColumn = requiredColumns.find(([, index]) => index === -1);
+  if (missingColumn) {
+    throw new NotFoundException(
+      `VGCPastes CSV is missing required column "${missingColumn[0]}"`,
+    );
+  }
+
+  // The item cells stay at the same offsets from Pokepaste in both sheet
+  // variants; using the anchor column preserves the existing extraction while
+  // allowing Category to shift the whole layout by one column.
+  const itemCols = [-17, -14, -11, -8, -5, -2].map(
+    (offset) => idxPokepaste + offset,
+  );
+
+  return rows.slice(headerRowIdx + 1).flatMap((cols) => {
+    const teamId = readCell(cols, idxTeamId);
+    // Skip blank rows, repeated headers, and anything that cannot be a team ID.
+    if (!teamId || teamId.length > 16 || !/^[A-Za-z0-9]+$/.test(teamId)) {
+      return [];
+    }
+
+    const species = cols
+      .slice(idxPokeText, idxPokeText + 6)
+      .map((value) => value.trim())
+      .filter(Boolean);
+    const items = itemCols
+      .map((index) => readCell(cols, index))
+      .filter((value): value is string => value !== null);
+
+    return [
+      {
+        teamId,
+        category: readCell(cols, idxCategory),
+        teamDescription: readCell(cols, idxTeamDescription),
+        playerName: readCell(cols, idxFullName),
+        pasteUrl: readCell(cols, idxPokepaste),
+        hasEvs: readCell(cols, idxHasEvs),
+        replicaStatus: readCell(cols, idxReplicaStatus),
+        dateShared: readCell(cols, idxDate),
+        tournament: readCell(cols, idxTournament),
+        rank: readCell(cols, idxRank),
+        sourceUrl: readCell(cols, idxSourceUrl),
+        owner: readCell(cols, idxOwner),
+        species,
+        items,
+      },
+    ];
+  });
+}
+
 /** Serialize a StatSpread as "hp/atk/def/spa/spd/spe" for grouping/deduplication. */
 function formatSpread(s: StatSpread): string {
   return `${s.hp}/${s.atk}/${s.def}/${s.spa}/${s.spd}/${s.spe}`;
@@ -106,89 +251,31 @@ export class VgcPastesService {
         );
       }
 
-      const rows = parseCsv(await res.text());
-
-      // Find the real column-header row by parsed cell values, not raw line text.
-      // "Team ID" appears twice (first and last column); "Pokemon Text for Copypasta"
-      // uniquely identifies the header row alongside it.
-      const headerRowIdx = rows.findIndex(
-        (cols) =>
-          cols.includes('Team ID') &&
-          cols.some((h) => h.includes('Pokemon Text for Copypasta')),
-      );
-      if (headerRowIdx === -1) {
-        throw new NotFoundException(
-          'Could not find column-header row (needs "Team ID" + "Pokemon Text for Copypasta") in VGCPastes CSV',
-        );
-      }
-
-      const headers = rows[headerRowIdx];
-      const idxTeamId = headers.indexOf('Team ID'); // first occurrence = col 0
-      const idxTeamDesc = headers.indexOf('Team Description');
-      const idxFullName = headers.indexOf('Full Name');
-      const idxPokepaste = headers.indexOf('Pokepaste');
-      const idxHasEvs = headers.indexOf('EVs');
-      const idxReplicaStatus = headers.findIndex((h) => h === 'Replica Status');
-      const idxDate = headers.indexOf('Date Shared');
-      const idxTournament = headers.indexOf('Tournament / Event');
-      const idxRank = headers.indexOf('Rank');
-      const idxSourceUrl = headers.indexOf('Link to Source');
-      const idxOwner = headers.indexOf('Owner');
-      const idxPokeText = headers.findIndex((h) =>
-        h.includes('Pokemon Text for Copypasta'),
-      );
-      // Species are in the 6 columns starting AT idxPokeText (the header reads "Pokemon Text for
-      // Copypasta" but each data row stores the first Pokémon name there, not paste text).
-      const speciesStart = idxPokeText;
-
-      // The per-Pokémon item columns sit in the upper "sprite slot" groups.
-      // Each group has 3 sub-cols; the 3rd sub-col (index 2 within the group) is the held item.
-      // Groups start at col 5 and repeat every 3 cols → item cols: 7, 10, 13, 16, 19, 22.
-      // Relative to idxPokepaste (col 24): offsets are -17, -14, -11, -8, -5, -2.
-      const itemCols = [-17, -14, -11, -8, -5, -2].map(
-        (offset) => idxPokepaste + offset,
-      );
-
-      this.logger.debug(
-        `Header at row ${headerRowIdx}: Team ID @ col ${idxTeamId}, ` +
-          `PokeText @ col ${idxPokeText}, species @ cols ${speciesStart}–${speciesStart + 5}`,
-      );
-
+      const parsedRows = parseVgcPastesCsv(await res.text());
+      // Featured-sheet Category is source metadata only. The existing table
+      // has no category field, and keeping it out avoids a schema migration.
       const seenTeamIds = new Set<string>();
 
       let count = 0;
-      for (const cols of rows.slice(headerRowIdx + 1)) {
-        const teamId = cols[idxTeamId]?.trim();
-        // Skip blank rows, repeated headers, and anything that can't be a valid team ID
-        if (!teamId || teamId.length > 16 || !/^[A-Za-z0-9]+$/.test(teamId))
-          continue;
-
-        const species = cols
-          .slice(speciesStart, speciesStart + 6)
-          .map((s) => s.trim())
-          .filter((s) => s.length > 0);
-
-        const items = itemCols
-          .map((ci) => cols[ci]?.trim() ?? '')
-          .filter((s) => s.length > 0);
-
+      for (const row of parsedRows) {
+        if (seenTeamIds.has(row.teamId)) continue;
         await this.vgcPastesRepository.upsertTeam({
-          id: teamId,
-          playerName: cols[idxFullName]?.trim() || null,
-          teamDescription: cols[idxTeamDesc]?.trim() || null,
-          pasteUrl: cols[idxPokepaste]?.trim() || null,
-          hasEvs: cols[idxHasEvs]?.trim() || null,
-          replicaStatus: cols[idxReplicaStatus]?.trim() || null,
-          dateShared: cols[idxDate]?.trim() || null,
-          tournament: cols[idxTournament]?.trim() || null,
-          rank: cols[idxRank]?.trim() || null,
-          sourceUrl: cols[idxSourceUrl]?.trim() || null,
-          owner: cols[idxOwner]?.trim() || null,
+          id: row.teamId,
+          playerName: row.playerName,
+          teamDescription: row.teamDescription,
+          pasteUrl: row.pasteUrl,
+          hasEvs: row.hasEvs,
+          replicaStatus: row.replicaStatus,
+          dateShared: row.dateShared,
+          tournament: row.tournament,
+          rank: row.rank,
+          sourceUrl: row.sourceUrl,
+          owner: row.owner,
           regulationId,
-          species,
-          items,
+          species: row.species,
+          items: row.items,
         });
-        seenTeamIds.add(teamId);
+        seenTeamIds.add(row.teamId);
         count++;
       }
 
