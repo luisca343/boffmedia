@@ -165,7 +165,7 @@ export function MapView({ rec, onNav }: ViewProps) {
             type="button"
             onClick={() => setShowMapLightbox(false)}
             className="absolute top-2 right-2 grid h-8 w-8 place-items-center border-[1.5px] border-solid border-white/50 bg-white/10 text-white rounded-full hover:bg-white/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-0"
-            aria-label={t("common.closeLightbox") || "Close"}
+            aria-label={t("common.closeLightbox")}
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <line x1="18" y1="6" x2="6" y2="18" />

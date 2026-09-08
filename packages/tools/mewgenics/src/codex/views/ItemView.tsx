@@ -40,7 +40,7 @@ export function ItemView({ rec, onNav }: ViewProps) {
 
   return (
     <MewDetail id={rec.id}>
-      <MewHero cat="items" rec={rec} badges={<>{rec.kind && <MewKind kind={rec.kind} />}{rec.rarity && <MewRarity rarity={rec.rarity} />}</>} />
+      <MewHero cat="items" rec={rec} badges={<>{rec.kind && <MewKind kind={rec.kind} />}<MewRarity rarity={rec.rarity} cursed={rec.cursed} /></>} />
       <MewDesc>{rec.desc}</MewDesc>
       {flags.length > 0 && <MewFlags>{flags}</MewFlags>}
       <MewSections>
@@ -110,7 +110,7 @@ export function ItemView({ rec, onNav }: ViewProps) {
           <MewFacts
             rows={rows([
               { label: t("label.type"), value: rec.kind ? <MewKind kind={rec.kind} /> : "—" },
-              { label: t("label.rarity"), value: rec.rarity ? <MewRarity rarity={rec.rarity} /> : "—" },
+              { label: t("label.rarity"), value: rec.rarity || rec.cursed ? <MewRarity rarity={rec.rarity} cursed={rec.cursed} /> : "—" },
               rec.shield != null && { label: t("label.shield"), value: rec.shield },
               rec.durability != null && { label: t("label.durability"), value: rec.durability },
             ])}

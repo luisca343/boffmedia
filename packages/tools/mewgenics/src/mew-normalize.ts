@@ -7,6 +7,18 @@ import { T, type Raw } from "./mew-store-state"
 
 const ITEM_MODS = ["str", "dex", "con", "int", "spd", "cha", "lck", "max_health", "durability"]
 
+/** Preserve the names players may search for even when the normalized record
+ * uses a localized display name. The extractor uses a few historical spellings
+ * for this field, so the normalizer folds them into one small array. */
+function withAliases(rec: MewRec, raw: Raw): MewRec {
+  const aliases = [raw.alias, raw.aliases, raw.quest_item_alias, raw.name_alias]
+    .flatMap((value) => Array.isArray(value) ? value : [value])
+    .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    .map((value) => value.trim())
+  if (aliases.length) rec.aliases = [...new Set(aliases)]
+  return rec
+}
+
 export function normItems(raw: Raw[]): MewRec[] {
   return raw.map((r) => {
     const rec: MewRec = {
@@ -33,7 +45,7 @@ export function normItems(raw: Raw[]): MewRec[] {
     rec.nk = r.name_key
     rec.dk = r.desc_key
     ITEM_MODS.forEach((k) => { if (r[k] != null) rec[k] = r[k] })
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -62,7 +74,7 @@ export function normCharacters(raw: Raw[], spriteMap: Record<string, string>): M
     }
     rec.nk = r.name_key
     rec.tk = r.tooltip_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -85,7 +97,7 @@ export function normPassives(raw: Raw[]): MewRec[] {
     }
     rec.nk = r.name_key
     rec.dk = r.desc_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -98,7 +110,7 @@ export function normKeywords(raw: Raw[]): MewRec[] {
     }
     rec.nk = r.name_key
     rec.tk = r.tooltip_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -215,7 +227,7 @@ export function normEvents(raw: Raw[]): MewRec[] {
         options,
       }
       rec.titlek = r.title_key
-      return rec
+      return withAliases(rec, r)
     })
     .filter((r) => !/\b(test|debug|placeholder)\b/i.test(r.name + " " + r.id))
 }
@@ -236,7 +248,7 @@ export function normClasses(raw: Raw[]): MewRec[] {
       // ships an array (it borrows every other class's palette).
       palette: typeof r.graphics?.palette === "number" ? r.graphics.palette : undefined,
     }
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -254,7 +266,7 @@ export function normMaps(raw: Raw[]): MewRec[] {
       enemies: r.enemy_pools,
       items: r.item_pools,
     }
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -289,7 +301,7 @@ export function compactAbility(a: Raw): MewRec {
   if (a.splash_damage != null) d.splash = a.splash_damage
   if (Object.keys(d).length) rec.dmg = d as MewRec["dmg"]
   if (a.bonus_passives) rec.bonus = a.bonus_passives
-  return rec
+  return withAliases(rec, a)
 }
 
 // The room stats ship Capitalized in furniture_effects.gon (`Comfort: 1`);
@@ -320,7 +332,7 @@ export function normFurniture(raw: Raw[]): MewRec[] {
     }
     rec.nk = r.name_key
     rec.dk = r.desc_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -352,7 +364,7 @@ export function normMutations(raw: Raw[]): MewRec[] {
     }
     rec.nk = r.name_key
     rec.dk = r.desc_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -374,7 +386,7 @@ export function normSets(raw: Raw[]): MewRec[] {
     }
     rec.nk = r.name_key
     rec.dk = r.desc_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -400,7 +412,7 @@ export function normStoryCats(raw: Raw[]): MewRec[] {
     if (typeof r.voice === "string") rec.voice = r.voice
     rec.nk = r.name_key
     rec.dk = r.desc_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -411,7 +423,7 @@ export function normItemPools(raw: Raw[]): MewRec[] {
       name: mewHuman(r._id),
       items: r.items || [],
     }
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -427,7 +439,7 @@ export function normShops(raw: Raw[]): MewRec[] {
       stockFillOrder: r.stock_fill_order || {},
     }
     rec.nk = r.name_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -438,7 +450,7 @@ export function normWorld(raw: Raw[]): MewRec[] {
       name: mewHuman(r._id),
       nodes: r,
     }
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -484,7 +496,7 @@ export function normWeather(raw: Raw[]): MewRec[] {
     }
     rec.nk = r.name_key
     rec.dk = r.desc_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -499,7 +511,7 @@ export function normInjuries(raw: Raw[]): MewRec[] {
     }
     rec.nk = r.name_key
     rec.dk = r.desc_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -524,7 +536,7 @@ export function normEliteBuffs(raw: Raw[]): MewRec[] {
     if (r.elite_type) rec.elite_type = r.elite_type
     rec.nk = r.name_key
     rec.dk = r.desc_key
-    return rec
+    return withAliases(rec, r)
   })
 }
 
@@ -537,6 +549,6 @@ export function normProgressionUnlocks(raw: Raw[]): MewRec[] {
     }
     rec.nk = r.name_key
     rec.dk = r.desc_key
-    return rec
+    return withAliases(rec, r)
   })
 }

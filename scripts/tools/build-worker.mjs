@@ -17,6 +17,25 @@ import { genericConfig, catpartsConfig } from "./svgo-profiles.mjs"
 
 if (!parentPort) throw new Error("build-worker.mjs must be run as a worker_threads Worker")
 
+const ITEM_ICON_PREFIX = "assets/icons/items/"
+const BAKED_RARITY_USE_RE = /<use\b(?=[^>]*\bid=(["'])rarity\1)[^>]*\/>/i
+
+/**
+ * FFDec exports the dynamic `rarity` child of each item MovieClip at the
+ * parent's timeline position. That frame is unrelated to the item's data and
+ * bakes a random-looking circle/triangle/diamond/square into 1,700 icons.
+ * Remove only that root placement; the UI composes the same game MovieClip
+ * frame from the record's actual rarity at render time.
+ */
+function readPreparedSvg(job) {
+  const source = fs.readFileSync(job.inPath, "utf8")
+  if (!job.relPath.startsWith(ITEM_ICON_PREFIX)) {
+    return { source, strippedItemRarity: false }
+  }
+  const prepared = source.replace(BAKED_RARITY_USE_RE, "")
+  return { source: prepared, strippedItemRarity: prepared !== source }
+}
+
 parentPort.on("message", async (job) => {
   try {
     if (job.type === "raster") {
@@ -37,7 +56,8 @@ parentPort.on("message", async (job) => {
 
 /** Rasterise one data-URI-carrying SVG to .webp, longest side == job.px. */
 async function rasterize(job) {
-  const svg = fs.readFileSync(job.inPath)
+  const { source, strippedItemRarity } = readPreparedSvg(job)
+  const svg = Buffer.from(source)
   const probe = sharp(svg)
   const meta = await probe.metadata()
   const iw = meta.width || job.px
@@ -63,12 +83,13 @@ async function rasterize(job) {
     relPath: job.relPath,
     bytesIn: svg.length,
     bytesOut: fs.statSync(job.outPath).size,
+    strippedItemRarity,
   }
 }
 
 /** Run one of the two svgo profiles and write the result. */
 function svgoOptimize(job) {
-  const src = fs.readFileSync(job.inPath, "utf8")
+  const { source: src, strippedItemRarity } = readPreparedSvg(job)
   const config = job.profile === "catparts" ? catpartsConfig() : genericConfig()
   const result = optimize(src, { ...config, path: job.inPath })
   fs.mkdirSync(path.dirname(job.outPath), { recursive: true })
@@ -79,5 +100,6 @@ function svgoOptimize(job) {
     relPath: job.relPath,
     bytesIn: Buffer.byteLength(src),
     bytesOut: Buffer.byteLength(result.data),
+    strippedItemRarity,
   }
 }

@@ -90,7 +90,7 @@ export function MewItemInline({ id, onNav }: { id: string; onNav: NavFn }) {
   const badges = (
     <>
       {it.kind && <MewKind kind={it.kind} />}
-      {it.rarity && <MewRarity rarity={it.rarity} />}
+      <MewRarity rarity={it.rarity} cursed={it.cursed} />
     </>
   )
   const facts = (

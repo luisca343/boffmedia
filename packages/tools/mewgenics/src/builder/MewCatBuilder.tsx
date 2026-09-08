@@ -3,6 +3,7 @@
 import React from "react"
 import { useToolT, useLocale, MEWGENICS_NS } from "../i18n"
 import { Icon, ToolStrip } from "@boffmedia/ui"
+import { MewButton } from "../mew-kit"
 import { saveFile } from "@boffmedia/tool-kit"
 import type { IconName } from "@boffmedia/ui"
 import { loadCatPartsFrames, mewStoryCatAppearance } from "../cat"
@@ -263,10 +264,8 @@ export function MewCatBuilder() {
 
   return (
     <div
-      className="mew-skin relative flex h-[var(--tool-vh)] min-w-0 flex-col overflow-hidden text-[color:var(--mwp-cream)] [font-family:var(--mwf-hand)] max-xl:h-auto max-xl:overflow-visible"
+      className="mew-skin mew-builder relative flex h-[var(--tool-vh)] min-w-0 flex-col overflow-hidden max-xl:h-auto max-xl:overflow-visible"
       style={{
-        background:
-          "radial-gradient(120% 90% at 50% -10%, var(--mwp-bg-glow) 0%, var(--base-deep,#0b0d11) 55%, var(--mwp-bg-deep) 100%)",
         ...(grainUrl ? ({ "--mwp-grain": `url(${grainUrl})` } as React.CSSProperties) : {}),
       }}
     >
@@ -409,16 +408,15 @@ function BarButton({
   compact?: boolean
 }) {
   return (
-    <button
-      type="button"
+    <MewButton
+      icon={icon}
       onClick={onClick}
       disabled={disabled}
       title={label}
       aria-label={label}
-      className="inline-flex items-center gap-[0.4375rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3 pb-1.5 pt-[0.5625rem] text-[0.8125rem]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-md)] transition-all hover:-translate-y-px active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-sm)] disabled:opacity-45 disabled:hover:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)]"
+      className="mew-builder__bar-button"
     >
-      <Icon name={icon} size={15} />
       <span className={compact ? "max-[1100px]:hidden" : "max-[760px]:hidden"}>{label}</span>
-    </button>
+    </MewButton>
   )
 }

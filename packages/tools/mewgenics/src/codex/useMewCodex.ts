@@ -42,8 +42,9 @@ export function useMewCodex() {
   const [selId, setSelId] = React.useState<string | null>(null)
   const [q, setQ] = React.useState("")
   const [filters, setFilters] = React.useState<Record<string, string>>({})
-  const [sort, setSort] = React.useState("name")
-  const [view, setView] = React.useState<"grid" | "list">("grid")
+  const [sort, setSort] = React.useState("default")
+  const [view, setView] = React.useState<"grid" | "list">("list")
+  const [density, setDensity] = React.useState<"compact" | "comfortable">("comfortable")
   const [trail, setTrail] = React.useState<TrailItem[]>([])
   const [shownCount, setShownCount] = React.useState(CX_CAP)
   const [favIds, setFavIds] = React.useState<Set<string>>(new Set())
@@ -123,6 +124,7 @@ export function useMewCodex() {
       hp: (a, b) => (b.hp || 0) - (a.hp || 0) || byName(a, b),
       faction: (a, b) => String(a.faction).localeCompare(String(b.faction)) || byName(a, b),
     }
+    if (sort === "default") return out
     return out.slice().sort(cmp[sort] || byName)
   }, [list, debouncedQ, filters, sort, cat, favIds])
 
@@ -197,7 +199,7 @@ export function useMewCodex() {
 
   const pickCat = (k: string) => {
     catState.current[cat] = { q, filters, sort }
-    const restored = catState.current[k] || { q: "", filters: {}, sort: "name" }
+    const restored = catState.current[k] || { q: "", filters: {}, sort: "default" }
     setCat(k)
     setQ(restored.q)
     setFilters(restored.filters)
@@ -212,7 +214,7 @@ export function useMewCodex() {
     const catChanged = nextCat !== cat
     if (catChanged) {
       catState.current[cat] = { q, filters, sort }
-      const restored = catState.current[nextCat] || { q: "", filters: {}, sort: "name" }
+      const restored = catState.current[nextCat] || { q: "", filters: {}, sort: "default" }
       setCat(nextCat)
       setQ(restored.q)
       setFilters(restored.filters)
@@ -263,17 +265,20 @@ export function useMewCodex() {
   React.useEffect(() => {
     let alive = true
     void (async () => {
-      const [trail, favs, view, cursor, sound] = await Promise.all([
-        mewRead<TrailItem[]>("trail"),
-        mewRead<string[]>("favs"),
-        mewRead<string>("view"),
-        mewRead<string>("cursor"),
-        mewRead<string>("sound"),
+        const [trail, favs, view, density, cursor, sound] = await Promise.all([
+          mewRead<TrailItem[]>("trail"),
+          mewRead<string[]>("favs"),
+          mewRead<string>("view"),
+          mewRead<string>("density"),
+          mewRead<string>("cursor"),
+          mewRead<string>("sound"),
       ])
       if (!alive) return
       if (Array.isArray(trail)) setTrail(trail)
       if (Array.isArray(favs)) setFavIds(new Set(favs))
       if (view === "grid" || view === "list") setView(view)
+      else if (window.matchMedia("(max-width: 640px)").matches) setView("grid")
+      if (density === "compact" || density === "comfortable") setDensity(density)
       if (cursor === "1") setCursorEnabled(true)
       // Sound stays off for anyone who asked for less motion, exactly as
       // before — the toggle is a preference, not an override of that request.
@@ -292,6 +297,10 @@ export function useMewCodex() {
   React.useEffect(() => {
     mewWrite("view", view)
   }, [view])
+
+  React.useEffect(() => {
+    mewWrite("density", density)
+  }, [density])
 
   React.useEffect(() => {
     mewWrite("cursor", cursorEnabled ? "1" : "0")
@@ -360,8 +369,8 @@ export function useMewCodex() {
 
   return {
     ready, error, catDef,
-    cat, selId, q, filters, sort, view, trail, shownCount, favIds, cursorEnabled, soundEnabled,
-    setQ, setFilters, setSort, setView, setCursorEnabled, setSoundEnabled,
+    cat, selId, q, filters, sort, view, density, trail, shownCount, favIds, cursorEnabled, soundEnabled,
+    setQ, setFilters, setSort, setView, setDensity, setCursorEnabled, setSoundEnabled,
     searchRef, codexRef,
     filterOpts, filtered, shown, selRec, total, abilitiesLoading, numberedHidden,
     prevRec, nextRec,

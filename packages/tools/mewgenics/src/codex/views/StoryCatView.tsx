@@ -5,7 +5,9 @@ import { useToolT, MEWGENICS_NS } from "../../i18n"
 import { Icon } from "@boffmedia/ui"
 import { MewPanel } from "../../MewAtoms"
 import { MewCat, mewStoryCatAppearance } from "../../cat"
+import { INITIAL_STATE, serializeState } from "../../builder/builder-state"
 import { mewClassColor, mewHuman } from "../../mew-util"
+import { MewScreenLink } from "../../nav"
 import { MewDesc, MewDetail, MewFactGrid, MewHero, MewSections, rows, type ViewProps } from "./scaffold"
 
 const PART_ROWS: { key: string; label: string }[] = [
@@ -25,6 +27,10 @@ const PART_ROWS: { key: string; label: string }[] = [
 export function StoryCatView({ rec }: ViewProps) {
   const t = useToolT(MEWGENICS_NS)
   const { parts, palette } = React.useMemo(() => mewStoryCatAppearance(rec as Record<string, unknown>), [rec])
+  const builderHash = React.useMemo(
+    () => serializeState({ ...INITIAL_STATE, parts, palette }),
+    [parts, palette],
+  )
   const cls = typeof rec.class_anis === "string" ? rec.class_anis : undefined
   const clsColor = cls ? null : mewClassColor(palette)
 
@@ -59,14 +65,15 @@ export function StoryCatView({ rec }: ViewProps) {
         <MewPanel title={t("storyCat.appearance")} icon="paw">
           <div className="flex flex-col gap-3">
             <MewFactGrid rows={traitRows} />
-            <a
-              href={`/otros/mewgenics/builder?preset=${encodeURIComponent(rec.id)}`}
-              className="inline-flex w-fit items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper-2)] px-3 pb-1.5 pt-[0.4375rem] text-[0.75rem]/none font-bold text-[color:var(--mwp-ink)] no-underline [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-sm)] transition-all hover:-translate-y-px active:translate-y-0.5 active:[box-shadow:none] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+            <MewScreenLink
+              screen="builder"
+              hash={builderHash}
+              className="mew-button mew-button--paper mew-button--compact mew-inline-action"
               style={clsColor ? { borderColor: clsColor.readable } : undefined}
             >
               <Icon name="edit" size={12} />
               {t("storyCat.openInBuilder")}
-            </a>
+            </MewScreenLink>
           </div>
         </MewPanel>
         {partRows.length > 0 && (

@@ -2,90 +2,27 @@
 
 import * as React from "react"
 import { useToolT, MEWGENICS_NS } from "./i18n"
-import { cn } from '@boffmedia/ui'
-import { Icon, type IconName } from "@boffmedia/ui"
+import { cn, Icon, type IconName } from "@boffmedia/ui"
+import { MewTag } from "./mew-kit"
 import { mewCursor } from "./mew-art"
-import { MewFaction, MewKind, MewRarity, MewStats, MewText, MewTile } from "./MewAtoms"
-import { MEW, MEW_KIND_LABEL, mewBodyPartLabel, mewCatKey, mewClip, mewFactionLabel, mewHueFor, mewHuman, mewRarityLabel, mewStatModLabel, type MewRec } from "./mew-util"
+import { MewRarity, MewStats, MewText, MewTile } from "./MewAtoms"
+import { MEW, MEW_KIND_LABEL, mewBodyPartLabel, mewCatKey, mewClip, mewFactionLabel, mewHueFor, mewHuman, mewRarityAccent, mewStatModLabel, type MewRec } from "./mew-util"
+import { MewRecordMeta } from "./codex/MewRecordMeta"
 
 // Mewgenics roster card (CxCard) + the hover popover card. Prefix cx- / mew-pop-.
 
 export function CxCard({ cat, rec, active, onOpen, view, cursorEnabled, playSound }: { cat: string; rec: MewRec; active?: boolean; onOpen?: () => void; view?: "grid" | "list"; cursorEnabled?: boolean; playSound?: (key: string) => void }) {
-  const t = useToolT(MEWGENICS_NS)
   const inspectCursorData = React.useMemo(() => (cursorEnabled ? mewCursor("inspect") : null), [cursorEnabled])
   const [isHovering, setIsHovering] = React.useState(false)
+  const rarityAccent = cat === "items" ? mewRarityAccent(rec.rarity, rec.cursed) : undefined
 
   const handleHoverEnter = () => {
     setIsHovering(true)
     playSound?.("hover")
   }
-  const meta =
-    cat === "items" ? (
-      <>
-        {rec.kind && <MewKind kind={rec.kind} />}
-        {rec.rarity && <MewRarity rarity={rec.rarity} />}
-      </>
-    ) : cat === "characters" ? (
-      <>
-        {rec.faction && <MewFaction faction={rec.faction} />}
-        {rec.hp != null && (
-          <span className="inline-flex items-center gap-[3px] font-mono text-[0.625rem]/none font-bold text-[color:var(--mwp-bad)]">
-            <Icon name="heart" size={11} />
-            {rec.hp}
-          </span>
-        )}
-      </>
-    ) : cat === "abilities" ? (
-      <>
-        {rec.cls && <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="star" size={10} className="text-[color:var(--mwp-ink-soft)]" />{mewHuman(rec.cls)}</span>}
-        {rec.cost?.act_points != null && <span className="inline-flex items-center gap-1 border-2 border-solid border-[color-mix(in_srgb,var(--mwp-warn)_45%,transparent)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-warn)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="bolt" size={10} />{rec.cost.act_points} {t("data.statAbbr.pa")}</span>}
-        {rec.cost?.move_points != null && <span className="inline-flex items-center gap-1 border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="compass" size={10} />{rec.cost.move_points} {t("data.statAbbr.pm")}</span>}
-      </>
-    ) : cat === "passives" ? (
-      <>
-        {rec.cls ? <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="star" size={10} className="text-[color:var(--mwp-ink-soft)]" />{mewHuman(rec.cls)}</span> : <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="shield" size={10} className="text-[color:var(--mwp-ink-soft)]" />{t("label.general")}</span>}
-      </>
-    ) : cat === "keywords" ? (
-      <>
-        <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color-mix(in_srgb,var(--mwp-warn)_45%,transparent)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-warn)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="flame" size={10} />{t("label.statusBadge")}</span>
-      </>
-    ) : cat === "events" ? (
-      <>
-        {rec.subject && <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="compass" size={10} className="text-[color:var(--mwp-ink-soft)]" />{rec.subject}</span>}
-      </>
-    ) : cat === "classes" ? (
-      <>
-        {rec.weapon && <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="sword" size={10} className="text-[color:var(--mwp-ink-soft)]" />{mewHuman(rec.weapon)}</span>}
-        {!rec.weapon && rec.abilities && Array.isArray(rec.abilities) && rec.abilities.length > 0 && <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="bolt" size={10} className="text-[color:var(--mwp-ink-soft)]" />{rec.abilities.length}</span>}
-      </>
-    ) : cat === "maps" ? (
-      <>
-        {rec.act != null && <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="map" size={10} className="text-[color:var(--mwp-ink-soft)]" />{t("label.act")} {rec.act} {rec.tileset && `· ${rec.tileset}`}</span>}
-      </>
-    ) : cat === "furniture" ? (
-      <>
-        {rec.stats && Object.entries(rec.stats).length > 0 && (
-          <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="home" size={10} className="text-[color:var(--mwp-ink-soft)]" />{["comfort", "appeal", "stimulation", "evolution", "health"].includes(Object.keys(rec.stats)[0]) ? t(`label.${Object.keys(rec.stats)[0]}`) : mewHuman(Object.keys(rec.stats)[0])}</span>
-        )}
-        {rec.special && <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color-mix(in_srgb,var(--mwp-good)_45%,transparent)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-good)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="star" size={10} />{t("label.special")}</span>}
-        {rec.removed && <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color-mix(in_srgb,var(--mwp-bad)_45%,transparent)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-bad)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="trash" size={10} />{t("label.removed")}</span>}
-      </>
-    ) : cat === "mutations" ? (
-      <>
-        {rec.body_part && <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="sparkles" size={10} className="text-[color:var(--mwp-ink-soft)]" />{mewBodyPartLabel(t, String(rec.body_part))}</span>}
-      </>
-    ) : cat === "sets" ? (
-      <>
-        {rec.pieces_required != null && <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="layers" size={10} className="text-[color:var(--mwp-ink-soft)]" />{rec.pieces_required}</span>}
-      </>
-    ) : cat === "story_cats" ? (
-      <>
-        <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"><Icon name="book" size={10} className="text-[color:var(--mwp-ink-soft)]" />{t("label.storyCat")}</span>
-      </>
-    ) : null
   // w-full: a <button> is shrink-to-fit even as a grid container, so without it
   // short-named cards render narrower than their track and their badges spill out.
-  const base = "relative w-full cursor-pointer border-2 border-solid bg-[color:var(--mwp-paper)] text-left text-[color:var(--mwp-ink)] transition-[transform,box-shadow,border-color] duration-[160ms] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+  const base = "mew-card"
   return (
     <button
       type="button"
@@ -95,12 +32,13 @@ export function CxCard({ cat, rec, active, onOpen, view, cursorEnabled, playSoun
       data-cxid={rec.id}
       style={{
         "--h": mewHueFor(cat, rec),
+        ...(rarityAccent ? { "--mew-card-accent": rarityAccent } : {}),
         ...(isHovering && inspectCursorData ? { cursor: `url(${inspectCursorData.src}) ${inspectCursorData.hotspot[0]} ${inspectCursorData.hotspot[1]}, auto` } : {})
       } as React.CSSProperties}
       className={cn(
         base,
-        active ? "border-[hsl(var(--h)_70%_34%)] [box-shadow:inset_0_0_0_3px_hsl(var(--h)_62%_62%/0.65),0_4px_0_var(--mwp-shadow-lg)] active:translate-y-0.5 active:[box-shadow:inset_0_0_0_3px_hsl(var(--h)_62%_62%/0.65),0_2px_0_var(--mwp-shadow-md)]" : "border-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-lg)] hover:-translate-y-[3px] hover:[box-shadow:0_7px_0_var(--mwp-shadow-lg)] active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-sm)]",
-        view === "list" ? "grid grid-cols-[2.5rem_1fr_auto] items-center gap-2.5 px-[0.6875rem] py-2.5 h-[4rem] [border-radius:var(--wob-sm)]" : "grid grid-rows-[4.25rem_1fr_1.625rem] gap-2 h-full px-[0.6875rem] pb-2.5 pt-[0.8125rem] [border-radius:var(--wob-c)]",
+        active ? "mew-card--active" : "mew-card--idle",
+        view === "list" ? "mew-card--list" : "mew-card--grid",
       )}
     >
       {view === "list" ? (
@@ -120,7 +58,7 @@ export function CxCard({ cat, rec, active, onOpen, view, cursorEnabled, playSoun
             <span className="overflow-hidden text-center text-[0.84375rem]/[1.15] font-bold [font-family:var(--mwf-hand)] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] [display:-webkit-box] [min-height:2.3em]">{rec.name}</span>
           </span>
           <span className="flex min-h-[1.625rem] min-w-0 max-w-full items-center justify-center gap-1 overflow-hidden [&>*]:min-w-0 [&>*]:overflow-hidden">
-            {meta}
+            <MewRecordMeta cat={cat} rec={rec} />
           </span>
         </>
       )}
@@ -146,19 +84,9 @@ function mewEffectNames(map?: Record<string, unknown>, max = 4): string | null {
   return keys.slice(0, max).map((k) => mewHuman(k)).join(" · ") + (keys.length > max ? " +" + (keys.length - max) : "")
 }
 
-const FLAG_TONE: Record<string, string> = {
-  warn: "text-[color:var(--mwp-warn)] border-[color-mix(in_srgb,var(--mwp-warn)_45%,transparent)] [&_svg]:text-[color:var(--mwp-warn)]",
-  bad: "text-[color:var(--mwp-bad)] border-[color-mix(in_srgb,var(--mwp-bad)_45%,transparent)] [&_svg]:text-[color:var(--mwp-bad)]",
-  good: "text-[color:var(--mwp-good)] border-[color-mix(in_srgb,var(--mwp-good)_45%,transparent)] [&_svg]:text-[color:var(--mwp-good)]",
-  rar: "text-[hsl(var(--h)_45%_34%)] border-[color-mix(in_srgb,hsl(var(--h)_55%_50%)_55%,transparent)] [&_svg]:text-[hsl(var(--h)_55%_45%)]",
-}
 function PopFlag({ icon, tone, children }: { icon?: IconName; tone?: string; children: React.ReactNode }) {
-  return (
-    <span className={cn("inline-flex items-center gap-1 border-[1.5px] border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2 pb-0.5 pt-[3px] text-[0.6875rem]/[1.2] font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:9px_11px_8px_12px] [&_svg]:text-[color:var(--mwp-ink-soft)]", tone && FLAG_TONE[tone])}>
-      {icon && <Icon name={icon} size={11} />}
-      {children}
-    </span>
-  )
+  const tagTone = tone === "good" || tone === "warn" || tone === "bad" ? tone : tone === "rar" ? "hue" : "neutral"
+  return <MewTag icon={icon} tone={tagTone}>{children}</MewTag>
 }
 
 type FactRow = { label: string; value: React.ReactNode; mono?: boolean }
@@ -230,16 +158,11 @@ function MewPopBody({ cat, rec, t }: { cat: string; rec: MewRec; t: (k: string, 
   if (cat === "items") {
     const passN = rec.passives ? Object.keys(rec.passives).length : 0
     const kindLabel = MEW_KIND_LABEL[rec.kind || ""] ? t(`data.kind.${rec.kind}`) : mewHuman(rec.kind)
-    const rarityLabel = rec.rarity ? mewRarityLabel(t, rec.rarity) : null
     return (
       <>
         <div className="flex flex-wrap gap-[0.3125rem]">
           <PopFlag icon="bookmark">{kindLabel}</PopFlag>
-          {rarityLabel && (
-            <PopFlag tone="rar" icon="star">
-              {rarityLabel}
-            </PopFlag>
-          )}
+          <MewRarity rarity={rec.rarity} cursed={rec.cursed} />
         </div>
         {mewClip(rec.desc, 130) ? <MewText muted>{mewClip(rec.desc, 130)}</MewText> : null}
         <PopFacts rows={[rec.shield != null && { label: t("label.shield"), value: rec.shield, mono: true }, rec.durability != null && { label: t("label.durability"), value: rec.durability, mono: true }, passN > 0 && { label: t("inline.passivesAbbr"), value: t("pop.passivesCount", { n: passN }) }]} />
@@ -361,33 +284,37 @@ function MewPopBody({ cat, rec, t }: { cat: string; rec: MewRec; t: (k: string, 
 export function MewPopCard({ cat, rec }: { cat: string; rec: MewRec }) {
   const t = useToolT(MEWGENICS_NS)
   const isSet = cat === "sets"
+  const rarityAccent = cat === "items" ? mewRarityAccent(rec.rarity, rec.cursed) : undefined
 
   return (
     // The game's tooltip PNG cannot 9-slice to arbitrary card sizes without
     // smearing its mottled fill, so the card renders the same motifs natively:
     // paper + tamed grain (mew-paper) and the teal accent rule (mew-rule).
     <div
-      style={{ "--h": mewPopHue(cat, rec) } as React.CSSProperties}
-      className="relative border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] mew-paper mew-rule [border-radius:var(--wob-c)] [box-shadow:0_5px_0_var(--mwp-shadow-lg)] [font-family:var(--mwf-hand)] [transform:rotate(-0.5deg)]"
+      style={{
+        "--h": mewPopHue(cat, rec),
+        ...(rarityAccent ? { "--mew-card-accent": rarityAccent } : {}),
+      } as React.CSSProperties}
+      className="mew-pop-card mew-paper mew-rule"
     >
-      <span aria-hidden className="pointer-events-none absolute -top-[0.5625rem] left-[1.375rem] h-[1.0625rem] w-[3.625rem] border-l border-r border-dashed border-[var(--mwp-tape-light-bright)] bg-[color-mix(in_srgb,hsl(var(--h)_60%_70%)_40%,var(--mwp-tape))] [transform:rotate(-4deg)]" />
-      <header className="flex items-center gap-[0.6875rem] border-b-2 border-dashed border-[color:var(--mwp-ink-line)] px-[0.875rem] pb-2.5 pt-3">
+      <span aria-hidden className="mew-pop-card__tape pointer-events-none absolute -top-[0.5625rem] left-[1.375rem] h-[1.0625rem] w-[3.625rem] border-l border-r border-dashed border-[var(--mwp-tape-light-bright)] [transform:rotate(-4deg)]" />
+      <header className="mew-pop-card__header">
         <MewTile cat={cat} rec={rec} size={40} glyph={isSet ? "layers" : undefined} />
         <div className="flex min-w-0 flex-col gap-[3px]">
-          <span className="text-[0.625rem]/none uppercase tracking-[0.1em] text-[hsl(var(--h)_45%_34%)] [font-family:var(--mwf-disp)]">{mewCatLabel(cat, t)}</span>
-          <span className="truncate text-[1rem]/none text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [text-shadow:1.5px_1.5px_0_color-mix(in_srgb,hsl(var(--h)_55%_55%)_40%,transparent)]">{rec.name}</span>
+          <span className="mew-pop-card__category text-[0.625rem]/none uppercase tracking-[0.1em] [font-family:var(--mwf-disp)]">{mewCatLabel(cat, t)}</span>
+          <span className="mew-pop-card__title truncate text-[1rem]/none [font-family:var(--mwf-disp)]">{rec.name}</span>
         </div>
       </header>
-      <div className="flex flex-col gap-[0.5625rem] px-[0.875rem] pb-3 pt-[0.6875rem]">
+      <div className="mew-pop-card__body">
         <MewPopBody cat={cat} rec={rec} t={t} />
       </div>
       {isSet ? (
-        <div className="flex items-center gap-[0.3125rem] border-t-2 border-dashed border-[color:var(--mwp-ink-line)] px-[0.875rem] py-2 text-[0.65625rem]/none font-bold tracking-[0.02em] text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [&_svg]:text-[color:var(--mwp-ink-soft)]">
+        <div className="mew-pop-card__footer">
           <Icon name="layers" size={11} />
           {t("pop.setFooter")}
         </div>
       ) : (
-        <div className="flex items-center gap-[0.3125rem] border-t-2 border-dashed border-[color:var(--mwp-ink-line)] bg-[color-mix(in_srgb,var(--mwp-red)_6%,transparent)] px-[0.875rem] py-2 text-[0.65625rem]/none font-bold tracking-[0.02em] text-[color:var(--mwp-red-deep)] [font-family:var(--mwf-hand)] [&_svg]:text-[color:var(--mwp-red)]">
+        <div className="mew-pop-card__footer mew-pop-card__footer--action">
           <Icon name="arrow" size={11} />
           {t("pop.openCard")}
         </div>
@@ -401,9 +328,8 @@ export function MewHoverCard({ cat, rec, children }: { cat: string; rec: MewRec;
   const [posAbove, setPosAbove] = React.useState(false)
   const showT = React.useRef(0)
   const hideT = React.useRef(0)
-  const containerRef = React.useRef<HTMLSpanElement>(null)
   const popoverRef = React.useRef<HTMLDivElement>(null)
-  const popIdRef = React.useRef(Math.random().toString(36).substring(7))
+  const popId = React.useId()
 
   const openFn = React.useCallback(() => {
     clearTimeout(hideT.current)
@@ -471,11 +397,11 @@ export function MewHoverCard({ cat, rec, children }: { cat: string; rec: MewRec;
     [],
   )
 
-  const triggerId = `mew-hover-trigger-${popIdRef.current}`
+  const triggerId = `mew-hover-trigger-${popId}`
+  const tooltipId = `${triggerId}-tooltip`
 
   return (
     <span
-      ref={containerRef}
       className="relative inline-flex max-w-full"
       onMouseEnter={openFn}
       onMouseLeave={closeFn}
@@ -486,15 +412,15 @@ export function MewHoverCard({ cat, rec, children }: { cat: string; rec: MewRec;
         }
       }}
     >
-      <span id={triggerId}>{children}</span>
+      <span id={triggerId} aria-describedby={open ? tooltipId : undefined}>{children}</span>
       {open && (
         <div
+          id={tooltipId}
           ref={popoverRef}
           className={`absolute z-[120] w-[18.75rem] max-w-[calc(100vw_-_20px)] ${
             posAbove ? "bottom-[calc(100%_+_9px)]" : "top-[calc(100%_+_9px)]"
           } left-1/2 -translate-x-1/2 [filter:drop-shadow(0_10px_14px_var(--mwp-shadow-lg))] focus-within:outline-none`}
           role="tooltip"
-          aria-describedby={triggerId}
           tabIndex={-1}
           onMouseEnter={() => clearTimeout(hideT.current)}
           onMouseLeave={closeFn}
@@ -509,7 +435,7 @@ export function MewHoverCard({ cat, rec, children }: { cat: string; rec: MewRec;
 // The paper pill link used as a hover trigger (mew-ref--link).
 export function MewRefLink({ icon, count, onClick, children }: { icon?: IconName; count?: number; onClick?: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className="group inline-flex cursor-pointer items-center gap-[0.3125rem] border-[1.5px] border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-[0.5625rem] pb-1 pt-[0.3125rem] text-[0.75rem]/[1.15] font-semibold text-[color:var(--mwp-ink)] transition-[color,border-color,transform,box-shadow] duration-[130ms] [box-shadow:0_2px_0_var(--mwp-shadow-pop)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] hover:border-[color:var(--mwp-red-deep)] hover:text-[color:var(--mwp-red-deep)] hover:[transform:rotate(-1.2deg)_translateY(-1px)] active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-pop)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0">
+    <button type="button" onClick={onClick} className="mew-ref-link group">
       {icon && <Icon name={icon} size={12} className="flex-none text-[color:var(--mwp-ink-soft)] group-hover:text-[color:var(--mwp-red)]" />}
       <span className="min-w-0">{children}</span>
       {count != null && <span className="pl-[3px] font-mono text-[0.5625rem]/none font-bold text-[color:var(--mwp-ink-soft)]">{count}</span>}
@@ -519,5 +445,5 @@ export function MewRefLink({ icon, count, onClick, children }: { icon?: IconName
 
 // The set tag (mew-tag--set) — a help-cursor sticker used as a hover trigger.
 export function MewSetTag({ children }: { children: React.ReactNode }) {
-  return <span className="cursor-help border-[1.5px] border-solid border-[color-mix(in_srgb,var(--mwp-paper-warn)_45%,var(--mwp-ink-line))] bg-[color:var(--mwp-paper-2)] px-2 pb-1 pt-[0.3125rem] text-[0.71875rem]/none font-semibold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">{children}</span>
+  return <span className="mew-set-tag">{children}</span>
 }

@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useToolT, MEWGENICS_NS } from "../i18n"
 import { Banner, ToolStrip } from "@boffmedia/ui"
+import { MewLoading } from "../mew-kit"
 import { mewTextureSrc, mewCursor } from "../mew-art"
 import { MewCatTabs, MewTopBar } from "./MewChrome"
 import { MewBrowse } from "./MewBrowse"
@@ -43,7 +44,7 @@ export function MewCodex() {
 
   if (error) {
     return (
-      <div className="mew-skin p-10">
+      <div className="mew-skin mew-codex p-10">
         <Banner tone="error" title={t("error.title")}>
           {t("error.checkPath", { path: "/boffmedia/tools/mewgenics/", error: String(error.message || error) })}
         </Banner>
@@ -60,9 +61,8 @@ export function MewCodex() {
       // container so it stays scoped to the codex — never saw the keydown
       // until the player clicked something first.
       tabIndex={-1}
-      className="mew-skin relative flex min-h-[var(--tool-vh)] min-w-0 flex-col text-[color:var(--mwp-cream)] [font-family:var(--mwf-hand)] focus:outline-none"
+      className="mew-skin mew-codex relative flex min-h-[var(--tool-vh)] min-w-0 flex-col focus:outline-none"
       style={{
-        background: "radial-gradient(120% 90% at 50% -10%, var(--mwp-bg-glow) 0%, var(--base-deep,#0b0d11) 55%, var(--mwp-bg-deep) 100%)",
         "--mew-chrome-h": `${chromeH}px`,
         ...(grainUrl ? { "--mwp-grain": `url(${grainUrl})` } : {}),
         ...(defaultCursorData ? { cursor: `url(${defaultCursorData.src}) ${defaultCursorData.hotspot[0]} ${defaultCursorData.hotspot[1]}, auto` } : {}),
@@ -92,10 +92,7 @@ export function MewCodex() {
       </div>
 
       {!ready ? (
-        <div className="flex flex-1 items-center justify-center gap-3 py-24 text-[0.9375rem]/none font-semibold text-[color:var(--mwp-cream-dim)]">
-          <span className="h-[1.375rem] w-[1.375rem] animate-spin border-[3px] border-solid border-[color:var(--mwp-nline)] border-t-[color:var(--mwp-red)] [border-radius:50%_45%_52%_48%] motion-reduce:animate-none" />
-          {t("loading")}
-        </div>
+        <MewLoading label={t("loading")} />
       ) : (
         <div role="tabpanel" id={`mew-panel-${codex.cat}`} aria-labelledby={`mew-tab-${codex.cat}`}>
           {selRec ? <MewFiche codex={codex} /> : <MewBrowse codex={codex} />}

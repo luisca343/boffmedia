@@ -4,6 +4,7 @@ import * as React from "react"
 import { MewScreenLink } from "../nav"
 import { useToolT, useLocale, MEWGENICS_NS } from "../i18n"
 import { Icon } from "@boffmedia/ui"
+import { MewButton, MewIconButton } from "../mew-kit"
 import { MewData } from "../mew-store"
 import { MEW_CATS, mewCatKey } from "../mew-util"
 import { MEW_SOUND_ENABLED } from "./useMewSounds"
@@ -41,49 +42,42 @@ export function MewTopBar({ codex }: { codex: MewCodexModel }) {
         </div>
       </div>
       <div className="ml-auto flex items-center gap-2">
-        <button
-          type="button"
+        <MewIconButton
+          icon="search"
+          label={t("chrome.cursorToggleTitle")}
           onClick={() => setCursorEnabled(!cursorEnabled)}
-          title={t("chrome.cursorToggleTitle")}
-          aria-label={t("chrome.cursorToggleTitle")}
           aria-pressed={cursorEnabled}
-          className={`grid h-[2.5rem] w-[2.5rem] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 ${cursorEnabled ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]" : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]"}`}
-        >
-          <Icon name="search" size={16} />
-        </button>
+          active={cursorEnabled}
+        />
         {MEW_SOUND_ENABLED && (
-          <button
-            type="button"
+          <MewIconButton
+            icon="volume"
+            label={t("chrome.soundToggleTitle")}
             onClick={() => setSoundEnabled(!soundEnabled)}
-            title={t("chrome.soundToggleTitle")}
-            aria-label={t("chrome.soundToggleTitle")}
             aria-pressed={soundEnabled}
-            className={`grid h-[2.5rem] w-[2.5rem] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 ${soundEnabled ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]" : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)]"}`}
-          >
-            <Icon name="volume" size={16} />
-          </button>
+            active={soundEnabled}
+          />
         )}
         {/* Through the nav seam: a route change on the web, a screen swap
             inside the same mounted tool in the launcher. */}
         <MewScreenLink
           screen="builder"
           title={t("chrome.catBuilderTitle")}
-          className="inline-flex items-center gap-[0.4375rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 pb-1.5 pt-[0.5625rem] text-[0.875rem]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(-1.5deg)] transition-all hover:[transform:rotate(1deg)_translateY(-1px)] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 [&_svg]:text-[color:var(--mwp-pink)]"
+          className="mew-topbar__button mew-topbar__button--builder [&_svg]:text-[color:var(--mwp-pink)]"
         >
-          <Icon name="paw" size={16} />
+          <Icon name="paw" size={16} aria-hidden />
           <span className="max-[760px]:hidden">{t("chrome.catBuilder")}</span>
         </MewScreenLink>
-        <button
-          type="button"
+        <MewButton
+          icon="sparkles"
           onClick={handleRandomClick}
           disabled={!ready}
           title={t("chrome.randomTitle")}
           aria-label={t("chrome.randomTitle")}
-          className={`inline-flex items-center gap-[0.4375rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3.5 pb-1.5 pt-[0.5625rem] text-[0.875rem]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:0_4px_0_var(--mwp-shadow-md)] [transform:rotate(1deg)] transition-all hover:[transform:rotate(-2deg)_translateY(-1px)] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 disabled:opacity-45 [&_svg]:text-[color:var(--mwp-red)] ${wobble ? "[animation:mew-wobble-pop_300ms_ease-out]" : ""}`}
+          className={`mew-topbar__button mew-topbar__button--random [&_svg]:text-[color:var(--mwp-red)] ${wobble ? "[animation:mew-wobble-pop_300ms_ease-out]" : ""}`}
         >
-          <Icon name="sparkles" size={16} />
           <span className="max-[760px]:hidden">{t("chrome.random")}</span>
-        </button>
+        </MewButton>
       </div>
     </>
   )

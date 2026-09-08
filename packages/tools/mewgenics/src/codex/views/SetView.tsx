@@ -29,7 +29,7 @@ function MewSetPiece({ item, onNav }: { item: MewRec; onNav: (cat: string, id: s
       <span className="text-[0.75rem]/[1.2] font-semibold max-w-[5.625rem] text-[color:var(--mwp-ink)]">{item.name}</span>
       <div className="flex gap-1 flex-wrap justify-center">
         {item.kind && <MewKind kind={item.kind} />}
-        {item.rarity && <MewRarity rarity={item.rarity} />}
+        <MewRarity rarity={item.rarity} cursed={item.cursed} />
       </div>
     </button>
   )

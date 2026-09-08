@@ -2,12 +2,13 @@
 
 import * as React from "react"
 import { useToolT, MEWGENICS_NS } from "../i18n"
-import { Icon } from "@boffmedia/ui"
 import { CxCard } from "../MewPop"
 import { MewData } from "../mew-store"
 import { mewCatKey } from "../mew-util"
 import { CX_CAP, CX_SORT } from "./codex-config"
 import { MewSearch, MewSelect, MewChips, MewEmpty } from "./controls"
+import { MewButton, MewIconButton, MewLoading } from "../mew-kit"
+import { MewRecordRow } from "./MewRecordRow"
 import type { MewCodexModel } from "./useMewCodex"
 
 function Kbd({ children }: { children: React.ReactNode }) {
@@ -21,16 +22,22 @@ function Kbd({ children }: { children: React.ReactNode }) {
  */
 export function MewBrowse({ codex }: { codex: MewCodexModel }) {
   const t = useToolT(MEWGENICS_NS)
-  const { cat, catDef, q, setQ, view, setView, sort, setSort, filters, setFilters, filterOpts, filtered, shown, abilitiesLoading, numberedHidden, searchRef, pick, favIds, toggleFav, isFav, loadMore, canLoadMore, cursorEnabled, playSound } = codex
+  const { cat, catDef, q, setQ, view, setView, density, setDensity, sort, setSort, filters, setFilters, filterOpts, filtered, shown, abilitiesLoading, numberedHidden, searchRef, pick, isFav, loadMore, canLoadMore, cursorEnabled, playSound } = codex
+  const [filtersOpen, setFiltersOpen] = React.useState(false)
+  const filtersId = React.useId()
 
-  const hasFiltersOrSearch = q || Object.values(filters).some((v) => v)
+  const activeFilterCount = Object.values(filters).filter((v) => v).length
+  const catFavCount = filtered.filter((r) => isFav(r)).length
+  const hasFilterControls = filterOpts.length > 0 || catFavCount > 0 || numberedHidden > 0 || filters.__fav === "1" || filters.__numbered === "1"
+  const hasFiltersOrSearch = q || activeFilterCount > 0
+
+  React.useEffect(() => {
+    if (activeFilterCount > 0) setFiltersOpen(true)
+  }, [activeFilterCount])
 
   const loading =
     catDef.remote && abilitiesLoading ? (
-      <div className="flex items-center justify-center gap-3 py-[3.75rem] text-[color:var(--mwp-cream-dim)]">
-        <span className="h-[1.375rem] w-[1.375rem] animate-spin border-[3px] border-solid border-[color:var(--mwp-nline)] border-t-[color:var(--mwp-red)] [border-radius:50%] motion-reduce:animate-none" />
-        {t("roster.loadingAbilities")}
-      </div>
+      <MewLoading label={t("roster.loadingAbilities")} />
     ) : null
 
   const error =
@@ -62,12 +69,10 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
       />
     ) : null
 
-  const catFavCount = filtered.filter((r) => isFav(r)).length
-
   return (
     <div className="px-[var(--mew-gutter)] pb-16 pt-5">
       {/* toolbar: search + sort + view toggle */}
-      <div className="flex flex-wrap items-center gap-2.5 mb-4">
+      <div className="mew-browse__toolbar mb-4 flex flex-wrap items-center gap-2.5">
         <div className="min-w-[13.75rem] flex-1 basis-[17.5rem]">
           <MewSearch
             ref={searchRef}
@@ -87,23 +92,28 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
             className="w-[11.875rem] flex-none max-[520px]:flex-1"
           />
         )}
-        <div className="flex flex-none gap-[0.3125rem]">
+        <MewSelect
+          value={density}
+          onChange={(value) => setDensity(value as "compact" | "comfortable")}
+          options={[
+            { value: "comfortable", label: t("roster.densityComfortable") },
+            { value: "compact", label: t("roster.densityCompact") },
+          ]}
+          ariaLabel={t("roster.densityLabel")}
+          className="w-[8.5rem] flex-none max-[520px]:flex-1"
+        />
+        <div className="mew-browse__view-toggle flex flex-none gap-[0.3125rem]">
           {(["grid", "list"] as const).map((vw) => (
-            <button
+            <MewIconButton
               key={vw}
-              type="button"
+              icon={vw === "grid" ? "grid" : "list"}
+              label={vw === "grid" ? t("roster.viewGrid") : t("roster.viewList")}
+              active={view === vw}
               aria-label={vw === "grid" ? t("roster.viewGrid") : t("roster.viewList")}
               aria-pressed={view === vw}
               onClick={() => setView(vw)}
-              className={
-                "grid h-[2.5rem] w-[2.75rem] place-items-center border-2 border-solid [border-radius:var(--wob-sm)] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 active:translate-y-0.5 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)] " +
-                (view === vw
-                  ? "border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)]"
-                  : "border-dashed border-[color:var(--mwp-nline)] bg-transparent text-[color:var(--mwp-cream-dim)] hover:border-[color:var(--mwp-ink-soft)]")
-              }
-            >
-              <Icon name={vw === "grid" ? "grid" : "list"} size={16} />
-            </button>
+              className="mew-browse__view-button"
+            />
           ))}
         </div>
       </div>
@@ -115,48 +125,67 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
         </div>
       )}
 
-      {/* filter chip groups */}
-      {filterOpts.length > 0 && (
-        <div className="mb-4 grid gap-3">
-          {filterOpts.map((fo) => (
-            <MewChips
-              key={fo.key}
-              label={fo.label}
-              value={filters[fo.key] || ""}
-              options={[{ value: "", label: t("roster.filterAll") }, ...fo.options]}
-              onChange={(v) => setFilters((f) => ({ ...f, [fo.key]: v as string }))}
-            />
-          ))}
-        </div>
-      )}
-
-      {/* favorites toggle chip */}
-      {catFavCount > 0 && (
-        <div className="mb-4">
-          <MewChips
-            label={t("roster.filters")}
-            value={filters.__fav || ""}
-            options={[
-              { value: "", label: t("roster.filterAll") },
-              { value: "1", label: t("roster.favoritesLabel", { count: catFavCount }) },
-            ]}
-            onChange={(v) => setFilters((f) => ({ ...f, __fav: v as string }))}
-          />
-        </div>
-      )}
-
-      {(numberedHidden > 0 || filters.__numbered === "1") && (
-        <div className="mb-4">
-          <MewChips
-            label={t("roster.mutationFold")}
-            value={filters.__numbered || ""}
-            options={[
-              { value: "", label: t("roster.mutationNamedOnly") },
-              { value: "1", label: t("roster.mutationShowAll") },
-            ]}
-            onChange={(v) => setFilters((f) => ({ ...f, __numbered: v as string }))}
-          />
-        </div>
+      {hasFilterControls && (
+        <section className="mew-filter-tray mb-4" aria-label={t("roster.filters")}>
+          <div className="mew-filter-tray__bar">
+            <MewButton
+              icon="filter"
+              variant={filtersOpen ? "paper" : "ghost"}
+              aria-expanded={filtersOpen}
+              aria-controls={filtersId}
+              className="mew-filter-tray__toggle"
+              onClick={() => setFiltersOpen((open) => !open)}
+            >
+              {t("roster.filters")}
+              {activeFilterCount > 0 && <span className="mew-filter-tray__count">{activeFilterCount}</span>}
+            </MewButton>
+            {activeFilterCount > 0 && (
+              <MewButton
+                icon="x"
+                variant="ghost"
+                className="mew-filter-tray__clear"
+                onClick={() => setFilters({})}
+              >
+                {t("roster.clearFilters")}
+              </MewButton>
+            )}
+          </div>
+          {filtersOpen && (
+            <div id={filtersId} className="mew-filter-tray__body">
+              {filterOpts.map((fo) => (
+                <MewChips
+                  key={fo.key}
+                  label={fo.label}
+                  value={filters[fo.key] || ""}
+                  options={[{ value: "", label: t("roster.filterAll") }, ...fo.options]}
+                  onChange={(v) => setFilters((f) => ({ ...f, [fo.key]: v as string }))}
+                />
+              ))}
+              {catFavCount > 0 && (
+                <MewChips
+                  label={t("roster.filters")}
+                  value={filters.__fav || ""}
+                  options={[
+                    { value: "", label: t("roster.filterAll") },
+                    { value: "1", label: t("roster.favoritesLabel", { count: catFavCount }) },
+                  ]}
+                  onChange={(v) => setFilters((f) => ({ ...f, __fav: v as string }))}
+                />
+              )}
+              {(numberedHidden > 0 || filters.__numbered === "1") && (
+                <MewChips
+                  label={t("roster.mutationFold")}
+                  value={filters.__numbered || ""}
+                  options={[
+                    { value: "", label: t("roster.mutationNamedOnly") },
+                    { value: "1", label: t("roster.mutationShowAll") },
+                  ]}
+                  onChange={(v) => setFilters((f) => ({ ...f, __numbered: v as string }))}
+                />
+              )}
+            </div>
+          )}
+        </section>
       )}
 
       {/* count + shortcut hints */}
@@ -182,28 +211,48 @@ export function MewBrowse({ codex }: { codex: MewCodexModel }) {
             className={
               view === "grid"
                 ? "mt-4 grid gap-x-3 gap-y-4 [grid-template-columns:repeat(auto-fill,minmax(11.625rem,1fr))] max-[520px]:[grid-template-columns:repeat(auto-fill,minmax(9.375rem,1fr))] [animation:mew-fade-rise_160ms_ease-out]"
-                : "mt-4 grid gap-2 grid-cols-1 [animation:mew-fade-rise_160ms_ease-out]"
+                : "mew-reference-list mt-4 grid grid-cols-1 gap-2 [animation:mew-fade-rise_160ms_ease-out]"
             }
+            data-density={density}
           >
             {shown.map((r, idx) => (
               <div key={r.id} style={{ "--card-delay": `${Math.min(idx, 11) * 18}ms` } as React.CSSProperties} className="[animation:mew-card-stagger_200ms_ease-out_forwards] [animation-delay:var(--card-delay)]">
-                <CxCard cat={cat} rec={r} onOpen={() => {
-                  playSound("select")
-                  pick(r.id)
-                }} view={view} cursorEnabled={cursorEnabled} playSound={playSound} />
+                {view === "list" ? (
+                  <MewRecordRow
+                    cat={cat}
+                    rec={r}
+                    density={density}
+                    favorite={isFav(r)}
+                    onOpen={() => {
+                      playSound("select")
+                      pick(r.id)
+                    }}
+                  />
+                ) : (
+                  <CxCard
+                    cat={cat}
+                    rec={r}
+                    onOpen={() => {
+                      playSound("select")
+                      pick(r.id)
+                    }}
+                    view={view}
+                    cursorEnabled={cursorEnabled}
+                    playSound={playSound}
+                  />
+                )}
               </div>
             ))}
           </div>
 
           {canLoadMore && (
             <div className="mt-6 flex flex-col items-center gap-3">
-              <button
-                type="button"
+              <MewButton
                 onClick={loadMore}
-                className="border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-6 py-2.5 text-[0.8125rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_3px_0_var(--mwp-shadow-sm)] transition-all hover:translate-y-[-2px] hover:[box-shadow:0_5px_0_var(--mwp-shadow-sm)] active:translate-y-1 active:[box-shadow:0_1px_0_var(--mwp-shadow-xs)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+                className="mew-button--compact px-6"
               >
                 {t("roster.loadMore")}
-              </button>
+              </MewButton>
               <p className="text-[0.6875rem]/[1.4] text-[color:var(--mwp-cream-dim)] [font-family:var(--mwf-hand)]">
                 {t("roster.loadMoreHint", { remaining: filtered.length - shown.length })}
               </p>

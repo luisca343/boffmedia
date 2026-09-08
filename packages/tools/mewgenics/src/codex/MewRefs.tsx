@@ -4,6 +4,7 @@ import * as React from "react"
 import { Icon, type IconName } from "@boffmedia/ui"
 import { MewHoverCard, MewRefLink } from "../MewPop"
 import { MewRef as MewRefAtom } from "../MewAtoms"
+import { MewTag } from "../mew-kit"
 import { select } from "../mew-store"
 import { mewHuman, mewIsRawToken, type MewRec } from "../mew-util"
 
@@ -123,18 +124,5 @@ export function MewEffects({ map, onNav, empty }: { map?: Record<string, unknown
 }
 
 export function MewFlag({ icon, children, tone }: { icon?: IconName; children: React.ReactNode; tone?: "good" | "warn" | "bad" }) {
-  const toneCls =
-    tone === "good"
-      ? "bg-[color:var(--mwp-paper-good)] [&_svg]:text-[color:var(--mwp-good)]"
-      : tone === "warn"
-        ? "bg-[color:var(--mwp-paper-warn)] [&_svg]:text-[color:var(--mwp-warn)]"
-        : tone === "bad"
-          ? "bg-[color:var(--mwp-paper-bad)] [&_svg]:text-[color:var(--mwp-bad)]"
-          : "bg-[color:var(--mwp-paper-2)] [&_svg]:text-[color:var(--mwp-ink-soft)]"
-  return (
-    <span className={"inline-flex items-center gap-1.5 border-2 border-solid border-[color:var(--mwp-ink)] px-2.5 pb-1 pt-[0.3125rem] text-[0.71875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-sm)] " + toneCls}>
-      {icon && <Icon name={icon} size={12} />}
-      {children}
-    </span>
-  )
+  return <MewTag icon={icon} tone={tone ?? "neutral"} className="mew-flag">{children}</MewTag>
 }

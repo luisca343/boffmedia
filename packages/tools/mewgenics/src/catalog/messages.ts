@@ -41,6 +41,11 @@ export const messages = {
           "sortLabel": "Ordenar",
           "filterAll": "Todo",
           "filters": "Filtros",
+          "densityLabel": "Densidad",
+          "densityCompact": "Compacta",
+          "densityComfortable": "Cómoda",
+          "openEntry": "Abrir {name}",
+          "favorite": "Favorito",
           "favoritesLabel": "★ Favoritos ({count})",
           "clearFilters": "Limpiar filtros",
           "loadMoreHint": "{remaining} resultados más",
@@ -96,6 +101,7 @@ export const messages = {
         },
         "label": {
           "id": "ID",
+          "quickFacts": "Ficha rápida",
           "type": "Tipo",
           "rarity": "Rareza",
           "faction": "Facción",
@@ -343,6 +349,7 @@ export const messages = {
           "act": "Acto"
         },
         "sort": {
+          "default": "Orden original",
           "name": "A–Z",
           "rarity": "Rareza",
           "kind": "Tipo",
@@ -450,7 +457,8 @@ export const messages = {
             "consumable_rare": "Consumible★",
             "consumable_very_rare": "Consumible★★",
             "quest": "Misión",
-            "sidequest": "Sub-misión"
+            "sidequest": "Sub-misión",
+            "cursed": "Maldito"
           },
           "faction": {
             "enemies": "Enemigo",
@@ -688,6 +696,11 @@ export const messages = {
           "sortLabel": "Sort",
           "filterAll": "All",
           "filters": "Filters",
+          "densityLabel": "Density",
+          "densityCompact": "Compact",
+          "densityComfortable": "Comfortable",
+          "openEntry": "Open {name}",
+          "favorite": "Favorite",
           "favoritesLabel": "★ Favorites ({count})",
           "clearFilters": "Clear filters",
           "loadMoreHint": "{remaining} more results",
@@ -743,6 +756,7 @@ export const messages = {
         },
         "label": {
           "id": "ID",
+          "quickFacts": "Quick facts",
           "type": "Type",
           "rarity": "Rarity",
           "faction": "Faction",
@@ -990,6 +1004,7 @@ export const messages = {
           "act": "Act"
         },
         "sort": {
+          "default": "Original order",
           "name": "A–Z",
           "rarity": "Rarity",
           "kind": "Type",
@@ -1097,7 +1112,8 @@ export const messages = {
             "consumable_rare": "Consumable★",
             "consumable_very_rare": "Consumable★★",
             "quest": "Quest",
-            "sidequest": "Side Quest"
+            "sidequest": "Side Quest",
+            "cursed": "Cursed"
           },
           "faction": {
             "enemies": "Enemy",

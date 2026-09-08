@@ -4,13 +4,14 @@ import * as React from "react"
 import { useToolT, MEWGENICS_NS } from "./i18n"
 import { cn } from '@boffmedia/ui'
 import { Icon, type IconName } from "@boffmedia/ui"
-import { MEW, MEW_KIND_LABEL, MEW_TOKEN_ICON, mewClassColor, mewFactionLabel, mewHueFor, mewHuman, mewIsRawKey, mewMonogram, mewParseText, mewRarityLabel, mewStatNameLabel, mewStatusColor, mewTokenLabelI18n, type MewRec } from "./mew-util"
+import { MEW, MEW_KIND_LABEL, MEW_TOKEN_ICON, mewClassColor, mewFactionLabel, mewHueFor, mewHuman, mewIsRawKey, mewMonogram, mewParseText, mewRarityAccent, mewRarityLabel, mewStatNameLabel, mewStatusColor, mewTokenLabelI18n, type MewRec } from "./mew-util"
 import { mewArtSrc, mewTokenSrc, mewUiSrc, mewCursor, mewFurnitureArt } from "./mew-art"
 import { select } from "./mew-store"
 
 // Mewgenics «Papel y tinta» atoms: tokened text, art tile, rarity/faction/kind
 // stickers, crayon stat bars, entity refs, the generic effect renderer and the
-// taped paper panel. Prefix mew-. Hue arrives via inline --h.
+// taped paper panel. Prefix mew-. Category hue and item rarity accent arrive
+// through inline custom properties.
 
 function MewTok({ v }: { v: string }) {
   const t = useToolT(MEWGENICS_NS)
@@ -49,6 +50,7 @@ export function MewText({ children, muted, className }: { children?: React.React
 
 export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artProp }: { cat: string; rec: MewRec; size?: number; glyph?: IconName; frame?: "blob" | "slot"; art?: string | null }) {
   const hue = mewHueFor(cat, rec)
+  const rarityAccent = cat === "items" ? mewRarityAccent(rec.rarity, rec.cursed) : undefined
   // Classes and statuses ship ONE flat white glyph each (or one per kind), so
   // the roster reads as a wall of identical marks. Both carry a real colour in
   // the game data — a palette row / an EliteFlatTint or weather effect — and
@@ -86,23 +88,33 @@ export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artPr
     } : undefined
     return mewArtSrc(cat, rec, setMemberResolver)
   }, [err, artProp, cat, rec])
-  // The game frames inventory art in a square beveled slot; fall back to the
-  // blob when the slot asset is unavailable (store not loaded, styleguide).
+  // Item SVGs already contain the game's native silhouette. Do not put a
+  // second Codex blob/slot around them; the generic frame remains useful for
+  // categories whose art is a glyph or a fallback monogram.
   const slotSrc = frame === "slot" ? mewUiSrc("slots", "InventoryGridBGBox") : null
+  const nativeItemArt = cat === "items" && !!art
+  const rarityFrame = nativeItemArt ? mewRarityAssetSrc(rec.rarity, rec.cursed) : undefined
   return (
     <span
       aria-hidden
-      style={{ "--h": hue, width: size, height: size, ...(slotSrc ? { backgroundImage: `url(${slotSrc})`, backgroundSize: "100% 100%" } : {}) } as React.CSSProperties}
+      style={{ "--h": hue, ...(rarityAccent ? { "--mew-card-accent": rarityAccent } : {}), width: size, height: size, ...(!nativeItemArt && slotSrc ? { backgroundImage: `url(${slotSrc})`, backgroundSize: "100% 100%" } : {}) } as React.CSSProperties}
       className={cn(
-        "relative grid flex-none place-items-center overflow-hidden border-2 border-solid border-[hsl(var(--h)_45%_27%)] text-[hsl(var(--h)_50%_28%)]",
-        slotSrc
-          ? "bg-[color:var(--mwp-paper-2)] [border-radius:10px_12px_11px_13px]"
-          : "[background:radial-gradient(120%_120%_at_30%_18%,hsl(var(--h)_58%_88%),hsl(var(--h)_46%_74%))] [border-radius:48%_52%_45%_55%/55%_45%_52%_48%]",
+        nativeItemArt
+          ? "mew-tile mew-tile--native relative grid flex-none place-items-center overflow-visible border-0 bg-transparent p-0 [border-radius:0]"
+          : "mew-tile mew-tile--framed relative grid flex-none place-items-center overflow-hidden border-2 border-solid",
+        !nativeItemArt && (slotSrc
+          ? "mew-tile--slot"
+          : "mew-tile--blob"),
       )}>
+      {rarityFrame && (
+        <img src={rarityFrame} alt="" draggable={false} className="mew-tile__rarity-bg" />
+      )}
       {art && tint ? (
         <span
           style={{
             backgroundColor: tint,
+            position: "relative",
+            zIndex: 1,
             WebkitMaskImage: `url(${art})`,
             maskImage: `url(${art})`,
             WebkitMaskRepeat: "no-repeat",
@@ -112,22 +124,22 @@ export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artPr
             WebkitMaskSize: "contain",
             maskSize: "contain",
           }}
-          className="block h-full w-full p-[9%]"
+          className="mew-tile__art block h-full w-full p-[9%]"
         />
       ) : art ? (
-        <img src={art} alt="" width={size} height={size} loading="lazy" onError={() => setErr(true)} className="block h-full w-full object-contain p-[9%] [filter:drop-shadow(0_2px_3px_var(--mwp-shadow-ink-drop))]" />
+        <img src={art} alt="" width={size} height={size} loading="lazy" onError={() => setErr(true)} style={{ position: "relative", zIndex: 1 }} className={cn("mew-tile__art block h-full w-full object-contain [filter:drop-shadow(0_2px_3px_var(--mwp-shadow-ink-drop))]", !nativeItemArt && "p-[9%]")} />
       ) : (
         <>
           {/* No glyph shipped for this record (every weather status, for one —
               the token set has no weather mark). The monogram still carries the
               tint so the theme colour reads consistently across the roster. */}
           <span
-            className="mt-[8%] text-[hsl(var(--h)_55%_22%)] [font-family:var(--mwf-disp)]"
+            className="mew-tile__monogram mt-[8%] [font-family:var(--mwf-disp)]"
             style={{ fontSize: Math.max(12, Math.min(24, Math.round(size * 0.44))), ...(tint ? { color: tint } : {}) }}
           >
             {mewMonogram(rec.name, rec.id)}
           </span>
-          <span className="absolute bottom-[5%] right-[8%] text-[hsl(var(--h)_45%_28%/0.55)]" style={tint ? { color: tint, opacity: 0.7 } : undefined}>
+          <span className="mew-tile__corner absolute bottom-[5%] right-[8%]" style={tint ? { color: tint, opacity: 0.7 } : undefined}>
             <Icon name={ico} size={Math.round(size * 0.34)} />
           </span>
         </>
@@ -136,16 +148,64 @@ export function MewTile({ cat, rec, size = 44, glyph, frame = "blob", art: artPr
   )
 }
 
-const STICKER = "inline-flex items-center gap-1.5 border-2 border-solid px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)] [box-shadow:0_2px_0_var(--mwp-shadow-xs)]"
+const STICKER = "mew-tag"
 
-export function MewRarity({ rarity }: { rarity: string }) {
+// These are the actual rendered frames from DefineSprite 17 (`rarity`) in
+// catparts.swf. Keeping the frame exports intact preserves the game's textured
+// silhouettes, tinting, alpha, and the composite quest-cursed variants.
+const RARITY_ASSET: Record<string, string> = {
+  uncommon: new URL("./assets/rarity/uncommon.png", import.meta.url).toString(),
+  consumable_uncommon: new URL("./assets/rarity/uncommon.png", import.meta.url).toString(),
+  rare: new URL("./assets/rarity/rare.png", import.meta.url).toString(),
+  consumable_rare: new URL("./assets/rarity/rare.png", import.meta.url).toString(),
+  very_rare: new URL("./assets/rarity/very-rare.png", import.meta.url).toString(),
+  consumable_very_rare: new URL("./assets/rarity/very-rare.png", import.meta.url).toString(),
+  quest: new URL("./assets/rarity/quest.png", import.meta.url).toString(),
+  sidequest: new URL("./assets/rarity/sidequest.png", import.meta.url).toString(),
+  cursed: new URL("./assets/rarity/cursed.png", import.meta.url).toString(),
+  "quest-cursed": new URL("./assets/rarity/quest-cursed.png", import.meta.url).toString(),
+  "sidequest-cursed": new URL("./assets/rarity/sidequest-cursed.png", import.meta.url).toString(),
+}
+
+function MewRarityMark({ src }: { src?: string }) {
+  if (!src) return null
+  return <img aria-hidden="true" className="mew-rarity-mark" src={src} alt="" draggable={false} />
+}
+
+function mewRarityAssetKey(rarity: string, cursed: boolean): string {
+  if (!cursed) return rarity
+  if (rarity === "quest") return "quest-cursed"
+  if (rarity === "sidequest") return "sidequest-cursed"
+  return "cursed"
+}
+
+function mewRarityAssetSrc(rarity?: string, cursed = false): string | undefined {
+  const resolvedRarity = rarity || (cursed ? "cursed" : "")
+  if (!resolvedRarity) return undefined
+  return RARITY_ASSET[mewRarityAssetKey(resolvedRarity, cursed && resolvedRarity !== "cursed")]
+}
+
+export function MewRarity({ rarity, cursed = false }: { rarity?: string; cursed?: boolean }) {
   const t = useToolT(MEWGENICS_NS)
-  const m = MEW.rarity(rarity)
-  const label = mewRarityLabel(t, rarity)
+  const resolvedRarity = rarity || (cursed ? "cursed" : "")
+  if (!resolvedRarity) return null
+  const m = MEW.rarity(resolvedRarity)
+  const label = mewRarityLabel(t, resolvedRarity)
+  const cursedOverlay = cursed && resolvedRarity !== "cursed"
+  const asset = mewRarityAssetSrc(rarity, cursed)
+  const rarityColor = mewRarityAccent(resolvedRarity, cursedOverlay) || "#7a7a7a"
   return (
-    <span data-rank={m.rank} style={{ "--h": m.hue } as React.CSSProperties} className={cn(STICKER, "border-[hsl(var(--h)_45%_26%)] bg-[hsl(var(--h)_52%_78%)] text-[hsl(var(--h)_60%_16%)]")}>
-      <span className="h-2 w-2 bg-[hsl(var(--h)_55%_30%)] [border-radius:50%_40%_55%_45%]" />
+    <span
+      data-rank={m.rank}
+      data-marker={m.marker || "none"}
+      data-rarity={resolvedRarity}
+      data-cursed={cursed ? "true" : "false"}
+      style={{ "--mew-rarity-color": rarityColor } as React.CSSProperties}
+      className={cn(STICKER, "mew-rarity-tag")}
+    >
+      <MewRarityMark src={asset} />
       {label}
+      {cursedOverlay && <span className="sr-only"> · {mewRarityLabel(t, "cursed")}</span>}
     </span>
   )
 }
@@ -155,7 +215,7 @@ export function MewFaction({ faction }: { faction: string }) {
   const m = MEW.faction(faction)
   const label = mewFactionLabel(t, faction)
   return (
-    <span style={{ "--h": m.hue } as React.CSSProperties} className={cn(STICKER, "border-[hsl(var(--h)_45%_26%)] bg-[hsl(var(--h)_52%_78%)] text-[hsl(var(--h)_60%_16%)]")}>
+    <span style={{ "--h": m.hue } as React.CSSProperties} className={cn(STICKER, "mew-tag--hue")}>
       {label}
     </span>
   )
@@ -165,7 +225,7 @@ export function MewKind({ kind }: { kind: string }) {
   const t = useToolT(MEWGENICS_NS)
   const kindLabel = MEW_KIND_LABEL[kind] ? t(`data.kind.${kind}`) : mewHuman(kind)
   return (
-    <span className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">
+    <span className="mew-tag">
       <Icon name="bookmark" size={11} className="text-[color:var(--mwp-ink-soft)]" />
       {kindLabel}
     </span>
@@ -181,7 +241,7 @@ export function MewClass({ cls }: { cls: string }) {
   return (
     <span
       style={color ? { borderColor: color.readable, color: color.readable } : undefined}
-      className="inline-flex items-center gap-[0.3125rem] border-2 border-solid border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-2.5 pb-1 pt-[0.3125rem] text-[0.6875rem]/none font-bold text-[color:var(--mwp-ink)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]"
+      className="mew-tag"
     >
       {src ? (
         color ? (
@@ -243,7 +303,7 @@ export function MewRef({ id, label, icon, count }: { id: string; label?: string;
   const t = useToolT(MEWGENICS_NS)
   const name = label || mewHuman(id)
   return (
-    <span className="inline-flex items-center gap-[0.3125rem] border-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-[0.5625rem] pb-1 pt-[0.3125rem] text-[0.75rem]/[1.15] font-semibold text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]" title={t("label.noRef")}>
+    <span className="mew-ref" title={t("label.noRef")}>
       {icon && <Icon name={icon} size={12} className="flex-none text-[color:var(--mwp-ink-soft)]" />}
       <span className="min-w-0">{name}</span>
       {count != null && <span className="pl-[3px] font-mono text-[0.5625rem]/none font-bold text-[color:var(--mwp-ink-soft)]">{count}</span>}
@@ -254,31 +314,31 @@ export function MewRef({ id, label, icon, count }: { id: string; label?: string;
 export { MewEffects } from "./codex/MewRefs"
 
 export function MewPanel({ title, icon, count, aside, children, className, span }: { title?: string; icon?: IconName; count?: number; aside?: React.ReactNode; children?: React.ReactNode; className?: string; span?: "wide" | "full" }) {
-  const spanClass = span === "wide" ? "col-span-2 max-[640px]:col-span-1" : span === "full" ? "col-span-full" : ""
+  const spanClass = span === "wide" ? "mew-panel--wide" : span === "full" ? "mew-panel--full" : ""
   const hasHeader = !!(title || icon || count != null)
   return (
-    <section className={cn("relative border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] text-[color:var(--mwp-ink)] [border-radius:var(--wob-b)] [box-shadow:0_5px_0_var(--mwp-shadow-lg)] mew-paper", spanClass, className)}>
+    <section className={cn("mew-panel mew-paper", spanClass, className)}>
       {hasHeader && (
-        <div style={{ marginLeft: "var(--mwp-tab-shift)" } as React.CSSProperties} className="relative z-[1] -mt-3 mr-4 flex w-fit items-center gap-[0.5625rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-4 pb-[0.5625rem] pt-[0.8125rem] [border-radius:var(--wob-sm)_var(--wob-sm)_0_0] [box-shadow:0_-2px_0_var(--mwp-shadow-lg)] mew-paper">
+        <div className="mew-panel__header mew-paper">
           {icon && (
-            <span className="grid place-items-center text-[color:var(--mwp-red)]">
+            <span className="mew-panel__icon">
               <Icon name={icon} size={14} />
             </span>
           )}
-          {title && <h2 className="m-0 text-[0.90625rem]/none tracking-[0.05em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)]">{title}</h2>}
-          {count != null && <span className="bg-[color:var(--mwp-red-deep)] px-[0.4375rem] py-[3px] font-mono text-[0.65625rem]/none font-bold text-[color:var(--mwp-paper)] [border-radius:10px_8px_11px_9px] [transform:rotate(2deg)]">{count}</span>}
+          {title && <h2>{title}</h2>}
+          {count != null && <span className="mew-panel__count">{count}</span>}
           {aside && <span className="flex-1">{aside}</span>}
         </div>
       )}
-      <div className={cn("relative px-4 pb-4 after:pointer-events-none after:absolute after:left-[8%] after:right-[8%] after:bottom-[3px] after:h-[2px] after:bg-[color:var(--mwp-accent)] after:opacity-70", hasHeader ? "pt-3" : "pt-[0.875rem]")}>{children}</div>
+      <div className={cn("mew-panel__body", !hasHeader && "mew-panel__body--bare")}>{children}</div>
     </section>
   )
 }
 
 export function MewNote({ children, icon = "info" }: { children?: React.ReactNode; icon?: IconName }) {
   return (
-    <div className="mt-3 flex items-start gap-2 border-[1.5px] border-dashed border-[color:var(--mwp-ink-line)] bg-[color:var(--mwp-paper-2)] px-3 py-[0.5625rem] text-[0.78125rem]/[1.5] font-medium italic text-[color:var(--mwp-ink-soft)] [font-family:var(--mwf-hand)] [border-radius:var(--wob-sm)]">
-      <Icon name={icon} size={12} className="mt-px flex-none text-[color:var(--mwp-red)]" />
+    <div className="mew-note">
+      <Icon name={icon} size={12} />
       {children}
     </div>
   )

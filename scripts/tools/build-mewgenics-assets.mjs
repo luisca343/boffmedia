@@ -80,6 +80,9 @@ const CLEAN = cli.clean
 const KEEP_ANIM = cli.keepAnim
 const DRY_RUN = cli.dryRun
 const STAMP_PATH = path.join(OUT, ".build-stamp.toon")
+// Increment whenever output semantics change without changing source files.
+// Schema 2 removes FFDec's timeline-selected rarity layer from item icons.
+const BUILD_SCHEMA = 2
 
 if (!Number.isFinite(ICON_PX) || ICON_PX <= 0) {
   console.error(`[build-mewgenics-assets] --icon-px must be a positive number, got ${cli.iconPx}`)
@@ -204,6 +207,8 @@ function readStamp() {
   const map = new Map()
   if (CLEAN || !fs.existsSync(STAMP_PATH)) return map
   const text = fs.readFileSync(STAMP_PATH, "utf8")
+  const schema = Number(/^schema:\s*(\d+)$/m.exec(text)?.[1] || 0)
+  if (schema !== BUILD_SCHEMA) return map
   let inRows = false
   for (const line of text.split("\n")) {
     if (/^files\[\d+\]\{path,mtimeMs,size\}:$/.test(line.trim())) {
@@ -229,6 +234,7 @@ function writeStamp(decisions) {
   const rows = included.map((d) => `  ${d.relPath},${d.mtimeMs},${d.size}`).join("\n")
   const content =
     `stamp: mewgenics\n` +
+    `schema: ${BUILD_SCHEMA}\n` +
     `builtAt: ${new Date().toISOString()}\n` +
     `iconPx: ${ICON_PX}\n` +
     `files[${included.length}]{path,mtimeMs,size}:\n` +
@@ -493,6 +499,7 @@ async function main() {
 
   let processed = 0
   let skipped = 0
+  let strippedItemRarities = 0
   const errors = []
   const jobs = []
 
@@ -517,6 +524,7 @@ async function main() {
       jobs.push(
         pool.run({ type, profile, inPath, outPath, relPath: d.relPath, px: ICON_PX }).then((res) => {
           if (!res.ok) errors.push(`${d.relPath}: ${res.error}`)
+          else if (res.strippedItemRarity) strippedItemRarities++
         }),
       )
     }
@@ -532,7 +540,7 @@ async function main() {
     process.exit(1)
   }
 
-  console.log(`[build-mewgenics-assets] processed ${processed} file(s), skipped ${skipped} unchanged`)
+  console.log(`[build-mewgenics-assets] processed ${processed} file(s), skipped ${skipped} unchanged, stripped ${strippedItemRarities} baked item-rarity layer(s)`)
 
   if (!DRY_RUN) writeStamp(decisions)
 
@@ -630,6 +638,7 @@ async function main() {
     .map((d) => (d.action === "raster" ? d.relPath.replace(/\.svg$/i, ".webp") : d.relPath))
     .sort()
   const versionHash = crypto.createHash("sha256")
+  versionHash.update(`buildSchema:${BUILD_SCHEMA}\n`)
   versionHash.update(`iconPx:${ICON_PX}\n`)
   for (const rel of emittedRels) {
     const outPath = path.join(OUT, rel)

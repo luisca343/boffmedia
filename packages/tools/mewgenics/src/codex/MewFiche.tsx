@@ -4,6 +4,7 @@ import * as React from "react"
 import { useMewNav } from "../nav"
 import { useToolT, MEWGENICS_NS } from "../i18n"
 import { Icon } from "@boffmedia/ui"
+import { MewButton, MewIconButton } from "../mew-kit"
 import { MEW, mewCatKey } from "../mew-util"
 import { cxTitle } from "./codex-config"
 import type { MewCodexModel } from "./useMewCodex"
@@ -45,61 +46,52 @@ export function MewFiche({ codex }: { codex: MewCodexModel }) {
 
   const pager = (
     <div className="flex flex-none items-center gap-1.5">
-      <button
-        type="button"
+      <MewIconButton
+        icon="back"
+        label={t("fiche.prev")}
         onClick={() => prevRec && pick(prevRec.id)}
         disabled={!prevRec}
         title={prevRec ? cxTitle(prevRec) : undefined}
-        aria-label={t("fiche.prev")}
-        className="grid h-[2.75rem] w-[2.75rem] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all enabled:hover:border-[color:var(--mwp-ink)] enabled:hover:bg-[color:var(--mwp-paper)] enabled:hover:text-[color:var(--mwp-ink)] enabled:active:translate-y-0.5 enabled:active:border-[color:var(--mwp-nline)] enabled:focus-visible:outline-none enabled:focus-visible:ring-2 enabled:focus-visible:ring-[color:var(--mwp-red)] enabled:focus-visible:ring-offset-0 disabled:opacity-35"
-      >
-        <Icon name="back" size={16} />
-      </button>
-      <button
-        type="button"
+        className="mew-fiche__action"
+      />
+      <MewIconButton
+        icon="arrow"
+        label={t("fiche.next")}
         onClick={() => nextRec && pick(nextRec.id)}
         disabled={!nextRec}
         title={nextRec ? cxTitle(nextRec) : undefined}
-        aria-label={t("fiche.next")}
-        className="grid h-[2.75rem] w-[2.75rem] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all enabled:hover:border-[color:var(--mwp-ink)] enabled:hover:bg-[color:var(--mwp-paper)] enabled:hover:text-[color:var(--mwp-ink)] enabled:active:translate-y-0.5 enabled:active:border-[color:var(--mwp-nline)] enabled:focus-visible:outline-none enabled:focus-visible:ring-2 enabled:focus-visible:ring-[color:var(--mwp-red)] enabled:focus-visible:ring-offset-0 disabled:opacity-35"
-      >
-        <Icon name="arrow" size={16} />
-      </button>
-      <button
-        type="button"
+        className="mew-fiche__action"
+      />
+      <MewIconButton
+        icon={copied ? "check" : "link"}
+        label={copied ? t("fiche.shareCopied") : t("fiche.share")}
         onClick={copyLink}
-        title={t("fiche.share")}
-        aria-label={copied ? t("fiche.shareCopied") : t("fiche.share")}
-        className="grid h-[2.75rem] w-[2.75rem] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:translate-y-0.5 active:border-[color:var(--mwp-nline)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
-      >
-        <Icon name={copied ? "check" : "link"} size={16} />
-      </button>
-      <button
-        type="button"
+        className="mew-fiche__action"
+      />
+      <MewIconButton
+        icon="star"
+        label={isFav(selRec) ? t("fiche.favRemove") : t("fiche.favAdd")}
         onClick={() => toggleFav(selRec)}
         aria-pressed={isFav(selRec)}
-        aria-label={isFav(selRec) ? t("fiche.favRemove") : t("fiche.favAdd")}
-        className="grid h-[2.75rem] w-[2.75rem] place-items-center border-[1.5px] border-dashed border-[color:var(--mwp-nline)] text-[color:var(--mwp-cream-dim)] [border-radius:var(--wob-sm)] transition-all hover:border-[color:var(--mwp-ink)] hover:bg-[color:var(--mwp-paper)] hover:text-[color:var(--mwp-ink)] active:translate-y-0.5 active:border-[color:var(--mwp-nline)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0 aria-pressed:border-[color:var(--mwp-ink)] aria-pressed:bg-[color:var(--mwp-paper)] aria-pressed:text-[color:var(--mwp-red)]"
-      >
-        <Icon name="star" size={16} />
-      </button>
+        active={isFav(selRec)}
+        className="mew-fiche__action"
+      />
     </div>
   )
 
   return (
     <div className="px-[var(--mew-gutter)] pb-16 pt-4 [animation:mew-fade-rise_160ms_ease-out]">
-      <div className="sticky top-0 z-[10] bg-[color:var(--mwp-night-2)] -mx-[var(--mew-gutter)] px-[var(--mew-gutter)] pb-3 pt-4 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-dashed border-[color:var(--mwp-nline)]">
-        <button
-          type="button"
+      <div className="mew-fiche__toolbar sticky top-0 z-[10] -mx-[var(--mew-gutter)] flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-dashed border-[color:var(--mwp-nline)] px-[var(--mew-gutter)] pb-3 pt-4">
+        <MewButton
+          icon="back"
           onClick={() => {
             playSound("close")
             back()
           }}
-          className="inline-flex flex-none items-center gap-[0.4375rem] border-2 border-solid border-[color:var(--mwp-ink)] bg-[color:var(--mwp-paper)] px-3 pb-1.5 pt-[0.5625rem] text-[0.8125rem]/none tracking-[0.03em] text-[color:var(--mwp-ink)] [font-family:var(--mwf-disp)] [border-radius:var(--wob-sm)] [box-shadow:var(--mwp-hard)] transition-all hover:-translate-y-[1px] active:translate-y-0.5 active:[box-shadow:0_2px_0_var(--mwp-shadow-sm)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--mwp-red)] focus-visible:ring-offset-0"
+          className="mew-fiche__back"
         >
-          <Icon name="back" size={15} />
           {t("fiche.back", { category: t(mewCatKey(catDef.key, "label")) })}
-        </button>
+        </MewButton>
 
         {/* visited trail with scroll affordance */}
         {trail.length > 1 && (

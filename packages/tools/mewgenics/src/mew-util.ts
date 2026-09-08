@@ -10,7 +10,15 @@ export interface MewMeta {
   hue: number
   key: string
   rank?: number
+  /** The marker shape used by the game's item icon rarity MovieClip. */
+  marker?: MewRarityMarker
+  /** Base tint sampled from the catparts.swf rarity MovieClip render. */
+  color?: string
+  /** The source marker is intentionally translucent over the item art. */
+  opacity?: number
 }
+
+export type MewRarityMarker = "none" | "circle" | "triangle" | "diamond" | "square" | "splat"
 
 export interface MewCat {
   key: string
@@ -47,17 +55,27 @@ export const mewCatKey = (cat: string, leaf: "label" | "singular" | "desc") =>
 const CATBY: Record<string, MewCat> = {}
 MEW_CATS.forEach((c) => { CATBY[c.key] = c })
 
+/**
+ * ItemIcon.rarity from catparts.swf is a labelled MovieClip. Its frames are
+ * the game's canonical visual language, including the intentionally unusual
+ * tier order: common has no marker, then circle, triangle, diamond; quest
+ * variants use a square. The SWF stores the shapes as textured grayscale
+ * art and applies these tints at runtime. The values below are the rendered
+ * RGB values from those frame color transforms (frames 3/5/7/10/11/13), not
+ * a generic rarity palette.
+ */
 const RARITY: Record<string, MewMeta> = {
-  common: { hue: 220, key: "data.rarity.common", rank: 1 },
-  uncommon: { hue: 150, key: "data.rarity.uncommon", rank: 2 },
-  rare: { hue: 210, key: "data.rarity.rare", rank: 3 },
-  very_rare: { hue: 285, key: "data.rarity.very_rare", rank: 4 },
-  consumable_common: { hue: 40, key: "data.rarity.consumable_common", rank: 1 },
-  consumable_uncommon: { hue: 150, key: "data.rarity.consumable_uncommon", rank: 2 },
-  consumable_rare: { hue: 210, key: "data.rarity.consumable_rare", rank: 3 },
-  consumable_very_rare: { hue: 285, key: "data.rarity.consumable_very_rare", rank: 4 },
-  quest: { hue: 96, key: "data.rarity.quest", rank: 3 },
-  sidequest: { hue: 96, key: "data.rarity.sidequest", rank: 2 },
+  common: { hue: 220, key: "data.rarity.common", rank: 1, marker: "none", color: "#7a7a7a", opacity: 0.5 },
+  uncommon: { hue: 150, key: "data.rarity.uncommon", rank: 2, marker: "circle", color: "#7a7a7a", opacity: 0.5 },
+  rare: { hue: 210, key: "data.rarity.rare", rank: 3, marker: "triangle", color: "#d1d17a", opacity: 0.5 },
+  very_rare: { hue: 285, key: "data.rarity.very_rare", rank: 4, marker: "diamond", color: "#d16464", opacity: 0.5 },
+  consumable_common: { hue: 40, key: "data.rarity.consumable_common", rank: 1, marker: "none", color: "#7a7a7a", opacity: 0.5 },
+  consumable_uncommon: { hue: 150, key: "data.rarity.consumable_uncommon", rank: 2, marker: "circle", color: "#7a7a7a", opacity: 0.5 },
+  consumable_rare: { hue: 210, key: "data.rarity.consumable_rare", rank: 3, marker: "triangle", color: "#d1d17a", opacity: 0.5 },
+  consumable_very_rare: { hue: 285, key: "data.rarity.consumable_very_rare", rank: 4, marker: "diamond", color: "#d16464", opacity: 0.5 },
+  quest: { hue: 96, key: "data.rarity.quest", rank: 3, marker: "square", color: "#74cb74", opacity: 0.5 },
+  sidequest: { hue: 96, key: "data.rarity.sidequest", rank: 2, marker: "square", color: "#7474a1", opacity: 0.5 },
+  cursed: { hue: 280, key: "data.rarity.cursed", rank: 0, marker: "splat", color: "#78648f", opacity: 0.5 },
 }
 const FACTION: Record<string, MewMeta> = {
   enemies: { hue: 355, key: "data.faction.enemies" },
@@ -228,6 +246,23 @@ export function mewRarityLabel(t: (k: string) => string, rarity?: string): strin
   return m.key || "—"
 }
 
+/** Game-rendered rarity tint for filter swatches and other non-tag surfaces. */
+export function mewRarityColor(rarity?: string): string {
+  return MEW.rarity(rarity).color || "#7a7a7a"
+}
+
+/**
+ * The accent used by a record's card chrome. Item rarities are deliberately
+ * not converted through the legacy hue scale: the game uses the tinted
+ * MovieClip colours above (gray, yellow, red, green, blue and purple).
+ */
+export function mewRarityAccent(rarity?: string, cursed = false): string | undefined {
+  if (!rarity && !cursed) return undefined
+  const meta = MEW.rarity(rarity)
+  if (cursed && meta.marker !== "square") return MEW.rarity("cursed").color
+  return meta.color
+}
+
 /** Resolve a faction key to its localized label. */
 export function mewFactionLabel(t: (k: string) => string, faction?: string): string {
   const m = MEW.faction(faction)
@@ -391,6 +426,7 @@ export interface MewRec {
   tipNeg?: string
   tipLess?: string
   nameNeg?: string
+  aliases?: string[]
   subject?: string
   prompt?: string
   shield?: number

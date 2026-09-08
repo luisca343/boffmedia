@@ -1,4 +1,4 @@
-import { MEW, mewHuman, mewRarityLabel, mewFactionLabel, type MewRec } from "../mew-util"
+import { MEW, mewHuman, mewRarityColor, mewRarityLabel, mewFactionLabel, type MewRec } from "../mew-util"
 
 // Pure codex configuration: per-category filters/sort, the search-text projection,
 // title accessor and the deep-link hash helpers. No React — imported by the state
@@ -19,7 +19,7 @@ export interface FilterDef {
 export const CX_FILTERS: Record<string, FilterDef[]> = {
   items: [
     { key: "kind", label: "filter.kind.label", from: (r) => r.kind || "", order: ["weapon", "head", "face", "neck", "trinket"], labelFn: (v) => "filter.kind." + v },
-    { key: "rarity", label: "filter.rarity", from: (r) => r.rarity || "", labelFn: (v) => "data.rarity." + v, colorFn: (v) => "hsl(" + MEW.rarity(v).hue + " 70% 60%)" },
+    { key: "rarity", label: "filter.rarity", from: (r) => r.rarity || "", labelFn: (v) => "data.rarity." + v, colorFn: (v) => mewRarityColor(v) },
   ],
   characters: [
     { key: "faction", label: "filter.faction", from: (r) => r.faction || "", labelFn: (v) => "data.faction." + v, colorFn: (v) => "hsl(" + MEW.faction(v).hue + " 70% 60%)" },
@@ -67,67 +67,85 @@ export const CX_FILTERS: Record<string, FilterDef[]> = {
 
 export const CX_SORT: Record<string, { v: string; label: string }[]> = {
   items: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
     { v: "rarity", label: "sort.rarity" },
     { v: "kind", label: "sort.kind" },
   ],
   characters: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
     { v: "hp", label: "sort.hp" },
     { v: "faction", label: "sort.faction" },
   ],
   abilities: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
   passives: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
   keywords: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
   events: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
   classes: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
   maps: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
   furniture: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
     { v: "comfort", label: "sort.furniture.comfort" },
     { v: "appeal", label: "sort.furniture.appeal" },
     { v: "stimulation", label: "sort.furniture.stimulation" },
   ],
   mutations: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
   sets: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
   story_cats: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
   statuses: [
+    { v: "default", label: "sort.default" },
     { v: "name", label: "sort.name" },
   ],
 }
 
 export function cxSearchText(cat: string, r: MewRec): string {
-  if (cat === "items") return (r.name + " " + (r.desc || "") + " " + (r.kind || "")).toLowerCase()
-  if (cat === "characters") return (r.name + " " + (r.tip || "") + " " + (r.faction || "") + " " + (r.type || "")).toLowerCase()
-  if (cat === "abilities") return (r.name + " " + (r.desc || "") + " " + (r.cls || "") + " " + (r.tags || []).join(" ")).toLowerCase()
-  if (cat === "passives") return (r.name + " " + (r.desc || "") + " " + (r.cls || "")).toLowerCase()
-  if (cat === "keywords") return (r.name + " " + (r.tip || "")).toLowerCase()
-  if (cat === "events") return (r.name + " " + (r.subject || "")).toLowerCase()
-  if (cat === "maps") return (r.name + " " + (r.tileset || "")).toLowerCase()
-  if (cat === "furniture") return (r.name + " " + (r.desc || "")).toLowerCase()
-  if (cat === "mutations") return (r.name + " " + (r.desc || "") + " " + (r.body_part || "")).toLowerCase()
-  if (cat === "sets") return (r.name + " " + (r.desc || "")).toLowerCase()
-  if (cat === "story_cats") return (r.name + " " + (r.desc || "")).toLowerCase()
-  if (cat === "statuses") return (r.name + " " + (r.desc || "") + " " + (r.status_kind || "")).toLowerCase()
-  return (r.name || r.id || "").toLowerCase()
+  const extra = [r.id, r.aliases, r.alias, r.quest_item_alias, r.nk, r.tk, r.dk]
+    .flatMap((value) => Array.isArray(value) ? value : [value])
+    .filter((value) => value != null && value !== "")
+  const search = (...parts: unknown[]) => parts.concat(extra).join(" ").toLowerCase()
+
+  if (cat === "items") return search(r.name, r.desc, r.kind)
+  if (cat === "characters") return search(r.name, r.tip, r.faction, r.type)
+  if (cat === "abilities") return search(r.name, r.desc, r.cls, r.tags)
+  if (cat === "passives") return search(r.name, r.desc, r.cls)
+  if (cat === "keywords") return search(r.name, r.tip)
+  if (cat === "events") return search(r.name, r.subject, r.prompt)
+  if (cat === "maps") return search(r.name, r.tileset, r.chapter, r.act)
+  if (cat === "furniture") return search(r.name, r.desc)
+  if (cat === "mutations") return search(r.name, r.desc, r.body_part, r.statMods)
+  if (cat === "sets") return search(r.name, r.desc)
+  if (cat === "story_cats") return search(r.name, r.desc, r.voice)
+  if (cat === "statuses") return search(r.name, r.desc, r.status_kind, r.effects, r.passives)
+  return search(r.name || r.id)
 }
 export function cxTitle(r: MewRec): string { return r.name || r.id }
 
@@ -155,7 +173,7 @@ export function cxParseHash(hash: string): { c: string | null; id: string | null
     id: p.get("id"),
     q: p.get("q") || "",
     filters,
-    sort: p.get("sort") || "name",
+    sort: p.get("sort") || "default",
   }
 }
 
@@ -165,7 +183,7 @@ export function cxBuildHash(cat?: string, id?: string | null, query?: string, fi
   if (cat) p.set("c", cat)
   if (id) p.set("id", id)
   if (query && query !== "") p.set("q", query)
-  if (sort && sort !== "name") p.set("sort", sort)
+  if (sort && sort !== "default") p.set("sort", sort)
   if (filters) {
     for (const [key, val] of Object.entries(filters)) {
       if (val) p.set("f_" + key, val)
