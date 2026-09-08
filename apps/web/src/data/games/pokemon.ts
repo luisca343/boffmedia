@@ -23,35 +23,27 @@ export const pokemon: GameEntry = {
 
   categories: [
     {
-      key: "vgc",
-      nameKey: "games.pokemon.categories.vgc",
-      href: "/pokemon/vgc/meta",
+      key: "competitive",
+      nameKey: "games.pokemon.categories.competitive",
+      href: "/pokemon/teambuilder",
       landing: {
         icon: staticAsset(ASSET.boffmedia.img, "games/pokemon/vgc-icon2.webp"),
-        fallbackIcon: "chart",
+        fallbackIcon: "sword",
         fallbackIconColor: "text-primary-hover",
         color: "from-primary to-violet-600",
-        features: ["meta", "speed", "tracker"],
+        features: ["teamBuilder", "battlesim", "damageCalc", "speed", "meta", "tracker"],
         featured: true,
         isNew: false,
         popularity: "high",
         heroImage: staticAsset(ASSET.boffmedia.img, "games/pokemon/vgc.webp"),
       },
       tools: [
-        { key: "meta",    nameKey: "games.pokemon.tools.meta",    href: "/pokemon/vgc/meta",    sidebarIcon: "chart", bleed: true },
-        { key: "speed",   nameKey: "games.pokemon.tools.speed",   href: "/pokemon/vgc/speed",   sidebarIcon: "bolt", bleed: true },
-        { key: "tracker", nameKey: "games.pokemon.tools.tracker", href: "/pokemon/vgc/tracker", sidebarIcon: "book", bleed: true },
-        // Not in the sidebar or landing yet (v3 migration pending) — the entry
-        // exists so the shell knows the route renders full-bleed.
-        { key: "damageCalc", nameKey: "games.pokemon.tools.damageCalc", href: "/pokemon/vgc/damage-calculator", sidebarIcon: "calc", showInSidebar: false, bleed: true },
-      ],
-    },
-    {
-      key: "teambuilder",
-      nameKey: "games.pokemon.categories.teambuilder",
-      href: "/pokemon/teambuilder",
-      tools: [
         { key: "teambuilder", nameKey: "games.pokemon.tools.teambuilder", href: "/pokemon/teambuilder", sidebarIcon: "layers", bleed: true },
+        { key: "battlesim", nameKey: "games.pokemon.tools.battlesim", href: "/pokemon/battlesim", sidebarIcon: "sword", bleed: true },
+        { key: "damageCalc", nameKey: "games.pokemon.tools.damageCalc", href: "/pokemon/vgc/damage-calculator", sidebarIcon: "calc", bleed: true },
+        { key: "speed",   nameKey: "games.pokemon.tools.speed",   href: "/pokemon/vgc/speed",   sidebarIcon: "bolt", bleed: true },
+        { key: "meta",    nameKey: "games.pokemon.tools.meta",    href: "/pokemon/vgc/meta",    sidebarIcon: "chart", bleed: true },
+        { key: "tracker", nameKey: "games.pokemon.tools.tracker", href: "/pokemon/vgc/tracker", sidebarIcon: "book", bleed: true },
       ],
     },
     {
@@ -64,7 +56,7 @@ export const pokemon: GameEntry = {
         fallbackIcon: "cards",
         fallbackIconColor: "text-yellow-400",
         color: "from-yellow-300 to-yellow-500",
-        features: ["cardList", "collection", "packs"],
+        features: ["cardList", "collection", "packs", "battles"],
         featured: true,
         isNew: true,
         popularity: "high",
@@ -77,27 +69,7 @@ export const pokemon: GameEntry = {
         { key: "cardList",   nameKey: "games.pokemon.tools.cardList",   href: "/pokemon/tcgpocket/cartas",    sidebarIcon: "cards", bleed: true },
         { key: "collection", nameKey: "games.pokemon.tools.collection", href: "/pokemon/tcgpocket/coleccion", sidebarIcon: "grid",  bleed: true },
         { key: "packs",      nameKey: "games.pokemon.tools.packs",      href: "/pokemon/tcgpocket/sobres",    sidebarIcon: "inbox", bleed: true },
-      ],
-    },
-    {
-      key: "battlesim",
-      nameKey: "games.pokemon.categories.battlesim",
-      href: "/pokemon/battlesim",
-      landing: {
-        icon: staticAsset(ASSET.boffmedia.img, "games/pokemon/vgc-icon2.webp"),
-        fallbackIcon: "sword",
-        fallbackIconColor: "text-red-400",
-        color: "from-red-500 to-orange-600",
-        features: ["battlesim"],
-        featured: false,
-        isNew: true,
-        popularity: "high",
-        heroImage: staticAsset(ASSET.boffmedia.img, "games/pokemon/vgc.webp"),
-      },
-      // Full-bleed v3 tool. One route with in-app nav (Lobby · Equipos ·
-      // Repeticiones); live battles keep dedicated room routes (Phase B).
-      tools: [
-        { key: "battlesim", nameKey: "games.pokemon.tools.battlesim", href: "/pokemon/battlesim", sidebarIcon: "sword", bleed: true },
+        { key: "battles",    nameKey: "games.pokemon.tools.battles",    href: "/pokemon/tcgpocket/combates", sidebarIcon: "sword", bleed: true },
       ],
     },
     {

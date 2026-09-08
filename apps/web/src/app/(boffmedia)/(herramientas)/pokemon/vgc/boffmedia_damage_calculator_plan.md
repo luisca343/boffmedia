@@ -302,7 +302,7 @@ Layout:
 ### 📥 Import/Export System ✅ DONE
 
 **Paste import** is handled by `PasteImportModal` inside `MatrixView.tsx`:
-- Uses `parseShowdownPaste(text)` from `@/features/vgc-tracker/showdown-parse` — the same canonical parser used by the tracker's `PresetManager`. Returns `PresetSlot[]` with `{ speciesId, speciesName, item?, ability?, moves: string[], nature? }`.
+- Uses `parseShowdownPaste(text)` from `@/features/vgc-tracker/showdown-parse` — the same canonical parser shared with the tracker's teambuilder adapter. Returns `PresetSlot[]` with `{ speciesId, speciesName, item?, ability?, moves: string[], nature? }`.
 - Move BP/type/category are resolved via `moveMap` from `useGameData()`. The Import button is disabled until `isLoaded === true` (prevents importing with empty move data on slow connections).
 - Species names are matched against `legalPokemon` via `toId()` for canonical lookup.
 - `_lib/pokePasteParser.ts` (old custom parser) is no longer used — ⚠️ **can be deleted** (relied on `@smogon/calc`'s `GEN9.moves.get()` which was fragile and format-specific).
@@ -501,7 +501,7 @@ Checklist:
 | Game data scoped to regulation | `GET /tools/vgc/champions/:reg/game-data` uses `Dex.forFormat()` so only moves/items/abilities valid for that regulation are returned. A single format-agnostic `/data/gen9` endpoint would return incorrect data (e.g. banned moves would appear). |
 | Natures as static client constants | 25 natures are Gen 3+ game constants that never change. No fetch needed. Exported as `NATURES` from `usePokemonData.ts`. |
 | Module-level `_cache` + `_fetchPromise` keyed by regulationId | One fetch per regulation per page session, shared across all components. Same `Record<string, ...>` pattern as `useLegalPokemon`. Prevents duplicate requests from 8+ `MoveSlot` components mounting simultaneously. |
-| `parseShowdownPaste` from tracker | Canonical, tested paste parser already used by `PresetManager`. Removes dependency on `@smogon/calc` for paste move lookups. Move data resolved post-parse via `moveMap` from `useGameData(regulationId)`. |
+| `parseShowdownPaste` from tracker | Canonical, tested paste parser shared with the teambuilder adapter. Removes dependency on `@smogon/calc` for paste move lookups. Move data resolved post-parse via `moveMap` from `useGameData(regulationId)`. |
 | `useChampions` toggle in store | Single source of truth for SP↔EV conversion everywhere |
 | Trick Room in FieldState but NOT in damage calc | Only affects Speed view sort order — never passed to `@smogon/calc` |
 | `Result.damage` typed `number[][]` | v0.11.0 changed tuple `[number[], number[]]` to `number[][]` in the TS type |

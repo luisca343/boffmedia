@@ -16,12 +16,11 @@ import {
   DkTitle,
 } from "@boffmedia/ui/datakit"
 import { Button, Icon } from "@boffmedia/ui"
-import { useSessions, usePresets, useBuilderPresets } from "../../tracker-core/hooks/useVgcDb"
+import { useSessions, useBuilderPresets } from "../../tracker-core/hooks/useVgcDb"
 import type { Session } from "../../tracker-core/types"
 import { TrSessionRow } from "../_components/TrSessionRow"
 import { careerFromSummaries, useSessionSummaries } from "../_components/useSessionSummaries"
 import { NewSessionDialog } from "../_components/NewSessionDialog"
-import { PresetManager } from "../_components/PresetManager"
 import { DuplicateSessionDialog } from "../_components/DuplicateSessionDialog"
 import { ExportImportDialog } from "../_components/ExportImportDialog"
 
@@ -39,9 +38,8 @@ export function TrackerHomeView() {
     unarchive: unarchiveSession,
     refresh: refreshSessions,
   } = useSessions()
-  const { presets, save: savePreset, remove: removePreset } = usePresets()
   const { presets: builderPresets } = useBuilderPresets()
-  const selectablePresets = useMemo(() => [...presets, ...builderPresets], [presets, builderPresets])
+  const selectablePresets = builderPresets
 
   const allSessions = useMemo(() => [...sessions, ...archivedSessions], [sessions, archivedSessions])
   const summaries = useSessionSummaries(allSessions)
@@ -51,7 +49,6 @@ export function TrackerHomeView() {
   const [q, setQ] = useState("")
   const [showArchived, setShowArchived] = useState(false)
   const [showNewSession, setShowNewSession] = useState(false)
-  const [showPresets, setShowPresets] = useState(false)
   const [duplicating, setDuplicating] = useState<Session | null>(null)
   const [showExportImport, setShowExportImport] = useState(false)
 
@@ -101,8 +98,8 @@ export function TrackerHomeView() {
         <DkSearch value={q} onChange={setQ} placeholder={t("search.session")} className="min-w-[min(15rem,100%)]" />
         <DkSpacer />
         <Button size="sm" icon="database" onClick={() => setShowExportImport(true)} aria-label={t("exportImport.title")} />
-        <Button size="sm" icon="layers" onClick={() => setShowPresets(true)}>
-          {t("buttons.presets", { count: presets.length })}
+        <Button size="sm" icon="layers" onClick={() => window.location.assign("/pokemon/teambuilder")}>
+          {t("buttons.teams", { count: builderPresets.length })}
         </Button>
         <Button variant="pri" size="sm" icon="plus" onClick={() => setShowNewSession(true)}>
           {t("buttons.newSession")}
@@ -191,9 +188,6 @@ export function TrackerHomeView() {
 
       {showNewSession && (
         <NewSessionDialog presets={selectablePresets} onConfirm={handleCreateSession} onClose={() => setShowNewSession(false)} />
-      )}
-      {showPresets && (
-        <PresetManager presets={presets} onSave={savePreset} onDelete={removePreset} onClose={() => setShowPresets(false)} />
       )}
       {duplicating && <DuplicateSessionDialog source={duplicating} onConfirm={handleDuplicate} onClose={() => setDuplicating(null)} />}
       {showExportImport && <ExportImportDialog onImportDone={refreshSessions} onClose={() => setShowExportImport(false)} />}

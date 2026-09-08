@@ -128,7 +128,6 @@ import {
   vgcMatches,
   vgcSeries,
   vgcSessions,
-  vgcTeamPresets,
 } from '@/_db/schema/VgcTracker';
 import { battlesimReplays, battlesimTeams } from '@/_db/schema/Battlesim';
 import { wingullInvites } from '@/_db/schema/Wingull';
@@ -557,14 +556,6 @@ export const EXPORTED_TABLES: readonly ExportedTable[] = [
     drizzle: vgcSeries,
     ownedBy: [{ column: vgcSeries.userId, key: 'accountId' }],
     meaning: 'Best-of-three series you logged in the VGC tracker.',
-  },
-  {
-    table: 'tools_vgc_team_presets',
-    section: 'tools',
-    drizzle: vgcTeamPresets,
-    ownedBy: [{ column: vgcTeamPresets.userId, key: 'accountId' }],
-    meaning:
-      'Team presets you saved in the VGC tracker, with their version history.',
   },
   {
     table: 'tools_tcg_user_cards',

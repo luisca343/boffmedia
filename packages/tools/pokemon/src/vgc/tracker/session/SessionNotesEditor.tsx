@@ -12,7 +12,7 @@ export function SessionNotesEditor({ notes, onSave }: { notes?: string; onSave: 
   const handleChange = (text: string) => {
     setValue(text)
     if (timer.current) clearTimeout(timer.current)
-    timer.current = setTimeout(() => onSave(text), 800)
+    timer.current = setTimeout(() => onSave(text), 3_000)
   }
 
   return (

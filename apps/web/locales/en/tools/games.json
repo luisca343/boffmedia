@@ -3,11 +3,9 @@
     "pokemon": {
       "name": "Pokémon",
       "categories": {
-        "vgc": "VGC",
+        "competitive": "Competitive",
         "tcgpocket": "TCG Pocket",
-        "others": "Others",
-        "battlesim": "Battlesim",
-        "teambuilder": "Team Builder"
+        "others": "Others"
       },
       "tools": {
         "meta": "Meta Analysis",
@@ -17,6 +15,7 @@
         "cardList": "Cards",
         "collection": "Collection",
         "packs": "Packs",
+        "battles": "Battles",
         "skyGenerator": "Wonder Mail Generator",
         "pokedex": "Pokédex",
         "damageCalc": "Damage Calculator",

@@ -33,13 +33,13 @@
 
 import { toolDb } from "@boffmedia/tool-kit";
 
-import type { Match, Series, Session, TeamPreset } from "./types";
+import type { Match, Series, Session } from "./types";
 
 /** Whose tracker this is: a Boffmedia user id, or `null` for signed-out work. */
 export type TrackerOwner = string | null;
 
-/** The four collections, in FK-safe order. */
-export type SyncTable = "sessions" | "matches" | "series" | "presets";
+/** The tracker collections, in FK-safe order. */
+export type SyncTable = "sessions" | "matches" | "series";
 
 const BASE_NS = "pokemon.vgc-tracker";
 
@@ -187,7 +187,6 @@ export function trackerStore(owner: TrackerOwner) {
     sessions: table<Session>("sessions", pinned),
     matches: table<Match>("matches", pinned),
     series: table<Series>("series", pinned),
-    presets: table<TeamPreset>("presets", pinned),
   };
 }
 
@@ -196,14 +195,17 @@ export const vgcDb = {
   sessions: table<Session>("sessions", getTrackerOwner),
   matches: table<Match>("matches", getTrackerOwner),
   series: table<Series>("series", getTrackerOwner),
-  presets: table<TeamPreset>("presets", getTrackerOwner),
 };
 
 /** True when signed-out work exists and is worth offering to import. */
 export async function hasAnonymousData(): Promise<boolean> {
   const anon = trackerStore(null);
-  const [sessions, presets] = await Promise.all([anon.sessions.all(), anon.presets.all()]);
-  return sessions.length > 0 || presets.length > 0;
+  const [sessions, matches, series] = await Promise.all([
+    anon.sessions.all(),
+    anon.matches.all(),
+    anon.series.all(),
+  ]);
+  return sessions.length > 0 || matches.length > 0 || series.length > 0;
 }
 
 /**
@@ -218,11 +220,10 @@ export async function claimAnonymousData(owner: string): Promise<void> {
   const anon = trackerStore(null);
   const mine = trackerStore(owner);
 
-  const [sessions, matches, series, presets] = await Promise.all([
+  const [sessions, matches, series] = await Promise.all([
     anon.sessions.all(),
     anon.matches.all(),
     anon.series.all(),
-    anon.presets.all(),
   ]);
 
   // Stamped as a fresh local write, not adopted: as far as the server is
@@ -231,10 +232,8 @@ export async function claimAnonymousData(owner: string): Promise<void> {
   await mine.sessions.putMany(sessions);
   await mine.matches.putMany(matches);
   await mine.series.putMany(series);
-  await mine.presets.putMany(presets);
 
   for (const row of sessions) await anon.sessions.remove(row.id);
   for (const row of matches) await anon.matches.remove(row.id);
   for (const row of series) await anon.series.remove(row.id);
-  for (const row of presets) await anon.presets.remove(row.id);
 }

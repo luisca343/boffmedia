@@ -2,9 +2,12 @@
   "pokemon": {
     "title": "Pokémon",
     "categories": {
-      "vgc": {
-        "name": "VGC",
+      "competitive": {
+        "name": "Competitivo",
         "tools": {
+          "teamBuilder": "Teambuilder",
+          "battlesim": "Battlesim",
+          "damageCalc": "Calculadora de daño",
           "meta": "Análisis de Meta",
           "speed": "Velocidad",
           "tracker": "Tracker"
@@ -35,10 +38,13 @@
     "accessButton": "Acceder a {tool}",
     "explore": "Explorar",
     "tools": {
-      "vgc": {
-        "title": "VGC",
-        "description": "Análisis de meta, niveles de velocidad y tracker de partidas para VGC competitivo",
+      "competitive": {
+        "title": "Pokémon competitivo",
+        "description": "Construye equipos, prueba combates y analiza tu rendimiento en VGC",
         "features": {
+          "teamBuilder": "Teambuilder",
+          "battlesim": "Battlesim",
+          "damageCalc": "Calculadora de daño",
           "meta": "Análisis de Meta",
           "speed": "Velocidad",
           "tracker": "Tracker"
@@ -50,7 +56,8 @@
         "features": {
           "cardList": "Cartas",
           "collection": "Colección",
-          "packs": "Sobres"
+          "packs": "Sobres",
+          "battles": "Combates"
         }
       },
       "pmdsky": {

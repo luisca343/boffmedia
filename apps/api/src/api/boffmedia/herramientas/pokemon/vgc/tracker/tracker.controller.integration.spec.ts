@@ -34,9 +34,6 @@ class MockJwtAuthGuard implements CanActivate {
 
 const mockService = {
   syncAll: jest.fn(),
-  getPresets: jest.fn(),
-  upsertPreset: jest.fn(),
-  deletePreset: jest.fn(),
   getSessions: jest.fn(),
   upsertSession: jest.fn(),
   deleteSession: jest.fn(),
@@ -46,13 +43,6 @@ const mockService = {
   getSeriesForSession: jest.fn(),
   upsertSeries: jest.fn(),
   deleteSeries: jest.fn(),
-};
-
-const VALID_PRESET = {
-  name: 'My Preset',
-  regulationId: 'reg-h',
-  exportString: 'Pikachu @ ...',
-  slots: [],
 };
 
 const VALID_SESSION = {
@@ -128,69 +118,6 @@ describe('TrackerController — integration (ValidationPipe + GlobalExceptionFil
 
       expect(res.status).toBe(200);
       expect(mockService.syncAll).toHaveBeenCalledWith(MOCK_USER_ID);
-    });
-  });
-
-  // ── GET /tools/vgc/tracker/presets ──────────────────────────────────────
-
-  describe('GET /tools/vgc/tracker/presets', () => {
-    it('returns 200 and delegates to service.getPresets with userId', async () => {
-      mockService.getPresets.mockResolvedValue([]);
-
-      const res = await request(app.getHttpServer()).get(
-        '/tools/vgc/tracker/presets',
-      );
-
-      expect(res.status).toBe(200);
-      expect(mockService.getPresets).toHaveBeenCalledWith(MOCK_USER_ID);
-    });
-  });
-
-  // ── PUT /tools/vgc/tracker/presets/:id ──────────────────────────────────
-
-  describe('PUT /tools/vgc/tracker/presets/:id', () => {
-    it('returns 200 and delegates to service.upsertPreset', async () => {
-      mockService.upsertPreset.mockResolvedValue(undefined);
-
-      const res = await request(app.getHttpServer())
-        .put('/tools/vgc/tracker/presets/preset-uuid')
-        .send(VALID_PRESET);
-
-      expect(res.status).toBe(200);
-      expect(mockService.upsertPreset).toHaveBeenCalledWith(
-        MOCK_USER_ID,
-        'preset-uuid',
-        expect.objectContaining({ name: 'My Preset' }),
-      );
-    });
-
-    it('returns 400 when name is missing', async () => {
-      const res = await request(app.getHttpServer())
-        .put('/tools/vgc/tracker/presets/preset-uuid')
-        .send({ regulationId: 'reg-h', exportString: 'x', slots: [] });
-
-      expect(res.status).toBe(400);
-    });
-  });
-
-  // ── DELETE /tools/vgc/tracker/presets/:id ───────────────────────────────
-
-  describe('DELETE /tools/vgc/tracker/presets/:id', () => {
-    it('returns 200 and delegates to service.deletePreset', async () => {
-      mockService.deletePreset.mockResolvedValue(undefined);
-
-      const res = await request(app.getHttpServer()).delete(
-        '/tools/vgc/tracker/presets/preset-uuid',
-      );
-
-      expect(res.status).toBe(200);
-      expect(mockService.deletePreset).toHaveBeenCalledWith(
-        MOCK_USER_ID,
-        'preset-uuid',
-        // No `clientDeletedAt` on the query string: the service stamps the
-        // tombstone with its own clock rather than refusing the delete.
-        undefined,
-      );
     });
   });
 

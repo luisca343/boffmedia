@@ -1,7 +1,7 @@
 'use client';
 
 import { useVgcT } from "../../i18n";
-import { useSingleSeries, useSessions } from '../../tracker-core/hooks/useVgcDb';
+import { useSingleSeries, useSessions, usePreset } from '../../tracker-core/hooks/useVgcDb';
 import { Spinner } from "@boffmedia/ui"
 import { SeriesWorkspace } from './SeriesWorkspace';
 
@@ -14,6 +14,7 @@ export function TrackerSeriesView({ sessionId, seriesId }: Props) {
   const t = useVgcT("tracker");
   const { series, loading, save } = useSingleSeries(seriesId);
   const { sessions } = useSessions();
+  const teamPreset = usePreset(series?.myTeam.presetId ?? null);
   const session = sessions.find((s) => s.id === sessionId);
 
   if (loading) {
@@ -37,6 +38,7 @@ export function TrackerSeriesView({ sessionId, seriesId }: Props) {
       series={series}
       sessionId={sessionId}
       regulationId={session?.regulationId ?? ''}
+      teamPreset={teamPreset}
       onSave={save}
     />
   );

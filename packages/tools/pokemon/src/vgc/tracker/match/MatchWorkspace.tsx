@@ -5,25 +5,26 @@ import { useVgcNav } from "../../routing";
 import { useVgcT } from "../../i18n";
 import { cn } from '@boffmedia/ui/cn';
 import { Icon } from "@boffmedia/ui"
-import { DkApp, DkBar, DkBody, DkBack, DkTitle, DkSpacer, cssVars } from '@boffmedia/ui/datakit';
+import { DkApp, DkBar, DkBody, DkBack, DkTitle, DkSpacer, DkDivider, cssVars } from '@boffmedia/ui/datakit';
 import { usePokemonSearch } from '../../tracker-core/hooks/usePokemonSearch';
 import { NotesPanel, NotesPanelHandle } from './NotesPanel';
 import { TeamPanel } from './TeamPanel';
 import { SpeedTierWidget } from './SpeedTierWidget';
 import { TrSub, TR_OUTCOME_ORDER, TR_OUTCOME_TONE } from '../_components/ui/tr-ui';
-import type { Match, MatchNote, MatchResult, MatchSlot, OutcomeTag } from '../../tracker-core/types';
+import type { Match, MatchNote, MatchResult, MatchSlot, OutcomeTag, TeamPreset } from '../../tracker-core/types';
 
 interface Props {
   match: Match;
   sessionId: string;
   regulationId: string;
+  teamPreset?: TeamPreset | null;
   onSave: (match: Match) => Promise<void>;
   onDelete: () => Promise<void>;
 }
 
 const HDR_INPUT = 'border border-solid border-line-2 bg-base font-body text-txt outline-none transition-[border-color] placeholder:text-txt-dim focus:border-accent';
 
-export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, onSave, onDelete }: Props) {
+export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, teamPreset, onSave, onDelete }: Props) {
   const t = useVgcT("tracker");
   const router = useVgcNav();
   const { search } = usePokemonSearch(regulationId);
@@ -42,7 +43,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
   const scheduleAutosave = useCallback(
     (updated: Match) => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(() => onSave(updated), 600);
+      saveTimer.current = setTimeout(() => onSave(updated), 3_000);
     },
     [onSave],
   );
@@ -114,28 +115,19 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         <DkTitle icon="sword" label={t('workspace.matchTitle')} sub={`${time} · ${match.format}`} />
         <DkSpacer />
 
-        {/* Result toggle */}
-        <div className="inline-flex gap-1">
-          {(['win', 'draw', 'loss'] as MatchResult[]).map((r) => (
-            <ResultButton key={r} result={r} active={match.result === r} onClick={() => handleResult(r)} label={t(`result.${r}Short`)} />
-          ))}
-        </div>
+        {(['win', 'draw', 'loss'] as MatchResult[]).map((r) => (
+          <ResultButton key={r} result={r} active={match.result === r} onClick={() => handleResult(r)} label={t(`result.${r}Short`)} />
+        ))}
 
-        {/* My ELO */}
-        <label className="inline-flex items-center gap-[0.375rem] border border-solid border-line-2 bg-panel px-[0.5rem] py-[0.25rem]">
-          <span className="select-none font-mono text-[0.5625rem] uppercase tracking-[0.08em] text-txt-muted">{t('indicators.myElo')}</span>
-          <input value={eloAfterInput} onChange={(e) => setEloAfterInput(e.target.value)} onBlur={() => update({ eloAfter: isNaN(parseFloat(eloAfterInput)) ? undefined : parseFloat(eloAfterInput) })} placeholder="—" className={cn(HDR_INPUT, 'w-16 border-0 bg-transparent text-center font-mono text-[0.9375rem]')} />
-        </label>
+        <DkDivider />
+        <span className="select-none font-mono text-[0.5625rem] uppercase tracking-[0.08em] text-txt-muted">{t('indicators.myElo')}</span>
+        <input aria-label={t('indicators.myElo')} value={eloAfterInput} onChange={(e) => setEloAfterInput(e.target.value)} onBlur={() => update({ eloAfter: isNaN(parseFloat(eloAfterInput)) ? undefined : parseFloat(eloAfterInput) })} placeholder="—" className={cn(HDR_INPUT, 'h-8 w-16 px-2 text-center font-mono text-[0.9375rem]')} />
 
-        {/* Rival group */}
-        <div className="inline-flex items-center gap-2 border border-solid border-line-2 bg-panel px-[0.5rem] py-[0.25rem]">
-          <input value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT, 'w-24 border-0 bg-transparent text-[0.8125rem]')} />
-          <span className="text-txt-dim">·</span>
-          <input value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT, 'w-20 border-0 bg-transparent text-[0.75rem] text-txt-muted')} />
-          <span className="text-txt-dim">·</span>
-          <span className="select-none font-mono text-[0.5625rem] uppercase tracking-[0.08em] text-txt-muted">{t('indicators.rival')}</span>
-          <input value={opponentEloInput} onChange={(e) => setOpponentEloInput(e.target.value)} onBlur={() => update({ opponentElo: isNaN(parseFloat(opponentEloInput)) ? undefined : parseFloat(opponentEloInput) })} placeholder="—" className={cn(HDR_INPUT, 'w-16 border-0 bg-transparent text-center font-mono text-[0.9375rem]')} />
-        </div>
+        <DkDivider />
+        <span className="select-none font-mono text-[0.5625rem] font-semibold uppercase tracking-[0.08em] text-txt-muted">{t('indicators.rival')}</span>
+        <input aria-label={t('labels.rivalName')} value={opponentNameInput} onChange={(e) => setOpponentNameInput(e.target.value)} onBlur={() => update({ opponentName: opponentNameInput.trim() || undefined })} placeholder={t('placeholders.rivalName')} className={cn(HDR_INPUT, 'h-8 w-32 px-2 text-[0.8125rem]')} />
+        <input aria-label={t('archetype.label')} value={archetypeInput} onChange={(e) => setArchetypeInput(e.target.value)} onBlur={() => update({ opponentArchetype: archetypeInput.trim() || undefined })} placeholder={t('archetype.placeholder')} className={cn(HDR_INPUT, 'h-8 w-24 px-2 text-[0.75rem] text-txt-muted')} />
+        <input aria-label="ELO" value={opponentEloInput} onChange={(e) => setOpponentEloInput(e.target.value)} onBlur={() => update({ opponentElo: isNaN(parseFloat(opponentEloInput)) ? undefined : parseFloat(opponentEloInput) })} placeholder="—" className={cn(HDR_INPUT, 'h-8 w-16 px-2 text-center font-mono text-[0.9375rem]')} />
 
         {/* Finish / saved */}
         {!isCompleted ? (
@@ -148,16 +140,15 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
           </span>
         )}
 
-        {/* Delete */}
         {confirmDelete ? (
-          <div className="inline-flex items-center gap-1">
+          <>
             <button type="button" onClick={handleDelete} className="border border-solid border-bad bg-bad px-[0.625rem] py-[0.375rem] font-mono text-[0.6875rem] font-semibold uppercase text-white">
               {t('buttons.delete')}
             </button>
             <button type="button" onClick={() => setConfirmDelete(false)} className="border border-solid border-line-2 bg-base px-[0.625rem] py-[0.375rem] font-mono text-[0.6875rem] text-txt-muted hover:text-txt">
               {t('buttons.cancel')}
             </button>
-          </div>
+          </>
         ) : (
           <button type="button" onClick={() => setConfirmDelete(true)} title={t('tooltips.deleteMatch')} className="grid h-8 w-8 place-items-center text-txt-dim transition-colors hover:text-bad">
             <Icon name="trash" size={15} />
@@ -169,7 +160,7 @@ export function MatchWorkspace({ match: initialMatch, sessionId, regulationId, o
         <div className="grid grid-cols-1 items-start gap-[1.125rem] min-[760px]:grid-cols-2 min-[1100px]:grid-cols-[minmax(17.5rem,22.5rem)_minmax(0,1fr)_minmax(17.5rem,22.5rem)]">
           <div className="grid gap-3 min-w-0">
             <TeamPanel label={t('labels.myTeam')} slots={match.myTeam.slots} editable={false} tone="var(--accent-bright)" onSlotChange={handleMyTeamChange} />
-            <SpeedTierWidget slots={match.myTeam.slots} regulationId={regulationId} />
+            <SpeedTierWidget slots={match.myTeam.slots} regulationId={regulationId} teamPreset={teamPreset} />
           </div>
 
           <div className="min-w-0 max-[1100px]:order-3 max-[1100px]:col-span-full">

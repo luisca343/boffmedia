@@ -1,83 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
-export class PresetSlotDto {
-  @ApiProperty()
-  slotIndex!: number;
-
-  @ApiProperty()
-  speciesId!: string;
-
-  @ApiProperty()
-  speciesName!: string;
-
-  @ApiPropertyOptional()
-  nickname?: string;
-
-  @ApiPropertyOptional()
-  item?: string;
-
-  @ApiPropertyOptional()
-  ability?: string;
-
-  @ApiProperty({ type: String, isArray: true })
-  moves!: string[];
-
-  @ApiPropertyOptional()
-  nature?: string;
-}
-
-export class PresetVersionDto {
-  @ApiProperty()
-  version!: number;
-
-  @ApiProperty()
-  name!: string;
-
-  @ApiProperty()
-  exportString!: string;
-
-  @ApiProperty({ type: PresetSlotDto, isArray: true })
-  slots!: PresetSlotDto[];
-
-  @ApiProperty()
-  savedAt!: number;
-}
-
-export class TeamPresetDto {
-  @ApiProperty()
-  id!: string;
-
-  @ApiProperty()
-  name!: string;
-
-  @ApiProperty()
-  regulationId!: string;
-
-  @ApiProperty()
-  exportString!: string;
-
-  @ApiProperty({ type: PresetSlotDto, isArray: true })
-  slots!: PresetSlotDto[];
-
-  @ApiProperty()
-  createdAt!: number;
-
-  @ApiProperty()
-  updatedAt!: number;
-
-  @ApiProperty()
-  currentVersion!: number;
-
-  @ApiProperty({ type: PresetVersionDto, isArray: true })
-  versions!: PresetVersionDto[];
-  @ApiPropertyOptional({
-    description:
-      'Epoch ms on the device that last wrote this row. The value conflict ' +
-      'detection compares — never `updatedAt`, which is the server clock.',
-  })
-  clientUpdatedAt?: number;
-}
-
 export class MatchSlotDto {
   @ApiProperty()
   slotIndex!: number;
@@ -307,8 +229,6 @@ export class TrackerDeletedIdsDto {
   @ApiProperty({ type: String, isArray: true })
   series!: string[];
 
-  @ApiProperty({ type: String, isArray: true })
-  presets!: string[];
 }
 
 export class TrackerSyncDataDto {
@@ -320,9 +240,6 @@ export class TrackerSyncDataDto {
 
   @ApiProperty({ type: SeriesDto, isArray: true })
   series!: SeriesDto[];
-
-  @ApiProperty({ type: TeamPresetDto, isArray: true })
-  presets!: TeamPresetDto[];
 
   @ApiProperty({
     type: TrackerDeletedIdsDto,

@@ -61,13 +61,12 @@ import {
 import {
   deleteOp,
   matchOp,
-  presetOp,
   seriesOp,
   sessionOp,
   syncPull,
 } from "../../tracker-service";
 import { useVgcT } from "../../i18n";
-import type { Match, Series, Session, TeamPreset } from "../types";
+import type { Match, Series, Session } from "../types";
 
 export type { SyncTable };
 
@@ -91,7 +90,7 @@ export type { SyncTable };
  */
 export type SyncStatus = ToolSyncState;
 
-type SyncEntity = Session | Match | Series | TeamPreset;
+type SyncEntity = Session | Match | Series;
 
 /**
  * The retry schedule comes from the kit now.
@@ -139,7 +138,7 @@ function opFor(table: SyncTable, id: string, data: SyncEntity | null) {
   if (table === "sessions") return sessionOp(data as Session);
   if (table === "matches") return matchOp(data as Match);
   if (table === "series") return seriesOp(data as Series);
-  return presetOp(data as TeamPreset);
+  throw new Error(`Unsupported tracker table: ${table}`);
 }
 
 /** Rows the queue still owes the server, as `<table>:<id>` dedupe keys. */
@@ -276,11 +275,10 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
     const remote = await syncPull();
     if (!remote) return;
 
-    const [localSessions, localMatches, localSeries, localPresets] = await Promise.all([
+    const [localSessions, localMatches, localSeries] = await Promise.all([
       vgcDb.sessions.all(),
       vgcDb.matches.all(),
       vgcDb.series.all(),
-      vgcDb.presets.all(),
     ]);
     const pending = await pendingKeys();
     const outbox = toolOutbox(trackerNamespace());
@@ -304,12 +302,10 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
     await vgcDb.sessions.adopt(toAdopt("sessions", localSessions, remote.sessions as Session[]));
     await vgcDb.matches.adopt(toAdopt("matches", localMatches, remote.matches as Match[]));
     await vgcDb.series.adopt(toAdopt("series", localSeries, remote.series as Series[]));
-    await vgcDb.presets.adopt(toAdopt("presets", localPresets, remote.presets as TeamPreset[]));
-
     // Tombstones. A row this device is mid-edit keeps its pending write, which
     // the server resolves on arrival (a later edit resurrects it; an earlier
     // one comes back as a conflict).
-    const deleted = remote.deleted ?? { sessions: [], matches: [], series: [], presets: [] };
+    const deleted = remote.deleted ?? { sessions: [], matches: [], series: [] };
     const applyDeletes = async (table: SyncTable, ids: string[]) => {
       for (const id of ids) {
         if (pending.has(`${table}:${id}`)) continue;
@@ -319,20 +315,17 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
     await applyDeletes("matches", deleted.matches ?? []);
     await applyDeletes("series", deleted.series ?? []);
     await applyDeletes("sessions", deleted.sessions ?? []);
-    await applyDeletes("presets", deleted.presets ?? []);
 
     // Local-only work, pushed parent-first so every FK resolves on arrival.
     const gone = {
       sessions: new Set(deleted.sessions ?? []),
       matches: new Set(deleted.matches ?? []),
       series: new Set(deleted.series ?? []),
-      presets: new Set(deleted.presets ?? []),
     };
     const onServer = {
       sessions: new Set(remote.sessions.map((r) => r.id)),
       matches: new Set(remote.matches.map((r) => r.id)),
       series: new Set(remote.series.map((r) => r.id)),
-      presets: new Set(remote.presets.map((r) => r.id)),
     };
     const localOnly = <T extends { id: string }>(table: SyncTable, rows: T[]) =>
       rows.filter(
@@ -342,7 +335,6 @@ export function TrackerSyncProvider({ children }: { children: React.ReactNode })
     for (const row of localOnly("sessions", localSessions)) await outbox.enqueue(sessionOp(row));
     for (const row of localOnly("matches", localMatches)) await outbox.enqueue(matchOp(row));
     for (const row of localOnly("series", localSeries)) await outbox.enqueue(seriesOp(row));
-    for (const row of localOnly("presets", localPresets)) await outbox.enqueue(presetOp(row));
   }, []);
 
   const refreshNow = useCallback(async () => {

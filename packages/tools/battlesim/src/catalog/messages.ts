@@ -1262,7 +1262,7 @@ export const messages = {
         "manifest": {
           "title": "Simulador de combates",
           "description": "Juega contra la IA, combate a otros jugadores o conecta a Pokémon Showdown",
-          "category": "Herramientas"
+          "category": "Competitivo"
         }
       }
     }
@@ -2515,7 +2515,7 @@ export const messages = {
         "manifest": {
           "title": "Battle Simulator",
           "description": "Play against AI, battle other players, or connect to Pokémon Showdown",
-          "category": "Tools"
+          "category": "Competitive"
         }
       }
     }

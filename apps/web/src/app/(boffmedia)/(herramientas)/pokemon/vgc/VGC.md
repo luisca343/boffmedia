@@ -705,10 +705,10 @@ Both old pages replaced by a single route with two tabs.
 Full client-side VGC battle logger. Sessions store match-by-match results, opponent team compositions, ELO history, and rich statistics (usage tables, heatmaps, matchup matrices, lead pairs, ELO curves). All data lives in IndexedDB (Dexie) — no server persistence.
 
 **API calls (metadata only):**
-- `VgcService.getChampionsRegulations()` — regulation list for session creation and preset management
-- `VgcService.getChampionsLegalPokemon(regulationId)` — species list for paste normalization in `PresetManager`
+- `VgcService.getChampionsRegulations()` — regulation list for session creation
+- `VgcService.getChampionsLegalPokemon(regulationId)` — species list for team/paste normalization
 
-**Storage:** `vgcDb` (Dexie/IndexedDB) — sessions, matches, series, presets, preset versions  
+**Storage:** `vgcDb` (Dexie/IndexedDB) — sessions, matches, and series. Teams are read from the canonical teambuilder shelf.
 **Export/import:** Full JSON dump or per-session export; no cloud path
 
 ---
@@ -719,7 +719,7 @@ Full client-side VGC battle logger. Sessions store match-by-match results, oppon
 |---|---|---|
 | Data loss on browser wipe | All tracker data | High |
 | No multi-device sync | Architecture | High |
-| `getChampionsRegulations()` uses legacy endpoint; won't list DB-only regulations | `NewSessionDialog`, `PresetManager` | Medium | **Resolved** — already calls `regulationsRepository.findActive()` (DB-backed) |
+| `getChampionsRegulations()` uses legacy endpoint; won't list DB-only regulations | `NewSessionDialog` | Medium | **Resolved** — already calls `regulationsRepository.findActive()` (DB-backed) |
 | `useRegulationMeta` re-fetches meta on every stats tab open — no cache layer visible | `tracker/[sessionId]/` | Medium |
 | Speed tiers not accessible from match context | Match flow | Low |
 | Opponent Pokémon in a match log are not clickable to meta page | Match flow | Low |
@@ -751,7 +751,7 @@ For `tournament`-type sessions, optionally link the session to an imported Limit
 
 The current export/import JSON mechanism is the only backup path. An opt-in cloud sync (server-side storage of sessions, keyed by user ID) would make the tracker viable for serious players who use multiple devices or fear browser wipe. This requires:
 - Auth (already in place via NextAuth)
-- A new NestJS module (`tracker/`) with session/match/preset CRUD endpoints
+- A new NestJS module (`tracker/`) with session/match CRUD endpoints
 - Client migration: keep IndexedDB as the primary store; sync to server on write; pull on first load from a new device
 
 This is a significant scope addition — needs explicit user decision before proceeding.
@@ -782,9 +782,9 @@ This is a significant scope addition — needs explicit user decision before pro
 
 ### Tracker
 
-**OQ-T1** → **Implemented.** Opt-in cloud sync via `TrackerSyncContext`: auto-pull on login (cloud→local merge), push on every write (`pushChange`), bidirectional backlog catch-up. Sessions/matches/series/presets all upserted. DB migration applied.
+**OQ-T1** → **Implemented.** Opt-in cloud sync via `TrackerSyncContext`: auto-pull on login (cloud→local merge), push on every write (`pushChange`), bidirectional backlog catch-up. Sessions/matches/series are synced; teams come from the canonical teambuilder sync. DB migration applied.
 
-**OQ-T2** → **Yes.** Regulation selector in `NewSessionDialog` + `PresetManager` to migrate from static list / legacy endpoint to `GET /vgc/regulations` (same source as meta and speed tools).
+**OQ-T2** → **Yes.** Regulation selector in `NewSessionDialog` to migrate from static list / legacy endpoint to `GET /vgc/regulations` (same source as meta and speed tools).
 
 **OQ-T3** → **Phase (c) first, then (b), defer (d).** Add Phase 4 divergence badges ("Ladder trap" / "Tournament staple") to `RegulationMetaSection`'s usage table — highest signal-to-noise, uses data already in DB. Once badges land, add Limitless tournament usage % as a tooltip/sub-column (option b). "You vs the meta" panel (option d) deferred until users have meaningful match history (20+ matches).
 

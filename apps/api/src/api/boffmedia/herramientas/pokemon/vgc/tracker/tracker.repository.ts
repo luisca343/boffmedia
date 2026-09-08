@@ -4,16 +4,13 @@ import { and, eq, desc, isNull, isNotNull } from 'drizzle-orm';
 import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
 import {
   vgcSessions,
-  vgcTeamPresets,
   vgcMatches,
   vgcSeries,
   VgcSession,
-  VgcTeamPreset,
   VgcMatch,
   VgcSeries,
   TeamSnapshotData,
   MatchNoteData,
-  PresetSlotData,
 } from '@/_db/schema/VgcTracker';
 
 @Injectable()
@@ -22,92 +19,8 @@ export class TrackerRepository {
     @Inject(DRIZZLE) private db: MySql2Database<Record<string, never>>,
   ) {}
 
-  // ─── Presets ────────────────────────────────────────────────────────────────
+  // Team persistence is owned by the Battlesim teambuilder.
 
-  async findPresets(userId?: number): Promise<VgcTeamPreset[]> {
-    const query = this.db
-      .select()
-      .from(vgcTeamPresets)
-      .where(
-        userId === undefined
-          ? isNull(vgcTeamPresets.deletedAt)
-          : and(
-              eq(vgcTeamPresets.userId, userId),
-              isNull(vgcTeamPresets.deletedAt),
-            ),
-      );
-    return query;
-  }
-
-  /**
-   * By id, tombstones INCLUDED.
-   *
-   * Every caller is a write path deciding what to do about this row, and
-   * "already deleted" is the answer it most needs — hiding it would turn an
-   * upsert over a tombstone into a silent resurrection.
-   */
-  async findPreset(id: string): Promise<VgcTeamPreset | undefined> {
-    const [row] = await this.db
-      .select()
-      .from(vgcTeamPresets)
-      .where(eq(vgcTeamPresets.id, id));
-    return row;
-  }
-
-  async upsertPreset(data: {
-    id: string;
-    userId?: number;
-    name: string;
-    regulationId: string;
-    exportString: string;
-    slots: PresetSlotData[];
-    currentVersion?: number;
-    versions?: any[];
-    createdAt?: Date;
-    updatedAt?: Date;
-    clientUpdatedAt?: number;
-    deletedAt?: number | null;
-  }): Promise<void> {
-    const row = {
-      id: data.id,
-      userId: data.userId,
-      name: data.name,
-      regulationId: data.regulationId,
-      exportString: data.exportString,
-      slots: JSON.stringify(data.slots),
-      currentVersion: data.currentVersion ?? 1,
-      versions: JSON.stringify(data.versions ?? []),
-      createdAt: data.createdAt,
-      updatedAt: data.updatedAt,
-      clientUpdatedAt: data.clientUpdatedAt,
-      deletedAt: data.deletedAt,
-    };
-
-    await this.db
-      .insert(vgcTeamPresets)
-      .values(row)
-      .onDuplicateKeyUpdate({
-        set: {
-          name: data.name,
-          regulationId: data.regulationId,
-          exportString: data.exportString,
-          slots: JSON.stringify(data.slots),
-          currentVersion: data.currentVersion ?? 1,
-          versions: JSON.stringify(data.versions ?? []),
-          updatedAt: data.updatedAt,
-          clientUpdatedAt: data.clientUpdatedAt,
-          deletedAt: data.deletedAt,
-        },
-      });
-  }
-
-  /** Soft — see the tombstone note on the schema. */
-  async deletePreset(id: string, userId: number, at: number): Promise<void> {
-    await this.db
-      .update(vgcTeamPresets)
-      .set({ deletedAt: at })
-      .where(and(eq(vgcTeamPresets.id, id), eq(vgcTeamPresets.userId, userId)));
-  }
 
   // ─── Sessions ────────────────────────────────────────────────────────────────
 
@@ -309,20 +222,17 @@ export class TrackerRepository {
     sessions: VgcSession[];
     matches: VgcMatch[];
     series: VgcSeries[];
-    presets: VgcTeamPreset[];
     deleted: {
       sessions: string[];
       matches: string[];
       series: string[];
-      presets: string[];
     };
   }> {
     const live = <
       T extends
         | typeof vgcSessions
         | typeof vgcMatches
-        | typeof vgcSeries
-        | typeof vgcTeamPresets,
+        | typeof vgcSeries,
     >(
       table: T,
     ) => and(eq(table.userId, userId), isNull(table.deletedAt));
@@ -331,8 +241,7 @@ export class TrackerRepository {
       T extends
         | typeof vgcSessions
         | typeof vgcMatches
-        | typeof vgcSeries
-        | typeof vgcTeamPresets,
+        | typeof vgcSeries,
     >(
       table: T,
     ) =>
@@ -345,11 +254,9 @@ export class TrackerRepository {
       sessions,
       matches,
       seriesList,
-      presets,
       deletedSessions,
       deletedMatches,
       deletedSeries,
-      deletedPresets,
     ] = await Promise.all([
       this.db
         .select()
@@ -366,27 +273,19 @@ export class TrackerRepository {
         .from(vgcSeries)
         .where(live(vgcSeries))
         .orderBy(desc(vgcSeries.createdAt)),
-      this.db
-        .select()
-        .from(vgcTeamPresets)
-        .where(live(vgcTeamPresets))
-        .orderBy(desc(vgcTeamPresets.createdAt)),
       tombstones(vgcSessions),
       tombstones(vgcMatches),
       tombstones(vgcSeries),
-      tombstones(vgcTeamPresets),
     ]);
 
     return {
       sessions,
       matches,
       series: seriesList,
-      presets,
       deleted: {
         sessions: deletedSessions.map((r) => r.id),
         matches: deletedMatches.map((r) => r.id),
         series: deletedSeries.map((r) => r.id),
-        presets: deletedPresets.map((r) => r.id),
       },
     };
   }

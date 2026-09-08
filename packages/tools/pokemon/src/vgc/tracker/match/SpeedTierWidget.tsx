@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useVgcT } from "../../i18n";
 import { cn } from '@boffmedia/ui/cn';
 import { Icon } from "@boffmedia/ui"
-import type { MatchSlot } from '../../tracker-core/types';
+import { calcStat, importPaste } from '@boffmedia/battle-core';
+import { Dex } from '@pkmn/dex';
+import type { MatchSlot, TeamPreset } from '../../tracker-core/types';
 import { spriteUrl, handleSpriteError } from '../../tracker-core/types';
 import { useLegalPokemon } from '../../damage-calculator/_hooks/useLegalPokemon';
 import { calcSpeedStat, applyMods, compareSpeed } from '../../speedCalc';
@@ -13,6 +15,7 @@ import { SpeedFlagChips } from '../../_components/SpeedFlagChips';
 interface Props {
   slots: MatchSlot[];
   regulationId: string;
+  teamPreset?: TeamPreset | null;
 }
 
 const EV_PRESETS = [
@@ -22,7 +25,15 @@ const EV_PRESETS = [
   { label: '252+', evs: 252, nature: 1.1 },
 ] as const;
 
-export function SpeedTierWidget({ slots, regulationId }: Props) {
+function natureMultiplier(nature?: string) {
+  if (!nature) return 1.0;
+  const info = Dex.natures.get(nature);
+  if (info.exists && info.plus === 'spe') return 1.1;
+  if (info.exists && info.minus === 'spe') return 0.9;
+  return 1.0;
+}
+
+export function SpeedTierWidget({ slots, regulationId, teamPreset }: Props) {
   const t = useVgcT("tracker");
   const tMods = useVgcT("speed.modifiers");
   const legalPokemon = useLegalPokemon(regulationId);
@@ -33,16 +44,37 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
   const [slotNatures, setSlotNatures] = useState<Record<number, number>>({});
   const [opponentBaseSpeed, setOpponentBaseSpeed] = useState<number | ''>('');
   const [selectedSlot, setSelectedSlot] = useState<number | null>(null);
+  const actualSets = useMemo(() => {
+    if (!teamPreset?.exportString) return [];
+    return importPaste(teamPreset.exportString) ?? [];
+  }, [teamPreset]);
 
   const rows = slots
     .filter((s) => !!s.speciesName)
     .map((s) => {
       const baseSpe = legalPokemon.find((p) => p.name === s.speciesName)?.baseStats.spe ?? 0;
-      const evs = slotEvs[s.slotIndex] ?? 0;
-      const nature = slotNatures[s.slotIndex] ?? 1.0;
+      const actualSet = actualSets[s.slotIndex];
+      const actualEvs = Number(actualSet?.evs?.spe ?? 0);
+      const actualNatureName = actualSet?.nature ?? 'Serious';
+      const actualNature = natureMultiplier(actualNatureName);
+      const hasPresetOverride = Object.prototype.hasOwnProperty.call(slotEvs, s.slotIndex) || Object.prototype.hasOwnProperty.call(slotNatures, s.slotIndex);
+      const evs = slotEvs[s.slotIndex] ?? actualEvs;
+      const nature = slotNatures[s.slotIndex] ?? actualNature;
       const stat = calcSpeedStat(baseSpe, evs, nature);
-      const effective = applyMods(stat, { boost: 0, tailwind, scarf, paralysis: false });
-      return { slotIndex: s.slotIndex, name: s.speciesName!, baseSpe, effective, evs, nature };
+      const realSpeed = actualSet
+        ? calcStat(
+            teamPreset?.regulationId ?? regulationId,
+            'spe',
+            baseSpe,
+            Number(actualSet.ivs?.spe ?? 31),
+            actualEvs,
+            Number(actualSet.level ?? 50),
+            actualNatureName,
+          )
+        : null;
+      const currentSpeed = realSpeed !== null && !hasPresetOverride ? realSpeed : stat;
+      const effective = applyMods(currentSpeed, { boost: 0, tailwind, scarf, paralysis: false });
+      return { slotIndex: s.slotIndex, name: s.speciesName!, baseSpe, realSpeed, effective, evs, nature, hasPresetOverride };
     })
     .filter((r) => r.baseSpe > 0)
     .sort((a, b) => (trickRoom ? a.effective - b.effective : b.effective - a.effective));
@@ -123,7 +155,22 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
                   </span>
                 </div>
               </div>
-              <span className="relative shrink-0 font-mono text-[0.75rem] tabular-nums text-txt-muted">{row.effective}</span>
+              <span className="relative shrink-0 text-right font-mono text-[0.5625rem] leading-[1.15] tabular-nums text-txt-dim">
+                <span className="block text-[0.5rem] uppercase tracking-[0.08em]">{t('speedWidget.baseShort')}</span>
+                <span className="text-txt-muted">{row.baseSpe}</span>
+              </span>
+              {row.realSpeed !== null && (
+                <span className="relative shrink-0 text-right font-mono text-[0.5625rem] leading-[1.15] tabular-nums text-signal">
+                  <span className="block text-[0.5rem] uppercase tracking-[0.08em]">{t('speedWidget.realShort')}</span>
+                  {row.realSpeed}
+                </span>
+              )}
+              <span className="relative shrink-0 text-right font-mono text-[0.75rem] leading-[1.15] tabular-nums text-txt">
+                <span className="block text-[0.5rem] uppercase tracking-[0.08em] text-txt-dim">
+                  {row.realSpeed !== null ? t('speedWidget.currentShort') : t('speedWidget.calculatedShort')}
+                </span>
+                {row.effective}
+              </span>
               {opponentSpeed !== null && (
                 <span className={cn('relative shrink-0 font-mono text-[0.625rem] tabular-nums', comparisonColor)}>
                   {comparisonResult === 'faster' ? '+' : comparisonResult === 'tie' ? '=' : ''}
@@ -135,6 +182,31 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
 
             {selectedSlot === row.slotIndex && (
               <div className="flex flex-wrap gap-1 border-t border-solid border-line bg-base px-3 py-2">
+                {row.realSpeed !== null && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSlotEvs((current) => {
+                        const next = { ...current };
+                        delete next[row.slotIndex];
+                        return next;
+                      });
+                      setSlotNatures((current) => {
+                        const next = { ...current };
+                        delete next[row.slotIndex];
+                        return next;
+                      });
+                    }}
+                    className={cn(
+                      'border border-solid px-2 py-[2px] font-mono text-[0.625rem] transition-colors',
+                      !row.hasPresetOverride
+                        ? 'border-signal bg-signal-soft text-signal'
+                        : 'border-line-2 bg-panel text-txt-muted hover:text-txt',
+                    )}
+                  >
+                    {t('speedWidget.realPreset')}
+                  </button>
+                )}
                 {EV_PRESETS.map((preset) => (
                   <button
                     key={preset.label}
@@ -145,7 +217,7 @@ export function SpeedTierWidget({ slots, regulationId }: Props) {
                     }}
                     className={cn(
                       'border border-solid px-2 py-[2px] font-mono text-[0.625rem] transition-colors',
-                      row.evs === preset.evs && row.nature === preset.nature
+                      row.hasPresetOverride && row.evs === preset.evs && row.nature === preset.nature
                         ? 'border-accent-line bg-accent-soft text-accent-bright'
                         : 'border-line-2 bg-panel text-txt-muted hover:text-txt',
                     )}

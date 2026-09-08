@@ -14,17 +14,6 @@ import { boffMediaUsers } from './BoffMedia';
 
 // ─── JSON column payload types ───────────────────────────────────────────────
 
-export interface PresetSlotData {
-  slotIndex: 0 | 1 | 2 | 3 | 4 | 5;
-  speciesId: string;
-  speciesName: string;
-  nickname?: string;
-  item?: string;
-  ability?: string;
-  moves: string[];
-  nature?: string;
-}
-
 export interface MatchSlotData {
   slotIndex: 0 | 1 | 2 | 3 | 4 | 5;
   speciesId: string | null;
@@ -46,44 +35,8 @@ export interface MatchNoteData {
 
 // ─── Tables ──────────────────────────────────────────────────────────────────
 
-export const vgcTeamPresets = mysqlTable(
-  'tools_vgc_team_presets',
-  {
-    id: varchar('id', { length: 36 }).primaryKey(),
-    userId: int('user_id').references(() => boffMediaUsers.id, {
-      onDelete: 'cascade',
-    }),
-    name: varchar('name', { length: 128 }).notNull(),
-    regulationId: varchar('regulation_id', { length: 64 }).notNull(),
-    exportString: text('export_string').notNull(),
-    slots: text('slots').notNull(),
-    currentVersion: int('current_version').notNull().default(1),
-    versions: text('versions').notNull().default('[]'),
-    createdAt: timestamp('created_at').notNull().defaultNow(),
-    updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
-    /**
-     * Sync bookkeeping, shared by all four tracker tables.
-     *
-     * `clientUpdatedAt` is the CLIENT's epoch-ms stamp for the last write this
-     * row accepted, and it is what conflict detection compares — never
-     * `updated_at`. `updated_at` is the server's clock; a device whose clock is
-     * five minutes slow would 409 on every write forever if it were compared
-     * against one. Two client stamps at least share a clock domain.
-     *
-     * `deletedAt` is a tombstone, also the client's stamp. A hard DELETE is
-     * invisible to a device that is offline when it happens: its copy survives,
-     * looks local-only on the next pull, and gets pushed straight back. The row
-     * has to stay long enough to be told about.
-     */
-    clientUpdatedAt: bigint('client_updated_at', { mode: 'number' }),
-    deletedAt: bigint('deleted_at', { mode: 'number' }),
-  },
-  (t) => ({
-    userIdx: index('vgc_presets_user_idx').on(t.userId),
-  }),
-);
-
-export type VgcTeamPreset = typeof vgcTeamPresets.$inferSelect;
+// Team persistence belongs to Battlesim.ts; the tracker stores only team ids
+// in session and match snapshots.
 
 export const vgcSessions = mysqlTable(
   'tools_vgc_sessions',
@@ -107,7 +60,7 @@ export const vgcSessions = mysqlTable(
     sessionNotes: text('session_notes'),
     createdAt: timestamp('created_at').notNull().defaultNow(),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
-    /** See the note on `tools_vgc_team_presets`. */
+    /** Client-clock version used by the offline tracker sync. */
     clientUpdatedAt: bigint('client_updated_at', { mode: 'number' }),
     deletedAt: bigint('deleted_at', { mode: 'number' }),
   },
@@ -143,7 +96,7 @@ export const vgcMatches = mysqlTable(
     createdAt: timestamp('created_at').notNull().defaultNow(),
     completedAt: timestamp('completed_at'),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
-    /** See the note on `tools_vgc_team_presets`. */
+    /** Client-clock version used by the offline tracker sync. */
     clientUpdatedAt: bigint('client_updated_at', { mode: 'number' }),
     deletedAt: bigint('deleted_at', { mode: 'number' }),
   },
@@ -182,7 +135,7 @@ export const vgcSeries = mysqlTable(
     seriesResult: varchar('series_result', { length: 8 }),
     notes: text('notes').notNull().default('[]'),
     updatedAt: timestamp('updated_at').notNull().defaultNow().onUpdateNow(),
-    /** See the note on `tools_vgc_team_presets`. */
+    /** Client-clock version used by the offline tracker sync. */
     clientUpdatedAt: bigint('client_updated_at', { mode: 'number' }),
     deletedAt: bigint('deleted_at', { mode: 'number' }),
   },

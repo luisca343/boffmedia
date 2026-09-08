@@ -21,7 +21,6 @@ import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { TrackerService } from './tracker.service';
 import {
   CreateMatchDto,
-  CreateTrackerPresetDto,
   CreateSessionDto,
   UpsertSeriesDto,
 } from './dto';
@@ -29,7 +28,6 @@ import {
   MatchDto,
   SeriesDto,
   SessionDto,
-  TeamPresetDto,
   TrackerSyncDataDto,
 } from './response.dto';
 
@@ -44,7 +42,7 @@ export class TrackerController {
   @Get('sync')
   @ApiOperation({
     summary:
-      'Pull all tracker data for a user (sessions, matches, series, presets)',
+      'Pull all tracker data for a user (sessions, matches, series)',
   })
   @ApiResponse({
     status: 200,
@@ -56,50 +54,6 @@ export class TrackerController {
   }
 
   // ─── Presets ────────────────────────────────────────────────────────────────
-
-  @Get('presets')
-  @ApiOperation({ summary: 'List team presets' })
-  @ApiResponse({
-    status: 200,
-    description: 'Presets returned.',
-    type: TeamPresetDto,
-    isArray: true,
-  })
-  getPresets(@Req() req: any) {
-    return this.service.getPresets(req.user.userId);
-  }
-
-  @Put('presets/:id')
-  @ApiParam({ name: 'id', description: 'Preset UUID' })
-  @ApiOperation({ summary: 'Create or update a team preset' })
-  upsertPreset(
-    @Param('id') id: string,
-    @Body() dto: CreateTrackerPresetDto,
-    @Req() req: any,
-  ) {
-    return this.service.upsertPreset(req.user.userId, id, dto);
-  }
-
-  @Delete('presets/:id')
-  @ApiOperation({ summary: 'Delete a team preset' })
-  @ApiQuery({
-    name: 'clientDeletedAt',
-    required: false,
-    description:
-      "Epoch ms on the deleting device. Stored as the tombstone's timestamp so a " +
-      'later offline edit of the same row can be told apart from an earlier one.',
-  })
-  deletePreset(
-    @Param('id') id: string,
-    @Req() req: any,
-    @Query('clientDeletedAt') clientDeletedAt?: string,
-  ) {
-    return this.service.deletePreset(
-      req.user.userId,
-      id,
-      clientDeletedAt ? Number(clientDeletedAt) : undefined,
-    );
-  }
 
   // ─── Sessions ────────────────────────────────────────────────────────────────
 

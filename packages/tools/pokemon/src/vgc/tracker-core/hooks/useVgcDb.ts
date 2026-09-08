@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { vgcDb } from '../db';
-import type { Match, PresetVersion, Series, Session, TeamPreset } from '../types';
+import type { Match, Series, Session, TeamPreset } from '../types';
 import { useTrackerSync } from '../context/TrackerSyncContext';
 import { getBuilderPreset, listBuilderPresets } from '../builder-teams';
 
@@ -128,60 +128,6 @@ export function useMatch(matchId: string) {
 
 // ─── Presets ─────────────────────────────────────────────────────────────────
 
-export function usePresets() {
-  const [presets, setPresets] = useState<TeamPreset[]>([]);
-  const [loading, setLoading] = useState(true);
-  const { pushChange, lastSyncAt } = useTrackerSync();
-
-  const refresh = useCallback(async () => {
-    const rows = await vgcDb.presets.all();
-    rows.sort((a, b) => b.createdAt - a.createdAt);
-    setPresets(rows);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => { refresh(); }, [refresh, lastSyncAt]);
-
-  const save = useCallback(async (preset: TeamPreset) => {
-    const existing = await vgcDb.presets.get(preset.id);
-    if (existing) {
-      // Auto-version: snapshot current state before overwriting
-      const snapshot: PresetVersion = {
-        version: existing.currentVersion,
-        name: existing.name,
-        exportString: existing.exportString,
-        slots: existing.slots,
-        savedAt: Date.now(),
-      };
-      const updated: TeamPreset = {
-        ...preset,
-        versions: [...(existing.versions ?? []), snapshot],
-        currentVersion: (existing.currentVersion ?? 1) + 1,
-        updatedAt: Date.now(),
-      };
-      const stored = await vgcDb.presets.put(updated);
-      pushChange('presets', stored.id, stored);
-    } else {
-      const toSave: TeamPreset = {
-        ...preset,
-        versions: preset.versions ?? [],
-        currentVersion: preset.currentVersion ?? 1,
-      };
-      const stored = await vgcDb.presets.put(toSave);
-      pushChange('presets', stored.id, stored);
-    }
-    await refresh();
-  }, [refresh, pushChange]);
-
-  const remove = useCallback(async (id: string) => {
-    await vgcDb.presets.remove(id);
-    pushChange('presets', id, null);
-    await refresh();
-  }, [refresh, pushChange]);
-
-  return { presets, loading, save, remove, refresh };
-}
-
 /**
  * The teambuilder is the canonical team editor. These rows are deliberately
  * read-only here: the tracker may select them for a session, while rename,
@@ -263,13 +209,7 @@ export function usePreset(presetId: string | null) {
 
   useEffect(() => {
     if (!presetId) { setPreset(null); return; }
-    vgcDb.presets.get(presetId).then(async (p) => {
-      if (p) {
-        setPreset(p);
-        return;
-      }
-      setPreset(await getBuilderPreset(presetId));
-    });
+    getBuilderPreset(presetId).then(setPreset);
   }, [presetId, lastSyncAt]);
 
   return preset;

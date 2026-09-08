@@ -1,6 +1,6 @@
 import { saveFile } from '@boffmedia/tool-kit';
 import { vgcDb } from '../db';
-import type { Match, Series, Session, TeamPreset } from '../types';
+import type { Match, Series, Session } from '../types';
 import type { SyncTable } from '../context/TrackerSyncContext';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -12,7 +12,6 @@ export interface SessionExport {
   session: Session;
   matches: Match[];
   series: Series[];
-  preset?: TeamPreset;
 }
 
 export interface FullExport {
@@ -22,7 +21,6 @@ export interface FullExport {
   sessions: Session[];
   matches: Match[];
   series: Series[];
-  presets: TeamPreset[];
 }
 
 export type VgcExport = SessionExport | FullExport;
@@ -31,10 +29,9 @@ export interface ImportResult {
   sessions: number;
   matches: number;
   series: number;
-  presets: number;
 }
 
-type ImportEntity = Session | Match | Series | TeamPreset;
+type ImportEntity = Session | Match | Series;
 type ImportSyncCallback = (table: SyncTable, id: string, data: ImportEntity) => void;
 
 // ─── Export ───────────────────────────────────────────────────────────────────
@@ -47,22 +44,17 @@ export async function exportSession(sessionId: string): Promise<SessionExport> {
   const matches = allMatches.filter((m) => m.sessionId === sessionId);
   const series = allSeries.filter((s) => s.sessionId === sessionId);
 
-  const preset = session.activePresetId
-    ? ((await vgcDb.presets.get(session.activePresetId)) ?? undefined)
-    : undefined;
-
-  return { _vgcExport: 1, exportedAt: Date.now(), type: 'session', session, matches, series, preset };
+  return { _vgcExport: 1, exportedAt: Date.now(), type: 'session', session, matches, series };
 }
 
 export async function exportAll(): Promise<FullExport> {
-  const [sessions, matches, series, presets] = await Promise.all([
+  const [sessions, matches, series] = await Promise.all([
     vgcDb.sessions.all(),
     vgcDb.matches.all(),
     vgcDb.series.all(),
-    vgcDb.presets.all(),
   ]);
 
-  return { _vgcExport: 1, exportedAt: Date.now(), type: 'full', sessions, matches, series, presets };
+  return { _vgcExport: 1, exportedAt: Date.now(), type: 'full', sessions, matches, series };
 }
 
 /**
@@ -92,7 +84,7 @@ export function parseExportFile(text: string): VgcExport {
 }
 
 export async function importData(data: VgcExport, onSynced?: ImportSyncCallback): Promise<ImportResult> {
-  const result: ImportResult = { sessions: 0, matches: 0, series: 0, presets: 0 };
+  const result: ImportResult = { sessions: 0, matches: 0, series: 0 };
 
   const mergeInto = async <T extends ImportEntity>(
     existing: (T | undefined)[],
@@ -120,15 +112,10 @@ export async function importData(data: VgcExport, onSynced?: ImportSyncCallback)
     await mergeInto(await vgcDb.sessions.getMany(sessions.map((s) => s.id)), sessions, (items) => vgcDb.sessions.putMany(items), 'sessions', 'sessions');
     await mergeInto(await vgcDb.matches.getMany(data.matches.map((m) => m.id)), data.matches, (items) => vgcDb.matches.putMany(items), 'matches', 'matches');
     await mergeInto(await vgcDb.series.getMany(data.series.map((s) => s.id)), data.series, (items) => vgcDb.series.putMany(items), 'series', 'series');
-    if (data.preset) {
-      const presets = [data.preset];
-      await mergeInto(await vgcDb.presets.getMany(presets.map((p) => p.id)), presets, (items) => vgcDb.presets.putMany(items), 'presets', 'presets');
-    }
   } else {
     await mergeInto(await vgcDb.sessions.getMany(data.sessions.map((s) => s.id)), data.sessions, (items) => vgcDb.sessions.putMany(items), 'sessions', 'sessions');
     await mergeInto(await vgcDb.matches.getMany(data.matches.map((m) => m.id)), data.matches, (items) => vgcDb.matches.putMany(items), 'matches', 'matches');
     await mergeInto(await vgcDb.series.getMany(data.series.map((s) => s.id)), data.series, (items) => vgcDb.series.putMany(items), 'series', 'series');
-    await mergeInto(await vgcDb.presets.getMany(data.presets.map((p) => p.id)), data.presets, (items) => vgcDb.presets.putMany(items), 'presets', 'presets');
   }
 
   return result;

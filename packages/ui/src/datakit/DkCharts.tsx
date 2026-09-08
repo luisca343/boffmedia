@@ -3,7 +3,6 @@
 import * as React from "react"
 import { useNsT } from "../i18n"
 import { cn } from "../cn"
-import { cssVars } from "./utils"
 
 function useElementWidth<T extends HTMLElement>() {
   const ref = React.useRef<T>(null)
@@ -121,7 +120,7 @@ export function DkHeat({ rows, cols, max, value, className }: DkHeatProps) {
     <div className={cn("overflow-x-auto", className)}>
       <div
         className="grid items-center gap-[3px]"
-        style={cssVars({ "grid-template-columns": `auto repeat(${cols.length}, minmax(22px,1fr))` })}
+        style={{ gridTemplateColumns: `auto repeat(${cols.length}, minmax(22px,1fr))` }}
       >
         <span />
         {cols.map((c) => (

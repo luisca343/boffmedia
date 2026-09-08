@@ -8,23 +8,6 @@ import {
   IsObject,
 } from 'class-validator';
 
-export class CreateTrackerPresetDto {
-  @ApiPropertyOptional() @IsOptional() @IsString() id?: string;
-  @ApiProperty() @IsString() name: string;
-  @ApiProperty() @IsString() regulationId: string;
-  @ApiProperty() @IsString() exportString: string;
-  @ApiProperty({ type: 'array' }) @IsArray() slots: any[];
-  @ApiPropertyOptional() @IsOptional() @IsNumber() currentVersion?: number;
-  @ApiPropertyOptional({ type: 'array' })
-  @IsOptional()
-  @IsArray()
-  versions?: any[];
-  @ApiPropertyOptional() @IsOptional() @IsNumber() createdAt?: number;
-  @ApiPropertyOptional() @IsOptional() @IsNumber() updatedAt?: number;
-  @ApiPropertyOptional() @IsOptional() @IsNumber() clientUpdatedAt?: number;
-  @ApiPropertyOptional() @IsOptional() @IsNumber() userId?: number;
-}
-
 export class CreateSessionDto {
   @ApiProperty() @IsString() id: string;
   @ApiProperty() @IsString() label: string;

@@ -143,9 +143,6 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
               {t("tagActive")}
             </div>
           )}
-          <div className="absolute bottom-[16%] right-[-4%] z-[3] inline-flex items-center gap-2 border border-solid border-line-2 border-l-[3px] border-l-accent px-3 py-2 font-mono text-[0.625rem] font-semibold uppercase leading-none tracking-[0.1em] text-[#f2f4f8] [animation-delay:-2.5s] [background:rgba(0,0,0,0.82)] cut-tag cut-tag-edge [--cut-line:var(--line-2)] [--cut-tag:7px] animate-[tv-bob_5s_ease-in-out_infinite] [.no-motion_&]:animate-none [[data-theme=light]_&]:[background:rgba(16,19,24,0.9)] max-[980px]:right-0">
-            {t("tagStops")}
-          </div>
         </div>
       </div>
       <button

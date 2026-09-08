@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { TrackerRepository } from './tracker.repository';
 import {
-  CreateTrackerPresetDto,
   CreateSessionDto,
   CreateMatchDto,
   UpdateMatchDto,
@@ -13,7 +12,6 @@ import {
 } from './dto';
 import {
   VgcSession,
-  VgcTeamPreset,
   VgcMatch,
   VgcSeries,
 } from '@/_db/schema/VgcTracker';
@@ -108,70 +106,7 @@ export class TrackerService {
     }
   }
 
-  // ─── Presets ────────────────────────────────────────────────────────────────
-
-  async getPresets(userId: number): Promise<VgcTeamPreset[]> {
-    return this.repo.findPresets(userId);
-  }
-
-  async upsertPreset(
-    userId: number,
-    id: string,
-    dto: CreateTrackerPresetDto,
-  ): Promise<void> {
-    const existing = await this.repo.findPreset(id);
-    if (existing) {
-      this.ensureOwnership(existing.userId, userId, `Preset "${id}"`);
-      this.ensureNoConflict(
-        `Preset "${id}"`,
-        dto.clientUpdatedAt,
-        existing.clientUpdatedAt,
-      );
-      this.resolveTombstone(
-        `Preset "${id}"`,
-        dto.clientUpdatedAt,
-        existing.deletedAt,
-      );
-    }
-
-    await this.repo.upsertPreset({
-      id,
-      userId,
-      name: dto.name,
-      regulationId: dto.regulationId,
-      exportString: dto.exportString,
-      slots: dto.slots,
-      currentVersion: dto.currentVersion,
-      versions: dto.versions,
-      createdAt: dto.createdAt ? new Date(dto.createdAt) : undefined,
-      updatedAt: dto.updatedAt ? new Date(dto.updatedAt) : undefined,
-      // Persist the version this write establishes, and clear any tombstone —
-      // reaching here means `resolveTombstone` judged the edit to be the later
-      // intent.
-      clientUpdatedAt: dto.clientUpdatedAt,
-      deletedAt: null,
-    });
-  }
-
-  /**
-   * `clientDeletedAt` is the deleting device's clock, not ours, because it is
-   * what a later edit is compared against — see `resolveTombstone`.
-   *
-   * Deleting something already deleted is a success, not a 404. The queue
-   * replays, a device can be told to delete a row twice, and answering the
-   * second one with an error turns a delete that worked into a red banner.
-   */
-  async deletePreset(
-    userId: number,
-    id: string,
-    clientDeletedAt?: number,
-  ): Promise<void> {
-    const existing = await this.repo.findPreset(id);
-    if (!existing) throw new NotFoundException(`Preset "${id}" not found.`);
-    this.ensureOwnership(existing.userId, userId, `Preset "${id}"`);
-    if (existing.deletedAt != null) return;
-    await this.repo.deletePreset(id, userId, clientDeletedAt ?? Date.now());
-  }
+  // Teams are owned by the Battlesim teambuilder; tracker rows store IDs only.
 
   // ─── Sessions ────────────────────────────────────────────────────────────────
 
@@ -476,18 +411,9 @@ export class TrackerService {
       notes: typeof s.notes === 'string' ? JSON.parse(s.notes) : s.notes,
     }));
 
-    const presets = raw.presets.map((p) => ({
-      ...p,
-      createdAt: toMs(p.createdAt as any),
-      updatedAt: toMs(p.updatedAt as any),
-      slots: typeof p.slots === 'string' ? JSON.parse(p.slots) : p.slots,
-      versions:
-        typeof p.versions === 'string' ? JSON.parse(p.versions) : p.versions,
-    }));
-
     // `deleted` is what lets a client tell a row it never had from one it is
     // meant to drop. Without it, absence means both, and the client guesses
     // "push it back" — which is how a delete on one device undid itself.
-    return { sessions, matches, series, presets, deleted: raw.deleted };
+    return { sessions, matches, series, deleted: raw.deleted };
   }
 }

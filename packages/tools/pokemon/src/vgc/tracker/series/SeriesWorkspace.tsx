@@ -15,7 +15,7 @@ import {
   handleSpriteError,
   isLead,
 } from '../../tracker-core/types';
-import type { Series, SeriesGame, MatchNote, MatchResult, MatchSlot, OutcomeTag } from '../../tracker-core/types';
+import type { Series, SeriesGame, MatchNote, MatchResult, MatchSlot, OutcomeTag, TeamPreset } from '../../tracker-core/types';
 import { TeamPanel } from '../match/TeamPanel';
 import { SpeedTierWidget } from '../match/SpeedTierWidget';
 import { SeriesNotesPanel } from './SeriesNotesPanel';
@@ -25,10 +25,11 @@ interface Props {
   series: Series;
   sessionId: string;
   regulationId: string;
+  teamPreset?: TeamPreset | null;
   onSave: (series: Series) => Promise<void>;
 }
 
-export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId, onSave }: Props) {
+export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId, teamPreset, onSave }: Props) {
   const t = useVgcT("tracker");
   const router = useVgcNav();
   const { search } = usePokemonSearch(regulationId);
@@ -44,7 +45,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
   const scheduleAutosave = useCallback(
     (updated: Series) => {
       if (saveTimer.current) clearTimeout(saveTimer.current);
-      saveTimer.current = setTimeout(() => onSave(updated), 600);
+      saveTimer.current = setTimeout(() => onSave(updated), 3_000);
     },
     [onSave],
   );
@@ -243,7 +244,7 @@ export function SeriesWorkspace({ series: initialSeries, sessionId, regulationId
           <div className="grid grid-cols-1 items-start gap-[1.125rem] min-[760px]:grid-cols-2 min-[1100px]:grid-cols-[minmax(17.5rem,22.5rem)_minmax(0,1fr)_minmax(17.5rem,22.5rem)]">
             <div className="grid min-w-0 gap-3">
               <TeamPanel label={t('labels.myTeam')} slots={currentGame.mySlots} editable={false} tone="var(--accent-bright)" onSlotChange={(slots) => handleMySlots(activeGame, slots)} />
-              <SpeedTierWidget slots={currentGame.mySlots} regulationId={regulationId} />
+              <SpeedTierWidget slots={currentGame.mySlots} regulationId={regulationId} teamPreset={teamPreset} />
               {activeGame > 1 && <PreviousGameRecap games={series.games} upToGame={activeGame} side="my" />}
             </div>
 

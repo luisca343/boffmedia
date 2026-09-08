@@ -16,17 +16,13 @@
 import type { ToolOutboxOp } from "@boffmedia/tool-kit";
 import type {
   CreateMatchDto,
-  CreateTrackerPresetDto,
   CreateSessionDto,
   MatchDto,
   MatchNoteDto,
   MatchSlotDto,
-  PresetSlotDto,
-  PresetVersionDto,
   SeriesDto,
   SeriesGameDto,
   SessionDto,
-  TeamPresetDto,
   TeamSnapshotDto,
   TrackerSyncDataDto,
   UpsertSeriesDto,
@@ -46,19 +42,6 @@ type TrackerOutcomeTag = 'skill' | 'misplay' | 'luck' | 'disconnect';
 type TrackerNotePhase = 'live' | 'post' | 'series';
 type TrackerSlotIndex = 0 | 1 | 2 | 3 | 4 | 5;
 type TrackerSlotRole = 'lead1' | 'lead2' | 'back1' | 'back2' | 'unknown';
-
-type TrackerPresetSlot = Omit<PresetSlotDto, 'slotIndex'> & {
-  slotIndex: TrackerSlotIndex;
-};
-
-type TrackerPresetVersion = Omit<PresetVersionDto, 'slots'> & {
-  slots: TrackerPresetSlot[];
-};
-
-type TrackerTeamPreset = Omit<TeamPresetDto, 'slots' | 'versions'> & {
-  slots: TrackerPresetSlot[];
-  versions: TrackerPresetVersion[];
-};
 
 type TrackerMatchSlot = Omit<MatchSlotDto, 'slotIndex' | 'role'> & {
   slotIndex: TrackerSlotIndex;
@@ -108,7 +91,6 @@ export type TrackerSyncData = Omit<TrackerSyncDataDto, 'sessions' | 'matches' | 
   sessions: TrackerSession[];
   matches: TrackerMatch[];
   series: TrackerSeries[];
-  presets: TrackerTeamPreset[];
 };
 
 type TrackerSessionWrite = Omit<CreateSessionDto, 'format' | 'type'> & {
@@ -126,10 +108,6 @@ type TrackerMatchWrite = Omit<CreateMatchDto, 'format' | 'result' | 'outcomeTag'
 
 type TrackerSeriesWrite = Omit<UpsertSeriesDto, 'seriesResult'> & {
   seriesResult?: TrackerResult;
-  updatedAt?: number;
-};
-
-type TrackerPresetWrite = CreateTrackerPresetDto & {
   updatedAt?: number;
 };
 
@@ -187,21 +165,6 @@ function toSeriesPayload(series: TrackerSeriesWrite): UpsertSeriesDto {
     seriesResult: series.seriesResult,
     notes: series.notes,
     clientUpdatedAt: series.clientUpdatedAt ?? series.updatedAt,
-  };
-}
-
-function toPresetPayload(preset: TrackerPresetWrite): CreateTrackerPresetDto {
-  return {
-    id: preset.id,
-    name: preset.name,
-    regulationId: preset.regulationId,
-    exportString: preset.exportString,
-    slots: preset.slots,
-    createdAt: preset.createdAt,
-    updatedAt: preset.updatedAt,
-    clientUpdatedAt: preset.clientUpdatedAt ?? preset.updatedAt,
-    currentVersion: preset.currentVersion,
-    versions: preset.versions,
   };
 }
 
@@ -267,15 +230,6 @@ export function seriesOp(series: TrackerSeriesWrite): ToolOutboxOp {
     path: `${BASE}/series/${series.id}`,
     body: toSeriesPayload(series),
     dedupeKey: `series:${series.id}`,
-  };
-}
-
-export function presetOp(preset: TrackerPresetWrite): ToolOutboxOp {
-  return {
-    method: "PUT",
-    path: `${BASE}/presets/${preset.id}`,
-    body: toPresetPayload(preset),
-    dedupeKey: `presets:${preset.id}`,
   };
 }
 

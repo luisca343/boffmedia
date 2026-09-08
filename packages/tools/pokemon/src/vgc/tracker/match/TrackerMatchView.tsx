@@ -1,7 +1,7 @@
 'use client';
 
 import { useVgcT } from "../../i18n";
-import { useMatch, useSessions, useMatches } from '../../tracker-core/hooks/useVgcDb';
+import { useMatch, useSessions, useMatches, usePreset } from '../../tracker-core/hooks/useVgcDb';
 import { Spinner } from "@boffmedia/ui"
 import { MatchWorkspace } from './MatchWorkspace';
 
@@ -15,6 +15,7 @@ export function TrackerMatchView({ sessionId, matchId }: Props) {
   const { match, loading, save } = useMatch(matchId);
   const { sessions } = useSessions();
   const { remove: removeMatch } = useMatches(sessionId);
+  const teamPreset = usePreset(match?.myTeam.presetId ?? null);
   const session = sessions.find((s) => s.id === sessionId);
 
   if (loading) {
@@ -38,6 +39,7 @@ export function TrackerMatchView({ sessionId, matchId }: Props) {
       match={match}
       sessionId={sessionId}
       regulationId={session?.regulationId ?? ''}
+      teamPreset={teamPreset}
       onSave={save}
       onDelete={() => removeMatch(matchId)}
     />
