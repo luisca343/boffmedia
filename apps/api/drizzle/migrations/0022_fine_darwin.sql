@@ -1,1 +1,0 @@
-DROP TABLE `tools_vgc_team_presets`;

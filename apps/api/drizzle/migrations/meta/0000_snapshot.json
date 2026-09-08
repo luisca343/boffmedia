@@ -1,9 +1,339 @@
 {
   "version": "5",
   "dialect": "mysql",
-  "id": "7fc31abb-ba33-4446-98f2-af642bab76e6",
+  "id": "6927d659-b3ce-4891-8336-671b02b37a9d",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
+    "tools_battlesim_replays": {
+      "name": "tools_battlesim_replays",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "format": {
+          "name": "format",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "p1_name": {
+          "name": "p1_name",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "p2_name": {
+          "name": "p2_name",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "winner": {
+          "name": "winner",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "log": {
+          "name": "log",
+          "type": "mediumtext",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "teams": {
+          "name": "teams",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "source": {
+          "name": "source",
+          "type": "enum('local','pvp')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'local'"
+        },
+        "opponent_user_id": {
+          "name": "opponent_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "played_at": {
+          "name": "played_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "bsim_replays_owner_client_uq": {
+          "name": "bsim_replays_owner_client_uq",
+          "columns": [
+            "user_id",
+            "client_id"
+          ],
+          "isUnique": true
+        },
+        "bsim_replays_owner_played_idx": {
+          "name": "bsim_replays_owner_played_idx",
+          "columns": [
+            "user_id",
+            "deleted_at",
+            "played_at"
+          ],
+          "isUnique": false
+        },
+        "bsim_replays_opponent_idx": {
+          "name": "bsim_replays_opponent_idx",
+          "columns": [
+            "opponent_user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "tools_battlesim_replays_user_id_boffmedia_users_id_fk": {
+          "name": "tools_battlesim_replays_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tools_battlesim_replays",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        },
+        "tools_battlesim_replays_opponent_user_id_boffmedia_users_id_fk": {
+          "name": "tools_battlesim_replays_opponent_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tools_battlesim_replays",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "opponent_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "tools_battlesim_replays_id": {
+          "name": "tools_battlesim_replays_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "tools_battlesim_teams": {
+      "name": "tools_battlesim_teams",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "client_id": {
+          "name": "client_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "format": {
+          "name": "format",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "packed": {
+          "name": "packed",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "tags": {
+          "name": "tags",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "('[]')"
+        },
+        "favorite": {
+          "name": "favorite",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "pinned": {
+          "name": "pinned",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        },
+        "client_updated_at": {
+          "name": "client_updated_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "bsim_teams_owner_client_uq": {
+          "name": "bsim_teams_owner_client_uq",
+          "columns": [
+            "user_id",
+            "client_id"
+          ],
+          "isUnique": true
+        },
+        "bsim_teams_owner_deleted_idx": {
+          "name": "bsim_teams_owner_deleted_idx",
+          "columns": [
+            "user_id",
+            "deleted_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "tools_battlesim_teams_user_id_boffmedia_users_id_fk": {
+          "name": "tools_battlesim_teams_user_id_boffmedia_users_id_fk",
+          "tableFrom": "tools_battlesim_teams",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "tools_battlesim_teams_id": {
+          "name": "tools_battlesim_teams_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "boffmedia_roles": {
       "name": "boffmedia_roles",
       "columns": {
@@ -252,6 +582,21 @@
         },
         "deleted_at": {
           "name": "deleted_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "email_bounced": {
+          "name": "email_bounced",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "email_bounced_at": {
+          "name": "email_bounced_at",
           "type": "timestamp",
           "primaryKey": false,
           "notNull": false,
@@ -507,6 +852,393 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
+    "boffmedia_refresh_tokens": {
+      "name": "boffmedia_refresh_tokens",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "jti": {
+          "name": "jti",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "family_id": {
+          "name": "family_id",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "rotated_at": {
+          "name": "rotated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "rt_family_idx": {
+          "name": "rt_family_idx",
+          "columns": [
+            "family_id"
+          ],
+          "isUnique": false
+        },
+        "rt_user_idx": {
+          "name": "rt_user_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        },
+        "rt_expires_idx": {
+          "name": "rt_expires_idx",
+          "columns": [
+            "expires_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "boffmedia_refresh_tokens_user_id_boffmedia_users_id_fk": {
+          "name": "boffmedia_refresh_tokens_user_id_boffmedia_users_id_fk",
+          "tableFrom": "boffmedia_refresh_tokens",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_refresh_tokens_id": {
+          "name": "boffmedia_refresh_tokens_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {
+        "boffmedia_refresh_tokens_jti_unique": {
+          "name": "boffmedia_refresh_tokens_jti_unique",
+          "columns": [
+            "jti"
+          ]
+        }
+      },
+      "checkConstraint": {}
+    },
+    "boffmedia_user_backup_codes": {
+      "name": "boffmedia_user_backup_codes",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "code_hash": {
+          "name": "code_hash",
+          "type": "char(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "used_at": {
+          "name": "used_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "ubc_user_idx": {
+          "name": "ubc_user_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "boffmedia_user_backup_codes_user_id_boffmedia_users_id_fk": {
+          "name": "boffmedia_user_backup_codes_user_id_boffmedia_users_id_fk",
+          "tableFrom": "boffmedia_user_backup_codes",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_user_backup_codes_id": {
+          "name": "boffmedia_user_backup_codes_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "boffmedia_user_totp": {
+      "name": "boffmedia_user_totp",
+      "columns": {
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "secret": {
+          "name": "secret",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "pending_secret": {
+          "name": "pending_secret",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "confirmed_at": {
+          "name": "confirmed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_step": {
+          "name": "last_step",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "boffmedia_user_totp_user_id_boffmedia_users_id_fk": {
+          "name": "boffmedia_user_totp_user_id_boffmedia_users_id_fk",
+          "tableFrom": "boffmedia_user_totp",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_user_totp_user_id": {
+          "name": "boffmedia_user_totp_user_id",
+          "columns": [
+            "user_id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "boffmedia_data_exports": {
+      "name": "boffmedia_data_exports",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('pending','ready','failed','expired')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'pending'"
+        },
+        "filename": {
+          "name": "filename",
+          "type": "varchar(128)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "size_bytes": {
+          "name": "size_bytes",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "last_error": {
+          "name": "last_error",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "requested_at": {
+          "name": "requested_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "completed_at": {
+          "name": "completed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        }
+      },
+      "indexes": {
+        "bde_user_requested_idx": {
+          "name": "bde_user_requested_idx",
+          "columns": [
+            "user_id",
+            "requested_at"
+          ],
+          "isUnique": false
+        },
+        "bde_status_idx": {
+          "name": "bde_status_idx",
+          "columns": [
+            "status"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "boffmedia_data_exports_user_id_boffmedia_users_id_fk": {
+          "name": "boffmedia_data_exports_user_id_boffmedia_users_id_fk",
+          "tableFrom": "boffmedia_data_exports",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_data_exports_id": {
+          "name": "boffmedia_data_exports_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "boffmedia_achievements": {
       "name": "boffmedia_achievements",
       "columns": {
@@ -677,7 +1409,7 @@
         },
         "subject_type": {
           "name": "subject_type",
-          "type": "enum('event','tournament','participant','match')",
+          "type": "enum('event','tournament','participant','match','report','content','user')",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -2330,6 +3062,575 @@
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
+    "boffmedia_content_moderation": {
+      "name": "boffmedia_content_moderation",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content_id": {
+          "name": "content_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "hidden_at": {
+          "name": "hidden_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "hidden_by_user_id": {
+          "name": "hidden_by_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "hidden_reason": {
+          "name": "hidden_reason",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "bcm_content_uq": {
+          "name": "bcm_content_uq",
+          "columns": [
+            "content_type",
+            "content_id"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "bcm_hidden_by_fk": {
+          "name": "bcm_hidden_by_fk",
+          "tableFrom": "boffmedia_content_moderation",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "hidden_by_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_content_moderation_id": {
+          "name": "boffmedia_content_moderation_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "boffmedia_content_reports": {
+      "name": "boffmedia_content_reports",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "content_type": {
+          "name": "content_type",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "content_id": {
+          "name": "content_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reporter_user_id": {
+          "name": "reporter_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reason": {
+          "name": "reason",
+          "type": "enum('spam','harassment','hate','sexual','illegal','off_topic','other')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "detail": {
+          "name": "detail",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "author_user_id": {
+          "name": "author_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "author_uuid": {
+          "name": "author_uuid",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "status": {
+          "name": "status",
+          "type": "enum('open','actioned','dismissed')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'open'"
+        },
+        "resolution": {
+          "name": "resolution",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolved_at": {
+          "name": "resolved_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolved_by_user_id": {
+          "name": "resolved_by_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "bcr_content_reporter_uq": {
+          "name": "bcr_content_reporter_uq",
+          "columns": [
+            "content_type",
+            "content_id",
+            "reporter_user_id"
+          ],
+          "isUnique": true
+        },
+        "bcr_status_idx": {
+          "name": "bcr_status_idx",
+          "columns": [
+            "status",
+            "created_at"
+          ],
+          "isUnique": false
+        },
+        "bcr_content_idx": {
+          "name": "bcr_content_idx",
+          "columns": [
+            "content_type",
+            "content_id"
+          ],
+          "isUnique": false
+        },
+        "bcr_author_idx": {
+          "name": "bcr_author_idx",
+          "columns": [
+            "author_user_id"
+          ],
+          "isUnique": false
+        },
+        "bcr_author_uuid_idx": {
+          "name": "bcr_author_uuid_idx",
+          "columns": [
+            "author_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "bcr_reporter_fk": {
+          "name": "bcr_reporter_fk",
+          "tableFrom": "boffmedia_content_reports",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "reporter_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "bcr_author_fk": {
+          "name": "bcr_author_fk",
+          "tableFrom": "boffmedia_content_reports",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "author_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "bcr_author_uuid_fk": {
+          "name": "bcr_author_uuid_fk",
+          "tableFrom": "boffmedia_content_reports",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "author_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        },
+        "bcr_resolver_fk": {
+          "name": "bcr_resolver_fk",
+          "tableFrom": "boffmedia_content_reports",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "resolved_by_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_content_reports_id": {
+          "name": "boffmedia_content_reports_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "boffmedia_moderation_sanctions": {
+      "name": "boffmedia_moderation_sanctions",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "subject_user_id": {
+          "name": "subject_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "subject_uuid": {
+          "name": "subject_uuid",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "kind": {
+          "name": "kind",
+          "type": "enum('warning','content_ban')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "reason": {
+          "name": "reason",
+          "type": "varchar(200)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "report_id": {
+          "name": "report_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "revoked_at": {
+          "name": "revoked_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "revoked_by_user_id": {
+          "name": "revoked_by_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "issued_by_user_id": {
+          "name": "issued_by_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "bms_subject_idx": {
+          "name": "bms_subject_idx",
+          "columns": [
+            "subject_user_id",
+            "revoked_at"
+          ],
+          "isUnique": false
+        },
+        "bms_subject_uuid_idx": {
+          "name": "bms_subject_uuid_idx",
+          "columns": [
+            "subject_uuid",
+            "revoked_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "bms_subject_fk": {
+          "name": "bms_subject_fk",
+          "tableFrom": "boffmedia_moderation_sanctions",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "subject_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "bms_subject_uuid_fk": {
+          "name": "bms_subject_uuid_fk",
+          "tableFrom": "boffmedia_moderation_sanctions",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "subject_uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "cascade"
+        },
+        "bms_report_fk": {
+          "name": "bms_report_fk",
+          "tableFrom": "boffmedia_moderation_sanctions",
+          "tableTo": "boffmedia_content_reports",
+          "columnsFrom": [
+            "report_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "bms_issuer_fk": {
+          "name": "bms_issuer_fk",
+          "tableFrom": "boffmedia_moderation_sanctions",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "issued_by_user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_moderation_sanctions_id": {
+          "name": "boffmedia_moderation_sanctions_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "boffmedia_notification_preferences": {
+      "name": "boffmedia_notification_preferences",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "type": {
+          "name": "type",
+          "type": "enum('event','achievement','tournament','system','forum')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "is_muted": {
+          "name": "is_muted",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "bnp_user_type_uq": {
+          "name": "bnp_user_type_uq",
+          "columns": [
+            "user_id",
+            "type"
+          ],
+          "isUnique": true
+        },
+        "bnp_user_idx": {
+          "name": "bnp_user_idx",
+          "columns": [
+            "user_id"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "boffmedia_notification_preferences_user_id_boffmedia_users_id_fk": {
+          "name": "boffmedia_notification_preferences_user_id_boffmedia_users_id_fk",
+          "tableFrom": "boffmedia_notification_preferences",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "boffmedia_notification_preferences_id": {
+          "name": "boffmedia_notification_preferences_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "boffmedia_notifications": {
       "name": "boffmedia_notifications",
       "columns": {
@@ -2990,6 +4291,20 @@
           "notNull": false,
           "autoincrement": false
         },
+        "resolved_by_user_id": {
+          "name": "resolved_by_user_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "resolved_at": {
+          "name": "resolved_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "version": {
           "name": "version",
           "type": "int",
@@ -3167,6 +4482,19 @@
           "tableTo": "boffmedia_tournament_matches",
           "columnsFrom": [
             "loser_next_match_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "cascade"
+        },
+        "tm_resolved_by_fk": {
+          "name": "tm_resolved_by_fk",
+          "tableFrom": "boffmedia_tournament_matches",
+          "tableTo": "boffmedia_users",
+          "columnsFrom": [
+            "resolved_by_user_id"
           ],
           "columnsTo": [
             "id"
@@ -3963,6 +5291,14 @@
           "autoincrement": false,
           "default": false
         },
+        "teamsheet_visibility": {
+          "name": "teamsheet_visibility",
+          "type": "enum('private','participants','public')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "'private'"
+        },
         "entry_deadline": {
           "name": "entry_deadline",
           "type": "timestamp",
@@ -4417,6 +5753,22 @@
           "notNull": false,
           "autoincrement": false
         },
+        "rollout_percent": {
+          "name": "rollout_percent",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 100
+        },
+        "paused": {
+          "name": "paused",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -4457,6 +5809,76 @@
       "compositePrimaryKeys": {
         "desktop_releases_id": {
           "name": "desktop_releases_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "desktop_telemetry_events": {
+      "name": "desktop_telemetry_events",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "install_id": {
+          "name": "install_id",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "event_name": {
+          "name": "event_name",
+          "type": "enum('install-done','launch','crash-code','tool-open')",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "code": {
+          "name": "code",
+          "type": "varchar(32)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "dtel_install_id_created_idx": {
+          "name": "dtel_install_id_created_idx",
+          "columns": [
+            "install_id",
+            "created_at"
+          ],
+          "isUnique": false
+        },
+        "dtel_event_name_created_idx": {
+          "name": "dtel_event_name_created_idx",
+          "columns": [
+            "event_name",
+            "created_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "desktop_telemetry_events_id": {
+          "name": "desktop_telemetry_events_id",
           "columns": [
             "id"
           ]
@@ -4697,6 +6119,108 @@
       "compositePrimaryKeys": {
         "rotom_ficusai_messages_id": {
           "name": "rotom_ficusai_messages_id",
+          "columns": [
+            "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "rotom_ficusai_usage": {
+      "name": "rotom_ficusai_usage",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "uuid": {
+          "name": "uuid",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "date": {
+          "name": "date",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "input_tokens": {
+          "name": "input_tokens",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "output_tokens": {
+          "name": "output_tokens",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "total_tokens": {
+          "name": "total_tokens",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "onUpdate": true,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "ficusai_usage_user_date_idx": {
+          "name": "ficusai_usage_user_date_idx",
+          "columns": [
+            "uuid",
+            "date"
+          ],
+          "isUnique": true
+        }
+      },
+      "foreignKeys": {
+        "rotom_ficusai_usage_uuid_rotom_users_uuid_fk": {
+          "name": "rotom_ficusai_usage_uuid_rotom_users_uuid_fk",
+          "tableFrom": "rotom_ficusai_usage",
+          "tableTo": "rotom_users",
+          "columnsFrom": [
+            "uuid"
+          ],
+          "columnsTo": [
+            "uuid"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {
+        "rotom_ficusai_usage_id": {
+          "name": "rotom_ficusai_usage_id",
           "columns": [
             "id"
           ]
@@ -5146,6 +6670,13 @@
           "notNull": false,
           "autoincrement": false
         },
+        "runtime": {
+          "name": "runtime",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "published": {
           "name": "published",
           "type": "boolean",
@@ -5156,6 +6687,13 @@
         },
         "notes": {
           "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "changelog": {
+          "name": "changelog",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -5976,6 +7514,60 @@
           "name": "tools_randomizer_roms_id",
           "columns": [
             "id"
+          ]
+        }
+      },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "retention_lease": {
+      "name": "retention_lease",
+      "columns": {
+        "lock_name": {
+          "name": "lock_name",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "owner_id": {
+          "name": "owner_id",
+          "type": "varchar(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "expires_at": {
+          "name": "expires_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "claimed_at": {
+          "name": "claimed_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "retention_lease_expires_idx": {
+          "name": "retention_lease_expires_idx",
+          "columns": [
+            "expires_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {
+        "retention_lease_lock_name": {
+          "name": "retention_lease_lock_name",
+          "columns": [
+            "lock_name"
           ]
         }
       },
@@ -13190,6 +14782,82 @@
       },
       "checkConstraint": {}
     },
+    "rotom_wigglypop_mon_custody": {
+      "name": "rotom_wigglypop_mon_custody",
+      "columns": {
+        "seller_uuid": {
+          "name": "seller_uuid",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "pokemon_key": {
+          "name": "pokemon_key",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "listing_id": {
+          "name": "listing_id",
+          "type": "int",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "wp_custody_seller_mon_uq": {
+          "name": "wp_custody_seller_mon_uq",
+          "columns": [
+            "seller_uuid",
+            "pokemon_key"
+          ],
+          "isUnique": true
+        },
+        "wp_custody_listing_idx": {
+          "name": "wp_custody_listing_idx",
+          "columns": [
+            "listing_id"
+          ],
+          "isUnique": false
+        },
+        "wp_custody_seller_idx": {
+          "name": "wp_custody_seller_idx",
+          "columns": [
+            "seller_uuid"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {
+        "wp_custody_listing_fk": {
+          "name": "wp_custody_listing_fk",
+          "tableFrom": "rotom_wigglypop_mon_custody",
+          "tableTo": "rotom_wigglypop_listings",
+          "columnsFrom": [
+            "listing_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "cascade"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
     "rotom_wigglypop_offers": {
       "name": "rotom_wigglypop_offers",
       "columns": {
@@ -13694,6 +15362,47 @@
           ]
         }
       },
+      "uniqueConstraints": {},
+      "checkConstraint": {}
+    },
+    "rotom_wigglypop_sessions": {
+      "name": "rotom_wigglypop_sessions",
+      "columns": {
+        "uuid": {
+          "name": "uuid",
+          "type": "char(36)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "session_id": {
+          "name": "session_id",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": "(now())"
+        }
+      },
+      "indexes": {
+        "wp_sessions_uuid_created_idx": {
+          "name": "wp_sessions_uuid_created_idx",
+          "columns": [
+            "uuid",
+            "created_at"
+          ],
+          "isUnique": false
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "checkConstraint": {}
     },
@@ -15348,6 +17057,20 @@
           "autoincrement": false,
           "onUpdate": true,
           "default": "(now())"
+        },
+        "client_updated_at": {
+          "name": "client_updated_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -15502,6 +17225,20 @@
           "autoincrement": false,
           "onUpdate": true,
           "default": "(now())"
+        },
+        "client_updated_at": {
+          "name": "client_updated_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -15665,6 +17402,20 @@
           "autoincrement": false,
           "onUpdate": true,
           "default": "(now())"
+        },
+        "client_updated_at": {
+          "name": "client_updated_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         }
       },
       "indexes": {
@@ -15694,120 +17445,6 @@
       "compositePrimaryKeys": {
         "tools_vgc_sessions_id": {
           "name": "tools_vgc_sessions_id",
-          "columns": [
-            "id"
-          ]
-        }
-      },
-      "uniqueConstraints": {},
-      "checkConstraint": {}
-    },
-    "tools_vgc_team_presets": {
-      "name": "tools_vgc_team_presets",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar(36)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "user_id": {
-          "name": "user_id",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "name": {
-          "name": "name",
-          "type": "varchar(128)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "regulation_id": {
-          "name": "regulation_id",
-          "type": "varchar(64)",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "export_string": {
-          "name": "export_string",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "slots": {
-          "name": "slots",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false
-        },
-        "current_version": {
-          "name": "current_version",
-          "type": "int",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": 1
-        },
-        "versions": {
-          "name": "versions",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "('[]')"
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": "(now())"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "onUpdate": true,
-          "default": "(now())"
-        }
-      },
-      "indexes": {
-        "vgc_presets_user_idx": {
-          "name": "vgc_presets_user_idx",
-          "columns": [
-            "user_id"
-          ],
-          "isUnique": false
-        }
-      },
-      "foreignKeys": {
-        "tools_vgc_team_presets_user_id_boffmedia_users_id_fk": {
-          "name": "tools_vgc_team_presets_user_id_boffmedia_users_id_fk",
-          "tableFrom": "tools_vgc_team_presets",
-          "tableTo": "boffmedia_users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {
-        "tools_vgc_team_presets_id": {
-          "name": "tools_vgc_team_presets_id",
           "columns": [
             "id"
           ]
