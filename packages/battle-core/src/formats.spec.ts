@@ -32,7 +32,7 @@ describe("statLimitsFor", () => {
     });
   });
 
-  it("gives the Stat Point budget for both champions formats", () => {
+  it("gives the Stat Point budget for Champions regulations", () => {
     const sp = {
       system: "sp",
       perStat: 32,
@@ -43,6 +43,7 @@ describe("statLimitsFor", () => {
     };
     expect(statLimitsFor("gen9championsvgc2026regmb")).toEqual(sp);
     expect(statLimitsFor("gen9championsvgc2026regma")).toEqual(sp);
+    expect(statLimitsFor("gen9championsvgc2026regmc")).toEqual(sp);
   });
 
   it("falls back to EVs for an unknown format", () => {

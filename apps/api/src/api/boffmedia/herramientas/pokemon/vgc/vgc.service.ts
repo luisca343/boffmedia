@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Dex } from '@pkmn/sim';
-import { initChampionsMod } from '@boffmedia/battle-core';
+import { initChampionsMod, legalItemsFor } from '@boffmedia/battle-core';
 import { VgcRegulationsRepository } from './meta/repositories/regulations.repository';
 
 export interface Gen9MoveEntry {
@@ -221,11 +221,15 @@ export class VgcService {
     }
     moves.sort((a, b) => a.name.localeCompare(b.name));
 
-    const items: string[] = ['None'];
-    for (const i of dex.items.all()) {
-      if (i.isNonstandard || i.num <= 0) continue;
-      items.push(i.name);
+    // Do not derive this from `num`: mod-only items such as Golisopite are
+    // real entries with num 0 in the installed @pkmn/sim data. The shared
+    // pool asks TeamValidator, so explicit regulation bans (for example
+    // Assault Vest in Reg M-C) are applied as well.
+    const legalItems = legalItemsFor(formatId);
+    if (!legalItems.known) {
+      throw new Error(`Could not resolve legal items for format "${formatId}".`);
     }
+    const items: string[] = ['None', ...legalItems.items.map((item) => item.name)];
     items.sort();
 
     const abilities: string[] = ['None'];

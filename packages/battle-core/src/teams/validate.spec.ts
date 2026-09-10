@@ -66,7 +66,11 @@ function championsTeam(spread: Partial<Stats> = { hp: 32, atk: 32, spe: 2 }): Po
   ];
 }
 
-const CHAMPIONS_FORMATS = ["gen9championsvgc2026regmb", "gen9championsvgc2026regma"] as const;
+const CHAMPIONS_FORMATS = [
+  "gen9championsvgc2026regmc",
+  "gen9championsvgc2026regmb",
+  "gen9championsvgc2026regma",
+] as const;
 
 describe.each(CHAMPIONS_FORMATS)("%s", (format) => {
   it("no longer reports the 'Condition' error", () => {
@@ -284,5 +288,6 @@ describe("mod registration", () => {
       registerBattleMods();
     }).not.toThrow();
     expect(validateTeam("gen9championsvgc2026regmb", championsTeam()).ok).toBe(true);
+    expect(validateTeam("gen9championsvgc2026regmc", championsTeam()).ok).toBe(true);
   });
 });

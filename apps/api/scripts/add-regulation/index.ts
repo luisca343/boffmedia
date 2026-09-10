@@ -12,7 +12,9 @@
  * not stable across regulations — upstream moved Reg M-A from `champions` to `championsregma` when Reg M-B
  * took over the `champions` name — so regenerating only the newly added format would leave every existing
  * regulation pointing at another regulation's data, with no error and no visible diff. Re-resolving all of
- * them makes that class of drift self-correcting.
+ * them makes that class of drift self-correcting. When upstream retires an
+ * old format, its previous local registry entry and generated delta are
+ * retained and chained after any newer upstream regulation layer.
  *
  * Everything it writes is generated. Review the diff, then commit.
  */
@@ -29,6 +31,7 @@ import {
   validateOutput,
 } from '../convert-showdown-mod/converter';
 import {
+  loadGeneratedFormats,
   loadUpstreamFormats,
   resolveModChain,
   toFormatId,
@@ -42,9 +45,10 @@ import { resolveUpstream, UpstreamSource } from './upstream';
 // ---------------------------------------------------------------------------
 
 // Output path changed: champions mod data now lives in @boffmedia/battle-core
+const ROOT_MOD_ID = 'champions';
 const MOD_DIR = path.resolve(
   __dirname,
-  '../../../packages/battle-core/src/mods/champions',
+  '../../../../packages/battle-core/src/mods/champions',
 );
 const PROVENANCE_FILE = path.join(MOD_DIR, '.source.json');
 const REGISTRY_FILE = path.join(MOD_DIR, 'registry.generated.ts');
@@ -86,6 +90,8 @@ interface Provenance {
   upstreamCommittedAt: string;
   pkmnSimVersion: string;
   trackedFormats: string[];
+  /** Formats retained from the previous local registry because upstream dropped them. */
+  archivedFormats: string[];
   mods: string[];
   pokedexBackfill: { count: number; species: string[] };
 }
@@ -139,21 +145,110 @@ function pkmnSimVersion(): string {
  * Directory a mod's generated files live in.
  *
  * The root mod keeps the historical `mod/` location so its (large) generated
- * files stay diffable across this restructure. Descendants nest under it, named
- * by the part of their id that is not shared with the parent —
- * `championsregma` under parent `champions` becomes `mod/regma/`.
+ * files stay diffable across this restructure. Descendants use their stable
+ * suffix under it, so `championsregma` stays in `mod/regma/` even after its
+ * parent changes from `champions` to `championsregmb`.
  */
-function outputDirFor(modId: string, parentId: string | null): string {
-  if (!parentId) return MOD_DIR;
-  const suffix = modId.startsWith(parentId)
-    ? modId.slice(parentId.length)
+function outputDirFor(modId: string): string {
+  const suffix = modId.startsWith(ROOT_MOD_ID)
+    ? modId.slice(ROOT_MOD_ID.length)
     : modId;
-  return path.join(MOD_DIR, suffix || modId);
+  return suffix ? path.join(MOD_DIR, suffix) : MOD_DIR;
 }
 
 function relativeImport(from: string, to: string): string {
   const rel = path.relative(from, to).split(path.sep).join('/');
   return rel.startsWith('.') ? rel : `./${rel}`;
+}
+
+function recordParent(
+  parentOf: Map<string, string | null>,
+  id: string,
+  parent: string | null,
+): void {
+  if (parentOf.has(id) && parentOf.get(id) !== parent) {
+    fail(
+      `Conflicting parents for mod "${id}": ` +
+        `"${parentOf.get(id) ?? '(base)'}" and "${parent ?? '(base)'}".`,
+    );
+  }
+  parentOf.set(id, parent);
+}
+
+function inheritedParent(scriptFile: string): string | null {
+  if (!fs.existsSync(scriptFile)) return null;
+  const match = /^\s*inherit\s*:\s*['"]([^'"]+)['"]/m.exec(
+    fs.readFileSync(scriptFile, 'utf-8'),
+  );
+  return match?.[1] ?? null;
+}
+
+/** Resolves the parent chain of a mod already generated in this repository. */
+function resolveLocalModChain(modId: string): string[] {
+  const chain: string[] = [];
+  const seen = new Set<string>();
+  let current: string | undefined = modId;
+
+  while (current) {
+    if (seen.has(current)) {
+      fail(
+        `Circular local mod inheritance detected at "${current}" ` +
+          `(chain: ${chain.join(' -> ')}).`,
+      );
+    }
+    seen.add(current);
+    chain.push(current);
+
+    const dir = outputDirFor(current);
+    if (!fs.existsSync(dir)) {
+      fail(
+        `Local generated mod directory is missing for "${current}": ` +
+          `${relativeImport(VGC_DIR, dir)}.`,
+      );
+    }
+    const parent = inheritedParent(path.join(dir, 'scripts.ts'));
+    current = parent ?? undefined;
+  }
+
+  return chain;
+}
+
+/** `ma < mb < mc`; newer regulation layers must be nearer the root mod. */
+function regulationSuffix(modId: string): string | null {
+  return /^championsreg([a-z]+)$/.exec(modId)?.[1] ?? null;
+}
+
+function compareModIds(a: string, b: string): number {
+  if (a === ROOT_MOD_ID) return b === ROOT_MOD_ID ? 0 : -1;
+  if (b === ROOT_MOD_ID) return 1;
+
+  const aReg = regulationSuffix(a);
+  const bReg = regulationSuffix(b);
+  if (aReg && bReg) return bReg.localeCompare(aReg);
+  if (aReg) return -1;
+  if (bReg) return 1;
+  return a.localeCompare(b);
+}
+
+function nearestNewerRegulation(
+  modId: string,
+  allModIds: Iterable<string>,
+): string | null {
+  const suffix = regulationSuffix(modId);
+  if (!suffix) return null;
+
+  return (
+    [...allModIds]
+      .filter((candidate) => {
+        const candidateSuffix = regulationSuffix(candidate);
+        return candidateSuffix && candidateSuffix > suffix;
+      })
+      .sort((a, b) => {
+        const aSuffix = regulationSuffix(a)!;
+        const bSuffix = regulationSuffix(b)!;
+        return aSuffix.localeCompare(bSuffix);
+      })[0] ?? null
+  );
 }
 
 // ---------------------------------------------------------------------------
@@ -179,7 +274,7 @@ function convertMod(
     fail(`Upstream mod directory not found: data/mods/${modId}`);
   }
 
-  const outDir = outputDirFor(modId, parentId);
+  const outDir = outputDirFor(modId);
   if (!dryRun) fs.mkdirSync(outDir, { recursive: true });
 
   const written: string[] = [];
@@ -234,6 +329,70 @@ function convertMod(
   }
 
   return { id: modId, parentId, dir: outDir, files: written };
+}
+
+/**
+ * Keeps a generated regulation mod that upstream has retired.
+ *
+ * Showdown stores a regulation as a delta over the immediately newer
+ * regulation. When that older regulation disappears upstream, its local delta
+ * is still valid; only its `inherit` target must move one layer down the
+ * preserved chain (for example, M-A: champions -> championsregmb).
+ */
+function preserveMod(
+  modId: string,
+  parentId: string | null,
+  dryRun: boolean,
+): ConvertedMod {
+  const dir = outputDirFor(modId);
+  if (!fs.existsSync(dir)) {
+    fail(
+      `Cannot preserve retired mod "${modId}": generated directory ` +
+        `${relativeImport(VGC_DIR, dir)} does not exist.`,
+    );
+  }
+
+  const files = fs
+    .readdirSync(dir)
+    .filter((entry) => GENERATED_MOD_FILES.has(entry))
+    .sort();
+  if (!files.length) {
+    fail(
+      `Cannot preserve retired mod "${modId}": no generated data files ` +
+        `were found in ${relativeImport(VGC_DIR, dir)}.`,
+    );
+  }
+
+  const scriptFile = path.join(dir, 'scripts.ts');
+  if (!parentId || !fs.existsSync(scriptFile)) {
+    fail(
+      `Cannot preserve retired mod "${modId}": it needs a generated ` +
+        `scripts.ts with an inheritance target.`,
+    );
+  }
+
+  const source = fs.readFileSync(scriptFile, 'utf-8');
+  const match = /^(\s*inherit\s*:\s*)(['"])([^'"]+)\2/m.exec(source);
+  if (!match) {
+    fail(
+      `Cannot preserve retired mod "${modId}": ${relativeImport(VGC_DIR, scriptFile)} ` +
+        `does not declare inherit.`,
+    );
+  }
+
+  const rewritten = source.replace(
+    match[0],
+    `${match[1]}${match[2]}${parentId}${match[2]}`,
+  );
+  console.log(
+    `\n  archive ${modId} -> ${relativeImport(VGC_DIR, dir)}/ ` +
+      `(inherit: ${match[3]} -> ${parentId})`,
+  );
+  if (!dryRun && rewritten !== source) {
+    fs.writeFileSync(scriptFile, rewritten, 'utf-8');
+  }
+
+  return { id: modId, parentId, dir, files };
 }
 
 /**
@@ -432,48 +591,140 @@ function main(): void {
     return;
   }
 
+  const localFormats = fs.existsSync(REGISTRY_FILE)
+    ? loadGeneratedFormats(REGISTRY_FILE)
+    : new Map<string, UpstreamFormat>();
+  const archivedFormats = new Set<string>();
+  const sourceByFormatId = new Map<string, 'upstream' | 'archive'>();
   const resolved: UpstreamFormat[] = [];
 
   for (const name of tracked) {
-    const format = upstreamFormats.get(toFormatId(name));
-    if (!format) {
-      fail(
-        `Format "${name}" no longer exists upstream at ${ref}.\n` +
-          `  It is still tracked, so nothing was written. Either correct the ` +
-          `name or drop it with:\n    pnpm add-regulation --forget "${name}"\n` +
-          `  To see what upstream offers:\n    pnpm add-regulation --list`,
-      );
+    const formatId = toFormatId(name);
+    const upstreamFormat = upstreamFormats.get(formatId);
+    if (upstreamFormat) {
+      resolved.push(upstreamFormat);
+      sourceByFormatId.set(formatId, 'upstream');
+      continue;
     }
-    resolved.push(format);
+
+    const localFormat = localFormats.get(formatId);
+    if (localFormat) {
+      resolved.push(localFormat);
+      archivedFormats.add(localFormat.name);
+      sourceByFormatId.set(formatId, 'archive');
+      continue;
+    }
+
+    fail(
+      `Format "${name}" no longer exists upstream at ${ref}, and no ` +
+        `matching entry exists in the local generated registry.\n` +
+        `  Nothing was written. Keep the historical generated registry or ` +
+        `remove the format explicitly with --forget if it is truly retired.\n` +
+        `  To see what upstream offers:\n    pnpm add-regulation --list`,
+    );
   }
   resolved.sort((a, b) => a.name.localeCompare(b.name));
 
   // -- Collect the mods those formats need, parents first --------------------
+  // Current upstream chains are authoritative for formats it still publishes.
+  // Archived formats use their previous local chain, then get reparented below
+  // when a newer regulation layer is now available.
   const parentOf = new Map<string, string | null>();
-  const ordered: string[] = [];
+  const localParentOf = new Map<string, string | null>();
+  const upstreamModIds = new Set<string>();
+  const localModIds = new Set<string>();
 
   for (const format of resolved) {
     if (!format.mod) continue; // a base-gen format needs no mod of ours
-    const chain = resolveModChain(upstream.dir, format.mod); // child -> root
+    const formatId = toFormatId(format.name);
+    const source = sourceByFormatId.get(formatId);
+    const chain =
+      source === 'archive'
+        ? resolveLocalModChain(format.mod)
+        : resolveModChain(upstream.dir, format.mod);
+    const target = source === 'archive' ? localParentOf : parentOf;
     for (let i = chain.length - 1; i >= 0; i--) {
       const id = chain[i];
       const parent = i === chain.length - 1 ? null : chain[i + 1];
-      if (!parentOf.has(id)) {
-        parentOf.set(id, parent);
-        ordered.push(id);
-      }
+      recordParent(target, id, parent);
+      if (source === 'archive') localModIds.add(id);
+      else upstreamModIds.add(id);
     }
   }
 
+  // A retired regulation's delta was authored against the previous root. If
+  // upstream has since added an intermediate child mod, put the archived
+  // delta after that child so the chain remains semantically correct:
+  // champions (M-C) -> championsregmb (M-B) -> championsregma (M-A).
+  const allModIds = new Set([...parentOf.keys(), ...localModIds]);
+  for (const modId of localModIds) {
+    if (parentOf.has(modId)) continue;
+
+    const localParent = localParentOf.get(modId) ?? null;
+    const newer = nearestNewerRegulation(modId, allModIds);
+    const parent = newer ?? localParent;
+
+    if (!parent) {
+      fail(`Archived mod "${modId}" has no parent in the local mod chain.`);
+    }
+    if (!parentOf.has(parent) && !localModIds.has(parent)) {
+      fail(
+        `Archived mod "${modId}" points at missing parent "${parent}".`,
+      );
+    }
+    if (
+      regulationSuffix(modId) &&
+      localParent === ROOT_MOD_ID &&
+      !newer &&
+      upstreamModIds.has(ROOT_MOD_ID)
+    ) {
+      fail(
+        `Cannot safely preserve archived mod "${modId}": its local delta ` +
+          `was based on "${ROOT_MOD_ID}", but no newer intermediate ` +
+          `regulation mod is available. Add regulations sequentially so each ` +
+          `archived delta has its immediate parent.`,
+      );
+    }
+    recordParent(parentOf, modId, parent);
+  }
+
+  // Topological order, with a deterministic preference for newer regulation
+  // layers near the root. Dex.mod() requires every parent to exist first.
+  const ordered: string[] = [];
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const visit = (id: string): void => {
+    if (visited.has(id)) return;
+    if (visiting.has(id)) fail(`Circular combined mod chain at "${id}".`);
+    visiting.add(id);
+    const parent = parentOf.get(id);
+    if (parent) {
+      if (!parentOf.has(parent)) {
+        fail(`Mod "${id}" has unresolved parent "${parent}".`);
+      }
+      visit(parent);
+    }
+    visiting.delete(id);
+    visited.add(id);
+    ordered.push(id);
+  };
+  [...parentOf.keys()].sort(compareModIds).forEach(visit);
+
   if (!ordered.length) fail('No Showdown mods resolved from the tracked formats.');
   console.log(`\nFormats : ${resolved.length} tracked`);
+  if (archivedFormats.size) {
+    console.log(`Archived: ${[...archivedFormats].sort().join(' | ')}`);
+  }
   console.log(`Mods    : ${ordered.join(' -> ')}`);
 
   // -- Convert each mod ------------------------------------------------------
   const converted: ConvertedMod[] = [];
   for (const modId of ordered) {
+    const parent = parentOf.get(modId) ?? null;
     converted.push(
-      convertMod(upstream, modId, parentOf.get(modId) ?? null, dryRun),
+      upstreamModIds.has(modId)
+        ? convertMod(upstream, modId, parent, dryRun)
+        : preserveMod(modId, parent, dryRun),
     );
   }
 
@@ -518,9 +769,14 @@ function main(): void {
   for (const mod of converted) {
     pruneStale(mod, new Set(mod.files), dryRun);
     if (!dryRun) {
+      const generatedIndex = generateIndex(mod.files);
+      const publicExports =
+        mod.id === ROOT_MOD_ID
+          ? "export { initChampionsMod, listChampionsFormatIds } from './registry.js';\n"
+          : '';
       fs.writeFileSync(
         path.join(mod.dir, 'index.ts'),
-        generateIndex(mod.files),
+        generatedIndex + publicExports,
         'utf-8',
       );
     }
@@ -534,6 +790,7 @@ function main(): void {
     upstreamCommittedAt: upstream.committedAt,
     pkmnSimVersion: pkmnSimVersion(),
     trackedFormats: resolved.map((f) => f.name),
+    archivedFormats: [...archivedFormats].sort(),
     mods: ordered,
     pokedexBackfill: { count: emitted.length, species: emitted },
   };

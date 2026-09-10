@@ -26,7 +26,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import type { BsimWorkerRequest, BsimWorkerResponse } from "./validate.worker";
-import type { SpeciesPickerData } from "@boffmedia/battle-core";
+import type { ItemPickerData, SpeciesPickerData } from "@boffmedia/battle-core";
 
 const DEBOUNCE_MS = 300;
 const CACHE_MAX = 200;
@@ -42,15 +42,18 @@ export interface TeamValidation {
 type Answer = { ok: boolean; problems: string[] };
 type MovesAnswer = { moves: Set<string>; known: boolean };
 type SpeciesAnswer = { species: Set<string>; known: boolean };
+type ItemsAnswer = { items: ItemPickerData[]; known: boolean };
 type AllSpeciesAnswer = { species: SpeciesPickerData[]; known: boolean };
 type Listener = (answer: Answer) => void;
 type MovesListener = (answer: MovesAnswer) => void;
 type SpeciesListener = (answer: SpeciesAnswer) => void;
+type ItemsListener = (answer: ItemsAnswer) => void;
 type AllSpeciesListener = (answer: AllSpeciesAnswer) => void;
 
 const IDLE: TeamValidation = { ok: null, problems: [], checking: false };
 const NO_MOVES: MovesAnswer = { moves: new Set<string>(), known: false };
 const NO_SPECIES: SpeciesAnswer = { species: new Set<string>(), known: false };
+const NO_ITEMS: ItemsAnswer = { items: [], known: false };
 
 const cache = new Map<string, Answer>();
 const listeners = new Map<string, Set<Listener>>();
@@ -64,13 +67,18 @@ const movesListeners = new Map<string, Set<MovesListener>>();
 const speciesCache = new Map<string, SpeciesAnswer>();
 const speciesListeners = new Map<string, Set<SpeciesListener>>();
 
+// Item pools are per FORMAT. Unlike the global Dex source, the worker's
+// answer contains mod-only item metadata as well as the regulation filter.
+const itemsCache = new Map<string, ItemsAnswer>();
+const itemsListeners = new Map<string, Set<ItemsListener>>();
+
 // The all-species list is global and never changes within a session, so this
 // cache is a single entry that survives the whole session.
 const allSpeciesCache = new Map<"all-species", AllSpeciesAnswer>();
 const allSpeciesListeners = new Set<AllSpeciesListener>();
 
 /** token → which cache the reply belongs to, and under which key. */
-const inflight = new Map<number, { kind: "validate" | "moves" | "species" | "all-species"; key: string }>();
+const inflight = new Map<number, { kind: "validate" | "moves" | "species" | "items" | "all-species"; key: string }>();
 let worker: Worker | null = null;
 let token = 0;
 let idleTimer: ReturnType<typeof setTimeout> | null = null;
@@ -112,6 +120,10 @@ function ensureWorker(): Worker | null {
       const answer: MovesAnswer = { moves: new Set(reply.moves), known: reply.known };
       remember(movesCache, pending.key, answer);
       movesListeners.get(pending.key)?.forEach((fn) => fn(answer));
+    } else if (reply.kind === "items") {
+      const answer: ItemsAnswer = { items: reply.items, known: reply.known };
+      remember(itemsCache, pending.key, answer);
+      itemsListeners.get(pending.key)?.forEach((fn) => fn(answer));
     } else if (reply.kind === "all-species") {
       const answer: AllSpeciesAnswer = { species: reply.species, known: reply.known };
       allSpeciesCache.set("all-species", answer);
@@ -131,6 +143,7 @@ function ensureWorker(): Worker | null {
     const failed: Answer = { ok: false, problems: ["worker_failed"] };
     for (const pending of [...inflight.values()]) {
       if (pending.kind === "moves") movesListeners.get(pending.key)?.forEach((fn) => fn(NO_MOVES));
+      else if (pending.kind === "items") itemsListeners.get(pending.key)?.forEach((fn) => fn(NO_ITEMS));
       else listeners.get(pending.key)?.forEach((fn) => fn(failed));
     }
     inflight.clear();
@@ -239,6 +252,32 @@ function subscribeSpecies(key: string, format: string, fn: SpeciesListener): () 
   };
 }
 
+/**
+ * The item list is per FORMAT and does not depend on a species. It is kept in
+ * the same worker as validation and learnsets so mod-only items are available
+ * without importing a second copy of @pkmn/sim into the page.
+ */
+function subscribeItems(key: string, format: string, fn: ItemsListener): () => void {
+  let set = itemsListeners.get(key);
+  if (!set) {
+    set = new Set();
+    itemsListeners.set(key, set);
+  }
+  set.add(fn);
+
+  const asked = [...inflight.values()].some((p) => p.kind === "items" && p.key === key);
+  if (!itemsCache.has(key) && !asked) {
+    const sent = send({ kind: "items", format }, key);
+    if (!sent) fn(NO_ITEMS);
+  }
+
+  return () => {
+    const current = itemsListeners.get(key);
+    current?.delete(fn);
+    if (current && current.size === 0) itemsListeners.delete(key);
+  };
+}
+
 export interface UseTeamValidationOptions {
   /** False keeps the hook idle — a card off-screen does not need an answer yet. */
   enabled?: boolean;
@@ -318,6 +357,41 @@ export function useLegalMoves(format: string, species: string): LegalMoves {
     setState({ moves: new Set<string>(), known: false, loading: true });
     return subscribeMoves(key, format, species, (answer) => setState({ ...answer, loading: false }));
   }, [key, format, species]);
+
+  return state;
+}
+
+export interface LegalItemsPool {
+  /** Format-legal item rows, including mod-only items. Meaningless when unknown. */
+  items: ItemPickerData[];
+  /** False = unknown format or worker failure; callers must use their fallback. */
+  known: boolean;
+  loading: boolean;
+}
+
+const EMPTY_ITEMS: LegalItemsPool = { items: [], known: false, loading: false };
+
+/** Which held items the selected format allows. */
+export function useLegalItems(format: string): LegalItemsPool {
+  const [state, setState] = useState<LegalItemsPool>(() => {
+    if (!format) return EMPTY_ITEMS;
+    const hit = itemsCache.get(format);
+    return hit ? { ...hit, loading: false } : { items: [], known: false, loading: true };
+  });
+
+  useEffect(() => {
+    if (!format) {
+      setState(EMPTY_ITEMS);
+      return;
+    }
+    const hit = itemsCache.get(format);
+    if (hit) {
+      setState({ ...hit, loading: false });
+      return;
+    }
+    setState({ items: [], known: false, loading: true });
+    return subscribeItems(format, format, (answer) => setState({ ...answer, loading: false }));
+  }, [format]);
 
   return state;
 }

@@ -17,7 +17,7 @@
 
 import * as React from "react";
 import { Dex } from "@pkmn/dex";
-import { statLimitsFor } from "@boffmedia/battle-core";
+import { displayItemName, statLimitsFor } from "@boffmedia/battle-core";
 import type { PokemonSet } from "@pkmn/sim";
 import { Button, Checkbox, cn, Icon } from "@boffmedia/ui";
 import { DkEmpty } from "@boffmedia/ui/datakit";
@@ -30,7 +30,7 @@ import { STAT_IDS, TB_NS, TYPE_LIST, canonicalGender, canonicalNature, canonical
 import { Picker, PICKER_TRIGGER, type PickerKind } from "./Picker";
 import { withSetDefaults } from "./set-defaults";
 import { StatEditor } from "./StatEditor";
-import { useLegalMoves, useLegalSpecies } from "./useTeamValidation";
+import { useLegalItems, useLegalMoves, useLegalSpecies } from "./useTeamValidation";
 import { itemIconStyle, speciesSprite, TbIconAction, TbKicker, TbMoveRow, TbNumInput, TbSegChoice, TbStatBar, TbTypeChip, usePop, type TbMoveInfo } from "./tb-kit";
 
 const CAT_KEY: Record<string, string> = { Physical: "phys", Special: "spec", Status: "status" };
@@ -66,6 +66,12 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
   // pooled worker caches it, so all six slots share one answer.
   const legalSpecies = useLegalSpecies(format);
   const roster = legalSpecies.known ? legalSpecies.species : null;
+  // Items use a closed, format-legal pool. `null` is deliberately different
+  // from an empty array: it means the worker could not answer, so Picker may
+  // fall back to its global source without silently making every item illegal.
+  const legalItems = useLegalItems(format);
+  const itemPool = legalItems.known ? legalItems.items : null;
+  const itemById = React.useMemo(() => new Map((itemPool ?? []).map((item) => [item.id, item])), [itemPool]);
   const abilityRef = React.useRef<HTMLDivElement>(null);
   const itemRef = React.useRef<HTMLButtonElement>(null);
   const moveRefs = React.useRef<(HTMLDivElement | null)[]>([]);
@@ -102,7 +108,7 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
   };
 
   const pickItem = (id: string) => {
-    update({ item: Dex.items.get(id).name });
+    update({ item: itemById.get(toId(id))?.name ?? displayItemName(Dex.items.get(id)) });
     setPicker(null);
     focusLater(moveRefs.current[0]?.querySelector("button"));
   };
@@ -160,6 +166,8 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
   })();
   const currentAbility = abilityOptions.find((o) => toId(o.value) === toId(set.ability))?.value ?? "";
   const itemData = set.item ? Dex.items.get(set.item) : null;
+  const formatItem = set.item ? itemById.get(toId(set.item)) : undefined;
+  const selectedItemName = set.item ? (itemData?.exists ? itemData.name : formatItem?.name ?? displayItemName(itemData!)) : undefined;
   const itemStyle = itemIconStyle(itemData?.exists ? itemData.name : undefined);
   const gender = canonicalGender(set.gender);
   const tera = canonicalType(set.teraType);
@@ -256,12 +264,12 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
           <div className="grid gap-[0.4375rem]">
             <TbKicker>{t("set.item")}</TbKicker>
             <div className="flex items-center gap-[0.375rem]">
-              <button ref={itemRef} type="button" onClick={() => setPicker({ kind: "item" })} className={PICKER_TRIGGER} aria-label={`${t("set.item")}: ${itemData?.exists ? L.item(itemData.name) : t("set.noItem")}`}>
+              <button ref={itemRef} type="button" onClick={() => setPicker({ kind: "item" })} className={PICKER_TRIGGER} aria-label={`${t("set.item")}: ${selectedItemName ? L.item(selectedItemName) : t("set.noItem")}`}>
                 <span aria-hidden className="grid h-6 w-6 flex-none place-items-center">
                   {itemStyle ? <span style={itemStyle} className="block" /> : <Icon name="cube" size={15} className="text-txt-dim" />}
                 </span>
-                <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", itemData?.exists ? "text-txt" : "text-txt-dim")}>
-                  {itemData?.exists ? L.item(itemData.name) : set.item || t("set.noItem")}
+                <span className={cn("min-w-0 flex-1 truncate font-display text-[0.8125rem]/none font-bold uppercase tracking-[0.03em]", selectedItemName ? "text-txt" : "text-txt-dim")}>
+                  {selectedItemName ? L.item(selectedItemName) : t("set.noItem")}
                 </span>
                 <Icon name="chevronDown" size={14} className="flex-none text-txt-dim" />
               </button>
@@ -399,8 +407,11 @@ export function SetEditor({ set: rawSet, slotIndex, format, onChange, actions }:
         }
         legalMoves={picker?.kind === "move" ? legal : undefined}
         legalSpecies={picker?.kind === "species" ? roster : undefined}
+        legalItems={picker?.kind === "item" ? itemPool : undefined}
         loading={
-          (picker?.kind === "move" && legalMoves.loading) || (picker?.kind === "species" && legalSpecies.loading)
+          (picker?.kind === "move" && legalMoves.loading) ||
+          (picker?.kind === "species" && legalSpecies.loading) ||
+          (picker?.kind === "item" && legalItems.loading)
         }
         preferredIds={picker?.kind === "ability" ? abilityOptions.map((o) => toId(o.value)) : undefined}
         excludeIds={picker?.kind === "move" ? chosenMoves.filter((_, i) => i !== picker.moveIdx) : undefined}

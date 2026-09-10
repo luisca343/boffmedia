@@ -20,7 +20,7 @@
  */
 
 import * as React from "react";
-import { exportPaste, type TeamRecord } from "@boffmedia/battle-core";
+import { displayItemName, exportPaste, type TeamRecord } from "@boffmedia/battle-core";
 import { Banner, Button, Disclosure, DISPLAY_VOICE, Icon, IconButton, Input, Menu, Textarea, cn, toast } from "@boffmedia/ui";
 import { DkBack, DkSelect, useDkNarrow } from "@boffmedia/ui/datakit";
 
@@ -178,7 +178,7 @@ export function TeamEditor({ team, onSaveLocal, onSync, onMetaChange, onTagsChan
     // The item through the dex, not the raw field: a packed team stores the
     // id, so the rail read "lightball" beside a set editor showing "Light Ball".
     const item = s.item ? Dex.items.get(s.item) : null;
-    return { name: sp.exists ? sp.name : s.species, types: sp.exists ? [...sp.types] : [], item: item?.exists ? item.name : s.item || undefined };
+    return { name: sp.exists ? sp.name : s.species, types: sp.exists ? [...sp.types] : [], item: s.item ? displayItemName(item ?? { id: s.item, name: s.item }) : undefined };
   };
 
   /**

@@ -78,6 +78,7 @@ export const BSIM_FORMATS: readonly BsimFormat[] = [
   // exists in a bare @pkmn/sim.
   { id: "gen9championsvgc2026regmb", label: "VGC 2026 Reg M-B (Champions)", kind: "team", gen: 9, teamSize: 6, doubles: true, custom: true, statSystem: "sp" },
   { id: "gen9championsvgc2026regma", label: "VGC 2026 Reg M-A (Champions)", kind: "team", gen: 9, teamSize: 6, doubles: true, custom: true, statSystem: "sp" },
+  { id: "gen9championsvgc2026regmc", label: "VGC 2026 Reg M-C (Champions)", kind: "team", gen: 9, teamSize: 6, doubles: true, custom: true, statSystem: "sp" },
   { id: "gen9teras", label: "Gen 9 Teras", kind: "team", gen: 9, teamSize: 6, custom: true },
 ] as const;
 

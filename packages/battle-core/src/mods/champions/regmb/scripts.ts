@@ -1,6 +1,6 @@
 import type {ModdedBattleScriptsData} from '@pkmn/sim';
 
 export const Scripts: ModdedBattleScriptsData = {
-	inherit: 'championsregmb',
+	inherit: 'champions',
 	gen: 9,
 };

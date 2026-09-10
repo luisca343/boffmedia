@@ -15,7 +15,9 @@
  * and marked ILEGAL in red. That is Showdown's behaviour and it is the right
  * one: a builder is for theorycrafting as much as for tournament sets, our
  * model of a custom regulation may not be perfect, and the validator is the
- * authority that will object anyway. `legalMoves` / `legalSpecies` are those
+ * authority that will object anyway. Items are different: their source is the
+ * complete format-legal pool, so banned items are not offered and mod-only
+ * items with no base Dex number can still be selected. `legalMoves` / `legalSpecies` are those
  * answers and `loading` is one being fetched; a null or empty set means the
  * lookup could not answer, and then nothing is marked — an unknown answer must
  * never read as "this Pokémon learns nothing" or "this format has no Pokémon".
@@ -24,6 +26,7 @@
 import * as React from "react";
 import { Dex } from "@pkmn/dex";
 import { cn, Icon, Input, Modal, Spinner } from "@boffmedia/ui";
+import type { ItemPickerData } from "@boffmedia/battle-core";
 
 import { BSIM_FOCUS, BSIM_FOCUS_CUT } from "../components/bsim-kit";
 import { BxType, BxTypeRow, BxCat } from "../components/bx-kit";
@@ -48,7 +51,9 @@ export interface PickerProps {
   legalMoves?: Set<string> | null;
   /** Species picker: the roster this regulation allows. Same contract as `legalMoves`. */
   legalSpecies?: Set<string> | null;
-  /** Move picker: the legal set is still on its way. Shows a wait, never an empty list. */
+  /** Item picker: the complete, format-legal item pool. Null/undefined = unknown. */
+  legalItems?: ItemPickerData[] | null;
+  /** A format-aware list is still on its way. Shows a wait, never an empty list. */
   loading?: boolean;
   /** Ability picker: the species' own abilities, listed first. */
   preferredIds?: string[];
@@ -111,7 +116,10 @@ function loadSource(kind: PickerKind): Row[] {
   } else if (kind === "item") {
     rows = Dex.items
       .all()
-      .filter((i) => i.exists && i.num > 0 && !HIDDEN_NONSTANDARD.has(i.isNonstandard ?? ""))
+      // `num` is a Pokédex ordering field, not an existence test. Mod-only
+      // entries can legitimately be zero; the format-aware source normally
+      // supplies those, and this fallback should not repeat the old mistake.
+      .filter((i) => i.exists && !HIDDEN_NONSTANDARD.has(i.isNonstandard ?? ""))
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((i) => ({ id: i.id, name: i.name, key: toId(i.name), sub: i.shortDesc || i.desc }));
   } else {
@@ -123,6 +131,12 @@ function loadSource(kind: PickerKind): Row[] {
   }
   sources[kind] = rows;
   return rows;
+}
+
+function rowsFromItems(items: ItemPickerData[]): Row[] {
+  return items
+    .map((item) => ({ id: item.id, name: item.name, key: toId(item.name), sub: item.shortDesc }))
+    .sort((a, b) => a.name.localeCompare(b.name) || a.id.localeCompare(b.id));
 }
 
 /* ── Recents ─────────────────────────────────────────────────────────────── */
@@ -145,7 +159,7 @@ const OVERSCAN = 6;
 
 /* ── Component ───────────────────────────────────────────────────────────── */
 
-export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSpecies, loading, preferredIds, excludeIds }: PickerProps) {
+export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSpecies, legalItems, loading, preferredIds, excludeIds }: PickerProps) {
   const t = useToolT(TB_NS);
   const labels = useTbLabels();
   const allSpecies = useAllSpecies();
@@ -201,6 +215,8 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
             types: s.types,
             num: s.bst,
           }))
+        : kind === "item" && legalItems !== null && legalItems !== undefined
+          ? rowsFromItems(legalItems)
         : loadSource(kind);
     // Species are not translated — Spanish uses the English names — so that
     // list is handed back as it is rather than copied to change nothing.
@@ -214,7 +230,7 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
       // Alphabetical in the language being read: a Spanish list sorted by the
       // English names looks unsorted, which is worse than either order.
       .sort((a, b) => (a.label ?? a.name).localeCompare(b.label ?? b.name, "es"));
-  }, [open, kind, allSpecies.species, pkmn]);
+  }, [open, kind, allSpecies.species, legalItems, pkmn]);
   const exclude = React.useMemo(() => new Set((excludeIds ?? []).filter(Boolean)), [excludeIds]);
 
   const { entries, options, total } = React.useMemo(() => {
@@ -430,7 +446,11 @@ export function Picker({ open, kind, value, onPick, onClose, legalMoves, legalSp
         {loading || (kind === "species" && allSpecies.loading) ? (
           <p aria-live="polite" className="m-0 flex items-center justify-center gap-2 px-4 py-10 font-body text-[0.8125rem] text-txt-dim">
             <Spinner size={14} />
-            {kind === "species" ? t("picker.loadingSpecies") : t("picker.loadingMoves")}
+            {kind === "species"
+              ? t("picker.loadingSpecies")
+              : kind === "item"
+                ? t("picker.loadingItems")
+                : t("picker.loadingMoves")}
           </p>
         ) : entries.length === 0 ? (
           <p className="m-0 px-4 py-10 text-center font-body text-[0.8125rem] text-txt-dim">{t("picker.noResults")}</p>

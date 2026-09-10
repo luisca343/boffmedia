@@ -7,7 +7,8 @@
  * is free to change between regulations. Reg M-A moved from `champions` to
  * `championsregma` exactly that way, so resolving `mod` from upstream on every
  * run — rather than trusting what we generated last time — is what keeps an
- * existing regulation from silently inheriting a newer regulation's legality.
+ * existing live regulation from silently inheriting a newer regulation's legality.
+ * Retired formats are read from the previous local registry by the generator.
  */
 import * as fs from 'fs';
 import * as path from 'path';
@@ -97,9 +98,14 @@ function readFormat(obj: ts.ObjectLiteralExpression): UpstreamFormat | null {
   return out as unknown as UpstreamFormat;
 }
 
-/** Parses every format entry in `config/formats.ts`, keyed by derived format id. */
-export function loadUpstreamFormats(repoDir: string): Map<string, UpstreamFormat> {
-  const file = path.join(repoDir, 'config', 'formats.ts');
+/**
+ * Parses every literal format entry in a Showdown-style format source file,
+ * keyed by derived format id.
+ *
+ * The generator also uses this for the previous local registry. That lets a
+ * regulation survive after Showdown removes its format from `config/formats.ts`.
+ */
+export function loadFormatFile(file: string): Map<string, UpstreamFormat> {
   const raw = fs.readFileSync(file, 'utf-8');
   const source = ts.createSourceFile(
     file,
@@ -126,6 +132,16 @@ export function loadUpstreamFormats(repoDir: string): Map<string, UpstreamFormat
   visit(source);
 
   return byId;
+}
+
+/** Parses every format entry in upstream `config/formats.ts`. */
+export function loadUpstreamFormats(repoDir: string): Map<string, UpstreamFormat> {
+  return loadFormatFile(path.join(repoDir, 'config', 'formats.ts'));
+}
+
+/** Parses the generated local `CHAMPIONS_FORMATS` registry. */
+export function loadGeneratedFormats(registryFile: string): Map<string, UpstreamFormat> {
+  return loadFormatFile(registryFile);
 }
 
 /**

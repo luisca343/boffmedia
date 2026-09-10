@@ -274,6 +274,11 @@ its derived id, its mod, and whether it is already tracked. Then review the diff
 and commit. Other flags: `--dry-run`, `--source <checkout>` (skip the network), `--ref <branch|sha>`
 (pin upstream), `--forget "<name>"` (stop tracking a format).
 
+The generator preserves historical regulations after Showdown removes them from `config/formats.ts`.
+It reads the retired format and delta mod from the previous local generated registry, then chains that
+delta after newer regulation layers still available upstream. Do not use `--forget` merely because a
+format disappeared upstream; use it only when the regulation is intentionally retired here.
+
 Registering the format is only half of it — the regulation also needs a **row in `vgc_regulations`**,
 created from the admin UI once the regenerated API is deployed. That row carries the per-regulation
 VGCPastes GID, which has to be looked up by hand (see the VGCPastes section above).
