@@ -461,7 +461,10 @@ export class LimitlessService {
       for (const team of teams) {
         if (team.parsedSlots)
           allSlots.push(
-            withMoveTypes(JSON.parse(team.parsedSlots) as VgcMetaSlot[], dexForFormat),
+            withMoveTypes(
+              JSON.parse(team.parsedSlots) as VgcMetaSlot[],
+              dexForFormat,
+            ),
           );
       }
     }
@@ -643,7 +646,8 @@ export class LimitlessService {
         `Player "${playerSlug}" not found in tournament ${tournamentId}`,
       );
     }
-    const tournament = await this.limitlessRepository.findTournamentById(tournamentId);
+    const tournament =
+      await this.limitlessRepository.findTournamentById(tournamentId);
     const regulation = tournament?.regulationId
       ? await this.regulationsRepository.findById(tournament.regulationId)
       : null;
@@ -657,7 +661,10 @@ export class LimitlessService {
       record: row.record ?? '',
       rawText: row.rawText ?? '',
       slots: row.parsedSlots
-        ? withMoveTypes(JSON.parse(row.parsedSlots) as VgcMetaSlot[], dexForFormat)
+        ? withMoveTypes(
+            JSON.parse(row.parsedSlots) as VgcMetaSlot[],
+            dexForFormat,
+          )
         : [],
     };
   }

@@ -19,11 +19,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { TrackerService } from './tracker.service';
-import {
-  CreateMatchDto,
-  CreateSessionDto,
-  UpsertSeriesDto,
-} from './dto';
+import { CreateMatchDto, CreateSessionDto, UpsertSeriesDto } from './dto';
 import {
   MatchDto,
   SeriesDto,
@@ -41,8 +37,7 @@ export class TrackerController {
 
   @Get('sync')
   @ApiOperation({
-    summary:
-      'Pull all tracker data for a user (sessions, matches, series)',
+    summary: 'Pull all tracker data for a user (sessions, matches, series)',
   })
   @ApiResponse({
     status: 200,

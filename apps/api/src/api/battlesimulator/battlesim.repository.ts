@@ -257,7 +257,6 @@ export class BattlesimRepository {
       );
   }
 
-
   /**
    * Parse tags from JSON string stored in the database.
    * Returns an empty array if parsing fails or the input is empty.

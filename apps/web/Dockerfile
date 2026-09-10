@@ -14,12 +14,19 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY packages/shared/package.json ./packages/shared/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/tailwind-config/package.json ./packages/tailwind-config/
+COPY packages/pokemon-identity ./packages/pokemon-identity
+COPY packages/battle-core ./packages/battle-core
+COPY packages/pkmn-names/package.json ./packages/pkmn-names/
 # Domain tool packages are `workspace:*` dependencies of apps/web since the
 # tools extraction — without their manifests here, `pnpm install` cannot resolve
 # @boffmedia/tool-kit, /tools-minecraft or /tools-mhwilds and the build dies.
 COPY packages/tools/kit/package.json ./packages/tools/kit/
+COPY packages/tools/battlesim/package.json ./packages/tools/battlesim/
+COPY packages/tools/mewgenics/package.json ./packages/tools/mewgenics/
 COPY packages/tools/minecraft/package.json ./packages/tools/minecraft/
 COPY packages/tools/mhwilds/package.json ./packages/tools/mhwilds/
+COPY packages/tools/misc/package.json ./packages/tools/misc/
+COPY packages/tools/pokemon/package.json ./packages/tools/pokemon/
 # Whole package: its `prepare` script builds on install (see apps/api/Dockerfile).
 COPY packages/pack-schema ./packages/pack-schema
 # Same reason as pack-schema above: asset-paths compiles on install.
@@ -33,6 +40,7 @@ FROM deps AS builder
 WORKDIR /app
 
 COPY packages/shared ./packages/shared
+COPY packages/pkmn-names ./packages/pkmn-names
 # @boffmedia/ui ships TypeScript source (transpilePackages) and
 # @boffmedia/tailwind-config carries the v3 tokens AND the webfonts — without
 # it the build succeeds and every page renders in a fallback typeface.

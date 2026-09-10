@@ -20,6 +20,7 @@ import {
   MhStat3,
 } from "@boffmedia/tools-mhwilds/ui/mh-kit"
 import { MH_VARS } from "@boffmedia/tools-mhwilds/ui/mh-helpers"
+import { getDecorationSlotImagePath } from "@boffmedia/tools-mhwilds/planner/_components/equipment-utils"
 
 const RES_LABELS: Record<string, string> = { fire: "Fuego", water: "Agua", thunder: "Rayo", ice: "Hielo", dragon: "Dragón" }
 const CAT_LABELS = { attack: "Ofensiva", element: "Elemental", defense: "Defensiva", utility: "Utilidad" }
@@ -136,8 +137,8 @@ export function PlanificadorMhChapter() {
         </Sample>
         <Sample title="Ranura de joya" code="<MhDecoSocket size decoName>" col>
           <div className="grid w-full max-w-[27.5rem] gap-[0.3125rem]">
-            <MhDecoSocket size={3} decoName="Joya de Ataque III" decoSlot={3} onOpen={() => {}} onClear={() => {}} />
-            <MhDecoSocket size={2} decoName={null} onOpen={() => {}} />
+            <MhDecoSocket size={3} decoName="Joya de Ataque III" decoSlot={3} slotImageSrc={getDecorationSlotImagePath(3, "weapon")} onOpen={() => {}} onClear={() => {}} />
+            <MhDecoSocket size={2} decoName={null} slotImageSrc={getDecorationSlotImagePath(2, "armor")} onOpen={() => {}} />
           </div>
         </Sample>
       </Section>

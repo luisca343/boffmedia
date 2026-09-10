@@ -17,6 +17,7 @@ apps/*/.next
 node_modules/
 apps/*/node_modules
 packages/*/node_modules
+packages/tools/*/node_modules
 
 # pnpm lockfiles inside apps (root lockfile is used)
 apps/*/pnpm-lock.yaml

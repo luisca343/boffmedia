@@ -376,7 +376,6 @@ export class BattlesimController {
     } as BattlesimTeamDto;
   }
 
-
   /**
    * DELETE /battlesimulator/teams/:clientId
    * Tombstone a team (soft delete).

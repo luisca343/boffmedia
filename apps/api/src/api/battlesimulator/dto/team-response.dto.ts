@@ -29,7 +29,11 @@ export class BattlesimTeamDto {
   @ApiProperty({ description: 'Whether the team is pinned in the library' })
   pinned: boolean;
 
-  @ApiProperty({ description: 'Private strategy notes for this team', nullable: true, type: String })
+  @ApiProperty({
+    description: 'Private strategy notes for this team',
+    nullable: true,
+    type: String,
+  })
   notes: string | null;
 
   @ApiProperty({

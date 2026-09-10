@@ -124,13 +124,10 @@ import {
   wigglypopWatchlist,
 } from '@/_db/schema/SmartRotomWigglypop';
 import { tcgUserCardHistory, tcgUserCards } from '@/_db/schema/Tcg';
-import {
-  vgcMatches,
-  vgcSeries,
-  vgcSessions,
-} from '@/_db/schema/VgcTracker';
+import { vgcMatches, vgcSeries, vgcSessions } from '@/_db/schema/VgcTracker';
 import { battlesimReplays, battlesimTeams } from '@/_db/schema/Battlesim';
 import { wingullInvites } from '@/_db/schema/Wingull';
+import { mhwildsAnatomyOverrides } from '@/_db/schema/Mhwilds';
 
 /**
  * The answer to "what do you hold on me" (GDPR art. 15 / 20), written down
@@ -533,6 +530,14 @@ export const EXPORTED_TABLES: readonly ExportedTable[] = [
     // IS. The opponent's ACCOUNT id is a different matter.
     redact: ['opponentUserId'],
     meaning: 'Battle-simulator replays you saved, including the battle log.',
+  },
+  {
+    table: 'tools_mhwilds_anatomy_overrides',
+    section: 'tools',
+    drizzle: mhwildsAnatomyOverrides,
+    ownedBy: [{ column: mhwildsAnatomyOverrides.updatedBy, key: 'accountId' }],
+    meaning:
+      'Monster Hunter Wilds anatomy corrections you last saved in the Hunter’s Manual editor.',
   },
   {
     table: 'tools_vgc_sessions',

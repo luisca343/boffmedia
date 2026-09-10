@@ -9,7 +9,10 @@ describe('VgcService.getChampionsGameData', () => {
     expect(regMc.items).toContain('Golisopite');
     expect(regMc.items).not.toContain('Assault Vest');
 
-    for (const format of ['gen9championsvgc2026regma', 'gen9championsvgc2026regmb']) {
+    for (const format of [
+      'gen9championsvgc2026regma',
+      'gen9championsvgc2026regmb',
+    ]) {
       const data = service.getChampionsGameData(format);
       expect(data.items).not.toContain('Golisopite');
       expect(data.items).not.toContain('Assault Vest');

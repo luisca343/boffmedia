@@ -227,9 +227,14 @@ export class VgcService {
     // Assault Vest in Reg M-C) are applied as well.
     const legalItems = legalItemsFor(formatId);
     if (!legalItems.known) {
-      throw new Error(`Could not resolve legal items for format "${formatId}".`);
+      throw new Error(
+        `Could not resolve legal items for format "${formatId}".`,
+      );
     }
-    const items: string[] = ['None', ...legalItems.items.map((item) => item.name)];
+    const items: string[] = [
+      'None',
+      ...legalItems.items.map((item) => item.name),
+    ];
     items.sort();
 
     const abilities: string[] = ['None'];

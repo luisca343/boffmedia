@@ -10,11 +10,7 @@ import {
   UpdateMatchDto,
   UpsertSeriesDto,
 } from './dto';
-import {
-  VgcSession,
-  VgcMatch,
-  VgcSeries,
-} from '@/_db/schema/VgcTracker';
+import { VgcSession, VgcMatch, VgcSeries } from '@/_db/schema/VgcTracker';
 
 // Convert a Date | null/undefined to unix ms, or pass through a number as-is
 function toMs(value: Date | number | null | undefined): number | undefined {

@@ -220,9 +220,9 @@ export class SmogonService {
       baseStats,
       abilities: JSON.parse(row.abilities),
       items: JSON.parse(row.items),
-      moves: (JSON.parse(row.moves) as Array<{ name: string; percent: number }>).map(
-        (move) => ({ ...move, type: resolveMoveType(move.name, dex) }),
-      ),
+      moves: (
+        JSON.parse(row.moves) as Array<{ name: string; percent: number }>
+      ).map((move) => ({ ...move, type: resolveMoveType(move.name, dex) })),
       teraTypes: JSON.parse(row.teraTypes),
       teammates: JSON.parse(row.teammates),
       spreads: JSON.parse(row.spreads),

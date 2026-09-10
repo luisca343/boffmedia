@@ -1,11 +1,5 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { and, asc, eq } from 'drizzle-orm';
-import { MySql2Database } from 'drizzle-orm/mysql2';
-import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
-import {
-  mhwildsAnatomyOverrides,
-  type MhwildsAnatomyCallouts,
-} from '@/_db/schema/Mhwilds';
+import { Injectable } from '@nestjs/common';
+import type { MhwildsAnatomyCallouts } from '@/_db/schema/Mhwilds';
 import type {
   AnatomyCalloutDto,
   SaveAnatomyOverrideDto,
@@ -14,19 +8,17 @@ import type {
   AnatomyCalloutEntity,
   AnatomyOverrideEntity,
 } from '../entities/anatomy-overrides.entity';
+import {
+  MhwildsAnatomyRepository,
+  type MhwildsAnatomyOverrideRow,
+} from '../repositories/mhwilds-anatomy.repository';
 
 @Injectable()
 export class MhwildsAnatomyService {
-  constructor(
-    @Inject(DRIZZLE)
-    private readonly db: MySql2Database<Record<string, never>>,
-  ) {}
+  constructor(private readonly repository: MhwildsAnatomyRepository) {}
 
   async list(): Promise<AnatomyOverrideEntity[]> {
-    const rows = await this.db
-      .select()
-      .from(mhwildsAnatomyOverrides)
-      .orderBy(asc(mhwildsAnatomyOverrides.fixedId));
+    const rows = await this.repository.list();
     return rows.map((row) => this.toEntity(row));
   }
 
@@ -35,49 +27,21 @@ export class MhwildsAnatomyService {
     updatedBy: number,
   ): Promise<AnatomyOverrideEntity> {
     const callouts = this.toCalloutMap(dto.callouts);
-    await this.db
-      .insert(mhwildsAnatomyOverrides)
-      .values({
-        fixedId: dto.fixedId,
-        variantId: dto.variantId,
-        callouts,
-        updatedBy,
-      })
-      .onDuplicateKeyUpdate({
-        set: {
-          callouts,
-          updatedBy,
-          updatedAt: new Date(),
-        },
-      });
-
-    const row = await this.db
-      .select()
-      .from(mhwildsAnatomyOverrides)
-      .where(
-        and(
-          eq(mhwildsAnatomyOverrides.fixedId, dto.fixedId),
-          eq(mhwildsAnatomyOverrides.variantId, dto.variantId),
-        ),
-      )
-      .limit(1);
-    if (!row[0]) throw new Error('Anatomy override was not persisted');
-    return this.toEntity(row[0]);
+    const row = await this.repository.save(
+      dto.fixedId,
+      dto.variantId,
+      callouts,
+      updatedBy,
+    );
+    if (!row) throw new Error('Anatomy override was not persisted');
+    return this.toEntity(row);
   }
 
   async remove(
     fixedId: number,
     variantId: string,
   ): Promise<{ deleted: boolean }> {
-    const result = await this.db
-      .delete(mhwildsAnatomyOverrides)
-      .where(
-        and(
-          eq(mhwildsAnatomyOverrides.fixedId, fixedId),
-          eq(mhwildsAnatomyOverrides.variantId, variantId),
-        ),
-      );
-    return { deleted: Number(result[0]?.affectedRows ?? 0) > 0 };
+    return { deleted: await this.repository.remove(fixedId, variantId) };
   }
 
   private toCalloutMap(callouts: AnatomyCalloutDto[]): MhwildsAnatomyCallouts {
@@ -89,9 +53,7 @@ export class MhwildsAnatomyService {
     );
   }
 
-  private toEntity(
-    row: typeof mhwildsAnatomyOverrides.$inferSelect,
-  ): AnatomyOverrideEntity {
+  private toEntity(row: MhwildsAnatomyOverrideRow): AnatomyOverrideEntity {
     const callouts: AnatomyCalloutEntity[] = Object.entries(
       row.callouts as MhwildsAnatomyCallouts,
     ).map(([slotKey, target]) => ({ slotKey, target }));

@@ -21,7 +21,6 @@ export class TrackerRepository {
 
   // Team persistence is owned by the Battlesim teambuilder.
 
-
   // ─── Sessions ────────────────────────────────────────────────────────────────
 
   async findSessions(userId?: number): Promise<VgcSession[]> {
@@ -229,19 +228,13 @@ export class TrackerRepository {
     };
   }> {
     const live = <
-      T extends
-        | typeof vgcSessions
-        | typeof vgcMatches
-        | typeof vgcSeries,
+      T extends typeof vgcSessions | typeof vgcMatches | typeof vgcSeries,
     >(
       table: T,
     ) => and(eq(table.userId, userId), isNull(table.deletedAt));
 
     const tombstones = <
-      T extends
-        | typeof vgcSessions
-        | typeof vgcMatches
-        | typeof vgcSeries,
+      T extends typeof vgcSessions | typeof vgcMatches | typeof vgcSeries,
     >(
       table: T,
     ) =>

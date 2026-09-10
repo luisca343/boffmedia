@@ -228,7 +228,6 @@ export class TrackerDeletedIdsDto {
 
   @ApiProperty({ type: String, isArray: true })
   series!: string[];
-
 }
 
 export class TrackerSyncDataDto {

@@ -9,6 +9,7 @@ import { MhwildsController } from './mhwilds.controller';
 import { MhwildsAnatomyController } from './mhwilds-anatomy.controller';
 import { MhwildsAnatomyAdminController } from './mhwilds-anatomy-admin.controller';
 import { MhwildsRepository } from './repositories/mhwilds.repository';
+import { MhwildsAnatomyRepository } from './repositories/mhwilds-anatomy.repository';
 import { MhwildsAnatomyService } from './services/mhwilds-anatomy.service';
 import { MHWILDS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
@@ -22,6 +23,7 @@ import { MHWILDS_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/re
   providers: [
     MhwildsDataService,
     MhwildsCacheService,
+    MhwildsAnatomyRepository,
     MhwildsAnatomyService,
     MhwildsFacadeService,
     {
