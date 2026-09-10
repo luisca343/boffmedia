@@ -19,6 +19,7 @@ import { ModerationAdmin } from "../_sections/moderation-admin"
 import { RandomizerAdmin } from "../_sections/randomizer-admin"
 import { TcgpSync } from "../_sections/tcgp-admin/TcgpSync"
 import { VgcMetaPanel } from "../_sections/vgc-admin/VgcMetaPanel"
+import { MhwildsAnatomyAdmin } from "../_sections/mhwilds-anatomy-admin"
 import MangaDownloader from "../_sections/manga-admin/MangaDownloader"
 import MangaLibrary from "../_sections/manga-admin/MangaLibrary"
 import MangaConfig from "../_sections/manga-admin/MangaConfig"
@@ -57,6 +58,7 @@ const NAV_META: { labelKey: string; items: { id: string; labelKey: string; icon:
     items: [
       { id: "tcgp",     labelKey: "tcgp",     icon: "cards" },
       { id: "vgc-meta", labelKey: "vgcMeta",  icon: "chart" },
+      { id: "mhwilds-anatomy", labelKey: "mhwildsAnatomy", icon: "crosshair" },
     ],
   },
   {
@@ -127,6 +129,7 @@ function AdminContent() {
       {section === "randomizer"        && <RandomizerAdmin />}
       {section === "tcgp"              && <TcgpSync />}
       {section === "vgc-meta"          && <VgcMetaPanel />}
+      {section === "mhwilds-anatomy"   && <MhwildsAnatomyAdmin />}
       {section === "manga-downloader"  && <MangaDownloader />}
       {section === "manga-library"     && <MangaLibrary />}
       {section === "manga-config"      && <MangaConfig />}

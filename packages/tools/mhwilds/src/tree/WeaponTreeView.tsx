@@ -17,6 +17,8 @@ const NODE_W = 212
 const NODE_H = 66
 const COL = NODE_W + 64
 const ROW = NODE_H + 16
+const CANVAS_TOP_PAD = 88
+const CANVAS_BOTTOM_PAD = 40
 const LS_OWNED = "mh_tree_owned_v3"
 
 function tLoad(): Record<string, Record<string, boolean>> {
@@ -78,10 +80,11 @@ export function WeaponTreeView() {
   const [fRar, setFRar] = useState("all")
   const [fEl, setFEl] = useState("all")
   const [pathMode, setPathMode] = useState(true)
-  const [xf, setXf] = useState({ scale: 1, tx: 40, ty: 24 })
+  const [xf, setXf] = useState({ scale: 1, tx: 40, ty: CANVAS_TOP_PAD })
+  const [isPanning, setIsPanning] = useState(false)
 
   const stageRef = useRef<HTMLDivElement>(null)
-  const drag = useRef<{ x: number; y: number; tx: number; ty: number } | null>(null)
+  const drag = useRef<{ pointerId: number; x: number; y: number; tx: number; ty: number } | null>(null)
 
   useEffect(() => { setOwned(tLoad()) }, [])
   // once data lands, ensure the active type actually exists
@@ -106,48 +109,94 @@ export function WeaponTreeView() {
 
   const fit = useCallback(() => {
     const st = stageRef.current; if (!st) return
-    const sw = st.clientWidth, sh = st.clientHeight
-    const scale = Math.min((sw - 64) / (layout.width || 1), (sh - 56) / (layout.height || 1), 1.1)
-    const s = Math.max(0.35, scale)
-    setXf({ scale: s, tx: Math.max(24, (sw - layout.width * s) / 2), ty: Math.max(20, (sh - layout.height * s) / 2) })
+    const sw = st.clientWidth
+    // Fit the columns, not the entire vertical progression. A full-tree fit
+    // turns a readable weapon card into a thumbnail because the graph is much
+    // taller than the viewport; the canvas remains intentionally document-sized
+    // so the player can pan through the progression at a useful scale.
+    const scale = Math.min((sw - 64) / (layout.width || 1), 1)
+    const s = Math.max(0.55, scale)
+    setXf({ scale: s, tx: Math.max(24, (sw - layout.width * s) / 2), ty: CANVAS_TOP_PAD })
   }, [layout])
-  useEffect(() => { fit(); setSelId(null) /* eslint-disable-next-line */ }, [type, view])
-
-  // native non-passive wheel zoom toward cursor
+  // Keep a readable starting scale when changing weapon families. The player
+  // can use Fit to centre the columns, but we never cram the whole graph into
+  // the visible height.
   useEffect(() => {
-    const st = stageRef.current; if (!st || view !== "tree") return
+    setXf({ scale: 1, tx: 40, ty: CANVAS_TOP_PAD })
+    setSelId(null)
+  }, [type, view])
+
+  const zoomAround = useCallback((factor: number, clientX?: number, clientY?: number) => {
+    const st = stageRef.current
+    if (!st) return
+    const rect = st.getBoundingClientRect()
+    const visibleTop = Math.max(0, -rect.top)
+    const visibleBottom = Math.min(st.clientHeight, window.innerHeight - rect.top)
+    const centerY = visibleBottom > visibleTop ? (visibleTop + visibleBottom) / 2 : st.clientHeight / 2
+    const mx = clientX == null ? st.clientWidth / 2 : clientX - rect.left
+    const my = clientY == null ? centerY : clientY - rect.top
+    setXf((c) => {
+      const ns = Math.min(2, Math.max(0.3, c.scale * factor))
+      const k = ns / c.scale
+      return { scale: ns, tx: mx - (mx - c.tx) * k, ty: my - (my - c.ty) * k }
+    })
+  }, [])
+
+  // A document-layout tool must leave the normal wheel available for page
+  // scrolling. Ctrl/Cmd+wheel is the conventional canvas zoom gesture and
+  // must use a native non-passive listener so the browser cannot scroll behind
+  // the zoom. Trackpad pinch gestures arrive here as Ctrl+wheel on Chromium.
+  useEffect(() => {
+    const st = stageRef.current
+    if (!st || view !== "tree") return
     const onWheel = (e: WheelEvent) => {
+      if (!e.ctrlKey && !e.metaKey) return
       e.preventDefault()
-      const rect = st.getBoundingClientRect()
-      const mx = e.clientX - rect.left, my = e.clientY - rect.top
-      setXf((c) => {
-        const factor = e.deltaY < 0 ? 1.12 : 0.89
-        const ns = Math.min(2, Math.max(0.3, c.scale * factor))
-        const k = ns / c.scale
-        return { scale: ns, tx: mx - (mx - c.tx) * k, ty: my - (my - c.ty) * k }
-      })
+      e.stopPropagation()
+      const delta = e.deltaMode === 1 ? e.deltaY * 16 : e.deltaY
+      const boundedDelta = Math.max(-120, Math.min(120, delta))
+      zoomAround(Math.exp(-boundedDelta * 0.0015), e.clientX, e.clientY)
     }
     st.addEventListener("wheel", onWheel, { passive: false })
     return () => st.removeEventListener("wheel", onWheel)
-  }, [view])
+  }, [layout, view, zoomAround])
 
   const onPointerDown = (e: React.PointerEvent) => {
-    if ((e.target as HTMLElement).closest("[data-node]")) return
-    drag.current = { x: e.clientX, y: e.clientY, tx: xf.tx, ty: xf.ty }
-    stageRef.current?.classList.add("cursor-grabbing")
+    if (e.button !== 0 || e.pointerType === "touch") return
+    const target = e.target as HTMLElement
+    if (target.closest("[data-node], [data-canvas-ui], button, a, input, select, textarea")) return
+    e.preventDefault()
+    e.currentTarget.setPointerCapture(e.pointerId)
+    drag.current = { pointerId: e.pointerId, x: e.clientX, y: e.clientY, tx: xf.tx, ty: xf.ty }
+    setIsPanning(true)
   }
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!drag.current) return
-    setXf((c) => ({ ...c, tx: drag.current!.tx + (e.clientX - drag.current!.x), ty: drag.current!.ty + (e.clientY - drag.current!.y) }))
+    const activeDrag = drag.current
+    if (!activeDrag || activeDrag.pointerId !== e.pointerId) return
+    e.preventDefault()
+    // Capture the ref before entering React's functional updater. Pointer-up
+    // can clear drag.current before React executes the updater, which was the
+    // source of the intermittent "cannot read properties of null (reading tx)".
+    setXf((c) => ({ ...c, tx: activeDrag.tx + (e.clientX - activeDrag.x), ty: activeDrag.ty + (e.clientY - activeDrag.y) }))
   }
-  const endDrag = () => { drag.current = null; stageRef.current?.classList.remove("cursor-grabbing") }
-  const zoom = (dir: number) => setXf((c) => {
-    const st = stageRef.current
-    const sw = st ? st.clientWidth / 2 : 300, sh = st ? st.clientHeight / 2 : 200
-    const ns = Math.min(2, Math.max(0.3, c.scale * (dir > 0 ? 1.2 : 0.83)))
-    const k = ns / c.scale
-    return { scale: ns, tx: sw - (sw - c.tx) * k, ty: sh - (sh - c.ty) * k }
-  })
+  const endDrag = (e: React.PointerEvent) => {
+    if (drag.current?.pointerId !== e.pointerId) return
+    drag.current = null
+    setIsPanning(false)
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId)
+  }
+  const onLostPointerCapture = (e: React.PointerEvent) => {
+    if (drag.current?.pointerId !== e.pointerId) return
+    drag.current = null
+    setIsPanning(false)
+  }
+  const zoom = (dir: number) => zoomAround(dir > 0 ? 1.2 : 0.83)
+  const onStageKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget) return
+    if (e.key === "+" || e.key === "=") { e.preventDefault(); zoom(1) }
+    if (e.key === "-" || e.key === "_") { e.preventDefault(); zoom(-1) }
+    if (e.key === "0") { e.preventDefault(); fit() }
+  }
 
   const matches = useCallback((n: Node) => {
     if (fRar !== "all" && n.rarity !== +fRar) return false
@@ -272,56 +321,70 @@ export function WeaponTreeView() {
       </div>
 
       {/* body */}
-      <MhBody className={view === "tree" ? "overflow-hidden flex" : ""}>
+      <MhBody
+        className={view === "tree" ? "flex flex-col flex-none" : ""}
+      >
         {view === "tree" ? (
-          <div className="flex-1 flex flex-col h-full">
+          <div className="flex-1 min-h-0 flex flex-col">
             <div
               ref={stageRef}
               onPointerDown={onPointerDown}
               onPointerMove={onPointerMove}
               onPointerUp={endDrag}
-              onPointerLeave={endDrag}
-              className="flex-1 relative overflow-hidden cursor-grab [background:radial-gradient(circle_at_1px_1px,var(--stripe)_1px,transparent_0)_0_0/26px_26px,var(--bg)]"
+              onPointerCancel={endDrag}
+              onLostPointerCapture={onLostPointerCapture}
+              onKeyDown={onStageKeyDown}
+              onDragStart={(e) => e.preventDefault()}
+              tabIndex={0}
+              aria-label={t("tree.canvasLabel")}
+              style={{ minHeight: `max(${Math.ceil(layout.height + CANVAS_TOP_PAD + CANVAS_BOTTOM_PAD)}px, var(--tool-vh, 42rem))` }}
+              className={`flex-1 relative select-none cursor-grab touch-pan-y outline-none [background:radial-gradient(circle_at_1px_1px,var(--stripe)_1px,transparent_0)_0_0/26px_26px,var(--bg)] ${isPanning ? "cursor-grabbing" : ""}`}
             >
-              <div className="absolute top-0 left-0 origin-top-left will-change-transform" style={{ transform: `translate(${xf.tx}px,${xf.ty}px) scale(${xf.scale})`, width: layout.width, height: layout.height }}>
-                <svg className="absolute top-0 left-0 overflow-visible pointer-events-none" width={layout.width} height={layout.height}>
-                  {layout.edges.map((e, i) => {
-                    const a = layout.pos[e.from], b = layout.pos[e.to]
-                    if (!a || !b) return null
-                    const x1 = a.x + NODE_W, y1 = a.y + NODE_H / 2, x2 = b.x, y2 = b.y + NODE_H / 2
-                    const mx = (x1 + x2) / 2
-                    return <path key={i} className={`fill-none [stroke-width:2] transition-[stroke,opacity] ${edgeCls(e)}`} d={`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`} />
+              <div className="absolute inset-0 overflow-hidden">
+                <div className="absolute top-0 left-0 origin-top-left will-change-transform" style={{ transform: `translate(${xf.tx}px,${xf.ty}px) scale(${xf.scale})`, width: layout.width, height: layout.height }}>
+                  <svg className="absolute top-0 left-0 overflow-visible pointer-events-none" width={layout.width} height={layout.height}>
+                    {layout.edges.map((e, i) => {
+                      const a = layout.pos[e.from], b = layout.pos[e.to]
+                      if (!a || !b) return null
+                      const x1 = a.x + NODE_W, y1 = a.y + NODE_H / 2, x2 = b.x, y2 = b.y + NODE_H / 2
+                      const mx = (x1 + x2) / 2
+                      return <path key={i} className={`fill-none [stroke-width:2] transition-[stroke,opacity] ${edgeCls(e)}`} d={`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`} />
+                    })}
+                  </svg>
+                  {allNodes.map((n) => {
+                    const p = layout.pos[String(n.id)]
+                    return (
+                      <MhNodeCard
+                        key={n.id}
+                        style={{ left: p.x, top: p.y, width: NODE_W }}
+                        name={n.name}
+                        rarity={n.rarity}
+                        attack={weaponAttack(n)}
+                        special={firstSpecial(n.specials)}
+                        selected={selId === String(n.id)}
+                        dim={!!nodeDim(n)}
+                        owned={!!ownedSet[String(n.id)]}
+                        isFinal={!n.children || n.children.length === 0}
+                        finalLabel={t("tree.final")}
+                        onSelect={() => setSelId(String(n.id))}
+                      />
+                    )
                   })}
-                </svg>
-                {allNodes.map((n) => {
-                  const p = layout.pos[String(n.id)]
-                  return (
-                    <MhNodeCard
-                      key={n.id}
-                      style={{ left: p.x, top: p.y, width: NODE_W }}
-                      name={n.name}
-                      rarity={n.rarity}
-                      attack={weaponAttack(n)}
-                      special={firstSpecial(n.specials)}
-                      selected={selId === String(n.id)}
-                      dim={!!nodeDim(n)}
-                      owned={!!ownedSet[String(n.id)]}
-                      isFinal={!n.children || n.children.length === 0}
-                      finalLabel={t("tree.final")}
-                      onSelect={() => setSelId(String(n.id))}
-                    />
-                  )
-                })}
+                </div>
               </div>
 
-              <div className="absolute left-3.5 bottom-3.5 z-[6] font-mono text-[0.6875rem] leading-none text-txt-dim bg-panel border border-line py-[0.4375rem] px-2.5 flex items-center gap-[0.4375rem]">
-                <Icon name="target" size={13} />{t("tree.dragHint")}
-              </div>
-              <div className="absolute right-3.5 bottom-3.5 flex flex-col gap-[0.3125rem] z-[6]">
-                <button type="button" onClick={() => zoom(1)} aria-label={t("tree.zoomIn")} className="w-[2.375rem] h-[2.375rem] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="plus" size={16} /></button>
-                <div className="font-mono text-[0.625rem] leading-none text-center text-txt-dim py-[3px]">{Math.round(xf.scale * 100)}%</div>
-                <button type="button" onClick={() => zoom(-1)} aria-label={t("tree.zoomOut")} className="w-[2.375rem] h-[2.375rem] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="minus" size={16} /></button>
-                <button type="button" onClick={fit} aria-label={t("tree.fit")} title={t("tree.fit")} className="w-[2.375rem] h-[2.375rem] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="grid" size={15} /></button>
+              <div data-canvas-ui="" className="sticky top-[calc(var(--tool-sticky-top,0px)_+_var(--tool-bar-h,3.625rem)_+_0.75rem)] z-[6] flex flex-col gap-2 px-3.5 pt-3.5 pointer-events-none sm:flex-row sm:items-start sm:justify-between">
+                <div className="pointer-events-auto flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.6875rem] leading-none text-txt-dim bg-panel border border-line py-[0.4375rem] px-2.5 select-none">
+                  <Icon name="target" size={13} />
+                  <span>{t("tree.dragHint")}</span>
+                  <span className="text-txt-dim/70">· {t("tree.zoomHint")}</span>
+                </div>
+                <div className="pointer-events-auto flex items-center gap-[0.3125rem] self-end">
+                  <button type="button" onClick={() => zoom(1)} aria-label={t("tree.zoomIn")} className="w-[2.375rem] h-[2.375rem] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="plus" size={16} /></button>
+                  <div className="w-[3.125rem] h-[2.375rem] grid place-items-center font-mono text-[0.625rem] leading-none text-center text-txt-dim bg-panel border-y border-line">{Math.round(xf.scale * 100)}%</div>
+                  <button type="button" onClick={() => zoom(-1)} aria-label={t("tree.zoomOut")} className="w-[2.375rem] h-[2.375rem] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="minus" size={16} /></button>
+                  <button type="button" onClick={fit} aria-label={t("tree.fit")} title={t("tree.fit")} className="w-[2.375rem] h-[2.375rem] grid place-items-center bg-panel border border-line text-txt-muted hover:text-txt hover:border-line-2"><Icon name="grid" size={15} /></button>
+                </div>
               </div>
             </div>
           </div>

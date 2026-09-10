@@ -14,7 +14,14 @@
 
 import { toolApi, ToolApiError } from "@boffmedia/tool-kit";
 
-import type { ArmorPiece, Charm, Decoration, MhMonster, Weapon } from "./types";
+import type {
+  ArmorPiece,
+  Charm,
+  Decoration,
+  MhMonster,
+  MhWildsAnatomyOverride,
+  Weapon,
+} from "./types";
 
 /** The API's global response envelope, as `@/services/boffAPI` declared it. */
 export interface ApiResponse<T = unknown> {
@@ -78,6 +85,13 @@ export class MhWildsService {
 
   static getMonsters(locale?: string): Promise<ApiResponse<MhMonster[]>> {
     return get<MhMonster[]>("/tools/mhwilds/monsters", { locale });
+  }
+
+  /** Public corrections made in the admin Hunter's Manual editor. */
+  static getAnatomyOverrides(): Promise<
+    ApiResponse<MhWildsAnatomyOverride[]>
+  > {
+    return get<MhWildsAnatomyOverride[]>("/tools/mhwilds/anatomy-overrides");
   }
 
   /** Same reasoning as `getSkills`: the tree hook owns the `WeaponTree` shape. */

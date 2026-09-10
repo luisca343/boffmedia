@@ -1,4 +1,12 @@
-export type EquipmentType = 'weapon' | 'secondaryWeapon' | 'head' | 'chest' | 'arms' | 'waist' | 'legs' | 'charm';
+export type EquipmentType =
+  | "weapon"
+  | "secondaryWeapon"
+  | "head"
+  | "chest"
+  | "arms"
+  | "waist"
+  | "legs"
+  | "charm";
 
 export interface SkillInfo {
   id: number;
@@ -311,7 +319,7 @@ export interface Charm {
 }
 
 // Generic EquipmentComponent interface to represent any armor piece or weapon
-export type EquipmentComponent = ArmorPiece | Weapon | Charm
+export type EquipmentComponent = ArmorPiece | Weapon | Charm;
 // ── Bestiary / monsters (wilds.mhdb.io/{locale}/monsters via the API proxy) ──
 export interface MhMonsterSize {
   base: number;
@@ -320,7 +328,7 @@ export interface MhMonsterSize {
   gold: number;
 }
 export interface MhMonsterWeakness {
-  kind: 'element' | 'status' | 'effect' | string;
+  kind: "element" | "status" | "effect" | string;
   element?: string;
   status?: string;
   effect?: string;
@@ -329,7 +337,7 @@ export interface MhMonsterWeakness {
   id: number;
 }
 export interface MhMonsterResistance {
-  kind: 'element' | 'status' | 'effect' | string;
+  kind: "element" | "status" | "effect" | string;
   element?: string;
   status?: string;
   effect?: string;
@@ -351,9 +359,146 @@ export interface MhRewardCondition {
 }
 export interface MhMonsterReward {
   id: number;
-  item: Item & { icon?: { kind?: string; color?: string; colorId?: number } };
+  item: Item & {
+    icon?: {
+      id?: number;
+      kind?: string;
+      color?: string;
+      colorId?: number;
+    };
+  };
   conditions: MhRewardCondition[];
 }
+
+export type MhLocalizedText = Record<string, string> | null;
+
+export interface MhWildsAssetFile {
+  raw?: string;
+  dds?: string;
+  png?: string;
+}
+
+export interface MhWildsPartTypeInfo {
+  index: number;
+  iconType: number;
+  nameGuid: string;
+  name: MhLocalizedText;
+  rottenName?: MhLocalizedText;
+  description?: MhLocalizedText;
+}
+
+export interface MhWildsHitzone {
+  slash?: number | null;
+  blunt?: number | null;
+  shot?: number | null;
+  fire?: number | null;
+  water?: number | null;
+  thunder?: number | null;
+  ice?: number | null;
+  dragon?: number | null;
+  stun?: number | null;
+  lightPlant?: number | null;
+}
+
+export interface MhWildsBreakData {
+  id: string;
+  executeCount?: number | null;
+  maxCount?: number | null;
+  condition?: number | null;
+  partType?: number | null;
+  targetPartGuids?: string[];
+}
+
+export interface MhWildsPartData {
+  index: number;
+  id: string;
+  type: number;
+  typeInfo: MhWildsPartTypeInfo;
+  health?: number | null;
+  healthStages?: number[];
+  hasHealth?: boolean;
+  kinsectExtract?: number | null;
+  hitzone?: MhWildsHitzone | null;
+  breakHitzone?: MhWildsHitzone | null;
+  breaks: MhWildsBreakData[];
+  breakRewards: unknown[];
+}
+
+export interface MhWildsAnatomyCallout {
+  anchor: { x: number; y: number };
+  target: { x: number; y: number };
+}
+
+/** Runtime correction saved by the Boffmedia admin anatomy editor. */
+export interface MhWildsAnatomyOverride {
+  fixedId: number;
+  variantId: string;
+  callouts: Array<{
+    slotKey: string;
+    target: { x: number; y: number };
+  }>;
+  updatedAt?: string;
+}
+
+export interface MhWildsAnatomySlot {
+  key: string;
+  visible: boolean;
+  partType: number;
+  part?: { name: MhLocalizedText } | null;
+  breakType?: number | null;
+  break?: { name: MhLocalizedText } | null;
+  arrow?: {
+    size: number | null;
+    rotation: number | null;
+    visible: boolean;
+  };
+  /** Normalized game-report endpoint, adjusted to the anatomy PNG when available. */
+  callout?: MhWildsAnatomyCallout | null;
+}
+
+export interface MhWildsGameElementWeakness {
+  element: string;
+  level: number;
+}
+
+export interface MhWildsMonsterVariant {
+  id: string;
+  identity?: {
+    enumName?: string;
+    fixedId?: number;
+    names?: MhLocalizedText;
+    descriptions?: MhLocalizedText;
+  } | null;
+  assets?: {
+    icon?: MhWildsAssetFile;
+    anatomy?: MhWildsAssetFile;
+    anatomyPrefab?: string;
+  };
+  report?: {
+    anatomyLayout?: { index: number; slots: MhWildsAnatomySlot[] } | null;
+    hiddenPartType?: number | null;
+    /** Element flags read from EnemyWeakAttrData.user.3. */
+    elementalWeaknesses?: MhWildsGameElementWeakness[];
+    /** The game's recommended attribute bitmask, used only as a fallback. */
+    recommendedElements?: string[];
+    recommendedAttributeBits?: number | null;
+  };
+  data?: {
+    baseHealth?: number | null;
+    reactionPercent?: number | null;
+    parts: MhWildsPartData[];
+    breaks?: MhWildsBreakData[];
+  } | null;
+}
+
+export interface MhWildsBestiaryData {
+  schema: number;
+  generatedAt?: string;
+  monsters: { id: string; variants: MhWildsMonsterVariant[] }[];
+  /** Equipment/gear render thumbnails extracted from the game, not material glyphs. */
+  itemThumbnails?: Record<string, MhWildsAssetFile>;
+}
+
 export interface MhMonster {
   id: number;
   gameId?: number;
@@ -376,4 +521,7 @@ export interface MhMonster {
   tips?: string;
   variants?: unknown[];
   parts?: unknown[];
+  /** Local game extraction joined by `gameId`/fixedId when available. */
+  localData?: MhWildsMonsterVariant;
+  localAssetVersion?: string;
 }

@@ -1,0 +1,65 @@
+# Minimal RE_RSZ configuration used by decode-mhwilds-bestiary.mjs.
+# The decoder itself remains a local third-party tool under laboon/.
+
+[tools]
+msg = "tools/REMSG_Converter/REMSG_Converter.exe"
+rsz_layouts = "rszmhwilds.json"
+
+[io]
+data = [
+    "data/natives",
+]
+output = "output/"
+
+[user]
+input_prefix = "STM/GameDesign"
+
+[[user.targets]]
+output_prefix = "monsters/"
+files = [
+    "Common/Enemy/EnemyData.user.3",
+    "Common/Enemy/EnemyPartsTypeData.user.3",
+    "Enemy/CommonData/EnumMaker/EmID.user.3",
+]
+
+[[user.targets.transform]]
+match = "EmID.user.3$"
+rsz = [0]
+
+[[user.targets]]
+output_prefix = "monsters/parts"
+files = [
+    "Enemy/Em*/*/Data/Em*_Param_Parts.user.3",
+    "Enemy/Em*/*/Data/Em*_Param_PartsBreakReward.user.3",
+]
+
+[[user.targets]]
+output_prefix = "monsters/report"
+files = [
+    "Common/Enemy/EnemyReportAnatomyPartsBreakData.user.3",
+    "Common/Enemy/EnemyReportAnatomyPartsRewardData.user.3",
+    "Common/Enemy/EnemyReportBossData.user.3",
+    "Common/Enemy/EnemyReportBossMaterialDispData.user.3",
+    "Common/Enemy/EnemyReportBossReleaseData.user.3",
+    "Common/Enemy/EnemyReportBossTitleData.user.3",
+    "Common/Enemy/EnemyReportMeatDisplayData.user.3",
+    "Common/Enemy/EnemyReportPartsBreakTypeData.user.3",
+    "GUI/Common/_UserData/EnemyReportBossAnatomyTextureData.user.3",
+]
+
+[[user.targets]]
+output_prefix = "monsters/"
+files = [
+    "Enemy/CommonData/Data/EnemyWeakAttrData.user.3",
+]
+
+[msg]
+input_prefix = "STM/GameDesign/Text"
+
+[[msg.targets]]
+files = [
+    "Excel_Data/EnemyPartsTypeName.msg.23",
+    "Excel_Data/EnemyReportPartsBreakTypeName.msg.23",
+    "Excel_Data/EnemySpeciesName.msg.23",
+    "Excel_Data/EnemyText.msg.23",
+]

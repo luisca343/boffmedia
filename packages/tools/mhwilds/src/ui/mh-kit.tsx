@@ -629,11 +629,14 @@ export function MhDrawer({
   }, [onClose])
   return (
     <>
-      <div className="absolute inset-0 bg-scrim z-[74] animate-[bm-fade_140ms_ease-out] motion-reduce:animate-none" onClick={onClose} />
+      {/* This is a document-layout tool, so an absolute overlay would move
+          with the graph. Keep the drawer in the host's visible tool viewport;
+          `--tool-sticky-top` is the shared web/desktop chrome offset. */}
+      <div className="fixed inset-x-0 bottom-0 top-[var(--tool-sticky-top,0px)] z-[74] bg-scrim animate-[bm-fade_140ms_ease-out] motion-reduce:animate-none" onClick={onClose} />
       <aside
         role="dialog"
         aria-modal="true"
-        className="absolute top-0 right-0 bottom-0 w-[min(28.75rem,96vw)] z-[75] bg-panel border-l border-line-2 shadow-[var(--shadow)] flex flex-col animate-[bm-drawer-in_260ms_ease-out] motion-reduce:animate-none"
+        className="fixed top-[var(--tool-sticky-top,0px)] right-0 bottom-0 w-[min(28.75rem,96vw)] z-[75] bg-panel border-l border-line-2 shadow-[var(--shadow)] flex flex-col animate-[bm-drawer-in_260ms_ease-out] motion-reduce:animate-none"
       >
         <div className="flex items-center gap-[0.6875rem] flex-none py-[0.8125rem] px-4 border-b border-line">
           {(iconName || icon) && (
@@ -648,7 +651,7 @@ export function MhDrawer({
           <IconButton name="x" label={t("close")} className="ml-auto" onClick={onClose} />
         </div>
         {tools && <div className="flex-none py-3 px-4 border-b border-line flex flex-col gap-2.5">{tools}</div>}
-        <div className="flex-1 overflow-y-auto py-3 px-4 pb-10">{children}</div>
+        <div className="flex-1 overflow-y-auto overscroll-contain py-3 px-4 pb-10">{children}</div>
       </aside>
     </>
   )

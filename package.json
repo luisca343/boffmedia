@@ -53,6 +53,12 @@
     "review:pokedex-locales": "node scripts/tools/build-pokedex-locales.mjs --review",
     "build:teras-mod": "node scripts/tools/build-teras-mod.mjs",
     "build:mewgenics-assets": "node scripts/tools/build-mewgenics-assets.mjs",
+    "extract:mhwilds-assets": "node scripts/tools/mhwilds/extract-mhwilds-assets.mjs",
+    "decode:mhwilds-bestiary": "node scripts/tools/mhwilds/decode-mhwilds-bestiary.mjs",
+    "normalize:mhwilds-bestiary": "node scripts/tools/mhwilds/normalize-mhwilds-bestiary.mjs",
+    "sync:mhwilds-item-icons": "node scripts/tools/mhwilds/sync-mhwilds-item-icons.mjs",
+    "build:mhwilds-assets": "node scripts/tools/mhwilds/build-mhwilds-assets.mjs",
+    "update:mhwilds-bestiary": "node scripts/tools/mhwilds/update-mhwilds-bestiary.mjs",
     "pack:tool-assets": "node scripts/tools/pack-tool-assets.mjs"
   },
   "devDependencies": {

@@ -65,6 +65,7 @@ export const mhwildsBestiaryTool: ToolManifest = {
   route: "/mhwilds/monsters",
   requiredCapabilities: CAPABILITIES,
   layout: LAYOUT,
+  dataPack: { id: "mhwilds" },
   component: lazy(() =>
     import("./bestiary/BestiaryView").then((m) => ({ default: m.BestiaryView })),
   ),
