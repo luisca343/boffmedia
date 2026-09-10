@@ -9,7 +9,7 @@ const withNextIntl = createNextIntlPlugin();
 // package.json is not something a browser bundle should be pulling in, and
 // `process.env.npm_package_version` is only set when the process was started by
 // a package manager script — which a container entrypoint is not.
-const pkgVersion = createRequire(import.meta.url)('./package.json').version;
+const webPackageVersion = createRequire(import.meta.url)('./package.json').version;
 
 const bundleAnalyzer = withBundleAnalyzer({
     enabled: process.env.ANALYZE === 'true',
@@ -92,12 +92,11 @@ const nextConfig = {
         ];
     },
 
-    // Only NEXT_PUBLIC_SENTRY_RELEASE — the DSN and environment come from the
-    // real environment. An explicit value (a commit sha from CI) wins; the
-    // fallback keeps events tagged with something on a plain `next build`.
+    // The Sentry release may be supplied by CI. Its fallback keeps events
+    // tagged on a plain next build.
     env: {
         NEXT_PUBLIC_SENTRY_RELEASE:
-            process.env.NEXT_PUBLIC_SENTRY_RELEASE || `web@${pkgVersion}`,
+            process.env.NEXT_PUBLIC_SENTRY_RELEASE || `web@${webPackageVersion}`,
     },
 
     // Production optimizations
@@ -158,4 +157,3 @@ const withNextra = nextra({
 
 export default withNextra(bundleAnalyzer(withNextIntl(nextConfig)));
 //export default bundleAnalyzer(nextConfig);
-

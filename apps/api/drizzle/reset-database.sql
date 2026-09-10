@@ -2,9 +2,14 @@
 -- DESTRUCTIVE: drops EVERY view and EVERY table in the current database.
 --
 -- This is a full reset, not a cleanup. There is no undo. It is intended for a
--- local/dev database that is about to be rebuilt from `0000_initial.sql`.
+-- local/dev database that is about to be rebuilt by
+-- `pnpm --filter api migrate`, using every file in `drizzle/migrations/`.
 -- `drizzle/reset-test-db.sql` is the narrow sibling that only removes the
 -- `tools_vgc_*` objects.
+--
+-- The table list is deliberately generated from information_schema rather than
+-- maintained by hand, so every current and future migration table (including
+-- `tools_mhwilds_anatomy_overrides`) is removed automatically.
 --
 --   mysql -u <user> -p <database> < apps/api/drizzle/reset-database.sql
 --   pnpm --filter api migrate
@@ -17,10 +22,9 @@
 --
 -- Three things make this work where a hand-written DROP list would not:
 --
---  1. FOREIGN_KEY_CHECKS is disabled. With 163 foreign keys there is no drop
---     order that satisfies every constraint, and circular references make one
---     impossible in principle. Dropping with checks off sidesteps ordering
---     entirely.
+--  1. FOREIGN_KEY_CHECKS is disabled. There is no drop order that satisfies
+--     every constraint, and circular references make one impossible in
+--     principle. Dropping with checks off sidesteps ordering entirely.
 --
 --  2. group_concat_max_len is raised to 1 MB. It defaults to 1024 bytes, which
 --     truncates the generated list at roughly 25 table names — and a truncated

@@ -36,6 +36,22 @@ input is left blank. So an entry written badly is an entry users read.
   `path` array.
 - `pnpm lint` no longer rewrites files. Fixing is `pnpm lint:fix`.
 
+## [0.9.1-beta.1] - 2026-09-10
+
+First public prerelease of the next Boffmedia App build.
+
+### Added
+
+- **Reg M-B support** in the VGC tools, including the new format data and
+  regulation-aware team validation.
+- **Monster Hunter Wilds anatomy editor**, with game-extracted manual pages,
+  draggable callouts, saved corrections and the asset pipeline behind them.
+
+### Changed
+
+- The web footer now identifies the web surface separately from the desktop
+  app, without presenting the two as one release.
+
 ## [0.9.0] - 2026-09-05
 
 First release with notes. The app has been installable for some time; this is

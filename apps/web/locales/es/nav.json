@@ -183,6 +183,8 @@
         "app": "Boffmedia App"
       },
       "footer": {
+        "copyright": "© {year} Boffmedia",
+        "build": "Boffmedia Web",
         "tagline": "Comunidad gaming: torneos, servidores, herramientas competitivas y una temporada siempre en marcha.",
         "explore": "Explorar",
         "community": "Comunidad",

@@ -183,6 +183,8 @@
         "app": "Boffmedia App"
       },
       "footer": {
+        "copyright": "© {year} Boffmedia",
+        "build": "Boffmedia Web",
         "tagline": "Gaming community: tournaments, servers, competitive tools and a season that never stops.",
         "explore": "Explore",
         "community": "Community",

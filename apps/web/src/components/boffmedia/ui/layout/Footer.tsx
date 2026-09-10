@@ -3,7 +3,7 @@ import * as React from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useTranslations } from "next-intl"
-import { Icon, Clock, type IconName } from "@boffmedia/ui"
+import { Icon, type IconName } from "@boffmedia/ui"
 import { FOOTER_COLS, FOOTER_SOCIAL } from "@/components/boffmedia/ui/navigation/nav-data"
 
 /** A single footer link target (already resolved — label passed separately). */
@@ -87,6 +87,7 @@ export function FooterSocial({ items }: { items: FooterSocialItem[] }) {
 
 export function Footer() {
   const t = useTranslations("nav.v3.footer")
+  const currentYear = new Date().getUTCFullYear()
   return (
     // Full-height layouts opt out of the top gap by putting `data-footer-flush`
     // on their root (landing, tool shell) — the footer never needs to know them.
@@ -119,10 +120,10 @@ export function Footer() {
             `ml-auto` element left for the copyright to sit opposite, so the row
             justifies to the end instead. */}
         <div className="flex flex-wrap items-center justify-end gap-x-[1.125rem] gap-y-2.5 border-t border-line pb-[1.375rem] pt-[0.9375rem] font-mono text-[0.6875rem] font-medium leading-none tracking-[0.07em] text-txt-dim">
-          <span className="text-txt-muted">© 2026 Boffmedia</span>
+          <span className="text-txt-muted">{t("copyright", { year: currentYear })}</span>
           <span className="inline-flex items-center gap-[0.4375rem] uppercase">
             <i aria-hidden="true" className="h-[0.3125rem] w-[0.3125rem] shrink-0 rotate-45 bg-accent" />
-            Boffmedia v3.0
+            {t("build")}
           </span>
           {/* 
           <div className="ml-auto flex items-center gap-[1.125rem] uppercase max-[619px]:ml-0 max-[619px]:w-full">
