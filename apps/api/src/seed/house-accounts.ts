@@ -1,10 +1,8 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
 
 import { and, eq } from 'drizzle-orm';
 import { MySql2Database, drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
-import { env } from '@/config/env';
 
 import { starBankAccounts } from '../_db/schema/SmartRotomStarBank';
 import {
@@ -65,6 +63,9 @@ async function findExisting(
 }
 
 async function main() {
+  // This module is also imported transitively by the credential-free SQL drift check.
+  dotenv.config({ quiet: true });
+  const { env } = await import('@/config/env');
   const DATABASE_URL = env.DATABASE_URL;
   if (!DATABASE_URL) throw new Error('DATABASE_URL env var is required');
 

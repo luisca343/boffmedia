@@ -1,10 +1,8 @@
 import * as dotenv from 'dotenv';
-dotenv.config();
 
 import { sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/mysql2';
 import * as mysql from 'mysql2/promise';
-import { env } from '@/config/env';
 
 import { boffMediaRoles } from '../_db/schema/BoffMedia';
 import { gobiernoTasas } from '../_db/schema/SmartRotomGobierno';
@@ -63,6 +61,9 @@ export const TASAS = [
 ];
 
 export async function main() {
+  // This module's constants are also imported by the credential-free SQL drift check.
+  dotenv.config({ quiet: true });
+  const { env } = await import('@/config/env');
   const DATABASE_URL = env.DATABASE_URL;
   if (!DATABASE_URL) throw new Error('DATABASE_URL env var is required');
 
