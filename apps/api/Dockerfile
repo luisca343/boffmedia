@@ -1,7 +1,7 @@
 # Build from the monorepo root:
 #   docker build -f apps/api/Dockerfile -t boffmedia-api .
 
-FROM node:20-slim AS base
+FROM node:24-slim AS base
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
 
@@ -18,6 +18,9 @@ COPY packages/shared/package.json ./packages/shared/
 COPY packages/pack-schema ./packages/pack-schema
 # Same reason as pack-schema above: asset-paths compiles on install.
 COPY packages/asset-paths ./packages/asset-paths
+# Same reason again: pokemon-identity compiles on install, and apps/api
+# declares it as a workspace dependency.
+COPY packages/pokemon-identity ./packages/pokemon-identity
 # And again for battle-core: apps/api imports the battle engine, the format
 # allowlist and the team validator as COMPILED CJS, produced by this package's
 # own `prepare` script during install. A manifest-only copy fails that tsc run.
@@ -113,8 +116,8 @@ RUN mkdir -p /build/shim-out && \
 FROM eclipse-temurin:21-jre AS jre
 
 # ---- Production image ----
-# node:20-slim (Debian) is required — Playwright does not support Alpine.
-FROM node:20-slim AS runner
+# node:24-slim (Debian) is required — Playwright does not support Alpine.
+FROM node:24-slim AS runner
 WORKDIR /app
 
 # Not an optimisation — the image cannot run without it. Unset, NODE_ENV
@@ -211,4 +214,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=3 \
 # @discordjs/voice is the dependency that would have made a slimmer second image
 # pointless anyway.
 CMD ["node", "dist/main.js"]
-

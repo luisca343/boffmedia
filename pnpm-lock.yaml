@@ -851,12 +851,18 @@ importers:
 
   packages/battle-core:
     dependencies:
+      '@pkmn/client':
+        specifier: ^0.7.0
+        version: 0.7.2
       '@pkmn/data':
         specifier: ^0.10.7
         version: 0.10.7
       '@pkmn/dex':
         specifier: ^0.9.38
         version: 0.9.38
+      '@pkmn/protocol':
+        specifier: ^0.7.0
+        version: 0.7.2
       '@pkmn/randoms':
         specifier: ^0.9.38
         version: 0.9.38
@@ -864,6 +870,9 @@ importers:
         specifier: ^0.9.38
         version: 0.9.38
     devDependencies:
+      '@types/node':
+        specifier: ^24.2.1
+        version: 24.12.0
       typescript:
         specifier: ^5.9.2
         version: 5.9.3

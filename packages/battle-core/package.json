@@ -19,12 +19,15 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@pkmn/client": "^0.7.0",
     "@pkmn/data": "^0.10.7",
     "@pkmn/dex": "^0.9.38",
+    "@pkmn/protocol": "^0.7.0",
     "@pkmn/randoms": "^0.9.38",
     "@pkmn/sim": "^0.9.38"
   },
   "devDependencies": {
+    "@types/node": "^24.2.1",
     "typescript": "^5.9.2",
     "vitest": "^4.1.10"
   },
