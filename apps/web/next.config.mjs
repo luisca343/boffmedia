@@ -107,6 +107,11 @@ const nextConfig = {
     // Enable experimental features for better performance
     experimental: {
         optimizePackageImports: ['@radix-ui/react-icons', '@heroicons/react'],
+        // The production image is built in a small Docker VM. Keep static
+        // generation serial so three workers do not exhaust its memory while
+        // rendering the large SmartRotom route tree.
+        cpus: 1,
+        staticGenerationMaxConcurrency: 1,
     },
     
     images: {

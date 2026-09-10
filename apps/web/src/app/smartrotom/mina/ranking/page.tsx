@@ -1,10 +1,12 @@
 import { RankingEntry } from "@boffmedia/shared";
 import { getTranslations } from "next-intl/server";
+import { connection } from "next/server";
 
 import MenuWrapper from "../_components/MenuWrapper";
 import { MinaService } from "@/services/api/smartrotom/minaService";
 
 export default async function Ranking() {
+  await connection();
   const t = await getTranslations("mina");
   const res = await MinaService.getPlayerRanking();
   const ranking = res.success ? res.data : undefined;

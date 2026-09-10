@@ -15,6 +15,7 @@ import PokemonList from "./_components/PokemonList"
 import { TypeEffectivenessSection } from "./_components/TypeEffectivenessSection"
 import { PalettesSection } from "./_components/PalettesSection"
 import { getTranslations } from "next-intl/server"
+import { connection } from "next/server"
 
 function SectionHead({
   num,
@@ -43,6 +44,7 @@ function SectionHead({
 }
 
 export default async function EntradaPokedex({ params }: any) {
+  await connection()
   const t = await getTranslations("pokedex")
   const resolvedParams = await params
   if (!resolvedParams.params) return <PokemonList />

@@ -1,5 +1,6 @@
 import { PokemonService } from "@/services/api/smartrotom/pokemonService"
 import { getTranslations } from "next-intl/server"
+import { connection } from "next/server"
 import Link from "next/link"
 import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead, MetaStat } from "../_components/PageHead"
@@ -8,6 +9,7 @@ import { getTranslatedBiomeName, isVisibleBiome } from "@/utils/pokemonTranslati
 import { MapIcon } from "lucide-react"
 
 export default async function LocalizacionPage() {
+  await connection()
   const t = await getTranslations("pokedex")
   const res = await PokemonService.getBiomes()
   const raw = (res.success ? res.data : undefined) ?? []

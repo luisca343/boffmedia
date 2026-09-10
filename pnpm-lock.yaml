@@ -32,6 +32,9 @@ importers:
 
   .:
     devDependencies:
+      '@pkmn/sim':
+        specifier: ^0.9.38
+        version: 0.9.38
       concurrently:
         specifier: ^9.0.0
         version: 9.2.1

@@ -1,4 +1,5 @@
 import { getTranslations } from "next-intl/server";
+import { connection } from "next/server";
 
 import MenuWrapper from "../_components/MenuWrapper";
 import {
@@ -11,6 +12,7 @@ import { MinaService } from "@/services/api/smartrotom/minaService";
 import { ASSET, staticAsset } from '@/lib/assets';
 
 export default async function Drops() {
+  await connection();
   // An HTTP failure resolves to `{ success: false }` with no `data`; destructuring it
   // would throw and take the whole route to the error boundary.
   const t = await getTranslations("mina");
