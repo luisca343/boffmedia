@@ -48,7 +48,7 @@ export function LandingPage() {
       <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden" aria-hidden="true">
         <i className="absolute left-[-16vw] top-[-12vw] h-[74vw] w-[74vw] rounded-full blur-[120px] transition-[background] duration-[260ms] ease-linear will-change-[background] [background:radial-gradient(circle,rgba(var(--zr),var(--zg),var(--zb),0.17),transparent_66%)] [[data-theme=light]_&]:opacity-70" />
         <i className="absolute bottom-[-14vw] right-[-16vw] h-[64vw] w-[64vw] rounded-full blur-[120px] transition-[background] duration-[260ms] ease-linear will-change-[background] [background:radial-gradient(circle,rgba(var(--zr),var(--zg),var(--zb),0.12),transparent_66%)] [[data-theme=light]_&]:opacity-55" />
-        <i className="absolute inset-0 opacity-40 [background-image:linear-gradient(var(--stripe)_1px,transparent_1px),linear-gradient(90deg,var(--stripe)_1px,transparent_1px)] [background-size:68px_68px] [mask-image:radial-gradient(120%_100%_at_50%_30%,#000_30%,transparent_80%)] [-webkit-mask-image:radial-gradient(120%_100%_at_50%_30%,#000_30%,transparent_80%)]" />
+        <i className="tv-grid absolute inset-0 opacity-40 [background-image:linear-gradient(var(--stripe)_1px,transparent_1px),linear-gradient(90deg,var(--stripe)_1px,transparent_1px)] [background-size:68px_68px] [mask-image:radial-gradient(120%_100%_at_50%_30%,#000_30%,transparent_80%)] [-webkit-mask-image:radial-gradient(120%_100%_at_50%_30%,#000_30%,transparent_80%)]" />
       </div>
 
       <TvMinimap active={stop} />

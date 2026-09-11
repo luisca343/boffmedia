@@ -58,7 +58,7 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
           data-pglow
           className="absolute right-[-9.375rem] top-[5.625rem] h-[38.75rem] w-[38.75rem] rounded-full blur-[110px] will-change-transform [background:radial-gradient(circle,rgba(255,138,34,0.14),transparent_68%)] [[data-theme=light]_&]:opacity-55"
         />
-        <i className="absolute inset-0 opacity-50 [background-image:linear-gradient(var(--stripe)_1px,transparent_1px),linear-gradient(90deg,var(--stripe)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(110%_85%_at_50%_40%,#000_35%,transparent_75%)] [-webkit-mask-image:radial-gradient(110%_85%_at_50%_40%,#000_35%,transparent_75%)]" />
+        <i className="tv-grid absolute inset-0 opacity-50 [background-image:linear-gradient(var(--stripe)_1px,transparent_1px),linear-gradient(90deg,var(--stripe)_1px,transparent_1px)] [background-size:64px_64px] [mask-image:radial-gradient(110%_85%_at_50%_40%,#000_35%,transparent_75%)] [-webkit-mask-image:radial-gradient(110%_85%_at_50%_40%,#000_35%,transparent_75%)]" />
         <Grain />
       </div>
       <div className="wrap relative z-[2] grid grid-cols-[1.08fr_0.92fr] items-center gap-[3.125rem] px-5 max-[980px]:grid-cols-1 max-[980px]:gap-[1.875rem] min-[640px]:px-10">
@@ -133,7 +133,7 @@ export function TvHero({ lvl, density }: { lvl: number; density: number }) {
             className="absolute left-[calc(50%_-_270px)] top-[calc(50%_-_270px)] h-[33.75rem] w-[33.75rem] rounded-full border border-dashed border-line-2 opacity-70 animate-[lv4-spin_90s_linear_infinite] [.no-motion_&]:animate-none"
             aria-hidden="true"
           />
-          <img className="relative z-[2] w-[min(100%,31.25rem)] max-[980px]:w-[min(80%,22.5rem)] [filter:drop-shadow(0_26px_44px_rgba(0,0,0,0.55))_drop-shadow(0_0_56px_rgba(255,92,10,0.30))] [[data-theme=light]_&]:[filter:drop-shadow(0_22px_38px_rgba(20,23,28,0.28))_drop-shadow(0_0_46px_rgba(240,78,0,0.22))] [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:will-change-transform [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:[transform:perspective(950px)_rotateY(calc(var(--mx,0)*9deg))_rotateX(calc(var(--my,0)*-7deg))] opacity-[0.67]" src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" aria-hidden="true" />
+          <img className="tv-hero-logo relative z-[2] w-[min(100%,31.25rem)] max-[980px]:w-[min(80%,22.5rem)] [filter:drop-shadow(0_26px_44px_rgba(0,0,0,0.55))_drop-shadow(0_0_56px_rgba(255,92,10,0.30))] [[data-theme=light]_&]:[filter:drop-shadow(0_22px_38px_rgba(20,23,28,0.28))_drop-shadow(0_0_46px_rgba(240,78,0,0.22))] [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:will-change-transform [@media(pointer:fine)_and_(prefers-reduced-motion:no-preference)]:[transform:perspective(950px)_rotateY(calc(var(--mx,0)*9deg))_rotateX(calc(var(--my,0)*-7deg))] opacity-[0.67]" src={staticAsset(ASSET.boffmedia.brand, 'boff-logo.webp')} alt="" aria-hidden="true" />
 
           {/* Same claim as the community tile, in words — so it lives or dies by
               the same floor. Absolutely positioned, so hiding it shifts nothing. */}

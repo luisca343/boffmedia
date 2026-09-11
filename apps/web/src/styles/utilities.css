@@ -61,3 +61,27 @@
 }
 html.no-motion [data-reveal] { opacity: 1 !important; transform: none !important; }
 html.reveal-all [data-reveal] { opacity: 1 !important; transform: none !important; transition: none !important; }
+
+/* ===========================================================================
+   BOFFMEDIA LANDING — light-theme calibration
+   ---------------------------------------------------------------------------
+   The landing is intentionally built around hairlines, a route spine and a
+   broadcast grid. The shared light tokens are correctly quiet for ordinary
+   cards, but on this page they collapse against the large open background.
+   Keep the correction local so the rest of the Boffmedia light theme retains
+   its existing contrast and density.
+   ========================================================================== */
+[data-theme="light"] .tv-landing {
+  --line: #c2c8d1;
+  --line-2: #9aa4b2;
+  --dim: #6b7584;
+  --stripe: rgba(20, 23, 28, 0.12);
+}
+
+[data-theme="light"] .tv-landing .tv-grid {
+  opacity: 0.7;
+}
+
+[data-theme="light"] .tv-landing .tv-hero-logo {
+  opacity: 1;
+}
