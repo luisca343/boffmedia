@@ -12,6 +12,14 @@ export const envSchema = z
     // App
     NODE_ENV: z.string().default('development'),
     PORT: z.coerce.number().default(34301),
+    // Product build identity. APP_VERSION is supplied by CI in production;
+    // local development falls back to release/version.json.
+    APP_VERSION: z.string().optional(),
+    GIT_SHA: z.string().optional(),
+    BUILD_ID: z.string().optional(),
+    // Shared secret for CI's release drafts, post-health callbacks, and desktop
+    // artifact automation route.
+    RELEASE_DEPLOYMENT_TOKEN: z.string().min(32).optional(),
     // WebSocket gateway port. Kept env-driven so it can move without a code
     // change; 34304 stays the effective default.
     SOCKET_PORT: z.coerce.number().default(34304),

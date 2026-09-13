@@ -95,7 +95,14 @@ import type { SystemId } from "../services/systems";
 // "tools" is the registry-driven hub, "tool" one tool full-screen. Both are
 // reachable WITHOUT a Boffmedia session and offline — the tools are public on
 // the web, so gating them behind sign-in here would take that away.
-export type View = "packs" | "pack" | "logs" | "settings" | "tools" | "tool";
+export type View =
+  | "packs"
+  | "pack"
+  | "logs"
+  | "settings"
+  | "releases"
+  | "tools"
+  | "tool";
 
 /** The unit the rail highlights. Views map onto sections, which is what makes
  *  the rail stay lit at depth — `pack` is still Play, `tool` is still Tools.
@@ -231,7 +238,11 @@ const BACKEND_FAULT: Record<string, BackendStatus | undefined> = {
 };
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [state, dispatch] = React.useReducer(appReducer, MOCK_SETTINGS, createAppInitialState);
+  const [state, dispatch] = React.useReducer(
+    appReducer,
+    MOCK_SETTINGS,
+    createAppInitialState,
+  );
   // Bumped to re-run the load effect; a counter rather than a callback so the
   // retry path and the initial load are the exact same code.
   const [reloadToken, setReloadToken] = React.useState(0);
@@ -397,7 +408,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
         if (pollCount > 0) {
           currentIntervalMs = Math.min(
             initialIntervalMs * Math.pow(1.5, pollCount - 1),
-            MAX_BACKOFF_MS
+            MAX_BACKOFF_MS,
           );
         }
       }
@@ -562,7 +573,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       return true;
     } catch (err) {
       const failure = err as { message?: string };
-      const message = failure?.message ?? "No se pudo vincular tu cuenta de Minecraft.";
+      const message =
+        failure?.message ?? "No se pudo vincular tu cuenta de Minecraft.";
       dispatch({ type: "signin/cancel" });
       // A TOAST, not just a log line. `signin/cancel` closes the code screen
       // outright, so without this the failure is indistinguishable from success
@@ -1031,7 +1043,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
             try {
               const installId = await getInstallId();
               const crashKind = game.diagnosis?.kind || "unclassified";
-              await emitGameCrash(state.settings, installId, crashKind as string);
+              await emitGameCrash(
+                state.settings,
+                installId,
+                crashKind as string,
+              );
             } catch {
               // Silently ignore telemetry errors
             }
@@ -1346,7 +1362,8 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       // Applied immediately for the same reason as the zoom, and one more:
       // switching reporting OFF has to stop it now, not after the 300 ms save
       // debounce. A consent toggle that lags is a consent toggle that lies.
-      if (patch.crashReports !== undefined) setCrashReporting(patch.crashReports);
+      if (patch.crashReports !== undefined)
+        setCrashReporting(patch.crashReports);
       if (saveTimer.current) clearTimeout(saveTimer.current);
       saveTimer.current = setTimeout(() => {
         void settingsSet(next).catch((err: { message?: string }) => {
@@ -1392,30 +1409,27 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   // Re-entrancy guard for the update queue: prevent multiple concurrent queueUpdates calls
   const startingQueue = React.useRef(false);
 
-  const queueUpdates = React.useCallback(
-    async (packIds: string[]) => {
-      // Prevent re-entrancy: reject if another queueUpdates call is already running
-      if (startingQueue.current) return;
+  const queueUpdates = React.useCallback(async (packIds: string[]) => {
+    // Prevent re-entrancy: reject if another queueUpdates call is already running
+    if (startingQueue.current) return;
 
-      startingQueue.current = true;
-      try {
-        // Enqueue the packs
-        dispatch({ type: "queue/enqueue", packIds });
+    startingQueue.current = true;
+    try {
+      // Enqueue the packs
+      dispatch({ type: "queue/enqueue", packIds });
 
-        // If nothing is currently being installed, start the first pack
-        if (updateQueueRef.current.current === null) {
-          const packId = updateQueueRef.current.queued[0];
-          if (packId) {
-            dispatch({ type: "queue/start", packId });
-            // install() will be called by the effect below
-          }
+      // If nothing is currently being installed, start the first pack
+      if (updateQueueRef.current.current === null) {
+        const packId = updateQueueRef.current.queued[0];
+        if (packId) {
+          dispatch({ type: "queue/start", packId });
+          // install() will be called by the effect below
         }
-      } finally {
-        startingQueue.current = false;
       }
-    },
-    [],
-  );
+    } finally {
+      startingQueue.current = false;
+    }
+  }, []);
 
   const stopUpdateQueue = React.useCallback(() => {
     dispatch({ type: "queue/stop" });
@@ -1423,7 +1437,10 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // When the queue current pack changes, install it
   React.useEffect(() => {
-    if (updateQueueRef.current.current !== null && !busy.current.has(updateQueueRef.current.current)) {
+    if (
+      updateQueueRef.current.current !== null &&
+      !busy.current.has(updateQueueRef.current.current)
+    ) {
       const packId = updateQueueRef.current.current;
       void install(packId);
     }
@@ -1579,7 +1596,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       booting,
     );
   }, [state.boffAccount, booting]);
-
 
   // The signed-out landing redirect to Tools is GONE. It existed for one
   // reason: Play was a sign-in wall, and dropping a player on a wall is worse

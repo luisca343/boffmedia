@@ -1,0 +1,25 @@
+{
+  "releases": {
+    "title": "What's new",
+    "sinceLastVisit": "What's new since your last visit",
+    "announcementLead": "{count, plural, =1 {1 published release} other {# published releases}}",
+    "viewAll": "View full changelog",
+    "acknowledge": "Got it",
+    "acknowledging": "Saving…",
+    "lead": "Important Boffmedia changes, explained for the people who use the platform.",
+    "releaseLabel": "Published version",
+    "withdrawnNotice": "This release was withdrawn after publication. Reason: {reason}",
+    "withdrawnFallback": "The release is no longer active.",
+    "loading": "Loading what's new…",
+    "error": "We couldn't load the changelog. Please try again later.",
+    "empty": "There are no published updates yet.",
+    "types": {
+      "new": "New",
+      "improvement": "Improvement",
+      "fix": "Fix",
+      "security": "Security",
+      "deprecated": "Deprecated",
+      "removed": "Removed"
+    }
+  }
+}

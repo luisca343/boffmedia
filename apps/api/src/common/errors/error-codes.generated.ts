@@ -51,6 +51,11 @@ export const ApiErrorCode = {
   MODERATION_NOT_HIDDEN: 'MODERATION_NOT_HIDDEN',
   MODERATION_REPORT_NOT_FOUND: 'MODERATION_REPORT_NOT_FOUND',
   MODERATION_SELF_REPORT: 'MODERATION_SELF_REPORT',
+  RELEASE_DEPLOYMENT_MISMATCH: 'RELEASE_DEPLOYMENT_MISMATCH',
+  RELEASE_INVALID_INPUT: 'RELEASE_INVALID_INPUT',
+  RELEASE_INVALID_STATE: 'RELEASE_INVALID_STATE',
+  RELEASE_NOT_FOUND: 'RELEASE_NOT_FOUND',
+  RELEASE_VERSION_CONFLICT: 'RELEASE_VERSION_CONFLICT',
   SERVICE_DATABASE_UNAVAILABLE: 'SERVICE_DATABASE_UNAVAILABLE',
   TAXI_INSUFFICIENT_FUNDS: 'TAXI_INSUFFICIENT_FUNDS',
   TAXI_IN_DUNGEON_RUN: 'TAXI_IN_DUNGEON_RUN',
@@ -147,6 +152,13 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   MODERATION_REPORT_NOT_FOUND:
     'No hay ningún reporte abierto sobre este contenido.',
   MODERATION_SELF_REPORT: 'No puedes reportar tu propio contenido.',
+  RELEASE_DEPLOYMENT_MISMATCH:
+    'El despliegue no coincide con la versión registrada.',
+  RELEASE_INVALID_INPUT: 'Los datos de la versión no son válidos.',
+  RELEASE_INVALID_STATE:
+    'La versión no está en un estado compatible con esta acción.',
+  RELEASE_NOT_FOUND: 'No se encontró la versión solicitada.',
+  RELEASE_VERSION_CONFLICT: 'Ya existe una versión con ese número.',
   SERVICE_DATABASE_UNAVAILABLE:
     'El servicio no está disponible ahora mismo. Vuelve a intentarlo en unos minutos.',
   TAXI_INSUFFICIENT_FUNDS: 'No tienes saldo suficiente para este viaje.',

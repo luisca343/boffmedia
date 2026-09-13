@@ -10,15 +10,15 @@ tags and are not versioned here. When a change to either is something a player
 would notice, it goes under the app release that shipped alongside it — a
 changelog is organised around who reads it, not around which container restarted.
 
-**This file is load-bearing, not decoration.** `.github/workflows/desktop-release.yml`
-refuses to build a version that has no section here, and uses the section body as
-the release notes shown in the in-app update banner when the workflow's `notes`
-input is left blank. So an entry written badly is an entry users read.
+**This file is load-bearing, not decoration.** It records the historical app
+release narrative. New public changelog entries are prepared as structured
+files under `changelog/fragments/`, reviewed in the release change, and copied
+into the product release tables by CI. The desktop updater's optional `notes`
+field remains separate from the public, localized changelog.
 
 - Draft a starting point from the commits: `node scripts/release-notes.mjs --draft [<since>]`
   — then rewrite every line. Commit subjects are addressed to developers.
-- Check a version is documented: `node scripts/release-notes.mjs --check 0.9.0`
-- Keep the three version fields in step: `node scripts/release-notes.mjs --check-versions`
+- Check a version is synchronized: `node scripts/release-notes.mjs --check-versions`
   (runs in `pnpm lint`).
 
 ## [Unreleased]
@@ -35,6 +35,20 @@ input is left blank. So an entry written badly is an entry users read.
   names each offending variable, instead of a stack trace containing a zod
   `path` array.
 - `pnpm lint` no longer rewrites files. Fixing is `pnpm lint:fix`.
+
+## [0.9.1] - 2026-09-13
+
+First stable release after the `0.9.1-beta.1` distribution. It introduces the
+public release history and carries the features validated during the beta.
+
+### Added
+
+- **Release history and What's New.** Web and desktop now show localized,
+  versioned product updates, with unread state shared for signed-in users.
+- **Regulation M-B support** in the VGC tools, including the new format data and
+  regulation-aware team validation.
+- **Monster Hunter Wilds anatomy editor**, with game-extracted manual pages,
+  draggable callouts, saved corrections and the asset pipeline behind them.
 
 ## [0.9.1-beta.1] - 2026-09-10
 

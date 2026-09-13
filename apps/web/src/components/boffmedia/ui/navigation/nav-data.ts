@@ -1,52 +1,56 @@
-import { getGameEntry, getToolHref, toolsVisibleTo } from "@/data/games"
-import { hubConfig } from "@/data/hub"
-import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data"
-import type { IconName } from "@boffmedia/ui"
+import { getGameEntry, getToolHref, toolsVisibleTo } from "@/data/games";
+import { hubConfig } from "@/data/hub";
+import { HUB_SLUGS } from "@/components/boffmedia/ui/tools/tools-data";
+import type { IconName } from "@boffmedia/ui";
 
 export interface NavItem {
-  label: string
-  href: string
-  icon?: IconName
+  label: string;
+  href: string;
+  icon?: IconName;
+  unread?: boolean;
 }
 
 export interface NavGroup {
-  name: string
-  href?: string
-  items: NavItem[]
+  name: string;
+  href?: string;
+  items: NavItem[];
 }
 
 export interface NavSection {
-  title: string
-  href: string
-  hue?: number
-  groups?: NavGroup[]
-  items: NavItem[]
+  title: string;
+  href: string;
+  hue?: number;
+  groups?: NavGroup[];
+  items: NavItem[];
 }
 
 export interface NavEntry {
-  labelKey: string
-  route: string
-  menu?: "tools" | "comunidad"
+  labelKey: string;
+  route: string;
+  menu?: "tools" | "comunidad";
 }
 
-type T = (key: string) => string
+type T = (key: string) => string;
 
 export const PRIMARY_NAV: NavEntry[] = [
   { labelKey: "home", route: "/" },
   { labelKey: "tools", route: "/herramientas", menu: "tools" },
   { labelKey: "community", route: "/community", menu: "comunidad" },
-]
+];
 
 /**
  * Tools menu derived from the games registry (single source of truth for
  * routes and names) — adding a game/tool there updates this menu, the hub,
  * the category landings and the shell sidebar together.
  */
-export function buildToolsSections(t: T, roles?: readonly string[]): NavSection[] {
+export function buildToolsSections(
+  t: T,
+  roles?: readonly string[],
+): NavSection[] {
   return HUB_SLUGS.flatMap((slug) => {
-    const game = getGameEntry(slug)
-    const hub = hubConfig[slug]
-    if (!game || !hub) return []
+    const game = getGameEntry(slug);
+    const hub = hubConfig[slug];
+    if (!game || !hub) return [];
     return [
       {
         title: t(game.nameKey),
@@ -58,24 +62,39 @@ export function buildToolsSections(t: T, roles?: readonly string[]): NavSection[
             href: c.href,
             items: toolsVisibleTo(c.tools, roles)
               .filter((tool) => tool.showInSidebar !== false)
-              .map((tool) => ({ label: t(tool.nameKey), href: tool.href, icon: tool.sidebarIcon })),
+              .map((tool) => ({
+                label: t(tool.nameKey),
+                href: tool.href,
+                icon: tool.sidebarIcon,
+              })),
           }))
           .filter((g) => g.items.length > 0),
         items: [],
       },
-    ]
-  })
+    ];
+  });
 }
 
-export function buildComunidadSections(t: T): NavSection[] {
+export function buildComunidadSections(
+  t: T,
+  hasUnreadReleases = false,
+): NavSection[] {
   return [
     {
       title: t("nav.v3.sections.competition"),
       href: "/clasificacion",
       items: [
         { label: t("nav.v3.items.games"), href: "/juegos", icon: "gamepad" },
-        { label: t("nav.v3.items.tournaments"), href: "/torneos", icon: "trophy" },
-        { label: t("nav.v3.items.ranking"), href: "/clasificacion", icon: "chart" },
+        {
+          label: t("nav.v3.items.tournaments"),
+          href: "/torneos",
+          icon: "trophy",
+        },
+        {
+          label: t("nav.v3.items.ranking"),
+          href: "/clasificacion",
+          icon: "chart",
+        },
       ],
     },
     {
@@ -83,7 +102,17 @@ export function buildComunidadSections(t: T): NavSection[] {
       href: "/eventos",
       items: [
         { label: t("nav.v3.items.events"), href: "/eventos", icon: "trophy" },
-        { label: t("nav.v3.items.raffles"), href: getToolHref("otros", "sorteos"), icon: "gift" },
+        {
+          label: t("nav.v3.items.raffles"),
+          href: getToolHref("otros", "sorteos"),
+          icon: "gift",
+        },
+        {
+          label: t("nav.v3.items.releases"),
+          href: "/novedades",
+          icon: "sparkles",
+          unread: hasUnreadReleases,
+        },
       ],
     },
     {
@@ -91,14 +120,14 @@ export function buildComunidadSections(t: T): NavSection[] {
       href: "/app",
       items: [{ label: t("nav.v3.items.app"), href: "/app", icon: "download" }],
     },
-  ]
+  ];
 }
 
 export interface FooterLink {
-  route?: string
-  href?: string
-  labelKey: string
-  external?: boolean
+  route?: string;
+  href?: string;
+  labelKey: string;
+  external?: boolean;
 }
 
 export const FOOTER_COLS: { titleKey: string; links: FooterLink[] }[] = [
@@ -115,7 +144,11 @@ export const FOOTER_COLS: { titleKey: string; links: FooterLink[] }[] = [
   {
     titleKey: "community",
     links: [
-      { href: "https://discord.gg/TWqjNHQz7d", labelKey: "discord", external: true },
+      {
+        href: "https://discord.gg/TWqjNHQz7d",
+        labelKey: "discord",
+        external: true,
+      },
       { route: getToolHref("otros", "sorteos"), labelKey: "raffles" },
     ],
   },
@@ -130,9 +163,17 @@ export const FOOTER_COLS: { titleKey: string; links: FooterLink[] }[] = [
       { route: "/privacidad", labelKey: "privacy" },
     ],
   },
-]
+];
 
-export const FOOTER_SOCIAL: { icon: IconName; labelKey: string; href: string }[] = [
-  { icon: "discord", labelKey: "discord", href: "https://discord.gg/TWqjNHQz7d" },
+export const FOOTER_SOCIAL: {
+  icon: IconName;
+  labelKey: string;
+  href: string;
+}[] = [
+  {
+    icon: "discord",
+    labelKey: "discord",
+    href: "https://discord.gg/TWqjNHQz7d",
+  },
   { icon: "globe", labelKey: "web", href: "/" },
-]
+];

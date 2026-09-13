@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DesktopUpdatesService } from './desktop-updates.service';
 import { DesktopReleasesRepository } from './repositories/desktop-releases.repository';
 import { DesktopRelease } from '@/_db/schema/DesktopReleases';
+import { ReleasesService } from '@api/boffmedia/releases/releases.service';
 
 describe('DesktopUpdatesService', () => {
   let service: DesktopUpdatesService;
@@ -12,6 +13,7 @@ describe('DesktopUpdatesService', () => {
   ): DesktopRelease => ({
     id: 1,
     version: '1.0.0',
+    productReleaseId: null,
     target: 'windows-x86_64',
     signature: 'test-sig',
     notes: 'Test release',
@@ -40,6 +42,10 @@ describe('DesktopUpdatesService', () => {
             setRolloutPercent: jest.fn(),
             setPaused: jest.fn(),
           },
+        },
+        {
+          provide: ReleasesService,
+          useValue: { productReleaseIdForVersion: jest.fn() },
         },
       ],
     }).compile();

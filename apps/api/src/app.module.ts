@@ -83,6 +83,8 @@ import { DesktopTelemetryModule } from './api/desktop-telemetry/desktop-telemetr
 import { RandomizerModule } from '@api/randomizer/randomizer.module';
 import { WebhooksModule } from '@api/webhooks/webhooks.module';
 import { publicPath } from '@/config/paths';
+import { VersionModule } from '@api/version/version.module';
+import { ReleasesModule } from '@api/boffmedia/releases/releases.module';
 
 @Module({
   imports: [
@@ -181,6 +183,8 @@ import { publicPath } from '@/config/paths';
     DesktopTelemetryModule,
     RandomizerModule,
     WebhooksModule,
+    VersionModule,
+    ReleasesModule,
   ],
   controllers: [AppController],
   providers: [

@@ -24,6 +24,12 @@ function DropItems({ items }: { items: NavItem[] }) {
             className="shrink-0 text-txt-dim transition-colors duration-[140ms] group-hover/item:text-accent"
           />
           <span className="flex-1">{it.label}</span>
+          {it.unread && (
+            <i
+              aria-hidden="true"
+              className="h-1.5 w-1.5 shrink-0 rotate-45 bg-accent"
+            />
+          )}
           <Icon
             name="chevronRight"
             size={12}

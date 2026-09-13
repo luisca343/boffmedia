@@ -1,9 +1,10 @@
-import { Icon, type IconName } from "@boffmedia/ui"
+import { Icon, type IconName } from "@boffmedia/ui";
 
-import { useT } from "../../i18n"
-import { type Section, useApp } from "../../state/app"
-import { AccountSwitcher } from "../AccountSwitcher"
-import { McAccountSwitcher } from "../McAccountSwitcher"
+import { useT } from "../../i18n";
+import { type Section, useApp } from "../../state/app";
+import { AccountSwitcher } from "../AccountSwitcher";
+import { McAccountSwitcher } from "../McAccountSwitcher";
+import { useProductReleaseAnnouncements } from "../ReleaseAnnouncements";
 
 // The rail is the APP SECTION rail, not a pack filter.
 //
@@ -15,12 +16,12 @@ import { McAccountSwitcher } from "../McAccountSwitcher"
 // The highlight is driven by `section`, never by the raw view, so opening a pack
 // or a tool full-screen keeps its section lit instead of going dark at depth.
 
-const BUTTON_SIZE = 56
-const ITEM_SIZE = BUTTON_SIZE - 16
+const BUTTON_SIZE = 56;
+const ITEM_SIZE = BUTTON_SIZE - 16;
 /** Sections read heavier than utilities on purpose: they are the app's top
  *  level, and same-weight glyphs made Tools look like a sibling of Settings. */
-const SECTION_ICON = 28
-const UTILITY_ICON = 24
+const SECTION_ICON = 28;
+const UTILITY_ICON = 24;
 
 function RailButton({
   active,
@@ -30,12 +31,12 @@ function RailButton({
   onClick,
   children,
 }: {
-  active: boolean
-  icon: IconName
-  size: number
-  label: string
-  onClick: () => void
-  children?: React.ReactNode
+  active: boolean;
+  icon: IconName;
+  size: number;
+  label: string;
+  onClick: () => void;
+  children?: React.ReactNode;
 }) {
   return (
     <button
@@ -43,19 +44,23 @@ function RailButton({
       onClick={onClick}
       aria-current={active ? "page" : undefined}
       className={`relative mb-2 flex items-center justify-center rounded transition-colors ${
-        active ? "bg-accent text-white" : "text-txt-muted hover:bg-surface-bright hover:text-txt"
+        active
+          ? "bg-accent text-white"
+          : "text-txt-muted hover:bg-surface-bright hover:text-txt"
       }`}
       style={{ width: `${ITEM_SIZE}px`, height: `${ITEM_SIZE}px` }}
       title={label}
       aria-label={label}
     >
-      {active && <div className="absolute inset-y-0 left-0 w-1 rounded-l bg-accent-bright" />}
+      {active && (
+        <div className="absolute inset-y-0 left-0 w-1 rounded-l bg-accent-bright" />
+      )}
       <div className="relative">
         <Icon name={icon} size={size} />
         {children}
       </div>
     </button>
-  )
+  );
 }
 
 /**
@@ -69,12 +74,12 @@ function RailButton({
  * tooltip carries the full explanation the one-line banner leaves out.
  */
 function BackendIndicator() {
-  const st = useT("shell")
-  const { backendStatus, retryBackend } = useApp()
+  const st = useT("shell");
+  const { backendStatus, retryBackend } = useApp();
 
-  if (backendStatus !== "down" && backendStatus !== "unreachable") return null
-  const isDown = backendStatus === "down"
-  const title = `${isDown ? st("serverDownTitle") : st("serverUnreachableTitle")} — ${st("retryButton")}`
+  if (backendStatus !== "down" && backendStatus !== "unreachable") return null;
+  const isDown = backendStatus === "down";
+  const title = `${isDown ? st("serverDownTitle") : st("serverUnreachableTitle")} — ${st("retryButton")}`;
 
   return (
     <button
@@ -87,7 +92,7 @@ function BackendIndicator() {
     >
       <Icon name="alert" size={UTILITY_ICON} />
     </button>
-  )
+  );
 }
 
 /**
@@ -96,12 +101,13 @@ function BackendIndicator() {
  * Logs, Settings, a divider and the account chip.
  */
 export function AppRail() {
-  const t = useT("appRail")
-  const st = useT("shell")
-  const { section, view, go, game, logs } = useApp()
+  const t = useT("appRail");
+  const st = useT("shell");
+  const { section, view, go, game, logs } = useApp();
+  const { hasUnread } = useProductReleaseAnnouncements();
 
-  const errorCount = logs.filter((l) => l.level === "error").length
-  const isSection = (s: Section) => section === s
+  const errorCount = logs.filter((l) => l.level === "error").length;
+  const isSection = (s: Section) => section === s;
 
   return (
     <nav
@@ -166,6 +172,21 @@ export function AppRail() {
         onClick={() => go("settings")}
       />
 
+      <RailButton
+        active={view === "releases"}
+        icon="sparkles"
+        size={UTILITY_ICON}
+        label={st("navReleases")}
+        onClick={() => go("releases")}
+      >
+        {hasUnread && (
+          <span
+            aria-hidden="true"
+            className="absolute -right-1 -top-1 h-2 w-2 rotate-45 bg-accent"
+          />
+        )}
+      </RailButton>
+
       <div className="my-2 h-px w-8 bg-line" />
 
       {/* Two identities, two chips, in the order they depend on each other: the
@@ -176,5 +197,5 @@ export function AppRail() {
       <McAccountSwitcher />
       <AccountSwitcher />
     </nav>
-  )
+  );
 }

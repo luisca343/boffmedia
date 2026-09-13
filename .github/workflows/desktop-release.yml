@@ -1,15 +1,13 @@
 name: Desktop App Release
 
 # Builds the Boffmedia App on Windows, signs the updater artifact, and uploads it
-# to the API as a DRAFT release. Publishing to the feed stays a deliberate act:
-# by default this leaves the release unpublished so a human reviews it in the
-# admin portal; set `publish: true` to publish in the same run.
+# to the API. Production publishes the updater row automatically; the product
+# changelog still publishes only after approval and all required surfaces verify.
 #
 # Windows is mandatory (RELEASING §3.4): WebView2 is what users run, and the
 # updater's `ring`/`zstd-sys` need MSVC's lib.exe — cross-compiling is not an
-# option. There is NO service API key (RELEASING §3.3): the run logs in as a
-# dedicated BOFF_ADMIN user to mint a 1h JWT, so store the username/password as
-# secrets, never a pre-issued token.
+# option. The artifact path uses the narrowly scoped internal release
+# credential; CI must never store or mint a human TOTP step-up token.
 #
 # Code signing is intentionally NOT done here (1.0 ships unsigned): the artifact
 # is minisign-signed for the updater only. The published SHA-512 on /app is
@@ -18,10 +16,6 @@ name: Desktop App Release
 on:
   workflow_dispatch:
     inputs:
-      version:
-        description: "Semver to release (must match src-tauri/tauri.conf.json)"
-        required: true
-        type: string
       environment:
         description: "Which API/profile to build against"
         required: true
@@ -35,12 +29,6 @@ on:
         required: false
         default: ""
         type: string
-      publish:
-        description: "Publish to the feed immediately (otherwise leave as draft)"
-        required: false
-        default: false
-        type: boolean
-
 concurrency:
   group: desktop-release
   cancel-in-progress: false
@@ -58,6 +46,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Read canonical release identity
+        id: release
+        shell: bash
+        run: |
+          version=$(node -p "JSON.parse(require('fs').readFileSync('release/version.json', 'utf8')).version")
+          version_file_sha=$(sha256sum release/version.json | cut -d' ' -f1)
+          build_id="desktop-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "version_file_sha=$version_file_sha" >> "$GITHUB_OUTPUT"
+          echo "git_sha=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+          echo "build_id=$build_id" >> "$GITHUB_OUTPUT"
+
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -66,7 +66,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.12.0
           cache: pnpm
 
       - name: Set up Rust
@@ -87,8 +87,8 @@ jobs:
         shell: bash
         run: |
           conf_version=$(node -p "require('./apps/desktop/src-tauri/tauri.conf.json').version")
-          if [ "$conf_version" != "${{ github.event.inputs.version }}" ]; then
-            echo "::error::tauri.conf.json version ($conf_version) != requested (${{ github.event.inputs.version }}). Bump it first (RELEASING §4.1)."
+          if [ "$conf_version" != "${{ steps.release.outputs.version }}" ]; then
+            echo "::error::tauri.conf.json version ($conf_version) != canonical release version (${{ steps.release.outputs.version }}). Bump synchronized build copies in the release preparation change."
             exit 1
           fi
           # ...and that package.json and Cargo.toml agree with it. The check
@@ -97,9 +97,9 @@ jobs:
           # feed has never heard of.
           node scripts/release-notes.mjs --check-versions
 
-      - name: Verify this version has release notes
+      - name: Verify changelog fragments
         shell: bash
-        run: node scripts/release-notes.mjs --check "${{ github.event.inputs.version }}"
+        run: node scripts/release-fragments.mjs --check
 
       - name: Build + sign (Tauri)
         env:
@@ -111,14 +111,47 @@ jobs:
           pnpm --filter desktop
           ${{ github.event.inputs.environment == 'prod' && 'build:prod' || 'build' }}
 
-      - name: Upload draft (and optionally publish)
+      - name: Create or retry the fragment-backed release draft
         shell: bash
         env:
-          BOFF_ADMIN_USERNAME: ${{ secrets.BOFF_ADMIN_USERNAME }}
-          BOFF_ADMIN_PASSWORD: ${{ secrets.BOFF_ADMIN_PASSWORD }}
-          VERSION: ${{ github.event.inputs.version }}
+          RELEASE_DEPLOYMENT_TOKEN: ${{ secrets.RELEASE_DEPLOYMENT_TOKEN }}
+          SOURCE_COMMIT_SHA: ${{ steps.release.outputs.git_sha }}
+          VERSION: ${{ steps.release.outputs.version }}
+          VERSION_FILE_SHA: ${{ steps.release.outputs.version_file_sha }}
+        run: |
+          set -euo pipefail
+          api_base="${BOFF_API_URL%/}"
+          [ -n "$RELEASE_DEPLOYMENT_TOKEN" ] || { echo "::error::RELEASE_DEPLOYMENT_TOKEN is not configured"; exit 1; }
+          required_surfaces=$(node -p "JSON.stringify(JSON.parse(require('fs').readFileSync('release/plan.json', 'utf8')).requiredSurfaces)")
+          registered=$(curl --fail --silent --show-error "$api_base/releases/internal/fragments/registered" \
+            -H "X-Release-Deployment-Token: $RELEASE_DEPLOYMENT_TOKEN")
+          claimed=$(echo "$registered" | jq -c '.data.fragmentIds // []')
+          available=$(RELEASE_SOURCE_COMMIT_SHA="$SOURCE_COMMIT_SHA" node scripts/release-fragments.mjs --json | \
+            jq --argjson claimed "$claimed" '{fragments: [.fragments[] | select((.fragmentId as $id | ($claimed | index($id))) == null)]}')
+          mode=$(echo "$available" | jq -r 'if (.fragments | length) > 0 then "entries" else "none" end')
+          body=$(echo "$available" | jq \
+            --arg version "$VERSION" \
+            --argjson requiredSurfaces "$required_surfaces" \
+            --arg changelogMode "$mode" \
+            --arg sourceCommitSha "$SOURCE_COMMIT_SHA" \
+            --arg versionFileSha "$VERSION_FILE_SHA" \
+            '. + {version:$version, requiredSurfaces:$requiredSurfaces, changelogMode:$changelogMode, sourceCommitSha:$sourceCommitSha, versionFileSha:$versionFileSha}')
+          draft=$(curl --fail --silent --show-error -X POST "$api_base/releases/internal/drafts" \
+            -H 'Content-Type: application/json' \
+            -H "X-Release-Deployment-Token: $RELEASE_DEPLOYMENT_TOKEN" \
+            --data "$body")
+          [ "$(echo "$draft" | jq -r '.success')" = "true" ] || { echo "::error::release draft was rejected: $draft"; exit 1; }
+          echo "Release draft for $VERSION is available for approval."
+
+      - name: Upload desktop artifact
+        shell: bash
+        env:
+          VERSION: ${{ steps.release.outputs.version }}
+          BUILD_ID: ${{ steps.release.outputs.build_id }}
+          GIT_SHA: ${{ steps.release.outputs.git_sha }}
+          VERSION_FILE_SHA: ${{ steps.release.outputs.version_file_sha }}
+          RELEASE_DEPLOYMENT_TOKEN: ${{ secrets.RELEASE_DEPLOYMENT_TOKEN }}
           NOTES: ${{ github.event.inputs.notes }}
-          PUBLISH: ${{ github.event.inputs.publish }}
         run: |
           set -euo pipefail
           # Blank notes fall back to CHANGELOG.md, which is the point of X9: the
@@ -141,18 +174,16 @@ jobs:
           # Log in for a fresh 1h admin JWT (RELEASING §3.3). Response is enveloped:
           # the token lives at .data.access_token, and a POST returns 201, so check
           # `success`, not the status code.
-          login=$(curl -sS -X POST "$BOFF_API_URL/auth/login" \
-            -H 'Content-Type: application/json' \
-            -d "{\"username\":\"$BOFF_ADMIN_USERNAME\",\"password\":\"$BOFF_ADMIN_PASSWORD\"}")
-          if [ "$(echo "$login" | jq -r '.success')" != "true" ]; then
-            echo "::error::login failed"; exit 1
+          publish_param="false"
+          if [ "${{ github.event.inputs.environment }}" = "prod" ]; then
+            publish_param="true"
           fi
-          token=$(echo "$login" | jq -r '.data.access_token')
+          [ -n "$RELEASE_DEPLOYMENT_TOKEN" ] || { echo "::error::RELEASE_DEPLOYMENT_TOKEN is not configured"; exit 1; }
 
           # Raw octet-stream body, sha512 computed server-side (RELEASING §4.3).
           upload=$(curl -sS -X POST \
-            "$BOFF_API_URL/desktop/admin/releases?version=$VERSION&target=$TARGET&notes=$(jq -rn --arg n "$NOTES" '$n|@uri')" \
-            -H "Authorization: Bearer $token" \
+            "$BOFF_API_URL/desktop/updates/internal/artifacts?version=$VERSION&target=$TARGET&publish=$publish_param&notes=$(jq -rn --arg n "$NOTES" '$n|@uri')" \
+            -H "X-Release-Deployment-Token: $RELEASE_DEPLOYMENT_TOKEN" \
             -H "Content-Type: application/octet-stream" \
             -H "X-Updater-Signature: $(cat "$sig")" \
             -H "X-Artifact-Filename: $(basename "$exe")" \
@@ -163,13 +194,33 @@ jobs:
           id=$(echo "$upload" | jq -r '.data.id')
           echo "Uploaded draft release $id"
 
-          if [ "$PUBLISH" = "true" ]; then
-            pub=$(curl -sS -X POST "$BOFF_API_URL/desktop/admin/releases/$id/publish" \
-              -H "Authorization: Bearer $token")
-            if [ "$(echo "$pub" | jq -r '.success')" != "true" ]; then
-              echo "::error::publish failed: $pub"; exit 1
-            fi
-            echo "Published $VERSION to the $TARGET feed."
+          if [ "$publish_param" = "true" ]; then
+            echo "Published $VERSION to the $TARGET updater feed."
           else
-            echo "Left as draft. Review and publish it from the admin portal."
+            echo "Left $VERSION as a desktop updater draft for the non-production environment."
+          fi
+
+          # A desktop artifact is a verified production deployment only after
+          # its updater row is public. A draft upload is intentionally not
+          # enough to satisfy a product release's desktop gate.
+          if [ "$publish_param" = "true" ]; then
+            checked_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+            idempotency_key="production:desktop:${VERSION}:${BUILD_ID}"
+            body=$(jq -n \
+              --arg surface desktop \
+              --arg environment production \
+              --arg productVersion "$VERSION" \
+              --arg buildId "$BUILD_ID" \
+              --arg gitSha "$GIT_SHA" \
+              --arg versionFileSha "$VERSION_FILE_SHA" \
+              --arg healthCheckUrl "$BOFF_API_URL/desktop/updates/download/$VERSION/$TARGET" \
+              --arg healthCheckedAt "$checked_at" \
+              --arg idempotencyKey "$idempotency_key" \
+              '{surface:$surface, environment:$environment, productVersion:$productVersion, buildId:$buildId, gitSha:$gitSha, versionFileSha:$versionFileSha, status:"verified", healthCheckUrl:$healthCheckUrl, healthCheckedAt:$healthCheckedAt, idempotencyKey:$idempotencyKey}')
+            recorded=$(curl --fail --silent --show-error -X POST "$BOFF_API_URL/releases/internal/deployments" \
+              -H 'Content-Type: application/json' \
+              -H "X-Release-Deployment-Token: $RELEASE_DEPLOYMENT_TOKEN" \
+              --data "$body")
+            [ "$(echo "$recorded" | jq -r '.success')" = "true" ] || { echo "::error::desktop deployment evidence was rejected: $recorded"; exit 1; }
+            echo "Recorded verified desktop deployment for $VERSION ($BUILD_ID)."
           fi

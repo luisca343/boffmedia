@@ -1,0 +1,25 @@
+{
+  "releases": {
+    "title": "Novedades",
+    "sinceLastVisit": "Novedades desde tu última visita",
+    "announcementLead": "{count, plural, =1 {1 release publicada} other {# releases publicadas}}",
+    "viewAll": "Ver changelog completo",
+    "acknowledge": "Entendido",
+    "acknowledging": "Guardando…",
+    "withdrawnNotice": "Esta release se retiró después de publicarse. Motivo: {reason}",
+    "withdrawnFallback": "La release ya no está activa.",
+    "lead": "Cambios importantes de Boffmedia, explicados para quienes usan la plataforma.",
+    "releaseLabel": "Versión publicada",
+    "loading": "Cargando novedades…",
+    "error": "No se han podido cargar las novedades. Inténtalo de nuevo más tarde.",
+    "empty": "Todavía no hay novedades publicadas.",
+    "types": {
+      "new": "Nuevo",
+      "improvement": "Mejora",
+      "fix": "Corrección",
+      "security": "Seguridad",
+      "deprecated": "Obsoleto",
+      "removed": "Retirado"
+    }
+  }
+}

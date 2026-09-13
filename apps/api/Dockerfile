@@ -35,6 +35,7 @@ WORKDIR /app
 
 COPY packages/shared ./packages/shared
 COPY apps/api ./apps/api
+COPY release ./release
 
 # `nest build` type-checks the whole API in one pass and needs more heap than
 # Node's default heuristic hands it inside a container — it dies with
@@ -120,12 +121,19 @@ FROM eclipse-temurin:21-jre AS jre
 FROM node:24-slim AS runner
 WORKDIR /app
 
+ARG APP_VERSION
+ARG GIT_SHA
+ARG BUILD_ID
+
 # Not an optimisation — the image cannot run without it. Unset, NODE_ENV
 # defaults to development, and the logger then configures a `pino-pretty`
 # transport that `pnpm deploy --prod` pruned out of this image, so the process
 # dies at boot with "unable to determine transport target". Pinned here so no
 # `docker run` can select that mode.
 ENV NODE_ENV=production
+ENV APP_VERSION=$APP_VERSION
+ENV GIT_SHA=$GIT_SHA
+ENV BUILD_ID=$BUILD_ID
 
 # Install runtime system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -165,6 +173,7 @@ RUN node node_modules/playwright/cli.js install --with-deps chromium
 COPY --from=builder /app/apps/api/drizzle ./drizzle
 COPY --from=builder /app/apps/api/data ./data
 COPY --from=builder /app/apps/api/package.json ./
+COPY --from=builder /app/release ./release
 # Operator scripts, taken from the build context rather than a stage: they are
 # dependency-free plain Node run against the mounted volumes, so they have to
 # travel with the image the server pulls.

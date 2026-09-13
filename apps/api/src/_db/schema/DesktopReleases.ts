@@ -1,4 +1,5 @@
 import {
+  AnyMySqlColumn,
   boolean,
   char,
   index,
@@ -9,6 +10,7 @@ import {
   varchar,
   timestamp,
 } from 'drizzle-orm/mysql-core';
+import { boffmediaReleases } from './BoffMediaReleases';
 
 // Boffmedia App auto-update — the artifacts Tauri v2's updater plugin downloads.
 // One row per (version, target) pair: a single release ships several bundles
@@ -28,6 +30,11 @@ export const desktopReleases = mysqlTable(
     id: int('id').primaryKey().autoincrement(),
     /** Semver, no leading `v`. Tauri compares this against its own version. */
     version: varchar('version', { length: 32 }).notNull(),
+    /** Optional product-level release link; standalone updater artifacts remain valid. */
+    productReleaseId: int('product_release_id').references(
+      (): AnyMySqlColumn => boffmediaReleases.id,
+      { onDelete: 'set null', onUpdate: 'cascade' },
+    ),
     target: varchar('target', { length: 32 }).$type<DesktopTarget>().notNull(),
     /** Minisign signature produced by `tauri signer` / the build's private key.
      *  The updater refuses any artifact whose signature does not verify, so a
@@ -73,6 +80,9 @@ export const desktopReleases = mysqlTable(
     targetPublishedIdx: index('desktop_releases_target_published_idx').on(
       table.target,
       table.published,
+    ),
+    productReleaseIdx: index('desktop_releases_product_release_idx').on(
+      table.productReleaseId,
     ),
   }),
 );

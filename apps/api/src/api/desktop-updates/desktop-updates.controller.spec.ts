@@ -3,6 +3,7 @@ import { DesktopUpdatesController } from './desktop-updates.controller';
 import { DesktopUpdatesService } from './desktop-updates.service';
 import { DesktopReleasesRepository } from './repositories/desktop-releases.repository';
 import { DesktopRelease } from '@/_db/schema/DesktopReleases';
+import { ReleasesService } from '@api/boffmedia/releases/releases.service';
 
 describe('DesktopUpdatesController', () => {
   let controller: DesktopUpdatesController;
@@ -13,6 +14,7 @@ describe('DesktopUpdatesController', () => {
   ): DesktopRelease => ({
     id: 1,
     version: '2.0.0',
+    productReleaseId: null,
     target: 'windows-x86_64',
     signature: 'test-sig',
     notes: 'Test release',
@@ -39,6 +41,10 @@ describe('DesktopUpdatesController', () => {
           useValue: {
             listPublishedForTarget: jest.fn(),
           },
+        },
+        {
+          provide: ReleasesService,
+          useValue: { productReleaseIdForVersion: jest.fn() },
         },
       ],
     }).compile();

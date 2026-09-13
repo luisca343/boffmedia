@@ -2,6 +2,7 @@ import { Channel, invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import type { ReleaseEntity } from "@boffmedia/shared";
 
 import {
   MOCK_ACCOUNT,
@@ -1419,11 +1420,12 @@ function mockRecommend(modCount: number, totalRamMib: number): number {
   return Math.max(Math.floor(chosen / 512) * 512, 1024);
 }
 
-const mockRuntime: { memory: MemoryChoice; java: JavaChoice; jvm: JvmChoice } = {
-  memory: { mode: "inherit" },
-  java: { mode: "inherit" },
-  jvm: { mode: "inherit" },
-};
+const mockRuntime: { memory: MemoryChoice; java: JavaChoice; jvm: JvmChoice } =
+  {
+    memory: { mode: "inherit" },
+    java: { mode: "inherit" },
+    jvm: { mode: "inherit" },
+  };
 
 function mockResolve(): InstanceRuntime {
   const modCount = 214;
@@ -2734,6 +2736,38 @@ export async function toolApiRequest<T = unknown>(request: {
   return await invoke<T>("tool_api_request", { request });
 }
 
+type ApiEnvelope<T> = { success: boolean; data?: T };
+
+/** Public product changelog through the same Rust proxy as tools. Rust may
+ * attach the stored Boffmedia bearer when one exists, while anonymous and
+ * offline launchers still get a harmless empty result. */
+export async function productReleasesList(
+  locale: "en" | "es",
+): Promise<ReleaseEntity[]> {
+  if (!isDesktop()) return [];
+  const response = await toolApiRequest<ApiEnvelope<ReleaseEntity[]>>({
+    path: "/releases",
+    query: { locale, limit: "100" },
+    auth: "optional",
+  });
+  return response.success ? (response.data ?? []) : [];
+}
+
+export async function productReleaseMarkSeen(id: number): Promise<boolean> {
+  if (!isDesktop()) return false;
+  try {
+    const response = await toolApiRequest<ApiEnvelope<{ success: true }>>({
+      path: `/releases/${id}/seen`,
+      method: "POST",
+      body: {},
+      auth: "required",
+    });
+    return response.success;
+  } catch {
+    return false;
+  }
+}
+
 /** Where the API lives, for the `apiUrl` capability — the ABSOLUTE base a
  *  download link is built on. Cached because a url builder cannot await, and
  *  asked of Rust because only Rust reads the runtime `BOFF_API_URL`: anything
@@ -2748,8 +2782,11 @@ let toolApiBase: string | null = null;
 export function toolApiBaseUrl(): string {
   if (toolApiBase) return toolApiBase;
   const configured = import.meta.env.VITE_API_URL as string | undefined;
-  if (configured && configured.trim()) return configured.trim().replace(/\/+$/, "");
-  return import.meta.env.DEV ? "http://localhost:34301" : "https://api.boffmedia.es";
+  if (configured && configured.trim())
+    return configured.trim().replace(/\/+$/, "");
+  return import.meta.env.DEV
+    ? "http://localhost:34301"
+    : "https://api.boffmedia.es";
 }
 
 /** Called once at boot. Best-effort: a failure leaves the fallback above in
@@ -2805,12 +2842,22 @@ export type ToolOutboxRow = {
 
 export type ToolFlushWire = {
   sent: number;
-  rejected: Array<{ opId: string; ns: string; path: string; status: number; message: string }>;
+  rejected: Array<{
+    opId: string;
+    ns: string;
+    path: string;
+    status: number;
+    message: string;
+  }>;
   remaining: number;
   stopped?: string | null;
 };
 
-export function toolDbGet(ns: string, collection: string, id: string): Promise<string | null> {
+export function toolDbGet(
+  ns: string,
+  collection: string,
+  id: string,
+): Promise<string | null> {
   return invoke<string | null>("tool_db_get", { ns, collection, id });
 }
 
@@ -2823,11 +2870,18 @@ export function toolDbPut(
   return invoke("tool_db_put", { ns, collection, id, value });
 }
 
-export function toolDbRemove(ns: string, collection: string, id: string): Promise<void> {
+export function toolDbRemove(
+  ns: string,
+  collection: string,
+  id: string,
+): Promise<void> {
   return invoke("tool_db_remove", { ns, collection, id });
 }
 
-export function toolDbList(ns: string, collection: string): Promise<ToolDocRow[]> {
+export function toolDbList(
+  ns: string,
+  collection: string,
+): Promise<ToolDocRow[]> {
   return invoke<ToolDocRow[]>("tool_db_list", { ns, collection });
 }
 
@@ -2915,7 +2969,8 @@ export async function instanceRomSlot(slug: string): Promise<string | null> {
  *  `ToolManifest.dataPack.id`. Never rejects: an unreachable index resolves
  *  with `available: null, source: "offline"` (see `tool_packs.rs`). */
 export async function toolPacksStatus(tool: string): Promise<ToolPackStatus> {
-  if (!isDesktop()) return { installed: null, available: null, source: "offline" };
+  if (!isDesktop())
+    return { installed: null, available: null, source: "offline" };
   return await invoke<ToolPackStatus>("tool_packs_status", { tool });
 }
 
@@ -2924,7 +2979,9 @@ export async function toolPacksStatus(tool: string): Promise<ToolPackStatus> {
  *  — it settles once the request is accepted, not once the pack is ready. */
 export async function toolPacksInstall(tool: string): Promise<void> {
   if (!isDesktop()) {
-    throw new Error("El gestor de packs solo está disponible dentro de la app de escritorio.");
+    throw new Error(
+      "El gestor de packs solo está disponible dentro de la app de escritorio.",
+    );
   }
   await invoke("tool_packs_install", { tool });
 }

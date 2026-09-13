@@ -1,37 +1,42 @@
-import { useEffect } from "react"
+import { useEffect } from "react";
 
-import { ToastStack } from "@boffmedia/ui"
+import { ToastStack } from "@boffmedia/ui";
 
-import { Shell } from "./components/Shell"
-import { Titlebar } from "./components/Titlebar"
-import { UpdateBanner } from "./components/UpdateBanner"
-import { Logs } from "./screens/Logs"
-import { PackDetail } from "./screens/PackDetail"
-import { Packs } from "./screens/Packs"
-import { Settings } from "./screens/Settings"
-import { Tools, ToolView } from "./screens/Tools"
-import { BoffSignIn } from "./screens/BoffSignIn"
-import { SignIn } from "./screens/SignIn"
-import { Splash } from "./screens/Splash"
-import { updatesMarkHealthy } from "./runtime"
-import { AppProvider, useApp } from "./state/app"
+import { Shell } from "./components/Shell";
+import { Titlebar } from "./components/Titlebar";
+import { UpdateBanner } from "./components/UpdateBanner";
+import {
+  ProductReleaseAnnouncement,
+  ProductReleaseAnnouncementsProvider,
+} from "./components/ReleaseAnnouncements";
+import { Logs } from "./screens/Logs";
+import { PackDetail } from "./screens/PackDetail";
+import { Packs } from "./screens/Packs";
+import { Settings } from "./screens/Settings";
+import { Releases } from "./screens/Releases";
+import { Tools, ToolView } from "./screens/Tools";
+import { BoffSignIn } from "./screens/BoffSignIn";
+import { SignIn } from "./screens/SignIn";
+import { Splash } from "./screens/Splash";
+import { updatesMarkHealthy } from "./runtime";
+import { AppProvider, useApp } from "./state/app";
 
 // No router library: six screens behind one union, and Tauri serves from a
 // custom protocol where history-based routing is more trouble than it solves.
 
 function Router() {
-  const { boffSigningIn, booting, bootStep, signingIn, view } = useApp()
+  const { boffSigningIn, booting, bootStep, signingIn, view } = useApp();
 
   // Before anything else: while the silent restore is in flight we do not yet
   // know whether this player is signed in, and guessing "no" is what put
   // "Entrar con Microsoft" in front of people who had a valid session.
-  if (booting) return <Splash step={bootStep} />
+  if (booting) return <Splash step={bootStep} />;
 
   // A Minecraft sign-in IN PROGRESS owns the screen. It is prompted when a
   // Minecraft pack needs an MSA session at install/launch time (play/install),
   // so reaching the code screen cannot be gated on being signed out — the shell
   // was already showing. SignIn is the only screen that renders the code.
-  if (signingIn) return <SignIn />
+  if (signingIn) return <SignIn />;
 
   // NOTHING here is gated on being signed in any more. This is Boffmedia's own
   // application, not a paid product behind a door: it opens, the rail is there,
@@ -59,17 +64,18 @@ function Router() {
           {view === "pack" && <PackDetail />}
           {view === "logs" && <Logs />}
           {view === "settings" && <Settings />}
+          {view === "releases" && <Releases />}
           {view === "tools" && <Tools />}
           {view === "tool" && <ToolView />}
         </>
       )}
     </Shell>
-  )
+  );
 }
 
 function BootAwareUpdateBanner() {
-  const { booting } = useApp()
-  return booting ? null : <UpdateBanner />
+  const { booting } = useApp();
+  return booting ? null : <UpdateBanner />;
 }
 
 /**
@@ -84,29 +90,32 @@ function BootAwareUpdateBanner() {
  */
 function ReportHealthyLaunch() {
   useEffect(() => {
-    void updatesMarkHealthy()
-  }, [])
-  return null
+    void updatesMarkHealthy();
+  }, []);
+  return null;
 }
 
 export function App() {
   return (
     <AppProvider>
-      <div className="flex h-full flex-col bg-base text-txt">
-        {/* Above everything, always: with native decorations off, this bar is
+      <ProductReleaseAnnouncementsProvider>
+        <div className="flex h-full flex-col bg-base text-txt">
+          {/* Above everything, always: with native decorations off, this bar is
             the only drag region and the only close button — the splash and
             sign-in screens need it as much as the shell does. */}
-        <Titlebar />
-        {/* Above the router on purpose: an update is worth showing on the
+          <Titlebar />
+          {/* Above the router on purpose: an update is worth showing on the
             sign-in screen too, and the check never blocks it. Suppressed only
             during boot, where it would push the splash off-centre. */}
-        <ReportHealthyLaunch />
-        <BootAwareUpdateBanner />
-        <div className="min-h-0 flex-1">
-          <Router />
+          <ReportHealthyLaunch />
+          <BootAwareUpdateBanner />
+          <ProductReleaseAnnouncement />
+          <div className="min-h-0 flex-1">
+            <Router />
+          </div>
         </div>
-      </div>
+      </ProductReleaseAnnouncementsProvider>
       <ToastStack />
     </AppProvider>
-  )
+  );
 }

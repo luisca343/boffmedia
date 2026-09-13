@@ -49,7 +49,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.12.0
           cache: pnpm
 
       # Not --frozen-lockfile, for the reason validate.yml documents: the API
@@ -183,7 +183,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.12.0
           cache: pnpm
 
       - name: Install dependencies
@@ -224,7 +224,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.12.0
           cache: pnpm
 
       - name: Install dependencies
@@ -290,7 +290,7 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 22.12.0
           cache: pnpm
 
       - name: Install dependencies

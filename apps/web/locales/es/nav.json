@@ -180,7 +180,8 @@
         "events": "Eventos",
         "raffles": "Sorteos",
         "tournaments": "Torneos",
-        "app": "Boffmedia App"
+        "app": "Boffmedia App",
+        "releases": "Novedades"
       },
       "footer": {
         "copyright": "© {year} Boffmedia",

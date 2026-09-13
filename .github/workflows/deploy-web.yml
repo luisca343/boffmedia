@@ -5,18 +5,22 @@ on:
   push:
     branches: [master]
     paths:
-      - 'apps/web/**'
-      - 'packages/shared/**'
-      - 'packages/pack-schema/**'
-      - 'packages/battle-core/**'
-      - 'packages/ui/**'
+      - "apps/web/**"
+      - "packages/shared/**"
+      - "packages/pack-schema/**"
+      - "packages/battle-core/**"
+      - "packages/ui/**"
       # Every tool package apps/web transpiles and renders. Absent until
       # 2026-09-02, so a tool-only change shipped nothing until some other
       # path happened to trigger a deploy.
-      - 'packages/tools/**'
-      - 'packages/tailwind-config/**'
-      - 'pnpm-lock.yaml'
-      - 'pnpm-workspace.yaml'
+      - "packages/tools/**"
+      - "packages/tailwind-config/**"
+      - "release/version.json"
+      - "changelog/fragments/**"
+      - "release/plan.json"
+      - "scripts/release-fragments.mjs"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
 
 jobs:
   # Load-bearing for the web image specifically: next.config.mjs sets
@@ -34,6 +38,18 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Read canonical release identity
+        id: release
+        shell: bash
+        run: |
+          version=$(node -p "JSON.parse(require('fs').readFileSync('release/version.json', 'utf8')).version")
+          version_file_sha=$(sha256sum release/version.json | cut -d' ' -f1)
+          build_id="web-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "version_file_sha=$version_file_sha" >> "$GITHUB_OUTPUT"
+          echo "git_sha=$GITHUB_SHA" >> "$GITHUB_OUTPUT"
+          echo "build_id=$build_id" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -91,6 +107,11 @@ jobs:
           tags: |
             luisca343/boffmedia-web2:latest
             luisca343/boffmedia-web2:${{ github.run_number }}
+          build-args: |
+            APP_VERSION=${{ steps.release.outputs.version }}
+            GIT_SHA=${{ steps.release.outputs.git_sha }}
+            BUILD_ID=${{ steps.release.outputs.build_id }}
+            VERSION_FILE_SHA=${{ steps.release.outputs.version_file_sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -115,3 +136,83 @@ jobs:
           ssh-keyscan -H "${{ secrets.DEPLOY_HOST }}" >> ~/.ssh/known_hosts
           ssh -i ~/.ssh/deploy_key root@${{ secrets.DEPLOY_HOST }} \
             "/opt/scripts/deploy.sh web ${{ github.run_number }}"
+
+      - name: Create or retry the fragment-backed release draft
+        shell: bash
+        env:
+          API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API || 'https://api.boffmedia.es' }}
+          RELEASE_DEPLOYMENT_TOKEN: ${{ secrets.RELEASE_DEPLOYMENT_TOKEN }}
+          SOURCE_COMMIT_SHA: ${{ steps.release.outputs.git_sha }}
+          VERSION: ${{ steps.release.outputs.version }}
+          VERSION_FILE_SHA: ${{ steps.release.outputs.version_file_sha }}
+        run: |
+          set -euo pipefail
+          api_base="${API_BASE_URL%/}"
+          [ -n "$RELEASE_DEPLOYMENT_TOKEN" ] || { echo "::error::RELEASE_DEPLOYMENT_TOKEN is not configured"; exit 1; }
+          required_surfaces=$(node -p "JSON.stringify(JSON.parse(require('fs').readFileSync('release/plan.json', 'utf8')).requiredSurfaces)")
+          registered=$(curl --fail --silent --show-error "$api_base/releases/internal/fragments/registered" \
+            -H "X-Release-Deployment-Token: $RELEASE_DEPLOYMENT_TOKEN")
+          claimed=$(echo "$registered" | jq -c '.data.fragmentIds // []')
+          available=$(RELEASE_SOURCE_COMMIT_SHA="$SOURCE_COMMIT_SHA" node scripts/release-fragments.mjs --json | \
+            jq --argjson claimed "$claimed" '{fragments: [.fragments[] | select((.fragmentId as $id | ($claimed | index($id))) == null)]}')
+          mode=$(echo "$available" | jq -r 'if (.fragments | length) > 0 then "entries" else "none" end')
+          body=$(echo "$available" | jq \
+            --arg version "$VERSION" \
+            --argjson requiredSurfaces "$required_surfaces" \
+            --arg changelogMode "$mode" \
+            --arg sourceCommitSha "$SOURCE_COMMIT_SHA" \
+            --arg versionFileSha "$VERSION_FILE_SHA" \
+            '. + {version:$version, requiredSurfaces:$requiredSurfaces, changelogMode:$changelogMode, sourceCommitSha:$sourceCommitSha, versionFileSha:$versionFileSha}')
+          draft=$(curl --fail --silent --show-error -X POST "$api_base/releases/internal/drafts" \
+            -H 'Content-Type: application/json' \
+            -H "X-Release-Deployment-Token: $RELEASE_DEPLOYMENT_TOKEN" \
+            --data "$body")
+          [ "$(echo "$draft" | jq -r '.success')" = "true" ] || { echo "::error::release draft was rejected: $draft"; exit 1; }
+          echo "Release draft for $VERSION is available for approval."
+
+      - name: Verify live web identity and record deployment
+        shell: bash
+        env:
+          API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API || 'https://api.boffmedia.es' }}
+          RELEASE_DEPLOYMENT_TOKEN: ${{ secrets.RELEASE_DEPLOYMENT_TOKEN }}
+          WEB_BASE_URL: ${{ secrets.NEXT_PUBLIC_URL || 'https://boffmedia.es' }}
+          EXPECTED_VERSION: ${{ steps.release.outputs.version }}
+          EXPECTED_VERSION_FILE_SHA: ${{ steps.release.outputs.version_file_sha }}
+          EXPECTED_GIT_SHA: ${{ steps.release.outputs.git_sha }}
+          EXPECTED_BUILD_ID: ${{ steps.release.outputs.build_id }}
+          RUN_ID: ${{ github.run_id }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          set -euo pipefail
+          api_base="${API_BASE_URL%/}"
+          web_base="${WEB_BASE_URL%/}"
+          [ -n "$RELEASE_DEPLOYMENT_TOKEN" ] || { echo "::error::RELEASE_DEPLOYMENT_TOKEN is not configured"; exit 1; }
+
+          curl --fail --silent --show-error --retry 10 --retry-delay 3 "$web_base/" >/dev/null
+          identity=$(curl --fail --silent --show-error --retry 10 --retry-delay 3 "$web_base/version")
+          [ "$(echo "$identity" | jq -r '.success')" = "true" ] || { echo "::error::/version returned an invalid envelope: $identity"; exit 1; }
+          [ "$(echo "$identity" | jq -r '.data.surface')" = "web" ] || { echo "::error::live web surface mismatch: $identity"; exit 1; }
+          [ "$(echo "$identity" | jq -r '.data.version')" = "$EXPECTED_VERSION" ] || { echo "::error::live web version mismatch: $identity"; exit 1; }
+          [ "$(echo "$identity" | jq -r '.data.gitSha')" = "$EXPECTED_GIT_SHA" ] || { echo "::error::live web git SHA mismatch: $identity"; exit 1; }
+          [ "$(echo "$identity" | jq -r '.data.buildId')" = "$EXPECTED_BUILD_ID" ] || { echo "::error::live web build identity mismatch: $identity"; exit 1; }
+          [ "$(echo "$identity" | jq -r '.data.versionFileSha')" = "$EXPECTED_VERSION_FILE_SHA" ] || { echo "::error::live web version manifest mismatch: $identity"; exit 1; }
+
+          checked_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          idempotency_key="production:web:web-${RUN_ID}-${RUN_ATTEMPT}"
+          body=$(jq -n \
+            --arg surface web \
+            --arg environment production \
+            --arg productVersion "$EXPECTED_VERSION" \
+            --arg buildId "$EXPECTED_BUILD_ID" \
+            --arg gitSha "$EXPECTED_GIT_SHA" \
+            --arg versionFileSha "$EXPECTED_VERSION_FILE_SHA" \
+            --arg healthCheckUrl "$web_base/version" \
+            --arg healthCheckedAt "$checked_at" \
+            --arg idempotencyKey "$idempotency_key" \
+            '{surface:$surface, environment:$environment, productVersion:$productVersion, buildId:$buildId, gitSha:$gitSha, versionFileSha:$versionFileSha, status:"verified", healthCheckUrl:$healthCheckUrl, healthCheckedAt:$healthCheckedAt, idempotencyKey:$idempotencyKey}')
+          recorded=$(curl --fail --silent --show-error -X POST "$api_base/releases/internal/deployments" \
+            -H 'Content-Type: application/json' \
+            -H "X-Release-Deployment-Token: $RELEASE_DEPLOYMENT_TOKEN" \
+            --data "$body")
+          [ "$(echo "$recorded" | jq -r '.success')" = "true" ] || { echo "::error::deployment evidence was rejected: $recorded"; exit 1; }
+          echo "Recorded verified web deployment for $EXPECTED_VERSION ($EXPECTED_BUILD_ID)."

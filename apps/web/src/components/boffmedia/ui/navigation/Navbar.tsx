@@ -15,6 +15,7 @@ import { MobileNav } from "./MobileNav"
 import { AccountNav } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections } from "./nav-data"
 import { useViewerRoles } from "@/services/useBoffSession"
+import { useReleaseAnnouncements } from "./ReleaseAnnouncements"
 
 function useTheme() {
   const [theme, setTheme] = React.useState<"dark" | "light">("dark")
@@ -43,8 +44,9 @@ export function Navbar() {
   const t = useTranslations()
   const tNav = useTranslations("nav.v3")
   const roles = useViewerRoles()
+  const { hasUnread } = useReleaseAnnouncements()
   const toolsSections = React.useMemo(() => buildToolsSections(t, roles), [t, roles])
-  const comunidadSections = React.useMemo(() => buildComunidadSections(t), [t])
+  const comunidadSections = React.useMemo(() => buildComunidadSections(t, hasUnread), [t, hasUnread])
 
   return (
     <nav className="sticky top-0 z-50 flex h-[var(--nav-h)] items-center gap-4 border-b border-line bg-base px-5 transition-[background,border-color] duration-[260ms] min-[640px]:px-10 min-[1120px]:gap-7">

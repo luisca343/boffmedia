@@ -37,7 +37,7 @@ stages:
 
 lint-typecheck:
   stage: validate
-  image: node:22-alpine
+  image: node:22.12-alpine
   tags:
     - docker
   cache:
@@ -60,7 +60,7 @@ lint-typecheck:
 
 test:
   stage: validate
-  image: node:22-alpine
+  image: node:22.12-alpine
   tags:
     - docker
   cache:

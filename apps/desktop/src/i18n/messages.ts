@@ -6,7 +6,7 @@
 // Spanish is the source of truth (the app was authored in it); English is
 // the translation. When they drift, `es` wins.
 
-import type { AppLocale } from "@boffmedia/ui"
+import type { AppLocale } from "@boffmedia/ui";
 
 const es = {
   // Design-system primitives (@boffmedia/ui reads this namespace via configureUi).
@@ -126,20 +126,23 @@ const es = {
       closeOnLaunch: "Cerrar la app al iniciar el juego",
       keepLogs: "Conservar el registro entre sesiones",
       backupBeforeUpdate: "Hacer copia antes de actualizar",
-      backupBeforeUpdateHint: "Guarda automáticamente una copia de los mundos y la configuración antes de descargar una nueva versión de un pack.",
+      backupBeforeUpdateHint:
+        "Guarda automáticamente una copia de los mundos y la configuración antes de descargar una nueva versión de un pack.",
     },
     crashReports: {
       title: "Informes de errores",
       toggle: "Enviar informes de errores automáticamente",
       sent: "Se envía: el mensaje de error, en qué parte de la app ocurrió, la versión de la app y tu sistema operativo (Windows, macOS o Linux).",
-      notSent: "No se envía: tu correo, tu cuenta de Minecraft ni su UUID, tus contraseñas, el nombre de tu usuario de Windows ni las rutas de tus carpetas, y nada de lo que escribas en la app.",
+      notSent:
+        "No se envía: tu correo, tu cuenta de Minecraft ni su UUID, tus contraseñas, el nombre de tu usuario de Windows ni las rutas de tus carpetas, y nada de lo que escribas en la app.",
       hint: "Está desactivado salvo que lo actives tú. Puedes desactivarlo cuando quieras y deja de enviarse al instante.",
     },
     telemetry: {
       title: "Telemetría",
       toggle: "Enviar datos de telemetría anónimos",
       sent: "Se envía: si una instalación se completó bien o falló, cuándo se abrió el juego, qué herramientas se utilizaron, y tipos de errores si ocurren (sin el mensaje de error).",
-      notSent: "No se envía: tu correo, tu cuenta de Minecraft ni su UUID, tus contraseñas, el nombre de tu usuario de Windows ni las rutas de tus carpetas. Cada instalación recibe un ID anónimo único que se borra si limpias los datos de la app.",
+      notSent:
+        "No se envía: tu correo, tu cuenta de Minecraft ni su UUID, tus contraseñas, el nombre de tu usuario de Windows ni las rutas de tus carpetas. Cada instalación recibe un ID anónimo único que se borra si limpias los datos de la app.",
       hint: "Está desactivado salvo que lo actives tú. Puedes desactivarlo cuando quieras y deja de enviarse al instante. Ningún dato se envía si está desactivado.",
     },
     updates: {
@@ -149,7 +152,8 @@ const es = {
       check: "Buscar actualizaciones",
       checking: "Buscando…",
       checkingHint: "Comprobando con el servidor…",
-      availableHint: "Disponible la {version}. Actualiza desde el aviso de arriba.",
+      availableHint:
+        "Disponible la {version}. Actualiza desde el aviso de arriba.",
       idleHint: "La app lo comprueba solo al arrancar.",
       rollback: "Volver a la {version}",
       rollbackHint:
@@ -217,7 +221,8 @@ const es = {
       linkedMinecraft: "Cuentas de Minecraft",
       minecraftLead:
         "Puedes vincular tantas como quieras. La marcada como activa es con la que se abre el juego; cámbiala aquí o desde el icono de la barra lateral.",
-      minecraftNone: "Sin cuenta de Minecraft vinculada. Se te pedirá al jugar un pack de Minecraft.",
+      minecraftNone:
+        "Sin cuenta de Minecraft vinculada. Se te pedirá al jugar un pack de Minecraft.",
       minecraftActive: "Activa",
       addMinecraft: "Vincular cuenta de Minecraft",
       useMinecraft: "Usar esta cuenta",
@@ -239,7 +244,8 @@ const es = {
       resolved: "Resuelto",
       notFound: "No encontrado",
       detected: "Detectado",
-      staleOverrideWarning: "Personalizado (ruta no existe — se usa detección automática)",
+      staleOverrideWarning:
+        "Personalizado (ruta no existe — se usa detección automática)",
       locate: "Localizar…",
       change: "Cambiar",
       clear: "Deshacer",
@@ -253,7 +259,8 @@ const es = {
       removeFolderSuccess: "Carpeta eliminada",
       removeFolderError: "No se pudo eliminar la carpeta",
       viaRetroarch: "vía RetroArch ({source})",
-      packPagePrimary: "La página del pack es el flujo principal; estos ajustes son la opción global de reserva.",
+      packPagePrimary:
+        "La página del pack es el flujo principal; estos ajustes son la opción global de reserva.",
       loadError: "No se pudieron cargar los emuladores",
       emulatorPathSet: "Ruta del emulador guardada",
       emulatorPathChanged: "Ruta del emulador actualizada",
@@ -277,7 +284,8 @@ const es = {
       version: "v{version}",
       delete: "Eliminar",
       deleteTitle: "Eliminar pack",
-      deleteWarning: "Se eliminará el pack de «{name}». La herramienta seguirá funcionando cargando su contenido bajo demanda.",
+      deleteWarning:
+        "Se eliminará el pack de «{name}». La herramienta seguirá funcionando cargando su contenido bajo demanda.",
       deleteButton: "Eliminar",
       deleteSuccess: "Pack de «{name}» eliminado.",
       deleteError: "No se pudo eliminar el pack.",
@@ -292,7 +300,8 @@ const es = {
       cacheTitle: "Caché de recursos",
       cacheSize: "Espacio usado",
       cacheClear: "Vaciar caché",
-      cacheHint: "Elimina los archivos sueltos descargados bajo demanda. No afecta a los packs instalados.",
+      cacheHint:
+        "Elimina los archivos sueltos descargados bajo demanda. No afecta a los packs instalados.",
       cacheClearSuccess: "Caché vaciada.",
       cacheClearError: "No se pudo vaciar la caché.",
     },
@@ -306,7 +315,8 @@ const es = {
     // Shown over a tool that needs the server when there is none. Named for
     // what the player can do about it, not for the transport that failed.
     offlineTitle: "Sin conexión con el servidor",
-    offlineBody: "Esta herramienta carga sus datos de Boffmedia. Lo que ya esté en pantalla sigue funcionando; para el resto, vuelve a intentarlo cuando haya conexión.",
+    offlineBody:
+      "Esta herramienta carga sus datos de Boffmedia. Lo que ya esté en pantalla sigue funcionando; para el resto, vuelve a intentarlo cuando haya conexión.",
     empty: "No hay herramientas disponibles.",
     notFound: "Esa herramienta ya no existe.",
     back: "Volver a herramientas",
@@ -319,19 +329,33 @@ const es = {
     // Section per game, the way the site's hub groups them. A domain with no
     // registered tools never renders, so listing one here costs nothing.
     domains: {
-      mhwilds: { name: "Monster Hunter Wilds", tagline: "Planificadores y bases de datos de caza" },
-      minecraft: { name: "Minecraft", tagline: "Esquemas, compatibilidad y mundos generados" },
-      pokemon: { name: "Pokémon", tagline: "Calculadoras, generadores y bases de datos" },
-      misc: { name: "Otras herramientas", tagline: "Utilidades y recursos generales" },
+      mhwilds: {
+        name: "Monster Hunter Wilds",
+        tagline: "Planificadores y bases de datos de caza",
+      },
+      minecraft: {
+        name: "Minecraft",
+        tagline: "Esquemas, compatibilidad y mundos generados",
+      },
+      pokemon: {
+        name: "Pokémon",
+        tagline: "Calculadoras, generadores y bases de datos",
+      },
+      misc: {
+        name: "Otras herramientas",
+        tagline: "Utilidades y recursos generales",
+      },
     },
   },
 
   boffSignin: {
     title: "Autoriza la app",
-    subtitle: "Con tu cuenta de Boffmedia. No hace falta Minecraft: solo se te pedirá cuando instales o juegues un pack de Minecraft.",
+    subtitle:
+      "Con tu cuenta de Boffmedia. No hace falta Minecraft: solo se te pedirá cuando instales o juegues un pack de Minecraft.",
     failedTitle: "No se pudo autorizar",
     button: "Autorizar con Boffmedia",
-    securityNote: "Aprobarás un código corto en la web, donde ya has iniciado sesión. La app nunca ve tu contraseña.",
+    securityNote:
+      "Aprobarás un código corto en la web, donde ya has iniciado sesión. La app nunca ve tu contraseña.",
     complete: "Completa la autorización",
     waiting: "Esperando",
     copied: "Copiado",
@@ -348,7 +372,8 @@ const es = {
     restoreStoreTitle: "No se pudo leer el almacén de credenciales",
     restoreOfflineTitle: "Sin conexión",
     playOffline: "Jugar sin conexión",
-    playOfflineHint: "Abre tu biblioteca con los packs ya instalados. Necesitarás conexión para instalar o actualizar.",
+    playOfflineHint:
+      "Abre tu biblioteca con los packs ya instalados. Necesitarás conexión para instalar o actualizar.",
     elapsedTime: "{elapsed} de {total}",
     expiredTitle: "El código ha caducado",
     restartButton: "Pedir un código nuevo",
@@ -356,14 +381,16 @@ const es = {
 
   signin: {
     title: "Inicia sesión",
-    subtitle: "Necesitas una cuenta de Minecraft con Java Edition. La app nunca ve tu contraseña — la sesión se abre en tu navegador.",
+    subtitle:
+      "Necesitas una cuenta de Minecraft con Java Edition. La app nunca ve tu contraseña — la sesión se abre en tu navegador.",
     sessionExpired: "Tu sesión caducó",
     sessionExpiredAction: "Vuelve a entrar con Microsoft para seguir jugando.",
     restoreFailed: "No pudimos recuperar tu sesión",
     restoreFailedAction: "Comprueba tu conexión e inténtalo de nuevo.",
     offlineMode: "Jugar sin conexión",
     button: "Entrar con Microsoft",
-    securityNote: "Guardamos únicamente el token de actualización, en el almacén de credenciales del sistema. Nunca en un archivo de texto.",
+    securityNote:
+      "Guardamos únicamente el token de actualización, en el almacén de credenciales del sistema. Nunca en un archivo de texto.",
     complete: "Completa el acceso",
     waiting: "Esperando",
     copied: "Copiado",
@@ -371,7 +398,8 @@ const es = {
     consulting: "Contactando con Microsoft…",
     copyCodeLabel: "Copia este código — lo necesitarás en el navegador:",
     copyCodeButton: "Copiar código",
-    browserStep: "Abre Microsoft en tu navegador y pega el código. El botón lo copia al portapapeles al abrirlo.",
+    browserStep:
+      "Abre Microsoft en tu navegador y pega el código. El botón lo copia al portapapeles al abrirlo.",
     browserButton: "Copiar código y abrir",
     linkButton: "Copiar enlace",
     confirmWaiting: "Esperando confirmación…",
@@ -380,7 +408,8 @@ const es = {
 
   accountPicker: {
     title: "Elige tu cuenta",
-    lastSessionExpired: "La sesión de tu última cuenta caducó. Puedes entrar con otra o volver a autorizarla.",
+    lastSessionExpired:
+      "La sesión de tu última cuenta caducó. Puedes entrar con otra o volver a autorizarla.",
     savedAccounts: "Estas son las cuentas guardadas en este equipo.",
     addAccount: "Entrar con otra cuenta",
     removeAccountLabel: "Quitar {username}",
@@ -434,8 +463,33 @@ const es = {
     retryButton: "Reintentar",
     updateButton: "Actualizar y reiniciar",
     failedMessage: "Inténtalo de nuevo más tarde.",
-    downloadingMessage: "Descargando la actualización. La app se reiniciará sola al terminar; no cierres la ventana.",
-    availableMessage: "Tienes la {currentVersion}. Se descargará e instalará sola, y la app se reiniciará al terminar.",
+    downloadingMessage:
+      "Descargando la actualización. La app se reiniciará sola al terminar; no cierres la ventana.",
+    availableMessage:
+      "Tienes la {currentVersion}. Se descargará e instalará sola, y la app se reiniciará al terminar.",
+  },
+
+  releases: {
+    title: "Novedades",
+    sinceLastVisit: "Novedades desde tu última visita",
+    announcementLead: "{count, plural, =1 {1 release publicada} other {# releases publicadas}}",
+    viewAll: "Ver novedades completas",
+    acknowledge: "Entendido",
+    acknowledging: "Guardando…",
+    lead: "Cambios recientes de Boffmedia.",
+    withdrawnNotice: "Esta release se retiró después de publicarse. Motivo: {reason}",
+    withdrawnFallback: "La release ya no está activa.",
+    loading: "Cargando novedades…",
+    error: "No se han podido cargar las novedades.",
+    empty: "No hay novedades publicadas.",
+    types: {
+      new: "Nuevo",
+      improvement: "Mejora",
+      fix: "Corrección",
+      security: "Seguridad",
+      deprecated: "Obsoleto",
+      removed: "Eliminado",
+    },
   },
 
   versionPicker: {
@@ -448,14 +502,16 @@ const es = {
     recommendedTag: "recomendada",
     latestTag: "última",
     loadingVersions: "Cargando versiones…",
-    noVersionsHint: "Este loader no publica versiones para esa versión de Minecraft.",
+    noVersionsHint:
+      "Este loader no publica versiones para esa versión de Minecraft.",
   },
 
   importPack: {
     backButton: "Volver a la biblioteca",
     fileButton: "Desde archivo .mrpack",
     linkLabel: "Importar por enlace",
-    linkHint: "Página del modpack en Modrinth, una versión concreta o un .mrpack directo.",
+    linkHint:
+      "Página del modpack en Modrinth, una versión concreta o un .mrpack directo.",
     importButton: "Importar",
     urlPlaceholder: "https://modrinth.com/modpack/…",
     downloadingPack: "Descargando {name}…",
@@ -465,7 +521,8 @@ const es = {
     importLinkError: "No se pudo importar el enlace.",
     importFileError: "No se pudo importar el .mrpack.",
     importedMessage: "Pack «{name}» importado.",
-    importedRenamedMessage: "Importado como «{name}» (había un pack con ese nombre).",
+    importedRenamedMessage:
+      "Importado como «{name}» (había un pack con ese nombre).",
     // Labels handed to the shared ModBrowser (@boffmedia/ui) — modpack variant.
     labels: {
       platformModrinth: "Modrinth",
@@ -474,7 +531,13 @@ const es = {
       projectType: "Tipo",
       type: { modpack: "Modpacks" },
       sort: "Orden",
-      sortBy: { downloads: "Descargas", follows: "Seguidores", updated: "Actualizado", relevance: "Relevancia", name: "Nombre" },
+      sortBy: {
+        downloads: "Descargas",
+        follows: "Seguidores",
+        updated: "Actualizado",
+        relevance: "Relevancia",
+        name: "Nombre",
+      },
       categories: "Categorías",
       allCategories: "Todas",
       noModResults: "Ningún modpack coincide con la búsqueda.",
@@ -487,16 +550,26 @@ const es = {
       compatibleOnly: "Compatibles",
       allFiles: "Todas",
       loadingFiles: "Cargando versiones…",
-      noCompatibleFiles: "Este proyecto no publica ninguna versión descargable.",
+      noCompatibleFiles:
+        "Este proyecto no publica ninguna versión descargable.",
       releaseType: { release: "Estable", beta: "Beta", alpha: "Alpha" },
       resolving: "Importando…",
       addMod: "Importar",
       installed: "Ya en el pack",
       notDistributable: "No descargable",
-      notDistributableLead: "El autor no permite la descarga automática de estos archivos.",
+      notDistributableLead:
+        "El autor no permite la descarga automática de estos archivos.",
       side: {
-        client: { required: "Cliente", optional: "Cliente opcional", unsupported: "Solo servidor" },
-        server: { required: "Servidor", optional: "Servidor opcional", unsupported: "Solo cliente" },
+        client: {
+          required: "Cliente",
+          optional: "Cliente opcional",
+          unsupported: "Solo servidor",
+        },
+        server: {
+          required: "Servidor",
+          optional: "Servidor opcional",
+          unsupported: "Solo cliente",
+        },
       },
       loadMore: "Cargar más ({shown}/{total})",
       depsCount: "{count} dep.",
@@ -526,15 +599,28 @@ const es = {
       needMinecraftLead: "Elige primero una versión de Minecraft para el pack.",
       loaderFabric: "Fabric",
       connectorToggle: "Incluir Fabric",
-      connectorHint: "Este pack usa Sinytra Connector, así que puede cargar mods de Fabric en NeoForge.",
-      connectorNote: "Se muestran mods de Fabric porque este pack puede usar Sinytra Connector. Connector permite instalarlos, no garantiza que funcionen: los mods que dependen a fondo de las tripas de Fabric pueden fallar igualmente.",
+      connectorHint:
+        "Este pack usa Sinytra Connector, así que puede cargar mods de Fabric en NeoForge.",
+      connectorNote:
+        "Se muestran mods de Fabric porque este pack puede usar Sinytra Connector. Connector permite instalarlos, no garantiza que funcionen: los mods que dependen a fondo de las tripas de Fabric pueden fallar igualmente.",
       platformModrinth: "Modrinth",
       platformCurseforge: "CurseForge",
       modSearchPlaceholder: "Buscar mods…",
       projectType: "Tipo",
-      type: { mod: "Mods", resourcepack: "Recursos", shader: "Shaders", datapack: "Datapacks" },
+      type: {
+        mod: "Mods",
+        resourcepack: "Recursos",
+        shader: "Shaders",
+        datapack: "Datapacks",
+      },
       sort: "Orden",
-      sortBy: { downloads: "Descargas", follows: "Seguidores", updated: "Actualizado", relevance: "Relevancia", name: "Nombre" },
+      sortBy: {
+        downloads: "Descargas",
+        follows: "Seguidores",
+        updated: "Actualizado",
+        relevance: "Relevancia",
+        name: "Nombre",
+      },
       categories: "Categorías",
       allCategories: "Todas",
       noModResults: "Ningún mod coincide con la búsqueda.",
@@ -547,16 +633,26 @@ const es = {
       compatibleOnly: "Compatibles",
       allFiles: "Todos",
       loadingFiles: "Cargando archivos…",
-      noCompatibleFiles: "No hay archivos para esta versión de Minecraft y este loader.",
+      noCompatibleFiles:
+        "No hay archivos para esta versión de Minecraft y este loader.",
       releaseType: { release: "Estable", beta: "Beta", alpha: "Alpha" },
       resolving: "Añadiendo…",
       addMod: "Añadir",
       installed: "Instalado",
       notDistributable: "No descargable",
-      notDistributableLead: "El autor no permite la descarga automática de estos archivos.",
+      notDistributableLead:
+        "El autor no permite la descarga automática de estos archivos.",
       side: {
-        client: { required: "Cliente", optional: "Cliente opcional", unsupported: "Solo servidor" },
-        server: { required: "Servidor", optional: "Servidor opcional", unsupported: "Solo cliente" },
+        client: {
+          required: "Cliente",
+          optional: "Cliente opcional",
+          unsupported: "Solo servidor",
+        },
+        server: {
+          required: "Servidor",
+          optional: "Servidor opcional",
+          unsupported: "Solo cliente",
+        },
       },
       loadMore: "Cargar más ({shown}/{total})",
       depsCount: "{count} dep.",
@@ -586,16 +682,21 @@ const es = {
     loadingPacks: "Cargando tus packs…",
     loadingPacaksDetail: "Consultando el registro.",
     noPacksAvailable: "No hay packs disponibles",
-    noPacksDetail: "Tu cuenta no tiene acceso a ningún pack todavía. Pide una invitación al administrador.",
+    noPacksDetail:
+      "Tu cuenta no tiene acceso a ningún pack todavía. Pide una invitación al administrador.",
     noPacksSignedOut: "Todavía no hay packs aquí",
-    noPacksSignedOutDetail: "Crea un pack local para empezar, o inicia sesión con tu cuenta de Boffmedia para ver los packs del servidor.",
+    noPacksSignedOutDetail:
+      "Crea un pack local para empezar, o inicia sesión con tu cuenta de Boffmedia para ver los packs del servidor.",
     noPacksServerDown: "No se pueden cargar los packs del servidor",
-    noPacksServerDownDetail: "Tus packs locales siguen disponibles. Los del servidor volverán cuando se restablezca el servicio.",
+    noPacksServerDownDetail:
+      "Tus packs locales siguen disponibles. Los del servidor volverán cuando se restablezca el servicio.",
     signedOutTitle: "Estás sin iniciar sesión",
-    signedOutMessage: "Puedes usar la aplicación y tus packs locales sin cuenta. Inicia sesión con Boffmedia para ver los packs del servidor a los que tengas acceso.",
+    signedOutMessage:
+      "Puedes usar la aplicación y tus packs locales sin cuenta. Inicia sesión con Boffmedia para ver los packs del servidor a los que tengas acceso.",
     signedOutAction: "Iniciar sesión",
     sessionExpiredTitle: "Tu sesión ha caducado",
-    sessionExpiredMessage: "Tu sesión de Boffmedia ya no es válida, así que los packs del servidor no se están mostrando. Vuelve a iniciar sesión para recuperarlos; tus packs locales no se han visto afectados.",
+    sessionExpiredMessage:
+      "Tu sesión de Boffmedia ya no es válida, así que los packs del servidor no se están mostrando. Vuelve a iniciar sesión para recuperarlos; tus packs locales no se han visto afectados.",
     sessionExpiredAction: "Volver a iniciar sesión",
     searchNoResultsTitle: "Sin resultados",
     searchNoResults: "Nada coincide con «{query}».",
@@ -639,7 +740,8 @@ const es = {
     openInstanceFolder: "Abrir carpeta",
     deleteLocalMenu: "Eliminar pack",
     deleteLocalTitle: "Eliminar pack local",
-    deleteLocalWarning: "Se eliminará «{name}» y todos sus archivos instalados.",
+    deleteLocalWarning:
+      "Se eliminará «{name}» y todos sus archivos instalados.",
     deleteLocalDetail:
       "Se borrarán de forma permanente la definición del pack, la instancia instalada y sus copias de seguridad. Esta acción no se puede deshacer.",
     deleteLocalSuccess: "«{name}» eliminado.",
@@ -653,7 +755,8 @@ const es = {
     uninstallSuccess: "«{name}» desinstalado.",
     uninstallError: "No se pudo desinstalar el pack.",
     uninstallButton: "Desinstalar",
-    cannotWhileRunning: "No puedes hacerlo mientras el juego está en ejecución.",
+    cannotWhileRunning:
+      "No puedes hacerlo mientras el juego está en ejecución.",
     layout: {
       label: "Vista",
       card: "Tarjeta",
@@ -686,7 +789,8 @@ const es = {
     installingPercent: "Instalando {percent}%",
     damagedTitle: "Instalación dañada",
     damaged: "Dañado",
-    damageExplanation: "Reparar borra los mods, la configuración y el loader gestionados por la app, y los vuelve a descargar. Tus mundos, capturas y opciones no se tocan.",
+    damageExplanation:
+      "Reparar borra los mods, la configuración y el loader gestionados por la app, y los vuelve a descargar. Tus mundos, capturas y opciones no se tocan.",
     crashedTitle: "El juego se cerró inesperadamente",
     crashCode: "Código {code}",
     noErrorLines: "No se registró ningún error antes del cierre.",
@@ -726,7 +830,8 @@ const es = {
       yourAccess: "Tu acceso",
       granted: "Concedido",
       integrityLabel: "integridad",
-      integrityDescription: "Cada archivo se verifica por SHA-512 antes de escribirse. Un archivo que no coincide se vuelve a descargar; si vuelve a fallar, la instalación se marca como dañada en lugar de lanzarse.",
+      integrityDescription:
+        "Cada archivo se verifica por SHA-512 antes de escribirse. Un archivo que no coincide se vuelve a descargar; si vuelve a fallar, la instalación se marca como dañada en lugar de lanzarse.",
       changelogLabel: "Novedades",
     },
     editLocalMenu: "Editar pack",
@@ -742,8 +847,10 @@ const es = {
     exportingServerMenu: "Exportando servidor…",
     exportServerZipMenu: "Crear servidor (ZIP ejecutable)",
     exportingServerZipMenu: "Creando servidor… {done}/{total}",
-    exportServerZipSuccess: "Servidor listo: descomprime y ejecuta start.sh o start.bat.",
-    exportServerZipSkipped: "Servidor listo, pero {count} archivo(s) no se pudieron incluir; míralo en LEEME-servidor.txt.",
+    exportServerZipSuccess:
+      "Servidor listo: descomprime y ejecuta start.sh o start.bat.",
+    exportServerZipSkipped:
+      "Servidor listo, pero {count} archivo(s) no se pudieron incluir; míralo en LEEME-servidor.txt.",
     exportServerZipError: "No se pudo crear el servidor.",
     duplicateSuccess: "«{name}» creado.",
     duplicateError: "No se pudo duplicar el pack.",
@@ -762,7 +869,8 @@ const es = {
     iconClearButton: "Quitar icono",
     galleryTab: "Galería",
     galleryEmpty: "Sin imágenes",
-    galleryEmptyDetail: "Añade capturas, renders o cualquier imagen asociada al pack.",
+    galleryEmptyDetail:
+      "Añade capturas, renders o cualquier imagen asociada al pack.",
     galleryAddButton: "Añadir imagen",
     galleryRemoveButton: "Quitar",
     galleryClearError: "No se pudo quitar la imagen.",
@@ -772,7 +880,8 @@ const es = {
     versionNamePlaceholder: "ej: 1.0, Beta 3, etc.",
     bundledWorldsSection: "Mundos incluidos en el pack",
     bundledWorldsEmpty: "Sin mundos",
-    bundledWorldsEmptyDetail: "Añade mundos que se instalen automáticamente en la primera ejecución.",
+    bundledWorldsEmptyDetail:
+      "Añade mundos que se instalen automáticamente en la primera ejecución.",
     addBundledWorldButton: "Añadir mundo (.zip)",
     addBundledWorldFromInstanceButton: "Incluir en el pack",
     promotedWorldSuccess: "Mundo incluido en el pack.",
@@ -805,6 +914,7 @@ const es = {
     navLabel: "Secciones de la aplicación",
     play: "Jugar",
     tools: "Herramientas",
+    navReleases: "Novedades",
   },
 
   logs: {
@@ -819,23 +929,34 @@ const es = {
     navTools: "Herramientas",
     navSettings: "Ajustes",
     offlineTitle: "Sin conexión",
-    offlineMessage: "Puedes jugar a los packs que ya tengas instalados. Instalar, actualizar y descargar packs necesita conexión.",
+    offlineMessage:
+      "Puedes jugar a los packs que ya tengas instalados. Instalar, actualizar y descargar packs necesita conexión.",
     partialTitle: "No se pudo cargar toda tu biblioteca",
-    partialMessage: "Se muestran tus packs locales. Los packs del servidor volverán a aparecer cuando se restablezca la conexión.",
+    partialMessage:
+      "Se muestran tus packs locales. Los packs del servidor volverán a aparecer cuando se restablezca la conexión.",
     serverDownTitle: "Servidor no disponible",
-    serverDownShort: "No es tu instalación. Tus packs instalados y las herramientas siguen funcionando.",
+    serverDownShort:
+      "No es tu instalación. Tus packs instalados y las herramientas siguen funcionando.",
     serverUnreachableTitle: "Sin conexión con el servidor",
-    serverUnreachableShort: "Tus packs instalados y las herramientas siguen funcionando.",
+    serverUnreachableShort:
+      "Tus packs instalados y las herramientas siguen funcionando.",
     retryButton: "Reintentar",
     running: "En ejecución",
     // Diagnostic error messages for each error code (D4)
-    dnsFailed: "No se pudo resolver el nombre del servidor. Comprueba tu conexión de internet.",
-    connectionRefused: "El servidor rechazó la conexión. Es posible que no esté disponible.",
-    connectionTimeout: "El servidor no respondió a tiempo. Puede estar caído o tu conexión ser inestable.",
-    httpProtocolError: "Respuesta inesperada del servidor. Intenta de nuevo más tarde.",
-    server5xxError: "El servidor tiene un error interno. Intenta de nuevo más tarde.",
-    authFailed: "Problema con la autenticación. Comprueba tu sesión e intenta de nuevo.",
-    storeError: "No se pudo acceder al almacén de credenciales del sistema. Comprueba que no esté bloqueado.",
+    dnsFailed:
+      "No se pudo resolver el nombre del servidor. Comprueba tu conexión de internet.",
+    connectionRefused:
+      "El servidor rechazó la conexión. Es posible que no esté disponible.",
+    connectionTimeout:
+      "El servidor no respondió a tiempo. Puede estar caído o tu conexión ser inestable.",
+    httpProtocolError:
+      "Respuesta inesperada del servidor. Intenta de nuevo más tarde.",
+    server5xxError:
+      "El servidor tiene un error interno. Intenta de nuevo más tarde.",
+    authFailed:
+      "Problema con la autenticación. Comprueba tu sesión e intenta de nuevo.",
+    storeError:
+      "No se pudo acceder al almacén de credenciales del sistema. Comprueba que no esté bloqueado.",
     // Diagnostic action titles (D4)
     diagnosticDNS: "Error de DNS",
     diagnosticRefused: "Conexión rechazada",
@@ -850,29 +971,38 @@ const es = {
   },
 
   crash: {
-    unrecognized: "No se ha reconocido la causa del cierre. Revisa el registro completo y, si se repite, cópialo y pásaselo al equipo del pack.",
+    unrecognized:
+      "No se ha reconocido la causa del cierre. Revisa el registro completo y, si se repite, cópialo y pásaselo al equipo del pack.",
     copyReport: "Copiar informe",
     whatToDo: "Qué hacer: ",
     evidenceLabel: "Líneas del registro que lo indican ({count})",
     "fabric-api-missing": {
       title: "Falta Fabric API",
-      explanation: "Uno de los mods necesita Fabric API y no está instalado en esta instancia.",
-      action: "Repara la instalación desde la ficha del pack; si el problema sigue, avisa a los administradores del pack: falta un mod obligatorio en el manifiesto.",
+      explanation:
+        "Uno de los mods necesita Fabric API y no está instalado en esta instancia.",
+      action:
+        "Repara la instalación desde la ficha del pack; si el problema sigue, avisa a los administradores del pack: falta un mod obligatorio en el manifiesto.",
     },
     "missing-unsupported-mods": {
       title: "Faltan mods obligatorios",
-      explanation: "El cargador de mods no ha podido resolver las dependencias: hay mods que exigen otros que no están presentes, o que están en una versión distinta a la esperada.",
-      action: "Repara la instalación para volver a descargar los mods. Si vuelve a ocurrir, el pack tiene una dependencia sin publicar: pásale estas líneas al equipo.",
+      explanation:
+        "El cargador de mods no ha podido resolver las dependencias: hay mods que exigen otros que no están presentes, o que están en una versión distinta a la esperada.",
+      action:
+        "Repara la instalación para volver a descargar los mods. Si vuelve a ocurrir, el pack tiene una dependencia sin publicar: pásale estas líneas al equipo.",
     },
     "missing-mods": {
       title: "Faltan mods obligatorios",
-      explanation: "Forge/NeoForge ha encontrado mods que dependen de otros que no están instalados.",
-      action: "Repara la instalación. Si persiste, falta una dependencia en el pack: reporta estas líneas.",
+      explanation:
+        "Forge/NeoForge ha encontrado mods que dependen de otros que no están instalados.",
+      action:
+        "Repara la instalación. Si persiste, falta una dependencia en el pack: reporta estas líneas.",
     },
     "mod-resolution-failed": {
       title: "No se pudieron resolver los mods",
-      explanation: "El cargador no ha conseguido montar una combinación de mods válida; casi siempre es una dependencia ausente o una versión incompatible entre dos mods.",
-      action: "Repara la instalación y reinicia. Si el error se repite, comparte estas líneas con el equipo del pack.",
+      explanation:
+        "El cargador no ha conseguido montar una combinación de mods válida; casi siempre es una dependencia ausente o una versión incompatible entre dos mods.",
+      action:
+        "Repara la instalación y reinicia. Si el error se repite, comparte estas líneas con el equipo del pack.",
     },
     "missing-mod-required": {
       title: "Falta un mod requerido",
@@ -881,87 +1011,118 @@ const es = {
     },
     "unmet-dependency": {
       title: "Dependencia sin cumplir",
-      explanation: "Un mod exige otro mod (o una versión concreta de él) que no está presente.",
-      action: "Repara la instalación; si continúa, reporta estas líneas al equipo del pack.",
+      explanation:
+        "Un mod exige otro mod (o una versión concreta de él) que no está presente.",
+      action:
+        "Repara la instalación; si continúa, reporta estas líneas al equipo del pack.",
     },
     "requires-minecraft": {
       title: "Mod para otra versión de Minecraft",
-      explanation: "Hay un mod compilado para una versión de Minecraft distinta a la del pack. Eso ocurre cuando se añade un mod a mano o cuando la instalación quedó a medias entre dos actualizaciones.",
-      action: "Quita los mods que hayas añadido tú a la carpeta de mods y repara la instalación para dejar el pack en su versión publicada.",
+      explanation:
+        "Hay un mod compilado para una versión de Minecraft distinta a la del pack. Eso ocurre cuando se añade un mod a mano o cuando la instalación quedó a medias entre dos actualizaciones.",
+      action:
+        "Quita los mods que hayas añadido tú a la carpeta de mods y repara la instalación para dejar el pack en su versión publicada.",
     },
     "requires-fabricloader": {
       title: "Versión del cargador incorrecta",
-      explanation: "Un mod pide una versión de Fabric Loader distinta de la instalada por el pack.",
-      action: "Repara la instalación para reinstalar el cargador en la versión del pack.",
+      explanation:
+        "Un mod pide una versión de Fabric Loader distinta de la instalada por el pack.",
+      action:
+        "Repara la instalación para reinstalar el cargador en la versión del pack.",
     },
     "incompatible-mods": {
       title: "Mods incompatibles entre sí",
-      explanation: "El cargador ha detectado mods que no pueden convivir: normalmente uno es de otra versión de Minecraft o del cargador.",
-      action: "Repara la instalación y no vuelvas a copiar mods sueltos en la carpeta de mods.",
+      explanation:
+        "El cargador ha detectado mods que no pueden convivir: normalmente uno es de otra versión de Minecraft o del cargador.",
+      action:
+        "Repara la instalación y no vuelvas a copiar mods sueltos en la carpeta de mods.",
     },
     "not-compatible-minecraft": {
       title: "Mod incompatible con esta versión",
-      explanation: "Un mod instalado no soporta la versión de Minecraft que usa el pack.",
-      action: "Repara la instalación para volver al conjunto de mods publicado.",
+      explanation:
+        "Un mod instalado no soporta la versión de Minecraft que usa el pack.",
+      action:
+        "Repara la instalación para volver al conjunto de mods publicado.",
     },
-    "classnotfoundexception": {
+    classnotfoundexception: {
       title: "Instalación de Minecraft incompleta",
-      explanation: "Falta el propio Minecraft en el classpath: la instalación del cargador o del juego quedó incompleta o corrupta.",
-      action: "Repara la instalación desde la ficha del pack; se volverá a descargar el juego y el cargador.",
+      explanation:
+        "Falta el propio Minecraft en el classpath: la instalación del cargador o del juego quedó incompleta o corrupta.",
+      action:
+        "Repara la instalación desde la ficha del pack; se volverá a descargar el juego y el cargador.",
     },
     "mixin-apply-failed": {
       title: "Conflicto entre mods (mixin)",
-      explanation: "Dos mods intentan modificar el mismo trozo del juego y uno de ellos ya no encaja. Suele significar que un mod está en una versión distinta a la del resto del pack.",
-      action: "Repara la instalación. Si el fallo persiste, copia el nombre del mod que aparece en estas líneas y repórtalo: es un conflicto del pack, no de tu equipo.",
+      explanation:
+        "Dos mods intentan modificar el mismo trozo del juego y uno de ellos ya no encaja. Suele significar que un mod está en una versión distinta a la del resto del pack.",
+      action:
+        "Repara la instalación. Si el fallo persiste, copia el nombre del mod que aparece en estas líneas y repórtalo: es un conflicto del pack, no de tu equipo.",
     },
-    "invalidinjectionexception": {
+    invalidinjectionexception: {
       title: "Conflicto entre mods (mixin)",
-      explanation: "Un mod no ha podido inyectar su código en el juego porque otro mod ya lo cambió o porque la versión no coincide.",
-      action: "Repara la instalación y reporta estas líneas si vuelve a ocurrir.",
+      explanation:
+        "Un mod no ha podido inyectar su código en el juego porque otro mod ya lo cambió o porque la versión no coincide.",
+      action:
+        "Repara la instalación y reporta estas líneas si vuelve a ocurrir.",
     },
-    "mixintransformererror": {
+    mixintransformererror: {
       title: "Conflicto entre mods (mixin)",
-      explanation: "Un mod falló al aplicar sus parches sobre el juego durante el arranque.",
-      action: "Repara la instalación y reporta estas líneas si vuelve a ocurrir.",
+      explanation:
+        "Un mod falló al aplicar sus parches sobre el juego durante el arranque.",
+      action:
+        "Repara la instalación y reporta estas líneas si vuelve a ocurrir.",
     },
     "mixin-spongepowered": {
       title: "Conflicto entre mods (mixin)",
-      explanation: "El sistema de parcheo de mods (Mixin) ha fallado durante el arranque, lo que casi siempre indica dos mods pisándose.",
-      action: "Repara la instalación y reporta estas líneas si vuelve a ocurrir.",
+      explanation:
+        "El sistema de parcheo de mods (Mixin) ha fallado durante el arranque, lo que casi siempre indica dos mods pisándose.",
+      action:
+        "Repara la instalación y reporta estas líneas si vuelve a ocurrir.",
     },
-    "outofmemoryerror": {
+    outofmemoryerror: {
       title: "El juego se quedó sin memoria",
-      explanation: "La memoria asignada a Minecraft se agotó. Con packs grandes, 2 GB no bastan: lo normal son 6-8 GB.",
-      action: "Sube la memoria en Ajustes y vuelve a entrar. No asignes más de la mitad de la RAM de tu equipo: el sistema también necesita la suya.",
+      explanation:
+        "La memoria asignada a Minecraft se agotó. Con packs grandes, 2 GB no bastan: lo normal son 6-8 GB.",
+      action:
+        "Sube la memoria en Ajustes y vuelve a entrar. No asignes más de la mitad de la RAM de tu equipo: el sistema también necesita la suya.",
     },
     "java-heap-space": {
       title: "El juego se quedó sin memoria",
-      explanation: "El montón de memoria de Java se llenó por completo durante la partida.",
+      explanation:
+        "El montón de memoria de Java se llenó por completo durante la partida.",
       action: "Aumenta la memoria asignada en Ajustes.",
     },
     "gc-overhead-limit": {
       title: "Memoria insuficiente",
-      explanation: "Java pasó más tiempo liberando memoria que ejecutando el juego: la asignada se queda corta para este pack.",
+      explanation:
+        "Java pasó más tiempo liberando memoria que ejecutando el juego: la asignada se queda corta para este pack.",
       action: "Aumenta la memoria asignada en Ajustes.",
     },
-    "unsupportedclassversionerror": {
+    unsupportedclassversionerror: {
       title: "Versión de Java incorrecta",
-      explanation: "El juego se está ejecutando con una versión de Java más antigua de la que necesita este pack.",
-      action: "En Ajustes, borra la ruta de Java para que el lanzador instale y use la correcta automáticamente.",
+      explanation:
+        "El juego se está ejecutando con una versión de Java más antigua de la que necesita este pack.",
+      action:
+        "En Ajustes, borra la ruta de Java para que el lanzador instale y use la correcta automáticamente.",
     },
     "has-been-compiled-more-recent": {
       title: "Versión de Java incorrecta",
-      explanation: "El Java configurado es demasiado antiguo para los mods de este pack.",
-      action: "En Ajustes, deja la ruta de Java vacía para que el lanzador use la adecuada.",
+      explanation:
+        "El Java configurado es demasiado antiguo para los mods de este pack.",
+      action:
+        "En Ajustes, deja la ruta de Java vacía para que el lanzador use la adecuada.",
     },
     "unrecognized-option": {
       title: "Java no acepta los argumentos de arranque",
-      explanation: "La instalación de Java configurada a mano no entiende las opciones que necesita Minecraft; suele ser una versión demasiado antigua o una JRE incompleta.",
-      action: "En Ajustes, borra la ruta de Java para volver a la que gestiona el lanzador.",
+      explanation:
+        "La instalación de Java configurada a mano no entiende las opciones que necesita Minecraft; suele ser una versión demasiado antigua o una JRE incompleta.",
+      action:
+        "En Ajustes, borra la ruta de Java para volver a la que gestiona el lanzador.",
     },
     "duplicate-mods-found": {
       title: "Hay mods duplicados",
-      explanation: "El mismo mod aparece dos veces en la carpeta de mods, normalmente en dos versiones distintas. El cargador se niega a arrancar así.",
+      explanation:
+        "El mismo mod aparece dos veces en la carpeta de mods, normalmente en dos versiones distintas. El cargador se niega a arrancar así.",
       action: "Borra las copias que hayas añadido tú y repara la instalación.",
     },
     "found-duplicate-mod": {
@@ -969,9 +1130,10 @@ const es = {
       explanation: "Dos archivos de la carpeta de mods declaran el mismo mod.",
       action: "Elimina el duplicado y repara la instalación.",
     },
-    "zipexception": {
+    zipexception: {
       title: "Un archivo de mod está dañado",
-      explanation: "Un .jar no se puede leer: la descarga se cortó o el archivo se corrompió en disco.",
+      explanation:
+        "Un .jar no se puede leer: la descarga se cortó o el archivo se corrompió en disco.",
       action: "Repara la instalación para volver a descargar los archivos.",
     },
     "invalid-corrupt-jarfile": {
@@ -981,7 +1143,8 @@ const es = {
     },
     "error-loading-mod-file": {
       title: "Un archivo de mod está dañado",
-      explanation: "El cargador no ha podido leer uno de los archivos de la carpeta de mods.",
+      explanation:
+        "El cargador no ha podido leer uno de los archivos de la carpeta de mods.",
       action: "Repara la instalación desde la ficha del pack.",
     },
     kind: {
@@ -1005,11 +1168,14 @@ const es = {
     packSuccess: "Copia del pack creada.",
     error: "No se pudo crear la copia.",
     noBackups: "Sin copias",
-    noBackupsDetail: "Crea una antes de actualizar mods o de tocar los configs a mano.",
+    noBackupsDetail:
+      "Crea una antes de actualizar mods o de tocar los configs a mano.",
     reading: "Leyendo las copias…",
     restoreConfirm: "¿Restaurar la copia del {date}?",
-    restoreWarningWorld: "Se reemplazará el mundo «{name}» por completo. El estado actual se perderá.",
-    restoreWarningPack: "Se sobrescribirán los archivos del pack con los de esta copia.",
+    restoreWarningWorld:
+      "Se reemplazará el mundo «{name}» por completo. El estado actual se perderá.",
+    restoreWarningPack:
+      "Se sobrescribirán los archivos del pack con los de esta copia.",
     restoreSuccess: "Copia restaurada.",
     restoreError: "No se pudo restaurar.",
     deleteError: "No se pudo borrar la copia.",
@@ -1038,7 +1204,8 @@ const es = {
     target: "Destino",
     targetNew: "Se creará un pack nuevo",
     targetExisting: "Se añadirá una versión al pack existente",
-    noIcon: "Este pack no tiene icono. Puedes añadirlo desde la pestaña Galería antes de publicar.",
+    noIcon:
+      "Este pack no tiene icono. Puedes añadirlo desde la pestaña Galería antes de publicar.",
     cancel: "Cancelar",
     saveDraft: "Guardar como borrador",
     publish: "Publicar",
@@ -1062,7 +1229,8 @@ const es = {
     toggleFileLabel: "Activar o desactivar {name}",
     // ── Optional content ─────────────────────────────────────────────────
     optionalTitle: "Contenido opcional",
-    optionalSubtitle: "Elige qué partes del pack quieres. Puedes cambiarlo cuando quieras.",
+    optionalSubtitle:
+      "Elige qué partes del pack quieres. Puedes cambiarlo cuando quieras.",
     optionalEmpty: "Este pack no ofrece contenido opcional.",
     optionalRecommended: "Recomendado",
     optionalDefaultOn: "Activado por defecto",
@@ -1080,7 +1248,8 @@ const es = {
     optionalUsesLibrary: "Usa: {names}",
     optionalAll: "Todo",
     optionalClear: "Nada",
-    optionalDeferredToast: "Guardado. Se aplicará la próxima vez que inicies el pack.",
+    optionalDeferredToast:
+      "Guardado. Se aplicará la próxima vez que inicies el pack.",
     optionalDownloading: "Descargando {count} archivo(s)…",
     // ── Optional content: authoring (local packs only) ───────────────────
     //
@@ -1104,7 +1273,8 @@ const es = {
       saved: "Contenido opcional guardado.",
       saveError: "No se pudo guardar el contenido opcional.",
       loadError: "No se pudo leer el pack.",
-      pending: "Hay cambios sin instalar. Esta lista es la de los archivos que hay ahora en disco; pulsa Jugar o Instalar para aplicar lo último.",
+      pending:
+        "Hay cambios sin instalar. Esta lista es la de los archivos que hay ahora en disco; pulsa Jugar o Instalar para aplicar lo último.",
       // The local-pack counterpart, and it says the OPPOSITE of `pending`: this
       // list is the manifest, not the disk. Two messages rather than one vague
       // both-ways wording, because the author's next question is precisely
@@ -1112,7 +1282,8 @@ const es = {
       pendingAuthored:
         "Estas son las opciones tal y como las has guardado. Todavía no están en los archivos instalados: pulsa Jugar o Instalar para aplicarlas, y entonces podrás activarlas y desactivarlas.",
       emptyTitle: "Sin contenido opcional",
-      emptyDesc: "Este pack instala todos sus archivos siempre. Crea un grupo para poder elegir.",
+      emptyDesc:
+        "Este pack instala todos sus archivos siempre. Crea un grupo para poder elegir.",
       addGroup: "Añadir grupo",
       removeGroup: "Eliminar grupo",
       addFeature: "Añadir opción",
@@ -1140,19 +1311,27 @@ const es = {
         datapack: "Datapack",
       },
       requires: "Necesita",
-      requiresHint: "Activar esta opción activará también las marcadas aquí, y desactivar una de ellas desactivará esta.",
-      missingRequires: "{mod} necesita «{modId}», que está en la opción «{feature}». Márcala abajo o el juego fallará al arrancar si alguien la desactiva.",
+      requiresHint:
+        "Activar esta opción activará también las marcadas aquí, y desactivar una de ellas desactivará esta.",
+      missingRequires:
+        "{mod} necesita «{modId}», que está en la opción «{feature}». Márcala abajo o el juego fallará al arrancar si alguien la desactiva.",
       paths: "Archivos de esta opción",
-      pathsHint: "Se marcarán como env.client «optional» al guardar. Un archivo solo puede pertenecer a una opción.",
+      pathsHint:
+        "Se marcarán como env.client «optional» al guardar. Un archivo solo puede pertenecer a una opción.",
       pathsFilter: "Filtrar {count} archivo(s) por nombre…",
       pathsFilterLabel: "Filtrar archivos por nombre",
       pathsNoMatch: "Ningún archivo coincide con «{query}».",
-      pathsHiddenSelected: "{count} archivo(s) de esta opción no coinciden con el filtro y no se ven aquí.",
+      pathsHiddenSelected:
+        "{count} archivo(s) de esta opción no coinciden con el filtro y no se ven aquí.",
       errorNoPaths: "Una opción necesita al menos un archivo.",
-      errorOneDefault: "Un grupo «Exactamente una» necesita justo una opción activada por defecto (hay {count}).",
-      errorAtMostOneDefault: "Un grupo «Una o ninguna» admite como mucho una activada por defecto (hay {count}).",
-      errorShaderpackGroup: "Un shader necesita un grupo «Exactamente una» o «Una o ninguna»: solo puede haber un shader activo.",
-      errorDatapackDir: "Un datapack debe estar dentro de {dirs} para que un cargador global lo lea.",
+      errorOneDefault:
+        "Un grupo «Exactamente una» necesita justo una opción activada por defecto (hay {count}).",
+      errorAtMostOneDefault:
+        "Un grupo «Una o ninguna» admite como mucho una activada por defecto (hay {count}).",
+      errorShaderpackGroup:
+        "Un shader necesita un grupo «Exactamente una» o «Una o ninguna»: solo puede haber un shader activo.",
+      errorDatapackDir:
+        "Un datapack debe estar dentro de {dirs} para que un cargador global lo lea.",
       // Refused by the schema too (group name minLength 1, features minItems 1,
       // paths minItems 1), but phrased for the author: a half-authored group is
       // the normal state of this form rather than an exceptional one, and the
@@ -1196,18 +1375,22 @@ const es = {
     noDescription: "Este mod no tiene descripción publicada.",
     brokenBadge: "No cargará",
     launchBrokenTitle: "{count} mod(s) puede que no carguen",
-    brokenDisabled: "Necesita «{modId}», que está en {name} y está desactivado.",
+    brokenDisabled:
+      "Necesita «{modId}», que está en {name} y está desactivado.",
     brokenMissing: "Necesita «{modId}», que no está en el pack.",
     brokenBanner: "{count} mod(s) no cargarán: les falta algo que necesitan.",
     breakTitle: "Otros mods lo necesitan",
-    breakWarning: "{names} necesitan «{name}». Si sigues, dejarán de cargar hasta que lo vuelvas a activar.",
+    breakWarning:
+      "{names} necesitan «{name}». Si sigues, dejarán de cargar hasta que lo vuelvas a activar.",
     breakConfirm: "Desactivar igualmente",
     downloadingBadge: "Descargando",
-    downloadError: "No se pudo descargar «{name}». Pulsa Instalar para reintentarlo.",
+    downloadError:
+      "No se pudo descargar «{name}». Pulsa Instalar para reintentarlo.",
     deleteAction: "Eliminar",
     deletePackFileTitle: "Eliminar del pack",
     deleteFileTitle: "Borrar archivo",
-    deleteFileWarning: "Vas a borrar «{name}» del disco. Lo añadiste tú, así que el launcher no puede recuperarlo.",
+    deleteFileWarning:
+      "Vas a borrar «{name}» del disco. Lo añadiste tú, así que el launcher no puede recuperarlo.",
     cancelButton: "Cancelar",
     deleteButton: "Borrar",
     nothingToShow: "Nada que mostrar",
@@ -1290,27 +1473,34 @@ const es = {
     optionalMods: "Mods opcionales",
     optionalModCount: "{count}",
     noOptional: "Sin mods opcionales",
-    noOptionalDetail: "Este pack no marca ningún archivo como opcional, o aún no lo has instalado.",
+    noOptionalDetail:
+      "Este pack no marca ningún archivo como opcional, o aún no lo has instalado.",
     spaceDivider: "tu espacio",
-    spaceWarning: "Los mods que añadas tú a <code>mods/</code> sobreviven a las actualizaciones: la app solo borra archivos que instaló ella misma y que no has modificado. Un opcional desactivado no se descarga.",
+    spaceWarning:
+      "Los mods que añadas tú a <code>mods/</code> sobreviven a las actualizaciones: la app solo borra archivos que instaló ella misma y que no has modificado. Un opcional desactivado no se descarga.",
     savedVersions: "Versiones guardadas",
     currentVersion: "actual",
     noVersions: "Sin historial",
-    noVersionsDetail: "Se guardan las últimas versiones instaladas para poder volver atrás.",
+    noVersionsDetail:
+      "Se guardan las últimas versiones instaladas para poder volver atrás.",
     revertButton: "Volver",
     costDivider: "coste",
-    costWarning: "Una versión guardada es solo su lista de archivos: los .jar viven una sola vez en la caché compartida, así que conservar varias no ocupa varias copias del pack.",
+    costWarning:
+      "Una versión guardada es solo su lista de archivos: los .jar viven una sola vez en la caché compartida, así que conservar varias no ocupa varias copias del pack.",
     memory: "Memoria de este pack",
-    recommendedMemory: "Recomendado para este pack: {gib}. Pasar de ahí no acelera el juego: lo que sobra del montón no se usa, y el sistema se queda sin memoria.",
+    recommendedMemory:
+      "Recomendado para este pack: {gib}. Pasar de ahí no acelera el juego: lo que sobra del montón no se usa, y el sistema se queda sin memoria.",
     memoryDivider: "memoria",
     inherit: "Heredar",
     auto: "Automático",
     manual: "Manual",
-    autoMemory: "Se calcula con los mods del pack ({count}) y la RAM del equipo, sin pasar nunca del 60 %.",
+    autoMemory:
+      "Se calcula con los mods del pack ({count}) y la RAM del equipo, sin pasar nunca del 60 %.",
     globalMemoryAuto: "Los ajustes generales están en automático.",
     globalMemoryMib: "Se usa lo que digan los ajustes generales ({gib}).",
     javaDivider: "java",
-    javaAuto: "Este pack ignora la ruta de los ajustes y usa la versión de Java que pida.",
+    javaAuto:
+      "Este pack ignora la ruta de los ajustes y usa la versión de Java que pida.",
     javaGlobal: "Se usa la ruta de los ajustes generales ({path}).",
     javaManaged: "Los ajustes generales dejan que la app gestione Java.",
     javaPath: "Java: {path}",
@@ -1322,13 +1512,15 @@ const es = {
     customJavaPlaceholder: "/ruta/a/bin/java",
     jvmDivider: "parámetros de la JVM",
     jvmCustomLabel: "Parámetros",
-    jvmCustomHint: "Separados por espacios. La memoria se ajusta arriba, no con -Xmx",
+    jvmCustomHint:
+      "Separados por espacios. La memoria se ajusta arriba, no con -Xmx",
     jvmCustomPlaceholder: "-XX:+UseG1GC -Xms2G",
     jvmInherit: "Sin parámetros propios: se usan los de los ajustes generales.",
     jvmInheritNone: "Ni este pack ni los ajustes generales añaden parámetros.",
     jvmGlobal: "De los ajustes generales: {args}",
     jvmEmpty: "Este pack arranca sin parámetros adicionales.",
-    jvmFromPack: "Propuestos por el pack. Puedes cambiarlos: no se volverán a aplicar en la próxima actualización.",
+    jvmFromPack:
+      "Propuestos por el pack. Puedes cambiarlos: no se volverán a aplicar en la próxima actualización.",
     jvmRejected: "{arg}: {reason}",
     error: "Error",
     sourceGlobal: "Heredado",
@@ -1384,7 +1576,8 @@ const es = {
     },
     patchNote: {
       title: "ROMs parcheadas",
-      description: "Las ROMs parcheadas se aplican automáticamente durante la instalación.",
+      description:
+        "Las ROMs parcheadas se aplican automáticamente durante la instalación.",
     },
     filesFoundToast: "Se encontraron {count} archivo(s) en tu biblioteca",
     scanError: "No se pudo escanear la biblioteca",
@@ -1412,14 +1605,16 @@ const es = {
     statusClaimed: "Reclamado",
     statusPatched: "Randomizado",
     statusVerified: "Verificado",
-    playBlockedRandomizeFirst: "Tienes que parchar el ROM en el randomizer antes de jugar.",
-    launchErrorNotPatched: "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar.",
-    launchErrorRomMismatch: "El ROM no coincide con el esperado. Asegúrate de que has descargado la versión correcta randomizada.",
+    playBlockedRandomizeFirst:
+      "Tienes que parchar el ROM en el randomizer antes de jugar.",
+    launchErrorNotPatched:
+      "Este pack está vinculado a un evento de randomizador que requiere que parches el ROM antes de jugar.",
+    launchErrorRomMismatch:
+      "El ROM no coincide con el esperado. Asegúrate de que has descargado la versión correcta randomizada.",
   },
 
-  errors: {
-  },
-} as const
+  errors: {},
+} as const;
 
 const en = {
   common: {
@@ -1507,7 +1702,8 @@ const en = {
       placeholder: "Automatic detection",
       manual: "Manual",
       auto: "Automatic",
-      manualHint: "This path will be used even if it is not compatible with the pack.",
+      manualHint:
+        "This path will be used even if it is not compatible with the pack.",
       autoHint: "The version each pack requires will be downloaded.",
     },
     jvm: {
@@ -1535,20 +1731,23 @@ const en = {
       closeOnLaunch: "Close the app when the game starts",
       keepLogs: "Keep the log between sessions",
       backupBeforeUpdate: "Backup before updating",
-      backupBeforeUpdateHint: "Automatically saves a backup of worlds and config before downloading a new version of a pack.",
+      backupBeforeUpdateHint:
+        "Automatically saves a backup of worlds and config before downloading a new version of a pack.",
     },
     crashReports: {
       title: "Crash reports",
       toggle: "Send crash reports automatically",
       sent: "What is sent: the error message, which part of the app it happened in, the app version, and your operating system (Windows, macOS or Linux).",
-      notSent: "What is not sent: your email, your Minecraft account or its UUID, your passwords, your Windows user name or any folder paths, and nothing you type into the app.",
+      notSent:
+        "What is not sent: your email, your Minecraft account or its UUID, your passwords, your Windows user name or any folder paths, and nothing you type into the app.",
       hint: "Off unless you turn it on. You can turn it off at any time and sending stops immediately.",
     },
     telemetry: {
       title: "Telemetry",
       toggle: "Send anonymous telemetry data",
       sent: "What is sent: whether pack installations succeed or fail, when the game is launched, which tools are used, and error types if they occur (not the error message).",
-      notSent: "What is not sent: your email, your Minecraft account or its UUID, your passwords, your Windows user name or folder paths. Each installation gets a unique anonymous ID that is deleted if you clear the app's data.",
+      notSent:
+        "What is not sent: your email, your Minecraft account or its UUID, your passwords, your Windows user name or folder paths. Each installation gets a unique anonymous ID that is deleted if you clear the app's data.",
       hint: "Off unless you turn it on. You can turn it off at any time and sending stops immediately. No data is sent when off.",
     },
     updates: {
@@ -1558,7 +1757,8 @@ const en = {
       check: "Check for updates",
       checking: "Checking…",
       checkingHint: "Checking with the server…",
-      availableHint: "Version {version} is available. Update from the banner above.",
+      availableHint:
+        "Version {version} is available. Update from the banner above.",
       idleHint: "The app checks on its own at startup.",
       rollback: "Go back to {version}",
       rollbackHint:
@@ -1620,18 +1820,21 @@ const en = {
       note: "Only the refresh token is stored, and never in plain text. The Minecraft access token lasts about 24h and is requested again each session.",
       revalidate: "Revalidate session",
       revalidating: "Revalidating…",
-      revalidateHint: "Re-checks your Boffmedia session if packs stop loading or return 401.",
+      revalidateHint:
+        "Re-checks your Boffmedia session if packs stop loading or return 401.",
       boffAccount: "Boffmedia account",
       linkedMinecraft: "Minecraft accounts",
       minecraftLead:
         "Link as many as you like. The one marked active is the account the game launches as — switch here or from the sidebar icon.",
-      minecraftNone: "No linked Minecraft account. You will be asked when you play a Minecraft pack.",
+      minecraftNone:
+        "No linked Minecraft account. You will be asked when you play a Minecraft pack.",
       minecraftActive: "Active",
       addMinecraft: "Link a Minecraft account",
       useMinecraft: "Use this account",
       unlinkMinecraft: "Unlink",
       signOutEverywhere: "Sign out everywhere",
-      signOutEverywhereHint: "Forgets every Minecraft account and the app session on this machine.",
+      signOutEverywhereHint:
+        "Forgets every Minecraft account and the app session on this machine.",
       boffAccounts: "Boffmedia accounts",
       boffActive: "Active",
       useBoffAccount: "Use",
@@ -1646,7 +1849,8 @@ const en = {
       resolved: "Resolved",
       notFound: "Not found",
       detected: "Detected",
-      staleOverrideWarning: "Custom (path no longer exists — using automatic detection)",
+      staleOverrideWarning:
+        "Custom (path no longer exists — using automatic detection)",
       locate: "Locate…",
       change: "Change",
       clear: "Reset",
@@ -1660,7 +1864,8 @@ const en = {
       removeFolderSuccess: "Folder removed",
       removeFolderError: "Could not remove folder",
       viaRetroarch: "via RetroArch ({source})",
-      packPagePrimary: "The pack page is the primary flow; these settings are the global fallback.",
+      packPagePrimary:
+        "The pack page is the primary flow; these settings are the global fallback.",
       loadError: "Could not load emulators",
       emulatorPathSet: "Emulator path saved",
       emulatorPathChanged: "Emulator path updated",
@@ -1680,7 +1885,8 @@ const en = {
       version: "v{version}",
       delete: "Delete",
       deleteTitle: "Delete pack",
-      deleteWarning: "The pack for “{name}” will be removed. The tool will keep working, loading its content on demand.",
+      deleteWarning:
+        "The pack for “{name}” will be removed. The tool will keep working, loading its content on demand.",
       deleteButton: "Delete",
       deleteSuccess: "Pack for “{name}” deleted.",
       deleteError: "Could not delete the pack.",
@@ -1695,7 +1901,8 @@ const en = {
       cacheTitle: "Asset cache",
       cacheSize: "Space used",
       cacheClear: "Clear cache",
-      cacheHint: "Removes loose files downloaded on demand. Does not affect installed packs.",
+      cacheHint:
+        "Removes loose files downloaded on demand. Does not affect installed packs.",
       cacheClearSuccess: "Cache cleared.",
       cacheClearError: "Could not clear the cache.",
     },
@@ -1705,7 +1912,8 @@ const en = {
     title: "Tools",
     subtitle: "The Boffmedia tools, in the app.",
     offlineTitle: "No connection to the server",
-    offlineBody: "This tool loads its data from Boffmedia. Whatever is already on screen keeps working; for the rest, try again once you are back online.",
+    offlineBody:
+      "This tool loads its data from Boffmedia. Whatever is already on screen keeps working; for the rest, try again once you are back online.",
     empty: "No tools available.",
     notFound: "That tool no longer exists.",
     back: "Back to tools",
@@ -1718,19 +1926,30 @@ const en = {
     // Section per game, the way the site's hub groups them. A domain with no
     // registered tools never renders, so listing one here costs nothing.
     domains: {
-      mhwilds: { name: "Monster Hunter Wilds", tagline: "Hunt planners and databases" },
-      minecraft: { name: "Minecraft", tagline: "Schematics, compatibility and world generation" },
-      pokemon: { name: "Pokémon", tagline: "Calculators, generators and databases" },
+      mhwilds: {
+        name: "Monster Hunter Wilds",
+        tagline: "Hunt planners and databases",
+      },
+      minecraft: {
+        name: "Minecraft",
+        tagline: "Schematics, compatibility and world generation",
+      },
+      pokemon: {
+        name: "Pokémon",
+        tagline: "Calculators, generators and databases",
+      },
       misc: { name: "Other tools", tagline: "General utilities and resources" },
     },
   },
 
   boffSignin: {
     title: "Authorize the app",
-    subtitle: "With your Boffmedia account. Minecraft is not required — you will only be asked for it when you install or play a Minecraft pack.",
+    subtitle:
+      "With your Boffmedia account. Minecraft is not required — you will only be asked for it when you install or play a Minecraft pack.",
     failedTitle: "Could not authorize",
     button: "Authorize with Boffmedia",
-    securityNote: "You approve a short code on the website, where you are already signed in. The app never sees your password.",
+    securityNote:
+      "You approve a short code on the website, where you are already signed in. The app never sees your password.",
     complete: "Finish authorizing",
     waiting: "Waiting",
     copied: "Copied",
@@ -1747,7 +1966,8 @@ const en = {
     restoreStoreTitle: "Could not read the credential store",
     restoreOfflineTitle: "No connection",
     playOffline: "Play offline",
-    playOfflineHint: "Opens your library with the packs already installed. You will need a connection to install or update.",
+    playOfflineHint:
+      "Opens your library with the packs already installed. You will need a connection to install or update.",
     elapsedTime: "{elapsed} of {total}",
     expiredTitle: "Code expired",
     restartButton: "Request a new code",
@@ -1755,14 +1975,16 @@ const en = {
 
   signin: {
     title: "Sign in",
-    subtitle: "You need a Minecraft account with Java Edition. The app never sees your password — the session opens in your browser.",
+    subtitle:
+      "You need a Minecraft account with Java Edition. The app never sees your password — the session opens in your browser.",
     sessionExpired: "Your session expired",
     sessionExpiredAction: "Sign in with Microsoft again to keep playing.",
     restoreFailed: "We couldn't restore your session",
     restoreFailedAction: "Check your connection and try again.",
     offlineMode: "Play offline",
     button: "Sign in with Microsoft",
-    securityNote: "We store only the refresh token, in your system's credential store. Never in a text file.",
+    securityNote:
+      "We store only the refresh token, in your system's credential store. Never in a text file.",
     complete: "Complete sign-in",
     waiting: "Waiting",
     copied: "Copied",
@@ -1770,7 +1992,8 @@ const en = {
     consulting: "Contacting Microsoft…",
     copyCodeLabel: "Copy this code — you'll need it in the browser:",
     copyCodeButton: "Copy code",
-    browserStep: "Open Microsoft in your browser and paste the code. The button copies it to your clipboard as it opens.",
+    browserStep:
+      "Open Microsoft in your browser and paste the code. The button copies it to your clipboard as it opens.",
     browserButton: "Copy code & open",
     linkButton: "Copy link",
     confirmWaiting: "Waiting for confirmation…",
@@ -1779,7 +2002,8 @@ const en = {
 
   accountPicker: {
     title: "Choose your account",
-    lastSessionExpired: "Your last account's session expired. You can sign in with another or reauthorize it.",
+    lastSessionExpired:
+      "Your last account's session expired. You can sign in with another or reauthorize it.",
     savedAccounts: "These are the accounts saved on this machine.",
     addAccount: "Sign in with another account",
     removeAccountLabel: "Remove {username}",
@@ -1833,8 +2057,33 @@ const en = {
     retryButton: "Retry",
     updateButton: "Update and restart",
     failedMessage: "Try again later.",
-    downloadingMessage: "Downloading the update. The app will restart on its own when done; don't close the window.",
-    availableMessage: "You have {currentVersion}. It will download and install itself, and the app will restart when done.",
+    downloadingMessage:
+      "Downloading the update. The app will restart on its own when done; don't close the window.",
+    availableMessage:
+      "You have {currentVersion}. It will download and install itself, and the app will restart when done.",
+  },
+
+  releases: {
+    title: "What's new",
+    sinceLastVisit: "What's new since your last visit",
+    announcementLead: "{count, plural, =1 {1 published release} other {# published releases}}",
+    viewAll: "View full changelog",
+    acknowledge: "Got it",
+    acknowledging: "Saving…",
+    lead: "Recent changes in Boffmedia.",
+    withdrawnNotice: "This release was withdrawn after publication. Reason: {reason}",
+    withdrawnFallback: "The release is no longer active.",
+    loading: "Loading what's new…",
+    error: "Could not load what's new.",
+    empty: "There are no published updates.",
+    types: {
+      new: "New",
+      improvement: "Improvement",
+      fix: "Fix",
+      security: "Security",
+      deprecated: "Deprecated",
+      removed: "Removed",
+    },
   },
 
   versionPicker: {
@@ -1847,7 +2096,8 @@ const en = {
     recommendedTag: "recommended",
     latestTag: "latest",
     loadingVersions: "Loading versions…",
-    noVersionsHint: "This loader doesn't publish versions for that Minecraft version.",
+    noVersionsHint:
+      "This loader doesn't publish versions for that Minecraft version.",
   },
 
   importPack: {
@@ -1864,7 +2114,8 @@ const en = {
     importLinkError: "Could not import the link.",
     importFileError: "Could not import the .mrpack.",
     importedMessage: "Pack «{name}» imported.",
-    importedRenamedMessage: "Imported as «{name}» (a pack with that name existed).",
+    importedRenamedMessage:
+      "Imported as «{name}» (a pack with that name existed).",
     // Labels handed to the shared ModBrowser (@boffmedia/ui) — modpack variant.
     labels: {
       platformModrinth: "Modrinth",
@@ -1873,7 +2124,13 @@ const en = {
       projectType: "Type",
       type: { modpack: "Modpacks" },
       sort: "Sort",
-      sortBy: { downloads: "Downloads", follows: "Followers", updated: "Updated", relevance: "Relevance", name: "Name" },
+      sortBy: {
+        downloads: "Downloads",
+        follows: "Followers",
+        updated: "Updated",
+        relevance: "Relevance",
+        name: "Name",
+      },
       categories: "Categories",
       allCategories: "All",
       noModResults: "No modpack matches the search.",
@@ -1892,10 +2149,19 @@ const en = {
       addMod: "Import",
       installed: "Already in the pack",
       notDistributable: "Not downloadable",
-      notDistributableLead: "The author does not allow automatic download of these files.",
+      notDistributableLead:
+        "The author does not allow automatic download of these files.",
       side: {
-        client: { required: "Client", optional: "Client optional", unsupported: "Server only" },
-        server: { required: "Server", optional: "Server optional", unsupported: "Client only" },
+        client: {
+          required: "Client",
+          optional: "Client optional",
+          unsupported: "Server only",
+        },
+        server: {
+          required: "Server",
+          optional: "Server optional",
+          unsupported: "Client only",
+        },
       },
       loadMore: "Load more ({shown}/{total})",
       depsCount: "{count} dep.",
@@ -1925,15 +2191,28 @@ const en = {
       needMinecraftLead: "Pick a Minecraft version for the pack first.",
       loaderFabric: "Fabric",
       connectorToggle: "Include Fabric",
-      connectorHint: "This pack runs Sinytra Connector, so it can load Fabric mods on NeoForge.",
-      connectorNote: "Fabric mods are shown because this pack can run Sinytra Connector. Connector makes them installable, not guaranteed to work — mods that hook deep into Fabric internals may still fail.",
+      connectorHint:
+        "This pack runs Sinytra Connector, so it can load Fabric mods on NeoForge.",
+      connectorNote:
+        "Fabric mods are shown because this pack can run Sinytra Connector. Connector makes them installable, not guaranteed to work — mods that hook deep into Fabric internals may still fail.",
       platformModrinth: "Modrinth",
       platformCurseforge: "CurseForge",
       modSearchPlaceholder: "Search mods…",
       projectType: "Type",
-      type: { mod: "Mods", resourcepack: "Resource packs", shader: "Shaders", datapack: "Datapacks" },
+      type: {
+        mod: "Mods",
+        resourcepack: "Resource packs",
+        shader: "Shaders",
+        datapack: "Datapacks",
+      },
       sort: "Sort",
-      sortBy: { downloads: "Downloads", follows: "Followers", updated: "Updated", relevance: "Relevance", name: "Name" },
+      sortBy: {
+        downloads: "Downloads",
+        follows: "Followers",
+        updated: "Updated",
+        relevance: "Relevance",
+        name: "Name",
+      },
       categories: "Categories",
       allCategories: "All",
       noModResults: "No mod matches the search.",
@@ -1952,10 +2231,19 @@ const en = {
       addMod: "Add",
       installed: "Installed",
       notDistributable: "Not downloadable",
-      notDistributableLead: "The author does not allow automatic download of these files.",
+      notDistributableLead:
+        "The author does not allow automatic download of these files.",
       side: {
-        client: { required: "Client", optional: "Client optional", unsupported: "Server only" },
-        server: { required: "Server", optional: "Server optional", unsupported: "Client only" },
+        client: {
+          required: "Client",
+          optional: "Client optional",
+          unsupported: "Server only",
+        },
+        server: {
+          required: "Server",
+          optional: "Server optional",
+          unsupported: "Client only",
+        },
       },
       loadMore: "Load more ({shown}/{total})",
       depsCount: "{count} dep.",
@@ -1985,19 +2273,24 @@ const en = {
     loadingPacks: "Loading your packs…",
     loadingPacaksDetail: "Querying the registry.",
     noPacksAvailable: "No packs available",
-    noPacksDetail: "Your account has no access to any packs yet. Ask the administrator for an invite.",
+    noPacksDetail:
+      "Your account has no access to any packs yet. Ask the administrator for an invite.",
     noPacksSignedOut: "No packs here yet",
-    noPacksSignedOutDetail: "Create a local pack to get started, or sign in with your Boffmedia account to see server packs.",
+    noPacksSignedOutDetail:
+      "Create a local pack to get started, or sign in with your Boffmedia account to see server packs.",
     noPacksServerDown: "Server packs cannot be loaded",
-    noPacksServerDownDetail: "Your local packs are still available. Server packs will return once the service is back.",
+    noPacksServerDownDetail:
+      "Your local packs are still available. Server packs will return once the service is back.",
     signedOutTitle: "You are not signed in",
-    signedOutMessage: "You can use the app and your local packs without an account. Sign in with Boffmedia to see the server packs you have access to.",
+    signedOutMessage:
+      "You can use the app and your local packs without an account. Sign in with Boffmedia to see the server packs you have access to.",
     signedOutAction: "Sign in",
     sessionExpiredTitle: "Your session has expired",
-    sessionExpiredMessage: "Your Boffmedia session is no longer valid, so server packs are not being shown. Sign in again to get them back; your local packs are unaffected.",
+    sessionExpiredMessage:
+      "Your Boffmedia session is no longer valid, so server packs are not being shown. Sign in again to get them back; your local packs are unaffected.",
     sessionExpiredAction: "Sign in again",
     searchNoResultsTitle: "No results",
-    searchNoResults: "Nothing matches \"{query}\".",
+    searchNoResults: 'Nothing matches "{query}".',
     accessInfo: "Only packs your UUID has access to are listed.",
     modalTitle: "Create local pack",
     nameField: "Name",
@@ -2085,7 +2378,8 @@ const en = {
     installingPercent: "Installing {percent}%",
     damagedTitle: "Installation damaged",
     damaged: "Damaged",
-    damageExplanation: "Repair deletes the mods, config, and loader managed by the app and re-downloads them. Your worlds, screenshots, and options are left untouched.",
+    damageExplanation:
+      "Repair deletes the mods, config, and loader managed by the app and re-downloads them. Your worlds, screenshots, and options are left untouched.",
     crashedTitle: "The game closed unexpectedly",
     crashCode: "Code {code}",
     noErrorLines: "No errors were logged before the crash.",
@@ -2125,7 +2419,8 @@ const en = {
       yourAccess: "Your access",
       granted: "Granted",
       integrityLabel: "integrity",
-      integrityDescription: "Every file is verified by SHA-512 before writing. A file that doesn't match is re-downloaded; if it fails again, the installation is marked as damaged instead of launching.",
+      integrityDescription:
+        "Every file is verified by SHA-512 before writing. A file that doesn't match is re-downloaded; if it fails again, the installation is marked as damaged instead of launching.",
       changelogLabel: "What's new",
     },
     editLocalMenu: "Edit pack",
@@ -2141,8 +2436,10 @@ const en = {
     exportingServerMenu: "Exporting server…",
     exportServerZipMenu: "Create server (runnable ZIP)",
     exportingServerZipMenu: "Building server… {done}/{total}",
-    exportServerZipSuccess: "Server ready: unzip it and run start.sh or start.bat.",
-    exportServerZipSkipped: "Server ready, but {count} file(s) could not be included — see LEEME-servidor.txt.",
+    exportServerZipSuccess:
+      "Server ready: unzip it and run start.sh or start.bat.",
+    exportServerZipSkipped:
+      "Server ready, but {count} file(s) could not be included — see LEEME-servidor.txt.",
     exportServerZipError: "Could not build the server.",
     duplicateSuccess: "«{name}» created.",
     duplicateError: "Could not duplicate the pack.",
@@ -2161,7 +2458,8 @@ const en = {
     iconClearButton: "Remove icon",
     galleryTab: "Gallery",
     galleryEmpty: "No images",
-    galleryEmptyDetail: "Add screenshots, renders, or any images associated with the pack.",
+    galleryEmptyDetail:
+      "Add screenshots, renders, or any images associated with the pack.",
     galleryAddButton: "Add image",
     galleryRemoveButton: "Remove",
     galleryClearError: "Could not remove the image.",
@@ -2171,7 +2469,8 @@ const en = {
     versionNamePlaceholder: "e.g., 1.0, Beta 3, etc.",
     bundledWorldsSection: "Worlds included in the pack",
     bundledWorldsEmpty: "No worlds",
-    bundledWorldsEmptyDetail: "Add worlds that will be installed automatically on first run.",
+    bundledWorldsEmptyDetail:
+      "Add worlds that will be installed automatically on first run.",
     addBundledWorldButton: "Add world (.zip)",
     addBundledWorldFromInstanceButton: "Include in pack",
     promotedWorldSuccess: "World included in the pack.",
@@ -2204,6 +2503,7 @@ const en = {
     navLabel: "App sections",
     play: "Play",
     tools: "Tools",
+    navReleases: "What's new",
   },
 
   logs: {
@@ -2218,23 +2518,30 @@ const en = {
     navTools: "Tools",
     navSettings: "Settings",
     offlineTitle: "Offline",
-    offlineMessage: "You can play packs you already have installed. Installing, updating, and downloading packs requires a connection.",
+    offlineMessage:
+      "You can play packs you already have installed. Installing, updating, and downloading packs requires a connection.",
     partialTitle: "Could not load your full library",
-    partialMessage: "Your local packs are shown. Server packs will reappear when the connection is restored.",
+    partialMessage:
+      "Your local packs are shown. Server packs will reappear when the connection is restored.",
     serverDownTitle: "Server unavailable",
-    serverDownShort: "Not your installation. Your installed packs and the tools keep working.",
+    serverDownShort:
+      "Not your installation. Your installed packs and the tools keep working.",
     serverUnreachableTitle: "Cannot reach the server",
     serverUnreachableShort: "Your installed packs and the tools keep working.",
     retryButton: "Retry",
     running: "Running",
     // Diagnostic error messages for each error code (D4)
-    dnsFailed: "Could not resolve the server name. Check your internet connection.",
-    connectionRefused: "The server refused the connection. It may not be available.",
-    connectionTimeout: "The server did not respond in time. It may be down or your connection may be unstable.",
+    dnsFailed:
+      "Could not resolve the server name. Check your internet connection.",
+    connectionRefused:
+      "The server refused the connection. It may not be available.",
+    connectionTimeout:
+      "The server did not respond in time. It may be down or your connection may be unstable.",
     httpProtocolError: "Unexpected response from the server. Try again later.",
     server5xxError: "The server has an internal error. Try again later.",
     authFailed: "Authentication problem. Check your session and try again.",
-    storeError: "Could not access the system credential store. Check that it is not locked.",
+    storeError:
+      "Could not access the system credential store. Check that it is not locked.",
     // Diagnostic action titles (D4)
     diagnosticDNS: "DNS Error",
     diagnosticRefused: "Connection Refused",
@@ -2249,29 +2556,38 @@ const en = {
   },
 
   crash: {
-    unrecognized: "The cause of the crash is not recognized. Check the full log and, if it happens again, copy it and send it to the pack team.",
+    unrecognized:
+      "The cause of the crash is not recognized. Check the full log and, if it happens again, copy it and send it to the pack team.",
     copyReport: "Copy report",
     whatToDo: "What to do: ",
     evidenceLabel: "Log lines that indicate it ({count})",
     "fabric-api-missing": {
       title: "Fabric API is missing",
-      explanation: "One of the mods requires Fabric API and it is not installed in this instance.",
-      action: "Repair the installation from the pack's page; if the problem persists, notify the pack administrators: a required mod is missing from the manifest.",
+      explanation:
+        "One of the mods requires Fabric API and it is not installed in this instance.",
+      action:
+        "Repair the installation from the pack's page; if the problem persists, notify the pack administrators: a required mod is missing from the manifest.",
     },
     "missing-unsupported-mods": {
       title: "Required mods are missing",
-      explanation: "The mod loader could not resolve dependencies: there are mods that require others that are not present, or are in a different version than expected.",
-      action: "Repair the installation to re-download the mods. If it happens again, the pack has an unpublished dependency: send these lines to the team.",
+      explanation:
+        "The mod loader could not resolve dependencies: there are mods that require others that are not present, or are in a different version than expected.",
+      action:
+        "Repair the installation to re-download the mods. If it happens again, the pack has an unpublished dependency: send these lines to the team.",
     },
     "missing-mods": {
       title: "Required mods are missing",
-      explanation: "Forge/NeoForge found mods that depend on others that are not installed.",
-      action: "Repair the installation. If it persists, a pack dependency is missing: report these lines.",
+      explanation:
+        "Forge/NeoForge found mods that depend on others that are not installed.",
+      action:
+        "Repair the installation. If it persists, a pack dependency is missing: report these lines.",
     },
     "mod-resolution-failed": {
       title: "Could not resolve the mods",
-      explanation: "The loader could not assemble a valid combination of mods; it is almost always an absent dependency or an incompatible version between two mods.",
-      action: "Repair the installation and restart. If the error repeats, share these lines with the pack team.",
+      explanation:
+        "The loader could not assemble a valid combination of mods; it is almost always an absent dependency or an incompatible version between two mods.",
+      action:
+        "Repair the installation and restart. If the error repeats, share these lines with the pack team.",
     },
     "missing-mod-required": {
       title: "A required mod is missing",
@@ -2280,58 +2596,79 @@ const en = {
     },
     "unmet-dependency": {
       title: "Unmet dependency",
-      explanation: "A mod requires another mod (or a specific version of it) that is not present.",
-      action: "Repair the installation; if it continues, report these lines to the pack team.",
+      explanation:
+        "A mod requires another mod (or a specific version of it) that is not present.",
+      action:
+        "Repair the installation; if it continues, report these lines to the pack team.",
     },
     "requires-minecraft": {
       title: "Mod for a different Minecraft version",
-      explanation: "There is a mod compiled for a different Minecraft version than the pack uses. This happens when you add a mod manually or when the installation was interrupted between two updates.",
-      action: "Remove any mods you added to the mods folder and repair the installation to restore the pack to its published version.",
+      explanation:
+        "There is a mod compiled for a different Minecraft version than the pack uses. This happens when you add a mod manually or when the installation was interrupted between two updates.",
+      action:
+        "Remove any mods you added to the mods folder and repair the installation to restore the pack to its published version.",
     },
     "requires-fabricloader": {
       title: "Loader version is incorrect",
-      explanation: "A mod requires a different version of Fabric Loader than the pack installed.",
-      action: "Repair the installation to reinstall the loader in the pack's version.",
+      explanation:
+        "A mod requires a different version of Fabric Loader than the pack installed.",
+      action:
+        "Repair the installation to reinstall the loader in the pack's version.",
     },
     "incompatible-mods": {
       title: "Incompatible mods",
-      explanation: "The loader detected mods that cannot coexist: usually one is for a different Minecraft version or loader.",
-      action: "Repair the installation and don't copy loose mods into the mods folder again.",
+      explanation:
+        "The loader detected mods that cannot coexist: usually one is for a different Minecraft version or loader.",
+      action:
+        "Repair the installation and don't copy loose mods into the mods folder again.",
     },
     "not-compatible-minecraft": {
       title: "Mod incompatible with this version",
-      explanation: "An installed mod does not support the Minecraft version this pack uses.",
+      explanation:
+        "An installed mod does not support the Minecraft version this pack uses.",
       action: "Repair the installation to restore the pack's mod set.",
     },
-    "classnotfoundexception": {
+    classnotfoundexception: {
       title: "Minecraft installation incomplete",
-      explanation: "Minecraft itself is missing from the classpath: the loader or game installation was incomplete or corrupt.",
-      action: "Repair the installation from the pack's page; the game and loader will be re-downloaded.",
+      explanation:
+        "Minecraft itself is missing from the classpath: the loader or game installation was incomplete or corrupt.",
+      action:
+        "Repair the installation from the pack's page; the game and loader will be re-downloaded.",
     },
     "mixin-apply-failed": {
       title: "Mod conflict (mixin)",
-      explanation: "Two mods are trying to modify the same part of the game and one no longer fits. Usually means a mod is in a different version than the rest of the pack.",
-      action: "Repair the installation. If the failure persists, copy the mod name that appears in these lines and report it: it's a pack conflict, not a machine issue.",
+      explanation:
+        "Two mods are trying to modify the same part of the game and one no longer fits. Usually means a mod is in a different version than the rest of the pack.",
+      action:
+        "Repair the installation. If the failure persists, copy the mod name that appears in these lines and report it: it's a pack conflict, not a machine issue.",
     },
-    "invalidinjectionexception": {
+    invalidinjectionexception: {
       title: "Mod conflict (mixin)",
-      explanation: "A mod could not inject its code into the game because another mod already changed it or the version doesn't match.",
-      action: "Repair the installation and report these lines if it happens again.",
+      explanation:
+        "A mod could not inject its code into the game because another mod already changed it or the version doesn't match.",
+      action:
+        "Repair the installation and report these lines if it happens again.",
     },
-    "mixintransformererror": {
+    mixintransformererror: {
       title: "Mod conflict (mixin)",
-      explanation: "A mod failed to apply its patches to the game during startup.",
-      action: "Repair the installation and report these lines if it happens again.",
+      explanation:
+        "A mod failed to apply its patches to the game during startup.",
+      action:
+        "Repair the installation and report these lines if it happens again.",
     },
     "mixin-spongepowered": {
       title: "Mod conflict (mixin)",
-      explanation: "The mod patching system (Mixin) failed during startup, which almost always means two mods stepping on each other.",
-      action: "Repair the installation and report these lines if it happens again.",
+      explanation:
+        "The mod patching system (Mixin) failed during startup, which almost always means two mods stepping on each other.",
+      action:
+        "Repair the installation and report these lines if it happens again.",
     },
-    "outofmemoryerror": {
+    outofmemoryerror: {
       title: "The game ran out of memory",
-      explanation: "The memory allocated to Minecraft was exhausted. With large packs, 2 GB is not enough: 6-8 GB is normal.",
-      action: "Increase the memory in Settings and try again. Don't allocate more than half your machine's RAM: the system needs its own.",
+      explanation:
+        "The memory allocated to Minecraft was exhausted. With large packs, 2 GB is not enough: 6-8 GB is normal.",
+      action:
+        "Increase the memory in Settings and try again. Don't allocate more than half your machine's RAM: the system needs its own.",
     },
     "java-heap-space": {
       title: "The game ran out of memory",
@@ -2340,27 +2677,34 @@ const en = {
     },
     "gc-overhead-limit": {
       title: "Insufficient memory",
-      explanation: "Java spent more time freeing memory than running the game: the allocated amount is not enough for this pack.",
+      explanation:
+        "Java spent more time freeing memory than running the game: the allocated amount is not enough for this pack.",
       action: "Increase the memory allocated in Settings.",
     },
-    "unsupportedclassversionerror": {
+    unsupportedclassversionerror: {
       title: "Wrong Java version",
-      explanation: "The game is running with a version of Java older than what this pack needs.",
-      action: "In Settings, clear the Java path so the app installs and uses the correct version automatically.",
+      explanation:
+        "The game is running with a version of Java older than what this pack needs.",
+      action:
+        "In Settings, clear the Java path so the app installs and uses the correct version automatically.",
     },
     "has-been-compiled-more-recent": {
       title: "Wrong Java version",
       explanation: "The configured Java is too old for this pack's mods.",
-      action: "In Settings, leave the Java path empty so the app uses the correct one.",
+      action:
+        "In Settings, leave the Java path empty so the app uses the correct one.",
     },
     "unrecognized-option": {
       title: "Java doesn't accept the startup arguments",
-      explanation: "The manually configured Java installation doesn't understand the options Minecraft needs; usually it's too old or an incomplete JRE.",
-      action: "In Settings, clear the Java path to go back to the app-managed version.",
+      explanation:
+        "The manually configured Java installation doesn't understand the options Minecraft needs; usually it's too old or an incomplete JRE.",
+      action:
+        "In Settings, clear the Java path to go back to the app-managed version.",
     },
     "duplicate-mods-found": {
       title: "Duplicate mods found",
-      explanation: "The same mod appears twice in the mods folder, usually in two different versions. The loader refuses to start like this.",
+      explanation:
+        "The same mod appears twice in the mods folder, usually in two different versions. The loader refuses to start like this.",
       action: "Delete any copies you added and repair the installation.",
     },
     "found-duplicate-mod": {
@@ -2368,9 +2712,10 @@ const en = {
       explanation: "Two files in the mods folder declare the same mod.",
       action: "Remove the duplicate and repair the installation.",
     },
-    "zipexception": {
+    zipexception: {
       title: "A mod file is damaged",
-      explanation: "A .jar cannot be read: the download was interrupted or the file became corrupted on disk.",
+      explanation:
+        "A .jar cannot be read: the download was interrupted or the file became corrupted on disk.",
       action: "Repair the installation to re-download the files.",
     },
     "invalid-corrupt-jarfile": {
@@ -2380,7 +2725,8 @@ const en = {
     },
     "error-loading-mod-file": {
       title: "A mod file is damaged",
-      explanation: "The loader could not read one of the files in the mods folder.",
+      explanation:
+        "The loader could not read one of the files in the mods folder.",
       action: "Repair the installation from the pack's page.",
     },
     kind: {
@@ -2404,11 +2750,14 @@ const en = {
     packSuccess: "Pack backup created.",
     error: "Could not create the backup.",
     noBackups: "No backups",
-    noBackupsDetail: "Create one before updating mods or touching config manually.",
+    noBackupsDetail:
+      "Create one before updating mods or touching config manually.",
     reading: "Reading backups…",
     restoreConfirm: "Restore the backup from {date}?",
-    restoreWarningWorld: "The world «{name}» will be completely replaced. The current state will be lost.",
-    restoreWarningPack: "The pack files will be overwritten with those from this backup.",
+    restoreWarningWorld:
+      "The world «{name}» will be completely replaced. The current state will be lost.",
+    restoreWarningPack:
+      "The pack files will be overwritten with those from this backup.",
     restoreSuccess: "Backup restored.",
     restoreError: "Could not restore.",
     deleteError: "Could not delete the backup.",
@@ -2437,7 +2786,8 @@ const en = {
     target: "Target",
     targetNew: "A new pack will be created",
     targetExisting: "A version will be added to the existing pack",
-    noIcon: "This pack has no icon. You can add one from the Gallery tab before publishing.",
+    noIcon:
+      "This pack has no icon. You can add one from the Gallery tab before publishing.",
     cancel: "Cancel",
     saveDraft: "Save as draft",
     publish: "Publish",
@@ -2461,7 +2811,8 @@ const en = {
     toggleFileLabel: "Turn {name} on or off",
     // ── Optional content ─────────────────────────────────────────────────
     optionalTitle: "Optional content",
-    optionalSubtitle: "Pick the parts of the pack you want. You can change this at any time.",
+    optionalSubtitle:
+      "Pick the parts of the pack you want. You can change this at any time.",
     optionalEmpty: "This pack offers no optional content.",
     optionalRecommended: "Recommended",
     optionalDefaultOn: "On by default",
@@ -2479,7 +2830,8 @@ const en = {
     optionalUsesLibrary: "Uses: {names}",
     optionalAll: "All",
     optionalClear: "None",
-    optionalDeferredToast: "Saved. It will apply the next time you start the pack.",
+    optionalDeferredToast:
+      "Saved. It will apply the next time you start the pack.",
     optionalDownloading: "Downloading {count} file(s)…",
     // ── Optional content: authoring (local packs only) ───────────────────
     //
@@ -2500,11 +2852,13 @@ const en = {
       saved: "Optional content saved.",
       saveError: "Could not save the optional content.",
       loadError: "Could not read the pack.",
-      pending: "There are changes that are not installed yet. This list is what is on disk right now; press Play or Install to apply the latest.",
+      pending:
+        "There are changes that are not installed yet. This list is what is on disk right now; press Play or Install to apply the latest.",
       pendingAuthored:
         "These are the options exactly as you saved them. They are not in the installed files yet: press Play or Install to apply them, and you will then be able to switch them on and off.",
       emptyTitle: "No optional content",
-      emptyDesc: "This pack always installs every file. Create a group to make some of it a choice.",
+      emptyDesc:
+        "This pack always installs every file. Create a group to make some of it a choice.",
       addGroup: "Add group",
       removeGroup: "Remove group",
       addFeature: "Add option",
@@ -2532,19 +2886,27 @@ const en = {
         datapack: "Datapack",
       },
       requires: "Requires",
-      requiresHint: "Turning this on also turns on whatever is ticked here, and turning one of those off takes this one down with it.",
-      missingRequires: "{mod} requires \"{modId}\", which lives in \"{feature}\". Tick it below, or the game fails to start whenever someone turns that one off.",
+      requiresHint:
+        "Turning this on also turns on whatever is ticked here, and turning one of those off takes this one down with it.",
+      missingRequires:
+        '{mod} requires "{modId}", which lives in "{feature}". Tick it below, or the game fails to start whenever someone turns that one off.',
       paths: "Files in this option",
-      pathsHint: "These are written as env.client “optional” on save. A file can belong to only one option.",
+      pathsHint:
+        "These are written as env.client “optional” on save. A file can belong to only one option.",
       pathsFilter: "Filter {count} file(s) by name…",
       pathsFilterLabel: "Filter files by name",
       pathsNoMatch: "No file matches “{query}”.",
-      pathsHiddenSelected: "{count} file(s) in this option do not match the filter and are not shown here.",
+      pathsHiddenSelected:
+        "{count} file(s) in this option do not match the filter and are not shown here.",
       errorNoPaths: "An option needs at least one file.",
-      errorOneDefault: "An “Exactly one” group needs exactly one option on by default (there are {count}).",
-      errorAtMostOneDefault: "A “One or none” group allows at most one on by default (there are {count}).",
-      errorShaderpackGroup: "A shader needs an “Exactly one” or “One or none” group: only one shader can be active.",
-      errorDatapackDir: "A datapack must sit inside {dirs} so a global loader reads it.",
+      errorOneDefault:
+        "An “Exactly one” group needs exactly one option on by default (there are {count}).",
+      errorAtMostOneDefault:
+        "A “One or none” group allows at most one on by default (there are {count}).",
+      errorShaderpackGroup:
+        "A shader needs an “Exactly one” or “One or none” group: only one shader can be active.",
+      errorDatapackDir:
+        "A datapack must sit inside {dirs} so a global loader reads it.",
       // Refused by the schema too (group name minLength 1, features minItems 1,
       // paths minItems 1), but phrased for the author: a half-authored group is
       // the normal state of this form rather than an exceptional one, and the
@@ -2588,18 +2950,21 @@ const en = {
     noDescription: "This mod has no published description.",
     brokenBadge: "Will not load",
     launchBrokenTitle: "{count} mod(s) may not load",
-    brokenDisabled: "Needs \"{modId}\", which is in {name} and is switched off.",
-    brokenMissing: "Needs \"{modId}\", which is not in the pack.",
-    brokenBanner: "{count} mod(s) will not load: something they need is missing.",
+    brokenDisabled: 'Needs "{modId}", which is in {name} and is switched off.',
+    brokenMissing: 'Needs "{modId}", which is not in the pack.',
+    brokenBanner:
+      "{count} mod(s) will not load: something they need is missing.",
     breakTitle: "Other mods need this",
-    breakWarning: "{names} need \"{name}\". If you continue they stop loading until you switch it back on.",
+    breakWarning:
+      '{names} need "{name}". If you continue they stop loading until you switch it back on.',
     breakConfirm: "Turn off anyway",
     downloadingBadge: "Downloading",
     downloadError: "Could not download «{name}». Press Install to retry.",
     deleteAction: "Delete",
     deletePackFileTitle: "Remove from pack",
     deleteFileTitle: "Delete file",
-    deleteFileWarning: "This deletes «{name}» from disk. You added it yourself, so the launcher cannot get it back.",
+    deleteFileWarning:
+      "This deletes «{name}» from disk. You added it yourself, so the launcher cannot get it back.",
     cancelButton: "Cancel",
     deleteButton: "Delete",
     nothingToShow: "Nothing to show",
@@ -2682,27 +3047,34 @@ const en = {
     optionalMods: "Optional mods",
     optionalModCount: "{count}",
     noOptional: "No optional mods",
-    noOptionalDetail: "This pack marks no files as optional, or hasn't been installed yet.",
+    noOptionalDetail:
+      "This pack marks no files as optional, or hasn't been installed yet.",
     spaceDivider: "your space",
-    spaceWarning: "Mods you add to <code>mods/</code> yourself survive updates: the app only deletes files it installed and you haven't modified. A disabled optional mod is not downloaded.",
+    spaceWarning:
+      "Mods you add to <code>mods/</code> yourself survive updates: the app only deletes files it installed and you haven't modified. A disabled optional mod is not downloaded.",
     savedVersions: "Saved versions",
     currentVersion: "current",
     noVersions: "No history",
-    noVersionsDetail: "The last installed versions are kept so you can roll back.",
+    noVersionsDetail:
+      "The last installed versions are kept so you can roll back.",
     revertButton: "Revert",
     costDivider: "cost",
-    costWarning: "A saved version is just its file list: .jars live once in the shared cache, so keeping several doesn't take up multiple copies of the pack.",
+    costWarning:
+      "A saved version is just its file list: .jars live once in the shared cache, so keeping several doesn't take up multiple copies of the pack.",
     memory: "Memory for this pack",
-    recommendedMemory: "Recommended for this pack: {gib}. Going above it won't speed up the game: excess heap is not used, and the system runs out of memory.",
+    recommendedMemory:
+      "Recommended for this pack: {gib}. Going above it won't speed up the game: excess heap is not used, and the system runs out of memory.",
     memoryDivider: "memory",
     inherit: "Inherit",
     auto: "Automatic",
     manual: "Manual",
-    autoMemory: "Calculated from this pack's mods ({count}) and your machine's RAM, never above 60%.",
+    autoMemory:
+      "Calculated from this pack's mods ({count}) and your machine's RAM, never above 60%.",
     globalMemoryAuto: "Global settings are automatic.",
     globalMemoryMib: "Using what global settings say ({gib}).",
     javaDivider: "java",
-    javaAuto: "This pack ignores the settings path and uses the Java version it requires.",
+    javaAuto:
+      "This pack ignores the settings path and uses the Java version it requires.",
     javaGlobal: "Using the path from global settings ({path}).",
     javaManaged: "Global settings let the app manage Java.",
     javaPath: "Java: {path}",
@@ -2716,11 +3088,13 @@ const en = {
     jvmCustomLabel: "Arguments",
     jvmCustomHint: "Space-separated. Memory is set above, not with -Xmx",
     jvmCustomPlaceholder: "-XX:+UseG1GC -Xms2G",
-    jvmInherit: "No arguments of its own: the ones from global settings are used.",
+    jvmInherit:
+      "No arguments of its own: the ones from global settings are used.",
     jvmInheritNone: "Neither this pack nor global settings add any arguments.",
     jvmGlobal: "From global settings: {args}",
     jvmEmpty: "This pack launches with no extra arguments.",
-    jvmFromPack: "Proposed by the pack. You can change them — they will not be re-applied on the next update.",
+    jvmFromPack:
+      "Proposed by the pack. You can change them — they will not be re-applied on the next update.",
     jvmRejected: "{arg}: {reason}",
     error: "Error",
     sourceGlobal: "Inherited",
@@ -2776,7 +3150,8 @@ const en = {
     },
     patchNote: {
       title: "Patched ROMs",
-      description: "Patched ROMs are applied automatically during installation.",
+      description:
+        "Patched ROMs are applied automatically during installation.",
     },
     filesFoundToast: "{count} file(s) found in your library",
     scanError: "Could not scan library",
@@ -2804,13 +3179,15 @@ const en = {
     statusClaimed: "Claimed",
     statusPatched: "Randomized",
     statusVerified: "Verified",
-    playBlockedRandomizeFirst: "You must patch the ROM in the randomizer before playing.",
-    launchErrorNotPatched: "This pack is linked to a randomizer event that requires you to patch the ROM before playing.",
-    launchErrorRomMismatch: "The ROM does not match the expected one. Make sure you downloaded the correct randomized version.",
+    playBlockedRandomizeFirst:
+      "You must patch the ROM in the randomizer before playing.",
+    launchErrorNotPatched:
+      "This pack is linked to a randomizer event that requires you to patch the ROM before playing.",
+    launchErrorRomMismatch:
+      "The ROM does not match the expected one. Make sure you downloaded the correct randomized version.",
   },
 
-  errors: {
-  },
-} as const
+  errors: {},
+} as const;
 
-export const messages: Record<AppLocale, unknown> = { es, en }
+export const messages: Record<AppLocale, unknown> = { es, en };

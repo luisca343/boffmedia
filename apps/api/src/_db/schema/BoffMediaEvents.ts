@@ -514,6 +514,8 @@ export const AUDIT_SUBJECT = {
   REPORT: 'report',
   CONTENT: 'content',
   USER: 'user',
+  // Appended last: MySQL stores ENUM values by ordinal position.
+  RELEASE: 'release',
 } as const;
 
 export type AuditSubject = (typeof AUDIT_SUBJECT)[keyof typeof AUDIT_SUBJECT];
@@ -530,6 +532,7 @@ export const boffMediaAudit = mysqlTable(
       AUDIT_SUBJECT.REPORT,
       AUDIT_SUBJECT.CONTENT,
       AUDIT_SUBJECT.USER,
+      AUDIT_SUBJECT.RELEASE,
     ]).notNull(),
     subjectId: int('subject_id').notNull(),
     /** Dotted action, e.g. `event.status`, `event.reopen`, `match.amend`. */

@@ -189,6 +189,26 @@
       "es": "No puedes reportar tu propio contenido.",
       "where": "boffmedia/moderation/moderation.service.ts"
     },
+    "RELEASE_DEPLOYMENT_MISMATCH": {
+      "es": "El despliegue no coincide con la versión registrada.",
+      "where": "boffmedia/releases/releases.service.ts"
+    },
+    "RELEASE_INVALID_INPUT": {
+      "es": "Los datos de la versión no son válidos.",
+      "where": "boffmedia/releases/releases.service.ts"
+    },
+    "RELEASE_INVALID_STATE": {
+      "es": "La versión no está en un estado compatible con esta acción.",
+      "where": "boffmedia/releases/releases.service.ts"
+    },
+    "RELEASE_NOT_FOUND": {
+      "es": "No se encontró la versión solicitada.",
+      "where": "boffmedia/releases/releases.service.ts"
+    },
+    "RELEASE_VERSION_CONFLICT": {
+      "es": "Ya existe una versión con ese número.",
+      "where": "boffmedia/releases/releases.service.ts"
+    },
     "SERVICE_DATABASE_UNAVAILABLE": {
       "es": "El servicio no está disponible ahora mismo. Vuelve a intentarlo en unos minutos.",
       "where": "api/_utils/database-availability.ts"

@@ -1,5 +1,11 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString, MaxLength, Matches } from 'class-validator';
+import {
+  IsIn,
+  IsOptional,
+  IsString,
+  MaxLength,
+  Matches,
+} from 'class-validator';
 
 /**
  * Metadatos de una subida de artefacto. Van en la query porque el CUERPO son
@@ -30,4 +36,14 @@ export class PublishReleaseQueryDto {
   @IsString()
   @MaxLength(8000)
   notes?: string;
+}
+
+export class DesktopAutomationReleaseQueryDto extends PublishReleaseQueryDto {
+  @ApiPropertyOptional({
+    enum: ['true', 'false'],
+    description: 'Publish the updater row after the artifact is stored',
+  })
+  @IsOptional()
+  @IsIn(['true', 'false'])
+  publish?: 'true' | 'false';
 }

@@ -1,0 +1,3 @@
+{
+  "requiredSurfaces": ["web", "api", "desktop"]
+}

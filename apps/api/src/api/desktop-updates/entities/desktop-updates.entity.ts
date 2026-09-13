@@ -92,6 +92,13 @@ export class DesktopReleaseEntity {
   @ApiProperty({ example: '1.4.0' })
   version!: string;
 
+  @ApiPropertyOptional({
+    type: Number,
+    nullable: true,
+    description: 'Linked product release id',
+  })
+  productReleaseId!: number | null;
+
   @ApiProperty({ example: 'windows-x86_64' })
   target!: string;
 

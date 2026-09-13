@@ -81,6 +81,7 @@ export class DesktopReleasesRepository {
       .values(row)
       .onDuplicateKeyUpdate({
         set: {
+          productReleaseId: row.productReleaseId,
           signature: row.signature,
           notes: row.notes,
           artifactName: row.artifactName,

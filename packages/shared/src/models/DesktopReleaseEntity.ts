@@ -5,6 +5,10 @@
 export type DesktopReleaseEntity = {
     id: number;
     version: string;
+    /**
+     * Linked product release id
+     */
+    productReleaseId?: number | null;
     target: string;
     notes?: string | null;
     artifactName: string;

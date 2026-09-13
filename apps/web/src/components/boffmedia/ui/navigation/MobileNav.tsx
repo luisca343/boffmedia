@@ -9,6 +9,7 @@ import { LangSwitcher } from "./LangSwitcher"
 import { MobileAccount } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections, type NavSection } from "./nav-data"
 import { useViewerRoles } from "@/services/useBoffSession"
+import { useReleaseAnnouncements } from "./ReleaseAnnouncements"
 
 function sectionItems(sections: NavSection[]) {
   return sections.map((s) => ({
@@ -59,6 +60,7 @@ function NavAccordion({ label, sections, onNavigate }: { label: string; sections
                 >
                   <Icon name={it.icon || "wrench"} size={15} className="shrink-0 text-txt-dim" />
                   {it.label}
+                  {it.unread && <i aria-hidden="true" className="ml-auto h-1.5 w-1.5 rotate-45 bg-accent" />}
                 </Link>
               ))}
             </div>
@@ -73,8 +75,9 @@ export function MobileNav({ pathname }: { pathname: string }) {
   const t = useTranslations()
   const tNav = useTranslations("nav.v3")
   const roles = useViewerRoles()
+  const { hasUnread } = useReleaseAnnouncements()
   const toolsSections = React.useMemo(() => buildToolsSections(t, roles), [t, roles])
-  const comunidadSections = React.useMemo(() => buildComunidadSections(t), [t])
+  const comunidadSections = React.useMemo(() => buildComunidadSections(t, hasUnread), [t, hasUnread])
   const [open, setOpen] = React.useState(false)
 
   React.useEffect(() => {

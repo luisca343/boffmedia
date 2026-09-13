@@ -76,7 +76,7 @@ export type AppState = {
     needsSignin: boolean;
     code?: string;
   } | null;
-  view: "packs" | "pack" | "logs" | "settings" | "tools" | "tool";
+  view: "packs" | "pack" | "logs" | "settings" | "releases" | "tools" | "tool";
   selectedPackId: string | null;
   /** Which registry tool the "tool" view is showing. */
   selectedToolId: string | null;
@@ -150,7 +150,14 @@ export type AppAction =
   | { type: "packs/error"; message: string }
   | {
       type: "view";
-      view: "packs" | "pack" | "logs" | "settings" | "tools" | "tool";
+      view:
+        | "packs"
+        | "pack"
+        | "logs"
+        | "settings"
+        | "releases"
+        | "tools"
+        | "tool";
       packId?: string;
       edit?: boolean;
       toolId?: string;
@@ -317,12 +324,20 @@ export function appReducer(state: AppState, action: AppAction): AppState {
     case "signin/restore-failed":
       return {
         ...state,
-        restoreError: { message: action.message, needsSignin: action.needsSignin },
+        restoreError: {
+          message: action.message,
+          needsSignin: action.needsSignin,
+        },
       };
     case "signin/start":
       // Clearing the banner here is what stops "tu sesión caducó" from sitting
       // above the device code the player is already typing in.
-      return { ...state, signingIn: true, deviceCode: null, restoreError: null };
+      return {
+        ...state,
+        signingIn: true,
+        deviceCode: null,
+        restoreError: null,
+      };
     case "signin/code":
       return { ...state, deviceCode: action.code };
     case "signin/done":
@@ -501,7 +516,7 @@ export function appReducer(state: AppState, action: AppAction): AppState {
         ...state,
         updateQueue: updateQueueReducer(
           state.updateQueue,
-          action as UpdateQueueAction
+          action as UpdateQueueAction,
         ),
       };
     default:

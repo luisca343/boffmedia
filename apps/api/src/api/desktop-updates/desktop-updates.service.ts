@@ -11,7 +11,13 @@ import { basename, dirname, join } from 'path';
 import type { Readable } from 'stream';
 import { pipeline } from 'stream/promises';
 import { laboonPath } from '@/config/paths';
+import { ReleasesService } from '@api/boffmedia/releases/releases.service';
 import { DesktopRelease } from '@/_db/schema/DesktopReleases';
+import {
+  compareReleaseVersions,
+  isStableReleaseVersion,
+  normalizeReleaseVersion,
+} from '@api/version/release-version';
 import { DesktopReleasesRepository } from './repositories/desktop-releases.repository';
 import {
   DesktopDownloadEntity,
@@ -29,9 +35,6 @@ export interface ClientIdentifier {
  *  segment, so it is validated before it ever reaches the filesystem. */
 const TARGET_RE = /^[a-z0-9]+-[a-z0-9_]+$/;
 
-/** Semver-ish. Tauri strips a leading `v`; we never store one. */
-const VERSION_RE = /^\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/;
-
 export interface ArtifactStream {
   stream: Readable;
   contentLength: number;
@@ -42,7 +45,10 @@ export interface ArtifactStream {
 export class DesktopUpdatesService {
   private readonly logger = new Logger(DesktopUpdatesService.name);
 
-  constructor(private readonly releases: DesktopReleasesRepository) {}
+  constructor(
+    private readonly releases: DesktopReleasesRepository,
+    private readonly productReleases: ReleasesService,
+  ) {}
 
   // ── The updater feed ─────────────────────────────────────────────────────
 
@@ -63,12 +69,19 @@ export class DesktopUpdatesService {
     clientId?: ClientIdentifier,
   ): Promise<UpdaterFeedEntity | null> {
     const platform = this.assertTarget(target);
-    const releases = await this.releases.listPublishedForTarget(platform);
+    const releases = (
+      await this.releases.listPublishedForTarget(platform)
+    ).filter((release) => isStableReleaseVersion(release.version));
     const newest = this.newest(
       releases.filter((r) => !r.paused && this.isClientInRollout(r, clientId)),
     );
     if (!newest) return null;
-    if (compareVersions(newest.version, stripV(currentVersion)) <= 0)
+    if (
+      compareReleaseVersions(
+        newest.version,
+        normalizeReleaseVersion(stripV(currentVersion)),
+      ) <= 0
+    )
       return null;
 
     return {
@@ -129,7 +142,7 @@ export class DesktopUpdatesService {
   private newest(rows: DesktopRelease[]): DesktopRelease | null {
     return rows.reduce<DesktopRelease | null>(
       (best, row) =>
-        best === null || compareVersions(row.version, best.version) > 0
+        best === null || compareReleaseVersions(row.version, best.version) > 0
           ? row
           : best,
       null,
@@ -148,9 +161,11 @@ export class DesktopUpdatesService {
    */
   async downloads(baseUrl: string): Promise<DesktopDownloadEntity[]> {
     const byTarget = new Map<string, DesktopRelease>();
-    for (const row of await this.releases.listPublished()) {
+    for (const row of (await this.releases.listPublished()).filter((release) =>
+      isStableReleaseVersion(release.version),
+    )) {
       const best = byTarget.get(row.target);
-      if (!best || compareVersions(row.version, best.version) > 0) {
+      if (!best || compareReleaseVersions(row.version, best.version) > 0) {
         byTarget.set(row.target, row);
       }
     }
@@ -279,8 +294,12 @@ export class DesktopUpdatesService {
     await mkdir(dirname(path), { recursive: true });
     await rename(temp, path);
 
+    const productReleaseId =
+      await this.productReleases.productReleaseIdForVersion(version);
+
     await this.releases.upsert({
       version,
+      productReleaseId,
       target,
       signature: input.signature.trim(),
       notes: input.notes,
@@ -304,6 +323,11 @@ export class DesktopUpdatesService {
   ): Promise<DesktopReleaseEntity> {
     const row = await this.releases.findById(id);
     if (!row) throw new NotFoundException('Release no encontrada');
+    if (published && !isStableReleaseVersion(row.version)) {
+      throw new BadRequestException(
+        'Prerelease artifacts cannot be published to the public updater feed',
+      );
+    }
     await this.releases.setPublished(id, published);
     return toEntity({
       ...row,
@@ -357,13 +381,14 @@ export class DesktopUpdatesService {
 
   private assertVersion(version: string): string {
     const value = stripV(version);
-    if (!VERSION_RE.test(value)) {
+    try {
+      return normalizeReleaseVersion(value);
+    } catch {
       throw new BadRequestException({
         message: `invalid version "${version}"`,
         userMessage: 'La versión no es válida.',
       });
     }
-    return value;
   }
 }
 
@@ -371,6 +396,7 @@ function toEntity(row: DesktopRelease): DesktopReleaseEntity {
   return {
     id: row.id,
     version: row.version,
+    productReleaseId: row.productReleaseId,
     target: row.target,
     notes: row.notes,
     artifactName: row.artifactName,
@@ -401,28 +427,4 @@ function artifactPath(
 
 function stripV(version: string): string {
   return version.trim().replace(/^v/i, '');
-}
-
-/** -1 / 0 / 1. Pre-release builds sort BELOW their release (1.2.0-rc1 < 1.2.0),
- *  which is what keeps an rc from being offered as an update to the final. */
-function compareVersions(a: string, b: string): number {
-  const [aCore, aPre] = splitPre(a);
-  const [bCore, bPre] = splitPre(b);
-
-  for (let i = 0; i < 3; i += 1) {
-    const diff = (aCore[i] ?? 0) - (bCore[i] ?? 0);
-    if (diff !== 0) return diff > 0 ? 1 : -1;
-  }
-  if (aPre === bPre) return 0;
-  if (!aPre) return 1;
-  if (!bPre) return -1;
-  return aPre > bPre ? 1 : -1;
-}
-
-function splitPre(version: string): [number[], string] {
-  const [core, ...rest] = version.split('-');
-  return [
-    core.split('.').map((n) => Number.parseInt(n, 10) || 0),
-    rest.join('-'),
-  ];
 }

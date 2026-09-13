@@ -39,6 +39,15 @@ RUN pnpm install --no-frozen-lockfile
 FROM deps AS builder
 WORKDIR /app
 
+ARG APP_VERSION
+ARG GIT_SHA
+ARG BUILD_ID
+ARG VERSION_FILE_SHA
+ENV NEXT_PUBLIC_APP_VERSION=$APP_VERSION
+ENV NEXT_PUBLIC_GIT_SHA=$GIT_SHA
+ENV NEXT_PUBLIC_BUILD_ID=$BUILD_ID
+ENV NEXT_PUBLIC_VERSION_FILE_SHA=$VERSION_FILE_SHA
+
 COPY packages/shared ./packages/shared
 COPY packages/pkmn-names ./packages/pkmn-names
 # @boffmedia/ui ships TypeScript source (transpilePackages) and
