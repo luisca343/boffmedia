@@ -7,6 +7,7 @@ export interface NavItem {
   label: string
   href: string
   icon?: IconName
+  iconSrc?: string
 }
 
 export interface NavGroup {
@@ -58,7 +59,12 @@ export function buildToolsSections(t: T, roles?: readonly string[]): NavSection[
             href: c.href,
             items: toolsVisibleTo(c.tools, roles)
               .filter((tool) => tool.showInSidebar !== false)
-              .map((tool) => ({ label: t(tool.nameKey), href: tool.href, icon: tool.sidebarIcon })),
+              .map((tool) => ({
+                label: t(tool.nameKey),
+                href: tool.href,
+                icon: tool.sidebarIcon,
+                iconSrc: tool.landing?.iconSrc,
+              })),
           }))
           .filter((g) => g.items.length > 0),
         items: [],

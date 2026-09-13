@@ -92,6 +92,7 @@ export function Tools() {
         desc: tRoot(tool.descriptionKey),
         cat: tool.categoryKey ? tRoot(tool.categoryKey) : undefined,
         icon: iconOf(tool),
+        iconSrc: tool.iconSrc,
         isNew: tool.isNew,
         hueColor: hueColorOf(meta.hue),
       }

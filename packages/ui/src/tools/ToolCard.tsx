@@ -6,6 +6,7 @@ import { getLink } from "../i18n"
 import { Badge } from "../primitives/badge"
 import { Icon } from "../primitives/icon"
 import { hueStyle, type ToolCardData, type ToolCardLabels } from "./hue"
+import { ToolIcon } from "./ToolIcon"
 
 // bottom-right diagonal cut (señal) / bottom-left (fila) — one-off clips. The
 // `-edge` classes redraw the diagonal the clip erases; --cut-line tracks the
@@ -13,9 +14,6 @@ import { hueStyle, type ToolCardData, type ToolCardLabels } from "./hue"
 const SENAL_CLIP = "cut-tag cut-tag-edge [--cut-tag:14px]"
 const FILA_CLIP = "cut-bl cut-edge-bl [--cut-e:10px]"
 const CARD_HOVER_LINE = "hover:[--cut-line:color-mix(in_srgb,var(--ghue)_45%,var(--line))]"
-
-const ICON_BOX =
-  "cut-seal cut-seal-edge [--cut:7px] [--cut-line:color-mix(in_srgb,var(--ghue)_45%,var(--line-2))] grid flex-none place-items-center border border-solid text-[var(--ghue)] border-[color-mix(in_srgb,var(--ghue)_45%,var(--line-2))] bg-[color-mix(in_srgb,var(--ghue)_10%,transparent)] transition-[background,border-color] duration-[140ms] group-hover:bg-[color-mix(in_srgb,var(--ghue)_18%,transparent)] group-hover:border-[color-mix(in_srgb,var(--ghue)_65%,var(--line-2))] group-hover:[--cut-line:color-mix(in_srgb,var(--ghue)_65%,var(--line-2))]"
 
 const SHELL_BASE =
   "group relative border border-solid border-line bg-panel text-left no-underline transition-[border-color,background,transform,box-shadow] duration-[140ms]"
@@ -56,9 +54,12 @@ export function ToolCard({ tool, variant = "senal", labels, onSelect, className 
     variant === "fila" ? (
       <>
         <span aria-hidden className="absolute left-0 top-0 h-full w-[3px] bg-[var(--ghue)]" />
-        <span className={cn(ICON_BOX, "h-11 w-11")}>
-          <Icon name={tool.icon} size={20} />
-        </span>
+        <ToolIcon
+          name={tool.icon}
+          src={tool.iconSrc}
+          size={32}
+          className="flex-none text-[var(--ghue)]"
+        />
         <span className="min-w-0 flex-1">
           <span className="block font-display text-[1.125rem] font-bold uppercase leading-[1.02] tracking-[0.02em]">
             {tool.title}
@@ -92,15 +93,12 @@ export function ToolCard({ tool, variant = "senal", labels, onSelect, className 
           )}
         />
         <span className="mb-4 flex items-center gap-[0.6875rem]">
-          <span
-            className={cn(
-              ICON_BOX,
-              "h-[2.375rem] w-[2.375rem]",
-              soon && "border-line-2 bg-transparent text-txt-dim [--cut-line:var(--line-2)]",
-            )}
-          >
-            <Icon name={tool.icon} size={20} />
-          </span>
+          <ToolIcon
+            name={tool.icon}
+            src={tool.iconSrc}
+            size={32}
+            className={cn("flex-none text-[var(--ghue)]", soon && "text-txt-dim opacity-70")}
+          />
           {tool.cat && (
             <span className="min-w-0 truncate font-mono text-[0.625rem]/[1.3] font-semibold uppercase tracking-[0.12em] text-txt-dim">
               {tool.cat}

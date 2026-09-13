@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, IconButton } from "@boffmedia/ui"
+import { Icon, IconButton, ToolIcon } from "@boffmedia/ui"
 import { LangSwitcher } from "./LangSwitcher"
 import { MobileAccount } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections, type NavSection } from "./nav-data"
@@ -57,7 +57,7 @@ function NavAccordion({ label, sections, onNavigate }: { label: string; sections
                   onClick={onNavigate}
                   className="flex items-center gap-2.5 px-1 py-2 font-body text-[0.875rem] font-medium leading-none text-txt-muted no-underline transition-colors duration-[140ms] hover:text-txt"
                 >
-                  <Icon name={it.icon || "wrench"} size={15} className="shrink-0 text-txt-dim" />
+                  <ToolIcon name={it.icon || "wrench"} src={it.iconSrc} size={15} className="shrink-0 text-txt-dim" />
                   {it.label}
                 </Link>
               ))}

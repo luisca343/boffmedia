@@ -5,6 +5,7 @@
 
 export * from "./hue"
 export * from "./GameLogo"
+export * from "./ToolIcon"
 export * from "./ToolCard"
 export * from "./ToolGrid"
 export * from "./ToolGroup"

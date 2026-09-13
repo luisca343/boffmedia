@@ -5,7 +5,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
-import { Icon, type IconName } from "@boffmedia/ui"
+import { Icon, ToolIcon, type IconName } from "@boffmedia/ui"
 import { useDismiss } from "@boffmedia/ui/hooks/use-dismiss"
 import { useToolChromeLocked } from "@boffmedia/tool-kit"
 import { getGameEntry, toolsVisibleTo, type GameEntry } from "@/data/games"
@@ -20,6 +20,7 @@ interface SideItem {
   href: string
   label: string
   icon: IconName
+  iconSrc?: string
   isNew?: boolean
 }
 interface SideGroup {
@@ -181,7 +182,7 @@ function SideRail({
                     )}
                   >
                     <span className={cn("relative grid w-6 flex-none place-items-center transition-colors duration-[140ms]", on ? "text-[var(--ghue)]" : "text-txt-dim group-hover/link:text-txt-muted")}>
-                      <Icon name={it.icon} size={18} />
+                      <ToolIcon name={it.icon} src={it.iconSrc} size={18} />
                     </span>
                     <span className={cn("min-w-0 flex-1 overflow-hidden text-ellipsis font-body text-[0.875rem] leading-[1.1]", labelFade)}>{it.label}</span>
                     {it.isNew && (
@@ -311,6 +312,9 @@ export function ToolShell({ slug, children }: ToolShellProps) {
             href: tool.href,
             label: t(tool.nameKey),
             icon: tool.sidebarIcon,
+            // One manually assigned artwork can drive both views; an explicit
+            // sidebar override remains available for exceptional cases.
+            iconSrc: tool.sidebarIconSrc ?? tool.landing?.iconSrc,
             isNew: tool.landing?.isNew ?? false,
           })),
       }))

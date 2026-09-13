@@ -48,7 +48,7 @@ export function FeaturedTool({ cat }: { cat: CategoryData }) {
   const tCat = useTranslations("toolsUi.category")
   const f = cat.featuredTool
   if (!f) return null
-  const art = f.heroImage || f.iconSrc
+  const art = f.heroImage || f.landingArtSrc
   return (
     <div
       style={hueStyle(cat.hueColor)}
@@ -63,9 +63,6 @@ export function FeaturedTool({ cat }: { cat: CategoryData }) {
       <div className="relative min-h-[13.75rem] border-b border-solid bg-base-2 md:min-h-[18.75rem] md:border-b-0 md:border-r border-[color-mix(in_srgb,var(--ghue)_28%,var(--line))]">
         <ArtImage src={art} sizes="(min-width: 768px) 40vw, 100vw" />
         <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-[2] hidden md:block [background:linear-gradient(to_right,transparent_52%,color-mix(in_srgb,var(--panel)_55%,transparent)_88%,var(--panel))]" />
-        <span className="absolute bottom-8 right-[1.625rem] z-[3] grid h-16 w-16 place-items-center border-2 border-solid text-[var(--ghue)] bg-[color-mix(in_srgb,var(--ghue)_16%,var(--bg))] border-[color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] shadow-[0_10px_34px_rgba(0,0,0,0.45)] cut-seal cut-seal-edge [--cut:13px] [--cut-w:2px] [--cut-line:color-mix(in_srgb,var(--ghue)_55%,var(--line-2))] transition-transform duration-300 group-hover:-translate-y-1 max-md:right-6 max-md:-bottom-[1.875rem]">
-          <Icon name={f.icon} size={26} />
-        </span>
       </div>
 
       <div className="flex flex-col px-[2.375rem] pb-8 pt-[2.125rem]">

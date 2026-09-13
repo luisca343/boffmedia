@@ -26,6 +26,8 @@ export interface ToolManifest {
   descriptionKey: string;
   /** Lucide-style icon name; hosts map it to their own icon set. */
   icon: string;
+  /** Optional custom artwork path. Root-relative paths are resolved by the host. */
+  iconSrc?: string;
   /**
    * Message key for the short kind-of-thing label a listing shows above the
    * title ("Bestiary", "Planner", "3D viewer").

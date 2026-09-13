@@ -19,6 +19,8 @@ export interface ToolCardData extends UiToolCardData {
   features: string[]
   featured?: boolean
   heroImage?: string
+  /** Landing artwork stays available to the featured panel without becoming a card icon. */
+  landingArtSrc?: string
   iconSrc?: string
 }
 
@@ -62,7 +64,8 @@ export function buildHubGame(slug: string, t: T, roles?: readonly string[]): Hub
       hueColor,
       featured: item.featured ?? false,
       heroImage: item.heroImage,
-      iconSrc: item.icon,
+      landingArtSrc: item.icon,
+      iconSrc: item.iconSrc,
     }
   })
 

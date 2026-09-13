@@ -36,6 +36,10 @@ export const mhwilds: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/mhwilds/long-sword.webp"),
+            iconSrc: staticAsset(
+              ASSET.boffmedia.img,
+              "games/mhwilds/long-sword.webp",
+            ),
             fallbackIcon: "shield",
             fallbackIconColor: "text-warning-hover",
             color: "from-warning-hover to-emerald-600",
@@ -54,6 +58,10 @@ export const mhwilds: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/mhwilds/charge-blade.webp"),
+            iconSrc: staticAsset(
+              ASSET.boffmedia.img,
+              "games/mhwilds/charge-blade.webp",
+            ),
             fallbackIcon: "sword",
             fallbackIconColor: "text-secondary-hover",
             color: "from-secondary-hover to-indigo-600",
@@ -71,6 +79,10 @@ export const mhwilds: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/mhwilds/chest.webp"),
+            iconSrc: staticAsset(
+              ASSET.boffmedia.img,
+              "games/mhwilds/chest.webp",
+            ),
             fallbackIcon: "shield",
             fallbackIconColor: "text-warning-hover",
             color: "from-warning-hover to-amber-700",

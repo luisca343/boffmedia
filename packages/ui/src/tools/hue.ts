@@ -15,6 +15,8 @@ export interface ToolCardData {
   title: string
   desc: string
   icon: IconName
+  /** Optional custom artwork. Root-relative paths go through the host asset resolver. */
+  iconSrc?: string
   /** URL target. Hosts that navigate by state pass `onSelect` to `ToolCard` and
    *  may leave this unset. */
   href?: string
