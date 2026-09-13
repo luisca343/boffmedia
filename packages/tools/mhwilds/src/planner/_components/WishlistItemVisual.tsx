@@ -66,7 +66,7 @@ export function WishlistItemVisual({
   const decoration = kind === "decoration" ? (item as Decoration | undefined) : undefined
   return (
     <div
-      className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden border border-white/[0.08] bg-base-deep/80 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.02)] ${className}`}
+      className={`grid h-14 w-14 shrink-0 place-items-center overflow-hidden ${className}`}
     >
       {source ? (
         <img

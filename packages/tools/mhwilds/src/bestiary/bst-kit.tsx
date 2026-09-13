@@ -103,21 +103,12 @@ export function MonsterArt({
   return (
     <span
       className={cn(
-        "relative isolate grid place-items-center overflow-hidden border border-solid border-line bg-base-2",
+        "relative grid place-items-center overflow-hidden",
         className,
       )}
     >
       {image ? (
         <>
-          {icon && (
-            <img
-              src={mhwildsBestiaryAsset(icon, monster.localAssetVersion)}
-              alt=""
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-[-14%] h-[128%] w-[128%] max-w-none object-cover opacity-25 blur-md saturate-75"
-            />
-          )}
-          <span className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_20%,var(--bg-2)_115%)]" />
           <img
             src={mhwildsBestiaryAsset(image, monster.localAssetVersion)}
             alt={alt}
@@ -402,7 +393,7 @@ export function MonsterRow({
     >
       <MonsterArt
         monster={m}
-        className="w-[2.125rem] h-[2.125rem] border border-solid border-line"
+        className="w-[2.125rem] h-[2.125rem]"
         fit="cover"
         alt=""
       />

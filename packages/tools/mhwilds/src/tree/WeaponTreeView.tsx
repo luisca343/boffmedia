@@ -500,7 +500,7 @@ function TreeDetail({ node, pathKey, nodesByKey, owned, onToggleOwned, onClose, 
       }
     >
       <div className="mb-4 grid grid-cols-[8rem_minmax(0,1fr)] gap-3 border border-[var(--mh-line)] bg-[var(--mh-soft)] p-3">
-        <div className="grid min-h-[8rem] place-items-center border border-[var(--mh-line)] bg-base-deep">
+        <div className="grid min-h-[8rem] place-items-center">
           {artSrc && !artFailed ? (
             <img src={artSrc} alt={node.name} width={128} height={128} draggable={false} className="h-32 w-32 object-contain" onError={() => setArtFailed(true)} />
           ) : (

@@ -88,7 +88,7 @@ The upstream `MHWs_STM_Release.list` is a useful baseline, but it can lag
 behind the PAKs installed by Steam. The canonical updater handles that in two
 passes:
 
-1. Ask RETool to inspect every current patch PAK for the stable `_00`
+1. Ask RETool to inspect every usable installed PAK for the stable `_00`
    `tex_emanatomy`/`tex_emicon` path family across the full `em0000`–`em9999`
    range. This discovers a newly shipped DLC ID even if the upstream list does
    not know it yet, then extracts and decodes the shared game tables.

@@ -441,7 +441,7 @@ function MonsterDetail({
         <MonsterArt
           monster={m}
           alt={m.name}
-          className="h-[8.75rem] w-[8.75rem] flex-none border border-solid border-line bg-base-2"
+          className="h-[8.75rem] w-[8.75rem] flex-none"
           fit="cover"
         />
         <div className="min-w-0">
@@ -700,10 +700,7 @@ function DropItemIcon({
   React.useEffect(() => setFailed(false), [iconSrc]);
   return (
     <span
-      className="relative grid h-11 w-11 flex-none place-items-center border border-solid bg-base-deep"
-      style={{
-        borderColor: `color-mix(in srgb, ${rarityColor} 55%, var(--line))`,
-      }}
+      className="relative grid h-11 w-11 flex-none place-items-center"
     >
       {showImage ? (
         <img

@@ -92,7 +92,7 @@ export function SkillSearchDrawer({
               .sort((a, b) => b.level - a.level)
               .map((src, i) => (
                 <div key={i} className="flex items-center gap-2.5 border border-line bg-base-2 px-2.5 py-2">
-          <span className="grid h-7 w-7 flex-none place-items-center border border-line bg-base-deep">
+          <span className="grid h-7 w-7 flex-none place-items-center">
                     {src.kind === "armor" ? (
                       <img
                         src={mhwildsArmorAsset(src.item) || getArmorImagePath(src.slot)}

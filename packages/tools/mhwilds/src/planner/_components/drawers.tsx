@@ -99,7 +99,7 @@ export function EquipDrawer({
             const description = slot === "charm" ? String((item as Charm).description || "") : ""
             return (
               <MhItem key={item.id} active={active} onPick={() => onPick(item)}>
-                <span className="inline-flex items-center gap-2 flex-none bg-base-deep">
+                <span className="inline-flex items-center gap-2 flex-none">
                   <MhRarity rarity={item.rarity} />
                   {imageSrc ? (
                     <img

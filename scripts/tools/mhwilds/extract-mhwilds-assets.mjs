@@ -206,7 +206,7 @@ Options:
   --include <regex>        Add a case-insensitive archive path pattern
   --exclude <regex>        Exclude a case-insensitive archive path pattern
   --discover-id <id>       Limit PAK visual discovery to an id, repeatable
-  --no-discover            Do not scan patch PAK indexes for new visual paths
+  --no-discover            Do not scan installed PAK indexes for new visual paths
   --convert                Convert extracted .tex files to .png with texconv
   --image-converter <exe>  Converter executable (default: local texconv.exe)
   --download-list          Download the file list when it is missing
@@ -703,10 +703,6 @@ function buildVisualDiscoveryCandidates(listedPaths, requestedIds = []) {
   return { templates, ids, candidates: [...candidates].sort() };
 }
 
-function isPatchPak(pak) {
-  return /\.patch_\d+\.pak$/i.test(path.basename(pak));
-}
-
 function isUsablePak(pak) {
   try {
     return fs.statSync(pak).size > 1024;
@@ -721,14 +717,12 @@ function discoverVisualPaths(fileList, paks, extractor, requestedIds = []) {
     listedPaths,
     requestedIds,
   );
-  const discoveryPaks = paks.filter((pak) => {
-    if (!isPatchPak(pak)) return false;
-    try {
-      return fs.statSync(pak).size > 1024;
-    } catch {
-      return false;
-    }
-  });
+  // The release file list is only a baseline. Title-update assets are not
+  // guaranteed to live in a `.patch_*` archive: depending on the install,
+  // RE Engine can put them in the base or `sub_000` PAK instead. Scan every
+  // usable archive so a new Hunter's Manual entry cannot be silently omitted
+  // just because its package name differs.
+  const discoveryPaks = paks.filter(isUsablePak);
   const discovered = new Set();
   const matchedPaks = [];
   const warnings = [];

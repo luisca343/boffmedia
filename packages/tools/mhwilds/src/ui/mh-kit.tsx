@@ -345,7 +345,7 @@ export function MhSlot({
       className={`group relative grid min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-3 w-full text-left py-[0.6875rem] px-[0.8125rem] bg-panel border cursor-pointer transition-colors hover:bg-panel-2 ${active ? "border-[var(--mh)] shadow-[0_0_0_1px_var(--mh)]" : "border-line hover:border-line-2"}`}
     >
       <span className={`absolute left-0 top-0 bottom-0 w-[3px] bg-[var(--mh)] transition-opacity ${filled ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
-      <span className={`w-11 h-11 grid place-items-center flex-none border ${filled ? "text-[var(--mh-bright)] border-[var(--mh-line)] bg-base-deep" : "text-txt-dim border-line bg-panel-2"}`}>
+      <span className={`w-11 h-11 grid place-items-center flex-none ${filled ? "text-[var(--mh-bright)]" : "text-txt-dim border border-line bg-panel-2"}`}>
         {resolvedImageSrc ? (
           <img
             src={resolvedImageSrc}
@@ -475,8 +475,7 @@ export function MhMaterial({
   return (
     <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5 py-2 px-[0.6875rem] bg-base-2 border border-line">
       <span
-        className="grid h-8 w-8 flex-none place-items-center overflow-hidden border bg-base-deep"
-        style={{ borderColor: rarVar(rarity) }}
+        className="grid h-8 w-8 flex-none place-items-center overflow-hidden"
       >
         {imageSrc && !imageFailed ? (
           <img

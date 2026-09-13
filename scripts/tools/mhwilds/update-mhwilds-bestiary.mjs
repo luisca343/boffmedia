@@ -51,7 +51,7 @@ Options:
   --image-converter <exe>  Forward a different texconv executable
   --decoder <dir>          Use a different decoder checkout
   --discover-id <id>       Forward a focused visual discovery id, repeatable
-  --no-discover             Do not scan patch PAK indexes for new visual paths
+  --no-discover             Do not scan installed PAK indexes for new visual paths
   --no-convert             Do not convert TEX files to PNG
   --no-clean               Keep files that are no longer selected
   --keep-work              Keep temporary per-PAK extraction directories
