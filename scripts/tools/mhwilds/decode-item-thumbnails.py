@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Decode Wilds item-thumbnail TEX files that use DirectStorage GDeflate.
+"""Decode Wilds UI-thumbnail TEX files that use DirectStorage GDeflate.
 
 REToolCustom can convert the game's monster report textures, but its TEX path
 does not understand the GDeflate-wrapped UI thumbnails. This helper uses the
@@ -118,7 +118,7 @@ def decode_texture(path: Path, dll: ctypes.WinDLL) -> None:
     stream_id, stream_magic, tile_count = struct.unpack_from("<BBH", data, stream)
     if stream_id != 4 or stream_magic != 0xFB or tile_count != 1:
         raise RuntimeError(
-            f"Unsupported item GDeflate stream in {path}: "
+            f"Unsupported UI-thumbnail GDeflate stream in {path}: "
             f"id={stream_id}, magic={stream_magic:#x}, tiles={tile_count}"
         )
     stream_header_size = 8 + 4 * tile_count
@@ -168,12 +168,35 @@ def main() -> None:
     files = sorted(
         args.root.glob(
             "natives/stm/gui/ui_texture/tex080000/tex_thumbnail/item/it??/"
-            "tex_it????_????_imlm4.tex.*"
+            "tex_it*_imlm4.tex.*"
         )
     )
+    files.extend(
+        args.root.glob(
+            "natives/stm/gui/ui_texture/tex080000/tex_thumbnail/character/ch02/"
+            "tex_ch02_00_*_*_*_imlm4.tex.*"
+        )
+    )
+    files.extend(
+        args.root.glob(
+            "natives/stm/gui/ui_texture/tex080000/tex_thumbnail/character/ch03/"
+            "tex_ch03_00_*_*_*_imlm4.tex.*"
+        )
+    )
+    # Wilds also ships a three-variant character thumbnail family.  These are
+    # not the five armor slots used by the gear builder, but they use the same
+    # GDeflate/BC7 container and must remain decodable when an update adds one
+    # to the selected extraction set.
+    files.extend(
+        args.root.glob(
+            "natives/stm/gui/ui_texture/tex080000/tex_thumbnail/character/ch05/"
+            "tex_ch05_*_*_imlm4.tex.*"
+        )
+    )
+    files = sorted(set(files))
     for path in files:
         decode_texture(path, dll)
-    print(f"[mhwilds-item-thumbnails] decoded={len(files)}")
+    print(f"[mhwilds-ui-thumbnails] decoded={len(files)}")
 
 
 if __name__ == "__main__":

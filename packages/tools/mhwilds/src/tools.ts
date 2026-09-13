@@ -2,11 +2,11 @@
  * This package's registry manifests. Hosts render their tool listings from
  * these; nothing host-shaped (routes aside) appears here.
  *
- * Three separate entries rather than one "MH Wilds" tile with internal tabs:
+ * Separate entries rather than one "MH Wilds" tile with internal tabs:
  * each is a destination in its own right, the same way tools-minecraft
  * registers compat and viewer separately.
  *
- * All three components are `lazy` so a host's Tools hub can list them without
+ * All components are `lazy` so a host's Tools hub can list them without
  * pulling the planner's calculation code or the bestiary's data into its
  * initial chunk.
  */
@@ -16,10 +16,10 @@ import type { ToolManifest } from "@boffmedia/tool-kit";
 
 import { MHWILDS_NS } from "./i18n";
 
-/** Every screen loads its game data from the API, hence `api` on all three. */
+/** Every screen loads its game data from the API, hence `api` on all screens. */
 const CAPABILITIES: ToolManifest["requiredCapabilities"] = ["api"];
 
-/** All three grow with their content and are scrolled by the host: page scroll
+/** All screens grow with their content and are scrolled by the host: page scroll
  *  on the web, the Tools scrollport in the launcher. */
 const LAYOUT: ToolManifest["layout"] = "document";
 
@@ -35,6 +35,7 @@ export const mhwildsPlannerTool: ToolManifest = {
   route: "/mhwilds/builds/planner",
   requiredCapabilities: CAPABILITIES,
   layout: LAYOUT,
+  dataPack: { id: "mhwilds" },
   component: lazy(() =>
     import("./planner/_components/PlannerView").then((m) => ({ default: m.PlannerView })),
   ),
@@ -50,6 +51,7 @@ export const mhwildsTreeTool: ToolManifest = {
   route: "/mhwilds/tree",
   requiredCapabilities: CAPABILITIES,
   layout: LAYOUT,
+  dataPack: { id: "mhwilds" },
   component: lazy(() =>
     import("./tree/WeaponTreeView").then((m) => ({ default: m.WeaponTreeView })),
   ),
@@ -71,8 +73,42 @@ export const mhwildsBestiaryTool: ToolManifest = {
   ),
 };
 
+export const mhwildsArmorTool: ToolManifest = {
+  id: "mhwilds.armor",
+  domain: "mhwilds",
+  titleKey: `${MHWILDS_NS}.manifest.armor.name`,
+  descriptionKey: `${MHWILDS_NS}.manifest.armor.description`,
+  categoryKey: `${MHWILDS_NS}.manifest.armor.category`,
+  icon: "shield",
+  route: "/mhwilds/armor",
+  requiredCapabilities: CAPABILITIES,
+  layout: LAYOUT,
+  dataPack: { id: "mhwilds" },
+  component: lazy(() =>
+    import("./armor/ArmorCatalogView").then((m) => ({ default: m.ArmorCatalogView })),
+  ),
+};
+
+export const mhwildsWishlistTool: ToolManifest = {
+  id: "mhwilds.wishlist",
+  domain: "mhwilds",
+  titleKey: `${MHWILDS_NS}.manifest.wishlist.name`,
+  descriptionKey: `${MHWILDS_NS}.manifest.wishlist.description`,
+  categoryKey: `${MHWILDS_NS}.manifest.wishlist.category`,
+  icon: "list",
+  route: "/mhwilds/wishlist",
+  requiredCapabilities: CAPABILITIES,
+  layout: LAYOUT,
+  dataPack: { id: "mhwilds" },
+  component: lazy(() =>
+    import("./planner/_components/WishlistView").then((m) => ({ default: m.WishlistView })),
+  ),
+};
+
 export const mhwildsTools: ToolManifest[] = [
   mhwildsPlannerTool,
+  mhwildsWishlistTool,
   mhwildsTreeTool,
   mhwildsBestiaryTool,
+  mhwildsArmorTool,
 ];

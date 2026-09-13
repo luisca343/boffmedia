@@ -138,17 +138,29 @@ describe('MhwildsDataService', () => {
 
   describe('createWeaponTree()', () => {
     it('returns cached tree when both cached entries exist', async () => {
-      const cachedTree = [{ id: 1, name: 'Iron Sword', children: [] }];
+      const cachedTree = [
+        {
+          id: 1,
+          gameId: 1,
+          pathKey: '1',
+          assetKey: 'sword-and-shield:1',
+          name: 'Iron Sword',
+          children: [],
+        },
+      ];
       const cachedTreeByKind = { 'sword-and-shield': cachedTree };
       mockRepo.getProcessedData
         .mockResolvedValueOnce(cachedTree)
         .mockResolvedValueOnce(cachedTreeByKind);
+      mockRepo.getWeapons.mockResolvedValue(
+        makeWeaponsResult([{ id: 1, kind: 'sword-and-shield' }]),
+      );
 
       const result = await service.createWeaponTree('en');
 
       expect(result.tree).toEqual(cachedTree);
       expect(result.weaponKinds).toContain('sword-and-shield');
-      expect(mockRepo.getWeapons).not.toHaveBeenCalled();
+      expect(mockRepo.getWeapons).toHaveBeenCalledWith('en');
     });
 
     it('builds and saves tree when cache is empty', async () => {
@@ -170,6 +182,76 @@ describe('MhwildsDataService', () => {
       expect(mockRepo.saveProcessedData).toHaveBeenCalledTimes(2);
       expect(result.totalWeapons).toBe(1);
       expect(result.weaponKinds).toContain('sword-and-shield');
+    });
+
+    it('rebuilds a shaped cache when the current catalog has another weapon', async () => {
+      const cachedTree = [
+        {
+          id: 1,
+          gameId: 1,
+          pathKey: '1',
+          assetKey: 'sword-and-shield:1',
+          name: 'Iron Sword',
+          children: [],
+        },
+      ];
+      mockRepo.getProcessedData
+        .mockResolvedValueOnce(cachedTree)
+        .mockResolvedValueOnce({ 'sword-and-shield': cachedTree });
+      mockRepo.getWeapons.mockResolvedValue(
+        makeWeaponsResult([
+          {
+            id: 1,
+            name: 'Iron Sword',
+            kind: 'sword-and-shield',
+            gameId: 1,
+            rarity: 1,
+            crafting: {
+              previous: null,
+              branches: [{ id: 2, name: 'Update Sword' }],
+            },
+          },
+          {
+            id: 2,
+            name: 'Update Sword',
+            kind: 'sword-and-shield',
+            gameId: 2,
+            rarity: 2,
+            crafting: { previous: { id: 1 }, branches: [] },
+          },
+        ]),
+      );
+
+      const result = await service.createWeaponTree('en');
+
+      expect(result.totalWeapons).toBe(2);
+      expect(result.tree[0].children[0].id).toBe(2);
+      expect(mockRepo.saveProcessedData).toHaveBeenCalledTimes(2);
+    });
+
+    it('links a child from previous when the parent omits its branch list', async () => {
+      mockRepo.getProcessedData.mockResolvedValue(null);
+      mockRepo.getWeapons.mockResolvedValue(
+        makeWeaponsResult([
+          {
+            id: 1,
+            name: 'Iron Sword',
+            kind: 'sword-and-shield',
+            crafting: { previous: null, branches: [] },
+          },
+          {
+            id: 2,
+            name: 'Update Sword',
+            kind: 'sword-and-shield',
+            crafting: { previous: { id: 1 }, branches: [] },
+          },
+        ]),
+      );
+
+      const result = await service.createWeaponTree('en');
+
+      expect(result.tree).toHaveLength(1);
+      expect(result.tree[0].children.map((node) => node.id)).toEqual([2]);
     });
 
     it('throws on error', async () => {

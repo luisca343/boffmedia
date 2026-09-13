@@ -10,10 +10,10 @@ import { Icon, type IconName } from "@boffmedia/ui"
 // (mh_favs_v1) isn't wired locally — MhFavStar toggles its own state. [deferred]
 
 const MH_TABS: { key: string; route: string; labelKey: string; icon: IconName }[] = [
-  { key: "monsters", route: "/herramientas/mhwilds/monsters", labelKey: "monsters", icon: "skull" },
-  { key: "armas", route: "/herramientas/mhwilds/armas", labelKey: "armas", icon: "sword" },
-  { key: "armor", route: "/herramientas/mhwilds/armor", labelKey: "armor", icon: "shield" },
-  { key: "planner", route: "/herramientas/mhwilds/builds/planner", labelKey: "planner", icon: "target" },
+  { key: "monsters", route: "/mhwilds/monsters", labelKey: "monsters", icon: "skull" },
+  { key: "armas", route: "/mhwilds/tree", labelKey: "armas", icon: "sword" },
+  { key: "armor", route: "/mhwilds/armor", labelKey: "armor", icon: "shield" },
+  { key: "planner", route: "/mhwilds/builds/planner", labelKey: "planner", icon: "target" },
   { key: "caza", route: "/herramientas/mhwilds/caza", labelKey: "caza", icon: "hammer" },
   { key: "dano", route: "/herramientas/mhwilds/dano", labelKey: "dano", icon: "crosshair" },
 ]
@@ -22,7 +22,7 @@ export function MhToolTabs({ go, active, onOpenFavs, favCount = 0 }: { go?: (rou
   const t = useTranslations("tools.mhwilds.shell")
   return (
     <div className="flex min-h-[2.875rem] items-stretch gap-1 border-b border-solid border-line bg-base-2 px-[clamp(0.625rem,2vw,1.5rem)]" role="tablist" aria-label={t("ariaLabel")}>
-      <button type="button" title={t("back")} onClick={() => go && go("/herramientas/mhwilds")} className="group mr-1.5 flex items-center gap-[0.5625rem] border-0 border-r border-solid border-line bg-transparent pr-4 cursor-pointer">
+      <button type="button" title={t("back")} onClick={() => go && go("/mhwilds")} className="group mr-1.5 flex items-center gap-[0.5625rem] border-0 border-r border-solid border-line bg-transparent pr-4 cursor-pointer">
         <span className="grid h-[1.625rem] w-[1.625rem] flex-none place-items-center border border-solid border-[color:var(--mh-line)] bg-[var(--mh-soft)] text-[color:var(--mh-bright)] cut-notch cut-edge-notch [--cut-e:6px] [--cut-line:var(--mh-line)]">
           <Icon name="skull" size={15} />
         </span>

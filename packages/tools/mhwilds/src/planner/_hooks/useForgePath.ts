@@ -1,86 +1,124 @@
-import { useEffect, useMemo, useState } from "react"
-import { useLocale } from "../../i18n"
-import { MhWildsService } from "../../service"
+import { useEffect, useMemo, useState } from "react";
+import { useLocale } from "../../i18n";
+import { MhWildsService } from "../../service";
+import type { Weapon, WeaponTreeData } from "../../types";
+import {
+  findWeaponPaths,
+  pathStepMaterials,
+  weaponTreeRoots,
+  type WeaponPath,
+} from "../_utils/weapon-paths";
 
-interface ForgeMat {
-  item: { id: string | number; name: string; rarity?: number }
-  quantity: number
-}
-interface WeaponTree {
-  tree: any[]
-  treeByKind: Record<string, any[]>
-}
-
-// Ancestor chain [root … node] for the weapon, or null if not found.
-function findPath(roots: any[], id: string): any[] | null {
-  for (const root of roots) {
-    const stack: any[] = []
-    const dfs = (n: any): any[] | null => {
-      stack.push(n)
-      if (String(n.id) === id) return [...stack]
-      for (const c of n.children || []) {
-        const r = dfs(c)
-        if (r) return r
-      }
-      stack.pop()
-      return null
-    }
-    const r = dfs(root)
-    if (r) return r
-  }
-  return null
+export interface ForgePath extends WeaponPath {
+  materials: any[];
+  steps: number;
+  zenny: number;
 }
 
-function stepMats(node: any, hasParent: boolean): ForgeMat[] {
-  return (hasParent ? node.upgradeMaterials : node.craftingMaterials) || node.craftingMaterials || []
+const treePromises = new Map<string, Promise<WeaponTreeData | null>>();
+
+function loadTree(locale: string): Promise<WeaponTreeData | null> {
+  const cached = treePromises.get(locale);
+  if (cached) return cached;
+
+  const promise = MhWildsService.getWeaponTree<WeaponTreeData>(locale)
+    .then((response) => (response.success ? response.data || null : null))
+    .catch(() => null);
+  treePromises.set(locale, promise);
+  return promise;
 }
 
-/**
- * Cumulative forge cost for a weapon across its FULL upgrade path (root → equipped),
- * derived from the real weapon-tree API. Fetches the tree lazily (once, only when a
- * weapon is set) and aggregates crafting + upgrade materials + zenny per step.
- */
-export function useForgePath(weaponId: string | null, weaponKind?: string) {
-  const locale = useLocale()
-  const [tree, setTree] = useState<WeaponTree | null>(null)
-  const [loading, setLoading] = useState(false)
+/** Returns every possible forge route for the requested weapon. */
+export function useForgePaths(weaponId: string | null, weaponKind?: string) {
+  const locale = useLocale();
+  const [tree, setTree] = useState<WeaponTreeData | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (!weaponId || tree) return
-    let cancelled = false
-    setLoading(true)
-    MhWildsService.getWeaponTree(locale)
-      .then((r) => {
-        if (!cancelled) setTree((r.data as WeaponTree) ?? null)
+    if (!weaponId || tree) return;
+    let cancelled = false;
+    setLoading(true);
+    loadTree(locale)
+      .then((nextTree) => {
+        if (!cancelled) setTree(nextTree);
       })
       .finally(() => {
-        if (!cancelled) setLoading(false)
-      })
+        if (!cancelled) setLoading(false);
+      });
     return () => {
-      cancelled = true
-    }
-  }, [weaponId, locale, tree])
+      cancelled = true;
+    };
+  }, [locale, tree, weaponId]);
 
-  const { materials, steps, zenny } = useMemo(() => {
-    if (!weaponId || !tree) return { materials: [] as ForgeMat[], steps: 0, zenny: 0 }
-    const roots = (weaponKind && tree.treeByKind?.[weaponKind]) || tree.tree
-    const path = findPath(roots, weaponId) || findPath(tree.tree, weaponId)
-    if (!path) return { materials: [] as ForgeMat[], steps: 0, zenny: 0 }
-    const agg = new Map<string, ForgeMat>()
-    let z = 0
-    path.forEach((node, i) => {
-      const hasParent = i > 0
-      z += (hasParent ? node.upgradeZennyCost : node.craftingZennyCost) || 0
-      stepMats(node, hasParent).forEach((m) => {
-        if (!m.item) return
-        const key = String(m.item.id)
-        const ex = agg.get(key)
-        if (ex) ex.quantity += m.quantity || 1
-        else agg.set(key, { item: m.item, quantity: m.quantity || 1 })
+  const paths = useMemo<ForgePath[]>(() => {
+    if (!weaponId || !tree) return [];
+    const roots = weaponTreeRoots(tree, weaponKind);
+    const rawPaths = findWeaponPaths(roots, weaponId);
+    // Old API trees do not have pathKey yet, but the route index still keeps
+    // every occurrence separate via the generated key.
+    return rawPaths.map((path) => ({
+      ...path,
+      ...pathStepMaterials(path),
+    }));
+  }, [tree, weaponId, weaponKind]);
+
+  return {
+    paths,
+    loading: !!weaponId && loading && !tree,
+  };
+}
+
+/** Loads one shared tree and resolves every wishlist weapon in one pass. */
+export function useForgePathsForWeapons(weapons: Weapon[]) {
+  const locale = useLocale();
+  const [tree, setTree] = useState<WeaponTreeData | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!weapons.length || tree) return;
+    let cancelled = false;
+    setLoading(true);
+    loadTree(locale)
+      .then((nextTree) => {
+        if (!cancelled) setTree(nextTree);
       })
-    })
-    return { materials: Array.from(agg.values()), steps: path.length, zenny: z }
-  }, [weaponId, tree, weaponKind])
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [locale, tree, weapons.length]);
 
-  return { materials, steps, zenny, loading: !!weaponId && loading && !tree }
+  const paths = useMemo(() => {
+    if (!tree) return weapons.map(() => [] as ForgePath[]);
+    return weapons.map((weapon) => {
+      const rawPaths = findWeaponPaths(
+        weaponTreeRoots(tree, weapon.kind),
+        String(weapon.id),
+      );
+      return rawPaths.map((path) => ({
+        ...path,
+        ...pathStepMaterials(path),
+      }));
+    });
+  }, [tree, weapons]);
+
+  return {
+    paths,
+    loading: weapons.length > 0 && loading && !tree,
+  };
+}
+
+/** Backward-compatible first-route view for small consumers. */
+export function useForgePath(weaponId: string | null, weaponKind?: string) {
+  const result = useForgePaths(weaponId, weaponKind);
+  const first = result.paths[0];
+  return {
+    materials: first?.materials || [],
+    steps: first?.steps || 0,
+    zenny: first?.zenny || 0,
+    paths: result.paths,
+    loading: result.loading,
+  };
 }

@@ -8,7 +8,8 @@ import {
   MhDrawer, MhItem, MhRarity, MhTag, MhSlotPips, MhTypeChip, MhSearch, MhLabel,
 } from "../../ui/mh-kit"
 import { WEAPON_TYPES, weaponAttack } from "../../ui/mh-helpers"
-import { getArmorImagePath, getCharmImagePath, getDecorationColorFilterStyle, getDecorationImagePath, getDecorationSlotImagePath, getRarityFilterStyle, getWeaponTypeIcon } from "./equipment-utils"
+import { getArmorImagePath, getCharmImagePath, getDecorationImagePath, getDecorationSlotImagePath, getWeaponTypeIcon } from "./equipment-utils"
+import { mhwildsArmorAsset, mhwildsWeaponAsset } from "../../bestiary/assets"
 import { getSavedBuilds, loadBuildFromLocalStorage, deleteBuildFromLocalStorage } from "../_utils/buildUtils"
 
 type Item = Weapon | ArmorPiece | Charm
@@ -93,13 +94,12 @@ export function EquipDrawer({
               : slot === "charm" ? <b className="text-txt">{t("rarity")} {item.rarity}</b>
               : <b className="text-txt">{t("def")} {(item as ArmorPiece).defense?.base}</b>
             const imageSrc = isWeaponSlot(slot)
-              ? getWeaponTypeIcon((item as Weapon).kind || (item as Weapon).type || "great-sword")
-              : slot === "charm" ? getCharmImagePath(item.rarity) : getArmorImagePath(slot)
-            const imageFilter = slot === "charm" ? undefined : getRarityFilterStyle(item.rarity)
+              ? (mhwildsWeaponAsset(item as Weapon) || getWeaponTypeIcon((item as Weapon).kind || (item as Weapon).type || "great-sword"))
+              : slot === "charm" ? getCharmImagePath(item.rarity) : (mhwildsArmorAsset(item as ArmorPiece) || getArmorImagePath(slot))
             const description = slot === "charm" ? String((item as Charm).description || "") : ""
             return (
               <MhItem key={item.id} active={active} onPick={() => onPick(item)}>
-                <span className="inline-flex items-center gap-2 flex-none">
+                <span className="inline-flex items-center gap-2 flex-none bg-base-deep">
                   <MhRarity rarity={item.rarity} />
                   {imageSrc ? (
                     <img
@@ -109,9 +109,17 @@ export function EquipDrawer({
                       width={32}
                       height={32}
                       draggable={false}
-                      className="h-8 w-8 object-contain"
-                      style={imageFilter ? { filter: imageFilter } : undefined}
-                    />
+                    className="h-8 w-8 object-contain"
+                    onError={(event) => {
+                      const fallback = isWeaponSlot(slot)
+                        ? getWeaponTypeIcon((item as Weapon).kind || (item as Weapon).type || "great-sword")
+                        : slot === "charm" ? getCharmImagePath(item.rarity) : getArmorImagePath(slot)
+                      if (event.currentTarget.src !== fallback) {
+                        event.currentTarget.onerror = null
+                        event.currentTarget.src = fallback
+                      }
+                    }}
+                  />
                   ) : null}
                 </span>
                 <span className="min-w-0">
@@ -179,14 +187,14 @@ export function DecoDrawer({
               <MhItem key={d.id} active={active} onPick={() => onPick(d)}>
                 <span className="w-9 h-9 grid place-items-center flex-none border border-[var(--mh-line)] bg-panel">
                   <img
-                    src={getDecorationImagePath(d.slot)}
+                    src={getDecorationImagePath(d.slot, d.icon?.color, d.icon?.colorId)}
                     alt=""
                     aria-hidden="true"
                     width={30}
                     height={30}
                     draggable={false}
                     className="h-[30px] w-[30px] object-contain"
-                    style={{ filter: getDecorationColorFilterStyle(d.icon?.color, d.icon?.colorId) }}
+                    style={undefined}
                   />
                 </span>
                 <span className="min-w-0">

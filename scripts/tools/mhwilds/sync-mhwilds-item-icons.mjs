@@ -31,6 +31,8 @@ const KIND_ALIASES = {
   certificate: "ticket",
   medulla: "monster-part",
   gem: "monster-part",
+  potion: "medicine",
+  curative: "medicine",
   powder: "sac",
   extract: "sac",
   phial: "bottle",
@@ -45,11 +47,52 @@ const KIND_ALIASES = {
   honey: "nectar",
   voucher: "ticket",
   "ammo-special": "slinger-ammo",
+  "ammo-basic": "slinger-ammo",
+  "ammo-slug": "slinger-ammo",
+  "ammo-utility": "slinger-ammo",
+  "ammo-heavy": "slinger-ammo",
   knife: "slinger-ammo",
   web: "spiderweb",
+  "capture-net": "spiderweb",
+  "camping-kit": "monster-part",
+  grill: "barrel",
+  "trap-tool": "trap",
+  poop: "monster-part",
+  nut: "seed",
+  "fishing-rod": "whetstone",
+  sprout: "seed",
+  "cooking-cheese": "meat-edible",
+  "cooking-mushroom": "mushroom-edible",
+  "cooking-shellfish": "fish-edible",
+  "cooking-egg": "egg",
+  "cooking-garlic": "herb",
   "mystery-material": "monster-part",
   "mystery-artian": "monster-part",
   "mystery-decoration": "decoration",
+  skull: "monster-part",
+  question: "monster-part",
+  unknown: "monster-part",
+};
+
+const COLOR_ALIASES = {
+  gray: "grey",
+  vermilion: "orange",
+  ivory: "light-brown",
+  rose: "pink",
+  sky: "deep-teal",
+  emerald: "teal",
+  lemon: "gold",
+  "sage-green": "light-green",
+  "moss-green": "dark-green",
+  ultramarine: "dark-blue",
+  "blue-purple": "purple",
+  none: "white",
+};
+
+// Bottle art is only available for the five exact game glyphs. Other bottle
+// colours use the complete medicine family, matching the runtime resolver.
+const PARTIAL_ICON_KIND_COLORS = {
+  bottle: new Set(["pink", "purple", "red", "white", "yellow"]),
 };
 
 // These cover the Wilds item enum plus the generic aliases above. The tree
@@ -160,7 +203,7 @@ function parseArgs(argv) {
 }
 
 function slug(value) {
-  return value
+  return String(value ?? "")
     .trim()
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
@@ -222,6 +265,38 @@ function selectFiles(tree, kinds) {
     .sort((a, b) => a.filename.localeCompare(b.filename));
 }
 
+function readItemIconReferences() {
+  if (!fs.existsSync(ITEM_DATA)) return new Set();
+
+  const items = JSON.parse(fs.readFileSync(ITEM_DATA, "utf8"));
+  const references = new Set();
+  for (const item of Array.isArray(items) ? items : []) {
+    const rawKind = typeof item?.icon === "string" ? item.icon : item?.icon?.kind;
+    const rawColor = item?.icon_color ?? item?.icon?.color;
+    if (!rawKind || !rawColor) continue;
+
+    const kind = KIND_ALIASES[slug(rawKind)] ?? slug(rawKind);
+    const color = COLOR_ALIASES[slug(rawColor)] ?? slug(rawColor);
+    const availableColors = PARTIAL_ICON_KIND_COLORS[kind];
+    const resolvedKind =
+      availableColors && !availableColors.has(color) ? "medicine" : kind;
+    references.add(`${resolvedKind}|${color}`);
+  }
+  return references;
+}
+
+function auditIconCoverage(files) {
+  const available = new Set(files.map((file) => `${file.kind}|${file.color}`));
+  const references = readItemIconReferences();
+  const missing = [...references].filter((reference) => !available.has(reference));
+  if (missing.length) {
+    throw new Error(
+      `No upstream glyph for ${missing.length} item icon reference(s): ${missing.join(", ")}`,
+    );
+  }
+  return { references: references.size, missing: missing.length };
+}
+
 async function downloadFiles(files, output) {
   fs.mkdirSync(output, { recursive: true });
   let completed = 0;
@@ -247,8 +322,12 @@ try {
   const kinds = requestedKinds();
   const tree = await getTree();
   const files = selectFiles(tree.tree, kinds);
+  const iconCoverage = auditIconCoverage(files);
   console.log(
     `[sync-mhwilds-item-icons] matching=${files.length} kinds=${kinds.size} tree=${tree.sha}`,
+  );
+  console.log(
+    `[sync-mhwilds-item-icons] icon-coverage=refs:${iconCoverage.references} missing:${iconCoverage.missing}`,
   );
   if (args.dryRun) {
     for (const file of files) console.log(`  ${file.filename}`);

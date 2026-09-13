@@ -4,7 +4,8 @@ import { useToolT } from "../../i18n"
 import { Button } from "@boffmedia/ui"
 import { BuildData, EquipmentType, Weapon } from "../../types"
 import { MhSlot, MhDecoSocket, MhRing } from "../../ui/mh-kit"
-import { getArmorImagePath, getCharmImagePath, getDecorationColorFilterStyle, getDecorationImagePath, getDecorationSlotImagePath, getRarityFilterStyle, getWeaponTypeIcon } from "./equipment-utils"
+import { getArmorImagePath, getCharmImagePath, getDecorationImagePath, getDecorationSlotImagePath, getWeaponTypeIcon } from "./equipment-utils"
+import { mhwildsArmorAsset, mhwildsWeaponAsset } from "../../bestiary/assets"
 import type { SlotDef } from "./PlannerView"
 
 export function Loadout({
@@ -49,12 +50,15 @@ export function Loadout({
         const item: any = build[s.key]
         const slotSizes: number[] = item?.slots || []
         const isWeaponSlot = s.key === "weapon" || s.key === "secondaryWeapon"
+        const armorFallback = !isWeaponSlot && s.key !== "charm" ? getArmorImagePath(s.key) : undefined
+        const weaponFallback = isWeaponSlot
+          ? getWeaponTypeIcon((item as Weapon | null)?.kind || (item as Weapon | null)?.type || "great-sword")
+          : undefined
         const imageSrc = s.key === "charm"
           ? getCharmImagePath(item?.rarity)
           : isWeaponSlot
-            ? getWeaponTypeIcon((item as Weapon | null)?.kind || (item as Weapon | null)?.type || "great-sword")
-            : getArmorImagePath(s.key)
-        const imageFilter = s.key === "charm" ? undefined : getRarityFilterStyle(item?.rarity ?? 0)
+            ? (mhwildsWeaponAsset(item as Weapon | null) || weaponFallback)
+            : (mhwildsArmorAsset(item as any) || armorFallback)
         return (
           <div key={s.key}>
             <div className={s.key === "secondaryWeapon" && (build.weapon || build.secondaryWeapon) ? "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-1" : undefined}>
@@ -62,7 +66,7 @@ export function Loadout({
                 icon={s.icon}
                 imageSrc={imageSrc}
                 imageAlt={item ? t(s.labelKey) : undefined}
-                imageFilter={imageFilter}
+                fallbackImageSrc={armorFallback || weaponFallback}
                 kind={t(s.labelKey)}
                 name={item ? item.name : t("build_planner.no_equipment", { name: t(s.labelKey) })}
                 rarity={item?.rarity}
@@ -88,8 +92,7 @@ export function Loadout({
                       decoName={deco?.name}
                       decoSlot={deco?.slot}
                       slotImageSrc={getDecorationSlotImagePath(size, isWeaponSlot ? "weapon" : "armor")}
-                      decoImageSrc={deco ? getDecorationImagePath(deco.slot) : undefined}
-                      decoImageFilter={deco ? getDecorationColorFilterStyle(deco.icon?.color, deco.icon?.colorId) : undefined}
+                      decoImageSrc={deco ? getDecorationImagePath(deco.slot, deco.icon?.color, deco.icon?.colorId) : undefined}
                       onOpen={() => onOpenDeco(s.key, idx, size)}
                       onClear={() => onClearDeco(s.key, idx)}
                     />

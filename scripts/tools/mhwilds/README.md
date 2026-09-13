@@ -18,6 +18,8 @@ The pipeline reads a local Steam installation and writes three layers:
      protocol.
    - Contains only normalized/provenance JSON and PNGs needed by the bestiary.
    - The version manifest is at `public/boffmedia/tools/mhwilds/manifest.json`.
+   - `en/armor-sets.json` and `es/armor-sets.json` are the small checked-out
+     API-id to game-id crosswalk used for offline armor joins.
 3. `laboon/tool-sources/mhwilds/mhdb-wilds-data/`
    - Ignored local RE_RSZ-compatible decoder checkout, copied inputs, and
      temporary decoded JSON.
@@ -43,6 +45,16 @@ machine. They are intentionally ignored and must not be committed:
 - Decoder layout: `laboon/tool-sources/mhwilds/mhdb-wilds-data/rszmhwilds.json`
 - Built parser: `tools/extractor/target/release/extractor.exe` inside the
   decoder checkout.
+
+The parser must be built with `rsz` **0.2.2 or newer**. Version 0.2.1 has an
+interned-string reader bug that truncates `PlayerArmorList` and silently loses
+armor package rows. In the decoder checkout, update the dependency and rebuild
+the extractor before decoding:
+
+```powershell
+cargo update -p rsz --precise 0.2.2
+cargo build --release --bin extractor
+```
 
 If the game is installed elsewhere, pass `--game` to the extraction command.
 If the decoder is rebuilt or moved, pass `--decoder` to the decode command.
@@ -161,6 +173,7 @@ For a different Steam location:
 ```powershell
 pnpm.cmd extract:mhwilds-assets -- --game "D:\Games\Monster Hunter Wilds" --convert --clean
 pnpm.cmd decode:mhwilds-bestiary
+pnpm.cmd sync:mhwilds-armor-identities
 pnpm.cmd build:mhwilds-assets -- --clean
 pnpm.cmd pack:tool-assets mhwilds
 ```
@@ -178,7 +191,25 @@ The package builds root-relative paths through its asset helper:
 /boffmedia/tools/mhwilds/bestiary/natives/.../tex_emicon_*.png
 /boffmedia/tools/mhwilds/bestiary/natives/.../tex_emanatomy_*.png
 /boffmedia/tools/mhwilds/bestiary/item-icons/<kind>-<color>.svg
+/boffmedia/tools/mhwilds/bestiary/gear/weapons/<kind>/<weapon-slug>.png
+/boffmedia/tools/mhwilds/bestiary/gear/armor/<armor-set-slug>/<slot>.png
+/boffmedia/tools/mhwilds/bestiary/gear/armor/<armor-set-slug>/preview.png
+/boffmedia/tools/mhwilds/bestiary/gear/manifest.json
 ```
+
+Armor and weapon filenames are deterministic English canonical-name slugs:
+lowercase kebab-case, accents removed, and `α`/`β`/`γ` written as
+`alpha`/`beta`/`gamma`. Duplicate weapon names receive a `-variant-01`
+suffix. The manifest still joins every asset by stable game id; paths are
+presentation names and must never be used as data identity keys. The published
+gear PNGs retain the game's foreground alpha mask, which removes the UI
+backdrop while preserving the equipment cutout. During publication, the
+builder re-encodes them as RGBA PNGs without the DirectXTex `gAMA=100000`
+metadata found in the game files. Chromium interprets that invalid gamma value
+as a very bright image when transparency is present, which is why a direct
+copy looks washed out in the browser. Do not flatten these images: the browser
+must composite them over the tool's image well so the gray game thumbnail
+backdrop is not baked into the published asset.
 
 The game supplies two relevant bestiary visuals. `tex_emicon` is the coloured
 monster illustration used for list/header identity. `tex_emanatomy` is the
@@ -247,19 +278,109 @@ coordinate page when that invariant fails.
 The item thumbnail family under `tex_thumbnail/item` is not a material-icon
 family. It contains equipment/weapon renders. In the game's item data,
 `icon.id` is an enum (`47` means the Tail icon kind), not the `0047` part of a
-texture filename. The extractor keeps this family under `itemThumbnails` for
-audits and future gear UI, but the bestiary must not use it for reward rows.
+texture filename. The extractor keeps the complete family under
+`itemThumbnails` for audits and publishes only catalogued weapon renders under
+`bestiary/gear/weapons/<kind>/<weapon-slug>.png`. Uncatalogued auxiliary
+rasters stay in the ignored extraction workspace rather than becoming random
+public filenames. The stable `kind` + `gameId` mapping is recorded in
+`gear/manifest.json`, alongside the readable path. If the installed game has no
+distinct raster for a title-update variant, the manifest records the real
+neighboring/predecessor render used for that variant; the UI never needs to
+know about the archive filename. These thumbnails are used for weapon
+identity, never as material icons in reward rows.
+
+Drop and crafting items use a separate generated catalogue at
+`bestiary/items/manifest.json`. It is keyed by the stable `Item.json`
+`game_id`, and each entry receives a readable English slug for diagnostics and
+future item-specific artwork. The current asset points at the shared semantic
+glyph under `item-icons/` instead of copying the same SVG into every item
+directory. The manifest records `assetSource: semantic-glyph` so a later
+game-owned or curated per-item raster can replace that entry without changing
+the drop, crafting, or decoration consumers. The complete item catalogue is
+published rather than only current monster rewards because the same items are
+reused across those features.
+
+Weapon classification uses the complete `tex_it####` stem, not only the
+archive folder: `it10` also contains the `tex_it1003` kinsect family beside
+`tex_it1000` insect glaives. The builder asserts that no two source files can
+write the same runtime path, so auxiliary item atlases cannot overwrite a
+weapon render.
+
+The current Wilds file list exposes paired GDeflate-wrapped `character/ch02`
+and `character/ch03` thumbnail families for armor previews. The decoder also
+reads `ArmorSeriesData` and every `PlayerArmorList` catalog package (including
+title-update catalogs such as `02_00`, `03_00`, `04_00`, and later revisions such
+as `04_10`). The extractor probes that catalog naming space across every
+installed PAK, so a lagging release list cannot omit a newly shipped table. The latter
+is the authoritative model/slot join: a filename that happens to share a model
+number is never assigned to a different armor slot. In a path such as
+`tex_ch02_00_028_1_0_imlm4`, the first numeric component after the model id is
+the visual style (`0` base, `1` alternate, `2` gamma when shipped), while the
+final component is the thumbnail slot (`0` head, `1` chest, `2` arms, `3`
+waist, `4` legs). Package sub-ids such as `300`/`500` are normalized to the
+same visual style before the join.
+
+`ArmorSeriesData._ModId` is the wearable prefab/package model, not the
+character thumbnail model. Those ids live in separate game namespaces. The
+checked-in `armor-thumbnail-map.json` is the explicit
+`ArmorSeriesData._Index -> tex_ch02/ch03 model` crosswalk used by the builder;
+there is deliberately no arithmetic fallback. If a new series is absent from
+that table, the build leaves it unavailable and reports
+`no-thumbnail-crosswalk` instead of borrowing a neighboring set's raster.
+
+Special/collaboration armor can use a second visual namespace. The extractor
+keeps `PlayerArmorVisualSetting*.user.3` and the decoder writes the decoded
+tables under `output/user/gear/visual/`; the builder applies the reviewed
+`armor-visual-overrides.json` table only for those explicit joins. For example,
+ArmorID `70` (Akuma) is rendered from thumbnail model `207` via visual parts
+`151`, while its catalog/model identity remains `70`. The generated manifest
+records both ids and the visual-setting provenance, so a numeric collision can
+never silently select another armor set.
+
+The API's `armorSet.id` is a mutable database id; `armorSet.gameId` is the
+stable identifier from the game files and is the only id used for long-lived
+asset joins. The API service enriches armor stubs from `/armor/sets` (or the
+generated local crosswalk when offline) before the web client resolves
+`gear/armor/<armor-set-slug>/<slot>.png`; the generated manifest retains the database
+id only as `apiSetId` for diagnostics. A client with only the mutable id fails
+closed and renders the semantic slot fallback instead of probing another set's
+URL.
+
+The game does not ship a raster for every named piece. When its thumbnail table
+has no matching family/model/style/slot, the builder leaves that slot absent in
+`gear/manifest.json` rather than displaying a valid image from the wrong slot.
+The numeric suffix is only interpreted for the standard armor namespace;
+special namespaces must have an explicit package/visual join. The manifest
+records `unavailableReason`, including `no-thumbnail-crosswalk`,
+`no-extracted-thumbnail`, and `thumbnail-package-slot-mismatch`, so missing
+source data is distinguishable from a rejected semantic join.
+The web tool falls back to the category glyph in that case, so entries such as
+the Alloy and Artian helmets remain searchable and usable without a broken
+image. `availableSlots`, `missingSlots`, `packageSlots`, and `visualJoin` make
+the distinction auditable after every update. Other character-thumbnail
+families are not armor previews and are intentionally excluded; full 3D
+extraction/rendering is outside this phase.
 
 The current Wilds file list does not expose a standalone raster atlas for the
 generic material glyphs. The app therefore uses the game's semantic
 `item.icon.kind` and `item.icon.color`, mapped to the generic fifth-generation
 glyph set in `item-icons/`. Those SVGs are a documented CC BY-SA fallback from
 the community `zukan-assets` project; they are not presented as Capcom game
-assets. Run the sync command once when setting up the workspace:
+assets. Generic `skull`, `question`, and `unknown` enum values are intentionally
+mapped to the colored `monster-part` family because the glyph source has no
+dedicated files for them. Tool-specific enum values without a source glyph
+(`ammo-*`, `capture-net`, cooking ingredients, and similar) are mapped to the
+closest complete 19-colour family, so every catalog item still has a colored
+fallback. Run the sync command once when setting up the workspace:
 
 ```powershell
 pnpm.cmd sync:mhwilds-item-icons
 ```
+
+The sync step audits every distinct raw `Item.json` icon/colour reference
+after applying the same aliases used by the web resolver. It fails before
+downloading if a new game enum has no complete coloured glyph mapping, so a
+title update cannot quietly introduce broken reward icons.
 
 When updating the game assets, keep `--convert` enabled so the `.tex` source
 becomes a browser-friendly PNG, refresh the semantic item glyphs if needed,
@@ -268,6 +389,7 @@ then rebuild the publishable tree:
 ```powershell
 pnpm.cmd extract:mhwilds-assets -- --convert
 pnpm.cmd sync:mhwilds-item-icons
+pnpm.cmd sync:mhwilds-armor-identities
 pnpm.cmd build:mhwilds-assets -- --clean
 ```
 

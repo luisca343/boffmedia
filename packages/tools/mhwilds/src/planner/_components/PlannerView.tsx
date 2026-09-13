@@ -53,7 +53,6 @@ export function PlannerView() {
     currentBuild, setCurrentBuild, buildWithFullObjects,
     handleSwapWeapons, handleReset,
   } = useBuildState({ getWeaponById, getArmorById, getDecorationById, getCharmById })
-
   const [drawer, setDrawer] = useState<Drawer>(null)
   const [mode, setMode] = useState<"build" | "compare">("build")
   const [targetMon, setTargetMon] = useState<MhMonster | null>(null)
@@ -62,6 +61,30 @@ export function PlannerView() {
   useEffect(() => {
     const imported = importBuildFromUrl(t("build_planner.defaultBuildName"))
     if (imported) setCurrentBuild(imported)
+  }, [setCurrentBuild])
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("mhw-pending-armor")
+      if (!raw) return
+      const pending = JSON.parse(raw) as Partial<{
+        headId: string | null
+        chestId: string | null
+        armsId: string | null
+        waistId: string | null
+        legsId: string | null
+      }>
+      localStorage.removeItem("mhw-pending-armor")
+      setCurrentBuild((current) => ({
+        ...current,
+        weaponId: null,
+        secondaryWeaponId: null,
+        ...pending,
+        decorations: [],
+      }))
+    } catch {
+      /* Ignore a stale handoff and leave the planner usable. */
+    }
   }, [setCurrentBuild])
 
   const stats = useMemo(() => calculateStats(buildWithFullObjects), [buildWithFullObjects])
@@ -182,7 +205,16 @@ export function PlannerView() {
                   onClear={() => setTargetMon(null)}
                   onEquipWeapon={(id) => equip("weapon", getWeaponById(id))}
                 />
-                <Summary stats={stats} skills={skills} skillsData={skillsData} weapon={wp} />
+                <Summary
+                  stats={stats}
+                  skills={skills}
+                  skillsData={skillsData}
+                  weapon={wp}
+                  weapons={[wp, buildWithFullObjects.secondaryWeapon]}
+                  armor={[buildWithFullObjects.head, buildWithFullObjects.chest, buildWithFullObjects.arms, buildWithFullObjects.waist, buildWithFullObjects.legs]}
+                  charm={buildWithFullObjects.charm}
+                  decorations={buildWithFullObjects.decorations.map((assignment) => assignment.decoration)}
+                />
               </div>
             </div>
           )}

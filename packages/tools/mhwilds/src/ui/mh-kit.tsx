@@ -5,9 +5,11 @@ import { useToolOnline } from "@boffmedia/tool-kit"
 import { MHWILDS_NS, useToolT } from "../i18n"
 import { Empty, Icon, IconButton, SearchInput, ToolSeal, ToolStrip, type IconName } from "@boffmedia/ui"
 import {
-  MH_VARS, rarClamp, rarVar, rarInk, elementColor, SK_COLOR, skillCategory,
+  MH_VARS, rarClamp, rarVar, elementColor, SK_COLOR, skillCategory,
   SHARP_ORDER, RES_ORDER,
 } from "./mh-helpers"
+import { useMhwildsItemAsset, MhwildsItemAssetProvider } from "../bestiary/item-assets"
+import type { MhwildsItemAssetReference } from "../bestiary/assets"
 
 // ── app chassis (full-bleed inside the host's box) ───────────────────────────
 /**
@@ -27,12 +29,14 @@ import {
  */
 export function MhApp({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
-    <div
-      style={MH_VARS}
-      className={`flex flex-col min-w-0 min-h-[var(--tool-vh,100%)] bg-base text-txt relative ${className}`}
-    >
-      {children}
-    </div>
+    <MhwildsItemAssetProvider>
+      <div
+        style={MH_VARS}
+        className={`flex flex-col min-w-0 min-h-[var(--tool-vh,100%)] bg-base text-txt relative ${className}`}
+      >
+        {children}
+      </div>
+    </MhwildsItemAssetProvider>
   )
 }
 
@@ -136,12 +140,12 @@ export function MhLabel({ children, className = "" }: { children: React.ReactNod
   return <div className={`font-mono text-[0.625rem] leading-none uppercase tracking-[0.08em] text-txt-dim mb-[0.4375rem] ${className}`}>{children}</div>
 }
 
-// ── rarity chip ───────────────────────────────────────────────────────────────
+// ── rarity label ──────────────────────────────────────────────────────────────
 export function MhRarity({ rarity, long }: { rarity?: number; long?: boolean }) {
   return (
     <span
-      className="font-mono text-[0.625rem] leading-none font-bold tracking-[0.04em] px-1.5 py-1 flex-none"
-      style={{ background: rarVar(rarity), color: rarInk(rarity) }}
+      className="font-mono text-[0.625rem] leading-none font-bold tracking-[0.04em] flex-none"
+      style={{ color: rarVar(rarity) }}
     >
       {long ? `R${rarClamp(rarity)}` : `R${rarClamp(rarity)}`}
     </span>
@@ -262,12 +266,13 @@ export function MhCatLegend({ labels }: { labels: Record<string, string> }) {
 
 // ── equipment slot (loadout) ─────────────────────────────────────────────────
 export function MhSlot({
-  icon, imageSrc, imageAlt, imageFilter, kind, name, rarity, filled, active, onOpen,
+  icon, imageSrc, imageAlt, imageFilter, fallbackImageSrc, kind, name, rarity, filled, active, onOpen,
 }: {
   icon: IconName
   imageSrc?: string
   imageAlt?: string
   imageFilter?: string
+  fallbackImageSrc?: string
   kind: string
   name: string
   rarity?: number
@@ -275,6 +280,11 @@ export function MhSlot({
   active: boolean
   onOpen: () => void
 }) {
+  const [imageFailed, setImageFailed] = React.useState(false)
+  React.useEffect(() => setImageFailed(false), [imageSrc])
+  const resolvedImageSrc = imageFailed && fallbackImageSrc && fallbackImageSrc !== imageSrc
+    ? fallbackImageSrc
+    : imageSrc
   return (
     <button
       type="button"
@@ -282,10 +292,10 @@ export function MhSlot({
       className={`group relative grid min-w-0 grid-cols-[2.75rem_minmax(0,1fr)_auto] items-center gap-3 w-full text-left py-[0.6875rem] px-[0.8125rem] bg-panel border cursor-pointer transition-colors hover:bg-panel-2 ${active ? "border-[var(--mh)] shadow-[0_0_0_1px_var(--mh)]" : "border-line hover:border-line-2"}`}
     >
       <span className={`absolute left-0 top-0 bottom-0 w-[3px] bg-[var(--mh)] transition-opacity ${filled ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`} />
-      <span className={`w-11 h-11 grid place-items-center flex-none border ${filled ? "text-[var(--mh-bright)] border-[var(--mh-line)] bg-[var(--mh-soft)]" : "text-txt-dim border-line bg-panel-2"}`}>
-        {imageSrc ? (
+      <span className={`w-11 h-11 grid place-items-center flex-none border ${filled ? "text-[var(--mh-bright)] border-[var(--mh-line)] bg-base-deep" : "text-txt-dim border-line bg-panel-2"}`}>
+        {resolvedImageSrc ? (
           <img
-            src={imageSrc}
+            src={resolvedImageSrc}
             alt={imageAlt || ""}
             aria-hidden={!imageAlt}
             width={40}
@@ -293,6 +303,9 @@ export function MhSlot({
             draggable={false}
             className={`h-10 w-10 object-contain ${filled ? "" : "opacity-30"}`}
             style={imageFilter ? { filter: imageFilter } : undefined}
+            onError={() => {
+              if (fallbackImageSrc && fallbackImageSrc !== imageSrc) setImageFailed(true)
+            }}
           />
         ) : (
           <Icon name={icon} size={20} />
@@ -317,10 +330,13 @@ export function MhDecoSocket({
   const t = useToolT("tools.mhwilds.ui")
   const filled = !!decoName
   const partial = filled && decoSlot != null && decoSlot < size
+  const [decoImageFailed, setDecoImageFailed] = React.useState(false)
+  React.useEffect(() => setDecoImageFailed(false), [decoImageSrc])
+  const showDecorationImage = filled && !!decoImageSrc && !decoImageFailed
   return (
     <div className={`grid grid-cols-[1.375rem_1fr_auto] items-center gap-[0.5625rem] w-full py-[0.4375rem] px-2.5 bg-base-2 border border-line border-l-2 transition-colors hover:bg-panel ${partial ? "border-l-warn" : filled ? "border-l-[var(--mh)]" : "border-l-line-2 hover:border-l-[var(--mh)]"}`}>
       <button type="button" onClick={onOpen} aria-label={t("slotLevel", { size })} className="w-[1.375rem] h-[1.375rem] grid place-items-center flex-none font-mono text-[0.6875rem] leading-none font-bold text-[var(--mh-bright)]">
-        {filled && decoImageSrc ? (
+        {showDecorationImage ? (
           <img
             src={decoImageSrc}
             alt=""
@@ -330,6 +346,7 @@ export function MhDecoSocket({
             draggable={false}
             className="block h-5 w-5 object-contain"
             style={decoImageFilter ? { filter: decoImageFilter } : undefined}
+            onError={() => setDecoImageFailed(true)}
           />
         ) : (
           <img
@@ -386,12 +403,51 @@ export function MhSlotPips({ slots, imagePath }: { slots?: number[]; imagePath?:
 
 // ── material row (+ optional owned toggle) ───────────────────────────────────
 export function MhMaterial({
-  name, rarity, quantity, owned, onToggle,
-}: { name: string; rarity?: number; quantity: number; owned?: boolean; onToggle?: () => void }) {
+  name, rarity, quantity, owned, onToggle, item, assetVersion,
+}: {
+  name: string
+  rarity?: number
+  quantity: number
+  owned?: boolean
+  onToggle?: () => void
+  item?: MhwildsItemAssetReference | null
+  assetVersion?: string
+}) {
   const t = useToolT("tools.mhwilds.ui")
+  const imageSrc = useMhwildsItemAsset(item, assetVersion)
+  const [imageFailed, setImageFailed] = React.useState(false)
+
+  React.useEffect(() => setImageFailed(false), [imageSrc])
+
   return (
     <div className="grid grid-cols-[auto_1fr_auto] items-center gap-2.5 py-2 px-[0.6875rem] bg-base-2 border border-line">
-      <span className="w-3 h-3 flex-none rotate-45 border" style={{ borderColor: rarVar(rarity), background: rarClamp(rarity) >= 7 ? rarVar(rarity) : "transparent" }} />
+      <span
+        className="grid h-8 w-8 flex-none place-items-center overflow-hidden border bg-base-deep"
+        style={{ borderColor: rarVar(rarity) }}
+      >
+        {imageSrc && !imageFailed ? (
+          <img
+            src={imageSrc}
+            alt=""
+            aria-hidden="true"
+            width={32}
+            height={32}
+            draggable={false}
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-contain p-0.5"
+            onError={() => setImageFailed(true)}
+          />
+        ) : (
+          <span
+            className="h-3 w-3 rotate-45 border"
+            style={{
+              borderColor: rarVar(rarity),
+              background: rarClamp(rarity) >= 7 ? rarVar(rarity) : "transparent",
+            }}
+          />
+        )}
+      </span>
       <span className="min-w-0">
         <span className="font-body text-[0.8125rem] leading-tight truncate">{name}</span>{" "}
         <span className="font-mono text-[0.625rem] leading-none text-txt-dim">R{rarClamp(rarity)}</span>
@@ -592,15 +648,17 @@ export function MhNodeCard({
       type="button"
       data-node
       onClick={onSelect}
-      style={{ ...style, borderLeftColor: rarVar(rarity) }}
-      className={`absolute box-border bg-panel border border-line border-l-[3px] py-[0.5625rem] px-[0.6875rem] text-left cursor-pointer transition-[border-color,box-shadow,transform,opacity] hover:-translate-y-0.5 hover:border-line-2 hover:[--cut-line:var(--line-2)] cut cut-edge-slant [--cut:9px] ${selected ? "!border-[var(--mh)] [--cut-line:var(--line)] shadow-[0_0_0_1px_var(--mh),0_12px_30px_-14px_#000]" : ""} ${dim ? "opacity-[0.34]" : ""}`}
+      title={name}
+      aria-label={name}
+      style={{ ...style, "--cut-line": selected ? "var(--mh)" : rarVar(rarity) } as React.CSSProperties}
+      className={`absolute box-border h-full overflow-hidden bg-panel border border-line py-3 px-3.5 text-left cursor-pointer transition-[border-color,box-shadow,transform,opacity] hover:-translate-y-0.5 hover:border-line-2 cut cut-edge-slant [--cut:9px] ${selected ? "!border-[var(--mh)] shadow-[0_0_0_1px_var(--mh),0_12px_30px_-14px_#000]" : ""} ${dim ? "opacity-[0.34]" : ""}`}
     >
       {owned && <span className="absolute top-2 right-[0.5625rem] w-[0.4375rem] h-[0.4375rem] rounded-full bg-[var(--mh)] shadow-[0_0_0_3px_var(--mh-soft)]" />}
-      <span className="flex items-center gap-[0.4375rem] mb-1.5">
+      <span className="flex min-w-0 items-start gap-[0.4375rem] pr-3 mb-2">
         <MhRarity rarity={rarity} />
-        <span className="font-body text-[0.8125rem] leading-[1.15] font-semibold truncate">{name}</span>
+        <span className="font-body text-[0.8125rem] leading-[1.15] font-semibold line-clamp-2">{name}</span>
       </span>
-      <span className="flex flex-wrap gap-x-2.5 gap-y-1">
+      <span className="flex min-w-0 flex-wrap gap-x-2.5 gap-y-1 pr-1">
         <span className="inline-flex items-center gap-1 font-mono text-[0.6875rem] leading-none text-txt-muted"><Icon name="sword" size={11} /><b className="text-txt">{attack}</b></span>
         {special && (
           <span className="inline-flex items-center gap-1 font-mono text-[0.6875rem] leading-none" style={{ color: elementColor(special.type) }}>
@@ -640,7 +698,7 @@ export function MhDrawer({
       >
         <div className="flex items-center gap-[0.6875rem] flex-none py-[0.8125rem] px-4 border-b border-line">
           {(iconName || icon) && (
-            <span className="w-9 h-9 grid place-items-center flex-none text-[var(--mh-bright)] border border-[var(--mh-line)] bg-[var(--mh-soft)]">
+            <span className="flex-none text-[var(--mh-bright)]">
               {icon || <Icon name={iconName!} size={18} />}
             </span>
           )}

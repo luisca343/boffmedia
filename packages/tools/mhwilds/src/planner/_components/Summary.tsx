@@ -2,7 +2,7 @@
 
 import { useToolT } from "../../i18n"
 import { Banner, Empty } from "@boffmedia/ui"
-import { StatsData, Skill, Weapon } from "../../types"
+import { ArmorPiece, Charm, Decoration, StatsData, Skill, Weapon } from "../../types"
 import { getAllWeaponElements } from "./equipment-utils"
 import {
   MhPanel, MhStat3, MhElement, MhResistances, MhSharpness, MhSkillRow, MhCatLegend, MhLabel,
@@ -11,9 +11,16 @@ import { weaponAttack } from "../../ui/mh-helpers"
 import { ForgePanel } from "./ForgePanel"
 
 export function Summary({
-  stats, skills, skillsData, weapon,
+  stats, skills, skillsData, weapon, weapons, armor, charm, decorations,
 }: {
-  stats: StatsData; skills: Skill[]; skillsData: Record<string, any>; weapon: Weapon | null
+  stats: StatsData
+  skills: Skill[]
+  skillsData: Record<string, any>
+  weapon: Weapon | null
+  weapons: (Weapon | null)[]
+  armor: (ArmorPiece | null)[]
+  charm: Charm | null
+  decorations: Decoration[]
 }) {
   const t = useToolT("tools.mhwilds")
   const catLabels = { attack: t("build_planner.cat_attack"), element: t("element"), defense: t("defense"), utility: t("build_planner.cat_utility") }
@@ -92,7 +99,12 @@ export function Summary({
       </MhPanel>
 
       {/* forge materials — cumulative full upgrade path (equipped weapon) */}
-      {weapon && <ForgePanel weapon={weapon} />}
+      <ForgePanel
+        weapons={weapons}
+        armor={armor}
+        charm={charm}
+        decorations={decorations}
+      />
     </div>
   )
 }

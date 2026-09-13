@@ -22,6 +22,10 @@ import type {
   MhWildsAnatomyOverride,
   Weapon,
 } from "./types";
+import {
+  loadMhwildsGearAssetManifest,
+  type MhwildsGearAssetManifest,
+} from "./bestiary/assets";
 
 /** The API's global response envelope, as `@/services/boffAPI` declared it. */
 export interface ApiResponse<T = unknown> {
@@ -58,13 +62,92 @@ async function get<T>(
   }
 }
 
+function weaponAssetPath(
+  weapon: { kind?: unknown; type?: unknown; gameId?: unknown },
+  manifest: MhwildsGearAssetManifest | null,
+): string | null {
+  const kind = String(weapon.kind ?? weapon.type ?? "");
+  const gameId = weapon.gameId == null ? null : String(weapon.gameId);
+  if (!kind || gameId == null) return null;
+  return manifest?.weapons?.[kind]?.[gameId] ?? null;
+}
+
+function enrichWeapon<T extends { kind?: unknown; type?: unknown; gameId?: unknown }>(
+  weapon: T,
+  manifest: MhwildsGearAssetManifest | null,
+): T & { localAssetPath: string | null; localAssetVersion?: string } {
+  return {
+    ...weapon,
+    localAssetPath: weaponAssetPath(weapon, manifest),
+    localAssetVersion: manifest?.version,
+  };
+}
+
+function enrichWeaponTree(value: unknown, manifest: MhwildsGearAssetManifest): unknown {
+  if (Array.isArray(value)) return value.map((item) => enrichWeaponTree(item, manifest));
+  if (!value || typeof value !== "object") return value;
+
+  const record = value as Record<string, unknown>;
+  const next: Record<string, unknown> = Object.fromEntries(
+    Object.entries(record).map(([key, child]) => [
+      key,
+      enrichWeaponTree(child, manifest),
+    ]),
+  );
+  if (next.gameId != null && (next.kind != null || next.type != null)) {
+    next.localAssetPath = weaponAssetPath(next, manifest);
+    next.localAssetVersion = manifest.version;
+  }
+  return next;
+}
+
 export class MhWildsService {
-  static getWeapons(locale?: string): Promise<ApiResponse<Weapon[]>> {
-    return get<Weapon[]>("/tools/mhwilds/weapons", { locale });
+  static async getWeapons(locale?: string): Promise<ApiResponse<Weapon[]>> {
+    const response = await get<Weapon[]>("/tools/mhwilds/weapons", { locale });
+    if (!response.success || !Array.isArray(response.data)) return response;
+    const manifest = await loadMhwildsGearAssetManifest();
+    return {
+      ...response,
+      data: response.data.map((weapon) => enrichWeapon(weapon, manifest)),
+    };
   }
 
-  static getArmor(locale?: string): Promise<ApiResponse<ArmorPiece[]>> {
-    return get<ArmorPiece[]>("/tools/mhwilds/armor", { locale });
+  static async getArmor(locale?: string): Promise<ApiResponse<ArmorPiece[]>> {
+    const response = await get<ArmorPiece[]>("/tools/mhwilds/armor", {
+      locale,
+    });
+    if (!response.success || !Array.isArray(response.data)) return response;
+
+    // The API owns the canonical records, while the local pack owns optional
+    // rasters. Join them by stable armor-set id + slot instead of by array
+    // position. A missing entry is explicit so consumers can render a
+    // semantic fallback without probing a guaranteed 404.
+    const manifest = await loadMhwildsGearAssetManifest();
+    if (!manifest?.armor) return response;
+    return {
+      ...response,
+      data: response.data.map((piece) => {
+        const gameId = piece.armorSet?.gameId;
+        const directEntry =
+          gameId == null ? undefined : manifest.armor?.[String(gameId)];
+        // Do not fall back to `armorSet.id`: it is the API's mutable primary
+        // key, whereas the extracted pack is keyed by the game's stable id.
+        // The API repository supplies that stable id from the checked-in
+        // crosswalk, and an absent join must remain an explicit null.
+        const entry =
+          directEntry &&
+          (directEntry.gameId == null ||
+            String(directEntry.gameId) === String(gameId))
+            ? directEntry
+            : undefined;
+        const relative = entry?.pieces?.[piece.kind]?.relative;
+        return {
+          ...piece,
+          localAssetPath: relative ?? null,
+          localAssetVersion: manifest.version,
+        };
+      }),
+    };
   }
 
   static getCharms(locale?: string): Promise<ApiResponse<Charm[]>> {
@@ -88,14 +171,19 @@ export class MhWildsService {
   }
 
   /** Public corrections made in the admin Hunter's Manual editor. */
-  static getAnatomyOverrides(): Promise<
-    ApiResponse<MhWildsAnatomyOverride[]>
-  > {
+  static getAnatomyOverrides(): Promise<ApiResponse<MhWildsAnatomyOverride[]>> {
     return get<MhWildsAnatomyOverride[]>("/tools/mhwilds/anatomy-overrides");
   }
 
   /** Same reasoning as `getSkills`: the tree hook owns the `WeaponTree` shape. */
-  static getWeaponTree<T = unknown>(locale?: string): Promise<ApiResponse<T>> {
-    return get<T>("/tools/mhwilds/weapons/tree", { locale });
+  static async getWeaponTree<T = unknown>(locale?: string): Promise<ApiResponse<T>> {
+    const response = await get<T>("/tools/mhwilds/weapons/tree", { locale });
+    if (!response.success || response.data == null) return response;
+    const manifest = await loadMhwildsGearAssetManifest();
+    if (!manifest) return response;
+    return {
+      ...response,
+      data: enrichWeaponTree(response.data, manifest) as T,
+    };
   }
 }

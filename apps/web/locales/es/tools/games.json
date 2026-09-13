@@ -31,7 +31,9 @@
       "tools": {
         "planner": "Planificador",
         "weaponTree": "Árbol de Armas",
-        "bestiary": "Bestiario"
+        "bestiary": "Bestiario",
+        "armor": "Armaduras",
+        "materials": "Lista de materiales"
       }
     },
     "otros": {

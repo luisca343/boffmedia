@@ -10,15 +10,19 @@ import {
   MhMeter,
 } from "../ui/mh-kit"
 import { WEAPON_TYPES, weaponAttack, firstSpecial, elementColor } from "../ui/mh-helpers"
+import { mhwildsWeaponAsset } from "../bestiary/assets"
+import { useWishlist, weaponWishlistEntry } from "../planner/_utils/wishlist"
+import { WishlistLink } from "../planner/_components/WishlistLink"
 
 type Node = any
 
-const NODE_W = 212
-const NODE_H = 66
-const COL = NODE_W + 64
-const ROW = NODE_H + 16
-const CANVAS_TOP_PAD = 88
-const CANVAS_BOTTOM_PAD = 40
+const NODE_W = 252
+const NODE_H = 88
+const COL = NODE_W + 96
+const ROW = NODE_H + 26
+const ROOT_GAP = 36
+const CANVAS_TOP_PAD = 104
+const CANVAS_BOTTOM_PAD = 56
 const LS_OWNED = "mh_tree_owned_v3"
 
 function tLoad(): Record<string, Record<string, boolean>> {
@@ -26,42 +30,43 @@ function tLoad(): Record<string, Record<string, boolean>> {
   try { return JSON.parse(localStorage.getItem(LS_OWNED) || "{}") || {} } catch { return {} }
 }
 
+function occurrenceKey(node: Node, parentKey: string, rootIndex?: number): string {
+  return node.pathKey || `${parentKey || `root-${rootIndex ?? 0}`}/${String(node.id)}`
+}
+
 function computeLayout(roots: Node[]) {
   const pos: Record<string, { x: number; y: number; node: Node }> = {}
   let leaf = 0
-  function assign(node: Node, depth: number): number {
+  function assign(node: Node, depth: number, parentKey: string, rootIndex: number): number {
+    const key = occurrenceKey(node, parentKey, rootIndex)
     const x = depth * COL
     if (!node.children || node.children.length === 0) {
-      const y = leaf * ROW; leaf++; pos[node.id] = { x, y, node }; return y
+      const y = leaf * ROW; leaf++; pos[key] = { x, y, node }; return y
     }
-    const ys = node.children.map((c: Node) => assign(c, depth + 1))
+    const ys = node.children.map((c: Node) => assign(c, depth + 1, key, rootIndex))
     const y = (ys[0] + ys[ys.length - 1]) / 2
-    pos[node.id] = { x, y, node }; return y
+    pos[key] = { x, y, node }; return y
   }
-  roots.forEach((r) => assign(r, 0))
+  roots.forEach((r, index) => {
+    assign(r, 0, "", index)
+    if (index < roots.length - 1) leaf += ROOT_GAP / ROW
+  })
   const edges: { from: string; to: string }[] = []
-  Object.values(pos).forEach((p) => (p.node.children || []).forEach((c: Node) => edges.push({ from: String(p.node.id), to: String(c.id) })))
+  Object.entries(pos).forEach(([from, p]) => (p.node.children || []).forEach((c: Node) => edges.push({ from, to: occurrenceKey(c, from) })))
   const xs = Object.values(pos).map((p) => p.x)
   const ys = Object.values(pos).map((p) => p.y)
   return { pos, edges, width: (xs.length ? Math.max(...xs) : 0) + NODE_W, height: (ys.length ? Math.max(...ys) : 0) + NODE_H }
 }
 
-function flatten(roots: Node[]): { node: Node; depth: number }[] {
-  const out: { node: Node; depth: number }[] = []
-  const walk = (n: Node, d: number) => { out.push({ node: n, depth: d }); (n.children || []).forEach((c: Node) => walk(c, d + 1)) }
-  roots.forEach((r) => walk(r, 0))
-  return out
-}
-
-function pathTo(roots: Node[], id: string): string[] | null {
-  const dfs = (n: Node, acc: string[]): string[] | null => {
-    const next = [...acc, String(n.id)]
-    if (String(n.id) === id) return next
-    for (const c of n.children || []) { const r = dfs(c, next); if (r) return r }
-    return null
+function flatten(roots: Node[]): { node: Node; depth: number; key: string }[] {
+  const out: { node: Node; depth: number; key: string }[] = []
+  const walk = (n: Node, d: number, parentKey: string, rootIndex: number) => {
+    const key = occurrenceKey(n, parentKey, rootIndex)
+    out.push({ node: n, depth: d, key })
+    for (const child of n.children || []) walk(child, d + 1, key, rootIndex)
   }
-  for (const r of roots) { const res = dfs(r, []); if (res) return res }
-  return null
+  roots.forEach((r, index) => walk(r, 0, "", index))
+  return out
 }
 
 export function WeaponTreeView() {
@@ -74,7 +79,7 @@ export function WeaponTreeView() {
 
   const [type, setType] = useState<string>("long-sword")
   const [view, setView] = useState<"tree" | "outline">("tree")
-  const [selId, setSelId] = useState<string | null>(null)
+  const [selKey, setSelKey] = useState<string | null>(null)
   const [owned, setOwned] = useState<Record<string, Record<string, boolean>>>({})
   const [q, setQ] = useState("")
   const [fRar, setFRar] = useState("all")
@@ -96,16 +101,13 @@ export function WeaponTreeView() {
 
   const roots = treeByKind[type] || []
   const layout = useMemo(() => computeLayout(roots), [roots])
-  const nodesById = useMemo(() => {
-    const m: Record<string, Node> = {}
-    Object.values(layout.pos).forEach((p) => { m[String(p.node.id)] = p.node })
-    return m
-  }, [layout])
-  const allNodes = useMemo(() => Object.values(nodesById), [nodesById])
+  const nodesByKey = useMemo(() => layout.pos, [layout])
+  const allOccurrences = useMemo(() => Object.entries(layout.pos).map(([key, value]) => ({ key, node: value.node })), [layout])
+  const allNodes = useMemo(() => allOccurrences.map(({ node }) => node), [allOccurrences])
   const total = allNodes.length
   const ownedSet = owned[type] || {}
   const ownedCount = allNodes.filter((n) => ownedSet[String(n.id)]).length
-  const sel = selId != null ? nodesById[selId] : null
+  const sel = selKey != null ? layout.pos[selKey]?.node || null : null
 
   const fit = useCallback(() => {
     const st = stageRef.current; if (!st) return
@@ -123,7 +125,7 @@ export function WeaponTreeView() {
   // the visible height.
   useEffect(() => {
     setXf({ scale: 1, tx: 40, ty: CANVAS_TOP_PAD })
-    setSelId(null)
+    setSelKey(null)
   }, [type, view])
 
   const zoomAround = useCallback((factor: number, clientX?: number, clientY?: number) => {
@@ -207,22 +209,26 @@ export function WeaponTreeView() {
   const filtering = !!q.trim() || fRar !== "all" || fEl !== "all"
 
   const pathSet = useMemo(() => {
-    if (!pathMode || !sel) return null
-    const anc = pathTo(roots, String(sel.id)) || [String(sel.id)]
+    if (!pathMode || !sel || !selKey) return null
     const set: Record<string, boolean> = {}
-    anc.forEach((id) => { set[id] = true })
-    let cur: Node = nodesById[String(sel.id)]
+    const parts = selKey.split("/")
+    for (let index = 1; index <= parts.length; index += 1) {
+      set[parts.slice(0, index).join("/")] = true
+    }
+    let cur: Node = sel
+    let curKey = selKey
     while (cur && cur.children && cur.children.length) {
       cur = [...cur.children].sort((a: Node, b: Node) => weaponAttack(b) - weaponAttack(a))[0]
-      set[String(cur.id)] = true
+      curKey = occurrenceKey(cur, curKey)
+      set[curKey] = true
     }
     return set
-  }, [pathMode, sel, roots, nodesById])
+  }, [pathMode, sel, selKey])
 
-  const nodeDim = (n: Node) => (filtering && !matches(n)) || (pathSet && !pathSet[String(n.id)])
+  const nodeDim = (n: Node, key: string) => (filtering && !matches(n)) || (pathSet && !pathSet[key])
   const edgeCls = (e: { from: string; to: string }) => {
     if (pathSet) return pathSet[e.from] && pathSet[e.to] ? "stroke-[var(--mh)] [stroke-width:3]" : "stroke-line-2 opacity-25"
-    if (filtering) return matches(nodesById[e.from]) && matches(nodesById[e.to]) ? "stroke-line-2" : "stroke-line-2 opacity-25"
+    if (filtering) return matches(nodesByKey[e.from]?.node) && matches(nodesByKey[e.to]?.node) ? "stroke-line-2" : "stroke-line-2 opacity-25"
     return "stroke-line-2"
   }
 
@@ -243,7 +249,7 @@ export function WeaponTreeView() {
 
   if (loading) {
     return (
-      <MhApp>
+      <MhApp className="h-[var(--tool-vh,100dvh)] overflow-hidden">
         <div className="flex-1 grid place-items-center">
           <div className="flex flex-col items-center gap-3">
             <Spinner />
@@ -255,7 +261,7 @@ export function WeaponTreeView() {
   }
   if (error) {
     return (
-      <MhApp>
+      <MhApp className="h-[var(--tool-vh,100dvh)] overflow-hidden">
         <div className="flex-1 grid place-items-center">
           <MhLoadError title={t("tree.loadError")} detail={error}>
             <Button size="sm" variant="pri" icon="refresh" onClick={() => refreshData()}>{t("build_planner.retry")}</Button>
@@ -266,7 +272,7 @@ export function WeaponTreeView() {
   }
 
   return (
-    <MhApp>
+    <MhApp className="h-[var(--tool-vh,100dvh)] overflow-hidden">
       <MhBar>
         <div className="flex items-center gap-[0.6875rem] min-w-0">
           <MhSeal name="tree" />
@@ -288,6 +294,7 @@ export function WeaponTreeView() {
               { value: "outline", label: <><Icon name="list" size={13} />{t("tree.list")}</> },
             ]}
           />
+          <WishlistLink />
           <MhSrc label={t("app.source")} />
         </MhBarSide>
       </MhBar>
@@ -322,10 +329,12 @@ export function WeaponTreeView() {
 
       {/* body */}
       <MhBody
-        className={view === "tree" ? "flex flex-col flex-none" : ""}
+        className={view === "tree"
+          ? "flex min-h-0 flex-1 flex-col overflow-hidden"
+          : "min-h-0 flex-1 overflow-y-auto overscroll-contain"}
       >
         {view === "tree" ? (
-          <div className="flex-1 min-h-0 flex flex-col">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <div
               ref={stageRef}
               onPointerDown={onPointerDown}
@@ -337,10 +346,15 @@ export function WeaponTreeView() {
               onDragStart={(e) => e.preventDefault()}
               tabIndex={0}
               aria-label={t("tree.canvasLabel")}
-              style={{ minHeight: `max(${Math.ceil(layout.height + CANVAS_TOP_PAD + CANVAS_BOTTOM_PAD)}px, var(--tool-vh, 42rem))` }}
-              className={`flex-1 relative select-none cursor-grab touch-pan-y outline-none [background:radial-gradient(circle_at_1px_1px,var(--stripe)_1px,transparent_0)_0_0/26px_26px,var(--bg)] ${isPanning ? "cursor-grabbing" : ""}`}
+              className={`relative min-h-0 flex-1 overflow-auto overscroll-contain select-none cursor-grab touch-pan-y outline-none [background:radial-gradient(circle_at_1px_1px,var(--stripe)_1px,transparent_0)_0_0/26px_26px,var(--bg)] ${isPanning ? "cursor-grabbing" : ""}`}
             >
-              <div className="absolute inset-0 overflow-hidden">
+              <div
+                className="relative"
+                style={{
+                  width: layout.width + 80,
+                  height: layout.height + CANVAS_TOP_PAD + CANVAS_BOTTOM_PAD,
+                }}
+              >
                 <div className="absolute top-0 left-0 origin-top-left will-change-transform" style={{ transform: `translate(${xf.tx}px,${xf.ty}px) scale(${xf.scale})`, width: layout.width, height: layout.height }}>
                   <svg className="absolute top-0 left-0 overflow-visible pointer-events-none" width={layout.width} height={layout.height}>
                     {layout.edges.map((e, i) => {
@@ -351,29 +365,29 @@ export function WeaponTreeView() {
                       return <path key={i} className={`fill-none [stroke-width:2] transition-[stroke,opacity] ${edgeCls(e)}`} d={`M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`} />
                     })}
                   </svg>
-                  {allNodes.map((n) => {
-                    const p = layout.pos[String(n.id)]
+                  {allOccurrences.map(({ key, node: n }) => {
+                    const p = layout.pos[key]
                     return (
                       <MhNodeCard
-                        key={n.id}
-                        style={{ left: p.x, top: p.y, width: NODE_W }}
+                        key={key}
+                        style={{ left: p.x, top: p.y, width: NODE_W, height: NODE_H }}
                         name={n.name}
                         rarity={n.rarity}
                         attack={weaponAttack(n)}
                         special={firstSpecial(n.specials)}
-                        selected={selId === String(n.id)}
-                        dim={!!nodeDim(n)}
+                        selected={selKey === key}
+                        dim={!!nodeDim(n, key)}
                         owned={!!ownedSet[String(n.id)]}
                         isFinal={!n.children || n.children.length === 0}
                         finalLabel={t("tree.final")}
-                        onSelect={() => setSelId(String(n.id))}
+                        onSelect={() => setSelKey(key)}
                       />
                     )
                   })}
                 </div>
               </div>
 
-              <div data-canvas-ui="" className="sticky top-[calc(var(--tool-sticky-top,0px)_+_var(--tool-bar-h,3.625rem)_+_0.75rem)] z-[6] flex flex-col gap-2 px-3.5 pt-3.5 pointer-events-none sm:flex-row sm:items-start sm:justify-between">
+              <div data-canvas-ui="" className="absolute inset-x-0 top-0 z-[6] flex flex-col gap-2 px-3.5 pt-3.5 pointer-events-none sm:flex-row sm:items-start sm:justify-between">
                 <div className="pointer-events-auto flex flex-wrap items-center gap-x-2 gap-y-1 font-mono text-[0.6875rem] leading-none text-txt-dim bg-panel border border-line py-[0.4375rem] px-2.5 select-none">
                   <Icon name="target" size={13} />
                   <span>{t("tree.dragHint")}</span>
@@ -390,7 +404,7 @@ export function WeaponTreeView() {
           </div>
         ) : (
           <MhWrap>
-            <TreeOutline roots={roots} ownedSet={ownedSet} matches={filtering ? matches : null} sel={selId} onSel={setSelId} />
+            <TreeOutline roots={roots} ownedSet={ownedSet} matches={filtering ? matches : null} sel={selKey} onSel={setSelKey} />
           </MhWrap>
         )}
       </MhBody>
@@ -398,12 +412,12 @@ export function WeaponTreeView() {
       {sel && (
         <TreeDetail
           node={sel}
-          roots={roots}
-          nodesById={nodesById}
+          pathKey={selKey || String(sel.id)}
+          nodesByKey={nodesByKey}
           owned={!!ownedSet[String(sel.id)]}
           onToggleOwned={() => toggleOwned(String(sel.id))}
-          onClose={() => setSelId(null)}
-          onGoTo={(id) => setSelId(id)}
+          onClose={() => setSelKey(null)}
+          onGoTo={setSelKey}
         />
       )}
     </MhApp>
@@ -411,22 +425,22 @@ export function WeaponTreeView() {
 }
 
 // ── outline (list) ────────────────────────────────────────────────────────────
-function TreeOutline({ roots, ownedSet, matches, sel, onSel }: { roots: Node[]; ownedSet: Record<string, boolean>; matches: ((n: Node) => boolean) | null; sel: string | null; onSel: (id: string) => void }) {
+function TreeOutline({ roots, ownedSet, matches, sel, onSel }: { roots: Node[]; ownedSet: Record<string, boolean>; matches: ((n: Node) => boolean) | null; sel: string | null; onSel: (key: string) => void }) {
   const t = useToolT("tools.mhwilds")
   const flat = flatten(roots)
   const visible = matches ? flat.filter((f) => matches(f.node)) : flat
   if (!visible.length) return <Empty icon="search" title={t("tree.noResults")} lead={t("tree.noResultsLead")} />
   return (
     <div className="flex flex-col gap-[3px]">
-      {visible.map(({ node, depth }) => {
+      {visible.map(({ node, depth, key }) => {
         const sp = firstSpecial(node.specials)
         return (
           <button
-            key={node.id}
+            key={key}
             type="button"
-            onClick={() => onSel(String(node.id))}
+            onClick={() => onSel(key)}
             style={{ marginLeft: matches ? 0 : depth * 20 }}
-            className={`grid grid-cols-[1fr_auto] items-center gap-3 py-[0.5625rem] px-3 bg-panel border text-left transition-colors hover:bg-panel-2 ${sel === String(node.id) ? "border-[var(--mh)]" : "border-line hover:border-line-2"}`}
+            className={`grid grid-cols-[1fr_auto] items-center gap-3 py-[0.5625rem] px-3 bg-panel border text-left transition-colors hover:bg-panel-2 ${sel === key ? "border-[var(--mh)]" : "border-line hover:border-line-2"}`}
           >
             <span className="flex items-center gap-2 min-w-0">
               {ownedSet[String(node.id)] && <Icon name="check" size={13} className="text-[var(--mh-bright)]" />}
@@ -446,16 +460,26 @@ function TreeOutline({ roots, ownedSet, matches, sel, onSel }: { roots: Node[]; 
 }
 
 // ── detail drawer ─────────────────────────────────────────────────────────────
-function TreeDetail({ node, roots, nodesById, owned, onToggleOwned, onClose, onGoTo }: {
-  node: Node; roots: Node[]; nodesById: Record<string, Node>; owned: boolean; onToggleOwned: () => void; onClose: () => void; onGoTo: (id: string) => void
+function TreeDetail({ node, pathKey, nodesByKey, owned, onToggleOwned, onClose, onGoTo }: {
+  node: Node
+  pathKey: string
+  nodesByKey: Record<string, { node: Node }>
+  owned: boolean
+  onToggleOwned: () => void
+  onClose: () => void
+  onGoTo: (key: string) => void
 }) {
   const t = useToolT("tools.mhwilds")
   const sp = firstSpecial(node.specials)
-  const path = pathTo(roots, String(node.id)) || [String(node.id)]
-  const parentId = path.length > 1 ? path[path.length - 2] : null
-  const parent = parentId ? nodesById[parentId] : null
+  const { has, toggle } = useWishlist()
+  const wishlistEntry = weaponWishlistEntry(node)
+  const wishlisted = has(wishlistEntry.key)
+  const parentKey = pathKey.includes("/") ? pathKey.slice(0, pathKey.lastIndexOf("/")) : null
+  const parent = parentKey ? nodesByKey[parentKey]?.node || null : null
   const stepMats: any[] = (parent ? node.upgradeMaterials : node.craftingMaterials) || node.craftingMaterials || []
   const zenny = parent ? node.upgradeZennyCost : node.craftingZennyCost
+  const [artFailed, setArtFailed] = useState(false)
+  const artSrc = mhwildsWeaponAsset(node)
 
   return (
     <MhDrawer
@@ -468,10 +492,27 @@ function TreeDetail({ node, roots, nodesById, owned, onToggleOwned, onClose, onG
           <Button size="sm" variant={owned ? "pri" : "default"} icon={owned ? "check" : "plus"} onClick={onToggleOwned}>
             {owned ? t("tree.forgedState") : t("tree.markForged")}
           </Button>
+          <Button size="sm" variant={wishlisted ? "pri" : "default"} icon={wishlisted ? "check" : "plus"} onClick={() => toggle(wishlistEntry)}>
+            {wishlisted ? t("build_planner.wishlist.added") : t("build_planner.wishlist.add")}
+          </Button>
           <Button size="sm" icon="sword" href="/mhwilds/builds/planner">{t("tree.plan")}</Button>
         </div>
       }
     >
+      <div className="mb-4 grid grid-cols-[8rem_minmax(0,1fr)] gap-3 border border-[var(--mh-line)] bg-[var(--mh-soft)] p-3">
+        <div className="grid min-h-[8rem] place-items-center border border-[var(--mh-line)] bg-base-deep">
+          {artSrc && !artFailed ? (
+            <img src={artSrc} alt={node.name} width={128} height={128} draggable={false} className="h-32 w-32 object-contain" onError={() => setArtFailed(true)} />
+          ) : (
+            <Icon name="sword" size={52} className="text-[var(--mh-bright)]" />
+          )}
+        </div>
+        <div className="min-w-0 self-center">
+          <div className="font-display text-[1.05rem] font-bold leading-tight">{node.name}</div>
+          {node.description && <p className="mt-2 font-body text-[0.75rem] leading-[1.4] text-txt-muted">{node.description}</p>}
+          {node.series?.name && <div className="mt-2 font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-dim">{node.series.name}</div>}
+        </div>
+      </div>
       <MhStat3 items={[
         { value: weaponAttack(node), label: t("attack"), mod: "attack" },
         { value: node.rarity, label: t("rarity") },
@@ -482,7 +523,7 @@ function TreeDetail({ node, roots, nodesById, owned, onToggleOwned, onClose, onG
       {parent && (
         <div className="mt-[1.125rem]">
           <MhLabel>{t("tree.improvesFrom")}</MhLabel>
-          <button type="button" onClick={() => onGoTo(String(parent.id))} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[0.5625rem] px-3 bg-panel border border-line text-left hover:border-line-2">
+          <button type="button" onClick={() => onGoTo(parentKey!)} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[0.5625rem] px-3 bg-panel border border-line text-left hover:border-line-2">
             <span className="flex items-center gap-2 min-w-0"><Icon name="back" size={13} className="text-txt-dim" /><MhRarity rarity={parent.rarity} /><b className="font-body text-[0.8125rem] leading-tight truncate">{parent.name}</b></span>
             <span className="font-mono text-[0.6875rem] leading-none text-txt-muted">{weaponAttack(parent)}</span>
           </button>
@@ -494,7 +535,7 @@ function TreeDetail({ node, roots, nodesById, owned, onToggleOwned, onClose, onG
           <MhLabel>{parent ? t("tree.upgradeMaterials") : t("tree.craftMaterials")}{zenny ? ` · ${zenny.toLocaleString()}z` : ""}</MhLabel>
           <div className="flex flex-col gap-[0.3125rem]">
             {stepMats.map((m: any, i: number) => (
-              <MhMaterial key={m.item?.id ?? i} name={m.item?.name ?? "?"} rarity={m.item?.rarity} quantity={m.quantity ?? 1} />
+              <MhMaterial key={m.item?.gameId ?? m.item?.id ?? i} item={m.item} name={m.item?.name ?? "?"} rarity={m.item?.rarity} quantity={m.quantity ?? 1} />
             ))}
           </div>
         </div>
@@ -502,10 +543,10 @@ function TreeDetail({ node, roots, nodesById, owned, onToggleOwned, onClose, onG
 
       {node.children && node.children.length > 0 && (
         <div className="mt-[1.125rem]">
-          <MhLabel>{t("tree.improvesTo")}</MhLabel>
+            <MhLabel>{t("tree.improvesTo")}</MhLabel>
           <div className="flex flex-col gap-1">
             {node.children.map((c: Node) => (
-              <button key={c.id} type="button" onClick={() => onGoTo(String(c.id))} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[0.5625rem] px-3 bg-panel border border-line text-left hover:border-line-2">
+              <button key={occurrenceKey(c, pathKey)} type="button" onClick={() => onGoTo(occurrenceKey(c, pathKey))} className="grid grid-cols-[1fr_auto] items-center gap-3 w-full py-[0.5625rem] px-3 bg-panel border border-line text-left hover:border-line-2">
                 <span className="flex items-center gap-2 min-w-0"><Icon name="chevronRight" size={13} className="text-[var(--mh-bright)]" /><MhRarity rarity={c.rarity} /><b className="font-body text-[0.8125rem] leading-tight truncate">{c.name}</b></span>
                 <span className="font-mono text-[0.6875rem] leading-none text-txt-muted">{weaponAttack(c)}</span>
               </button>

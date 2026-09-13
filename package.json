@@ -57,6 +57,7 @@
     "decode:mhwilds-bestiary": "node scripts/tools/mhwilds/decode-mhwilds-bestiary.mjs",
     "normalize:mhwilds-bestiary": "node scripts/tools/mhwilds/normalize-mhwilds-bestiary.mjs",
     "sync:mhwilds-item-icons": "node scripts/tools/mhwilds/sync-mhwilds-item-icons.mjs",
+    "sync:mhwilds-armor-identities": "node scripts/tools/mhwilds/sync-mhwilds-armor-identities.mjs",
     "build:mhwilds-assets": "node scripts/tools/mhwilds/build-mhwilds-assets.mjs",
     "update:mhwilds-bestiary": "node scripts/tools/mhwilds/update-mhwilds-bestiary.mjs",
     "pack:tool-assets": "node scripts/tools/pack-tool-assets.mjs"

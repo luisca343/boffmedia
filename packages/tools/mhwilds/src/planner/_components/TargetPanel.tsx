@@ -6,7 +6,8 @@ import { Button, Icon } from "@boffmedia/ui"
 import { MhMonster, Weapon } from "../../types"
 import { MhPanel, MhLabel } from "../../ui/mh-kit"
 import { elementColor, weaponAttack } from "../../ui/mh-helpers"
-import { getAllWeaponElements, getRarityFilterStyle, getWeaponTypeIcon } from "./equipment-utils"
+import { getAllWeaponElements, getWeaponTypeIcon } from "./equipment-utils"
+import { mhwildsWeaponAsset } from "../../bestiary/assets"
 
 export function TargetPanel({
   target,
@@ -122,16 +123,22 @@ export function TargetPanel({
         <div className="flex flex-col gap-1.5">
           {suggestions.map(({ w, el, level }) => (
             <div key={w.id} className="flex items-center gap-2.5 border border-line bg-base-2 px-2.5 py-2">
-              <span className="grid h-7 w-7 flex-none place-items-center border border-line bg-panel">
+              <span className="grid h-7 w-7 flex-none place-items-center border border-line bg-base-deep">
                 <img
-                  src={getWeaponTypeIcon(w.kind || w.type || "great-sword")}
+                  src={mhwildsWeaponAsset(w) || getWeaponTypeIcon(w.kind || w.type || "great-sword")}
                   alt=""
                   aria-hidden="true"
                   width={24}
                   height={24}
                   draggable={false}
                   className="h-6 w-6 object-contain"
-                  style={{ filter: getRarityFilterStyle(w.rarity) }}
+                  onError={(event) => {
+                    const fallback = getWeaponTypeIcon(w.kind || w.type || "great-sword")
+                    if (event.currentTarget.src !== fallback) {
+                      event.currentTarget.onerror = null
+                      event.currentTarget.src = fallback
+                    }
+                  }}
                 />
               </span>
               <span className="grid min-w-0 flex-1 gap-0.5">

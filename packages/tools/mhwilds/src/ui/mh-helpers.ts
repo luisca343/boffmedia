@@ -35,8 +35,14 @@ export const ELEMENT_COLOR: Record<string, string> = {
   sleep: "#7d9bff",
   paralysis: "#ffcf5c",
   blast: "#ff9a6b",
+  blastblight: "#ff9a6b",
   stun: "#ffcf5c",
   exhaust: "#9aa3b2",
+  fireblight: "#ff7a5c",
+  waterblight: "var(--info)",
+  thunderblight: "#ffcf5c",
+  iceblight: "#6cc4e8",
+  dragonblight: "#b98bff",
 }
 export const elementColor = (type?: string) => (type ? ELEMENT_COLOR[type.toLowerCase()] || "var(--muted)" : "var(--muted)")
 

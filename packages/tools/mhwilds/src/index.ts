@@ -10,15 +10,19 @@
 // Tool entry points. Hosts with their own routing (web) import these directly;
 // registry-driven hosts (the launcher Tools hub) go through `mhwildsTools`.
 export { PlannerView } from "./planner/_components/PlannerView";
+export { WishlistView } from "./planner/_components/WishlistView";
 export { WeaponTreeView } from "./tree/WeaponTreeView";
 export { BestiaryView } from "./bestiary/BestiaryView";
+export { ArmorCatalogView } from "./armor/ArmorCatalogView";
 
 // Registry manifests (D6).
 export {
   mhwildsTools,
   mhwildsPlannerTool,
+  mhwildsWishlistTool,
   mhwildsTreeTool,
   mhwildsBestiaryTool,
+  mhwildsArmorTool,
 } from "./tools";
 
 // Message-key namespace + the bound-translator shim, for hosts that merge the

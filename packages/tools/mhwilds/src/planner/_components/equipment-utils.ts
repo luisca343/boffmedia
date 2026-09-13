@@ -1,5 +1,6 @@
 import { ArmorPiece, EquipmentType, Weapon } from "../../types";
 import { assetUrl, hasToolHost } from "@boffmedia/tool-kit";
+import { mhwildsItemIconAsset } from "../../bestiary/assets";
 
 const MHWILDS_ICON_PATH = "/boffmedia/img/games/mhwilds";
 
@@ -12,19 +13,43 @@ function clampIconIndex(value: number | undefined, max: number): number {
   return Math.max(1, Math.min(max, value || 1));
 }
 
-export const getDecorationImagePath = (slot?: number): string =>
-  mhWildsAsset(`decoration-${clampIconIndex(slot, 3)}.png`);
+const DECORATION_ICON_COLORS = new Set([
+  "blue",
+  "brown",
+  "dark-blue",
+  "dark-green",
+  "dark-purple",
+  "dark-red",
+  "deep-teal",
+  "gold",
+  "green",
+  "grey",
+  "light-brown",
+  "light-green",
+  "orange",
+  "pink",
+  "purple",
+  "red",
+  "teal",
+  "white",
+  "yellow",
+]);
 
-export type DecorationSlotKind = "weapon" | "armor";
+const DECORATION_ICON_COLOR_ALIASES: Record<string, string> = {
+  gray: "grey",
+  vermilion: "orange",
+  ivory: "light-brown",
+  rose: "pink",
+  sky: "deep-teal",
+  emerald: "teal",
+  lemon: "gold",
+  "sage-green": "light-green",
+  "moss-green": "dark-green",
+  ultramarine: "dark-blue",
+  "blue-purple": "purple",
+  none: "white",
+};
 
-export const getDecorationSlotImagePath = (
-  slot?: number,
-  kind: DecorationSlotKind = "armor",
-): string => mhWildsAsset(`decoration-slot-${kind}-${clampIconIndex(slot, 3)}.png`);
-
-// Wilds decoration colors belong to the decoration icon family, not to the
-// decoration rarity. The API exposes the game's color name and color id; keep
-// both as inputs so a stale/localized payload can still resolve by id.
 const DECORATION_COLOR_BY_ID: Record<number, string> = {
   1: "white",
   2: "gray",
@@ -49,6 +74,42 @@ const DECORATION_COLOR_BY_ID: Record<number, string> = {
   21: "dark-purple",
 };
 
+function decorationIconColor(color?: string, colorId?: number): string | null {
+  const name = color?.trim().toLowerCase();
+  const source = name || (colorId == null ? undefined : DECORATION_COLOR_BY_ID[colorId]);
+  if (!source) return null;
+  const canonical = DECORATION_ICON_COLOR_ALIASES[source] || source;
+  return DECORATION_ICON_COLORS.has(canonical) ? canonical : null;
+}
+
+/**
+ * Resolve the exact coloured decoration glyph. The old implementation used
+ * a grayscale/sepia CSS filter over a slot PNG; that loses the game's 19
+ * colour variants and makes every jewel look muddy. Keep the slot PNG only
+ * as a fallback for legacy callers without semantic icon metadata.
+ */
+export const getDecorationImagePath = (
+  slot?: number,
+  color?: string,
+  colorId?: number,
+): string => {
+  const canonical = decorationIconColor(color, colorId);
+  return (
+    (canonical && mhwildsItemIconAsset("decoration", canonical)) ||
+    mhWildsAsset(`decoration-${clampIconIndex(slot, 3)}.png`)
+  );
+};
+
+export type DecorationSlotKind = "weapon" | "armor";
+
+export const getDecorationSlotImagePath = (
+  slot?: number,
+  kind: DecorationSlotKind = "armor",
+): string => mhWildsAsset(`decoration-slot-${kind}-${clampIconIndex(slot, 3)}.png`);
+
+// Wilds decoration colors belong to the decoration icon family, not to the
+// decoration rarity. The API exposes the game's color name and color id; keep
+// both as inputs so a stale/localized payload can still resolve by id.
 const DECORATION_COLOR_FILTERS: Record<string, string> = {
   white: "grayscale(1) brightness(1.35)",
   gray: "grayscale(1) brightness(0.72)",
@@ -307,8 +368,8 @@ export const getWeaponTypeIcon = (weaponType: string): string => {
   return mhWildsAsset(`${iconMap[normalizedType] || 'great-sword'}.webp`);
 };
 
-export const getArmorImagePath = (armorType: EquipmentType): string => {
-  const imageMap: Record<EquipmentType, string> = {
+export const getArmorImagePath = (armorType: EquipmentType | string): string => {
+  const imageMap: Record<string, string> = {
     'head': 'helmet',
     'chest': 'chest',
     'arms': 'gauntlets',

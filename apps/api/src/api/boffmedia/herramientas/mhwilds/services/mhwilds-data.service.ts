@@ -136,8 +136,9 @@ export class MhwildsDataService {
       const charms = result.data;
 
       const allRanks = charms.reduce((ranks: CharmRankResult[], charm: any) => {
+        const charmRanks = Array.isArray(charm?.ranks) ? charm.ranks : [];
         return ranks.concat(
-          charm.ranks.map((rank: any) => ({
+          charmRanks.map((rank: any) => ({
             ...rank,
             charm: {
               id: charm.id,
@@ -161,6 +162,12 @@ export class MhwildsDataService {
 
   async createWeaponTree(locale: string): Promise<WeaponTreeResult> {
     try {
+      // The processed tree is derived data. Read the current weapon catalog
+      // before accepting it so a cache generated before a title update cannot
+      // silently hide the new weapons.
+      const weaponsResult = await this.mhwildsRepository.getWeapons(locale);
+      const weapons = weaponsResult.data;
+
       // Check if we have cached weapon tree
       const cachedTree = await this.mhwildsRepository.getProcessedData(
         'weapon-tree.json',
@@ -171,7 +178,11 @@ export class MhwildsDataService {
         locale,
       );
 
-      if (cachedTree && cachedTreeByKind) {
+      if (
+        cachedTree &&
+        cachedTreeByKind &&
+        this.isCurrentWeaponTree(cachedTree, cachedTreeByKind, weapons)
+      ) {
         return {
           tree: cachedTree,
           treeByKind: cachedTreeByKind,
@@ -180,39 +191,41 @@ export class MhwildsDataService {
         };
       }
 
-      // Generate weapon tree from weapons data
-      const weaponsResult = await this.mhwildsRepository.getWeapons(locale);
-      const weapons = weaponsResult.data;
-
       const weaponsById = weapons.reduce(
         (map: Record<string, any>, weapon: any) => {
-          map[weapon.id] = weapon;
+          map[String(weapon.id)] = weapon;
           return map;
         },
         {},
       );
+      const childrenByParent = this.buildWeaponChildren(weapons);
 
-      const rootWeapons = weapons.filter(
-        (weapon: any) =>
-          weapon.crafting?.craftable === true && !weapon.crafting?.previous,
-      );
+      const rootWeapons = weapons.filter((weapon: any) => {
+        const previousId = weapon.crafting?.previous?.id;
+        return previousId == null || !weaponsById[String(previousId)];
+      });
 
-      const weaponTree = rootWeapons.map((rootWeapon: any) =>
-        this.buildWeaponBranch(rootWeapon, weaponsById),
-      );
+      const weaponTree = rootWeapons
+        .map((rootWeapon: any) =>
+          this.buildWeaponBranch(rootWeapon, weaponsById, [], childrenByParent),
+        )
+        .filter(Boolean) as WeaponTreeNode[];
 
-      const weaponTreeByKind = weapons.reduce(
+      const weaponTreeByKind = rootWeapons.reduce(
         (tree: Record<string, any[]>, weapon: any) => {
           const kind = weapon.kind;
           if (!tree[kind]) {
             tree[kind] = [];
           }
 
-          if (
-            weapon.crafting?.craftable === true &&
-            !weapon.crafting?.previous
-          ) {
-            tree[kind].push(this.buildWeaponBranch(weapon, weaponsById));
+          const branch = this.buildWeaponBranch(
+            weapon,
+            weaponsById,
+            [],
+            childrenByParent,
+          );
+          if (branch) {
+            tree[kind].push(branch);
           }
 
           return tree;
@@ -410,19 +423,79 @@ export class MhwildsDataService {
 
   // ==================== UTILITY METHODS ====================
 
+  /**
+   * Build a complete set of parent -> child links from both representations
+   * used by the upstream catalog. Most records expose `branches` on the
+   * parent, but some update records only expose `previous` on the child.
+   */
+  private buildWeaponChildren(
+    weapons: any[],
+  ): Map<string, { id: number; name?: string }[]> {
+    const childrenByParent = new Map<string, { id: number; name?: string }[]>();
+
+    const addChild = (parentId: unknown, child: any) => {
+      if (parentId == null || child?.id == null) return;
+
+      const key = String(parentId);
+      const children = childrenByParent.get(key) || [];
+      if (
+        children.some((existing) => String(existing.id) === String(child.id))
+      ) {
+        return;
+      }
+
+      children.push({ id: child.id, name: child.name });
+      childrenByParent.set(key, children);
+    };
+
+    for (const weapon of weapons) {
+      const branches = Array.isArray(weapon.crafting?.branches)
+        ? weapon.crafting.branches
+        : [];
+      for (const branch of branches) {
+        addChild(weapon.id, branch);
+      }
+
+      const previousId = weapon.crafting?.previous?.id;
+      if (previousId != null) {
+        addChild(previousId, weapon);
+      }
+    }
+
+    return childrenByParent;
+  }
+
   private buildWeaponBranch(
     weapon: any,
     weaponsById: Record<string, any>,
+    parentPath: string[] = [],
+    childrenByParent?: Map<string, { id: number; name?: string }[]>,
   ): WeaponTreeNode | null {
     if (!weapon) return null;
 
+    const id = String(weapon.id);
+    const pathKey = [...parentPath, id].join('/');
+    const childLinks =
+      childrenByParent?.get(id) || weapon.crafting?.branches || [];
+
     const node: WeaponTreeNode = {
       id: weapon.id,
+      gameId: weapon.gameId,
+      pathKey,
+      assetKey:
+        weapon.gameId == null ? undefined : `${weapon.kind}:${weapon.gameId}`,
       name: weapon.name,
+      description: weapon.description,
       rarity: weapon.rarity,
       kind: weapon.kind,
       damage: weapon.damage,
       specials: weapon.specials || [],
+      slots: weapon.slots || [],
+      affinity: weapon.affinity || 0,
+      skills: weapon.skills || [],
+      series: weapon.series,
+      previous: weapon.crafting?.previous || null,
+      branchIds: childLinks,
       craftingMaterials: weapon.crafting?.craftingMaterials || [],
       craftingZennyCost: weapon.crafting?.craftingZennyCost || 0,
       upgradeMaterials: weapon.crafting?.upgradeMaterials || [],
@@ -430,11 +503,16 @@ export class MhwildsDataService {
       children: [],
     };
 
-    if (weapon.crafting?.branches && weapon.crafting.branches.length > 0) {
-      node.children = weapon.crafting.branches
+    if (childLinks.length > 0 && !parentPath.includes(id)) {
+      node.children = childLinks
         .map((branch: any) => {
-          const branchWeapon = weaponsById[branch.id];
-          return this.buildWeaponBranch(branchWeapon, weaponsById);
+          const branchWeapon = weaponsById[String(branch.id)];
+          return this.buildWeaponBranch(
+            branchWeapon,
+            weaponsById,
+            [...parentPath, id],
+            childrenByParent,
+          );
         })
         .filter(Boolean) as WeaponTreeNode[];
     }
@@ -446,6 +524,66 @@ export class MhwildsDataService {
     return tree.reduce((total, node) => {
       return total + 1 + this.countWeaponsInTree(node.children);
     }, 0);
+  }
+
+  private isCurrentWeaponTree(
+    tree: any,
+    treeByKind?: Record<string, any[]>,
+    weapons?: any[],
+  ): boolean {
+    const collectIds = (nodes: any): Set<string> | null => {
+      if (!Array.isArray(nodes)) return null;
+
+      const ids = new Set<string>();
+      for (const node of nodes) {
+        if (
+          !node ||
+          node.id == null ||
+          typeof node.pathKey !== 'string' ||
+          typeof node.assetKey !== 'string' ||
+          !('gameId' in node) ||
+          !Array.isArray(node.children)
+        ) {
+          return null;
+        }
+
+        ids.add(String(node.id));
+        const childIds = collectIds(node.children);
+        if (!childIds) return null;
+        childIds.forEach((id) => ids.add(id));
+      }
+
+      return ids;
+    };
+
+    const treeIds = collectIds(tree);
+    if (!treeIds) return false;
+
+    let treeByKindIds: Set<string> | null = null;
+    if (treeByKind) {
+      treeByKindIds = new Set<string>();
+      for (const nodes of Object.values(treeByKind)) {
+        const ids = collectIds(nodes);
+        if (!ids) return false;
+        ids.forEach((id) => treeByKindIds?.add(id));
+      }
+    }
+
+    if (!weapons) return true;
+
+    const expectedIds = new Set(
+      weapons
+        .filter((weapon) => weapon?.id != null)
+        .map((weapon) => String(weapon.id)),
+    );
+    const matchesCatalog = (ids: Set<string> | null) =>
+      ids != null &&
+      ids.size === expectedIds.size &&
+      [...expectedIds].every((id) => ids.has(id));
+
+    return (
+      matchesCatalog(treeIds) && (!treeByKind || matchesCatalog(treeByKindIds))
+    );
   }
 
   private formatResultWithCacheInfo(result: ResourceFetchResult): {

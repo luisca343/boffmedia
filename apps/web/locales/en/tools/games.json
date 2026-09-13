@@ -31,7 +31,9 @@
       "tools": {
         "planner": "Planner",
         "weaponTree": "Weapon Tree",
-        "bestiary": "Bestiary"
+        "bestiary": "Bestiary",
+        "armor": "Armor",
+        "materials": "Material checklist"
       }
     },
     "otros": {

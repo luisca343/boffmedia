@@ -22,7 +22,8 @@ import type {
   MhWildsHitzone,
   MhWildsPartData,
 } from "../types";
-import { mhwildsBestiaryAsset, mhwildsItemIconAsset } from "./assets";
+import { mhwildsBestiaryAsset } from "./assets";
+import { useMhwildsItemAsset } from "./item-assets";
 import { anatomyCalloutTarget } from "./anatomy-geometry";
 import { useMonsters } from "./useMonsters";
 import {
@@ -50,6 +51,7 @@ type BestiaryTranslate = (
 type DropGroup = {
   key: string;
   name: string;
+  itemGameId?: number | string;
   rarity: number;
   iconKind?: string;
   iconColor?: string;
@@ -355,7 +357,9 @@ export function BestiaryView() {
 
             {/* ── detail ── */}
             <div ref={detailRef} className="min-w-0">
-              {selected ? <MonsterDetail m={selected} /> : null}
+              {selected ? (
+                <MonsterDetail m={selected} />
+              ) : null}
             </div>
           </div>
         )}
@@ -364,7 +368,11 @@ export function BestiaryView() {
   );
 }
 
-function MonsterDetail({ m }: { m: MhMonster }) {
+function MonsterDetail({
+  m,
+}: {
+  m: MhMonster;
+}) {
   const t = useToolT("tools.mhwilds.bestiary");
   const locale = useLocale();
   const [selectedPartType, setSelectedPartType] = React.useState<number | null>(
@@ -381,16 +389,19 @@ function MonsterDetail({ m }: { m: MhMonster }) {
   const parts = m.localData?.data?.parts ?? [];
   const drops = m.rewards.reduce<DropGroup[]>((groups, reward) => {
     const name = reward.item?.name ?? t("unknownDrop");
-    const key = String(reward.item?.id ?? name);
+    const itemGameId = reward.item?.gameId;
+    const key = String(itemGameId ?? reward.item?.id ?? name);
     const existing = groups.find((group) => group.key === key);
     if (existing) {
       existing.conditions.push(...(reward.conditions ?? []));
+      existing.itemGameId ??= itemGameId;
       existing.iconKind ??= reward.item?.icon?.kind;
       existing.iconColor ??= reward.item?.icon?.color;
     } else {
       groups.push({
         key,
         name,
+        itemGameId,
         rarity: reward.item?.rarity ?? 1,
         iconKind: reward.item?.icon?.kind,
         iconColor: reward.item?.icon?.color,
@@ -582,6 +593,7 @@ function MonsterDetail({ m }: { m: MhMonster }) {
                 <div className="flex items-center justify-between gap-3 border-b border-solid border-line bg-panel px-2.5 py-2.5">
                   <span className="flex min-w-0 items-center gap-2">
                     <DropItemIcon
+                      itemGameId={drop.itemGameId}
                       iconKind={drop.iconKind}
                       iconColor={drop.iconColor}
                       rarity={drop.rarity}
@@ -650,12 +662,14 @@ function MonsterDetail({ m }: { m: MhMonster }) {
 }
 
 function DropItemIcon({
+  itemGameId,
   iconKind,
   iconColor,
   rarity,
   version,
   alt,
 }: {
+  itemGameId?: number | string;
   iconKind?: string;
   iconColor?: string;
   rarity: number;
@@ -664,7 +678,13 @@ function DropItemIcon({
 }) {
   const [failed, setFailed] = React.useState(false);
   const rarityColor = `var(--rar${Math.min(8, Math.max(1, rarity))})`;
-  const iconSrc = mhwildsItemIconAsset(iconKind, iconColor, version);
+  const iconSrc = useMhwildsItemAsset(
+    {
+      gameId: itemGameId,
+      icon: { kind: iconKind, color: iconColor },
+    },
+    version,
+  );
   const showImage = iconSrc != null && !failed;
   React.useEffect(() => setFailed(false), [iconSrc]);
   return (

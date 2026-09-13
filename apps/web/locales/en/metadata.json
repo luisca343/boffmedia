@@ -145,6 +145,14 @@
         "title": "Weapon tree",
         "description": "The full upgrade tree for every Monster Hunter Wilds weapon class."
       },
+      "mhwildsArmor": {
+        "title": "Armor sets",
+        "description": "Browse Monster Hunter Wilds armor sets and calculate their materials."
+      },
+      "mhwildsWishlist": {
+        "title": "Material checklist",
+        "description": "Calculate materials and zenny for everything you want to craft in Monster Hunter Wilds."
+      },
       "schematicViewer": {
         "title": "Schematic viewer",
         "description": "Open and explore Minecraft schematics in 3D."

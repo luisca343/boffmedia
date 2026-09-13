@@ -5,7 +5,8 @@ import { useToolT } from "../../i18n"
 import { Empty, Icon } from "@boffmedia/ui"
 import { ArmorPiece, Charm, Decoration, EquipmentType } from "../../types"
 import { MhDrawer, MhSearch, MhTag } from "../../ui/mh-kit"
-import { getArmorImagePath, getCharmImagePath, getDecorationColorFilterStyle, getDecorationImagePath, getRarityFilterStyle } from "./equipment-utils"
+import { getArmorImagePath, getCharmImagePath, getDecorationImagePath } from "./equipment-utils"
+import { mhwildsArmorAsset } from "../../bestiary/assets"
 
 export type SkillSource =
   | { kind: "armor"; slot: EquipmentType; item: ArmorPiece; level: number }
@@ -91,28 +92,35 @@ export function SkillSearchDrawer({
               .sort((a, b) => b.level - a.level)
               .map((src, i) => (
                 <div key={i} className="flex items-center gap-2.5 border border-line bg-base-2 px-2.5 py-2">
-                  <span className="grid h-7 w-7 flex-none place-items-center border border-line bg-panel">
+          <span className="grid h-7 w-7 flex-none place-items-center border border-line bg-base-deep">
                     {src.kind === "armor" ? (
                       <img
-                        src={getArmorImagePath(src.slot)}
+                        src={mhwildsArmorAsset(src.item) || getArmorImagePath(src.slot)}
                         alt=""
                         aria-hidden="true"
                         width={24}
                         height={24}
                         draggable={false}
                         className="h-6 w-6 object-contain"
-                        style={{ filter: getRarityFilterStyle(src.item.rarity) }}
+                        style={undefined}
+                        onError={(event) => {
+                          const fallback = getArmorImagePath(src.slot)
+                          if (event.currentTarget.src !== fallback) {
+                            event.currentTarget.onerror = null
+                            event.currentTarget.src = fallback
+                          }
+                        }}
                       />
                     ) : (
                       <img
-                        src={src.kind === "charm" ? getCharmImagePath(src.item.rarity) : getDecorationImagePath(src.decoSlot)}
+                        src={src.kind === "charm" ? getCharmImagePath(src.item.rarity) : getDecorationImagePath(src.decoSlot, src.item.icon?.color, src.item.icon?.colorId)}
                         alt=""
                         aria-hidden="true"
                         width={24}
                         height={24}
                         draggable={false}
                         className="h-6 w-6 object-contain"
-                        style={src.kind === "charm" ? undefined : { filter: getDecorationColorFilterStyle(src.item.icon?.color, src.item.icon?.colorId) }}
+                        style={undefined}
                       />
                     )}
                   </span>

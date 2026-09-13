@@ -145,6 +145,14 @@
         "title": "Árbol de armas",
         "description": "El árbol de mejora completo de cada tipo de arma de Monster Hunter Wilds."
       },
+      "mhwildsArmor": {
+        "title": "Armaduras",
+        "description": "Explora conjuntos de armadura de Monster Hunter Wilds y calcula sus materiales."
+      },
+      "mhwildsWishlist": {
+        "title": "Lista de materiales",
+        "description": "Calcula materiales y zenny para todo lo que quieres fabricar en Monster Hunter Wilds."
+      },
       "schematicViewer": {
         "title": "Visor de esquemas",
         "description": "Abre y explora esquemas de Minecraft en 3D."

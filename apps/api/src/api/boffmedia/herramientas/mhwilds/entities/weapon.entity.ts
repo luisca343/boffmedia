@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class WeaponEntity {
   @ApiProperty({
@@ -7,11 +7,33 @@ export class WeaponEntity {
   })
   id: number;
 
+  @ApiPropertyOptional({
+    example: 12,
+    description: 'Localized game identifier used by the extracted asset pack',
+  })
+  gameId?: number;
+
+  @ApiPropertyOptional({
+    example: '1/2/7',
+    description:
+      'Unique occurrence key for a route through converging branches',
+  })
+  pathKey?: string;
+
+  @ApiPropertyOptional({
+    example: 'long-sword:12',
+    description: 'Stable weapon-kind/game-id key for the 2D thumbnail',
+  })
+  assetKey?: string;
+
   @ApiProperty({
     example: 'Iron Sword',
     description: 'Name of the weapon',
   })
   name: string;
+
+  @ApiPropertyOptional({ description: 'Weapon description' })
+  description?: string;
 
   @ApiProperty({
     example: 1,

@@ -3,6 +3,7 @@
 import { useToolT } from "../../i18n"
 import { Button, Icon, IconButton } from "@boffmedia/ui"
 import { MhBar, MhBarSide, MhModes, MhSeal } from "../../ui/mh-kit"
+import { WishlistLink } from "./WishlistLink"
 
 export function PlannerBar({
   name, onName, filled, total, skillCount, mode, onMode, onOpenSaved, onIo, onShare, onReset, onSave,
@@ -41,6 +42,7 @@ export function PlannerBar({
             { value: "compare", label: <><Icon name="layers" size={13} />{t("build_planner.compare.mode_compare")}</> },
           ]}
         />
+        <WishlistLink />
         <Button size="sm" icon="bookmark" onClick={onOpenSaved}>{t("build_planner.saved_builds")}</Button>
         <Button size="sm" icon="download" onClick={onIo}>{t("build_planner.import_export")}</Button>
         <Button size="sm" icon="link" onClick={onShare}>{t("build_planner.share")}</Button>

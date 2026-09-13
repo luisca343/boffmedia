@@ -55,23 +55,64 @@ const DEFAULT_OUTPUT = path.join(
   REPO,
   "laboon/tool-sources/mhwilds/extracted/bestiary",
 );
+const ARMOR_THUMBNAIL_MAP_SOURCE = path.join(HERE, "armor-thumbnail-map.json");
 const FILE_LIST_URL =
   "https://raw.githubusercontent.com/Ekey/REE.PAK.Tool/main/Projects/MHWs_STM_Release.list";
 const EXTRACTOR_URL =
   "https://github.com/SlickAmogus/REToolCustom/releases/download/release/REToolCustom_1.0.zip";
 const CONVERTER_URL =
   "https://github.com/microsoft/DirectXTex/releases/tag/may2026";
-const TOOL_VERSION = 1;
+const TOOL_VERSION = 4;
 const PER_MONSTER_PART_DATA_PATTERN =
   /^natives\/stm\/gamedesign\/enemy\/em\d+\/\d+\/data\/em\d+_\d+_param_parts(?:breakreward|effect|lost)?\.user\.3$/i;
 const ITEM_THUMBNAIL_PATTERN =
-  /^natives\/stm\/gui\/ui_texture\/tex080000\/tex_thumbnail\/item\/it\d{2}\/tex_it\d{4}_\d{4}_imlm4\.tex\./i;
+  /^natives\/stm\/gui\/ui_texture\/tex080000\/tex_thumbnail\/item\/it\d+\/tex_it\d+_.+_imlm4\.tex\./i;
+const ARMOR_THUMBNAIL_PATTERN =
+  /^natives\/stm\/gui\/ui_texture\/tex080000\/tex_thumbnail\/character\/(?:ch02\/tex_ch02_00_\d+_\d+_\d+|ch03\/tex_ch03_00_\d+_\d+_\d+)_imlm4\.tex\./i;
+const CHARACTER_THUMBNAIL_PATTERN =
+  /^natives\/stm\/gui\/ui_texture\/tex080000\/tex_thumbnail\/character\/ch05\/tex_ch05_\d+_\d+_imlm4\.tex\./i;
+const PLAYER_ARMOR_LIST_PATTERN =
+  /^natives\/stm\/gamedesign\/catalog\/(?:\d+_\d+|first)\/data\/playerarmorlist(?:_[^/]+)?\.user\.3$/i;
+const PLAYER_ARMOR_VISUAL_SETTING_PATTERN =
+  /^natives\/stm\/gamedesign\/equip\/_prefab\/armor\/armorvisualsetting\/playerarmorvisualsetting(?:_\d+)?\.user\.3$/i;
 const VISUAL_RESOURCE_PATTERN =
   /\/tex_emanatomy[^/]*\/tex_|\/enemyreportbossanatomytexture\//i;
 const VISUAL_TEXTURE_PATH_PATTERN =
   /^natives\/stm\/gui\/ui_texture\/tex000000\/tex_(?:emanatomy|emicon_\d+)\/tex_(?:emanatomy|emicon)_em\d{4}_/i;
 const LEGACY_SKETCH_PATH_PATTERN = /(?:tex_emsketch|enemyreportbosssketch)/i;
 const VISUAL_ID_COUNT = 10_000;
+const WEAPON_KIND_TO_THUMBNAIL_FAMILY = Object.freeze({
+  "great-sword": "it00",
+  "sword-shield": "it01",
+  "dual-blades": "it02",
+  "long-sword": "it03",
+  hammer: "it04",
+  "hunting-horn": "it05",
+  lance: "it06",
+  gunlance: "it07",
+  "switch-axe": "it08",
+  "charge-blade": "it09",
+  "insect-glaive": "it10",
+  bow: "it11",
+  "light-bowgun": "it12",
+  "heavy-bowgun": "it13",
+});
+const RAW_WEAPON_KIND_BY_FILE = Object.freeze({
+  GreatSword: "great-sword",
+  SwordShield: "sword-shield",
+  DualBlades: "dual-blades",
+  LongSword: "long-sword",
+  Hammer: "hammer",
+  HuntingHorn: "hunting-horn",
+  Lance: "lance",
+  Gunlance: "gunlance",
+  SwitchAxe: "switch-axe",
+  ChargeBlade: "charge-blade",
+  InsectGlaive: "insect-glaive",
+  Bow: "bow",
+  LightBowgun: "light-bowgun",
+  HeavyBowgun: "heavy-bowgun",
+});
 const DEFAULT_VISUAL_TEMPLATES = [
   "natives/stm/gui/ui_texture/tex000000/tex_emanatomy/tex_emanatomy_{id}_00_0_imlm4.tex.241106027",
   "natives/stm/gui/ui_texture/tex000000/tex_emicon_00/tex_emicon_{id}_00_0_imlm4.tex.241106027",
@@ -81,6 +122,7 @@ const DEFAULT_PATTERNS = [
   /^natives\/stm\/gui\/ui_texture\/tex000000\/tex_emanatomy\/tex_emanatomy_.*\.tex\./i,
   /^natives\/stm\/gui\/ui_texture\/tex000000\/tex_emicon_\d+\/tex_emicon_.*\.tex\./i,
   ITEM_THUMBNAIL_PATTERN,
+  ARMOR_THUMBNAIL_PATTERN,
   /^natives\/stm\/gamedesign\/gui\/common\/_prefab\/enemyreportbossanatomytexture\/.*\.pfb\./i,
   PER_MONSTER_PART_DATA_PATTERN,
   /^natives\/stm\/gamedesign\/common\/enemy\/enemyreport(?:anatomypartsbreakdata|anatomypartsrewarddata|bossdata|bossmaterialdispdata|bossreleasedata|bosstitledata|partsbreaktypedata)\.user\.3$/i,
@@ -88,6 +130,10 @@ const DEFAULT_PATTERNS = [
   /^natives\/stm\/gamedesign\/enemy\/commondata\/data\/enemyweakattrdata\.user\.3$/i,
   /^natives\/stm\/gamedesign\/common\/enemy\/(?:enemydata|enemypartstypedata)\.user\.3$/i,
   /^natives\/stm\/gamedesign\/enemy\/commondata\/enummaker\/emid\.user\.3$/i,
+  /^natives\/stm\/gamedesign\/common\/equip\/armorseriesdata\.user\.3$/i,
+  PLAYER_ARMOR_LIST_PATTERN,
+  PLAYER_ARMOR_VISUAL_SETTING_PATTERN,
+  /^natives\/stm\/gamedesign\/gui\/common\/_userdata\/(?:armor|other|weapon)thumbnailtexturedata\.user\.3$/i,
   /^natives\/stm\/gamedesign\/text\/excel_data\/enemyreportbosstitledatatext\.msg\.23$/i,
   /^natives\/stm\/gamedesign\/text\/excel_data\/enemyreportpartsbreaktypename\.msg\.23$/i,
   /^natives\/stm\/gamedesign\/text\/excel_data\/enemypartstypename\.msg\.23$/i,
@@ -319,7 +365,18 @@ function isSharedDataPath(archivePath) {
       archivePath,
     ) ||
     /^natives\/stm\/gamedesign\/gui\/gui060000\/enemyicon/i.test(archivePath) ||
+    /^natives\/stm\/gamedesign\/common\/equip\/armorseriesdata\.user\.3$/i.test(
+      archivePath,
+    ) ||
+    /^natives\/stm\/gamedesign\/catalog\/[^/]+\/data\/playerarmorlist(?:_[^/]+)?\.user\.3$/i.test(
+      archivePath,
+    ) ||
+    PLAYER_ARMOR_VISUAL_SETTING_PATTERN.test(archivePath) ||
+    /^natives\/stm\/gamedesign\/gui\/common\/_userdata\/(?:armor|other|weapon)thumbnailtexturedata\.user\.3$/i.test(
+      archivePath,
+    ) ||
     ITEM_THUMBNAIL_PATTERN.test(archivePath) ||
+    ARMOR_THUMBNAIL_PATTERN.test(archivePath) ||
     /^natives\/stm\/gamedesign\/gui\/common\/_userdata\/enemyreportbossanatomytexture/i.test(
       archivePath,
     )
@@ -343,6 +400,212 @@ function buildVisualPathTemplates(listedPaths) {
     templates.add(`${match[1]}{id}${match[3]}`.toLowerCase());
   }
   return [...templates].sort();
+}
+
+function buildItemThumbnailPathTemplates(listedPaths) {
+  const templates = new Map();
+  for (const archivePath of listedPaths) {
+    if (!ITEM_THUMBNAIL_PATTERN.test(archivePath)) continue;
+    const match = archivePath.match(
+      /^(.*\/item\/(it\d+)\/tex_it\d+_)([^/]+)(_imlm4\.tex\.\d+)$/i,
+    );
+    if (!match) continue;
+    const family = match[2].toLowerCase();
+    const template = `${match[1]}{gameId}${match[4]}`.toLowerCase();
+    templates.set(`${family}:${template}`, {
+      family,
+      template,
+    });
+  }
+  return [...templates.values()].sort((a, b) =>
+    a.template.localeCompare(b.template),
+  );
+}
+
+function buildArmorThumbnailPathTemplates(listedPaths) {
+  const templates = new Map();
+  for (const archivePath of listedPaths) {
+    if (!ARMOR_THUMBNAIL_PATTERN.test(archivePath)) continue;
+    const ch02or03 = archivePath.match(
+      /^(.*\/character\/(ch02|ch03)\/tex_ch(?:02|03)_00_)(\d+)(_\d+_\d+_imlm4\.tex\.\d+)$/i,
+    );
+    if (ch02or03) {
+      const template = `${ch02or03[1]}{modelid}${ch02or03[4]}`.toLowerCase();
+      templates.set(`${ch02or03[2]}:${template}`, {
+        family: ch02or03[2].toLowerCase(),
+        template,
+      });
+      continue;
+    }
+  }
+  return [...templates.values()].sort((a, b) =>
+    a.template.localeCompare(b.template),
+  );
+}
+
+function addWeaponGameId(idsByFamily, family, value) {
+  const gameId = Number(value);
+  if (!Number.isSafeInteger(gameId) || gameId < 0) return;
+  const ids = idsByFamily.get(family) || new Set();
+  ids.add(String(gameId).padStart(4, "0"));
+  idsByFamily.set(family, ids);
+}
+
+function readJsonIfPresent(filePath) {
+  try {
+    if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile())
+      return null;
+    return JSON.parse(fs.readFileSync(filePath, "utf8"));
+  } catch {
+    return null;
+  }
+}
+
+function readWeaponGameIds() {
+  const idsByFamily = new Map();
+  const publicWeaponFiles = [
+    path.join(REPO, "public/boffmedia/tools/mhwilds/en/weapons.json"),
+    path.join(REPO, "public/boffmedia/tools/mhwilds/es/weapons.json"),
+  ];
+
+  for (const filePath of publicWeaponFiles) {
+    const records = readJsonIfPresent(filePath);
+    if (!Array.isArray(records)) continue;
+    for (const record of records) {
+      const family = WEAPON_KIND_TO_THUMBNAIL_FAMILY[record?.kind];
+      if (family) addWeaponGameId(idsByFamily, family, record?.gameId);
+    }
+  }
+
+  const rawWeaponDirectory = path.join(
+    REPO,
+    "laboon/tool-sources/mhwilds/mhdb-wilds-data/output/merged/weapons",
+  );
+  if (fs.existsSync(rawWeaponDirectory)) {
+    for (const entry of fs.readdirSync(rawWeaponDirectory)) {
+      if (!entry.endsWith(".json")) continue;
+      const kind = RAW_WEAPON_KIND_BY_FILE[entry.slice(0, -5)];
+      const family = kind ? WEAPON_KIND_TO_THUMBNAIL_FAMILY[kind] : null;
+      if (!family) continue;
+      const records = readJsonIfPresent(path.join(rawWeaponDirectory, entry));
+      if (!Array.isArray(records)) continue;
+      for (const record of records)
+        addWeaponGameId(idsByFamily, family, record?.game_id);
+    }
+  }
+
+  return idsByFamily;
+}
+
+function readArmorThumbnailModelIds() {
+  const modelIds = new Set();
+  const rawArmorFile = path.join(
+    REPO,
+    "laboon/tool-sources/mhwilds/mhdb-wilds-data/output/merged/Armor.json",
+  );
+  const records = readJsonIfPresent(rawArmorFile);
+  if (Array.isArray(records)) {
+    for (const record of records) {
+      const modelId = Number(record?.model_id);
+      if (Number.isSafeInteger(modelId) && modelId >= 0)
+        modelIds.add(String(modelId).padStart(3, "0"));
+    }
+  }
+
+  // ArmorSeriesData._ModId is the wearable model and does not enumerate the
+  // separate character-thumbnail namespace. Add the reviewed crosswalk's
+  // thumbnail ids so discovery can actually extract the rasters selected by
+  // the asset builder (for example Nerscylla 24, not wearable model 22).
+  const thumbnailMap = readJsonIfPresent(ARMOR_THUMBNAIL_MAP_SOURCE);
+  if (
+    !thumbnailMap ||
+    typeof thumbnailMap !== "object" ||
+    Array.isArray(thumbnailMap) ||
+    !thumbnailMap.entries ||
+    typeof thumbnailMap.entries !== "object" ||
+    Array.isArray(thumbnailMap.entries)
+  ) {
+    throw new Error(
+      `Armor thumbnail crosswalk is missing or invalid: ${ARMOR_THUMBNAIL_MAP_SOURCE}`,
+    );
+  }
+  for (const value of Object.values(thumbnailMap.entries)) {
+    const thumbnailModelId = Number(value);
+    if (!Number.isSafeInteger(thumbnailModelId) || thumbnailModelId < 0) {
+      throw new Error(
+        `Armor thumbnail crosswalk contains an invalid model id: ${value}`,
+      );
+    }
+    modelIds.add(String(thumbnailModelId).padStart(3, "0"));
+  }
+  return modelIds;
+}
+
+function buildItemThumbnailDiscoveryCandidates(listedPaths) {
+  const templates = buildItemThumbnailPathTemplates(listedPaths);
+  const idsByFamily = readWeaponGameIds();
+  const listedIdsByFamily = new Map();
+
+  for (const archivePath of listedPaths) {
+    const match = archivePath.match(
+      /\/item\/(it\d+)\/tex_it\d+_([^/]+)_imlm4\.tex\./i,
+    );
+    if (!match) continue;
+    const ids = listedIdsByFamily.get(match[1].toLowerCase()) || new Set();
+    ids.add(match[2]);
+    listedIdsByFamily.set(match[1].toLowerCase(), ids);
+  }
+
+  const candidates = new Set();
+  for (const { family, template } of templates) {
+    const ids = new Set([
+      ...(idsByFamily.get(family) || []),
+      ...(listedIdsByFamily.get(family) || []),
+    ]);
+    for (const gameId of ids)
+      candidates.add(template.replace("{gameid}", gameId));
+  }
+
+  return {
+    templates: templates.map(({ template }) => template),
+    idsByFamily: Object.fromEntries(
+      [...idsByFamily.entries()].map(([family, ids]) => [
+        family,
+        [...ids].sort(),
+      ]),
+    ),
+    candidates: [...candidates].sort(),
+  };
+}
+
+function buildArmorThumbnailDiscoveryCandidates(listedPaths) {
+  const templates = buildArmorThumbnailPathTemplates(listedPaths);
+  const modelIds = readArmorThumbnailModelIds();
+  const listedModelIds = new Set();
+
+  for (const archivePath of listedPaths) {
+    const match = archivePath.match(
+      /\/character\/(?:ch02|ch03)\/tex_ch(?:02|03)_00_(\d+)_\d+_\d+_imlm4\.tex\./i,
+    );
+    if (match) listedModelIds.add(match[1]);
+  }
+
+  // The decoded catalog and the release list can advance independently. Keep
+  // both sources so a title update cannot disappear just because one local
+  // dataset has not been refreshed yet.
+  for (const modelId of listedModelIds) modelIds.add(modelId);
+
+  const candidates = new Set();
+  for (const { template } of templates) {
+    for (const modelId of modelIds)
+      candidates.add(template.replace("{modelid}", modelId));
+  }
+
+  return {
+    templates: templates.map(({ template }) => template),
+    modelIds: [...modelIds].sort(),
+    candidates: [...candidates].sort(),
+  };
 }
 
 function buildBroadVisualPathTemplates(listedPaths) {
@@ -395,6 +658,14 @@ function isPatchPak(pak) {
   return /\.patch_\d+\.pak$/i.test(path.basename(pak));
 }
 
+function isUsablePak(pak) {
+  try {
+    return fs.statSync(pak).size > 1024;
+  } catch {
+    return false;
+  }
+}
+
 function discoverVisualPaths(fileList, paks, extractor, requestedIds = []) {
   const listedPaths = readListedPaths(fileList);
   const { templates, ids, candidates } = buildVisualDiscoveryCandidates(
@@ -432,7 +703,9 @@ function discoverVisualPaths(fileList, paks, extractor, requestedIds = []) {
       if (result.error) {
         warnings.push(`${path.basename(pak)}: ${result.error.message}`);
       } else if (result.status !== 0 && result.status !== 1) {
-        warnings.push(`${path.basename(pak)}: RETool exited with ${result.status}`);
+        warnings.push(
+          `${path.basename(pak)}: RETool exited with ${result.status}`,
+        );
       }
 
       const trimmedList = path.join(workDirectory, "trimmed.list");
@@ -472,8 +745,269 @@ function discoverVisualPaths(fileList, paks, extractor, requestedIds = []) {
   };
 }
 
+function discoverItemThumbnailPaths(fileList, paks, extractor) {
+  const listedPaths = readListedPaths(fileList);
+  const { templates, idsByFamily, candidates } =
+    buildItemThumbnailDiscoveryCandidates(listedPaths);
+  // The release list is only a baseline. Steam may place a later title-update
+  // asset in the base/sub archive instead of a patch archive, so gear discovery
+  // must inspect every usable installed PAK.
+  const discoveryPaks = paks.filter(isUsablePak);
+  const discovered = new Set();
+  const matchedPaks = [];
+  const warnings = [];
+  const workDirectory = fs.mkdtempSync(
+    path.join(os.tmpdir(), "mhwilds-gear-discovery-"),
+  );
+  const candidateList = path.join(workDirectory, "gear-candidates.list");
+  fs.writeFileSync(candidateList, `${candidates.join("\n")}\n`, "utf8");
+
+  try {
+    for (const pak of discoveryPaks) {
+      const result = spawnSync(
+        extractor,
+        ["-h", candidateList, "-l", "-trimList", pak],
+        {
+          cwd: workDirectory,
+          stdio: "ignore",
+          windowsHide: true,
+        },
+      );
+      if (result.error) {
+        warnings.push(`${path.basename(pak)}: ${result.error.message}`);
+      } else if (result.status !== 0 && result.status !== 1) {
+        warnings.push(
+          `${path.basename(pak)}: RETool exited with ${result.status}`,
+        );
+      }
+
+      const trimmedList = path.join(workDirectory, "trimmed.list");
+      if (fs.existsSync(trimmedList)) {
+        const matches = readListedPaths(trimmedList).filter((archivePath) =>
+          ITEM_THUMBNAIL_PATTERN.test(archivePath),
+        );
+        for (const archivePath of matches) discovered.add(archivePath);
+        if (matches.length)
+          matchedPaks.push({
+            pak: path.basename(pak),
+            paths: [...new Set(matches)].sort(),
+          });
+        fs.rmSync(trimmedList, { force: true });
+      }
+
+      for (const entry of fs.readdirSync(workDirectory)) {
+        if (!entry.toLowerCase().endsWith(".txt")) continue;
+        fs.rmSync(path.join(workDirectory, entry), { force: true });
+      }
+    }
+  } finally {
+    fs.rmSync(workDirectory, { recursive: true, force: true });
+  }
+
+  return {
+    enabled: true,
+    paks: discoveryPaks.map((pak) => path.basename(pak)),
+    idsByFamily,
+    templates,
+    candidateCount: candidates.length,
+    paths: [...discovered].sort(),
+    matchedPaks,
+    warnings,
+  };
+}
+
+function discoverArmorThumbnailPaths(fileList, paks, extractor) {
+  const listedPaths = readListedPaths(fileList);
+  const { templates, modelIds, candidates } =
+    buildArmorThumbnailDiscoveryCandidates(listedPaths);
+  const discoveryPaks = paks.filter(isUsablePak);
+  const discovered = new Set();
+  const matchedPaks = [];
+  const warnings = [];
+  const workDirectory = fs.mkdtempSync(
+    path.join(os.tmpdir(), "mhwilds-armor-discovery-"),
+  );
+  const candidateList = path.join(workDirectory, "armor-candidates.list");
+  fs.writeFileSync(candidateList, `${candidates.join("\n")}\n`, "utf8");
+
+  try {
+    for (const pak of discoveryPaks) {
+      const result = spawnSync(
+        extractor,
+        ["-h", candidateList, "-l", "-trimList", pak],
+        {
+          cwd: workDirectory,
+          stdio: "ignore",
+          windowsHide: true,
+        },
+      );
+      if (result.error) {
+        warnings.push(`${path.basename(pak)}: ${result.error.message}`);
+      } else if (result.status !== 0 && result.status !== 1) {
+        warnings.push(
+          `${path.basename(pak)}: RETool exited with ${result.status}`,
+        );
+      }
+
+      const trimmedList = path.join(workDirectory, "trimmed.list");
+      if (fs.existsSync(trimmedList)) {
+        const matches = readListedPaths(trimmedList).filter((archivePath) =>
+          ARMOR_THUMBNAIL_PATTERN.test(archivePath),
+        );
+        for (const archivePath of matches) discovered.add(archivePath);
+        if (matches.length)
+          matchedPaks.push({
+            pak: path.basename(pak),
+            paths: [...new Set(matches)].sort(),
+          });
+        fs.rmSync(trimmedList, { force: true });
+      }
+
+      for (const entry of fs.readdirSync(workDirectory)) {
+        if (!entry.toLowerCase().endsWith(".txt")) continue;
+        fs.rmSync(path.join(workDirectory, entry), { force: true });
+      }
+    }
+  } finally {
+    fs.rmSync(workDirectory, { recursive: true, force: true });
+  }
+
+  const paths = [...discovered].sort();
+  const matchedModelIds = new Set(
+    paths
+      .map(
+        (archivePath) =>
+          archivePath.match(
+            /\/character\/(?:ch02|ch03)\/tex_ch(?:02|03)_00_(\d+)_\d+_\d+_imlm4\.tex\./i,
+          )?.[1],
+      )
+      .filter(Boolean)
+      .map((modelId) => String(Number(modelId))),
+  );
+  const unmatchedModelIds = modelIds.filter(
+    (modelId) => !matchedModelIds.has(String(Number(modelId))),
+  );
+
+  return {
+    enabled: true,
+    paks: discoveryPaks.map((pak) => path.basename(pak)),
+    modelIds,
+    unmatchedModelIds,
+    templates,
+    candidateCount: candidates.length,
+    paths,
+    matchedPaks,
+    warnings,
+  };
+}
+
+/**
+ * Discover title-update armor catalogs independently from the release list.
+ *
+ * The public list is not updated atomically with Steam patches.  A stale list
+ * can therefore still contain every thumbnail while omitting a new
+ * PlayerArmorList_<title> table; decoding then silently loses the model/slot
+ * join for that generation.  Catalog folders use a two-component numeric
+ * generation (for example 02_00), so probing the bounded naming space is
+ * cheap compared with the existing thumbnail discovery and keeps the update
+ * reproducible without requiring a network refresh of the list.
+ */
+function buildArmorCatalogDiscoveryCandidates(listedPaths) {
+  const candidates = new Set(
+    listedPaths.filter((archivePath) =>
+      PLAYER_ARMOR_LIST_PATTERN.test(archivePath),
+    ),
+  );
+  candidates.add(
+    "natives/stm/gamedesign/catalog/00_00/data/playerarmorlist.user.3",
+  );
+  candidates.add(
+    "natives/stm/gamedesign/catalog/first/data/playerarmorlist_first.user.3",
+  );
+
+  for (let major = 0; major <= 99; major += 1) {
+    for (let minor = 0; minor <= 99; minor += 1) {
+      const generation = `${String(major).padStart(2, "0")}_${String(minor).padStart(2, "0")}`;
+      candidates.add(
+        `natives/stm/gamedesign/catalog/${generation}/data/playerarmorlist_${generation}.user.3`,
+      );
+    }
+  }
+  return [...candidates].sort();
+}
+
+function discoverArmorCatalogPaths(fileList, paks, extractor) {
+  const listedPaths = readListedPaths(fileList);
+  const candidates = buildArmorCatalogDiscoveryCandidates(listedPaths);
+  const discoveryPaks = paks.filter(isUsablePak);
+  const discovered = new Set();
+  const matchedPaks = [];
+  const warnings = [];
+  const workDirectory = fs.mkdtempSync(
+    path.join(os.tmpdir(), "mhwilds-armor-catalog-discovery-"),
+  );
+  const candidateList = path.join(
+    workDirectory,
+    "armor-catalog-candidates.list",
+  );
+  fs.writeFileSync(candidateList, `${candidates.join("\n")}\n`, "utf8");
+
+  try {
+    for (const pak of discoveryPaks) {
+      const result = spawnSync(
+        extractor,
+        ["-h", candidateList, "-l", "-trimList", pak],
+        {
+          cwd: workDirectory,
+          stdio: "ignore",
+          windowsHide: true,
+        },
+      );
+      if (result.error) {
+        warnings.push(`${path.basename(pak)}: ${result.error.message}`);
+      } else if (result.status !== 0 && result.status !== 1) {
+        warnings.push(
+          `${path.basename(pak)}: RETool exited with ${result.status}`,
+        );
+      }
+
+      const trimmedList = path.join(workDirectory, "trimmed.list");
+      if (fs.existsSync(trimmedList)) {
+        const matches = readListedPaths(trimmedList).filter((archivePath) =>
+          PLAYER_ARMOR_LIST_PATTERN.test(archivePath),
+        );
+        for (const archivePath of matches) discovered.add(archivePath);
+        if (matches.length)
+          matchedPaks.push({
+            pak: path.basename(pak),
+            paths: [...new Set(matches)].sort(),
+          });
+        fs.rmSync(trimmedList, { force: true });
+      }
+
+      for (const entry of fs.readdirSync(workDirectory)) {
+        if (!entry.toLowerCase().endsWith(".txt")) continue;
+        fs.rmSync(path.join(workDirectory, entry), { force: true });
+      }
+    }
+  } finally {
+    fs.rmSync(workDirectory, { recursive: true, force: true });
+  }
+
+  return {
+    enabled: true,
+    paks: discoveryPaks.map((pak) => path.basename(pak)),
+    candidateCount: candidates.length,
+    paths: [...discovered].sort(),
+    matchedPaks,
+    warnings,
+  };
+}
+
 function readSelectedPaths(listedPaths, args, discoveredPaths = []) {
-  const lines = [...new Set([...listedPaths, ...discoveredPaths, ...args.paths])];
+  const lines = [
+    ...new Set([...listedPaths, ...discoveredPaths, ...args.paths]),
+  ];
 
   const monsterIds = args.monsters.map((id) => {
     const normalized = id.startsWith("em") ? id.slice(2) : id;
@@ -656,12 +1190,17 @@ function convertTextures(outputDirectory, converterPath) {
   const texFiles = walkFiles(outputDirectory).filter((filePath) =>
     /\.tex\.\d+$/i.test(filePath),
   );
-  const itemThumbnailFiles = texFiles.filter((filePath) =>
-    ITEM_THUMBNAIL_PATTERN.test(
-      path.relative(outputDirectory, filePath).replaceAll(path.sep, "/"),
-    ),
-  );
-  if (itemThumbnailFiles.length > 0) decodeItemThumbnails(outputDirectory);
+  const gdeflateThumbnailFiles = texFiles.filter((filePath) => {
+    const relativePath = path
+      .relative(outputDirectory, filePath)
+      .replaceAll(path.sep, "/");
+    return (
+      ITEM_THUMBNAIL_PATTERN.test(relativePath) ||
+      ARMOR_THUMBNAIL_PATTERN.test(relativePath) ||
+      CHARACTER_THUMBNAIL_PATTERN.test(relativePath)
+    );
+  });
+  if (gdeflateThumbnailFiles.length > 0) decodeUiThumbnails(outputDirectory);
 
   const converted = [];
   for (const texPath of texFiles) {
@@ -670,7 +1209,11 @@ function convertTextures(outputDirectory, converterPath) {
     const relativeTexPath = path
       .relative(outputDirectory, texPath)
       .replaceAll(path.sep, "/");
-    if (!ITEM_THUMBNAIL_PATTERN.test(relativeTexPath)) {
+    const isGdeflateThumbnail =
+      ITEM_THUMBNAIL_PATTERN.test(relativeTexPath) ||
+      ARMOR_THUMBNAIL_PATTERN.test(relativeTexPath) ||
+      CHARACTER_THUMBNAIL_PATTERN.test(relativeTexPath);
+    if (!isGdeflateThumbnail) {
       const texResult = spawnSync(
         resolveExtractorPathForTexture(),
         ["-tex", texPath],
@@ -772,11 +1315,14 @@ function buildAssetIndex(outputDirectory, extractedFiles, converted) {
   for (const file of extractedFiles) {
     const filePath = file.path;
     const itemThumbnailMatch = filePath.match(
-      /\/tex_thumbnail\/item\/(it\d{2})\/(tex_it\d{4})_(\d{4})_imlm4\.tex\.\d+$/i,
+      /\/tex_thumbnail\/item\/(it\d+)\/(tex_it\d+)_(\d+)_imlm4\.tex\.\d+$/i,
     );
     if (itemThumbnailMatch) {
       itemThumbnails.set(
-        `${itemThumbnailMatch[1]}-${itemThumbnailMatch[3]}`,
+        // Keep the full four-digit family (tex_it5201, for example). The
+        // previous two-digit key collided when several non-weapon families
+        // shared the same variant number (it52-0000, it59-0000, ...).
+        `${itemThumbnailMatch[2]}-${itemThumbnailMatch[3]}`,
         makeTextureAsset(filePath),
       );
       continue;
@@ -803,8 +1349,10 @@ function buildAssetIndex(outputDirectory, extractedFiles, converted) {
       /\/enemyreportbossanatomytexture\/.*?_(em\d+)_(\d+)_/i,
     );
     if (prefabMatch) {
-      ensureVariant(prefabMatch[1].toLowerCase(), prefabMatch[2]).anatomyPrefab =
-        filePath;
+      ensureVariant(
+        prefabMatch[1].toLowerCase(),
+        prefabMatch[2],
+      ).anatomyPrefab = filePath;
     }
 
     const partDataMatch = filePath.match(
@@ -865,21 +1413,21 @@ function resolveExtractorPathForTexture() {
   return textureExtractor;
 }
 
-function decodeItemThumbnails(outputDirectory) {
+function decodeUiThumbnails(outputDirectory) {
   const helper = path.join(
     REPO,
     "scripts/tools/mhwilds/decode-item-thumbnails.py",
   );
   const dll = path.join(path.dirname(textureExtractor), "libGDeflate.dll");
   if (!fs.existsSync(helper) || !fs.existsSync(dll))
-    throw new Error(`Item thumbnail fallback requires ${helper} and ${dll}`);
+    throw new Error(`UI thumbnail fallback requires ${helper} and ${dll}`);
   const result = spawnSync(
     process.env.MHWILDS_PYTHON || "python",
     [helper, "--root", outputDirectory, "--dll", dll],
     { stdio: "inherit", windowsHide: true },
   );
   if (result.status !== 0)
-    throw new Error("Item thumbnail GDeflate conversion failed");
+    throw new Error("UI thumbnail GDeflate conversion failed");
 }
 
 function writeManifest(outputDirectory, data) {
@@ -942,6 +1490,41 @@ async function main() {
         matchedPaks: [],
         warnings: [],
       };
+  const gearDiscovery = args.discover
+    ? discoverItemThumbnailPaths(fileList, paks, extractor)
+    : {
+        enabled: false,
+        paks: [],
+        idsByFamily: {},
+        templates: [],
+        candidateCount: 0,
+        paths: [],
+        matchedPaks: [],
+        warnings: [],
+      };
+  const armorDiscovery = args.discover
+    ? discoverArmorThumbnailPaths(fileList, paks, extractor)
+    : {
+        enabled: false,
+        paks: [],
+        modelIds: [],
+        unmatchedModelIds: [],
+        templates: [],
+        candidateCount: 0,
+        paths: [],
+        matchedPaks: [],
+        warnings: [],
+      };
+  const armorCatalogDiscovery = args.discover
+    ? discoverArmorCatalogPaths(fileList, paks, extractor)
+    : {
+        enabled: false,
+        paks: [],
+        candidateCount: 0,
+        paths: [],
+        matchedPaks: [],
+        warnings: [],
+      };
   if (discovery.enabled) {
     console.log(
       `[mhwilds-extract] visual-discovery=paks:${discovery.paks.length} ids:${discovery.ids.length} candidates:${discovery.candidateCount} matches:${discovery.paths.length}`,
@@ -953,6 +1536,51 @@ async function main() {
     for (const warning of discovery.warnings)
       console.warn(`[mhwilds-extract] visual-discovery warning: ${warning}`);
   }
+  if (gearDiscovery.enabled) {
+    console.log(
+      `[mhwilds-extract] gear-discovery=paks:${gearDiscovery.paks.length} families:${Object.keys(gearDiscovery.idsByFamily).length} ids:${Object.entries(
+        gearDiscovery.idsByFamily,
+      )
+        .map(([family, ids]) => `${family}:${ids.length}`)
+        .join(
+          ",",
+        )} candidates:${gearDiscovery.candidateCount} matches:${gearDiscovery.paths.length}`,
+    );
+    for (const match of gearDiscovery.matchedPaks)
+      console.log(
+        `[mhwilds-extract] gear-discovery ${match.pak}: ${match.paths.join(", ")}`,
+      );
+    for (const warning of gearDiscovery.warnings)
+      console.warn(`[mhwilds-extract] gear-discovery warning: ${warning}`);
+  }
+  if (armorDiscovery.enabled) {
+    console.log(
+      `[mhwilds-extract] armor-discovery=paks:${armorDiscovery.paks.length} models:${armorDiscovery.modelIds.length} candidates:${armorDiscovery.candidateCount} matches:${armorDiscovery.paths.length} unmatched-models:${armorDiscovery.unmatchedModelIds.length}`,
+    );
+    if (armorDiscovery.unmatchedModelIds.length)
+      console.warn(
+        `[mhwilds-extract] armor-discovery has no archive thumbnail for model ids: ${armorDiscovery.unmatchedModelIds.join(", ")}`,
+      );
+    for (const match of armorDiscovery.matchedPaks)
+      console.log(
+        `[mhwilds-extract] armor-discovery ${match.pak}: ${match.paths.join(", ")}`,
+      );
+    for (const warning of armorDiscovery.warnings)
+      console.warn(`[mhwilds-extract] armor-discovery warning: ${warning}`);
+  }
+  if (armorCatalogDiscovery.enabled) {
+    console.log(
+      `[mhwilds-extract] armor-catalog-discovery=paks:${armorCatalogDiscovery.paks.length} candidates:${armorCatalogDiscovery.candidateCount} matches:${armorCatalogDiscovery.paths.length}`,
+    );
+    for (const match of armorCatalogDiscovery.matchedPaks)
+      console.log(
+        `[mhwilds-extract] armor-catalog-discovery ${match.pak}: ${match.paths.join(", ")}`,
+      );
+    for (const warning of armorCatalogDiscovery.warnings)
+      console.warn(
+        `[mhwilds-extract] armor-catalog-discovery warning: ${warning}`,
+      );
+  }
 
   const converterPath = args.convert
     ? resolveConverter(args.imageConverter)
@@ -963,7 +1591,12 @@ async function main() {
         `Download texconv.exe from ${CONVERTER_URL}, or install Microsoft.DirectXTex.Texconv with winget.`,
     );
 
-  const selectedPaths = readSelectedPaths(listedPaths, args, discovery.paths);
+  const selectedPaths = readSelectedPaths(listedPaths, args, [
+    ...discovery.paths,
+    ...gearDiscovery.paths,
+    ...armorDiscovery.paths,
+    ...armorCatalogDiscovery.paths,
+  ]);
   if (selectedPaths.length === 0)
     throw new Error("No archive paths matched the requested selection");
 
@@ -1068,6 +1701,9 @@ async function main() {
       includes: args.includes.map((pattern) => pattern.source),
       excludes: args.excludes.map((pattern) => pattern.source),
       discovery,
+      gearDiscovery,
+      armorDiscovery,
+      armorCatalogDiscovery,
       paths: selectedPaths,
     },
     index: "index.json",

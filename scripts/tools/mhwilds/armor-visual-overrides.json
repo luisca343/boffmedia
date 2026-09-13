@@ -1,0 +1,8 @@
+{
+  "70:0": {
+    "thumbnailModelId": "207",
+    "visualPartsNumber": 151,
+    "visualJoin": "PlayerArmorVisualSetting_070",
+    "missingSlots": ["head", "arms", "waist"]
+  }
+}

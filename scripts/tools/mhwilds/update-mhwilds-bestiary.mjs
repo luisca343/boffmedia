@@ -30,6 +30,10 @@ const ASSETS = path.join(REPO, "laboon/tool-sources/mhwilds/extracted/bestiary")
 const NORMALIZED = path.join(ASSETS, "bestiary-data.json");
 const EXTRACT = path.join(HERE, "extract-mhwilds-assets.mjs");
 const DECODE = path.join(HERE, "decode-mhwilds-bestiary.mjs");
+const SYNC_ARMOR_IDENTITIES = path.join(
+  HERE,
+  "sync-mhwilds-armor-identities.mjs",
+);
 const BUILD = path.join(HERE, "build-mhwilds-assets.mjs");
 
 function printHelp() {
@@ -269,6 +273,7 @@ function main(argv) {
     }
   }
 
+  run("syncing armor asset identities", SYNC_ARMOR_IDENTITIES, []);
   run(
     "building runtime asset tree",
     BUILD,

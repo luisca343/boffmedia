@@ -32,21 +32,28 @@ export interface Item {
   value: number;
   carryLimit: number;
   recipes: any[]; // Could be more specific if we have recipe details
+  /** Semantic icon metadata used by the generated item-asset manifest. */
+  icon?: {
+    id?: number;
+    kind?: string;
+    color?: string;
+    colorId?: number;
+  };
 }
 
 export interface CraftingMaterial {
   item: Item;
   quantity: number;
-  id: number;
+  id?: number;
 }
 
 export interface Crafting {
-  armor: {
+  armor?: {
     id: number;
   };
   materials: CraftingMaterial[];
-  zennyCost: number;
-  id: number;
+  zennyCost?: number;
+  id?: number;
 }
 
 export interface ElementData {
@@ -79,12 +86,26 @@ export interface ArmorPiece {
   skills: SkillRank[];
   armorSet?: {
     id: string | number;
+    /** Stable game-file identifier; preferred for local asset joins. */
+    gameId?: string | number;
     name: string | null;
     pieces?: number;
     bonus?: string | null;
   };
   crafting?: Crafting;
   imageUrl?: string;
+  /**
+   * Local game raster resolved from the generated gear manifest. These fields
+   * are attached by the client service after the API response; they are not
+   * part of the MHDB payload.
+   *
+   * `null` is intentional: it means the extractor checked the game pack and
+   * this particular slot has no 2D raster. Keeping that distinction prevents
+   * the UI from probing a guaranteed 404 before falling back to its semantic
+   * slot glyph.
+   */
+  localAssetPath?: string | null;
+  localAssetVersion?: string;
 }
 
 export interface DecorationSkill {
@@ -113,6 +134,11 @@ export interface Decoration {
   skills: DecorationSkill[];
   icon?: DecorationIcon;
   value?: number;
+  /** Present when a future data source exposes a direct jewel recipe. */
+  crafting?: {
+    materials?: CraftingMaterial[];
+    zennyCost?: number;
+  };
 }
 
 export interface DecorationAssignment {
@@ -154,13 +180,20 @@ export type Elderseal = "low" | "average" | "high" | null;
 
 export interface WeaponCrafting {
   craftable: boolean;
-  materials: {
-    item: {
-      id: number;
-      name: string;
-    };
-    quantity: number;
-  }[];
+  weapon?: { id: number | string };
+  previous?: { id: number | string; name?: string } | null;
+  branches?: { id: number | string; name?: string }[];
+  /** The API keeps weapon recipes under the explicit step names. */
+  craftingMaterials?: CraftingMaterial[];
+  craftingZennyCost?: number;
+  upgradeMaterials?: CraftingMaterial[];
+  upgradeZennyCost?: number;
+  /** Kept for compatibility with older normalized payloads. */
+  materials?: CraftingMaterial[];
+  zennyCost?: number;
+  column?: number;
+  row?: number;
+  id?: number | string;
 }
 
 export interface Weapon {
@@ -183,7 +216,11 @@ export interface Weapon {
   defense?: number | DefenseData; // For backward compatibility
   attack?: number; // For backward compatibility
   crafting?: WeaponCrafting;
+  series?: { id: number | string; gameId?: number; name?: string };
   imageUrl?: string;
+  /** Local game raster resolved from the generated gear manifest. */
+  localAssetPath?: string | null;
+  localAssetVersion?: string;
 
   description?: string;
 }
@@ -225,6 +262,24 @@ export interface BuildDataWithIds {
     slotIndex: number;
     decorationId: string;
   }[];
+}
+
+export type WishlistEntryKind = "weapon" | "armor" | "charm" | "decoration";
+
+/** A locale-independent saved crafting target. The full recipe is resolved
+ *  from the current API catalog when the planner opens. */
+export interface WishlistEntry {
+  key: string;
+  kind: WishlistEntryKind;
+  id: string;
+  name: string;
+  rarity?: number;
+  weaponKind?: string;
+  gameId?: number;
+  armorKind?: string;
+  rank?: string;
+  charmLevel?: number;
+  decorationSlot?: number;
 }
 
 export interface Filters {
@@ -290,7 +345,7 @@ export interface CharmMaterial {
     recipes: any[];
   };
   quantity: number;
-  id: number;
+  id?: number;
 }
 
 export interface CharmCrafting {
@@ -320,6 +375,25 @@ export interface Charm {
 
 // Generic EquipmentComponent interface to represent any armor piece or weapon
 export type EquipmentComponent = ArmorPiece | Weapon | Charm;
+
+export interface WeaponTreeNode extends Weapon {
+  /** Stable occurrence key. The same weapon can appear in several branches. */
+  pathKey?: string;
+  /** Manifest-joined local asset path for the extracted 2D thumbnail. */
+  assetKey?: string;
+  craftingMaterials?: CraftingMaterial[];
+  craftingZennyCost?: number;
+  upgradeMaterials?: CraftingMaterial[];
+  upgradeZennyCost?: number;
+  children: WeaponTreeNode[];
+}
+
+export interface WeaponTreeData {
+  tree: WeaponTreeNode[];
+  treeByKind: Record<string, WeaponTreeNode[]>;
+  totalWeapons: number;
+  weaponKinds: string[];
+}
 // ── Bestiary / monsters (wilds.mhdb.io/{locale}/monsters via the API proxy) ──
 export interface MhMonsterSize {
   base: number;

@@ -1,27 +1,79 @@
 "use client"
 
 import * as React from "react"
+import { Select } from "@boffmedia/ui"
 import { useToolT } from "../../i18n"
-import { Weapon } from "../../types"
-import { MhPanel, MhLabel, MhMaterial } from "../../ui/mh-kit"
-import { useForgePath } from "../_hooks/useForgePath"
+import { ArmorPiece, Charm, Decoration, Weapon } from "../../types"
+import { MhLabel, MhMaterial, MhPanel } from "../../ui/mh-kit"
+import { useForgePaths, type ForgePath } from "../_hooks/useForgePath"
+import { aggregateLoadoutRequirements } from "../_utils/materials"
 
 const OWNED_KEY = "mhw-owned-mats"
 
-/**
- * Forge materials for the equipped weapon. Prefers the cumulative full-path total
- * from the real weapon tree (`useForgePath`); falls back to the weapon's direct
- * crafting materials while the tree loads. Owned-material tracking persists in
- * localStorage (`MhMaterial`'s built-in checkbox).
- */
-export function ForgePanel({ weapon }: { weapon: Weapon }) {
-  const t = useToolT("tools.mhwilds")
-  const { materials, steps, zenny, loading } = useForgePath(String(weapon.id), (weapon as any).kind)
+function routeLabel(path: ForgePath, index: number): string {
+  const names = path.nodes.map((node) => node.name).filter(Boolean)
+  const route = names.length > 3
+    ? `${names[0]} -> ... -> ${names[names.length - 1]}`
+    : names.join(" -> ")
+  return `${index + 1}. ${route || path.key}`
+}
 
-  const direct: { item: { id: string | number; name: string; rarity?: number }; quantity: number }[] =
-    (weapon as any).crafting?.materials || []
-  const fullPath = materials.length > 0
-  const mats = fullPath ? materials : direct
+function RouteChoice({
+  weapon,
+  paths,
+  value,
+  onChange,
+}: {
+  weapon: Weapon
+  paths: ForgePath[]
+  value: string | undefined
+  onChange: (key: string) => void
+}) {
+  const t = useToolT("tools.mhwilds")
+  if (paths.length < 2) return null
+  return (
+    <div className="mt-2.5 border border-[var(--mh-line)] bg-[var(--mh-soft)] p-2.5">
+      <MhLabel className="mb-1.5">{t("build_planner.forge.choose_route", { name: weapon.name })}</MhLabel>
+      <Select
+        ariaLabel={t("build_planner.forge.choose_route", { name: weapon.name })}
+        value={value || paths[0].key}
+        onChange={onChange}
+        options={paths.map((path, index) => ({ value: path.key, label: routeLabel(path, index) }))}
+      />
+    </div>
+  )
+}
+
+export function ForgePanel({
+  weapons,
+  armor,
+  charm,
+  decorations,
+}: {
+  weapons: (Weapon | null)[]
+  armor: (ArmorPiece | null)[]
+  charm: Charm | null
+  decorations: Decoration[]
+}) {
+  const t = useToolT("tools.mhwilds")
+  const primary = weapons[0] || null
+  const secondary = weapons[1] || null
+  const primaryRoutes = useForgePaths(primary ? String(primary.id) : null, primary?.kind)
+  const secondaryRoutes = useForgePaths(secondary ? String(secondary.id) : null, secondary?.kind)
+  const [selectedRoutes, setSelectedRoutes] = React.useState<Record<string, string>>({})
+
+  const selectedPrimary = primaryRoutes.paths.find((path) => path.key === selectedRoutes.primary) || primaryRoutes.paths[0] || null
+  const selectedSecondary = secondaryRoutes.paths.find((path) => path.key === selectedRoutes.secondary) || secondaryRoutes.paths[0] || null
+  const requirements = React.useMemo(
+    () => aggregateLoadoutRequirements({
+      weapons,
+      weaponPaths: [selectedPrimary, selectedSecondary],
+      armor,
+      charm,
+      decorations,
+    }),
+    [armor, charm, decorations, selectedPrimary, selectedSecondary, weapons],
+  )
 
   const [owned, setOwned] = React.useState<Record<string, boolean>>({})
   React.useEffect(() => {
@@ -32,54 +84,76 @@ export function ForgePanel({ weapon }: { weapon: Weapon }) {
     }
   }, [])
   const toggle = (id: string) =>
-    setOwned((o) => {
-      const n = { ...o }
-      if (n[id]) delete n[id]
-      else n[id] = true
+    setOwned((current) => {
+      const next = { ...current }
+      if (next[id]) delete next[id]
+      else next[id] = true
       try {
-        localStorage.setItem(OWNED_KEY, JSON.stringify(n))
+        localStorage.setItem(OWNED_KEY, JSON.stringify(next))
       } catch {
         /* ignore */
       }
-      return n
+      return next
     })
 
-  if (mats.length === 0) return null
-  const ownedCount = mats.filter((m) => owned[String(m.item?.id)]).length
+  const loading = primaryRoutes.loading || secondaryRoutes.loading
+  const ownedCount = requirements.materials.filter((material) => owned[String(material.item.id)]).length
+  const hasCurrentEquipment = weapons.some(Boolean) || armor.some(Boolean) || !!charm || decorations.length > 0
+  const hasContent = hasCurrentEquipment || requirements.materials.length > 0 || requirements.zenny > 0 || requirements.untracked.length > 0
+  if (!hasContent && !loading) return null
 
   return (
     <MhPanel
       title={t("build_planner.forge_materials")}
       icon="hammer"
-      count={mats.length}
+      count={requirements.materials.length}
       aside={
         <span className="font-mono text-[0.6875rem] leading-none text-txt-muted">
-          {t("build_planner.forge.owned", { owned: ownedCount, total: mats.length })}
+          {t("build_planner.forge.owned", { owned: ownedCount, total: requirements.materials.length })}
         </span>
       }
     >
-      {fullPath && (
-        <MhLabel className="mb-2">
-          {t("build_planner.forge.full_path", { steps })}
-          {zenny ? ` · ${zenny.toLocaleString()}z` : ""}
-        </MhLabel>
+      {hasCurrentEquipment && (
+        <div className="border border-[var(--mh-line)] bg-[var(--mh-soft)] p-2.5">
+          <MhLabel className="mb-1.5">{t("build_planner.wishlist.currentBuild")}</MhLabel>
+          {primary && <RouteChoice weapon={primary} paths={primaryRoutes.paths} value={selectedRoutes.primary} onChange={(key) => setSelectedRoutes((current) => ({ ...current, primary: key }))} />}
+          {secondary && <RouteChoice weapon={secondary} paths={secondaryRoutes.paths} value={selectedRoutes.secondary} onChange={(key) => setSelectedRoutes((current) => ({ ...current, secondary: key }))} />}
+          {!primary && !secondary && <div className="font-mono text-[0.6875rem] text-txt-dim">{t("build_planner.no_weapon")}</div>}
+        </div>
       )}
-      <div className="flex flex-col gap-[0.3125rem]">
-        {mats.map((m, i) => {
-          const id = String(m.item?.id ?? i)
-          return (
-            <MhMaterial
-              key={id}
-              name={m.item?.name ?? "?"}
-              rarity={m.item?.rarity}
-              quantity={m.quantity ?? 1}
-              owned={!!owned[id]}
-              onToggle={() => toggle(id)}
-            />
-          )
-        })}
+
+      <div className="mt-3 flex flex-wrap gap-x-3 gap-y-1 font-mono text-[0.6875rem] leading-none text-txt-muted">
+        {requirements.steps > 0 && <span>{t("build_planner.forge.steps", { count: requirements.steps })}</span>}
+        {requirements.zenny > 0 && <span>{t("build_planner.forge.zenny", { amount: requirements.zenny.toLocaleString() })}</span>}
       </div>
-      {loading && !fullPath && (
+
+      {requirements.materials.length > 0 && (
+        <div className="mt-2.5 flex flex-col gap-[0.3125rem]">
+          {requirements.materials.map((material) => {
+            const id = String(material.item.id)
+            return (
+              <MhMaterial
+                key={id}
+                item={material.item}
+                name={material.item.name}
+                rarity={material.item.rarity}
+                quantity={material.quantity}
+                owned={!!owned[id]}
+                onToggle={() => toggle(id)}
+              />
+            )
+          })}
+        </div>
+      )}
+
+      {requirements.untracked.length > 0 && (
+        <div className="mt-3 border border-line bg-base-2 px-2.5 py-2 font-mono text-[0.6875rem] leading-[1.35] text-txt-muted">
+          <b className="text-txt">{t("build_planner.forge.untracked")}</b>{" "}
+          {requirements.untracked.map((source) => source.label).join(", ")}
+        </div>
+      )}
+
+      {loading && (
         <div className="mt-2 font-mono text-[0.625rem] uppercase leading-none tracking-[0.08em] text-txt-dim">
           {t("build_planner.forge.loading_path")}
         </div>

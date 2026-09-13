@@ -53,6 +53,49 @@ files = [
     "Enemy/CommonData/Data/EnemyWeakAttrData.user.3",
 ]
 
+# Equipment thumbnail joins. These game-owned lookup tables are authoritative;
+# thumbnail filenames are implementation details and cannot be joined safely
+# from localized names or armor model ids.
+[[user.targets]]
+output_prefix = "gear/"
+files = [
+    "Common/Equip/ArmorSeriesData.user.3",
+    "GUI/Common/_UserData/ArmorThumbnailTextureData.user.3",
+    "GUI/Common/_UserData/OtherThumbnailTextureData.user.3",
+    "GUI/Common/_UserData/WeaponThumbnailTextureData.user.3",
+]
+
+# ArmorSeriesData only identifies the visual model.  The catalog package
+# table is the authoritative model/slot join (and includes both body types).
+# Keep the catalog glob broad: title updates add folders such as 04_10 without
+# necessarily updating the public release list at the same time. The rsz
+# transform unwraps the male/female root arrays emitted by the community
+# decoder.
+[[user.targets]]
+output_prefix = "gear/"
+files = [
+    "Catalog/*/Data/PlayerArmorList*.user.3",
+]
+
+[[user.targets.transform]]
+match = "PlayerArmorList(?:_[^/]+)?[.]user[.]3$"
+rsz = [0, 1]
+
+# A few collab/special armors do not render from ArmorSeriesData's model id.
+# PlayerArmorVisualSetting_<id> maps the catalog ArmorID to the visual-parts
+# number used by the character thumbnail prefab. Keep these tables in the
+# decoded provenance tree so the asset builder can apply an explicit visual
+# namespace join instead of guessing from a numeric id.
+[[user.targets]]
+output_prefix = "gear/visual/"
+files = [
+  "Equip/_Prefab/Armor/ArmorVisualSetting/PlayerArmorVisualSetting*.user.3",
+]
+
+[[user.targets.transform]]
+match = "PlayerArmorVisualSetting(?:_[^/]+)?[.]user[.]3$"
+rsz = [0]
+
 [msg]
 input_prefix = "STM/GameDesign/Text"
 
