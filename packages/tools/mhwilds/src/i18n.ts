@@ -41,3 +41,4 @@ export function useLocale(): string {
 
 /** Message-key namespace owned by this package. */
 export const MHWILDS_NS = "tools.mhwilds";
+export const MHWILDS_UI_NS = `${MHWILDS_NS}.ui`;

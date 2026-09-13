@@ -5,8 +5,8 @@ import { useToolT } from "../../i18n"
 import { cn } from "@boffmedia/ui/cn"
 import { Button, Chip, Empty } from "@boffmedia/ui"
 import { BuildDataWithIds, Skill } from "../../types"
-import { MhLabel, MhTag } from "../../ui/mh-kit"
-import { elementColor } from "../../ui/mh-helpers"
+import { MhAttributeIcon, MhLabel, MhTag } from "../../ui/mh-kit"
+import { normalizeAttributeKey } from "../../ui/mh-helpers"
 import { resolveBuild, getSavedBuilds, type BuildResolvers } from "../_utils/buildUtils"
 import { calculateStats, calculateTotalSkills } from "../_utils/calculationUtils"
 
@@ -86,8 +86,8 @@ export function PlannerCompare({
       get: (m) =>
         m.element ? (
           <span className="inline-flex items-center gap-1.5">
-            <span className="h-2 w-2 rounded-full" style={{ background: elementColor(m.element.type) }} />
-            {t(m.element.type)} {m.element.damage}
+            <MhAttributeIcon type={m.element.type} size={13} />
+            {t(normalizeAttributeKey(m.element.type))} {m.element.damage}
           </span>
         ) : (
           "—"

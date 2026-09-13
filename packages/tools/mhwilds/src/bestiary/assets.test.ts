@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   mhwildsArmorAsset,
+  mhwildsAttributeAsset,
   mhwildsItemAsset,
   mhwildsItemIconAsset,
   mhwildsWeaponAsset,
@@ -72,6 +73,21 @@ describe("mhwildsWeaponAsset", () => {
   it("does not manufacture a path from a kind/game id pair", () => {
     expect(mhwildsWeaponAsset({ kind: "bow", gameId: 1 })).toBeNull();
     expect(mhwildsWeaponAsset({ kind: "kinsect", gameId: 1 })).toBeNull();
+  });
+});
+
+describe("mhwildsAttributeAsset", () => {
+  it("resolves the extracted game glyphs from canonical and blight keys", () => {
+    expect(mhwildsAttributeAsset("Dragon")).toBe(
+      "/boffmedia/tools/mhwilds/bestiary/attributes/dragon.png",
+    );
+    expect(mhwildsAttributeAsset("Thunder-Blight", "game-test-schema-16")).toBe(
+      "/boffmedia/tools/mhwilds/bestiary/attributes/thunder.png?v=game-test-schema-16",
+    );
+  });
+
+  it("does not pretend unsupported statuses have a cropped atlas glyph", () => {
+    expect(mhwildsAttributeAsset("stun")).toBeNull();
   });
 });
 

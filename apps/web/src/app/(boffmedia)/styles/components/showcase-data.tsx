@@ -272,6 +272,7 @@ export const CHAPTERS: Chapter[] = [
     dom: "Monster Hunter",
     sections: [
       { id: "mbroster", label: "Roster y amenaza" },
+      { id: "mbassets", label: "Assets y drops" },
       { id: "mbweak", label: "Debilidades e hitzones" },
       { id: "mbdrops", label: "Botín y roturas" },
       { id: "mbstrat", label: "Estrategia y pestañas" },
@@ -291,6 +292,7 @@ export const CHAPTERS: Chapter[] = [
     dom: "Monster Hunter",
     sections: [
       { id: "mhdbsets", label: "Catálogo de armadura" },
+      { id: "mhdbassets", label: "Renders de gear" },
       { id: "mhdbskills", label: "Habilidades y fuentes" },
       { id: "mhdbweapons", label: "Armas y afilado" },
       { id: "mhdbtype", label: "Datos por tipo de arma" },

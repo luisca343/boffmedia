@@ -4,9 +4,9 @@ import * as React from "react"
 import { useToolT } from "../../i18n"
 import { Empty, Icon, Spinner } from "@boffmedia/ui"
 import { MhMonster } from "../../types"
-import { MhDrawer, MhSearch } from "../../ui/mh-kit"
-import { elementColor } from "../../ui/mh-helpers"
+import { MhAttributeIcon, MhDrawer, MhSearch } from "../../ui/mh-kit"
 import { useMonsters } from "../../bestiary/useMonsters"
+import { normalizeAttributeKey } from "../../ui/mh-helpers"
 
 export function TargetDrawer({ onPick, onClose }: { onPick: (m: MhMonster) => void; onClose: () => void }) {
   const t = useToolT("tools.mhwilds")
@@ -53,12 +53,7 @@ export function TargetDrawer({ onPick, onClose }: { onPick: (m: MhMonster) => vo
                   <span className="inline-flex items-center gap-1.5">
                     {weaks.length ? (
                       weaks.map((w) => (
-                        <span
-                          key={w.id}
-                          className="h-2 w-2 rounded-full"
-                          style={{ background: elementColor(w.element!) }}
-                          title={t(w.element!)}
-                        />
+                        <MhAttributeIcon key={w.id} type={w.element!} size={12} title={t(normalizeAttributeKey(w.element))} />
                       ))
                     ) : (
                       <span className="font-mono text-[0.625rem] uppercase text-txt-dim">{t("build_planner.target.no_elem_weak")}</span>

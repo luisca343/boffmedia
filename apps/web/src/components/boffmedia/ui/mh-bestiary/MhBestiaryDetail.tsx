@@ -5,19 +5,32 @@ import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, type IconName } from "@boffmedia/ui"
 import { MhStars } from "@boffmedia/tools-mhwilds/bestiary/bst-kit"
-import { MhRarity } from "@boffmedia/tools-mhwilds/ui/mh-kit"
+import { useMhwildsItemAsset } from "@boffmedia/tools-mhwilds/bestiary/item-assets"
+import type { MhwildsItemAssetReference } from "@boffmedia/tools-mhwilds/bestiary/assets"
+import {
+  MH_ELEMENT_KEYS,
+  MH_AILMENT_KEYS,
+  MH_STATUS_KEYS,
+  normalizeAttributeKey,
+  attributeColor,
+} from "@boffmedia/tools-mhwilds/ui/mh-helpers"
+import { MhAttributeIcon, MhRarity } from "@boffmedia/tools-mhwilds/ui/mh-kit"
+import { useToolT } from "@boffmedia/tools-mhwilds/i18n"
 
 // v3 «Señal» — MH Wilds Bestiary detail molecules (weakness/hitzone/drops/
 // strategy). Mirrors v3-mh-monsters-kit.jsx; prop-driven (mock data). [deferred]
 
-export const MH_ELEM: Record<string, { color: string; label: string; short: string }> = {
-  fire: { color: "#ff7a5c", label: "Fuego", short: "FUE" },
-  water: { color: "#4f89e8", label: "Agua", short: "AGU" },
-  thunder: { color: "#e0c93c", label: "Rayo", short: "RAY" },
-  ice: { color: "#5fe3f0", label: "Hielo", short: "HIE" },
-  dragon: { color: "#b06bff", label: "Dragón", short: "DRA" },
+const ELEMENT_SHORT: Record<string, string> = {
+  fire: "FUE",
+  water: "AGU",
+  thunder: "RAY",
+  ice: "HIE",
+  dragon: "DRA",
 }
-export const MH_WEAK_ORDER = ["fire", "water", "thunder", "ice", "dragon"]
+export const MH_WEAK_ORDER = [...MH_ELEMENT_KEYS]
+export const MH_ELEM: Record<string, { color: string; short: string }> = Object.fromEntries(
+  MH_WEAK_ORDER.map((key) => [key, { color: attributeColor(key), short: ELEMENT_SHORT[key] }]),
+)
 
 const HZ_COLOR: Record<string, string> = { great: "#46e39a", good: "#8fd6a0", ok: "var(--warn)", poor: "var(--line-2)" }
 const HZ_TEXT: Record<string, string> = { great: "#46e39a", good: "#8fd6a0", ok: "var(--warn)", poor: "var(--dim)" }
@@ -32,6 +45,7 @@ export interface MhWeak {
   condition?: string
 }
 export function MhWeaknessGrid({ weaknesses }: { weaknesses: MhWeak[] }) {
+  const tAttribute = useToolT("tools.mhwilds")
   const byEl: Record<string, MhWeak> = {}
   weaknesses.forEach((w) => (byEl[w.element] = w))
   const rows = MH_WEAK_ORDER.map((el) => byEl[el] || { element: el, stars: 0 })
@@ -45,8 +59,8 @@ export function MhWeaknessGrid({ weaknesses }: { weaknesses: MhWeak[] }) {
             style={{ "--ec": m.color } as React.CSSProperties}
             className={cn("grid grid-cols-[auto_1fr_auto] items-center gap-2 border border-solid border-line border-t-2 border-t-[color:var(--ec)] bg-base-2 px-[0.6875rem] py-[0.5625rem]", w.stars >= 3 && "bg-[color-mix(in_srgb,var(--ec)_12%,var(--bg-2))] [box-shadow:0_0_0_1px_color-mix(in_srgb,var(--ec)_40%,transparent)]", w.stars === 0 && "opacity-50")}
           >
-            <span className={cn("h-2.5 w-2.5 rounded-full", w.stars === 0 ? "bg-line-2" : "bg-[color:var(--ec)]")} />
-            <span className="font-mono text-[0.75rem]/none font-semibold text-txt">{m.label}</span>
+            <MhAttributeIcon type={w.element} size={14} muted={w.stars === 0} />
+            <span className="font-mono text-[0.75rem]/none font-semibold text-txt">{tAttribute(w.element)}</span>
             <MhStars value={w.stars} max={3} />
           </div>
         )
@@ -56,27 +70,25 @@ export function MhWeaknessGrid({ weaknesses }: { weaknesses: MhWeak[] }) {
 }
 
 // ── status vulnerabilities ────────────────────────────────────────────────────
-const STATUS_DEFS = [
-  { key: "poison", label: "Veneno", color: "#a855f7" },
-  { key: "sleep", label: "Sueño", color: "#6f8bff" },
-  { key: "paralysis", label: "Parálisis", color: "#ffd34d" },
-  { key: "blast", label: "Explosión", color: "#ff8a3d" },
-  { key: "stun", label: "Aturdir", color: "#ffe08a" },
-  { key: "exhaust", label: "Agotar", color: "#7fd6a8" },
-]
+const STATUS_DEFS = MH_STATUS_KEYS.map((key) => ({ key }))
 const EFF_LABEL = ["Inmune", "Bajo", "Medio", "Alto"]
 export function MhStatusVulns({ statuses }: { statuses: Record<string, { eff: number }> }) {
+  const tAttribute = useToolT("tools.mhwilds")
   return (
     <div className="flex flex-col gap-[0.3125rem]">
       {STATUS_DEFS.map((s) => {
         const eff = statuses[s.key]?.eff ?? 0
         return (
-          <div key={s.key} style={{ "--sc": s.color } as React.CSSProperties} className={cn("grid grid-cols-[auto_1fr_auto_auto] items-center gap-[0.5625rem] border border-solid border-line bg-base-2 px-2.5 py-[0.4375rem]", eff === 0 && "opacity-[0.42]")}>
-            <span className={cn("h-[0.5625rem] w-[0.5625rem] rounded-full", eff === 0 ? "bg-line-2" : "bg-[color:var(--sc)]")} />
-            <span className="font-body text-[0.75rem]/none font-semibold">{s.label}</span>
+          <div key={s.key} className={cn("grid grid-cols-[auto_1fr_auto_auto] items-center gap-[0.5625rem] border border-solid border-line bg-base-2 px-2.5 py-[0.4375rem]", eff === 0 && "opacity-[0.42]")}>
+            <MhAttributeIcon type={s.key} size={14} muted={eff === 0} />
+            <span className="font-body text-[0.75rem]/none font-semibold">{tAttribute(s.key)}</span>
             <span className="inline-flex gap-[3px]">
               {[1, 2, 3].map((n) => (
-                <i key={n} className={cn("h-[0.375rem] w-[0.875rem] [transform:skewX(-14deg)]", n <= eff ? "bg-[color:var(--sc)]" : "bg-line-2")} />
+                <i
+                  key={n}
+                  className={cn("h-[0.375rem] w-[0.875rem] [transform:skewX(-14deg)]", n > eff && "bg-line-2")}
+                  style={n <= eff ? { background: attributeColor(s.key) } : undefined}
+                />
               ))}
             </span>
             <span className="min-w-[2.625rem] text-right font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.05em] text-txt-dim">{EFF_LABEL[eff]}</span>
@@ -127,8 +139,9 @@ export function MhHitzoneScan({ hitzones }: { hitzones: MhHitzone[] }) {
   )
 }
 
-const HZ_PHYS: [keyof MhHitzone, string][] = [["sever", "Corte"], ["blunt", "Impacto"], ["shot", "Disparo"]]
+const HZ_PHYS: [keyof MhHitzone, string, IconName][] = [["sever", "Corte", "sword"], ["blunt", "Impacto", "hammer"], ["shot", "Disparo", "target"]]
 export function MhHitzoneTable({ hitzones }: { hitzones: MhHitzone[] }) {
+  const tAttribute = useToolT("tools.mhwilds")
   const th = "whitespace-nowrap border-b border-solid border-line px-1.5 py-2 text-center font-mono text-[0.5625rem] font-semibold uppercase tracking-[0.06em] text-txt-dim"
   const td = "border-b border-solid border-line px-1.5 py-2 text-center"
   return (
@@ -137,18 +150,22 @@ export function MhHitzoneTable({ hitzones }: { hitzones: MhHitzone[] }) {
         <thead>
           <tr>
             <th className={cn(th, "text-left")}>Parte</th>
-            {HZ_PHYS.map(([k, l]) => (
+            {HZ_PHYS.map(([k, l, icon]) => (
               <th key={k} className={th}>
-                {l}
+                <span className="inline-flex items-center gap-1">
+                  <Icon name={icon} size={11} />
+                  {l}
+                </span>
               </th>
             ))}
             {MH_WEAK_ORDER.map((el) => (
-              <th key={el} className={th} title={MH_ELEM[el].label}>
-                <span className="mr-1 inline-block h-2 w-2 rounded-full align-0" style={{ background: MH_ELEM[el].color }} />
+                <th key={el} className={th} title={tAttribute(el)}>
+                <MhAttributeIcon type={el} size={12} className="mr-1 !inline-flex !h-3 !w-3 align-[-2px]" />
                 {MH_ELEM[el].short}
               </th>
             ))}
-            <th className={th} title="Aturdimiento">
+            <th className={th} title={tAttribute("stun")}>
+              <MhAttributeIcon type="stun" size={12} className="mr-1 !inline-flex !h-3 !w-3 align-[-2px]" />
               KO
             </th>
           </tr>
@@ -200,11 +217,11 @@ export function MhHitzoneTable({ hitzones }: { hitzones: MhHitzone[] }) {
 
 // ── drops ─────────────────────────────────────────────────────────────────────
 export function MhDropChance({ chance, rare }: { chance: number; rare?: boolean }) {
-  const t = useTranslations("tools.mhwilds.bestiary")
+  const tBestiary = useToolT("tools.mhwilds.bestiary")
   const band = rare ? "rare" : chance >= 40 ? "hi" : chance >= 18 ? "mid" : "low"
   const col = { hi: "var(--ok)", mid: "var(--warn)", low: "var(--bad)", rare: "var(--rar8)" }[band]
   return (
-    <span className="inline-flex min-w-[6rem] items-center gap-[0.4375rem]" title={t("dropChancePct", { chance })}>
+    <span className="inline-flex min-w-[6rem] items-center gap-[0.4375rem]" title={tBestiary("dropChancePct", { chance })}>
       <span className="h-[0.4375rem] flex-1 overflow-hidden border border-solid border-line bg-base-deep">
         <i className="block h-full" style={{ width: Math.max(6, Math.min(100, chance)) + "%", background: col }} />
       </span>
@@ -224,7 +241,7 @@ const DROP_TYPES: Record<string, { labelKey: string; icon: IconName }> = {
   investigation: { labelKey: "investigation", icon: "compass" },
   track: { labelKey: "dropTrack", icon: "target" },
 }
-export interface MhRewardItem {
+export interface MhRewardItem extends MhwildsItemAssetReference {
   name: string
   rarity: number
 }
@@ -232,9 +249,40 @@ export interface MhReward {
   item: MhRewardItem
   conditions: { type: string; rank?: string; chance: number; quantity: number; subtype?: string }[]
 }
+
+function MhRewardIcon({ item, className = "h-7 w-7" }: { item: MhRewardItem; className?: string }) {
+  const imageSrc = useMhwildsItemAsset(item)
+  const [imageFailed, setImageFailed] = React.useState(false)
+
+  React.useEffect(() => setImageFailed(false), [imageSrc])
+
+  return (
+    <span className={cn("grid flex-none place-items-center", className)} aria-hidden="true">
+      {imageSrc && !imageFailed ? (
+        <img
+          src={imageSrc}
+          alt=""
+          width={28}
+          height={28}
+          draggable={false}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-contain p-0.5"
+          onError={() => setImageFailed(true)}
+        />
+      ) : (
+        <span
+          className="h-[0.6875rem] w-[0.6875rem] rotate-45 border border-solid"
+          style={{ borderColor: `var(--rar${item.rarity})`, background: `var(--rar${item.rarity})` }}
+        />
+      )}
+    </span>
+  )
+}
+
 export function MhDropTable({ rewards }: { rewards: MhReward[] }) {
-  const t = useTranslations("common.bestiary")
-  const tMh = useTranslations("tools.mhwilds.bestiary")
+  const tCommon = useTranslations("common.bestiary")
+  const tBestiary = useToolT("tools.mhwilds.bestiary")
   const rows: { item: MhRewardItem; cond: MhReward["conditions"][number]; rare: boolean }[] = []
   rewards.forEach((r) => r.conditions.forEach((c) => rows.push({ item: r.item, cond: c, rare: r.item.rarity >= 7 })))
   rows.sort((a, b) => b.cond.chance - a.cond.chance)
@@ -244,15 +292,18 @@ export function MhDropTable({ rewards }: { rewards: MhReward[] }) {
         const meta = DROP_TYPES[row.cond.type]
         // Unknown drop types fall back to the raw API value, which is data, not chrome.
         const dt = meta
-          ? { label: tMh(meta.labelKey), icon: meta.icon }
+          ? { label: tBestiary(meta.labelKey), icon: meta.icon }
           : { label: row.cond.type, icon: "gift" as IconName }
         return (
-          <div key={i} className={cn("grid grid-cols-[minmax(0,1.5fr)_auto_auto_minmax(6rem,0.8fr)] items-center gap-3 border border-solid border-line bg-base-2 px-[0.6875rem] py-2", row.rare && "border-[color-mix(in_srgb,var(--rar8)_40%,var(--line))] bg-[color-mix(in_srgb,var(--rar8)_6%,var(--bg-2))]")}>
+          <div
+            key={i}
+            className={cn("grid grid-cols-[minmax(0,1.5fr)_auto_auto_minmax(6rem,0.8fr)] items-center gap-3 border border-solid border-line bg-base-2 px-[0.6875rem] py-2", row.rare && "bg-[color-mix(in_srgb,var(--rar8)_6%,var(--bg-2))]")}
+          >
             <span className="flex min-w-0 items-center gap-2">
-              <span className="h-[0.6875rem] w-[0.6875rem] flex-none rotate-45 border border-solid" style={{ borderColor: `var(--rar${row.item.rarity})`, background: `var(--rar${row.item.rarity})` }} />
+              <MhRewardIcon item={row.item} />
               <span className="truncate font-body text-[0.8125rem] text-txt">{row.item.name}</span>
               <MhRarity rarity={row.item.rarity} />
-              {row.rare && <span className="text-[0.75rem] text-[color:var(--rar8)]" title={t("rareMaterial")}>★</span>}
+              {row.rare && <span className="text-[0.75rem] text-[color:var(--rar8)]" title={tCommon("rareMaterial")}>★</span>}
             </span>
             <span className="inline-flex items-center gap-[0.3125rem] whitespace-nowrap font-mono text-[0.625rem]/none uppercase tracking-[0.04em] text-txt-muted">
               <Icon name={dt.icon} size={11} />
@@ -292,7 +343,7 @@ export function MhBreakPanel({ breaks }: { breaks: MhBreak[] }) {
             <div className="mt-[0.5625rem] flex flex-wrap gap-[0.3125rem]">
               {b.unlocks.map((it) => (
                 <span key={it.name} style={{ "--rc": `var(--rar${it.rarity})` } as React.CSSProperties} className="inline-flex items-center gap-1.5 border border-solid border-line bg-base-2 px-2 py-1 font-body text-[0.6875rem] text-txt">
-                  <span className="h-[0.5625rem] w-[0.5625rem] flex-none rotate-45 border border-solid border-[color:var(--rc)] bg-[color:var(--rc)]" />
+                  <MhRewardIcon item={it} className="h-5 w-5" />
                   {it.name}
                 </span>
               ))}
@@ -340,11 +391,19 @@ export function MhDangerCard({ danger }: { danger: { name: string; tell: string;
   )
 }
 
-export function MhRelGear({ icon, name, meta, onClick }: { icon: IconName; name: string; meta?: string; onClick?: () => void }) {
+export function MhRelGear({ icon, name, meta, imageSrc, onClick }: { icon: IconName; name: string; meta?: string; imageSrc?: string | null; onClick?: () => void }) {
+  const [imageFailed, setImageFailed] = React.useState(false)
+
+  React.useEffect(() => setImageFailed(false), [imageSrc])
+
   return (
     <button type="button" onClick={onClick} disabled={!onClick} className="grid w-full grid-cols-[2.125rem_1fr_auto] items-center gap-[0.6875rem] border border-solid border-line bg-base-2 px-[0.6875rem] py-[0.5625rem] text-left transition-[border-color,background] duration-[140ms] hover:border-line-2 hover:bg-panel-2 disabled:cursor-default">
       <span className="grid h-[2.125rem] w-[2.125rem] place-items-center border border-solid border-[color:var(--mh-line)] bg-[var(--mh-soft)] text-[color:var(--mh-bright)]">
-        <Icon name={icon} size={15} />
+        {imageSrc && !imageFailed ? (
+          <img src={imageSrc} alt="" aria-hidden="true" width={34} height={34} draggable={false} className="h-full w-full object-contain p-0.5" onError={() => setImageFailed(true)} />
+        ) : (
+          <Icon name={icon} size={15} />
+        )}
       </span>
       <span className="min-w-0">
         <span className="block truncate font-body text-[0.8125rem]/[1.2] font-semibold">{name}</span>
@@ -377,20 +436,15 @@ export function MhTabs({ tabs, value, onChange }: { tabs: { id: string; label: s
   )
 }
 
-const AILMENTS: Record<string, { label: string; color: string }> = {
-  fireblight: { label: "Quemadura", color: "#ff7a5c" },
-  waterblight: { label: "Empapado", color: "#4f89e8" },
-  thunderblight: { label: "Paralizante", color: "#e0c93c" },
-  paralysis: { label: "Parálisis", color: "#ffd34d" },
-  poison: { label: "Veneno", color: "#a855f7" },
-}
 export function MhAilmentTag({ id }: { id: string }) {
-  const a = AILMENTS[id]
-  if (!a) return null
+  const tAttribute = useToolT("tools.mhwilds")
+  const key = normalizeAttributeKey(id)
+  const known = MH_AILMENT_KEYS.includes(key)
+  if (!known) return null
   return (
-    <span style={{ "--ac": a.color } as React.CSSProperties} className="inline-flex flex-wrap items-center gap-1.5 border border-solid border-line border-l-2 border-l-[color:var(--ac)] bg-base-2 px-[0.5625rem] py-[0.3125rem] font-body text-[0.6875rem]/[1.3] font-semibold">
-      <span className="h-2 w-2 flex-none rounded-full bg-[color:var(--ac)]" />
-      {a.label}
+    <span style={{ "--ac": attributeColor(key) } as React.CSSProperties} className="inline-flex flex-wrap items-center gap-1.5 border border-solid border-line border-l-2 border-l-[color:var(--ac)] bg-base-2 px-[0.5625rem] py-[0.3125rem] font-body text-[0.6875rem]/[1.3] font-semibold">
+      <MhAttributeIcon type={key} size={13} />
+      {tAttribute(key)}
     </span>
   )
 }

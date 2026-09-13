@@ -1,8 +1,27 @@
 import { assetUrl, hasToolHost } from "@boffmedia/tool-kit";
+import { normalizeAttributeKey } from "../ui/mh-helpers";
 
 export const MHWILDS_ASSET_ROOT = "/boffmedia/tools/mhwilds";
 export const MHWILDS_BESTIARY_ASSET_ROOT = "/boffmedia/tools/mhwilds/bestiary";
 export const MHWILDS_GEAR_ASSET_ROOT = "/boffmedia/tools/mhwilds/bestiary/gear";
+export const MHWILDS_ATTRIBUTE_ASSET_ROOT = "/boffmedia/tools/mhwilds/bestiary/attributes";
+const MHWILDS_ATTRIBUTE_ASSET_KEYS: Readonly<Record<string, string>> = {
+  fire: "fire",
+  water: "water",
+  thunder: "thunder",
+  ice: "ice",
+  dragon: "dragon",
+  poison: "poison",
+  sleep: "sleep",
+  paralysis: "paralysis",
+  blast: "blast",
+  blastblight: "blast",
+  fireblight: "fire",
+  waterblight: "water",
+  thunderblight: "thunder",
+  iceblight: "ice",
+  dragonblight: "dragon",
+};
 
 export interface MhwildsArmorAssetManifestEntry {
   apiSetId?: string | number;
@@ -78,6 +97,16 @@ export function mhwildsAsset(path: string, version?: string): string {
 /** Resolve a path from the generated bestiary subtree. */
 export function mhwildsBestiaryAsset(path: string, version?: string): string {
   return resolveAsset(MHWILDS_BESTIARY_ASSET_ROOT, path, version);
+}
+
+/** Resolve a cropped game UI glyph for an element or ailment. */
+export function mhwildsAttributeAsset(
+  type: string | null | undefined,
+  version?: string,
+): string | null {
+  const key = MHWILDS_ATTRIBUTE_ASSET_KEYS[normalizeAttributeKey(type ?? undefined)];
+  if (!key) return null;
+  return resolveAsset(MHWILDS_ATTRIBUTE_ASSET_ROOT, `${key}.png`, version);
 }
 
 export interface MhwildsWeaponAssetReference {

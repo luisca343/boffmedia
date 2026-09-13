@@ -27,7 +27,7 @@ export {
 
 // Message-key namespace + the bound-translator shim, for hosts that merge the
 // package catalog or render tool titles themselves.
-export { MHWILDS_NS, useToolT } from "./i18n";
+export { MHWILDS_NS, MHWILDS_UI_NS, useToolT } from "./i18n";
 
 // The shared MH shell/kit, exported because the web styleguide renders it.
 export * from "./ui/mh-kit";

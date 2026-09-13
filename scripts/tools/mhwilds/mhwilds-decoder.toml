@@ -53,6 +53,17 @@ files = [
     "Enemy/CommonData/Data/EnemyWeakAttrData.user.3",
 ]
 
+# Element/status ids and the game's status UI metadata. The UI glyphs are
+# backed by the extracted icon font/atlas selected by the asset extractor;
+# keeping the decoded tables gives the app a stable provenance trail without
+# coupling runtime presentation to game-owned binary data.
+[[user.targets]]
+output_prefix = "attributes/"
+files = [
+    "Common/Enemy/EnemyReportWeaponAttributeData.user.3",
+    "GUI/GUI080000/GUI080000/_UserData/StatusUIData.user.3",
+]
+
 # Equipment thumbnail joins. These game-owned lookup tables are authoritative;
 # thumbnail filenames are implementation details and cannot be joined safely
 # from localized names or armor model ids.
@@ -103,6 +114,8 @@ input_prefix = "STM/GameDesign/Text"
 files = [
     "Excel_Data/EnemyPartsTypeName.msg.23",
     "Excel_Data/EnemyReportPartsBreakTypeName.msg.23",
+    "Excel_Data/EnemyReportWeaponAttributeText.msg.23",
     "Excel_Data/EnemySpeciesName.msg.23",
     "Excel_Data/EnemyText.msg.23",
+    "Reference/RefStatus.msg.23",
 ]

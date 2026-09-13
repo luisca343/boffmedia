@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useLocale, useToolT } from "../i18n";
 import { cn } from "@boffmedia/ui/cn";
-import { Icon, Empty, Spinner, ToolTitle } from "@boffmedia/ui";
+import { Icon, Empty, Spinner, ToolTitle, type IconName } from "@boffmedia/ui";
 import {
   MhApp,
   MhBar,
@@ -14,8 +14,15 @@ import {
   MhLabel,
   MhLoadError,
   MhTypeChip,
+  MhAttributeIcon,
 } from "../ui/mh-kit";
-import { elementColor } from "../ui/mh-helpers";
+import {
+  MH_ELEMENT_KEYS,
+  attributeDefinition,
+  elementColor,
+  elementIcon,
+  normalizeAttributeKey,
+} from "../ui/mh-helpers";
 import type {
   MhMonster,
   MhWildsAnatomySlot,
@@ -112,8 +119,17 @@ function localizedText(
   return value?.[locale] ?? value?.en ?? value?.es ?? value?.es419 ?? null;
 }
 
+function localizedAttributeLabel(
+  value: string,
+  t: (key: string) => string,
+): string {
+  const key = normalizeAttributeKey(value);
+  return attributeDefinition(key) ? t(key) : cap(value);
+}
+
 export function BestiaryView() {
   const t = useToolT("tools.mhwilds.bestiary");
+  const tAttr = useToolT("tools.mhwilds");
   const { monsters, loading, error } = useMonsters();
 
   const [q, setQ] = React.useState("");
@@ -132,15 +148,12 @@ export function BestiaryView() {
     return [...m.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   }, [monsters]);
 
-  const elementList = React.useMemo(() => {
-    const s = new Set<string>();
-    monsters.forEach((x) =>
-      x.weaknesses.forEach(
-        (w) => w.kind === "element" && w.element && s.add(w.element),
-      ),
-    );
-    return [...s].sort();
-  }, [monsters]);
+  const elementList = React.useMemo(
+    () => MH_ELEMENT_KEYS.filter((key) => monsters.some((monster) => monster.weaknesses.some(
+      (w) => w.kind === "element" && normalizeAttributeKey(w.element) === key,
+    ))),
+    [monsters],
+  );
 
   const filtered = React.useMemo(() => {
     const nq = q.trim().toLowerCase();
@@ -158,7 +171,7 @@ export function BestiaryView() {
         !m.weaknesses.some(
           (w) =>
             w.kind === "element" &&
-            w.element === element &&
+            normalizeAttributeKey(w.element) === element &&
             (w.level ?? 0) >= 2,
         )
       )
@@ -309,11 +322,8 @@ export function BestiaryView() {
                               : undefined
                           }
                         >
-                          <span
-                            className="w-2 h-2 rounded-full"
-                            style={{ background: elementColor(el) }}
-                          />
-                          {el}
+                          <MhAttributeIcon type={el} size={13} />
+                          {localizedAttributeLabel(el, tAttr)}
                         </button>
                       ))}
                     </div>
@@ -374,6 +384,7 @@ function MonsterDetail({
   m: MhMonster;
 }) {
   const t = useToolT("tools.mhwilds.bestiary");
+  const tAttr = useToolT("tools.mhwilds");
   const locale = useLocale();
   const [selectedPartType, setSelectedPartType] = React.useState<number | null>(
     null,
@@ -494,8 +505,8 @@ function MonsterDetail({
               </span>
               <span className="flex flex-wrap gap-1.5 justify-end">
                 {m.elements.map((el) => (
-                  <Tag2 key={el} dot={elementColor(el)}>
-                    {cap(el)}
+                  <Tag2 key={el} attribute={el}>
+                    {localizedAttributeLabel(el, tAttr)}
                   </Tag2>
                 ))}
               </span>
@@ -539,8 +550,8 @@ function MonsterDetail({
         <MhPanel title={t("resistances")} icon="shield">
           <div className="flex flex-wrap gap-1.5">
             {m.resistances.map((r) => (
-              <Tag2 key={r.id} dot={vulnColor(r)}>
-                {cap(vulnLabel(r))}
+              <Tag2 key={r.id} attribute={r.element ?? r.status ?? r.effect}>
+                {localizedAttributeLabel(vulnLabel(r), tAttr)}
               </Tag2>
             ))}
           </div>
@@ -552,7 +563,7 @@ function MonsterDetail({
         <MhPanel title={t("ailments")} icon="alert">
           <div className="flex flex-wrap gap-1.5">
             {ailments.map((a) => (
-              <Tag2 key={a}>{cap(a)}</Tag2>
+              <Tag2 key={a} attribute={a}>{localizedAttributeLabel(a, tAttr)}</Tag2>
             ))}
           </div>
         </MhPanel>
@@ -908,6 +919,7 @@ type HitzoneColumn = {
   translation: string;
   group: "physical" | "element";
   color: string;
+  icon: IconName;
 };
 
 const HITZONE_COLUMNS: HitzoneColumn[] = [
@@ -916,48 +928,56 @@ const HITZONE_COLUMNS: HitzoneColumn[] = [
     translation: "damageSlash",
     group: "physical",
     color: "var(--mh-bright)",
+    icon: "sword",
   },
   {
     key: "blunt",
     translation: "damageBlunt",
     group: "physical",
     color: "var(--mh-bright)",
+    icon: "hammer",
   },
   {
     key: "shot",
     translation: "damageShot",
     group: "physical",
     color: "var(--mh-bright)",
+    icon: "target",
   },
   {
     key: "fire",
     translation: "damageFire",
     group: "element",
     color: elementColor("fire"),
+    icon: elementIcon("fire"),
   },
   {
     key: "water",
     translation: "damageWater",
     group: "element",
     color: elementColor("water"),
+    icon: elementIcon("water"),
   },
   {
     key: "thunder",
     translation: "damageThunder",
     group: "element",
     color: elementColor("thunder"),
+    icon: elementIcon("thunder"),
   },
   {
     key: "ice",
     translation: "damageIce",
     group: "element",
     color: elementColor("ice"),
+    icon: elementIcon("ice"),
   },
   {
     key: "dragon",
     translation: "damageDragon",
     group: "element",
     color: elementColor("dragon"),
+    icon: elementIcon("dragon"),
   },
 ];
 
@@ -1091,7 +1111,14 @@ function PartDamagePanel({
                   )}
                   style={{ color: column.color }}
                 >
-                  {t(column.translation)}
+                  <span className="inline-flex items-center gap-1">
+                    {column.group === "element" ? (
+                      <MhAttributeIcon type={String(column.key)} size={12} className="!h-3 !w-3" />
+                    ) : (
+                      <Icon name={column.icon} size={12} />
+                    )}
+                    {t(column.translation)}
+                  </span>
                 </th>
               ))}
             </tr>

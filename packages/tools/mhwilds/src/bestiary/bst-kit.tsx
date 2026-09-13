@@ -2,25 +2,14 @@ import * as React from "react";
 import { useToolT } from "../i18n";
 import { cn } from "@boffmedia/ui/cn";
 import { Icon, type IconName } from "@boffmedia/ui";
-import { elementColor } from "../ui/mh-helpers";
+import {
+  attributeColor,
+  attributeDefinition,
+  normalizeAttributeKey,
+} from "../ui/mh-helpers";
+import { MhAttributeIcon } from "../ui/mh-kit";
 import type { MhMonster, MhMonsterWeakness } from "../types";
 import { mhwildsBestiaryAsset } from "./assets";
-
-/** Status/effect swatches — cosmetic only (the API gives no colour). */
-const STATUS_COLOR: Record<string, string> = {
-  poison: "#a855f7",
-  paralysis: "#eab308",
-  sleep: "#38bdf8",
-  blast: "#f97316",
-  blastblight: "#f97316",
-  stun: "#f59e0b",
-  exhaust: "#84cc16",
-  fireblight: "#ef4444",
-  waterblight: "#3b82f6",
-  thunderblight: "#facc15",
-  iceblight: "#67e8f9",
-  dragonblight: "#c026d3",
-};
 
 export function vulnLabel(w: {
   element?: string;
@@ -35,9 +24,8 @@ export function vulnColor(w: {
   status?: string;
   effect?: string;
 }): string {
-  if (w.element) return elementColor(w.element);
-  const key = (w.status ?? w.effect ?? "").toLowerCase();
-  return STATUS_COLOR[key] ?? "var(--mh)";
+  if (w.element) return attributeColor(w.element);
+  return attributeColor(w.status ?? w.effect) || "var(--mh)";
 }
 
 /** Deterministic species hue so avatars read as families. Cosmetic. */
@@ -49,6 +37,14 @@ export function speciesHue(species: string): number {
 }
 
 const cap = (s: string) => (s ? s[0].toUpperCase() + s.slice(1) : s);
+
+function attributeLabel(
+  type: string | undefined,
+  t: (key: string) => string,
+): string {
+  const key = normalizeAttributeKey(type);
+  return attributeDefinition(key) ? t(key) : cap(type ?? "—");
+}
 
 /* ── threat tiers & species meta (editorial — see [deferred] fields on MhMonster) ── */
 // Labels/descriptions are chrome and live under the mhwilds.bestiary.threat
@@ -249,7 +245,9 @@ export function MhElemBadge({
   stars?: number;
   muted?: boolean;
 }) {
-  const color = elementColor(element);
+  const t = useToolT("tools.mhwilds");
+  const color = attributeColor(element);
+  const label = attributeLabel(element, t);
   return (
     <span
       className={cn(
@@ -257,11 +255,8 @@ export function MhElemBadge({
         muted && "opacity-45",
       )}
     >
-      <span
-        className="w-[0.5625rem] h-[0.5625rem] rounded-full flex-none"
-        style={{ background: color, boxShadow: `0 0 8px -1px ${color}` }}
-      />
-      <span>{cap(element)}</span>
+      <MhAttributeIcon type={element} size={13} style={{ filter: `drop-shadow(0 0 5px ${color})` }} />
+      <span>{label}</span>
       {stars != null && <MhStars value={stars} max={3} />}
     </span>
   );
@@ -284,6 +279,7 @@ export function Pips({ level, color }: { level: number; color: string }) {
 
 /* ── weakness dot row (roster) ──────────────────────────────────────────────── */
 export function WeakDots({ monster }: { monster: MhMonster }) {
+  const t = useToolT("tools.mhwilds");
   const els = monster.weaknesses
     .filter((w) => w.kind === "element" && (w.level ?? 0) >= 2)
     .slice(0, 4);
@@ -291,11 +287,11 @@ export function WeakDots({ monster }: { monster: MhMonster }) {
   return (
     <span className="inline-flex gap-[3px]">
       {els.map((w) => (
-        <span
+        <MhAttributeIcon
           key={w.id}
-          title={cap(vulnLabel(w))}
-          className="w-2 h-2 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.3)_inset]"
-          style={{ background: vulnColor(w) }}
+          type={w.element ?? w.status ?? w.effect}
+          size={12}
+          title={attributeLabel(w.element ?? w.status ?? w.effect, t)}
         />
       ))}
     </span>
@@ -313,6 +309,7 @@ export function MonsterCard({
   onClick: () => void;
 }) {
   const t = useToolT("tools.mhwilds.bestiary");
+  const tAttr = useToolT("tools.mhwilds");
   const s = speciesMeta(m.species);
   const top = topWeaknesses(m).slice(0, 3);
   return (
@@ -363,11 +360,11 @@ export function MonsterCard({
           <MhSpeciesTag species={m.species} />
           <span className="inline-flex gap-[3px]">
             {top.map((w) => (
-              <span
+              <MhAttributeIcon
                 key={w.id}
-                className="w-2 h-2 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.3)_inset]"
-                style={{ background: vulnColor(w) }}
-                title={`${vulnLabel(w)} ${w.level ?? 0}★`}
+                type={w.element ?? w.status ?? w.effect}
+                size={12}
+                title={`${attributeLabel(w.element ?? w.status ?? w.effect, tAttr)} ${w.level ?? 0}★`}
               />
             ))}
           </span>
@@ -388,6 +385,7 @@ export function MonsterRow({
   onClick: () => void;
 }) {
   const t = useToolT("tools.mhwilds.bestiary");
+  const tAttr = useToolT("tools.mhwilds");
   const s = speciesMeta(m.species);
   const top = topWeaknesses(m).slice(0, 3);
   const tc =
@@ -427,11 +425,11 @@ export function MonsterRow({
       </span>
       <span className="inline-flex gap-[3px]">
         {top.map((w) => (
-          <span
+          <MhAttributeIcon
             key={w.id}
-            className="w-2 h-2 rounded-full shadow-[0_0_0_1px_rgba(0,0,0,0.3)_inset]"
-            style={{ background: vulnColor(w) }}
-            title={vulnLabel(w)}
+            type={w.element ?? w.status ?? w.effect}
+            size={12}
+            title={attributeLabel(w.element ?? w.status ?? w.effect, tAttr)}
           />
         ))}
       </span>
@@ -446,7 +444,9 @@ export function MonsterRow({
 
 /* ── detail: element weakness cell ──────────────────────────────────────────── */
 export function WeakCell({ w, best }: { w: MhMonsterWeakness; best: boolean }) {
+  const t = useToolT("tools.mhwilds");
   const color = vulnColor(w);
+  const label = attributeLabel(w.element ?? w.status ?? w.effect, t);
   const immune = (w.level ?? 0) <= 0;
   return (
     <div
@@ -464,12 +464,9 @@ export function WeakCell({ w, best }: { w: MhMonsterWeakness; best: boolean }) {
           : {}),
       }}
     >
-      <span
-        className="w-2.5 h-2.5 rounded-full"
-        style={{ background: immune ? "var(--line-2)" : color }}
-      />
+      <MhAttributeIcon type={w.element ?? w.status ?? w.effect} size={13} muted={immune} />
       <span className="font-mono text-[0.75rem] text-txt capitalize">
-        {vulnLabel(w)}
+        {label}
       </span>
       <Pips level={w.level ?? 0} color={color} />
       {w.condition && (
@@ -483,15 +480,14 @@ export function WeakCell({ w, best }: { w: MhMonsterWeakness; best: boolean }) {
 
 /* ── detail: status/effect vuln row ─────────────────────────────────────────── */
 export function VulnRow({ w }: { w: MhMonsterWeakness }) {
+  const t = useToolT("tools.mhwilds");
   const color = vulnColor(w);
+  const label = attributeLabel(w.element ?? w.status ?? w.effect, t);
   return (
     <div className="grid grid-cols-[auto_1fr_auto] items-center gap-[0.5625rem] p-[7px_10px] bg-base-2 border border-solid border-line">
-      <span
-        className="w-[0.5625rem] h-[0.5625rem] rounded-full"
-        style={{ background: color }}
-      />
+      <MhAttributeIcon type={w.element ?? w.status ?? w.effect} size={13} />
       <span className="font-body text-[0.75rem] font-semibold capitalize">
-        {vulnLabel(w)}
+        {label}
       </span>
       <Pips level={w.level ?? 0} color={color} />
     </div>
@@ -503,10 +499,14 @@ export function Tag2({
   children,
   good,
   dot,
+  icon,
+  attribute,
 }: {
   children: React.ReactNode;
   good?: boolean;
   dot?: string;
+  icon?: IconName;
+  attribute?: string;
 }) {
   return (
     <span
@@ -517,12 +517,16 @@ export function Tag2({
           : "text-txt-muted bg-base-2 border-line",
       )}
     >
-      {dot && (
+      {attribute ? (
+        <MhAttributeIcon type={attribute} size={12} />
+      ) : icon ? (
+        <Icon name={icon} size={12} style={dot ? { color: dot } : undefined} />
+      ) : dot ? (
         <span
           className="w-2 h-2 rounded-full inline-block"
           style={{ background: dot }}
         />
-      )}
+      ) : null}
       {children}
     </span>
   );

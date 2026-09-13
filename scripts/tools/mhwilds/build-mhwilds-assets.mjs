@@ -110,7 +110,23 @@ const PARTIAL_ITEM_GLYPH_COLORS = Object.freeze({
 // Bump whenever the published mapping/source selection changes. The version
 // is appended to every browser asset URL; keeping it stable after a remap
 // lets a persistent dev browser continue serving the old, incorrect PNGs.
-const BUILD_SCHEMA = 15;
+const BUILD_SCHEMA = 16;
+const ATTRIBUTE_ICON_ATLAS_RELATIVE =
+  "natives/stm/gui/ui_texture/tex000000/tex000201_20_imlm4.png";
+// The game's status/element atlas is a regular 8x8 64px grid. These cells are
+// the nine entries used by EnemyReportWeaponAttributeData (1..9), in the same
+// vocabulary as the extracted English/Spanish message tables.
+const ATTRIBUTE_ICON_CELLS = Object.freeze({
+  fire: [4, 2],
+  water: [5, 1],
+  thunder: [2, 2],
+  ice: [1, 0],
+  dragon: [4, 1],
+  poison: [6, 2],
+  sleep: [3, 2],
+  paralysis: [1, 3],
+  blast: [5, 2],
+});
 const LEGACY_SKETCH_PATH_PATTERN = /(?:emsketch|enemyreportbosssketch)/i;
 const ARMOR_CATALOG_SOURCE = path.join(
   REPO,
@@ -295,6 +311,27 @@ async function copyGearPng(source, destination, dryRun) {
   if (dryRun) return;
   fs.mkdirSync(path.dirname(destination), { recursive: true });
   await sharp(source).png().toFile(destination);
+}
+
+async function copyAttributePng(source, destination, crop, dryRun) {
+  if (dryRun) return;
+  fs.mkdirSync(path.dirname(destination), { recursive: true });
+  await sharp(source).extract(crop).png().toFile(destination);
+}
+
+function buildAttributeEntries(sourceRoot) {
+  const source = path.join(sourceRoot, ATTRIBUTE_ICON_ATLAS_RELATIVE);
+  if (!fs.existsSync(source)) {
+    console.warn(
+      `[build-mhwilds-assets] attribute atlas missing: ${source}; runtime will use the vector fallback`,
+    );
+    return [];
+  }
+  return Object.entries(ATTRIBUTE_ICON_CELLS).map(([key, [column, row]]) => ({
+    source,
+    relative: `attributes/${key}.png`,
+    crop: { left: column * 64, top: row * 64, width: 64, height: 64 },
+  }));
 }
 
 function assertUniqueRuntimeEntries(entries) {
@@ -1459,6 +1496,7 @@ try {
   );
   const gear = buildGearEntries(source, itemPngFiles, armorPngFiles);
   assertNamedGearPaths(gear.entries);
+  const attributeEntries = buildAttributeEntries(source);
   const itemIconFiles = fs.existsSync(ITEM_ICON_SOURCE)
     ? walkFiles(ITEM_ICON_SOURCE)
         .filter((file) => file.toLowerCase().endsWith(".svg"))
@@ -1472,6 +1510,7 @@ try {
       source: file,
       relative: relativePosix(source, file),
     })),
+    ...attributeEntries,
     ...gear.entries,
     ...itemIconFiles.map((file) => ({
       source: file,
@@ -1507,7 +1546,7 @@ try {
   console.log(`[build-mhwilds-assets] src=${source}`);
   console.log(`[build-mhwilds-assets] out=${output}`);
   console.log(
-    `[build-mhwilds-assets] files=${files.length} pngs=${pngFiles.length} gear-pngs=${gear.entries.length} armor-pngs=${gear.armorEntries.length} item-icons=${itemIconFiles.length} item-catalog=${itemManifest.coverage.catalogItems} item-assets=${itemManifest.coverage.availableItems} version=${version}${args.dryRun ? " --dry-run" : ""}`,
+    `[build-mhwilds-assets] files=${files.length} pngs=${pngFiles.length} attribute-pngs=${attributeEntries.length} gear-pngs=${gear.entries.length} armor-pngs=${gear.armorEntries.length} item-icons=${itemIconFiles.length} item-catalog=${itemManifest.coverage.catalogItems} item-assets=${itemManifest.coverage.availableItems} version=${version}${args.dryRun ? " --dry-run" : ""}`,
   );
   const armorCoverage = gear.manifest.armorCoverage;
   const weaponCoverage = gear.manifest.weaponCoverage;
@@ -1557,7 +1596,9 @@ try {
     )
       continue;
     const destination = path.join(output, entry.relative);
-    if (entry.relative.startsWith("gear/") && entry.relative.endsWith(".png")) {
+    if (entry.crop) {
+      await copyAttributePng(entry.source, destination, entry.crop, false);
+    } else if (entry.relative.startsWith("gear/") && entry.relative.endsWith(".png")) {
       await copyGearPng(entry.source, destination, false);
     } else {
       copyFile(entry.source, destination, false);
@@ -1608,7 +1649,7 @@ try {
         ],
         excluded,
         notes: [
-          "Runtime tree contains normalized bestiary data, selected game PNGs, generic item glyph SVGs, a stable item asset manifest, weapon gear renders, and armor slot previews.",
+          "Runtime tree contains normalized bestiary data, selected game PNGs, cropped game element/ailment glyphs, generic item glyph SVGs, a stable item asset manifest, weapon gear renders, and armor slot previews.",
           "Weapon and armor manifest joins retain stable game ids, while generated gear paths use canonical-name slugs.",
           "Item manifest joins retain stable game ids and readable item slugs; current entries point at shared semantic glyphs without duplicating identical SVG files.",
           "Gear thumbnails are republished as RGBA PNGs with the game's invalid DirectXTex gamma metadata removed; this preserves the foreground alpha mask and prevents browser washout. Do not flatten these PNGs during publication.",

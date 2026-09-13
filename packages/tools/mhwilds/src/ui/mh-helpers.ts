@@ -1,4 +1,5 @@
 import type { Weapon } from "../types"
+import type { IconName } from "@boffmedia/ui"
 
 // Emerald game hue + rarity ramp — set as CSS custom properties on the MhApp
 // root so the whole subtree (and arbitrary-value utilities) can read them.
@@ -23,28 +24,87 @@ export const rarVar = (n?: number) => `var(--rar${rarClamp(n)})`
 // rarity 5+ ramps use a white glyph for contrast
 export const rarInk = (n?: number) => (rarClamp(n) >= 5 && rarClamp(n) <= 6 ? "#fff" : "var(--naranja-ink)")
 
-export const RES_ORDER = ["fire", "water", "thunder", "ice", "dragon"] as const
-
-export const ELEMENT_COLOR: Record<string, string> = {
-  fire: "#ff7a5c",
-  water: "var(--info)",
-  thunder: "#ffcf5c",
-  ice: "#6cc4e8",
-  dragon: "#b98bff",
-  poison: "#b98bff",
-  sleep: "#7d9bff",
-  paralysis: "#ffcf5c",
-  blast: "#ff9a6b",
-  blastblight: "#ff9a6b",
-  stun: "#ffcf5c",
-  exhaust: "#9aa3b2",
-  fireblight: "#ff7a5c",
-  waterblight: "var(--info)",
-  thunderblight: "#ffcf5c",
-  iceblight: "#6cc4e8",
-  dragonblight: "#b98bff",
+export type MhAttributeKind = "element" | "ailment"
+export type MhAttributeDefinition = {
+  key: string
+  kind: MhAttributeKind
+  color: string
+  icon: IconName
 }
-export const elementColor = (type?: string) => (type ? ELEMENT_COLOR[type.toLowerCase()] || "var(--muted)" : "var(--muted)")
+
+/**
+ * The single semantic source for every MH Wilds element and ailment glyph.
+ *
+ * The game stores these as attribute/status ids and its UI renders them from a
+ * shared coloured atlas. The web/desktop tools load those cropped atlas cells
+ * through MhAttributeIcon and use this table as the semantic/color bridge.
+ * Keep aliases and presentation components out of individual pages; add them
+ * here instead.
+ */
+export const MH_ATTRIBUTE_DEFINITIONS: readonly MhAttributeDefinition[] = [
+  { key: "fire", kind: "element", color: "#d09070", icon: "flame" },
+  { key: "water", kind: "element", color: "#7090b0", icon: "drop" },
+  { key: "thunder", kind: "element", color: "#d0c080", icon: "bolt" },
+  { key: "ice", kind: "element", color: "#a0c0f0", icon: "sparkles" },
+  { key: "dragon", kind: "element", color: "#a06060", icon: "skull" },
+  { key: "poison", kind: "ailment", color: "#70e070", icon: "skull" },
+  { key: "sleep", kind: "ailment", color: "#6080b0", icon: "moon" },
+  { key: "paralysis", kind: "ailment", color: "#f0b030", icon: "bolt" },
+  { key: "blast", kind: "ailment", color: "#ff8050", icon: "flame" },
+  { key: "blastblight", kind: "ailment", color: "#ff8050", icon: "flame" },
+  { key: "stun", kind: "ailment", color: "#f0b030", icon: "alert" },
+  { key: "exhaust", kind: "ailment", color: "#9aa3b2", icon: "target" },
+  { key: "fireblight", kind: "ailment", color: "#d09070", icon: "flame" },
+  { key: "waterblight", kind: "ailment", color: "#7090b0", icon: "drop" },
+  { key: "thunderblight", kind: "ailment", color: "#d0c080", icon: "bolt" },
+  { key: "iceblight", kind: "ailment", color: "#a0c0f0", icon: "sparkles" },
+  { key: "dragonblight", kind: "ailment", color: "#a06060", icon: "skull" },
+]
+
+export const MH_ATTRIBUTE_BY_KEY: Readonly<Record<string, MhAttributeDefinition>> =
+  Object.freeze(Object.fromEntries(MH_ATTRIBUTE_DEFINITIONS.map((definition) => [definition.key, definition])))
+
+export const MH_ELEMENT_KEYS = MH_ATTRIBUTE_DEFINITIONS
+  .filter((definition) => definition.kind === "element")
+  .map((definition) => definition.key) as unknown as readonly ["fire", "water", "thunder", "ice", "dragon"]
+export const MH_AILMENT_KEYS = MH_ATTRIBUTE_DEFINITIONS
+  .filter((definition) => definition.kind === "ailment")
+  .map((definition) => definition.key)
+export const MH_WEAPON_AILMENT_KEYS = ["poison", "sleep", "paralysis", "blast"] as const
+export const MH_STATUS_KEYS = ["poison", "sleep", "paralysis", "blast", "stun", "exhaust"] as const
+export const RES_ORDER = MH_ELEMENT_KEYS
+
+/** Normalize the game's kebab/space-separated labels to our stable keys. */
+export function normalizeAttributeKey(type?: string): string {
+  return String(type ?? "").trim().toLowerCase().replace(/[\s_-]+/g, "")
+}
+
+export function attributeDefinition(type?: string): MhAttributeDefinition | undefined {
+  return MH_ATTRIBUTE_BY_KEY[normalizeAttributeKey(type)]
+}
+
+export function attributeKind(type?: string): MhAttributeKind | undefined {
+  return attributeDefinition(type)?.kind
+}
+
+export function attributeColor(type?: string): string {
+  return attributeDefinition(type)?.color || "var(--muted)"
+}
+
+export function attributeIcon(type?: string): IconName {
+  return attributeDefinition(type)?.icon || "sparkles"
+}
+
+// Compatibility names retained for callers outside the package. Both now
+// derive from the same definitions rather than maintaining parallel maps.
+export const ELEMENT_COLOR: Record<string, string> = Object.fromEntries(
+  MH_ATTRIBUTE_DEFINITIONS.map((definition) => [definition.key, definition.color]),
+)
+export const ELEMENT_ICON: Record<string, IconName> = Object.fromEntries(
+  MH_ATTRIBUTE_DEFINITIONS.map((definition) => [definition.key, definition.icon]),
+)
+export const elementColor = attributeColor
+export const elementIcon = attributeIcon
 
 // skill category → left-accent colour (the sk-* ramp)
 export const SK_COLOR: Record<string, string> = {
@@ -101,7 +161,7 @@ export function firstSpecial(specials?: any[]): { type: string; value: number; h
     else if (typeof s.damage === "number") value = s.damage
     else if (typeof s.value === "number") value = s.value
     if (value <= 0) continue
-    const kind = s.kind || (["poison", "sleep", "paralysis", "blast", "stun", "exhaust"].includes(String(type).toLowerCase()) ? "status" : "element")
+    const kind = s.kind || (attributeKind(String(type)) === "ailment" || s.status ? "status" : "element")
     return { type: String(type), value, hidden: !!s.hidden, kind }
   }
   return null

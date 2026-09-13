@@ -2,7 +2,10 @@
 
 import * as React from "react"
 import { Sample, Section } from "../showcase-shared"
-import { MhElemBadge, MhSpeciesTag, MhStars, MhThreatBadge, MonsterCard, MonsterRow } from "@boffmedia/tools-mhwilds/bestiary/bst-kit"
+import { MhElemBadge, MhSpeciesTag, MhStars, MhThreatBadge, MonsterArt, MonsterCard, MonsterRow } from "@boffmedia/tools-mhwilds/bestiary/bst-kit"
+import { MhMaterial } from "@boffmedia/tools-mhwilds/ui/mh-kit"
+import { MhwildsItemAssetProvider } from "@boffmedia/tools-mhwilds/bestiary/item-assets"
+import { mhwildsArmorAsset, mhwildsWeaponAsset } from "@boffmedia/tools-mhwilds/bestiary/assets"
 import {
   MhAilmentTag,
   MhBreakPanel,
@@ -42,18 +45,24 @@ const DIABLOS_HITZONES: MhHitzone[] = [
 ]
 const ANJA_STATUSES = { poison: { eff: 2 }, sleep: { eff: 1 }, paralysis: { eff: 2 }, blast: { eff: 3 }, stun: { eff: 2 }, exhaust: { eff: 1 } }
 const RATH_REWARDS: MhReward[] = [
-  { item: { name: "Escama de Rathalos", rarity: 5 }, conditions: [{ type: "carve", chance: 36, quantity: 2 }, { type: "reward", chance: 28, quantity: 1 }] },
-  { item: { name: "Caparazón de Rathalos", rarity: 5 }, conditions: [{ type: "carve", chance: 24, quantity: 1 }, { type: "break", chance: 60, quantity: 1, subtype: "cabeza" }] },
-  { item: { name: "Membrana de Rathalos", rarity: 6 }, conditions: [{ type: "break", chance: 35, quantity: 1, subtype: "alas" }] },
-  { item: { name: "Rubí de fuego", rarity: 7 }, conditions: [{ type: "reward", chance: 5, quantity: 1 }, { type: "carve", chance: 3, quantity: 1 }] },
-  { item: { name: "Placa de Rathalos", rarity: 7 }, conditions: [{ type: "reward", chance: 8, quantity: 1 }] },
+  { item: { name: "Escama de Rathalos+", rarity: 5, gameId: 556, icon: { kind: "scale", color: "red" } }, conditions: [{ type: "carve", chance: 36, quantity: 2 }, { type: "reward", chance: 28, quantity: 1 }] },
+  { item: { name: "Caparazón de Rathalos", rarity: 5, gameId: 557, icon: { kind: "shell", color: "red" } }, conditions: [{ type: "carve", chance: 24, quantity: 1 }, { type: "break", chance: 60, quantity: 1, subtype: "cabeza" }] },
+  { item: { name: "Alas de Rathalos", rarity: 6, gameId: 558, icon: { kind: "wing", color: "red" } }, conditions: [{ type: "break", chance: 35, quantity: 1, subtype: "alas" }] },
+  { item: { name: "Rubí de Rathalos", rarity: 7, gameId: 560, icon: { kind: "gem", color: "red" } }, conditions: [{ type: "reward", chance: 5, quantity: 1 }, { type: "carve", chance: 3, quantity: 1 }] },
+  { item: { name: "Certificado S de Rathalos", rarity: 7, gameId: 561, icon: { kind: "certificate", color: "red" } }, conditions: [{ type: "reward", chance: 8, quantity: 1 }] },
 ]
 const RATH_BREAKS: MhBreak[] = [
-  { part: "Cabeza", impact: 3, effect: "Rompible dos veces. Aumenta la caída de escamas y facilita el aturdimiento.", unlocks: [{ name: "Caparazón de Rathalos", rarity: 5 }] },
-  { part: "Alas", impact: 2, effect: "Al romperlas, el Rathalos vuela menos y cae al suelo con más frecuencia.", unlocks: [{ name: "Membrana de Rathalos", rarity: 6 }] },
-  { part: "Cola", impact: 2, effect: "Se puede cortar en el suelo para obtener material extra único de la cola.", unlocks: [{ name: "Cola de Rathalos", rarity: 5 }] },
+  { part: "Cabeza", impact: 3, effect: "Rompible dos veces. Aumenta la caída de escamas y facilita el aturdimiento.", unlocks: [{ name: "Caparazón de Rathalos", rarity: 5, gameId: 557, icon: { kind: "shell", color: "red" } }] },
+  { part: "Alas", impact: 2, effect: "Al romperlas, el Rathalos vuela menos y cae al suelo con más frecuencia.", unlocks: [{ name: "Alas de Rathalos", rarity: 6, gameId: 558, icon: { kind: "wing", color: "red" } }] },
+  { part: "Cola", impact: 2, effect: "Se puede cortar en el suelo para obtener material extra único de la cola.", unlocks: [{ name: "Cola de Rathalos", rarity: 5, gameId: 559, icon: { kind: "tail", color: "red" } }] },
 ]
 const RATH_DANGER = { name: "Picado en llamas", tell: "Se eleva y marca al cazador con un breve destello antes de lanzarse en diagonal.", counter: "Rueda lateralmente en el último instante; deja el flanco expuesto para un golpe cargado." }
+
+const DROP_ITEMS = [
+  { id: "scale", name: "Escama de Rathalos", rarity: 5, quantity: 2, item: { gameId: 556, icon: { kind: "scale", color: "red" } } },
+  { id: "shell", name: "Caparazón de Rathalos", rarity: 5, quantity: 1, item: { gameId: 557, icon: { kind: "shell", color: "red" } } },
+  { id: "ruby", name: "Rubí de Rathalos", rarity: 7, quantity: 1, item: { gameId: 560, icon: { kind: "monster-part", color: "red" } } },
+]
 
 // MH accent tokens (set by the MH shell on the live tool; set here so the
 // specimens render identically inside the showcase).
@@ -63,6 +72,11 @@ const MH_VARS = {
   ["--mh-soft" as string]: "hsl(152 52% 46% / 0.13)",
   ["--mh-line" as string]: "hsl(152 52% 46% / 0.4)",
 } as React.CSSProperties
+
+const monsterAsset = (png: string): NonNullable<MhMonster["localData"]> => ({
+  id: "00",
+  assets: { icon: { png } },
+})
 
 // Demo monsters shaped to the MH DB schema; threat/title/flagship are [deferred]
 // editorial fields (not in the API) — showcase only.
@@ -82,6 +96,7 @@ const rathalos: MhMonster = {
   id: 1,
   species: "flying-wyvern",
   name: "Rathalos",
+  localData: monsterAsset("natives/stm/gui/ui_texture/tex000000/tex_emicon_00/tex_emicon_em0002_00_0_imlm4.png"),
   title: "Rey de los Cielos",
   threat: 4,
   elements: ["fire"],
@@ -99,6 +114,7 @@ const arkveld: MhMonster = {
   id: 2,
   species: "wraith",
   name: "Arkveld",
+  localData: monsterAsset("natives/stm/gui/ui_texture/tex000000/tex_emicon_00/tex_emicon_em0160_00_0_imlm4.png"),
   title: "Espectro Blanco",
   threat: 4,
   flagship: true,
@@ -116,6 +132,7 @@ const anjanath: MhMonster = {
   id: 3,
   species: "brute-wyvern",
   name: "Anjanath",
+  localData: monsterAsset("natives/stm/gui/ui_texture/tex000000/tex_emicon_00/tex_emicon_em0100_51_0_imlm4.png"),
   threat: 2,
   weaknesses: [
     { id: 1, kind: "element", element: "water", level: 3 },
@@ -125,27 +142,32 @@ const anjanath: MhMonster = {
   locations: [{ id: 1, name: "Llanuras del Viento", zoneCount: 9 }],
 }
 
-const teostra: MhMonster = {
+const goreMagala: MhMonster = {
   ...base,
   id: 4,
   species: "elder-dragon",
-  name: "Teostra",
+  name: "Gore Magala",
+  localData: monsterAsset("natives/stm/gui/ui_texture/tex000000/tex_emicon_00/tex_emicon_em0071_00_0_imlm4.png"),
+  title: "Eclipse Negro",
   threat: 5,
-  elements: ["fire"],
+  elements: ["dragon"],
   weaknesses: [
     { id: 1, kind: "element", element: "ice", level: 2 },
     { id: 2, kind: "element", element: "water", level: 2 },
-    { id: 3, kind: "element", element: "dragon", level: 1 },
+    { id: 3, kind: "element", element: "fire", level: 1 },
   ],
-  locations: [{ id: 1, name: "Cuenca Putrefacta", zoneCount: 14 }],
+  locations: [{ id: 1, name: "Cuenca del Petróleo", zoneCount: 14 }],
 }
 
 export function BestiarioChapter() {
   const [active, setActive] = React.useState(1)
   const [tab, setTab] = React.useState("overview")
   const rathWeak = rathalos.weaknesses.filter((w) => w.kind === "element").map((w) => ({ element: w.element ?? "", stars: w.level ?? 0 }))
+  const relatedWeaponAsset = mhwildsWeaponAsset({ localAssetPath: "gear/weapons/great-sword/rathalos-firesword.png" })
+  const relatedArmorAsset = mhwildsArmorAsset({ localAssetPath: "gear/armor/rathalos-alpha/preview.png" })
   return (
-    <div style={MH_VARS}>
+    <MhwildsItemAssetProvider>
+      <div style={MH_VARS}>
       <Section
         id="mbroster"
         kicker="Bestiario"
@@ -159,7 +181,7 @@ export function BestiarioChapter() {
           </div>
           <div className="grid gap-2 w-full">
             <MonsterRow m={anjanath} active={active === 3} onClick={() => setActive(3)} />
-            <MonsterRow m={teostra} active={active === 4} onClick={() => setActive(4)} />
+            <MonsterRow m={goreMagala} active={active === 4} onClick={() => setActive(4)} />
           </div>
         </Sample>
         <Sample title="Insignia de amenaza · especie · estrellas" code="<MhThreatBadge> <MhSpeciesTag> <MhStars>">
@@ -170,6 +192,31 @@ export function BestiarioChapter() {
           <MhSpeciesTag species="elder-dragon" />
           <MhStars value={2} max={3} />
           <MhStars value={3} max={3} />
+        </Sample>
+      </Section>
+
+      <Section
+        id="mbassets"
+        kicker="Bestiario"
+        title="Arte y assets de items"
+        lead={<>El roster consume iconos extraídos del juego mediante <code>localData.assets.icon</code>; los drops y materiales resuelven su miniatura por <code>gameId</code> a través del manifiesto estable de ítems.</>}
+      >
+        <Sample title="Arte de monstruo" code="<MonsterArt monster>" col>
+          <div className="grid w-full min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[rathalos, arkveld, anjanath, goreMagala].map((monster) => (
+              <div key={monster.id} className="grid min-w-0 gap-2 border border-solid border-line bg-panel p-2">
+                <MonsterArt monster={monster} className="aspect-square h-auto min-h-0 w-full" fit="contain" alt={monster.name} />
+                <span className="font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-muted">{monster.name}</span>
+              </div>
+            ))}
+          </div>
+        </Sample>
+        <Sample title="Iconos de drops por manifiesto" code="<MhMaterial item gameId icon>" col note="El proveedor comparte la caché del manifiesto con todas las filas de materiales; si un asset falla, la fila conserva el glifo semántico de rareza.">
+          <div className="grid w-full max-w-[32.5rem] gap-2">
+            {DROP_ITEMS.map((drop) => (
+              <MhMaterial key={drop.id} item={drop.item} name={drop.name} rarity={drop.rarity} quantity={drop.quantity} />
+            ))}
+          </div>
         </Sample>
       </Section>
 
@@ -267,12 +314,13 @@ export function BestiarioChapter() {
               ]}
             />
             <div className="flex flex-col gap-1.5">
-              <MhRelGear icon="sword" name="Filo de Rathalos III" meta="Espada larga · ATQ 230 · Fuego" onClick={() => {}} />
-              <MhRelGear icon="shield" name="Serie Rathalos" meta="5 piezas · R8 · Poder de Rathalos" onClick={() => {}} />
+              <MhRelGear icon="sword" imageSrc={relatedWeaponAsset} name="Rathalos Firesword" meta="Gran espada · ATQ 462 · Fuego" onClick={() => {}} />
+              <MhRelGear icon="shield" imageSrc={relatedArmorAsset} name="Serie Rathalos α" meta="5 piezas · R8 · Poder de Rathalos" onClick={() => {}} />
             </div>
           </div>
         </Sample>
       </Section>
-    </div>
+      </div>
+    </MhwildsItemAssetProvider>
   )
 }

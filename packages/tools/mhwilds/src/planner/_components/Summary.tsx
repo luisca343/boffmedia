@@ -44,7 +44,7 @@ export function Summary({
               { value: `${weapon.affinity >= 0 ? "+" : ""}${weapon.affinity}%`, label: t("affinity"), color: weapon.affinity >= 0 ? "var(--ok)" : "var(--bad)" },
               { value: (weapon.slots || []).filter((x) => x > 0).length || 0, label: t("build_planner.slots") },
             ]} />
-            {primary && <div className="mt-3"><MhElement type={primary.type} value={primary.damage} hidden={primary.hidden} label={t(primary.type)} /></div>}
+            {primary && <div className="mt-3"><MhElement type={primary.type} value={primary.damage} hidden={primary.hidden} /></div>}
             {weapon.sharpness && (
               <div className="mt-3.5">
                 <MhLabel>{t("build_planner.sharpness")}</MhLabel>
@@ -66,7 +66,6 @@ export function Summary({
         <MhLabel>{t("build_planner.elemental_resistances")}</MhLabel>
         <MhResistances
           res={{ fire: stats.fireRes, water: stats.waterRes, thunder: stats.thunderRes, ice: stats.iceRes, dragon: stats.dragonRes }}
-          labelFor={(k) => t(k)}
         />
       </MhPanel>
 

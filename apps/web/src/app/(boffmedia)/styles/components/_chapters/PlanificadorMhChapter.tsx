@@ -20,20 +20,35 @@ import {
   MhStat3,
 } from "@boffmedia/tools-mhwilds/ui/mh-kit"
 import { MH_VARS } from "@boffmedia/tools-mhwilds/ui/mh-helpers"
-import { getDecorationSlotImagePath } from "@boffmedia/tools-mhwilds/planner/_components/equipment-utils"
+import {
+  getArmorImagePath,
+  getDecorationImagePath,
+  getDecorationSlotImagePath,
+  getWeaponTypeIcon,
+} from "@boffmedia/tools-mhwilds/planner/_components/equipment-utils"
+import { mhwildsArmorAsset, mhwildsWeaponAsset } from "@boffmedia/tools-mhwilds/bestiary/assets"
+import { MhwildsItemAssetProvider } from "@boffmedia/tools-mhwilds/bestiary/item-assets"
 
-const RES_LABELS: Record<string, string> = { fire: "Fuego", water: "Agua", thunder: "Rayo", ice: "Hielo", dragon: "Dragón" }
 const CAT_LABELS = { attack: "Ofensiva", element: "Elemental", defense: "Defensiva", utility: "Utilidad" }
 
 // Demo weapon / armor for the specimens. Real builds come from the planner store. [deferred]
+const ASSET_ARMOR = {
+  name: "Yelmo de Rathalos α",
+  kind: "head",
+  rarity: 7,
+  localAssetPath: "gear/armor/rathalos-alpha/head.png",
+}
+
 const WP = {
   name: "Filo del Rey Cielo",
+  kind: "great-sword",
   rarity: 7,
   attack: 210,
   affinity: 15,
   special: { type: "fire", value: 240 },
   sharpness: { green: 40, blue: 60, white: 50, purple: 20 },
   slots: [3, 1, 0],
+  localAssetPath: "gear/weapons/great-sword/rathalos-firesword.png",
   skills: [{ name: "Ataque", level: 3 }, { name: "Vista Crítica", level: 2 }],
 }
 const ARMOR = { name: "Yelmo de Rathalos α", rarity: 7, defense: 96, slots: [2, 1, 0], skills: [{ name: "Maestría", level: 1 }] }
@@ -49,20 +64,31 @@ const MATERIALS = [
   { id: "gema", name: "Gema de Rathalos", rarity: 8, quantity: 1 },
 ]
 
+const MATERIAL_ITEMS: Record<string, { gameId: number; icon: { kind: string; color: string } }> = {
+  escama: { gameId: 556, icon: { kind: "scale", color: "red" } },
+  garra: { gameId: 557, icon: { kind: "shell", color: "red" } },
+  ala: { gameId: 558, icon: { kind: "wing", color: "red" } },
+  gema: { gameId: 560, icon: { kind: "monster-part", color: "red" } },
+}
+
 export function PlanificadorMhChapter() {
   const [owned, setOwned] = React.useState<Record<string, boolean>>({ escama: true })
+  const weaponAsset = mhwildsWeaponAsset(WP)
+  const armorAsset = mhwildsArmorAsset(ASSET_ARMOR)
 
   return (
-    <div style={MH_VARS}>
+    <MhwildsItemAssetProvider>
+      <div style={MH_VARS}>
       <Section
         id="mhequip"
         kicker="Monster Hunter"
         title="Equipo y selector"
         lead={<>Las piezas base del planificador: la ranura de equipo (<code>MhSlot</code>) con barra de acento y estado lleno / vacío, la fila del selector en el cajón (<code>MhEquipItem</code>) con rareza, habilidades y ranuras, y el sello de rareza (<code>MhRarity</code>) del ramp 1–8.</>}
       >
-        <Sample title="Ranura de equipo" code="<MhSlot icon kind name filled onOpen>" col>
+        <Sample title="Ranura de equipo" code="<MhSlot imageSrc fallbackImageSrc>" col>
           <div className="grid max-w-[27.5rem] gap-2">
-            <MhSlot icon="sword" kind="Arma" name={WP.name} rarity={WP.rarity} filled active onOpen={() => {}} />
+            <MhSlot icon="sword" imageSrc={weaponAsset ?? undefined} fallbackImageSrc={getWeaponTypeIcon(WP.kind)} imageAlt={WP.name} kind="Arma" name={WP.name} rarity={WP.rarity} filled active onOpen={() => {}} />
+            <MhSlot icon="shield" imageSrc={armorAsset ?? undefined} fallbackImageSrc={getArmorImagePath("head")} imageAlt={ASSET_ARMOR.name} kind="Casco" name={ASSET_ARMOR.name} rarity={ASSET_ARMOR.rarity} filled active={false} onOpen={() => {}} />
             <MhSlot icon="sparkles" kind="Talismán" name="Ranura vacía" filled={false} active={false} onOpen={() => {}} />
           </div>
         </Sample>
@@ -96,7 +122,7 @@ export function PlanificadorMhChapter() {
               ]}
             />
             <div className="mt-3">
-              <MhElement type={WP.special.type} value={WP.special.value} label="Fuego" />
+              <MhElement type={WP.special.type} value={WP.special.value} />
             </div>
           </div>
         </Sample>
@@ -107,7 +133,7 @@ export function PlanificadorMhChapter() {
         </Sample>
         <Sample title="Resistencias" code="<MhResistances res>" col>
           <div className="w-full max-w-[26.25rem]">
-            <MhResistances res={{ fire: 3, water: -1, thunder: 0, ice: -2, dragon: 1 }} labelFor={(k) => RES_LABELS[k] ?? k} />
+            <MhResistances res={{ fire: 3, water: -1, thunder: 0, ice: -2, dragon: 1 }} />
           </div>
         </Sample>
       </Section>
@@ -137,7 +163,7 @@ export function PlanificadorMhChapter() {
         </Sample>
         <Sample title="Ranura de joya" code="<MhDecoSocket size decoName>" col>
           <div className="grid w-full max-w-[27.5rem] gap-[0.3125rem]">
-            <MhDecoSocket size={3} decoName="Joya de Ataque III" decoSlot={3} slotImageSrc={getDecorationSlotImagePath(3, "weapon")} onOpen={() => {}} onClear={() => {}} />
+            <MhDecoSocket size={3} decoName="Joya de Ataque III" decoSlot={3} slotImageSrc={getDecorationSlotImagePath(3, "weapon")} decoImageSrc={getDecorationImagePath(3, "orange")} onOpen={() => {}} onClear={() => {}} />
             <MhDecoSocket size={2} decoName={null} slotImageSrc={getDecorationSlotImagePath(2, "armor")} onOpen={() => {}} />
           </div>
         </Sample>
@@ -150,13 +176,13 @@ export function PlanificadorMhChapter() {
         lead={<>La tarjeta del árbol de armas (<code>MhNodeCard</code>) — teñida por rareza, con marca de arma final y punto de «forjada» — y la fila de material (<code>MhMaterial</code>) con gema de rareza y contador, opcionalmente con seguimiento de obtenidos. El esqueleto (<code>MhSkeletonSlots</code>) cubre la carga.</>}
       >
         <Sample title="Nodo del árbol" code="<MhNodeCard node selected owned isFinal>" col>
-          <div className="relative flex min-h-[5rem] flex-wrap gap-[1.125rem]">
-            <MhNodeCard {...NODE_A} style={{ position: "relative", left: 0, top: 0, width: 212 } as React.CSSProperties} selected owned isFinal finalLabel="Final" dim={false} onSelect={() => {}} />
-            <MhNodeCard {...NODE_B} style={{ position: "relative", left: 0, top: 0, width: 212 } as React.CSSProperties} selected={false} owned={false} isFinal={false} finalLabel="Final" dim={false} onSelect={() => {}} />
-            <MhNodeCard {...NODE_C} style={{ position: "relative", left: 0, top: 0, width: 212 } as React.CSSProperties} selected={false} owned={false} isFinal={false} finalLabel="Final" dim onSelect={() => {}} />
+          <div className="relative flex min-h-[5.5rem] flex-wrap gap-[1.125rem]">
+            <MhNodeCard {...NODE_A} style={{ position: "relative", left: 0, top: 0, width: 252, height: 88 } as React.CSSProperties} selected owned isFinal finalLabel="Final" dim={false} onSelect={() => {}} />
+            <MhNodeCard {...NODE_B} style={{ position: "relative", left: 0, top: 0, width: 252, height: 88 } as React.CSSProperties} selected={false} owned={false} isFinal={false} finalLabel="Final" dim={false} onSelect={() => {}} />
+            <MhNodeCard {...NODE_C} style={{ position: "relative", left: 0, top: 0, width: 252, height: 88 } as React.CSSProperties} selected={false} owned={false} isFinal={false} finalLabel="Final" dim onSelect={() => {}} />
           </div>
         </Sample>
-        <Sample title="Materiales de forja" code="<MhMaterial material onToggle>" col note="Con <code>onToggle</code> aparece la casilla de seguimiento; sin ella, la fila es de solo lectura (detalle de un nodo).">
+        <Sample title="Materiales de forja" code="<MhMaterial item material onToggle>" col note="Con <code>item</code>, la fila resuelve el icono por el manifiesto estable; con <code>onToggle</code> aparece la casilla de seguimiento.">
           <div className="grid w-full max-w-[27.5rem] gap-2">
             {MATERIALS.map((m, i) => (
               <MhMaterial
@@ -164,6 +190,7 @@ export function PlanificadorMhChapter() {
                 name={m.name}
                 rarity={m.rarity}
                 quantity={m.quantity}
+                item={MATERIAL_ITEMS[m.id]}
                 owned={!!owned[m.id]}
                 onToggle={i < 2 ? () => setOwned((o) => ({ ...o, [m.id]: !o[m.id] })) : undefined}
               />
@@ -176,6 +203,7 @@ export function PlanificadorMhChapter() {
           </div>
         </Sample>
       </Section>
-    </div>
+      </div>
+    </MhwildsItemAssetProvider>
   )
 }

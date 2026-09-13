@@ -1,6 +1,7 @@
 import { ArmorPiece, EquipmentType, Weapon } from "../../types";
 import { assetUrl, hasToolHost } from "@boffmedia/tool-kit";
 import { mhwildsItemIconAsset } from "../../bestiary/assets";
+import { attributeKind, attributeColor } from "../../ui/mh-helpers";
 
 const MHWILDS_ICON_PATH = "/boffmedia/img/games/mhwilds";
 
@@ -196,19 +197,11 @@ export const getRarityStyle = (rarity: number): string => {
   }
 };
 
-// Get element color class
+// Compatibility helper for older callers. New MH UI should use the shared
+// attribute component or attributeColor() so elements and ailments cannot
+// drift into separate palettes.
 export const getElementColor = (elementType: string): string => {
-  if (!elementType) return "text-txt-muted";
-  
-  const colors: Record<string, string> = {
-    fire: "text-red-400",
-    water: "text-signal",
-    thunder: "text-yellow-400",
-    ice: "text-cyan-400",
-    dragon: "text-signal"
-  };
-  
-  return colors[elementType.toLowerCase()] || "text-txt-muted";
+  return attributeColor(elementType);
 };
 
 // Helper to get defense value regardless of format
@@ -251,11 +244,12 @@ export const getAllWeaponElements = (weapon: Weapon): {
   
   // Case 1: Direct element property
   if (weapon.element && typeof weapon.element === 'object') {
-    elements.push({
+    const direct = {
       type: weapon.element.type,
       damage: weapon.element.damage,
       hidden: false
-    });
+    };
+    (attributeKind(direct.type) === "ailment" ? statuses : elements).push(direct);
   }
   
   // Case 2: Elements in specials array
@@ -280,8 +274,8 @@ export const getAllWeaponElements = (weapon: Weapon): {
         }
         
         // Determine if it's an element or status effect
-        if ((special.kind === 'element' || special.element) && 
-            ['fire', 'water', 'thunder', 'ice', 'dragon'].includes(type.toLowerCase())) {
+        const kind = attributeKind(type);
+        if ((special.kind === 'element' || special.element || kind === 'element') && kind === 'element') {
           
           if (damage > 0) {
             elements.push({
@@ -292,9 +286,7 @@ export const getAllWeaponElements = (weapon: Weapon): {
           }
         } 
         // Handle status effects
-        else if (special.kind === 'status' || 
-                special.status || 
-                ['poison', 'sleep', 'paralysis', 'blast', 'stun'].includes(type.toLowerCase())) {
+        else if (special.kind === 'status' || special.status || kind === 'ailment') {
           
           if (damage > 0) {
             statuses.push({
@@ -316,22 +308,7 @@ export const getAllWeaponElements = (weapon: Weapon): {
 
 // Add a helper function to get status color
 export function getStatusColor(statusType: string | undefined): string {
-  if (!statusType) return 'text-txt';
-  
-  switch (statusType.toLowerCase()) {
-    case 'poison':
-      return 'text-signal';
-    case 'paralysis':
-      return 'text-yellow-300';
-    case 'sleep':
-      return 'text-signal';
-    case 'blast':
-      return 'text-orange-400';
-    case 'stun':
-      return 'text-amber-400';
-    default:
-      return 'text-txt';
-  }
+  return attributeColor(statusType);
 }
 
 export const getWeaponTypeIcon = (weaponType: string): string => {

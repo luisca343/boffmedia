@@ -1,11 +1,11 @@
 "use client"
 
 import * as React from "react"
-import { Button, Empty, Icon, Modal, Select, type IconName } from "@boffmedia/ui"
+import { Button, Empty, Icon, Modal, Select } from "@boffmedia/ui"
 import { useToolT } from "../../i18n"
 import type { ArmorPiece, Charm, Decoration, Weapon, WishlistEntry } from "../../types"
-import { elementColor } from "../../ui/mh-helpers"
-import { MhModes, MhRarity, MhSearch } from "../../ui/mh-kit"
+import { MH_ATTRIBUTE_DEFINITIONS, attributeColor, normalizeAttributeKey } from "../../ui/mh-helpers"
+import { MhAttributeIcon, MhModes, MhRarity, MhSearch } from "../../ui/mh-kit"
 import { getAllWeaponElements } from "./equipment-utils"
 import { WishlistItemVisual } from "./WishlistItemVisual"
 import {
@@ -39,20 +39,7 @@ const WEAPON_KIND_KEYS = new Set([
   "bow",
 ])
 const ARMOR_KIND_KEYS = new Set(["head", "chest", "arms", "waist", "legs"])
-const LOCALIZED_ATTRIBUTE_KEYS = new Set([
-  "fire",
-  "water",
-  "thunder",
-  "ice",
-  "dragon",
-  "sleep",
-  "paralysis",
-  "poison",
-  "blast",
-  "blastblight",
-  "exhaust",
-  "stun",
-])
+const LOCALIZED_ATTRIBUTE_KEYS = new Set(MH_ATTRIBUTE_DEFINITIONS.map(({ key }) => key))
 
 function normalize(value: unknown): string {
   return String(value || "").trim().toLocaleLowerCase()
@@ -113,7 +100,7 @@ function localizedEquipmentKind(t: ReturnType<typeof useToolT>, kind: string): s
 
 function localizedAttribute(t: ReturnType<typeof useToolT>, value: string, noneKey: string): string {
   if (value === NONE) return t(noneKey)
-  const key = normalize(value)
+  const key = normalizeAttributeKey(value)
   return LOCALIZED_ATTRIBUTE_KEYS.has(key) ? t(key) : value
 }
 
@@ -122,25 +109,6 @@ function wishlistEntryFor(kind: SearchKind, item: SearchItem): WishlistEntry {
   if (kind === "armor") return armorWishlistEntry(item as ArmorPiece)
   if (kind === "charm") return charmWishlistEntry(item as Charm)
   return decorationWishlistEntry(item as Decoration)
-}
-
-const ATTRIBUTE_ICONS: Record<string, IconName> = {
-  fire: "flame",
-  water: "drop",
-  thunder: "bolt",
-  ice: "sparkles",
-  dragon: "skull",
-  poison: "skull",
-  sleep: "moon",
-  paralysis: "bolt",
-  blast: "flame",
-  blastblight: "flame",
-  stun: "alert",
-  exhaust: "target",
-}
-
-function attributeIcon(type: string): IconName {
-  return ATTRIBUTE_ICONS[normalize(type)] || "sparkles"
 }
 
 function WeaponAttributeList({ weapon }: { weapon: Weapon }) {
@@ -164,7 +132,7 @@ function WeaponAttributeList({ weapon }: { weapon: Weapon }) {
     <div className="mt-1 flex min-w-0 flex-wrap gap-x-2 gap-y-1">
       {attributes.map((attribute, index) => {
         const label = localizedAttribute(t, attribute.type, "build_planner.wishlist.noElement")
-        const color = elementColor(attribute.type)
+        const color = attributeColor(attribute.type)
         return (
           <span
             key={`${attribute.group}-${attribute.type}-${index}`}
@@ -172,7 +140,7 @@ function WeaponAttributeList({ weapon }: { weapon: Weapon }) {
             style={{ color }}
             title={`${label}${attribute.hidden ? ` ${t("hidden")}` : ""}`}
           >
-            <Icon name={attributeIcon(attribute.type)} size={11} />
+            <MhAttributeIcon type={attribute.type} size={11} />
             <span className="truncate">{label}</span>
             {attribute.damage > 0 && <span>{attribute.damage}</span>}
             {attribute.hidden && <span className="text-[0.5625rem]">{t("hidden")}</span>}

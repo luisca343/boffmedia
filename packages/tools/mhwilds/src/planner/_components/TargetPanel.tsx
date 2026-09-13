@@ -4,8 +4,8 @@ import * as React from "react"
 import { useToolT } from "../../i18n"
 import { Button, Icon } from "@boffmedia/ui"
 import { MhMonster, Weapon } from "../../types"
-import { MhPanel, MhLabel } from "../../ui/mh-kit"
-import { elementColor, weaponAttack } from "../../ui/mh-helpers"
+import { MhAttributeIcon, MhPanel, MhLabel } from "../../ui/mh-kit"
+import { elementColor, normalizeAttributeKey, weaponAttack } from "../../ui/mh-helpers"
 import { getAllWeaponElements, getWeaponTypeIcon } from "./equipment-utils"
 import { mhwildsWeaponAsset } from "../../bestiary/assets"
 
@@ -33,7 +33,7 @@ export function TargetPanel({
       target.weaknesses
         .filter((w) => w.kind === "element" && w.element)
         .forEach((w) => {
-          const el = w.element!.toLowerCase()
+          const el = normalizeAttributeKey(w.element)
           m[el] = Math.max(m[el] ?? 0, w.level ?? 1)
         })
     }
@@ -46,8 +46,8 @@ export function TargetPanel({
     return weapons
       .map((w) => {
         const { elements } = getAllWeaponElements(w)
-        const el = elements.find((e) => !e.hidden && weakByElement[e.type.toLowerCase()] != null)
-        return el ? { w, el, level: weakByElement[el.type.toLowerCase()] } : null
+        const el = elements.find((e) => !e.hidden && weakByElement[normalizeAttributeKey(e.type)] != null)
+        return el ? { w, el, level: weakByElement[normalizeAttributeKey(el.type)] } : null
       })
       .filter((x): x is NonNullable<typeof x> => Boolean(x))
       .sort((a, b) => b.level - a.level || b.el.damage - a.el.damage || weaponAttack(b.w) - weaponAttack(a.w))
@@ -106,8 +106,8 @@ export function TargetPanel({
               key={w.id}
               className="inline-flex items-center gap-1.5 border border-line bg-base-2 px-2 py-1 font-mono text-[0.6875rem] leading-none"
             >
-              <span className="h-2 w-2 rounded-full" style={{ background: elementColor(w.element!) }} />
-              {t(w.element!)}
+              <MhAttributeIcon type={w.element!} size={12} />
+              {t(normalizeAttributeKey(w.element))}
               {w.level ? ` ${"★".repeat(w.level)}` : ""}
             </span>
           ))}
@@ -143,8 +143,9 @@ export function TargetPanel({
               </span>
               <span className="grid min-w-0 flex-1 gap-0.5">
                 <span className="truncate font-display text-[0.8125rem] leading-tight font-bold uppercase not-italic">{w.name}</span>
-                <span className="font-mono text-[0.65625rem] leading-none" style={{ color: elementColor(el.type) }}>
-                  {t(el.type)} {el.damage} · {"★".repeat(level)}
+                <span className="inline-flex items-center gap-1.5 font-mono text-[0.65625rem] leading-none" style={{ color: elementColor(el.type) }}>
+                  <MhAttributeIcon type={el.type} size={11} />
+                  {t(normalizeAttributeKey(el.type))} {el.damage} · {"★".repeat(level)}
                 </span>
               </span>
               <button

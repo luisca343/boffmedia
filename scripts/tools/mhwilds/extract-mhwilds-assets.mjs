@@ -8,10 +8,11 @@
  * small RETool-compatible executable does the proprietary PAK decoding.
  *
  * The default selection is intentionally narrow.  It extracts the game's own
- * bestiary icons, anatomy diagrams, shared equipment thumbnails, their
- * prefabs, and the report/part data that maps those resources to enemy ids. It
- * does not extract the full game or monster meshes unless an explicit
- * --include pattern is supplied.
+ * bestiary icons, anatomy diagrams, shared equipment thumbnails,
+ * attribute/ailment presentation resources, their prefabs, and the
+ * report/part data that maps those resources to enemy ids. It does not
+ * extract the full game or monster meshes unless an explicit --include
+ * pattern is supplied.
  *
  * Local output is ignored by git (`laboon/`), because these are game-owned
  * assets and must never accidentally enter the source repository.
@@ -62,7 +63,7 @@ const EXTRACTOR_URL =
   "https://github.com/SlickAmogus/REToolCustom/releases/download/release/REToolCustom_1.0.zip";
 const CONVERTER_URL =
   "https://github.com/microsoft/DirectXTex/releases/tag/may2026";
-const TOOL_VERSION = 4;
+const TOOL_VERSION = 5;
 const PER_MONSTER_PART_DATA_PATTERN =
   /^natives\/stm\/gamedesign\/enemy\/em\d+\/\d+\/data\/em\d+_\d+_param_parts(?:breakreward|effect|lost)?\.user\.3$/i;
 const ITEM_THUMBNAIL_PATTERN =
@@ -80,6 +81,42 @@ const VISUAL_RESOURCE_PATTERN =
 const VISUAL_TEXTURE_PATH_PATTERN =
   /^natives\/stm\/gui\/ui_texture\/tex000000\/tex_(?:emanatomy|emicon_\d+)\/tex_(?:emanatomy|emicon)_em\d{4}_/i;
 const LEGACY_SKETCH_PATH_PATTERN = /(?:tex_emsketch|enemyreportbosssketch)/i;
+// Attribute/status presentation is stored separately from the bestiary data:
+// the game maps these ids through a user table and renders the glyphs from an
+// icon font/texture atlas. Keep those source resources in the extraction so a
+// later font subset or pixel-perfect renderer has the original inputs.
+const ATTRIBUTE_DATA_PATTERN =
+  /^natives\/stm\/gamedesign\/common\/enemy\/enemyreportweaponattributedata\.user\.3$/i;
+const ATTRIBUTE_STATUS_UI_PATTERN =
+  /^natives\/stm\/gamedesign\/gui\/gui080000\/gui080000\/_userdata\/statusuidata\.user\.3$/i;
+const ATTRIBUTE_MESSAGE_PATTERN =
+  /^natives\/stm\/gamedesign\/text\/(?:excel_data\/enemyreportweaponattributetext|reference\/refstatus)\.msg\.23$/i;
+const ATTRIBUTE_ICON_FONT_PATTERN =
+  /^natives\/stm\/gui\/ui_font\/ift_iconfont_00\.ift\.7$/i;
+const ATTRIBUTE_ICON_TEXTURE_PATTERN =
+  /^natives\/stm\/gui\/ui_texture\/tex_font\/iconfont_(?:kb00|pad\d+)_imlm4\.tex\./i;
+const ATTRIBUTE_ICON_UVS_PATTERN =
+  /^natives\/stm\/gui\/ui_texture\/tex_font\/uvs_iconfont\.uvs\.8\.x64$/i;
+// This shared game UI atlas contains the nine coloured element/status cells
+// used by the equipment and bestiary screens. The builder crops the cells
+// after extraction so every consumer uses the original game artwork.
+const ATTRIBUTE_GAME_ICON_ATLAS_PATTERN =
+  /^natives\/stm\/gui\/ui_texture\/tex000000\/tex000201_20_imlm4\.tex\./i;
+const ATTRIBUTE_GAME_ICON_UVS_PATTERN =
+  /^natives\/stm\/gui\/ui_texture\/tex000000\/uvs000201_2\.uvs\.8$/i;
+const ATTRIBUTE_RESOURCE_PATTERNS = [
+  ATTRIBUTE_DATA_PATTERN,
+  ATTRIBUTE_STATUS_UI_PATTERN,
+  ATTRIBUTE_MESSAGE_PATTERN,
+  ATTRIBUTE_ICON_FONT_PATTERN,
+  ATTRIBUTE_ICON_TEXTURE_PATTERN,
+  ATTRIBUTE_ICON_UVS_PATTERN,
+  ATTRIBUTE_GAME_ICON_ATLAS_PATTERN,
+  ATTRIBUTE_GAME_ICON_UVS_PATTERN,
+];
+function isAttributeResourcePath(archivePath) {
+  return ATTRIBUTE_RESOURCE_PATTERNS.some((pattern) => pattern.test(archivePath));
+}
 const VISUAL_ID_COUNT = 10_000;
 const WEAPON_KIND_TO_THUMBNAIL_FAMILY = Object.freeze({
   "great-sword": "it00",
@@ -129,6 +166,7 @@ const DEFAULT_PATTERNS = [
   /^natives\/stm\/gamedesign\/common\/enemy\/enemyreportmeatdisplaydata\.user\.3$/i,
   /^natives\/stm\/gamedesign\/enemy\/commondata\/data\/enemyweakattrdata\.user\.3$/i,
   /^natives\/stm\/gamedesign\/common\/enemy\/(?:enemydata|enemypartstypedata)\.user\.3$/i,
+  ATTRIBUTE_DATA_PATTERN,
   /^natives\/stm\/gamedesign\/enemy\/commondata\/enummaker\/emid\.user\.3$/i,
   /^natives\/stm\/gamedesign\/common\/equip\/armorseriesdata\.user\.3$/i,
   PLAYER_ARMOR_LIST_PATTERN,
@@ -141,13 +179,20 @@ const DEFAULT_PATTERNS = [
   /^natives\/stm\/gamedesign\/text\/excel_data\/enemyspeciesname\.msg\.23$/i,
   /^natives\/stm\/gamedesign\/gui\/gui060000\/enemyicontexture\/.*$/i,
   /^natives\/stm\/gamedesign\/gui\/common\/_userdata\/enemyreportbossanatomytexturedata\.user\.3$/i,
+  ATTRIBUTE_STATUS_UI_PATTERN,
+  ATTRIBUTE_MESSAGE_PATTERN,
+  ATTRIBUTE_ICON_FONT_PATTERN,
+  ATTRIBUTE_ICON_TEXTURE_PATTERN,
+  ATTRIBUTE_ICON_UVS_PATTERN,
+  ATTRIBUTE_GAME_ICON_ATLAS_PATTERN,
+  ATTRIBUTE_GAME_ICON_UVS_PATTERN,
 ];
 
 function printHelp() {
   console.log(`Usage: node scripts/tools/mhwilds/extract-mhwilds-assets.mjs [options]
 
-Extract the game's bestiary icons, anatomy textures and shared item
-thumbnails into the ignored local tree under
+Extract the game's bestiary icons, anatomy textures, shared item thumbnails,
+and attribute/ailment presentation resources into the ignored local tree under
 laboon/tool-sources/mhwilds/extracted/bestiary. The output also contains
 index.json for asset lookup and manifest.json for provenance.
 
@@ -355,6 +400,7 @@ function isSharedDataPath(archivePath) {
     /^natives\/stm\/gamedesign\/common\/enemy\/(?:enemyreport|enemydata|enemypartstypedata)/i.test(
       archivePath,
     ) ||
+    isAttributeResourcePath(archivePath) ||
     /^natives\/stm\/gamedesign\/enemy\/commondata\/data\/enemyweakattrdata\.user\.3$/i.test(
       archivePath,
     ) ||
@@ -362,6 +408,9 @@ function isSharedDataPath(archivePath) {
       archivePath,
     ) ||
     /^natives\/stm\/gamedesign\/text\/excel_data\/(?:enemyreport|enemytext|enemyspeciesname|enemypartstypename)/i.test(
+      archivePath,
+    ) ||
+    /^natives\/stm\/gamedesign\/text\/reference\/refstatus\.msg\.23$/i.test(
       archivePath,
     ) ||
     /^natives\/stm\/gamedesign\/gui\/gui060000\/enemyicon/i.test(archivePath) ||
@@ -1387,20 +1436,25 @@ function buildAssetIndex(outputDirectory, extractedFiles, converted) {
     [...itemThumbnails.entries()].sort(([a], [b]) => Number(a) - Number(b)),
   );
 
+  const describeFile = (file) => ({
+    path: file.path,
+    bytes: file.bytes,
+    sourcePak: file.sourcePak,
+    sha256: file.sha256,
+  });
   const sharedData = extractedFiles
     .filter((file) => isSharedDataPath(file.path))
-    .map((file) => ({
-      path: file.path,
-      bytes: file.bytes,
-      sourcePak: file.sourcePak,
-      sha256: file.sha256,
-    }));
+    .map(describeFile);
+  const attributeResources = extractedFiles
+    .filter((file) => isAttributeResourcePath(file.path))
+    .map(describeFile);
 
   return {
     schema: 1,
     generatedAt: new Date().toISOString(),
     monsters,
     itemThumbnails: serializedItemThumbnails,
+    attributeResources,
     sharedData,
     note: "Paths are relative to this index.json file's directory.",
   };

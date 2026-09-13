@@ -168,6 +168,27 @@ and that the monster's `EmID._FixedID` matches its report row. The same
 fixed-ID rule should be used for future weakness-related tables instead of
 adding per-DLC exceptions.
 
+### Element and ailment presentation resources
+
+The extractor also selects the game's shared attribute/status resources:
+`EnemyReportWeaponAttributeData.user.3`, `StatusUIData.user.3`, the attribute
+and status message tables, `ift_iconfont_00.ift.7`, the keyboard/controller
+iconfont textures, and `uvs_iconfont.uvs.8.x64`. They are recorded under
+`index.json.attributeResources` (and `sharedData`) and decoded under
+`output/user/attributes/` when the local decoder supports the corresponding
+table.
+
+Wilds does not expose one standalone PNG per element or ailment. The in-game
+glyphs are entries in the shared icon font/atlas, while the attribute table
+only supplies ids and message references. The extractor now also keeps the
+game's coloured `tex000201_20_imlm4` atlas and its `uvs000201_2` mapping. The
+asset builder crops the nine report attributes into
+`bestiary/attributes/{fire,water,thunder,ice,dragon,poison,sleep,paralysis,blast}.png`.
+`MhAttributeIcon` loads those original game glyphs everywhere and falls back to
+the host-neutral icon only when the local runtime pack has not been rebuilt.
+`MH_ATTRIBUTE_DEFINITIONS` remains the canonical semantic/color source, so
+pages and style-guide specimens cannot drift apart.
+
 For a different Steam location:
 
 ```powershell

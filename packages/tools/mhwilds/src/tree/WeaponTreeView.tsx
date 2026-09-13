@@ -6,10 +6,10 @@ import { Button, Chip, Empty, Icon, Select, Spinner, ToolTitle } from "@boffmedi
 import { useWeaponTreeData } from "./useWeaponTreeData"
 import {
   MhApp, MhBar, MhBarSide, MhBody, MhWrap, MhSeal, MhModes, MhSrc, MhSearch,
-  MhTypeChip, MhNodeCard, MhDrawer, MhRarity, MhStat3, MhElement, MhMaterial, MhLabel, MhLoadError,
+  MhTypeChip, MhNodeCard, MhDrawer, MhRarity, MhStat3, MhElement, MhAttributeIcon, MhMaterial, MhLabel, MhLoadError,
   MhMeter,
 } from "../ui/mh-kit"
-import { WEAPON_TYPES, weaponAttack, firstSpecial, elementColor } from "../ui/mh-helpers"
+import { MH_ELEMENT_KEYS, MH_WEAPON_AILMENT_KEYS, WEAPON_TYPES, weaponAttack, firstSpecial, elementColor, normalizeAttributeKey } from "../ui/mh-helpers"
 import { mhwildsWeaponAsset } from "../bestiary/assets"
 import { useWishlist, weaponWishlistEntry } from "../planner/_utils/wishlist"
 import { WishlistLink } from "../planner/_components/WishlistLink"
@@ -244,7 +244,7 @@ export function WeaponTreeView() {
   const elOptions = [
     { value: "all", label: t("tree.allElement") },
     { value: "none", label: t("tree.noElement") },
-    ...["fire", "water", "thunder", "ice", "dragon", "poison", "sleep", "paralysis", "blast"].map((e) => ({ value: e, label: t(e) })),
+    ...[...MH_ELEMENT_KEYS, ...MH_WEAPON_AILMENT_KEYS].map((e) => ({ value: e, label: t(e) })),
   ]
 
   if (loading) {
@@ -450,7 +450,7 @@ function TreeOutline({ roots, ownedSet, matches, sel, onSel }: { roots: Node[]; 
             </span>
             <span className="flex gap-3 font-mono text-[0.6875rem] leading-none text-txt-muted flex-none">
               <span><Icon name="sword" size={11} className="inline align-[-1px]" /> {weaponAttack(node)}</span>
-              {sp && <span style={{ color: elementColor(sp.type) }}>{sp.value}</span>}
+              {sp && <span className="inline-flex items-center gap-1" style={{ color: elementColor(sp.type) }}><MhAttributeIcon type={sp.type} size={11} />{sp.value}</span>}
             </span>
           </button>
         )
@@ -516,9 +516,9 @@ function TreeDetail({ node, pathKey, nodesByKey, owned, onToggleOwned, onClose, 
       <MhStat3 items={[
         { value: weaponAttack(node), label: t("attack"), mod: "attack" },
         { value: node.rarity, label: t("rarity") },
-        { value: sp ? t(sp.type) : "—", label: t("element") },
+        { value: sp ? t(normalizeAttributeKey(sp.type)) : "—", label: t("element") },
       ]} />
-      {sp && <div className="mt-3"><MhElement type={sp.type} value={sp.value} hidden={sp.hidden} label={t(sp.type)} /></div>}
+      {sp && <div className="mt-3"><MhElement type={sp.type} value={sp.value} hidden={sp.hidden} /></div>}
 
       {parent && (
         <div className="mt-[1.125rem]">

@@ -2,14 +2,15 @@
 
 import React, { useEffect } from "react"
 import { useToolOnline } from "@boffmedia/tool-kit"
-import { MHWILDS_NS, useToolT } from "../i18n"
+import { MHWILDS_NS, MHWILDS_UI_NS, useToolT } from "../i18n"
 import { Empty, Icon, IconButton, SearchInput, ToolSeal, ToolStrip, type IconName } from "@boffmedia/ui"
 import {
-  MH_VARS, rarClamp, rarVar, elementColor, SK_COLOR, skillCategory,
+  MH_VARS, rarClamp, rarVar, attributeColor, attributeIcon, normalizeAttributeKey, SK_COLOR, skillCategory,
   SHARP_ORDER, RES_ORDER,
 } from "./mh-helpers"
 import { useMhwildsItemAsset, MhwildsItemAssetProvider } from "../bestiary/item-assets"
 import type { MhwildsItemAssetReference } from "../bestiary/assets"
+import { mhwildsAttributeAsset } from "../bestiary/assets"
 
 // ── app chassis (full-bleed inside the host's box) ───────────────────────────
 /**
@@ -154,14 +155,65 @@ export function MhRarity({ rarity, long }: { rarity?: number; long?: boolean }) 
 
 
 // ── element / status chip ─────────────────────────────────────────────────────
-export function MhElement({ type, value, hidden, label }: { type: string; value: number; hidden?: boolean; label: string }) {
-  const t = useToolT("tools.mhwilds.ui")
+export function MhAttributeIcon({
+  type,
+  size = 13,
+  muted = false,
+  title,
+  className = "",
+  style,
+}: {
+  type?: string
+  size?: number
+  muted?: boolean
+  title?: string
+  className?: string
+  style?: React.CSSProperties
+}) {
+  const [gameIconFailed, setGameIconFailed] = React.useState(false)
+  const gameIcon = mhwildsAttributeAsset(type)
+
+  React.useEffect(() => {
+    setGameIconFailed(false)
+  }, [gameIcon])
+
   return (
-    <span className={`inline-flex items-center gap-[0.4375rem] px-2.5 py-1.5 bg-base-2 border border-line font-mono text-[0.75rem] leading-none ${hidden ? "opacity-60" : ""}`} title={label}>
-      <span className="w-[0.5625rem] h-[0.5625rem] rounded-full" style={{ background: elementColor(type) }} />
-      <span>{label} {value}{hidden ? ` ${t("hidden")}` : ""}</span>
+    <span
+      className={`inline-flex h-4 w-4 flex-none items-center justify-center ${className}`}
+      style={{ color: muted ? "var(--line-2)" : attributeColor(type), ...style }}
+      title={title}
+    >
+      {gameIcon && !gameIconFailed ? (
+        <img
+          src={gameIcon}
+          alt=""
+          aria-hidden="true"
+          width={size}
+          height={size}
+          className="h-auto w-auto object-contain"
+          onError={() => setGameIconFailed(true)}
+        />
+      ) : (
+        <Icon name={attributeIcon(type)} size={size} />
+      )}
     </span>
   )
+}
+
+export function MhAttribute({ type, value, hidden, label }: { type: string; value: number; hidden?: boolean; label?: string }) {
+  const t = useToolT(MHWILDS_NS)
+  const resolvedLabel = label ?? t(normalizeAttributeKey(type))
+  return (
+    <span className={`inline-flex items-center gap-[0.4375rem] px-2.5 py-1.5 bg-base-2 border border-line font-mono text-[0.75rem] leading-none ${hidden ? "opacity-60" : ""}`} title={resolvedLabel}>
+      <MhAttributeIcon type={type} />
+      <span>{resolvedLabel} {value}{hidden ? ` ${t("hidden")}` : ""}</span>
+    </span>
+  )
+}
+
+/** Kept as the public name used by the weapon/tree screens. */
+export function MhElement(props: { type: string; value: number; hidden?: boolean; label?: string }) {
+  return <MhAttribute {...props} />
 }
 
 // ── stat trio ─────────────────────────────────────────────────────────────────
@@ -184,7 +236,8 @@ export function MhStat3({ items }: { items: { value: React.ReactNode; label: str
 }
 
 // ── resistances row ───────────────────────────────────────────────────────────
-export function MhResistances({ res, labelFor }: { res: Record<string, number>; labelFor: (k: string) => string }) {
+export function MhResistances({ res, labelFor }: { res: Record<string, number>; labelFor?: (k: string) => string }) {
+  const t = useToolT(MHWILDS_NS)
   return (
     <div className="grid grid-cols-5 gap-[0.3125rem]">
       {RES_ORDER.map((rk) => {
@@ -192,9 +245,9 @@ export function MhResistances({ res, labelFor }: { res: Record<string, number>; 
         const tone = v > 0 ? "text-ok" : v < 0 ? "text-bad" : "text-txt-muted"
         return (
           <div key={rk} className="text-center py-[0.4375rem] px-0.5 bg-base-2 border border-line">
-            <div className="w-2.5 h-2.5 rounded-full mx-auto mb-[0.3125rem]" style={{ background: elementColor(rk) }} />
+            <MhAttributeIcon type={rk} size={12} className="mx-auto mb-[0.3125rem]" />
             <div className={`font-mono text-[0.875rem] leading-none font-bold ${tone}`}>{v > 0 ? "+" : ""}{v}</div>
-            <div className="font-mono text-[0.5625rem] leading-none uppercase text-txt-dim mt-[3px]">{labelFor(rk).slice(0, 3)}</div>
+            <div className="font-mono text-[0.5625rem] leading-none uppercase text-txt-dim mt-[3px]">{(labelFor?.(rk) ?? t(rk)).slice(0, 3)}</div>
           </div>
         )
       })}
@@ -327,7 +380,7 @@ export function MhSlot({
 export function MhDecoSocket({
   size, decoName, decoSlot, slotImageSrc, decoImageSrc, decoImageFilter, onOpen, onClear,
 }: { size: number; decoName?: string | null; decoSlot?: number; slotImageSrc: string; decoImageSrc?: string; decoImageFilter?: string; onOpen: () => void; onClear?: () => void }) {
-  const t = useToolT("tools.mhwilds.ui")
+  const t = useToolT(MHWILDS_UI_NS)
   const filled = !!decoName
   const partial = filled && decoSlot != null && decoSlot < size
   const [decoImageFailed, setDecoImageFailed] = React.useState(false)
@@ -413,7 +466,7 @@ export function MhMaterial({
   item?: MhwildsItemAssetReference | null
   assetVersion?: string
 }) {
-  const t = useToolT("tools.mhwilds.ui")
+  const t = useToolT(MHWILDS_UI_NS)
   const imageSrc = useMhwildsItemAsset(item, assetVersion)
   const [imageFailed, setImageFailed] = React.useState(false)
 
@@ -477,11 +530,12 @@ export interface MhEquipItemData {
 export function MhEquipItem({
   item, kind, active, onPick, slotImagePath,
 }: { item: MhEquipItemData; kind: "weapon" | "armor" | "charm"; active?: boolean; onPick: () => void; slotImagePath?: (slot: number) => string }) {
-  const t = useToolT("tools.mhwilds.ui")
+  const t = useToolT(MHWILDS_NS)
+  const tUi = useToolT(MHWILDS_UI_NS)
   const skills = (item.skills || []).map((s) => `${s.name} ${s.level}`)
   const stat =
     kind === "weapon" ? (
-      <><b className="text-txt">{t("atk")} {item.attack}</b><br />{(item.affinity ?? 0) >= 0 ? "+" : ""}{item.affinity}% {t("affinity")}</>
+      <><b className="text-txt">{tUi("atk")} {item.attack}</b><br />{(item.affinity ?? 0) >= 0 ? "+" : ""}{item.affinity}% {t("affinity")}</>
     ) : kind === "charm" ? (
       <b className="text-txt">{t("rarity")} {rarClamp(item.rarity)}</b>
     ) : (
@@ -519,7 +573,7 @@ export interface MhSetBonusData {
   skill?: { name: string } | null
 }
 export function MhSetBonus({ bonus }: { bonus: MhSetBonusData }) {
-  const t = useToolT("tools.mhwilds.ui")
+  const t = useToolT(MHWILDS_UI_NS)
   const active = bonus.activeAt != null
   return (
     <div className={`py-[0.5625rem] px-[0.6875rem] bg-base-2 border border-line ${active ? "" : "opacity-50"}`}>
@@ -583,7 +637,7 @@ export function MhRing({ pct, label }: { pct: number; label: React.ReactNode }) 
  *  field in the product carried the `cut-tag` chamfer at 38 or 45px — the tool's
  *  emerald tint is what makes it feel like MH, not a third input geometry. */
 export function MhSearch({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
-  const t = useToolT("tools.mhwilds.ui")
+  const t = useToolT(MHWILDS_UI_NS)
   return (
     <SearchInput
       value={value}
@@ -661,8 +715,8 @@ export function MhNodeCard({
       <span className="flex min-w-0 flex-wrap gap-x-2.5 gap-y-1 pr-1">
         <span className="inline-flex items-center gap-1 font-mono text-[0.6875rem] leading-none text-txt-muted"><Icon name="sword" size={11} /><b className="text-txt">{attack}</b></span>
         {special && (
-          <span className="inline-flex items-center gap-1 font-mono text-[0.6875rem] leading-none" style={{ color: elementColor(special.type) }}>
-            <span className="w-[0.4375rem] h-[0.4375rem] rounded-full inline-block" style={{ background: elementColor(special.type) }} />{special.value}
+          <span className="inline-flex items-center gap-1 font-mono text-[0.6875rem] leading-none" style={{ color: attributeColor(special.type) }}>
+            <MhAttributeIcon type={special.type} size={11} />{special.value}
           </span>
         )}
       </span>
@@ -679,7 +733,7 @@ export function MhDrawer({
 }: {
   icon?: React.ReactNode; iconName?: IconName; title: React.ReactNode; sub?: React.ReactNode; onClose: () => void; tools?: React.ReactNode; children: React.ReactNode
 }) {
-  const t = useToolT("tools.mhwilds.ui")
+  const t = useToolT(MHWILDS_UI_NS)
   useEffect(() => {
     const esc = (e: KeyboardEvent) => { if (e.key === "Escape") onClose() }
     document.addEventListener("keydown", esc)

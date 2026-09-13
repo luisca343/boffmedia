@@ -14,6 +14,9 @@ import {
   MhWeaponExtra,
 } from "@/components/boffmedia/ui/mh-db"
 import { MHDB, MH_MAX_DEF } from "./mh-db-demo"
+import type { ArmorPiece, Weapon } from "@boffmedia/tools-mhwilds/types"
+import { mhwildsArmorAsset, mhwildsWeaponAsset } from "@boffmedia/tools-mhwilds/bestiary/assets"
+import { WishlistItemVisual } from "@boffmedia/tools-mhwilds/planner/_components/WishlistItemVisual"
 
 // MH emerald accent tokens (mirrors mh.css :root; scoped so mh-db components tint
 // correctly on the showcase page — same pattern as BestiarioChapter).
@@ -24,6 +27,31 @@ const MH_VARS = {
   ["--mh-line" as string]: "hsl(152 52% 46% / 0.4)",
 } as React.CSSProperties
 
+const ASSET_WEAPON: Weapon = {
+  id: 32,
+  gameId: 32,
+  kind: "great-sword",
+  name: "Rathalos Firesword",
+  rarity: 7,
+  damage: { display: 462, raw: 462 },
+  affinity: 0,
+  slots: [3, 1, 0],
+  localAssetPath: "gear/weapons/great-sword/rathalos-firesword.png",
+}
+
+const ASSET_ARMOR: ArmorPiece = {
+  id: 1769659776,
+  name: "Rathalos alpha helm",
+  kind: "head",
+  rank: "high",
+  rarity: 7,
+  defense: { base: 96 },
+  resistances: { fire: 3, water: -1, thunder: 0, ice: -2, dragon: 1 },
+  slots: [2, 1, 0],
+  skills: [],
+  localAssetPath: "gear/armor/rathalos-alpha/head.png",
+}
+
 export function ArmeriaMhChapter() {
   const [sel, setSel] = React.useState(true)
   const set = MHDB.armorSet(1)
@@ -33,6 +61,8 @@ export function ArmeriaMhChapter() {
   const wBow = MHDB.weapon(4005)
   const wCb = MHDB.weapon(6003)
   const wHh = MHDB.weapon(7003)
+  const weaponAsset = mhwildsWeaponAsset(ASSET_WEAPON)
+  const armorAsset = mhwildsArmorAsset(ASSET_ARMOR)
 
   return (
     <div style={MH_VARS}>
@@ -65,6 +95,37 @@ export function ArmeriaMhChapter() {
           <div className="grid w-full max-w-[28.75rem] gap-0">
             <MhPieceRow piece={piece} />
             <MhPieceRow piece={MHDB.armor(105)} />
+          </div>
+        </Sample>
+      </Section>
+
+      <Section
+        id="mhdbassets"
+        kicker="Monster Hunter"
+        title="Renders canónicos de gear"
+        lead={<>El pipeline de assets une cada arma y pieza con su <code>localAssetPath</code> estable. El PNG conserva transparencia y se compone directamente sobre la superficie de la tarjeta.</>}
+      >
+        <Sample title="Arma y pieza con arte extraído" code="<mhwildsWeaponAsset> <mhwildsArmorAsset>" col>
+          <div className="grid w-full max-w-[38rem] grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="border border-solid border-line bg-panel p-3">
+              <div className="grid min-h-[11rem] place-items-center">
+                {weaponAsset ? <img src={weaponAsset} alt={ASSET_WEAPON.name} width={180} height={180} draggable={false} className="h-40 w-full object-contain" /> : <span className="font-mono text-[0.6875rem] text-txt-dim">Sin asset</span>}
+              </div>
+              <div className="mt-2 font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-muted">{ASSET_WEAPON.name}</div>
+            </div>
+            <div className="border border-solid border-line bg-panel p-3">
+              <div className="grid min-h-[11rem] place-items-center">
+                {armorAsset ? <img src={armorAsset} alt={ASSET_ARMOR.name} width={180} height={180} draggable={false} className="h-40 w-full object-contain" /> : <span className="font-mono text-[0.6875rem] text-txt-dim">Sin asset</span>}
+              </div>
+              <div className="mt-2 font-mono text-[0.625rem] uppercase tracking-[0.08em] text-txt-muted">{ASSET_ARMOR.name}</div>
+            </div>
+          </div>
+        </Sample>
+        <Sample title="Visual de wishlist" code="<WishlistItemVisual kind item>">
+          <div className="flex flex-wrap items-center gap-3">
+            <WishlistItemVisual kind="weapon" item={ASSET_WEAPON} />
+            <WishlistItemVisual kind="armor" item={ASSET_ARMOR} />
+            <span className="font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-txt-muted">Arma · armadura · fallback semántico</span>
           </div>
         </Sample>
       </Section>
