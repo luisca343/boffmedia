@@ -5,6 +5,7 @@ import { TcgImageService } from './tcg-image.service';
 jest.mock('fs', () => ({
   promises: {
     mkdir: jest.fn().mockResolvedValue(undefined),
+    access: jest.fn().mockRejectedValue(new Error('missing')),
     writeFile: jest.fn().mockResolvedValue(undefined),
   },
 }));
@@ -31,6 +32,7 @@ describe('TcgImageService', () => {
   beforeEach(async () => {
     jest.clearAllMocks();
     (fs.mkdir as jest.Mock).mockResolvedValue(undefined);
+    (fs.access as jest.Mock).mockRejectedValue(new Error('missing'));
     (fs.writeFile as jest.Mock).mockResolvedValue(undefined);
     (axios.get as jest.Mock).mockResolvedValue({ data: Buffer.from('img') });
 
@@ -43,6 +45,54 @@ describe('TcgImageService', () => {
 
   it('should be defined', () => {
     expect(service).toBeDefined();
+  });
+
+  describe('downloadPackImages()', () => {
+    it('downloads one pack image by stable booster id', async () => {
+      const result = await service.downloadPackImages(
+        [
+          {
+            id: 'boo_A1-charizard',
+            name: 'Charizard',
+            image: 'https://cdn/front',
+          },
+        ],
+        'A1',
+      );
+
+      expect(result).toEqual({
+        downloaded: 1,
+        updated: 0,
+        skipped: 0,
+        failed: 0,
+      });
+      expect(axios.get).toHaveBeenNthCalledWith(1, 'https://cdn/front.webp', {
+        responseType: 'arraybuffer',
+      });
+      expect(axios.get).toHaveBeenCalledTimes(1);
+      expect(fs.writeFile).toHaveBeenCalledWith(
+        expect.stringMatching(/[\\/]packs[\\/]A1[\\/]boo_A1-charizard\.webp$/),
+        expect.anything(),
+      );
+    });
+
+    it('does not re-download existing booster artwork unless forced', async () => {
+      (fs.access as jest.Mock).mockResolvedValue(undefined);
+
+      const result = await service.downloadPackImages(
+        [
+          {
+            id: 'boo_A1-charizard',
+            name: 'Charizard',
+            image: 'https://cdn/front',
+          },
+        ],
+        'A1',
+      );
+
+      expect(result.skipped).toBe(1);
+      expect(axios.get).not.toHaveBeenCalled();
+    });
   });
 
   // ─── downloadSetImages ────────────────────────────────────────────────────────
@@ -67,7 +117,7 @@ describe('TcgImageService', () => {
     });
 
     it('sets logo_local to null when logo download fails', async () => {
-      (axios.get as jest.Mock).mockRejectedValueOnce(new Error('network'));
+      (axios.get as jest.Mock).mockRejectedValue(new Error('network'));
       const sets: any[] = [
         { id: 'sv1', logo: 'https://cdn/sv1', symbol: null },
       ];
@@ -121,6 +171,25 @@ describe('TcgImageService', () => {
 
       expect(result).toBeNull();
       expect(mockLogger.warn).toHaveBeenCalled();
+    });
+
+    it('retries a transient CDN response before succeeding', async () => {
+      const rateLimited = Object.assign(new Error('rate limited'), {
+        response: { status: 429, headers: {} },
+      });
+      (axios.get as jest.Mock)
+        .mockRejectedValueOnce(rateLimited)
+        .mockResolvedValueOnce({ data: Buffer.from('img') });
+
+      const result = await service.downloadCardImage(
+        { image: 'https://cdn/sv1-1' },
+        'sv1-1',
+        'sv1',
+        'en',
+      );
+
+      expect(result).toBe('/boffmedia/tools/tcg/cards/sv1/sv1-1_en.webp');
+      expect(axios.get).toHaveBeenCalledTimes(2);
     });
   });
 

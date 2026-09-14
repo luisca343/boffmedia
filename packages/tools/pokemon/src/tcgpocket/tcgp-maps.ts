@@ -23,6 +23,16 @@ const TYPE_ALIAS: Record<string, string> = {
   electric: "lightning", dark: "darkness", steel: "metal", normal: "colorless",
 }
 
+// TCGdex exposes type names, not standalone type-image URLs. Reuse the
+// already-hosted Pokémon type symbols and translate TCG names to their
+// existing filenames where the games use different terminology.
+const TYPE_ASSET_NAME: Record<string, string> = {
+  colorless: "normal",
+  darkness: "dark",
+  lightning: "electric",
+  metal: "steel",
+}
+
 export function normType(type: string | undefined | null): string {
   if (!type) return "colorless"
   const k = type.toLowerCase().trim()
@@ -31,6 +41,12 @@ export function normType(type: string | undefined | null): string {
 
 export function typeColor(type: string | undefined | null): string {
   return TYPE_COLORS[normType(type)] ?? "var(--dim)"
+}
+
+export function localTypeIcon(type: string | undefined | null): string {
+  const key = normType(type)
+  const filename = TYPE_ASSET_NAME[key] ?? key
+  return assetUrl(joinAssetPath(ASSET.smartrotom.img, "types", `${filename}.png`))
 }
 
 // Signal glyph per type — the «cara señal» art window's fallback face.
@@ -131,4 +147,13 @@ export function timeAgo(iso: string, locale: string): string {
 // locale, so the locale is part of the filename rather than a directory.
 export function localCardArt(setId: string, id: string, locale = 'en'): string {
   return assetUrl(joinAssetPath(ASSET.boffmedia.tools.tcg, 'cards', setId, `${id}_${locale}.webp`))
+}
+
+/** The API stores booster assets by ID so localized names share one file. */
+export function packAssetName(id: string): string {
+  return id.trim().replace(/[^a-zA-Z0-9._-]+/g, '_') || 'pack'
+}
+
+export function localPackArt(setId: string, id: string): string {
+  return assetUrl(joinAssetPath(ASSET.boffmedia.tools.tcg, 'packs', setId, `${packAssetName(id)}.webp`))
 }

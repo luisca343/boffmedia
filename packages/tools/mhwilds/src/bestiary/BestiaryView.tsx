@@ -22,9 +22,12 @@ import {
   elementColor,
   elementIcon,
   normalizeAttributeKey,
+  rarVar,
 } from "../ui/mh-helpers";
 import type {
   MhMonster,
+  MhMonsterReward,
+  MhRewardCondition,
   MhWildsAnatomySlot,
   MhWildsHitzone,
   MhWildsPartData,
@@ -33,6 +36,13 @@ import { mhwildsBestiaryAsset } from "./assets";
 import { useMhwildsItemAsset } from "./item-assets";
 import { anatomyCalloutTarget } from "./anatomy-geometry";
 import { useMonsters } from "./useMonsters";
+import {
+  displayableBreakRecords,
+  isBreakRewardKind,
+  partBreakCount,
+  reportBreakSummary,
+  type MhBreakAction,
+} from "./break-info";
 import {
   MonsterCard,
   MonsterRow,
@@ -94,17 +104,6 @@ function dropKindLabel(kind: string, t: BestiaryTranslate): string {
               ? "dropCarve"
               : undefined);
   return key ? t(key) : kind;
-}
-
-function breakTargetCount(
-  breakData: MhWildsPartData["breaks"][number],
-): number | null {
-  const value = breakData.maxCount ?? breakData.executeCount;
-  return value == null || value < 1 || value >= 9999 ? null : value;
-}
-
-function partBreakCount(part: MhWildsPartData): number {
-  return Math.max(...part.breaks.map((item) => breakTargetCount(item) ?? 0), 0);
 }
 
 function ailmentLabel(a: unknown): string | null {
@@ -408,12 +407,16 @@ function MonsterDetail({ m }: { m: MhMonster }) {
     .filter(Boolean) as string[];
   const parts = m.localData?.data?.parts ?? [];
   const drops = m.rewards.reduce<DropGroup[]>((groups, reward) => {
+    const conditions = (reward.conditions ?? []).filter(
+      (condition) => !isBreakRewardKind(condition.kind),
+    );
+    if (conditions.length === 0) return groups;
     const name = reward.item?.name ?? t("unknownDrop");
     const itemGameId = reward.item?.gameId;
     const key = String(itemGameId ?? reward.item?.id ?? name);
     const existing = groups.find((group) => group.key === key);
     if (existing) {
-      existing.conditions.push(...(reward.conditions ?? []));
+      existing.conditions.push(...conditions);
       existing.itemGameId ??= itemGameId;
       existing.iconKind ??= reward.item?.icon?.kind;
       existing.iconColor ??= reward.item?.icon?.color;
@@ -425,7 +428,7 @@ function MonsterDetail({ m }: { m: MhMonster }) {
         rarity: reward.item?.rarity ?? 1,
         iconKind: reward.item?.icon?.kind,
         iconColor: reward.item?.icon?.color,
-        conditions: [...(reward.conditions ?? [])],
+        conditions: [...conditions],
       });
     }
     return groups;
@@ -490,6 +493,9 @@ function MonsterDetail({ m }: { m: MhMonster }) {
       {parts.length > 0 && (
         <PartDamagePanel
           parts={parts}
+          rewards={m.rewards}
+          reportSlots={m.localData?.report?.anatomyLayout?.slots ?? []}
+          assetVersion={m.localAssetVersion}
           locale={locale}
           t={t}
           selectedPartType={selectedPartType}
@@ -630,10 +636,16 @@ function MonsterDetail({ m }: { m: MhMonster }) {
                       alt=""
                     />
                     <span className="min-w-0">
-                      <span className="block truncate font-body text-[0.8125rem] font-semibold">
+                      <span
+                        className="block truncate font-body text-[0.8125rem] font-semibold"
+                        style={{ color: rarVar(drop.rarity) }}
+                      >
                         {drop.name}
                       </span>
-                      <span className="mt-0.5 block font-mono text-[0.5625rem] uppercase tracking-[0.06em] text-txt-dim">
+                      <span
+                        className="mt-0.5 block font-mono text-[0.5625rem] uppercase tracking-[0.06em]"
+                        style={{ color: rarVar(drop.rarity) }}
+                      >
                         {t("rarity")} {drop.rarity}
                       </span>
                     </span>
@@ -697,6 +709,7 @@ function DropItemIcon({
   rarity,
   version,
   alt,
+  className,
 }: {
   itemGameId?: number | string;
   iconKind?: string;
@@ -704,9 +717,10 @@ function DropItemIcon({
   rarity: number;
   version?: string;
   alt: string;
+  className?: string;
 }) {
   const [failed, setFailed] = React.useState(false);
-  const rarityColor = `var(--rar${Math.min(8, Math.max(1, rarity))})`;
+  const rarityColor = rarVar(rarity);
   const iconSrc = useMhwildsItemAsset(
     {
       gameId: itemGameId,
@@ -717,7 +731,12 @@ function DropItemIcon({
   const showImage = iconSrc != null && !failed;
   React.useEffect(() => setFailed(false), [iconSrc]);
   return (
-    <span className="relative grid h-11 w-11 flex-none place-items-center">
+    <span
+      className={cn(
+        "relative grid h-11 w-11 flex-none place-items-center",
+        className,
+      )}
+    >
       {showImage ? (
         <img
           src={iconSrc}
@@ -738,11 +757,33 @@ function DropItemIcon({
           }}
         />
       )}
-      <span
-        aria-hidden="true"
-        className="absolute bottom-[-1px] right-[-1px] h-1.5 w-1.5 border border-solid bg-base-deep"
-        style={{ borderColor: rarityColor }}
-      />
+    </span>
+  );
+}
+
+const BREAK_ACTION_KEYS: Record<MhBreakAction, string> = {
+  breakable: "breakable",
+  severable: "severable",
+  weakPoint: "weakPoint",
+};
+
+function BreakActionTags({
+  actions,
+  t,
+}: {
+  actions: MhBreakAction[];
+  t: BestiaryTranslate;
+}) {
+  return (
+    <span className="flex flex-wrap gap-1">
+      {actions.map((action) => (
+        <span
+          key={action}
+          className="border border-[var(--mh-line)] bg-[var(--mh-soft)] px-1.5 py-0.5 text-[var(--mh-bright)]"
+        >
+          {t(BREAK_ACTION_KEYS[action])}
+        </span>
+      ))}
     </span>
   );
 }
@@ -867,6 +908,7 @@ function AnatomyPanel({
                   localizedText(slot.part?.name, locale) ?? t("unknownPart");
                 const breakName = localizedText(slot.break?.name, locale);
                 const part = parts.find((item) => item.type === slot.partType);
+                const breakSummary = reportBreakSummary(breakName, part);
                 const active = selectedPartType === slot.partType;
                 return (
                   <button
@@ -896,10 +938,22 @@ function AnatomyPanel({
                         {name}
                       </span>
                       <span className="flex min-w-0 flex-wrap gap-x-2 gap-y-0.5 font-mono text-[0.59375rem] text-txt-dim">
-                        {breakName && <span>{breakName}</span>}
-                        {part && partBreakCount(part) > 0 && (
+                        {breakSummary.actions.length > 0 ? (
+                          <BreakActionTags
+                            actions={breakSummary.actions}
+                            t={t}
+                          />
+                        ) : (
+                          breakName && <span>{breakName}</span>
+                        )}
+                        {breakSummary.count != null && (
                           <span className="text-[var(--mh-bright)]">
-                            {t("breakCount", { count: partBreakCount(part) })}
+                            {t(
+                              breakSummary.countKind === "parts"
+                                ? "partCount"
+                                : "breakCount",
+                              { count: breakSummary.count },
+                            )}
                           </span>
                         )}
                       </span>
@@ -1042,12 +1096,18 @@ function DamageCell({
 
 function PartDamagePanel({
   parts,
+  rewards,
+  reportSlots,
+  assetVersion,
   locale,
   t,
   selectedPartType,
   onSelectPart,
 }: {
   parts: MhWildsPartData[];
+  rewards: MhMonsterReward[];
+  reportSlots: MhWildsAnatomySlot[];
+  assetVersion?: string;
   locale: string;
   t: BestiaryTranslate;
   selectedPartType: number | null;
@@ -1057,7 +1117,7 @@ function PartDamagePanel({
     (part) => part.typeInfo.name && (part.health ?? 0) > 0,
   );
   const breakableParts = visibleParts.filter(
-    (part) => part.breaks.length > 0 || part.breakHitzone,
+    (part) => displayableBreakRecords(part).length > 0 || part.breakHitzone,
   );
 
   return (
@@ -1247,6 +1307,7 @@ function PartDamagePanel({
             {breakableParts.map((part) => {
               const name =
                 localizedText(part.typeInfo.name, locale) ?? t("unknownPart");
+              const breaks = displayableBreakRecords(part);
               const active = selectedPartType === part.type;
               return (
                 <button
@@ -1269,22 +1330,24 @@ function PartDamagePanel({
                     <span className="min-w-0 truncate pl-1 font-body text-[0.75rem] font-semibold">
                       {name}
                     </span>
-                    <span className="shrink-0 font-mono text-[0.59375rem] uppercase text-[var(--mh-bright)]">
-                      {t("breakCount", {
-                        count: partBreakCount(part) || part.breaks.length,
-                      })}
-                    </span>
+                    {breaks.length > 0 && (
+                      <span className="shrink-0 font-mono text-[0.59375rem] uppercase text-[var(--mh-bright)]">
+                        {t("breakCount", { count: breaks.length })}
+                      </span>
+                    )}
                   </span>
                   <span className="mt-2 flex flex-wrap gap-1 pl-1">
-                    {part.breaks.map((breakData, index) => (
+                    {breaks.map((breakData, index) => (
                       <span
                         key={breakData.id}
                         className="border border-solid border-[var(--mh-line)] bg-panel px-1.5 py-1 font-mono text-[0.59375rem] text-txt-muted"
                       >
-                        {t("breakStage", {
-                          stage: index + 1,
-                          count: breakTargetCount(breakData) ?? "∞",
-                        })}
+                        {breakData.maxCount != null && breakData.maxCount > 1
+                          ? t("breakStageThreshold", {
+                              stage: index + 1,
+                              count: breakData.maxCount,
+                            })
+                          : t("breakStage", { stage: index + 1 })}
                       </span>
                     ))}
                     {part.breakHitzone && (
@@ -1299,7 +1362,195 @@ function PartDamagePanel({
           </div>
         </div>
       )}
+      <BreakRewardsPanel
+        rewards={rewards}
+        parts={parts}
+        reportSlots={reportSlots}
+        assetVersion={assetVersion}
+        locale={locale}
+        t={t}
+      />
     </MhPanel>
+  );
+}
+
+type BreakRewardEntry = {
+  reward: MhMonsterReward;
+  condition: MhRewardCondition;
+};
+
+type BreakRewardGroup = {
+  key: string;
+  part: string | null;
+  entries: BreakRewardEntry[];
+};
+
+const BREAK_REWARD_PART_ALIASES: Record<string, string> = {
+  "abdominal-iceplate": "frozen-core-waist",
+  antenna: "antennae",
+  foreleg: "front-legs",
+  "front-left-arm": "left-front-arm",
+  "front-right-arm": "right-front-arm",
+  "head-crystallized": "head-hide",
+  "l-wingarm-crystallized": "left-wing-arm-hide",
+  "left-chainblade": "left-wing-blade",
+  "left-claw": "left-nail",
+  "left-foreleg": "left-front-leg",
+  "lg-iceplate-exposed": "frozen-bigcore-after",
+  petals: "petal",
+  "r-wingarm-crystallized": "right-wing-arm-hide",
+  "right-chainblade": "right-wing-blade",
+  "right-claw": "right-nail",
+  "right-foreleg": "right-front-leg",
+};
+
+function partKey(value: string): string {
+  const normalized = value
+    .trim()
+    .toLocaleLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return BREAK_REWARD_PART_ALIASES[normalized] ?? normalized;
+}
+
+function groupBreakRewards(rewards: MhMonsterReward[]): BreakRewardGroup[] {
+  const groups = new Map<string, BreakRewardGroup>();
+  for (const reward of rewards) {
+    for (const condition of reward.conditions ?? []) {
+      if (!isBreakRewardKind(condition.kind)) continue;
+      const part = condition.part?.trim() || null;
+      const key = part ? partKey(part) : "__unassigned";
+      const group = groups.get(key);
+      if (group) {
+        group.entries.push({ reward, condition });
+      } else {
+        groups.set(key, {
+          key,
+          part,
+          entries: [{ reward, condition }],
+        });
+      }
+    }
+  }
+  return [...groups.values()];
+}
+
+function breakRewardPartLabel(
+  part: string | null,
+  parts: MhWildsPartData[],
+  reportSlots: MhWildsAnatomySlot[],
+  locale: string,
+  t: BestiaryTranslate,
+): string {
+  if (!part) return t("unassignedBreakPart");
+  const key = partKey(part);
+  const localPart = parts.find((candidate) => {
+    const name = localizedText(candidate.typeInfo.name, "en");
+    return name ? partKey(name) === key : false;
+  });
+  if (localPart) {
+    return localizedText(localPart.typeInfo.name, locale) ?? part;
+  }
+  const reportSlot = reportSlots.find((slot) => {
+    const name = localizedText(slot.part?.name, "en");
+    return name ? partKey(name) === key : false;
+  });
+  if (reportSlot) {
+    return localizedText(reportSlot.part?.name, locale) ?? part;
+  }
+  return part.split("-").map(cap).join(" ");
+}
+
+function BreakRewardsPanel({
+  rewards,
+  parts,
+  reportSlots,
+  assetVersion,
+  locale,
+  t,
+}: {
+  rewards: MhMonsterReward[];
+  parts: MhWildsPartData[];
+  reportSlots: MhWildsAnatomySlot[];
+  assetVersion?: string;
+  locale: string;
+  t: BestiaryTranslate;
+}) {
+  const groups = groupBreakRewards(rewards);
+  if (groups.length === 0) return null;
+
+  return (
+    <div className="mt-3 border-t border-solid border-line pt-3">
+      <div className="mb-2 flex flex-wrap items-baseline justify-between gap-2">
+        <MhLabel className="mb-0">{t("breakRewards")}</MhLabel>
+        <span className="font-mono text-[0.59375rem] uppercase tracking-[0.06em] text-txt-dim">
+          {t("breakRewardsHint")}
+        </span>
+      </div>
+      <div className="grid gap-1.5 lg:grid-cols-2">
+        {groups.map((group) => (
+          <div
+            key={group.key}
+            className="overflow-hidden border border-solid border-line bg-base-2"
+          >
+            <div className="border-b border-solid border-line bg-panel px-2.5 py-2 font-body text-[0.75rem] font-semibold">
+              {breakRewardPartLabel(
+                group.part,
+                parts,
+                reportSlots,
+                locale,
+                t,
+              )}
+            </div>
+            <div className="divide-y divide-dashed divide-line">
+              {group.entries.map(({ reward, condition }) => {
+                const chance = Math.max(
+                  0,
+                  Math.min(100, condition.chance ?? 0),
+                );
+                const tone = chanceTone(chance);
+                return (
+                  <div
+                    key={`${reward.id}-${condition.id}`}
+                    className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-2 px-2.5 py-2"
+                  >
+                    <DropItemIcon
+                      itemGameId={reward.item.gameId}
+                      iconKind={reward.item.icon?.kind}
+                      iconColor={reward.item.icon?.color}
+                      rarity={reward.item.rarity}
+                      version={assetVersion}
+                      alt=""
+                      className="h-8 w-8"
+                    />
+                    <span className="min-w-0">
+                      <span
+                        className="block truncate font-body text-[0.75rem] font-semibold"
+                        style={{ color: rarVar(reward.item.rarity) }}
+                      >
+                        {reward.item.name}
+                      </span>
+                      <span className="mt-0.5 block truncate font-mono text-[0.5625rem] uppercase tracking-[0.04em] text-txt-dim">
+                        {condition.rank ? `${cap(condition.rank)} · ` : ""}
+                        {t("dropQuantity")} ×{condition.quantity ?? 1}
+                      </span>
+                    </span>
+                    <span
+                      className="text-right font-mono text-[0.6875rem] font-bold"
+                      style={{ color: tone.color }}
+                    >
+                      {chance}%
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
   );
 }
 

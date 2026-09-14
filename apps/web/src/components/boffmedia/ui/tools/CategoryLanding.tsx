@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { useTranslations } from "next-intl"
-import { Icon, Button, Chip } from "@boffmedia/ui"
+import { Icon, Button, Chip, ToolIcon } from "@boffmedia/ui"
 import { GameLogo } from "./GameLogo"
 import { ToolGrid } from "./ToolGrid"
 import { TxSection } from "./TxSection"
@@ -66,6 +66,12 @@ export function FeaturedTool({ cat }: { cat: CategoryData }) {
       </div>
 
       <div className="flex flex-col px-[2.375rem] pb-8 pt-[2.125rem]">
+        <ToolIcon
+          name={f.icon}
+          src={f.iconSrc}
+          size={32}
+          className="mb-3 flex-none text-[var(--ghue)]"
+        />
         <h3 className="mb-[0.875rem] text-[clamp(1.875rem,3.2vw,3rem)] leading-[0.98]">{f.title}</h3>
         <p className="max-w-[50ch] text-[0.96875rem] leading-[1.55] text-txt-muted">{f.desc}</p>
         <div className="my-[1.25rem] mb-[1.625rem] flex flex-wrap gap-2">

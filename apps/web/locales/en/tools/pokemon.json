@@ -60,6 +60,48 @@
           "battles": "Battles"
         }
       },
+      "teambuilder": {
+        "title": "Team Builder",
+        "description": "Create, validate, and prepare your competitive teams.",
+        "features": {
+          "teamBuilder": "Teams"
+        }
+      },
+      "tcgPanel": {
+        "title": "TCG Pocket Dashboard",
+        "description": "Review your TCG Pocket progress and activity.",
+        "features": {
+          "tcgPanel": "Overview"
+        }
+      },
+      "cardList": {
+        "title": "TCG Pocket Cards",
+        "description": "Browse and search every available card.",
+        "features": {
+          "cardList": "Cards"
+        }
+      },
+      "collection": {
+        "title": "TCG Pocket Collection",
+        "description": "Track the cards you own and the ones you still need.",
+        "features": {
+          "collection": "Collection"
+        }
+      },
+      "packs": {
+        "title": "TCG Pocket Packs",
+        "description": "Explore packs and their available cards.",
+        "features": {
+          "packs": "Packs"
+        }
+      },
+      "battles": {
+        "title": "TCG Pocket Battles",
+        "description": "Prepare and review your TCG Pocket battles.",
+        "features": {
+          "battles": "Battles"
+        }
+      },
       "pmdsky": {
         "title": "Mystery Dungeon",
         "description": "Secret mail generator for Explorers of Sky",
@@ -79,6 +121,34 @@
         "description": "Real-time Pokémon battles against the AI, PvP or Showdown, with replays",
         "features": {
           "battlesim": "Battle"
+        }
+      },
+      "damageCalc": {
+        "title": "Damage Calculator",
+        "description": "Calculate damage ranges for competitive battles.",
+        "features": {
+          "damageCalc": "VGC Damage"
+        }
+      },
+      "speed": {
+        "title": "VGC Speed",
+        "description": "Compare speed tiers and battle conditions.",
+        "features": {
+          "speed": "Speed"
+        }
+      },
+      "tracker": {
+        "title": "VGC Tracker",
+        "description": "Log matches and analyze your performance.",
+        "features": {
+          "tracker": "Matches"
+        }
+      },
+      "meta": {
+        "title": "VGC Meta",
+        "description": "Analyze usage, trends, and competitive teams.",
+        "features": {
+          "meta": "Meta analysis"
         }
       }
     },

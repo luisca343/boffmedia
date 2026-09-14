@@ -17,11 +17,13 @@ const mockFetchService = {
   fetchAndMergeSetsForSeries: jest.fn(),
   fetchAndMergeCardsForSet: jest.fn(),
   fetchCardImageUrlsForSet: jest.fn(),
+  fetchPackArtworkForSet: jest.fn(),
 };
 
 const mockImageService = {
   downloadSetImages: jest.fn(),
   downloadCardImage: jest.fn(),
+  downloadPackImages: jest.fn(),
 };
 
 const mockRepository = {
@@ -65,10 +67,17 @@ describe('TcgSyncService', () => {
       { setId: 'A2', cards: 1, imagesEn: 1, imagesEs: 0, imagesAny: 1 }, // partial
     ]);
     mockFetchService.fetchAndMergeSetsForSeries.mockResolvedValue(remoteSets);
+    mockFetchService.fetchPackArtworkForSet.mockResolvedValue([]);
     mockRepository.upsertSets.mockResolvedValue({ inserted: 0, updated: 2 });
     mockRepository.upsertCards.mockResolvedValue({ inserted: 2, updated: 0 });
     mockRepository.checkIfSeriesExists.mockResolvedValue(true);
     mockRepository.repairLegacyImagePaths.mockResolvedValue(0);
+    mockImageService.downloadPackImages.mockResolvedValue({
+      downloaded: 0,
+      updated: 0,
+      skipped: 0,
+      failed: 0,
+    });
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -349,6 +358,41 @@ describe('TcgSyncService', () => {
 
       expect(mockImageService.downloadCardImage).not.toHaveBeenCalled();
       expect(mockFetchService.fetchCardImageUrlsForSet).not.toHaveBeenCalled();
+    });
+
+    it('downloads pack artwork even when card artwork is complete', async () => {
+      mockRepository.getCardImageStateForSet.mockResolvedValue([
+        { id: 'A2-001', imageLocalEn: '/en.webp', imageLocalEs: null },
+      ]);
+      const packs = [
+        {
+          id: 'boo_A2-dialga',
+          name: 'Dialga',
+          image: 'https://x/front',
+        },
+      ];
+      mockFetchService.fetchPackArtworkForSet.mockResolvedValue(packs);
+      mockImageService.downloadPackImages.mockResolvedValue({
+        downloaded: 1,
+        updated: 0,
+        skipped: 0,
+        failed: 0,
+      });
+
+      const events = await collect(
+        service.run({ seriesId: 'tcgp', images: true, setIds: ['A2'] }),
+      );
+
+      expect(mockFetchService.fetchPackArtworkForSet).toHaveBeenCalledWith(
+        'A2',
+      );
+      expect(mockImageService.downloadPackImages).toHaveBeenCalledWith(
+        packs,
+        'A2',
+        false,
+      );
+      expect(mockImageService.downloadCardImage).not.toHaveBeenCalled();
+      expect((events[events.length - 1] as any).counts.downloaded).toBe(1);
     });
 
     it('fetches both locales for a card that has no artwork yet', async () => {

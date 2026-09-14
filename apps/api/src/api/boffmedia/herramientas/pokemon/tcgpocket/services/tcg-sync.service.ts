@@ -506,6 +506,27 @@ export class TcgSyncService {
         if (isCancelled()) break;
         const set = targetSets[i];
 
+        // Pack art lives on the full set payload, not on the set brief used by
+        // sync status. Download it independently so an images-only run also
+        // repairs missing pack files when all card art is already complete.
+        let packCounts = zero();
+        try {
+          const packs = await this.fetchService.fetchPackArtworkForSet(set.id);
+          packCounts =
+            (await this.imageService.downloadPackImages(
+              packs,
+              set.id,
+              Boolean(dto.force),
+            )) ?? zero();
+        } catch (error: any) {
+          const message = `Pack artwork: ${summarize(error)}`;
+          packCounts.failed = 1;
+          failures.push({ stage: 'images', scope: set.id, message });
+          this.logger.warn(
+            `[TCG] Sync: pack art failed for ${set.id}: ${message}`,
+          );
+        }
+
         try {
           const cards = await this.tcgRepository.getCardImageStateForSet(
             set.id,
@@ -521,7 +542,10 @@ export class TcgSyncService {
           );
 
           if (pending.length === 0) {
-            const counts = { ...zero(), skipped: cards.length };
+            const counts = {
+              ...packCounts,
+              skipped: packCounts.skipped + cards.length,
+            };
             add(stageCounts, counts);
             yield {
               type: 'set',
@@ -530,7 +554,10 @@ export class TcgSyncService {
               setName: set.name,
               index: i + 1,
               total: targetSets.length,
-              state: 'skipped',
+              state:
+                packCounts.downloaded > 0 || packCounts.failed > 0
+                  ? 'done'
+                  : 'skipped',
               counts,
             };
             continue;
@@ -546,7 +573,7 @@ export class TcgSyncService {
             state: 'running',
           };
 
-          const { counts, unavailable } = yield* this.withProgress<{
+          const { counts: cardCounts, unavailable } = yield* this.withProgress<{
             counts: TcgSyncCounts;
             unavailable: number;
           }>((emit) =>
@@ -565,12 +592,18 @@ export class TcgSyncService {
               isCancelled,
             ),
           );
+          const counts = {
+            downloaded: packCounts.downloaded + cardCounts.downloaded,
+            updated: packCounts.updated + cardCounts.updated,
+            skipped: packCounts.skipped + cardCounts.skipped,
+            failed: packCounts.failed + cardCounts.failed,
+          };
           add(stageCounts, counts);
-          if (counts.failed > 0) {
+          if (cardCounts.failed > 0) {
             failures.push({
               stage: 'images',
               scope: set.id,
-              message: `${counts.failed} card(s) could not be downloaded`,
+              message: `${cardCounts.failed} card(s) could not be downloaded`,
             });
           }
           yield {

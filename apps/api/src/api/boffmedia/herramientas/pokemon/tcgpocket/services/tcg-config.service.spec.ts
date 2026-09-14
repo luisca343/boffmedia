@@ -62,6 +62,25 @@ describe('TcgConfigService', () => {
     });
   });
 
+  describe('getPackArtworkCatalogUrl()', () => {
+    it('returns the image-backed Pocket Decks expansion catalogue', () => {
+      expect(service.getPackArtworkCatalogUrl()).toContain(
+        'PocketDecks/pokemon-tcg-pocket-cards',
+      );
+      expect(service.getPackArtworkCatalogUrl()).toContain(
+        'data/v5/expansions.json',
+      );
+    });
+  });
+
+  describe('getPackArtworkImageUrl()', () => {
+    it('builds a webp pack asset URL', () => {
+      expect(service.getPackArtworkImageUrl('pa-promov1')).toContain(
+        'images/webp/packs/pa-promov1.webp',
+      );
+    });
+  });
+
   describe('getSupportedLocales()', () => {
     it('returns a copy of the supported locales array', () => {
       const locales = service.getSupportedLocales();

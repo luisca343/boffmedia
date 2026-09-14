@@ -5,16 +5,17 @@ import { useEffect, useMemo, useState } from "react"
 import { cn } from "@boffmedia/ui/cn"
 import { Icon, type IconName } from "@boffmedia/ui"
 import type { TcgCard } from "./service"
-import { ASSET, joinAssetPath } from "@boffmedia/asset-paths"
-import { assetUrl } from "@boffmedia/tool-kit"
 import { optionalT, TCGP_NS, useLocale, useToolT } from "../i18n"
 import {
-  cssVars, typeColor, typeGlyph, normType, normStage, rarityMeta, isPokemon, pct, padNum, localCardArt,
+  cssVars, typeColor, typeGlyph, localTypeIcon, normType, rarityMeta, isPokemon, pct, padNum, localCardArt, localPackArt,
 } from "./tcgp-maps"
 
 // ── Type pip ─────────────────────────────────────────────────────────────────
 export function TcgTypePip({ type, size = 20, title }: { type: string; size?: number; title?: string }) {
   const c = typeColor(type)
+  const [imageFailed, setImageFailed] = useState(false)
+  useEffect(() => setImageFailed(false), [type])
+
   return (
     <span
       title={title}
@@ -25,7 +26,17 @@ export function TcgTypePip({ type, size = 20, title }: { type: string; size?: nu
         color: c, border: `1px solid color-mix(in srgb, ${c} 55%, transparent)`,
       })}
     >
-      {typeGlyph(type)}
+      {imageFailed ? (
+        typeGlyph(type)
+      ) : (
+        <img
+          src={localTypeIcon(type)}
+          alt=""
+          aria-hidden="true"
+          className="h-[72%] w-[72%] object-contain"
+          onError={() => setImageFailed(true)}
+        />
+      )}
     </span>
   )
 }
@@ -75,7 +86,7 @@ function TcgCardArt({ card, glyphLabel }: { card: TcgCard; glyphLabel: string })
         src={sources[idx]}
         alt={card.name}
         loading="lazy"
-        className="absolute inset-0 h-full w-full object-cover"
+        className="absolute left-1/2 top-1/2 h-auto max-h-full max-w-full -translate-x-1/2 -translate-y-1/2"
         onError={() => setIdx((i) => i + 1)}
       />
     )
@@ -134,7 +145,6 @@ export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim
     r.kind === "star" ? "border-warn/[0.45]" : "border-line-2"
 
   const catLabel = tl(`app.category.${(card.category || "").toLowerCase()}`, card.category || "")
-  const stageLabel = tl(`app.stage.${normStage(card.stage)}`, tl("app.stage.basic", "Básica"))
   const typeLabel = primary ? tl(`types.${normType(primary)}`, catLabel).toUpperCase() : catLabel.toUpperCase()
 
   return (
@@ -145,7 +155,7 @@ export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim
       onKeyDown={onOpen ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(card) } } : undefined}
       aria-label={`${card.name} — ${catLabel}`}
       className={cn(
-        "group relative flex aspect-[2.5/3.5] flex-col overflow-hidden rounded-[9px] border border-solid shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_6px_16px_rgba(0,0,0,0.28)] transition-[transform,border-color,box-shadow]",
+        "group relative flex flex-col overflow-hidden rounded-[9px] border border-solid shadow-[inset_0_1px_0_rgba(255,255,255,0.03),0_6px_16px_rgba(0,0,0,0.28)] transition-[transform,border-color,box-shadow]",
         rarityBorder,
         r.kind === "crown" && "bg-[linear-gradient(180deg,var(--accent-soft),var(--panel)_44%)]",
         onOpen && "cursor-pointer hover:-translate-y-1 hover:shadow-[0_10px_26px_rgba(0,0,0,0.42)] focus-visible:-translate-y-1 focus-visible:outline-none",
@@ -158,22 +168,20 @@ export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim
         ...(isEx ? { boxShadow: `0 0 0 1px color-mix(in srgb, ${c} 40%, transparent) inset, 0 6px 16px rgba(0,0,0,0.28)` } : {}),
       })}
     >
-      {/* top row — stage/category · name · PS */}
-      <div className="flex items-baseline gap-[0.375rem] px-2 pb-1 pt-[0.4375rem]">
-        <span className="flex-none font-mono text-[0.5rem] font-semibold uppercase leading-none tracking-[0.08em] text-txt-dim">
-          {pk ? stageLabel : catLabel}
-        </span>
+      {/* top row — name · PS · type */}
+      <div className="flex items-center gap-[0.375rem] px-2 pb-1 pt-[0.4375rem]">
         <span className="flex-1 truncate font-display text-[0.75rem] font-bold leading-none tracking-[0.01em] text-txt">{card.name}</span>
         {pk && card.hp != null && (
           <span className="inline-flex flex-none items-baseline gap-[2px] font-mono text-[0.75rem] font-bold leading-none text-txt">
             <small className="text-[0.4375rem] text-txt-muted">PS</small>{card.hp}
           </span>
         )}
+        {primary && <TcgTypePip type={primary} size={16} title={typeLabel} />}
       </div>
 
       {/* art window — real art when present, glyph «señal» otherwise */}
       <div
-        className="relative mx-[0.4375rem] grid flex-1 place-items-center overflow-hidden rounded-[5px] border border-solid"
+        className="relative mx-[0.4375rem] grid aspect-[8/11] flex-none place-items-center overflow-hidden rounded-[5px] border border-solid"
         aria-hidden="true"
         style={{
           borderColor: `color-mix(in srgb, ${c} 30%, transparent)`,
@@ -186,11 +194,8 @@ export function TcgCardFace({ card, count = 0, editable, showAmounts = true, dim
         )}
       </div>
 
-      {/* foot — type pips · rarity · set·id */}
+      {/* foot — rarity · set·id */}
       <div className="flex items-center gap-[0.3125rem] px-2 pb-[0.4375rem] pt-[0.3125rem]">
-        <span className="inline-flex gap-[3px]">
-          {(card.types || []).map((ty) => <TcgTypePip key={ty} type={ty} size={16} />)}
-        </span>
         <TcgRarityMarks rarity={card.rarity} size={9} />
         <span className="ml-auto font-mono text-[0.5rem] font-semibold leading-none tracking-[0.04em] text-txt-dim">{card.setId}·{padNum(card.localId || card.id)}</span>
       </div>
@@ -294,40 +299,27 @@ export function TcgSetProgress({ label, sub, have, total }: { label: string; sub
 }
 
 // ── Pack tile (real pack art with CSS booster fallback) ──────────────────────
-function packArt(setId: string, name: string): string {
+function packArt(setId: string, packId: string): string {
   // Through the host: same origin on the web, the cached `boffasset://` scheme
   // in the app, which is what keeps 147 MB of art off the installer.
-  return assetUrl(joinAssetPath(ASSET.boffmedia.img, 'games/tcgpocket/packs', setId, `${name.toLowerCase()}.png`))
+  return localPackArt(setId, packId)
 }
-export function TcgPackTile({ setId, name, meta, hue, onOpen }: { setId: string; name: string; meta?: string; hue?: string; onOpen?: () => void }) {
+export function TcgPackTile({ setId, packId, name, onOpen }: { setId: string; packId?: string; name: string; onOpen?: () => void }) {
   const t = useToolT(TCGP_NS)
-  const c = hue || typeColor("fire")
   const [failed, setFailed] = useState(false)
   return (
     <button
       type="button" onClick={onOpen} aria-label={t("app.sobres.tileAria", { name, setId })}
-      className="group relative flex aspect-[3/4.2] flex-col overflow-hidden rounded-[10px] border border-solid shadow-[0_8px_22px_rgba(0,0,0,0.35)] transition-transform hover:-translate-y-[5px] hover:-rotate-[0.6deg] hover:shadow-[0_14px_32px_rgba(0,0,0,0.5)]"
-      style={{
-        borderColor: `color-mix(in srgb, ${c} 45%, var(--line-2))`,
-        background: `linear-gradient(160deg, color-mix(in srgb, ${c} 30%, var(--panel)), var(--bg-deep))`,
-      }}
+      className="group relative flex w-full items-center justify-center border-0 bg-transparent p-0 transition-transform hover:-translate-y-1 focus-visible:outline-none"
     >
-      <span className="pointer-events-none absolute inset-0 z-[1]" style={{ background: "linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.14) 46%, transparent 60%)" }} />
-      <span className="cut [--cut:3px] absolute left-[0.5625rem] top-[0.5625rem] z-[2] bg-white/90 px-[0.375rem] py-[3px] font-display text-[0.75rem] font-extrabold uppercase leading-none tracking-[0.04em] text-accent-ink">{setId}</span>
-      <span className="relative z-0 grid flex-1 place-items-center">
-        {failed ? (
-          <>
+      {failed ? (
+          <span className="relative grid aspect-[3/4.2] w-full place-items-center">
             <span className="pointer-events-none absolute inset-x-0 top-[14%] h-[0.375rem] opacity-50 [background:repeating-linear-gradient(90deg,rgba(255,255,255,0.5)_0_3px,transparent_3px_7px)]" aria-hidden="true" />
             <span className="text-[2.875rem] text-white/85" style={{ textShadow: "0 0 16px rgba(255,255,255,0.4)" }}>◆</span>
-          </>
+          </span>
         ) : (
-          <img src={packArt(setId, name)} alt={name} loading="lazy" className="h-full w-full object-contain p-2" onError={() => setFailed(true)} />
+          <img src={packArt(setId, packId || name)} alt={name} loading="lazy" className="block h-auto max-h-[18rem] w-full object-contain" onError={() => setFailed(true)} />
         )}
-      </span>
-      <span className="relative z-[2] bg-gradient-to-t from-base-deep to-transparent px-[0.6875rem] pb-3 pt-[0.625rem]">
-        <b className="block truncate font-display text-[0.9375rem] font-bold uppercase leading-none tracking-[0.02em] text-white">{name}</b>
-        {meta && <small className="font-mono text-[0.625rem] font-medium leading-tight tracking-[0.05em] text-white/65">{meta}</small>}
-      </span>
     </button>
   )
 }

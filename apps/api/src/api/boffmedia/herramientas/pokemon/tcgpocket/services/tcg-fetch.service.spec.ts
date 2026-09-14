@@ -38,6 +38,13 @@ const mockConfigService = {
     (locale: string, id: string) =>
       `https://api.tcgdex.net/v2/${locale}/cards/${id}`,
   ),
+  getPackArtworkCatalogUrl: jest.fn(
+    () =>
+      'https://raw.githubusercontent.com/PocketDecks/pokemon-tcg-pocket-cards/data/v5/expansions.json',
+  ),
+  getPackArtworkImageUrl: jest.fn(
+    (id: string) => `https://cdn.example/packs/${id}.webp`,
+  ),
 };
 
 describe('TcgFetchService', () => {
@@ -64,6 +71,13 @@ describe('TcgFetchService', () => {
     mockConfigService.getCardUrl.mockImplementation(
       (locale: string, id: string) =>
         `https://api.tcgdex.net/v2/${locale}/cards/${id}`,
+    );
+    mockConfigService.getPackArtworkCatalogUrl.mockImplementation(
+      () =>
+        'https://raw.githubusercontent.com/PocketDecks/pokemon-tcg-pocket-cards/data/v5/expansions.json',
+    );
+    mockConfigService.getPackArtworkImageUrl.mockImplementation(
+      (id: string) => `https://cdn.example/packs/${id}.webp`,
     );
 
     const module: TestingModule = await Test.createTestingModule({
@@ -210,6 +224,147 @@ describe('TcgFetchService', () => {
       expect(result).toHaveLength(1);
       expect(result[0].name_en).toBe('Base Set');
       expect(result[0].name_es).toBe('Set Base');
+    });
+  });
+
+  describe('fetchPackArtworkForSet()', () => {
+    it('merges localized booster artwork by booster id', async () => {
+      mockHttpService.get
+        .mockReturnValueOnce(
+          of({
+            data: {
+              boosters: [
+                {
+                  id: 'boo_A1-charizard',
+                  name: 'Charizard',
+                  image: 'https://cdn/front',
+                },
+              ],
+            },
+          }),
+        )
+        .mockReturnValueOnce(
+          of({
+            data: {
+              boosters: [
+                {
+                  id: 'boo_A1-charizard',
+                  name: 'Charizard',
+                },
+              ],
+            },
+          }),
+        );
+
+      const result = await service.fetchPackArtworkForSet('A1');
+
+      expect(result).toEqual([
+        {
+          id: 'boo_A1-charizard',
+          name: 'Charizard',
+          image: 'https://cdn/front',
+        },
+      ]);
+      expect(mockConfigService.getSetUrl).toHaveBeenCalledWith('en', 'A1');
+      expect(mockConfigService.getSetUrl).toHaveBeenCalledWith('es', 'A1');
+    });
+
+    it('fills missing TCGdex booster artwork from the fallback catalogue', async () => {
+      mockHttpService.get
+        .mockReturnValueOnce(
+          of({
+            data: {
+              boosters: [
+                { id: 'boo_A1-charizard', name: 'Charizard' },
+                { id: 'boo_A1-mewtwo', name: 'Mewtwo' },
+              ],
+            },
+          }),
+        )
+        .mockReturnValueOnce(of({ data: { boosters: [] } }))
+        .mockReturnValueOnce(
+          of({
+            data: [
+              {
+                id: 'a1',
+                packs: [
+                  {
+                    id: 'a1-charizard',
+                    name: 'Charizard',
+                    image: 'https://cdn/a1-charizard.webp',
+                  },
+                  {
+                    id: 'a1-mewtwo',
+                    name: 'Mewtwo',
+                    image: 'https://cdn/a1-mewtwo.webp',
+                  },
+                ],
+              },
+            ],
+          }),
+        );
+
+      const result = await service.fetchPackArtworkForSet('A1');
+
+      expect(result).toEqual([
+        {
+          id: 'boo_A1-charizard',
+          name: 'Charizard',
+          image: 'https://cdn/a1-charizard.webp',
+        },
+        {
+          id: 'boo_A1-mewtwo',
+          name: 'Mewtwo',
+          image: 'https://cdn/a1-mewtwo.webp',
+        },
+      ]);
+      expect(mockConfigService.getPackArtworkCatalogUrl).toHaveBeenCalled();
+    });
+
+    it('maps renamed single-booster and promo ids to available artwork', async () => {
+      mockHttpService.get
+        .mockReturnValueOnce(
+          of({
+            data: {
+              boosters: [
+                { id: 'boo_A2b-shining', name: 'Shining' },
+                { id: 'boo_P-A-vol1', name: 'Vol. 1' },
+              ],
+            },
+          }),
+        )
+        .mockReturnValueOnce(of({ data: { boosters: [] } }))
+        .mockReturnValueOnce(
+          of({
+            data: [
+              {
+                id: 'a2b',
+                packs: [
+                  {
+                    id: 'a2b-booster',
+                    name: 'Booster',
+                    image: 'https://cdn/a2b-booster.webp',
+                  },
+                ],
+              },
+              {
+                id: 'pa',
+                packs: [{ id: 'pa-promov1', name: 'Promo V1' }],
+              },
+            ],
+          }),
+        );
+
+      const a2b = await service.fetchPackArtworkForSet('A2b');
+      expect(a2b[0].image).toBe('https://cdn/a2b-booster.webp');
+
+      mockHttpService.get
+        .mockReturnValueOnce(
+          of({ data: { boosters: [{ id: 'boo_P-A-vol1', name: 'Vol. 1' }] } }),
+        )
+        .mockReturnValueOnce(of({ data: { boosters: [] } }));
+      const promo = await service.fetchPackArtworkForSet('P-A');
+      expect(promo[0].image).toBe('https://cdn.example/packs/pa-promov1.webp');
     });
   });
 });

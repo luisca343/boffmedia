@@ -29,7 +29,7 @@ interface SideGroup {
 }
 
 // ── game switcher (rail header) ──────────────────────────────────────────────
-function GameSwitch({ slug }: { slug: string }) {
+function GameSwitch({ slug, compact, hoverOpen }: { slug: string; compact: boolean; hoverOpen: boolean }) {
   const t = useTranslations()
   const tShell = useTranslations("toolsUi.shell")
   const [open, setOpen] = React.useState(false)
@@ -47,7 +47,7 @@ function GameSwitch({ slug }: { slug: string }) {
     // line across the shell. So its height is `--tool-bar-h`, not whatever the
     // switcher button plus a `p-3` gutter happened to add up to (74px against
     // the bar's 58 — the step was visible on every tool page).
-    <div ref={ref} className="relative flex h-[var(--tool-bar-h,3.625rem)] items-center px-3">
+    <div ref={ref} className={cn("relative flex h-[var(--tool-bar-h,3.625rem)] items-center", compact ? "px-1" : "px-3")}>
       <button
         type="button"
         aria-expanded={open}
@@ -56,11 +56,37 @@ function GameSwitch({ slug }: { slug: string }) {
         onClick={() => setOpen((v) => !v)}
         // `py-[0.3125rem]` (not the old 7) is what lets the 34px seal live inside a
         // 58px row with air left over on both sides.
-        className="group/sw cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] flex w-full items-center gap-3 whitespace-nowrap border border-solid border-line bg-panel py-[0.3125rem] pl-[0.375rem] pr-[0.625rem] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2"
+        className={cn(
+          "group/sw cut-tag cut-tag-edge hover:[--cut-line:var(--accent-line)] flex w-full items-center whitespace-nowrap border border-solid border-line bg-panel py-[0.3125rem] transition-[border-color,background] duration-[140ms] hover:border-accent-line hover:bg-panel-2",
+          compact
+            ? cn(
+                "justify-center gap-0 px-[0.375rem]",
+                "group-focus-within/rail:justify-start group-focus-within/rail:gap-3 group-focus-within/rail:pl-[0.375rem] group-focus-within/rail:pr-[0.625rem]",
+                hoverOpen && "group-hover/rail:justify-start group-hover/rail:gap-3 group-hover/rail:pl-[0.375rem] group-hover/rail:pr-[0.625rem]",
+              )
+            : "gap-3 pl-[0.375rem] pr-[0.625rem]",
+        )}
       >
         <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} bare />
-        <span className="min-w-0 flex-1 text-left font-display text-[0.9375rem] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
-        <Icon name="chevronDown" size={16} className={cn("flex-none text-txt-muted transition-transform duration-[140ms]", open && "rotate-180")} />
+        <span
+          className={cn(
+            "min-w-0 flex-1 text-left font-display text-[0.9375rem] font-bold uppercase leading-none tracking-[0.02em]",
+            compact && "hidden group-focus-within/rail:!block",
+            compact && hoverOpen && "group-hover/rail:!block",
+          )}
+        >
+          {t(game.nameKey)}
+        </span>
+        <Icon
+          name="chevronDown"
+          size={16}
+          className={cn(
+            "flex-none text-txt-muted transition-transform duration-[140ms]",
+            open && "rotate-180",
+            compact && "hidden group-focus-within/rail:!block",
+            compact && hoverOpen && "group-hover/rail:!block",
+          )}
+        />
       </button>
       {open && (
         // `top-full` keeps the old 6px gap under the button: the row is now 58px
@@ -151,7 +177,7 @@ function SideRail({
         )}
       >
         <div className="flex-none border-b border-solid border-line">
-          <GameSwitch slug={slug} />
+          <GameSwitch slug={slug} compact={min} hoverOpen={hoverOpen} />
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden py-[0.625rem] pb-4">
@@ -174,7 +200,13 @@ function SideRail({
                     // rail is N identical links to a screen reader.
                     aria-current={on ? "page" : undefined}
                     className={cn(
-                      "group/link relative flex h-11 w-full items-center gap-3 overflow-hidden whitespace-nowrap pl-6 pr-3 no-underline transition-[color,background] duration-[140ms]",
+                      "group/link relative flex min-h-11 w-full items-center gap-3 overflow-hidden py-2 pl-6 pr-3 no-underline transition-[color,background] duration-[140ms]",
+                      min
+                        ? cn(
+                            "whitespace-nowrap group-focus-within/rail:whitespace-normal",
+                            hoverOpen && "group-hover/rail:whitespace-normal",
+                          )
+                        : "whitespace-normal",
                       "before:absolute before:left-0 before:top-1/2 before:w-[3px] before:-translate-y-1/2 before:bg-[var(--ghue)] before:transition-[height] before:duration-[260ms] before:content-['']",
                       on
                         ? "text-txt before:h-[62%] [background:linear-gradient(90deg,color-mix(in_srgb,var(--ghue)_14%,transparent),color-mix(in_srgb,var(--ghue)_3%,transparent)_62%,transparent)]"
@@ -184,7 +216,20 @@ function SideRail({
                     <span className={cn("relative grid w-6 flex-none place-items-center transition-colors duration-[140ms]", on ? "text-[var(--ghue)]" : "text-txt-dim group-hover/link:text-txt-muted")}>
                       <ToolIcon name={it.icon} src={it.iconSrc} size={18} />
                     </span>
-                    <span className={cn("min-w-0 flex-1 overflow-hidden text-ellipsis font-body text-[0.875rem] leading-[1.1]", labelFade)}>{it.label}</span>
+                    <span
+                      className={cn(
+                        "min-w-0 flex-1 font-body text-[0.875rem] leading-[1.1]",
+                        min
+                          ? cn(
+                              "overflow-hidden whitespace-nowrap text-ellipsis group-focus-within/rail:overflow-visible group-focus-within/rail:break-words group-focus-within/rail:text-clip",
+                              hoverOpen && "group-hover/rail:overflow-visible group-hover/rail:break-words group-hover/rail:text-clip",
+                            )
+                          : "break-words",
+                        labelFade,
+                      )}
+                    >
+                      {it.label}
+                    </span>
                     {it.isNew && (
                       <span className={cn("flex-none font-mono text-[0.5625rem] font-bold uppercase tracking-[0.1em] text-accent", labelFade)}>{tShell("new")}</span>
                     )}
@@ -312,9 +357,7 @@ export function ToolShell({ slug, children }: ToolShellProps) {
             href: tool.href,
             label: t(tool.nameKey),
             icon: tool.sidebarIcon,
-            // One manually assigned artwork can drive both views; an explicit
-            // sidebar override remains available for exceptional cases.
-            iconSrc: tool.sidebarIconSrc ?? tool.landing?.iconSrc,
+            iconSrc: tool.landing?.iconSrc,
             isNew: tool.landing?.isNew ?? false,
           })),
       }))
@@ -383,7 +426,7 @@ export function ToolShell({ slug, children }: ToolShellProps) {
             className="cut-tag cut-tag-edge flex flex-none items-center gap-3 border border-solid border-line bg-panel py-[0.3125rem] pl-[0.375rem] pr-[0.625rem]"
           >
             <GameLogo label={hub.logoLabel} hueColor={hueColorOf(hub.hue)} size="sm" imageSrc={game.icon} bare />
-            <span className="font-display text-[0.9375rem] font-bold uppercase leading-none tracking-[0.02em]">{hub.short}</span>
+            <span className="font-display text-[0.9375rem] font-bold uppercase leading-none tracking-[0.02em]">{t(game.nameKey)}</span>
             <Icon name="list" size={18} className="text-txt-muted" />
           </button>
 

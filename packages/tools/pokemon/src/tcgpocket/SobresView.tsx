@@ -5,7 +5,6 @@ import { useMemo, useState } from "react"
 import { Button, Panel, Empty } from "@boffmedia/ui"
 import type { TcgCard } from "./service"
 import type { TcgpData, TcgpSet } from "./useTcgpCards"
-import { typeColor } from "./tcgp-maps"
 import { TcgPackTile, TcgCardGrid } from "./tcgp-kit"
 import { TCGP_NS, useToolT } from "../i18n"
 
@@ -16,27 +15,27 @@ interface Props {
   onOpenCard: (card: TcgCard, list: TcgCard[]) => void
 }
 
-const HUES = ["fire", "water", "psychic", "lightning", "grass"]
+type Pack = TcgpSet["packs"][number]
 
 function PackDetail({ set, pack, effective, onBack, onOpenCard }: {
   set: TcgpSet
-  pack: string
+  pack: Pack
   effective: (id: string) => number
   onBack: () => void
   onOpenCard: (card: TcgCard, list: TcgCard[]) => void
 }) {
   const t = useToolT(TCGP_NS)
-  const cards = useMemo(() => set.cards.filter((c) => (c.boosters || []).some((b) => b.name === pack)), [set.cards, pack])
+  const cards = useMemo(() => set.cards.filter((c) => (c.boosters || []).some((b) => b.id === pack.id || b.name === pack.name)), [set.cards, pack])
   return (
     <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
       <div className="mb-5"><Button size="sm" variant="ghost" icon="back" onClick={onBack}>{t("app.sobres.title")}</Button></div>
       <div className="grid grid-cols-1 items-start gap-5 md:grid-cols-[auto_1fr]">
         <div className="mx-auto w-[11.875rem] md:mx-0">
-          <TcgPackTile setId={set.id} name={pack} meta={set.name} hue={typeColor("fire")} onOpen={() => {}} />
+          <TcgPackTile setId={set.id} packId={pack.id} name={pack.name} onOpen={() => {}} />
         </div>
         <div className="grid gap-5">
           <div>
-            <h2 className="font-display text-[1.5rem] font-bold uppercase leading-none text-txt">{pack}</h2>
+            <h2 className="font-display text-[1.5rem] font-bold uppercase leading-none text-txt">{pack.name}</h2>
             <p className="mt-1 text-[0.875rem] leading-relaxed text-txt-muted">{set.id} · {set.name} · {t("app.sobres.cardCount", { count: cards.length })}</p>
           </div>
           <Panel title={t("app.sobres.packCards")} aside={<span className="mono-label">{cards.length}</span>}>
@@ -54,7 +53,7 @@ function PackDetail({ set, pack, effective, onBack, onOpenCard }: {
 
 export function SobresView({ data, effective, initialSetId, onOpenCard }: Props) {
   const t = useToolT(TCGP_NS)
-  const [sel, setSel] = useState<{ setId: string; pack: string } | null>(null)
+  const [sel, setSel] = useState<{ setId: string; pack: Pack } | null>(null)
 
   const sets = initialSetId ? data.sets.filter((s) => s.id === initialSetId) : data.sets
 
@@ -80,9 +79,9 @@ export function SobresView({ data, effective, initialSetId, onOpenCard }: Props)
             <p className="text-[0.8125rem] text-txt-dim">{t("app.sobres.noPacks")}</p>
           ) : (
             <div className="grid gap-4" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))" }}>
-              {s.packs.map((p, i) => (
-                <TcgPackTile key={p.id} setId={s.id} name={p.name} meta={s.name}
-                  hue={typeColor(HUES[i % HUES.length])} onOpen={() => setSel({ setId: s.id, pack: p.name })} />
+              {s.packs.map((p) => (
+                <TcgPackTile key={p.id} setId={s.id} packId={p.id} name={p.name}
+                  onOpen={() => setSel({ setId: s.id, pack: p })} />
               ))}
             </div>
           )}

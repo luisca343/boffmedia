@@ -26,7 +26,8 @@ export const minecraft: GameEntry = {
           sidebarIcon: "grid",
           bleed: true,
           landing: {
-            icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/schematic-icon.webp"),
+            icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
+            iconSrc: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
             fallbackIcon: "grid",
             fallbackIconColor: "text-green-500",
             color: "from-green-700 to-emerald-500",
@@ -47,7 +48,8 @@ export const minecraft: GameEntry = {
           // scrolled by exactly the padding and the map never fit the screen.
           bleed: true,
           landing: {
-            icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/schematic-icon.webp"),
+            icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
+            iconSrc: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
             fallbackIcon: "grid",
             fallbackIconColor: "text-sky-400",
             color: "from-sky-700 to-cyan-500",
@@ -63,7 +65,8 @@ export const minecraft: GameEntry = {
           sidebarIcon: "cube",
           bleed: true,
           landing: {
-            icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/schematic-icon.webp"),
+            icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
+            iconSrc: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
             fallbackIcon: "cube",
             fallbackIconColor: "text-emerald-400",
             color: "from-emerald-700 to-teal-500",

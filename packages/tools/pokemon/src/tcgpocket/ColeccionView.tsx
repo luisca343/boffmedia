@@ -220,7 +220,8 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
   }, [data.sets, q, setF])
 
   return (
-    <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
+    <>
+      <div className="motion-safe:animate-[bm-modal-in_.3s_both] motion-reduce:animate-none">
       {/* Signed out is a STATE, not a wall. This used to return a sign-in
           screen instead of the collection, which meant a player with no account
           had nothing at all — and in the desktop app, where the whole Tools
@@ -331,6 +332,7 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
           </Panel>
         </div>
       </div>
+    </div>
 
       {editable && dirtyCount > 0 && (
         <div className="cut-corner cut-corner-edge [--cut-line:var(--accent-line)] fixed bottom-[1.375rem] left-1/2 z-[120] flex -translate-x-1/2 items-center gap-[0.875rem] border border-solid border-accent-line bg-panel py-[0.6875rem] pl-[1.125rem] pr-3 shadow-2xl motion-safe:animate-[bm-toast-in_.24s_both]">
@@ -341,6 +343,6 @@ export function ColeccionView({ data, collection, username, onOpenCard }: Props)
           <Button size="sm" variant="pri" icon="check" onClick={save} disabled={saving}>{saving ? t("app.coleccion.saving") : t("app.coleccion.saveChanges")}</Button>
         </div>
       )}
-    </div>
+    </>
   )
 }

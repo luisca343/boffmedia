@@ -4,7 +4,7 @@ import type { UserRole } from "@boffmedia/shared/roles"
 export interface LandingCardConfig {
   /** Artwork for the landing/featured area; it is not automatically used on tool cards. */
   icon: string;
-  /** Optional custom icon. For a tool entry, this is shared by its card and sidebar. */
+  /** Optional custom icon shared by the landing card, sidebar, and top tools navigation. */
   iconSrc?: string;
   fallbackIcon: IconName;
   fallbackIconColor: string;
@@ -21,8 +21,6 @@ export interface ToolEntry {
   nameKey: string;
   href: string;
   sidebarIcon: IconName;
-  /** Optional custom artwork used in the compact sidebar. */
-  sidebarIconSrc?: string;
   /** Default true. Set false for tools shown on the landing page but not in the sidebar. */
   showInSidebar?: boolean;
   /**

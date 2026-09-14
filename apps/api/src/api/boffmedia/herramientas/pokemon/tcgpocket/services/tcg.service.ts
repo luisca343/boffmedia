@@ -131,6 +131,9 @@ export class TcgService {
 
       // Download images locally
       await this.imageService.downloadSetImages(mergedSets);
+      for (const set of mergedSets) {
+        await this.downloadPackArtwork(set.id);
+      }
 
       // Store in database
       await this.tcgRepository.insertSets(mergedSets);
@@ -194,6 +197,7 @@ export class TcgService {
 
       // Download images for cards
       await this.imageService.downloadImagesForCards(mergedCards, setId);
+      await this.downloadPackArtwork(setId);
 
       // Store in database
       await this.tcgRepository.insertCards(mergedCards);
@@ -216,6 +220,8 @@ export class TcgService {
       const mergedCards =
         await this.fetchService.fetchAndMergeCardsForSet(setId);
 
+      await this.downloadPackArtwork(setId);
+
       this.logger.log(
         `[TCG] Storing ${mergedCards.length} cards for set ${setId}...`,
       );
@@ -226,6 +232,11 @@ export class TcgService {
     } catch (error: any) {
       throw error; // Re-throw as fetchService already handles the error
     }
+  }
+
+  private async downloadPackArtwork(setId: string): Promise<void> {
+    const packs = await this.fetchService.fetchPackArtworkForSet(setId);
+    await this.imageService.downloadPackImages(packs, setId);
   }
 
   // ==================== USER CARDS OPERATIONS ====================

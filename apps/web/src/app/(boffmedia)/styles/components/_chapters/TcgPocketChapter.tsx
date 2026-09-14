@@ -84,13 +84,13 @@ export function TcgPocketChapter() {
         id="tgsobres"
         kicker="TCG Pocket"
         title="Sobre y tabla de probabilidades"
-        lead={<><code>TcgPackTile</code> es el sobre (booster) con brillo de lámina; <code>TcgOddsTable</code> muestra la probabilidad de carta nueva por hueco — la fila destacada es el mejor sobre para la colección actual.</>}
+        lead={<><code>TcgPackTile</code> muestra únicamente la imagen del sobre (booster); <code>TcgOddsTable</code> muestra la probabilidad de carta nueva por hueco — la fila destacada es el mejor sobre para la colección actual.</>}
       >
-        <Sample title="Sobres" code="<TcgPackTile setId name meta hue />">
+        <Sample title="Sobres" code="<TcgPackTile setId name packId />">
           <div className="grid grid-cols-[repeat(3,8.125rem)] gap-4">
-            <TcgPackTile setId="A1" name="Choque Genético" meta="Charizard" hue="hsl(18 90% 55%)" onOpen={() => {}} />
-            <TcgPackTile setId="A1a" name="Isla Fabulosa" meta="Mew" hue="hsl(320 70% 62%)" onOpen={() => {}} />
-            <TcgPackTile setId="A2" name="Choque Espacio-Tiempo" meta="Dialga" hue="hsl(200 80% 55%)" onOpen={() => {}} />
+            <TcgPackTile setId="A1" packId="boo_A1-charizard" name="Charizard" onOpen={() => {}} />
+            <TcgPackTile setId="A1a" packId="boo_A1a-mew" name="Mew" onOpen={() => {}} />
+            <TcgPackTile setId="A2" packId="boo_A2-dialga" name="Dialga" onOpen={() => {}} />
           </div>
         </Sample>
         <Sample title="Tabla de probabilidades" code="<TcgOddsTable rows />" col>

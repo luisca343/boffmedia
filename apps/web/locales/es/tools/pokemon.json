@@ -60,6 +60,48 @@
           "battles": "Combates"
         }
       },
+      "teambuilder": {
+        "title": "Constructor de equipos",
+        "description": "Crea, valida y prepara tus equipos competitivos.",
+        "features": {
+          "teamBuilder": "Equipos"
+        }
+      },
+      "tcgPanel": {
+        "title": "Panel de TCG Pocket",
+        "description": "Consulta tu progreso y actividad de TCG Pocket.",
+        "features": {
+          "tcgPanel": "Resumen"
+        }
+      },
+      "cardList": {
+        "title": "Cartas de TCG Pocket",
+        "description": "Explora y busca todas las cartas disponibles.",
+        "features": {
+          "cardList": "Cartas"
+        }
+      },
+      "collection": {
+        "title": "Colecci\u00f3n de TCG Pocket",
+        "description": "Controla las cartas que ya tienes y las que te faltan.",
+        "features": {
+          "collection": "Colecci\u00f3n"
+        }
+      },
+      "packs": {
+        "title": "Sobres de TCG Pocket",
+        "description": "Consulta los sobres y sus cartas disponibles.",
+        "features": {
+          "packs": "Sobres"
+        }
+      },
+      "battles": {
+        "title": "Combates de TCG Pocket",
+        "description": "Prepara y consulta tus combates de TCG Pocket.",
+        "features": {
+          "battles": "Combates"
+        }
+      },
       "pmdsky": {
         "title": "Mundo Misterioso",
         "description": "Generador de correos secretos para Exploradores del Cielo",
@@ -79,6 +121,34 @@
         "description": "Combates Pokémon en tiempo real contra la IA, PvP o Showdown, con repeticiones",
         "features": {
           "battlesim": "Combate"
+        }
+      },
+      "damageCalc": {
+        "title": "Calculadora de da\u00f1o",
+        "description": "Calcula rangos de da\u00f1o para tus combates competitivos.",
+        "features": {
+          "damageCalc": "Da\u00f1o VGC"
+        }
+      },
+      "speed": {
+        "title": "Velocidad VGC",
+        "description": "Compara niveles de velocidad y condiciones de combate.",
+        "features": {
+          "speed": "Velocidad"
+        }
+      },
+      "tracker": {
+        "title": "VGC Tracker",
+        "description": "Registra partidas y analiza tu rendimiento.",
+        "features": {
+          "tracker": "Partidas"
+        }
+      },
+      "meta": {
+        "title": "Meta VGC",
+        "description": "Analiza el uso, las tendencias y los equipos competitivos.",
+        "features": {
+          "meta": "AnÃ¡lisis de meta"
         }
       }
     },

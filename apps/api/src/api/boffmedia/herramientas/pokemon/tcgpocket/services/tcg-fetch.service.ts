@@ -11,6 +11,27 @@ import { Logger } from 'nestjs-pino';
 import { publicPath } from '@/config/paths';
 import { ASSET } from '@boffmedia/asset-paths';
 
+const IMAGE_RETRY_DELAYS_MS = [300, 900, 2_000];
+const IMAGE_REQUEST_MIN_INTERVAL_MS = 100;
+
+export interface TcgPackArtwork {
+  id: string;
+  name: string;
+  image: string | null;
+}
+
+interface PocketDecksPack {
+  id?: string;
+  name?: string;
+  image?: string | null;
+  image_png?: string | null;
+}
+
+interface PocketDecksExpansion {
+  id?: string;
+  packs?: PocketDecksPack[];
+}
+
 @Injectable()
 export class TcgFetchService {
   constructor(
@@ -20,6 +41,10 @@ export class TcgFetchService {
     private readonly errorService: TcgErrorService,
     private readonly configService: TcgConfigService,
   ) {}
+
+  private packArtworkCatalogPromise: Promise<PocketDecksExpansion[]> | null =
+    null;
+  private lastImageRequestAt = 0;
 
   // ==================== SERIES FETCHING ====================
 
@@ -163,6 +188,203 @@ export class TcgFetchService {
         'Fetch and merge sets for series',
       );
     }
+  }
+
+  /**
+   * Fetches the booster catalogue for a set in both locales.
+   *
+   * Booster artwork is only present on the full set/card payload, not on the
+   * series set briefs used by the sync status screen. Keep this as a separate
+   * request so checking sync status does not turn into one request per set.
+   *
+   * TCGdex currently returns only `id`/`name` for TCG Pocket boosters. When
+   * that happens, fill the missing front artwork from the image-backed
+   * Pocket Decks expansion catalogue. The TCGdex booster id remains the
+   * canonical id used by cards and by our local filenames.
+   */
+  async fetchPackArtworkForSet(setId: string): Promise<TcgPackArtwork[]> {
+    try {
+      this.errorService.validateSetId(setId);
+
+      const [enRes, esRes] = await Promise.all([
+        firstValueFrom(
+          this.httpService.get(this.configService.getSetUrl('en', setId)),
+        ),
+        firstValueFrom(
+          this.httpService.get(this.configService.getSetUrl('es', setId)),
+        ).catch((error: any) => {
+          if (error?.response?.status === 404) return null;
+          throw error;
+        }),
+      ]);
+
+      const packs = new Map<string, TcgPackArtwork>();
+      for (const [locale, response] of [
+        ['en', enRes] as const,
+        ['es', esRes] as const,
+      ]) {
+        for (const booster of response?.data?.boosters || []) {
+          const id = String(booster?.id ?? booster?.name ?? '').trim();
+          if (!id) continue;
+
+          const current = packs.get(id) ?? {
+            id,
+            name: '',
+            image: null,
+          };
+
+          if (locale === 'en' || !current.name) {
+            current.name = String(booster?.name ?? id);
+          }
+          current.image =
+            current.image ??
+            booster?.image ??
+            booster?.artwork_front ??
+            booster?.artworkFront ??
+            null;
+          packs.set(id, current);
+        }
+      }
+
+      const resolved = Array.from(packs.values());
+      if (resolved.length === 0 || resolved.some((pack) => !pack.image)) {
+        await this.mergePocketDecksPackArtwork(setId, packs);
+      }
+
+      return Array.from(packs.values());
+    } catch (error: any) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.errorService.handleApiError(error, 'Fetch pack artwork for set');
+    }
+  }
+
+  private async mergePocketDecksPackArtwork(
+    setId: string,
+    packs: Map<string, TcgPackArtwork>,
+  ): Promise<void> {
+    try {
+      const catalog = await this.fetchPocketDecksPackCatalog();
+      const expansion = catalog.find(
+        (entry) => this.packKey(entry.id) === this.packKey(setId),
+      );
+      const fallbackPacks = expansion?.packs || [];
+      const hadTcgDexPacks = packs.size > 0;
+      const usedFallbackIds = new Set<string>();
+
+      // First resolve the TCGdex rows in place. This preserves their ids,
+      // names, and card associations even when the fallback uses a different
+      // pack id or a generic name.
+      for (const current of packs.values()) {
+        const candidate = fallbackPacks.find((fallbackPack) => {
+          const fallbackId = this.packKey(fallbackPack.id);
+          const image = this.getPocketDecksPackImage(fallbackPack);
+          return (
+            Boolean(image) &&
+            !usedFallbackIds.has(fallbackId) &&
+            (this.fallbackPackKeys(current.id).includes(fallbackId) ||
+              this.packNameKey(current.name) ===
+                this.packNameKey(fallbackPack.name))
+          );
+        });
+        const imageCandidates = fallbackPacks.filter(
+          (fallbackPack) =>
+            this.getPocketDecksPackImage(fallbackPack) &&
+            !usedFallbackIds.has(this.packKey(fallbackPack.id)),
+        );
+        const resolved =
+          candidate ||
+          (imageCandidates.length === 1 ? imageCandidates[0] : null);
+        if (resolved) {
+          const fallbackId = this.packKey(resolved.id);
+          current.image ??= this.getPocketDecksPackImage(resolved);
+          usedFallbackIds.add(fallbackId);
+        }
+      }
+
+      // If TCGdex has no booster rows at all, use the fallback rows to keep
+      // the set usable. Do not append extra fallback-only promo rows when
+      // TCGdex already supplied a canonical booster catalogue.
+      if (!hadTcgDexPacks) {
+        for (const fallbackPack of fallbackPacks) {
+          const fallbackId = String(fallbackPack.id || '').trim();
+          const image = this.getPocketDecksPackImage(fallbackPack);
+          if (!fallbackId || !image) continue;
+
+          const id = `boo_${fallbackId}`;
+          packs.set(id, {
+            id,
+            name: String(fallbackPack.name || fallbackId),
+            image,
+          });
+        }
+      }
+    } catch (error: any) {
+      // Pack art is supplemental. Keep the TCGdex response usable if the
+      // image catalogue is temporarily unavailable; the image stage will
+      // report the resulting skipped pack assets instead of losing cards.
+      this.logger.warn(
+        `[TCG] Pack artwork fallback unavailable for ${setId}:`,
+        error,
+      );
+    }
+  }
+
+  private async fetchPocketDecksPackCatalog(): Promise<PocketDecksExpansion[]> {
+    if (!this.packArtworkCatalogPromise) {
+      this.packArtworkCatalogPromise = firstValueFrom(
+        this.httpService.get(this.configService.getPackArtworkCatalogUrl()),
+      )
+        .then((response) => (Array.isArray(response.data) ? response.data : []))
+        .catch((error) => {
+          this.packArtworkCatalogPromise = null;
+          throw error;
+        });
+    }
+
+    return this.packArtworkCatalogPromise;
+  }
+
+  private packKey(value: string | null | undefined): string {
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/^boo_/, '')
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  private packNameKey(value: string | null | undefined): string {
+    return String(value || '')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, '');
+  }
+
+  private fallbackPackKeys(value: string | null | undefined): string[] {
+    const key = this.packKey(value);
+    const keys = [key];
+    const promo = key.match(/^(pa|pb)vol(\d+)$/);
+    if (promo) keys.push(`${promo[1]}promov${promo[2]}`);
+    return keys;
+  }
+
+  private getPocketDecksPackImage(pack: PocketDecksPack): string | null {
+    if (pack.image || pack.image_png)
+      return pack.image || pack.image_png || null;
+
+    // The current expansion index leaves legacy promo image fields null even
+    // though the corresponding files are present in the same public asset
+    // tree. Limit this derived URL to the known promo naming scheme so a
+    // genuinely absent pack never becomes a guaranteed 404 download.
+    const id = String(pack.id || '')
+      .trim()
+      .toLowerCase();
+    if (/^(pa|pb)-promov\d+$/.test(id)) {
+      return this.configService.getPackArtworkImageUrl(id);
+    }
+
+    return null;
   }
 
   // ==================== CARDS FETCHING ====================
@@ -389,7 +611,7 @@ export class TcgFetchService {
           types: this.safeStringify(enCard.types),
           weaknesses: this.safeStringify(enCard.weaknesses),
           attacks: this.safeStringify(enCard.attacks),
-          boosters: this.safeStringify(enCard.boosters),
+          boosters: this.safeStringify(enCard.boosters ?? esCard?.boosters),
           variants: this.safeStringify(enCard.variants),
           legal: this.safeStringify(enCard.legal),
           retreat: enCard.retreat ?? null,
@@ -478,9 +700,7 @@ export class TcgFetchService {
       const imageUrl = cardData.image + '/high.webp';
       const imageFilename = path.join(cardImgDir, `${cardId}_${locale}.webp`);
 
-      const response = await axios.get(imageUrl, {
-        responseType: 'arraybuffer',
-      });
+      const response = await this.downloadImage(imageUrl);
       await fs.writeFile(imageFilename, response.data);
 
       return `${ASSET.boffmedia.tools.tcg}/cards/${setId}/${cardId}_${locale}.webp`;
@@ -494,6 +714,58 @@ export class TcgFetchService {
   }
 
   // ==================== PRIVATE HELPER METHODS ====================
+
+  private async downloadImage(url: string): Promise<{ data: any }> {
+    for (let attempt = 0; ; attempt += 1) {
+      try {
+        await this.waitForImageSlot();
+        return await axios.get(url, { responseType: 'arraybuffer' });
+      } catch (error: any) {
+        if (
+          attempt >= IMAGE_RETRY_DELAYS_MS.length ||
+          !this.isRetryableImageError(error)
+        ) {
+          throw error;
+        }
+
+        await new Promise((resolve) =>
+          setTimeout(resolve, this.getRetryDelay(error, attempt)),
+        );
+      }
+    }
+  }
+
+  private async waitForImageSlot(): Promise<void> {
+    const elapsed = Date.now() - this.lastImageRequestAt;
+    const wait = IMAGE_REQUEST_MIN_INTERVAL_MS - elapsed;
+    if (wait > 0) {
+      await new Promise((resolve) => setTimeout(resolve, wait));
+    }
+    this.lastImageRequestAt = Date.now();
+  }
+
+  private isRetryableImageError(error: any): boolean {
+    const status = error?.response?.status;
+    return (
+      !status ||
+      status === 408 ||
+      status === 429 ||
+      status === 500 ||
+      status === 502 ||
+      status === 503 ||
+      status === 504
+    );
+  }
+
+  private getRetryDelay(error: any, attempt: number): number {
+    const retryAfter = error?.response?.headers?.['retry-after'];
+    const retryAfterSeconds = Number(retryAfter);
+    if (Number.isFinite(retryAfterSeconds) && retryAfterSeconds > 0) {
+      return Math.min(retryAfterSeconds * 1_000, 10_000);
+    }
+
+    return IMAGE_RETRY_DELAYS_MS[attempt];
+  }
 
   private safeStringify(data: any): string | null {
     if (!data || (Array.isArray(data) && data.length === 0)) return null;
