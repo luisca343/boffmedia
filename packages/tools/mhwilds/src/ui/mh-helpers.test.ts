@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import {
+  MH_VARS,
   MH_ATTRIBUTE_DEFINITIONS,
   attributeColor,
   attributeIcon,
@@ -7,6 +8,25 @@ import {
   firstSpecial,
   normalizeAttributeKey,
 } from "./mh-helpers"
+
+describe("MH rarity palette", () => {
+  it("uses the exact colors extracted from the in-game rarity glyphs", () => {
+    expect(
+      Array.from({ length: 8 }, (_, index) =>
+        (MH_VARS as Record<string, unknown>)[`--rar${index + 1}`],
+      ),
+    ).toEqual([
+      "#969696",
+      "#dedede",
+      "#a4c43b",
+      "#47a33f",
+      "#5caebb",
+      "#575fd9",
+      "#9272e3",
+      "#c76d46",
+    ])
+  })
+})
 
 describe("MH attribute definitions", () => {
   it("keeps elements and ailments in one canonical table", () => {

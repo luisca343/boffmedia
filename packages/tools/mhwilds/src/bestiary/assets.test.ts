@@ -79,15 +79,18 @@ describe("mhwildsWeaponAsset", () => {
 describe("mhwildsAttributeAsset", () => {
   it("resolves the extracted game glyphs from canonical and blight keys", () => {
     expect(mhwildsAttributeAsset("Dragon")).toBe(
-      "/boffmedia/tools/mhwilds/bestiary/attributes/dragon.png",
+      "/boffmedia/tools/mhwilds/bestiary/attributes/dragon.png?v=game-status-glyphs-schema-19",
     );
     expect(mhwildsAttributeAsset("Thunder-Blight", "game-test-schema-16")).toBe(
       "/boffmedia/tools/mhwilds/bestiary/attributes/thunder.png?v=game-test-schema-16",
     );
   });
 
-  it("does not pretend unsupported statuses have a cropped atlas glyph", () => {
-    expect(mhwildsAttributeAsset("stun")).toBeNull();
+  it("resolves the game's named stun glyph and fails closed for Exhaust", () => {
+    expect(mhwildsAttributeAsset("stun")).toBe(
+      "/boffmedia/tools/mhwilds/bestiary/attributes/stun.png?v=game-status-glyphs-schema-19",
+    );
+    expect(mhwildsAttributeAsset("exhaust")).toBeNull();
   });
 });
 

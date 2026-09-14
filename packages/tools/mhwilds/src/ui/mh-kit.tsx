@@ -11,6 +11,7 @@ import {
 import { useMhwildsItemAsset, MhwildsItemAssetProvider } from "../bestiary/item-assets"
 import type { MhwildsItemAssetReference } from "../bestiary/assets"
 import { mhwildsAttributeAsset } from "../bestiary/assets"
+import { getWeaponTypeIcon } from "../planner/_components/equipment-utils"
 
 // ── app chassis (full-bleed inside the host's box) ───────────────────────────
 /**
@@ -65,9 +66,9 @@ export function MhWrap({ children, className = "" }: { children: React.ReactNode
  * overlays its top, so the bar must clear it; in the launcher the scroller
  * starts below all the chrome, so 0 is correct — and 0 is the fallback.
  */
-export function MhBar({ children }: { children: React.ReactNode }) {
+export function MhBar({ children, sticky = true }: { children: React.ReactNode; sticky?: boolean }) {
   return (
-    <ToolStrip>
+    <ToolStrip sticky={sticky}>
       {children}
     </ToolStrip>
   )
@@ -82,16 +83,6 @@ export function MhSeal({ name }: { name: IconName }) {
 
 export function MhBarSide({ children }: { children: React.ReactNode }) {
   return <div className="flex items-center gap-2 flex-wrap ml-auto">{children}</div>
-}
-
-// data-source pill
-export function MhSrc({ label, className = "" }: { label: string; className?: string }) {
-  return (
-    <span className={`inline-flex items-center gap-1.5 font-mono text-[0.625rem] leading-none uppercase tracking-[0.08em] text-txt-muted px-2 py-[0.3125rem] border border-line bg-panel ${className}`}>
-      <span className="w-1.5 h-1.5 rounded-full bg-[var(--mh-bright)] shadow-[0_0_0_3px_var(--mh-soft)]" />
-      {label}
-    </span>
-  )
 }
 
 // mode switch (emerald-scoped, distinct from the orange Seg)
@@ -649,8 +640,8 @@ export function MhSearch({ value, onChange, placeholder }: { value: string; onCh
 
 // ── type chip (tree type rail / drawer filters) ──────────────────────────────
 export function MhTypeChip({
-  icon, label, count, on, disabled, onClick,
-}: { icon?: IconName; label: React.ReactNode; count?: React.ReactNode; on?: boolean; disabled?: boolean; onClick?: () => void }) {
+  icon, weaponType, label, count, on, disabled, onClick,
+}: { icon?: IconName; weaponType?: string; label: React.ReactNode; count?: React.ReactNode; on?: boolean; disabled?: boolean; onClick?: () => void }) {
   return (
     <button
       type="button"
@@ -658,10 +649,60 @@ export function MhTypeChip({
       disabled={disabled}
       className={`inline-flex items-center gap-[0.4375rem] py-2 px-3 bg-panel border font-mono text-[0.75rem] leading-none tracking-[0.02em] transition-colors ${disabled ? "opacity-45 cursor-not-allowed border-line text-txt-muted" : on ? "text-[var(--mh-bright)] border-[var(--mh-line)] bg-[var(--mh-soft)] cursor-pointer" : "text-txt-muted border-line hover:text-txt hover:border-line-2 cursor-pointer"}`}
     >
-      {icon && <Icon name={icon} size={14} />}
+      {weaponType ? <MhWeaponIcon weaponType={weaponType} size={14} color={on ? "var(--mh-bright)" : "var(--muted)"} /> : icon && <Icon name={icon} size={14} />}
       {label}
       {count != null && <span className={`font-mono text-[0.625rem] leading-none ${on ? "text-[var(--mh-bright)]" : "text-txt-dim"}`}>{count}</span>}
     </button>
+  )
+}
+
+/** Render the extracted in-game weapon glyph and tint it without flattening
+ *  the source artwork. Multiply makes the rarity color land on the light
+ *  source pixels while keeping the darker game-art details visible. */
+export function MhWeaponIcon({
+  weaponType = "great-sword", size = 28, color = "currentColor", className = "",
+}: { weaponType?: string; size?: number; color?: string; className?: string }) {
+  const source = getWeaponTypeIcon(weaponType)
+  const [failed, setFailed] = React.useState(false)
+
+  React.useEffect(() => {
+    setFailed(false)
+  }, [source])
+
+  if (failed) return <Icon name="sword" size={size} className={className} style={{ color }} />
+
+  const imageMask = {
+    maskImage: `url("${source}")`,
+    WebkitMaskImage: `url("${source}")`,
+    maskPosition: "center",
+    WebkitMaskPosition: "center",
+    maskRepeat: "no-repeat",
+    WebkitMaskRepeat: "no-repeat",
+    maskSize: "contain",
+    WebkitMaskSize: "contain",
+  } as React.CSSProperties
+
+  return (
+    <span
+      aria-hidden="true"
+      className={`relative inline-block flex-none ${className}`}
+      style={{ width: size, height: size }}
+    >
+      <img
+        src={source}
+        alt=""
+        width={size}
+        height={size}
+        draggable={false}
+        className="absolute inset-0 h-full w-full object-contain"
+        onError={() => setFailed(true)}
+      />
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0"
+        style={{ ...imageMask, backgroundColor: color, mixBlendMode: "multiply" }}
+      />
+    </span>
   )
 }
 
@@ -690,12 +731,14 @@ export function MhTag({ children, sk }: { children: React.ReactNode; sk?: boolea
 
 // ── weapon tree node (positioned by the tree via style) ──────────────────────
 export function MhNodeCard({
-  name, rarity, attack, special, style, selected, dim, owned, isFinal, finalLabel, onSelect,
+  name, weaponType, rarity, attack, special, style, selected, dim, owned, onSelect,
 }: {
-  name: string; rarity?: number; attack: number
+  name: string; weaponType?: string; rarity?: number; attack: number
   special: { type: string; value: number } | null
-  style: React.CSSProperties; selected: boolean; dim: boolean; owned: boolean; isFinal: boolean; finalLabel: string; onSelect: () => void
+  style: React.CSSProperties; selected: boolean; dim: boolean; owned: boolean; onSelect: () => void
 }) {
+  const t = useToolT(MHWILDS_UI_NS)
+  const rarityColor = rarVar(rarity)
   return (
     <button
       type="button"
@@ -703,25 +746,44 @@ export function MhNodeCard({
       onClick={onSelect}
       title={name}
       aria-label={name}
-      style={{ ...style, "--cut-line": selected ? "var(--mh)" : rarVar(rarity) } as React.CSSProperties}
-      className={`absolute box-border h-full overflow-hidden bg-panel border border-line py-3 px-3.5 text-left cursor-pointer transition-[border-color,box-shadow,transform,opacity] hover:-translate-y-0.5 hover:border-line-2 cut cut-edge-slant [--cut:9px] ${selected ? "!border-[var(--mh)] shadow-[0_0_0_1px_var(--mh),0_12px_30px_-14px_#000]" : ""} ${dim ? "opacity-[0.34]" : ""}`}
+      style={{
+        ...style,
+        "--cut-line": selected ? "var(--mh)" : rarityColor,
+        "--node-rarity": rarityColor,
+        "--node-rarity-soft": `color-mix(in srgb, ${rarityColor} 13%, transparent)`,
+        "--node-rarity-line": `color-mix(in srgb, ${rarityColor} 48%, transparent)`,
+      } as React.CSSProperties}
+      className={`absolute box-border flex h-full flex-col justify-between overflow-hidden bg-panel border border-[var(--node-rarity)] p-2.5 text-left cursor-pointer transition-[border-color,box-shadow,transform,opacity] hover:-translate-y-0.5 hover:border-line-2 cut-corner cut-corner-edge [--cut-lg:9px] ${selected ? "!border-[var(--mh)] shadow-[0_0_0_1px_var(--mh),0_12px_30px_-14px_#000]" : ""} ${dim ? "opacity-[0.34]" : ""}`}
     >
-      {owned && <span className="absolute top-2 right-[0.5625rem] w-[0.4375rem] h-[0.4375rem] rounded-full bg-[var(--mh)] shadow-[0_0_0_3px_var(--mh-soft)]" />}
-      <span className="flex min-w-0 items-start gap-[0.4375rem] pr-3 mb-2">
-        <MhRarity rarity={rarity} />
-        <span className="font-body text-[0.8125rem] leading-[1.15] font-semibold line-clamp-2">{name}</span>
+      <span className="pointer-events-none absolute inset-y-0 left-0 w-[3px] bg-[var(--node-rarity)] opacity-80" />
+
+      <span className="flex min-w-0 items-center gap-2.5 pr-1">
+        <span className="grid h-10 w-10 flex-none place-items-center border border-[var(--node-rarity-line)] bg-[var(--node-rarity-soft)]">
+          <MhWeaponIcon weaponType={weaponType} size={28} color="var(--node-rarity)" />
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="mb-1 flex items-center gap-1.5">
+            <MhRarity rarity={rarity} />
+            {owned && <Icon name="check" size={11} className="text-[var(--mh-bright)]" />}
+          </span>
+          <span className="block truncate font-body text-[0.8125rem] font-semibold leading-[1.1]">{name}</span>
+        </span>
       </span>
-      <span className="flex min-w-0 flex-wrap gap-x-2.5 gap-y-1 pr-1">
-        <span className="inline-flex items-center gap-1 font-mono text-[0.6875rem] leading-none text-txt-muted"><Icon name="sword" size={11} /><b className="text-txt">{attack}</b></span>
+
+      <span className="flex min-w-0 items-center gap-2 border-t border-line pt-1.5 font-mono text-[0.625rem] leading-none">
+        <span className="inline-flex items-baseline gap-1 text-txt-muted">
+          <span className="text-[0.5625rem] uppercase tracking-[0.1em]">{t("atk")}</span>
+          <b className="text-[0.75rem] text-txt">{attack}</b>
+        </span>
         {special && (
-          <span className="inline-flex items-center gap-1 font-mono text-[0.6875rem] leading-none" style={{ color: attributeColor(special.type) }}>
+          <span className="h-3.5 w-px bg-line" />
+        )}
+        {special && (
+          <span className="inline-flex min-w-0 items-center gap-1" style={{ color: attributeColor(special.type) }}>
             <MhAttributeIcon type={special.type} size={11} />{special.value}
           </span>
         )}
       </span>
-      {isFinal && (
-        <span className="absolute -bottom-px -right-px font-mono text-[0.5rem] leading-none font-bold tracking-[0.06em] uppercase text-[var(--mh-bright)] bg-[var(--mh-soft)] border border-[var(--mh-line)] py-[3px] px-[0.3125rem]">{finalLabel}</span>
-      )}
     </button>
   )
 }
@@ -771,11 +833,12 @@ export function MhDrawer({
 /**
  * A failed data load, said once and said correctly.
  *
- * Every screen here reads its game data from the API, so the interesting
- * question on a failure is not which call broke but whether there is a network
- * at all. With none, the transport's own message ("Failed to fetch") is noise
- * and "try again" is advice the player cannot act on, so this says what is
- * actually true and drops the retry.
+ * Catalog screens read their game data from the local pack; the bestiary also
+ * uses a server-backed monster source. The interesting question on a failure
+ * is therefore whether the local pack or the network-backed bestiary is
+ * unavailable. With no network, the transport's own message ("Failed to
+ * fetch") is noise and "try again" is advice the player cannot act on, so
+ * this says what is actually true and drops the retry.
  *
  * On the desktop the shell puts the same verdict in a banner above the tool.
  * Agreeing with it is the point: two different explanations for one outage read

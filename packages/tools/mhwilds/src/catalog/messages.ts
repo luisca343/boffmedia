@@ -31,7 +31,6 @@ export const messages = {
         },
         "weaponType": "Tipo de Arma",
         "app": {
-          "source": "API · caché",
           "loading": "Cargando",
           "offlineTitle": "Sin conexión",
           "offlineLead": "Estos datos vienen de Boffmedia. Vuelve a abrir la herramienta cuando tengas conexión."
@@ -572,7 +571,6 @@ export const messages = {
           "titlePrefix": "Armaduras",
           "titleAccent": "y conjuntos",
           "subtitle": "{sets, plural, one {# conjunto} other {# conjuntos}} · {pieces, plural, one {# pieza} other {# piezas}}",
-          "source": "API · MHDB",
           "search": "Buscar armadura…",
           "rank": "Rango",
           "rarity": "Rareza",
@@ -664,7 +662,6 @@ export const messages = {
         },
         "weaponType": "Weapon Type",
         "app": {
-          "source": "API · cached",
           "loading": "Loading",
           "offlineTitle": "No connection",
           "offlineLead": "This data comes from Boffmedia. Open the tool again once you are back online."
@@ -1205,7 +1202,6 @@ export const messages = {
           "titlePrefix": "Armor",
           "titleAccent": "sets",
           "subtitle": "{sets, plural, one {# set} other {# sets}} · {pieces, plural, one {# piece} other {# pieces}}",
-          "source": "API · MHDB",
           "search": "Search armor…",
           "rank": "Rank",
           "rarity": "Rarity",

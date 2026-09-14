@@ -267,7 +267,7 @@ export interface BuildDataWithIds {
 export type WishlistEntryKind = "weapon" | "armor" | "charm" | "decoration";
 
 /** A locale-independent saved crafting target. The full recipe is resolved
- *  from the current API catalog when the planner opens. */
+ *  from the current local catalog when the planner opens. */
 export interface WishlistEntry {
   key: string;
   kind: WishlistEntryKind;

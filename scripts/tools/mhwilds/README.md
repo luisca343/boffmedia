@@ -18,17 +18,27 @@ The pipeline reads a local Steam installation and writes three layers:
      protocol.
    - Contains only normalized/provenance JSON and PNGs needed by the bestiary.
    - The version manifest is at `public/boffmedia/tools/mhwilds/manifest.json`.
-   - `en/armor-sets.json` and `es/armor-sets.json` are the small checked-out
-     API-id to game-id crosswalk used for offline armor joins.
+   - The sibling `en/` and `es/` catalog files are the runtime source for the
+     weapon, armor, charm, decoration, and skill screens. The weapon tree is
+     derived at runtime from the localized weapon catalog; stale checked-out
+     `weapon-tree*.json` snapshots are not used or packed.
 3. `laboon/tool-sources/mhwilds/mhdb-wilds-data/`
    - Ignored local RE_RSZ-compatible decoder checkout, copied inputs, and
      temporary decoded JSON.
 
-The application joins the API's localized monster records with the local game
-data using the game's `fixedId`. This gives the bestiary the existing API
-features (weaknesses, locations, rewards) plus the extracted icon, anatomy
-diagram, part hitzones, break stages, break metadata, and game-owned elemental
-weakness flags.
+Catalog screens read their localized records from the generated local pack, so
+they do not need the MHDB API. The bestiary still joins the API's localized
+monster records with local game data using the game's `fixedId`. This gives the
+bestiary the existing API features (weaknesses, locations, rewards) plus the
+extracted icon, anatomy diagram, part hitzones, break stages, break metadata,
+and game-owned elemental weakness flags.
+
+The ignored extraction workspace preserves the game's native archive paths for
+RETool and the decoder. The publishable runtime tree renames monster visuals to
+readable paths based on their English game names, for example
+`bestiary/monsters/rathian/icon.png` and `bestiary/monsters/rathian/anatomy.png`.
+Repeated names receive deterministic `-variant-##` suffixes; stable game ids
+remain the only identity keys.
 
 ## Initial setup
 
@@ -180,12 +190,18 @@ table.
 
 Wilds does not expose one standalone PNG per element or ailment. The in-game
 glyphs are entries in the shared icon font/atlas, while the attribute table
-only supplies ids and message references. The extractor now also keeps the
-game's coloured `tex000201_20_imlm4` atlas and its `uvs000201_2` mapping. The
-asset builder crops the nine report attributes into
-`bestiary/attributes/{fire,water,thunder,ice,dragon,poison,sleep,paralysis,blast}.png`.
-`MhAttributeIcon` loads those original game glyphs everywhere and falls back to
-the host-neutral icon only when the local runtime pack has not been rebuilt.
+only supplies ids and message references. The extractor keeps the font's
+`ift_iconfont_00`/`uvs_iconfont` mapping and the referenced
+`tex000201_2_imlm4` texture (the report `tex000201_20_imlm4` atlas is retained
+separately for its other UI consumers). The asset builder crops the glyphs by
+the game's own names and UV order into `bestiary/attributes/`, including
+`fire`, `water`, `thunder`, `ice`, `dragon`, `poison`, `paralysis`, `stun`,
+`sleep`, and `blast`; blight names resolve to the matching base files rather
+than duplicating identical PNGs. The game has no `ST_EXHAUST` glyph in this
+font, so Exhaust deliberately falls back instead of being assigned unrelated
+artwork. `MhAttributeIcon` loads those original game glyphs everywhere and
+falls back to the host-neutral icon only when the local runtime pack has not
+been rebuilt.
 `MH_ATTRIBUTE_DEFINITIONS` remains the canonical semantic/color source, so
 pages and style-guide specimens cannot drift apart.
 
@@ -209,8 +225,8 @@ The package builds root-relative paths through its asset helper:
 
 ```text
 /boffmedia/tools/mhwilds/bestiary/bestiary-data.json
-/boffmedia/tools/mhwilds/bestiary/natives/.../tex_emicon_*.png
-/boffmedia/tools/mhwilds/bestiary/natives/.../tex_emanatomy_*.png
+/boffmedia/tools/mhwilds/bestiary/monsters/<monster-slug>/icon.png
+/boffmedia/tools/mhwilds/bestiary/monsters/<monster-slug>/anatomy.png
 /boffmedia/tools/mhwilds/bestiary/item-icons/<kind>-<color>.svg
 /boffmedia/tools/mhwilds/bestiary/gear/weapons/<kind>/<weapon-slug>.png
 /boffmedia/tools/mhwilds/bestiary/gear/armor/<armor-set-slug>/<slot>.png
@@ -358,14 +374,13 @@ ArmorID `70` (Akuma) is rendered from thumbnail model `207` via visual parts
 records both ids and the visual-setting provenance, so a numeric collision can
 never silently select another armor set.
 
-The API's `armorSet.id` is a mutable database id; `armorSet.gameId` is the
+The catalog's `armorSet.id` is a mutable catalog id; `armorSet.gameId` is the
 stable identifier from the game files and is the only id used for long-lived
-asset joins. The API service enriches armor stubs from `/armor/sets` (or the
-generated local crosswalk when offline) before the web client resolves
-`gear/armor/<armor-set-slug>/<slot>.png`; the generated manifest retains the database
-id only as `apiSetId` for diagnostics. A client with only the mutable id fails
-closed and renders the semantic slot fallback instead of probing another set's
-URL.
+asset joins. The local `armor-sets.json` crosswalk supplies that game id before
+the web client resolves `gear/armor/<armor-set-slug>/<slot>.png`; the generated
+manifest retains the catalog id only as `apiSetId` for diagnostics. A client
+with only the mutable id fails closed and renders the semantic slot fallback
+instead of probing another set's URL.
 
 The game does not ship a raster for every named piece. When its thumbnail table
 has no matching family/model/style/slot, the builder leaves that slot absent in

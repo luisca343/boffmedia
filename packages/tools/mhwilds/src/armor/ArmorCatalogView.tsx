@@ -231,7 +231,7 @@ export function ArmorCatalogView() {
           <MhSeal name="shield" />
           <ToolTitle title={<>{t("titlePrefix")} <em className="not-italic text-[var(--mh-bright)]">{t("titleAccent")}</em></>} sub={t("subtitle", { sets: filteredGroups.length, pieces: armor.length })} />
         </div>
-        <MhBarSide><WishlistLink /><span className="font-mono text-[0.6875rem] text-txt-muted">{t("source")}</span></MhBarSide>
+        <MhBarSide><WishlistLink /></MhBarSide>
       </MhBar>
 
       <MhBody>

@@ -173,13 +173,13 @@ export function PlanificadorMhChapter() {
         id="mhtreepieces"
         kicker="Monster Hunter"
         title="Nodo de árbol y materiales"
-        lead={<>La tarjeta del árbol de armas (<code>MhNodeCard</code>) — teñida por rareza, con marca de arma final y punto de «forjada» — y la fila de material (<code>MhMaterial</code>) con gema de rareza y contador, opcionalmente con seguimiento de obtenidos. El esqueleto (<code>MhSkeletonSlots</code>) cubre la carga.</>}
+        lead={<>La tarjeta del árbol de armas (<code>MhNodeCard</code>) — con glifo genérico de arma teñido por rareza, jerarquía de nombre y estadísticas, además de la marca de «forjada» — y la fila de material (<code>MhMaterial</code>) con gema de rareza y contador, opcionalmente con seguimiento de obtenidos. El esqueleto (<code>MhSkeletonSlots</code>) cubre la carga.</>}
       >
-        <Sample title="Nodo del árbol" code="<MhNodeCard node selected owned isFinal>" col>
+        <Sample title="Nodo del árbol" code="<MhNodeCard selected owned>" col>
           <div className="relative flex min-h-[5.5rem] flex-wrap gap-[1.125rem]">
-            <MhNodeCard {...NODE_A} style={{ position: "relative", left: 0, top: 0, width: 252, height: 88 } as React.CSSProperties} selected owned isFinal finalLabel="Final" dim={false} onSelect={() => {}} />
-            <MhNodeCard {...NODE_B} style={{ position: "relative", left: 0, top: 0, width: 252, height: 88 } as React.CSSProperties} selected={false} owned={false} isFinal={false} finalLabel="Final" dim={false} onSelect={() => {}} />
-            <MhNodeCard {...NODE_C} style={{ position: "relative", left: 0, top: 0, width: 252, height: 88 } as React.CSSProperties} selected={false} owned={false} isFinal={false} finalLabel="Final" dim onSelect={() => {}} />
+            <MhNodeCard {...NODE_A} style={{ position: "relative", left: 0, top: 0, width: 252, height: 88 } as React.CSSProperties} selected owned dim={false} onSelect={() => {}} />
+            <MhNodeCard {...NODE_B} style={{ position: "relative", left: 0, top: 0, width: 252, height: 88 } as React.CSSProperties} selected={false} owned={false} dim={false} onSelect={() => {}} />
+            <MhNodeCard {...NODE_C} style={{ position: "relative", left: 0, top: 0, width: 252, height: 88 } as React.CSSProperties} selected={false} owned={false} dim onSelect={() => {}} />
           </div>
         </Sample>
         <Sample title="Materiales de forja" code="<MhMaterial item material onToggle>" col note="Con <code>item</code>, la fila resuelve el icono por el manifiesto estable; con <code>onToggle</code> aparece la casilla de seguimiento.">

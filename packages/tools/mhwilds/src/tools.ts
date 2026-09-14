@@ -16,8 +16,9 @@ import type { ToolManifest } from "@boffmedia/tool-kit";
 
 import { MHWILDS_NS } from "./i18n";
 
-/** Every screen loads its game data from the API, hence `api` on all screens. */
-const CAPABILITIES: ToolManifest["requiredCapabilities"] = ["api"];
+/** Catalog screens are fully local; only the bestiary uses the API capability. */
+const LOCAL_CAPABILITIES: ToolManifest["requiredCapabilities"] = [];
+const API_CAPABILITIES: ToolManifest["requiredCapabilities"] = ["api"];
 
 /** All screens grow with their content and are scrolled by the host: page scroll
  *  on the web, the Tools scrollport in the launcher. */
@@ -33,7 +34,7 @@ export const mhwildsPlannerTool: ToolManifest = {
   categoryKey: `${MHWILDS_NS}.manifest.planner.category`,
   icon: "target",
   route: "/mhwilds/builds/planner",
-  requiredCapabilities: CAPABILITIES,
+  requiredCapabilities: LOCAL_CAPABILITIES,
   layout: LAYOUT,
   dataPack: { id: "mhwilds" },
   component: lazy(() =>
@@ -49,7 +50,7 @@ export const mhwildsTreeTool: ToolManifest = {
   categoryKey: `${MHWILDS_NS}.manifest.tree.category`,
   icon: "sword",
   route: "/mhwilds/tree",
-  requiredCapabilities: CAPABILITIES,
+  requiredCapabilities: LOCAL_CAPABILITIES,
   layout: LAYOUT,
   dataPack: { id: "mhwilds" },
   component: lazy(() =>
@@ -65,7 +66,7 @@ export const mhwildsBestiaryTool: ToolManifest = {
   categoryKey: `${MHWILDS_NS}.manifest.bestiary.category`,
   icon: "skull",
   route: "/mhwilds/monsters",
-  requiredCapabilities: CAPABILITIES,
+  requiredCapabilities: API_CAPABILITIES,
   layout: LAYOUT,
   dataPack: { id: "mhwilds" },
   component: lazy(() =>
@@ -81,7 +82,7 @@ export const mhwildsArmorTool: ToolManifest = {
   categoryKey: `${MHWILDS_NS}.manifest.armor.category`,
   icon: "shield",
   route: "/mhwilds/armor",
-  requiredCapabilities: CAPABILITIES,
+  requiredCapabilities: LOCAL_CAPABILITIES,
   layout: LAYOUT,
   dataPack: { id: "mhwilds" },
   component: lazy(() =>
@@ -97,7 +98,7 @@ export const mhwildsWishlistTool: ToolManifest = {
   categoryKey: `${MHWILDS_NS}.manifest.wishlist.category`,
   icon: "list",
   route: "/mhwilds/wishlist",
-  requiredCapabilities: CAPABILITIES,
+  requiredCapabilities: LOCAL_CAPABILITIES,
   layout: LAYOUT,
   dataPack: { id: "mhwilds" },
   component: lazy(() =>

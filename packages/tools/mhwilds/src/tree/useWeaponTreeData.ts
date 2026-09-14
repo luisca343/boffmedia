@@ -39,7 +39,7 @@ export function useWeaponTreeData() {
       const response = await MhWildsService.getWeaponTree<WeaponTree>(locale);
       
       if (!response.data) {
-        throw new Error('No data received from weapon tree API');
+        throw new Error('No data received from the local weapon catalog');
       }
       
       setWeaponTree(response.data);

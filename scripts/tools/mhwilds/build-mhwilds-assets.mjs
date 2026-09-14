@@ -110,22 +110,28 @@ const PARTIAL_ITEM_GLYPH_COLORS = Object.freeze({
 // Bump whenever the published mapping/source selection changes. The version
 // is appended to every browser asset URL; keeping it stable after a remap
 // lets a persistent dev browser continue serving the old, incorrect PNGs.
-const BUILD_SCHEMA = 16;
+const BUILD_SCHEMA = 19;
+const MONSTER_ASSET_ROOT = "monsters";
 const ATTRIBUTE_ICON_ATLAS_RELATIVE =
-  "natives/stm/gui/ui_texture/tex000000/tex000201_20_imlm4.png";
-// The game's status/element atlas is a regular 8x8 64px grid. These cells are
-// the nine entries used by EnemyReportWeaponAttributeData (1..9), in the same
-// vocabulary as the extracted English/Spanish message tables.
-const ATTRIBUTE_ICON_CELLS = Object.freeze({
-  fire: [4, 2],
-  water: [5, 1],
-  thunder: [2, 2],
-  ice: [1, 0],
-  dragon: [4, 1],
-  poison: [6, 2],
-  sleep: [3, 2],
-  paralysis: [1, 3],
-  blast: [5, 2],
+  "natives/stm/gui/ui_texture/tex000000/tex000201_2_IMLM4.png";
+const ATTRIBUTE_ICON_FONT_RELATIVE =
+  "natives/stm/gui/ui_font/ift_iconfont_00.ift.7";
+const ATTRIBUTE_ICON_UVS_RELATIVE =
+  "natives/stm/gui/ui_texture/tex_font/uvs_iconfont.uvs.8.x64";
+// These are the actual names in ift_iconfont_00. Blights intentionally resolve
+// to these base files at runtime because the game has no separate
+// ST_*BLIGHT records in this font.
+const ATTRIBUTE_ICON_NAMES = Object.freeze({
+  fire: "ST_FIRE",
+  water: "ST_WATER",
+  thunder: "ST_THUNDER",
+  ice: "ST_ICE",
+  dragon: "ST_DRUGON",
+  poison: "ST_POISON",
+  paralysis: "ST_PARALYSIS",
+  stun: "ST_STUN",
+  sleep: "ST_SLEEP",
+  blast: "ST_BOMB",
 });
 const LEGACY_SKETCH_PATH_PATTERN = /(?:emsketch|enemyreportbosssketch)/i;
 const ARMOR_CATALOG_SOURCE = path.join(
@@ -154,6 +160,21 @@ const WEAPON_CATALOG_SOURCE = path.join(
   REPO,
   "public/boffmedia/tools/mhwilds/en/weapons.json",
 );
+const LOCAL_CATALOG_ROOT = path.join(REPO, "public/boffmedia/tools/mhwilds");
+const LOCAL_CATALOG_FILES = Object.freeze([
+  "en/armor-sets.json",
+  "en/armor.json",
+  "en/charms.json",
+  "en/decorations.json",
+  "en/skills.json",
+  "en/weapons.json",
+  "es/armor-sets.json",
+  "es/armor.json",
+  "es/charms.json",
+  "es/decorations.json",
+  "es/skills.json",
+  "es/weapons.json",
+]);
 // The archive folder is not always the weapon family. For example, it10
 // contains both tex_it1000 (insect glaives) and tex_it1003 (kinsects). Use the
 // complete filename family so a non-weapon atlas can never overwrite a weapon
@@ -319,7 +340,59 @@ async function copyAttributePng(source, destination, crop, dryRun) {
   await sharp(source).extract(crop).png().toFile(destination);
 }
 
-function buildAttributeEntries(sourceRoot) {
+function readUtf16String(buffer, offset) {
+  if (!Number.isInteger(offset) || offset < 0 || offset >= buffer.length - 1)
+    return "";
+  let end = offset;
+  while (end + 1 < buffer.length && (buffer[end] !== 0 || buffer[end + 1] !== 0))
+    end += 2;
+  return buffer.toString("utf16le", offset, end);
+}
+
+function readAttributeFontEntries(sourceRoot) {
+  const file = path.join(sourceRoot, ATTRIBUTE_ICON_FONT_RELATIVE);
+  if (!fs.existsSync(file)) return null;
+  const buffer = fs.readFileSync(file);
+  const recordCount = buffer.readUInt32LE(0x38);
+  const recordStart = 0x48;
+  const entries = new Map();
+  for (let index = 0; index < recordCount; index += 1) {
+    const offset = recordStart + index * 24;
+    if (offset + 24 > buffer.length) break;
+    const name = readUtf16String(buffer, buffer.readUInt32LE(offset));
+    if (!Object.values(ATTRIBUTE_ICON_NAMES).includes(name)) continue;
+    entries.set(name, {
+      glyph: buffer.readUInt32LE(offset + 12),
+      textureGroup: buffer.readUInt32LE(offset + 8) >>> 16,
+    });
+  }
+  return entries;
+}
+
+function readAttributeUvEntries(sourceRoot) {
+  const file = path.join(sourceRoot, ATTRIBUTE_ICON_UVS_RELATIVE);
+  if (!fs.existsSync(file)) return null;
+  const buffer = fs.readFileSync(file);
+  const recordCount = buffer.readUInt32LE(0x0c);
+  const recordStart = buffer.readUInt32LE(0x28);
+  const entries = new Map();
+  for (let index = 0; index < recordCount; index += 1) {
+    const offset = recordStart + index * 32;
+    if (offset + 32 > buffer.length) break;
+    const textureIndex = buffer.readUInt32LE(offset + 24);
+    const textureEntries = entries.get(textureIndex) || [];
+    textureEntries.push({
+      left: buffer.readFloatLE(offset + 8),
+      top: buffer.readFloatLE(offset + 12),
+      right: buffer.readFloatLE(offset + 16),
+      bottom: buffer.readFloatLE(offset + 20),
+    });
+    entries.set(textureIndex, textureEntries);
+  }
+  return entries;
+}
+
+async function buildAttributeEntries(sourceRoot) {
   const source = path.join(sourceRoot, ATTRIBUTE_ICON_ATLAS_RELATIVE);
   if (!fs.existsSync(source)) {
     console.warn(
@@ -327,11 +400,53 @@ function buildAttributeEntries(sourceRoot) {
     );
     return [];
   }
-  return Object.entries(ATTRIBUTE_ICON_CELLS).map(([key, [column, row]]) => ({
-    source,
-    relative: `attributes/${key}.png`,
-    crop: { left: column * 64, top: row * 64, width: 64, height: 64 },
-  }));
+  const fontEntries = readAttributeFontEntries(sourceRoot);
+  const uvEntries = readAttributeUvEntries(sourceRoot);
+  if (!fontEntries || !uvEntries) {
+    console.warn(
+      "[build-mhwilds-assets] attribute font/UV metadata missing; runtime will use the vector fallback",
+    );
+    return [];
+  }
+  const metadata = await sharp(source).metadata();
+  const width = metadata.width || 0;
+  const height = metadata.height || 0;
+  if (!width || !height) {
+    console.warn(
+      `[build-mhwilds-assets] attribute atlas dimensions unavailable: ${source}; runtime will use the vector fallback`,
+    );
+    return [];
+  }
+
+  const entries = [];
+  for (const [key, name] of Object.entries(ATTRIBUTE_ICON_NAMES)) {
+    const fontEntry = fontEntries.get(name);
+    // The IFT texture group is one-based while UVS record texture indexes are
+    // zero-based. This group must resolve to the dedicated tex000201_2 atlas.
+    const uvEntry = fontEntry
+      ? uvEntries.get(fontEntry.textureGroup - 1)?.[fontEntry.glyph]
+      : undefined;
+    if (!fontEntry || !uvEntry) {
+      console.warn(
+        `[build-mhwilds-assets] attribute glyph metadata missing for ${key} (${name})`,
+      );
+      continue;
+    }
+    const crop = {
+      left: Math.round(uvEntry.left * width),
+      top: Math.round(uvEntry.top * height),
+      width: Math.round((uvEntry.right - uvEntry.left) * width),
+      height: Math.round((uvEntry.bottom - uvEntry.top) * height),
+    };
+    if (crop.width <= 0 || crop.height <= 0) {
+      console.warn(
+        `[build-mhwilds-assets] invalid attribute crop for ${key}: ${JSON.stringify(crop)}`,
+      );
+      continue;
+    }
+    entries.push({ source, relative: `attributes/${key}.png`, crop });
+  }
+  return entries;
 }
 
 function assertUniqueRuntimeEntries(entries) {
@@ -413,6 +528,70 @@ function assignNamedAssetSlugs(
   return entries;
 }
 
+/**
+ * Turn the game-facing monster texture paths into readable runtime paths.
+ *
+ * The extraction workspace intentionally keeps the original archive layout so
+ * RETool, the decoder and the provenance index can continue to use it. The
+ * publishable tree is a consumer-facing API, though, so it should not expose
+ * opaque archive buckets such as `tex000000` or `tex_emicon_02`.
+ */
+function buildMonsterAssetPaths(data) {
+  const records = [];
+  for (const monster of data?.monsters ?? []) {
+    for (const variant of monster.variants ?? []) {
+      const englishName = variant.identity?.names?.en;
+      const spanishName = variant.identity?.names?.es;
+      records.push({
+        id: `${monster.id}-${variant.id}`,
+        name: englishName || spanishName || `monster-${monster.id}`,
+        assets: variant.assets,
+      });
+    }
+  }
+
+  assignNamedAssetSlugs(records, {
+    nameKey: "name",
+    idKey: "id",
+    fallbackPrefix: "monster",
+  });
+
+  const paths = new Map();
+  for (const record of records) {
+    for (const [kind, asset] of [
+      ["icon", record.assets?.icon],
+      ["anatomy", record.assets?.anatomy],
+    ]) {
+      const source = asset?.png;
+      if (typeof source !== "string") continue;
+      const relative = `${MONSTER_ASSET_ROOT}/${record.assetSlug}/${kind}.png`;
+      const existing = paths.get(source);
+      if (existing && existing !== relative) {
+        throw new Error(
+          `Monster source PNG is mapped to multiple runtime paths: ${source} -> ${existing}, ${relative}`,
+        );
+      }
+      paths.set(source, relative);
+    }
+  }
+  return paths;
+}
+
+function remapPublishedPngPaths(value, assetPaths) {
+  if (Array.isArray(value))
+    return value.map((item) => remapPublishedPngPaths(item, assetPaths));
+  if (!value || typeof value !== "object") return value;
+
+  return Object.fromEntries(
+    Object.entries(value).map(([key, child]) => [
+      key,
+      key === "png" && typeof child === "string"
+        ? assetPaths.get(child) ?? child
+        : remapPublishedPngPaths(child, assetPaths),
+    ]),
+  );
+}
+
 function assertNamedGearPaths(entries) {
   const numericPath =
     /^gear\/(?:armor\/[-]?\d+(?:\/|\.png)|weapons\/[^/]+\/[-]?\d+\.png)$/;
@@ -426,13 +605,14 @@ function assertNamedGearPaths(entries) {
   }
 }
 
-function copyStableJson(source, destination) {
-  const json = JSON.parse(fs.readFileSync(source, "utf8"));
+function copyStableJson(source, destination, assetPaths = null) {
+  let json = JSON.parse(fs.readFileSync(source, "utf8"));
   // Keep already-extracted workspaces compatible with the clearer field name.
   if (json && json.itemIcons && !json.itemThumbnails) {
     json.itemThumbnails = json.itemIcons;
     delete json.itemIcons;
   }
+  if (assetPaths) json = remapPublishedPngPaths(json, assetPaths);
   if (json && typeof json === "object") delete json.generatedAt;
   fs.mkdirSync(path.dirname(destination), { recursive: true });
   fs.writeFileSync(destination, `${JSON.stringify(json, null, 2)}\n`, "utf8");
@@ -1457,6 +1637,24 @@ try {
   const source = resolvePath(args.src);
   const output = resolvePath(args.out);
   assertSafeTarget(output);
+  const toolRoot = path.dirname(output);
+  const catalogEntries = LOCAL_CATALOG_FILES.map((relative) => ({
+    relative,
+    source: path.join(LOCAL_CATALOG_ROOT, ...relative.split("/")),
+    destination: path.join(toolRoot, ...relative.split("/")),
+  }));
+  const missingCatalogFiles = catalogEntries
+    .filter((entry) => !fs.existsSync(entry.source))
+    .map((entry) => entry.source);
+  if (missingCatalogFiles.length > 0) {
+    throw new Error(
+      `Local MH Wilds catalog files are missing:\n${missingCatalogFiles.join("\n")}`,
+    );
+  }
+  const catalogSources = catalogEntries.map((entry) => entry.source);
+  const catalogDestinations = new Set(
+    catalogEntries.map((entry) => entry.destination),
+  );
 
   if (!fs.existsSync(source))
     throw new Error(`Extraction directory not found: ${source}`);
@@ -1467,6 +1665,9 @@ try {
       `Expected bestiary-data.json and index.json under ${source}`,
     );
   }
+
+  const normalizedData = JSON.parse(fs.readFileSync(dataFile, "utf8"));
+  const monsterAssetPaths = buildMonsterAssetPaths(normalizedData);
 
   const allPngFiles = walkFiles(path.join(source, "natives"))
     .filter((file) => file.toLowerCase().endsWith(".png"))
@@ -1496,7 +1697,7 @@ try {
   );
   const gear = buildGearEntries(source, itemPngFiles, armorPngFiles);
   assertNamedGearPaths(gear.entries);
-  const attributeEntries = buildAttributeEntries(source);
+  const attributeEntries = await buildAttributeEntries(source);
   const itemIconFiles = fs.existsSync(ITEM_ICON_SOURCE)
     ? walkFiles(ITEM_ICON_SOURCE)
         .filter((file) => file.toLowerCase().endsWith(".svg"))
@@ -1508,7 +1709,9 @@ try {
     { source: indexFile, relative: "index.json" },
     ...pngFiles.map((file) => ({
       source: file,
-      relative: relativePosix(source, file),
+      relative:
+        monsterAssetPaths.get(relativePosix(source, file)) ??
+        relativePosix(source, file),
     })),
     ...attributeEntries,
     ...gear.entries,
@@ -1520,6 +1723,7 @@ try {
   assertUniqueRuntimeEntries(runtimeEntries);
   const files = runtimeEntries.map((entry) => entry.source);
   const provenanceFiles = [
+    ...catalogSources,
     ARMOR_CATALOG_SOURCE,
     RAW_ARMOR_SOURCE,
     ITEM_CATALOG_SOURCE,
@@ -1546,7 +1750,7 @@ try {
   console.log(`[build-mhwilds-assets] src=${source}`);
   console.log(`[build-mhwilds-assets] out=${output}`);
   console.log(
-    `[build-mhwilds-assets] files=${files.length} pngs=${pngFiles.length} attribute-pngs=${attributeEntries.length} gear-pngs=${gear.entries.length} armor-pngs=${gear.armorEntries.length} item-icons=${itemIconFiles.length} item-catalog=${itemManifest.coverage.catalogItems} item-assets=${itemManifest.coverage.availableItems} version=${version}${args.dryRun ? " --dry-run" : ""}`,
+    `[build-mhwilds-assets] files=${files.length} pngs=${pngFiles.length} monster-pngs=${monsterAssetPaths.size} attribute-pngs=${attributeEntries.length} gear-pngs=${gear.entries.length} armor-pngs=${gear.armorEntries.length} item-icons=${itemIconFiles.length} item-catalog=${itemManifest.coverage.catalogItems} item-assets=${itemManifest.coverage.availableItems} version=${version}${args.dryRun ? " --dry-run" : ""}`,
   );
   const armorCoverage = gear.manifest.armorCoverage;
   const weaponCoverage = gear.manifest.weaponCoverage;
@@ -1587,8 +1791,12 @@ try {
     fs.rmSync(output, { recursive: true, force: true });
   fs.mkdirSync(output, { recursive: true });
 
-  copyStableJson(dataFile, path.join(output, "bestiary-data.json"));
-  copyStableJson(indexFile, path.join(output, "index.json"));
+  copyStableJson(
+    dataFile,
+    path.join(output, "bestiary-data.json"),
+    monsterAssetPaths,
+  );
+  copyStableJson(indexFile, path.join(output, "index.json"), monsterAssetPaths);
   for (const entry of runtimeEntries) {
     if (
       entry.relative === "bestiary-data.json" ||
@@ -1619,15 +1827,18 @@ try {
   );
 
   // The manifest belongs to the tool root because pack-tool-assets.mjs reads
-  // public/boffmedia/tools/<tool>/manifest.json. Existing API cache files in
-  // that root stay available to the web app but are excluded from the optional
-  // MH Wilds runtime pack below.
-  const toolRoot = path.dirname(output);
+  // public/boffmedia/tools/<tool>/manifest.json. The localized catalogs are
+  // part of the runtime pack; other generated files in that root stay out.
+  for (const entry of catalogEntries) {
+    if (entry.source !== entry.destination)
+      copyFile(entry.source, entry.destination, false);
+  }
   const excluded = walkFiles(toolRoot)
     .filter(
       (file) =>
         !file.startsWith(`${output}${path.sep}`) &&
-        path.basename(file) !== "manifest.json",
+        path.basename(file) !== "manifest.json" &&
+        !catalogDestinations.has(file),
     )
     .map((file) => relativePosix(toolRoot, file));
   fs.writeFileSync(
@@ -1646,11 +1857,13 @@ try {
           ),
           path.posix.join(path.basename(output), "gear/manifest.json"),
           path.posix.join(path.basename(output), ITEM_MANIFEST_RELATIVE),
+          ...LOCAL_CATALOG_FILES,
         ],
         excluded,
         notes: [
-          "Runtime tree contains normalized bestiary data, selected game PNGs, cropped game element/ailment glyphs, generic item glyph SVGs, a stable item asset manifest, weapon gear renders, and armor slot previews.",
-          "Weapon and armor manifest joins retain stable game ids, while generated gear paths use canonical-name slugs.",
+          "Runtime tree contains normalized bestiary data, readable monster PNG paths, cropped game element/ailment glyphs, generic item glyph SVGs, a stable item asset manifest, weapon gear renders, and armor slot previews.",
+          "Localized weapon, armor, charm, decoration, and skill catalogs are generated from the local game extraction and shipped with the tool pack; the client derives the weapon tree from the localized weapon catalog.",
+          "Monster, weapon and armor manifest joins retain stable game ids, while generated runtime paths use canonical-name slugs.",
           "Item manifest joins retain stable game ids and readable item slugs; current entries point at shared semantic glyphs without duplicating identical SVG files.",
           "Gear thumbnails are republished as RGBA PNGs with the game's invalid DirectXTex gamma metadata removed; this preserves the foreground alpha mask and prevents browser washout. Do not flatten these PNGs during publication.",
           "Raw game files remain in the ignored laboon extraction workspace.",

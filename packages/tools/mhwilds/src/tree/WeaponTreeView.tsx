@@ -5,7 +5,7 @@ import { useToolT } from "../i18n"
 import { Button, Chip, Empty, Icon, Select, Spinner, ToolTitle } from "@boffmedia/ui"
 import { useWeaponTreeData } from "./useWeaponTreeData"
 import {
-  MhApp, MhBar, MhBarSide, MhBody, MhWrap, MhSeal, MhModes, MhSrc, MhSearch,
+  MhApp, MhBar, MhBarSide, MhBody, MhWrap, MhSeal, MhModes, MhSearch,
   MhTypeChip, MhNodeCard, MhDrawer, MhRarity, MhStat3, MhElement, MhAttributeIcon, MhMaterial, MhLabel, MhLoadError,
   MhMeter,
 } from "../ui/mh-kit"
@@ -273,7 +273,7 @@ export function WeaponTreeView() {
 
   return (
     <MhApp className="h-[var(--tool-vh,100dvh)] overflow-hidden">
-      <MhBar>
+      <MhBar sticky={false}>
         <div className="flex items-center gap-[0.6875rem] min-w-0">
           <MhSeal name="tree" />
           <ToolTitle
@@ -295,7 +295,6 @@ export function WeaponTreeView() {
             ]}
           />
           <WishlistLink />
-          <MhSrc label={t("app.source")} />
         </MhBarSide>
       </MhBar>
 
@@ -303,10 +302,10 @@ export function WeaponTreeView() {
       <div className="flex gap-3 items-center flex-wrap px-[clamp(1rem,2.4vw,2.25rem)] py-[0.6875rem] border-b border-line bg-base-2">
         <div className="flex gap-1.5 flex-wrap flex-1">
           {availableTypes.map((k) => (
-            <MhTypeChip key={k} icon="sword" label={t(`weapons.${k}`)} count={treeByKind[k].length} on={type === k} onClick={() => setType(k)} />
+            <MhTypeChip key={k} weaponType={k} label={t(`weapons.${k}`)} count={treeByKind[k].length} on={type === k} onClick={() => setType(k)} />
           ))}
           {soonTypes.slice(0, 3).map((k) => (
-            <MhTypeChip key={k} label={t(`weapons.${k}`)} count={t("tree.soon")} disabled />
+            <MhTypeChip key={k} weaponType={k} label={t(`weapons.${k}`)} count={t("tree.soon")} disabled />
           ))}
         </div>
       </div>
@@ -372,14 +371,13 @@ export function WeaponTreeView() {
                         key={key}
                         style={{ left: p.x, top: p.y, width: NODE_W, height: NODE_H }}
                         name={n.name}
+                        weaponType={n.kind}
                         rarity={n.rarity}
                         attack={weaponAttack(n)}
                         special={firstSpecial(n.specials)}
                         selected={selKey === key}
                         dim={!!nodeDim(n, key)}
                         owned={!!ownedSet[String(n.id)]}
-                        isFinal={!n.children || n.children.length === 0}
-                        finalLabel={t("tree.final")}
                         onSelect={() => setSelKey(key)}
                       />
                     )

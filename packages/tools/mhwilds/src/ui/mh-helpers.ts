@@ -5,18 +5,20 @@ import type { IconName } from "@boffmedia/ui"
 // root so the whole subtree (and arbitrary-value utilities) can read them.
 // Brand orange (`--accent`) stays reserved for primary actions.
 export const MH_VARS: React.CSSProperties = {
+  // Exact opaque sRGB samples from the extracted in-game talisman-1..8
+  // assets, which share the game's rarity glyph palette.
   ["--mh" as string]: "hsl(152 52% 46%)",
   ["--mh-bright" as string]: "hsl(152 58% 56%)",
   ["--mh-soft" as string]: "hsl(152 52% 46% / 0.13)",
   ["--mh-line" as string]: "hsl(152 52% 46% / 0.4)",
-  ["--rar1" as string]: "#9aa3b2",
-  ["--rar2" as string]: "#cfd6e0",
-  ["--rar3" as string]: "#7fd6a8",
-  ["--rar4" as string]: "#6cc4e8",
-  ["--rar5" as string]: "#7d9bff",
-  ["--rar6" as string]: "#b98bff",
-  ["--rar7" as string]: "#ff9a6b",
-  ["--rar8" as string]: "#ffcf5c",
+  ["--rar1" as string]: "#969696",
+  ["--rar2" as string]: "#dedede",
+  ["--rar3" as string]: "#a4c43b",
+  ["--rar4" as string]: "#47a33f",
+  ["--rar5" as string]: "#5caebb",
+  ["--rar6" as string]: "#575fd9",
+  ["--rar7" as string]: "#9272e3",
+  ["--rar8" as string]: "#c76d46",
 }
 
 export const rarClamp = (n?: number) => Math.max(1, Math.min(8, n || 1))

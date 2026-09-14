@@ -1,15 +1,19 @@
 /**
- * MH Wilds game data, fetched through `@boffmedia/tool-kit`'s `api` capability.
+ * MH Wilds game data service.
  *
- * Every endpoint here is `@Public()` on the API side, so the calls stay
- * `auth: "optional"` (the seam's default): the launcher attaches a session if
- * the player happens to have one and proceeds anonymously otherwise, which is
- * what lets the Tools section work without a Boffmedia account (plan D4).
+ * Read-only catalog data is served from the generated local extraction pack.
+ * The API capability remains only for server-owned bestiary records and
+ * editorial anatomy overrides.
+ *
+ * The remaining API endpoints are `@Public()` on the API side, so the calls
+ * stay `auth: "optional"` (the seam's default): the launcher attaches a
+ * session if the player happens to have one and proceeds anonymously
+ * otherwise. Local catalog requests do not use the API capability.
  *
  * The `ApiResponse` envelope and the NON-throwing contract are kept exactly as
  * `@/services/boffAPI` had them. The capability throws `ToolApiError`; catching
- * it here is what let the hooks move across unchanged, since every call site
- * was written as `if (res.success && res.data)`.
+ * it here keeps the remaining API-backed hooks on the same non-throwing seam,
+ * since every call site was written as `if (res.success && res.data)`.
  */
 
 import { toolApi, ToolApiError } from "@boffmedia/tool-kit";
@@ -23,9 +27,17 @@ import type {
   Weapon,
 } from "./types";
 import {
+  mhwildsAsset,
   loadMhwildsGearAssetManifest,
   type MhwildsGearAssetManifest,
 } from "./bestiary/assets";
+import {
+  buildLocalWeaponTree,
+  flattenLocalCharmRanks,
+  joinLocalArmorSetIdentities,
+  mhwildsCatalogPath,
+  type LocalArmorSetIdentity,
+} from "./catalog/local-data";
 
 /** The API's global response envelope, as `@/services/boffAPI` declared it. */
 export interface ApiResponse<T = unknown> {
@@ -59,6 +71,35 @@ async function get<T>(
       };
     }
     throw err;
+  }
+}
+
+async function getLocal<T>(
+  file: string,
+  locale?: string,
+): Promise<ApiResponse<T>> {
+  try {
+    const response = await fetch(mhwildsAsset(mhwildsCatalogPath(locale, file)), {
+      cache: "no-store",
+    });
+    if (!response.ok) {
+      return {
+        success: false,
+        statusCode: response.status,
+        error: `Local MH Wilds catalog request failed: ${response.status}`,
+      };
+    }
+    return {
+      success: true,
+      statusCode: response.status,
+      data: (await response.json()) as T,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      statusCode: 0,
+      error: err instanceof Error ? err.message : String(err),
+    };
   }
 }
 
@@ -103,7 +144,7 @@ function enrichWeaponTree(value: unknown, manifest: MhwildsGearAssetManifest): u
 
 export class MhWildsService {
   static async getWeapons(locale?: string): Promise<ApiResponse<Weapon[]>> {
-    const response = await get<Weapon[]>("/tools/mhwilds/weapons", { locale });
+    const response = await getLocal<Weapon[]>("weapons.json", locale);
     if (!response.success || !Array.isArray(response.data)) return response;
     const manifest = await loadMhwildsGearAssetManifest();
     return {
@@ -113,27 +154,31 @@ export class MhWildsService {
   }
 
   static async getArmor(locale?: string): Promise<ApiResponse<ArmorPiece[]>> {
-    const response = await get<ArmorPiece[]>("/tools/mhwilds/armor", {
-      locale,
-    });
+    const [response, identities] = await Promise.all([
+      getLocal<ArmorPiece[]>("armor.json", locale),
+      getLocal<LocalArmorSetIdentity[]>("armor-sets.json", locale),
+    ]);
     if (!response.success || !Array.isArray(response.data)) return response;
 
-    // The API owns the canonical records, while the local pack owns optional
-    // rasters. Join them by stable armor-set id + slot instead of by array
-    // position. A missing entry is explicit so consumers can render a
-    // semantic fallback without probing a guaranteed 404.
+    const armor =
+      identities.success && Array.isArray(identities.data)
+        ? joinLocalArmorSetIdentities(response.data, identities.data)
+        : response.data;
+
+    // The local catalog owns the canonical records, while the local pack also
+    // owns optional rasters. Join them by stable armor-set game id + slot.
+    // A missing entry is explicit so consumers can render a semantic fallback
+    // without probing a guaranteed 404.
     const manifest = await loadMhwildsGearAssetManifest();
-    if (!manifest?.armor) return response;
+    if (!manifest?.armor) return { ...response, data: armor };
     return {
       ...response,
-      data: response.data.map((piece) => {
+      data: armor.map((piece) => {
         const gameId = piece.armorSet?.gameId;
         const directEntry =
           gameId == null ? undefined : manifest.armor?.[String(gameId)];
-        // Do not fall back to `armorSet.id`: it is the API's mutable primary
-        // key, whereas the extracted pack is keyed by the game's stable id.
-        // The API repository supplies that stable id from the checked-in
-        // crosswalk, and an absent join must remain an explicit null.
+        // Do not fall back to `armorSet.id`: the extracted pack is keyed by
+        // the game's stable id, and an absent join remains an explicit null.
         const entry =
           directEntry &&
           (directEntry.gameId == null ||
@@ -150,20 +195,20 @@ export class MhWildsService {
     };
   }
 
-  static getCharms(locale?: string): Promise<ApiResponse<Charm[]>> {
-    // The raw charms endpoint returns grouped charm tables. The planner needs
-    // the flattened, named ranks (name, description, rarity and skills).
-    return get<Charm[]>("/tools/mhwilds/charms/ranks", { locale });
+  static async getCharms(locale?: string): Promise<ApiResponse<Charm[]>> {
+    const response = await getLocal<unknown>("charms.json", locale);
+    if (!response.success) return response as ApiResponse<Charm[]>;
+    return { ...response, data: flattenLocalCharmRanks(response.data) };
   }
 
   static getDecorations(locale?: string): Promise<ApiResponse<Decoration[]>> {
-    return get<Decoration[]>("/tools/mhwilds/decorations", { locale });
+    return getLocal<Decoration[]>("decorations.json", locale);
   }
 
   /** Generic because the skill shape is the caller's concern: the planner
    *  enriches it into its own `ServerSkill`, and nothing here needs to know. */
   static getSkills<T = unknown>(locale?: string): Promise<ApiResponse<T[]>> {
-    return get<T[]>("/tools/mhwilds/skills", { locale });
+    return getLocal<T[]>("skills.json", locale);
   }
 
   static getMonsters(locale?: string): Promise<ApiResponse<MhMonster[]>> {
@@ -177,13 +222,16 @@ export class MhWildsService {
 
   /** Same reasoning as `getSkills`: the tree hook owns the `WeaponTree` shape. */
   static async getWeaponTree<T = unknown>(locale?: string): Promise<ApiResponse<T>> {
-    const response = await get<T>("/tools/mhwilds/weapons/tree", { locale });
-    if (!response.success || response.data == null) return response;
+    const response = await this.getWeapons(locale);
+    if (!response.success || !Array.isArray(response.data))
+      return response as ApiResponse<T>;
+
+    const tree = buildLocalWeaponTree(response.data);
     const manifest = await loadMhwildsGearAssetManifest();
-    if (!manifest) return response;
+    if (!manifest) return { ...response, data: tree as T };
     return {
       ...response,
-      data: enrichWeaponTree(response.data, manifest) as T,
+      data: enrichWeaponTree(tree, manifest) as T,
     };
   }
 }

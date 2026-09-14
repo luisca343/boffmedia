@@ -100,6 +100,7 @@ export const mhwilds: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/mhwilds/icon.webp"),
+            iconSrc: staticAsset(ASSET.boffmedia.tools.mhwilds, "bestiary/item-icons/plate-grey.svg"),
             fallbackIcon: "list",
             fallbackIconColor: "text-warning-hover",
             color: "from-warning-hover to-emerald-700",
@@ -117,6 +118,7 @@ export const mhwilds: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/mhwilds/icon.webp"),
+            iconSrc: staticAsset(ASSET.boffmedia.tools.mhwilds, "bestiary/item-icons/trap-grey.svg"),
             fallbackIcon: "paw",
             fallbackIconColor: "text-warning-hover",
             color: "from-warning-hover to-rose-600",

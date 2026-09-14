@@ -5,6 +5,10 @@ export const MHWILDS_ASSET_ROOT = "/boffmedia/tools/mhwilds";
 export const MHWILDS_BESTIARY_ASSET_ROOT = "/boffmedia/tools/mhwilds/bestiary";
 export const MHWILDS_GEAR_ASSET_ROOT = "/boffmedia/tools/mhwilds/bestiary/gear";
 export const MHWILDS_ATTRIBUTE_ASSET_ROOT = "/boffmedia/tools/mhwilds/bestiary/attributes";
+// Keep this in sync with the focused game-glyph remap in
+// scripts/tools/mhwilds/build-mhwilds-assets.mjs. Attribute URLs do not load
+// the large runtime manifest, so they need their own stable cache key.
+const MHWILDS_ATTRIBUTE_ASSET_VERSION = "game-status-glyphs-schema-19";
 const MHWILDS_ATTRIBUTE_ASSET_KEYS: Readonly<Record<string, string>> = {
   fire: "fire",
   water: "water",
@@ -15,12 +19,17 @@ const MHWILDS_ATTRIBUTE_ASSET_KEYS: Readonly<Record<string, string>> = {
   sleep: "sleep",
   paralysis: "paralysis",
   blast: "blast",
+  // The game has no distinct blight glyphs; use the matching base artwork
+  // without publishing duplicate PNGs.
   blastblight: "blast",
   fireblight: "fire",
   waterblight: "water",
   thunderblight: "thunder",
   iceblight: "ice",
   dragonblight: "dragon",
+  stun: "stun",
+  // Wilds exposes Exhaust as a status label, but its extracted icon font has
+  // no ST_EXHAUST glyph. Do not substitute a misleading artwork cell.
 };
 
 export interface MhwildsArmorAssetManifestEntry {
@@ -106,7 +115,11 @@ export function mhwildsAttributeAsset(
 ): string | null {
   const key = MHWILDS_ATTRIBUTE_ASSET_KEYS[normalizeAttributeKey(type ?? undefined)];
   if (!key) return null;
-  return resolveAsset(MHWILDS_ATTRIBUTE_ASSET_ROOT, `${key}.png`, version);
+  return resolveAsset(
+    MHWILDS_ATTRIBUTE_ASSET_ROOT,
+    `${key}.png`,
+    version ?? MHWILDS_ATTRIBUTE_ASSET_VERSION,
+  );
 }
 
 export interface MhwildsWeaponAssetReference {

@@ -7,7 +7,7 @@ import { MhWildsService, type ApiResponse } from '../../service';
  * The service NEVER throws on a failed request: it resolves an envelope with
  * `success: false` and no `data`. `response.data!` therefore stored `undefined`
  * in state, the try/catch saw nothing wrong, and the lookup-map memos below
- * crashed on `.forEach` — a dead API took the whole planner page down instead
+ * crashed on `.forEach` — a failed catalog load took the whole planner page down instead
  * of showing its own error state. Every fetch goes through this instead.
  */
 function listOrThrow<T>(response: ApiResponse<T[]>): T[] {

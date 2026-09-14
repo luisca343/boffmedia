@@ -97,11 +97,12 @@ const ATTRIBUTE_ICON_TEXTURE_PATTERN =
   /^natives\/stm\/gui\/ui_texture\/tex_font\/iconfont_(?:kb00|pad\d+)_imlm4\.tex\./i;
 const ATTRIBUTE_ICON_UVS_PATTERN =
   /^natives\/stm\/gui\/ui_texture\/tex_font\/uvs_iconfont\.uvs\.8\.x64$/i;
-// This shared game UI atlas contains the nine coloured element/status cells
-// used by the equipment and bestiary screens. The builder crops the cells
-// after extraction so every consumer uses the original game artwork.
+// These shared game UI atlases contain the coloured report cells and the
+// dedicated 100px status glyph cells used by the equipment/bestiary screens.
+// The builder crops the cells after extraction so every consumer uses the
+// original game artwork.
 const ATTRIBUTE_GAME_ICON_ATLAS_PATTERN =
-  /^natives\/stm\/gui\/ui_texture\/tex000000\/tex000201_20_imlm4\.tex\./i;
+  /^natives\/stm\/gui\/ui_texture\/tex000000\/tex000201_(?:2|20)_imlm4\.tex\./i;
 const ATTRIBUTE_GAME_ICON_UVS_PATTERN =
   /^natives\/stm\/gui\/ui_texture\/tex000000\/uvs000201_2\.uvs\.8$/i;
 const ATTRIBUTE_RESOURCE_PATTERNS = [

@@ -34,7 +34,7 @@ export function useToolT(namespace: string): Translate {
   );
 }
 
-/** The host's active locale (`"es"` / `"en"`), used as an API query param. */
+/** The host's active locale (`"es"` / `"en"`), used for local catalog paths and API fallback data. */
 export function useLocale(): string {
   return useUiLocale();
 }
