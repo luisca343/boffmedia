@@ -115,4 +115,24 @@ describe("local MH Wilds catalog data", () => {
       pathKey: "1/2",
     });
   });
+
+  it("keeps standalone game weapons as roots when the game has no series link", () => {
+    const tree = buildLocalWeaponTree([
+      { ...weapon(70, undefined, [], "hunting-horn"), series: null },
+      { ...weapon(71, undefined, [], "hunting-horn"), series: null },
+      { ...weapon(86, undefined, [], "hunting-horn"), series: null },
+    ]);
+
+    expect(tree.treeByKind["hunting-horn"]).toHaveLength(3);
+    expect(tree.treeByKind["hunting-horn"].map((root) => root.id)).toEqual([
+      70,
+      71,
+      86,
+    ]);
+    expect(
+      tree.treeByKind["hunting-horn"].every(
+        (root) => root.children.length === 0,
+      ),
+    ).toBe(true);
+  });
 });

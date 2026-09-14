@@ -37,6 +37,7 @@ import {
   MonsterCard,
   MonsterRow,
   MonsterArt,
+  SPECIES,
   WeakCell,
   VulnRow,
   Tag2,
@@ -116,7 +117,11 @@ function localizedText(
   value: Record<string, string> | null | undefined,
   locale: string,
 ): string | null {
-  return value?.[locale] ?? value?.en ?? value?.es ?? value?.es419 ?? null;
+  const localized =
+    value?.[locale] ?? value?.[locale.replaceAll("-", "")] ?? value?.en;
+  return localized && !localized.includes("?")
+    ? localized
+    : (value?.es ?? value?.es419 ?? null);
 }
 
 function localizedAttributeLabel(
@@ -128,6 +133,7 @@ function localizedAttributeLabel(
 }
 
 export function BestiaryView() {
+  const locale = useLocale();
   const t = useToolT("tools.mhwilds.bestiary");
   const tAttr = useToolT("tools.mhwilds");
   const { monsters, loading, error } = useMonsters();
@@ -137,7 +143,7 @@ export function BestiaryView() {
   const [sort, setSort] = React.useState<Sort>("name");
   const [species, setSpecies] = React.useState<string | null>(null);
   const [element, setElement] = React.useState<string | null>(null);
-  const [kind, setKind] = React.useState<string | null>(null);
+  const [kind, setKind] = React.useState<string | null>("large");
   const [selId, setSelId] = React.useState<number | null>(null);
   const detailRef = React.useRef<HTMLDivElement>(null);
 
@@ -149,19 +155,28 @@ export function BestiaryView() {
   }, [monsters]);
 
   const elementList = React.useMemo(
-    () => MH_ELEMENT_KEYS.filter((key) => monsters.some((monster) => monster.weaknesses.some(
-      (w) => w.kind === "element" && normalizeAttributeKey(w.element) === key,
-    ))),
+    () =>
+      MH_ELEMENT_KEYS.filter((key) =>
+        monsters.some((monster) =>
+          monster.weaknesses.some(
+            (w) =>
+              w.kind === "element" && normalizeAttributeKey(w.element) === key,
+          ),
+        ),
+      ),
     [monsters],
   );
 
   const filtered = React.useMemo(() => {
     const nq = q.trim().toLowerCase();
     let out = monsters.filter((m) => {
+      const speciesName =
+        localizedText(m.localData?.identity?.speciesNames, locale) ?? m.species;
       if (
         nq &&
         !m.name.toLowerCase().includes(nq) &&
-        !m.species.toLowerCase().includes(nq)
+        !m.species.toLowerCase().includes(nq) &&
+        !speciesName.toLowerCase().includes(nq)
       )
         return false;
       if (species && m.species !== species) return false;
@@ -172,7 +187,7 @@ export function BestiaryView() {
           (w) =>
             w.kind === "element" &&
             normalizeAttributeKey(w.element) === element &&
-            (w.level ?? 0) >= 2,
+            (w.level ?? 0) > 0,
         )
       )
         return false;
@@ -184,7 +199,7 @@ export function BestiaryView() {
         : a.name.localeCompare(b.name),
     );
     return out;
-  }, [monsters, q, species, element, kind, sort]);
+  }, [monsters, q, species, element, kind, sort, locale]);
 
   // keep a valid selection
   React.useEffect(() => {
@@ -367,9 +382,7 @@ export function BestiaryView() {
 
             {/* ── detail ── */}
             <div ref={detailRef} className="min-w-0">
-              {selected ? (
-                <MonsterDetail m={selected} />
-              ) : null}
+              {selected ? <MonsterDetail m={selected} /> : null}
             </div>
           </div>
         )}
@@ -378,11 +391,7 @@ export function BestiaryView() {
   );
 }
 
-function MonsterDetail({
-  m,
-}: {
-  m: MhMonster;
-}) {
+function MonsterDetail({ m }: { m: MhMonster }) {
   const t = useToolT("tools.mhwilds.bestiary");
   const tAttr = useToolT("tools.mhwilds");
   const locale = useLocale();
@@ -434,8 +443,13 @@ function MonsterDetail({
     setSelectedPartType((current) => (current === partType ? null : partType));
   };
 
+  const speciesLabel =
+    localizedText(m.localData?.identity?.speciesNames, locale) ??
+    SPECIES[m.species]?.label ??
+    cap(m.species.replace(/-/g, " "));
+
   return (
-    <div className="p-[clamp(1rem,2.4vw,1.875rem)] flex flex-col gap-4 max-w-[62.5rem]">
+    <div className="w-full max-w-none p-[clamp(1rem,2.4vw,1.875rem)] flex flex-col gap-4">
       {/* header */}
       <div className="flex flex-wrap items-start gap-4">
         <MonsterArt
@@ -450,7 +464,7 @@ function MonsterDetail({
               {m.name}
             </h2>
             <Tag2 dot={`hsl(${(m.species.length * 47) % 360} 45% 60%)`}>
-              {cap(m.species)}
+              {speciesLabel}
             </Tag2>
             <Tag2>{m.kind === "large" ? t("kindLarge") : t("kindSmall")}</Tag2>
           </div>
@@ -483,6 +497,7 @@ function MonsterDetail({
         />
       )}
 
+      <div className="grid gap-4 2xl:grid-cols-[minmax(0,1fr)_minmax(20rem,24rem)] 2xl:items-start">
       {/* overview stats */}
       <MhPanel title={t("overview")} icon="target">
         <div className="flex flex-col">
@@ -563,7 +578,9 @@ function MonsterDetail({
         <MhPanel title={t("ailments")} icon="alert">
           <div className="flex flex-wrap gap-1.5">
             {ailments.map((a) => (
-              <Tag2 key={a} attribute={a}>{localizedAttributeLabel(a, tAttr)}</Tag2>
+              <Tag2 key={a} attribute={a}>
+                {localizedAttributeLabel(a, tAttr)}
+              </Tag2>
             ))}
           </div>
         </MhPanel>
@@ -583,6 +600,7 @@ function MonsterDetail({
           <BstNone>{t("noLocations")}</BstNone>
         )}
       </MhPanel>
+      </div>
 
       {/* drops */}
       <MhPanel
@@ -699,9 +717,7 @@ function DropItemIcon({
   const showImage = iconSrc != null && !failed;
   React.useEffect(() => setFailed(false), [iconSrc]);
   return (
-    <span
-      className="relative grid h-11 w-11 flex-none place-items-center"
-    >
+    <span className="relative grid h-11 w-11 flex-none place-items-center">
       {showImage ? (
         <img
           src={iconSrc}
@@ -1110,7 +1126,11 @@ function PartDamagePanel({
                 >
                   <span className="inline-flex items-center gap-1">
                     {column.group === "element" ? (
-                      <MhAttributeIcon type={String(column.key)} size={12} className="!h-3 !w-3" />
+                      <MhAttributeIcon
+                        type={String(column.key)}
+                        size={12}
+                        className="!h-3 !w-3"
+                      />
                     ) : (
                       <Icon name={column.icon} size={12} />
                     )}

@@ -2,10 +2,7 @@ import { useEffect, useState } from "react";
 import { useLocale, useToolT } from "../i18n";
 import { MhWildsService } from "../service";
 import { mhwildsBestiaryAsset, mhwildsManifestAsset } from "./assets";
-import {
-  ANATOMY_SLOT_ANCHORS,
-  anatomyCalloutTarget,
-} from "./anatomy-geometry";
+import { ANATOMY_SLOT_ANCHORS, anatomyCalloutTarget } from "./anatomy-geometry";
 import type {
   MhMonster,
   MhMonsterWeakness,
@@ -26,11 +23,14 @@ function normalizeName(value: string): string {
 function indexLocalVariants(data: MhWildsBestiaryData): {
   byFixedId: Map<number, MhWildsMonsterVariant>;
   byName: Map<string, MhWildsMonsterVariant>;
+  all: MhWildsMonsterVariant[];
 } {
   const byFixedId = new Map<number, MhWildsMonsterVariant>();
   const byName = new Map<string, MhWildsMonsterVariant>();
+  const all: MhWildsMonsterVariant[] = [];
   for (const monster of data.monsters) {
     for (const variant of monster.variants) {
+      all.push(variant);
       if (variant.identity?.fixedId != null)
         byFixedId.set(variant.identity.fixedId, variant);
       for (const name of Object.values(variant.identity?.names ?? {})) {
@@ -38,7 +38,76 @@ function indexLocalVariants(data: MhWildsBestiaryData): {
       }
     }
   }
-  return { byFixedId, byName };
+  return { byFixedId, byName, all };
+}
+
+function localizedValue(
+  value: Record<string, string> | null | undefined,
+  locale: string,
+): string {
+  return (
+    value?.[locale] ??
+    value?.[locale.replaceAll("-", "")] ??
+    value?.en ??
+    value?.es ??
+    value?.es419 ??
+    ""
+  );
+}
+
+function speciesSlug(value: string): string {
+  const slug = value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "");
+  return slug || "unknown";
+}
+
+function localMonsterId(fixedId: number): number {
+  return -2_000_000_000 - Math.abs(fixedId);
+}
+
+function localMonsterFromVariant(
+  variant: MhWildsMonsterVariant,
+  locale: string,
+  localAssetVersion?: string,
+): MhMonster | null {
+  const identity = variant.identity;
+  if (identity?.fixedId == null || !identity.names) return null;
+  const name = localizedValue(identity.names, locale);
+  if (!name) return null;
+  const localData = variant;
+  const monster: MhMonster = {
+    id: localMonsterId(identity.fixedId),
+    gameId: identity.fixedId,
+    kind: (identity.zakoIconType ?? 0) > 0 ? "small" : "large",
+    species: speciesSlug(localizedValue(identity.speciesNames, "en")),
+    name,
+    description: localizedValue(identity.descriptions, locale),
+    size: {},
+    ailments: [],
+    elements: [],
+    weaknesses: [],
+    resistances: [],
+    locations: [],
+    rewards: (variant.rewards ?? []).map((reward) => ({
+      ...reward,
+      item: {
+        ...reward.item,
+        name:
+          localizedValue(reward.item.localizedNames, locale) ||
+          reward.item.name,
+        description:
+          localizedValue(reward.item.localizedDescriptions, locale) ||
+          reward.item.description,
+      },
+    })),
+    localData,
+    localAssetVersion,
+  };
+  monster.weaknesses = mergeWeaknesses(monster, localData);
+  return monster;
 }
 
 function weaknessKey(weakness: MhMonsterWeakness): string {
@@ -77,7 +146,7 @@ function mergeWeaknesses(
     }),
   );
   const merged = new Map<string, MhMonsterWeakness>();
-  for (const weakness of [...apiWeaknesses, ...gameWeaknesses])
+  for (const weakness of [...gameWeaknesses, ...apiWeaknesses])
     merged.set(weaknessKey(weakness), weakness);
 
   // Some game reports do not set an element flag even though the in-game
@@ -144,14 +213,18 @@ function joinLocalData(
   monsters: MhMonster[],
   payload: LocalBestiaryPayload | null,
   overrides: MhWildsAnatomyOverride[] = [],
+  locale = "en",
 ): MhMonster[] {
   if (!payload) return monsters;
-  const { byFixedId, byName } = indexLocalVariants(payload.data);
-  return monsters.map((monster) => {
+  const { byFixedId, byName, all } = indexLocalVariants(payload.data);
+  const matchedFixedIds = new Set<number>();
+  const joined = monsters.map((monster) => {
     const localData =
       (monster.gameId != null ? byFixedId.get(monster.gameId) : undefined) ??
       byName.get(normalizeName(monster.name));
     if (!localData) return monster;
+    if (localData.identity?.fixedId != null)
+      matchedFixedIds.add(localData.identity.fixedId);
     const correctedLocalData = applyAnatomyOverrides(localData, overrides);
     return {
       ...monster,
@@ -160,6 +233,21 @@ function joinLocalData(
       weaknesses: mergeWeaknesses(monster, correctedLocalData),
     };
   });
+
+  // The public API catalogue is intentionally large-monster focused. Keep it
+  // as the authoritative source when a row exists, then append small monsters
+  // that only exist in the game pack so their reward tables are discoverable.
+  const localOnly = all
+    .filter(
+      (variant) =>
+        (variant.identity?.zakoIconType ?? 0) > 0 &&
+        variant.identity?.fixedId != null &&
+        !matchedFixedIds.has(variant.identity.fixedId),
+    )
+    .map((variant) => localMonsterFromVariant(variant, locale, payload.version))
+    .filter((monster): monster is MhMonster => monster !== null);
+
+  return [...joined, ...localOnly];
 }
 
 async function getLocalBestiaryData(): Promise<LocalBestiaryPayload | null> {
@@ -212,6 +300,7 @@ export function useMonsters() {
           Array.isArray(res.data) ? res.data : [],
           localData,
           overrides,
+          locale,
         ),
       );
       setError(null);

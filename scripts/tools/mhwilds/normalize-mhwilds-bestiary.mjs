@@ -97,6 +97,22 @@ const RECOMMENDED_ELEMENT_BITS = [
   [32, "dragon"],
 ];
 
+// EnemyRewardData uses 10 as "same source as the previous row". The values
+// below are the source categories used by the bestiary UI; unknown values are
+// kept as generic rewards instead of silently dropping an item.
+const REWARD_KIND_BY_TYPE = new Map([
+  [2, "carve"],
+  [3, "carve"],
+  [4, "reward"],
+  [5, "capture"],
+  [6, "reward"],
+  [7, "break"],
+  [8, "wound"],
+  [9, "reward"],
+  [810441920, "track"],
+  [911862272, "carve"],
+]);
+
 function printHelp() {
   console.log(`Usage: node scripts/tools/mhwilds/normalize-mhwilds-bestiary.mjs [options]
 
@@ -330,6 +346,23 @@ function buildMessageMap(filePath) {
   return new Map(entries.map((entry) => [entry.guid, localizedEntry(entry)]));
 }
 
+function buildNumberedMessageMap(filePath, prefix) {
+  const document = readOptionalJson(filePath);
+  const entries = document?.entries;
+  if (!Array.isArray(entries)) return new Map();
+  const result = new Map();
+  for (const entry of entries) {
+    const match =
+      typeof entry?.name === "string"
+        ? entry.name.match(new RegExp(`^${prefix}_(\\d+)$`, "i"))
+        : null;
+    if (!match) continue;
+    const value = localizedEntry(entry);
+    if (value) result.set(Number(match[1]), value);
+  }
+  return result;
+}
+
 function buildByNumber(values, field) {
   return new Map(
     (Array.isArray(values) ? values : [])
@@ -377,6 +410,21 @@ function listDecodedPartFiles(decodedDirectory) {
   return files;
 }
 
+function listDecodedRewardFiles(decodedDirectory) {
+  const directory = path.join(decodedDirectory, "monsters", "rewards");
+  if (!fs.existsSync(directory)) return new Map();
+
+  const files = new Map();
+  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
+    if (!entry.isFile()) continue;
+    const match = entry.name.match(/^((?:em)?\d+)_(\d+)_\d+\.json$/i);
+    if (!match) continue;
+    const id = normalizeMonsterId(match[1]);
+    files.set(`${id}_${match[2]}`, path.join(directory, entry.name));
+  }
+  return files;
+}
+
 function relativeAsset(asset) {
   if (typeof asset === "string") return asset;
   if (!asset || typeof asset !== "object") return null;
@@ -387,14 +435,13 @@ function relativeAsset(asset) {
   };
 }
 
-function normalizeAssets(variant) {
+function normalizeAssets(variant, fallbackVariants = []) {
   const assets = {};
-  for (const key of [
-    "icon",
-    "anatomy",
-    "anatomyPrefab",
-  ]) {
-    if (variant[key]) assets[key] = relativeAsset(variant[key]);
+  for (const key of ["icon", "anatomy", "anatomyPrefab"]) {
+    const asset =
+      variant[key] ||
+      fallbackVariants.find((candidate) => candidate[key])?.[key];
+    if (asset) assets[key] = relativeAsset(asset);
   }
   return assets;
 }
@@ -660,6 +707,102 @@ function normalizePartData(partsData, rewardsData, partTypes, partNames) {
   };
 }
 
+function itemFromGameRecord(item) {
+  if (!item || typeof item.game_id !== "number") return null;
+  const names = item.names && typeof item.names === "object" ? item.names : {};
+  const descriptions =
+    item.descriptions && typeof item.descriptions === "object"
+      ? item.descriptions
+      : {};
+  return {
+    id: item.game_id,
+    gameId: item.game_id,
+    rarity: numberOrNull(item.rarity) ?? 1,
+    name: names.es || names.en || `Item ${item.game_id}`,
+    description: descriptions.es || descriptions.en || "",
+    value: numberOrNull(item.sell_price) ?? 0,
+    carryLimit: numberOrNull(item.max_count) ?? 0,
+    recipes: Array.isArray(item.recipes) ? item.recipes : [],
+    localizedNames: names,
+    localizedDescriptions: descriptions,
+    icon: {
+      id: numberOrNull(item.icon_id),
+      kind: stringOrNull(item.icon),
+      color: stringOrNull(item.icon_color),
+      colorId: numberOrNull(item.icon_color_id),
+    },
+  };
+}
+
+function normalizeMonsterRewards(rows, itemsByGameId) {
+  if (!Array.isArray(rows)) return [];
+  const rewards = [];
+  let previousKind = "reward";
+
+  for (const [rowIndex, row] of rows.entries()) {
+    const rewardType = numberOrNull(row?._rewardType);
+    const kind =
+      rewardType === 10
+        ? previousKind
+        : REWARD_KIND_BY_TYPE.get(rewardType) || "reward";
+    if (rewardType !== 10) previousKind = kind;
+
+    const conditions = [];
+    const addCondition = (itemId, quantity, chance, sourceIndex) => {
+      const id = numberOrNull(itemId);
+      const amount = numberOrNull(quantity);
+      const probability = numberOrNull(chance);
+      const item = itemsByGameId.get(id);
+      if (id == null || id <= 0 || !item || amount == null || amount <= 0)
+        return;
+      if (probability == null || probability <= 0) return;
+      conditions.push({
+        kind,
+        quantity: amount,
+        chance: probability,
+        part: null,
+        id: -(rowIndex * 100 + sourceIndex + 1),
+      });
+    };
+
+    addCondition(
+      row?._IdStory,
+      row?._RewardNumStory,
+      row?._probabilityStory,
+      0,
+    );
+    const ids = Array.isArray(row?._IdEx) ? row._IdEx : [];
+    const quantities = Array.isArray(row?._RewardNumEx) ? row._RewardNumEx : [];
+    const probabilities = Array.isArray(row?._probabilityEx)
+      ? row._probabilityEx
+      : [];
+    for (let index = 0; index < ids.length; index += 1) {
+      addCondition(
+        ids[index],
+        quantities[index],
+        probabilities[index],
+        index + 1,
+      );
+    }
+
+    if (conditions.length === 0) continue;
+    const item = itemsByGameId.get(
+      conditions.length > 0
+        ? row?._IdStory > 0 && itemsByGameId.has(row._IdStory)
+          ? row._IdStory
+          : ids.find((id) => id > 0 && itemsByGameId.has(id))
+        : null,
+    );
+    if (!item) continue;
+    rewards.push({
+      id: -(rowIndex + 1),
+      item,
+      conditions,
+    });
+  }
+  return rewards;
+}
+
 function normalizePartTypeCatalog(rawTypes, partNames) {
   return (Array.isArray(rawTypes) ? rawTypes : [])
     .map((type) => ({
@@ -669,7 +812,14 @@ function normalizePartTypeCatalog(rawTypes, partNames) {
     .sort((a, b) => (a.type ?? 0) - (b.type ?? 0));
 }
 
-function buildIdentity(id, variant, emIds, enemyData, enemyNames) {
+function buildIdentity(
+  id,
+  variant,
+  emIds,
+  enemyData,
+  enemyNames,
+  speciesNames,
+) {
   const enumPrefix = `${id.toUpperCase()}_${variant}_`;
   const enumRecord = emIds.find(
     (entry) =>
@@ -683,6 +833,8 @@ function buildIdentity(id, variant, emIds, enemyData, enemyNames) {
   return {
     enumName: enumRecord?._EnumName || null,
     fixedId: numberOrNull(fixedId),
+    speciesIndex: numberOrNull(data?._Species),
+    speciesNames: speciesNames.get(data?._Species) || null,
     nameGuid: stringOrNull(data?._EnemyName),
     descriptionGuid: stringOrNull(data?._EnemyExp),
     names: enemyNames.get(data?._EnemyName) || null,
@@ -691,6 +843,8 @@ function buildIdentity(id, variant, emIds, enemyData, enemyNames) {
     frenzyNames: enemyNames.get(data?._EnemyFrenzyName) || null,
     legendaryNames: enemyNames.get(data?._EnemyLegendaryName) || null,
     bossIconType: numberOrNull(data?._BossIconType),
+    zakoIconType: numberOrNull(data?._ZakoIconType),
+    animalIconType: numberOrNull(data?._AnimalIconType),
   };
 }
 
@@ -745,6 +899,12 @@ async function main() {
     "msg",
     "EnemyText.json",
   );
+  const enemySpeciesNamePath = path.join(
+    decodedDirectory,
+    "..",
+    "msg",
+    "EnemySpeciesName.json",
+  );
   const breakTypeNamesPath = path.join(
     decodedDirectory,
     "..",
@@ -758,6 +918,10 @@ async function main() {
   const enemyData = readJson(enemyDataPath, "EnemyData");
   const partNames = buildMessageMap(partNamesPath);
   const enemyNames = buildMessageMap(enemyTextPath);
+  const speciesNames = buildNumberedMessageMap(
+    enemySpeciesNamePath,
+    "EnemySpeciesName",
+  );
   const breakTypeNames = buildMessageMap(breakTypeNamesPath);
   const rawBreakTypes =
     readOptionalJson(
@@ -792,6 +956,16 @@ async function main() {
   );
   const bossDataByFixedId = buildByNumber(rawBossData, "_EmID");
   const decodedFiles = listDecodedPartFiles(decodedDirectory);
+  const decodedRewardFiles = listDecodedRewardFiles(decodedDirectory);
+  const itemRecords = readOptionalJson(
+    path.join(decodedDirectory, "..", "merged", "Item.json"),
+  );
+  const itemsByGameId = new Map(
+    (Array.isArray(itemRecords) ? itemRecords : [])
+      .map(itemFromGameRecord)
+      .filter(Boolean)
+      .map((item) => [item.gameId, item]),
+  );
   const selectedIds = new Set(args.monsters);
   const selectedMonsters = index.monsters.filter(
     (monster) => selectedIds.size === 0 || selectedIds.has(monster.id),
@@ -813,6 +987,21 @@ async function main() {
     const variants = [];
     for (const indexedVariant of monster.variants || []) {
       const key = `${monster.id}_${indexedVariant.id}`;
+      const identity = buildIdentity(
+        monster.id,
+        indexedVariant.id,
+        emIds,
+        enemyData,
+        enemyNames,
+        speciesNames,
+      );
+      // EnemyData also contains endemic fauna. Only boss/zako icon entries
+      // are bestiary monsters; the latter is the game's small-monster flag.
+      if (
+        !identity ||
+        ((identity.bossIconType ?? 0) <= 0 && (identity.zakoIconType ?? 0) <= 0)
+      )
+        continue;
       const decoded = decodedFiles.get(key) || {};
       const data = decoded.parts
         ? normalizePartData(
@@ -824,13 +1013,6 @@ async function main() {
         : null;
       if (indexedVariant.partData?.parts && !data) missingParts += 1;
 
-      const identity = buildIdentity(
-        monster.id,
-        indexedVariant.id,
-        emIds,
-        enemyData,
-        enemyNames,
-      );
       const rawAnatomyLayout = anatomyByFixedId.get(identity?.fixedId);
       for (const slot of unknownAnatomySlots(rawAnatomyLayout))
         unknownAnatomySlotKeys.add(slot);
@@ -860,20 +1042,30 @@ async function main() {
       );
       if (elementalWeaknesses.length > 0) weaknessMapVariants += 1;
       if (recommended.elements.length > 0) recommendationVariants += 1;
+      const rewardFile = decodedRewardFiles.get(key);
+      const rewards = rewardFile
+        ? normalizeMonsterRewards(readJson(rewardFile), itemsByGameId)
+        : [];
 
       variants.push({
         id: indexedVariant.id,
         identity,
         assets: Object.fromEntries(
-          Object.entries(normalizeAssets(indexedVariant)).map(
-            ([assetKey, asset]) => [
-              assetKey,
-              typeof asset === "object"
-                ? copyAssetRecord(asset, assetsDirectory)
-                : asset,
-            ],
-          ),
+          Object.entries(
+            normalizeAssets(
+              indexedVariant,
+              (monster.variants || []).filter(
+                (candidate) => candidate.id !== indexedVariant.id,
+              ),
+            ),
+          ).map(([assetKey, asset]) => [
+            assetKey,
+            typeof asset === "object"
+              ? copyAssetRecord(asset, assetsDirectory)
+              : asset,
+          ]),
         ),
+        rewards,
         report: {
           anatomyLayout,
           hiddenPartType: numberOrNull(meatDisplay?._HiddenParts),
@@ -885,7 +1077,7 @@ async function main() {
         decodedFiles: Object.keys(decoded).sort(),
       });
     }
-    monsters.push({ id: monster.id, variants });
+    if (variants.length > 0) monsters.push({ id: monster.id, variants });
   }
 
   const result = {
@@ -901,6 +1093,7 @@ async function main() {
         "EnemyWeakAttrData.user.3",
         "EnemyReportBossData.user.3:_RecoAttributeBit",
       ],
+      rewardTables: ["Common/Enemy/Em*_*_*.user.3"],
       note: "Generated from a locally owned game installation. Do not commit or redistribute game-owned assets without clearance.",
     },
     partTypes: normalizePartTypeCatalog(rawPartTypes, partNames),

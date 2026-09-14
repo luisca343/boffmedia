@@ -7,12 +7,12 @@
  * repository owns the selection, merge, provenance and output layout; the
  * small RETool-compatible executable does the proprietary PAK decoding.
  *
- * The default selection is intentionally narrow.  It extracts the game's own
+ * The default selection is intentionally narrow. It extracts the game's own
  * bestiary icons, anatomy diagrams, shared equipment thumbnails,
- * attribute/ailment presentation resources, their prefabs, and the
- * report/part data that maps those resources to enemy ids. It does not
- * extract the full game or monster meshes unless an explicit --include
- * pattern is supplied.
+ * attribute/ailment presentation resources, weapon catalog/tree tables,
+ * their prefabs, and the report/part data that maps those resources to enemy
+ * ids. It does not extract the full game or monster meshes unless an explicit
+ * --include pattern is supplied.
  *
  * Local output is ignored by git (`laboon/`), because these are game-owned
  * assets and must never accidentally enter the source repository.
@@ -66,6 +66,11 @@ const CONVERTER_URL =
 const TOOL_VERSION = 5;
 const PER_MONSTER_PART_DATA_PATTERN =
   /^natives\/stm\/gamedesign\/enemy\/em\d+\/\d+\/data\/em\d+_\d+_param_parts(?:breakreward|effect|lost)?\.user\.3$/i;
+// Small monsters do not have Hunter's Manual anatomy/parts files, but their
+// carve/reward tables live in the shared enemy directory. Keep these rows in
+// the same extraction index so the normalizer can publish their drops.
+const PER_MONSTER_REWARD_DATA_PATTERN =
+  /^natives\/stm\/gamedesign\/common\/enemy\/em\d+_\d+_\d+\.user\.3$/i;
 const ITEM_THUMBNAIL_PATTERN =
   /^natives\/stm\/gui\/ui_texture\/tex080000\/tex_thumbnail\/item\/it\d+\/tex_it\d+_.+_imlm4\.tex\./i;
 const ARMOR_THUMBNAIL_PATTERN =
@@ -105,6 +110,15 @@ const ATTRIBUTE_GAME_ICON_ATLAS_PATTERN =
   /^natives\/stm\/gui\/ui_texture\/tex000000\/tex000201_(?:2|20)_imlm4\.tex\./i;
 const ATTRIBUTE_GAME_ICON_UVS_PATTERN =
   /^natives\/stm\/gui\/ui_texture\/tex000000\/uvs000201_2\.uvs\.8$/i;
+// Equipment catalogs are decoded separately from the bestiary normalizer, but
+// they must travel through the same extraction workspace so a title update can
+// refresh the weapon tree from the installed game files. Keep this explicit:
+// broad Common/Weapon globs also pick up binary assets that are not catalog
+// inputs and make the update unnecessarily large.
+const WEAPON_DATA_PATTERN =
+  /^natives\/stm\/gamedesign\/(?:common\/equip\/(?:rodinsectrecipedata|weaponseriesdata)|common\/weapon\/(?:bow|bowrecipe|bowtree|chargeaxe|chargeaxerecipe|chargeaxetree|gunlance|gunlancerecipe|gunlancetree|hammer|hammerrecipe|hammertree|heavybowgun|heavybowgunrecipe|heavybowguntree|lance|lancerecipe|lancetree|lightbowgun|lightbowgunrecipe|lightbowguntree|longsword|longswordrecipe|longswordtree|rod|rodinsectdata|rodrecipe|rodtree|shortsword|shortswordrecipe|shortswordtree|slashaxe|slashaxerecipe|slashaxetree|tachi|tachirecipe|tachitree|twinsword|twinswordrecipe|twinswordtree|whistle|whistlerecipe|whistletree)|player\/enummaker\/(?:weaponseries|weapon\/(?:bow|chargeaxe|gunlance|hammer|heavybowgun|lance|lightbowgun|longsword|rod|shortsword|slashaxe|tachi|twinsword|whistle)id)|player\/actiondata\/wp05\/userdata\/.+)\.user\.3$/i;
+const WEAPON_MESSAGE_PATTERN =
+  /^natives\/stm\/gamedesign\/text\/(?:excel_equip\/(?:bow|chargeaxe|gunlance|hammer|heavybowgun|lance|lightbowgun|longsword|rod|rodinsect|shortsword|slashaxe|tachi|twinsword|weaponseries|whistle)|excel_action\/(?:hibikidatatext_wp05|highfreqdatatext_wp05|musicskilldatatext_wp05))\.msg\.23$/i;
 const ATTRIBUTE_RESOURCE_PATTERNS = [
   ATTRIBUTE_DATA_PATTERN,
   ATTRIBUTE_STATUS_UI_PATTERN,
@@ -116,7 +130,16 @@ const ATTRIBUTE_RESOURCE_PATTERNS = [
   ATTRIBUTE_GAME_ICON_UVS_PATTERN,
 ];
 function isAttributeResourcePath(archivePath) {
-  return ATTRIBUTE_RESOURCE_PATTERNS.some((pattern) => pattern.test(archivePath));
+  return ATTRIBUTE_RESOURCE_PATTERNS.some((pattern) =>
+    pattern.test(archivePath),
+  );
+}
+
+function isWeaponResourcePath(archivePath) {
+  return (
+    WEAPON_DATA_PATTERN.test(archivePath) ||
+    WEAPON_MESSAGE_PATTERN.test(archivePath)
+  );
 }
 const VISUAL_ID_COUNT = 10_000;
 const WEAPON_KIND_TO_THUMBNAIL_FAMILY = Object.freeze({
@@ -163,6 +186,7 @@ const DEFAULT_PATTERNS = [
   ARMOR_THUMBNAIL_PATTERN,
   /^natives\/stm\/gamedesign\/gui\/common\/_prefab\/enemyreportbossanatomytexture\/.*\.pfb\./i,
   PER_MONSTER_PART_DATA_PATTERN,
+  PER_MONSTER_REWARD_DATA_PATTERN,
   /^natives\/stm\/gamedesign\/common\/enemy\/enemyreport(?:anatomypartsbreakdata|anatomypartsrewarddata|bossdata|bossmaterialdispdata|bossreleasedata|bosstitledata|partsbreaktypedata)\.user\.3$/i,
   /^natives\/stm\/gamedesign\/common\/enemy\/enemyreportmeatdisplaydata\.user\.3$/i,
   /^natives\/stm\/gamedesign\/enemy\/commondata\/data\/enemyweakattrdata\.user\.3$/i,
@@ -187,13 +211,16 @@ const DEFAULT_PATTERNS = [
   ATTRIBUTE_ICON_UVS_PATTERN,
   ATTRIBUTE_GAME_ICON_ATLAS_PATTERN,
   ATTRIBUTE_GAME_ICON_UVS_PATTERN,
+  WEAPON_DATA_PATTERN,
+  WEAPON_MESSAGE_PATTERN,
 ];
 
 function printHelp() {
   console.log(`Usage: node scripts/tools/mhwilds/extract-mhwilds-assets.mjs [options]
 
 Extract the game's bestiary icons, anatomy textures, shared item thumbnails,
-and attribute/ailment presentation resources into the ignored local tree under
+weapon catalog/tree tables, and attribute/ailment presentation resources into
+the ignored local tree under
 laboon/tool-sources/mhwilds/extracted/bestiary. The output also contains
 index.json for asset lookup and manifest.json for provenance.
 
@@ -388,6 +415,13 @@ function getMonsterVariant(archivePath) {
     return { id: dataPath[1].toLowerCase(), variant: dataPath[2] };
   }
 
+  const rewardPath = archivePath.match(
+    /\/common\/enemy\/(em\d+)_(\d+)_\d+\.user\.3$/i,
+  );
+  if (rewardPath) {
+    return { id: rewardPath[1].toLowerCase(), variant: rewardPath[2] };
+  }
+
   const assetPath = archivePath.match(/_(em\d+)_(\d+)_/i);
   if (assetPath) {
     return { id: assetPath[1].toLowerCase(), variant: assetPath[2] };
@@ -401,6 +435,7 @@ function isSharedDataPath(archivePath) {
     /^natives\/stm\/gamedesign\/common\/enemy\/(?:enemyreport|enemydata|enemypartstypedata)/i.test(
       archivePath,
     ) ||
+    PER_MONSTER_REWARD_DATA_PATTERN.test(archivePath) ||
     isAttributeResourcePath(archivePath) ||
     /^natives\/stm\/gamedesign\/enemy\/commondata\/data\/enemyweakattrdata\.user\.3$/i.test(
       archivePath,
@@ -418,6 +453,7 @@ function isSharedDataPath(archivePath) {
     /^natives\/stm\/gamedesign\/common\/equip\/armorseriesdata\.user\.3$/i.test(
       archivePath,
     ) ||
+    isWeaponResourcePath(archivePath) ||
     /^natives\/stm\/gamedesign\/catalog\/[^/]+\/data\/playerarmorlist(?:_[^/]+)?\.user\.3$/i.test(
       archivePath,
     ) ||
@@ -702,6 +738,113 @@ function buildVisualDiscoveryCandidates(listedPaths, requestedIds = []) {
     for (const id of ids) candidates.add(template.replace("{id}", id));
   }
   return { templates, ids, candidates: [...candidates].sort() };
+}
+
+function buildMonsterDataDiscoveryCandidates(visualPaths) {
+  const variants = new Set();
+  for (const archivePath of visualPaths) {
+    const monster = getMonsterVariant(archivePath);
+    if (monster) variants.add(`${monster.id}_${monster.variant}`);
+  }
+
+  const candidates = new Set();
+  for (const key of variants) {
+    const [id, variant] = key.split("_");
+    for (const kind of [
+      "parts",
+      "partsbreakreward",
+      "partseffect",
+      "partslost",
+    ])
+      candidates.add(
+        `natives/stm/gamedesign/enemy/${id}/${variant}/data/${id}_${variant}_param_${kind}.user.3`,
+      );
+    candidates.add(
+      `natives/stm/gamedesign/gui/common/_prefab/enemyreportbossanatomytexture/enemyreportbossanatomy_${id}_${variant}_0.pfb.18`,
+    );
+    for (let suffix = 0; suffix <= 9; suffix += 1)
+      candidates.add(
+        `natives/stm/gamedesign/common/enemy/${id}_${variant}_${suffix}.user.3`,
+      );
+  }
+  return [...candidates].sort();
+}
+
+function isMonsterDataDiscoveryPath(archivePath) {
+  return (
+    PER_MONSTER_PART_DATA_PATTERN.test(archivePath) ||
+    PER_MONSTER_REWARD_DATA_PATTERN.test(archivePath) ||
+    /^natives\/stm\/gamedesign\/gui\/common\/_prefab\/enemyreportbossanatomytexture\/.*\.pfb\./i.test(
+      archivePath,
+    )
+  );
+}
+
+function discoverMonsterDataPaths(paks, extractor, visualPaths) {
+  const candidates = buildMonsterDataDiscoveryCandidates(visualPaths);
+  const discoveryPaks = paks.filter(isUsablePak);
+  const discovered = new Set();
+  const matchedPaks = [];
+  const warnings = [];
+  const workDirectory = fs.mkdtempSync(
+    path.join(os.tmpdir(), "mhwilds-monster-data-discovery-"),
+  );
+  const candidateList = path.join(
+    workDirectory,
+    "monster-data-candidates.list",
+  );
+  fs.writeFileSync(candidateList, `${candidates.join("\n")}\n`, "utf8");
+
+  try {
+    for (const pak of discoveryPaks) {
+      const result = spawnSync(
+        extractor,
+        ["-h", candidateList, "-l", "-trimList", pak],
+        {
+          cwd: workDirectory,
+          stdio: "ignore",
+          windowsHide: true,
+        },
+      );
+      if (result.error) {
+        warnings.push(`${path.basename(pak)}: ${result.error.message}`);
+      } else if (result.status !== 0 && result.status !== 1) {
+        warnings.push(
+          `${path.basename(pak)}: RETool exited with ${result.status}`,
+        );
+      }
+
+      const trimmedList = path.join(workDirectory, "trimmed.list");
+      if (fs.existsSync(trimmedList)) {
+        const matches = readListedPaths(trimmedList).filter(
+          isMonsterDataDiscoveryPath,
+        );
+        for (const archivePath of matches) discovered.add(archivePath);
+        if (matches.length)
+          matchedPaks.push({
+            pak: path.basename(pak),
+            paths: [...new Set(matches)].sort(),
+          });
+        fs.rmSync(trimmedList, { force: true });
+      }
+
+      for (const entry of fs.readdirSync(workDirectory)) {
+        if (!entry.toLowerCase().endsWith(".txt")) continue;
+        fs.rmSync(path.join(workDirectory, entry), { force: true });
+      }
+    }
+  } finally {
+    fs.rmSync(workDirectory, { recursive: true, force: true });
+  }
+
+  return {
+    enabled: true,
+    paks: discoveryPaks.map((pak) => path.basename(pak)),
+    candidateCount: candidates.length,
+    paths: [...discovered].sort(),
+    matchedPaks,
+    warnings,
+  };
 }
 
 function isUsablePak(pak) {
@@ -1416,6 +1559,16 @@ function buildAssetIndex(outputDirectory, extractedFiles, converted) {
       variant.partData ??= {};
       variant.partData[kind] = filePath;
     }
+
+    const rewardDataMatch = filePath.match(
+      /\/common\/enemy\/(em\d+)_(\d+)_\d+\.user\.3$/i,
+    );
+    if (rewardDataMatch) {
+      ensureVariant(
+        rewardDataMatch[1].toLowerCase(),
+        rewardDataMatch[2],
+      ).rewardData = filePath;
+    }
   }
 
   const monsters = [...monsterMap.values()]
@@ -1551,6 +1704,21 @@ async function main() {
         matchedPaks: [],
         warnings: [],
       };
+  const monsterDataDiscovery = args.discover
+    ? discoverMonsterDataPaths(paks, extractor, [
+        ...listedPaths.filter((archivePath) =>
+          VISUAL_TEXTURE_PATH_PATTERN.test(archivePath),
+        ),
+        ...discovery.paths,
+      ])
+    : {
+        enabled: false,
+        paks: [],
+        candidateCount: 0,
+        paths: [],
+        matchedPaks: [],
+        warnings: [],
+      };
   const armorDiscovery = args.discover
     ? discoverArmorThumbnailPaths(fileList, paks, extractor)
     : {
@@ -1602,6 +1770,19 @@ async function main() {
     for (const warning of gearDiscovery.warnings)
       console.warn(`[mhwilds-extract] gear-discovery warning: ${warning}`);
   }
+  if (monsterDataDiscovery.enabled) {
+    console.log(
+      `[mhwilds-extract] monster-data-discovery=paks:${monsterDataDiscovery.paks.length} candidates:${monsterDataDiscovery.candidateCount} matches:${monsterDataDiscovery.paths.length}`,
+    );
+    for (const match of monsterDataDiscovery.matchedPaks)
+      console.log(
+        `[mhwilds-extract] monster-data-discovery ${match.pak}: ${match.paths.join(", ")}`,
+      );
+    for (const warning of monsterDataDiscovery.warnings)
+      console.warn(
+        `[mhwilds-extract] monster-data-discovery warning: ${warning}`,
+      );
+  }
   if (armorDiscovery.enabled) {
     console.log(
       `[mhwilds-extract] armor-discovery=paks:${armorDiscovery.paks.length} models:${armorDiscovery.modelIds.length} candidates:${armorDiscovery.candidateCount} matches:${armorDiscovery.paths.length} unmatched-models:${armorDiscovery.unmatchedModelIds.length}`,
@@ -1643,6 +1824,7 @@ async function main() {
   const selectedPaths = readSelectedPaths(listedPaths, args, [
     ...discovery.paths,
     ...gearDiscovery.paths,
+    ...monsterDataDiscovery.paths,
     ...armorDiscovery.paths,
     ...armorCatalogDiscovery.paths,
   ]);
@@ -1751,6 +1933,7 @@ async function main() {
       excludes: args.excludes.map((pattern) => pattern.source),
       discovery,
       gearDiscovery,
+      monsterDataDiscovery,
       armorDiscovery,
       armorCatalogDiscovery,
       paths: selectedPaths,

@@ -40,6 +40,13 @@ readable paths based on their English game names, for example
 Repeated names receive deterministic `-variant-##` suffixes; stable game ids
 remain the only identity keys.
 
+Artian and Gogmazios/Onyx weapons are standalone forge records in the game:
+they are not present in a weapon `Tree` row, so the decoder correctly emits no
+series, parent, or branches for them. The client treats records without an
+in-catalog previous weapon as roots, which keeps these isolated weapons in the
+weapon-tree view instead of inventing a progression link that the game does
+not have.
+
 ## Initial setup
 
 The following local prerequisites are already prepared on the development

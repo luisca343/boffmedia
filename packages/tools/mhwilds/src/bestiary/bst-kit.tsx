@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useToolT } from "../i18n";
+import { useLocale, useToolT } from "../i18n";
 import { cn } from "@boffmedia/ui/cn";
 import { Icon, type IconName } from "@boffmedia/ui";
 import {
@@ -63,12 +63,18 @@ export const SPECIES: Record<
   { label: string; icon: IconName; hue: number }
 > = {
   "flying-wyvern": { label: "Wyvern volador", icon: "flame", hue: 8 },
-  "brute-wyvern": { label: "Wyvern bruto", icon: "axe", hue: 24 },
-  "fanged-wyvern": { label: "Wyvern colmillo", icon: "bolt", hue: 48 },
-  "fanged-beast": { label: "Bestia colmillo", icon: "paw", hue: 210 },
-  temnoceran: { label: "Temnóceros", icon: "puzzle", hue: 280 },
+  "bird-wyvern": { label: "Wyvern pájaro", icon: "flame", hue: 12 },
+  "brute-wyvern": { label: "Wyvern brutal", icon: "axe", hue: 24 },
+  "fanged-wyvern": { label: "Wyvern de colmillos", icon: "bolt", hue: 48 },
+  "fanged-beast": { label: "Bestia de colmillos", icon: "paw", hue: 210 },
+  amphibian: { label: "Anfibio", icon: "paw", hue: 160 },
+  cephalopod: { label: "Cefalópodo", icon: "paw", hue: 300 },
+  construct: { label: "Constructo", icon: "axe", hue: 90 },
+  "demi-elder": { label: "Semianciano", icon: "sparkles", hue: 250 },
+  temnoceran: { label: "Temnoceran", icon: "puzzle", hue: 280 },
   leviathan: { label: "Leviatán", icon: "target", hue: 190 },
   "elder-dragon": { label: "Dragón anciano", icon: "sparkles", hue: 270 },
+  machine: { label: "Máquina", icon: "axe", hue: 110 },
   wraith: { label: "Wyvern guardián", icon: "sword", hue: 340 },
 };
 
@@ -86,6 +92,31 @@ function speciesMeta(species: string): {
   );
 }
 
+function localizedSpeciesLabel(
+  monster: MhMonster,
+  locale: string,
+): string | null {
+  const names = monster.localData?.identity?.speciesNames;
+  const label =
+    names?.[locale] ??
+    names?.[locale.replaceAll("-", "")] ??
+    names?.en ??
+    names?.es ??
+    names?.es419 ??
+    null;
+  return label && !label.includes("?") ? label : null;
+}
+
+function monsterAssetSlug(value: string): string {
+  return value
+    .trim()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/gu, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 export function MonsterArt({
   monster,
   alt = "",
@@ -98,8 +129,12 @@ export function MonsterArt({
   fit?: "contain" | "cover";
 }) {
   const species = speciesMeta(monster.species);
-  const icon = monster.localData?.assets?.icon?.png;
-  const image = icon;
+  const imagePath =
+    monster.localData?.assets?.icon?.png ??
+    `monsters/${monsterAssetSlug(monster.name)}/icon.png`;
+  const [imageFailed, setImageFailed] = React.useState(false);
+  React.useEffect(() => setImageFailed(false), [imagePath]);
+  const image = imageFailed ? null : imagePath;
   return (
     <span
       className={cn(
@@ -116,6 +151,7 @@ export function MonsterArt({
               "relative z-[1] block h-full w-full",
               fit === "cover" ? "object-cover" : "object-contain p-1",
             )}
+            onError={() => setImageFailed(true)}
           />
         </>
       ) : (
@@ -205,9 +241,11 @@ export function MhThreatBadge({
 /* ── species tag ────────────────────────────────────────────────────────────── */
 export function MhSpeciesTag({
   species,
+  label,
   icon = true,
 }: {
   species: string;
+  label?: string | null;
   icon?: boolean;
 }) {
   const s = speciesMeta(species);
@@ -221,7 +259,7 @@ export function MhSpeciesTag({
       }}
     >
       {icon && <Icon name={s.icon} size={12} />}
-      {s.label}
+      {label ?? s.label}
     </span>
   );
 }
@@ -246,7 +284,11 @@ export function MhElemBadge({
         muted && "opacity-45",
       )}
     >
-      <MhAttributeIcon type={element} size={13} style={{ filter: `drop-shadow(0 0 5px ${color})` }} />
+      <MhAttributeIcon
+        type={element}
+        size={13}
+        style={{ filter: `drop-shadow(0 0 5px ${color})` }}
+      />
       <span>{label}</span>
       {stars != null && <MhStars value={stars} max={3} />}
     </span>
@@ -301,7 +343,9 @@ export function MonsterCard({
 }) {
   const t = useToolT("tools.mhwilds.bestiary");
   const tAttr = useToolT("tools.mhwilds");
+  const locale = useLocale();
   const s = speciesMeta(m.species);
+  const speciesLabel = localizedSpeciesLabel(m, locale);
   const top = topWeaknesses(m).slice(0, 3);
   return (
     <button
@@ -348,7 +392,7 @@ export function MonsterCard({
           </div>
         )}
         <div className="flex items-center justify-between gap-1.5 mt-[0.4375rem]">
-          <MhSpeciesTag species={m.species} />
+          <MhSpeciesTag species={m.species} label={speciesLabel} />
           <span className="inline-flex gap-[3px]">
             {top.map((w) => (
               <MhAttributeIcon
@@ -377,7 +421,9 @@ export function MonsterRow({
 }) {
   const t = useToolT("tools.mhwilds.bestiary");
   const tAttr = useToolT("tools.mhwilds");
+  const locale = useLocale();
   const s = speciesMeta(m.species);
+  const speciesLabel = localizedSpeciesLabel(m, locale);
   const top = topWeaknesses(m).slice(0, 3);
   const tc =
     m.threat != null ? (THREAT[m.threat]?.color ?? "var(--mh)") : "var(--mh)";
@@ -410,7 +456,7 @@ export function MonsterRow({
           )}
         </span>
         <span className="block font-mono text-[0.625rem] font-medium leading-[1.2] text-txt-dim truncate">
-          {s.label}
+          {speciesLabel ?? s.label}
           {m.locations[0] ? ` · ${m.locations[0].name}` : ""}
         </span>
       </span>
@@ -455,7 +501,11 @@ export function WeakCell({ w, best }: { w: MhMonsterWeakness; best: boolean }) {
           : {}),
       }}
     >
-      <MhAttributeIcon type={w.element ?? w.status ?? w.effect} size={13} muted={immune} />
+      <MhAttributeIcon
+        type={w.element ?? w.status ?? w.effect}
+        size={13}
+        muted={immune}
+      />
       <span className="font-mono text-[0.75rem] text-txt capitalize">
         {label}
       </span>

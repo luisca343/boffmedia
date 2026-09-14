@@ -32,6 +32,9 @@ export interface Item {
   value: number;
   carryLimit: number;
   recipes: any[]; // Could be more specific if we have recipe details
+  /** Full game-file names used when a local pack is displayed in another locale. */
+  localizedNames?: Record<string, string>;
+  localizedDescriptions?: Record<string, string>;
   /** Semantic icon metadata used by the generated item-asset manifest. */
   icon?: {
     id?: number;
@@ -216,7 +219,8 @@ export interface Weapon {
   defense?: number | DefenseData; // For backward compatibility
   attack?: number; // For backward compatibility
   crafting?: WeaponCrafting;
-  series?: { id: number | string; gameId?: number; name?: string };
+  /** Standalone game records (for example Artian/Gogmazios weapons) have no series. */
+  series?: { id: number | string; gameId?: number; name?: string } | null;
   imageUrl?: string;
   /** Local game raster resolved from the generated gear manifest. */
   localAssetPath?: string | null;
@@ -396,10 +400,10 @@ export interface WeaponTreeData {
 }
 // ── Bestiary / monsters (wilds.mhdb.io/{locale}/monsters via the API proxy) ──
 export interface MhMonsterSize {
-  base: number;
-  mini: number;
-  silver: number;
-  gold: number;
+  base?: number;
+  mini?: number;
+  silver?: number;
+  gold?: number;
 }
 export interface MhMonsterWeakness {
   kind: "element" | "status" | "effect" | string;
@@ -540,8 +544,13 @@ export interface MhWildsMonsterVariant {
   identity?: {
     enumName?: string;
     fixedId?: number;
+    speciesIndex?: number;
+    speciesNames?: MhLocalizedText;
     names?: MhLocalizedText;
     descriptions?: MhLocalizedText;
+    bossIconType?: number | null;
+    zakoIconType?: number | null;
+    animalIconType?: number | null;
   } | null;
   assets?: {
     icon?: MhWildsAssetFile;
@@ -563,6 +572,7 @@ export interface MhWildsMonsterVariant {
     parts: MhWildsPartData[];
     breaks?: MhWildsBreakData[];
   } | null;
+  rewards?: MhMonsterReward[];
 }
 
 export interface MhWildsBestiaryData {

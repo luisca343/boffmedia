@@ -33,6 +33,15 @@ files = [
     "Enemy/Em*/*/Data/Em*_Param_PartsBreakReward.user.3",
 ]
 
+# Small monsters do not have anatomy reports, but their game-owned carve and
+# reward rows are stored beside EnemyData under Common/Enemy. The normalizer
+# joins these rows to EmID/EnemyData and publishes them as drop-only entries.
+[[user.targets]]
+output_prefix = "monsters/rewards"
+files = [
+    "Common/Enemy/Em*_*_*.user.3",
+]
+
 [[user.targets]]
 output_prefix = "monsters/report"
 files = [
@@ -52,6 +61,28 @@ output_prefix = "monsters/"
 files = [
     "Enemy/CommonData/Data/EnemyWeakAttrData.user.3",
 ]
+
+# Keep the game-owned weapon/tree tables in the decoder output as well for the
+# local catalog extraction/merge workflow; the bestiary normalizer ignores
+# this additional output.
+[[user.targets]]
+output_prefix = "weapons/"
+files = [
+    "Common/Equip/RodInsectRecipeData.user.3",
+    "Common/Equip/WeaponSeriesData.user.3",
+    "Common/Weapon/*.user.3",
+    "Player/ActionData/Wp05/UserData/*.user.3",
+    "Player/EnumMaker/WeaponSeries.user.3",
+    "Player/EnumMaker/Weapon/*.user.3",
+]
+
+[[user.targets.transform]]
+match = "(?i)Tree.user.3$"
+rsz = [2, 4]
+
+[[user.targets.transform]]
+match = "(?i)WeaponSeries.user.3$"
+rsz = [0]
 
 # Element/status ids and the game's status UI metadata. The UI glyphs are
 # backed by the extracted icon font/atlas selected by the asset extractor;
@@ -118,4 +149,27 @@ files = [
     "Excel_Data/EnemySpeciesName.msg.23",
     "Excel_Data/EnemyText.msg.23",
     "Reference/RefStatus.msg.23",
+]
+
+[[msg.targets]]
+files = [
+    "Excel_Equip/Bow.msg.23",
+    "Excel_Equip/ChargeAxe.msg.23",
+    "Excel_Equip/GunLance.msg.23",
+    "Excel_Equip/Hammer.msg.23",
+    "Excel_Equip/HeavyBowgun.msg.23",
+    "Excel_Equip/Lance.msg.23",
+    "Excel_Equip/LightBowgun.msg.23",
+    "Excel_Equip/LongSword.msg.23",
+    "Excel_Equip/Rod.msg.23",
+    "Excel_Equip/RodInsect.msg.23",
+    "Excel_Equip/ShortSword.msg.23",
+    "Excel_Equip/SlashAxe.msg.23",
+    "Excel_Equip/Tachi.msg.23",
+    "Excel_Equip/TwinSword.msg.23",
+    "Excel_Equip/WeaponSeries.msg.23",
+    "Excel_Equip/Whistle.msg.23",
+    "Excel_Action/HibikiDataText_Wp05.msg.23",
+    "Excel_Action/HighFreqDataText_Wp05.msg.23",
+    "Excel_Action/MusicSkillDataText_Wp05.msg.23",
 ]
