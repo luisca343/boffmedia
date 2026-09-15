@@ -10,7 +10,8 @@
           "damageCalc": "Damage Calculator",
           "meta": "Meta Analysis",
           "speed": "Speed",
-          "tracker": "Tracker"
+          "tracker": "Tracker",
+          "preview": "VGC Preview"
         }
       },
       "tcgpocket": {
@@ -47,7 +48,8 @@
           "damageCalc": "Damage Calculator",
           "meta": "Meta Analysis",
           "speed": "Speed",
-          "tracker": "Tracker"
+          "tracker": "Tracker",
+          "preview": "VGC Preview"
         }
       },
       "tcgpocket": {
@@ -149,6 +151,13 @@
         "description": "Analyze usage, trends, and competitive teams.",
         "features": {
           "meta": "Meta analysis"
+        }
+      },
+      "preview": {
+        "title": "VGC Preview",
+        "description": "Capture and calibrate a Champions team-preview frame.",
+        "features": {
+          "preview": "OBS capture"
         }
       }
     },

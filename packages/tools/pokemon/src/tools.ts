@@ -111,6 +111,23 @@ export const vgcMetaTool: ToolManifest = {
   ),
 };
 
+export const vgcPreviewTool: ToolManifest = {
+  id: "pokemon.vgc-preview",
+  domain: "pokemon",
+  titleKey: `${VGC_NS}.manifest.preview.name`,
+  descriptionKey: `${VGC_NS}.manifest.preview.description`,
+  categoryKey: `${VGC_NS}.manifest.preview.category`,
+  icon: "camera",
+  route: "/pokemon/vgc/preview",
+  // Camera access and matching stay in the renderer. The API supplies the
+  // current Champions-legal candidate roster.
+  requiredCapabilities: ["api"],
+  layout: "document",
+  component: lazy(() =>
+    import("./vgc/preview/VgcPreviewApp").then((m) => ({ default: m.VgcPreviewApp })),
+  ),
+};
+
 export const vgcTrackerTool: ToolManifest = {
   id: "pokemon.vgc-tracker",
   domain: "pokemon",
@@ -136,5 +153,6 @@ export const pokemonTools: ToolManifest[] = [
   vgcCalcTool,
   vgcSpeedTool,
   vgcMetaTool,
+  vgcPreviewTool,
   vgcTrackerTool,
 ];

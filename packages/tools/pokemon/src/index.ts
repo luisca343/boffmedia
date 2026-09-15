@@ -16,6 +16,7 @@ export { DamageCalculatorView } from "./vgc/damage-calculator/_components/Damage
 export { SpeedTiersView } from "./vgc/speed/_components/SpeedTiersView";
 export { MetaLayoutClient } from "./vgc/meta/_components/MetaLayoutClient";
 export { TrackerApp } from "./vgc/tracker/TrackerApp";
+export { VgcPreviewApp } from "./vgc/preview/VgcPreviewApp";
 
 // VGC's address bar. A host with real routing (apps/web) builds a `VgcNav` from
 // its own router and passes it in; omit it and the provider runs the memory

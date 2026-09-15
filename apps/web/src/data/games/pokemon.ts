@@ -31,7 +31,7 @@ export const pokemon: GameEntry = {
         fallbackIcon: "sword",
         fallbackIconColor: "text-primary-hover",
         color: "from-primary to-violet-600",
-        features: ["teamBuilder", "battlesim", "damageCalc", "speed", "meta", "tracker"],
+        features: ["teamBuilder", "battlesim", "damageCalc", "speed", "meta", "tracker", "preview"],
         featured: true,
         isNew: false,
         popularity: "high",
@@ -142,6 +142,26 @@ export const pokemon: GameEntry = {
             featured: false,
             isNew: false,
             popularity: "high",
+          },
+        },
+        {
+          key: "preview",
+          nameKey: "games.pokemon.tools.preview",
+          href: "/pokemon/vgc/preview",
+          sidebarIcon: "camera",
+          // VGC tools own the datakit bar and must start flush beneath the
+          // shell chrome. Without this flag ToolShell adds its page gutter
+          // above the sticky bar, which makes the bar look detached.
+          bleed: true,
+          landing: {
+            icon: staticAsset(ASSET.boffmedia.img, "games/pokemon/vgc-icon2.webp"),
+            fallbackIcon: "camera",
+            fallbackIconColor: "text-primary-hover",
+            color: "from-primary to-orange-600",
+            features: ["preview"],
+            featured: false,
+            isNew: true,
+            popularity: "medium",
           },
         },
       ],

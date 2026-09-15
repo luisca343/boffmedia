@@ -10,7 +10,8 @@
           "damageCalc": "Calculadora de daño",
           "meta": "Análisis de Meta",
           "speed": "Velocidad",
-          "tracker": "Tracker"
+          "tracker": "Tracker",
+          "preview": "Vista previa VGC"
         }
       },
       "tcgpocket": {
@@ -47,7 +48,8 @@
           "damageCalc": "Calculadora de daño",
           "meta": "Análisis de Meta",
           "speed": "Velocidad",
-          "tracker": "Tracker"
+          "tracker": "Tracker",
+          "preview": "Vista previa VGC"
         }
       },
       "tcgpocket": {
@@ -149,6 +151,13 @@
         "description": "Analiza el uso, las tendencias y los equipos competitivos.",
         "features": {
           "meta": "AnÃ¡lisis de meta"
+        }
+      },
+      "preview": {
+        "title": "Vista previa VGC",
+        "description": "Captura y calibra un frame del team preview de Champions.",
+        "features": {
+          "preview": "Captura OBS"
         }
       }
     },

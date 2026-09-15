@@ -1445,6 +1445,82 @@ export const messages = {
             "keepSeparate": "Dejarlas aparte"
           }
         },
+        "preview": {
+          "title": "Vista previa del combate",
+          "subtitle": "Conecta la camara virtual de OBS",
+          "empty": "Conecta OBS Virtual Camera para ver la captura.",
+          "status": {
+            "connected": "CONECTADA",
+            "disconnected": "DESCONECTADA"
+          },
+          "buttons": {
+            "connect": "Conectar",
+            "reconnect": "Reconectar",
+            "disconnect": "Desconectar",
+            "capture": "Capturar frame",
+            "calibrate": "Calibrar slots",
+            "extract": "Extraer slots",
+            "recognize": "Reconocer",
+            "reset": "Restablecer layout",
+            "refresh": "Actualizar camaras"
+          },
+          "source": {
+            "title": "Fuente de captura",
+            "description": "Selecciona OBS Virtual Camera. La imagen permanece en este dispositivo en esta primera prueba.",
+            "camera": "Camara de video",
+            "noCameras": "No se han encontrado camaras",
+            "unnamed": "Camara {number}"
+          },
+          "next": {
+            "title": "Siguiente paso",
+            "description": "Despues de confirmar la geometria, extrae los slots y ejecuta el reconocimiento para revisar sus sugerencias."
+          },
+          "calibration": {
+            "title": "Calibrar team preview",
+            "description": "Activa la calibracion y arrastra cada marco sobre un icono del team preview.",
+            "selected": "Seleccionado: {slot}",
+            "normalized": "norm x={x} y={y} w={width} h={height}",
+            "pixels": "px left={left} top={top} width={width} height={height}",
+            "values": "Valores de las guias"
+          },
+          "slots": {
+            "title": "Slots extraidos",
+            "description": "Estas capturas locales se comparan con plantillas de las especies legales de Champions.",
+            "own": "Tu slot {number}",
+            "opponent": "Slot rival {number}",
+            "placeholder": "Nombre opcional"
+          },
+          "recognition": {
+            "rosterLoading": "Cargando roster de Champions...",
+            "roster": "Plantillas disponibles: {count}",
+            "loading": "Comparando plantillas",
+            "progress": "{completed} de {total}",
+            "title": "Reconocimiento",
+            "description": "Las sugerencias comparan tus recortes con los sprites de menú de Pokémon Champions; confirma los resultados antes de usarlos.",
+            "source": "Sprites: Pokémon Champions Battle Data",
+            "status": {
+              "match": "Coincidencia",
+              "review": "Revisar",
+              "unknown": "Sin coincidencia"
+            },
+            "confidence": "Confianza: {value}%",
+            "use": "Usar",
+            "noMatch": "No hay una coincidencia fiable.",
+            "alternatives": "Alternativas"
+          },
+          "capture": {
+            "title": "Ultimo frame capturado",
+            "localOnly": "Solo local",
+            "alt": "Frame capturado desde la camara de OBS"
+          },
+          "errors": {
+            "unsupported": "Este navegador o WebView no permite acceso a camaras.",
+            "permission": "Se denego el acceso. Permite la camara para este sitio y vuelve a intentarlo.",
+            "notFound": "No se encontro esa camara. Comprueba que OBS Virtual Camera esta activa.",
+            "busy": "La camara esta siendo usada por otra aplicacion.",
+            "unknown": "No se pudo abrir la camara. Comprueba la configuracion de OBS."
+          }
+        },
         "meta": {
           "title": "Análisis de meta",
           "subtitle": "Uso en el ladder y composición de equipos, según Smogon Stats",
@@ -1647,6 +1723,11 @@ export const messages = {
           "tracker": {
             "name": "Tracker VGC",
             "description": "Registra sesiones, combates y series, con o sin conexión.",
+            "category": "Competitivo"
+          },
+          "preview": {
+            "name": "Vista previa VGC",
+            "description": "Comprueba la captura de OBS antes de añadir reconocimiento.",
             "category": "Competitivo"
           }
         }
@@ -3079,6 +3160,82 @@ export const messages = {
             "keepSeparate": "Leave them alone"
           }
         },
+        "preview": {
+          "title": "Battle preview",
+          "subtitle": "Connect OBS Virtual Camera",
+          "empty": "Connect OBS Virtual Camera to see the capture.",
+          "status": {
+            "connected": "CONNECTED",
+            "disconnected": "DISCONNECTED"
+          },
+          "buttons": {
+            "connect": "Connect",
+            "reconnect": "Reconnect",
+            "disconnect": "Disconnect",
+            "capture": "Capture frame",
+            "calibrate": "Calibrate slots",
+            "extract": "Extract slots",
+            "recognize": "Recognize",
+            "reset": "Reset layout",
+            "refresh": "Refresh cameras"
+          },
+          "source": {
+            "title": "Capture source",
+            "description": "Select OBS Virtual Camera. During this first test, the image stays on this device.",
+            "camera": "Video camera",
+            "noCameras": "No cameras found",
+            "unnamed": "Camera {number}"
+          },
+          "next": {
+            "title": "Next step",
+            "description": "After confirming the geometry, extract the slots and run recognition to review its suggestions."
+          },
+          "calibration": {
+            "title": "Calibrate team preview",
+            "description": "Enable calibration and drag each guide over a team-preview icon.",
+            "selected": "Selected: {slot}",
+            "normalized": "norm x={x} y={y} w={width} h={height}",
+            "pixels": "px left={left} top={top} width={width} height={height}",
+            "values": "Guide values"
+          },
+          "slots": {
+            "title": "Extracted slots",
+            "description": "These local crops are compared with templates for the Champions-legal species.",
+            "own": "Your slot {number}",
+            "opponent": "Opponent slot {number}",
+            "placeholder": "Optional name"
+          },
+          "recognition": {
+            "rosterLoading": "Loading the Champions roster...",
+            "roster": "Templates available: {count}",
+            "loading": "Comparing templates",
+            "progress": "{completed} of {total}",
+            "title": "Recognition",
+            "description": "Suggestions compare your crops with Pokémon Champions menu sprites; confirm results before applying them.",
+            "source": "Sprites: Pokémon Champions Battle Data",
+            "status": {
+              "match": "Match",
+              "review": "Review",
+              "unknown": "No match"
+            },
+            "confidence": "Confidence: {value}%",
+            "use": "Use",
+            "noMatch": "No reliable match found.",
+            "alternatives": "Alternatives"
+          },
+          "capture": {
+            "title": "Last captured frame",
+            "localOnly": "Local only",
+            "alt": "Frame captured from the OBS camera"
+          },
+          "errors": {
+            "unsupported": "This browser or WebView does not allow camera access.",
+            "permission": "Access was denied. Allow camera access for this site and try again.",
+            "notFound": "That camera was not found. Check that OBS Virtual Camera is active.",
+            "busy": "The camera is being used by another application.",
+            "unknown": "The camera could not be opened. Check your OBS setup."
+          }
+        },
         "meta": {
           "title": "Meta Analysis",
           "subtitle": "Ladder usage & team composition data from Smogon Stats",
@@ -3281,6 +3438,11 @@ export const messages = {
           "tracker": {
             "name": "VGC tracker",
             "description": "Log sessions, matches and series, online or off.",
+            "category": "Competitive"
+          },
+          "preview": {
+            "name": "VGC preview",
+            "description": "Check the OBS capture before adding recognition.",
             "category": "Competitive"
           }
         }
