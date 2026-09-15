@@ -20,8 +20,8 @@ const GEN9 = Generations.get(9)
 const KO_TONE: Record<string, DamageTone> = {
   guaranteedOHKO: "red",
   possibleOHKO: "red",
-  guaranteed2HKO: "orange",
-  possible2HKO: "amber",
+  guaranteedHKO: "orange",
+  possibleHKO: "amber",
   noKO: "dim",
 }
 
@@ -125,7 +125,11 @@ export function VersusStrip({ poke1, poke2, field, useChampions, sel, setSel }: 
     return `${hp} ${t("panel.hpLabel")}${item}`
   }
 
-  const koKey = res ? getKOVerdict(res).labelKey : "noKO"
+  const verdict = res ? getKOVerdict(res) : null
+  const koKey = verdict?.labelKey ?? "noKO"
+  const koText = verdict?.hits && verdict.hits > 1
+    ? t(`moveStrip.${koKey}`, { n: verdict.hits })
+    : t(`moveStrip.${koKey}`)
 
   return (
     <section
@@ -149,7 +153,7 @@ export function VersusStrip({ poke1, poke2, field, useChampions, sel, setSel }: 
             <span className="font-mono text-[0.625rem]/none font-semibold uppercase tracking-[0.14em] text-txt-dim">
               {atkName} · {move.name}
             </span>
-            <KoVerdict text={t(`moveStrip.${koKey}`)} tone={KO_TONE[koKey]} />
+            <KoVerdict text={koText} tone={KO_TONE[koKey]} />
             <span className="font-mono text-[0.9375rem]/none font-bold" style={{ color: damageColor(damageTone(res.maxPct)) }}>
               {res.min}–{res.max} {t("panel.hpLabel")} · {res.minPct.toFixed(1)}–{res.maxPct.toFixed(1)}%
             </span>

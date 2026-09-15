@@ -136,6 +136,9 @@ const SPRITE_BASE      = 'https://play.pokemonshowdown.com/sprites/home-centered
 const SPRITE_BASE_GEN5 = 'https://play.pokemonshowdown.com/sprites/gen5/';
 const SPRITE_BASE_DEX  = 'https://play.pokemonshowdown.com/sprites/dex/';
 const SUBSTITUTE_URL   = 'https://play.pokemonshowdown.com/sprites/dex/substitute.png';
+export const SPRITE_FALLBACK_URL = `data:image/svg+xml,${encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><circle cx="32" cy="32" r="29" fill="#fff" stroke="#1b2533" stroke-width="4"/><path d="M4 32a28 28 0 0 1 56 0H4Z" fill="#e34b43"/><path d="M4 32h56" stroke="#1b2533" stroke-width="4"/><circle cx="32" cy="32" r="10" fill="#dfe5ed" stroke="#1b2533" stroke-width="4"/><circle cx="32" cy="32" r="4" fill="#fff"/></svg>',
+)}`;
 
 /** Explicit Showdown slug overrides for forms that don't follow any generic rule. */
 const SPRITE_SLUG_OVERRIDES: Record<string, string> = {
@@ -190,7 +193,16 @@ export function spriteUrl(speciesName: string): string {
  */
 export function handleSpriteError(e: React.SyntheticEvent<HTMLImageElement>): void {
   const img = e.currentTarget;
-  if (img.src === SUBSTITUTE_URL) return;
+  if (img.dataset.pokemonSpriteFallback === 'final') {
+    img.style.visibility = 'hidden';
+    return;
+  }
+
+  if (img.dataset.pokemonSpriteFallback === 'substitute' || img.src === SUBSTITUTE_URL) {
+    img.dataset.pokemonSpriteFallback = 'final';
+    img.src = SPRITE_FALLBACK_URL;
+    return;
+  }
 
   if (!img.dataset.triedAlt) {
     img.dataset.triedAlt = '1';
@@ -207,6 +219,7 @@ export function handleSpriteError(e: React.SyntheticEvent<HTMLImageElement>): vo
     }
   }
 
+  img.dataset.pokemonSpriteFallback = 'substitute';
   img.src = SUBSTITUTE_URL;
 }
 

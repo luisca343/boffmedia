@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import Image from "next/image"
+import { ImageFallback } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import { isOptimizableImageSrc } from "@/lib/image-hosts"
 
@@ -9,6 +10,7 @@ export interface ArtImageProps {
   src?: string | null
   alt?: string
   className?: string
+  style?: React.CSSProperties
   /** Rendered instead of the image when the source is missing or fails to load. */
   fallback?: React.ReactNode
   /** Fixed-size mode; omit both to fill the (positioned) parent. */
@@ -21,14 +23,26 @@ export interface ArtImageProps {
 }
 
 /** Key-art/icon image with a graceful fallback — the one place that owns the broken-image behavior. */
-export function ArtImage({ src, alt = "", className, fallback = null, width, height, sizes, priority, fit = "cover" }: ArtImageProps) {
+export function ArtImage({ src, alt = "", className, style, fallback, width, height, sizes, priority, fit = "cover" }: ArtImageProps) {
   const [failedSrc, setFailedSrc] = React.useState<string | null>(null)
-  if (!src || failedSrc === src) return <>{fallback}</>
+  const fallbackNode = fallback === undefined ? (
+    <ImageFallback
+      alt={alt}
+      className={cn(
+        width != null && height != null ? "h-full w-full" : "absolute inset-0",
+        className,
+      )}
+      style={width != null && height != null ? { width, height } : undefined}
+    />
+  ) : fallback
+
+  if (!src || failedSrc === src) return <>{fallbackNode}</>
   const shared = {
     src,
     priority,
     onError: () => setFailedSrc(src),
     className: cn(fit === "contain" ? "object-contain" : "object-cover", className),
+    style,
   }
 
   // A host outside `images.remotePatterns` makes next/image THROW while rendering,

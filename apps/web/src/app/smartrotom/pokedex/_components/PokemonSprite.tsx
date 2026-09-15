@@ -9,9 +9,10 @@ import { Loading } from "@/components/smartrotom/Loading"
 import { getItemSprite, getPokemonNameFromIdAndForm, getVisibility, PokedexStatus } from "../dexUtils"
 import { usePokemonSprite } from "../_hooks/usePokemonSprite"
 import { usePokedexData } from "@/hooks/usePokedexData"
-import Image from "next/image"
 import { useSpriteManifestStore } from "@/stores/spriteManifestStore"
 import { getSpriteUrl } from "@/utils/spriteUtils"
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
+import { ImageFallback } from "@boffmedia/ui"
 
 export type PokemonSpriteProps = {
   children?: any
@@ -120,13 +121,23 @@ export function PokemonSprite({
         style={{ width, maxHeight: height }}
         className={`relative ${className}`}
       >
-        <Image
+        <ArtImage
           width={width}
           height={height}
           src={imageUrl || "/placeholder.svg"}
           alt={t("sprite.pokemonAlt")}
           style={{ imageRendering: pixelated ? "pixelated" : "auto",  height: 'auto' }}
           className={`${(status === PokedexStatus.UNSEEN && hide) || forceBlack ? `brightness-0 ${inverted ? "invert" : ""}` : ""}`}
+          fit="contain"
+          fallback={
+            <ImageFallback
+              kind="pokemon"
+              alt={t("sprite.pokemonAlt")}
+              iconSize={Math.max(18, Math.round(Math.min(width, height) * 0.34))}
+              style={{ width, height }}
+              className="border-0 bg-transparent text-pk-surface-400"
+            />
+          }
         />
         {showStatus && (
           <div className="absolute top-1 right-1">
@@ -173,13 +184,20 @@ export function ItemSprite({ name, width = 100, height = 100 }: { name: string; 
 
   if (!loaded) return <Loading width={width} height={height} />
   return (
-    <img
+    <ArtImage
       width={width}
       height={height}
       src={imageUrl?.url || "/placeholder.svg"}
       alt={t("sprite.itemAlt")}
       style={{ imageRendering: "pixelated" }}
+      fit="contain"
+      fallback={
+        <ImageFallback
+          alt={t("sprite.itemAlt")}
+          style={{ width, height }}
+          className="border-0 bg-transparent"
+        />
+      }
     />
   )
 }
-

@@ -2,7 +2,7 @@
 
 import { forwardRef, useImperativeHandle, useRef, useState, useEffect, KeyboardEvent } from 'react';
 import { createPortal } from 'react-dom';
-import { spriteUrl, SpeciesEntry } from '../../tracker-core/types';
+import { spriteUrl, handleSpriteError, SpeciesEntry } from '../../tracker-core/types';
 
 export interface PokemonAutocompleteHandle {
   focusInput: () => void;
@@ -127,7 +127,7 @@ export const PokemonAutocomplete = forwardRef<PokemonAutocompleteHandle, Props>(
                   src={spriteUrl(entry.name)}
                   alt={entry.name}
                   className="h-8 w-8 shrink-0 object-contain"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  onError={handleSpriteError}
                 />
                 <span>{entry.name}</span>
                 <span className="ml-auto font-mono text-[0.6875rem] text-txt-dim">#{entry.num}</span>

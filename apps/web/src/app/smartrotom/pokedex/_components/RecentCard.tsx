@@ -8,9 +8,10 @@ import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { StatusPill, TypeChip } from "./ui"
 import { Loading } from "@/components/smartrotom/Loading"
-import Image from "next/image"
+import { ImageFallback } from "@boffmedia/ui"
 import { useEffect, useState } from "react"
 import { getSpriteUrl } from "@/utils/spriteUtils"
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 
 type EnrichedRegistry = {
   pokemonId: number
@@ -96,9 +97,23 @@ export function RecentCard() {
                       : "bg-white/[0.03] border-white/[0.05]"
                   }`}
                 >
-                  {spriteUrl && (
-                    <Image src={spriteUrl} alt="" width={36} height={36} style={{ imageRendering: "pixelated" }} />
-                  )}
+                  <ArtImage
+                    src={spriteUrl}
+                    alt={reg.name || `#${reg.pokemonId}`}
+                    width={36}
+                    height={36}
+                    fit="contain"
+                    style={{ imageRendering: "pixelated" }}
+                    fallback={
+                      <ImageFallback
+                        kind="pokemon"
+                        alt={reg.name || `#${reg.pokemonId}`}
+                        style={{ width: 36, height: 36 }}
+                        className="border-0 bg-transparent text-pk-surface-500"
+                        iconSize={16}
+                      />
+                    }
+                  />
                 </div>
                 <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                   <div className="flex items-center gap-2">

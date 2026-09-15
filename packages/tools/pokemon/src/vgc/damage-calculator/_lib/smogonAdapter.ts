@@ -172,13 +172,42 @@ export function calcAllMoves(
   return attacker.moves.map((move) => calcDamage(attacker, defender, move, field, useChampions))
 }
 
-export function getKOVerdict(res: DamageResult): { labelKey: string; colorClass: string } {
+export interface KOVerdict {
+  labelKey: 'guaranteedOHKO' | 'possibleOHKO' | 'guaranteedHKO' | 'possibleHKO' | 'noKO'
+  /** Number of hits needed, or null when the move cannot KO in the tracked range. */
+  hits: number | null
+  colorClass: string
+}
+
+/**
+ * Return the first KO that is possible for the damage range.
+ *
+ * The calculator's canonical description checks beyond OHKO/2HKO (for example,
+ * 41.5–49% is a guaranteed 3HKO). Keeping that same ordering here prevents
+ * the summary badge from falling back to "no KO" while the copied description
+ * reports a guaranteed multi-turn KO.
+ */
+export function getKOVerdict(res: DamageResult): KOVerdict {
   const { minPct, maxPct } = res
-  if (minPct >= 100) return { labelKey: 'guaranteedOHKO', colorClass: 'text-red-400' }
-  if (minPct * 2 >= 100) return { labelKey: 'guaranteed2HKO', colorClass: 'text-accent-bright' }
-  if (maxPct * 2 >= 100) return { labelKey: 'possible2HKO', colorClass: 'text-warning-hover' }
-  if (maxPct >= 100) return { labelKey: 'possibleOHKO', colorClass: 'text-red-400' }
-  return { labelKey: 'noKO', colorClass: 'text-txt-muted' }
+
+  // @smogon/calc looks for concrete KO descriptions up to 9HKO. For the
+  // standalone summary we use the range bounds, so a KO is possible when the
+  // maximum roll reaches the defender and guaranteed when the minimum does.
+  for (let hits = 1; hits <= 9; hits++) {
+    if (maxPct * hits < 100) continue
+
+    if (minPct * hits >= 100) {
+      return hits === 1
+        ? { labelKey: 'guaranteedOHKO', hits, colorClass: 'text-red-400' }
+        : { labelKey: 'guaranteedHKO', hits, colorClass: 'text-accent-bright' }
+    }
+
+    return hits === 1
+      ? { labelKey: 'possibleOHKO', hits, colorClass: 'text-red-400' }
+      : { labelKey: 'possibleHKO', hits, colorClass: 'text-warning-hover' }
+  }
+
+  return { labelKey: 'noKO', hits: null, colorClass: 'text-txt-muted' }
 }
 
 export function getDamageColorClass(res: DamageResult): string {

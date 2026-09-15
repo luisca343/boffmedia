@@ -3,11 +3,12 @@ import { useState } from "react"
 import { useParams } from "next/navigation"
 import { useTranslations } from "next-intl"
 import Link from "next/link"
-import Image from "next/image"
+import { ImageFallback } from "@boffmedia/ui"
 import { useGetPokemonByBiome } from "@/hooks/pokemon/useGetPokemonByBiome"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { PokedexStatus } from "../../dexUtils"
 import { getSpriteUrl } from "@/utils/spriteUtils"
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 import { ScreenShell } from "../../_components/ScreenShell"
 import { StatusPill } from "../../_components/ui"
 import { RARITY_META } from "../../_utils/dexMeta"
@@ -115,9 +116,22 @@ export default function BiomeDetailPage() {
                       <span className="absolute top-1.5 left-1.5">
                         <StatusPill status={status} size="sm" showLabel={false} />
                       </span>
-                      {spriteUrl && (
-                        <Image src={spriteUrl} alt={s.species || ""} width={52} height={52} style={{ imageRendering: "pixelated", filter: "drop-shadow(0 3px 4px rgba(0,0,0,.3))" }} />
-                      )}
+                      <ArtImage
+                        src={spriteUrl}
+                        alt={s.species || ""}
+                        width={52}
+                        height={52}
+                        fit="contain"
+                        style={{ imageRendering: "pixelated", filter: "drop-shadow(0 3px 4px rgba(0,0,0,.3))" }}
+                        fallback={
+                          <ImageFallback
+                            kind="pokemon"
+                            alt={s.species || ""}
+                            style={{ width: 52, height: 52 }}
+                            className="border-0 bg-transparent text-pk-surface-500"
+                          />
+                        }
+                      />
                       <span className="text-[0.6875rem] font-medium text-pk-surface-200 text-center leading-tight">{s.species}</span>
                       {s.percentage != null && (
                         <span className="font-pk-mono text-[0.65625rem] tabular-nums font-semibold" style={{ color: tier.fg }}>

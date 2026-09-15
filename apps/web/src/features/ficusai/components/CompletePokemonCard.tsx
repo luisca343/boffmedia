@@ -7,6 +7,8 @@ import { useTranslations } from "next-intl";
 import { Search, X } from "lucide-react";
 import { Input } from "@/components/ui/primitives/input";
 import { Button } from "@/components/ui/primitives/button";
+import { ImageFallback } from "@boffmedia/ui";
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage";
 
 import TypeBadge from "@/components/shared/pokemon/TypeBadge";
 import MoveDataElement from "./MoveData";
@@ -34,15 +36,23 @@ interface PokemonDataCardProps {
 /* ---------- Header ---------- */
 const PokemonHeader: FC<{ sprite?: string; name: string; types?: string[] }> = ({ sprite, name, types }) => (
   <div className="text-center mb-6">
-    {sprite && (
-      <img
-        src={sprite}
-        alt={name}
-        className="mx-auto mb-2 h-24 w-24 object-contain"
-        loading="lazy"
-        style={{ imageRendering: "pixelated" }}
-      />
-    )}
+    <ArtImage
+      src={sprite}
+      alt={name}
+      width={96}
+      height={96}
+      fit="contain"
+      className="mx-auto mb-2 h-24 w-24"
+      style={{ imageRendering: "pixelated" }}
+      fallback={
+        <ImageFallback
+          kind="pokemon"
+          alt={name}
+          style={{ width: 96, height: 96 }}
+          className="mx-auto mb-2 border-0 bg-transparent text-ink-muted"
+        />
+      }
+    />
     <h2 className="text-2xl font-bold text-ink mb-3">{name}</h2>
     {types && types.length > 0 && (
       <div className="flex justify-center gap-2">

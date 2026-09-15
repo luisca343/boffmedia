@@ -1,10 +1,11 @@
 "use client"
 
 import Link from "next/link"
-import Image from "next/image"
 import { useTranslations } from "next-intl"
+import { ImageFallback } from "@boffmedia/ui"
 import { PokedexStatus } from "../dexUtils"
 import { getSpriteUrl } from "@/utils/spriteUtils"
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 import type { PossibleSpawn } from "./PossibleSpawns"
 
 const SHADOW = "drop-shadow(0 3px 4px rgba(0,0,0,.3))"
@@ -58,16 +59,23 @@ export function SpawnTile({
             {t("spawntile_new")}
           </span>
         )}
-        {spriteUrl && (
-          <Image
-            src={spriteUrl}
-            alt={name}
-            width={56}
-            height={56}
-            // An inline filter beats a brightness-0 class, so the silhouette has to live here too.
-            style={{ imageRendering: "pixelated", filter: isUnseen ? `brightness(0) ${SHADOW}` : SHADOW }}
-          />
-        )}
+        <ArtImage
+          src={spriteUrl}
+          alt={name}
+          width={56}
+          height={56}
+          fit="contain"
+          // An inline filter beats a brightness-0 class, so the silhouette has to live here too.
+          style={{ imageRendering: "pixelated", filter: isUnseen ? `brightness(0) ${SHADOW}` : SHADOW }}
+          fallback={
+            <ImageFallback
+              kind="pokemon"
+              alt={name}
+              style={{ width: 56, height: 56 }}
+              className="border-0 bg-transparent text-pk-surface-500"
+            />
+          }
+        />
         <span className="text-[0.6875rem] font-medium text-pk-surface-200 text-center leading-tight">{name}</span>
         <span className="font-pk-mono text-[0.6875rem] tabular-nums font-semibold" style={{ color: accent }}>
           {formatPercentage(spawn.percentage)}%

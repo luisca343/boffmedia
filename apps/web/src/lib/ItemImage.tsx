@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { PokemonImage } from "./PokemonImage";
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage";
 
 interface ItemImageProps {
   type?: string;
@@ -24,7 +24,7 @@ export const ItemImage = ({ type = "", itemId, amount = 0, size = 32 }: ItemImag
     <div className="relative group flex space-x-2">
       {type === "pokemon" ? 
         <PokemonImage itemId={itemId} size={size} /> :
-        <Image alt={itemId} width={size} height={size} src={imagePath} style={{ imageRendering: "pixelated" }} />
+        <ArtImage alt={itemId} width={size} height={size} src={imagePath} fit="contain" style={{ imageRendering: "pixelated" }} />
       }
 
       {amount > 0 && <span className="ml-2">x{amount}</span>}

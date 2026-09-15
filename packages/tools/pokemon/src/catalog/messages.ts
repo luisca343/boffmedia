@@ -449,7 +449,10 @@ export const messages = {
           "darkness": "Oscuridad",
           "metal": "Metal",
           "dragon": "Dragón",
-          "colorless": "Incolora"
+          "colorless": "Incolora",
+          "item": "Objeto",
+          "supporter": "Partidario",
+          "stadium": "Estadio"
         },
         "cardDetail": {
           "loading": "Cargando…",
@@ -536,6 +539,7 @@ export const messages = {
           },
           "category": {
             "pokemon": "Pokémon",
+            "pokémon": "Pokémon",
             "trainer": "Entrenador",
             "supporter": "Partidario",
             "item": "Objeto",
@@ -855,6 +859,8 @@ export const messages = {
             "noKO": "sin KO",
             "possibleOHKO": "posible OHKO",
             "guaranteedOHKO": "OHKO garantizado",
+            "guaranteedHKO": "{n}HKO garantizado",
+            "possibleHKO": "posible {n}HKO",
             "guaranteed2HKO": "2HKO garantizado",
             "possible2HKO": "posible 2HKO"
           },
@@ -2083,7 +2089,10 @@ export const messages = {
           "darkness": "Darkness",
           "metal": "Metal",
           "dragon": "Dragon",
-          "colorless": "Colorless"
+          "colorless": "Colorless",
+          "item": "Item",
+          "supporter": "Supporter",
+          "stadium": "Stadium"
         },
         "cardDetail": {
           "loading": "Loading...",
@@ -2170,6 +2179,7 @@ export const messages = {
           },
           "category": {
             "pokemon": "Pokémon",
+            "pokémon": "Pokémon",
             "trainer": "Trainer",
             "supporter": "Supporter",
             "item": "Item",
@@ -2489,6 +2499,8 @@ export const messages = {
             "noKO": "no KO",
             "possibleOHKO": "possible OHKO",
             "guaranteedOHKO": "guaranteed OHKO",
+            "guaranteedHKO": "guaranteed {n}HKO",
+            "possibleHKO": "possible {n}HKO",
             "guaranteed2HKO": "guaranteed 2HKO",
             "possible2HKO": "possible 2HKO"
           },

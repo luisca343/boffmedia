@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { SearchIcon, ZapIcon, FilterIcon, SettingsIcon, RefreshCwIcon } from "lucide-react"
 import { TypeChip, StatusPill } from "./ui"
+import { ImageFallback } from "@boffmedia/ui"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { PokedexStatus } from "../dexUtils"
-import Image from "next/image"
 import { getSpriteUrl } from "@/utils/spriteUtils"
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 
 export function HubTopbar() {
   const t = useTranslations("pokedex")
@@ -124,9 +125,23 @@ export function HubTopbar() {
                   <span className="font-pk-mono text-[0.6875rem] text-pk-surface-500 w-9">
                     #{String(p.dex).padStart(3, "0")}
                   </span>
-                  {spriteUrl && (
-                    <Image src={spriteUrl} alt="" width={36} height={36} style={{ imageRendering: "pixelated" }} />
-                  )}
+                  <ArtImage
+                    src={spriteUrl}
+                    alt={p.name}
+                    width={36}
+                    height={36}
+                    fit="contain"
+                    style={{ imageRendering: "pixelated" }}
+                    fallback={
+                      <ImageFallback
+                        kind="pokemon"
+                        alt={p.name}
+                        style={{ width: 36, height: 36 }}
+                        className="border-0 bg-transparent text-pk-surface-500"
+                        iconSize={16}
+                      />
+                    }
+                  />
                   <span className="text-sm font-medium text-pk-surface-100 flex-1">{p.name}</span>
                   <span className="flex gap-1">
                     {p.forms?.[0]?.types?.map((type: string) => (

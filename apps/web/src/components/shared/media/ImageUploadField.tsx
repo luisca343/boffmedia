@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Button, Field, Icon, Input, toast } from "@boffmedia/ui"
+import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 import { cn } from "@/lib/utils"
 import { UploadService, type UploadFolder } from "@/services/api/smartrotom/uploadService"
 import { ImageCropDialog, type CropShape } from "./ImageCropDialog"
@@ -123,7 +124,7 @@ export function ImageUploadField({
               {value ? (
                 /* A thumbnail of an arbitrary admin-supplied URL: next/image throws
                    on a host outside images.remotePatterns. */
-                <img src={value} alt="" className="h-full w-full object-cover" />
+                <ArtImage src={value} alt="" className="absolute inset-0 h-full w-full" sizes="96px" />
               ) : (
                 <div className="absolute inset-0 grid place-items-center text-txt-dim">
                   <Icon name="camera" size={20} />

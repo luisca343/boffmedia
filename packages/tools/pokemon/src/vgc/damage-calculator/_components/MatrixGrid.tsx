@@ -6,7 +6,7 @@ import { PokemonSprite } from "./ui/PokemonSprite"
 import { TypeBadge } from "./ui/TypeBadge"
 import { damageColor, type DamageTone } from "./ui/theme"
 import type { CalcPokemon, CalcField } from "../_types/calculator"
-import { calcAllMoves } from "../_lib/smogonAdapter"
+import { calcAllMoves, getKOVerdict } from "../_lib/smogonAdapter"
 import { useLegalPokemon } from "../_hooks/useLegalPokemon"
 import { useCalculatorStore } from "../_store/calculatorStore"
 
@@ -84,16 +84,17 @@ export function MatrixGrid({ attackers, defenders, field, useChampions, cornerLa
                 <td key={j} className={`${th} px-[0.625rem] py-2`}>
                   <div className="h-[1.875rem]" aria-hidden="true" />
                   {matrix[i][j].map((res, mi) => {
-                    const tone: DamageTone = res
-                      ? res.minPct >= 100
+                    const verdict = res ? getKOVerdict(res) : null
+                    const tone: DamageTone = !verdict || verdict.labelKey === "noKO"
+                      ? "dim"
+                      : verdict.labelKey.includes("OHKO")
                         ? "red"
-                        : res.minPct * 2 >= 100
-                          ? "orange"
-                          : res.maxPct * 2 >= 100
-                            ? "amber"
-                            : "dim"
-                      : "dim"
-                    const ko = res ? (res.minPct >= 100 ? "OHKO" : res.minPct * 2 >= 100 ? "2HKO" : res.maxPct * 2 >= 100 ? "2HKO?" : "") : ""
+                        : verdict.labelKey.startsWith("possible")
+                          ? "amber"
+                          : "orange"
+                    const ko = verdict?.hits
+                      ? `${verdict.hits === 1 ? "OHKO" : `${verdict.hits}HKO`}${verdict.labelKey.startsWith("possible") ? "?" : ""}`
+                      : ""
                     const c = damageColor(tone)
                     return (
                       <div
