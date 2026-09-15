@@ -27,7 +27,7 @@ export const minecraft: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
             fallbackIcon: "grid",
             fallbackIconColor: "text-green-500",
             color: "from-green-700 to-emerald-500",
@@ -49,7 +49,7 @@ export const minecraft: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
             fallbackIcon: "grid",
             fallbackIconColor: "text-sky-400",
             color: "from-sky-700 to-cyan-500",
@@ -66,7 +66,7 @@ export const minecraft: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "games/minecraft/icon.webp"),
             fallbackIcon: "cube",
             fallbackIconColor: "text-emerald-400",
             color: "from-emerald-700 to-teal-500",

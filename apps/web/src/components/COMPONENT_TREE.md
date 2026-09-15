@@ -99,6 +99,7 @@ never marker classes.
 | `tools/GameLogo.tsx` | GameLogo — game seal in its hue |
 | `tools/ToolCard.tsx` | ToolCard — «fila» tool card (hue rail, icon, title/desc, badges) |
 | `tools/ToolGrid.tsx` | ToolGrid — responsive card grid shared by hub + category landings |
+| `tools/ToolSubsection.tsx` | ToolSubsection — numbered category boundary with hierarchy, spacing and count above a tool grid |
 | `tools/TxSection.tsx` | TxSection — accent-barred section block with mono count (wraps on mobile) |
 | `tools/VideoHero.tsx` | VideoHero — hub hero with looping bg video + scanlines + scrim (`motion-reduce` falls back to poster/surface) |
 | `tools/ToolShell.tsx` | ToolShell + Bleed — v3 tool-page shell: collapsible+pinnable `SideRail` (72px→264px, hover/focus overlay, hue-active) with `GameSwitch` header, mobile off-canvas drawer. Mounted by per-game server layouts (`(herramientas)/<game>/layout.tsx`); full-bleed routes come from `ToolEntry.bleed` in `@/data/games`. Owns the `--pad-x`/`--pad-y` content padding; `Bleed` escapes it (no-op outside the shell). |
@@ -175,4 +176,3 @@ Pokemon-specific components. Shared across Boffmedia and SmartRotom.
 | `TypeBadge.tsx` | TypeBadge | Pokemon type badge |
 | `PokemonTypeIcon.tsx` | PokemonTypeIcon | Pokemon type icon |
 | `PokemonItemImage.tsx` | PokemonItemImage | Pokemon item image |
-

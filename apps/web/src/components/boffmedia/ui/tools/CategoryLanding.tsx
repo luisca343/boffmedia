@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl"
 import { Icon, Button, Chip, ToolIcon } from "@boffmedia/ui"
 import { GameLogo } from "./GameLogo"
 import { ToolGrid } from "./ToolGrid"
+import { ToolSubsection } from "./ToolSubsection"
 import { TxSection } from "./TxSection"
 import { ArtImage } from "./ArtImage"
 import { Bleed } from "./ToolShell"
@@ -156,7 +157,22 @@ export function CategoryLanding({ slug }: { slug: string }) {
       <div className="mt-1">
         <FeaturedTool cat={cat} />
         <TxSection title={tCat("allTools")} count={tHub("toolCount", { count: cat.otherTools.length })}>
-          <ToolGrid tools={cat.otherTools} />
+          {cat.toolSections.length > 1 ? (
+            <div className="space-y-12">
+              {cat.toolSections.map((section, index) => (
+                <ToolSubsection
+                  key={section.key}
+                  id={`tool-section-${section.key}`}
+                  title={section.title}
+                  tools={section.tools}
+                  index={index + 1}
+                  count={tHub("toolCount", { count: section.tools.length })}
+                />
+              ))}
+            </div>
+          ) : (
+            <ToolGrid tools={cat.otherTools} />
+          )}
         </TxSection>
         {cat.ext.length > 0 && (
           <TxSection

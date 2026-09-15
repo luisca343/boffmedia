@@ -1,4 +1,4 @@
-import { getGameEntry, getLandingItems } from "@/data/games"
+import { getGameEntry, getLandingItems, toolsVisibleTo } from "@/data/games"
 import { hubConfig } from "@/data/hub"
 import { hueColorOf, hueStyle, type ToolCardData as UiToolCardData } from "@boffmedia/ui"
 
@@ -97,8 +97,15 @@ export interface CategoryData extends HubGame {
   banner: { prefix: string; highlight: string; subtitle: string; image?: string }
   featuredTool: ToolCardData | null
   otherTools: ToolCardData[]
+  toolSections: ToolSectionData[]
   ext: ExtLinkData[]
   bannerImage?: string
+}
+
+export interface ToolSectionData {
+  key: string
+  title: string
+  tools: ToolCardData[]
 }
 
 /** Build a game/category landing page's data (banner · featured · tools · external links). */
@@ -123,15 +130,34 @@ export function buildCategory(slug: string, t: T, roles?: readonly string[]): Ca
     href: l.href,
   }))
 
-  // show the first featured tool as the hero; keep every other tool in the grid
-  // (including any additional featured ones) so none disappear.
+  // Show the first featured tool as the hero. Keep every other tool in its
+  // registry category so the landing page can make those boundaries visible
+  // instead of flattening the whole catalogue into one grid.
   const featuredTool = g.tools.find((x) => x.featured) ?? null
+  const cardsByKey = new Map(g.tools.map((tool) => [tool.key, tool]))
+  const toolSections = game.categories
+    .map((category) => {
+      const keys = [
+        ...(category.landing ? [category.key] : []),
+        ...toolsVisibleTo(category.tools, roles).map((tool) => tool.key),
+      ]
+      const tools = keys.reduce<ToolCardData[]>((sectionTools, key) => {
+        const tool = cardsByKey.get(key)
+        if (tool && tool !== featuredTool) sectionTools.push(tool)
+        return sectionTools
+      }, [])
+
+      return { key: category.key, title: t(category.nameKey), tools }
+    })
+    .filter((section) => section.tools.length > 0)
+
   return {
     ...g,
     banner,
     bannerImage: game.bannerImage,
     featuredTool,
-    otherTools: g.tools.filter((x) => x !== featuredTool),
+    otherTools: toolSections.flatMap((section) => section.tools),
+    toolSections,
     ext,
   }
 }

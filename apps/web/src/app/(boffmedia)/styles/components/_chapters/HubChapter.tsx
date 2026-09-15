@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils"
 import { DEMO_TOOLS } from "../showcase-data"
 import { DISPLAY, DISPLAY_EM, HEAD4, Sample, Section } from "../showcase-shared"
 import { Button, Empty, Icon, Panel, Seg } from "@boffmedia/ui"
-import { ExtLinks, FeaturedTool, GameBanner, GameCover, GameLogo, ToolCard, ToolGrid, ToolShell, TxSection, VideoHero, buildCategory } from "@/components/boffmedia/ui/tools"
+import { ExtLinks, FeaturedTool, GameBanner, GameCover, GameLogo, ToolCard, ToolGrid, ToolShell, ToolSubsection, TxSection, VideoHero, buildCategory } from "@/components/boffmedia/ui/tools"
 import { useTranslations } from "next-intl"
 
 export function HubChapter() {
@@ -24,6 +24,27 @@ export function HubChapter() {
                 <TxSection title="Recursos externos" hint={<><Icon name="external" size={12} />Salen del sitio</>}>
                   <p className="text-txt-muted text-[0.875rem]">Contenido de la sección…</p>
                 </TxSection>
+              </Sample>
+            </Section>
+
+            <Section id="subsecciones" kicker="Hub de herramientas" title="Subsecciones" lead={<>Agrupación de herramientas dentro de un catálogo (<code>ToolSubsection</code>): marcador numérico, título jerarquizado, ritmo y contador. Mantiene el encabezado general separado de cada familia sin añadir barras intermedias.</>}>
+              <Sample title="Catálogo agrupado" code="<ToolSubsection title tools count index>" col note="El ejemplo usa las categorías reales de Pokémon para que el patrón se mantenga alineado con el registro de juegos.">
+                {pokeCat ? (
+                  <div className="w-full space-y-12">
+                    {pokeCat.toolSections.slice(0, 2).map((section, index) => (
+                      <ToolSubsection
+                        key={section.key}
+                        id={`showcase-tool-section-${section.key}`}
+                        title={section.title}
+                        tools={section.tools}
+                        index={index + 1}
+                        count={t("toolsUi.hub.toolCount", { count: section.tools.length })}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <Empty title="Sin datos de categoría" />
+                )}
               </Sample>
             </Section>
 

@@ -142,6 +142,7 @@ export const CHAPTERS: Chapter[] = [
     dom: "Herramientas",
     sections: [
       { id: "panelsec", label: "Panel de sección" },
+      { id: "subsecciones", label: "Subsecciones" },
       { id: "tarjetas", label: "Tarjeta de herramienta" },
       { id: "portadas", label: "Portada de juego" },
       { id: "banner", label: "Banner de juego" },

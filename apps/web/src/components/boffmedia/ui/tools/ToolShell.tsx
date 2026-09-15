@@ -141,6 +141,7 @@ function SideRail({
   const hub = hubConfig[slug]
   const hue = hub ? hueColorOf(hub.hue) : "var(--accent)"
   const min = !pinned
+  const showGroupHeaders = groups.length > 1
 
   const labelFade = min
     ? cn(
@@ -183,9 +184,11 @@ function SideRail({
         <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden py-[0.625rem] pb-4">
           {groups.map((g) => (
             <div key={g.name} className="mt-1.5 first:mt-0">
-              <div className={cn("whitespace-nowrap px-[1.625rem] pb-[0.4375rem] pt-3.5 font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.16em] text-txt-dim", labelFade)}>
-                {g.name}
-              </div>
+              {showGroupHeaders && (
+                <div className={cn("whitespace-nowrap px-[1.625rem] pb-[0.4375rem] pt-3.5 font-mono text-[0.625rem] font-bold uppercase leading-none tracking-[0.16em] text-txt-dim", labelFade)}>
+                  {g.name}
+                </div>
+              )}
               {g.items.map((it) => {
                 const on = it.href === activeHref
                 return (

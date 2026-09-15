@@ -80,7 +80,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.smartrotom.img, "sprites/items/CHOICESPECS.png"),
-            iconSrc: staticAsset(ASSET.smartrotom.img, "sprites/items/CHOICESPECS.png"),
+            //iconSrc: staticAsset(ASSET.smartrotom.img, "sprites/items/CHOICESPECS.png"),
             fallbackIcon: "calc",
             fallbackIconColor: "text-primary-hover",
             color: "from-primary to-violet-600",
@@ -98,7 +98,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.smartrotom.img, "sprites/items/CHOICESCARF.png"),
-            iconSrc: staticAsset(ASSET.smartrotom.img, "sprites/items/CHOICESCARF.png"),
+            //iconSrc: staticAsset(ASSET.smartrotom.img, "sprites/items/CHOICESCARF.png"),
             fallbackIcon: "bolt",
             fallbackIconColor: "text-primary-hover",
             color: "from-primary to-indigo-600",
@@ -116,7 +116,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/pokemon/POKEDEX.png"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "games/pokemon/POKEDEX.png"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "games/pokemon/POKEDEX.png"),
             fallbackIcon: "chart",
             fallbackIconColor: "text-primary-hover",
             color: "from-primary to-fuchsia-600",
@@ -134,7 +134,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.smartrotom.img, "sprites/items/POKERADAR.png"),
-            iconSrc: staticAsset(ASSET.smartrotom.img, "sprites/items/POKERADAR.png"),
+            //iconSrc: staticAsset(ASSET.smartrotom.img, "sprites/items/POKERADAR.png"),
             fallbackIcon: "book",
             fallbackIconColor: "text-primary-hover",
             color: "from-primary to-cyan-600",
@@ -153,7 +153,7 @@ export const pokemon: GameEntry = {
       // The whole category appears as a single card on the Pokemon landing page
       landing: {
         icon: staticAsset(ASSET.boffmedia.img, "games/tcgpocket/icon.webp"),
-        iconSrc: staticAsset(ASSET.boffmedia.img, "games/tcgpocket/icon.webp"),
+        //iconSrc: staticAsset(ASSET.boffmedia.img, "games/tcgpocket/icon.webp"),
         fallbackIcon: "cards",
         fallbackIconColor: "text-yellow-400",
         color: "from-yellow-300 to-yellow-500",
@@ -174,7 +174,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/tcgpocket/icon.webp"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "games/tcgpocket/icon.webp"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "games/tcgpocket/icon.webp"),
             fallbackIcon: "home",
             fallbackIconColor: "text-yellow-400",
             color: "from-yellow-300 to-yellow-500",
@@ -192,7 +192,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "tcgpocket/cards.png"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "tcgpocket/cards.png"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "tcgpocket/cards.png"),
             fallbackIcon: "cards",
             fallbackIconColor: "text-yellow-400",
             color: "from-yellow-300 to-orange-500",
@@ -210,7 +210,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "tcgpocket/collection.png"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "tcgpocket/collection.png"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "tcgpocket/collection.png"),
             fallbackIcon: "grid",
             fallbackIconColor: "text-yellow-400",
             color: "from-yellow-300 to-amber-500",
@@ -228,7 +228,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "tcgpocket/packs.png"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "tcgpocket/packs.png"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "tcgpocket/packs.png"),
             fallbackIcon: "inbox",
             fallbackIconColor: "text-yellow-400",
             color: "from-yellow-300 to-red-500",
@@ -246,7 +246,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "tcgpocket/battle.png"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "tcgpocket/battle.png"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "tcgpocket/battle.png"),
             fallbackIcon: "sword",
             fallbackIconColor: "text-yellow-400",
             color: "from-yellow-300 to-rose-500",
@@ -271,7 +271,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/pmdsky-icon.webp"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "games/pokemon/gear.png"),
+            //iconSrc: staticAsset(ASSET.boffmedia.img, "games/pokemon/gear.png"),
             fallbackIcon: "zap",
             fallbackIconColor: "text-secondary-hover",
             color: "from-secondary-hover to-cyan-600",
