@@ -227,6 +227,25 @@ export class TcgRepository implements ITcgRepository {
     }
   }
 
+  /** Read a whole series in one joined query. The grouped catalogue endpoint
+   * used to issue one round-trip per set, which made a cold desktop open much
+   * more likely to fail or exceed the control timeout. */
+  async getCardsBySeriesId(seriesId: string): Promise<any[]> {
+    try {
+      return await this.db
+        .select(this.cardSelect)
+        .from(tcgCards)
+        .innerJoin(tcgSets, eq(tcgCards.setId, tcgSets.id))
+        .where(eq(tcgSets.seriesId, seriesId));
+    } catch (error: any) {
+      this.logger.error(
+        `[TcgRepository] Error getting cards for series ${seriesId}:`,
+        error,
+      );
+      throw error;
+    }
+  }
+
   async insertCards(cards: any[]): Promise<void> {
     try {
       if (cards.length === 0) return;

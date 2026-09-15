@@ -26,6 +26,7 @@ import {
   registerTools,
   webSaveFile,
   ToolApiError,
+  retryToolApiRequest,
   type SaveFileData,
   type SaveFileRequest,
   type SaveFileResult,
@@ -120,7 +121,7 @@ async function desktopSaveFile(request: SaveFileRequest): Promise<SaveFileResult
 }
 
 /** Rust's serialised `ApiError`, as it arrives through `invoke`. */
-type WireApiError = { message?: string; needs_signin?: boolean; code?: string }
+type WireApiError = { message?: string; needs_signin?: boolean; code?: string; status?: number }
 
 /**
  * The desktop `api` capability (plan D7).
@@ -153,6 +154,7 @@ function webModeApiBase(): string {
 
 const desktopApi: ToolApi = {
   async request<T>(path: string, init?: ToolApiRequest): Promise<T> {
+    const method = init?.method ?? "GET"
     const query: Record<string, string> = {}
     for (const [key, value] of Object.entries(init?.query ?? {})) {
       if (value !== undefined) query[key] = String(value)
@@ -160,21 +162,31 @@ const desktopApi: ToolApi = {
     // `signal` is deliberately not forwarded: a Tauri command cannot be
     // cancelled mid-flight, so honouring the abort would only hide a request
     // that is still running. Callers that pass one still get their result.
-    try {
-      return await toolApiRequest<T>({
-        path,
-        method: init?.method,
-        body: init?.body,
-        query,
-        auth: init?.auth ?? "optional",
-      })
-    } catch (err) {
-      const wire = err as WireApiError
-      throw new ToolApiError(wire?.message ?? `${init?.method ?? "GET"} ${path} failed`, {
-        needsSignin: wire?.needs_signin === true,
-        code: wire?.code,
-      })
-    }
+    return retryToolApiRequest(method, async () => {
+      try {
+        return await toolApiRequest<T>({
+          path,
+          method: init?.method,
+          body: init?.body,
+          query,
+          auth: init?.auth ?? "optional",
+        })
+      } catch (err) {
+        const wire = err as WireApiError
+        throw new ToolApiError(wire?.message ?? `${method} ${path} failed`, {
+          status: wire?.status,
+          needsSignin: wire?.needs_signin === true,
+          code: wire?.code,
+        })
+      }
+    }, {
+      label: `${method} ${path}`,
+      onRetry: (error, attempt) => console.warn(`[tool-api] retry ${method} ${path}`, {
+        attempt,
+        code: error.code,
+        status: error.status,
+      }),
+    })
   },
 
   async stream<T>(path: string, init: ToolStreamRequest<T>): Promise<void> {

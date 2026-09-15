@@ -64,7 +64,7 @@ export function TcgpApp({
   const view = viewProp ?? ownView
   const galleryUser = view === "coleccion" ? (galleryUserProp ?? ownGalleryUser) : null
 
-  const { data, loading, error } = useTcgpCards()
+  const { data, loading, error, refresh } = useTcgpCards()
   const collection = useCollection({ username: galleryUser || undefined, byId: data?.byId })
 
   const [drawer, setDrawer] = useState<{ card: TcgCard; list: TcgCard[] } | null>(null)
@@ -150,7 +150,15 @@ export function TcgpApp({
             <div className="grid min-h-[40vh] place-items-center"><Spinner /></div>
           ) : error || !data ? (
             <div className="grid min-h-[40vh] place-items-center">
-              <Empty icon="alert" title={t("app.errorTitle")} lead={t("app.errorLead")} />
+              <Empty icon="alert" title={t("app.errorTitle")} lead={t("app.errorLead")}>
+                <button
+                  type="button"
+                  onClick={refresh}
+                  className="border border-line-2 bg-panel px-4 py-2 font-mono text-xs font-semibold uppercase tracking-[0.08em] text-txt transition-colors hover:bg-panel-2"
+                >
+                  {t("app.retry")}
+                </button>
+              </Empty>
             </div>
           ) : view === "cartas" ? (
             <CartasView data={data} effective={collection.effective} initialQ={query || (view === "cartas" ? search.trim() : "")} onOpenCard={openCard} />

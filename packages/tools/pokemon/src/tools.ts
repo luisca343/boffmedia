@@ -44,10 +44,10 @@ export const tcgPocketTool: ToolManifest = {
   icon: "cards",
   route: "/pokemon/tcgpocket",
   // The card database comes from the API. The COLLECTION does not — it is read
-  // from and written to the local store, and synced through the outbox — so a
-  // player with no connection still has a working collection, just not a
-  // browsable card list they have never loaded.
-  requiredCapabilities: ["api"],
+  // from and written to the local store, and synced through the outbox. The
+  // catalogue is cached after its first successful API load as well, so a
+  // later startup hiccup does not blank an otherwise usable tool.
+  requiredCapabilities: ["api", "storage"],
   layout: "document",
   component: lazy(() => import("./tcgpocket/TcgpApp").then((m) => ({ default: m.TcgpApp }))),
 };

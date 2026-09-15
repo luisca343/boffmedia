@@ -20,6 +20,15 @@ const DESKTOP_GUARDS = [
   'DesktopOrUserAuthGuard',
 ];
 
+// These controllers are public to anonymous tool users, but the desktop host
+// may still attach its optional launcher JWT. Keep the explicit opt-in close to
+// the route so a future refactor cannot reintroduce a token-dependent 403.
+const PUBLIC_TOOL_CONTROLLERS = [
+  'api/boffmedia/herramientas/mhwilds/mhwilds.controller.ts',
+  'api/boffmedia/herramientas/mhwilds/mhwilds-anatomy.controller.ts',
+  'api/boffmedia/herramientas/pokemon/tcgpocket/tcg.controller.ts',
+];
+
 function controllerFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((entry) => {
     const full = join(dir, entry);
@@ -45,6 +54,15 @@ describe('client model declarations', () => {
         return usesDesktop && !source.includes('CLIENT.DESKTOP');
       })
       .map((file) => relative(API_SRC, file).split(sep).join('/'));
+
+    expect(missing).toEqual([]);
+  });
+
+  it('public tool controllers admit the optional desktop bearer', () => {
+    const missing = PUBLIC_TOOL_CONTROLLERS.filter((relativePath) => {
+      const source = readFileSync(join(API_SRC, relativePath), 'utf8');
+      return source.includes('@Public()') && !source.includes('CLIENT.DESKTOP');
+    });
 
     expect(missing).toEqual([]);
   });

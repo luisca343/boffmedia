@@ -146,6 +146,21 @@ export class TcgService {
 
   // ==================== CARDS OPERATIONS ====================
 
+  async getCardsForSeriesFromDb(seriesId: string): Promise<any[]> {
+    try {
+      this.errorService.validateSeriesId(seriesId);
+      return await this.tcgRepository.getCardsBySeriesId(seriesId);
+    } catch (error: any) {
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      this.errorService.handleDatabaseError(
+        error,
+        'Get cards for series from database',
+      );
+    }
+  }
+
   async getCardsForSetFromDb(setId: string): Promise<any[]> {
     try {
       this.errorService.validateSetId(setId);

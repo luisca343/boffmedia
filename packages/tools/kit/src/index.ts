@@ -44,6 +44,8 @@ export type {
 } from "./data";
 export { createWebData } from "./web-data";
 export { createToolSession } from "./session";
+export { isRetryableToolApiError, retryToolApiRequest } from "./retry";
+export type { ToolApiRetryOptions } from "./retry";
 export type { ToolSession, ToolSessionStatus, ToolSessionUser } from "./session";
 
 export {

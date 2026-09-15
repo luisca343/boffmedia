@@ -16,6 +16,7 @@ export interface ITcgRepository {
   checkExistingSets(seriesId: string): Promise<any[]>;
 
   // ==================== CARDS OPERATIONS ====================
+  getCardsBySeriesId(seriesId: string): Promise<any[]>;
   getCardsBySetId(setId: string): Promise<any[]>;
   insertCards(cards: any[]): Promise<void>;
   findCardById(id: string): Promise<any | null>;

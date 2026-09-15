@@ -554,6 +554,7 @@ fn as_failure(err: ApiError) -> InstallFailure {
         ApiError::Denied(message)
         | ApiError::Message(message)
         | ApiError::Store(message) => InstallFailure::message(message),
+        ApiError::Http { message, .. } => InstallFailure::message(message),
         ApiError::Unreachable { message, .. } | ApiError::ServerDown { message, .. } => {
             InstallFailure::message(message)
         }

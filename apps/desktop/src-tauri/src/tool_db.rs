@@ -532,6 +532,7 @@ fn api_message(err: crate::api::ApiError) -> String {
         | crate::api::ApiError::Denied(m)
         | crate::api::ApiError::Message(m)
         | crate::api::ApiError::Store(m) => m,
+        crate::api::ApiError::Http { message: m, .. } => m,
         crate::api::ApiError::Unreachable { message: m, .. }
         | crate::api::ApiError::ServerDown { message: m, .. } => m,
     }

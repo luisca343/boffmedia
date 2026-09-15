@@ -10,6 +10,7 @@ import { createWebData } from "./web-data";
 import { createToolSession } from "./session";
 import type { ToolSession } from "./session";
 import { ToolApiError } from "./host";
+import { retryToolApiRequest } from "./retry";
 import type {
   SaveFileData,
   SaveFileRequest,
@@ -184,6 +185,7 @@ export function createWebApi(baseUrl: string, token?: ToolTokenSource): ToolApi 
     async request<T>(path: string, init?: ToolApiRequest): Promise<T> {
       const method = init?.method ?? "GET";
       const url = urlFor(path, init?.query);
+      return retryToolApiRequest(method, async () => {
       const headers = await headersFor(init);
 
       let response: Response;
@@ -223,6 +225,14 @@ export function createWebApi(baseUrl: string, token?: ToolTokenSource): ToolApi 
         );
       }
       return (await response.json()) as T;
+      }, {
+        label: `${method} ${url.pathname}`,
+        onRetry: (error, attempt) => console.warn(`[tool-api] retry ${method} ${url.pathname}`, {
+          attempt,
+          code: error.code,
+          status: error.status,
+        }),
+      });
     },
 
     async stream<T>(path: string, init: ToolStreamRequest<T>): Promise<void> {

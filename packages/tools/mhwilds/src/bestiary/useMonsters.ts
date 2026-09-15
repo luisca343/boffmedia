@@ -217,6 +217,7 @@ function joinLocalData(
 ): MhMonster[] {
   if (!payload) return monsters;
   const { byFixedId, byName, all } = indexLocalVariants(payload.data);
+  const apiUnavailable = monsters.length === 0;
   const matchedFixedIds = new Set<number>();
   const joined = monsters.map((monster) => {
     const localData =
@@ -240,7 +241,7 @@ function joinLocalData(
   const localOnly = all
     .filter(
       (variant) =>
-        (variant.identity?.zakoIconType ?? 0) > 0 &&
+        (apiUnavailable || (variant.identity?.zakoIconType ?? 0) > 0) &&
         variant.identity?.fixedId != null &&
         !matchedFixedIds.has(variant.identity.fixedId),
     )
@@ -290,7 +291,15 @@ export function useMonsters() {
         getLocalBestiaryData(),
         MhWildsService.getAnatomyOverrides(),
       ]);
-      if (!res.data) throw new Error("No data received from monsters API");
+      if (!res.data && !localData) {
+        throw new Error("No data received from monsters API or local pack");
+      }
+      if (!res.success && localData) {
+        console.warn(
+          "[mhwilds-bestiary] API unavailable; serving local bestiary data",
+          res.error,
+        );
+      }
       const overrides =
         overrideResponse.success && Array.isArray(overrideResponse.data)
           ? overrideResponse.data

@@ -28,6 +28,7 @@ const mockLogger = {
 const mockFacade = {
   getAllSeries: jest.fn(),
   getSetsForSeriesFromDb: jest.fn(),
+  getCardsForSeriesFromDb: jest.fn(),
   getCardsForSetFromDb: jest.fn(),
   getCardById: jest.fn(),
   fetchAndStoreSeries: jest.fn(),
@@ -477,6 +478,32 @@ describe('TcgController — integration (ValidationPipe + GlobalExceptionFilter)
       );
 
       expect(res.body[0].name).toBe('Genetic Apex');
+    });
+  });
+
+  describe('GET /tools/ptcgp/series/:seriesId/cards/grouped', () => {
+    it('loads the series cards once and groups them by set', async () => {
+      mockFacade.getSetsForSeriesFromDb.mockResolvedValue([
+        { id: 'A1', nameEn: 'Genetic Apex' },
+        { id: 'A2', nameEn: 'Space-Time Smackdown' },
+      ]);
+      mockFacade.getCardsForSeriesFromDb.mockResolvedValue([
+        { id: 'A2-001', setId: 'A2', localId: '001', name_en: 'Dialga' },
+        { id: 'A1-001', setId: 'A1', localId: '001', name_en: 'Pikachu' },
+      ]);
+
+      const res = await request(app.getHttpServer()).get(
+        '/tools/ptcgp/series/tcgp/cards/grouped',
+      );
+
+      expect(res.status).toBe(200);
+      expect(mockFacade.getCardsForSeriesFromDb).toHaveBeenCalledWith('tcgp');
+      expect(res.body.map((group: { setId: string }) => group.setId)).toEqual([
+        'A1',
+        'A2',
+      ]);
+      expect(res.body[0].cards[0].id).toBe('A1-001');
+      expect(res.body[1].cards[0].id).toBe('A2-001');
     });
   });
 

@@ -452,6 +452,10 @@ pub enum ApiError {
     /// Authenticated fine; this player simply is not entitled.
     Denied(String),
     Message(String),
+    /// The API answered with a non-5xx HTTP status. Keep the status across the
+    /// Tauri boundary so callers can distinguish a retryable 429/408 from a
+    /// permanent 403 without parsing human text.
+    Http { status: u16, message: String },
     /// The request never reached the API: DNS, refused connection, TLS, or a
     /// connect timeout. Distinct from `Message` so the renderer can say
     /// "cannot reach the server" instead of inventing a reason — from here we
@@ -534,7 +538,10 @@ pub(crate) async fn response_error(res: reqwest::Response, fallback: &str) -> Ap
             code: ErrorCode::Server5xxError,
         };
     }
-    ApiError::Message(error_message(res, fallback).await)
+    ApiError::Http {
+        status: res.status().as_u16(),
+        message: error_message(res, fallback).await,
+    }
 }
 
 impl From<ApiError> for AuthFailure {
@@ -546,6 +553,7 @@ impl From<ApiError> for AuthFailure {
             },
             ApiError::Denied(message)
             | ApiError::Message(message)
+            | ApiError::Http { message, .. }
             | ApiError::Store(message) => AuthFailure {
                 message,
                 needs_signin: false,
@@ -567,29 +575,35 @@ impl serde::Serialize for ApiError {
             message: &'a str,
             needs_signin: bool,
             #[serde(skip_serializing_if = "Option::is_none")]
+            status: Option<u16>,
+            #[serde(skip_serializing_if = "Option::is_none")]
             code: Option<&'a str>,
         }
-        let (message, needs_signin, code) = match self {
-            ApiError::NeedsSignin(m) => (m.as_str(), true, None),
-            ApiError::Denied(m) => (m.as_str(), false, None),
-            ApiError::Message(m) => (m.as_str(), false, None),
+        let (message, needs_signin, code, status) = match self {
+            ApiError::NeedsSignin(m) => (m.as_str(), true, None, None),
+            ApiError::Denied(m) => (m.as_str(), false, None, Some(403)),
+            ApiError::Message(m) => (m.as_str(), false, None, None),
+            ApiError::Http { status, message } => {
+                (message.as_str(), false, None, Some(*status))
+            }
             // Unreachable now carries an optional diagnostic code. The renderer
             // can use code-based fallbacks to "server_unreachable" for backwards compat.
             ApiError::Unreachable { message: m, code } => {
                 let code_str = code.map(|c| c.as_str()).or(Some("server_unreachable"));
-                (m.as_str(), false, code_str)
+                (m.as_str(), false, code_str, None)
             }
             // ServerDown always has a code now (Server5xxError), but we send
             // "server_down" for backwards compat with older renderers.
             ApiError::ServerDown { message: m, code: _ } => {
-                (m.as_str(), false, Some("server_down"))
+                (m.as_str(), false, Some("server_down"), None)
             }
-            ApiError::Store(m) => (m.as_str(), false, Some("store_error")),
+            ApiError::Store(m) => (m.as_str(), false, Some("store_error"), None),
         };
         Wire {
             message,
             needs_signin,
             code,
+            status,
         }
         .serialize(s)
     }
@@ -1734,5 +1748,18 @@ mod tests {
         assert!(failure.needs_signin);
         let failure = AuthFailure::from(ApiError::Denied("x".into()));
         assert!(!failure.needs_signin, "denial is not fixed by signing in again");
+    }
+
+    #[test]
+    fn api_http_errors_preserve_status_for_renderer_recovery() {
+        let wire = serde_json::to_value(ApiError::Http {
+            status: 429,
+            message: "try later".into(),
+        })
+        .expect("API errors must serialize");
+
+        assert_eq!(wire["status"], 429);
+        assert_eq!(wire["code"], serde_json::Value::Null);
+        assert_eq!(wire["needs_signin"], false);
     }
 }

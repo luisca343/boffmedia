@@ -53,6 +53,7 @@ import { RolesGuard } from '@api/_utils/guards/roles.guard';
 import { USER_ROLES } from '@api/_utils/auth/roles.constants';
 import { Roles } from '@api/_utils/decorators/roles.decorator';
 import { RequireSession } from '@api/_utils/decorators/require-session.decorator';
+import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 @ApiTags('BoffMedia 🛠 | MHWilds')
 // The MH Wilds data endpoints are deliberately public — the Tools section works
@@ -60,6 +61,10 @@ import { RequireSession } from '@api/_utils/decorators/require-session.decorator
 // four cache-maintenance routes are privileged: public, they would let anyone
 // flush or rebuild the cache at will.
 @Public()
+// A valid desktop launcher token is still attached to optional API calls. The
+// global ClientsGuard must explicitly admit the desktop surface; otherwise a
+// public route is unexpectedly answered with 403.
+@Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
 @Controller('tools/mhwilds')
 @UsePipes(new ValidationPipe({ transform: true, whitelist: true }))
 export class MhwildsController {

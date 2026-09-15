@@ -135,7 +135,7 @@ export function BestiaryView() {
   const locale = useLocale();
   const t = useToolT("tools.mhwilds.bestiary");
   const tAttr = useToolT("tools.mhwilds");
-  const { monsters, loading, error } = useMonsters();
+  const { monsters, loading, error, refresh } = useMonsters();
 
   const [q, setQ] = React.useState("");
   const [view, setView] = React.useState<View>("grid");
@@ -242,7 +242,15 @@ export function BestiaryView() {
           </div>
         ) : error ? (
           <div className="py-16">
-            <MhLoadError title={t("errorTitle")} detail={error} />
+            <MhLoadError title={t("errorTitle")} detail={error}>
+              <button
+                type="button"
+                onClick={refresh}
+                className="border border-[var(--mh-bright)] bg-transparent px-4 py-2 font-mono text-xs font-semibold uppercase tracking-[0.08em] text-[var(--mh-bright)] transition-colors hover:bg-[var(--mh-soft)]"
+              >
+                {t("retry")}
+              </button>
+            </MhLoadError>
           </div>
         ) : (
           // Master/detail: the roster is a sticky, self-scrolling column and the

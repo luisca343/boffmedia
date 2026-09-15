@@ -29,6 +29,10 @@ export class TcgFacadeService {
     return this.tcgService.getCardsForSetFromDb(setId);
   }
 
+  async getCardsForSeriesFromDb(seriesId: string) {
+    return this.tcgService.getCardsForSeriesFromDb(seriesId);
+  }
+
   async getCardById(cardId: string) {
     return this.tcgService.getCardById(cardId);
   }

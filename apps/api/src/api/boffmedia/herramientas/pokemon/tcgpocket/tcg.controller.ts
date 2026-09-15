@@ -44,6 +44,10 @@ import { CLIENT, Clients } from '@api/_utils/decorators/clients.decorator';
 
 @ApiTags('BoffMedia 🛠 | Pokemon TCG Pocket')
 @Public()
+// The catalog is public, but the desktop host may attach its optional launcher
+// token. Admit all tool surfaces so ClientsGuard does not turn that harmless
+// credential into a 403 on catalog requests.
+@Clients(CLIENT.WEB, CLIENT.DESKTOP, CLIENT.INGAME)
 @Controller('tools/ptcgp')
 export class TcgController {
   constructor(
@@ -238,19 +242,27 @@ export class TcgController {
     @Query('locale') locale: string = 'en',
   ): Promise<SeriesCardsGroup[]> {
     const sets = await this.tcgFacade.getSetsForSeriesFromDb(seriesId);
-    const groupedCards = [];
+    const cards = await this.tcgFacade.getCardsForSeriesFromDb(seriesId);
+    const bySet = new Map<string, any[]>();
+    for (const card of cards) {
+      const setId = this.either<string>(card, 'setId', 'set_id');
+      if (!setId) continue;
+      const group = bySet.get(setId) ?? [];
+      group.push(card);
+      bySet.set(setId, group);
+    }
 
-    for (const set of sets) {
-      const cards = await this.tcgFacade.getCardsForSetFromDb(set.id);
-      const mappedCards = cards.map((card) => this.parseCardData(card, locale));
-
-      groupedCards.push({
+    const groupedCards = sets.map((set) => {
+      const mappedCards = (bySet.get(set.id) ?? []).map((card) =>
+        this.parseCardData(card, locale),
+      );
+      return {
         setId: set.id,
         setName: this.setName(set, locale),
         cardCount: mappedCards.length,
         cards: mappedCards,
-      });
-    }
+      };
+    });
 
     return groupedCards;
   }
@@ -274,16 +286,8 @@ export class TcgController {
     @Param('seriesId') seriesId: string,
     @Query('locale') locale: string = 'en',
   ): Promise<TcgCard[]> {
-    const sets = await this.tcgFacade.getSetsForSeriesFromDb(seriesId);
-    const allCards = [];
-
-    for (const set of sets) {
-      const cards = await this.tcgFacade.getCardsForSetFromDb(set.id);
-      const mappedCards = cards.map((card) => this.parseCardData(card, locale));
-      allCards.push(...mappedCards);
-    }
-
-    return allCards;
+    const cards = await this.tcgFacade.getCardsForSeriesFromDb(seriesId);
+    return cards.map((card) => this.parseCardData(card, locale));
   }
 
   // ==================== FETCH OPERATIONS (EXTERNAL API) ====================

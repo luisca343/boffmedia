@@ -5,6 +5,7 @@ import { TcgSyncService } from './services/tcg-sync.service';
 
 const mockTcgService = {
   getSetsForSeriesFromDb: jest.fn(),
+  getCardsForSeriesFromDb: jest.fn(),
   getCardsForSetFromDb: jest.fn(),
   getCardById: jest.fn(),
   fetchAndStoreCardsForSet: jest.fn(),
@@ -65,6 +66,17 @@ describe('TcgFacadeService', () => {
       const result = await service.getCardsForSetFromDb('sv1');
 
       expect(result).toEqual([{ id: 'sv1-1' }]);
+    });
+  });
+
+  describe('getCardsForSeriesFromDb()', () => {
+    it('delegates to TcgService', async () => {
+      mockTcgService.getCardsForSeriesFromDb.mockResolvedValue([{ id: 'A1-1' }]);
+
+      await expect(service.getCardsForSeriesFromDb('tcgp')).resolves.toEqual([
+        { id: 'A1-1' },
+      ]);
+      expect(mockTcgService.getCardsForSeriesFromDb).toHaveBeenCalledWith('tcgp');
     });
   });
 

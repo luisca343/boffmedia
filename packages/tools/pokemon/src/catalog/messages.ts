@@ -520,6 +520,7 @@ export const messages = {
           "loadMore": "Cargar más ({n} restantes)",
           "ownedOnly": "Solo mías",
           "errorTitle": "No se pudo cargar",
+          "retry": "Reintentar",
           "errorLead": "No pudimos cargar la base de datos de cartas. Inténtalo de nuevo más tarde.",
           "empty": {
             "title": "Sin resultados",
@@ -2160,6 +2161,7 @@ export const messages = {
           "loadMore": "Load more ({n} left)",
           "ownedOnly": "Owned only",
           "errorTitle": "Couldn't load",
+          "retry": "Try again",
           "errorLead": "We couldn't load the card database. Please try again later.",
           "empty": {
             "title": "No results",
