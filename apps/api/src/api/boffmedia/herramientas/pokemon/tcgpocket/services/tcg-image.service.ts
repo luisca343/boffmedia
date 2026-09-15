@@ -5,7 +5,7 @@ import { Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { publicPath } from '@/config/paths';
 import { ASSET } from '@boffmedia/asset-paths';
-import type { TcgPackArtwork } from './tcg-fetch.service';
+import type { TcgPackArtwork } from './tcg-pocket-fallback.service';
 
 // The URL prefix that serves what we write. `apps/web/public` is a symlink to
 // the repo's `public/`, so a file written to publicPath('boffmedia','tools',
@@ -146,7 +146,7 @@ export class TcgImageService {
       );
       await fs.mkdir(cardImgDir, { recursive: true });
 
-      const imageUrl = cardData.image + '/high.webp';
+      const imageUrl = this.toCardImageUrl(cardData.image);
       const imageFilename = path.join(cardImgDir, `${cardId}_${locale}.webp`);
 
       const response = await this.downloadImage(imageUrl);
@@ -293,6 +293,12 @@ export class TcgImageService {
 
   private toWebpUrl(url: string): string {
     return /\.(?:png|jpe?g|webp)(?:[?#].*)?$/i.test(url) ? url : `${url}.webp`;
+  }
+
+  private toCardImageUrl(url: string): string {
+    return /\.(?:png|jpe?g|webp)(?:[?#].*)?$/i.test(url)
+      ? url
+      : `${url}/high.webp`;
   }
 
   private safeAssetName(value: string | null | undefined): string {

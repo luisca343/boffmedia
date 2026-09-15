@@ -10,6 +10,7 @@ import { TcgImageService } from './services/tcg-image.service';
 import { TcgSyncService } from './services/tcg-sync.service';
 import { TcgErrorService } from './services/tcg-error.service';
 import { TcgConfigService } from './services/tcg-config.service';
+import { TcgPocketFallbackService } from './services/tcg-pocket-fallback.service';
 import { TcgFacadeService } from './tcg.facade.service';
 import { TcgRepository } from './repositories/tcg.repository';
 import { TCGPOCKET_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
@@ -35,6 +36,7 @@ import { PacksModule } from '@api/packs/packs.module';
     TcgFacadeService,
     TcgErrorService,
     TcgConfigService,
+    TcgPocketFallbackService,
     ResponseService,
     {
       provide: TCGPOCKET_REPOSITORY_TOKEN,

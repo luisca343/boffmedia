@@ -214,7 +214,7 @@ function SideRail({
                     )}
                   >
                     <span className={cn("relative grid w-6 flex-none place-items-center transition-colors duration-[140ms]", on ? "text-[var(--ghue)]" : "text-txt-dim group-hover/link:text-txt-muted")}>
-                      <ToolIcon name={it.icon} src={it.iconSrc} size={18} />
+                      <ToolIcon name={it.icon} src={it.iconSrc} size={24} />
                     </span>
                     <span
                       className={cn(

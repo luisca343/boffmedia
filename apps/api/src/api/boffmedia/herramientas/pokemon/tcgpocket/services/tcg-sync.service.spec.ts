@@ -3,6 +3,7 @@ import { Logger } from 'nestjs-pino';
 import { TcgSyncService, TcgSyncEvent } from './tcg-sync.service';
 import { TcgFetchService } from './tcg-fetch.service';
 import { TcgImageService } from './tcg-image.service';
+import { TcgPocketFallbackService } from './tcg-pocket-fallback.service';
 import { TCGPOCKET_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 
 const mockLogger = {
@@ -24,6 +25,11 @@ const mockImageService = {
   downloadSetImages: jest.fn(),
   downloadCardImage: jest.fn(),
   downloadPackImages: jest.fn(),
+};
+
+const mockPocketFallbackService = {
+  isPocketDecksImage: jest.fn().mockReturnValue(false),
+  downloadCardImage: jest.fn(),
 };
 
 const mockRepository = {
@@ -78,6 +84,7 @@ describe('TcgSyncService', () => {
       skipped: 0,
       failed: 0,
     });
+    mockPocketFallbackService.isPocketDecksImage.mockReturnValue(false);
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -85,6 +92,10 @@ describe('TcgSyncService', () => {
         { provide: Logger, useValue: mockLogger },
         { provide: TcgFetchService, useValue: mockFetchService },
         { provide: TcgImageService, useValue: mockImageService },
+        {
+          provide: TcgPocketFallbackService,
+          useValue: mockPocketFallbackService,
+        },
         { provide: TCGPOCKET_REPOSITORY_TOKEN, useValue: mockRepository },
       ],
     }).compile();

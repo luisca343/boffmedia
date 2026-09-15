@@ -2,6 +2,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { Logger } from 'nestjs-pino';
 import { TcgFetchService } from './tcg-fetch.service';
 import { TcgImageService } from './tcg-image.service';
+import { TcgPocketFallbackService } from './tcg-pocket-fallback.service';
 import { TcgRepository } from '../repositories/tcg.repository';
 import { TCGPOCKET_REPOSITORY_TOKEN } from '@api/_utils/repositories/interfaces/repository.token';
 import {
@@ -123,6 +124,7 @@ export class TcgSyncService {
     private readonly logger: Logger,
     private readonly fetchService: TcgFetchService,
     private readonly imageService: TcgImageService,
+    private readonly pocketFallbackService: TcgPocketFallbackService,
     @Inject(TCGPOCKET_REPOSITORY_TOKEN)
     private readonly tcgRepository: TcgRepository,
   ) {}
@@ -766,12 +768,19 @@ export class TcgSyncService {
         const url = locale === 'en' ? remote.en : remote.es;
         if (!url) continue;
 
-        const path = await this.imageService.downloadCardImage(
-          { image: url },
-          card.id,
-          setId,
-          locale,
-        );
+        const path = this.pocketFallbackService.isPocketDecksImage(url)
+          ? await this.pocketFallbackService.downloadCardImage(
+              url,
+              card.id,
+              setId,
+              locale,
+            )
+          : await this.imageService.downloadCardImage(
+              { image: url },
+              card.id,
+              setId,
+              locale,
+            );
         if (path) {
           counts.downloaded += 1;
           if (locale === 'en') written.imageLocalEn = path;

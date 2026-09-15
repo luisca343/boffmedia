@@ -271,7 +271,7 @@ export const pokemon: GameEntry = {
           bleed: true,
           landing: {
             icon: staticAsset(ASSET.boffmedia.img, "games/pmdsky-icon.webp"),
-            iconSrc: staticAsset(ASSET.boffmedia.img, "games/pokemon/WONDERMAIL.png"),
+            iconSrc: staticAsset(ASSET.boffmedia.img, "games/pokemon/gear.png"),
             fallbackIcon: "zap",
             fallbackIconColor: "text-secondary-hover",
             color: "from-secondary-hover to-cyan-600",

@@ -6,6 +6,7 @@ import { Logger } from 'nestjs-pino';
 import { TcgFetchService } from './tcg-fetch.service';
 import { TcgErrorService } from './tcg-error.service';
 import { TcgConfigService } from './tcg-config.service';
+import { TcgPocketFallbackService } from './tcg-pocket-fallback.service';
 
 const mockLogger = {
   log: jest.fn(),
@@ -46,6 +47,12 @@ const mockConfigService = {
     (id: string) => `https://cdn.example/packs/${id}.webp`,
   ),
 };
+const mockPocketFallbackService = {
+  getSetsForSeries: jest.fn(),
+  mergePackArtwork: jest.fn(),
+  fetchCardsForSet: jest.fn(),
+  fetchCardImageUrlsForSet: jest.fn(),
+};
 
 describe('TcgFetchService', () => {
   let service: TcgFetchService;
@@ -79,6 +86,12 @@ describe('TcgFetchService', () => {
     mockConfigService.getPackArtworkImageUrl.mockImplementation(
       (id: string) => `https://cdn.example/packs/${id}.webp`,
     );
+    mockPocketFallbackService.getSetsForSeries.mockResolvedValue([]);
+    mockPocketFallbackService.mergePackArtwork.mockResolvedValue(undefined);
+    mockPocketFallbackService.fetchCardsForSet.mockResolvedValue([]);
+    mockPocketFallbackService.fetchCardImageUrlsForSet.mockResolvedValue(
+      new Map(),
+    );
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -87,6 +100,10 @@ describe('TcgFetchService', () => {
         { provide: HttpService, useValue: mockHttpService },
         { provide: TcgErrorService, useValue: mockErrorService },
         { provide: TcgConfigService, useValue: mockConfigService },
+        {
+          provide: TcgPocketFallbackService,
+          useValue: mockPocketFallbackService,
+        },
       ],
     }).compile();
 
@@ -225,6 +242,33 @@ describe('TcgFetchService', () => {
       expect(result[0].name_en).toBe('Base Set');
       expect(result[0].name_es).toBe('Set Base');
     });
+
+    it('adds Pocket expansions that TCGdex has not published yet', async () => {
+      mockHttpService.get
+        .mockReturnValueOnce(of({ data: { sets: [] } }))
+        .mockReturnValueOnce(of({ data: { sets: [] } }));
+      mockPocketFallbackService.getSetsForSeries.mockResolvedValue([
+        {
+          id: 'B4a',
+          name_en: "Team Rocket's Ambition",
+          name_es: "Team Rocket's Ambition",
+          total_cards: 110,
+        },
+      ]);
+
+      const result = await service.fetchAndMergeSetsForSeries('tcgp');
+
+      expect(result).toEqual([
+        expect.objectContaining({
+          id: 'B4a',
+          name_en: "Team Rocket's Ambition",
+          card_count_total: 110,
+        }),
+      ]);
+      expect(mockPocketFallbackService.getSetsForSeries).toHaveBeenCalledWith(
+        'tcgp',
+      );
+    });
   });
 
   describe('fetchPackArtworkForSet()', () => {
@@ -269,7 +313,40 @@ describe('TcgFetchService', () => {
       expect(mockConfigService.getSetUrl).toHaveBeenCalledWith('es', 'A1');
     });
 
+    it('uses the Pocket fallback when TCGdex does not have the set', async () => {
+      mockHttpService.get
+        .mockReturnValueOnce(throwError(() => ({ response: { status: 404 } })))
+        .mockReturnValueOnce(throwError(() => ({ response: { status: 404 } })));
+      mockPocketFallbackService.mergePackArtwork.mockImplementation(
+        async (_setId: string, packs: Map<string, any>) => {
+          packs.set('boo_B4a-default', {
+            id: 'boo_B4a-default',
+            name: 'Default',
+            image: 'https://cdn/b4a.webp',
+          });
+        },
+      );
+
+      await expect(service.fetchPackArtworkForSet('B4a')).resolves.toEqual([
+        {
+          id: 'boo_B4a-default',
+          name: 'Default',
+          image: 'https://cdn/b4a.webp',
+        },
+      ]);
+      expect(mockPocketFallbackService.mergePackArtwork).toHaveBeenCalledWith(
+        'B4a',
+        expect.any(Map),
+      );
+    });
+
     it('fills missing TCGdex booster artwork from the fallback catalogue', async () => {
+      mockPocketFallbackService.mergePackArtwork.mockImplementation(
+        async (_setId: string, packs: Map<string, any>) => {
+          packs.get('boo_A1-charizard').image = 'https://cdn/a1-charizard.webp';
+          packs.get('boo_A1-mewtwo').image = 'https://cdn/a1-mewtwo.webp';
+        },
+      );
       mockHttpService.get
         .mockReturnValueOnce(
           of({
@@ -318,10 +395,23 @@ describe('TcgFetchService', () => {
           image: 'https://cdn/a1-mewtwo.webp',
         },
       ]);
-      expect(mockConfigService.getPackArtworkCatalogUrl).toHaveBeenCalled();
+      expect(mockPocketFallbackService.mergePackArtwork).toHaveBeenCalledWith(
+        'A1',
+        expect.any(Map),
+      );
     });
 
     it('maps renamed single-booster and promo ids to available artwork', async () => {
+      mockPocketFallbackService.mergePackArtwork.mockImplementation(
+        async (setId: string, packs: Map<string, any>) => {
+          if (setId === 'A2b') {
+            packs.get('boo_A2b-shining').image = 'https://cdn/a2b-booster.webp';
+          } else {
+            packs.get('boo_P-A-vol1').image =
+              'https://cdn.example/packs/pa-promov1.webp';
+          }
+        },
+      );
       mockHttpService.get
         .mockReturnValueOnce(
           of({
