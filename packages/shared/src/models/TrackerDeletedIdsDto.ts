@@ -6,6 +6,5 @@ export type TrackerDeletedIdsDto = {
     sessions: Array<string>;
     matches: Array<string>;
     series: Array<string>;
-    presets: Array<string>;
 };
 

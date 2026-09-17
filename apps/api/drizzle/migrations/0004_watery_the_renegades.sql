@@ -1,0 +1,1 @@
+ALTER TABLE `boffmedia_changelog_translations` MODIFY COLUMN `locale` enum('es','en') NOT NULL;

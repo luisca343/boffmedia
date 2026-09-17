@@ -95,7 +95,7 @@ import type { SystemId } from "../services/systems";
 // "tools" is the registry-driven hub, "tool" one tool full-screen. Both are
 // reachable WITHOUT a Boffmedia session and offline — the tools are public on
 // the web, so gating them behind sign-in here would take that away.
-export type View = "packs" | "pack" | "logs" | "settings" | "tools" | "tool";
+export type View = "packs" | "pack" | "logs" | "settings" | "tools" | "tool" | "changelog";
 
 /** The unit the rail highlights. Views map onto sections, which is what makes
  *  the rail stay lit at depth — `pack` is still Play, `tool` is still Tools.

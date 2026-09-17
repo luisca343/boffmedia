@@ -1,0 +1,22 @@
+{
+  "styles": {
+    "icons": {
+      "title": "Iconos",
+      "description": "El inventario completo del registro de iconos compartido por la web, el escritorio y las herramientas.",
+      "controlsLabel": "Controles del catálogo de iconos",
+      "searchLabel": "Filtrar iconos",
+      "searchPlaceholder": "Buscar por nombre…",
+      "clearSearch": "Limpiar búsqueda",
+      "sizeLabel": "Tamaño de muestra",
+      "sizeValue": "{size}px",
+      "count": "{count, plural, =0 {Ningún icono visible} =1 {# icono visible} other {# iconos visibles}}",
+      "catalogLabel": "Registro",
+      "catalogTitle": "Todos los iconos",
+      "copyHint": "Pulsa una tarjeta para copiar su nombre.",
+      "copyIcon": "Copiar el nombre del icono {name}",
+      "copied": "Nombre copiado: {name}",
+      "copyFailed": "No se pudo copiar el nombre del icono.",
+      "empty": "No hay iconos para esa búsqueda."
+    }
+  }
+}

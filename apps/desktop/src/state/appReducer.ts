@@ -76,7 +76,7 @@ export type AppState = {
     needsSignin: boolean;
     code?: string;
   } | null;
-  view: "packs" | "pack" | "logs" | "settings" | "tools" | "tool";
+  view: "packs" | "pack" | "logs" | "settings" | "tools" | "tool" | "changelog";
   selectedPackId: string | null;
   /** Which registry tool the "tool" view is showing. */
   selectedToolId: string | null;
@@ -150,7 +150,7 @@ export type AppAction =
   | { type: "packs/error"; message: string }
   | {
       type: "view";
-      view: "packs" | "pack" | "logs" | "settings" | "tools" | "tool";
+      view: "packs" | "pack" | "logs" | "settings" | "tools" | "tool" | "changelog";
       packId?: string;
       edit?: boolean;
       toolId?: string;

@@ -15,8 +15,12 @@ export default async function AdminLayout({
     redirect('/entrar?returnTo=/admin');
   }
 
-  // Gate 2: Require BOFF_ADMIN role
-  if (!session.user.roles?.includes(USER_ROLES.BOFF_ADMIN)) {
+  // Content administrators own the customer-facing changelog. The console
+  // applies the narrower section filter; this layout only decides whether the
+  // account may enter the admin surface at all.
+  if (!session.user.roles?.some((role) =>
+    role === USER_ROLES.BOFF_ADMIN || role === USER_ROLES.BOFF_ADMIN_CONTENT
+  )) {
     redirect('/entrar?returnTo=/admin');
   }
 

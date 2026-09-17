@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 
-import { Icon, Spinner, Empty, SearchInput, ToolSeal, ToolStrip, ToolTitle, type IconName } from "@boffmedia/ui"
+import { Icon, Spinner, Empty, SearchInput, ToolStrip, type IconName } from "@boffmedia/ui"
 import { cn } from "@boffmedia/ui/cn"
 import { TCGP_NS, useToolT } from "../i18n"
 import type { TcgCard } from "./service"
@@ -105,33 +105,25 @@ export function TcgpApp({
     // still scrolls by exactly one Footer's height — scrolling down slides the
     // tool up and leaves the grid peeking through a sliver above the footer.
     <div className="flex min-w-0 flex-col">
-      {/* section header — the shared ToolStrip, so this tool's bar is the same
-          object (height, gutter, sticky offset, z-order) as every other one. */}
-      {/* Two rows, one sticky context — `ToolStrip` owns both. The wrapper this
-          used to hand-roll (and the `static` override that went with it) is now
-          the primitive's job, so the tab row cannot scroll out from under the
-          title here or anywhere else. */}
-      <ToolStrip
-        sub={
-          <nav role="tablist" aria-label="TCG Pocket" className="-my-2 flex gap-[2px] overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {TABS.map((tab) => {
-              const on = tab.key === view
-              return (
-                <button key={tab.key} role="tab" aria-selected={on} type="button" onClick={() => nav(tab.key)}
-                  className={cn(
-                    "inline-flex flex-none items-center gap-2 border-b-2 border-solid px-[0.9375rem] pb-[0.8125rem] pt-[0.6875rem] font-display text-[0.875rem] font-bold uppercase leading-none tracking-[0.06em] transition-colors",
-                    on ? "border-accent text-txt" : "border-transparent text-txt-muted hover:text-txt",
-                  )}>
-                  <Icon name={tab.icon} size={16} className={on ? "text-accent" : "text-txt-dim"} />
-                  {t(`app.tabs.${tab.key}`)}
-                </button>
-              )
-            })}
-          </nav>
-        }
-      >
-        <ToolSeal label="TCG" solid />
-        <ToolTitle title="TCG Pocket" sub={<span className="max-[560px]:hidden">{t("app.tagline")}</span>} />
+      {/* One compact app bar: tabs own the left side and search stays at the
+          trailing edge. Keeping everything in the primary row preserves the
+          shared ToolStrip height instead of creating a second navigation row. */}
+      <ToolStrip>
+        <nav role="tablist" aria-label="TCG Pocket" className="-my-2 flex min-w-0 flex-1 gap-[2px] overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {TABS.map((tab) => {
+            const on = tab.key === view
+            return (
+              <button key={tab.key} role="tab" aria-selected={on} type="button" onClick={() => nav(tab.key)}
+                className={cn(
+                  "inline-flex flex-none items-center gap-2 border-b-2 border-solid px-[0.9375rem] pb-[0.8125rem] pt-[0.6875rem] font-display text-[0.875rem] font-bold uppercase leading-none tracking-[0.06em] transition-colors",
+                  on ? "border-accent text-txt" : "border-transparent text-txt-muted hover:text-txt",
+                )}>
+                <Icon name={tab.icon} size={16} className={on ? "text-accent" : "text-txt-dim"} />
+                {t(`app.tabs.${tab.key}`)}
+              </button>
+            )
+          })}
+        </nav>
         <div className="ml-auto w-[min(20rem,40vw)] max-[720px]:hidden">
           <SearchInput
             value={search}

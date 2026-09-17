@@ -9,6 +9,7 @@ import { LangSwitcher } from "./LangSwitcher"
 import { MobileAccount } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections, type NavSection } from "./nav-data"
 import { useViewerRoles } from "@/services/useBoffSession"
+import { ChangelogLink } from "./ChangelogLink"
 
 function sectionItems(sections: NavSection[]) {
   return sections.map((s) => ({
@@ -141,6 +142,8 @@ export function MobileNav({ pathname }: { pathname: string }) {
               <LangSwitcher />
               <IconButton name="search" label={tNav("search")} />
             </div>
+
+            <ChangelogLink mobile />
 
             <MobileAccount onNavigate={close} />
           </nav>

@@ -125,6 +125,18 @@
       "es": "No formas parte de este chat.",
       "where": "smartrotom/chatapp"
     },
+    "CHANGELOG_CONTENT_INVALID": {
+      "es": "Revisa el contenido de la novedad antes de guardarla.",
+      "where": "api/boffmedia/changelog/changelog.service.ts"
+    },
+    "CHANGELOG_ENTRY_NOT_FOUND": {
+      "es": "Esta novedad ya no existe.",
+      "where": "api/boffmedia/changelog/changelog.service.ts"
+    },
+    "CHANGELOG_SPANISH_REVIEW_REQUIRED": {
+      "es": "Revisa la traducción al español antes de publicar la novedad.",
+      "where": "api/boffmedia/changelog/changelog.service.ts"
+    },
     "DATA_EXPORT_EXPIRED": {
       "es": "Esta copia de tus datos ha caducado y se ha borrado. Puedes volver a pedirla.",
       "where": "api/boffmedia/data-export/data-export.service.ts"

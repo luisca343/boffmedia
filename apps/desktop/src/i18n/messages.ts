@@ -807,6 +807,19 @@ const es = {
     tools: "Herramientas",
   },
 
+  changelog: {
+    title: "Novedades",
+    description: "Mejoras, funciones nuevas y cambios importantes de Boffmedia.",
+    loading: "Cargando novedades...",
+    error: "No se pudieron cargar las novedades.",
+    retry: "Reintentar",
+    empty: "Todavía no hay novedades",
+    emptyDescription: "Cuando publiquemos una actualización, aparecerá aquí.",
+    offline: "Mostrando la última copia guardada; algunas novedades pueden faltar.",
+    version: "Versión {version}",
+    platform: { web: "Web", desktop: "App", all: "Todos" },
+  },
+
   logs: {
     title: "Registro",
     copied: "Copiado",
@@ -816,6 +829,7 @@ const es = {
   shell: {
     navPacks: "Packs",
     navLogs: "Registro",
+    navChangelog: "Novedades",
     navTools: "Herramientas",
     navSettings: "Ajustes",
     offlineTitle: "Sin conexión",
@@ -2206,6 +2220,19 @@ const en = {
     tools: "Tools",
   },
 
+  changelog: {
+    title: "What's new",
+    description: "Improvements, new features and important changes from Boffmedia.",
+    loading: "Loading updates...",
+    error: "We could not load the updates.",
+    retry: "Try again",
+    empty: "No updates yet",
+    emptyDescription: "When we publish an update, it will appear here.",
+    offline: "Showing the last saved copy; some updates may be missing.",
+    version: "Version {version}",
+    platform: { web: "Web", desktop: "App", all: "All" },
+  },
+
   logs: {
     title: "Log",
     copied: "Copied",
@@ -2215,6 +2242,7 @@ const en = {
   shell: {
     navPacks: "Packs",
     navLogs: "Log",
+    navChangelog: "What's new",
     navTools: "Tools",
     navSettings: "Settings",
     offlineTitle: "Offline",

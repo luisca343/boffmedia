@@ -1,0 +1,21 @@
+{
+  "changelog": {
+    "title": "What's new",
+    "shortTitle": "What's new",
+    "description": "Improvements, new features and important changes across Boffmedia.",
+    "smartrotomDescription": "Improvements, new features and important changes across SmartRotom.",
+    "loading": "Loading updates...",
+    "error": "We could not load the updates.",
+    "retry": "Try again",
+    "empty": "No updates yet",
+    "emptyDescription": "When we publish an update, it will appear here.",
+    "open": "Open updates",
+    "openWithUnread": "Open updates; {count} unread",
+    "version": "Version {version}",
+    "platform": {
+      "web": "Web",
+      "desktop": "App",
+      "all": "All"
+    }
+  }
+}

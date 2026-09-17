@@ -68,12 +68,14 @@ export default function AppWrapper({
   const t = useTranslations("smartrotom")
   const router = useRouter()
   const pathname = usePathname()
+  const isPublicSmartRotomRoute =
+    pathname === "/smartrotom/changelog" || pathname.startsWith("/smartrotom/changelog/")
 
   // Out of the game there is no MCEF bridge and no reason for SmartRotom to own
   // a login form: `/entrar` is the single entry point, and it comes back here.
   // In game this branch never runs — MinecraftAuthForm handles the Mojang
   // handshake below.
-  const needsWebSignIn = status === "unauthenticated" && !isMC
+  const needsWebSignIn = status === "unauthenticated" && !isMC && !isPublicSmartRotomRoute
   useEffect(() => {
     if (!needsWebSignIn) return
     router.replace(`/entrar?redirect=${encodeURIComponent(pathname || "/smartrotom")}`)
@@ -191,7 +193,7 @@ export default function AppWrapper({
     return rotomUuid ? true : false
   }
 
-  if (status === "authenticated" && !smartRotomLinked()) {
+  if (!isPublicSmartRotomRoute && status === "authenticated" && !smartRotomLinked()) {
     if (!isMC)
       return (
         <AuthScreen>
@@ -218,7 +220,7 @@ export default function AppWrapper({
     )
   }
 
-  if (status === "authenticated" && !boffMediaLinked()) {
+  if (!isPublicSmartRotomRoute && status === "authenticated" && !boffMediaLinked()) {
     return (
       <AuthScreen>
         <RotomErrorPage

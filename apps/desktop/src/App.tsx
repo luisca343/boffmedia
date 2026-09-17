@@ -6,6 +6,7 @@ import { Shell } from "./components/Shell"
 import { Titlebar } from "./components/Titlebar"
 import { UpdateBanner } from "./components/UpdateBanner"
 import { Logs } from "./screens/Logs"
+import { Changelog } from "./screens/Changelog"
 import { PackDetail } from "./screens/PackDetail"
 import { Packs } from "./screens/Packs"
 import { Settings } from "./screens/Settings"
@@ -58,6 +59,7 @@ function Router() {
           {view === "packs" && <Packs />}
           {view === "pack" && <PackDetail />}
           {view === "logs" && <Logs />}
+          {view === "changelog" && <Changelog />}
           {view === "settings" && <Settings />}
           {view === "tools" && <Tools />}
           {view === "tool" && <ToolView />}

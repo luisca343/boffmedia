@@ -15,6 +15,7 @@ import { MobileNav } from "./MobileNav"
 import { AccountNav } from "./AccountNav"
 import { PRIMARY_NAV, buildToolsSections, buildComunidadSections } from "./nav-data"
 import { useViewerRoles } from "@/services/useBoffSession"
+import { ChangelogLink } from "./ChangelogLink"
 
 function useTheme() {
   const [theme, setTheme] = React.useState<"dark" | "light">("dark")
@@ -91,6 +92,7 @@ export function Navbar() {
           <LangSwitcher />
           <span aria-hidden="true" className="h-[1.375rem] w-px shrink-0 bg-line-2" />
           <NotifBell />
+          <ChangelogLink />
         </div>
         <IconButton name={theme === "dark" ? "sun" : "moon"} label={tNav("theme")} onClick={toggle} />
         <div className="hidden items-center gap-2 min-[1120px]:inline-flex">

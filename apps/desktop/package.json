@@ -19,6 +19,7 @@
     "sync:tool-assets": "node scripts/sync-tool-assets.mjs"
   },
   "dependencies": {
+    "@boffmedia/shared": "workspace:*",
     "@boffmedia/pack-schema": "workspace:*",
     "@boffmedia/tailwind-config": "workspace:*",
     "@boffmedia/tool-kit": "workspace:*",

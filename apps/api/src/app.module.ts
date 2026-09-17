@@ -82,6 +82,7 @@ import { DesktopUpdatesModule } from './api/desktop-updates/desktop-updates.modu
 import { DesktopTelemetryModule } from './api/desktop-telemetry/desktop-telemetry.module';
 import { RandomizerModule } from '@api/randomizer/randomizer.module';
 import { WebhooksModule } from '@api/webhooks/webhooks.module';
+import { ChangelogModule } from '@api/boffmedia/changelog/changelog.module';
 import { publicPath } from '@/config/paths';
 
 @Module({
@@ -181,6 +182,7 @@ import { publicPath } from '@/config/paths';
     DesktopTelemetryModule,
     RandomizerModule,
     WebhooksModule,
+    ChangelogModule,
   ],
   controllers: [AppController],
   providers: [

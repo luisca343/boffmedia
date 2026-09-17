@@ -8,9 +8,25 @@ export type WeaponTreeNodeEntity = {
      */
     id: number;
     /**
+     * Localized game identifier used by the extracted asset pack
+     */
+    gameId?: number;
+    /**
+     * Unique occurrence key for a route through converging branches
+     */
+    pathKey?: string;
+    /**
+     * Stable weapon-kind/game-id key for the 2D thumbnail
+     */
+    assetKey?: string;
+    /**
      * Name of the weapon
      */
     name: string;
+    /**
+     * Weapon description
+     */
+    description?: string;
     /**
      * Rarity level of the weapon
      */

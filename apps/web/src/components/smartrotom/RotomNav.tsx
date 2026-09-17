@@ -20,6 +20,7 @@ import { SmartRotomBadge, SmartRotomButton, SmartRotomPanel } from "@/components
 import { NotificationsService } from "@/services/api/smartrotom/notificationsService";
 import type { NotificationResponseDto } from "@boffmedia/shared";
 import { useTranslations } from "next-intl";
+import { ChangelogLink } from "./ChangelogLink";
 
 export function RotomNav() {
   const { socket, connect } = useSocketStore();
@@ -175,6 +176,7 @@ export function RotomNav() {
       <NextButton />
       <ReloadButton />
       <BreadcrumbNav className="flex-1 mx-1 invisible w-0 sm:w-auto sm:visible " />
+      <ChangelogLink />
       <SrSheet>
         <SrSheetTrigger>
           <SettingsButton />

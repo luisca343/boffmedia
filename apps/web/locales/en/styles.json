@@ -1,0 +1,22 @@
+{
+  "styles": {
+    "icons": {
+      "title": "Icons",
+      "description": "The complete inventory of the icon registry shared by the web app, desktop app and tools.",
+      "controlsLabel": "Icon catalogue controls",
+      "searchLabel": "Filter icons",
+      "searchPlaceholder": "Search by name…",
+      "clearSearch": "Clear search",
+      "sizeLabel": "Preview size",
+      "sizeValue": "{size}px",
+      "count": "{count, plural, =0 {No icons visible} =1 {# icon visible} other {# icons visible}}",
+      "catalogLabel": "Registry",
+      "catalogTitle": "All icons",
+      "copyHint": "Click a card to copy its name.",
+      "copyIcon": "Copy icon name {name}",
+      "copied": "Name copied: {name}",
+      "copyFailed": "The icon name could not be copied.",
+      "empty": "No icons match that search."
+    }
+  }
+}

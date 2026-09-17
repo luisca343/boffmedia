@@ -1,5 +1,9 @@
 {
   "pageMeta": {
+    "changelog": {
+      "title": "What's new - Boffmedia",
+      "description": "Boffmedia changes, improvements and new features."
+    },
     "foro": {
       "index": {
         "title": "Forum · Boffmedia",
@@ -263,6 +267,10 @@
       }
     },
     "smartrotom": {
+      "changelog": {
+        "title": "What's new - SmartRotom",
+        "description": "SmartRotom changes and improvements."
+      },
       "index": {
         "title": "SmartRotom",
         "description": "SmartRotom"
