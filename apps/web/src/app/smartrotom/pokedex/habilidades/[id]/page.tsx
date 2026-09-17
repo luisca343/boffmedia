@@ -1,7 +1,7 @@
 import { ScreenShell } from "../../_components/ScreenShell"
 import { PageHead } from "../../_components/PageHead"
 import { AbilityDetailPane } from "../_components/AbilityDetailPane"
-import { SparklesIcon } from "lucide-react"
+import { SparklesIcon } from "@boffmedia/ui"
 import { getTranslations } from "next-intl/server"
 
 export default async function AbilityDetailPage({ params }: { params: Promise<{ id: string }> }) {

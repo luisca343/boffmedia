@@ -12,7 +12,7 @@ import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 import { ScreenShell } from "../../_components/ScreenShell"
 import { StatusPill } from "../../_components/ui"
 import { RARITY_META } from "../../_utils/dexMeta"
-import { ArrowLeftIcon } from "lucide-react"
+import { ArrowLeftIcon } from "@boffmedia/ui"
 import { getTranslatedBiomeName } from "@/utils/pokemonTranslations"
 import { resolveBiome } from "../../_data/biomes"
 

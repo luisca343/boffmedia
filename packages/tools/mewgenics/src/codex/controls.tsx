@@ -85,14 +85,11 @@ export function MewSelect({
           </option>
         ))}
       </select>
-      <svg
-        className="pointer-events-none absolute right-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-[color:var(--mwp-ink)]"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 16 16"
-        fill="currentColor"
-      >
-        <path d="M4 6l4 4 4-4z" />
-      </svg>
+      <Icon
+        name="chevronDown"
+        size={16}
+        className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[color:var(--mwp-ink)]"
+      />
     </div>
   )
 }

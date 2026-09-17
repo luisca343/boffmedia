@@ -2,7 +2,7 @@
 
 import { useMemo } from "react"
 import { useTranslations } from "next-intl"
-import { BookmarkIcon } from "lucide-react"
+import { BookmarkIcon } from "@boffmedia/ui"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { usePokemonStore } from "@/stores/pokemonStore"
 

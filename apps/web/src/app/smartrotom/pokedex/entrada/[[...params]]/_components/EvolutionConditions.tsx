@@ -1,6 +1,6 @@
 import React from "react"
 import { Evolution } from "@/types/Pokemon"
-import { InfoIcon } from "lucide-react"
+import { InfoIcon } from "@boffmedia/ui"
 import { ItemSprite } from "../../../_components/PokemonSprite"
 import { getTranslatedBiomeName, isVisibleBiome } from "@/utils/pokemonTranslations"
 

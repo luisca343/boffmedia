@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useLocale, useTranslations } from "next-intl"
 import { useTransition } from "react"
-import { Globe } from "lucide-react"
+import { Globe } from "@boffmedia/ui"
 
 interface LanguageSwitcherProps {
   variant?: "default" | "mobile"

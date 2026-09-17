@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { OutdatedDataWarning } from "@/components/smartrotom/behavior/OutdatedDataWarning";
 import { useTranslations } from "next-intl";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle } from "@boffmedia/ui";
 import { getMcUserData, getWaypoints, type Waypoint } from "@/services/mcef/mcefApi";
 import { useIsMinecraft } from "@/components/smartrotom/behavior/useIsMinecraft";
 import { Icon, Modal } from "../ui";

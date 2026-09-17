@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, Download, Trash2 } from "lucide-react"
+import { ChevronLeft, ChevronRight, Download, Trash2 } from "@boffmedia/ui"
 import { Button } from "@/components/ui/primitives/button"
 import { Dialog, DialogContent } from "@/components/ui/primitives/dialog"
 import { toast } from "react-toastify"

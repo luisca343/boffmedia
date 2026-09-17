@@ -3,7 +3,7 @@
 import type { Abilities, Pokemon } from "@/types/Pokemon"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { StarIcon, SparklesIcon } from "lucide-react"
+import { StarIcon, SparklesIcon } from "@boffmedia/ui"
 import { PokedexStatus } from "../../../dexUtils"
 import { usePokedexData } from "@/hooks/usePokedexData"
 

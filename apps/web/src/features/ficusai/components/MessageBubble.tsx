@@ -1,6 +1,6 @@
 "use client";
 import { Avatar, AvatarFallback } from "@/components/ui/primitives/avatar";
-import { Bot, User } from "lucide-react";
+import { Bot, User } from "@boffmedia/ui";
 import { Mensaje, MessagePart, PokemonStats } from "../types";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";

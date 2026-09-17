@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/primitives/button"
 import { toast } from 'react-toastify';
-import { Copy, Server, Users, Zap } from 'lucide-react'
+import { Copy, Server, Users, Zap } from '@boffmedia/ui'
 import { useTranslations } from 'next-intl'
 
 export function MovingSection() {

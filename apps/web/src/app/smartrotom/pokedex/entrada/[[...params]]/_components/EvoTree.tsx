@@ -1,6 +1,6 @@
 import { getTranslations } from "next-intl/server"
 import { PokemonService } from "@/services/api/smartrotom/pokemonService"
-import { InfoIcon } from "lucide-react"
+import { InfoIcon } from "@boffmedia/ui"
 import { TreeRenderer } from "./TreeRenderer"
 import { PokemonSpriteLink } from "../../../_components/PokemonSprite"
 

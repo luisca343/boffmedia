@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
+import { WigglypopMark } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import { fmt } from "../_utils/format"
 import { cartCount, useCartStore } from "../_stores/cartStore"
@@ -60,21 +61,7 @@ export function TopNav({
       <Link href="/smartrotom/wigglypop" className="flex flex-none items-center gap-3">
         <span className="wp-grad-mark flex h-10 w-10 items-center justify-center rounded-[14px] shadow-[0_8px_18px_-6px_rgba(223,63,137,.7),inset_0_1px_0_rgba(255,255,255,.5)]">
           {/* The mascot: a speech bubble with Wigglytuff's face — buy, sell, chat. */}
-          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path
-              d="M5 4h14a2.5 2.5 0 0 1 2.5 2.5v8A2.5 2.5 0 0 1 19 17h-6.5L7 21v-4H5a2.5 2.5 0 0 1-2.5-2.5v-8A2.5 2.5 0 0 1 5 4z"
-              fill="#fff"
-            />
-            <circle cx="9.4" cy="10" r="1.5" fill="#ef4f97" />
-            <circle cx="14.6" cy="10" r="1.5" fill="#ef4f97" />
-            <path
-              d="M9.6 12.6q2.4 2 4.8 0"
-              stroke="#ef4f97"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              fill="none"
-            />
-          </svg>
+          <WigglypopMark />
         </span>
         <span>
           <span className="block font-wp-display text-[1.375rem] font-semibold leading-none text-wp-fg">

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
-import { CompassIcon } from "lucide-react"
+import { CompassIcon } from "@boffmedia/ui"
 import { getSpawns } from "@/services/mcef/mcefApi"
 import { Loading } from "@/components/smartrotom/Loading"
 import { RARITY_META } from "../_utils/dexMeta"

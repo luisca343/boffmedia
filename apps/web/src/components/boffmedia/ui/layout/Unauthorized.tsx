@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { ShieldOff } from "lucide-react";
+import { ShieldOff } from "@boffmedia/ui";
 
 export default function UnauthorizedPage() {
   const router = useRouter();

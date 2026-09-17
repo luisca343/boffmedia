@@ -6,7 +6,7 @@ import BreadcrumbNav from "@/components/smartrotom/BreadcrumbNav";
 import FicusAI from "@/features/ficusai/components/FicusAI";
 import { usePathname } from "next/navigation";
 import { getSmartRotomUser, cn } from "@/lib/utils";
-import { Bell, Check, X, Globe } from "lucide-react";
+import { Bell, Check, X, Globe } from "@boffmedia/ui";
 import { SettingsPage } from "@/components/smartrotom/Settings";
 import { SrPopover, SrPopoverTrigger, SrPopoverContent } from "@/components/smartrotom/chrome/SrPopover";
 import { useBoffSession } from "@/services/useBoffSession";

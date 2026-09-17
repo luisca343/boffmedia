@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 import { PokemonSprite } from "../../../_components/PokemonSprite"
-import { ChevronLeftIcon, ChevronRightIcon, ArrowUpRightIcon, BookmarkIcon } from "lucide-react"
+import { ChevronLeftIcon, ChevronRightIcon, ArrowUpRightIcon, BookmarkIcon } from "@boffmedia/ui"
 import { getPokemonNameAndForm, PILL_STATUS, PokedexStatus } from "../../../dexUtils"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import type { Pokemon } from "@/types/Pokemon"

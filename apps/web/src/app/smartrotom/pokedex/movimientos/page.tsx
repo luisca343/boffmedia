@@ -6,7 +6,7 @@ import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead, MetaStat } from "../_components/PageHead"
 import { MoveDetailPane } from "./_components/MoveDetailPane"
 import { getTranslatedMoveName } from "@/utils/pokemonTranslations"
-import { ZapIcon, SearchIcon } from "lucide-react"
+import { ZapIcon, SearchIcon } from "@boffmedia/ui"
 
 export default function MovimientosPage() {
   const t = useTranslations("pokedex")

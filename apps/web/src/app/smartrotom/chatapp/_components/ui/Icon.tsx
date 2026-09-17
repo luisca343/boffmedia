@@ -23,7 +23,7 @@ import {
   BellOff,
   Bell,
   Sparkles,
-  Clock,
+  ClockIcon,
   Reply,
   Forward,
   Copy,
@@ -61,8 +61,8 @@ import {
   PhoneOutgoing,
   PhoneIncoming,
   Grip,
-  type LucideIcon,
-} from "lucide-react";
+  type IconGlyph,
+} from "@boffmedia/ui";
 
 /** Lucide-react placeholders standing in for the hand-drawn path map this replaced. */
 const MAP = {
@@ -88,7 +88,7 @@ const MAP = {
   belloff: BellOff,
   bell: Bell,
   sparkles: Sparkles,
-  clock: Clock,
+  clock: ClockIcon,
   reply: Reply,
   forward: Forward,
   copy: Copy,
@@ -126,7 +126,7 @@ const MAP = {
   callup: PhoneOutgoing,
   calldown: PhoneIncoming,
   grip: Grip,
-} as const satisfies Record<string, LucideIcon>;
+} as const satisfies Record<string, IconGlyph>;
 
 export type IconName = keyof typeof MAP;
 

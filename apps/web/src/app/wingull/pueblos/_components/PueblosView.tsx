@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useTranslations } from 'next-intl'
-import { MapPin, Compass, Search, ChevronRight } from "lucide-react"
+import { MapPin, Compass, Search, ChevronRight } from "@boffmedia/ui"
 import { WingullService } from "@/services/api/smartrotom/wingullService"
 import { Input } from "@/components/ui/primitives/input"
 import Link from "next/link"

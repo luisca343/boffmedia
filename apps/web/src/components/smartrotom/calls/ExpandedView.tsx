@@ -5,7 +5,7 @@ import {
   VideoIcon,
   Volume2Icon,
   LockIcon,
-} from "lucide-react"
+} from "@boffmedia/ui"
 import { type CallData, UserStatus } from "../types/call"
 import { useEffect, useState, type ReactNode } from "react"
 import { useTranslations } from "next-intl"

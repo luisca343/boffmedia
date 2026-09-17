@@ -5,7 +5,7 @@ import { TypeChip } from "../../../_components/ui"
 import { useTranslations } from "next-intl"
 import { getTranslatedMoveName } from "@/utils/pokemonTranslations"
 import { useMemo, useState } from "react"
-import { SearchIcon, InfoIcon } from "lucide-react"
+import { SearchIcon, InfoIcon } from "@boffmedia/ui"
 
 interface MoveEntry {
   key: string

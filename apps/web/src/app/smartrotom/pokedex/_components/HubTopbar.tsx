@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
-import { SearchIcon, ZapIcon, FilterIcon, SettingsIcon, RefreshCwIcon } from "lucide-react"
+import { SearchIcon, ZapIcon, FilterIcon, SettingsIcon, RefreshCwIcon } from "@boffmedia/ui"
 import { TypeChip, StatusPill } from "./ui"
 import { ImageFallback } from "@boffmedia/ui"
 import { usePokemonStore } from "@/stores/pokemonStore"

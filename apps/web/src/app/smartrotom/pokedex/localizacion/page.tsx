@@ -6,7 +6,7 @@ import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead, MetaStat } from "../_components/PageHead"
 import { resolveBiome } from "../_data/biomes"
 import { getTranslatedBiomeName, isVisibleBiome } from "@/utils/pokemonTranslations"
-import { MapIcon } from "lucide-react"
+import { MapIcon } from "@boffmedia/ui"
 
 export default async function LocalizacionPage() {
   await connection()

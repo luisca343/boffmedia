@@ -5,7 +5,7 @@ import type { ComponentProps } from "react"
 import { cn } from "@/lib/utils"
 import { makeIconComponent } from "@/components/smartrotom/behavior/makeIconComponent"
 import {
-  Clock,
+  ClockIcon,
   Trophy,
   Skull,
   Footprints,
@@ -36,17 +36,17 @@ import {
   Plane,
   Medal,
   Star,
-  type LucideIcon,
-} from "lucide-react"
-import { Rotom } from "@/lib/smartrotom/customIcons"
+  type IconGlyph,
+} from "@boffmedia/ui"
+import { Rotom } from "@boffmedia/ui"
 
 /**
- * Pasaporte's icon set — lucide-react placeholders standing in for the hand-drawn
+ * Pasaporte's icon set â€” shared registry glyphs standing in for the hand-drawn
  * engraved glyphs this replaced, plus the hand-drawn `rotom` mascot (lucide has no
  * equivalent); see the migration ledger for fidelity notes on every entry.
  */
 const MAP = {
-  clock: Clock,
+  clock: ClockIcon,
   trophy: Trophy,
   skull: Skull,
   foot: Footprints,
@@ -78,14 +78,14 @@ const MAP = {
   plane: Plane,
   medal: Medal,
   star: Star,
-} as const satisfies Record<string, LucideIcon>
+} as const satisfies Record<string, IconGlyph>
 
 /** Drawn as a solid, not a stroke. */
 const FILLED = new Set<IconName>(["star"])
 
 export type IconName = keyof typeof MAP
 
-/** Sized by class (`h-4 w-4`, `h-[1.0625rem] w-[1.0625rem]`) — `size` is ignored here. */
+/** Sized by class (`h-4 w-4`, `h-[1.0625rem] w-[1.0625rem]`) â€” `size` is ignored here. */
 export const Icon = makeIconComponent(MAP, {
   sizeless: true,
   strokeWidth: 2,

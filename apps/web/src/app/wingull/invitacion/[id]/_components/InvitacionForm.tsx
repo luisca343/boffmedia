@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/primitives/input"
 import { Button } from "@/components/ui/primitives/button"
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/primitives/card"
 import { Separator } from "@/components/ui/primitives/separator"
-import { Mail, Paperclip, User, AtSign, Key, Send, Star, Reply, ReplyAll, Forward } from 'lucide-react'
+import { Mail, Paperclip, User, AtSign, Key, Send, Star, Reply, ReplyAll, Forward } from '@boffmedia/ui'
 import { BackgroundDecorations } from '../../../_components/BackgroundDecorations'
 
 type Invitacion = {

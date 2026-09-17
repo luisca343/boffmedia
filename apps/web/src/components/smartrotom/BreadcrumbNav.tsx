@@ -1,6 +1,6 @@
 "use client"
 import { usePathname } from "next/navigation"
-import { HomeIcon } from 'lucide-react'
+import { HomeIcon } from '@boffmedia/ui'
 import { useRouter } from "next/navigation";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 

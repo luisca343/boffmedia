@@ -5,7 +5,7 @@ import FullTypeChart from "./_components/FullTypeChart"
 import TypeAnalysis from "./_components/TypeAnalysis"
 import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead } from "../_components/PageHead"
-import { LayersIcon, TableIcon, ScaleIcon } from "lucide-react"
+import { LayersIcon, TableIcon, ScaleIcon } from "@boffmedia/ui"
 
 export default function TiposPage() {
   const t = useTranslations("pokedex")

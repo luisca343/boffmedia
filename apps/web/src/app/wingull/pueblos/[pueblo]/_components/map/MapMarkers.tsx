@@ -3,7 +3,7 @@ import { MAP_CONSTANTS } from '@/components/shared/map/StandardizedMap';
 import type { CoordinateTransformer, Position } from '@/components/shared/map/StandardizedMap';
 import { CompleteMarker } from './CompleteMarker';
 import { BoundaryOverlay } from './BoundaryOverlay';
-import { House, Building, Sparkles } from "lucide-react";
+import { House, Building, Sparkles } from "@boffmedia/ui";
 import { BaseMarker } from '@/components/shared/map/BaseMarker';
 
 interface MarkerProps {

@@ -41,13 +41,13 @@ import {
   TrendingUp,
   Bookmark,
   ChevronRight,
-  Clock,
-  type LucideIcon,
-} from "lucide-react"
-import { Gif } from "@/lib/smartrotom/customIcons"
+  ClockIcon,
+  type IconGlyph,
+} from "@boffmedia/ui"
+import { Gif } from "@boffmedia/ui"
 
 /**
- * Rooker's icon set — lucide-react placeholders standing in for the hand-drawn
+ * Rooker's icon set â€” shared registry glyphs standing in for the hand-drawn
  * glyphs this replaced, plus the hand-drawn `gif` (lucide ships no GIF glyph).
  * See the migration ledger for fidelity notes.
  */
@@ -94,12 +94,12 @@ const MAP = {
   trending: TrendingUp,
   bookmark: Bookmark,
   chevron: ChevronRight,
-  clock: Clock,
-} as const satisfies Record<string, LucideIcon>
+  clock: ClockIcon,
+} as const satisfies Record<string, IconGlyph>
 
 export type IconName = keyof typeof MAP
 
-/** `fill` is a boolean here — `true` draws the glyph solid and drops the stroke. */
+/** `fill` is a boolean here â€” `true` draws the glyph solid and drops the stroke. */
 export const Icon = makeIconComponent(MAP, {
   size: 20,
   strokeWidth: 1.9,

@@ -6,7 +6,7 @@ import { signIn, signOut } from "next-auth/react";
 import { useMemo, useState } from "react";
 import { cn } from "@/lib/utils";
 import { SmartRotomButton } from "@/components/smartrotom/ui";
-import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone, Sun } from "lucide-react";
+import { Copy, Check, LogIn, LogOut, Palette, Bug, Monitor, Smartphone, Sun } from "@boffmedia/ui";
 import { ROTOM_THEMES } from "@/components/smartrotom/theme/rotomTheme";
 import { useRotomMode, useRotomThemeStore } from "@/components/smartrotom/theme/useRotomTheme";
 import { useTranslations } from "next-intl";

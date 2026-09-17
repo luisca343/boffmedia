@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { TownData, Property, Amenity, SelectedMarker } from '../../types';
-import { MapPin } from 'lucide-react';
+import { MapPin } from '@boffmedia/ui';
 import { useTranslations } from 'next-intl';
 import { StandardizedMap, CoordinateTransformer, MAP_CONSTANTS } from '@/components/shared/map/StandardizedMap';
 import { PropertyMarker, AmenityMarker, BoundaryMarker, BusinessMarker } from './MapMarkers';

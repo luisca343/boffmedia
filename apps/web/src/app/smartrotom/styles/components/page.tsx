@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { Icon } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import { CHAPTERS, DOMAINS, DOMAIN_META, chapterKey } from "./showcase-data"
 import { DISPLAY, DISPLAY_EM, GRP_KEY, Kicker, MONO_LABEL, norm, sideLink } from "./showcase-shared"
@@ -426,10 +427,5 @@ export default function SmartRotomComponentsShowcase() {
 }
 
 function SearchGlyph() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-      <circle cx="11" cy="11" r="7" />
-      <path d="m20 20-3.5-3.5" strokeLinecap="round" />
-    </svg>
-  )
+  return <Icon name="search" size={14} />
 }

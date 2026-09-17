@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { ClockIcon, ArrowRightIcon } from "lucide-react"
+import { ClockIcon, ArrowRightIcon } from "@boffmedia/ui"
 import { useRotomUuid } from "@/components/smartrotom/behavior/useRotomUuid"
 import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 import { usePokemonStore } from "@/stores/pokemonStore"

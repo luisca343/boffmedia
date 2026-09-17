@@ -2,7 +2,7 @@
 import TypeBadge from "@/components/shared/pokemon/TypeBadge";
 import { MoveEffect } from "./MoveEffect";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
-import { InfoIcon } from "lucide-react";
+import { InfoIcon } from "@boffmedia/ui";
 import { useTranslations } from "next-intl";
 import { useGetMove } from "@/hooks/pokemon/useGetMove";
 import { getTranslatedMoveName } from "@/utils/pokemonTranslations";

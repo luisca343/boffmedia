@@ -4,7 +4,7 @@ import {
   Compass,
   Radio,
   Library,
-  Clock,
+  ClockIcon,
   Heart,
   Flame,
   Search,
@@ -13,7 +13,7 @@ import {
   MessageCircle,
   ChevronRight,
   Check,
-  Menu,
+  MenuIcon,
   Gamepad2,
   Users,
   TrendingUp,
@@ -28,9 +28,9 @@ import {
   Sparkles,
   Bookmark,
   Eye,
-  type LucideIcon,
-} from "lucide-react"
-import { Rotom } from "@/lib/smartrotom/customIcons"
+  type IconGlyph,
+} from "@boffmedia/ui"
+import { Rotom } from "@boffmedia/ui"
 import { makeGlyphIcon } from "@/components/smartrotom/behavior/makeIconComponent"
 
 export interface IconProps {
@@ -65,17 +65,17 @@ function Icon({
 }
 
 /** `filled` glyphs render solid (`fill="currentColor"`, no visible stroke). */
-function make(Glyph: LucideIcon, opts: { filled?: boolean } = {}) {
+function make(Glyph: IconGlyph, opts: { filled?: boolean } = {}) {
   return makeGlyphIcon(Glyph, { size: 20, strokeWidth: 1.75, fill: Boolean(opts.filled) })
 }
 
 const IcRotom = makeGlyphIcon(Rotom, { size: 20, strokeWidth: 1.5 })
 
 /**
- * Icon registry — lucide-react placeholders standing in for the hand-drawn glyphs
+ * Icon registry â€” shared registry glyphs standing in for the hand-drawn glyphs
  * this replaced, plus the hand-drawn `rotom` mascot (lucide has no equivalent); see
  * the migration ledger for fidelity notes. Reference by literal key (`<I.home />`) or
- * drive a nav config with a string key (`const Glyph = I[item.icon]`) — never a
+ * drive a nav config with a string key (`const Glyph = I[item.icon]`) â€” never a
  * dynamic class.
  */
 export const I = {
@@ -83,7 +83,7 @@ export const I = {
   compass: make(Compass),
   live: make(Radio),
   lib: make(Library),
-  clock: make(Clock),
+  clock: make(ClockIcon),
   heart: make(Heart),
   flame: make(Flame),
   search: make(Search),
@@ -92,7 +92,7 @@ export const I = {
   chat: make(MessageCircle),
   chevron: make(ChevronRight),
   check: make(Check),
-  menu: make(Menu),
+  menu: make(MenuIcon),
   gamepad: make(Gamepad2),
   users: make(Users),
   trending: make(TrendingUp),

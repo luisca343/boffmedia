@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/primit
 import { Badge } from "@/components/ui/primitives/badge";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/primitives/hover-card";
 import { useTranslations } from "next-intl";
-import { Search, X } from "lucide-react";
+import { Search, X } from "@boffmedia/ui";
 import { Input } from "@/components/ui/primitives/input";
 import { Button } from "@/components/ui/primitives/button";
 import { ImageFallback } from "@boffmedia/ui";

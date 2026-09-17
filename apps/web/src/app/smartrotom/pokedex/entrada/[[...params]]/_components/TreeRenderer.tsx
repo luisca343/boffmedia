@@ -1,7 +1,7 @@
 import React from "react"
 import { SubTree, PokemonEvo } from "@/types/pokedex"
 import { Evolution } from "@/types/Pokemon"
-import { ChevronRightIcon } from "lucide-react"
+import { ChevronRightIcon } from "@boffmedia/ui"
 import { PokemonSpriteLink } from "../../../_components/PokemonSprite"
 import { getEvolutionMethod } from "./EvolutionConditions"
 

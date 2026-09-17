@@ -1,4 +1,4 @@
-import { Camera, X, Trash2 } from "lucide-react"
+import { Camera, X, Trash2 } from "@boffmedia/ui"
 import { Button } from "@/components/ui/primitives/button"
 import { useEffect } from "react"
 import { useTranslations } from "next-intl"

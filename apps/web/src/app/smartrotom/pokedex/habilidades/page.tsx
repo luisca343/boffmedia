@@ -5,7 +5,7 @@ import { useGetAllAbilities } from "@/hooks/pokemon/useGetAllAbilities"
 import { ScreenShell } from "../_components/ScreenShell"
 import { PageHead, MetaStat } from "../_components/PageHead"
 import { AbilityDetailPane } from "./_components/AbilityDetailPane"
-import { SparklesIcon, SearchIcon, StarIcon } from "lucide-react"
+import { SparklesIcon, SearchIcon, StarIcon } from "@boffmedia/ui"
 
 export default function HabilidadesPage() {
   const t = useTranslations("pokedex")

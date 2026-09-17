@@ -42,12 +42,12 @@ import {
   Target,
   Volume2,
   VolumeX,
-  type LucideIcon,
-} from "lucide-react"
-import { Mars, Venus, Neuter } from "@/lib/smartrotom/customIcons"
+  type IconGlyph,
+} from "@boffmedia/ui"
+import { Mars, Venus, Neuter } from "@boffmedia/ui"
 
 /**
- * The PC's icon set — lucide-react placeholders standing in for the hand-drawn set
+ * The PC's icon set â€” shared registry glyphs standing in for the hand-drawn set
  * this replaced. `mars`/`venus`/`neuter` come from the shared hand-drawn gender
  * glyphs (lucide ships none); see the migration ledger for fidelity notes.
  */
@@ -96,7 +96,7 @@ const MAP = {
   target: Target,
   volume: Volume2,
   volumeOff: VolumeX,
-} as const satisfies Record<string, LucideIcon>
+} as const satisfies Record<string, IconGlyph>
 
 export type IconName = keyof typeof MAP
 

@@ -32,7 +32,7 @@ import {
   BadgeCheck,
   History,
   TrendingUp,
-  Clock,
+  ClockIcon,
   Sparkles,
   Crown,
   Star,
@@ -43,12 +43,12 @@ import {
   Info,
   TriangleAlert,
   VolumeX,
-  type LucideIcon,
-} from "lucide-react"
-import { Mars, Venus } from "@/lib/smartrotom/customIcons"
+  type IconGlyph,
+} from "@boffmedia/ui"
+import { Mars, Venus } from "@boffmedia/ui"
 
 /**
- * Wigglypop's icon set — lucide-react placeholders standing in for the hand-drawn
+ * Wigglypop's icon set â€” shared registry glyphs standing in for the hand-drawn
  * glyphs this replaced. `mars`/`venus` come from the shared hand-drawn gender
  * glyphs (lucide ships none); see the migration ledger for fidelity notes.
  */
@@ -86,10 +86,10 @@ const MAP = {
   badgeCheck: BadgeCheck,
   history: History,
   trending: TrendingUp,
-  clock: Clock,
+  clock: ClockIcon,
 
   sparkles: Sparkles,
-  /** Drawn to be FILLED — pass `filled`. */
+  /** Drawn to be FILLED â€” pass `filled`. */
   crown: Crown,
   star: Star,
   wand: Wand2,
@@ -102,7 +102,7 @@ const MAP = {
   info: Info,
   alert: TriangleAlert,
   mute: VolumeX,
-} as const satisfies Record<string, LucideIcon>
+} as const satisfies Record<string, IconGlyph>
 
 export type IconName = keyof typeof MAP
 

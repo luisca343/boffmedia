@@ -4,7 +4,7 @@ import {
   MapPin,
   Search,
   ArrowUpDown,
-  Clock,
+  ClockIcon,
   Coins,
   Navigation,
   X,
@@ -34,18 +34,18 @@ import {
   PartyPopper,
   Skull,
   Anchor,
-  type LucideIcon,
-} from "lucide-react"
+  type IconGlyph,
+} from "@boffmedia/ui"
 
 /**
- * The taxi's icon set — lucide-react placeholders standing in for the hand-drawn
+ * The taxi's icon set â€” shared registry glyphs standing in for the hand-drawn
  * glyphs this replaced. See the migration ledger for fidelity notes.
  */
 const MAP = {
   pin: MapPin,
   search: Search,
   sort: ArrowUpDown,
-  clock: Clock,
+  clock: ClockIcon,
   coins: Coins,
   nav: Navigation,
   x: X,
@@ -75,7 +75,7 @@ const MAP = {
   partyPop: PartyPopper,
   skull: Skull,
   anchor: Anchor,
-} as const satisfies Record<string, LucideIcon>
+} as const satisfies Record<string, IconGlyph>
 
 export type IconName = keyof typeof MAP
 

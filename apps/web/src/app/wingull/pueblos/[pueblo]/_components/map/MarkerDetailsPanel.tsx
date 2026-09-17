@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { SelectedMarker, TownData, Property, Amenity } from "../../types";
 import { ImageShowcase } from "../shared/image/ImageShowcase";
 import { getIconComponent } from "../../utils";
-import { MapPin, Home, Building2, Sparkles } from 'lucide-react';
+import { MapPin, Home, Building2, Sparkles } from '@boffmedia/ui';
 import { BasicCard } from "../shared/cards/BasicCard";
 import { GradientBar } from "../shared/decorative/GradientBar";
 import { DecorativeCorner } from "../shared/decorative/DecorativeCorner";

@@ -2,14 +2,14 @@
 
 import * as React from "react"
 import { cn } from "@/lib/utils"
-import { Gif, GoldCoin, Mars, Neuter, Rotom, RotomMark, RookerMark, Venus } from "@/lib/smartrotom/customIcons"
+import { Gif, GoldCoin, Mars, Neuter, Rotom, RotomMark, RookerMark, Venus } from "@boffmedia/ui"
 import { MONO_LABEL, Sample, Section } from "../showcase-shared"
 
 /**
- * The hand-drawn glyphs — everything in `lib/smartrotom/customIcons/`, the icons
- * lucide doesn't ship. This chapter lives under Sistema because the module is
- * cross-app: each specimen below stages its glyph inside the scope of the app that
- * consumes it.
+ * The shared icon registry and its explicit artwork exceptions. Generic glyphs
+ * resolve through Heroicons 2 first; domain artwork remains an intentional
+ * exception in `@boffmedia/ui`. This chapter lives under Sistema because the
+ * module is cross-app.
  */
 
 function Cell({ label, children }: { label: string; children: React.ReactNode }) {
@@ -30,15 +30,15 @@ export function SrIconosChapter() {
         title="Inventario"
         lead={
           <>
-            Todo lo dibujado a mano vive en <code>lib/smartrotom/customIcons/</code>, un fichero por
-            glifo — los iconos que lucide no trae. Los cinco primeros son <code>LucideIcon</code> reales
-            (<code>createLucideIcon</code>), así que los mapas de iconos de cada app los registran
-            como cualquier import de lucide; <code>GoldCoin</code>, <code>RookerMark</code> y{" "}
-            <code>RotomMark</code> tienen dirección de arte propia y son componentes.
+            Todo el registro vive en <code>@boffmedia/ui</code>: Heroicons 2 para los glifos
+            genéricos, Tabler/Simple Icons cuando hace falta y una capa explícita para el arte
+            de dominio. Así, los mapas de cada app importan desde el mismo punto y un cambio
+            afecta a web y desktop a la vez; <code>GoldCoin</code>, <code>RookerMark</code> y{" "}
+            <code>RotomMark</code> conservan su dirección de arte propia.
           </>
         }
       >
-        <Sample title="El módulo completo" code='import { … } from "@/lib/smartrotom/customIcons"'>
+        <Sample title="El módulo completo" code='import { … } from "@boffmedia/ui"'>
           <div className="flex flex-wrap gap-3">
             <Cell label="Rotom">
               <Rotom size={30} strokeWidth={1.8} />

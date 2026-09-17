@@ -8,7 +8,7 @@ import {
   SunMoon,
   Sunrise,
   Cloud,
-} from "lucide-react";
+} from "@boffmedia/ui";
 
 export const getWeatherIcon = (weather: string): React.JSX.Element => {
   switch (weather) {

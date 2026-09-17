@@ -1,4 +1,4 @@
-import { Camera, Image as ImageIcon } from "lucide-react"
+import { Camera, Image as ImageIcon } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/primitives/button"
 

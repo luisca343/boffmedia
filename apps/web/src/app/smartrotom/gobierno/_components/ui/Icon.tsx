@@ -38,7 +38,7 @@ import {
   Check,
   CircleCheck,
   Bell,
-  Clock,
+  ClockIcon,
   Trash2,
   Filter,
   Crosshair,
@@ -64,10 +64,10 @@ import {
   Smartphone,
   Store,
   Sprout,
-  type LucideIcon,
-} from "lucide-react"
+  type IconGlyph,
+} from "@boffmedia/ui"
 
-// The whole icon set — lucide-react placeholders standing in for the hand-drawn path
+// The whole icon set â€” shared registry glyphs standing in for the hand-drawn path
 // map this replaced. See the migration ledger for fidelity notes.
 const MAP = {
   // nav + civic
@@ -110,7 +110,7 @@ const MAP = {
   check: Check,
   checkCircle: CircleCheck,
   bell: Bell,
-  clock: Clock,
+  clock: ClockIcon,
   trash: Trash2,
   filter: Filter,
   crosshair: Crosshair,
@@ -136,7 +136,7 @@ const MAP = {
   smartphone: Smartphone,
   store: Store,
   sprout: Sprout,
-} as const satisfies Record<string, LucideIcon>
+} as const satisfies Record<string, IconGlyph>
 
 export type IconName = keyof typeof MAP
 

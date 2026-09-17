@@ -96,7 +96,7 @@ export function PsPrimitivasChapter() {
           title="Icon"
           code='<Icon name="shield" className="h-5 w-5" />'
           app="ps"
-          note="Un mapa de SVG en línea, nada de `lucide-react` (§10). Todo glifo es un trazo de 2px con remates redondos a 24×24 para que se lean como un solo juego grabado; `star` es la excepción y va macizo, porque una estrella trazada a 20px sobre una moneda se lee como un garabato. El tamaño es una clase, no una prop: no hay `size`."
+          note="Un mapa de SVG en línea, nada de `@boffmedia/ui` (§10). Todo glifo es un trazo de 2px con remates redondos a 24×24 para que se lean como un solo juego grabado; `star` es la excepción y va macizo, porque una estrella trazada a 20px sobre una moneda se lee como un garabato. El tamaño es una clase, no una prop: no hay `size`."
         >
           <div className="flex flex-wrap items-center gap-4 text-ps-gild-hi">
             {(

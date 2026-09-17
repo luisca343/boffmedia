@@ -20,7 +20,7 @@ import "./globals.css"
 import "@boffmedia/tailwind-config/base.css"
 
 import { useEffect } from "react"
-import { AlertTriangle, RefreshCw, Home } from "lucide-react"
+import { AlertTriangle, RefreshCw, Home } from "@boffmedia/ui"
 import { reportBoundaryError } from "@/lib/sentry"
 
 interface GlobalErrorProps {

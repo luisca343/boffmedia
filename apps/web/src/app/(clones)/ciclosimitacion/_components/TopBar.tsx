@@ -1,4 +1,4 @@
-import { Settings } from 'lucide-react'
+import { Settings } from '@boffmedia/ui'
 import { env } from '@/config/env.public'
 
 export function TopBar() {

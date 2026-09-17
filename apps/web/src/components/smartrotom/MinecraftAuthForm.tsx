@@ -1,7 +1,7 @@
 "use client"
 import { signOut } from "next-auth/react"
 import { motion } from "framer-motion"
-import { Globe, Link as LinkIcon, LogOut } from "lucide-react"
+import { Globe, Link as LinkIcon, LogOut } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
 import { env } from "@/config/env.public"
 

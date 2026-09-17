@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useLocale, useTranslations } from "next-intl"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { ChangelogItemEntity, ChangelogListEntity } from "@boffmedia/shared"
-import { ArrowUpRight, CalendarDays, ExternalLink, RefreshCw } from "lucide-react"
+import { ArrowUpRight, CalendarDays, ExternalLink, RefreshCw } from "@boffmedia/ui"
 
 import { SafeMarkdown } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"

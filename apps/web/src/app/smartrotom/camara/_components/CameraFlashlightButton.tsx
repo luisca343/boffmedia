@@ -1,4 +1,4 @@
-import { Flashlight, FlashlightOff } from "lucide-react"
+import { Flashlight, FlashlightOff } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
 import { useEffect, useState } from "react"
 import { getFlashlight, setFlashlight, subscribeFlashlightChanged } from "@/services/mcef/mcefApi"

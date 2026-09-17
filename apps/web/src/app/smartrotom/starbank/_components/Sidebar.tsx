@@ -2,6 +2,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { Icon } from "@boffmedia/ui";
 import { cn } from "@/lib/utils";
 import { AccountAvatar, Ico, type IconName } from "./ui";
 import { formatMoney } from "../_utils/format";
@@ -48,9 +49,7 @@ export function Sidebar({ currentPage, account, onOpenAccounts }: { currentPage:
           className="relative grid size-9 place-items-center rounded-[10px]"
           style={{ background: LOGO_BG, boxShadow: "inset 0 0 0 1px rgba(255,255,255,.18), 0 6px 20px -8px rgba(59,130,246,.8)" }}
         >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 3 14.5 8.5 20 9.5 16 13.5 17 19 12 16.5 7 19 8 13.5 4 9.5 9.5 8.5 12 3Z" />
-          </svg>
+          <Icon name="star" size={20} color="#fff" />
           <span className="pointer-events-none absolute inset-1.5 rounded-md" style={{ background: "radial-gradient(circle at 30% 30%, rgba(255,255,255,.7), rgba(255,255,255,0) 55%)" }} />
         </div>
         <div className="font-sb-display text-[1.125rem] font-bold tracking-[-0.02em] text-white">

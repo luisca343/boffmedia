@@ -15,14 +15,14 @@ import {
   Coins,
   ArrowRight,
   Info,
-  type LucideIcon,
-} from "lucide-react"
+  type IconGlyph,
+} from "@boffmedia/ui"
 
 /**
- * The board's icon set — lucide-react placeholders standing in for the hand-drawn
+ * The board's icon set â€” shared registry glyphs standing in for the hand-drawn
  * ink glyphs this replaced. See the migration ledger for fidelity notes.
  */
-function make(Glyph: LucideIcon, defaultStrokeWidth = 1.5) {
+function make(Glyph: IconGlyph, defaultStrokeWidth = 1.5) {
   return makeGlyphIcon(Glyph, { size: 14, strokeWidth: defaultStrokeWidth })
 }
 

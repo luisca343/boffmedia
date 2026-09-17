@@ -8,7 +8,7 @@ import { AmenitiesSection } from '../_components/amenities/AmenitiesSection';
 import { TownMapSection } from '../_components/map/TownMapSection';
 import { PropertiesSection } from '../_components/properties/PropertiesSection';
 import { BusinessSection } from '../_components/properties/BusinessSection';
-import { Loader2 } from 'lucide-react';
+import { Loader2 } from '@boffmedia/ui';
 import { useTranslations } from 'next-intl';
 import { HeroSection } from '../_components/sections/HeroSection';
 
@@ -34,7 +34,7 @@ function ErrorScreen({ error, onRetry }: { error: string; onRetry: () => void })
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
       <div className="text-center space-y-6 max-w-md">
         <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
-          <span className="text-2xl">⚠️</span>
+          <span className="text-2xl">âš ï¸</span>
         </div>
         <h2 className="text-2xl font-bold text-ink">{t('errorTitle')}</h2>
         <p className='text-ink'>{error}</p>

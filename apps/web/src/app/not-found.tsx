@@ -1,7 +1,7 @@
 import { Suspense } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/primitives/button"
-import { Home, ArrowLeft } from 'lucide-react'
+import { Home, ArrowLeft } from '@boffmedia/ui'
 import { getTranslations } from "next-intl/server"
 import "./globals.css"
 

@@ -1,7 +1,7 @@
 "use client"
 import { SpawnInfo } from "../../../_types/spawnInfo"
 import { useTranslations } from "next-intl"
-import { MapPinIcon } from "lucide-react"
+import { MapPinIcon } from "@boffmedia/ui"
 import { RARITY_META } from "../../../_utils/dexMeta"
 import { readBiomeKeys, getTranslatedBiomeName, isVisibleBiome } from "@/utils/pokemonTranslations"
 

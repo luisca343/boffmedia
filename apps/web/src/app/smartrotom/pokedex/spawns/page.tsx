@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react"
 import { OutdatedDataWarning } from "@/components/smartrotom/behavior/OutdatedDataWarning";
 import { useTranslations } from "next-intl"
-import { CompassIcon, AlertCircle } from "lucide-react"
+import { CompassIcon, AlertCircle } from "@boffmedia/ui"
 import { getSpawns } from "@/services/mcef/mcefApi"
 import { useIsMinecraft } from "@/components/smartrotom/behavior/useIsMinecraft"
 import { usePokedexData } from "@/hooks/usePokedexData"

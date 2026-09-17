@@ -1,6 +1,6 @@
 "use client"
 import { useState } from 'react'
-import { Menu, MoreVertical, Scale, Cog, LogOut, Accessibility, Inbox } from 'lucide-react'
+import { MenuIcon, MoreVertical, Scale, Cog, LogOut, Accessibility, Inbox } from '@boffmedia/ui'
 import { ASSET, staticAsset } from '@/lib/assets'
 
 export function Header() {
@@ -15,12 +15,12 @@ export function Header() {
       <div id="app_nome" className="w-60 flex items-center justify-between pl-4 border-r border-edge pr-4 h-full">
         <span className="font-bold whitespace-nowrap overflow-hidden">
           <span className="text-[#009ee0]">Ciclos</span>
-          <span className="text-[#346ea1]">Imitación</span>
+          <span className="text-[#346ea1]">ImitaciÃ³n</span>
         </span>
         {isSidebarCollapsed ? (
           <MoreVertical className="text-[#009ee0] cursor-pointer" onClick={toggleSidebar} />
         ) : (
-          <Menu className="text-[#009ee0] cursor-pointer" onClick={toggleSidebar} />
+          <MenuIcon className="text-[#009ee0] cursor-pointer" onClick={toggleSidebar} />
         )}
       </div>
       <div className="flex items-center space-x-4 pr-4">

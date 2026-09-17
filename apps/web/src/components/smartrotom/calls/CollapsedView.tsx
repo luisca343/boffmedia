@@ -1,4 +1,4 @@
-import { PhoneIcon, Maximize2Icon, MicIcon } from "lucide-react"
+import { PhoneIcon, Maximize2Icon, MicIcon } from "@boffmedia/ui"
 import { type CallData, UserStatus } from "../types/call"
 import { useState, useEffect } from "react"
 import { useTranslations } from "next-intl"

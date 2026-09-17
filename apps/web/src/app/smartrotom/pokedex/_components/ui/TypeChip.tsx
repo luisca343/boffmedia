@@ -1,6 +1,6 @@
-import type { ReactNode } from "react"
 import { useTranslations } from "next-intl"
 import { TYPE_LABEL_KEYS } from "../../_utils/typeColors"
+import { PokemonTypeGlyph } from "@boffmedia/ui"
 
 // Chip background + contrasting ink per type. Move-damage categories
 // (physical/special/status) reuse the same chip so tables stay consistent.
@@ -37,27 +37,6 @@ const CATEGORY_LABEL_KEYS: Record<string, string> = {
   status: "type_status",
 }
 
-const TYPE_GLYPHS: Record<string, ReactNode> = {
-  fire: <path d="M12 2c1 3 4 5 4 9a4 4 0 0 1-8 0c0-2 2-3 2-5 0 2 2 3 2 5" />,
-  water: <path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11Z" />,
-  grass: <path d="M12 22c0-6 5-10 10-12-2 8-6 12-10 12ZM12 22c0-6-5-10-10-12 2 8 6 12 10 12Z" />,
-  electric: <path d="m13 2-9 13h7l-2 7 9-13h-7l2-7Z" />,
-  ice: <path d="M12 2v20M2 12h20M4 4l16 16M20 4 4 20" />,
-  fighting: <path d="M7 4h10v8a5 5 0 0 1-10 0V4Z" />,
-  poison: <path d="M12 3a4 4 0 0 0-4 4v3h8V7a4 4 0 0 0-4-4ZM5 10h14l-2 11H7L5 10Z" />,
-  ground: <path d="M3 16h18M5 16l3-6 4 4 3-3 4 5" />,
-  flying: <path d="M2 12c4-6 9-9 20-9-3 4-7 7-12 9 4 0 7 0 10 2-5 2-12 2-18-2Z" />,
-  psychic: <path d="M12 2 22 12 12 22 2 12Z" />,
-  bug: <path d="M12 3v18M3 8h18M3 16h18M6 5l3 3M18 5l-3 3M6 19l3-3M18 19l-3-3" />,
-  rock: <path d="m12 3 9 7-4 11H7L3 10Z" />,
-  ghost: <path d="M5 22V10a7 7 0 0 1 14 0v12l-3-2-2 2-2-2-2 2-2-2-3 2Z" />,
-  dragon: <path d="m12 2 10 18H2Z" />,
-  dark: <path d="M22 12a10 10 0 1 1-10-10A8 8 0 0 0 22 12Z" />,
-  steel: <path d="M5 5l7-3 7 3 3 7-3 7-7 3-7-3-3-7Z" />,
-  fairy: <path d="M12 2v8l7-4-3 8 7 0-7 4 3 8-7-4v8l-7-4 3-8H2l7-4-3-8 7 4Z" />,
-  normal: <circle cx="12" cy="12" r="6" />,
-}
-
 const SIZES = {
   sm: { padX: 7, fs: 10, gap: 4, glyph: 9, h: 18, radius: 4 },
   md: { padX: 9, fs: 11, gap: 5, glyph: 11, h: 22, radius: 5 },
@@ -65,11 +44,7 @@ const SIZES = {
 }
 
 export function TypeGlyph({ type, size = 12 }: { type: string; size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true">
-      {TYPE_GLYPHS[type] || TYPE_GLYPHS.normal}
-    </svg>
-  )
+  return <PokemonTypeGlyph type={type} size={size} />
 }
 
 export function TypeChip({

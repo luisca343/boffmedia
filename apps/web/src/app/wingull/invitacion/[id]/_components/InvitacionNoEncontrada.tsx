@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/primitives/card";
 import { Button } from "@/components/ui/primitives/button";
-import { Home, AlertCircle } from "lucide-react";
+import { Home, AlertCircle } from "@boffmedia/ui";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { BackgroundDecorations } from "@/app/wingull/_components/BackgroundDecorations";

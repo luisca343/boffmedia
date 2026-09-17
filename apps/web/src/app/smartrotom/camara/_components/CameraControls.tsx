@@ -1,6 +1,6 @@
 'use client'
 
-import { PanelsTopLeft } from "lucide-react"
+import { PanelsTopLeft } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/primitives/button"
 import { CameraZoomSlider } from "./CameraZoomSlider"

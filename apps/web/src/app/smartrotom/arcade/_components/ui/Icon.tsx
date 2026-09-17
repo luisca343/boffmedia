@@ -20,17 +20,17 @@ import {
   Crown,
   Grid2x2,
   ShieldCheck,
-  type LucideIcon,
-} from "lucide-react"
-import { GoldCoin } from "@/lib/smartrotom/customIcons"
+  type IconGlyph,
+} from "@boffmedia/ui"
+import { GoldCoin } from "@boffmedia/ui"
 
-/** `s` is the pixel size — both axes. */
+/** `s` is the pixel size â€” both axes. */
 export type IconProps = GlyphIconProps
 
 /** The two glyphs that forward raw SVG attributes themselves. */
 type RawIconProps = Omit<SVGProps<SVGSVGElement>, "width" | "height"> & { s?: number }
 
-function make(Glyph: LucideIcon, strokeWidth = 1.8) {
+function make(Glyph: IconGlyph, strokeWidth = 1.8) {
   return makeGlyphIcon(Glyph, { size: 18, strokeWidth })
 }
 
@@ -48,7 +48,7 @@ const ChevronIcon = ({ s, dir = "right", style, ...p }: RawIconProps & { dir?: k
 )
 
 // The only icon in the set with its own palette: the hand-drawn gold coin
-// (radial gradient + ★), shared from the custom-icon module.
+// (radial gradient + â˜…), shared from the custom-icon module.
 const CoinIcon = ({ s = 18, ...p }: RawIconProps) => <GoldCoin size={s} {...p} />
 
 const HeartIcon = makeGlyphIcon(Heart, { size: 18, fill: true })
@@ -56,7 +56,7 @@ const HeartIcon = makeGlyphIcon(Heart, { size: 18, fill: true })
 const SparkleIcon = makeGlyphIcon(Sparkle, { size: 18, fill: true })
 
 /**
- * The arcade's icon set — lucide-react placeholders standing in for the hand-drawn
+ * The arcade's icon set â€” shared registry glyphs standing in for the hand-drawn
  * glyphs this replaced. See the migration ledger for fidelity notes.
  */
 export const Icon = {

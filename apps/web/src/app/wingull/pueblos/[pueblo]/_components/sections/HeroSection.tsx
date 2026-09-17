@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Users, ChevronDown } from 'lucide-react';
+import { Sparkles, Users, ChevronDown } from '@boffmedia/ui';
 import { useTranslations } from 'next-intl';
 import type { TownData } from '../../types';
 import { HeroBackground } from '../shared/decorative/HeroBackground';

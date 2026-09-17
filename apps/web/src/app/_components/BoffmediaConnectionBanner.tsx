@@ -4,7 +4,7 @@ import { useTranslations } from "next-intl"
 import { useSocketState } from "@/services/useSocketState"
 import { useEffect, useState } from "react"
 import useSocketStore from "@/stores/useSocketStore"
-import { AlertCircle, Wifi, WifiOff } from "lucide-react"
+import { AlertCircle, Wifi, WifiOff } from "@boffmedia/ui"
 
 /**
  * Connection status banner for BoffMedia (web shell).

@@ -2,6 +2,7 @@
 
 import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from "react"
 import { useTranslations } from "next-intl"
+import { Icon } from "@boffmedia/ui"
 import { I } from "@/components/smartrotom/media/ui"
 import type { Chapter } from "../../_utils/chapters"
 
@@ -58,22 +59,9 @@ function fmt(t: number): string {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`
 }
 
-const PauseGlyph = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
-    <rect x="6" y="5" width="4" height="14" fill="currentColor" />
-    <rect x="14" y="5" width="4" height="14" fill="currentColor" />
-  </svg>
-)
-const VolGlyph = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M4 9v6h4l5 4V5L8 9zM16 9a3 3 0 0 1 0 6" />
-  </svg>
-)
-const FsGlyph = () => (
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" aria-hidden="true">
-    <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />
-  </svg>
-)
+const PauseGlyph = () => <Icon name="pause" size={18} />
+const VolGlyph = () => <Icon name="volume" size={18} />
+const FsGlyph = () => <Icon name="fullscreen" size={18} />
 
 /**
  * Native Mewtube player: the official YouTube IFrame Player API (our controls,

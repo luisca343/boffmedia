@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle } from '@boffmedia/ui'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
 import { useIsMinecraft } from './useIsMinecraft'
@@ -10,7 +10,7 @@ export interface OutdatedDataWarningProps {
   messageKey?: string
   descriptionKey?: string
   /** Already-translated text, for callers whose strings live in another
-   *  namespace (chatapp, pokedex). Takes precedence over the key props — the
+   *  namespace (chatapp, pokedex). Takes precedence over the key props â€” the
    *  alternative was each of those surfaces hand-rolling the same banner,
    *  which is the inconsistency this whole finding is about. */
   message?: string

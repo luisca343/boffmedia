@@ -1,4 +1,4 @@
-import { MapPin, Info } from "lucide-react"
+import { MapPin, Info } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
 import type { Screenshot } from "@/stores/cameraGalleryStore"
 

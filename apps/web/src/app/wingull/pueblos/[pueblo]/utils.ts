@@ -1,4 +1,4 @@
-import { HeartPulse, MapPin, ParkingMeter, Store, Warehouse, Swords, Gamepad2 } from "lucide-react";
+import { HeartPulse, MapPin, ParkingMeter, Store, Warehouse, Swords, Gamepad2 } from "@boffmedia/ui";
 
 export function getIconComponent(iconName: string) {
   const icons: { [key: string]: React.ComponentType<any> } = {

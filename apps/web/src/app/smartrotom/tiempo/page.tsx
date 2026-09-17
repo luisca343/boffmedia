@@ -11,7 +11,7 @@ import {
   Moon,
   Sunset,
   RefreshCw,
-} from "lucide-react";
+} from "@boffmedia/ui";
 import useGetWeather from "./_hooks/useGetWeather";
 
 export default function Component() {

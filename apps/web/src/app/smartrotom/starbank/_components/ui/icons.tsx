@@ -41,17 +41,17 @@ import {
   Bot,
   Download,
   ScanLine,
-  Menu,
+  MenuIcon,
   Pencil,
   ImagePlus,
   Trash2,
-  type LucideIcon,
-} from "lucide-react";
+  type IconGlyph,
+} from "@boffmedia/ui";
 
 /** `stroke` is a WIDTH, not a colour. */
 export type IconProps = GlyphIconProps;
 
-function make(Glyph: LucideIcon) {
+function make(Glyph: IconGlyph) {
   return makeGlyphIcon(Glyph, {
     size: 18,
     strokeWidth: 1.6,
@@ -60,7 +60,7 @@ function make(Glyph: LucideIcon) {
 }
 
 /**
- * StarBank's icon set — lucide-react placeholders standing in for the hand-drawn
+ * StarBank's icon set â€” shared registry glyphs standing in for the hand-drawn
  * glyphs this replaced. See the migration ledger for fidelity notes.
  */
 export const I = {
@@ -106,7 +106,7 @@ export const I = {
   bot: make(Bot),
   download: make(Download),
   scan: make(ScanLine),
-  menu: make(Menu),
+  menu: make(MenuIcon),
   pencil: make(Pencil),
   imagePlus: make(ImagePlus),
   trash: make(Trash2),
@@ -114,7 +114,7 @@ export const I = {
 
 export type IconName = keyof typeof I;
 
-/** Render an icon by name (compile-checked — a typo is a type error). */
+/** Render an icon by name (compile-checked â€” a typo is a type error). */
 export function Ico({ name, ...p }: IconProps & { name: IconName }) {
   const C = I[name];
   return <C {...p} />;

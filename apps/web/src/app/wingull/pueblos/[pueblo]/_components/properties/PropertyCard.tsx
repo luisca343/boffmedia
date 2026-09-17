@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Property, TownData } from "../../types";
-import { ArrowRight, Eye, Home, MapPin, Star, ChevronDown, Sparkles, Calendar, Shield, Building2 } from "lucide-react";
+import { ArrowRight, Eye, Home, MapPin, Star, ChevronDown, Sparkles, Calendar, Shield, Building2 } from "@boffmedia/ui";
 import { getIconComponent } from "../../utils";
 import { ImageShowcase } from "../shared/image/ImageShowcase";
 import { BasicCard } from "../shared/cards/BasicCard";

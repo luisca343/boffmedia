@@ -20,7 +20,7 @@ import {
   ChevronLeft,
   X,
   Check,
-  Clock,
+  ClockIcon,
   History,
   Link2,
   Columns2,
@@ -36,7 +36,7 @@ import {
   Quote,
   Code,
   SquareCode,
-  Table,
+  TableIcon,
   Heading1,
   Heading2,
   Type,
@@ -51,7 +51,7 @@ import {
   Download,
   Globe,
   Lock,
-  Menu,
+  MenuIcon,
   ArrowUpDown,
   Inbox,
   Save,
@@ -60,8 +60,8 @@ import {
   Palette,
   Network,
   Pencil,
-  type LucideIcon,
-} from "lucide-react";
+  type IconGlyph,
+} from "@boffmedia/ui";
 
 /** Lucide-react placeholders standing in for the hand-drawn path map this replaced. */
 const MAP = {
@@ -84,7 +84,7 @@ const MAP = {
   "chevron-left": ChevronLeft,
   x: X,
   check: Check,
-  clock: Clock,
+  clock: ClockIcon,
   history: History,
   link: Link2,
   split: Columns2,
@@ -100,7 +100,7 @@ const MAP = {
   quote: Quote,
   code: Code,
   "code-block": SquareCode,
-  table: Table,
+  table: TableIcon,
   "h-1": Heading1,
   "h-2": Heading2,
   type: Type,
@@ -115,7 +115,7 @@ const MAP = {
   download: Download,
   globe: Globe,
   lock: Lock,
-  menu: Menu,
+  menu: MenuIcon,
   sort: ArrowUpDown,
   inbox: Inbox,
   save: Save,
@@ -124,7 +124,7 @@ const MAP = {
   swatch: Palette,
   network: Network,
   pencil: Pencil,
-} as const satisfies Record<string, LucideIcon>;
+} as const satisfies Record<string, IconGlyph>;
 
 export type IconName = keyof typeof MAP;
 

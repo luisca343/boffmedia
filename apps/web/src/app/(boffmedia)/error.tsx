@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/primitives/button";
-import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { AlertTriangle, RefreshCw, Home } from "@boffmedia/ui";
 import Link from "next/link";
 import { FloatingBackground } from "./_components/layout/FloatingBackground";
 import { reportBoundaryError } from "@/lib/sentry";

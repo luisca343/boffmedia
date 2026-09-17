@@ -1,10 +1,6 @@
 /**
- * Every hand-drawn SmartRotom glyph lives here — the icons lucide doesn't ship,
- * one file per icon. The `createLucideIcon` ones behave exactly like any lucide
- * import (size/strokeWidth/className), so the app icon maps register them
- * directly; `GoldCoin`, `RookerMark` and `RotomMark` own their art direction and
- * are plain components. Showcased at /smartrotom/styles/components → Sistema · Iconos.
- * Redraw history: docs/audits/ICON_MIGRATION_2026-07-13.md.
+ * Compatibility exports for SmartRotom artwork now owned by @boffmedia/ui.
+ * Keep this module for older app-local imports; new code should import from @boffmedia/ui.
  */
 export { Mars } from "./Mars"
 export { Venus } from "./Venus"

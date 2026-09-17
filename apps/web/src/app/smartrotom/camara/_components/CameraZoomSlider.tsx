@@ -1,4 +1,4 @@
-import { Minus, Plus } from "lucide-react"
+import { Minus, Plus } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/primitives/button"
 import { useEffect, useRef, useState } from "react"

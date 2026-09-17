@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { BookOpen } from "lucide-react"
+import { BookOpen } from "@boffmedia/ui"
 import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 

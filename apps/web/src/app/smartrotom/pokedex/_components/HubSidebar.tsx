@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation"
 import Link from "next/link"
 import { useTranslations } from "next-intl"
 import { PokeballIcon } from "./ui"
-import { HomeIcon, BookOpenIcon, MapIcon, ZapIcon, SparklesIcon, SettingsIcon } from "lucide-react"
+import { HomeIcon, BookOpenIcon, MapIcon, ZapIcon, SparklesIcon, SettingsIcon } from "@boffmedia/ui"
 import { useBoffSession } from "@/services/useBoffSession"
 
 type NavItem = { href: string; label: string; icon: typeof HomeIcon; tail?: string }

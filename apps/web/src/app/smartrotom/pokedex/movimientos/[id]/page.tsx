@@ -1,7 +1,7 @@
 import { ScreenShell } from "../../_components/ScreenShell"
 import { PageHead } from "../../_components/PageHead"
 import { MoveDetailPane } from "../_components/MoveDetailPane"
-import { ZapIcon } from "lucide-react"
+import { ZapIcon } from "@boffmedia/ui"
 import { getTranslations } from "next-intl/server"
 
 export default async function MoveDetailPage({ params }: { params: Promise<{ id: string }> }) {

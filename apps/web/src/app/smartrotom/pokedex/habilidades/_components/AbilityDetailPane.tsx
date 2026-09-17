@@ -2,7 +2,7 @@
 import { useGetPokemonByAbility } from "@/hooks/pokemon/useGetPokemonByAbility"
 import { useTranslations } from "next-intl"
 import { PokemonSpriteLink } from "../../_components/PokemonSprite"
-import { StarIcon } from "lucide-react"
+import { StarIcon } from "@boffmedia/ui"
 
 // Name + effect come from i18n (ability_* keys); carriers from the real API.
 export function AbilityDetailPane({ abilityKey }: { abilityKey: string }) {

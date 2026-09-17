@@ -1,5 +1,5 @@
 "use client"
-import { AlertTriangle, HelpCircle } from "lucide-react"
+import { AlertTriangle, HelpCircle } from "@boffmedia/ui"
 import { motion } from "framer-motion"
 import { useState } from "react"
 import { useTranslations } from "next-intl"

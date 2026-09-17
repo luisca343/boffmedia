@@ -1,12 +1,12 @@
 "use client"
-import { RefreshCcw, BellRing, ChevronLeft, ChevronRight, Settings, Cpu } from "lucide-react";
+import { RefreshCcw, BellRing, ChevronLeft, ChevronRight, Settings, Cpu, type IconGlyph } from "@boffmedia/ui";
 import { useRouter } from "next/navigation";
 
 const chrome =
     "rounded-none h-8 w-8 mx-0.5 flex items-center justify-center group transition-colors hover:bg-sr-panel-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sr-accent";
 const glyph = "text-sr-txt-muted transition-colors group-hover:text-sr-accent-bright";
 
-export function NavButton({Icono, strokeWidth = 2.25, onClick = null, label} : {onClick?:any,strokeWidth?: number, Icono: React.ForwardRefExoticComponent<React.PropsWithoutRef<React.SVGProps<SVGSVGElement>>>, label: string}){
+export function NavButton({Icono, strokeWidth = 2.25, onClick = null, label} : {onClick?:any,strokeWidth?: number, Icono: IconGlyph, label: string}){
     return (
         <button aria-label={label} className={chrome} onClick={onClick}>
             <Icono strokeWidth={strokeWidth} height={22} width={22} className={glyph}/>

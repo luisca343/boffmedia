@@ -1,16 +1,16 @@
 import type { CSSProperties, SVGProps } from "react"
-import type { LucideIcon } from "lucide-react"
+import type { IconGlyph as SharedIconGlyph } from "@boffmedia/ui"
 
-export type IconGlyph = LucideIcon
+export type IconGlyph = SharedIconGlyph
 
 /**
  * The one prop contract every SmartRotom icon set speaks. Each app keeps its own
- * name→glyph map (that is its identity); only this renderer is shared.
+ * nameâ†’glyph map (that is its identity); only this renderer is shared.
  */
 export interface IconStyleProps {
   size?: number
   /**
-   * Stroke WIDTH, not a colour — the system's historical name for it. Kept as an
+   * Stroke WIDTH, not a colour â€” the system's historical name for it. Kept as an
    * alias of `strokeWidth`; if both are given, `strokeWidth` wins.
    */
   stroke?: number
@@ -40,9 +40,9 @@ export interface IconRendererOptions {
   strokeWidth?: number
   /** Default fill (see `IconStyleProps.fill`). Omit to emit no `fill` at all. */
   fill?: boolean | string
-  /** Rewrite the final className (default classes, prefixes…). */
+  /** Rewrite the final className (default classes, prefixesâ€¦). */
   className?: (className?: string) => string
-  /** Do not emit a size — the glyph is sized by class. */
+  /** Do not emit a size â€” the glyph is sized by class. */
   sizeless?: boolean
 }
 
@@ -85,7 +85,7 @@ export type IconComponentProps<M> = IconStyleProps &
   IconPassthroughProps & { name: keyof M & string }
 
 /**
- * Build an app's `<Icon name="…" />` from its own glyph map. An unknown name
+ * Build an app's `<Icon name="â€¦" />` from its own glyph map. An unknown name
  * renders nothing.
  */
 export function makeIconComponent<M extends Record<string, IconGlyph>>(

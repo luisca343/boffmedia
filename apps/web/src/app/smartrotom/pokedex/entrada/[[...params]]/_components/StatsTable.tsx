@@ -3,7 +3,7 @@ import { BattleStats, Pokemon } from "@/types/Pokemon"
 import { useState } from "react"
 import { useTranslations } from "next-intl"
 import { statColor, totalStatColor, getContrastingTextColor } from "../../../_utils/dexMeta"
-import { ChevronDownIcon, SettingsIcon } from "lucide-react"
+import { ChevronDownIcon, SettingsIcon } from "@boffmedia/ui"
 
 const STAT_LABELS: Record<string, { key: string; color: string }> = {
   hp: { key: "stat_hp", color: "#34d399" },

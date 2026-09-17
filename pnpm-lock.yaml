@@ -679,9 +679,6 @@ importers:
       jszip:
         specifier: ^3.10.1
         version: 3.10.1
-      lucide-react:
-        specifier: ^0.452.0
-        version: 0.452.0(react@19.2.3)
       mdast-util-from-markdown:
         specifier: ^2.0.0
         version: 2.0.3
@@ -8773,11 +8770,6 @@ packages:
   lru.min@1.1.4:
     resolution: {integrity: sha512-DqC6n3QQ77zdFpCMASA1a3Jlb64Hv2N2DciFGkO/4L9+q/IpIAuRlKOvCXabtRW6cQf8usbmM6BE/TOPysCdIA==}
     engines: {bun: '>=1.0.0', deno: '>=1.30.0', node: '>=8.0.0'}
-
-  lucide-react@0.452.0:
-    resolution: {integrity: sha512-kNefjOUOGm+Mu3KDiryONyPba9r+nhcrz5oJs3N6JDzGboQNEXw5GB3yB8rnV9/FA4bPyggNU6CRSihZm9MvSw==}
-    peerDependencies:
-      react: 19.2.3
 
   luxon@3.7.2:
     resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
@@ -20759,10 +20751,6 @@ snapshots:
       yallist: 4.0.0
 
   lru.min@1.1.4: {}
-
-  lucide-react@0.452.0(react@19.2.3):
-    dependencies:
-      react: 19.2.3
 
   luxon@3.7.2: {}
 

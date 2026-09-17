@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/primitives/button";
 import { Input } from "@/components/ui/primitives/input";
-import { Send, Bot } from "lucide-react";
+import { Send, Bot } from "@boffmedia/ui";
 import { useState } from "react";
 
 interface ChatInputProps {
