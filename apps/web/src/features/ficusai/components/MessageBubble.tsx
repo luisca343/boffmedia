@@ -1,9 +1,7 @@
 "use client";
 import { Avatar, AvatarFallback } from "@/components/ui/primitives/avatar";
-import { Bot, User } from "@boffmedia/ui";
-import { Mensaje, MessagePart, PokemonStats } from "../types";
-import ReactMarkdown from "react-markdown";
-import remarkGfm from "remark-gfm";
+import { Bot, Markdown, User } from "@boffmedia/ui";
+import { Mensaje, MessagePart } from "../types";
 import BiomeListCard from "./BiomeListCard";
 import CompletePokemonCard from "./CompletePokemonCard";
 import { cn } from "@/lib/utils";
@@ -20,18 +18,9 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
     switch (part.type) {
       case "text":
         return (
-          <div key={index} className="prose prose-invert max-w-none prose-ul:list-disc prose-ul:ml-4 prose-li:mb-1 prose-p:mb-4 prose-p:last:mb-0">
-            <ReactMarkdown 
-              remarkPlugins={[remarkGfm]}
-              components={{
-                ul: ({ children }) => <ul className="list-disc ml-4 space-y-1 mb-4">{children}</ul>,
-                li: ({ children }) => <li className="mb-1">{children}</li>,
-                p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>
-              }}
-            >
-              {(part.content as string).trim()}
-            </ReactMarkdown>
-          </div>
+          <Markdown key={index} className="max-w-none text-inherit">
+            {(part.content as string).trim()}
+          </Markdown>
         );
       
       case "biomeList":
@@ -76,7 +65,7 @@ export default function MessageBubble({ message, isTyping }: MessageBubbleProps)
           ? "bg-primary-active text-white rounded-tr-md" 
           : "bg-layer-3 text-ink rounded-tl-md"
       )}>
-        <div className="prose prose-invert max-w-none space-y-2">
+        <div className="space-y-2">
           {message.parts.map((part, index) => renderMessagePart(part, index))}
         </div>
         {isTyping && !isUser && (

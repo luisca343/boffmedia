@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useTranslations } from "next-intl"
 import type { ChangelogAdminItemEntity, ChangelogTranslationInputDto, CreateChangelogDto, UpdateChangelogDto } from "@boffmedia/shared"
-import { Button, ChangelogMarkdown, Icon, Spinner } from "@boffmedia/ui"
+import { Button, ChangelogFeed, Icon, Spinner } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 
 import {
@@ -274,7 +274,7 @@ export function ChangelogAdmin() {
           aside={<AvPill tone="muted">{rows.length}</AvPill>}
           bodyClassName="p-0"
         >
-          <div className="max-h-[42rem] overflow-y-auto bg-base-deep p-2.5 bm-scroll">
+      <div className="max-h-[42rem] overflow-y-auto bg-base-2 p-2.5 bm-scroll">
             {loading && (
               <div className="flex min-h-[12rem] items-center justify-center gap-2 text-sm text-txt-muted">
                 <Spinner size={18} className="text-accent" />
@@ -350,13 +350,19 @@ export function ChangelogAdmin() {
               <label className="block space-y-1 text-sm font-semibold text-txt"><span>{t("bodyLabel")}</span><textarea value={draft.translations[locale].body} onChange={(event) => updateTranslation("body", event.target.value)} rows={15} className="w-full resize-y border border-line-2 bg-base px-3 py-2 font-mono text-sm leading-6 text-txt" /></label>
               <label className="block space-y-1 text-sm font-semibold text-txt"><span>{t("translations")} - {t("status")}</span><select value={draft.translations[locale].status} onChange={(event) => updateTranslation("status", event.target.value)} className="w-full border border-line-2 bg-base px-3 py-2 text-sm text-txt">{TRANSLATION_STATUSES.map((value) => <option key={value} value={value}>{value === "reviewed" ? t("reviewed") : value === "translated" ? t("translated") : t("draft")}</option>)}</select></label>
             </div>
-            <div className="min-w-0 border border-dashed border-line-2 bg-base-2 p-4">
+            <div className="min-w-0">
               <p className="mb-3 font-mono text-[0.625rem] font-bold uppercase tracking-[0.14em] text-txt-dim">{t("preview")}</p>
-              <h3 className="font-display text-xl font-bold uppercase text-txt">{draft.translations[locale].title || "..."}</h3>
-              {draft.translations[locale].summary && <p className="mt-2 text-sm text-txt-muted">{draft.translations[locale].summary}</p>}
-              <ChangelogMarkdown className="mt-4 text-sm">
-                {draft.translations[locale].body || "..."}
-              </ChangelogMarkdown>
+              <ChangelogFeed
+                compact
+                items={[{
+                  id: "preview",
+                  title: draft.translations[locale].title || "...",
+                  version: draft.version.trim() ? `${t("version")} ${draft.version.trim()}` : undefined,
+                  platform: t(draft.platform),
+                  summary: draft.translations[locale].summary || undefined,
+                  body: draft.translations[locale].body || "...",
+                }]}
+              />
             </div>
           </div>
 

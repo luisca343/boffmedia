@@ -4,9 +4,8 @@ import Link from "next/link"
 import { useLocale, useTranslations } from "next-intl"
 import { useCallback, useEffect, useRef, useState } from "react"
 import type { ChangelogItemEntity, ChangelogListEntity } from "@boffmedia/shared"
-import { ArrowUpRight, CalendarDays, ExternalLink, RefreshCw } from "@boffmedia/ui"
+import { ArrowUpRight, CalendarDays, ExternalLink, MARKDOWN_LAYOUT_CLASS, RefreshCw, SafeMarkdown } from "@boffmedia/ui"
 
-import { SafeMarkdown } from "@boffmedia/ui"
 import { cn } from "@/lib/utils"
 import { ChangelogService, type ChangelogLocale } from "@/services/api/boffmedia/changelogService"
 import { useBoffSession } from "@/services/useBoffSession"
@@ -39,7 +38,11 @@ function SmartRotomEntry({ item }: { item: ChangelogItemEntity }) {
         {date}
       </div>
       {item.translation.summary && <p className="mb-4 text-sm leading-relaxed text-sr-txt-muted">{item.translation.summary}</p>}
-      <SafeMarkdown className="text-sm leading-7 text-sr-txt [&_a]:font-bold [&_a]:text-sr-accent-bright [&_a]:underline [&_h2]:mt-5 [&_h2]:font-display [&_h2]:font-bold [&_h3]:mt-4 [&_h3]:font-display [&_h3]:font-bold [&_li]:ml-5 [&_li]:list-disc [&_p]:mb-3 [&_p:last-child]:mb-0 [&_strong]:text-sr-txt [&_ul]:my-3">
+      <SafeMarkdown className={cn(
+        "text-sm leading-7 text-sr-txt",
+        MARKDOWN_LAYOUT_CLASS,
+        "[&_a]:font-bold [&_a]:text-sr-accent-bright [&_a]:underline [&_h2]:mt-5 [&_h2]:font-display [&_h2]:font-bold [&_h3]:mt-4 [&_h3]:font-display [&_h3]:font-bold [&_strong]:text-sr-txt",
+      )}>
         {item.translation.body}
       </SafeMarkdown>
       {ctaUrl && ctaLabel && (

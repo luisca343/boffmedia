@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 
 import { cn } from "../cn";
 import { uiOpenUrl } from "../i18n";
+import { MarkdownCodeBlock } from "./CodeBlock";
 
 /**
  * Renderer for first-party Markdown that is allowed to contain structure but
@@ -25,6 +26,7 @@ export function SafeMarkdown({
         skipHtml
         urlTransform={(url) => (isSafeUrl(url) ? url : "")}
         components={{
+          pre: MarkdownCodeBlock,
           // Keep links from replacing the desktop shell. The same host hook is
           // a normal browser navigation on the web host.
           a: ({ href, children: linkChildren, ...rest }) => {
