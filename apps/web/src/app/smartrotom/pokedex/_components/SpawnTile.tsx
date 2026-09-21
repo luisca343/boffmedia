@@ -2,10 +2,9 @@
 
 import Link from "next/link"
 import { useTranslations } from "next-intl"
-import { ImageFallback } from "@boffmedia/ui"
+import { PokedexArtImage as ArtImage, PokedexImageFallback as ImageFallback } from "./PokedexArtImage"
 import { PokedexStatus } from "../dexUtils"
 import { getSpriteUrl } from "@/utils/spriteUtils"
-import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 import type { PossibleSpawn } from "./PossibleSpawns"
 
 const SHADOW = "drop-shadow(0 3px 4px rgba(0,0,0,.3))"

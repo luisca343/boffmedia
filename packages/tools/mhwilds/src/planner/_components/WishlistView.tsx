@@ -338,7 +338,7 @@ export function WishlistView() {
                 title={t("build_planner.forge_materials")}
                 icon="hammer"
                 count={requirements.materials.length}
-                className="xl:sticky xl:top-[4.625rem]"
+                className="xl:sticky xl:top-[calc(var(--tool-sticky-top,0px)_+_var(--tool-bar-h,3.625rem)_+_1rem)]"
                 aside={<span className="font-mono text-[0.6875rem] leading-none text-txt-muted">{t("build_planner.forge.owned", { owned: ownedCount, total: requirements.materials.length })}</span>}
               >
                 <p className="mb-3 font-mono text-[0.6875rem] leading-[1.4] text-txt-muted">{t("build_planner.wishlist.materialsLead")}</p>

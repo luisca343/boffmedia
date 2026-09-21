@@ -4,6 +4,22 @@ import { ASSET, joinAssetPath } from "@boffmedia/asset-paths"
 import { uiAssetUrl } from "../i18n"
 import type { SrtDrawPhase } from "./draw-stage"
 
+const persistentWinSounds = new Map<string, HTMLAudioElement>()
+
+function playPersistentWinSound(src: string, volume: number) {
+  if (typeof Audio === "undefined") return
+
+  let audio = persistentWinSounds.get(src)
+  if (!audio) {
+    audio = new Audio(src)
+    audio.volume = volume
+    persistentWinSounds.set(src, audio)
+  }
+
+  audio.currentTime = 0
+  audio.play().catch((error) => console.error("Audio play error:", error))
+}
+
 /**
  * Audio for draw animations (shared by all modes).
  *
@@ -15,7 +31,6 @@ export function useSrtDrawAudio(muted: boolean) {
   const tickPath = joinAssetPath(ASSET.boffmedia.img, "audio", "spinner-tick.wav")
   const winPath = joinAssetPath(ASSET.boffmedia.img, "audio", "spinner-win.wav")
   const tickSound = useAudio(uiAssetUrl(tickPath), 0.25)
-  const winSound = useAudio(uiAssetUrl(winPath), 0.8)
   const muteRef = useRef(muted)
 
   useEffect(() => {
@@ -27,7 +42,7 @@ export function useSrtDrawAudio(muted: boolean) {
       if (!muteRef.current) tickSound.play()
     },
     win: () => {
-      if (!muteRef.current) winSound.play()
+      if (!muteRef.current) playPersistentWinSound(uiAssetUrl(winPath), 0.8)
     }
   }
 }
@@ -48,6 +63,8 @@ export interface UseSrtDrawRunOptions {
   reducedMotion: boolean
   onFrame?: (progress: number) => void
   onLand: () => void
+  /** Called after the landed hold, immediately before the run becomes done. */
+  onDone?: () => void
   onSkip: () => void
 }
 
@@ -56,7 +73,7 @@ export interface UseSrtDrawRunOptions {
  * Manages: idle → (startDelayMs) → spinning (calls onFrame per rAF) → landed → (settleMs) → done
  */
 export function useSrtDrawRun(opts: UseSrtDrawRunOptions) {
-  const settleMs = opts.settleMs ?? 1200
+  const settleMs = opts.settleMs ?? 250
   const startDelayMs = opts.startDelayMs ?? 400
   const { durationMs, reducedMotion } = opts
 
@@ -88,6 +105,7 @@ export function useSrtDrawRun(opts: UseSrtDrawRunOptions) {
     landTimeoutRef.current = setTimeout(() => {
       setPhase("landed")
       landTimeoutRef.current = setTimeout(() => {
+        cbRef.current.onDone?.()
         setPhase("done")
       }, settleMs)
     }, 450)
@@ -101,8 +119,9 @@ export function useSrtDrawRun(opts: UseSrtDrawRunOptions) {
       cbRef.current.onFrame?.(1)
       setPhase("landed")
       landTimeoutRef.current = setTimeout(() => {
+        cbRef.current.onDone?.()
         setPhase("done")
-      }, 600)
+      }, settleMs)
       return
     }
 
@@ -126,6 +145,7 @@ export function useSrtDrawRun(opts: UseSrtDrawRunOptions) {
           cbRef.current.onLand()
 
           landTimeoutRef.current = setTimeout(() => {
+            cbRef.current.onDone?.()
             setPhase("done")
           }, settleMs)
         }

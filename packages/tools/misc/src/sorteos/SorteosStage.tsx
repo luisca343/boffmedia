@@ -58,6 +58,8 @@ const MODE_ICONS: Record<SrtDrawMode, "layers" | "wheel" | "grid"> = {
   spotlight: "grid",
 }
 
+const SORTEOS_DRAW_MODES = SRT_DRAW_MODES.filter((mode) => mode !== "spotlight")
+
 export const SorteosStage = React.forwardRef<HTMLDivElement, SorteosStageProps>(
   function SorteosStage(
     {
@@ -209,7 +211,7 @@ export const SorteosStage = React.forwardRef<HTMLDivElement, SorteosStageProps>(
                     {t("modeTitle")}
                   </span>
                   <Seg
-                    options={SRT_DRAW_MODES.map((mode) => ({
+                    options={SORTEOS_DRAW_MODES.map((mode) => ({
                       value: mode,
                       label: (
                         <span className="inline-flex items-center gap-[0.375rem]">

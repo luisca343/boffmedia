@@ -1,14 +1,11 @@
 import { ArmorPiece, EquipmentType, Weapon } from "../../types";
-import { assetUrl, hasToolHost } from "@boffmedia/tool-kit";
 import { mhwildsItemIconAsset } from "../../bestiary/assets";
 import { attributeKind, attributeColor } from "../../ui/mh-helpers";
-
-const MHWILDS_ICON_PATH = "/boffmedia/img/games/mhwilds";
-
-function mhWildsAsset(fileName: string): string {
-  const rooted = `${MHWILDS_ICON_PATH}/${fileName}`;
-  return hasToolHost() ? assetUrl(rooted) : rooted;
-}
+import {
+  MHWILDS_ICON_ASSETS,
+  mhwildsIconAsset,
+  resolveMhwildsIconAsset,
+} from "../../ui/mh-icons";
 
 function clampIconIndex(value: number | undefined, max: number): number {
   return Math.max(1, Math.min(max, value || 1));
@@ -97,7 +94,11 @@ export const getDecorationImagePath = (
   const canonical = decorationIconColor(color, colorId);
   return (
     (canonical && mhwildsItemIconAsset("decoration", canonical)) ||
-    mhWildsAsset(`decoration-${clampIconIndex(slot, 3)}.png`)
+    resolveMhwildsIconAsset(
+      MHWILDS_ICON_ASSETS.decorations[
+        clampIconIndex(slot, 3) as 1 | 2 | 3
+      ],
+    )
   );
 };
 
@@ -106,7 +107,7 @@ export type DecorationSlotKind = "weapon" | "armor";
 export const getDecorationSlotImagePath = (
   slot?: number,
   kind: DecorationSlotKind = "armor",
-): string => mhWildsAsset(`decoration-slot-${kind}-${clampIconIndex(slot, 3)}.png`);
+): string => mhwildsIconAsset(`decoration-slot-${kind}-${clampIconIndex(slot, 3)}.png`);
 
 // Wilds decoration colors belong to the decoration icon family, not to the
 // decoration rarity. The API exposes the game's color name and color id; keep
@@ -143,7 +144,11 @@ export const getDecorationColorFilterStyle = (color?: string, colorId?: number):
 };
 
 export const getCharmImagePath = (rarity?: number): string =>
-  mhWildsAsset(`talisman-${clampIconIndex(rarity, 8)}.png`);
+  resolveMhwildsIconAsset(
+    MHWILDS_ICON_ASSETS.charms[
+      clampIconIndex(rarity, 8) as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8
+    ],
+  );
 
 export const getEquipmentDisplayName = (slotType: EquipmentType): string => {
   const typeNames: Record<EquipmentType, string> = {
@@ -321,42 +326,45 @@ export const getWeaponTypeIcon = (weaponType: string): string => {
   const normalizedType = kebabCase(weaponType);
   
   // Map of weapon types to their icon filenames
-  const iconMap: Record<string, string> = {
-    'great-sword': 'great-sword',
-    'long-sword': 'long-sword',
-    'sword-shield': 'sword-shield',
-    'sword-and-shield': 'sword-shield',
-    'dual-blades': 'dual-blades',
-    'hammer': 'hammer',
-    'hunting-horn': 'hunting-horn',
-    'lance': 'lance',
-    'gunlance': 'gunlance',
-    'switch-axe': 'switch-axe',
-    'charge-blade': 'charge-blade',
-    'insect-glaive': 'insect-glaive',
-    'light-bowgun': 'light-bowgun',
-    'heavy-bowgun': 'heavy-bowgun',
-    'bow': 'bow',
+  const iconMap: Record<string, keyof typeof MHWILDS_ICON_ASSETS.weapons> = {
+    "great-sword": "greatSword",
+    "long-sword": "longSword",
+    "sword-shield": "swordShield",
+    "sword-and-shield": "swordShield",
+    "dual-blades": "dualBlades",
+    hammer: "hammer",
+    "hunting-horn": "huntingHorn",
+    lance: "lance",
+    gunlance: "gunlance",
+    "switch-axe": "switchAxe",
+    "charge-blade": "chargeBlade",
+    "insect-glaive": "insectGlaive",
+    "light-bowgun": "lightBowgun",
+    "heavy-bowgun": "heavyBowgun",
+    bow: "bow",
   };
 
-
-
-  // Default to a generic weapon icon if not found
-  return mhWildsAsset(`${iconMap[normalizedType] || 'great-sword'}.webp`);
+  return resolveMhwildsIconAsset(
+    MHWILDS_ICON_ASSETS.weapons[iconMap[normalizedType] || "greatSword"],
+  );
 };
 
 export const getArmorImagePath = (armorType: EquipmentType | string): string => {
-  const imageMap: Record<string, string> = {
-    'head': 'helmet',
-    'chest': 'chest',
-    'arms': 'gauntlets',
-    'waist': 'waist',
-    'legs': 'greaves',
-    'weapon': 'great-sword',
-    'secondaryWeapon': 'great-sword',
-    'charm': 'charm',
+  const imageMap: Record<string, keyof typeof MHWILDS_ICON_ASSETS.armor> = {
+    head: "head",
+    chest: "chest",
+    arms: "arms",
+    waist: "waist",
+    legs: "legs",
   };
 
-  // Return the path to the image
-  return mhWildsAsset(`${imageMap[armorType] || 'helmet'}.webp`);
+  if (armorType === "weapon" || armorType === "secondaryWeapon") {
+    return resolveMhwildsIconAsset(MHWILDS_ICON_ASSETS.weapons.greatSword);
+  }
+  if (armorType === "charm") {
+    return resolveMhwildsIconAsset(MHWILDS_ICON_ASSETS.charms[1]);
+  }
+  return resolveMhwildsIconAsset(
+    MHWILDS_ICON_ASSETS.armor[imageMap[armorType] || "head"],
+  );
 };

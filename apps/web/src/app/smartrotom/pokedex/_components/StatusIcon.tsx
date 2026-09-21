@@ -1,7 +1,7 @@
 import { useTranslations } from "next-intl"
 import { ASSET, staticAsset } from '@/lib/assets'
 import { PokedexStatus } from "../dexUtils"
-import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
+import { PokedexArtImage as ArtImage } from "./PokedexArtImage"
 
 function StatusImage({ src, alt, width, height }: { src: string; alt: string; width: number; height: number }) {
     return <ArtImage src={src} alt={alt} width={width} height={height} fit="contain" />

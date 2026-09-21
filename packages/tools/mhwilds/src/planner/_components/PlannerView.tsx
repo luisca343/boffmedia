@@ -196,7 +196,7 @@ export function PlannerView() {
                   <Icon name="chevronRight" size={15} className="ml-auto shrink-0 text-txt-dim" />
                 </button>
               </div>
-              <div className="flex flex-col gap-3.5 lg:sticky lg:top-[4.625rem]">
+              <div className="flex flex-col gap-3.5 lg:sticky lg:top-[calc(var(--tool-sticky-top,0px)_+_var(--tool-bar-h,3.625rem)_+_1rem)]">
                 <TargetPanel
                   target={targetMon}
                   weapons={weapons}

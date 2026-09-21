@@ -86,16 +86,14 @@ export function Navbar() {
         })}
       </div>
 
-      <div className="ml-auto flex items-center gap-2.5">
-        <div className="hidden items-center gap-2.5 min-[1120px]:flex">
-          <IconButton name="search" label={tNav("search")} />
+      <div className="ml-auto flex h-full items-center gap-2.5">
+        <div className="hidden h-full items-center gap-2.5 min-[1120px]:flex">
           <LangSwitcher />
-          <span aria-hidden="true" className="h-[1.375rem] w-px shrink-0 bg-line-2" />
           <NotifBell />
           <ChangelogLink />
         </div>
         <IconButton name={theme === "dark" ? "sun" : "moon"} label={tNav("theme")} onClick={toggle} />
-        <div className="hidden items-center gap-2 min-[1120px]:inline-flex">
+        <div className="hidden h-10 items-center gap-2 min-[1120px]:inline-flex">
           <AccountNav />
         </div>
         <MobileNav pathname={pathname} />

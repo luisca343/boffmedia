@@ -84,7 +84,7 @@ export const MARKDOWN_LAYOUT_CLASS = [
  * remains owned by Shiki.
  */
 export const MARKDOWN_CODE_BLOCK_CLASS = [
-  "relative overflow-hidden rounded-md border border-solid border-line bg-panel-2",
+  "relative overflow-hidden border border-solid border-line bg-panel-2",
   "[&_pre]:m-0",
   "[&_pre]:overflow-x-auto",
   "[&_pre]:bg-transparent",
@@ -287,7 +287,6 @@ export const MARKDOWN_CLASS = [
    * of making the whole block appear muted/gray.
    */
   "[&_pre]:overflow-x-auto",
-  "[&_pre]:rounded-md",
   "[&_pre]:border",
   "[&_pre]:border-solid",
   "[&_pre]:border-line",
@@ -326,7 +325,6 @@ export const MARKDOWN_CLASS = [
   "[&_img]:block",
   "[&_img]:h-auto",
   "[&_img]:max-w-full",
-  "[&_img]:rounded-md",
 
   /* Tables --------------------------------------------------------------- */
 
@@ -554,7 +552,6 @@ export const MARKDOWN_CATALOG_CLASS = [
 
   "[&_pre]:my-3",
   "[&_pre]:overflow-x-auto",
-  "[&_pre]:rounded",
   "[&_pre]:border",
   "[&_pre]:border-solid",
   "[&_pre]:border-line",

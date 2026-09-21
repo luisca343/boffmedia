@@ -61,7 +61,7 @@ export function useSorteos() {
     setWinnerCount(s.cfg.winnerCount || 1)
     setSound(s.cfg.sound !== false)
     const mode = s.cfg.drawMode || "reel"
-    if (SRT_DRAW_MODES.includes(mode)) {
+    if (mode !== "spotlight" && SRT_DRAW_MODES.includes(mode)) {
       setDrawMode(mode)
     }
     setReady(true)

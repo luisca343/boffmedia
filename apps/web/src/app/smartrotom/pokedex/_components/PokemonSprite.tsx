@@ -11,8 +11,7 @@ import { usePokemonSprite } from "../_hooks/usePokemonSprite"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { useSpriteManifestStore } from "@/stores/spriteManifestStore"
 import { getSpriteUrl } from "@/utils/spriteUtils"
-import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
-import { ImageFallback } from "@boffmedia/ui"
+import { PokedexArtImage as ArtImage, PokedexImageFallback as ImageFallback } from "./PokedexArtImage"
 
 export type PokemonSpriteProps = {
   children?: any

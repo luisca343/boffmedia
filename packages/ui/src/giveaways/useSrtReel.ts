@@ -30,7 +30,7 @@ function clamp(v: number, min: number, max: number) {
 
 export function useSrtReel(o: UseSrtReelOptions): UseSrtReelResult {
   const itemWidth = o.itemWidth ?? 200
-  const settleMs = o.settleMs ?? 1200
+  const settleMs = o.settleMs ?? 250
   const viewportRef = useRef<HTMLDivElement | null>(null)
   const trackRef = useRef<HTMLDivElement | null>(null)
 
@@ -63,21 +63,148 @@ export function useSrtReel(o: UseSrtReelOptions): UseSrtReelResult {
   const prefersReducedMotion = usePrefersReducedMotion()
   const lastPosRef = useRef(0)
   const lastCenterIndexRef = useRef(-1)
-  const phaseRef = useRef<"fast" | "slow">("fast")
   const soundCounterRef = useRef(0)
+  const targetPositionRef = useRef<number | null>(null)
+  const itemPitchRef = useRef(itemWidth)
+  const itemLeadingMarginRef = useRef(0)
+  const itemCenterOffsetRef = useRef(itemWidth / 2)
 
-  // Compute target position once per hook call
-  const containerWidth = viewportRef.current?.clientWidth || 0
-  const finalPosition = winnerIndex * itemWidth - containerWidth / 2 + itemWidth / 2
-  const randomOffset = (Math.random() - 0.5) * itemWidth * 0.5
-  const clampedOffset = clamp(randomOffset, -itemWidth * 0.25, itemWidth * 0.25)
-  const targetPosition = clamp(finalPosition + clampedOffset, 0, strip.length * itemWidth - containerWidth)
+  // The reel card dimensions are expressed in rem. The host can scale the
+  // root font size on large screens, so the visual pitch is not always the
+  // 200px fallback passed by the stage. Read the layout width instead of
+  // letting the math drift away from the card that is actually under the
+  // reticle.
+  const getItemMetrics = useCallback(() => {
+    const firstCard = trackRef.current?.firstElementChild as HTMLElement | null
+    if (firstCard && typeof window !== "undefined") {
+      const styles = window.getComputedStyle(firstCard)
+      const marginLeft = Number.parseFloat(styles.marginLeft) || 0
+      const marginRight = Number.parseFloat(styles.marginRight) || 0
+      const pitch = firstCard.offsetWidth + marginLeft + marginRight
+
+      if (pitch > 0) {
+        itemPitchRef.current = pitch
+        itemLeadingMarginRef.current = marginLeft
+        itemCenterOffsetRef.current = marginLeft + firstCard.offsetWidth / 2
+      }
+    }
+
+    return {
+      pitch: itemPitchRef.current,
+      leadingMargin: itemLeadingMarginRef.current,
+      centerOffset: itemCenterOffsetRef.current
+    }
+  }, [itemWidth])
+
+  // Correct the arithmetic with the actual card bounds. This matters while a
+  // highlighted card is scaled, and guarantees that the visual state follows
+  // the card physically under the reticle rather than a neighbouring slot.
+  const getVisualCenterIndex = useCallback(
+    (fallbackIndex: number) => {
+      const viewport = viewportRef.current
+      const track = trackRef.current
+      if (!viewport || !track || track.children.length === 0) return fallbackIndex
+
+      const viewportRect = viewport.getBoundingClientRect()
+      const centerX = viewportRect.left + viewportRect.width / 2
+      const firstIndex = clamp(fallbackIndex - 2, 0, track.children.length - 1)
+      const lastIndex = clamp(fallbackIndex + 2, 0, track.children.length - 1)
+      let closestIndex = fallbackIndex
+      let closestDistance = Number.POSITIVE_INFINITY
+
+      for (let index = firstIndex; index <= lastIndex; index++) {
+        const card = track.children[index]
+        if (!(card instanceof HTMLElement)) continue
+
+        const cardRect = card.getBoundingClientRect()
+        if (centerX >= cardRect.left && centerX <= cardRect.right) return index
+
+        const distance = Math.abs(centerX - (cardRect.left + cardRect.width / 2))
+        if (distance < closestDistance) {
+          closestDistance = distance
+          closestIndex = index
+        }
+      }
+
+      return closestIndex
+    },
+    []
+  )
+
+  // Keep the landing offset stable for the whole run. This hook re-renders as
+  // the centered card changes; generating the offset during render used to
+  // move the target underneath the animation on every card crossing.
+  const randomOffsetRatio = useMemo(
+    () => clamp((Math.random() - 0.5) * 0.5, -0.25, 0.25),
+    [itemsKey, o.winner, o.durationMs, itemWidth],
+  )
+
+  const getTargetPosition = useCallback(() => {
+    if (targetPositionRef.current !== null) return targetPositionRef.current
+
+    const containerWidth = viewportRef.current?.getBoundingClientRect().width || 0
+    const { pitch, centerOffset } = getItemMetrics()
+    if (!containerWidth) return 0
+
+    const finalPosition = winnerIndex * pitch + centerOffset - containerWidth / 2
+    const maxPosition = Math.max(0, strip.length * pitch - containerWidth)
+    targetPositionRef.current = clamp(finalPosition + randomOffsetRatio * pitch, 0, maxPosition)
+    return targetPositionRef.current
+  }, [getItemMetrics, randomOffsetRatio, strip.length, winnerIndex])
+
+  // Reset run-local position bookkeeping if the hook is reused with new data.
+  useEffect(() => {
+    targetPositionRef.current = null
+    itemPitchRef.current = itemWidth
+    itemLeadingMarginRef.current = 0
+    itemCenterOffsetRef.current = itemWidth / 2
+    lastPosRef.current = 0
+    lastCenterIndexRef.current = -1
+    soundCounterRef.current = 0
+    setCenterIndex(0)
+  }, [itemsKey, o.winner, o.durationMs])
+
+  const updateCenterIndex = useCallback(() => {
+    const containerWidth = viewportRef.current?.getBoundingClientRect().width || 0
+    if (!containerWidth || strip.length === 0) return
+
+    const { pitch, leadingMargin } = getItemMetrics()
+    const fallbackIndex = clamp(
+      Math.floor((lastPosRef.current + containerWidth / 2 - leadingMargin) / pitch),
+      0,
+      strip.length - 1,
+    )
+    const index = getVisualCenterIndex(fallbackIndex)
+    setCenterIndex((current) => (current === index ? current : index))
+  }, [getItemMetrics, getVisualCenterIndex, strip.length])
+
+  // The viewport ref is assigned after render, so establish the initial
+  // highlighted card and keep it correct when the stage is resized.
+  useEffect(() => {
+    updateCenterIndex()
+    const viewport = viewportRef.current
+    if (!viewport) return
+
+    if (typeof ResizeObserver !== "undefined") {
+      const observer = new ResizeObserver(updateCenterIndex)
+      observer.observe(viewport)
+      return () => observer.disconnect()
+    }
+
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", updateCenterIndex)
+      return () => window.removeEventListener("resize", updateCenterIndex)
+    }
+  }, [itemsKey, o.durationMs, o.winner, updateCenterIndex])
 
   const onFrame = useCallback(
     (progress: number) => {
       if (prefersReducedMotion || !trackRef.current) return
 
       const trackEl = trackRef.current
+      const targetPosition = getTargetPosition()
+      const containerWidth = viewportRef.current?.getBoundingClientRect().width || 0
+      const { pitch, leadingMargin } = getItemMetrics()
       let newPosition: number
 
       if (progress < 0.3) {
@@ -88,16 +215,11 @@ export function useSrtReel(o: UseSrtReelOptions): UseSrtReelResult {
         const slowProgress = (progress - 0.3) / 0.7
         const transitionPoint = targetPosition * 0.95
         const remaining = targetPosition - transitionPoint
-        const baseApproach = transitionPoint + remaining * (1 - Math.pow(1 - slowProgress, 3))
-
-        let oscillation = 0
-        if (slowProgress > 0.1 && slowProgress < 0.9) {
-          const oscProgress = (slowProgress - 0.1) / 0.8
-          oscillation = Math.sin(oscProgress * 4 * Math.PI) * 4 * Math.pow(1 - oscProgress, 1.5)
-        }
-        newPosition = baseApproach + oscillation
+        newPosition = transitionPoint + remaining * (1 - Math.pow(1 - slowProgress, 3))
       }
 
+      // The target is stable for the run, so this only protects the strip from
+      // a frame-level reversal caused by a late frame arriving out of order.
       newPosition = Math.max(newPosition, lastPosRef.current)
       trackEl.style.transform = `translateX(${-newPosition}px)`
 
@@ -108,7 +230,12 @@ export function useSrtReel(o: UseSrtReelOptions): UseSrtReelResult {
         trackEl.style.filter = ""
       }
 
-      const newCenterIndex = Math.floor((newPosition + containerWidth / 2) / itemWidth)
+      const fallbackCenterIndex = clamp(
+        Math.floor((newPosition + containerWidth / 2 - leadingMargin) / pitch),
+        0,
+        Math.max(0, strip.length - 1),
+      )
+      const newCenterIndex = getVisualCenterIndex(fallbackCenterIndex)
       if (newCenterIndex !== lastCenterIndexRef.current) {
         setCenterIndex(newCenterIndex)
 
@@ -124,21 +251,22 @@ export function useSrtReel(o: UseSrtReelOptions): UseSrtReelResult {
 
       lastPosRef.current = newPosition
     },
-    [targetPosition, containerWidth, itemWidth, prefersReducedMotion, audio]
+    [audio, getItemMetrics, getTargetPosition, getVisualCenterIndex, prefersReducedMotion, strip.length]
   )
 
   const onLand = useCallback(() => {
     if (!trackRef.current) return
     const trackEl = trackRef.current
+    const targetPosition = getTargetPosition()
     trackEl.style.transform = `translateX(${-targetPosition}px)`
     trackEl.style.filter = ""
     setCenterIndex(winnerIndex)
-    audio.win()
-  }, [targetPosition, winnerIndex, audio])
+  }, [getTargetPosition, winnerIndex])
 
   const onSkip = useCallback(() => {
     if (!trackRef.current) return
     const trackEl = trackRef.current
+    const targetPosition = getTargetPosition()
     trackEl.style.transition = "transform 450ms cubic-bezier(.2,.8,.2,1)"
     trackEl.style.transform = `translateX(${-targetPosition}px)`
     trackEl.style.filter = ""
@@ -146,7 +274,7 @@ export function useSrtReel(o: UseSrtReelOptions): UseSrtReelResult {
     setTimeout(() => {
       trackEl.style.transition = "none"
     }, 450)
-  }, [targetPosition, winnerIndex])
+  }, [getTargetPosition, winnerIndex])
 
   const run = useSrtDrawRun({
     durationMs: o.durationMs,
@@ -155,6 +283,7 @@ export function useSrtReel(o: UseSrtReelOptions): UseSrtReelResult {
     reducedMotion: prefersReducedMotion,
     onFrame,
     onLand,
+    onDone: audio.win,
     onSkip
   })
 

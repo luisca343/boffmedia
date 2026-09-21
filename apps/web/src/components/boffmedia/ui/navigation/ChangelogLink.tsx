@@ -21,10 +21,22 @@ export function ChangelogLink({ mobile = false }: { mobile?: boolean }) {
       return
     }
     let active = true
+    let requestId = 0
+    const currentRequest = ++requestId
     void ChangelogService.list("boffmedia", "web", "es").then((response) => {
-      if (active && response.success) setUnreadCount(response.data?.unreadCount ?? 0)
+      if (active && currentRequest === requestId && response.success) {
+        setUnreadCount(response.data?.unreadCount ?? 0)
+      }
     }).catch(() => undefined)
-    return () => { active = false }
+    const onSeen = () => {
+      requestId++
+      setUnreadCount(0)
+    }
+    window.addEventListener("boffmedia:changelog-seen", onSeen)
+    return () => {
+      active = false
+      window.removeEventListener("boffmedia:changelog-seen", onSeen)
+    }
   }, [status])
 
   return (

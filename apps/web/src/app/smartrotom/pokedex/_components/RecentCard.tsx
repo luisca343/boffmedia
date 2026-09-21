@@ -8,10 +8,9 @@ import { useGetRegistries } from "@/hooks/pokemon/useGetRegistries"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { StatusPill, TypeChip } from "./ui"
 import { Loading } from "@/components/smartrotom/Loading"
-import { ImageFallback } from "@boffmedia/ui"
+import { PokedexArtImage as ArtImage, PokedexImageFallback as ImageFallback } from "./PokedexArtImage"
 import { useEffect, useState } from "react"
 import { getSpriteUrl } from "@/utils/spriteUtils"
-import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 
 type EnrichedRegistry = {
   pokemonId: number

@@ -15,6 +15,7 @@ import { lazy } from "react";
 import type { ToolManifest } from "@boffmedia/tool-kit";
 
 import { MHWILDS_NS } from "./i18n";
+import { MHWILDS_ICON_ASSETS } from "./ui/mh-icons";
 
 /** Catalog screens are fully local; only the bestiary uses the API capability. */
 const LOCAL_CAPABILITIES: ToolManifest["requiredCapabilities"] = [];
@@ -33,6 +34,7 @@ export const mhwildsPlannerTool: ToolManifest = {
   descriptionKey: `${MHWILDS_NS}.manifest.planner.description`,
   categoryKey: `${MHWILDS_NS}.manifest.planner.category`,
   icon: "target",
+  iconSrc: MHWILDS_ICON_ASSETS.tools.planner,
   route: "/mhwilds/builds/planner",
   requiredCapabilities: LOCAL_CAPABILITIES,
   layout: LAYOUT,
@@ -49,6 +51,7 @@ export const mhwildsTreeTool: ToolManifest = {
   descriptionKey: `${MHWILDS_NS}.manifest.tree.description`,
   categoryKey: `${MHWILDS_NS}.manifest.tree.category`,
   icon: "sword",
+  iconSrc: MHWILDS_ICON_ASSETS.tools.weaponTree,
   route: "/mhwilds/tree",
   requiredCapabilities: LOCAL_CAPABILITIES,
   layout: LAYOUT,
@@ -65,6 +68,7 @@ export const mhwildsBestiaryTool: ToolManifest = {
   descriptionKey: `${MHWILDS_NS}.manifest.bestiary.description`,
   categoryKey: `${MHWILDS_NS}.manifest.bestiary.category`,
   icon: "skull",
+  iconSrc: MHWILDS_ICON_ASSETS.tools.bestiary,
   route: "/mhwilds/monsters",
   requiredCapabilities: API_CAPABILITIES,
   layout: LAYOUT,
@@ -81,6 +85,7 @@ export const mhwildsArmorTool: ToolManifest = {
   descriptionKey: `${MHWILDS_NS}.manifest.armor.description`,
   categoryKey: `${MHWILDS_NS}.manifest.armor.category`,
   icon: "shield",
+  iconSrc: MHWILDS_ICON_ASSETS.tools.armor,
   route: "/mhwilds/armor",
   requiredCapabilities: LOCAL_CAPABILITIES,
   layout: LAYOUT,
@@ -97,6 +102,7 @@ export const mhwildsWishlistTool: ToolManifest = {
   descriptionKey: `${MHWILDS_NS}.manifest.wishlist.description`,
   categoryKey: `${MHWILDS_NS}.manifest.wishlist.category`,
   icon: "list",
+  iconSrc: MHWILDS_ICON_ASSETS.tools.materials,
   route: "/mhwilds/wishlist",
   requiredCapabilities: LOCAL_CAPABILITIES,
   layout: LAYOUT,

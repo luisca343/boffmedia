@@ -63,7 +63,7 @@ function ReelRun({
     durationMs,
     muted,
     itemWidth: 200,
-    settleMs: 1200
+    settleMs: 250
   })
 
   React.useEffect(() => {
@@ -82,6 +82,8 @@ function ReelRun({
 
   const isSpinning = reel.phase === "spinning"
   const isLanded = reel.phase === "landed" || reel.phase === "done"
+  const activeIndex =
+    reel.centerIndex >= 0 && reel.centerIndex < reel.strip.length ? reel.centerIndex : 0
 
   return (
     <>
@@ -122,7 +124,7 @@ function ReelRun({
                 state={
                   isLanded && index === reel.winnerIndex
                     ? "winner"
-                    : isSpinning && index === reel.centerIndex
+                    : !isLanded && index === activeIndex
                       ? "current"
                       : "idle"
                 }

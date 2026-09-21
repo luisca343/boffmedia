@@ -16,13 +16,20 @@ import {
 } from "@boffmedia/ui";
 
 import { useLocale, useT } from "../i18n";
-import { openUrl } from "../runtime";
+import { openUrl, webBaseUrl } from "../runtime";
 import {
   cacheChangelog,
   loadChangelog,
   markChangelogSeen,
 } from "../services/changelog";
 import { useApp } from "../state/app";
+
+function openChangelogUrl(url: string): void {
+  const destination = url.startsWith("/") || url.startsWith("#")
+    ? new URL(url, webBaseUrl()).toString()
+    : url;
+  void openUrl(destination).catch(() => undefined);
+}
 
 export function Changelog() {
   const t = useT("changelog");
@@ -129,7 +136,8 @@ export function Changelog() {
                   ? { label: item.translation.ctaLabel, url: item.cta.url }
                   : undefined,
             }))}
-            onOpenCta={(url) => void openUrl(url)}
+            onOpenCta={openChangelogUrl}
+            onOpenLink={openChangelogUrl}
           />
         )}
       </div>

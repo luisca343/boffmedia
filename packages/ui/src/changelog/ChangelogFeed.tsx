@@ -26,14 +26,16 @@ export interface ChangelogFeedProps {
   items: readonly ChangelogDisplayItem[]
   /** Optional host navigation hook. When supplied, the host owns the CTA open. */
   onOpenCta?: (url: string) => void
+  /** Route links inside the Markdown body through a host such as the desktop shell. */
+  onOpenLink?: (url: string) => void
   /** Stack the release panel for narrow host surfaces such as an admin preview. */
   compact?: boolean
   className?: string
 }
 
-export function ChangelogMarkdown({ children, className }: { children: string; className?: string }) {
+export function ChangelogMarkdown({ children, className, onOpenLink }: { children: string; className?: string; onOpenLink?: (url: string) => void }) {
   return (
-    <Markdown className={cn("mt-6", className)}>
+    <Markdown className={cn("mt-6", className)} onOpenLink={onOpenLink}>
       {children}
     </Markdown>
   )
@@ -47,7 +49,7 @@ function present(value: React.ReactNode): boolean {
   return value !== null && value !== undefined && value !== "" && value !== false
 }
 
-export function ChangelogFeed({ items, onOpenCta, compact = false, className }: ChangelogFeedProps) {
+export function ChangelogFeed({ items, onOpenCta, onOpenLink, compact = false, className }: ChangelogFeedProps) {
   return (
     <div className={cn("w-full space-y-5", className)}>
       {items.map((item) => {
@@ -91,7 +93,7 @@ export function ChangelogFeed({ items, onOpenCta, compact = false, className }: 
               "min-w-0",
               !compact && "lg:border-l lg:border-solid lg:border-line lg:pl-10",
             )}>
-              <ChangelogMarkdown className="mt-0">{item.body}</ChangelogMarkdown>
+              <ChangelogMarkdown className="mt-0" onOpenLink={onOpenLink}>{item.body}</ChangelogMarkdown>
 
               {cta && present(cta.label) && (
                 <Button
@@ -99,6 +101,7 @@ export function ChangelogFeed({ items, onOpenCta, compact = false, className }: 
                   onClick={
                     onOpenCta
                       ? (event) => {
+                          if (cta.url.startsWith("#")) return
                           event.preventDefault()
                           onOpenCta(cta.url)
                         }

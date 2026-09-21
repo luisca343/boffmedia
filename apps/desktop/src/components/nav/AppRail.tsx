@@ -135,7 +135,7 @@ function ChangelogRailButton({
   return (
     <RailButton
       active={active}
-      icon="list"
+      icon="book"
       size={UTILITY_ICON}
       label={t("navChangelog")}
       onClick={go}

@@ -140,7 +140,6 @@ export function MobileNav({ pathname }: { pathname: string }) {
 
             <div className="mt-5 flex items-center gap-2.5">
               <LangSwitcher />
-              <IconButton name="search" label={tNav("search")} />
             </div>
 
             <ChangelogLink mobile />

@@ -192,6 +192,7 @@ export function MarkdownCodeBlock({ children, className, node: _node, ...rest }:
 
       <pre {...rest} className="m-0 overflow-x-auto bg-transparent p-4 font-mono text-[0.8125rem] leading-6 text-txt">
         {highlightedHtml ? (
+          // xss-ok: Shiki escapes the source text before returning highlighted HTML.
           <code dangerouslySetInnerHTML={{ __html: highlightedHtml }} />
         ) : (
           <code>{source}</code>

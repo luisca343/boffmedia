@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation"
 import { useTranslations } from "next-intl"
 import { SearchIcon, ZapIcon, FilterIcon, SettingsIcon, RefreshCwIcon } from "@boffmedia/ui"
 import { TypeChip, StatusPill } from "./ui"
-import { ImageFallback } from "@boffmedia/ui"
+import { PokedexArtImage as ArtImage, PokedexImageFallback as ImageFallback } from "./PokedexArtImage"
 import { usePokemonStore } from "@/stores/pokemonStore"
 import { usePokedexData } from "@/hooks/usePokedexData"
 import { PokedexStatus } from "../dexUtils"
 import { getSpriteUrl } from "@/utils/spriteUtils"
-import { ArtImage } from "@/components/boffmedia/ui/tools/ArtImage"
 
 export function HubTopbar() {
   const t = useTranslations("pokedex")

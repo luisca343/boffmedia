@@ -48,6 +48,7 @@ export function BoffmediaChangelog() {
     }).then((response) => {
       if (response.success) {
         setResult((current) => current ? { ...current, hasUnread: false, unreadCount: 0 } : current)
+        window.dispatchEvent(new Event("boffmedia:changelog-seen"))
       }
     }).catch(() => {
       seenEntryRef.current = null

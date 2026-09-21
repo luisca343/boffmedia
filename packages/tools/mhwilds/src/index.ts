@@ -32,5 +32,6 @@ export { MHWILDS_NS, MHWILDS_UI_NS, useToolT } from "./i18n";
 // The shared MH shell/kit, exported because the web styleguide renders it.
 export * from "./ui/mh-kit";
 export * from "./ui/mh-helpers";
+export * from "./ui/mh-icons";
 
 export type * from "./types";

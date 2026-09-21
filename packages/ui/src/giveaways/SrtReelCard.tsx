@@ -24,17 +24,17 @@ export const SrtReelCard = React.memo(function SrtReelCard({ name, state, winner
         "cut-corner cut-corner-edge [--cut-lg:12px]",
         "relative mx-[0.625rem] flex h-64 w-[11.25rem] flex-none flex-col items-center justify-center p-4 transition-all duration-[120ms]",
         isWinner
-          ? "scale-105 border border-accent-line bg-accent-soft"
+          ? "z-10 scale-105 border-2 border-accent bg-accent-soft"
           : isCurrent
-            ? "scale-105 border border-accent-line bg-panel-2"
+            ? "z-10 scale-105 border-2 border-accent bg-panel-2"
             : "border border-line-2 bg-panel-2"
       )}
       style={{
         boxShadow:
           isWinner
-            ? "0 0 30px color-mix(in srgb, var(--accent) 34%, transparent), 0 0 80px color-mix(in srgb, var(--accent) 14%, transparent)"
+            ? "0 0 30px color-mix(in srgb, var(--accent) 46%, transparent), 0 0 80px color-mix(in srgb, var(--accent) 20%, transparent)"
             : isCurrent
-              ? "0 0 18px color-mix(in srgb, var(--accent) 22%, transparent)"
+              ? "0 0 24px color-mix(in srgb, var(--accent) 40%, transparent)"
               : "none"
       }}
     >

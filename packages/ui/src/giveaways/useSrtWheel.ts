@@ -62,23 +62,10 @@ export function useSrtWheel(opts: UseSrtWheelOptions) {
 
       const target = targetRef.current
 
-      // ONE monotonic ease-out that reaches EXACTLY 1 at progress 1: the frame
-      // loop must finish on `target`, because onLand() also writes `target`.
-      // (A piecewise curve that ended at 0.9 left the wheel a tenth of a turn
-      // short and the land then snapped it onto a different segment.)
+      // Keep the established long spin profile while the stable target above
+      // prevents the final slowdown from jumping.
       const eased = 1 - Math.pow(1 - progress, 4)
-
-      // Settle wobble in ABSOLUTE degrees — a fraction of `target` would scale
-      // with the turn count and could throw the pointer out of a thin slice.
-      // Decays to exactly 0 at progress 1 so it never shifts the landing.
-      let wobble = 0
-      if (progress > 0.85) {
-        const q = (progress - 0.85) / 0.15
-        const amp = Math.min(3, winnerSegment.angle * 0.2)
-        wobble = Math.sin(q * Math.PI * 3) * amp * (1 - q) * (1 - q)
-      }
-
-      const rotation = target * eased + wobble
+      const rotation = target * eased
       gRef.current.style.transform = `rotate(${rotation}deg)`
 
       // Find current segment: angle from pointer
@@ -111,8 +98,7 @@ export function useSrtWheel(opts: UseSrtWheelOptions) {
     const target = targetRef.current
     gRef.current.style.transform = `rotate(${target}deg)`
     setCurrentIndex(winnerSegmentIndex)
-    audio.win()
-  }, [winnerSegmentIndex, audio])
+  }, [winnerSegmentIndex])
 
   const onSkip = useCallback(() => {
     if (!gRef.current) return
@@ -127,11 +113,12 @@ export function useSrtWheel(opts: UseSrtWheelOptions) {
 
   const run = useSrtDrawRun({
     durationMs: opts.durationMs,
-    settleMs: 1200,
+    settleMs: 250,
     startDelayMs: 400,
     reducedMotion: prefersReducedMotion,
     onFrame,
     onLand,
+    onDone: audio.win,
     onSkip
   })
 

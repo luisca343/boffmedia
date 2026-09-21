@@ -15,9 +15,11 @@ import { MarkdownCodeBlock } from "./CodeBlock";
 export function SafeMarkdown({
   children,
   className,
+  onOpenLink,
 }: {
   children: string;
   className?: string;
+  onOpenLink?: (url: string) => void;
 }) {
   return (
     <div className={cn("safe-markdown", className)}>
@@ -39,6 +41,11 @@ export function SafeMarkdown({
                 target={external ? "_blank" : undefined}
                 rel={external ? "noopener noreferrer" : undefined}
                 onClick={(event) => {
+                  if (onOpenLink && !href.startsWith("#")) {
+                    event.preventDefault();
+                    onOpenLink(href);
+                    return;
+                  }
                   if (!external) return;
                   event.preventDefault();
                   uiOpenUrl(href);
@@ -61,6 +68,7 @@ export function SafeMarkdown({
 function isSafeUrl(value: string): boolean {
   const trimmed = value.trim();
   if (!trimmed) return false;
+  if (trimmed.startsWith("//")) return false;
   if (trimmed.startsWith("/") || trimmed.startsWith("#")) return true;
   try {
     const protocol = new URL(trimmed).protocol.toLowerCase();

@@ -68,10 +68,10 @@ const MOBILE_ITEM =
 function AccountAvatar({ image, initial, size }: { image?: string | null; initial: string; size: number }) {
   return (
     <span
-      className="relative grid shrink-0 place-items-center border border-solid border-accent bg-panel-2 font-display font-extrabold italic text-accent cut-seal cut-seal-edge [--cut-line:var(--accent)] [--cut:5px]"
-      style={{ width: size, height: size, fontSize: Math.round(size * 0.42) }}
+      className="relative grid shrink-0 place-items-center overflow-hidden border border-solid border-accent bg-panel-2 font-display font-extrabold italic text-accent cut-seal cut-seal-edge [--cut-line:var(--accent)] [--cut:5px]"
+      style={{ width: size, height: size, minWidth: size, minHeight: size, fontSize: Math.round(size * 0.42) }}
     >
-      <ArtImage src={image} alt="" sizes={`${size}px`} fallback={<span>{initial}</span>} />
+      <ArtImage src={image} alt="" className="absolute inset-0 h-full w-full object-cover" sizes={`${size}px`} fallback={<span>{initial}</span>} />
     </span>
   )
 }
@@ -101,7 +101,7 @@ export function AccountMenu({ user, isAdmin }: { user: AccountUser; isAdmin?: bo
   const initial = name.charAt(0).toUpperCase()
 
   return (
-    <span className="relative inline-flex" ref={rootRef}>
+    <span className="relative inline-flex h-10" ref={rootRef}>
       <button
         type="button"
         aria-haspopup="menu"
@@ -109,13 +109,13 @@ export function AccountMenu({ user, isAdmin }: { user: AccountUser; isAdmin?: bo
         aria-label={tNav("account")}
         onClick={() => setOpen((v) => !v)}
         className={cn(
-          "inline-flex items-center gap-[0.5625rem] border border-solid py-1 pl-1 pr-2 cut-tag cut-tag-edge transition-[color,border-color,background] duration-[140ms]",
+          "inline-flex h-10 items-center gap-[0.5625rem] border border-solid px-1 pr-2 cut-tag cut-tag-edge transition-[color,border-color,background] duration-[140ms]",
           open
             ? "border-line-2 [--cut-line:var(--line-2)] bg-panel-2 text-txt"
             : "border-transparent [--cut-line:transparent] bg-transparent text-txt-muted hover:border-line-2 hover:[--cut-line:var(--line-2)] hover:bg-panel-2 hover:text-txt",
         )}
       >
-        <AccountAvatar image={image} initial={initial} size={28} />
+        <AccountAvatar image={image} initial={initial} size={40} />
         <span className="max-w-[8.125rem] truncate font-display text-[0.8125rem] font-bold leading-none tracking-[0.05em] text-txt">
           {name}
         </span>
