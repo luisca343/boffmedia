@@ -71,12 +71,16 @@ describe('TcgFacadeService', () => {
 
   describe('getCardsForSeriesFromDb()', () => {
     it('delegates to TcgService', async () => {
-      mockTcgService.getCardsForSeriesFromDb.mockResolvedValue([{ id: 'A1-1' }]);
+      mockTcgService.getCardsForSeriesFromDb.mockResolvedValue([
+        { id: 'A1-1' },
+      ]);
 
       await expect(service.getCardsForSeriesFromDb('tcgp')).resolves.toEqual([
         { id: 'A1-1' },
       ]);
-      expect(mockTcgService.getCardsForSeriesFromDb).toHaveBeenCalledWith('tcgp');
+      expect(mockTcgService.getCardsForSeriesFromDb).toHaveBeenCalledWith(
+        'tcgp',
+      );
     });
   });
 

@@ -7,6 +7,7 @@ import { useT } from "../i18n"
 import { useDismiss } from "../hooks/use-dismiss"
 import { Icon, type IconName } from "./icon"
 import { Button } from "./button"
+import { IconButton } from "./icon-button"
 import { Kbd } from "./kbd"
 
 export interface MenuItem {
@@ -30,6 +31,8 @@ export interface MenuProps {
   items: MenuItem[]
   align?: "start" | "end"
   ariaLabel?: string
+  /** Use the shared square IconButton chassis for a compact native trigger. */
+  iconOnly?: boolean
 }
 
 const POP_SHADOW = "0 1px 0 var(--accent-line), 0 18px 40px -18px rgba(0,0,0,0.7)"
@@ -48,6 +51,7 @@ export function Menu({
   items,
   align = "start",
   ariaLabel,
+  iconOnly = false,
 }: MenuProps) {
   const t = useT()
   const resolvedLabel = label ?? t("actions")
@@ -163,6 +167,12 @@ export function Menu({
         >
           {trigger}
         </span>
+      ) : iconOnly ? (
+        <IconButton type="button" data-menu-trigger name={icon} variant={variant} size={size}
+          label={ariaLabel ?? (typeof resolvedLabel === "string" ? resolvedLabel : t("actions"))}
+          aria-haspopup="menu" aria-expanded={open}
+          className={cn(open && "border-accent text-accent-bright")}
+          onClick={() => (open ? setOpen(false) : openWith(-1))} onKeyDown={onTrigKey} />
       ) : (
         <Button
           data-menu-trigger

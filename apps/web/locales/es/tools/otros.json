@@ -53,6 +53,15 @@
           "countdown": "Cuenta atrás",
           "claim": "Reclamar en un clic"
         }
+      },
+      "tierLists": {
+        "title": "Tier lists",
+        "description": "Clasifica elementos o planifica en varias filas con plantillas reutilizables",
+        "features": {
+          "placement": "Clasificación y planificación",
+          "templates": "Plantillas personalizadas",
+          "export": "Exportación JSON y PNG"
+        }
       }
     },
     "fortunesWeave": {

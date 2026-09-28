@@ -8,7 +8,8 @@ import { resolve } from "node:path"
 // The .mts extension makes Vite emit ESM and load it with import() instead.
 // __dirname below still works: Vite shims it when it bundles the config.
 
-// Unit tests for pure logic only (node env, no DOM). Playwright still owns e2e.
+// Node by default; component/hook suites opt into jsdom via a file annotation.
+// Playwright still owns full-page browser interactions.
 export default defineConfig({
   resolve: {
     alias: {
@@ -20,7 +21,7 @@ export default defineConfig({
     environment: "node",
     // @boffmedia/ui is included explicitly: its tests moved out of src/ with
     // the package and would otherwise be silently collected by nothing.
-    include: ["src/**/*.test.ts", "../../packages/ui/src/**/*.test.ts"],
+    include: ["src/**/*.test.{ts,tsx}", "../../packages/ui/src/**/*.test.ts"],
     // `config/env` validates NEXT_PUBLIC_* with zod AT IMPORT TIME, so any test
     // that reaches the service layer dies with a ZodError before a single
     // assertion runs — and vitest reports that as a FILE failure while still

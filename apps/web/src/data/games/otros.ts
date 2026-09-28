@@ -27,6 +27,17 @@ export const otros: GameEntry = {
       href: "/otros",
       tools: [
         {
+          key: "tierLists",
+          nameKey: "tierLists.hubTitle",
+          href: "/tier-lists",
+          sidebarIcon: "list",
+          landing: {
+            icon: "", fallbackIcon: "list", fallbackIconColor: "text-secondary-hover",
+            color: "from-secondary-hover to-indigo-600", features: ["placement", "templates", "export"],
+            isNew: true, popularity: "medium",
+          },
+        },
+        {
           key: "sorteos",
           nameKey: "games.otros.tools.sorteos",
           href: "/otros/sorteos",

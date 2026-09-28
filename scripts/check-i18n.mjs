@@ -597,8 +597,11 @@ for (const file of spanishSources) {
 // are out of its reach now rather than translated. Their strings do go through
 // the package catalog, so nothing regressed - but the number is not evidence of
 // that either way.
+<<<<<<< HEAD
 // 2026-09-23: 32 -> 30. The current scan is below the prior baseline, so pin
 // its observed floor per the ratchet rule.
+=======
+>>>>>>> tierlist
 const HARDCODED_ES_BASELINE = 30;
 const hardcodedCount = hardcodedSpanish.length;
 if (hardcodedCount > HARDCODED_ES_BASELINE) {
