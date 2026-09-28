@@ -4,7 +4,7 @@ import * as React from "react"
 import Image from "next/image"
 import { SearchInput } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
-import { CHARACTER_PORTRAITS } from "../portraits"
+import { CHARACTER_PORTRAITS } from "@/features/fortunes-weave/characters"
 import {
   CHARACTERS,
   FORTUNES_WEAVE_SOURCE_URL,

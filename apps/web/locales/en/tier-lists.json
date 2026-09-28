@@ -10,6 +10,13 @@
     "createTemplate": "Create template",
     "openTemplate": "Create my tier list",
     "templateEditor": "Template editor",
+    "editPreset": "Edit preset",
+    "presetEditor": "Preset editor",
+    "presetEditorHint": "Edit the base preset’s rows, rules, characters and starting assignments. Saving creates your own reusable copy on this device; the original preset stays available.",
+    "startingPlacements": "Starting assignments",
+    "startingPlacementsHint": "Arrange the cards that every new list should start with. Reset list restores these assignments; Clear all placements empties the board. Changes to this preset’s defaults do not replace an existing list’s arrangement.",
+    "startingReferenceHint": "Starting assignments are preserved for this collection. Switch to custom items to edit them on the preview board.",
+    "presetUpdated": "This base preset has been updated. Create another list to use its current rows and starting assignments. Your saved arrangement is kept.",
     "templateDetails": "Template details",
     "untitled": "My tier list",
     "title": "Title",
@@ -151,7 +158,8 @@
     "templates": {
       "standard": { "title": "Classic S / A / B / C", "description": "A classic exclusive ranking. Remix it with your own items." },
       "planner": { "title": "Multi-row planner", "description": "Assign the same item to several groups while keeping the source pool available.", "first": "Group 1", "second": "Group 2", "third": "Group 3" },
-      "games": { "title": "Site game collection", "description": "Rank games from the existing Boffmedia catalog using their original entries." }
+      "games": { "title": "Site game collection", "description": "Rank games from the existing Boffmedia catalog using their original entries." },
+      "fortunesWeave": { "title": "Fire Emblem: Fortune’s Weave", "description": "Plan the 50 characters across Cai, Dietrich, Theodora and Leda’s routes. Each lord starts in their own group, and a character can join several routes. Uses pre-timeskip portraits." }
     }
   }
 }

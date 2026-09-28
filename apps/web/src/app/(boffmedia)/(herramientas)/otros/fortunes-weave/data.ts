@@ -1,6 +1,7 @@
-export const FORTUNES_WEAVE_SOURCE_URL = "https://www.polygon.com/fire-emblem-fortunes-weave-recruitable-characters-all-support-level/"
+import { FORTUNES_WEAVE_CHARACTERS, FORTUNES_WEAVE_ROUTES } from "@/features/fortunes-weave/characters"
+export { FORTUNES_WEAVE_SOURCE_URL } from "@/features/fortunes-weave/characters"
 
-export const ROUTE_IDS = ["cai", "dietrich", "theodora", "leda"] as const
+export const ROUTE_IDS = FORTUNES_WEAVE_ROUTES
 export type RouteId = (typeof ROUTE_IDS)[number]
 
 export const ROUTES: { id: RouteId; name: string }[] = [
@@ -46,10 +47,9 @@ export interface WeaveCharacter {
   routes: Record<RouteId, RouteRecruitment>
 }
 
-export const CHARACTERS: WeaveCharacter[] = [
+const recruitments: Omit<WeaveCharacter, "name">[] = [
   {
     "id": "cai",
-    "name": "Cai",
     "routes": {
       "cai": {
         "available": true,
@@ -95,7 +95,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "tialla",
-    "name": "Tialla",
     "routes": {
       "cai": {
         "available": true,
@@ -168,7 +167,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "peter",
-    "name": "Peter",
     "routes": {
       "cai": {
         "available": true,
@@ -226,7 +224,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "ultand",
-    "name": "Ultand",
     "routes": {
       "cai": {
         "available": true,
@@ -285,7 +282,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "gaitz",
-    "name": "Gaitz",
     "routes": {
       "cai": {
         "available": false,
@@ -336,7 +332,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "jester",
-    "name": "Jester",
     "routes": {
       "cai": {
         "available": true,
@@ -398,7 +393,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "goliath",
-    "name": "Goliath",
     "routes": {
       "cai": {
         "available": true,
@@ -464,7 +458,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "dante",
-    "name": "Dante",
     "routes": {
       "cai": {
         "available": true,
@@ -526,7 +519,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "dietrich",
-    "name": "Dietrich",
     "routes": {
       "cai": {
         "available": false,
@@ -572,7 +564,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "fabio",
-    "name": "Fabio",
     "routes": {
       "cai": {
         "available": false,
@@ -630,7 +621,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "esmeralda",
-    "name": "Esmeralda",
     "routes": {
       "cai": {
         "available": true,
@@ -688,7 +678,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "mikaela",
-    "name": "Mikaela",
     "routes": {
       "cai": {
         "available": true,
@@ -749,7 +738,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "diego",
-    "name": "Diego",
     "routes": {
       "cai": {
         "available": true,
@@ -811,7 +799,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "loretta",
-    "name": "Loretta",
     "routes": {
       "cai": {
         "available": true,
@@ -877,7 +864,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "seteth",
-    "name": "Seteth",
     "routes": {
       "cai": {
         "available": true,
@@ -931,7 +917,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "ninae",
-    "name": "Ninae",
     "routes": {
       "cai": {
         "available": true,
@@ -997,7 +982,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "theodora",
-    "name": "Theodora",
     "routes": {
       "cai": {
         "available": false,
@@ -1043,7 +1027,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "bonaventure",
-    "name": "Bonaventure",
     "routes": {
       "cai": {
         "available": false,
@@ -1089,7 +1072,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "tobias",
-    "name": "Tobias",
     "routes": {
       "cai": {
         "available": false,
@@ -1135,7 +1117,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "lilian",
-    "name": "Lilian",
     "routes": {
       "cai": {
         "available": true,
@@ -1196,7 +1177,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "lysander",
-    "name": "Lysander",
     "routes": {
       "cai": {
         "available": true,
@@ -1260,7 +1240,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "ursula",
-    "name": "Ursula",
     "routes": {
       "cai": {
         "available": true,
@@ -1326,7 +1305,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "ludia",
-    "name": "Ludia",
     "routes": {
       "cai": {
         "available": true,
@@ -1384,7 +1362,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "simon",
-    "name": "Simon",
     "routes": {
       "cai": {
         "available": true,
@@ -1442,7 +1419,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "fianna",
-    "name": "Fianna",
     "routes": {
       "cai": {
         "available": true,
@@ -1504,7 +1480,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "leda",
-    "name": "Leda",
     "routes": {
       "cai": {
         "available": false,
@@ -1550,7 +1525,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "buccar",
-    "name": "Buccar",
     "routes": {
       "cai": {
         "available": false,
@@ -1606,7 +1580,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "sirocco",
-    "name": "Sirocco",
     "routes": {
       "cai": {
         "available": true,
@@ -1664,7 +1637,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "olympia",
-    "name": "Olympia",
     "routes": {
       "cai": {
         "available": true,
@@ -1725,7 +1697,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "mu",
-    "name": "Mu",
     "routes": {
       "cai": {
         "available": true,
@@ -1789,7 +1760,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "nezha",
-    "name": "Nezha",
     "routes": {
       "cai": {
         "available": true,
@@ -1855,7 +1825,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "sha-lan",
-    "name": "Sha Lan",
     "routes": {
       "cai": {
         "available": false,
@@ -1923,7 +1892,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "dadao",
-    "name": "Dadao",
     "routes": {
       "cai": {
         "available": true,
@@ -1989,7 +1957,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "halvin",
-    "name": "Halvin",
     "routes": {
       "cai": {
         "available": true,
@@ -2055,7 +2022,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "guzran",
-    "name": "Guzran",
     "routes": {
       "cai": {
         "available": true,
@@ -2101,7 +2067,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "yang-jie",
-    "name": "Yang Jie",
     "routes": {
       "cai": {
         "available": true,
@@ -2174,7 +2139,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "io",
-    "name": "Io",
     "routes": {
       "cai": {
         "available": true,
@@ -2236,7 +2200,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "peppe",
-    "name": "Peppe",
     "routes": {
       "cai": {
         "available": true,
@@ -2293,7 +2256,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "noctula",
-    "name": "Noctula",
     "routes": {
       "cai": {
         "available": true,
@@ -2335,7 +2297,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "sofia",
-    "name": "Sofia",
     "routes": {
       "cai": {
         "available": true,
@@ -2381,7 +2342,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "catania",
-    "name": "Catania",
     "routes": {
       "cai": {
         "available": true,
@@ -2427,7 +2387,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "nydine",
-    "name": "Nydine",
     "routes": {
       "cai": {
         "available": true,
@@ -2493,7 +2452,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "zarcone",
-    "name": "Zarcone",
     "routes": {
       "cai": {
         "available": true,
@@ -2551,7 +2509,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "majide",
-    "name": "Majide",
     "routes": {
       "cai": {
         "available": true,
@@ -2609,7 +2566,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "benditz",
-    "name": "Benditz",
     "routes": {
       "cai": {
         "available": true,
@@ -2651,7 +2607,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "inyoni",
-    "name": "Inyoni",
     "routes": {
       "cai": {
         "available": true,
@@ -2713,7 +2668,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "jasmine",
-    "name": "Jasmine",
     "routes": {
       "cai": {
         "available": true,
@@ -2775,7 +2729,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "alexandra",
-    "name": "Alexandra",
     "routes": {
       "cai": {
         "available": true,
@@ -2817,7 +2770,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "nuzzuo",
-    "name": "Nuzzuo",
     "routes": {
       "cai": {
         "available": true,
@@ -2883,7 +2835,6 @@ export const CHARACTERS: WeaveCharacter[] = [
   },
   {
     "id": "kiroc",
-    "name": "Kiroc",
     "routes": {
       "cai": {
         "available": true,
@@ -2948,3 +2899,10 @@ export const CHARACTERS: WeaveCharacter[] = [
     }
   }
 ]
+
+
+export const CHARACTERS: WeaveCharacter[] = FORTUNES_WEAVE_CHARACTERS.map(({ id, name }) => {
+  const recruitment = recruitments.find((character) => character.id === id)
+  if (!recruitment) throw new Error(`Missing recruitment data: ${id}`)
+  return { id, name, routes: recruitment.routes }
+})

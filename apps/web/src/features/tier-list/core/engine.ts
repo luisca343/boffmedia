@@ -11,7 +11,10 @@ export function getSourceItems(items: TierListItem[], template: TierListTemplate
   return template.settings.keepSourceVisible ? items : items.filter((item) => !assigned.has(item.id))
 }
 export function createInstance(template: TierListTemplate, id = newTierListId()): TierListInstance {
-  return { id, templateId: template.id, placements: {}, visibility: "private" }
+  const placements = Object.fromEntries(Object.entries(template.initialPlacements ?? {}).map(([rowId, items]) =>
+    [rowId, items.map((itemId) => ({ id: newTierListId(), itemId }))],
+  ))
+  return { id, templateId: template.id, placements, visibility: "private" }
 }
 export function createDocument(template: TierListTemplate, items: TierListItem[], instanceId?: string): TierListDocument {
   return { schemaVersion: 1, template, items, instance: createInstance(template, instanceId) }
@@ -93,7 +96,10 @@ export function applyTierListAction(doc: TierListDocument, action: TierListActio
     case "clear":
     case "reset":
       for (const rowId of Object.keys(placements)) delete placements[rowId]
-      if (action.type === "reset") nextRows = undefined
+      if (action.type === "reset") {
+        nextRows = undefined
+        Object.assign(placements, createInstance(template, instance.id).placements)
+      }
       break
     case "editRow": {
       if (!settings.allowRowEditing || !hasRow(action.rowId)) return doc

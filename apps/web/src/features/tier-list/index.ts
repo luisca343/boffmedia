@@ -1,5 +1,6 @@
 export { TierList, type TierListProps } from "./components/TierList"
 export { TierListTemplateEditor } from "./components/TierListTemplateEditor"
+export { TierListStartingPlacementsEditor } from "./components/TierListStartingPlacementsEditor"
 export { TierListDisplayControls } from "./components/TierListDisplayControls"
 export { TierListHeadingEditor } from "./components/TierListHeadingEditor"
 export { TierListHeading } from "./components/TierListHeading"

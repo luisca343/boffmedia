@@ -19,13 +19,14 @@ import { TierListDisplayControls } from "./TierListDisplayControls"
 import { TierListHeadingEditor } from "./TierListHeadingEditor"
 import { TierListHeading } from "./TierListHeading"
 
-function LoadedWorkspace({ initial, adapter }: { initial: TierListDocument; adapter: LocalStorageTierListAdapter }) {
+function LoadedWorkspace({ initial, adapter, preset }: { initial: TierListDocument; adapter: LocalStorageTierListAdapter; preset: TierListTemplate | null }) {
   const t = useTranslations("tierLists")
   const router = useRouter()
   const state = useTierList(initial, adapter)
   const doc = withTierListStarterImages(state.document)
   const title = getTierListTitle(doc.template, doc.instance)
   const description = getTierListDescription(doc.template, doc.instance)
+  const presetChanged = !!preset && doc.template.ownership?.type === "system" && JSON.stringify([doc.template.rows, doc.template.settings, doc.template.initialPlacements]) !== JSON.stringify([preset.rows, preset.settings, preset.initialPlacements])
   const [recover, setRecover] = useState(false)
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState(false)
@@ -49,8 +50,10 @@ function LoadedWorkspace({ initial, adapter }: { initial: TierListDocument; adap
         <Button size="sm" disabled={creating} onClick={async () => {
           setCreating(true); setCreateError(false)
           try {
-            // Use this definition snapshot, not another instance's older local copy.
-            const next = createDocument(doc.template, doc.items)
+            // A changed system preset starts a fresh list; the saved arrangement stays intact.
+            const definition = presetChanged && preset ? preset : doc.template
+            const items = presetChanged ? await resolveTierListItems(definition.source, tierListSources) : doc.items
+            const next = createDocument(definition, items)
             await adapter.save(next)
             router.push(tierListHref(next))
           } catch { setCreateError(true) } finally { setCreating(false) }
@@ -58,6 +61,7 @@ function LoadedWorkspace({ initial, adapter }: { initial: TierListDocument; adap
         <Button size="sm" href="/tier-lists">{t("back")}</Button>
       </div>
       {createError && <p role="alert" className="text-sm text-bad">{t("newInstanceError")}</p>}
+      {presetChanged && <p className="text-sm text-txt-muted">{t("presetUpdated")}</p>}
     </header>
     <TierListToolbar document={doc} getPresentation={() => presentationRef.current} onEditHeading={() => setEditingHeading(true)} dispatch={state.dispatch} canUndo={state.canUndo} canRedo={state.canRedo} onImport={async (imported) => {
       // Import creates a new private local copy and never overwrites an existing list.
@@ -109,7 +113,7 @@ export function TierListWorkspace({ template, slug, instanceId = "default" }: { 
     })().catch(() => { if (!cancelled) setError("storage") })
     return () => { cancelled = true; controller.abort() }
   }, [template, slug, instanceId, retry])
-  if (value) return <LoadedWorkspace key={`${value.doc.template.id}:${instanceId}`} initial={value.doc} adapter={value.adapter} />
+  if (value) return <LoadedWorkspace key={`${value.doc.template.id}:${instanceId}`} initial={value.doc} adapter={value.adapter} preset={template} />
   return <div className="grid gap-4">
     <p role={error ? "alert" : "status"}>{t(error === "storage" ? "storageLoadError" : error === "source" ? "sourceError" : error === "missing" ? "localMissing" : "loading")}</p>
     {error && <div className="flex flex-wrap gap-2"><Button onClick={() => setRetry((n) => n + 1)}>{t("retry")}</Button><Button href="/tier-lists">{t("back")}</Button></div>}

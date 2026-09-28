@@ -62,5 +62,8 @@ export function TierListsChapter() {
         {savedTitle && <p role="status" className="text-sm text-ok">{t("saved", { title: savedTitle })}</p>}
       </Sample>
     </Section>
+    <Sample title={t("collection")} code="getTierListTemplates(t) · source.type = static" col note={t("collectionNote")}>
+      <Button size="sm" icon="list" href="/tier-lists/fire-emblem-fortunes-weave">{tier("templates.fortunesWeave.title")}</Button>
+    </Sample>
   </>
 }
