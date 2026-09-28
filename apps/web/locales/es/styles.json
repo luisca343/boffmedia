@@ -11,6 +11,15 @@
         "note": "Importa ColorInput desde @boffmedia/ui y envuélvelo en Field para su etiqueta, ayuda y error. Reenvía la referencia y los atributos nativos del input; size=sm encaja en barras compactas. El color elegido sigue visible con el selector cerrado."
       },
       "tierLists": {
+        "itemEditor": "Editor compacto de elementos",
+        "itemEditorNote": "TierListTemplateItemEditor extrae el formulario repetido de cada elemento. Los elementos con imagen empiezan plegados y los nuevos, desplegados. Los campos nativos permanecen montados para su validación. Edita, pliega o elimina este ejemplo local y restáuralo. El callback opcional onUpload habilita la subida de imágenes en el anfitrión.",
+        "locked": "Tarjeta fijada",
+        "controls": "Controles de colección y ayuda",
+        "controlsLead": "Búsqueda, progreso de asignación, estados vacíos con recuperación y ayuda desplegable reutilizables.",
+        "controlsNote": "TierListSourcePanel es controlado y admite tarjetas o una zona de destino como contenido, además de controles opcionales. El progreso cuenta elementos únicos sin fijar. Prueba Mostrar todos los elementos y busca un nombre inexistente para ver la recuperación de filtros. TierListInstructions explica ratón, pantalla táctil y teclado. Ambos se usan en cada tablero y en el editor de asignaciones iniciales.",
+        "lockedBoard": "Elementos fijados a una ruta",
+        "lockedBoardLead": "Ejemplo interactivo compacto de Fire Emblem: cuatro Lords fijados y dos personajes que puedes asignar libremente.",
+        "lockedBoardNote": "DragCard.dragDisabled cambia el cursor mientras el anfitrión desactiva el sensor de arrastre; las acciones de clic siguen disponibles. Su slot status admite indicadores de bloqueo y asignación. Los Lords muestran su bloqueo en el diálogo y no pueden salir de su ruta. Tialla y Peter pueden aparecer en varias rutas; no se permiten duplicados en la misma. Vaciar y Restablecer conservan a los Lords.",
         "drag": "Presentación del arrastre",
         "dragLead": "Controles visuales compartidos de @boffmedia/ui. El anfitrión conecta sus sensores y decide las asignaciones; los controles no contienen reglas de tier lists.",
         "dragSample": "Tarjeta, vista elevada, hueco de inserción y destino",
@@ -26,11 +35,7 @@
         "boardNote": "Importa TierList y TierListDisplayControls desde @/features/tier-list. Proporciona template, instance, items y onChange; las preferencias display usan Toggle de la biblioteca y afectan al tablero y a la captura PNG. Ocultar los controles elimina la barra y las ayudas de filas vacías; las tarjetas siguen siendo arrastrables. Las tarjetas siempre omiten los indicadores de agarre. El modo de asignación permanece en la plantilla. renderItem, renderRowHeader, sourceControls y summary personalizan la presentación. Engranaje/subir/bajar reutilizan IconButton y Menu iconOnly. Todos/Asignados incluyen tarjetas clasificadas. Estos ejemplos mantienen estados independientes en memoria sin escribir en almacenamiento ni en la API.",
         "reset": "Reiniciar ejemplo",
         "collection": "Una colección real de personajes",
-<<<<<<< HEAD
-        "collectionNote": "El preajuste de Fortune’s Weave reutiliza este tablero, editor y controles de apariencia con 50 personajes compartidos en las rutas de Cai, Dietrich, Theodora y Leda. Cada protagonista empieza en su grupo y las tarjetas pueden estar en varias rutas. El seguimiento comparte los retratos públicos anteriores al salto temporal. Editar preajuste en el catálogo crea una copia reutilizable. TierListStartingPlacementsEditor usa el tablero real para editar los valores iniciales; Vaciar deja la lista vacía y Reiniciar los restaura.",
-=======
         "collectionNote": "El preajuste de Fortune’s Weave reutiliza este tablero, editor y controles de apariencia con 50 personajes en las rutas de Cai, Dietrich, Theodora y Leda. Cada protagonista permanece en su propia ruta y no aparece entre los elementos disponibles; los demás personajes pueden estar en varias rutas. Los retratos respetan la estructura pública de recursos y usan imágenes de los protagonistas anteriores al salto temporal. Editar preajuste en el catálogo crea una copia reutilizable. TierListStartingPlacementsEditor usa el tablero real para editar los valores iniciales; Vaciar conserva a los protagonistas y Restablecer recupera todas las asignaciones iniciales.",
->>>>>>> tierlist
         "editor": "Editor de plantillas",
         "editorLead": "El editor reutilizable comparte el esquema, ColorInput, Field, Panel y los demás controles de la biblioteca. Personaliza sus filas, reglas y elementos.",
         "editorNote": "TierListTemplateEditor recibe una plantilla y un onSave asíncrono. Inyecta un adaptador imageStorage para habilitar subidas. Este ejemplo confirma el guardado en memoria y no sube archivos ni publica listas.",

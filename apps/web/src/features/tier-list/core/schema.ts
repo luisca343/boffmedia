@@ -70,8 +70,6 @@ export const tierListTemplateSchema = z.object({
       assigned.set(itemId, rowId)
     }
   }
-<<<<<<< HEAD
-=======
   const fixedItems = itemIds && template.source.type !== "reference"
     ? template.source.items.filter((item) => item.fixedRowId)
     : []
@@ -80,7 +78,6 @@ export const tierListTemplateSchema = z.object({
     const seededRows = Object.entries(template.initialPlacements ?? {}).flatMap(([rowId, ids]) => ids.includes(item.id) ? [rowId] : [])
     if (seededRows.length !== 1 || seededRows[0] !== item.fixedRowId) invalid("Fixed items need one starting assignment in their row")
   }
->>>>>>> tierlist
   if (count > LIMITS.placements) invalid("Too many starting placements")
 })
 export const tierListPlacementSchema = z.object({ id, itemId: id }).strict()
@@ -112,8 +109,6 @@ export const tierListDocumentSchema = z.object({
   unique(rows.map((r) => r.id), "instance row IDs")
   const rowIds = new Set(rows.map((r) => r.id))
   const itemIds = new Set(doc.items.map((i) => i.id))
-<<<<<<< HEAD
-=======
   const fixedItems = new Map(doc.items.flatMap((item) => item.fixedRowId ? [[item.id, item.fixedRowId] as const] : []))
   const fixedSeeds = new Map<string, string[]>()
   for (const [rowId, seedItems] of Object.entries(doc.template.initialPlacements ?? {})) {
@@ -124,7 +119,6 @@ export const tierListDocumentSchema = z.object({
     const seededRows = fixedSeeds.get(itemId) ?? []
     if (seededRows.length !== 1 || seededRows[0] !== fixedRowId) invalid("Fixed items need one starting assignment in their row")
   }
->>>>>>> tierlist
   for (const items of Object.values(doc.template.initialPlacements ?? {})) {
     if (items.some((itemId) => !itemIds.has(itemId))) invalid("Unknown starting item in snapshot")
   }

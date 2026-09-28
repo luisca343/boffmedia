@@ -1,5 +1,22 @@
 {
   "tierLists": {
+    "lockedTo": "Locked to {row}",
+    "lockedItems": "Locked items stay in their rows",
+    "interactionHelp": "How to arrange your list",
+    "collectionProgress": "{assigned} of {total} assigned",
+    "allAssigned": "All items are assigned. Show all items to change their rows, or drag a card back here.",
+    "showAllItems": "Show all items",
+    "poolDropHint": "Drop a card here to remove that assignment. Locked items stay in their rows.",
+    "assignedToRows": "Assigned to: {rows}",
+    "notAssigned": "Not assigned to a row yet",
+    "done": "Done",
+    "editActions": "Edit list",
+    "fileActions": "Import and export",
+    "resetActions": "Clear and reset",
+    "clearAllBody": "Remove every unlocked assignment? Locked items stay in their rows. You can undo this while the page stays open.",
+    "resetBody": "Restore the template’s starting rows and assignments? Your list heading stays the same. You can undo this while the page stays open.",
+    "clearRowBody": "Remove the unlocked items from this row? Other rows and locked items stay in place. You can undo this while the page stays open.",
+    "deleteRowBody": "Delete this row and its assignments? Items remain available in the collection. You can undo this while the page stays open.",
     "hubTitle": "Tier lists",
     "hubLead": "Rank anything, build a reusable template, or plan across several rows. Start locally with no account required.",
     "localOnly": "Saved on this device",
@@ -14,11 +31,7 @@
     "presetEditor": "Preset editor",
     "presetEditorHint": "Edit the base preset’s rows, rules, characters and starting assignments. Saving creates your own reusable copy on this device; the original preset stays available.",
     "startingPlacements": "Starting assignments",
-<<<<<<< HEAD
-    "startingPlacementsHint": "Arrange the cards that every new list should start with. Reset list restores these assignments; Clear all placements empties the board. Changes to this preset’s defaults do not replace an existing list’s arrangement.",
-=======
     "startingPlacementsHint": "Arrange the cards that every new list should start with. Reset list restores these assignments; Clear all placements leaves row-bound items in place. Changes to this preset’s defaults do not replace an existing list’s arrangement.",
->>>>>>> tierlist
     "startingReferenceHint": "Starting assignments are preserved for this collection. Switch to custom items to edit them on the preview board.",
     "presetUpdated": "This base preset has been updated. Create another list to use its current rows and starting assignments. Your saved arrangement is kept.",
     "templateDetails": "Template details",
@@ -34,6 +47,7 @@
     "newRow": "New row",
     "newItem": "New item",
     "itemName": "Item name",
+    "itemEditorHint": "Open an item to edit its name, artwork or description. New items start expanded.",
     "imageUrl": "Image URL",
     "uploadImage": "Upload image",
     "uploadSignIn": "Use an image URL, or sign in to upload JPG, PNG, WebP or GIF images up to 5 MB.",
@@ -165,11 +179,7 @@
       "standard": { "title": "Classic S / A / B / C", "description": "A classic exclusive ranking. Remix it with your own items." },
       "planner": { "title": "Multi-row planner", "description": "Assign the same item to several groups while keeping the source pool available.", "first": "Group 1", "second": "Group 2", "third": "Group 3" },
       "games": { "title": "Site game collection", "description": "Rank games from the existing Boffmedia catalog using their original entries." },
-<<<<<<< HEAD
-      "fortunesWeave": { "title": "Fire Emblem: Fortune’s Weave", "description": "Plan the 50 characters across Cai, Dietrich, Theodora and Leda’s routes. Each lord starts in their own group, and a character can join several routes. Uses pre-timeskip portraits." }
-=======
       "fortunesWeave": { "title": "Fire Emblem: Fortune’s Weave", "description": "Plan the 50 characters across Cai, Dietrich, Theodora and Leda’s routes. Each lord starts in their own route and stays there; lords don't appear in Available items. Other characters can join several routes. Uses pre-timeskip portraits." }
->>>>>>> tierlist
     }
   }
 }

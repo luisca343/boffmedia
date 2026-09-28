@@ -11,6 +11,15 @@
         "note": "Import ColorInput from @boffmedia/ui and wrap it in Field for its label, hint and error. It forwards its ref and native input attributes; size=sm matches compact toolbars. The selected color stays visible with the picker closed."
       },
       "tierLists": {
+        "itemEditor": "Compact item editor",
+        "itemEditorNote": "TierListTemplateItemEditor extracts the repeated item form. Existing artwork starts collapsed; new items start expanded. The disclosure keeps native fields mounted for validation. Edit, collapse or remove this local sample, then restore it. An optional onUpload callback enables image uploads in the host.",
+        "locked": "Locked card",
+        "controls": "Collection controls and guidance",
+        "controlsLead": "Reusable source search, assignment progress, recoverable empty states and expandable interaction help.",
+        "controlsNote": "TierListSourcePanel is controlled and accepts cards or a drop zone as children plus optional controls. Progress counts unique movable items. Try Show all items, then search for a missing name to see filter recovery. TierListInstructions explains mouse, touch and keyboard input. Both are used by every embedded board and the starting-placement editor.",
+        "lockedBoard": "Route-locked items",
+        "lockedBoardLead": "A compact working Fire Emblem example: four locked Lords and two freely assignable characters.",
+        "lockedBoardNote": "DragCard.dragDisabled changes its affordance while the host disables the drag sensor; click actions remain available. Its status slot supports lock and assignment markers. Lords expose their lock in the assignment dialog and cannot leave their route. Tialla and Peter can appear in several routes; duplicates within the same route are rejected. Clear and Reset retain the Lords.",
         "drag": "Drag presentation",
         "dragLead": "Shared visual controls in @boffmedia/ui. The host binds its drag sensors and decides placements; the controls contain no tier-list rules.",
         "dragSample": "Card, lifted preview, insertion slot and destination",
@@ -26,11 +35,7 @@
         "boardNote": "Import TierList and TierListDisplayControls from @/features/tier-list. Supply template, instance, items and onChange; display preferences use shared Toggle controls and affect both the live presentation and PNG capture. Hiding editing controls removes the rail and empty-row hints while cards remain draggable. Cards always omit grip markers. Placement mode stays in the template. renderItem, renderRowHeader, sourceControls and summary customize presentation. Gear/up/down reuse IconButton and Menu iconOnly. All/Assigned filters include ranked cards. These examples keep independent state in memory without storage or API writes.",
         "reset": "Reset example",
         "collection": "A real character collection",
-<<<<<<< HEAD
-        "collectionNote": "The Fortune’s Weave preset reuses this board, editor and appearance controls with 50 shared characters across Cai, Dietrich, Theodora and Leda’s routes. Each lord starts in their own group; cards can join several routes. The tracker shares the pre-timeskip public portraits. Edit preset in the catalog creates a reusable copy. TierListStartingPlacementsEditor reuses the real board to edit defaults; Clear empties a list and Reset restores them.",
-=======
         "collectionNote": "The Fortune’s Weave preset reuses this board, editor and appearance controls with 50 characters across Cai, Dietrich, Theodora and Leda’s routes. Each lord is locked to their own route and stays out of Available items; the other characters can join several routes. Portraits use the existing public asset structure, with pre-timeskip artwork for the lords. Edit preset in the catalog creates a reusable copy. TierListStartingPlacementsEditor reuses the real board to edit defaults; Clear leaves route leaders in place and Reset restores all starting assignments.",
->>>>>>> tierlist
         "editor": "Template editor",
         "editorLead": "The reusable editor shares the same schema, ColorInput, Field, Panel and other library controls. Customize its rows, rules and items.",
         "editorNote": "TierListTemplateEditor accepts a template and an asynchronous onSave. Inject an imageStorage adapter to enable uploads. This example acknowledges save in memory and does not upload files or publish a list.",

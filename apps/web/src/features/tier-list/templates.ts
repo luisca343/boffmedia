@@ -1,9 +1,5 @@
-<<<<<<< HEAD
-import { tierListSettingsSchema, type TierListDocument, type TierListTemplate } from "./core/schema"
-=======
 import { newTierListId } from "./core/engine"
 import { tierListSettingsSchema, type TierListDocument, type TierListItem, type TierListTemplate } from "./core/schema"
->>>>>>> tierlist
 import { FORTUNES_WEAVE_CHARACTERS, FORTUNES_WEAVE_ROUTES } from "@/features/fortunes-weave/characters"
 
 // Illustrative demo artwork already served by this site; never copied into the engine.

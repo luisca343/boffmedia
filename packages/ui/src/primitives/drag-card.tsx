@@ -7,25 +7,31 @@ export interface DragCardProps extends React.ButtonHTMLAttributes<HTMLButtonElem
   dropTarget?: boolean
   /** Optional visual grip; whole-card activation works without it. Defaults to false. */
   showGrip?: boolean
+  /** Keep the click action available while the host disables drag activation. */
+  dragDisabled?: boolean
+  /** Non-interactive status, such as a lock or assignment marker. */
+  status?: React.ReactNode
 }
 
 /** Presentation only: bind the host's drag listeners/ref to the whole button.
  * A tap/Enter can still open actions. Children must be non-interactive content. */
 export const DragCard = React.forwardRef<HTMLButtonElement, DragCardProps>(function DragCard({
-  dragging = false, dropTarget = false, showGrip = false, children, className, type = "button", ...props
+  dragging = false, dropTarget = false, showGrip = false, dragDisabled = false, status, children, className, type = "button", ...props
 }, ref) {
   return <button {...props} ref={ref} type={type} data-dragging={dragging || undefined} data-drop-target={dropTarget || undefined}
     className={cn(
       "group relative block w-[var(--drag-card-size,5rem)] shrink-0 select-none self-start border border-line bg-base p-0 text-left",
-      "touch-manipulation cursor-grab outline-none transition-[border-color,box-shadow,opacity] duration-150",
-      "hover:border-accent hover:shadow-md focus-visible:ring-2 focus-visible:ring-accent active:cursor-grabbing",
+      "touch-manipulation outline-none transition-[border-color,box-shadow,opacity] duration-150",
+      "hover:border-accent hover:shadow-md focus-visible:ring-2 focus-visible:ring-accent",
+      dragDisabled ? "cursor-pointer" : "cursor-grab active:cursor-grabbing",
       "disabled:cursor-not-allowed disabled:opacity-[0.42]",
       dragging && "border-dashed border-accent opacity-30",
       dropTarget && "border-accent ring-2 ring-accent before:absolute before:-left-1.5 before:inset-y-0 before:w-1 before:bg-accent before:content-['']",
       className,
     )}>
     {children}
-    {showGrip && <span data-drag-grip aria-hidden="true" className="pointer-events-none absolute right-0 top-0 grid h-6 w-6 place-items-center bg-base/85 text-txt-muted group-hover:text-accent">
+    {status && <span data-drag-status className="pointer-events-none absolute right-1 top-1 grid min-h-6 min-w-6 place-items-center border border-line bg-panel px-1 text-txt">{status}</span>}
+    {showGrip && !status && !dragDisabled && <span data-drag-grip aria-hidden="true" className="pointer-events-none absolute right-0 top-0 grid h-6 w-6 place-items-center bg-base/85 text-txt-muted group-hover:text-accent">
       <Icon name="grip" size={14} />
     </span>}
   </button>

@@ -1,5 +1,8 @@
 # Tier lists
 
+The [UI and UX audit](./UI-UX-AUDIT.md) records the interaction fixes, reusable controls and
+verification scope for the September 2026 improvement pass.
+
 The reusable web feature lives in `apps/web/src/features/tier-list/`. It is used by the catalog,
 standalone board and template editor at `/tier-lists`, `/tier-lists/[slug]` and
 `/tier-lists/[slug]/edit`, and can be embedded without those routes. It uses the Boffmedia v3
@@ -116,30 +119,18 @@ definitions; unknown system slugs return 404. `/tier-lists/new/edit` creates a p
 definition. Editing a system template remixes it with a fresh UUID, keeping its original intact.
 
 `/tier-lists/fire-emblem-fortunes-weave` is a concrete multi-route collection with
-<<<<<<< HEAD
-the existing tracker’s 50 characters. Its four groups are Cai, Dietrich, Theodora and Leda;
-each lord starts in their own route, cards can appear in several routes, and the full source
-pool stays available. Only pre-timeskip lord artwork is used, with fresh asset URLs for caches.
-=======
-50 characters. Its four groups are Cai, Dietrich, Theodora and Leda;
-each lord is bound to their own route and stays out of the available pool. The other characters
-can appear in several routes. Only pre-timeskip lord artwork is used, with fresh asset URLs for caches.
->>>>>>> tierlist
+the same 50 characters as the existing tracker. Its four groups are Cai, Dietrich, Theodora and
+Leda; each lord is bound to their own route and stays out of the available pool. The other
+characters can appear in several routes. Only pre-timeskip lord artwork is used, with fresh asset
+URLs for caches.
 Saved boards and private remixes receive corrections to the exact former site-owned lord
 image URLs for display/export, without replacing placements or custom artwork.
 It reuses
 the same workspace, editor, display switches, persistence and export components. Shared
-<<<<<<< HEAD
-identities and asset URLs live in `features/fortunes-weave/characters.ts`; recruitment
-conditions stay in the tracker route. Artwork lives in root
+identities and asset URLs live in `features/fortunes-weave/characters.ts`; recruitment conditions
+stay in the tracker route. The preset does not depend on that route's logic. Artwork lives in root
 `public/boffmedia/img/games/fortunes-weave/portraits/`, shared with the tracker rather than
 imported from source or copied into tier-list internals. All public assets remain ignored.
-=======
-identities and asset URLs live in `features/fortunes-weave/characters.ts`. The collection has
-no dependency on a dedicated recruitment page. Artwork lives in root
-`public/boffmedia/img/games/fortunes-weave/portraits/`, using the existing public asset structure
-rather than source imports or copies inside tier-list internals. All public assets remain ignored.
->>>>>>> tierlist
 See `features/fortunes-weave/README.md`
 for Polygon provenance and `/styles/components` → Tier Lists for the reuse example.
 
