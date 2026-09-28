@@ -117,6 +117,10 @@
         "title": "Steam keys",
         "description": "The community's Steam key catalogue for giveaways and handouts."
       },
+      "fortunesWeave": {
+        "title": "Fortune's Weave Recruit Tracker",
+        "description": "Track recruitable characters and requirements across all four routes."
+      },
       "biblioteca": {
         "title": "Library",
         "description": "Game catalogue by console and region."

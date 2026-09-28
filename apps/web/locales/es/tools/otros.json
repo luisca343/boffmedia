@@ -36,6 +36,15 @@
           "crosslinks": "Fichas enlazadas"
         }
       },
+      "fortunesWeave": {
+        "title": "Registro de reclutamiento de Fortune's Weave",
+        "description": "Sigue a los personajes reclutables en las cuatro rutas y filtra por apoyo, renombre y requisitos",
+        "features": {
+          "routes": "Cuatro rutas",
+          "filters": "Filtros de apoyo y renombre",
+          "progress": "Progreso de reclutamiento"
+        }
+      },
       "steamfree": {
         "title": "Gratis en Steam",
         "description": "Juegos que Steam regala ahora mismo al 100 % de descuento, con cuenta atrás para reclamarlos",
@@ -44,6 +53,118 @@
           "countdown": "Cuenta atrás",
           "claim": "Reclamar en un clic"
         }
+      }
+    },
+    "fortunesWeave": {
+      "eyebrow": "FIRE EMBLEM: FORTUNE'S WEAVE",
+      "title": "Registro de reclutamiento",
+      "description": "Consulta el progreso de reclutamiento por ruta o para toda la lista. Filtra por apoyo, renombre, tipo y estado, y añade cualquier personaje a cualquier ruta desde la vista global.",
+      "sourceLink": "Abrir la guía de personajes de Polygon",
+      "sourceNote": "El listado y el progreso inicial se han conservado del archivo que compartiste; los retratos individuales provienen de la guía de Polygon enlazada.",
+      "portraitAlt": "Retrato del personaje {name}",
+      "routes": {
+        "label": "Vistas de ruta",
+        "global": "Resumen global",
+        "cai": "Cai",
+        "dietrich": "Dietrich",
+        "theodora": "Theodora",
+        "leda": "Leda"
+      },
+      "progress": {
+        "title": "Progreso de reclutamiento",
+        "allRoutes": "Progreso de todas las rutas",
+        "currentRoute": "Progreso de la ruta de {route}",
+        "outOf": "{total, plural, one {de # personaje en seguimiento} other {de # personajes en seguimiento}}",
+        "outOfAllRoutes": "{total, plural, one {de # asignación de personaje a una ruta} other {de # asignaciones de personajes a rutas}}",
+        "globalNote": "Un personaje puede contar una vez por ruta. También se incluyen los añadidos manualmente.",
+        "uniqueRoster": "Personajes únicos reclutados en cualquier ruta",
+        "savedLocally": "El progreso se guarda en este navegador.",
+        "localStorageNote": "El progreso se guarda en este navegador para tu cuenta. No se sincroniza entre dispositivos."
+      },
+      "filters": {
+        "title": "Buscar personajes",
+        "lead": "Filtra esta ruta por estado de reclutamiento y requisitos.",
+        "leadGlobal": "Busca en toda la lista usando los requisitos de cualquiera de las rutas.",
+        "clear": "Restablecer filtros",
+        "search": "Buscar por nombre o requisito",
+        "searchAria": "Buscar personajes y requisitos de reclutamiento",
+        "status": "Estado de reclutamiento",
+        "allStatuses": "Todos los estados",
+        "notRecruited": "Sin reclutar",
+        "pendingAny": "Pendiente en alguna ruta seguida",
+        "notRecruitedAny": "Sin reclutar en ninguna ruta",
+        "recruited": "Reclutado",
+        "available": "Disponible en esta ruta",
+        "unavailable": "No disponible en esta ruta",
+        "availableAny": "Disponible en alguna ruta",
+        "unavailableEvery": "No disponible en ninguna ruta",
+        "support": "Nivel de apoyo",
+        "anySupport": "Cualquier nivel de apoyo",
+        "supportLevel": "Apoyo {level}",
+        "renown": "Nivel de renombre",
+        "anyRenown": "Cualquier nivel de renombre",
+        "renownLevel": "Renombre {level}",
+        "type": "Tipo de requisito",
+        "anyType": "Cualquier tipo",
+        "sort": "Ordenar por",
+        "sortName": "Nombre",
+        "sortRenown": "Menos renombre",
+        "sortSupport": "Menos apoyo"
+      },
+      "requirements": {
+        "support": "Apoyo {level}",
+        "renown": "Renombre {level}",
+        "none": "Sin requisito de apoyo ni renombre"
+      },
+      "conditions": {
+        "automatic": "Automático",
+        "recruitmentTutorial": "Automático tras el tutorial de reclutamiento",
+        "automaticChapter": "Automático en el capítulo {chapter}",
+        "paralogue": "Completa el paralogo de {name}",
+        "pay": "Paga {amount} G",
+        "recruitmentQuest": "Completa la misión de reclutamiento",
+        "questCount": "Completa {count, plural, one {# misión} other {# misiones}}",
+        "completeQuest": "Completa {name}",
+        "giveItem": "Entrega {count} × {item}",
+        "suitableItem": "Entrega un objeto adecuado",
+        "answerYesThreeTimes": "Responde sí tres veces",
+        "chooseTails": "Elige cruz",
+        "answerOptions": "Responde {choices}",
+        "or": "o",
+        "negotiatePayment": "Negocia el pago",
+        "answerQuestionThreeTimes": "Responde a la pregunta tres veces"
+      },
+      "types": {
+        "auto": "Automático",
+        "dialogue": "Diálogo",
+        "gold": "Oro",
+        "gold_paralogue": "Oro y paralogo",
+        "item": "Objeto",
+        "item_paralogue": "Objeto y paralogo",
+        "paralogue": "Paralogo",
+        "paralogue_dialogue": "Paralogo y diálogo",
+        "quest": "Misión",
+        "quest_dialogue": "Misión y diálogo",
+        "support": "Apoyo",
+        "unavailable": "No disponible"
+      },
+      "actions": {
+        "recruited": "Reclutado",
+        "markRecruited": "Marcar como reclutado",
+        "unavailable": "No disponible",
+        "manualTracking": "Añadido manualmente",
+        "sourceUnavailable": "La guía no lo marca como reclutable en esta ruta. Añádelo manualmente para seguirlo aquí.",
+        "addToRoute": "Añadir a {route}",
+        "removeFromRoute": "Quitar de {route}",
+        "remove": "Quitar"
+      },
+      "results": {
+        "label": "Resultados de personajes",
+        "count": "{count, plural, one {# personaje} other {# personajes}}",
+        "route": "Ruta de {route}",
+        "global": "Todas las rutas",
+        "emptyTitle": "No hay personajes",
+        "emptyDescription": "Cambia o restablece los filtros para mostrar más personajes."
       }
     },
     "externalLinks": {

@@ -36,6 +36,15 @@
           "crosslinks": "Cross-linked fiches"
         }
       },
+      "fortunesWeave": {
+        "title": "Fortune's Weave Recruit Tracker",
+        "description": "Track recruitable characters across all four routes and filter by support, renown, and recruitment conditions",
+        "features": {
+          "routes": "Four routes",
+          "filters": "Support & renown filters",
+          "progress": "Recruitment progress"
+        }
+      },
       "steamfree": {
         "title": "Free on Steam",
         "description": "Games Steam is giving away at 100 % off right now, with a live countdown to claim them",
@@ -44,6 +53,118 @@
           "countdown": "Claim countdown",
           "claim": "One-click claim"
         }
+      }
+    },
+    "fortunesWeave": {
+      "eyebrow": "FIRE EMBLEM: FORTUNE'S WEAVE",
+      "title": "Recruitment tracker",
+      "description": "See recruitment progress by route or across the full roster. Filter by support, renown, type, and status, then add any character to any route from the global overview.",
+      "sourceLink": "Open the Polygon character guide",
+      "sourceNote": "The roster and starting progress come from your workbook; the individual portraits come from the linked Polygon guide.",
+      "portraitAlt": "{name} character portrait",
+      "routes": {
+        "label": "Route views",
+        "global": "Global overview",
+        "cai": "Cai",
+        "dietrich": "Dietrich",
+        "theodora": "Theodora",
+        "leda": "Leda"
+      },
+      "progress": {
+        "title": "Recruitment progress",
+        "allRoutes": "Progress across all routes",
+        "currentRoute": "{route} route progress",
+        "outOf": "{total, plural, one {of # tracked character} other {of # tracked characters}}",
+        "outOfAllRoutes": "{total, plural, one {of # tracked route entry} other {of # tracked route entries}}",
+        "globalNote": "A character can count once on each route. Manually added route entries are included.",
+        "uniqueRoster": "Unique characters recruited on any route",
+        "savedLocally": "Your progress is saved in this browser.",
+        "localStorageNote": "Progress is stored in this browser for your account. It does not sync across devices."
+      },
+      "filters": {
+        "title": "Find characters",
+        "lead": "Narrow this route by recruitment status and requirements.",
+        "leadGlobal": "Find characters across the roster using any route's recruitment requirements.",
+        "clear": "Reset filters",
+        "search": "Search names or requirements",
+        "searchAria": "Search characters and recruitment requirements",
+        "status": "Recruitment status",
+        "allStatuses": "All statuses",
+        "notRecruited": "Not recruited",
+        "pendingAny": "Pending on any tracked route",
+        "notRecruitedAny": "Not recruited on any route",
+        "recruited": "Recruited",
+        "available": "Available on this route",
+        "unavailable": "Unavailable on this route",
+        "availableAny": "Available on any route",
+        "unavailableEvery": "Unavailable on every route",
+        "support": "Support level",
+        "anySupport": "Any support level",
+        "supportLevel": "Support {level}",
+        "renown": "Renown level",
+        "anyRenown": "Any renown level",
+        "renownLevel": "Renown {level}",
+        "type": "Requirement type",
+        "anyType": "Any type",
+        "sort": "Sort by",
+        "sortName": "Name",
+        "sortRenown": "Lowest renown",
+        "sortSupport": "Lowest support"
+      },
+      "requirements": {
+        "support": "Support {level}",
+        "renown": "Renown {level}",
+        "none": "No support or renown requirement"
+      },
+      "conditions": {
+        "automatic": "Automatic",
+        "recruitmentTutorial": "Automatic after the recruitment tutorial",
+        "automaticChapter": "Automatic in chapter {chapter}",
+        "paralogue": "Clear {name}'s paralogue",
+        "pay": "Pay {amount} G",
+        "recruitmentQuest": "Complete the recruitment quest",
+        "questCount": "Complete {count, plural, one {# quest} other {# quests}}",
+        "completeQuest": "Complete {name}",
+        "giveItem": "Give {count} × {item}",
+        "suitableItem": "Give a suitable item",
+        "answerYesThreeTimes": "Answer Yes three times",
+        "chooseTails": "Choose Tails",
+        "answerOptions": "Answer with {choices}",
+        "or": "or",
+        "negotiatePayment": "Negotiate payment",
+        "answerQuestionThreeTimes": "Answer the question three times"
+      },
+      "types": {
+        "auto": "Automatic",
+        "dialogue": "Dialogue",
+        "gold": "Gold",
+        "gold_paralogue": "Gold & paralogue",
+        "item": "Item",
+        "item_paralogue": "Item & paralogue",
+        "paralogue": "Paralogue",
+        "paralogue_dialogue": "Paralogue & dialogue",
+        "quest": "Quest",
+        "quest_dialogue": "Quest & dialogue",
+        "support": "Support",
+        "unavailable": "Unavailable"
+      },
+      "actions": {
+        "recruited": "Recruited",
+        "markRecruited": "Mark recruited",
+        "unavailable": "Unavailable",
+        "manualTracking": "Added manually",
+        "sourceUnavailable": "Not listed as recruitable on this route. Add manually to track it here.",
+        "addToRoute": "Add to {route}",
+        "removeFromRoute": "Remove from {route}",
+        "remove": "Remove"
+      },
+      "results": {
+        "label": "Character results",
+        "count": "{count, plural, one {# character} other {# characters}}",
+        "route": "{route} route",
+        "global": "All routes",
+        "emptyTitle": "No characters found",
+        "emptyDescription": "Change or reset the filters to see more characters."
       }
     },
     "externalLinks": {

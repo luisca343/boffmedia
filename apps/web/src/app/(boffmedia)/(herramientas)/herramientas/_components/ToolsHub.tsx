@@ -4,13 +4,15 @@ import * as React from "react"
 import { useTranslations } from "next-intl"
 import { Icon, Button, Empty, SearchInput } from "@boffmedia/ui"
 import { GameLogo, ToolGrid, TxSection, VideoHero, buildHubGames } from "@/components/boffmedia/ui/tools"
+import { useViewerRoles } from "@/services/useBoffSession"
 
 const META = "inline-flex items-center gap-[0.5625rem] font-mono text-[0.75rem] uppercase leading-none tracking-[0.08em] text-txt-muted [&_b]:font-bold [&_b]:text-txt [&_svg]:text-accent"
 
 export function ToolsHub() {
   const t = useTranslations()
   const tHub = useTranslations("toolsUi.hub")
-  const games = React.useMemo(() => buildHubGames(t), [t])
+  const roles = useViewerRoles()
+  const games = React.useMemo(() => buildHubGames(t, roles), [t, roles])
   const [q, setQ] = React.useState("")
 
   const allTools = React.useMemo(

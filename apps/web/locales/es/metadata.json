@@ -117,6 +117,10 @@
         "title": "Claves de Steam",
         "description": "Catálogo de claves de Steam para sorteos y entregas de la comunidad."
       },
+      "fortunesWeave": {
+        "title": "Registro de reclutamiento de Fortune's Weave",
+        "description": "Sigue a los personajes reclutables y sus requisitos en las cuatro rutas."
+      },
       "biblioteca": {
         "title": "Biblioteca",
         "description": "Catálogo de juegos por consola y región."
