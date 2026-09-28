@@ -49,7 +49,7 @@ export function TierListHub({ templates }: { templates: TierListTemplate[] }) {
     {!!invalid && <p role="status" className="text-sm text-txt-muted">{t("invalidLocal", { count: invalid })}</p>}
     <section className="grid gap-4"><h2 className="text-2xl">{t("systemTemplates")}</h2>
       <div className="grid gap-4 md:grid-cols-3">{templates.map((template) => <Panel key={template.id} title={template.title} bodyClassName="grid gap-4">
-        <p className="text-sm text-txt-muted">{template.description}</p><Button href={`/tier-lists/${template.slug}`}>{t("openTemplate")}</Button>
+        <p className="text-sm text-txt-muted">{template.description}</p><div className="flex flex-wrap gap-2"><Button href={`/tier-lists/${template.slug}`}>{t("openTemplate")}</Button><Button size="sm" icon="edit" href={`/tier-lists/${template.slug}/edit`}>{t("editPreset")}</Button></div>
       </Panel>)}</div>
     </section>
     <section className="grid gap-4"><h2 className="text-2xl">{t("localLists")}</h2><p className="text-sm text-txt-muted">{t("localLead")}</p>

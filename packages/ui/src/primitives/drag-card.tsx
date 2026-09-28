@@ -5,14 +5,14 @@ import { Icon } from "./icon"
 export interface DragCardProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   dragging?: boolean
   dropTarget?: boolean
-  /** Hide the visual grip without changing whole-card drag activation. */
+  /** Optional visual grip; whole-card activation works without it. Defaults to false. */
   showGrip?: boolean
 }
 
 /** Presentation only: bind the host's drag listeners/ref to the whole button.
  * A tap/Enter can still open actions. Children must be non-interactive content. */
 export const DragCard = React.forwardRef<HTMLButtonElement, DragCardProps>(function DragCard({
-  dragging = false, dropTarget = false, showGrip = true, children, className, type = "button", ...props
+  dragging = false, dropTarget = false, showGrip = false, children, className, type = "button", ...props
 }, ref) {
   return <button {...props} ref={ref} type={type} data-dragging={dragging || undefined} data-drop-target={dropTarget || undefined}
     className={cn(

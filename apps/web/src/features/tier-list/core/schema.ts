@@ -44,10 +44,32 @@ export const tierListTemplateSchema = z.object({
   id, slug: id, title: text, description,
   rows: z.array(tierListRowSchema).min(1).max(LIMITS.rows),
   source: tierListSourceSchema, settings: tierListSettingsSchema,
+  // Item IDs only: every instance creates its own occurrence IDs from these defaults.
+  initialPlacements: z.record(id, z.array(id).max(LIMITS.placements)).optional(),
   ownership: z.object({ type: z.enum(["system", "user"]), userId: id.optional() }).strict().optional(),
   visibility: tierListVisibilitySchema.default("private"), sourceTemplateId: id.optional(),
   createdAt: z.string().datetime().optional(), updatedAt: z.string().datetime().optional(),
-}).strict()
+}).strict().superRefine((template, ctx) => {
+  const invalid = (message: string) => ctx.addIssue({ code: "custom", message })
+  const rowIds = new Set(template.rows.map((row) => row.id))
+  if (rowIds.size !== template.rows.length) invalid("Duplicate template row IDs")
+  const itemIds = template.source.type === "reference" ? null : new Set(template.source.items.map((item) => item.id))
+  if (itemIds && template.source.type !== "reference" && itemIds.size !== template.source.items.length) invalid("Duplicate source item IDs")
+  const assigned = new Map<string, string>()
+  let count = 0
+  for (const [rowId, items] of Object.entries(template.initialPlacements ?? {})) {
+    if (!rowIds.has(rowId)) invalid("Unknown starting row")
+    if (!template.settings.allowDuplicateWithinRow && new Set(items).size !== items.length) invalid("Duplicate starting item within row")
+    for (const itemId of items) {
+      count++
+      if (itemIds && !itemIds.has(itemId)) invalid("Unknown starting item")
+      const previousRow = assigned.get(itemId)
+      if (template.settings.placementMode === "exclusive" && previousRow && previousRow !== rowId) invalid("Exclusive starting item assigned to multiple rows")
+      assigned.set(itemId, rowId)
+    }
+  }
+  if (count > LIMITS.placements) invalid("Too many starting placements")
+})
 export const tierListPlacementSchema = z.object({ id, itemId: id }).strict()
 export const tierListInstanceSchema = z.object({
   id, templateId: id,
@@ -77,6 +99,9 @@ export const tierListDocumentSchema = z.object({
   unique(rows.map((r) => r.id), "instance row IDs")
   const rowIds = new Set(rows.map((r) => r.id))
   const itemIds = new Set(doc.items.map((i) => i.id))
+  for (const items of Object.values(doc.template.initialPlacements ?? {})) {
+    if (items.some((itemId) => !itemIds.has(itemId))) invalid("Unknown starting item in snapshot")
+  }
   const occurrenceIds: string[] = []
   const assigned = new Map<string, string>()
   let count = 0

@@ -1,4 +1,5 @@
 import { tierListSettingsSchema, type TierListDocument, type TierListTemplate } from "./core/schema"
+import { FORTUNES_WEAVE_CHARACTERS, FORTUNES_WEAVE_ROUTES } from "@/features/fortunes-weave/characters"
 
 // Illustrative demo artwork already served by this site; never copied into the engine.
 const starterArtwork = {
@@ -11,8 +12,20 @@ const starterArtwork = {
 }
 
 /** Enrich older system demo snapshots for display/export without rewriting saved
- * definitions, custom images, placements or history. User templates are untouched. */
+ * state or custom artwork. Also refresh obsolete site-owned lord image URLs in
+ * any saved list. Raw saves, placements and history are untouched. */
 export function withTierListStarterImages(doc: TierListDocument): TierListDocument {
+  const corrected = doc.items.map((item) => {
+    if (!FORTUNES_WEAVE_ROUTES.some((id) => id === item.id)) return item
+    const canonical = FORTUNES_WEAVE_CHARACTERS.find((character) => character.id === item.id)!
+    const previous = canonical.image.replace("-pre-timeskip.webp", ".webp")
+    const previousPath = new URL(previous, "https://tier-list.invalid").pathname
+    // Exact site-owned legacy URLs only, including private remixes; custom art stays intact.
+    return item.image === previous || item.image === previousPath ? { ...item, image: canonical.image } : item
+  })
+  if (corrected.some((item, index) => item !== doc.items[index])) {
+    doc = { ...doc, items: corrected, template: doc.template.source.type === "reference" ? doc.template : { ...doc.template, source: { ...doc.template.source, items: corrected } } }
+  }
   if (doc.template.ownership?.type !== "system" || !["standard", "planner"].includes(doc.template.id) || doc.template.source.type === "reference") return doc
   const decorate = (items: TierListDocument["items"]) => items.map((item) => {
     const image = starterArtwork[item.id as keyof typeof starterArtwork]
@@ -41,5 +54,6 @@ export function getTierListTemplates(t: Translate): TierListTemplate[] {
       { id: "third", label: t("templates.planner.third"), color: "#92c98f" },
     ], source, settings: tierListSettingsSchema.parse({ placementMode: "multi", keepSourceVisible: true }), ownership: { type: "system" }, visibility: "public" },
     { id: "site-games", slug: "site-games", title: t("templates.games.title"), description: t("templates.games.description"), rows: standardRows(), source: { type: "reference", key: "site-games" }, settings: tierListSettingsSchema.parse({}), ownership: { type: "system" }, visibility: "public" },
+    { id: "fire-emblem-fortunes-weave", slug: "fire-emblem-fortunes-weave", title: t("templates.fortunesWeave.title"), description: t("templates.fortunesWeave.description"), rows: FORTUNES_WEAVE_ROUTES.map((id, index) => ({ id, label: FORTUNES_WEAVE_CHARACTERS.find((character) => character.id === id)!.name, color: standardRows()[index].color })), initialPlacements: Object.fromEntries(FORTUNES_WEAVE_ROUTES.map((id) => [id, [id]])), source: { type: "static", items: FORTUNES_WEAVE_CHARACTERS }, settings: tierListSettingsSchema.parse({ placementMode: "multi", keepSourceVisible: true }), ownership: { type: "system" }, visibility: "public" },
   ]
 }

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { Button, DragCard, DragPlaceholder, DragPreview, DragTarget } from "@boffmedia/ui"
+import { Button, DragCard, DragPlaceholder, DragPreview, DragTarget, MediaCardContent } from "@boffmedia/ui"
 import { TierList, TierListDisplayControls, TierListHeading, TierListHeadingEditor, TierListTemplateEditor, applyTierListAction, createDocument, defaultTierListDisplay, getTierListDescription, getTierListTitle, type TierListTemplate } from "@/features/tier-list"
 import { createBlankTemplate, getTierListTemplates } from "@/features/tier-list/templates"
 import { Sample, Section } from "../showcase-shared"
@@ -32,13 +32,12 @@ export function TierListsChapter() {
   const [templates] = useState(() => getTierListTemplates(tier))
   const [editorTemplate] = useState(() => createBlankTemplate(tier, "showcase-template"))
   const [savedTitle, setSavedTitle] = useState<string | null>(null)
-  const artwork = <>
+  const artwork = <MediaCardContent label={t("cardLabel")}>
     <span aria-hidden="true" className="grid aspect-square place-items-center bg-accent-soft font-display text-2xl text-accent">S</span>
-    <span className="block truncate px-1 py-1 text-center text-xs">{t("cardLabel")}</span>
-  </>
+  </MediaCardContent>
   return <>
     <Section id="tier-drag" kicker="Tier Lists" title={t("drag")} lead={t("dragLead")}>
-      <Sample title={t("dragSample")} code="<DragCard /> · <DragPreview /> · <DragPlaceholder /> · <DragTarget />" col note={t("dragNote")}>
+      <Sample title={t("dragSample")} code="<MediaCardContent label={name}>{artwork}</MediaCardContent> · DragCard / DragPreview / DragPlaceholder / DragTarget" col note={t("dragNote")}>
         <div className="flex flex-wrap items-start gap-8">
           <div className="grid gap-3"><span className="text-xs text-txt-muted">{t("idle")}</span><DragCard aria-label={t("cardLabel")}>{artwork}</DragCard></div>
           <div className="grid gap-3"><span className="text-xs text-txt-muted">{t("lifted")}</span><DragPreview>{artwork}</DragPreview></div>
@@ -62,5 +61,8 @@ export function TierListsChapter() {
         {savedTitle && <p role="status" className="text-sm text-ok">{t("saved", { title: savedTitle })}</p>}
       </Sample>
     </Section>
+    <Sample title={t("collection")} code="getTierListTemplates(t) · source.type = static" col note={t("collectionNote")}>
+      <Button size="sm" icon="list" href="/tier-lists/fire-emblem-fortunes-weave">{tier("templates.fortunesWeave.title")}</Button>
+    </Sample>
   </>
 }

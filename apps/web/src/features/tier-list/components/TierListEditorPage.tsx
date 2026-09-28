@@ -14,7 +14,7 @@ import { tierListSources, tierListImageStorage } from "@/services/api/boffmedia/
 import { TierListTemplateEditor } from "./TierListTemplateEditor"
 import { tierListHref } from "../routes"
 
-export function TierListEditorPage({ template, slug, instanceId = "default" }: { template: TierListTemplate | null; slug: string; instanceId?: string }) {
+export function TierListEditorPage({ template, slug, instanceId = "default", editBasePreset = false }: { template: TierListTemplate | null; slug: string; instanceId?: string; editBasePreset?: boolean }) {
   const t = useTranslations("tierLists")
   const router = useRouter()
   const session = useSession()
@@ -26,14 +26,14 @@ export function TierListEditorPage({ template, slug, instanceId = "default" }: {
     let cancelled = false
     void (async () => {
       const adapter = new LocalStorageTierListAdapter(window.localStorage)
-      const original = slug === "new" ? null : await adapter.load({ templateId: template?.id ?? slug, instanceId })
+      const original = slug === "new" || editBasePreset ? null : await adapter.load({ templateId: template?.id ?? slug, instanceId })
       const base = original?.template ?? template
       if (!base && slug !== "new") throw new Error("Local template missing")
       const draft = base ? (base.ownership?.type === "system" ? cloneTemplate(base, t("copyTitle", { title: base.title })) : base) : createBlankTemplate(t, newTierListId())
       if (!cancelled) setValue({ template: draft, original })
     })().catch(() => { if (!cancelled) setError(true) })
     return () => { cancelled = true }
-  }, [template, slug, instanceId, t])
+  }, [template, slug, instanceId, editBasePreset, t])
   const save = async (nextTemplate: TierListTemplate) => {
     setBusy(true); setError(false)
     try {
@@ -47,7 +47,7 @@ export function TierListEditorPage({ template, slug, instanceId = "default" }: {
     } catch { setError(true); throw new Error("Template save failed") } finally { setBusy(false); setPending(null) }
   }
   return <div className="grid gap-6">
-    <header className="grid gap-3"><h1 className="text-3xl">{t("templateEditor")}</h1><p className="text-sm text-txt-muted">{t("localOnly")}</p><div><Button size="sm" href="/tier-lists">{t("back")}</Button></div></header>
+    <header className="grid gap-3"><h1 className="text-3xl">{t(template?.ownership?.type === "system" ? "presetEditor" : "templateEditor")}</h1><p className="text-sm text-txt-muted">{t(template?.ownership?.type === "system" ? "presetEditorHint" : "localOnly")}</p><div><Button size="sm" href="/tier-lists">{t("back")}</Button></div></header>
     {error && <p role="alert" className="text-bad">{t("editorError")}</p>}
     {value ? <TierListTemplateEditor template={value.template} busy={busy} imageStorage={session.data?.user?.accessToken ? tierListImageStorage : undefined} sources={[{ key: "site-games", label: t("templates.games.title") }]} onSave={async (next) => {
       if (value.original && Object.values(value.original.instance.placements).some((row) => row.length)) setPending(next)

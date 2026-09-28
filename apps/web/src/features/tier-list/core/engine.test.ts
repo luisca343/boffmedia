@@ -1,11 +1,43 @@
 import { describe, expect, it } from "vitest"
-import { applyTierListAction, cloneTemplate, createInstance, getRows, getSourceItems, getTierListTitle, getTierListDescription, reconcileTemplate } from "./engine"
+import { applyTierListAction, cloneTemplate, createDocument, createInstance, getRows, getSourceItems, getTierListTitle, getTierListDescription, reconcileTemplate } from "./engine"
 import { createHistory, tierListHistoryReducer } from "./history"
-import { LIMITS, tierListDocumentSchema, tierListSettingsSchema, type TierListDocument } from "./schema"
+import { LIMITS, tierListDocumentSchema, tierListSettingsSchema, tierListTemplateSchema, type TierListDocument } from "./schema"
 import { tierListDropAction } from "../dnd/actions"
 import { fixture } from "../testing/fixtures"
 const assign = (doc: TierListDocument, itemId: string, rowId: string) => applyTierListAction(doc, { type: "assign", itemId, rowId })
 const ids = (doc: TierListDocument, rowId: string) => (doc.instance.placements[rowId] ?? []).map((p) => p.itemId)
+
+describe("reusable starting assignments", () => {
+  it("starts independent instances, resets to defaults and keeps clear/undo separate", () => {
+    const base = fixture("multi")
+    const template = { ...base.template, initialPlacements: { s: ["one"], a: ["one", "two"] } }
+    const doc = createDocument(template, base.items)
+    const another = createDocument(template, base.items)
+    expect(ids(doc, "s")).toEqual(["one"])
+    expect(ids(doc, "a")).toEqual(["one", "two"])
+    expect(doc.instance.placements.s[0].id).not.toBe(another.instance.placements.s[0].id)
+    const cleared = applyTierListAction(doc, { type: "clear" })
+    expect(cleared.instance.placements).toEqual({})
+    const reset = applyTierListAction(cleared, { type: "reset" })
+    expect(ids(reset, "a")).toEqual(["one", "two"])
+    expect(template.initialPlacements).toEqual({ s: ["one"], a: ["one", "two"] })
+    expect(tierListHistoryReducer(tierListHistoryReducer(createHistory(doc), { type: "clear" }), { type: "undo" }).present).toBe(doc)
+    expect(tierListDocumentSchema.safeParse(reset).success).toBe(true)
+  })
+  it.each(["row", "item", "exclusive", "duplicate", "limit"])("rejects invalid starting %s assignments", (kind) => {
+    const base = fixture(kind === "exclusive" ? "exclusive" : "multi")
+    const template = { ...base.template, initialPlacements: { s: ["one"] } as Record<string, string[]> }
+    if (kind === "row") template.initialPlacements.unknown = ["one"]
+    if (kind === "item") template.initialPlacements.s = ["missing"]
+    if (kind === "exclusive") template.initialPlacements.a = ["one"]
+    if (kind === "duplicate") template.initialPlacements.s = ["one", "one"]
+    if (kind === "limit") {
+      template.settings = { ...template.settings, allowDuplicateWithinRow: true }
+      template.initialPlacements = { s: Array(LIMITS.placements).fill("one"), a: ["two"] }
+    }
+    expect(tierListTemplateSchema.safeParse(template).success).toBe(false)
+  })
+})
 
 describe("exclusive placement", () => {
   it("edits list-owned headings with undo, validation and unchanged template/placements", () => {

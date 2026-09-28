@@ -114,7 +114,7 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
                   const previewSlot = !!movement && (placement.id === movement.placeholderId || (placement.id === movingPlacementId && placements.includes(placement)))
                   const originalIndex = committed.findIndex((p) => p.id === placement.id)
                   return <Fragment key={placement.id}>
-                    {placement.id !== movement?.placeholderId && <TierListDraggableItem id={`placement-${placement.id}`} name={item.name} showGrip={view.rowControls} hidden={placement.id === movingPlacementId}
+                    {placement.id !== movement?.placeholderId && <TierListDraggableItem id={`placement-${placement.id}`} name={item.name} hidden={placement.id === movingPlacementId}
                       data={{ kind: "item", itemId: item.id, rowId: row.id, index: originalIndex, placementId: placement.id }} onSelect={() => setSelected(context)}>
                       {visual(context)}
                     </TierListDraggableItem>}
@@ -145,7 +145,7 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
           {pool.map((item, index) => {
             const context = { item, rowId: null, index }
             return <Fragment key={item.id}>
-              <TierListDraggableItem id={`source-${item.id}`} name={item.name} showGrip={view.rowControls} hidden={returningItem?.id === item.id} data={{ kind: "item", itemId: item.id, rowId: null, index }} onSelect={() => setSelected(context)}>{visual(context)}</TierListDraggableItem>
+              <TierListDraggableItem id={`source-${item.id}`} name={item.name} hidden={returningItem?.id === item.id} data={{ kind: "item", itemId: item.id, rowId: null, index }} onSelect={() => setSelected(context)}>{visual(context)}</TierListDraggableItem>
               {returningItem?.id === item.id && movement && <TierListPlacementPreview target={movement.target} itemId={item.id}>{visual(context)}</TierListPlacementPreview>}
             </Fragment>
           })}

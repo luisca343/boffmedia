@@ -1,10 +1,18 @@
 import { describe, expect, it } from "vitest"
-import { applyTierListAction } from "../core/engine"
+import { applyTierListAction, createDocument } from "../core/engine"
 import { fixture } from "../testing/fixtures"
 import { exportTierListDocument, parseTierListDocument, TierListFormatError } from "./document"
 import { LIMITS } from "../core/schema"
 
 describe("versioned serialization", () => {
+  it("keeps preset defaults portable independently of cleared instance placements", () => {
+    const base = fixture("multi")
+    const doc = applyTierListAction(createDocument({ ...base.template, initialPlacements: { s: ["one"], a: ["one"] } }, base.items), { type: "clear" })
+    const imported = parseTierListDocument(exportTierListDocument(doc))
+    expect(imported.instance.placements).toEqual({})
+    expect(imported.template.initialPlacements).toEqual({ s: ["one"], a: ["one"] })
+    expect(createDocument(imported.template, imported.items).instance.placements.s[0].itemId).toBe("one")
+  })
   it("keeps starter instructions out of the visible caption after a private import remix", () => {
     const doc = fixture()
     doc.template.ownership = { type: "system" }

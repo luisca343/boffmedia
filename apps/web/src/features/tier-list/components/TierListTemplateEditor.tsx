@@ -7,6 +7,7 @@ import { newTierListId } from "../core/engine"
 import { LIMITS, tierListTemplateSchema, type TierListItem, type TierListSettings, type TierListTemplate, type TierListVisibility } from "../core/schema"
 import { TIER_LIST_IMAGE_TYPES, uploadTierListImage, type TierListImageStorageAdapter } from "../adapters/images"
 import { TierListItemVisual } from "./TierListItemVisual"
+import { TierListStartingPlacementsEditor } from "./TierListStartingPlacementsEditor"
 
 const PERMISSIONS = ["allowDuplicateWithinRow", "allowRowEditing", "allowRowReordering", "allowRowCreation", "allowRowDeletion", "allowItemReordering"] as const
 
@@ -21,11 +22,11 @@ export function TierListTemplateEditor({ template, onSave, imageStorage, sources
   const [pending, setPending] = useState<(() => void) | null>(null)
   const [saving, setSaving] = useState(false)
   const customItems = draft.source.type === "reference" ? null : draft.source.items
-  const setItems = (items: TierListItem[]) => setDraft({ ...draft, source: { type: "custom", items } })
+  const setItems = (items: TierListItem[]) => setDraft({ ...draft, source: { type: "custom", items }, initialPlacements: draft.initialPlacements && Object.fromEntries(Object.entries(draft.initialPlacements).map(([rowId, ids]) => [rowId, ids.filter((id) => items.some((item) => item.id === id))])) })
   const patchItem = (id: string, patch: Partial<TierListItem>) => setDraft((prev) => prev.source.type === "reference" ? prev : {
     ...prev, source: { type: "custom", items: prev.source.items.map((i) => i.id === id ? { ...i, ...patch } : i) },
   })
-  const setting = (key: keyof TierListSettings, value: boolean) => setDraft({ ...draft, settings: { ...draft.settings, [key]: value } })
+  const setting = (key: keyof TierListSettings, value: boolean) => setDraft({ ...draft, initialPlacements: key === "allowDuplicateWithinRow" && !value && draft.initialPlacements ? Object.fromEntries(Object.entries(draft.initialPlacements).map(([rowId, ids]) => [rowId, [...new Set(ids)]])) : draft.initialPlacements, settings: { ...draft.settings, [key]: value } })
   const reorderRow = (from: number, to: number) => {
     const rows = [...draft.rows]
     rows.splice(to, 0, rows.splice(from, 1)[0])
@@ -47,7 +48,14 @@ export function TierListTemplateEditor({ template, onSave, imageStorage, sources
         ]} />
       </Panel>
       <Panel title={t("behavior")} bodyClassName="grid gap-4">
-        <Select label={t("placementMode")} value={draft.settings.placementMode} onChange={(v) => setDraft({ ...draft, settings: { ...draft.settings, placementMode: v as "exclusive" | "multi" } })} options={[
+        <Select label={t("placementMode")} value={draft.settings.placementMode} onChange={(v) => {
+          const assigned = new Map<string, string>()
+          const initialPlacements = draft.initialPlacements && Object.fromEntries(draft.rows.map((row) => [row.id, (draft.initialPlacements?.[row.id] ?? []).filter((id) => {
+            if (v === "exclusive" && assigned.has(id) && assigned.get(id) !== row.id) return false
+            assigned.set(id, row.id); return true
+          })]))
+          setDraft({ ...draft, initialPlacements, settings: { ...draft.settings, placementMode: v as "exclusive" | "multi" } })
+        }} options={[
           { value: "exclusive", label: t("exclusive") }, { value: "multi", label: t("multi") },
         ]} />
         <Checkbox label={t("keepSourceVisible")} checked={draft.settings.keepSourceVisible} onChange={(v) => setting("keepSourceVisible", v)} />
@@ -60,7 +68,7 @@ export function TierListTemplateEditor({ template, onSave, imageStorage, sources
           <div className="flex flex-wrap items-end gap-1">
             <Button size="sm" type="button" disabled={!index} aria-label={t("moveRowUp", { label: row.label })} onClick={() => reorderRow(index, index - 1)}>{t("up")}</Button>
             <Button size="sm" type="button" disabled={index === draft.rows.length - 1} aria-label={t("moveRowDown", { label: row.label })} onClick={() => reorderRow(index, index + 1)}>{t("down")}</Button>
-            <Button size="sm" type="button" disabled={draft.rows.length === 1} aria-label={t("deleteNamedRow", { label: row.label })} onClick={() => setPending(() => () => setDraft({ ...draft, rows: draft.rows.filter((r) => r.id !== row.id) }))}>{t("deleteRow")}</Button>
+            <Button size="sm" type="button" disabled={draft.rows.length === 1} aria-label={t("deleteNamedRow", { label: row.label })} onClick={() => setPending(() => () => setDraft({ ...draft, rows: draft.rows.filter((r) => r.id !== row.id), initialPlacements: draft.initialPlacements && Object.fromEntries(Object.entries(draft.initialPlacements).filter(([id]) => id !== row.id)) }))}>{t("deleteRow")}</Button>
           </div>
         </div>)}
         <Button type="button" disabled={draft.rows.length >= LIMITS.rows} onClick={() => setDraft({ ...draft, rows: [...draft.rows, { id: newTierListId(), label: t("newRow"), color: "#808080" }] })}>{t("addRow")}</Button>
@@ -69,7 +77,7 @@ export function TierListTemplateEditor({ template, onSave, imageStorage, sources
         <Select label={t("dataSource")} value={draft.source.type === "reference" ? draft.source.key : "custom"} options={[
           { value: "custom", label: t("customItems") }, ...sources.map((s) => ({ value: s.key, label: s.label })),
         ]} onChange={(value) => {
-          const change = () => setDraft({ ...draft, source: value === "custom" ? { type: "custom", items: [] } : { type: "reference", key: value } })
+          const change = () => setDraft({ ...draft, initialPlacements: undefined, source: value === "custom" ? { type: "custom", items: [] } : { type: "reference", key: value } })
           if (customItems?.length) setPending(() => change); else change()
         }} />
         {customItems ? <>
@@ -94,6 +102,9 @@ export function TierListTemplateEditor({ template, onSave, imageStorage, sources
           </div>)}
           <Button type="button" disabled={customItems.length >= LIMITS.items} onClick={() => setItems([...customItems, { id: newTierListId(), name: t("newItem") }])}>{t("addItem")}</Button>
         </> : <p className="text-sm text-txt-muted">{t("referenceHint")}</p>}
+      </Panel>
+      <Panel title={t("startingPlacements")} bodyClassName="grid gap-4">
+        <TierListStartingPlacementsEditor template={draft} onChange={(initialPlacements) => setDraft({ ...draft, initialPlacements })} />
       </Panel>
       {error && <p role="alert" className="text-sm text-bad">{t("editorError")}</p>}
       <div><Button variant="pri" type="submit" disabled={!!uploading} loading={saving}>{t("saveTemplate")}</Button></div>

@@ -20,7 +20,7 @@ it is not a new global primitive or a desktop tool package.
   sensors. Drag translation lives under `dnd/`; the core does not import DnD or React.
 - Whole-card activation and a cursor-centered, lifted preview follow SmartRotom's app-grid
   interaction pattern, using Boffmedia tokens. Shared `DragCard`, `DragPreview`, `DragTarget`
-  and `ColorInput` live in `@boffmedia/ui`; the DnD adapter owns sensors and placement rules.
+  `MediaCardContent` and `ColorInput` live in `@boffmedia/ui`; the DnD adapter owns sensors and placement rules.
   Active rows remain highlighted over nested insertion targets. Tap/Enter opens assignments;
   Space drags by keyboard and a short hold activates touch dragging.
 - Existing `ArtImage` handles arbitrary hosts, missing images and errors. `@boffmedia/ui`
@@ -108,6 +108,38 @@ The system catalog and slug route use that registry. UUID slugs belong to local 
 definitions; unknown system slugs return 404. `/tier-lists/new/edit` creates a private local
 definition. Editing a system template remixes it with a fresh UUID, keeping its original intact.
 
+`/tier-lists/fire-emblem-fortunes-weave` is a concrete multi-route collection with
+50 characters. Its four groups are Cai, Dietrich, Theodora and Leda;
+each lord starts in their own route, cards can appear in several routes, and the full source
+pool stays available. Only pre-timeskip lord artwork is used, with fresh asset URLs for caches.
+Saved boards and private remixes receive corrections to the exact former site-owned lord
+image URLs for display/export, without replacing placements or custom artwork.
+It reuses
+the same workspace, editor, display switches, persistence and export components. Shared
+identities and asset URLs live in `features/fortunes-weave/characters.ts`. The collection has
+no dependency on a dedicated recruitment page. Artwork lives in root
+`public/boffmedia/img/games/fortunes-weave/portraits/`, using the existing public asset structure
+rather than source imports or copies inside tier-list internals. All public assets remain ignored.
+See `features/fortunes-weave/README.md`
+for Polygon provenance and `/styles/components` → Tier Lists for the reuse example.
+
+Templates optionally define `initialPlacements: Record<rowId, itemId[]>`. This is a generic
+starting arrangement, validated against rows, source items, mode, duplicate rules and limits.
+Each new instance gets independent occurrence IDs. Clear empties placements; Reset restores
+the template's rows and starting assignments. Defaults travel with JSON and private remixes,
+independently of current placements. Existing version-1 templates without them stay compatible.
+
+The catalog's **Edit preset** action opens the same `TierListTemplateEditor` at
+`/tier-lists/[slug]/edit`. System edits save a private reusable copy, retaining the base preset.
+Catalog editing uses the current base definition, even when the device has an older saved
+list; instance-specific edit links retain the existing remix/reconciliation behavior.
+`TierListStartingPlacementsEditor` composes the actual controlled board inside that editor:
+drag or tap to change defaults, with no second assignment implementation. Deleting rows/items
+prunes affected defaults; changing collection clears them; switching to exclusive mode reconciles
+cross-row copies. Changes to a preset do not silently replace saved instance placements. If a
+system preset changes, its workspace offers a fresh list using the new definition while keeping
+the saved arrangement. This editor is also demonstrated under `/styles/components` → Tier Lists.
+
 ## Sources and composition
 
 Static/custom sources contain small item collections. Reference sources are `{ type: "reference",
@@ -148,7 +180,7 @@ case-insensitive search and the consumer's `filterItem`. Ranked cards remain rec
 All/Assigned; filtering never changes row placements. Assignment dialogs, reorder buttons,
 whole-card drag activators, visible focus and localized screen-reader announcements are available on every board.
 
-The grip is a visual cue; the entire card, including artwork and name, is the drag activator.
+The entire card, including artwork and name, is the drag activator. No grip marker is rendered.
 An activated drag suppresses the assignment click, preserves a faded origin, and shows the
 lifted preview plus row/insertion feedback. `tierListMovementPreview` derives a temporary
 instance through the core rules. `DragPlaceholder` occupies the exact destination and
@@ -230,13 +262,14 @@ including custom inline DOM item renderers. No second board layout or dependency
 `TierListDisplayControls` reuses library `Toggle` controls. Pass its controlled value to `TierList`
 as `display` and use `title`/`descriptions` when composing the heading. Title, item labels, row
 labels, counts, descriptions and editing controls affect both page and PNG. Hiding editing controls
-also hides visual grips and empty-row instructions; cards remain draggable and accessible by name.
+also hides empty-row instructions; cards remain draggable and accessible by name.
 Preferences are view state, independent of placement/history/JSON and of exclusive/multi mode.
 Row counts default off and use compact centered numeric `Badge` controls when enabled.
 `TierListRowHeader` gives labels readable body typography, natural case, consistent centering
 and wrapping for long names. Cards use the shared `--drag-card-size` at `6rem`; preview and slot
-inherit the same size. Names have two lines with equal caption height rather than
-being truncated to one line. Custom renderers own their label visibility.
+inherit the same size. `MediaCardContent` supplies the square media slot and a compact,
+centered 28px caption with up to two lines, reused by cards, overlays, insertion slots,
+editor thumbnails and the live `/styles/components` examples. Custom renderers own their label visibility.
 `TierListHeading` and `TierListHeadingEditor` are reused by the workspace and component showcase;
 the editor composes library `Modal`, `Field`, `Input`, `Textarea` and `Button`. Headings sit in
 the presentation panel with consistent padding; row names/colors remain editable through gear.
