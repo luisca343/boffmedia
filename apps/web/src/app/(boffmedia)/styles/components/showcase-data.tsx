@@ -9,6 +9,8 @@ import type { AvMember, AvPipeStage } from "@/app/(boffmedia)/admin/_components/
 export interface SecMeta {
   id: string
   label: string
+  /** New specimens resolve their UI label through styles.components. */
+  labelKey?: string
 }
 export interface Chapter {
   name: string
@@ -33,6 +35,7 @@ export const CHAPTERS: Chapter[] = [
       { id: "botones", label: "Botones" },
       { id: "chips", label: "Chips y badges" },
       { id: "formularios", label: "Formularios" },
+      { id: "color-input", label: "ColorInput", labelKey: "colorInput.title" },
       { id: "seleccion", label: "Selección y rango" },
       { id: "navegacion", label: "Navegación" },
       { id: "navdrop", label: "Dropdown de nav" },
@@ -185,6 +188,16 @@ export const CHAPTERS: Chapter[] = [
       { id: "lzmonth", label: "Rejilla de mes" },
       { id: "lzweek", label: "Tira de la semana" },
       { id: "lztime", label: "Línea de tiempo" },
+    ],
+  },
+  {
+    name: "Tier Lists",
+    dom: "Herramientas",
+    sections: [
+      { id: "tier-drag", label: "DragCard / DragTarget", labelKey: "tierLists.drag" },
+      { id: "tier-exclusive", label: "TierList: exclusive", labelKey: "tierLists.exclusive" },
+      { id: "tier-multi", label: "TierList: multi", labelKey: "tierLists.multi" },
+      { id: "tier-editor", label: "TierListTemplateEditor", labelKey: "tierLists.editor" },
     ],
   },
   {

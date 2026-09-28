@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { cn } from "@/lib/utils"
 import { Icon, ToastStack } from "@boffmedia/ui"
 import { CHAPTERS, DOMAINS } from "./showcase-data"
@@ -32,6 +33,7 @@ import { KeysChapter } from "./_chapters/KeysChapter"
 import { CatalogoChapter } from "./_chapters/CatalogoChapter"
 import { CalculadoraChapter } from "./_chapters/CalculadoraChapter"
 import { LegalChapter } from "./_chapters/LegalChapter"
+import { TierListsChapter } from "./_chapters/TierListsChapter"
 
 const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
   Bases: BasesChapter,
@@ -61,9 +63,11 @@ const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
   "Claves de Steam": KeysChapter,
   Calculadora: CalculadoraChapter,
   Legal: LegalChapter,
+  "Tier Lists": TierListsChapter,
 }
 
 export default function ComponentsShowcase() {
+  const t = useTranslations("styles.components")
   const [grpName, setGrpName] = React.useState(CHAPTERS[0].name)
   const [q, setQ] = React.useState("")
   const [active, setActive] = React.useState(CHAPTERS[0].sections[0].id)
@@ -71,7 +75,10 @@ export default function ComponentsShowcase() {
   const findRef = React.useRef<HTMLInputElement>(null)
   const firstGrp = React.useRef(true)
 
-  const chapters = CHAPTERS
+  const chapters = React.useMemo(() => CHAPTERS.map((chapter) => ({ ...chapter,
+    sections: chapter.sections.map((section) => ({ ...section, label: section.labelKey ? t(section.labelKey) : section.label })),
+  })), [t])
+  const domains = DOMAINS.map((domain) => ({ ...domain, chapters: chapters.filter((chapter) => chapter.dom === domain.name) }))
   const gi = chapters.findIndex((g) => g.name === grpName)
   const chapter = chapters[gi]
   const ActiveView = CHAPTER_VIEWS[chapter.name]
@@ -231,7 +238,7 @@ export default function ComponentsShowcase() {
                 <span className="py-3 px-[0.875rem] font-mono text-[0.6875rem] leading-[1.6] text-txt-dim">Sin resultados para «{q.trim()}»</span>
               )
             ) : (
-              DOMAINS.map((d) => {
+              domains.map((d) => {
                 const dOpen = openDoms.has(d.name)
                 const dCur = d.chapters.some((g) => g.name === grpName)
                 return (

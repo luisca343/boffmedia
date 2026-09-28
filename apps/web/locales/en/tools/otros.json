@@ -44,6 +44,15 @@
           "countdown": "Claim countdown",
           "claim": "One-click claim"
         }
+      },
+      "tierLists": {
+        "title": "Tier lists",
+        "description": "Rank items or plan across several rows with reusable templates",
+        "features": {
+          "placement": "Rankings and planning",
+          "templates": "Custom templates",
+          "export": "JSON and PNG export"
+        }
       }
     },
     "externalLinks": {

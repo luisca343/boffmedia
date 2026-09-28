@@ -1,5 +1,36 @@
 {
   "styles": {
+    "components": {
+      "colorInput": {
+        "title": "Color picker",
+        "lead": "A native picker whose entire clickable field shows the selected color, with a contrasting hex value. Use it wherever a form edits a color.",
+        "sample": "Controlled, compact and disabled",
+        "label": "Row color",
+        "compact": "Compact color",
+        "disabled": "Disabled color",
+        "note": "Import ColorInput from @boffmedia/ui and wrap it in Field for its label, hint and error. It forwards its ref and native input attributes; size=sm matches compact toolbars. The selected color stays visible with the picker closed."
+      },
+      "tierLists": {
+        "drag": "Drag presentation",
+        "dragLead": "Shared visual controls in @boffmedia/ui. The host binds its drag sensors and decides placements; the controls contain no tier-list rules.",
+        "dragSample": "Card, lifted preview, insertion slot and destination",
+        "dragNote": "Bind drag listeners to the whole DragCard button and use its click action for menus. DragPreview belongs in the host overlay; DragPlaceholder occupies the predicted destination and shifts neighboring cards before dropping. Forward its drop ref to keep hovering stable. DragTarget highlights the full destination. The boards below demonstrate the real interactions.",
+        "cardLabel": "Example card",
+        "idle": "Available card",
+        "lifted": "Lifted preview",
+        "target": "Active destination",
+        "exclusive": "Exclusive board",
+        "exclusiveLead": "An embedded controlled TierList. Moving a card removes its previous placement. Edit the list heading, rename rows from their gear menu, or enable the optional centered count badges. Drag from the image or name, or tap to assign.",
+        "multi": "Multi-placement board",
+        "multiLead": "The same component with multi placement and a persistent source pool. Assign one card to several rows; clearing one leaves the others intact. This example has its own editable heading and presentation preferences.",
+        "boardNote": "Import TierList and TierListDisplayControls from @/features/tier-list. Supply template, instance, items and onChange; display preferences use shared Toggle controls and affect both the live presentation and PNG capture. Hiding editing controls removes the rail, grip markers and empty-row hints while cards remain draggable. Placement mode stays in the template. renderItem, renderRowHeader, sourceControls and summary customize presentation. Gear/up/down reuse IconButton and Menu iconOnly. All/Assigned filters include ranked cards. These examples keep independent state in memory without storage or API writes.",
+        "reset": "Reset example",
+        "editor": "Template editor",
+        "editorLead": "The reusable editor shares the same schema, ColorInput, Field, Panel and other library controls. Customize its rows, rules and items.",
+        "editorNote": "TierListTemplateEditor accepts a template and an asynchronous onSave. Inject an imageStorage adapter to enable uploads. This example acknowledges save in memory and does not upload files or publish a list.",
+        "saved": "Example saved: {title}"
+      }
+    },
     "icons": {
       "title": "Icons",
       "description": "The complete inventory of the icon registry shared by the web app, desktop app and tools.",

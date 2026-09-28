@@ -1,10 +1,13 @@
 "use client"
 
 import * as React from "react"
+import { useTranslations } from "next-intl"
 import { Sample, Section } from "../../showcase-shared"
-import { Button, Checkbox, Disclosure, Field, IconButton, Input, OptionGroup, Progress, RadioGroup, SearchInput, Select, Slider, Textarea, Toggle } from "@boffmedia/ui"
+import { Button, Checkbox, ColorInput, Disclosure, Field, IconButton, Input, OptionGroup, Progress, RadioGroup, SearchInput, Select, Slider, Textarea, Toggle } from "@boffmedia/ui"
 
 export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; setRng: React.Dispatch<React.SetStateAction<number>> }) {
+  const t = useTranslations("styles.components.colorInput")
+  const [color, setColor] = React.useState("#f08080")
   const [sq, setSq] = React.useState("")
   const [tglA, setTglA] = React.useState(true)
   const [tglB, setTglB] = React.useState(false)
@@ -168,6 +171,16 @@ export function FormulariosSeleccionSections({ rng, setRng }: { rng: number; set
                 El rango sale de aplicar la fórmula de daño con los modificadores activos: naturaleza, objeto, campo y clima.
               </p>
             </Disclosure>
+          </div>
+        </Sample>
+      </Section>
+
+      <Section id="color-input" kicker="ColorInput" title={t("title")} lead={t("lead")}>
+        <Sample title={t("sample")} code={'<Field><ColorInput value onChange size="sm" /></Field>'} col note={t("note")}>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <Field label={t("label")}><ColorInput value={color} onChange={(event) => setColor(event.target.value)} /></Field>
+            <Field label={t("compact")}><ColorInput size="sm" value={color} onChange={(event) => setColor(event.target.value)} /></Field>
+            <Field label={t("disabled")}><ColorInput disabled value={color} /></Field>
           </div>
         </Sample>
       </Section>

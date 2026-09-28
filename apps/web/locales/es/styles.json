@@ -1,5 +1,36 @@
 {
   "styles": {
+    "components": {
+      "colorInput": {
+        "title": "Selector de color",
+        "lead": "Un selector nativo cuya superficie pulsable muestra el color elegido, con un valor hexadecimal de contraste. Úsalo cuando un formulario permita editar un color.",
+        "sample": "Controlado, compacto y deshabilitado",
+        "label": "Color de fila",
+        "compact": "Color compacto",
+        "disabled": "Color deshabilitado",
+        "note": "Importa ColorInput desde @boffmedia/ui y envuélvelo en Field para su etiqueta, ayuda y error. Reenvía la referencia y los atributos nativos del input; size=sm encaja en barras compactas. El color elegido sigue visible con el selector cerrado."
+      },
+      "tierLists": {
+        "drag": "Presentación del arrastre",
+        "dragLead": "Controles visuales compartidos de @boffmedia/ui. El anfitrión conecta sus sensores y decide las asignaciones; los controles no contienen reglas de tier lists.",
+        "dragSample": "Tarjeta, vista elevada, hueco de inserción y destino",
+        "dragNote": "Conecta los listeners de arrastre a todo el botón DragCard y usa su acción de clic para los menús. DragPreview vive en la capa de arrastre del anfitrión; DragPlaceholder ocupa el destino previsto y desplaza las tarjetas vecinas antes de soltar. Pasa su referencia de destino para mantener estable la posición. DragTarget resalta todo el destino. Los tableros siguientes muestran las interacciones reales.",
+        "cardLabel": "Tarjeta de ejemplo",
+        "idle": "Tarjeta disponible",
+        "lifted": "Vista elevada",
+        "target": "Destino activo",
+        "exclusive": "Tablero exclusivo",
+        "exclusiveLead": "Una TierList controlada e integrada. Mover una tarjeta elimina su asignación anterior. Edita el encabezado, renombra filas desde su engranaje o activa los contadores centrados opcionales. Arrastra desde la imagen o el nombre, o toca para asignar.",
+        "multi": "Tablero de varias asignaciones",
+        "multiLead": "El mismo componente con asignación múltiple y un grupo de origen persistente. Asigna una tarjeta a varias filas; vaciar una conserva las demás. Este ejemplo tiene su propio encabezado editable y preferencias de presentación.",
+        "boardNote": "Importa TierList y TierListDisplayControls desde @/features/tier-list. Proporciona template, instance, items y onChange; las preferencias display usan Toggle de la biblioteca y afectan al tablero y a la captura PNG. Ocultar los controles elimina la barra, los indicadores de agarre y las ayudas de filas vacías; las tarjetas siguen siendo arrastrables. El modo de asignación permanece en la plantilla. renderItem, renderRowHeader, sourceControls y summary personalizan la presentación. Engranaje/subir/bajar reutilizan IconButton y Menu iconOnly. Todos/Asignados incluyen tarjetas clasificadas. Estos ejemplos mantienen estados independientes en memoria sin escribir en almacenamiento ni en la API.",
+        "reset": "Reiniciar ejemplo",
+        "editor": "Editor de plantillas",
+        "editorLead": "El editor reutilizable comparte el esquema, ColorInput, Field, Panel y los demás controles de la biblioteca. Personaliza sus filas, reglas y elementos.",
+        "editorNote": "TierListTemplateEditor recibe una plantilla y un onSave asíncrono. Inyecta un adaptador imageStorage para habilitar subidas. Este ejemplo confirma el guardado en memoria y no sube archivos ni publica listas.",
+        "saved": "Ejemplo guardado: {title}"
+      }
+    },
     "icons": {
       "title": "Iconos",
       "description": "El inventario completo del registro de iconos compartido por la web, el escritorio y las herramientas.",
