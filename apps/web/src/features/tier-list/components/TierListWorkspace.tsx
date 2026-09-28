@@ -13,7 +13,7 @@ import { useTierList } from "../hooks/useTierList"
 import { TierList } from "./TierList"
 import { TierListToolbar } from "./TierListToolbar"
 import { tierListHref } from "../routes"
-import { withTierListStarterImages } from "../templates"
+import { withTierListPresetRules, withTierListStarterImages } from "../templates"
 import { defaultTierListDisplay } from "../display"
 import { TierListDisplayControls } from "./TierListDisplayControls"
 import { TierListHeadingEditor } from "./TierListHeadingEditor"
@@ -22,11 +22,12 @@ import { TierListHeading } from "./TierListHeading"
 function LoadedWorkspace({ initial, adapter, preset }: { initial: TierListDocument; adapter: LocalStorageTierListAdapter; preset: TierListTemplate | null }) {
   const t = useTranslations("tierLists")
   const router = useRouter()
-  const state = useTierList(initial, adapter)
+  const migrate = useCallback((document: TierListDocument) => withTierListPresetRules(document, preset), [preset])
+  const state = useTierList(initial, adapter, migrate)
   const doc = withTierListStarterImages(state.document)
   const title = getTierListTitle(doc.template, doc.instance)
   const description = getTierListDescription(doc.template, doc.instance)
-  const presetChanged = !!preset && doc.template.ownership?.type === "system" && JSON.stringify([doc.template.rows, doc.template.settings, doc.template.initialPlacements]) !== JSON.stringify([preset.rows, preset.settings, preset.initialPlacements])
+  const presetChanged = !!preset && doc.template.ownership?.type === "system" && JSON.stringify([doc.template.rows, doc.template.settings, doc.template.initialPlacements, doc.items.map(({ id, fixedRowId }) => [id, fixedRowId])]) !== JSON.stringify([preset.rows, preset.settings, preset.initialPlacements, preset.source.type === "reference" ? [] : preset.source.items.map(({ id, fixedRowId }) => [id, fixedRowId])])
   const [recover, setRecover] = useState(false)
   const [creating, setCreating] = useState(false)
   const [createError, setCreateError] = useState(false)
@@ -65,8 +66,9 @@ function LoadedWorkspace({ initial, adapter, preset }: { initial: TierListDocume
     </header>
     <TierListToolbar document={doc} getPresentation={() => presentationRef.current} onEditHeading={() => setEditingHeading(true)} dispatch={state.dispatch} canUndo={state.canUndo} canRedo={state.canRedo} onImport={async (imported) => {
       // Import creates a new private local copy and never overwrites an existing list.
-      const template = cloneTemplate(imported.template)
-      const next: TierListDocument = { ...imported, template, instance: { ...imported.instance, id: newTierListId(), templateId: template.id, ownerId: undefined, visibility: "private", createdAt: undefined, updatedAt: undefined } }
+      const constrained = withTierListPresetRules(imported, preset)
+      const template = cloneTemplate(constrained.template)
+      const next: TierListDocument = { ...constrained, template, instance: { ...constrained.instance, id: newTierListId(), templateId: template.id, ownerId: undefined, visibility: "private", createdAt: undefined, updatedAt: undefined } }
       await adapter.save(next)
       router.push(tierListHref(next))
     }} />

@@ -29,3 +29,7 @@ Runtime pages and PNG export use these locally served assets, without hotlinking
 This collection contains the existing 50 characters and does not add the guide's separate
 spoiler-only recruits. The tier-list preset has no runtime or test dependency on the dedicated
 recruitment page. This feature is developed on the `tierlist` branch.
+Each route lord carries a generic `fixedRowId` in the preset item data. That binding requires one
+default placement in the named route, prevents moves or removals elsewhere in the core rules,
+and keeps the lord out of the available-item pool. Older saved system boards are upgraded when
+opened, retaining ordinary rankings while restoring each lord to their own route.

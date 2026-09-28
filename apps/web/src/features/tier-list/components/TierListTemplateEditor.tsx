@@ -32,6 +32,18 @@ export function TierListTemplateEditor({ template, onSave, imageStorage, sources
     rows.splice(to, 0, rows.splice(from, 1)[0])
     setDraft({ ...draft, rows })
   }
+  const deleteRow = (rowId: string) => {
+    const source = draft.source.type === "reference" ? draft.source : {
+      ...draft.source,
+      items: draft.source.items.map((item) => {
+        if (item.fixedRowId !== rowId) return item
+        const { fixedRowId: _fixed, ...unbound } = item
+        return unbound
+      }),
+    }
+    setDraft({ ...draft, rows: draft.rows.filter((row) => row.id !== rowId), source,
+      initialPlacements: draft.initialPlacements && Object.fromEntries(Object.entries(draft.initialPlacements).filter(([id]) => id !== rowId)) })
+  }
   return <form className="grid gap-6" onSubmit={async (e) => {
     e.preventDefault()
     const parsed = tierListTemplateSchema.safeParse(draft)
@@ -68,7 +80,7 @@ export function TierListTemplateEditor({ template, onSave, imageStorage, sources
           <div className="flex flex-wrap items-end gap-1">
             <Button size="sm" type="button" disabled={!index} aria-label={t("moveRowUp", { label: row.label })} onClick={() => reorderRow(index, index - 1)}>{t("up")}</Button>
             <Button size="sm" type="button" disabled={index === draft.rows.length - 1} aria-label={t("moveRowDown", { label: row.label })} onClick={() => reorderRow(index, index + 1)}>{t("down")}</Button>
-            <Button size="sm" type="button" disabled={draft.rows.length === 1} aria-label={t("deleteNamedRow", { label: row.label })} onClick={() => setPending(() => () => setDraft({ ...draft, rows: draft.rows.filter((r) => r.id !== row.id), initialPlacements: draft.initialPlacements && Object.fromEntries(Object.entries(draft.initialPlacements).filter(([id]) => id !== row.id)) }))}>{t("deleteRow")}</Button>
+            <Button size="sm" type="button" disabled={draft.rows.length === 1} aria-label={t("deleteNamedRow", { label: row.label })} onClick={() => setPending(() => () => deleteRow(row.id))}>{t("deleteRow")}</Button>
           </div>
         </div>)}
         <Button type="button" disabled={draft.rows.length >= LIMITS.rows} onClick={() => setDraft({ ...draft, rows: [...draft.rows, { id: newTierListId(), label: t("newRow"), color: "#808080" }] })}>{t("addRow")}</Button>

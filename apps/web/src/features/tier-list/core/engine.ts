@@ -8,7 +8,7 @@ export const getTierListDescription = (template: TierListTemplate, instance: Tie
 export const assignedItemIds = (instance: TierListInstance) => new Set(Object.values(instance.placements).flatMap((row) => row.map((p) => p.itemId)))
 export function getSourceItems(items: TierListItem[], template: TierListTemplate, instance: TierListInstance) {
   const assigned = assignedItemIds(instance)
-  return template.settings.keepSourceVisible ? items : items.filter((item) => !assigned.has(item.id))
+  return items.filter((item) => !item.fixedRowId && (template.settings.keepSourceVisible || !assigned.has(item.id)))
 }
 export function createInstance(template: TierListTemplate, id = newTierListId()): TierListInstance {
   const placements = Object.fromEntries(Object.entries(template.initialPlacements ?? {}).map(([rowId, items]) =>
@@ -56,9 +56,10 @@ export function applyTierListAction(doc: TierListDocument, action: TierListActio
       return { ...doc, instance: { ...parsed.data, updatedAt: new Date().toISOString() } }
     }
     case "assign": {
-      if (!hasRow(action.rowId) || !items.some((i) => i.id === action.itemId)) return doc
+      const item = items.find((i) => i.id === action.itemId)
+      if (!hasRow(action.rowId) || !item || (item.fixedRowId && action.rowId !== item.fixedRowId)) return doc
       const target = placements[action.rowId] ?? []
-      if (!settings.allowDuplicateWithinRow && target.some((p) => p.itemId === action.itemId)) return doc
+      if ((!settings.allowDuplicateWithinRow || item.fixedRowId) && Object.values(placements).some((row) => row.some((p) => p.itemId === action.itemId))) return doc
       const occurrenceId = action.placementId ?? newTierListId()
       if (Object.values(placements).some((row) => row.some((p) => p.id === occurrenceId))) return doc
       if (settings.placementMode === "exclusive") {
@@ -83,19 +84,28 @@ export function applyTierListAction(doc: TierListDocument, action: TierListActio
     }
     case "remove": {
       if (!hasRow(action.rowId)) return doc
-      placements[action.rowId] = (placements[action.rowId] ?? []).filter((p) => action.placementId ? p.id !== action.placementId : p.itemId !== action.itemId)
+      placements[action.rowId] = (placements[action.rowId] ?? []).filter((p) => {
+        const matches = action.placementId ? p.id === action.placementId : p.itemId === action.itemId
+        return !matches || items.some((item) => item.id === p.itemId && item.fixedRowId === action.rowId)
+      })
       break
     }
-    case "unassign":
+    case "unassign": {
+      if (items.some((item) => item.id === action.itemId && item.fixedRowId)) return doc
       for (const [rowId, row] of Object.entries(placements)) placements[rowId] = row.filter((p) => p.itemId !== action.itemId)
       break
+    }
     case "clearRow":
       if (!hasRow(action.rowId)) return doc
-      placements[action.rowId] = []
+      placements[action.rowId] = (placements[action.rowId] ?? []).filter((placement) => items.some((item) => item.id === placement.itemId && item.fixedRowId === action.rowId))
       break
     case "clear":
     case "reset":
-      for (const rowId of Object.keys(placements)) delete placements[rowId]
+      for (const rowId of Object.keys(placements)) {
+        if (action.type === "clear") {
+          placements[rowId] = placements[rowId].filter((placement) => items.some((item) => item.id === placement.itemId && item.fixedRowId === rowId))
+        } else delete placements[rowId]
+      }
       if (action.type === "reset") {
         nextRows = undefined
         Object.assign(placements, createInstance(template, instance.id).placements)
@@ -114,6 +124,7 @@ export function applyTierListAction(doc: TierListDocument, action: TierListActio
       break
     case "deleteRow":
       if (!settings.allowRowDeletion || rows.length <= 1 || !hasRow(action.rowId)) return doc
+      if (items.some((item) => item.fixedRowId === action.rowId)) return doc
       nextRows = rows.filter((r) => r.id !== action.rowId)
       delete placements[action.rowId]
       break
@@ -139,12 +150,20 @@ export function reconcileTemplate(doc: TierListDocument, template: TierListTempl
     const withinRow = new Set<string>()
     placements[row.id] = (doc.instance.placements[row.id] ?? []).filter((p) => {
       if (!itemIds.has(p.itemId)) return false
+      const fixedRowId = items.find((item) => item.id === p.itemId)?.fixedRowId
+      if (fixedRowId && (fixedRowId !== row.id || withinRow.has(p.itemId))) return false
       if (!template.settings.allowDuplicateWithinRow && withinRow.has(p.itemId)) return false
       if (template.settings.placementMode === "exclusive" && globallyAssigned.has(p.itemId) && !withinRow.has(p.itemId)) return false
       withinRow.add(p.itemId)
       globallyAssigned.add(p.itemId)
       return true
     })
+  }
+  for (const item of items) {
+    if (!item.fixedRowId || !template.rows.some((row) => row.id === item.fixedRowId)) continue
+    if (!placements[item.fixedRowId].some((placement) => placement.itemId === item.id)) {
+      placements[item.fixedRowId].push({ id: newTierListId(), itemId: item.id })
+    }
   }
   return { schemaVersion: 1, template, items, instance: { ...doc.instance, templateId: template.id, rows: undefined, placements, updatedAt: new Date().toISOString() } }
 }

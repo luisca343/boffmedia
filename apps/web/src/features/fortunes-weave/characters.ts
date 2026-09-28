@@ -210,4 +210,5 @@ const characters = [
 export const FORTUNES_WEAVE_CHARACTERS = characters.map((character) => ({
   ...character,
   image: staticAsset(ASSET.boffmedia.img, "games/fortunes-weave/portraits", `${character.id}${FORTUNES_WEAVE_ROUTES.some((id) => id === character.id) ? "-pre-timeskip" : ""}.webp`),
+  ...(FORTUNES_WEAVE_ROUTES.some((id) => id === character.id) ? { fixedRowId: character.id } : {}),
 }))

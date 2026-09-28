@@ -56,14 +56,21 @@ a private user remix. Old version-1 documents without these optional fields rema
 Clearing/resetting placements preserves the list's heading.
 
 An item has an ID, name, optional image URL/description/metadata and optional `{ source, id }`
-entity reference. A placement is `{ id, itemId }`: its occurrence ID distinguishes explicitly
-allowed copies of the same item. Rows are ordered arrays of these occurrences.
+entity reference. `fixedRowId` optionally binds an item to one row. Bound items require exactly
+one default placement there, remain there across assignments and clears, and never appear in the
+source pool. Editing the source row releases its items; deleting that row on a board is blocked.
+The schema enforces the rule for saved documents and imports as well as live actions. Older saved
+system boards are upgraded on load, retaining ordinary rankings and repairing route leaders.
+A placement is `{ id, itemId }`: its occurrence ID distinguishes explicitly allowed copies of the
+same item. Rows are ordered arrays of these occurrences.
 
 `exclusive` assigns an item to one row and removes it from other rows. `multi` copies across rows.
 Both normally prohibit duplicate item IDs within a row. `allowDuplicateWithinRow` allows separate
-occurrences within that one row; exclusive mode still permits only one destination row.
-`keepSourceVisible` sets the default source view: true starts with the full collection, false
-starts with items absent from every row. Explicit All/Assigned filters can recover ranked cards.
+occurrences within that one row; exclusive mode still permits only one destination row. A fixed-row
+item is the exception in either mode: it stays assigned exactly once to its bound row.
+`keepSourceVisible` sets the default source view: true starts with all eligible items, false
+starts with items absent from every row. Fixed-row items stay out of the source pool in both cases.
+Explicit All/Assigned filters can recover other ranked cards.
 Dropping a multi occurrence into the pool removes just that occurrence;
 an exclusive pool drop unassigns that item. The tap menu also offers removal from every row.
 
@@ -110,8 +117,8 @@ definition. Editing a system template remixes it with a fresh UUID, keeping its 
 
 `/tier-lists/fire-emblem-fortunes-weave` is a concrete multi-route collection with
 50 characters. Its four groups are Cai, Dietrich, Theodora and Leda;
-each lord starts in their own route, cards can appear in several routes, and the full source
-pool stays available. Only pre-timeskip lord artwork is used, with fresh asset URLs for caches.
+each lord is bound to their own route and stays out of the available pool. The other characters
+can appear in several routes. Only pre-timeskip lord artwork is used, with fresh asset URLs for caches.
 Saved boards and private remixes receive corrections to the exact former site-owned lord
 image URLs for display/export, without replacing placements or custom artwork.
 It reuses
