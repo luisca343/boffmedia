@@ -8,7 +8,7 @@ import type { TierListPersistenceAdapter } from "../persistence/adapters"
 export type TierListSaveStatus = "loading" | "saving" | "saved" | "error"
 
 /** Saves meaningful commits, in order; drag previews never enter this hook. */
-export function useTierList(initial: TierListDocument, adapter: TierListPersistenceAdapter) {
+export function useTierList(initial: TierListDocument, adapter: TierListPersistenceAdapter, migrate?: (document: TierListDocument) => TierListDocument) {
   const [history, dispatch] = useReducer(tierListHistoryReducer, initial, createHistory)
   const [status, setStatus] = useState<TierListSaveStatus>("loading")
   const [loaded, setLoaded] = useState(false)
@@ -27,7 +27,7 @@ export function useTierList(initial: TierListDocument, adapter: TierListPersiste
       if (cancelled) return
       if (doc) {
         queued.current = JSON.stringify(doc)
-        dispatch({ type: "load", document: doc })
+        dispatch({ type: "load", document: migrate ? migrate(doc) : doc })
       }
       setLoadFailed(false)
       setLoaded(true)
@@ -38,7 +38,7 @@ export function useTierList(initial: TierListDocument, adapter: TierListPersiste
       setStatus("error")
     })
     return () => { cancelled = true; revision.current++ }
-  }, [adapter, key.templateId, key.instanceId])
+  }, [adapter, key.templateId, key.instanceId, migrate])
 
   useEffect(() => {
     if (!loaded || loadFailed) return

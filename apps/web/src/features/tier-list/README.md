@@ -20,7 +20,7 @@ it is not a new global primitive or a desktop tool package.
   sensors. Drag translation lives under `dnd/`; the core does not import DnD or React.
 - Whole-card activation and a cursor-centered, lifted preview follow SmartRotom's app-grid
   interaction pattern, using Boffmedia tokens. Shared `DragCard`, `DragPreview`, `DragTarget`
-  and `ColorInput` live in `@boffmedia/ui`; the DnD adapter owns sensors and placement rules.
+  `MediaCardContent` and `ColorInput` live in `@boffmedia/ui`; the DnD adapter owns sensors and placement rules.
   Active rows remain highlighted over nested insertion targets. Tap/Enter opens assignments;
   Space drags by keyboard and a short hold activates touch dragging.
 - Existing `ArtImage` handles arbitrary hosts, missing images and errors. `@boffmedia/ui`
@@ -56,14 +56,21 @@ a private user remix. Old version-1 documents without these optional fields rema
 Clearing/resetting placements preserves the list's heading.
 
 An item has an ID, name, optional image URL/description/metadata and optional `{ source, id }`
-entity reference. A placement is `{ id, itemId }`: its occurrence ID distinguishes explicitly
-allowed copies of the same item. Rows are ordered arrays of these occurrences.
+entity reference. `fixedRowId` optionally binds an item to one row. Bound items require exactly
+one default placement there, remain there across assignments and clears, and never appear in the
+source pool. Editing the source row releases its items; deleting that row on a board is blocked.
+The schema enforces the rule for saved documents and imports as well as live actions. Older saved
+system boards are upgraded on load, retaining ordinary rankings and repairing route leaders.
+A placement is `{ id, itemId }`: its occurrence ID distinguishes explicitly allowed copies of the
+same item. Rows are ordered arrays of these occurrences.
 
 `exclusive` assigns an item to one row and removes it from other rows. `multi` copies across rows.
 Both normally prohibit duplicate item IDs within a row. `allowDuplicateWithinRow` allows separate
-occurrences within that one row; exclusive mode still permits only one destination row.
-`keepSourceVisible` sets the default source view: true starts with the full collection, false
-starts with items absent from every row. Explicit All/Assigned filters can recover ranked cards.
+occurrences within that one row; exclusive mode still permits only one destination row. A fixed-row
+item is the exception in either mode: it stays assigned exactly once to its bound row.
+`keepSourceVisible` sets the default source view: true starts with all eligible items, false
+starts with items absent from every row. Fixed-row items stay out of the source pool in both cases.
+Explicit All/Assigned filters can recover other ranked cards.
 Dropping a multi occurrence into the pool removes just that occurrence;
 an exclusive pool drop unassigns that item. The tap menu also offers removal from every row.
 
@@ -109,17 +116,30 @@ definitions; unknown system slugs return 404. `/tier-lists/new/edit` creates a p
 definition. Editing a system template remixes it with a fresh UUID, keeping its original intact.
 
 `/tier-lists/fire-emblem-fortunes-weave` is a concrete multi-route collection with
+<<<<<<< HEAD
 the existing tracker’s 50 characters. Its four groups are Cai, Dietrich, Theodora and Leda;
 each lord starts in their own route, cards can appear in several routes, and the full source
 pool stays available. Only pre-timeskip lord artwork is used, with fresh asset URLs for caches.
+=======
+50 characters. Its four groups are Cai, Dietrich, Theodora and Leda;
+each lord is bound to their own route and stays out of the available pool. The other characters
+can appear in several routes. Only pre-timeskip lord artwork is used, with fresh asset URLs for caches.
+>>>>>>> tierlist
 Saved boards and private remixes receive corrections to the exact former site-owned lord
 image URLs for display/export, without replacing placements or custom artwork.
 It reuses
 the same workspace, editor, display switches, persistence and export components. Shared
+<<<<<<< HEAD
 identities and asset URLs live in `features/fortunes-weave/characters.ts`; recruitment
 conditions stay in the tracker route. Artwork lives in root
 `public/boffmedia/img/games/fortunes-weave/portraits/`, shared with the tracker rather than
 imported from source or copied into tier-list internals. All public assets remain ignored.
+=======
+identities and asset URLs live in `features/fortunes-weave/characters.ts`. The collection has
+no dependency on a dedicated recruitment page. Artwork lives in root
+`public/boffmedia/img/games/fortunes-weave/portraits/`, using the existing public asset structure
+rather than source imports or copies inside tier-list internals. All public assets remain ignored.
+>>>>>>> tierlist
 See `features/fortunes-weave/README.md`
 for Polygon provenance and `/styles/components` → Tier Lists for the reuse example.
 
@@ -180,7 +200,7 @@ case-insensitive search and the consumer's `filterItem`. Ranked cards remain rec
 All/Assigned; filtering never changes row placements. Assignment dialogs, reorder buttons,
 whole-card drag activators, visible focus and localized screen-reader announcements are available on every board.
 
-The grip is a visual cue; the entire card, including artwork and name, is the drag activator.
+The entire card, including artwork and name, is the drag activator. No grip marker is rendered.
 An activated drag suppresses the assignment click, preserves a faded origin, and shows the
 lifted preview plus row/insertion feedback. `tierListMovementPreview` derives a temporary
 instance through the core rules. `DragPlaceholder` occupies the exact destination and
@@ -262,13 +282,14 @@ including custom inline DOM item renderers. No second board layout or dependency
 `TierListDisplayControls` reuses library `Toggle` controls. Pass its controlled value to `TierList`
 as `display` and use `title`/`descriptions` when composing the heading. Title, item labels, row
 labels, counts, descriptions and editing controls affect both page and PNG. Hiding editing controls
-also hides visual grips and empty-row instructions; cards remain draggable and accessible by name.
+also hides empty-row instructions; cards remain draggable and accessible by name.
 Preferences are view state, independent of placement/history/JSON and of exclusive/multi mode.
 Row counts default off and use compact centered numeric `Badge` controls when enabled.
 `TierListRowHeader` gives labels readable body typography, natural case, consistent centering
 and wrapping for long names. Cards use the shared `--drag-card-size` at `6rem`; preview and slot
-inherit the same size. Names have two lines with equal caption height rather than
-being truncated to one line. Custom renderers own their label visibility.
+inherit the same size. `MediaCardContent` supplies the square media slot and a compact,
+centered 28px caption with up to two lines, reused by cards, overlays, insertion slots,
+editor thumbnails and the live `/styles/components` examples. Custom renderers own their label visibility.
 `TierListHeading` and `TierListHeadingEditor` are reused by the workspace and component showcase;
 the editor composes library `Modal`, `Field`, `Input`, `Textarea` and `Button`. Headings sit in
 the presentation panel with consistent padding; row names/colors remain editable through gear.

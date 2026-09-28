@@ -55,7 +55,7 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
   // Filter the full collection. The source-visibility rule chooses the default
   // view, while explicit All/Assigned must still recover already ranked items.
   const pool = useMemo(() => items.filter((i) =>
-    i.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()) &&
+    !i.fixedRowId && i.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()) &&
     (filter === "all" || (filter === "assigned" ? assigned.has(i.id) : !assigned.has(i.id))) && (!filterItem || filterItem(i)),
   ), [items, search, filter, assigned, filterItem])
   const act = useCallback((action: TierListAction) => {
@@ -78,6 +78,7 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
   return <div ref={boardRef} className="grid min-w-0 gap-5" style={{ "--drag-card-size": "6rem" } as CSSProperties} data-tier-list>
     <p className="text-sm text-txt-muted">{t(template.settings.placementMode === "multi" ? "multiHint" : "exclusiveHint")}</p>
     <p className="text-xs text-txt-dim">{t("dragHint")}</p>
+    {items.some((item) => item.fixedRowId) && <p className="text-sm text-txt-muted">{t("fixedItemsHint")}</p>}
     <TierListDragProvider document={doc} onAction={(action, active) => {
       act(action)
       // Exclusive moves replace the original occurrence. Keep keyboard focus
@@ -114,7 +115,7 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
                   const previewSlot = !!movement && (placement.id === movement.placeholderId || (placement.id === movingPlacementId && placements.includes(placement)))
                   const originalIndex = committed.findIndex((p) => p.id === placement.id)
                   return <Fragment key={placement.id}>
-                    {placement.id !== movement?.placeholderId && <TierListDraggableItem id={`placement-${placement.id}`} name={item.name} showGrip={view.rowControls} hidden={placement.id === movingPlacementId}
+                    {placement.id !== movement?.placeholderId && <TierListDraggableItem id={`placement-${placement.id}`} name={item.name} hidden={placement.id === movingPlacementId}
                       data={{ kind: "item", itemId: item.id, rowId: row.id, index: originalIndex, placementId: placement.id }} onSelect={() => setSelected(context)}>
                       {visual(context)}
                     </TierListDraggableItem>}
@@ -123,7 +124,9 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
                 })}
                 {!placements.length && view.rowControls && <span className="self-center py-5 text-xs text-txt-dim">{t("emptyRow")}</span>}
               </TierListDropZone>
-              {view.rowControls && <TierListRowActions row={row} index={rowIndex} rowCount={rows.length} itemCount={committed.length} settings={template.settings}
+              {view.rowControls && <TierListRowActions row={row} index={rowIndex} rowCount={rows.length}
+                itemCount={committed.filter((placement) => !itemMap.get(placement.itemId)?.fixedRowId).length}
+                hasFixedItems={committed.some((placement) => itemMap.get(placement.itemId)?.fixedRowId === row.id)} settings={template.settings}
                 onEdit={() => setEditingRow(row)} onAction={act} onConfirm={setConfirmAction} />}
             </div>
           </section>
@@ -145,7 +148,7 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
           {pool.map((item, index) => {
             const context = { item, rowId: null, index }
             return <Fragment key={item.id}>
-              <TierListDraggableItem id={`source-${item.id}`} name={item.name} showGrip={view.rowControls} hidden={returningItem?.id === item.id} data={{ kind: "item", itemId: item.id, rowId: null, index }} onSelect={() => setSelected(context)}>{visual(context)}</TierListDraggableItem>
+              <TierListDraggableItem id={`source-${item.id}`} name={item.name} hidden={returningItem?.id === item.id} data={{ kind: "item", itemId: item.id, rowId: null, index }} onSelect={() => setSelected(context)}>{visual(context)}</TierListDraggableItem>
               {returningItem?.id === item.id && movement && <TierListPlacementPreview target={movement.target} itemId={item.id}>{visual(context)}</TierListPlacementPreview>}
             </Fragment>
           })}

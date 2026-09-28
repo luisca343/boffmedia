@@ -14,7 +14,11 @@
     "presetEditor": "Editor de preajustes",
     "presetEditorHint": "Edita las filas, reglas, personajes y asignaciones iniciales del preajuste base. Al guardar, creas tu propia copia reutilizable en este dispositivo; el preajuste original sigue disponible.",
     "startingPlacements": "Asignaciones iniciales",
+<<<<<<< HEAD
     "startingPlacementsHint": "Coloca las tarjetas con las que debe comenzar cada lista nueva. Reiniciar lista restaura estas asignaciones; Vaciar todas las asignaciones deja el tablero vacío. Cambiar los valores iniciales del preajuste no sustituye la distribución de una lista existente.",
+=======
+    "startingPlacementsHint": "Coloca las tarjetas con las que debe comenzar cada lista nueva. Restablecer la lista recupera estas asignaciones; Vaciar las asignaciones conserva los elementos vinculados a una fila. Cambiar los valores iniciales del preajuste no sustituye la distribución de una lista existente.",
+>>>>>>> tierlist
     "startingReferenceHint": "Las asignaciones iniciales de esta colección se conservan. Cambia a elementos personalizados para editarlas en el tablero de vista previa.",
     "presetUpdated": "Este preajuste base se ha actualizado. Crea otra lista para usar sus filas y asignaciones iniciales actuales. Tu distribución guardada se conserva.",
     "templateDetails": "Datos de la plantilla",
@@ -73,6 +77,8 @@
     "public": "Pública",
     "exclusiveHint": "Al mover una tarjeta a otra fila se eliminan sus asignaciones anteriores.",
     "multiHint": "Una tarjeta puede estar en varias filas. Soltarla en otra fila la copia; devolverla a los elementos disponibles elimina solo esa asignación.",
+    "fixedItemsHint": "Los elementos vinculados a una fila permanecen en ella y no aparecen entre los elementos disponibles. Vaciar los conserva; Restablecer recupera sus asignaciones iniciales.",
+    "fixedItemHint": "Este personaje pertenece a {row}; permanece en esa ruta y no aparece entre los elementos disponibles.",
     "sourcePool": "Elementos disponibles",
     "sourceCount": "{count, plural, one {# elemento mostrado} other {# elementos mostrados}}",
     "count": "{count, plural, one {# elemento} other {# elementos}}",
@@ -159,7 +165,11 @@
       "standard": { "title": "Clásica S / A / B / C", "description": "Una clasificación exclusiva clásica. Crea una copia con tus propios elementos." },
       "planner": { "title": "Planificador de varias filas", "description": "Asigna el mismo elemento a varios grupos manteniendo disponible el grupo de origen.", "first": "Grupo 1", "second": "Grupo 2", "third": "Grupo 3" },
       "games": { "title": "Colección de juegos del sitio", "description": "Clasifica juegos del catálogo existente de Boffmedia a partir de sus entradas originales." },
+<<<<<<< HEAD
       "fortunesWeave": { "title": "Fire Emblem: Fortune’s Weave", "description": "Organiza los 50 personajes en las rutas de Cai, Dietrich, Theodora y Leda. Cada protagonista empieza en su propio grupo y un personaje puede estar en varias rutas. Usa retratos anteriores al salto temporal." }
+=======
+      "fortunesWeave": { "title": "Fire Emblem: Fortune’s Weave", "description": "Organiza los 50 personajes en las rutas de Cai, Dietrich, Theodora y Leda. Cada protagonista empieza en su propia ruta y permanece en ella; los protagonistas no aparecen entre los elementos disponibles. Los demás personajes pueden estar en varias rutas. Usa retratos anteriores al salto temporal." }
+>>>>>>> tierlist
     }
   }
 }

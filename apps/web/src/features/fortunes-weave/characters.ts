@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /** Shared identities and public artwork for the recruitment tracker and tier list. */
+=======
+/** Character collection and public artwork used by the Fortune's Weave tier-list preset. */
+>>>>>>> tierlist
 import { ASSET, staticAsset } from "@/lib/assets"
 
 export const FORTUNES_WEAVE_SOURCE_URL = "https://www.polygon.com/fire-emblem-fortunes-weave-recruitable-characters-all-support-level/"
@@ -210,8 +214,13 @@ const characters = [
 export const FORTUNES_WEAVE_CHARACTERS = characters.map((character) => ({
   ...character,
   image: staticAsset(ASSET.boffmedia.img, "games/fortunes-weave/portraits", `${character.id}${FORTUNES_WEAVE_ROUTES.some((id) => id === character.id) ? "-pre-timeskip" : ""}.webp`),
+<<<<<<< HEAD
 }))
 
 export const CHARACTER_PORTRAITS: Readonly<Record<string, string>> = Object.fromEntries(
   FORTUNES_WEAVE_CHARACTERS.map(({ id, image }) => [id, image]),
 )
+=======
+  ...(FORTUNES_WEAVE_ROUTES.some((id) => id === character.id) ? { fixedRowId: character.id } : {}),
+}))
+>>>>>>> tierlist

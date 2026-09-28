@@ -14,7 +14,7 @@
         "drag": "Drag presentation",
         "dragLead": "Shared visual controls in @boffmedia/ui. The host binds its drag sensors and decides placements; the controls contain no tier-list rules.",
         "dragSample": "Card, lifted preview, insertion slot and destination",
-        "dragNote": "Bind drag listeners to the whole DragCard button and use its click action for menus. DragPreview belongs in the host overlay; DragPlaceholder occupies the predicted destination and shifts neighboring cards before dropping. Forward its drop ref to keep hovering stable. DragTarget highlights the full destination. The boards below demonstrate the real interactions.",
+        "dragNote": "Bind drag listeners to the whole DragCard button and use its click action for menus. MediaCardContent shares square artwork and a centered, compact two-line caption across cards, overlays, insertion slots and editor previews. showLabel hides the caption. DragCard has no grip marker by default. DragPreview belongs in the host overlay; DragPlaceholder occupies the predicted destination and shifts neighboring cards before dropping. Forward its drop ref to keep hovering stable. DragTarget highlights the full destination. The boards below demonstrate the real interactions.",
         "cardLabel": "Example card",
         "idle": "Available card",
         "lifted": "Lifted preview",
@@ -23,10 +23,14 @@
         "exclusiveLead": "An embedded controlled TierList. Moving a card removes its previous placement. Edit the list heading, rename rows from their gear menu, or enable the optional centered count badges. Drag from the image or name, or tap to assign.",
         "multi": "Multi-placement board",
         "multiLead": "The same component with multi placement and a persistent source pool. Assign one card to several rows; clearing one leaves the others intact. This example has its own editable heading and presentation preferences.",
-        "boardNote": "Import TierList and TierListDisplayControls from @/features/tier-list. Supply template, instance, items and onChange; display preferences use shared Toggle controls and affect both the live presentation and PNG capture. Hiding editing controls removes the rail, grip markers and empty-row hints while cards remain draggable. Placement mode stays in the template. renderItem, renderRowHeader, sourceControls and summary customize presentation. Gear/up/down reuse IconButton and Menu iconOnly. All/Assigned filters include ranked cards. These examples keep independent state in memory without storage or API writes.",
+        "boardNote": "Import TierList and TierListDisplayControls from @/features/tier-list. Supply template, instance, items and onChange; display preferences use shared Toggle controls and affect both the live presentation and PNG capture. Hiding editing controls removes the rail and empty-row hints while cards remain draggable. Cards always omit grip markers. Placement mode stays in the template. renderItem, renderRowHeader, sourceControls and summary customize presentation. Gear/up/down reuse IconButton and Menu iconOnly. All/Assigned filters include ranked cards. These examples keep independent state in memory without storage or API writes.",
         "reset": "Reset example",
         "collection": "A real character collection",
+<<<<<<< HEAD
         "collectionNote": "The Fortune’s Weave preset reuses this board, editor and appearance controls with 50 shared characters across Cai, Dietrich, Theodora and Leda’s routes. Each lord starts in their own group; cards can join several routes. The tracker shares the pre-timeskip public portraits. Edit preset in the catalog creates a reusable copy. TierListStartingPlacementsEditor reuses the real board to edit defaults; Clear empties a list and Reset restores them.",
+=======
+        "collectionNote": "The Fortune’s Weave preset reuses this board, editor and appearance controls with 50 characters across Cai, Dietrich, Theodora and Leda’s routes. Each lord is locked to their own route and stays out of Available items; the other characters can join several routes. Portraits use the existing public asset structure, with pre-timeskip artwork for the lords. Edit preset in the catalog creates a reusable copy. TierListStartingPlacementsEditor reuses the real board to edit defaults; Clear leaves route leaders in place and Reset restores all starting assignments.",
+>>>>>>> tierlist
         "editor": "Template editor",
         "editorLead": "The reusable editor shares the same schema, ColorInput, Field, Panel and other library controls. Customize its rows, rules and items.",
         "editorNote": "TierListTemplateEditor accepts a template and an asynchronous onSave. Inject an imageStorage adapter to enable uploads. This example acknowledges save in memory and does not upload files or publish a list.",

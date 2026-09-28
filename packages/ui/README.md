@@ -38,8 +38,8 @@ These are presentation components, independent of any DnD library or tier-list r
 
 - `DragCard` is a whole-card native button. Forward the host's drag ref, listeners and ARIA
   attributes to it; `onClick` can open an action menu. Its `dragging` state leaves a faded origin
-  and `dropTarget` marks an insertion point. `showGrip={false}` hides the marker while preserving
-  whole-card activation, useful for clean presentation views. Children contain display content only.
+  and `dropTarget` marks an insertion point. The grip marker is off by default; `showGrip` can
+  opt into a decorative marker. Whole-card activation is independent of it. Children contain display content only.
 - `DragPreview` is the lifted, tilted, non-interactive overlay artwork. It respects reduced
   motion. The host positions it, owns its overlay lifecycle and chooses drop animation.
 - `DragPlaceholder` is an in-flow, faded artwork slot with an accent dashed border. Insert it
@@ -51,6 +51,19 @@ These are presentation components, independent of any DnD library or tier-list r
 
 `--drag-card-size` sizes the card, preview and placeholder together (default `5rem`). Set it on
 the host region so movement preserves geometry. Tier lists use `6rem` for more readable names.
+
+`MediaCardContent` supplies square artwork and a centered, compact 28px caption with up to
+two lines. Pass a translated `label` and host-rendered artwork as children; `showLabel={false}`
+removes the caption entirely. It has no image fetching, drag behavior or domain dependency.
+Reuse the same content in `DragCard`, `DragPreview`, `DragPlaceholder` and static editor
+previews so their geometry stays consistent. The caption exposes the full label through its
+native `title`; the enclosing interactive card still needs its translated accessible name.
+
+```tsx
+<DragCard aria-label={translatedAction} ref={dragRef} {...dragListeners}>
+  <MediaCardContent label={name}>{artwork}</MediaCardContent>
+</DragCard>
+```
 
 The tier-list DnD adapter demonstrates integration with existing dnd-kit mouse, touch and
 keyboard sensors. Its mouse threshold distinguishes a click from a drag; a delayed touch

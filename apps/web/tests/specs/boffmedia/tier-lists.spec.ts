@@ -19,7 +19,7 @@ async function drag(page: Page, item: string, sourceRow: string, targetRow: stri
   await source.scrollIntoViewIfNeeded()
   const card = await source.boundingBox()
   if (!card) throw new Error("Missing card")
-  // Start in the artwork or the name, deliberately away from the grip marker.
+  // Start in the artwork or the compact name caption; the whole card activates dragging.
   const startX = card.x + 20, startY = fromName ? card.y + card.height - 10 : card.y + 40
   await page.mouse.move(startX, startY)
   await page.mouse.down()
@@ -257,6 +257,8 @@ test("shared controls and embedded tier boards are documented in the component s
   await page.getByRole("button", { name: /^Tier Lists/ }).click()
   await expect(page.locator("#tier-exclusive [data-tier-list]")).toBeVisible()
   await expect(page.locator("#tier-multi [data-tier-list]")).toBeVisible()
+  await expect(page.locator("[data-drag-grip]")).toHaveCount(0)
+  await expect(page.locator("#tier-drag [data-media-card-caption]").first()).toHaveCSS("height", "28px")
   await page.locator("#tier-exclusive").getByRole("button", { name: "Assign Exploration", exact: true }).click()
   await page.getByRole("dialog").getByRole("radio", { name: "S", exact: true }).click()
   await expect(page.locator('#tier-exclusive [data-tier-row="s"]').getByRole("button", { name: "Assign Exploration", exact: true })).toBeVisible()
@@ -532,6 +534,12 @@ test("Fortune’s Weave starts four lord-led routes, copies characters and expor
   await expect(page.getByRole("heading", { name: "Fire Emblem: Fortune’s Weave", exact: true })).toBeVisible()
   const source = row(page, "source")
   await expect(source.getByRole("button", { name: /^Assign / })).toHaveCount(50)
+<<<<<<< HEAD
+=======
+  await expect(page.locator("[data-drag-grip]")).toHaveCount(0)
+  await expect(source.locator("[data-media-card-caption]").first()).toHaveCSS("height", "28px")
+  await source.getByRole("button", { name: "Assign Leda", exact: true }).screenshot({ path: testInfo.outputPath("compact-leda-card.png") })
+>>>>>>> tierlist
   const urls = await source.locator("img").evaluateAll((images) => images.map((image) => new URL((image as HTMLImageElement).src).searchParams.get("url") ?? (image as HTMLImageElement).src))
   expect(new Set(urls).size).toBe(50)
   for (const url of urls) {

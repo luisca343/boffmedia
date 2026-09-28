@@ -1,4 +1,9 @@
+<<<<<<< HEAD
 import { tierListSettingsSchema, type TierListDocument, type TierListTemplate } from "./core/schema"
+=======
+import { newTierListId } from "./core/engine"
+import { tierListSettingsSchema, type TierListDocument, type TierListItem, type TierListTemplate } from "./core/schema"
+>>>>>>> tierlist
 import { FORTUNES_WEAVE_CHARACTERS, FORTUNES_WEAVE_ROUTES } from "@/features/fortunes-weave/characters"
 
 // Illustrative demo artwork already served by this site; never copied into the engine.
@@ -32,6 +37,70 @@ export function withTierListStarterImages(doc: TierListDocument): TierListDocume
     return image && !item.image ? { ...item, image } : item
   })
   return { ...doc, items: decorate(doc.items), template: { ...doc.template, source: { ...doc.template.source, items: decorate(doc.template.source.items) } } }
+}
+
+/** Upgrade older saved boards when a system preset adds or changes fixed-row item rules. */
+export function withTierListPresetRules(doc: TierListDocument, preset: TierListTemplate | null): TierListDocument {
+  const isCurrentPreset = !!preset && doc.template.id === preset.id
+  const isPresetRemix = !!preset && doc.template.sourceTemplateId === preset.id
+  if (!preset || (!isCurrentPreset && !isPresetRemix) || preset.source.type === "reference" || doc.template.source.type === "reference") return doc
+  const policy = new Map(preset.source.items.map(({ id, fixedRowId }) => [id, fixedRowId]))
+  if (![...policy.values()].some(Boolean) && !doc.items.some((item) => item.fixedRowId)) return doc
+
+  const items: TierListItem[] = doc.items.map((item) => {
+    if (!policy.has(item.id)) return item
+    const fixedRowId = policy.get(item.id)
+    if (item.fixedRowId === fixedRowId) return item
+    const { fixedRowId: _previous, ...rest } = item
+    return fixedRowId ? { ...rest, fixedRowId } : rest
+  })
+  const rows = [...doc.template.rows]
+  for (const row of preset.rows) {
+    if (items.some((item) => item.fixedRowId === row.id) && !rows.some((existing) => existing.id === row.id)) rows.push(row)
+  }
+  const initialPlacements: Record<string, string[]> = {}
+  const seededItems = new Set<string>()
+  for (const [rowId, itemIds] of Object.entries(doc.template.initialPlacements ?? {})) {
+    initialPlacements[rowId] = itemIds.filter((itemId) => {
+      const fixedRowId = policy.get(itemId)
+      if (!fixedRowId) return true
+      if (fixedRowId !== rowId || seededItems.has(itemId)) return false
+      seededItems.add(itemId)
+      return true
+    })
+  }
+  for (const item of items) {
+    if (item.fixedRowId && !seededItems.has(item.id)) {
+      initialPlacements[item.fixedRowId] = [...(initialPlacements[item.fixedRowId] ?? []), item.id]
+    }
+  }
+  const source = { ...doc.template.source, items }
+  const template = { ...doc.template, rows, source, initialPlacements }
+  const rowById = new Map((doc.instance.rows ?? rows).map((row) => [row.id, row]))
+  for (const fixedRow of preset.rows) {
+    if (items.some((item) => item.fixedRowId === fixedRow.id) && !rowById.has(fixedRow.id)) rowById.set(fixedRow.id, fixedRow)
+  }
+  const nextRows = doc.instance.rows ? [...rowById.values()] : undefined
+  const placements: TierListDocument["instance"]["placements"] = {}
+  for (const row of rowById.values()) {
+    const seenFixed = new Set<string>()
+    placements[row.id] = (doc.instance.placements[row.id] ?? []).filter((placement) => {
+      const fixedRowId = items.find((item) => item.id === placement.itemId)?.fixedRowId
+      if (!fixedRowId) return true
+      if (fixedRowId !== row.id || seenFixed.has(placement.itemId)) return false
+      seenFixed.add(placement.itemId)
+      return true
+    })
+  }
+  for (const item of items) {
+    if (item.fixedRowId && !placements[item.fixedRowId]?.some((placement) => placement.itemId === item.id)) {
+      placements[item.fixedRowId].push({ id: newTierListId(), itemId: item.id })
+    }
+  }
+  const unchanged = JSON.stringify([doc.template, doc.items, doc.instance.rows, doc.instance.placements]) ===
+    JSON.stringify([template, items, nextRows, placements])
+  if (unchanged) return doc
+  return { ...doc, template, items, instance: { ...doc.instance, rows: nextRows, placements, updatedAt: new Date().toISOString() } }
 }
 
 type Translate = (key: string) => string

@@ -1,7 +1,12 @@
 # Fortune’s Weave portraits
 
+<<<<<<< HEAD
 `public/boffmedia/img/games/fortunes-weave/portraits/<character-id>.webp` contains the shared artwork for the recruitment tracker
 and `/tier-lists/fire-emblem-fortunes-weave`. Character IDs and URLs are defined once in
+=======
+`public/boffmedia/img/games/fortunes-weave/portraits/<character-id>.webp` contains the artwork
+for `/tier-lists/fire-emblem-fortunes-weave`. Character IDs and URLs are defined once in
+>>>>>>> tierlist
 `apps/web/src/features/fortunes-weave/characters.ts`, using the site's static asset helper.
 The real asset tree lives in root `public/`; `apps/web/public` is its junction.
 All of `public/` stays ignored, matching the existing asset workflow. Do not add ignore
@@ -26,5 +31,15 @@ selected later artwork. The old four lord files have been removed.
 | Theodora | [fefw2_0000_theodora.jpg](https://static0.polygonimages.com/wordpress/wp-content/uploads/2026/09/fefw2_0000_theodora.jpg?q=70&fit=crop&w=226&dpr=1) |
 
 Runtime pages and PNG export use these locally served assets, without hotlinking Polygon.
+<<<<<<< HEAD
 This collection matches the existing 50-character tracker roster; it does not add the guide's
 separate spoiler-only recruits.
+=======
+This collection contains the existing 50 characters and does not add the guide's separate
+spoiler-only recruits. The tier-list preset has no runtime or test dependency on the dedicated
+recruitment page. This feature is developed on the `tierlist` branch.
+Each route lord carries a generic `fixedRowId` in the preset item data. That binding requires one
+default placement in the named route, prevents moves or removals elsewhere in the core rules,
+and keeps the lord out of the available-item pool. Older saved system boards are upgraded when
+opened, retaining ordinary rankings while restoring each lord to their own route.
+>>>>>>> tierlist

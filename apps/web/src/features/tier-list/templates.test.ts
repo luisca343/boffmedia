@@ -2,8 +2,12 @@ import { describe, expect, it } from "vitest"
 import { createDocument } from "./core/engine"
 import { getTierListTemplates, withTierListStarterImages } from "./templates"
 import { parseTierListDocument } from "./serialization/document"
+<<<<<<< HEAD
 import { FORTUNES_WEAVE_CHARACTERS, CHARACTER_PORTRAITS } from "@/features/fortunes-weave/characters"
 import { CHARACTERS } from "@/app/(boffmedia)/(herramientas)/otros/fortunes-weave/data"
+=======
+import { FORTUNES_WEAVE_CHARACTERS } from "@/features/fortunes-weave/characters"
+>>>>>>> tierlist
 import { readFileSync } from "node:fs"
 import { resolve } from "node:path"
 
@@ -32,7 +36,11 @@ describe("starter artwork", () => {
   })
 })
 
+<<<<<<< HEAD
 it("shares the complete Fortune’s Weave roster and public artwork with the tracker", () => {
+=======
+it("uses the complete Fortune’s Weave collection with public portraits and four seeded routes", () => {
+>>>>>>> tierlist
   const template = getTierListTemplates((key) => key).find((template) => template.slug === "fire-emblem-fortunes-weave")!
   if (template.source.type === "reference") throw new Error("Expected character collection")
   expect(template.settings).toMatchObject({ placementMode: "multi", keepSourceVisible: true })
@@ -40,16 +48,24 @@ it("shares the complete Fortune’s Weave roster and public artwork with the tra
   expect(template.source.items).toEqual(FORTUNES_WEAVE_CHARACTERS)
   expect(FORTUNES_WEAVE_CHARACTERS).toHaveLength(50)
   expect(new Set(FORTUNES_WEAVE_CHARACTERS.map(({ id }) => id)).size).toBe(50)
+<<<<<<< HEAD
   expect(CHARACTERS.map(({ id, name }) => ({ id, name }))).toEqual(FORTUNES_WEAVE_CHARACTERS.map(({ id, name }) => ({ id, name })))
   for (const { id, image } of FORTUNES_WEAVE_CHARACTERS) {
     expect(CHARACTER_PORTRAITS[id]).toBe(image)
+=======
+  for (const { image } of FORTUNES_WEAVE_CHARACTERS) {
+>>>>>>> tierlist
     const asset = readFileSync(resolve(process.cwd(), "../../public", new URL(image, "http://localhost").pathname.slice(1)))
     expect(asset.toString("ascii", 0, 4)).toBe("RIFF")
     expect(asset.toString("ascii", 8, 12)).toBe("WEBP")
   }
   for (const id of ["cai", "dietrich", "theodora", "leda"] as const) {
+<<<<<<< HEAD
     expect(CHARACTERS.find((character) => character.id === id)?.routes[id].initiallyRecruited).toBe(true)
     expect(CHARACTER_PORTRAITS[id]).toContain(`${id}-pre-timeskip.webp`)
+=======
+    expect(FORTUNES_WEAVE_CHARACTERS.find((character) => character.id === id)?.image).toContain(`${id}-pre-timeskip.webp`)
+>>>>>>> tierlist
   }
   const doc = createDocument(template, template.source.items, "default")
   expect(parseTierListDocument(JSON.stringify(doc))).toEqual(doc)
