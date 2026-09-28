@@ -1,5 +1,8 @@
 # Tier lists
 
+The [UI and UX audit](./UI-UX-AUDIT.md) records the interaction fixes, reusable controls and
+verification scope for the September 2026 improvement pass.
+
 The reusable web feature lives in `apps/web/src/features/tier-list/`. It is used by the catalog,
 standalone board and template editor at `/tier-lists`, `/tier-lists/[slug]` and
 `/tier-lists/[slug]/edit`, and can be embedded without those routes. It uses the Boffmedia v3

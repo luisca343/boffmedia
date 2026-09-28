@@ -8,6 +8,7 @@ import messages from "../../../../locales/en/tier-lists.json"
 import { TierList } from "./TierList"
 import { fixture } from "../testing/fixtures"
 import type { TierListDocument } from "../core/schema"
+import { createDocument } from "../core/engine"
 
 configureUi({ useTranslate: () => (key: string) => key })
 afterEach(cleanup)
@@ -26,6 +27,41 @@ function mount(initial: TierListDocument, custom = false) {
 const row = (id: string) => document.querySelector(`[data-tier-row="${id}"]`) as HTMLElement
 
 describe("embedded accessible board", () => {
+  it("shows locked cards without drag instructions while other cards can join several rows", () => {
+    const base = fixture("multi", { keepSourceVisible: true })
+    const items = base.items.map((item) => item.id === "one" ? { ...item, fixedRowId: "s" } : item)
+    mount(createDocument({ ...base.template, source: { type: "static", items }, initialPlacements: { s: ["one"] } }, items))
+    const locked = within(row("s")).getByRole("button", { name: "Assign One" })
+    expect(locked.getAttribute("aria-roledescription")).toBeNull()
+    expect(locked.title).toBe("Locked to S")
+    expect(within(row("source")).queryByRole("button", { name: "Assign One" })).toBeNull()
+    fireEvent.click(locked)
+    expect((screen.getByRole("checkbox", { name: "S" }) as HTMLInputElement).disabled).toBe(true)
+    expect(screen.queryByRole("checkbox", { name: "A" })).toBeNull()
+    expect(screen.queryByRole("button", { name: "Remove from all rows" })).toBeNull()
+    fireEvent.click(screen.getByRole("button", { name: "Done" }))
+    fireEvent.click(screen.getByRole("button", { name: "Assign Two" }))
+    fireEvent.click(screen.getByRole("checkbox", { name: "S" }))
+    fireEvent.click(screen.getByRole("checkbox", { name: "A" }))
+    expect(screen.getByText("Assigned to: S, A")).toBeTruthy()
+    fireEvent.click(screen.getByRole("button", { name: "Done" }))
+    expect(within(row("s")).getByRole("button", { name: "Assign Two" })).toBeTruthy()
+    expect(within(row("a")).getByRole("button", { name: "Assign Two" })).toBeTruthy()
+    expect(screen.getByText("1 of 2 assigned")).toBeTruthy()
+  })
+
+  it("recovers from completed and filtered-empty collections", () => {
+    const base = fixture()
+    mount(createDocument({ ...base.template, initialPlacements: { s: ["one", "two", "three"] } }, base.items))
+    expect(screen.getByText(/All items are assigned/)).toBeTruthy()
+    fireEvent.click(screen.getByRole("button", { name: "Show all items" }))
+    expect(within(row("source")).getAllByRole("button", { name: /^Assign / })).toHaveLength(3)
+    fireEvent.change(screen.getByPlaceholderText("Search items…"), { target: { value: "missing" } })
+    expect(screen.getByText("No matching items.")).toBeTruthy()
+    fireEvent.click(screen.getByRole("button", { name: "Show all items" }))
+    expect((screen.getByPlaceholderText("Search items…") as HTMLInputElement).value).toBe("")
+    expect(within(row("source")).getAllByRole("button", { name: /^Assign / })).toHaveLength(3)
+  })
   it("assigns, moves and reorders by click with no drag dependency", () => {
     mount(fixture())
     fireEvent.click(screen.getByRole("button", { name: "Assign One" }))

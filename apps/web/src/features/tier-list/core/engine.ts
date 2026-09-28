@@ -59,7 +59,9 @@ export function applyTierListAction(doc: TierListDocument, action: TierListActio
       const item = items.find((i) => i.id === action.itemId)
       if (!hasRow(action.rowId) || !item || (item.fixedRowId && action.rowId !== item.fixedRowId)) return doc
       const target = placements[action.rowId] ?? []
-      if ((!settings.allowDuplicateWithinRow || item.fixedRowId) && Object.values(placements).some((row) => row.some((p) => p.itemId === action.itemId))) return doc
+      // Duplicates are scoped to the destination, not the entire board. An
+      // exclusive assignment moves existing placements; multi assignments copy.
+      if ((!settings.allowDuplicateWithinRow || item.fixedRowId) && target.some((p) => p.itemId === action.itemId)) return doc
       const occurrenceId = action.placementId ?? newTierListId()
       if (Object.values(placements).some((row) => row.some((p) => p.id === occurrenceId))) return doc
       if (settings.placementMode === "exclusive") {
@@ -104,6 +106,7 @@ export function applyTierListAction(doc: TierListDocument, action: TierListActio
       for (const rowId of Object.keys(placements)) {
         if (action.type === "clear") {
           placements[rowId] = placements[rowId].filter((placement) => items.some((item) => item.id === placement.itemId && item.fixedRowId === rowId))
+          if (!placements[rowId].length) delete placements[rowId]
         } else delete placements[rowId]
       }
       if (action.type === "reset") {

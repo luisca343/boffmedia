@@ -1,7 +1,7 @@
 "use client"
 
 import { Fragment, useCallback, useMemo, useRef, useState, type CSSProperties, type ReactNode, type Ref } from "react"
-import { Button, ConfirmDialog, SearchInput, Select } from "@boffmedia/ui"
+import { Button, ConfirmDialog } from "@boffmedia/ui"
 import { useTranslations } from "next-intl"
 import { applyTierListAction, assignedItemIds, getRows, getTierListTitle, newTierListId, type TierListAction } from "../core/engine"
 import { LIMITS, type TierListDocument, type TierListInstance, type TierListItem, type TierListRow, type TierListTemplate } from "../core/schema"
@@ -15,6 +15,8 @@ import { TierListItemVisual } from "./TierListItemVisual"
 import { TierListRowEditor } from "./TierListRowEditor"
 import { TierListRowActions } from "./TierListRowActions"
 import { TierListRowHeader } from "./TierListRowHeader"
+import { TierListInstructions } from "./TierListInstructions"
+import { TierListSourcePanel } from "./TierListSourcePanel"
 import { defaultTierListDisplay, type TierListDisplayOptions } from "../display"
 
 export interface TierListProps {
@@ -52,12 +54,13 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
   const rows = getRows(template, instance)
   const itemMap = useMemo(() => new Map(items.map((i) => [i.id, i])), [items])
   const assigned = useMemo(() => assignedItemIds(instance), [instance])
+  const available = useMemo(() => items.filter((item) => !item.fixedRowId && (!filterItem || filterItem(item))), [items, filterItem])
   // Filter the full collection. The source-visibility rule chooses the default
   // view, while explicit All/Assigned must still recover already ranked items.
-  const pool = useMemo(() => items.filter((i) =>
-    !i.fixedRowId && i.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()) &&
-    (filter === "all" || (filter === "assigned" ? assigned.has(i.id) : !assigned.has(i.id))) && (!filterItem || filterItem(i)),
-  ), [items, search, filter, assigned, filterItem])
+  const pool = useMemo(() => available.filter((i) =>
+    i.name.toLocaleLowerCase().includes(search.trim().toLocaleLowerCase()) &&
+    (filter === "all" || (filter === "assigned" ? assigned.has(i.id) : !assigned.has(i.id))),
+  ), [available, search, filter, assigned])
   const act = useCallback((action: TierListAction) => {
     const next = applyTierListAction(doc, action)
     if (next !== doc) onChange(next.instance, action)
@@ -66,19 +69,22 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
   const displayed = movement?.instance ?? instance
   const movingPlacementId = movement && (movement.action.type !== "assign" || template.settings.placementMode === "exclusive") ? movement.active.placementId : undefined
   const returningItem = movement?.target.rowId === null ? itemMap.get(movement.active.itemId) : undefined
-  const closeAssignment = () => {
+  const closeAssignment = (targetRowId?: string | null) => {
     const itemId = selected?.item.id
     setSelected(null)
     // An exclusive move may unmount the button that opened the dialog.
     requestAnimationFrame(() => {
       const buttons = boardRef.current?.querySelectorAll<HTMLButtonElement>("button[data-tier-item-id]")
-      if (buttons) Array.from(buttons).find((button) => button.dataset.tierItemId === itemId)?.focus()
+      const matches = buttons && Array.from(buttons).filter((button) => button.dataset.tierItemId === itemId)
+      const target = targetRowId === null ? "source" : targetRowId ?? selected?.rowId ?? "source"
+      const button = matches?.find((button) => button.closest<HTMLElement>("[data-tier-row]")?.dataset.tierRow === target) ?? matches?.[0]
+      // Returning to a filtered pool may hide every occurrence; retain a useful focus target.
+      if (button) button.focus({ preventScroll: true })
+      else boardRef.current?.querySelector<HTMLInputElement>("input")?.focus({ preventScroll: true })
     })
   }
   return <div ref={boardRef} className="grid min-w-0 gap-5" style={{ "--drag-card-size": "6rem" } as CSSProperties} data-tier-list>
-    <p className="text-sm text-txt-muted">{t(template.settings.placementMode === "multi" ? "multiHint" : "exclusiveHint")}</p>
-    <p className="text-xs text-txt-dim">{t("dragHint")}</p>
-    {items.some((item) => item.fixedRowId) && <p className="text-sm text-txt-muted">{t("fixedItemsHint")}</p>}
+    <TierListInstructions mode={template.settings.placementMode} hasFixedItems={items.some((item) => !!item.fixedRowId)} />
     <TierListDragProvider document={doc} onAction={(action, active) => {
       act(action)
       // Exclusive moves replace the original occurrence. Keep keyboard focus
@@ -115,7 +121,7 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
                   const previewSlot = !!movement && (placement.id === movement.placeholderId || (placement.id === movingPlacementId && placements.includes(placement)))
                   const originalIndex = committed.findIndex((p) => p.id === placement.id)
                   return <Fragment key={placement.id}>
-                    {placement.id !== movement?.placeholderId && <TierListDraggableItem id={`placement-${placement.id}`} name={item.name} hidden={placement.id === movingPlacementId}
+                    {placement.id !== movement?.placeholderId && <TierListDraggableItem id={`placement-${placement.id}`} name={item.name} hidden={placement.id === movingPlacementId} lockedTo={item.fixedRowId ? row.label : undefined}
                       data={{ kind: "item", itemId: item.id, rowId: row.id, index: originalIndex, placementId: placement.id }} onSelect={() => setSelected(context)}>
                       {visual(context)}
                     </TierListDraggableItem>}
@@ -133,33 +139,24 @@ export function TierList({ template, instance, items, onChange, renderItem, rend
         })}
         </div>
       </div>
-      {template.settings.allowRowCreation && <div className="mt-3"><Button size="sm" disabled={rows.length >= LIMITS.rows} onClick={() => act({ type: "addRow", row: { id: newTierListId(), label: t("newRow"), color: "#808080" } })}>{t("addRow")}</Button></div>}
-      <section className="mt-5 border border-line bg-panel" aria-label={t("sourcePool")}>
-        <div className="flex flex-wrap items-center gap-3 border-b border-line p-3">
-          <h2 className="font-display text-lg">{t("sourcePool")}</h2>
-          <span className="text-sm text-txt-muted">{t("sourceCount", { count: pool.length })}</span>
-          <SearchInput value={search} onChange={setSearch} placeholder={t("search")} className="min-w-0 basis-full sm:basis-auto sm:flex-1" />
-          <Select className="w-auto min-w-36" ariaLabel={t("filter")} value={filter} onChange={setFilter} options={[
-            { value: "all", label: t("all") }, { value: "assigned", label: t("assigned") }, { value: "unassigned", label: t("unassigned") },
-          ]} />
-          {sourceControls}
-        </div>
+      {view.rowControls && template.settings.allowRowCreation && <div><Button type="button" size="sm" disabled={rows.length >= LIMITS.rows} onClick={() => act({ type: "addRow", row: { id: newTierListId(), label: t("newRow"), color: "#808080" } })}>{t("addRow")}</Button></div>}
+      <TierListSourcePanel search={search} onSearch={setSearch} filter={filter} onFilter={setFilter}
+        shown={pool.length} total={available.length} assigned={available.filter((item) => assigned.has(item.id)).length} controls={sourceControls}>
         <TierListDropZone rowId={null} ids={pool.map((i) => `source-${i.id}`)} label={t("sourcePool")}>
           {pool.map((item, index) => {
             const context = { item, rowId: null, index }
             return <Fragment key={item.id}>
-              <TierListDraggableItem id={`source-${item.id}`} name={item.name} hidden={returningItem?.id === item.id} data={{ kind: "item", itemId: item.id, rowId: null, index }} onSelect={() => setSelected(context)}>{visual(context)}</TierListDraggableItem>
+              <TierListDraggableItem id={`source-${item.id}`} name={item.name} assigned={assigned.has(item.id)} hidden={returningItem?.id === item.id} data={{ kind: "item", itemId: item.id, rowId: null, index }} onSelect={() => setSelected(context)}>{visual(context)}</TierListDraggableItem>
               {returningItem?.id === item.id && movement && <TierListPlacementPreview target={movement.target} itemId={item.id}>{visual(context)}</TierListPlacementPreview>}
             </Fragment>
           })}
           {returningItem && movement && !pool.some((item) => item.id === returningItem.id) && <TierListPlacementPreview target={movement.target} itemId={returningItem.id}>{visual({ item: returningItem, rowId: null, index: pool.length })}</TierListPlacementPreview>}
-          {!pool.length && !returningItem && <p className="p-3 text-sm text-txt-dim">{t(search || filter !== "all" ? "noResults" : "emptyPool")}</p>}
         </TierListDropZone>
-      </section>
+      </TierListSourcePanel>
     </TierListDragProvider>
     {summary?.(doc)}
     <TierListAssignmentMenu context={selected} document={doc} onAction={act} onClose={closeAssignment} actions={itemActions} />
     {editingRow && <TierListRowEditor key={editingRow.id} row={editingRow} onClose={() => setEditingRow(null)} onSave={(row) => act({ type: "editRow", rowId: row.id, patch: { label: row.label, color: row.color, description: row.description, icon: row.icon } })} />}
-    <ConfirmDialog open={!!confirmAction} title={t("confirmTitle")} body={t("confirmBody")} onClose={() => setConfirmAction(null)} onConfirm={() => { if (confirmAction) act(confirmAction); setConfirmAction(null) }} />
+    <ConfirmDialog open={!!confirmAction} title={t(confirmAction?.type === "deleteRow" ? "deleteRow" : "clearRow")} body={t(confirmAction?.type === "deleteRow" ? "deleteRowBody" : "clearRowBody")} onClose={() => setConfirmAction(null)} onConfirm={() => { if (confirmAction) act(confirmAction); setConfirmAction(null) }} />
   </div>
 }

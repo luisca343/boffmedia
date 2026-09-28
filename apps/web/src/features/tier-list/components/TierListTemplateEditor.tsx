@@ -5,8 +5,8 @@ import { Button, Checkbox, ColorInput, ConfirmDialog, Field, Input, Panel, Selec
 import { useTranslations } from "next-intl"
 import { newTierListId } from "../core/engine"
 import { LIMITS, tierListTemplateSchema, type TierListItem, type TierListSettings, type TierListTemplate, type TierListVisibility } from "../core/schema"
-import { TIER_LIST_IMAGE_TYPES, uploadTierListImage, type TierListImageStorageAdapter } from "../adapters/images"
-import { TierListItemVisual } from "./TierListItemVisual"
+import { uploadTierListImage, type TierListImageStorageAdapter } from "../adapters/images"
+import { TierListTemplateItemEditor } from "./TierListTemplateItemEditor"
 import { TierListStartingPlacementsEditor } from "./TierListStartingPlacementsEditor"
 
 const PERMISSIONS = ["allowDuplicateWithinRow", "allowRowEditing", "allowRowReordering", "allowRowCreation", "allowRowDeletion", "allowItemReordering"] as const
@@ -94,24 +94,13 @@ export function TierListTemplateEditor({ template, onSave, imageStorage, sources
         }} />
         {customItems ? <>
           <p className="text-sm text-txt-muted">{t(imageStorage ? "uploadPrivacy" : "uploadSignIn")}</p>
-          {customItems.map((item) => <div key={item.id} className="flex min-w-0 flex-wrap gap-3 border-b border-line pb-4">
-            <div className="w-20 shrink-0"><TierListItemVisual item={item} /></div>
-            <div className="grid min-w-0 flex-1 gap-3 sm:grid-cols-2">
-              <Field label={t("itemName")}><Input required maxLength={200} value={item.name} onChange={(e) => patchItem(item.id, { name: e.target.value })} /></Field>
-              <Field label={t("imageUrl")}><Input maxLength={2048} value={item.image ?? ""} onChange={(e) => patchItem(item.id, { image: e.target.value || undefined })} /></Field>
-              <Field label={t("description")}><Input maxLength={2000} value={item.description ?? ""} onChange={(e) => patchItem(item.id, { description: e.target.value })} /></Field>
-              <div className="flex flex-wrap items-end gap-2">
-                {imageStorage && <Field label={t("uploadImage")}><Input type="file" accept={TIER_LIST_IMAGE_TYPES.join(",")} onChange={async (e) => {
-                  const file = e.target.files?.[0]
-                  e.target.value = ""
-                  if (!file) return
-                  setUploading(item.id); setError(false)
-                  try { patchItem(item.id, { image: await uploadTierListImage(file, imageStorage) }) } catch { setError(true) } finally { setUploading(null) }
-                }} /></Field>}
-                <Button type="button" size="sm" aria-label={t("deleteItem", { name: item.name })} onClick={() => setPending(() => () => setItems(customItems.filter((i) => i.id !== item.id)))}>{t("remove")}</Button>
-              </div>
-            </div>
-          </div>)}
+          <p className="text-xs text-txt-muted">{t("itemEditorHint")}</p>
+          {customItems.map((item) => <TierListTemplateItemEditor key={item.id} item={item} onPatch={(patch) => patchItem(item.id, patch)}
+            onRemove={() => setPending(() => () => setItems(customItems.filter((i) => i.id !== item.id)))}
+            onUpload={imageStorage ? async (file) => {
+              setUploading(item.id); setError(false)
+              try { patchItem(item.id, { image: await uploadTierListImage(file, imageStorage) }) } catch { setError(true) } finally { setUploading(null) }
+            } : undefined} />)}
           <Button type="button" disabled={customItems.length >= LIMITS.items} onClick={() => setItems([...customItems, { id: newTierListId(), name: t("newItem") }])}>{t("addItem")}</Button>
         </> : <p className="text-sm text-txt-muted">{t("referenceHint")}</p>}
       </Panel>

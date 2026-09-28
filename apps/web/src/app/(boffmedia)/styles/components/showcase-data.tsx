@@ -195,7 +195,9 @@ export const CHAPTERS: Chapter[] = [
     dom: "Herramientas",
     sections: [
       { id: "tier-drag", label: "DragCard / DragTarget", labelKey: "tierLists.drag" },
+      { id: "tier-controls", label: "TierListSourcePanel / TierListInstructions", labelKey: "tierLists.controls" },
       { id: "tier-exclusive", label: "TierList: exclusive", labelKey: "tierLists.exclusive" },
+      { id: "tier-locked", label: "TierList: locked items", labelKey: "tierLists.lockedBoard" },
       { id: "tier-multi", label: "TierList: multi", labelKey: "tierLists.multi" },
       { id: "tier-editor", label: "TierListTemplateEditor", labelKey: "tierLists.editor" },
     ],

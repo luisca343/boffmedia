@@ -43,10 +43,11 @@ function LoadedWorkspace({ initial, adapter, preset }: { initial: TierListDocume
   return <div className="grid gap-6">
     <header className="grid gap-3">
       {!display.title && <h1 className="sr-only">{title}</h1>}
-      <p className="font-mono text-xs uppercase tracking-wider text-accent">{t("localOnly")}</p>
       <div className="flex flex-wrap items-center gap-2">
+        <Button size="sm" variant="ghost" href="/tier-lists">{t("back")}</Button>
         <span role="status" className={state.status === "error" ? "text-sm text-bad" : "text-sm text-txt-muted"}>{t(`status.${state.status}`)}</span>
         {state.status === "error" && <Button size="sm" onClick={state.retrySave}>{t("retry")}</Button>}
+        <span className="hidden flex-1 sm:block" />
         <Button size="sm" href={tierListHref(doc, true)}>{t(doc.template.ownership?.type === "system" ? "remix" : "editTemplate")}</Button>
         <Button size="sm" disabled={creating} onClick={async () => {
           setCreating(true); setCreateError(false)
@@ -59,7 +60,6 @@ function LoadedWorkspace({ initial, adapter, preset }: { initial: TierListDocume
             router.push(tierListHref(next))
           } catch { setCreateError(true) } finally { setCreating(false) }
         }}>{t("newInstance")}</Button>
-        <Button size="sm" href="/tier-lists">{t("back")}</Button>
       </div>
       {createError && <p role="alert" className="text-sm text-bad">{t("newInstanceError")}</p>}
       {presetChanged && <p className="text-sm text-txt-muted">{t("presetUpdated")}</p>}
@@ -72,7 +72,7 @@ function LoadedWorkspace({ initial, adapter, preset }: { initial: TierListDocume
       await adapter.save(next)
       router.push(tierListHref(next))
     }} />
-    <TierListDisplayControls value={display} onChange={setDisplay} />
+    <TierListDisplayControls value={display} onChange={setDisplay} collapsible />
     <TierList template={doc.template} instance={doc.instance} items={doc.items} onChange={onChange}
       display={display} presentationRef={presentationRef} heading={(display.title || (display.descriptions && description)) && <TierListHeading title={title} description={description} display={display} />} />
     {editingHeading && <TierListHeadingEditor title={title} description={description} onClose={() => setEditingHeading(false)}
