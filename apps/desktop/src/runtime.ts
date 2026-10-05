@@ -2734,6 +2734,11 @@ export async function toolApiRequest<T = unknown>(request: {
   return await invoke<T>("tool_api_request", { request });
 }
 
+/** Upload one image through Rust so the desktop JWT stays out of the webview. */
+export async function toolApiUploadTierImage(bytes: Uint8Array, filename: string): Promise<{ data?: { url?: string } }> {
+  return await invoke("tool_api_upload_tier_image", { bytes: Array.from(bytes), filename });
+}
+
 /** Where the API lives, for the `apiUrl` capability — the ABSOLUTE base a
  *  download link is built on. Cached because a url builder cannot await, and
  *  asked of Rust because only Rust reads the runtime `BOFF_API_URL`: anything

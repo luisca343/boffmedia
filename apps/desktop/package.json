@@ -28,6 +28,7 @@
     "@boffmedia/tools-mhwilds": "workspace:*",
     "@boffmedia/tools-minecraft": "workspace:*",
     "@boffmedia/tools-misc": "workspace:*",
+    "@boffmedia/tools-tier-list": "workspace:*",
     "@boffmedia/tools-pokemon": "workspace:*",
     "@boffmedia/ui": "workspace:*",
     "@sentry/browser": "^10.73.0",

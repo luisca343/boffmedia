@@ -14,6 +14,7 @@ import { mhwildsTools } from "@boffmedia/tools-mhwilds/tools"
 import { pokemonTools } from "@boffmedia/tools-pokemon/tools"
 import { mewgenicsTools } from "@boffmedia/tools-mewgenics/tools"
 import { miscTools } from "@boffmedia/tools-misc/tools"
+import { tierListTools } from "@boffmedia/tools-tier-list/tools"
 import { battlesimToolsFor } from "@boffmedia/tools-battlesim/tools"
 import {
   configureToolHost,
@@ -50,6 +51,7 @@ import {
   saveStream,
   saveDialog,
   toolApiRequest,
+  toolApiUploadTierImage,
   toolApiStream,
   toolApiBaseUrl,
   loadToolApiBaseUrl,
@@ -344,9 +346,9 @@ const desktopNetwork: ToolNetwork = {
  * The desktop `data`: SQLite in Rust (`src-tauri/src/tool_db.rs`).
  *
  * Documents cross as JSON text, so this side is only encode/decode. A row whose
- * text will not parse is treated as absent rather than thrown: the store is a
- * cache of the player's own work, and one corrupt row must not take down the
- * screen that reads the other four hundred.
+ * text will not parse is treated as absent for cache-backed tools. Tier-list
+ * documents preserve a schema-invalid marker so their editor can report a
+ * corrupt save and require confirmation before replacing it.
  */
 function desktopDb(namespace: string): ToolDb {
   const decode = <T>(text: string | null): T | null => {
@@ -354,6 +356,10 @@ function desktopDb(namespace: string): ToolDb {
     try {
       return JSON.parse(text) as T
     } catch {
+      // Tier lists are user documents, not disposable cache rows. Preserve a
+      // malformed value as a schema-invalid marker so their adapter can show
+      // recovery instead of treating it as missing and overwriting it.
+      if (namespace === "tier-lists") return { __corruptTierListJson: true } as T
       return null
     }
   }
@@ -508,6 +514,12 @@ configureToolHost({
   // an anonymous direct fetch — enough for the public tool endpoints, which is
   // what `dev:renderer` needs to stay useful.
   api: isDesktop() ? desktopApi : createWebApi(webModeApiBase()),
+  uploadImage: async (file) => {
+    if (!isDesktop()) throw new Error("Image uploads need the desktop runtime")
+    const response = await toolApiUploadTierImage(new Uint8Array(await file.arrayBuffer()), file.name)
+    if (!response.data?.url) throw new Error("Image upload failed")
+    return response.data.url
+  },
   assetUrl: desktopAssetUrl,
   siteUrl: desktopSiteUrl,
   // Not `desktopAssetUrl` and not `desktopSiteUrl`: a download link must point
@@ -536,6 +548,7 @@ registerTools([
   ...pokemonTools,
   ...mewgenicsTools,
   ...miscTools,
+  ...tierListTools,
   // D5: showdownProxy false — the PS relay is a website-only arrangement,
   // and this makes its screens unreachable here rather than merely unlisted.
   ...battlesimToolsFor({ showdownProxy: false }),

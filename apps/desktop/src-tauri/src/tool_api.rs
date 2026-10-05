@@ -15,6 +15,31 @@ use std::collections::HashMap;
 
 use crate::api::{base_url, error_message, response_error, ApiError, ApiState, CONTROL_TIMEOUT};
 
+/// Authenticated upload for tier-list artwork. The server still sniffs image
+/// bytes, checks size/dimensions and records ownership.
+#[tauri::command]
+pub async fn tool_api_upload_tier_image(
+    api: tauri::State<'_, ApiState>,
+    bytes: Vec<u8>,
+    filename: String,
+) -> Result<serde_json::Value, ApiError> {
+    if bytes.is_empty() || bytes.len() > 5 * 1024 * 1024 {
+        return Err(ApiError::Message("Image must be no larger than 5 MB".into()));
+    }
+    let response = crate::api::authed_post_image_in_directory(
+        &api,
+        "/upload/image",
+        bytes,
+        &filename,
+        "tier-lists",
+    )
+    .await?;
+    if !response.status().is_success() {
+        return Err(response_error(response, "Image upload failed").await);
+    }
+    Ok(response.json().await?)
+}
+
 /// Whether the call needs the player's session. Mirrors `ToolApiAuth` in
 /// `@boffmedia/tool-kit`.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Deserialize)]

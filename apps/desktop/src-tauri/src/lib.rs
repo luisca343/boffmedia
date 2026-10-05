@@ -236,6 +236,7 @@ pub fn run() {
             dialogs::save_stream_finish,
             dialogs::save_stream_abort,
             tool_api::tool_api_request,
+            tool_api::tool_api_upload_tier_image,
             tool_api::tool_api_stream,
             tool_api::tool_api_base_url,
             emulators::emulator_status,

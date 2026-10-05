@@ -28,6 +28,7 @@
     "@boffmedia/tools-mhwilds": "workspace:*",
     "@boffmedia/tools-minecraft": "workspace:*",
     "@boffmedia/tools-misc": "workspace:*",
+    "@boffmedia/tools-tier-list": "workspace:*",
     "@boffmedia/tools-pokemon": "workspace:*",
     "@boffmedia/ui": "workspace:*",
     "@ckeditor/ckeditor5-react": "^9.4.0",
