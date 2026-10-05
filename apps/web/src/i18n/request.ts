@@ -5,6 +5,7 @@ import { messages as toolsMhwildsMessages } from '@boffmedia/tools-mhwilds/catal
 import { messages as toolsPokemonMessages } from '@boffmedia/tools-pokemon/catalog';
 import { messages as toolsMewgenicsMessages } from '@boffmedia/tools-mewgenics/catalog';
 import { messages as toolsMiscMessages } from '@boffmedia/tools-misc/catalog';
+import { messages as tierListMessages } from '@boffmedia/tools-tier-list/catalog';
 import { messages as toolsBattlesimMessages } from '@boffmedia/tools-battlesim/catalog';
 import { messages as uiMessages } from '@boffmedia/ui/messages';
 import { ALL_NAMESPACES } from './manifest.generated';
@@ -151,7 +152,8 @@ export default getRequestConfig(async () => {
     const withPokemon = deepMerge(withMhwilds, toolsPokemonMessages[loc] as DeepMergeable);
     const withMewgenics = deepMerge(withPokemon, toolsMewgenicsMessages[loc] as DeepMergeable);
     const withMisc = deepMerge(withMewgenics, toolsMiscMessages[loc] as DeepMergeable);
-    const withBattlesim = deepMerge(withMisc, toolsBattlesimMessages[loc] as DeepMergeable);
+    const withTierLists = deepMerge(withMisc, tierListMessages[loc] as DeepMergeable);
+    const withBattlesim = deepMerge(withTierLists, toolsBattlesimMessages[loc] as DeepMergeable);
     // `@boffmedia/ui` owns strings too, on the same rule: the giveaways kit
     // renders them and lives there, so it carries them rather than each host
     // keeping its own copy.

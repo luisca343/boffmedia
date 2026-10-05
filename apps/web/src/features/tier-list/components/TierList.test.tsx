@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { createElement, useState } from "react"
-import { NextIntlClientProvider } from "next-intl"
+import { NextIntlClientProvider, useTranslations } from "next-intl"
 import { afterEach, describe, expect, it } from "vitest"
 import { cleanup, fireEvent, render, screen, within } from "@testing-library/react"
 import { configureUi } from "@boffmedia/ui"
@@ -10,7 +10,7 @@ import { fixture } from "../testing/fixtures"
 import type { TierListDocument } from "../core/schema"
 import { createDocument } from "../core/engine"
 
-configureUi({ useTranslate: () => (key: string) => key })
+configureUi({ useTranslate: () => (key: string) => key, useTranslateRoot: () => useTranslations() })
 afterEach(cleanup)
 function mount(initial: TierListDocument, custom = false) {
   function Host() {

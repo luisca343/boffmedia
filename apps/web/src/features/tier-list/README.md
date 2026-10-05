@@ -3,11 +3,14 @@
 The [UI and UX audit](./UI-UX-AUDIT.md) records the interaction fixes, reusable controls and
 verification scope for the September 2026 improvement pass.
 
-The reusable web feature lives in `apps/web/src/features/tier-list/`. It is used by the catalog,
+The shared model and UI live in `packages/tools/tier-list/src/`; the web feature path contains
+route and service adapters plus compatibility re-exports. The desktop registry mounts the same
+board and editor through `TierListsView`, using the tool database for local documents and the
+tool host's file-save capability for exports. The feature is used by the catalog,
 standalone board and template editor at `/tier-lists`, `/tier-lists/[slug]` and
 `/tier-lists/[slug]/edit`, and can be embedded without those routes. It uses the Boffmedia v3
 design system. The feature slice is intentional: the board and editor serve multiple routes;
-it is not a new global primitive or a desktop tool package.
+it is not a new global primitive.
 
 ## Repository findings and scope
 
@@ -26,10 +29,13 @@ it is not a new global primitive or a desktop tool package.
   `MediaCardContent` and `ColorInput` live in `@boffmedia/ui`; the DnD adapter owns sensors and placement rules.
   Active rows remain highlighted over nested insertion targets. Tap/Enter opens assignments;
   Space drags by keyboard and a short hold activates touch dragging.
-- Existing `ArtImage` handles arbitrary hosts, missing images and errors. `@boffmedia/ui`
-  supplies forms, modals, confirmations, focus trapping and v3 tokens; `next-intl` owns es/en UI.
+- Shared image rendering resolves root assets through the host and falls back to item initials on
+  failure. `@boffmedia/ui` supplies forms, modals, confirmations, focus trapping and v3 tokens;
+  the host-configured translator supplies es/en UI.
 - The existing authenticated `/upload/image` endpoint validates actual image content, dimensions
   and a 5 MB limit, and records ownership. The service adapter reuses it in `uploads/tier-lists`.
+  The desktop host sends the same multipart request through Rust so the device-flow JWT never
+  enters the renderer; both hosts pass an image-storage adapter to the shared editor.
   Supported types are JPEG, PNG, WebP and GIF. These image URLs are public, independently of list
   visibility. Anonymous creation supports image URLs; anonymous binary uploads are not introduced.
   Image bytes, data URLs and temporary blob URLs never enter list JSON or localStorage.

@@ -368,6 +368,7 @@ export function createWebApiUrl(baseUrl: string) {
 export function createWebToolHost(options?: {
   apiBaseUrl?: string;
   session?: ToolSession;
+  uploadImage?: ToolHost["uploadImage"];
   /**
    * The session bearer for `auth` calls. Omitted, every request goes out
    * anonymous — fine for a host with no accounts, wrong for one that has them:
@@ -384,6 +385,7 @@ export function createWebToolHost(options?: {
     openUrl: webOpenUrl,
     storage: createWebStorage(),
     api,
+    uploadImage: options?.uploadImage,
     assetUrl: webAssetUrl,
     siteUrl: webSiteUrl,
     apiUrl: createWebApiUrl(apiBaseUrl),

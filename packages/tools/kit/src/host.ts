@@ -233,6 +233,8 @@ export interface ToolHost {
   openUrl(url: string): Promise<void> | void;
   storage: ToolStorage;
   api: ToolApi;
+  /** Optional authenticated multipart upload for image-backed tools. */
+  uploadImage?: (file: File) => Promise<string>;
   assetUrl: ToolAssetUrl;
   /** See {@link ToolSiteUrl} — for links a person will open, not for bytes. */
   siteUrl: ToolSiteUrl;

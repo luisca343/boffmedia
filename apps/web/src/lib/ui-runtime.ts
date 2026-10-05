@@ -69,6 +69,7 @@ if (typeof window !== "undefined") {
       // this runs at import time, long before a session exists, and the token
       // is refreshed underneath us.
       token: sessionToken,
+      uploadImage: async (file) => (await import("@/services/api/boffmedia/tierListSourcesService")).tierListImageStorage.upload(file),
     }),
   )
 }

@@ -24,6 +24,8 @@
       "@boffmedia/tools-mewgenics/*": ["../../packages/tools/mewgenics/src/*"],
       "@boffmedia/tools-battlesim": ["../../packages/tools/battlesim/src"],
       "@boffmedia/tools-battlesim/*": ["../../packages/tools/battlesim/src/*"],
+      "@boffmedia/tools-tier-list": ["../../packages/tools/tier-list/src"],
+      "@boffmedia/tools-tier-list/*": ["../../packages/tools/tier-list/src/*"],
       "@boffmedia/tools-pokemon": ["../../packages/tools/pokemon/src"],
       "@boffmedia/tools-pokemon/*": ["../../packages/tools/pokemon/src/*"],
       "@boffmedia/ui": ["../../packages/ui/src"],

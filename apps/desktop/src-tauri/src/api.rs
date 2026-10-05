@@ -1242,6 +1242,32 @@ pub async fn authed_post_image(
     .await
 }
 
+/// Multipart image upload with a server-validated destination subdirectory.
+/// The `path` field must precede `file` so Multer's diskStorage sees it.
+pub async fn authed_post_image_in_directory(
+    api: &ApiState,
+    path: &str,
+    bytes: Vec<u8>,
+    filename: &str,
+    directory: &str,
+) -> Result<reqwest::Response, ApiError> {
+    let filename = filename.to_string();
+    let directory = directory.to_string();
+    authed(api, move |http, base| {
+        let part = reqwest::multipart::Part::bytes(bytes.clone())
+            .file_name(filename.clone())
+            .mime_str(mime_for(&filename))
+            .unwrap_or_else(|_| reqwest::multipart::Part::bytes(bytes.clone()));
+        http.post(format!("{base}{path}"))
+            .multipart(
+                reqwest::multipart::Form::new()
+                    .text("path", directory.clone())
+                    .part("file", part),
+            )
+    })
+    .await
+}
+
 /// The image types the server accepts, by extension. Guessed from the filename
 /// because that is all a file on disk gives us, and the server re-validates.
 fn mime_for(filename: &str) -> &'static str {

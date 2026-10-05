@@ -28,6 +28,7 @@ const PACKAGES = [
   'packages/tools/pokemon',
   'packages/tools/mewgenics',
   'packages/tools/misc',
+  'packages/tools/tier-list',
   'packages/tools/battlesim',
 ];
 function getAvailableMemoryMB() {
