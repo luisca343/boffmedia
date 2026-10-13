@@ -130,6 +130,14 @@ async function bootstrap() {
         },
         'JWT',
       )
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          description: 'Anonymous contest room or member capability',
+        },
+        'concursos-capability',
+      )
       .build();
 
     const document = SwaggerModule.createDocument(app, config, {

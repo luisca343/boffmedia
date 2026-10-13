@@ -1,0 +1,28 @@
+{
+  "concursos": {
+    "title": "Concursos",
+    "intro": "Entra en la sala con el código que aparece en el juego.",
+    "joinTitle": "Unirse a una sala",
+    "codeLabel": "Código de sala",
+    "codeHint": "Seis letras que muestra el juego del anfitrión.",
+    "codePlaceholder": "ABCDEF",
+    "nicknameLabel": "Tu apodo",
+    "nicknamePlaceholder": "¿Cómo te llamas?",
+    "join": "Entrar",
+    "noAccount": "No necesitas registrarte ni iniciar sesión.",
+    "fieldsRequired": "Escribe el código de seis letras y tu apodo.",
+    "connectionError": "No se pudo conectar con la sala. Inténtalo de nuevo.",
+    "lobbyTitle": "Ya estás en la sala",
+    "closedTitle": "Sala cerrada",
+    "closed": "El anfitrión ha cerrado la sala.",
+    "connected": "Conectado",
+    "reconnecting": "Reconectando…",
+    "youJoined": "Has entrado como {nickname}.",
+    "members": "Participantes: {count} de {capacity}",
+    "you": "Tú",
+    "online": "Conectado",
+    "connectionOnly": "Prueba de conexión: puedes entrar y reconectar. La partida con móviles todavía no está disponible.",
+    "leave": "Salir de la sala",
+    "anotherRoom": "Entrar en otra sala"
+  }
+}

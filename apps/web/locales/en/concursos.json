@@ -1,0 +1,28 @@
+{
+  "concursos": {
+    "title": "Contests",
+    "intro": "Join with the room code shown in the game.",
+    "joinTitle": "Join a room",
+    "codeLabel": "Room code",
+    "codeHint": "Six letters displayed by the host game.",
+    "codePlaceholder": "ABCDEF",
+    "nicknameLabel": "Your nickname",
+    "nicknamePlaceholder": "What is your name?",
+    "join": "Join",
+    "noAccount": "No account or sign-in needed.",
+    "fieldsRequired": "Enter the six-letter code and your nickname.",
+    "connectionError": "Could not connect to the room. Please try again.",
+    "lobbyTitle": "You are in the room",
+    "closedTitle": "Room closed",
+    "closed": "The host has closed the room.",
+    "connected": "Connected",
+    "reconnecting": "Reconnecting…",
+    "youJoined": "You joined as {nickname}.",
+    "members": "Players: {count} of {capacity}",
+    "you": "You",
+    "online": "Connected",
+    "connectionOnly": "Connection test: you can join and reconnect. Phone gameplay is not available yet.",
+    "leave": "Leave room",
+    "anotherRoom": "Join another room"
+  }
+}

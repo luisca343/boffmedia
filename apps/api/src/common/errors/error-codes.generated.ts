@@ -38,6 +38,12 @@ export const ApiErrorCode = {
   CHAT_MESSAGE_NOT_EDITABLE: 'CHAT_MESSAGE_NOT_EDITABLE',
   CHAT_NOT_FOUND: 'CHAT_NOT_FOUND',
   CHAT_NOT_MEMBER: 'CHAT_NOT_MEMBER',
+  CONCURSOS_ACCESS: 'CONCURSOS_ACCESS',
+  CONCURSOS_BUSY: 'CONCURSOS_BUSY',
+  CONCURSOS_CLOSED: 'CONCURSOS_CLOSED',
+  CONCURSOS_FULL: 'CONCURSOS_FULL',
+  CONCURSOS_NAME: 'CONCURSOS_NAME',
+  CONCURSOS_NOT_FOUND: 'CONCURSOS_NOT_FOUND',
   DATA_EXPORT_EXPIRED: 'DATA_EXPORT_EXPIRED',
   DATA_EXPORT_NOT_READY: 'DATA_EXPORT_NOT_READY',
   DATA_EXPORT_TOO_SOON: 'DATA_EXPORT_TOO_SOON',
@@ -126,6 +132,15 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
   CHAT_MESSAGE_NOT_EDITABLE: 'No puedes editar este mensaje.',
   CHAT_NOT_FOUND: 'No se encontró el chat.',
   CHAT_NOT_MEMBER: 'No formas parte de este chat.',
+  CONCURSOS_ACCESS:
+    'Este acceso no pertenece a la sala. Vuelve a entrar con su código.',
+  CONCURSOS_BUSY:
+    'No se pueden crear más salas ahora. Inténtalo dentro de un minuto.',
+  CONCURSOS_CLOSED: 'El anfitrión ha cerrado la sala.',
+  CONCURSOS_FULL: 'La sala está completa.',
+  CONCURSOS_NAME: 'Este apodo ya está en uso. Elige otro.',
+  CONCURSOS_NOT_FOUND:
+    'La sala no existe o ha caducado. Comprueba el código del juego.',
   DATA_EXPORT_EXPIRED:
     'Esta copia de tus datos ha caducado y se ha borrado. Puedes volver a pedirla.',
   DATA_EXPORT_NOT_READY:

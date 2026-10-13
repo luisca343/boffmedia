@@ -268,6 +268,30 @@
     "TOURNAMENT_TEAMSHEET_REQUIRED": {
       "es": "Envía tu lista de equipo antes de hacer check-in.",
       "where": "boffmedia/tournaments/services/registration.service.ts"
+    },
+    "CONCURSOS_ACCESS": {
+      "es": "Este acceso no pertenece a la sala. Vuelve a entrar con su código.",
+      "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
+    },
+    "CONCURSOS_NOT_FOUND": {
+      "es": "La sala no existe o ha caducado. Comprueba el código del juego.",
+      "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
+    },
+    "CONCURSOS_BUSY": {
+      "es": "No se pueden crear más salas ahora. Inténtalo dentro de un minuto.",
+      "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
+    },
+    "CONCURSOS_CLOSED": {
+      "es": "El anfitrión ha cerrado la sala.",
+      "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
+    },
+    "CONCURSOS_NAME": {
+      "es": "Este apodo ya está en uso. Elige otro.",
+      "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
+    },
+    "CONCURSOS_FULL": {
+      "es": "La sala está completa.",
+      "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
     }
   }
 }

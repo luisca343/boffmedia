@@ -766,3 +766,9 @@ export { WigglypopValuationEntity } from './models/WigglypopValuationEntity';
 export type { WigglypopWatchlistEntity } from './models/WigglypopWatchlistEntity';
 export type { WigglypopWatchResultEntity } from './models/WigglypopWatchResultEntity';
 export type { ZMove } from './models/ZMove';
+
+export type { ConcursosMemberDto } from './models/ConcursosMemberDto';
+export { ConcursosRoomDto } from './models/ConcursosRoomDto';
+export type { JoinConcursosRoomDto } from './models/JoinConcursosRoomDto';
+
+export type { CreateConcursosRoomDto } from './models/CreateConcursosRoomDto';

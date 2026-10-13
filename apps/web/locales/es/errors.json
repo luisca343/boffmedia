@@ -44,6 +44,12 @@
     "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": "No se puede cambiar un torneo cuyo evento padre ya ha finalizado.",
     "DATA_EXPORT_TOO_SOON": "Ya has pedido tus datos hace poco. Espera un poco antes de volver a pedirlos.",
     "DATA_EXPORT_NOT_READY": "Todavía estamos preparando tus datos. Te avisaremos cuando puedas descargarlos.",
-    "DATA_EXPORT_EXPIRED": "Esta copia de tus datos ha caducado y se ha borrado. Puedes volver a pedirla."
+    "DATA_EXPORT_EXPIRED": "Esta copia de tus datos ha caducado y se ha borrado. Puedes volver a pedirla.",
+    "CONCURSOS_ACCESS": "Este acceso no pertenece a la sala. Vuelve a entrar con su código.",
+    "CONCURSOS_NOT_FOUND": "La sala no existe o ha caducado. Comprueba el código del juego.",
+    "CONCURSOS_BUSY": "No se pueden crear más salas ahora. Inténtalo dentro de un minuto.",
+    "CONCURSOS_CLOSED": "El anfitrión ha cerrado la sala.",
+    "CONCURSOS_NAME": "Este apodo ya está en uso. Elige otro.",
+    "CONCURSOS_FULL": "La sala está completa."
   }
 }

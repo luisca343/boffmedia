@@ -44,6 +44,12 @@
     "TOURNAMENT_REOPEN_BLOCKED_BY_COMPLETED_EVENT": "That tournament belongs to an event that is already completed, so it cannot be reopened.",
     "DATA_EXPORT_TOO_SOON": "You asked for your data recently. Please wait a little before asking again.",
     "DATA_EXPORT_NOT_READY": "We are still preparing your data. We will let you know when you can download it.",
-    "DATA_EXPORT_EXPIRED": "This copy of your data has expired and been deleted. You can request a new one."
+    "DATA_EXPORT_EXPIRED": "This copy of your data has expired and been deleted. You can request a new one.",
+    "CONCURSOS_ACCESS": "This access does not belong to the room. Join again with its code.",
+    "CONCURSOS_NOT_FOUND": "The room does not exist or has expired. Check the game code.",
+    "CONCURSOS_BUSY": "No more rooms can be created right now. Try again in a minute.",
+    "CONCURSOS_CLOSED": "The host has closed the room.",
+    "CONCURSOS_NAME": "This nickname is already in use. Choose another.",
+    "CONCURSOS_FULL": "The room is full."
   }
 }

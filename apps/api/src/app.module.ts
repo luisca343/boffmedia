@@ -82,6 +82,7 @@ import { DesktopUpdatesModule } from './api/desktop-updates/desktop-updates.modu
 import { DesktopTelemetryModule } from './api/desktop-telemetry/desktop-telemetry.module';
 import { RandomizerModule } from '@api/randomizer/randomizer.module';
 import { WebhooksModule } from '@api/webhooks/webhooks.module';
+import { ConcursosModule } from '@api/boffmedia/concursos/concursos.module';
 import { ChangelogModule } from '@api/boffmedia/changelog/changelog.module';
 import { publicPath } from '@/config/paths';
 
@@ -90,6 +91,7 @@ import { publicPath } from '@/config/paths';
     // Global: provides AuditService/AuditRepository to every module, including
     // the ones that reach an audit writer transitively without knowing it.
     AuditModule,
+    ConcursosModule,
     // The module owns this route, so no Nest guard or @Public() decorator
     // applies to it: METRICS_PATH is unauthenticated wherever the port is
     // reachable. It must be restricted at the reverse proxy — Prometheus
