@@ -2901,8 +2901,35 @@ const recruitments: Omit<WeaveCharacter, "name">[] = [
 ]
 
 
+const laterPartCharacterIds = [
+  "orchel",
+  "talimun",
+  "anatolia",
+  "bertrand",
+  "creek",
+  "nathan",
+  "centurio",
+  "hong-hua",
+  "troy",
+  "aswan",
+  "tahonia",
+  "klapka",
+] as const
+
+const laterPartRecruitments: Omit<WeaveCharacter, "name">[] = laterPartCharacterIds.map((id) => ({
+  id,
+  routes: Object.fromEntries(ROUTE_IDS.map((route) => [route, {
+    available: false,
+    initiallyRecruited: false,
+    type: "unavailable" as const,
+    supportLevel: null,
+    renownLevel: null,
+    conditions: [],
+    searchText: "Joins in a later part",
+  }])) as Record<RouteId, RouteRecruitment>,
+}))
 export const CHARACTERS: WeaveCharacter[] = FORTUNES_WEAVE_CHARACTERS.map(({ id, name }) => {
-  const recruitment = recruitments.find((character) => character.id === id)
+  const recruitment = [...recruitments, ...laterPartRecruitments].find((character) => character.id === id)
   if (!recruitment) throw new Error(`Missing recruitment data: ${id}`)
   return { id, name, routes: recruitment.routes }
 })

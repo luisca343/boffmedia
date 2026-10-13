@@ -203,6 +203,54 @@ const characters = [
   {
     "id": "kiroc",
     "name": "Kiroc"
+  },
+  {
+    "id": "orchel",
+    "name": "Orchel"
+  },
+  {
+    "id": "talimun",
+    "name": "Talimun"
+  },
+  {
+    "id": "anatolia",
+    "name": "Anatolia"
+  },
+  {
+    "id": "bertrand",
+    "name": "Bertrand"
+  },
+  {
+    "id": "creek",
+    "name": "Creek"
+  },
+  {
+    "id": "nathan",
+    "name": "Nathan"
+  },
+  {
+    "id": "centurio",
+    "name": "Centurio"
+  },
+  {
+    "id": "hong-hua",
+    "name": "Hong Hua"
+  },
+  {
+    "id": "troy",
+    "name": "Troy"
+  },
+  {
+    "id": "aswan",
+    "name": "Aswan"
+  },
+  {
+    "id": "tahonia",
+    "name": "Tahonia"
+  },
+  {
+    "id": "klapka",
+    "name": "Klapka"
   }
 ] as const
 

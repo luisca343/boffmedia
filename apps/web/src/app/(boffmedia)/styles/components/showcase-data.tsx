@@ -337,6 +337,14 @@ export const CHAPTERS: Chapter[] = [
       { id: "mewpopover", label: "Ficha al vuelo" },
     ],
   },
+  {
+    name: "Fortune’s Weave",
+    dom: "Otros juegos",
+    sections: [
+      { id: "weave-class-card", label: "ClassCard", labelKey: "fortunesWeave.card" },
+      { id: "weave-class-compare", label: "ClassComparison", labelKey: "fortunesWeave.compare" },
+    ],
+  },
 ]
 
 export const DOMAIN_ORDER = ["Sistema", "Plataforma", "Herramientas", "Pokémon", "Monster Hunter", "Otros juegos"]

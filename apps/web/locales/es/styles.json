@@ -40,6 +40,10 @@
         "editorLead": "El editor reutilizable comparte el esquema, ColorInput, Field, Panel y los demás controles de la biblioteca. Personaliza sus filas, reglas y elementos.",
         "editorNote": "TierListTemplateEditor recibe una plantilla y un onSave asíncrono. Inyecta un adaptador imageStorage para habilitar subidas. Este ejemplo confirma el guardado en memoria y no sube archivos ni publica listas.",
         "saved": "Ejemplo guardado: {title}"
+      },
+      "fortunesWeave": {
+        "card": "Ficha de clase",
+        "compare": "Comparación de clases"
       }
     },
     "icons": {

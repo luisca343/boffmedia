@@ -1,4 +1,31 @@
-# Fortune’s Weave portraits
+# Fortune’s Weave
+
+## Class planning
+
+The existing admin-gated `/otros/fortunes-weave` route opens the class planner, with
+recruitment available from its navigation. `classes.json` is the 60-class snapshot of
+[the Fortune’s Weave class guide](https://fortunesweave.co.uk/classes), checked on
+2026-10-05. It preserves the source's unverified flags, missing fields and route unlock
+conditions. Weapon ranks and unlock training ranks are separate facts; do not infer
+requirements from weapons, missing movement values, or promotion paths from class tiers.
+English class, skill and item names are retained in both catalogs for matching the source.
+UI labels, training types and route conditions are translated.
+
+`class-model.ts` owns filtering and saved-data validation. The controlled components
+in `components/` render the catalog, roster, requirements and comparison; they also
+serve `/styles/components` → Fortune’s Weave. This second consumer justifies the
+feature slice, rather than moving domain components into global UI.
+`useClassPlan.ts` handles browser persistence independently of presentation, with
+account-scoped storage and separate character assignments for each route.
+Plans are targets, not eligibility calculations: current training and character
+restrictions are not available in this data. Recruitment progress uses its existing
+separate storage.
+
+When updating the snapshot, update the matching es/en class, skill, item and route
+condition catalogs and the checked date together. Run the reference-integrity,
+planner-interaction and persistence tests, `pnpm check:i18n`, and TypeScript checks.
+
+## Portraits
 
 `public/boffmedia/img/games/fortunes-weave/portraits/<character-id>.webp` contains the shared artwork for the recruitment tracker
 and `/tier-lists/fire-emblem-fortunes-weave`. Character IDs and URLs are defined once in

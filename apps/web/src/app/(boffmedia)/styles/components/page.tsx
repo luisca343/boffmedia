@@ -34,6 +34,7 @@ import { CatalogoChapter } from "./_chapters/CatalogoChapter"
 import { CalculadoraChapter } from "./_chapters/CalculadoraChapter"
 import { LegalChapter } from "./_chapters/LegalChapter"
 import { TierListsChapter } from "./_chapters/TierListsChapter"
+import { FortunesWeaveChapter } from "./_chapters/FortunesWeaveChapter"
 
 const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
   Bases: BasesChapter,
@@ -64,6 +65,7 @@ const CHAPTER_VIEWS: Record<string, React.ComponentType> = {
   Calculadora: CalculadoraChapter,
   Legal: LegalChapter,
   "Tier Lists": TierListsChapter,
+  "Fortune’s Weave": FortunesWeaveChapter,
 }
 
 export default function ComponentsShowcase() {

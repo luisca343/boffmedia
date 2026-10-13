@@ -40,6 +40,10 @@
         "editorLead": "The reusable editor shares the same schema, ColorInput, Field, Panel and other library controls. Customize its rows, rules and items.",
         "editorNote": "TierListTemplateEditor accepts a template and an asynchronous onSave. Inject an imageStorage adapter to enable uploads. This example acknowledges save in memory and does not upload files or publish a list.",
         "saved": "Example saved: {title}"
+      },
+      "fortunesWeave": {
+        "card": "Class reference card",
+        "compare": "Class comparison"
       }
     },
     "icons": {

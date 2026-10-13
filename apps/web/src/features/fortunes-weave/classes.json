@@ -1,0 +1,2598 @@
+[
+  {
+    "id": "the-apsara",
+    "tier": "divine",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": null
+      },
+      {
+        "type": "sword",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 6
+    },
+    "skills": [
+      "combat-arts-3",
+      "dance"
+    ],
+    "masterSkill": "divine-dance",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "bow",
+          "rank": "C"
+        },
+        {
+          "type": "sword",
+          "rank": "A"
+        }
+      ],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": "muses-necklace",
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "the-avatar",
+    "tier": "divine",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": null
+      },
+      {
+        "type": "whiteMagic",
+        "rank": null
+      },
+      {
+        "type": "blackMagic",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 6
+    },
+    "skills": [
+      "magic-hit-10",
+      "magic-heal-20",
+      "all-magic-zenith"
+    ],
+    "masterSkill": "divine-law",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "whiteMagic",
+          "rank": "S"
+        },
+        {
+          "type": "blackMagic",
+          "rank": "S"
+        }
+      ],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": "lotus-of-reincarnation",
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "the-blade",
+    "tier": "divine",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": null
+      },
+      {
+        "type": "sword",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 6
+    },
+    "skills": [
+      "combat-arts-3",
+      "sword-crit-10"
+    ],
+    "masterSkill": "divine-insight",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "sword",
+          "rank": "S"
+        }
+      ],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": "demonic-swordguard",
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "the-calamity",
+    "tier": "divine",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": null
+      },
+      {
+        "type": "sword",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 6
+    },
+    "skills": [
+      "locktouch",
+      "combat-arts-3",
+      "ultimate-search"
+    ],
+    "masterSkill": "divine-will",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "bow",
+          "rank": "S"
+        },
+        {
+          "type": "sword",
+          "rank": "S"
+        }
+      ],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": "crystal-of-darkness",
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "the-cavalier",
+    "tier": "divine",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": null
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 8
+    },
+    "skills": [
+      "mount-dismount",
+      "combat-arts-3",
+      "golden-ride"
+    ],
+    "masterSkill": "divine-dexterity",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "riding",
+          "rank": "A"
+        },
+        {
+          "type": "axe",
+          "rank": "S"
+        },
+        {
+          "type": "spear",
+          "rank": "S"
+        },
+        {
+          "type": "sword",
+          "rank": "S"
+        }
+      ],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": "divinium-saddle",
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "the-eternal",
+    "tier": "divine",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 6
+    },
+    "skills": [
+      "combat-arts-3",
+      "axe-hit-10",
+      "brawl-hit-10"
+    ],
+    "masterSkill": "divine-might",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "gauntlet",
+          "rank": "S"
+        },
+        {
+          "type": "axe",
+          "rank": "S"
+        },
+        {
+          "type": "sword",
+          "rank": "S"
+        }
+      ],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": "scales-of-judgement",
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "the-godhand",
+    "tier": "divine",
+    "weapons": [
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "whiteMagic",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 6
+    },
+    "skills": [
+      "combat-arts-3",
+      "brawl-avo-10",
+      "white-magic-zenith"
+    ],
+    "masterSkill": "divine-adornment",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "whiteMagic",
+          "rank": "C"
+        },
+        {
+          "type": "gauntlet",
+          "rank": "S"
+        }
+      ],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": "emperor-s-sash",
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "the-trident",
+    "tier": "divine",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": null
+      },
+      {
+        "type": "whiteMagic",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 6
+    },
+    "skills": [
+      "magic-heal-10",
+      "combat-arts-3",
+      "white-magic-zenith"
+    ],
+    "masterSkill": "divine-wall",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "spear",
+          "rank": "S"
+        }
+      ],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": "trident",
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "commoner",
+    "tier": "preClass",
+    "weapons": [],
+    "movement": null,
+    "skills": [],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": null,
+      "documented": false,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "noble",
+    "tier": "preClass",
+    "weapons": [],
+    "movement": null,
+    "skills": [],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": null,
+      "documented": false,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "diviner",
+    "tier": "beginner",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": null
+      },
+      {
+        "type": "whiteMagic",
+        "rank": "D"
+      },
+      {
+        "type": "blackMagic",
+        "rank": "D"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 4
+    },
+    "skills": [
+      "magic-basics"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [],
+      "level": 5,
+      "renown": 1,
+      "license": "beginner",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "gladiator",
+    "tier": "beginner",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": "D"
+      },
+      {
+        "type": "gauntlet",
+        "rank": "D"
+      },
+      {
+        "type": "axe",
+        "rank": "D"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 4
+    },
+    "skills": [
+      "attack-basics"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [],
+      "level": 5,
+      "renown": 1,
+      "license": "beginner",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "hunter",
+    "tier": "beginner",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "D"
+      },
+      {
+        "type": "sword",
+        "rank": "D"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 4
+    },
+    "skills": [
+      "hunting-basics"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [],
+      "level": 5,
+      "renown": 1,
+      "license": "beginner",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "ornius-rider",
+    "tier": "beginner",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "D"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": "D"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 5
+    },
+    "skills": [
+      "offense-basics"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [],
+      "level": 5,
+      "renown": 1,
+      "license": "beginner",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "soldier",
+    "tier": "beginner",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "D"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": "D"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 4
+    },
+    "skills": [
+      "defense-basics"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [],
+      "level": 5,
+      "renown": 1,
+      "license": "beginner",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "archer",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "C"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-1",
+      "bow-hit-5"
+    ],
+    "masterSkill": "crescendo",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "bow",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "armored-knight",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "C"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": "C"
+      }
+    ],
+    "movement": null,
+    "skills": [
+      "strike-last-def-3",
+      "combat-arts-1"
+    ],
+    "masterSkill": "great-counter",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "heavy",
+          "rank": "E+"
+        },
+        {
+          "type": "axe",
+          "rank": "C"
+        },
+        {
+          "type": "spear",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "armored-ornius-rider",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "C"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": "C"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 6
+    },
+    "skills": [],
+    "masterSkill": "sense-threat",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "axe",
+          "rank": "C"
+        },
+        {
+          "type": "spear",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "brigand",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": "C"
+      },
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": "C"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-1",
+      "axe-hit-3"
+    ],
+    "masterSkill": "regroup",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "axe",
+          "rank": "C"
+        },
+        {
+          "type": "sword",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "charioteer",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "C"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 5
+    },
+    "skills": [
+      "chariot-armor",
+      "charioteer-tactics",
+      "charioteer-s-path"
+    ],
+    "masterSkill": "charger",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "bow",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "light-cavalry",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "C"
+      },
+      {
+        "type": "sword",
+        "rank": "C"
+      },
+      {
+        "type": "axe",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 6
+    },
+    "skills": [],
+    "masterSkill": "bolster-health",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "spear",
+          "rank": "C"
+        },
+        {
+          "type": "sword",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "myrmidon",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": null
+      },
+      {
+        "type": "sword",
+        "rank": "C"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-1",
+      "sword-crit-3"
+    ],
+    "masterSkill": "ravaging-arts",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "sword",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "priest",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": null
+      },
+      {
+        "type": "whiteMagic",
+        "rank": "C"
+      },
+      {
+        "type": "blackMagic",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "white-magic-seeker",
+      "magic-heal-5"
+    ],
+    "masterSkill": "piety",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "whiteMagic",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "pugilist",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "gauntlet",
+        "rank": "C"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-1",
+      "brawl-avo-3"
+    ],
+    "masterSkill": "attack-get-back",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "gauntlet",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "rogue",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "C"
+      },
+      {
+        "type": "sword",
+        "rank": "C"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-1",
+      "locktouch",
+      "search"
+    ],
+    "masterSkill": "in-shadow",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "bow",
+          "rank": "C"
+        },
+        {
+          "type": "sword",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "shaman",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "whiteMagic",
+        "rank": null
+      },
+      {
+        "type": "blackMagic",
+        "rank": "C"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "black-magic-seeker",
+      "magic-hit-3"
+    ],
+    "masterSkill": "bind-dexterity",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "blackMagic",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "wing-soldier",
+    "tier": "specialty",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "C"
+      },
+      {
+        "type": "sword",
+        "rank": "C"
+      }
+    ],
+    "movement": {
+      "type": "flying",
+      "spaces": 6
+    },
+    "skills": [],
+    "masterSkill": "protecting-wings",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "flier",
+          "rank": "D"
+        },
+        {
+          "type": "spear",
+          "rank": "C"
+        },
+        {
+          "type": "sword",
+          "rank": "C"
+        }
+      ],
+      "level": 20,
+      "renown": 4,
+      "license": "specialty",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "bardinger",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "C"
+      },
+      {
+        "type": "sword",
+        "rank": "B"
+      },
+      {
+        "type": "axe",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 6
+    },
+    "skills": [
+      "combat-arts-2"
+    ],
+    "masterSkill": "aegis",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "C"
+        },
+        {
+          "type": "sword",
+          "rank": "B"
+        },
+        {
+          "type": "spear",
+          "rank": "C"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "bishop",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": null
+      },
+      {
+        "type": "whiteMagic",
+        "rank": "B"
+      },
+      {
+        "type": "blackMagic",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "white-magic-seeker",
+      "magic-heal-10"
+    ],
+    "masterSkill": "barrier",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "whiteMagic",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "blacksmith",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "axe",
+        "rank": "C"
+      },
+      {
+        "type": "blackMagic",
+        "rank": "D"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "black-magic-seeker",
+      "axe-hit-5"
+    ],
+    "masterSkill": "makeshift",
+    "requirements": {
+      "ranks": [],
+      "level": null,
+      "renown": null,
+      "license": null,
+      "item": null,
+      "documented": false,
+      "routeUnlocks": [
+        {
+          "route": "dietrich",
+          "textKey": "blacksmith-dietrich"
+        }
+      ]
+    },
+    "unverified": true
+  },
+  {
+    "id": "caladrius",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": null
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": null
+      },
+      {
+        "type": "blackMagic",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": null
+    },
+    "skills": [
+      "black-magic-seeker",
+      "combat-arts-1"
+    ],
+    "masterSkill": "overtake",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "blackMagic",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": [
+        {
+          "route": "cai",
+          "textKey": "caladrius-cai"
+        }
+      ]
+    },
+    "unverified": false
+  },
+  {
+    "id": "cataphract",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "B"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 5
+    },
+    "skills": [
+      "strike-last-def-3",
+      "combat-arts-1"
+    ],
+    "masterSkill": "pavise",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "heavy",
+          "rank": "E+"
+        },
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "axe",
+          "rank": "B"
+        },
+        {
+          "type": "spear",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": [
+        {
+          "route": "theodora",
+          "textKey": "cataphract-theodora"
+        }
+      ]
+    },
+    "unverified": false
+  },
+  {
+    "id": "dancer",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "B"
+      },
+      {
+        "type": "sword",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-2",
+      "dance"
+    ],
+    "masterSkill": "special-dance",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "bow",
+          "rank": "B"
+        },
+        {
+          "type": "sword",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": [
+        {
+          "route": "leda",
+          "textKey": "dancer-leda"
+        }
+      ]
+    },
+    "unverified": false
+  },
+  {
+    "id": "dragoon",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "B"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 6
+    },
+    "skills": [
+      "combat-arts-1"
+    ],
+    "masterSkill": "besieger",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "flier",
+          "rank": "C"
+        },
+        {
+          "type": "axe",
+          "rank": "B"
+        },
+        {
+          "type": "spear",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": [
+        {
+          "route": "cai",
+          "textKey": "dragoon-cai"
+        },
+        {
+          "route": "theodora",
+          "textKey": "dragoon-theodora"
+        }
+      ]
+    },
+    "unverified": false
+  },
+  {
+    "id": "dreadnought",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "B"
+      },
+      {
+        "type": "axe",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 4
+    },
+    "skills": [
+      "strike-last-def-5",
+      "combat-arts-2"
+    ],
+    "masterSkill": "focused-counter",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "heavy",
+          "rank": "D"
+        },
+        {
+          "type": "axe",
+          "rank": "B"
+        },
+        {
+          "type": "spear",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "elephant-rider",
+    "tier": "advanced",
+    "weapons": [],
+    "movement": {
+      "type": "mounted",
+      "spaces": 5
+    },
+    "skills": [
+      "war-elephant-boots",
+      "elephant-tactics"
+    ],
+    "masterSkill": "elephant-vanguard",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "C"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "forest-knight",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "B"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 6
+    },
+    "skills": [
+      "combat-arts-1",
+      "bow-hit-5"
+    ],
+    "masterSkill": "hunter-s-eye",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "bow",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "guardian",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "B"
+      },
+      {
+        "type": "whiteMagic",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-2",
+      "magic-heal-10"
+    ],
+    "masterSkill": "brace",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "spear",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": [
+        {
+          "route": "dietrich",
+          "textKey": "guardian-dietrich"
+        },
+        {
+          "route": "theodora",
+          "textKey": "guardian-theodora"
+        }
+      ]
+    },
+    "unverified": false
+  },
+  {
+    "id": "ovate",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "whiteMagic",
+        "rank": null
+      },
+      {
+        "type": "blackMagic",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "black-magic-seeker",
+      "magic-hit-5"
+    ],
+    "masterSkill": "bind-speed",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "blackMagic",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "ranger",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "B"
+      },
+      {
+        "type": "sword",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-2",
+      "locktouch",
+      "advanced-search"
+    ],
+    "masterSkill": "countershot",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "bow",
+          "rank": "B"
+        },
+        {
+          "type": "sword",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": [
+        {
+          "route": "dietrich",
+          "textKey": "ranger-dietrich"
+        },
+        {
+          "route": "leda",
+          "textKey": "ranger-leda"
+        }
+      ]
+    },
+    "unverified": false
+  },
+  {
+    "id": "shido",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": null
+      },
+      {
+        "type": "sword",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-2",
+      "sword-crit-5"
+    ],
+    "masterSkill": "ever-vigilant",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "sword",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "sniper",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-2",
+      "bow-hit-10"
+    ],
+    "masterSkill": "marksmanship",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "bow",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "troubadour",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "whiteMagic",
+        "rank": "B"
+      },
+      {
+        "type": "blackMagic",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 6
+    },
+    "skills": [
+      "magic-hit-3",
+      "magic-heal-5"
+    ],
+    "masterSkill": "song-of-courage",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "whiteMagic",
+          "rank": "B"
+        },
+        {
+          "type": "blackMagic",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": [
+        {
+          "route": "cai",
+          "textKey": "troubadour-cai"
+        },
+        {
+          "route": "leda",
+          "textKey": "troubadour-leda"
+        }
+      ]
+    },
+    "unverified": false
+  },
+  {
+    "id": "warrior",
+    "tier": "advanced",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": "B"
+      },
+      {
+        "type": "gauntlet",
+        "rank": "B"
+      },
+      {
+        "type": "axe",
+        "rank": "B"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-2",
+      "axe-hit-5",
+      "brawl-hit-5"
+    ],
+    "masterSkill": "practiced-art",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "gauntlet",
+          "rank": "B"
+        },
+        {
+          "type": "axe",
+          "rank": "B"
+        },
+        {
+          "type": "sword",
+          "rank": "B"
+        }
+      ],
+      "level": 35,
+      "renown": 8,
+      "license": "advanced",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "battlemaster",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": "A"
+      },
+      {
+        "type": "gauntlet",
+        "rank": "A"
+      },
+      {
+        "type": "axe",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-3",
+      "axe-hit-7",
+      "brawl-hit-7"
+    ],
+    "masterSkill": "war-master-s-strike",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "gauntlet",
+          "rank": "A"
+        },
+        {
+          "type": "axe",
+          "rank": "A"
+        },
+        {
+          "type": "sword",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "bau-lord",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "A"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 7
+    },
+    "skills": [
+      "combat-arts-2"
+    ],
+    "masterSkill": "ambush",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "flier",
+          "rank": "C"
+        },
+        {
+          "type": "axe",
+          "rank": "A"
+        },
+        {
+          "type": "spear",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": true
+  },
+  {
+    "id": "bow-adept",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-3",
+      "bow-hit-15"
+    ],
+    "masterSkill": "sky-hunter",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "bow",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "bow-knight",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "A"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 7
+    },
+    "skills": [
+      "combat-arts-2",
+      "bow-hit-10"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "bow",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "castle-knight",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "A"
+      },
+      {
+        "type": "axe",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 4
+    },
+    "skills": [
+      "combat-arts-3",
+      "strike-last-def-7"
+    ],
+    "masterSkill": "intercept",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "heavy",
+          "rank": "C"
+        },
+        {
+          "type": "axe",
+          "rank": "A"
+        },
+        {
+          "type": "spear",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "celestial-trooper",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "A"
+      },
+      {
+        "type": "sword",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 7
+    },
+    "skills": [
+      "combat-arts-1",
+      "flying-avo-7"
+    ],
+    "masterSkill": "lightning-reflexes",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "flier",
+          "rank": "C"
+        },
+        {
+          "type": "spear",
+          "rank": "A"
+        },
+        {
+          "type": "sword",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "druid",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "blackMagic",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "black-magic-seeker",
+      "magic-hit-7"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [
+        {
+          "type": "blackMagic",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "great-knight",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "A"
+      },
+      {
+        "type": "sword",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 6
+    },
+    "skills": [
+      "combat-arts-2"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [
+        {
+          "type": "heavy",
+          "rank": "D"
+        },
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "axe",
+          "rank": "A"
+        },
+        {
+          "type": "spear",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "high-savant",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "sword",
+        "rank": "B"
+      },
+      {
+        "type": "blackMagic",
+        "rank": "D"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 7
+    },
+    "skills": [
+      "combat-arts-2",
+      "black-magic-seeker"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "blackMagic",
+          "rank": "D"
+        },
+        {
+          "type": "sword",
+          "rank": "B"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "orichaldia",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "A"
+      },
+      {
+        "type": "sword",
+        "rank": "A"
+      },
+      {
+        "type": "axe",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 7
+    },
+    "skills": [
+      "combat-arts-3",
+      "mount-dismount"
+    ],
+    "masterSkill": "fierce-spear",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "B"
+        },
+        {
+          "type": "spear",
+          "rank": "A"
+        },
+        {
+          "type": "sword",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "sentinel",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": "A"
+      },
+      {
+        "type": "whiteMagic",
+        "rank": null
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "white-magic-seeker",
+      "magic-heal-10",
+      "combat-arts-3"
+    ],
+    "masterSkill": "resolute-stance",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "spear",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "shadow-seeker",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "bow",
+        "rank": "A"
+      },
+      {
+        "type": "sword",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "locktouch",
+      "combat-arts-3",
+      "master-search"
+    ],
+    "masterSkill": "dropshadow-blade",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "bow",
+          "rank": "A"
+        },
+        {
+          "type": "sword",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "sword-master",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "spear",
+        "rank": null
+      },
+      {
+        "type": "sword",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "combat-arts-3",
+      "sword-crit-7"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [
+        {
+          "type": "sword",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "valkyrium",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "whiteMagic",
+        "rank": "A"
+      },
+      {
+        "type": "blackMagic",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "mounted",
+      "spaces": 7
+    },
+    "skills": [
+      "magic-heal-10"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [
+        {
+          "type": "rider",
+          "rank": "D"
+        },
+        {
+          "type": "whiteMagic",
+          "rank": "A"
+        },
+        {
+          "type": "blackMagic",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "war-monk",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "gauntlet",
+        "rank": "B"
+      },
+      {
+        "type": "whiteMagic",
+        "rank": "D"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "white-magic-seeker",
+      "combat-arts-3"
+    ],
+    "masterSkill": null,
+    "requirements": {
+      "ranks": [
+        {
+          "type": "whiteMagic",
+          "rank": "D"
+        },
+        {
+          "type": "gauntlet",
+          "rank": "B"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  },
+  {
+    "id": "wiseman",
+    "tier": "master",
+    "weapons": [
+      {
+        "type": "gauntlet",
+        "rank": null
+      },
+      {
+        "type": "axe",
+        "rank": null
+      },
+      {
+        "type": "whiteMagic",
+        "rank": "A"
+      }
+    ],
+    "movement": {
+      "type": "foot",
+      "spaces": 5
+    },
+    "skills": [
+      "white-magic-seeker",
+      "magic-heal-15"
+    ],
+    "masterSkill": "dominate-magic",
+    "requirements": {
+      "ranks": [
+        {
+          "type": "whiteMagic",
+          "rank": "A"
+        }
+      ],
+      "level": 45,
+      "renown": null,
+      "license": "master",
+      "item": null,
+      "documented": true,
+      "routeUnlocks": []
+    },
+    "unverified": false
+  }
+]
