@@ -101,7 +101,7 @@ export class ConcursosController {
     @Body() body: ConcursosConfigurationDto,
     @Req() req: Request,
   ) {
-    return this.rooms.configure(code, extractBearer(req), body.mode);
+    return this.rooms.configure(code, extractBearer(req), body);
   }
   @Post(':code/group')
   @Header('Cache-Control', 'no-store')

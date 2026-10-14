@@ -3,6 +3,7 @@
 /* tslint:disable */
 /* eslint-disable */
 export type ConcursosResultDto = {
+    points: number;
     entityId: string;
     answer?: number;
     correct: boolean;

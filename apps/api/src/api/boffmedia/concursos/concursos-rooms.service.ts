@@ -12,6 +12,7 @@ import { createHash, randomInt, randomUUID } from 'node:crypto';
 import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import type {
   ConcursosRoomDto,
+  ConcursosConfigurationDto,
   ConcursosEntityDto,
   ConcursosActionDto,
   StartConcursosGameDto,
@@ -36,6 +37,8 @@ type Room = {
   code: string;
   hostHash: string;
   mode: 'individual' | 'teams';
+  pacing: 'automatic' | 'directed';
+  resultSeconds: number;
   game?: ConcursosGame;
   createdAt: number;
   hostSeenAt: number;
@@ -113,6 +116,8 @@ export class ConcursosRoomsService {
       room.closedAt === undefined ? room.game?.view(member?.id) : undefined;
     return {
       mode: room.mode,
+      pacing: room.pacing,
+      resultSeconds: room.resultSeconds,
       entities: this.entities(room).map((e) => ({
         ...e,
         memberIds: [...e.memberIds],
@@ -176,6 +181,8 @@ export class ConcursosRoomsService {
       code,
       hostHash: actor,
       mode: 'individual',
+      pacing: 'automatic',
+      resultSeconds: 8,
       createdAt: now,
       hostSeenAt: now,
       members: new Map(),
@@ -307,14 +314,38 @@ export class ConcursosRoomsService {
     if (member) member.seenAt = Date.now();
     return { room, host, member };
   }
-  configure(code: string, token: string | null, mode: 'individual' | 'teams') {
+  configure(
+    code: string,
+    token: string | null,
+    configuration: ConcursosConfigurationDto | 'individual' | 'teams',
+  ) {
     const { room, host } = this.context(code, token);
     if (!host)
       throw new ForbiddenException(
         userError(ApiErrorCode.CONCURSOS_ACCESS, 'host required'),
       );
     if (room.game) gameConflict();
-    room.mode = mode;
+    const body =
+      typeof configuration === 'string'
+        ? { mode: configuration }
+        : configuration;
+    if (
+      !body ||
+      !Object.keys(body).length ||
+      (body.mode !== undefined &&
+        !['individual', 'teams'].includes(body.mode)) ||
+      (body.pacing !== undefined &&
+        !['automatic', 'directed'].includes(body.pacing)) ||
+      (body.resultSeconds !== undefined &&
+        (!Number.isInteger(body.resultSeconds) ||
+          body.resultSeconds < 3 ||
+          body.resultSeconds > 30))
+    )
+      gameConflict();
+    if (body.mode !== undefined) room.mode = body.mode;
+    if (body.pacing !== undefined) room.pacing = body.pacing;
+    if (body.resultSeconds !== undefined)
+      room.resultSeconds = body.resultSeconds;
     return this.publish(this.view(room, 'host'));
   }
   group(code: string, token: string | null, entityId: string) {
@@ -345,6 +376,8 @@ export class ConcursosRoomsService {
         this.entities(room),
         structuredClone(body.questions),
         room.mode,
+        room.pacing,
+        room.resultSeconds,
       );
     }
     return this.publish(this.view(room, 'host'));

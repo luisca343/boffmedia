@@ -21,12 +21,15 @@ export class ConcursosGame {
   private used = new Set<string>();
   private current?: ConcursosQuestionDto;
   private deadlineAt?: number;
+  private advanceAt?: number;
   private answers = new Map<string, number>();
   private proposals = new Map<string, number>();
   constructor(
     readonly entities: ConcursosEntityDto[],
     private readonly questions: ConcursosQuestionDto[],
     private readonly mode: 'individual' | 'teams',
+    private readonly pacing: 'automatic' | 'directed' = 'automatic',
+    private readonly resultSeconds = 8,
   ) {
     if (
       entities.length < 2 ||
@@ -45,18 +48,45 @@ export class ConcursosGame {
   }
   tick() {
     if (this.stage === 'question' && Date.now() >= this.deadlineAt!)
-      this.close();
+      this.close(this.deadlineAt!);
+    if (
+      this.stage === 'result' &&
+      this.advanceAt !== undefined &&
+      Date.now() >= this.advanceAt
+    )
+      this.advance();
   }
-  private close() {
+  private close(closedAt = Date.now()) {
     if (this.stage !== 'question') return;
     this.stage = 'result';
+    this.advanceAt =
+      this.pacing === 'automatic'
+        ? closedAt + this.resultSeconds * 1000
+        : undefined;
     for (const entity of this.entities)
       if (this.answers.get(entity.id) === this.current!.correctIndex)
         entity.score += this.current!.points;
   }
+  private advance() {
+    if (this.stage !== 'result') return;
+    this.used.add(this.current!.id);
+    this.current = undefined;
+    if (this.mode === 'teams')
+      for (const unit of this.entities) {
+        const previous = unit.memberIds.indexOf(unit.captainId!);
+        unit.captainId = unit.memberIds[(previous + 1) % unit.memberIds.length];
+      }
+    this.selector = (this.selector + 1) % this.entities.length;
+    this.stage = this.available().length ? 'board' : 'finished';
+    this.deadlineAt = undefined;
+    this.advanceAt = undefined;
+    this.answers.clear();
+    this.proposals.clear();
+  }
   act(memberId: string | undefined, command: ConcursosActionDto) {
     this.tick();
     if (command.action === 'next') {
+      if (this.pacing !== 'directed') gameConflict();
       if (memberId !== undefined)
         throw new ForbiddenException(
           userError(ApiErrorCode.CONCURSOS_ACCESS, 'host required'),
@@ -65,16 +95,7 @@ export class ConcursosGame {
       // A lost next reply can be retried without skipping a question.
       if (this.stage === 'board' || this.stage === 'finished') return;
       if (this.stage !== 'result') gameConflict();
-      this.used.add(this.current!.id);
-      this.current = undefined;
-      if (this.mode === 'teams')
-        for (const unit of this.entities) {
-          const previous = unit.memberIds.indexOf(unit.captainId!);
-          unit.captainId =
-            unit.memberIds[(previous + 1) % unit.memberIds.length];
-        }
-      this.selector = (this.selector + 1) % this.entities.length;
-      this.stage = this.available().length ? 'board' : 'finished';
+      this.advance();
       return;
     }
     const entity = this.entities.find((e) =>
@@ -149,6 +170,10 @@ export class ConcursosGame {
     const showResult = this.stage === 'result';
     return {
       stage: this.stage,
+      pacing: this.pacing,
+      resultSeconds: this.resultSeconds,
+      ...(showResult &&
+        this.advanceAt !== undefined && { advanceAt: this.advanceAt }),
       roundId: this.roundId,
       selectorId: this.entities[this.selector].id,
       phaseTitle: this.current?.phaseTitle ?? available[0]?.phaseTitle ?? '',
@@ -183,6 +208,10 @@ export class ConcursosGame {
       ...(showResult && {
         results: this.entities.map((e) => ({
           entityId: e.id,
+          points:
+            this.answers.get(e.id) === this.current!.correctIndex
+              ? this.current!.points
+              : 0,
           ...(this.answers.has(e.id) && { answer: this.answers.get(e.id) }),
           correct: this.answers.get(e.id) === this.current!.correctIndex,
         })),

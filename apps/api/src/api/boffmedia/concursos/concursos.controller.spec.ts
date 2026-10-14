@@ -132,7 +132,7 @@ describe('Concursos anonymous HTTP contract', () => {
     await client
       .post(base + '/configuration')
       .set('Authorization', capability(21))
-      .send({ mode: 'teams' })
+      .send({ mode: 'teams', pacing: 'directed' })
       .expect(403);
     await client
       .post(base + '/configuration')

@@ -45,25 +45,31 @@ export function GameController({
     setSelection(null);
     setError("");
   }, [game?.roundId]);
+  const deadline =
+    game?.stage === "result"
+      ? game.advanceAt
+      : game?.stage === "question"
+        ? game.deadlineAt
+        : undefined;
   useEffect(() => {
-    if (!game?.deadlineAt) return;
+    if (!deadline || !game) {
+      setRemaining(0);
+      return;
+    }
     const received = performance.now();
     const update = () =>
       setRemaining(
         Math.max(
           0,
           Math.ceil(
-            (game.deadlineAt! -
-              game.serverNow -
-              (performance.now() - received)) /
-              1000,
+            (deadline - game.serverNow - (performance.now() - received)) / 1000,
           ),
         ),
       );
     update();
     const timer = setInterval(update, 250);
     return () => clearInterval(timer);
-  }, [game?.serverNow, game?.deadlineAt]);
+  }, [game?.serverNow, deadline]);
   async function run(operation: () => Promise<ConcursosRoomDto>) {
     setBusy(true);
     setError("");
@@ -87,20 +93,25 @@ export function GameController({
         </p>
       )}
       <p>{t(room.mode === "individual" ? "individualMode" : "teamsMode")}</p>
+      <p className="text-sm text-txt-muted">
+        {t(room.pacing === "automatic" ? "automaticPacing" : "directedPacing")}
+      </p>
       {!game && room.mode === "teams" && (
         <div className="grid gap-2">
           <p>{t("chooseTeam")}</p>
-          {room.entities.map((unit) => (
-            <Button
-              key={unit.id}
-              disabled={busy || entity?.id === unit.id}
-              onClick={() =>
-                run(() => ConcursosService.group(room.code, token, unit.id))
-              }
-            >
-              {entityName(unit.id)}
-            </Button>
-          ))}
+          {[...room.entities]
+            .sort((a, b) => b.score - a.score)
+            .map((unit) => (
+              <Button
+                key={unit.id}
+                disabled={busy || entity?.id === unit.id}
+                onClick={() =>
+                  run(() => ConcursosService.group(room.code, token, unit.id))
+                }
+              >
+                {entityName(unit.id)}
+              </Button>
+            ))}
         </div>
       )}
       {room.mode === "teams" && entity && (
@@ -111,11 +122,16 @@ export function GameController({
         <>
           <p className="font-bold">{game.phaseTitle}</p>
           <ul className="grid grid-cols-2 gap-2 text-sm">
-            {room.entities.map((unit) => (
-              <li key={unit.id} className="break-words">
-                {t("score", { name: entityName(unit.id), points: unit.score })}
-              </li>
-            ))}
+            {[...room.entities]
+              .sort((a, b) => b.score - a.score)
+              .map((unit) => (
+                <li key={unit.id} className="break-words">
+                  {t("score", {
+                    name: entityName(unit.id),
+                    points: unit.score,
+                  })}
+                </li>
+              ))}
           </ul>
           {game.stage === "board" && (
             <>
@@ -235,11 +251,18 @@ export function GameController({
                           {result.answer === undefined
                             ? t("noAnswer")
                             : game.question!.choices[result.answer]}{" "}
-                          · {t(result.correct ? "correct" : "incorrect")}
+                          · {t(result.correct ? "correct" : "incorrect")} ·{" "}
+                          {t("earnedPoints", { points: result.points })}
                         </li>
                       ))}
                     </ul>
-                    <p>{t("waitingNext")}</p>
+                    {game.advanceAt !== undefined ? (
+                      <p role="timer" className="font-bold">
+                        {t("nextCountdown", { count: remaining })}
+                      </p>
+                    ) : (
+                      <p>{t("waitingNext")}</p>
+                    )}
                   </>
                 )}
               </>

@@ -184,7 +184,7 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
     });
     switch (frame.operation) {
       case 'configuration':
-        return this.rooms.configure(code, token, body.mode);
+        return this.rooms.configure(code, token, body);
       case 'group':
         return this.rooms.group(code, token, body.entityId);
       case 'start':

@@ -37,9 +37,20 @@ export class ConcursosMemberDto {
 }
 
 export class ConcursosConfigurationDto {
-  @ApiProperty({ enum: ['individual', 'teams'] })
+  @ApiPropertyOptional({ enum: ['individual', 'teams'] })
+  @IsOptional()
   @IsIn(['individual', 'teams'])
-  mode!: 'individual' | 'teams';
+  mode?: 'individual' | 'teams';
+  @ApiPropertyOptional({ enum: ['automatic', 'directed'] })
+  @IsOptional()
+  @IsIn(['automatic', 'directed'])
+  pacing?: 'automatic' | 'directed';
+  @ApiPropertyOptional({ default: 8, minimum: 3, maximum: 30 })
+  @IsOptional()
+  @IsInt()
+  @Min(3)
+  @Max(30)
+  resultSeconds?: number;
 }
 export class ConcursosGroupDto {
   @ApiProperty() @IsString() @IsIn(['team-1', 'team-2']) entityId!: string;
@@ -110,11 +121,17 @@ export class ConcursosOwnAnswerDto {
   proposals!: ConcursosProposalDto[];
 }
 export class ConcursosResultDto {
+  @ApiProperty() points!: number;
   @ApiProperty() entityId!: string;
   @ApiPropertyOptional() answer?: number;
   @ApiProperty() correct!: boolean;
 }
 export class ConcursosGameDto {
+  @ApiProperty({ enum: ['automatic', 'directed'] }) pacing!:
+    | 'automatic'
+    | 'directed';
+  @ApiProperty() resultSeconds!: number;
+  @ApiPropertyOptional() advanceAt?: number;
   @ApiProperty({ enum: ['board', 'question', 'result', 'finished'] }) stage!:
     | 'board'
     | 'question'
@@ -135,6 +152,10 @@ export class ConcursosGameDto {
   results?: ConcursosResultDto[];
 }
 export class ConcursosRoomDto {
+  @ApiProperty({ enum: ['automatic', 'directed'] }) pacing!:
+    | 'automatic'
+    | 'directed';
+  @ApiProperty() resultSeconds!: number;
   @ApiProperty({ enum: ['individual', 'teams'] }) mode!: 'individual' | 'teams';
   @ApiProperty({ type: [ConcursosEntityDto] }) entities!: ConcursosEntityDto[];
   @ApiPropertyOptional({ type: ConcursosGameDto }) game?: ConcursosGameDto;

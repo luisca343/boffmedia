@@ -35,7 +35,7 @@
     "sendProposal": "Share proposal with my team",
     "sendAnswer": "Submit answer",
     "confirmTeamAnswer": "Confirm team answer",
-    "privateProposals": "Your team\u0027s private proposals",
+    "privateProposals": "Your team's private proposals",
     "answerSent": "Answer submitted: {answer}",
     "solution": "Solution: {answer}",
     "correct": "Correct",
@@ -43,6 +43,10 @@
     "noAnswer": "No answer",
     "waitingNext": "The host will continue from the game.",
     "finished": "Contest finished",
-    "playingTitle": "Game"
+    "playingTitle": "Game",
+    "automaticPacing": "Automatic progression",
+    "directedPacing": "Host-controlled progression",
+    "earnedPoints": "+{points} points",
+    "nextCountdown": "Next turn in {count, plural, one {# second} other {# seconds}}"
   }
 }

@@ -7,6 +7,9 @@ import type { ConcursosOwnAnswerDto } from './ConcursosOwnAnswerDto';
 import type { ConcursosResultDto } from './ConcursosResultDto';
 import type { ConcursosVisibleQuestionDto } from './ConcursosVisibleQuestionDto';
 export type ConcursosGameDto = {
+    pacing: ConcursosGameDto.pacing;
+    resultSeconds: number;
+    advanceAt?: number;
     stage: ConcursosGameDto.stage;
     roundId: number;
     selectorId: string;
@@ -19,6 +22,10 @@ export type ConcursosGameDto = {
     results?: Array<ConcursosResultDto>;
 };
 export namespace ConcursosGameDto {
+    export enum pacing {
+        AUTOMATIC = 'automatic',
+        DIRECTED = 'directed',
+    }
     export enum stage {
         BOARD = 'board',
         QUESTION = 'question',

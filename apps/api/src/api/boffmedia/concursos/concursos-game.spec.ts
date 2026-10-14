@@ -39,6 +39,7 @@ const questions: ConcursosQuestionDto[] = [
 function setup(mode: 'individual' | 'teams', count = 4) {
   const rooms = new ConcursosRoomsService();
   const { code } = rooms.create(token(1), 'local');
+  rooms.configure(code, token(1), { pacing: 'directed' });
   const ids = Array.from(
     { length: count },
     (_, index) =>
@@ -275,5 +276,156 @@ describe('Common individual and team question engine', () => {
       active.members.find((member) => member.id === ids[1])!.connected,
     ).toBe(true);
     expect(active.game!.deadlineAt).toBe(opened.game!.deadlineAt);
+  });
+});
+
+describe('Automatic and directed result pacing', () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-10-14T08:00:00Z'));
+  });
+  afterEach(() => jest.useRealTimers());
+  it('defaults to automatic eight-second results and freezes lobby settings at start', () => {
+    const rooms = new ConcursosRoomsService();
+    const { code } = rooms.create(token(1), 'qa');
+    expect(rooms.read(code, token(1))).toMatchObject({
+      pacing: 'automatic',
+      resultSeconds: 8,
+      mode: 'individual',
+    });
+    rooms.join(code, token(2), 'A');
+    rooms.join(code, token(3), 'B');
+    rooms.startGame(code, token(1), { questions });
+    expect(() =>
+      rooms.configure(code, token(1), { pacing: 'directed' }),
+    ).toThrow();
+    expect(() =>
+      rooms.configure(code, token(1), { resultSeconds: 3 }),
+    ).toThrow();
+    expect(rooms.read(code, token(2)).game).toMatchObject({
+      pacing: 'automatic',
+      resultSeconds: 8,
+    });
+  });
+  it.each(['individual', 'teams'] as const)(
+    'automatically advances %s across phases, rotates once and ends without host next commands',
+    (mode) => {
+      const { rooms, code, ids } = setup(mode);
+      rooms.configure(code, token(1), {
+        pacing: 'automatic',
+        resultSeconds: 3,
+      });
+      rooms.startGame(code, token(1), { questions });
+      let priorScore = 0;
+      for (const [index, question] of questions.entries()) {
+        const board = rooms.read(code, token(1));
+        const selector = board.entities.find(
+          (e) => e.id === board.game!.selectorId,
+        )!;
+        const chooser =
+          mode === 'individual' ? selector.memberIds[0] : selector.captainId!;
+        rooms.action(code, token(ids.indexOf(chooser) + 2), {
+          action: 'choose',
+          questionId: question.id,
+        });
+        for (const [entityIndex, entity] of board.entities.entries()) {
+          const actor =
+            mode === 'individual' ? entity.memberIds[0] : entity.captainId!;
+          rooms.action(code, token(ids.indexOf(actor) + 2), {
+            action: 'answer',
+            roundId: index + 1,
+            choice: entityIndex === 0 ? question.correctIndex : 0,
+          });
+        }
+        const result = rooms.read(code, token(1));
+        expect(result.game!.stage).toBe('result');
+        expect(result.game!.results![0].points).toBe(question.points);
+        expect(result.game!.results![1].points).toBe(0);
+        expect(result.game!.advanceAt).toBe(Date.now() + 3000);
+        priorScore += question.points;
+        expect(result.entities[0].score).toBe(priorScore);
+        const deadline = result.game!.advanceAt;
+        expect(() =>
+          rooms.action(code, token(1), { action: 'next', roundId: index + 1 }),
+        ).toThrow();
+        jest.advanceTimersByTime(2999);
+        expect(rooms.read(code, token(2)).game!.advanceAt).toBe(deadline);
+        expect(rooms.read(code, token(1)).game!.stage).toBe('result');
+        jest.advanceTimersByTime(1);
+        const advanced = rooms.read(code, token(1));
+        expect(advanced.game!.stage).toBe(index === 2 ? 'finished' : 'board');
+        expect(advanced.game!.advanceAt).toBeUndefined();
+        expect(advanced.game!.deadlineAt).toBeUndefined();
+        expect(advanced.game!.own).toBeUndefined();
+        expect(advanced.entities[0].score).toBe(priorScore);
+        if (mode === 'teams' && index === 0)
+          expect(advanced.entities[0].captainId).toBe(ids[1]);
+        expect(rooms.read(code, token(1)).entities).toEqual(advanced.entities);
+        expect(() =>
+          rooms.action(code, token(2), {
+            action: 'answer',
+            roundId: index + 1,
+            choice: question.correctIndex,
+          }),
+        ).toThrow();
+      }
+    },
+  );
+  it('anchors timeout results to the question deadline and catches up without extending results on reads', () => {
+    const { rooms, code } = setup('individual', 2);
+    rooms.configure(code, token(1), { pacing: 'automatic', resultSeconds: 8 });
+    rooms.startGame(code, token(1), { questions: [questions[0]] });
+    const open = rooms.action(code, token(2), {
+      action: 'choose',
+      questionId: 'q1',
+    });
+    jest.advanceTimersByTime(7000);
+    const result = rooms.read(code, token(3));
+    expect(result.game!.advanceAt).toBe(open.game!.deadlineAt! + 8000);
+    expect(result.game!.stage).toBe('result');
+    jest.advanceTimersByTime(6000);
+    expect(rooms.read(code, token(1)).game!.stage).toBe('finished');
+    expect(rooms.read(code, token(1)).entities.map((e) => e.score)).toEqual([
+      0, 0,
+    ]);
+  });
+  it('directed results wait for the host and pacing changes preserve participation and result duration', () => {
+    const { rooms, code } = setup('individual', 2);
+    rooms.configure(code, token(1), { resultSeconds: 12 });
+    rooms.configure(code, token(1), { pacing: 'automatic' });
+    rooms.configure(code, token(1), { pacing: 'directed' });
+    expect(rooms.read(code, token(1))).toMatchObject({
+      mode: 'individual',
+      pacing: 'directed',
+      resultSeconds: 12,
+    });
+    rooms.startGame(code, token(1), { questions });
+    rooms.action(code, token(2), { action: 'choose', questionId: 'q1' });
+    jest.advanceTimersByTime(25000);
+    expect(rooms.read(code, token(1)).game!.stage).toBe('result');
+    expect(rooms.read(code, token(1)).game!.advanceAt).toBeUndefined();
+    expect(() =>
+      rooms.action(code, token(2), { action: 'next', roundId: 1 }),
+    ).toThrow();
+    rooms.action(code, token(1), { action: 'next', roundId: 1 });
+    expect(rooms.read(code, token(1)).game!.stage).toBe('board');
+  });
+  it('rejects empty/null/out-of-range lobby settings and non-host changes without partial updates', () => {
+    const { rooms, code } = setup('individual', 2);
+    const before = rooms.read(code, token(1));
+    for (const body of [
+      {},
+      { resultSeconds: 0 },
+      { resultSeconds: 31 },
+      { resultSeconds: 3.5 },
+      { pacing: null },
+      { mode: null },
+    ]) {
+      expect(() => rooms.configure(code, token(1), body as never)).toThrow();
+    }
+    expect(() =>
+      rooms.configure(code, token(2), { pacing: 'automatic' }),
+    ).toThrow();
+    expect(rooms.read(code, token(1))).toEqual(before);
   });
 });

@@ -94,6 +94,7 @@ describe('Concursos real WebSocket transport', () => {
   it('pushes joins/configuration without polling and acknowledges leaving before disconnecting', async () => {
     const { code } = rooms.create(token(1), 'qa');
     const host = await connect(code, token(1));
+    await command(host, 'configuration', { pacing: 'directed' });
     const start = Date.now();
     rooms.join(code, token(2), 'Lucía');
     await until(() =>
@@ -127,6 +128,7 @@ describe('Concursos real WebSocket transport', () => {
         .statusCode,
     ).toBe(400);
     const host = await connect(code, token(1));
+    await command(host, 'configuration', { pacing: 'directed' });
     expect(
       (
         await command(host, 'start', {
@@ -143,6 +145,7 @@ describe('Concursos real WebSocket transport', () => {
     const { code } = rooms.create(token(1), 'qa');
     for (let n = 2; n <= 5; n++) rooms.join(code, token(n), `P${n}`);
     const host = await connect(code, token(1));
+    await command(host, 'configuration', { pacing: 'directed' });
     await command(host, 'configuration', { mode: 'teams' });
     const players = await Promise.all(
       [2, 3, 4, 5].map((n) => connect(code, token(n))),
@@ -183,6 +186,7 @@ describe('Concursos real WebSocket transport', () => {
     rooms.join(code, token(2), 'Ana');
     rooms.join(code, token(3), 'Luis');
     const host = await connect(code, token(1));
+    await command(host, 'configuration', { pacing: 'directed' });
     const a = await connect(code, token(2));
     const b = await connect(code, token(3));
     await command(host, 'start', {
@@ -210,6 +214,7 @@ describe('Concursos real WebSocket transport', () => {
     rooms.join(code, token(2), 'A');
     rooms.join(code, token(3), 'B');
     const host = await connect(code, token(1));
+    await command(host, 'configuration', { pacing: 'directed' });
     const a = await connect(code, token(2));
     const b = await connect(code, token(3));
     await command(host, 'start', { questions: [{ ...question, seconds: 1 }] });
@@ -221,5 +226,40 @@ describe('Concursos real WebSocket transport', () => {
     expect(snapshot(host)?.entities.map((e) => e.score)).toEqual([0, 0]);
     await command(host, 'close');
     await until(() => (snapshot(b)?.status === 'closed' ? true : undefined));
+  });
+  it('pushes automatic result countdown and advancement without host continuation and preserves it on reconnect', async () => {
+    const { code } = rooms.create(token(1), 'qa');
+    rooms.join(code, token(2), 'A');
+    rooms.join(code, token(3), 'B');
+    const host = await connect(code, token(1));
+    const a = await connect(code, token(2));
+    const b = await connect(code, token(3));
+    const configured = await command(host, 'configuration', {
+      pacing: 'automatic',
+      resultSeconds: 3,
+    });
+    expect(configured.data).toMatchObject({
+      mode: 'individual',
+      pacing: 'automatic',
+      resultSeconds: 3,
+    });
+    await command(host, 'start', { questions: [question] });
+    expect(
+      (await command(host, 'configuration', { pacing: 'directed' })).statusCode,
+    ).toBe(409);
+    await command(a, 'action', { action: 'choose', questionId: 'q' });
+    await command(a, 'action', { action: 'answer', roundId: 1, choice: 1 });
+    await command(b, 'action', { action: 'answer', roundId: 1, choice: 0 });
+    await until(() => snapshot(host)?.game?.advanceAt);
+    const advanceAt = snapshot(host)!.game!.advanceAt;
+    expect(snapshot(a)?.game?.results?.[0].points).toBe(100);
+    a.socket.terminate();
+    const restored = await connect(code, token(2));
+    expect(snapshot(restored)?.game?.advanceAt).toBe(advanceAt);
+    await until(() =>
+      snapshot(host)?.game?.stage === 'finished' ? true : undefined,
+    );
+    expect(snapshot(restored)?.entities[0].score).toBe(100);
+    expect(snapshot(b)?.game?.advanceAt).toBeUndefined();
   });
 });

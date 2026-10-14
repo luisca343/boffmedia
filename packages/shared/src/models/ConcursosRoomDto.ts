@@ -6,6 +6,8 @@ import type { ConcursosEntityDto } from './ConcursosEntityDto';
 import type { ConcursosGameDto } from './ConcursosGameDto';
 import type { ConcursosMemberDto } from './ConcursosMemberDto';
 export type ConcursosRoomDto = {
+    pacing: ConcursosRoomDto.pacing;
+    resultSeconds: number;
     mode: ConcursosRoomDto.mode;
     entities: Array<ConcursosEntityDto>;
     game?: ConcursosGameDto;
@@ -17,6 +19,10 @@ export type ConcursosRoomDto = {
     memberId?: string;
 };
 export namespace ConcursosRoomDto {
+    export enum pacing {
+        AUTOMATIC = 'automatic',
+        DIRECTED = 'directed',
+    }
     export enum mode {
         INDIVIDUAL = 'individual',
         TEAMS = 'teams',
