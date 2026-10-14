@@ -112,4 +112,90 @@ describe('Concursos anonymous HTTP contract', () => {
       .expect(200);
     expect(closed.body.data.status).toBe('closed');
   });
+  it('validates gameplay DTOs and exposes only actor-scoped state through the real guards', async () => {
+    const client = request(app.getHttpServer());
+    const created = await client
+      .post('/concursos/rooms')
+      .set('Authorization', capability(20))
+      .send({});
+    const base = '/concursos/rooms/' + created.body.data.code;
+    await client
+      .post(base + '/players')
+      .set('Authorization', capability(21))
+      .send({ nickname: 'Individual A' })
+      .expect(201);
+    await client
+      .post(base + '/players')
+      .set('Authorization', capability(22))
+      .send({ nickname: 'Individual B' })
+      .expect(201);
+    await client
+      .post(base + '/configuration')
+      .set('Authorization', capability(21))
+      .send({ mode: 'teams' })
+      .expect(403);
+    await client
+      .post(base + '/configuration')
+      .set('Authorization', capability(20))
+      .send({ mode: 'mixed' })
+      .expect(400);
+    await client
+      .post(base + '/game')
+      .set('Authorization', capability(20))
+      .send({ questions: [] })
+      .expect(400);
+    const question = {
+      id: 'http-1',
+      category: 'Ciencia',
+      prompt: 'Planet?',
+      choices: ['Venus', 'Mars', 'Earth', 'Jupiter'],
+      correctIndex: 1,
+      seconds: 20,
+      points: 100,
+      phaseIndex: 0,
+      phaseTitle: 'HTTP phase',
+    };
+    await client
+      .post(base + '/game')
+      .set('Authorization', capability(20))
+      .send({ questions: [{ ...question, correctIndex: 4 }] })
+      .expect(400);
+    await client
+      .post(base + '/game')
+      .set('Authorization', capability(20))
+      .send({ questions: [question] })
+      .expect(201);
+    const open = await client
+      .post(base + '/game/actions')
+      .set('Authorization', capability(21))
+      .send({ action: 'choose', questionId: 'http-1' })
+      .expect(201);
+    expect(open.body.data.game.question).not.toHaveProperty('correctIndex');
+    await client
+      .post(base + '/game/actions')
+      .set('Authorization', capability(21))
+      .send({ action: 'answer', roundId: 1, choice: 99 })
+      .expect(400);
+    await client
+      .post(base + '/game/actions')
+      .set('Authorization', capability(21))
+      .send({ action: 'answer', roundId: 1, choice: 1 })
+      .expect(201);
+    const rival = await client
+      .get(base)
+      .set('Authorization', capability(22))
+      .expect(200);
+    expect(rival.body.data.game.own).not.toHaveProperty('answer');
+    expect(rival.body.data.game.question).not.toHaveProperty('correctIndex');
+    const result = await client
+      .post(base + '/game/actions')
+      .set('Authorization', capability(22))
+      .send({ action: 'answer', roundId: 1, choice: 0 })
+      .expect(201);
+    expect(result.body.data.game.stage).toBe('result');
+    expect(
+      result.body.data.entities.map((e: { score: number }) => e.score),
+    ).toEqual([100, 0]);
+    await client.delete(base).set('Authorization', capability(20)).expect(200);
+  });
 });

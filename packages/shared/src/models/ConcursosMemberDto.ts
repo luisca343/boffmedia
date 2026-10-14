@@ -6,5 +6,6 @@ export type ConcursosMemberDto = {
     id: string;
     nickname: string;
     connected: boolean;
+    entityId?: string;
 };
 

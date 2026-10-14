@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
+  ApiExtraModels,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -20,10 +21,17 @@ import { Public } from '@api/_utils/decorators/public.decorator';
 import { ConcursosRoomsService } from './concursos-rooms.service';
 import {
   ConcursosRoomDto,
+  ConcursosSocketRequestDto,
+  ConcursosSocketResponseDto,
+  ConcursosConfigurationDto,
+  ConcursosGroupDto,
+  StartConcursosGameDto,
+  ConcursosActionDto,
   CreateConcursosRoomDto,
   JoinConcursosRoomDto,
 } from './concursos.dto';
 
+@ApiExtraModels(ConcursosSocketRequestDto, ConcursosSocketResponseDto)
 @ApiTags('Concursos')
 @ApiBearerAuth('concursos-capability')
 @Public()
@@ -84,5 +92,45 @@ export class ConcursosController {
   @ApiResponse({ status: 200, type: ConcursosRoomDto })
   leave(@Param('code') code: string, @Req() req: Request): ConcursosRoomDto {
     return this.rooms.leave(code, extractBearer(req));
+  }
+  @Post(':code/configuration')
+  @Header('Cache-Control', 'no-store')
+  @ApiResponse({ status: 201, type: ConcursosRoomDto })
+  configure(
+    @Param('code') code: string,
+    @Body() body: ConcursosConfigurationDto,
+    @Req() req: Request,
+  ) {
+    return this.rooms.configure(code, extractBearer(req), body.mode);
+  }
+  @Post(':code/group')
+  @Header('Cache-Control', 'no-store')
+  @ApiResponse({ status: 201, type: ConcursosRoomDto })
+  group(
+    @Param('code') code: string,
+    @Body() body: ConcursosGroupDto,
+    @Req() req: Request,
+  ) {
+    return this.rooms.group(code, extractBearer(req), body.entityId);
+  }
+  @Post(':code/game')
+  @Header('Cache-Control', 'no-store')
+  @ApiResponse({ status: 201, type: ConcursosRoomDto })
+  start(
+    @Param('code') code: string,
+    @Body() body: StartConcursosGameDto,
+    @Req() req: Request,
+  ) {
+    return this.rooms.startGame(code, extractBearer(req), body);
+  }
+  @Post(':code/game/actions')
+  @Header('Cache-Control', 'no-store')
+  @ApiResponse({ status: 201, type: ConcursosRoomDto })
+  action(
+    @Param('code') code: string,
+    @Body() body: ConcursosActionDto,
+    @Req() req: Request,
+  ) {
+    return this.rooms.action(code, extractBearer(req), body);
   }
 }

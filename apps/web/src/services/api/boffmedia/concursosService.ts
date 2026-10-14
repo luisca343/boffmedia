@@ -1,13 +1,28 @@
-import type { ConcursosRoomDto, JoinConcursosRoomDto } from "@boffmedia/shared";
-import {
-  apiAuthedPOST,
-  apiAuthedGET,
-  apiAuthedDELETE,
-} from "@/services/boffAPI";
+import { roomCommand } from "./concursosSocket";
+import type {
+  ConcursosRoomDto,
+  JoinConcursosRoomDto,
+  ConcursosActionDto,
+} from "@boffmedia/shared";
+import { apiAuthedPOST, apiAuthedGET } from "@/services/boffAPI";
 import { ApiError, orThrow } from "@/services/http/core";
 
 /** These are anonymous room capabilities, never a NextAuth/session JWT. */
 export const ConcursosService = {
+  async action(
+    code: string,
+    capability: string,
+    body: ConcursosActionDto,
+  ): Promise<ConcursosRoomDto> {
+    return roomCommand(code, capability, "action", body);
+  },
+  async group(
+    code: string,
+    capability: string,
+    entityId: string,
+  ): Promise<ConcursosRoomDto> {
+    return roomCommand(code, capability, "group", { entityId });
+  },
   async recover(
     code: string,
     nickname: string,
@@ -44,11 +59,6 @@ export const ConcursosService = {
     );
   },
   async leave(code: string, capability: string): Promise<ConcursosRoomDto> {
-    return orThrow(
-      apiAuthedDELETE<ConcursosRoomDto>(
-        `/concursos/rooms/${encodeURIComponent(code)}/players/me`,
-        capability,
-      ),
-    );
+    return roomCommand(code, capability, "leave");
   },
 };

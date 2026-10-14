@@ -1,0 +1,254 @@
+"use client";
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Button } from "@boffmedia/ui";
+import type { ConcursosRoomDto } from "@boffmedia/shared";
+import { ConcursosActionDto } from "@boffmedia/shared";
+import { ConcursosService } from "@/services/api/boffmedia/concursosService";
+import { useApiError } from "@/hooks/useApiError";
+
+export function GameController({
+  room,
+  token,
+  onRoom,
+}: {
+  room: ConcursosRoomDto;
+  token: string;
+  onRoom: (next: ConcursosRoomDto) => void;
+}) {
+  const t = useTranslations("concursos");
+  const apiError = useApiError();
+  const [selection, setSelection] = useState<{
+    roundId: number;
+    choice: number;
+  } | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+  const [remaining, setRemaining] = useState(0);
+  const game = room.game;
+  const choice =
+    game && selection?.roundId === game.roundId ? selection.choice : null;
+  const entity = room.entities.find((e) =>
+    e.memberIds.includes(room.memberId ?? ""),
+  );
+  const canCommit =
+    room.mode === "individual" || entity?.captainId === room.memberId;
+  const memberName = (id?: string) =>
+    room.members.find((m) => m.id === id)?.nickname ?? "";
+  const entityName = (id: string) => {
+    const unit = room.entities.find((e) => e.id === id);
+    return room.mode === "teams"
+      ? t("team", { number: unit?.label ?? "" })
+      : (unit?.label ?? "");
+  };
+  useEffect(() => {
+    setSelection(null);
+    setError("");
+  }, [game?.roundId]);
+  useEffect(() => {
+    if (!game?.deadlineAt) return;
+    const received = performance.now();
+    const update = () =>
+      setRemaining(
+        Math.max(
+          0,
+          Math.ceil(
+            (game.deadlineAt! -
+              game.serverNow -
+              (performance.now() - received)) /
+              1000,
+          ),
+        ),
+      );
+    update();
+    const timer = setInterval(update, 250);
+    return () => clearInterval(timer);
+  }, [game?.serverNow, game?.deadlineAt]);
+  async function run(operation: () => Promise<ConcursosRoomDto>) {
+    setBusy(true);
+    setError("");
+    try {
+      onRoom(await operation());
+    } catch (failure) {
+      setError(apiError(failure, t("connectionError")));
+    } finally {
+      setBusy(false);
+    }
+  }
+  const act = (body: ConcursosActionDto) =>
+    run(() => ConcursosService.action(room.code, token, body));
+  const ownAnswer = game?.own?.answer;
+  const locked = ownAnswer !== undefined;
+  return (
+    <section className="grid gap-4">
+      {error && (
+        <p role="alert" className="border border-bad p-3 text-bad">
+          {error}
+        </p>
+      )}
+      <p>{t(room.mode === "individual" ? "individualMode" : "teamsMode")}</p>
+      {!game && room.mode === "teams" && (
+        <div className="grid gap-2">
+          <p>{t("chooseTeam")}</p>
+          {room.entities.map((unit) => (
+            <Button
+              key={unit.id}
+              disabled={busy || entity?.id === unit.id}
+              onClick={() =>
+                run(() => ConcursosService.group(room.code, token, unit.id))
+              }
+            >
+              {entityName(unit.id)}
+            </Button>
+          ))}
+        </div>
+      )}
+      {room.mode === "teams" && entity && (
+        <p>{t("captain", { name: memberName(entity.captainId) })}</p>
+      )}
+      {!game && <p className="text-sm text-txt-muted">{t("waitingStart")}</p>}
+      {game && (
+        <>
+          <p className="font-bold">{game.phaseTitle}</p>
+          <ul className="grid grid-cols-2 gap-2 text-sm">
+            {room.entities.map((unit) => (
+              <li key={unit.id} className="break-words">
+                {t("score", { name: entityName(unit.id), points: unit.score })}
+              </li>
+            ))}
+          </ul>
+          {game.stage === "board" && (
+            <>
+              <p>{t("chooses", { name: entityName(game.selectorId) })}</p>
+              {game.board.map((item, index) => (
+                <Button
+                  key={item.id}
+                  disabled={
+                    busy || entity?.id !== game.selectorId || !canCommit
+                  }
+                  onClick={() =>
+                    act({
+                      action: ConcursosActionDto.action.CHOOSE,
+                      questionId: item.id,
+                    })
+                  }
+                >
+                  {item.category} · {index + 1}
+                </Button>
+              ))}
+            </>
+          )}
+          {(game.stage === "question" || game.stage === "result") &&
+            game.question && (
+              <>
+                <h2 className="break-words text-xl font-bold">
+                  {game.question.prompt}
+                </h2>
+                {game.stage === "question" && (
+                  <>
+                    <p role="timer">{t("seconds", { count: remaining })}</p>
+                    {game.question.choices.map((option, index) => (
+                      <Button
+                        key={index}
+                        disabled={busy || locked || remaining === 0}
+                        variant={choice === index ? "pri" : undefined}
+                        onClick={() =>
+                          setSelection({ roundId: game.roundId, choice: index })
+                        }
+                      >
+                        {option}
+                      </Button>
+                    ))}
+                    {locked ? (
+                      <p role="status">
+                        {t("answerSent", {
+                          answer: game.question.choices[ownAnswer],
+                        })}
+                      </p>
+                    ) : (
+                      <>
+                        {room.mode === "teams" && (
+                          <Button
+                            disabled={
+                              busy || choice === null || remaining === 0
+                            }
+                            onClick={() =>
+                              act({
+                                action: ConcursosActionDto.action.PROPOSE,
+                                roundId: game.roundId,
+                                choice: choice!,
+                              })
+                            }
+                          >
+                            {t("sendProposal")}
+                          </Button>
+                        )}
+                        {(room.mode === "individual" || canCommit) && (
+                          <Button
+                            disabled={
+                              busy || choice === null || remaining === 0
+                            }
+                            onClick={() =>
+                              act({
+                                action: ConcursosActionDto.action.ANSWER,
+                                roundId: game.roundId,
+                                choice: choice!,
+                              })
+                            }
+                          >
+                            {t(
+                              room.mode === "individual"
+                                ? "sendAnswer"
+                                : "confirmTeamAnswer",
+                            )}
+                          </Button>
+                        )}
+                      </>
+                    )}
+                    {room.mode === "teams" && (
+                      <>
+                        <p className="font-bold">{t("privateProposals")}</p>
+                        <ul>
+                          {game.own?.proposals.map((proposal) => (
+                            <li key={proposal.memberId}>
+                              {memberName(proposal.memberId)}:{" "}
+                              {game.question!.choices[proposal.choice]}
+                            </li>
+                          ))}
+                        </ul>
+                      </>
+                    )}
+                  </>
+                )}
+                {game.stage === "result" && (
+                  <>
+                    <p>
+                      {t("solution", {
+                        answer:
+                          game.question.choices[game.question.correctIndex!],
+                      })}
+                    </p>
+                    <ul>
+                      {game.results?.map((result) => (
+                        <li key={result.entityId}>
+                          {entityName(result.entityId)}:{" "}
+                          {result.answer === undefined
+                            ? t("noAnswer")
+                            : game.question!.choices[result.answer]}{" "}
+                          · {t(result.correct ? "correct" : "incorrect")}
+                        </li>
+                      ))}
+                    </ul>
+                    <p>{t("waitingNext")}</p>
+                  </>
+                )}
+              </>
+            )}
+          {game.stage === "finished" && (
+            <p className="text-xl font-bold">{t("finished")}</p>
+          )}
+        </>
+      )}
+    </section>
+  );
+}

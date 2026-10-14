@@ -50,6 +50,7 @@
     "CONCURSOS_BUSY": "No more rooms can be created right now. Try again in a minute.",
     "CONCURSOS_CLOSED": "The host has closed the room.",
     "CONCURSOS_NAME": "This nickname is already in use. Choose another.",
+    "CONCURSOS_GAME": "This action is no longer available. Check the turn and game state.",
     "CONCURSOS_FULL": "The room is full."
   }
 }

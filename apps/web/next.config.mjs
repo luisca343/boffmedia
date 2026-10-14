@@ -18,6 +18,8 @@ const bundleAnalyzer = withBundleAnalyzer({
 
 const nextConfig = {
     reactStrictMode: false,
+    // Separate cache/lock for the isolated Concursos QA server.
+    distDir: process.env.CONCURSOS_QA === '1' ? '.next-concursos-qa' : '.next',
     output: "standalone",
 
     // @boffmedia/ui ships TypeScript source, not a build.

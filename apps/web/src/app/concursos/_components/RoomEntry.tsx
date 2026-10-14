@@ -1,8 +1,9 @@
 "use client";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, useCallback, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Field, Input, Panel } from "@boffmedia/ui";
 import type { ConcursosRoomDto } from "@boffmedia/shared";
+import { ConcursosSocket } from "@/services/api/boffmedia/concursosSocket";
 import { ConcursosService } from "@/services/api/boffmedia/concursosService";
 import { useApiError } from "@/hooks/useApiError";
 import {
@@ -12,6 +13,8 @@ import {
   saveGuestSession,
   type GuestRoomSession,
 } from "../guest-session";
+
+import { GameController } from "./GameController";
 
 export function RoomEntry() {
   const t = useTranslations("concursos");
@@ -27,6 +30,15 @@ export function RoomEntry() {
     null,
   );
 
+  const acceptRoom = useCallback((next: ConcursosRoomDto) => {
+    setRoom((previous) =>
+      previous?.game &&
+      next.game &&
+      previous.game.serverNow > next.game.serverNow
+        ? previous
+        : next,
+    );
+  }, []);
   useEffect(() => {
     const saved = restoreGuestSession();
     if (saved) {
@@ -39,40 +51,49 @@ export function RoomEntry() {
   useEffect(() => {
     if (!session) return;
     let cancelled = false;
-    let admitted = false;
-    let timer: ReturnType<typeof setTimeout>;
-    const poll = async () => {
+    let channel: ConcursosSocket | undefined;
+    let retry: ReturnType<typeof setTimeout>;
+    setConnected(false);
+    const connect = async () => {
       try {
-        // Joining is idempotent for the same capability; also recovers a lost join reply.
-        const next = admitted
-          ? await ConcursosService.read(session.code, session.token)
-          : await ConcursosService.recover(
-              session.code,
-              session.nickname,
-              session.token,
-            );
+        const next = await ConcursosService.recover(
+          session.code,
+          session.nickname,
+          session.token,
+        );
         if (cancelled) return;
-        admitted = true;
-        setRoom(next);
-        setConnected(true);
-        setError("");
+        acceptRoom(next);
         if (next.status === "closed") {
           forgetGuestSession();
           return;
         }
+        channel = new ConcursosSocket(
+          session.code,
+          session.token,
+          (snapshot) => {
+            acceptRoom(snapshot);
+            if (snapshot.status === "closed") forgetGuestSession();
+          },
+          (online, failure) => {
+            if (cancelled) return;
+            setConnected(online);
+            setError(online ? "" : apiError(failure, t("connectionError")));
+          },
+        );
       } catch (failure) {
         if (cancelled) return;
         setConnected(false);
         setError(apiError(failure, t("connectionError")));
+        retry = setTimeout(connect, 5000);
       }
-      if (!cancelled) timer = setTimeout(poll, 3000);
     };
-    void poll();
+    void connect();
     return () => {
       cancelled = true;
-      clearTimeout(timer);
+      clearTimeout(retry);
+      channel?.stop();
     };
-  }, [session, apiError, t]);
+  }, [session, apiError, t, acceptRoom]);
 
   async function join(event: FormEvent) {
     event.preventDefault();
@@ -103,7 +124,7 @@ export function RoomEntry() {
       );
       setRoom(joined);
       setSession(attempt);
-      setConnected(true);
+      setConnected(false);
     } catch (failure) {
       setError(apiError(failure, t("connectionError")));
     } finally {
@@ -148,7 +169,7 @@ export function RoomEntry() {
             Boffmedia
           </p>
           <h1 className="mt-2 font-display text-4xl font-bold">{t("title")}</h1>
-          <p className="mt-3 text-txt-muted">{t("intro")}</p>
+          {!room?.game && <p className="mt-3 text-txt-muted">{t("intro")}</p>}
         </header>
         {error && (
           <p role="alert" className="border border-bad p-3 text-bad">
@@ -202,7 +223,11 @@ export function RoomEntry() {
         ) : (
           <Panel
             title={
-              room?.status === "closed" ? t("closedTitle") : t("lobbyTitle")
+              room?.status === "closed"
+                ? t("closedTitle")
+                : room?.game
+                  ? t("playingTitle")
+                  : t("lobbyTitle")
             }
           >
             <div className="grid gap-4">
@@ -216,7 +241,7 @@ export function RoomEntry() {
                     ? t("connected")
                     : t("reconnecting")}
               </p>
-              {room?.status !== "closed" && (
+              {room?.status !== "closed" && !room?.game && (
                 <>
                   <p>{t("youJoined", { nickname: session.nickname })}</p>
                   <p className="text-sm text-txt-muted">
@@ -241,12 +266,24 @@ export function RoomEntry() {
                       </li>
                     ))}
                   </ul>
-                  <p className="text-sm text-txt-muted">
-                    {t("connectionOnly")}
-                  </p>
                 </>
               )}
-              <Button onClick={leave} loading={busy} disabled={busy}>
+              {room && room.status !== "closed" && (
+                <GameController
+                  room={room}
+                  token={session.token}
+                  onRoom={acceptRoom}
+                />
+              )}
+              <Button
+                onClick={leave}
+                loading={busy}
+                disabled={
+                  busy ||
+                  (room?.status === "playing" &&
+                    room.game?.stage !== "finished")
+                }
+              >
                 {room?.status === "closed" ? t("anotherRoom") : t("leave")}
               </Button>
             </div>

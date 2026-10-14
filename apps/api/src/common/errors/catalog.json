@@ -289,6 +289,10 @@
       "es": "Este apodo ya está en uso. Elige otro.",
       "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
     },
+    "CONCURSOS_GAME": {
+      "es": "Esta acción ya no está disponible. Comprueba el turno y el estado de la partida.",
+      "where": "api/boffmedia/concursos/concursos-game.ts"
+    },
     "CONCURSOS_FULL": {
       "es": "La sala está completa.",
       "where": "api/boffmedia/concursos/concursos-rooms.service.ts"

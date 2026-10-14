@@ -50,6 +50,7 @@
     "CONCURSOS_BUSY": "No se pueden crear más salas ahora. Inténtalo dentro de un minuto.",
     "CONCURSOS_CLOSED": "El anfitrión ha cerrado la sala.",
     "CONCURSOS_NAME": "Este apodo ya está en uso. Elige otro.",
+    "CONCURSOS_GAME": "Esta acción ya no está disponible. Comprueba el turno y el estado de la partida.",
     "CONCURSOS_FULL": "La sala está completa."
   }
 }

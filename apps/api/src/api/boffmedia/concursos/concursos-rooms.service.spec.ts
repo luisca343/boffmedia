@@ -1,4 +1,4 @@
-﻿import { ConcursosRoomsService } from './concursos-rooms.service';
+import { ConcursosRoomsService } from './concursos-rooms.service';
 import {
   ConflictException,
   ForbiddenException,
@@ -57,6 +57,7 @@ describe('Concursos room-code lobby', () => {
       id: member.memberId,
       nickname: 'Lucía',
       connected: true,
+      entityId: member.memberId,
     });
     expect(JSON.stringify(view)).not.toContain(token(2));
   });

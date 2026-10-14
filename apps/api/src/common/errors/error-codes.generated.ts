@@ -42,6 +42,7 @@ export const ApiErrorCode = {
   CONCURSOS_BUSY: 'CONCURSOS_BUSY',
   CONCURSOS_CLOSED: 'CONCURSOS_CLOSED',
   CONCURSOS_FULL: 'CONCURSOS_FULL',
+  CONCURSOS_GAME: 'CONCURSOS_GAME',
   CONCURSOS_NAME: 'CONCURSOS_NAME',
   CONCURSOS_NOT_FOUND: 'CONCURSOS_NOT_FOUND',
   DATA_EXPORT_EXPIRED: 'DATA_EXPORT_EXPIRED',
@@ -138,6 +139,8 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
     'No se pueden crear más salas ahora. Inténtalo dentro de un minuto.',
   CONCURSOS_CLOSED: 'El anfitrión ha cerrado la sala.',
   CONCURSOS_FULL: 'La sala está completa.',
+  CONCURSOS_GAME:
+    'Esta acción ya no está disponible. Comprueba el turno y el estado de la partida.',
   CONCURSOS_NAME: 'Este apodo ya está en uso. Elige otro.',
   CONCURSOS_NOT_FOUND:
     'La sala no existe o ha caducado. Comprueba el código del juego.',

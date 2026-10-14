@@ -772,3 +772,19 @@ export { ConcursosRoomDto } from './models/ConcursosRoomDto';
 export type { JoinConcursosRoomDto } from './models/JoinConcursosRoomDto';
 
 export type { CreateConcursosRoomDto } from './models/CreateConcursosRoomDto';
+
+export { ConcursosActionDto } from './models/ConcursosActionDto';
+export type { ConcursosBoardItemDto } from './models/ConcursosBoardItemDto';
+export { ConcursosConfigurationDto } from './models/ConcursosConfigurationDto';
+export type { ConcursosEntityDto } from './models/ConcursosEntityDto';
+export { ConcursosGameDto } from './models/ConcursosGameDto';
+export type { ConcursosGroupDto } from './models/ConcursosGroupDto';
+export type { ConcursosOwnAnswerDto } from './models/ConcursosOwnAnswerDto';
+export type { ConcursosProposalDto } from './models/ConcursosProposalDto';
+export type { ConcursosQuestionDto } from './models/ConcursosQuestionDto';
+export type { ConcursosResultDto } from './models/ConcursosResultDto';
+export type { ConcursosVisibleQuestionDto } from './models/ConcursosVisibleQuestionDto';
+export type { StartConcursosGameDto } from './models/StartConcursosGameDto';
+
+export { ConcursosSocketRequestDto } from './models/ConcursosSocketRequestDto';
+export { ConcursosSocketResponseDto } from './models/ConcursosSocketResponseDto';
