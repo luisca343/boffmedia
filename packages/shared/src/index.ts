@@ -788,3 +788,5 @@ export type { StartConcursosGameDto } from './models/StartConcursosGameDto';
 
 export { ConcursosSocketRequestDto } from './models/ConcursosSocketRequestDto';
 export { ConcursosSocketResponseDto } from './models/ConcursosSocketResponseDto';
+
+export { ConcursosRecoverySettingsDto } from './models/ConcursosRecoverySettingsDto';

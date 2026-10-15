@@ -47,6 +47,12 @@
     "automaticPacing": "Automatic progression",
     "directedPacing": "Host-controlled progression",
     "earnedPoints": "+{points} points",
-    "nextCountdown": "Next turn in {count, plural, one {# second} other {# seconds}}"
+    "nextCountdown": "Next turn in {count, plural, one {# second} other {# seconds}}",
+    "paused": "Game paused",
+    "hostPaused": "The host paused the game.",
+    "hostDisconnected": "The host connection was lost.",
+    "waitingResume": "Waiting for the host to resume.",
+    "resumeCountdown": "Resuming in {count, plural, one {# second} other {# seconds}}",
+    "frozenSeconds": "Time preserved: {count, plural, one {# second} other {# seconds}}"
   }
 }

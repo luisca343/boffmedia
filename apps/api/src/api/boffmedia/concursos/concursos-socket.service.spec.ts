@@ -11,7 +11,11 @@ import type {
 } from './concursos.dto';
 
 const token = (n: number) => n.toString(16).padStart(48, '0');
-type Peer = { socket: WebSocket; frames: ConcursosSocketResponseDto[] };
+type Peer = {
+  heartbeat?: ReturnType<typeof setInterval>;
+  socket: WebSocket;
+  frames: ConcursosSocketResponseDto[];
+};
 async function until<T>(read: () => T | undefined, timeout = 4000): Promise<T> {
   const end = Date.now() + timeout;
   while (Date.now() < end) {
@@ -45,7 +49,10 @@ describe('Concursos real WebSocket transport', () => {
     peers = [];
   });
   afterEach(async () => {
-    for (const peer of peers) peer.socket.terminate();
+    for (const peer of peers) {
+      clearInterval(peer.heartbeat);
+      peer.socket.terminate();
+    }
     io.disconnectSockets(true);
     await app.close();
   });
@@ -56,7 +63,7 @@ describe('Concursos real WebSocket transport', () => {
   ): Promise<Peer> {
     const socket = new WebSocket(url);
     const frames: ConcursosSocketResponseDto[] = [];
-    const peer = { socket, frames };
+    const peer: Peer = { socket, frames };
     peers.push(peer);
     socket.on('message', (raw) => frames.push(JSON.parse(raw.toString())));
     await new Promise<void>((resolve, reject) => {
@@ -67,6 +74,11 @@ describe('Concursos real WebSocket transport', () => {
     await until(() =>
       frames.find((f) => f.type === (accepted ? 'ready' : 'error')),
     );
+    if (accepted)
+      peer.heartbeat = setInterval(() => {
+        if (socket.readyState === WebSocket.OPEN)
+          socket.send(JSON.stringify({ type: 'ping' }));
+      }, 1000);
     return peer;
   }
   let sequence = 0;
@@ -141,6 +153,107 @@ describe('Concursos real WebSocket transport', () => {
         .statusCode,
     ).toBe(400);
   });
+  it.each([
+    ['individual', 'automatic'],
+    ['individual', 'directed'],
+    ['teams', 'automatic'],
+    ['teams', 'directed'],
+  ] as const)(
+    'pauses and resumes the initial round-zero board in %s/%s',
+    async (mode, pacing) => {
+      const { code } = rooms.create(token(1), 'qa');
+      rooms.join(code, token(2), 'A');
+      rooms.join(code, token(3), 'B');
+      const host = await connect(code, token(1));
+      const a = await connect(code, token(2));
+      const b = await connect(code, token(3));
+      await command(host, 'configuration', { mode, pacing });
+      if (mode === 'teams') {
+        await command(a, 'group', { entityId: 'team-1' });
+        await command(b, 'group', { entityId: 'team-2' });
+      }
+      const started = await command(host, 'start', { questions: [question] });
+      expect(started.data?.game).toMatchObject({
+        stage: 'board',
+        roundId: 0,
+        controlRevision: 0,
+      });
+      const invalid = await command(host, 'action', {
+        action: 'pause',
+        roundId: -1,
+        controlRevision: 0,
+      });
+      expect(invalid).toMatchObject({
+        type: 'error',
+        statusCode: 400,
+        code: 'CONCURSOS_GAME',
+      });
+      const forbidden = await command(a, 'action', {
+        action: 'pause',
+        roundId: 0,
+        controlRevision: 0,
+      });
+      expect(forbidden).toMatchObject({
+        type: 'error',
+        statusCode: 403,
+        code: 'CONCURSOS_ACCESS',
+      });
+      const paused = await command(host, 'action', {
+        action: 'pause',
+        roundId: 0,
+        controlRevision: 0,
+      });
+      expect(paused.type).toBe('reply');
+      expect(paused.data?.game).toMatchObject({
+        stage: 'board',
+        roundId: 0,
+        paused: true,
+        controlRevision: 1,
+        board: [],
+      });
+      await until(() => (snapshot(b)?.game?.paused ? true : undefined));
+      expect(
+        (await command(a, 'action', { action: 'choose', questionId: 'q' }))
+          .statusCode,
+      ).toBe(409);
+      const retry = await command(host, 'action', {
+        action: 'pause',
+        roundId: 0,
+        controlRevision: 0,
+      });
+      expect(retry.data?.game?.controlRevision).toBe(1);
+      const resume = await command(host, 'action', {
+        action: 'resume',
+        roundId: 0,
+        controlRevision: 1,
+      });
+      expect(resume.type).toBe('reply');
+      expect(resume.data?.game?.resumeAt).toBeGreaterThan(Date.now());
+      const cancelled = await command(host, 'action', {
+        action: 'pause',
+        roundId: 0,
+        controlRevision: 2,
+      });
+      expect(cancelled.data?.game?.paused).toBe(true);
+      expect(cancelled.data?.game?.resumeAt).toBeUndefined();
+      await command(host, 'action', {
+        action: 'resume',
+        roundId: 0,
+        controlRevision: 3,
+      });
+      await until(() =>
+        snapshot(b)?.game?.paused === false ? true : undefined,
+      );
+      expect(snapshot(b)?.game?.stage).toBe('board');
+      expect(snapshot(b)?.game?.board).toHaveLength(1);
+      expect(
+        (await command(a, 'action', { action: 'choose', questionId: 'q' }))
+          .type,
+      ).toBe('reply');
+      expect(snapshot(a)?.game?.roundId).toBe(1);
+    },
+    10000,
+  );
   it('keeps proposals private on every pushed frame and reconnects with the same identity', async () => {
     const { code } = rooms.create(token(1), 'qa');
     for (let n = 2; n <= 5; n++) rooms.join(code, token(n), `P${n}`);
@@ -262,4 +375,100 @@ describe('Concursos real WebSocket transport', () => {
     expect(snapshot(restored)?.entities[0].score).toBe(100);
     expect(snapshot(b)?.game?.advanceAt).toBeUndefined();
   });
+  it('pushes masked pause, rejects player controls, restores the countdown and keeps private answers', async () => {
+    const { code } = rooms.create(token(1), 'qa');
+    rooms.join(code, token(2), 'A');
+    rooms.join(code, token(3), 'B');
+    const host = await connect(code, token(1));
+    const a = await connect(code, token(2));
+    const b = await connect(code, token(3));
+    await command(host, 'start', { questions: [question] });
+    await command(a, 'action', { action: 'choose', questionId: 'q' });
+    await command(a, 'action', { action: 'answer', roundId: 1, choice: 1 });
+    const paused = await command(host, 'action', {
+      action: 'pause',
+      roundId: 1,
+      controlRevision: 0,
+    });
+    expect(paused.type).toBe('reply');
+    await until(() => (snapshot(b)?.game?.paused ? true : undefined));
+    expect(snapshot(b)?.game?.question).toBeUndefined();
+    expect(snapshot(host)?.game?.own).toBeUndefined();
+    expect(snapshot(a)?.game?.own?.answer).toBe(1);
+    expect(
+      (await command(b, 'action', { action: 'answer', roundId: 1, choice: 1 }))
+        .statusCode,
+    ).toBe(409);
+    expect(
+      (
+        await command(b, 'action', {
+          action: 'resume',
+          roundId: 1,
+          controlRevision: 1,
+        })
+      ).statusCode,
+    ).toBe(403);
+    const frozen = paused.data!.game!.remainingMs!;
+    a.socket.terminate();
+    const refreshed = await connect(code, token(2));
+    expect(snapshot(refreshed)?.game?.remainingMs).toBe(frozen);
+    const resume = await command(host, 'action', {
+      action: 'resume',
+      roundId: 1,
+      controlRevision: 1,
+    });
+    expect(resume.data!.game!.resumeAt).toBeGreaterThan(Date.now());
+    await until(() => (snapshot(b)?.game?.paused === false ? true : undefined));
+    expect(
+      snapshot(b)!.game!.deadlineAt! - snapshot(b)!.game!.serverNow,
+    ).toBeGreaterThan(frozen - 200);
+    expect(
+      (
+        await command(host, 'action', {
+          action: 'pause',
+          roundId: 1,
+          controlRevision: 0,
+        })
+      ).statusCode,
+    ).toBe(409);
+  }, 10000);
+  it('automatically pauses on an actual host socket loss and waits for explicit resume after host reconnect', async () => {
+    const { code } = rooms.create(token(1), 'qa');
+    rooms.join(code, token(2), 'A');
+    rooms.join(code, token(3), 'B');
+    const host = await connect(code, token(1));
+    const a = await connect(code, token(2));
+    const b = await connect(code, token(3));
+    await command(host, 'configuration', {
+      recoverySettings: {
+        version: 1,
+        hostGraceSeconds: 2,
+        hostRetentionMinutes: 1,
+        hideQuestionWhilePaused: true,
+        allowLocalSelectionWhilePaused: false,
+        resumeCountdownSeconds: 1,
+      },
+    });
+    await command(host, 'start', { questions: [question] });
+    await command(a, 'action', { action: 'choose', questionId: 'q' });
+    host.socket.terminate();
+    await until(() =>
+      snapshot(b)?.game?.pauseReason === 'host_disconnected' ? true : undefined,
+    );
+    const remaining = snapshot(b)!.game!.remainingMs!;
+    const restored = await connect(code, token(1));
+    expect(snapshot(restored)?.hostConnected).toBe(true);
+    expect(snapshot(restored)?.game?.paused).toBe(true);
+    expect(snapshot(restored)?.game?.remainingMs).toBe(remaining);
+    const game = snapshot(restored)!.game!;
+    await command(restored, 'action', {
+      action: 'resume',
+      roundId: game.roundId,
+      controlRevision: game.controlRevision,
+    });
+    await until(() => (snapshot(a)?.game?.paused === false ? true : undefined));
+    expect(
+      snapshot(a)!.game!.deadlineAt! - snapshot(a)!.game!.serverNow,
+    ).toBeGreaterThan(remaining - 200);
+  }, 10000);
 });

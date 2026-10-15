@@ -48,9 +48,13 @@ export class ConcursosController {
   @ApiResponse({ status: 201, type: ConcursosRoomDto })
   create(
     @Req() req: Request,
-    @Body() _body: CreateConcursosRoomDto,
+    @Body() body: CreateConcursosRoomDto,
   ): ConcursosRoomDto {
-    return this.rooms.create(extractBearer(req), req.ip ?? 'unknown');
+    return this.rooms.create(
+      extractBearer(req),
+      req.ip ?? 'unknown',
+      body.recoverySettings,
+    );
   }
 
   @Post(':code/players')

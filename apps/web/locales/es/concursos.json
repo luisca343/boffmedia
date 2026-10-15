@@ -47,6 +47,12 @@
     "automaticPacing": "Ritmo automático",
     "directedPacing": "Ritmo dirigido por el anfitrión",
     "earnedPoints": "+{points} puntos",
-    "nextCountdown": "Siguiente turno en {count, plural, one {# segundo} other {# segundos}}"
+    "nextCountdown": "Siguiente turno en {count, plural, one {# segundo} other {# segundos}}",
+    "paused": "Partida pausada",
+    "hostPaused": "El anfitrión ha pausado la partida.",
+    "hostDisconnected": "Se perdió la conexión del anfitrión.",
+    "waitingResume": "Esperando a que el anfitrión reanude.",
+    "resumeCountdown": "Reanudando en {count, plural, one {# segundo} other {# segundos}}",
+    "frozenSeconds": "Tiempo conservado: {count, plural, one {# segundo} other {# segundos}}"
   }
 }

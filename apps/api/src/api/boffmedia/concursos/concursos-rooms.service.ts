@@ -13,14 +13,15 @@ import { ApiErrorCode, userError } from '@/common/errors/user-error';
 import type {
   ConcursosRoomDto,
   ConcursosConfigurationDto,
+  ConcursosRecoverySettingsDto,
   ConcursosEntityDto,
   ConcursosActionDto,
   StartConcursosGameDto,
 } from './concursos.dto';
+import { recoverySettings } from './concursos-recovery-settings';
 import { ConcursosGame, gameConflict } from './concursos-game';
 
 const ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
-const HOST_IDLE_MS = 90_000;
 const MEMBER_IDLE_MS = 15_000;
 const ROOM_LIFETIME_MS = 4 * 60 * 60_000;
 const CLOSED_RETENTION_MS = 60_000;
@@ -42,6 +43,10 @@ type Room = {
   game?: ConcursosGame;
   createdAt: number;
   hostSeenAt: number;
+  recoverySettings: ConcursosRecoverySettingsDto;
+  hostSockets: Set<symbol>;
+  hostSocketSeen: boolean;
+  hostLostAt?: number;
   closedAt?: number;
   members: Map<string, Member>;
 };
@@ -76,9 +81,19 @@ export class ConcursosRoomsService {
 
   private sweep(now: number): void {
     for (const [code, room] of this.rooms) {
+      if (room.closedAt === undefined && room.hostSocketSeen) {
+        const grace = room.recoverySettings.hostGraceSeconds * 1000;
+        // Native host sends an application heartbeat every second. Explicit socket
+        // close starts grace immediately; silence uses last confirmed activity.
+        if (room.hostLostAt === undefined && now - room.hostSeenAt >= 1500)
+          room.hostLostAt = room.hostSeenAt;
+        if (room.hostLostAt !== undefined && now >= room.hostLostAt + grace)
+          room.game?.pauseForHostLoss(room.hostLostAt + grace);
+      }
       if (
         room.closedAt === undefined &&
-        (now - room.hostSeenAt >= HOST_IDLE_MS ||
+        (now - (room.hostLostAt ?? room.hostSeenAt) >=
+          room.recoverySettings.hostRetentionMinutes * 60_000 ||
           now - room.createdAt >= ROOM_LIFETIME_MS)
       ) {
         room.closedAt = now;
@@ -115,6 +130,8 @@ export class ConcursosRoomsService {
     const game =
       room.closedAt === undefined ? room.game?.view(member?.id) : undefined;
     return {
+      hostConnected: room.hostLostAt === undefined,
+      recoverySettings: structuredClone(room.recoverySettings),
       mode: room.mode,
       pacing: room.pacing,
       resultSeconds: room.resultSeconds,
@@ -145,7 +162,12 @@ export class ConcursosRoomsService {
     };
   }
 
-  create(token: string | null, source: string): ConcursosRoomDto {
+  create(
+    token: string | null,
+    source: string,
+    settings?: ConcursosRecoverySettingsDto,
+  ): ConcursosRoomDto {
+    const profile = recoverySettings(settings);
     const actor = this.actor(token);
     const now = Date.now();
     this.sweep(now);
@@ -185,6 +207,9 @@ export class ConcursosRoomsService {
       resultSeconds: 8,
       createdAt: now,
       hostSeenAt: now,
+      recoverySettings: profile,
+      hostSockets: new Set(),
+      hostSocketSeen: false,
       members: new Map(),
     };
     this.rooms.set(code, room);
@@ -239,7 +264,10 @@ export class ConcursosRoomsService {
     const actor = this.actor(token);
     const room = this.get(code);
     if (room.hostHash === actor) {
-      if (touch && room.closedAt === undefined) room.hostSeenAt = Date.now();
+      if (touch && room.closedAt === undefined) {
+        room.hostSeenAt = Date.now();
+        room.hostLostAt = undefined;
+      }
       return this.view(room, 'host');
     }
     const member = room.members.get(actor);
@@ -279,6 +307,29 @@ export class ConcursosRoomsService {
     room.members.delete(actor);
     return this.publish(this.view(room, 'player', member));
   }
+  socketOpened(code: string, token: string, connection: symbol) {
+    const actor = this.actor(token);
+    const room = this.get(code);
+    if (actor === room.hostHash && room.closedAt === undefined) {
+      room.hostSockets.add(connection);
+      room.hostSocketSeen = true;
+      room.hostSeenAt = Date.now();
+      room.hostLostAt = undefined;
+      this.changed.next(code);
+    }
+  }
+  socketClosed(code: string, token: string, connection: symbol) {
+    const room = this.rooms.get(code);
+    if (
+      !room ||
+      room.hostHash !== this.actor(token) ||
+      !room.hostSockets.delete(connection)
+    )
+      return;
+    if (!room.hostSockets.size && room.closedAt === undefined)
+      room.hostLostAt ??= Date.now();
+    this.changed.next(code);
+  }
   private entities(room: Room): ConcursosEntityDto[] {
     if (room.game) return room.game.entities;
     const members = Array.from(room.members.values());
@@ -310,7 +361,10 @@ export class ConcursosRoomsService {
       throw new ForbiddenException(
         userError(ApiErrorCode.CONCURSOS_ACCESS, 'not a room member'),
       );
-    if (host) room.hostSeenAt = Date.now();
+    if (host) {
+      room.hostSeenAt = Date.now();
+      room.hostLostAt = undefined;
+    }
     if (member) member.seenAt = Date.now();
     return { room, host, member };
   }
@@ -342,6 +396,11 @@ export class ConcursosRoomsService {
           body.resultSeconds > 30))
     )
       gameConflict();
+    const profile =
+      body.recoverySettings === undefined
+        ? room.recoverySettings
+        : recoverySettings(body.recoverySettings);
+    room.recoverySettings = profile;
     if (body.mode !== undefined) room.mode = body.mode;
     if (body.pacing !== undefined) room.pacing = body.pacing;
     if (body.resultSeconds !== undefined)
@@ -378,6 +437,7 @@ export class ConcursosRoomsService {
         room.mode,
         room.pacing,
         room.resultSeconds,
+        structuredClone(room.recoverySettings),
       );
     }
     return this.publish(this.view(room, 'host'));

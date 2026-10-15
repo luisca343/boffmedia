@@ -108,7 +108,7 @@ describe('Concursos room-code lobby', () => {
   it('expires a missing host even while a guest remains active, and cannot revive it', () => {
     const { code } = rooms.create(token(1), 'source');
     rooms.join(code, token(2), 'Ana');
-    now += 90_000;
+    now += 10 * 60_000;
     expect(rooms.read(code, token(2)).status).toBe('closed');
     expect(rooms.read(code, token(1)).status).toBe('closed');
     expect(rooms.create(token(1), 'source').code).not.toBe(code);

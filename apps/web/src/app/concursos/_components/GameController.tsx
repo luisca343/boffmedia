@@ -45,15 +45,16 @@ export function GameController({
     setSelection(null);
     setError("");
   }, [game?.roundId]);
-  const deadline =
-    game?.stage === "result"
+  const deadline = game?.paused
+    ? game.resumeAt
+    : game?.stage === "result"
       ? game.advanceAt
       : game?.stage === "question"
         ? game.deadlineAt
         : undefined;
   useEffect(() => {
     if (!deadline || !game) {
-      setRemaining(0);
+      setRemaining(Math.ceil((game?.remainingMs ?? 0) / 1000));
       return;
     }
     const received = performance.now();
@@ -69,7 +70,7 @@ export function GameController({
     update();
     const timer = setInterval(update, 250);
     return () => clearInterval(timer);
-  }, [game?.serverNow, deadline]);
+  }, [game?.serverNow, deadline, game?.remainingMs, game?.paused]);
   async function run(operation: () => Promise<ConcursosRoomDto>) {
     setBusy(true);
     setError("");
@@ -85,6 +86,7 @@ export function GameController({
     run(() => ConcursosService.action(room.code, token, body));
   const ownAnswer = game?.own?.answer;
   const locked = ownAnswer !== undefined;
+  const paused = game?.paused ?? false;
   return (
     <section className="grid gap-4">
       {error && (
@@ -118,6 +120,30 @@ export function GameController({
         <p>{t("captain", { name: memberName(entity.captainId) })}</p>
       )}
       {!game && <p className="text-sm text-txt-muted">{t("waitingStart")}</p>}
+      {game?.paused && (
+        <div role="status" className="border border-accent p-3">
+          <p className="font-bold">{t("paused")}</p>
+          <p>
+            {t(
+              game.pauseReason === "host_disconnected"
+                ? "hostDisconnected"
+                : "hostPaused",
+            )}
+          </p>
+          {game.resumeAt !== undefined ? (
+            <p role="timer">{t("resumeCountdown", { count: remaining })}</p>
+          ) : (
+            <p>{t("waitingResume")}</p>
+          )}
+          {game.remainingMs !== undefined && (
+            <p>
+              {t("frozenSeconds", {
+                count: Math.ceil(game.remainingMs / 1000),
+              })}
+            </p>
+          )}
+        </div>
+      )}
       {game && (
         <>
           <p className="font-bold">{game.phaseTitle}</p>
@@ -140,7 +166,10 @@ export function GameController({
                 <Button
                   key={item.id}
                   disabled={
-                    busy || entity?.id !== game.selectorId || !canCommit
+                    busy ||
+                    paused ||
+                    entity?.id !== game.selectorId ||
+                    !canCommit
                   }
                   onClick={() =>
                     act({
@@ -162,11 +191,22 @@ export function GameController({
                 </h2>
                 {game.stage === "question" && (
                   <>
-                    <p role="timer">{t("seconds", { count: remaining })}</p>
+                    <p role="timer">
+                      {t(paused ? "frozenSeconds" : "seconds", {
+                        count: remaining,
+                      })}
+                    </p>
                     {game.question.choices.map((option, index) => (
                       <Button
                         key={index}
-                        disabled={busy || locked || remaining === 0}
+                        disabled={
+                          busy ||
+                          locked ||
+                          remaining === 0 ||
+                          (paused &&
+                            !room.recoverySettings
+                              .allowLocalSelectionWhilePaused)
+                        }
                         variant={choice === index ? "pri" : undefined}
                         onClick={() =>
                           setSelection({ roundId: game.roundId, choice: index })
@@ -186,7 +226,10 @@ export function GameController({
                         {room.mode === "teams" && (
                           <Button
                             disabled={
-                              busy || choice === null || remaining === 0
+                              busy ||
+                              paused ||
+                              choice === null ||
+                              remaining === 0
                             }
                             onClick={() =>
                               act({
@@ -202,7 +245,10 @@ export function GameController({
                         {(room.mode === "individual" || canCommit) && (
                           <Button
                             disabled={
-                              busy || choice === null || remaining === 0
+                              busy ||
+                              paused ||
+                              choice === null ||
+                              remaining === 0
                             }
                             onClick={() =>
                               act({
@@ -256,13 +302,13 @@ export function GameController({
                         </li>
                       ))}
                     </ul>
-                    {game.advanceAt !== undefined ? (
+                    {!paused && game.advanceAt !== undefined ? (
                       <p role="timer" className="font-bold">
                         {t("nextCountdown", { count: remaining })}
                       </p>
-                    ) : (
+                    ) : !paused ? (
                       <p>{t("waitingNext")}</p>
-                    )}
+                    ) : null}
                   </>
                 )}
               </>

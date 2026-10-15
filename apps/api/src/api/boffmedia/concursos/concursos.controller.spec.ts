@@ -198,4 +198,36 @@ describe('Concursos anonymous HTTP contract', () => {
     ).toEqual([100, 0]);
     await client.delete(base).set('Authorization', capability(20)).expect(200);
   });
+  it('validates versioned nested recovery configuration on anonymous room creation', async () => {
+    await request(app.getHttpServer())
+      .post('/concursos/rooms')
+      .set('Authorization', capability(40))
+      .send({ recoverySettings: { hostGraceSeconds: '5' } })
+      .expect(400);
+    await request(app.getHttpServer())
+      .post('/concursos/rooms')
+      .set('Authorization', capability(41))
+      .send({ recoverySettings: { version: 2 } })
+      .expect(400);
+    await request(app.getHttpServer())
+      .post('/concursos/rooms')
+      .set('Authorization', capability(42))
+      .send({ recoverySettings: { extra: true } })
+      .expect(400);
+    const created = await request(app.getHttpServer())
+      .post('/concursos/rooms')
+      .set('Authorization', capability(43))
+      .send({
+        recoverySettings: { hostGraceSeconds: 0, resumeCountdownSeconds: 0 },
+      })
+      .expect(201);
+    expect(created.body.data.recoverySettings).toMatchObject({
+      version: 1,
+      hostGraceSeconds: 0,
+      resumeCountdownSeconds: 0,
+      hostRetentionMinutes: 10,
+      hideQuestionWhilePaused: true,
+      allowLocalSelectionWhilePaused: false,
+    });
+  });
 });

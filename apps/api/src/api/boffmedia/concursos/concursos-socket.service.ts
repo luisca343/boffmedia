@@ -21,11 +21,12 @@ import {
   ConcursosGroupDto,
   StartConcursosGameDto,
   ConcursosActionDto,
-  CreateConcursosRoomDto,
+  EmptyConcursosCommandDto,
 } from './concursos.dto';
 
 type Client = {
   socket: WebSocket;
+  connection: symbol;
   code?: string;
   token?: string;
   signature?: string;
@@ -100,6 +101,7 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
   private connected(socket: WebSocket) {
     const client: Client = {
       socket,
+      connection: Symbol('concursos-connection'),
       lastPing: Date.now(),
       chain: Promise.resolve(),
       count: 0,
@@ -107,7 +109,11 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
     };
     this.clients.add(client);
     socket.on('error', () => socket.terminate());
-    socket.on('close', () => this.clients.delete(client));
+    socket.on('close', () => {
+      this.clients.delete(client);
+      if (client.code && client.token)
+        this.rooms.socketClosed(client.code, client.token, client.connection);
+    });
     socket.on('message', (raw, binary) => {
       if (Date.now() - client.window >= 1000) {
         client.count = 0;
@@ -138,11 +144,15 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
           if (frame.type === 'auth') {
             if (client.code || !frame.code || !frame.token)
               throw new UnauthorizedException();
-            const view = this.rooms.read(frame.code, frame.token);
+            this.rooms.read(frame.code, frame.token);
             client.code = frame.code;
             client.token = frame.token;
             client.lastPing = Date.now();
-            this.send(client, { type: 'ready', data: view });
+            this.rooms.socketOpened(frame.code, frame.token, client.connection);
+            this.send(client, {
+              type: 'ready',
+              data: this.rooms.read(frame.code, frame.token, false),
+            });
             this.broadcast(frame.code);
           } else {
             if (!client.code || !client.token)
@@ -175,8 +185,8 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
       group: ConcursosGroupDto,
       start: StartConcursosGameDto,
       action: ConcursosActionDto,
-      leave: CreateConcursosRoomDto,
-      close: CreateConcursosRoomDto,
+      leave: EmptyConcursosCommandDto,
+      close: EmptyConcursosCommandDto,
     }[frame.operation!];
     const body = await this.validation.transform(frame.body ?? {}, {
       type: 'body',
@@ -215,7 +225,12 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
     const error =
       typeof response === 'object' && 'code' in response
         ? (response as { code: string; userMessage: string })
-        : userError(ApiErrorCode.CONCURSOS_ACCESS, 'invalid socket message');
+        : userError(
+            statusCode === 401 || statusCode === 403
+              ? ApiErrorCode.CONCURSOS_ACCESS
+              : ApiErrorCode.CONCURSOS_GAME,
+            'invalid socket message',
+          );
     this.send(client, {
       type: 'error',
       id,

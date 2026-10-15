@@ -7,6 +7,11 @@ import type { ConcursosOwnAnswerDto } from './ConcursosOwnAnswerDto';
 import type { ConcursosResultDto } from './ConcursosResultDto';
 import type { ConcursosVisibleQuestionDto } from './ConcursosVisibleQuestionDto';
 export type ConcursosGameDto = {
+    paused: boolean;
+    controlRevision: number;
+    pauseReason?: ConcursosGameDto.pauseReason;
+    remainingMs?: number;
+    resumeAt?: number;
     pacing: ConcursosGameDto.pacing;
     resultSeconds: number;
     advanceAt?: number;
@@ -22,6 +27,10 @@ export type ConcursosGameDto = {
     results?: Array<ConcursosResultDto>;
 };
 export namespace ConcursosGameDto {
+    export enum pauseReason {
+        MANUAL = 'manual',
+        HOST_DISCONNECTED = 'host_disconnected',
+    }
     export enum pacing {
         AUTOMATIC = 'automatic',
         DIRECTED = 'directed',

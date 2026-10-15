@@ -11,12 +11,41 @@ import {
   IsOptional,
   IsArray,
   IsObject,
+  IsBoolean,
   ArrayMinSize,
   ArrayMaxSize,
   ValidateNested,
 } from 'class-validator';
 
-export class CreateConcursosRoomDto {}
+export class ConcursosRecoverySettingsDto {
+  @ApiProperty({ enum: [1], default: 1 }) @IsIn([1]) version = 1;
+  @ApiProperty({ minimum: 0, maximum: 60, default: 5 })
+  @IsInt()
+  @Min(0)
+  @Max(60)
+  hostGraceSeconds = 5;
+  @ApiProperty({ minimum: 1, maximum: 240, default: 10 })
+  @IsInt()
+  @Min(1)
+  @Max(240)
+  hostRetentionMinutes = 10;
+  @ApiProperty({ default: false }) @IsBoolean() allowLocalSelectionWhilePaused =
+    false;
+  @ApiProperty({ default: true }) @IsBoolean() hideQuestionWhilePaused = true;
+  @ApiProperty({ minimum: 0, maximum: 10, default: 3 })
+  @IsInt()
+  @Min(0)
+  @Max(10)
+  resumeCountdownSeconds = 3;
+}
+export class CreateConcursosRoomDto {
+  @ApiPropertyOptional({ type: ConcursosRecoverySettingsDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ConcursosRecoverySettingsDto)
+  recoverySettings?: ConcursosRecoverySettingsDto;
+}
+export class EmptyConcursosCommandDto {}
 
 export class JoinConcursosRoomDto {
   @ApiProperty({ maxLength: 24, minLength: 1, example: 'Lucía' })
@@ -37,6 +66,11 @@ export class ConcursosMemberDto {
 }
 
 export class ConcursosConfigurationDto {
+  @ApiPropertyOptional({ type: ConcursosRecoverySettingsDto })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ConcursosRecoverySettingsDto)
+  recoverySettings?: ConcursosRecoverySettingsDto;
   @ApiPropertyOptional({ enum: ['individual', 'teams'] })
   @IsOptional()
   @IsIn(['individual', 'teams'])
@@ -82,15 +116,30 @@ export class StartConcursosGameDto {
   questions!: ConcursosQuestionDto[];
 }
 export class ConcursosActionDto {
-  @ApiProperty({ enum: ['choose', 'propose', 'answer', 'next'] })
-  @IsIn(['choose', 'propose', 'answer', 'next'])
-  action!: 'choose' | 'propose' | 'answer' | 'next';
+  @ApiProperty({
+    enum: ['choose', 'propose', 'answer', 'next', 'pause', 'resume'],
+  })
+  @IsIn(['choose', 'propose', 'answer', 'next', 'pause', 'resume'])
+  action!: 'choose' | 'propose' | 'answer' | 'next' | 'pause' | 'resume';
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  controlRevision?: number;
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
   @Length(1, 160)
   questionId?: string;
-  @ApiPropertyOptional() @IsOptional() @IsInt() @Min(1) roundId?: number;
+  @ApiPropertyOptional({
+    minimum: 0,
+    description:
+      'Current round; zero is the initial board before the first question.',
+  })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  roundId?: number;
   @ApiPropertyOptional() @IsOptional() @IsInt() @Min(0) @Max(3) choice?: number;
 }
 export class ConcursosEntityDto {
@@ -127,6 +176,13 @@ export class ConcursosResultDto {
   @ApiProperty() correct!: boolean;
 }
 export class ConcursosGameDto {
+  @ApiProperty() paused!: boolean;
+  @ApiProperty() controlRevision!: number;
+  @ApiPropertyOptional({ enum: ['manual', 'host_disconnected'] }) pauseReason?:
+    | 'manual'
+    | 'host_disconnected';
+  @ApiPropertyOptional() remainingMs?: number;
+  @ApiPropertyOptional() resumeAt?: number;
   @ApiProperty({ enum: ['automatic', 'directed'] }) pacing!:
     | 'automatic'
     | 'directed';
@@ -152,6 +208,9 @@ export class ConcursosGameDto {
   results?: ConcursosResultDto[];
 }
 export class ConcursosRoomDto {
+  @ApiProperty() hostConnected!: boolean;
+  @ApiProperty({ type: ConcursosRecoverySettingsDto })
+  recoverySettings!: ConcursosRecoverySettingsDto;
   @ApiProperty({ enum: ['automatic', 'directed'] }) pacing!:
     | 'automatic'
     | 'directed';

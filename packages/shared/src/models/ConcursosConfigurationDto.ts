@@ -2,7 +2,9 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ConcursosRecoverySettingsDto } from './ConcursosRecoverySettingsDto';
 export type ConcursosConfigurationDto = {
+    recoverySettings?: ConcursosRecoverySettingsDto;
     mode?: ConcursosConfigurationDto.mode;
     pacing?: ConcursosConfigurationDto.pacing;
     resultSeconds?: number;

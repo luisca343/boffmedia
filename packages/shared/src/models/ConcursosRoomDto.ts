@@ -5,7 +5,10 @@
 import type { ConcursosEntityDto } from './ConcursosEntityDto';
 import type { ConcursosGameDto } from './ConcursosGameDto';
 import type { ConcursosMemberDto } from './ConcursosMemberDto';
+import type { ConcursosRecoverySettingsDto } from './ConcursosRecoverySettingsDto';
 export type ConcursosRoomDto = {
+    hostConnected: boolean;
+    recoverySettings: ConcursosRecoverySettingsDto;
     pacing: ConcursosRoomDto.pacing;
     resultSeconds: number;
     mode: ConcursosRoomDto.mode;
