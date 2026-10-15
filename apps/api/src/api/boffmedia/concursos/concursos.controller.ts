@@ -20,6 +20,9 @@ import { extractBearer } from '@api/_utils/auth/secret-compare';
 import { Public } from '@api/_utils/decorators/public.decorator';
 import { ConcursosRoomsService } from './concursos-rooms.service';
 import {
+  ConcursosDeviceRecoveryDto,
+  ConcursosRecoveryDecisionDto,
+  ConcursosRecoveryIdDto,
   ConcursosRoomDto,
   ConcursosSocketRequestDto,
   ConcursosSocketResponseDto,
@@ -31,7 +34,12 @@ import {
   JoinConcursosRoomDto,
 } from './concursos.dto';
 
-@ApiExtraModels(ConcursosSocketRequestDto, ConcursosSocketResponseDto)
+@ApiExtraModels(
+  ConcursosSocketRequestDto,
+  ConcursosSocketResponseDto,
+  ConcursosRecoveryDecisionDto,
+  ConcursosRecoveryIdDto,
+)
 @ApiTags('Concursos')
 @ApiBearerAuth('concursos-capability')
 @Public()
@@ -70,6 +78,22 @@ export class ConcursosController {
     @Req() req: Request,
   ): ConcursosRoomDto {
     return this.rooms.join(code, extractBearer(req), body.nickname);
+  }
+
+  @Post(':code/recovery-requests')
+  @Header('Cache-Control', 'no-store')
+  @ApiResponse({ status: 201, type: ConcursosDeviceRecoveryDto })
+  requestRecovery(
+    @Param('code') code: string,
+    @Req() req: Request,
+    @Body() body: JoinConcursosRoomDto,
+  ) {
+    return this.rooms.requestDeviceRecovery(
+      code,
+      extractBearer(req),
+      body.nickname,
+      req.ip ?? 'unknown',
+    );
   }
 
   @Get(':code')

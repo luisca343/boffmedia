@@ -58,6 +58,27 @@
     "playersDisconnected": "The game was paused when all contestants disconnected.",
     "absentSelectorCountdown": "Disconnected: selection passes to the next contestant in {count} s.",
     "participantConnections": "Participant connections",
-    "offlineReserved": "Offline · place reserved"
+    "offlineReserved": "Offline · place reserved",
+    "recoverPlayer": "Recover player on this phone",
+    "deviceRecoveryIntro": "Enter the room and your existing nickname. The host must approve the change.",
+    "requestDeviceRecovery": "Request recovery",
+    "backToEntry": "Back to entry",
+    "recoveringName": "Recovering {name}",
+    "compareRecoveryCode": "Show this code to the host to identify your request:",
+    "waitingDeviceApproval": "Waiting for host approval.",
+    "recoveryExpires": "Request expires in {count} s.",
+    "recoveryPreservesState": "The change preserves your game and replaces the previous phone access.",
+    "cancelRecovery": "Cancel request",
+    "connectingRecovery": "Connecting to your request…",
+    "retryRecovery": "Retry connection",
+    "newRecoveryRequest": "Create another request",
+    "deviceRecoveryStatus": {
+      "approved": "Recovery approved. Joining the game…",
+      "denied": "The host denied the request.",
+      "expired": "The request expired. You can create another one.",
+      "cancelled": "You cancelled the request.",
+      "superseded": "Another request was approved for that player.",
+      "closed": "The room is closed."
+    }
   }
 }

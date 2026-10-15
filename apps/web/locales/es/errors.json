@@ -51,6 +51,8 @@
     "CONCURSOS_CLOSED": "El anfitrión ha cerrado la sala.",
     "CONCURSOS_NAME": "Este apodo ya está en uso. Elige otro.",
     "CONCURSOS_GAME": "Esta acción ya no está disponible. Comprueba el turno y el estado de la partida.",
-    "CONCURSOS_FULL": "La sala está completa."
+    "CONCURSOS_FULL": "La sala está completa.",
+    "CONCURSOS_REVOKED": "Este acceso se ha sustituido por otro móvil. Ya no puedes controlar ese jugador.",
+    "CONCURSOS_RECOVERY": "No se puede recuperar ese jugador. Comprueba el código y el apodo o crea otra solicitud."
   }
 }

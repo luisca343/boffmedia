@@ -31,6 +31,42 @@ describe('Concursos anonymous HTTP contract', () => {
     await app.init();
   });
   afterAll(async () => app.close());
+  it('validates anonymous device requests without exposing a room or requiring an account', async () => {
+    const client = request(app.getHttpServer());
+    const created = await client
+      .post('/concursos/rooms')
+      .set('Authorization', capability(80))
+      .send({})
+      .expect(201);
+    const base = '/concursos/rooms/' + created.body.data.code;
+    await client
+      .post(base + '/players')
+      .set('Authorization', capability(81))
+      .send({ nickname: 'Device A' })
+      .expect(201);
+    await client
+      .post(base + '/recovery-requests')
+      .set('Authorization', capability(82))
+      .send({ nickname: 'Device A', host: true })
+      .expect(400);
+    const pending = await client
+      .post(base + '/recovery-requests')
+      .set('Authorization', capability(82))
+      .send({ nickname: ' Device A ' })
+      .expect(201);
+    expect(pending.headers['cache-control']).toBe('no-store');
+    expect(pending.body.data).toMatchObject({
+      nickname: 'Device A',
+      status: 'pending',
+    });
+    expect(pending.body.data.members).toBeUndefined();
+    expect(pending.body.data.game).toBeUndefined();
+    await client.get(base).set('Authorization', capability(82)).expect(403);
+    await client
+      .post(base + '/recovery-requests')
+      .send({ nickname: 'Device A' })
+      .expect(401);
+  });
   it('uses the real global auth guards without a Boffmedia account and keeps secrets out of snapshots', async () => {
     const created = await request(app.getHttpServer())
       .post('/concursos/rooms')

@@ -103,6 +103,102 @@ describe('Concursos real WebSocket transport', () => {
     phaseTitle: 'Primera',
   };
 
+  it('streams private recovery status, transfers on host approval and closes every revoked socket', async () => {
+    const { code } = rooms.create(token(1), 'qa');
+    rooms.join(code, token(2), 'A');
+    rooms.join(code, token(3), 'B');
+    const host = await connect(code, token(1));
+    const old = await connect(code, token(2));
+    const overlap = await connect(code, token(2));
+    const other = await connect(code, token(3));
+    await command(host, 'start', { questions: [question] });
+    await command(old, 'action', { action: 'choose', questionId: 'q' });
+    await command(old, 'action', { action: 'answer', roundId: 1, choice: 1 });
+    const before = snapshot(old)!;
+    const request = rooms.requestDeviceRecovery(code, token(8), 'A', 'qa');
+    const applicant = await connect(code, token(8));
+    expect(snapshot(applicant)).toBeUndefined();
+    expect(
+      applicant.frames.find((frame) => frame.recovery)?.recovery,
+    ).toMatchObject({ id: request.id, status: 'pending' });
+    expect(
+      (
+        await command(applicant, 'action', {
+          action: 'answer',
+          roundId: 1,
+          choice: 2,
+        })
+      ).statusCode,
+    ).toBe(403);
+    expect(
+      (
+        await command(host, 'recovery-decision', {
+          requestId: 'invalid',
+          approve: true,
+        })
+      ).statusCode,
+    ).toBe(400);
+    expect(
+      (
+        await command(other, 'recovery-decision', {
+          requestId: request.id,
+          approve: true,
+        })
+      ).statusCode,
+    ).toBe(403);
+    const approved = await command(host, 'recovery-decision', {
+      requestId: request.id,
+      approve: true,
+    });
+    expect(approved.type).toBe('reply');
+    await until(() =>
+      snapshot(applicant)?.memberId === before.memberId ? true : undefined,
+    );
+    expect(snapshot(applicant)?.game?.own?.answer).toBe(1);
+    expect(snapshot(applicant)?.game?.deadlineAt).toBe(before.game!.deadlineAt);
+    for (const peer of [old, overlap]) {
+      await until(() =>
+        peer.frames.find((frame) => frame.code === 'CONCURSOS_REVOKED'),
+      );
+      await until(() =>
+        peer.socket.readyState === WebSocket.CLOSED ? true : undefined,
+      );
+    }
+    const restored = await connect(code, token(8));
+    expect(snapshot(restored)?.memberId).toBe(before.memberId);
+    expect(
+      (await connect(code, token(2), false)).frames.find(
+        (frame) => frame.type === 'error',
+      )?.code,
+    ).toBe('CONCURSOS_REVOKED');
+    expect(snapshot(other)?.pendingRecoveries).toBeUndefined();
+  });
+  it('acknowledges cancellation privately and pushes host denial without admitting an applicant', async () => {
+    const { code } = rooms.create(token(1), 'qa');
+    rooms.join(code, token(2), 'A');
+    const host = await connect(code, token(1));
+    const first = rooms.requestDeviceRecovery(code, token(8), 'A', 'qa');
+    const applicant = await connect(code, token(8));
+    const cancelled = await command(applicant, 'recovery-cancel', {
+      requestId: first.id,
+    });
+    expect(cancelled).toMatchObject({
+      type: 'reply',
+      recovery: { status: 'cancelled' },
+    });
+    expect(cancelled.data).toBeUndefined();
+    const second = rooms.requestDeviceRecovery(code, token(9), 'A', 'qa');
+    const denied = await connect(code, token(9));
+    await command(host, 'recovery-decision', {
+      requestId: second.id,
+      approve: false,
+    });
+    await until(() =>
+      denied.frames.find((frame) => frame.recovery?.status === 'denied'),
+    );
+    expect(snapshot(denied)).toBeUndefined();
+    expect(rooms.read(code, token(2)).role).toBe('player');
+  });
   it('pushes joins/configuration without polling and acknowledges leaving before disconnecting', async () => {
     const { code } = rooms.create(token(1), 'qa');
     const host = await connect(code, token(1));

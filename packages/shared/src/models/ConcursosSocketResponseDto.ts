@@ -2,11 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ConcursosDeviceRecoveryDto } from './ConcursosDeviceRecoveryDto';
 import type { ConcursosRoomDto } from './ConcursosRoomDto';
 export type ConcursosSocketResponseDto = {
     type: ConcursosSocketResponseDto.type;
     id?: string;
     data?: ConcursosRoomDto;
+    recovery?: ConcursosDeviceRecoveryDto;
     statusCode?: number;
     code?: string;
     userMessage?: string;

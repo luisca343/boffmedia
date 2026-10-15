@@ -1,5 +1,6 @@
 import { roomCommand } from "./concursosSocket";
 import type {
+  ConcursosDeviceRecoveryDto,
   ConcursosRoomDto,
   JoinConcursosRoomDto,
   ConcursosActionDto,
@@ -9,6 +10,34 @@ import { ApiError, orThrow } from "@/services/http/core";
 
 /** These are anonymous room capabilities, never a NextAuth/session JWT. */
 export const ConcursosService = {
+  async recoverDevice(
+    code: string,
+    nickname: string,
+    capability: string,
+  ): Promise<{
+    room?: ConcursosRoomDto;
+    recovery?: ConcursosDeviceRecoveryDto;
+  }> {
+    try {
+      return { room: await ConcursosService.read(code, capability) };
+    } catch (failure) {
+      if (
+        !(failure instanceof ApiError) ||
+        failure.statusCode !== 403 ||
+        failure.code === "CONCURSOS_REVOKED"
+      )
+        throw failure;
+    }
+    return {
+      recovery: await orThrow(
+        apiAuthedPOST<ConcursosDeviceRecoveryDto>(
+          `/concursos/rooms/${encodeURIComponent(code)}/recovery-requests`,
+          { nickname },
+          capability,
+        ),
+      ),
+    };
+  },
   async action(
     code: string,
     capability: string,

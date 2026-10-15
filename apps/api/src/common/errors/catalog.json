@@ -296,6 +296,14 @@
     "CONCURSOS_FULL": {
       "es": "La sala está completa.",
       "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
+    },
+    "CONCURSOS_REVOKED": {
+      "es": "Este acceso se ha sustituido por otro móvil. Ya no puedes controlar ese jugador.",
+      "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
+    },
+    "CONCURSOS_RECOVERY": {
+      "es": "No se puede recuperar ese jugador. Comprueba el código y el apodo o crea otra solicitud.",
+      "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
     }
   }
 }

@@ -15,6 +15,9 @@ export type ConcursosRecoverySettingsDto = {
     captainGraceSeconds: Record<string, any>;
     pauseWhenAllDisconnected: Record<string, any>;
     allDisconnectedGraceSeconds: Record<string, any>;
+    deviceRecoveryMinutes: Record<string, any>;
+    allowConnectedDeviceRecovery: Record<string, any>;
+    allowDeviceRecoveryDuringQuestion: Record<string, any>;
 };
 export namespace ConcursosRecoverySettingsDto {
     export enum version {

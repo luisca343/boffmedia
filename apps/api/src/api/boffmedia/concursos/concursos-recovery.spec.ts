@@ -69,6 +69,9 @@ describe('Configurable authoritative pause and host recovery', () => {
       captainGraceSeconds: 5,
       pauseWhenAllDisconnected: true,
       allDisconnectedGraceSeconds: 5,
+      deviceRecoveryMinutes: 2,
+      allowConnectedDeviceRecovery: true,
+      allowDeviceRecoveryDuringQuestion: true,
     });
     for (const patch of [
       { version: 2 },

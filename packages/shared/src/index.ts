@@ -790,3 +790,7 @@ export { ConcursosSocketRequestDto } from './models/ConcursosSocketRequestDto';
 export { ConcursosSocketResponseDto } from './models/ConcursosSocketResponseDto';
 
 export { ConcursosRecoverySettingsDto } from './models/ConcursosRecoverySettingsDto';
+
+export { ConcursosDeviceRecoveryDto } from './models/ConcursosDeviceRecoveryDto';
+export type { ConcursosRecoveryDecisionDto } from './models/ConcursosRecoveryDecisionDto';
+export type { ConcursosRecoveryIdDto } from './models/ConcursosRecoveryIdDto';

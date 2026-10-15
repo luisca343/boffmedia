@@ -1,4 +1,5 @@
 import type {
+  ConcursosDeviceRecoveryDto,
   ConcursosRoomDto,
   ConcursosSocketRequestDto,
   ConcursosSocketResponseDto,
@@ -23,7 +24,7 @@ export class ConcursosSocket {
   private pending = new Map<
     string,
     {
-      resolve: (room: ConcursosRoomDto) => void;
+      resolve: (frame: ConcursosSocketResponseDto) => void;
       reject: (error: unknown) => void;
       timeout: ReturnType<typeof setTimeout>;
     }
@@ -33,6 +34,7 @@ export class ConcursosSocket {
     private token: string,
     private onRoom: (room: ConcursosRoomDto) => void,
     private onConnection: (connected: boolean, error?: unknown) => void,
+    private onRecovery?: (request: ConcursosDeviceRecoveryDto) => void,
   ) {
     channels.set(key(code, token), this);
     this.connect();
@@ -67,6 +69,7 @@ export class ConcursosSocket {
             socket.send(JSON.stringify({ type: "ping" }));
         }, 1000);
       }
+      if (frame.recovery) this.onRecovery?.(frame.recovery);
       if (frame.data) {
         this.onRoom(frame.data);
         if (frame.data.status === "closed") this.stopped = true;
@@ -82,9 +85,15 @@ export class ConcursosSocket {
         if (command && frame.id) {
           clearTimeout(command.timeout);
           this.pending.delete(frame.id);
-          if (frame.type === "reply" && frame.data) command.resolve(frame.data);
+          if (frame.type === "reply" && (frame.data || frame.recovery))
+            command.resolve(frame);
           else command.reject(error);
         } else if (frame.type === "error") this.onConnection(false, error);
+        if (frame.code === "CONCURSOS_REVOKED") {
+          this.onConnection(false, error);
+          this.stopped = true;
+          socket.close();
+        }
       }
       if (this.stopped) socket.close();
     };
@@ -105,10 +114,22 @@ export class ConcursosSocket {
     };
     socket.onerror = () => socket.close();
   }
-  command(
+  async command(
     operation: `${NonNullable<ConcursosSocketRequestDto["operation"]>}`,
     body: object = {},
   ): Promise<ConcursosRoomDto> {
+    const frame = await this.request(operation, body);
+    if (!frame.data) throw unavailable();
+    return frame.data;
+  }
+  async cancelRecovery(requestId: string): Promise<void> {
+    const frame = await this.request("recovery-cancel", { requestId });
+    if (frame.recovery?.status !== "cancelled") throw unavailable();
+  }
+  private request(
+    operation: `${NonNullable<ConcursosSocketRequestDto["operation"]>}`,
+    body: object = {},
+  ): Promise<ConcursosSocketResponseDto> {
     if (!this.ready || this.socket?.readyState !== WebSocket.OPEN)
       return Promise.reject(unavailable());
     const id = crypto.randomUUID();

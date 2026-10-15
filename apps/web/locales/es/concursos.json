@@ -58,6 +58,27 @@
     "playersDisconnected": "La partida se pausó al desconectarse todos los concursantes.",
     "absentSelectorCountdown": "Sin conexión: la elección pasa al siguiente en {count} s.",
     "participantConnections": "Conexión de los participantes",
-    "offlineReserved": "Sin conexión · plaza reservada"
+    "offlineReserved": "Sin conexión · plaza reservada",
+    "recoverPlayer": "Recuperar jugador en este móvil",
+    "deviceRecoveryIntro": "Escribe la sala y el apodo que ya usabas. El anfitrión debe aprobar el cambio.",
+    "requestDeviceRecovery": "Solicitar recuperación",
+    "backToEntry": "Volver a la entrada",
+    "recoveringName": "Recuperando a {name}",
+    "compareRecoveryCode": "Muestra este código al anfitrión para que identifique tu solicitud:",
+    "waitingDeviceApproval": "Esperando aprobación del anfitrión.",
+    "recoveryExpires": "La solicitud caduca en {count} s.",
+    "recoveryPreservesState": "El cambio conserva tu partida y sustituye el acceso del móvil anterior.",
+    "cancelRecovery": "Cancelar solicitud",
+    "connectingRecovery": "Conectando con tu solicitud…",
+    "retryRecovery": "Reintentar conexión",
+    "newRecoveryRequest": "Crear otra solicitud",
+    "deviceRecoveryStatus": {
+      "approved": "Recuperación aprobada. Entrando en la partida…",
+      "denied": "El anfitrión ha rechazado la solicitud.",
+      "expired": "La solicitud ha caducado. Puedes crear otra.",
+      "cancelled": "Has cancelado la solicitud.",
+      "superseded": "Se aprobó otra solicitud para ese jugador.",
+      "closed": "La sala se ha cerrado."
+    }
   }
 }

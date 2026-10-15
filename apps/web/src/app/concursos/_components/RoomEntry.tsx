@@ -5,20 +5,24 @@ import { Button, Field, Input, Panel } from "@boffmedia/ui";
 import type { ConcursosRoomDto } from "@boffmedia/shared";
 import { ConcursosSocket } from "@/services/api/boffmedia/concursosSocket";
 import { ConcursosService } from "@/services/api/boffmedia/concursosService";
+import { ApiError } from "@/services/http/core";
 import { useApiError } from "@/hooks/useApiError";
 import {
   forgetGuestSession,
   guestCapability,
   restoreGuestSession,
+  restoreRecoveryAttempt,
   saveGuestSession,
   type GuestRoomSession,
 } from "../guest-session";
 
+import { DeviceRecovery } from "./DeviceRecovery";
 import { GameController } from "./GameController";
 
 export function RoomEntry() {
   const t = useTranslations("concursos");
   const apiError = useApiError();
+  const [deviceMode, setDeviceMode] = useState(false);
   const [code, setCode] = useState("");
   const [nickname, setNickname] = useState("");
   const [session, setSession] = useState<GuestRoomSession | null>(null);
@@ -30,6 +34,17 @@ export function RoomEntry() {
     null,
   );
 
+  const recoveredDevice = useCallback(
+    (next: ConcursosRoomDto, restored: GuestRoomSession) => {
+      setDeviceMode(false);
+      setError("");
+      setRoom(next);
+      setSession(restored);
+      setCode(restored.code);
+      setNickname(restored.nickname);
+    },
+    [],
+  );
   const acceptRoom = useCallback((next: ConcursosRoomDto) => {
     setRoom((previous) =>
       previous?.game &&
@@ -40,6 +55,11 @@ export function RoomEntry() {
     );
   }, []);
   useEffect(() => {
+    const pending = restoreRecoveryAttempt();
+    if (pending) {
+      setDeviceMode(true);
+      return;
+    }
     const saved = restoreGuestSession();
     if (saved) {
       setCode(saved.code);
@@ -54,6 +74,19 @@ export function RoomEntry() {
     let channel: ConcursosSocket | undefined;
     let retry: ReturnType<typeof setTimeout>;
     setConnected(false);
+    const revoked = (failure: unknown) => {
+      if (
+        !(failure instanceof ApiError) ||
+        failure.code !== "CONCURSOS_REVOKED"
+      )
+        return false;
+      forgetGuestSession(session);
+      setSession(null);
+      setRoom(null);
+      setRetrySession(null);
+      setError(apiError(failure));
+      return true;
+    };
     const connect = async () => {
       try {
         const next = await ConcursosService.recover(
@@ -76,12 +109,14 @@ export function RoomEntry() {
           },
           (online, failure) => {
             if (cancelled) return;
+            if (revoked(failure)) return;
             setConnected(online);
             setError(online ? "" : apiError(failure, t("connectionError")));
           },
         );
       } catch (failure) {
         if (cancelled) return;
+        if (revoked(failure)) return;
         setConnected(false);
         setError(apiError(failure, t("connectionError")));
         retry = setTimeout(connect, 5000);
@@ -176,7 +211,14 @@ export function RoomEntry() {
             {error}
           </p>
         )}
-        {!session ? (
+        {!session && deviceMode ? (
+          <DeviceRecovery
+            initialCode={code}
+            initialNickname={nickname}
+            onRecovered={recoveredDevice}
+            onBack={() => setDeviceMode(false)}
+          />
+        ) : !session ? (
           <Panel title={t("joinTitle")}>
             <form onSubmit={join} className="grid gap-5">
               <Field label={t("codeLabel")} hint={t("codeHint")}>
@@ -218,6 +260,15 @@ export function RoomEntry() {
                 {t("join")}
               </Button>
               <p className="text-sm text-txt-muted">{t("noAccount")}</p>
+              <Button
+                type="button"
+                onClick={() => {
+                  setError("");
+                  setDeviceMode(true);
+                }}
+              >
+                {t("recoverPlayer")}
+              </Button>
             </form>
           </Panel>
         ) : (

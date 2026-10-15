@@ -22,6 +22,8 @@ import {
   StartConcursosGameDto,
   ConcursosActionDto,
   EmptyConcursosCommandDto,
+  ConcursosRecoveryDecisionDto,
+  ConcursosRecoveryIdDto,
 } from './concursos.dto';
 
 type Client = {
@@ -144,28 +146,28 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
           if (frame.type === 'auth') {
             if (client.code || !frame.code || !frame.token)
               throw new UnauthorizedException();
-            this.rooms.read(frame.code, frame.token);
+            this.rooms.watch(frame.code, frame.token);
             client.code = frame.code;
             client.token = frame.token;
             client.lastPing = Date.now();
             this.rooms.socketOpened(frame.code, frame.token, client.connection);
             this.send(client, {
               type: 'ready',
-              data: this.rooms.read(frame.code, frame.token, false),
+              ...this.rooms.watch(frame.code, frame.token, false),
             });
             this.broadcast(frame.code);
           } else {
             if (!client.code || !client.token)
               throw new UnauthorizedException();
             if (frame.type === 'ping') {
-              this.rooms.read(client.code, client.token);
+              this.rooms.watch(client.code, client.token);
               client.lastPing = Date.now();
               this.send(client, { type: 'pong' });
             } else {
               if (!frame.id || !frame.operation)
                 throw new BadRequestException();
-              const data = await this.command(client, frame);
-              this.send(client, { type: 'reply', id: frame.id, data });
+              const payload = await this.command(client, frame);
+              this.send(client, { type: 'reply', id: frame.id, ...payload });
               this.broadcast(client.code);
               if (frame.operation === 'leave') client.socket.close(1000);
             }
@@ -187,6 +189,8 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
       action: ConcursosActionDto,
       leave: EmptyConcursosCommandDto,
       close: EmptyConcursosCommandDto,
+      'recovery-decision': ConcursosRecoveryDecisionDto,
+      'recovery-cancel': ConcursosRecoveryIdDto,
     }[frame.operation!];
     const body = await this.validation.transform(frame.body ?? {}, {
       type: 'body',
@@ -194,17 +198,34 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
     });
     switch (frame.operation) {
       case 'configuration':
-        return this.rooms.configure(code, token, body);
+        return { data: this.rooms.configure(code, token, body) };
       case 'group':
-        return this.rooms.group(code, token, body.entityId);
+        return { data: this.rooms.group(code, token, body.entityId) };
       case 'start':
-        return this.rooms.startGame(code, token, body);
+        return { data: this.rooms.startGame(code, token, body) };
       case 'action':
-        return this.rooms.action(code, token, body);
+        return { data: this.rooms.action(code, token, body) };
       case 'leave':
-        return this.rooms.leave(code, token);
+        return { data: this.rooms.leave(code, token) };
       case 'close':
-        return this.rooms.close(code, token);
+        return { data: this.rooms.close(code, token) };
+      case 'recovery-decision':
+        return {
+          data: this.rooms.decideDeviceRecovery(
+            code,
+            token,
+            body.requestId,
+            body.approve,
+          ),
+        };
+      case 'recovery-cancel':
+        return {
+          recovery: this.rooms.cancelDeviceRecovery(
+            code,
+            token,
+            body.requestId,
+          ),
+        };
       default:
         throw new BadRequestException();
     }
@@ -242,13 +263,13 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
   private snapshot(client: Client) {
     if (!client.code || !client.token) return;
     try {
-      const data = this.rooms.read(client.code, client.token, false);
-      const signature = JSON.stringify(data, (key, value: unknown) =>
+      const payload = this.rooms.watch(client.code, client.token, false);
+      const signature = JSON.stringify(payload, (key, value: unknown) =>
         key === 'serverNow' ? undefined : value,
       );
       if (signature !== client.signature) {
         client.signature = signature;
-        this.send(client, { type: 'snapshot', data });
+        this.send(client, { type: 'snapshot', ...payload });
       }
     } catch (failure) {
       this.failure(client, failure);

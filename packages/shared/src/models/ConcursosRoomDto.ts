@@ -2,11 +2,13 @@
 /* istanbul ignore file */
 /* tslint:disable */
 /* eslint-disable */
+import type { ConcursosDeviceRecoveryDto } from './ConcursosDeviceRecoveryDto';
 import type { ConcursosEntityDto } from './ConcursosEntityDto';
 import type { ConcursosGameDto } from './ConcursosGameDto';
 import type { ConcursosMemberDto } from './ConcursosMemberDto';
 import type { ConcursosRecoverySettingsDto } from './ConcursosRecoverySettingsDto';
 export type ConcursosRoomDto = {
+    pendingRecoveries?: Array<ConcursosDeviceRecoveryDto>;
     hostConnected: boolean;
     recoverySettings: ConcursosRecoverySettingsDto;
     pacing: ConcursosRoomDto.pacing;

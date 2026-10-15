@@ -1,6 +1,9 @@
 ﻿import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   forgetGuestSession,
+  restoreRecoveryAttempt,
+  saveRecoveryAttempt,
+  forgetRecoveryAttempt,
   guestCapability,
   restoreGuestSession,
   saveGuestSession,
@@ -15,6 +18,56 @@ describe("anonymous room reconnect storage", () => {
       setItem: (key: string, value: string) => values.set(key, value),
       removeItem: (key: string) => values.delete(key),
     });
+  });
+  it("keeps a pending applicant separate from an authorized guest on refresh", () => {
+    const guest = { code: "ABCDEF", nickname: "Ana", token: guestCapability() };
+    const applicant = { ...guest, token: guestCapability() };
+    saveGuestSession(guest);
+    saveRecoveryAttempt(applicant);
+    expect(restoreGuestSession()).toEqual(guest);
+    expect(restoreRecoveryAttempt()).toEqual(applicant);
+    forgetRecoveryAttempt(applicant);
+    expect(restoreRecoveryAttempt()).toBeNull();
+    expect(restoreGuestSession()).toEqual(guest);
+  });
+  it("does not let a revoked older tab erase a newer authorized session or request", () => {
+    const old = { code: "ABCDEF", nickname: "Ana", token: guestCapability() };
+    const current = { ...old, token: guestCapability() };
+    saveGuestSession(current);
+    saveRecoveryAttempt(current);
+    forgetGuestSession(old);
+    forgetRecoveryAttempt(old);
+    expect(restoreGuestSession()).toEqual(current);
+    expect(restoreRecoveryAttempt()).toEqual(current);
+    forgetGuestSession(current);
+    expect(restoreGuestSession()).toBeNull();
+  });
+  it("rejects malformed pending credentials and tolerates disabled storage", () => {
+    values.set(
+      "boffmedia.concursos.recovery.v1",
+      JSON.stringify({ code: "ABCDEF", nickname: "Ana", token: "short" }),
+    );
+    expect(restoreRecoveryAttempt()).toBeNull();
+    vi.stubGlobal("localStorage", {
+      getItem: () => {
+        throw Error("disabled");
+      },
+      setItem: () => {
+        throw Error("disabled");
+      },
+      removeItem: () => {
+        throw Error("disabled");
+      },
+    });
+    expect(restoreRecoveryAttempt()).toBeNull();
+    expect(() =>
+      saveRecoveryAttempt({
+        code: "ABCDEF",
+        nickname: "Ana",
+        token: guestCapability(),
+      }),
+    ).not.toThrow();
+    expect(() => forgetRecoveryAttempt()).not.toThrow();
   });
   it("uses a fresh opaque capability without an account", () => {
     expect(guestCapability()).toMatch(/^[a-f0-9]{48}$/);

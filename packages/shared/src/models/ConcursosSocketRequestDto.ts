@@ -23,6 +23,8 @@ export namespace ConcursosSocketRequestDto {
         ACTION = 'action',
         LEAVE = 'leave',
         CLOSE = 'close',
+        RECOVERY_DECISION = 'recovery-decision',
+        RECOVERY_CANCEL = 'recovery-cancel',
     }
 }
 

@@ -1,6 +1,7 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
+  IsUUID,
   IsString,
   Length,
   Matches,
@@ -55,6 +56,16 @@ export class ConcursosRecoverySettingsDto {
   @Min(0)
   @Max(60)
   allDisconnectedGraceSeconds = 5;
+  @ApiProperty({ minimum: 1, maximum: 10, default: 2 })
+  @IsInt()
+  @Min(1)
+  @Max(10)
+  deviceRecoveryMinutes = 2;
+  @ApiProperty({ default: true }) @IsBoolean() allowConnectedDeviceRecovery =
+    true;
+  @ApiProperty({ default: true })
+  @IsBoolean()
+  allowDeviceRecoveryDuringQuestion = true;
 }
 export class CreateConcursosRoomDto {
   @ApiPropertyOptional({ type: ConcursosRecoverySettingsDto })
@@ -241,7 +252,44 @@ export class ConcursosGameDto {
   @ApiPropertyOptional({ type: [ConcursosResultDto] })
   results?: ConcursosResultDto[];
 }
+export class ConcursosDeviceRecoveryDto {
+  @ApiProperty() id!: string;
+  @ApiProperty() roomCode!: string;
+  @ApiProperty() memberId!: string;
+  @ApiProperty() nickname!: string;
+  @ApiProperty() verificationCode!: string;
+  @ApiProperty({
+    enum: [
+      'pending',
+      'approved',
+      'denied',
+      'expired',
+      'cancelled',
+      'superseded',
+      'closed',
+    ],
+  })
+  status!:
+    | 'pending'
+    | 'approved'
+    | 'denied'
+    | 'expired'
+    | 'cancelled'
+    | 'superseded'
+    | 'closed';
+  @ApiProperty() createdAt!: number;
+  @ApiProperty() expiresAt!: number;
+  @ApiProperty() serverNow!: number;
+}
+export class ConcursosRecoveryIdDto {
+  @ApiProperty({ format: 'uuid' }) @IsUUID('4') requestId!: string;
+}
+export class ConcursosRecoveryDecisionDto extends ConcursosRecoveryIdDto {
+  @ApiProperty() @IsBoolean() approve!: boolean;
+}
 export class ConcursosRoomDto {
+  @ApiPropertyOptional({ type: [ConcursosDeviceRecoveryDto] })
+  pendingRecoveries?: ConcursosDeviceRecoveryDto[];
   @ApiProperty() hostConnected!: boolean;
   @ApiProperty({ type: ConcursosRecoverySettingsDto })
   recoverySettings!: ConcursosRecoverySettingsDto;
@@ -276,17 +324,37 @@ export class ConcursosSocketRequestDto {
   @Matches(/^[a-f0-9]{48}$/)
   token?: string;
   @ApiPropertyOptional({
-    enum: ['configuration', 'group', 'start', 'action', 'leave', 'close'],
+    enum: [
+      'configuration',
+      'group',
+      'start',
+      'action',
+      'leave',
+      'close',
+      'recovery-decision',
+      'recovery-cancel',
+    ],
   })
   @IsOptional()
-  @IsIn(['configuration', 'group', 'start', 'action', 'leave', 'close'])
+  @IsIn([
+    'configuration',
+    'group',
+    'start',
+    'action',
+    'leave',
+    'close',
+    'recovery-decision',
+    'recovery-cancel',
+  ])
   operation?:
     | 'configuration'
     | 'group'
     | 'start'
     | 'action'
     | 'leave'
-    | 'close';
+    | 'close'
+    | 'recovery-decision'
+    | 'recovery-cancel';
   @ApiPropertyOptional({ type: 'object', additionalProperties: true })
   @IsOptional()
   @IsObject()
@@ -297,6 +365,8 @@ export class ConcursosSocketResponseDto {
   type!: 'ready' | 'snapshot' | 'reply' | 'error' | 'pong';
   @ApiPropertyOptional() id?: string;
   @ApiPropertyOptional({ type: ConcursosRoomDto }) data?: ConcursosRoomDto;
+  @ApiPropertyOptional({ type: ConcursosDeviceRecoveryDto })
+  recovery?: ConcursosDeviceRecoveryDto;
   @ApiPropertyOptional() statusCode?: number;
   @ApiPropertyOptional() code?: string;
   @ApiPropertyOptional() userMessage?: string;
