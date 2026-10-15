@@ -366,6 +366,17 @@ export class ConcursosRoomsService {
     return this.publish(this.view(room, 'player', member));
   }
 
+  restoreHost(token: string | null): ConcursosRoomDto {
+    const actor = this.actor(token);
+    this.sweep(Date.now());
+    const code = this.hosts.get(actor);
+    if (!code)
+      throw new NotFoundException(
+        userError(ApiErrorCode.CONCURSOS_NOT_FOUND, 'host session not found'),
+      );
+    return this.read(code, token);
+  }
+
   read(code: string, token: string | null, touch = true): ConcursosRoomDto {
     const actor = this.actor(token);
     const room = this.get(code);

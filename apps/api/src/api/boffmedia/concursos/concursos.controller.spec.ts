@@ -67,6 +67,39 @@ describe('Concursos anonymous HTTP contract', () => {
       .send({ nickname: 'Device A' })
       .expect(401);
   });
+  it('restores an existing host session without room code or account and never creates for unknown credentials', async () => {
+    const client = request(app.getHttpServer());
+    await client.get('/concursos/rooms/host-session').expect(401);
+    await client
+      .get('/concursos/rooms/host-session')
+      .set('Authorization', capability(90))
+      .expect(404);
+    const created = await client
+      .post('/concursos/rooms')
+      .set('Authorization', capability(90))
+      .send({})
+      .expect(201);
+    await client
+      .post(`/concursos/rooms/${created.body.data.code}/players`)
+      .set('Authorization', capability(91))
+      .send({ nickname: 'Player' })
+      .expect(201);
+    await client
+      .get('/concursos/rooms/host-session')
+      .set('Authorization', capability(91))
+      .expect(404);
+    const restored = await client
+      .get('/concursos/rooms/host-session')
+      .set('Authorization', capability(90))
+      .expect(200);
+    expect(restored.headers['cache-control']).toBe('no-store');
+    expect(restored.body.data).toMatchObject({
+      role: 'host',
+      code: created.body.data.code,
+    });
+    expect(JSON.stringify(restored.body.data)).not.toContain('Bearer');
+  });
+
   it('uses the real global auth guards without a Boffmedia account and keeps secrets out of snapshots', async () => {
     const created = await request(app.getHttpServer())
       .post('/concursos/rooms')

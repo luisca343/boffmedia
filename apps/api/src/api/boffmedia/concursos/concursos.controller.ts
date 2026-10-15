@@ -96,6 +96,17 @@ export class ConcursosController {
     );
   }
 
+  @Get('host-session')
+  @Header('Cache-Control', 'no-store')
+  @ApiOperation({
+    summary:
+      'Restore an existing room using its saved host capability; never create a room',
+  })
+  @ApiResponse({ status: 200, type: ConcursosRoomDto })
+  restoreHost(@Req() req: Request): ConcursosRoomDto {
+    return this.rooms.restoreHost(extractBearer(req));
+  }
+
   @Get(':code')
   @Header('Cache-Control', 'no-store')
   @ApiOperation({
