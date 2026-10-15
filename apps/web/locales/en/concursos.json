@@ -53,6 +53,11 @@
     "hostDisconnected": "The host connection was lost.",
     "waitingResume": "Waiting for the host to resume.",
     "resumeCountdown": "Resuming in {count, plural, one {# second} other {# seconds}}",
-    "frozenSeconds": "Time preserved: {count, plural, one {# second} other {# seconds}}"
+    "frozenSeconds": "Time preserved: {count, plural, one {# second} other {# seconds}}",
+    "temporaryCaptain": "Substitute captain: {name}",
+    "playersDisconnected": "The game was paused when all contestants disconnected.",
+    "absentSelectorCountdown": "Disconnected: selection passes to the next contestant in {count} s.",
+    "participantConnections": "Participant connections",
+    "offlineReserved": "Offline · place reserved"
   }
 }

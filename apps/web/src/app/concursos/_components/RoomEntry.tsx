@@ -272,6 +272,7 @@ export function RoomEntry() {
                 <GameController
                   room={room}
                   token={session.token}
+                  connected={connected}
                   onRoom={acceptRoom}
                 />
               )}

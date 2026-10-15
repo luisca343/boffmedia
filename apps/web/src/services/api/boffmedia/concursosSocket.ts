@@ -65,7 +65,7 @@ export class ConcursosSocket {
         this.heartbeat = setInterval(() => {
           if (socket.readyState === WebSocket.OPEN)
             socket.send(JSON.stringify({ type: "ping" }));
-        }, 5000);
+        }, 1000);
       }
       if (frame.data) {
         this.onRoom(frame.data);

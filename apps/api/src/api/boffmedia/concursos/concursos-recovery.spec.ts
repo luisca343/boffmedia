@@ -28,6 +28,10 @@ function setup(
   rooms.startGame(code, token(1), {
     questions: [question, { ...question, id: 'q2' }],
   });
+  // Keep contestants present while this suite independently exercises host loss/pause.
+  setInterval(() => {
+    for (let n = 2; n <= 5; n++) rooms.read(code, token(n));
+  }, 1000);
   return { rooms, code };
 }
 function control(
@@ -47,7 +51,10 @@ describe('Configurable authoritative pause and host recovery', () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date('2026-10-14T19:00:00Z'));
   });
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  });
   it('uses the chosen defaults and validates complete versioned profiles without accepting extra fields', () => {
     expect(recoverySettings()).toEqual({
       version: 1,
@@ -56,6 +63,12 @@ describe('Configurable authoritative pause and host recovery', () => {
       hideQuestionWhilePaused: true,
       allowLocalSelectionWhilePaused: false,
       resumeCountdownSeconds: 3,
+      skipAbsentSelector: true,
+      absentSelectorSeconds: 20,
+      autoReplaceCaptain: true,
+      captainGraceSeconds: 5,
+      pauseWhenAllDisconnected: true,
+      allDisconnectedGraceSeconds: 5,
     });
     for (const patch of [
       { version: 2 },

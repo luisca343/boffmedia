@@ -53,6 +53,11 @@
     "hostDisconnected": "Se perdió la conexión del anfitrión.",
     "waitingResume": "Esperando a que el anfitrión reanude.",
     "resumeCountdown": "Reanudando en {count, plural, one {# segundo} other {# segundos}}",
-    "frozenSeconds": "Tiempo conservado: {count, plural, one {# segundo} other {# segundos}}"
+    "frozenSeconds": "Tiempo conservado: {count, plural, one {# segundo} other {# segundos}}",
+    "temporaryCaptain": "Capitán sustituto: {name}",
+    "playersDisconnected": "La partida se pausó al desconectarse todos los concursantes.",
+    "absentSelectorCountdown": "Sin conexión: la elección pasa al siguiente en {count} s.",
+    "participantConnections": "Conexión de los participantes",
+    "offlineReserved": "Sin conexión · plaza reservada"
   }
 }

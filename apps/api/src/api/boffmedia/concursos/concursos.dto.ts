@@ -37,6 +37,24 @@ export class ConcursosRecoverySettingsDto {
   @Min(0)
   @Max(10)
   resumeCountdownSeconds = 3;
+  @ApiProperty({ default: true }) @IsBoolean() skipAbsentSelector = true;
+  @ApiProperty({ minimum: 0, maximum: 120, default: 20 })
+  @IsInt()
+  @Min(0)
+  @Max(120)
+  absentSelectorSeconds = 20;
+  @ApiProperty({ default: true }) @IsBoolean() autoReplaceCaptain = true;
+  @ApiProperty({ minimum: 0, maximum: 60, default: 5 })
+  @IsInt()
+  @Min(0)
+  @Max(60)
+  captainGraceSeconds = 5;
+  @ApiProperty({ default: true }) @IsBoolean() pauseWhenAllDisconnected = true;
+  @ApiProperty({ minimum: 0, maximum: 60, default: 5 })
+  @IsInt()
+  @Min(0)
+  @Max(60)
+  allDisconnectedGraceSeconds = 5;
 }
 export class CreateConcursosRoomDto {
   @ApiPropertyOptional({ type: ConcursosRecoverySettingsDto })
@@ -128,6 +146,16 @@ export class ConcursosActionDto {
   controlRevision?: number;
   @ApiPropertyOptional()
   @IsOptional()
+  @IsInt()
+  @Min(0)
+  captainRevision?: number;
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  selectionRevision?: number;
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsString()
   @Length(1, 160)
   questionId?: string;
@@ -147,6 +175,8 @@ export class ConcursosEntityDto {
   @ApiProperty() label!: string;
   @ApiProperty({ type: [String] }) memberIds!: string[];
   @ApiPropertyOptional() captainId?: string;
+  @ApiPropertyOptional() captainRevision?: number;
+  @ApiPropertyOptional() temporaryCaptain?: boolean;
   @ApiProperty() score!: number;
 }
 export class ConcursosBoardItemDto {
@@ -178,9 +208,13 @@ export class ConcursosResultDto {
 export class ConcursosGameDto {
   @ApiProperty() paused!: boolean;
   @ApiProperty() controlRevision!: number;
-  @ApiPropertyOptional({ enum: ['manual', 'host_disconnected'] }) pauseReason?:
-    | 'manual'
-    | 'host_disconnected';
+  @ApiPropertyOptional({
+    enum: ['manual', 'host_disconnected', 'players_disconnected'],
+  })
+  pauseReason?: 'manual' | 'host_disconnected' | 'players_disconnected';
+  @ApiProperty() selectionRevision!: number;
+  @ApiPropertyOptional() selectionSkipAt?: number;
+  @ApiPropertyOptional() selectionRemainingMs?: number;
   @ApiPropertyOptional() remainingMs?: number;
   @ApiPropertyOptional() resumeAt?: number;
   @ApiProperty({ enum: ['automatic', 'directed'] }) pacing!:

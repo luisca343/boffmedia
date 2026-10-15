@@ -25,7 +25,13 @@ export class ConcursosGame {
   private advanceAt?: number;
   private pausedAt?: number;
   private resumeAt?: number;
-  private pauseReason?: 'manual' | 'host_disconnected';
+  private pauseReason?: ConcursosGameDto['pauseReason'];
+  private absent?: Map<string, number>;
+  private selectionNotBefore = 0;
+  private selectionWaitAt?: number;
+  private selectionSkipAt?: number;
+  private selectionRevision = 0;
+  private readonly captainSeats = new Map<string, number>();
   private controlRevision = 0;
   private lastControl?: { action: string; revision: number; roundId: number };
   private answers = new Map<string, number>();
@@ -44,6 +50,100 @@ export class ConcursosGame {
       new Set(questions.map((q) => q.id)).size !== questions.length
     )
       gameConflict();
+    if (mode === 'teams')
+      for (const entity of entities) {
+        this.captainSeats.set(
+          entity.id,
+          Math.max(0, entity.memberIds.indexOf(entity.captainId!)),
+        );
+        entity.captainRevision = 0;
+        entity.temporaryCaptain = false;
+      }
+  }
+  /** Room presence is authoritative. Apply the earliest automatic pause before
+   * advancing timers; a delayed sweep must not reveal a paused question. */
+  syncPresence(absent: Map<string, number>, now: number, hostPauseAt?: number) {
+    this.absent = absent;
+    // A return cancels the old absence episode even during a manual pause.
+    if (this.stage === 'board' && this.connected(this.entities[this.selector]))
+      this.selectionWaitAt = this.selectionSkipAt = undefined;
+    const pauses: {
+      at: number;
+      reason: 'host_disconnected' | 'players_disconnected';
+    }[] = [];
+    if (hostPauseAt !== undefined)
+      pauses.push({ at: hostPauseAt, reason: 'host_disconnected' });
+    const ids = this.entities.flatMap((entity) => entity.memberIds);
+    if (
+      this.recovery.pauseWhenAllDisconnected &&
+      ids.every((id) => absent.has(id))
+    )
+      pauses.push({
+        at:
+          Math.max(...ids.map((id) => absent.get(id)!)) +
+          this.recovery.allDisconnectedGraceSeconds * 1000,
+        reason: 'players_disconnected',
+      });
+    for (const pause of pauses.sort((a, b) => a.at - b.at))
+      if (now >= pause.at) this.pauseForLoss(pause.at, pause.reason);
+    this.tick(now);
+  }
+  private connected(entity: ConcursosEntityDto) {
+    return entity.memberIds.some((id) => !this.absent?.has(id));
+  }
+  private updateParticipants(now: number) {
+    if (!this.absent || this.stage === 'finished') return;
+    if (
+      this.mode === 'teams' &&
+      this.recovery.autoReplaceCaptain &&
+      this.stage !== 'result'
+    )
+      for (const entity of this.entities) {
+        const lostAt = this.absent.get(entity.captainId!);
+        if (
+          lostAt === undefined ||
+          now < lostAt + this.recovery.captainGraceSeconds * 1000
+        )
+          continue;
+        const previous = entity.memberIds.indexOf(entity.captainId!);
+        for (let offset = 1; offset < entity.memberIds.length; offset++) {
+          const candidate =
+            entity.memberIds[(previous + offset) % entity.memberIds.length];
+          if (!this.absent.has(candidate)) {
+            entity.captainId = candidate;
+            entity.captainRevision = (entity.captainRevision ?? 0) + 1;
+            entity.temporaryCaptain = true;
+            break;
+          }
+        }
+      }
+    if (
+      this.stage !== 'board' ||
+      !this.recovery.skipAbsentSelector ||
+      this.connected(this.entities[this.selector])
+    ) {
+      this.selectionWaitAt = this.selectionSkipAt = undefined;
+      return;
+    }
+    if (this.selectionSkipAt === undefined) {
+      const entity = this.entities[this.selector];
+      this.selectionWaitAt = Math.max(
+        this.selectionNotBefore,
+        ...entity.memberIds.map((id) => this.absent!.get(id)!),
+      );
+      this.selectionSkipAt =
+        this.selectionWaitAt + this.recovery.absentSelectorSeconds * 1000;
+    }
+    if (now < this.selectionSkipAt) return;
+    for (let offset = 1; offset < this.entities.length; offset++) {
+      const next = (this.selector + offset) % this.entities.length;
+      if (this.connected(this.entities[next])) {
+        this.selector = next;
+        this.selectionRevision++;
+        this.selectionWaitAt = this.selectionSkipAt = undefined;
+        return;
+      }
+    }
   }
   private responder(entity: ConcursosEntityDto): string | undefined {
     return this.mode === 'individual' ? entity.memberIds[0] : entity.captainId;
@@ -59,6 +159,11 @@ export class ConcursosGame {
       const shift = this.resumeAt - this.pausedAt;
       if (this.deadlineAt !== undefined) this.deadlineAt += shift;
       if (this.advanceAt !== undefined) this.advanceAt += shift;
+      if (this.selectionSkipAt !== undefined)
+        this.selectionSkipAt +=
+          this.resumeAt - Math.max(this.pausedAt, this.selectionWaitAt!);
+      if (this.selectionSkipAt === undefined && this.stage === 'board')
+        this.selectionNotBefore = this.resumeAt;
       this.pausedAt = undefined;
       this.resumeAt = undefined;
       this.pauseReason = undefined;
@@ -71,8 +176,15 @@ export class ConcursosGame {
       now >= this.advanceAt
     )
       this.advance();
+    this.updateParticipants(now);
   }
   pauseForHostLoss(at: number) {
+    this.pauseForLoss(at, 'host_disconnected');
+  }
+  private pauseForLoss(
+    at: number,
+    reason: 'host_disconnected' | 'players_disconnected',
+  ) {
     this.tick(at);
     if (this.stage === 'finished') return;
     if (this.pausedAt !== undefined) {
@@ -85,7 +197,7 @@ export class ConcursosGame {
       return;
     }
     this.pausedAt = at;
-    this.pauseReason = 'host_disconnected';
+    this.pauseReason = reason;
     this.controlRevision++;
     this.lastControl = undefined;
   }
@@ -115,6 +227,12 @@ export class ConcursosGame {
     } else {
       if (this.pausedAt === undefined || this.resumeAt !== undefined)
         gameConflict();
+      if (
+        this.recovery.pauseWhenAllDisconnected &&
+        this.absent &&
+        this.entities.every((entity) => !this.connected(entity))
+      )
+        gameConflict();
       this.resumeAt = Date.now() + this.recovery.resumeCountdownSeconds * 1000;
     }
     this.lastControl = {
@@ -142,10 +260,17 @@ export class ConcursosGame {
     this.current = undefined;
     if (this.mode === 'teams')
       for (const unit of this.entities) {
-        const previous = unit.memberIds.indexOf(unit.captainId!);
-        unit.captainId = unit.memberIds[(previous + 1) % unit.memberIds.length];
+        const next =
+          (this.captainSeats.get(unit.id)! + 1) % unit.memberIds.length;
+        this.captainSeats.set(unit.id, next);
+        unit.captainId = unit.memberIds[next];
+        unit.captainRevision = (unit.captainRevision ?? 0) + 1;
+        unit.temporaryCaptain = false;
       }
     this.selector = (this.selector + 1) % this.entities.length;
+    this.selectionRevision++;
+    this.selectionNotBefore = 0;
+    this.selectionWaitAt = this.selectionSkipAt = undefined;
     this.stage = this.available().length ? 'board' : 'finished';
     this.deadlineAt = undefined;
     this.advanceAt = undefined;
@@ -179,7 +304,16 @@ export class ConcursosGame {
       throw new ForbiddenException(
         userError(ApiErrorCode.CONCURSOS_ACCESS, 'player required'),
       );
+    if (command.action === 'choose' || command.action === 'answer') {
+      if (
+        this.mode === 'teams' &&
+        (command.captainRevision ?? 0) !== (entity.captainRevision ?? 0)
+      )
+        gameConflict();
+    }
     if (command.action === 'choose') {
+      if ((command.selectionRevision ?? 0) !== this.selectionRevision)
+        gameConflict();
       if (
         this.stage === 'question' &&
         this.current?.id === command.questionId &&
@@ -244,6 +378,18 @@ export class ConcursosGame {
     const showResult = this.stage === 'result';
     return {
       stage: this.stage,
+      selectionRevision: this.selectionRevision,
+      ...(this.selectionSkipAt !== undefined && {
+        ...(this.pausedAt === undefined
+          ? { selectionSkipAt: this.selectionSkipAt }
+          : {
+              selectionRemainingMs: Math.max(
+                0,
+                this.selectionSkipAt -
+                  Math.max(this.pausedAt, this.selectionWaitAt!),
+              ),
+            }),
+      }),
       paused: this.pausedAt !== undefined,
       controlRevision: this.controlRevision,
       ...(this.pausedAt !== undefined && {

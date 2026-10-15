@@ -9,6 +9,12 @@ export type ConcursosRecoverySettingsDto = {
     allowLocalSelectionWhilePaused: Record<string, any>;
     hideQuestionWhilePaused: Record<string, any>;
     resumeCountdownSeconds: Record<string, any>;
+    skipAbsentSelector: Record<string, any>;
+    absentSelectorSeconds: Record<string, any>;
+    autoReplaceCaptain: Record<string, any>;
+    captainGraceSeconds: Record<string, any>;
+    pauseWhenAllDisconnected: Record<string, any>;
+    allDisconnectedGraceSeconds: Record<string, any>;
 };
 export namespace ConcursosRecoverySettingsDto {
     export enum version {

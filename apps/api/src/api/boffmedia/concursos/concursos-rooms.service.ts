@@ -32,6 +32,9 @@ type Member = {
   id: string;
   nickname: string;
   seenAt: number;
+  sockets: Set<symbol>;
+  socketSeen: boolean;
+  lostAt?: number;
   groupId?: string;
 };
 type Room = {
@@ -82,14 +85,21 @@ export class ConcursosRoomsService {
   private sweep(now: number): void {
     for (const [code, room] of this.rooms) {
       if (room.closedAt === undefined && room.hostSocketSeen) {
-        const grace = room.recoverySettings.hostGraceSeconds * 1000;
         // Native host sends an application heartbeat every second. Explicit socket
         // close starts grace immediately; silence uses last confirmed activity.
         if (room.hostLostAt === undefined && now - room.hostSeenAt >= 1500)
           room.hostLostAt = room.hostSeenAt;
-        if (room.hostLostAt !== undefined && now >= room.hostLostAt + grace)
-          room.game?.pauseForHostLoss(room.hostLostAt + grace);
       }
+      for (const member of room.members.values()) {
+        if (member.lostAt === undefined) {
+          const timeout = member.socketSeen ? 1500 : MEMBER_IDLE_MS;
+          if (now - member.seenAt >= timeout)
+            member.lostAt = member.socketSeen
+              ? member.seenAt
+              : member.seenAt + timeout;
+        }
+      }
+      if (room.closedAt === undefined) this.syncGame(room, now);
       if (
         room.closedAt === undefined &&
         (now - (room.hostLostAt ?? room.hostSeenAt) >=
@@ -110,6 +120,23 @@ export class ConcursosRoomsService {
     for (const [key, window] of this.createWindows) {
       if (now >= window.until) this.createWindows.delete(key);
     }
+  }
+
+  private syncGame(room: Room, now = Date.now()) {
+    const absent = new Map<string, number>();
+    for (const member of room.members.values())
+      if (member.lostAt !== undefined) absent.set(member.id, member.lostAt);
+    room.game?.syncPresence(
+      absent,
+      now,
+      room.hostSocketSeen && room.hostLostAt !== undefined
+        ? room.hostLostAt + room.recoverySettings.hostGraceSeconds * 1000
+        : undefined,
+    );
+  }
+  private touchMember(member: Member) {
+    member.seenAt = Date.now();
+    member.lostAt = undefined;
   }
 
   private get(code: string): Room {
@@ -156,7 +183,7 @@ export class ConcursosRoomsService {
               id: player.id,
               nickname: player.nickname,
               entityId: room.mode === 'individual' ? player.id : player.groupId,
-              connected: Date.now() - player.seenAt < MEMBER_IDLE_MS,
+              connected: player.lostAt === undefined,
             }))
           : [],
     };
@@ -237,7 +264,8 @@ export class ConcursosRoomsService {
         throw new ConflictException(
           userError(ApiErrorCode.CONCURSOS_NAME, 'reconnect nickname changed'),
         );
-      previous.seenAt = Date.now();
+      this.touchMember(previous);
+      this.syncGame(room);
       return this.publish(this.view(room, 'player', previous));
     }
     if (room.game) gameConflict();
@@ -255,7 +283,13 @@ export class ConcursosRoomsService {
         userError(ApiErrorCode.CONCURSOS_NAME, 'nickname already used'),
       );
     }
-    const member: Member = { id: randomUUID(), nickname, seenAt: Date.now() };
+    const member: Member = {
+      id: randomUUID(),
+      nickname,
+      seenAt: Date.now(),
+      sockets: new Set(),
+      socketSeen: false,
+    };
     room.members.set(actor, member);
     return this.publish(this.view(room, 'player', member));
   }
@@ -268,6 +302,7 @@ export class ConcursosRoomsService {
         room.hostSeenAt = Date.now();
         room.hostLostAt = undefined;
       }
+      this.syncGame(room);
       return this.view(room, 'host');
     }
     const member = room.members.get(actor);
@@ -275,7 +310,8 @@ export class ConcursosRoomsService {
       throw new ForbiddenException(
         userError(ApiErrorCode.CONCURSOS_ACCESS, 'not a room member'),
       );
-    if (touch) member.seenAt = Date.now();
+    if (touch) this.touchMember(member);
+    this.syncGame(room);
     return this.view(room, 'player', member);
   }
 
@@ -315,19 +351,29 @@ export class ConcursosRoomsService {
       room.hostSocketSeen = true;
       room.hostSeenAt = Date.now();
       room.hostLostAt = undefined;
-      this.changed.next(code);
+    } else {
+      const member = room.members.get(actor);
+      if (!member || room.closedAt !== undefined) return;
+      member.sockets.add(connection);
+      member.socketSeen = true;
+      this.touchMember(member);
     }
+    this.syncGame(room);
+    this.changed.next(code);
   }
   socketClosed(code: string, token: string, connection: symbol) {
     const room = this.rooms.get(code);
-    if (
-      !room ||
-      room.hostHash !== this.actor(token) ||
-      !room.hostSockets.delete(connection)
-    )
-      return;
-    if (!room.hostSockets.size && room.closedAt === undefined)
-      room.hostLostAt ??= Date.now();
+    if (!room || room.closedAt !== undefined) return;
+    const actor = this.actor(token);
+    if (actor === room.hostHash) {
+      if (!room.hostSockets.delete(connection)) return;
+      if (!room.hostSockets.size) room.hostLostAt ??= Date.now();
+    } else {
+      const member = room.members.get(actor);
+      if (!member || !member.sockets.delete(connection)) return;
+      if (!member.sockets.size) member.lostAt ??= Date.now();
+    }
+    // The normal sweep applies all losses together before evaluating game rules.
     this.changed.next(code);
   }
   private entities(room: Room): ConcursosEntityDto[] {
@@ -365,7 +411,8 @@ export class ConcursosRoomsService {
       room.hostSeenAt = Date.now();
       room.hostLostAt = undefined;
     }
-    if (member) member.seenAt = Date.now();
+    if (member) this.touchMember(member);
+    this.syncGame(room);
     return { room, host, member };
   }
   configure(
@@ -440,6 +487,7 @@ export class ConcursosRoomsService {
         structuredClone(room.recoverySettings),
       );
     }
+    this.syncGame(room);
     return this.publish(this.view(room, 'host'));
   }
   action(code: string, token: string | null, body: ConcursosActionDto) {

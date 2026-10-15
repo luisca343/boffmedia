@@ -5,6 +5,8 @@
 export type ConcursosActionDto = {
     action: ConcursosActionDto.action;
     controlRevision?: number;
+    captainRevision?: number;
+    selectionRevision?: number;
     questionId?: string;
     /**
      * Current round; zero is the initial board before the first question.

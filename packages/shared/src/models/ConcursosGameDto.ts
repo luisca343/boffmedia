@@ -10,6 +10,9 @@ export type ConcursosGameDto = {
     paused: boolean;
     controlRevision: number;
     pauseReason?: ConcursosGameDto.pauseReason;
+    selectionRevision: number;
+    selectionSkipAt?: number;
+    selectionRemainingMs?: number;
     remainingMs?: number;
     resumeAt?: number;
     pacing: ConcursosGameDto.pacing;
@@ -30,6 +33,7 @@ export namespace ConcursosGameDto {
     export enum pauseReason {
         MANUAL = 'manual',
         HOST_DISCONNECTED = 'host_disconnected',
+        PLAYERS_DISCONNECTED = 'players_disconnected',
     }
     export enum pacing {
         AUTOMATIC = 'automatic',

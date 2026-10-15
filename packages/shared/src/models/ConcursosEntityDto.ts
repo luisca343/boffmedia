@@ -7,6 +7,8 @@ export type ConcursosEntityDto = {
     label: string;
     memberIds: Array<string>;
     captainId?: string;
+    captainRevision?: number;
+    temporaryCaptain?: boolean;
     score: number;
 };
 

@@ -10,10 +10,12 @@ import { useApiError } from "@/hooks/useApiError";
 export function GameController({
   room,
   token,
+  connected,
   onRoom,
 }: {
   room: ConcursosRoomDto;
   token: string;
+  connected: boolean;
   onRoom: (next: ConcursosRoomDto) => void;
 }) {
   const t = useTranslations("concursos");
@@ -51,7 +53,9 @@ export function GameController({
       ? game.advanceAt
       : game?.stage === "question"
         ? game.deadlineAt
-        : undefined;
+        : game?.stage === "board"
+          ? game.selectionSkipAt
+          : undefined;
   useEffect(() => {
     if (!deadline || !game) {
       setRemaining(Math.ceil((game?.remainingMs ?? 0) / 1000));
@@ -83,10 +87,24 @@ export function GameController({
     }
   }
   const act = (body: ConcursosActionDto) =>
-    run(() => ConcursosService.action(room.code, token, body));
+    run(() =>
+      ConcursosService.action(room.code, token, {
+        ...body,
+        ...(body.action === ConcursosActionDto.action.CHOOSE && {
+          roundId: game!.roundId,
+          selectionRevision: game!.selectionRevision,
+        }),
+        ...(room.mode === "teams" &&
+          (body.action === ConcursosActionDto.action.CHOOSE ||
+            body.action === ConcursosActionDto.action.ANSWER) && {
+            captainRevision: entity?.captainRevision ?? 0,
+          }),
+      }),
+    );
   const ownAnswer = game?.own?.answer;
   const locked = ownAnswer !== undefined;
   const paused = game?.paused ?? false;
+  const unavailable = busy || !connected;
   return (
     <section className="grid gap-4">
       {error && (
@@ -106,7 +124,7 @@ export function GameController({
             .map((unit) => (
               <Button
                 key={unit.id}
-                disabled={busy || entity?.id === unit.id}
+                disabled={unavailable || entity?.id === unit.id}
                 onClick={() =>
                   run(() => ConcursosService.group(room.code, token, unit.id))
                 }
@@ -117,7 +135,11 @@ export function GameController({
         </div>
       )}
       {room.mode === "teams" && entity && (
-        <p>{t("captain", { name: memberName(entity.captainId) })}</p>
+        <p>
+          {t(entity.temporaryCaptain ? "temporaryCaptain" : "captain", {
+            name: memberName(entity.captainId),
+          })}
+        </p>
       )}
       {!game && <p className="text-sm text-txt-muted">{t("waitingStart")}</p>}
       {game?.paused && (
@@ -127,7 +149,9 @@ export function GameController({
             {t(
               game.pauseReason === "host_disconnected"
                 ? "hostDisconnected"
-                : "hostPaused",
+                : game.pauseReason === "players_disconnected"
+                  ? "playersDisconnected"
+                  : "hostPaused",
             )}
           </p>
           {game.resumeAt !== undefined ? (
@@ -162,11 +186,16 @@ export function GameController({
           {game.stage === "board" && (
             <>
               <p>{t("chooses", { name: entityName(game.selectorId) })}</p>
+              {!paused && game.selectionSkipAt !== undefined && (
+                <p role="timer">
+                  {t("absentSelectorCountdown", { count: remaining })}
+                </p>
+              )}
               {game.board.map((item, index) => (
                 <Button
                   key={item.id}
                   disabled={
-                    busy ||
+                    unavailable ||
                     paused ||
                     entity?.id !== game.selectorId ||
                     !canCommit
@@ -200,7 +229,7 @@ export function GameController({
                       <Button
                         key={index}
                         disabled={
-                          busy ||
+                          unavailable ||
                           locked ||
                           remaining === 0 ||
                           (paused &&
@@ -226,7 +255,7 @@ export function GameController({
                         {room.mode === "teams" && (
                           <Button
                             disabled={
-                              busy ||
+                              unavailable ||
                               paused ||
                               choice === null ||
                               remaining === 0
@@ -245,7 +274,7 @@ export function GameController({
                         {(room.mode === "individual" || canCommit) && (
                           <Button
                             disabled={
-                              busy ||
+                              unavailable ||
                               paused ||
                               choice === null ||
                               remaining === 0
@@ -313,6 +342,17 @@ export function GameController({
                 )}
               </>
             )}
+          <ul
+            aria-label={t("participantConnections")}
+            className="grid gap-1 text-sm text-txt-muted"
+          >
+            {room.members.map((member) => (
+              <li key={member.id}>
+                {member.nickname} ·{" "}
+                {t(member.connected ? "online" : "offlineReserved")}
+              </li>
+            ))}
+          </ul>
           {game.stage === "finished" && (
             <p className="text-xl font-bold">{t("finished")}</p>
           )}

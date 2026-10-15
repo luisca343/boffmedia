@@ -51,6 +51,11 @@ function setup(mode: 'individual' | 'teams', count = 4) {
       rooms.group(code, token(index + 2), index < 2 ? 'team-1' : 'team-2'),
     );
   }
+  // This suite exercises gameplay with present participants; loss is covered separately.
+  setInterval(
+    () => ids.forEach((_, index) => rooms.read(code, token(index + 2))),
+    1000,
+  );
   return { rooms, code, ids };
 }
 describe('Common individual and team question engine', () => {
@@ -58,7 +63,10 @@ describe('Common individual and team question engine', () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date('2026-10-14T08:00:00Z'));
   });
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  });
   it('individual creates one scoring entity per person and scores exactly once', () => {
     const { rooms, code, ids } = setup('individual', 4);
     rooms.startGame(code, token(1), { questions });
@@ -173,7 +181,11 @@ describe('Common individual and team question engine', () => {
     expect(rooms.read(code, token(1)).game!.board.map((q) => q.id)).toEqual([
       'q2',
     ]);
-    rooms.action(code, token(3), { action: 'choose', questionId: 'q2' });
+    rooms.action(code, token(3), {
+      action: 'choose',
+      questionId: 'q2',
+      selectionRevision: 1,
+    });
     expect(() =>
       rooms.action(code, token(1), { action: 'next', roundId: 1 }),
     ).toThrow();
@@ -193,11 +205,21 @@ describe('Common individual and team question engine', () => {
     expect(() =>
       rooms.action(code, token(4), { action: 'choose', questionId: 'q2' }),
     ).toThrow();
-    rooms.action(code, token(5), { action: 'choose', questionId: 'q2' });
+    rooms.action(code, token(5), {
+      action: 'choose',
+      questionId: 'q2',
+      selectionRevision: 1,
+      captainRevision: 1,
+    });
     expect(() =>
       rooms.action(code, token(2), { action: 'answer', roundId: 2, choice: 2 }),
     ).toThrow();
-    rooms.action(code, token(3), { action: 'answer', roundId: 2, choice: 2 });
+    rooms.action(code, token(3), {
+      action: 'answer',
+      roundId: 2,
+      choice: 2,
+      captainRevision: 1,
+    });
   });
   it('locks composition/mode while playing and refuses new players', () => {
     const { rooms, code } = setup('individual', 2);
@@ -232,15 +254,19 @@ describe('Common individual and team question engine', () => {
       rooms.action(code, token((index % 2) + 2), {
         action: 'choose',
         questionId: q.id,
+        selectionRevision: index,
+        captainRevision: index,
       });
       rooms.action(code, token(2), {
         action: 'answer',
         roundId: index + 1,
+        captainRevision: index,
         choice: q.correctIndex,
       });
       rooms.action(code, token(3), {
         action: 'answer',
         roundId: index + 1,
+        captainRevision: index,
         choice: 0,
       });
       rooms.action(code, token(1), { action: 'next', roundId: index + 1 });
@@ -284,7 +310,10 @@ describe('Automatic and directed result pacing', () => {
     jest.useFakeTimers();
     jest.setSystemTime(new Date('2026-10-14T08:00:00Z'));
   });
-  afterEach(() => jest.useRealTimers());
+  afterEach(() => {
+    jest.clearAllTimers();
+    jest.useRealTimers();
+  });
   it('defaults to automatic eight-second results and freezes lobby settings at start', () => {
     const rooms = new ConcursosRoomsService();
     const { code } = rooms.create(token(1), 'qa');
@@ -327,6 +356,8 @@ describe('Automatic and directed result pacing', () => {
         rooms.action(code, token(ids.indexOf(chooser) + 2), {
           action: 'choose',
           questionId: question.id,
+          selectionRevision: board.game!.selectionRevision,
+          captainRevision: selector.captainRevision,
         });
         for (const [entityIndex, entity] of board.entities.entries()) {
           const actor =
@@ -334,6 +365,7 @@ describe('Automatic and directed result pacing', () => {
           rooms.action(code, token(ids.indexOf(actor) + 2), {
             action: 'answer',
             roundId: index + 1,
+            captainRevision: entity.captainRevision,
             choice: entityIndex === 0 ? question.correctIndex : 0,
           });
         }
