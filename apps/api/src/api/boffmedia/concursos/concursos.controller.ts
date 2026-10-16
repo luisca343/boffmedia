@@ -18,7 +18,7 @@ import {
 import type { Request } from 'express';
 import { extractBearer } from '@api/_utils/auth/secret-compare';
 import { Public } from '@api/_utils/decorators/public.decorator';
-import { ConcursosRoomsService } from './concursos-rooms.service';
+import { ConcursosPersistenceService } from './concursos-persistence.service';
 import {
   ConcursosDeviceRecoveryDto,
   ConcursosRecoveryDecisionDto,
@@ -45,7 +45,7 @@ import {
 @Public()
 @Controller('concursos/rooms')
 export class ConcursosController {
-  constructor(private readonly rooms: ConcursosRoomsService) {}
+  constructor(private readonly rooms: ConcursosPersistenceService) {}
 
   @Post()
   @Header('Cache-Control', 'no-store')
@@ -57,7 +57,7 @@ export class ConcursosController {
   create(
     @Req() req: Request,
     @Body() body: CreateConcursosRoomDto,
-  ): ConcursosRoomDto {
+  ): Promise<ConcursosRoomDto> {
     return this.rooms.create(
       extractBearer(req),
       req.ip ?? 'unknown',
@@ -76,7 +76,7 @@ export class ConcursosController {
     @Param('code') code: string,
     @Body() body: JoinConcursosRoomDto,
     @Req() req: Request,
-  ): ConcursosRoomDto {
+  ): Promise<ConcursosRoomDto> {
     return this.rooms.join(code, extractBearer(req), body.nickname);
   }
 
@@ -121,7 +121,10 @@ export class ConcursosController {
   @Header('Cache-Control', 'no-store')
   @ApiOperation({ summary: 'Close a lobby as its host' })
   @ApiResponse({ status: 200, type: ConcursosRoomDto })
-  close(@Param('code') code: string, @Req() req: Request): ConcursosRoomDto {
+  close(
+    @Param('code') code: string,
+    @Req() req: Request,
+  ): Promise<ConcursosRoomDto> {
     return this.rooms.close(code, extractBearer(req));
   }
 
@@ -129,7 +132,10 @@ export class ConcursosController {
   @Header('Cache-Control', 'no-store')
   @ApiOperation({ summary: 'Leave your own lobby seat' })
   @ApiResponse({ status: 200, type: ConcursosRoomDto })
-  leave(@Param('code') code: string, @Req() req: Request): ConcursosRoomDto {
+  leave(
+    @Param('code') code: string,
+    @Req() req: Request,
+  ): Promise<ConcursosRoomDto> {
     return this.rooms.leave(code, extractBearer(req));
   }
   @Post(':code/configuration')

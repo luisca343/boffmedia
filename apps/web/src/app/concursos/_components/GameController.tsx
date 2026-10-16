@@ -104,9 +104,15 @@ export function GameController({
   const ownAnswer = game?.own?.answer;
   const locked = ownAnswer !== undefined;
   const paused = game?.paused ?? false;
-  const unavailable = busy || !connected;
+  const unavailable =
+    busy || !connected || room.storageStatus === "unavailable";
   return (
     <section className="grid gap-4">
+      {room.storageStatus === "unavailable" && (
+        <p role="alert" className="border border-bad p-3 text-bad">
+          {t("storageUnavailable")}
+        </p>
+      )}
       {error && (
         <p role="alert" className="border border-bad p-3 text-bad">
           {error}
@@ -151,7 +157,11 @@ export function GameController({
                 ? "hostDisconnected"
                 : game.pauseReason === "players_disconnected"
                   ? "playersDisconnected"
-                  : "hostPaused",
+                  : game.pauseReason === "api_restarted"
+                    ? "apiRestarted"
+                    : game.pauseReason === "storage_unavailable"
+                      ? "storagePaused"
+                      : "hostPaused",
             )}
           </p>
           {game.resumeAt !== undefined ? (

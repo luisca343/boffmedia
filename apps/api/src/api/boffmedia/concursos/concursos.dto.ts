@@ -220,9 +220,20 @@ export class ConcursosGameDto {
   @ApiProperty() paused!: boolean;
   @ApiProperty() controlRevision!: number;
   @ApiPropertyOptional({
-    enum: ['manual', 'host_disconnected', 'players_disconnected'],
+    enum: [
+      'manual',
+      'host_disconnected',
+      'players_disconnected',
+      'api_restarted',
+      'storage_unavailable',
+    ],
   })
-  pauseReason?: 'manual' | 'host_disconnected' | 'players_disconnected';
+  pauseReason?:
+    | 'manual'
+    | 'host_disconnected'
+    | 'players_disconnected'
+    | 'api_restarted'
+    | 'storage_unavailable';
   @ApiProperty() selectionRevision!: number;
   @ApiPropertyOptional() selectionSkipAt?: number;
   @ApiPropertyOptional() selectionRemainingMs?: number;
@@ -288,6 +299,8 @@ export class ConcursosRecoveryDecisionDto extends ConcursosRecoveryIdDto {
   @ApiProperty() @IsBoolean() approve!: boolean;
 }
 export class ConcursosRoomDto {
+  @ApiProperty({ enum: ['ready', 'unavailable'] })
+  storageStatus!: 'ready' | 'unavailable';
   @ApiPropertyOptional({ type: [ConcursosDeviceRecoveryDto] })
   pendingRecoveries?: ConcursosDeviceRecoveryDto[];
   @ApiProperty() hostConnected!: boolean;

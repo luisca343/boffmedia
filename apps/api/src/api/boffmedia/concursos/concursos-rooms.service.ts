@@ -7,6 +7,7 @@ import {
   HttpStatus,
   UnauthorizedException,
 } from '@nestjs/common';
+import type { ConcursosRoomSnapshotV1 } from './concursos-room-snapshot-v1';
 import { Subject } from 'rxjs';
 import { createHash, randomInt, randomUUID } from 'node:crypto';
 import { ApiErrorCode, userError } from '@/common/errors/user-error';
@@ -78,6 +79,248 @@ type Room = {
 export class ConcursosRoomsService {
   readonly changed = new Subject<string>();
 
+  /** Durable facade owns all transitions; passive views never advance gameplay. */
+  durable = false;
+  private passive = false;
+  passiveCall<T>(call: () => T): T {
+    const previous = this.passive;
+    this.passive = true;
+    try {
+      return call();
+    } finally {
+      this.passive = previous;
+    }
+  }
+  codes() {
+    return [...this.rooms.keys()];
+  }
+  hostCode(token: string | null) {
+    return this.hosts.get(this.actor(token));
+  }
+  metadata(code: string) {
+    const r = this.rooms.get(code)!;
+    return {
+      code,
+      hostHash: r.hostHash,
+      status: (r.closedAt !== undefined
+        ? 'closed'
+        : r.game
+          ? 'playing'
+          : 'lobby') as 'closed' | 'playing' | 'lobby',
+      expiresAt: new Date(
+        Math.min(
+          r.createdAt + ROOM_LIFETIME_MS,
+          (r.hostLostAt ?? r.hostSeenAt) +
+            r.recoverySettings.hostRetentionMinutes * 60000,
+        ),
+      ),
+      deletedAt: r.closedAt === undefined ? null : new Date(r.closedAt),
+    };
+  }
+  snapshot(code: string, now = Date.now()): ConcursosRoomSnapshotV1 {
+    const r = this.rooms.get(code)!;
+    return structuredClone({
+      version: 1,
+      createdAtMs: r.createdAt,
+      checkpointAtMs: now,
+      hostSeenAtMs: r.hostSeenAt,
+      hostLostAtMs: r.hostLostAt ?? null,
+      config: {
+        mode: r.mode,
+        pacing: r.pacing,
+        resultSeconds: r.resultSeconds,
+        recovery: { ...r.recoverySettings, version: 1 },
+      },
+      members: [...r.members].map(([capabilityHash, m]) => ({
+        id: m.id,
+        capabilityHash,
+        nickname: m.nickname,
+        groupId: (m.groupId ?? null) as 'team-1' | 'team-2' | null,
+        seenAtMs: m.seenAt,
+        lostAtMs: m.lostAt ?? null,
+      })),
+      revokedCapabilityHashes: [...r.revoked],
+      recoveries: [...r.recoveries.values()].map((q) => ({
+        id: q.id,
+        applicantHash: q.actor,
+        memberId: q.memberId,
+        nickname: q.nickname,
+        verificationCode: q.verificationCode,
+        status: q.status,
+        createdAtMs: q.createdAt,
+        expiresAtMs: q.expiresAt,
+        terminalAtMs: q.terminalAt ?? null,
+      })),
+      game: r.game?.snapshot() ?? null,
+      appliedOperations: [],
+    });
+  }
+  load(
+    code: string,
+    hostHash: string,
+    s: ConcursosRoomSnapshotV1,
+    closedAt?: number,
+  ) {
+    const r: Room = {
+      code,
+      hostHash,
+      mode: s.config.mode,
+      pacing: s.config.pacing,
+      resultSeconds: s.config.resultSeconds,
+      recoverySettings: structuredClone(s.config.recovery),
+      createdAt: s.createdAtMs,
+      hostSeenAt: s.hostSeenAtMs,
+      hostLostAt: s.hostLostAtMs ?? undefined,
+      hostSockets: new Set(),
+      hostSocketSeen: true,
+      closedAt,
+      members: new Map(
+        s.members.map((m) => [
+          m.capabilityHash,
+          {
+            id: m.id,
+            nickname: m.nickname,
+            groupId: m.groupId ?? undefined,
+            seenAt: m.seenAtMs,
+            lostAt: m.lostAtMs ?? undefined,
+            sockets: new Set<symbol>(),
+            socketSeen: true,
+          },
+        ]),
+      ),
+      recoveries: new Map(
+        s.recoveries.map((q) => [
+          q.applicantHash,
+          {
+            id: q.id,
+            actor: q.applicantHash,
+            memberId: q.memberId,
+            nickname: q.nickname,
+            verificationCode: q.verificationCode,
+            status: q.status,
+            createdAt: q.createdAtMs,
+            expiresAt: q.expiresAtMs,
+            terminalAt: q.terminalAtMs ?? undefined,
+            seenAt: 0,
+            sockets: new Set<symbol>(),
+          },
+        ]),
+      ),
+      revoked: new Set(s.revokedCapabilityHashes),
+      recoveryWindows: new Map(),
+      game: s.game
+        ? ConcursosGame.restore(
+            s.game,
+            s.config.mode,
+            s.config.pacing,
+            s.config.resultSeconds,
+            structuredClone(s.config.recovery),
+          )
+        : undefined,
+    };
+    this.rooms.set(code, r);
+    if (closedAt === undefined) this.hosts.set(hostHash, code);
+  }
+  /** Fork exactly one room; ephemeral presence is copied, never shared with a candidate. */
+  fork(code?: string) {
+    const copy = new ConcursosRoomsService();
+    copy.durable = true;
+    for (const [key, value] of this.hosts) copy.hosts.set(key, value);
+    for (const [key, value] of this.createWindows)
+      copy.createWindows.set(key, { ...value });
+    // Creation only inspects existing identities/capacity; it never mutates these rooms.
+    if (!code) for (const [key, room] of this.rooms) copy.rooms.set(key, room);
+    if (code && this.rooms.has(code)) {
+      const r = this.rooms.get(code)!;
+      copy.load(code, r.hostHash, this.snapshot(code), r.closedAt);
+      copy.copyPresence(code, this, false);
+      copy.rooms.get(code)!.recoveryWindows = structuredClone(
+        r.recoveryWindows,
+      );
+    }
+    return copy;
+  }
+  private copyPresence(
+    code: string,
+    source: ConcursosRoomsService,
+    latest: boolean,
+  ) {
+    const from = source.rooms.get(code),
+      to = this.rooms.get(code);
+    if (!from || !to) return;
+    const transfer = (
+      a: Member | DeviceRecovery,
+      b: Member | DeviceRecovery,
+    ) => {
+      b.sockets = new Set(a.sockets);
+      if (!latest || a.seenAt >= b.seenAt) {
+        b.seenAt = a.seenAt;
+        if ('socketSeen' in a && 'socketSeen' in b) {
+          b.socketSeen = a.socketSeen;
+          b.lostAt = a.lostAt;
+        }
+      }
+    };
+    to.hostSockets = new Set(from.hostSockets);
+    if (!latest || from.hostSeenAt >= to.hostSeenAt) {
+      to.hostSeenAt = from.hostSeenAt;
+      to.hostLostAt = from.hostLostAt;
+      to.hostSocketSeen = from.hostSocketSeen;
+    }
+    for (const [key, m] of to.members) {
+      const prior = from.members.get(key) ?? from.recoveries.get(key);
+      if (prior) transfer(prior, m);
+    }
+    for (const [key, q] of to.recoveries) {
+      const prior = from.recoveries.get(key);
+      if (prior) transfer(prior, q);
+    }
+  }
+  adopt(code: string, candidate: ConcursosRoomsService) {
+    candidate.copyPresence(code, this, true);
+    const r = candidate.rooms.get(code)!;
+    this.rooms.set(code, r);
+    if (r.closedAt === undefined) this.hosts.set(r.hostHash, code);
+    else if (this.hosts.get(r.hostHash) === code) this.hosts.delete(r.hostHash);
+    // Concurrent room commits must not roll back the global creation rate window.
+    for (const [key, value] of this.createWindows)
+      if (Date.now() >= value.until) this.createWindows.delete(key);
+    for (const [key, value] of candidate.createWindows) {
+      const current = this.createWindows.get(key);
+      if (
+        Date.now() < value.until &&
+        (!current ||
+          value.until > current.until ||
+          (value.until === current.until && value.count > current.count))
+      )
+        this.createWindows.set(key, { ...value });
+    }
+    this.changed.next(code);
+  }
+  expire(code: string, at: number) {
+    this.rooms.get(code)!.closedAt ??= at;
+  }
+  maintain(code: string, now: number) {
+    this.sweep(now, code);
+  }
+  forget(code: string) {
+    const r = this.rooms.get(code);
+    this.rooms.delete(code);
+    if (r && this.hosts.get(r.hostHash) === code) this.hosts.delete(r.hostHash);
+  }
+  freeze(
+    code: string,
+    at: number,
+    reason: 'api_restarted' | 'storage_unavailable',
+    disconnected = false,
+  ) {
+    const r = this.rooms.get(code)!;
+    r.game?.freeze(at, reason);
+    if (disconnected) {
+      r.hostLostAt ??= r.hostSeenAt;
+      for (const m of r.members.values()) m.lostAt = Date.now();
+    }
+  }
   private publish(snapshot: ConcursosRoomDto): ConcursosRoomDto {
     this.changed.next(snapshot.code);
     return snapshot;
@@ -99,8 +342,9 @@ export class ConcursosRoomsService {
     return createHash('sha256').update(token).digest('hex');
   }
 
-  private sweep(now: number): void {
+  private sweep(now: number, onlyCode?: string): void {
     for (const [code, room] of this.rooms) {
+      if (onlyCode && onlyCode !== code) continue;
       if (room.closedAt === undefined && room.hostSocketSeen) {
         // Native host sends an application heartbeat every second. Explicit socket
         // close starts grace immediately; silence uses last confirmed activity.
@@ -143,6 +387,7 @@ export class ConcursosRoomsService {
       }
       if (
         room.closedAt !== undefined &&
+        !this.durable &&
         now - room.closedAt >= CLOSED_RETENTION_MS
       ) {
         this.rooms.delete(code);
@@ -183,6 +428,7 @@ export class ConcursosRoomsService {
     );
   }
   private syncGame(room: Room, now = Date.now()) {
+    if (this.passive) return;
     const absent = new Map<string, number>();
     for (const member of room.members.values())
       if (member.lostAt !== undefined) absent.set(member.id, member.lostAt);
@@ -200,9 +446,22 @@ export class ConcursosRoomsService {
   }
 
   private get(code: string): Room {
-    this.sweep(Date.now());
+    if (!this.durable) this.sweep(Date.now());
     const room = this.rooms.get(code);
-    if (!room)
+    // A heartbeat cannot renew an expired room while SQL is unavailable and
+    // its durable close is pending. Check the existing lease before touching it.
+    const expired =
+      room &&
+      this.durable &&
+      this.passive &&
+      room.closedAt === undefined &&
+      Date.now() >=
+        Math.min(
+          room.createdAt + ROOM_LIFETIME_MS,
+          (room.hostLostAt ?? room.hostSeenAt) +
+            room.recoverySettings.hostRetentionMinutes * 60000,
+        );
+    if (!room || expired)
       throw new NotFoundException(
         userError(ApiErrorCode.CONCURSOS_NOT_FOUND, 'room not found'),
       );
@@ -215,8 +474,11 @@ export class ConcursosRoomsService {
     member?: Member,
   ): ConcursosRoomDto {
     const game =
-      room.closedAt === undefined ? room.game?.view(member?.id) : undefined;
+      room.closedAt === undefined
+        ? room.game?.view(member?.id, !this.durable)
+        : undefined;
     return {
+      storageStatus: 'ready',
       ...(role === 'host' && {
         pendingRecoveries:
           room.closedAt === undefined
@@ -265,7 +527,7 @@ export class ConcursosRoomsService {
     const profile = recoverySettings(settings);
     const actor = this.actor(token);
     const now = Date.now();
-    this.sweep(now);
+    if (!this.durable) this.sweep(now);
     const previous = this.hosts.get(actor);
     if (previous) {
       const room = this.rooms.get(previous);
@@ -368,7 +630,7 @@ export class ConcursosRoomsService {
 
   restoreHost(token: string | null): ConcursosRoomDto {
     const actor = this.actor(token);
-    this.sweep(Date.now());
+    if (!this.durable) this.sweep(Date.now());
     const code = this.hosts.get(actor);
     if (!code)
       throw new NotFoundException(
@@ -408,6 +670,11 @@ export class ConcursosRoomsService {
         userError(ApiErrorCode.CONCURSOS_ACCESS, 'host required'),
       );
     room.closedAt ??= Date.now();
+    for (const request of room.recoveries.values())
+      if (request.status === 'pending') {
+        request.status = 'closed';
+        request.terminalAt = room.closedAt;
+      }
     return this.publish(this.view(room, 'host'));
   }
 
@@ -491,7 +758,11 @@ export class ConcursosRoomsService {
         userError(ApiErrorCode.CONCURSOS_ACCESS, 'not a room observer'),
       );
     if (touch) request.seenAt = Date.now();
-    if (room.closedAt !== undefined && request.status === 'pending') {
+    if (
+      !this.passive &&
+      room.closedAt !== undefined &&
+      request.status === 'pending'
+    ) {
       request.status = 'closed';
       request.terminalAt = Date.now();
     }

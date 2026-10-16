@@ -9,6 +9,9 @@ import {
   copyFile,
 } from 'node:fs/promises';
 import path from 'node:path';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { CONCURSOS_STORE } from '@repositories/concursos.repository';
+import { ConcursosMemoryStore } from '@/_testing/concursos-memory-store';
 import { ConcursosModule } from './concursos.module';
 
 /** Generates this new domain's models from its Nest DTOs without booting database,
@@ -17,7 +20,12 @@ import { ConcursosModule } from './concursos.module';
 async function main() {
   const module = await Test.createTestingModule({
     imports: [ConcursosModule],
-  }).compile();
+  })
+    .overrideProvider(DRIZZLE)
+    .useValue({})
+    .overrideProvider(CONCURSOS_STORE)
+    .useValue(new ConcursosMemoryStore())
+    .compile();
   const app = module.createNestApplication();
   const document = SwaggerModule.createDocument(
     app,

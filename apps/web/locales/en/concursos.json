@@ -79,6 +79,9 @@
       "cancelled": "You cancelled the request.",
       "superseded": "Another request was approved for that player.",
       "closed": "The room is closed."
-    }
+    },
+    "storageUnavailable": "The room cannot be saved. Actions are blocked while saving becomes available again.",
+    "apiRestarted": "The room was recovered after the server restarted. The host must resume.",
+    "storagePaused": "The game paused because saving was unavailable. The host must resume once saving is available again."
   }
 }

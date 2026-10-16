@@ -8,6 +8,7 @@ import type { ConcursosGameDto } from './ConcursosGameDto';
 import type { ConcursosMemberDto } from './ConcursosMemberDto';
 import type { ConcursosRecoverySettingsDto } from './ConcursosRecoverySettingsDto';
 export type ConcursosRoomDto = {
+    storageStatus: ConcursosRoomDto.storageStatus;
     pendingRecoveries?: Array<ConcursosDeviceRecoveryDto>;
     hostConnected: boolean;
     recoverySettings: ConcursosRecoverySettingsDto;
@@ -24,6 +25,10 @@ export type ConcursosRoomDto = {
     memberId?: string;
 };
 export namespace ConcursosRoomDto {
+    export enum storageStatus {
+        READY = 'ready',
+        UNAVAILABLE = 'unavailable',
+    }
     export enum pacing {
         AUTOMATIC = 'automatic',
         DIRECTED = 'directed',

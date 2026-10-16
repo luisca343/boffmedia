@@ -1,3 +1,4 @@
+import type { CategoryGameSnapshotV1 } from './concursos-room-snapshot-v1';
 import { ConcursosRecoverySettingsDto } from './concursos.dto';
 import { ConflictException, ForbiddenException } from '@nestjs/common';
 import { ApiErrorCode, userError } from '@/common/errors/user-error';
@@ -59,6 +60,116 @@ export class ConcursosGame {
         entity.captainRevision = 0;
         entity.temporaryCaptain = false;
       }
+  }
+  /** Internal durable state. Never send this document to a participant. */
+  snapshot(): CategoryGameSnapshotV1 {
+    return structuredClone({
+      stage: this.stage,
+      roundId: this.roundId,
+      entities: this.entities.map((e) => ({
+        ...e,
+        captainId: e.captainId ?? null,
+        captainRevision: e.captainRevision ?? 0,
+        temporaryCaptain: e.temporaryCaptain ?? false,
+      })),
+      questions: this.questions.map((q) => ({
+        ...q,
+        choices: [...q.choices] as [string, string, string, string],
+        correctIndex: q.correctIndex as 0 | 1 | 2 | 3,
+      })),
+      selectorIndex: this.selector,
+      usedQuestionIds: [...this.used],
+      currentQuestionId: this.current?.id ?? null,
+      answers: [...this.answers].map(([entityId, choice]) => ({
+        entityId,
+        choice: choice as 0 | 1 | 2 | 3,
+      })),
+      proposals: [...this.proposals].map(([memberId, choice]) => ({
+        memberId,
+        choice: choice as 0 | 1 | 2 | 3,
+      })),
+      captainSeats: [...this.captainSeats].map(([entityId, seatIndex]) => ({
+        entityId,
+        seatIndex,
+      })),
+      selectionRevision: this.selectionRevision,
+      controlRevision: this.controlRevision,
+      lastControl: this.lastControl
+        ? {
+            ...this.lastControl,
+            action: this.lastControl.action as 'pause' | 'resume',
+          }
+        : null,
+      clock: {
+        deadlineAtMs: this.deadlineAt ?? null,
+        advanceAtMs: this.advanceAt ?? null,
+        pausedAtMs: this.pausedAt ?? null,
+        resumeAtMs: this.resumeAt ?? null,
+        pauseReason: this.pauseReason ?? null,
+        selectionNotBeforeMs: this.selectionNotBefore,
+        selectionWaitAtMs: this.selectionWaitAt ?? null,
+        selectionSkipAtMs: this.selectionSkipAt ?? null,
+      },
+    });
+  }
+  static restore(
+    s: CategoryGameSnapshotV1,
+    mode: 'individual' | 'teams',
+    pacing: 'automatic' | 'directed',
+    seconds: number,
+    recovery: ConcursosRecoverySettingsDto,
+  ) {
+    const entities = s.entities.map((e) => ({
+      ...e,
+      memberIds: [...e.memberIds],
+      captainId: e.captainId ?? undefined,
+    }));
+    const game = new ConcursosGame(
+      entities,
+      structuredClone(s.questions),
+      mode,
+      pacing,
+      seconds,
+      recovery,
+    );
+    // Construction initializes normal captains. Restore exceptional roles afterwards.
+    entities.forEach((e, i) =>
+      Object.assign(e, s.entities[i], {
+        captainId: s.entities[i].captainId ?? undefined,
+      }),
+    );
+    game.stage = s.stage;
+    game.roundId = s.roundId;
+    game.selector = s.selectorIndex;
+    game.used = new Set(s.usedQuestionIds);
+    game.current = game.questions.find((q) => q.id === s.currentQuestionId);
+    game.answers = new Map(s.answers.map((a) => [a.entityId, a.choice]));
+    game.proposals = new Map(s.proposals.map((a) => [a.memberId, a.choice]));
+    game.captainSeats.clear();
+    s.captainSeats.forEach((c) =>
+      game.captainSeats.set(c.entityId, c.seatIndex),
+    );
+    game.selectionRevision = s.selectionRevision;
+    game.controlRevision = s.controlRevision;
+    game.lastControl = s.lastControl ?? undefined;
+    game.deadlineAt = s.clock.deadlineAtMs ?? undefined;
+    game.advanceAt = s.clock.advanceAtMs ?? undefined;
+    game.pausedAt = s.clock.pausedAtMs ?? undefined;
+    game.resumeAt = s.clock.resumeAtMs ?? undefined;
+    game.pauseReason = s.clock.pauseReason ?? undefined;
+    game.selectionNotBefore = s.clock.selectionNotBeforeMs;
+    game.selectionWaitAt = s.clock.selectionWaitAtMs ?? undefined;
+    game.selectionSkipAt = s.clock.selectionSkipAtMs ?? undefined;
+    return game;
+  }
+  /** Freeze without ticking/scoring. A restart or failed write cannot consume time. */
+  freeze(at: number, reason: 'api_restarted' | 'storage_unavailable') {
+    if (this.stage === 'finished') return;
+    this.pausedAt ??= at;
+    this.resumeAt = undefined;
+    this.pauseReason = reason;
+    this.controlRevision++;
+    this.lastControl = undefined;
   }
   /** Room presence is authoritative. Apply the earliest automatic pause before
    * advancing timers; a delayed sweep must not reveal a paused question. */
@@ -369,8 +480,8 @@ export class ConcursosGame {
       if (this.answers.size === this.entities.length) this.close();
     }
   }
-  view(memberId?: string): ConcursosGameDto {
-    this.tick();
+  view(memberId?: string, advance = true): ConcursosGameDto {
+    if (advance) this.tick();
     const available = this.available();
     const ownEntity = this.entities.find((e) =>
       e.memberIds.includes(memberId ?? ''),

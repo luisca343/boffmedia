@@ -47,6 +47,7 @@ export const ApiErrorCode = {
   CONCURSOS_NOT_FOUND: 'CONCURSOS_NOT_FOUND',
   CONCURSOS_RECOVERY: 'CONCURSOS_RECOVERY',
   CONCURSOS_REVOKED: 'CONCURSOS_REVOKED',
+  CONCURSOS_STORAGE: 'CONCURSOS_STORAGE',
   DATA_EXPORT_EXPIRED: 'DATA_EXPORT_EXPIRED',
   DATA_EXPORT_NOT_READY: 'DATA_EXPORT_NOT_READY',
   DATA_EXPORT_TOO_SOON: 'DATA_EXPORT_TOO_SOON',
@@ -150,6 +151,8 @@ export const API_ERROR_FALLBACK_ES: Record<ApiErrorCode, string> = {
     'No se puede recuperar ese jugador. Comprueba el código y el apodo o crea otra solicitud.',
   CONCURSOS_REVOKED:
     'Este acceso se ha sustituido por otro móvil. Ya no puedes controlar ese jugador.',
+  CONCURSOS_STORAGE:
+    'No se puede guardar la sala. La partida permanece pausada hasta recuperar el guardado y reanudar.',
   DATA_EXPORT_EXPIRED:
     'Esta copia de tus datos ha caducado y se ha borrado. Puedes volver a pedirla.',
   DATA_EXPORT_NOT_READY:

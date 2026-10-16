@@ -34,6 +34,8 @@ export namespace ConcursosGameDto {
         MANUAL = 'manual',
         HOST_DISCONNECTED = 'host_disconnected',
         PLAYERS_DISCONNECTED = 'players_disconnected',
+        API_RESTARTED = 'api_restarted',
+        STORAGE_UNAVAILABLE = 'storage_unavailable',
     }
     export enum pacing {
         AUTOMATIC = 'automatic',

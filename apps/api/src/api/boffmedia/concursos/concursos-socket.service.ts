@@ -13,7 +13,7 @@ import type { Duplex } from 'node:stream';
 import type { Subscription } from 'rxjs';
 import { WebSocket, WebSocketServer } from 'ws';
 import { ApiErrorCode, userError } from '@/common/errors/user-error';
-import { ConcursosRoomsService } from './concursos-rooms.service';
+import { ConcursosPersistenceService } from './concursos-persistence.service';
 import {
   ConcursosSocketRequestDto,
   ConcursosSocketResponseDto,
@@ -58,7 +58,7 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
   private subscription?: Subscription;
   constructor(
     private readonly adapter: HttpAdapterHost,
-    private readonly rooms: ConcursosRoomsService,
+    private readonly rooms: ConcursosPersistenceService,
   ) {}
 
   private readonly upgrade = (
@@ -198,32 +198,40 @@ export class ConcursosSocketService implements OnModuleInit, OnModuleDestroy {
     });
     switch (frame.operation) {
       case 'configuration':
-        return { data: this.rooms.configure(code, token, body) };
+        return {
+          data: await this.rooms.configure(code, token, body, frame.id),
+        };
       case 'group':
-        return { data: this.rooms.group(code, token, body.entityId) };
+        return {
+          data: await this.rooms.group(code, token, body.entityId, frame.id),
+        };
       case 'start':
-        return { data: this.rooms.startGame(code, token, body) };
+        return {
+          data: await this.rooms.startGame(code, token, body, frame.id),
+        };
       case 'action':
-        return { data: this.rooms.action(code, token, body) };
+        return { data: await this.rooms.action(code, token, body, frame.id) };
       case 'leave':
-        return { data: this.rooms.leave(code, token) };
+        return { data: await this.rooms.leave(code, token, frame.id) };
       case 'close':
-        return { data: this.rooms.close(code, token) };
+        return { data: await this.rooms.close(code, token, frame.id) };
       case 'recovery-decision':
         return {
-          data: this.rooms.decideDeviceRecovery(
+          data: await this.rooms.decideDeviceRecovery(
             code,
             token,
             body.requestId,
             body.approve,
+            frame.id,
           ),
         };
       case 'recovery-cancel':
         return {
-          recovery: this.rooms.cancelDeviceRecovery(
+          recovery: await this.rooms.cancelDeviceRecovery(
             code,
             token,
             body.requestId,
+            frame.id,
           ),
         };
       default:

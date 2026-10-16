@@ -53,6 +53,7 @@
     "CONCURSOS_GAME": "Esta acción ya no está disponible. Comprueba el turno y el estado de la partida.",
     "CONCURSOS_FULL": "La sala está completa.",
     "CONCURSOS_REVOKED": "Este acceso se ha sustituido por otro móvil. Ya no puedes controlar ese jugador.",
-    "CONCURSOS_RECOVERY": "No se puede recuperar ese jugador. Comprueba el código y el apodo o crea otra solicitud."
+    "CONCURSOS_RECOVERY": "No se puede recuperar ese jugador. Comprueba el código y el apodo o crea otra solicitud.",
+    "CONCURSOS_STORAGE": "No se puede guardar la sala. La partida permanece pausada hasta recuperar el guardado y reanudar."
   }
 }

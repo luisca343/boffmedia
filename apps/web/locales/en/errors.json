@@ -53,6 +53,7 @@
     "CONCURSOS_GAME": "This action is no longer available. Check the turn and game state.",
     "CONCURSOS_FULL": "The room is full.",
     "CONCURSOS_REVOKED": "This access was replaced by another phone. You can no longer control that player.",
-    "CONCURSOS_RECOVERY": "That player cannot be recovered. Check the room code and nickname or create another request."
+    "CONCURSOS_RECOVERY": "That player cannot be recovered. Check the room code and nickname or create another request.",
+    "CONCURSOS_STORAGE": "The room cannot be saved. The game stays paused until saving recovers and the host resumes."
   }
 }

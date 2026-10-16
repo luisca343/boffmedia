@@ -5,6 +5,9 @@ import request from 'supertest';
 import { JwtAuthGuard } from '@api/auth/jwt-auth.guard';
 import { ClientsGuard } from '@api/_utils/guards/clients.guard';
 import { ResponseInterceptor } from '@api/_utils/interceptors/response.interceptor';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { CONCURSOS_STORE } from '@repositories/concursos.repository';
+import { ConcursosMemoryStore } from '@/_testing/concursos-memory-store';
 import { ConcursosModule } from './concursos.module';
 const capability = (n: number) => 'Bearer ' + n.toString(16).padStart(48, '0');
 describe('Concursos anonymous HTTP contract', () => {
@@ -12,7 +15,12 @@ describe('Concursos anonymous HTTP contract', () => {
   beforeAll(async () => {
     const module = await Test.createTestingModule({
       imports: [ConcursosModule],
-    }).compile();
+    })
+      .overrideProvider(DRIZZLE)
+      .useValue({})
+      .overrideProvider(CONCURSOS_STORE)
+      .useValue(new ConcursosMemoryStore())
+      .compile();
     app = module.createNestApplication();
     app.useLogger(false);
     const reflector = app.get(Reflector);

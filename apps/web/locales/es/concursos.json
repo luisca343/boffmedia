@@ -79,6 +79,9 @@
       "cancelled": "Has cancelado la solicitud.",
       "superseded": "Se aprobó otra solicitud para ese jugador.",
       "closed": "La sala se ha cerrado."
-    }
+    },
+    "storageUnavailable": "No se puede guardar la sala. Las acciones están bloqueadas mientras se recupera el guardado.",
+    "apiRestarted": "La sala se ha recuperado tras reiniciar el servidor. El anfitrión debe reanudar.",
+    "storagePaused": "La partida se pausó por un problema de guardado. El anfitrión debe reanudar cuando vuelva a estar disponible."
   }
 }

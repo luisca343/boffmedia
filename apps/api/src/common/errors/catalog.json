@@ -304,6 +304,10 @@
     "CONCURSOS_RECOVERY": {
       "es": "No se puede recuperar ese jugador. Comprueba el código y el apodo o crea otra solicitud.",
       "where": "api/boffmedia/concursos/concursos-rooms.service.ts"
+    },
+    "CONCURSOS_STORAGE": {
+      "es": "No se puede guardar la sala. La partida permanece pausada hasta recuperar el guardado y reanudar.",
+      "where": "api/boffmedia/concursos/concursos-persistence.service.ts"
     }
   }
 }

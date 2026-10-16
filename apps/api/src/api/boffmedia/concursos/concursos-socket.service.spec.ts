@@ -3,8 +3,11 @@ import type { INestApplication } from '@nestjs/common';
 import type { AddressInfo } from 'node:net';
 import { Server as SocketIoServer } from 'socket.io';
 import { WebSocket } from 'ws';
+import { DRIZZLE } from '@api/_utils/drizzle/drizzle.module';
+import { CONCURSOS_STORE } from '@repositories/concursos.repository';
+import { ConcursosMemoryStore } from '@/_testing/concursos-memory-store';
 import { ConcursosModule } from './concursos.module';
-import { ConcursosRoomsService } from './concursos-rooms.service';
+import { ConcursosPersistenceService } from './concursos-persistence.service';
 import type {
   ConcursosRoomDto,
   ConcursosSocketResponseDto,
@@ -30,18 +33,23 @@ const snapshot = (peer: Peer) =>
 
 describe('Concursos real WebSocket transport', () => {
   let app: INestApplication;
-  let rooms: ConcursosRoomsService;
+  let rooms: ConcursosPersistenceService;
   let url: string;
   let io: SocketIoServer;
   let peers: Peer[];
   beforeEach(async () => {
     const module = await Test.createTestingModule({
       imports: [ConcursosModule],
-    }).compile();
+    })
+      .overrideProvider(DRIZZLE)
+      .useValue({})
+      .overrideProvider(CONCURSOS_STORE)
+      .useValue(new ConcursosMemoryStore())
+      .compile();
     app = module.createNestApplication();
     app.useLogger(false);
     await app.listen(0, '127.0.0.1');
-    rooms = app.get(ConcursosRoomsService);
+    rooms = app.get(ConcursosPersistenceService);
     const port = (app.getHttpServer().address() as AddressInfo).port;
     url = `ws://127.0.0.1:${port}/concursos/socket`;
     // Exercise coexistence with Engine.IO upgrade listeners on the same port.
@@ -104,9 +112,9 @@ describe('Concursos real WebSocket transport', () => {
   };
 
   it('streams private recovery status, transfers on host approval and closes every revoked socket', async () => {
-    const { code } = rooms.create(token(1), 'qa');
-    rooms.join(code, token(2), 'A');
-    rooms.join(code, token(3), 'B');
+    const { code } = await rooms.create(token(1), 'qa');
+    await rooms.join(code, token(2), 'A');
+    await rooms.join(code, token(3), 'B');
     const host = await connect(code, token(1));
     const old = await connect(code, token(2));
     const overlap = await connect(code, token(2));
@@ -115,7 +123,12 @@ describe('Concursos real WebSocket transport', () => {
     await command(old, 'action', { action: 'choose', questionId: 'q' });
     await command(old, 'action', { action: 'answer', roundId: 1, choice: 1 });
     const before = snapshot(old)!;
-    const request = rooms.requestDeviceRecovery(code, token(8), 'A', 'qa');
+    const request = await rooms.requestDeviceRecovery(
+      code,
+      token(8),
+      'A',
+      'qa',
+    );
     const applicant = await connect(code, token(8));
     expect(snapshot(applicant)).toBeUndefined();
     expect(
@@ -174,10 +187,10 @@ describe('Concursos real WebSocket transport', () => {
     expect(snapshot(other)?.pendingRecoveries).toBeUndefined();
   });
   it('acknowledges cancellation privately and pushes host denial without admitting an applicant', async () => {
-    const { code } = rooms.create(token(1), 'qa');
-    rooms.join(code, token(2), 'A');
+    const { code } = await rooms.create(token(1), 'qa');
+    await rooms.join(code, token(2), 'A');
     const host = await connect(code, token(1));
-    const first = rooms.requestDeviceRecovery(code, token(8), 'A', 'qa');
+    const first = await rooms.requestDeviceRecovery(code, token(8), 'A', 'qa');
     const applicant = await connect(code, token(8));
     const cancelled = await command(applicant, 'recovery-cancel', {
       requestId: first.id,
@@ -187,7 +200,7 @@ describe('Concursos real WebSocket transport', () => {
       recovery: { status: 'cancelled' },
     });
     expect(cancelled.data).toBeUndefined();
-    const second = rooms.requestDeviceRecovery(code, token(9), 'A', 'qa');
+    const second = await rooms.requestDeviceRecovery(code, token(9), 'A', 'qa');
     const denied = await connect(code, token(9));
     await command(host, 'recovery-decision', {
       requestId: second.id,
@@ -200,11 +213,11 @@ describe('Concursos real WebSocket transport', () => {
     expect(rooms.read(code, token(2)).role).toBe('player');
   });
   it('pushes joins/configuration without polling and acknowledges leaving before disconnecting', async () => {
-    const { code } = rooms.create(token(1), 'qa');
+    const { code } = await rooms.create(token(1), 'qa');
     const host = await connect(code, token(1));
     await command(host, 'configuration', { pacing: 'directed' });
     const start = Date.now();
-    rooms.join(code, token(2), 'Lucía');
+    await rooms.join(code, token(2), 'Lucía');
     await until(() =>
       snapshot(host)?.members.length === 1 ? true : undefined,
     );
@@ -220,8 +233,8 @@ describe('Concursos real WebSocket transport', () => {
     );
   });
   it('rejects unknown capabilities, forged host commands and invalid nested command fields', async () => {
-    const { code } = rooms.create(token(1), 'qa');
-    rooms.join(code, token(2), 'Ana');
+    const { code } = await rooms.create(token(1), 'qa');
+    await rooms.join(code, token(2), 'Ana');
     expect(
       (await connect(code, token(3), false)).frames.find(
         (f) => f.type === 'error',
@@ -257,9 +270,9 @@ describe('Concursos real WebSocket transport', () => {
   ] as const)(
     'pauses and resumes the initial round-zero board in %s/%s',
     async (mode, pacing) => {
-      const { code } = rooms.create(token(1), 'qa');
-      rooms.join(code, token(2), 'A');
-      rooms.join(code, token(3), 'B');
+      const { code } = await rooms.create(token(1), 'qa');
+      await rooms.join(code, token(2), 'A');
+      await rooms.join(code, token(3), 'B');
       const host = await connect(code, token(1));
       const a = await connect(code, token(2));
       const b = await connect(code, token(3));
@@ -351,8 +364,8 @@ describe('Concursos real WebSocket transport', () => {
     10000,
   );
   it('keeps proposals private on every pushed frame and reconnects with the same identity', async () => {
-    const { code } = rooms.create(token(1), 'qa');
-    for (let n = 2; n <= 5; n++) rooms.join(code, token(n), `P${n}`);
+    const { code } = await rooms.create(token(1), 'qa');
+    for (let n = 2; n <= 5; n++) await rooms.join(code, token(n), `P${n}`);
     const host = await connect(code, token(1));
     await command(host, 'configuration', { pacing: 'directed' });
     await command(host, 'configuration', { mode: 'teams' });
@@ -391,9 +404,9 @@ describe('Concursos real WebSocket transport', () => {
     expect(snapshot(restored)?.game?.own?.proposals).toHaveLength(1);
   });
   it('pushes individual answers/results immediately and rejects stale answers after advancing', async () => {
-    const { code } = rooms.create(token(1), 'qa');
-    rooms.join(code, token(2), 'Ana');
-    rooms.join(code, token(3), 'Luis');
+    const { code } = await rooms.create(token(1), 'qa');
+    await rooms.join(code, token(2), 'Ana');
+    await rooms.join(code, token(3), 'Luis');
     const host = await connect(code, token(1));
     await command(host, 'configuration', { pacing: 'directed' });
     const a = await connect(code, token(2));
@@ -419,9 +432,9 @@ describe('Concursos real WebSocket transport', () => {
     expect(snapshot(a)?.entities.every((e) => !e.captainId)).toBe(true);
   });
   it('closes by server deadline without any client read, and pushes host closure to all guests', async () => {
-    const { code } = rooms.create(token(1), 'qa');
-    rooms.join(code, token(2), 'A');
-    rooms.join(code, token(3), 'B');
+    const { code } = await rooms.create(token(1), 'qa');
+    await rooms.join(code, token(2), 'A');
+    await rooms.join(code, token(3), 'B');
     const host = await connect(code, token(1));
     await command(host, 'configuration', { pacing: 'directed' });
     const a = await connect(code, token(2));
@@ -437,9 +450,9 @@ describe('Concursos real WebSocket transport', () => {
     await until(() => (snapshot(b)?.status === 'closed' ? true : undefined));
   });
   it('pushes automatic result countdown and advancement without host continuation and preserves it on reconnect', async () => {
-    const { code } = rooms.create(token(1), 'qa');
-    rooms.join(code, token(2), 'A');
-    rooms.join(code, token(3), 'B');
+    const { code } = await rooms.create(token(1), 'qa');
+    await rooms.join(code, token(2), 'A');
+    await rooms.join(code, token(3), 'B');
     const host = await connect(code, token(1));
     const a = await connect(code, token(2));
     const b = await connect(code, token(3));
@@ -472,9 +485,9 @@ describe('Concursos real WebSocket transport', () => {
     expect(snapshot(b)?.game?.advanceAt).toBeUndefined();
   });
   it('pushes masked pause, rejects player controls, restores the countdown and keeps private answers', async () => {
-    const { code } = rooms.create(token(1), 'qa');
-    rooms.join(code, token(2), 'A');
-    rooms.join(code, token(3), 'B');
+    const { code } = await rooms.create(token(1), 'qa');
+    await rooms.join(code, token(2), 'A');
+    await rooms.join(code, token(3), 'B');
     const host = await connect(code, token(1));
     const a = await connect(code, token(2));
     const b = await connect(code, token(3));
@@ -529,9 +542,9 @@ describe('Concursos real WebSocket transport', () => {
     ).toBe(409);
   }, 10000);
   it('automatically pauses on an actual host socket loss and waits for explicit resume after host reconnect', async () => {
-    const { code } = rooms.create(token(1), 'qa');
-    rooms.join(code, token(2), 'A');
-    rooms.join(code, token(3), 'B');
+    const { code } = await rooms.create(token(1), 'qa');
+    await rooms.join(code, token(2), 'A');
+    await rooms.join(code, token(3), 'B');
     const host = await connect(code, token(1));
     const a = await connect(code, token(2));
     const b = await connect(code, token(3));
